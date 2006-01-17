@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "typing_command.h"
+#include "SelectionController.h"
 
 #include "insert_text_command.h"
 #include "insert_line_break_command.h"
@@ -66,7 +67,7 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())->deleteKeyPressed();
   } else {
-    SelectionController selection = frame->selection();
+    Selection selection = frame->selection().selection();
     if (selection.isCaret() &&
         VisiblePosition(selection.start(), selection.affinity())
             .previous()
@@ -93,7 +94,7 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->forwardDeleteKeyPressed();
   } else {
-    SelectionController selection = frame->selection();
+    Selection selection = frame->selection().selection();
     if (selection.isCaret() && isEndOfDocument(VisiblePosition(
                                    selection.start(), selection.affinity()))) {
       // do nothing for a delete key at the start of an editable element.
@@ -326,7 +327,7 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent() {
 }
 
 void TypingCommand::deleteKeyPressed() {
-  SelectionController selectionToDelete;
+  Selection selectionToDelete;
 
   switch (endingSelection().state()) {
     case khtml::Selection::RANGE:
@@ -345,8 +346,7 @@ void TypingCommand::deleteKeyPressed() {
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete =
-            SelectionController(start, end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete = Selection(start, end, SEL_DEFAULT_AFFINITY);
       break;
     }
     case khtml::Selection::NONE:
@@ -362,7 +362,7 @@ void TypingCommand::deleteKeyPressed() {
 }
 
 void TypingCommand::forwardDeleteKeyPressed() {
-  SelectionController selectionToDelete;
+  Selection selectionToDelete;
 
   switch (endingSelection().state()) {
     case khtml::Selection::RANGE:
@@ -381,8 +381,7 @@ void TypingCommand::forwardDeleteKeyPressed() {
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete =
-            SelectionController(start, end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete = Selection(start, end, SEL_DEFAULT_AFFINITY);
       break;
     }
     case khtml::Selection::NONE:

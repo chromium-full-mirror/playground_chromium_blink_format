@@ -31,15 +31,13 @@
 
 #include "xml/dom_position.h"
 #include "DocumentImpl.h"
+#include "visible_position.h"
 #include "css/css_valueimpl.h"
 #include "css/css_computedstyle.h"
 
 #include <kxmlcore/Assertions.h>
 
-using DOM::DocumentImpl;
-using DOM::Position;
-using DOM::CSSMutableStyleDeclarationImpl;
-using DOM::CSSComputedStyleDeclarationImpl;
+namespace WebCore {
 
 #define IF_IMPL_NULL_RETURN_ARG(arg) \
   do {                               \
@@ -54,8 +52,6 @@ using DOM::CSSComputedStyleDeclarationImpl;
       return;               \
     }                       \
   } while (0)
-
-namespace khtml {
 
 EditCommandPtr::EditCommandPtr() {}
 
@@ -101,17 +97,17 @@ DocumentImpl* const EditCommandPtr::document() const {
   return get()->document();
 }
 
-SelectionController EditCommandPtr::startingSelection() const {
-  IF_IMPL_NULL_RETURN_ARG(SelectionController());
+Selection EditCommandPtr::startingSelection() const {
+  IF_IMPL_NULL_RETURN_ARG(Selection());
   return get()->startingSelection();
 }
 
-SelectionController EditCommandPtr::endingSelection() const {
-  IF_IMPL_NULL_RETURN_ARG(SelectionController());
+Selection EditCommandPtr::endingSelection() const {
+  IF_IMPL_NULL_RETURN_ARG(Selection());
   return get()->endingSelection();
 }
 
-void EditCommandPtr::setStartingSelection(const SelectionController& s) const {
+void EditCommandPtr::setStartingSelection(const Selection& s) const {
   IF_IMPL_NULL_RETURN;
   get()->setStartingSelection(s);
 }
@@ -124,11 +120,11 @@ void EditCommandPtr::setStartingSelection(const VisiblePosition& p) const {
 void EditCommandPtr::setStartingSelection(const Position& p,
                                           EAffinity affinity) const {
   IF_IMPL_NULL_RETURN;
-  SelectionController s = SelectionController(p, affinity);
+  Selection s = Selection(p, affinity);
   get()->setStartingSelection(s);
 }
 
-void EditCommandPtr::setEndingSelection(const SelectionController& s) const {
+void EditCommandPtr::setEndingSelection(const Selection& s) const {
   IF_IMPL_NULL_RETURN;
   get()->setEndingSelection(s);
 }
@@ -141,7 +137,7 @@ void EditCommandPtr::setEndingSelection(const VisiblePosition& p) const {
 void EditCommandPtr::setEndingSelection(const Position& p,
                                         EAffinity affinity) const {
   IF_IMPL_NULL_RETURN;
-  SelectionController s = SelectionController(p, affinity);
+  Selection s = Selection(p, affinity);
   get()->setEndingSelection(s);
 }
 
@@ -175,7 +171,7 @@ EditCommand::EditCommand(DocumentImpl* document)
     : m_document(document), m_state(NotApplied), m_parent(0) {
   ASSERT(m_document);
   ASSERT(m_document->frame());
-  m_startingSelection = m_document->frame()->selection();
+  m_startingSelection = m_document->frame()->selection().selection();
   m_endingSelection = m_startingSelection;
 }
 
@@ -253,36 +249,36 @@ EditAction EditCommand::editingAction() const {
   return EditActionUnspecified;
 }
 
-void EditCommand::setStartingSelection(const SelectionController& s) {
+void EditCommand::setStartingSelection(const Selection& s) {
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
 void EditCommand::setStartingSelection(const VisiblePosition& p) {
-  SelectionController s = SelectionController(p);
+  Selection s = Selection(p.deepEquivalent(), p.affinity());
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
 void EditCommand::setStartingSelection(const Position& p, EAffinity affinity) {
-  SelectionController s = SelectionController(p, affinity);
+  Selection s = Selection(p, affinity);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
-void EditCommand::setEndingSelection(const SelectionController& s) {
+void EditCommand::setEndingSelection(const Selection& s) {
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }
 
 void EditCommand::setEndingSelection(const VisiblePosition& p) {
-  SelectionController s = SelectionController(p);
+  Selection s = Selection(p.deepEquivalent(), p.affinity());
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }
 
 void EditCommand::setEndingSelection(const Position& p, EAffinity affinity) {
-  SelectionController s = SelectionController(p, affinity);
+  Selection s = Selection(p, affinity);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }
@@ -329,4 +325,4 @@ void EditCommand::updateLayout() const {
   document()->updateLayoutIgnorePendingStylesheets();
 }
 
-}  // namespace khtml
+}  // namespace WebCore

@@ -28,14 +28,13 @@
 
 #include "Shared.h"
 #include "edit_actions.h"
-#include "SelectionController.h"
+#include "Selection.h"
 
-namespace DOM {
+namespace WebCore {
+
 class CSSMutableStyleDeclarationImpl;
 class DocumentImpl;
-}
-
-namespace khtml {
+class VisiblePosition;
 
 //------------------------------------------------------------------------------------------
 // EditCommand
@@ -63,20 +62,16 @@ class EditCommand : public Shared<EditCommand> {
 
   virtual DOM::DocumentImpl* const document() const { return m_document.get(); }
 
-  SelectionController startingSelection() const { return m_startingSelection; }
-  SelectionController endingSelection() const { return m_endingSelection; }
-
-  void setEndingSelectionNeedsLayout(bool flag = true) {
-    m_endingSelection.setNeedsLayout(flag);
-  }
+  Selection startingSelection() const { return m_startingSelection; }
+  Selection endingSelection() const { return m_endingSelection; }
 
   ECommandState state() const { return m_state; }
   void setState(ECommandState state) { m_state = state; }
 
-  void setStartingSelection(const SelectionController& s);
+  void setStartingSelection(const Selection& s);
   void setStartingSelection(const VisiblePosition& p);
   void setStartingSelection(const DOM::Position& p, EAffinity affinity);
-  void setEndingSelection(const SelectionController& s);
+  void setEndingSelection(const Selection& s);
   void setEndingSelection(const VisiblePosition& p);
   void setEndingSelection(const DOM::Position& p, EAffinity affinity);
 
@@ -98,8 +93,8 @@ class EditCommand : public Shared<EditCommand> {
 
   RefPtr<DOM::DocumentImpl> m_document;
   ECommandState m_state;
-  SelectionController m_startingSelection;
-  SelectionController m_endingSelection;
+  Selection m_startingSelection;
+  Selection m_endingSelection;
   RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_typingStyle;
   EditCommand* m_parent;
 };
@@ -119,13 +114,13 @@ class EditCommandPtr : public RefPtr<EditCommand> {
 
   DOM::DocumentImpl* const document() const;
 
-  SelectionController startingSelection() const;
-  SelectionController endingSelection() const;
+  Selection startingSelection() const;
+  Selection endingSelection() const;
 
-  void setStartingSelection(const SelectionController& s) const;
+  void setStartingSelection(const Selection& s) const;
   void setStartingSelection(const VisiblePosition& p) const;
   void setStartingSelection(const DOM::Position& p, EAffinity affinity) const;
-  void setEndingSelection(const SelectionController& s) const;
+  void setEndingSelection(const Selection& s) const;
   void setEndingSelection(const VisiblePosition& p) const;
   void setEndingSelection(const DOM::Position& p, EAffinity affinity) const;
 
@@ -142,6 +137,6 @@ class EditCommandPtr : public RefPtr<EditCommand> {
   static EditCommandPtr& emptyCommand();
 };
 
-}  // namespace khtml
+}  // namespace WebCore
 
 #endif  // __edit_command_h__

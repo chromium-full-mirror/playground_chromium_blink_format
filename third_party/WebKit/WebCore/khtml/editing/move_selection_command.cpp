@@ -52,7 +52,7 @@ MoveSelectionCommand::MoveSelectionCommand(DocumentImpl* document,
 MoveSelectionCommand::~MoveSelectionCommand() {}
 
 void MoveSelectionCommand::doApply() {
-  SelectionController selection = endingSelection();
+  Selection selection = endingSelection();
   ASSERT(selection.isRange());
 
   Position pos = m_position;

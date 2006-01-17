@@ -1111,7 +1111,6 @@ class Frame : public ObjectContents {
 
   FramePrivate* d;
   friend class FramePrivate;
-  friend class khtml::SelectionController;
 
  public:
   friend class MacFrame;

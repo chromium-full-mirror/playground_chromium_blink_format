@@ -41,6 +41,7 @@ class Selection {
 #define SEL_DEFAULT_AFFINITY DOWNSTREAM
 
   Selection();
+  Selection(const Position&, EAffinity);
   Selection(const Position&, const Position&, EAffinity);
 
   EState state() const { return m_state; }
@@ -48,12 +49,8 @@ class Selection {
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }
   EAffinity affinity() const { return m_affinity; }
 
-  void clear();
-
   void setBase(Position base) { m_base = base; }
   void setExtent(Position extent) { m_extent = extent; }
-  void setStart(Position start) { m_start = start; }
-  void setEnd(Position end) { m_end = end; }
   Position base() const { return m_base; }
   Position extent() const { return m_extent; }
   Position start() const { return m_start; }
@@ -66,14 +63,15 @@ class Selection {
 
   bool isBaseFirst() const { return m_baseIsFirst; }
 
+  bool expandUsingGranularity(ETextGranularity granularity);
+  ETextGranularity granularity() const { return m_granularity; }
+
   PassRefPtr<RangeImpl> toRange() const;
 
   void debugPosition() const;
 
  private:
-  friend class SelectionController;  // for access to validate; should be fixed
-                                     // later
-  void validate(ETextGranularity granularity = CHARACTER);
+  void validate();
   void adjustForEditableContent();
 
   Position m_base;    // base position for the selection
@@ -82,6 +80,7 @@ class Selection {
   Position m_end;     // end position for the selection
 
   EAffinity m_affinity;  // the upstream/downstream affinity of the caret
+  ETextGranularity m_granularity;  // granularity of start/end selection
 
   // these are cached, can be recalculated by validate()
   EState m_state;      // the state of the selection
@@ -90,7 +89,7 @@ class Selection {
 
 inline bool operator==(const Selection& a, const Selection& b) {
   return a.start() == b.start() && a.end() == b.end() &&
-         a.affinity() == b.affinity();
+         a.affinity() == b.affinity() && a.granularity() == b.granularity();
 }
 
 inline bool operator!=(const Selection& a, const Selection& b) {

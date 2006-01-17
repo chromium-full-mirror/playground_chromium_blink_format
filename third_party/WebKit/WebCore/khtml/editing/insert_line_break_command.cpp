@@ -86,7 +86,7 @@ void InsertLineBreakCommand::insertNodeBeforePosition(NodeImpl* node,
 
 void InsertLineBreakCommand::doApply() {
   deleteSelection();
-  SelectionController selection = endingSelection();
+  Selection selection = endingSelection();
 
   ElementImpl* breakNode = createBreakElement(document());
   NodeImpl* nodeToInsert = breakNode;
@@ -119,7 +119,7 @@ void InsertLineBreakCommand::doApply() {
                                next->enclosingBlockFlowElement();
       insertNodeAfterPosition(nodeToInsert, pos);
       if (hasTrailingBR)
-        setEndingSelection(SelectionController(Position(next, 0), DOWNSTREAM));
+        setEndingSelection(Selection(Position(next, 0), DOWNSTREAM));
       else if (!document()->inStrictMode()) {
         // Insert an "extra" BR at the end of the block.
         ElementImpl* extraBreakNode = createBreakElement(document());
@@ -175,7 +175,7 @@ void InsertLineBreakCommand::doApply() {
       document()->frame()->typingStyle();
 
   if (typingStyle && typingStyle->length() > 0) {
-    SelectionController selectionBeforeStyle = endingSelection();
+    Selection selectionBeforeStyle = endingSelection();
     applyStyle(typingStyle, Position(nodeToInsert, 0),
                Position(nodeToInsert, maxDeepOffset(nodeToInsert)));
     setEndingSelection(selectionBeforeStyle);
