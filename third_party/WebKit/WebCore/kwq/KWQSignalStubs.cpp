@@ -20,9 +20,9 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 #include "config.h"
 #import "FrameView.h"
 #import "loader.h"
@@ -35,21 +35,16 @@ using khtml::DocLoader;
 using khtml::Loader;
 using khtml::Tokenizer;
 
-void KHTMLView::cleared()
-{
+void KHTMLView::cleared() {}
+
+void Loader::requestDone(DocLoader* l, CachedObject* o) {
+  kwq->_requestDone.call(l, o);
 }
 
-void Loader::requestDone(DocLoader *l, CachedObject *o)
-{
-    kwq->_requestDone.call(l, o);
+void Loader::requestFailed(DocLoader* l, CachedObject* o) {
+  kwq->_requestFailed.call(l, o);
 }
 
-void Loader::requestFailed(DocLoader *l, CachedObject *o)
-{
-    kwq->_requestFailed.call(l, o);
-}
-
-void Loader::requestStarted(DocLoader *l, CachedObject *o)
-{
-    kwq->_requestStarted.call(l, o);
+void Loader::requestStarted(DocLoader* l, CachedObject* o) {
+  kwq->_requestStarted.call(l, o);
 }

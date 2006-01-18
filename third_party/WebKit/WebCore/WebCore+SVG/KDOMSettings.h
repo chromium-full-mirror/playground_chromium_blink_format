@@ -146,7 +146,6 @@ class KDOMSettings {
   int mediumFontSize() const;
 
   const QString& encoding() const;
-  static const QString& availableFamilies();
 
   // Color settings
   const QColor& textColor() const;
