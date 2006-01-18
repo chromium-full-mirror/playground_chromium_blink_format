@@ -1,7 +1,7 @@
 // -*- mode: c++; c-basic-offset: 4 -*-
 /*
  * This file is part of the KDE libraries
- * Copyright (C) 2005 Apple Computer, Inc.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -96,7 +96,7 @@ struct GenericHashTraits {
 template <typename T>
 struct HashTraits : GenericHashTraits<T> {};
 
-// may not be appropriate for all uses since it would disallow 0 and -1 as keys
+// may not be appropriate for all uses since it disallows 0 and -1 as keys
 template <>
 struct HashTraits<int> : GenericHashTraits<int> {
   static TraitType deletedValue() { return -1; }
@@ -107,7 +107,7 @@ struct HashTraits<P*> : GenericHashTraits<P*> {
   typedef P* TraitType;
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static TraitType emptyValue() { return reinterpret_cast<P*>(0); }
+  static TraitType emptyValue() { return 0; }
   static TraitType deletedValue() { return reinterpret_cast<P*>(-1); }
 };
 
