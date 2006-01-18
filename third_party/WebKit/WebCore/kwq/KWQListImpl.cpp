@@ -28,7 +28,9 @@
 
 #include <cstddef>
 #include <algorithm>
+#if __APPLE__
 #include <CoreFoundation/CFArray.h>
+#endif
 #include <kxmlcore/Assertions.h>
 
 class KWQListNode {
@@ -132,7 +134,9 @@ void KWQListImpl::sort(int (*compareFunc)(void* a, void* b, void* data),
     return;
   }
 
-  // insertion sort for most common sizes
+// insertion sort for most common sizes
+#if __APPLE__
+  // FIXME: LAME LAME LAME! Write a real sort that doesn't depend on CF.
   const uint cutoff = 32;
   if (nodeCount <= cutoff) {
     // Straight out of Sedgewick's Algorithms in C++.
@@ -189,6 +193,7 @@ void KWQListImpl::sort(int (*compareFunc)(void* a, void* b, void* data),
   }
 
   CFRelease(array);
+#endif
 }
 
 void* KWQListImpl::at(uint n) {
