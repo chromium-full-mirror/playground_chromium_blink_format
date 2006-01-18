@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 2004-2005 Allan Sandfeld Jensen (kde@carewolf.com)
- * Copyright (C) 2005 Apple Computer, Inc.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,49 +22,44 @@
  */
 
 #include "config.h"
-#include "css/cssstyleselector.h"
-#include "rendering/render_style.h"
-#include "css/css_stylesheetimpl.h"
-#include "css/css_ruleimpl.h"
-#include "css/css_valueimpl.h"
-#include "css/csshelper.h"
-#include "rendering/render_object.h"
-#include "html/html_documentimpl.h"
-#include "html/html_elementimpl.h"
-#include "xml/dom_elementimpl.h"
-#include "dom/css_rule.h"
-#include "dom/css_value.h"
-#include "khtml_factory.h"
+#include "cssstyleselector.h"
 
+#include "CachedImage.h"
+#include "Frame.h"
+#include "FrameView.h"
+#include "UserAgentStyleSheets.h"
+#include "css_rule.h"
+#include "css_ruleimpl.h"
+#include "css_stylesheetimpl.h"
+#include "css_value.h"
+#include "css_valueimpl.h"
+#include "csshelper.h"
 #include "cssproperties.h"
 #include "cssvalues.h"
-
-#include "khtmllayout.h"
-#include "khtml_settings.h"
+#include "dom_elementimpl.h"
+#include "font.h"
 #include "helper.h"
+#include "html_documentimpl.h"
+#include "html_elementimpl.h"
+#include "khtml_factory.h"
+#include "khtml_settings.h"
+#include "khtmllayout.h"
 #include "loader.h"
-#include "CachedImage.h"
-
-#include "rendering/font.h"
+#include "render_object.h"
+#include "render_style.h"
 #include "render_theme.h"
-
-#include "FrameView.h"
-#include "Frame.h"
-
-#include <kstandarddirs.h>
-#include <qfile.h>
-#include <qvaluelist.h>
-#include <qstring.h>
+#include <assert.h>
 #include <kdebug.h>
 #include <kurl.h>
+#include <kxmlcore/HashMap.h>
 #include <qdatetime.h>
-#include <assert.h>
 #include <qpaintdevicemetrics.h>
+#include <qstring.h>
+#include <qvaluelist.h>
 #include <stdlib.h>
 
-#include <kxmlcore/HashMap.h>
+namespace WebCore {
 
-using namespace DOM;
 using namespace HTMLNames;
 
 // #define STYLE_SHARING_STATS 1
@@ -172,34 +167,28 @@ using namespace HTMLNames;
     return;                                                 \
   }
 
-namespace khtml {
-
 class CSSRuleSet {
  public:
   CSSRuleSet();
   ~CSSRuleSet();
 
-  typedef HashMap<DOM::DOMStringImpl*,
-                  CSSRuleDataList*,
-                  PointerHash<DOM::DOMStringImpl*>>
+  typedef HashMap<DOMStringImpl*, CSSRuleDataList*, PointerHash<DOMStringImpl*>>
       AtomRuleMap;
 
-  void addRulesFromSheet(DOM::CSSStyleSheetImpl* sheet,
-                         const DOM::DOMString& medium = "screen");
+  void addRulesFromSheet(CSSStyleSheetImpl* sheet,
+                         const DOMString& medium = "screen");
 
-  void addRule(DOM::CSSStyleRuleImpl* rule, DOM::CSSSelector* sel);
-  void addToRuleSet(DOM::DOMStringImpl* key,
+  void addRule(CSSStyleRuleImpl* rule, CSSSelector* sel);
+  void addToRuleSet(DOMStringImpl* key,
                     AtomRuleMap& map,
-                    DOM::CSSStyleRuleImpl* rule,
-                    DOM::CSSSelector* sel);
+                    CSSStyleRuleImpl* rule,
+                    CSSSelector* sel);
 
-  CSSRuleDataList* getIDRules(DOM::DOMStringImpl* key) {
-    return m_idRules.get(key);
-  }
-  CSSRuleDataList* getClassRules(DOM::DOMStringImpl* key) {
+  CSSRuleDataList* getIDRules(DOMStringImpl* key) { return m_idRules.get(key); }
+  CSSRuleDataList* getClassRules(DOMStringImpl* key) {
     return m_classRules.get(key);
   }
-  CSSRuleDataList* getTagRules(DOM::DOMStringImpl* key) {
+  CSSRuleDataList* getTagRules(DOMStringImpl* key) {
     return m_tagRules.get(key);
   }
   CSSRuleDataList* getUniversalRules() { return m_universalRules; }
@@ -306,42 +295,54 @@ CSSStyleSelector::~CSSStyleSelector() {
   delete m_userSheet;
 }
 
-static CSSStyleSheetImpl* parseUASheet(const char* sheetName) {
-  QFile f(locate("data", sheetName));
-  f.open(IO_ReadOnly);
+static CSSStyleSheetImpl* parseUASheet(const unsigned short* characters,
+                                       int size) {
+  // FIXME: Hack to point a DOMString at existing characters.
+  // Good to avoid copying the array just to parse, but we should find a more
+  // elegant way.
+  DOMStringImpl stringImpl("");
+  stringImpl.ref();
+  QChar* saveString = stringImpl.s;
+  stringImpl.s =
+      reinterpret_cast<QChar*>(const_cast<unsigned short*>(characters));
+  stringImpl.l = size;
 
-  QCString file(f.size() + 1);
-  int readbytes = f.readBlock(file.data(), f.size());
-  f.close();
-  if (readbytes >= 0)
-    file[readbytes] = '\0';
+  CSSStyleSheetImpl* const parent = 0;
+  CSSStyleSheetImpl* sheet = new CSSStyleSheetImpl(parent);
+  sheet->parseString(&stringImpl);
 
-  CSSStyleSheetImpl* sheet = new CSSStyleSheetImpl((CSSStyleSheetImpl*)0);
-  sheet->parseString(DOMString(file.data()));
+  stringImpl.s = saveString;
+
   return sheet;
+}
+
+template <typename T>
+CSSStyleSheetImpl* parseUASheet(const T& array) {
+  return parseUASheet(array, sizeof(array) / sizeof(unsigned short));
 }
 
 void CSSStyleSelector::loadDefaultStyle() {
   if (defaultStyle)
     return;
-  defaultSheet = parseUASheet("html4.css");
 
-  // Collect only strict-mode rules.
-  defaultStyle = new CSSRuleSet();
+  defaultStyle = new CSSRuleSet;
+  defaultPrintStyle = new CSSRuleSet;
+  defaultQuirksStyle = new CSSRuleSet;
+
+  // Strict-mode rules.
+  defaultSheet = parseUASheet(html4UserAgentStyleSheet);
   defaultStyle->addRulesFromSheet(defaultSheet, "screen");
-
-  defaultPrintStyle = new CSSRuleSet();
   defaultPrintStyle->addRulesFromSheet(defaultSheet, "print");
 
 #if SVG_SUPPORT
-  svgSheet = parseUASheet("svg.css");
+  // SVG rules.
+  svgSheet = parseUASheet(svgUserAgentStyleSheet);
   defaultStyle->addRulesFromSheet(svgSheet, "screen");
   defaultPrintStyle->addRulesFromSheet(svgSheet, "print");
 #endif
 
-  // Collect only quirks-mode rules.
-  quirksSheet = parseUASheet("quirks.css");
-  defaultQuirksStyle = new CSSRuleSet();
+  // Quirks-mode rules.
+  quirksSheet = parseUASheet(quirksUserAgentStyleSheet);
   defaultQuirksStyle->addRulesFromSheet(quirksSheet, "screen");
 }
 
@@ -4636,4 +4637,4 @@ QColor CSSStyleSelector::getColorFromPrimitiveValue(
   return col;
 }
 
-}  // namespace khtml
+}  // namespace WebCore
