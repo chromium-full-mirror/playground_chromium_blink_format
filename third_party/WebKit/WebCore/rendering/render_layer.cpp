@@ -545,9 +545,11 @@ void RenderLayer::scrollToOffset(int x,
 
   RenderCanvas* canvas = renderer()->canvas();
   if (canvas) {
+#if __APPLE__
     // Update dashboard regions, scrolling may change the clip of a
     // particular region.
     canvas->view()->updateDashboardRegions();
+#endif
 
     m_object->canvas()->updateWidgetPositions();
   }
@@ -902,9 +904,11 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     setHasHorizontalScrollbar(needHorizontalBar);
     setHasVerticalScrollbar(needVerticalBar);
 
+#if __APPLE__
     // Force an update since we know the scrollbars have changed things.
     if (m_object->document()->hasDashboardRegions())
       m_object->document()->setDashboardRegionsDirty(true);
+#endif
 
     m_object->repaint();
 
@@ -941,9 +945,11 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         m_object->height() - m_object->borderTop() - m_object->borderBottom()));
   }
 
+#if __APPLE__
   // Force an update since we know the scrollbars have changed things.
   if (m_object->document()->hasDashboardRegions())
     m_object->document()->setDashboardRegionsDirty(true);
+#endif
 
   m_object->repaint();
 }

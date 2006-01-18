@@ -33,7 +33,7 @@
 
 #include "khtml_factory.h"
 #include "khtml_events.h"
-#include "khtml_ext.h"
+#include "BrowserExtension.h"
 #include "khtml_settings.h"
 #include "decoder.h"
 #include "formdata.h"
@@ -61,13 +61,13 @@ struct ChildFrame {
 
   QGuardedPtr<khtml::RenderPart> m_renderer;
   QGuardedPtr<ObjectContents> m_frame;
-  QGuardedPtr<KParts::BrowserExtension> m_extension;
+  QGuardedPtr<BrowserExtension> m_extension;
   QString m_serviceName;
   QString m_serviceType;
   QStringList m_services;
   bool m_bCompleted;
   QString m_name;
-  KParts::URLArgs m_args;
+  URLArgs m_args;
   bool m_bPreloaded;
   KURL m_workingURL;
   Type m_type;
@@ -181,7 +181,7 @@ class FramePrivate {
   QValueList<khtml::ChildFrame> m_objects;
 
   QGuardedPtr<KHTMLView> m_view;
-  KHTMLPartBrowserExtension* m_extension;
+  WebCore::BrowserExtension* m_extension;
   DOM::DocumentImpl* m_doc;
   RefPtr<khtml::Decoder> m_decoder;
   QString m_encoding;

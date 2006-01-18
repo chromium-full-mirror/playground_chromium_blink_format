@@ -34,9 +34,7 @@
 #include "text_affinity.h"
 #include <kxmlcore/HashSet.h>
 
-#if __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
-#endif
 
 class FramePrivate;
 class KWQWindowWidget;
@@ -127,36 +125,36 @@ class MacFrame : public Frame {
 
   virtual bool openURL(const KURL&);
 
-  void openURLRequest(const KURL&, const KParts::URLArgs&);
-  void submitForm(const KURL&, const KParts::URLArgs&);
+  virtual void openURLRequest(const KURL&, const WebCore::URLArgs&);
+  virtual void submitForm(const KURL&, const WebCore::URLArgs&);
 
   void scheduleHistoryNavigation(int steps);
 
   QString advanceToNextMisspelling(bool startBeforeSelection = false);
 
-  void setTitle(const DOM::DOMString&);
+  virtual void setTitle(const DOM::DOMString&);
   void setStatusBarText(const QString& status);
 
-  void urlSelected(const KURL& url,
-                   int button,
-                   int state,
-                   const KParts::URLArgs& args);
-  ObjectContents* createPart(const khtml::ChildFrame& child,
-                             const KURL& url,
-                             const QString& mimeType);
+  virtual void urlSelected(const KURL& url,
+                           int button,
+                           int state,
+                           const WebCore::URLArgs& args);
+  virtual ObjectContents* createPart(const khtml::ChildFrame& child,
+                                     const KURL& url,
+                                     const QString& mimeType);
 
-  void scheduleClose();
+  virtual void scheduleClose();
 
-  void unfocusWindow();
+  virtual void unfocusWindow();
 
   void openURLFromPageCache(KWQPageState* state);
 
-  void saveDocumentState();
-  void restoreDocumentState();
+  virtual void saveDocumentState();
+  virtual void restoreDocumentState();
 
-  void addMessageToConsole(const DOM::DOMString& message,
-                           unsigned int lineNumber,
-                           const DOM::DOMString& sourceID);
+  virtual void addMessageToConsole(const DOM::DOMString& message,
+                                   unsigned int lineNumber,
+                                   const DOM::DOMString& sourceID);
   void setDisplaysWithFocusAttributes(bool flag);
 
   NSView* nextKeyView(DOM::NodeImpl* startingPoint, KWQSelectionDirection);
@@ -172,38 +170,39 @@ class MacFrame : public Frame {
 
   static bool currentEventIsMouseDownInWidget(QWidget* candidate);
 
-  void runJavaScriptAlert(const DOM::DOMString& message);
-  bool runJavaScriptConfirm(const DOM::DOMString& message);
-  bool runJavaScriptPrompt(const DOM::DOMString& message,
-                           const DOM::DOMString& defaultValue,
-                           DOM::DOMString& result);
-  bool locationbarVisible();
-  bool menubarVisible();
-  bool personalbarVisible();
-  bool statusbarVisible();
-  bool toolbarVisible();
+  virtual void runJavaScriptAlert(const DOM::DOMString& message);
+  virtual bool runJavaScriptConfirm(const DOM::DOMString& message);
+  virtual bool runJavaScriptPrompt(const DOM::DOMString& message,
+                                   const DOM::DOMString& defaultValue,
+                                   DOM::DOMString& result);
+  virtual bool locationbarVisible();
+  virtual bool menubarVisible();
+  virtual bool personalbarVisible();
+  virtual bool statusbarVisible();
+  virtual bool toolbarVisible();
 
   bool shouldClose();
 
-  void createEmptyDocument();
+  virtual void createEmptyDocument();
+
+  virtual BrowserExtension* createBrowserExtension() {
+    return new BrowserExtensionMac(this);
+  }
 
   static WebCoreFrameBridge* bridgeForWidget(const QWidget*);
 
   QString requestedURLString() const;
-  QString incomingReferrer() const;
-  QString userAgent() const;
+  virtual QString incomingReferrer() const;
+  virtual QString userAgent() const;
 
-  QString mimeTypeForFileName(const QString&) const;
+  virtual QString mimeTypeForFileName(const QString&) const;
 
-#if __APPLE__
-  // FIXME: This ifdef can be removed when Win32 no longer needs to include
-  // MacFrame.h
   NSRect visibleSelectionRect() const;
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(DOM::NodeImpl* node,
                              NSRect* imageRect,
                              NSRect* elementRect) const;
-#endif
+
   bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
                             const IntPoint& loc) const;
 
@@ -212,8 +211,8 @@ class MacFrame : public Frame {
 
   NSWritingDirection baseWritingDirectionForSelectionStart() const;
 
-  void markMisspellingsInAdjacentWords(const khtml::VisiblePosition&);
-  void markMisspellings(const khtml::SelectionController&);
+  virtual void markMisspellingsInAdjacentWords(const khtml::VisiblePosition&);
+  virtual void markMisspellings(const khtml::SelectionController&);
 
   NSFileWrapper* fileWrapperForElement(DOM::ElementImpl*);
   NSAttributedString* attributedString(DOM::NodeImpl* startNode,
@@ -230,7 +229,7 @@ class MacFrame : public Frame {
 
   void sendFakeEventsAfterWidgetTracking(NSEvent* initiatingEvent);
 
-  bool lastEventIsMouseUp() const;
+  virtual bool lastEventIsMouseUp() const;
   void setActivationEventNumber(int num) { _activationEventNumber = num; }
 
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
@@ -248,15 +247,15 @@ class MacFrame : public Frame {
   bool sendContextMenuEvent(NSEvent*);
 
   bool passMouseDownEventToWidget(QWidget*);
-  bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
-  bool passWheelEventToChildWidget(DOM::NodeImpl*);
+  virtual bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
+  virtual bool passWheelEventToChildWidget(DOM::NodeImpl*);
 
   void redirectionTimerStartedOrStopped();
 
-  void clearRecordedFormValues();
-  void recordFormValue(const QString& name,
-                       const QString& value,
-                       DOM::HTMLFormElementImpl* element);
+  virtual void clearRecordedFormValues();
+  virtual void recordFormValue(const QString& name,
+                               const QString& value,
+                               DOM::HTMLFormElementImpl* element);
 
   NSString* searchForLabelsAboveCell(QRegExp* regExp,
                                      DOM::HTMLTableCellElementImpl* cell);
@@ -271,7 +270,7 @@ class MacFrame : public Frame {
 
   void tokenizerProcessedData();
 
-  QString overrideMediaType() const;
+  virtual QString overrideMediaType() const;
 
   NSColor* bodyBackgroundColor() const;
 
@@ -280,25 +279,26 @@ class MacFrame : public Frame {
   void didTellBridgeAboutLoad(const DOM::DOMString& URL);
   bool haveToldBridgeAboutLoad(const DOM::DOMString& URL);
 
-  KJS::Bindings::Instance* getEmbedInstanceForWidget(QWidget*);
-  KJS::Bindings::Instance* getObjectInstanceForWidget(QWidget*);
-  KJS::Bindings::Instance* getAppletInstanceForWidget(QWidget*);
+  virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(QWidget*);
+  virtual KJS::Bindings::Instance* getObjectInstanceForWidget(QWidget*);
+  virtual KJS::Bindings::Instance* getAppletInstanceForWidget(QWidget*);
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
-  void registerCommandForUndo(const khtml::EditCommandPtr&);
-  void registerCommandForRedo(const khtml::EditCommandPtr&);
-  void clearUndoRedoOperations();
-  void issueUndoCommand();
-  void issueRedoCommand();
-  void issueCutCommand();
-  void issueCopyCommand();
-  void issuePasteCommand();
-  void issuePasteAndMatchStyleCommand();
-  void issueTransposeCommand();
-  void respondToChangedSelection(const khtml::SelectionController& oldSelection,
-                                 bool closeTyping);
-  void respondToChangedContents();
+  virtual void registerCommandForUndo(const khtml::EditCommandPtr&);
+  virtual void registerCommandForRedo(const khtml::EditCommandPtr&);
+  virtual void clearUndoRedoOperations();
+  virtual void issueUndoCommand();
+  virtual void issueRedoCommand();
+  virtual void issueCutCommand();
+  virtual void issueCopyCommand();
+  virtual void issuePasteCommand();
+  virtual void issuePasteAndMatchStyleCommand();
+  virtual void issueTransposeCommand();
+  virtual void respondToChangedSelection(
+      const khtml::SelectionController& oldSelection,
+      bool closeTyping);
+  virtual void respondToChangedContents();
   virtual bool isContentEditable() const;
   virtual bool shouldChangeSelection(
       const khtml::SelectionController& oldSelection,
@@ -314,7 +314,7 @@ class MacFrame : public Frame {
   WebScriptObject* windowScriptObject();
   NPObject* windowScriptNPObject();
 
-  void partClearedInBegin();
+  virtual void partClearedInBegin();
 
   // Implementation of CSS property -khtml-user-drag == auto
   bool shouldDragAutoNode(DOM::NodeImpl*, int x, int y) const;
@@ -322,9 +322,11 @@ class MacFrame : public Frame {
   void setMarkedTextRange(const DOM::RangeImpl*,
                           NSArray* attributes,
                           NSArray* ranges);
-  DOM::RangeImpl* markedTextRange() const { return m_markedTextRange.get(); }
+  virtual DOM::RangeImpl* markedTextRange() const {
+    return m_markedTextRange.get();
+  }
 
-  bool canGoBackOrForward(int distance) const;
+  virtual bool canGoBackOrForward(int distance) const;
 
   void didFirstLayout();
 
@@ -337,7 +339,10 @@ class MacFrame : public Frame {
     return _mouseDownMayStartSelect;
   }
 
-  void handledOnloadEvents();
+  virtual void handledOnloadEvents();
+
+ protected:
+  virtual QString generateFrameName();
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
@@ -346,8 +351,6 @@ class MacFrame : public Frame {
 
   NSView* mouseDownViewIfStillGood();
 
-  QString generateFrameName();
-
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
   static NSView* documentViewForNode(DOM::NodeImpl*);
@@ -355,10 +358,7 @@ class MacFrame : public Frame {
   bool dispatchCPPEvent(const DOM::AtomicString& eventType,
                         KWQClipboard::AccessPolicy policy);
 
-#if __APPLE__
-  // FIXME: This can be removed when Win32 no longer needs to include MacFrame.h
   NSImage* imageFromRect(NSRect rect) const;
-#endif
 
   void freeClipboard();
 

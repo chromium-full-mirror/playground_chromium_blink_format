@@ -83,7 +83,9 @@ static const int computedProperties[] = {
     CSS_PROP_CLEAR,
     CSS_PROP_COLOR,
     CSS_PROP_CURSOR,
+#if __APPLE__
     CSS_PROP__KHTML_DASHBOARD_REGION,
+#endif
     CSS_PROP_DIRECTION,
     CSS_PROP_DISPLAY,
     CSS_PROP_EMPTY_CELLS,
@@ -1197,6 +1199,7 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
     case CSS_PROP_PADDING:
       // FIXME: unimplemented
       break;
+#if __APPLE__
     case CSS_PROP__KHTML_DASHBOARD_REGION: {
       QValueList<StyleDashboardRegion> regions = style->dashboardRegions();
       uint i, count = regions.count();
@@ -1228,6 +1231,7 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       }
       return new CSSPrimitiveValueImpl(firstRegion);
     }
+#endif
   }
 
   ERROR("unimplemented propertyID: %d", propertyID);

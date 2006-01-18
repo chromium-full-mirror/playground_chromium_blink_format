@@ -51,7 +51,9 @@ namespace khtml {
 class CSSStyleSelector;
 class DocLoader;
 class Tokenizer;
+#if __APPLE__
 struct DashboardRegionValue;
+#endif
 }
 
 #ifndef KHTML_NO_XBL
@@ -777,12 +779,14 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setDecoder(Decoder*);
   Decoder* decoder() const { return m_decoder.get(); }
 
+#if __APPLE__
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
   void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
   const QValueList<DashboardRegionValue>& dashboardRegions() const;
   void setDashboardRegions(const QValueList<DashboardRegionValue>& regions);
+#endif
 
   void removeAllEventListenersFromAllNodes();
 
@@ -826,9 +830,12 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   InheritedBool m_designMode;
 
+#if __APPLE__
   QValueList<DashboardRegionValue> m_dashboardRegions;
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
+#endif
+
   int m_selfOnlyRefCount;
   typedef HashMap<DOMStringImpl*,
                   HTMLInputElementImpl*,

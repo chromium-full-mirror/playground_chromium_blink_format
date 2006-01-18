@@ -772,11 +772,13 @@ CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(RectImpl* r) {
   m_type = CSSPrimitiveValue::CSS_RECT;
 }
 
+#if __APPLE__
 CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(DashboardRegionImpl* r) {
   if ((m_value.region = r))
     m_value.region->ref();
   m_type = CSSPrimitiveValue::CSS_DASHBOARD_REGION;
 }
+#endif
 
 CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(QRgb color) {
   m_value.rgbcolor = color;
@@ -807,10 +809,12 @@ void CSSPrimitiveValueImpl::cleanup() {
     case CSSPrimitiveValue::CSS_RECT:
       m_value.rect->deref();
       break;
+#if __APPLE__
     case CSSPrimitiveValue::CSS_DASHBOARD_REGION:
       if (m_value.region)
         m_value.region->deref();
       break;
+#endif
     default:
       break;
   }
@@ -1070,6 +1074,7 @@ DOMString CSSPrimitiveValueImpl::cssText() const {
       text += m_value.pair->second()->cssText();
       break;
 
+#if __APPLE__
     case CSSPrimitiveValue::CSS_DASHBOARD_REGION: {
       DashboardRegionImpl* region = getDashboardRegionValue();
       while (region) {
@@ -1090,6 +1095,7 @@ DOMString CSSPrimitiveValueImpl::cssText() const {
       }
       break;
     }
+#endif
   }
   return text;
 }

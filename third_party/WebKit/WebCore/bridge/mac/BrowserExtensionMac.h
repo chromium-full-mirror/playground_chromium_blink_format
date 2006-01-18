@@ -23,14 +23,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "KWQKPartsBrowserExtension.h"
+#include "BrowserExtension.h"
 
 class Frame;
 class MacFrame;
 
-class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
+namespace WebCore {
+
+class BrowserExtensionMac : public BrowserExtension {
  public:
-  KHTMLPartBrowserExtension(Frame*);
+  BrowserExtensionMac(Frame*);
 
   virtual void openURLRequest(const KURL&,
                               const KParts::URLArgs& args = KParts::URLArgs());
@@ -50,9 +52,9 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
   virtual int getHistoryLength();
   virtual void goBackOrForward(int distance);
 
-  bool canRunModal();
-  bool canRunModalNow();
-  void runModal();
+  virtual bool canRunModal();
+  virtual bool canRunModalNow();
+  virtual void runModal();
 
  private:
   void createNewWindow(const KURL& url,
@@ -62,3 +64,4 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
 
   MacFrame* m_frame;
 };
+}

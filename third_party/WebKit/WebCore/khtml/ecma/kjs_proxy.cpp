@@ -23,7 +23,8 @@
 
 #include "kjs_window.h"
 #include "kjs_events.h"
-#include "MacFrame.h"
+#include "NodeImpl.h"
+#include "Frame.h"
 #include <kjs/collector.h>
 
 using namespace DOM;
@@ -82,8 +83,8 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
 
-    Mac(m_frame)->addMessageToConsole(errorMessage.domString(), lineNumber,
-                                      sourceURL.domString());
+    m_frame->addMessageToConsole(errorMessage.domString(), lineNumber,
+                                 sourceURL.domString());
   }
   return QVariant();
 }
@@ -158,7 +159,7 @@ void KJSProxyImpl::initScript() {
   globalObject->put(m_script->globalExec(), "debug", new TestFunctionImp(),
                     Internal);
 
-  QString userAgent = Mac(m_frame)->userAgent();
+  QString userAgent = m_frame->userAgent();
   if (userAgent.find(QString::fromLatin1("Microsoft")) >= 0 ||
       userAgent.find(QString::fromLatin1("MSIE")) >= 0)
     m_script->setCompatMode(Interpreter::IECompat);

@@ -37,7 +37,7 @@
 
 class ObjectContents;
 
-namespace KParts {
+namespace WebCore {
 
 struct URLArgs {
   QString frameName;
@@ -94,8 +94,6 @@ struct WindowArgs {
 
 class BrowserExtension : public QObject {
  public:
-  BrowserExtension() {}
-
   virtual void openURLRequest(const KURL&, const URLArgs& args = URLArgs()) = 0;
   virtual void openURLNotify() = 0;
 
@@ -116,9 +114,16 @@ class BrowserExtension : public QObject {
   void setURLArgs(const URLArgs& args) { m_args = args; }
   URLArgs urlArgs() const { return m_args; }
 
+  virtual bool canRunModal() = 0;
+  virtual bool canRunModalNow() = 0;
+  virtual void runModal() = 0;
+
+ protected:
+  BrowserExtension(){};
+
  private:
   URLArgs m_args;
 };
-};
+}
 
 #endif

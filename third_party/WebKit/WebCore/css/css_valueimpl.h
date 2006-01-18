@@ -40,7 +40,9 @@ namespace DOM {
 
 class CSSMutableStyleDeclarationImpl;
 class CounterImpl;
+#if __APPLE__
 class DashboardRegionImpl;
+#endif
 class RectImpl;
 class PairImpl;
 class NodeImpl;
@@ -152,10 +154,12 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
   CSSPrimitiveValueImpl(const DOMString&, CSSPrimitiveValue::UnitTypes);
   CSSPrimitiveValueImpl(CounterImpl*);
   CSSPrimitiveValueImpl(RectImpl*);
+#if __APPLE__
   CSSPrimitiveValueImpl(DashboardRegionImpl*);  // FIXME: Why is dashboard
                                                 // region a primitive value?
                                                 // This makes no sense.
-  CSSPrimitiveValueImpl(unsigned color);        // RGB value
+#endif
+  CSSPrimitiveValueImpl(unsigned color);  // RGB value
   CSSPrimitiveValueImpl(PairImpl*);
 
   virtual ~CSSPrimitiveValueImpl();
@@ -214,10 +218,12 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
     return (m_type != CSSPrimitiveValue::CSS_PAIR ? 0 : m_value.pair);
   }
 
+#if __APPLE__
   DashboardRegionImpl* getDashboardRegionValue() const {
     return (m_type != CSSPrimitiveValue::CSS_DASHBOARD_REGION ? 0
                                                               : m_value.region);
   }
+#endif
 
   virtual bool isPrimitiveValue() const { return true; }
   virtual unsigned short cssValueType() const;
@@ -239,7 +245,9 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
     RectImpl* rect;
     unsigned rgbcolor;
     PairImpl* pair;
+#if __APPLE__
     DashboardRegionImpl* region;
+#endif
   } m_value;
 };
 
@@ -314,6 +322,7 @@ class PairImpl : public Shared<PairImpl> {
   RefPtr<CSSPrimitiveValueImpl> m_second;
 };
 
+#if __APPLE__
 class DashboardRegionImpl : public RectImpl {
  public:
   DashboardRegionImpl() : m_next(0), m_isCircle(0), m_isRectangle(0) {}
@@ -331,6 +340,7 @@ class DashboardRegionImpl : public RectImpl {
   unsigned int m_isCircle : 1;
   unsigned int m_isRectangle : 1;
 };
+#endif
 
 class CSSImageValueImpl : public CSSPrimitiveValueImpl,
                           public khtml::CachedObjectClient {

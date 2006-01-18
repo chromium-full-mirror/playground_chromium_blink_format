@@ -51,8 +51,7 @@
 #include "domparser.h"
 
 #include "FrameView.h"
-#include "MacFrame.h"
-#include "khtml_ext.h"
+#include "Frame.h"
 #include "dom/dom_string.h"
 #include "dom/dom_node.h"
 #include "editing/htmlediting.h"
@@ -69,10 +68,7 @@
 
 using namespace DOM;
 using namespace EventNames;
-
 using namespace khtml;
-
-using namespace KParts;
 
 namespace KJS {
 
@@ -614,14 +610,14 @@ static Frame* createNewWindow(ExecState* exec,
 static bool canShowModalDialog(const Window* window) {
   Frame* frame = window->frame();
   return frame &&
-         static_cast<KHTMLPartBrowserExtension*>(frame->browserExtension())
+         static_cast<BrowserExtension*>(frame->browserExtension())
              ->canRunModal();
 }
 
 static bool canShowModalDialogNow(const Window* window) {
   Frame* frame = window->frame();
   return frame &&
-         static_cast<KHTMLPartBrowserExtension*>(frame->browserExtension())
+         static_cast<BrowserExtension*>(frame->browserExtension())
              ->canRunModalNow();
 }
 
@@ -697,8 +693,7 @@ static JSValue* showModalDialog(ExecState* exec,
   Window* dialogWindow = Window::retrieveWindow(dialogPart);
   JSValue* returnValue = jsUndefined();
   dialogWindow->setReturnValueSlot(&returnValue);
-  static_cast<KHTMLPartBrowserExtension*>(dialogPart->browserExtension())
-      ->runModal();
+  static_cast<BrowserExtension*>(dialogPart->browserExtension())->runModal();
   dialogWindow->setReturnValueSlot(NULL);
   return returnValue;
 }
@@ -887,7 +882,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case Document:
       if (!m_frame->xmlDocImpl()) {
-        Mac(m_frame)->createEmptyDocument();
+        m_frame->createEmptyDocument();
         m_frame->begin();
         m_frame->write("<HTML><BODY>");
         m_frame->end();
@@ -1269,7 +1264,7 @@ bool Window::toBoolean(ExecState*) const {
 void Window::scheduleClose() {
   kdDebug(6070) << "Window::scheduleClose window.close() " << m_frame << endl;
   Q_ASSERT(winq);
-  Mac(m_frame)->scheduleClose();
+  m_frame->scheduleClose();
 }
 
 static bool shouldLoadAsEmptyDocument(const KURL& url) {
@@ -1333,10 +1328,9 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       targetDocument->URL().latin1(), originDocument->URL().latin1());
-  Mac(targetPart)
-      ->addMessageToConsole(
-          DOMString(message), 1,
-          DOMString());  // fixme: provide a real line number and sourceurl
+  targetPart->addMessageToConsole(
+      DOMString(message), 1,
+      DOMString());  // fixme: provide a real line number and sourceurl
 
   return false;
 }
@@ -1407,7 +1401,7 @@ bool Window::isSafeScript(ExecState* exec) const {
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       thisDocument->URL().latin1(), actDocument->URL().latin1());
-  Mac(m_frame)->addMessageToConsole(DOMString(message), 1, DOMString());
+  m_frame->addMessageToConsole(DOMString(message), 1, DOMString());
 
   return false;
 }
@@ -1537,7 +1531,7 @@ static void setWindowFeature(const QString& keyString,
 }
 
 static void parseWindowFeatures(const QString& features,
-                                KParts::WindowArgs& windowArgs) {
+                                WindowArgs& windowArgs) {
   /*
    The IE rule is: all features except for channelmode and fullscreen default to
    YES, but
@@ -1622,8 +1616,7 @@ static void parseWindowFeatures(const QString& features,
   }
 }
 
-static void constrainToVisible(const IntRect& screen,
-                               KParts::WindowArgs& windowArgs) {
+static void constrainToVisible(const IntRect& screen, WindowArgs& windowArgs) {
   windowArgs.x += screen.x();
   if (windowArgs.x < screen.x() || windowArgs.x > screen.right())
     windowArgs.x = screen.x();  // only safe choice until size is determined
@@ -1663,18 +1656,18 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::Alert:
       if (frame && frame->xmlDocImpl())
         frame->xmlDocImpl()->updateRendering();
-      Mac(frame)->runJavaScriptAlert(str);
+      frame->runJavaScriptAlert(str);
       return jsUndefined();
     case Window::Confirm:
       if (frame && frame->xmlDocImpl())
         frame->xmlDocImpl()->updateRendering();
-      return jsBoolean(Mac(frame)->runJavaScriptConfirm(str));
+      return jsBoolean(frame->runJavaScriptConfirm(str));
     case Window::Prompt: {
       if (frame && frame->xmlDocImpl())
         frame->xmlDocImpl()->updateRendering();
       DOMString message =
           args.size() >= 2 ? args[1]->toString(exec).domString() : DOMString();
-      bool ok = Mac(frame)->runJavaScriptPrompt(str, message, str2);
+      bool ok = frame->runJavaScriptPrompt(str, message, str2);
       if (ok)
         return jsString(str2);
       else
@@ -1689,7 +1682,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (frameName == "_top" || frameName == "_parent" || frameName == "_self")
         return jsUndefined();
 
-      KParts::WindowArgs windowArgs;
+      WindowArgs windowArgs;
       QString features = args[2]->isUndefinedOrNull()
                              ? QString()
                              : args[2]->toString(exec).qstring();
@@ -1706,7 +1699,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!str.isEmpty() && activePart)
         url = activePart->xmlDocImpl()->completeURL(str.qstring());
 
-      KParts::URLArgs uargs;
+      URLArgs uargs;
       uargs.frameName = frameName;
       if (uargs.frameName == "_top") {
         while (frame->parentFrame())
@@ -1924,7 +1917,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       return window->selection();
     case Window::Blur:
-      Mac(frame)->unfocusWindow();
+      frame->unfocusWindow();
       return jsUndefined();
     case Window::Close:
       /* From
@@ -2017,8 +2010,7 @@ void ScheduledAction::execute(Window* window) {
         int lineNumber = exception->get(exec, "line")->toInt32(exec);
         if (Interpreter::shouldPrintExceptions())
           printf("(timer):%s\n", message.qstring().utf8().data());
-        Mac(window->m_frame)
-            ->addMessageToConsole(message, lineNumber, DOMString());
+        window->m_frame->addMessageToConsole(message, lineNumber, DOMString());
       }
     }
   } else
@@ -2584,17 +2576,17 @@ JSValue* BarInfo::getValueProperty(ExecState* exec, int token) const {
   assert(token == Visible);
   switch (m_type) {
     case Locationbar:
-      return jsBoolean(Mac(m_frame)->locationbarVisible());
+      return jsBoolean(m_frame->locationbarVisible());
     case Menubar:
-      return jsBoolean(Mac(m_frame)->locationbarVisible());
+      return jsBoolean(m_frame->locationbarVisible());
     case Personalbar:
-      return jsBoolean(Mac(m_frame)->personalbarVisible());
+      return jsBoolean(m_frame->personalbarVisible());
     case Scrollbars:
-      return jsBoolean(Mac(m_frame)->scrollbarsVisible());
+      return jsBoolean(m_frame->scrollbarsVisible());
     case Statusbar:
-      return jsBoolean(Mac(m_frame)->statusbarVisible());
+      return jsBoolean(m_frame->statusbarVisible());
     case Toolbar:
-      return jsBoolean(Mac(m_frame)->toolbarVisible());
+      return jsBoolean(m_frame->toolbarVisible());
     default:
       return jsBoolean(false);
   }
@@ -2633,7 +2625,7 @@ bool History::getOwnPropertySlot(ExecState* exec,
 JSValue* History::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case Length: {
-      KParts::BrowserExtension* ext = m_frame->browserExtension();
+      BrowserExtension* ext = m_frame->browserExtension();
       if (!ext)
         return jsNumber(0);
 

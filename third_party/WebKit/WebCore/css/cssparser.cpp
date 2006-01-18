@@ -480,11 +480,13 @@ bool CSSParser::parseValue(int propId, bool important) {
         return parseShape(propId, important);
       break;
 
+#if __APPLE__
     case CSS_PROP__KHTML_DASHBOARD_REGION:  // <dashboard-region> |
                                             // <dashboard-region>
       if (value->unit == Value::Function || id == CSS_VAL_NONE)
         return parseDashboardRegions(propId, important);
       break;
+#endif
 
     /* Start of supported CSS properties with validation. This is needed for
      * parseShorthand to work
@@ -1852,6 +1854,7 @@ failed:
   return false;
 }
 
+#if __APPLE__
 #define DASHBOARD_REGION_NUM_PARAMETERS 6
 #define DASHBOARD_REGION_SHORT_NUM_PARAMETERS 2
 
@@ -1994,6 +1997,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 
   return valid;
 }
+#endif
 
 bool CSSParser::parseShape(int propId, bool important) {
   Value* value = valueList->current();
