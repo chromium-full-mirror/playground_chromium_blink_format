@@ -504,7 +504,7 @@ void KHTMLView::updateDashboardRegions() {
     QValueList<DashboardRegionValue> currentRegions =
         document->dashboardRegions();
     document->setDashboardRegions(newRegions);
-    m_frame->dashboardRegionsChanged();
+    Mac(m_frame)->dashboardRegionsChanged();
   }
 }
 #endif
