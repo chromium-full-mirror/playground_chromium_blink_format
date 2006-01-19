@@ -32,8 +32,9 @@
 #include "FormDataList.h"
 
 #include "cssproperties.h"
-#include "rendering/render_form.h"
-#include "rendering/render_button.h"
+#include "render_form.h"
+#include "render_button.h"
+#include "RenderTextField.h"
 #include "render_theme.h"
 #include "DocumentImpl.h"
 
@@ -294,8 +295,11 @@ int HTMLInputElementImpl::selectionStart() {
 
   switch (m_type) {
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        return static_cast<RenderTextField*>(m_render)->selectionStart();
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       return static_cast<RenderLineEdit*>(m_render)->selectionStart();
     default:
       break;
@@ -309,8 +313,11 @@ int HTMLInputElementImpl::selectionEnd() {
 
   switch (m_type) {
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        return static_cast<RenderTextField*>(m_render)->selectionEnd();
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       return static_cast<RenderLineEdit*>(m_render)->selectionEnd();
     default:
       break;
@@ -324,8 +331,11 @@ void HTMLInputElementImpl::setSelectionStart(int start) {
 
   switch (m_type) {
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        static_cast<RenderTextField*>(m_render)->setSelectionStart(start);
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       static_cast<RenderLineEdit*>(m_render)->setSelectionStart(start);
       break;
     default:
@@ -339,8 +349,11 @@ void HTMLInputElementImpl::setSelectionEnd(int end) {
 
   switch (m_type) {
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        static_cast<RenderTextField*>(m_render)->setSelectionEnd(end);
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       static_cast<RenderLineEdit*>(m_render)->setSelectionEnd(end);
       break;
     default:
@@ -357,8 +370,11 @@ void HTMLInputElementImpl::select() {
       static_cast<RenderFileButton*>(m_render)->select();
       break;
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        static_cast<RenderTextField*>(m_render)->select();
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       static_cast<RenderLineEdit*>(m_render)->select();
       break;
     case BUTTON:
@@ -380,8 +396,11 @@ void HTMLInputElementImpl::setSelectionRange(int start, int end) {
 
   switch (m_type) {
     case PASSWORD:
-    case SEARCH:
     case TEXT:
+      if (m_render->style()->appearance() == TextFieldAppearance)
+        static_cast<RenderTextField*>(m_render)->setSelectionRange(start, end);
+    // Fall through for text fields that don't specify appearance
+    case SEARCH:
       static_cast<RenderLineEdit*>(m_render)->setSelectionRange(start, end);
       break;
     default:
@@ -577,6 +596,9 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
   switch (m_type) {
     case TEXT:
     case PASSWORD:
+      if (style->appearance() == TextFieldAppearance)
+        return new (arena) RenderTextField(this);
+    // Fall through for text fields that don't specify appearance
     case SEARCH:
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
