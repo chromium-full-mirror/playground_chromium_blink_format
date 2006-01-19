@@ -41,6 +41,7 @@
 #include <kio/job.h>
 #include <kio/jobclasses.h>
 #include <kxmlcore/Assertions.h>
+#include <qptrvector.h>
 
 namespace WebCore {
 

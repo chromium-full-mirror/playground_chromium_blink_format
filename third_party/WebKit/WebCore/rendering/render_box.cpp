@@ -39,7 +39,7 @@
 #include "render_theme.h"
 
 #include "DocumentImpl.h"
-#include "html/html_elementimpl.h"
+#include "HTMLElementImpl.h"
 #include "CachedImage.h"
 
 #include "render_line.h"
@@ -47,10 +47,11 @@
 #include <FrameView.h>
 #include <kdebug.h>
 #include <assert.h>
+#include "htmlnames.h"
 
-using namespace DOM;
+namespace WebCore {
+
 using namespace HTMLNames;
-using namespace khtml;
 
 #define TABLECELLMARGIN -0x4000
 
@@ -157,7 +158,6 @@ int RenderBox::contentWidth() const {
   if (includeScrollbarSize())
     w -= m_layer->verticalScrollbarWidth();
 
-  // kdDebug( 6040 ) << "RenderBox::contentWidth(2) = " << w << endl;
   return w;
 }
 
@@ -271,8 +271,6 @@ void RenderBox::paint(PaintInfo& i, int _tx, int _ty) {
 }
 
 void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
-  // kdDebug( 6040 ) << renderName() << "::paintBoxDecorations()" << _tx << "/"
-  // << _ty << endl;
   const BackgroundLayer* bgLayer = style()->backgroundLayers();
   QColor bgColor = style()->backgroundColor();
   if (document()->isHTMLDocument() && !style()->hasBackground()) {
@@ -293,8 +291,6 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   int w = width();
   int h = height();
 
-  //    kdDebug(0) << "width = " << w <<endl;
-
   int rw, rh;
   if (canvas()->view()) {
     rw = canvas()->view()->contentsWidth();
@@ -303,8 +299,6 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
     rw = canvas()->width();
     rh = canvas()->height();
   }
-
-  //    kdDebug(0) << "rw = " << rw <<endl;
 
   int bx = _tx - marginLeft();
   int by = _ty - marginTop();
@@ -331,7 +325,6 @@ void RenderBox::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   if (!shouldPaintWithinRoot(i))
     return;
 
-  // kdDebug( 6040 ) << renderName() << "::paintDecorations()" << endl;
   if (isRoot())
     return paintRootBoxDecorations(i, _tx, _ty);
 
@@ -705,8 +698,6 @@ IntRect RenderBox::getClipRect(int tx, int ty) {
     int h = style()->clipBottom().width(m_height);
     cliph -= m_height - h;
   }
-  // kdDebug( 6040 ) << "setting
-  // clip("<<clipx<<","<<clipy<<","<<clipw<<","<<cliph<<")"<<endl;
 
   IntRect cr(clipx, clipy, clipw, cliph);
   return cr;
@@ -900,12 +891,9 @@ void RenderBox::relativePositionOffset(int& tx, int& ty) {
 }
 
 void RenderBox::calcWidth() {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << "RenderBox(" << renderName() << ")::calcWidth()" << endl;
-#endif
-  if (isPositioned()) {
+  if (isPositioned())
     calcAbsoluteHorizontal();
-  } else {
+  else {
     // The parent box is flexing us, so it has increased or decreased our width.
     // Use the width
     // from the style context.
@@ -988,13 +976,6 @@ void RenderBox::calcWidth() {
         m_marginLeft = cw - m_width - m_marginRight;
     }
   }
-
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << "RenderBox::calcWidth(): m_width=" << m_width
-                << " containingBlockWidth()=" << containingBlockWidth() << endl;
-  kdDebug(6040) << "m_marginLeft=" << m_marginLeft
-                << " m_marginRight=" << m_marginRight << endl;
-#endif
 }
 
 int RenderBox::calcWidthUsing(WidthType widthType,
@@ -1101,10 +1082,6 @@ void RenderBox::calcHorizontalMargins(const Length& ml,
 }
 
 void RenderBox::calcHeight() {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << "RenderBox::calcHeight()" << endl;
-#endif
-
   // Cell height is managed by the table and inline non-replaced elements do not
   // support a height property.
   if (isTableCell() || (isInline() && !isReplaced()))
@@ -1893,5 +1870,4 @@ int RenderBox::leftmostPosition(bool includeOverflowInterior,
                                 bool includeSelf) const {
   return includeSelf ? 0 : m_width;
 }
-
-#undef DEBUG_LAYOUT
+}

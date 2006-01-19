@@ -36,11 +36,10 @@
 #include "csshelper.h"
 #include "cssproperties.h"
 #include "cssvalues.h"
-#include "dom_elementimpl.h"
 #include "font.h"
 #include "helper.h"
 #include "html_documentimpl.h"
-#include "html_elementimpl.h"
+#include "HTMLElementImpl.h"
 #include "khtml_factory.h"
 #include "khtml_settings.h"
 #include "khtmllayout.h"
@@ -49,7 +48,6 @@
 #include "render_style.h"
 #include "render_theme.h"
 #include <assert.h>
-#include <kdebug.h>
 #include <kurl.h>
 #include <kxmlcore/HashMap.h>
 #include <qdatetime.h>
@@ -57,6 +55,7 @@
 #include <qstring.h>
 #include <qvaluelist.h>
 #include <stdlib.h>
+#include "htmlnames.h"
 
 namespace WebCore {
 
@@ -2015,8 +2014,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
         d = EDisplay(primitiveValue->getIdent() - CSS_VAL_INLINE);
 
       style->setDisplay(d);
-      // kdDebug( 6080 ) << "setting display to " << d << endl;
-
       break;
     }
 
@@ -2515,7 +2512,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
           col = getColorFromPrimitiveValue(primitiveValue);
         }
 
-        // kdDebug( 6080 ) << "applying color " << col.isValid() << endl;
         switch (id) {
           case CSS_PROP_BACKGROUND_COLOR:
             style->setBackgroundColor(col);
@@ -2556,8 +2552,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       style->setListStyleImage(
           static_cast<CSSImageValueImpl*>(primitiveValue)
               ->image(element->getDocument()->docLoader()));
-      // kdDebug( 6080 ) << "setting image in list to " << image->image() <<
-      // endl;
       break;
     }
 
@@ -2782,10 +2776,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
         }
       }
       if (id != CSS_PROP_MAX_WIDTH && primitiveValue &&
-          primitiveValue->getIdent() == CSS_VAL_AUTO) {
-        // kdDebug( 6080 ) << "found value=auto" << endl;
+          primitiveValue->getIdent() == CSS_VAL_AUTO)
         apply = true;
-      }
     case CSS_PROP_PADDING_TOP:
     case CSS_PROP_PADDING_RIGHT:
     case CSS_PROP_PADDING_BOTTOM:
@@ -3106,8 +3098,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       if (size <= 0)
         return;
 
-      // kdDebug( 6080 ) << "computed raw font size: " << size << endl;
-
       setFontSize(fontDef, size);
       if (style->setFontDef(fontDef))
         fontDirty = true;
@@ -3242,10 +3232,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       } else if (primitiveValue->getIdent() != CSS_VAL_AUTO) {
         break;
       }
-      // 	qDebug("setting clip top to %d", top.value );
-      // 	qDebug("setting clip right to %d", right.value );
-      // 	qDebug("setting clip bottom to %d", bottom.value );
-      // 	qDebug("setting clip left to %d", left.value );
       style->setClip(top, right, bottom, left);
       style->setHasClip(hasClip);
 
