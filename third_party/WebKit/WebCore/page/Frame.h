@@ -1154,6 +1154,8 @@ class Frame : public ObjectContents {
 
   bool isComplete();
 
+  void replaceContentsWithScriptResult(const KURL& url);
+
  protected:
   mutable RefPtr<DOM::NodeImpl> _elementToDraw;
   mutable bool _drawSelectionOnly;
@@ -1169,8 +1171,6 @@ class Frame : public ObjectContents {
   void emitLoadEvent();
 
   void receivedFirstData();
-
-  void replaceContentsWithScriptResult(const KURL& url);
 
   bool handleMouseMoveEventDrag(khtml::MouseMoveEvent* event);
   bool handleMouseMoveEventOver(khtml::MouseMoveEvent* event);
