@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2006 Alexander Kellett <lypanov@kde.org>
+    Copyright (C) 2006 Apple Computer, Inc.
 
     This file is part of the WebKit project
 
@@ -43,18 +44,22 @@ RenderSVGImage::RenderSVGImage(SVGImageElementImpl* impl) : RenderImage(impl) {}
 RenderSVGImage::~RenderSVGImage() {}
 
 void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
-  if (paintInfo.p->paintingDisabled())
-    return;
-
   if (paintInfo.p->paintingDisabled() ||
       (paintInfo.phase != PaintActionForeground) ||
       style()->visibility() == khtml::HIDDEN)
     return;
 
-  paintInfo.p->save();
+  KRenderingDevice* renderingDevice = QPainter::renderingDevice();
+  KRenderingDeviceContext* context = renderingDevice->currentContext();
+  bool shouldPopContext = false;
+  if (!context) {
+    // Need to push a device context on the stack if empty.
+    context = paintInfo.p->createRenderingDeviceContext();
+    renderingDevice->pushContext(context);
+    shouldPopContext = true;
+  } else
+    paintInfo.p->save();
 
-  KRenderingDeviceContext* context =
-      QPainter::renderingDevice()->currentContext();
   context->concatCTM(QMatrix().translate(parentX, parentY));
   context->concatCTM(localTransform());
   translateForAttributes();
@@ -79,7 +84,12 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (filter)
     filter->applyFilter(boundingBox);
 
-  paintInfo.p->restore();
+  // restore drawing state
+  if (shouldPopContext) {
+    renderingDevice->popContext();
+    delete context;
+  } else
+    paintInfo.p->restore();
 }
 
 void RenderSVGImage::translateForAttributes() {
