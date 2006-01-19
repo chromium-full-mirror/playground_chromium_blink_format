@@ -840,7 +840,7 @@ class Frame : public ObjectContents {
   virtual WebCore::BrowserExtension* createBrowserExtension() = 0;
   virtual void setTitle(const DOM::DOMString&) = 0;
   virtual void handledOnloadEvents() = 0;
-  virtual QString userAgent() const;
+  virtual QString userAgent() const = 0;
   virtual QString incomingReferrer() const = 0;
   virtual QString mimeTypeForFileName(const QString&) const = 0;
   virtual void clearRecordedFormValues() = 0;
@@ -860,7 +860,7 @@ class Frame : public ObjectContents {
   virtual bool runJavaScriptConfirm(const DOM::DOMString& message) = 0;
   virtual bool runJavaScriptPrompt(const DOM::DOMString& message,
                                    const DOM::DOMString& defaultValue,
-                                   DOM::DOMString& result);
+                                   DOM::DOMString& result) = 0;
   virtual bool locationbarVisible() = 0;
   virtual bool menubarVisible() = 0;
   virtual bool personalbarVisible() = 0;
@@ -898,7 +898,7 @@ class Frame : public ObjectContents {
   virtual void urlSelected(const KURL& url,
                            int button,
                            int state,
-                           const WebCore::URLArgs& args);
+                           const WebCore::URLArgs& args) = 0;
   virtual ObjectContents* createPart(const khtml::ChildFrame& child,
                                      const KURL& url,
                                      const QString& mimeType) = 0;
