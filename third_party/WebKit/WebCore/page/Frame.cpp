@@ -27,19 +27,20 @@
 
 #include "config.h"
 #include "Frame.h"
+#include "FramePrivate.h"
 
 #include "Cache.h"
 #include "CachedCSSStyleSheet.h"
 #include "DOMImplementationImpl.h"
 #include "DocLoader.h"
 #include "EventNames.h"
-#include "FramePrivate.h"
 #include "FrameView.h"
 #include "HTMLFormElementImpl.h"
 #include "HTMLGenericFormElementImpl.h"
 #include "Frame.h"
 #include "RenderText.h"
-#include "SelectionController.h"
+#include "SegmentedString.h"
+#include "apply_style_command.h"
 #include "css_computedstyle.h"
 #include "css_valueimpl.h"
 #include "csshelper.h"
@@ -54,25 +55,28 @@
 #include "html_miscimpl.h"
 #include "html_objectimpl.h"
 #include "htmlediting.h"
+#include "khtml_events.h"
 #include "khtml_settings.h"
 #include "kjs_proxy.h"
 #include "kjs_window.h"
-#include "kxmlcore/Assertions.h"
 #include "loader.h"
 #include "markup.h"
 #include "render_block.h"
 #include "render_canvas.h"
 #include "render_frames.h"
+#include "typing_command.h"
 #include "visible_position.h"
 #include "visible_text.h"
 #include "visible_units.h"
 #include "xml_tokenizer.h"
 #include "xmlhttprequest.h"
 #include <assert.h>
+#include <kcursor.h>
 #include <kdebug.h>
 #include <kio/global.h>
 #include <kio/job.h>
 #include <klocale.h>
+#include <kxmlcore/Assertions.h>
 #include <qptrlist.h>
 #include <qtextcodec.h>
 #include <sys/types.h>
@@ -262,8 +266,6 @@ bool Frame::didOpenURL(const KURL& url) {
     d->m_job->addMetaData("content-type", args.contentType());
   } else {
     d->m_job = KIO::get(url, false, false);
-    d->m_job->addMetaData("cache",
-                          KIO::getCacheControlString(d->m_cachePolicy));
   }
 
   d->m_job->addMetaData(args.metaData());
@@ -1148,7 +1150,7 @@ void Frame::changeLocation(const QString& URL,
 
   args.setLockHistory(lockHistory);
   if (!referrer.isEmpty())
-    args.metaData()["referrer"] = referrer;
+    args.metaData().set("referrer", referrer);
 
   urlSelected(URL, 0, 0, "_self", args);
 }
@@ -1311,11 +1313,11 @@ const SelectionController& Frame::dragCaret() const {
   return d->m_dragCaret;
 }
 
-const SelectionController& Frame::mark() const {
+const WebCore::Selection& Frame::mark() const {
   return d->m_mark;
 }
 
-void Frame::setMark(const SelectionController& s) {
+void Frame::setMark(const WebCore::Selection& s) {
   d->m_mark = s;
 }
 
@@ -1495,11 +1497,11 @@ void Frame::urlSelected(const QString& url,
 
   if (d->m_bHTTPRefresh) {
     d->m_bHTTPRefresh = false;
-    args.metaData()["cache"] = "refresh";
+    args.metaData().set("cache", "refresh");
   }
 
   if (!d->m_referrer.isEmpty())
-    args.metaData()["referrer"] = d->m_referrer;
+    args.metaData().set("referrer", d->m_referrer);
   urlSelected(cURL, button, state, args);
 }
 
@@ -1585,7 +1587,7 @@ bool Frame::requestObject(ChildFrame* child,
   child->m_serviceName = QString::null;
   if (!d->m_referrer.isEmpty() &&
       !child->m_args.metaData().contains("referrer"))
-    child->m_args.metaData()["referrer"] = d->m_referrer;
+    child->m_args.metaData().set("referrer", d->m_referrer);
 
   // We want a Frame if the HTML says <frame src=""> or <frame
   // src="about:blank">
@@ -1627,7 +1629,7 @@ bool Frame::processObjectRequest(ChildFrame* child,
     if (frame && frame->inherits("Frame")) {
       URLArgs args;
       if (!d->m_referrer.isEmpty())
-        args.metaData()["referrer"] = d->m_referrer;
+        args.metaData().set("referrer", d->m_referrer);
       frame->openURLRequest(url, args);
     }
   } else {
@@ -1739,7 +1741,7 @@ void Frame::submitForm(const char* action,
   URLArgs args;
 
   if (!d->m_referrer.isEmpty())
-    args.metaData()["referrer"] = d->m_referrer;
+    args.metaData().set("referrer", d->m_referrer);
 
   args.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
 

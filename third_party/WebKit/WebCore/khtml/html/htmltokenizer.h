@@ -29,28 +29,26 @@
 #ifndef HTMLTOKENIZER_H
 #define HTMLTOKENIZER_H
 
-#include <qstring.h>
-#include <qobject.h>
-#include <qptrqueue.h>
-
 #include "CachedObjectClient.h"
-#include "xml/xml_tokenizer.h"
-#include "html/html_elementimpl.h"
+#include "SegmentedString.h"
+#include "xml_tokenizer.h"
+#include <qptrqueue.h>
+#include <qstring.h>
+#include "dom_qname.h"
 
-#ifdef __OBJC__
+#if __OBJC__
 #define id id_AVOID_KEYWORD
 #endif
 
 class HTMLParser;
 class FrameView;
 
-namespace DOM {
-class DocumentFragmentImpl;
-}
-
-namespace khtml {
+namespace WebCore {
 
 class CachedScript;
+class DocumentFragmentImpl;
+class DocumentImpl;
+class NamedMappedAttrMapImpl;
 
 /**
  * @internal
@@ -62,28 +60,28 @@ class Token {
  public:
   Token() : beginTag(true), flat(false) {}
 
-  void addAttribute(DOM::DocumentImpl*,
-                    const DOM::AtomicString& attrName,
-                    const DOM::AtomicString& v);
+  void addAttribute(DocumentImpl*,
+                    const AtomicString& attrName,
+                    const AtomicString& v);
 
-  bool isOpenTag(const DOM::QualifiedName& fullName) const {
+  bool isOpenTag(const QualifiedName& fullName) const {
     return beginTag && fullName.localName() == tagName;
   }
-  bool isCloseTag(const DOM::QualifiedName& fullName) const {
+  bool isCloseTag(const QualifiedName& fullName) const {
     return !beginTag && fullName.localName() == tagName;
   }
 
   void reset() {
     attrs = 0;
     text = 0;
-    tagName = DOM::nullAtom;
+    tagName = nullAtom;
     beginTag = true;
     flat = false;
   }
 
-  RefPtr<DOM::NamedMappedAttrMapImpl> attrs;
-  RefPtr<DOM::DOMStringImpl> text;
-  DOM::AtomicString tagName;
+  RefPtr<NamedMappedAttrMapImpl> attrs;
+  RefPtr<DOMStringImpl> text;
+  AtomicString tagName;
   bool beginTag;
   bool flat;
 };
@@ -92,11 +90,9 @@ class Token {
 
 class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
  public:
-  HTMLTokenizer(DOM::DocumentImpl*,
-                FrameView* = 0,
-                bool includesComments = false);
-  HTMLTokenizer(DOM::DocumentImpl*,
-                DOM::DocumentFragmentImpl* frag,
+  HTMLTokenizer(DocumentImpl*, FrameView* = 0, bool includesComments = false);
+  HTMLTokenizer(DocumentImpl*,
+                DocumentFragmentImpl*,
                 bool includesComments = false);
   virtual ~HTMLTokenizer();
 
@@ -116,7 +112,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void end();
 
   void reset();
-  DOM::NodeImpl* processToken();
+  NodeImpl* processToken();
 
   State processListing(SegmentedString, State);
   State parseComment(SegmentedString&, State);
@@ -308,7 +304,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   bool brokenServer;
 
   // Name of an attribute that we just scanned.
-  DOM::AtomicString attrName;
+  AtomicString attrName;
 
   // Used to store the code of a srcipting sequence
   QChar* scriptCode;
@@ -351,7 +347,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // finished executing
   int m_executingScript;
   QPtrQueue<CachedScript> pendingScripts;
-  RefPtr<DOM::NodeImpl> scriptNode;
+  RefPtr<NodeImpl> scriptNode;
   // you can pause the tokenizer if you need to display a dialog or something
   bool onHold;
 
@@ -384,8 +380,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   bool inWrite;
 };
 
-void parseHTMLDocumentFragment(const DOM::DOMString&,
-                               DOM::DocumentFragmentImpl*);
+void parseHTMLDocumentFragment(const DOMString&, DocumentFragmentImpl*);
 }
 
 #undef id

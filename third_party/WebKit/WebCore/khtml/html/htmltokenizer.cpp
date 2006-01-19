@@ -7,7 +7,7 @@
               (C) 1999 Lars Knoll (knoll@kde.org)
               (C) 1999 Antti Koivisto (koivisto@kde.org)
               (C) 2001 Dirk Mueller (mueller@kde.org)
-    Copyright (C) 2004 Apple Computer, Inc.
+    Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,32 +32,24 @@
 //#define TOKEN_DEBUG 2
 
 #include "config.h"
-
-//#include <string.h>
 #include "html/htmltokenizer.h"
-#include "html/html_documentimpl.h"
-#include "html/htmlparser.h"
 
-#include "DocLoader.h"
 #include "CachedScript.h"
-
-#include "FrameView.h"
-#include "Frame.h"
-#include "DocumentImpl.h"
+#include "DocLoader.h"
 #include "DocumentFragmentImpl.h"
-#include "xml/EventNames.h"
-#include "css/csshelper.h"
-#include "ecma/kjs_proxy.h"
-#include <ctype.h>
+#include "DocumentImpl.h"
+#include "EventNames.h"
+#include "Frame.h"
+#include "FrameView.h"
+#include "csshelper.h"
+#include "html_documentimpl.h"
+#include "htmlparser.h"
+#include "kjs_proxy.h"
 #include <assert.h>
-#include <qvariant.h>
+#include <ctype.h>
 #include <kdebug.h>
+#include <qvariant.h>
 #include <stdlib.h>
-
-using namespace DOM::HTMLNames;
-using namespace DOM::EventNames;
-
-using namespace DOM;
 
 // turn off inlining to allow proper linking on newer gcc (xmltokenizer.cpp also
 // uses findEntity())
@@ -77,7 +69,10 @@ using namespace DOM;
 // though, so for now we set a value of 500.
 #define TOKENIZER_TIME_DELAY 500
 
-namespace khtml {
+namespace WebCore {
+
+using namespace HTMLNames;
+using namespace EventNames;
 
 static const char commentStart[] = "<!--";
 static const char scriptEnd[] = "</script";
@@ -87,8 +82,6 @@ static const char textareaEnd[] = "</textarea";
 static const char titleEnd[] = "</title";
 
 #define KHTML_ALLOC_QCHAR_VEC(N) (QChar*)fastMalloc(sizeof(QChar) * (N))
-#define KHTML_REALLOC_QCHAR_VEC(P, N) \
-  (QChar*)P = fastRealloc(p, sizeof(QChar) * (N))
 #define KHTML_DELETE_QCHAR_VEC(P) fastFree((char*)(P))
 
 // Full support for MS Windows extensions to Latin-1.
@@ -149,7 +142,7 @@ void Token::addAttribute(DocumentImpl* doc,
 
 // ----------------------------------------------------------------------------
 
-HTMLTokenizer::HTMLTokenizer(DOM::DocumentImpl* _doc,
+HTMLTokenizer::HTMLTokenizer(DocumentImpl* _doc,
                              FrameView* _view,
                              bool includesComments)
     : inWrite(false) {
@@ -166,8 +159,8 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentImpl* _doc,
   begin();
 }
 
-HTMLTokenizer::HTMLTokenizer(DOM::DocumentImpl* _doc,
-                             DOM::DocumentFragmentImpl* i,
+HTMLTokenizer::HTMLTokenizer(DocumentImpl* _doc,
+                             DocumentFragmentImpl* i,
                              bool includesComments)
     : inWrite(false) {
   view = 0;
@@ -1870,8 +1863,8 @@ void HTMLTokenizer::setOnHold(bool _onHold) {
   onHold = _onHold;
 }
 
-void parseHTMLDocumentFragment(const DOM::DOMString& source,
-                               DOM::DocumentFragmentImpl* fragment) {
+void parseHTMLDocumentFragment(const DOMString& source,
+                               DocumentFragmentImpl* fragment) {
   HTMLTokenizer tok(fragment->getDocument(), fragment);
   tok.setForceSynchronous(true);
   tok.write(source.qstring(), true);

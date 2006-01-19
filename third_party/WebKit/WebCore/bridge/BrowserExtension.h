@@ -26,22 +26,19 @@
 #ifndef BROWSEREXTENSION_H_
 #define BROWSEREXTENSION_H_
 
-#include "KWQEvent.h"
-#include "KWQMap.h"
-#include "IntPointArray.h"
-
-#include "KWQKURL.h"
-#include "KWQObject.h"
-
+#include "dom_string.h"
 #include "formdata.h"
+#include <kxmlcore/HashMap.h>
+#include <qobject.h>
 
+class KURL;
 class ObjectContents;
 
 namespace WebCore {
 
 struct URLArgs {
   QString frameName;
-  khtml::FormData postData;
+  FormData postData;
   bool reload;
   QString serviceType;
   int xOffset;
@@ -63,14 +60,14 @@ struct URLArgs {
   bool lockHistory() const { return m_lockHistory; }
   void setLockHistory(bool lock) { m_lockHistory = lock; }
 
-  QMap<QString, QString>& metaData() { return m_metadata; }
-  const QMap<QString, QString>& metaData() const { return m_metadata; }
+  HashMap<DOMString, DOMString>& metaData() { return m_metadata; }
+  const HashMap<DOMString, DOMString>& metaData() const { return m_metadata; }
 
  private:
   QString m_contentType;
   bool m_doPost;
   bool m_lockHistory;
-  QMap<QString, QString> m_metadata;
+  HashMap<DOMString, DOMString> m_metadata;
 };
 
 struct WindowArgs {

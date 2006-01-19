@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,21 +25,16 @@
 
 //#define DEBUG_LAYOUT
 
-#if __APPLE__
-
 #include "config.h"
 #include "render_canvasimage.h"
-#include "render_canvas.h"
 
-#include <qpainter.h>
+#if __APPLE__
 
-#include "css/csshelper.h"
-#include "helper.h"
-#include "html/html_canvasimpl.h"
-#include "xml/dom2_eventsimpl.h"
-#include "html/html_documentimpl.h"
+#include "DocumentImpl.h"
+#include "html_canvasimpl.h"
 
-using namespace DOM;
+namespace WebCore {
+
 using namespace HTMLNames;
 using namespace khtml;
 
@@ -222,6 +217,7 @@ void RenderCanvasImage::layout() {
     repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
 
   setNeedsLayout(false);
+}
 }
 
 #endif
