@@ -183,7 +183,9 @@ JSValue* DOMCSSStyleDeclaration::cssPropertyGetter(
     else
       return jsStringOrNull(v->cssText());
   } else
-    return jsString("");
+    // If the property is a shorthand property (such as "padding"),
+    // it can only be accessed using getPropertyValue
+    return jsString(thisObj->m_impl->getPropertyValue(prop));
 }
 
 bool DOMCSSStyleDeclaration::getOwnPropertySlot(ExecState* exec,
