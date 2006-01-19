@@ -217,6 +217,8 @@ class HashTableConstIterator {
 
     removeIterator(this);
     addIterator(other.m_table, this);
+
+    return *this;
   }
 #endif
 
