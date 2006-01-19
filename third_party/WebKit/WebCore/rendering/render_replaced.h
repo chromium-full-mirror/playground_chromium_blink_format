@@ -24,7 +24,7 @@
 
 #include "render_container.h"
 #include <qobject.h>
-class KHTMLView;
+class FrameView;
 class QWidget;
 
 namespace DOM {
@@ -89,7 +89,7 @@ class RenderWidget : public QObject, public RenderReplaced {
   virtual void layout();
 
   QWidget* widget() const { return m_widget; }
-  KHTMLView* view() const { return m_view; }
+  FrameView* view() const { return m_view; }
 
   RenderArena* ref() {
     ++m_refCount;
@@ -113,7 +113,7 @@ class RenderWidget : public QObject, public RenderReplaced {
 
   bool m_deleteWidget;
   QWidget* m_widget;
-  KHTMLView* m_view;
+  FrameView* m_view;
   int m_refCount;
 };
 };

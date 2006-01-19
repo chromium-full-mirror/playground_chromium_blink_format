@@ -38,7 +38,7 @@
 
 #include <kxmlcore/HashMap.h>
 
-class KHTMLView;
+class FrameView;
 
 namespace DOM {
 
@@ -59,7 +59,7 @@ class XSLTProcessorImpl : public Shared<XSLTProcessorImpl> {
                                                 const QString& sourceEncoding,
                                                 const QString& sourceMIMEType,
                                                 NodeImpl* sourceNode,
-                                                KHTMLView* view = 0);
+                                                FrameView* view = 0);
 
   // DOM methods
   void importStylesheet(NodeImpl* style) { m_stylesheetRootNode = style; }

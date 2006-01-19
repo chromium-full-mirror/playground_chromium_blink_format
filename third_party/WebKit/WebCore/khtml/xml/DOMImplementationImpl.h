@@ -27,7 +27,7 @@
 
 #include "Shared.h"
 
-class KHTMLView;
+class FrameView;
 
 namespace DOM {
 
@@ -64,8 +64,8 @@ class DOMImplementationImpl : public Shared<DOMImplementationImpl> {
   HTMLDocumentImpl* createHTMLDocument(const DOMString& title);
 
   // Other methods (not part of DOM)
-  DocumentImpl* createDocument(KHTMLView* v = 0);
-  HTMLDocumentImpl* createHTMLDocument(KHTMLView* v = 0);
+  DocumentImpl* createDocument(FrameView* v = 0);
+  HTMLDocumentImpl* createHTMLDocument(FrameView* v = 0);
 
   // Returns the static instance of this class - only one instance of this class
   // should

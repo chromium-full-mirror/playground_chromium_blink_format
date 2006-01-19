@@ -98,7 +98,7 @@ namespace DOM {
 using namespace HTMLNames;
 
 HTMLDocumentImpl::HTMLDocumentImpl(DOMImplementationImpl* _implementation,
-                                   KHTMLView* v)
+                                   FrameView* v)
     : DocumentImpl(_implementation, v) {
   bodyElement = 0;
   htmlElement = 0;

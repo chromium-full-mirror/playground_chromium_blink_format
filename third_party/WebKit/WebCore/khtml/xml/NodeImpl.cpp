@@ -510,7 +510,7 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
   // better to
   // ensure that document can never be null.
   Frame* frame = 0;
-  KHTMLView* view = 0;
+  FrameView* view = 0;
 
   if (DocumentImpl* doc = getDocument()) {
     frame = doc->frame();
@@ -714,7 +714,7 @@ bool NodeImpl::dispatchMouseEvent(QMouseEvent* _mouse,
 
   int clientX = 0;
   int clientY = 0;
-  if (KHTMLView* view = getDocument()->view())
+  if (FrameView* view = getDocument()->view())
     view->viewportToContents(_mouse->x(), _mouse->y(), clientX, clientY);
   int screenX = _mouse->globalX();
   int screenY = _mouse->globalY();
@@ -932,7 +932,7 @@ void NodeImpl::dispatchWheelEvent(QWheelEvent* e) {
   if (!doc)
     return;
 
-  KHTMLView* view = getDocument()->view();
+  FrameView* view = getDocument()->view();
   if (!view)
     return;
 

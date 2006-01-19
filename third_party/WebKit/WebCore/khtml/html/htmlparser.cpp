@@ -114,7 +114,7 @@ class HTMLStackElem {
  *    element or ignore the tag.
  *
  */
-HTMLParser::HTMLParser(KHTMLView* _parent,
+HTMLParser::HTMLParser(FrameView* _parent,
                        DocumentImpl* doc,
                        bool includesComments)
     : current(0),

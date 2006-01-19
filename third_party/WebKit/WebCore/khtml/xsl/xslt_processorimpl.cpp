@@ -203,7 +203,7 @@ RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
     const QString& sourceEncoding,
     const QString& sourceMIMEType,
     NodeImpl* sourceNode,
-    KHTMLView* view) {
+    FrameView* view) {
   RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
   QString documentSource = sourceString;

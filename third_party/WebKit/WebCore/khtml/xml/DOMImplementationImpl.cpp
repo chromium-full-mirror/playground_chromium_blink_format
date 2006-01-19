@@ -176,11 +176,11 @@ CSSStyleSheetImpl* DOMImplementationImpl::createCSSStyleSheet(
   return sheet;
 }
 
-DocumentImpl* DOMImplementationImpl::createDocument(KHTMLView* v) {
+DocumentImpl* DOMImplementationImpl::createDocument(FrameView* v) {
   return new DocumentImpl(this, v);
 }
 
-HTMLDocumentImpl* DOMImplementationImpl::createHTMLDocument(KHTMLView* v) {
+HTMLDocumentImpl* DOMImplementationImpl::createHTMLDocument(FrameView* v) {
   return new HTMLDocumentImpl(this, v);
 }
 

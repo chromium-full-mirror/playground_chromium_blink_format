@@ -41,7 +41,7 @@
 #include <qstringlist.h>
 
 class Frame;
-class KHTMLView;
+class FrameView;
 class KWQAccObjectCache;
 class QPaintDevice;
 class QPaintDeviceMetrics;
@@ -118,7 +118,7 @@ struct DocumentMarker {
 
 class DocumentImpl : public QObject, public ContainerNodeImpl {
  public:
-  DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v);
+  DocumentImpl(DOMImplementationImpl* _implementation, FrameView* v);
   ~DocumentImpl();
 
   virtual void removedLastRef();
@@ -257,7 +257,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setRestoreState(const QStringList& s) { m_state = s; }
   QStringList& restoreState() { return m_state; }
 
-  KHTMLView* view() const { return m_view; }
+  FrameView* view() const { return m_view; }
   Frame* frame() const;
 
   RangeImpl* createRange();
@@ -627,7 +627,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
  protected:
   CSSStyleSelector* m_styleSelector;
-  KHTMLView* m_view;
+  FrameView* m_view;
   QStringList m_state;
 
   DocLoader* m_docLoader;

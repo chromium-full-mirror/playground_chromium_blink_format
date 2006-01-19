@@ -32,7 +32,7 @@ class DocumentImpl;
 class DocumentTypeImpl;
 class CSSStyleSheetImpl;
 
-typedef KHTMLView KDOMView;
+typedef FrameView KDOMView;
 }
 
 namespace KSVG {

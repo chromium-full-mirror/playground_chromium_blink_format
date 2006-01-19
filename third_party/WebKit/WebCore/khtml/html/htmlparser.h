@@ -31,7 +31,7 @@
 
 #include "html/html_documentimpl.h"
 
-class KHTMLView;
+class FrameView;
 class HTMLStackElem;
 
 namespace DOM {
@@ -55,7 +55,7 @@ class Token;
  */
 class HTMLParser {
  public:
-  HTMLParser(KHTMLView* w, DOM::DocumentImpl* i, bool includesComments = false);
+  HTMLParser(FrameView* w, DOM::DocumentImpl* i, bool includesComments = false);
   HTMLParser(DOM::DocumentFragmentImpl* frag,
              DOM::DocumentImpl* doc,
              bool includesComments = false);
@@ -90,7 +90,7 @@ class HTMLParser {
     discard_until = qName.localName();
   }
 
-  KHTMLView* HTMLWidget;
+  FrameView* HTMLWidget;
   DOM::DocumentImpl* document;
 
   /*

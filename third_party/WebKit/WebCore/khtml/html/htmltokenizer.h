@@ -42,7 +42,7 @@
 #endif
 
 class HTMLParser;
-class KHTMLView;
+class FrameView;
 
 namespace DOM {
 class DocumentFragmentImpl;
@@ -93,7 +93,7 @@ class Token {
 class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
  public:
   HTMLTokenizer(DOM::DocumentImpl*,
-                KHTMLView* = 0,
+                FrameView* = 0,
                 bool includesComments = false);
   HTMLTokenizer(DOM::DocumentImpl*,
                 DOM::DocumentFragmentImpl* frag,
@@ -380,7 +380,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   SegmentedString src;
   HTMLParser* parser;
-  QGuardedPtr<KHTMLView> view;
+  QGuardedPtr<FrameView> view;
   bool inWrite;
 };
 

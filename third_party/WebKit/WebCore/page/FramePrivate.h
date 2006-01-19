@@ -180,7 +180,7 @@ class FramePrivate {
   FrameList m_frames;
   QValueList<khtml::ChildFrame> m_objects;
 
-  QGuardedPtr<KHTMLView> m_view;
+  QGuardedPtr<FrameView> m_view;
   WebCore::BrowserExtension* m_extension;
   DOM::DocumentImpl* m_doc;
   RefPtr<khtml::Decoder> m_decoder;
