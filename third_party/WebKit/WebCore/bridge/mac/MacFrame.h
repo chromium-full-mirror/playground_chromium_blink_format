@@ -33,6 +33,7 @@
 #include "WebCoreKeyboardAccess.h"
 #include "text_affinity.h"
 #include <kxmlcore/HashSet.h>
+#include "BrowserExtensionMac.h"
 
 #import <CoreFoundation/CoreFoundation.h>
 
@@ -185,8 +186,8 @@ class MacFrame : public Frame {
 
   virtual void createEmptyDocument();
 
-  virtual BrowserExtension* createBrowserExtension() {
-    return new BrowserExtensionMac(this);
+  virtual WebCore::BrowserExtension* createBrowserExtension() {
+    return new WebCore::BrowserExtensionMac(this);
   }
 
   static WebCoreFrameBridge* bridgeForWidget(const QWidget*);
