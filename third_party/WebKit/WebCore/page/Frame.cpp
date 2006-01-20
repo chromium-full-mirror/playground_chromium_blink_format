@@ -3242,7 +3242,7 @@ bool Frame::canCachePage() {
   // 3.  The page has no password fields.
   // 4.  The URL for the page is not https.
   // 5.  The page has no applets.
-  if (d->m_frames.count() || parentFrame() ||
+  if (d->m_frames.count() || d->m_objects.count() || parentFrame() ||
       m_url.protocol().startsWith("https") ||
       (d->m_doc && (d->m_doc->applets()->length() != 0 ||
                     d->m_doc->hasWindowEventListener(unloadEvent) ||
