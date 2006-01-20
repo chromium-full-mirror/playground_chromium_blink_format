@@ -90,6 +90,8 @@ using XBL::XBLBindingManager;
 #include "SVGElementFactory.h"
 #include "SVGZoomEventImpl.h"
 #include "SVGStyleElementImpl.h"
+#include "SVGDocumentExtensions.h"
+#include "KSVGTimeScheduler.h"
 #endif
 
 namespace WebCore {
@@ -213,19 +215,20 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, FrameView* v)
 #endif
       ,
       m_finishedParsing(this, SIGNAL(finishedParsing())),
-      m_inPageCache(false),
       m_savedRenderer(0),
       m_passwordFields(0),
       m_secureForms(0),
-      m_createRenderers(true),
-      m_designMode(inherit)
+      m_designMode(inherit),
+      m_selfOnlyRefCount(0)
 #if __APPLE__
       ,
       m_hasDashboardRegions(false),
       m_dashboardRegionsDirty(false)
 #endif
       ,
-      m_selfOnlyRefCount(0) {
+      m_accessKeyMapValid(false),
+      m_createRenderers(true),
+      m_inPageCache(false) {
   document.resetSkippingRef(this);
 
   m_paintDevice = 0;
@@ -281,7 +284,6 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, FrameView* v)
   m_ignorePendingStylesheets = false;
 
   m_cssTarget = 0;
-  m_accessKeyMapValid = false;
 
   resetLinkColor();
   resetVisitedLinkColor();
@@ -1254,6 +1256,14 @@ void DocumentImpl::implicitClose() {
   if (renderer() && KWQAccObjectCache::accessibilityEnabled())
     getAccObjectCache()->postNotification(renderer(), "AXLoadComplete");
 #endif
+
+#if SVG_SUPPORT
+  // FIXME: Officially, time 0 is when the outermost <svg> recieves its
+  // SVGLoad event, but we don't implement those yet.  This is close enough
+  // for now.  In some cases we should have fired earlier.
+  if (svgExtensions())
+    accessSVGExtensions()->timeScheduler()->startAnimations();
+#endif
 }
 
 void DocumentImpl::setParsing(bool b) {
@@ -1354,7 +1364,6 @@ void DocumentImpl::setURL(const QString& url) {
 }
 
 void DocumentImpl::setStyleSheet(const DOMString& url, const DOMString& sheet) {
-  //    kdDebug( 6030 ) << "HTMLDocument::setStyleSheet()" << endl;
   m_sheet = new CSSStyleSheetImpl(this, url);
   m_sheet->ref();
   m_sheet->parseString(sheet);
@@ -1934,7 +1943,7 @@ void DocumentImpl::recalcStyleSelector() {
         if (title != m_preferredStylesheetSet)
           sheet = 0;  // don't use it
 
-        title = title.replace('&', QString::fromLatin1("&&"));
+        title = title.replace('&', "&&");
 
         if (!m_availableSheets.contains(title))
           m_availableSheets.append(title);
@@ -2985,6 +2994,18 @@ AttrImpl* DocumentImpl::createAttributeNS(const DOMString& namespaceURI,
           DOMString("").impl()),
       false);
 }
+
+#if SVG_SUPPORT
+const SVGDocumentExtensions* DocumentImpl::svgExtensions() {
+  return m_svgExtensions.get();
+}
+
+SVGDocumentExtensions* DocumentImpl::accessSVGExtensions() {
+  if (!m_svgExtensions)
+    m_svgExtensions = new SVGDocumentExtensions(this);
+  return m_svgExtensions.get();
+}
+#endif
 
 void DocumentImpl::radioButtonChecked(HTMLInputElementImpl* caller,
                                       HTMLFormElementImpl* form) {

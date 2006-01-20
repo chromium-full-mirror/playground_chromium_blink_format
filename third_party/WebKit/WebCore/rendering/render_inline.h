@@ -97,6 +97,6 @@ class RenderInline : public RenderFlow {
                               // inline.
 };
 
-};  // namespace
+}  // namespace
 
-#endif  // RENDER_BLOCK_H
+#endif

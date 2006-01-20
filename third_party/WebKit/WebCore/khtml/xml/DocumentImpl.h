@@ -47,22 +47,13 @@ class QPaintDevice;
 class QPaintDeviceMetrics;
 class RenderArena;
 
-namespace khtml {
-class CSSStyleSelector;
-class DocLoader;
-class Tokenizer;
-#if __APPLE__
-struct DashboardRegionValue;
-#endif
-}
-
 #ifndef KHTML_NO_XBL
 namespace XBL {
 class XBLBindingManager;
 }
 #endif
 
-namespace DOM {
+namespace WebCore {
 class AbstractViewImpl;
 class AttrImpl;
 class CDATASectionImpl;
@@ -95,6 +86,13 @@ class StyleSheetListImpl;
 class TextImpl;
 class TreeWalkerImpl;
 class NameNodeListImpl;
+class CSSStyleSelector;
+class DocLoader;
+class Tokenizer;
+#if __APPLE__
+struct DashboardRegionValue;
+#endif
+class SVGDocumentExtensions;
 
 // A range of a node within a document that is "marked", such as being
 // misspelled
@@ -799,6 +797,11 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                                    HTMLFormElementImpl* form);
   void removeRadioButtonGroup(DOMStringImpl* name, HTMLFormElementImpl* form);
 
+#if SVG_SUPPORT
+  const SVGDocumentExtensions* svgExtensions();
+  SVGDocumentExtensions* accessSVGExtensions();
+#endif
+
  private:
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
@@ -810,7 +813,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool acceptsEditingFocus(NodeImpl* node);
 
   mutable DOMString m_domain;
-  bool m_inPageCache;
   RenderObject* m_savedRenderer;
   int m_passwordFields;
   int m_secureForms;
@@ -824,17 +826,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   HashMap<DOMStringImpl*, ElementImpl*, CaseInsensitiveHash>
       m_elementsByAccessKey;
-  bool m_accessKeyMapValid;
-
-  bool m_createRenderers;
 
   InheritedBool m_designMode;
-
-#if __APPLE__
-  QValueList<DashboardRegionValue> m_dashboardRegions;
-  bool m_hasDashboardRegions;
-  bool m_dashboardRegionsDirty;
-#endif
 
   int m_selfOnlyRefCount;
   typedef HashMap<DOMStringImpl*,
@@ -846,6 +839,19 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                   PointerHash<HTMLFormElementImpl*>>
       FormToGroupMap;
   FormToGroupMap m_selectedRadioButtons;
+
+#if SVG_SUPPORT
+  RefPtr<SVGDocumentExtensions> m_svgExtensions;
+#endif
+
+#if __APPLE__
+  QValueList<DashboardRegionValue> m_dashboardRegions;
+  bool m_hasDashboardRegions;
+  bool m_dashboardRegionsDirty;
+#endif
+  bool m_accessKeyMapValid;
+  bool m_createRenderers;
+  bool m_inPageCache;
 };
 
 }  // namespace

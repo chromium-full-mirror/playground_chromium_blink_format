@@ -25,9 +25,9 @@
 #ifndef RENDER_FORM_H
 #define RENDER_FORM_H
 
-#include "rendering/render_replaced.h"
-#include "rendering/render_image.h"
-#include "rendering/render_block.h"
+#include "render_replaced.h"
+#include "render_image.h"
+#include "RenderBlock.h"
 
 class QWidget;
 class QListboxItem;
@@ -41,13 +41,10 @@ class QListBox;
 #include "HTMLSelectElementImpl.h"
 #include "HTMLTextAreaElementImpl.h"
 
-namespace DOM {
+namespace WebCore {
+
 class HTMLFormElementImpl;
 class HTMLGenericFormElementImpl;
-};
-
-namespace khtml {
-
 class DocLoader;
 
 // -------------------------------------------------------------------------
