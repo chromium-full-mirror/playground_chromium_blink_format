@@ -92,7 +92,6 @@ class Tokenizer;
 #if __APPLE__
 struct DashboardRegionValue;
 #endif
-class SVGDocumentExtensions;
 
 // A range of a node within a document that is "marked", such as being
 // misspelled
@@ -797,11 +796,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                                    HTMLFormElementImpl* form);
   void removeRadioButtonGroup(DOMStringImpl* name, HTMLFormElementImpl* form);
 
-#if SVG_SUPPORT
-  const SVGDocumentExtensions* svgExtensions();
-  SVGDocumentExtensions* accessSVGExtensions();
-#endif
-
  private:
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
@@ -839,10 +833,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                   PointerHash<HTMLFormElementImpl*>>
       FormToGroupMap;
   FormToGroupMap m_selectedRadioButtons;
-
-#if SVG_SUPPORT
-  RefPtr<SVGDocumentExtensions> m_svgExtensions;
-#endif
 
 #if __APPLE__
   QValueList<DashboardRegionValue> m_dashboardRegions;
