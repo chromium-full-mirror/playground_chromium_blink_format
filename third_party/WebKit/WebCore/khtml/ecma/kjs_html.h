@@ -627,6 +627,7 @@ class HTMLElement : public DOMElement {
     ImageIsMap,
     ImageBorder,
     ImageHeight,
+    ImageComplete,
     ImageLongDesc,
     ImageSrc,
     ImageX,
@@ -922,39 +923,6 @@ class ImageConstructorImp : public JSObject {
   RefPtr<DOM::DocumentImpl> m_doc;
 };
 
-class Image : public DOMObject, public khtml::CachedObjectClient {
- public:
-  Image(DOM::DocumentImpl* d, bool ws, int w, bool hs, int h);
-  ~Image();
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   JSValue* value,
-                   int attr = None);
-  void putValueProperty(ExecState* exec,
-                        int token,
-                        JSValue* value,
-                        int /*attr*/);
-  void notifyFinished(khtml::CachedObject*);
-  virtual bool toBoolean(ExecState*) const { return true; }
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-  enum { Src, Complete, OnLoad, Width, Height };
-
-  khtml::CachedImage* image() { return img; }
-
- private:
-  UString src;
-  QGuardedPtr<DOM::DocumentImpl> doc;
-  khtml::CachedImage* img;
-  JSAbstractEventListener* onLoadListener;
-  bool widthSet;
-  bool heightSet;
-  int width;
-  int height;
-};
-
 ////////////////////// Context2D Object ////////////////////////
 class Context2D : public DOMObject {
   friend class Context2DFunction;
@@ -1140,7 +1108,7 @@ class Gradient : public DOMObject {
 
 class ImagePattern : public DOMObject {
  public:
-  ImagePattern(Image* i, int type);
+  ImagePattern(const QPixmap& pixmap, int repetitionType);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
