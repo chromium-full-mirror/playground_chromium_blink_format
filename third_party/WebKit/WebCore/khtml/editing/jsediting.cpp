@@ -316,6 +316,15 @@ bool execSelectAll(Frame* frame, bool userInterface, const DOMString& value) {
   return true;
 }
 
+bool execStrikethrough(Frame* frame,
+                       bool userInterface,
+                       const DOMString& value) {
+  bool isStrikethrough = selectionStartHasStyle(
+      frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "line-through");
+  return execStyleChange(frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
+                         isStrikethrough ? "none" : "line-through");
+}
+
 bool execSubscript(Frame* frame, bool userInterface, const DOMString& value) {
   return execStyleChange(frame, CSS_PROP_VERTICAL_ALIGN, "sub");
 }
@@ -415,6 +424,10 @@ Frame::TriState stateItalic(Frame* frame) {
   return stateStyle(frame, CSS_PROP_FONT_STYLE, "italic");
 }
 
+Frame::TriState stateStrikethrough(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_TEXT_DECORATION, "line-through");
+}
+
 Frame::TriState stateSubscript(Frame* frame) {
   return stateStyle(frame, CSS_PROP_VERTICAL_ALIGN, "sub");
 }
@@ -510,6 +523,8 @@ CommandMap* createCommandDictionary() {
       {"Print", {execPrint, enabled, stateNone, valueNull}},
       {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
       {"SelectAll", {execSelectAll, enabled, stateNone, valueNull}},
+      {"Strikethrough",
+       {execStrikethrough, enabledAnySelection, stateStrikethrough, valueNull}},
       {"Subscript",
        {execSubscript, enabledAnySelection, stateSubscript, valueNull}},
       {"Superscript",
@@ -575,7 +590,6 @@ CommandMap* createCommandDictionary() {
       // SizeToControlWidth (not supported)
       // Stop (not supported)
       // StopImage (not supported)
-      // Strikethrough (not supported)
       // Unbookmark (not supported)
       // Unlink (not supported)
   };
