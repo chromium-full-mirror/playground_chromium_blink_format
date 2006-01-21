@@ -370,6 +370,7 @@ class RenderObject : public CachedObjectClient {
     * positioned elements
     */
   RenderObject* container() const;
+  RenderObject* hoverAncestor() const;
 
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
