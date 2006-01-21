@@ -64,7 +64,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class WebCoreSettings;
 @class WebScriptObject;
 
-@protocol WebCoreDOMTreeCopier;
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
@@ -323,7 +322,6 @@ typedef enum {
 - (NSView*)nextKeyViewInsideWebFrameViews;
 - (NSView*)previousKeyViewInsideWebFrameViews;
 
-- (NSObject*)copyDOMTree:(id<WebCoreDOMTreeCopier>)copier;
 - (NSObject*)copyRenderTree:(id<WebCoreRenderTreeCopier>)copier;
 - (NSString*)renderTreeAsExternalRepresentation;
 
@@ -794,13 +792,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 // This idiom is appropriate because WebCoreFrameBridge is an abstract class.
 
 @interface WebCoreFrameBridge (SubclassResponsibility)<WebCoreFrameBridge>
-@end
-
-@protocol WebCoreDOMTreeCopier<NSObject>
-- (NSObject*)nodeWithName:(NSString*)name
-                    value:(NSString*)value
-                   source:(NSString*)source
-                 children:(NSArray*)children;
 @end
 
 @protocol WebCoreRenderTreeCopier<NSObject>
