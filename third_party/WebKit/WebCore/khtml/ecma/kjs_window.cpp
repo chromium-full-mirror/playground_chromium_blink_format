@@ -592,7 +592,7 @@ static Frame* createNewWindow(ExecState* exec,
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
 
-  DocumentImpl* activeDoc = activePart ? activePart->xmlDocImpl() : 0;
+  DocumentImpl* activeDoc = activePart ? activePart->document() : 0;
   if (!URL.isEmpty() && activeDoc) {
     QString completedURL = activeDoc->completeURL(URL);
     if (!completedURL.startsWith("javascript:", false) ||
@@ -852,15 +852,15 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       // FIXME: this property (and the few below) probably shouldn't create a
       // new object every
       // time
-      return new ImageConstructorImp(exec, m_frame->xmlDocImpl());
+      return new ImageConstructorImp(exec, m_frame->document());
     case Option:
-      return new OptionConstructorImp(exec, m_frame->xmlDocImpl());
+      return new OptionConstructorImp(exec, m_frame->document());
     case XMLHttpRequest:
-      return new XMLHttpRequestConstructorImp(exec, m_frame->xmlDocImpl());
+      return new XMLHttpRequestConstructorImp(exec, m_frame->document());
     case XMLSerializer:
       return new XMLSerializerConstructorImp(exec);
     case DOMParser:
-      return new DOMParserConstructorImp(exec, m_frame->xmlDocImpl());
+      return new DOMParserConstructorImp(exec, m_frame->document());
 #ifdef KHTML_XSLT
     case XSLTProcessor:
       return new XSLTProcessorConstructorImp(exec);
@@ -869,7 +869,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return jsUndefined();
 #endif
     case FrameElement:
-      if (DocumentImpl* doc = m_frame->xmlDocImpl())
+      if (DocumentImpl* doc = m_frame->document())
         if (ElementImpl* fe = doc->ownerElement())
           if (checkNodeSecurity(exec, fe)) {
             return getDOMNode(exec, fe);
@@ -882,13 +882,13 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
 
   switch (token) {
     case Document:
-      if (!m_frame->xmlDocImpl()) {
+      if (!m_frame->document()) {
         m_frame->createEmptyDocument();
         m_frame->begin();
         m_frame->write("<HTML><BODY>");
         m_frame->end();
       }
-      return getDOMNode(exec, m_frame->xmlDocImpl());
+      return getDOMNode(exec, m_frame->document());
     case Onabort:
       return getListener(exec, abortEvent);
     case Onblur:
@@ -982,7 +982,7 @@ JSValue* Window::namedItemGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
-  DocumentImpl* doc = thisObj->m_frame->xmlDocImpl();
+  DocumentImpl* doc = thisObj->m_frame->document();
   assert(thisObj->isSafeScript(exec) && doc && doc->isHTMLDocument());
 
   DOMString name = propertyName.domString();
@@ -1080,7 +1080,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   }
 
   // allow shortcuts like 'Image1' instead of document.images.Image1
-  DocumentImpl* doc = m_frame->xmlDocImpl();
+  DocumentImpl* doc = m_frame->document();
   if (isSafeScript(exec) && doc && doc->isHTMLDocument()) {
     AtomicString name = propertyName.domString().impl();
     if (static_cast<HTMLDocumentImpl*>(doc)->hasNamedItem(name) ||
@@ -1124,7 +1124,7 @@ void Window::put(ExecState* exec,
         Frame* p = Window::retrieveActive(exec)->m_frame;
         if (p) {
           QString dstUrl =
-              p->xmlDocImpl()->completeURL(value->toString(exec).qstring());
+              p->document()->completeURL(value->toString(exec).qstring());
           if (!dstUrl.startsWith("javascript:", false) || isSafeScript(exec)) {
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
@@ -1283,11 +1283,11 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
   // JS may be attempting to access the "window" object, which should be valid,
   // even if the document hasn't been constructed yet.  If the document doesn't
   // exist yet allow JS to access the window object.
-  if (!targetPart->xmlDocImpl())
+  if (!targetPart->document())
     return true;
 
-  DOM::DocumentImpl* originDocument = originPart->xmlDocImpl();
-  DOM::DocumentImpl* targetDocument = targetPart->xmlDocImpl();
+  DOM::DocumentImpl* originDocument = originPart->document();
+  DOM::DocumentImpl* targetDocument = targetPart->document();
 
   if (!targetDocument) {
     return false;
@@ -1312,7 +1312,7 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
     }
 
     if (ancestorPart)
-      originDomain = ancestorPart->xmlDocImpl()->domain();
+      originDomain = ancestorPart->document()->domain();
   }
 
   if (targetDomain == originDomain)
@@ -1354,11 +1354,11 @@ bool Window::isSafeScript(ExecState* exec) const {
   // JS may be attempting to access the "window" object, which should be valid,
   // even if the document hasn't been constructed yet.  If the document doesn't
   // exist yet allow JS to access the window object.
-  if (!m_frame->xmlDocImpl())
+  if (!m_frame->document())
     return true;
 
-  DOM::DocumentImpl* thisDocument = m_frame->xmlDocImpl();
-  DOM::DocumentImpl* actDocument = activePart->xmlDocImpl();
+  DOM::DocumentImpl* thisDocument = m_frame->document();
+  DOM::DocumentImpl* actDocument = activePart->document();
 
   if (!actDocument) {
     kdDebug(6070) << "Window::isSafeScript: active frame has no document!"
@@ -1385,7 +1385,7 @@ bool Window::isSafeScript(ExecState* exec) const {
     }
 
     if (ancestorPart)
-      thisDomain = ancestorPart->xmlDocImpl()->domain();
+      thisDomain = ancestorPart->document()->domain();
   }
 
   if (actDomain == thisDomain)
@@ -1412,7 +1412,7 @@ void Window::setListener(ExecState* exec,
                          JSValue* func) {
   if (!isSafeScript(exec))
     return;
-  DOM::DocumentImpl* doc = m_frame->xmlDocImpl();
+  DOM::DocumentImpl* doc = m_frame->document();
   if (!doc)
     return;
 
@@ -1423,7 +1423,7 @@ JSValue* Window::getListener(ExecState* exec,
                              const AtomicString& eventType) const {
   if (!isSafeScript(exec))
     return jsUndefined();
-  DOM::DocumentImpl* doc = m_frame->xmlDocImpl();
+  DOM::DocumentImpl* doc = m_frame->document();
   if (!doc)
     return jsUndefined();
 
@@ -1655,17 +1655,17 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 
   switch (id) {
     case Window::Alert:
-      if (frame && frame->xmlDocImpl())
-        frame->xmlDocImpl()->updateRendering();
+      if (frame && frame->document())
+        frame->document()->updateRendering();
       frame->runJavaScriptAlert(str);
       return jsUndefined();
     case Window::Confirm:
-      if (frame && frame->xmlDocImpl())
-        frame->xmlDocImpl()->updateRendering();
+      if (frame && frame->document())
+        frame->document()->updateRendering();
       return jsBoolean(frame->runJavaScriptConfirm(str));
     case Window::Prompt: {
-      if (frame && frame->xmlDocImpl())
-        frame->xmlDocImpl()->updateRendering();
+      if (frame && frame->document())
+        frame->document()->updateRendering();
       DOMString message =
           args.size() >= 2 ? args[1]->toString(exec).domString() : DOMString();
       bool ok = frame->runJavaScriptPrompt(str, message, str2);
@@ -1698,7 +1698,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       KURL url;
       Frame* activePart = Window::retrieveActive(exec)->m_frame;
       if (!str.isEmpty() && activePart)
-        url = activePart->xmlDocImpl()->completeURL(str.qstring());
+        url = activePart->document()->completeURL(str.qstring());
 
       URLArgs uargs;
       uargs.frameName = frameName;
@@ -1749,8 +1749,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       frame->setOpener(frame);
       frame->setOpenedByJS(true);
 
-      if (!frame->xmlDocImpl()) {
-        DocumentImpl* oldDoc = frame->xmlDocImpl();
+      if (!frame->document()) {
+        DocumentImpl* oldDoc = frame->document();
         if (oldDoc && oldDoc->baseURL() != 0)
           frame->begin(oldDoc->baseURL());
         else
@@ -1762,8 +1762,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         if (oldDoc) {
           kdDebug(6070) << "Setting domain to " << oldDoc->domain().qstring()
                         << endl;
-          frame->xmlDocImpl()->setDomain(oldDoc->domain(), true);
-          frame->xmlDocImpl()->setBaseURL(oldDoc->baseURL());
+          frame->document()->setDomain(oldDoc->domain(), true);
+          frame->document()->setBaseURL(oldDoc->baseURL());
         }
       }
       if (!url.isEmpty()) {
@@ -1959,7 +1959,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
-        if (DocumentImpl* doc = frame->xmlDocImpl())
+        if (DocumentImpl* doc = frame->document())
           doc->addWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
@@ -1969,7 +1969,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
-        if (DocumentImpl* doc = frame->xmlDocImpl())
+        if (DocumentImpl* doc = frame->document())
           doc->removeWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
@@ -1981,7 +1981,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 }
 
 void Window::updateLayout() const {
-  DOM::DocumentImpl* docimpl = m_frame->xmlDocImpl();
+  DOM::DocumentImpl* docimpl = m_frame->document();
   if (docimpl)
     docimpl->updateLayoutIgnorePendingStylesheets();
 }
@@ -2020,7 +2020,7 @@ void ScheduledAction::execute(Window* window) {
   // Update our document's rendering following the execution of the timeout
   // callback.
   // FIXME: Why? Why not other documents, for example?
-  DocumentImpl* doc = window->m_frame->xmlDocImpl();
+  DocumentImpl* doc = window->m_frame->document();
   if (doc)
     doc->updateRendering();
 
@@ -2301,7 +2301,7 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
       case Href: {
         Frame* p = Window::retrieveActive(exec)->frame();
         if (p)
-          url = p->xmlDocImpl()->completeURL(str);
+          url = p->document()->completeURL(str);
         else
           url = str;
         break;
@@ -2384,7 +2384,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                     ->wasRunByUserGesture();
-            frame->scheduleLocationChange(p->xmlDocImpl()->completeURL(str),
+            frame->scheduleLocationChange(p->document()->completeURL(str),
                                           p->referrer(), true /*lock history*/,
                                           userGesture);
           }
@@ -2410,7 +2410,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
         if (p) {
           const Window* window = Window::retrieveWindow(frame);
           QString dstUrl =
-              p->xmlDocImpl()->completeURL(args[0]->toString(exec).qstring());
+              p->document()->completeURL(args[0]->toString(exec).qstring());
           if (!dstUrl.startsWith("javascript:", false) ||
               (window && window->isSafeScript(exec))) {
             bool userGesture =

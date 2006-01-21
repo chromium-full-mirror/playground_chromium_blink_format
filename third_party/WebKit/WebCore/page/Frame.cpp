@@ -606,13 +606,13 @@ bool Frame::openFile() {
   return true;
 }
 
-DocumentImpl* Frame::xmlDocImpl() const {
+DocumentImpl* Frame::document() const {
   if (d)
     return d->m_doc;
   return 0;
 }
 
-void Frame::replaceDocImpl(DocumentImpl* newDoc) {
+void Frame::setDocument(DocumentImpl* newDoc) {
   if (d) {
     if (d->m_doc) {
       d->m_doc->detach();
@@ -1390,7 +1390,7 @@ static bool isFrameElement(const NodeImpl* n) {
 }
 
 void Frame::setFocusNodeIfNeeded() {
-  if (!xmlDocImpl() || d->m_selection.isNone() || !d->m_isFocused)
+  if (!document() || d->m_selection.isNone() || !d->m_isFocused)
     return;
 
   NodeImpl* startNode = d->m_selection.start().node();
@@ -1404,11 +1404,11 @@ void Frame::setFocusNodeIfNeeded() {
       // make this
       // work in the long term, but this is the safest fix at this time.
       if (target->isMouseFocusable() && !::isFrameElement(target)) {
-        xmlDocImpl()->setFocusNode(target);
+        document()->setFocusNode(target);
         return;
       }
     }
-    xmlDocImpl()->setFocusNode(0);
+    document()->setFocusNode(0);
   }
 }
 
@@ -2064,11 +2064,11 @@ bool Frame::isPointInsideSelection(int x, int y) {
   // Treat a collapsed selection like no selection.
   if (!d->m_selection.isRange())
     return false;
-  if (!xmlDocImpl()->renderer())
+  if (!document()->renderer())
     return false;
 
   RenderObject::NodeInfo nodeInfo(true, true);
-  xmlDocImpl()->renderer()->layer()->hitTest(nodeInfo, x, y);
+  document()->renderer()->layer()->hitTest(nodeInfo, x, y);
   NodeImpl* innerNode = nodeInfo.innerNode();
   if (!innerNode || !innerNode->renderer())
     return false;
@@ -2574,9 +2574,9 @@ void Frame::computeAndSetTypingStyle(CSSStyleDeclarationImpl* style,
       mutableStyle->copyBlockProperties();
   blockStyle->ref();
   blockStyle->diff(mutableStyle);
-  if (xmlDocImpl() && blockStyle->length() > 0) {
+  if (document() && blockStyle->length() > 0) {
     EditCommandPtr cmd(
-        new ApplyStyleCommand(xmlDocImpl(), blockStyle, editingAction));
+        new ApplyStyleCommand(document(), blockStyle, editingAction));
     cmd.apply();
   }
   blockStyle->deref();
@@ -2597,9 +2597,9 @@ void Frame::applyStyle(CSSStyleDeclarationImpl* style,
       break;
     }
     case WebCore::Selection::RANGE:
-      if (xmlDocImpl() && style) {
+      if (document() && style) {
         EditCommandPtr cmd(
-            new ApplyStyleCommand(xmlDocImpl(), style, editingAction));
+            new ApplyStyleCommand(document(), style, editingAction));
         cmd.apply();
       }
       break;
@@ -2614,9 +2614,9 @@ void Frame::applyParagraphStyle(CSSStyleDeclarationImpl* style,
       break;
     case WebCore::Selection::CARET:
     case WebCore::Selection::RANGE:
-      if (xmlDocImpl() && style) {
+      if (document() && style) {
         EditCommandPtr cmd(
-            new ApplyStyleCommand(xmlDocImpl(), style, editingAction,
+            new ApplyStyleCommand(document(), style, editingAction,
                                   ApplyStyleCommand::ForceBlockProperties));
         cmd.apply();
       }
@@ -2746,7 +2746,7 @@ CSSComputedStyleDeclarationImpl* Frame::selectionComputedStyle(
     NodeImpl*& nodeToRemove) const {
   nodeToRemove = 0;
 
-  if (!xmlDocImpl())
+  if (!document())
     return 0;
 
   if (d->m_selection.isNone())
@@ -2764,7 +2764,7 @@ CSSComputedStyleDeclarationImpl* Frame::selectionComputedStyle(
 
   if (d->m_typingStyle) {
     styleElement =
-        xmlDocImpl()->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
+        document()->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
     assert(exceptionCode == 0);
 
     styleElement->ref();
@@ -2773,7 +2773,7 @@ CSSComputedStyleDeclarationImpl* Frame::selectionComputedStyle(
                                exceptionCode);
     assert(exceptionCode == 0);
 
-    TextImpl* text = xmlDocImpl()->createEditingTextNode("");
+    TextImpl* text = document()->createEditingTextNode("");
     styleElement->appendChild(text, exceptionCode);
     assert(exceptionCode == 0);
 
@@ -2951,10 +2951,10 @@ void Frame::selectFrameElementInParentIfFullySelected() {
 
   // Get to the <iframe> or <frame> (or even <object>) element in the parent
   // frame.
-  DocumentImpl* document = xmlDocImpl();
-  if (!document)
+  DocumentImpl* doc = document();
+  if (!doc)
     return;
-  ElementImpl* ownerElement = document->ownerElement();
+  ElementImpl* ownerElement = doc->ownerElement();
   if (!ownerElement)
     return;
   NodeImpl* ownerElementParent = ownerElement->parentNode();
@@ -3018,7 +3018,7 @@ bool Frame::userGestureHint() {
 }
 
 RenderObject* Frame::renderer() const {
-  DocumentImpl* doc = xmlDocImpl();
+  DocumentImpl* doc = document();
   return doc ? doc->renderer() : 0;
 }
 
@@ -3140,11 +3140,11 @@ void Frame::revealSelection() {
 // FIXME: should this be here?
 bool Frame::scrollOverflow(KWQScrollDirection direction,
                            KWQScrollGranularity granularity) {
-  if (!xmlDocImpl()) {
+  if (!document()) {
     return false;
   }
 
-  NodeImpl* node = xmlDocImpl()->focusNode();
+  NodeImpl* node = document()->focusNode();
   if (node == 0) {
     node = d->m_mousePressNode.get();
   }
@@ -3165,7 +3165,7 @@ void Frame::paint(QPainter* p, const IntRect& rect) {
   bool fillWithRed;
   if (p->device()->devType() == QInternal::Printer)
     fillWithRed = false;  // Printing, don't fill with red (can't remember why).
-  else if (!xmlDocImpl() || xmlDocImpl()->ownerElement())
+  else if (!document() || document()->ownerElement())
     fillWithRed = false;  // Subframe, don't fill with red.
   else if (view() && view()->isTransparent())
     fillWithRed = false;  // Transparent, don't fill with red.
@@ -3201,7 +3201,7 @@ void Frame::adjustPageHeight(float* newBottom,
                              float oldTop,
                              float oldBottom,
                              float bottomLimit) {
-  RenderCanvas* root = static_cast<RenderCanvas*>(xmlDocImpl()->renderer());
+  RenderCanvas* root = static_cast<RenderCanvas*>(document()->renderer());
   if (root) {
     // Use a printer device, with painting disabled for the pagination phase
     QPainter painter(true);
@@ -3334,15 +3334,15 @@ QPtrList<Frame>& Frame::mutableInstances() {
 }
 
 void Frame::updatePolicyBaseURL() {
-  if (parentFrame() && parentFrame()->xmlDocImpl())
-    setPolicyBaseURL(parentFrame()->xmlDocImpl()->policyBaseURL());
+  if (parentFrame() && parentFrame()->document())
+    setPolicyBaseURL(parentFrame()->document()->policyBaseURL());
   else
     setPolicyBaseURL(m_url.url());
 }
 
 void Frame::setPolicyBaseURL(const DOMString& s) {
-  if (xmlDocImpl())
-    xmlDocImpl()->setPolicyBaseURL(s);
+  if (document())
+    document()->setPolicyBaseURL(s);
   ConstFrameIt end = d->m_frames.end();
   for (ConstFrameIt it = d->m_frames.begin(); it != end; ++it) {
     ObjectContents* subpart = (*it).m_frame;
@@ -3371,7 +3371,7 @@ void Frame::forceLayoutWithPageWidthRange(float minPageWidth,
   // Dumping externalRepresentation(m_frame->renderer()).ascii() is a good trick
   // to see
   // the state of things before and after the layout
-  RenderCanvas* root = static_cast<RenderCanvas*>(xmlDocImpl()->renderer());
+  RenderCanvas* root = static_cast<RenderCanvas*>(document()->renderer());
   if (root) {
     // This magic is basically copied from khtmlview::print
     int pageW = (int)ceil(minPageWidth);
@@ -3407,7 +3407,7 @@ void Frame::sendResizeEvent() {
 void Frame::sendScrollEvent() {
   FrameView* v = d->m_view;
   if (v) {
-    DocumentImpl* doc = xmlDocImpl();
+    DocumentImpl* doc = document();
     if (!doc)
       return;
     doc->dispatchHTMLEvent(scrollEvent, true, false);
@@ -3508,7 +3508,7 @@ void Frame::clearTimers(FrameView* view) {
   if (view) {
     view->unscheduleRelayout();
     if (view->frame()) {
-      DocumentImpl* document = view->frame()->xmlDocImpl();
+      DocumentImpl* document = view->frame()->document();
       if (document && document->renderer() && document->renderer()->layer())
         document->renderer()->layer()->suspendMarquees();
     }
@@ -3553,7 +3553,7 @@ void Frame::centerSelectionInVisibleArea() const {
 RenderStyle* Frame::styleForSelectionStart(NodeImpl*& nodeToRemove) const {
   nodeToRemove = 0;
 
-  if (!xmlDocImpl())
+  if (!document())
     return 0;
   if (d->m_selection.isNone())
     return 0;
@@ -3572,7 +3572,7 @@ RenderStyle* Frame::styleForSelectionStart(NodeImpl*& nodeToRemove) const {
 
   int exceptionCode = 0;
   ElementImpl* styleElement =
-      xmlDocImpl()->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
+      document()->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
   ASSERT(exceptionCode == 0);
 
   styleElement->ref();
@@ -3581,7 +3581,7 @@ RenderStyle* Frame::styleForSelectionStart(NodeImpl*& nodeToRemove) const {
                              exceptionCode);
   ASSERT(exceptionCode == 0);
 
-  TextImpl* text = xmlDocImpl()->createEditingTextNode("");
+  TextImpl* text = document()->createEditingTextNode("");
   styleElement->appendChild(text, exceptionCode);
   ASSERT(exceptionCode == 0);
 
@@ -3604,7 +3604,7 @@ void Frame::setSelectionFromNone() {
   // This has the effect of flashing the caret in a contentEditable view
   // automatically
   // without requiring the programmer to set a selection explicitly.
-  DocumentImpl* doc = xmlDocImpl();
+  DocumentImpl* doc = document();
   if (doc && selection().isNone() && isContentEditable()) {
     NodeImpl* node = doc->documentElement();
     while (node) {
@@ -3628,13 +3628,13 @@ void Frame::setWindowHasFocus(bool flag) {
     return;
   m_windowHasFocus = flag;
 
-  if (DocumentImpl* doc = xmlDocImpl())
+  if (DocumentImpl* doc = document())
     if (NodeImpl* body = doc->body())
       body->dispatchWindowEvent(flag ? focusEvent : blurEvent, false, false);
 }
 
 QChar Frame::backslashAsCurrencySymbol() const {
-  DocumentImpl* doc = xmlDocImpl();
+  DocumentImpl* doc = document();
   if (!doc)
     return '\\';
   Decoder* decoder = doc->decoder();

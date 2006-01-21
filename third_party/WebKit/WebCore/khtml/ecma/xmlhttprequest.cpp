@@ -731,7 +731,7 @@ JSValue* XMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
 
       QString method = args[0]->toString(exec).qstring();
       KURL url =
-          KURL(Window::retrieveActive(exec)->frame()->xmlDocImpl()->completeURL(
+          KURL(Window::retrieveActive(exec)->frame()->document()->completeURL(
               args[1]->toString(exec).qstring()));
 
       bool async = true;

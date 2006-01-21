@@ -197,7 +197,7 @@ bool execCut(Frame* frame, bool userInterface, const DOMString& value) {
 }
 
 bool execDelete(Frame* frame, bool userInterface, const DOMString& value) {
-  TypingCommand::deleteKeyPressed(frame->xmlDocImpl(),
+  TypingCommand::deleteKeyPressed(frame->document(),
                                   frame->selectionGranularity() == khtml::WORD);
   return true;
 }
@@ -205,7 +205,7 @@ bool execDelete(Frame* frame, bool userInterface, const DOMString& value) {
 bool execForwardDelete(Frame* frame,
                        bool userInterface,
                        const DOMString& value) {
-  TypingCommand::forwardDeleteKeyPressed(frame->xmlDocImpl());
+  TypingCommand::forwardDeleteKeyPressed(frame->document());
   return true;
 }
 
@@ -235,26 +235,26 @@ bool execIndent(Frame* frame, bool userInterface, const DOMString& value) {
 bool execInsertLineBreak(Frame* frame,
                          bool userInterface,
                          const DOMString& value) {
-  TypingCommand::insertLineBreak(frame->xmlDocImpl());
+  TypingCommand::insertLineBreak(frame->document());
   return true;
 }
 
 bool execInsertParagraph(Frame* frame,
                          bool userInterface,
                          const DOMString& value) {
-  TypingCommand::insertParagraphSeparator(frame->xmlDocImpl());
+  TypingCommand::insertParagraphSeparator(frame->document());
   return true;
 }
 
 bool execInsertNewlineInQuotedContent(Frame* frame,
                                       bool userInterface,
                                       const DOMString& value) {
-  TypingCommand::insertParagraphSeparatorInQuotedContent(frame->xmlDocImpl());
+  TypingCommand::insertParagraphSeparatorInQuotedContent(frame->document());
   return true;
 }
 
 bool execInsertText(Frame* frame, bool userInterface, const DOMString& value) {
-  TypingCommand::insertText(frame->xmlDocImpl(), value);
+  TypingCommand::insertText(frame->document(), value);
   return true;
 }
 

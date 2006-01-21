@@ -2938,7 +2938,7 @@ DocumentImpl* DocumentImpl::parentDocument() const {
   Frame* parent = childPart->parentFrame();
   if (!parent)
     return 0;
-  return parent->xmlDocImpl();
+  return parent->document();
 }
 
 DocumentImpl* DocumentImpl::topDocument() const {
