@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimateElementImpl_H
 #define KSVG_SVGAnimateElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGAnimationElementImpl.h"
 
@@ -41,6 +42,7 @@ class SVGAnimateElementImpl : public SVGAnimationElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

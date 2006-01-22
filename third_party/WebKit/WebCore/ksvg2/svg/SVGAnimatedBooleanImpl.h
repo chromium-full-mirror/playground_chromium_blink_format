@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedBooleanImpl_H
 #define KSVG_SVGAnimatedBooleanImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -46,6 +47,7 @@ class SVGAnimatedBooleanImpl : public Shared<SVGAnimatedBooleanImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

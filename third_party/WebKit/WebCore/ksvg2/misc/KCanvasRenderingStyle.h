@@ -23,6 +23,7 @@
 
 #ifndef KSVG_KCanvasRenderingStyle_H
 #define KSVG_KCanvasRenderingStyle_H
+#if SVG_SUPPORT
 
 #include "css_valueimpl.h"
 #include <kcanvas/KCanvasMatrix.h>
@@ -64,6 +65,7 @@ class KSVGPainterFactory {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

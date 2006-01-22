@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGAnimateElementImpl.h"
 #include "SVGSVGElementImpl.h"
 #include "KSVGTimeScheduler.h"
@@ -212,3 +213,4 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPathSegClosePathImpl.h"
 
 using namespace KSVG;
@@ -30,3 +31,4 @@ SVGPathSegClosePathImpl::SVGPathSegClosePathImpl() : SVGPathSegImpl() {}
 SVGPathSegClosePathImpl::~SVGPathSegClosePathImpl() {}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kcanvas/KCanvas.h>
 
 #include "DocumentImpl.h"
@@ -449,3 +450,4 @@ float TimeScheduler::elapsed() const {
 }  // namespace;
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

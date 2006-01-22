@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "RGBColorImpl.h"
 #include "css_valueimpl.h"
 
@@ -52,3 +53,4 @@ CSSPrimitiveValueImpl* RGBColorImpl::blue() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

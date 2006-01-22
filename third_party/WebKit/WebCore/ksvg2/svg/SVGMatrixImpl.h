@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGMatrixImpl_H
 #define KSVG_SVGMatrixImpl_H
+#if SVG_SUPPORT
 
 #include <qmatrix.h>
 
@@ -97,6 +98,7 @@ class SVGMatrixImpl : public Shared<SVGMatrixImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

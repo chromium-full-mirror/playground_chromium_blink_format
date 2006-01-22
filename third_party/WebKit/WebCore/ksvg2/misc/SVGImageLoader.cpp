@@ -20,6 +20,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <kdom/core/AttrImpl.h>
 #include <kdom/cache/KDOMLoader.h>
@@ -66,3 +67,4 @@ void SVGImageLoader::updateFromElement() {
           static_cast<khtml::RenderImage*>(imageElement->renderer()))
     renderer->resetAnimation();
 }
+#endif  // SVG_SUPPORT

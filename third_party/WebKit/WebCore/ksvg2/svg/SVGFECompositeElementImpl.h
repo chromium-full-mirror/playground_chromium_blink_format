@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFECompositeElementImpl_H
 #define KSVG_SVGFECompositeElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "KCanvasFilters.h"
@@ -64,6 +65,7 @@ class SVGFECompositeElementImpl
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "KRenderingDevice.h"
 
 KRenderingDevice::KRenderingDevice() {}
@@ -41,3 +42,4 @@ void KRenderingDevice::pushContext(KRenderingDeviceContext* context) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

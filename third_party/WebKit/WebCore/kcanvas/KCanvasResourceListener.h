@@ -22,6 +22,7 @@
 
 #ifndef KCanvasResourceListener_H
 #define KCanvasResourceListener_H
+#if SVG_SUPPORT
 
 class KCanvasResourceListener {
  public:
@@ -31,6 +32,7 @@ class KCanvasResourceListener {
   virtual void resourceNotification() const = 0;
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KDOMEVENTS_H
 #define KDOMEVENTS_H
+#if SVG_SUPPORT
 
 // General namespace specific definitions
 namespace KDOM {
@@ -96,6 +97,7 @@ enum AttrChangeType { MODIFICATION = 1, ADDITION = 2, REMOVAL = 3 };
 enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

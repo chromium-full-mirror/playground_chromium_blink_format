@@ -22,6 +22,7 @@
 
 #ifndef KCanvas_RenderSVGImage_H
 #define KCanvas_RenderSVGImage_H
+#if SVG_SUPPORT
 
 #include "render_image.h"
 #include <qmatrix.h>
@@ -46,6 +47,7 @@ class RenderSVGImage : public khtml::RenderImage {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

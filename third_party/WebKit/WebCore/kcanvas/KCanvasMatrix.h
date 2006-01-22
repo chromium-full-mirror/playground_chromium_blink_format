@@ -22,6 +22,7 @@
 
 #ifndef KCanvasMatrix_H
 #define KCanvasMatrix_H
+#if SVG_SUPPORT
 
 #include <qmatrix.h>
 
@@ -98,6 +99,7 @@ class KCanvasMatrix {
   KCMatrixOperationMode m_mode;
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

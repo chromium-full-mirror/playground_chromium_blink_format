@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdebug.h>
 #include <qregexp.h>
 #include <qstringlist.h>
@@ -127,3 +128,4 @@ void SVGStyledTransformableElementImpl::attach() {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

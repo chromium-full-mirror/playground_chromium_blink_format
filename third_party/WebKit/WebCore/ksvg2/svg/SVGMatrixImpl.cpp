@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <math.h>
 
 #include "ksvg.h"
@@ -267,3 +268,4 @@ void SVGMatrixImpl::removeScale(double* xScale, double* yScale) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGHelper.h"
 #include "SVGRectImpl.h"
 #include "SVGStyledElementImpl.h"
@@ -80,3 +81,4 @@ void SVGRectImpl::setHeight(double value) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

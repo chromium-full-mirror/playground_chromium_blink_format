@@ -22,6 +22,7 @@
 
 #ifndef KRenderingPaintServerPattern_H
 #define KRenderingPaintServerPattern_H
+#if SVG_SUPPORT
 
 #include <kcanvas/device/KRenderingPaintServer.h>
 #include <kcanvas/KCanvasResourceListener.h>
@@ -62,6 +63,7 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer {
   Private* d;
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGHelper_H
 #define KSVG_SVGHelper_H
+#if SVG_SUPPORT
 
 #include <qstring.h>
 #include <kxmlcore/RefPtr.h>
@@ -103,6 +104,7 @@ T* lazy_create(RefPtr<T>& variable,
 }
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

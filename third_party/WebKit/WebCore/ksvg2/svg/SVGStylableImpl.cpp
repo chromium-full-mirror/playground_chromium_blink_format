@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGStylableImpl.h"
 
 using namespace KSVG;
@@ -30,3 +31,4 @@ SVGStylableImpl::SVGStylableImpl() {}
 SVGStylableImpl::~SVGStylableImpl() {}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 #include "cssstyleselector.h"
 #include "DocumentImpl.h"
@@ -170,3 +171,4 @@ void SVGGradientElementImpl::rebuildStops() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

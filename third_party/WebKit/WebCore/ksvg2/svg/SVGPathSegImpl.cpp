@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPathSegImpl.h"
 
 using namespace KSVG;
@@ -31,3 +32,4 @@ SVGPathSegImpl::SVGPathSegImpl(const SVGStyledElementImpl* context)
 SVGPathSegImpl::~SVGPathSegImpl() {}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

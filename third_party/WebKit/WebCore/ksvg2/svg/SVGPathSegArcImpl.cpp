@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPathSegArcImpl.h"
 #include "SVGStyledElementImpl.h"
 
@@ -197,3 +198,4 @@ bool SVGPathSegArcRelImpl::sweepFlag() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

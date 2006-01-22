@@ -22,6 +22,7 @@
 
 #ifndef KDOM_SVGZoomEventImpl_H
 #define KDOM_SVGZoomEventImpl_H
+#if SVG_SUPPORT
 
 #include <kdom/events/UIEventImpl.h>
 
@@ -57,6 +58,7 @@ class SVGZoomEventImpl : public KDOM::UIEventImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

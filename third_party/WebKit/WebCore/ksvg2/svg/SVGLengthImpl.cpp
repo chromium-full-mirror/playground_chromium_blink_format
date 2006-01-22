@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "IntRect.h"
 
 #include <kdebug.h>
@@ -330,3 +331,4 @@ void SVGLengthImpl::setContext(const SVGStyledElementImpl* context) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

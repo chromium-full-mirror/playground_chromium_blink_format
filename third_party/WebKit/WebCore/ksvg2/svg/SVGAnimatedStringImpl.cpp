@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGAnimatedStringImpl.h"
 
 using namespace KSVG;
@@ -46,3 +47,4 @@ void SVGAnimatedStringImpl::assign(KDOM::DOMStringImpl* src,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

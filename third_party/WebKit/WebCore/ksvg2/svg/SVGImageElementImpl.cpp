@@ -22,6 +22,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <kdom/core/AttrImpl.h>
 
@@ -135,3 +136,4 @@ void SVGImageElementImpl::attach() {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFEBlendElementImpl_H
 #define KSVG_SVGFEBlendElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "KCanvasFilters.h"
@@ -54,4 +55,5 @@ class SVGFEBlendElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/Namespace.h>
 #include <kdom/core/AttrImpl.h>
 
@@ -180,3 +181,4 @@ khtml::RenderObject* SVGUseElementImpl::createRenderer(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

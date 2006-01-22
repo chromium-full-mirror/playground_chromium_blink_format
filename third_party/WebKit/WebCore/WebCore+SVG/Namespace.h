@@ -21,6 +21,7 @@
 
 #ifndef KDOM_Namespace_h
 #define KDOM_Namespace_h
+#if SVG_SUPPORT
 
 /**
  * @file Namespace.h
@@ -195,6 +196,7 @@ const DOMString NS_KXPATH_ERR =
 const DOMString NS_KDT = "http://www.example.org/KXPATH/DataTypeNamespace/TODO";
 };
 
+#endif  // SVG_SUPPORT
 #endif  // KDOM_Namespace_h
 
 // vim:ts=4:noet

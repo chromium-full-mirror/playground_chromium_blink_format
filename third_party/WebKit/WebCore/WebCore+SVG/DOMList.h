@@ -22,6 +22,7 @@
 
 #ifndef KDOM_DOMList_H
 #define KDOM_DOMList_H
+#if SVG_SUPPORT
 
 #include <q3ptrlist.h>
 #include "Shared.h"
@@ -108,6 +109,7 @@ class DOMList : public Shared<DOMList<T>> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

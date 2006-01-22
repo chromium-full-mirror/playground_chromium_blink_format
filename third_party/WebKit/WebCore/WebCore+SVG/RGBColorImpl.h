@@ -22,6 +22,7 @@
 
 #ifndef KDOM_RGBColorImpl_H
 #define KDOM_RGBColorImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -46,6 +47,7 @@ class RGBColorImpl : public Shared<RGBColorImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

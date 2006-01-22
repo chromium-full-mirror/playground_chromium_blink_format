@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/kdom.h>
 #include "SVGRectImpl.h"
 #include "SVGMatrixImpl.h"
@@ -66,3 +67,4 @@ SVGMatrixImpl* SVGStyledLocatableElementImpl::getTransformToElement(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

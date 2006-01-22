@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGTextContentElementImpl_H
 #define KSVG_SVGTextContentElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGStyledElementImpl.h"
 #include "SVGTestsImpl.h"
@@ -67,6 +68,7 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

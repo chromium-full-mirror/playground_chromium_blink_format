@@ -21,6 +21,7 @@
 
 #ifndef KSVG_SVGAnimatedColorImpl_H
 #define KSVG_SVGAnimatedColorImpl_H
+#if SVG_SUPPORT
 
 #include "SVGColorImpl.h"
 #include "SVGAnimatedTemplate.h"
@@ -37,4 +38,5 @@ class SVGAnimatedColorImpl : public SVGAnimatedTemplate<SVGColorImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif

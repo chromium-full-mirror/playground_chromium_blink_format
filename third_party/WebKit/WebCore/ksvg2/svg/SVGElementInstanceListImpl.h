@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGElementInstanceListImpl_H
 #define KSVG_SVGElementInstanceListImpl_H
+#if SVG_SUPPORT
 
 #include "SVGList.h"
 #include "SVGElementInstanceImpl.h"
@@ -34,6 +35,7 @@ class SVGElementInstanceListImpl : public SVGList<SVGElementInstanceImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGDOMImplementationImpl_H
 #define KSVG_SVGDOMImplementationImpl_H
+#if SVG_SUPPORT
 
 #include "DOMImplementationImpl.h"
 #include <qstringlist.h>
@@ -78,6 +79,7 @@ class SVGDOMImplementationImpl : public DOM::DOMImplementationImpl {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

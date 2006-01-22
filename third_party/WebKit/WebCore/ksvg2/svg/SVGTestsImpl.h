@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGTestsImpl_H
 #define KSVG_SVGTestsImpl_H
+#if SVG_SUPPORT
 
 #include <kxmlcore/RefPtr.h>
 
@@ -56,6 +57,7 @@ class SVGTestsImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

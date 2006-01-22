@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGFEFuncAElementImpl.h"
 
 using namespace KSVG;
@@ -32,3 +33,4 @@ SVGFEFuncAElementImpl::SVGFEFuncAElementImpl(const KDOM::QualifiedName& tagName,
 SVGFEFuncAElementImpl::~SVGFEFuncAElementImpl() {}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

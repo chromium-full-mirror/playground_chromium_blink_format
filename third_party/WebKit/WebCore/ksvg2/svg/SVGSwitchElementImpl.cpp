@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 
 #include <kcanvas/KCanvasCreator.h>
@@ -63,3 +64,4 @@ khtml::RenderObject* SVGSwitchElementImpl::createRenderer(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

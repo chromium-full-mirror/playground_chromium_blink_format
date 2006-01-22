@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGFESpotLightElementImpl.h"
 
 #include "SVGAnimatedNumberImpl.h"
@@ -42,3 +43,4 @@ KCLightSource* SVGFESpotLightElementImpl::lightSource() const {
                                limitingConeAngle()->baseVal());
 }
 }
+#endif  // SVG_SUPPORT

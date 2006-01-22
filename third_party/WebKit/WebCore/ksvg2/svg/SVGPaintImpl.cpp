@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "ksvg.h"
 #include "SVGPaintImpl.h"
 
@@ -87,3 +88,4 @@ KDOM::DOMString SVGPaintImpl::cssText() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

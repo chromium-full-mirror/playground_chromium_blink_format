@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 #include <kdom/events/MouseEventImpl.h>
 #include <kdom/events/kdomevents.h>
@@ -134,3 +135,4 @@ void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

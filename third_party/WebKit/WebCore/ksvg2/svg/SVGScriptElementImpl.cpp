@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/DOMString.h>
 //#include <kdom/ecma/Ecma.h>
 #include <kdom/core/AttrImpl.h>
@@ -113,3 +114,4 @@ void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

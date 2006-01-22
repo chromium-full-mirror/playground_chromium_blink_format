@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPatternElementImpl_H
 #define KSVG_SVGPatternElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGTestsImpl.h"
 #include "SVGLangSpaceImpl.h"
@@ -109,6 +110,7 @@ class SVGPatternElementImpl : public SVGStyledLocatableElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

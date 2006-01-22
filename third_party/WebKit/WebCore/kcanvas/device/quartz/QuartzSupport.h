@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if SVG_SUPPORT
+
 #import "KCanvasRenderingStyle.h"  // for all the CAP_BUTT contstants, etc.
 
 namespace WebCore {
@@ -80,3 +82,5 @@ static inline CGLineJoin CGLineJoinFromKC(KCJoinStyle join) {
 static inline CGPoint CGPointSubtractPoints(CGPoint a, CGPoint b) {
   return CGPointMake(a.x - b.x, a.y - b.y);
 }
+
+#endif  // SVG_SUPPORT

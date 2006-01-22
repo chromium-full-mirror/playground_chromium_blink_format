@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGRectImpl.h"
 #include "SVGPointImpl.h"
 #include "SVGZoomEventImpl.h"
@@ -63,3 +64,4 @@ SVGPointImpl* SVGZoomEventImpl::newTranslate() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

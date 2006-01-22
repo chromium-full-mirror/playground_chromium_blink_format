@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathSegLinetoHorizontalImpl_H
 #define KSVG_SVGPathSegLinetoHorizontalImpl_H
+#if SVG_SUPPORT
 
 #include <ksvg2/svg/SVGPathSegImpl.h>
 
@@ -71,6 +72,7 @@ class SVGPathSegLinetoHorizontalRelImpl : public SVGPathSegImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

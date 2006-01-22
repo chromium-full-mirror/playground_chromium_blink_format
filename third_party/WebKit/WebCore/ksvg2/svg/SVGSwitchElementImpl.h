@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGSwitchElementImpl_H
 #define KSVG_SVGSwitchElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGTestsImpl.h"
 #include "SVGLangSpaceImpl.h"
@@ -51,6 +52,7 @@ class SVGSwitchElementImpl : public SVGStyledTransformableElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

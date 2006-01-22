@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPointImpl.h"
 
 #include "SVGMatrixImpl.h"
@@ -80,3 +81,4 @@ SVGPointImpl* SVGPointImpl::matrixTransform(SVGMatrixImpl* /* matrix */) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

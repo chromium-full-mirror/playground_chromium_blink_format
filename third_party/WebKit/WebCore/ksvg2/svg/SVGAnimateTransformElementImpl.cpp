@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 
 #include <kcanvas/RenderPath.h>
@@ -481,3 +482,4 @@ SVGMatrixImpl* SVGAnimateTransformElementImpl::transformMatrix() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGElementImpl.h"
 #include "SVGUseElementImpl.h"
 #include "SVGElementInstanceImpl.h"
@@ -65,3 +66,4 @@ SVGElementInstanceImpl* SVGElementInstanceImpl::lastChild() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

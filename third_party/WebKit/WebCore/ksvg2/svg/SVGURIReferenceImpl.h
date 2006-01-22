@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGURIReferenceImpl_H
 #define KSVG_SVGURIReferenceImpl_H
+#if SVG_SUPPORT
 
 #include <qstring.h>
 
@@ -50,6 +51,7 @@ class SVGURIReferenceImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

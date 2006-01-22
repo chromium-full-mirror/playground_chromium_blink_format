@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedPointsImpl_H
 #define KSVG_SVGAnimatedPointsImpl_H
+#if SVG_SUPPORT
 
 namespace KSVG {
 class SVGPointListImpl;
@@ -36,6 +37,7 @@ class SVGAnimatedPointsImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

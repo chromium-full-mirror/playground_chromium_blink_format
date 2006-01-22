@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGStyledElementImpl.h"
 #include "SVGAnimatedIntegerImpl.h"
 
@@ -64,3 +65,4 @@ void SVGAnimatedIntegerImpl::setAnimVal(long animVal) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

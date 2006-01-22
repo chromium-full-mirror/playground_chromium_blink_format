@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGSVGElementImpl_H
 #define KSVG_SVGSVGElementImpl_H
+#if SVG_SUPPORT
 
 #include "IntPoint.h"
 
@@ -147,6 +148,7 @@ class SVGSVGElementImpl : public SVGStyledLocatableElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

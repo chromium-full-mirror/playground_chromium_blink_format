@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGStylableImpl_H
 #define KSVG_SVGStylableImpl_H
+#if SVG_SUPPORT
 
 #include <kdom/DOMString.h>
 
@@ -48,6 +49,7 @@ class SVGStylableImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

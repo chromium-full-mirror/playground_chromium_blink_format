@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGRectImpl_H
 #define KSVG_SVGRectImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -55,6 +56,7 @@ class SVGRectImpl : public Shared<SVGRectImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

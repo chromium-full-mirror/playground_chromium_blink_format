@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFEMergeElementImpl_H
 #define KSVG_SVGFEMergeElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "KCanvasFilters.h"
@@ -40,4 +41,5 @@ class SVGFEMergeElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif

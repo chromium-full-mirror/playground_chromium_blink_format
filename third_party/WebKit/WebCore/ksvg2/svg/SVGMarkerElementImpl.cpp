@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/DOMString.h>
 #include <kdom/core/AttrImpl.h>
 #include <kdom/core/NamedAttrMapImpl.h>
@@ -183,3 +184,4 @@ khtml::RenderObject* SVGMarkerElementImpl::createRenderer(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedTemplate_H
 #define KSVG_SVGAnimatedTemplate_H
+#if SVG_SUPPORT
 
 #include "SVGStyledElementImpl.h"
 
@@ -90,6 +91,7 @@ class SVGAnimatedTemplate : public Shared<SVGAnimatedTemplate<T>> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

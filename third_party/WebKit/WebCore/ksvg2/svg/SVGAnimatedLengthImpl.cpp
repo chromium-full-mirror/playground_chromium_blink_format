@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGAnimatedLengthImpl.h"
 
 using namespace KSVG;
@@ -49,3 +50,4 @@ void SVGAnimatedLengthImpl::assign(SVGLengthImpl* src,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

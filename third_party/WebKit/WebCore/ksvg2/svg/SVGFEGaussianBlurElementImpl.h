@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFEGaussianBlurElementImpl_H
 #define KSVG_SVGFEGaussianBlurElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "KCanvasFilters.h"
@@ -57,6 +58,7 @@ class SVGFEGaussianBlurElementImpl
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

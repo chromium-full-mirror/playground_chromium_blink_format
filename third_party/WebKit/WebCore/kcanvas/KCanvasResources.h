@@ -22,6 +22,7 @@
 
 #ifndef KCanvasResources_H
 #define KCanvasResources_H
+#if SVG_SUPPORT
 
 #include <qstring.h>
 #include <q3valuelist.h>
@@ -163,6 +164,7 @@ KCanvasMasker* getMaskerById(KDOM::DocumentImpl* document,
 KRenderingPaintServer* getPaintServerById(KDOM::DocumentImpl* document,
                                           const KDOM::AtomicString& id);
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

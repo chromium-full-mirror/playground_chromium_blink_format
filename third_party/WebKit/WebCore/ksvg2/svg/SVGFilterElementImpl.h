@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFilterElementImpl_H
 #define KSVG_SVGFilterElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGLangSpaceImpl.h"
 #include "SVGURIReferenceImpl.h"
@@ -76,6 +77,7 @@ class SVGFilterElementImpl : public SVGStyledElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

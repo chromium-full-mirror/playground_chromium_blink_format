@@ -28,6 +28,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <q3cstring.h>
 #include <qpaintdevice.h>
@@ -696,3 +697,4 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

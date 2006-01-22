@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "ksvg.h"
 #include "SVGHelper.h"
 #include "SVGStringListImpl.h"
@@ -101,3 +102,4 @@ void SVGHelper::ParseSeperatedList(SVGStringListImpl* list,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

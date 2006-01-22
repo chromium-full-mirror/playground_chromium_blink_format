@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathElementImpl_H
 #define KSVG_SVGPathElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGTestsImpl.h"
 #include "svgpathparser.h"
@@ -218,6 +219,7 @@ class SVGPathElementImpl : public SVGStyledTransformableElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

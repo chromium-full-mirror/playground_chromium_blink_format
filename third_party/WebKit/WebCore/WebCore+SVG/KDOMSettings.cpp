@@ -23,6 +23,7 @@
 #define DEBUG_SETTINGS 0
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdebug.h>
 #include <kconfig.h>
 #include <kglobal.h>
@@ -809,3 +810,4 @@ QString KDOMSettings::lookupFont(unsigned int i) const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

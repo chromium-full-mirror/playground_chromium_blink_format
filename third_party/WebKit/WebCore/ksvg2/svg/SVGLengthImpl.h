@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGLengthImpl_H
 #define KSVG_SVGLengthImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 #include <kdom/DOMString.h>
@@ -81,6 +82,7 @@ class SVGLengthImpl : public Shared<SVGLengthImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

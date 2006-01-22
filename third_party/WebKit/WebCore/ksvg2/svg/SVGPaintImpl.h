@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPaintImpl_H
 #define KSVG_SVGPaintImpl_H
+#if SVG_SUPPORT
 
 #include <kdom/DOMString.h>
 
@@ -57,6 +58,7 @@ class SVGPaintImpl : public SVGColorImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

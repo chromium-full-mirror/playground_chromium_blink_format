@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGTransformableImpl_H
 #define KSVG_SVGTransformableImpl_H
+#if SVG_SUPPORT
 
 #include "SVGLocatableImpl.h"
 
@@ -53,6 +54,7 @@ class SVGTransformableImpl : public SVGLocatableImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

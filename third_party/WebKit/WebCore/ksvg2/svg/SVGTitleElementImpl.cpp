@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGTitleElementImpl.h"
 
 using namespace KSVG;
@@ -36,3 +37,4 @@ KDOM::DOMString SVGTitleElementImpl::title() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

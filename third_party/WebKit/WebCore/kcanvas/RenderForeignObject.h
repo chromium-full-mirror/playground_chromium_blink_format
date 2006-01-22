@@ -22,6 +22,7 @@
 
 #ifndef RenderForeignObject_H
 #define RenderForeignObject_H
+#if SVG_SUPPORT
 
 #include "RenderBlock.h"
 #include <qmatrix.h>
@@ -54,4 +55,5 @@ class RenderForeignObject : public khtml::RenderBlock {
   QMatrix m_transform;
 };
 
+#endif  // SVG_SUPPORT
 #endif

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedPathDataImpl_H
 #define KSVG_SVGAnimatedPathDataImpl_H
+#if SVG_SUPPORT
 
 namespace KSVG {
 class SVGPathSegListImpl;
@@ -38,6 +39,7 @@ class SVGAnimatedPathDataImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPolylineElementImpl_H
 #define KSVG_SVGPolylineElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGPolyElementImpl.h"
 
@@ -36,6 +37,7 @@ class SVGPolylineElementImpl : public SVGPolyElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

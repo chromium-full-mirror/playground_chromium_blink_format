@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGTextPositioningElementImpl_H
 #define KSVG_SVGTextPositioningElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGTextContentElementImpl.h"
 
@@ -53,6 +54,7 @@ class SVGTextPositioningElementImpl : public SVGTextContentElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

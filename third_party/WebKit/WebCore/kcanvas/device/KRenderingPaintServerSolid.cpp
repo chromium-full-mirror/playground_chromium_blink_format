@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "KRenderingPaintServerSolid.h"
 #include <qtextstream.h>
 #include "KCanvasTreeDebug.h"
@@ -66,3 +67,4 @@ QTextStream& KRenderingPaintServerSolid::externalRepresentation(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

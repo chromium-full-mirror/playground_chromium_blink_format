@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/kdom.h>
 #include <kdom/DOMString.h>
 #include "DocumentImpl.h"
@@ -116,3 +117,4 @@ bool SVGStyleElementImpl::isLoading() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

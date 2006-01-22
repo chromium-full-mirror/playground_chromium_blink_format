@@ -22,6 +22,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 
 #include <kcanvas/KCanvas.h>
@@ -166,3 +167,4 @@ KCanvasMasker* SVGMaskElementImpl::canvasResource() {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

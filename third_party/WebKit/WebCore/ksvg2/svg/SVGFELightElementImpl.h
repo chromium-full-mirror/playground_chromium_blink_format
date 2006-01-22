@@ -21,6 +21,7 @@
 
 #ifndef KSVG_SVGFELightElementImpl_H
 #define KSVG_SVGFELightElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGElementImpl.h"
 #include "KCanvasFilters.h"
@@ -67,4 +68,5 @@ class SVGFELightElementImpl : public SVGElementImpl {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif

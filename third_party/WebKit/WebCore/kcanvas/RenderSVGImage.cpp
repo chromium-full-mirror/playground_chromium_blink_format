@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <kdom/core/AttrImpl.h>
 
@@ -100,3 +101,4 @@ void RenderSVGImage::translateForAttributes() {
   float yOffset = image->y()->baseVal() ? image->y()->baseVal()->value() : 0;
   context->concatCTM(QMatrix().translate(xOffset, yOffset));
 }
+#endif  // SVG_SUPPORT

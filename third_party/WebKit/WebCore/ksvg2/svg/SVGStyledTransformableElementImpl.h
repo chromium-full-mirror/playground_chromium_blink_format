@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGStyledTransformableElementImpl_H
 #define KSVG_SVGStyledTransformableElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGStyledLocatableElementImpl.h"
 #include "SVGTransformableImpl.h"
@@ -72,6 +73,7 @@ class SVGStyledTransformableElementImpl : public SVGStyledLocatableElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

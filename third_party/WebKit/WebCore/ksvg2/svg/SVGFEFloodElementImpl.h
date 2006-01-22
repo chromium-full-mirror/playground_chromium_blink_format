@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFEFloodElementImpl_H
 #define KSVG_SVGFEFloodElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "KCanvasFilters.h"
@@ -49,4 +50,5 @@ class SVGFEFloodElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif

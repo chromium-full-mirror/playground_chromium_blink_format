@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGZoomAndPanImpl_H
 #define KSVG_SVGZoomAndPanImpl_H
+#if SVG_SUPPORT
 
 namespace KDOM {
 class MappedAttributeImpl;
@@ -44,6 +45,7 @@ class SVGZoomAndPanImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

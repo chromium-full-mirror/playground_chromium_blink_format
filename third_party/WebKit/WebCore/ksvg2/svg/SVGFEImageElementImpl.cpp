@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <kdom/core/AttrImpl.h>
 #include <kdom/cache/KDOMLoader.h>
@@ -109,3 +110,4 @@ KCanvasFEImage* SVGFEImageElementImpl::filterEffect() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

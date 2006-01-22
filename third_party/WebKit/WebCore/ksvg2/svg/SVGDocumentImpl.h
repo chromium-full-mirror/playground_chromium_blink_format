@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGDocumentImpl_H
 #define KSVG_SVGDocumentImpl_H
+#if SVG_SUPPORT
 
 #include <q3ptrlist.h>
 
@@ -63,6 +64,7 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
 // Internal
 #if 0
         virtual KDOM::Ecma *ecmaEngine() const;
+#endif  // SVG_SUPPORT
 #endif
   void finishedParsing();
   void dispatchRecursiveEvent(KDOM::EventImpl* event, KDOM::NodeImpl* obj);

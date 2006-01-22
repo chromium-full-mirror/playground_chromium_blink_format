@@ -19,6 +19,7 @@
 
 #ifndef __SVGPATHPARSER_H__
 #define __SVGPATHPARSER_H__
+#if SVG_SUPPORT
 
 class QString;
 
@@ -102,6 +103,7 @@ class SVGPathParser {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

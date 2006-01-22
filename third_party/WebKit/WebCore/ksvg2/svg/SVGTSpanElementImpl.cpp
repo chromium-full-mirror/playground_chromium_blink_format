@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGTSpanElementImpl.h"
 #include "SVGNames.h"
 #include "render_inline.h"
@@ -46,3 +47,4 @@ khtml::RenderObject* SVGTSpanElementImpl::createRenderer(RenderArena* arena,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

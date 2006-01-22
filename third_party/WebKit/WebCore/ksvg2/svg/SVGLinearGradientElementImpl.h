@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGLinearGradientElementImpl_H
 #define KSVG_SVGLinearGradientElementImpl_H
+#if SVG_SUPPORT
 
 #include <SVGGradientElementImpl.h>
 
@@ -53,6 +54,7 @@ class SVGLinearGradientElementImpl : public SVGGradientElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

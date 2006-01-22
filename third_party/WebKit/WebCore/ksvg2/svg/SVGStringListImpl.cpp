@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <qstringlist.h>
 
 #include "SVGStringListImpl.h"
@@ -47,3 +48,4 @@ void SVGStringListImpl::reset(const QString& str) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

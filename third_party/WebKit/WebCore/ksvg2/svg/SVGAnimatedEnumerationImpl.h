@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedEnumerationImpl_H
 #define KSVG_SVGAnimatedEnumerationImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -47,6 +48,7 @@ class SVGAnimatedEnumerationImpl : public Shared<SVGAnimatedEnumerationImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

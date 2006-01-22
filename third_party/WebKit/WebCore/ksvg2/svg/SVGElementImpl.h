@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGElementImpl_H
 #define KSVG_SVGElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGNames.h"
 #include <kdom/core/XMLElementImpl.h>
@@ -86,6 +87,7 @@ class SVGElementImpl : public KDOM::XMLElementImpl {
   bool m_closed;
 #if 0
         void addSVGEventListener(KDOM::Ecma *ecmaEngine, const KDOM::DOMString &type, const KDOM::DOMString &value);
+#endif  // SVG_SUPPORT
 #endif
 };
 };

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFilterPrimitiveStandardAttributesImpl_H
 #define KSVG_SVGFilterPrimitiveStandardAttributesImpl_H
+#if SVG_SUPPORT
 
 #include "SVGStyledElementImpl.h"
 
@@ -62,6 +63,7 @@ class SVGFilterPrimitiveStandardAttributesImpl : public SVGStyledElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

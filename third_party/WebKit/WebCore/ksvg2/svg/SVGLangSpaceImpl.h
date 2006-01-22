@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGLangSpaceImpl_H
 #define KSVG_SVGLangSpaceImpl_H
+#if SVG_SUPPORT
 
 #include "dom_atomicstring.h"
 
@@ -54,6 +55,7 @@ class SVGLangSpaceImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

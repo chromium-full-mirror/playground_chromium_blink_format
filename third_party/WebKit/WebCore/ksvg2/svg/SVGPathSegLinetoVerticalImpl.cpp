@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPathSegLinetoVerticalImpl.h"
 #include "SVGStyledElementImpl.h"
 
@@ -65,3 +66,4 @@ double SVGPathSegLinetoVerticalRelImpl::y() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

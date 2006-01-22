@@ -25,6 +25,7 @@
  */
 
 #include "config.h"
+#if SVG_SUPPORT
 
 #include <qpainter.h>
 #include <qtextstream.h>
@@ -55,3 +56,4 @@ QTextStream& operator<<(QTextStream& ts, const KCClipData& d) {
      << "]";
   return ts;
 }
+#endif  // SVG_SUPPORT

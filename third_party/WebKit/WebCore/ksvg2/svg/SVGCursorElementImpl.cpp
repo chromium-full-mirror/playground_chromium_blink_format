@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 #include "DocumentImpl.h"
 #include "DocLoader.h"
@@ -92,3 +93,4 @@ void SVGCursorElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

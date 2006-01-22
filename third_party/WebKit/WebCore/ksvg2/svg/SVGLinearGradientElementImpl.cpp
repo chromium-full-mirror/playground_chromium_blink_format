@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/AttrImpl.h>
 
 #include "ksvg.h"
@@ -197,3 +198,4 @@ void SVGLinearGradientElementImpl::buildGradient(
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPointImpl_H
 #define KSVG_SVGPointImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -57,6 +58,7 @@ class SVGPointImpl : public Shared<SVGPointImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

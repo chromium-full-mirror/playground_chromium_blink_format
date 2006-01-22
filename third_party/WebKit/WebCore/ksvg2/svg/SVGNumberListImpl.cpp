@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <qstringlist.h>
 
 #include "SVGMatrixImpl.h"
@@ -46,3 +47,4 @@ void SVGNumberListImpl::parse(const QString& value,
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathSegArcImpl_H
 #define KSVG_SVGPathSegArcImpl_H
+#if SVG_SUPPORT
 
 #include "SVGPathSegImpl.h"
 
@@ -131,6 +132,7 @@ class SVGPathSegArcRelImpl : public SVGPathSegImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGList_H
 #define KSVG_SVGList_H
+#if SVG_SUPPORT
 
 #include <q3ptrlist.h>
 #include <kdom/core/DOMList.h>
@@ -82,6 +83,7 @@ class SVGList : public KDOM::DOMList<T> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

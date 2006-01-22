@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAngleImpl_H
 #define KSVG_SVGAngleImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 #include <kdom/DOMString.h>
@@ -70,6 +71,7 @@ class SVGAngleImpl : public Shared<SVGAngleImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

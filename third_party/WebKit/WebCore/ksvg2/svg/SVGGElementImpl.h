@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGGElementImpl_H
 #define KSVG_SVGGElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGStyledTransformableElementImpl.h"
 #include "SVGTestsImpl.h"
@@ -62,6 +63,7 @@ class SVGDummyElementImpl : public SVGGElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

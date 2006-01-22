@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/kdom.h>
 #include "SVGTextElementImpl.h"
 #include "SVGTSpanElementImpl.h"
@@ -117,3 +118,4 @@ bool SVGTextElementImpl::childShouldCreateRenderer(DOM::NodeImpl* child) const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

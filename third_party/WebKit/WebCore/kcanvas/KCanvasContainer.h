@@ -22,6 +22,7 @@
 
 #ifndef KCanvasContainer_H
 #define KCanvasContainer_H
+#if SVG_SUPPORT
 
 #include "kcanvas/RenderPath.h"
 #include "RenderContainer.h"
@@ -85,6 +86,7 @@ class KCanvasContainer : public khtml::RenderContainer {
   Private* d;
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

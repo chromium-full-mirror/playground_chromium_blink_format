@@ -22,6 +22,7 @@
 
 #ifndef KDOM_KDOMSettings_H
 #define KDOM_KDOMSettings_H
+#if SVG_SUPPORT
 
 #include <qcolor.h>
 #include <qstring.h>
@@ -209,6 +210,7 @@ class KDOMSettings {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

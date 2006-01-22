@@ -27,6 +27,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "ksvg.h"
 #include "render_style.h"
 #include "SVGRenderStyle.h"
@@ -166,3 +167,4 @@ bool StyleMiscData::operator==(const StyleMiscData& other) const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

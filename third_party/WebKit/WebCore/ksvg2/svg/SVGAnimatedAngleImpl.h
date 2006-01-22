@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedAngleImpl_H
 #define KSVG_SVGAnimatedAngleImpl_H
+#if SVG_SUPPORT
 
 #include "SVGAngleImpl.h"
 #include "SVGAnimatedTemplate.h"
@@ -38,6 +39,7 @@ class SVGAnimatedAngleImpl : public SVGAnimatedTemplate<SVGAngleImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

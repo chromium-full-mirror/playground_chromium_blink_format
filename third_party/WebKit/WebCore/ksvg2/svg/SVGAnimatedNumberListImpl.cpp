@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGNumberListImpl.h"
 #include "SVGAnimatedNumberListImpl.h"
 
@@ -47,3 +48,4 @@ SVGNumberListImpl* SVGAnimatedNumberListImpl::create() const {
 //}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

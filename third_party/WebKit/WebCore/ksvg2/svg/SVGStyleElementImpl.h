@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGStyleElementImpl_H
 #define KSVG_SVGStyleElementImpl_H
+#if SVG_SUPPORT
 
 #include <SVGElementImpl.h>
 
@@ -63,6 +64,7 @@ class SVGStyleElementImpl : public SVGElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

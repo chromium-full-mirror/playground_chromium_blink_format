@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGSymbolElementImpl_H
 #define KSVG_SVGSymbolElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGLangSpaceImpl.h"
 #include "SVGFitToViewBoxImpl.h"
@@ -43,6 +44,7 @@ class SVGSymbolElementImpl : public SVGStyledElementImpl,
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGFitToViewBoxImpl_H
 #define KSVG_SVGFitToViewBoxImpl_H
+#if SVG_SUPPORT
 
 namespace KDOM {
 class AttributeImpl;
@@ -53,6 +54,7 @@ class SVGFitToViewBoxImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGAnimatedPointsImpl.h"
 
 using namespace KSVG;
@@ -30,3 +31,4 @@ SVGAnimatedPointsImpl::SVGAnimatedPointsImpl() {}
 SVGAnimatedPointsImpl::~SVGAnimatedPointsImpl() {}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

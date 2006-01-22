@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGTransformImpl_H
 #define KSVG_SVGTransformImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -52,6 +53,7 @@ class SVGTransformImpl : public Shared<SVGTransformImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

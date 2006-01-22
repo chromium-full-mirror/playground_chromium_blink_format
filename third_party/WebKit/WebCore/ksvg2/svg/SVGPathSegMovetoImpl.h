@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathSegMovetoImpl_H
 #define KSVG_SVGPathSegMovetoImpl_H
+#if SVG_SUPPORT
 
 #include <ksvg2/svg/SVGPathSegImpl.h>
 
@@ -75,6 +76,7 @@ class SVGPathSegMovetoRelImpl : public SVGPathSegImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

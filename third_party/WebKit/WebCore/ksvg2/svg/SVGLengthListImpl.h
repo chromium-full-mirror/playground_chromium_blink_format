@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGLengthListImpl_H
 #define KSVG_SVGLengthListImpl_H
+#if SVG_SUPPORT
 
 #include "SVGList.h"
 #include "SVGLengthImpl.h"
@@ -38,6 +39,7 @@ class SVGLengthListImpl : public SVGList<SVGLengthImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

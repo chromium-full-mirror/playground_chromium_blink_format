@@ -22,6 +22,7 @@
 
 #ifndef KCanvasCreator_H
 #define KCanvasCreator_H
+#if SVG_SUPPORT
 
 #include <kcanvas/KCanvasPath.h>
 
@@ -51,6 +52,7 @@ class KCanvasCreator {
   static KCanvasCreator* s_creator;
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

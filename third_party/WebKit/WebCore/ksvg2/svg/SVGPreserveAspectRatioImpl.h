@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPreserveAspectRatioImpl_H
 #define KSVG_SVGPreserveAspectRatioImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 
@@ -63,6 +64,7 @@ class SVGPreserveAspectRatioImpl : public Shared<SVGPreserveAspectRatioImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGPathSegMovetoImpl.h"
 #include "SVGStyledElementImpl.h"
 
@@ -87,3 +88,4 @@ double SVGPathSegMovetoRelImpl::y() const {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGAnimatedRectImpl_H
 #define KSVG_SVGAnimatedRectImpl_H
+#if SVG_SUPPORT
 
 #include "SVGRectImpl.h"
 #include "SVGAnimatedTemplate.h"
@@ -38,6 +39,7 @@ class SVGAnimatedRectImpl : public SVGAnimatedTemplate<SVGRectImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

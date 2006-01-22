@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathSegImpl_H
 #define KSVG_SVGPathSegImpl_H
+#if SVG_SUPPORT
 
 #include "Shared.h"
 #include <kdom/core/DOMStringImpl.h>
@@ -47,6 +48,7 @@ class SVGPathSegImpl : public Shared<SVGPathSegImpl> {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

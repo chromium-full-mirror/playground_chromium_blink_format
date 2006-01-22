@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGCSSParser_H
 #define KSVG_SVGCSSParser_H
+#if SVG_SUPPORT
 
 #include <kdom/css/KDOMCSSParser.h>
 
@@ -45,6 +46,7 @@ class SVGCSSParser : public KDOM::CSSParser {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

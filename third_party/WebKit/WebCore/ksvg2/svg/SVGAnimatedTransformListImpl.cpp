@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGTransformListImpl.h"
 #include "SVGAnimatedTransformListImpl.h"
 
@@ -47,3 +48,4 @@ SVGTransformListImpl* SVGAnimatedTransformListImpl::create() const {
 //}
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

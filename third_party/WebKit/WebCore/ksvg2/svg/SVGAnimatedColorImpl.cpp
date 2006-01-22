@@ -20,6 +20,7 @@
  */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include "SVGAnimatedColorImpl.h"
 
 using namespace KSVG;
@@ -38,3 +39,4 @@ void SVGAnimatedColorImpl::assign(SVGColorImpl* src, SVGColorImpl* dst) const {
     return;
   dst->setCssText(src->cssText());
 }
+#endif  // SVG_SUPPORT

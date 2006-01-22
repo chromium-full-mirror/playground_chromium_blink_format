@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+#if SVG_SUPPORT
 #include <kdom/core/domattrs.h>
 #include <kdom/core/AttrImpl.h>
 #include <kdom/core/DOMStringImpl.h>
@@ -65,3 +66,4 @@ bool SVGLangSpaceImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
 }
 
 // vim:ts=4:noet
+#endif  // SVG_SUPPORT

@@ -22,6 +22,7 @@
 
 #ifndef KSVG_SVGPathSegCurvetoCubicImpl_H
 #define KSVG_SVGPathSegCurvetoCubicImpl_H
+#if SVG_SUPPORT
 
 #include "SVGPathSegImpl.h"
 
@@ -123,6 +124,7 @@ class SVGPathSegCurvetoCubicRelImpl : public SVGPathSegImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

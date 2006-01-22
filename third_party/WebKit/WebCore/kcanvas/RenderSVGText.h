@@ -22,6 +22,7 @@
 
 #ifndef RenderSVGText_H
 #define RenderSVGText_H
+#if SVG_SUPPORT
 
 #include "RenderBlock.h"
 #include <qmatrix.h>
@@ -55,4 +56,5 @@ class RenderSVGText : public khtml::RenderBlock {
   QMatrix m_transform;
 };
 
+#endif  // SVG_SUPPORT
 #endif

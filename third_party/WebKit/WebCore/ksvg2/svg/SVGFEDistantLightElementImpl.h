@@ -19,6 +19,7 @@
 
 #ifndef KSVG_SVGFEDistantLightElementImpl_H
 #define KSVG_SVGFEDistantLightElementImpl_H
+#if SVG_SUPPORT
 
 #include "SVGFELightElementImpl.h"
 
@@ -32,4 +33,5 @@ class SVGFEDistantLightElementImpl : public SVGFELightElementImpl {
 };
 };
 
+#endif  // SVG_SUPPORT
 #endif
