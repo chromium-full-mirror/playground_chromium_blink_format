@@ -1182,6 +1182,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // Now determine the correct ypos based off examination of collapsing margin
     // values.
     collapseMargins(child, marginInfo, yPosEstimate);
+    int postCollapseChildY = child->yPos();
 
     // Now check for clear.
     clearFloatsIfNeeded(child, marginInfo, oldTopPosMargin, oldTopNegMargin);
@@ -1233,8 +1234,20 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // descendants.  An exception is if we need a layout.  In this case, we know
     // we're going to
     // repaint ourselves (and the child) anyway.
-    if (!selfNeedsLayout() && child->checkForRepaintDuringLayout())
-      child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
+    if (!selfNeedsLayout() && child->checkForRepaintDuringLayout()) {
+      int finalChildX = child->xPos();
+      int finalChildY = child->yPos();
+      if (finalChildX != oldChildX || finalChildY != oldChildY)
+        child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
+      else if (finalChildY != yPosEstimate ||
+               finalChildY != postCollapseChildY) {
+        // The child's repaints during layout were done before it reached its
+        // final position,
+        // so they were wrong.
+        child->repaint();
+        child->repaintFloatingDescendants();
+      }
+    }
 
     child = child->nextSibling();
   }
