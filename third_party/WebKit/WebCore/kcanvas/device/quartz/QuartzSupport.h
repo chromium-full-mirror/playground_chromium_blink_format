@@ -24,14 +24,11 @@
  */
 
 #import "KCanvasRenderingStyle.h"  // for all the CAP_BUTT contstants, etc.
-class RenderPath;
 
 namespace WebCore {
 class IntRect;
-}
-
-namespace khtml {
 class RenderStyle;
+class RenderObject;
 }
 
 #ifndef NDEBUG
@@ -39,8 +36,8 @@ void debugDumpCGImageToFile(NSString* filename,
                             CGImageRef image,
                             int width,
                             int height);
-void debugDumpCGImageToFile(NSString* filename,
-                            CGImageRef image,
+void debugDumpCGLayerToFile(NSString* filename,
+                            CGLayerRef layer,
                             int width,
                             int height);
 void debugDumpCIImageToFile(NSString* filename,
@@ -54,9 +51,9 @@ CFStringRef CFStringFromCGAffineTransform(CGAffineTransform t);
 CGAffineTransform CGAffineTransformMakeMapBetweenRects(CGRect source,
                                                        CGRect dest);
 
-void applyStrokeStyleToContext(CGContextRef context,
-                               khtml::RenderStyle* style,
-                               const RenderPath* renderPath);
+void applyStrokeStyleToContext(CGContextRef,
+                               WebCore::RenderStyle*,
+                               const WebCore::RenderObject*);
 
 static inline CGLineCap CGLineCapFromKC(KCCapStyle cap) {
   if (cap == CAP_BUTT)

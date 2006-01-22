@@ -25,6 +25,8 @@
 #include <q3paintdevicemetrics.h>
 #include <qpaintdevice.h>
 
+#include <render_object.h>
+
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasPath.h>
 #include <kcanvas/device/KRenderingDevice.h>
@@ -45,9 +47,17 @@
 #include "KCanvasRenderingStyle.h"
 #include "SVGRenderStyle.h"
 
-using namespace KSVG;
+namespace WebCore {
 
-bool KSVGPainterFactory::isFilled(const khtml::RenderStyle* style) {
+static KRenderingPaintServerSolid* sharedSolidPaintServer() {
+  KRenderingPaintServerSolid* _sharedSolidPaintServer = 0;
+  if (!_sharedSolidPaintServer)
+    _sharedSolidPaintServer = static_cast<KRenderingPaintServerSolid*>(
+        QPainter::renderingDevice()->createPaintServer(PS_SOLID));
+  return _sharedSolidPaintServer;
+}
+
+bool KSVGPainterFactory::isFilled(const RenderStyle* style) {
   SVGPaintImpl* fill = style->svgStyle()->fillPaint();
   if (fill && fill->paintType() == SVG_PAINTTYPE_NONE)
     return false;
@@ -55,8 +65,8 @@ bool KSVGPainterFactory::isFilled(const khtml::RenderStyle* style) {
 }
 
 KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
-    const khtml::RenderStyle* style,
-    const RenderPath* item) {
+    const RenderStyle* style,
+    const RenderObject* item) {
   if (!isFilled(style))
     return 0;
 
@@ -65,19 +75,16 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
   KRenderingPaintServer* fillPaintServer;
   if (!fill) {
     // initial value (black)
-    fillPaintServer = QPainter::renderingDevice()->createPaintServer(
-        KCPaintServerType(PS_SOLID));
-    KRenderingPaintServerSolid* fillPaintServerSolid =
-        static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
-    fillPaintServerSolid->setColor(Qt::black);
+    fillPaintServer = sharedSolidPaintServer();
+    static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
+        ->setColor(Qt::black);
   } else if (fill->paintType() == SVG_PAINTTYPE_URI) {
-    KDOM::DOMString id(fill->uri());
+    DOMString id(fill->uri());
     fillPaintServer = getPaintServerById(item->document(), id.qstring().mid(1));
-    if (item && fillPaintServer)
-      fillPaintServer->addClient(item);
+    if (item && fillPaintServer && item->isRenderPath())
+      fillPaintServer->addClient(static_cast<const RenderPath*>(item));
   } else {
-    fillPaintServer = QPainter::renderingDevice()->createPaintServer(
-        KCPaintServerType(PS_SOLID));
+    fillPaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
     if (fill->paintType() == SVG_PAINTTYPE_CURRENTCOLOR)
@@ -89,7 +96,7 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
   return fillPaintServer;
 }
 
-bool KSVGPainterFactory::isStroked(const khtml::RenderStyle* style) {
+bool KSVGPainterFactory::isStroked(const RenderStyle* style) {
   SVGPaintImpl* stroke = style->svgStyle()->strokePaint();
   if (!stroke || stroke->paintType() == SVG_PAINTTYPE_NONE)
     return false;
@@ -97,8 +104,8 @@ bool KSVGPainterFactory::isStroked(const khtml::RenderStyle* style) {
 }
 
 KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
-    const khtml::RenderStyle* style,
-    const RenderPath* item) {
+    const RenderStyle* style,
+    const RenderObject* item) {
   if (!isStroked(style))
     return 0;
 
@@ -106,14 +113,13 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
 
   KRenderingPaintServer* strokePaintServer;
   if (stroke && stroke->paintType() == SVG_PAINTTYPE_URI) {
-    KDOM::DOMString id(stroke->uri());
+    DOMString id(stroke->uri());
     strokePaintServer =
         getPaintServerById(item->document(), id.qstring().mid(1));
-    if (item && strokePaintServer)
-      strokePaintServer->addClient(item);
+    if (item && strokePaintServer && item->isRenderPath())
+      strokePaintServer->addClient(static_cast<const RenderPath*>(item));
   } else {
-    strokePaintServer = QPainter::renderingDevice()->createPaintServer(
-        KCPaintServerType(PS_SOLID));
+    strokePaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* strokePaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(strokePaintServer);
     if (stroke->paintType() == SVG_PAINTTYPE_CURRENTCOLOR)
@@ -125,17 +131,16 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
   return strokePaintServer;
 }
 
-double KSVGPainterFactory::cssPrimitiveToLength(const RenderPath* item,
-                                                KDOM::CSSValueImpl* value,
+double KSVGPainterFactory::cssPrimitiveToLength(const RenderObject* item,
+                                                CSSValueImpl* value,
                                                 double defaultValue) {
-  KDOM::CSSPrimitiveValueImpl* primitive =
-      static_cast<KDOM::CSSPrimitiveValueImpl*>(value);
+  CSSPrimitiveValueImpl* primitive = static_cast<CSSPrimitiveValueImpl*>(value);
 
   unsigned short cssType =
       (primitive ? primitive->primitiveType()
-                 : (unsigned short)KDOM::CSSPrimitiveValue::CSS_UNKNOWN);
-  if (!(cssType > KDOM::CSSPrimitiveValue::CSS_UNKNOWN &&
-        cssType <= KDOM::CSSPrimitiveValue::CSS_PC))
+                 : (unsigned short)CSSPrimitiveValue::CSS_UNKNOWN);
+  if (!(cssType > CSSPrimitiveValue::CSS_UNKNOWN &&
+        cssType <= CSSPrimitiveValue::CSS_PC))
     return defaultValue;
 
   Q3PaintDeviceMetrics* paintDeviceMetrics = 0;
@@ -144,33 +149,32 @@ double KSVGPainterFactory::cssPrimitiveToLength(const RenderPath* item,
   if (element && element->ownerDocument())
     paintDeviceMetrics = element->ownerDocument()->paintDeviceMetrics();
 
-  if (cssType == KDOM::CSSPrimitiveValue::CSS_PERCENTAGE) {
+  if (cssType == CSSPrimitiveValue::CSS_PERCENTAGE) {
     SVGElementImpl* viewportElement =
         (element ? element->viewportElement() : 0);
     if (viewportElement) {
       double result =
-          primitive->getFloatValue(KDOM::CSSPrimitiveValue::CSS_PERCENTAGE) /
-          100.0;
+          primitive->getFloatValue(CSSPrimitiveValue::CSS_PERCENTAGE) / 100.0;
       return SVGHelper::PercentageOfViewport(result, viewportElement, LM_OTHER);
     }
   }
 
-  return primitive->computeLengthFloat(
-      const_cast<khtml::RenderStyle*>(item->style()), paintDeviceMetrics);
+  return primitive->computeLengthFloat(const_cast<RenderStyle*>(item->style()),
+                                       paintDeviceMetrics);
 }
 
 KRenderingStrokePainter KSVGPainterFactory::strokePainter(
-    const khtml::RenderStyle* style,
-    const RenderPath* item) {
+    const RenderStyle* style,
+    const RenderObject* item) {
   KRenderingStrokePainter strokePainter;
 
   strokePainter.setOpacity(style->svgStyle()->strokeOpacity());
   strokePainter.setStrokeWidth(KSVGPainterFactory::cssPrimitiveToLength(
       item, style->svgStyle()->strokeWidth(), 1.0));
 
-  KDOM::CSSValueListImpl* dashes = style->svgStyle()->strokeDashArray();
+  CSSValueListImpl* dashes = style->svgStyle()->strokeDashArray();
   if (dashes) {
-    KDOM::CSSPrimitiveValueImpl* dash = 0;
+    CSSPrimitiveValueImpl* dash = 0;
     Q3PaintDeviceMetrics* paintDeviceMetrics = 0;
 
     SVGElementImpl* element = static_cast<SVGElementImpl*>(item->element());
@@ -180,10 +184,10 @@ KRenderingStrokePainter KSVGPainterFactory::strokePainter(
     KCDashArray array;
     unsigned long len = dashes->length();
     for (unsigned long i = 0; i < len; i++) {
-      dash = static_cast<KDOM::CSSPrimitiveValueImpl*>(dashes->item(i));
+      dash = static_cast<CSSPrimitiveValueImpl*>(dashes->item(i));
       if (dash)
         array.append((float)dash->computeLengthFloat(
-            const_cast<khtml::RenderStyle*>(style), paintDeviceMetrics));
+            const_cast<RenderStyle*>(style), paintDeviceMetrics));
     }
 
     strokePainter.setDashArray(array);
@@ -199,8 +203,8 @@ KRenderingStrokePainter KSVGPainterFactory::strokePainter(
 }
 
 KRenderingFillPainter KSVGPainterFactory::fillPainter(
-    const khtml::RenderStyle* style,
-    const RenderPath* item) {
+    const RenderStyle* style,
+    const RenderObject* item) {
   KRenderingFillPainter fillPainter;
 
   fillPainter.setFillRule(style->svgStyle()->fillRule() == WR_NONZERO
@@ -209,6 +213,7 @@ KRenderingFillPainter KSVGPainterFactory::fillPainter(
   fillPainter.setOpacity(style->svgStyle()->fillOpacity());
 
   return fillPainter;
+}
 }
 
 // vim:ts=4:noet

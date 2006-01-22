@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ *               2006 Alexander Kellett <lypanov@kde.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,20 +30,56 @@
 #import <kcanvas/device/KRenderingPaintServerPattern.h>
 #import <kcanvas/device/KRenderingPaintServerGradient.h>
 
+class KCanvasImage;
+
+class KRenderingPaintServerQuartzHelper {
+ public:
+  static void strokePath(CGContextRef, const RenderPath* renderPath);
+  static void clipToStrokePath(CGContextRef, const RenderPath* renderPath);
+  static void fillPath(CGContextRef, const RenderPath* renderPath);
+  static void clipToFillPath(CGContextRef, const RenderPath* renderPath);
+};
+
 class KRenderingPaintServerSolidQuartz : public KRenderingPaintServerSolid {
  public:
   KRenderingPaintServerSolidQuartz(){};
-  virtual void draw(KRenderingDeviceContext* context,
-                    const RenderPath* renderPath,
-                    KCPaintTargetType type) const;
+  virtual void draw(KRenderingDeviceContext*,
+                    const RenderPath*,
+                    KCPaintTargetType) const;
+  virtual bool setup(KRenderingDeviceContext*,
+                     const WebCore::RenderObject*,
+                     KCPaintTargetType) const;
+  virtual void teardown(KRenderingDeviceContext*,
+                        const WebCore::RenderObject*,
+                        KCPaintTargetType) const;
+
+ protected:
+  virtual void renderPath(KRenderingDeviceContext*,
+                          const RenderPath*,
+                          KCPaintTargetType) const;
 };
 
 class KRenderingPaintServerPatternQuartz : public KRenderingPaintServerPattern {
  public:
-  KRenderingPaintServerPatternQuartz(){};
-  virtual void draw(KRenderingDeviceContext* context,
-                    const RenderPath* renderPath,
-                    KCPaintTargetType type) const;
+  KRenderingPaintServerPatternQuartz() {}
+  virtual void draw(KRenderingDeviceContext*,
+                    const RenderPath*,
+                    KCPaintTargetType) const;
+  virtual bool setup(KRenderingDeviceContext*,
+                     const WebCore::RenderObject*,
+                     KCPaintTargetType) const;
+  virtual void teardown(KRenderingDeviceContext*,
+                        const WebCore::RenderObject*,
+                        KCPaintTargetType) const;
+
+ protected:
+  virtual void renderPath(KRenderingDeviceContext*,
+                          const RenderPath*,
+                          KCPaintTargetType) const;
+
+ private:
+  mutable CGColorSpaceRef m_patternSpace;
+  mutable CGPatternRef m_pattern;
 };
 
 typedef struct {
@@ -68,26 +105,49 @@ class KRenderingPaintServerGradientQuartz {
  protected:
   void invalidateCaches();
   CGShadingRef m_shadingCache;
+  mutable KCanvasImage* m_maskImage;
 };
 
 class KRenderingPaintServerLinearGradientQuartz
     : public KRenderingPaintServerLinearGradient,
       public KRenderingPaintServerGradientQuartz {
  public:
-  KRenderingPaintServerLinearGradientQuartz(){};
+  KRenderingPaintServerLinearGradientQuartz() {}
   virtual void invalidate();
-  virtual void draw(KRenderingDeviceContext* context,
-                    const RenderPath* renderPath,
-                    KCPaintTargetType type) const;
+  virtual void draw(KRenderingDeviceContext*,
+                    const RenderPath*,
+                    KCPaintTargetType) const;
+  virtual bool setup(KRenderingDeviceContext*,
+                     const WebCore::RenderObject*,
+                     KCPaintTargetType) const;
+  virtual void teardown(KRenderingDeviceContext*,
+                        const WebCore::RenderObject*,
+                        KCPaintTargetType) const;
+
+ protected:
+  virtual void renderPath(KRenderingDeviceContext*,
+                          const RenderPath*,
+                          KCPaintTargetType) const;
 };
 
 class KRenderingPaintServerRadialGradientQuartz
     : public KRenderingPaintServerRadialGradient,
       public KRenderingPaintServerGradientQuartz {
  public:
-  KRenderingPaintServerRadialGradientQuartz(){};
+  KRenderingPaintServerRadialGradientQuartz() {}
   virtual void invalidate();
-  virtual void draw(KRenderingDeviceContext* context,
-                    const RenderPath* renderPath,
-                    KCPaintTargetType type) const;
+  virtual void draw(KRenderingDeviceContext*,
+                    const RenderPath*,
+                    KCPaintTargetType) const;
+  virtual bool setup(KRenderingDeviceContext*,
+                     const WebCore::RenderObject*,
+                     KCPaintTargetType) const;
+  virtual void teardown(KRenderingDeviceContext*,
+                        const WebCore::RenderObject*,
+                        KCPaintTargetType) const;
+
+ protected:
+  virtual void renderPath(KRenderingDeviceContext*,
+                          const RenderPath*,
+                          KCPaintTargetType) const;
 };
