@@ -177,6 +177,11 @@ class DOMExceptionTranslator {
 JSValue* jsStringOrNull(const DOM::DOMString&);
 
 /**
+ *  Get a String object, or jsUndefined() if s is null
+ */
+JSValue* jsStringOrUndefined(const WebCore::DOMString&);
+
+/**
  *  Get a DOMString object or a null DOMString if the value is null
  */
 DOM::DOMString valueToStringWithNullCheck(ExecState* exec, JSValue* val);

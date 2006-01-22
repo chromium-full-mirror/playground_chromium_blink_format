@@ -308,6 +308,12 @@ JSValue* jsStringOrNull(const DOMString& s) {
   return jsString(s);
 }
 
+JSValue* jsStringOrUndefined(const DOMString& s) {
+  if (s.isNull())
+    return jsUndefined();
+  return jsString(s);
+}
+
 DOMString valueToStringWithNullCheck(ExecState* exec, JSValue* val) {
   if (val->isNull())
     return DOMString();
