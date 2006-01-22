@@ -22,6 +22,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef HTML_HTMLSelectElementImpl_H
 #define HTML_HTMLSelectElementImpl_H
 
@@ -47,7 +48,6 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
                         DocumentImpl* doc,
                         HTMLFormElementImpl* f = 0);
   ~HTMLSelectElementImpl();
-  void init();
 
   virtual int tagPriority() const { return 6; }
   virtual bool checkDTD(const NodeImpl* newChild);
@@ -85,15 +85,16 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   virtual QString state();
   virtual void restoreState(QStringList&);
 
-  virtual NodeImpl* insertBefore(NodeImpl* newChild,
-                                 NodeImpl* refChild,
-                                 int& exceptioncode);
-  virtual NodeImpl* replaceChild(NodeImpl* newChild,
-                                 NodeImpl* oldChild,
-                                 int& exceptioncode);
-  virtual NodeImpl* removeChild(NodeImpl* oldChild, int& exceptioncode);
-  virtual NodeImpl* appendChild(NodeImpl* newChild, int& exceptioncode);
-  virtual NodeImpl* addChild(NodeImpl* newChild);
+  virtual PassRefPtr<NodeImpl> insertBefore(PassRefPtr<NodeImpl> newChild,
+                                            NodeImpl* refChild,
+                                            ExceptionCode&);
+  virtual PassRefPtr<NodeImpl> replaceChild(PassRefPtr<NodeImpl> newChild,
+                                            NodeImpl* oldChild,
+                                            ExceptionCode&);
+  virtual PassRefPtr<NodeImpl> removeChild(NodeImpl* child, ExceptionCode&);
+  virtual PassRefPtr<NodeImpl> appendChild(PassRefPtr<NodeImpl> newChild,
+                                           ExceptionCode&);
+  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl>);
 
   virtual void childrenChanged();
 
@@ -131,7 +132,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
  protected:
   mutable Array<HTMLElementImpl*> m_listItems;
-  HTMLOptionsCollectionImpl* m_options;
+  RefPtr<HTMLOptionsCollectionImpl> m_options;
   short m_minwidth;
   short m_size;
   bool m_multiple;

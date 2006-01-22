@@ -26,9 +26,8 @@
 
 #include "config.h"
 #include "HTMLOptGroupElementImpl.h"
-#include "HTMLSelectElementImpl.h"
 
-#include "rendering/render_form.h"
+#include "HTMLSelectElementImpl.h"
 #include "htmlnames.h"
 
 namespace WebCore {
@@ -49,48 +48,53 @@ DOMString HTMLOptGroupElementImpl::type() const {
   return "optgroup";
 }
 
-NodeImpl* HTMLOptGroupElementImpl::insertBefore(NodeImpl* newChild,
-                                                NodeImpl* refChild,
-                                                int& exceptioncode) {
-  NodeImpl* result = HTMLGenericFormElementImpl::insertBefore(
-      newChild, refChild, exceptioncode);
-  if (!exceptioncode)
+PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::insertBefore(
+    PassRefPtr<NodeImpl> newChild,
+    NodeImpl* refChild,
+    ExceptionCode& ec) {
+  PassRefPtr<NodeImpl> result =
+      HTMLGenericFormElementImpl::insertBefore(newChild, refChild, ec);
+  if (result)
     recalcSelectOptions();
   return result;
 }
 
-NodeImpl* HTMLOptGroupElementImpl::replaceChild(NodeImpl* newChild,
-                                                NodeImpl* oldChild,
-                                                int& exceptioncode) {
-  NodeImpl* result = HTMLGenericFormElementImpl::replaceChild(
-      newChild, oldChild, exceptioncode);
-  if (!exceptioncode)
+PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::replaceChild(
+    PassRefPtr<NodeImpl> newChild,
+    NodeImpl* oldChild,
+    ExceptionCode& ec) {
+  PassRefPtr<NodeImpl> result =
+      HTMLGenericFormElementImpl::replaceChild(newChild, oldChild, ec);
+  if (result)
     recalcSelectOptions();
   return result;
 }
 
-NodeImpl* HTMLOptGroupElementImpl::removeChild(NodeImpl* oldChild,
-                                               int& exceptioncode) {
-  NodeImpl* result =
-      HTMLGenericFormElementImpl::removeChild(oldChild, exceptioncode);
-  if (!exceptioncode)
+PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::removeChild(NodeImpl* oldChild,
+                                                          ExceptionCode& ec) {
+  PassRefPtr<NodeImpl> result =
+      HTMLGenericFormElementImpl::removeChild(oldChild, ec);
+  if (result)
     recalcSelectOptions();
   return result;
 }
 
-NodeImpl* HTMLOptGroupElementImpl::appendChild(NodeImpl* newChild,
-                                               int& exceptioncode) {
-  NodeImpl* result =
-      HTMLGenericFormElementImpl::appendChild(newChild, exceptioncode);
-  if (!exceptioncode)
+PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::appendChild(
+    PassRefPtr<NodeImpl> newChild,
+    ExceptionCode& ec) {
+  PassRefPtr<NodeImpl> result =
+      HTMLGenericFormElementImpl::appendChild(newChild, ec);
+  if (result)
     recalcSelectOptions();
   return result;
 }
 
-NodeImpl* HTMLOptGroupElementImpl::addChild(NodeImpl* newChild) {
-  recalcSelectOptions();
-
-  return HTMLGenericFormElementImpl::addChild(newChild);
+ContainerNodeImpl* HTMLOptGroupElementImpl::addChild(
+    PassRefPtr<NodeImpl> newChild) {
+  ContainerNodeImpl* result = HTMLGenericFormElementImpl::addChild(newChild);
+  if (result)
+    recalcSelectOptions();
+  return result;
 }
 
 void HTMLOptGroupElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
@@ -112,6 +116,11 @@ DOMString HTMLOptGroupElementImpl::label() const {
 
 void HTMLOptGroupElementImpl::setLabel(const DOMString& value) {
   setAttribute(labelAttr, value);
+}
+
+bool HTMLOptGroupElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::optionTag) ||
+         newChild->hasTagName(HTMLNames::hrTag);
 }
 
 }  // namespace

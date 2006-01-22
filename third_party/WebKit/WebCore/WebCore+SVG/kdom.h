@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2006 Apple Computer, Inc.
 
     This file is part of the KDE project
 
@@ -52,7 +53,7 @@ enum NodeType {
   NOTATION_NODE = 12
 };
 
-enum ExceptionCode {
+enum ExceptionCodes {
   INDEX_SIZE_ERR = 1,
   DOMSTRING_SIZE_ERR = 2,
   HIERARCHY_REQUEST_ERR = 3,

@@ -415,8 +415,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   // We want to consolidate this with the HTML parser and HTML DOM code at some
   // point.
   // For now, it's too risky to rip that code up.
-  if (m_currentNode->hasTagName(tableTag) && newElement->hasTagName(trTag) &&
-      m_currentNode->isHTMLElement() && newElement->isHTMLElement()) {
+  if (m_currentNode->hasTagName(tableTag) && newElement->hasTagName(trTag)) {
     RefPtr<NodeImpl> implicitTBody =
         new HTMLTableSectionElementImpl(tbodyTag, m_doc, true /* implicit */);
     m_currentNode->addChild(implicitTBody.get());

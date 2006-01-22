@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,27 +24,26 @@
 
 #include "config.h"
 #include "HTMLElementImpl.h"
-#include "html/html_documentimpl.h"
-#include "html/htmltokenizer.h"
-#include "htmlfactory.h"
 
-#include <kxmlcore/HashSet.h>
-#include "editing/visible_text.h"
-
+#include "EventNames.h"
 #include "Frame.h"
-
-#include "dom/dom_exception.h"
-#include "rendering/render_replaced.h"
-#include "css/css_valueimpl.h"
-#include "css/css_stylesheetimpl.h"
+#include "css_ruleimpl.h"
+#include "css_stylesheetimpl.h"
+#include "css_valueimpl.h"
 #include "cssproperties.h"
 #include "cssvalues.h"
-#include "css/css_ruleimpl.h"
-#include "xml/dom_textimpl.h"
-#include "xml/dom2_eventsimpl.h"
-#include "xml/EventNames.h"
-#include "editing/markup.h"
+#include "dom2_events.h"
+#include "dom2_eventsimpl.h"
+#include "dom_exception.h"
+#include "dom_textimpl.h"
+#include "html_documentimpl.h"
+#include "htmlfactory.h"
 #include "htmlnames.h"
+#include "htmltokenizer.h"
+#include "markup.h"
+#include "render_replaced.h"
+#include "visible_text.h"
+#include <kxmlcore/HashSet.h>
 
 namespace WebCore {
 

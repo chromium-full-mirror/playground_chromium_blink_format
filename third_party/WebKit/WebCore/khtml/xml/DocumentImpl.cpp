@@ -869,8 +869,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
       oldStyle->deref(m_renderArena);
   }
 
-  NodeImpl* n;
-  for (n = _first; n; n = n->nextSibling())
+  for (NodeImpl* n = fastFirstChild(); n; n = n->nextSibling())
     if (change >= Inherit || n->hasChangedChild() || n->changed())
       n->recalcStyle(change);
 
