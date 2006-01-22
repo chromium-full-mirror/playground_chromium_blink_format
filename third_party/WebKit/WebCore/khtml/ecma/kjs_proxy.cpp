@@ -24,11 +24,13 @@
 #include "kjs_window.h"
 #include "kjs_events.h"
 #include "NodeImpl.h"
+#include "JSSVGLazyEventListener.h"
 #include "Frame.h"
 #include <kjs/collector.h>
 
-using namespace DOM;
 using namespace KJS;
+
+namespace WebCore {
 
 KJSProxyImpl::KJSProxyImpl(Frame* frame) {
   m_script = 0;
@@ -106,9 +108,19 @@ EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
                                                     NodeImpl* node) {
   initScript();
   JSLock lock;
-  return KJS::Window::retrieveWindow(m_frame)->getJSLazyEventListener(
-      code, node, m_handlerLineno);
+  return new JSLazyEventListener(code, KJS::Window::retrieveWindow(m_frame),
+                                 node, m_handlerLineno);
 }
+
+#if SVG_SUPPORT
+EventListener* KJSProxyImpl::createSVGEventHandler(const DOMString& code,
+                                                   NodeImpl* node) {
+  initScript();
+  JSLock lock;
+  return new JSSVGLazyEventListener(code, KJS::Window::retrieveWindow(m_frame),
+                                    node, m_handlerLineno);
+}
+#endif
 
 void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
   // This is called when the DOM implementation has finished with a particular
@@ -168,4 +180,5 @@ void KJSProxyImpl::initScript() {
       if (userAgent.find(QString::fromLatin1("Mozilla")) >= 0 &&
           userAgent.find(QString::fromLatin1("compatible")) == -1)
     m_script->setCompatMode(Interpreter::NetscapeCompat);
+}
 }

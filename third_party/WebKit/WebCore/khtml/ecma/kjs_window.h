@@ -187,9 +187,6 @@ class Window : public JSObject {
   JSEventListener* getJSEventListener(JSValue*, bool html = false);
   JSUnprotectedEventListener* getJSUnprotectedEventListener(JSValue*,
                                                             bool html = false);
-  JSLazyEventListener* getJSLazyEventListener(const DOM::DOMString& code,
-                                              DOM::NodeImpl*,
-                                              int lineno = 0);
   void clear(ExecState*);
   virtual UString toString(ExecState*) const;
 

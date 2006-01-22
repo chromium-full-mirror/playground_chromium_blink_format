@@ -1462,12 +1462,6 @@ JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(JSValue* val,
   return new JSUnprotectedEventListener(object, this, html);
 }
 
-JSLazyEventListener* Window::getJSLazyEventListener(const DOMString& code,
-                                                    DOM::NodeImpl* node,
-                                                    int lineNumber) {
-  return new JSLazyEventListener(code, this, node, lineNumber);
-}
-
 void Window::clear(ExecState* exec) {
   JSLock lock;
   if (m_returnValueSlot)

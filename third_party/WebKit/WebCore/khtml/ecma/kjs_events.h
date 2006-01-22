@@ -91,10 +91,8 @@ class JSLazyEventListener : public JSEventListener {
                       int lineno = 0);
   virtual JSObject* listenerObj() const;
 
- protected:
-  virtual JSValue* eventParameterName() const;
-
  private:
+  virtual JSValue* eventParameterName() const;
   void parseCode() const;
 
   mutable DOM::DOMString code;

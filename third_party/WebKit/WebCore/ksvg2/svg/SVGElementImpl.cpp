@@ -106,31 +106,30 @@ KDOM::AtomicString SVGElementImpl::tryGetAttributeNS(
 void SVGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   // standard events
   if (attr->name() == onclickAttr)
-    setHTMLEventListener(clickEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(clickEvent, getDocument()->createSVGEventListener(
                                          attr->value().qstring(), this));
   else if (attr->name() == onmousedownAttr)
-    setHTMLEventListener(mousedownEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(mousedownEvent, getDocument()->createSVGEventListener(
                                              attr->value().qstring(), this));
   else if (attr->name() == onmousemoveAttr)
-    setHTMLEventListener(mousemoveEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(mousemoveEvent, getDocument()->createSVGEventListener(
                                              attr->value().qstring(), this));
   else if (attr->name() == onmouseoutAttr)
-    setHTMLEventListener(mouseoutEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(mouseoutEvent, getDocument()->createSVGEventListener(
                                             attr->value().qstring(), this));
   else if (attr->name() == onmouseoverAttr)
-    setHTMLEventListener(mouseoverEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(mouseoverEvent, getDocument()->createSVGEventListener(
                                              attr->value().qstring(), this));
   else if (attr->name() == onmouseupAttr)
-    setHTMLEventListener(mouseupEvent, getDocument()->createHTMLEventListener(
+    setHTMLEventListener(mouseupEvent, getDocument()->createSVGEventListener(
                                            attr->value().qstring(), this));
   else if (attr->name() == onfocusAttr)
-    setHTMLEventListener(
-        DOMFocusInEvent,
-        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+    setHTMLEventListener(DOMFocusInEvent, getDocument()->createSVGEventListener(
+                                              attr->value().qstring(), this));
   else if (attr->name() == onblurAttr)
     setHTMLEventListener(
         DOMFocusOutEvent,
-        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+        getDocument()->createSVGEventListener(attr->value().qstring(), this));
   else
     KDOM::StyledElementImpl::parseMappedAttribute(attr);
 }

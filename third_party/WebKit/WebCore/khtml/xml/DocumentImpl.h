@@ -452,6 +452,11 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   EventListener* createHTMLEventListener(const DOMString& code, NodeImpl*);
 
+#if SVG_SUPPORT
+  // FIXME: Move to SVGDocumentExtensions, when that lands w/ animation
+  EventListener* createSVGEventListener(const DOMString& code, NodeImpl*);
+#endif
+
   /**
    * Searches through the document, starting from fromNode, for the next
    * selectable element that comes after fromNode.
