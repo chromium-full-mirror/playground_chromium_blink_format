@@ -47,7 +47,7 @@ class SourceStream {
   UString str; /* TODO: buffer */
   UString ind;
 };
-};
+}
 
 using namespace KJS;
 

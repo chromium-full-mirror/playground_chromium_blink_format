@@ -82,6 +82,6 @@ JSValue* add(ExecState* exec, JSValue* v1, JSValue* v2, char oper);
  * @return The result of the operation.
  */
 JSValue* mult(ExecState* exec, JSValue* v1, JSValue* v2, char oper);
-};
+}
 
 #endif

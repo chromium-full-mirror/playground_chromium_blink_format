@@ -221,6 +221,6 @@ class Debugger {
  public:
   static int debuggersPresent;
 };
-};
+}
 
 #endif
