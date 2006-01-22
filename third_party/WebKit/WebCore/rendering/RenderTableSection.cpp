@@ -7,6 +7,7 @@
  *           (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -623,6 +624,20 @@ void RenderTableSection::clearGrid() {
     delete grid[rows].row;
 }
 
+int RenderTableSection::numColumns() const {
+  int result = 0;
+
+  for (int r = 0; r < gridRows; ++r) {
+    for (int c = result; c < table()->numEffCols(); ++c) {
+      const CellStruct& cell = cellAt(r, c);
+      if (cell.cell || cell.inColSpan)
+        result = c;
+    }
+  }
+
+  return result + 1;
+}
+
 RenderObject* RenderTableSection::removeChildNode(RenderObject* child) {
   setNeedCellRecalc();
   return RenderContainer::removeChildNode(child);
@@ -631,10 +646,10 @@ RenderObject* RenderTableSection::removeChildNode(RenderObject* child) {
 #ifndef NDEBUG
 void RenderTableSection::dump(QTextStream* stream, QString ind) const {
   *stream << endl
-          << ind << "grid=(" << grid.size() << "," << table()->numEffCols()
-          << ")" << endl
+          << ind << "grid=(" << gridRows << "," << table()->numEffCols() << ")"
+          << endl
           << ind;
-  for (unsigned int r = 0; r < grid.size(); r++) {
+  for (int r = 0; r < gridRows; r++) {
     for (int c = 0; c < table()->numEffCols(); c++) {
       if (cellAt(r, c).cell && !cellAt(r, c).inColSpan)
         *stream << "(" << cellAt(r, c).cell->row() << ","

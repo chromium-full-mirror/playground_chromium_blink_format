@@ -7,6 +7,7 @@
  *           (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -577,6 +578,23 @@ void RenderTable::recalcSections() {
         break;
     }
   }
+
+  // repair column count (addChild can grow it too much, because it always adds
+  // elements to the last row of a section)
+  int maxCols = 0;
+  for (RenderObject* child = firstChild(); child;
+       child = child->nextSibling()) {
+    if (child->isTableSection()) {
+      RenderTableSection* section = static_cast<RenderTableSection*>(child);
+      int sectionCols = section->numColumns();
+      if (sectionCols > maxCols)
+        maxCols = sectionCols;
+    }
+  }
+
+  columns.resize(maxCols);
+  columnPos.resize(maxCols + 1);
+
   needSectionRecalc = false;
   setNeedsLayout(true);
 }

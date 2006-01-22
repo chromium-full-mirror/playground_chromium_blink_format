@@ -81,6 +81,7 @@ class RenderTableSection : public RenderContainer {
   virtual void paint(PaintInfo& i, int tx, int ty);
 
   int numRows() const { return gridRows; }
+  int numColumns() const;
   int getBaseline(int row) { return grid[row].baseLine; }
 
   void setNeedCellRecalc() {
@@ -96,6 +97,7 @@ class RenderTableSection : public RenderContainer {
   int gridRows;
   Array<int> rowPos;
 
+  // the current insertion position
   int cCol;
   int cRow;
   bool needCellRecalc;
