@@ -84,7 +84,6 @@ khtml::RenderObject* SVGAElementImpl::createRenderer(
 
 void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
   // TODO : should use CLICK instead
-  kdDebug() << k_funcinfo << endl;
   if ((evt->type() == KDOM::EventNames::mouseupEvent && m_isLink)) {
     KDOM::MouseEventImpl* e = static_cast<KDOM::MouseEventImpl*>(evt);
 
@@ -95,9 +94,7 @@ void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
       return;
     }
     url = khtml::parseURL(href()->baseVal()).qstring();
-    kdDebug() << "url : " << url << endl;
     utarget = KDOM::DOMString(getAttribute(SVGNames::targetAttr)).qstring();
-    kdDebug() << "utarget : " << utarget << endl;
 
     if (e && e->button() == 1)
       utarget = "_blank";

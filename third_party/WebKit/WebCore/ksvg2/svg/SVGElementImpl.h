@@ -27,16 +27,13 @@
 #include "SVGNames.h"
 #include <kdom/core/XMLElementImpl.h>
 
-namespace KDOM {
-class Ecma;
-class DocumentPtr;
-typedef StyledElementImpl XMLElementImpl;
-};
-
-namespace KSVG {
+namespace WebCore {
 class SVGMatrixImpl;
 class SVGSVGElementImpl;
 class SVGStyledElementImpl;
+class Ecma;
+class DocumentPtr;
+typedef StyledElementImpl XMLElementImpl;
 
 class SVGElementImpl : public KDOM::XMLElementImpl {
  public:
@@ -85,19 +82,12 @@ class SVGElementImpl : public KDOM::XMLElementImpl {
 
  private:
   bool m_closed;
-#if 0
-        void addSVGEventListener(KDOM::Ecma *ecmaEngine, const KDOM::DOMString &type, const KDOM::DOMString &value);
-#endif  // SVG_SUPPORT
-#endif
+  void addSVGEventListener(const AtomicString& eventType,
+                           const AttributeImpl* attr);
 };
 };
 
-// Helper for DOMNode -> SVGElement conversion
-#include <kdom/kdom.h>
-#include <kdom/Namespace.h>
-#include <kdom/DOMString.h>
-
-namespace KSVG {
+namespace WebCore {
 static inline SVGElementImpl* svg_dynamic_cast(KDOM::NodeImpl* node) {
   SVGElementImpl* svgElement = NULL;
   if (node && node->isSVGElement())
@@ -106,6 +96,7 @@ static inline SVGElementImpl* svg_dynamic_cast(KDOM::NodeImpl* node) {
 }
 };
 
+#endif  // SVG_SUPPORT
 #endif
 
 // vim:ts=4:noet

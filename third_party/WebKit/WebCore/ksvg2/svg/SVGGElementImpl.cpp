@@ -49,12 +49,6 @@ void SVGGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   SVGStyledTransformableElementImpl::parseMappedAttribute(attr);
 }
 
-void SVGGElementImpl::setChanged(bool b, bool) {
-  // FIXME: this is waaay to slow & wrong!
-  // KDOM::NodeImpl::setChanged(b, true);
-  // KDOM::NodeImpl::setChanged(b, false);
-}
-
 khtml::RenderObject* SVGGElementImpl::createRenderer(
     RenderArena* arena,
     khtml::RenderStyle* style) {

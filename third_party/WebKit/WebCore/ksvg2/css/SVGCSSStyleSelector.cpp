@@ -689,10 +689,8 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
       svgstyle->setFloodColor(col);
       break;
     }
-    default: {
-      kdDebug() << "RULE UNIMPLEMENTED! FIX ME :) id=" << id << endl;
+    default:
       return;
-    }
   }
 }
 

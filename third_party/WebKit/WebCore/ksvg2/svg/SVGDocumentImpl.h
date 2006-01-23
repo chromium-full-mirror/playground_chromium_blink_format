@@ -32,12 +32,8 @@
 
 #include <ksvg2/misc/KSVGTimeScheduler.h>
 
-typedef FrameView KSVGView;
-namespace KDOM {
-typedef FrameView KDOMView;
-}
+namespace WebCore {
 
-namespace KSVG {
 class SVGElementImpl;
 class SVGSVGElementImpl;
 class SVGScriptElementImpl;
@@ -46,7 +42,7 @@ class SVGDOMImplementationImpl;
 class SVGDocumentImpl : public KDOM::DocumentImpl,
                         public KDOM::CachedObjectClient {
  public:
-  SVGDocumentImpl(SVGDOMImplementationImpl* i, KDOM::KDOMView* view);
+  SVGDocumentImpl(SVGDOMImplementationImpl* i, FrameView* view);
   virtual ~SVGDocumentImpl();
 
   SVGSVGElementImpl* rootElement() const;
@@ -59,20 +55,14 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   // Derived from: 'CachedObjectClient'
   virtual void notifyFinished(KDOM::CachedObject* finishedObj);
 
-  KSVGView* svgView() const;
+  FrameView* svgView() const;
 
-// Internal
-#if 0
-        virtual KDOM::Ecma *ecmaEngine() const;
-#endif  // SVG_SUPPORT
-#endif
+  // Internal
   void finishedParsing();
   void dispatchRecursiveEvent(KDOM::EventImpl* event, KDOM::NodeImpl* obj);
   void dispatchZoomEvent(float prevScale, float newScale);
   void dispatchScrollEvent();
-  bool dispatchKeyEvent(KDOM::EventTargetImpl* target,
-                        QKeyEvent* key,
-                        bool keypress);
+  bool dispatchKeyEvent(NodeImpl* target, QKeyEvent* key, bool keypress);
 
   virtual void recalcStyle(StyleChange = NoChange);
 
@@ -82,10 +72,8 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   virtual KDOM::CSSStyleSelector* createStyleSelector(const QString&);
 
  private:
-  void dispatchUIEvent(KDOM::EventTargetImpl* target,
-                       const KDOM::AtomicString& type);
-  void dispatchMouseEvent(KDOM::EventTargetImpl* target,
-                          const KDOM::AtomicString& type);
+  void dispatchUIEvent(NodeImpl* target, const KDOM::AtomicString& type);
+  void dispatchMouseEvent(NodeImpl* target, const KDOM::AtomicString& type);
 
   // <script> related
   void executeScripts(bool needsStyleSelectorUpdate);
@@ -97,6 +85,8 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   Q3PtrList<SVGElementImpl> m_forwardReferences;
 };
 };
+
+#endif  // SVG_SUPPORT
 
 #endif
 

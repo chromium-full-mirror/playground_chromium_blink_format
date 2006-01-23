@@ -134,8 +134,8 @@ void SVGDocumentImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
   }
 }
 
-KSVGView* SVGDocumentImpl::svgView() const {
-  return static_cast<KSVGView*>(m_view);
+FrameView* SVGDocumentImpl::svgView() const {
+  return m_view;
 }
 
 void SVGDocumentImpl::finishedParsing() {
@@ -265,10 +265,6 @@ void SVGDocumentImpl::executeScripts(bool needsStyleSelectorUpdate) {
       it.current()->closeRenderer();
   }
   m_forwardReferences.clear();
-
-  // Start animations, as "load" scripts are executed.
-  // FIXME: this won't work for CDF
-  rootElement()->timeScheduler()->startAnimations();
 }
 
 void SVGDocumentImpl::recalcStyle(StyleChange change) {

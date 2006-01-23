@@ -89,6 +89,7 @@
 #if SVG_SUPPORT
 #include "SVGNames.h"
 #include "XLinkNames.h"
+#include "SVGDocumentExtensions.h"
 #endif
 
 using namespace WebCore;
@@ -3213,6 +3214,11 @@ void Frame::adjustPageHeight(float* newBottom,
 }
 
 PausedTimeouts* Frame::pauseTimeouts() {
+#if SVG_SUPPORT
+  if (d->m_doc && d->m_doc->svgExtensions())
+    d->m_doc->accessSVGExtensions()->pauseAnimations();
+#endif
+
   if (d->m_doc && d->m_jscript) {
     Window* w = Window::retrieveWindow(this);
     if (w)
@@ -3222,6 +3228,11 @@ PausedTimeouts* Frame::pauseTimeouts() {
 }
 
 void Frame::resumeTimeouts(PausedTimeouts* t) {
+#if SVG_SUPPORT
+  if (d->m_doc && d->m_doc->svgExtensions())
+    d->m_doc->accessSVGExtensions()->unpauseAnimations();
+#endif
+
   if (d->m_doc && d->m_jscript && d->m_bJScriptEnabled) {
     Window* w = Window::retrieveWindow(this);
     if (w)

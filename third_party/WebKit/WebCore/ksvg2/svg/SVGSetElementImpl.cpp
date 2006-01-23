@@ -23,8 +23,9 @@
 #include "config.h"
 #if SVG_SUPPORT
 #include "SVGSetElementImpl.h"
-#include "SVGSVGElementImpl.h"
 #include "KSVGTimeScheduler.h"
+#include "DocumentImpl.h"
+#include "SVGDocumentExtensions.h"
 
 using namespace KSVG;
 
@@ -37,12 +38,10 @@ SVGSetElementImpl::~SVGSetElementImpl() {}
 void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
   // Start condition.
   if (!m_connected) {
-    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
-    if (ownerSVG) {
-      ownerSVG->timeScheduler()->connectIntervalTimer(this);
+    if (DocumentImpl* doc = getDocument()) {
+      doc->accessSVGExtensions()->timeScheduler()->connectIntervalTimer(this);
       m_connected = true;
     }
-
     return;
   }
 
@@ -59,9 +58,9 @@ void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
 
   // End condition.
   if (timePercentage == 1.0) {
-    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
-    if (ownerSVG) {
-      ownerSVG->timeScheduler()->disconnectIntervalTimer(this);
+    if (DocumentImpl* doc = getDocument()) {
+      doc->accessSVGExtensions()->timeScheduler()->disconnectIntervalTimer(
+          this);
       m_connected = false;
     }
 

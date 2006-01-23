@@ -35,13 +35,10 @@ class RenderPath;
 class KRenderingDevice;
 class KCanvasResource;
 
-namespace KDOM {
-class CSSStyleDeclarationImpl;
-}
-
-namespace KSVG {
+namespace WebCore {
 class KCanvasRenderingStyle;
-class SVGStyledElementImpl;
+class CSSStyleDeclarationImpl;
+class RenderCanvas;
 class SVGStyledElementImpl : public SVGElementImpl {
  public:
   SVGStyledElementImpl(const KDOM::QualifiedName& tagName,
@@ -62,7 +59,7 @@ class SVGStyledElementImpl : public SVGElementImpl {
 
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  khtml::RenderCanvas* canvas() const;
+  RenderCanvas* canvas() const;
   virtual void notifyAttributeChange() const;
   virtual void attributeChanged(KDOM::AttributeImpl* attr,
                                 bool preserveDecls = false);
