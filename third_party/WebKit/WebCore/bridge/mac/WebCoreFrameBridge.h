@@ -28,7 +28,6 @@
 #import <JavaScriptCore/npruntime.h>
 #import <JavaVM/jni.h>
 #import <WebCore/WebCoreKeyboardAccess.h>
-#import <WebKit/WebView.h>
 
 #ifdef __cplusplus
 
@@ -553,7 +552,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (WebCoreFrameBridge*)mainFrame;
 - (void)frameDetached;
 - (NSView*)documentView;
-- (WebView*)webView;
+- (NSView*)webView;
 
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
