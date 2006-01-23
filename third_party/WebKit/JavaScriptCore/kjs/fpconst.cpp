@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+namespace KJS {
+
 // This file exists because JavaScriptCore needs to define the NaN and Inf
 // globals in a way
 // that does not use a static initializer so we don't have a framework
@@ -36,7 +38,7 @@
 // It would be good to figure out a 100% clean way that still avoids code that
 // runs at init time.
 
-namespace KJS {
+#if __APPLE__
 
 #ifdef WORDS_BIGENDIAN
 extern const unsigned char NaN[sizeof(double)] = {0x7f, 0xf8, 0, 0, 0, 0, 0, 0};
@@ -45,4 +47,6 @@ extern const unsigned char Inf[sizeof(double)] = {0x7f, 0xf0, 0, 0, 0, 0, 0, 0};
 extern const unsigned char NaN[sizeof(double)] = {0, 0, 0, 0, 0, 0, 0xf8, 0x7f};
 extern const unsigned char Inf[sizeof(double)] = {0, 0, 0, 0, 0, 0, 0xf0, 0x7f};
 #endif
-};
+
+#endif
+}

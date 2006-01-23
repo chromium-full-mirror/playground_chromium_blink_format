@@ -96,7 +96,7 @@ class PassRefPtr {
 template <typename T>
 template <typename U>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<U>& o) {
-  T* optr = o.m_ptr;
+  T* optr = o.get();
   if (optr)
     optr->ref();
   T* ptr = m_ptr;
