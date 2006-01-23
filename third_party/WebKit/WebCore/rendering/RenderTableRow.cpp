@@ -53,55 +53,40 @@ void RenderTableRow::setStyle(RenderStyle* style) {
 }
 
 void RenderTableRow::addChild(RenderObject* child, RenderObject* beforeChild) {
-  if (child->element() && child->element()->hasTagName(formTag)) {
-    RenderContainer::addChild(child, beforeChild);
-    return;
-  }
-
-  RenderTableCell* cell;
-
   if (!child->isTableCell()) {
+    if (child->element() && child->element()->hasTagName(formTag)) {
+      RenderContainer::addChild(child, beforeChild);
+      return;
+    }
+
     RenderObject* last = beforeChild;
     if (!last)
       last = lastChild();
-    RenderTableCell* cell = 0;
-    if (last && last->isAnonymous() && last->isTableCell())
-      cell = static_cast<RenderTableCell*>(last);
-    else {
-      cell = new (renderArena())
-          RenderTableCell(document() /* anonymous object */);
-      RenderStyle* newStyle = new (renderArena()) RenderStyle();
-      newStyle->inheritFrom(style());
-      newStyle->setDisplay(TABLE_CELL);
-      cell->setStyle(newStyle);
-      addChild(cell, beforeChild);
+    if (last && last->isAnonymous() && last->isTableCell()) {
+      last->addChild(child);
+      return;
     }
-    cell->addChild(child);
-    child->setNeedsLayoutAndMinMaxRecalc();
-    return;
-  } else
-    cell = static_cast<RenderTableCell*>(child);
 
-  static_cast<RenderTableSection*>(parent())->addCell(cell);
+    RenderTableCell* cell =
+        new (renderArena()) RenderTableCell(document() /* anonymous object */);
+    RenderStyle* newStyle = new (renderArena()) RenderStyle();
+    newStyle->inheritFrom(style());
+    newStyle->setDisplay(TABLE_CELL);
+    cell->setStyle(newStyle);
+    addChild(cell, beforeChild);
+    cell->addChild(child);
+    return;
+  }
+
+  RenderTableCell* cell = static_cast<RenderTableCell*>(child);
+
+  section()->addCell(cell);
 
   RenderContainer::addChild(cell, beforeChild);
 
-  if ((beforeChild || nextSibling()) && section())
+  if (beforeChild || nextSibling())
     section()->setNeedCellRecalc();
 }
-
-RenderObject* RenderTableRow::removeChildNode(RenderObject* child) {
-  // RenderTableCell destroy should do it
-  //     if ( section() )
-  // 	section()->setNeedCellRecalc();
-  return RenderContainer::removeChildNode(child);
-}
-
-#ifndef NDEBUG
-void RenderTableRow::dump(QTextStream* stream, QString ind) const {
-  RenderContainer::dump(stream, ind);
-}
-#endif
 
 void RenderTableRow::layout() {
   KHTMLAssert(needsLayout());

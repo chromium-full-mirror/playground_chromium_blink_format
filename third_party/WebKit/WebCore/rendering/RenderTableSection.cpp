@@ -72,46 +72,48 @@ void RenderTableSection::setStyle(RenderStyle* _style) {
 
 void RenderTableSection::addChild(RenderObject* child,
                                   RenderObject* beforeChild) {
-  RenderObject* row = child;
-
-  if (child->element() && child->element()->hasTagName(formTag)) {
-    RenderContainer::addChild(child, beforeChild);
-    return;
-  }
-
   if (!child->isTableRow()) {
-    if (!beforeChild)
-      beforeChild = lastChild();
-
-    if (beforeChild && beforeChild->isAnonymous())
-      row = beforeChild;
-    else {
-      RenderObject* lastBox = beforeChild;
-      while (lastBox && lastBox->parent()->isAnonymous() &&
-             !lastBox->isTableRow())
-        lastBox = lastBox->parent();
-      if (lastBox && lastBox->isAnonymous()) {
-        lastBox->addChild(child, beforeChild);
-        return;
-      } else {
-        row = new (renderArena())
-            RenderTableRow(document() /* anonymous table */);
-        RenderStyle* newStyle = new (renderArena()) RenderStyle();
-        newStyle->inheritFrom(style());
-        newStyle->setDisplay(TABLE_ROW);
-        row->setStyle(newStyle);
-        addChild(row, beforeChild);
-      }
+    if (child->element() && child->element()->hasTagName(formTag) &&
+        child->style()->display() != TABLE_CELL) {
+      RenderContainer::addChild(child, beforeChild);
+      return;
     }
+
+    RenderObject* last = beforeChild;
+    if (!last)
+      last = lastChild();
+    if (last && last->isAnonymous()) {
+      last->addChild(child);
+      return;
+    }
+
+    // FIXME: Not sure why this code is needed to pop back up out of the table.
+    // It doesn't affect any of our layout tests, but I'm going to leave it in
+    // for now.
+    RenderObject* lastBox = last;
+    while (lastBox && lastBox->parent()->isAnonymous() &&
+           !lastBox->isTableRow())
+      lastBox = lastBox->parent();
+    if (lastBox && lastBox->isAnonymous()) {
+      lastBox->addChild(child, beforeChild);
+      return;
+    }
+
+    RenderObject* row =
+        new (renderArena()) RenderTableRow(document() /* anonymous table */);
+    RenderStyle* newStyle = new (renderArena()) RenderStyle();
+    newStyle->inheritFrom(style());
+    newStyle->setDisplay(TABLE_ROW);
+    row->setStyle(newStyle);
+    addChild(row, beforeChild);
     row->addChild(child);
-    child->setNeedsLayoutAndMinMaxRecalc();
     return;
   }
 
   if (beforeChild)
     setNeedCellRecalc();
 
-  cRow++;
+  ++cRow;
   cCol = 0;
 
   ensureRows(cRow + 1);
