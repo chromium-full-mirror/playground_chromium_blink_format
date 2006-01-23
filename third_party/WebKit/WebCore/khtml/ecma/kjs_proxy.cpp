@@ -100,7 +100,7 @@ void KJSProxyImpl::clear() {
   if (m_script) {
     Window* win = Window::retrieveWindow(m_frame);
     if (win)
-      win->clear(m_script->globalExec());
+      win->clear();
   }
 }
 
@@ -137,7 +137,6 @@ void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
 KJS::ScriptInterpreter* KJSProxyImpl::interpreter() {
   if (!m_script)
     initScript();
-  m_frame->keepAlive();
   return m_script;
 }
 

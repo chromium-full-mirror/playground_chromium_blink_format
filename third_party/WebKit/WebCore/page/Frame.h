@@ -41,6 +41,7 @@ class FramePrivate;
 class FrameView;
 class KHTMLPartBrowserExtension;
 class KHTMLSettings;
+class FrameTreeNode;
 
 namespace KJS {
 class PausedTimeouts;
@@ -152,7 +153,7 @@ class Frame : public ObjectContents {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
-  Frame() : d(0) {}
+  Frame();
   virtual ~Frame();
 
   /**
@@ -492,11 +493,6 @@ class Frame : public ObjectContents {
   virtual QString selectedText() const;
 
   /**
-   * Returns the selected part of the HTML.
-   */
-  WebCore::SelectionController& selection() const;
-
-  /**
    * Returns the granularity of the selection (character, word, line,
    * paragraph).
    */
@@ -780,6 +776,8 @@ class Frame : public ObjectContents {
   // Used to keep the part alive when running a script that might destroy it.
   void keepAlive();
 
+  static void endAllLifeSupport();
+
  signals:
   /**
    * Emitted if the cursor is moved over an URL.
@@ -962,6 +960,8 @@ class Frame : public ObjectContents {
 
   void slotEndLifeSupport();
 
+  virtual void clear();
+
  private:
   bool restoreURL(const KURL& url);
   void clearCaretRectIfNeeded();
@@ -988,8 +988,6 @@ class Frame : public ObjectContents {
   void popupMenu(const QString& url);
 
   void init(FrameView* view);
-
-  virtual void clear();
 
   bool scheduleScript(WebCore::NodeImpl* n, const QString& script);
 
@@ -1198,6 +1196,12 @@ class Frame : public ObjectContents {
   virtual void didFirstLayout() {}
 
   int frameCount;
+
+  virtual void detachFromView();
+
+  // split out controller objects
+  FrameTreeNode* treeNode();
+  WebCore::SelectionController& selection() const;
 };
 
 #endif

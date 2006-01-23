@@ -186,12 +186,6 @@ typedef enum {
   RenderArena* _renderPartArena;
   BOOL _shouldCreateRenderers;
 
-  WebCoreFrameBridge* _nextSibling;
-  WebCoreFrameBridge* _previousSibling;
-  WebCoreFrameBridge* _firstChild;
-  WebCoreFrameBridge* _lastChild;
-  int _childCount;
-
   NSString* _frameNamespace;
 }
 
@@ -264,6 +258,7 @@ typedef enum {
 - (void)end;
 - (void)stop;
 
+- (void)clearFrame;
 - (void)handleFallbackContent;
 
 - (NSURL*)URL;

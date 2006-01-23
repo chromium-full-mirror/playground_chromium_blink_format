@@ -35,6 +35,7 @@
 #include <kio/global.h>
 #include <qdatetime.h>
 #include <qtimer.h>
+#include "FrameTreeNode.h"
 
 namespace KIO {
 class TransferJob;
@@ -55,7 +56,7 @@ struct ChildFrame {
   }
 
   QGuardedPtr<RenderPart> m_renderer;
-  QGuardedPtr<ObjectContents> m_frame;
+  RefPtr<ObjectContents> m_frame;
   QGuardedPtr<BrowserExtension> m_extension;
   QString m_serviceName;
   QString m_serviceType;
@@ -91,7 +92,7 @@ enum RedirectionScheduled {
 
 class FramePrivate {
  public:
-  FramePrivate(QObject* parent) {
+  FramePrivate(QObject* parent, Frame* thisFrame) : m_treeNode(thisFrame) {
     m_doc = 0;
     m_jscript = 0;
     m_runningScripts = 0;
@@ -172,6 +173,9 @@ class FramePrivate {
       m_typingStyle->deref();
   }
 
+  FrameTreeNode m_treeNode;
+
+  // old style frame info
   FrameList m_frames;
   QValueList<WebCore::ChildFrame> m_objects;
 

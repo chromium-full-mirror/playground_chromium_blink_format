@@ -1360,14 +1360,15 @@ bool Window::isSafeScript(ExecState* exec) const {
   DOM::DocumentImpl* thisDocument = m_frame->document();
   DOM::DocumentImpl* actDocument = activePart->document();
 
-  if (!actDocument) {
-    kdDebug(6070) << "Window::isSafeScript: active frame has no document!"
-                  << endl;
-    return false;
-  }
+  DOM::DOMString actDomain;
 
-  DOM::DOMString actDomain = actDocument->domain();
+  if (!actDocument)
+    actDomain = activePart->url().host();
+  else
+    actDomain = actDocument->domain();
 
+  // FIXME: this really should be explicitly checking for the "file:" protocol
+  // instead
   // Always allow local pages to execute any JS.
   if (actDomain.isNull())
     return true;
@@ -1388,6 +1389,7 @@ bool Window::isSafeScript(ExecState* exec) const {
       thisDomain = ancestorPart->document()->domain();
   }
 
+  // FIXME: this should check that URL scheme and port match too, probably
   if (actDomain == thisDomain)
     return true;
 
@@ -1462,7 +1464,7 @@ JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(JSValue* val,
   return new JSUnprotectedEventListener(object, this, html);
 }
 
-void Window::clear(ExecState* exec) {
+void Window::clear() {
   JSLock lock;
   if (m_returnValueSlot)
     if (JSValue* returnValue = getDirect("returnValue"))
