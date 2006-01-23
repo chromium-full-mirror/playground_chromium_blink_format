@@ -1042,12 +1042,11 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     // it to end up
     // under the reopened residual tags (e.g., the <i> in the above example.)
     NodeImpl* prevNode = 0;
-    NodeImpl* currNode = 0;
     currElem = maxElem;
     while (currElem->node != residualElem) {
       if (isResidualStyleTag(currElem->node->localName())) {
         // Create a clone of this element.
-        currNode = currElem->node->cloneNode(false);
+        RefPtr<NodeImpl> currNode = currElem->node->cloneNode(false);
 
         // Change the stack element's node to point to the clone.
         currElem->node = currNode;
@@ -1057,9 +1056,9 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
           currNode->appendChild(prevNode, exceptionCode);
         else  // The new parent for the block element is going to be the
               // innermost clone.
-          parentElem = currNode;
+          parentElem = currNode.get();
 
-        prevNode = currNode;
+        prevNode = currNode.get();
       }
 
       currElem = currElem->next;
@@ -1084,7 +1083,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   blockElem->parentNode()->removeChild(blockElem, exceptionCode);
 
   // Step 2: Clone |residualElem|.
-  NodeImpl* newNode = residualElem->cloneNode(
+  PassRefPtr<NodeImpl> newNode = residualElem->cloneNode(
       false);  // Shallow clone. We don't pick up the same kids.
 
   // Step 3: Place |blockElem|'s children under |newNode|.  Remove all of the
@@ -1164,7 +1163,7 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
   // Loop for each tag that needs to be reopened.
   while (elem) {
     // Create a shallow clone of the DOM node for this element.
-    NodeImpl* newNode = elem->node->cloneNode(false);
+    RefPtr<NodeImpl> newNode = elem->node->cloneNode(false);
 
     // Append the new node. In the malformed table case, we need to insert
     // before the table,
@@ -1191,7 +1190,7 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
     malformedTableParent = 0;
 
     // Update |current| manually to point to the new node.
-    setCurrent(newNode);
+    setCurrent(newNode.get());
 
     // Advance to the next tag that needs to be reopened.
     HTMLStackElem* next = elem->next;

@@ -194,7 +194,7 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   if (appletInstance)
     return appletInstance;
 
-  RenderApplet* r = static_cast<RenderApplet*>(m_render);
+  RenderApplet* r = static_cast<RenderApplet*>(renderer());
   if (r) {
     r->createWidgetIfNecessary();
     if (r->widget())
@@ -209,10 +209,9 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
 void HTMLAppletElementImpl::closeRenderer() {
   // The parser just reached </applet>, so all the params are available now.
   m_allParamsAvailable = true;
-  if (m_render)
-    m_render->setNeedsLayout(
+  if (renderer())
+    renderer()->setNeedsLayout(
         true);  // This will cause it to create its widget & the Java applet
-
   HTMLElementImpl::closeRenderer();
 }
 
@@ -327,7 +326,7 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   if (embedInstance)
     return embedInstance;
 
-  RenderObject* r = m_render;
+  RenderObject* r = renderer();
   if (!r) {
     NodeImpl* p = parentNode();
     if (p && p->hasTagName(objectTag))
@@ -444,9 +443,8 @@ RenderObject* HTMLEmbedElementImpl::createRenderer(RenderArena* arena,
 void HTMLEmbedElementImpl::attach() {
   HTMLElementImpl::attach();
 
-  if (m_render) {
-    static_cast<RenderPartObject*>(m_render)->updateWidget();
-  }
+  if (renderer())
+    static_cast<RenderPartObject*>(renderer())->updateWidget();
 }
 
 void HTMLEmbedElementImpl::insertedIntoDocument() {
@@ -497,7 +495,7 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
   if (objectInstance)
     return objectInstance;
 
-  if (RenderObject* r = m_render) {
+  if (RenderObject* r = renderer()) {
     if (r->isWidget()) {
       if (QWidget* widget = static_cast<RenderWidget*>(r)->widget()) {
         // Call into the frame (and over the bridge) to pull the
@@ -548,7 +546,7 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     pos = serviceType.find(";");
     if (pos != -1)
       serviceType = serviceType.left(pos);
-    if (m_render)
+    if (renderer())
       needWidgetUpdate = true;
     if (!isImageType() && m_imageLoader) {
       delete m_imageLoader;
@@ -556,9 +554,9 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     }
   } else if (attr->name() == dataAttr) {
     url = khtml::parseURL(val).qstring();
-    if (m_render)
+    if (renderer())
       needWidgetUpdate = true;
-    if (m_render && isImageType()) {
+    if (renderer() && isImageType()) {
       if (!m_imageLoader)
         m_imageLoader = new HTMLImageLoader(this);
       m_imageLoader->updateFromElement();
@@ -577,7 +575,7 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     addHTMLAlignment(attr);
   } else if (attr->name() == classidAttr) {
     classId = val;
-    if (m_render)
+    if (renderer())
       needWidgetUpdate = true;
   } else if (attr->name() == onloadAttr) {
     setHTMLEventListener(loadEvent, attr);
@@ -635,7 +633,7 @@ RenderObject* HTMLObjectElementImpl::createRenderer(RenderArena* arena,
 void HTMLObjectElementImpl::attach() {
   HTMLElementImpl::attach();
 
-  if (m_render && !m_useFallbackContent) {
+  if (renderer() && !m_useFallbackContent) {
     if (isImageType()) {
       if (!m_imageLoader)
         m_imageLoader = new HTMLImageLoader(this);
@@ -651,7 +649,7 @@ void HTMLObjectElementImpl::attach() {
         // this method or recalcStyle (which also calls updateWidget) to be
         // called.
         needWidgetUpdate = false;
-        static_cast<RenderPartObject*>(m_render)->updateWidget();
+        static_cast<RenderPartObject*>(renderer())->updateWidget();
       } else {
         needWidgetUpdate = true;
         setChanged();
@@ -678,7 +676,7 @@ void HTMLObjectElementImpl::setComplete(bool complete) {
 }
 
 void HTMLObjectElementImpl::detach() {
-  if (attached() && m_render && !m_useFallbackContent) {
+  if (attached() && renderer() && !m_useFallbackContent) {
     // Update the widget the next time we attach (detaching destroys the
     // plugin).
     needWidgetUpdate = true;
@@ -708,7 +706,8 @@ void HTMLObjectElementImpl::removedFromDocument() {
 }
 
 void HTMLObjectElementImpl::recalcStyle(StyleChange ch) {
-  if (!m_useFallbackContent && needWidgetUpdate && m_render && !isImageType()) {
+  if (!m_useFallbackContent && needWidgetUpdate && renderer() &&
+      !isImageType()) {
     detach();
     attach();
   }

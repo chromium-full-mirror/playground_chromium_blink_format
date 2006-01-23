@@ -376,9 +376,9 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                          int y,
                          MouseEvent* ev);
 
-  virtual bool childAllowed(NodeImpl* newChild);
+  virtual bool childAllowed(NodeImpl*);
   virtual bool childTypeAllowed(unsigned short nodeType);
-  virtual NodeImpl* cloneNode(bool deep);
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
   StyleSheetListImpl* styleSheets();
 

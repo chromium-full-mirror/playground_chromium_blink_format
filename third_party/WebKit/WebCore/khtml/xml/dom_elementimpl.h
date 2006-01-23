@@ -142,7 +142,7 @@ class AttrImpl : public ContainerNodeImpl {
 
   virtual DOMString nodeValue() const;
   virtual void setNodeValue(const DOMString&, int& exceptioncode);
-  virtual NodeImpl* cloneNode(bool deep);
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
   // Other methods (not part of DOM)
   virtual bool isAttributeNode() const { return true; }
@@ -221,11 +221,11 @@ class ElementImpl : public ContainerNodeImpl {
   }
   AttrImpl* getAttributeNodeNS(const DOMString& namespaceURI,
                                const DOMString& localName);
-  RefPtr<AttrImpl> setAttributeNode(AttrImpl* newAttr, int& exception);
-  RefPtr<AttrImpl> setAttributeNodeNS(AttrImpl* newAttr, int& exception) {
+  PassRefPtr<AttrImpl> setAttributeNode(AttrImpl*, int& exception);
+  PassRefPtr<AttrImpl> setAttributeNodeNS(AttrImpl* newAttr, int& exception) {
     return setAttributeNode(newAttr, exception);
   }
-  RefPtr<AttrImpl> removeAttributeNode(AttrImpl* oldAttr, int& exception);
+  PassRefPtr<AttrImpl> removeAttributeNode(AttrImpl*, int& exception);
 
   virtual CSSStyleDeclarationImpl* style();
 
@@ -253,7 +253,7 @@ class ElementImpl : public ContainerNodeImpl {
 
   // DOM methods overridden from  parent classes
   virtual unsigned short nodeType() const;
-  virtual NodeImpl* cloneNode(bool deep);
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
   virtual DOMString nodeName() const;
   virtual bool isElementNode() const { return true; }
   virtual void insertedIntoDocument();
@@ -336,15 +336,15 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   // DOM methods & attributes for NamedNodeMap
   virtual NodeImpl* getNamedItemNS(const DOMString& namespaceURI,
                                    const DOMString& localName) const;
-  virtual RefPtr<NodeImpl> removeNamedItemNS(const DOMString& namespaceURI,
-                                             const DOMString& localName,
-                                             int& exception);
+  virtual PassRefPtr<NodeImpl> removeNamedItemNS(const DOMString& namespaceURI,
+                                                 const DOMString& localName,
+                                                 int& exception);
 
   virtual AttrImpl* getNamedItem(const QualifiedName& name) const;
 
-  virtual RefPtr<NodeImpl> removeNamedItem(const QualifiedName& name,
-                                           int& exceptioncode);
-  virtual RefPtr<NodeImpl> setNamedItem(NodeImpl* arg, int& exceptioncode);
+  virtual PassRefPtr<NodeImpl> removeNamedItem(const QualifiedName& name,
+                                               int& exceptioncode);
+  virtual PassRefPtr<NodeImpl> setNamedItem(NodeImpl* arg, int& exceptioncode);
 
   virtual AttrImpl* item(unsigned index) const;
   unsigned length() const { return len; }

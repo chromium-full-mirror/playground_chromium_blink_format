@@ -462,8 +462,9 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
         m_startContainer->nodeType() == Node::CDATA_SECTION_NODE ||
         m_startContainer->nodeType() == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
-        CharacterDataImpl* c =
-            static_cast<CharacterDataImpl*>(m_startContainer->cloneNode(true));
+        PassRefPtr<CharacterDataImpl> c =
+            static_pointer_cast<CharacterDataImpl>(
+                m_startContainer->cloneNode(true));
         c->deleteData(
             m_endOffset,
             static_cast<CharacterDataImpl*>(m_startContainer)->length() -
@@ -522,7 +523,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
   //
   // These are deleted, cloned, or extracted (i.e. both) depending on action.
 
-  NodeImpl* leftContents = 0;
+  RefPtr<NodeImpl> leftContents;
   if (m_startContainer != cmnRoot) {
     // process the left-hand side of the range, up until the last ancestor of
     // m_startContainer before cmnRoot
@@ -530,8 +531,9 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
         m_startContainer->nodeType() == Node::CDATA_SECTION_NODE ||
         m_startContainer->nodeType() == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
-        CharacterDataImpl* c =
-            static_cast<CharacterDataImpl*>(m_startContainer->cloneNode(true));
+        PassRefPtr<CharacterDataImpl> c =
+            static_pointer_cast<CharacterDataImpl>(
+                m_startContainer->cloneNode(true));
         c->deleteData(0, m_startOffset, exceptioncode);
         leftContents = c;
       }
@@ -573,7 +575,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
     NodeImpl* n = m_startContainer->nextSibling();
     for (; leftParent != cmnRoot; leftParent = leftParent->parentNode()) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
-        NodeImpl* leftContentsParent = leftParent->cloneNode(false);
+        RefPtr<NodeImpl> leftContentsParent = leftParent->cloneNode(false);
         leftContentsParent->appendChild(leftContents, exceptioncode);
         leftContents = leftContentsParent;
       }
@@ -596,7 +598,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
     }
   }
 
-  NodeImpl* rightContents = 0;
+  RefPtr<NodeImpl> rightContents = 0;
   if (m_endContainer != cmnRoot) {
     // delete the right-hand side of the range, up until the last ancestor of
     // m_endContainer before cmnRoot
@@ -604,8 +606,8 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
         m_endContainer->nodeType() == Node::CDATA_SECTION_NODE ||
         m_endContainer->nodeType() == Node::COMMENT_NODE) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
-        CharacterDataImpl* c =
-            static_cast<CharacterDataImpl*>(m_endContainer->cloneNode(true));
+        RefPtr<CharacterDataImpl> c = static_pointer_cast<CharacterDataImpl>(
+            m_endContainer->cloneNode(true));
         c->deleteData(
             m_endOffset,
             static_cast<CharacterDataImpl*>(m_endContainer)->length() -
@@ -641,11 +643,8 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
           else if (action == CLONE_CONTENTS)
             rightContents->insertBefore(
                 n->cloneNode(true), rightContents->firstChild(), exceptioncode);
-          else {
-            n->ref();
+          else
             m_endContainer->removeChild(n, exceptioncode);
-            n->deref();
-          }
         }
       }
     }
@@ -654,7 +653,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
     NodeImpl* n = m_endContainer->previousSibling();
     for (; rightParent != cmnRoot; rightParent = rightParent->parentNode()) {
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS) {
-        NodeImpl* rightContentsParent = rightParent->cloneNode(false);
+        RefPtr<NodeImpl> rightContentsParent = rightParent->cloneNode(false);
         rightContentsParent->appendChild(rightContents, exceptioncode);
         rightContents = rightContentsParent;
       }

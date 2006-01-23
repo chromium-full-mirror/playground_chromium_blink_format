@@ -72,8 +72,8 @@ bool HTMLSelectElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 void HTMLSelectElementImpl::recalcStyle(StyleChange ch) {
-  if (hasChangedChild() && m_render)
-    static_cast<RenderSelect*>(m_render)->setOptionsChanged(true);
+  if (hasChangedChild() && renderer())
+    static_cast<RenderSelect*>(renderer())->setOptionsChanged(true);
 
   HTMLGenericFormElementImpl::recalcStyle(ch);
 }
@@ -424,8 +424,8 @@ void HTMLSelectElementImpl::childrenChanged() {
 
 void HTMLSelectElementImpl::setRecalcListItems() {
   m_recalcListItems = true;
-  if (m_render)
-    static_cast<RenderSelect*>(m_render)->setOptionsChanged(true);
+  if (renderer())
+    static_cast<RenderSelect*>(renderer())->setOptionsChanged(true);
   setChanged();
 }
 
@@ -440,8 +440,8 @@ void HTMLSelectElementImpl::reset() {
       option->setSelected(selected);
     }
   }
-  if (m_render)
-    static_cast<RenderSelect*>(m_render)->setSelectionChanged(true);
+  if (renderer())
+    static_cast<RenderSelect*>(renderer())->setSelectionChanged(true);
   setChanged(true);
 }
 
@@ -458,8 +458,8 @@ void HTMLSelectElementImpl::notifyOptionSelected(
             (items[i] == selectedOption);
     }
   }
-  if (m_render)
-    static_cast<RenderSelect*>(m_render)->setSelectionChanged(true);
+  if (renderer())
+    static_cast<RenderSelect*>(renderer())->setSelectionChanged(true);
 
   setChanged(true);
 }
@@ -468,7 +468,7 @@ void HTMLSelectElementImpl::defaultEventHandler(EventImpl* evt) {
   // Use key press event here since sending simulated mouse events
   // on key down blocks the proper sending of the key press event.
   if (evt->type() == keypressEvent) {
-    if (!m_form || !m_render || !evt->isKeyboardEvent())
+    if (!m_form || !renderer() || !evt->isKeyboardEvent())
       return;
 
     DOMString key = static_cast<KeyboardEventImpl*>(evt)->keyIdentifier();

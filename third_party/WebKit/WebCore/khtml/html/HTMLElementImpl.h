@@ -47,9 +47,9 @@ class HTMLElementImpl : public StyledElementImpl {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
-  virtual NodeImpl* cloneNode(bool deep);
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
-  RefPtr<HTMLCollectionImpl> children();
+  PassRefPtr<HTMLCollectionImpl> children();
 
   DOMString id() const;
   void setId(const DOMString& value);

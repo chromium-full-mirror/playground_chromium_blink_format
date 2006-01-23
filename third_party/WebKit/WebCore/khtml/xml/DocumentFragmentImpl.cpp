@@ -63,10 +63,11 @@ DOMString DocumentFragmentImpl::toString() const {
   return result;
 }
 
-NodeImpl* DocumentFragmentImpl::cloneNode(bool deep) {
-  DocumentFragmentImpl* clone = new DocumentFragmentImpl(getDocument());
+PassRefPtr<NodeImpl> DocumentFragmentImpl::cloneNode(bool deep) {
+  PassRefPtr<DocumentFragmentImpl> clone =
+      new DocumentFragmentImpl(getDocument());
   if (deep)
-    cloneChildNodes(clone);
+    cloneChildNodes(clone.get());
   return clone;
 }
 }

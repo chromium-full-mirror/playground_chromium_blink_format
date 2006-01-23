@@ -52,12 +52,9 @@ class EntityImpl : public ContainerNodeImpl {
   DOMString systemId() const { return m_systemId.get(); }
   DOMString notationName() const { return m_notationName.get(); }
 
-  // DOM methods overridden from  parent classes
   virtual DOMString nodeName() const;
   virtual unsigned short nodeType() const;
-  virtual NodeImpl* cloneNode(bool deep);
-
-  // Other methods (not part of DOM)
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
   virtual bool childTypeAllowed(unsigned short type);
   virtual DOMString toString() const;
 
@@ -73,12 +70,9 @@ class EntityReferenceImpl : public ContainerNodeImpl {
   EntityReferenceImpl(DocumentImpl*);
   EntityReferenceImpl(DocumentImpl*, DOMStringImpl* entityName);
 
-  // DOM methods overridden from  parent classes
   virtual DOMString nodeName() const;
   virtual unsigned short nodeType() const;
-  virtual NodeImpl* cloneNode(bool deep);
-
-  // Other methods (not part of DOM)
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
   virtual bool childTypeAllowed(unsigned short type);
   virtual DOMString toString() const;
 
@@ -98,12 +92,9 @@ class NotationImpl : public ContainerNodeImpl {
   DOMString publicId() const { return m_publicId.get(); }
   DOMString systemId() const { return m_systemId.get(); }
 
-  // DOM methods overridden from  parent classes
   virtual DOMString nodeName() const;
   virtual unsigned short nodeType() const;
-  virtual NodeImpl* cloneNode(bool deep);
-
-  // Other methods (not part of DOM)
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
   virtual bool childTypeAllowed(unsigned short type);
 
  private:
@@ -126,16 +117,15 @@ class ProcessingInstructionImpl : public ContainerNodeImpl,
   DOMString data() const { return m_data.get(); }
   void setData(const DOMString& data, int& exceptioncode);
 
-  // DOM methods overridden from  parent classes
   virtual DOMString nodeName() const;
   virtual unsigned short nodeType() const;
   virtual DOMString nodeValue() const;
   virtual void setNodeValue(const DOMString& nodeValue, int& exceptioncode);
-  virtual NodeImpl* cloneNode(bool deep);
+  virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
+  virtual bool childTypeAllowed(unsigned short type);
 
   // Other methods (not part of DOM)
   DOMString localHref() const { return m_localHref.get(); }
-  virtual bool childTypeAllowed(unsigned short type);
   StyleSheetImpl* sheet() const { return m_sheet.get(); }
   bool checkStyleSheet();
   virtual void setStyleSheet(const DOMString& URL, const DOMString& sheet);

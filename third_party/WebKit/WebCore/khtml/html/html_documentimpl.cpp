@@ -153,14 +153,6 @@ ElementImpl* HTMLDocumentImpl::createElement(const DOMString& name,
                                                false);
 }
 
-void HTMLDocumentImpl::slotHistoryChanged() {
-  if (true || !m_render)  // disabled for now
-    return;
-
-  recalcStyle(Force);
-  m_render->repaint();
-}
-
 static void addItemToMap(HTMLDocumentImpl::NameCountMap& map,
                          const DOMString& name) {
   if (name.length() == 0)

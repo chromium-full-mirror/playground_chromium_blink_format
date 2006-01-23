@@ -83,12 +83,6 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   HTMLElementImpl* bodyElement;
   HTMLElementImpl* htmlElement;
 
- protected slots:
-  /**
-   * Repaints, so that all links get the proper color
-   */
-  void slotHistoryChanged();
-
  private:
   HTMLCollectionImpl::CollectionInfo
       m_collection_info[HTMLCollectionImpl::NUM_CACHEABLE_TYPES];
