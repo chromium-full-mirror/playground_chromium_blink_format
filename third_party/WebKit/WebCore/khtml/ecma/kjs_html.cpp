@@ -1407,20 +1407,6 @@ JSValue* HTMLElement::framesetNameGetter(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* HTMLElement::frameWindowPropertyGetter(ExecState* exec,
-                                                JSObject* originalObject,
-                                                const Identifier& propertyName,
-                                                const PropertySlot& slot) {
-  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
-
-  if (DocumentImpl* doc = static_cast<HTMLFrameElementImpl*>(thisObj->impl())
-                              ->contentDocument())
-    if (Window* window = Window::retrieveWindow(doc->frame()))
-      return window->get(exec, propertyName);
-
-  return jsUndefined();
-}
-
 JSValue* HTMLElement::runtimeObjectGetter(ExecState* exec,
                                           JSObject* originalObject,
                                           const Identifier& propertyName,
@@ -1480,16 +1466,7 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
     NodeImpl* frame = element.children()->namedItem(propertyName.domString());
     if (frame && frame->hasTagName(frameTag)) {
       slot.setCustom(this, framesetNameGetter);
-    }
-  } else if (element.hasLocalName(frameTag) ||
-             element.hasLocalName(iframeTag)) {
-    if (DocumentImpl* doc =
-            static_cast<HTMLFrameElementImpl&>(element).contentDocument()) {
-      Window* window = Window::retrieveWindow(doc->frame());
-      if (window && window->hasProperty(exec, propertyName)) {
-        slot.setCustom(this, frameWindowPropertyGetter);
-        return true;
-      }
+      return true;
     }
   } else if (element.hasLocalName(embedTag) ||
              element.hasLocalName(objectTag) ||
