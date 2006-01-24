@@ -1,6 +1,6 @@
 /*
  *  This file is part of the KDE libraries
- *  Copyright (C) 2004 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2006 Apple Computer, Inc.
  *  Copyright (C) 2005, 2006 Alexey Proskuryakov <ap@nypop.com>
  *
  *  This library is free software; you can redistribute it and/or
@@ -21,26 +21,27 @@
 #include "config.h"
 #include "xmlhttprequest.h"
 
-#include "kjs/protect.h"
-
-#include "dom/dom_exception.h"
-#include "dom/dom_string.h"
-#include "dom/dom2_events.h"
 #include "Cache.h"
-#include "html/html_documentimpl.h"
-#include "misc/formdata.h"
-#include "xml/dom2_eventsimpl.h"
-#include "xml/EventNames.h"
 #include "DOMImplementationImpl.h"
-
+#include "EventNames.h"
+#include "KWQLoader.h"
+#include "dom2_events.h"
+#include "dom2_eventsimpl.h"
+#include "dom_exception.h"
+#include "dom_string.h"
+#include "formdata.h"
+#include "html_documentimpl.h"
+#include "kjs_binding.h"
 #include <kio/job.h>
-#include <qobject.h>
+#include <kjs/protect.h>
 #include <qregexp.h>
 #include <qtextcodec.h>
 
-#include "KWQLoader.h"
+using namespace KIO;
 
-using namespace WebCore::EventNames;
+namespace WebCore {
+
+using namespace EventNames;
 
 static inline QString getMIMEType(const QString& contentTypeString) {
   return QStringList::split(";", contentTypeString, true)[0].stripWhiteSpace();
@@ -92,26 +93,6 @@ static QString getCharset(const QString& contentTypeString) {
   return QString();
 }
 
-namespace WebCore {
-
-XMLHttpRequestQObject::XMLHttpRequestQObject(XMLHttpRequest* _jsObject) {
-  jsObject = _jsObject;
-}
-
-void XMLHttpRequestQObject::slotData(KIO::Job* job,
-                                     const char* data,
-                                     int size) {
-  jsObject->slotData(job, data, size);
-}
-
-void XMLHttpRequestQObject::slotFinished(KIO::Job* job) {
-  jsObject->slotFinished(job);
-}
-
-void XMLHttpRequestQObject::slotRedirection(KIO::Job* job, const KURL& url) {
-  jsObject->slotRedirection(job, url);
-}
-
 XMLHttpRequestState XMLHttpRequest::getReadyState() const {
   return state;
 }
@@ -120,46 +101,39 @@ DOMString XMLHttpRequest::getResponseText() const {
   return response;
 }
 
-PassRefPtr<DocumentImpl> XMLHttpRequest::getResponseXML() const {
+DocumentImpl* XMLHttpRequest::getResponseXML() const {
   if (state != Completed)
     return 0;
 
   if (!createdDocument) {
-    if (typeIsXML = responseIsXML()) {
+    if (responseIsXML()) {
       responseXML = doc->implementation()->createDocument();
-
-      DocumentImpl* docImpl = responseXML.get();
-
-      docImpl->open();
-      docImpl->write(response);
-      docImpl->finishParsing();
-      docImpl->close();
+      responseXML->open();
+      responseXML->write(response);
+      responseXML->finishParsing();
+      responseXML->close();
     }
     createdDocument = true;
   }
 
-  if (!typeIsXML)
-    return 0;
-
-  return responseXML;
+  return responseXML.get();
 }
 
-PassRefPtr<EventListener> XMLHttpRequest::getOnReadyStateChangeListener()
-    const {
-  return onReadyStateChangeListener;
+EventListener* XMLHttpRequest::onReadyStateChangeListener() const {
+  return m_onReadyStateChangeListener.get();
 }
 
 void XMLHttpRequest::setOnReadyStateChangeListener(
     EventListener* eventListener) {
-  onReadyStateChangeListener = eventListener;
+  m_onReadyStateChangeListener = eventListener;
 }
 
-PassRefPtr<EventListener> XMLHttpRequest::getOnLoadListener() const {
-  return onLoadListener;
+EventListener* XMLHttpRequest::onLoadListener() const {
+  return m_onLoadListener.get();
 }
 
 void XMLHttpRequest::setOnLoadListener(EventListener* eventListener) {
-  onLoadListener = eventListener;
+  m_onLoadListener = eventListener;
 }
 
 XMLHttpRequest::XMLHttpRequest(DocumentImpl* d)
@@ -179,18 +153,18 @@ void XMLHttpRequest::changeState(XMLHttpRequestState newState) {
   if (state != newState) {
     state = newState;
 
-    if (doc && doc->frame() && onReadyStateChangeListener) {
+    if (doc && doc->frame() && m_onReadyStateChangeListener) {
       int ignoreException;
       RefPtr<EventImpl> ev = doc->createEvent("HTMLEvents", ignoreException);
       ev->initEvent(readystatechangeEvent, true, true);
-      onReadyStateChangeListener->handleEventImpl(ev.get(), true);
+      m_onReadyStateChangeListener->handleEventImpl(ev.get(), true);
     }
 
-    if (doc && doc->frame() && state == Completed && onLoadListener) {
+    if (doc && doc->frame() && state == Completed && m_onLoadListener) {
       int ignoreException;
       RefPtr<EventImpl> ev = doc->createEvent("HTMLEvents", ignoreException);
       ev->initEvent(loadEvent, true, true);
-      onLoadListener->handleEventImpl(ev.get(), true);
+      m_onLoadListener->handleEventImpl(ev.get(), true);
     }
   }
 }
@@ -281,9 +255,9 @@ void XMLHttpRequest::send(const DOMString& _body) {
     if (!codec)  // FIXME: report an error?
       codec = QTextCodec::codecForName("UTF-8");
 
-    job = KIO::http_post(url, codec->fromUnicode(_body.qstring()), false);
+    job = http_post(url, codec->fromUnicode(_body.qstring()), false);
   } else
-    job = KIO::get(url, false, false);
+    job = get(url, false, false);
   if (requestHeaders.length() > 0)
     job->addMetaData("customHTTPHeader", requestHeaders);
 
@@ -297,8 +271,8 @@ void XMLHttpRequest::send(const DOMString& _body) {
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
 
-      data = KWQServeSynchronousRequest(
-          khtml::Cache::loader(), doc->docLoader(), job, finalURL, headers);
+      data = KWQServeSynchronousRequest(Cache::loader(), doc->docLoader(), job,
+                                        finalURL, headers);
     }
 
     job = 0;
@@ -307,7 +281,14 @@ void XMLHttpRequest::send(const DOMString& _body) {
     return;
   }
 
-  ref();  // this object should not be deleted while a request is in progress
+  // Neither this object nor the JavaScript wrapper should be deleted while
+  // a request is in progress because we need to keep the listeners alive,
+  // and they are referenced by the JavaScript wrapper.
+  ref();
+  {
+    KJS::JSLock lock;
+    gcProtectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
+  }
 
   qObject->connect(job, SIGNAL(result(KIO::Job*)),
                    SLOT(slotFinished(KIO::Job*)));
@@ -318,7 +299,7 @@ void XMLHttpRequest::send(const DOMString& _body) {
 
   addToRequestsByDocument();
 
-  KWQServeRequest(khtml::Cache::loader(), doc->docLoader(), job);
+  KWQServeRequest(Cache::loader(), doc->docLoader(), job);
 }
 
 void XMLHttpRequest::abort() {
@@ -332,8 +313,13 @@ void XMLHttpRequest::abort() {
   decoder = 0;
   aborted = true;
 
-  if (hadJob)
+  if (hadJob) {
+    {
+      KJS::JSLock lock;
+      gcUnprotectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
+    }
     deref();
+  }
 }
 
 void XMLHttpRequest::overrideMIMEType(const DOMString& override) {
@@ -481,7 +467,7 @@ void XMLHttpRequest::processSyncLoadResults(const ByteArray& data,
   slotFinished(0);
 }
 
-void XMLHttpRequest::slotFinished(KIO::Job*) {
+void XMLHttpRequest::slotFinished(Job*) {
   if (responseHeaders.isEmpty() && job)
     responseHeaders = job->queryMetaData("HTTP-Headers");
 
@@ -498,17 +484,22 @@ void XMLHttpRequest::slotFinished(KIO::Job*) {
   changeState(Completed);
   decoder = 0;
 
-  if (hadJob)
+  if (hadJob) {
+    {
+      KJS::JSLock lock;
+      gcUnprotectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
+    }
     deref();
+  }
 }
 
-void XMLHttpRequest::slotRedirection(KIO::Job*, const KURL& url) {
+void XMLHttpRequest::slotRedirection(Job*, const KURL& url) {
   if (!urlMatchesDocumentDomain(url)) {
     abort();
   }
 }
 
-void XMLHttpRequest::slotData(KIO::Job*, const char* data, int len) {
+void XMLHttpRequest::slotData(Job*, const char* data, int len) {
   if (responseHeaders.isEmpty() && job)
     responseHeaders = job->queryMetaData("HTTP-Headers");
 

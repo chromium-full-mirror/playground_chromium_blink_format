@@ -1,7 +1,7 @@
 // -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2006 Apple Computer, Inc.
  *  Copyright (C) 2005, 2006 Alexey Proskuryakov <ap@nypop.com>
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,9 +23,8 @@
 #define XMLHTTPREQUEST_H_
 
 #include <kurl.h>
-#include <kxmlcore/PassRefPtr.h>
-#include <kxmlcore/HashSet.h>
 #include <kxmlcore/HashMap.h>
+#include <kxmlcore/HashSet.h>
 #include <qguardedptr.h>
 #include <qobject.h>
 
@@ -72,22 +71,21 @@ class XMLHttpRequest : public Shared<XMLHttpRequest> {
   DOMString getAllResponseHeaders() const;
   DOMString getResponseHeader(const DOMString& name) const;
   DOMString getResponseText() const;
-  PassRefPtr<DocumentImpl> getResponseXML() const;
+  DocumentImpl* getResponseXML() const;
 
-  void setOnReadyStateChangeListener(EventListener* eventListener);
-  PassRefPtr<EventListener> getOnReadyStateChangeListener() const;
-  void setOnLoadListener(EventListener* eventListener);
-  PassRefPtr<EventListener> getOnLoadListener() const;
+  void setOnReadyStateChangeListener(EventListener*);
+  EventListener* onReadyStateChangeListener() const;
+  void setOnLoadListener(EventListener*);
+  EventListener* onLoadListener() const;
 
  private:
-  friend class XMLHttpRequestProtoFunc;
   friend class XMLHttpRequestQObject;
 
   bool urlMatchesDocumentDomain(const KURL&) const;
 
   XMLHttpRequestQObject* qObject;
 
-  void slotData(KIO::Job* job, const char* data, int size);
+  void slotData(KIO::Job*, const char* data, int size);
   void slotFinished(KIO::Job*);
   void slotRedirection(KIO::Job*, const KURL&);
 
@@ -109,8 +107,8 @@ class XMLHttpRequest : public Shared<XMLHttpRequest> {
   void removeFromRequestsByDocument();
 
   QGuardedPtr<DocumentImpl> doc;
-  RefPtr<EventListener> onReadyStateChangeListener;
-  RefPtr<EventListener> onLoadListener;
+  RefPtr<EventListener> m_onReadyStateChangeListener;
+  RefPtr<EventListener> m_onLoadListener;
 
   KURL url;
   QString method;
@@ -121,32 +119,33 @@ class XMLHttpRequest : public Shared<XMLHttpRequest> {
 
   XMLHttpRequestState state;
 
-  RefPtr<khtml::Decoder> decoder;
+  RefPtr<Decoder> decoder;
   QString encoding;
   QString responseHeaders;
   QString MIMETypeOverride;
 
   QString response;
   mutable bool createdDocument;
-  mutable bool typeIsXML;
   mutable RefPtr<DocumentImpl> responseXML;
 
   bool aborted;
 };
 
 class XMLHttpRequestQObject : public QObject {
-  Q_OBJECT
-
  public:
-  XMLHttpRequestQObject(XMLHttpRequest* _jsObject);
+  XMLHttpRequestQObject(XMLHttpRequest* r) { m_request = r; }
 
  public slots:
-  void slotData(KIO::Job* job, const char* data, int size);
-  void slotFinished(KIO::Job* job);
-  void slotRedirection(KIO::Job* job, const KURL& url);
+  void slotData(KIO::Job* job, const char* data, int size) {
+    m_request->slotData(job, data, size);
+  }
+  void slotFinished(KIO::Job* job) { m_request->slotFinished(job); }
+  void slotRedirection(KIO::Job* job, const KURL& url) {
+    m_request->slotRedirection(job, url);
+  }
 
  private:
-  XMLHttpRequest* jsObject;
+  XMLHttpRequest* m_request;
 };
 
 }  // namespace
