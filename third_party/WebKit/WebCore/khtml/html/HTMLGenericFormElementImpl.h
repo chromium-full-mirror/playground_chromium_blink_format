@@ -79,7 +79,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual void recalcStyle(StyleChange);
 
-  virtual AtomicString name() const;
+  virtual const AtomicString& name() const;
   void setName(const AtomicString& name);
 
   virtual bool isGenericFormElement() const { return true; }

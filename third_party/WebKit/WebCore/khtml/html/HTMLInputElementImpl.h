@@ -76,7 +76,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isKeyboardFocusable() const;
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
 
-  virtual AtomicString name() const;
+  virtual const AtomicString& name() const;
 
   bool autoComplete() const { return m_autocomplete; }
 
