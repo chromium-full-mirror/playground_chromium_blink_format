@@ -30,9 +30,9 @@
 namespace KXMLCore {
 
 template <typename T>
-inline const T& identityExtract(const T& t) {
-  return t;
-}
+struct IdentityExtractor {
+  static const T& extract(const T& t) { return t; }
+};
 
 template <typename Value, typename T, typename HashSetTranslator>
 struct HashSetTranslatorAdapter {
@@ -57,7 +57,7 @@ class HashSet {
  private:
   typedef HashTable<Value,
                     Value,
-                    identityExtract<Value>,
+                    IdentityExtractor<Value>,
                     HashFunctions,
                     Traits,
                     Traits>

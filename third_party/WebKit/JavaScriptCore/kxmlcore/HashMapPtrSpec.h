@@ -226,7 +226,7 @@ class HashMap<P*, Q*, PointerHash<P*>, HashTraits<P*>, HashTraits<Q*>> {
   typedef HashTableIterator<
       void*,
       ImplValueType,
-      extractFirst<ImplValueType>,
+      PairFirstExtractor<void*, void*>,
       DefaultHash<void*>,
       PairHashTraits<HashTraits<void*>, HashTraits<void*>>,
       HashTraits<void*>>
@@ -234,7 +234,7 @@ class HashMap<P*, Q*, PointerHash<P*>, HashTraits<P*>, HashTraits<Q*>> {
   typedef HashTableConstIterator<
       void*,
       ImplValueType,
-      extractFirst<ImplValueType>,
+      PairFirstExtractor<void*, void*>,
       DefaultHash<void*>,
       PairHashTraits<HashTraits<void*>, HashTraits<void*>>,
       HashTraits<void*>>

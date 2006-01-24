@@ -29,11 +29,13 @@
 
 namespace KXMLCore {
 
-template <typename PairType>
-inline typename PairType::first_type const& extractFirst(
-    const PairType& value) {
-  return value.first;
-}
+template <typename Key, typename Mapped>
+class PairFirstExtractor {
+  typedef pair<Key, Mapped> ValueType;
+
+ public:
+  static const Key& extract(const ValueType& value) { return value.first; }
+};
 
 template <typename Key, typename Mapped, typename HashFunctions>
 class HashMapTranslator {
@@ -70,7 +72,7 @@ class HashMap {
  private:
   typedef HashTable<KeyType,
                     ValueType,
-                    extractFirst<ValueType>,
+                    PairFirstExtractor<KeyType, MappedType>,
                     HashFunctions,
                     ValueTraits,
                     KeyTraits>

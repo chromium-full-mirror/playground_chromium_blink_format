@@ -57,21 +57,21 @@ struct HashTableStats {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 class HashTable;
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 class HashTableIterator;
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
@@ -80,56 +80,56 @@ class HashTableConstIterator;
 #if CHECK_HASHTABLE_ITERATORS
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 void addIterator(
-    const HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>*,
+    const HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>*,
     HashTableConstIterator<Key,
                            Value,
-                           ExtractKey,
+                           Extractor,
                            HashFunctions,
                            Traits,
                            KeyTraits>*);
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 void removeIterator(HashTableConstIterator<Key,
                                            Value,
-                                           ExtractKey,
+                                           Extractor,
                                            HashFunctions,
                                            Traits,
                                            KeyTraits>*);
 #else
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void addIterator(
-    const HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>*,
+    const HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>*,
     HashTableConstIterator<Key,
                            Value,
-                           ExtractKey,
+                           Extractor,
                            HashFunctions,
                            Traits,
                            KeyTraits>*) {}
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void removeIterator(HashTableConstIterator<Key,
                                                   Value,
-                                                  ExtractKey,
+                                                  Extractor,
                                                   HashFunctions,
                                                   Traits,
                                                   KeyTraits>*) {}
@@ -137,24 +137,24 @@ inline void removeIterator(HashTableConstIterator<Key,
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 class HashTableConstIterator {
  private:
-  typedef HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>
+  typedef HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>
       HashTableType;
   typedef HashTableIterator<Key,
                             Value,
-                            ExtractKey,
+                            Extractor,
                             HashFunctions,
                             Traits,
                             KeyTraits>
       iterator;
   typedef HashTableConstIterator<Key,
                                  Value,
-                                 ExtractKey,
+                                 Extractor,
                                  HashFunctions,
                                  Traits,
                                  KeyTraits>
@@ -165,13 +165,13 @@ class HashTableConstIterator {
 
   friend class HashTable<Key,
                          Value,
-                         ExtractKey,
+                         Extractor,
                          HashFunctions,
                          Traits,
                          KeyTraits>;
   friend class HashTableIterator<Key,
                                  Value,
-                                 ExtractKey,
+                                 Extractor,
                                  HashFunctions,
                                  Traits,
                                  KeyTraits>;
@@ -276,24 +276,24 @@ class HashTableConstIterator {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 class HashTableIterator {
  private:
-  typedef HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>
+  typedef HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>
       HashTableType;
   typedef HashTableIterator<Key,
                             Value,
-                            ExtractKey,
+                            Extractor,
                             HashFunctions,
                             Traits,
                             KeyTraits>
       iterator;
   typedef HashTableConstIterator<Key,
                                  Value,
-                                 ExtractKey,
+                                 Extractor,
                                  HashFunctions,
                                  Traits,
                                  KeyTraits>
@@ -304,7 +304,7 @@ class HashTableIterator {
 
   friend class HashTable<Key,
                          Value,
-                         ExtractKey,
+                         Extractor,
                          HashFunctions,
                          Traits,
                          KeyTraits>;
@@ -382,7 +382,7 @@ class IdentityHashTranslator {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
@@ -390,14 +390,14 @@ class HashTable {
  public:
   typedef HashTableIterator<Key,
                             Value,
-                            ExtractKey,
+                            Extractor,
                             HashFunctions,
                             Traits,
                             KeyTraits>
       iterator;
   typedef HashTableConstIterator<Key,
                                  Value,
-                                 ExtractKey,
+                                 Extractor,
                                  HashFunctions,
                                  Traits,
                                  KeyTraits>
@@ -428,8 +428,8 @@ class HashTable {
   int capacity() const { return m_tableSize; }
 
   pair<iterator, bool> add(const ValueType& value) {
-    return add<KeyType, ValueType, IdentityTranslatorType>(ExtractKey(value),
-                                                           value);
+    return add<KeyType, ValueType, IdentityTranslatorType>(
+        Extractor::extract(value), value);
   }
 
   // A special version of add() that finds the object by hashing and comparing
@@ -448,10 +448,10 @@ class HashTable {
   void clear();
 
   static bool isEmptyBucket(const ValueType& value) {
-    return ExtractKey(value) == KeyTraits::emptyValue();
+    return Extractor::extract(value) == KeyTraits::emptyValue();
   }
   static bool isDeletedBucket(const ValueType& value) {
-    return ExtractKey(value) == KeyTraits::deletedValue();
+    return Extractor::extract(value) == KeyTraits::deletedValue();
   }
   static bool isEmptyOrDeletedBucket(const ValueType& value) {
     return isEmptyBucket(value) || isDeletedBucket(value);
@@ -539,11 +539,11 @@ class HashTable {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+inline HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     HashTable()
     : m_table(0),
       m_tableSize(0),
@@ -559,18 +559,18 @@ inline HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 template <typename T, typename HashTranslator>
 inline typename HashTable<Key,
                           Value,
-                          ExtractKey,
+                          Extractor,
                           HashFunctions,
                           Traits,
                           KeyTraits>::FullLookupType
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::lookup(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::lookup(
     const T& key) {
   assert(m_table);
 
@@ -590,7 +590,7 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::lookup(
   while (!isEmptyBucket(*(entry = table + i))) {
     if (isDeletedBucket(*entry))
       deletedEntry = entry;
-    else if (HashTranslator::equal(ExtractKey(*entry), key))
+    else if (HashTranslator::equal(Extractor::extract(*entry), key))
       return makeLookupResult(entry, true, h);
 #if DUMP_HASHTABLE_STATS
     ++probeCount;
@@ -606,19 +606,19 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::lookup(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 template <typename T, typename Extra, typename HashTranslator>
 inline pair<typename HashTable<Key,
                                Value,
-                               ExtractKey,
+                               Extractor,
                                HashFunctions,
                                Traits,
                                KeyTraits>::iterator,
             bool>
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::add(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
     const T& key,
     const Extra& extra) {
   invalidateIterators();
@@ -647,7 +647,7 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::add(
     // FIXME: this makes an extra copy on expand. Probably not that bad since
     // expand is rare, but would be better to have a version of expand that can
     // follow a pivot entry and return the new position
-    KeyType enteredKey = ExtractKey(*entry);
+    KeyType enteredKey = Extractor::extract(*entry);
     expand();
     return std::make_pair(find(enteredKey), true);
   }
@@ -659,37 +659,37 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::add(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::reinsert(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::reinsert(
     ValueType& entry) {
   assert(m_table);
-  assert(!lookup(ExtractKey(entry)).second);
-  assert(!isDeletedBucket(*(lookup(ExtractKey(entry)).first)));
+  assert(!lookup(Extractor::extract(entry)).second);
+  assert(!isDeletedBucket(*(lookup(Extractor::extract(entry)).first)));
 #if DUMP_HASHTABLE_STATS
   ++HashTableStats::numReinserts;
 #endif
 
   Mover<ValueType, Traits::needsDestruction>::move(
-      entry, *(lookup(ExtractKey(entry)).first));
+      entry, *(lookup(Extractor::extract(entry)).first));
 }
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline typename HashTable<Key,
                           Value,
-                          ExtractKey,
+                          Extractor,
                           HashFunctions,
                           Traits,
                           KeyTraits>::iterator
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::find(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
     const Key& key) {
   if (!m_table)
     return end();
@@ -702,17 +702,17 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::find(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline typename HashTable<Key,
                           Value,
-                          ExtractKey,
+                          Extractor,
                           HashFunctions,
                           Traits,
                           KeyTraits>::const_iterator
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::find(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
     const Key& key) const {
   if (!m_table)
     return end();
@@ -725,12 +725,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::find(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline bool
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::contains(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::contains(
     const KeyType& key) const {
   if (!m_table)
     return false;
@@ -740,12 +740,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::contains(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     ValueType* pos) {
   invalidateIterators();
   checkTableConsistency();
@@ -766,12 +766,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     const KeyType& key) {
   if (!m_table)
     return;
@@ -781,12 +781,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     iterator it) {
   if (it == end())
     return;
@@ -796,12 +796,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::remove(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline Value*
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     allocateTable(int size) {
   // would use a template member function with explicit specializations here,
   // but
@@ -820,12 +820,11 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+inline void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     deallocateTable(ValueType* table, int size) {
   if (Traits::needsDestruction) {
     for (int i = 0; i < size; ++i) {
@@ -838,12 +837,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::expand() {
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::expand() {
   int newSize;
   if (m_tableSize == 0)
     newSize = m_minTableSize;
@@ -857,12 +856,12 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::expand() {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
-    rehash(int newTableSize) {
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::rehash(
+    int newTableSize) {
   checkTableConsistencyExceptSize();
 
   int oldTableSize = m_tableSize;
@@ -891,12 +890,12 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 inline void
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::clear() {
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::clear() {
   invalidateIterators();
   deallocateTable(m_table, m_tableSize);
   m_table = 0;
@@ -907,11 +906,11 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::clear() {
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::HashTable(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::HashTable(
     const HashTable& other)
     : m_table(0),
       m_tableSize(0),
@@ -933,11 +932,11 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::HashTable(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::swap(
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::swap(
     HashTable& other) {
   invalidateIterators();
   other.invalidateIterators();
@@ -965,12 +964,12 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::swap(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>&
-HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::operator=(
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>&
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::operator=(
     const HashTable& other) {
   HashTable tmp(other);
   swap(tmp);
@@ -981,11 +980,11 @@ HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::operator=(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     checkTableConsistency() const {
   checkTableConsistencyExceptSize();
   assert(!shouldExpand());
@@ -994,11 +993,11 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     checkTableConsistencyExceptSize() const {
   if (!m_table)
     return;
@@ -1015,7 +1014,7 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
       continue;
     }
 
-    const_iterator it = find(ExtractKey(*entry));
+    const_iterator it = find(Extractor::extract(*entry));
     assert(entry == it.m_position);
     ++count;
   }
@@ -1033,11 +1032,11 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     invalidateIterators() {
   const_iterator* next;
   for (const_iterator* p = m_iterators; p; p = next) {
@@ -1051,16 +1050,16 @@ void HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>::
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 void addIterator(
-    const HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>*
+    const HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>*
         table,
     HashTableConstIterator<Key,
                            Value,
-                           ExtractKey,
+                           Extractor,
                            HashFunctions,
                            Traits,
                            KeyTraits>* it) {
@@ -1083,19 +1082,19 @@ void addIterator(
 
 template <typename Key,
           typename Value,
-          const Key& ExtractKey(const Value&),
+          typename Extractor,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
 void removeIterator(HashTableConstIterator<Key,
                                            Value,
-                                           ExtractKey,
+                                           Extractor,
                                            HashFunctions,
                                            Traits,
                                            KeyTraits>* it) {
-  typedef HashTable<Key, Value, ExtractKey, HashFunctions, Traits, KeyTraits>
+  typedef HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>
       HashTableType;
-  typedef HashTableConstIterator<Key, Value, ExtractKey, HashFunctions, Traits,
+  typedef HashTableConstIterator<Key, Value, Extractor, HashFunctions, Traits,
                                  KeyTraits>
       const_iterator;
 
