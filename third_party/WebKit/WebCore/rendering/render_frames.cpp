@@ -863,7 +863,7 @@ void RenderPartObject::updateWidget() {
           }
         }
         if (!embed) {
-          uniqueParamNames.insert(p->name().impl());
+          uniqueParamNames.add(p->name().impl());
           paramNames.append(p->name().qstring());
           paramValues.append(p->value().qstring());
         }
@@ -883,7 +883,7 @@ void RenderPartObject::updateWidget() {
     DOMString codebase;
     if (!embed && serviceType.lower() == "application/x-java-applet") {
       codebase = "codebase";
-      uniqueParamNames.insert(
+      uniqueParamNames.add(
           codebase.impl());  // pretend we found it in a PARAM already
     }
 

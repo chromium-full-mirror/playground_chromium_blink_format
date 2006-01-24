@@ -562,7 +562,7 @@ void XMLHttpRequest::addToRequestsByDocument() {
   }
 
   assert(!requests->contains(this));
-  requests->insert(this);
+  requests->add(this);
 }
 
 void XMLHttpRequest::removeFromRequestsByDocument() {

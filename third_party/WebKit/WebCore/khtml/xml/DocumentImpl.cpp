@@ -666,7 +666,7 @@ void DocumentImpl::addElementById(const AtomicString& elementId,
   if (!m_elementsById.contains(elementId.impl()))
     m_elementsById.set(elementId.impl(), element);
   else
-    m_duplicateIds.insert(elementId.impl());
+    m_duplicateIds.add(elementId.impl());
 }
 
 void DocumentImpl::removeElementById(const AtomicString& elementId,
@@ -1006,7 +1006,7 @@ void DocumentImpl::removeAllEventListenersFromAllNodes() {
 }
 
 void DocumentImpl::registerDisconnectedNodeWithEventListeners(NodeImpl* node) {
-  m_disconnectedNodesWithEventListeners.insert(node);
+  m_disconnectedNodesWithEventListeners.add(node);
 }
 
 void DocumentImpl::unregisterDisconnectedNodeWithEventListeners(

@@ -83,7 +83,7 @@ void CachedObject::setRequest(Request* _request) {
 }
 
 void CachedObject::ref(CachedObjectClient* c) {
-  m_clients.insert(c);
+  m_clients.add(c);
   Cache::removeFromLRUList(this);
   increaseAccessCount();
 }

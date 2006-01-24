@@ -79,7 +79,7 @@ DOMStringImpl* AtomicString::add(const char* c) {
   if (length == 0)
     return DOMStringImpl::empty();
 
-  return *stringTable.insert<const char*, CStringTranslator>(c).first;
+  return *stringTable.add<const char*, CStringTranslator>(c).first;
 }
 
 struct QCharBuffer {
@@ -134,7 +134,7 @@ DOMStringImpl* AtomicString::add(const QChar* s, int length) {
     return DOMStringImpl::empty();
 
   QCharBuffer buf = {s, length};
-  return *stringTable.insert<QCharBuffer, QCharBufferTranslator>(buf).first;
+  return *stringTable.add<QCharBuffer, QCharBufferTranslator>(buf).first;
 }
 
 DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
@@ -144,7 +144,7 @@ DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
   if (r->l == 0)
     return DOMStringImpl::empty();
 
-  DOMStringImpl* result = *stringTable.insert(r).first;
+  DOMStringImpl* result = *stringTable.add(r).first;
   if (result == r)
     r->_inTable = true;
   return result;

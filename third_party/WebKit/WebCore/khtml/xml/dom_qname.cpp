@@ -121,10 +121,10 @@ QualifiedName::QualifiedName(const AtomicString& p,
   if (!gNameCache)
     gNameCache = new QNameSet;
   QualifiedNameComponents components = {p.impl(), l.impl(), n.impl()};
-  m_impl = *gNameCache
-                ->insert<QualifiedNameComponents, QNameComponentsTranslator>(
-                    components)
-                .first;
+  m_impl =
+      *gNameCache
+           ->add<QualifiedNameComponents, QNameComponentsTranslator>(components)
+           .first;
   ref();
 }
 
