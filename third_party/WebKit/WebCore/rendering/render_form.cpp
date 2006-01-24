@@ -315,7 +315,7 @@ void RenderLineEdit::slotTextChanged(const DOMString& string) {
   // when the user
   // empties a textfield, but should always force an empty textfield to use the
   // empty string.
-  QString newText = string.isNull() ? "" : string.qstring();
+  DOMString newText = string.isNull() ? "" : string;
   newText.replace(backslashAsCurrencySymbol(), QChar('\\'));
   element()->setValueFromRenderer(newText);
 }

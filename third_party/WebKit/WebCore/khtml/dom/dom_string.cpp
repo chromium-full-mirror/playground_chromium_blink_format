@@ -156,6 +156,8 @@ QChar* DOMString::unicode() const {
 QString DOMString::qstring() const {
   if (!m_impl)
     return QString::null;
+  if (!m_impl->s)
+    return QString("", 0);
 
   return QString(m_impl->s, m_impl->l);
 }
