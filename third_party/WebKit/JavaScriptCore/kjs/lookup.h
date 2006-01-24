@@ -271,6 +271,16 @@ inline void lookupPut(ExecState* exec,
     thisObj->putValueProperty(exec, entry->value, value, attr);
 }
 
+}  // namespace
+
+/*
+ * The template method below can't be in the KJS namespace because it's used in
+ * KJS_DEFINE_PROPERTY which can be used outside of the KJS namespace. It can be
+ * moved back
+ * when a gcc with http://gcc.gnu.org/bugzilla/show_bug.cgi?id=8355 is
+ * mainstream enough.
+ */
+
 /**
  * This template method retrieves or create an object that is unique
  * (for a given interpreter) The first time this is called (for a given
@@ -280,17 +290,17 @@ inline void lookupPut(ExecState* exec,
  * exec.
  */
 template <class ClassCtor>
-inline JSObject* cacheGlobalObject(ExecState* exec,
-                                   const Identifier& propertyName) {
-  JSObject* globalObject =
-      static_cast<JSObject*>(exec->lexicalInterpreter()->globalObject());
-  JSValue* obj = globalObject->getDirect(propertyName);
+inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
+                                        const KJS::Identifier& propertyName) {
+  KJS::JSObject* globalObject =
+      static_cast<KJS::JSObject*>(exec->lexicalInterpreter()->globalObject());
+  KJS::JSValue* obj = globalObject->getDirect(propertyName);
   if (obj) {
     assert(obj->isObject());
-    return static_cast<JSObject*>(obj);
+    return static_cast<KJS::JSObject*>(obj);
   }
-  JSObject* newObject = new ClassCtor(exec);
-  globalObject->put(exec, propertyName, newObject, Internal);
+  KJS::JSObject* newObject = new ClassCtor(exec);
+  globalObject->put(exec, propertyName, newObject, KJS::Internal);
   return newObject;
 }
 
@@ -317,19 +327,21 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
  * DOMNodeProto as last argument.
  */
 #define KJS_DEFINE_PROTOTYPE(ClassProto)                                    \
-  class ClassProto : public JSObject {                                      \
-    friend JSObject* cacheGlobalObject<ClassProto>(                         \
-        ExecState * exec,                                                   \
-        const Identifier& propertyName);                                    \
+  class ClassProto : public KJS::JSObject {                                 \
+    friend KJS::JSObject* cacheGlobalObject<ClassProto>(                    \
+        KJS::ExecState * exec,                                              \
+        const KJS::Identifier& propertyName);                               \
                                                                             \
    public:                                                                  \
-    static JSObject* ClassProto::self(ExecState* exec);                     \
-    virtual const ClassInfo* classInfo() const { return &info; }            \
-    static const ClassInfo info;                                            \
-    bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);  \
+    static KJS::JSObject* ClassProto::self(KJS::ExecState* exec);           \
+    virtual const KJS::ClassInfo* classInfo() const { return &info; }       \
+    static const KJS::ClassInfo info;                                       \
+    bool getOwnPropertySlot(KJS::ExecState*,                                \
+                            const KJS::Identifier&,                         \
+                            KJS::PropertySlot&);                            \
                                                                             \
    protected:                                                               \
-    ClassProto(ExecState* exec)                                             \
+    ClassProto(KJS::ExecState* exec)                                        \
         : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()) {} \
   };
 
@@ -389,6 +401,5 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
  * - cleanup old stuff (e.g. hasProperty)
  * - compile, test, commit ;)
  */
-}  // namespace
 
 #endif
