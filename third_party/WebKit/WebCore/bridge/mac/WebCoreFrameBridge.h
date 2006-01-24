@@ -62,6 +62,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class DOMHTMLTextAreaElement;
 @class WebCoreSettings;
 @class WebScriptObject;
+@class WebView;
 
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceHandle;
@@ -552,7 +553,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (WebCoreFrameBridge*)mainFrame;
 - (void)frameDetached;
 - (NSView*)documentView;
-- (NSView*)webView;
+- (WebView*)webView;
 
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
