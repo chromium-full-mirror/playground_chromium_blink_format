@@ -299,8 +299,7 @@ void RenderCanvas::absoluteRects(QValueList<IntRect>& rects, int _tx, int _ty) {
 }
 
 IntRect RenderCanvas::selectionRect() const {
-  typedef HashMap<RenderObject*, SelectionInfo*, PointerHash<RenderObject*>>
-      SelectionMap;
+  typedef HashMap<RenderObject*, SelectionInfo*> SelectionMap;
   SelectionMap selectedObjects;
 
   RenderObject* os = m_selectionStart;
@@ -370,8 +369,7 @@ void RenderCanvas::setSelection(RenderObject* s,
   int oldEndPos = m_selectionEndPos;
 
   // Objects each have a single selection rect to examine.
-  typedef HashMap<RenderObject*, SelectionInfo*, PointerHash<RenderObject*>>
-      SelectedObjectMap;
+  typedef HashMap<RenderObject*, SelectionInfo*> SelectedObjectMap;
   SelectedObjectMap oldSelectedObjects;
   SelectedObjectMap newSelectedObjects;
 
@@ -381,8 +379,7 @@ void RenderCanvas::setSelection(RenderObject* s,
   // and right rects individually, since otherwise
   // the union of those rects might remain the same even when changes have
   // occurred.
-  typedef HashMap<RenderBlock*, BlockSelectionInfo*, PointerHash<RenderBlock*>>
-      SelectedBlockMap;
+  typedef HashMap<RenderBlock*, BlockSelectionInfo*> SelectedBlockMap;
   SelectedBlockMap oldSelectedBlocks;
   SelectedBlockMap newSelectedBlocks;
 

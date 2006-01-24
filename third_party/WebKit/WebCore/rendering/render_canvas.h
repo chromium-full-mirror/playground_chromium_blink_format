@@ -133,7 +133,7 @@ class RenderCanvas : public RenderBlock {
                              // checks on blocks/tables.
   IntRect m_printRect;       // Used when printing.
 
-  typedef HashSet<RenderObject*, PointerHash<RenderObject*>> RenderObjectSet;
+  typedef HashSet<RenderObject*> RenderObjectSet;
 
   RenderObjectSet m_widgets;
 };

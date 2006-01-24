@@ -625,7 +625,7 @@ bool HTMLElementImpl::childAllowed(NodeImpl* newChild) {
 // This unfortunate function is only needed when checking against the DTD.
 // Other languages (like SVG) won't need this.
 bool HTMLElementImpl::isRecognizedTagName(const QualifiedName& tagName) {
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> tagList;
+  static HashSet<AtomicStringImpl*> tagList;
   if (tagList.isEmpty()) {
 #define ADD_TAG(name) tagList.add(name##Tag.localName().impl());
     DOM_HTMLNAMES_FOR_EACH_TAG(ADD_TAG)
@@ -636,8 +636,8 @@ bool HTMLElementImpl::isRecognizedTagName(const QualifiedName& tagName) {
 // The terms inline and block are used here loosely.  Don't make the mistake of
 // assuming all inlines or all blocks
 // need to be in these two lists.
-HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>>* inlineTagList() {
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> tagList;
+HashSet<AtomicStringImpl*>* inlineTagList() {
+  static HashSet<AtomicStringImpl*> tagList;
   if (tagList.isEmpty()) {
     tagList.add(ttTag.localName().impl());
     tagList.add(iTag.localName().impl());
@@ -688,8 +688,8 @@ HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>>* inlineTagList() {
   return &tagList;
 }
 
-HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>>* blockTagList() {
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> tagList;
+HashSet<AtomicStringImpl*>* blockTagList() {
+  static HashSet<AtomicStringImpl*> tagList;
   if (tagList.isEmpty()) {
     tagList.add(pTag.localName().impl());
     tagList.add(h1Tag.localName().impl());

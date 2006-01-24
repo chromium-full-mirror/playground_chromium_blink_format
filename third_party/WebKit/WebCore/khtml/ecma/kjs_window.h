@@ -95,7 +95,7 @@ class WindowQObject : public QObject {
   virtual void timerEvent(QTimerEvent*);
 
   Window* m_parent;
-  typedef HashMap<int, ScheduledAction*, PointerHash<int>> TimeoutsMap;
+  typedef HashMap<int, ScheduledAction*> TimeoutsMap;
   TimeoutsMap m_timeouts;
 };
 
@@ -196,11 +196,8 @@ class Window : public JSObject {
   // Set a place to put a dialog return value when the window is cleared.
   void setReturnValueSlot(JSValue** slot) { m_returnValueSlot = slot; }
 
-  typedef HashMap<JSObject*, JSEventListener*, PointerHash<JSObject*>>
-      ListenersMap;
-  typedef HashMap<JSObject*,
-                  JSUnprotectedEventListener*,
-                  PointerHash<JSObject*>>
+  typedef HashMap<JSObject*, JSEventListener*> ListenersMap;
+  typedef HashMap<JSObject*, JSUnprotectedEventListener*>
       UnprotectedListenersMap;
   ListenersMap jsEventListeners;
   UnprotectedListenersMap jsUnprotectedEventListeners;

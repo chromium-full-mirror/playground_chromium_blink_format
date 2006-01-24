@@ -604,9 +604,7 @@ const ClassInfo KJS::HTMLElement::marquee_info = {
     "HTMLMarqueeElement", &KJS::HTMLElement::info, &HTMLMarqueeElementTable, 0};
 
 const ClassInfo* KJS::HTMLElement::classInfo() const {
-  static HashMap<DOM::DOMStringImpl*, const ClassInfo*,
-                 PointerHash<DOM::DOMStringImpl*>>
-      classInfoMap;
+  static HashMap<DOM::AtomicStringImpl*, const ClassInfo*> classInfoMap;
   if (classInfoMap.isEmpty()) {
     classInfoMap.set(aTag.localName().impl(), &a_info);
     classInfoMap.set(appletTag.localName().impl(), &applet_info);
@@ -794,9 +792,7 @@ const HTMLElement::Accessors HTMLElement::marquee_accessors = {
     &HTMLElement::marqueeGetter, &HTMLElement::marqueeSetter};
 
 const HTMLElement::Accessors* HTMLElement::accessors() const {
-  static HashMap<DOM::DOMStringImpl*, const Accessors*,
-                 PointerHash<DOM::DOMStringImpl*>>
-      accessorMap;
+  static HashMap<DOM::AtomicStringImpl*, const Accessors*> accessorMap;
   if (accessorMap.isEmpty()) {
     accessorMap.add(aTag.localName().impl(), &a_accessors);
     accessorMap.add(appletTag.localName().impl(), &applet_accessors);
@@ -3160,7 +3156,7 @@ void HTMLElement::selectSetter(ExecState* exec,
       return;
     }
     case SelectName: {
-      select.setName(str);
+      select.setName(AtomicString(str));
       return;
     }
     case SelectSize: {
@@ -3276,7 +3272,7 @@ void HTMLElement::inputSetter(ExecState* exec,
       return;
     }
     case InputName: {
-      input.setName(str);
+      input.setName(AtomicString(str));
       return;
     }
     case InputReadOnly: {
@@ -3343,7 +3339,7 @@ void HTMLElement::textAreaSetter(ExecState* exec,
       return;
     }
     case TextAreaName: {
-      textarea.setName(str);
+      textarea.setName(AtomicString(str));
       return;
     }
     case TextAreaReadOnly: {
@@ -3390,7 +3386,7 @@ void HTMLElement::buttonSetter(ExecState* exec,
       return;
     }
     case ButtonName: {
-      button.setName(str);
+      button.setName(AtomicString(str));
       return;
     }
     case ButtonTabIndex: {

@@ -48,13 +48,20 @@ namespace KXMLCore {
 
 template <typename T>
 class DefaultHash;
+template <typename T>
+class StrHash;
 
 template <>
-struct DefaultHash<KJS::UString::Rep*> {
+struct StrHash<KJS::UString::Rep*> {
   static unsigned hash(const KJS::UString::Rep* key) { return key->hash(); }
   static bool equal(const KJS::UString::Rep* a, const KJS::UString::Rep* b) {
     return KJS::Identifier::equal(a, b);
   }
+};
+
+template <>
+struct DefaultHash<KJS::UString::Rep*> {
+  typedef StrHash<KJS::UString::Rep*> Hash;
 };
 }
 

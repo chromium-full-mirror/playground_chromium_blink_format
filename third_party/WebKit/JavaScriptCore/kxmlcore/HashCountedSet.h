@@ -29,7 +29,7 @@
 namespace KXMLCore {
 
 template <typename Value,
-          typename HashFunctions = DefaultHash<Value>,
+          typename HashFunctions = typename DefaultHash<Value>::Hash,
           typename Traits = HashTraits<Value>>
 class HashCountedSet {
  private:

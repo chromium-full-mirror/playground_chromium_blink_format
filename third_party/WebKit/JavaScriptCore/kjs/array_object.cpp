@@ -474,7 +474,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
 
     // fall through
     case Join: {
-      static HashSet<JSObject*, PointerHash<JSObject*>> visitedElems;
+      static HashSet<JSObject*> visitedElems;
       if (visitedElems.contains(thisObj))
         return jsString("");
       UString separator = ",";

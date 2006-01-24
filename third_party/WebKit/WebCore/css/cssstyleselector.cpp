@@ -171,23 +171,24 @@ class CSSRuleSet {
   CSSRuleSet();
   ~CSSRuleSet();
 
-  typedef HashMap<DOMStringImpl*, CSSRuleDataList*, PointerHash<DOMStringImpl*>>
-      AtomRuleMap;
+  typedef HashMap<AtomicStringImpl*, CSSRuleDataList*> AtomRuleMap;
 
   void addRulesFromSheet(CSSStyleSheetImpl* sheet,
                          const DOMString& medium = "screen");
 
   void addRule(CSSStyleRuleImpl* rule, CSSSelector* sel);
-  void addToRuleSet(DOMStringImpl* key,
+  void addToRuleSet(AtomicStringImpl* key,
                     AtomRuleMap& map,
                     CSSStyleRuleImpl* rule,
                     CSSSelector* sel);
 
-  CSSRuleDataList* getIDRules(DOMStringImpl* key) { return m_idRules.get(key); }
-  CSSRuleDataList* getClassRules(DOMStringImpl* key) {
+  CSSRuleDataList* getIDRules(AtomicStringImpl* key) {
+    return m_idRules.get(key);
+  }
+  CSSRuleDataList* getClassRules(AtomicStringImpl* key) {
     return m_classRules.get(key);
   }
-  CSSRuleDataList* getTagRules(DOMStringImpl* key) {
+  CSSRuleDataList* getTagRules(AtomicStringImpl* key) {
     return m_tagRules.get(key);
   }
   CSSRuleDataList* getUniversalRules() { return m_universalRules; }
@@ -1624,7 +1625,7 @@ CSSRuleSet::~CSSRuleSet() {
   delete m_universalRules;
 }
 
-void CSSRuleSet::addToRuleSet(DOMStringImpl* key,
+void CSSRuleSet::addToRuleSet(AtomicStringImpl* key,
                               AtomRuleMap& map,
                               CSSStyleRuleImpl* rule,
                               CSSSelector* sel) {

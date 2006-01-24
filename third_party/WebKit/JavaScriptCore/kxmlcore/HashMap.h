@@ -59,7 +59,7 @@ class HashMapTranslator {
 
 template <typename Key,
           typename Mapped,
-          typename HashFunctions = DefaultHash<Key>,
+          typename HashFunctions = typename DefaultHash<Key>::Hash,
           typename KeyTraits = HashTraits<Key>,
           typename MappedTraits = HashTraits<Mapped>>
 class HashMap {

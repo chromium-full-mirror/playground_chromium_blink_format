@@ -605,10 +605,7 @@ bool HTMLParser::handleError(NodeImpl* n,
 }
 
 typedef bool (HTMLParser::*CreateErrorCheckFunc)(Token* t, NodeImpl*&);
-typedef HashMap<DOMStringImpl*,
-                CreateErrorCheckFunc,
-                PointerHash<DOMStringImpl*>>
-    FunctionMap;
+typedef HashMap<AtomicStringImpl*, CreateErrorCheckFunc> FunctionMap;
 
 bool HTMLParser::textCreateErrorCheck(Token* t, NodeImpl*& result) {
   result = new TextImpl(document, t->text.get());
@@ -861,7 +858,7 @@ void HTMLParser::processCloseTag(Token* t) {
 }
 
 bool HTMLParser::isHeaderTag(const AtomicString& tagName) {
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> headerTags;
+  static HashSet<AtomicStringImpl*> headerTags;
   if (headerTags.isEmpty()) {
     headerTags.add(h1Tag.localName().impl());
     headerTags.add(h2Tag.localName().impl());
@@ -915,7 +912,7 @@ bool HTMLParser::isInline(DOM::NodeImpl* node) const {
 }
 
 bool HTMLParser::isResidualStyleTag(const AtomicString& tagName) {
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> residualStyleTags;
+  static HashSet<AtomicStringImpl*> residualStyleTags;
   if (residualStyleTags.isEmpty()) {
     residualStyleTags.add(aTag.localName().impl());
     residualStyleTags.add(fontTag.localName().impl());
@@ -945,7 +942,7 @@ bool HTMLParser::isAffectedByResidualStyle(const AtomicString& tagName) {
   if (isResidualStyleTag(tagName))
     return true;
 
-  static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> affectedBlockTags;
+  static HashSet<AtomicStringImpl*> affectedBlockTags;
   if (affectedBlockTags.isEmpty()) {
     affectedBlockTags.add(h1Tag.localName().impl());
     affectedBlockTags.add(h2Tag.localName().impl());

@@ -128,7 +128,7 @@ struct DashboardRegionValue {
 // structure yet.
 // This means the paint order of outlines will be wrong, although this is a
 // minor issue.
-typedef HashSet<RenderFlow*, PointerHash<RenderFlow*>> RenderFlowSequencedSet;
+typedef HashSet<RenderFlow*> RenderFlowSequencedSet;
 
 /**
  * Base Class for all rendering tree objects.

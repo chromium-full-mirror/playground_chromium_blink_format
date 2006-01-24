@@ -3036,7 +3036,7 @@ void DocumentImpl::radioButtonChecked(HTMLInputElementImpl* caller,
 }
 
 HTMLInputElementImpl* DocumentImpl::checkedRadioButtonForGroup(
-    DOMStringImpl* name,
+    AtomicStringImpl* name,
     HTMLFormElementImpl* form) {
   if (!form)
     form = defaultForm;
@@ -3047,7 +3047,7 @@ HTMLInputElementImpl* DocumentImpl::checkedRadioButtonForGroup(
   return formRadioButtons->get(name);
 }
 
-void DocumentImpl::removeRadioButtonGroup(DOMStringImpl* name,
+void DocumentImpl::removeRadioButtonGroup(AtomicStringImpl* name,
                                           HTMLFormElementImpl* form) {
   if (!form)
     form = defaultForm;

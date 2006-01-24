@@ -554,7 +554,7 @@ class NodeImpl : public TreeShared<NodeImpl> {
 
  protected:
   QPtrList<RegisteredEventListener>* m_regdListeners;
-  typedef HashSet<NodeListImpl*, PointerHash<NodeListImpl*>> NodeListSet;
+  typedef HashSet<NodeListImpl*> NodeListSet;
   NodeListSet* m_nodeLists;
 
   unsigned short m_tabIndex : 15;
