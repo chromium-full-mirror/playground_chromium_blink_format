@@ -37,9 +37,7 @@
 #include "xsl_stylesheetimpl.h"
 #endif
 
-using khtml::parseAttributes;
-
-namespace DOM {
+namespace WebCore {
 
 EntityImpl::EntityImpl(DocumentImpl* doc) : ContainerNodeImpl(doc) {}
 
@@ -312,12 +310,9 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
         // needs to be able
         // to kick off import/include loads that can hang off some parent sheet.
         if (m_isXSL) {
-          if (m_sheet)
-            m_sheet->deref();
-          XSLStyleSheetImpl* localSheet =
+          PassRefPtr<XSLStyleSheetImpl> localSheet =
               new XSLStyleSheetImpl(this, m_localHref.get(), true);
           localSheet->setDocument((xmlDocPtr)getDocument()->transformSource());
-          localSheet->ref();
           localSheet->loadChildSheets();
           m_sheet = localSheet;
           m_loading = false;
@@ -368,15 +363,12 @@ void ProcessingInstructionImpl::sheetLoaded() {
 
 void ProcessingInstructionImpl::setStyleSheet(const DOMString& url,
                                               const DOMString& sheet) {
-  if (m_sheet)
-    m_sheet->deref();
 #ifdef KHTML_XSLT
   if (m_isXSL)
     m_sheet = new XSLStyleSheetImpl(this, url);
   else
 #endif
     m_sheet = new CSSStyleSheetImpl(this, url);
-  m_sheet->ref();
   m_sheet->parseString(sheet);
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
