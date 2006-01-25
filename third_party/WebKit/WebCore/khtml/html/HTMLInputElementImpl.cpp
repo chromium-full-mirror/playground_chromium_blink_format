@@ -819,20 +819,21 @@ void HTMLInputElementImpl::reset() {
   m_useDefaultChecked = true;
 }
 
-void HTMLInputElementImpl::setChecked(bool _checked) {
-  // WinIE does not allow unnamed radio buttons to even be checked.
-  if (checked() == _checked || (m_type == RADIO && name().isEmpty()))
+void HTMLInputElementImpl::setChecked(bool nowChecked) {
+  // We mimic WinIE and don't allow unnamed radio buttons to be checked.
+  if (checked() == nowChecked || (m_type == RADIO && name().isEmpty()))
     return;
 
-  if (m_type == RADIO && _checked)
+  if (m_type == RADIO && nowChecked)
     getDocument()->radioButtonChecked(this, m_form);
 
   m_useDefaultChecked = false;
-  m_checked = _checked;
+  m_checked = nowChecked;
   setChanged();
   if (renderer() && renderer()->style()->hasAppearance())
     theme()->stateChanged(renderer(), CheckedState);
-  onChange();
+  if (inDocument())
+    onChange();
 }
 
 void HTMLInputElementImpl::setIndeterminate(bool _indeterminate) {
