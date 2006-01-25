@@ -298,7 +298,7 @@ class ElementImpl : public ContainerNodeImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-  void focus();
+  virtual void focus();
   void blur();
 
 #ifndef NDEBUG

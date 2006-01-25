@@ -32,6 +32,7 @@
 #include "FormDataList.h"
 
 #include "cssproperties.h"
+#include "Frame.h"
 #include "render_form.h"
 #include "render_button.h"
 #include "RenderTextField.h"
@@ -126,6 +127,23 @@ bool HTMLInputElementImpl::isKeyboardFocusable() const {
   }
 
   return true;
+}
+
+void HTMLInputElementImpl::focus() {
+  if ((m_type == TEXT) ||
+      (m_type == PASSWORD) &&
+          renderer()->style()->appearance() == TextFieldAppearance) {
+    DocumentImpl* doc = getDocument();
+    if (doc) {
+      doc->updateLayout();
+      if (isFocusable()) {
+        doc->setFocusNode(this);
+        select();
+        doc->frame()->revealSelection();
+      }
+    }
+  } else
+    HTMLGenericFormElementImpl::focus();
 }
 
 void HTMLInputElementImpl::setType(const DOMString& t) {
@@ -332,8 +350,10 @@ void HTMLInputElementImpl::setSelectionStart(int start) {
   switch (m_type) {
     case PASSWORD:
     case TEXT:
-      if (renderer()->style()->appearance() == TextFieldAppearance)
+      if (renderer()->style()->appearance() == TextFieldAppearance) {
         static_cast<RenderTextField*>(renderer())->setSelectionStart(start);
+        break;
+      }
     // Fall through for text fields that don't specify appearance
     case SEARCH:
       static_cast<RenderLineEdit*>(renderer())->setSelectionStart(start);
@@ -350,8 +370,10 @@ void HTMLInputElementImpl::setSelectionEnd(int end) {
   switch (m_type) {
     case PASSWORD:
     case TEXT:
-      if (renderer()->style()->appearance() == TextFieldAppearance)
+      if (renderer()->style()->appearance() == TextFieldAppearance) {
         static_cast<RenderTextField*>(renderer())->setSelectionEnd(end);
+        break;
+      }
     // Fall through for text fields that don't specify appearance
     case SEARCH:
       static_cast<RenderLineEdit*>(renderer())->setSelectionEnd(end);
@@ -371,8 +393,10 @@ void HTMLInputElementImpl::select() {
       break;
     case PASSWORD:
     case TEXT:
-      if (renderer()->style()->appearance() == TextFieldAppearance)
+      if (renderer()->style()->appearance() == TextFieldAppearance) {
         static_cast<RenderTextField*>(renderer())->select();
+        break;
+      }
     // Fall through for text fields that don't specify appearance
     case SEARCH:
       static_cast<RenderLineEdit*>(renderer())->select();
@@ -397,9 +421,11 @@ void HTMLInputElementImpl::setSelectionRange(int start, int end) {
   switch (m_type) {
     case PASSWORD:
     case TEXT:
-      if (renderer()->style()->appearance() == TextFieldAppearance)
+      if (renderer()->style()->appearance() == TextFieldAppearance) {
         static_cast<RenderTextField*>(renderer())
             ->setSelectionRange(start, end);
+        break;
+      }
     // Fall through for text fields that don't specify appearance
     case SEARCH:
       static_cast<RenderLineEdit*>(renderer())->setSelectionRange(start, end);

@@ -75,6 +75,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool isKeyboardFocusable() const;
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
+  virtual void focus();
 
   virtual const AtomicString& name() const;
 
