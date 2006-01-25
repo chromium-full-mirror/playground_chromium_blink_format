@@ -206,7 +206,7 @@ int InlineTextBox::placeEllipsisBox(bool ltr,
   return -1;
 }
 
-static int simpleDifferenceBetweenColors(QColor c1, QColor c2) {
+static int simpleDifferenceBetweenColors(Color c1, Color c2) {
   // a distance could be computed by squaring the differences between
   // components, but
   // this is faster and so far seems good enough for our purposes.
@@ -214,7 +214,7 @@ static int simpleDifferenceBetweenColors(QColor c1, QColor c2) {
          abs(c1.blue() - c2.blue());
 }
 
-static QColor correctedTextColor(QColor textColor, QColor backgroundColor) {
+static Color correctedTextColor(Color textColor, Color backgroundColor) {
   // Adjust the text color if it is too close to the background color,
   // by darkening or lightening it to move it further away.
 
@@ -224,8 +224,10 @@ static QColor correctedTextColor(QColor textColor, QColor backgroundColor) {
     return textColor;
   }
 
-  int distanceFromWhite = simpleDifferenceBetweenColors(textColor, Qt::white);
-  int distanceFromBlack = simpleDifferenceBetweenColors(textColor, Qt::black);
+  int distanceFromWhite =
+      simpleDifferenceBetweenColors(textColor, Color::white);
+  int distanceFromBlack =
+      simpleDifferenceBetweenColors(textColor, Color::black);
 
   if (distanceFromWhite < distanceFromBlack) {
     return textColor.dark();
@@ -315,11 +317,11 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   }
   QValueListIterator<MarkedTextUnderline> underlineIt = underlines.begin();
 
-  QColor textColor = styleToUse->color();
+  Color textColor = styleToUse->color();
 
   // Make the text color legible against a white background
   if (styleToUse->forceBackgroundsToWhite())
-    textColor = correctedTextColor(textColor, Qt::white);
+    textColor = correctedTextColor(textColor, Color::white);
 
   if (textColor != i.p->pen().color())
     i.p->setPen(textColor);
@@ -339,7 +341,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   bool paintSelectedTextSeparately =
       false;  // Whether or not we have to do multiple paints.  Only
   // necessary when a custom ::selection foreground color is applied.
-  QColor selectionColor = i.p->pen().color();
+  Color selectionColor = i.p->pen().color();
   ShadowData* selectionTextShadow = 0;
   if (haveSelection) {
     RenderStyle* pseudoStyle = object()->getPseudoStyle(RenderStyle::SELECTION);
@@ -510,8 +512,8 @@ void InlineTextBox::paintSelection(QPainter* p,
 
   // Macintosh-style text highlighting is to draw with a particular background
   // color, not invert.
-  QColor textColor = style->color();
-  QColor c = object()->selectionColor(p);
+  Color textColor = style->color();
+  Color c = object()->selectionColor(p);
   if (!c.isValid())
     return;
 
@@ -520,7 +522,7 @@ void InlineTextBox::paintSelection(QPainter* p,
   // background.  This should basically never happen, since the selection has
   // transparency.
   if (textColor == c)
-    c = QColor(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
+    c = Color(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
 
   p->save();
   p->setPen(c);  // Don't draw text at all!
@@ -552,7 +554,7 @@ void InlineTextBox::paintMarkedTextBackground(QPainter* p,
 
   p->save();
 
-  QColor c = QColor(225, 221, 85);
+  Color c = Color(225, 221, 85);
 
   p->setPen(c);  // Don't draw text at all!
 
@@ -581,7 +583,7 @@ void InlineTextBox::paintDecoration(QPainter* pt, int _tx, int _ty, int deco) {
                 m_start, m_truncation - m_start, textPos(), m_firstLine);
 
   // Get the text decoration colors.
-  QColor underline, overline, linethrough;
+  Color underline, overline, linethrough;
   object()->getTextDecorationColors(deco, underline, overline, linethrough,
                                     true);
 

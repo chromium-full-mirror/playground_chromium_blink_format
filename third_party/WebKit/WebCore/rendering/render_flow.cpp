@@ -721,7 +721,7 @@ void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
 
 void RenderFlow::paintFocusRing(QPainter* p, int tx, int ty) {
   int ow = style()->outlineWidth();
-  QColor oc = style()->outlineColor();
+  Color oc = style()->outlineColor();
   if (!oc.isValid())
     oc = style()->color();
 
@@ -758,7 +758,7 @@ void RenderFlow::paintOutlineForLine(QPainter* p,
                                      const IntRect& nextline) {
   int ow = style()->outlineWidth();
   EBorderStyle os = style()->outlineStyle();
-  QColor oc = style()->outlineColor();
+  Color oc = style()->outlineColor();
   if (!oc.isValid())
     oc = style()->color();
 

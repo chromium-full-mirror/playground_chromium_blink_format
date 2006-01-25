@@ -265,7 +265,7 @@ class InlineFlowBox : public InlineRunBox {
                                         int _tx,
                                         int _ty);
   void paintBackgrounds(QPainter* p,
-                        const QColor& c,
+                        const Color& c,
                         const BackgroundLayer* bgLayer,
                         int my,
                         int mh,
@@ -274,7 +274,7 @@ class InlineFlowBox : public InlineRunBox {
                         int w,
                         int h);
   void paintBackground(QPainter* p,
-                       const QColor& c,
+                       const Color& c,
                        const BackgroundLayer* bgLayer,
                        int my,
                        int mh,

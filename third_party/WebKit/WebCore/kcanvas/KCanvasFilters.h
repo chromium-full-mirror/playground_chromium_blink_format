@@ -27,7 +27,7 @@
 
 #include "KCanvasResources.h"
 #include "FloatSize.h"
-#include <qcolor.h>
+#include "Color.h"
 #include <qstringlist.h>
 
 #ifdef __OBJC__
@@ -404,8 +404,8 @@ class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
   KCanvasFEDiffuseLighting() : m_lightSource(0) {}
   ~KCanvasFEDiffuseLighting() { delete m_lightSource; }
 
-  QColor lightingColor() const { return m_lightingColor; }
-  void setLightingColor(const QColor& lightingColor) {
+  Color lightingColor() const { return m_lightingColor; }
+  void setLightingColor(const Color& lightingColor) {
     m_lightingColor = lightingColor;
   }
 
@@ -433,7 +433,7 @@ class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QColor m_lightingColor;
+  Color m_lightingColor;
   float m_surfaceScale;
   float m_diffuseConstant;
   float m_kernelUnitLengthX;
@@ -464,8 +464,8 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
 
 class KCanvasFEFlood : public KCanvasFilterEffect {
  public:
-  QColor floodColor() const { return m_floodColor; }
-  void setFloodColor(const QColor& color) { m_floodColor = color; }
+  Color floodColor() const { return m_floodColor; }
+  void setFloodColor(const Color& color) { m_floodColor = color; }
 
   float floodOpacity() const { return m_floodOpacity; }
   void setFloodOpacity(float floodOpacity) { m_floodOpacity = floodOpacity; }
@@ -473,7 +473,7 @@ class KCanvasFEFlood : public KCanvasFilterEffect {
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QColor m_floodColor;
+  Color m_floodColor;
   float m_floodOpacity;
 };
 
@@ -566,8 +566,8 @@ class KCanvasFESpecularLighting : public KCanvasFilterEffect {
   KCanvasFESpecularLighting() : m_lightSource(0) {}
   ~KCanvasFESpecularLighting() { delete m_lightSource; }
 
-  QColor lightingColor() const { return m_lightingColor; }
-  void setLightingColor(const QColor& lightingColor) {
+  Color lightingColor() const { return m_lightingColor; }
+  void setLightingColor(const Color& lightingColor) {
     m_lightingColor = lightingColor;
   }
 
@@ -600,7 +600,7 @@ class KCanvasFESpecularLighting : public KCanvasFilterEffect {
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QColor m_lightingColor;
+  Color m_lightingColor;
   float m_surfaceScale;
   float m_specularConstant;
   float m_specularExponent;

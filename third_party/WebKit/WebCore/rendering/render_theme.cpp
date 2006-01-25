@@ -111,7 +111,7 @@ bool RenderTheme::isControlContainer(EAppearance appearance) const {
 bool RenderTheme::isControlStyled(const RenderStyle* style,
                                   const BorderData& border,
                                   const BackgroundLayer& background,
-                                  const QColor& backgroundColor) const {
+                                  const Color& backgroundColor) const {
   switch (style->appearance()) {
     case PushButtonAppearance:
     case SquareButtonAppearance:

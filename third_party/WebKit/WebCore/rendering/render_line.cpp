@@ -796,7 +796,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 }
 
 void InlineFlowBox::paintBackgrounds(QPainter* p,
-                                     const QColor& c,
+                                     const Color& c,
                                      const BackgroundLayer* bgLayer,
                                      int my,
                                      int mh,
@@ -811,7 +811,7 @@ void InlineFlowBox::paintBackgrounds(QPainter* p,
 }
 
 void InlineFlowBox::paintBackground(QPainter* p,
-                                    const QColor& c,
+                                    const Color& c,
                                     const BackgroundLayer* bgLayer,
                                     int my,
                                     int mh,
@@ -888,7 +888,7 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
   RenderStyle* styleToUse = object()->style(m_firstLine);
   if ((!parent() && m_firstLine && styleToUse != object()->style()) ||
       (parent() && object()->shouldPaintBackgroundOrBorder())) {
-    QColor c = styleToUse->backgroundColor();
+    Color c = styleToUse->backgroundColor();
     paintBackgrounds(p, c, styleToUse->backgroundLayers(), my, mh, _tx, _ty, w,
                      h);
 
@@ -1017,7 +1017,7 @@ void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& i,
     // We must have child boxes and have decorations defined.
     _tx += borderLeft() + paddingLeft();
 
-    QColor underline, overline, linethrough;
+    Color underline, overline, linethrough;
     underline = overline = linethrough = styleToUse->color();
     if (!parent())
       object()->getTextDecorationColors(deco, underline, overline, linethrough);
@@ -1112,7 +1112,7 @@ void EllipsisBox::paint(RenderObject::PaintInfo& i, int _tx, int _ty) {
     p->setFont(_style->font());
 
   const Font* font = &_style->htmlFont();
-  QColor textColor = _style->color();
+  Color textColor = _style->color();
   if (textColor != p->pen().color())
     p->setPen(textColor);
   bool setShadow = false;

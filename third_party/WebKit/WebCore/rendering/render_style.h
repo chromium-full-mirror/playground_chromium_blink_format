@@ -34,7 +34,7 @@
  * and produce invaliud results.
  */
 
-#include <qcolor.h>
+#include "Color.h"
 #include <qfont.h>
 #include <qfontmetrics.h>
 #include <qlist.h>
@@ -138,7 +138,7 @@ class BorderValue {
     style = BNONE;
   }
 
-  QColor color;
+  Color color;
   unsigned short width : 12;
   EBorderStyle style : 4;
 
@@ -146,9 +146,7 @@ class BorderValue {
     return width != 0 && (!checkStyle || style != BNONE);
   }
 
-  bool isTransparent() const {
-    return color.isValid() && qAlpha(color.rgb()) == 0;
-  }
+  bool isTransparent() const { return color.isValid() && color.alpha() == 0; }
 
   bool operator==(const BorderValue& o) const {
     return width == o.width && style == o.style && color == o.color;
@@ -193,7 +191,7 @@ struct CollapsedBorderValue {
   int width() const { return border && border->nonZero() ? border->width : 0; }
   EBorderStyle style() const { return border ? border->style : BHIDDEN; }
   bool exists() const { return border; }
-  QColor color() const { return border ? border->color : QColor(); }
+  Color color() const { return border ? border->color : Color(); }
   bool isTransparent() const { return border ? border->isTransparent() : true; }
 
   bool operator==(const CollapsedBorderValue& o) const {
@@ -548,7 +546,7 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
   bool operator!=(const StyleBackgroundData& o) const { return !(*this == o); }
 
   BackgroundLayer m_background;
-  QColor m_color;
+  Color m_color;
   OutlineValue m_outline;
 };
 
@@ -612,7 +610,7 @@ class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData> {
 // This struct holds information about shadows for the text-shadow and
 // box-shadow properties.
 struct ShadowData {
-  ShadowData(int _x, int _y, int _blur, const QColor& _color)
+  ShadowData(int _x, int _y, int _blur, const Color& _color)
       : x(_x), y(_y), blur(_blur), color(_color), next(0) {}
   ShadowData(const ShadowData& o);
 
@@ -624,7 +622,7 @@ struct ShadowData {
   int x;
   int y;
   int blur;
-  QColor color;
+  Color color;
   ShadowData* next;
 };
 
@@ -825,7 +823,7 @@ class StyleInheritedData : public Shared<StyleInheritedData> {
   CachedImage* cursor_image;
 
   khtml::Font font;
-  QColor color;
+  Color color;
 
   short horizontal_border_spacing;
   short vertical_border_spacing;
@@ -1189,7 +1187,7 @@ class RenderStyle {
   bool hasOffset() const { return surround->offset.nonZero(); }
 
   bool hasBackground() const {
-    if (backgroundColor().isValid() && qAlpha(backgroundColor().rgb()) > 0)
+    if (backgroundColor().isValid() && backgroundColor().alpha() > 0)
       return true;
     return background->m_background.hasImage();
   }
@@ -1248,7 +1246,7 @@ class RenderStyle {
     return surround->border.borderLeftWidth();
   }
   EBorderStyle borderLeftStyle() const { return surround->border.left.style; }
-  const QColor& borderLeftColor() const { return surround->border.left.color; }
+  const Color& borderLeftColor() const { return surround->border.left.color; }
   bool borderLeftIsTransparent() const {
     return surround->border.left.isTransparent();
   }
@@ -1256,9 +1254,7 @@ class RenderStyle {
     return surround->border.borderRightWidth();
   }
   EBorderStyle borderRightStyle() const { return surround->border.right.style; }
-  const QColor& borderRightColor() const {
-    return surround->border.right.color;
-  }
+  const Color& borderRightColor() const { return surround->border.right.color; }
   bool borderRightIsTransparent() const {
     return surround->border.right.isTransparent();
   }
@@ -1266,7 +1262,7 @@ class RenderStyle {
     return surround->border.borderTopWidth();
   }
   EBorderStyle borderTopStyle() const { return surround->border.top.style; }
-  const QColor& borderTopColor() const { return surround->border.top.color; }
+  const Color& borderTopColor() const { return surround->border.top.color; }
   bool borderTopIsTransparent() const {
     return surround->border.top.isTransparent();
   }
@@ -1276,7 +1272,7 @@ class RenderStyle {
   EBorderStyle borderBottomStyle() const {
     return surround->border.bottom.style;
   }
-  const QColor& borderBottomColor() const {
+  const Color& borderBottomColor() const {
     return surround->border.bottom.color;
   }
   bool borderBottomIsTransparent() const {
@@ -1294,7 +1290,7 @@ class RenderStyle {
   }
   EBorderStyle outlineStyle() const { return background->m_outline.style; }
   bool outlineStyleIsAuto() const { return background->m_outline._auto; }
-  const QColor& outlineColor() const { return background->m_outline.color; }
+  const Color& outlineColor() const { return background->m_outline.color; }
 
   EOverflow overflow() const { return noninherited_flags._overflow; }
   EVisibility visibility() const { return inherited_flags._visibility; }
@@ -1323,7 +1319,7 @@ class RenderStyle {
   const Font& htmlFont() { return inherited->font; }
   const QFontMetrics& fontMetrics() const { return inherited->font.fm; }
 
-  const QColor& color() const { return inherited->color; }
+  const Color& color() const { return inherited->color; }
   Length textIndent() const { return inherited->indent; }
   ETextAlign textAlign() const { return inherited_flags._text_align; }
   ETextTransform textTransform() const {
@@ -1369,7 +1365,7 @@ class RenderStyle {
     return whiteSpace() == PRE_WRAP || khtmlLineBreak() == AFTER_WHITE_SPACE;
   }
 
-  const QColor& backgroundColor() const { return background->m_color; }
+  const Color& backgroundColor() const { return background->m_color; }
   CachedImage* backgroundImage() const {
     return background->m_background.m_image;
   }
@@ -1593,7 +1589,7 @@ class RenderStyle {
 
   void resetOutline() { SET_VAR(background, m_outline, OutlineValue()) }
 
-  void setBackgroundColor(const QColor& v) { SET_VAR(background, m_color, v) }
+  void setBackgroundColor(const Color& v) { SET_VAR(background, m_color, v) }
 
   void setBorderImage(const BorderImage& b) {
     SET_VAR(surround, border.image, b)
@@ -1624,7 +1620,7 @@ class RenderStyle {
   void setBorderLeftStyle(EBorderStyle v) {
     SET_VAR(surround, border.left.style, v)
   }
-  void setBorderLeftColor(const QColor& v) {
+  void setBorderLeftColor(const Color& v) {
     SET_VAR(surround, border.left.color, v)
   }
   void setBorderRightWidth(unsigned short v) {
@@ -1633,7 +1629,7 @@ class RenderStyle {
   void setBorderRightStyle(EBorderStyle v) {
     SET_VAR(surround, border.right.style, v)
   }
-  void setBorderRightColor(const QColor& v) {
+  void setBorderRightColor(const Color& v) {
     SET_VAR(surround, border.right.color, v)
   }
   void setBorderTopWidth(unsigned short v) {
@@ -1642,7 +1638,7 @@ class RenderStyle {
   void setBorderTopStyle(EBorderStyle v) {
     SET_VAR(surround, border.top.style, v)
   }
-  void setBorderTopColor(const QColor& v) {
+  void setBorderTopColor(const Color& v) {
     SET_VAR(surround, border.top.color, v)
   }
   void setBorderBottomWidth(unsigned short v) {
@@ -1651,7 +1647,7 @@ class RenderStyle {
   void setBorderBottomStyle(EBorderStyle v) {
     SET_VAR(surround, border.bottom.style, v)
   }
-  void setBorderBottomColor(const QColor& v) {
+  void setBorderBottomColor(const Color& v) {
     SET_VAR(surround, border.bottom.color, v)
   }
   void setOutlineWidth(unsigned short v) {
@@ -1661,7 +1657,7 @@ class RenderStyle {
     SET_VAR(background, m_outline.style, v)
     SET_VAR(background, m_outline._auto, isAuto)
   }
-  void setOutlineColor(const QColor& v) {
+  void setOutlineColor(const Color& v) {
     SET_VAR(background, m_outline.color, v)
   }
 
@@ -1695,7 +1691,7 @@ class RenderStyle {
     return false;
   }
 
-  void setColor(const QColor& v) { SET_VAR(inherited, color, v) }
+  void setColor(const Color& v) { SET_VAR(inherited, color, v) }
   void setTextIndent(Length v) { SET_VAR(inherited, indent, v) }
   void setTextAlign(ETextAlign v) { inherited_flags._text_align = v; }
   void setTextTransform(ETextTransform v) {
@@ -1960,7 +1956,7 @@ class RenderStyle {
   static short initialHorizontalBorderSpacing() { return 0; }
   static short initialVerticalBorderSpacing() { return 0; }
   static ECursor initialCursor() { return CURSOR_AUTO; }
-  static QColor initialColor() { return Qt::black; }
+  static Color initialColor() { return Color::black; }
   static CachedImage* initialBackgroundImage() { return 0; }
   static CachedImage* initialListStyleImage() { return 0; }
   static unsigned short initialBorderWidth() { return 3; }

@@ -37,7 +37,6 @@
 
 class CSSStyle;
 class FrameView;
-class QColor;
 class QMatrix;
 class QPainter;
 class QTextStream;
@@ -73,6 +72,7 @@ class RenderArena;
 
 namespace WebCore {
 
+class Color;
 class CollapsedBorderValue;
 class DOMString;
 class DocumentImpl;
@@ -483,7 +483,7 @@ class RenderObject : public CachedObjectClient {
   virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty){};
 
   virtual void paintBackgroundExtended(QPainter* p,
-                                       const QColor& c,
+                                       const Color& c,
                                        const BackgroundLayer* bgLayer,
                                        int clipy,
                                        int cliph,
@@ -798,9 +798,9 @@ class RenderObject : public CachedObjectClient {
   }
 
   void getTextDecorationColors(int decorations,
-                               QColor& underline,
-                               QColor& overline,
-                               QColor& linethrough,
+                               Color& underline,
+                               Color& overline,
+                               Color& linethrough,
                                bool quirksMode = false);
 
   enum BorderSide { BSTop, BSBottom, BSLeft, BSRight };
@@ -810,8 +810,8 @@ class RenderObject : public CachedObjectClient {
                   int x2,
                   int y2,
                   BorderSide s,
-                  QColor c,
-                  const QColor& textcolor,
+                  Color c,
+                  const Color& textcolor,
                   EBorderStyle style,
                   int adjbw1,
                   int adjbw2,
@@ -926,7 +926,7 @@ class RenderObject : public CachedObjectClient {
 
   // Obtains the selection background color that should be used when painting a
   // selection.
-  virtual QColor selectionColor(QPainter* p) const;
+  virtual Color selectionColor(QPainter* p) const;
 
   // Whether or not a given block needs to paint selection gaps.
   virtual bool shouldPaintSelectionGaps() const { return false; }

@@ -163,7 +163,7 @@ class RenderBox : public RenderObject {
                             int* extraWidthToEndOfLine = 0);
 
   virtual void paintBackgroundExtended(QPainter* p,
-                                       const QColor& c,
+                                       const Color& c,
                                        const BackgroundLayer* bgLayer,
                                        int clipy,
                                        int cliph,
@@ -186,7 +186,7 @@ class RenderBox : public RenderObject {
   void paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty);
 
   void paintBackgrounds(QPainter* p,
-                        const QColor& c,
+                        const Color& c,
                         const BackgroundLayer* bgLayer,
                         int clipy,
                         int cliph,
@@ -195,7 +195,7 @@ class RenderBox : public RenderObject {
                         int w,
                         int h);
   void paintBackground(QPainter* p,
-                       const QColor& c,
+                       const Color& c,
                        const BackgroundLayer* bgLayer,
                        int clipy,
                        int cliph,

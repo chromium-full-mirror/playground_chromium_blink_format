@@ -166,7 +166,7 @@ class StyleStopData : public Shared<StyleStopData> {
   }
 
   float opacity;
-  QColor color;
+  Color color;
 
  private:
   StyleStopData& operator=(const StyleStopData&);
@@ -234,7 +234,7 @@ class StyleMiscData : public Shared<StyleMiscData> {
   }
 
   QString filter;
-  QColor floodColor;
+  Color floodColor;
   float floodOpacity;
 
  private:

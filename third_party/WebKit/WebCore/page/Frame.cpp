@@ -3196,7 +3196,7 @@ void Frame::paint(QPainter* p, const IntRect& rect) {
 
   if (fillWithRed)
     p->fillRect(rect.x(), rect.y(), rect.width(), rect.height(),
-                QColor(0xFF, 0, 0));
+                Color(0xFF, 0, 0));
 #endif
 
   if (renderer()) {

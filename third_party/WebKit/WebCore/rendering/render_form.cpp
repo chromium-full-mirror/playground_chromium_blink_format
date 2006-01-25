@@ -430,8 +430,8 @@ void RenderFieldset::paintBorderMinusLegend(QPainter* p,
                                             const RenderStyle* style,
                                             int lx,
                                             int lw) {
-  const QColor& tc = style->borderTopColor();
-  const QColor& bc = style->borderBottomColor();
+  const Color& tc = style->borderTopColor();
+  const Color& bc = style->borderBottomColor();
 
   EBorderStyle ts = style->borderTopStyle();
   EBorderStyle bs = style->borderBottomStyle();
@@ -468,7 +468,7 @@ void RenderFieldset::paintBorderMinusLegend(QPainter* p,
                     : 0));
 
   if (render_l) {
-    const QColor& lc = style->borderLeftColor();
+    const Color& lc = style->borderLeftColor();
 
     bool ignore_top =
         (tc == lc) && (ls >= OUTSET) &&
@@ -484,7 +484,7 @@ void RenderFieldset::paintBorderMinusLegend(QPainter* p,
   }
 
   if (render_r) {
-    const QColor& rc = style->borderRightColor();
+    const Color& rc = style->borderRightColor();
 
     bool ignore_top =
         (tc == rc) && (rs >= DOTTED || rs == INSET) &&

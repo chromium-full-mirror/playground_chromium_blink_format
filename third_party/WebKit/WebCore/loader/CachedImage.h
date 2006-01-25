@@ -48,7 +48,7 @@ class CachedImage : public QObject, public CachedObject {
   virtual ~CachedImage();
 
   const QPixmap& pixmap() const;
-  const QPixmap& tiled_pixmap(const QColor& background);
+  const QPixmap& tiled_pixmap(const Color& background);
 
   IntSize pixmap_size()
       const;  // returns the size of the complete (i.e. when finished) loading

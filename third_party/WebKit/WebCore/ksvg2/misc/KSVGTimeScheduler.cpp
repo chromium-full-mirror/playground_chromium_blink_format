@@ -165,7 +165,7 @@ void SVGTimer::notifyAll() {
     Q3PtrList<SVGAnimationElementImpl>::Iterator it = tit->second.begin();
     Q3PtrList<SVGAnimationElementImpl>::Iterator end = tit->second.end();
 
-    HashMap<DOMString, QColor> targetColor;  // special <animateColor> case
+    HashMap<DOMString, Color> targetColor;  // special <animateColor> case
     RefPtr<SVGTransformListImpl>
         targetTransforms;  // special <animateTransform> case
 
@@ -239,7 +239,7 @@ void SVGTimer::notifyAll() {
           continue;
 
         QString name = animColor->attributeName();
-        QColor color = animColor->color();
+        Color color = animColor->color();
 
         if (!targetColor.contains(name)) {
           if (animation->isAdditive()) {
@@ -254,7 +254,7 @@ void SVGTimer::notifyAll() {
           if (!animation->isAdditive())
             targetColor.set(name, color);
           else {
-            QColor baseColor = targetColor.get(name);
+            Color baseColor = targetColor.get(name);
             int r = baseColor.red() + color.red();
             int g = baseColor.green() + color.green();
             int b = baseColor.blue() + color.blue();
@@ -277,8 +277,8 @@ void SVGTimer::notifyAll() {
     }
 
     // Handle <animateColor>...
-    HashMap<DOMString, QColor>::iterator cend = targetColor.end();
-    for (HashMap<DOMString, QColor>::iterator cit = targetColor.begin();
+    HashMap<DOMString, Color>::iterator cend = targetColor.end();
+    for (HashMap<DOMString, Color>::iterator cit = targetColor.begin();
          cit != cend; ++cit) {
       if (cit->second.isValid()) {
         SVGAnimationElementImpl::setTargetAttribute(

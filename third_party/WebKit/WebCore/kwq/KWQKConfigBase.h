@@ -29,10 +29,13 @@
 #include "KWQString.h"
 #include "KWQKHTMLSettings.h"
 
-class QColor;
 class QStringList;
 
 class KWQKConfigImpl;
+
+namespace WebCore {
+class Color;
+}
 
 class KConfig {
  public:
@@ -49,7 +52,8 @@ class KConfig {
                                     const char* pKey,
                                     unsigned int nDefault = 0) const;
 
-  QColor readColorEntry(const char* pKey, const QColor* pDefault = 0L) const;
+  WebCore::Color readColorEntry(const char* pKey,
+                                const WebCore::Color* pDefault = 0L) const;
 
  private:
   KConfig(const KConfig&);

@@ -26,15 +26,15 @@
 
 #include "Shared.h"
 
-#include <qcolor.h>
+#include "Color.h"
 
 namespace KDOM {
 class DOMString;
 class CSSPrimitiveValueImpl;
 class RGBColorImpl : public Shared<RGBColorImpl> {
  public:
-  RGBColorImpl(const QRgb& color);
-  RGBColorImpl(const QColor& color);
+  RGBColorImpl(const RGBA32& color);
+  RGBColorImpl(const Color& color);
   virtual ~RGBColorImpl();
 
   // 'RGBColorImpl' functions
@@ -43,7 +43,7 @@ class RGBColorImpl : public Shared<RGBColorImpl> {
   CSSPrimitiveValueImpl* blue() const;
 
  protected:
-  QRgb m_color;
+  Color m_color;
 };
 };
 

@@ -79,7 +79,7 @@ class RenderTable : public RenderBlock {
 
   Rules getRules() const { return rules; }
 
-  const QColor& bgColor() const { return style()->backgroundColor(); }
+  const Color& bgColor() const { return style()->backgroundColor(); }
 
   uint cellPadding() const { return padding; }
   void setCellPadding(uint p) { padding = p; }

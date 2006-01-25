@@ -37,7 +37,7 @@ class KRenderingPaintServerSolid::Private {
   Private() {}
   ~Private() {}
 
-  QColor color;
+  Color color;
 };
 
 KRenderingPaintServerSolid::KRenderingPaintServerSolid()
@@ -47,11 +47,11 @@ KRenderingPaintServerSolid::~KRenderingPaintServerSolid() {
   delete d;
 }
 
-QColor KRenderingPaintServerSolid::color() const {
+Color KRenderingPaintServerSolid::color() const {
   return d->color;
 }
 
-void KRenderingPaintServerSolid::setColor(const QColor& color) {
+void KRenderingPaintServerSolid::setColor(const Color& color) {
   d->color = color;
 }
 

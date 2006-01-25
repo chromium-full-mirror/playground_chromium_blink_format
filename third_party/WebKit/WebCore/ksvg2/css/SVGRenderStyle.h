@@ -179,12 +179,12 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            StopOpacity,
                                            stopOpacity,
                                            1.0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QColor,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Color,
                                            stops,
                                            color,
                                            StopColor,
                                            stopColor,
-                                           QColor(0, 0, 0))
+                                           Color(0, 0, 0))
 
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
                                            clip,
@@ -229,12 +229,12 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            FloodOpacity,
                                            floodOpacity,
                                            1.0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QColor,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Color,
                                            misc,
                                            floodColor,
                                            FloodColor,
                                            floodColor,
-                                           QColor(0, 0, 0))
+                                           Color(0, 0, 0))
 
  protected:
   // inherit

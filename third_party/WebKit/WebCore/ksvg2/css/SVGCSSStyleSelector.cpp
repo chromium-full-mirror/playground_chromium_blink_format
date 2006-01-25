@@ -610,7 +610,7 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
 #if 0
         case CSS_PROP_COLOR: // colors || inherit
         {
-            QColor col;
+            Color col;
             if(isInherit)
             {
                 HANDLE_INHERIT_COND(CSS_PROP_COLOR, color, Color)
@@ -632,7 +632,7 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
         }
 #endif
     case SVGCSS_PROP_STOP_COLOR: {
-      QColor col;
+      Color col;
       if (isInherit) {
         style->setColor(parentStyle->color());
         return;
@@ -672,7 +672,7 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
       break;
     }
     case SVGCSS_PROP_FLOOD_COLOR: {
-      QColor col;
+      Color col;
       if (isInitial)
         col = SVGRenderStyle::initialStopColor();
       else {

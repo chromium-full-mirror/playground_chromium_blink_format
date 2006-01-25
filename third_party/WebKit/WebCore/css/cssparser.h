@@ -23,7 +23,7 @@
 #define _CSS_cssparser_h_
 
 #include <qstring.h>
-#include <qcolor.h>
+#include "Color.h"
 #include <dom/dom_string.h>
 #include "xml/dom_atomicstring.h"
 
@@ -112,7 +112,7 @@ class CSSParser {
                   int id,
                   const DOM::DOMString& string,
                   bool _important);
-  static QRgb CSSParser::parseColor(const DOM::DOMString& string);
+  static RGBA32 CSSParser::parseColor(const DOM::DOMString& string);
   bool parseColor(DOM::CSSMutableStyleDeclarationImpl* declaration,
                   const DOM::DOMString& string);
   bool parseDeclaration(DOM::CSSMutableStyleDeclarationImpl* decls,
@@ -167,7 +167,7 @@ class CSSParser {
   CSSValueImpl* parseSVGStrokeDasharray();
 #endif
 
-  static bool parseColor(const QString& name, QRgb& rgb);
+  static bool parseColor(const QString& name, RGBA32& rgb);
 
   // CSS3 Parsing Routines (for properties specific to CSS3)
   bool parseShadow(int propId, bool important);

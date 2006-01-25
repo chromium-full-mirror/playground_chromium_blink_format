@@ -26,10 +26,10 @@
 #include "config.h"
 #include "KWQPen.h"
 
-QPen::QPen(const QColor& color, uint width, PenStyle style)
+QPen::QPen(const Color& color, uint width, PenStyle style)
     : penStyle(style), penWidth(width), penColor(color) {}
 
-const QColor& QPen::color() const {
+const Color& QPen::color() const {
   return penColor;
 }
 
@@ -41,7 +41,7 @@ QPen::PenStyle QPen::style() const {
   return penStyle;
 }
 
-void QPen::setColor(const QColor& color) {
+void QPen::setColor(const Color& color) {
   penColor = color;
 }
 

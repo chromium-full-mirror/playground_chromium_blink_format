@@ -68,7 +68,7 @@ void Font::drawHighlightForText(QPainter* p,
                                 bool visuallyOrdered,
                                 int from,
                                 int to,
-                                QColor bg) const {
+                                Color bg) const {
   p->drawHighlightForText(x, y, h, tabWidth, xpos, str + pos,
                           std::min(slen - pos, len), from, to, toAdd, bg, d,
                           visuallyOrdered, letterSpacing, wordSpacing,
@@ -89,7 +89,7 @@ void Font::drawText(QPainter* p,
                     bool visuallyOrdered,
                     int from,
                     int to,
-                    QColor bg) const {
+                    Color bg) const {
   p->drawText(x, y, tabWidth, xpos, str + pos, std::min(slen - pos, len), from,
               to, toAdd, bg, d, visuallyOrdered, letterSpacing, wordSpacing,
               fontDef.smallCaps);

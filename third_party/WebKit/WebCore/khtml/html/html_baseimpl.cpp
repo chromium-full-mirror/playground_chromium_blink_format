@@ -126,7 +126,7 @@ void HTMLBodyElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       if (val) {
         val->ref();
         if (val->isPrimitiveValue()) {
-          QColor col =
+          Color col =
               getDocument()->styleSelector()->getColorFromPrimitiveValue(
                   static_cast<CSSPrimitiveValueImpl*>(val));
           if (attr->name() == linkAttr)

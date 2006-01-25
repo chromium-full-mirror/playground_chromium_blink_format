@@ -150,7 +150,7 @@ class CSSStyleSelector : public StyleSelector {
   float getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
                                          float specifiedSize);
 
-  QColor getColorFromPrimitiveValue(DOM::CSSPrimitiveValueImpl* primitiveValue);
+  Color getColorFromPrimitiveValue(DOM::CSSPrimitiveValueImpl* primitiveValue);
 
   QPaintDeviceMetrics* paintMetrics() const { return paintDeviceMetrics; }
 
@@ -198,7 +198,7 @@ class CSSStyleSelector : public StyleSelector {
   bool m_hasUAAppearance;
   BorderData m_borderData;
   BackgroundLayer m_backgroundData;
-  QColor m_backgroundColor;
+  Color m_backgroundColor;
 
  public:
   static RenderStyle* styleNotYetAvailable;

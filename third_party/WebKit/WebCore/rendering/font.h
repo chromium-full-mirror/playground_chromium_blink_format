@@ -30,7 +30,7 @@
 #include <math.h>  // FIXME: This is here because of the use of floorf instead of lroundf on Win32.
 #endif
 
-#include <qcolor.h>
+#include "Color.h"
 #include <qfont.h>
 #include <qfontmetrics.h>
 #include <qpainter.h>
@@ -128,7 +128,7 @@ class Font {
                 bool visuallyOrdered = false,
                 int from = -1,
                 int to = -1,
-                QColor bg = QColor()) const;
+                Color bg = Color()) const;
   float floatWidth(QChar* str,
                    int slen,
                    int pos,
@@ -176,7 +176,7 @@ class Font {
                             bool visuallyOrdered = false,
                             int from = -1,
                             int to = -1,
-                            QColor bg = QColor()) const;
+                            Color bg = Color()) const;
 
   int width(QChar* str, int slen, int pos, int len, int tabWidth, int xpos)
       const;

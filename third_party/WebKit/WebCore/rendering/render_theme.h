@@ -94,7 +94,7 @@ class RenderTheme {
   virtual bool isControlStyled(const RenderStyle* style,
                                const BorderData& border,
                                const BackgroundLayer& background,
-                               const QColor& backgroundColor) const;
+                               const Color& backgroundColor) const;
 
   // A general method asking if any control tinting is supported at all.
   virtual bool supportsControlTints() const { return false; }
