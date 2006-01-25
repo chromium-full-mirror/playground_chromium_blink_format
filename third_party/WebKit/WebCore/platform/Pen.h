@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003-6 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,41 +23,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "KWQPen.h"
+#ifndef PEN_H_
+#define PEN_H_
 
-QPen::QPen(const Color& color, uint width, PenStyle style)
-    : penStyle(style), penWidth(width), penColor(color) {}
+#include "KWQNamespace.h"
+#include "Color.h"
 
-const Color& QPen::color() const {
-  return penColor;
+namespace WebCore {
+
+class Pen {
+ public:
+  enum PenStyle { NoPen, SolidLine, DotLine, DashLine };
+
+  Pen(const Color& c = Color::black, uint w = 0, PenStyle ps = SolidLine);
+
+  const Color& color() const;
+  uint width() const;
+  PenStyle style() const;
+
+  void setColor(const Color&);
+  void setWidth(uint);
+  void setStyle(PenStyle);
+
+  bool operator==(const Pen&) const;
+  bool operator!=(const Pen&) const;
+
+ private:
+  PenStyle m_style;
+  uint m_width;
+  Color m_color;
+};
 }
 
-uint QPen::width() const {
-  return penWidth;
-}
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::Pen;
 
-QPen::PenStyle QPen::style() const {
-  return penStyle;
-}
-
-void QPen::setColor(const Color& color) {
-  penColor = color;
-}
-
-void QPen::setWidth(uint width) {
-  penWidth = width;
-}
-
-void QPen::setStyle(PenStyle style) {
-  penStyle = style;
-}
-
-bool QPen::operator==(const QPen& compareTo) const {
-  return (penWidth == compareTo.penWidth) && (penStyle == compareTo.penStyle) &&
-         (penColor == compareTo.penColor);
-}
-
-bool QPen::operator!=(const QPen& compareTo) const {
-  return !(*this == compareTo);
-}
+#endif

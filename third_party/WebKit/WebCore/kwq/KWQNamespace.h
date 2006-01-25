@@ -62,8 +62,6 @@ class Qt {
 
   enum Orientation { Horizontal, Vertical };
 
-  enum PenStyle { NoPen, SolidLine, DotLine, DashLine };
-
   enum BrushStyle {
     NoBrush,
     SolidPattern,

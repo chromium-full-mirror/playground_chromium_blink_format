@@ -54,7 +54,7 @@
 #include <assert.h>
 #include <kdebug.h>
 #include <qpainter.h>
-#include <qpen.h>
+#include "Pen.h"
 #include <qtextcodec.h>
 #include <qwmatrix.h>
 
@@ -803,11 +803,11 @@ void RenderObject::drawBorder(QPainter* p,
 
       return;
     case DOTTED:
-      p->setPen(QPen(c, width == 1 ? 0 : width, Qt::DotLine));
+      p->setPen(Pen(c, width == 1 ? 0 : width, Pen::DotLine));
     /* nobreak; */
     case DASHED:
       if (style == DASHED)
-        p->setPen(QPen(c, width == 1 ? 0 : width, Qt::DashLine));
+        p->setPen(Pen(c, width == 1 ? 0 : width, Pen::DashLine));
 
       if (width > 0)
         switch (s) {
@@ -827,7 +827,7 @@ void RenderObject::drawBorder(QPainter* p,
       int third = (width + 1) / 3;
 
       if (adjbw1 == 0 && adjbw2 == 0) {
-        p->setPen(Qt::NoPen);
+        p->setPen(Pen::NoPen);
         p->setBrush(c);
         switch (s) {
           case BSTop:
@@ -971,7 +971,7 @@ void RenderObject::drawBorder(QPainter* p,
     /* nobreak; */
     case SOLID:
       IntPointArray quad(4);
-      p->setPen(Qt::NoPen);
+      p->setPen(Pen::NoPen);
       p->setBrush(c);
       Q_ASSERT(x2 >= x1);
       Q_ASSERT(y2 >= y1);

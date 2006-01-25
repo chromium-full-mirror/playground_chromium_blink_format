@@ -23,31 +23,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QPEN_H_
-#define QPEN_H_
+#include "config.h"
+#include "Pen.h"
 
-#include "KWQNamespace.h"
-#include "Color.h"
+namespace WebCore {
 
-class QPen : public Qt {
- public:
-  QPen(const Color& c = Color::black, uint w = 0, PenStyle ps = SolidLine);
+Pen::Pen(const Color& color, uint width, PenStyle style)
+    : m_style(style), m_width(width), m_color(color) {}
 
-  const Color& color() const;
-  uint width() const;
-  PenStyle style() const;
+const Color& Pen::color() const {
+  return m_color;
+}
 
-  void setColor(const Color&);
-  void setWidth(uint);
-  void setStyle(PenStyle);
+uint Pen::width() const {
+  return m_width;
+}
 
-  bool operator==(const QPen&) const;
-  bool operator!=(const QPen&) const;
+Pen::PenStyle Pen::style() const {
+  return m_style;
+}
 
- private:
-  PenStyle penStyle;
-  uint penWidth;
-  Color penColor;
-};
+void Pen::setColor(const Color& color) {
+  m_color = color;
+}
 
-#endif
+void Pen::setWidth(uint width) {
+  m_width = width;
+}
+
+void Pen::setStyle(PenStyle style) {
+  m_style = style;
+}
+
+bool Pen::operator==(const Pen& compareTo) const {
+  return (m_width == compareTo.m_width) && (m_style == compareTo.m_style) &&
+         (m_color == compareTo.m_color);
+}
+
+bool Pen::operator!=(const Pen& compareTo) const {
+  return !(*this == compareTo);
+}
+}
