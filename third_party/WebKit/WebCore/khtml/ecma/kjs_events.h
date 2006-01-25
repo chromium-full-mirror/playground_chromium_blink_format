@@ -34,7 +34,6 @@ class KeyboardEventImpl;
 class MouseEventImpl;
 class MutationEventImpl;
 class UIEventImpl;
-class WheelEventImpl;
 }
 
 namespace KJS {
@@ -270,31 +269,6 @@ class DOMMutationEvent : public DOMEvent {
     PrevValue,
     NewValue,
     InitMutationEvent
-  };
-};
-
-class DOMWheelEvent : public DOMUIEvent {
- public:
-  DOMWheelEvent(ExecState*, DOM::WheelEventImpl*);
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
-  // no put - all read-only
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-  enum {
-    ScreenX,
-    ScreenY,
-    ClientX,
-    X,
-    ClientY,
-    Y,
-    OffsetX,
-    OffsetY,
-    CtrlKey,
-    ShiftKey,
-    AltKey,
-    MetaKey,
-    WheelDelta
   };
 };
 
