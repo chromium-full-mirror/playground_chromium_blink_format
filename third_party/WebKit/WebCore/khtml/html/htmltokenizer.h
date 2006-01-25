@@ -31,10 +31,10 @@
 
 #include "CachedObjectClient.h"
 #include "SegmentedString.h"
+#include "dom_qname.h"
 #include "xml_tokenizer.h"
 #include <qptrqueue.h>
 #include <qstring.h>
-#include "dom_qname.h"
 
 #if __OBJC__
 #define id id_AVOID_KEYWORD
@@ -148,9 +148,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void enlargeBuffer(int len);
   void enlargeScriptBuffer(int len);
 
-  bool continueProcessing(int& processedCount,
-                          const QTime& startTime,
-                          State& state);
+  bool continueProcessing(int& processedCount, double startTime, State& state);
   void timerEvent(QTimerEvent*);
   void allDataProcessed();
 

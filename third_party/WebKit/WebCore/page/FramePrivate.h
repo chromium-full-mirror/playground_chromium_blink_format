@@ -33,7 +33,6 @@
 #include "edit_command.h"
 #include "kjs_proxy.h"
 #include <kio/global.h>
-#include <qdatetime.h>
 #include <qtimer.h>
 #include "FrameTreeNode.h"
 
@@ -224,7 +223,6 @@ class FramePrivate {
 
   KIO::CacheControl m_cachePolicy;
   QTimer m_redirectionTimer;
-  QTime m_parsetime;
 
   RedirectionScheduled m_scheduledRedirection;
   double m_delayRedirect;

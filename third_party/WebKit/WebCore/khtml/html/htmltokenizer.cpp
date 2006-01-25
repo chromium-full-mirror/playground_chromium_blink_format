@@ -34,16 +34,17 @@
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "HTMLElementImpl.h"
+#include "SystemTime.h"
 #include "csshelper.h"
 #include "html_documentimpl.h"
-#include "HTMLElementImpl.h"
+#include "htmlnames.h"
 #include "htmlparser.h"
 #include "kjs_proxy.h"
 #include <assert.h>
 #include <ctype.h>
 #include <qvariant.h>
 #include <stdlib.h>
-#include "htmlnames.h"
 
 // turn off inlining to allow proper linking on newer gcc (xmltokenizer.cpp also
 // uses findEntity())
@@ -56,17 +57,17 @@
 
 #define TOKENIZER_CHUNK_SIZE 4096
 
-// FIXME: We would like this constant to be 200ms.  Yielding more aggressively
-// results in increased
-// responsiveness and better incremental rendering.  It slows down overall
-// page-load on slower machines,
-// though, so for now we set a value of 500.
-#define TOKENIZER_TIME_DELAY 500
-
 namespace WebCore {
 
 using namespace HTMLNames;
 using namespace EventNames;
+
+// FIXME: We would like this constant to be 200ms.
+// Yielding more aggressively results in increased responsiveness and better
+// incremental rendering.
+// It slows down overall page-load on slower machines, though, so for now we set
+// a value of 500.
+const double tokenizerTimeDelay = 0.500;
 
 static const char commentStart[] = "<!--";
 static const char scriptEnd[] = "</script";
@@ -379,7 +380,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
   if (!scriptSrc.isEmpty() && parser->doc()->frame()) {
     // forget what we just got; load from src url instead
     if (!parser->skipMode() && !followingFrameset) {
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
       if (!parser->doc()->ownerElement())
         printf("Requesting script at time %d\n", parser->doc()->elapsedTime());
 #endif
@@ -495,7 +496,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const QString& str,
   SegmentedString prependingSrc;
   currentPrependingSrc = &prependingSrc;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!parser->doc()->ownerElement())
     printf("beginning script execution at %d\n", parser->doc()->elapsedTime());
 #endif
@@ -506,7 +507,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const QString& str,
 
   state.setAllowYield(true);
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!parser->doc()->ownerElement())
     printf("ending script execution at %d\n", parser->doc()->elapsedTime());
 #endif
@@ -1337,7 +1338,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 }
 
 inline bool HTMLTokenizer::continueProcessing(int& processedCount,
-                                              const QTime& startTime,
+                                              double startTime,
                                               State& state) {
   // We don't want to be checking elapsed time with every character, so we only
   // check after we've
@@ -1348,7 +1349,7 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
       !m_executingScript &&
       (processedCount > TOKENIZER_CHUNK_SIZE || allowedYield)) {
     processedCount = 0;
-    if (startTime.elapsed() > TOKENIZER_TIME_DELAY) {
+    if (currentTime() - startTime > tokenizerTimeDelay) {
       /* FIXME: We'd like to yield aggressively to give stylesheets the
       opportunity to
          load, but this hurts overall performance on slower machines.  For now
@@ -1360,10 +1361,10 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
       // Schedule the timer to keep processing as soon as possible.
       if (!timerId)
         timerId = startTimer(0);
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
-      if (startTime.elapsed() > TOKENIZER_TIME_DELAY)
+#if INSTRUMENT_LAYOUT_SCHEDULING
+      if (currentTime() - startTime > tokenizerTimeDelay)
         printf(
-            "Deferring processing of data because 200ms elapsed away from "
+            "Deferring processing of data because 500ms elapsed away from "
             "event loop.\n");
 #endif
       return false;
@@ -1413,14 +1414,13 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   bool wasInWrite = inWrite;
   inWrite = true;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!parser->doc()->ownerElement())
     printf("Beginning write at time %d\n", parser->doc()->elapsedTime());
 #endif
 
   int processedCount = 0;
-  QTime startTime;
-  startTime.start();
+  double startTime = currentTime();
 
   Frame* frame = parser->doc()->frame();
 
@@ -1541,7 +1541,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
     }
   }
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!parser->doc()->ownerElement())
     printf("Ending write at time %d\n", parser->doc()->elapsedTime());
 #endif
@@ -1581,7 +1581,7 @@ void HTMLTokenizer::timerEvent(QTimerEvent* e) {
     killTimer(timerId);
     timerId = 0;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
     if (!parser->doc()->ownerElement())
       printf("Beginning timer write at time %d\n",
              parser->doc()->elapsedTime());
@@ -1767,7 +1767,7 @@ void HTMLTokenizer::enlargeScriptBuffer(int len) {
 }
 
 void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!parser->doc()->ownerElement())
     printf("script loaded at %d\n", parser->doc()->elapsedTime());
 #endif
@@ -1796,7 +1796,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     RefPtr<NodeImpl> n = scriptNode;
     scriptNode = 0;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
     if (!parser->doc()->ownerElement())
       printf("external script beginning execution at %d\n",
              parser->doc()->elapsedTime());
@@ -1816,7 +1816,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     finished = pendingScripts.isEmpty();
     if (finished) {
       m_state.setLoadingExtScript(false);
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
       if (!parser->doc()->ownerElement())
         printf("external script finished execution at %d\n",
                parser->doc()->elapsedTime());

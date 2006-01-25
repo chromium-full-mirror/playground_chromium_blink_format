@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2006 Apple Computer, Inc.
 
     This file is part of the KDE project
 
@@ -34,6 +35,7 @@
 #include "SVGNames.h"
 #include "SVGStyledElementImpl.h"
 #include "SVGStyledTransformableElementImpl.h"
+#include "SystemTime.h"
 
 namespace KSVG {
 
@@ -342,7 +344,7 @@ TimeScheduler::TimeScheduler(KDOM::DocumentImpl* document)
   m_intervalTimer = new SVGTimer(this, staticTimerInterval, false);
 
   m_savedTime = 0;
-  m_creationTime = QTime::currentTime();
+  m_creationTime = currentTime();
 }
 
 TimeScheduler::~TimeScheduler() {
@@ -374,7 +376,7 @@ void TimeScheduler::disconnectIntervalTimer(SVGAnimationElementImpl* element) {
 }
 
 void TimeScheduler::startAnimations() {
-  m_creationTime.start();
+  m_creationTime = currentTime();
 
   SVGTimerList::iterator it = m_timerList.begin();
   SVGTimerList::iterator end = m_timerList.end();
@@ -389,12 +391,12 @@ void TimeScheduler::startAnimations() {
 void TimeScheduler::toggleAnimations() {
   if (m_intervalTimer->isActive()) {
     m_intervalTimer->stop();
-    m_savedTime = m_creationTime.elapsed();
+    m_savedTime = currentTime();
   } else {
-    if (m_savedTime != 0)
-      m_creationTime =
-          m_creationTime.addMSecs(m_creationTime.elapsed() - m_savedTime);
-
+    if (m_savedTime != 0) {
+      m_creationTime += currentTime() - m_savedTime;
+      m_savedTime = 0;
+    }
     m_intervalTimer->start(this, SLOT(slotTimerNotify()));
   }
 }
@@ -442,8 +444,8 @@ void TimeScheduler::slotTimerNotify() {
     m_intervalTimer->start(this, SLOT(slotTimerNotify()));
 }
 
-float TimeScheduler::elapsed() const {
-  return float(m_creationTime.elapsed()) / 1000.0;
+double TimeScheduler::elapsed() const {
+  return currentTime() - m_creationTime;
 }
 
 }  // namespace;

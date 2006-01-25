@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,67 +23,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QDATETIME_H_
-#define QDATETIME_H_
+#include "config.h"
+#include "SystemTime.h"
 
-#include "KWQDef.h"
-#if __APPLE__
 #include <CoreFoundation/CFDate.h>
-#else
-typedef double CFAbsoluteTime;
-inline CFAbsoluteTime CFAbsoluteTimeGetCurrent() {
-  return 0;
-}  // FIXME: Temporary until we port this class.
-#endif
 
-class QTime {
- public:
-  QTime() : timeInSeconds(0) {}
-  explicit QTime(CFAbsoluteTime t) : timeInSeconds(t) {}
-  QTime(int hours, int minutes);
+namespace WebCore {
 
-  int msec() const;
-  QTime addMSecs(int msecs) const;
-
-  void start() { timeInSeconds = CFAbsoluteTimeGetCurrent(); }
-  int elapsed() const;
-  int restart();
-
-  static QTime currentTime() { return QTime(CFAbsoluteTimeGetCurrent()); }
-
- private:
-  CFAbsoluteTime timeInSeconds;
-
-  friend class QDateTime;
-};
-
-class QDate {
- public:
-  QDate(int year, int month, int day);
-
- private:
-  int year;
-  int month;
-  int day;
-
-  friend class QDateTime;
-};
-
-class QDateTime {
- public:
-  QDateTime() : dateInSeconds(0) {}
-  explicit QDateTime(CFAbsoluteTime d) : dateInSeconds(d) {}
-  QDateTime(const QDate&, const QTime&);
-
-  QTime time() const { return QTime(dateInSeconds); }
-  int secsTo(const QDateTime&) const;
-
-  static QDateTime currentDateTime() {
-    return QDateTime(CFAbsoluteTimeGetCurrent());
-  }
-
- private:
-  CFAbsoluteTime dateInSeconds;
-};
-
-#endif
+double currentTime() {
+  return CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970;
+}
+}
