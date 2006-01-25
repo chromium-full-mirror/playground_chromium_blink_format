@@ -57,7 +57,8 @@ HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentImpl* doc)
 }
 
 HTMLAppletElementImpl::~HTMLAppletElementImpl() {
-  delete appletInstance;
+  // appletInstance should have been cleaned up in detach().
+  assert(!appletInstance);
 }
 
 bool HTMLAppletElementImpl::checkDTD(const NodeImpl* newChild) {
@@ -215,6 +216,17 @@ void HTMLAppletElementImpl::closeRenderer() {
   HTMLElementImpl::closeRenderer();
 }
 
+void HTMLAppletElementImpl::detach() {
+  // Delete appletInstance, because it references the widget owned by the
+  // renderer we're about to destroy.
+  if (appletInstance) {
+    delete appletInstance;
+    appletInstance = 0;
+  }
+
+  HTMLElementImpl::detach();
+}
+
 bool HTMLAppletElementImpl::allParamsAvailable() {
   return m_allParamsAvailable;
 }
@@ -312,7 +324,10 @@ void HTMLAppletElementImpl::setWidth(const DOMString& value) {
 HTMLEmbedElementImpl::HTMLEmbedElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(embedTag, doc), embedInstance(0) {}
 
-HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {}
+HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {
+  // embedInstance should have been cleaned up in detach().
+  assert(!embedInstance);
+}
 
 bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
@@ -447,6 +462,17 @@ void HTMLEmbedElementImpl::attach() {
     static_cast<RenderPartObject*>(renderer())->updateWidget();
 }
 
+void HTMLEmbedElementImpl::detach() {
+  // Delete embedInstance, because it references the widget owned by the
+  // renderer we're about to destroy.
+  if (embedInstance) {
+    delete embedInstance;
+    embedInstance = 0;
+  }
+
+  HTMLElementImpl::detach();
+}
+
 void HTMLEmbedElementImpl::insertedIntoDocument() {
   if (getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
@@ -480,6 +506,9 @@ HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentImpl* doc)
 }
 
 HTMLObjectElementImpl::~HTMLObjectElementImpl() {
+  // objectInstance should have been cleaned up in detach().
+  assert(!objectInstance);
+
   delete m_imageLoader;
 }
 
@@ -680,6 +709,13 @@ void HTMLObjectElementImpl::detach() {
     // Update the widget the next time we attach (detaching destroys the
     // plugin).
     needWidgetUpdate = true;
+  }
+
+  // Delete objectInstance, because it references the widget owned by the
+  // renderer we're about to destroy.
+  if (objectInstance) {
+    delete objectInstance;
+    objectInstance = 0;
   }
 
   HTMLElementImpl::detach();

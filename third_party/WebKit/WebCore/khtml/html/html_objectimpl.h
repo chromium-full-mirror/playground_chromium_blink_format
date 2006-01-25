@@ -60,6 +60,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
   virtual void closeRenderer();
+  virtual void detach();
 
   DOMString align() const;
   void setAlign(const DOMString&);
@@ -130,6 +131,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void attach();
+  virtual void detach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
