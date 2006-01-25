@@ -80,7 +80,7 @@ PassRefPtr<RangeImpl> Selection::toRange() const {
     // the conventions of text editors tested, which make style determinations
     // based
     // on the character before the caret, if any.
-    s = m_start.upstream().equivalentRangeCompliantPosition();
+    s = rangeCompliantEquivalent(m_start.upstream());
     e = s;
   } else {
     // If the selection is a range, select the minimum range that encompasses
@@ -111,8 +111,8 @@ PassRefPtr<RangeImpl> Selection::toRange() const {
       s = e;
       e = tmp;
     }
-    s = s.equivalentRangeCompliantPosition();
-    e = e.equivalentRangeCompliantPosition();
+    s = rangeCompliantEquivalent(s);
+    e = rangeCompliantEquivalent(e);
   }
 
   int exceptionCode = 0;
@@ -235,11 +235,12 @@ void Selection::validate() {
       m_end = end.deepEquivalent();
       break;
     }
-    case LINE_BOUNDARY:
+    case LINE_BOUNDARY: {
       m_start =
           startOfLine(VisiblePosition(m_start, m_affinity)).deepEquivalent();
       m_end = endOfLine(VisiblePosition(m_end, m_affinity)).deepEquivalent();
       break;
+    }
     case PARAGRAPH: {
       VisiblePosition pos(m_start, m_affinity);
       if (isStartOfLine(pos) && isEndOfDocument(pos))
@@ -249,9 +250,15 @@ void Selection::validate() {
           endOfParagraph(VisiblePosition(m_end, m_affinity));
       // Include the space after the end of the paragraph in the selection.
       VisiblePosition startOfNextParagraph = visibleParagraphEnd.next();
-      m_end = startOfNextParagraph.isNotNull()
-                  ? startOfNextParagraph.deepEquivalent()
-                  : visibleParagraphEnd.deepEquivalent();
+      if (startOfNextParagraph.isNull())
+        m_end = visibleParagraphEnd.deepEquivalent();
+      else {
+        m_end = startOfNextParagraph.deepEquivalent();
+        // Stay within enclosing node, e.g. do not span end of table.
+        if (visibleParagraphEnd.deepEquivalent().node()->isAncestor(
+                m_end.node()))
+          m_end = visibleParagraphEnd.deepEquivalent();
+      }
       break;
     }
     case DOCUMENT_BOUNDARY:

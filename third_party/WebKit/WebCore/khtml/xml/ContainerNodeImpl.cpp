@@ -803,7 +803,7 @@ unsigned ContainerNodeImpl::childNodeCount() const {
   return count;
 }
 
-NodeImpl* ContainerNodeImpl::childNode(unsigned index) {
+NodeImpl* ContainerNodeImpl::childNode(unsigned index) const {
   unsigned i;
   NodeImpl* n = firstChild();
   for (i = 0; n != 0 && i < index; i++)

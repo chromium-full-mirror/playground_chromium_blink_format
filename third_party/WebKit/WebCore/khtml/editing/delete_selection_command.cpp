@@ -46,17 +46,6 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static bool isListStructureNode(const NodeImpl* node) {
-  // FIXME: Irritating that we can get away with just going at the render tree
-  // for isTableStructureNode,
-  // but here we also have to peek at the type of DOM node?
-  RenderObject* r = node->renderer();
-  return (r && r->isListItem()) || node->hasTagName(olTag) ||
-         node->hasTagName(ulTag) || node->hasTagName(ddTag) ||
-         node->hasTagName(dtTag) || node->hasTagName(dirTag) ||
-         node->hasTagName(menuTag);
-}
-
 static void debugPosition(const char* prefix, const Position& pos) {
   if (!prefix)
     prefix = "";
@@ -76,23 +65,26 @@ static void debugNode(const char* prefix, const NodeImpl* node) {
     LOG(Editing, "%s%s %p", prefix, node->nodeName().qstring().latin1(), node);
 }
 
+#if 1
 static Position positionBeforePossibleContainingSpecialElement(
-    const Position& pos) {
-  if (isFirstVisiblePositionInSpecialElement(pos)) {
-    return positionBeforeContainingSpecialElement(pos);
-  }
+    const Position& pos,
+    NodeImpl** containingSpecialElement) {
+  if (isFirstVisiblePositionInSpecialElement(pos))
+    return positionBeforeContainingSpecialElement(pos,
+                                                  containingSpecialElement);
 
   return pos;
 }
 
 static Position positionAfterPossibleContainingSpecialElement(
-    const Position& pos) {
-  if (isLastVisiblePositionInSpecialElement(pos)) {
-    return positionAfterContainingSpecialElement(pos);
-  }
+    const Position& pos,
+    NodeImpl** containingSpecialElement) {
+  if (isLastVisiblePositionInSpecialElement(pos))
+    return positionAfterContainingSpecialElement(pos, containingSpecialElement);
 
   return pos;
 }
+#endif
 
 DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
                                                bool smartDelete,
@@ -122,22 +114,54 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
       m_typingStyle(0),
       m_deleteIntoBlockquoteStyle(0) {}
 
+void DeleteSelectionCommand::initializeStartEnd() {
+#if 0
+    Position start = m_selectionToDelete.start();
+    Position end = m_selectionToDelete.end();
+    m_upstreamStart = start.upstream();
+    m_downstreamStart = start.downstream();
+    m_upstreamEnd = end.upstream();
+    m_downstreamEnd = end.downstream();
+#else
+  NodeImpl* startSpecialContainer = 0;
+  NodeImpl* endSpecialContainer = 0;
+
+  Position start = positionOutsideContainingSpecialElement(
+      m_selectionToDelete.start(), &startSpecialContainer);
+  Position end = positionOutsideContainingSpecialElement(
+      m_selectionToDelete.end(), &endSpecialContainer);
+
+  m_upstreamStart = positionBeforePossibleContainingSpecialElement(
+      start.upstream(), &startSpecialContainer);
+  m_downstreamStart =
+      positionBeforePossibleContainingSpecialElement(start.downstream(), 0);
+  m_upstreamEnd =
+      positionAfterPossibleContainingSpecialElement(end.upstream(), 0);
+  m_downstreamEnd = positionAfterPossibleContainingSpecialElement(
+      end.downstream(), &endSpecialContainer);
+
+  // do not adjust start/end if one of them did not adjust, and the selection is
+  // entirely within the special element
+  if (m_upstreamStart == m_selectionToDelete.start().upstream() ||
+      m_downstreamEnd == m_selectionToDelete.end().downstream()) {
+    if (m_downstreamEnd.node()->isAncestor(startSpecialContainer) ||
+        m_upstreamStart.node()->isAncestor(endSpecialContainer)) {
+      start = m_selectionToDelete.start();
+      end = m_selectionToDelete.end();
+      m_upstreamStart = start.upstream();
+      m_downstreamStart = start.downstream();
+      m_upstreamEnd = end.upstream();
+      m_downstreamEnd = end.downstream();
+    }
+  }
+#endif
+}
+
 void DeleteSelectionCommand::initializePositionData() {
   //
   // Handle setting some basic positions
   //
-  Position start = m_selectionToDelete.start();
-  start = positionOutsideContainingSpecialElement(start);
-  Position end = m_selectionToDelete.end();
-  end = positionOutsideContainingSpecialElement(end);
-
-  m_upstreamStart =
-      positionBeforePossibleContainingSpecialElement(start.upstream());
-  m_downstreamStart =
-      positionBeforePossibleContainingSpecialElement(start.downstream());
-  m_upstreamEnd = positionAfterPossibleContainingSpecialElement(end.upstream());
-  m_downstreamEnd =
-      positionAfterPossibleContainingSpecialElement(end.downstream());
+  initializeStartEnd();
 
   //
   // Handle leading and trailing whitespace, as well as smart delete adjustments
@@ -168,7 +192,7 @@ void DeleteSelectionCommand::initializePositionData() {
             .isNotNull();
     if (!skipSmartDelete && hasLeadingWhitespaceBeforeAdjustment) {
       VisiblePosition visiblePos =
-          VisiblePosition(start, m_selectionToDelete.affinity()).previous();
+          VisiblePosition(m_upstreamStart, VP_DEFAULT_AFFINITY).previous();
       pos = visiblePos.deepEquivalent();
       // Expand out one character upstream for smart delete and recalculate
       // positions based on this change.
@@ -187,7 +211,7 @@ void DeleteSelectionCommand::initializePositionData() {
             .isNotNull()) {
       // Expand out one character downstream for smart delete and recalculate
       // positions based on this change.
-      pos = VisiblePosition(end, m_selectionToDelete.affinity())
+      pos = VisiblePosition(m_downstreamEnd, VP_DEFAULT_AFFINITY)
                 .next()
                 .deepEquivalent();
       m_upstreamEnd = pos.upstream();
@@ -212,7 +236,7 @@ void DeleteSelectionCommand::initializePositionData() {
   // This is one of the tests that determines if block merging of content needs
   // to be done.
   //
-  VisiblePosition visibleEnd(end, m_selectionToDelete.affinity());
+  VisiblePosition visibleEnd(m_downstreamEnd, VP_DEFAULT_AFFINITY);
   if (isEndOfParagraph(visibleEnd)) {
     Position previousLineStart =
         previousLinePosition(visibleEnd, 0).deepEquivalent();
@@ -352,7 +376,9 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     if (!m_startBlock->isAncestor(m_endBlock.get()) &&
         !isStartOfBlock(visibleEnd) && endAtEndOfBlock) {
       // Delete all the children of the block, but not the block itself.
-      m_startNode = m_startBlock->firstChild();
+      // Use traverseNextNode in case the block has no children (e.g. is an
+      // empty table cell)
+      m_startNode = m_startBlock->traverseNextNode();
       startOffset = 0;
     }
   } else if (startOffset >= m_startNode->caretMaxOffset() &&
@@ -564,9 +590,10 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
     return;
 
   NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
-  if (isTableStructureNode(startBlock) || isListStructureNode(startBlock))
-    // Do not move content between parts of a table or list.
+  if (isTableStructureNode(startBlock)) {
+    // Do not move content between parts of a table.
     return;
+  }
 
   // Now that we are about to add content, check to see if a placeholder element
   // can be removed.
@@ -575,7 +602,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
   // Move the subtree containing node
   NodeImpl* node = startNode->enclosingInlineElement();
 
-  // Insert after the subtree containing destNode
+  // Insert after the subtree containing dstNode
   NodeImpl* refNode = dstNode->enclosingInlineElement();
 
   // Nothing to do if start is already at the beginning of dstBlock
@@ -624,7 +651,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
   // 'Three'.
   // This may not be ideal, but it is better than nothing.
   updateLayout();
-  if (!startBlock->renderer() || !startBlock->renderer()->firstChild()) {
+  if (!startBlock->renderer() || startBlock->renderer()->isEmpty()) {
     removeNode(startBlock);
     updateLayout();
     if (refNode->renderer() && refNode->renderer()->inlineBox() &&

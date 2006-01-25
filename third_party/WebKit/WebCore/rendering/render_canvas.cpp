@@ -322,7 +322,7 @@ IntRect RenderCanvas::selectionRect() const {
         os->selectionState() != SelectionNone) {
       // Blocks are responsible for painting line gaps and margin gaps. They
       // must be examined as well.
-      assert(!selectedObjects.get(os));
+      //          assert(!selectedObjects.get(os));
       selectedObjects.set(os, new SelectionInfo(os));
       RenderBlock* cb = os->containingBlock();
       while (cb && !cb->isCanvas()) {

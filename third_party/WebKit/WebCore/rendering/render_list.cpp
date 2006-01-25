@@ -190,6 +190,10 @@ void RenderListItem::calcListValue() {
   }
 }
 
+bool RenderListItem::isEmpty() const {
+  return lastChild() == m_marker;
+}
+
 static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
                                              RenderObject* marker) {
   RenderObject* firstChild = curr->firstChild();
@@ -223,6 +227,11 @@ static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
   return 0;
 }
 
+void RenderListItem::resetMarkerValue() {
+  m_marker->m_value = -1;
+  m_marker->setNeedsLayoutAndMinMaxRecalc();
+}
+
 void RenderListItem::updateMarkerLocation() {
   // Sanity check the location of our marker.
   if (m_marker) {
@@ -238,7 +247,8 @@ void RenderListItem::updateMarkerLocation() {
       else
         lineBoxParent = this;
     }
-    if (markerPar != lineBoxParent) {
+
+    if (markerPar != lineBoxParent || !m_marker->minMaxKnown()) {
       if (markerPar)
         markerPar->removeChild(m_marker);
       if (!lineBoxParent)

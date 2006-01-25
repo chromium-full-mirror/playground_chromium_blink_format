@@ -93,7 +93,7 @@ void InsertLineBreakCommand::doApply() {
 
   Position pos(selection.start().upstream());
 
-  pos = positionOutsideContainingSpecialElement(pos);
+  pos = positionAvoidingSpecialElementBoundary(pos);
 
   if (isTabSpanTextNode(pos.node())) {
     insertNodeAtTabSpanPosition(nodeToInsert, pos);

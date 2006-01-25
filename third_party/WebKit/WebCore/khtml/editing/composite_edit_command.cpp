@@ -176,9 +176,16 @@ void CompositeEditCommand::removeFullySelectedNode(NodeImpl* node) {
       child = child->nextSibling();
       removeFullySelectedNode(remove);
     }
-  } else {
-    removeNode(node);
+
+    // make sure empty cell has some height
+    updateLayout();
+    RenderObject* r = node->renderer();
+    if (r && r->isTableCell() && r->contentHeight() <= 0)
+      insertBlockPlaceholder(Position(node, 0));
+    return;
   }
+
+  removeNode(node);
 }
 
 void CompositeEditCommand::removeChildrenInRange(NodeImpl* node,
@@ -276,7 +283,8 @@ void CompositeEditCommand::replaceTextInNode(TextImpl* node,
 }
 
 Position CompositeEditCommand::positionOutsideTabSpan(const Position& pos) {
-  ASSERT(isTabSpanTextNode(pos.node()));
+  if (!isTabSpanTextNode(pos.node()))
+    return pos;
 
   NodeImpl* tabSpan = tabSpanNode(pos.node());
 
@@ -496,6 +504,7 @@ NodeImpl* CompositeEditCommand::addBlockPlaceholderIfNeeded(NodeImpl* node) {
 
   // append the placeholder to make sure it follows
   // any unrendered blocks
+  // FIXME: use contentHeight() instead so to not be confused by bordere, e.g.
   if (renderer->height() == 0) {
     return appendBlockPlaceholder(node);
   }

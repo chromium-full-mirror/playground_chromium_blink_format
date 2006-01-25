@@ -56,7 +56,8 @@ class ContainerNodeImpl : public NodeImpl {
   virtual void setActive(bool active = true, bool pause = false);
   virtual void setHovered(bool = true);
   virtual unsigned childNodeCount() const;
-  virtual NodeImpl* childNode(unsigned index);
+  virtual NodeImpl* childNode(unsigned index) const;
+
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void insertedIntoTree(bool deep);

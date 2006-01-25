@@ -151,11 +151,9 @@ static bool isProbablyBlock(const NodeImpl* node) {
 }
 
 static bool isMailPasteAsQuotationNode(const NodeImpl* node) {
-  if (!node)
-    return false;
-
-  return static_cast<const ElementImpl*>(node)->getAttribute("class") ==
-         ApplePasteAsQuotation;
+  return node &&
+         static_cast<const ElementImpl*>(node)->getAttribute("class") ==
+             ApplePasteAsQuotation;
 }
 
 NodeImpl* ReplacementFragment::mergeStartNode() const {
@@ -462,34 +460,6 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
 
 ReplaceSelectionCommand::~ReplaceSelectionCommand() {}
 
-static int maxRangeOffset(NodeImpl* n) {
-  if (DOM::offsetInCharacters(n->nodeType()))
-    return n->maxOffset();
-
-  if (n->isElementNode())
-    return n->childNodeCount();
-
-  return 1;
-}
-
-// This version of the function is meant to be called on positions in a document
-// fragment,
-// so it does not check for a root editable element, it is assumed these nodes
-// will be put
-// somewhere editable in the future
-bool isFirstVisiblePositionInSpecialElementInFragment(const Position& pos) {
-  VisiblePosition vPos = VisiblePosition(pos, DOWNSTREAM);
-
-  for (NodeImpl* n = pos.node(); n; n = n->parentNode()) {
-    if (VisiblePosition(n, 0, DOWNSTREAM) != vPos)
-      return false;
-    if (isSpecialElement(n))
-      return true;
-  }
-
-  return false;
-}
-
 void ReplaceSelectionCommand::doApply() {
   // collect information about the current selection, prior to deleting the
   // selection
@@ -513,6 +483,7 @@ void ReplaceSelectionCommand::doApply() {
       startAtEndOfBlock) {
     // empty editable subtree, need to mergeStart so that fragment ends up
     // inside the editable subtree rather than just before it
+    // FIXME: Reconcile comment versus mergeStart = false
     mergeStart = false;
   } else {
     // merge if current selection starts inside a paragraph, or there is only
@@ -520,18 +491,33 @@ void ReplaceSelectionCommand::doApply() {
     mergeStart = !m_fragment.hasInterchangeNewlineAtStart() &&
                  (!isStartOfParagraph(visibleStart) ||
                   (!m_fragment.hasInterchangeNewlineAtEnd() &&
-                   !m_fragment.hasMoreThanOneBlock())) &&
-                 !isLastVisiblePositionInSpecialElement(selection.start());
+                   !m_fragment.hasMoreThanOneBlock()));
 
     // This is a workaround for this bug:
-    // <rdar://problem/4013642> REGRESSION (Mail): Copied quoted word does not
-    // paste as a quote if pasted at the start of a line
+    // <rdar://problem/4013642> Copied quoted word does not paste as a quote if
+    // pasted at the start of a line
     // We need more powerful logic in this whole mergeStart code for this case
     // to come out right without
     // breaking other cases.
     if (isStartOfParagraph(visibleStart) &&
         isMailBlockquote(m_fragment.firstChild()))
       mergeStart = false;
+
+    // prevent first list item from getting merged into target, thereby pulled
+    // out of list
+    // NOTE: ideally, we'd check for "first visible position in list" here,
+    // but we cannot.  Fragments do not have any visible positions.  Instead, we
+    // assume that the mergeStartNode() contains the first visible content to
+    // paste.
+    // Any better ideas?
+    if (mergeStart) {
+      for (NodeImpl* n = m_fragment.mergeStartNode(); n; n = n->parentNode()) {
+        if (isListElement(n)) {
+          mergeStart = false;
+          break;
+        }
+      }
+    }
   }
 
   // decide whether to later append nodes to the end
@@ -550,9 +536,10 @@ void ReplaceSelectionCommand::doApply() {
   // delete the current range selection, or insert paragraph for caret
   // selection, as needed
   if (selection.isRange()) {
-    deleteSelection(false, !(m_fragment.hasInterchangeNewlineAtStart() ||
-                             m_fragment.hasInterchangeNewlineAtEnd() ||
-                             m_fragment.hasMoreThanOneBlock()));
+    bool mergeBlocksAfterDelete = !(m_fragment.hasInterchangeNewlineAtStart() ||
+                                    m_fragment.hasInterchangeNewlineAtEnd() ||
+                                    m_fragment.hasMoreThanOneBlock());
+    deleteSelection(false, mergeBlocksAfterDelete);
     updateLayout();
     visibleStart =
         VisiblePosition(endingSelection().start(), VP_DEFAULT_AFFINITY);
@@ -595,10 +582,11 @@ void ReplaceSelectionCommand::doApply() {
   if (startAtStartOfBlock && startBlock->inDocument())
     startPos = Position(startBlock, 0);
 
-  if (isTabSpanTextNode(startPos.node()))
-    startPos = positionOutsideTabSpan(startPos);
-  else
-    startPos = positionOutsideContainingSpecialElement(startPos);
+  // paste into run of tabs splits the tab span
+  startPos = positionOutsideTabSpan(startPos);
+
+  // paste at start or end of link goes outside of link
+  startPos = positionAvoidingSpecialElementBoundary(startPos);
 
   Frame* frame = document()->frame();
 
@@ -617,7 +605,10 @@ void ReplaceSelectionCommand::doApply() {
   NodeImpl* linePlaceholder = findBlockPlaceholder(block);
   if (!linePlaceholder) {
     Position downstream = startPos.downstream();
-    downstream = positionOutsideContainingSpecialElement(downstream);
+    // NOTE: the check for brTag offset 0 could be false negative after
+    // positionAvoidingSpecialElementBoundary() because "downstream" is
+    // now a "second deepest position"
+    downstream = positionAvoidingSpecialElementBoundary(downstream);
     if (downstream.node()->hasTagName(brTag) && downstream.offset() == 0 &&
         m_fragment.hasInterchangeNewlineAtEnd() &&
         isStartOfLine(VisiblePosition(downstream, VP_DEFAULT_AFFINITY)))
@@ -665,10 +656,8 @@ void ReplaceSelectionCommand::doApply() {
   updateLayout();
   Position insertionPos = startPos;
 
-  // step 1: merge content into the start block, if that is needed
-  if (mergeStart &&
-      !isFirstVisiblePositionInSpecialElementInFragment(
-          Position(m_fragment.mergeStartNode(), 0))) {
+  // step 1: merge content into the start block
+  if (mergeStart) {
     NodeImpl* refNode = m_fragment.mergeStartNode();
     if (refNode) {
       NodeImpl* parent = refNode->parentNode();
@@ -825,14 +814,11 @@ void ReplaceSelectionCommand::doApply() {
       }
     }
 
-    if (moveNodesAfterEnd &&
-        !isLastVisiblePositionInSpecialElement(
-            Position(m_lastNodeInserted.get(),
-                     maxRangeOffset(m_lastNodeInserted.get())))) {
+    if (moveNodesAfterEnd) {
       updateLayout();
       QValueList<NodeDesiredStyle> styles;
       QPtrList<NodeImpl> blocks;
-      NodeImpl* node = beyondEndNode;
+      NodeImpl* node = beyondEndNode->enclosingInlineElement();
       NodeImpl* refNode = m_lastNodeInserted.get();
       while (node) {
         if (node->isBlockFlowOrBlockTable())
