@@ -194,47 +194,52 @@ void SVGTimer::notifyAll() {
       if (percentage <= 1.0 || animation->connected())
         animation->handleTimerEvent(percentage);
 
-      // Special cases for animate* objects depending on 'additive' attribute
-      if (animation->hasTagName(SVGNames::animateTransformTag)) {
-        SVGAnimateTransformElementImpl* animTransform =
-            static_cast<SVGAnimateTransformElementImpl*>(animation);
-        if (!animTransform)
-          continue;
+// FIXME: Disable animateTransform until SVGList can be fixed.
+#if 0
+            // Special cases for animate* objects depending on 'additive' attribute
+            if(animation->hasTagName(SVGNames::animateTransformTag))
+            {
+                SVGAnimateTransformElementImpl *animTransform = static_cast<SVGAnimateTransformElementImpl *>(animation);
+                if(!animTransform)
+                    continue;
 
-        RefPtr<SVGMatrixImpl> transformMatrix =
-            animTransform->transformMatrix();
-        if (!transformMatrix)
-          continue;
+                RefPtr<SVGMatrixImpl> transformMatrix = animTransform->transformMatrix();
+                if(!transformMatrix)
+                    continue;
 
-        RefPtr<SVGMatrixImpl> initialMatrix = animTransform->initialMatrix();
-        RefPtr<SVGTransformImpl> data = new SVGTransformImpl();
+                RefPtr<SVGMatrixImpl> initialMatrix = animTransform->initialMatrix();
+                RefPtr<SVGTransformImpl> data = new SVGTransformImpl();
 
-        if (!targetTransforms)  // lazy creation, only if needed.
-        {
-          targetTransforms = new SVGTransformListImpl();
+                if(!targetTransforms) // lazy creation, only if needed.
+                {
+                    targetTransforms = new SVGTransformListImpl();
 
-          if (animation->isAdditive() && initialMatrix) {
-            RefPtr<SVGMatrixImpl> matrix =
-                new SVGMatrixImpl(initialMatrix->qmatrix());
+                    if(animation->isAdditive() && initialMatrix)
+                    {
+                        RefPtr<SVGMatrixImpl> matrix = new SVGMatrixImpl(initialMatrix->qmatrix());
+                        
+                        data->setMatrix(matrix.get());
+                        targetTransforms->appendItem(data.get());
 
-            data->setMatrix(matrix.get());
-            targetTransforms->appendItem(data.get());
+                        data = new SVGTransformImpl();
+                    }
+                }
 
-            data = new SVGTransformImpl();
-          }
-        }
+                if(targetTransforms->numberOfItems() <= 1)
+                    data->setMatrix(transformMatrix.get());
+                else
+                {
+                    if(!animation->isAdditive())
+                        targetTransforms->clear();    
+                    
+                    data->setMatrix(transformMatrix.get());
+                }
 
-        if (targetTransforms->numberOfItems() <= 1)
-          data->setMatrix(transformMatrix.get());
-        else {
-          if (!animation->isAdditive())
-            targetTransforms->clear();
-
-          data->setMatrix(transformMatrix.get());
-        }
-
-        targetTransforms->appendItem(data.get());
-      } else if (animation->hasTagName(SVGNames::animateColorTag)) {
+                targetTransforms->appendItem(data.get());
+            }
+            else
+#endif
+      if (animation->hasTagName(SVGNames::animateColorTag)) {
         SVGAnimateColorElementImpl* animColor =
             static_cast<SVGAnimateColorElementImpl*>(animation);
         if (!animColor)
