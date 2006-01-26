@@ -229,7 +229,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
     if (cWidth > 2 && cHeight > 2) {
       if (!berrorPic) {
         p->setPen(Color::lightGray);
-        p->setBrush(Qt::NoBrush);
+        p->setBrush(WebCore::Brush::NoBrush);
         p->drawRect(_tx + leftBorder + leftPad, _ty + topBorder + topPad,
                     cWidth, cHeight);
       }
@@ -311,7 +311,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         tintSize = resizeCache.rect().size();
       }
       if (drawSelectionTint) {
-        QBrush brush(selectionColor(p));
+        Brush brush(selectionColor(p));
         IntRect selRect(selectionRect());
         p->fillRect(selRect.x(), selRect.y(), selRect.width(), selRect.height(),
                     brush);
@@ -352,7 +352,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         p->drawPixmap(offs, pix, rect);
       }
       if (drawSelectionTint) {
-        QBrush brush(selectionColor(p));
+        Brush brush(selectionColor(p));
         IntRect selRect(selectionRect());
         p->fillRect(selRect.x(), selRect.y(), selRect.width(), selRect.height(),
                     brush);

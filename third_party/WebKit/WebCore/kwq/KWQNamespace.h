@@ -62,11 +62,6 @@ class Qt {
 
   enum Orientation { Horizontal, Vertical };
 
-  enum BrushStyle {
-    NoBrush,
-    SolidPattern,
-  };
-
   enum RasterOp {  // raster op mode
     CopyROP,
     OrROP,

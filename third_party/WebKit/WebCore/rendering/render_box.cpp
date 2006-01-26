@@ -648,7 +648,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
 
 void RenderBox::outlineBox(QPainter* p, int _tx, int _ty, const char* color) {
   p->setPen(Pen(Color(color), 1, Pen::DotLine));
-  p->setBrush(Qt::NoBrush);
+  p->setBrush(WebCore::Brush::NoBrush);
   p->drawRect(_tx, _ty, m_width, m_height);
 }
 
