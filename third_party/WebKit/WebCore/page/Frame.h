@@ -960,7 +960,7 @@ class Frame : public ObjectContents {
 
   void slotEndLifeSupport();
 
-  virtual void clear();
+  virtual void clear(bool clearWindowProperties = true);
 
  private:
   bool restoreURL(const KURL& url);
