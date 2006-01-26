@@ -228,6 +228,9 @@ static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
 }
 
 void RenderListItem::resetMarkerValue() {
+  if (!m_marker)
+    return;
+
   m_marker->m_value = -1;
   m_marker->setNeedsLayoutAndMinMaxRecalc();
 }
