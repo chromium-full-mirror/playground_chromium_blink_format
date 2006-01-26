@@ -72,6 +72,10 @@ class RenderThemeMac : public RenderTheme {
                            const IntRect& r);
   virtual void setButtonSize(RenderStyle* style) const;
 
+  virtual bool paintTextField(RenderObject* o,
+                              const RenderObject::PaintInfo& i,
+                              const IntRect& r);
+
  private:
   IntRect inflateRect(const IntRect& r,
                       const IntSize& size,
@@ -111,10 +115,13 @@ class RenderThemeMac : public RenderTheme {
   const int* buttonMargins() const;
   void setButtonCellState(const RenderObject* o, const IntRect& r);
 
+  void setTextFieldCellState(const RenderObject* o, const IntRect& r);
+
  private:
   NSButtonCell* checkbox;
   NSButtonCell* radio;
   NSButtonCell* button;
+  NSTextFieldCell* textField;
 };
 }
 

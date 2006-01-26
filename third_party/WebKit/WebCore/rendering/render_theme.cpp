@@ -58,6 +58,8 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
     case SquareButtonAppearance:
     case ButtonAppearance:
       return adjustButtonStyle(selector, style, e);
+    case TextFieldAppearance:
+      return adjustTextFieldStyle(selector, style, e);
     default:
       break;
   }
@@ -89,6 +91,8 @@ bool RenderTheme::paint(RenderObject* o,
     case SquareButtonAppearance:
     case ButtonAppearance:
       return paintButton(o, i, r);
+    case TextFieldAppearance:
+      return paintTextField(o, i, r);
     default:
       break;
   }
@@ -219,5 +223,11 @@ void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
   // at all by default.  We will still allow the theme a crack at setting up a
   // desired vertical size.
   setButtonSize(style);
+}
+
+void RenderTheme::adjustTextFieldStyle(CSSStyleSelector* selector,
+                                       RenderStyle* style,
+                                       ElementImpl* e) const {
+  // FIXME: If the style has a border, then turn off the aqua appearance.
 }
 }

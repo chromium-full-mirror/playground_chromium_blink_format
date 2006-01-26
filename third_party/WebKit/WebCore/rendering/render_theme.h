@@ -147,6 +147,13 @@ class RenderTheme {
                            const RenderObject::PaintInfo& i,
                            const IntRect& r) = 0;
   virtual void setButtonSize(RenderStyle* style) const {};
+
+  virtual void adjustTextFieldStyle(CSSStyleSelector* selector,
+                                    RenderStyle* style,
+                                    DOM::ElementImpl* e) const;
+  virtual bool paintTextField(RenderObject* o,
+                              const RenderObject::PaintInfo& i,
+                              const IntRect& r) = 0;
 };
 
 // Function to obtain the theme.  This is implemented in your platform-specific
