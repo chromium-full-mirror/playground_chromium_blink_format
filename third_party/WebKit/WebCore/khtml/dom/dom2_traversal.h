@@ -37,6 +37,7 @@ class NodeFilterCondition : public Shared<NodeFilterCondition> {
  public:
   virtual ~NodeFilterCondition() {}
   virtual short acceptNode(NodeImpl*) const;
+  virtual void mark(){};
 };
 
 /**

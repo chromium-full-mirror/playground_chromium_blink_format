@@ -37,6 +37,7 @@ class DOMNodeIterator : public DOMObject {
  public:
   DOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);
   ~DOMNodeIterator();
+  virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
@@ -76,6 +77,7 @@ class DOMNodeFilter : public DOMObject {
  public:
   DOMNodeFilter(ExecState* exec, DOM::NodeFilterImpl* nf);
   ~DOMNodeFilter();
+  virtual void mark();
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -90,6 +92,7 @@ class DOMTreeWalker : public DOMObject {
  public:
   DOMTreeWalker(ExecState* exec, DOM::TreeWalkerImpl* tw);
   ~DOMTreeWalker();
+  virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier&,
                                   PropertySlot& slot);
@@ -133,9 +136,10 @@ class JSNodeFilterCondition : public DOM::NodeFilterCondition {
   JSNodeFilterCondition(JSObject* _filter);
   virtual ~JSNodeFilterCondition() {}
   virtual short acceptNode(DOM::NodeImpl*) const;
+  virtual void mark();
 
  protected:
-  ProtectedPtr<JSObject> filter;
+  JSObject* filter;
 };
 
 }  // namespace

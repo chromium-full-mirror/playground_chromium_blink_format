@@ -30,15 +30,7 @@
 namespace DOM {
 
 NodeFilterImpl::NodeFilterImpl(NodeFilterCondition* condition)
-    : m_condition(condition) {
-  if (m_condition)
-    m_condition->ref();
-}
-
-NodeFilterImpl::~NodeFilterImpl() {
-  if (m_condition)
-    m_condition->deref();
-}
+    : m_condition(condition) {}
 
 short NodeFilterImpl::acceptNode(NodeImpl* node) const {
   // cast to short silences "enumeral and non-enumeral types in return" warning
@@ -55,19 +47,9 @@ TraversalImpl::TraversalImpl(NodeImpl* rootNode,
     : m_root(rootNode),
       m_whatToShow(whatToShow),
       m_filter(nodeFilter),
-      m_expandEntityReferences(expandEntityReferences) {
-  if (root())
-    root()->ref();
-  if (filter())
-    filter()->ref();
-}
+      m_expandEntityReferences(expandEntityReferences) {}
 
-TraversalImpl::~TraversalImpl() {
-  if (root())
-    root()->deref();
-  if (filter())
-    filter()->deref();
-}
+TraversalImpl::~TraversalImpl() {}
 
 short TraversalImpl::acceptNode(NodeImpl* node) const {
   // FIXME: If XML is implemented we have to check expandEntityRerefences in
@@ -90,26 +72,16 @@ NodeIteratorImpl::NodeIteratorImpl(NodeImpl* rootNode,
                                    NodeFilterImpl* filter,
                                    bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
-      m_referenceNode(0),
       m_beforeReferenceNode(true),
       m_detached(false),
-      m_doc(0) {
-  if (root()) {
-    setDocument(root()->getDocument());
-    if (document()) {
-      document()->attachNodeIterator(this);
-      document()->ref();
-    }
-  }
+      m_doc(rootNode ? rootNode->getDocument() : 0) {
+  if (document())
+    document()->attachNodeIterator(this);
 }
 
 NodeIteratorImpl::~NodeIteratorImpl() {
-  if (referenceNode())
-    referenceNode()->deref();
-  if (document()) {
+  if (document())
     document()->detachNodeIterator(this);
-    document()->deref();
-  }
 }
 
 NodeImpl* NodeIteratorImpl::findNextNode(NodeImpl* node) const {
@@ -168,27 +140,7 @@ void NodeIteratorImpl::detach(int& /*exceptioncode*/) {
 }
 
 void NodeIteratorImpl::setReferenceNode(NodeImpl* node) {
-  if (node == m_referenceNode)
-    return;
-
-  NodeImpl* old = m_referenceNode;
   m_referenceNode = node;
-  if (m_referenceNode)
-    m_referenceNode->ref();
-  if (old)
-    old->deref();
-}
-
-void NodeIteratorImpl::setDocument(DocumentImpl* doc) {
-  if (doc == m_doc)
-    return;
-
-  DocumentImpl* old = m_doc;
-  m_doc = doc;
-  if (m_doc)
-    m_doc->ref();
-  if (old)
-    old->deref();
 }
 
 void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
@@ -265,15 +217,7 @@ TreeWalkerImpl::TreeWalkerImpl(NodeImpl* rootNode,
                                NodeFilterImpl* filter,
                                bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
-      m_current(rootNode) {
-  if (currentNode())
-    currentNode()->ref();
-}
-
-TreeWalkerImpl::~TreeWalkerImpl() {
-  if (currentNode())
-    currentNode()->deref();
-}
+      m_current(rootNode) {}
 
 void TreeWalkerImpl::setCurrentNode(NodeImpl* node, int& exceptioncode) {
   if (!node) {
@@ -281,15 +225,7 @@ void TreeWalkerImpl::setCurrentNode(NodeImpl* node, int& exceptioncode) {
     return;
   }
 
-  if (node == m_current)
-    return;
-
-  NodeImpl* old = m_current;
   m_current = node;
-  if (m_current)
-    m_current->ref();
-  if (old)
-    old->deref();
 }
 
 void TreeWalkerImpl::setCurrentNode(NodeImpl* node) {

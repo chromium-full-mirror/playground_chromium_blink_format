@@ -37,15 +37,16 @@ class DocumentImpl;
 class NodeFilterImpl : public Shared<NodeFilterImpl> {
  public:
   NodeFilterImpl(NodeFilterCondition*);
-  ~NodeFilterImpl();
 
   short acceptNode(NodeImpl*) const;
+
+  void mark() { m_condition->mark(); };
 
  private:
   NodeFilterImpl(const NodeFilterImpl&);
   NodeFilterImpl& operator=(const NodeFilterImpl&);
 
-  NodeFilterCondition* m_condition;
+  RefPtr<NodeFilterCondition> m_condition;
 };
 
 class TraversalImpl : public Shared<TraversalImpl> {
@@ -54,11 +55,11 @@ class TraversalImpl : public Shared<TraversalImpl> {
                 int whatToShow,
                 NodeFilterImpl*,
                 bool expandEntityReferences);
-  ~TraversalImpl();
+  virtual ~TraversalImpl();
 
-  NodeImpl* root() const { return m_root; }
+  NodeImpl* root() const { return m_root.get(); }
   unsigned whatToShow() const { return m_whatToShow; }
-  NodeFilterImpl* filter() const { return m_filter; }
+  NodeFilterImpl* filter() const { return m_filter.get(); }
   bool expandEntityReferences() const { return m_expandEntityReferences; }
 
   short acceptNode(NodeImpl*) const;
@@ -67,9 +68,9 @@ class TraversalImpl : public Shared<TraversalImpl> {
   TraversalImpl(const TraversalImpl&);
   TraversalImpl& operator=(const TraversalImpl&);
 
-  NodeImpl* m_root;
+  RefPtr<NodeImpl> m_root;
   int m_whatToShow;
-  NodeFilterImpl* m_filter;
+  RefPtr<NodeFilterImpl> m_filter;
   bool m_expandEntityReferences;
 };
 
@@ -85,7 +86,7 @@ class NodeIteratorImpl : public TraversalImpl {
   NodeImpl* previousNode(int& exceptioncode);
   void detach(int& exceptioncode);
 
-  NodeImpl* referenceNode() const { return m_referenceNode; }
+  NodeImpl* referenceNode() const { return m_referenceNode.get(); }
   bool pointerBeforeReferenceNode() const { return m_beforeReferenceNode; }
 
   /**
@@ -105,15 +106,14 @@ class NodeIteratorImpl : public TraversalImpl {
   }
   bool detached() const { return m_detached; }
   void setDetached(bool flag = true) { m_detached = flag; }
-  DocumentImpl* document() const { return m_doc; }
-  void setDocument(DocumentImpl*);
+  DocumentImpl* document() const { return m_doc.get(); }
   NodeImpl* findNextNode(NodeImpl*) const;
   NodeImpl* findPreviousNode(NodeImpl*) const;
 
-  NodeImpl* m_referenceNode;
+  RefPtr<NodeImpl> m_referenceNode;
   bool m_beforeReferenceNode;
   bool m_detached;
-  DocumentImpl* m_doc;
+  RefPtr<DocumentImpl> m_doc;
 };
 
 class TreeWalkerImpl : public TraversalImpl {
@@ -122,9 +122,8 @@ class TreeWalkerImpl : public TraversalImpl {
                  int whatToShow,
                  NodeFilterImpl*,
                  bool expandEntityReferences);
-  ~TreeWalkerImpl();
 
-  NodeImpl* currentNode() const { return m_current; }
+  NodeImpl* currentNode() const { return m_current.get(); }
   void setCurrentNode(NodeImpl*, int& exceptioncode);
 
   NodeImpl* parentNode();
@@ -144,7 +143,7 @@ class TreeWalkerImpl : public TraversalImpl {
 
   bool ancestorRejected(const NodeImpl*) const;
 
-  NodeImpl* m_current;
+  RefPtr<NodeImpl> m_current;
 };
 
 }  // namespace
