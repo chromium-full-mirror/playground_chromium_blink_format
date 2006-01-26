@@ -99,8 +99,9 @@ bool TagNodeListImpl::nodeMatches(NodeImpl* testNode) const {
 #ifndef NDEBUG
 struct NodeImplCounter {
   static int count;
-  ~NodeImplCounter() { /* if (count != 0) fprintf(stderr, "LEAK: %d NodeImpl\n",
-                          count); */
+  ~NodeImplCounter() {
+    if (count != 0)
+      fprintf(stderr, "LEAK: %d NodeImpl\n", count);
   }
 };
 int NodeImplCounter::count = 0;
