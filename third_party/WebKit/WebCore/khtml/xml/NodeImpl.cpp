@@ -468,18 +468,16 @@ EventListener* NodeImpl::getHTMLEventListener(const AtomicString& eventType) {
   return 0;
 }
 
-bool NodeImpl::dispatchEvent(EventImpl* evt,
+bool NodeImpl::dispatchEvent(PassRefPtr<EventImpl> e,
                              int& exceptioncode,
                              bool tempEvent) {
+  RefPtr<EventImpl> evt(e);
   assert(!eventDispatchForbidden());
   if (!evt || evt->type().isEmpty()) {
     exceptioncode = EventException::_EXCEPTION_OFFSET +
                     EventException::UNSPECIFIED_EVENT_TYPE_ERR;
     return false;
   }
-
-  evt->ref();
-
   evt->setTarget(this);
 
   // We've had at least one report of a crash on a page where document is null
@@ -506,18 +504,16 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
   // have a reference to it in a variable.
   // So there is no need for the interpreter to keep the event in it's cache
   if (tempEvent && frame && frame->jScript())
-    frame->jScript()->finishedWithEvent(evt);
-
-  evt->deref();
+    frame->jScript()->finishedWithEvent(evt.get());
 
   return ret;
 }
 
-bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
+bool NodeImpl::dispatchGenericEvent(PassRefPtr<EventImpl> e,
+                                    int& /*exceptioncode */) {
+  RefPtr<EventImpl> evt(e);
   assert(!eventDispatchForbidden());
   assert(evt->target());
-
-  evt->ref();
 
   // ### check that type specified
 
@@ -534,7 +530,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   // Before we begin dispatching events, give the target node a chance to do
   // some work prior
   // to the DOM event handlers getting a crack.
-  void* data = preDispatchEventHandler(evt);
+  void* data = preDispatchEventHandler(evt.get());
 
   // trigger any capturing event handlers on our way down
   evt->setEventPhase(Event::CAPTURING_PHASE);
@@ -542,7 +538,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   for (; it.current() && it.current() != this && !evt->propagationStopped();
        ++it) {
     evt->setCurrentTarget(it.current());
-    it.current()->handleLocalEvents(evt, true);
+    it.current()->handleLocalEvents(evt.get(), true);
   }
 
   // dispatch to the actual target node
@@ -552,7 +548,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
     evt->setCurrentTarget(it.current());
 
     if (!evt->propagationStopped())
-      it.current()->handleLocalEvents(evt, false);
+      it.current()->handleLocalEvents(evt.get(), false);
   }
   --it;
 
@@ -575,7 +571,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
          it.current() && !evt->propagationStopped() && !evt->getCancelBubble();
          --it) {
       evt->setCurrentTarget(it.current());
-      it.current()->handleLocalEvents(evt, false);
+      it.current()->handleLocalEvents(evt.get(), false);
     }
   }
 
@@ -585,7 +581,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
            // anything about the default event handler phase.
 
   // Now call the post dispatch.
-  postDispatchEventHandler(evt, data);
+  postDispatchEventHandler(evt.get(), data);
 
   if (evt->bubbles()) {
     // now we call all default event handlers (this is not part of DOM - it is
@@ -594,7 +590,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
     it.toLast();
     for (; it.current() && !evt->defaultPrevented() && !evt->defaultHandled();
          --it)
-      it.current()->defaultEventHandler(evt);
+      it.current()->defaultEventHandler(evt.get());
   }
 
   // deref all nodes in chain
@@ -604,12 +600,8 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
 
   DocumentImpl::updateDocumentsRendering();
 
-  bool defaultPrevented = evt->defaultPrevented();
-
-  evt->deref();
-
-  return !defaultPrevented;  // ### what if defaultPrevented was called before
-                             // dispatchEvent?
+  return !evt->defaultPrevented();  // ### what if defaultPrevented was called
+                                    // before dispatchEvent?
 }
 
 bool NodeImpl::dispatchHTMLEvent(const AtomicString& eventType,
@@ -629,7 +621,7 @@ bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
   RefPtr<EventImpl> evt = new EventImpl(eventType, canBubbleArg, cancelableArg);
   RefPtr<DocumentImpl> doc = getDocument();
   evt->setTarget(doc.get());
-  bool r = dispatchGenericEvent(evt.get(), exceptioncode);
+  bool r = dispatchGenericEvent(evt, exceptioncode);
   if (!evt->defaultPrevented() && doc)
     doc->defaultEventHandler(evt.get());
 
@@ -757,17 +749,16 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
 
   bool swallowEvent = false;
 
-  EventImpl* me = new MouseEventImpl(
+  RefPtr<EventImpl> me = new MouseEventImpl(
       eventType, true, cancelable, getDocument()->defaultView(), detail,
       screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey,
       button, 0, 0, isSimulated);
-  me->ref();
+
   dispatchEvent(me, exceptioncode, true);
   bool defaultHandled = me->defaultHandled();
   bool defaultPrevented = me->defaultPrevented();
   if (defaultHandled || defaultPrevented)
     swallowEvent = true;
-  me->deref();
 
   // Special case: If it's a double click event, we also send the KHTML_DBLCLICK
   // event. This is not part
@@ -780,13 +771,11 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
                             getDocument()->defaultView(), detail, screenX,
                             screenY, clientX, clientY, ctrlKey, altKey,
                             shiftKey, metaKey, button, 0, 0, isSimulated);
-    me->ref();
     if (defaultHandled)
       me->setDefaultHandled();
     dispatchEvent(me, exceptioncode, true);
     if (me->defaultHandled() || me->defaultPrevented())
       swallowEvent = true;
-    me->deref();
   }
 
   // Also send a DOMActivate event, which causes things like form submissions to
@@ -881,10 +870,8 @@ bool NodeImpl::dispatchSubtreeModifiedEvent(bool sendChildrenChanged) {
 bool NodeImpl::dispatchKeyEvent(QKeyEvent* key) {
   assert(!eventDispatchForbidden());
   int exceptioncode = 0;
-  // kdDebug(6010) << "DOM::NodeImpl: dispatching keyboard event" << endl;
-  KeyboardEventImpl* keyboardEventImpl =
+  RefPtr<KeyboardEventImpl> keyboardEventImpl =
       new KeyboardEventImpl(key, getDocument()->defaultView());
-  keyboardEventImpl->ref();
   bool r = dispatchEvent(keyboardEventImpl, exceptioncode, true);
 
   // we want to return false if default is prevented (already taken care of)
@@ -893,7 +880,6 @@ bool NodeImpl::dispatchKeyEvent(QKeyEvent* key) {
   if (keyboardEventImpl->defaultHandled())
     r = false;
 
-  keyboardEventImpl->deref();
   return r;
 }
 

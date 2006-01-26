@@ -435,36 +435,22 @@ class MappedAttributeImpl : public AttributeImpl {
   MappedAttributeImpl(const QualifiedName& name,
                       const AtomicString& value,
                       CSSMappedAttributeDeclarationImpl* decl = 0)
-      : AttributeImpl(name, value), m_styleDecl(decl) {
-    if (decl)
-      decl->ref();
-  }
+      : AttributeImpl(name, value), m_styleDecl(decl) {}
 
   MappedAttributeImpl(const AtomicString& name,
                       const AtomicString& value,
                       CSSMappedAttributeDeclarationImpl* decl = 0)
-      : AttributeImpl(name, value), m_styleDecl(decl) {
-    if (decl)
-      decl->ref();
-  }
-
-  ~MappedAttributeImpl();
+      : AttributeImpl(name, value), m_styleDecl(decl) {}
 
   virtual AttributeImpl* clone(bool preserveDecl = true) const;
 
-  virtual CSSStyleDeclarationImpl* style() const { return m_styleDecl; }
+  virtual CSSStyleDeclarationImpl* style() const { return m_styleDecl.get(); }
 
-  CSSMappedAttributeDeclarationImpl* decl() const { return m_styleDecl; }
-  void setDecl(CSSMappedAttributeDeclarationImpl* decl) {
-    if (m_styleDecl)
-      m_styleDecl->deref();
-    m_styleDecl = decl;
-    if (m_styleDecl)
-      m_styleDecl->ref();
-  }
+  CSSMappedAttributeDeclarationImpl* decl() const { return m_styleDecl.get(); }
+  void setDecl(CSSMappedAttributeDeclarationImpl* decl) { m_styleDecl = decl; }
 
  private:
-  CSSMappedAttributeDeclarationImpl* m_styleDecl;
+  RefPtr<CSSMappedAttributeDeclarationImpl> m_styleDecl;
 };
 
 class NamedMappedAttrMapImpl : public NamedAttrMapImpl {
@@ -545,7 +531,7 @@ class StyledElementImpl : public ElementImpl {
                                         const AtomicString& attrValue);
 
   CSSMutableStyleDeclarationImpl* inlineStyleDecl() const {
-    return m_inlineStyleDecl;
+    return m_inlineStyleDecl.get();
   }
   virtual CSSMutableStyleDeclarationImpl* additionalAttributeStyleDecl();
   CSSMutableStyleDeclarationImpl* getInlineStyleDecl();
@@ -566,7 +552,7 @@ class StyledElementImpl : public ElementImpl {
                                          DOMStringImpl* value);
 
  protected:
-  CSSMutableStyleDeclarationImpl* m_inlineStyleDecl;
+  RefPtr<CSSMutableStyleDeclarationImpl> m_inlineStyleDecl;
   mutable bool m_isStyleAttributeValid : 1;
   mutable bool m_synchronizingStyleAttribute : 1;
 };

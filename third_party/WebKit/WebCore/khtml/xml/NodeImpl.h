@@ -294,8 +294,10 @@ class NodeImpl : public TreeShared<NodeImpl> {
   EventListener* getHTMLEventListener(const AtomicString& eventType);
   void removeAllEventListeners();
 
-  bool dispatchEvent(EventImpl*, ExceptionCode&, bool tempEvent = false);
-  bool dispatchGenericEvent(EventImpl*, ExceptionCode&);
+  bool dispatchEvent(PassRefPtr<EventImpl>,
+                     ExceptionCode&,
+                     bool tempEvent = false);
+  bool dispatchGenericEvent(PassRefPtr<EventImpl>, ExceptionCode&);
   bool dispatchHTMLEvent(const AtomicString& eventType,
                          bool canBubble,
                          bool cancelable);

@@ -23,16 +23,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __dom_position_h__
-#define __dom_position_h__
+#ifndef Position_H
+#define Position_H
 
+#include "NodeImpl.h"
 #include "text_affinity.h"
 
 namespace DOM {
 
 class CSSComputedStyleDeclarationImpl;
 class ElementImpl;
-class NodeImpl;
 class RangeImpl;
 
 enum EUsingComposedCharacters {
@@ -44,14 +44,10 @@ class Position {
  public:
   Position() : m_node(0), m_offset(0) {}
   Position(NodeImpl* node, int offset);
-  Position(const Position&);
-  ~Position();
-
-  Position& operator=(const Position& o);
 
   void clear();
 
-  NodeImpl* node() const { return m_node; }
+  NodeImpl* node() const { return m_node.get(); }
   int offset() const { return m_offset; }
 
   bool isNull() const { return m_node == 0; }
@@ -115,7 +111,7 @@ class Position {
   Position previousCharacterPosition(khtml::EAffinity affinity) const;
   Position nextCharacterPosition(khtml::EAffinity affinity) const;
 
-  NodeImpl* m_node;
+  RefPtr<NodeImpl> m_node;
   int m_offset;
 };
 
@@ -137,4 +133,4 @@ void showTree(const Position* pos);
 
 }  // namespace DOM
 
-#endif  // __dom_position_h__
+#endif  // Position_H

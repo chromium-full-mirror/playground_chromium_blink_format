@@ -360,16 +360,12 @@ void HTMLTableElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == borderAttr) {
     m_noBorder = true;
     if (attr->decl()) {
-      CSSValueImpl* val =
+      RefPtr<CSSValueImpl> val =
           attr->decl()->getPropertyCSSValue(CSS_PROP_BORDER_LEFT_WIDTH);
-      if (val) {
-        val->ref();
-        if (val->isPrimitiveValue()) {
-          CSSPrimitiveValueImpl* primVal =
-              static_cast<CSSPrimitiveValueImpl*>(val);
-          m_noBorder = !primVal->getFloatValue(CSSPrimitiveValue::CSS_NUMBER);
-        }
-        val->deref();
+      if (val && val->isPrimitiveValue()) {
+        CSSPrimitiveValueImpl* primVal =
+            static_cast<CSSPrimitiveValueImpl*>(val.get());
+        m_noBorder = !primVal->getFloatValue(CSSPrimitiveValue::CSS_NUMBER);
       }
     } else if (!attr->isNull()) {
       // ### this needs more work, as the border value is not only
@@ -714,10 +710,8 @@ void HTMLTableSectionElementImpl::deleteRow(int index, int& exceptioncode) {
   if (index == -1)
     index = numRows - 1;
   if (index >= 0 && index < numRows) {
-    NodeImpl* row = children->item(index);
-    row->ref();
-    HTMLElementImpl::removeChild(row, exceptioncode);
-    row->deref();
+    RefPtr<NodeImpl> row = children->item(index);
+    HTMLElementImpl::removeChild(row.get(), exceptioncode);
   } else
     exceptioncode = DOMException::INDEX_SIZE_ERR;
 }
@@ -886,10 +880,8 @@ void HTMLTableRowElementImpl::deleteCell(int index, int& exceptioncode) {
   if (index == -1)
     index = numCells - 1;
   if (index >= 0 && index < numCells) {
-    NodeImpl* row = children->item(index);
-    row->ref();
-    HTMLElementImpl::removeChild(row, exceptioncode);
-    row->deref();
+    RefPtr<NodeImpl> row = children->item(index);
+    HTMLElementImpl::removeChild(row.get(), exceptioncode);
   } else
     exceptioncode = DOMException::INDEX_SIZE_ERR;
 }

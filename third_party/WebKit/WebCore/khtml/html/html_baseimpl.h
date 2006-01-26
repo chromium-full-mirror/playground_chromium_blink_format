@@ -80,7 +80,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
   void setVLink(const DOMString&);
 
  protected:
-  CSSMutableStyleDeclarationImpl* m_linkDecl;
+  RefPtr<CSSMutableStyleDeclarationImpl> m_linkDecl;
 };
 
 // -------------------------------------------------------------------------
