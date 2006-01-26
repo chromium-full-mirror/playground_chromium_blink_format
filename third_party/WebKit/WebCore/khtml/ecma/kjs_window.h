@@ -211,6 +211,7 @@ class Window : public JSObject {
     Document,
     Node,
     EventCtor,
+    MutationEventCtor,
     Range,
     NodeFilter,
     DOMException,
