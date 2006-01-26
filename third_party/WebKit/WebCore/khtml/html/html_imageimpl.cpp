@@ -259,8 +259,8 @@ int HTMLImageElementImpl::width(bool ignorePendingStylesheets) const {
     if (ok)
       return width;
 
-    // if the image has been loaded, use its width
-    if (m_imageLoader.imageComplete())
+    // if the image is available, use its width
+    if (m_imageLoader.image())
       return m_imageLoader.image()->valid_rect().width();
   }
 
@@ -282,8 +282,8 @@ int HTMLImageElementImpl::height(bool ignorePendingStylesheets) const {
     if (ok)
       return height;
 
-    // if the image has been loaded, use its height
-    if (m_imageLoader.imageComplete())
+    // if the image is available, use its height
+    if (m_imageLoader.image())
       return m_imageLoader.image()->valid_rect().height();
   }
 
