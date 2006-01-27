@@ -86,7 +86,7 @@ void SVGCursorElementImpl::parseMappedAttribute(
 
 void SVGCursorElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
   if (finishedObj == m_cachedImage) {
-    m_image = m_cachedImage->pixmap();
+    m_image = m_cachedImage->image();
     m_cachedImage->deref(this);
     m_cachedImage = 0;
   }

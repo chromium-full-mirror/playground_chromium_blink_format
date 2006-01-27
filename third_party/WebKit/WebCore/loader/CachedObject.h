@@ -64,7 +64,7 @@ class Request;
 class CachedObject {
  public:
   enum Type {
-    Image,
+    ImageResource,
     CSSStyleSheet,
     Script
 #ifdef KHTML_XSLT

@@ -35,8 +35,6 @@
 #include <qfontmetrics.h>
 #include <qpainter.h>
 
-class QPaintDeviceMetrics;
-
 namespace khtml {
 
 class RenderStyle;
@@ -112,7 +110,7 @@ class Font {
 
   const FontDef& getFontDef() const { return fontDef; }
 
-  void update(QPaintDeviceMetrics* devMetrics) const;
+  void update() const;
 
   void drawText(QPainter* p,
                 int x,

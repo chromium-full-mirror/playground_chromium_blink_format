@@ -333,7 +333,7 @@ class Frame : public ObjectContents {
    *
    * @param url is the url of the document to be displayed.  Even if you
    * are generating the HTML on the fly, it may be useful to specify
-   * a directory so that any pixmaps are found.
+   * a directory so that any images are found.
    *
    * @param xOffset is the initial horizontal scrollbar value. Usually
    * you don't want to use this.
@@ -391,7 +391,7 @@ class Frame : public ObjectContents {
    */
   void stop();
 
-  void paint(QPainter*, const IntRect&);
+  void paint(WebCore::QPainter*, const IntRect&);
 
   void setEncoding(const QString& encoding, bool userChosen);
 
@@ -553,12 +553,12 @@ class Frame : public ObjectContents {
   /**
    * Paints the caret.
    */
-  void paintCaret(QPainter* p, const IntRect& rect) const;
+  void paintCaret(WebCore::QPainter* p, const IntRect& rect) const;
 
   /**
     * Paints the drag caret.
     */
-  void paintDragCaret(QPainter* p, const IntRect& rect) const;
+  void paintDragCaret(WebCore::QPainter* p, const IntRect& rect) const;
 
   /**
    * Set info for vertical arrow navigation.

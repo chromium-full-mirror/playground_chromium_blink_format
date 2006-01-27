@@ -28,7 +28,9 @@
 
 #include "KWQEvent.h"
 
+namespace WebCore {
 class QPainter;
+}
 
 namespace KParts {
 

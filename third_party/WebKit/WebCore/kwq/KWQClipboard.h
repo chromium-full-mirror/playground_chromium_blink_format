@@ -29,7 +29,7 @@
 #ifndef KWQCLIPBOARD_H_
 #define KWQCLIPBOARD_H_
 
-#include "KWQPixmap.h"
+#include "Image.h"
 #include "xml/dom2_eventsimpl.h"
 #include "IntPoint.h"
 
@@ -45,6 +45,8 @@ typedef unsigned NSDragOperation;
 
 class MacFrame;
 class QStringList;
+
+namespace WebCore {
 
 class KWQClipboard : public DOM::ClipboardImpl {
  public:
@@ -79,8 +81,8 @@ class KWQClipboard : public DOM::ClipboardImpl {
   virtual QStringList types() const;
 
   IntPoint dragLocation() const;  // same point as client passed us
-  QPixmap dragImage() const;
-  void setDragImage(const QPixmap&, const IntPoint&);
+  Image dragImage() const;
+  void setDragImage(const Image&, const IntPoint&);
   DOM::NodeImpl* dragImageElement();
   void setDragImageElement(DOM::NodeImpl*, const IntPoint&);
 
@@ -99,19 +101,23 @@ class KWQClipboard : public DOM::ClipboardImpl {
   void setDragHasStarted() { m_dragStarted = true; }
 
  private:
-  void setDragImage(const QPixmap& pm, DOM::NodeImpl*, const IntPoint& loc);
+  void setDragImage(const Image& pm, DOM::NodeImpl*, const IntPoint& loc);
 
   NSPasteboard* m_pasteboard;
   bool m_forDragging;
   DOM::DOMString m_dropEffect;
   DOM::DOMString m_effectAllowed;
   IntPoint m_dragLoc;
-  QPixmap m_dragImage;
+  Image m_dragImage;
   RefPtr<DOM::NodeImpl> m_dragImageElement;
   AccessPolicy m_policy;
   int m_changeCount;
   bool m_dragStarted;
   MacFrame* m_frame;  // used on the source side to generate dragging images
 };
+}
+
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::KWQClipboard;
 
 #endif

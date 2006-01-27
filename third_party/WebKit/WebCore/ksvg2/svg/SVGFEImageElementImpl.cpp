@@ -92,7 +92,7 @@ void SVGFEImageElementImpl::parseMappedAttribute(
 
 void SVGFEImageElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
   if (finishedObj == m_cachedImage) {
-    filterEffect()->setPixmap(m_cachedImage->pixmap());
+    filterEffect()->setImage(m_cachedImage->image());
 
     m_cachedImage->deref(this);
     m_cachedImage = 0;

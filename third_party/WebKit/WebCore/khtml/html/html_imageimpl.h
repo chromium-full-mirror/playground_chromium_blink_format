@@ -31,13 +31,12 @@
 #include "render_object.h"
 #include <qregion.h>
 
-class QPixmap;
-
 namespace WebCore {
 
 class DOMString;
 class HTMLCollectionImpl;
 class HTMLFormElementImpl;
+class Image;
 
 class HTMLImageLoader : public CachedObjectClient {
  public:
@@ -98,7 +97,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
 
   QString compositeOperator() const { return _compositeOperator; }
 
-  const QPixmap& pixmap() { return m_imageLoader.image()->pixmap(); }
+  const Image& image() { return m_imageLoader.image()->image(); }
 
   DOMString name() const;
   void setName(const DOMString&);

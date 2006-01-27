@@ -32,12 +32,11 @@
 #include <qobject.h>
 #include <khtml_settings.h>
 
-class QPixmap;
-
 namespace WebCore {
 class DocLoader;
 class CachedImageCallback;
 class Cache;
+class Image;
 
 class CachedImage : public QObject, public CachedObject {
  public:
@@ -47,13 +46,13 @@ class CachedImage : public QObject, public CachedObject {
               time_t expireDate);
   virtual ~CachedImage();
 
-  const QPixmap& pixmap() const;
-  const QPixmap& tiled_pixmap(const Color& background);
+  const Image& image() const;
+  const Image& tiled_image(const Color& background);
 
-  IntSize pixmap_size()
+  IntSize image_size()
       const;  // returns the size of the complete (i.e. when finished) loading
   IntRect valid_rect()
-      const;  // returns the rectangle of pixmap that has been loaded already
+      const;  // returns the rectangle of image that has been loaded already
 
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
@@ -75,12 +74,12 @@ class CachedImage : public QObject, public CachedObject {
   void clear();
 
  private:
-  void do_notify(const QPixmap&, const IntRect&);
+  void do_notify(const Image&, const IntRect&);
 
-  QPixmap* p;
-  QPixmap* bg;
+  Image* p;
+  Image* bg;
   unsigned bgColor;
-  mutable QPixmap* pixPart;
+  mutable Image* pixPart;
 
   int width;
   int height;

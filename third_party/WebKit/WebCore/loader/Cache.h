@@ -33,7 +33,6 @@
 #include <qptrlist.h>
 #include <qstring.h>
 
-class QPixmap;
 class KURL;
 
 namespace khtml {
@@ -43,6 +42,7 @@ class CachedObject;
 class CachedScript;
 class CachedXSLStyleSheet;
 class DocLoader;
+class Image;
 class Loader;
 struct LRUList;
 
@@ -156,8 +156,8 @@ class Cache {
 
   static Loader* loader() { return m_loader; }
 
-  static QPixmap* nullPixmap;
-  static QPixmap* brokenPixmap;
+  static Image* nullImage;
+  static Image* brokenImage;
 
   struct TypeStatistic {
     int count;

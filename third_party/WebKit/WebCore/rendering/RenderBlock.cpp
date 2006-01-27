@@ -1387,7 +1387,7 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
                                     ? PaintActionChildBlockBackground
                                     : i.phase,
                       paintingRootForChildren(i));
-  bool isPrinting = (i.p->device()->devType() == QInternal::Printer);
+  bool isPrinting = i.p->printing();
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
@@ -1464,7 +1464,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
     paintChildren(i, scrolledX, scrolledY);
 
   // 3. paint selection
-  bool isPrinting = (i.p->device()->devType() == QInternal::Printer);
+  bool isPrinting = i.p->printing();
   if (!inlineFlow && !isPrinting)
     paintSelection(
         i, scrolledX,

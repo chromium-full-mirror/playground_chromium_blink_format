@@ -123,7 +123,7 @@ void Loader::servePendingRequests() {
           SLOT(slotReceivedResponse(KIO::Job*, NSURLResponse*)));
 
   if (KWQServeRequest(this, req, job)) {
-    if (req->object->type() == CachedObject::Image) {
+    if (req->object->type() == CachedObject::ImageResource) {
       CachedImage* ci = static_cast<CachedImage*>(req->object);
       if (ci->decoderCallback())
         m_requestsBackgroundDecoding.append(req);
@@ -145,7 +145,7 @@ void Loader::slotFinished(KIO::Job* job, NSData* allData) {
   DocLoader* docLoader = r->m_docLoader;
 
   bool backgroundImageDecoding =
-      (object->type() == CachedObject::Image &&
+      (object->type() == CachedObject::ImageResource &&
        static_cast<CachedImage*>(object)->decoderCallback());
 
   if (j->error() || j->isErrorPage()) {

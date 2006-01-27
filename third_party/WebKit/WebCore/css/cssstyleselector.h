@@ -152,8 +152,6 @@ class CSSStyleSelector : public StyleSelector {
 
   Color getColorFromPrimitiveValue(DOM::CSSPrimitiveValueImpl* primitiveValue);
 
-  QPaintDeviceMetrics* paintMetrics() const { return paintDeviceMetrics; }
-
  protected:
   /* checks if a compound selector (which can consist of multiple simple
      selectors)
@@ -248,7 +246,6 @@ class CSSStyleSelector : public StyleSelector {
   FrameView* view;
   Frame* frame;
   const KHTMLSettings* settings;
-  QPaintDeviceMetrics* paintDeviceMetrics;
   bool fontDirty;
   bool isXMLDoc;
 

@@ -28,7 +28,7 @@
 #include "HTMLElementImpl.h"
 #include "render_replaced.h"
 #include "dom_string.h"
-#include <qpixmap.h>
+#include "Image.h"
 
 namespace WebCore {
 
@@ -49,9 +49,9 @@ class RenderImage : public RenderReplaced {
 
   virtual void layout();
 
-  virtual void setPixmap(const QPixmap&, const IntRect&, CachedImage*);
+  virtual void setImage(const Image&, const IntRect&, CachedImage*);
 
-  const QPixmap& pixmap() const { return pix; }
+  const Image& image() const { return pix; }
   // don't even think about making this method virtual!
   HTMLElementImpl* element() const {
     return static_cast<HTMLElementImpl*>(RenderReplaced::element());
@@ -62,7 +62,7 @@ class RenderImage : public RenderReplaced {
   void updateAltText();
 
   void setImage(CachedImage* image);
-  CachedImage* getImage() const { return image; }
+  CachedImage* getImage() const { return m_image; }
 
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
@@ -95,17 +95,17 @@ class RenderImage : public RenderReplaced {
    * from the internet for example.
    */
 
-  QPixmap pix;
+  Image pix;
 
   /*
    * Cache for images that need resizing
    */
-  QPixmap resizeCache;
+  Image resizeCache;
 
   // text to display as long as the image isn't available
   DOMString alt;
 
-  CachedImage* image;
+  CachedImage* m_image;
   bool berrorPic : 1;
 };
 

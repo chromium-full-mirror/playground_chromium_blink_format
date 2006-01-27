@@ -37,11 +37,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
-class IntPointArray;
 class QFont;
-class QPaintDevice;
-class QPainterPrivate;
-class QPixmap;
 class QString;
 class QWidget;
 
@@ -49,6 +45,11 @@ class QWidget;
 class KRenderingDevice;
 class KRenderingDeviceContext;
 #endif
+
+namespace WebCore {
+
+class Image;
+class QPainterPrivate;
 
 class QPainter : public Qt {
  public:
@@ -58,8 +59,6 @@ class QPainter : public Qt {
   QPainter();
   QPainter(bool forPrinting);
   ~QPainter();
-
-  QPaintDevice* device() const;
 
   const QFont& font() const;
   void setFont(const QFont&);
@@ -89,106 +88,102 @@ class QPainter : public Qt {
   void fillRect(int, int, int, int, const WebCore::Brush&);
   void fillRect(const IntRect&, const WebCore::Brush&);
 
-  void drawPixmap(const IntPoint&, const QPixmap&);
-  void drawPixmap(const IntPoint&, const QPixmap&, const IntRect&);
-  void drawPixmap(const IntPoint&,
-                  const QPixmap&,
-                  const IntRect&,
-                  const QString&);
+  void drawImage(const IntPoint&, const Image&);
+  void drawImage(const IntPoint&, const Image&, const IntRect&);
+  void drawImage(const IntPoint&, const Image&, const IntRect&, const QString&);
 #if __APPLE__
-  void drawPixmap(int x,
-                  int y,
-                  const QPixmap&,
-                  int sx = 0,
-                  int sy = 0,
-                  int sw = -1,
-                  int sh = -1,
-                  int compositeOperator = -1,
-                  CGContextRef context = 0);
-  void drawPixmap(int x,
-                  int y,
-                  int w,
-                  int h,
-                  const QPixmap&,
-                  int sx = 0,
-                  int sy = 0,
-                  int sw = -1,
-                  int sh = -1,
-                  int compositeOperator = -1,
-                  CGContextRef context = 0);
-  void drawFloatPixmap(float x,
-                       float y,
-                       float w,
-                       float h,
-                       const QPixmap&,
-                       float sx = 0,
-                       float sy = 0,
-                       float sw = -1,
-                       float sh = -1,
-                       int compositeOperator = -1,
-                       CGContextRef context = 0);
-  void drawTiledPixmap(int,
-                       int,
-                       int,
-                       int,
-                       const QPixmap&,
-                       int sx = 0,
-                       int sy = 0,
-                       CGContextRef context = 0);
-  void drawScaledAndTiledPixmap(int,
-                                int,
-                                int,
-                                int,
-                                const QPixmap&,
-                                int,
-                                int,
-                                int,
-                                int,
-                                TileRule hRule = STRETCH,
-                                TileRule vRule = STRETCH,
-                                CGContextRef context = 0);
+  void drawImage(int x,
+                 int y,
+                 const Image&,
+                 int sx = 0,
+                 int sy = 0,
+                 int sw = -1,
+                 int sh = -1,
+                 int compositeOperator = -1,
+                 CGContextRef context = 0);
+  void drawImage(int x,
+                 int y,
+                 int w,
+                 int h,
+                 const Image&,
+                 int sx = 0,
+                 int sy = 0,
+                 int sw = -1,
+                 int sh = -1,
+                 int compositeOperator = -1,
+                 CGContextRef context = 0);
+  void drawFloatImage(float x,
+                      float y,
+                      float w,
+                      float h,
+                      const Image&,
+                      float sx = 0,
+                      float sy = 0,
+                      float sw = -1,
+                      float sh = -1,
+                      int compositeOperator = -1,
+                      CGContextRef context = 0);
+  void drawTiledImage(int,
+                      int,
+                      int,
+                      int,
+                      const Image&,
+                      int sx = 0,
+                      int sy = 0,
+                      CGContextRef context = 0);
+  void drawScaledAndTiledImage(int,
+                               int,
+                               int,
+                               int,
+                               const Image&,
+                               int,
+                               int,
+                               int,
+                               int,
+                               TileRule hRule = STRETCH,
+                               TileRule vRule = STRETCH,
+                               CGContextRef context = 0);
 #else
-  void drawPixmap(int x,
-                  int y,
-                  const QPixmap&,
-                  int sx = 0,
-                  int sy = 0,
-                  int sw = -1,
-                  int sh = -1,
-                  int compositeOperator = -1);
-  void drawPixmap(int x,
-                  int y,
-                  int w,
-                  int h,
-                  const QPixmap&,
-                  int sx = 0,
-                  int sy = 0,
-                  int sw = -1,
-                  int sh = -1,
-                  int compositeOperator = -1);
-  void drawFloatPixmap(float x,
-                       float y,
-                       float w,
-                       float h,
-                       const QPixmap&,
-                       float sx = 0,
-                       float sy = 0,
-                       float sw = -1,
-                       float sh = -1,
-                       int compositeOperator = -1);
-  void
-  drawTiledPixmap(int, int, int, int, const QPixmap&, int sx = 0, int sy = 0);
-  void drawScaledAndTiledPixmap(int,
-                                int,
-                                int,
-                                int,
-                                const QPixmap&,
-                                int,
-                                int,
-                                int,
-                                int,
-                                TileRule hRule = STRETCH,
-                                TileRule vRule = STRETCH);
+  void drawImage(int x,
+                 int y,
+                 const Image&,
+                 int sx = 0,
+                 int sy = 0,
+                 int sw = -1,
+                 int sh = -1,
+                 int compositeOperator = -1);
+  void drawImage(int x,
+                 int y,
+                 int w,
+                 int h,
+                 const Image&,
+                 int sx = 0,
+                 int sy = 0,
+                 int sw = -1,
+                 int sh = -1,
+                 int compositeOperator = -1);
+  void drawFloatImage(float x,
+                      float y,
+                      float w,
+                      float h,
+                      const Image&,
+                      float sx = 0,
+                      float sy = 0,
+                      float sw = -1,
+                      float sh = -1,
+                      int compositeOperator = -1);
+  void drawTiledImage(int, int, int, int, const Image&, int sx = 0, int sy = 0);
+  void drawScaledAndTiledImage(int,
+                               int,
+                               int,
+                               int,
+                               const Image&,
+                               int,
+                               int,
+                               int,
+                               int,
+                               TileRule hRule = STRETCH,
+                               TileRule vRule = STRETCH);
 #endif
 
   void addClip(const IntRect&);
@@ -287,6 +282,8 @@ class QPainter : public Qt {
   static void setCompositeOperation(CGContextRef context, int operation);
 #endif
 
+  bool printing() const { return _isForPrinting; }
+
  private:
   // no copying or assignment
   QPainter(const QPainter&);
@@ -304,5 +301,9 @@ class QPainter : public Qt {
   bool _usesInactiveTextBackgroundColor;
   bool _updatingControlTints;
 };
+}
+
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::QPainter;
 
 #endif

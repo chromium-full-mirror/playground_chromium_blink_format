@@ -50,7 +50,7 @@ class RenderListMarker : public RenderBox {
   virtual void layout();
   virtual void calcMinMaxWidth();
 
-  virtual void setPixmap(const QPixmap&, const IntRect&, CachedImage*);
+  virtual void setImage(const Image&, const IntRect&, CachedImage*);
 
   virtual void calcWidth();
 
@@ -75,7 +75,6 @@ class RenderListMarker : public RenderBox {
 
   QString m_item;
   CachedImage* m_listImage;
-  QPixmap m_listPixmap;
   int m_value;
   RenderListItem* m_listItem;
 };

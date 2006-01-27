@@ -428,7 +428,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
 
   CachedImage* bg = bgLayer->backgroundImage();
   bool shouldPaintBackgroundImage =
-      bg && bg->pixmap_size() == bg->valid_rect().size() &&
+      bg && bg->image_size() == bg->valid_rect().size() &&
       !bg->isTransparent() && !bg->isErrorImage();
   Color bgColor = c;
 
@@ -530,8 +530,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       int pw = w - hpab;
       int ph = h - vpab;
 
-      int pixw = bg->pixmap_size().width();
-      int pixh = bg->pixmap_size().height();
+      int pixw = bg->image_size().width();
+      int pixh = bg->image_size().height();
       EBackgroundRepeat bgr = bgLayer->backgroundRepeat();
       if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && w > pixw) {
         cw = pixw;
@@ -597,8 +597,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       int pw = vr.width();
       int ph = vr.height();
 
-      int pixw = bg->pixmap_size().width();
-      int pixh = bg->pixmap_size().height();
+      int pixw = bg->image_size().width();
+      int pixh = bg->image_size().height();
       EBackgroundRepeat bgr = bgLayer->backgroundRepeat();
       if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && pw > pixw) {
         cw = pixw;
@@ -636,7 +636,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
     }
 
     if (cw > 0 && ch > 0)
-      p->drawTiledPixmap(cx, cy, cw, ch, bg->tiled_pixmap(c), sx, sy);
+      p->drawTiledImage(cx, cy, cw, ch, bg->tiled_image(c), sx, sy);
   }
 
   if (bgLayer->backgroundClip() != BGBORDER)

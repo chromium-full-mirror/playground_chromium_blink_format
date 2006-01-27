@@ -115,6 +115,6 @@ class RenderWidget : public QObject, public RenderReplaced {
   FrameView* m_view;
   int m_refCount;
 };
-};
+}
 
 #endif

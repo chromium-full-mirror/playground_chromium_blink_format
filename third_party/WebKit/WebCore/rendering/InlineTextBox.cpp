@@ -264,7 +264,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   if ((xPos >= i.r.x() + i.r.width()) || (xPos + w <= i.r.x()))
     return;
 
-  bool isPrinting = (i.p->device()->devType() == QInternal::Printer);
+  bool isPrinting = i.p->printing();
 
   // Determine whether or not we're selected.
   bool haveSelection =
