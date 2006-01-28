@@ -698,9 +698,6 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   // come after the mouseout events
   m_frame->executeScheduledScript();
 
-  d->prevMouseX = xm;
-  d->prevMouseY = ym;
-
   if (!swallowEvent) {
     MouseMoveEvent event(_mouse, xm, ym, mev.url, mev.target,
                          mev.innerNode.get());
@@ -1071,7 +1068,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
       // more,
       // so we could be sending a mouseout to a node that never got a mouseover.
       RefPtr<NodeImpl> oldUnder;
-      if (d->prevMouseX >= 0 && d->prevMouseY >= 0) {
+      if (d->prevMouseX >= 0) {
         NodeImpl::MouseEvent mev(
             _mouse->stateAfter(),
             static_cast<NodeImpl::MouseEventType>(mouseEventType));
@@ -1081,13 +1078,16 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
         if (oldUnder && oldUnder->isTextNode())
           oldUnder = oldUnder->parentNode();
       }
+      d->prevMouseX = clientX;
+      d->prevMouseY = clientY;
       if (oldUnder != targetNode) {
         // send mouseout event to the old node
         if (oldUnder)
-          oldUnder->dispatchMouseEvent(_mouse, mouseoutEvent);
+          oldUnder->dispatchMouseEvent(_mouse, mouseoutEvent, 0, targetNode);
         // send mouseover event to the new node
         if (targetNode)
-          targetNode->dispatchMouseEvent(_mouse, mouseoverEvent);
+          targetNode->dispatchMouseEvent(_mouse, mouseoverEvent, 0,
+                                         oldUnder.get());
       }
     }
   }

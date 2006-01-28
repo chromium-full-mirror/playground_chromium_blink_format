@@ -306,7 +306,8 @@ class NodeImpl : public TreeShared<NodeImpl> {
                            bool cancelable);
   bool dispatchMouseEvent(QMouseEvent*,
                           const AtomicString& overrideType,
-                          int overrideDetail = 0);
+                          int overrideDetail = 0,
+                          NodeImpl* relatedTarget = 0);
   bool dispatchSimulatedMouseEvent(const AtomicString& eventType);
   bool dispatchMouseEvent(const AtomicString& eventType,
                           int button,
@@ -319,7 +320,8 @@ class NodeImpl : public TreeShared<NodeImpl> {
                           bool altKey,
                           bool shiftKey,
                           bool metaKey,
-                          bool isSimulated = false);
+                          bool isSimulated = false,
+                          NodeImpl* relatedTarget = 0);
   bool dispatchUIEvent(const AtomicString& eventType, int detail = 0);
   bool dispatchSubtreeModifiedEvent(bool childrenChanged = true);
   bool dispatchKeyEvent(QKeyEvent*);
