@@ -21,6 +21,10 @@
 #include "config.h"
 #include "Page.h"
 #include "Frame.h"
+#include <kjs/collector.h>
+#include <kjs/JSLock.h>
+
+using namespace KJS;
 
 static int pageCount;
 
@@ -30,6 +34,12 @@ Page::Page(PassRefPtr<Frame> mainFrame) : m_mainFrame(mainFrame) {
 
 Page::~Page() {
   m_mainFrame->detachFromView();
-  if (!--pageCount)
+  if (!--pageCount) {
     Frame::endAllLifeSupport();
+#ifndef NDEBUG
+    m_mainFrame = 0;
+    JSLock lock;
+    Collector::collect();
+#endif
+  }
 }
