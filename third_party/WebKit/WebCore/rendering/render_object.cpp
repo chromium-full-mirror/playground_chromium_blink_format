@@ -737,9 +737,7 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
 
   // Make sure we have a valid background image.
   CachedImage* bg = bgLayer->backgroundImage();
-  bool shouldPaintBackgroundImage =
-      bg && bg->image_size() == bg->valid_rect().size() &&
-      !bg->isTransparent() && !bg->isErrorImage();
+  bool shouldPaintBackgroundImage = bg && bg->isDecoded();
 
   // These are always percents or auto.
   if (shouldPaintBackgroundImage &&
@@ -752,10 +750,7 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
   if (style()->hasBorder()) {
     // Border images are not ok.
     CachedImage* borderImage = style()->borderImage().image();
-    bool shouldPaintBorderImage =
-        borderImage &&
-        borderImage->image_size() == borderImage->valid_rect().size() &&
-        !borderImage->isTransparent() && !borderImage->isErrorImage();
+    bool shouldPaintBorderImage = borderImage && borderImage->isDecoded();
     if (shouldPaintBorderImage && borderImage->isLoaded())
       return true;  // If the image hasn't loaded, we're still using the normal
                     // border style.
@@ -1171,10 +1166,7 @@ void RenderObject::paintBorder(QPainter* p,
                                bool begin,
                                bool end) {
   CachedImage* borderImage = style->borderImage().image();
-  bool shouldPaintBackgroundImage =
-      borderImage &&
-      borderImage->image_size() == borderImage->valid_rect().size() &&
-      !borderImage->isTransparent() && !borderImage->isErrorImage();
+  bool shouldPaintBackgroundImage = borderImage && borderImage->isDecoded();
   if (shouldPaintBackgroundImage)
     shouldPaintBackgroundImage = paintBorderImage(p, _tx, _ty, w, h, style);
 
@@ -2643,7 +2635,7 @@ void RenderObject::setImage(const Image&, const IntRect&, CachedImage* image) {
   // would avoid putting this function and the CachedObjectClient base class
   // into RenderObject.
 
-  if (image && image->image_size() == image->valid_rect().size() && parent()) {
+  if (image && image->imageSize() == image->decodedRect().size() && parent()) {
     if (canvas() && element() &&
         (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
       canvas()->repaint();  // repaint the entire canvas since the background

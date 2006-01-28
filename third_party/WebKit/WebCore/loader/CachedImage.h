@@ -29,16 +29,15 @@
 #define KHTML_CachedImage_h
 
 #include "CachedObject.h"
-#include <qobject.h>
 #include <khtml_settings.h>
 
 namespace WebCore {
+
 class DocLoader;
-class CachedImageCallback;
 class Cache;
 class Image;
 
-class CachedImage : public QObject, public CachedObject {
+class CachedImage : public CachedObject {
  public:
   CachedImage(DocLoader*,
               const DOMString& url,
@@ -47,12 +46,18 @@ class CachedImage : public QObject, public CachedObject {
   virtual ~CachedImage();
 
   const Image& image() const;
-  const Image& tiled_image(const Color& background);
 
-  IntSize image_size()
-      const;  // returns the size of the complete (i.e. when finished) loading
-  IntRect valid_rect()
-      const;  // returns the rectangle of image that has been loaded already
+  IntSize imageSize() const;  // returns the size of the complete image
+
+  // This method indicates that the decoded frame of the image is fully
+  // available and that the image
+  // is not the error image.
+  bool isDecoded() const {
+    return !isErrorImage() && imageSize() == decodedRect().size();
+  }
+  IntRect decodedRect() const;  // returns the rectangle that represents the
+                                // portion of the image that has been decoded
+                                // already
 
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
@@ -60,8 +65,7 @@ class CachedImage : public QObject, public CachedObject {
   virtual void data(QBuffer&, bool atEnd);
   virtual void error(int code, const char* message);
 
-  bool isTransparent() const { return isFullyTransparent; }
-  bool isErrorImage() const { return errorOccured; }
+  bool isErrorImage() const { return m_errorOccurred; }
 
   void setShowAnimations(KHTMLSettings::KAnimationAdvice);
 
@@ -74,35 +78,15 @@ class CachedImage : public QObject, public CachedObject {
   void clear();
 
  private:
-  void do_notify(const Image&, const IntRect&);
+  void notifyObservers(const Image&, const IntRect&);
 
-  Image* p;
-  Image* bg;
-  unsigned bgColor;
-  mutable Image* pixPart;
+  Image* m_image;
+  int m_dataSize;
 
-  int width;
-  int height;
-
-  // Is set if movie format type ( incremental/animation) was checked
-  bool typeChecked : 1;
-  bool isFullyTransparent : 1;
-  bool errorOccured : 1;
-  bool monochrome : 1;
+  bool m_errorOccurred : 1;
   KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
 
   friend class Cache;
-
- public:
-  int dataSize() const { return m_dataSize; }
-  CachedImageCallback* decoderCallback() const { return m_decoderCallback; }
-
- private:
-  friend class CachedImageCallback;
-
-  int m_dataSize;
-  CachedImageCallback* m_decoderCallback;
 };
 }
-
 #endif

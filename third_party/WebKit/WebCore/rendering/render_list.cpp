@@ -527,8 +527,8 @@ void RenderListMarker::setImage(const Image& p,
     return;
   }
 
-  if (m_width != m_listImage->image_size().width() ||
-      m_height != m_listImage->image_size().height())
+  if (m_width != m_listImage->imageSize().width() ||
+      m_height != m_listImage->imageSize().height())
     setNeedsLayoutAndMinMaxRecalc();
   else
     repaint();

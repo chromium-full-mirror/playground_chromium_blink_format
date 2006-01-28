@@ -30,7 +30,6 @@
 #include "CachedImage.h"
 
 #include "Cache.h"
-#include "CachedImageCallback.h"
 #include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "DocLoader.h"
@@ -43,22 +42,13 @@ CachedImage::CachedImage(DocLoader* dl,
                          const DOMString& url,
                          KIO::CacheControl _cachePolicy,
                          time_t _expireDate)
-    : QObject(),
-      CachedObject(url, ImageResource, _cachePolicy, _expireDate),
+    : CachedObject(url, ImageResource, _cachePolicy, _expireDate),
       m_dataSize(0) {
-  p = 0;
-  pixPart = 0;
-  bg = 0;
-  isFullyTransparent = false;
-  errorOccured = false;
-  monochrome = false;
+  m_image = 0;
+  m_errorOccurred = false;
   m_status = Unknown;
   m_loading = true;
   m_showAnimations = dl->showAnimations();
-  if (Image::shouldUseThreadedDecoding())
-    m_decoderCallback = new CachedImageCallback(this);
-  else
-    m_decoderCallback = 0;
 }
 
 CachedImage::~CachedImage() {
@@ -69,8 +59,8 @@ void CachedImage::ref(CachedObjectClient* c) {
   CachedObject::ref(c);
 
   // for mouseovers, dynamic changes
-  if (!valid_rect().isNull())
-    c->setImage(image(), valid_rect(), this);
+  if (!decodedRect().isNull())
+    c->setImage(image(), decodedRect(), this);
 
   if (!m_loading)
     c->notifyFinished(this);
@@ -83,29 +73,25 @@ void CachedImage::deref(CachedObjectClient* c) {
     delete this;
 }
 
-const Image& CachedImage::tiled_image(const Color& newc) {
-  return image();
-}
-
 const Image& CachedImage::image() const {
-  if (errorOccured)
+  if (m_errorOccurred)
     return *Cache::brokenImage;
 
-  if (p)
-    return *p;
+  if (m_image)
+    return *m_image;
 
   return *Cache::nullImage;
 }
 
-IntSize CachedImage::image_size() const {
-  return (p ? p->size() : IntSize());
+IntSize CachedImage::imageSize() const {
+  return (m_image ? m_image->size() : IntSize());
 }
 
-IntRect CachedImage::valid_rect() const {
-  return (p ? p->rect() : IntRect());
+IntRect CachedImage::decodedRect() const {
+  return (m_image ? m_image->rect() : IntRect());
 }
 
-void CachedImage::do_notify(const Image& p, const IntRect& r) {
+void CachedImage::notifyObservers(const Image& p, const IntRect& r) {
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next())
     c->setImage(p, r, this);
@@ -117,28 +103,12 @@ void CachedImage::setShowAnimations(
 }
 
 void CachedImage::clear() {
-  delete p;
-  p = 0;
-  delete bg;
-  bg = 0;
-  delete pixPart;
-  pixPart = 0;
-
+  delete m_image;
+  m_image = 0;
   setSize(0);
-
-  if (m_decoderCallback) {
-    m_decoderCallback->clear();
-    m_decoderCallback->deref();
-    m_decoderCallback = 0;
-  }
 }
 
 void CachedImage::data(QBuffer& _buffer, bool eof) {
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << this << "in CachedImage::data(buffersize "
-                << _buffer.buffer().size() << ", eof=" << eof << endl;
-#endif
-
   bool canDraw = false;
 
   m_dataSize = _buffer.size();
@@ -146,47 +116,43 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   // If we're at eof and don't have a image yet, the data
   // must have arrived in one chunk.  This avoids the attempt
   // to perform incremental decoding.
-  if (eof && !p) {
+  if (eof && !m_image) {
 #if __APPLE__
-    p = new Image(_buffer.buffer(), KWQResponseMIMEType(m_response));
+    m_image = new Image(_buffer.buffer(), KWQResponseMIMEType(m_response));
 #endif
-    if (m_decoderCallback)
-      m_decoderCallback->notifyFinished();
     canDraw = true;
   } else {
 // Always attempt to load the image incrementally.
 #if __APPLE__
-    if (!p)
-      p = new Image(KWQResponseMIMEType(m_response));
+    if (!m_image)
+      m_image = new Image(KWQResponseMIMEType(m_response));
 #endif
-    canDraw = p->receivedData(_buffer.buffer(), eof, m_decoderCallback);
+    canDraw = m_image->receivedData(_buffer.buffer(), eof);
   }
 
   // If we have a decoder, we'll be notified when decoding has completed.
-  if (!m_decoderCallback) {
-    if (canDraw || eof) {
-      if (p->isNull()) {
-        errorOccured = true;
-        Image ep = image();
-        do_notify(ep, ep.rect());
-        Cache::remove(this);
-      } else
-        do_notify(*p, p->rect());
+  if (canDraw || eof) {
+    if (m_image->isNull()) {
+      m_errorOccurred = true;
+      Image ep = image();
+      notifyObservers(ep, ep.rect());
+      Cache::remove(this);
+    } else
+      notifyObservers(*m_image, m_image->rect());
 
-      IntSize s = image_size();
-      setSize(s.width() * s.height() * 2);
-    }
-    if (eof) {
-      m_loading = false;
-      checkNotify();
-    }
+    IntSize s = imageSize();
+    setSize(s.width() * s.height() * 2);
+  }
+  if (eof) {
+    m_loading = false;
+    checkNotify();
   }
 }
 
 void CachedImage::error(int /*err*/, const char* /*text*/) {
   clear();
-  errorOccured = true;
-  do_notify(image(), IntRect(0, 0, 16, 16));
+  m_errorOccurred = true;
+  notifyObservers(image(), IntRect(0, 0, 16, 16));
   m_loading = false;
   checkNotify();
 }
@@ -196,8 +162,7 @@ void CachedImage::checkNotify() {
     return;
 
   CachedObjectClientWalker w(m_clients);
-  while (CachedObjectClient* c = w.next()) {
+  while (CachedObjectClient* c = w.next())
     c->notifyFinished(this);
-  }
 }
 }
