@@ -91,7 +91,8 @@ enum RedirectionScheduled {
 
 class FramePrivate {
  public:
-  FramePrivate(QObject* parent, Frame* thisFrame) : m_treeNode(thisFrame) {
+  FramePrivate(Frame* parent, Frame* thisFrame)
+      : m_treeNode(thisFrame), m_parent(parent) {
     m_doc = 0;
     m_jscript = 0;
     m_runningScripts = 0;
@@ -173,6 +174,8 @@ class FramePrivate {
   }
 
   FrameTreeNode m_treeNode;
+  Frame* m_parent;
+  QString m_name;
 
   // old style frame info
   FrameList m_frames;
@@ -219,6 +222,7 @@ class FramePrivate {
   bool m_redirectLockHistory : 1;
   bool m_redirectUserGesture : 1;
 
+  KURL m_url;
   KURL m_workingURL;
 
   KIO::CacheControl m_cachePolicy;

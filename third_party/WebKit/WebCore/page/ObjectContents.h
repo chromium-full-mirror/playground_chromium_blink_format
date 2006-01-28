@@ -32,21 +32,9 @@
 
 class ObjectContents : public QObject {
  public:
-  ObjectContents() : _parent(0), _name(0), _widget(0), _ref(1) {}
+  ObjectContents() : _ref(1) {}
 
-  KURL url() const { return m_url; }
-
-  void setParent(QObject* parent) { _parent = parent; }
-  QObject* parent() const { return _parent; }
-
-  virtual void setName(const QString& name) { _name = name; }
-  QString name() { return _name; }
-
-  virtual bool openURL(const KURL&) = 0;
-  virtual bool closeURL() = 0;
-
-  QWidget* widget() const { return _widget; }
-  void setWidget(QWidget* widget) { _widget = widget; }
+  virtual QWidget* view() const = 0;
 
   void ref() { ++_ref; }
   void deref() {
@@ -54,20 +42,7 @@ class ObjectContents : public QObject {
       delete this;
   }
 
-  bool event(QEvent* event) {
-    customEvent(event);
-    return true;
-  }
-  virtual void customEvent(QCustomEvent*) {}
-
- protected:
-  KURL m_url;
-
  private:
-  virtual bool isObjectContents() const { return true; }
-  QObject* _parent;
-  QString _name;
-  QWidget* _widget;
   unsigned int _ref;
 };
 

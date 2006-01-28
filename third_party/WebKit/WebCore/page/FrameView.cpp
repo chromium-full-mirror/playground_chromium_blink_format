@@ -545,7 +545,7 @@ void FrameView::viewportMousePressEvent(QMouseEvent* _mouse) {
   if (!swallowEvent) {
     MousePressEvent event(_mouse, xm, ym, mev.url, mev.target,
                           mev.innerNode.get());
-    QApplication::sendEvent(m_frame, &event);
+    m_frame->khtmlMousePressEvent(&event);
     // Many AK widgets run their own event loops and consume events while the
     // mouse is down.
     // When they finish, currentEvent is the mouseUp that they exited on.  We
@@ -554,9 +554,8 @@ void FrameView::viewportMousePressEvent(QMouseEvent* _mouse) {
     // If this event isn't a mouseUp, we assume that the mouseUp will be coming
     // later.  There
     // is a hole here if the widget consumes the mouseUp and subsequent events.
-    if (m_frame->lastEventIsMouseUp()) {
+    if (m_frame->lastEventIsMouseUp())
       d->mousePressed = false;
-    }
   }
 }
 
@@ -591,11 +590,11 @@ void FrameView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
   if (!swallowEvent) {
     MouseReleaseEvent event1(_mouse, xm, ym, mev.url, mev.target,
                              mev.innerNode.get());
-    QApplication::sendEvent(m_frame, &event1);
+    m_frame->khtmlMouseReleaseEvent(&event1);
 
     MouseDoubleClickEvent event2(_mouse, xm, ym, mev.url, mev.target,
                                  mev.innerNode.get());
-    QApplication::sendEvent(m_frame, &event2);
+    m_frame->khtmlMouseDoubleClickEvent(&event2);
   }
 
   invalidateClick();
@@ -701,7 +700,7 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   if (!swallowEvent) {
     MouseMoveEvent event(_mouse, xm, ym, mev.url, mev.target,
                          mev.innerNode.get());
-    QApplication::sendEvent(m_frame, &event);
+    m_frame->khtmlMouseMoveEvent(&event);
   }
 }
 
@@ -741,7 +740,7 @@ void FrameView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
   if (!swallowEvent) {
     MouseReleaseEvent event(_mouse, xm, ym, mev.url, mev.target,
                             mev.innerNode.get());
-    QApplication::sendEvent(m_frame, &event);
+    m_frame->khtmlMouseReleaseEvent(&event);
   }
 
   invalidateClick();

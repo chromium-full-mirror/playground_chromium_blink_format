@@ -35,7 +35,8 @@
 #include "text_affinity.h"
 #include "text_granularity.h"
 #include "Color.h"
-#include <qscrollbar.h>
+#include "FrameView.h"
+#include "qscrollbar.h"
 
 class FramePrivate;
 class FrameView;
@@ -809,7 +810,6 @@ class Frame : public ObjectContents {
    */
   void htmlError(int errorCode, const QString& text, const KURL& reqUrl);
 
-  virtual void customEvent(QCustomEvent* event);
   virtual void khtmlMouseDoubleClickEvent(
       WebCore::MouseDoubleClickEvent* event);
   virtual void khtmlMousePressEvent(WebCore::MousePressEvent* event);
@@ -1134,6 +1134,7 @@ class Frame : public ObjectContents {
 
   QChar backslashAsCurrencySymbol() const;
   void setName(const QString& name);
+  const QString& name();
 
   QValueList<MarkedTextUnderline> markedTextUnderlines() const;
   bool markedTextUsesUnderlines() const;
@@ -1198,6 +1199,10 @@ class Frame : public ObjectContents {
   int frameCount;
 
   virtual void detachFromView();
+
+  KURL url() const;
+  void setParent(Frame* parent);
+  Frame* parent() const;
 
   // split out controller objects
   FrameTreeNode* treeNode();
