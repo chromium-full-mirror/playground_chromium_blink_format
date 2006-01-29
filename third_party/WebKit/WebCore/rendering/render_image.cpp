@@ -52,7 +52,6 @@ RenderImage::RenderImage(NodeImpl* _node) : RenderReplaced(_node) {
 RenderImage::~RenderImage() {
   if (m_image)
     m_image->deref(this);
-  pix.decreaseUseCount();
 }
 
 void RenderImage::setStyle(RenderStyle* _style) {
@@ -151,9 +150,7 @@ void RenderImage::setImage(const Image& p, const IntRect& r, CachedImage* o) {
   // Stop the previous image, if it may be animating.
   pix.stopAnimations();
 
-  pix.decreaseUseCount();
   pix = p;
-  p.increaseUseCount();
 
   if (needlayout) {
     if (!selfNeedsLayout())

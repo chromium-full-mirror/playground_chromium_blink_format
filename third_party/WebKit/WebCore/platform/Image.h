@@ -92,11 +92,6 @@ class Image {
   CGImageRef imageRef() const;
 #endif
 
-  void increaseUseCount() const;
-  void decreaseUseCount() const;
-
-  void flushRasterCache();
-
   void stopAnimations();
   void resetAnimation();
   void setAnimationRect(const IntRect&) const;

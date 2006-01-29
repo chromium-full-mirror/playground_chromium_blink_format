@@ -54,9 +54,6 @@ typedef enum {
                    context:(CGContextRef)context;
 - (BOOL)isNull;
 - (id<WebCoreImageRenderer>)retainOrCopyIfNeeded;
-- (void)increaseUseCount;
-- (void)decreaseUseCount;
-- (void)flushRasterCache;
 - (void)resetAnimation;
 - (void)setAnimationRect:(NSRect)r;
 
