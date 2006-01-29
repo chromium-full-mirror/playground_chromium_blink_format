@@ -5376,8 +5376,8 @@ JSValue* KJS::Context2DFunction::callAsFunction(ExecState* exec,
 
       if (!sourceContext) {
         QPainter p;
-        p.drawFloatImage(dx, dy, dw, dh, image, sx, sy, sw, sh,
-                         QPainter::compositeOperatorFromString(
+        p.drawFloatImage(image, dx, dy, dw, dh, sx, sy, sw, sh,
+                         Image::compositeOperatorFromString(
                              contextObject->_globalComposite->toString(exec)
                                  .qstring()
                                  .lower()),
@@ -5450,8 +5450,8 @@ JSValue* KJS::Context2DFunction::callAsFunction(ExecState* exec,
 
       QPainter p;
 
-      p.drawFloatImage(dx, dy, dw, dh, image, sx, sy, sw, sh,
-                       QPainter::compositeOperatorFromString(compositeOperator),
+      p.drawFloatImage(image, dx, dy, dw, dh, sx, sy, sw, sh,
+                       Image::compositeOperatorFromString(compositeOperator),
                        drawingContext);
 
       renderer->setNeedsImageUpdate();
@@ -6312,9 +6312,8 @@ static void drawPattern(void* info, CGContextRef context) {
   if (ref) {
     CGContextDrawImage(context, CGRectMake(0, 0, w, h), ref);
   } else
-    p.drawFloatImage(
-        0, 0, w, h, image, 0.f, 0.f, w, h,
-        QPainter::compositeOperatorFromString(QString("source-over")), context);
+    p.drawFloatImage(image, 0, 0, w, h, 0.f, 0.f, w, h,
+                     Image::CompositeSourceOver, context);
 }
 
 CGPatternCallbacks patternCallbacks = {0, drawPattern, NULL};

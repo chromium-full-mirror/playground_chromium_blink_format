@@ -1058,26 +1058,26 @@ bool RenderObject::paintBorderImage(QPainter* p,
     // The rect to use from within the image is obtained from our slice, and is
     // (0, 0, leftSlice, topSlice)
     if (drawTop)
-      p->drawImage(_tx, _ty, style->borderLeftWidth(), style->borderTopWidth(),
-                   borderImage->image(), 0, 0, leftSlice, topSlice);
+      p->drawImage(borderImage->image(), _tx, _ty, style->borderLeftWidth(),
+                   style->borderTopWidth(), 0, 0, leftSlice, topSlice);
 
     // The bottom left corner rect is (_tx, _ty + h - bottomWidth, leftWidth,
     // bottomWidth)
     // The rect to use from within the image is (0, imageHeight - bottomSlice,
     // leftSlice, botomSlice)
     if (drawBottom)
-      p->drawImage(_tx, _ty + h - style->borderBottomWidth(),
-                   style->borderLeftWidth(), style->borderBottomWidth(),
-                   borderImage->image(), 0, imageHeight - bottomSlice,
-                   leftSlice, bottomSlice);
+      p->drawImage(borderImage->image(), _tx,
+                   _ty + h - style->borderBottomWidth(),
+                   style->borderLeftWidth(), style->borderBottomWidth(), 0,
+                   imageHeight - bottomSlice, leftSlice, bottomSlice);
 
     // Paint the left edge.
     // Have to scale and tile into the border rect.
     p->drawScaledAndTiledImage(
-        _tx, _ty + style->borderTopWidth(), style->borderLeftWidth(),
-        h - style->borderTopWidth() - style->borderBottomWidth(),
-        borderImage->image(), 0, topSlice, leftSlice,
-        imageHeight - topSlice - bottomSlice, QPainter::STRETCH,
+        borderImage->image(), _tx, _ty + style->borderTopWidth(),
+        style->borderLeftWidth(),
+        h - style->borderTopWidth() - style->borderBottomWidth(), 0, topSlice,
+        leftSlice, imageHeight - topSlice - bottomSlice, QPainter::STRETCH,
         (QPainter::TileRule)vRule);
   }
 
@@ -1088,28 +1088,27 @@ bool RenderObject::paintBorderImage(QPainter* p,
     // The rect to use from within the image is obtained from our slice, and is
     // (imageWidth - rightSlice, 0, rightSlice, topSlice)
     if (drawTop)
-      p->drawImage(_tx + w - style->borderRightWidth(), _ty,
-                   style->borderRightWidth(), style->borderTopWidth(),
-                   borderImage->image(), imageWidth - rightSlice, 0, rightSlice,
-                   topSlice);
+      p->drawImage(borderImage->image(), _tx + w - style->borderRightWidth(),
+                   _ty, style->borderRightWidth(), style->borderTopWidth(),
+                   imageWidth - rightSlice, 0, rightSlice, topSlice);
 
     // The bottom right corner rect is (_tx + w - rightWidth, _ty + h -
     // bottomWidth, rightWidth, bottomWidth)
     // The rect to use from within the image is (imageWidth - rightSlice,
     // imageHeight - bottomSlice, rightSlice, botomSlice)
     if (drawBottom)
-      p->drawImage(_tx + w - style->borderRightWidth(),
+      p->drawImage(borderImage->image(), _tx + w - style->borderRightWidth(),
                    _ty + h - style->borderBottomWidth(),
                    style->borderRightWidth(), style->borderBottomWidth(),
-                   borderImage->image(), imageWidth - rightSlice,
-                   imageHeight - bottomSlice, rightSlice, bottomSlice);
+                   imageWidth - rightSlice, imageHeight - bottomSlice,
+                   rightSlice, bottomSlice);
 
     // Paint the right edge.
     p->drawScaledAndTiledImage(
-        _tx + w - style->borderRightWidth(), _ty + style->borderTopWidth(),
-        style->borderRightWidth(),
+        borderImage->image(), _tx + w - style->borderRightWidth(),
+        _ty + style->borderTopWidth(), style->borderRightWidth(),
         h - style->borderTopWidth() - style->borderBottomWidth(),
-        borderImage->image(), imageWidth - rightSlice, topSlice, rightSlice,
+        imageWidth - rightSlice, topSlice, rightSlice,
         imageHeight - topSlice - bottomSlice, QPainter::STRETCH,
         (QPainter::TileRule)vRule);
   }
@@ -1117,29 +1116,30 @@ bool RenderObject::paintBorderImage(QPainter* p,
   // Paint the top edge.
   if (drawTop)
     p->drawScaledAndTiledImage(
-        _tx + style->borderLeftWidth(), _ty,
+        borderImage->image(), _tx + style->borderLeftWidth(), _ty,
         w - style->borderLeftWidth() - style->borderRightWidth(),
-        style->borderTopWidth(), borderImage->image(), leftSlice, 0,
+        style->borderTopWidth(), leftSlice, 0,
         imageWidth - rightSlice - leftSlice, topSlice,
         (QPainter::TileRule)hRule, QPainter::STRETCH);
 
   // Paint the bottom edge.
   if (drawBottom)
     p->drawScaledAndTiledImage(
-        _tx + style->borderLeftWidth(), _ty + h - style->borderBottomWidth(),
+        borderImage->image(), _tx + style->borderLeftWidth(),
+        _ty + h - style->borderBottomWidth(),
         w - style->borderLeftWidth() - style->borderRightWidth(),
-        style->borderBottomWidth(), borderImage->image(), leftSlice,
-        imageHeight - bottomSlice, imageWidth - rightSlice - leftSlice,
-        bottomSlice, (QPainter::TileRule)hRule, QPainter::STRETCH);
+        style->borderBottomWidth(), leftSlice, imageHeight - bottomSlice,
+        imageWidth - rightSlice - leftSlice, bottomSlice,
+        (QPainter::TileRule)hRule, QPainter::STRETCH);
 
   // Paint the middle.
   if (drawMiddle)
     p->drawScaledAndTiledImage(
-        _tx + style->borderLeftWidth(), _ty + style->borderTopWidth(),
+        borderImage->image(), _tx + style->borderLeftWidth(),
+        _ty + style->borderTopWidth(),
         w - style->borderLeftWidth() - style->borderRightWidth(),
-        h - style->borderTopWidth() - style->borderBottomWidth(),
-        borderImage->image(), leftSlice, topSlice,
-        imageWidth - rightSlice - leftSlice,
+        h - style->borderTopWidth() - style->borderBottomWidth(), leftSlice,
+        topSlice, imageWidth - rightSlice - leftSlice,
         imageHeight - topSlice - bottomSlice, (QPainter::TileRule)hRule,
         (QPainter::TileRule)vRule);
 
@@ -2626,7 +2626,7 @@ QChar RenderObject::backslashAsCurrencySymbol() const {
   return codec->backslashAsCurrencySymbol();
 }
 
-void RenderObject::setImage(const Image&, const IntRect&, CachedImage* image) {
+void RenderObject::setImage(CachedImage* image, const IntRect&) {
   // Repaint when the background image or border image finishes loading.
   // This is needed for RenderBox objects, and also for table objects that hold
   // backgrounds that are then respected by the table cells (which are RenderBox

@@ -41,9 +41,6 @@
   NSData* TIFFData;
 
   NSRect targetAnimationRect;
-
-  NSSize adjustedSize;
-  BOOL isSizeAdjusted;
 }
 
 - (id)initWithMIMEType:(NSString*)MIME;
@@ -53,7 +50,6 @@
 + (void)stopAnimationsInView:(NSView*)aView;
 - (int)frameCount;
 - (NSRect)targetAnimationRect;
-- (void)resize:(NSSize)s;
 - (NSSize)size;
 
 @end

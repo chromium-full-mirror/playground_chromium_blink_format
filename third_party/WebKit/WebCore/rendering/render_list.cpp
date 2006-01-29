@@ -440,7 +440,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
     xoff += haveImage ? cMarkerPadding : (m_width - bulletWidth);
 
   if (m_listImage && !m_listImage->isErrorImage()) {
-    p->drawImage(IntPoint(_tx + xoff, _ty), m_listImage->image());
+    p->drawImageAtPoint(m_listImage->image(), IntPoint(_tx + xoff, _ty));
     return;
   }
 
@@ -519,11 +519,9 @@ void RenderListMarker::layout() {
   setNeedsLayout(false);
 }
 
-void RenderListMarker::setImage(const Image& p,
-                                const IntRect& r,
-                                CachedImage* o) {
+void RenderListMarker::imageChanged(CachedImage* o, const IntRect& r) {
   if (o != m_listImage) {
-    RenderBox::setImage(p, r, o);
+    RenderBox::setImage(o, r);
     return;
   }
 

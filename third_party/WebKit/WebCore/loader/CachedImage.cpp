@@ -60,7 +60,7 @@ void CachedImage::ref(CachedObjectClient* c) {
 
   // for mouseovers, dynamic changes
   if (!decodedRect().isNull())
-    c->setImage(image(), decodedRect(), this);
+    c->imageChanged(this, decodedRect());
 
   if (!m_loading)
     c->notifyFinished(this);
@@ -91,10 +91,10 @@ IntRect CachedImage::decodedRect() const {
   return (m_image ? m_image->rect() : IntRect());
 }
 
-void CachedImage::notifyObservers(const Image& p, const IntRect& r) {
+void CachedImage::notifyObservers(const IntRect& r) {
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next())
-    c->setImage(p, r, this);
+    c->imageChanged(this, r);
 }
 
 void CachedImage::setShowAnimations(
@@ -130,11 +130,10 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   if (canDraw || eof) {
     if (m_image->isNull()) {
       m_errorOccurred = true;
-      Image ep = image();
-      notifyObservers(ep, ep.rect());
+      notifyObservers(image().rect());
       Cache::remove(this);
     } else
-      notifyObservers(*m_image, m_image->rect());
+      notifyObservers(m_image->rect());
 
     IntSize s = imageSize();
     setSize(s.width() * s.height() *
@@ -149,7 +148,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
 void CachedImage::error(int /*err*/, const char* /*text*/) {
   clear();
   m_errorOccurred = true;
-  notifyObservers(image(), IntRect(0, 0, 16, 16));
+  notifyObservers(IntRect(0, 0, 16, 16));
   m_loading = false;
   checkNotify();
 }

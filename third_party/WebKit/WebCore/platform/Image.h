@@ -82,8 +82,6 @@ class Image {
   IntRect rect() const;
   int width() const;
   int height() const;
-  void resize(const IntSize&);
-  void resize(int, int);
 
   bool decode(const ByteArray& bytes, bool allDataReceived);
 
@@ -92,15 +90,36 @@ class Image {
   CGImageRef imageRef() const;
 #endif
 
-  void stopAnimations();
-  void resetAnimation();
+  void stopAnimations() const;
+  void resetAnimation() const;
   void setAnimationRect(const IntRect&) const;
+
+  // Note: These constants exactly match the NSCompositeOperator constants of
+  // AppKit.
+  enum CompositeOperator {
+    CompositeClear,
+    CompositeCopy,
+    CompositeSourceOver,
+    CompositeSourceIn,
+    CompositeSourceOut,
+    CompositeSourceAtop,
+    CompositeDestinationOver,
+    CompositeDestinationIn,
+    CompositeDestinationOut,
+    CompositeDestinationAtop,
+    CompositeXOR,
+    CompositePlusDarker,
+    CompositeHighlight,
+    CompositePlusLighter
+  };
+
+  static CompositeOperator compositeOperatorFromString(
+      const QString& compositeOperator);
 
  private:
 #if __APPLE__
   WebCoreImageRendererPtr m_imageRenderer;
 #endif
-  mutable bool m_needCopyOnWrite;
 
   friend class QPainter;
 };

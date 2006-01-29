@@ -39,7 +39,6 @@ typedef enum {
                         callback:(id)c;
 
 - (NSSize)size;
-- (void)resize:(NSSize)s;
 - (void)drawImageInRect:(NSRect)ir fromRect:(NSRect)fr;
 - (void)drawImageInRect:(NSRect)ir
                fromRect:(NSRect)fr
