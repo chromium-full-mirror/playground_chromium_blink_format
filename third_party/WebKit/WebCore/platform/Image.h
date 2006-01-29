@@ -55,20 +55,26 @@ class QPainter;
 class Image {
  public:
   Image();
-  Image(void* MIMEType);
+  Image(const QString& type);
   Image(const IntSize&);
-  Image(const ByteArray&);
-#if __APPLE__
-  Image(const ByteArray&, NSString* MIMEType);
-#endif
+  Image(const ByteArray&, const QString& type);
   Image(int, int);
 #if __APPLE__
   Image(WebCoreImageRendererPtr);
 #endif
+
+  // FIXME: Eliminate these soon and make them private so that Images can't be
+  // copied or assigned.
+  // We will be switching to RefPtr<Image> in WebCore so that Image doesn't have
+  // to do its own
+  // copy-on-write nonsense.
   Image(const Image&);
+  Image& operator=(const Image&);
+
   ~Image();
 
   static Image* loadResource(const char* name);
+  static bool supportsType(const QString& type);
 
   bool isNull() const;
 
@@ -81,10 +87,7 @@ class Image {
 
   bool mask() const;
 
-  Image& operator=(const Image&);
-
-  bool receivedData(const ByteArray& bytes, bool isComplete);
-  void stopAnimations();
+  bool decode(const ByteArray& bytes, bool allDataReceived);
 
 #if __APPLE__
   WebCoreImageRendererPtr imageRenderer() const { return m_imageRenderer; }
@@ -96,20 +99,18 @@ class Image {
 
   void flushRasterCache();
 
+  void stopAnimations();
   void resetAnimation();
   void setAnimationRect(const IntRect&) const;
 
  private:
 #if __APPLE__
   WebCoreImageRendererPtr m_imageRenderer;
-  NSString* m_MIMEType;
 #endif
   mutable bool m_needCopyOnWrite;
 
   friend class QPainter;
 };
-
-bool canRenderImageType(const QString& type);
 }
 
 #endif

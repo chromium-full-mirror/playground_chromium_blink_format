@@ -65,7 +65,7 @@ bool KWQCheckIfReloading(khtml::DocLoader* loader);
 bool KWQIsResponseURLEqualToURL(NSURLResponse* response,
                                 const DOM::DOMString& m_url);
 QString KWQResponseURL(NSURLResponse* response);
-NSString* KWQResponseMIMEType(NSURLResponse* response);
+QString KWQResponseMIMEType(NSURLResponse* response);
 bool KWQResponseIsMultipart(NSURLResponse* response);
 int KWQNumberOfPendingOrLoadingRequests(khtml::DocLoader* dl);
 time_t KWQCacheObjectExpiresTime(khtml::DocLoader* docLoader,
