@@ -263,8 +263,13 @@ void SVGSVGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
       return;
     if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
       return;
-    if (SVGFitToViewBoxImpl::parseMappedAttribute(attr))
-      return;
+    if (SVGFitToViewBoxImpl::parseMappedAttribute(attr)) {
+      if (renderer())
+        static_cast<KCanvasContainer*>(renderer())
+            ->setViewBox(FloatRect(
+                viewBox()->baseVal()->x(), viewBox()->baseVal()->y(),
+                viewBox()->baseVal()->width(), viewBox()->baseVal()->height()));
+    }
     if (SVGZoomAndPanImpl::parseMappedAttribute(attr))
       return;
 
