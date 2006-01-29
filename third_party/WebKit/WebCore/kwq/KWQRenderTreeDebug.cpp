@@ -45,7 +45,7 @@
 
 #include "Frame.h"
 #include "KWQTextStream.h"
-#include "KWQPtrVector.h"
+#include <kxmlcore/Vector.h>
 
 using namespace DOM;
 using namespace khtml;
@@ -379,23 +379,23 @@ static void writeLayers(QTextStream& ts,
   l->updateZOrderLists();
 
   bool shouldPaint = l->intersectsDamageRect(layerBounds, damageRect);
-  QPtrVector<RenderLayer>* negList = l->negZOrderList();
-  if (shouldPaint && negList && negList->count() > 0)
+  Vector<RenderLayer*>* negList = l->negZOrderList();
+  if (shouldPaint && negList && negList->size() > 0)
     write(ts, *l, layerBounds, damageRect, clipRectToApply, outlineRect, -1,
           indent);
 
   if (negList) {
-    for (unsigned i = 0; i != negList->count(); ++i)
+    for (unsigned i = 0; i != negList->size(); ++i)
       writeLayers(ts, rootLayer, negList->at(i), paintDirtyRect, indent);
   }
 
   if (shouldPaint)
     write(ts, *l, layerBounds, damageRect, clipRectToApply, outlineRect,
-          negList && negList->count() > 0, indent);
+          negList && negList->size() > 0, indent);
 
-  QPtrVector<RenderLayer>* posList = l->posZOrderList();
+  Vector<RenderLayer*>* posList = l->posZOrderList();
   if (posList) {
-    for (unsigned i = 0; i != posList->count(); ++i)
+    for (unsigned i = 0; i != posList->size(); ++i)
       writeLayers(ts, rootLayer, posList->at(i), paintDirtyRect, indent);
   }
 }

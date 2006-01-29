@@ -80,8 +80,7 @@ class QComboBox : public QWidget {
 
   mutable int _currentItem;
 
-  // A vector<KWQListBoxItem> or QValueVector<KWQListBoxItem> may be more
-  // efficient for large menus.
+  // A Vector<KWQListBoxItem> may be more efficient for large menus.
   QValueList<KWQListBoxItem> _items;
   mutable bool _menuPopulated;
 

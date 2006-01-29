@@ -26,9 +26,8 @@
 
 #include "Shared.h"
 #include <kxmlcore/HashMap.h>
+#include <kxmlcore/Vector.h>
 
-template <typename T>
-class QPtrVector;
 template <typename T>
 class QValueList;
 
@@ -94,8 +93,8 @@ class HTMLCollectionImpl : public Shared<HTMLCollectionImpl> {
     unsigned int position;
     unsigned int length;
     int elementsArrayPosition;
-    HashMap<AtomicStringImpl*, QPtrVector<NodeImpl>*> idCache;
-    HashMap<AtomicStringImpl*, QPtrVector<NodeImpl>*> nameCache;
+    HashMap<AtomicStringImpl*, Vector<NodeImpl*>*> idCache;
+    HashMap<AtomicStringImpl*, Vector<NodeImpl*>*> nameCache;
     bool haslength;
     bool hasNameCache;
   };

@@ -40,7 +40,7 @@
 #include <kio/job.h>
 #include <kio/jobclasses.h>
 #include <kxmlcore/Assertions.h>
-#include <qptrvector.h>
+#include <kxmlcore/Vector.h>
 
 namespace WebCore {
 
@@ -242,15 +242,16 @@ void Loader::cancelRequests(DocLoader* dl) {
       ++pIt;
   }
 
-  QPtrVector<KIO::Job> jobsToCancel(m_requestsLoading.size());
+  Vector<KIO::Job*, 256> jobsToCancel;
+
   RequestMap::iterator end = m_requestsLoading.end();
   for (RequestMap::iterator i = m_requestsLoading.begin(); i != end; ++i) {
     Request* r = i->second;
     if (r->m_docLoader == dl)
       jobsToCancel.append(i->first);
   }
-  unsigned count = jobsToCancel.count();
-  for (unsigned i = 0; i < count; ++i) {
+
+  for (unsigned i = 0; i < jobsToCancel.size(); ++i) {
     KIO::Job* job = jobsToCancel[i];
     Request* r = m_requestsLoading.get(job);
     m_requestsLoading.remove(job);
