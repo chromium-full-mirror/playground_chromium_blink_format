@@ -102,6 +102,9 @@ class KCanvasFilter : public KCanvasResource {
   FloatRect filterRect() const { return m_filterRect; }
   void setFilterRect(const FloatRect& rect) { m_filterRect = rect; }
 
+  FloatRect filterBBoxForItemBBox(FloatRect itemBBox) const;
+
+  void clearEffects();
   void addFilterEffect(KCanvasFilterEffect* effect);
 
   virtual void prepareFilter(const FloatRect& bbox) = 0;

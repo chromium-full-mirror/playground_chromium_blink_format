@@ -38,7 +38,10 @@ class KCanvasItemQuartz : public RenderPath {
 
   virtual IntRect getAbsoluteRepaintRect();
 
-  virtual bool requiresLayer() { return false; }
+  virtual bool requiresLayer();
+  virtual short lineHeight(bool b, bool isRootLineBox = false) const;
+  virtual short baselinePosition(bool b, bool isRootLineBox = false) const;
+
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
   virtual bool nodeAtPoint(NodeInfo&,

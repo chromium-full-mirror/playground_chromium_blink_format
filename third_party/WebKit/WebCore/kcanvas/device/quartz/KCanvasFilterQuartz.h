@@ -54,8 +54,6 @@ class KCanvasFilterQuartz : public KCanvasFilter {
  private:
   NSArray* getCIFilterStack(CIImage* inputImage);
 
-  CGRect filterBBoxForItemBBox(CGRect itemBBox) const;
-
   CIContext* m_filterCIContext;
   CGLayerRef m_filterCGLayer;
   NSMutableDictionary* m_imagesByName;
