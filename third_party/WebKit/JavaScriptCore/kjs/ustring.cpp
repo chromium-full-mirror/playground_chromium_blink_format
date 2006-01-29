@@ -40,7 +40,7 @@
 #include <math.h>
 #include "dtoa.h"
 
-#include <algorithm>
+#include <kxmlcore/Vector.h>
 
 using std::max;
 
@@ -1268,17 +1268,10 @@ int decodeUTF8Sequence(const char* sequence) {
 CString UString::UTF8String() const {
   // Allocate a buffer big enough to hold all the characters.
   const int length = size();
-  const unsigned bufferSize = length * 3;
-  char fixedSizeBuffer[1024];
-  char* buffer;
-  if (bufferSize > sizeof(fixedSizeBuffer)) {
-    buffer = new char[bufferSize];
-  } else {
-    buffer = fixedSizeBuffer;
-  }
+  Vector<char, 1024> buffer(length * 3);
 
   // Convert to runs of 8-bit characters.
-  char* p = buffer;
+  char* p = buffer.begin();
   const UChar* d = data();
   for (int i = 0; i != length; ++i) {
     unsigned short c = d[i].unicode();
@@ -1307,9 +1300,7 @@ CString UString::UTF8String() const {
 
   // Return the result as a C string.
   CString result(buffer, p - buffer);
-  if (buffer != fixedSizeBuffer) {
-    delete[] buffer;
-  }
+
   return result;
 }
 

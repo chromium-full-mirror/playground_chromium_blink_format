@@ -317,12 +317,17 @@ void HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::clear() {
   m_impl.clear();
 }
 
-template <typename T>
-void deleteAllValues(T& collection) {
-  for (typename T::iterator it = collection.begin(); it != collection.end();
-       ++it) {
+template <typename Key,
+          typename Mapped,
+          typename HashFunctions,
+          typename KeyTraits,
+          typename MappedTraits>
+void deleteAllValues(
+    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>& collection) {
+  typedef HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits> T;
+  typename T::iterator end = collection.end();
+  for (typename T::iterator it = collection.begin(); it != end; ++it)
     delete it->second;
-  }
 }
 
 }  // namespace KXMLCore
