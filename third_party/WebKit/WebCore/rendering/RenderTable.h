@@ -57,12 +57,12 @@ class RenderTable : public RenderBlock {
     Box = 0x0f
   };
 
-  RenderTable(DOM::NodeImpl* node);
+  RenderTable(NodeImpl*);
   ~RenderTable();
 
   virtual const char* renderName() const { return "RenderTable"; }
 
-  virtual void setStyle(RenderStyle* style);
+  virtual void setStyle(RenderStyle*);
 
   virtual bool isTable() const { return true; }
 
@@ -81,8 +81,8 @@ class RenderTable : public RenderBlock {
 
   const Color& bgColor() const { return style()->backgroundColor(); }
 
-  uint cellPadding() const { return padding; }
-  void setCellPadding(uint p) { padding = p; }
+  unsigned cellPadding() const { return padding; }
+  void setCellPadding(unsigned p) { padding = p; }
 
   // overrides
   virtual int overflowHeight(bool includeInterior = true) const {
@@ -92,8 +92,8 @@ class RenderTable : public RenderBlock {
     return width();
   }
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual void paint(PaintInfo& i, int tx, int ty);
-  virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
+  virtual void paintBoxDecorations(PaintInfo&, int _tx, int _ty);
   virtual void layout();
   virtual void calcMinMaxWidth();
 
@@ -113,8 +113,8 @@ class RenderTable : public RenderBlock {
       span = 1;
       width = WidthUndefined;
     }
-    ushort span;
-    uint width;  // the calculated position of the column
+    unsigned short span;
+    unsigned width;  // the calculated position of the column
   };
 
   Array<int> columnPos;
@@ -150,18 +150,18 @@ class RenderTable : public RenderBlock {
 
   void setNeedSectionRecalc() { needSectionRecalc = true; }
 
-  virtual RenderObject* removeChildNode(RenderObject* child);
+  virtual RenderObject* removeChildNode(RenderObject*);
 
-  RenderTableCell* cellAbove(const RenderTableCell* cell) const;
-  RenderTableCell* cellBelow(const RenderTableCell* cell) const;
-  RenderTableCell* cellLeft(const RenderTableCell* cell) const;
-  RenderTableCell* cellRight(const RenderTableCell* cell) const;
+  RenderTableCell* cellAbove(const RenderTableCell*) const;
+  RenderTableCell* cellBelow(const RenderTableCell*) const;
+  RenderTableCell* cellBefore(const RenderTableCell*) const;
+  RenderTableCell* cellAfter(const RenderTableCell*) const;
 
   CollapsedBorderValue* currentBorderStyle() { return m_currentBorder; }
 
   bool hasSections() const { return head || foot || firstBody; }
 
- protected:
+ private:
   void recalcSections();
 
   friend class AutoTableLayout;
@@ -180,11 +180,12 @@ class RenderTable : public RenderBlock {
   Rules rules : 4;
 
   bool has_col_elems : 1;
-  uint padding : 22;
+  unsigned padding : 22;
   uint needSectionRecalc : 1;
 
   short hspacing;
   short vspacing;
 };
 }
+
 #endif
