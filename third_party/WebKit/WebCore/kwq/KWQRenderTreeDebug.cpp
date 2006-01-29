@@ -454,20 +454,18 @@ QString externalRepresentation(RenderObject* o) {
   JSEditor::setSupportsPasteCommand(true);
 
   QString s;
-  {
+  if (o) {
     QTextStream ts(&s);
 #if SVG_SUPPORT
     ts.precision(2);
     writeRenderResources(ts, o->document());
 #endif
-    if (o) {
-      o->canvas()->view()->layout();
-      RenderLayer* l = o->layer();
-      if (l) {
-        writeLayers(ts, l, l,
-                    IntRect(l->xPos(), l->yPos(), l->width(), l->height()));
-        writeSelection(ts, o);
-      }
+    o->canvas()->view()->layout();
+    RenderLayer* l = o->layer();
+    if (l) {
+      writeLayers(ts, l, l,
+                  IntRect(l->xPos(), l->yPos(), l->width(), l->height()));
+      writeSelection(ts, o);
     }
   }
   return s;

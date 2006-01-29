@@ -25,10 +25,10 @@
 #ifndef RENDER_IMAGE_H
 #define RENDER_IMAGE_H
 
-#include "HTMLElementImpl.h"
-#include "render_replaced.h"
-#include "dom_string.h"
 #include "CachedImage.h"
+#include "HTMLElementImpl.h"
+#include "dom_string.h"
+#include "render_replaced.h"
 
 namespace WebCore {
 
@@ -45,7 +45,7 @@ class RenderImage : public RenderReplaced {
   virtual bool isImage() const { return true; }
   virtual bool isImageButton() const { return false; }
 
-  virtual void paint(PaintInfo& i, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual void layout();
 
@@ -60,26 +60,30 @@ class RenderImage : public RenderReplaced {
   virtual void setStyle(RenderStyle* style);
   void updateAltText();
 
-  void setCachedImage(CachedImage* image);
+  void setCachedImage(CachedImage*);
   CachedImage* cachedImage() const { return m_cachedImage; }
 
-  const Image& image() { return m_cachedImage->image(); }
+  const Image& image() {
+    return m_cachedImage ? m_cachedImage->image() : nullImage();
+  }
 
-  virtual bool nodeAtPoint(NodeInfo& info,
+  virtual bool nodeAtPoint(NodeInfo&,
                            int x,
                            int y,
                            int tx,
                            int ty,
-                           HitTestAction hitTestAction);
+                           HitTestAction);
 
   virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
 
   // Called to set generated content images (e.g., :before/:after generated
   // images).
-  void setContentObject(CachedObject* co);
+  void setContentObject(CachedObject*);
 
-  bool errorOccurred() const { return m_cachedImage->isErrorImage(); }
+  bool errorOccurred() const {
+    return m_cachedImage && m_cachedImage->isErrorImage();
+  }
 
   HTMLMapElementImpl* imageMap();
 
@@ -92,8 +96,10 @@ class RenderImage : public RenderReplaced {
   // The image we are rendering.
   CachedImage* m_cachedImage;
 
-  // Text to display as long as the image isn't available
+  // Text to display as long as the image isn't available.
   DOMString m_altText;
+
+  static const Image& nullImage();
 };
 
 }  // namespace
