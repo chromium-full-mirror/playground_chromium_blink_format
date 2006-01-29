@@ -117,8 +117,6 @@ class FloatRect {
   operator CGRect() const;
 #endif
 
-  operator IntRect() const;
-
  private:
   float xp;
   float yp;
