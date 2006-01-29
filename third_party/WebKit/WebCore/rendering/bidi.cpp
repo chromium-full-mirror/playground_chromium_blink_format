@@ -808,8 +808,11 @@ RootInlineBox* RenderBlock::constructLine(const BidiIterator& start,
   InlineFlowBox* parentBox = 0;
   for (BidiRun* r = sFirstBidiRun; r; r = r->nextRun) {
     // Create a box for our object.
-    r->box = r->obj->createInlineBox(r->obj->isPositioned(), false,
-                                     sBidiRunCount == 1);
+    bool isOnlyRun = (sBidiRunCount == 1);
+    if (sBidiRunCount == 2 && !r->obj->isListMarker())
+      isOnlyRun = ((style()->direction() == RTL) ? sLastBidiRun : sFirstBidiRun)
+                      ->obj->isListMarker();
+    r->box = r->obj->createInlineBox(r->obj->isPositioned(), false, isOnlyRun);
     if (r->box) {
       // If we have no parent box yet, or if the run is not simply a sibling,
       // then we need to construct inline boxes as necessary to properly enclose
@@ -2237,7 +2240,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         // list
         // item, then this is all moot. -dwh
         RenderObject* next = bidiNext(start.block, o, bidi);
-        if (style()->collapseWhiteSpace() && next && next->isText() &&
+        if (style()->collapseWhiteSpace() && next && !next->isBR() &&
+            next->isText() &&
             static_cast<RenderText*>(next)->stringLength() > 0) {
           RenderText* nextText = static_cast<RenderText*>(next);
           QChar nextChar = nextText->text()[0];
