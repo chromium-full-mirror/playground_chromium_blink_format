@@ -1676,9 +1676,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       QString frameName = args[1]->isUndefinedOrNull()
                               ? QString("_blank")
                               : args[1]->toString(exec).qstring();
-      if (!allowPopUp(exec, window) && !(frame->findFrame(frameName)))
-        return jsUndefined();
-      if (frameName == "_top" || frameName == "_parent" || frameName == "_self")
+      if (!allowPopUp(exec, window) &&
+          !(frameName == "_top" || frameName == "_parent" ||
+            frameName == "_self" || frame->findFrame(frameName)))
         return jsUndefined();
 
       WindowArgs windowArgs;
