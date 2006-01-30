@@ -47,11 +47,11 @@ KJSProxyImpl::~KJSProxyImpl() {
   Collector::collect();
 }
 
-QVariant KJSProxyImpl::evaluate(const DOMString& filename,
+JSValue* KJSProxyImpl::evaluate(const DOMString& filename,
                                 int baseLine,
                                 const DOMString& str,
                                 NodeImpl* n) {
-  // evaluate code. Returns the JS return value or an invalid QVariant
+  // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
 
   initScript();
@@ -65,18 +65,14 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
 
   JSLock lock;
 
-  KJS::JSValue* thisNode =
+  JSValue* thisNode =
       n ? Window::retrieve(m_frame) : getDOMNode(m_script->globalExec(), n);
   Completion comp = m_script->evaluate(
       filename, baseLine, reinterpret_cast<KJS::UChar*>(str.unicode()),
       str.length(), thisNode);
 
-  bool success =
-      (comp.complType() == Normal) || (comp.complType() == ReturnValue);
-
-  // let's try to convert the return value
-  if (success && comp.value())
-    return ValueToVariant(m_script->globalExec(), comp.value());
+  if (comp.complType() == Normal || comp.complType() == ReturnValue)
+    return comp.value();
 
   if (comp.complType() == Throw) {
     UString errorMessage = comp.value()->toString(m_script->globalExec());
@@ -88,11 +84,11 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
                             ->toObject(m_script->globalExec())
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
-
     m_frame->addMessageToConsole(errorMessage.domString(), lineNumber,
                                  sourceURL.domString());
   }
-  return QVariant();
+
+  return 0;
 }
 
 void KJSProxyImpl::clear() {
@@ -112,8 +108,8 @@ EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
                                                     NodeImpl* node) {
   initScript();
   JSLock lock;
-  return new JSLazyEventListener(code, KJS::Window::retrieveWindow(m_frame),
-                                 node, m_handlerLineno);
+  return new JSLazyEventListener(code, Window::retrieveWindow(m_frame), node,
+                                 m_handlerLineno);
 }
 
 #if SVG_SUPPORT
@@ -121,8 +117,8 @@ EventListener* KJSProxyImpl::createSVGEventHandler(const DOMString& code,
                                                    NodeImpl* node) {
   initScript();
   JSLock lock;
-  return new JSSVGLazyEventListener(code, KJS::Window::retrieveWindow(m_frame),
-                                    node, m_handlerLineno);
+  return new JSSVGLazyEventListener(code, Window::retrieveWindow(m_frame), node,
+                                    m_handlerLineno);
 }
 #endif
 
@@ -138,7 +134,7 @@ void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
   m_script->forgetDOMObject(event);
 }
 
-KJS::ScriptInterpreter* KJSProxyImpl::interpreter() {
+ScriptInterpreter* KJSProxyImpl::interpreter() {
   if (!m_script)
     initScript();
   return m_script;
@@ -166,11 +162,11 @@ void KJSProxyImpl::initScript() {
     return;
 
   // Build the global object - which is a Window instance
-  KJS::JSLock lock;
+  JSLock lock;
   JSObject* globalObject(new Window(m_frame));
 
   // Create a KJS interpreter for this frame
-  m_script = new KJS::ScriptInterpreter(globalObject, m_frame);
+  m_script = new ScriptInterpreter(globalObject, m_frame);
   globalObject->put(m_script->globalExec(), "debug", new TestFunctionImp(),
                     Internal);
 

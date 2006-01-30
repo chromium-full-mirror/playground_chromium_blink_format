@@ -21,12 +21,11 @@
 #ifndef KJS_PROXY_H
 #define KJS_PROXY_H
 
-#include <qvariant.h>
-
 class Frame;
 class QString;
 
 namespace KJS {
+class JSValue;
 class ScriptInterpreter;
 }
 
@@ -41,10 +40,10 @@ class KJSProxyImpl {
  public:
   KJSProxyImpl(Frame*);
   ~KJSProxyImpl();
-  QVariant evaluate(const DOMString& filename,
-                    int baseLine,
-                    const DOMString& code,
-                    NodeImpl*);
+  KJS::JSValue* evaluate(const DOMString& filename,
+                         int baseLine,
+                         const DOMString& code,
+                         NodeImpl*);
   void clear();
   EventListener* createHTMLEventHandler(const DOMString& code, NodeImpl*);
 #if SVG_SUPPORT

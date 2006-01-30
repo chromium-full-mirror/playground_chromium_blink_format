@@ -29,6 +29,7 @@
 #define KHTML_CachedImage_h
 
 #include "CachedObject.h"
+#include "IntRect.h"
 #include <khtml_settings.h>
 
 namespace WebCore {
@@ -89,4 +90,5 @@ class CachedImage : public CachedObject {
   friend class Cache;
 };
 }
+
 #endif
