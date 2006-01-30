@@ -968,8 +968,8 @@ void RenderObject::drawBorder(QPainter* p,
       IntPointArray quad(4);
       p->setPen(Pen::NoPen);
       p->setBrush(c);
-      Q_ASSERT(x2 >= x1);
-      Q_ASSERT(y2 >= y1);
+      ASSERT(x2 >= x1);
+      ASSERT(y2 >= y1);
       if (adjbw1 == 0 && adjbw2 == 0) {
         p->drawRect(x1, y1, x2 - x1, y2 - y1);
         return;

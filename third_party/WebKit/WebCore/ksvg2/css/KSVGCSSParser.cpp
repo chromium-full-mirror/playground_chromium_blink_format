@@ -297,23 +297,18 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
   }
 
   if (valid_primitive) {
-    if (id != 0) {
-      // qDebug(" new value: id=%d", id);
+    if (id != 0)
       parsedValue = new CSSPrimitiveValueImpl(id);
-    } else if (value->unit == CSSPrimitiveValue::CSS_STRING)
+    else if (value->unit == CSSPrimitiveValue::CSS_STRING)
       parsedValue = new CSSPrimitiveValueImpl(
           domString(value->string), (CSSPrimitiveValue::UnitTypes)value->unit);
     else if (value->unit >= CSSPrimitiveValue::CSS_NUMBER &&
-             value->unit <= CSSPrimitiveValue::CSS_KHZ) {
-      // qDebug(" new value: value=%.2f, unit=%d", value->fValue, value->unit);
+             value->unit <= CSSPrimitiveValue::CSS_KHZ)
       parsedValue = new CSSPrimitiveValueImpl(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
-    } else if (value->unit >= KDOMCSSValue::Q_EMS) {
-      // qDebug(" new quirks value: value=%.2f, unit=%d", value->fValue,
-      // value->unit);
+    else if (value->unit >= KDOMCSSValue::Q_EMS)
       parsedValue = new CSSQuirkPrimitiveValueImpl(value->fValue,
                                                    CSSPrimitiveValue::CSS_EMS);
-    }
     valueList->next();
     if (valueList->current()) {
       delete parsedValue;
@@ -333,18 +328,15 @@ CSSValueImpl* CSSParser::parseSVGStrokeDasharray() {
   bool valid_primitive = true;
   while (valid_primitive && value) {
     valid_primitive = validUnit(value, FLength | FPercent | FNonNeg, false);
-    if (value->id != 0) {
-      // qDebug(" new value: id=%d", id);
+    if (value->id != 0)
       ret->append(new CSSPrimitiveValueImpl(value->id));
-    } else if (value->unit == CSSPrimitiveValue::CSS_STRING)
+    else if (value->unit == CSSPrimitiveValue::CSS_STRING)
       ret->append(new CSSPrimitiveValueImpl(
           domString(value->string), (CSSPrimitiveValue::UnitTypes)value->unit));
     else if (value->unit >= CSSPrimitiveValue::CSS_NUMBER &&
-             value->unit <= CSSPrimitiveValue::CSS_KHZ) {
-      // qDebug(" new value: value=%.2f, unit=%d", value->fValue, value->unit);
+             value->unit <= CSSPrimitiveValue::CSS_KHZ)
       ret->append(new CSSPrimitiveValueImpl(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit));
-    }
     value = valueList->next();
     if (value && value->unit == KDOMCSSValue::Operator && value->iValue == ',')
       value = valueList->next();

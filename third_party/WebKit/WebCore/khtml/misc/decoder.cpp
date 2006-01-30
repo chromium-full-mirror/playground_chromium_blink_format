@@ -2,7 +2,7 @@
     This file is part of the KDE libraries
 
     Copyright (C) 1999 Lars Knoll (knoll@mpi-hd.mpg.de)
-    Copyright (C) 2003 Apple Computer, Inc.
+    Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,21 +27,16 @@
 
 #include "config.h"
 #include "decoder.h"
-using namespace khtml;
 
+#include "htmlnames.h"
+#include <ctype.h>
+#include <klocale.h>
+#include <kxmlcore/Assertions.h>
 #include <qregexp.h>
 #include <qtextcodec.h>
 
-#include <ctype.h>
-#include <kdebug.h>
-#include <klocale.h>
-
-#include "htmlnames.h"
-
-using namespace DOM::HTMLNames;
-
-using DOM::AtomicString;
-using DOM::nullAtom;
+using namespace WebCore;
+using namespace HTMLNames;
 
 class KanjiCode {
  public:
@@ -107,7 +102,7 @@ const unsigned char KanjiCode::kanji_map_sjis[] = {
 enum KanjiCode::Type KanjiCode::judge(const char* str, int size) {
   enum Type code;
   int i;
-  int bfr = FALSE; /* Kana Moji */
+  int bfr = false; /* Kana Moji */
   int bfk = 0;     /* EUC Kana */
   int sjis = 0;
   int euc = 0;
@@ -136,11 +131,11 @@ enum KanjiCode::Type KanjiCode::judge(const char* str, int size) {
       } else {
         i++;
       }
-      bfr = FALSE;
+      bfr = false;
       bfk = 0;
     } else {
       if (ptr[i] < 0x20) {
-        bfr = FALSE;
+        bfr = false;
         bfk = 0;
         /* ?? check kudokuten ?? && ?? hiragana ?? */
         if ((i >= 2) && (ptr[i - 2] == 0x81) &&
@@ -205,7 +200,7 @@ enum KanjiCode::Type KanjiCode::judge(const char* str, int size) {
             } else if (0x20 <= ptr[i] && ptr[i] <= 0x7f) {
               sjis++;
             }
-            bfr = FALSE;
+            bfr = false;
             bfk = 0;
           }
         } else if (0x8e == ptr[i]) {
@@ -239,7 +234,7 @@ enum KanjiCode::Type KanjiCode::judge(const char* str, int size) {
         } else if (ptr[i] <= 0x7f) {
           ;
         } else {
-          bfr = TRUE;
+          bfr = true;
           bfk = 0;
         }
       }
@@ -389,11 +384,13 @@ QString Decoder::decode(const char* data, int len) {
       // Extract the first three bytes.
       // Handle the case where some of bytes are already in the buffer.
       // The last byte is always guaranteed to not be in the buffer.
-      const uchar* udata = (const uchar*)data;
-      uchar c1 = bufferLength >= 1 ? (uchar)buffer[0] : *udata++;
-      uchar c2 = bufferLength >= 2 ? (uchar)buffer[1] : *udata++;
-      assert(bufferLength < 3);
-      uchar c3 = *udata;
+      const unsigned char* udata = (const unsigned char*)data;
+      unsigned char c1 =
+          bufferLength >= 1 ? (unsigned char)buffer[0] : *udata++;
+      unsigned char c2 =
+          bufferLength >= 2 ? (unsigned char)buffer[1] : *udata++;
+      ASSERT(bufferLength < 3);
+      unsigned char c3 = *udata;
 
       // Check for the BOM.
       const char* autoDetectedEncoding;
@@ -409,7 +406,7 @@ QString Decoder::decode(const char* data, int len) {
       if (autoDetectedEncoding != 0) {
         m_type = AutoDetectedEncoding;
         m_codec = QTextCodec::codecForName(autoDetectedEncoding);
-        assert(m_codec);
+        ASSERT(m_codec);
         enc = m_codec->name();
         delete m_decoder;
         m_decoder = m_codec->makeDecoder();

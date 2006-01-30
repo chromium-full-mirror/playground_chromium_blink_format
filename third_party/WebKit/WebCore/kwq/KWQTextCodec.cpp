@@ -168,12 +168,12 @@ QCString QTextCodec::fromUnicode(const QString& qcs, bool allowEntities) const {
   while (charactersLeft > 0) {
     CFRange range = CFRangeMake(startPos, charactersLeft);
     CFIndex bufferLength;
-    CFStringGetBytes(cfs, range, encoding, allowEntities ? 0 : '?', FALSE, NULL,
+    CFStringGetBytes(cfs, range, encoding, allowEntities ? 0 : '?', false, NULL,
                      0x7FFFFFFF, &bufferLength);
 
     QCString chunk(bufferLength + 1);
     CFIndex charactersConverted =
-        CFStringGetBytes(cfs, range, encoding, allowEntities ? 0 : '?', FALSE,
+        CFStringGetBytes(cfs, range, encoding, allowEntities ? 0 : '?', false,
                          reinterpret_cast<unsigned char*>(chunk.data()),
                          bufferLength, &bufferLength);
     chunk[bufferLength] = 0;

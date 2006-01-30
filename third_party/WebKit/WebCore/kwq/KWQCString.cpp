@@ -262,10 +262,9 @@ QCString& QCString::replace(char c1, char c2) {
 }
 
 bool operator==(const QCString& s1, const char* s2) {
-  if (s1.size() == 0 && !s2) {
-    return TRUE;
-  } else if (s1.size() == 0 && s2) {
-    return FALSE;
-  }
-  return (strcmp(s1, s2) == 0);
+  if (s1.size() == 0 && !s2)
+    return true;
+  if (s1.size() == 0 && s2)
+    return false;
+  return strcmp(s1, s2) == 0;
 }

@@ -39,7 +39,6 @@
 #include <qfontmetrics.h>
 #include <qlist.h>
 #include <qpalette.h>
-#include <qapplication.h>
 
 #include "khtmllayout.h"
 #include "Shared.h"
@@ -89,12 +88,13 @@ struct LengthBox {
   Length right;
   Length top;
   Length bottom;
-  Length& operator=(Length& len) {
+
+  LengthBox& operator=(const Length& len) {
     left = len;
     right = len;
     top = len;
     bottom = len;
-    return len;
+    return *this;
   }
 
   bool operator==(const LengthBox& o) const {
@@ -103,8 +103,7 @@ struct LengthBox {
   }
 
   bool nonZero() const {
-    return left.value != 0 || right.value != 0 || top.value != 0 ||
-           bottom.value != 0;
+    return left.value || right.value || top.value || bottom.value;
   }
 };
 

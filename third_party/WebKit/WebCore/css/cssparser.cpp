@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
  * Copyright (C) 2005 Allan Sandfeld Jensen (kde@carewolf.com)
- * Copyright (C) 2004, 2005 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -2053,18 +2053,11 @@ bool CSSParser::parseShape(int propId, bool important) {
 // [ 'font-style' || 'font-variant' || 'font-weight' ]? 'font-size' [ /
 // 'line-height' ]? 'font-family'
 bool CSSParser::parseFont(bool important) {
-  //     kdDebug(6080) << "parsing font property current=" <<
-  //     valueList->currentValue << endl;
   bool valid = true;
   Value* value = valueList->current();
   FontValueImpl* font = new FontValueImpl;
   // optional font-style, font-variant and font-weight
   while (value) {
-    // 	kdDebug( 6080 ) << "got value " << value->id << " / " << (value->unit ==
-    // CSSPrimitiveValue::CSS_STRING ||
-    // 				   value->unit == CSSPrimitiveValue::CSS_IDENT ? qString(
-    // value->string ) : QString::null )
-    // 			<< endl;
     int id = value->id;
     if (id) {
       if (id == CSS_VAL_NORMAL) {
@@ -2200,11 +2193,6 @@ CSSValueListImpl* CSSParser::parseFontFamily() {
   Value* value = valueList->current();
   FontFamilyValueImpl* currFamily = 0;
   while (value) {
-    // 	kdDebug( 6080 ) << "got value " << value->id << " / "
-    // 			<< (value->unit == CSSPrimitiveValue::CSS_STRING ||
-    // 			    value->unit == CSSPrimitiveValue::CSS_IDENT ? qString(
-    // value->string ) : QString::null )
-    // 			<< endl;
     Value* nextValue = valueList->next();
     bool nextValBreaksFont =
         !nextValue ||
@@ -2238,7 +2226,6 @@ CSSValueListImpl* CSSParser::parseFontFamily() {
         list->append(currFamily =
                          new FontFamilyValueImpl(qString(value->string)));
     } else {
-      // 	    kdDebug( 6080 ) << "invalid family part" << endl;
       break;
     }
 
@@ -2761,14 +2748,20 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
   return context.failed();
 }
 
+#if CSS_DEBUG
+
 static inline int yyerror(const char* str) {
-#ifdef CSS_DEBUG
   kdDebug(6080) << "CSS parse error " << str << endl;
-#else
-  Q_UNUSED(str);
-#endif
   return 1;
 }
+
+#else
+
+static inline int yyerror(const char*) {
+  return 1;
+}
+
+#endif
 
 #define END_TOKEN 0
 
@@ -2935,14 +2928,10 @@ unsigned short* CSSParser::text(int* length) {
       int uc = 0;
       escape++;
       while (escape < current) {
-        // 		qDebug("toHex( %c = %x", (char)*escape, toHex( *escape )
-        // );
         uc *= 16;
         uc += toHex(*escape);
         escape++;
       }
-      // 	    qDebug(" converting escape: string='%s', value=0x%x",
-      // QString( (QChar *)e, current-e ).latin1(), uc );
       // can't handle chars outside ucs2
       if (uc > 0xffff)
         uc = 0xfffd;
@@ -2963,14 +2952,10 @@ unsigned short* CSSParser::text(int* length) {
     int uc = 0;
     escape++;
     while (escape < start + l) {
-      // 		qDebug("toHex( %c = %x", (char)*escape, toHex( *escape )
-      // );
       uc *= 16;
       uc += toHex(*escape);
       escape++;
     }
-    // 	    qDebug(" converting escape: string='%s', value=0x%x", QString(
-    // (QChar *)e, current-e ).latin1(), uc );
     // can't handle chars outside ucs2
     if (uc > 0xffff)
       uc = 0xfffd;

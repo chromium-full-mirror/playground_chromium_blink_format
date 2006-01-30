@@ -4,7 +4,7 @@
  *                     1999 Lars Knoll <knoll@kde.org>
  *                     1999 Antti Koivisto <koivisto@kde.org>
  *                     2000 Dirk Mueller <mueller@kde.org>
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -1006,34 +1006,34 @@ void FrameView::useSlowRepaints() {
   setStaticBackground(true);
 }
 
+#if !KHTML_NO_SCROLLBARS
+
 void FrameView::setScrollBarsMode(ScrollBarMode mode) {
-#ifndef KHTML_NO_SCROLLBARS
   d->vmode = mode;
   d->hmode = mode;
 
   QScrollView::setScrollBarsMode(mode);
-#else
-  Q_UNUSED(mode);
-#endif
 }
 
 void FrameView::setVScrollBarMode(ScrollBarMode mode) {
-#ifndef KHTML_NO_SCROLLBARS
   d->vmode = mode;
   QScrollView::setVScrollBarMode(mode);
-#else
-  Q_UNUSED(mode);
-#endif
 }
 
 void FrameView::setHScrollBarMode(ScrollBarMode mode) {
-#ifndef KHTML_NO_SCROLLBARS
   d->hmode = mode;
   QScrollView::setHScrollBarMode(mode);
-#else
-  Q_UNUSED(mode);
-#endif
 }
+
+#else
+
+void FrameView::setScrollBarsMode(ScrollBarMode) {}
+
+void FrameView::setVScrollBarMode(ScrollBarMode) {}
+
+void FrameView::setHScrollBarMode(ScrollBarMode) {}
+
+#endif
 
 void FrameView::restoreScrollBar() {
   suppressScrollBars(false);

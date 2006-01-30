@@ -32,7 +32,7 @@
 #include "NodeImpl.h"
 #include "render_style.h"
 #include "text_affinity.h"
-#include <assert.h>
+#include <kxmlcore/Assertions.h>
 #include <kxmlcore/HashSet.h>
 
 class CSSStyle;
@@ -41,15 +41,14 @@ class QMatrix;
 class QTextStream;
 class RenderArena;
 
-#ifndef NDEBUG
-#define KHTMLAssert(x)                 \
-  if (!(x)) {                          \
-    const RenderObject* o = this;      \
-    while (o->parent())                \
-      o = o->parent();                 \
-    o->printTree();                    \
-    qDebug(" this object = %p", this); \
-    assert(false);                     \
+#if !NDEBUG
+#define KHTMLAssert(x)            \
+  if (!(x)) {                     \
+    const RenderObject* o = this; \
+    while (o->parent())           \
+      o = o->parent();            \
+    o->printTree();               \
+    ASSERT(false);                \
   }
 #else
 #define KHTMLAssert(x)
@@ -231,7 +230,7 @@ class RenderObject : public CachedObjectClient {
 
  public:
   virtual const char* renderName() const { return "RenderObject"; }
-#ifndef NDEBUG
+#if !NDEBUG
   QString information() const;
   virtual void printTree(int indent = 0) const;
   virtual void dump(QTextStream* stream, QString ind = "") const;
@@ -294,7 +293,7 @@ class RenderObject : public CachedObjectClient {
   }
   // We may eventually want to make these non-virtual
   virtual QMatrix localTransform() const;
-  virtual void setLocalTransform(const QMatrix&) { assert(false); }
+  virtual void setLocalTransform(const QMatrix&) { ASSERT(false); }
   virtual QMatrix absoluteTransform() const;
 #endif
 

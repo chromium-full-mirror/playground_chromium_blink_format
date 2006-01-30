@@ -50,7 +50,7 @@ class RenderPath::Private {
 RenderPath::RenderPath(khtml::RenderStyle* style,
                        KSVG::SVGStyledElementImpl* node)
     : RenderObject((DOM::NodeImpl*)node), d(new Private()) {
-  Q_ASSERT(style != 0);
+  ASSERT(style != 0);
 }
 
 RenderPath::~RenderPath() {

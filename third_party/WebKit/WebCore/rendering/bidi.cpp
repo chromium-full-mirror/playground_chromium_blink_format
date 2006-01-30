@@ -1435,8 +1435,8 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   // do not reverse for visually ordered web sites
   if (!style()->visuallyOrdered()) {
     // first find highest and lowest levels
-    uchar levelLow = 128;
-    uchar levelHigh = 0;
+    unsigned char levelLow = 128;
+    unsigned char levelHigh = 0;
     BidiRun* r = sFirstBidiRun;
     while (r) {
       if (r->level > levelHigh)
@@ -1986,7 +1986,7 @@ bool RenderBlock::matchedEndLine(const BidiIterator& start,
   return false;
 }
 
-static const ushort nonBreakingSpace = 0xa0;
+static const unsigned short nonBreakingSpace = 0xa0;
 
 static inline bool skipNonBreakingSpace(BidiIterator& it) {
   if (it.obj->style()->nbspMode() != SPACE ||

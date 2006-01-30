@@ -159,7 +159,7 @@ static const KPerDomainSettings& lookup_hostname_policy(
     host_part.remove(0, dot_idx);
     it = policies.find(host_part);
 
-    Q_ASSERT(notfound == policies.end());
+    ASSERT(notfound == policies.end());
     if (it != notfound) {
 #if DEBUG_SETTINGS > 0
       kdDebug() << "partial match" << endl;
@@ -169,7 +169,7 @@ static const KPerDomainSettings& lookup_hostname_policy(
       return *it;
     }
 
-    // assert(host_part[0] == QChar('.'));
+    // ASSERT(host_part[0] == QChar('.'));
     host_part.remove(0, 1);  // Chop off the dot.
   }
 

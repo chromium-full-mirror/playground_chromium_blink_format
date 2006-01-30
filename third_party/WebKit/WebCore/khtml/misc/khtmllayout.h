@@ -2,6 +2,7 @@
     This file is part of the KDE libraries
 
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
+    Copyright (C) 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,21 +26,11 @@
 #define HTML_LAYOUT_H
 
 #include "IntRect.h"
+#include <stdint.h>
 
-/*
- * this namespace contains definitions for various types needed for
- * layouting.
- */
-namespace khtml {
+namespace WebCore {
 const int UNDEFINED = -1;
 
-// alignment
-enum VAlign { VNone = 0, Bottom, VCenter, Top, Baseline };
-enum HAlign { HDefault, Left, HCenter, Right, HNone = 0 };
-
-/*
- * %multiLength and %Length
- */
 enum LengthType {
   Auto = 0,
   Relative,
@@ -50,24 +41,24 @@ enum LengthType {
   MinIntrinsic
 };
 struct Length {
-  Length() { *((Q_UINT32*)this) = 0; }
+  Length() { *((int32_t*)this) = 0; }
   Length(LengthType t) {
     type = t;
     value = 0;
     quirk = false;
   }
   Length(int v, LengthType t, bool q = false) : value(v), type(t), quirk(q) {}
-  Length(const Length& o) { *((Q_UINT32*)this) = *((Q_UINT32*)&o); }
+  Length(const Length& o) { *((int32_t*)this) = *((int32_t*)&o); }
 
   Length& operator=(const Length& o) {
-    *((Q_UINT32*)this) = *((Q_UINT32*)&o);
+    *((int32_t*)this) = *((int32_t*)&o);
     return *this;
   }
   bool operator==(const Length& o) const {
-    return *((Q_UINT32*)this) == *((Q_UINT32*)&o);
+    return *((int32_t*)this) == *((int32_t*)&o);
   }
   bool operator!=(const Length& o) const {
-    return *((Q_UINT32*)this) != *((Q_UINT32*)&o);
+    return *((int32_t*)this) != *((int32_t*)&o);
   }
 
   int length() const { return value; }
@@ -144,6 +135,6 @@ struct GapRects {
   }
   bool operator!=(const GapRects& other) { return !(*this == other); }
 };
-};
+}
 
 #endif

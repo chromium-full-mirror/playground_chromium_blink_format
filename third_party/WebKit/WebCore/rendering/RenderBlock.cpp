@@ -145,7 +145,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       lastChild()->style()->styleType() == RenderStyle::AFTER)
     beforeChild = lastChild();
 
-  bool madeBoxesNonInline = FALSE;
+  bool madeBoxesNonInline = false;
 
   // If the requested beforeChild is not one of our children, then this is most
   // likely because

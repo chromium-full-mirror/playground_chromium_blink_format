@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2002 Lars Knoll (knoll@kde.org)
  *           (C) 2002 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -189,7 +189,7 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
         int usedSpan = 0;
         int i = 0;
         while (usedSpan < span) {
-          Q_ASSERT(cCol + i < nEffCols);
+          ASSERT(cCol + i < nEffCols);
           int eSpan = table->spanOfEffCol(cCol + i);
           // only set if no col element has already set it.
           if (width[cCol + i].type == Auto && w.type != Auto) {
@@ -212,7 +212,7 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
         }
         cCol += i;
       } else {
-        Q_ASSERT(false);
+        ASSERT(false);
       }
       child = child->nextSibling();
     }
@@ -883,7 +883,6 @@ void AutoTableLayout::layout() {
   int nEffCols = table->numEffCols();
 
   if (nEffCols != (int)layoutStruct.size()) {
-    qWarning("WARNING: nEffCols is not equal to layoutstruct!");
     fullRecalc();
     nEffCols = table->numEffCols();
   }

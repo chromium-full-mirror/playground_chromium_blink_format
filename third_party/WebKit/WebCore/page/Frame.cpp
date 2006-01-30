@@ -537,18 +537,6 @@ bool Frame::pluginsEnabled() const {
   return d->m_bPluginsEnabled;
 }
 
-void Frame::slotDebugDOMTree() {
-  if (d->m_doc && d->m_doc->firstChild())
-    qDebug("%s", createMarkup(d->m_doc->firstChild()).latin1());
-}
-
-void Frame::slotDebugRenderTree() {
-#ifndef NDEBUG
-  if (d->m_doc)
-    d->m_doc->renderer()->printTree();
-#endif
-}
-
 void Frame::setAutoloadImages(bool enable) {
   if (d->m_doc && d->m_doc->docLoader()->autoloadImages() == enable)
     return;
@@ -3474,10 +3462,11 @@ bool Frame::canMouseDownStartSelect(NodeImpl* node) {
 }
 
 void Frame::khtmlMouseDoubleClickEvent(MouseDoubleClickEvent* event) {
-  passWidgetMouseDownEventToWidget(event);
+  passWidgetMouseDownEventToWidget(event, true);
 }
 
-bool Frame::passWidgetMouseDownEventToWidget(MouseEvent* event) {
+bool Frame::passWidgetMouseDownEventToWidget(MouseEvent* event,
+                                             bool isDoubleClick) {
   // Figure out which view to send the event to.
   RenderObject* target =
       event->innerNode() ? event->innerNode()->renderer() : 0;
@@ -3498,10 +3487,9 @@ bool Frame::passWidgetMouseDownEventToWidget(MouseEvent* event) {
   // don't correspond to Cocoa events.  The mousedown/ups will have already been
   // passed on as
   // part of the pressed/released handling.
-  if (!MouseDoubleClickEvent::test(event))
+  if (!isDoubleClick)
     return passMouseDownEventToWidget(widget);
-  else
-    return true;
+  return true;
 }
 
 bool Frame::passWidgetMouseDownEventToWidget(RenderWidget* renderWidget) {

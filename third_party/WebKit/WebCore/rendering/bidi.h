@@ -112,7 +112,7 @@ struct BidiRun {
   InlineBox* box;
 
   // explicit + implicit levels here
-  uchar level;
+  unsigned char level;
   bool override : 1;
 
   bool compact : 1;

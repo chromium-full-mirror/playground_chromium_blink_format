@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,43 +23,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KWQSTYLE_H_
-#define KWQSTYLE_H_
+#import "config.h"
+#import "Screen.h"
 
-#include "KWQObject.h"
-#include "IntSize.h"
+#import "IntRect.h"
+#import "KWQWidget.h"
 
-class QWidget;
+namespace WebCore {
 
-class QStyle : public QObject {
- public:
-  enum PixelMetric {
-    PM_IndicatorWidth,
-    PM_IndicatorHeight,
-    PM_ExclusiveIndicatorWidth,
-    PM_ExclusiveIndicatorHeight,
-    PM_DefaultFrameWidth,
-    PM_ButtonMargin
-  };
+static NSScreen* screen(QWidget* widget)
+{
+    if (widget)
+        if (NSScreen* screen = [[widget->getView() window] screen])
+            return screen;
+    return [NSScreen mainScreen];
+}
 
-  enum ContentType { CT_PushButton };
+static NSRect flipGlobalRect(NSRect rect)
+{
+    rect.origin.y = NSMaxY([[[NSScreen screens] objectAtIndex:0] frame]) - NSMaxY(rect);
+    return rect;
+}
 
-  int pixelMetric(PixelMetric metric, QWidget* = 0) const {
-    switch (metric) {
-      case PM_IndicatorWidth:
-      case PM_IndicatorHeight:
-      case PM_ExclusiveIndicatorWidth:
-      case PM_ExclusiveIndicatorHeight:
-        return 22;  // FIXME! Shouldn't be hardcoded. Perhaps shouldn't all be
-                    // same.
-      case PM_DefaultFrameWidth:
-      case PM_ButtonMargin:
-        return 0;
-    }
-    return 0;
-  }
+int screenDepth(QWidget* widget)
+{
+    return [screen(widget) depth];
+}
 
-  IntSize sizeFromContents(ContentType, QWidget*, const IntSize&) const;
-};
+IntRect screenRect(QWidget* widget)
+{
+    return IntRect(flipGlobalRect([screen(widget) frame]));
+}
 
-#endif
+IntRect usableScreenRect(QWidget* widget)
+{
+    return IntRect(flipGlobalRect([screen(widget) visibleFrame]));
+}
+
+}
