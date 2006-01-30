@@ -94,7 +94,7 @@ class KRenderingPaintServerGradientQuartz {
   KRenderingPaintServerGradientQuartz();
   ~KRenderingPaintServerGradientQuartz();
 
-  void updateQuartzGradientStopsCache(const KCSortedGradientStopList& stops);
+  void updateQuartzGradientStopsCache(const Vector<KCGradientStop>& stops);
   void updateQuartzGradientCache(const KRenderingPaintServerGradient* server);
 
  public:
