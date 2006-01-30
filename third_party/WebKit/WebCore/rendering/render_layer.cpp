@@ -663,7 +663,7 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
 
   // Find the appropriate X coordinate to scroll to.
   ScrollBehavior scrollX = getHiddenBehavior(alignX);
-  int intersectWidth = visibleRect.intersect(exposeRect).width();
+  int intersectWidth = intersection(visibleRect, exposeRect).width();
   // If the rectangle is fully visible, use the specified visible behavior.
   // If the rectangle is partially visible, but over a certain threshold, then
   // treat it as fully visible to avoid unnecessary horizontal scrolling
@@ -691,7 +691,7 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
            ((scrollX == alignToClosestEdge) &&
             exposeRect.right() > visibleRect.right() &&
             w < visibleRect.width()))
-    x = exposeRect.right() - visibleRect.width();
+    x = (exposeRect.right() - 1) - visibleRect.width();
   else if (scrollX == alignCenter)
     x -= (visibleRect.width() - w) / 2;
   // By default, x is set to the left of the exposeRect, so for the alignLeft
@@ -702,7 +702,7 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
 
   // Find the appropriate Y coordinate to scroll to.
   ScrollBehavior scrollY = getHiddenBehavior(alignY);
-  int intersectHeight = visibleRect.intersect(exposeRect).height();
+  int intersectHeight = intersection(visibleRect, exposeRect).height();
   // If the rectangle is fully visible, use the specified visible behavior.
   if (intersectHeight == h)
     scrollY = getVisibleBehavior(alignY);
@@ -727,7 +727,7 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
            ((scrollY == alignToClosestEdge) &&
             exposeRect.bottom() > visibleRect.bottom() &&
             h < visibleRect.height()))
-    y = exposeRect.bottom() - visibleRect.height();
+    y = (exposeRect.bottom() - 1) - visibleRect.height();
   else if (scrollY == alignCenter)
     y -= (visibleRect.height() - h) / 2;
   // By default, y is set to the top of the exposeRect, so for the alignTop
@@ -823,8 +823,7 @@ void RenderLayer::moveScrollbarsAside() {
 
 void RenderLayer::positionScrollbars(const IntRect& absBounds) {
   if (m_vBar) {
-    m_vBar->move(absBounds.x() + absBounds.width() - m_object->borderRight() -
-                     m_vBar->width(),
+    m_vBar->move(absBounds.right() - m_object->borderRight() - m_vBar->width(),
                  absBounds.y() + m_object->borderTop());
     m_vBar->resize(m_vBar->width(),
                    absBounds.height() -
@@ -833,9 +832,9 @@ void RenderLayer::positionScrollbars(const IntRect& absBounds) {
   }
 
   if (m_hBar) {
-    m_hBar->move(absBounds.x() + m_object->borderLeft(),
-                 absBounds.y() + absBounds.height() - m_object->borderBottom() -
-                     m_hBar->height());
+    m_hBar->move(
+        absBounds.x() + m_object->borderLeft(),
+        absBounds.bottom() - m_object->borderBottom() - m_hBar->height());
     m_hBar->resize(absBounds.width() -
                        (m_object->borderLeft() + m_object->borderRight()) -
                        (m_vBar ? m_vBar->width() - 1 : 0),
@@ -1309,15 +1308,15 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
 
     if (m_object->hasOverflowClip()) {
       IntRect newOverflowClip = m_object->getOverflowClipRect(x, y);
-      overflowClipRect = newOverflowClip.intersect(overflowClipRect);
+      overflowClipRect.intersect(newOverflowClip);
       if (m_object->isPositioned() || m_object->isRelPositioned())
-        posClipRect = newOverflowClip.intersect(posClipRect);
+        posClipRect.intersect(newOverflowClip);
     }
     if (m_object->hasClip()) {
       IntRect newPosClip = m_object->getClipRect(x, y);
-      posClipRect = posClipRect.intersect(newPosClip);
-      overflowClipRect = overflowClipRect.intersect(newPosClip);
-      fixedClipRect = fixedClipRect.intersect(newPosClip);
+      posClipRect.intersect(newPosClip);
+      overflowClipRect.intersect(newPosClip);
+      fixedClipRect.intersect(newPosClip);
     }
   }
 
@@ -1347,7 +1346,7 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
                          : (m_object->isPositioned()
                                 ? parent()->clipRects()->posClipRect()
                                 : parent()->clipRects()->overflowClipRect());
-    backgroundRect = backgroundRect.intersect(paintDirtyRect);
+    backgroundRect.intersect(paintDirtyRect);
   } else
     backgroundRect = paintDirtyRect;
   foregroundRect = backgroundRect;
@@ -1362,19 +1361,18 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
   if (m_object->hasOverflowClip() || m_object->hasClip()) {
     // This layer establishes a clip of some kind.
     if (m_object->hasOverflowClip())
-      foregroundRect =
-          foregroundRect.intersect(m_object->getOverflowClipRect(x, y));
+      foregroundRect.intersect(m_object->getOverflowClipRect(x, y));
     if (m_object->hasClip()) {
       // Clip applies to *us* as well, so go ahead and update the damageRect.
       IntRect newPosClip = m_object->getClipRect(x, y);
-      backgroundRect = backgroundRect.intersect(newPosClip);
-      foregroundRect = foregroundRect.intersect(newPosClip);
-      outlineRect = outlineRect.intersect(newPosClip);
+      backgroundRect.intersect(newPosClip);
+      foregroundRect.intersect(newPosClip);
+      outlineRect.intersect(newPosClip);
     }
 
     // If we establish a clip at all, then go ahead and make sure our background
     // rect is intersected with our layer's bounds.
-    backgroundRect = backgroundRect.intersect(layerBounds);
+    backgroundRect.intersect(layerBounds);
   }
 }
 

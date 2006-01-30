@@ -832,10 +832,10 @@ bool FrameView::scrollTo(const IntRect& bounds) {
   d->scrollingSelf = true;  // so scroll events get ignored
 
   int x, y, xe, ye;
-  x = bounds.left();
-  y = bounds.top();
-  xe = bounds.right();
-  ye = bounds.bottom();
+  x = bounds.x();
+  y = bounds.y();
+  xe = bounds.right() - 1;
+  ye = bounds.bottom() - 1;
 
   int deltax;
   int deltay;
@@ -870,12 +870,12 @@ bool FrameView::scrollTo(const IntRect& bounds) {
   int maxx = curWidth - d->borderX;
   int maxy = curHeight - d->borderY;
 
-  int scrollX, scrollY;
-
-  scrollX = deltax > 0 ? (deltax > maxx ? maxx : deltax)
-                       : deltax == 0 ? 0 : (deltax > -maxx ? deltax : -maxx);
-  scrollY = deltay > 0 ? (deltay > maxy ? maxy : deltay)
-                       : deltay == 0 ? 0 : (deltay > -maxy ? deltay : -maxy);
+  int scrollX = deltax > 0
+                    ? (deltax > maxx ? maxx : deltax)
+                    : deltax == 0 ? 0 : (deltax > -maxx ? deltax : -maxx);
+  int scrollY = deltay > 0
+                    ? (deltay > maxy ? maxy : deltay)
+                    : deltay == 0 ? 0 : (deltay > -maxy ? deltay : -maxy);
 
   if (contentsX() + scrollX < 0)
     scrollX = -contentsX();
@@ -897,10 +897,7 @@ bool FrameView::scrollTo(const IntRect& bounds) {
 
   d->scrollingSelf = false;
 
-  if ((scrollX != maxx) && (scrollY != maxy))
-    return true;
-  else
-    return false;
+  return scrollX != maxx && scrollY != maxy;
 }
 
 void FrameView::focusNextPrevNode(bool next) {
@@ -930,11 +927,8 @@ void FrameView::focusNextPrevNode(bool next) {
     bool visible = false;
     NodeImpl* toFocus = newFocusNode;
     while (!visible && toFocus) {
-      IntRect focusNodeRect = toFocus->getRect();
-      if ((focusNodeRect.left() > contentsX()) &&
-          (focusNodeRect.right() < contentsX() + visibleWidth()) &&
-          (focusNodeRect.top() > contentsY()) &&
-          (focusNodeRect.bottom() < contentsY() + visibleHeight())) {
+      if (toFocus->getRect().intersects(IntRect(
+              contentsX(), contentsY(), visibleWidth(), visibleHeight()))) {
         // toFocus is visible in the contents area
         visible = true;
       } else {

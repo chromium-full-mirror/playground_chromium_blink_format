@@ -347,10 +347,7 @@ SVGAngleImpl* SVGSVGElementImpl::createSVGAngle() {
 }
 
 SVGPointImpl* SVGSVGElementImpl::createSVGPoint(const IntPoint& p) {
-  if (p.isNull())
-    return new SVGPointImpl();
-  else
-    return new SVGPointImpl(p);
+  return new SVGPointImpl(p);
 }
 
 SVGMatrixImpl* SVGSVGElementImpl::createSVGMatrix() {

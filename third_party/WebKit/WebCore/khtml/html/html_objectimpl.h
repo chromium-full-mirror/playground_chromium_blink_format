@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,11 +21,11 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef HTML_OBJECTIMPL_H
 #define HTML_OBJECTIMPL_H
 
-#include "html_imageimpl.h"
-#include "xml/dom_stringimpl.h"
+#include "HTMLElementImpl.h"
 
 #if __APPLE__
 #include <JavaScriptCore/runtime.h>
@@ -37,15 +37,14 @@ class Instance;
 }
 #endif
 
-class QStringList;
-
 namespace DOM {
 
 class HTMLFormElementImpl;
+class HTMLImageLoader;
 
 class HTMLAppletElementImpl : public HTMLElementImpl {
  public:
-  HTMLAppletElementImpl(DocumentImpl* doc);
+  HTMLAppletElementImpl(DocumentImpl*);
   ~HTMLAppletElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -54,11 +53,10 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* token);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void closeRenderer();
   virtual void detach();
 
@@ -116,7 +114,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
 class HTMLEmbedElementImpl : public HTMLElementImpl {
  public:
-  HTMLEmbedElementImpl(DocumentImpl* doc);
+  HTMLEmbedElementImpl(DocumentImpl*);
   ~HTMLEmbedElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -125,17 +123,16 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   virtual void attach();
   virtual void detach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
   KJS::Bindings::Instance* getEmbedInstance() const;
 
@@ -153,7 +150,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
 class HTMLObjectElementImpl : public HTMLElementImpl {
  public:
-  HTMLObjectElementImpl(DocumentImpl* doc);
+  HTMLObjectElementImpl(DocumentImpl*);
   ~HTMLObjectElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -164,12 +161,11 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* token);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   virtual void attach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void closeRenderer();
   virtual void detach();
   virtual void insertedIntoDocument();
@@ -180,7 +176,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   DocumentImpl* contentDocument() const;
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
   bool isImageType();
 
@@ -268,15 +264,15 @@ class HTMLParamElementImpl : public HTMLElementImpl {
   friend class HTMLAppletElementImpl;
 
  public:
-  HTMLParamElementImpl(DocumentImpl* doc);
+  HTMLParamElementImpl(DocumentImpl*);
   ~HTMLParamElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
 
-  virtual void parseMappedAttribute(MappedAttributeImpl* token);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
   DOMString name() const { return m_name; }
   void setName(const DOMString&);

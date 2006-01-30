@@ -588,9 +588,9 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
       if (p >= 0) {
         paint.setPen(Pen::NoPen);
         paint.setBrush(Color::gray);
-        v->setDrawingAlpha((float)0.25);
+        v->setDrawingAlpha(0.25);
         paint.drawRect(p + sw / 2 - rBord, r.y(), 2 * rBord, r.height());
-        v->setDrawingAlpha((float)1.0);
+        v->setDrawingAlpha(1.0);
       }
     } else {
       if (m_oldpos >= 0)
@@ -599,9 +599,9 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
       if (p >= 0) {
         paint.setPen(Pen::NoPen);
         paint.setBrush(Color::gray);
-        v->setDrawingAlpha((float)0.25);
+        v->setDrawingAlpha(0.25);
         paint.drawRect(r.x(), p + sw / 2 - rBord, r.width(), 2 * rBord);
-        v->setDrawingAlpha((float)1.0);
+        v->setDrawingAlpha(1.0);
       }
     }
     m_oldpos = p;

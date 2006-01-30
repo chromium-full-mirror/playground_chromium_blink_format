@@ -58,8 +58,7 @@ CachedImage::~CachedImage() {
 void CachedImage::ref(CachedObjectClient* c) {
   CachedObject::ref(c);
 
-  // for mouseovers, dynamic changes
-  if (!decodedRect().isNull())
+  if (!decodedRect().isEmpty())
     c->imageChanged(this, decodedRect());
 
   if (!m_loading)

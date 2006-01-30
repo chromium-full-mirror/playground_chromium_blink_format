@@ -355,8 +355,7 @@ class RenderBlock : public RenderFlow {
   int leftSelectionOffset(RenderBlock* rootBlock, int y);
   int rightSelectionOffset(RenderBlock* rootBlock, int y);
 
-#ifndef NDEBUG
-  virtual void printTree(int indent = 0) const;
+#if !NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
 

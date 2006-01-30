@@ -29,34 +29,33 @@
 #include "CachedImage.h"
 #include "DocumentImpl.h"
 #include "EventNames.h"
+#include "FloatRect.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "KWQAccObjectCache.h"
+#include "Pen.h"
+#include "RenderBlock.h"
+#include "RenderTable.h"
+#include "RenderTableCell.h"
+#include "RenderTableCol.h"
+#include "RenderTableRow.h"
 #include "RenderText.h"
 #include "cssstyleselector.h"
 #include "dom2_eventsimpl.h"
 #include "dom_elementimpl.h"
 #include "dom_position.h"
-#include "visible_position.h"
 #include "htmlnames.h"
 #include "render_arena.h"
-#include "RenderBlock.h"
 #include "render_canvas.h"
 #include "render_flexbox.h"
 #include "render_inline.h"
 #include "render_line.h"
 #include "render_list.h"
-#include "RenderTable.h"
-#include "RenderTableRow.h"
-#include "RenderTableCol.h"
-#include "RenderTableCell.h"
-
-#include <assert.h>
-#include <kdebug.h>
+#include "visible_position.h"
+#include <qmatrix.h>
 #include <qpainter.h>
-#include "Pen.h"
 #include <qtextcodec.h>
-#include <qwmatrix.h>
+#include <qtextstream.h>
 
 namespace WebCore {
 
@@ -72,7 +71,7 @@ void* RenderObject::operator new(size_t sz, RenderArena* renderArena) throw() {
 }
 
 void RenderObject::operator delete(void* ptr, size_t sz) {
-  assert(baseOfRenderObjectBeingDeleted == ptr);
+  ASSERT(baseOfRenderObjectBeingDeleted == ptr);
 
   // Stash size where destroy can find it.
   *(size_t*)ptr = sz;
@@ -103,7 +102,6 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
       break;
     case TABLE:
     case INLINE_TABLE:
-      // kdDebug( 6040 ) << "creating RenderTable" << endl;
       o = new (arena) RenderTable(node);
       break;
     case TABLE_ROW_GROUP:
@@ -1344,33 +1342,29 @@ IntRect RenderObject::absoluteBoundingBoxRect() {
   absoluteRects(rects, x, y);
 
   if (rects.isEmpty())
-    return IntRect(0, 0, 0, 0);
+    return IntRect();
 
   QValueList<IntRect>::ConstIterator it = rects.begin();
   IntRect result = *it;
-  while (++it != rects.end()) {
-    result = result.unite(*it);
-  }
+  while (++it != rects.end())
+    result.unite(*it);
   return result;
 }
 
 void RenderObject::addAbsoluteRectForLayer(IntRect& result) {
-  if (layer()) {
-    result = result.unite(absoluteBoundingBoxRect());
-  }
+  if (layer())
+    result.unite(absoluteBoundingBoxRect());
   for (RenderObject* current = firstChild(); current;
-       current = current->nextSibling()) {
+       current = current->nextSibling())
     current->addAbsoluteRectForLayer(result);
-  }
 }
 
 IntRect RenderObject::paintingRootRect(IntRect& topLevelRect) {
   IntRect result = absoluteBoundingBoxRect();
   topLevelRect = result;
   for (RenderObject* current = firstChild(); current;
-       current = current->nextSibling()) {
+       current = current->nextSibling())
     current->addAbsoluteRectForLayer(result);
-  }
   return result;
 }
 
@@ -1485,35 +1479,34 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   if (newBounds == oldBounds && !selfNeedsLayout())
     return false;
 
-  bool fullRepaint = selfNeedsLayout() || newBounds.x() != oldBounds.x() ||
-                     newBounds.y() != oldBounds.y() ||
+  bool fullRepaint = selfNeedsLayout() ||
+                     newBounds.location() != oldBounds.location() ||
                      mustRepaintBackgroundOrBorder();
   if (fullRepaint) {
     c->repaintViewRectangle(oldFullBounds);
     if (newBounds != oldBounds)
       c->repaintViewRectangle(newFullBounds);
-  } else {
-    // We didn't move, but we did change size.  Invalidate the delta, which will
-    // consist of possibly
-    // two rectangles (but typically only one).
-    int width = abs(newBounds.width() - oldBounds.width());
-    if (width)
-      c->repaintViewRectangle(
-          IntRect(kMin(newBounds.x() + newBounds.width(),
-                       oldBounds.x() + oldBounds.width()) -
-                      borderRight(),
-                  newBounds.y(), width + borderRight(),
-                  kMax(newBounds.height(), oldBounds.height())));
-    int height = abs(newBounds.height() - oldBounds.height());
-    if (height)
-      c->repaintViewRectangle(IntRect(
-          newBounds.x(), kMin(newBounds.y() + newBounds.height(),
-                              oldBounds.y() + oldBounds.height()) -
-                             borderBottom(),
-          kMax(newBounds.width(), oldBounds.width()), height + borderBottom()));
-    return false;
+    return true;
   }
-  return true;
+
+  // We didn't move, but we did change size.  Invalidate the delta, which will
+  // consist of possibly
+  // two rectangles (but typically only one).
+  int width = abs(newBounds.width() - oldBounds.width());
+  if (width)
+    c->repaintViewRectangle(
+        IntRect(kMin(newBounds.x() + newBounds.width(),
+                     oldBounds.x() + oldBounds.width()) -
+                    borderRight(),
+                newBounds.y(), width + borderRight(),
+                kMax(newBounds.height(), oldBounds.height())));
+  int height = abs(newBounds.height() - oldBounds.height());
+  if (height)
+    c->repaintViewRectangle(IntRect(
+        newBounds.x(),
+        kMin(newBounds.bottom(), oldBounds.bottom()) - borderBottom(),
+        kMax(newBounds.width(), oldBounds.width()), height + borderBottom()));
+  return false;
 }
 
 void RenderObject::repaintDuringLayoutIfMoved(int x, int y) {}
@@ -1546,20 +1539,15 @@ void RenderObject::repaintObjectsBeforeLayout() {
 
 IntRect RenderObject::getAbsoluteRepaintRectWithOutline(int ow) {
   IntRect r(getAbsoluteRepaintRect());
-  r.setRect(r.x() - ow, r.y() - ow, r.width() + ow * 2, r.height() + ow * 2);
+  r.inflate(ow);
 
   if (continuation() && !isInline())
-    r.setRect(r.x(), r.y() - collapsedMarginTop(), r.width(),
-              r.height() + collapsedMarginTop() + collapsedMarginBottom());
+    r.inflateY(collapsedMarginTop());
 
-  if (isInlineFlow()) {
-    for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
-      if (!curr->isText()) {
-        IntRect childRect = curr->getAbsoluteRepaintRectWithOutline(ow);
-        r = r.unite(childRect);
-      }
-    }
-  }
+  if (isInlineFlow())
+    for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
+      if (!curr->isText())
+        r.unite(curr->getAbsoluteRepaintRectWithOutline(ow));
 
   return r;
 }
@@ -1635,19 +1623,6 @@ QString RenderObject::information() const {
   return str;
 }
 
-void RenderObject::printTree(int indent) const {
-  QString ind;
-  ind.fill(' ', indent);
-
-  kdDebug() << ind << information() << endl;
-
-  RenderObject* child = firstChild();
-  while (child != 0) {
-    child->printTree(indent + 2);
-    child = child->nextSibling();
-  }
-}
-
 void RenderObject::dump(QTextStream* stream, QString ind) const {
   if (isAnonymous()) {
     *stream << " anonymous";
@@ -1715,7 +1690,7 @@ static NodeImpl* selectStartNode(const RenderObject* object) {
   }
 
   // somewhere up the render tree there must be an element!
-  assert(node);
+  ASSERT(node);
 
   return node;
 }
@@ -2680,8 +2655,16 @@ InlineBox* RenderObject::inlineBox(int offset, EAffinity affinity) {
 
 #if SVG_SUPPORT
 
+FloatRect RenderObject::relativeBBox(bool) const {
+  return FloatRect();
+}
+
 QMatrix RenderObject::localTransform() const {
   return QMatrix(1, 0, 0, 1, xPos(), yPos());
+}
+
+void RenderObject::setLocalTransform(const QMatrix&) {
+  ASSERT(false);
 }
 
 QMatrix RenderObject::absoluteTransform() const {

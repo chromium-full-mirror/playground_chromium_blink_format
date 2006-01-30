@@ -221,39 +221,40 @@ int RenderBox::calcContentBoxHeight(int h) const {
 
 // Hit Testing
 bool RenderBox::nodeAtPoint(NodeInfo& info,
-                            int _x,
-                            int _y,
-                            int _tx,
-                            int _ty,
-                            HitTestAction hitTestAction) {
+                            int x,
+                            int y,
+                            int tx,
+                            int ty,
+                            HitTestAction action) {
+  tx += m_x;
+  ty += m_y;
+
   // Check kids first.
-  _tx += m_x;
-  _ty += m_y;
   for (RenderObject* child = lastChild(); child;
        child = child->previousSibling()) {
     // FIXME: We have to skip over inline flows, since they can show up inside
-    // table rows at the moment (a demoted inline <form> for example).  If we
-    // ever implement a
+    // table rows
+    // at the moment (a demoted inline <form> for example). If we ever implement
+    // a
     // table-specific hit-test method (which we should do for performance
-    // reasons anyway), then we can remove this check.
+    // reasons anyway),
+    // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
-        child->nodeAtPoint(info, _x, _y, _tx, _ty, hitTestAction)) {
+        child->nodeAtPoint(info, x, y, tx, ty, action)) {
       setInnerNode(info);
       return true;
     }
   }
 
-  // Check our bounds next.  For this purpose always assume that we can only be
+  // Check our bounds next. For this purpose always assume that we can only be
   // hit in the
   // foreground phase (which is true for replaced elements like images).
-  if (hitTestAction != HitTestForeground)
-    return false;
-
-  IntRect boundsRect(_tx, _ty, m_width, m_height);
-  if (boundsRect.contains(_x, _y)) {
+  if (action == HitTestForeground &&
+      IntRect(tx, ty, m_width, m_height).contains(x, y)) {
     setInnerNode(info);
     return true;
   }
+
   return false;
 }
 
@@ -604,10 +605,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       } else {
         cw = pw;
         cx = vr.x();
-        if (pixw > 0) {
-          sx = pixw -
-               ((bgLayer->backgroundXPosition().minWidth(pw - pixw)) % pixw);
-        }
+        if (pixw > 0)
+          sx = pixw - bgLayer->backgroundXPosition().minWidth(pw - pixw) % pixw;
       }
 
       if ((bgr == NO_REPEAT || bgr == REPEAT_X) && ph > pixh) {
@@ -616,15 +615,12 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       } else {
         ch = ph;
         cy = vr.y();
-        if (pixh > 0) {
-          sy = pixh -
-               ((bgLayer->backgroundYPosition().minWidth(ph - pixh)) % pixh);
-        }
+        if (pixh > 0)
+          sy = pixh - bgLayer->backgroundYPosition().minWidth(ph - pixh) % pixh;
       }
 
-      IntRect fix(cx, cy, cw, ch);
-      IntRect ele(_tx, _ty, w, h);
-      IntRect b = fix.intersect(ele);
+      IntRect b =
+          intersection(IntRect(cx, cy, cw, ch), IntRect(_tx, _ty, w, h));
       sx += b.x() - cx;
       sy += b.y() - cy;
       cx = b.x();
@@ -841,7 +837,7 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& r, bool f) {
       o->layer()->subtractScrollOffset(x,
                                        y);  // For overflow:auto/scroll/hidden.
       IntRect repaintRect(x, y, r.width(), r.height());
-      r = repaintRect.intersect(boxRect);
+      r = intersection(repaintRect, boxRect);
       if (r.isEmpty())
         return;
     } else {
