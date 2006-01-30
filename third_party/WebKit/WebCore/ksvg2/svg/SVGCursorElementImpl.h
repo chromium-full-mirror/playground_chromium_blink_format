@@ -54,15 +54,12 @@ class SVGCursorElementImpl : public SVGElementImpl,
 
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  virtual void notifyFinished(KDOM::CachedObject* finishedObj);
-
-  const Image& image() const { return m_image; }
+  CachedImage* cachedImage() const { return m_cachedImage; }
 
  private:
   mutable RefPtr<SVGAnimatedLengthImpl> m_x;
   mutable RefPtr<SVGAnimatedLengthImpl> m_y;
   KDOM::CachedImage* m_cachedImage;
-  Image m_image;
 };
 };
 

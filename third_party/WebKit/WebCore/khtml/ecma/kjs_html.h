@@ -1105,9 +1105,10 @@ class Gradient : public DOMObject {
   mutable unsigned regenerateShading : 1;
 };
 
-class ImagePattern : public DOMObject {
+class ImagePattern : public DOMObject, public WebCore::CachedObjectClient {
  public:
-  ImagePattern(const WebCore::Image& image, int repetitionType);
+  ImagePattern(WebCore::CachedImage* cachedImage, int repetitionType);
+  ~ImagePattern();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
@@ -1127,13 +1128,13 @@ class ImagePattern : public DOMObject {
   CGPatternRef createPattern(CGAffineTransform transform);
 #endif
 
-  WebCore::Image image() { return _image; }
+  WebCore::CachedImage* cachedImage() const { return m_cachedImage; }
 
   enum { Repeat, RepeatX, RepeatY, NoRepeat };
 
  private:
   float _rw, _rh;
-  WebCore::Image _image;
+  WebCore::CachedImage* m_cachedImage;
 #if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGRect _bounds;
