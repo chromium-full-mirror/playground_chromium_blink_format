@@ -264,8 +264,8 @@ class Vector {
     return m_impl.buffer()[i];
   }
 
-  T& operator[](size_t i) { return at(i); }
-  const T& operator[](size_t i) const { return at(i); }
+  T& operator[](unsigned long i) { return at(i); }
+  const T& operator[](unsigned long i) const { return at(i); }
   T& operator[](int i) { return at(i); }
   const T& operator[](int i) const { return at(i); }
   T& operator[](unsigned i) { return at(i); }

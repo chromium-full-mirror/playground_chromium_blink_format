@@ -328,7 +328,7 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
  */
 #define KJS_DEFINE_PROTOTYPE(ClassProto)                                    \
   class ClassProto : public KJS::JSObject {                                 \
-    friend KJS::JSObject* cacheGlobalObject<ClassProto>(                    \
+    friend KJS::JSObject* ::cacheGlobalObject<ClassProto>(                  \
         KJS::ExecState * exec,                                              \
         const KJS::Identifier& propertyName);                               \
                                                                             \
@@ -345,30 +345,32 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
         : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()) {} \
   };
 
-#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassProto, ClassFunc)              \
-  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};    \
-  JSObject* ClassProto::self(ExecState* exec) {                                \
-    return cacheGlobalObject<ClassProto>(exec, "[[" ClassName ".prototype]]"); \
-  }                                                                            \
-  bool ClassProto::getOwnPropertySlot(                                         \
-      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {   \
-    return getStaticFunctionSlot<ClassFunc, JSObject>(                         \
-        exec, &ClassProto##Table, this, propertyName, slot);                   \
+#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassProto, ClassFunc)            \
+  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};  \
+  JSObject* ClassProto::self(ExecState* exec) {                              \
+    return ::cacheGlobalObject<ClassProto>(exec,                             \
+                                           "[[" ClassName ".prototype]]");   \
+  }                                                                          \
+  bool ClassProto::getOwnPropertySlot(                                       \
+      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) { \
+    return getStaticFunctionSlot<ClassFunc, JSObject>(                       \
+        exec, &ClassProto##Table, this, propertyName, slot);                 \
   }
 
-#define KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT(ClassName, ClassProto, ClassFunc,  \
-                                            ParentProto)                       \
-  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};    \
-  JSObject* ClassProto::self(ExecState* exec) {                                \
-    return cacheGlobalObject<ClassProto>(exec, "[[" ClassName ".prototype]]"); \
-  }                                                                            \
-  bool ClassProto::getOwnPropertySlot(                                         \
-      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {   \
-    if (getStaticFunctionSlot<ClassFunc, JSObject>(exec, &ClassProto##Table,   \
-                                                   this, propertyName, slot))  \
-      return true;                                                             \
-    return ParentProto::self(exec)->getOwnPropertySlot(exec, propertyName,     \
-                                                       slot);                  \
+#define KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT(ClassName, ClassProto, ClassFunc, \
+                                            ParentProto)                      \
+  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};   \
+  JSObject* ClassProto::self(ExecState* exec) {                               \
+    return ::cacheGlobalObject<ClassProto>(exec,                              \
+                                           "[[" ClassName ".prototype]]");    \
+  }                                                                           \
+  bool ClassProto::getOwnPropertySlot(                                        \
+      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {  \
+    if (getStaticFunctionSlot<ClassFunc, JSObject>(exec, &ClassProto##Table,  \
+                                                   this, propertyName, slot)) \
+      return true;                                                            \
+    return ParentProto::self(exec)->getOwnPropertySlot(exec, propertyName,    \
+                                                       slot);                 \
   }
 
 #define KJS_IMPLEMENT_PROTOFUNC(ClassFunc)                           \
