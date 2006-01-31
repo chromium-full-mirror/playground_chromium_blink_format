@@ -764,6 +764,8 @@ NodeImpl* HTMLParser::getNode(Token* t) {
                      &HTMLParser::nestedCreateErrorCheck);
     gFunctionMap.set(aTag.localName().impl(),
                      &HTMLParser::nestedCreateErrorCheck);
+    gFunctionMap.set(buttonTag.localName().impl(),
+                     &HTMLParser::nestedCreateErrorCheck);
     gFunctionMap.set(nobrTag.localName().impl(),
                      &HTMLParser::nestedCreateErrorCheck);
     gFunctionMap.set(wbrTag.localName().impl(),
