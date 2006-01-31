@@ -1349,6 +1349,8 @@ NodeImpl* RangeImpl::startNode() const {
   NodeImpl* child = m_startContainer->childNode(m_startOffset);
   if (child)
     return child;
+  if (m_startOffset == 0)
+    return m_startContainer;
   return m_startContainer->traverseNextSibling();
 }
 
