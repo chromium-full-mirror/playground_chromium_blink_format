@@ -48,7 +48,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
                         int UTF8Length,
                         NPUTF16** UTF16Chars,
                         unsigned int* UTF16Length) {
-  assert(UTF8Chars);
+  assert(UTF8Chars || UTF8Length == 0);
 
   if (UTF8Length == -1)
     UTF8Length = strlen(UTF8Chars);
