@@ -896,7 +896,7 @@ class HTMLAllCollection : public HTMLCollection {
   HTMLAllCollection(ExecState* exec, DOM::HTMLCollectionImpl* c)
       : HTMLCollection(exec, c) {}
   virtual bool toBoolean(ExecState*) const { return false; }
-  virtual bool isEqualToNull(ExecState*) const { return true; }
+  virtual bool masqueradeAsUndefined() const { return true; }
 };
 
 ////////////////////// Option Object ////////////////////////
