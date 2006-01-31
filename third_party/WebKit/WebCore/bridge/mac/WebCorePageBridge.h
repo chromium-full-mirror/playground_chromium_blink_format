@@ -33,9 +33,12 @@
 // non-WebCore side of the bridge.
 
 #ifdef __cplusplus
+namespace WebCore {
 class Page;
+}
+typedef WebCore::Page WebCorePage;
 #else
-@class Page;
+@class WebCorePage;
 #endif
 
 #ifdef __OBJC__
@@ -45,7 +48,7 @@ class WebCoreFrameBridge;
 #endif
 
 @interface WebCorePageBridge : NSObject {
-  Page* _page;
+  WebCorePage* _page;
 }
 
 - (id)initWithMainFrame:(WebCoreFrameBridge*)mainFrame;

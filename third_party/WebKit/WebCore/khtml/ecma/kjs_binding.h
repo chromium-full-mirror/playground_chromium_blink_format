@@ -29,11 +29,10 @@
 #include <JavaScriptCore/runtime.h>
 #endif
 
-class Frame;
-
-namespace DOM {
+namespace WebCore {
 class DocumentImpl;
 class EventImpl;
+class Frame;
 class NodeImpl;
 }
 
@@ -75,7 +74,7 @@ class DOMNode;
  */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(JSObject* global, Frame* frame);
+  ScriptInterpreter(JSObject* global, WebCore::Frame* frame);
   virtual ~ScriptInterpreter();
 
   static DOMObject* getDOMObject(void* objectHandle);
@@ -94,7 +93,7 @@ class ScriptInterpreter : public Interpreter {
                                     DOM::DocumentImpl* oldDoc,
                                     DOM::DocumentImpl* newDoc);
 
-  Frame* frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
 
   virtual int rtti() { return 1; }
 
@@ -131,7 +130,7 @@ class ScriptInterpreter : public Interpreter {
                                    const Bindings::RootObject* current);
 
  private:
-  Frame* m_frame;
+  WebCore::Frame* m_frame;
 
   DOM::EventImpl* m_evt;
   bool m_inlineCode;

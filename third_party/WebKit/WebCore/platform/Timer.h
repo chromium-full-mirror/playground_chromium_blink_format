@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,22 +23,62 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __khtml_factory_h__
-#define __khtml_factory_h__
+#ifndef TIMER_H
+#define TIMER_H
 
-#include "KWQKPartsHistoryProvider.h"
+namespace WebCore {
 
-class Frame;
-class KHTMLSettings;
+// Fire times are in the same units as currentTime() in SystemTime.h.
+// In seconds, using the classic POSIX epoch of January 1, 1970.
 
-class KHTMLFactory {
+class TimerBase {
  public:
-  static KHTMLSettings* defaultHTMLSettings();
+  typedef void (*TimerBaseFiredFunction)(TimerBase*);
 
-  // list of visited URLs
-  static KParts::HistoryProvider* vLinks() {
-    return KParts::HistoryProvider::self();
-  }
+  TimerBase(TimerBaseFiredFunction);
+  ~TimerBase() { stop(); }
+
+  void start(double nextFireTime, double repeatInterval);
+
+  void startRepeating(double repeatInterval);
+  void startOneShot(double interval);
+
+  void stop();
+  bool isActive() const;
+
+  double nextFireTime() const;
+  double repeatInterval() const;
+
+  void fire();
+
+ private:
+  TimerBase(const TimerBase&);
+  TimerBase& operator=(const TimerBase&);
+
+  TimerBaseFiredFunction m_function;
+
+#if __APPLE__
+  CFRunLoopTimerRef m_runLoopTimer;
+#endif
 };
+
+template <typename TimerFiredClass>
+class Timer : public TimerBase {
+ public:
+  typedef void (TimerFiredClass::*TimerFiredFunction)(Timer*);
+
+  Timer(TimerFiredClass* o, TimerFiredFunction f)
+      : TimerBase(fired), m_object(o), m_memberFunction(f) {}
+
+  static void fired(TimerBase* b) {
+    Timer* t = static_cast<Timer*>(b);
+    (t->m_object->*t->m_memberFunction)(t);
+  }
+
+ private:
+  TimerFiredClass* m_object;
+  TimerFiredFunction m_memberFunction;
+};
+}
 
 #endif

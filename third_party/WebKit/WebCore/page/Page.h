@@ -24,6 +24,8 @@
 #include <kxmlcore/RefPtr.h>
 #include <kxmlcore/PassRefPtr.h>
 
+namespace WebCore {
+
 class Frame;
 
 class Page {
@@ -35,5 +37,6 @@ class Page {
  private:
   RefPtr<Frame> m_mainFrame;
 };
+}
 
 #endif  // PAGE_H

@@ -31,10 +31,9 @@
 #include "dom2_events.h"
 #include "dom2_rangeimpl.h"
 
-class Frame;
-
 namespace WebCore {
 
+class Frame;
 class QPainter;
 class RenderObject;
 class VisiblePosition;
@@ -125,7 +124,7 @@ class SelectionController {
 
   void debugRenderer(RenderObject*, bool selected) const;
 
-  friend class ::Frame;
+  friend class Frame;
 
   Frame* frame() const;
 

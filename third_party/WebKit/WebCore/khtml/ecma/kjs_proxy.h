@@ -21,7 +21,6 @@
 #ifndef KJS_PROXY_H
 #define KJS_PROXY_H
 
-class Frame;
 class QString;
 
 namespace KJS {
@@ -34,6 +33,7 @@ namespace WebCore {
 class DOMString;
 class EventImpl;
 class EventListener;
+class Frame;
 class NodeImpl;
 
 class KJSProxyImpl {

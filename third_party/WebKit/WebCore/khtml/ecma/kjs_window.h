@@ -28,12 +28,12 @@
 #include <qobject.h>
 #include <qstring.h>
 
-class Frame;
-class FrameView;
 class QTimer;
 
-namespace DOM {
+namespace WebCore {
 class AtomicString;
+class Frame;
+class FrameView;
 class NodeImpl;
 }
 
@@ -119,19 +119,19 @@ class Screen : public JSObject {
 
  private:
   friend class Window;
-  Screen(ExecState*, Frame*);
-  QGuardedPtr<Frame> m_frame;
+  Screen(ExecState*, WebCore::Frame*);
+  QGuardedPtr<WebCore::Frame> m_frame;
 };
 
 class Window : public JSObject {
-  friend QGuardedPtr<Frame> getInstance();
+  friend QGuardedPtr<WebCore::Frame> getInstance();
   friend class Location;
   friend class WindowFunc;
   friend class WindowQObject;
   friend class ScheduledAction;
 
  public:
-  Window(Frame* p);
+  Window(WebCore::Frame* p);
 
  public:
   ~Window();
@@ -140,18 +140,18 @@ class Window : public JSObject {
    * for the specified frame p this will be returned in order to have unique
    * bindings.
    */
-  static JSValue* retrieve(Frame*);
+  static JSValue* retrieve(WebCore::Frame* p);
   /**
    * Returns the Window object for a given HTML frame
    */
-  static Window* retrieveWindow(Frame*);
+  static Window* retrieveWindow(WebCore::Frame* p);
   /**
    * returns a pointer to the Window object this javascript interpreting
    * instance
    * was called from.
    */
   static Window* retrieveActive(ExecState*);
-  QGuardedPtr<Frame> frame() const { return m_frame; }
+  QGuardedPtr<WebCore::Frame> frame() const { return m_frame; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -339,7 +339,7 @@ class Window : public JSObject {
 
   void updateLayout() const;
 
-  QGuardedPtr<Frame> m_frame;
+  QGuardedPtr<WebCore::Frame> m_frame;
   mutable Screen* screen;
   mutable History* history;
   mutable FrameArray* frames;
@@ -402,14 +402,14 @@ class Location : public JSObject {
     ToString,
     Assign
   };
-  Frame* frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
   friend class Window;
-  Location(Frame* p);
-  QGuardedPtr<Frame> m_frame;
+  Location(WebCore::Frame* p);
+  QGuardedPtr<WebCore::Frame> m_frame;
 };
 
 class Selection : public JSObject {
@@ -440,14 +440,14 @@ class Selection : public JSObject {
     Modify,
     GetRangeAt
   };
-  Frame* frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
   friend class Window;
-  Selection(Frame* p);
-  QGuardedPtr<Frame> m_frame;
+  Selection(WebCore::Frame* p);
+  QGuardedPtr<WebCore::Frame> m_frame;
 };
 
 class BarInfo : public JSObject {
@@ -463,14 +463,14 @@ class BarInfo : public JSObject {
     Statusbar,
     Toolbar
   };
-  Frame* frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
   friend class Window;
-  BarInfo(ExecState* exec, Frame* p, Type barType);
-  QGuardedPtr<Frame> m_frame;
+  BarInfo(ExecState* exec, WebCore::Frame* p, Type barType);
+  QGuardedPtr<WebCore::Frame> m_frame;
   Type m_type;
 };
 

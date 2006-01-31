@@ -20,11 +20,14 @@
 
 #include "config.h"
 #include "Page.h"
+
 #include "Frame.h"
 #include <kjs/collector.h>
 #include <kjs/JSLock.h>
 
 using namespace KJS;
+
+namespace WebCore {
 
 static int pageCount;
 
@@ -42,4 +45,5 @@ Page::~Page() {
     Collector::collect();
 #endif
   }
+}
 }

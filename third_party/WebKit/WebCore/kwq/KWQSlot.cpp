@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,28 +34,18 @@
 #include "render_form.h"
 #include "render_layer.h"
 #include "xmlhttprequest.h"
-#ifdef SVG_SUPPORT
+
+#if SVG_SUPPORT
 #define id ID_HACK
 #import "ksvg2/misc/KSVGTimeScheduler.h"
 #undef id
 #endif
 
-using DOM::DocumentImpl;
-using khtml::CachedObject;
-using khtml::DocLoader;
-using khtml::Loader;
-using khtml::RenderFileButton;
-using khtml::RenderFormElement;
-using khtml::RenderLineEdit;
-using khtml::RenderSelect;
-using khtml::RenderSlider;
-using khtml::RenderTextArea;
-using khtml::RenderWidget;
-using khtml::RenderScrollMediator;
+using namespace WebCore;
+
 using KIO::Job;
 using KJS::WindowQObject;
-using WebCore::XMLHttpRequestQObject;
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
 using KSVG::TimeScheduler;
 #endif
 
@@ -71,7 +61,6 @@ enum FunctionNumber {
   slotParentCompleted,
   slotParentDestroyed,
   slotPerformSearch,
-  slotRedirect,
   slotReturnPressed,
   slotSelected,
   slotSelectionChanged,
@@ -90,7 +79,7 @@ enum FunctionNumber {
   slotFinished_Loader,
   slotFinished_XMLHttpRequest,
   slotReceivedResponse,
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
   slotTimerNotify,
 #endif
 };
@@ -109,7 +98,6 @@ KWQSlot::KWQSlot(QObject* object, const char* member) {
   CASE(slotLoaderRequestDone, (khtml::DocLoader*, khtml::CachedObject*), Frame)
   CASE(slotParentCompleted, (), Frame)
   CASE(slotPerformSearch, (), RenderLineEdit)
-  CASE(slotRedirect, (), Frame)
   CASE(slotReturnPressed, (), RenderLineEdit)
   CASE(slotSelected, (int), RenderSelect)
   CASE(slotSelectionChanged, (), RenderFormElement)
@@ -117,7 +105,7 @@ KWQSlot::KWQSlot(QObject* object, const char* member) {
   CASE(slotTextChanged, (), RenderTextArea)
   CASE(slotValueChanged, (int), RenderScrollMediator)
   CASE(slotWidgetDestructed, (), RenderWidget)
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
   CASE(slotTimerNotify, (), TimeScheduler)
 #endif
 
@@ -185,14 +173,13 @@ void KWQSlot::call() const {
     CASE(slotParentCompleted, Frame, slotParentCompleted)
     CASE(slotParentDestroyed, WindowQObject, parentDestroyed)
     CASE(slotPerformSearch, RenderLineEdit, slotPerformSearch)
-    CASE(slotRedirect, Frame, slotRedirect)
     CASE(slotReturnPressed, RenderLineEdit, slotReturnPressed)
     CASE(slotSelectionChanged, RenderFormElement, slotSelectionChanged)
     CASE(slotSliderValueChanged, RenderSlider, slotSliderValueChanged)
     CASE(slotSubmitFormAgain, Frame, submitFormAgain)
     CASE(slotTextChanged, RenderTextArea, slotTextChanged)
     CASE(slotWidgetDestructed, RenderWidget, slotWidgetDestructed)
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
     CASE(slotTimerNotify, TimeScheduler, slotTimerNotify)
 #endif
   }

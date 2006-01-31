@@ -23,13 +23,15 @@
 
 #include <kjs/object.h>
 
+namespace WebCore {
 class Frame;
+}
 
 namespace KJS {
 
 class Navigator : public JSObject {
  public:
-  Navigator(ExecState* exec, Frame* p);
+  Navigator(ExecState* exec, WebCore::Frame* p);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -49,11 +51,11 @@ class Navigator : public JSObject {
     CookieEnabled,
     JavaEnabled
   };
-  Frame* frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
 
  private:
-  Frame* m_frame;
+  WebCore::Frame* m_frame;
 };
-};  // namespace
+}  // namespace
 
 #endif

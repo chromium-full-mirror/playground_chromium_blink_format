@@ -31,20 +31,17 @@
 
 #include "html/html_documentimpl.h"
 
-class FrameView;
 class HTMLStackElem;
 
-namespace DOM {
+namespace WebCore {
+class DocumentFragmentImpl;
+class FrameView;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
-class NodeImpl;
 class HTMLFormElementImpl;
-class HTMLMapElementImpl;
 class HTMLHeadElementImpl;
-class DocumentFragmentImpl;
-}
-
-namespace khtml {
+class HTMLMapElementImpl;
+class NodeImpl;
 class Token;
 }
 
@@ -55,7 +52,9 @@ class Token;
  */
 class HTMLParser {
  public:
-  HTMLParser(FrameView* w, DOM::DocumentImpl* i, bool includesComments = false);
+  HTMLParser(WebCore::FrameView* w,
+             DOM::DocumentImpl* i,
+             bool includesComments = false);
   HTMLParser(DOM::DocumentFragmentImpl* frag,
              DOM::DocumentImpl* doc,
              bool includesComments = false);
@@ -90,7 +89,7 @@ class HTMLParser {
     discard_until = qName.localName();
   }
 
-  FrameView* HTMLWidget;
+  WebCore::FrameView* HTMLWidget;
   DOM::DocumentImpl* document;
 
   /*

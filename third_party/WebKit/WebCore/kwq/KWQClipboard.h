@@ -30,8 +30,8 @@
 #define KWQCLIPBOARD_H_
 
 #include "Image.h"
-#include "xml/dom2_eventsimpl.h"
 #include "IntPoint.h"
+#include "dom2_eventsimpl.h"
 
 #ifdef __OBJC__
 @class NSImage;
@@ -43,12 +43,13 @@ class NSPasteboard;
 
 typedef unsigned NSDragOperation;
 
-class MacFrame;
 class QStringList;
 
 namespace WebCore {
 
-class KWQClipboard : public DOM::ClipboardImpl, public CachedObjectClient {
+class MacFrame;
+
+class KWQClipboard : public ClipboardImpl, public CachedObjectClient {
  public:
   // security mechanisms
   typedef enum {
@@ -67,15 +68,15 @@ class KWQClipboard : public DOM::ClipboardImpl, public CachedObjectClient {
 
   bool isForDragging() const;
 
-  DOM::DOMString dropEffect() const;
-  void setDropEffect(const DOM::DOMString& s);
-  DOM::DOMString effectAllowed() const;
-  void setEffectAllowed(const DOM::DOMString& s);
+  DOMString dropEffect() const;
+  void setDropEffect(const DOMString& s);
+  DOMString effectAllowed() const;
+  void setEffectAllowed(const DOMString& s);
 
-  void clearData(const DOM::DOMString& type);
+  void clearData(const DOMString& type);
   void clearAllData();
-  DOM::DOMString getData(const DOM::DOMString& type, bool& success) const;
-  bool setData(const DOM::DOMString& type, const DOM::DOMString& data);
+  DOMString getData(const DOMString& type, bool& success) const;
+  bool setData(const DOMString& type, const DOMString& data);
 
   // extensions beyond IE's API
   virtual QStringList types() const;
@@ -83,8 +84,8 @@ class KWQClipboard : public DOM::ClipboardImpl, public CachedObjectClient {
   IntPoint dragLocation() const;  // same point as client passed us
   CachedImage* dragImage() const;
   void setDragImage(CachedImage*, const IntPoint&);
-  DOM::NodeImpl* dragImageElement();
-  void setDragImageElement(DOM::NodeImpl*, const IntPoint&);
+  NodeImpl* dragImageElement();
+  void setDragImageElement(NodeImpl*, const IntPoint&);
 
 #if __APPLE__
   // Methods for getting info in Cocoa's type system
@@ -103,17 +104,15 @@ class KWQClipboard : public DOM::ClipboardImpl, public CachedObjectClient {
   virtual void imageChanged(CachedImage*, const IntRect&);
 
  private:
-  void setDragImage(CachedImage* cachedImage,
-                    DOM::NodeImpl*,
-                    const IntPoint& loc);
+  void setDragImage(CachedImage* cachedImage, NodeImpl*, const IntPoint& loc);
 
   NSPasteboard* m_pasteboard;
   bool m_forDragging;
-  DOM::DOMString m_dropEffect;
-  DOM::DOMString m_effectAllowed;
+  DOMString m_dropEffect;
+  DOMString m_effectAllowed;
   IntPoint m_dragLoc;
   CachedImage* m_dragImage;
-  RefPtr<DOM::NodeImpl> m_dragImageElement;
+  RefPtr<NodeImpl> m_dragImageElement;
   AccessPolicy m_policy;
   int m_changeCount;
   bool m_dragStarted;

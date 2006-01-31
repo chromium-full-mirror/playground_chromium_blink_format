@@ -3,6 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Simon Hausmann <hausmann@kde.org>
+ * Copyright (C) 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,18 +21,19 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef __render_frames_h__
-#define __render_frames_h__
+
+#ifndef render_frames_h__
+#define render_frames_h__
 
 #include "RenderContainer.h"
 #include "render_replaced.h"
 #include "html_baseimpl.h"
 
-class FrameView;
-
 namespace WebCore {
-class HTMLFrameElementImpl;
+
+class FrameView;
 class HTMLElementImpl;
+class HTMLFrameElementImpl;
 class MouseEventImpl;
 
 struct ChildFrame;

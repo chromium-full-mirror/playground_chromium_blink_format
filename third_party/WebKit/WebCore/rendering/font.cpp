@@ -96,10 +96,7 @@ void Font::drawText(QPainter* p,
 }
 
 void Font::update() const {
-  if (fontDef.family.familyIsEmpty())
-    f.setFamily(KHTMLFactory::defaultHTMLSettings()->stdFontName());
-  else
-    f.setFirstFamily(fontDef.family);
+  f.setFirstFamily(fontDef.family);
   f.setItalic(fontDef.italic);
   f.setWeight(fontDef.weight);
   f.setPixelSize(fontDef.computedPixelSize());

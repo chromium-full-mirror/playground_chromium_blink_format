@@ -60,8 +60,7 @@
 #include "SVGDocumentImpl.h"
 #include "EventNames.h"
 
-using namespace KSVG;
-using namespace khtml;
+namespace WebCore {
 
 SVGDocumentImpl::SVGDocumentImpl(SVGDOMImplementationImpl* i,
                                  KDOM::KDOMView* view)
@@ -294,6 +293,7 @@ void SVGDocumentImpl::dispatchMouseEvent(KDOM::EventTargetImpl* target,
 
 void SVGDocumentImpl::addForwardReference(const SVGElementImpl* element) {
   m_forwardReferences.append(element);
+}
 }
 
 // vim:ts=4:noet

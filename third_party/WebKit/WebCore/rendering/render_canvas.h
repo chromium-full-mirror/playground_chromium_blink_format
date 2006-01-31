@@ -25,10 +25,9 @@
 #include "RenderBlock.h"
 #include <kxmlcore/HashSet.h>
 
-class FrameView;
-class QScrollView;
-
 namespace WebCore {
+
+class FrameView;
 
 class RenderCanvas : public RenderBlock {
  public:

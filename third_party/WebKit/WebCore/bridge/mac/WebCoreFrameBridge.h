@@ -31,22 +31,20 @@
 
 #ifdef __cplusplus
 
-class MacFrame;
-class FrameView;
 class RenderArena;
 
-namespace khtml {
+namespace WebCore {
+class MacFrame;
 class RenderPart;
-class RenderObject;
 }
 
-typedef khtml::RenderPart KHTMLRenderPart;
+typedef WebCore::MacFrame WebCoreMacFrame;
+typedef WebCore::RenderPart WebCoreRenderPart;
 
 #else
 
-@class MacFrame;
-@class FrameView;
-@class KHTMLRenderPart;
+@class WebCoreMacFrame;
+@class WebCoreRenderPart;
 @class RenderArena;
 
 #endif
@@ -181,8 +179,8 @@ typedef enum {
 // side of the bridge.
 
 @interface WebCoreFrameBridge : NSObject {
-  MacFrame* m_frame;
-  KHTMLRenderPart* _renderPart;
+  WebCoreMacFrame* m_frame;
+  WebCoreRenderPart* _renderPart;
   RenderArena* _renderPartArena;
   BOOL _shouldCreateRenderers;
 
@@ -195,8 +193,8 @@ typedef enum {
 
 - (void)initializeSettings:(WebCoreSettings*)settings;
 
-- (void)setRenderPart:(KHTMLRenderPart*)renderPart;
-- (KHTMLRenderPart*)renderPart;
+- (void)setRenderPart:(WebCoreRenderPart*)renderPart;
+- (WebCoreRenderPart*)renderPart;
 
 - (void)setName:(NSString*)name;
 - (NSString*)name;
@@ -204,7 +202,7 @@ typedef enum {
  * repeatable results for loads of the same frameset. */
 - (NSString*)generateFrameName;
 
-- (MacFrame*)part;
+- (WebCoreMacFrame*)part;
 
 - (void)setParent:(WebCoreFrameBridge*)parent;
 - (WebCoreFrameBridge*)parent;
@@ -592,7 +590,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (WebCoreFrameBridge*)createChildFrameNamed:(NSString*)frameName
                                      withURL:(NSURL*)URL
                                     referrer:(NSString*)referrer
-                                  renderPart:(KHTMLRenderPart*)renderPart
+                                  renderPart:(WebCoreRenderPart*)renderPart
                              allowsScrolling:(BOOL)allowsScrolling
                                  marginWidth:(int)width
                                 marginHeight:(int)height;
