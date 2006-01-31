@@ -6363,7 +6363,7 @@ CGPatternRef ImagePattern::createPattern(CGAffineTransform transform) {
     return 0;
 
   CGAffineTransform patternTransform = transform;
-  patternTransform = CGAffineTransformScale(patternTransform, -1, -1);
+  patternTransform = CGAffineTransformScale(patternTransform, 1, -1);
   patternTransform = CGAffineTransformTranslate(
       patternTransform, 0, -m_cachedImage->image().height());
 
