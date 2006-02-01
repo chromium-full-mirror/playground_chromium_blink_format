@@ -86,14 +86,33 @@ using namespace KJS;
 
 // ------------------------------ Node -----------------------------------------
 
+#ifndef NDEBUG
+struct NodeCounter {
+  static int count;
+  ~NodeCounter() {
+    if (count != 0)
+      fprintf(stderr, "LEAK: %d KJS::Node\n", count);
+  }
+};
+int NodeCounter::count = 0;
+static NodeCounter nodeImplCounter;
+#endif NDEBUG
+
 Node::Node() {
+#ifndef NDEBUG
+  ++NodeCounter::count;
+#endif
   line = Lexer::curr()->lineNo();
   sourceURL = Lexer::curr()->sourceURL();
   m_refcount = 0;
   Parser::saveNewNode(this);
 }
 
-Node::~Node() {}
+Node::~Node() {
+#ifndef NDEBUG
+  --NodeCounter::count;
+#endif
+}
 
 static void substitute(UString& string, const UString& substring) {
   int position = string.find("%s");
