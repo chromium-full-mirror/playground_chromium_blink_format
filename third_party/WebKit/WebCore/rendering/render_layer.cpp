@@ -1203,10 +1203,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // the lowest
   // z-index.
   if (m_posZOrderList) {
-    for (Vector<RenderLayer*>::iterator it = &m_posZOrderList->last();
-         it >= m_posZOrderList->begin(); --it) {
-      insideLayer = it[0]->hitTestLayer(rootLayer, info, xMousePos, yMousePos,
-                                        hitTestRect);
+    for (int i = m_posZOrderList->size() - 1; i >= 0; --i) {
+      insideLayer = m_posZOrderList->at(i)->hitTestLayer(
+          rootLayer, info, xMousePos, yMousePos, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1245,10 +1244,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
 
   // Now check our negative z-index children.
   if (m_negZOrderList) {
-    for (Vector<RenderLayer*>::iterator it = &m_negZOrderList->last();
-         it >= m_negZOrderList->begin(); --it) {
-      insideLayer = it[0]->hitTestLayer(rootLayer, info, xMousePos, yMousePos,
-                                        hitTestRect);
+    for (int i = m_negZOrderList->size() - 1; i >= 0; --i) {
+      insideLayer = m_negZOrderList->at(i)->hitTestLayer(
+          rootLayer, info, xMousePos, yMousePos, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
