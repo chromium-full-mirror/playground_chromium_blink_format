@@ -49,7 +49,7 @@ class EventImpl : public Shared<EventImpl> {
 
   const AtomicString& type() const { return m_type; }
   NodeImpl* target() const { return m_target.get(); }
-  void setTarget(NodeImpl* target) { m_target = target; }
+  void setTarget(NodeImpl*);
   NodeImpl* currentTarget() const { return m_currentTarget; }
   void setCurrentTarget(NodeImpl* currentTarget) {
     m_currentTarget = currentTarget;
@@ -92,6 +92,7 @@ class EventImpl : public Shared<EventImpl> {
   virtual void storeResult(const DOMString&);
 
  protected:
+  virtual void receivedTarget();
   bool dispatched() const { return m_target; }
 
  private:
@@ -214,7 +215,8 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
   int m_screenY;
   int m_clientX;
   int m_clientY;
-  void computePositions();
+  void initCoordinates();
+  virtual void receivedTarget();
 
  private:
   int m_pageX;
