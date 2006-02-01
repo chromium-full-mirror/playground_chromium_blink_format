@@ -26,18 +26,34 @@
 #include "RenderText.h"
 #include "htmlnames.h"
 #include "HTMLInputElementImpl.h"
+#include "xml/dom_elementimpl.h"
+#include "xml/EventNames.h"
+#include "xml/dom2_eventsimpl.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
+using namespace EventNames;
 
-RenderTextField::RenderTextField(NodeImpl* node) : RenderBlock(node) {}
+void InputMutationListener::handleEvent(EventImpl* event, bool isWindowEvent) {
+  if (!m_renderTextField)
+    return;
+
+  if (event->type() == DOMCharacterDataModifiedEvent)
+    m_renderTextField->subtreeHasChanged();
+}
+
+RenderTextField::RenderTextField(NodeImpl* node)
+    : RenderBlock(node), m_mutationListener(new InputMutationListener(this)) {}
 
 RenderTextField::~RenderTextField() {
   // The renderer for the div has already been destroyed by
   // destroyLeftoverChildren
-  if (m_div)
+  if (m_div) {
+    m_div->removeEventListener(DOMCharacterDataModifiedEvent,
+                               m_mutationListener.get(), false);
     m_div->detach();
+  }
 }
 
 void RenderTextField::setStyle(RenderStyle* style) {
@@ -45,8 +61,6 @@ void RenderTextField::setStyle(RenderStyle* style) {
   if (m_div) {
     RenderBlock* divRenderer = static_cast<RenderBlock*>(m_div->renderer());
     RenderStyle* divStyle = createDivStyle(style);
-    if (divRenderer->firstChild())
-      divRenderer->firstChild()->setStyle(divStyle);
     divRenderer->setStyle(divStyle);
   }
   setReplaced(isInline());
@@ -97,6 +111,8 @@ void RenderTextField::updateFromElement() {
       text = new TextImpl(document(), value.impl());
       int exception = 0;
       m_div->appendChild(text, exception);
+      m_div->addEventListener(DOMCharacterDataModifiedEvent,
+                              m_mutationListener.get(), false);
     }
 
     if (!input->valueMatchesRenderer()) {
@@ -138,5 +154,11 @@ void RenderTextField::select() {
 
 void RenderTextField::setSelectionRange(int start, int end) {
   // FIXME: Implement this.
+}
+
+void RenderTextField::subtreeHasChanged() {
+  HTMLInputElementImpl* input = static_cast<HTMLInputElementImpl*>(element());
+  if (input && m_div)
+    input->setValueFromRenderer(m_div->textContent());
 }
 }
