@@ -54,7 +54,7 @@ JSValue* KJSProxyImpl::evaluate(const DOMString& filename,
   // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
 
-  initScript();
+  initScriptIfNeeded();
   // inlineCode is true for <a href="javascript:doSomething()">
   // and false for <script>doSomething()</script>. Check if it has the
   // expected value in all cases.
@@ -106,7 +106,7 @@ void KJSProxyImpl::clear() {
 
 EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
                                                     NodeImpl* node) {
-  initScript();
+  initScriptIfNeeded();
   JSLock lock;
   return new JSLazyEventListener(code, Window::retrieveWindow(m_frame), node,
                                  m_handlerLineno);
@@ -115,7 +115,7 @@ EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
 #if SVG_SUPPORT
 EventListener* KJSProxyImpl::createSVGEventHandler(const DOMString& code,
                                                    NodeImpl* node) {
-  initScript();
+  initScriptIfNeeded();
   JSLock lock;
   return new JSSVGLazyEventListener(code, Window::retrieveWindow(m_frame), node,
                                     m_handlerLineno);
@@ -135,8 +135,8 @@ void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
 }
 
 ScriptInterpreter* KJSProxyImpl::interpreter() {
-  if (!m_script)
-    initScript();
+  initScriptIfNeeded();
+  assert(m_script);
   return m_script;
 }
 
@@ -157,7 +157,7 @@ JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-void KJSProxyImpl::initScript() {
+void KJSProxyImpl::initScriptIfNeeded() {
   if (m_script)
     return;
 
