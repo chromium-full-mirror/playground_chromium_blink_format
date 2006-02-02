@@ -735,7 +735,7 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
 
   // Make sure we have a valid background image.
   CachedImage* bg = bgLayer->backgroundImage();
-  bool shouldPaintBackgroundImage = bg && bg->isDecoded();
+  bool shouldPaintBackgroundImage = bg && bg->canRender();
 
   // These are always percents or auto.
   if (shouldPaintBackgroundImage &&
@@ -748,7 +748,7 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
   if (style()->hasBorder()) {
     // Border images are not ok.
     CachedImage* borderImage = style()->borderImage().image();
-    bool shouldPaintBorderImage = borderImage && borderImage->isDecoded();
+    bool shouldPaintBorderImage = borderImage && borderImage->canRender();
     if (shouldPaintBorderImage && borderImage->isLoaded())
       return true;  // If the image hasn't loaded, we're still using the normal
                     // border style.
@@ -1075,8 +1075,8 @@ bool RenderObject::paintBorderImage(QPainter* p,
         borderImage->image(), _tx, _ty + style->borderTopWidth(),
         style->borderLeftWidth(),
         h - style->borderTopWidth() - style->borderBottomWidth(), 0, topSlice,
-        leftSlice, imageHeight - topSlice - bottomSlice, QPainter::STRETCH,
-        (QPainter::TileRule)vRule);
+        leftSlice, imageHeight - topSlice - bottomSlice, Image::StretchTile,
+        (Image::TileRule)vRule);
   }
 
   if (drawRight) {
@@ -1107,8 +1107,8 @@ bool RenderObject::paintBorderImage(QPainter* p,
         _ty + style->borderTopWidth(), style->borderRightWidth(),
         h - style->borderTopWidth() - style->borderBottomWidth(),
         imageWidth - rightSlice, topSlice, rightSlice,
-        imageHeight - topSlice - bottomSlice, QPainter::STRETCH,
-        (QPainter::TileRule)vRule);
+        imageHeight - topSlice - bottomSlice, Image::StretchTile,
+        (Image::TileRule)vRule);
   }
 
   // Paint the top edge.
@@ -1117,8 +1117,8 @@ bool RenderObject::paintBorderImage(QPainter* p,
         borderImage->image(), _tx + style->borderLeftWidth(), _ty,
         w - style->borderLeftWidth() - style->borderRightWidth(),
         style->borderTopWidth(), leftSlice, 0,
-        imageWidth - rightSlice - leftSlice, topSlice,
-        (QPainter::TileRule)hRule, QPainter::STRETCH);
+        imageWidth - rightSlice - leftSlice, topSlice, (Image::TileRule)hRule,
+        Image::StretchTile);
 
   // Paint the bottom edge.
   if (drawBottom)
@@ -1128,7 +1128,7 @@ bool RenderObject::paintBorderImage(QPainter* p,
         w - style->borderLeftWidth() - style->borderRightWidth(),
         style->borderBottomWidth(), leftSlice, imageHeight - bottomSlice,
         imageWidth - rightSlice - leftSlice, bottomSlice,
-        (QPainter::TileRule)hRule, QPainter::STRETCH);
+        (Image::TileRule)hRule, Image::StretchTile);
 
   // Paint the middle.
   if (drawMiddle)
@@ -1138,15 +1138,8 @@ bool RenderObject::paintBorderImage(QPainter* p,
         w - style->borderLeftWidth() - style->borderRightWidth(),
         h - style->borderTopWidth() - style->borderBottomWidth(), leftSlice,
         topSlice, imageWidth - rightSlice - leftSlice,
-        imageHeight - topSlice - bottomSlice, (QPainter::TileRule)hRule,
-        (QPainter::TileRule)vRule);
-
-  // Because of the bizarre way we do animations in WebKit, WebCore does not get
-  // any sort of notification when the image changes
-  // animation frames.  We have to tell WebKit about the rect so that it can do
-  // the animation itself and invalidate the right
-  // rect.
-  borderImage->image().setAnimationRect(IntRect(_tx, _ty, w, h));
+        imageHeight - topSlice - bottomSlice, (Image::TileRule)hRule,
+        (Image::TileRule)vRule);
 
   // Clear the clip for the border radius.
   if (clipped)
@@ -1164,7 +1157,7 @@ void RenderObject::paintBorder(QPainter* p,
                                bool begin,
                                bool end) {
   CachedImage* borderImage = style->borderImage().image();
-  bool shouldPaintBackgroundImage = borderImage && borderImage->isDecoded();
+  bool shouldPaintBackgroundImage = borderImage && borderImage->canRender();
   if (shouldPaintBackgroundImage)
     shouldPaintBackgroundImage = paintBorderImage(p, _tx, _ty, w, h, style);
 
@@ -2601,7 +2594,7 @@ QChar RenderObject::backslashAsCurrencySymbol() const {
   return codec->backslashAsCurrencySymbol();
 }
 
-void RenderObject::imageChanged(CachedImage* image, const IntRect&) {
+void RenderObject::imageChanged(CachedImage* image) {
   // Repaint when the background image or border image finishes loading.
   // This is needed for RenderBox objects, and also for table objects that hold
   // backgrounds that are then respected by the table cells (which are RenderBox
@@ -2609,7 +2602,7 @@ void RenderObject::imageChanged(CachedImage* image, const IntRect&) {
   // this that
   // would avoid putting this function and the CachedObjectClient base class
   // into RenderObject.
-  if (image && image->imageSize() == image->decodedRect().size() && parent()) {
+  if (image && image->canRender() && parent()) {
     if (canvas() && element() &&
         (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
       canvas()->repaint();  // repaint the entire canvas since the background
@@ -2618,6 +2611,18 @@ void RenderObject::imageChanged(CachedImage* image, const IntRect&) {
       repaint();  // repaint object, which is a box or a container with boxes
                   // inside it
   }
+}
+
+bool RenderObject::willRenderImage(CachedImage*) {
+  // Without visibility we won't render (and therefore don't care about
+  // animation).
+  if (style()->visibility() != VISIBLE)
+    return false;
+
+  // If we're not in a window (i.e., we're dormant from being put in the b/f
+  // cache or in a background tab)
+  // then we don't want to render either.
+  return !document()->inPageCache() && document()->view()->inWindow();
 }
 
 int RenderObject::maximalOutlineSize(PaintAction p) const {

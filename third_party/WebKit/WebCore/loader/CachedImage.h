@@ -31,6 +31,7 @@
 #include "CachedObject.h"
 #include "IntRect.h"
 #include <khtml_settings.h>
+#include "Image.h"
 
 namespace WebCore {
 
@@ -38,7 +39,7 @@ class DocLoader;
 class Cache;
 class Image;
 
-class CachedImage : public CachedObject {
+class CachedImage : public CachedObject, public ImageAnimationObserver {
  public:
   CachedImage(DocLoader*,
               const DOMString& url,
@@ -48,17 +49,13 @@ class CachedImage : public CachedObject {
 
   const Image& image() const;
 
-  IntSize imageSize() const;  // returns the size of the complete image
-
-  // This method indicates that the decoded frame of the image is fully
-  // available and that the image
-  // is not the error image.
-  bool isDecoded() const {
-    return !isErrorImage() && imageSize() == decodedRect().size();
+  bool canRender() const {
+    return !isErrorImage() && imageSize().width() > 0 &&
+           imageSize().height() > 0;
   }
-  IntRect decodedRect() const;  // returns the rectangle that represents the
-                                // portion of the image that has been decoded
-                                // already
+
+  IntSize imageSize() const;  // returns the size of the complete image
+  IntRect imageRect() const;  // The size of the image.
 
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
@@ -78,8 +75,11 @@ class CachedImage : public CachedObject {
 
   void clear();
 
+  virtual bool shouldStopAnimation(const Image* image);
+  virtual void animationAdvanced(const Image* image);
+
  private:
-  void notifyObservers(const IntRect&);
+  void notifyObservers();
 
   Image* m_image;
   int m_dataSize;

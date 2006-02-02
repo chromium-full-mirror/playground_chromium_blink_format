@@ -53,7 +53,6 @@ class QPainterPrivate;
 class QPainter : public Qt {
  public:
   enum TextDirection { RTL, LTR };
-  enum TileRule { STRETCH, ROUND, REPEAT };
 
   QPainter();
   QPainter(bool forPrinting);
@@ -142,8 +141,8 @@ class QPainter : public Qt {
                                int,
                                int,
                                int,
-                               TileRule hRule = STRETCH,
-                               TileRule vRule = STRETCH,
+                               Image::TileRule hRule = Image::StretchTile,
+                               Image::TileRule vRule = Image::StretchTile,
                                void* nativeData = 0);
 
   void addClip(const IntRect&);

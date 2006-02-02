@@ -42,7 +42,7 @@ class RenderSVGImage : public khtml::RenderImage {
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
   virtual IntRect getAbsoluteRepaintRect();
 
-  virtual void imageChanged(CachedImage*, const IntRect&);
+  virtual void imageChanged(CachedImage*);
 
   virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
 

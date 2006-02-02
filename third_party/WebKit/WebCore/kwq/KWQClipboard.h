@@ -101,8 +101,6 @@ class KWQClipboard : public ClipboardImpl, public CachedObjectClient {
   AccessPolicy accessPolicy() const;
   void setDragHasStarted() { m_dragStarted = true; }
 
-  virtual void imageChanged(CachedImage*, const IntRect&);
-
  private:
   void setDragImage(CachedImage* cachedImage, NodeImpl*, const IntPoint& loc);
 

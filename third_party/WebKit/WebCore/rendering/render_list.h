@@ -50,7 +50,7 @@ class RenderListMarker : public RenderBox {
   virtual void layout();
   virtual void calcMinMaxWidth();
 
-  virtual void imageChanged(CachedImage*, const IntRect&);
+  virtual void imageChanged(CachedImage*);
 
   virtual void calcWidth();
 

@@ -1004,7 +1004,8 @@ class RenderObject : public CachedObjectClient {
   virtual int previousOffset(int current) const;
   virtual int nextOffset(int current) const;
 
-  virtual void imageChanged(CachedImage*, const IntRect&);
+  virtual void imageChanged(CachedImage*);
+  virtual bool willRenderImage(CachedImage*);
 
   virtual void selectionStartEnd(int& spos, int& epos);
 

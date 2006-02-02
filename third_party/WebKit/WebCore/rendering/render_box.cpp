@@ -428,7 +428,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
   }
 
   CachedImage* bg = bgLayer->backgroundImage();
-  bool shouldPaintBackgroundImage = bg && bg->isDecoded();
+  bool shouldPaintBackgroundImage = bg && bg->canRender();
   Color bgColor = c;
 
   // When this style flag is set, change existing background colors and images
