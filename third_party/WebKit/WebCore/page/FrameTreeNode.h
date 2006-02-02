@@ -23,6 +23,7 @@
 
 #include <kxmlcore/RefPtr.h>
 #include <kxmlcore/PassRefPtr.h>
+#include "dom_string.h"
 
 namespace WebCore {
 
@@ -30,12 +31,18 @@ class Frame;
 
 class FrameTreeNode {
  public:
-  FrameTreeNode(Frame* thisFrame)
+  FrameTreeNode(Frame* thisFrame, Frame* parentFrame)
       : m_thisFrame(thisFrame),
+        m_parent(parentFrame),
         m_previousSibling(0),
         m_lastChild(0),
         m_childCount(0) {}
   ~FrameTreeNode();
+
+  DOMString& name() { return m_name; }
+  void setName(const DOMString& name);
+  Frame* parent() { return m_parent; }
+  void setParent(Frame* parent) { m_parent = parent; }
 
   Frame* nextSibling() { return m_nextSibling.get(); }
   Frame* previousSibling() { return m_previousSibling; }
@@ -48,6 +55,9 @@ class FrameTreeNode {
 
  private:
   Frame* m_thisFrame;
+
+  Frame* m_parent;
+  DOMString m_name;
 
   // FIXME: use ListRefPtr?
   RefPtr<Frame> m_nextSibling;

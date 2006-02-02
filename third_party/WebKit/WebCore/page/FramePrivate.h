@@ -91,8 +91,7 @@ enum RedirectionScheduled {
 class FramePrivate {
  public:
   FramePrivate(Frame* parent, Frame* thisFrame)
-      : m_treeNode(thisFrame),
-        m_parent(parent),
+      : m_treeNode(thisFrame, parent),
         m_redirectionTimer(thisFrame, &Frame::redirectionTimerFired),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
         m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired) {
@@ -176,8 +175,6 @@ class FramePrivate {
   }
 
   FrameTreeNode m_treeNode;
-  Frame* m_parent;
-  QString m_name;
 
   // old style frame info
   FrameList m_frames;

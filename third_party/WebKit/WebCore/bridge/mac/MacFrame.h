@@ -335,7 +335,7 @@ class MacFrame : public Frame {
   virtual void handledOnloadEvents();
 
  protected:
-  virtual QString generateFrameName();
+  virtual DOMString generateFrameName();
 
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();

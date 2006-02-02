@@ -2356,7 +2356,7 @@ ElementImpl* DocumentImpl::ownerElement() {
   Frame* childPart = childView->frame();
   if (!childPart)
     return 0;
-  Frame* parent = childPart->parentFrame();
+  Frame* parent = childPart->treeNode()->parent();
   if (!parent)
     return 0;
   ChildFrame* childFrame = parent->childFrame(childPart);
@@ -2927,7 +2927,7 @@ DocumentImpl* DocumentImpl::parentDocument() const {
   Frame* childPart = frame();
   if (!childPart)
     return 0;
-  Frame* parent = childPart->parentFrame();
+  Frame* parent = childPart->treeNode()->parent();
   if (!parent)
     return 0;
   return parent->document();

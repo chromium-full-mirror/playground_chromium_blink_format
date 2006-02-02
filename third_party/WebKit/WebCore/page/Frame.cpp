@@ -971,7 +971,7 @@ void Frame::checkCompleted() {
   if (d->m_scheduledRedirection != noRedirectionScheduled) {
     // Do not start redirection for frames here! That action is
     // deferred until the parent emits a completed signal.
-    if (!parentFrame())
+    if (!treeNode()->parent())
       startRedirectionTimer();
 
     emit completed(true);
@@ -1158,7 +1158,7 @@ void Frame::redirectionTimerFired(Timer<Frame>*) {
     // in both IE and NS (but not in Mozilla).... we can't easily do that
     // in Konqueror...
     if (d->m_scheduledHistoryNavigationSteps ==
-        0)  // add && parentFrame() to get only frames, but doesn't matter
+        0)             // add && parent() to get only frames, but doesn't matter
       openURL(url());  /// ## need args.reload=true?
     else {
       if (d->m_extension) {
@@ -1536,7 +1536,7 @@ bool Frame::requestFrame(RenderPart* part,
   return requestObject(&(*it), completeURL(url));
 }
 
-QString Frame::requestFrameName() {
+DOMString Frame::requestFrameName() {
   return generateFrameName();
 }
 
@@ -1839,7 +1839,7 @@ void Frame::slotChildCompleted(bool complete) {
   child->m_bCompleted = true;
   child->m_args = URLArgs();
 
-  if (complete && parentFrame() == 0)
+  if (complete && treeNode()->parent() == 0)
     d->m_bPendingChildRedirection = true;
 
   checkCompleted();
@@ -1886,10 +1886,6 @@ bool Frame::frameExists(const QString& frameName) {
   // set. Otherwise we might find our preloaded-selve.
   // This happens when we restore the frameset.
   return (!(*it).m_renderer.isNull());
-}
-
-Frame* Frame::parentFrame() const {
-  return parent();
 }
 
 int Frame::zoomFactor() const {
@@ -2456,24 +2452,23 @@ bool Frame::restored() const {
 }
 
 void Frame::incrementFrameCount() {
+  // FIXME: this should be in Page
   frameCount++;
-  if (parentFrame()) {
-    parentFrame()->incrementFrameCount();
-  }
+  if (treeNode()->parent())
+    treeNode()->parent()->incrementFrameCount();
 }
 
 void Frame::decrementFrameCount() {
+  // FIXME: this should be in Page
   frameCount--;
-  if (parentFrame()) {
-    parentFrame()->decrementFrameCount();
-  }
+  if (treeNode()->parent())
+    treeNode()->parent()->decrementFrameCount();
 }
 
 int Frame::topLevelFrameCount() {
-  if (parentFrame()) {
-    return parentFrame()->topLevelFrameCount();
-  }
-
+  // FIXME: this should be in Page
+  if (treeNode()->parent())
+    return treeNode()->parent()->topLevelFrameCount();
   return frameCount;
 }
 
@@ -2926,7 +2921,7 @@ void Frame::lifeSupportTimerFired(Timer<Frame>*) {
 // mouse or the keyboard after setting the selection.
 void Frame::selectFrameElementInParentIfFullySelected() {
   // Find the parent frame; if there is none, then we have nothing to do.
-  Frame* parent = parentFrame();
+  Frame* parent = treeNode()->parent();
   if (!parent)
     return;
   FrameView* parentView = parent->view();
@@ -2974,7 +2969,7 @@ void Frame::selectFrameElementInParentIfFullySelected() {
 }
 
 void Frame::handleFallbackContent() {
-  Frame* parent = parentFrame();
+  Frame* parent = treeNode()->parent();
   if (!parent)
     return;
   ChildFrame* childFrame = parent->childFrame(this);
@@ -3002,8 +2997,8 @@ void Frame::provisionalLoadStarted() {
 
 bool Frame::userGestureHint() {
   Frame* rootFrame = this;
-  while (rootFrame->parentFrame())
-    rootFrame = rootFrame->parentFrame();
+  while (rootFrame->treeNode()->parent())
+    rootFrame = rootFrame->treeNode()->parent();
 
   if (rootFrame->jScript() && rootFrame->jScript()->interpreter())
     return rootFrame->jScript()->interpreter()->wasRunByUserGesture();
@@ -3246,7 +3241,7 @@ bool Frame::canCachePage() {
   // 3.  The page has no password fields.
   // 4.  The URL for the page is not https.
   // 5.  The page has no applets.
-  if (d->m_frames.count() || d->m_objects.count() || parentFrame() ||
+  if (d->m_frames.count() || d->m_objects.count() || treeNode()->parent() ||
       d->m_url.protocol().startsWith("https") ||
       (d->m_doc && (d->m_doc->applets()->length() != 0 ||
                     d->m_doc->hasWindowEventListener(unloadEvent) ||
@@ -3338,8 +3333,8 @@ QPtrList<Frame>& Frame::mutableInstances() {
 }
 
 void Frame::updatePolicyBaseURL() {
-  if (parentFrame() && parentFrame()->document())
-    setPolicyBaseURL(parentFrame()->document()->policyBaseURL());
+  if (treeNode()->parent() && treeNode()->parent()->document())
+    setPolicyBaseURL(treeNode()->parent()->document()->policyBaseURL());
   else
     setPolicyBaseURL(d->m_url.url());
 }
@@ -3649,31 +3644,6 @@ QChar Frame::backslashAsCurrencySymbol() const {
     return '\\';
 
   return codec->backslashAsCurrencySymbol();
-}
-
-void Frame::setName(const QString& name) {
-  QString n = name;
-
-  Frame* parent = parentFrame();
-
-  // FIXME: is the blank rule needed or useful?
-  if (parent &&
-      (name.isEmpty() || parent->frameExists(name) || name == "_blank"))
-    n = parent->requestFrameName();
-
-  d->m_name = name;
-}
-
-const QString& Frame::name() {
-  return d->m_name;
-}
-
-void Frame::setParent(Frame* parent) {
-  d->m_parent = parent;
-}
-
-Frame* Frame::parent() const {
-  return d->m_parent;
 }
 
 bool Frame::markedTextUsesUnderlines() const {
