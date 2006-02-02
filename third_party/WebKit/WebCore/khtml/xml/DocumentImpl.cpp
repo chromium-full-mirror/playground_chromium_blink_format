@@ -2304,7 +2304,8 @@ void DocumentImpl::setHTMLWindowEventListener(const AtomicString& eventType,
 
 void DocumentImpl::dispatchImageLoadEventSoon(HTMLImageLoader* image) {
   m_imageLoadEventDispatchSoonList.append(image);
-  m_imageLoadEventTimer.startOneShot(0);
+  if (!m_imageLoadEventTimer.isActive())
+    m_imageLoadEventTimer.startOneShot(0);
 }
 
 void DocumentImpl::removeImage(HTMLImageLoader* image) {
