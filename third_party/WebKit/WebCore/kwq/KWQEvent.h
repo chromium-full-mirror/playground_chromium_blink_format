@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,7 +43,6 @@ class QEvent : public Qt {
     None,
     Enter,
     Leave,
-    Timer,
     MouseButtonPress,
     MouseButtonRelease,
     MouseButtonDblClick,
@@ -96,16 +95,6 @@ class QMouseEvent : public QEvent {
   int _state;
   int _stateAfter;
   int _clickCount;
-};
-
-class QTimerEvent : public QEvent {
- public:
-  QTimerEvent(int timerId) : QEvent(Timer), _timerId(timerId) {}
-
-  int timerId() const { return _timerId; }
-
- private:
-  int _timerId;
 };
 
 class QKeyEvent : public QEvent {

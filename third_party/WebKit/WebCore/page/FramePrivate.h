@@ -34,7 +34,6 @@
 #include "edit_command.h"
 #include "kjs_proxy.h"
 #include <kio/global.h>
-#include <qtimer.h>
 #include "FrameTreeNode.h"
 
 namespace KIO {
@@ -73,7 +72,7 @@ struct ChildFrame {
   bool m_hasFallbackContent;
 };
 
-class FrameList : public QValueList<WebCore::ChildFrame> {
+class FrameList : public QValueList<ChildFrame> {
  public:
   Iterator find(const QString& name);
 };
@@ -94,7 +93,9 @@ class FramePrivate {
   FramePrivate(Frame* parent, Frame* thisFrame)
       : m_treeNode(thisFrame),
         m_parent(parent),
-        m_redirectionTimer(thisFrame, &Frame::redirectionTimerFired) {
+        m_redirectionTimer(thisFrame, &Frame::redirectionTimerFired),
+        m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
+        m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired) {
     m_doc = 0;
     m_jscript = 0;
     m_runningScripts = 0;
@@ -125,7 +126,6 @@ class FramePrivate {
     m_bPluginsOverride = false;
     m_onlyLocalReferences = false;
 
-    m_caretBlinkTimer = 0;
     m_caretVisible = false;
     m_caretBlinks = true;
     m_caretPaint = true;
@@ -181,17 +181,17 @@ class FramePrivate {
 
   // old style frame info
   FrameList m_frames;
-  QValueList<WebCore::ChildFrame> m_objects;
+  QValueList<ChildFrame> m_objects;
 
   QGuardedPtr<FrameView> m_view;
-  WebCore::BrowserExtension* m_extension;
-  DOM::DocumentImpl* m_doc;
-  RefPtr<WebCore::Decoder> m_decoder;
+  BrowserExtension* m_extension;
+  DocumentImpl* m_doc;
+  RefPtr<Decoder> m_decoder;
   QString m_encoding;
   QString scheduledScript;
-  RefPtr<DOM::NodeImpl> scheduledScriptNode;
+  RefPtr<NodeImpl> scheduledScriptNode;
 
-  WebCore::KJSProxyImpl* m_jscript;
+  KJSProxyImpl* m_jscript;
   int m_runningScripts;
   bool m_bJScriptEnabled : 1;
   bool m_bJavaEnabled : 1;
@@ -245,7 +245,7 @@ class FramePrivate {
   struct SubmitForm {
     const char* submitAction;
     QString submitUrl;
-    WebCore::FormData submitFormData;
+    FormData submitFormData;
     QString target;
     QString submitContentType;
     QString submitBoundary;
@@ -254,17 +254,16 @@ class FramePrivate {
   SubmitForm* m_submitForm;
 
   bool m_bMousePressed;
-  RefPtr<DOM::NodeImpl> m_mousePressNode;  // node under the mouse when the
-                                           // mouse was pressed (set in the
-                                           // mouse handler)
+  RefPtr<NodeImpl> m_mousePressNode;  // node under the mouse when the mouse was
+                                      // pressed (set in the mouse handler)
 
-  WebCore::ETextGranularity m_selectionGranularity;
+  ETextGranularity m_selectionGranularity;
   bool m_beganSelectingText;
 
-  WebCore::SelectionController m_selection;
-  WebCore::SelectionController m_dragCaret;
-  WebCore::Selection m_mark;
-  int m_caretBlinkTimer;
+  SelectionController m_selection;
+  SelectionController m_dragCaret;
+  Selection m_mark;
+  Timer<Frame> m_caretBlinkTimer;
 
   bool m_caretVisible : 1;
   bool m_caretBlinks : 1;
@@ -277,9 +276,9 @@ class FramePrivate {
   bool m_focusNodeRestored : 1;
   bool m_isFocused : 1;
 
-  WebCore::EditCommandPtr m_lastEditCommand;
+  EditCommandPtr m_lastEditCommand;
   int m_xPosForVerticalArrowNavigation;
-  DOM::CSSMutableStyleDeclarationImpl* m_typingStyle;
+  CSSMutableStyleDeclarationImpl* m_typingStyle;
 
   int m_focusNodeNumber;
 
@@ -293,7 +292,7 @@ class FramePrivate {
   bool m_executingJavaScriptFormAction;
   bool m_cancelWithLoadInProgress;
 
-  QTimer m_lifeSupportTimer;
+  Timer<Frame> m_lifeSupportTimer;
 };
 }
 

@@ -46,22 +46,22 @@
 
 #include "Color.h"
 #include "IntRect.h"
+#include "Timer.h"
+#include "render_object.h"
 #include <assert.h>
 #include <kxmlcore/Vector.h>
 
-#include "render_object.h"
-
 class QScrollBar;
 
-namespace khtml {
-class RenderStyle;
-class RenderTable;
+namespace WebCore {
+
 class CachedObject;
 class RenderCanvas;
-class RenderText;
 class RenderFrameSet;
 class RenderObject;
-class RenderScrollMediator;
+class RenderStyle;
+class RenderTable;
+class RenderText;
 
 class RenderScrollMediator : public QObject {
  public:
@@ -116,13 +116,9 @@ class ClipRects {
 };
 
 // This class handles the auto-scrolling of layers with overflow: marquee.
-class Marquee : public QObject {
-  Q_OBJECT
-
+class Marquee {
  public:
-  Marquee(RenderLayer* l);
-
-  void timerEvent(QTimerEvent*);
+  Marquee(RenderLayer*);
 
   int speed() const { return m_speed; }
   int marqueeSpeed() const;
@@ -148,10 +144,12 @@ class Marquee : public QObject {
   void updateMarqueePosition();
 
  private:
+  void timerFired(Timer<Marquee>*);
+
   RenderLayer* m_layer;
   int m_currentLoop;
   int m_totalLoops;
-  int m_timerId;
+  Timer<Marquee> m_timer;
   int m_start;
   int m_end;
   int m_speed;
@@ -455,5 +453,6 @@ class RenderLayer {
   Marquee* m_marquee;  // Used by layers with overflow:marquee
 };
 
-};  // namespace
+}  // namespace
+
 #endif

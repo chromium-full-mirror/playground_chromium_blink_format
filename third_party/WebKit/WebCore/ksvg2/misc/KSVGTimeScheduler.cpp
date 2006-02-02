@@ -23,10 +23,9 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include <kcanvas/KCanvas.h>
+#include "KSVGTimeScheduler.h"
 
 #include "DocumentImpl.h"
-#include "KSVGTimeScheduler.h"
 #include "SVGAnimateColorElementImpl.h"
 #include "SVGAnimateTransformElementImpl.h"
 #include "SVGAnimatedTransformListImpl.h"
@@ -36,59 +35,67 @@
 #include "SVGStyledElementImpl.h"
 #include "SVGStyledTransformableElementImpl.h"
 #include "SystemTime.h"
+#include "Timer.h"
+#include <kcanvas/KCanvas.h>
 
-namespace KSVG {
+namespace WebCore {
 
-SVGTimer::SVGTimer(TimeScheduler* scheduler, unsigned int ms, bool singleShot) {
-  m_ms = ms;
-  m_scheduler = scheduler;
-  m_singleShot = singleShot;
+const double staticTimerInterval = 0.050;  // 50 ms
 
-  m_timer = new QTimer();
-}
+typedef HashSet<SVGAnimationElementImpl*> SVGNotifySet;
 
-SVGTimer::~SVGTimer() {
-  delete m_timer;
-}
+class SVGTimer : private Timer<TimeScheduler> {
+ public:
+  SVGTimer(TimeScheduler*, double interval, bool singleShot);
 
-bool SVGTimer::operator==(const QTimer* timer) {
-  return (m_timer == timer);
-}
+  void start();
+  using Timer<TimeScheduler>::stop;
+  using Timer<TimeScheduler>::isActive;
 
-const QTimer* SVGTimer::qtimer() const {
-  return m_timer;
-}
+  void notifyAll();
+  void addNotify(SVGAnimationElementImpl*, bool enabled = false);
+  void removeNotify(SVGAnimationElementImpl*);
 
-void SVGTimer::start(QObject* receiver, const char* member) {
-  QObject::connect(m_timer, SIGNAL(timeout()), receiver, member);
-  m_timer->start(m_ms, m_singleShot);
-}
+  static SVGTimer* downcast(Timer<TimeScheduler>* t) {
+    return static_cast<SVGTimer*>(t);
+  }
 
-void SVGTimer::stop() {
-  m_timer->stop();
-}
+ private:
+  double calculateTimePercentage(double elapsed,
+                                 double start,
+                                 double end,
+                                 double duration,
+                                 double repetitions);
 
-bool SVGTimer::isActive() const {
-  return m_timer->isActive();
-}
+  TimeScheduler* m_scheduler;
+  double m_interval;
+  bool m_singleShot;
 
-unsigned int SVGTimer::ms() const {
-  return m_ms;
-}
+  SVGNotifySet m_notifySet;
+  SVGNotifySet m_enabledNotifySet;
+};
 
-bool SVGTimer::singleShot() const {
-  return m_singleShot;
+SVGTimer::SVGTimer(TimeScheduler* scheduler, double interval, bool singleShot)
+    : Timer<TimeScheduler>(scheduler, &TimeScheduler::timerFired),
+      m_scheduler(scheduler),
+      m_interval(interval),
+      m_singleShot(singleShot) {}
+
+void SVGTimer::start() {
+  if (m_singleShot)
+    startOneShot(m_interval);
+  else
+    startRepeating(m_interval);
 }
 
 double SVGTimer::calculateTimePercentage(double elapsed,
                                          double start,
                                          double end,
                                          double duration,
-                                         double repeations) {
+                                         double repetitions) {
   double percentage = 0.0;
 
-  // Take into account repeations...
-  double useElapsed = elapsed - (duration * repeations);
+  double useElapsed = elapsed - (duration * repetitions);
 
   if (duration > 0.0 && end == 0.0)
     percentage = 1.0 - (((start + duration) - useElapsed) / duration);
@@ -100,51 +107,33 @@ double SVGTimer::calculateTimePercentage(double elapsed,
   } else if (duration == 0.0 && end != 0.0)
     percentage = 1.0 - (((start + end) - useElapsed) / end);
 
-  // kdDebug() << "RETURNING PERCENTAGE: " << percentage << " (elapsed: " <<
-  // elapsed << " -> " << useElapsed << " start: " << start << " end: " << end
-  // << " dur: " << duration << " rep: " << repeations << ")" << endl;
   return percentage;
 }
 
 void SVGTimer::notifyAll() {
-  bool stillRunning = false;
-  for (unsigned int i = m_notifyList.count(); i > 0; i--) {
-    SVGNotificationStruct notifyStruct = m_notifyList[i - 1];
-
-    if (notifyStruct.enabled) {
-      stillRunning = true;
-      continue;
-    }
-  }
-
-  if (!stillRunning)
+  if (m_enabledNotifySet.isEmpty())
     return;
 
-  double elapsed = m_scheduler->elapsed() * 1000.0;  // Take time now...
+  double elapsed = m_scheduler->elapsed() * 1000.0;  // Take time now.
 
   // First build a list of animation elements per target element
   // This is important to decide about the order & priority of
   // the animations -> 'additive' support is handled this way.
-  typedef HashMap<SVGElementImpl*, Q3PtrList<SVGAnimationElementImpl>>
+  typedef HashMap<SVGElementImpl*, Vector<SVGAnimationElementImpl*>>
       TargetAnimationMap;
   TargetAnimationMap targetMap;
 
-  for (unsigned int i = m_notifyList.count(); i > 0; i--) {
-    SVGNotificationStruct notifyStruct = m_notifyList[i - 1];
-
-    if (!notifyStruct.animation)
-      continue;
-
-    SVGAnimationElementImpl* animation = notifyStruct.animation;
+  SVGNotifySet::const_iterator end = m_notifySet.end();
+  for (SVGNotifySet::const_iterator it = m_notifySet.begin(); it != end; ++it) {
+    SVGAnimationElementImpl* animation = *it;
 
     // If we're dealing with a disabled element with fill="freeze",
-    // we have to take it into account for further calculations...
-    if (!notifyStruct.enabled) {
-      if (animation->isFrozen()) {
-        if (elapsed <=
-            (animation->getStartTime() + animation->getSimpleDuration()))
-          continue;
-      } else
+    // we have to take it into account for further calculations.
+    if (!m_enabledNotifySet.contains(animation)) {
+      if (!animation->isFrozen())
+        continue;
+      if (elapsed <=
+          (animation->getStartTime() + animation->getSimpleDuration()))
         continue;
     }
 
@@ -152,32 +141,29 @@ void SVGTimer::notifyAll() {
         const_cast<SVGElementImpl*>(animation->targetElement());
     TargetAnimationMap::iterator i = targetMap.find(target);
     if (i != targetMap.end())
-      i->second.prepend(animation);
+      i->second.append(animation);
     else {
-      Q3PtrList<SVGAnimationElementImpl> list;
+      Vector<SVGAnimationElementImpl*> list;
       list.append(animation);
       targetMap.set(target, list);
     }
   }
 
-  TargetAnimationMap::iterator tit = targetMap.begin();
+  TargetAnimationMap::iterator targetIterator = targetMap.begin();
   TargetAnimationMap::iterator tend = targetMap.end();
-
-  for (; tit != tend; ++tit) {
-    Q3PtrList<SVGAnimationElementImpl>::Iterator it = tit->second.begin();
-    Q3PtrList<SVGAnimationElementImpl>::Iterator end = tit->second.end();
-
+  for (; targetIterator != tend; ++targetIterator) {
     HashMap<DOMString, Color> targetColor;  // special <animateColor> case
     RefPtr<SVGTransformListImpl>
         targetTransforms;  // special <animateTransform> case
 
-    for (; it != end; ++it) {
-      SVGAnimationElementImpl* animation = (*it);
+    unsigned count = targetIterator->second.size();
+    for (unsigned i = 0; i < count; ++i) {
+      SVGAnimationElementImpl* animation = targetIterator->second[i];
 
       double end = animation->getEndTime();
       double start = animation->getStartTime();
       double duration = animation->getSimpleDuration();
-      double repeations = animation->repeations();
+      double repetitions = animation->repeations();
 
       // Validate animation timing settings:
       // #1 (duration > 0) -> fine
@@ -185,11 +171,11 @@ void SVGTimer::notifyAll() {
 
       if ((duration <= 0.0 && end <= 0.0) ||
           (animation->isIndefinite(duration) &&
-           end <= 0.0))  // Ignore dur="0" or dur="-neg"...
+           end <= 0.0))  // Ignore dur="0" or dur="-neg"
         continue;
 
       float percentage =
-          calculateTimePercentage(elapsed, start, end, duration, repeations);
+          calculateTimePercentage(elapsed, start, end, duration, repetitions);
 
       if (percentage <= 1.0 || animation->connected())
         animation->handleTimerEvent(percentage);
@@ -272,9 +258,9 @@ void SVGTimer::notifyAll() {
       }
     }
 
-    // Handle <animateTransform>...
+    // Handle <animateTransform>.
     if (targetTransforms) {
-      SVGElementImpl* key = tit->first;
+      SVGElementImpl* key = targetIterator->first;
       if (key && key->isStyled() && key->isStyledTransformable()) {
         SVGStyledTransformableElementImpl* transform =
             static_cast<SVGStyledTransformableElementImpl*>(key);
@@ -283,92 +269,60 @@ void SVGTimer::notifyAll() {
       }
     }
 
-    // Handle <animateColor>...
+    // Handle <animateColor>.
     HashMap<DOMString, Color>::iterator cend = targetColor.end();
     for (HashMap<DOMString, Color>::iterator cit = targetColor.begin();
          cit != cend; ++cit) {
       if (cit->second.isValid()) {
         SVGAnimationElementImpl::setTargetAttribute(
-            tit->first, cit->first.impl(),
-            KDOM::DOMString(cit->second.name()).impl());
+            targetIterator->first, cit->first.impl(),
+            DOMString(cit->second.name()).impl());
       }
     }
   }
 
-  // Optimized update logic (to avoid 4 updates, on the same element)
-  for (tit = targetMap.begin(); tit != tend; ++tit) {
-    SVGElementImpl* key = tit->first;
+  // Make a second pass through the map to avoid multiple setChanged calls on
+  // the same element.
+  for (targetIterator = targetMap.begin(); targetIterator != tend;
+       ++targetIterator) {
+    SVGElementImpl* key = targetIterator->first;
     if (key && key->isStyled())
       static_cast<SVGStyledElementImpl*>(key)->setChanged(true);
   }
 }
 
 void SVGTimer::addNotify(SVGAnimationElementImpl* element, bool enabled) {
-  for (unsigned int i = m_notifyList.count(); i > 0; i--) {
-    SVGNotificationStruct& notifyStruct = m_notifyList[i - 1];
-    if (notifyStruct.animation == element) {
-      notifyStruct.enabled = enabled;
-      return;
-    }
-  }
-
-  SVGNotificationStruct notifyStruct;
-  notifyStruct.animation = element;
-  notifyStruct.enabled = enabled;
-
-  m_notifyList.append(notifyStruct);
+  m_notifySet.add(element);
+  if (enabled)
+    m_enabledNotifySet.add(element);
+  else
+    m_enabledNotifySet.remove(element);
 }
 
 void SVGTimer::removeNotify(SVGAnimationElementImpl* element) {
-  for (unsigned int i = m_notifyList.count(); i > 0; i--) {
-    SVGNotificationStruct& notifyStruct = m_notifyList[i - 1];
-    if (notifyStruct.animation == element) {
-      notifyStruct.enabled = false;
-      break;
-    }
-  }
+  // FIXME: Why do we keep a pointer to the element forever (marked disabled)?
+  // That can't be right!
 
-  bool active = false;
-  for (unsigned int i = m_notifyList.count(); i > 0; i--) {
-    SVGNotificationStruct notifyStruct = m_notifyList[i - 1];
-    if (notifyStruct.enabled) {
-      active = true;
-      break;
-    }
-  }
-
-  if (!active)
+  m_enabledNotifySet.remove(element);
+  if (m_enabledNotifySet.isEmpty())
     stop();
 }
 
-const unsigned int TimeScheduler::staticTimerInterval = 50;  // milliseconds
-
-TimeScheduler::TimeScheduler(KDOM::DocumentImpl* document)
-    : QObject(), m_document(document) {
-  // Create static interval timers but don't start it yet!
+TimeScheduler::TimeScheduler(DocumentImpl* document)
+    : m_creationTime(currentTime()), m_savedTime(0), m_document(document) {
+  // Don't start this timer yet.
   m_intervalTimer = new SVGTimer(this, staticTimerInterval, false);
-
-  m_savedTime = 0;
-  m_creationTime = currentTime();
 }
 
 TimeScheduler::~TimeScheduler() {
-  // Usually singleShot timers cleanup themselves, after usage
-  SVGTimerList::const_iterator it = m_timerList.begin();
-  SVGTimerList::const_iterator end = m_timerList.end();
-
-  for (; it != end; ++it)
-    delete (*it);
-
+  deleteAllValues(m_timerSet);
   delete m_intervalTimer;
 }
 
-void TimeScheduler::addTimer(SVGAnimationElementImpl* element,
-                             unsigned int ms) {
-  SVGTimer* svgTimer = new SVGTimer(this, ms, true);
+void TimeScheduler::addTimer(SVGAnimationElementImpl* element, unsigned ms) {
+  SVGTimer* svgTimer = new SVGTimer(this, ms * 0.001, true);
   svgTimer->addNotify(element, true);
-  m_timerList.append(svgTimer);
-
+  m_timerSet.add(svgTimer);
   m_intervalTimer->addNotify(element, false);
 }
 
@@ -383,13 +337,11 @@ void TimeScheduler::disconnectIntervalTimer(SVGAnimationElementImpl* element) {
 void TimeScheduler::startAnimations() {
   m_creationTime = currentTime();
 
-  SVGTimerList::iterator it = m_timerList.begin();
-  SVGTimerList::iterator end = m_timerList.end();
-
-  for (; it != end; ++it) {
+  SVGTimerSet::iterator end = m_timerSet.end();
+  for (SVGTimerSet::iterator it = m_timerSet.begin(); it != end; ++it) {
     SVGTimer* svgTimer = *it;
     if (svgTimer && !svgTimer->isActive())
-      svgTimer->start(this, SLOT(slotTimerNotify()));
+      svgTimer->start();
   }
 }
 
@@ -402,7 +354,7 @@ void TimeScheduler::toggleAnimations() {
       m_creationTime += currentTime() - m_savedTime;
       m_savedTime = 0;
     }
-    m_intervalTimer->start(this, SLOT(slotTimerNotify()));
+    m_intervalTimer->start();
   }
 }
 
@@ -410,50 +362,42 @@ bool TimeScheduler::animationsPaused() const {
   return !m_intervalTimer->isActive();
 }
 
-void TimeScheduler::slotTimerNotify() {
-  QTimer* senderTimer =
-      const_cast<QTimer*>(static_cast<const QTimer*>(sender()));
-  SVGTimer* svgTimer = 0;
+void TimeScheduler::timerFired(Timer<TimeScheduler>* baseTimer) {
+  // Get the pointer now, because notifyAll could make the document,
+  // including this TimeScheduler, go away.
+  RefPtr<DocumentImpl> doc = m_document;
 
-  SVGTimerList::iterator it = m_timerList.begin();
-  SVGTimerList::iterator end = m_timerList.end();
-  for (; it != end; ++it) {
-    SVGTimer* cur = *it;
-    if (*cur == senderTimer) {
-      svgTimer = cur;
-      break;
-    }
+  SVGTimer* timer = SVGTimer::downcast(baseTimer);
+
+  timer->notifyAll();
+
+  // FIXME: Is it really safe to look at m_intervalTimer now?
+  // Isn't it possible the TimeScheduler was deleted already?
+  // If so, timer, m_timerSet, and m_intervalTimer have all
+  // been deleted. May need to reference count the TimeScheduler
+  // to work around this, and ref/deref it in this function.
+  if (timer != m_intervalTimer) {
+    ASSERT(!timer->isActive());
+    ASSERT(m_timerSet.contains(timer));
+    m_timerSet.remove(timer);
+    delete timer;
+
+    // The singleShot timers of ie. <animate> with begin="3s" are notified
+    // by the previous call, and now all connections to the interval timer
+    // are created and now we just need to fire that timer (Niko)
+    if (!m_intervalTimer->isActive())
+      m_intervalTimer->start();
   }
 
-  if (!svgTimer) {
-    svgTimer = (*m_intervalTimer == senderTimer) ? m_intervalTimer : 0;
-
-    if (!svgTimer)
-      return;
-  }
-
-  svgTimer->notifyAll();
-
-  // Update any 'dirty' shapes...
-  m_document->updateRendering();
-
-  if (svgTimer->singleShot()) {
-    m_timerList.remove(svgTimer);
-    delete svgTimer;
-  }
-
-  // The singleShot timers of ie. <animate> with begin="3s" are notified
-  // by the previous call, and now all connections to the interval timer
-  // are created and now we just need to fire that timer (Niko)
-  if (svgTimer != m_intervalTimer && !m_intervalTimer->isActive())
-    m_intervalTimer->start(this, SLOT(slotTimerNotify()));
+  // Update any 'dirty' shapes.
+  doc->updateRendering();
 }
 
 double TimeScheduler::elapsed() const {
   return currentTime() - m_creationTime;
 }
 
-}  // namespace;
+}  // namespace
 
 // vim:ts=4:noet
 #endif  // SVG_SUPPORT

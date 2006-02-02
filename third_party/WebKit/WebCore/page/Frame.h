@@ -36,6 +36,7 @@
 #include "edit_actions.h"
 #include "text_affinity.h"
 #include "text_granularity.h"
+#include <kurl.h>
 #include <qscrollbar.h>
 #include <qstringlist.h>
 
@@ -937,7 +938,8 @@ class Frame : public ObjectContents {
   void slotJobPercent(KIO::Job*, unsigned long);
   void slotJobSpeed(KIO::Job*, unsigned long);
 
-  void slotEndLifeSupport();
+  void lifeSupportTimerFired(Timer<Frame>*);
+  void endLifeSupport();
 
   virtual void clear(bool clearWindowProperties = true);
 
@@ -946,7 +948,7 @@ class Frame : public ObjectContents {
   void clearCaretRectIfNeeded();
   void setFocusNodeIfNeeded();
   void selectionLayoutChanged();
-  void timerEvent(QTimerEvent*);
+  void caretBlinkTimerFired(Timer<Frame>*);
   bool openURLInFrame(const KURL& url, const URLArgs& urlArgs);
 
   void overURL(const QString& url,
@@ -966,9 +968,9 @@ class Frame : public ObjectContents {
 
   void popupMenu(const QString& url);
 
-  void init(FrameView* view);
+  void init(FrameView*);
 
-  bool scheduleScript(NodeImpl* n, const QString& script);
+  bool scheduleScript(NodeImpl*, const QString& script);
 
   KJS::JSValue* executeScheduledScript();
 

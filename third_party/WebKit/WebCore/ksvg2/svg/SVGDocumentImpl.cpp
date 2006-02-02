@@ -193,7 +193,8 @@ bool SVGDocumentImpl::dispatchKeyEvent(KDOM::EventTargetImpl* target,
 
 KDOM::CSSStyleSelector* SVGDocumentImpl::createStyleSelector(
     const QString& usersheet) {
-  return new KDOM::CSSStyleSelector(this, usersheet, m_styleSheets, false);
+  return new KDOM::CSSStyleSelector(this, usersheet, m_styleSheets.get(),
+                                    false);
 }
 
 void SVGDocumentImpl::addScripts(KDOM::NodeImpl* n) {

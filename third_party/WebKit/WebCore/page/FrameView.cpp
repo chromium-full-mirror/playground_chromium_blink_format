@@ -60,12 +60,12 @@ using namespace HTMLNames;
 
 class FrameViewPrivate {
  public:
-  FrameViewPrivate() {
+  FrameViewPrivate(FrameView* view)
+      : layoutTimer(view, &FrameView::layoutTimerFired) {
     repaintRects = 0;
     underMouse = 0;
     clickNode = 0;
     reset();
-    layoutTimerId = 0;
     delayedLayout = false;
     mousePressed = false;
     doFullRepaint = true;
@@ -100,7 +100,7 @@ class FrameViewPrivate {
       clickNode->deref();
     clickNode = 0;
     scrollingSelf = false;
-    layoutTimerId = 0;
+    layoutTimer.stop();
     delayedLayout = false;
     mousePressed = false;
     doFullRepaint = true;
@@ -131,7 +131,7 @@ class FrameViewPrivate {
 
   int prevMouseX, prevMouseY;
   bool scrollingSelf;
-  int layoutTimerId;
+  Timer<FrameView> layoutTimer;
   bool delayedLayout;
 
   bool layoutSchedulingEnabled;
@@ -155,13 +155,10 @@ FrameView::FrameView(Frame* frame, QWidget* parent, const char* name)
     : QScrollView(parent,
                   name,
                   WResizeNoErase | WRepaintNoErase | WPaintUnclipped),
-      _refCount(1) {
-  m_medium = "screen";
-
-  m_frame = frame;
-  m_frame->ref();
-  d = new FrameViewPrivate;
-
+      _refCount(1),
+      m_frame(frame),
+      d(new FrameViewPrivate(this)),
+      m_medium("screen") {
   connect(this, SIGNAL(contentsMoving(int, int)), this,
           SLOT(slotScrollBarMoved()));
 
@@ -176,13 +173,10 @@ FrameView::~FrameView() {
   ASSERT(_refCount == 0);
 
   if (m_frame) {
-    // WABA: Is this Ok? Do I need to deref it as well?
-    // Does this need to be done somewhere else?
+    // FIXME: Is this really the right place to call detach on the document?
     DocumentImpl* doc = m_frame->document();
     if (doc)
       doc->detach();
-
-    m_frame->deref();
   }
 
   delete d;
@@ -190,10 +184,7 @@ FrameView::~FrameView() {
 }
 
 void FrameView::clearPart() {
-  if (m_frame) {
-    m_frame->deref();
-    m_frame = 0;
-  }
+  m_frame = 0;
 }
 
 void FrameView::resetScrollBars() {
@@ -218,8 +209,6 @@ void FrameView::init() {
 }
 
 void FrameView::clear() {
-  //    viewport()->erase();
-
   setStaticBackground(false);
 
   // FIXME: 6498 Should just be able to call m_frame->selection().clear()
@@ -227,14 +216,14 @@ void FrameView::clear() {
 
   d->reset();
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
-  if (d->layoutTimerId && m_frame->document() &&
+#if INSTRUMENT_LAYOUT_SCHEDULING
+  if (d->layoutTimer.isActive() && m_frame->document() &&
       !m_frame->document()->ownerElement())
     printf("Killing the layout timer from a clear at %d\n",
            m_frame->document()->elapsedTime());
 #endif
+  d->layoutTimer.stop();
 
-  killTimers();
   emit cleared();
 
   suppressScrollBars(true);
@@ -328,8 +317,7 @@ void FrameView::layout() {
   if (d->layoutSuppressed)
     return;
 
-  killTimer(d->layoutTimerId);
-  d->layoutTimerId = 0;
+  d->layoutTimer.stop();
   d->delayedLayout = false;
 
   if (!m_frame) {
@@ -385,7 +373,7 @@ void FrameView::layout() {
     applyOverflowToViewport(rootRenderer, hMode,
                             vMode);  // XML/XHTML UAs use the root element.
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (d->firstLayout && !document->ownerElement())
     printf("Elapsed time before first layout: %d\n", document->elapsedTime());
 #endif
@@ -483,9 +471,8 @@ void FrameView::layout() {
   }
   setStaticBackground(d->useSlowRepaints);
 
-  if (didFirstLayout) {
+  if (didFirstLayout)
     m_frame->didFirstLayout();
-  }
 }
 
 #if __APPLE__
@@ -497,7 +484,7 @@ void FrameView::updateDashboardRegions() {
     QValueList<DashboardRegionValue> currentRegions =
         document->dashboardRegions();
     document->setDashboardRegions(newRegions);
-    Mac(m_frame)->dashboardRegionsChanged();
+    Mac(m_frame.get())->dashboardRegionsChanged();
   }
 }
 #endif
@@ -682,7 +669,7 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
       xm, ym, &mev);
 
   if (!m_frame->passSubframeEventToSubframe(mev))
-    viewport()->setCursor(selectCursor(mev, m_frame, d->mousePressed));
+    viewport()->setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
 
   bool swallowEvent =
       dispatchMouseEvent(mousemoveEvent, mev.innerNode.get(), false, 0, _mouse,
@@ -741,12 +728,10 @@ void FrameView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
   invalidateClick();
 }
 
-void FrameView::keyPressEvent(QKeyEvent* _ke) {
+void FrameView::keyPressEvent(QKeyEvent* ke) {
   if (m_frame->document() && m_frame->document()->focusNode()) {
-    if (m_frame->document()->focusNode()->dispatchKeyEvent(_ke)) {
-      _ke->accept();
-      return;
-    }
+    if (m_frame->document()->focusNode()->dispatchKeyEvent(ke))
+      ke->accept();
   }
 }
 
@@ -1163,14 +1148,12 @@ void FrameView::repaintRectangle(const IntRect& r, bool immediate) {
   updateContents(r, immediate);
 }
 
-void FrameView::timerEvent(QTimerEvent* e) {
-  if (e->timerId() == d->layoutTimerId) {
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
-    if (m_frame->document() && !m_frame->document()->ownerElement())
-      printf("Layout timer fired at %d\n", m_frame->document()->elapsedTime());
+void FrameView::layoutTimerFired(Timer<FrameView>*) {
+#if INSTRUMENT_LAYOUT_SCHEDULING
+  if (m_frame->document() && !m_frame->document()->ownerElement())
+    printf("Layout timer fired at %d\n", m_frame->document()->elapsedTime());
 #endif
-    layout();
-  }
+  layout();
 }
 
 void FrameView::scheduleRelayout() {
@@ -1181,41 +1164,40 @@ void FrameView::scheduleRelayout() {
     return;
 
   int delay = m_frame->document()->minimumLayoutDelay();
-  if (d->layoutTimerId && d->delayedLayout && !delay)
+  if (d->layoutTimer.isActive() && d->delayedLayout && !delay)
     unscheduleRelayout();
-  if (d->layoutTimerId)
+  if (d->layoutTimer.isActive())
     return;
 
   d->delayedLayout = delay != 0;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (!m_frame->document()->ownerElement())
     printf("Scheduling layout for %d\n", delay);
 #endif
 
-  d->layoutTimerId = startTimer(delay);
+  d->layoutTimer.startOneShot(delay * 0.001);
 }
 
 bool FrameView::layoutPending() {
-  return d->layoutTimerId;
+  return d->layoutTimer.isActive();
 }
 
 bool FrameView::haveDelayedLayoutScheduled() {
-  return d->layoutTimerId && d->delayedLayout;
+  return d->layoutTimer.isActive() && d->delayedLayout;
 }
 
 void FrameView::unscheduleRelayout() {
-  if (!d->layoutTimerId)
+  if (!d->layoutTimer.isActive())
     return;
 
-#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+#if INSTRUMENT_LAYOUT_SCHEDULING
   if (m_frame->document() && !m_frame->document()->ownerElement())
     printf("Layout timer unscheduled at %d\n",
            m_frame->document()->elapsedTime());
 #endif
 
-  killTimer(d->layoutTimerId);
-  d->layoutTimerId = 0;
+  d->layoutTimer.stop();
   d->delayedLayout = false;
 }
 

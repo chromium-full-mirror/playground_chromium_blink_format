@@ -24,8 +24,6 @@
 
 #if SVG_SUPPORT
 
-#include "Shared.h"
-
 namespace WebCore {
 
 class TimeScheduler;
@@ -34,14 +32,14 @@ class EventListener;
 class DOMString;
 class NodeImpl;
 
-class SVGDocumentExtensions : public Shared<SVGDocumentExtensions> {
+class SVGDocumentExtensions {
  public:
   SVGDocumentExtensions(DocumentImpl*);
   ~SVGDocumentExtensions();
 
   EventListener* createSVGEventListener(const DOMString& code, NodeImpl*);
 
-  TimeScheduler* timeScheduler() const;
+  TimeScheduler* timeScheduler() const { return m_timeScheduler; }
 
   void pauseAnimations();
   void unpauseAnimations();
@@ -53,8 +51,12 @@ class SVGDocumentExtensions : public Shared<SVGDocumentExtensions> {
  private:
   DocumentImpl* m_doc;  // weak reference
   TimeScheduler* m_timeScheduler;
+
+  SVGDocumentExtensions(const SVGDocumentExtensions&);
+  SVGDocumentExtensions& operator=(const SVGDocumentExtensions&);
 };
 }
+
 #endif  // SVG_SUPPORT
 
 #endif

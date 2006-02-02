@@ -1606,7 +1606,7 @@ void RenderLayer::suspendMarquees() {
 Marquee::Marquee(RenderLayer* l)
     : m_layer(l),
       m_currentLoop(0),
-      m_timerId(0),
+      m_timer(this, &Marquee::timerFired),
       m_start(0),
       m_end(0),
       m_speed(0),
@@ -1707,7 +1707,8 @@ int Marquee::computePosition(EMarqueeDirection dir, bool stopAtContentEdge) {
 }
 
 void Marquee::start() {
-  if (m_timerId || m_layer->renderer()->style()->marqueeIncrement().value == 0)
+  if (m_timer.isActive() ||
+      m_layer->renderer()->style()->marqueeIncrement().value == 0)
     return;
 
   if (!m_suspended && !m_stopped) {
@@ -1728,24 +1729,16 @@ void Marquee::start() {
     m_stopped = false;
   }
 
-  m_timerId = startTimer(speed());
+  m_timer.startRepeating(speed() * 0.001);
 }
 
 void Marquee::suspend() {
-  if (m_timerId) {
-    killTimer(m_timerId);
-    m_timerId = 0;
-  }
-
+  m_timer.stop();
   m_suspended = true;
 }
 
 void Marquee::stop() {
-  if (m_timerId) {
-    killTimer(m_timerId);
-    m_timerId = 0;
-  }
-
+  m_timer.stop();
   m_stopped = true;
 }
 
@@ -1821,24 +1814,19 @@ void Marquee::updateMarqueeStyle() {
 
   if (speed() != marqueeSpeed()) {
     m_speed = marqueeSpeed();
-    if (m_timerId) {
-      killTimer(m_timerId);
-      m_timerId = startTimer(speed());
-    }
+    if (m_timer.isActive())
+      m_timer.startRepeating(speed() * 0.001);
   }
 
   // Check the loop count to see if we should now stop.
   bool activate = (m_totalLoops <= 0 || m_currentLoop < m_totalLoops);
-  if (activate && !m_timerId)
+  if (activate && !m_timer.isActive())
     m_layer->renderer()->setNeedsLayout(true);
-  else if (!activate && m_timerId) {
-    // Destroy the timer.
-    killTimer(m_timerId);
-    m_timerId = 0;
-  }
+  else if (!activate && m_timer.isActive())
+    m_timer.stop();
 }
 
-void Marquee::timerEvent(QTimerEvent* evt) {
+void Marquee::timerFired(Timer<Marquee>*) {
   if (m_layer->renderer()->needsLayout())
     return;
 
@@ -1895,11 +1883,10 @@ void Marquee::timerEvent(QTimerEvent* evt) {
 
   if (newPos == endPoint) {
     m_currentLoop++;
-    if (m_totalLoops > 0 && m_currentLoop >= m_totalLoops) {
-      killTimer(m_timerId);
-      m_timerId = 0;
-    } else if (s->marqueeBehavior() != MALTERNATE &&
-               s->marqueeBehavior() != MUNFURL)
+    if (m_totalLoops > 0 && m_currentLoop >= m_totalLoops)
+      m_timer.stop();
+    else if (s->marqueeBehavior() != MALTERNATE &&
+             s->marqueeBehavior() != MUNFURL)
       m_reset = true;
   }
 

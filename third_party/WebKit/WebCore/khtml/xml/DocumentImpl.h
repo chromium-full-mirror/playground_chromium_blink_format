@@ -26,15 +26,16 @@
 #ifndef DOM_DocumentImpl_h
 #define DOM_DocumentImpl_h
 
+#include "Color.h"
 #include "KWQSignal.h"
 #include "Shared.h"
+#include "Timer.h"
 #include "decoder.h"
-#include "xml/dom2_traversalimpl.h"
-#include "xml/dom_elementimpl.h"
+#include "dom2_traversalimpl.h"
+#include "dom_elementimpl.h"
 #include <kurl.h>
 #include <kxmlcore/HashCountedSet.h>
 #include <kxmlcore/HashMap.h>
-#include "Color.h"
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
@@ -86,9 +87,11 @@ class NameNodeListImpl;
 class CSSStyleSelector;
 class DocLoader;
 class Tokenizer;
+
 #if __APPLE__
 struct DashboardRegionValue;
 #endif
+
 #if SVG_SUPPORT
 class SVGDocumentExtensions;
 #endif
@@ -509,7 +512,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void dispatchImageLoadEventSoon(HTMLImageLoader*);
   void dispatchImageLoadEventsNow();
   void removeImage(HTMLImageLoader*);
-  virtual void timerEvent(QTimerEvent*);
 
   // Returns the owning element in the parent document.
   // Returns 0 if this is the top level document.
@@ -635,7 +637,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   QString m_baseTarget;
 
   RefPtr<DocumentTypeImpl> m_docType;
-  DOMImplementationImpl* m_implementation;
+  RefPtr<DOMImplementationImpl> m_implementation;
 
   StyleSheetImpl* m_sheet;
   QString m_usersheet;
@@ -652,7 +654,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   // force an immediate layout when requested by JS.
   bool m_ignorePendingStylesheets;
 
-  CSSStyleSheetImpl* m_elemSheet;
+  RefPtr<CSSStyleSheetImpl> m_elemSheet;
 
   bool m_printing;
 
@@ -685,7 +687,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   AbstractViewImpl* m_defaultView;
 
   unsigned short m_listenerTypes;
-  StyleSheetListImpl* m_styleSheets;
+  RefPtr<StyleSheetListImpl> m_styleSheets;
   QPtrList<RegisteredEventListener> m_windowEventListeners;
   QPtrList<NodeImpl> m_maintainsState;
 
@@ -720,7 +722,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   QPtrList<HTMLImageLoader> m_imageLoadEventDispatchSoonList;
   QPtrList<HTMLImageLoader> m_imageLoadEventDispatchingList;
-  int m_imageLoadEventTimer;
+  Timer<DocumentImpl> m_imageLoadEventTimer;
 
   NodeImpl* m_cssTarget;
 
@@ -728,7 +730,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   double m_startTime;
   bool m_overMinimumLayoutThreshold;
 
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
   void* m_transformSource;
   RefPtr<DocumentImpl> m_transformSourceDocument;
 #endif
@@ -800,6 +802,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
  private:
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
+  void imageLoadEventTimerFired(Timer<DocumentImpl>*);
 
   JSEditor* jsEditor();
 
@@ -828,7 +831,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   FormToGroupMap m_selectedRadioButtons;
 
 #if SVG_SUPPORT
-  RefPtr<SVGDocumentExtensions> m_svgExtensions;
+  SVGDocumentExtensions* m_svgExtensions;
 #endif
 
 #if __APPLE__

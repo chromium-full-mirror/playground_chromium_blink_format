@@ -37,12 +37,14 @@ class QStringList;
 class QWheelEvent;
 
 namespace WebCore {
+
 class CSSProperty;
 class CSSStyleSelector;
 class ClipboardImpl;
 class DocumentImpl;
 class ElementImpl;
 class Frame;
+class FrameViewPrivate;
 class HTMLAnchorElementImpl;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
@@ -63,9 +65,10 @@ class RenderPartObject;
 class RenderStyle;
 class RenderWidget;
 
-void applyRule(CSSProperty*);
+template <typename T>
+class Timer;
 
-class FrameViewPrivate;
+void applyRule(CSSProperty*);
 
 /**
  * Renders and displays HTML in a @ref QScrollView.
@@ -104,7 +107,7 @@ class FrameView : public QScrollView {
    * Returns a pointer to the Frame that is
    * rendering the page.
    **/
-  Frame* frame() const { return m_frame; }
+  Frame* frame() const { return m_frame.get(); }
 
   int frameWidth() const { return _width; }
 
@@ -189,7 +192,7 @@ class FrameView : public QScrollView {
   void cancelDragAndDrop(const IntPoint&, DOM::ClipboardImpl* clipboard);
   bool performDragAndDrop(const IntPoint&, DOM::ClipboardImpl* clipboard);
 
-  void timerEvent(QTimerEvent*);
+  void layoutTimerFired(Timer<FrameView>*);
 
   void repaintRectangle(const IntRect& r, bool immediate);
 
@@ -295,7 +298,7 @@ class FrameView : public QScrollView {
   int _marginWidth;
   int _marginHeight;
 
-  Frame* m_frame;
+  RefPtr<Frame> m_frame;
   FrameViewPrivate* d;
 
   QString m_medium;  // media type
