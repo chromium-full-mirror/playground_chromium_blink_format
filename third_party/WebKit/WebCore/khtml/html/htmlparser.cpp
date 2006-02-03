@@ -1302,7 +1302,7 @@ void HTMLParser::popOneBlock(bool delBlock) {
   if (!Elem)
     return;
 
-  if ((Elem->node != current)) {
+  if (current && Elem->node != current) {
     if (current->maintainsState() && doc()) {
       doc()->registerMaintainsState(current);
       QStringList& states = doc()->restoreState();
