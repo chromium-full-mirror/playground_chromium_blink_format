@@ -249,7 +249,7 @@ class WordAwareIterator {
   // Did we have to look ahead in the textIterator to confirm the current chunk?
   bool m_didLookAhead;
 
-  PassRefPtr<DOM::RangeImpl> m_range;
+  RefPtr<DOM::RangeImpl> m_range;
 
   TextIterator m_textIterator;
 };
