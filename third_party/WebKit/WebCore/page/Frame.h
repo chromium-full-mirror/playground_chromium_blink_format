@@ -109,6 +109,7 @@ class Selection;
 class SelectionController;
 class VisiblePosition;
 class XMLTokenizer;
+class Plugin;
 
 struct ChildFrame;
 
@@ -122,6 +123,13 @@ struct MarkedTextUnderline {
   unsigned endOffset;
   Color color;
   bool thick;
+};
+
+enum ObjectContentType {
+  ObjectContentNone,
+  ObjectContentImage,
+  ObjectContentFrame,
+  ObjectContentPlugin,
 };
 
 class Frame : public ObjectContents {
@@ -847,9 +855,6 @@ class Frame : public ObjectContents {
                            int button,
                            int state,
                            const URLArgs& args) = 0;
-  virtual ObjectContents* createPart(const ChildFrame& child,
-                                     const KURL& url,
-                                     const QString& mimeType) = 0;
   virtual bool passSubframeEventToSubframe(NodeImpl::MouseEvent&) = 0;
   virtual bool passWheelEventToChildWidget(NodeImpl*) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
@@ -857,6 +862,17 @@ class Frame : public ObjectContents {
 
  protected:
   virtual DOMString generateFrameName() = 0;
+  virtual Plugin* createPlugin(const KURL& url,
+                               const QStringList& paramNames,
+                               const QStringList& paramValues,
+                               const QString& mimeType) = 0;
+  virtual Frame* createFrame(const KURL& url,
+                             const QString& name,
+                             RenderPart* renderer,
+                             const DOMString& referrer,
+                             bool isObject) = 0;
+  virtual ObjectContentType objectContentType(const KURL& url,
+                                              const QString& mimeType) = 0;
 
  public slots:
   /**
@@ -947,15 +963,6 @@ class Frame : public ObjectContents {
                     const QStringList& paramNames = QStringList(),
                     const QStringList& paramValues = QStringList(),
                     bool isIFrame = false);
-
-  /**
-   * @internal returns a name for a frame without a name.
-   * This function returns a sequence of names.
-   * All names in a sequence are different but the sequence is
-   * always the same.
-   * The sequence is reset in clear().
-   */
-
   bool requestObject(RenderPart* frame,
                      const QString& url,
                      const QString& serviceType,
@@ -964,6 +971,9 @@ class Frame : public ObjectContents {
   bool requestObject(ChildFrame* child,
                      const KURL& url,
                      const URLArgs& args = URLArgs());
+  virtual ObjectContents* createPart(const ChildFrame& child,
+                                     const KURL& url,
+                                     const QString& mimeType);
 
  public:
   DOMString requestFrameName();
@@ -1016,6 +1026,8 @@ class Frame : public ObjectContents {
   void setMediaType(const QString&);
 
   RenderObject* renderer() const;
+  ElementImpl* ownerElement();
+
   IntRect selectionRect() const;
   bool isFrameSet() const;
 
@@ -1142,12 +1154,14 @@ class Frame : public ObjectContents {
   bool didOpenURL(const KURL&);
   void setStatusBarText(const QString&);
   void started(KIO::Job*);
-  void frameDetached();
   virtual void didFirstLayout() {}
+
+  virtual void frameDetached();
 
   int frameCount;
 
   virtual void detachFromView();
+  void updateBaseURLForEmptyDocument();
 
   KURL url() const;
 

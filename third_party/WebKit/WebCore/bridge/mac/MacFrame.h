@@ -122,6 +122,7 @@ class MacFrame : public Frame {
   void setBridge(WebCoreFrameBridge* p);
   WebCoreFrameBridge* bridge() const { return _bridge; }
   void setView(FrameView* view);
+  virtual void frameDetached();
 
   virtual bool openURL(const KURL&);
 
@@ -139,9 +140,18 @@ class MacFrame : public Frame {
                            int button,
                            int state,
                            const URLArgs& args);
-  virtual ObjectContents* createPart(const ChildFrame& child,
-                                     const KURL& url,
-                                     const QString& mimeType);
+
+  virtual ObjectContentType objectContentType(const KURL& url,
+                                              const QString& mimeType);
+  virtual Plugin* createPlugin(const KURL& url,
+                               const QStringList& paramNames,
+                               const QStringList& paramValues,
+                               const QString& mimeType);
+  virtual Frame* createFrame(const KURL& url,
+                             const QString& name,
+                             RenderPart* renderer,
+                             const DOMString& referrer,
+                             bool isObject);
 
   virtual void scheduleClose();
 
