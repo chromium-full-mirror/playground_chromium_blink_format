@@ -31,7 +31,7 @@
 #include "CachedObject.h"
 #include "IntRect.h"
 #include <khtml_settings.h>
-#include "Image.h"
+#include "ImageAnimationObserver.h"
 
 namespace WebCore {
 
