@@ -1212,14 +1212,6 @@ QCursor Frame::urlCursor() const {
   return KCursor::handCursor();
 }
 
-bool Frame::onlyLocalReferences() const {
-  return d->m_onlyLocalReferences;
-}
-
-void Frame::setOnlyLocalReferences(bool enable) {
-  d->m_onlyLocalReferences = enable;
-}
-
 QString Frame::selectedText() const {
   return plainText(selection().toRange().get());
 }
@@ -1444,182 +1436,151 @@ void Frame::urlSelected(const QString& url,
   urlSelected(cURL, button, state, args);
 }
 
+DOMString Frame::requestFrameName() {
+  return generateFrameName();
+}
+
 bool Frame::requestFrame(RenderPart* part,
-                         const QString& url,
-                         const QString& frameName,
-                         const QStringList& paramNames,
-                         const QStringList& paramValues,
-                         bool isIFrame) {
+                         const QString& _url,
+                         const QString& frameName) {
   FrameIt it = d->m_frames.find(frameName);
   if (it == d->m_frames.end()) {
     ChildFrame child;
     child.m_name = frameName;
     it = d->m_frames.append(child);
   }
-
-  (*it).m_type = isIFrame ? ChildFrame::IFrame : ChildFrame::Frame;
   (*it).m_renderer = part;
-  (*it).m_paramValues = paramNames;
-  (*it).m_paramNames = paramValues;
 
   // Support for <frame src="javascript:string">
-  if (url.startsWith("javascript:", false)) {
-    if (!processObjectRequest(&(*it), "about:blank", "text/html"))
-      return false;
+  KURL scriptURL;
+  KURL url;
+  if (_url.startsWith("javascript:", false)) {
+    scriptURL = _url;
+    url = "about:blank";
+  } else
+    url = completeURL(_url);
 
+  if ((*it).m_frame) {
+    URLArgs args;
+    args.metaData().set("referrer", d->m_referrer);
+    args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
+                  (d->m_cachePolicy == KIO::CC_Refresh);
+    static_cast<Frame*>((*it).m_frame.get())->openURLRequest(url, args);
+  } else if (!loadSubframe(&(*it), url, d->m_referrer))
+    return false;
+
+  if (!scriptURL.isEmpty()) {
     Frame* newPart = static_cast<Frame*>(&*(*it).m_frame);
-    newPart->replaceContentsWithScriptResult(url);
-
-    return true;
+    newPart->replaceContentsWithScriptResult(scriptURL);
   }
 
-  return requestObject(&(*it), completeURL(url));
+  return true;
 }
 
-DOMString Frame::requestFrameName() {
-  return generateFrameName();
-}
-
-bool Frame::requestObject(RenderPart* frame,
+bool Frame::requestObject(RenderPart* renderer,
                           const QString& url,
-                          const QString& serviceType,
+                          const QString& mimeType,
                           const QStringList& paramNames,
                           const QStringList& paramValues) {
   ChildFrame child;
   QValueList<ChildFrame>::Iterator it = d->m_objects.append(child);
-  (*it).m_renderer = frame;
-  (*it).m_type = ChildFrame::Object;
-  (*it).m_paramNames = paramNames;
-  (*it).m_paramValues = paramValues;
-  (*it).m_hasFallbackContent = frame->hasFallbackContent();
+  (*it).m_renderer = renderer;
 
   KURL completedURL;
   if (!url.isEmpty())
     completedURL = completeURL(url);
 
-  URLArgs args;
-  args.serviceType = serviceType;
-  return requestObject(&(*it), completedURL, args);
-}
-
-bool Frame::requestObject(ChildFrame* child,
-                          const KURL& url,
-                          const URLArgs& _args) {
-  if (child->m_bPreloaded) {
-    if (child->m_renderer && child->m_frame && child->m_renderer->widget())
-      child->m_renderer->setWidget(child->m_renderer->widget());
-
-    child->m_bPreloaded = false;
-    return true;
-  }
-
-  URLArgs args(_args);
-
-  if (child->m_frame && !args.reload && child->m_frame->isFrame() &&
-      urlcmp(static_cast<Frame*>(child->m_frame.get())->url().url(), url.url(),
-             true, true))
-    args.serviceType = child->m_serviceType;
-
-  child->m_args = args;
-  child->m_args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
-                         (d->m_cachePolicy == KIO::CC_Refresh);
-  child->m_serviceName = QString::null;
-  if (!d->m_referrer.isEmpty() &&
-      !child->m_args.metaData().contains("referrer"))
-    child->m_args.metaData().set("referrer", d->m_referrer);
-
-  // We want a Frame if the HTML says <frame src=""> or <frame
-  // src="about:blank">
-  if ((url.isEmpty() || url.url() == "about:blank") &&
-      args.serviceType.isEmpty())
-    args.serviceType = QString::fromLatin1("text/html");
-
-  return processObjectRequest(child, url, args.serviceType);
-}
-
-bool Frame::processObjectRequest(ChildFrame* child,
-                                 const KURL& _url,
-                                 const QString& mimetype) {
-  // IMPORTANT: create a copy of the url here, because it is just a reference,
-  // which was likely to be given
-  // by an emitting frame part (emit openURLRequest( blahurl, ... ) . A few
-  // lines below we delete the part
-  // though -> the reference becomes invalid -> crash is likely
-  KURL url(_url);
-
-  // khtmlrun called us this way to indicate a loading error
-  if (d->m_onlyLocalReferences || (url.isEmpty() && mimetype.isEmpty())) {
+  if (url.isEmpty() && mimeType.isEmpty()) {
     checkEmitLoadEvent();
-    child->m_bCompleted = true;
+    child.m_bCompleted = true;
     return true;
   }
 
-  if (child->m_bNotify) {
-    child->m_bNotify = false;
-    if (!child->m_args.lockHistory())
-      emit d->m_extension->openURLNotify();
+  bool useFallback;
+  if (shouldUsePlugin((*it).m_renderer->element(), completedURL, mimeType,
+                      renderer->hasFallbackContent(), useFallback))
+    return loadPlugin(&(*it), completedURL, mimeType, paramNames, paramValues,
+                      useFallback);
+  else
+    return loadSubframe(&(*it), completedURL, d->m_referrer);
+}
+
+bool Frame::shouldUsePlugin(NodeImpl* element,
+                            const KURL& url,
+                            const QString& mimeType,
+                            bool hasFallback,
+                            bool& useFallback) {
+  useFallback = false;
+  ObjectContentType objectType = objectContentType(url, mimeType);
+
+  // if an object's content can't be handled and it has no fallback, let
+  // it be handled as a plugin to show the broken plugin icon
+  if (objectType == ObjectContentNone && hasFallback)
+    useFallback = true;
+
+  return objectType == ObjectContentNone || objectType == ObjectContentPlugin;
+}
+
+bool Frame::loadPlugin(ChildFrame* child,
+                       const KURL& url,
+                       const QString& mimeType,
+                       const QStringList& paramNames,
+                       const QStringList& paramValues,
+                       bool useFallback) {
+  if (useFallback) {
+    checkEmitLoadEvent();
+    return false;
   }
 
-  if (child->m_frame) {
-    Frame* frame = static_cast<Frame*>(&*child->m_frame);
-    if (frame && frame->isFrame()) {
-      URLArgs args;
-      if (!d->m_referrer.isEmpty())
-        args.metaData().set("referrer", d->m_referrer);
-      frame->openURLRequest(url, args);
-    }
-  } else {
-    ObjectContents* part = createPart(*child, url, mimetype);
-    if (part && part->isFrame()) {
-      Frame* frame = static_cast<Frame*>(part);
-      frame->childBegin();
-    }
-
-    if (!part) {
-      checkEmitLoadEvent();
-      return false;
-    }
-
-    // CRITICAL STUFF
-    if (child->m_frame)
-      disconnectChild(child);
-
-    child->m_serviceType = mimetype;
-    if (child->m_renderer && part->view())
-      child->m_renderer->setWidget(part->view());
-
-    child->m_frame = part;
-    assert(child->m_frame);
-
-    connectChild(child);
+  Plugin* plugin = createPlugin(url, paramNames, paramValues, mimeType);
+  if (!plugin) {
+    checkEmitLoadEvent();
+    return false;
   }
+
+  if (child->m_renderer && plugin->view())
+    child->m_renderer->setWidget(plugin->view());
+  child->m_frame = plugin;
 
   checkEmitLoadEvent();
-  // Some JS code in the load event may have destroyed the part
-  // In that case, abort
+
+  // Some JS code in the load event may have destroyed the plugin, in that case,
+  // abort
   if (!child->m_renderer)
     return false;
 
-  if (child->m_bPreloaded) {
-    if (child->m_renderer && child->m_renderer)
-      child->m_renderer->setWidget(child->m_renderer->widget());
+  child->m_bCompleted = false;
+  return true;
+}
 
-    child->m_bPreloaded = false;
-    return true;
+bool Frame::loadSubframe(ChildFrame* child,
+                         const KURL& url,
+                         const DOMString& referrer) {
+  Frame* frame = createFrame(url, child->m_name, child->m_renderer, referrer);
+  if (!frame) {
+    checkEmitLoadEvent();
+    return false;
   }
 
-  child->m_args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
-                         (d->m_cachePolicy == KIO::CC_Refresh);
+  frame->childBegin();
 
-  // make sure the part has a way to find out about the mimetype.
-  // we actually set it in child->m_args in requestObject already,
-  // but it's useless if we had to use a KHTMLRun instance, as the
-  // point the run object is to find out exactly the mimetype.
-  child->m_args.serviceType = mimetype;
+  if (child->m_frame)
+    disconnectChild(child);
+
+  if (child->m_renderer && frame->view())
+    child->m_renderer->setWidget(frame->view());
+
+  child->m_frame = frame;
+  connectChild(child);
+
+  checkEmitLoadEvent();
+
+  // Some JS code in the load event may have destroyed the frame, in that case,
+  // abort
+  if (!child->m_renderer)
+    return false;
 
   child->m_bCompleted = false;
-  if (child->m_extension)
-    child->m_extension->setURLArgs(child->m_args);
 
   // In these cases, the synchronous load would have finished
   // before we could connect the signals, so make sure to send the
@@ -1627,38 +1588,12 @@ bool Frame::processObjectRequest(ChildFrame* child,
   // FIXME: In this case the Frame will have finished loading before
   // it's being added to the child list.  It would be a good idea to
   // create the child first, then invoke the loader separately
-  if (url.isEmpty() || url.url() == "about:blank") {
-    ObjectContents* part = child->m_frame.get();
-    if (part && part->isFrame()) {
-      Frame* frame = static_cast<Frame*>(part);
-      frame->completed();
-      frame->checkCompleted();
-    }
+  if (url.isEmpty() || url == "about:blank") {
+    frame->completed();
+    frame->checkCompleted();
   }
+
   return true;
-}
-
-ObjectContents* Frame::createPart(const ChildFrame& child,
-                                  const KURL& url,
-                                  const QString& mimeType) {
-  bool isObject = child.m_type == ChildFrame::Object;
-
-  ObjectContentType objectType =
-      isObject ? objectContentType(url, mimeType) : ObjectContentFrame;
-
-  if (objectType == ObjectContentNone) {
-    if (child.m_hasFallbackContent)
-      return 0;
-    objectType = ObjectContentPlugin;  // Since no fallback content exists,
-                                       // we'll make a plugin and show the error
-                                       // dialog.
-  }
-
-  if (objectType == ObjectContentPlugin)
-    return createPlugin(url, child.m_paramNames, child.m_paramValues, mimeType);
-
-  return createFrame(url, child.m_name, child.m_renderer,
-                     child.m_args.metaData().get("referrer"), isObject);
 }
 
 void Frame::submitFormAgain() {
@@ -1800,7 +1735,6 @@ void Frame::slotChildCompleted(bool complete) {
   assert(child);
 
   child->m_bCompleted = true;
-  child->m_args = URLArgs();
 
   if (complete && treeNode()->parent() == 0)
     d->m_bPendingChildRedirection = true;
@@ -1961,8 +1895,7 @@ QStringList Frame::frameNames() const {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (!(*it).m_bPreloaded)
-      res += (*it).m_name;
+    res += (*it).m_name;
 
   return res;
 }
@@ -1973,8 +1906,7 @@ QPtrList<ObjectContents> Frame::frames() const {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (!(*it).m_bPreloaded)
-      res.append((*it).m_frame.get());
+    res.append((*it).m_frame.get());
 
   return res;
 }
@@ -2805,7 +2737,7 @@ bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
 
 void Frame::connectChild(const ChildFrame* child) const {
   ObjectContents* part = child->m_frame.get();
-  if (part && child->m_type != ChildFrame::Object) {
+  if (part && part->isFrame()) {
     connect(part, SIGNAL(started(KIO::Job*)), this,
             SLOT(slotChildStarted(KIO::Job*)));
     connect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
@@ -2820,7 +2752,7 @@ void Frame::connectChild(const ChildFrame* child) const {
 
 void Frame::disconnectChild(const ChildFrame* child) const {
   ObjectContents* part = child->m_frame.get();
-  if (part && child->m_type != ChildFrame::Object) {
+  if (part && part->isFrame()) {
     disconnect(part, SIGNAL(started(KIO::Job*)), this,
                SLOT(slotChildStarted(KIO::Job*)));
     disconnect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
@@ -2932,19 +2864,10 @@ void Frame::selectFrameElementInParentIfFullySelected() {
 }
 
 void Frame::handleFallbackContent() {
-  Frame* parent = treeNode()->parent();
-  if (!parent)
+  ElementImpl* owner = ownerElement();
+  if (!owner || !owner->hasTagName(objectTag))
     return;
-  ChildFrame* childFrame = parent->childFrame(this);
-  if (!childFrame || childFrame->m_type != ChildFrame::Object)
-    return;
-  RenderPart* renderPart = childFrame->m_renderer;
-  if (!renderPart)
-    return;
-  NodeImpl* node = renderPart->element();
-  if (!node || !node->hasTagName(objectTag))
-    return;
-  static_cast<HTMLObjectElementImpl*>(node)->renderFallbackContent();
+  static_cast<HTMLObjectElementImpl*>(owner)->renderFallbackContent();
 }
 
 void Frame::setSettings(KHTMLSettings* settings) {
@@ -3682,9 +3605,10 @@ void Frame::frameDetached() {
 }
 
 void Frame::updateBaseURLForEmptyDocument() {
-  if (treeNode()->parent() &&
-      (treeNode()->parent()->childFrame(this)->m_type == ChildFrame::IFrame ||
-       treeNode()->parent()->childFrame(this)->m_type == ChildFrame::Object))
+  ElementImpl* owner = ownerElement();
+  // FIXME: should embed be included
+  if (owner && (owner->hasTagName(iframeTag) || owner->hasTagName(objectTag) ||
+                owner->hasTagName(embedTag)))
     d->m_doc->setBaseURL(treeNode()->parent()->d->m_doc->baseURL());
 }
 

@@ -956,14 +956,7 @@ void RenderPartObject::updateWidget() {
     if (url.isEmpty())
       url = "about:blank";
     FrameView* v = static_cast<FrameView*>(m_view);
-    bool requestSucceeded = v->frame()->requestFrame(
-        this, url, o->m_name.qstring(), QStringList(), QStringList(), true);
-    if (requestSucceeded && url == "about:blank") {
-      Frame* newPart = v->frame()->findFrame(o->m_name.qstring());
-      if (newPart && newPart->document()) {
-        newPart->document()->setBaseURL(v->frame()->baseURL().url());
-      }
-    }
+    v->frame()->requestFrame(this, url, o->m_name.qstring());
   }
 }
 

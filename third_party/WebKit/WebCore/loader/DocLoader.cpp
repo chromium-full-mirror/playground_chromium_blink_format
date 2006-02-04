@@ -91,8 +91,6 @@ bool DocLoader::needReload(const KURL& fullURL) {
 
 CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
   KURL fullURL = m_doc->completeURL(url.qstring());
-  if (m_frame && m_frame->onlyLocalReferences() && fullURL.protocol() != "file")
-    return 0;
 
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
@@ -109,8 +107,6 @@ CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
 CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
                                                   const QString& charset) {
   KURL fullURL = m_doc->completeURL(url.qstring());
-  if (m_frame && m_frame->onlyLocalReferences() && fullURL.protocol() != "file")
-    return 0;
 
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
@@ -127,8 +123,6 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
 CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
                                        const QString& charset) {
   KURL fullURL = m_doc->completeURL(url.qstring());
-  if (m_frame && m_frame->onlyLocalReferences() && fullURL.protocol() != "file")
-    return 0;
 
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
@@ -146,9 +140,6 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
 CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(
     const DOM::DOMString& url) {
   KURL fullURL = m_doc->completeURL(url.qstring());
-
-  if (m_frame && m_frame->onlyLocalReferences() && fullURL.protocol() != "file")
-    return 0;
 
   if (KWQCheckIfReloading(this))
     setCachePolicy(KIO::CC_Reload);

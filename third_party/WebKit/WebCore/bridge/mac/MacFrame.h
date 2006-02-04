@@ -150,8 +150,7 @@ class MacFrame : public Frame {
   virtual Frame* createFrame(const KURL& url,
                              const QString& name,
                              RenderPart* renderer,
-                             const DOMString& referrer,
-                             bool isObject);
+                             const DOMString& referrer);
 
   virtual void scheduleClose();
 
