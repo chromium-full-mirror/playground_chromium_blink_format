@@ -1487,8 +1487,8 @@ void Window::setCurrentEvent(EventImpl* evt) {
   // ")::setCurrentEvent m_evt=" << evt << endl;
 }
 
-static void setWindowFeature(const QString& keyString,
-                             const QString& valueString,
+static void setWindowFeature(const DOMString& keyString,
+                             const DOMString& valueString,
                              WindowArgs& windowArgs) {
   int value;
 
@@ -1527,7 +1527,7 @@ static void setWindowFeature(const QString& keyString,
     windowArgs.scrollBarsVisible = value;
 }
 
-static void parseWindowFeatures(const QString& features,
+static void parseWindowFeatures(const DOMString& features,
                                 WindowArgs& windowArgs) {
   /*
    The IE rule is: all features except for channelmode and fullscreen default to
@@ -1572,7 +1572,7 @@ static void parseWindowFeatures(const QString& features,
 
   int i = 0;
   int length = features.length();
-  QString buffer = features.lower();
+  DOMString buffer = features.lower();
   while (i < length) {
     // skip to first letter or number, but don't skip past the end of the string
     while (!buffer[i].isLetterOrNumber()) {
@@ -1608,8 +1608,9 @@ static void parseWindowFeatures(const QString& features,
       i++;
     valueEnd = i;
 
-    setWindowFeature(buffer.mid(keyBegin, keyEnd - keyBegin),
-                     buffer.mid(valueBegin, valueEnd - valueBegin), windowArgs);
+    DOMString keyString(buffer.substring(keyBegin, keyEnd - keyBegin));
+    DOMString valueString(buffer.substring(valueBegin, valueEnd - valueBegin));
+    setWindowFeature(keyString, valueString, windowArgs);
   }
 }
 
@@ -1680,11 +1681,10 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
 
       WindowArgs windowArgs;
-      QString features = args[2]->isUndefinedOrNull()
-                             ? QString()
-                             : args[2]->toString(exec).qstring();
+      DOMString features = args[2]->isUndefinedOrNull()
+                               ? DOMString()
+                               : args[2]->toString(exec).domString();
       parseWindowFeatures(features, windowArgs);
-
       constrainToVisible(screenRect(widget), windowArgs);
 
       // prepare arguments
