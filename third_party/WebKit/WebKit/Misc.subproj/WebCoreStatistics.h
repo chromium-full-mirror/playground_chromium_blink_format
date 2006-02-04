@@ -39,10 +39,14 @@
 
 + (size_t)javaScriptObjectsCount;
 + (size_t)javaScriptInterpretersCount;
++ (size_t)javaScriptProtectedObjectsCount;
++ (NSCountedSet*)javaScriptRootObjecTypeCounts;
++ (void)garbageCollectJavaScriptObjects;
+
+// deprecated
 + (size_t)javaScriptNoGCAllowedObjectsCount;
 + (size_t)javaScriptReferencedObjectsCount;
 + (NSSet*)javaScriptRootObjectClasses;
-+ (void)garbageCollectJavaScriptObjects;
 
 + (BOOL)shouldPrintExceptions;
 + (void)setShouldPrintExceptions:(BOOL)print;
