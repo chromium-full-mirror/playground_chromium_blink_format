@@ -40,6 +40,8 @@ class CSSPrimitiveValueImpl;
 class CSSMutableStyleDeclarationImpl;
 class CSSProperty;
 class CSSRuleListImpl;
+class MediaListImpl;
+class MediaQueryImpl;
 
 struct ParseString {
   unsigned short* string;
@@ -117,6 +119,8 @@ class CSSParser {
                   const DOM::DOMString& string);
   bool parseDeclaration(DOM::CSSMutableStyleDeclarationImpl* decls,
                         const DOM::DOMString& string);
+  bool parseMediaQuery(DOM::MediaListImpl* queries,
+                       const DOM::DOMString& string);
 
   static CSSParser* current() { return currentParser; }
 
@@ -181,6 +185,7 @@ class CSSParser {
   int id;
   DOM::StyleListImpl* styleElement;
   DOM::CSSRuleImpl* rule;
+  DOM::MediaQueryImpl* mediaQuery;
   ValueList* valueList;
   CSSProperty** parsedProperties;
   int numParsedProperties;
