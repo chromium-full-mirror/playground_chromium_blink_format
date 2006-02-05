@@ -60,8 +60,6 @@ HTMLSelectElementImpl::HTMLSelectElementImpl(const QualifiedName& tagName,
 HTMLSelectElementImpl::~HTMLSelectElementImpl() {
   if (getDocument())
     getDocument()->deregisterMaintainsState(this);
-  if (m_options)
-    m_options->detach();
 }
 
 bool HTMLSelectElementImpl::checkDTD(const NodeImpl* newChild) {
@@ -145,8 +143,7 @@ void HTMLSelectElementImpl::remove(int index) {
   if (listIndex < 0 || index >= int(items.size()))
     return;  // ### what should we do ? remove the last item?
 
-  RefPtr<NodeImpl> item = items[listIndex];
-  removeChild(item.get(), exceptioncode);
+  removeChild(items[listIndex], exceptioncode);
   if (!exceptioncode)
     setRecalcListItems();
 }
@@ -348,20 +345,8 @@ int HTMLSelectElementImpl::listToOptionIndex(int listIndex) const {
   return optionIndex;
 }
 
-// FIXME 4197997: This method is used by the public Objective-C DOM API
-// -[DOMHTMLSelectElement options],
-// but always returns an empty list.
-HTMLOptionsCollectionImpl* HTMLSelectElementImpl::options() {
-  if (!m_options)
-    m_options = new HTMLOptionsCollectionImpl(this);
-  return m_options.get();
-}
-
-// FIXME: Delete this once the above function is working well enough to use for
-// real.
-RefPtr<HTMLCollectionImpl> HTMLSelectElementImpl::optionsHTMLCollection() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::SELECT_OPTIONS));
+PassRefPtr<HTMLOptionsCollectionImpl> HTMLSelectElementImpl::options() {
+  return new HTMLOptionsCollectionImpl(this);
 }
 
 void HTMLSelectElementImpl::recalcListItems() {

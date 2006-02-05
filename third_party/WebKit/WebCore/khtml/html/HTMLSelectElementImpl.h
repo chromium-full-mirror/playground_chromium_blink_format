@@ -26,27 +26,23 @@
 #ifndef HTML_HTMLSelectElementImpl_H
 #define HTML_HTMLSelectElementImpl_H
 
+#include "Array.h"
 #include "HTMLGenericFormElementImpl.h"
 
-#include "Array.h"
-
-namespace khtml {
-class RenderSelect;
-};
-
-namespace DOM {
+namespace WebCore {
 
 class HTMLOptionElementImpl;
 class HTMLOptionsCollectionImpl;
+class RenderSelect;
 
 class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
-  friend class khtml::RenderSelect;
+  friend class RenderSelect;
 
  public:
-  HTMLSelectElementImpl(DocumentImpl* doc, HTMLFormElementImpl* f = 0);
+  HTMLSelectElementImpl(DocumentImpl*, HTMLFormElementImpl* = 0);
   HTMLSelectElementImpl(const QualifiedName& tagName,
-                        DocumentImpl* doc,
-                        HTMLFormElementImpl* f = 0);
+                        DocumentImpl*,
+                        HTMLFormElementImpl* = 0);
   ~HTMLSelectElementImpl();
 
   virtual int tagPriority() const { return 6; }
@@ -69,17 +65,13 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   bool multiple() const { return m_multiple; }
 
-  void add(HTMLElementImpl* element,
-           HTMLElementImpl* before,
-           int& exceptioncode);
+  void add(HTMLElementImpl* element, HTMLElementImpl* before, ExceptionCode&);
   void remove(int index);
 
   DOMString value();
   void setValue(const DOMString&);
 
-  HTMLOptionsCollectionImpl* options();
-  RefPtr<HTMLCollectionImpl>
-  optionsHTMLCollection();  // FIXME: Remove this and migrate to options().
+  PassRefPtr<HTMLOptionsCollectionImpl> options();
 
   virtual bool maintainsState() { return true; }
   virtual QString state();
@@ -97,10 +89,9 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void childrenChanged();
 
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool appendFormData(FormDataList&, bool);
 
   // get the actual listbox index of the optionIndexth option
@@ -119,7 +110,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void notifyOptionSelected(HTMLOptionElementImpl* selectedOption,
                             bool selected);
 
-  virtual void defaultEventHandler(EventImpl* evt);
+  virtual void defaultEventHandler(EventImpl*);
   virtual void accessKeyAction(bool sendToAnyElement);
 
   void setMultiple(bool);
@@ -129,11 +120,9 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
  private:
   void recalcListItems();
 
- protected:
   mutable Array<HTMLElementImpl*> m_listItems;
-  RefPtr<HTMLOptionsCollectionImpl> m_options;
-  short m_minwidth;
-  short m_size;
+  int m_minwidth;
+  int m_size;
   bool m_multiple;
   bool m_recalcListItems;
 };
