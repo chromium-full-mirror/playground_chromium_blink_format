@@ -303,7 +303,9 @@ class NodeImpl : public TreeShared<NodeImpl> {
   bool dispatchEvent(PassRefPtr<EventImpl>,
                      ExceptionCode&,
                      bool tempEvent = false);
-  bool dispatchGenericEvent(PassRefPtr<EventImpl>, ExceptionCode&);
+  bool dispatchGenericEvent(PassRefPtr<EventImpl>,
+                            ExceptionCode&,
+                            bool tempEvent = false);
   bool dispatchHTMLEvent(const AtomicString& eventType,
                          bool canBubble,
                          bool cancelable);
