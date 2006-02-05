@@ -48,42 +48,37 @@ DOMString HTMLOptGroupElementImpl::type() const {
   return "optgroup";
 }
 
-PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::insertBefore(
-    PassRefPtr<NodeImpl> newChild,
-    NodeImpl* refChild,
-    ExceptionCode& ec) {
-  PassRefPtr<NodeImpl> result =
+bool HTMLOptGroupElementImpl::insertBefore(PassRefPtr<NodeImpl> newChild,
+                                           NodeImpl* refChild,
+                                           ExceptionCode& ec) {
+  bool result =
       HTMLGenericFormElementImpl::insertBefore(newChild, refChild, ec);
   if (result)
     recalcSelectOptions();
   return result;
 }
 
-PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::replaceChild(
-    PassRefPtr<NodeImpl> newChild,
-    NodeImpl* oldChild,
-    ExceptionCode& ec) {
-  PassRefPtr<NodeImpl> result =
+bool HTMLOptGroupElementImpl::replaceChild(PassRefPtr<NodeImpl> newChild,
+                                           NodeImpl* oldChild,
+                                           ExceptionCode& ec) {
+  bool result =
       HTMLGenericFormElementImpl::replaceChild(newChild, oldChild, ec);
   if (result)
     recalcSelectOptions();
   return result;
 }
 
-PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::removeChild(NodeImpl* oldChild,
-                                                          ExceptionCode& ec) {
-  PassRefPtr<NodeImpl> result =
-      HTMLGenericFormElementImpl::removeChild(oldChild, ec);
+bool HTMLOptGroupElementImpl::removeChild(NodeImpl* oldChild,
+                                          ExceptionCode& ec) {
+  bool result = HTMLGenericFormElementImpl::removeChild(oldChild, ec);
   if (result)
     recalcSelectOptions();
   return result;
 }
 
-PassRefPtr<NodeImpl> HTMLOptGroupElementImpl::appendChild(
-    PassRefPtr<NodeImpl> newChild,
-    ExceptionCode& ec) {
-  PassRefPtr<NodeImpl> result =
-      HTMLGenericFormElementImpl::appendChild(newChild, ec);
+bool HTMLOptGroupElementImpl::appendChild(PassRefPtr<NodeImpl> newChild,
+                                          ExceptionCode& ec) {
+  bool result = HTMLGenericFormElementImpl::appendChild(newChild, ec);
   if (result)
     recalcSelectOptions();
   return result;

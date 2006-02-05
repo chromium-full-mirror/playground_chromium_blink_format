@@ -877,8 +877,8 @@ void XMLTokenizer::insertErrorMessageBlock() {
 
   RefPtr<ElementImpl> reportElement =
       createXHTMLParserErrorHeader(doc, m_errorMessages);
-  documentElement->insertBefore(reportElement.get(),
-                                documentElement->firstChild(), exceptioncode);
+  documentElement->insertBefore(reportElement, documentElement->firstChild(),
+                                exceptioncode);
 #ifdef KHTML_XSLT
   if (doc->transformSourceDocument()) {
     ElementImpl* par =
