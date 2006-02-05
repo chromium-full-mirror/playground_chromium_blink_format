@@ -1,7 +1,7 @@
 /*
  * This file is part of the DOM implementation for KDE.
  *
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,14 +20,13 @@
  *
  */
 
-#ifndef DOM_AtomicString_h
-#define DOM_AtomicString_h
+#ifndef AtomicString_h
+#define AtomicString_h
 
-#include "dom/dom_string.h"
+#include "AtomicStringImpl.h"
+#include "PlatformString.h"
 
-namespace DOM {
-
-class AtomicStringImpl : public DOMStringImpl {};
+namespace WebCore {
 
 class AtomicString {
  public:
@@ -39,12 +38,12 @@ class AtomicString {
   AtomicString(const unsigned short* s, int length)
       : m_string(add((QChar*)s, length)) {}
   AtomicString(const QString& s) : m_string(add(s.unicode(), s.length())) {}
-  AtomicString(DOMStringImpl* imp) : m_string(add(imp)) {}
+  AtomicString(StringImpl* imp) : m_string(add(imp)) {}
   AtomicString(AtomicStringImpl* imp) : m_string(imp) {}
-  explicit AtomicString(const DOMString& s) : m_string(add(s.impl())) {}
+  explicit AtomicString(const String& s) : m_string(add(s.impl())) {}
 
-  operator const DOMString&() const { return m_string; }
-  const DOMString& domString() const { return m_string; };
+  operator const String&() const { return m_string; }
+  const String& domString() const { return m_string; };
   QString qstring() const { return m_string.qstring(); };
 
   AtomicStringImpl* impl() const {
@@ -57,8 +56,8 @@ class AtomicString {
   const QChar& operator[](unsigned int i) const { return m_string[i]; }
 
   bool contains(QChar c) const { return m_string.contains(c); }
-  bool contains(const AtomicString& s, bool caseSentitive = true) const {
-    return (find(s, 0, caseSentitive) != -1);
+  bool contains(const AtomicString& s, bool caseSensitive = true) const {
+    return m_string.contains(s.domString(), caseSensitive);
   }
 
   int find(QChar c, int start = 0) const { return m_string.find(c, start); }
@@ -69,52 +68,46 @@ class AtomicString {
   }
 
   bool startsWith(const AtomicString& s, bool caseSensitive = true) const {
-    return (find(s, 0, caseSensitive) == 0);
+    return m_string.startsWith(s.domString(), caseSensitive);
   }
   bool endsWith(const AtomicString& s, bool caseSensitive = true) const {
     return m_string.endsWith(s.domString(), caseSensitive);
   }
 
   int toInt() const { return m_string.toInt(); }
-  bool percentage(int& _percentage) const {
-    return m_string.percentage(_percentage);
-  }
-  khtml::Length* toLengthArray(int& len) const {
-    return m_string.toLengthArray(len);
-  }
-  khtml::Length* toCoordsArray(int& len) const {
-    return m_string.toCoordsArray(len);
-  }
+  bool percentage(int& p) const { return m_string.percentage(p); }
+  Length* toLengthArray(int& len) const { return m_string.toLengthArray(len); }
+  Length* toCoordsArray(int& len) const { return m_string.toCoordsArray(len); }
 
   bool isNull() const { return m_string.isNull(); }
   bool isEmpty() const { return m_string.isEmpty(); }
 
-  static void remove(DOMStringImpl*);
+  static void remove(StringImpl*);
 
 #ifdef __OBJC__
-  AtomicString(NSString* s) : m_string(add(DOMString(s).impl())) {}
+  AtomicString(NSString* s) : m_string(add(String(s).impl())) {}
   operator NSString*() const { return m_string; }
 #endif
 
  private:
-  DOMString m_string;
+  String m_string;
 
-  static DOMStringImpl* add(const char*);
-  static DOMStringImpl* add(const QChar*, int length);
-  static DOMStringImpl* add(DOMStringImpl*);
+  static StringImpl* add(const char*);
+  static StringImpl* add(const QChar*, int length);
+  static StringImpl* add(StringImpl*);
 };
 
 inline bool operator==(const AtomicString& a, const AtomicString& b) {
   return a.impl() == b.impl();
 }
 bool operator==(const AtomicString& a, const char* b);
-inline bool operator==(const AtomicString& a, const DOMString& b) {
+inline bool operator==(const AtomicString& a, const String& b) {
   return equal(a.impl(), b.impl());
 }
 inline bool operator==(const char* a, const AtomicString& b) {
   return b == a;
 }
-inline bool operator==(const DOMString& a, const AtomicString& b) {
+inline bool operator==(const String& a, const AtomicString& b) {
   return equal(a.impl(), b.impl());
 }
 
@@ -124,13 +117,13 @@ inline bool operator!=(const AtomicString& a, const AtomicString& b) {
 inline bool operator!=(const AtomicString& a, const char* b) {
   return !(a == b);
 }
-inline bool operator!=(const AtomicString& a, const DOMString& b) {
+inline bool operator!=(const AtomicString& a, const String& b) {
   return !equal(a.impl(), b.impl());
 }
 inline bool operator!=(const char* a, const AtomicString& b) {
   return !(b == a);
 }
-inline bool operator!=(const DOMString& a, const AtomicString& b) {
+inline bool operator!=(const String& a, const AtomicString& b) {
   return !equal(a.impl(), b.impl());
 }
 
@@ -140,13 +133,13 @@ inline bool equalIgnoringCase(const AtomicString& a, const AtomicString& b) {
 inline bool equalIgnoringCase(const AtomicString& a, const char* b) {
   return equalIgnoringCase(a.impl(), b);
 }
-inline bool equalIgnoringCase(const AtomicString& a, const DOMString& b) {
+inline bool equalIgnoringCase(const AtomicString& a, const String& b) {
   return equalIgnoringCase(a.impl(), b.impl());
 }
 inline bool equalIgnoringCase(const char* a, const AtomicString& b) {
   return equalIgnoringCase(a, b.impl());
 }
-inline bool equalIgnoringCase(const DOMString& a, const AtomicString& b) {
+inline bool equalIgnoringCase(const String& a, const AtomicString& b) {
   return equalIgnoringCase(a.impl(), b.impl());
 }
 
@@ -159,13 +152,15 @@ extern const AtomicString commentAtom;
 extern const AtomicString starAtom;
 #endif
 }
+
 namespace KXMLCore {
 
 template <typename T>
 class StrHash;
 
 template <>
-struct StrHash<DOM::AtomicStringImpl*> : public StrHash<DOM::DOMStringImpl*> {};
+struct StrHash<WebCore::AtomicStringImpl*>
+    : public StrHash<WebCore::StringImpl*> {};
 }
 
 #endif
