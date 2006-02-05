@@ -694,7 +694,7 @@ JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
       return jsNull();
     case DOMNode::ReplaceChild:
       if (node.replaceChild(toNode(args[0]), toNode(args[1]), exception))
-        return args[0];
+        return args[1];
       return jsNull();
     case DOMNode::Contains:
       if (node.isElementNode())
