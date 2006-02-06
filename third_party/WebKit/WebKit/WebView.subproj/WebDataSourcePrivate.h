@@ -51,8 +51,6 @@
 
   id<WebDocumentRepresentation> representation;
 
-  WebView* webView;
-
   // A reference to actual request used to create the data source.
   // This should only be used by the resourceLoadDelegate's
   // identifierForInitialRequest:fromDatasource: method.  It is
@@ -162,7 +160,6 @@
 - (NSURL*)_URLForHistory;
 - (WebView*)_webView;
 - (void)_setRepresentation:(id<WebDocumentRepresentation>)representation;
-- (void)_setWebView:(WebView*)webView;
 - (void)_startLoading:(NSDictionary*)pageCache;
 - (BOOL)_isStopping;
 - (void)_addSubresourceLoader:(WebLoader*)loader;
