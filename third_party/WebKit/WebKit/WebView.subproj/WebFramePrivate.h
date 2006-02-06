@@ -92,7 +92,6 @@ extern NSString* WebPageCacheDocumentViewKey;
         subresources:(NSArray*)subresources
     subframeArchives:(NSArray*)subframeArchives;
 
-- (void)_setWebView:(WebView*)webView;
 - (void)_detachFromParent;
 - (void)_detachChildren;
 - (void)_closeOldDataSources;
