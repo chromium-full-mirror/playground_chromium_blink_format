@@ -337,6 +337,10 @@ JSValue* ElementNode::evaluate(ExecState* exec) {
   return array;
 }
 
+void ElementNode::breakCycle() {
+  next = 0;
+}
+
 // ------------------------------ ArrayNode ------------------------------------
 
 // ECMA 11.1.4
@@ -405,6 +409,10 @@ JSValue* PropertyListNode::evaluate(ExecState* exec) {
   return obj;
 }
 
+void PropertyListNode::breakCycle() {
+  next = 0;
+}
+
 // ------------------------------ PropertyNode -----------------------------
 // ECMA 11.1.5
 JSValue* PropertyNode::evaluate(ExecState* exec) {
@@ -471,6 +479,10 @@ List ArgumentListNode::evaluateList(ExecState* exec) {
   }
 
   return l;
+}
+
+void ArgumentListNode::breakCycle() {
+  next = 0;
 }
 
 // ------------------------------ ArgumentsNode --------------------------------
@@ -1460,6 +1472,7 @@ JSValue* CommaNode::evaluate(ExecState* exec) {
 // ------------------------------ StatListNode ---------------------------------
 
 StatListNode::StatListNode(StatementNode* s) : statement(s), next(this) {
+  Parser::noteNodeCycle(this);
   setLoc(s->firstLine(), s->lastLine(), s->sourceId());
 }
 
@@ -1495,6 +1508,10 @@ Completion StatListNode::execute(ExecState* exec) {
 void StatListNode::processVarDecls(ExecState* exec) {
   for (StatListNode* n = this; n; n = n->next.get())
     n->statement->processVarDecls(exec);
+}
+
+void StatListNode::breakCycle() {
+  next = 0;
 }
 
 // ------------------------------ AssignExprNode -------------------------------
@@ -1574,6 +1591,10 @@ void VarDeclListNode::processVarDecls(ExecState* exec) {
     n->var->processVarDecls(exec);
 }
 
+void VarDeclListNode::breakCycle() {
+  next = 0;
+}
+
 // ------------------------------ VarStatementNode -----------------------------
 
 // ECMA 12.2
@@ -1595,6 +1616,7 @@ void VarStatementNode::processVarDecls(ExecState* exec) {
 BlockNode::BlockNode(SourceElementsNode* s) {
   if (s) {
     source = s->next;
+    Parser::removeNodeCycle(source.get());
     s->next = 0;
     setLoc(s->firstLine(), s->lastLine(), s->sourceId());
   } else {
@@ -2036,6 +2058,10 @@ void ClauseListNode::processVarDecls(ExecState* exec) {
       n->clause->processVarDecls(exec);
 }
 
+void ClauseListNode::breakCycle() {
+  next = 0;
+}
+
 // ------------------------------ CaseBlockNode --------------------------------
 
 CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
@@ -2043,6 +2069,7 @@ CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
                              ClauseListNode* l2) {
   if (l1) {
     list1 = l1->next;
+    Parser::removeNodeCycle(list1.get());
     l1->next = 0;
   } else {
     list1 = 0;
@@ -2052,6 +2079,7 @@ CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
 
   if (l2) {
     list2 = l2->next;
+    Parser::removeNodeCycle(list2.get());
     l2->next = 0;
   } else {
     list2 = 0;
@@ -2228,6 +2256,10 @@ JSValue* ParameterNode::evaluate(ExecState*) {
   return jsUndefined();
 }
 
+void ParameterNode::breakCycle() {
+  next = 0;
+}
+
 // ------------------------------ FunctionBodyNode -----------------------------
 
 FunctionBodyNode::FunctionBodyNode(SourceElementsNode* s) : BlockNode(s) {
@@ -2329,6 +2361,7 @@ int SourceElementsNode::count = 0;
 
 SourceElementsNode::SourceElementsNode(StatementNode* s1)
     : node(s1), next(this) {
+  Parser::noteNodeCycle(this);
   setLoc(s1->firstLine(), s1->lastLine(), s1->sourceId());
 }
 
@@ -2370,6 +2403,10 @@ void SourceElementsNode::processFuncDecl(ExecState* exec) {
 void SourceElementsNode::processVarDecls(ExecState* exec) {
   for (SourceElementsNode* n = this; n; n = n->next.get())
     n->node->processVarDecls(exec);
+}
+
+void SourceElementsNode::breakCycle() {
+  next = 0;
 }
 
 ProgramNode::ProgramNode(SourceElementsNode* s) : FunctionBodyNode(s) {}
