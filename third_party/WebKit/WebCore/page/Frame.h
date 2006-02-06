@@ -851,6 +851,8 @@ class Frame : public ObjectContents {
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const QString& mimeType) = 0;
 
+  virtual void redirectionTimerFired(Timer<Frame>*);
+
  public slots:
   /**
    * Stops all animated images on the current and child pages
@@ -864,7 +866,6 @@ class Frame : public ObjectContents {
   void slotRestoreData(const ByteArray& data);
   void slotFinished(KIO::Job*);
   void slotFinishedParsing();
-  void redirectionTimerFired(Timer<Frame>*);
   void slotRedirection(KIO::Job*, const KURL&);
 
   void slotIncZoom();

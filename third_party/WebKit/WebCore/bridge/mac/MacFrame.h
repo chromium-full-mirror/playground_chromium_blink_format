@@ -348,6 +348,7 @@ class MacFrame : public Frame {
 
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
+  virtual void redirectionTimerFired(Timer<Frame>*);
 
  private:
   virtual void khtmlMousePressEvent(MousePressEvent*);
