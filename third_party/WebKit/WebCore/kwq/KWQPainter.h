@@ -86,14 +86,14 @@ class QPainter : public Qt {
   void fillRect(int, int, int, int, const Brush&);
   void fillRect(const IntRect&, const Brush&);
 
-  void drawImageAtPoint(const Image&,
+  void drawImageAtPoint(Image*,
                         const IntPoint&,
                         Image::CompositeOperator = Image::CompositeSourceOver);
-  void drawImageInRect(const Image&,
+  void drawImageInRect(Image*,
                        const IntRect&,
                        Image::CompositeOperator = Image::CompositeSourceOver);
 
-  void drawImage(const Image&,
+  void drawImage(Image*,
                  int x,
                  int y,
                  int sx = 0,
@@ -102,7 +102,7 @@ class QPainter : public Qt {
                  int sh = -1,
                  Image::CompositeOperator = Image::CompositeSourceOver,
                  void* nativeData = 0);
-  void drawImage(const Image&,
+  void drawImage(Image*,
                  int x,
                  int y,
                  int w,
@@ -113,7 +113,7 @@ class QPainter : public Qt {
                  int sh = -1,
                  Image::CompositeOperator = Image::CompositeSourceOver,
                  void* nativeData = 0);
-  void drawFloatImage(const Image&,
+  void drawFloatImage(Image*,
                       float x,
                       float y,
                       float w,
@@ -124,7 +124,7 @@ class QPainter : public Qt {
                       float sh = -1,
                       Image::CompositeOperator = Image::CompositeSourceOver,
                       void* nativeData = 0);
-  void drawTiledImage(const Image&,
+  void drawTiledImage(Image*,
                       int,
                       int,
                       int,
@@ -132,7 +132,7 @@ class QPainter : public Qt {
                       int sx = 0,
                       int sy = 0,
                       void* nativeData = 0);
-  void drawScaledAndTiledImage(const Image&,
+  void drawScaledAndTiledImage(Image*,
                                int,
                                int,
                                int,

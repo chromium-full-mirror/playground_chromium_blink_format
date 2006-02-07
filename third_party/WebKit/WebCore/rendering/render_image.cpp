@@ -90,8 +90,8 @@ void RenderImage::imageChanged(CachedImage* o) {
   bool iwchanged = false;
 
   if (o->isErrorImage()) {
-    int iw = o->image().width() + 4;
-    int ih = o->image().height() + 4;
+    int iw = o->image()->width() + 4;
+    int ih = o->image()->height() + 4;
 
     // we have an alt and the user meant it (its not a text we invented)
     if (!m_altText.isEmpty()) {
@@ -161,7 +161,7 @@ void RenderImage::imageChanged(CachedImage* o) {
 
 void RenderImage::resetAnimation() {
   if (m_cachedImage) {
-    image().resetAnimation();
+    image()->resetAnimation();
     if (!needsLayout())
       repaint();
   }
@@ -208,7 +208,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
   if (isPrinting && !canvas()->printImages())
     return;
 
-  if (!m_cachedImage || image().isNull() || errorOccurred()) {
+  if (!m_cachedImage || image()->isNull() || errorOccurred()) {
     if (i.phase == PaintActionSelection)
       return;
 
@@ -225,14 +225,14 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       int usableWidth = cWidth;
       int usableHeight = cHeight;
 
-      if (errorOccurred() && !image().isNull() &&
-          (usableWidth >= image().width()) &&
-          (usableHeight >= image().height())) {
+      if (errorOccurred() && !image()->isNull() &&
+          (usableWidth >= image()->width()) &&
+          (usableHeight >= image()->height())) {
         // Center the error image, accounting for border and padding.
-        int centerX = (usableWidth - image().width()) / 2;
+        int centerX = (usableWidth - image()->width()) / 2;
         if (centerX < 0)
           centerX = 0;
-        int centerY = (usableHeight - image().height()) / 2;
+        int centerY = (usableHeight - image()->height()) / 2;
         if (centerY < 0)
           centerY = 0;
         imageX = leftBorder + leftPad + centerX;
@@ -393,8 +393,8 @@ int RenderImage::calcReplacedHeight() const {
   return RenderReplaced::calcReplacedHeight();
 }
 
-const Image& RenderImage::nullImage() {
+Image* RenderImage::nullImage() {
   static Image sharedNullImage;
-  return sharedNullImage;
+  return &sharedNullImage;
 }
 }

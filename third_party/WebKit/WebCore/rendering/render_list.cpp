@@ -319,7 +319,7 @@ IntRect RenderListItem::getAbsoluteRepaintRect() {
     bool haveImage =
         m_marker->listImage() && !m_marker->listImage()->isErrorImage();
     if (haveImage)
-      offset = m_marker->listImage()->image().width();
+      offset = m_marker->listImage()->image()->width();
     int bulletWidth = offset / 2;
     if (offset % 2)
       bulletWidth++;
@@ -445,7 +445,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   int offset = fm.ascent() * 2 / 3;
   bool haveImage = m_listImage && !m_listImage->isErrorImage();
   if (haveImage)
-    offset = m_listImage->image().width();
+    offset = m_listImage->image()->width();
 
   int xoff = 0;
   int yoff = fm.ascent() - offset;
@@ -561,8 +561,8 @@ void RenderListMarker::calcMinMaxWidth() {
 
   if (m_listImage) {
     if (isInside())
-      m_width = m_listImage->image().width() + cMarkerPadding;
-    m_height = m_listImage->image().height();
+      m_width = m_listImage->image()->width() + cMarkerPadding;
+    m_height = m_listImage->image()->height();
     m_minWidth = m_maxWidth = m_width;
     setMinMaxKnown();
     return;

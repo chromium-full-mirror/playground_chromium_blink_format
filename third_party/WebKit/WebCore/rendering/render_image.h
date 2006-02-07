@@ -63,7 +63,7 @@ class RenderImage : public RenderReplaced {
   void setCachedImage(CachedImage*);
   CachedImage* cachedImage() const { return m_cachedImage; }
 
-  const Image& image() {
+  Image* image() {
     return m_cachedImage ? m_cachedImage->image() : nullImage();
   }
 
@@ -99,7 +99,7 @@ class RenderImage : public RenderReplaced {
   // Text to display as long as the image isn't available.
   DOMString m_altText;
 
-  static const Image& nullImage();
+  static Image* nullImage();
 };
 
 }  // namespace

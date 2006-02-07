@@ -47,7 +47,7 @@ class CachedImage : public CachedObject, public ImageAnimationObserver {
               time_t expireDate);
   virtual ~CachedImage();
 
-  const Image& image() const;
+  Image* image() const;
 
   bool canRender() const {
     return !isErrorImage() && imageSize().width() > 0 &&
