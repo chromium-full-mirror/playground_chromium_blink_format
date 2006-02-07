@@ -30,8 +30,6 @@
 #include "IntSize.h"
 #include "FloatRect.h"
 #include "Image.h"
-#include "ImageDecoder.h"
-#include "ImageData.h"
 
 // FIXME: Hack for image viewer test app.  Will have to remove when we add to
 // WebCore for real.
@@ -89,7 +87,7 @@ void Image::drawInRect(const FloatRect& dst,
                        void* ctxt) {
   cairo_t* context = graphicsContext(ctxt);
 
-  if (!m_decoder.initialized())
+  if (!m_source.initialized())
     return;
 
   cairo_surface_t* image = frameAtIndex(m_currentFrame);

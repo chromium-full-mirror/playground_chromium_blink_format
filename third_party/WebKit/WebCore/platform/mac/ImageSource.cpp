@@ -24,15 +24,15 @@
  */
 
 #include "config.h"
-#include "ImageDecoder.h"
+#include "ImageSource.h"
 
 #include "IntSize.h"
 
 namespace WebCore {
 
-ImageDecoder::ImageDecoder() : m_decoder(0) {}
+ImageSource::ImageSource() : m_decoder(0) {}
 
-ImageDecoder::~ImageDecoder() {
+ImageSource::~ImageSource() {
   if (m_decoder)
     CFRelease(m_decoder);
 }
@@ -54,17 +54,17 @@ CFDictionaryRef imageSourceOptions() {
   return options;
 }
 
-bool ImageDecoder::initialized() const {
+bool ImageSource::initialized() const {
   return m_decoder;
 }
 
-void ImageDecoder::setData(NativeBytePtr data, bool allDataReceived) {
+void ImageSource::setData(NativeBytePtr data, bool allDataReceived) {
   if (!m_decoder)
     m_decoder = CGImageSourceCreateIncremental(imageSourceOptions());
   CGImageSourceUpdateData(m_decoder, data, allDataReceived);
 }
 
-bool ImageDecoder::isSizeAvailable() {
+bool ImageSource::isSizeAvailable() {
   bool result = false;
   CGImageSourceStatus imageSourceStatus = CGImageSourceGetStatus(m_decoder);
 
@@ -85,7 +85,7 @@ bool ImageDecoder::isSizeAvailable() {
   return result;
 }
 
-IntSize ImageDecoder::size() const {
+IntSize ImageSource::size() const {
   IntSize result;
   CFDictionaryRef properties =
       CGImageSourceCopyPropertiesAtIndex(m_decoder, 0, imageSourceOptions());
@@ -105,7 +105,7 @@ IntSize ImageDecoder::size() const {
   return result;
 }
 
-int ImageDecoder::repetitionCount() {
+int ImageSource::repetitionCount() {
   int result = cAnimationLoopOnce;  // No property means loop once.
 
   // A property with value 0 means loop forever.
@@ -129,16 +129,16 @@ int ImageDecoder::repetitionCount() {
   return result;
 }
 
-size_t ImageDecoder::frameCount() const {
+size_t ImageSource::frameCount() const {
   return m_decoder ? CGImageSourceGetCount(m_decoder) : 0;
 }
 
-CGImageRef ImageDecoder::createFrameAtIndex(size_t index) {
+CGImageRef ImageSource::createFrameAtIndex(size_t index) {
   return CGImageSourceCreateImageAtIndex(m_decoder, index,
                                          imageSourceOptions());
 }
 
-float ImageDecoder::frameDurationAtIndex(size_t index) {
+float ImageSource::frameDurationAtIndex(size_t index) {
   float duration = 0;
   CFDictionaryRef properties = CGImageSourceCopyPropertiesAtIndex(
       m_decoder, index, imageSourceOptions());
