@@ -923,7 +923,7 @@ class Frame : public ObjectContents {
                   const QString& contentType = QString::null,
                   const QString& boundary = QString::null);
 
-  void init(FrameView*);
+  void init(FrameView*, RenderPart*);
 
   bool scheduleScript(NodeImpl*, const QString& script);
 
@@ -934,6 +934,7 @@ class Frame : public ObjectContents {
                     const QString& frameName);
   bool requestObject(RenderPart* frame,
                      const QString& url,
+                     const QString& frameName,
                      const QString& serviceType,
                      const QStringList& paramNames,
                      const QStringList& paramValues);
@@ -943,14 +944,16 @@ class Frame : public ObjectContents {
                        const QString& mimeType,
                        bool hasFallback,
                        bool& useFallback);
-  bool loadPlugin(ChildFrame* child,
+  bool loadPlugin(RenderPart* renderer,
                   const KURL& url,
                   const QString& mimeType,
                   const QStringList& paramNames,
                   const QStringList& paramValues,
                   bool useFallback);
   bool loadSubframe(ChildFrame* child,
+                    RenderPart* renderer,
                     const KURL& url,
+                    const QString& name,
                     const DOMString& referrer);
 
  public:
@@ -1003,8 +1006,12 @@ class Frame : public ObjectContents {
   void addMetaData(const QString& key, const QString& value);
   void setMediaType(const QString&);
 
+  // root renderer for the document contained in this frame
   RenderObject* renderer() const;
+
   ElementImpl* ownerElement();
+  // renderer for the element that contains this frame
+  RenderPart* ownerRenderer();
 
   IntRect selectionRect() const;
   bool isFrameSet() const;

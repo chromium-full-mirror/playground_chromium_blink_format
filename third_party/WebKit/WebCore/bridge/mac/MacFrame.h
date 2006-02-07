@@ -114,7 +114,7 @@ enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
 
 class MacFrame : public Frame {
  public:
-  MacFrame();
+  MacFrame(RenderPart*);
   ~MacFrame();
 
   void clear();

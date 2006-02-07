@@ -32,6 +32,7 @@
 @class WebDataSource;
 @class WebFrame;
 @class WebFrameView;
+@class WebCoreRenderPart;
 @protocol WebOpenPanelResultListener;
 
 @interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
@@ -49,6 +50,7 @@
 
 - (id)initWithPage:(WebPageBridge*)page
            webView:(WebView*)webView
+          renderer:(WebCoreRenderPart*)renderer
          frameName:(NSString*)name
               view:(WebFrameView*)view;
 - (void)close;

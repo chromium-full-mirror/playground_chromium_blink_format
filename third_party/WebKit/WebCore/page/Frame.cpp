@@ -130,13 +130,13 @@ FrameList::Iterator FrameList::find(const QString& name) {
   Iterator e = end();
 
   for (; it != e; ++it)
-    if ((*it).m_name == name)
+    if ((*it).m_frame && (*it).m_frame->treeNode()->name() == name)
       break;
 
   return it;
 }
 
-void Frame::init(FrameView* view) {
+void Frame::init(FrameView* view, RenderPart* ownerRenderer) {
   AtomicString::init();
   QualifiedName::init();
   EventNames::init();
@@ -155,7 +155,7 @@ void Frame::init(FrameView* view) {
 
   // FIXME: FramePrivate constructor wants to take a parent but we do not have
   // one yet
-  d = new FramePrivate(0, this);
+  d = new FramePrivate(0, this, ownerRenderer);
 
   d->m_view = view;
 
@@ -535,7 +535,7 @@ void Frame::clear(bool clearWindowProperties) {
     }
   }
   d->m_frames.clear();
-  d->m_objects.clear();
+  d->m_plugins.clear();
 
   d->m_scheduledRedirection = noRedirectionScheduled;
   d->m_delayRedirect = 0;
@@ -648,15 +648,10 @@ void Frame::slotFinished(KIO::Job* job) {
 }
 
 void Frame::childBegin() {
-  // We need to do this when the child is created so as to avoid the bogus state
-  // of the parent's
-  // child->m_bCompleted being false but the child's m_bComplete being true.  If
-  // the child gets
-  // an error early on, we had trouble where checkingComplete on the child was a
-  // NOP because
-  // it thought it was already complete, and thus the parent was never signaled,
-  // and never set
-  // its child->m_bComplete.
+  // We need to do this when the child is created so as to avoid the parent
+  // thining the child
+  // is complete before it has even started loading.
+  // FIXME: do we really still need this?
   d->m_bComplete = false;
 }
 
@@ -810,7 +805,15 @@ void Frame::stop() {
     if (d->m_doc->tokenizer())
       d->m_doc->tokenizer()->stopParsing();
     d->m_doc->finishParsing();
-  }
+  } else
+    // WebKit partially uses WebCore when loading non-HTML docs.  In these cases
+    // doc==nil, but
+    // WebCore is enough involved that we need to checkCompleted() in order for
+    // m_bComplete to
+    // become true.  An example is when a subframe is a pure text doc, and that
+    // subframe is the
+    // last one to complete.
+    checkCompleted();
 }
 
 void Frame::stopAnimations() {
@@ -881,7 +884,7 @@ void Frame::checkCompleted() {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (!(*it).m_bCompleted)
+    if (!(*it).m_frame->d->m_bComplete)
       return;
 
   // Have we completed before?
@@ -928,7 +931,8 @@ void Frame::checkEmitLoadEvent() {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (!(*it).m_bCompleted)  // still got a frame running -> too early
+    if (!(*it).m_frame->d->m_bComplete)  // still got a frame running -> too
+                                         // early
       return;
 
   // All frames completed -> set their domain to the frameset's domain
@@ -1438,16 +1442,14 @@ DOMString Frame::requestFrameName() {
   return generateFrameName();
 }
 
-bool Frame::requestFrame(RenderPart* part,
+bool Frame::requestFrame(RenderPart* renderer,
                          const QString& _url,
                          const QString& frameName) {
   FrameIt it = d->m_frames.find(frameName);
   if (it == d->m_frames.end()) {
     ChildFrame child;
-    child.m_name = frameName;
     it = d->m_frames.append(child);
   }
-  (*it).m_renderer = part;
 
   // Support for <frame src="javascript:string">
   KURL scriptURL;
@@ -1464,8 +1466,10 @@ bool Frame::requestFrame(RenderPart* part,
     args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
                   (d->m_cachePolicy == KIO::CC_Refresh);
     static_cast<Frame*>((*it).m_frame.get())->openURLRequest(url, args);
-  } else if (!loadSubframe(&(*it), url, d->m_referrer))
-    return false;
+  } else {
+    if (!loadSubframe(&(*it), renderer, url, frameName, d->m_referrer))
+      return false;
+  }
 
   if (!scriptURL.isEmpty()) {
     Frame* newPart = static_cast<Frame*>(&*(*it).m_frame);
@@ -1477,30 +1481,28 @@ bool Frame::requestFrame(RenderPart* part,
 
 bool Frame::requestObject(RenderPart* renderer,
                           const QString& url,
+                          const QString& frameName,
                           const QString& mimeType,
                           const QStringList& paramNames,
                           const QStringList& paramValues) {
-  ChildFrame child;
-  QValueList<ChildFrame>::Iterator it = d->m_objects.append(child);
-  (*it).m_renderer = renderer;
-
   KURL completedURL;
   if (!url.isEmpty())
     completedURL = completeURL(url);
 
-  if (url.isEmpty() && mimeType.isEmpty()) {
-    checkEmitLoadEvent();
-    child.m_bCompleted = true;
+  if (url.isEmpty() && mimeType.isEmpty())
     return true;
-  }
 
   bool useFallback;
-  if (shouldUsePlugin((*it).m_renderer->element(), completedURL, mimeType,
-                      renderer->hasFallbackContent(), useFallback))
-    return loadPlugin(&(*it), completedURL, mimeType, paramNames, paramValues,
+  if (shouldUsePlugin(renderer->element(), completedURL, mimeType,
+                      renderer->hasFallbackContent(), useFallback)) {
+    return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
-  else
-    return loadSubframe(&(*it), completedURL, d->m_referrer);
+  } else {
+    ChildFrame child;
+    QValueList<ChildFrame>::Iterator it = d->m_frames.append(child);
+    return loadSubframe(&(*it), renderer, completedURL, frameName,
+                        d->m_referrer);
+  }
 }
 
 bool Frame::shouldUsePlugin(NodeImpl* element,
@@ -1519,7 +1521,7 @@ bool Frame::shouldUsePlugin(NodeImpl* element,
   return objectType == ObjectContentNone || objectType == ObjectContentPlugin;
 }
 
-bool Frame::loadPlugin(ChildFrame* child,
+bool Frame::loadPlugin(RenderPart* renderer,
                        const KURL& url,
                        const QString& mimeType,
                        const QStringList& paramNames,
@@ -1535,26 +1537,22 @@ bool Frame::loadPlugin(ChildFrame* child,
     checkEmitLoadEvent();
     return false;
   }
+  d->m_plugins.append(plugin);
 
-  if (child->m_renderer && plugin->view())
-    child->m_renderer->setWidget(plugin->view());
-  child->m_frame = plugin;
+  if (renderer && plugin->view())
+    renderer->setWidget(plugin->view());
 
   checkEmitLoadEvent();
 
-  // Some JS code in the load event may have destroyed the plugin, in that case,
-  // abort
-  if (!child->m_renderer)
-    return false;
-
-  child->m_bCompleted = false;
   return true;
 }
 
 bool Frame::loadSubframe(ChildFrame* child,
+                         RenderPart* renderer,
                          const KURL& url,
+                         const QString& name,
                          const DOMString& referrer) {
-  Frame* frame = createFrame(url, child->m_name, child->m_renderer, referrer);
+  Frame* frame = createFrame(url, name, renderer, referrer);
   if (!frame) {
     checkEmitLoadEvent();
     return false;
@@ -1565,20 +1563,13 @@ bool Frame::loadSubframe(ChildFrame* child,
   if (child->m_frame)
     disconnectChild(child);
 
-  if (child->m_renderer && frame->view())
-    child->m_renderer->setWidget(frame->view());
+  if (renderer && frame->view())
+    renderer->setWidget(frame->view());
 
   child->m_frame = frame;
   connectChild(child);
 
   checkEmitLoadEvent();
-
-  // Some JS code in the load event may have destroyed the frame, in that case,
-  // abort
-  if (!child->m_renderer)
-    return false;
-
-  child->m_bCompleted = false;
 
   // In these cases, the synchronous load would have finished
   // before we could connect the signals, so make sure to send the
@@ -1711,12 +1702,6 @@ void Frame::slotParentCompleted() {
 }
 
 void Frame::slotChildStarted(KIO::Job* job) {
-  ChildFrame* child = childFrame(sender());
-
-  assert(child);
-
-  child->m_bCompleted = false;
-
   if (d->m_bComplete) {
     d->m_bComplete = false;
     emit started(job);
@@ -1728,12 +1713,6 @@ void Frame::slotChildCompleted() {
 }
 
 void Frame::slotChildCompleted(bool complete) {
-  ChildFrame* child = childFrame(sender());
-
-  assert(child);
-
-  child->m_bCompleted = true;
-
   if (complete && treeNode()->parent() == 0)
     d->m_bPendingChildRedirection = true;
 
@@ -1745,12 +1724,6 @@ ChildFrame* Frame::childFrame(const QObject* obj) {
 
   FrameIt it = d->m_frames.begin();
   FrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if ((*it).m_frame == part)
-      return &(*it);
-
-  it = d->m_objects.begin();
-  end = d->m_objects.end();
   for (; it != end; ++it)
     if ((*it).m_frame == part)
       return &(*it);
@@ -1774,13 +1747,7 @@ Frame* Frame::findFrame(const QString& f) {
 
 bool Frame::frameExists(const QString& frameName) {
   ConstFrameIt it = d->m_frames.find(frameName);
-  if (it == d->m_frames.end())
-    return false;
-
-  // WABA: We only return true if the child actually has a frame
-  // set. Otherwise we might find our preloaded-selve.
-  // This happens when we restore the frameset.
-  return (!(*it).m_renderer.isNull());
+  return it != d->m_frames.end();
 }
 
 int Frame::zoomFactor() const {
@@ -1893,7 +1860,7 @@ QStringList Frame::frameNames() const {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    res += (*it).m_name;
+    res += (*it).m_frame->treeNode()->name().qstring();
 
   return res;
 }
@@ -2897,16 +2864,14 @@ RenderObject* Frame::renderer() const {
 }
 
 ElementImpl* Frame::ownerElement() {
-  Frame* parent = treeNode()->parent();
-  if (!parent)
-    return 0;
-  ChildFrame* childFrame = parent->childFrame(this);
-  if (!childFrame)
-    return 0;
-  RenderPart* ownerElementRenderer = childFrame->m_renderer;
+  RenderPart* ownerElementRenderer = d->m_ownerRenderer;
   if (!ownerElementRenderer)
     return 0;
   return static_cast<ElementImpl*>(ownerElementRenderer->element());
+}
+
+RenderPart* Frame::ownerRenderer() {
+  return d->m_ownerRenderer;
 }
 
 IntRect Frame::selectionRect() const {
@@ -3136,7 +3101,7 @@ bool Frame::canCachePage() {
   // 3.  The page has no password fields.
   // 4.  The URL for the page is not https.
   // 5.  The page has no applets.
-  if (d->m_frames.count() || d->m_objects.count() || treeNode()->parent() ||
+  if (d->m_frames.count() || d->m_plugins.size() || treeNode()->parent() ||
       d->m_url.protocol().startsWith("https") ||
       (d->m_doc && (d->m_doc->applets()->length() != 0 ||
                     d->m_doc->hasWindowEventListener(unloadEvent) ||
