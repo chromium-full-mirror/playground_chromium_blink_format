@@ -96,7 +96,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
   Image::CompositeOperator compositeOperator() const {
-    return Image::compositeOperatorFromString(_compositeOperator);
+    return Image::compositeOperatorFromString(_compositeOperator.ascii());
   }
 
   CachedImage* cachedImage() { return m_imageLoader.image(); }
