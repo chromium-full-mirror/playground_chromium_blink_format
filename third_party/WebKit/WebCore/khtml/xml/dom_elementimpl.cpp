@@ -89,14 +89,16 @@ AttributeImpl* AttributeImpl::clone(bool) const {
   return new AttributeImpl(m_name, m_value);
 }
 
-void AttributeImpl::allocateImpl(ElementImpl* e) {
-  m_impl = new AttrImpl(e, e->getDocument(), this, true);
+PassRefPtr<AttrImpl> AttributeImpl::createAttrImplIfNeeded(ElementImpl* e) {
+  RefPtr<AttrImpl> r(m_impl);
+  if (!r) {
+    r = new AttrImpl(e, e->getDocument(), this);
+    r->createTextChild();
+  }
+  return r.release();
 }
 
-AttrImpl::AttrImpl(ElementImpl* element,
-                   DocumentImpl* docPtr,
-                   AttributeImpl* a,
-                   bool createTextChild)
+AttrImpl::AttrImpl(ElementImpl* element, DocumentImpl* docPtr, AttributeImpl* a)
     : ContainerNodeImpl(docPtr),
       m_element(element),
       m_attribute(a),
@@ -105,20 +107,23 @@ AttrImpl::AttrImpl(ElementImpl* element,
   m_attribute->m_impl = this;
   m_attribute->ref();
   m_specified = true;
-
-  if (createTextChild && !m_attribute->value().isEmpty()) {
-    int exceptioncode = 0;
-    m_ignoreChildrenChanged++;
-    appendChild(getDocument()->createTextNode(m_attribute->value().impl()),
-                exceptioncode);
-    m_ignoreChildrenChanged--;
-  }
 }
 
 AttrImpl::~AttrImpl() {
   assert(m_attribute->m_impl == this);
   m_attribute->m_impl = 0;
   m_attribute->deref();
+}
+
+void AttrImpl::createTextChild() {
+  assert(refCount());
+  if (!m_attribute->value().isEmpty()) {
+    int exceptioncode = 0;
+    m_ignoreChildrenChanged++;
+    appendChild(getDocument()->createTextNode(m_attribute->value().impl()),
+                exceptioncode);
+    m_ignoreChildrenChanged--;
+  }
 }
 
 DOMString AttrImpl::nodeName() const {
@@ -188,10 +193,9 @@ void AttrImpl::setNodeValue(const DOMString& v, int& exceptioncode) {
 }
 
 PassRefPtr<NodeImpl> AttrImpl::cloneNode(bool /*deep*/) {
-  PassRefPtr<AttrImpl> clone =
-      new AttrImpl(0, getDocument(), m_attribute->clone(), false);
+  RefPtr<AttrImpl> clone = new AttrImpl(0, getDocument(), m_attribute->clone());
   cloneChildNodes(clone.get());
-  return clone;
+  return clone.release();
 }
 
 // DOM Section 1.1.1
@@ -293,7 +297,7 @@ ElementImpl::~ElementImpl() {
 
 PassRefPtr<NodeImpl> ElementImpl::cloneNode(bool deep) {
   int exceptionCode = 0;
-  PassRefPtr<ElementImpl> clone =
+  RefPtr<ElementImpl> clone =
       getDocument()->createElementNS(namespaceURI(), nodeName(), exceptionCode);
   assert(!exceptionCode);
 
@@ -306,7 +310,7 @@ PassRefPtr<NodeImpl> ElementImpl::cloneNode(bool deep) {
   if (deep)
     cloneChildNodes(clone.get());
 
-  return clone;
+  return clone.release();
 }
 
 void ElementImpl::removeAttribute(const QualifiedName& name,
@@ -793,16 +797,17 @@ void ElementImpl::removeAttributeNS(const DOMString& namespaceURI,
                   exception);
 }
 
-AttrImpl* ElementImpl::getAttributeNodeNS(const DOMString& namespaceURI,
-                                          const DOMString& localName) {
+PassRefPtr<AttrImpl> ElementImpl::getAttributeNodeNS(
+    const DOMString& namespaceURI,
+    const DOMString& localName) {
   NamedAttrMapImpl* attrs = attributes(true);
   if (!attrs)
     return 0;
   DOMString ln(localName);
   if (getDocument() && getDocument()->isHTMLDocument())
     ln = localName.lower();
-  return attrs->getNamedItem(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()));
+  return static_pointer_cast<AttrImpl>(attrs->getNamedItem(
+      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl())));
 }
 
 bool ElementImpl::hasAttributeNS(const DOMString& namespaceURI,
@@ -858,8 +863,9 @@ bool NamedAttrMapImpl::isMappedAttributeMap() const {
   return false;
 }
 
-NodeImpl* NamedAttrMapImpl::getNamedItemNS(const DOMString& namespaceURI,
-                                           const DOMString& localName) const {
+PassRefPtr<NodeImpl> NamedAttrMapImpl::getNamedItemNS(
+    const DOMString& namespaceURI,
+    const DOMString& localName) const {
   DOMString ln(localName);
   if (element->getDocument()->isHTMLDocument())
     ln = localName.lower();
@@ -877,15 +883,13 @@ PassRefPtr<NodeImpl> NamedAttrMapImpl::removeNamedItemNS(
       QualifiedName(nullAtom, ln.impl(), namespaceURI.impl()), exception);
 }
 
-AttrImpl* NamedAttrMapImpl::getNamedItem(const QualifiedName& name) const {
+PassRefPtr<NodeImpl> NamedAttrMapImpl::getNamedItem(
+    const QualifiedName& name) const {
   AttributeImpl* a = getAttributeItem(name);
   if (!a)
     return 0;
 
-  if (!a->attrImpl())
-    a->allocateImpl(element);
-
-  return a->attrImpl();
+  return a->createAttrImplIfNeeded(element);
 }
 
 PassRefPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
@@ -934,16 +938,14 @@ PassRefPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
     element->updateId(old ? old->value() : nullAtom, a->value());
 
   // ### slightly inefficient - resizes attribute array twice.
-  PassRefPtr<NodeImpl> r;
+  RefPtr<NodeImpl> r;
   if (old) {
-    if (!old->attrImpl())
-      old->allocateImpl(element);
-    r = old->m_impl;
+    r = old->createAttrImplIfNeeded(element);
     removeAttribute(a->name());
   }
 
   addAttribute(a);
-  return r;
+  return r.release();
 }
 
 // The DOM2 spec doesn't say that removeAttribute[NS] throws NOT_FOUND_ERR
@@ -967,25 +969,20 @@ PassRefPtr<NodeImpl> NamedAttrMapImpl::removeNamedItem(
     return 0;
   }
 
-  if (!a->attrImpl())
-    a->allocateImpl(element);
-  PassRefPtr<NodeImpl> r(a->attrImpl());
+  RefPtr<NodeImpl> r = a->createAttrImplIfNeeded(element);
 
   if (name == idAttr)
     element->updateId(a->value(), nullAtom);
 
   removeAttribute(name);
-  return r;
+  return r.release();
 }
 
-AttrImpl* NamedAttrMapImpl::item(unsigned index) const {
+PassRefPtr<NodeImpl> NamedAttrMapImpl::item(unsigned index) const {
   if (index >= len)
     return 0;
 
-  if (!attrs[index]->attrImpl())
-    attrs[index]->allocateImpl(element);
-
-  return attrs[index]->attrImpl();
+  return attrs[index]->createAttrImplIfNeeded(element);
 }
 
 AttributeImpl* NamedAttrMapImpl::getAttributeItem(

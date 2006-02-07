@@ -81,6 +81,7 @@ class AttributeImpl : public Shared<AttributeImpl> {
   const QualifiedName& name() const { return m_name; }
 
   AttrImpl* attrImpl() const { return m_impl; }
+  PassRefPtr<AttrImpl> createAttrImplIfNeeded(ElementImpl* e);
 
   bool isNull() const { return m_value.isNull(); }
   bool isEmpty() const { return m_value.isEmpty(); }
@@ -93,8 +94,6 @@ class AttributeImpl : public Shared<AttributeImpl> {
  private:
   void setValue(const AtomicString& value) { m_value = value; }
   void setPrefix(const AtomicString& prefix) { m_name.setPrefix(prefix); }
-
-  void allocateImpl(ElementImpl* e);
 
  protected:
   QualifiedName m_name;
@@ -112,17 +111,13 @@ class AttrImpl : public ContainerNodeImpl {
   friend class NamedAttrMapImpl;
 
  public:
-  AttrImpl(ElementImpl* element,
-           DocumentImpl* doc,
-           AttributeImpl* a,
-           bool createTextChild);
+  AttrImpl(ElementImpl* element, DocumentImpl* doc, AttributeImpl* a);
   ~AttrImpl();
 
- private:
-  AttrImpl(const AttrImpl& other);
-  AttrImpl& operator=(const AttrImpl& other);
+  // Call this after calling the constructor so the
+  // AttrImpl node isn't floating when we append the text node
+  void createTextChild();
 
- public:
   // DOM methods & attributes for Attr
   DOMString name() const;
   bool specified() const { return m_specified; }
@@ -216,11 +211,11 @@ class ElementImpl : public ContainerNodeImpl {
                          const DOMString& localName,
                          int& exception);
 
-  AttrImpl* getAttributeNode(const DOMString& name) {
+  PassRefPtr<AttrImpl> getAttributeNode(const DOMString& name) {
     return getAttributeNodeNS(DOMString(), name);
   }
-  AttrImpl* getAttributeNodeNS(const DOMString& namespaceURI,
-                               const DOMString& localName);
+  PassRefPtr<AttrImpl> getAttributeNodeNS(const DOMString& namespaceURI,
+                                          const DOMString& localName);
   PassRefPtr<AttrImpl> setAttributeNode(AttrImpl*, int& exception);
   PassRefPtr<AttrImpl> setAttributeNodeNS(AttrImpl* newAttr, int& exception) {
     return setAttributeNode(newAttr, exception);
@@ -334,19 +329,19 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   NamedAttrMapImpl& operator=(const NamedAttrMapImpl& other);
 
   // DOM methods & attributes for NamedNodeMap
-  virtual NodeImpl* getNamedItemNS(const DOMString& namespaceURI,
-                                   const DOMString& localName) const;
+  virtual PassRefPtr<NodeImpl> getNamedItemNS(const DOMString& namespaceURI,
+                                              const DOMString& localName) const;
   virtual PassRefPtr<NodeImpl> removeNamedItemNS(const DOMString& namespaceURI,
                                                  const DOMString& localName,
                                                  int& exception);
 
-  virtual AttrImpl* getNamedItem(const QualifiedName& name) const;
+  virtual PassRefPtr<NodeImpl> getNamedItem(const QualifiedName& name) const;
 
   virtual PassRefPtr<NodeImpl> removeNamedItem(const QualifiedName& name,
                                                int& exceptioncode);
   virtual PassRefPtr<NodeImpl> setNamedItem(NodeImpl* arg, int& exceptioncode);
 
-  virtual AttrImpl* item(unsigned index) const;
+  virtual PassRefPtr<NodeImpl> item(unsigned index) const;
   unsigned length() const { return len; }
 
   // Other methods (not part of DOM)
