@@ -5382,7 +5382,8 @@ JSValue* KJS::Context2DFunction::callAsFunction(ExecState* exec,
                          Image::compositeOperatorFromString(
                              contextObject->_globalComposite->toString(exec)
                                  .qstring()
-                                 .lower()),
+                                 .lower()
+                                 .ascii()),
                          drawingContext);
       } else {
         // Cheap, because the image is backed by copy-on-write memory, and we're
