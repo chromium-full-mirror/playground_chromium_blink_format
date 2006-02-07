@@ -344,6 +344,8 @@ typedef enum {
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string;
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string
                                    forceUserGesture:(BOOL)forceUserGesture;
+- (NSAppleEventDescriptor*)aeDescByEvaluatingJavaScriptFromString:
+    (NSString*)string;
 
 - (DOMDocument*)DOMDocument;
 - (DOMHTMLElement*)frameElement;
