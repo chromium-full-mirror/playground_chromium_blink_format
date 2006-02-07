@@ -72,20 +72,22 @@ struct URLArgs {
 
 struct WindowArgs {
   int x;
+  bool xSet;
   int y;
+  bool ySet;
   int width;
+  bool widthSet;
   int height;
+  bool heightSet;
+
   bool menuBarVisible;
   bool statusBarVisible;
   bool toolBarVisible;
   bool locationBarVisible;
   bool scrollBarsVisible;
   bool resizable;
+
   bool fullscreen;
-  bool xSet;
-  bool ySet;
-  bool widthSet;
-  bool heightSet;
   bool dialog;
 };
 
