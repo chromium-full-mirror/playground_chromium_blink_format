@@ -24,9 +24,10 @@
  */
 
 #include "config.h"
+#include "ImageSource.h"
 #include <cairo.h>
 #include "GIFImageDecoder.h"
-#include "ImageSource.h"
+#include "PNGImageDecoder.h"
 #include "IntSize.h"
 
 namespace WebCore {
@@ -48,7 +49,7 @@ ImageDecoder* createDecoder(const ByteArray& data) {
   // Test for PNG.
   if (uContents[0] == 0x89 && uContents[1] == 0x50 && uContents[2] == 0x4E &&
       uContents[3] == 0x47) {
-    return 0;
+    return new PNGImageDecoder();
   }
 
   // JPEG
