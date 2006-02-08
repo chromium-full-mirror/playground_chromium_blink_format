@@ -237,7 +237,8 @@ void GIFImageDecoder::haveDecodedRow(
   // y, and each row goes from x to x+w.
   unsigned dstPos = (m_impl->frameYOffset() + rowNumber) * m_size.width() +
                     m_impl->frameXOffset();
-  unsigned currDstPos = dstPos;
+  unsigned* dst = buffer.bytes().data() + dstPos;
+  unsigned* currDst = dst;
   unsigned char* currentRowByte = rowBuffer;
 
   bool hasAlpha = m_impl->isTransparent();
@@ -248,11 +249,25 @@ void GIFImageDecoder::haveDecodedRow(
       unsigned red = colorMap[colorIndex];
       unsigned green = colorMap[colorIndex + 1];
       unsigned blue = colorMap[colorIndex + 2];
-      for (unsigned i = 0; i < repeatCount; i++)
-        buffer.setRGBA(currDstPos + m_size.width() * i, red, blue, green, 255);
+      RGBA32Buffer::setRGBA(*currDst, red, blue, green, 255);
     }
-    currDstPos++;
+    currDst++;
     currentRowByte++;
+  }
+
+  if (repeatCount > 1) {
+    // Copy the row |repeatCount|-1 times.
+    unsigned size = (currDst - dst) * sizeof(unsigned);
+    unsigned width = m_size.width();
+    unsigned* end = buffer.bytes().data() + width * m_size.height();
+    currDst = dst + width;
+    for (unsigned i = 1; i < repeatCount; i++) {
+      if (currDst + size >
+          end)  // Protect against a buffer overrun from a bogus repeatCount.
+        break;
+      memcpy(currDst, dst, size);
+      currDst += width;
+    }
   }
 }
 

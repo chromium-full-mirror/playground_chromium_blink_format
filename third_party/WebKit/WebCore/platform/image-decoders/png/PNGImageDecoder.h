@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-class PNGImageDecoderPrivate;
+class PNGImageReader;
 
 // This class decodes the PNG image format.
 class PNGImageDecoder : public ImageDecoder {
@@ -51,11 +51,23 @@ class PNGImageDecoder : public ImageDecoder {
 
   void decode(bool sizeOnly = false) const;
 
+  void setFailed() { m_failed = true; }
+
+  PNGImageReader* reader() { return m_reader; }
+
+  // Callbacks from libpng
+  void decodingFailed() { m_failed = true; }
+  void headerAvailable();
+  void rowAvailable(unsigned char* rowBuffer,
+                    unsigned rowIndex,
+                    int interlacePass);
+  void pngComplete();
+
  private:
   bool m_sizeAvailable;
   mutable bool m_failed;
   IntSize m_size;
-  mutable PNGImageDecoderPrivate* m_impl;
+  mutable PNGImageReader* m_reader;
 };
 }
 
