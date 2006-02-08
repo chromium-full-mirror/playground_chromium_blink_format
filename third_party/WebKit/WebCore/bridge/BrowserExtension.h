@@ -32,9 +32,10 @@
 #include <qobject.h>
 
 class KURL;
-class ObjectContents;
 
 namespace WebCore {
+
+class Frame;
 
 struct URLArgs {
   QString frameName;
@@ -102,7 +103,7 @@ class BrowserExtension : public QObject {
   virtual void createNewWindow(const KURL& url,
                                const URLArgs& urlArgs,
                                const WindowArgs& winArgs,
-                               ObjectContents*& part) = 0;
+                               Frame*& part) = 0;
 
   virtual void setIconURL(const KURL& url) = 0;
   virtual void setTypedIconURL(const KURL& url, const QString& type) = 0;

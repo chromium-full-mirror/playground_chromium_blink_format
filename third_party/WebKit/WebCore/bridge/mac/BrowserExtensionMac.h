@@ -42,7 +42,7 @@ class BrowserExtensionMac : public BrowserExtension {
   virtual void createNewWindow(const KURL& url,
                                const URLArgs& urlArgs,
                                const WindowArgs& winArgs,
-                               ObjectContents*& part);
+                               Frame*& part);
 
   virtual void setIconURL(const KURL& url);
   virtual void setTypedIconURL(const KURL& url, const QString& type);
@@ -58,7 +58,7 @@ class BrowserExtensionMac : public BrowserExtension {
   void createNewWindow(const KURL& url,
                        const URLArgs& urlArgs,
                        const WindowArgs& winArgs,
-                       ObjectContents** part);
+                       Frame** part);
 
   MacFrame* m_frame;
 };

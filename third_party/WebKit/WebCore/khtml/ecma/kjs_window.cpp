@@ -580,14 +580,13 @@ static Frame* createNewWindow(ExecState* exec,
   // before creating it.
   // We'd have to resolve all those issues to pass the URL instead of "".
 
-  ObjectContents* newPart = 0;
+  Frame* newFrame = 0;
   openerPart->browserExtension()->createNewWindow("", uargs, windowArgs,
-                                                  newPart);
+                                                  newFrame);
 
-  if (!newPart || !newPart->inherits("Frame"))
+  if (!newFrame)
     return 0;
 
-  Frame* newFrame = static_cast<Frame*>(newPart);
   Window* newWindow = Window::retrieveWindow(newFrame);
 
   newFrame->setOpener(openerPart);
@@ -969,11 +968,11 @@ JSValue* Window::indexGetter(ExecState* exec,
                              const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
 
-  QPtrList<ObjectContents> frames = thisObj->m_frame->frames();
-  ObjectContents* frame = frames.at(slot.index());
-  ASSERT(frame && frame->inherits("Frame"));
+  QPtrList<Frame> frames = thisObj->m_frame->frames();
+  Frame* frame = frames.at(slot.index());
+  ASSERT(frame);
 
-  return retrieve(static_cast<Frame*>(frame));
+  return retrieve(frame);
 }
 
 JSValue* Window::namedItemGetter(ExecState* exec,
@@ -1067,11 +1066,11 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   bool ok;
   unsigned int i = propertyName.toArrayIndex(&ok);
   if (ok) {
-    QPtrList<ObjectContents> frames = m_frame->frames();
+    QPtrList<Frame> frames = m_frame->frames();
     unsigned int len = frames.count();
     if (i < len) {
-      ObjectContents* frame = frames.at(i);
-      if (frame && frame->inherits("Frame")) {
+      Frame* frame = frames.at(i);
+      if (frame) {
         slot.setCustomIndex(this, i, indexGetter);
         return true;
       }
@@ -1738,13 +1737,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       uargs.serviceType = "text/html";
 
       // request window (new or existing if framename is set)
-      ObjectContents* newPart = 0;
+      Frame* newFrame = 0;
       uargs.metaData().set("referrer", activePart->referrer());
       frame->browserExtension()->createNewWindow("", uargs, windowArgs,
-                                                 newPart);
-      if (!newPart || !newPart->inherits("Frame"))
+                                                 newFrame);
+      if (!newFrame)
         return jsUndefined();
-      Frame* newFrame = static_cast<Frame*>(newPart);
       newFrame->setOpener(frame);
       newFrame->setOpenedByJS(true);
 
@@ -2129,7 +2127,7 @@ location        FrameArray::Location    DontDelete|ReadOnly
 JSValue* FrameArray::getValueProperty(ExecState* exec, int token) {
   switch (token) {
     case Length: {
-      QPtrList<ObjectContents> frames = m_frame->frames();
+      QPtrList<Frame> frames = m_frame->frames();
       unsigned int len = frames.count();
       return jsNumber(len);
     }
@@ -2149,7 +2147,7 @@ JSValue* FrameArray::indexGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
-  ObjectContents* frame = thisObj->m_frame->frames().at(slot.index());
+  Frame* frame = thisObj->m_frame->frames().at(slot.index());
 
   if (frame && frame->inherits("Frame")) {
     Frame* khtml = static_cast<Frame*>(frame);
@@ -2164,7 +2162,7 @@ JSValue* FrameArray::nameGetter(ExecState* exec,
                                 const Identifier& propertyName,
                                 const PropertySlot& slot) {
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
-  ObjectContents* frame = thisObj->m_frame->findFrame(propertyName.qstring());
+  Frame* frame = thisObj->m_frame->findFrame(propertyName.qstring());
 
   if (frame && frame->inherits("Frame")) {
     Frame* khtml = static_cast<Frame*>(frame);
@@ -2189,7 +2187,7 @@ bool FrameArray::getOwnPropertySlot(ExecState* exec,
   }
 
   // check for the name or number
-  ObjectContents* frame = m_frame->findFrame(propertyName.qstring());
+  Frame* frame = m_frame->findFrame(propertyName.qstring());
   if (frame) {
     slot.setCustom(this, nameGetter);
     return true;

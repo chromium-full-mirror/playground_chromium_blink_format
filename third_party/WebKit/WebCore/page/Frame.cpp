@@ -125,17 +125,6 @@ class PartStyleSheetLoader : public CachedObjectClient {
   CachedCSSStyleSheet* m_cachedSheet;
 };
 
-FrameList::Iterator FrameList::find(const QString& name) {
-  Iterator it = begin();
-  Iterator e = end();
-
-  for (; it != e; ++it)
-    if ((*it).m_frame && (*it).m_frame->treeNode()->name() == name)
-      break;
-
-  return it;
-}
-
 void Frame::init(FrameView* view, RenderPart* ownerRenderer) {
   AtomicString::init();
   QualifiedName::init();
@@ -191,6 +180,9 @@ static FrameCounter frameCounter;
 #endif
 
 Frame::Frame() : d(0) {
+  // FIXME: Frames were originally created with a refcount of 1, leave this
+  // here until we can straighten that out
+  ref();
 #if !NDEBUG
   ++FrameCounter::count;
 #endif
@@ -356,19 +348,9 @@ void Frame::stopLoading(bool sendUnload) {
   }
 
   // tell all subframes to stop as well
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it) {
-    ObjectContents* part = (*it).m_frame.get();
-    if (part) {
-      Frame* frame = static_cast<Frame*>(part);
-
-      if (frame->inherits("Frame"))
-        frame->stopLoading(sendUnload);
-      else
-        frame->closeURL();
-    }
-  }
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    child->stopLoading(sendUnload);
 
   d->m_bPendingChildRedirection = false;
 
@@ -526,15 +508,9 @@ void Frame::clear(bool clearWindowProperties) {
   d->m_doc = 0;
   d->m_decoder = 0;
 
-  {
-    ConstFrameIt it = d->m_frames.begin();
-    ConstFrameIt end = d->m_frames.end();
-    for (; it != end; ++it) {
-      if ((*it).m_frame)
-        disconnectChild(&*it);
-    }
-  }
-  d->m_frames.clear();
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    disconnectChild(child);
   d->m_plugins.clear();
 
   d->m_scheduledRedirection = noRedirectionScheduled;
@@ -820,13 +796,9 @@ void Frame::stopAnimations() {
   if (d->m_doc)
     d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationDisabled);
 
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if ((*it).m_frame && (*it).m_frame->inherits("Frame")) {
-      ObjectContents* p = (*it).m_frame.get();
-      static_cast<Frame*>(p)->stopAnimations();
-    }
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    child->stopAnimations();
 }
 
 void Frame::gotoAnchor() {
@@ -881,10 +853,9 @@ void Frame::slotLoaderRequestDone(DocLoader* dl, CachedObject* obj) {
 
 void Frame::checkCompleted() {
   // Any frame that hasn't completed yet ?
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if (!(*it).m_frame->d->m_bComplete)
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    if (!child->d->m_bComplete)
       return;
 
   // Have we completed before?
@@ -928,11 +899,9 @@ void Frame::checkEmitLoadEvent() {
   if (d->m_bLoadEventEmitted || !d->m_doc || d->m_doc->parsing())
     return;
 
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if (!(*it).m_frame->d->m_bComplete)  // still got a frame running -> too
-                                         // early
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    if (!child->d->m_bComplete)  // still got a frame running -> too early
       return;
 
   // All frames completed -> set their domain to the frameset's domain
@@ -940,16 +909,10 @@ void Frame::checkEmitLoadEvent() {
   // not when following a link in a frame (#44162).
   if (d->m_doc) {
     DOMString domain = d->m_doc->domain();
-    ConstFrameIt it = d->m_frames.begin();
-    ConstFrameIt end = d->m_frames.end();
-    for (; it != end; ++it) {
-      ObjectContents* p = (*it).m_frame.get();
-      if (p && p->inherits("Frame")) {
-        Frame* htmlFrame = static_cast<Frame*>(p);
-        if (htmlFrame->d->m_doc)
-          htmlFrame->d->m_doc->setDomain(domain);
-      }
-    }
+    for (Frame* child = treeNode()->firstChild(); child;
+         child = child->treeNode()->nextSibling())
+      if (child->d->m_doc)
+        child->d->m_doc->setDomain(domain);
   }
 
   d->m_bLoadEventEmitted = true;
@@ -1445,12 +1408,6 @@ DOMString Frame::requestFrameName() {
 bool Frame::requestFrame(RenderPart* renderer,
                          const QString& _url,
                          const QString& frameName) {
-  FrameIt it = d->m_frames.find(frameName);
-  if (it == d->m_frames.end()) {
-    ChildFrame child;
-    it = d->m_frames.append(child);
-  }
-
   // Support for <frame src="javascript:string">
   KURL scriptURL;
   KURL url;
@@ -1460,21 +1417,21 @@ bool Frame::requestFrame(RenderPart* renderer,
   } else
     url = completeURL(_url);
 
-  if ((*it).m_frame) {
+  Frame* frame = childFrameNamed(frameName);
+  if (frame) {
     URLArgs args;
     args.metaData().set("referrer", d->m_referrer);
     args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
                   (d->m_cachePolicy == KIO::CC_Refresh);
-    static_cast<Frame*>((*it).m_frame.get())->openURLRequest(url, args);
-  } else {
-    if (!loadSubframe(&(*it), renderer, url, frameName, d->m_referrer))
-      return false;
-  }
+    frame->openURLRequest(url, args);
+  } else
+    frame = loadSubframe(renderer, url, frameName, d->m_referrer);
 
-  if (!scriptURL.isEmpty()) {
-    Frame* newPart = static_cast<Frame*>(&*(*it).m_frame);
-    newPart->replaceContentsWithScriptResult(scriptURL);
-  }
+  if (!frame)
+    return false;
+
+  if (!scriptURL.isEmpty())
+    frame->replaceContentsWithScriptResult(scriptURL);
 
   return true;
 }
@@ -1494,15 +1451,12 @@ bool Frame::requestObject(RenderPart* renderer,
 
   bool useFallback;
   if (shouldUsePlugin(renderer->element(), completedURL, mimeType,
-                      renderer->hasFallbackContent(), useFallback)) {
+                      renderer->hasFallbackContent(), useFallback))
     return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
-  } else {
-    ChildFrame child;
-    QValueList<ChildFrame>::Iterator it = d->m_frames.append(child);
-    return loadSubframe(&(*it), renderer, completedURL, frameName,
-                        d->m_referrer);
-  }
+
+  // FIXME: ok to always make a new one? when does the old frame get removed?
+  return loadSubframe(renderer, completedURL, frameName, d->m_referrer);
 }
 
 bool Frame::shouldUsePlugin(NodeImpl* element,
@@ -1547,27 +1501,22 @@ bool Frame::loadPlugin(RenderPart* renderer,
   return true;
 }
 
-bool Frame::loadSubframe(ChildFrame* child,
-                         RenderPart* renderer,
-                         const KURL& url,
-                         const QString& name,
-                         const DOMString& referrer) {
+Frame* Frame::loadSubframe(RenderPart* renderer,
+                           const KURL& url,
+                           const QString& name,
+                           const DOMString& referrer) {
   Frame* frame = createFrame(url, name, renderer, referrer);
   if (!frame) {
     checkEmitLoadEvent();
-    return false;
+    return 0;
   }
 
   frame->childBegin();
 
-  if (child->m_frame)
-    disconnectChild(child);
-
   if (renderer && frame->view())
     renderer->setWidget(frame->view());
 
-  child->m_frame = frame;
-  connectChild(child);
+  connectChild(frame);
 
   checkEmitLoadEvent();
 
@@ -1582,7 +1531,7 @@ bool Frame::loadSubframe(ChildFrame* child,
     frame->checkCompleted();
   }
 
-  return true;
+  return frame;
 }
 
 void Frame::submitFormAgain() {
@@ -1719,35 +1668,18 @@ void Frame::slotChildCompleted(bool complete) {
   checkCompleted();
 }
 
-ChildFrame* Frame::childFrame(const QObject* obj) {
-  const ObjectContents* part = static_cast<const ObjectContents*>(obj);
-
-  FrameIt it = d->m_frames.begin();
-  FrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if ((*it).m_frame == part)
-      return &(*it);
-
-  return 0L;
-}
-
 Frame* Frame::findFrame(const QString& f) {
+  // FIXME: this only finds child frames, is it ever appropriate to use this?
   // ### http://www.w3.org/TR/html4/appendix/notes.html#notes-frames
-  ConstFrameIt it = d->m_frames.find(f);
-  if (it == d->m_frames.end())
-    return 0L;
-  else {
-    ObjectContents* p = (*it).m_frame.get();
-    if (p && p->inherits("Frame"))
-      return (Frame*)p;
-    else
-      return 0L;
-  }
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    if (child->treeNode()->name() == f)
+      return child;
+  return 0;
 }
 
 bool Frame::frameExists(const QString& frameName) {
-  ConstFrameIt it = d->m_frames.find(frameName);
-  return it != d->m_frames.end();
+  return findFrame(frameName);
 }
 
 int Frame::zoomFactor() const {
@@ -1791,19 +1723,15 @@ void Frame::slotDecZoom() {
 void Frame::setZoomFactor(int percent) {
   if (d->m_zoomFactor == percent)
     return;
+
   d->m_zoomFactor = percent;
 
-  if (d->m_doc) {
+  if (d->m_doc)
     d->m_doc->recalcStyle(NodeImpl::Force);
-  }
 
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    if ((*it).m_frame && (*it).m_frame->inherits("Frame")) {
-      ObjectContents* p = (*it).m_frame.get();
-      static_cast<Frame*>(p)->setZoomFactor(d->m_zoomFactor);
-    }
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    child->setZoomFactor(d->m_zoomFactor);
 
   if (d->m_doc && d->m_doc->renderer() && d->m_doc->renderer()->needsLayout())
     view()->layout();
@@ -1857,30 +1785,29 @@ void Frame::reparseConfiguration() {
 QStringList Frame::frameNames() const {
   QStringList res;
 
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    res += (*it).m_frame->treeNode()->name().qstring();
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    res += child->treeNode()->name().qstring();
 
   return res;
 }
 
-QPtrList<ObjectContents> Frame::frames() const {
-  QPtrList<ObjectContents> res;
+QPtrList<Frame> Frame::frames() const {
+  QPtrList<Frame> res;
 
-  ConstFrameIt it = d->m_frames.begin();
-  ConstFrameIt end = d->m_frames.end();
-  for (; it != end; ++it)
-    res.append((*it).m_frame.get());
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    res.append(child);
 
   return res;
 }
 
 Frame* Frame::childFrameNamed(const QString& name) const {
-  FrameList::Iterator it = d->m_frames.find(name);
-  if (it != d->m_frames.end())
-    return static_cast<Frame*>(&*(*it).m_frame);
-  return NULL;
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    if (child->treeNode()->name() == name)
+      return child;
+  return 0;
 }
 
 bool Frame::shouldDragAutoNode(NodeImpl* node, int x, int y) const {
@@ -2278,8 +2205,8 @@ JSValue* Frame::executeScript(const QString& filename,
   return ret;
 }
 
-void Frame::slotPartRemoved(ObjectContents* part) {
-  if (part == d->m_activeFrame)
+void Frame::slotPartRemoved(Frame* frame) {
+  if (frame == d->m_activeFrame)
     d->m_activeFrame = 0;
 }
 
@@ -2700,33 +2627,31 @@ bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
   return true;
 }
 
-void Frame::connectChild(const ChildFrame* child) const {
-  ObjectContents* part = child->m_frame.get();
-  if (part && part->isFrame()) {
-    connect(part, SIGNAL(started(KIO::Job*)), this,
+void Frame::connectChild(Frame* frame) const {
+  if (frame) {
+    connect(frame, SIGNAL(started(KIO::Job*)), this,
             SLOT(slotChildStarted(KIO::Job*)));
-    connect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
-    connect(part, SIGNAL(completed(bool)), this,
+    connect(frame, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
+    connect(frame, SIGNAL(completed(bool)), this,
             SLOT(slotChildCompleted(bool)));
-    connect(part, SIGNAL(setStatusBarText(const QString&)), this,
+    connect(frame, SIGNAL(setStatusBarText(const QString&)), this,
             SIGNAL(setStatusBarText(const QString&)));
-    connect(this, SIGNAL(completed()), part, SLOT(slotParentCompleted()));
-    connect(this, SIGNAL(completed(bool)), part, SLOT(slotParentCompleted()));
+    connect(this, SIGNAL(completed()), frame, SLOT(slotParentCompleted()));
+    connect(this, SIGNAL(completed(bool)), frame, SLOT(slotParentCompleted()));
   }
 }
 
-void Frame::disconnectChild(const ChildFrame* child) const {
-  ObjectContents* part = child->m_frame.get();
-  if (part && part->isFrame()) {
-    disconnect(part, SIGNAL(started(KIO::Job*)), this,
+void Frame::disconnectChild(Frame* frame) const {
+  if (frame) {
+    disconnect(frame, SIGNAL(started(KIO::Job*)), this,
                SLOT(slotChildStarted(KIO::Job*)));
-    disconnect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
-    disconnect(part, SIGNAL(completed(bool)), this,
+    disconnect(frame, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
+    disconnect(frame, SIGNAL(completed(bool)), this,
                SLOT(slotChildCompleted(bool)));
-    disconnect(part, SIGNAL(setStatusBarText(const QString&)), this,
+    disconnect(frame, SIGNAL(setStatusBarText(const QString&)), this,
                SIGNAL(setStatusBarText(const QString&)));
-    disconnect(this, SIGNAL(completed()), part, SLOT(slotParentCompleted()));
-    disconnect(this, SIGNAL(completed(bool)), part,
+    disconnect(this, SIGNAL(completed()), frame, SLOT(slotParentCompleted()));
+    disconnect(this, SIGNAL(completed(bool)), frame,
                SLOT(slotParentCompleted()));
   }
 }
@@ -3101,7 +3026,7 @@ bool Frame::canCachePage() {
   // 3.  The page has no password fields.
   // 4.  The URL for the page is not https.
   // 5.  The page has no applets.
-  if (d->m_frames.count() || d->m_plugins.size() || treeNode()->parent() ||
+  if (treeNode()->childCount() || d->m_plugins.size() || treeNode()->parent() ||
       d->m_url.protocol().startsWith("https") ||
       (d->m_doc && (d->m_doc->applets()->length() != 0 ||
                     d->m_doc->hasWindowEventListener(unloadEvent) ||
@@ -3202,11 +3127,9 @@ void Frame::updatePolicyBaseURL() {
 void Frame::setPolicyBaseURL(const DOMString& s) {
   if (document())
     document()->setPolicyBaseURL(s);
-  ConstFrameIt end = d->m_frames.end();
-  for (ConstFrameIt it = d->m_frames.begin(); it != end; ++it) {
-    ObjectContents* subpart = (*it).m_frame.get();
-    static_cast<Frame*>(subpart)->setPolicyBaseURL(s);
-  }
+  for (Frame* child = treeNode()->firstChild(); child;
+       child = child->treeNode()->nextSibling())
+    child->setPolicyBaseURL(s);
 }
 
 void Frame::forceLayout() {
@@ -3532,7 +3455,7 @@ bool Frame::isComplete() {
   return d->m_bComplete;
 }
 
-FrameTreeNode* Frame::treeNode() {
+FrameTreeNode* Frame::treeNode() const {
   return &d->m_treeNode;
 }
 
@@ -3552,18 +3475,8 @@ void Frame::stopRedirectionTimer() {
 
 void Frame::frameDetached() {
   Frame* parent = treeNode()->parent();
-  if (parent) {
-    FrameList& parentFrames = parent->d->m_frames;
-    FrameIt end = parentFrames.end();
-    for (FrameIt it = parentFrames.begin(); it != end; ++it) {
-      ChildFrame& child = *it;
-      if (child.m_frame == this) {
-        parent->disconnectChild(&child);
-        parentFrames.remove(it);
-        break;
-      }
-    }
-  }
+  if (parent)
+    parent->disconnectChild(this);
 }
 
 void Frame::updateBaseURLForEmptyDocument() {
