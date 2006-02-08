@@ -271,6 +271,8 @@ class DOMDocument : public DOMNode {
 DOM::AttrImpl* toAttr(
     JSValue*);  // returns 0 if passed-in value is not a DOMAttr object
 
+KJS_DEFINE_PROTOTYPE(DOMElementProto)
+
 class DOMElement : public DOMNode {
  public:
   DOMElement(ExecState* exec, DOM::ElementImpl* e);
@@ -279,30 +281,7 @@ class DOMElement : public DOMNode {
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum {
-    TagName,
-    Style,
-    GetAttribute,
-    SetAttribute,
-    RemoveAttribute,
-    GetAttributeNode,
-    SetAttributeNode,
-    RemoveAttributeNode,
-    GetElementsByTagName,
-    GetAttributeNS,
-    SetAttributeNS,
-    RemoveAttributeNS,
-    GetAttributeNodeNS,
-    SetAttributeNodeNS,
-    GetElementsByTagNameNS,
-    HasAttribute,
-    HasAttributeNS,
-    ScrollByLines,
-    ScrollByPages,
-    ScrollIntoView,
-    ElementFocus,
-    ElementBlur
-  };
+  enum { TagName, ScrollByLines, ScrollByPages, ScrollIntoView };
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
@@ -385,7 +364,7 @@ bool checkNodeSecurity(ExecState* exec, DOM::NodeImpl* n);
 JSValue* getRuntimeObject(ExecState* exec, DOM::NodeImpl* n);
 JSValue* getDOMNode(ExecState*, PassRefPtr<DOM::NodeImpl>);
 JSValue* getDOMNamedNodeMap(ExecState* exec, DOM::NamedNodeMapImpl* m);
-JSValue* getDOMNodeList(ExecState* exec, DOM::NodeListImpl* l);
+JSValue* getDOMNodeList(ExecState* exec, PassRefPtr<DOM::NodeListImpl>);
 JSValue* getDOMDOMImplementation(ExecState* exec,
                                  DOM::DOMImplementationImpl* i);
 JSObject* getNodeConstructor(ExecState* exec);

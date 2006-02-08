@@ -1122,27 +1122,9 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
 
 /* Source for DOMElementProtoTable. Use "make hashtables" to regenerate.
 @begin DOMElementProtoTable 17
-  getAttribute          DOMElement::GetAttribute        DontDelete|Function 1
-  setAttribute          DOMElement::SetAttribute        DontDelete|Function 2
-  removeAttribute       DOMElement::RemoveAttribute     DontDelete|Function 1
-  getAttributeNode      DOMElement::GetAttributeNode    DontDelete|Function 1
-  setAttributeNode      DOMElement::SetAttributeNode    DontDelete|Function 2
-  removeAttributeNode   DOMElement::RemoveAttributeNode DontDelete|Function 1
-  getElementsByTagName  DOMElement::GetElementsByTagName DontDelete|Function 1
-  hasAttribute          DOMElement::HasAttribute        DontDelete|Function 1
-  getAttributeNS        DOMElement::GetAttributeNS      DontDelete|Function 2
-  setAttributeNS        DOMElement::SetAttributeNS      DontDelete|Function 3
-  removeAttributeNS     DOMElement::RemoveAttributeNS   DontDelete|Function 2
-  getAttributeNodeNS    DOMElement::GetAttributeNodeNS  DontDelete|Function 2
-  setAttributeNodeNS    DOMElement::SetAttributeNodeNS  DontDelete|Function 1
-  getElementsByTagNameNS DOMElement::GetElementsByTagNameNS
-DontDelete|Function 2
-  hasAttributeNS        DOMElement::HasAttributeNS      DontDelete|Function 2
   scrollIntoView        DOMElement::ScrollIntoView      DontDelete|Function 1
   scrollIntoViewIfNeeded        DOMElement::ScrollIntoViewIfNeeded
 DontDelete|Function 1
-  focus                 DOMElement::ElementFocus        DontDelete|Function 0
-  blur                  DOMElement::ElementBlur         DontDelete|Function 0
 
 # extension for Safari RSS
   scrollByLines         DOMElement::ScrollByLines       DontDelete|Function 1
@@ -1150,7 +1132,6 @@ DontDelete|Function 1
 
 @end
 */
-KJS_DEFINE_PROTOTYPE(DOMElementProto)
 KJS_IMPLEMENT_PROTOFUNC(DOMElementProtoFunc)
 KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMElement",
                                     DOMElementProto,
@@ -1162,7 +1143,6 @@ const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
 /* Source for DOMElementTable. Use "make hashtables" to regenerate.
 @begin DOMElementTable 3
   tagName       DOMElement::TagName                         DontDelete|ReadOnly
-  style         DOMElement::Style                           DontDelete|ReadOnly
 @end
 */
 DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
@@ -1176,8 +1156,6 @@ JSValue* DOMElement::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case TagName:
       return jsStringOrNull(element->nodeName());
-    case Style:
-      return getDOMCSSStyleDeclaration(exec, element->style());
     default:
       assert(0);
       return jsUndefined();
@@ -1240,67 +1218,6 @@ JSValue* DOMElementProtoFunc::callAsFunction(ExecState* exec,
   ElementImpl& element = static_cast<ElementImpl&>(node);
 
   switch (id) {
-    case DOMElement::GetAttribute:
-      // jsStringOrNull should be used here, since if the attribute isn't
-      // present at all, you should
-      // return null and not "".
-      return jsStringOrNull(
-          element.getAttribute(args[0]->toString(exec).domString()));
-    case DOMElement::SetAttribute:
-      element.setAttribute(args[0]->toString(exec).domString(),
-                           args[1]->toString(exec).domString(), exception);
-      return jsUndefined();
-    case DOMElement::RemoveAttribute:
-      element.removeAttribute(args[0]->toString(exec).domString(), exception);
-      return jsUndefined();
-    case DOMElement::GetAttributeNode:
-      return getDOMNode(
-          exec, element.getAttributeNode(args[0]->toString(exec).domString()));
-    case DOMElement::SetAttributeNode:
-      return getDOMNode(
-          exec, element.setAttributeNode(toAttr(args[0]), exception).get());
-    case DOMElement::RemoveAttributeNode:
-      return getDOMNode(
-          exec, element.removeAttributeNode(toAttr(args[0]), exception).get());
-    case DOMElement::GetElementsByTagName:
-      return getDOMNodeList(
-          exec,
-          element.getElementsByTagName(args[0]->toString(exec).domString())
-              .get());
-    case DOMElement::HasAttribute:  // DOM2
-      return jsBoolean(
-          element.hasAttribute(args[0]->toString(exec).domString()));
-    case DOMElement::GetAttributeNS:  // DOM2
-      return jsString(element
-                          .getAttributeNS(args[0]->toString(exec).domString(),
-                                          args[1]->toString(exec).domString())
-                          .domString());
-    case DOMElement::SetAttributeNS:  // DOM2
-      element.setAttributeNS(valueToStringWithNullCheck(exec, args[0]),
-                             args[1]->toString(exec).domString(),
-                             args[2]->toString(exec).domString(), exception);
-      return jsUndefined();
-    case DOMElement::RemoveAttributeNS:  // DOM2
-      element.removeAttributeNS(args[0]->toString(exec).domString(),
-                                args[1]->toString(exec).domString(), exception);
-      return jsUndefined();
-    case DOMElement::GetAttributeNodeNS:  // DOM2
-      return getDOMNode(exec, element.getAttributeNodeNS(
-                                  args[0]->toString(exec).domString(),
-                                  args[1]->toString(exec).domString()));
-    case DOMElement::SetAttributeNodeNS:  // DOM2
-      return getDOMNode(
-          exec, element.setAttributeNodeNS(toAttr(args[0]), exception).get());
-    case DOMElement::GetElementsByTagNameNS:  // DOM2
-      return getDOMNodeList(
-          exec, element
-                    .getElementsByTagNameNS(args[0]->toString(exec).domString(),
-                                            args[1]->toString(exec).domString())
-                    .get());
-    case DOMElement::HasAttributeNS:  // DOM2
-      return jsBoolean(
-          element.hasAttributeNS(args[0]->toString(exec).domString(),
-                                 args[1]->toString(exec).domString()));
     case DOMElement::ScrollIntoView:
       element.scrollIntoView(args[0]->isUndefinedOrNull() ||
                              args[0]->toBoolean(exec));
@@ -1326,12 +1243,6 @@ JSValue* DOMElementProtoFunc::callAsFunction(ExecState* exec,
             rend->layer()->scroll(direction, granularity, multiplier);
           }
       }
-      return jsUndefined();
-    case DOMElement::ElementFocus:
-      element.focus();
-      return jsUndefined();
-    case DOMElement::ElementBlur:
-      element.blur();
       return jsUndefined();
     default:
       return jsUndefined();
@@ -1535,7 +1446,7 @@ JSValue* getDOMNode(ExecState* exec, PassRefPtr<NodeImpl> node) {
       if (n->isHTMLElement())
         ret = new HTMLElement(exec, static_cast<HTMLElementImpl*>(n));
       else
-        ret = new DOMElement(exec, static_cast<ElementImpl*>(n));
+        ret = new JSElement(exec, static_cast<ElementImpl*>(n));
       break;
     case DOM::Node::ATTRIBUTE_NODE:
       ret = new JSAttr(exec, static_cast<AttrImpl*>(n));
@@ -1606,8 +1517,8 @@ JSValue* getRuntimeObject(ExecState* exec, NodeImpl* n) {
   return 0;
 }
 
-JSValue* getDOMNodeList(ExecState* exec, NodeListImpl* l) {
-  return cacheDOMObject<NodeListImpl, DOMNodeList>(exec, l);
+JSValue* getDOMNodeList(ExecState* exec, PassRefPtr<NodeListImpl> l) {
+  return cacheDOMObject<NodeListImpl, DOMNodeList>(exec, l.get());
 }
 
 JSValue* getDOMDOMImplementation(ExecState* exec, DOMImplementationImpl* i) {

@@ -24,6 +24,7 @@
 
 #include "CachedObjectClient.h"
 #include "kjs_dom.h"
+#include "JSElement.h"
 #include "Color.h"
 #include <qguardedptr.h>
 #include "Image.h"
@@ -103,7 +104,7 @@ class HTMLDocument : public DOMDocument {
                                   const PropertySlot&);
 };
 
-class HTMLElement : public DOMElement {
+class HTMLElement : public WebCore::JSElement {
  public:
   HTMLElement(ExecState* exec, DOM::HTMLElementImpl* e);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);

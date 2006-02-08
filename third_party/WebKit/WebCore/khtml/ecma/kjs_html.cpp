@@ -477,7 +477,7 @@ void KJS::HTMLDocument::putValueProperty(ExecState* exec,
 
 // -------------------------------------------------------------------------
 
-const ClassInfo KJS::HTMLElement::info = {"HTMLElement", &DOMElement::info,
+const ClassInfo KJS::HTMLElement::info = {"HTMLElement", &JSElement::info,
                                           &HTMLElementTable, 0};
 const ClassInfo KJS::HTMLElement::html_info = {
     "HTMLHtmlElement", &KJS::HTMLElement::info, &HTMLHtmlElementTable, 0};
@@ -1351,7 +1351,7 @@ DontDelete|Function 2
 */
 
 HTMLElement::HTMLElement(ExecState* exec, HTMLElementImpl* e)
-    : DOMElement(exec, e) {}
+    : JSElement(exec, e) {}
 
 JSValue* HTMLElement::formIndexGetter(ExecState* exec,
                                       JSObject* originalObject,
@@ -1513,7 +1513,7 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
   }
 
   // Base HTMLElement stuff or parent class forward, as usual
-  return getStaticPropertySlot<HTMLElementFunction, HTMLElement, DOMElement>(
+  return getStaticPropertySlot<HTMLElementFunction, HTMLElement, JSElement>(
       exec, &HTMLElementTable, this, propertyName, slot);
 }
 
@@ -2624,7 +2624,7 @@ UString KJS::HTMLElement::toString(ExecState* exec) const {
   if (impl()->hasTagName(aTag))
     return UString(static_cast<const HTMLAnchorElementImpl*>(impl())->href());
   else
-    return DOMElement::toString(exec);
+    return JSElement::toString(exec);
 }
 
 static HTMLFormElementImpl* getForm(HTMLElementImpl* element) {
@@ -2892,8 +2892,8 @@ void KJS::HTMLElement::put(ExecState* exec,
     }
   }
 
-  lookupPut<KJS::HTMLElement, DOMElement>(exec, propertyName, value, attr,
-                                          &HTMLElementTable, this);
+  lookupPut<KJS::HTMLElement, JSElement>(exec, propertyName, value, attr,
+                                         &HTMLElementTable, this);
 }
 
 void HTMLElement::htmlSetter(ExecState* exec,
