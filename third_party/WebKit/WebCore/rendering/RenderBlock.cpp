@@ -453,7 +453,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   if (!relayoutChildren && posChildNeedsLayout() && !normalChildNeedsLayout() &&
       !selfNeedsLayout()) {
     // All we have to is lay out our positioned objects.
-    layoutPositionedObjects(relayoutChildren);
+    layoutPositionedObjects(relayoutChildren || isRoot());
     if (hasOverflowClip())
       m_layer->updateScrollInfoAfterLayout();
     setNeedsLayout(false);
@@ -574,7 +574,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     m_height += borderBottom() + paddingBottom();
   }
 
-  layoutPositionedObjects(relayoutChildren);
+  layoutPositionedObjects(relayoutChildren || isRoot());
 
   // Always ensure our overflow width/height are at least as large as our
   // width/height.
