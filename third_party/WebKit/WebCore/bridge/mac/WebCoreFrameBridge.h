@@ -756,6 +756,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                       stillSelecting:(BOOL)flag;
 - (BOOL)shouldBeginEditing:(DOMRange*)range;
 - (BOOL)shouldEndEditing:(DOMRange*)range;
+- (void)didBeginEditing;
+- (void)didEndEditing;
 - (BOOL)canPaste;
 
 - (NSString*)overrideMediaType;

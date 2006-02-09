@@ -1997,6 +1997,20 @@ bool DocumentImpl::acceptsEditingFocus(NodeImpl* node) {
   return frame()->shouldBeginEditing(rangeOfContents(root).get());
 }
 
+void DocumentImpl::didBeginEditing() {
+  if (!frame())
+    return;
+
+  frame()->didBeginEditing();
+}
+
+void DocumentImpl::didEndEditing() {
+  if (!frame())
+    return;
+
+  frame()->didEndEditing();
+}
+
 #if __APPLE__
 const QValueList<DashboardRegionValue>& DocumentImpl::dashboardRegions() const {
   return m_dashboardRegions;
@@ -2026,7 +2040,7 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   if (m_focusNode == newFocusNode)
     return true;
 
-  if (m_focusNode && m_focusNode->isContentEditable() &&
+  if (m_focusNode && m_focusNode.get() == m_focusNode->rootEditableElement() &&
       !relinquishesEditingFocus(m_focusNode.get()))
     return false;
 
@@ -2057,10 +2071,13 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
     clearSelectionIfNeeded(newFocusNode);
     if ((oldFocusNode.get() == this) && oldFocusNode->hasOneRef())
       return true;
+
+    if (oldFocusNode.get() == oldFocusNode->rootEditableElement())
+      didEndEditing();
   }
 
   if (newFocusNode) {
-    if (newFocusNode->isContentEditable() &&
+    if (newFocusNode == newFocusNode->rootEditableElement() &&
         !acceptsEditingFocus(newFocusNode)) {
       // delegate blocks focus change
       focusChangeBlocked = true;
@@ -2081,6 +2098,10 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
       goto SetFocusNodeDone;
     }
     m_focusNode->setFocus();
+
+    if (m_focusNode.get() == m_focusNode->rootEditableElement())
+      didBeginEditing();
+
     // eww, I suck. set the qt focus correctly
     // ### find a better place in the code for this
     if (view()) {

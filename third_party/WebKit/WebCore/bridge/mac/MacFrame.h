@@ -311,6 +311,8 @@ class MacFrame : public Frame {
                                      bool stillSelecting) const;
   virtual bool shouldBeginEditing(const RangeImpl*) const;
   virtual bool shouldEndEditing(const RangeImpl*) const;
+  virtual void didBeginEditing() const;
+  virtual void didEndEditing() const;
 
   KJS::Bindings::RootObject* executionContextForDOM();
   KJS::Bindings::RootObject* bindingRootObject();
