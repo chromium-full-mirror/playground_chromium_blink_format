@@ -21,15 +21,16 @@
 #ifndef FRAME_TREE_NODE_H
 #define FRAME_TREE_NODE_H
 
-#include <kxmlcore/RefPtr.h>
+#include <kxmlcore/Noncopyable.h>
 #include <kxmlcore/PassRefPtr.h>
+#include <kxmlcore/RefPtr.h>
 #include "PlatformString.h"
 
 namespace WebCore {
 
 class Frame;
 
-class FrameTreeNode {
+class FrameTreeNode : Noncopyable {
  public:
   FrameTreeNode(Frame* thisFrame, Frame* parentFrame)
       : m_thisFrame(thisFrame),
@@ -65,11 +66,8 @@ class FrameTreeNode {
   RefPtr<Frame> m_firstChild;
   Frame* m_lastChild;
   int m_childCount;
-
-  // uncopyable
-  FrameTreeNode(const FrameTreeNode&);
-  FrameTreeNode& operator=(const FrameTreeNode&);
 };
-}
+
+}  // namespace WebCore
 
 #endif  // FRAME_TREE_NODE_H

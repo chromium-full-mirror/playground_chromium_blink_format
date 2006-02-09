@@ -434,26 +434,6 @@ JSValue* Frame::executeScript(NodeImpl* n,
   return ret;
 }
 
-bool Frame::scheduleScript(NodeImpl* n, const QString& script) {
-  d->scheduledScript = script;
-  d->scheduledScriptNode = n;
-
-  return true;
-}
-
-JSValue* Frame::executeScheduledScript() {
-  if (d->scheduledScript.isEmpty())
-    return 0;
-
-  JSValue* ret =
-      executeScript(d->scheduledScriptNode.get(), d->scheduledScript);
-
-  d->scheduledScript = QString();
-  d->scheduledScriptNode = 0;
-
-  return ret;
-}
-
 bool Frame::javaEnabled() const {
 #ifndef Q_WS_QWS
   return d->m_bJavaEnabled;

@@ -21,14 +21,15 @@
 #ifndef PAGE_H
 #define PAGE_H
 
-#include <kxmlcore/RefPtr.h>
+#include <kxmlcore/Noncopyable.h>
 #include <kxmlcore/PassRefPtr.h>
+#include <kxmlcore/RefPtr.h>
 
 namespace WebCore {
 
 class Frame;
 
-class Page {
+class Page : Noncopyable {
  public:
   Page(PassRefPtr<Frame> mainFrame);
   ~Page();
@@ -37,6 +38,7 @@ class Page {
  private:
   RefPtr<Frame> m_mainFrame;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // PAGE_H

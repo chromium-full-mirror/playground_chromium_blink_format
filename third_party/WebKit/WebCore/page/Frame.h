@@ -39,20 +39,15 @@
 #include <kurl.h>
 #include <qscrollbar.h>
 #include <qstringlist.h>
+#include <kxmlcore/Noncopyable.h>
 
-class KHTMLPartBrowserExtension;
 class KHTMLSettings;
 
 namespace KJS {
-class DOMDocument;
 class JSValue;
 class PausedTimeouts;
 class SavedBuiltins;
 class SavedProperties;
-class Selection;
-class SelectionFunc;
-class Window;
-class WindowFunc;
 
 namespace Bindings {
 class Instance;
@@ -61,55 +56,24 @@ class Instance;
 
 namespace WebCore {
 
-class CSSComputedStyleDeclarationImpl;
+class SelectionController;
+class Selection;
+class RangeImpl;
+class EditCommandPtr;
 class CSSMutableStyleDeclarationImpl;
 class CSSStyleDeclarationImpl;
-class CSSStyleSelector;
-class CachedObject;
-class DOMString;
-class DocLoader;
-class Document;
-class DocumentImpl;
-class DrawContentsEvent;
-class EditCommandPtr;
-class ElementImpl;
-class EventListener;
-class FormData;
-class FramePrivate;
-class FrameTreeNode;
-class HTMLAnchorElementImpl;
-class HTMLDocument;
-class HTMLDocumentImpl;
-class HTMLElementImpl;
-class HTMLEventListener;
-class HTMLFormElementImpl;
-class HTMLFrameElementImpl;
-class HTMLIFrameElementImpl;
-class HTMLMetaElementImpl;
-class HTMLObjectElementImpl;
-class HTMLTitleElementImpl;
-class HTMLTokenizer;
-class KJSProxyImpl;
-class MacFrame;
 class MouseDoubleClickEvent;
-class MouseEvent;
-class MouseMoveEvent;
 class MousePressEvent;
 class MouseReleaseEvent;
-class Node;
-class NodeImpl;
-class Range;
-class RangeImpl;
-class RenderObject;
-class RenderPart;
-class RenderPartObject;
-class RenderStyle;
-class RenderWidget;
-class Selection;
-class SelectionController;
+class DrawContentsEvent;
 class VisiblePosition;
-class XMLTokenizer;
+class MouseEvent;
+class MouseMoveEvent;
+class CSSComputedStyleDeclarationImpl;
+class FramePrivate;
+class FrameTreeNode;
 class Plugin;
+class KJSProxyImpl;
 
 template <typename T>
 class Timer;
@@ -130,29 +94,7 @@ enum ObjectContentType {
   ObjectContentPlugin,
 };
 
-class Frame : public Shared<Frame>, public QObject {
-  friend class FrameView;
-  friend class KJS::DOMDocument;
-  friend class KJS::Selection;
-  friend class KJS::SelectionFunc;
-  friend class KJS::Window;
-  friend class KJS::WindowFunc;
-  friend class CSSStyleSelector;
-  friend class DocumentImpl;
-  friend class HTMLAnchorElementImpl;
-  friend class HTMLDocumentImpl;
-  friend class HTMLFormElementImpl;
-  friend class HTMLFrameElementImpl;
-  friend class HTMLIFrameElementImpl;
-  friend class HTMLMetaElementImpl;
-  friend class HTMLObjectElementImpl;
-  friend class HTMLTitleElementImpl;
-  friend class HTMLTokenizer;
-  friend class NodeImpl;
-  friend class RenderPartObject;
-  friend class RenderWidget;
-  friend class XMLTokenizer;
-
+class Frame : public Shared<Frame>, public QObject, Noncopyable {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
@@ -916,28 +858,7 @@ class Frame : public Shared<Frame>, public QObject {
                const QString& target,
                bool shiftPressed = false);
 
-  void submitForm(const char* action,
-                  const QString& url,
-                  const FormData& formData,
-                  const QString& target,
-                  const QString& contentType = QString::null,
-                  const QString& boundary = QString::null);
-
   void init(FrameView*, RenderPart*);
-
-  bool scheduleScript(NodeImpl*, const QString& script);
-
-  KJS::JSValue* executeScheduledScript();
-
-  bool requestFrame(RenderPart* frame,
-                    const QString& url,
-                    const QString& frameName);
-  bool requestObject(RenderPart* frame,
-                     const QString& url,
-                     const QString& frameName,
-                     const QString& serviceType,
-                     const QStringList& paramNames,
-                     const QStringList& paramValues);
 
   bool shouldUsePlugin(NodeImpl* element,
                        const KURL& url,
@@ -956,6 +877,22 @@ class Frame : public Shared<Frame>, public QObject {
                       const DOMString& referrer);
 
  public:
+  void submitForm(const char* action,
+                  const QString& url,
+                  const FormData& formData,
+                  const QString& target,
+                  const QString& contentType = QString::null,
+                  const QString& boundary = QString::null);
+
+  bool requestObject(RenderPart* frame,
+                     const QString& url,
+                     const QString& frameName,
+                     const QString& serviceType,
+                     const QStringList& paramNames,
+                     const QStringList& paramValues);
+  bool requestFrame(RenderPart* frame,
+                    const QString& url,
+                    const QString& frameName);
   DOMString requestFrameName();
 
   DocumentImpl* document() const;
@@ -977,14 +914,14 @@ class Frame : public Shared<Frame>, public QObject {
   bool checkLinkSecurity(const KURL& linkURL,
                          const QString& message = QString::null,
                          const QString& button = QString::null);
-  KJS::JSValue* executeScript(const QString& filename,
-                              int baseLine,
-                              NodeImpl*,
-                              const QString& script);
 
   void cancelRedirection(bool newLoadInProgress = false);
 
  public:
+  KJS::JSValue* executeScript(const QString& filename,
+                              int baseLine,
+                              NodeImpl*,
+                              const QString& script);
   KJSProxyImpl* jScript();
   Frame* opener();
   void setOpener(Frame* _opener);
@@ -1091,17 +1028,9 @@ class Frame : public Shared<Frame>, public QObject {
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
 
-  mutable RefPtr<NodeImpl> _elementToDraw;
-  mutable bool _drawSelectionOnly;
-  KURL _submittedFormURL;
-  bool m_markedTextUsesUnderlines;
-  QValueList<MarkedTextUnderline> m_markedTextUnderlines;
-  bool m_windowHasFocus;
-
  private:
   int cacheId() const;
 
-  void checkEmitLoadEvent();
   void emitLoadEvent();
 
   void receivedFirstData();
@@ -1122,12 +1051,10 @@ class Frame : public Shared<Frame>, public QObject {
   CSSComputedStyleDeclarationImpl* selectionComputedStyle(
       NodeImpl*& nodeToRemove) const;
 
-  FramePrivate* d;
-  friend class FramePrivate;
-
  public:
   friend class MacFrame;
 
+  void checkEmitLoadEvent();
   void completed();
   void completed(bool);
   bool didOpenURL(const KURL&);
@@ -1137,8 +1064,6 @@ class Frame : public Shared<Frame>, public QObject {
 
   virtual void frameDetached();
 
-  int frameCount;
-
   virtual void detachFromView();
   void updateBaseURLForEmptyDocument();
 
@@ -1147,6 +1072,18 @@ class Frame : public Shared<Frame>, public QObject {
   // split out controller objects
   FrameTreeNode* treeNode() const;
   SelectionController& selection() const;
+
+ private:
+  friend class FramePrivate;
+  FramePrivate* d;
+
+  mutable RefPtr<NodeImpl> _elementToDraw;
+  mutable bool _drawSelectionOnly;
+  KURL _submittedFormURL;
+  bool m_markedTextUsesUnderlines;
+  QValueList<MarkedTextUnderline> m_markedTextUnderlines;
+  bool m_windowHasFocus;
+  int frameCount;
 };
 }
 

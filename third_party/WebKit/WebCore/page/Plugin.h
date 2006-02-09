@@ -21,13 +21,14 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include <kxmlcore/Noncopyable.h>
 #include "Shared.h"
 
 class QWidget;
 
 namespace WebCore {
 
-class Plugin : public Shared<Plugin> {
+class Plugin : public Shared<Plugin>, Noncopyable {
  public:
   Plugin(QWidget* view) : m_view(view) {}
   QWidget* view() const { return m_view; }
