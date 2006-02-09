@@ -193,9 +193,7 @@ class ElementImpl : public ContainerNodeImpl {
 
   void setAttribute(const DOMString& name,
                     const DOMString& value,
-                    int& exception) {
-    setAttributeNS(DOMString(), name, value, exception);
-  }
+                    int& exception);
   void setAttributeNS(const DOMString& namespaceURI,
                       const DOMString& qualifiedName,
                       const DOMString& value,

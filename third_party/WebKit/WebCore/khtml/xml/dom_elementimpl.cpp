@@ -406,6 +406,22 @@ const AtomicString& ElementImpl::getAttributeNS(
   return getAttribute(name);
 }
 
+void ElementImpl::setAttribute(const DOMString& name,
+                               const DOMString& value,
+                               int& exception) {
+  DOMString ln(name);
+  if (getDocument() && getDocument()->isHTMLDocument())
+    ln = name.lower();
+
+  if (!DocumentImpl::isValidName(ln)) {
+    exception = DOMException::INVALID_CHARACTER_ERR;
+    return;
+  }
+
+  setAttribute(QualifiedName(nullAtom, ln.impl(), nullAtom), value.impl(),
+               exception);
+}
+
 void ElementImpl::setAttribute(const QualifiedName& name,
                                DOMStringImpl* value,
                                int& exceptioncode) {
