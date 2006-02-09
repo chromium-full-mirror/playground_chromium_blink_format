@@ -558,6 +558,7 @@ bool NodeImpl::dispatchGenericEvent(PassRefPtr<EventImpl> e,
       it.current()->handleLocalEvents(evt.get(), false);
     }
     // Handle window events for bubbling phase
+    it.toFirst();
     if (it.current()->isDocumentNode() && !evt->propagationStopped() &&
         !evt->getCancelBubble()) {
       evt->setCurrentTarget(it.current());
