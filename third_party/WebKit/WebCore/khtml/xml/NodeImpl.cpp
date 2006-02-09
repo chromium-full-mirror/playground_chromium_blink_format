@@ -511,7 +511,14 @@ bool NodeImpl::dispatchGenericEvent(PassRefPtr<EventImpl> e,
 
   // trigger any capturing event handlers on our way down
   evt->setEventPhase(Event::CAPTURING_PHASE);
+
   it.toFirst();
+  // Handle window events for capture phase
+  if (it.current()->isDocumentNode() && !evt->propagationStopped()) {
+    static_cast<DocumentImpl*>(it.current())
+        ->handleWindowEvent(evt.get(), true);
+  }
+
   for (; it.current() && it.current() != this && !evt->propagationStopped();
        ++it) {
     evt->setCurrentTarget(it.current());
@@ -549,6 +556,13 @@ bool NodeImpl::dispatchGenericEvent(PassRefPtr<EventImpl> e,
          --it) {
       evt->setCurrentTarget(it.current());
       it.current()->handleLocalEvents(evt.get(), false);
+    }
+    // Handle window events for bubbling phase
+    if (it.current()->isDocumentNode() && !evt->propagationStopped() &&
+        !evt->getCancelBubble()) {
+      evt->setCurrentTarget(it.current());
+      static_cast<DocumentImpl*>(it.current())
+          ->handleWindowEvent(evt.get(), false);
     }
   }
 
@@ -600,7 +614,7 @@ bool NodeImpl::dispatchHTMLEvent(const AtomicString& eventType,
                        exceptioncode, true);
 }
 
-bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
+void NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
                                    bool canBubbleArg,
                                    bool cancelableArg) {
   assert(!eventDispatchForbidden());
@@ -608,7 +622,7 @@ bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
   RefPtr<EventImpl> evt = new EventImpl(eventType, canBubbleArg, cancelableArg);
   RefPtr<DocumentImpl> doc = getDocument();
   evt->setTarget(doc.get());
-  bool r = dispatchGenericEvent(evt.release(), exceptioncode, true);
+  doc->handleWindowEvent(evt.get(), false);
 
   if (eventType == loadEvent) {
     // For onload events, send a separate load event to the enclosing frame
@@ -624,8 +638,6 @@ bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
                                          true);
     }
   }
-
-  return r;
 }
 
 bool NodeImpl::dispatchMouseEvent(QMouseEvent* _mouse,

@@ -309,7 +309,7 @@ class NodeImpl : public TreeShared<NodeImpl> {
   bool dispatchHTMLEvent(const AtomicString& eventType,
                          bool canBubble,
                          bool cancelable);
-  bool dispatchWindowEvent(const AtomicString& eventType,
+  void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubble,
                            bool cancelable);
   bool dispatchMouseEvent(QMouseEvent*,
