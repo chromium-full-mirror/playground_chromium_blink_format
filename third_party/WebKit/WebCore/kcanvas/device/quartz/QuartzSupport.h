@@ -53,6 +53,7 @@ CFStringRef CFStringFromCGAffineTransform(CGAffineTransform t);
 CGAffineTransform CGAffineTransformMakeMapBetweenRects(CGRect source,
                                                        CGRect dest);
 
+void applyStrokeStyleToContext(CGContextRef, const KRenderingStrokePainter&);
 void applyStrokeStyleToContext(CGContextRef,
                                WebCore::RenderStyle*,
                                const WebCore::RenderObject*);

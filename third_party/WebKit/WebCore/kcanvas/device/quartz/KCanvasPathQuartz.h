@@ -45,6 +45,11 @@ class KCanvasPathQuartz : public KCanvasPath {
                        float y3);
   virtual void closeSubpath();
 
+  virtual FloatRect boundingBox();
+  virtual FloatRect strokeBoundingBox(const KRenderingStrokePainter&);
+  virtual bool containsPoint(const FloatPoint&, KCWindRule);
+  virtual bool strokeContainsPoint(const FloatPoint&);
+
   CGPathRef cgPath() const { return m_cgPath; }
 
  private:
