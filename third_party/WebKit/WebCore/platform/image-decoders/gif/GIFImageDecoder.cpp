@@ -72,14 +72,10 @@ class GIFImageDecoderPrivate {
   unsigned m_readOffset;
 };
 
-GIFImageDecoder::GIFImageDecoder()
-    : m_frameCountValid(true),
-      m_sizeAvailable(false),
-      m_failed(false),
-      m_impl(0) {}
+GIFImageDecoder::GIFImageDecoder() : m_frameCountValid(true), m_reader(0) {}
 
 GIFImageDecoder::~GIFImageDecoder() {
-  delete m_impl;
+  delete m_reader;
 }
 
 // Take the data and store it.
@@ -94,14 +90,14 @@ void GIFImageDecoder::setData(const ByteArray& data, bool allDataReceived) {
   m_frameCountValid = false;
 
   // Create the GIF reader.
-  if (!m_impl && !m_failed)
-    m_impl = new GIFImageDecoderPrivate(this);
+  if (!m_reader && !m_failed)
+    m_reader = new GIFImageDecoderPrivate(this);
 }
 
 // Whether or not the size information has been decoded yet.
 bool GIFImageDecoder::isSizeAvailable() const {
   // If we have pending data to decode, send it to the GIF reader now.
-  if (!m_sizeAvailable && m_impl) {
+  if (!m_sizeAvailable && m_reader) {
     if (m_failed)
       return false;
 
@@ -112,11 +108,6 @@ bool GIFImageDecoder::isSizeAvailable() const {
   }
 
   return m_sizeAvailable;
-}
-
-// Requests the size.
-IntSize GIFImageDecoder::size() const {
-  return m_size;
 }
 
 // The total number of frames for the image.  Will scan the image data for the
@@ -148,8 +139,8 @@ int GIFImageDecoder::repetitionCount() const {
   // We don't have to do any decoding to determine this, since the loop count
   // was determined after
   // the initial query for size.
-  if (m_impl)
-    return m_impl->repetitionCount();
+  if (m_reader)
+    return m_reader->repetitionCount();
   return cAnimationNone;
 }
 
@@ -158,7 +149,7 @@ RGBA32Buffer GIFImageDecoder::frameBufferAtIndex(size_t index) {
     return RGBA32Buffer();
 
   const RGBA32Buffer& frame = m_frameBufferCache[index];
-  if (frame.status() != RGBA32Buffer::FrameComplete && m_impl)
+  if (frame.status() != RGBA32Buffer::FrameComplete && m_reader)
     // Decode this frame.
     decode(GIFFullQuery, index + 1);
 
@@ -170,11 +161,11 @@ void GIFImageDecoder::decode(GIFQuery query, unsigned haltAtFrame) const {
   if (m_failed)
     return;
 
-  m_failed = !m_impl->decode(m_data, query, haltAtFrame);
+  m_failed = !m_reader->decode(m_data, query, haltAtFrame);
 
   if (m_failed) {
-    delete m_impl;
-    m_impl = 0;
+    delete m_reader;
+    m_reader = 0;
   }
 }
 
@@ -185,7 +176,7 @@ void GIFImageDecoder::sizeNowAvailable(unsigned width, unsigned height) {
 }
 
 void GIFImageDecoder::decodingHalted(unsigned bytesLeft) {
-  m_impl->setReadOffset(m_data.size() - bytesLeft);
+  m_reader->setReadOffset(m_data.size() - bytesLeft);
 }
 
 void GIFImageDecoder::haveDecodedRow(
@@ -220,7 +211,7 @@ void GIFImageDecoder::haveDecodedRow(
 
   unsigned colorMapSize;
   unsigned char* colorMap;
-  m_impl->getColorMap(colorMap, colorMapSize);
+  m_reader->getColorMap(colorMap, colorMapSize);
   if (!colorMap)
     return;
 
@@ -234,15 +225,15 @@ void GIFImageDecoder::haveDecodedRow(
   // sub-rectangle.  This means that if the GIF frame's sub-rectangle is
   // (x,y,w,h) then row 0 is really row
   // y, and each row goes from x to x+w.
-  unsigned dstPos = (m_impl->frameYOffset() + rowNumber) * m_size.width() +
-                    m_impl->frameXOffset();
+  unsigned dstPos = (m_reader->frameYOffset() + rowNumber) * m_size.width() +
+                    m_reader->frameXOffset();
   unsigned* dst = buffer.bytes().data() + dstPos;
   unsigned* currDst = dst;
   unsigned char* currentRowByte = rowBuffer;
 
-  bool hasAlpha = m_impl->isTransparent();
+  bool hasAlpha = m_reader->isTransparent();
   while (currentRowByte != rowEnd) {
-    if ((!hasAlpha || *currentRowByte != m_impl->transparentPixel()) &&
+    if ((!hasAlpha || *currentRowByte != m_reader->transparentPixel()) &&
         *currentRowByte < colorMapSize) {
       unsigned colorIndex = *currentRowByte * 3;
       unsigned red = colorMap[colorIndex];
@@ -287,7 +278,7 @@ void GIFImageDecoder::frameComplete(unsigned frameIndex,
 }
 
 void GIFImageDecoder::gifComplete() {
-  delete m_impl;
-  m_impl = 0;
+  delete m_reader;
+  m_reader = 0;
 }
 }

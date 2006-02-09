@@ -102,6 +102,7 @@ class RGBA32Buffer {
 // and the base class manages the RGBA32 frame cache.
 class ImageDecoder {
  public:
+  ImageDecoder() : m_sizeAvailable(false), m_failed(false) {}
   virtual ~ImageDecoder() {}
 
   // All specific decoder plugins must do something with the data they are
@@ -114,7 +115,7 @@ class ImageDecoder {
   virtual bool isSizeAvailable() const = 0;
 
   // Requests the size.
-  virtual IntSize size() const = 0;
+  virtual IntSize size() const { return m_size; }
 
   // The total number of frames for the image.  Classes that support multiple
   // frames
@@ -131,9 +132,15 @@ class ImageDecoder {
   // back the buffer.
   virtual RGBA32Buffer frameBufferAtIndex(size_t index) = 0;
 
+  bool failed() const { return m_failed; }
+  void setFailed() { m_failed = true; }
+
  protected:
   ByteArray m_data;  // The encoded data.
   Vector<RGBA32Buffer> m_frameBufferCache;
+  bool m_sizeAvailable;
+  mutable bool m_failed;
+  IntSize m_size;
 };
 }
 

@@ -135,8 +135,7 @@ class PNGImageReader {
   bool m_hasAlpha;
 };
 
-PNGImageDecoder::PNGImageDecoder()
-    : m_sizeAvailable(false), m_failed(false), m_reader(0) {}
+PNGImageDecoder::PNGImageDecoder() : m_reader(0) {}
 
 PNGImageDecoder::~PNGImageDecoder() {
   delete m_reader;
@@ -169,11 +168,6 @@ bool PNGImageDecoder::isSizeAvailable() const {
   }
 
   return m_sizeAvailable;
-}
-
-// Requests the size.
-IntSize PNGImageDecoder::size() const {
-  return m_size;
 }
 
 RGBA32Buffer PNGImageDecoder::frameBufferAtIndex(size_t index) {
