@@ -82,7 +82,6 @@ class KRenderingPaintServer : public KCanvasResource {
 
   virtual QTextStream& externalRepresentation(QTextStream&) const = 0;
 
- protected:
   virtual void renderPath(KRenderingDeviceContext*,
                           const RenderPath*,
                           KCPaintTargetType) const = 0;
