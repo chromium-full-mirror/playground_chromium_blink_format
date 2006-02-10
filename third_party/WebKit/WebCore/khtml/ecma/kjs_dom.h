@@ -63,7 +63,7 @@ class DOMNode : public DOMObject {
   static const ClassInfo info;
 
   virtual JSValue* toPrimitive(ExecState* exec,
-                               Type preferred = UndefinedType) const;
+                               JSType preferred = UndefinedType) const;
   virtual UString toString(ExecState* exec) const;
   void setListener(ExecState* exec,
                    const DOM::AtomicString& eventType,
@@ -191,7 +191,7 @@ class DOMNodeList : public DOMObject {
   DOM::NodeListImpl* impl() const { return m_impl.get(); }
 
   virtual JSValue* toPrimitive(ExecState* exec,
-                               Type preferred = UndefinedType) const;
+                               JSType preferred = UndefinedType) const;
 
  private:
   static JSValue* indexGetter(ExecState* exec,

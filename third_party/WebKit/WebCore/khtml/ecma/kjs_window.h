@@ -384,7 +384,7 @@ class Location : public JSObject {
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual JSValue* toPrimitive(ExecState* exec, Type preferred) const;
+  virtual JSValue* toPrimitive(ExecState* exec, JSType preferred) const;
   virtual UString toString(ExecState*) const;
   enum {
     Hash,
@@ -415,7 +415,7 @@ class Selection : public JSObject {
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual JSValue* toPrimitive(ExecState* exec, Type preferred) const;
+  virtual JSValue* toPrimitive(ExecState* exec, JSType preferred) const;
   virtual UString toString(ExecState*) const;
   enum {
     AnchorNode,

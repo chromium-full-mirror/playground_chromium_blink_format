@@ -55,7 +55,7 @@ class UserObjectImp : public JSObject {
                    int attr = None);
 
   JSValue* toPrimitive(ExecState* exec,
-                       Type preferredType = UnspecifiedType) const;
+                       JSType preferredType = UnspecifiedType) const;
   virtual bool toBoolean(ExecState* exec) const;
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
