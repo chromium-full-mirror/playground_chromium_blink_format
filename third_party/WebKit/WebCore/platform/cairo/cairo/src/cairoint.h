@@ -2106,12 +2106,15 @@ slim_hidden_proto(cairo_get_current_point) slim_hidden_proto(
                                     cairo_stroke_preserve)
                                     slim_hidden_proto(cairo_surface_destroy)
                                         slim_hidden_proto(cairo_push_group)
-                                            slim_hidden_proto(cairo_pop_group)
+                                            slim_hidden_proto(
+                                                cairo_push_group_with_content)
                                                 slim_hidden_proto(
-                                                    cairo_pop_group_to_source)
+                                                    cairo_pop_group)
                                                     slim_hidden_proto(
-                                                        moz_cairo_set_target)
+                                                        cairo_pop_group_to_source)
+                                                        slim_hidden_proto(
+                                                            moz_cairo_set_target)
 
-                                                        CAIRO_END_DECLS
+                                                            CAIRO_END_DECLS
 
 #endif

@@ -195,6 +195,26 @@ typedef enum _cairo_status {
 } cairo_status_t;
 
 /**
+ * cairo_content_t
+ * @CAIRO_CONTENT_COLOR: The surface will hold color content only.
+ * @CAIRO_CONTENT_ALPHA: The surface will hold alpha content only.
+ * @CAIRO_CONTENT_COLOR_ALPHA: The surface will hold color and alpha content.
+ *
+ * @cairo_content_t is used to describe the content that a surface will
+ * contain, whether color information, alpha information (translucence
+ * vs. opacity), or both.
+ *
+ * Note: The large values here are designed to keep cairo_content_t
+ * values distinct from cairo_format_t values so that the
+ * implementation can detect the error if users confuse the two types.
+ */
+typedef enum _cairo_content {
+  CAIRO_CONTENT_COLOR = 0x1000,
+  CAIRO_CONTENT_ALPHA = 0x2000,
+  CAIRO_CONTENT_COLOR_ALPHA = 0x3000
+} cairo_content_t;
+
+/**
  * cairo_write_func_t:
  * @closure: the output closure
  * @data: the buffer containing the data to write
@@ -248,6 +268,9 @@ cairo_public void cairo_restore(cairo_t* cr);
 cairo_public void moz_cairo_set_target(cairo_t* cr, cairo_surface_t* target);
 
 cairo_public void cairo_push_group(cairo_t* cr);
+
+cairo_public void cairo_push_group_with_content(cairo_t* cr,
+                                                cairo_content_t content);
 
 cairo_public cairo_pattern_t* cairo_pop_group(cairo_t* cr);
 
@@ -927,6 +950,8 @@ cairo_public void cairo_get_matrix(cairo_t* cr, cairo_matrix_t* matrix);
 
 cairo_public cairo_surface_t* cairo_get_target(cairo_t* cr);
 
+cairo_public cairo_surface_t* cairo_get_group_target(cairo_t* cr);
+
 typedef enum _cairo_path_data_type {
   CAIRO_PATH_MOVE_TO,
   CAIRO_PATH_LINE_TO,
@@ -1045,26 +1070,6 @@ cairo_public const char* cairo_status_to_string(cairo_status_t status);
 
 /* Surface manipulation */
 
-/**
- * cairo_content_t
- * @CAIRO_CONTENT_COLOR: The surface will hold color content only.
- * @CAIRO_CONTENT_ALPHA: The surface will hold alpha content only.
- * @CAIRO_CONTENT_COLOR_ALPHA: The surface will hold color and alpha content.
- *
- * @cairo_content_t is used to describe the content that a surface will
- * contain, whether color information, alpha information (translucence
- * vs. opacity), or both.
- *
- * Note: The large values here are designed to keep cairo_content_t
- * values distinct from cairo_format_t values so that the
- * implementation can detect the error if users confuse the two types.
- */
-typedef enum _cairo_content {
-  CAIRO_CONTENT_COLOR = 0x1000,
-  CAIRO_CONTENT_ALPHA = 0x2000,
-  CAIRO_CONTENT_COLOR_ALPHA = 0x3000
-} cairo_content_t;
-
 cairo_public cairo_surface_t* cairo_surface_create_similar(
     cairo_surface_t* other,
     cairo_content_t content,
@@ -1117,6 +1122,10 @@ cairo_public void cairo_surface_mark_dirty_rectangle(cairo_surface_t* surface,
 cairo_public void cairo_surface_set_device_offset(cairo_surface_t* surface,
                                                   double x_offset,
                                                   double y_offset);
+
+cairo_public void cairo_surface_get_device_offset(cairo_surface_t* surface,
+                                                  double* x_offset,
+                                                  double* y_offset);
 
 /* Image-surface functions */
 
