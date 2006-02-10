@@ -94,7 +94,7 @@ template <typename U>
 inline RefPtr<T>::RefPtr(const PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
 template <typename T>
-RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
+inline RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
   T* optr = o.get();
   if (optr)
     optr->ref();
@@ -107,7 +107,7 @@ RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
 
 template <typename T>
 template <typename U>
-RefPtr<T>& RefPtr<T>::operator=(const RefPtr<U>& o) {
+inline RefPtr<T>& RefPtr<T>::operator=(const RefPtr<U>& o) {
   T* optr = o.get();
   if (optr)
     optr->ref();
