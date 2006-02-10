@@ -416,7 +416,7 @@ void Collector::protect(JSValue* k) {
   assert(k);
   assert(JSLock::lockCount() > 0);
 
-  if (SimpleNumber::is(k))
+  if (JSImmediate::isImmediate(k))
     return;
 
   protectedValues().add(k->downcast());
@@ -426,7 +426,7 @@ void Collector::unprotect(JSValue* k) {
   assert(k);
   assert(JSLock::lockCount() > 0);
 
-  if (SimpleNumber::is(k))
+  if (JSImmediate::isImmediate(k))
     return;
 
   protectedValues().remove(k->downcast());
@@ -453,7 +453,6 @@ bool Collector::collect() {
       scr = scr->next;
     } while (scr != InterpreterImp::s_hook);
   }
-  ConstantValues::mark();
 
   // MARK: first mark all referenced objects recursively starting out from the
   // set of root objects

@@ -53,7 +53,7 @@ class ObjcInstance : public Instance {
   virtual void end();
 
   virtual JSValue* valueOf() const;
-  virtual JSValue* defaultValue(Type hint) const;
+  virtual JSValue* defaultValue(JSType hint) const;
 
   virtual JSValue* invokeMethod(ExecState* exec,
                                 const MethodList& method,
@@ -72,7 +72,7 @@ class ObjcInstance : public Instance {
                                                  const Field* aField) const;
   virtual JSValue* getValueOfUndefinedField(ExecState* exec,
                                             const Identifier& property,
-                                            Type hint) const;
+                                            JSType hint) const;
 
   ObjectStructPtr getObject() const { return _instance; }
 

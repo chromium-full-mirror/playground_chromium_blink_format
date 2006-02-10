@@ -47,7 +47,7 @@ class RuntimeObjectImp : public JSObject {
                    JSValue* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
-  virtual JSValue* defaultValue(ExecState* exec, Type hint) const;
+  virtual JSValue* defaultValue(ExecState* exec, JSType hint) const;
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,

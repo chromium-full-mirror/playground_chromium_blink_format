@@ -26,6 +26,7 @@
 #ifndef JAVASCRIPTCORE_BINDINGS_RUNTIME_H
 #define JAVASCRIPTCORE_BINDINGS_RUNTIME_H
 
+#include "JSType.h"
 #include "value.h"
 
 namespace KJS {
@@ -156,7 +157,7 @@ class Instance {
   virtual JSValue* getValueOfField(ExecState*, const Field*) const;
   virtual JSValue* getValueOfUndefinedField(ExecState*,
                                             const Identifier& property,
-                                            Type hint) const {
+                                            JSType hint) const {
     return jsUndefined();
   }
   virtual void setValueOfField(ExecState*, const Field*, JSValue*) const;
@@ -170,7 +171,7 @@ class Instance {
                                 const List& args) = 0;
   virtual JSValue* invokeDefaultMethod(ExecState*, const List& args) = 0;
 
-  virtual JSValue* defaultValue(Type hint) const = 0;
+  virtual JSValue* defaultValue(JSType hint) const = 0;
 
   virtual JSValue* valueOf() const { return jsString(getClass()->name()); }
 
