@@ -27,13 +27,13 @@
 #include "CachedXSLStyleSheet.h"
 #include "DocLoader.h"
 #include "DocumentImpl.h"
-#include "css/css_stylesheetimpl.h"
-#include "dom/dom_exception.h"
-#include "dom_node.h"
 #include "StringImpl.h"
+#include "css_stylesheetimpl.h"
+#include "dom_exception.h"
+#include "dom_node.h"
 #include "xml_tokenizer.h"
 
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
 #include "xsl_stylesheetimpl.h"
 #endif
 
@@ -131,14 +131,14 @@ unsigned short EntityReferenceImpl::nodeType() const {
 }
 
 PassRefPtr<NodeImpl> EntityReferenceImpl::cloneNode(bool deep) {
-  PassRefPtr<EntityReferenceImpl> clone =
+  RefPtr<EntityReferenceImpl> clone =
       new EntityReferenceImpl(getDocument(), m_entityName.get());
   // ### make sure children are readonly
   // ### since we are a reference, should we clone children anyway (even if not
   // deep?)
   if (deep)
     cloneChildNodes(clone.get());
-  return clone;
+  return clone.release();
 }
 
 // DOM Section 1.1.1
@@ -205,7 +205,7 @@ bool NotationImpl::childTypeAllowed(unsigned short /*type*/) {
 
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentImpl* doc)
     : ContainerNodeImpl(doc), m_cachedSheet(0), m_loading(false) {
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
   m_isXSL = false;
 #endif
 }
@@ -218,7 +218,7 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentImpl* doc,
       m_data(data.impl()),
       m_cachedSheet(0),
       m_loading(false) {
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
   m_isXSL = false;
 #endif
 }
@@ -285,7 +285,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
       type = i->second;
 
     bool isCSS = type.isEmpty() || type == "text/css";
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
     m_isXSL = (type == "text/xml" || type == "text/xsl" ||
                type == "application/xml" || type == "application/xhtml+xml" ||
                type == "application/rss+xml" || type == "application/atom=xml");
@@ -295,7 +295,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
 #endif
       return true;
 
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
     if (m_isXSL)
       getDocument()->tokenizer()->setTransformSource(getDocument());
 #endif
@@ -305,16 +305,16 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
     if (href.length() > 1) {
       if (href[0] == '#') {
         m_localHref = href.substring(1).impl();
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
         // We need to make a synthetic XSLStyleSheetImpl that is embedded.  It
         // needs to be able
         // to kick off import/include loads that can hang off some parent sheet.
         if (m_isXSL) {
-          PassRefPtr<XSLStyleSheetImpl> localSheet =
+          RefPtr<XSLStyleSheetImpl> localSheet =
               new XSLStyleSheetImpl(this, m_localHref.get(), true);
           localSheet->setDocument((xmlDocPtr)getDocument()->transformSource());
           localSheet->loadChildSheets();
-          m_sheet = localSheet;
+          m_sheet = localSheet.release();
           m_loading = false;
         }
         return !m_isXSL;
@@ -327,7 +327,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
           getDocument()->addPendingSheet();
           if (m_cachedSheet)
             m_cachedSheet->deref(this);
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
           if (m_isXSL)
             m_cachedSheet = getDocument()->docLoader()->requestXSLStyleSheet(
                 getDocument()->completeURL(href));
@@ -337,7 +337,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
                 getDocument()->completeURL(href), QString::null);
           if (m_cachedSheet)
             m_cachedSheet->ref(this);
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
           return !m_isXSL;
 #endif
         }
@@ -363,7 +363,7 @@ void ProcessingInstructionImpl::sheetLoaded() {
 
 void ProcessingInstructionImpl::setStyleSheet(const DOMString& url,
                                               const DOMString& sheet) {
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
   if (m_isXSL)
     m_sheet = new XSLStyleSheetImpl(this, url);
   else

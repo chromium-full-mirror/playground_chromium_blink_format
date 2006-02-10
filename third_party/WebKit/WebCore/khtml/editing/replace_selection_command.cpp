@@ -112,7 +112,7 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
   if (newlineAtEndNode)
     removeNode(newlineAtEndNode);
 
-  PassRefPtr<NodeImpl> holder = insertFragmentForTestRendering();
+  RefPtr<NodeImpl> holder = insertFragmentForTestRendering();
   if (!m_matchStyle)
     computeStylesUsingTestRendering(holder.get());
   removeUnrenderedNodesUsingTestRendering(holder.get());
@@ -226,8 +226,7 @@ PassRefPtr<NodeImpl> ReplacementFragment::insertFragmentForTestRendering() {
   if (!body)
     return 0;
 
-  PassRefPtr<ElementImpl> holder =
-      createDefaultParagraphElement(m_document.get());
+  RefPtr<ElementImpl> holder = createDefaultParagraphElement(m_document.get());
 
   int exceptionCode = 0;
   holder->appendChild(m_fragment.get(), exceptionCode);
@@ -238,7 +237,7 @@ PassRefPtr<NodeImpl> ReplacementFragment::insertFragmentForTestRendering() {
 
   m_document->updateLayoutIgnorePendingStylesheets();
 
-  return holder;
+  return holder.release();
 }
 
 void ReplacementFragment::restoreTestRenderingNodesToFragment(
@@ -808,7 +807,7 @@ void ReplaceSelectionCommand::doApply() {
                                  next->enclosingBlockFlowElement();
         if (!hasTrailingBR) {
           // Insert an "extra" BR at the end of the block.
-          insertNodeBefore(createBreakElement(document()),
+          insertNodeBefore(createBreakElement(document()).get(),
                            m_lastNodeInserted.get());
         }
       }

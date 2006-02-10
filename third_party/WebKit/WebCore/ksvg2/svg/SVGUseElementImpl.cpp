@@ -120,7 +120,7 @@ void SVGUseElementImpl::closeRenderer() {
   int exceptioncode;
   QString trans = QString::fromLatin1("translate(%1, %2)").arg(_x).arg(_y);
   if (target->hasTagName(SVGNames::symbolTag)) {
-    SVGElementImpl* dummy =
+    RefPtr<SVGElementImpl> dummy =
         new SVGSVGElementImpl(SVGNames::svgTag, getDocument());
     if (_w > 0)
       dummy->setAttribute(SVGNames::widthAttr, wString.impl());
@@ -133,20 +133,20 @@ void SVGUseElementImpl::closeRenderer() {
           symbol->getAttribute(SVGNames::viewBoxAttr);
       dummy->setAttribute(SVGNames::viewBoxAttr, symbolViewBox);
     }
-    target->cloneChildNodes(dummy);
+    target->cloneChildNodes(dummy.get());
 
-    SVGElementImpl* dummy2 =
+    RefPtr<SVGElementImpl> dummy2 =
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
     dummy2->setAttribute(SVGNames::transformAttr, KDOM::DOMString(trans));
 
     appendChild(dummy2, exceptioncode);
     dummy2->appendChild(dummy, exceptioncode);
   } else if (target->hasTagName(SVGNames::svgTag)) {
-    SVGDummyElementImpl* dummy =
+    RefPtr<SVGDummyElementImpl> dummy =
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
     dummy->setAttribute(SVGNames::transformAttr, KDOM::DOMString(trans));
 
-    PassRefPtr<SVGElementImpl> root =
+    RefPtr<SVGElementImpl> root =
         static_pointer_cast<SVGElementImpl>(target->cloneNode(true));
     if (hasAttribute(SVGNames::widthAttr))
       root->setAttribute(SVGNames::widthAttr, wString.impl());
@@ -155,16 +155,16 @@ void SVGUseElementImpl::closeRenderer() {
       root->setAttribute(SVGNames::heightAttr, hString.impl());
 
     appendChild(dummy, exceptioncode);
-    dummy->appendChild(root, exceptioncode);
+    dummy->appendChild(root.release(), exceptioncode);
   } else {
-    SVGDummyElementImpl* dummy =
+    RefPtr<SVGDummyElementImpl> dummy =
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
     dummy->setAttribute(SVGNames::transformAttr, trans);
 
-    PassRefPtr<KDOM::NodeImpl> root = target->cloneNode(true);
+    RefPtr<KDOM::NodeImpl> root = target->cloneNode(true);
 
     appendChild(dummy, exceptioncode);
-    dummy->appendChild(root, exceptioncode);
+    dummy->appendChild(root.release(), exceptioncode);
   }
 
   SVGElementImpl::closeRenderer();

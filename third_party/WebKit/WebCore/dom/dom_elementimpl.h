@@ -5,7 +5,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -30,15 +30,13 @@
 #include "NamedNodeMapImpl.h"
 #include "ContainerNodeImpl.h"
 #include "StringImpl.h"
-#include "Shared.h"
-#include "css/css_valueimpl.h"
+#include "css_valueimpl.h"
 #include "dom_qname.h"
+#include "dom_atomicstringlist.h"
 
-#ifdef __OBJC__
+#if __OBJC__
 #define id id_AVOID_KEYWORD
 #endif
-
-#include "dom_atomicstringlist.h"
 
 namespace khtml {
 class CSSStyleSelector;
@@ -46,8 +44,6 @@ class CSSStyleSelector;
 
 namespace DOM {
 
-class AtomicStringList;
-class DocumentImpl;
 class CSSStyleDeclarationImpl;
 class ElementImpl;
 class NamedAttrMapImpl;
@@ -95,7 +91,6 @@ class AttributeImpl : public Shared<AttributeImpl> {
   void setValue(const AtomicString& value) { m_value = value; }
   void setPrefix(const AtomicString& prefix) { m_name.setPrefix(prefix); }
 
- protected:
   QualifiedName m_name;
   AtomicString m_value;
   AttrImpl* m_impl;
@@ -107,52 +102,52 @@ class AttributeImpl : public Shared<AttributeImpl> {
 // resulting nodevalue in the AttributeImpl upon
 // destruction. however, this is not yet implemented.
 class AttrImpl : public ContainerNodeImpl {
-  friend class ElementImpl;
   friend class NamedAttrMapImpl;
 
  public:
-  AttrImpl(ElementImpl* element, DocumentImpl* doc, AttributeImpl* a);
+  AttrImpl(ElementImpl*, DocumentImpl*, AttributeImpl*);
   ~AttrImpl();
 
   // Call this after calling the constructor so the
-  // AttrImpl node isn't floating when we append the text node
+  // AttrImpl node isn't floating when we append the text node.
   void createTextChild();
 
   // DOM methods & attributes for Attr
-  DOMString name() const;
+  DOMString name() const { return qualifiedName().toString(); }
   bool specified() const { return m_specified; }
   ElementImpl* ownerElement() const { return m_element; }
-  AttributeImpl* attrImpl() const { return m_attribute; }
 
-  DOMString value() const;
-  void setValue(const DOMString& v, int& exceptioncode);
+  DOMString value() const { return m_attribute->value(); }
+  void setValue(const DOMString&, ExceptionCode&);
 
-  // DOM methods overridden from  parent classes
+  // DOM methods overridden from parent classes
   virtual DOMString nodeName() const;
   virtual unsigned short nodeType() const;
   virtual const AtomicString& localName() const;
   virtual const AtomicString& namespaceURI() const;
   virtual const AtomicString& prefix() const;
-  virtual void setPrefix(const AtomicString& _prefix, int& exceptioncode);
+  virtual void setPrefix(const AtomicString&, ExceptionCode&);
 
   virtual DOMString nodeValue() const;
-  virtual void setNodeValue(const DOMString&, int& exceptioncode);
+  virtual void setNodeValue(const DOMString&, ExceptionCode&);
   virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
   // Other methods (not part of DOM)
   virtual bool isAttributeNode() const { return true; }
-  virtual bool childAllowed(NodeImpl* newChild);
   virtual bool childTypeAllowed(unsigned short type);
 
   virtual void childrenChanged();
   virtual DOMString toString() const;
 
+  AttributeImpl* attrImpl() const { return m_attribute.get(); }
+  const QualifiedName& qualifiedName() const { return m_attribute->name(); }
+
   // An extension to get presentational information for attributes.
   CSSStyleDeclarationImpl* style() { return m_attribute->style(); }
 
- protected:
+ private:
   ElementImpl* m_element;
-  AttributeImpl* m_attribute;
+  RefPtr<AttributeImpl> m_attribute;
   int m_ignoreChildrenChanged;
 };
 
@@ -161,7 +156,7 @@ class ElementImpl : public ContainerNodeImpl {
   friend class NamedAttrMapImpl;
   friend class AttrImpl;
   friend class NodeImpl;
-  friend class khtml::CSSStyleSelector;
+  friend class CSSStyleSelector;
 
  public:
   ElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
@@ -271,9 +266,8 @@ class ElementImpl : public ContainerNodeImpl {
   virtual QString state() { return QString::null; }
 
   virtual void attach();
-  virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual RenderStyle* styleForRenderer(RenderObject* parent);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
   virtual void mouseEventHandler(MouseEvent* /*ev*/, bool /*inside*/){};
@@ -285,7 +279,7 @@ class ElementImpl : public ContainerNodeImpl {
   void dispatchAttrRemovalEvent(AttributeImpl* attr);
   void dispatchAttrAdditionEvent(AttributeImpl* attr);
 
-  virtual void accessKeyAction(bool sendToAnyEvent){};
+  virtual void accessKeyAction(bool sendToAnyEvent) {}
 
   virtual DOMString toString() const;
 
@@ -294,11 +288,8 @@ class ElementImpl : public ContainerNodeImpl {
   virtual void focus();
   void blur();
 
-#ifndef NDEBUG
+#if !NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
-#endif
-
-#ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 
@@ -374,7 +365,6 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   virtual void clearAttributes();
   void detachFromElement();
 
- protected:
   ElementImpl* element;
   AttributeImpl** attrs;
   uint len;
@@ -506,7 +496,7 @@ class StyledElementImpl : public ElementImpl {
       MappedAttributeImpl* attr,
       int id,
       const DOMString& value,
-      DOM::CSSPrimitiveValue::UnitTypes = DOM::CSSPrimitiveValue::CSS_STRING);
+      CSSPrimitiveValue::UnitTypes = CSSPrimitiveValue::CSS_STRING);
   void addCSSImageProperty(MappedAttributeImpl* attr,
                            int id,
                            const DOMString& URL);
@@ -550,7 +540,7 @@ class StyledElementImpl : public ElementImpl {
   mutable bool m_synchronizingStyleAttribute : 1;
 };
 
-};  // namespace
+}  // namespace
 
 #undef id
 

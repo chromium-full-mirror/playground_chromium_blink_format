@@ -116,7 +116,7 @@ PassRefPtr<RangeImpl> Selection::toRange() const {
   }
 
   int exceptionCode = 0;
-  PassRefPtr<RangeImpl> result(new RangeImpl(s.node()->getDocument()));
+  RefPtr<RangeImpl> result(new RangeImpl(s.node()->getDocument()));
   result->setStart(s.node(), s.offset(), exceptionCode);
   if (exceptionCode) {
     ERROR("Exception setting Range start from Selection: %d", exceptionCode);
@@ -127,7 +127,7 @@ PassRefPtr<RangeImpl> Selection::toRange() const {
     ERROR("Exception setting Range end from Selection: %d", exceptionCode);
     return 0;
   }
-  return result;
+  return result.release();
 }
 
 bool Selection::expandUsingGranularity(ETextGranularity granularity) {

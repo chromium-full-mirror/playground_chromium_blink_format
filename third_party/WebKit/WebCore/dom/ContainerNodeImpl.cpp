@@ -114,6 +114,10 @@ NodeImpl* ContainerNodeImpl::lastChild() const {
 bool ContainerNodeImpl::insertBefore(PassRefPtr<NodeImpl> newChild,
                                      NodeImpl* refChild,
                                      ExceptionCode& ec) {
+  // Check that this node is not "floating".
+  // If it is, it can be deleted as a side effect of sending mutation events.
+  ASSERT(refCount() || parent());
+
   ec = 0;
 
   // insertBefore(node, 0) is equivalent to appendChild(node)
@@ -209,6 +213,10 @@ bool ContainerNodeImpl::insertBefore(PassRefPtr<NodeImpl> newChild,
 bool ContainerNodeImpl::replaceChild(PassRefPtr<NodeImpl> newChild,
                                      NodeImpl* oldChild,
                                      ExceptionCode& ec) {
+  // Check that this node is not "floating".
+  // If it is, it can be deleted as a side effect of sending mutation events.
+  ASSERT(refCount() || parent());
+
   ec = 0;
 
   if (oldChild == newChild)  // nothing to do
@@ -329,6 +337,10 @@ static ExceptionCode willRemoveChild(NodeImpl* child) {
 }
 
 bool ContainerNodeImpl::removeChild(NodeImpl* oldChild, ExceptionCode& ec) {
+  // Check that this node is not "floating".
+  // If it is, it can be deleted as a side effect of sending mutation events.
+  ASSERT(refCount() || parent());
+
   ec = 0;
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
@@ -451,6 +463,10 @@ void ContainerNodeImpl::removeChildren() {
 
 bool ContainerNodeImpl::appendChild(PassRefPtr<NodeImpl> newChild,
                                     ExceptionCode& ec) {
+  // Check that this node is not "floating".
+  // If it is, it can be deleted as a side effect of sending mutation events.
+  ASSERT(refCount() || parent());
+
   ec = 0;
 
   // Make sure adding the new child is ok

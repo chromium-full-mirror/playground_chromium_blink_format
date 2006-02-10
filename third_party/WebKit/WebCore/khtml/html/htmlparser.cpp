@@ -1089,7 +1089,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     blockElem->parentNode()->removeChild(blockElem, exceptionCode);
 
   // Step 2: Clone |residualElem|.
-  PassRefPtr<NodeImpl> newNode = residualElem->cloneNode(
+  RefPtr<NodeImpl> newNode = residualElem->cloneNode(
       false);  // Shallow clone. We don't pick up the same kids.
 
   // Step 3: Place |blockElem|'s children under |newNode|.  Remove all of the
@@ -1107,7 +1107,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   // Step 4: Place |newNode| under |blockElem|.  |blockElem| is still out of the
   // document, so no
   // attachment can occur yet.
-  blockElem->appendChild(newNode, exceptionCode);
+  blockElem->appendChild(newNode.release(), exceptionCode);
 
   // Step 5: Reparent |blockElem|.  Now the full attachment of the fixed up tree
   // takes place.

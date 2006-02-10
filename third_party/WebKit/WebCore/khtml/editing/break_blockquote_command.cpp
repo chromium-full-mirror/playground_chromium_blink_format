@@ -41,7 +41,6 @@ BreakBlockquoteCommand::BreakBlockquoteCommand(DocumentImpl* document)
     : CompositeEditCommand(document) {}
 
 void BreakBlockquoteCommand::doApply() {
-  DOM::ElementImpl* breakNode;
   QPtrList<DOM::NodeImpl> ancestors;
 
   Selection selection = endingSelection();
@@ -69,8 +68,8 @@ void BreakBlockquoteCommand::doApply() {
     return;
 
   // Insert a break after the top blockquote.
-  breakNode = createBreakElement(document());
-  insertNodeAfter(breakNode, topBlockquote);
+  RefPtr<ElementImpl> breakNode = createBreakElement(document());
+  insertNodeAfter(breakNode.get(), topBlockquote);
 
   if (!isLastVisiblePositionInNode(VisiblePosition(pos, affinity),
                                    topBlockquote)) {
@@ -111,7 +110,7 @@ void BreakBlockquoteCommand::doApply() {
 
     // Insert a clone of the top blockquote after the break.
     RefPtr<NodeImpl> clonedBlockquote = topBlockquote->cloneNode(false);
-    insertNodeAfter(clonedBlockquote.get(), breakNode);
+    insertNodeAfter(clonedBlockquote.get(), breakNode.get());
 
     // Clone startNode's ancestors into the cloned blockquote.
     // On exiting this loop, clonedAncestor is the lowest ancestor
@@ -161,7 +160,7 @@ void BreakBlockquoteCommand::doApply() {
   }
 
   // Put the selection right before the break.
-  setEndingSelection(Position(breakNode, 0), DOWNSTREAM);
+  setEndingSelection(Position(breakNode.get(), 0), DOWNSTREAM);
   rebalanceWhitespace();
 }
 
