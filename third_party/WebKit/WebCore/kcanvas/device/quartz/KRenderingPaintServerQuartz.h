@@ -30,6 +30,8 @@
 #import <kcanvas/device/KRenderingPaintServerPattern.h>
 #import <kcanvas/device/KRenderingPaintServerGradient.h>
 
+namespace WebCore {
+
 class KCanvasImage;
 
 class KRenderingPaintServerQuartzHelper {
@@ -47,10 +49,10 @@ class KRenderingPaintServerSolidQuartz : public KRenderingPaintServerSolid {
                     const RenderPath*,
                     KCPaintTargetType) const;
   virtual bool setup(KRenderingDeviceContext*,
-                     const WebCore::RenderObject*,
+                     const RenderObject*,
                      KCPaintTargetType) const;
   virtual void teardown(KRenderingDeviceContext*,
-                        const WebCore::RenderObject*,
+                        const RenderObject*,
                         KCPaintTargetType) const;
 
  protected:
@@ -66,10 +68,10 @@ class KRenderingPaintServerPatternQuartz : public KRenderingPaintServerPattern {
                     const RenderPath*,
                     KCPaintTargetType) const;
   virtual bool setup(KRenderingDeviceContext*,
-                     const WebCore::RenderObject*,
+                     const RenderObject*,
                      KCPaintTargetType) const;
   virtual void teardown(KRenderingDeviceContext*,
-                        const WebCore::RenderObject*,
+                        const RenderObject*,
                         KCPaintTargetType) const;
 
  protected:
@@ -103,11 +105,11 @@ class KRenderingPaintServerGradientQuartz {
             KCPaintTargetType) const;
   bool setup(const KRenderingPaintServerGradient* server,
              KRenderingDeviceContext*,
-             const WebCore::RenderObject*,
+             const RenderObject*,
              KCPaintTargetType) const;
   void teardown(const KRenderingPaintServerGradient* server,
                 KRenderingDeviceContext*,
-                const WebCore::RenderObject*,
+                const RenderObject*,
                 KCPaintTargetType) const;
   void renderPath(const KRenderingPaintServerGradient* server,
                   KRenderingDeviceContext*,
@@ -137,13 +139,13 @@ class KRenderingPaintServerLinearGradientQuartz
     KRenderingPaintServerGradientQuartz::draw(this, context, renderPath, type);
   }
   virtual bool setup(KRenderingDeviceContext* context,
-                     const WebCore::RenderObject* renderObject,
+                     const RenderObject* renderObject,
                      KCPaintTargetType type) const {
     return KRenderingPaintServerGradientQuartz::setup(this, context,
                                                       renderObject, type);
   }
   virtual void teardown(KRenderingDeviceContext* context,
-                        const WebCore::RenderObject* renderObject,
+                        const RenderObject* renderObject,
                         KCPaintTargetType type) const {
     KRenderingPaintServerGradientQuartz::teardown(this, context, renderObject,
                                                   type);
@@ -168,13 +170,13 @@ class KRenderingPaintServerRadialGradientQuartz
     KRenderingPaintServerGradientQuartz::draw(this, context, renderPath, type);
   }
   virtual bool setup(KRenderingDeviceContext* context,
-                     const WebCore::RenderObject* renderObject,
+                     const RenderObject* renderObject,
                      KCPaintTargetType type) const {
     return KRenderingPaintServerGradientQuartz::setup(this, context,
                                                       renderObject, type);
   }
   virtual void teardown(KRenderingDeviceContext* context,
-                        const WebCore::RenderObject* renderObject,
+                        const RenderObject* renderObject,
                         KCPaintTargetType type) const {
     KRenderingPaintServerGradientQuartz::teardown(this, context, renderObject,
                                                   type);
@@ -186,3 +188,4 @@ class KRenderingPaintServerRadialGradientQuartz
                                                     type);
   }
 };
+}

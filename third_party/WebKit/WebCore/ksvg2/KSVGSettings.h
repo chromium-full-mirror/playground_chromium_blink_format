@@ -26,11 +26,11 @@
 
 #include <kdom/KDOMSettings.h>
 
-namespace KSVG {
+namespace WebCore {
 /**
  * Settings for the SVG view.
  */
-class KSVGSettings : public KDOM::KDOMSettings {
+class KSVGSettings : public KDOMSettings {
  public:
   KSVGSettings();
   KSVGSettings(const KSVGSettings& other);

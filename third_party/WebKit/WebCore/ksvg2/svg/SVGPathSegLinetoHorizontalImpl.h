@@ -26,7 +26,7 @@
 
 #include <ksvg2/svg/SVGPathSegImpl.h>
 
-namespace KSVG {
+namespace WebCore {
 class SVGPathSegLinetoHorizontalAbsImpl : public SVGPathSegImpl {
  public:
   SVGPathSegLinetoHorizontalAbsImpl(const SVGStyledElementImpl* context = 0);
@@ -35,8 +35,8 @@ class SVGPathSegLinetoHorizontalAbsImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_ABS;
   }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("H");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("H");
   }
   virtual QString toString() const {
     return QString::fromLatin1("H %1").arg(m_x);
@@ -57,8 +57,8 @@ class SVGPathSegLinetoHorizontalRelImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_HORIZONTAL_REL;
   }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("h");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("h");
   }
   virtual QString toString() const {
     return QString::fromLatin1("h %1").arg(m_x);

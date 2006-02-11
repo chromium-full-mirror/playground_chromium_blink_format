@@ -26,11 +26,11 @@
 
 #include <QString.h>
 
-namespace KDOM {
+namespace WebCore {
 class MappedAttributeImpl;
 };
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedStringImpl;
 
 class SVGURIReferenceImpl {
@@ -41,7 +41,7 @@ class SVGURIReferenceImpl {
   // 'SVGURIReference' functions
   virtual SVGAnimatedStringImpl* href() const;
 
-  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  bool parseMappedAttribute(MappedAttributeImpl* attr);
 
   // Helpers
   static QString getTarget(const QString& url);

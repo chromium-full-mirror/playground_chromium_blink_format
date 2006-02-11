@@ -29,7 +29,7 @@
 #include "SVGStringListImpl.h"
 #include "SVGExternalResourcesRequiredImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 enum EFillMode { FILL_REMOVE = 0, FILL_FREEZE };
 
 enum EAdditiveMode { ADDITIVE_REPLACE = 0, ADDITIVE_SUM };
@@ -63,8 +63,7 @@ class SVGAnimationElementImpl : public SVGElementImpl,
                                 public SVGTestsImpl,
                                 public SVGExternalResourcesRequiredImpl {
  public:
-  SVGAnimationElementImpl(const KDOM::QualifiedName& tagName,
-                          KDOM::DocumentImpl* doc);
+  SVGAnimationElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGAnimationElementImpl();
 
   // 'SVGAnimationElement' functions
@@ -77,8 +76,8 @@ class SVGAnimationElementImpl : public SVGElementImpl,
   double getCurrentTime() const;
   double getSimpleDuration() const;
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return false; }
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
   virtual void closeRenderer();
 
@@ -87,12 +86,12 @@ class SVGAnimationElementImpl : public SVGElementImpl,
 
   double parseClockValue(const QString& data) const;
 
-  KDOM::DOMString targetAttribute() const;
-  void setTargetAttribute(KDOM::DOMStringImpl* value);
+  DOMString targetAttribute() const;
+  void setTargetAttribute(DOMStringImpl* value);
 
   static void setTargetAttribute(SVGElementImpl* target,
-                                 KDOM::DOMStringImpl* name,
-                                 KDOM::DOMStringImpl* value,
+                                 DOMStringImpl* name,
+                                 DOMStringImpl* value,
                                  EAttributeType type = ATTRIBUTETYPE_AUTO);
 
   QString attributeName() const;

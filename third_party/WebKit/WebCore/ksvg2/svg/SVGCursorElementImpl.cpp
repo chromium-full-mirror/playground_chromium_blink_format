@@ -33,15 +33,15 @@
 #include "SVGAnimatedLengthImpl.h"
 #include "SVGAnimatedStringImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGCursorElementImpl::SVGCursorElementImpl(const KDOM::QualifiedName& tagName,
-                                           KDOM::DocumentImpl* doc)
+SVGCursorElementImpl::SVGCursorElementImpl(const QualifiedName& tagName,
+                                           DocumentImpl* doc)
     : SVGElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGExternalResourcesRequiredImpl(),
       SVGURIReferenceImpl(),
-      KDOM::CachedObjectClient() {
+      CachedObjectClient() {
   m_cachedImage = 0;
 }
 
@@ -62,9 +62,8 @@ SVGAnimatedLengthImpl* SVGCursorElementImpl::y() const {
       LM_HEIGHT, viewportElement());
 }
 
-void SVGCursorElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+void SVGCursorElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)

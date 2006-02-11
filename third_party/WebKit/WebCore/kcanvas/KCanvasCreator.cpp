@@ -32,6 +32,8 @@
 #include "KRenderingDevice.h"
 #include "KCanvasContainer.h"
 
+namespace WebCore {
+
 KCanvasCreator* KCanvasCreator::s_creator = 0;
 
 KCanvasCreator::KCanvasCreator() {}
@@ -163,6 +165,7 @@ KCanvasPath* KCanvasCreator::createLine(float x1,
   path->moveTo(x1, y1);
   path->lineTo(x2, y2);
   return path;
+}
 }
 
 // vim:ts=4:noet

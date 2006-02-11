@@ -26,15 +26,15 @@
 
 #include "SVGPathSegImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGPathSegArcAbsImpl : public SVGPathSegImpl {
  public:
   SVGPathSegArcAbsImpl(const SVGStyledElementImpl* context = 0);
   virtual ~SVGPathSegArcAbsImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_ABS; }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("A");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("A");
   }
   virtual QString toString() const {
     return QString::fromLatin1("A %1 %2 %3 %4 %5 %6 %7")
@@ -85,8 +85,8 @@ class SVGPathSegArcRelImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegArcRelImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_REL; }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("a");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("a");
   }
   virtual QString toString() const {
     return QString::fromLatin1("a %1 %2 %3 %4 %5 %6 %7")

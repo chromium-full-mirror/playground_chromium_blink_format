@@ -28,7 +28,7 @@
 #include "SVGSVGElementImpl.h"
 #include "SVGLengthListImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGLengthListImpl::SVGLengthListImpl(const SVGStyledElementImpl* context)
     : SVGList<SVGLengthImpl>(context) {}
@@ -41,7 +41,7 @@ void SVGLengthListImpl::parse(const QString& value,
   QStringList lengths = QStringList::split(' ', value);
   for (unsigned int i = 0; i < lengths.count(); i++) {
     SVGLengthImpl* length = new SVGLengthImpl(context, mode);
-    KDOM::DOMString str(lengths[i]);
+    DOMString str(lengths[i]);
     length->setValueAsString(str.impl());
     appendItem(length);
   }

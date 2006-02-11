@@ -28,8 +28,8 @@
 
 #include "SVGList.h"
 
-namespace KSVG {
-class SVGStringListImpl : public SVGList<KDOM::DOMStringImpl> {
+namespace WebCore {
+class SVGStringListImpl : public SVGList<DOMStringImpl> {
  public:
   SVGStringListImpl(const SVGStyledElementImpl* context = 0);
   virtual ~SVGStringListImpl();

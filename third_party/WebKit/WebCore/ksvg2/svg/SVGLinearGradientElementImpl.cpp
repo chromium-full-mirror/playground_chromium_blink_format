@@ -42,11 +42,11 @@
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingPaintServerGradient.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGLinearGradientElementImpl::SVGLinearGradientElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGGradientElementImpl(tagName, doc) {}
 
 SVGLinearGradientElementImpl::~SVGLinearGradientElementImpl() {}
@@ -84,8 +84,8 @@ SVGAnimatedLengthImpl* SVGLinearGradientElementImpl::y2() const {
 }
 
 void SVGLinearGradientElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+    MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::x1Attr)
     x1()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::y1Attr)
@@ -120,7 +120,7 @@ void SVGLinearGradientElementImpl::buildGradient(
     mat = KCanvasMatrix(
         gradientTransform()->baseVal()->consolidate()->matrix()->qmatrix());
 
-  QString ref = KDOM::DOMString(href()->baseVal()).qstring();
+  QString ref = DOMString(href()->baseVal()).qstring();
   KRenderingPaintServer* pserver =
       getPaintServerById(getDocument(), ref.mid(1));
 

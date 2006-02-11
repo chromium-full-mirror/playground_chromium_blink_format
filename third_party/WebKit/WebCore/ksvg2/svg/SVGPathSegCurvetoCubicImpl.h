@@ -26,7 +26,7 @@
 
 #include "SVGPathSegImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGPathSegCurvetoCubicAbsImpl : public SVGPathSegImpl {
  public:
   SVGPathSegCurvetoCubicAbsImpl(const SVGStyledElementImpl* context = 0);
@@ -35,8 +35,8 @@ class SVGPathSegCurvetoCubicAbsImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_ABS;
   }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("C");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("C");
   }
   virtual QString toString() const {
     return QString::fromLatin1("C %1 %2 %3 %4 %5 %6")
@@ -83,8 +83,8 @@ class SVGPathSegCurvetoCubicRelImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_CUBIC_REL;
   }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("c");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("c");
   }
   virtual QString toString() const {
     return QString::fromLatin1("c %1 %2 %3 %4 %5 %6")

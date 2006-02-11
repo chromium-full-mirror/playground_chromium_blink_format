@@ -29,7 +29,7 @@
 #include "SVGLangSpaceImpl.h"
 #include "SVGExternalResourcesRequiredImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGRectImpl;
 class SVGPointImpl;
 class SVGAnimatedLengthImpl;
@@ -40,8 +40,7 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
                                   public SVGLangSpaceImpl,
                                   public SVGExternalResourcesRequiredImpl {
  public:
-  SVGTextContentElementImpl(const KDOM::QualifiedName& tagName,
-                            KDOM::DocumentImpl* doc);
+  SVGTextContentElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGTextContentElementImpl();
 
   virtual bool isValid() const { return SVGTestsImpl::isValid(); }
@@ -60,7 +59,7 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
   long getCharNumAtPosition(SVGPointImpl* point) const;
   void selectSubString(unsigned long charnum, unsigned long nchars) const;
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
  private:
   mutable RefPtr<SVGAnimatedLengthImpl> m_textLength;

@@ -43,11 +43,11 @@
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingPaintServerGradient.h>
 
-using namespace KSVG;
+namespace WebCore {
 
 SVGRadialGradientElementImpl::SVGRadialGradientElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGGradientElementImpl(tagName, doc) {}
 
 SVGRadialGradientElementImpl::~SVGRadialGradientElementImpl() {}
@@ -97,8 +97,8 @@ SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::r() const {
 }
 
 void SVGRadialGradientElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+    MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::cxAttr)
     cx()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::cyAttr)
@@ -138,7 +138,7 @@ void SVGRadialGradientElementImpl::buildGradient(
     mat = KCanvasMatrix(
         gradientTransform()->baseVal()->consolidate()->matrix()->qmatrix());
 
-  QString ref = KDOM::DOMString(href()->baseVal()).qstring();
+  QString ref = DOMString(href()->baseVal()).qstring();
   KRenderingPaintServer* pserver =
       getPaintServerById(getDocument(), ref.mid(1));
 
@@ -215,6 +215,7 @@ void SVGRadialGradientElementImpl::buildGradient(
   grad->setGradientCenter(FloatPoint(_cx, _cy));
   grad->setGradientFocal(FloatPoint(_fx, _fy));
   grad->setGradientRadius(_r);
+}
 }
 
 // vim:ts=4:noet

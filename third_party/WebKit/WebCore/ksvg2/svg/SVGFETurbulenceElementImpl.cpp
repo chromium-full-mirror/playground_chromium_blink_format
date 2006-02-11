@@ -41,11 +41,11 @@
 #include "SVGAnimatedIntegerImpl.h"
 #include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGFETurbulenceElementImpl::SVGFETurbulenceElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_filterEffect = 0;
 }
@@ -85,8 +85,8 @@ SVGAnimatedEnumerationImpl* SVGFETurbulenceElementImpl::type() const {
 }
 
 void SVGFETurbulenceElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "fractalNoise")
       type()->setBaseVal(SVG_TURBULENCE_TYPE_FRACTALNOISE);

@@ -27,15 +27,15 @@
 #include "SVGElementImpl.h"
 #include "KCanvasFilters.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedNumberImpl;
 class SVGAnimatedNumberListImpl;
 class SVGAnimatedEnumerationImpl;
 
 class SVGComponentTransferFunctionElementImpl : public SVGElementImpl {
  public:
-  SVGComponentTransferFunctionElementImpl(const KDOM::QualifiedName& tagName,
-                                          KDOM::DocumentImpl* doc);
+  SVGComponentTransferFunctionElementImpl(const QualifiedName& tagName,
+                                          DocumentImpl* doc);
   virtual ~SVGComponentTransferFunctionElementImpl();
 
   // 'SVGComponentTransferFunctionElement' functions
@@ -48,7 +48,7 @@ class SVGComponentTransferFunctionElementImpl : public SVGElementImpl {
   SVGAnimatedNumberImpl* offset() const;
 
   // Derived from: 'ElementImpl'
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   KCComponentTransferFunction transferFunction() const;
 

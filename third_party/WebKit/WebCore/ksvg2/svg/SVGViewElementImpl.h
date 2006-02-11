@@ -29,18 +29,17 @@
 #include "SVGFitToViewBoxImpl.h"
 #include "SVGZoomAndPanImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGStringListImpl;
 class SVGViewElementImpl : public SVGStyledElementImpl,
                            public SVGExternalResourcesRequiredImpl,
                            public SVGFitToViewBoxImpl,
                            public SVGZoomAndPanImpl {
  public:
-  SVGViewElementImpl(const KDOM::QualifiedName& tagName,
-                     KDOM::DocumentImpl* doc);
+  SVGViewElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGViewElementImpl();
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   // 'SVGViewElement' functions
   SVGStringListImpl* viewTarget() const;

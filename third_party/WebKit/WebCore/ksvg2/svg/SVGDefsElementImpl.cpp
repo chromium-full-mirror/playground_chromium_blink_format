@@ -24,10 +24,10 @@
 #if SVG_SUPPORT
 #include "SVGDefsElementImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGDefsElementImpl::SVGDefsElementImpl(const KDOM::QualifiedName& tagName,
-                                       KDOM::DocumentImpl* doc)
+SVGDefsElementImpl::SVGDefsElementImpl(const QualifiedName& tagName,
+                                       DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),

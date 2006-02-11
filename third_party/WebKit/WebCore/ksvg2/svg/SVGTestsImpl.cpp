@@ -33,7 +33,7 @@
 #include "SVGStringListImpl.h"
 #include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGTestsImpl::SVGTestsImpl() {}
 
@@ -51,14 +51,14 @@ SVGStringListImpl* SVGTestsImpl::systemLanguage() const {
   return lazy_create<SVGStringListImpl>(m_systemLanguage);
 }
 
-bool SVGTestsImpl::hasExtension(KDOM::DOMStringImpl*) const {
+bool SVGTestsImpl::hasExtension(DOMStringImpl*) const {
   return false;
 }
 
 bool SVGTestsImpl::isValid() const {
   SVGStringListImpl* list = requiredFeatures();
   for (unsigned long i = 0; i < list->numberOfItems(); i++) {
-    KDOM::DOMString value = KDOM::DOMString(list->getItem(i));
+    DOMString value = DOMString(list->getItem(i));
     if (value.isEmpty() ||
         !SVGDOMImplementationImpl::self()->hasFeature(value.impl(), 0))
       return false;
@@ -66,7 +66,7 @@ bool SVGTestsImpl::isValid() const {
 
   list = systemLanguage();
   for (unsigned long i = 0; i < list->numberOfItems(); i++) {
-    KDOM::DOMString value = KDOM::DOMString(list->getItem(i));
+    DOMString value = DOMString(list->getItem(i));
     if (value.isEmpty() || value.qstring() != (KLocale::language()).left(2))
       return false;
   }
@@ -78,8 +78,8 @@ bool SVGTestsImpl::isValid() const {
   return true;
 }
 
-bool SVGTestsImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+bool SVGTestsImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::requiredFeaturesAttr) {
     requiredFeatures()->reset(value.qstring());
     return true;

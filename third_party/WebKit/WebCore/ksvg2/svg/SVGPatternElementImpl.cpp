@@ -48,10 +48,10 @@
 #include "SVGAnimatedEnumerationImpl.h"
 #include "SVGAnimatedTransformListImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGPatternElementImpl::SVGPatternElementImpl(const KDOM::QualifiedName& tagName,
-                                             KDOM::DocumentImpl* doc)
+SVGPatternElementImpl::SVGPatternElementImpl(const QualifiedName& tagName,
+                                             DocumentImpl* doc)
     : SVGStyledLocatableElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGTestsImpl(),
@@ -110,9 +110,8 @@ SVGAnimatedTransformListImpl* SVGPatternElementImpl::patternTransform() const {
   return lazy_create<SVGAnimatedTransformListImpl>(m_patternTransform, this);
 }
 
-void SVGPatternElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+void SVGPatternElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::patternUnitsAttr) {
     if (value == "userSpaceOnUse")
       patternUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -171,7 +170,7 @@ void SVGPatternElementImpl::resourceNotification() const {
 void SVGPatternElementImpl::fillAttributesFromReferencePattern(
     const SVGPatternElementImpl* target,
     KCanvasMatrix& patternTransformMatrix) const {
-  QString ref = KDOM::DOMString(href()->baseVal()).qstring();
+  QString ref = DOMString(href()->baseVal()).qstring();
   KRenderingPaintServer* refServer =
       getPaintServerById(getDocument(), ref.mid(1));
 
@@ -182,7 +181,7 @@ void SVGPatternElementImpl::fillAttributesFromReferencePattern(
       static_cast<KRenderingPaintServerPattern*>(refServer);
 
   if (!hasAttribute(SVGNames::patternUnitsAttr)) {
-    const KDOM::AtomicString& value =
+    const AtomicString& value =
         target->getAttribute(SVGNames::patternUnitsAttr);
     if (value == "userSpaceOnUse")
       patternUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -191,7 +190,7 @@ void SVGPatternElementImpl::fillAttributesFromReferencePattern(
   }
 
   if (!hasAttribute(SVGNames::patternContentUnitsAttr)) {
-    const KDOM::AtomicString& value =
+    const AtomicString& value =
         target->getAttribute(SVGNames::patternContentUnitsAttr);
     if (value == "userSpaceOnUse")
       patternContentUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -240,12 +239,12 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
   m_paintServer->setPatternTransform(patternTransformMatrix);
   m_paintServer->setTile(m_tile);
 
-  for (KDOM::NodeImpl* n = target->firstChild(); n != 0; n = n->nextSibling()) {
+  for (NodeImpl* n = target->firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* elem = svg_dynamic_cast(n);
     if (!elem || !elem->isStyled())
       continue;
     SVGStyledElementImpl* e = static_cast<SVGStyledElementImpl*>(elem);
-    khtml::RenderObject* item = e->renderer();
+    RenderObject* item = e->renderer();
     if (!item)
       continue;
 #if 0
@@ -281,8 +280,7 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
 #endif
 
     QPainter p;
-    khtml::RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground,
-                                        0);
+    RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground, 0);
     item->paint(info, 0, 0);
 #if 0
         if(savedContext)
@@ -341,10 +339,10 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
 
   // Find first pattern def that has children
   const SVGPatternElementImpl* target = this;
-  const KDOM::NodeImpl* test = this;
+  const NodeImpl* test = this;
   while (test && !test->hasChildNodes()) {
-    QString ref = KDOM::DOMString(target->href()->baseVal()).qstring();
-    test = ownerDocument()->getElementById(KDOM::DOMString(ref.mid(1)).impl());
+    QString ref = DOMString(target->href()->baseVal()).qstring();
+    test = ownerDocument()->getElementById(DOMString(ref.mid(1)).impl());
     if (test && test->hasTagName(SVGNames::patternTag))
       target = static_cast<const SVGPatternElementImpl*>(test);
   }
@@ -369,9 +367,8 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
   m_ignoreAttributeChanges = false;
 }
 
-khtml::RenderObject* SVGPatternElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGPatternElementImpl::createRenderer(RenderArena* arena,
+                                                    RenderStyle* style) {
   KCanvasContainer* patternContainer =
       QPainter::renderingDevice()->createContainer(arena, style, this);
   patternContainer->setDrawsContents(false);

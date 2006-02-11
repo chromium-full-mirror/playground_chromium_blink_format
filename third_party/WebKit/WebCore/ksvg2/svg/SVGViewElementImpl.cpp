@@ -33,10 +33,10 @@
 #include "SVGFitToViewBoxImpl.h"
 #include "SVGZoomAndPanImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGViewElementImpl::SVGViewElementImpl(const KDOM::QualifiedName& tagName,
-                                       KDOM::DocumentImpl* doc)
+SVGViewElementImpl::SVGViewElementImpl(const QualifiedName& tagName,
+                                       DocumentImpl* doc)
     : SVGStyledElementImpl(tagName, doc),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl(),
@@ -48,8 +48,8 @@ SVGStringListImpl* SVGViewElementImpl::viewTarget() const {
   return lazy_create<SVGStringListImpl>(m_viewTarget);
 }
 
-void SVGViewElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGViewElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::viewTargetAttr) {
     viewTarget()->reset(value.qstring());
   } else {

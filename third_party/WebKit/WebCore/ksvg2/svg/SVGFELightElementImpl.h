@@ -26,15 +26,14 @@
 #include "SVGElementImpl.h"
 #include "KCanvasFilters.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedNumberImpl;
 class SVGAnimatedNumberListImpl;
 class SVGAnimatedEnumerationImpl;
 
 class SVGFELightElementImpl : public SVGElementImpl {
  public:
-  SVGFELightElementImpl(const KDOM::QualifiedName& tagName,
-                        KDOM::DocumentImpl* doc);
+  SVGFELightElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGFELightElementImpl();
 
   // 'SVGComponentTransferFunctionElement' functions
@@ -52,7 +51,7 @@ class SVGFELightElementImpl : public SVGElementImpl {
   virtual KCLightSource* lightSource() const = 0;
 
   // Derived from: 'ElementImpl'
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
  private:
   mutable RefPtr<SVGAnimatedNumberImpl> m_azimuth;

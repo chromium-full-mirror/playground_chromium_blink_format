@@ -28,11 +28,11 @@
 #include "SVGFEMergeNodeElementImpl.h"
 #include "SVGAnimatedStringImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGFEMergeNodeElementImpl::SVGFEMergeNodeElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGElementImpl(tagName, doc) {}
 
 SVGFEMergeNodeElementImpl::~SVGFEMergeNodeElementImpl() {}
@@ -43,8 +43,8 @@ SVGAnimatedStringImpl* SVGFEMergeNodeElementImpl::in1() const {
 }
 
 void SVGFEMergeNodeElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::inAttr)
     in1()->setBaseVal(value.impl());
   else

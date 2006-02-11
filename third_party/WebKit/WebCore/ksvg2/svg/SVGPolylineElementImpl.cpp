@@ -29,11 +29,10 @@
 #include <kcanvas/KCanvasCreator.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGPolylineElementImpl::SVGPolylineElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+SVGPolylineElementImpl::SVGPolylineElementImpl(const QualifiedName& tagName,
+                                               DocumentImpl* doc)
     : SVGPolyElementImpl(tagName, doc) {}
 
 SVGPolylineElementImpl::~SVGPolylineElementImpl() {}

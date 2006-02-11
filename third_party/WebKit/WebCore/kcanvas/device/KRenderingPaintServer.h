@@ -27,26 +27,26 @@
 
 #include <kcanvas/KCanvasResources.h>
 
+class QTextStream;
+
+namespace WebCore {
+
 // Enumerations
-typedef enum {
+enum KCPaintServerType {
   // Painting mode
   PS_SOLID = 0,
   PS_PATTERN = 1,
   PS_LINEAR_GRADIENT = 2,
   PS_RADIAL_GRADIENT = 3
-} KCPaintServerType;
+};
 
-typedef enum {
+enum KCPaintTargetType {
   // Target mode
   APPLY_TO_FILL = 1,
   APPLY_TO_STROKE = 2
-} KCPaintTargetType;
+};
 
-namespace WebCore {
 class RenderStyle;
-}
-
-class QTextStream;
 class RenderPath;
 class KRenderingDeviceContext;
 class KRenderingPaintServer : public KCanvasResource {
@@ -71,10 +71,10 @@ class KRenderingPaintServer : public KCanvasResource {
                     KCPaintTargetType) const = 0;
 
   virtual bool setup(KRenderingDeviceContext*,
-                     const WebCore::RenderObject*,
+                     const RenderObject*,
                      KCPaintTargetType) const = 0;
   virtual void teardown(KRenderingDeviceContext*,
-                        const WebCore::RenderObject*,
+                        const RenderObject*,
                         KCPaintTargetType) const = 0;
 
   bool isPaintingText() const { return m_paintingText; }
@@ -91,8 +91,9 @@ class KRenderingPaintServer : public KCanvasResource {
   QString m_registryId;
   bool m_paintingText;
 };
+}
 
-QTextStream& operator<<(QTextStream&, const KRenderingPaintServer&);
+QTextStream& operator<<(QTextStream&, const WebCore::KRenderingPaintServer&);
 
 #endif  // SVG_SUPPORT
 #endif

@@ -33,7 +33,7 @@
 #include "SVGRenderStyle.h"
 #include "SVGRenderStyleDefs.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 StyleFillData::StyleFillData() : Shared<StyleFillData>() {
   paint = SVGRenderStyle::initialFillPaint();
@@ -150,8 +150,8 @@ bool StyleMarkerData::operator==(const StyleMarkerData& other) const {
 }
 
 StyleMiscData::StyleMiscData() : Shared<StyleMiscData>() {
-  floodColor = khtml::RenderStyle::initialColor();
-  floodOpacity = khtml::RenderStyle::initialOpacity();
+  floodColor = RenderStyle::initialColor();
+  floodOpacity = RenderStyle::initialOpacity();
 }
 
 StyleMiscData::StyleMiscData(const StyleMiscData& other)

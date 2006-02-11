@@ -30,6 +30,8 @@
 #include <qtextstream.h>
 #include "KCanvasTreeDebug.h"
 
+namespace WebCore {
+
 // KCGradientSpreadMethod
 QTextStream& operator<<(QTextStream& ts, KCGradientSpreadMethod m) {
   switch (m) {
@@ -254,6 +256,7 @@ QTextStream& KRenderingPaintServerRadialGradient::externalRepresentation(
      << " [focal=" << gradientFocal() << "]"
      << " [radius=" << gradientRadius() << "]";
   return ts;
+}
 }
 
 // vim:ts=4:noet

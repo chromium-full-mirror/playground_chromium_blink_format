@@ -31,11 +31,11 @@
 #include "SVGAnimatedLengthListImpl.h"
 #include "SVGAnimatedNumberListImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGTextPositioningElementImpl::SVGTextPositioningElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGTextContentElementImpl(tagName, doc) {}
 
 SVGTextPositioningElementImpl::~SVGTextPositioningElementImpl() {}
@@ -61,8 +61,8 @@ SVGAnimatedNumberListImpl* SVGTextPositioningElementImpl::rotate() const {
 }
 
 void SVGTextPositioningElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
 
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->parse(value.qstring(), this, LM_WIDTH);

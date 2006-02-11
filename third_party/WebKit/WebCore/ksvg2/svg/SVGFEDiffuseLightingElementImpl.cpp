@@ -38,11 +38,11 @@
 #include "SVGDOMImplementationImpl.h"
 #include "SVGFEDiffuseLightingElementImpl.h"
 
-using namespace KSVG;
+namespace WebCore {
 
 SVGFEDiffuseLightingElementImpl::SVGFEDiffuseLightingElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_filterEffect = 0;
 }
@@ -85,8 +85,8 @@ SVGAnimatedColorImpl* SVGFEDiffuseLightingElementImpl::lightingColor() const {
 }
 
 void SVGFEDiffuseLightingElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::inAttr)
     in1()->setBaseVal(value.impl());
   else if (attr->name() == SVGNames::surfaceScaleAttr)
@@ -111,7 +111,7 @@ KCanvasFEDiffuseLighting* SVGFEDiffuseLightingElementImpl::filterEffect()
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEDiffuseLighting*>(
         QPainter::renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
-  m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());
+  m_filterEffect->setIn(DOMString(in1()->baseVal()).qstring());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setDiffuseConstant((diffuseConstant()->baseVal()));
   m_filterEffect->setSurfaceScale((surfaceScale()->baseVal()));
@@ -127,7 +127,7 @@ void SVGFEDiffuseLightingElementImpl::updateLights() const {
     return;
 
   KCLightSource* light = 0;
-  for (KDOM::NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+  for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feDistantLightTag) ||
         n->hasTagName(SVGNames::fePointLightTag) ||
         n->hasTagName(SVGNames::feSpotLightTag)) {
@@ -138,4 +138,6 @@ void SVGFEDiffuseLightingElementImpl::updateLights() const {
   }
   m_filterEffect->setLightSource(light);
 }
+}
+
 #endif  // SVG_SUPPORT

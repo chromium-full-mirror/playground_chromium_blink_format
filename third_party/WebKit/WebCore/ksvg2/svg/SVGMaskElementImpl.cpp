@@ -39,10 +39,10 @@
 #include "SVGMaskElementImpl.h"
 #include "SVGAnimatedLengthImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 
-SVGMaskElementImpl::SVGMaskElementImpl(const KDOM::QualifiedName& tagName,
-                                       KDOM::DocumentImpl* doc)
+SVGMaskElementImpl::SVGMaskElementImpl(const QualifiedName& tagName,
+                                       DocumentImpl* doc)
     : SVGStyledLocatableElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGTestsImpl(),
@@ -75,7 +75,7 @@ SVGAnimatedLengthImpl* SVGMaskElementImpl::height() const {
                                             viewportElement());
 }
 
-void SVGMaskElementImpl::attributeChanged(KDOM::AttributeImpl* attr,
+void SVGMaskElementImpl::attributeChanged(AttributeImpl* attr,
                                           bool preserveDecls) {
   IntSize newSize = IntSize(lroundf(width()->baseVal()->value()),
                             lroundf(height()->baseVal()->value()));
@@ -89,8 +89,8 @@ void SVGMaskElementImpl::childrenChanged() {
   SVGStyledLocatableElementImpl::childrenChanged();
 }
 
-void SVGMaskElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGMaskElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)
@@ -131,7 +131,7 @@ KCanvasImage* SVGMaskElementImpl::drawMaskerContent() {
 
   KCanvasContainer* maskContainer = static_cast<KCanvasContainer*>(renderer());
   QPainter p;
-  khtml::RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground, 0);
+  RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground, 0);
   maskContainer->setDrawsContents(true);
   maskContainer->paint(info, 0, 0);
   maskContainer->setDrawsContents(false);
@@ -142,9 +142,8 @@ KCanvasImage* SVGMaskElementImpl::drawMaskerContent() {
   return maskImage;
 }
 
-khtml::RenderObject* SVGMaskElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGMaskElementImpl::createRenderer(RenderArena* arena,
+                                                 RenderStyle* style) {
   KCanvasContainer* maskContainer =
       QPainter::renderingDevice()->createContainer(arena, style, this);
   maskContainer->setDrawsContents(false);

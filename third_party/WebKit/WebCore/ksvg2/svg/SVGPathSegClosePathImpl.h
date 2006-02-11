@@ -26,15 +26,15 @@
 
 #include <ksvg2/svg/SVGPathSegImpl.h>
 
-namespace KSVG {
+namespace WebCore {
 class SVGPathSegClosePathImpl : public SVGPathSegImpl {
  public:
   SVGPathSegClosePathImpl();
   virtual ~SVGPathSegClosePathImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_CLOSEPATH; }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("Z");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("Z");
   }
   virtual QString toString() const { return QString::fromLatin1("Z"); }
 };

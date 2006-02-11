@@ -41,10 +41,10 @@
 #include "SVGAElementImpl.h"
 #include "SVGAnimatedStringImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGAElementImpl::SVGAElementImpl(const KDOM::QualifiedName& tagName,
-                                 KDOM::DocumentImpl* doc)
+SVGAElementImpl::SVGAElementImpl(const QualifiedName& tagName,
+                                 DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGTestsImpl(),
@@ -57,8 +57,8 @@ SVGAnimatedStringImpl* SVGAElementImpl::target() const {
   return lazy_create<SVGAnimatedStringImpl>(m_target, this);
 }
 
-void SVGAElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGAElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::targetAttr) {
     target()->setBaseVal(value.impl());
   } else {
@@ -76,25 +76,24 @@ void SVGAElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   }
 }
 
-khtml::RenderObject* SVGAElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGAElementImpl::createRenderer(RenderArena* arena,
+                                              RenderStyle* style) {
   return QPainter::renderingDevice()->createContainer(arena, style, this);
 }
 
-void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
+void SVGAElementImpl::defaultEventHandler(EventImpl* evt) {
   // TODO : should use CLICK instead
-  if ((evt->type() == KDOM::EventNames::mouseupEvent && m_isLink)) {
-    KDOM::MouseEventImpl* e = static_cast<KDOM::MouseEventImpl*>(evt);
+  if ((evt->type() == EventNames::mouseupEvent && m_isLink)) {
+    MouseEventImpl* e = static_cast<MouseEventImpl*>(evt);
 
     QString url;
     QString utarget;
     if (e && e->button() == 2) {
-      KDOM::EventTargetImpl::defaultEventHandler(evt);
+      EventTargetImpl::defaultEventHandler(evt);
       return;
     }
-    url = khtml::parseURL(href()->baseVal()).qstring();
-    utarget = KDOM::DOMString(getAttribute(SVGNames::targetAttr)).qstring();
+    url = parseURL(href()->baseVal()).qstring();
+    utarget = DOMString(getAttribute(SVGNames::targetAttr)).qstring();
 
     if (e && e->button() == 1)
       utarget = "_blank";
@@ -128,7 +127,7 @@ void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
     evt->setDefaultHandled();
   }
 
-  KDOM::EventTargetImpl::defaultEventHandler(evt);
+  EventTargetImpl::defaultEventHandler(evt);
 }
 
 // vim:ts=4:noet

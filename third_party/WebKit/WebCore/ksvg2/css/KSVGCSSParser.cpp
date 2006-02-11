@@ -29,7 +29,7 @@
 
 namespace DOM {
 
-using namespace KSVG;
+using namespace WebCore;
 
 typedef DOM::Value KDOMCSSValue;
 typedef DOM::ValueList KDOMCSSValueList;
@@ -170,7 +170,7 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
 
     /* Start of supported CSS properties with validation. This is needed for
      * parseShortHand to work
-     * correctly and allows optimization in khtml::applyRule(..)
+     * correctly and allows optimization in applyRule(..)
      */
 
     case SVGCSS_PROP_POINTER_EVENTS:

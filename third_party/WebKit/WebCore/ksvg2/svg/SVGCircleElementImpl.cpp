@@ -32,10 +32,10 @@
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasCreator.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGCircleElementImpl::SVGCircleElementImpl(const KDOM::QualifiedName& tagName,
-                                           KDOM::DocumentImpl* doc)
+SVGCircleElementImpl::SVGCircleElementImpl(const QualifiedName& tagName,
+                                           DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -58,9 +58,8 @@ SVGAnimatedLengthImpl* SVGCircleElementImpl::r() const {
                                             viewportElement());
 }
 
-void SVGCircleElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+void SVGCircleElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::cxAttr)
     cx()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::cyAttr)

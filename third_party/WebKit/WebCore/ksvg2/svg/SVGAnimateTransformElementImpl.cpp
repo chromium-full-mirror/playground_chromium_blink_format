@@ -42,12 +42,12 @@
 
 #include <cmath>
 
-using namespace KSVG;
+using namespace WebCore;
 using namespace std;
 
 SVGAnimateTransformElementImpl::SVGAnimateTransformElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGAnimationElementImpl(tagName, doc) {
   m_type = SVG_TRANSFORM_UNKNOWN;
 
@@ -61,8 +61,8 @@ SVGAnimateTransformElementImpl::SVGAnimateTransformElementImpl(
 SVGAnimateTransformElementImpl::~SVGAnimateTransformElementImpl() {}
 
 void SVGAnimateTransformElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "translate")
       m_type = SVG_TRANSFORM_TRANSLATE;
@@ -185,10 +185,8 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
     if (m_currentItem != itemByPercentage)  // Item changed...
     {
       // Extract current 'from' / 'to' values
-      KDOM::DOMString value1 =
-          KDOM::DOMString(m_values->getItem(itemByPercentage));
-      KDOM::DOMString value2 =
-          KDOM::DOMString(m_values->getItem(itemByPercentage + 1));
+      DOMString value1 = DOMString(m_values->getItem(itemByPercentage));
+      DOMString value2 = DOMString(m_values->getItem(itemByPercentage + 1));
 
       // Calculate new from/to transform values...
       if (!value1.isEmpty() && !value2.isEmpty()) {

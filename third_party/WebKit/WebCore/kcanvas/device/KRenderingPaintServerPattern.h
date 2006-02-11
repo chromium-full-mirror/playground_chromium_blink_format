@@ -29,6 +29,8 @@
 
 #include "IntPoint.h"
 
+namespace WebCore {
+
 class KCanvasImage;
 
 class KRenderingPaintServerPattern : public KRenderingPaintServer {
@@ -62,6 +64,7 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer {
   class Private;
   Private* d;
 };
+}
 
 #endif  // SVG_SUPPORT
 #endif

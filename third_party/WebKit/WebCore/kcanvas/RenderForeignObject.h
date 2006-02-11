@@ -27,13 +27,13 @@
 #include "RenderBlock.h"
 #include <qmatrix.h>
 
-namespace KSVG {
-class SVGForeignObjectElementImpl;
-}
+namespace WebCore {
 
-class RenderForeignObject : public khtml::RenderBlock {
+class SVGForeignObjectElementImpl;
+
+class RenderForeignObject : public RenderBlock {
  public:
-  RenderForeignObject(KSVG::SVGForeignObjectElementImpl* node);
+  RenderForeignObject(SVGForeignObjectElementImpl* node);
 
   const char* renderName() const { return "RenderForeignObject"; }
   void paint(PaintInfo& paintInfo, int parentX, int parentY);
@@ -43,17 +43,13 @@ class RenderForeignObject : public khtml::RenderBlock {
     m_transform = transform;
   }
 
-  bool nodeAtPoint(NodeInfo&,
-                   int x,
-                   int y,
-                   int tx,
-                   int ty,
-                   WebCore::HitTestAction);
+  bool nodeAtPoint(NodeInfo&, int x, int y, int tx, int ty, HitTestAction);
 
  private:
   QMatrix translationForAttributes();
   QMatrix m_transform;
 };
+}
 
 #endif  // SVG_SUPPORT
 #endif

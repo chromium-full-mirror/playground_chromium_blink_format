@@ -31,15 +31,14 @@
 
 #include "KCanvasResources.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedEnumerationImpl;
 class SVGClipPathElementImpl : public SVGStyledTransformableElementImpl,
                                public SVGTestsImpl,
                                public SVGLangSpaceImpl,
                                public SVGExternalResourcesRequiredImpl {
  public:
-  SVGClipPathElementImpl(const KDOM::QualifiedName& tagName,
-                         KDOM::DocumentImpl* doc);
+  SVGClipPathElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGClipPathElementImpl();
 
   virtual bool isValid() const { return SVGTestsImpl::isValid(); }
@@ -49,7 +48,7 @@ class SVGClipPathElementImpl : public SVGStyledTransformableElementImpl,
   // 'SVGClipPathElement' functions
   SVGAnimatedEnumerationImpl* clipPathUnits() const;
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
  private:
   mutable RefPtr<SVGAnimatedEnumerationImpl> m_clipPathUnits;

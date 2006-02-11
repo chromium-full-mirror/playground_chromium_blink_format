@@ -25,6 +25,8 @@
 #if SVG_SUPPORT
 #include "KRenderingDevice.h"
 
+namespace WebCore {
+
 KRenderingDevice::KRenderingDevice() {}
 
 KRenderingDevice::~KRenderingDevice() {}
@@ -43,6 +45,7 @@ KRenderingDeviceContext* KRenderingDevice::popContext() {
 
 void KRenderingDevice::pushContext(KRenderingDeviceContext* context) {
   m_contextStack.append(context);
+}
 }
 
 // vim:ts=4:noet

@@ -24,11 +24,11 @@
 #define KSVG_SVGExternalResourcesRequiredImpl_H
 #if SVG_SUPPORT
 
-namespace KDOM {
+namespace WebCore {
 class AttributeImpl;
 };
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedBooleanImpl;
 class SVGExternalResourcesRequiredImpl {
  public:
@@ -38,7 +38,7 @@ class SVGExternalResourcesRequiredImpl {
   // 'SVGExternalResourcesRequired' functions
   SVGAnimatedBooleanImpl* externalResourcesRequired() const;
 
-  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  bool parseMappedAttribute(MappedAttributeImpl* attr);
 
  private:
   mutable RefPtr<SVGAnimatedBooleanImpl> m_external;

@@ -26,12 +26,12 @@
 
 #include <kxmlcore/RefPtr.h>
 
-namespace KDOM {
+namespace WebCore {
 class DOMStringImpl;
 class MappedAttributeImpl;
 };
 
-namespace KSVG {
+namespace WebCore {
 class SVGStringListImpl;
 
 class SVGTestsImpl {
@@ -44,11 +44,11 @@ class SVGTestsImpl {
   SVGStringListImpl* requiredExtensions() const;
   SVGStringListImpl* systemLanguage() const;
 
-  bool hasExtension(KDOM::DOMStringImpl* extension) const;
+  bool hasExtension(DOMStringImpl* extension) const;
 
   bool isValid() const;
 
-  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  bool parseMappedAttribute(MappedAttributeImpl* attr);
 
  private:
   mutable RefPtr<SVGStringListImpl> m_features;

@@ -27,7 +27,9 @@
 #include "kcanvas/RenderPath.h"
 #include "RenderContainer.h"
 
-typedef enum {
+namespace WebCore {
+
+enum KCAlign {
   ALIGN_NONE = 0,
   ALIGN_XMINYMIN = 1,
   ALIGN_XMIDYMIN = 2,
@@ -38,15 +40,13 @@ typedef enum {
   ALIGN_XMINYMAX = 7,
   ALIGN_XMIDYMAX = 8,
   ALIGN_XMAXYMAX = 9
-} KCAlign;
+};
 
-namespace KSVG {
 class KCanvasRenderingStyle;
-}
 
-class KCanvasContainer : public khtml::RenderContainer {
+class KCanvasContainer : public RenderContainer {
  public:
-  KCanvasContainer(KSVG::SVGStyledElementImpl* node);
+  KCanvasContainer(SVGStyledElementImpl* node);
   virtual ~KCanvasContainer();
 
   // Some containers do not want it's children
@@ -85,6 +85,7 @@ class KCanvasContainer : public khtml::RenderContainer {
   class Private;
   Private* d;
 };
+}
 
 #endif  // SVG_SUPPORT
 #endif

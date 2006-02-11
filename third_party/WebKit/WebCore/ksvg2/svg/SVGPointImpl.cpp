@@ -28,7 +28,7 @@
 #include "SVGStyledElementImpl.h"
 #include "IntPoint.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context) {
   m_x = 0.0;

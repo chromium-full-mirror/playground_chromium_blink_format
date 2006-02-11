@@ -32,7 +32,7 @@
 #include "SVGStyledElementImpl.h"
 #include "SVGAnimatedStringImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGURIReferenceImpl::SVGURIReferenceImpl() {}
 
@@ -45,9 +45,8 @@ SVGAnimatedStringImpl* SVGURIReferenceImpl::href() const {
       m_href, (const SVGStyledElementImpl*)0);  // FIXME: 0 is a hack
 }
 
-bool SVGURIReferenceImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  if (attr->name().matches(KDOM::XLinkNames::hrefAttr)) {
+bool SVGURIReferenceImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  if (attr->name().matches(XLinkNames::hrefAttr)) {
     href()->setBaseVal(attr->value().impl());
     return true;
   }

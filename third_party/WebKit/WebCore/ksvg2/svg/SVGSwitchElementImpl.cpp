@@ -34,10 +34,10 @@
 #include "SVGSwitchElementImpl.h"
 #include "SVGAnimatedLengthImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGSwitchElementImpl::SVGSwitchElementImpl(const KDOM::QualifiedName& tagName,
-                                           KDOM::DocumentImpl* doc)
+SVGSwitchElementImpl::SVGSwitchElementImpl(const QualifiedName& tagName,
+                                           DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -45,9 +45,8 @@ SVGSwitchElementImpl::SVGSwitchElementImpl(const KDOM::QualifiedName& tagName,
 
 SVGSwitchElementImpl::~SVGSwitchElementImpl() {}
 
-bool SVGSwitchElementImpl::childShouldCreateRenderer(
-    KDOM::NodeImpl* child) const {
-  for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
+bool SVGSwitchElementImpl::childShouldCreateRenderer(NodeImpl* child) const {
+  for (NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* element = svg_dynamic_cast(n);
     if (element && element->isValid())
       return (n ==
@@ -57,9 +56,8 @@ bool SVGSwitchElementImpl::childShouldCreateRenderer(
   return false;
 }
 
-khtml::RenderObject* SVGSwitchElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGSwitchElementImpl::createRenderer(RenderArena* arena,
+                                                   RenderStyle* style) {
   return QPainter::renderingDevice()->createContainer(arena, style, this);
 }
 

@@ -31,19 +31,18 @@
 #include "SVGDOMImplementationImpl.h"
 #include "RGBColorImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGColorImpl::SVGColorImpl() : KDOM::CSSValueImpl() {
+SVGColorImpl::SVGColorImpl() : CSSValueImpl() {
   m_colorType = SVG_COLORTYPE_UNKNOWN;
 }
 
-SVGColorImpl::SVGColorImpl(KDOM::DOMStringImpl* rgbColor)
-    : KDOM::CSSValueImpl() {
+SVGColorImpl::SVGColorImpl(DOMStringImpl* rgbColor) : CSSValueImpl() {
   m_colorType = SVG_COLORTYPE_RGBCOLOR;
   setRGBColor(rgbColor);
 }
 
-SVGColorImpl::SVGColorImpl(unsigned short colorType) : KDOM::CSSValueImpl() {
+SVGColorImpl::SVGColorImpl(unsigned short colorType) : CSSValueImpl() {
   m_colorType = colorType;
 }
 
@@ -53,8 +52,8 @@ unsigned short SVGColorImpl::colorType() const {
   return m_colorType;
 }
 
-KDOM::RGBColorImpl* SVGColorImpl::rgbColor() const {
-  return new KDOM::RGBColorImpl(m_qColor);
+RGBColorImpl* SVGColorImpl::rgbColor() const {
+  return new RGBColorImpl(m_qColor);
 }
 
 static const Color cmap[] = {
@@ -108,7 +107,7 @@ static const Color cmap[] = {
     Color(238, 130, 238), Color(245, 222, 179), Color(255, 255, 255),
     Color(245, 245, 245), Color(255, 255, 0),   Color(154, 205, 50)};
 
-void SVGColorImpl::setRGBColor(KDOM::DOMStringImpl* rgbColor) {
+void SVGColorImpl::setRGBColor(DOMStringImpl* rgbColor) {
   m_rgbColor = rgbColor;
 
   if (m_rgbColor.isNull())
@@ -138,7 +137,7 @@ void SVGColorImpl::setRGBColor(KDOM::DOMStringImpl* rgbColor) {
 
     m_qColor = Color(r.toInt(), g.toInt(), b.toInt());
   } else {
-    KDOM::DOMString colorName = m_rgbColor.lower();
+    DOMString colorName = m_rgbColor.lower();
     QString name = colorName.qstring();
     //        int col = KSVG::getValueID(name.ascii(), name.length());
     //        if(col == 0)
@@ -148,23 +147,23 @@ void SVGColorImpl::setRGBColor(KDOM::DOMStringImpl* rgbColor) {
   }
 }
 
-void SVGColorImpl::setRGBColorICCColor(KDOM::DOMStringImpl* /* rgbColor */,
-                                       KDOM::DOMStringImpl* /* iccColor */) {
+void SVGColorImpl::setRGBColorICCColor(DOMStringImpl* /* rgbColor */,
+                                       DOMStringImpl* /* iccColor */) {
   // TODO: implement me!
 }
 
 void SVGColorImpl::setColor(unsigned short colorType,
-                            KDOM::DOMStringImpl* /* rgbColor */,
-                            KDOM::DOMStringImpl* /* iccColor */) {
+                            DOMStringImpl* /* rgbColor */,
+                            DOMStringImpl* /* iccColor */) {
   // TODO: implement me!
   m_colorType = colorType;
 }
 
-KDOM::DOMString SVGColorImpl::cssText() const {
+DOMString SVGColorImpl::cssText() const {
   if (m_colorType == SVG_COLORTYPE_RGBCOLOR)
     return m_rgbColor;
 
-  return KDOM::DOMString();
+  return DOMString();
 }
 
 const Color& SVGColorImpl::color() const {

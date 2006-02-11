@@ -28,9 +28,12 @@
 
 // this is related to KRenderingPaintServer, but currently it doesn't have its
 // own .cpp file
-QTextStream& operator<<(QTextStream& ts, const KRenderingPaintServer& ps) {
+QTextStream& operator<<(QTextStream& ts,
+                        const WebCore::KRenderingPaintServer& ps) {
   return ps.externalRepresentation(ts);
 }
+
+namespace WebCore {
 
 class KRenderingPaintServerSolid::Private {
  public:
@@ -64,6 +67,7 @@ QTextStream& KRenderingPaintServerSolid::externalRepresentation(
   ts << "[type=SOLID]"
      << " [color=" << color() << "]";
   return ts;
+}
 }
 
 // vim:ts=4:noet

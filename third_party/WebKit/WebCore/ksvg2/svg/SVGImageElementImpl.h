@@ -31,7 +31,7 @@
 #include "SVGStyledTransformableElementImpl.h"
 #include "SVGExternalResourcesRequiredImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedPreserveAspectRatioImpl;
 class SVGAnimatedLengthImpl;
 class SVGDocumentImpl;
@@ -42,8 +42,7 @@ class SVGImageElementImpl : public SVGStyledTransformableElementImpl,
                             public SVGExternalResourcesRequiredImpl,
                             public SVGURIReferenceImpl {
  public:
-  SVGImageElementImpl(const KDOM::QualifiedName& tagName,
-                      KDOM::DocumentImpl* doc);
+  SVGImageElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGImageElementImpl();
 
   virtual bool isValid() const { return SVGTestsImpl::isValid(); }
@@ -57,12 +56,11 @@ class SVGImageElementImpl : public SVGStyledTransformableElementImpl,
 
   SVGAnimatedPreserveAspectRatioImpl* preserveAspectRatio() const;
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void attach();
 
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
-  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
-                                              khtml::RenderStyle* style);
+  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
  private:
   mutable RefPtr<SVGAnimatedLengthImpl> m_x;

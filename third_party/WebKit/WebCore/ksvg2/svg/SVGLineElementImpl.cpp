@@ -32,10 +32,10 @@
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasCreator.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGLineElementImpl::SVGLineElementImpl(const KDOM::QualifiedName& tagName,
-                                       KDOM::DocumentImpl* doc)
+SVGLineElementImpl::SVGLineElementImpl(const QualifiedName& tagName,
+                                       DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -63,8 +63,8 @@ SVGAnimatedLengthImpl* SVGLineElementImpl::y2() const {
                                             viewportElement());
 }
 
-void SVGLineElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+void SVGLineElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::x1Attr)
     x1()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::y1Attr)

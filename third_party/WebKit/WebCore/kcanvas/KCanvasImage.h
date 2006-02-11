@@ -29,18 +29,18 @@
 
 namespace WebCore {
 class Image;
-}
 
 class KCanvasImage : public KCanvasResource {
  public:
   KCanvasImage(){};
   virtual ~KCanvasImage(){};
 
-  virtual void init(const WebCore::Image&) = 0;
+  virtual void init(const Image&) = 0;
   virtual void init(IntSize) = 0;
 
   virtual IntSize size() = 0;
 };
+}
 
 #endif  // SVG_SUPPORT
 #endif

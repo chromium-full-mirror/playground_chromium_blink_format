@@ -34,6 +34,8 @@
 #include "KCanvasTreeDebug.h"
 #include "KRenderingDevice.h"
 
+namespace WebCore {
+
 // KCWindRule
 QTextStream& operator<<(QTextStream& ts, KCWindRule rule) {
   switch (rule) {
@@ -56,4 +58,6 @@ QTextStream& operator<<(QTextStream& ts, const KCClipData& d) {
      << "]";
   return ts;
 }
+}
+
 #endif  // SVG_SUPPORT

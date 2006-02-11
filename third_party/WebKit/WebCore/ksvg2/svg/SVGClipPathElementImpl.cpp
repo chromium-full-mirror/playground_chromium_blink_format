@@ -37,11 +37,10 @@
 #include "SVGClipPathElementImpl.h"
 #include "SVGAnimatedEnumerationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGClipPathElementImpl::SVGClipPathElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+SVGClipPathElementImpl::SVGClipPathElementImpl(const QualifiedName& tagName,
+                                               DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -62,9 +61,8 @@ SVGAnimatedEnumerationImpl* SVGClipPathElementImpl::clipPathUnits() const {
   return m_clipPathUnits.get();
 }
 
-void SVGClipPathElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGClipPathElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::clipPathUnitsAttr) {
     if (value == "userSpaceOnUse")
       clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -92,15 +90,14 @@ KCanvasClipper* SVGClipPathElementImpl::canvasResource() {
 
   bool bbox = clipPathUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
-  khtml::RenderStyle* clipPathStyle = styleForRenderer(
+  RenderStyle* clipPathStyle = styleForRenderer(
       parent()->renderer());  // FIXME: Manual style resolution is a hack
-  for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
+  for (NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* e = svg_dynamic_cast(n);
     if (e && e->isStyled()) {
       SVGStyledElementImpl* styled = static_cast<SVGStyledElementImpl*>(e);
-      khtml::RenderStyle* pathStyle =
-          getDocument()->styleSelector()->styleForElement(styled,
-                                                          clipPathStyle);
+      RenderStyle* pathStyle = getDocument()->styleSelector()->styleForElement(
+          styled, clipPathStyle);
       if (KCanvasPath* pathData = styled->toPathData())
         m_clipper->addClipData(
             pathData, (KCWindRule)pathStyle->svgStyle()->clipRule(), bbox);

@@ -39,10 +39,10 @@
 #include "SVGAnimatedEnumerationImpl.h"
 #include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGFELightElementImpl::SVGFELightElementImpl(const KDOM::QualifiedName& tagName,
-                                             KDOM::DocumentImpl* doc)
+SVGFELightElementImpl::SVGFELightElementImpl(const QualifiedName& tagName,
+                                             DocumentImpl* doc)
     : SVGElementImpl(tagName, doc) {}
 
 SVGFELightElementImpl::~SVGFELightElementImpl() {}
@@ -97,9 +97,8 @@ SVGAnimatedNumberImpl* SVGFELightElementImpl::limitingConeAngle() const {
   return lazy_create<SVGAnimatedNumberImpl>(m_limitingConeAngle, dummy);
 }
 
-void SVGFELightElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGFELightElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::azimuthAttr)
     azimuth()->setBaseVal(value.qstring().toDouble());
   else if (attr->name() == SVGNames::elevationAttr)

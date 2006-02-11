@@ -28,10 +28,10 @@
 #include <kcanvas/KCanvasContainer.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGGElementImpl::SVGGElementImpl(const KDOM::QualifiedName& tagName,
-                                 KDOM::DocumentImpl* doc)
+SVGGElementImpl::SVGGElementImpl(const QualifiedName& tagName,
+                                 DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -39,7 +39,7 @@ SVGGElementImpl::SVGGElementImpl(const KDOM::QualifiedName& tagName,
 
 SVGGElementImpl::~SVGGElementImpl() {}
 
-void SVGGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
+void SVGGElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   if (SVGTestsImpl::parseMappedAttribute(attr))
     return;
   if (SVGLangSpaceImpl::parseMappedAttribute(attr))
@@ -49,20 +49,19 @@ void SVGGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   SVGStyledTransformableElementImpl::parseMappedAttribute(attr);
 }
 
-khtml::RenderObject* SVGGElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGGElementImpl::createRenderer(RenderArena* arena,
+                                              RenderStyle* style) {
   return QPainter::renderingDevice()->createContainer(arena, style, this);
 }
 
 // Helper class for <use> support
-SVGDummyElementImpl::SVGDummyElementImpl(const KDOM::QualifiedName& tagName,
-                                         KDOM::DocumentImpl* doc)
+SVGDummyElementImpl::SVGDummyElementImpl(const QualifiedName& tagName,
+                                         DocumentImpl* doc)
     : SVGGElementImpl(tagName, doc), m_localName("dummy") {}
 
 SVGDummyElementImpl::~SVGDummyElementImpl() {}
 
-const KDOM::AtomicString& SVGDummyElementImpl::localName() const {
+const AtomicString& SVGDummyElementImpl::localName() const {
   return m_localName;
 }
 

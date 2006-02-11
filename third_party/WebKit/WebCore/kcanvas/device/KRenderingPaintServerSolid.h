@@ -28,6 +28,8 @@
 
 #include <kcanvas/device/KRenderingPaintServer.h>
 
+namespace WebCore {
+
 class KRenderingPaintServerSolid : public KRenderingPaintServer {
  public:
   KRenderingPaintServerSolid();
@@ -45,6 +47,7 @@ class KRenderingPaintServerSolid : public KRenderingPaintServer {
   class Private;
   Private* d;
 };
+}
 
 #endif  // SVG_SUPPORT
 #endif

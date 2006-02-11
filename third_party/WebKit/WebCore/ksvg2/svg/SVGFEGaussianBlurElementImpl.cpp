@@ -40,11 +40,11 @@
 #include "SVGAnimatedStringImpl.h"
 #include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGFEGaussianBlurElementImpl::SVGFEGaussianBlurElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_filterEffect = 0;
 }
@@ -72,8 +72,8 @@ void SVGFEGaussianBlurElementImpl::setStdDeviation(float stdDeviationX,
                                                    float stdDeviationY) {}
 
 void SVGFEGaussianBlurElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::stdDeviationAttr) {
     QStringList numbers = QStringList::split(' ', value.qstring());
     stdDeviationX()->setBaseVal(numbers[0].toDouble());
@@ -93,7 +93,7 @@ KCanvasFEGaussianBlur* SVGFEGaussianBlurElementImpl::filterEffect() const {
         QPainter::renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());
+  m_filterEffect->setIn(DOMString(in1()->baseVal()).qstring());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setStdDeviationX(stdDeviationX()->baseVal());
   m_filterEffect->setStdDeviationY(stdDeviationY()->baseVal());

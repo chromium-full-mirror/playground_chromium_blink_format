@@ -23,6 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef KCanvasResourcesQuartz_h
+#define KCanvasResourcesQuartz_h
+
 #import "KCanvasImage.h"
 #import "KCanvasResources.h"
 #import "KCanvasContainer.h"
@@ -31,10 +34,11 @@
 typedef struct CGContext* CGContextRef;
 typedef struct CGLayer* CGLayerRef;
 
+namespace WebCore {
+
 class KCanvasContainerQuartz : public KCanvasContainer {
  public:
-  KCanvasContainerQuartz(KSVG::SVGStyledElementImpl* node)
-      : KCanvasContainer(node) {}
+  KCanvasContainerQuartz(SVGStyledElementImpl* node) : KCanvasContainer(node) {}
 
   virtual bool canHaveChildren() const;
 
@@ -77,7 +81,7 @@ class KCanvasImageQuartz : public KCanvasImage {
  public:
   KCanvasImageQuartz() : m_cgLayer(0) {}
   ~KCanvasImageQuartz();
-  void init(const WebCore::Image&) {}
+  void init(const Image&) {}
   void init(IntSize size) { m_size = size; }
 
   CGLayerRef cgLayer();
@@ -89,3 +93,6 @@ class KCanvasImageQuartz : public KCanvasImage {
   IntSize m_size;
   CGLayerRef m_cgLayer;
 };
+}
+
+#endif

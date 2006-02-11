@@ -29,7 +29,7 @@
 
 #include "ksvg.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGPathElementImpl;
 class SVGStyledElementImpl;
 class SVGPathSegImpl : public Shared<SVGPathSegImpl> {
@@ -38,8 +38,8 @@ class SVGPathSegImpl : public Shared<SVGPathSegImpl> {
   virtual ~SVGPathSegImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_UNKNOWN; }
-  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
-    return new KDOM::DOMStringImpl("");
+  virtual DOMStringImpl* pathSegTypeAsLetter() const {
+    return new DOMStringImpl("");
   }
   virtual QString toString() const { return QString::fromLatin1(""); }
 

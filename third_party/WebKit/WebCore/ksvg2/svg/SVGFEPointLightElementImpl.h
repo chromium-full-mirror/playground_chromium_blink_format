@@ -23,11 +23,10 @@
 
 #include "SVGFELightElementImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGFEPointLightElementImpl : public SVGFELightElementImpl {
  public:
-  SVGFEPointLightElementImpl(const KDOM::QualifiedName& tagName,
-                             KDOM::DocumentImpl* doc);
+  SVGFEPointLightElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGFEPointLightElementImpl();
   virtual KCLightSource* lightSource() const;
 };

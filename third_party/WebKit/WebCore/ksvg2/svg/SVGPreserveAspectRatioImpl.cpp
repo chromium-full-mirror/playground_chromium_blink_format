@@ -32,7 +32,7 @@
 #include "SVGSVGElementImpl.h"
 #include "SVGPreserveAspectRatioImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGPreserveAspectRatioImpl::SVGPreserveAspectRatioImpl(
     const SVGStyledElementImpl* context)
@@ -61,12 +61,12 @@ unsigned short SVGPreserveAspectRatioImpl::meetOrSlice() const {
 }
 
 void SVGPreserveAspectRatioImpl::parsePreserveAspectRatio(
-    KDOM::DOMStringImpl* strImpl) {
+    DOMStringImpl* strImpl) {
   // Spec: set the defaults
   setAlign(SVG_PRESERVEASPECTRATIO_NONE);
   setMeetOrSlice(SVG_MEETORSLICE_MEET);
 
-  KDOM::DOMString s(strImpl);
+  DOMString s(strImpl);
   QString str = s.qstring();
   QStringList params = QStringList::split(' ', str.simplifyWhiteSpace());
 

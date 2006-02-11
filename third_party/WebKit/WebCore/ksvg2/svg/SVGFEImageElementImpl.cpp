@@ -44,10 +44,10 @@
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingFillPainter.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGFEImageElementImpl::SVGFEImageElementImpl(const KDOM::QualifiedName& tagName,
-                                             KDOM::DocumentImpl* doc)
+SVGFEImageElementImpl::SVGFEImageElementImpl(const QualifiedName& tagName,
+                                             DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGLangSpaceImpl(),
@@ -68,9 +68,8 @@ SVGAnimatedPreserveAspectRatioImpl* SVGFEImageElementImpl::preserveAspectRatio()
                                                          this);
 }
 
-void SVGFEImageElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGFEImageElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::preserveAspectRatioAttr)
     preserveAspectRatio()->baseVal()->parsePreserveAspectRatio(value.impl());
   else {
@@ -92,7 +91,7 @@ void SVGFEImageElementImpl::parseMappedAttribute(
   }
 }
 
-void SVGFEImageElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
+void SVGFEImageElementImpl::notifyFinished(CachedObject* finishedObj) {
   if (finishedObj == m_cachedImage && filterEffect())
     filterEffect()->setCachedImage(m_cachedImage);
 }

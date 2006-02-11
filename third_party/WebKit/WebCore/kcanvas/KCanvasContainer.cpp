@@ -27,6 +27,8 @@
 #include "KCanvasContainer.h"
 #include "SVGStyledElementImpl.h"
 
+namespace WebCore {
+
 class KCanvasContainer::Private {
  public:
   Private() : drawsContents(true), slice(false) {}
@@ -37,8 +39,8 @@ class KCanvasContainer::Private {
   QMatrix matrix;
 };
 
-KCanvasContainer::KCanvasContainer(KSVG::SVGStyledElementImpl* node)
-    : khtml::RenderContainer(node), d(new Private()) {
+KCanvasContainer::KCanvasContainer(SVGStyledElementImpl* node)
+    : RenderContainer(node), d(new Private()) {
   setReplaced(true);
 }
 
@@ -63,7 +65,7 @@ void KCanvasContainer::setLocalTransform(const QMatrix& matrix) {
 }
 
 bool KCanvasContainer::fillContains(const FloatPoint& p) const {
-  khtml::RenderObject* current = firstChild();
+  RenderObject* current = firstChild();
   for (; current != 0; current = current->nextSibling()) {
     if (current->isRenderPath() &&
         static_cast<RenderPath*>(current)->fillContains(p))
@@ -74,7 +76,7 @@ bool KCanvasContainer::fillContains(const FloatPoint& p) const {
 }
 
 bool KCanvasContainer::strokeContains(const FloatPoint& p) const {
-  khtml::RenderObject* current = firstChild();
+  RenderObject* current = firstChild();
   for (; current != 0; current = current->nextSibling()) {
     if (current->isRenderPath() &&
         static_cast<RenderPath*>(current)->strokeContains(p))
@@ -87,7 +89,7 @@ bool KCanvasContainer::strokeContains(const FloatPoint& p) const {
 FloatRect KCanvasContainer::relativeBBox(bool includeStroke) const {
   FloatRect rect;
 
-  khtml::RenderObject* current = firstChild();
+  RenderObject* current = firstChild();
   for (; current != 0; current = current->nextSibling()) {
     FloatRect childBBox = current->relativeBBox(includeStroke);
     FloatRect mappedBBox = current->localTransform().mapRect(childBBox);
@@ -154,6 +156,7 @@ KCanvasMatrix KCanvasContainer::getAspectRatio(const FloatRect logical,
   }
 
   return temp;
+}
 }
 
 // vim:ts=4:noet

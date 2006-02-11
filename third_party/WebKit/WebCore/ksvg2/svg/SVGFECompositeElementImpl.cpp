@@ -42,11 +42,11 @@
 #include "SVGAnimatedStringImpl.h"
 #include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGFECompositeElementImpl::SVGFECompositeElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_filterEffect = 0;
 }
@@ -91,8 +91,8 @@ SVGAnimatedNumberImpl* SVGFECompositeElementImpl::k4() const {
 }
 
 void SVGFECompositeElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+    MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::operatorAttr) {
     if (value == "over")
       _operator()->setBaseVal(SVG_FECOMPOSITE_OPERATOR_OVER);
@@ -130,8 +130,8 @@ KCanvasFEComposite* SVGFECompositeElementImpl::filterEffect() const {
     return 0;
   m_filterEffect->setOperation(
       (KCCompositeOperationType)(_operator()->baseVal() - 1));
-  m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());
-  m_filterEffect->setIn2(KDOM::DOMString(in2()->baseVal()).qstring());
+  m_filterEffect->setIn(DOMString(in1()->baseVal()).qstring());
+  m_filterEffect->setIn2(DOMString(in2()->baseVal()).qstring());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setK1(k1()->baseVal());
   m_filterEffect->setK2(k2()->baseVal());

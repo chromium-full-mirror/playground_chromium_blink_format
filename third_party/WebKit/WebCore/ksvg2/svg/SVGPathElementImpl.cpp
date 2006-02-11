@@ -48,10 +48,10 @@
 #include <kcanvas/KCanvasCreator.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-namespace KSVG {
+namespace WebCore {
 
-SVGPathElementImpl::SVGPathElementImpl(const KDOM::QualifiedName& tagName,
-                                       KDOM::DocumentImpl* doc)
+SVGPathElementImpl::SVGPathElementImpl(const QualifiedName& tagName,
+                                       DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -444,7 +444,7 @@ void SVGPathElementImpl::svgClosePath() {
   pathSegList()->appendItem(createSVGPathSegClosePath());
 }
 
-void SVGPathElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
+void SVGPathElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   if (attr->name() == SVGNames::dAttr) {
     pathSegList()->clear();
     parseSVG(attr->value().qstring(), true);

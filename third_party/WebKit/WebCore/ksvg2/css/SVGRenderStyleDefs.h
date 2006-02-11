@@ -41,7 +41,7 @@
   Data Name() const { return (Data)svg_inherited_flags.f._##Name; }  \
   static Data initial##Type() { return Initial; }
 
-namespace KSVG {
+namespace WebCore {
 enum EWindRule { WR_NONZERO = 0, WR_EVENODD = 1 };
 
 enum ECapStyle { CS_BUTT = 1, CS_ROUND = 2, CS_SQUARE = 3 };
@@ -145,11 +145,11 @@ class StyleStrokeData : public Shared<StyleStrokeData> {
   float opacity;
   unsigned int miterLimit;
 
-  KDOM::CSSValueImpl* width;
-  KDOM::CSSValueImpl* dashOffset;
+  CSSValueImpl* width;
+  CSSValueImpl* dashOffset;
 
   SVGPaintImpl* paint;
-  KDOM::CSSValueListImpl* dashArray;
+  CSSValueListImpl* dashArray;
 
  private:
   StyleStrokeData& operator=(const StyleStrokeData&);

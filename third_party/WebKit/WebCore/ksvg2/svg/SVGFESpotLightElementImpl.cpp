@@ -23,11 +23,11 @@
 
 #include "SVGAnimatedNumberImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 
 SVGFESpotLightElementImpl::SVGFESpotLightElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGFELightElementImpl(tagName, doc) {}
 
 SVGFESpotLightElementImpl::~SVGFESpotLightElementImpl() {}

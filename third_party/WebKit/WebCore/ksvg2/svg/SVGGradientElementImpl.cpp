@@ -43,11 +43,10 @@
 #include <kcanvas/device/KRenderingPaintServerGradient.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGGradientElementImpl::SVGGradientElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+SVGGradientElementImpl::SVGGradientElementImpl(const QualifiedName& tagName,
+                                               DocumentImpl* doc)
     : SVGStyledElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGExternalResourcesRequiredImpl() {
@@ -76,9 +75,8 @@ SVGAnimatedEnumerationImpl* SVGGradientElementImpl::spreadMethod() const {
   return lazy_create<SVGAnimatedEnumerationImpl>(m_spreadMethod, this);
 }
 
-void SVGGradientElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+void SVGGradientElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  DOMString value(attr->value());
   if (attr->name() == SVGNames::gradientUnitsAttr) {
     if (value == "userSpaceOnUse")
       gradientUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -145,16 +143,16 @@ void SVGGradientElementImpl::rebuildStops() const {
   if (m_resource && !ownerDocument()->parsing()) {
     Vector<KCGradientStop> stops;
     // FIXME: Manual style resolution is a hack
-    khtml::RenderStyle* gradientStyle =
+    RenderStyle* gradientStyle =
         const_cast<SVGGradientElementImpl*>(this)->styleForRenderer(
             parent()->renderer());
-    for (KDOM::NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+    for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
       SVGElementImpl* element = svg_dynamic_cast(n);
       if (element && element->isGradientStop()) {
         SVGStopElementImpl* stop = static_cast<SVGStopElementImpl*>(element);
         float stopOffset = stop->offset()->baseVal();
 
-        khtml::RenderStyle* stopStyle =
+        RenderStyle* stopStyle =
             getDocument()->styleSelector()->styleForElement(stop,
                                                             gradientStyle);
         Color c = stopStyle->svgStyle()->stopColor();

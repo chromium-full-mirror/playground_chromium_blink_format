@@ -40,7 +40,7 @@
 #include "SVGAnimatedTransformListImpl.h"
 #include "ksvg.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGTransformableImpl::SVGTransformableImpl() : SVGLocatableImpl() {}
 
@@ -48,7 +48,7 @@ SVGTransformableImpl::~SVGTransformableImpl() {}
 
 void SVGTransformableImpl::parseTransformAttribute(
     SVGTransformListImpl* list,
-    const KDOM::AtomicString& transform) {
+    const AtomicString& transform) {
   // Split string for handling 1 transform statement at a time
   QStringList subtransforms =
       QStringList::split(')', transform.qstring().simplifyWhiteSpace());

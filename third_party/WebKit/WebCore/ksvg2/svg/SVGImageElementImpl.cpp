@@ -52,10 +52,10 @@
 
 #include "cssproperties.h"
 
-using namespace KSVG;
+using namespace WebCore;
 
-SVGImageElementImpl::SVGImageElementImpl(const KDOM::QualifiedName& tagName,
-                                         KDOM::DocumentImpl* doc)
+SVGImageElementImpl::SVGImageElementImpl(const QualifiedName& tagName,
+                                         DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -91,9 +91,8 @@ SVGAnimatedPreserveAspectRatioImpl* SVGImageElementImpl::preserveAspectRatio()
                                                          this);
 }
 
-void SVGImageElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+void SVGImageElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)
@@ -114,7 +113,7 @@ void SVGImageElementImpl::parseMappedAttribute(
     if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
       return;
     if (SVGURIReferenceImpl::parseMappedAttribute(attr)) {
-      if (attr->name().matches(KDOM::XLinkNames::hrefAttr))
+      if (attr->name().matches(XLinkNames::hrefAttr))
         m_imageLoader.updateFromElement();
       return;
     }
@@ -122,9 +121,8 @@ void SVGImageElementImpl::parseMappedAttribute(
   }
 }
 
-khtml::RenderObject* SVGImageElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGImageElementImpl::createRenderer(RenderArena* arena,
+                                                  RenderStyle* style) {
   return new (arena) RenderSVGImage(this);
 }
 

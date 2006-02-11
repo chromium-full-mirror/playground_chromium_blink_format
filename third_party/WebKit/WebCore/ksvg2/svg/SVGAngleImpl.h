@@ -27,7 +27,7 @@
 #include "Shared.h"
 #include "PlatformString.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGStyledElementImpl;
 
 class SVGAngleImpl : public Shared<SVGAngleImpl> {
@@ -43,8 +43,8 @@ class SVGAngleImpl : public Shared<SVGAngleImpl> {
   void setValueInSpecifiedUnits(float valueInSpecifiedUnits);
   float valueInSpecifiedUnits() const;
 
-  void setValueAsString(KDOM::DOMStringImpl* valueAsString);
-  KDOM::DOMStringImpl* valueAsString() const;
+  void setValueAsString(DOMStringImpl* valueAsString);
+  DOMStringImpl* valueAsString() const;
 
   void newValueSpecifiedUnits(unsigned short unitType,
                               float valueInSpecifiedUnits);
@@ -64,7 +64,7 @@ class SVGAngleImpl : public Shared<SVGAngleImpl> {
   unsigned short m_unitType;
   float m_value;
   float m_valueInSpecifiedUnits;
-  KDOM::DOMString m_valueAsString;
+  DOMString m_valueAsString;
   const SVGStyledElementImpl* m_context;
 
   void calculate();

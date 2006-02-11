@@ -27,15 +27,14 @@
 #include "SVGTextPositioningElementImpl.h"
 #include "SVGTransformableImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGTextElementImpl : public SVGTextPositioningElementImpl,
                            public SVGTransformableImpl {
  public:
-  SVGTextElementImpl(const KDOM::QualifiedName& tagName,
-                     KDOM::DocumentImpl* doc);
+  SVGTextElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGTextElementImpl();
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   // 'SVGTextElement' functions
   virtual SVGElementImpl* nearestViewportElement() const;
@@ -48,9 +47,8 @@ class SVGTextElementImpl : public SVGTextPositioningElementImpl,
     return 0;
   }
 
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
-  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
-                                              khtml::RenderStyle* style);
+  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
   virtual bool childShouldCreateRenderer(DOM::NodeImpl*) const;
   virtual void attach();
 

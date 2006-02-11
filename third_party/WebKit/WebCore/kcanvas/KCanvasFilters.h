@@ -34,8 +34,10 @@
 @class CIFilter;
 #else
 class CIFilter;
-#endif  // SVG_SUPPORT
 #endif
+
+namespace WebCore {
+
 class KCanvasFilterQuartz;
 
 // Enumerations
@@ -119,8 +121,7 @@ class KCanvasFilter : public KCanvasResource {
   bool m_effectBBoxMode;
 };
 
-KCanvasFilter* getFilterById(KDOM::DocumentImpl* document,
-                             const KDOM::AtomicString& id);
+KCanvasFilter* getFilterById(DocumentImpl* document, const AtomicString& id);
 
 class KCanvasFilterEffect {
  public:
@@ -495,8 +496,7 @@ class KCanvasFEGaussianBlur : public KCanvasFilterEffect {
   float m_y;
 };
 
-class KCanvasFEImage : public KCanvasFilterEffect,
-                       public WebCore::CachedObjectClient {
+class KCanvasFEImage : public KCanvasFilterEffect, public CachedObjectClient {
  public:
   KCanvasFEImage() : m_cachedImage(0) {}
   virtual ~KCanvasFEImage();
@@ -504,13 +504,13 @@ class KCanvasFEImage : public KCanvasFilterEffect,
   // FIXME: Eventually we need to support <svg> (RenderObject *) as well as
   // image data.
 
-  WebCore::CachedImage* cachedImage() const { return m_cachedImage; }
-  void setCachedImage(WebCore::CachedImage* image);
+  CachedImage* cachedImage() const { return m_cachedImage; }
+  void setCachedImage(CachedImage* image);
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  WebCore::CachedImage* m_cachedImage;
+  CachedImage* m_cachedImage;
 };
 
 class KCanvasFEMerge : public KCanvasFilterEffect {
@@ -650,5 +650,8 @@ class KCanvasFETurbulence : public KCanvasFilterEffect {
   bool m_stitchTiles;
   KCTurbulanceType m_type;
 };
+}
+
+#endif  // SVG_SUPPORT
 
 #endif

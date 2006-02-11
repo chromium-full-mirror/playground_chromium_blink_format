@@ -32,8 +32,9 @@
 #include "KCanvasMatrix.h"
 #include "KCanvasRenderingStyle.h"
 
-RenderSVGText::RenderSVGText(KSVG::SVGTextElementImpl* node)
-    : RenderBlock(node) {}
+namespace WebCore {
+
+RenderSVGText::RenderSVGText(SVGTextElementImpl* node) : RenderBlock(node) {}
 
 QMatrix RenderSVGText::translationTopToBaseline() {
   int offset = baselinePosition(true, true);
@@ -41,8 +42,7 @@ QMatrix RenderSVGText::translationTopToBaseline() {
 }
 
 QMatrix RenderSVGText::translationForAttributes() {
-  KSVG::SVGTextElementImpl* text =
-      static_cast<KSVG::SVGTextElementImpl*>(element());
+  SVGTextElementImpl* text = static_cast<SVGTextElementImpl*>(element());
 
   float xOffset = text->x()->baseVal()->getFirst()
                       ? text->x()->baseVal()->getFirst()->value()
@@ -75,7 +75,7 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   context->concatCTM(translationTopToBaseline());
 
   FloatRect boundingBox(0, 0, width(), height());
-  const KSVG::SVGRenderStyle* svgStyle = style()->svgStyle();
+  const SVGRenderStyle* svgStyle = style()->svgStyle();
 
   if (KCanvasClipper* clipper =
           getClipperById(document(), svgStyle->clipPath().mid(1)))
@@ -90,7 +90,7 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     filter->prepareFilter(boundingBox);
 
   KRenderingPaintServer* fillPaintServer =
-      KSVG::KSVGPainterFactory::fillPaintServer(style(), this);
+      KSVGPainterFactory::fillPaintServer(style(), this);
   if (fillPaintServer) {
     fillPaintServer->setPaintingText(true);
     // fillPaintServer->setActiveClient(this);
@@ -102,7 +102,7 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   }
 
   KRenderingPaintServer* strokePaintServer =
-      KSVG::KSVGPainterFactory::strokePaintServer(style(), this);
+      KSVGPainterFactory::strokePaintServer(style(), this);
   if (strokePaintServer) {
     strokePaintServer->setPaintingText(true);
     // strokePaintServer->setActiveClient(this);
@@ -129,7 +129,7 @@ bool RenderSVGText::nodeAtPoint(NodeInfo& info,
                                 int _y,
                                 int _tx,
                                 int _ty,
-                                WebCore::HitTestAction hitTestAction) {
+                                HitTestAction hitTestAction) {
   QMatrix totalTransform = translationForAttributes();
   totalTransform *= translationTopToBaseline();
   totalTransform *= absoluteTransform();
@@ -138,4 +138,6 @@ bool RenderSVGText::nodeAtPoint(NodeInfo& info,
   return RenderBlock::nodeAtPoint(info, (int)localX, (int)localY, _tx, _ty,
                                   hitTestAction);
 }
+}
+
 #endif  // SVG_SUPPORT

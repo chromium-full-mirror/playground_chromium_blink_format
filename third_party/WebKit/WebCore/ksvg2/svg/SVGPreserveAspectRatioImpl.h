@@ -26,11 +26,11 @@
 
 #include "Shared.h"
 
-namespace KDOM {
+namespace WebCore {
 class DOMStringImpl;
 };
 
-namespace KSVG {
+namespace WebCore {
 class SVGMatrixImpl;
 class SVGStyledElementImpl;
 class SVGPreserveAspectRatioImpl : public Shared<SVGPreserveAspectRatioImpl> {
@@ -54,7 +54,7 @@ class SVGPreserveAspectRatioImpl : public Shared<SVGPreserveAspectRatioImpl> {
                         float physHeight);
 
   // Helper
-  void parsePreserveAspectRatio(KDOM::DOMStringImpl* string);
+  void parsePreserveAspectRatio(DOMStringImpl* string);
 
  protected:
   unsigned short m_align;

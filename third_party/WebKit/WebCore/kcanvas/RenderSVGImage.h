@@ -27,9 +27,9 @@
 #include "render_image.h"
 #include <qmatrix.h>
 
-namespace KSVG {
+namespace WebCore {
 class SVGImageElementImpl;
-class RenderSVGImage : public khtml::RenderImage {
+class RenderSVGImage : public RenderImage {
  public:
   RenderSVGImage(SVGImageElementImpl* impl);
   virtual ~RenderSVGImage();

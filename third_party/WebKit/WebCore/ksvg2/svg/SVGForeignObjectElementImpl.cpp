@@ -33,11 +33,11 @@
 
 #include "cssproperties.h"
 
-namespace KSVG {
+namespace WebCore {
 
 SVGForeignObjectElementImpl::SVGForeignObjectElementImpl(
-    const KDOM::QualifiedName& tagName,
-    KDOM::DocumentImpl* doc)
+    const QualifiedName& tagName,
+    DocumentImpl* doc)
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -66,8 +66,8 @@ SVGAnimatedLengthImpl* SVGForeignObjectElementImpl::height() const {
 }
 
 void SVGForeignObjectElementImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+    MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)
@@ -89,9 +89,8 @@ void SVGForeignObjectElementImpl::parseMappedAttribute(
   }
 }
 
-khtml::RenderObject* SVGForeignObjectElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
+RenderObject* SVGForeignObjectElementImpl::createRenderer(RenderArena* arena,
+                                                          RenderStyle* style) {
   return new (arena) RenderForeignObject(this);
 }
 

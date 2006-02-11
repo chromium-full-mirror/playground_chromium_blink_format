@@ -31,7 +31,7 @@
 
 class RenderPath;
 
-namespace KSVG {
+namespace WebCore {
 class SVGElementImpl;
 class SVGStyledElementImpl;
 class SVGLengthImpl : public Shared<SVGLengthImpl> {
@@ -50,8 +50,8 @@ class SVGLengthImpl : public Shared<SVGLengthImpl> {
   float valueInSpecifiedUnits() const;
   void setValueInSpecifiedUnits(float valueInSpecifiedUnits);
 
-  KDOM::DOMStringImpl* valueAsString() const;
-  void setValueAsString(KDOM::DOMStringImpl* valueAsString);
+  DOMStringImpl* valueAsString() const;
+  void setValueAsString(DOMStringImpl* valueAsString);
 
   void newValueSpecifiedUnits(unsigned short unitType,
                               float valueInSpecifiedUnits);

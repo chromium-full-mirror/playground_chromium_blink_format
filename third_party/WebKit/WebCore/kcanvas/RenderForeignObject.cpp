@@ -29,15 +29,14 @@
 #include "SVGAnimatedLengthImpl.h"
 #include "SVGForeignObjectElementImpl.h"
 
-using namespace WebCore;
+namespace WebCore {
 
-RenderForeignObject::RenderForeignObject(
-    KSVG::SVGForeignObjectElementImpl* node)
+RenderForeignObject::RenderForeignObject(SVGForeignObjectElementImpl* node)
     : RenderBlock(node) {}
 
 QMatrix RenderForeignObject::translationForAttributes() {
-  KSVG::SVGForeignObjectElementImpl* foreign =
-      static_cast<KSVG::SVGForeignObjectElementImpl*>(element());
+  SVGForeignObjectElementImpl* foreign =
+      static_cast<SVGForeignObjectElementImpl*>(element());
   return QMatrix().translate(foreign->x()->baseVal()->value(),
                              foreign->y()->baseVal()->value());
 }
@@ -85,4 +84,6 @@ bool RenderForeignObject::nodeAtPoint(NodeInfo& info,
   return RenderBlock::nodeAtPoint(info, (int)localX, (int)localY, tx, ty,
                                   hitTestAction);
 }
+}
+
 #endif  // SVG_SUPPORT

@@ -36,11 +36,11 @@
 
 #include <kcanvas/KCanvasFilters.h>
 
-using namespace KSVG;
+using namespace WebCore;
 
 SVGFilterPrimitiveStandardAttributesImpl::
-    SVGFilterPrimitiveStandardAttributesImpl(const KDOM::QualifiedName& tagName,
-                                             KDOM::DocumentImpl* doc)
+    SVGFilterPrimitiveStandardAttributesImpl(const QualifiedName& tagName,
+                                             DocumentImpl* doc)
     : SVGStyledElementImpl(tagName, doc) {}
 
 SVGFilterPrimitiveStandardAttributesImpl::
@@ -63,7 +63,7 @@ SVGAnimatedLengthImpl* SVGFilterPrimitiveStandardAttributesImpl::width() const {
   // "100%" were specified.
   if (!m_width) {
     lazy_create<SVGAnimatedLengthImpl>(m_width, this, LM_WIDTH);
-    m_width->baseVal()->setValueAsString(KDOM::DOMString("100%").impl());
+    m_width->baseVal()->setValueAsString(DOMString("100%").impl());
   }
 
   return m_width.get();
@@ -75,7 +75,7 @@ SVGAnimatedLengthImpl* SVGFilterPrimitiveStandardAttributesImpl::height()
   // "100%" were specified.
   if (!m_height) {
     lazy_create<SVGAnimatedLengthImpl>(m_height, this, LM_HEIGHT);
-    m_height->baseVal()->setValueAsString(KDOM::DOMString("100%").impl());
+    m_height->baseVal()->setValueAsString(DOMString("100%").impl());
   }
 
   return m_height.get();
@@ -87,8 +87,8 @@ SVGAnimatedStringImpl* SVGFilterPrimitiveStandardAttributesImpl::result()
 }
 
 void SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(
-    KDOM::MappedAttributeImpl* attr) {
-  const KDOM::AtomicString& value = attr->value();
+    MappedAttributeImpl* attr) {
+  const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)
@@ -127,7 +127,7 @@ void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
   else
     filterEffect->setSubRegion(FloatRect(_x, _y, _width, _height));
 
-  filterEffect->setResult(KDOM::DOMString(result()->baseVal()).qstring());
+  filterEffect->setResult(DOMString(result()->baseVal()).qstring());
 }
 
 // vim:ts=4:noet

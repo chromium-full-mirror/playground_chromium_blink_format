@@ -29,7 +29,7 @@
 #include "SVGStyledTransformableElementImpl.h"
 #include "SVGExternalResourcesRequiredImpl.h"
 
-namespace KSVG {
+namespace WebCore {
 class SVGAnimatedLengthImpl;
 class SVGDocumentImpl;
 
@@ -39,8 +39,7 @@ class SVGForeignObjectElementImpl : public SVGStyledTransformableElementImpl,
                                     public SVGExternalResourcesRequiredImpl,
                                     public SVGURIReferenceImpl {
  public:
-  SVGForeignObjectElementImpl(const KDOM::QualifiedName& tagName,
-                              KDOM::DocumentImpl* doc);
+  SVGForeignObjectElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~SVGForeignObjectElementImpl();
 
   virtual bool isValid() const { return SVGTestsImpl::isValid(); }
@@ -51,12 +50,11 @@ class SVGForeignObjectElementImpl : public SVGStyledTransformableElementImpl,
   SVGAnimatedLengthImpl* width() const;
   SVGAnimatedLengthImpl* height() const;
 
-  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
+  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
   bool childShouldCreateRenderer(DOM::NodeImpl* child) const;
-  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
-                                              khtml::RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
  private:
   mutable RefPtr<SVGAnimatedLengthImpl> m_x;
