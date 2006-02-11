@@ -399,6 +399,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   NodeImpl* hoverNode() const { return m_hoverNode.get(); }
   void setHoverNode(NodeImpl* newHoverNode);
+  void hoveredNodeDetached(NodeImpl*);
+  void activeChainNodeDetached(NodeImpl*);
 
   NodeImpl* activeNode() const { return m_activeNode.get(); }
   void setActiveNode(NodeImpl* newActiveNode);
