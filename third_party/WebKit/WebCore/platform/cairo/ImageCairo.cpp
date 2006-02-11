@@ -43,6 +43,7 @@ void FrameData::clear() {
     cairo_surface_destroy(m_frame);
     m_frame = 0;
     m_duration = 0.;
+    m_hasAlpha = true;
   }
 }
 
@@ -74,12 +75,19 @@ static cairo_t* graphicsContext(void* context) {
 }
 
 static void setCompositingOperation(cairo_t* context,
-                                    Image::CompositeOperator op) {
+                                    Image::CompositeOperator op,
+                                    bool hasAlpha) {
   // FIXME: Add support for more operators.
   // FIXME: This should really move to be a graphics context function once we
   // have
   // a C++ abstraction for GraphicsContext.
-  cairo_set_operator(context, CAIRO_OPERATOR_OVER);
+  if (op == Image::CompositeSourceOver && !hasAlpha)
+    op = Image::CompositeCopy;
+
+  if (op == Image::CompositeCopy)
+    cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
+  else
+    cairo_set_operator(context, CAIRO_OPERATOR_OVER);
 }
 
 void Image::drawInRect(const FloatRect& dst,
@@ -102,7 +110,8 @@ void Image::drawInRect(const FloatRect& dst,
   cairo_save(context);
 
   // Set the compositing operation.
-  setCompositingOperation(context, compositeOp);
+  setCompositingOperation(context, compositeOp,
+                          frameHasAlphaAtIndex(m_currentFrame));
 
   // If we're drawing a sub portion of the image or scaling then create
   // a pattern transformation on the image and draw the transformed pattern.
@@ -169,6 +178,11 @@ void Image::tileInRect(const FloatRect& dstRect,
   cairo_t* context = graphicsContext(ctxt);
 
   cairo_save(context);
+
+  // Set the compositing operation.
+  // FIXME: This should be part of the tileInRect API.
+  setCompositingOperation(context, CompositeSourceOver,
+                          frameHasAlphaAtIndex(m_currentFrame));
 
   cairo_translate(context, dstTileRect.x(), dstTileRect.y());
   cairo_pattern_t* pattern = cairo_pattern_create_for_surface(image);

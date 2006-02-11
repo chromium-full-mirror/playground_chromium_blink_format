@@ -49,13 +49,15 @@ class RGBA32Buffer {
       : m_height(0),
         m_status(FrameEmpty),
         m_duration(0),
-        m_includeInNextFrame(false) {}
+        m_includeInNextFrame(false),
+        m_hasAlpha(false) {}
 
   RGBA32Array& bytes() { return m_bytes; }
   unsigned height() { return m_height; }
   FrameStatus status() const { return m_status; }
   unsigned duration() const { return m_duration; }
   bool includeInNextFrame() const { return m_includeInNextFrame; }
+  bool hasAlpha() const { return m_hasAlpha; }
 
   void ensureHeight(unsigned rowIndex) {
     if (rowIndex > m_height)
@@ -65,6 +67,7 @@ class RGBA32Buffer {
   void setStatus(FrameStatus s) { m_status = s; }
   void setDuration(unsigned duration) { m_duration = duration; }
   void setIncludeInNextFrame(bool n) { m_includeInNextFrame = n; }
+  void setHasAlpha(bool alpha) { m_hasAlpha = alpha; }
 
   static void setRGBA(unsigned& pos,
                       unsigned r,
@@ -93,6 +96,8 @@ class RGBA32Buffer {
   unsigned m_duration;        // The animation delay.
   bool m_includeInNextFrame;  // Whether or not the next buffer should be
                               // initially populated with our data.
+  bool m_hasAlpha;  // Whether or not any of the pixels in the buffer have
+                    // transparency.
 };
 
 // The ImageDecoder class represents a base class for specific image format

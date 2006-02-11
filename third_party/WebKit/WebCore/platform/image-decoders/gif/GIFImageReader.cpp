@@ -817,8 +817,8 @@ bool GIFImageReader::read(const unsigned char* buf,
           int num_colors = 2 << (q[8] & 0x7);
           const unsigned size = 3 * num_colors;
           unsigned char* map = frame_reader ? frame_reader->local_colormap : 0;
-          if (frame_reader && !map ||
-              (num_colors > frame_reader->local_colormap_size)) {
+          if (frame_reader &&
+              (!map || (num_colors > frame_reader->local_colormap_size))) {
             delete[] map;
             map = new unsigned char[size];
             if (!map) {
