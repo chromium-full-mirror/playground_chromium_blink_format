@@ -162,9 +162,6 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   bool m_frameBorder : 1;
   bool m_frameBorderSet : 1;
   bool m_noResize : 1;
-
- private:
-  void updateForNewURL();
 };
 
 // -------------------------------------------------------------------------
