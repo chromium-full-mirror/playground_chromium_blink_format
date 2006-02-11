@@ -333,6 +333,9 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
 
 void RenderContainer::appendChildNode(RenderObject* newChild) {
   KHTMLAssert(newChild->parent() == 0);
+  KHTMLAssert(!isBlockFlow() ||
+              (!newChild->isTableSection() && !newChild->isTableRow() &&
+               !newChild->isTableCell()));
 
   newChild->setParent(this);
   RenderObject* lChild = lastChild();
@@ -380,6 +383,10 @@ void RenderContainer::insertChildNode(RenderObject* child,
          beforeChild->parent()->isAnonymousBlock())
     beforeChild = beforeChild->parent();
   KHTMLAssert(beforeChild->parent() == this);
+
+  KHTMLAssert(!isBlockFlow() ||
+              (!child->isTableSection() && !child->isTableRow() &&
+               !child->isTableCell()));
 
   if (beforeChild == firstChild())
     setFirstChild(child);

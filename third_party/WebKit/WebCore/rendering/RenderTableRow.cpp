@@ -53,8 +53,11 @@ void RenderTableRow::setStyle(RenderStyle* style) {
 }
 
 void RenderTableRow::addChild(RenderObject* child, RenderObject* beforeChild) {
+  bool isTableRow = element() && element()->hasTagName(trTag);
+
   if (!child->isTableCell()) {
-    if (child->element() && child->element()->hasTagName(formTag)) {
+    if (isTableRow && child->element() &&
+        child->element()->hasTagName(formTag)) {
       RenderContainer::addChild(child, beforeChild);
       return;
     }

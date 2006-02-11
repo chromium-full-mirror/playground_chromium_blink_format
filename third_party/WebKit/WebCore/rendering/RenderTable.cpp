@@ -91,6 +91,7 @@ void RenderTable::setStyle(RenderStyle* _style) {
 
 void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
   bool wrapInAnonymousSection = true;
+  bool isTableElement = element() && element()->hasTagName(tableTag);
 
   switch (child->style()->display()) {
     case TABLE_CAPTION:
@@ -143,8 +144,8 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
     case RUN_IN:
     case TABLE:
       // Allow a form to just sit at the top level.
-      wrapInAnonymousSection =
-          !(child->element() && child->element()->hasTagName(formTag));
+      wrapInAnonymousSection = !isTableElement || !child->element() ||
+                               !child->element()->hasTagName(formTag);
       break;
   }
 

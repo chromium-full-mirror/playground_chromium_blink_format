@@ -80,7 +80,8 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
       lastChild()->style()->styleType() == RenderStyle::AFTER)
     beforeChild = lastChild();
 
-  if (!newChild->isInline() && !newChild->isFloatingOrPositioned()) {
+  if (!newChild->isInline() && !newChild->isFloatingOrPositioned() &&
+      containingBlock()->isBlockFlow()) {
     // We are placing a block inside an inline. We have to perform a split of
     // this
     // inline into continuations.  This involves creating an anonymous block box
