@@ -73,6 +73,7 @@ class Tokenizer : public QObject {
 Tokenizer* newXMLTokenizer(DocumentImpl*, FrameView* = 0);
 #if KHTML_XSLT
 void* xmlDocPtrForString(const QString& source, const QString& URL = QString());
+void setLoaderForLibXMLCallbacks(DocLoader*);
 #endif
 HashMap<DOMString, DOMString> parseAttributes(const DOMString&, bool& attrsOK);
 bool parseXMLDocumentFragment(const DOMString&,
