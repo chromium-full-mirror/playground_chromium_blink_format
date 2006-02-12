@@ -71,7 +71,7 @@ class MouseEvent;
 class MouseMoveEvent;
 class CSSComputedStyleDeclarationImpl;
 class FramePrivate;
-class FrameTreeNode;
+class FrameTree;
 class Plugin;
 class KJSProxyImpl;
 
@@ -1070,7 +1070,7 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
   KURL url() const;
 
   // split out controller objects
-  FrameTreeNode* treeNode() const;
+  FrameTree* tree() const;
   SelectionController& selection() const;
 
  private:

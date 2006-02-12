@@ -18,8 +18,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef FRAME_TREE_NODE_H
-#define FRAME_TREE_NODE_H
+#ifndef FRAME_TREE_H
+#define FRAME_TREE_H
 
 #include <kxmlcore/Noncopyable.h>
 #include <kxmlcore/PassRefPtr.h>
@@ -30,15 +30,15 @@ namespace WebCore {
 
 class Frame;
 
-class FrameTreeNode : Noncopyable {
+class FrameTree : Noncopyable {
  public:
-  FrameTreeNode(Frame* thisFrame, Frame* parentFrame)
+  FrameTree(Frame* thisFrame, Frame* parentFrame)
       : m_thisFrame(thisFrame),
         m_parent(parentFrame),
         m_previousSibling(0),
         m_lastChild(0),
         m_childCount(0) {}
-  ~FrameTreeNode();
+  ~FrameTree();
 
   const DOMString& name() const { return m_name; }
   void setName(const DOMString& name);
@@ -70,4 +70,4 @@ class FrameTreeNode : Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // FRAME_TREE_NODE_H
+#endif  // FRAME_TREE_H

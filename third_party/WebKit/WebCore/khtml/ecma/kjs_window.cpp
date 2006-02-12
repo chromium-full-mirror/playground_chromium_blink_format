@@ -57,7 +57,7 @@
 #include <kdebug.h>
 #include <kjs/collector.h>
 #include <klocale.h>
-#include "FrameTreeNode.h"
+#include "FrameTree.h"
 
 #if KHTML_XSLT
 #include "XSLTProcessor.h"
@@ -751,7 +751,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
     case _Location:
       return location();
     case Name:
-      return jsString(m_frame->treeNode()->name());
+      return jsString(m_frame->tree()->name());
     case _Navigator:
     case ClientInformation: {
       // Store the navigator in the object so we get the same one each time.
@@ -796,9 +796,8 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       updateLayout();
       return jsNumber(m_frame->view()->contentsY());
     case Parent:
-      return retrieve(m_frame->treeNode()->parent()
-                          ? m_frame->treeNode()->parent()
-                          : (Frame*)m_frame);
+      return retrieve(m_frame->tree()->parent() ? m_frame->tree()->parent()
+                                                : (Frame*)m_frame);
     case Personalbar:
       return personalbar(exec);
     case ScreenLeft:
@@ -838,8 +837,8 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return retrieve(m_frame);
     case Top: {
       Frame* p = m_frame;
-      while (p->treeNode()->parent())
-        p = p->treeNode()->parent();
+      while (p->tree()->parent())
+        p = p->tree()->parent();
       return retrieve(p);
     }
     case _Screen:
@@ -1245,7 +1244,7 @@ void Window::put(ExecState* exec,
         return;
       case Name:
         if (isSafeScript(exec))
-          m_frame->treeNode()->setName(value->toString(exec).qstring());
+          m_frame->tree()->setName(value->toString(exec).qstring());
         return;
       default:
         break;
@@ -1303,11 +1302,10 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
   // or opener, allow access from any document in the same domain as
   // the parent or opener.
   if (shouldLoadAsEmptyDocument(targetPart->url())) {
-    Frame* ancestorPart = targetPart->opener()
-                              ? targetPart->opener()
-                              : targetPart->treeNode()->parent();
+    Frame* ancestorPart = targetPart->opener() ? targetPart->opener()
+                                               : targetPart->tree()->parent();
     while (ancestorPart && shouldLoadAsEmptyDocument(ancestorPart->url())) {
-      ancestorPart = ancestorPart->treeNode()->parent();
+      ancestorPart = ancestorPart->tree()->parent();
     }
 
     if (ancestorPart)
@@ -1379,9 +1377,9 @@ bool Window::isSafeScript(ExecState* exec) const {
   // the parent or opener.
   if (shouldLoadAsEmptyDocument(m_frame->url())) {
     Frame* ancestorPart =
-        m_frame->opener() ? m_frame->opener() : m_frame->treeNode()->parent();
+        m_frame->opener() ? m_frame->opener() : m_frame->tree()->parent();
     while (ancestorPart && shouldLoadAsEmptyDocument(ancestorPart->url())) {
-      ancestorPart = ancestorPart->treeNode()->parent();
+      ancestorPart = ancestorPart->tree()->parent();
     }
 
     if (ancestorPart)
@@ -1703,8 +1701,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       URLArgs uargs;
       uargs.frameName = frameName;
       if (uargs.frameName == "_top") {
-        while (frame->treeNode()->parent())
-          frame = frame->treeNode()->parent();
+        while (frame->tree()->parent())
+          frame = frame->tree()->parent();
 
         const Window* window = Window::retrieveWindow(frame);
         if (!url.url().startsWith("javascript:", false) ||
@@ -1719,8 +1717,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return Window::retrieve(frame);
       }
       if (uargs.frameName == "_parent") {
-        if (frame->treeNode()->parent())
-          frame = frame->treeNode()->parent();
+        if (frame->tree()->parent())
+          frame = frame->tree()->parent();
 
         const Window* window = Window::retrieveWindow(frame);
         if (!url.url().startsWith("javascript:", false) ||

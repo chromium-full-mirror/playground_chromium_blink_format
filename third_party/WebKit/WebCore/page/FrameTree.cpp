@@ -19,7 +19,7 @@
  */
 
 #include "config.h"
-#include "FrameTreeNode.h"
+#include "FrameTree.h"
 
 #include <kxmlcore/Assertions.h>
 #include "Frame.h"
@@ -31,13 +31,12 @@ using std::swap;
 
 namespace WebCore {
 
-FrameTreeNode::~FrameTreeNode() {
-  for (Frame* child = firstChild(); child;
-       child = child->treeNode()->nextSibling())
+FrameTree::~FrameTree() {
+  for (Frame* child = firstChild(); child; child = child->tree()->nextSibling())
     child->detachFromView();
 }
 
-void FrameTreeNode::setName(const DOMString& name) {
+void FrameTree::setName(const DOMString& name) {
   DOMString n = name;
 
   // FIXME: is the blank rule needed or useful?
@@ -48,25 +47,25 @@ void FrameTreeNode::setName(const DOMString& name) {
   m_name = n;
 }
 
-void FrameTreeNode::appendChild(PassRefPtr<Frame> child) {
-  child->treeNode()->m_parent = m_thisFrame;
+void FrameTree::appendChild(PassRefPtr<Frame> child) {
+  child->tree()->m_parent = m_thisFrame;
 
   Frame* oldLast = m_lastChild;
   m_lastChild = child.get();
 
   if (oldLast) {
-    child->treeNode()->m_previousSibling = oldLast;
-    oldLast->treeNode()->m_nextSibling = child;
+    child->tree()->m_previousSibling = oldLast;
+    oldLast->tree()->m_nextSibling = child;
   } else
     m_firstChild = child;
 
   m_childCount++;
 
-  ASSERT(!m_lastChild->treeNode()->m_nextSibling);
+  ASSERT(!m_lastChild->tree()->m_nextSibling);
 }
 
-void FrameTreeNode::removeChild(Frame* child) {
-  child->treeNode()->m_parent = 0;
+void FrameTree::removeChild(Frame* child) {
+  child->tree()->m_parent = 0;
   child->detachFromView();
 
   // Slightly tricky way to prevent deleting the child until we are done with
@@ -78,16 +77,16 @@ void FrameTreeNode::removeChild(Frame* child) {
   RefPtr<Frame>& newLocationForNext =
       m_firstChild == child
           ? m_firstChild
-          : child->treeNode()->m_previousSibling->treeNode()->m_nextSibling;
+          : child->tree()->m_previousSibling->tree()->m_nextSibling;
   Frame*& newLocationForPrevious =
       m_lastChild == child
           ? m_lastChild
-          : child->treeNode()->m_nextSibling->treeNode()->m_previousSibling;
-  swap(newLocationForNext, child->treeNode()->m_nextSibling);
-  swap(newLocationForPrevious, child->treeNode()->m_previousSibling);
+          : child->tree()->m_nextSibling->tree()->m_previousSibling;
+  swap(newLocationForNext, child->tree()->m_nextSibling);
+  swap(newLocationForPrevious, child->tree()->m_previousSibling);
 
-  child->treeNode()->m_previousSibling = 0;
-  child->treeNode()->m_nextSibling = 0;
+  child->tree()->m_previousSibling = 0;
+  child->tree()->m_nextSibling = 0;
 
   m_childCount--;
 }
