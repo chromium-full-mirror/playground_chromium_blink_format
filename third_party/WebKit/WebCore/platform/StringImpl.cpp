@@ -50,67 +50,49 @@ StringImpl* StringImpl::empty() {
   return &e;
 }
 
-StringImpl::StringImpl(const QChar* str, unsigned len) {
-  _hash = 0;
-  _inTable = false;
-  bool havestr = str && len;
-  s = newQCharVector(havestr ? len : 1);
-  if (havestr) {
-    memcpy(s, str, len * sizeof(QChar));
-    l = len;
-  } else {
-    // crash protection
-    s[0] = 0x0;
-    l = 0;
-  }
+StringImpl::StringImpl(const QString& str) {
+  initWithQChar(str.unicode(), str.length());
 }
 
-StringImpl::StringImpl(const QString& string) {
-  const QChar* str = string.unicode();
-  unsigned len = string.length();
-  _hash = 0;
-  _inTable = false;
-  bool havestr = str && len;
-  s = newQCharVector(havestr ? len : 1);
-  if (havestr) {
-    memcpy(s, str, len * sizeof(QChar));
-    l = len;
-  } else {
-    // crash protection
-    s[0] = 0x0;
-    l = 0;
-  }
+StringImpl::StringImpl(const QChar* str, unsigned len) {
+  initWithQChar(str, len);
 }
 
 StringImpl::StringImpl(const char* str) {
-  _hash = 0;
-  _inTable = false;
-  if (str && *str) {
-    l = strlen(str);
-    s = newQCharVector(l);
-    int i = l;
-    QChar* ptr = s;
-    while (i--)
-      *ptr++ = *str++;
-  } else {
-    s = newQCharVector(1);  // crash protection
-    s[0] = 0x0;             // == QChar::null;
-    l = 0;
-  }
+  initWithChar(str, strlen(str));
 }
 
 StringImpl::StringImpl(const char* str, unsigned int len) {
+  initWithChar(str, len);
+}
+
+void StringImpl::initWithChar(const char* str, unsigned int len) {
   _hash = 0;
   _inTable = false;
   l = len;
-  if (!l || !str)
+  if (!l || !str) {
+    s = 0;
     return;
+  }
 
   s = newQCharVector(l);
   int i = l;
   QChar* ptr = s;
   while (i--)
     *ptr++ = *str++;
+}
+
+void StringImpl::initWithQChar(const QChar* str, unsigned int len) {
+  _hash = 0;
+  _inTable = false;
+  l = len;
+  if (!l || !str) {
+    s = 0;
+    return;
+  }
+
+  s = newQCharVector(len);
+  memcpy(s, str, len * sizeof(QChar));
 }
 
 StringImpl::~StringImpl() {
