@@ -29,6 +29,7 @@
 #include "SharedTimer.h"
 #include "SystemTime.h"
 #include <algorithm>
+#include <math.h>
 #include <kxmlcore/Assertions.h>
 #include <kxmlcore/HashSet.h>
 
@@ -169,6 +170,12 @@ class TimerHeapIterator
   int m_index;
 };
 
+inline bool operator==(TimerHeapIterator a, TimerHeapIterator b) {
+  return a.index() == b.index();
+}
+inline bool operator!=(TimerHeapIterator a, TimerHeapIterator b) {
+  return a.index() != b.index();
+}
 inline bool operator<(TimerHeapIterator a, TimerHeapIterator b) {
   return a.index() < b.index();
 }
@@ -292,7 +299,7 @@ inline void TimerBase::heapInsert() {
 inline void TimerBase::heapPop() {
   // Temporarily force this timer to have the minimum key so we can pop it.
   double fireTime = m_nextFireTime;
-  m_nextFireTime = -1e500;
+  m_nextFireTime = -HUGE_VAL;
   heapDecreaseKey();
   heapPopMin();
   m_nextFireTime = fireTime;
