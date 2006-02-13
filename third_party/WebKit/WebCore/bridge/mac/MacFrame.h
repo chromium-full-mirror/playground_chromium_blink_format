@@ -169,7 +169,7 @@ class MacFrame : public Frame {
   NSView* nextKeyView(NodeImpl* startingPoint, KWQSelectionDirection);
   NSView* nextKeyViewInFrameHierarchy(NodeImpl* startingPoint,
                                       KWQSelectionDirection);
-  static NSView* nextKeyViewForWidget(QWidget* startingPoint,
+  static NSView* nextKeyViewForWidget(Widget* startingPoint,
                                       KWQSelectionDirection);
   static bool currentEventIsKeyboardOptionTab();
   static bool handleKeyboardOptionTabInView(NSView* view);
@@ -177,7 +177,7 @@ class MacFrame : public Frame {
   virtual bool tabsToLinks() const;
   virtual bool tabsToAllControls() const;
 
-  static bool currentEventIsMouseDownInWidget(QWidget* candidate);
+  static bool currentEventIsMouseDownInWidget(Widget* candidate);
 
   virtual void runJavaScriptAlert(const DOMString& message);
   virtual bool runJavaScriptConfirm(const DOMString& message);
@@ -198,7 +198,7 @@ class MacFrame : public Frame {
     return new BrowserExtensionMac(this);
   }
 
-  static WebCoreFrameBridge* bridgeForWidget(const QWidget*);
+  static WebCoreFrameBridge* bridgeForWidget(const Widget*);
 
   QString requestedURLString() const;
   virtual QString incomingReferrer() const;
@@ -255,7 +255,7 @@ class MacFrame : public Frame {
 
   bool sendContextMenuEvent(NSEvent*);
 
-  bool passMouseDownEventToWidget(QWidget*);
+  bool passMouseDownEventToWidget(Widget*);
   virtual bool passSubframeEventToSubframe(NodeImpl::MouseEvent&);
   virtual bool passWheelEventToChildWidget(NodeImpl*);
 
@@ -284,9 +284,9 @@ class MacFrame : public Frame {
   void didTellBridgeAboutLoad(const DOMString& URL);
   bool haveToldBridgeAboutLoad(const DOMString& URL);
 
-  virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(QWidget*);
-  virtual KJS::Bindings::Instance* getObjectInstanceForWidget(QWidget*);
-  virtual KJS::Bindings::Instance* getAppletInstanceForWidget(QWidget*);
+  virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*);
+  virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
+  virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*);
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 

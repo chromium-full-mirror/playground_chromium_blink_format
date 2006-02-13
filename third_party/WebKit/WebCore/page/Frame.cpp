@@ -1266,7 +1266,7 @@ static bool isFrameElement(const NodeImpl* n) {
   RenderObject* renderer = n->renderer();
   if (!renderer || !renderer->isWidget())
     return false;
-  QWidget* widget = static_cast<RenderWidget*>(renderer)->widget();
+  Widget* widget = static_cast<RenderWidget*>(renderer)->widget();
   return widget && widget->inherits("FrameView");
 }
 
@@ -3064,7 +3064,7 @@ void Frame::restoreInterpreterBuiltins(
     jScript()->interpreter()->restoreBuiltins(interpreterBuiltins);
 }
 
-Frame* Frame::frameForWidget(const QWidget* widget) {
+Frame* Frame::frameForWidget(const Widget* widget) {
   ASSERT_ARG(widget, widget);
 
   NodeImpl* node = nodeForWidget(widget);
@@ -3081,19 +3081,19 @@ Frame* Frame::frameForNode(NodeImpl* node) {
   return node->getDocument()->frame();
 }
 
-NodeImpl* Frame::nodeForWidget(const QWidget* widget) {
+NodeImpl* Frame::nodeForWidget(const Widget* widget) {
   ASSERT_ARG(widget, widget);
   const QObject* o = widget->eventFilterObject();
   return o ? static_cast<const RenderWidget*>(o)->element() : 0;
 }
 
-void Frame::setDocumentFocus(QWidget* widget) {
+void Frame::setDocumentFocus(Widget* widget) {
   NodeImpl* node = nodeForWidget(widget);
   ASSERT(node);
   node->getDocument()->setFocusNode(node);
 }
 
-void Frame::clearDocumentFocus(QWidget* widget) {
+void Frame::clearDocumentFocus(Widget* widget) {
   NodeImpl* node = nodeForWidget(widget);
   ASSERT(node);
   node->getDocument()->setFocusNode(0);
@@ -3250,7 +3250,7 @@ bool Frame::passWidgetMouseDownEventToWidget(MouseEvent* event,
   if (!target)
     return false;
 
-  QWidget* widget = RenderLayer::gScrollBar;
+  Widget* widget = RenderLayer::gScrollBar;
   if (!widget) {
     if (!target->isWidget())
       return false;

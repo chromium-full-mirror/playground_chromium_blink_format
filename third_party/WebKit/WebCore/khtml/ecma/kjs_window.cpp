@@ -182,7 +182,7 @@ bool Screen::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* Screen::getValueProperty(ExecState*, int token) const {
-  QWidget* widget = m_frame ? m_frame->view() : 0;
+  Widget* widget = m_frame ? m_frame->view() : 0;
 
   switch (token) {
     case Height:
@@ -1786,7 +1786,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       return jsUndefined();
     case Window::MoveBy:
       if (args.size() >= 2 && widget) {
-        QWidget* tl = widget->topLevelWidget();
+        Widget* tl = widget->topLevelWidget();
         IntRect sg = screenRect(widget);
         IntPoint dest = tl->pos() + IntPoint(args[0]->toInt32(exec),
                                              args[1]->toInt32(exec));
@@ -1798,7 +1798,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       return jsUndefined();
     case Window::MoveTo:
       if (args.size() >= 2 && widget) {
-        QWidget* tl = widget->topLevelWidget();
+        Widget* tl = widget->topLevelWidget();
         IntRect sg = screenRect(widget);
         IntPoint dest(args[0]->toInt32(exec) + sg.x(),
                       args[1]->toInt32(exec) + sg.y());
@@ -1810,7 +1810,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       return jsUndefined();
     case Window::ResizeBy:
       if (args.size() >= 2 && widget) {
-        QWidget* tl = widget->topLevelWidget();
+        Widget* tl = widget->topLevelWidget();
         IntSize dest = tl->size() +
                        IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
         IntRect sg = screenRect(widget);
@@ -1828,7 +1828,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       return jsUndefined();
     case Window::ResizeTo:
       if (args.size() >= 2 && widget) {
-        QWidget* tl = widget->topLevelWidget();
+        Widget* tl = widget->topLevelWidget();
         IntSize dest = IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
         IntRect sg = screenRect(widget);
         // Security check: within desktop limits and bigger than 100x100 (per

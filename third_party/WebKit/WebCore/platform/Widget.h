@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,38 +23,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QWIDGET_H_
-#define QWIDGET_H_
+#ifndef WEBCORE_PLATFORM_WIDGET_H_
+#define WEBCORE_PLATFORM_WIDGET_H_
 
 #include "KWQObject.h"
-#include "IntSize.h"
-#include "KWQFont.h"
-#include "KWQCursor.h"
 
+class QEvent;
+class QFont;
+class QPalette;
+
+#if __APPLE__
 #ifdef __OBJC__
 @class NSView;
 #else
 class NSView;
 #endif
-
-class KWQWidgetPrivate;
-class QEvent;
-class QPalette;
+#endif
 
 namespace WebCore {
+
+class IntPoint;
 class IntRect;
+class IntSize;
+class QCursor;
 class QPainter;
-}
-using WebCore::IntRect;  // move QWidget into WebCore and remove this line
+class WidgetPrivate;
 
-class QWidget : public QObject {
+class Widget : public QObject {
  public:
-  enum WidgetFlags {
-    WResizeNoErase = 1,
-    WRepaintNoErase = 1 << 1,
-    WPaintUnclipped = 1 << 2
-  };
-
   enum FocusPolicy {
     NoFocus = 0,
     TabFocus = 0x1,
@@ -63,9 +59,8 @@ class QWidget : public QObject {
     WheelFocus = 0x7
   };
 
-  QWidget();
-  QWidget(NSView* view);
-  virtual ~QWidget();
+  Widget();
+  virtual ~Widget();
 
   virtual IntSize sizeHint() const;
 
@@ -85,7 +80,7 @@ class QWidget : public QObject {
   void move(int, int);
   void move(const IntPoint&);
 
-  virtual void paint(WebCore::QPainter*, const IntRect&);
+  virtual void paint(QPainter*, const IntRect&);
 
   virtual IntRect frameGeometry() const;
   virtual void setFrameGeometry(const IntRect&);
@@ -101,9 +96,6 @@ class QWidget : public QObject {
   virtual bool checksDescendantsForFocus() const;
 
   virtual FocusPolicy focusPolicy() const;
-  void setFocusPolicy(FocusPolicy){};
-
-  virtual void setFocusProxy(QWidget*){};
 
   const QPalette& palette() const;
   virtual void setPalette(const QPalette&);
@@ -111,31 +103,32 @@ class QWidget : public QObject {
   QFont font() const;
   virtual void setFont(const QFont&);
 
-  void constPolish() const;
-  bool isVisible() const;
   void setCursor(const QCursor&);
   QCursor cursor();
-  void unsetCursor();
+
   bool event(QEvent*);
 
   void show();
   void hide();
 
-  NSView* getView() const;
-  NSView* getOuterView() const;
-  void setView(NSView* aView);
-  virtual void populate(){};
+  virtual void populate() {}
 
-  void displayRect(int x, int y, int w, int h);
   void lockDrawingFocus();
   void unlockDrawingFocus();
   void enableFlushDrawing();
   void disableFlushDrawing();
   void setDrawingAlpha(float alpha);
 
-  void sendConsumedMouseUp();
-
   void setIsSelected(bool isSelected);
+
+#if __APPLE__
+  Widget(NSView* view);
+
+  NSView* getView() const;
+  NSView* getOuterView() const;
+  void setView(NSView*);
+
+  void sendConsumedMouseUp();
 
   static void beforeMouseDown(NSView*);
   static void afterMouseDown(NSView*);
@@ -144,9 +137,20 @@ class QWidget : public QObject {
   void removeFromSuperview();
 
   static void setDeferFirstResponderChanges(bool);
+#endif
 
  private:
-  KWQWidgetPrivate* data;
+  WidgetPrivate* data;
 };
+}
+
+using WebCore::IntPoint;  // remove when we move everything into the WebCore
+                          // namespace
+using WebCore::IntRect;   // remove when we move everything into the WebCore
+                          // namespace
+using WebCore::IntSize;   // remove when we move everything into the WebCore
+                          // namespace
+using WebCore::Widget;    // remove when we move everything into the WebCore
+                          // namespace
 
 #endif

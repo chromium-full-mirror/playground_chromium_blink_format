@@ -350,7 +350,7 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   }
 
   if (r && r->isWidget()) {
-    if (QWidget* widget = static_cast<RenderWidget*>(r)->widget()) {
+    if (Widget* widget = static_cast<RenderWidget*>(r)->widget()) {
       // Call into the frame (and over the bridge) to pull the
       // Bindings::Instance
       // from the guts of the Java VM.
@@ -527,7 +527,7 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
 
   if (RenderObject* r = renderer()) {
     if (r->isWidget()) {
-      if (QWidget* widget = static_cast<RenderWidget*>(r)->widget()) {
+      if (Widget* widget = static_cast<RenderWidget*>(r)->widget()) {
         // Call into the frame (and over the bridge) to pull the
         // Bindings::Instance
         // from the guts of the plugin.

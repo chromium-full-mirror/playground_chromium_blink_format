@@ -203,7 +203,7 @@ bool HTMLGenericFormElementImpl::isKeyboardFocusable() const {
     if (renderer()->isWidget()) {
       return static_cast<RenderWidget*>(renderer())->widget() &&
              (static_cast<RenderWidget*>(renderer())->widget()->focusPolicy() &
-              QWidget::TabFocus);
+              Widget::TabFocus);
     }
     if (getDocument()->frame())
       return getDocument()->frame()->tabsToAllControls();
@@ -218,7 +218,7 @@ bool HTMLGenericFormElementImpl::isMouseFocusable() const {
     else if (renderer()->isWidget()) {
       return static_cast<RenderWidget*>(renderer())->widget() &&
              (static_cast<RenderWidget*>(renderer())->widget()->focusPolicy() &
-              QWidget::ClickFocus);
+              Widget::ClickFocus);
     }
     // For <input type=image> and <button>, we will assume no mouse
     // focusability.  This is

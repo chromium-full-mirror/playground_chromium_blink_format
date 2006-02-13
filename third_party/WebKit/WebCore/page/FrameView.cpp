@@ -155,10 +155,8 @@ class FrameViewPrivate {
   RefPtr<NodeImpl> dragTarget;
 };
 
-FrameView::FrameView(Frame* frame, QWidget* parent, const char* name)
-    : QScrollView(parent,
-                  name,
-                  WResizeNoErase | WRepaintNoErase | WPaintUnclipped),
+FrameView::FrameView(Frame* frame)
+    : QScrollView(),
       _refCount(1),
       m_frame(frame),
       d(new FrameViewPrivate(this)),
@@ -204,10 +202,6 @@ void FrameView::resetScrollBars() {
 }
 
 void FrameView::init() {
-  setFocusPolicy(QWidget::StrongFocus);
-  viewport()->setFocusPolicy(QWidget::WheelFocus);
-  viewport()->setFocusProxy(this);
-
   _marginWidth = -1;  // undefined
   _marginHeight = -1;
   _width = 0;
