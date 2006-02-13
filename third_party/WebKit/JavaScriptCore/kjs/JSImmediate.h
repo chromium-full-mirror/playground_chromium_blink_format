@@ -105,9 +105,10 @@ class JSImmediate {
 
       return tag(doubleUnion.asBits, NumberType);
     } else {
-      // could just return 0 here, but nicer to be explicit about not supporting
-      // the platform well
+      // could just return 0 without aborting, but nicer to be explicit about
+      // not supporting the platform well
       abort();
+      return 0;
     }
   }
 
@@ -122,8 +123,10 @@ class JSImmediate {
       DoubleUnion doubleUnion;
       doubleUnion.asBits = unTag(v);
       return doubleUnion.asDouble;
-    } else
+    } else {
       abort();
+      return 0;
+    }
   }
 
   static bool toBoolean(const JSValue* v) {
@@ -201,8 +204,10 @@ class JSImmediate {
       return NaN32AsBits;
     else if (JSImmediate::is64bit())
       return NaN64AsBits;
-    else
+    else {
       abort();
+      return 0;
+    }
   }
 
   static uintptr_t zeroAsBits() { return 0x0; }
@@ -215,8 +220,10 @@ class JSImmediate {
       return One32AsBits;
     else if (JSImmediate::is64bit())
       return One64AsBits;
-    else
+    else {
       abort();
+      return 0;
+    }
   }
 };
 
