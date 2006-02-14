@@ -644,9 +644,9 @@ void InlineTextBox::paintTextMatchMarker(QPainter* pt,
                                          DocumentMarker marker,
                                          RenderStyle* style,
                                          const Font* f) {
-  Color c = Color(255, 255, 0);
+  Color yellow = Color(255, 255, 0);
   pt->save();
-  pt->setPen(c);  // Don't draw text at all!
+  pt->setPen(yellow);  // Don't draw text at all!
   // Use same y positioning and height as for selection, so that when the
   // selection and this highlight are on
   // the same word there are no pieces sticking out.
@@ -661,14 +661,14 @@ void InlineTextBox::paintTextMatchMarker(QPainter* pt,
       pt, m_x + _tx, y + _ty, h, textObject()->tabWidth(), textPos(),
       textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
       m_reversed ? QPainter::RTL : QPainter::LTR,
-      m_dirOverride || style->visuallyOrdered(), sPos, ePos, c);
+      m_dirOverride || style->visuallyOrdered(), sPos, ePos, yellow);
   pt->restore();
 }
 
 void InlineTextBox::paintAllMarkersOfType(QPainter* pt,
                                           int _tx,
                                           int _ty,
-                                          int markerType,
+                                          DocumentMarker::MarkerType markerType,
                                           RenderStyle* style,
                                           const Font* f) {
   QValueList<DocumentMarker> markers =
@@ -692,25 +692,25 @@ void InlineTextBox::paintAllMarkersOfType(QPainter* pt,
       // truncation.
       continue;
 
-    if (marker.startOffset <= end()) {
-      // marker intersects this run.  Paint it.
-      switch (markerType) {
-        case DocumentMarker::Spelling:
-          paintSpellingMarker(pt, _tx, _ty, marker);
-          break;
-        case DocumentMarker::TextMatch:
-          paintTextMatchMarker(pt, _tx, _ty, marker, style, f);
-          break;
-        default:
-          assert(false);
-      }
-
-      if (marker.endOffset > end() + 1)
-        // marker also runs into the next run. Bail now, no more marker
-        // advancement.
-        break;
-    } else
+    if (marker.startOffset > end())
       // marker is completely after this run, bail.  A later run will paint it.
+      break;
+
+    // marker intersects this run.  Paint it.
+    switch (markerType) {
+      case DocumentMarker::Spelling:
+        paintSpellingMarker(pt, _tx, _ty, marker);
+        break;
+      case DocumentMarker::TextMatch:
+        paintTextMatchMarker(pt, _tx, _ty, marker, style, f);
+        break;
+      default:
+        assert(false);
+    }
+
+    if (marker.endOffset > end() + 1)
+      // marker also runs into the next run. Bail now, no more marker
+      // advancement.
       break;
   }
 }
