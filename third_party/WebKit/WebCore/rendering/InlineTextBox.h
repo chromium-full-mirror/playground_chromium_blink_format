@@ -132,7 +132,22 @@ class InlineTextBox : public InlineRunBox {
                                  const Font* font,
                                  int startPos,
                                  int endPos);
-  void paintMarker(QPainter* p, int _tx, int _ty, DOM::DocumentMarker marker);
+  void paintAllMarkersOfType(QPainter* p,
+                             int _tx,
+                             int _ty,
+                             int markerType,
+                             RenderStyle* style,
+                             const Font* font);
+  void paintSpellingMarker(QPainter* p,
+                           int _tx,
+                           int _ty,
+                           DOM::DocumentMarker marker);
+  void paintTextMatchMarker(QPainter* p,
+                            int _tx,
+                            int _ty,
+                            DOM::DocumentMarker marker,
+                            RenderStyle* style,
+                            const Font* font);
   void paintMarkedTextUnderline(QPainter* pt,
                                 int _tx,
                                 int _ty,

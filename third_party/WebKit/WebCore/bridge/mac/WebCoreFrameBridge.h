@@ -333,6 +333,9 @@ typedef enum {
         direction:(BOOL)forward
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
+- (unsigned)highlightAllMatchesForString:(NSString*)string
+                           caseSensitive:(BOOL)caseFlag;
+- (void)clearHighlightedMatches;
 
 - (NSString*)advanceToNextMisspelling;
 - (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
