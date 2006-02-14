@@ -31,7 +31,6 @@
 #include "CachedObject.h"
 
 #include <kio/global.h>
-#include "String.h"
 
 namespace khtml {
 class CachedObject;
