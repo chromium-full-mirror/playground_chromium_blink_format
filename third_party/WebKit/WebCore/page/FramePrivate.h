@@ -28,14 +28,14 @@
 #define khtmlpart_p_h
 
 #include "Frame.h"
+#include "FrameTree.h"
 #include "SelectionController.h"
 #include "Timer.h"
 #include "css_valueimpl.h"
 #include "edit_command.h"
 #include "kjs_proxy.h"
 #include <kio/global.h>
-#include "FrameTree.h"
-#include "kxmlcore/Vector.h"
+#include <kxmlcore/Vector.h>
 
 namespace KIO {
 class TransferJob;
@@ -43,14 +43,6 @@ class TransferJob;
 
 namespace WebCore {
 class Decoder;
-
-class FrameList : public QValueList<RefPtr<Frame>> {
- public:
-  Iterator find(const QString& name);
-};
-
-typedef FrameList::ConstIterator ConstFrameIt;
-typedef FrameList::Iterator FrameIt;
 
 enum RedirectionScheduled {
   noRedirectionScheduled,
@@ -62,89 +54,81 @@ enum RedirectionScheduled {
 
 class FramePrivate {
  public:
-  FramePrivate(Frame* parent, Frame* thisFrame, RenderPart* ownerRenderer)
-      : m_treeNode(thisFrame, parent),
+  FramePrivate(Page* page,
+               Frame* parent,
+               Frame* thisFrame,
+               RenderPart* ownerRenderer)
+      : m_page(page),
+        m_treeNode(thisFrame, parent),
         m_ownerRenderer(ownerRenderer),
+        m_extension(0),
+        m_jscript(0),
+        m_runningScripts(0),
+        m_bJScriptEnabled(true),
+        m_bJavaEnabled(true),
+        m_bPluginsEnabled(true),
+        m_metaRefreshEnabled(true),
+        m_restored(false),
+        m_frameNameId(1),
+        m_settings(0),
+        m_job(0),
+        m_bComplete(true),
+        m_bLoadingMainResource(false),
+        m_bLoadEventEmitted(true),
+        m_bUnloadEventEmitted(true),
+        m_haveEncoding(false),
+        m_bHTTPRefresh(false),
+        m_redirectLockHistory(false),
+        m_redirectUserGesture(false),
+        m_cachePolicy(KIO::CC_Verify),
         m_redirectionTimer(thisFrame, &Frame::redirectionTimerFired),
+        m_scheduledRedirection(noRedirectionScheduled),
+        m_delayRedirect(0),
+        m_zoomFactor(100),
+        m_submitForm(0),
+        m_bMousePressed(false),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
+        m_caretVisible(false),
+        m_caretBlinks(true),
+        m_caretPaint(true),
+        m_bDnd(true),
+        m_bFirstData(true),
+        m_bClearing(false),
+        m_bCleared(true),
+        m_bSecurityInQuestion(false),
+        m_focusNodeRestored(false),
+        m_isFocused(false),
+        m_focusNodeNumber(-1),
+        m_activeFrame(0),
+        m_opener(0),
+        m_openedByJS(false),
+        m_newJSInterpreterExists(false),
+        m_bPendingChildRedirection(false),
+        m_executingJavaScriptFormAction(false),
+        m_cancelWithLoadInProgress(false),
         m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired) {
-    m_doc = 0;
-    m_jscript = 0;
-    m_runningScripts = 0;
-    m_job = 0;
-    m_bComplete = true;
-    m_bLoadingMainResource = false;
-    m_bLoadEventEmitted = true;
-    m_bUnloadEventEmitted = true;
-    m_cachePolicy = KIO::CC_Verify;
-    m_bClearing = false;
-    m_bCleared = true;
-    m_zoomFactor = 100;
-    m_bDnd = true;
-    m_haveEncoding = false;
-    m_activeFrame = 0;
-    m_frameNameId = 1;
-
-    m_restored = false;
-
-    m_focusNodeNumber = -1;
-    m_focusNodeRestored = false;
-
-    m_onlyLocalReferences = false;
-
-    m_caretVisible = false;
-    m_caretBlinks = true;
-    m_caretPaint = true;
-
-    m_typingStyle = 0;
-
-    m_metaRefreshEnabled = true;
-    m_bHTTPRefresh = false;
-
-    m_bFirstData = true;
-    m_submitForm = 0;
-    m_scheduledRedirection = noRedirectionScheduled;
-    m_delayRedirect = 0;
-
-    m_bPendingChildRedirection = false;
-    m_executingJavaScriptFormAction = false;
-
-    m_cancelWithLoadInProgress = false;
-
     // inherit settings from parent
     if (parent && parent->inherits("Frame")) {
       Frame* frame = static_cast<Frame*>(parent);
-      if (frame->d) {
-        // Same for SSL settings
-        m_onlyLocalReferences = frame->d->m_onlyLocalReferences;
+      if (frame->d)
         m_zoomFactor = frame->d->m_zoomFactor;
-      }
     }
-
-    m_isFocused = false;
-    m_focusNodeNumber = -1;
-    m_focusNodeRestored = false;
-    m_opener = 0;
-    m_openedByJS = false;
-    m_newJSInterpreterExists = false;
   }
+
   ~FramePrivate() {
     delete m_extension;
     delete m_jscript;
-    if (m_typingStyle)
-      m_typingStyle->deref();
   }
 
+  Page* m_page;
   FrameTree m_treeNode;
 
-  // old style frame info
-  FrameList m_frames;
   Vector<RefPtr<Plugin>> m_plugins;
 
   QGuardedPtr<RenderPart> m_ownerRenderer;
   QGuardedPtr<FrameView> m_view;
   BrowserExtension* m_extension;
-  DocumentImpl* m_doc;
+  RefPtr<DocumentImpl> m_doc;
   RefPtr<Decoder> m_decoder;
   QString m_encoding;
   QString scheduledScript;
@@ -173,7 +157,6 @@ class FramePrivate {
   bool m_bUnloadEventEmitted : 1;
   bool m_haveEncoding : 1;
   bool m_bHTTPRefresh : 1;
-  bool m_onlyLocalReferences : 1;
   bool m_redirectLockHistory : 1;
   bool m_redirectUserGesture : 1;
 
@@ -203,7 +186,6 @@ class FramePrivate {
     QString submitContentType;
     QString submitBoundary;
   };
-
   SubmitForm* m_submitForm;
 
   bool m_bMousePressed;
@@ -231,7 +213,7 @@ class FramePrivate {
 
   EditCommandPtr m_lastEditCommand;
   int m_xPosForVerticalArrowNavigation;
-  CSSMutableStyleDeclarationImpl* m_typingStyle;
+  RefPtr<CSSMutableStyleDeclarationImpl> m_typingStyle;
 
   int m_focusNodeNumber;
 

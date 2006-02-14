@@ -34,7 +34,6 @@
 #include "WebCoreKeyboardAccess.h"
 #include "text_affinity.h"
 #include <kxmlcore/HashSet.h>
-#include "BrowserExtensionMac.h"
 
 #import <CoreFoundation/CoreFoundation.h>
 
@@ -114,7 +113,7 @@ enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
 
 class MacFrame : public Frame {
  public:
-  MacFrame(RenderPart*);
+  MacFrame(Page*, RenderPart*);
   ~MacFrame();
 
   void clear();
@@ -193,10 +192,6 @@ class MacFrame : public Frame {
   bool shouldClose();
 
   virtual void createEmptyDocument();
-
-  virtual BrowserExtension* createBrowserExtension() {
-    return new BrowserExtensionMac(this);
-  }
 
   static WebCoreFrameBridge* bridgeForWidget(const Widget*);
 

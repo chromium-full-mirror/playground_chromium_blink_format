@@ -126,48 +126,6 @@ class PartStyleSheetLoader : public CachedObjectClient {
   CachedCSSStyleSheet* m_cachedSheet;
 };
 
-void Frame::init(FrameView* view, RenderPart* ownerRenderer) {
-  AtomicString::init();
-  QualifiedName::init();
-  EventNames::init();
-  HTMLNames::init();  // FIXME: We should make this happen only when HTML is
-                      // used.
-#if SVG_SUPPORT
-  KSVG::SVGNames::init();
-  XLinkNames::init();
-#endif
-
-  _drawSelectionOnly = false;
-  m_markedTextUsesUnderlines = false;
-  m_windowHasFocus = false;
-
-  frameCount = 0;
-
-  // FIXME: FramePrivate constructor wants to take a parent but we do not have
-  // one yet
-  d = new FramePrivate(0, this, ownerRenderer);
-
-  d->m_view = view;
-
-  d->m_extension = createBrowserExtension();
-
-  d->m_bSecurityInQuestion = false;
-  d->m_bMousePressed = false;
-
-  // The java, javascript, and plugin settings will be set after the settings
-  // have been initialized.
-  d->m_bJScriptEnabled = true;
-  d->m_bJavaEnabled = true;
-  d->m_bPluginsEnabled = true;
-
-  connect(Cache::loader(),
-          SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
-          SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
-  connect(Cache::loader(),
-          SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
-          SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
-}
-
 #if !NDEBUG
 struct FrameCounter {
   static int count;
@@ -180,13 +138,45 @@ int FrameCounter::count = 0;
 static FrameCounter frameCounter;
 #endif
 
-Frame::Frame() : d(0) {
+static inline Frame* parentFromOwnerRenderer(RenderPart* ownerRenderer) {
+  if (!ownerRenderer)
+    return 0;
+  return ownerRenderer->node()->getDocument()->frame();
+}
+
+Frame::Frame(Page* page, RenderPart* ownerRenderer)
+    : d(new FramePrivate(page,
+                         parentFromOwnerRenderer(ownerRenderer),
+                         this,
+                         ownerRenderer)),
+      _drawSelectionOnly(false),
+      m_markedTextUsesUnderlines(false),
+      m_windowHasFocus(false),
+      frameCount(0) {
+  AtomicString::init();
+  Cache::init();
+  EventNames::init();
+  HTMLNames::init();
+  QualifiedName::init();
+
+#if SVG_SUPPORT
+  SVGNames::init();
+  XLinkNames::init();
+#endif
+
   // FIXME: Frames were originally created with a refcount of 1, leave this
-  // here until we can straighten that out
+  // ref call here until we can straighten that out.
   ref();
 #if !NDEBUG
   ++FrameCounter::count;
 #endif
+
+  connect(Cache::loader(),
+          SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
+          SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
+  connect(Cache::loader(),
+          SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
+          SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
 }
 
 Frame::~Frame() {
@@ -342,7 +332,7 @@ void Frame::stopLoading(bool sendUnload) {
 
   d->m_workingURL = KURL();
 
-  if (DocumentImpl* doc = d->m_doc) {
+  if (DocumentImpl* doc = d->m_doc.get()) {
     if (DocLoader* docLoader = doc->docLoader())
       Cache::loader()->cancelRequests(docLoader);
     XMLHttpRequest::cancelRequests(doc);
@@ -470,7 +460,7 @@ void Frame::clear(bool clearWindowProperties) {
   d->m_mousePressNode = 0;
 
   if (d->m_doc) {
-    disconnect(d->m_doc, SIGNAL(finishedParsing()), this,
+    disconnect(d->m_doc.get(), SIGNAL(finishedParsing()), this,
                SLOT(slotFinishedParsing()));
     d->m_doc->cancelParsing();
     d->m_doc->detach();
@@ -483,11 +473,9 @@ void Frame::clear(bool clearWindowProperties) {
   if (d->m_view)
     d->m_view->clear();
 
-  // do not dereference the document before the jscript and view are cleared, as
-  // some destructors
+  // do not drop the document before the jscript and view are cleared, as some
+  // destructors
   // might still try to access the document.
-  if (d->m_doc)
-    d->m_doc->deref();
   d->m_doc = 0;
   d->m_decoder = 0;
 
@@ -519,23 +507,21 @@ bool Frame::openFile() {
 
 DocumentImpl* Frame::document() const {
   if (d)
-    return d->m_doc;
+    return d->m_doc.get();
   return 0;
 }
 
 void Frame::setDocument(DocumentImpl* newDoc) {
   if (d) {
     if (d->m_doc) {
-      disconnect(d->m_doc, SIGNAL(finishedParsing()), this,
+      disconnect(d->m_doc.get(), SIGNAL(finishedParsing()), this,
                  SLOT(slotFinishedParsing()));
       d->m_doc->detach();
-      d->m_doc->deref();
     }
     d->m_doc = newDoc;
     if (newDoc) {
-      newDoc->ref();
       newDoc->attach();
-      connect(d->m_doc, SIGNAL(finishedParsing()), this,
+      connect(newDoc, SIGNAL(finishedParsing()), this,
               SLOT(slotFinishedParsing()));
     }
   }
@@ -653,7 +639,6 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   else
     d->m_doc = DOMImplementationImpl::instance()->createHTMLDocument(d->m_view);
 
-  d->m_doc->ref();
   if (!d->m_doc->attached())
     d->m_doc->attach();
   d->m_doc->setURL(d->m_url.url());
@@ -678,7 +663,7 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   // clear widget
   if (d->m_view)
     d->m_view->resizeContents(0, 0);
-  connect(d->m_doc, SIGNAL(finishedParsing()), this,
+  connect(d->m_doc.get(), SIGNAL(finishedParsing()), this,
           SLOT(slotFinishedParsing()));
 }
 
@@ -1104,7 +1089,7 @@ bool Frame::gotoAnchor(const QString& name) {
   NodeImpl* n = d->m_doc->getElementById(name);
   if (!n) {
     HTMLCollectionImpl* anchors =
-        new HTMLCollectionImpl(d->m_doc, HTMLCollectionImpl::DOC_ANCHORS);
+        new HTMLCollectionImpl(d->m_doc.get(), HTMLCollectionImpl::DOC_ANCHORS);
     anchors->ref();
     n = anchors->namedItem(name, !d->m_doc->inCompatMode());
     anchors->deref();
@@ -2158,23 +2143,15 @@ void Frame::reappliedEditing(EditCommandPtr& cmd) {
 }
 
 CSSMutableStyleDeclarationImpl* Frame::typingStyle() const {
-  return d->m_typingStyle;
+  return d->m_typingStyle.get();
 }
 
 void Frame::setTypingStyle(CSSMutableStyleDeclarationImpl* style) {
-  if (d->m_typingStyle == style)
-    return;
-
-  CSSMutableStyleDeclarationImpl* old = d->m_typingStyle;
   d->m_typingStyle = style;
-  if (d->m_typingStyle)
-    d->m_typingStyle->ref();
-  if (old)
-    old->deref();
 }
 
 void Frame::clearTypingStyle() {
-  setTypingStyle(0);
+  d->m_typingStyle = 0;
 }
 
 JSValue* Frame::executeScript(const QString& filename,
@@ -2795,7 +2772,7 @@ IntRect Frame::selectionRect() const {
 }
 
 bool Frame::isFrameSet() const {
-  DocumentImpl* document = d->m_doc;
+  DocumentImpl* document = d->m_doc.get();
   if (!document || !document->isHTMLDocument())
     return false;
   NodeImpl* body = static_cast<HTMLDocumentImpl*>(document)->body();
@@ -3472,6 +3449,10 @@ void Frame::updateBaseURLForEmptyDocument() {
   if (owner && (owner->hasTagName(iframeTag) || owner->hasTagName(objectTag) ||
                 owner->hasTagName(embedTag)))
     d->m_doc->setBaseURL(tree()->parent()->d->m_doc->baseURL());
+}
+
+Page* Frame::page() const {
+  return d->m_page;
 }
 
 }  // namespace WebCore

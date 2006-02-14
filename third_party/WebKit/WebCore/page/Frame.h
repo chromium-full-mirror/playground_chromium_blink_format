@@ -56,24 +56,25 @@ class Instance;
 
 namespace WebCore {
 
-class SelectionController;
-class Selection;
-class RangeImpl;
-class EditCommandPtr;
+class CSSComputedStyleDeclarationImpl;
 class CSSMutableStyleDeclarationImpl;
 class CSSStyleDeclarationImpl;
-class MouseDoubleClickEvent;
-class MousePressEvent;
-class MouseReleaseEvent;
 class DrawContentsEvent;
-class VisiblePosition;
-class MouseEvent;
-class MouseMoveEvent;
-class CSSComputedStyleDeclarationImpl;
+class EditCommandPtr;
 class FramePrivate;
 class FrameTree;
-class Plugin;
 class KJSProxyImpl;
+class MouseDoubleClickEvent;
+class MouseEvent;
+class MouseMoveEvent;
+class MousePressEvent;
+class MouseReleaseEvent;
+class Page;
+class Plugin;
+class RangeImpl;
+class Selection;
+class SelectionController;
+class VisiblePosition;
 
 template <typename T>
 class Timer;
@@ -98,18 +99,20 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
-  Frame();
+  Frame(Page*, RenderPart*);
   virtual ~Frame();
 
   virtual bool openURL(const KURL&);
+  virtual bool closeURL();
 
   void didExplicitOpen();
 
+  Page* page() const;
+
   /**
-   * Stops loading the document and kill all data requests (for images, etc.)
+   * Stop loading the document and kill all data requests (for images, etc.)
    */
   void stopLoading(bool sendUnload = false);
-  virtual bool closeURL();
 
   /**
    * Returns a pointer to the @ref BrowserExtension.
@@ -715,7 +718,6 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
 
   // Methods with platform-specific overrides (and no base class
   // implementation).
-  virtual BrowserExtension* createBrowserExtension() = 0;
   virtual void setTitle(const DOMString&) = 0;
   virtual void handledOnloadEvents() = 0;
   virtual QString userAgent() const = 0;
@@ -857,8 +859,6 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
   void overURL(const QString& url,
                const QString& target,
                bool shiftPressed = false);
-
-  void init(FrameView*, RenderPart*);
 
   bool shouldUsePlugin(NodeImpl* element,
                        const KURL& url,

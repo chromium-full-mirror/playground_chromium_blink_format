@@ -31,8 +31,9 @@ class Frame;
 
 class Page : Noncopyable {
  public:
-  Page(PassRefPtr<Frame> mainFrame);
-  ~Page();
+  Page();
+  virtual ~Page();
+  void setMainFrame(PassRefPtr<Frame> mainFrame);
   Frame* mainFrame() { return m_mainFrame.get(); }
 
  private:
