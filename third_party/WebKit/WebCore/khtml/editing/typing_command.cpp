@@ -27,6 +27,7 @@
 #include "typing_command.h"
 #include "SelectionController.h"
 
+#include "htmlediting.h"
 #include "insert_text_command.h"
 #include "insert_line_break_command.h"
 #include "insert_paragraph_separator_command.h"
@@ -66,20 +67,13 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
   EditCommandPtr lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())->deleteKeyPressed();
-  } else {
-    Selection selection = frame->selection().selection();
-    if (selection.isCaret() &&
-        VisiblePosition(selection.start(), selection.affinity())
-            .previous()
-            .isNull()) {
-      // do nothing for a delete key at the start of an editable element.
-    } else {
-      TypingCommand* typingCommand = new TypingCommand(document, DeleteKey);
-      typingCommand->setSmartDelete(smartDelete);
-      EditCommandPtr cmd(typingCommand);
-      cmd.apply();
-    }
+    return;
   }
+
+  TypingCommand* typingCommand = new TypingCommand(document, DeleteKey);
+  typingCommand->setSmartDelete(smartDelete);
+  EditCommandPtr cmd(typingCommand);
+  cmd.apply();
 }
 
 void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
@@ -93,19 +87,13 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->forwardDeleteKeyPressed();
-  } else {
-    Selection selection = frame->selection().selection();
-    if (selection.isCaret() && isEndOfDocument(VisiblePosition(
-                                   selection.start(), selection.affinity()))) {
-      // do nothing for a delete key at the start of an editable element.
-    } else {
-      TypingCommand* typingCommand =
-          new TypingCommand(document, ForwardDeleteKey);
-      typingCommand->setSmartDelete(smartDelete);
-      EditCommandPtr cmd(typingCommand);
-      cmd.apply();
-    }
+    return;
   }
+
+  TypingCommand* typingCommand = new TypingCommand(document, ForwardDeleteKey);
+  typingCommand->setSmartDelete(smartDelete);
+  EditCommandPtr cmd(typingCommand);
+  cmd.apply();
 }
 
 void TypingCommand::insertText(DocumentImpl* document,
@@ -120,11 +108,12 @@ void TypingCommand::insertText(DocumentImpl* document,
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->insertText(text, selectInsertedText);
-  } else {
-    EditCommandPtr cmd(
-        new TypingCommand(document, InsertText, text, selectInsertedText));
-    cmd.apply();
+    return;
   }
+
+  EditCommandPtr cmd(
+      new TypingCommand(document, InsertText, text, selectInsertedText));
+  cmd.apply();
 }
 
 void TypingCommand::insertLineBreak(DocumentImpl* document) {
@@ -136,10 +125,11 @@ void TypingCommand::insertLineBreak(DocumentImpl* document) {
   EditCommandPtr lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())->insertLineBreak();
-  } else {
-    EditCommandPtr cmd(new TypingCommand(document, InsertLineBreak));
-    cmd.apply();
+    return;
   }
+
+  EditCommandPtr cmd(new TypingCommand(document, InsertLineBreak));
+  cmd.apply();
 }
 
 void TypingCommand::insertParagraphSeparatorInQuotedContent(
@@ -153,11 +143,12 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent(
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->insertParagraphSeparatorInQuotedContent();
-  } else {
-    EditCommandPtr cmd(
-        new TypingCommand(document, InsertParagraphSeparatorInQuotedContent));
-    cmd.apply();
+    return;
   }
+
+  EditCommandPtr cmd(
+      new TypingCommand(document, InsertParagraphSeparatorInQuotedContent));
+  cmd.apply();
 }
 
 void TypingCommand::insertParagraphSeparator(DocumentImpl* document) {
@@ -170,10 +161,11 @@ void TypingCommand::insertParagraphSeparator(DocumentImpl* document) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->insertParagraphSeparator();
-  } else {
-    EditCommandPtr cmd(new TypingCommand(document, InsertParagraphSeparator));
-    cmd.apply();
+    return;
   }
+
+  EditCommandPtr cmd(new TypingCommand(document, InsertParagraphSeparator));
+  cmd.apply();
 }
 
 bool TypingCommand::isOpenForMoreTypingCommand(const EditCommandPtr& cmd) {
@@ -264,16 +256,15 @@ void TypingCommand::insertText(const DOMString& text, bool selectInsertedText) {
   int offset = 0;
   int newline;
   while ((newline = text.find('\n', offset)) != -1) {
-    if (newline != offset) {
+    if (newline != offset)
       insertTextRunWithoutNewlines(text.substring(offset, newline - offset),
                                    false);
-    }
     insertParagraphSeparator();
     offset = newline + 1;
   }
-  if (offset == 0) {
+  if (offset == 0)
     insertTextRunWithoutNewlines(text, selectInsertedText);
-  } else {
+  else {
     int length = text.length();
     if (length != offset) {
       insertTextRunWithoutNewlines(text.substring(offset, length - offset),
@@ -337,16 +328,12 @@ void TypingCommand::deleteKeyPressed() {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
-      Position pos(endingSelection().start());
-      Position start = VisiblePosition(pos, endingSelection().affinity())
-                           .previous()
-                           .deepEquivalent();
-      Position end =
-          VisiblePosition(pos, endingSelection().affinity()).deepEquivalent();
-      if (start.isNotNull() && end.isNotNull() &&
-          start.node()->rootEditableElement() ==
-              end.node()->rootEditableElement())
-        selectionToDelete = Selection(start, end, SEL_DEFAULT_AFFINITY);
+      SelectionController sc =
+          SelectionController(endingSelection().start(),
+                              endingSelection().end(), SEL_DEFAULT_AFFINITY);
+      sc.modify(SelectionController::EXTEND, SelectionController::BACKWARD,
+                CHARACTER);
+      selectionToDelete = sc.selection();
       break;
     }
     case khtml::Selection::NONE:
@@ -372,16 +359,12 @@ void TypingCommand::forwardDeleteKeyPressed() {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
-      Position pos(endingSelection().start());
-      Position start = VisiblePosition(pos, endingSelection().affinity())
-                           .next()
-                           .deepEquivalent();
-      Position end =
-          VisiblePosition(pos, endingSelection().affinity()).deepEquivalent();
-      if (start.isNotNull() && end.isNotNull() &&
-          start.node()->rootEditableElement() ==
-              end.node()->rootEditableElement())
-        selectionToDelete = Selection(start, end, SEL_DEFAULT_AFFINITY);
+      SelectionController sc =
+          SelectionController(endingSelection().start(),
+                              endingSelection().end(), SEL_DEFAULT_AFFINITY);
+      sc.modify(SelectionController::EXTEND, SelectionController::FORWARD,
+                CHARACTER);
+      selectionToDelete = sc.selection();
       break;
     }
     case khtml::Selection::NONE:
