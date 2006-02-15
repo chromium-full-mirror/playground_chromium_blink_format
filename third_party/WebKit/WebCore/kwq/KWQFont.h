@@ -70,12 +70,14 @@ class QFont {
   bool operator==(const QFont& x) const;
   bool operator!=(const QFont& x) const { return !(*this == x); }
 
+#if __APPLE__
   NSString* getNSFamily() const { return _family.getNSFamily(); }
   int getNSTraits() const { return _trait; }
   float getNSSize() const { return _size; }
 
   NSFont* getNSFont() const { return getWebCoreFont().font; }
   const WebCoreFont& getWebCoreFont() const;
+#endif
 
  private:
   FontFamily _family;
@@ -83,7 +85,9 @@ class QFont {
   float _size;
   bool _isPrinterFont : 1;
   mutable Pitch _pitch : 2;
+#if __APPLE__
   mutable WebCoreFont m_webCoreFont;
+#endif
 };
 
 #endif

@@ -52,7 +52,7 @@ class GIFImageDecoder : public ImageDecoder {
   // The number of repetitions to perform for an animation loop.
   virtual int repetitionCount() const;
 
-  virtual RGBA32Buffer frameBufferAtIndex(size_t index);
+  virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 
   virtual unsigned frameDurationAtIndex(size_t index) { return 0; }
 

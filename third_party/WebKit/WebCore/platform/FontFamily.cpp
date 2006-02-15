@@ -29,7 +29,15 @@
 
 namespace WebCore {
 
-FontFamily::FontFamily() : m_next(0), m_refCnt(0), m_CFFamily(0) {}
+FontFamily::FontFamily()
+    : m_next(0),
+      m_refCnt(0)
+#if __APPLE__
+      ,
+      m_CFFamily(0)
+#endif
+{
+}
 
 FontFamily::FontFamily(const FontFamily& other)
     : m_family(other.m_family),
