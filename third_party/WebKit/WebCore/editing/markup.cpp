@@ -39,6 +39,7 @@
 #include "InlineTextBox.h"
 #include "htmlnames.h"
 #include "DocumentImpl.h"
+#include "DocumentTypeImpl.h"
 #include "CommentImpl.h"
 
 using namespace DOM::HTMLNames;
@@ -189,14 +190,24 @@ static QString startMarkup(const NodeImpl* node,
     }
     case Node::COMMENT_NODE:
       return static_cast<const CommentImpl*>(node)->toString().qstring();
-    case Node::DOCUMENT_NODE:
+    case Node::DOCUMENT_NODE: {
+      // Documents do not normally contain a docType as a child node, force it
+      // to print here instead.
+      const DocumentTypeImpl* docType =
+          static_cast<const DocumentImpl*>(node)->doctype();
+      if (docType)
+        return docType->toString().qstring();
+      return "";
+    }
     case Node::DOCUMENT_FRAGMENT_NODE:
       return "";
+    case Node::DOCUMENT_TYPE_NODE:
+      return static_cast<const DocumentTypeImpl*>(node)->toString().qstring();
     case Node::PROCESSING_INSTRUCTION_NODE:
       return static_cast<const ProcessingInstructionImpl*>(node)
           ->toString()
           .qstring();
-    default: {
+    case Node::ELEMENT_NODE: {
       QString markup = QChar('<') + node->nodeName().qstring();
       if (type == Node::ELEMENT_NODE) {
         const ElementImpl* el = static_cast<const ElementImpl*>(node);
@@ -249,6 +260,7 @@ static QString startMarkup(const NodeImpl* node,
       return markup;
     }
   }
+  return "";
 }
 
 static inline bool doesHTMLForbidEndTag(const NodeImpl* node) {
