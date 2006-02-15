@@ -215,7 +215,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* impl, FrameView* v)
       ,
       m_bindingManager(new XBLBindingManager(this))
 #endif
-#if KHTML_XSLT
+#ifdef KHTML_XSLT
       ,
       m_transformSource(0)
 #endif
@@ -443,11 +443,11 @@ ProcessingInstructionImpl* DocumentImpl::createProcessingInstruction(
     int& exception) {
   if (!isValidName(target)) {
     exception = DOMException::INVALID_CHARACTER_ERR;
-    return NULL;
+    return 0;
   }
   if (isHTMLDocument()) {
     exception = DOMException::NOT_SUPPORTED_ERR;
-    return NULL;
+    return 0;
   }
   return new ProcessingInstructionImpl(this, target, data);
 }
@@ -1103,17 +1103,14 @@ void DocumentImpl::open() {
 
   implicitOpen();
 
-  if (frame()) {
+  if (frame())
     frame()->didExplicitOpen();
-  }
 
   // This is work that we should probably do in clear(), but we can't have it
   // happen when implicitOpen() is called unless we reorganize Frame code.
   setURL(QString());
-  DocumentImpl* parent = parentDocument();
-  if (parent) {
+  if (DocumentImpl* parent = parentDocument())
     setBaseURL(parent->baseURL());
-  }
 }
 
 void DocumentImpl::cancelParsing() {
@@ -1837,10 +1834,11 @@ void DocumentImpl::recalcStyleSelector() {
           static_cast<ProcessingInstructionImpl*>(n);
       sheet = pi->sheet();
 #ifdef KHTML_XSLT
-      if (pi->isXSL()) {
-        // Don't apply transforms to already transformed documents --
-        // <rdar://problem/4132806>
-        if (!transformSourceDocument())
+      // Don't apply XSL transforms to already transformed documents --
+      // <rdar://problem/4132806>
+      if (pi->isXSL() && !transformSourceDocument()) {
+        // Don't apply XSL transforms until loading is finished.
+        if (!parsing())
           applyXSLTransform(pi);
         return;
       }

@@ -45,27 +45,30 @@ namespace WebCore {
 
 XSLStyleSheetImpl::XSLStyleSheetImpl(XSLImportRuleImpl* parentRule,
                                      DOMString href)
-    : StyleSheetImpl(parentRule, href) {
+    : StyleSheetImpl(parentRule, href),
+      m_ownerDocument(0),
+      m_stylesheetDoc(0),
+      m_embedded(false),
+      m_processed(false)  // Child sheets get marked as processed when the
+                          // libxslt engine has finally seen them.
+{
   m_lstChildren = new QPtrList<StyleBaseImpl>;
-  m_ownerDocument = 0;
-  m_embedded = false;
-  m_processed = false;  // Child sheets get marked as processed when the libxslt
-                        // engine has finally seen them.
 }
 
 XSLStyleSheetImpl::XSLStyleSheetImpl(NodeImpl* parentNode,
                                      DOMString href,
                                      bool embedded)
-    : StyleSheetImpl(parentNode, href) {
+    : StyleSheetImpl(parentNode, href),
+      m_ownerDocument(parentNode->getDocument()),
+      m_stylesheetDoc(0),
+      m_embedded(embedded),
+      m_processed(true)  // The root sheet starts off processed.
+{
   m_lstChildren = new QPtrList<StyleBaseImpl>;
-  m_ownerDocument = parentNode->getDocument();
-  m_embedded = embedded;
-  m_processed = true;  // The root sheet starts off processed.
 }
 
 XSLStyleSheetImpl::~XSLStyleSheetImpl() {
-  if (!m_embedded)
-    xmlFreeDoc(m_stylesheetDoc);
+  xmlFreeDoc(m_stylesheetDoc);
 }
 
 bool XSLStyleSheetImpl::isLoading() {
@@ -87,6 +90,12 @@ void XSLStyleSheetImpl::checkLoaded() {
     parent()->checkLoaded();
   if (m_parentNode)
     m_parentNode->sheetLoaded();
+}
+
+xmlDocPtr XSLStyleSheetImpl::document() {
+  if (m_embedded && ownerDocument())
+    return (xmlDocPtr)ownerDocument()->transformSource();
+  return m_stylesheetDoc;
 }
 
 void XSLStyleSheetImpl::clearDocuments() {
@@ -113,6 +122,7 @@ bool XSLStyleSheetImpl::parseString(const DOMString& string, bool strict) {
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
   setLoaderForLibXMLCallbacks(docLoader());
+  xmlFreeDoc(m_stylesheetDoc);
   m_stylesheetDoc = xmlReadMemory(
       reinterpret_cast<const char*>(string.unicode()),
       string.length() * sizeof(QChar), m_ownerDocument->URL().ascii(),
@@ -120,20 +130,20 @@ bool XSLStyleSheetImpl::parseString(const DOMString& string, bool strict) {
       XML_PARSE_NOCDATA | XML_PARSE_DTDATTR | XML_PARSE_NOENT);
   loadChildSheets();
   setLoaderForLibXMLCallbacks(0);
-  return m_stylesheetDoc;
+  return newDoc;
 }
 
 void XSLStyleSheetImpl::loadChildSheets() {
-  if (!m_stylesheetDoc)
+  if (!document())
     return;
 
-  xmlNodePtr stylesheetRoot = m_stylesheetDoc->children;
+  xmlNodePtr stylesheetRoot = document()->children;
   if (m_embedded) {
     // We have to locate (by ID) the appropriate embedded stylesheet element, so
     // that we can walk the
     // import/include list.
-    xmlAttrPtr idNode = xmlGetID(
-        m_stylesheetDoc, (const xmlChar*)(href().qstring().utf8().data()));
+    xmlAttrPtr idNode =
+        xmlGetID(document(), (const xmlChar*)(href().qstring().utf8().data()));
     if (idNode == NULL)
       return;
     stylesheetRoot = idNode->parent;
@@ -193,14 +203,14 @@ XSLStyleSheetImpl* XSLImportRuleImpl::parentStyleSheet() const {
 xsltStylesheetPtr XSLStyleSheetImpl::compileStyleSheet() {
   // FIXME: Hook up error reporting for the stylesheet compilation process.
   if (m_embedded)
-    return xsltLoadStylesheetPI(m_stylesheetDoc);
+    return xsltLoadStylesheetPI(document());
   else
-    return xsltParseStylesheetDoc(m_stylesheetDoc);
+    return xsltParseStylesheetDoc(document());
 }
 
 xmlDocPtr XSLStyleSheetImpl::locateStylesheetSubResource(xmlDocPtr parentDoc,
                                                          const xmlChar* uri) {
-  bool matchedParent = (parentDoc == m_stylesheetDoc);
+  bool matchedParent = (parentDoc == document());
   for (StyleBaseImpl* rule = m_lstChildren->first(); rule;
        rule = m_lstChildren->next()) {
     if (rule->isImportRule()) {
@@ -235,7 +245,7 @@ xmlDocPtr XSLStyleSheetImpl::locateStylesheetSubResource(xmlDocPtr parentDoc,
     }
   }
 
-  return NULL;
+  return 0;
 }
 
 // ----------------------------------------------------------------------------------------------

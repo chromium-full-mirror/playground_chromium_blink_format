@@ -95,7 +95,6 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   virtual bool write(const SegmentedString& str, bool appendData);
   virtual void finish();
-  virtual void setOnHold(bool onHold);
   virtual void setForceSynchronous(bool force);
   virtual bool isWaitingForScripts() const;
   virtual void stopParsing();
@@ -342,8 +341,6 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   int m_executingScript;
   QPtrQueue<CachedScript> pendingScripts;
   RefPtr<NodeImpl> scriptNode;
-  // you can pause the tokenizer if you need to display a dialog or something
-  bool onHold;
 
   // if we found one broken comment, there are most likely others as well
   // store a flag to get rid of the O(n^2) behaviour in such a case.
