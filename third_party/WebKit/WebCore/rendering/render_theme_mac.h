@@ -75,6 +75,9 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintTextField(RenderObject* o,
                               const RenderObject::PaintInfo& i,
                               const IntRect& r);
+  virtual void adjustTextFieldStyle(CSSStyleSelector* selector,
+                                    RenderStyle* style,
+                                    ElementImpl* e) const;
 
  private:
   IntRect inflateRect(const IntRect& r,
