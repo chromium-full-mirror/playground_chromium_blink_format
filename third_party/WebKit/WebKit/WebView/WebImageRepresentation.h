@@ -28,7 +28,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class WebArchive;
 @class WebDataSource;
 @class WebImageRenderer;
 
@@ -42,7 +41,6 @@
 + (NSArray*)supportedMIMETypes;
 - (WebImageRenderer*)image;
 - (NSString*)filename;
-- (WebArchive*)archive;
 - (BOOL)doneLoading;
 - (NSData*)data;
 - (NSURL*)URL;
