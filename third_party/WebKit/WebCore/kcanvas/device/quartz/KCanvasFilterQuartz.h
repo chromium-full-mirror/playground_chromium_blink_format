@@ -106,6 +106,11 @@ class KCanvasFEImageQuartz : public KCanvasFEImage {
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
 };
 
+class KCanvasFEDisplacementMapQuartz : public KCanvasFEDisplacementMap {
+ public:
+  virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
+};
+
 class KCanvasFEMergeQuartz : public KCanvasFEMerge {
  public:
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;

@@ -338,8 +338,8 @@ QTextStream& KCanvasFEDisplacementMap::externalRepresentation(
   if (!in2().isEmpty())
     ts << " [in2=" << in2() << "]";
   ts << " [scale=" << m_scale << "]"
-     << " [x channel selector=" << m_XChannelSelector << "]"
-     << " [y channel selector=" << m_XChannelSelector << "]";
+     << " [x channel selector=" << m_xChannelSelector << "]"
+     << " [y channel selector=" << m_yChannelSelector << "]";
   return ts;
 }
 
