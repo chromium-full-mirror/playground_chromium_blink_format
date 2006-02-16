@@ -156,7 +156,6 @@ class ObjcArray : public Array {
 
 class ObjcFallbackObjectImp : public JSObject {
  public:
-  ObjcFallbackObjectImp(JSObject* proto);
   ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
 
   const ClassInfo* classInfo() const { return &info; }
@@ -178,9 +177,14 @@ class ObjcFallbackObjectImp : public JSObject {
   virtual bool toBoolean(ExecState* exec) const;
 
  private:
+  ObjcFallbackObjectImp();  // prevent default construction
+  ObjcFallbackObjectImp(const ObjcFallbackObjectImp& other);  // prevent copying
+  ObjcFallbackObjectImp& operator=(
+      const ObjcFallbackObjectImp& other);  // ditto
+
   static const ClassInfo info;
 
-  ObjcInstance* _instance;
+  RefPtr<ObjcInstance> _instance;
   Identifier _item;
 };
 

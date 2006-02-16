@@ -105,7 +105,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   DOMString oldNameAttr;
   DOMString oldIdAttr;
 
-  mutable KJS::Bindings::Instance* appletInstance;
+  mutable RefPtr<KJS::Bindings::Instance> m_appletInstance;
 
   bool m_allParamsAvailable;
 };
@@ -143,7 +143,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
  private:
   DOMString oldNameAttr;
 
-  mutable KJS::Bindings::Instance* embedInstance;
+  mutable RefPtr<KJS::Bindings::Instance> m_embedInstance;
 };
 
 // -------------------------------------------------------------------------
@@ -252,7 +252,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   DOMString oldIdAttr;
   DOMString oldNameAttr;
 
-  mutable KJS::Bindings::Instance* objectInstance;
+  mutable RefPtr<KJS::Bindings::Instance> m_objectInstance;
 
   bool m_complete;
   bool m_docNamedItem;
