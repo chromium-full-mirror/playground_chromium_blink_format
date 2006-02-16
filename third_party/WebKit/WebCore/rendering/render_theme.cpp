@@ -132,6 +132,10 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
   return false;
 }
 
+bool RenderTheme::supportsFocusRing(const RenderStyle* style) const {
+  return (style->hasAppearance() && style->appearance() != TextFieldAppearance);
+}
+
 bool RenderTheme::stateChanged(RenderObject* o, ControlState state) const {
   // Default implementation assumes the controls dont respond to changes in
   // :hover state

@@ -115,6 +115,9 @@ class RenderTheme {
   // old theme.
   void themeChanged();
 
+  // A method asking if the theme is able to draw the focus ring.
+  virtual bool supportsFocusRing(const RenderStyle* style) const;
+
  protected:
   // Methods for state querying
   bool isChecked(const RenderObject* o) const;
