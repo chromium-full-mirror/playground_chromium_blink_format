@@ -167,8 +167,8 @@ void XSLStyleSheetImpl::loadChildSheets() {
           IS_XSLT_NAME(curr, "import")) {
         xmlChar* uriRef =
             xsltGetNsProp(curr, (const xmlChar*)"href", XSLT_NAMESPACE);
-        QString buff = QString::fromUtf8((const char*)uriRef);
-        loadChildSheet(buff);
+        loadChildSheet(QString::fromUtf8((const char*)uriRef));
+        xmlFree(uriRef);
       } else
         break;
       curr = curr->next;
@@ -180,8 +180,8 @@ void XSLStyleSheetImpl::loadChildSheets() {
           IS_XSLT_NAME(curr, "include")) {
         xmlChar* uriRef =
             xsltGetNsProp(curr, (const xmlChar*)"href", XSLT_NAMESPACE);
-        QString buff = QString::fromUtf8((const char*)uriRef);
-        loadChildSheet(buff);
+        loadChildSheet(QString::fromUtf8((const char*)uriRef));
+        xmlFree(uriRef);
       }
       curr = curr->next;
     }
@@ -232,7 +232,10 @@ xmlDocPtr XSLStyleSheetImpl::locateStylesheetSubResource(xmlDocPtr parentDoc,
         xmlChar* base = xmlNodeGetBase(parentDoc, (xmlNodePtr)parentDoc);
         xmlChar* childURI =
             xmlBuildURI((const xmlChar*)(const char*)importHref, base);
-        if (xmlStrEqual(uri, childURI)) {
+        bool equalURIs = xmlStrEqual(uri, childURI);
+        xmlFree(base);
+        xmlFree(childURI);
+        if (equalURIs) {
           child->markAsProcessed();
           return child->document();
         }
