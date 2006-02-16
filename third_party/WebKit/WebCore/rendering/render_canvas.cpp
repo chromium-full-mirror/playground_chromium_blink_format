@@ -2,7 +2,7 @@
  * This file is part of the HTML widget for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,22 +19,23 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include "config.h"
-#include "rendering/render_canvas.h"
-#include "render_layer.h"
-#include "DocumentImpl.h"
 
+#include "config.h"
+#include "render_canvas.h"
+
+#include "DocumentImpl.h"
 #include "FrameView.h"
+#include "render_layer.h"
 #include <kdebug.h>
 
-using namespace khtml;
+namespace WebCore {
 
 //#define BOX_DEBUG
-//#define SPEED_DEBUG
 
-RenderCanvas::RenderCanvas(DOM::NodeImpl* node, FrameView* view)
+RenderCanvas::RenderCanvas(NodeImpl* node, FrameView* view)
     : RenderBlock(node) {
-  // Clear our anonymous bit.
+  // Clear our anonymous bit, set because RenderObject assumes
+  // any renderer with document as the node is anonymous.
   setIsAnonymous(false);
 
   // init RenderObject attributes
@@ -48,9 +49,6 @@ RenderCanvas::RenderCanvas(DOM::NodeImpl* node, FrameView* view)
 
   m_width = m_minWidth;
   m_maxWidth = m_minWidth;
-
-  m_rootWidth = m_rootHeight = 0;
-  m_viewportWidth = m_viewportHeight = 0;
 
   setPositioned(true);  // to 0,0 :)
 
@@ -71,34 +69,15 @@ RenderCanvas::RenderCanvas(DOM::NodeImpl* node, FrameView* view)
 RenderCanvas::~RenderCanvas() {}
 
 void RenderCanvas::calcHeight() {
-  if (!m_printingMode && m_view) {
+  if (!m_printingMode && m_view)
     m_height = m_view->visibleHeight();
-  } else if (!m_view) {
-    m_height = m_rootHeight;
-  }
 }
 
 void RenderCanvas::calcWidth() {
-  // the width gets set by FrameView::print when printing to a printer.
-  if (m_printingMode || !m_view) {
-    m_width = m_rootWidth;
-    return;
-  }
-
-  m_width = m_view
-                ? m_view->frameWidth() + paddingLeft() + paddingRight() +
-                      borderLeft() + borderRight()
-                : m_minWidth;
-
-  if (style()->marginLeft().type == Fixed)
-    m_marginLeft = style()->marginLeft().value;
-  else
-    m_marginLeft = 0;
-
-  if (style()->marginRight().type == Fixed)
-    m_marginRight = style()->marginRight().value;
-  else
-    m_marginRight = 0;
+  if (!m_printingMode && m_view)
+    m_width = m_view->visibleWidth();
+  m_marginLeft = 0;
+  m_marginRight = 0;
 }
 
 void RenderCanvas::calcMinMaxWidth() {
@@ -111,8 +90,6 @@ void RenderCanvas::calcMinMaxWidth() {
   setMinMaxKnown();
 }
 
-//#define SPEED_DEBUG
-
 void RenderCanvas::layout() {
   KHTMLAssert(!view()->inLayout());
 
@@ -124,28 +101,8 @@ void RenderCanvas::layout() {
   for (RenderObject* c = firstChild(); c; c = c->nextSibling())
     c->setChildNeedsLayout(true);
 
-#ifdef SPEED_DEBUG
-  QTime qt;
-  qt.start();
-#endif
   if (recalcMinMax())
     recalcMinMaxWidths();
-#ifdef SPEED_DEBUG
-  kdDebug() << "RenderCanvas::calcMinMax time used=" << qt.elapsed() << endl;
-  qt.start();
-#endif
-
-#ifdef SPEED_DEBUG
-  kdDebug() << "RenderCanvas::layout time used=" << qt.elapsed() << endl;
-  qt.start();
-#endif
-  if (!m_printingMode) {
-    m_viewportWidth = m_width = m_view->visibleWidth();
-    m_viewportHeight = m_height = m_view->visibleHeight();
-  } else {
-    m_width = m_rootWidth;
-    m_height = m_rootHeight;
-  }
 
   RenderBlock::layout();
 
@@ -153,17 +110,13 @@ void RenderCanvas::layout() {
   int doch = docHeight();
 
   if (!m_printingMode) {
-    setWidth(m_viewportWidth = m_view->visibleWidth());
-    setHeight(m_viewportHeight = m_view->visibleHeight());
+    setWidth(m_view->visibleWidth());
+    setHeight(m_view->visibleHeight());
   }
 
   // ### we could maybe do the call below better and only pass true if the
   // docsize changed.
   layoutPositionedObjects(true);
-
-#ifdef SPEED_DEBUG
-  kdDebug() << "RenderCanvas::end time used=" << qt.elapsed() << endl;
-#endif
 
   layer()->setHeight(kMax(doch, m_height));
   layer()->setWidth(kMax(docw, m_width));
@@ -223,7 +176,7 @@ void RenderCanvas::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   // Check to see if we are enclosed by a transparent layer.  If so, we cannot
   // blit
   // when scrolling, and we need to use slow repaints.
-  DOM::ElementImpl* elt = element()->getDocument()->ownerElement();
+  ElementImpl* elt = element()->getDocument()->ownerElement();
   if (view() && elt) {
     RenderLayer* layer = elt->renderer()->enclosingLayer();
     if (layer->isTransparent() || layer->transparentAncestor())
@@ -255,7 +208,7 @@ void RenderCanvas::repaintViewRectangle(const IntRect& ur, bool immediate) {
     // is clipped out
     // or even invisible.
     IntRect r = intersection(ur, vr);
-    DOM::ElementImpl* elt = element()->getDocument()->ownerElement();
+    ElementImpl* elt = element()->getDocument()->ownerElement();
     if (!elt)
       m_view->repaintRectangle(r, immediate);
     else {
@@ -265,8 +218,9 @@ void RenderCanvas::repaintViewRectangle(const IntRect& ur, bool immediate) {
       r.move(-m_view->contentsX(), -m_view->contentsY());
 
       RenderObject* obj = elt->renderer();
-      int yFrameOffset = (m_view->frameStyle() != QFrame::NoFrame) ? 2 : 0;
-      int xFrameOffset = (m_view->frameStyle() != QFrame::NoFrame) ? 1 : 0;
+      // FIXME: Hardcoded offsets here are not good.
+      int yFrameOffset = m_view->hasBorder() ? 2 : 0;
+      int xFrameOffset = m_view->hasBorder() ? 1 : 0;
       r.move(obj->borderLeft() + obj->paddingLeft() + xFrameOffset,
              obj->borderTop() + obj->paddingTop() + yFrameOffset);
       obj->repaintRectangle(r, immediate);
@@ -581,11 +535,10 @@ void RenderCanvas::removeWidget(RenderObject* o) {
 IntRect RenderCanvas::viewRect() const {
   if (m_printingMode)
     return IntRect(0, 0, m_width, m_height);
-  else if (m_view)
+  if (m_view)
     return IntRect(m_view->contentsX(), m_view->contentsY(),
                    m_view->visibleWidth(), m_view->visibleHeight());
-  else
-    return IntRect(0, 0, m_rootWidth, m_rootHeight);
+  return IntRect();
 }
 
 int RenderCanvas::docHeight() const {
@@ -654,4 +607,5 @@ void RenderCanvas::setBestTruncatedAt(int y,
     m_truncatorWidth = width;
     m_bestTruncatedAt = y;
   }
+}
 }

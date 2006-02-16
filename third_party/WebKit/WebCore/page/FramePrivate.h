@@ -108,7 +108,7 @@ class FramePrivate {
         m_cancelWithLoadInProgress(false),
         m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired) {
     // inherit settings from parent
-    if (parent && parent->inherits("Frame")) {
+    if (parent && parent->isFrame()) {
       Frame* frame = static_cast<Frame*>(parent);
       if (frame->d)
         m_zoomFactor = frame->d->m_zoomFactor;

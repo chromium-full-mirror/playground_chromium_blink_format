@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,29 +20,36 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef QFRAME_H_
-#define QFRAME_H_
+#import "config.h"
+#import "FrameView.h"
 
-#include "Widget.h"
+#import "DocumentImpl.h"
+#import "KWQExceptions.h"
+#import "MacFrame.h"
+#import "WebCoreFrameBridge.h"
+#import "render_object.h"
 
-class QFrame : public Widget {
- public:
-  enum Shape { NoFrame = 1, Box = 2, StyledPanel = 4 };
-  enum Shadow { Sunken = 8, Plain = 16 };
+namespace WebCore {
 
-  QFrame() : _frameStyle(QFrame::NoFrame) {}
+void FrameView::updateBorder()
+{
+    KWQ_BLOCK_EXCEPTIONS;
+    [Mac(m_frame.get())->bridge() setHasBorder:hasBorder()];
+    KWQ_UNBLOCK_EXCEPTIONS;
+}
 
-  void setFrameStyle(int);
-  int frameStyle();
-  int frameWidth() const;
+void FrameView::updateDashboardRegions()
+{
+    DocumentImpl* document = m_frame->document();
+    if (document->hasDashboardRegions()) {
+        QValueList<DashboardRegionValue> newRegions = document->renderer()->computeDashboardRegions();
+        QValueList<DashboardRegionValue> currentRegions = document->dashboardRegions();
+        document->setDashboardRegions(newRegions);
+        Mac(m_frame.get())->dashboardRegionsChanged();
+    }
+}
 
- private:
-  virtual bool isQFrame() const;
-
-  int _frameStyle;
-};
-
-#endif
+}

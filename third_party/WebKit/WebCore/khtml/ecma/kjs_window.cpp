@@ -2147,10 +2147,8 @@ JSValue* FrameArray::indexGetter(ExecState* exec,
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
   Frame* frame = thisObj->m_frame->frames().at(slot.index());
 
-  if (frame && frame->inherits("Frame")) {
-    Frame* khtml = static_cast<Frame*>(frame);
-    return Window::retrieve(khtml);
-  }
+  if (frame && frame->isFrame())
+    return Window::retrieve(static_cast<Frame*>(frame));
 
   return jsUndefined();
 }
@@ -2162,10 +2160,8 @@ JSValue* FrameArray::nameGetter(ExecState* exec,
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
   Frame* frame = thisObj->m_frame->findFrame(propertyName.qstring());
 
-  if (frame && frame->inherits("Frame")) {
-    Frame* khtml = static_cast<Frame*>(frame);
-    return Window::retrieve(khtml);
-  }
+  if (frame && frame->isFrame())
+    return Window::retrieve(static_cast<Frame*>(frame));
 
   return jsUndefined();
 }

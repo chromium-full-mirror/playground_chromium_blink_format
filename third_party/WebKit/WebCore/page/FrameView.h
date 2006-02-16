@@ -217,6 +217,9 @@ class FrameView : public QScrollView {
   void adjustViewSize();
   void initScrollBars();
 
+  void setHasBorder(bool);
+  bool hasBorder() const;
+
 #if __APPLE__
   void updateDashboardRegions();
 #endif
@@ -293,9 +296,10 @@ class FrameView : public QScrollView {
 
   virtual bool isFrameView() const;
 
+  void updateBorder();
+
   // ------------------------------------- member variables
   // ------------------------------------
- private:
   unsigned _refCount;
 
   int _width;

@@ -49,10 +49,6 @@
 #include <kcursor.h>
 #include <qpainter.h>
 
-#if __APPLE__
-#include "MacFrame.h"
-#endif
-
 namespace WebCore {
 
 using namespace EventNames;
@@ -61,30 +57,17 @@ using namespace HTMLNames;
 class FrameViewPrivate {
  public:
   FrameViewPrivate(FrameView* view)
-      : layoutTimer(view, &FrameView::layoutTimerFired),
+      : m_hasBorder(false),
+        layoutTimer(view, &FrameView::layoutTimerFired),
         hoverTimer(view, &FrameView::hoverTimerFired) {
     repaintRects = 0;
-    underMouse = 0;
-    clickNode = 0;
-    reset();
-    delayedLayout = false;
-    mousePressed = false;
-    doFullRepaint = true;
     isTransparent = false;
     vmode = hmode = QScrollView::Auto;
-    firstLayout = true;
     needToInitScrollBars = true;
+    reset();
   }
-  ~FrameViewPrivate() {
-    if (underMouse)
-      underMouse->deref();
-    if (clickNode)
-      clickNode->deref();
-    delete repaintRects;
-  }
+  ~FrameViewPrivate() { delete repaintRects; }
   void reset() {
-    if (underMouse)
-      underMouse->deref();
     underMouse = 0;
     linkPressed = false;
     useSlowRepaints = false;
@@ -97,8 +80,6 @@ class FrameViewPrivate {
     prevMouseX = -1;
     prevMouseY = -1;
     clickCount = 0;
-    if (clickNode)
-      clickNode->deref();
     clickNode = 0;
     scrollingSelf = false;
     layoutTimer.stop();
@@ -114,12 +95,13 @@ class FrameViewPrivate {
       repaintRects->clear();
   }
 
-  NodeImpl* underMouse;
+  RefPtr<NodeImpl> underMouse;
 
   bool borderTouched : 1;
   bool borderStart : 1;
   bool scrollBarMoved : 1;
   bool doFullRepaint : 1;
+  bool m_hasBorder : 1;
 
   QScrollView::ScrollBarMode vmode;
   QScrollView::ScrollBarMode hmode;
@@ -129,7 +111,7 @@ class FrameViewPrivate {
 
   int borderX, borderY;
   int clickCount;
-  NodeImpl* clickNode;
+  RefPtr<NodeImpl> clickNode;
 
   int prevMouseX, prevMouseY;
   bool scrollingSelf;
@@ -456,11 +438,11 @@ void FrameView::layout() {
   }
 
   d->layoutCount++;
+
 #if __APPLE__
   if (KWQAccObjectCache::accessibilityEnabled())
     root->document()->getAccObjectCache()->postNotification(root,
                                                             "AXLayoutComplete");
-
   updateDashboardRegions();
 #endif
 
@@ -474,20 +456,6 @@ void FrameView::layout() {
   if (didFirstLayout)
     m_frame->didFirstLayout();
 }
-
-#if __APPLE__
-void FrameView::updateDashboardRegions() {
-  DocumentImpl* document = m_frame->document();
-  if (document->hasDashboardRegions()) {
-    QValueList<DashboardRegionValue> newRegions =
-        document->renderer()->computeDashboardRegions();
-    QValueList<DashboardRegionValue> currentRegions =
-        document->dashboardRegions();
-    document->setDashboardRegions(newRegions);
-    Mac(m_frame.get())->dashboardRegionsChanged();
-  }
-}
-#endif
 
 //
 // Event Handling
@@ -514,11 +482,7 @@ void FrameView::viewportMousePressEvent(QMouseEvent* _mouse) {
   }
 
   d->clickCount = _mouse->clickCount();
-  if (d->clickNode)
-    d->clickNode->deref();
-  d->clickNode = mev.innerNode.get();
-  if (d->clickNode)
-    d->clickNode->ref();
+  d->clickNode = mev.innerNode;
 
   bool swallowEvent =
       dispatchMouseEvent(mousedownEvent, mev.innerNode.get(), true,
@@ -687,10 +651,7 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
 
 void FrameView::invalidateClick() {
   d->clickCount = 0;
-  if (d->clickNode) {
-    d->clickNode->deref();
-    d->clickNode = 0;
-  }
+  d->clickNode = 0;
 }
 
 void FrameView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
@@ -748,16 +709,14 @@ bool FrameView::dispatchDragEvent(const AtomicString& eventType,
   bool shiftKey = 0;
   bool metaKey = 0;
 
-  MouseEventImpl* me = new MouseEventImpl(
+  RefPtr<MouseEventImpl> me = new MouseEventImpl(
       eventType, true, true, m_frame->document()->defaultView(), 0, screenX,
       screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, 0, 0,
       clipboard);
-  me->ref();
+
   int exceptioncode = 0;
-  dragTarget->dispatchEvent(me, exceptioncode, true);
-  bool accept = me->defaultPrevented();
-  me->deref();
-  return accept;
+  dragTarget->dispatchEvent(me.get(), exceptioncode, true);
+  return me->defaultPrevented();
 }
 
 bool FrameView::updateDragAndDrop(const IntPoint& loc,
@@ -810,7 +769,7 @@ bool FrameView::performDragAndDrop(const IntPoint& loc,
 }
 
 NodeImpl* FrameView::nodeUnderMouse() const {
-  return d->underMouse;
+  return d->underMouse.get();
 }
 
 bool FrameView::scrollTo(const IntRect& bounds) {
@@ -1023,11 +982,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   // rdar://4196646
   if (targetNode && targetNode->isTextNode())
     targetNode = targetNode->parentNode();
-  if (d->underMouse)
-    d->underMouse->deref();
   d->underMouse = targetNode;
-  if (d->underMouse)
-    d->underMouse->ref();
 
   // mouseout/mouseover
   if (setUnder) {
@@ -1218,5 +1173,14 @@ void FrameView::setTransparent(bool isTransparent) {
 void FrameView::scheduleHoverStateUpdate() {
   if (!d->hoverTimer.isActive())
     d->hoverTimer.startOneShot(0);
+}
+
+void FrameView::setHasBorder(bool b) {
+  d->m_hasBorder = b;
+  updateBorder();
+}
+
+bool FrameView::hasBorder() const {
+  return d->m_hasBorder;
 }
 }
