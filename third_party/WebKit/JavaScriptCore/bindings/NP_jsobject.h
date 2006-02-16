@@ -49,5 +49,6 @@ NPObject* _NPN_CreateScriptObject(
     KJS::JSObject* imp,
     const KJS::Bindings::RootObject* originExecutionContext,
     const KJS::Bindings::RootObject* executionContext);
+NPObject* _NPN_CreateNoScriptObject(void);
 
 #endif
