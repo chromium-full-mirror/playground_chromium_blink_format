@@ -91,12 +91,11 @@ class ObjcField : public Field {
 
 class ObjcMethod : public Method {
  public:
-  ObjcMethod() : _objcClass(0), _selector(0) {}
+  ObjcMethod() : _objcClass(0), _selector(0), _javaScriptName(0) {}
   ObjcMethod(struct objc_class* aClass, const char* _selector);
   ~ObjcMethod() {
     if (_javaScriptName)
-      ;
-    CFRelease(_javaScriptName);
+      CFRelease(_javaScriptName);
   }
 
   ObjcMethod(const ObjcMethod& other) : Method() {

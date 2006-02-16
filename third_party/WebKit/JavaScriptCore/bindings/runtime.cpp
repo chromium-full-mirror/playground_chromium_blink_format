@@ -130,8 +130,7 @@ Instance* Instance::createBindingForLanguageInstance(
       break;
     }
     case Instance::ObjectiveCLanguage: {
-      newInstance =
-          new Bindings::ObjcInstance((struct objc_object*)nativeInstance);
+      newInstance = new Bindings::ObjcInstance((ObjectStructPtr)nativeInstance);
       break;
     }
     case Instance::CLanguage: {
