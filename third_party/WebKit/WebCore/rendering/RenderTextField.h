@@ -54,6 +54,10 @@ class RenderTextField : public RenderBlock {
 
   RenderStyle* createDivStyle(RenderStyle* startStyle);
 
+  bool isEdited() const { return m_dirty; };
+  void setEdited(bool isEdited) { m_dirty = isEdited; };
+  bool isTextField() const { return true; }
+
   int selectionStart();
   int selectionEnd();
   void setSelectionStart(int);
@@ -66,6 +70,8 @@ class RenderTextField : public RenderBlock {
  protected:
   RefPtr<HTMLDivElementImpl> m_div;
   RefPtr<InputMutationListener> m_mutationListener;
+
+  bool m_dirty;
 };
 };
 #endif
