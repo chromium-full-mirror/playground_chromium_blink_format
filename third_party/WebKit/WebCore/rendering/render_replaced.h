@@ -107,7 +107,6 @@ class RenderWidget : public QObject, public RenderReplaced {
   bool eventFilter(QObject* /*o*/, QEvent* e);
   void setQWidget(Widget* widget, bool deleteWidget = true);
   void resizeWidget(Widget* widget, int w, int h);
-  virtual void handleFocusOut();
 
   bool m_deleteWidget;
   Widget* m_widget;

@@ -135,6 +135,9 @@ class RenderLineEdit : public RenderFormElement {
   void setSelectionStart(int);
   void setSelectionEnd(int);
 
+  bool isEdited() const;
+  void setEdited(bool);
+  bool isTextField() const { return true; }
   void select();
   void setSelectionRange(int, int);
 
@@ -151,9 +154,6 @@ class RenderLineEdit : public RenderFormElement {
 
  public:
   void addSearchResult();
-
- protected:
-  virtual void handleFocusOut();
 
  private:
   virtual bool isEditable() const { return true; }
@@ -328,7 +328,9 @@ class RenderTextArea : public RenderFormElement {
   virtual void updateFromElement();
   virtual void setStyle(RenderStyle*);
 
-  virtual bool isTextArea() const { return true; }
+  bool isTextArea() const { return true; }
+  bool isEdited() const { return m_dirty; }
+  void setEdited(bool);
 
   // don't even think about making this method virtual!
   DOM::HTMLTextAreaElementImpl* element() const {
@@ -352,8 +354,6 @@ class RenderTextArea : public RenderFormElement {
   void slotSelectionChanged();
 
  protected:
-  virtual void handleFocusOut();
-
   virtual bool isEditable() const { return true; }
 
   bool m_dirty;
