@@ -26,22 +26,22 @@
 #include "config.h"
 #include "ReplaceSelectionCommand.h"
 
+#include "ApplyStyleCommand.h"
 #include "DocumentFragmentImpl.h"
 #include "DocumentImpl.h"
+#include "EditingTextImpl.h"
 #include "Frame.h"
-#include "ApplyStyleCommand.h"
+#include "HTMLElementImpl.h"
+#include "VisiblePosition.h"
 #include "css_computedstyle.h"
 #include "css_valueimpl.h"
 #include "cssproperties.h"
 #include "dom2_rangeimpl.h"
 #include "dom_position.h"
-#include "EditingTextImpl.h"
-#include "HTMLElementImpl.h"
 #include "html_interchange.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
 #include "render_object.h"
-#include "VisiblePosition.h"
 #include "visible_units.h"
 #include <kxmlcore/Assertions.h>
 
@@ -323,7 +323,7 @@ static void computeAndStoreNodeDesiredStyle(
 
   RefPtr<CSSComputedStyleDeclarationImpl> computedStyle =
       Position(node, 0).computedStyle();
-  CSSMutableStyleDeclarationImpl* style =
+  RefPtr<CSSMutableStyleDeclarationImpl> style =
       computedStyle->copyInheritableProperties();
   list.append(NodeDesiredStyle(node, style));
 
@@ -442,8 +442,9 @@ void ReplacementFragment::removeStyleNodes() {
   }
 }
 
-NodeDesiredStyle::NodeDesiredStyle(NodeImpl* node,
-                                   CSSMutableStyleDeclarationImpl* style)
+NodeDesiredStyle::NodeDesiredStyle(
+    PassRefPtr<NodeImpl> node,
+    PassRefPtr<CSSMutableStyleDeclarationImpl> style)
     : m_node(node), m_style(style) {}
 
 ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
@@ -735,10 +736,11 @@ void ReplaceSelectionCommand::doApply() {
         insertTextIntoNode(text, text->length(), nonBreakingSpaceString());
         insertionPos = Position(text, text->length());
       } else {
-        NodeImpl* node =
+        RefPtr<NodeImpl> node =
             document()->createEditingTextNode(nonBreakingSpaceString());
-        insertNodeAfterAndUpdateNodesInserted(node, m_lastNodeInserted.get());
-        insertionPos = Position(node, 1);
+        insertNodeAfterAndUpdateNodesInserted(node.get(),
+                                              m_lastNodeInserted.get());
+        insertionPos = Position(node.get(), 1);
       }
     }
   }
@@ -753,9 +755,10 @@ void ReplaceSelectionCommand::doApply() {
         TextImpl* text = static_cast<TextImpl*>(m_firstNodeInserted.get());
         insertTextIntoNode(text, 0, nonBreakingSpaceString());
       } else {
-        NodeImpl* node =
+        RefPtr<NodeImpl> node =
             document()->createEditingTextNode(nonBreakingSpaceString());
-        insertNodeBeforeAndUpdateNodesInserted(node, m_firstNodeInserted.get());
+        insertNodeBeforeAndUpdateNodesInserted(node.get(),
+                                               m_firstNodeInserted.get());
       }
     }
   }

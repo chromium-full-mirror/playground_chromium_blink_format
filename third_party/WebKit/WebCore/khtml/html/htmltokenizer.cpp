@@ -1269,7 +1269,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           }
         }
 
-        NodeImpl* n = processToken();
+        RefPtr<NodeImpl> n = processToken();
 
         if (tagName == preTag) {
           state.setDiscardLF(
@@ -1653,7 +1653,7 @@ void HTMLTokenizer::finish() {
     end();  // this actually causes us to be deleted
 }
 
-NodeImpl* HTMLTokenizer::processToken() {
+PassRefPtr<NodeImpl> HTMLTokenizer::processToken() {
   KJSProxyImpl* jsProxy =
       (view && view->frame()) ? view->frame()->jScript() : 0L;
   if (jsProxy)
@@ -1702,17 +1702,18 @@ NodeImpl* HTMLTokenizer::processToken() {
   }
   kdDebug(6036) << endl;
 #endif
-  NodeImpl* n = 0;
 
-  if (!m_parserStopped) {
+  RefPtr<NodeImpl> n;
+
+  if (!m_parserStopped)
     // pass the token over to the parser, the parser DOES NOT delete the token
     n = parser->parseToken(&currToken);
-  }
 
   currToken.reset();
   if (jsProxy)
     jsProxy->setEventHandlerLineno(0);
-  return n;
+
+  return n.release();
 }
 
 HTMLTokenizer::~HTMLTokenizer() {

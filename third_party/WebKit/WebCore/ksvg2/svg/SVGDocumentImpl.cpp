@@ -93,14 +93,13 @@ DOMString SVGDocumentImpl::title() const {
   return DOMString();
 }
 
-ElementImpl* SVGDocumentImpl::createElement(const DOMString& tagName,
-                                            int& exceptionCode) {
+PassRefPtr<ElementImpl> SVGDocumentImpl::createElement(const DOMString& tagName,
+                                                       int& exceptionCode) {
   QualifiedName qname(nullAtom, tagName.impl(), SVGNames::svgNamespaceURI);
-  SVGElementImpl* elem =
+  RefPtr<SVGElementImpl> elem =
       SVGElementFactory::createSVGElement(qname, this, false);
   if (!elem)
     return DocumentImpl::createElement(tagName, exceptionCode);
-
   return elem;
 }
 
@@ -157,7 +156,7 @@ void SVGDocumentImpl::dispatchRecursiveEvent(EventImpl* event, NodeImpl* obj) {
 void SVGDocumentImpl::dispatchZoomEvent(float prevScale, float newScale) {
   // dispatch zoom event
   int exceptioncode;
-  RefPtr<SVGZoomEventImpl> event = static_cast<SVGZoomEventImpl*>(
+  RefPtr<SVGZoomEventImpl> event = static_pointer_cast<SVGZoomEventImpl>(
       createEvent("SVGZoomEvents", exceptioncode));
   event->initEvent(EventNames::zoomEvent, true, false);
   event->setPreviousScale(prevScale);
@@ -178,8 +177,9 @@ bool SVGDocumentImpl::dispatchKeyEvent(EventTargetImpl* target,
                                        bool keypress) {
   // dispatch key event
   int exceptioncode;
-  RefPtr<KeyboardEventImpl> keyEventImpl = static_cast<KeyboardEventImpl*>(
-      createEvent("KeyboardEvents", exceptioncode));
+  RefPtr<KeyboardEventImpl> keyEventImpl =
+      static_pointer_cast<KeyboardEventImpl>(
+          createEvent("KeyboardEvents", exceptioncode));
   // keyEventImpl->initKeyboardEvent(key);
   target->dispatchEvent(keyEventImpl.get(), exceptioncode);
 
@@ -271,7 +271,7 @@ void SVGDocumentImpl::dispatchUIEvent(EventTargetImpl* target,
   // Setup kdom 'UIEvent'...
   int exceptioncode;
   RefPtr<UIEventImpl> event =
-      static_cast<UIEventImpl*>(createEvent("UIEvents", exceptioncode));
+      static_pointer_cast<UIEventImpl>(createEvent("UIEvents", exceptioncode));
   event->initUIEvent(type, true, true, 0, 0);
   target->dispatchEvent(event.get(), exceptioncode);
 }
@@ -280,8 +280,8 @@ void SVGDocumentImpl::dispatchMouseEvent(EventTargetImpl* target,
                                          const AtomicString& type) {
   // Setup kdom 'MouseEvent'...
   int exceptioncode;
-  RefPtr<MouseEventImpl> event =
-      static_cast<MouseEventImpl*>(createEvent("MouseEvents", exceptioncode));
+  RefPtr<MouseEventImpl> event = static_pointer_cast<MouseEventImpl>(
+      createEvent("MouseEvents", exceptioncode));
   event->initEvent(type, true, true);
   target->dispatchEvent(event.get(), exceptioncode);
 }

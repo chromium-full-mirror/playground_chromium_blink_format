@@ -28,14 +28,20 @@
 
 #include "Shared.h"
 
-namespace DOM {
+namespace KXMLCore {
+template <typename T>
+class PassRefPtr;
+}
+using KXMLCore::PassRefPtr;
+
+namespace WebCore {
 
 class AtomicString;
 class NodeImpl;
 
 class NodeListImpl : public Shared<NodeListImpl> {
  public:
-  NodeListImpl(NodeImpl* _rootNode);
+  NodeListImpl(PassRefPtr<NodeImpl> rootNode);
   virtual ~NodeListImpl();
 
   // DOM methods & attributes for NodeList
@@ -53,7 +59,7 @@ class NodeListImpl : public Shared<NodeListImpl> {
   NodeImpl* recursiveItem(unsigned offset, NodeImpl* start = 0) const;
   virtual bool nodeMatches(NodeImpl* testNode) const = 0;
 
-  NodeImpl* rootNode;
+  RefPtr<NodeImpl> rootNode;
   mutable int cachedLength;
   mutable NodeImpl* lastItem;
   mutable unsigned lastItemOffset;

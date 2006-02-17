@@ -25,16 +25,15 @@
 
 #include "config.h"
 #include "EditCommand.h"
-#include "SelectionController.h"
-#include "Frame.h"
-#include "htmlediting.h"
 
-#include "dom_position.h"
 #include "DocumentImpl.h"
+#include "Frame.h"
+#include "SelectionController.h"
 #include "VisiblePosition.h"
-#include "css_valueimpl.h"
 #include "css_computedstyle.h"
-
+#include "css_valueimpl.h"
+#include "dom_position.h"
+#include "htmlediting.h"
 #include <kxmlcore/Assertions.h>
 
 namespace WebCore {
@@ -147,7 +146,7 @@ CSSMutableStyleDeclarationImpl* EditCommandPtr::typingStyle() const {
 }
 
 void EditCommandPtr::setTypingStyle(
-    CSSMutableStyleDeclarationImpl* style) const {
+    PassRefPtr<CSSMutableStyleDeclarationImpl> style) const {
   IF_IMPL_NULL_RETURN;
   get()->setTypingStyle(style);
 }
@@ -283,12 +282,20 @@ void EditCommand::setEndingSelection(const Position& p, EAffinity affinity) {
     cmd->m_endingSelection = s;
 }
 
-void EditCommand::setTypingStyle(CSSMutableStyleDeclarationImpl* style) {
+void EditCommand::setTypingStyle(
+    PassRefPtr<CSSMutableStyleDeclarationImpl> style) {
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
+  if (!m_parent) {
+    // Special more-efficient case for where there's only one command that
+    // takes advantage of the ability of PassRefPtr to pass its ref to a RefPtr.
+    m_typingStyle = style;
+    return;
+  }
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
-    cmd->m_typingStyle = style;
+    cmd->m_typingStyle =
+        style.get();  // must use get() to avoid setting parent styles to 0
 }
 
 bool EditCommand::preservesTypingStyle() const {
@@ -303,12 +310,10 @@ bool EditCommand::isTypingCommand() const {
   return false;
 }
 
-CSSMutableStyleDeclarationImpl* EditCommand::styleAtPosition(
+PassRefPtr<CSSMutableStyleDeclarationImpl> EditCommand::styleAtPosition(
     const Position& pos) {
-  RefPtr<CSSComputedStyleDeclarationImpl> computedStyle =
-      positionBeforeTabSpan(pos).computedStyle();
-  CSSMutableStyleDeclarationImpl* style =
-      computedStyle->copyInheritableProperties();
+  RefPtr<CSSMutableStyleDeclarationImpl> style =
+      positionBeforeTabSpan(pos).computedStyle()->copyInheritableProperties();
 
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
@@ -318,7 +323,7 @@ CSSMutableStyleDeclarationImpl* EditCommand::styleAtPosition(
   if (typingStyle)
     style->merge(typingStyle);
 
-  return style;
+  return style.release();
 }
 
 void EditCommand::updateLayout() const {

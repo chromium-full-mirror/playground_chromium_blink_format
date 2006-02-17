@@ -42,7 +42,7 @@ short NodeFilterImpl::acceptNode(NodeImpl* node) const {
 
 TraversalImpl::TraversalImpl(NodeImpl* rootNode,
                              int whatToShow,
-                             NodeFilterImpl* nodeFilter,
+                             PassRefPtr<NodeFilterImpl> nodeFilter,
                              bool expandEntityReferences)
     : m_root(rootNode),
       m_whatToShow(whatToShow),
@@ -69,7 +69,7 @@ short TraversalImpl::acceptNode(NodeImpl* node) const {
 
 NodeIteratorImpl::NodeIteratorImpl(NodeImpl* rootNode,
                                    int whatToShow,
-                                   NodeFilterImpl* filter,
+                                   PassRefPtr<NodeFilterImpl> filter,
                                    bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
       m_beforeReferenceNode(true),
@@ -214,7 +214,7 @@ void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
 
 TreeWalkerImpl::TreeWalkerImpl(NodeImpl* rootNode,
                                int whatToShow,
-                               NodeFilterImpl* filter,
+                               PassRefPtr<NodeFilterImpl> filter,
                                bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
       m_current(rootNode) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,7 +43,7 @@ enum EUsingComposedCharacters {
 class Position {
  public:
   Position() : m_node(0), m_offset(0) {}
-  Position(NodeImpl* node, int offset);
+  Position(NodeImpl*, int offset);
 
   void clear();
 
@@ -54,7 +54,7 @@ class Position {
   bool isNotNull() const { return m_node != 0; }
 
   ElementImpl* element() const;
-  CSSComputedStyleDeclarationImpl* computedStyle() const;
+  PassRefPtr<CSSComputedStyleDeclarationImpl> computedStyle() const;
 
   // Move up or down the DOM by one position
   Position previous(EUsingComposedCharacters usingComposedCharacters =

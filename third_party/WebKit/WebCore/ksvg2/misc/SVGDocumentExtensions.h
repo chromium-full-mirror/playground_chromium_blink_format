@@ -24,6 +24,12 @@
 
 #if SVG_SUPPORT
 
+namespace KXMLCore {
+template <typename T>
+class PassRefPtr;
+}
+using KXMLCore::PassRefPtr;
+
 namespace WebCore {
 
 class TimeScheduler;
@@ -37,7 +43,8 @@ class SVGDocumentExtensions {
   SVGDocumentExtensions(DocumentImpl*);
   ~SVGDocumentExtensions();
 
-  EventListener* createSVGEventListener(const DOMString& code, NodeImpl*);
+  PassRefPtr<EventListener> createSVGEventListener(const DOMString& code,
+                                                   NodeImpl*);
 
   TimeScheduler* timeScheduler() const { return m_timeScheduler; }
 

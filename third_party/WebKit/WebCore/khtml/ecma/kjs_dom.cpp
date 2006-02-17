@@ -21,22 +21,29 @@
 #include "config.h"
 #include "kjs_dom.h"
 
+#include "CDATASectionImpl.h"
+#include "CommentImpl.h"
 #include "DOMImplementationImpl.h"
 #include "DocumentFragmentImpl.h"
 #include "DocumentTypeImpl.h"
+#include "EventNames.h"
 #include "Frame.h"
 #include "JSAttr.h"
 #include "JSCharacterData.h"
-#include "JSDocumentType.h"
 #include "JSDOMImplementation.h"
+#include "JSDocumentType.h"
 #include "JSEntity.h"
 #include "JSNotation.h"
 #include "JSProcessingInstruction.h"
 #include "JSText.h"
-#include "css/css_ruleimpl.h"
-#include "css/css_stylesheetimpl.h"
-#include "dom/dom_exception.h"
-#include "html/html_documentimpl.h"
+#include "css_ruleimpl.h"
+#include "css_stylesheetimpl.h"
+#include "dom2_eventsimpl.h"
+#include "dom2_rangeimpl.h"
+#include "dom2_viewsimpl.h"
+#include "dom_exception.h"
+#include "dom_xmlimpl.h"
+#include "html_documentimpl.h"
 #include "html_objectimpl.h"
 #include "htmlnames.h"
 #include "khtml_settings.h"
@@ -47,13 +54,7 @@
 #include "kjs_traversal.h"
 #include "kjs_views.h"
 #include "kjs_window.h"
-#include "rendering/render_canvas.h"
-#include "EventNames.h"
-#include "dom2_eventsimpl.h"
-#include "dom2_viewsimpl.h"
-#include "CDATASectionImpl.h"
-#include "CommentImpl.h"
-#include "dom_xmlimpl.h"
+#include "render_canvas.h"
 #include <kdebug.h>
 
 #if __APPLE__
@@ -1045,33 +1046,35 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
       return getDOMNode(
           exec, doc.getElementById(args[0]->toString(exec).domString().impl()));
     case DOMDocument::CreateRange:
-      return getDOMRange(exec, doc.createRange());
+      return getDOMRange(exec, doc.createRange().get());
     case DOMDocument::CreateNodeIterator: {
-      NodeFilterImpl* filter = 0;
+      RefPtr<NodeFilterImpl> filter;
       JSValue* arg2 = args[2];
       if (arg2->isObject()) {
         JSObject* o(static_cast<JSObject*>(arg2));
         filter = new NodeFilterImpl(new JSNodeFilterCondition(o));
       }
       return getDOMNodeIterator(
-          exec,
-          doc.createNodeIterator(toNode(args[0]), args[1]->toUInt32(exec),
-                                 filter, args[3]->toBoolean(exec), exception));
+          exec, doc.createNodeIterator(toNode(args[0]), args[1]->toUInt32(exec),
+                                       filter.release(),
+                                       args[3]->toBoolean(exec), exception)
+                    .get());
     }
     case DOMDocument::CreateTreeWalker: {
-      NodeFilterImpl* filter = 0;
+      RefPtr<NodeFilterImpl> filter;
       JSValue* arg2 = args[2];
       if (arg2->isObject()) {
         JSObject* o(static_cast<JSObject*>(arg2));
         filter = new NodeFilterImpl(new JSNodeFilterCondition(o));
       }
       return getDOMTreeWalker(
-          exec,
-          doc.createTreeWalker(toNode(args[0]), args[1]->toUInt32(exec), filter,
-                               args[3]->toBoolean(exec), exception));
+          exec, doc.createTreeWalker(toNode(args[0]), args[1]->toUInt32(exec),
+                                     filter.release(), args[3]->toBoolean(exec),
+                                     exception)
+                    .get());
     }
     case DOMDocument::CreateEvent:
-      return getDOMEvent(exec, doc.createEvent(s, exception));
+      return getDOMEvent(exec, doc.createEvent(s, exception).get());
     case DOMDocument::GetOverrideStyle:
       if (ElementImpl* element0 = toElement(args[0]))
         return getDOMCSSStyleDeclaration(

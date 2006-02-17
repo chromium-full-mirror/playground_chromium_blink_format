@@ -29,7 +29,13 @@
 #include "dom/dom2_traversal.h"
 #include "Shared.h"
 
-namespace DOM {
+namespace KXMLCore {
+template <class T>
+class PassRefPtr;
+}
+using KXMLCore::PassRefPtr;
+
+namespace WebCore {
 
 class NodeImpl;
 class DocumentImpl;
@@ -53,7 +59,7 @@ class TraversalImpl : public Shared<TraversalImpl> {
  public:
   TraversalImpl(NodeImpl*,
                 int whatToShow,
-                NodeFilterImpl*,
+                PassRefPtr<NodeFilterImpl>,
                 bool expandEntityReferences);
   virtual ~TraversalImpl();
 
@@ -78,7 +84,7 @@ class NodeIteratorImpl : public TraversalImpl {
  public:
   NodeIteratorImpl(NodeImpl*,
                    int whatToShow,
-                   NodeFilterImpl*,
+                   PassRefPtr<NodeFilterImpl>,
                    bool expandEntityReferences);
   ~NodeIteratorImpl();
 
@@ -97,9 +103,6 @@ class NodeIteratorImpl : public TraversalImpl {
   void notifyBeforeNodeRemoval(NodeImpl* removed);
 
  private:
-  NodeIteratorImpl(const NodeIteratorImpl&);
-  NodeIteratorImpl& operator=(const NodeIteratorImpl&);
-
   void setReferenceNode(NodeImpl*);
   void setPointerBeforeReferenceNode(bool flag = true) {
     m_beforeReferenceNode = flag;
@@ -120,7 +123,7 @@ class TreeWalkerImpl : public TraversalImpl {
  public:
   TreeWalkerImpl(NodeImpl*,
                  int whatToShow,
-                 NodeFilterImpl*,
+                 PassRefPtr<NodeFilterImpl>,
                  bool expandEntityReferences);
 
   NodeImpl* currentNode() const { return m_current.get(); }
@@ -135,9 +138,6 @@ class TreeWalkerImpl : public TraversalImpl {
   NodeImpl* nextNode();
 
  private:
-  TreeWalkerImpl(const TreeWalkerImpl&);
-  TreeWalkerImpl& operator=(const TreeWalkerImpl&);
-
   // convenience for when it is known there will be no exception
   void setCurrentNode(NodeImpl*);
 

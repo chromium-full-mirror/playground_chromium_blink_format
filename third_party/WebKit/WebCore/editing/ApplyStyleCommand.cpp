@@ -27,20 +27,20 @@
 #include "ApplyStyleCommand.h"
 
 #include "DocumentImpl.h"
+#include "HTMLElementImpl.h"
 #include "NodeListImpl.h"
+#include "PlatformString.h"
+#include "TextImpl.h"
+#include "VisiblePosition.h"
 #include "css_computedstyle.h"
 #include "css_valueimpl.h"
 #include "cssparser.h"
 #include "cssproperties.h"
 #include "dom2_rangeimpl.h"
-#include "PlatformString.h"
-#include "TextImpl.h"
-#include "HTMLElementImpl.h"
 #include "html_interchange.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
 #include "render_object.h"
-#include "VisiblePosition.h"
 #include <kxmlcore/Assertions.h>
 
 namespace WebCore {
@@ -251,22 +251,22 @@ static bool isEmptyFontTag(const NodeImpl* node) {
          elem->getAttribute(classAttr) == styleSpanClassString();
 }
 
-static ElementImpl* createFontElement(DocumentImpl* document) {
+static PassRefPtr<ElementImpl> createFontElement(DocumentImpl* document) {
   int exceptionCode = 0;
-  ElementImpl* fontNode =
+  RefPtr<ElementImpl> fontNode =
       document->createElementNS(xhtmlNamespaceURI, "font", exceptionCode);
   ASSERT(exceptionCode == 0);
   fontNode->setAttribute(classAttr, styleSpanClassString());
-  return fontNode;
+  return fontNode.release();
 }
 
-ElementImpl* createStyleSpanElement(DocumentImpl* document) {
+PassRefPtr<HTMLElementImpl> createStyleSpanElement(DocumentImpl* document) {
   int exceptionCode = 0;
-  ElementImpl* styleElement =
+  RefPtr<ElementImpl> styleElement =
       document->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
   ASSERT(exceptionCode == 0);
   styleElement->setAttribute(classAttr, styleSpanClassString());
-  return styleElement;
+  return static_pointer_cast<HTMLElementImpl>(styleElement.release());
 }
 
 ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
@@ -285,8 +285,8 @@ ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
 
 ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
                                      CSSStyleDeclarationImpl* style,
-                                     Position start,
-                                     Position end,
+                                     const Position& start,
+                                     const Position& end,
                                      EditAction editingAction,
                                      EPropertyLevel propertyLevel)
     : CompositeEditCommand(document),
@@ -299,9 +299,8 @@ ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
   m_useEndingSelection = false;
 }
 
-ApplyStyleCommand::~ApplyStyleCommand() {}
-
-void ApplyStyleCommand::updateStartEnd(Position newStart, Position newEnd) {
+void ApplyStyleCommand::updateStartEnd(const Position& newStart,
+                                       const Position& newEnd) {
   ASSERT(RangeImpl::compareBoundaryPoints(newEnd, newStart) >= 0);
 
   if (!m_useEndingSelection && (newStart != m_start || newEnd != m_end))
@@ -503,9 +502,10 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
       // style this
       // text node. To make this possible, add a style span to surround this
       // text node.
-      elem = static_cast<HTMLElementImpl*>(createStyleSpanElement(document()));
-      insertNodeBefore(elem, node);
-      surroundNodeRangeWithElement(node, node, elem);
+      RefPtr<HTMLElementImpl> span = createStyleSpanElement(document());
+      insertNodeBefore(span.get(), node);
+      surroundNodeRangeWithElement(node, node, span.get());
+      elem = span.get();
     } else {
       // Only handle HTML elements and text nodes.
       continue;
@@ -757,8 +757,8 @@ static NodeImpl* highestAncestorWithTextDecoration(NodeImpl* node) {
   return result;
 }
 
-CSSMutableStyleDeclarationImpl* ApplyStyleCommand::extractTextDecorationStyle(
-    NodeImpl* node) {
+PassRefPtr<CSSMutableStyleDeclarationImpl>
+ApplyStyleCommand::extractTextDecorationStyle(NodeImpl* node) {
   ASSERT(node);
   ASSERT(node->isElementNode());
 
@@ -772,7 +772,7 @@ CSSMutableStyleDeclarationImpl* ApplyStyleCommand::extractTextDecorationStyle(
     return 0;
 
   int properties[1] = {CSS_PROP_TEXT_DECORATION};
-  CSSMutableStyleDeclarationImpl* textDecorationStyle =
+  RefPtr<CSSMutableStyleDeclarationImpl> textDecorationStyle =
       style->copyPropertiesInSet(properties, 1);
 
   RefPtr<CSSValueImpl> property =
@@ -780,10 +780,10 @@ CSSMutableStyleDeclarationImpl* ApplyStyleCommand::extractTextDecorationStyle(
   if (property && !equalIgnoringCase(property->cssText(), "none"))
     removeCSSProperty(style.get(), CSS_PROP_TEXT_DECORATION);
 
-  return textDecorationStyle;
+  return textDecorationStyle.release();
 }
 
-CSSMutableStyleDeclarationImpl*
+PassRefPtr<CSSMutableStyleDeclarationImpl>
 ApplyStyleCommand::extractAndNegateTextDecorationStyle(NodeImpl* node) {
   ASSERT(node);
   ASSERT(node->isElementNode());
@@ -798,7 +798,7 @@ ApplyStyleCommand::extractAndNegateTextDecorationStyle(NodeImpl* node) {
   ASSERT(computedStyle);
 
   int properties[1] = {CSS_PROP_TEXT_DECORATION};
-  CSSMutableStyleDeclarationImpl* textDecorationStyle =
+  RefPtr<CSSMutableStyleDeclarationImpl> textDecorationStyle =
       computedStyle->copyPropertiesInSet(properties, 1);
 
   RefPtr<CSSValueImpl> property =
@@ -810,7 +810,7 @@ ApplyStyleCommand::extractAndNegateTextDecorationStyle(NodeImpl* node) {
     applyTextDecorationStyle(node, newStyle.get());
   }
 
-  return textDecorationStyle;
+  return textDecorationStyle.release();
 }
 
 void ApplyStyleCommand::applyTextDecorationStyle(
@@ -822,11 +822,10 @@ void ApplyStyleCommand::applyTextDecorationStyle(
     return;
 
   if (node->isTextNode()) {
-    HTMLElementImpl* styleSpan =
-        static_cast<HTMLElementImpl*>(createStyleSpanElement(document()));
-    insertNodeBefore(styleSpan, node);
-    surroundNodeRangeWithElement(node, node, styleSpan);
-    node = styleSpan;
+    RefPtr<HTMLElementImpl> styleSpan = createStyleSpanElement(document());
+    insertNodeBefore(styleSpan.get(), node);
+    surroundNodeRangeWithElement(node, node, styleSpan.get());
+    node = styleSpan.get();
   }
 
   if (!node->isElementNode())
@@ -1308,16 +1307,16 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
   //
   if (styleChange.applyFontColor() || styleChange.applyFontFace() ||
       styleChange.applyFontSize()) {
-    ElementImpl* fontElement = createFontElement(document());
+    RefPtr<ElementImpl> fontElement = createFontElement(document());
     ASSERT(exceptionCode == 0);
-    insertNodeBefore(fontElement, startNode);
+    insertNodeBefore(fontElement.get(), startNode);
     if (styleChange.applyFontColor())
       fontElement->setAttribute(colorAttr, styleChange.fontColor());
     if (styleChange.applyFontFace())
       fontElement->setAttribute(faceAttr, styleChange.fontFace());
     if (styleChange.applyFontSize())
       fontElement->setAttribute(sizeAttr, styleChange.fontSize());
-    surroundNodeRangeWithElement(startNode, endNode, fontElement);
+    surroundNodeRangeWithElement(startNode, endNode, fontElement.get());
   }
 
   if (styleChange.cssStyle().length() > 0) {
@@ -1328,19 +1327,19 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
   }
 
   if (styleChange.applyBold()) {
-    ElementImpl* boldElement =
+    RefPtr<ElementImpl> boldElement =
         document()->createElementNS(xhtmlNamespaceURI, "b", exceptionCode);
     ASSERT(exceptionCode == 0);
-    insertNodeBefore(boldElement, startNode);
-    surroundNodeRangeWithElement(startNode, endNode, boldElement);
+    insertNodeBefore(boldElement.get(), startNode);
+    surroundNodeRangeWithElement(startNode, endNode, boldElement.get());
   }
 
   if (styleChange.applyItalic()) {
-    ElementImpl* italicElement =
+    RefPtr<ElementImpl> italicElement =
         document()->createElementNS(xhtmlNamespaceURI, "i", exceptionCode);
     ASSERT(exceptionCode == 0);
-    insertNodeBefore(italicElement, startNode);
-    surroundNodeRangeWithElement(startNode, endNode, italicElement);
+    insertNodeBefore(italicElement.get(), startNode);
+    surroundNodeRangeWithElement(startNode, endNode, italicElement.get());
   }
 }
 
@@ -1353,8 +1352,9 @@ float ApplyStyleCommand::computedFontSize(const NodeImpl* node) {
   if (!computedStyle)
     return 0;
 
-  RefPtr<CSSPrimitiveValueImpl> value = static_cast<CSSPrimitiveValueImpl*>(
-      computedStyle->getPropertyCSSValue(CSS_PROP_FONT_SIZE));
+  RefPtr<CSSPrimitiveValueImpl> value =
+      static_pointer_cast<CSSPrimitiveValueImpl>(
+          computedStyle->getPropertyCSSValue(CSS_PROP_FONT_SIZE));
   if (!value)
     return 0;
 

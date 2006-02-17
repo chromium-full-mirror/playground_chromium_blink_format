@@ -302,12 +302,13 @@ void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
   parsedProperties[numParsedProperties++] = prop;
 }
 
-CSSMutableStyleDeclarationImpl* CSSParser::createStyleDeclaration(
+PassRefPtr<CSSMutableStyleDeclarationImpl> CSSParser::createStyleDeclaration(
     CSSStyleRuleImpl* rule) {
-  CSSMutableStyleDeclarationImpl* result = new CSSMutableStyleDeclarationImpl(
-      rule, parsedProperties, numParsedProperties);
+  RefPtr<CSSMutableStyleDeclarationImpl> result =
+      new CSSMutableStyleDeclarationImpl(rule, parsedProperties,
+                                         numParsedProperties);
   clearProperties();
-  return result;
+  return result.release();
 }
 
 void CSSParser::clearProperties() {
@@ -1878,15 +1879,16 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
     return valid;
   }
 
-  DashboardRegionImpl *firstRegion = new DashboardRegionImpl(), *region = 0;
+  RefPtr<DashboardRegionImpl> firstRegion = new DashboardRegionImpl;
+  DashboardRegionImpl* region = 0;
 
   while (value) {
     if (region == 0) {
-      region = firstRegion;
+      region = firstRegion.get();
     } else {
-      DashboardRegionImpl* nextRegion = new DashboardRegionImpl();
-      region->setNext(nextRegion);
-      region = nextRegion;
+      RefPtr<DashboardRegionImpl> nextRegion = new DashboardRegionImpl();
+      region->m_next = nextRegion;
+      region = nextRegion.get();
     }
 
     if (value->unit != Value::Function) {
@@ -1991,9 +1993,8 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
   }
 
   if (valid)
-    addProperty(propId, new CSSPrimitiveValueImpl(firstRegion), important);
-  else
-    delete firstRegion;
+    addProperty(propId, new CSSPrimitiveValueImpl(firstRegion.release()),
+                important);
 
   return valid;
 }

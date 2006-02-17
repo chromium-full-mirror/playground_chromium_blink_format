@@ -31,34 +31,30 @@
 
 namespace DOM {
 
-NodeListImpl::NodeListImpl(NodeImpl* _rootNode)
+NodeListImpl::NodeListImpl(PassRefPtr<NodeImpl> _rootNode)
     : rootNode(_rootNode), isLengthCacheValid(false), isItemCacheValid(false) {
-  rootNode->ref();
   rootNode->registerNodeList(this);
 }
 
 NodeListImpl::~NodeListImpl() {
   rootNode->unregisterNodeList(this);
-  rootNode->deref();
 }
 
 unsigned NodeListImpl::recursiveLength(NodeImpl* start) const {
   if (!start)
-    start = rootNode;
+    start = rootNode.get();
 
-  if (isLengthCacheValid && start == rootNode) {
+  if (isLengthCacheValid && start == rootNode)
     return cachedLength;
-  }
 
   unsigned len = 0;
 
-  for (NodeImpl* n = start->firstChild(); n != 0; n = n->nextSibling()) {
+  for (NodeImpl* n = start->firstChild(); n; n = n->nextSibling())
     if (n->nodeType() == Node::ELEMENT_NODE) {
       if (nodeMatches(n))
         len++;
       len += recursiveLength(n);
     }
-  }
 
   if (start == rootNode) {
     cachedLength = len;
@@ -82,9 +78,7 @@ NodeImpl* NodeListImpl::recursiveItem(unsigned offset, NodeImpl* start) const {
     }
   }
 
-  NodeImpl* n = start;
-
-  while (n) {
+  for (NodeImpl* n = start; n; n = n->traverseNextNode(rootNode.get())) {
     if (n->nodeType() == Node::ELEMENT_NODE) {
       if (nodeMatches(n)) {
         if (!remainingOffset) {
@@ -96,8 +90,6 @@ NodeImpl* NodeListImpl::recursiveItem(unsigned offset, NodeImpl* start) const {
         remainingOffset--;
       }
     }
-
-    n = n->traverseNextNode(rootNode);
   }
 
   return 0;  // no matching node in this subtree
@@ -110,10 +102,9 @@ NodeImpl* NodeListImpl::itemById(const AtomicString& elementId) const {
     if (!node || !nodeMatches(node))
       return 0;
 
-    for (NodeImpl* p = node->parentNode(); p; p = p->parentNode()) {
+    for (NodeImpl* p = node->parentNode(); p; p = p->parentNode())
       if (p == rootNode)
         return node;
-    }
 
     return 0;
   }
@@ -122,10 +113,8 @@ NodeImpl* NodeListImpl::itemById(const AtomicString& elementId) const {
 
   for (unsigned i = 0; i < l; i++) {
     NodeImpl* node = item(i);
-
-    if (static_cast<ElementImpl*>(node)->getIDAttribute() == elementId) {
+    if (static_cast<ElementImpl*>(node)->getIDAttribute() == elementId)
       return node;
-    }
   }
 
   return 0;

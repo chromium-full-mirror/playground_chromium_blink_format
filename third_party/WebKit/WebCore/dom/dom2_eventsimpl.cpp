@@ -621,9 +621,10 @@ bool WheelEventImpl::isWheelEvent() const {
 
 // -----------------------------------------------------------------------------
 
-RegisteredEventListener::RegisteredEventListener(const AtomicString& eventType,
-                                                 EventListener* listener,
-                                                 bool useCapture)
+RegisteredEventListener::RegisteredEventListener(
+    const AtomicString& eventType,
+    PassRefPtr<EventListener> listener,
+    bool useCapture)
     : m_eventType(eventType), m_listener(listener), m_useCapture(useCapture) {}
 
 bool operator==(const RegisteredEventListener& a,

@@ -127,7 +127,7 @@ bool SVGDOMImplementationImpl::hasFeature(DOMStringImpl* featureImpl,
   return DOMImplementationImpl::hasFeature(featureImpl, versionImpl);
 }
 
-DocumentTypeImpl* SVGDOMImplementationImpl::createDocumentType(
+PassRefPtr<DocumentTypeImpl> SVGDOMImplementationImpl::createDocumentType(
     DOMStringImpl* qualifiedNameImpl,
     DOMStringImpl* publicId,
     DOMStringImpl* systemId,
@@ -153,7 +153,7 @@ DocumentTypeImpl* SVGDOMImplementationImpl::createDocumentType(
   return new DocumentTypeImpl(0, qualifiedName, publicId, systemId);
 }
 
-DocumentImpl* SVGDOMImplementationImpl::createDocument(
+PassRefPtr<DocumentImpl> SVGDOMImplementationImpl::createDocument(
     DOMStringImpl* namespaceURI,
     DOMStringImpl* qualifiedNameImpl,
     DocumentTypeImpl* doctype,
@@ -162,7 +162,7 @@ DocumentImpl* SVGDOMImplementationImpl::createDocument(
                         exceptioncode);
 }
 
-DocumentImpl* SVGDOMImplementationImpl::createDocument(
+PassRefPtr<DocumentImpl> SVGDOMImplementationImpl::createDocument(
     DOMStringImpl* namespaceURIImpl,
     DOMStringImpl* qualifiedNameImpl,
     DocumentTypeImpl* doctype,
@@ -190,7 +190,7 @@ DocumentImpl* SVGDOMImplementationImpl::createDocument(
     return 0;
   }
 
-  SVGDocumentImpl* doc =
+  RefPtr<SVGDocumentImpl> doc =
       new SVGDocumentImpl(const_cast<SVGDOMImplementationImpl*>(this), view);
 
   // TODO : what to do when doctype is null?
@@ -198,24 +198,23 @@ DocumentImpl* SVGDOMImplementationImpl::createDocument(
     doc->setDocType(doctype);
 
   // Add root element...
-  if (createDocElement) {
-    ElementImpl* svg =
-        doc->createElementNS(namespaceURI, qualifiedName, exceptioncode);
-    doc->appendChild(svg, exceptioncode);
-  }
+  if (createDocElement)
+    doc->appendChild(
+        doc->createElementNS(namespaceURI, qualifiedName, exceptioncode),
+        exceptioncode);
 
-  return doc;
+  return doc.release();
 }
 
-CSSStyleSheetImpl* SVGDOMImplementationImpl::createCSSStyleSheet(
+PassRefPtr<CSSStyleSheetImpl> SVGDOMImplementationImpl::createCSSStyleSheet(
     DOMStringImpl* title,
     DOMStringImpl* media) const {
   // TODO : check whether media is valid
   CSSStyleSheetImpl* parent = 0;
-  CSSStyleSheetImpl* sheet = new CSSStyleSheetImpl(parent);
+  RefPtr<CSSStyleSheetImpl> sheet = new CSSStyleSheetImpl(parent);
   // sheet->setTitle(title);
-  sheet->setMedia(new MediaListImpl(sheet, media));
-  return sheet;
+  sheet->setMedia(new MediaListImpl(sheet.get(), media));
+  return sheet.release();
 }
 
 DocumentTypeImpl* SVGDOMImplementationImpl::defaultDocumentType() const {

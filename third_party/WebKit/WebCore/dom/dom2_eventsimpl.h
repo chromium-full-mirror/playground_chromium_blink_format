@@ -414,7 +414,7 @@ class WheelEventImpl : public MouseRelatedEventImpl {
 class RegisteredEventListener {
  public:
   RegisteredEventListener(const AtomicString& eventType,
-                          EventListener* listener,
+                          PassRefPtr<EventListener>,
                           bool useCapture);
 
   const AtomicString& eventType() const { return m_eventType; }
@@ -436,7 +436,6 @@ inline bool operator!=(const RegisteredEventListener& a,
 // State available during IE's events for drag and drop and copy/paste
 class ClipboardImpl : public Shared<ClipboardImpl> {
  public:
-  ClipboardImpl() {}
   virtual ~ClipboardImpl();
 
   // Is this operation a drag-drop or a copy-paste?

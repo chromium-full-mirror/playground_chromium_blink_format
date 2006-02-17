@@ -2,7 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,14 +19,22 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#ifndef _CSS_cssparser_h_
-#define _CSS_cssparser_h_
 
-#include <QString.h>
-#include "Color.h"
+#ifndef CSS_cssparser_h_
+#define CSS_cssparser_h_
+
 #include "AtomicString.h"
+#include "Color.h"
+#include "QString.h"
 
-namespace DOM {
+namespace KXMLCore {
+template <typename T>
+class PassRefPtr;
+}
+using KXMLCore::PassRefPtr;
+
+namespace WebCore {
+
 class StyleListImpl;
 class CSSStyleSheetImpl;
 class CSSRuleImpl;
@@ -60,15 +68,14 @@ struct Value {
     Function* function;
   };
   enum { Operator = 0x100000, Function = 0x100001, Q_EMS = 0x100002 };
-
   int unit;
 };
 
 static inline QString qString(const ParseString& ps) {
   return QString((QChar*)ps.string, ps.length);
 }
-static inline DOMString domString(const ParseString& ps) {
-  return DOMString((QChar*)ps.string, ps.length);
+static inline String domString(const ParseString& ps) {
+  return String((QChar*)ps.string, ps.length);
 }
 static inline AtomicString atomicString(const ParseString& ps) {
   return AtomicString(ps.string, ps.length);
@@ -78,7 +85,7 @@ class ValueList {
  public:
   ValueList();
   ~ValueList();
-  void addValue(const Value& val);
+  void addValue(const Value&);
   Value* current() {
     return currentValue < numValues ? values + currentValue : 0;
   }
@@ -104,27 +111,24 @@ class CSSParser {
   CSSParser(bool strictParsing = true);
   ~CSSParser();
 
-  void parseSheet(DOM::CSSStyleSheetImpl* sheet, const DOM::DOMString& string);
-  DOM::CSSRuleImpl* parseRule(DOM::CSSStyleSheetImpl* sheet,
-                              const DOM::DOMString& string);
-  bool parseValue(DOM::CSSMutableStyleDeclarationImpl* decls,
+  void parseSheet(CSSStyleSheetImpl*, const String&);
+  CSSRuleImpl* parseRule(CSSStyleSheetImpl*, const String&);
+  bool parseValue(CSSMutableStyleDeclarationImpl*,
                   int id,
-                  const DOM::DOMString& string,
-                  bool _important);
-  static RGBA32 CSSParser::parseColor(const DOM::DOMString& string);
-  bool parseColor(DOM::CSSMutableStyleDeclarationImpl* declaration,
-                  const DOM::DOMString& string);
-  bool parseDeclaration(DOM::CSSMutableStyleDeclarationImpl* decls,
-                        const DOM::DOMString& string);
+                  const String&,
+                  bool important);
+  static RGBA32 parseColor(const String&);
+  bool parseColor(CSSMutableStyleDeclarationImpl*, const String&);
+  bool parseDeclaration(CSSMutableStyleDeclarationImpl*, const String&);
 
   static CSSParser* current() { return currentParser; }
 
-  DOM::DocumentImpl* document() const;
+  DocumentImpl* document() const;
 
-  void addProperty(int propId, CSSValueImpl* value, bool important);
+  void addProperty(int propId, CSSValueImpl*, bool important);
   bool hasProperties() const { return numParsedProperties > 0; }
-  CSSMutableStyleDeclarationImpl* createStyleDeclaration(
-      CSSStyleRuleImpl* rule);
+  PassRefPtr<CSSMutableStyleDeclarationImpl> createStyleDeclaration(
+      CSSStyleRuleImpl*);
   void clearProperties();
 
   bool parseValue(int propId, bool important);
@@ -157,7 +161,7 @@ class CSSParser {
   bool parseFont(bool important);
   CSSValueListImpl* parseFontFamily();
   CSSPrimitiveValueImpl* parseColor();
-  CSSPrimitiveValueImpl* parseColorFromValue(Value* val);
+  CSSPrimitiveValueImpl* parseColorFromValue(Value*);
 
 #if SVG_SUPPORT
   bool parseSVGValue(int propId, bool important);
@@ -166,7 +170,7 @@ class CSSParser {
   CSSValueImpl* parseSVGStrokeDasharray();
 #endif
 
-  static bool parseColor(const QString& name, RGBA32& rgb);
+  static bool parseColor(const QString&, RGBA32& rgb);
 
   // CSS3 Parsing Routines (for properties specific to CSS3)
   bool parseShadow(int propId, bool important);
@@ -178,8 +182,8 @@ class CSSParser {
   bool strict;
   bool important;
   int id;
-  DOM::StyleListImpl* styleElement;
-  DOM::CSSRuleImpl* rule;
+  StyleListImpl* styleElement;
+  CSSRuleImpl* rule;
   ValueList* valueList;
   CSSProperty** parsedProperties;
   int numParsedProperties;
@@ -201,9 +205,7 @@ class CSSParser {
   int lex();
 
  private:
-  void setupParser(const char* prefix,
-                   const DOMString& string,
-                   const char* suffix);
+  void setupParser(const char* prefix, const String&, const char* suffix);
   void enterShorthand(int propId) {
     if (!(m_inParseShorthand++))
       m_currentShorthand = propId;
@@ -225,5 +227,6 @@ class CSSParser {
   int yy_start;
 };
 
-};  // namespace
+}  // namespace
+
 #endif

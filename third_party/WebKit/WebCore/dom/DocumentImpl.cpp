@@ -254,7 +254,6 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* impl, FrameView* v)
   m_loadingSheet = false;
   m_bParsing = false;
   m_docChanged = false;
-  m_sheet = 0;
   m_tokenizer = 0;
 
   pMode = Strict;
@@ -267,7 +266,6 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* impl, FrameView* v)
   m_attrNameAlloc = 0;
   m_attrNameCount = 0;
   m_defaultView = new AbstractViewImpl(this);
-  m_defaultView->ref();
   m_listenerTypes = 0;
   m_inDocument = true;
   m_styleSelectorDirty = false;
@@ -335,7 +333,6 @@ DocumentImpl::~DocumentImpl() {
     changedDocuments->remove(this);
   delete m_tokenizer;
   document.resetSkippingRef(0);
-  delete m_sheet;
   delete m_styleSelector;
   delete m_docLoader;
 
@@ -349,7 +346,6 @@ DocumentImpl::~DocumentImpl() {
       m_attrNames[id]->deref();
     delete[] m_attrNames;
   }
-  m_defaultView->deref();
 
   if (m_renderArena) {
     delete m_renderArena;
@@ -392,7 +388,7 @@ void DocumentImpl::resetActiveLinkColor() {
   m_activeLinkColor.setNamedColor(QString("red"));
 }
 
-void DocumentImpl::setDocType(DocumentTypeImpl* docType) {
+void DocumentImpl::setDocType(PassRefPtr<DocumentTypeImpl> docType) {
   m_docType = docType;
 }
 
@@ -411,33 +407,34 @@ ElementImpl* DocumentImpl::documentElement() const {
   return static_cast<ElementImpl*>(n);
 }
 
-ElementImpl* DocumentImpl::createElement(const DOMString& name,
-                                         int& exceptionCode) {
+PassRefPtr<ElementImpl> DocumentImpl::createElement(const DOMString& name,
+                                                    int& exceptionCode) {
   return createElementNS(nullAtom, name, exceptionCode);
 }
 
-DocumentFragmentImpl* DocumentImpl::createDocumentFragment() {
+PassRefPtr<DocumentFragmentImpl> DocumentImpl::createDocumentFragment() {
   return new DocumentFragmentImpl(getDocument());
 }
 
-TextImpl* DocumentImpl::createTextNode(const DOMString& data) {
+PassRefPtr<TextImpl> DocumentImpl::createTextNode(const DOMString& data) {
   return new TextImpl(this, data);
 }
 
-CommentImpl* DocumentImpl::createComment(const DOMString& data) {
+PassRefPtr<CommentImpl> DocumentImpl::createComment(const DOMString& data) {
   return new CommentImpl(this, data);
 }
 
-CDATASectionImpl* DocumentImpl::createCDATASection(const DOMString& data,
-                                                   int& exception) {
+PassRefPtr<CDATASectionImpl> DocumentImpl::createCDATASection(
+    const DOMString& data,
+    int& exception) {
   if (isHTMLDocument()) {
     exception = DOMException::NOT_SUPPORTED_ERR;
-    return NULL;
+    return 0;
   }
   return new CDATASectionImpl(this, data);
 }
 
-ProcessingInstructionImpl* DocumentImpl::createProcessingInstruction(
+PassRefPtr<ProcessingInstructionImpl> DocumentImpl::createProcessingInstruction(
     const DOMString& target,
     const DOMString& data,
     int& exception) {
@@ -452,30 +449,32 @@ ProcessingInstructionImpl* DocumentImpl::createProcessingInstruction(
   return new ProcessingInstructionImpl(this, target, data);
 }
 
-EntityReferenceImpl* DocumentImpl::createEntityReference(const DOMString& name,
-                                                         int& exception) {
+PassRefPtr<EntityReferenceImpl> DocumentImpl::createEntityReference(
+    const DOMString& name,
+    int& exception) {
   if (!isValidName(name)) {
     exception = DOMException::INVALID_CHARACTER_ERR;
-    return NULL;
+    return 0;
   }
   if (isHTMLDocument()) {
     exception = DOMException::NOT_SUPPORTED_ERR;
-    return NULL;
+    return 0;
   }
   return new EntityReferenceImpl(this, name.impl());
 }
 
-EditingTextImpl* DocumentImpl::createEditingTextNode(const DOMString& text) {
+PassRefPtr<EditingTextImpl> DocumentImpl::createEditingTextNode(
+    const DOMString& text) {
   return new EditingTextImpl(this, text);
 }
 
-CSSStyleDeclarationImpl* DocumentImpl::createCSSStyleDeclaration() {
+PassRefPtr<CSSStyleDeclarationImpl> DocumentImpl::createCSSStyleDeclaration() {
   return new CSSMutableStyleDeclarationImpl;
 }
 
-NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
-                                   bool deep,
-                                   int& exceptioncode) {
+PassRefPtr<NodeImpl> DocumentImpl::importNode(NodeImpl* importedNode,
+                                              bool deep,
+                                              int& exceptioncode) {
   exceptioncode = 0;
 
   switch (importedNode->nodeType()) {
@@ -492,14 +491,12 @@ NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
       return createComment(importedNode->nodeValue());
     case Node::ELEMENT_NODE: {
       ElementImpl* oldElement = static_cast<ElementImpl*>(importedNode);
-      ElementImpl* newElement =
+      RefPtr<ElementImpl> newElement =
           createElementNS(oldElement->namespaceURI(),
                           oldElement->tagName().toString(), exceptioncode);
 
       if (exceptioncode != 0)
         return 0;
-
-      newElement->ref();
 
       NamedAttrMapImpl* attrs = oldElement->attributes(true);
       if (attrs) {
@@ -508,10 +505,8 @@ NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
           AttributeImpl* attr = attrs->attributeItem(i);
           newElement->setAttribute(attr->name(), attr->value().impl(),
                                    exceptioncode);
-          if (exceptioncode != 0) {
-            newElement->deref();
+          if (exceptioncode != 0)
             return 0;
-          }
         }
       }
 
@@ -520,26 +515,16 @@ NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
       if (deep) {
         for (NodeImpl* oldChild = oldElement->firstChild(); oldChild;
              oldChild = oldChild->nextSibling()) {
-          NodeImpl* newChild = importNode(oldChild, true, exceptioncode);
-          if (exceptioncode != 0) {
-            newElement->deref();
+          RefPtr<NodeImpl> newChild = importNode(oldChild, true, exceptioncode);
+          if (exceptioncode != 0)
             return 0;
-          }
-          newElement->appendChild(newChild, exceptioncode);
-          if (exceptioncode != 0) {
-            newElement->deref();
+          newElement->appendChild(newChild.release(), exceptioncode);
+          if (exceptioncode != 0)
             return 0;
-          }
         }
       }
 
-      // Trick to get the result back to the floating state, with 0 refs but not
-      // destroyed.
-      newElement->setParent(this);
-      newElement->deref();
-      newElement->setParent(0);
-
-      return newElement;
+      return newElement.release();
     }
   }
 
@@ -547,11 +532,10 @@ NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
   return 0;
 }
 
-NodeImpl* DocumentImpl::adoptNode(NodeImpl* source, int& exceptioncode) {
+PassRefPtr<NodeImpl> DocumentImpl::adoptNode(PassRefPtr<NodeImpl> source,
+                                             int& exceptioncode) {
   if (!source)
     return 0;
-
-  RefPtr<NodeImpl> protect(source);
 
   switch (source->nodeType()) {
     case Node::ENTITY_NODE:
@@ -562,20 +546,19 @@ NodeImpl* DocumentImpl::adoptNode(NodeImpl* source, int& exceptioncode) {
       exceptioncode = DOMException::NOT_SUPPORTED_ERR;
       return 0;
     case Node::ATTRIBUTE_NODE: {
-      AttrImpl* attr = static_cast<AttrImpl*>(source);
-
+      AttrImpl* attr = static_cast<AttrImpl*>(source.get());
       if (attr->ownerElement())
         attr->ownerElement()->removeAttributeNode(attr, exceptioncode);
-
       attr->m_specified = true;
       break;
     }
     default:
       if (source->parentNode())
-        source->parentNode()->removeChild(source, exceptioncode);
+        source->parentNode()->removeChild(source.get(), exceptioncode);
   }
 
-  for (NodeImpl* node = source; node; node = node->traverseNextNode(source)) {
+  for (NodeImpl* node = source.get(); node;
+       node = node->traverseNextNode(source.get())) {
     KJS::ScriptInterpreter::updateDOMNodeDocument(node, node->getDocument(),
                                                   this);
     node->setDocument(this);
@@ -584,9 +567,10 @@ NodeImpl* DocumentImpl::adoptNode(NodeImpl* source, int& exceptioncode) {
   return source;
 }
 
-ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
-                                           const DOMString& qualifiedName,
-                                           int& exceptioncode) {
+PassRefPtr<ElementImpl> DocumentImpl::createElementNS(
+    const DOMString& _namespaceURI,
+    const DOMString& qualifiedName,
+    int& exceptioncode) {
   // FIXME: We'd like a faster code path that skips this check for calls from
   // inside the engine where the name is known to be valid.
   DOMString prefix, localName;
@@ -595,7 +579,7 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
     return 0;
   }
 
-  ElementImpl* e = 0;
+  RefPtr<ElementImpl> e;
   QualifiedName qName =
       QualifiedName(AtomicString(prefix), AtomicString(localName),
                     AtomicString(_namespaceURI));
@@ -619,7 +603,7 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
   if (!e)
     e = new ElementImpl(qName, getDocument());
 
-  return e;
+  return e.release();
 }
 
 ElementImpl* DocumentImpl::getElementById(const AtomicString& elementId) const {
@@ -699,7 +683,7 @@ void DocumentImpl::updateTitle() {
   p->setTitle(m_title);
 }
 
-void DocumentImpl::setTitle(DOMString title, NodeImpl* titleElement) {
+void DocumentImpl::setTitle(const String& title, NodeImpl* titleElement) {
   if (!titleElement) {
     // Title set by JavaScript -- overrides any title elements.
     m_titleSetExplicitly = true;
@@ -762,15 +746,16 @@ Frame* DocumentImpl::frame() const {
   return m_view ? m_view->frame() : 0;
 }
 
-RangeImpl* DocumentImpl::createRange() {
+PassRefPtr<RangeImpl> DocumentImpl::createRange() {
   return new RangeImpl(this);
 }
 
-NodeIteratorImpl* DocumentImpl::createNodeIterator(NodeImpl* root,
-                                                   unsigned whatToShow,
-                                                   NodeFilterImpl* filter,
-                                                   bool expandEntityReferences,
-                                                   int& exceptioncode) {
+PassRefPtr<NodeIteratorImpl> DocumentImpl::createNodeIterator(
+    NodeImpl* root,
+    unsigned whatToShow,
+    PassRefPtr<NodeFilterImpl> filter,
+    bool expandEntityReferences,
+    int& exceptioncode) {
   if (!root) {
     exceptioncode = DOMException::NOT_SUPPORTED_ERR;
     return 0;
@@ -778,11 +763,12 @@ NodeIteratorImpl* DocumentImpl::createNodeIterator(NodeImpl* root,
   return new NodeIteratorImpl(root, whatToShow, filter, expandEntityReferences);
 }
 
-TreeWalkerImpl* DocumentImpl::createTreeWalker(NodeImpl* root,
-                                               unsigned whatToShow,
-                                               NodeFilterImpl* filter,
-                                               bool expandEntityReferences,
-                                               int& exceptioncode) {
+PassRefPtr<TreeWalkerImpl> DocumentImpl::createTreeWalker(
+    NodeImpl* root,
+    unsigned whatToShow,
+    PassRefPtr<NodeFilterImpl> filter,
+    bool expandEntityReferences,
+    int& exceptioncode) {
   if (!root) {
     exceptioncode = DOMException::NOT_SUPPORTED_ERR;
     return 0;
@@ -1352,7 +1338,6 @@ void DocumentImpl::setURL(const QString& url) {
 
 void DocumentImpl::setStyleSheet(const DOMString& url, const DOMString& sheet) {
   m_sheet = new CSSStyleSheetImpl(this, url);
-  m_sheet->ref();
   m_sheet->parseString(sheet);
   m_loadingSheet = false;
 
@@ -1965,14 +1950,12 @@ void DocumentImpl::recalcStyleSelector() {
   m_styleSelectorDirty = false;
 }
 
-void DocumentImpl::setHoverNode(NodeImpl* newHoverNode) {
-  if (m_hoverNode != newHoverNode)
-    m_hoverNode = newHoverNode;
+void DocumentImpl::setHoverNode(PassRefPtr<NodeImpl> newHoverNode) {
+  m_hoverNode = newHoverNode;
 }
 
-void DocumentImpl::setActiveNode(NodeImpl* newActiveNode) {
-  if (m_activeNode != newActiveNode)
-    m_activeNode = newActiveNode;
+void DocumentImpl::setActiveNode(PassRefPtr<NodeImpl> newActiveNode) {
+  m_activeNode = newActiveNode;
 }
 
 void DocumentImpl::hoveredNodeDetached(NodeImpl* node) {
@@ -2055,7 +2038,7 @@ static Widget* widgetForNode(NodeImpl* focusNode) {
   return static_cast<RenderWidget*>(renderer)->widget();
 }
 
-bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
+bool DocumentImpl::setFocusNode(PassRefPtr<NodeImpl> newFocusNode) {
   // Make sure newFocusNode is actually in this document
   if (newFocusNode && (newFocusNode->getDocument() != this))
     return true;
@@ -2070,7 +2053,7 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   bool focusChangeBlocked = false;
   RefPtr<NodeImpl> oldFocusNode = m_focusNode;
   m_focusNode = 0;
-  clearSelectionIfNeeded(newFocusNode);
+  clearSelectionIfNeeded(newFocusNode.get());
 
   // Remove focus from the existing focus node (if any)
   if (oldFocusNode && !oldFocusNode->m_inDetach) {
@@ -2084,14 +2067,14 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
       focusChangeBlocked = true;
       newFocusNode = 0;
     }
-    clearSelectionIfNeeded(newFocusNode);
+    clearSelectionIfNeeded(newFocusNode.get());
     oldFocusNode->dispatchUIEvent(DOMFocusOutEvent);
     if (m_focusNode) {
       // handler shifted focus
       focusChangeBlocked = true;
       newFocusNode = 0;
     }
-    clearSelectionIfNeeded(newFocusNode);
+    clearSelectionIfNeeded(newFocusNode.get());
     if ((oldFocusNode.get() == this) && oldFocusNode->hasOneRef())
       return true;
 
@@ -2101,13 +2084,13 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
 
   if (newFocusNode) {
     if (newFocusNode == newFocusNode->rootEditableElement() &&
-        !acceptsEditingFocus(newFocusNode)) {
+        !acceptsEditingFocus(newFocusNode.get())) {
       // delegate blocks focus change
       focusChangeBlocked = true;
       goto SetFocusNodeDone;
     }
     // Set focus on the new node
-    m_focusNode = newFocusNode;
+    m_focusNode = newFocusNode.get();
     m_focusNode->dispatchHTMLEvent(focusEvent, false, false);
     if (m_focusNode != newFocusNode) {
       // handler shifted focus
@@ -2196,32 +2179,30 @@ void DocumentImpl::notifyBeforeNodeRemoval(NodeImpl* n) {
 }
 
 AbstractViewImpl* DocumentImpl::defaultView() const {
-  return m_defaultView;
+  return m_defaultView.get();
 }
 
-EventImpl* DocumentImpl::createEvent(const DOMString& eventType,
-                                     int& exceptioncode) {
+PassRefPtr<EventImpl> DocumentImpl::createEvent(const DOMString& eventType,
+                                                int& exceptioncode) {
   if (eventType == "UIEvents" || eventType == "UIEvent")
     return new UIEventImpl();
-  else if (eventType == "MouseEvents" || eventType == "MouseEvent")
+  if (eventType == "MouseEvents" || eventType == "MouseEvent")
     return new MouseEventImpl();
-  else if (eventType == "MutationEvents" || eventType == "MutationEvent")
+  if (eventType == "MutationEvents" || eventType == "MutationEvent")
     return new MutationEventImpl();
-  else if (eventType == "KeyboardEvents" || eventType == "KeyboardEvent")
+  if (eventType == "KeyboardEvents" || eventType == "KeyboardEvent")
     return new KeyboardEventImpl();
-  else if (eventType == "HTMLEvents" || eventType == "Event" ||
-           eventType == "Events")
+  if (eventType == "HTMLEvents" || eventType == "Event" ||
+      eventType == "Events")
     return new EventImpl();
 #if SVG_SUPPORT
-  else if (eventType == "SVGEvents")
+  if (eventType == "SVGEvents")
     return new EventImpl();
-  else if (eventType == "SVGZoomEvents")
+  if (eventType == "SVGZoomEvents")
     return new KSVG::SVGZoomEventImpl();
 #endif
-  else {
-    exceptioncode = DOMException::NOT_SUPPORTED_ERR;
-    return 0;
-  }
+  exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+  return 0;
 }
 
 CSSStyleDeclarationImpl* DocumentImpl::getOverrideStyle(
@@ -2261,16 +2242,13 @@ void DocumentImpl::defaultEventHandler(EventImpl* evt) {
   }
 }
 
-void DocumentImpl::setHTMLWindowEventListener(const AtomicString& eventType,
-                                              EventListener* listener) {
+void DocumentImpl::setHTMLWindowEventListener(
+    const AtomicString& eventType,
+    PassRefPtr<EventListener> listener) {
   // If we already have it we don't want removeWindowEventListener to delete it
-  if (listener)
-    listener->ref();
   removeHTMLWindowEventListener(eventType);
-  if (listener) {
+  if (listener)
     addWindowEventListener(eventType, listener, false);
-    listener->deref();
-  }
 }
 
 EventListener* DocumentImpl::getHTMLWindowEventListener(
@@ -2297,17 +2275,13 @@ void DocumentImpl::removeHTMLWindowEventListener(
 }
 
 void DocumentImpl::addWindowEventListener(const AtomicString& eventType,
-                                          EventListener* listener,
+                                          PassRefPtr<EventListener> listener,
                                           bool useCapture) {
-  listener->ref();
-
   // Remove existing identical listener set with identical arguments.
   // The DOM 2 spec says that "duplicate instances are discarded" in this case.
-  removeWindowEventListener(eventType, listener, useCapture);
+  removeWindowEventListener(eventType, listener.get(), useCapture);
   m_windowEventListeners.append(
       new RegisteredEventListener(eventType, listener, useCapture));
-
-  listener->deref();
 }
 
 void DocumentImpl::removeWindowEventListener(const AtomicString& eventType,
@@ -2333,8 +2307,9 @@ bool DocumentImpl::hasWindowEventListener(const AtomicString& eventType) {
   return false;
 }
 
-EventListener* DocumentImpl::createHTMLEventListener(const DOMString& code,
-                                                     NodeImpl* node) {
+PassRefPtr<EventListener> DocumentImpl::createHTMLEventListener(
+    const DOMString& code,
+    NodeImpl* node) {
   if (Frame* frm = frame()) {
     if (KJSProxyImpl* proxy = frm->jScript())
       return proxy->createHTMLEventHandler(code, node);
@@ -3072,58 +3047,52 @@ void DocumentImpl::removeRadioButtonGroup(AtomicStringImpl* name,
   }
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::images() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_IMAGES));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::images() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_IMAGES);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::applets() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_APPLETS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::applets() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_APPLETS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::embeds() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_EMBEDS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::embeds() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_EMBEDS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::objects() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_OBJECTS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::objects() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_OBJECTS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::links() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_LINKS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::links() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_LINKS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::forms() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_FORMS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::forms() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_FORMS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::anchors() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ANCHORS));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::anchors() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ANCHORS);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::all() {
-  return RefPtr<HTMLCollectionImpl>(
-      new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ALL));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::all() {
+  return new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ALL);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::windowNamedItems(DOMString& name) {
-  return RefPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
-      this, HTMLCollectionImpl::WINDOW_NAMED_ITEMS, name));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::windowNamedItems(
+    const String& name) {
+  return new HTMLNameCollectionImpl(
+      this, HTMLCollectionImpl::WINDOW_NAMED_ITEMS, name);
 }
 
-RefPtr<HTMLCollectionImpl> DocumentImpl::documentNamedItems(DOMString& name) {
-  return RefPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
-      this, HTMLCollectionImpl::DOCUMENT_NAMED_ITEMS, name));
+PassRefPtr<HTMLCollectionImpl> DocumentImpl::documentNamedItems(
+    const String& name) {
+  return new HTMLNameCollectionImpl(
+      this, HTMLCollectionImpl::DOCUMENT_NAMED_ITEMS, name);
 }
 
-RefPtr<NameNodeListImpl> DocumentImpl::getElementsByName(
-    const DOMString& elementName) {
-  return RefPtr<NameNodeListImpl>(new NameNodeListImpl(this, elementName));
+PassRefPtr<NameNodeListImpl> DocumentImpl::getElementsByName(
+    const String& elementName) {
+  return new NameNodeListImpl(this, elementName);
 }
 }

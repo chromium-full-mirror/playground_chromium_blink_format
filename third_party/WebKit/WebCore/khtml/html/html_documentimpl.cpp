@@ -134,8 +134,8 @@ bool HTMLDocumentImpl::childAllowed(NodeImpl* newChild) {
   return newChild->hasTagName(htmlTag) || newChild->isCommentNode();
 }
 
-ElementImpl* HTMLDocumentImpl::createElement(const DOMString& name,
-                                             int& exceptioncode) {
+PassRefPtr<ElementImpl> HTMLDocumentImpl::createElement(const DOMString& name,
+                                                        int& exceptioncode) {
   DOMString lowerName(name.lower());
   if (!isValidName(lowerName)) {
     exceptioncode = DOMException::INVALID_CHARACTER_ERR;

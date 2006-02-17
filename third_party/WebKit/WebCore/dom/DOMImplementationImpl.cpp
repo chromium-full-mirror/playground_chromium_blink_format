@@ -33,8 +33,6 @@
 
 namespace DOM {
 
-DOMImplementationImpl* DOMImplementationImpl::m_instance = 0;
-
 // FIXME: An implementation of this is still waiting for me to understand the
 // distinction between
 // a "malformed" qualified name and one with bad characters in it. For example,
@@ -155,11 +153,9 @@ DocumentImpl* DOMImplementationImpl::createDocument(
   if (doctype)
     doc->setDocType(new DocumentTypeImpl(doc, *doctype));
 
-  if (!qualifiedName.isEmpty()) {
-    ElementImpl* rootElement =
-        doc->createElementNS(namespaceURI, qualifiedName, exceptioncode);
-    doc->addChild(rootElement);
-  }
+  if (!qualifiedName.isEmpty())
+    doc->addChild(
+        doc->createElementNS(namespaceURI, qualifiedName, exceptioncode));
 
   return doc;
 }
@@ -185,12 +181,8 @@ HTMLDocumentImpl* DOMImplementationImpl::createHTMLDocument(FrameView* v) {
 }
 
 DOMImplementationImpl* DOMImplementationImpl::instance() {
-  if (!m_instance) {
-    m_instance = new DOMImplementationImpl();
-    m_instance->ref();
-  }
-
-  return m_instance;
+  static RefPtr<DOMImplementationImpl> i = new DOMImplementationImpl;
+  return i.get();
 }
 
 bool DOMImplementationImpl::isXMLMIMEType(const DOMString& mimeType) {

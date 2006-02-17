@@ -2,7 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,29 +23,28 @@
 #ifndef CSS_css_valueimpl_h_
 #define CSS_css_valueimpl_h_
 
-#include "dom/css_value.h"
-#include "css/css_base.h"
 #include "CachedObjectClient.h"
+#include "css_base.h"
+#include "css_value.h"
 #include <qvaluelist.h>
+#include <kxmlcore/PassRefPtr.h>
 
 class QPaintDeviceMetrics;
 
-namespace khtml {
-class RenderStyle;
-class CachedImage;
-class DocLoader;
-}
-
-namespace DOM {
+namespace WebCore {
 
 class CSSMutableStyleDeclarationImpl;
+class CachedImage;
 class CounterImpl;
+class DocLoader;
+class NodeImpl;
+class PairImpl;
+class RectImpl;
+class RenderStyle;
+
 #if __APPLE__
 class DashboardRegionImpl;
 #endif
-class RectImpl;
-class PairImpl;
-class NodeImpl;
 
 extern const int inheritableProperties[];
 extern const unsigned numInheritableProperties;
@@ -54,46 +53,48 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
  public:
   virtual bool isStyleDeclaration();
 
-  static bool isPropertyName(const DOMString& propertyName);
+  static bool isPropertyName(const String& propertyName);
 
   CSSRuleImpl* parentRule() const;
 
-  virtual DOMString cssText() const = 0;
-  virtual void setCssText(const DOMString&, int& exceptionCode) = 0;
+  virtual String cssText() const = 0;
+  virtual void setCssText(const String&, int& exceptionCode) = 0;
 
   virtual unsigned length() const = 0;
-  virtual DOMString item(unsigned index) const = 0;
+  virtual String item(unsigned index) const = 0;
 
-  CSSValueImpl* getPropertyCSSValue(const DOMString& propertyName);
-  DOMString getPropertyValue(const DOMString& propertyName);
-  DOMString getPropertyPriority(const DOMString& propertyName);
-  DOMString getPropertyShorthand(const DOMString& propertyName);
-  bool isPropertyImplicit(const DOMString& propertyName);
+  PassRefPtr<CSSValueImpl> getPropertyCSSValue(const String& propertyName);
+  String getPropertyValue(const String& propertyName);
+  String getPropertyPriority(const String& propertyName);
+  String getPropertyShorthand(const String& propertyName);
+  bool isPropertyImplicit(const String& propertyName);
 
-  virtual CSSValueImpl* getPropertyCSSValue(int propertyID) const = 0;
-  virtual DOMString getPropertyValue(int propertyID) const = 0;
+  virtual PassRefPtr<CSSValueImpl> getPropertyCSSValue(
+      int propertyID) const = 0;
+  virtual String getPropertyValue(int propertyID) const = 0;
   virtual bool getPropertyPriority(int propertyID) const = 0;
   virtual int getPropertyShorthand(int propertyID) const = 0;
   virtual bool isPropertyImplicit(int propertyID) const = 0;
 
-  void setProperty(const DOMString& propertyName,
-                   const DOMString& value,
-                   const DOMString& priority,
+  void setProperty(const String& propertyName,
+                   const String& value,
+                   const String& priority,
                    int& exception);
-  DOMString removeProperty(const DOMString& propertyName, int& exception);
+  String removeProperty(const String& propertyName, int& exception);
   virtual void setProperty(int propertyId,
-                           const DOMString& value,
+                           const String& value,
                            bool important,
                            int& exceptionCode) = 0;
-  virtual DOMString removeProperty(int propertyID, int& exceptionCode) = 0;
+  virtual String removeProperty(int propertyID, int& exceptionCode) = 0;
 
-  virtual CSSMutableStyleDeclarationImpl* copy() const = 0;
-  virtual CSSMutableStyleDeclarationImpl* makeMutable() = 0;
+  virtual PassRefPtr<CSSMutableStyleDeclarationImpl> copy() const = 0;
+  virtual PassRefPtr<CSSMutableStyleDeclarationImpl> makeMutable() = 0;
 
   void diff(CSSMutableStyleDeclarationImpl*) const;
 
-  CSSMutableStyleDeclarationImpl* copyPropertiesInSet(const int* set,
-                                                      unsigned length) const;
+  PassRefPtr<CSSMutableStyleDeclarationImpl> copyPropertiesInSet(
+      const int* set,
+      unsigned length) const;
 
  protected:
   CSSStyleDeclarationImpl(CSSRuleImpl* parentRule = 0);
@@ -106,8 +107,8 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 class CSSValueImpl : public StyleBaseImpl {
  public:
   virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
-  virtual DOMString cssText() const = 0;
-  void setCssText(const DOMString&) {}  // FIXME: Not implemented.
+  virtual String cssText() const = 0;
+  void setCssText(const String&) {}  // FIXME: Not implemented.
 
   virtual bool isValue() { return true; }
   virtual bool isFontValue() { return false; }
@@ -116,19 +117,17 @@ class CSSValueImpl : public StyleBaseImpl {
 class CSSInheritedValueImpl : public CSSValueImpl {
  public:
   virtual unsigned short cssValueType() const;
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 };
 
 class CSSInitialValueImpl : public CSSValueImpl {
  public:
   virtual unsigned short cssValueType() const;
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 };
 
 class CSSValueListImpl : public CSSValueImpl {
  public:
-  CSSValueListImpl();
-
   virtual ~CSSValueListImpl();
 
   unsigned length() const { return m_values.count(); }
@@ -138,8 +137,8 @@ class CSSValueListImpl : public CSSValueImpl {
 
   virtual unsigned short cssValueType() const;
 
-  void append(CSSValueImpl* val);
-  virtual DOMString cssText() const;
+  void append(PassRefPtr<CSSValueImpl>);
+  virtual String cssText() const;
 
  protected:
   QPtrList<CSSValueImpl> m_values;
@@ -151,16 +150,19 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
   CSSPrimitiveValueImpl();
   CSSPrimitiveValueImpl(int ident);
   CSSPrimitiveValueImpl(double, CSSPrimitiveValue::UnitTypes);
-  CSSPrimitiveValueImpl(const DOMString&, CSSPrimitiveValue::UnitTypes);
-  CSSPrimitiveValueImpl(CounterImpl*);
-  CSSPrimitiveValueImpl(RectImpl*);
-#if __APPLE__
-  CSSPrimitiveValueImpl(DashboardRegionImpl*);  // FIXME: Why is dashboard
-                                                // region a primitive value?
-                                                // This makes no sense.
-#endif
+  CSSPrimitiveValueImpl(const String&, CSSPrimitiveValue::UnitTypes);
+  CSSPrimitiveValueImpl(PassRefPtr<CounterImpl>);
+  CSSPrimitiveValueImpl(PassRefPtr<RectImpl>);
   CSSPrimitiveValueImpl(unsigned color);  // RGB value
-  CSSPrimitiveValueImpl(PairImpl*);
+  CSSPrimitiveValueImpl(PassRefPtr<PairImpl>);
+
+#if __APPLE__
+  CSSPrimitiveValueImpl(PassRefPtr<DashboardRegionImpl>);  // FIXME: Why is
+                                                           // dashboard region a
+                                                           // primitive value?
+                                                           // This makes no
+                                                           // sense.
+#endif
 
   virtual ~CSSPrimitiveValueImpl();
 
@@ -180,9 +182,9 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
    * this,
    * and some tool to calibrate.
    */
-  int computeLength(RenderStyle* style);
-  int computeLength(RenderStyle* style, double multiplier);
-  double computeLengthFloat(RenderStyle* style, bool applyZoomFactor = true);
+  int computeLength(RenderStyle*);
+  int computeLength(RenderStyle*, double multiplier);
+  double computeLengthFloat(RenderStyle*, bool applyZoomFactor = true);
 
   // use with care!!!
   void setPrimitiveType(unsigned short type) { m_type = type; }
@@ -194,30 +196,30 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
   }
 
   void setStringValue(unsigned short stringType,
-                      const DOM::DOMString& stringValue,
+                      const String& stringValue,
                       int& exceptioncode);
-  DOM::DOMString getStringValue() const;
+  String getStringValue() const;
 
   CounterImpl* getCounterValue() const {
-    return (m_type != CSSPrimitiveValue::CSS_COUNTER ? 0 : m_value.counter);
+    return m_type != CSSPrimitiveValue::CSS_COUNTER ? 0 : m_value.counter;
   }
 
   RectImpl* getRectValue() const {
-    return (m_type != CSSPrimitiveValue::CSS_RECT ? 0 : m_value.rect);
+    return m_type != CSSPrimitiveValue::CSS_RECT ? 0 : m_value.rect;
   }
 
   unsigned getRGBColorValue() const {
-    return (m_type != CSSPrimitiveValue::CSS_RGBCOLOR ? 0 : m_value.rgbcolor);
+    return m_type != CSSPrimitiveValue::CSS_RGBCOLOR ? 0 : m_value.rgbcolor;
   }
 
   PairImpl* getPairValue() const {
-    return (m_type != CSSPrimitiveValue::CSS_PAIR ? 0 : m_value.pair);
+    return m_type != CSSPrimitiveValue::CSS_PAIR ? 0 : m_value.pair;
   }
 
 #if __APPLE__
   DashboardRegionImpl* getDashboardRegionValue() const {
-    return (m_type != CSSPrimitiveValue::CSS_DASHBOARD_REGION ? 0
-                                                              : m_value.region);
+    return m_type != CSSPrimitiveValue::CSS_DASHBOARD_REGION ? 0
+                                                             : m_value.region;
   }
 #endif
 
@@ -226,8 +228,8 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
 
   int getIdent();
 
-  virtual bool parseString(const DOMString& string, bool = false);
-  virtual DOMString cssText() const;
+  virtual bool parseString(const String&, bool = false);
+  virtual String cssText() const;
 
   virtual bool isQuirkValue() { return false; }
 
@@ -236,7 +238,7 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
   union {
     int ident;
     double num;
-    DOMStringImpl* string;
+    StringImpl* string;
     CounterImpl* counter;
     RectImpl* rect;
     unsigned rgbcolor;
@@ -264,18 +266,17 @@ class CSSQuirkPrimitiveValueImpl : public CSSPrimitiveValueImpl {
 
 class CounterImpl : public Shared<CounterImpl> {
  public:
-  DOMString identifier() const { return m_identifier; }
-  DOMString listStyle() const { return m_listStyle; }
-  DOMString separator() const { return m_separator; }
+  String identifier() const { return m_identifier; }
+  String listStyle() const { return m_listStyle; }
+  String separator() const { return m_separator; }
 
-  DOMString m_identifier;
-  DOMString m_listStyle;
-  DOMString m_separator;
+  String m_identifier;
+  String m_listStyle;
+  String m_separator;
 };
 
 class RectImpl : public Shared<RectImpl> {
  public:
-  RectImpl();
   virtual ~RectImpl();
 
   CSSPrimitiveValueImpl* top() const { return m_top.get(); }
@@ -283,10 +284,12 @@ class RectImpl : public Shared<RectImpl> {
   CSSPrimitiveValueImpl* bottom() const { return m_bottom.get(); }
   CSSPrimitiveValueImpl* left() const { return m_left.get(); }
 
-  void setTop(CSSPrimitiveValueImpl* top);
-  void setRight(CSSPrimitiveValueImpl* right);
-  void setBottom(CSSPrimitiveValueImpl* bottom);
-  void setLeft(CSSPrimitiveValueImpl* left);
+  void setTop(PassRefPtr<CSSPrimitiveValueImpl> top) { m_top = top; }
+  void setRight(PassRefPtr<CSSPrimitiveValueImpl> right) { m_right = right; }
+  void setBottom(PassRefPtr<CSSPrimitiveValueImpl> bottom) {
+    m_bottom = bottom;
+  }
+  void setLeft(PassRefPtr<CSSPrimitiveValueImpl> left) { m_left = left; }
 
  protected:
   RefPtr<CSSPrimitiveValueImpl> m_top;
@@ -304,64 +307,55 @@ class RectImpl : public Shared<RectImpl> {
 // (eliminating some extra -khtml- internal properties).
 class PairImpl : public Shared<PairImpl> {
  public:
-  PairImpl();
   virtual ~PairImpl();
 
   CSSPrimitiveValueImpl* first() const { return m_first.get(); }
   CSSPrimitiveValueImpl* second() const { return m_second.get(); }
 
-  void setFirst(CSSPrimitiveValueImpl* first);
-  void setSecond(CSSPrimitiveValueImpl* second);
+  void setFirst(PassRefPtr<CSSPrimitiveValueImpl> first) { m_first = first; }
+  void setSecond(PassRefPtr<CSSPrimitiveValueImpl> second) {
+    m_second = second;
+  }
 
  protected:
   RefPtr<CSSPrimitiveValueImpl> m_first;
   RefPtr<CSSPrimitiveValueImpl> m_second;
 };
 
-#if __APPLE__
 class DashboardRegionImpl : public RectImpl {
  public:
-  DashboardRegionImpl() : m_next(0), m_isCircle(0), m_isRectangle(0) {}
-  ~DashboardRegionImpl() {
-    if (m_next)
-      m_next->deref();
-  }
+  DashboardRegionImpl() : m_isCircle(0), m_isRectangle(0) {}
 
-  void setNext(DashboardRegionImpl* next) { m_next = next; }
-
- public:
   RefPtr<DashboardRegionImpl> m_next;
   QString m_label;
   QString m_geometryType;
-  unsigned int m_isCircle : 1;
-  unsigned int m_isRectangle : 1;
+  bool m_isCircle : 1;
+  bool m_isRectangle : 1;
 };
-#endif
 
 class CSSImageValueImpl : public CSSPrimitiveValueImpl,
-                          public khtml::CachedObjectClient {
+                          public CachedObjectClient {
  public:
   CSSImageValueImpl();
-  CSSImageValueImpl(const DOMString& url, StyleBaseImpl* style);
+  CSSImageValueImpl(const String& url, StyleBaseImpl*);
   virtual ~CSSImageValueImpl();
 
-  khtml::CachedImage* image(khtml::DocLoader* loader);
+  CachedImage* image(DocLoader*);
 
  protected:
-  khtml::CachedImage* m_image;
+  CachedImage* m_image;
   bool m_accessedImage;
 };
 
 class CSSBorderImageValueImpl : public CSSValueImpl {
  public:
   CSSBorderImageValueImpl();
-  CSSBorderImageValueImpl(CSSImageValueImpl* image,
-                          RectImpl* imageRect,
+  CSSBorderImageValueImpl(PassRefPtr<CSSImageValueImpl>,
+                          PassRefPtr<RectImpl>,
                           int horizontalRule,
                           int verticalRule);
-  virtual ~CSSBorderImageValueImpl();
 
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 
  public:
   // The border image.
@@ -385,7 +379,7 @@ class FontFamilyValueImpl : public CSSPrimitiveValueImpl {
   const QString& fontName() const { return parsedFontName; }
   int genericFamilyType() const { return _genericFamilyType; }
 
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 
   QString parsedFontName;
 
@@ -395,36 +389,32 @@ class FontFamilyValueImpl : public CSSPrimitiveValueImpl {
 
 class FontValueImpl : public CSSValueImpl {
  public:
-  FontValueImpl();
-  virtual ~FontValueImpl();
-
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 
   virtual bool isFontValue() { return true; }
 
-  CSSPrimitiveValueImpl* style;
-  CSSPrimitiveValueImpl* variant;
-  CSSPrimitiveValueImpl* weight;
-  CSSPrimitiveValueImpl* size;
-  CSSPrimitiveValueImpl* lineHeight;
-  CSSValueListImpl* family;
+  RefPtr<CSSPrimitiveValueImpl> style;
+  RefPtr<CSSPrimitiveValueImpl> variant;
+  RefPtr<CSSPrimitiveValueImpl> weight;
+  RefPtr<CSSPrimitiveValueImpl> size;
+  RefPtr<CSSPrimitiveValueImpl> lineHeight;
+  RefPtr<CSSValueListImpl> family;
 };
 
 // Used for text-shadow and box-shadow
 class ShadowValueImpl : public CSSValueImpl {
  public:
-  ShadowValueImpl(CSSPrimitiveValueImpl* _x,
-                  CSSPrimitiveValueImpl* _y,
-                  CSSPrimitiveValueImpl* _blur,
-                  CSSPrimitiveValueImpl* _color);
-  virtual ~ShadowValueImpl();
+  ShadowValueImpl(PassRefPtr<CSSPrimitiveValueImpl> x,
+                  PassRefPtr<CSSPrimitiveValueImpl> y,
+                  PassRefPtr<CSSPrimitiveValueImpl> blur,
+                  PassRefPtr<CSSPrimitiveValueImpl> color);
 
-  virtual DOMString cssText() const;
+  virtual String cssText() const;
 
-  CSSPrimitiveValueImpl* x;
-  CSSPrimitiveValueImpl* y;
-  CSSPrimitiveValueImpl* blur;
-  CSSPrimitiveValueImpl* color;
+  RefPtr<CSSPrimitiveValueImpl> x;
+  RefPtr<CSSPrimitiveValueImpl> y;
+  RefPtr<CSSPrimitiveValueImpl> blur;
+  RefPtr<CSSPrimitiveValueImpl> color;
 };
 
 // ------------------------------------------------------------------------------
@@ -433,7 +423,7 @@ class ShadowValueImpl : public CSSValueImpl {
 class CSSProperty {
  public:
   CSSProperty(int propID,
-              CSSValueImpl* value,
+              PassRefPtr<CSSValueImpl> value,
               bool important = false,
               int shorthandID = 0,
               bool implicit = false)
@@ -443,14 +433,6 @@ class CSSProperty {
         m_implicit(implicit),
         m_value(value) {}
 
-  CSSProperty(const CSSProperty& o) {
-    m_id = o.m_id;
-    m_shorthandID = o.m_shorthandID;
-    m_important = o.m_important;
-    m_implicit = o.m_implicit;
-    m_value = o.m_value;
-  }
-
   CSSProperty& operator=(const CSSProperty& o) {
     m_id = o.m_id;
     m_shorthandID = o.m_shorthandID;
@@ -458,10 +440,6 @@ class CSSProperty {
     m_value = o.m_value;
     return *this;
   }
-
-  ~CSSProperty() {}
-
-  void setValue(CSSValueImpl* val) { m_value = val; }
 
   int id() const { return m_id; }
   int shorthandID() const { return m_shorthandID; }
@@ -471,7 +449,7 @@ class CSSProperty {
 
   CSSValueImpl* value() const { return m_value.get(); }
 
-  DOMString cssText() const;
+  String cssText() const;
 
   // make sure the following fits in 4 bytes.
   int m_id;
@@ -483,7 +461,6 @@ class CSSProperty {
 
   friend bool operator==(const CSSProperty&, const CSSProperty&);
 
- protected:
   RefPtr<CSSValueImpl> m_value;
 };
 
@@ -496,33 +473,32 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
   CSSMutableStyleDeclarationImpl(CSSRuleImpl* parentRule,
                                  const CSSProperty* const*,
                                  int numProperties);
-  virtual ~CSSMutableStyleDeclarationImpl();
 
   CSSMutableStyleDeclarationImpl& operator=(
       const CSSMutableStyleDeclarationImpl&);
 
   void setNode(NodeImpl* node) { m_node = node; }
 
-  virtual DOMString cssText() const;
-  virtual void setCssText(const DOMString&, int& exceptionCode);
+  virtual String cssText() const;
+  virtual void setCssText(const String&, int& exceptionCode);
 
   virtual unsigned length() const;
-  virtual DOMString item(unsigned index) const;
+  virtual String item(unsigned index) const;
 
-  virtual CSSValueImpl* getPropertyCSSValue(int propertyID) const;
-  virtual DOMString getPropertyValue(int propertyID) const;
+  virtual PassRefPtr<CSSValueImpl> getPropertyCSSValue(int propertyID) const;
+  virtual String getPropertyValue(int propertyID) const;
   virtual bool getPropertyPriority(int propertyID) const;
   virtual int getPropertyShorthand(int propertyID) const;
   virtual bool isPropertyImplicit(int propertyID) const;
 
   virtual void setProperty(int propertyId,
-                           const DOMString& value,
+                           const String& value,
                            bool important,
                            int& exceptionCode);
-  virtual DOMString removeProperty(int propertyID, int& exceptionCode);
+  virtual String removeProperty(int propertyID, int& exceptionCode);
 
-  virtual CSSMutableStyleDeclarationImpl* copy() const;
-  virtual CSSMutableStyleDeclarationImpl* makeMutable();
+  virtual PassRefPtr<CSSMutableStyleDeclarationImpl> copy() const;
+  virtual PassRefPtr<CSSMutableStyleDeclarationImpl> makeMutable();
 
   QValueListConstIterator<CSSProperty> valuesIterator() const {
     return m_values.begin();
@@ -533,12 +509,12 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
                    bool important = false,
                    bool notifyChanged = true);
   bool setProperty(int propertyID,
-                   const DOMString& value,
+                   const String& value,
                    bool important,
                    bool notifyChanged,
                    int& exceptionCode);
   bool setProperty(int propertyId,
-                   const DOMString& value,
+                   const String& value,
                    bool important = false,
                    bool notifyChanged = true) {
     int exceptionCode;
@@ -546,10 +522,8 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
                        exceptionCode);
   }
 
-  DOMString removeProperty(int propertyID,
-                           bool notifyChanged,
-                           int& exceptionCode);
-  DOMString removeProperty(int propertyID, bool notifyChanged = true) {
+  String removeProperty(int propertyID, bool notifyChanged, int& exceptionCode);
+  String removeProperty(int propertyID, bool notifyChanged = true) {
     int exceptionCode;
     return removeProperty(propertyID, notifyChanged, exceptionCode);
   }
@@ -561,26 +535,26 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
   // setLengthProperty treats integers as pixels! (Needed for conversion of HTML
   // attributes.)
   void setLengthProperty(int propertyId,
-                         const DOMString& value,
+                         const String& value,
                          bool important,
                          bool multiLength = false);
   void setStringProperty(int propertyId,
-                         const DOMString& value,
+                         const String& value,
                          CSSPrimitiveValue::UnitTypes,
                          bool important = false);  // parsed string value
   void setImageProperty(int propertyId,
-                        const DOMString& URL,
+                        const String& URL,
                         bool important = false);
 
   // The following parses an entire new style declaration.
-  void parseDeclaration(const DOMString& styleDeclaration);
+  void parseDeclaration(const String& styleDeclaration);
 
   // Besides adding the properties, this also removes any existing properties
   // with these IDs.
   // It does no notification since it's called by the parser.
   void addParsedProperties(const CSSProperty* const*, int numProperties);
 
-  CSSMutableStyleDeclarationImpl* copyBlockProperties() const;
+  PassRefPtr<CSSMutableStyleDeclarationImpl> copyBlockProperties() const;
   void removeBlockProperties();
   void removeInheritableProperties();
   void removePropertiesInSet(const int* set, unsigned length);
@@ -589,8 +563,8 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
              bool argOverridesOnConflict = true);
 
  private:
-  DOMString getShortHandValue(const int* properties, int number) const;
-  DOMString get4Values(const int* properties) const;
+  String getShortHandValue(const int* properties, int number) const;
+  String get4Values(const int* properties) const;
 
   QValueList<CSSProperty> m_values;
   NodeImpl* m_node;

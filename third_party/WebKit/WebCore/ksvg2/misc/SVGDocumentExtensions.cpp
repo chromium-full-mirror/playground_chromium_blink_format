@@ -26,6 +26,7 @@
 #include "DocumentImpl.h"
 #include "Frame.h"
 #include "KSVGTimeScheduler.h"
+#include "dom2_events.h"
 #include "kjs_proxy.h"
 
 namespace WebCore {
@@ -37,7 +38,7 @@ SVGDocumentExtensions::~SVGDocumentExtensions() {
   delete m_timeScheduler;
 }
 
-EventListener* SVGDocumentExtensions::createSVGEventListener(
+PassRefPtr<EventListener> SVGDocumentExtensions::createSVGEventListener(
     const DOMString& code,
     NodeImpl* node) {
   if (Frame* frame = m_doc->frame()) {

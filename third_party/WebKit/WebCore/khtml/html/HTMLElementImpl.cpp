@@ -231,7 +231,7 @@ DOMString HTMLElementImpl::outerText() const {
   return innerText();
 }
 
-DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
+PassRefPtr<DocumentFragmentImpl> HTMLElementImpl::createContextualFragment(
     const DOMString& html) {
   // the following is in accordance with the definition as used by IE
   if (endTagRequirement() == TagStatusForbidden)
@@ -242,17 +242,15 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
       hasLocalName(styleTag) || hasLocalName(titleTag))
     return 0;
 
-  DocumentFragmentImpl* fragment = new DocumentFragmentImpl(getDocument());
-  fragment->ref();
+  RefPtr<DocumentFragmentImpl> fragment =
+      new DocumentFragmentImpl(getDocument());
 
   if (getDocument()->isHTMLDocument())
-    parseHTMLDocumentFragment(html, fragment);
+    parseHTMLDocumentFragment(html, fragment.get());
   else {
-    if (!parseXMLDocumentFragment(html, fragment, this)) {
+    if (!parseXMLDocumentFragment(html, fragment.get(), this))
       // FIXME: We should propagate a syntax error exception out here.
-      fragment->deref();
       return 0;
-    }
   }
 
   // Exceptions are ignored because none ought to happen here.
@@ -285,24 +283,18 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
     }
   }
 
-  // Trick to get the fragment back to the floating state, with 0
-  // refs but not destroyed.
-  fragment->setParent(this);
-  fragment->deref();
-  fragment->setParent(0);
-
-  return fragment;
+  return fragment.release();
 }
 
 void HTMLElementImpl::setInnerHTML(const DOMString& html, int& exception) {
-  DocumentFragmentImpl* fragment = createContextualFragment(html);
-  if (fragment == NULL) {
+  RefPtr<DocumentFragmentImpl> fragment = createContextualFragment(html);
+  if (!fragment) {
     exception = DOMException::NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 
   removeChildren();
-  appendChild(fragment, exception);
+  appendChild(fragment.release(), exception);
 }
 
 void HTMLElementImpl::setOuterHTML(const DOMString& html, int& exception) {
@@ -312,16 +304,15 @@ void HTMLElementImpl::setOuterHTML(const DOMString& html, int& exception) {
     return;
   }
   HTMLElementImpl* parent = static_cast<HTMLElementImpl*>(p);
-  DocumentFragmentImpl* fragment = parent->createContextualFragment(html);
+  RefPtr<DocumentFragmentImpl> fragment =
+      parent->createContextualFragment(html);
 
   if (!fragment) {
     exception = DOMException::NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 
-  ref();
-  parent->replaceChild(fragment, this, exception);
-  deref();
+  parent->replaceChild(fragment.release(), this, exception);
 }
 
 void HTMLElementImpl::setInnerText(const DOMString& text, int& exception) {
@@ -367,10 +358,8 @@ void HTMLElementImpl::setOuterText(const DOMString& text, int& exception) {
     return;
   }
 
-  TextImpl* t = new TextImpl(getDocument(), text);
-  ref();
+  RefPtr<TextImpl> t = new TextImpl(getDocument(), text);
   parent->replaceChild(t, this, exception);
-  deref();
   if (exception)
     return;
 

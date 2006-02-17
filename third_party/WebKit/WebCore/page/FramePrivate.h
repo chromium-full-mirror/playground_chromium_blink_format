@@ -126,7 +126,7 @@ class FramePrivate {
   Vector<RefPtr<Plugin>> m_plugins;
 
   QGuardedPtr<RenderPart> m_ownerRenderer;
-  QGuardedPtr<FrameView> m_view;
+  RefPtr<FrameView> m_view;
   BrowserExtension* m_extension;
   RefPtr<DocumentImpl> m_doc;
   RefPtr<Decoder> m_decoder;

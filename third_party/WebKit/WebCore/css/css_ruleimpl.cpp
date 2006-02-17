@@ -328,9 +328,9 @@ bool CSSStyleRuleImpl::parseString(const DOMString& /*string*/, bool) {
   return false;
 }
 
-void CSSStyleRuleImpl::setDeclaration(CSSMutableStyleDeclarationImpl* style) {
-  if (m_style != style)
-    m_style = style;
+void CSSStyleRuleImpl::setDeclaration(
+    PassRefPtr<CSSMutableStyleDeclarationImpl> style) {
+  m_style = style;
 }
 
 void CSSRuleListImpl::deleteRule(unsigned index) {

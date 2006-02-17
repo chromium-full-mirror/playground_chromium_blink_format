@@ -51,13 +51,16 @@ class XBLBindingManager;
 #endif
 
 namespace WebCore {
+
 class AbstractViewImpl;
 class AttrImpl;
 class CDATASectionImpl;
+class CSSStyleSelector;
 class CSSStyleSheetImpl;
 class CommentImpl;
-class DocumentFragmentImpl;
 class DOMImplementationImpl;
+class DocLoader;
+class DocumentFragmentImpl;
 class DocumentTypeImpl;
 class EditingTextImpl;
 class ElementImpl;
@@ -74,6 +77,7 @@ class HTMLImageLoader;
 class HTMLInputElementImpl;
 class HTMLMapElementImpl;
 class JSEditor;
+class NameNodeListImpl;
 class NodeFilterImpl;
 class NodeIteratorImpl;
 class NodeListImpl;
@@ -83,11 +87,8 @@ class RegisteredEventListener;
 class StyleSheetImpl;
 class StyleSheetListImpl;
 class TextImpl;
-class TreeWalkerImpl;
-class NameNodeListImpl;
-class CSSStyleSelector;
-class DocLoader;
 class Tokenizer;
+class TreeWalkerImpl;
 
 #if __APPLE__
 struct DashboardRegionValue;
@@ -99,7 +100,7 @@ class SVGDocumentExtensions;
 
 class DocumentImpl : public QObject, public ContainerNodeImpl {
  public:
-  DocumentImpl(DOMImplementationImpl* _implementation, FrameView* v);
+  DocumentImpl(DOMImplementationImpl*, FrameView*);
   ~DocumentImpl();
 
   virtual void removedLastRef();
@@ -124,64 +125,67 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   DOMImplementationImpl* implementation() const;
   virtual ElementImpl* documentElement() const;
-  virtual ElementImpl* createElement(const DOMString& tagName,
-                                     int& exceptioncode);
-  DocumentFragmentImpl* createDocumentFragment();
-  TextImpl* createTextNode(const DOMString& data);
-  CommentImpl* createComment(const DOMString& data);
-  CDATASectionImpl* createCDATASection(const DOMString& data, int& exception);
-  ProcessingInstructionImpl* createProcessingInstruction(
-      const DOMString& target,
-      const DOMString& data,
-      int& exception);
-  PassRefPtr<AttrImpl> createAttribute(const DOMString& name, int& exception) {
-    return createAttributeNS(DOMString(), name, exception);
+  virtual PassRefPtr<ElementImpl> createElement(const String& tagName,
+                                                ExceptionCode&);
+  PassRefPtr<DocumentFragmentImpl> createDocumentFragment();
+  PassRefPtr<TextImpl> createTextNode(const String& data);
+  PassRefPtr<CommentImpl> createComment(const String& data);
+  PassRefPtr<CDATASectionImpl> createCDATASection(const String& data,
+                                                  ExceptionCode&);
+  PassRefPtr<ProcessingInstructionImpl> createProcessingInstruction(
+      const String& target,
+      const String& data,
+      ExceptionCode&);
+  PassRefPtr<AttrImpl> createAttribute(const String& name, ExceptionCode& ec) {
+    return createAttributeNS(String(), name, ec);
   }
-  PassRefPtr<AttrImpl> createAttributeNS(const DOMString& namespaceURI,
-                                         const DOMString& qualifiedName,
-                                         int& exception);
-  EntityReferenceImpl* createEntityReference(const DOMString& name,
-                                             int& exceptionCode);
-  NodeImpl* importNode(NodeImpl* importedNode, bool deep, int& exceptioncode);
-  virtual ElementImpl* createElementNS(const DOMString& _namespaceURI,
-                                       const DOMString& _qualifiedName,
-                                       int& exceptioncode);
+  PassRefPtr<AttrImpl> createAttributeNS(const String& namespaceURI,
+                                         const String& qualifiedName,
+                                         ExceptionCode&);
+  PassRefPtr<EntityReferenceImpl> createEntityReference(const String& name,
+                                                        ExceptionCode&);
+  PassRefPtr<NodeImpl> importNode(NodeImpl* importedNode,
+                                  bool deep,
+                                  ExceptionCode&);
+  virtual PassRefPtr<ElementImpl> createElementNS(const String& namespaceURI,
+                                                  const String& qualifiedName,
+                                                  ExceptionCode&);
   ElementImpl* getElementById(const AtomicString&) const;
   ElementImpl* elementFromPoint(int x, int y) const;
 
-  NodeImpl* adoptNode(NodeImpl* source, int& exceptioncode);
+  PassRefPtr<NodeImpl> adoptNode(PassRefPtr<NodeImpl> source, ExceptionCode&);
 
-  RefPtr<NameNodeListImpl> getElementsByName(const DOMString& elementName);
+  PassRefPtr<NameNodeListImpl> getElementsByName(const String& elementName);
 
   // Actually part of HTMLDocument, but used for giving XML documents a window
   // title as well
-  DOMString title() const { return m_title; }
-  void setTitle(DOMString, NodeImpl* titleElement = 0);
+  String title() const { return m_title; }
+  void setTitle(const String&, NodeImpl* titleElement = 0);
   void removeTitle(NodeImpl* titleElement);
 
-  RefPtr<HTMLCollectionImpl> images();
-  RefPtr<HTMLCollectionImpl> embeds();
-  RefPtr<HTMLCollectionImpl> applets();
-  RefPtr<HTMLCollectionImpl> links();
-  RefPtr<HTMLCollectionImpl> forms();
-  RefPtr<HTMLCollectionImpl> anchors();
-  RefPtr<HTMLCollectionImpl> all();
-  RefPtr<HTMLCollectionImpl> objects();
-  RefPtr<HTMLCollectionImpl> windowNamedItems(DOMString& name);
-  RefPtr<HTMLCollectionImpl> documentNamedItems(DOMString& name);
+  PassRefPtr<HTMLCollectionImpl> images();
+  PassRefPtr<HTMLCollectionImpl> embeds();
+  PassRefPtr<HTMLCollectionImpl> applets();
+  PassRefPtr<HTMLCollectionImpl> links();
+  PassRefPtr<HTMLCollectionImpl> forms();
+  PassRefPtr<HTMLCollectionImpl> anchors();
+  PassRefPtr<HTMLCollectionImpl> all();
+  PassRefPtr<HTMLCollectionImpl> objects();
+  PassRefPtr<HTMLCollectionImpl> windowNamedItems(const String& name);
+  PassRefPtr<HTMLCollectionImpl> documentNamedItems(const String& name);
 
   // DOM methods overridden from  parent classes
 
-  virtual DOMString nodeName() const;
+  virtual String nodeName() const;
   virtual unsigned short nodeType() const;
 
   // Other methods (not part of DOM)
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
 
-  CSSStyleSelector* styleSelector() { return m_styleSelector; }
+  CSSStyleSelector* styleSelector() const { return m_styleSelector; }
 
-  ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key);
+  ElementImpl* getElementByAccessKey(const String& key);
 
   /**
    * Updates the pending sheet count and then calls updateStyleSelector.
@@ -241,23 +245,23 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   FrameView* view() const { return m_view; }
   Frame* frame() const;
 
-  RangeImpl* createRange();
+  PassRefPtr<RangeImpl> createRange();
 
-  NodeIteratorImpl* createNodeIterator(NodeImpl* root,
-                                       unsigned whatToShow,
-                                       NodeFilterImpl* filter,
-                                       bool expandEntityReferences,
-                                       int& exceptioncode);
+  PassRefPtr<NodeIteratorImpl> createNodeIterator(NodeImpl* root,
+                                                  unsigned whatToShow,
+                                                  PassRefPtr<NodeFilterImpl>,
+                                                  bool expandEntityReferences,
+                                                  ExceptionCode&);
 
-  TreeWalkerImpl* createTreeWalker(NodeImpl* root,
-                                   unsigned whatToShow,
-                                   NodeFilterImpl* filter,
-                                   bool expandEntityReferences,
-                                   int& exceptioncode);
+  PassRefPtr<TreeWalkerImpl> createTreeWalker(NodeImpl* root,
+                                              unsigned whatToShow,
+                                              PassRefPtr<NodeFilterImpl>,
+                                              bool expandEntityReferences,
+                                              ExceptionCode&);
 
   // Special support for editing
-  CSSStyleDeclarationImpl* createCSSStyleDeclaration();
-  EditingTextImpl* createEditingTextNode(const DOMString& text);
+  PassRefPtr<CSSStyleDeclarationImpl> createCSSStyleDeclaration();
+  PassRefPtr<EditingTextImpl> createEditingTextNode(const String&);
 
   virtual void recalcStyle(StyleChange = NoChange);
   static QPtrList<DocumentImpl>* changedDocuments;
@@ -285,9 +289,9 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void implicitClose();
   void cancelParsing();
 
-  void write(const DOMString& text);
+  void write(const String& text);
   void write(const QString& text);
-  void writeln(const DOMString& text);
+  void writeln(const String& text);
   void finishParsing();
   void clear();
 
@@ -301,10 +305,10 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setBaseTarget(const QString& baseTarget) { m_baseTarget = baseTarget; }
 
   QString completeURL(const QString&);
-  DOMString completeURL(const DOMString&);
+  String completeURL(const String&);
 
   // from cachedObjectClient
-  virtual void setStyleSheet(const DOMString& url, const DOMString& sheetStr);
+  virtual void setStyleSheet(const String& url, const String& sheetStr);
   void setUserStyleSheet(const QString& sheet);
   QString userStyleSheet() const { return m_usersheet; }
   void setPrintStyleSheet(const QString& sheet) { m_printSheet = sheet; }
@@ -368,35 +372,35 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
      stylesheets using the DOM. May be subject to change as
      spec matures. - dwh
   */
-  DOMString preferredStylesheetSet();
-  DOMString selectedStylesheetSet();
-  void setSelectedStylesheetSet(const DOMString& aString);
+  String preferredStylesheetSet();
+  String selectedStylesheetSet();
+  void setSelectedStylesheetSet(const String&);
 
   QStringList availableStyleSheets() const;
 
   NodeImpl* focusNode() const { return m_focusNode.get(); }
-  bool setFocusNode(NodeImpl* newFocusNode);
-  void clearSelectionIfNeeded(NodeImpl* newFocusNode);
+  bool setFocusNode(PassRefPtr<NodeImpl>);
+  void clearSelectionIfNeeded(NodeImpl*);
 
   NodeImpl* hoverNode() const { return m_hoverNode.get(); }
-  void setHoverNode(NodeImpl* newHoverNode);
+  void setHoverNode(PassRefPtr<NodeImpl>);
   void hoveredNodeDetached(NodeImpl*);
   void activeChainNodeDetached(NodeImpl*);
 
   NodeImpl* activeNode() const { return m_activeNode.get(); }
-  void setActiveNode(NodeImpl* newActiveNode);
+  void setActiveNode(PassRefPtr<NodeImpl>);
 
   // Updates for :target (CSS3 selector).
-  void setCSSTarget(NodeImpl* n);
+  void setCSSTarget(NodeImpl*);
   NodeImpl* getCSSTarget();
 
   void setDocumentChanged(bool);
 
-  void attachNodeIterator(NodeIteratorImpl* ni);
-  void detachNodeIterator(NodeIteratorImpl* ni);
-  void notifyBeforeNodeRemoval(NodeImpl* n);
+  void attachNodeIterator(NodeIteratorImpl*);
+  void detachNodeIterator(NodeIteratorImpl*);
+  void notifyBeforeNodeRemoval(NodeImpl*);
   AbstractViewImpl* defaultView() const;
-  EventImpl* createEvent(const DOMString& eventType, int& exceptioncode);
+  PassRefPtr<EventImpl> createEvent(const String& eventType, ExceptionCode&);
 
   // keep track of what types of event listeners are registered, so we don't
   // dispatch events unnecessarily
@@ -417,13 +421,13 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
     m_listenerTypes = m_listenerTypes | listenerType;
   }
 
-  CSSStyleDeclarationImpl* getOverrideStyle(ElementImpl* elt,
-                                            const DOMString& pseudoElt);
+  CSSStyleDeclarationImpl* getOverrideStyle(ElementImpl*,
+                                            const String& pseudoElt);
 
-  virtual void defaultEventHandler(EventImpl* evt);
-  void handleWindowEvent(EventImpl* evt, bool useCapture);
+  virtual void defaultEventHandler(EventImpl*);
+  void handleWindowEvent(EventImpl*, bool useCapture);
   void setHTMLWindowEventListener(const AtomicString& eventType,
-                                  EventListener* listener);
+                                  PassRefPtr<EventListener>);
   EventListener* getHTMLWindowEventListener(const AtomicString& eventType);
   void removeHTMLWindowEventListener(const AtomicString& eventType);
 
@@ -431,14 +435,15 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                   AttributeImpl*);
 
   void addWindowEventListener(const AtomicString& eventType,
-                              EventListener* listener,
+                              PassRefPtr<EventListener>,
                               bool useCapture);
   void removeWindowEventListener(const AtomicString& eventType,
-                                 EventListener* listener,
+                                 EventListener*,
                                  bool useCapture);
   bool hasWindowEventListener(const AtomicString& eventType);
 
-  EventListener* createHTMLEventListener(const DOMString& code, NodeImpl*);
+  PassRefPtr<EventListener> createHTMLEventListener(const String& code,
+                                                    NodeImpl*);
 
   /**
    * Searches through the document, starting from fromNode, for the next
@@ -474,7 +479,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
    */
   NodeImpl* previousFocusNode(NodeImpl* fromNode);
 
-  int nodeAbsIndex(NodeImpl* node);
+  int nodeAbsIndex(NodeImpl*);
   NodeImpl* nodeWithAbsIndex(int absIndex);
 
   /**
@@ -491,7 +496,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
    * @param content The header value (value of the meta tag's "content"
    * attribute)
    */
-  void processHttpEquiv(const DOMString& equiv, const DOMString& content);
+  void processHttpEquiv(const String& equiv, const String& content);
 
   void dispatchImageLoadEventSoon(HTMLImageLoader*);
   void dispatchImageLoadEventsNow();
@@ -501,50 +506,50 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   // Returns 0 if this is the top level document.
   ElementImpl* ownerElement();
 
-  DOMString referrer() const;
-  DOMString domain() const;
-  void setDomain(const DOMString& newDomain,
+  String referrer() const;
+  String domain() const;
+  void setDomain(const String& newDomain,
                  bool force = false);  // not part of the DOM
 
-  DOMString policyBaseURL() const { return m_policyBaseURL; }
-  void setPolicyBaseURL(const DOMString& s) { m_policyBaseURL = s; }
+  String policyBaseURL() const { return m_policyBaseURL; }
+  void setPolicyBaseURL(const String& s) { m_policyBaseURL = s; }
 
   // The following implements the rule from HTML 4 for what valid names are.
   // To get this right for all the XML cases, we probably have to improve this
   // or move it
   // and make it sensitive to the type of document.
-  static bool isValidName(const DOMString&);
+  static bool isValidName(const String&);
 
   // The following breaks a qualified name into a prefix and a local name.
   // It also does a validity check, and returns false if the qualified name is
   // invalid
   // (empty string or invalid characters).
-  static bool parseQualifiedName(const DOMString& qualifiedName,
-                                 DOMString& prefix,
-                                 DOMString& localName);
+  static bool parseQualifiedName(const String& qualifiedName,
+                                 String& prefix,
+                                 String& localName);
 
   void addElementById(const AtomicString& elementId, ElementImpl* element);
   void removeElementById(const AtomicString& elementId, ElementImpl* element);
 
   void addImageMap(HTMLMapElementImpl*);
   void removeImageMap(HTMLMapElementImpl*);
-  HTMLMapElementImpl* getImageMap(const DOMString& URL) const;
+  HTMLMapElementImpl* getImageMap(const String& URL) const;
 
   HTMLElementImpl* body();
 
-  DOMString toString() const;
+  String toString() const;
 
-  bool execCommand(const DOMString& command,
+  bool execCommand(const String& command,
                    bool userInterface,
-                   const DOMString& value);
-  bool queryCommandEnabled(const DOMString& command);
-  bool queryCommandIndeterm(const DOMString& command);
-  bool queryCommandState(const DOMString& command);
-  bool queryCommandSupported(const DOMString& command);
-  DOMString queryCommandValue(const DOMString& command);
+                   const String& value);
+  bool queryCommandEnabled(const String& command);
+  bool queryCommandIndeterm(const String& command);
+  bool queryCommandState(const String& command);
+  bool queryCommandSupported(const String& command);
+  String queryCommandValue(const String& command);
 
-  void addMarker(RangeImpl* range, DocumentMarker::MarkerType type);
-  void addMarker(NodeImpl* node, DocumentMarker marker);
+  void addMarker(RangeImpl*, DocumentMarker::MarkerType type);
+  void addMarker(NodeImpl*, DocumentMarker marker);
   void copyMarkers(
       NodeImpl* srcNode,
       unsigned startOffset,
@@ -553,42 +558,40 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
       int delta,
       DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
   void removeMarkers(
-      RangeImpl* range,
+      RangeImpl*,
       DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
   void removeMarkers(
-      NodeImpl* node,
+      NodeImpl*,
       unsigned startOffset,
       int length,
       DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
   void removeMarkers(
       DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
-  void removeMarkers(NodeImpl* node);
+  void removeMarkers(NodeImpl*);
   void shiftMarkers(
-      NodeImpl* node,
+      NodeImpl*,
       unsigned startOffset,
       int delta,
       DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
 
-  QValueList<DocumentMarker> markersForNode(NodeImpl* node);
+  QValueList<DocumentMarker> markersForNode(NodeImpl*);
 
-  /**
-   * designMode support
-   */
+  // designMode support
   enum InheritedBool { off = false, on = true, inherit };
-
   void setDesignMode(InheritedBool value);
   InheritedBool getDesignMode() const;
   bool inDesignMode() const;
+
   DocumentImpl* parentDocument() const;
   DocumentImpl* topDocument() const;
 
   int docID() const { return m_docID; }
 
-#ifdef KHTML_XSLT
+#if KHTML_XSLT
   void applyXSLTransform(ProcessingInstructionImpl* pi);
   void setTransformSource(void* doc) { m_transformSource = doc; }
   const void* transformSource() { return m_transformSource; }
-  RefPtr<DocumentImpl> transformSourceDocument() {
+  PassRefPtr<DocumentImpl> transformSourceDocument() {
     return m_transformSourceDocument;
   }
   void setTransformSourceDocument(DocumentImpl* doc) {
@@ -602,9 +605,9 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 #endif
 
   void incDOMTreeVersion() { ++m_domtree_version; }
-  unsigned int domTreeVersion() const { return m_domtree_version; }
+  unsigned domTreeVersion() const { return m_domtree_version; }
 
-  void setDocType(DocumentTypeImpl* docType);
+  void setDocType(PassRefPtr<DocumentTypeImpl>);
 
  signals:
   void finishedParsing();
@@ -623,7 +626,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   RefPtr<DocumentTypeImpl> m_docType;
   RefPtr<DOMImplementationImpl> m_implementation;
 
-  StyleSheetImpl* m_sheet;
+  RefPtr<StyleSheetImpl> m_sheet;
   QString m_usersheet;
   QString m_printSheet;
   QStringList m_availableSheets;
@@ -651,24 +654,23 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   RefPtr<NodeImpl> m_hoverNode;
   RefPtr<NodeImpl> m_activeNode;
 
-  unsigned int m_domtree_version;
+  unsigned m_domtree_version;
 
-  // ### replace me with something more efficient
-  // in lookup and insertion.
-  DOMStringImpl** m_elementNames;
+  // ### replace with something more efficient in lookup and insertion
+  StringImpl** m_elementNames;
   unsigned short m_elementNameAlloc;
   unsigned short m_elementNameCount;
 
-  DOMStringImpl** m_attrNames;
+  StringImpl** m_attrNames;
   unsigned short m_attrNameAlloc;
   unsigned short m_attrNameCount;
 
-  DOMStringImpl** m_namespaceURIs;
+  StringImpl** m_namespaceURIs;
   unsigned short m_namespaceURIAlloc;
   unsigned short m_namespaceURICount;
 
   QPtrList<NodeIteratorImpl> m_nodeIterators;
-  AbstractViewImpl* m_defaultView;
+  RefPtr<AbstractViewImpl> m_defaultView;
 
   unsigned short m_listenerTypes;
   RefPtr<StyleSheetListImpl> m_styleSheets;
@@ -679,8 +681,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   Color m_visitedLinkColor;
   Color m_activeLinkColor;
 
-  DOMString m_preferredStylesheetSet;
-  DOMString m_selectedStylesheetSet;
+  String m_preferredStylesheetSet;
+  String m_selectedStylesheetSet;
 
   bool m_loadingSheet;
   bool visuallyOrdered;
@@ -693,7 +695,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool m_usesDescendantRules;
   bool m_usesSiblingRules;
 
-  DOMString m_title;
+  String m_title;
   bool m_titleSetExplicitly;
   RefPtr<NodeImpl> m_titleElement;
 
@@ -728,7 +730,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   typedef HashMap<AtomicStringImpl*, HTMLMapElementImpl*> ImageMapsByName;
   ImageMapsByName m_imageMapsByName;
 
-  DOMString m_policyBaseURL;
+  String m_policyBaseURL;
 
   typedef HashSet<NodeImpl*> NodeSet;
   NodeSet m_disconnectedNodesWithEventListeners;
@@ -741,7 +743,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   bool inPageCache();
   void setInPageCache(bool flag);
-  void restoreRenderer(RenderObject* render);
+  void restoreRenderer(RenderObject*);
 
   void passwordFieldAdded();
   void passwordFieldRemoved();
@@ -751,7 +753,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void secureFormRemoved();
   bool hasSecureForm() const;
 
-  void setShouldCreateRenderers(bool f);
+  void setShouldCreateRenderers(bool);
   bool shouldCreateRenderers();
 
   void setDecoder(Decoder*);
@@ -791,12 +793,12 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   JSEditor* jsEditor();
 
   JSEditor* m_jsEditor;
-  bool relinquishesEditingFocus(NodeImpl* node);
-  bool acceptsEditingFocus(NodeImpl* node);
+  bool relinquishesEditingFocus(NodeImpl*);
+  bool acceptsEditingFocus(NodeImpl*);
   void didBeginEditing();
   void didEndEditing();
 
-  mutable DOMString m_domain;
+  mutable String m_domain;
   RenderObject* m_savedRenderer;
   int m_passwordFields;
   int m_secureForms;
@@ -806,8 +808,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   mutable HashMap<AtomicStringImpl*, ElementImpl*> m_elementsById;
   mutable HashCountedSet<AtomicStringImpl*> m_duplicateIds;
 
-  HashMap<DOMStringImpl*, ElementImpl*, CaseInsensitiveHash>
-      m_elementsByAccessKey;
+  HashMap<StringImpl*, ElementImpl*, CaseInsensitiveHash> m_elementsByAccessKey;
 
   InheritedBool m_designMode;
 
@@ -825,6 +826,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
 #endif
+
   bool m_accessKeyMapValid;
   bool m_createRenderers;
   bool m_inPageCache;

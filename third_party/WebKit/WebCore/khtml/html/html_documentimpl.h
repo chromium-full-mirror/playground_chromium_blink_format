@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,8 +25,8 @@
 #ifndef HTML_DOCUMENTIMPL_H
 #define HTML_DOCUMENTIMPL_H
 
-#include "DocumentImpl.h"
 #include "CachedObjectClient.h"
+#include "DocumentImpl.h"
 #include "HTMLCollectionImpl.h"
 #include <kxmlcore/HashMap.h>
 
@@ -46,28 +46,28 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   virtual bool isHTMLDocument() const { return true; }
   virtual ElementImpl* documentElement() const;
 
-  DOMString lastModified() const;
-  DOMString cookie() const;
-  void setCookie(const DOMString&);
+  String lastModified() const;
+  String cookie() const;
+  void setCookie(const String&);
 
-  void setBody(HTMLElementImpl* _body, int& exceptioncode);
+  void setBody(HTMLElementImpl*, ExceptionCode& exceptioncode);
 
-  virtual khtml::Tokenizer* createTokenizer();
+  virtual Tokenizer* createTokenizer();
 
-  virtual bool childAllowed(NodeImpl* newChild);
+  virtual bool childAllowed(NodeImpl*);
 
-  virtual ElementImpl* createElement(const DOMString& tagName,
-                                     int& exceptioncode);
+  virtual PassRefPtr<ElementImpl> createElement(const String& tagName,
+                                                ExceptionCode&);
 
-  virtual void determineParseMode(const QString& str);
+  virtual void determineParseMode(const QString&);
 
-  void addNamedItem(const DOMString& name);
-  void removeNamedItem(const DOMString& name);
-  bool hasNamedItem(const DOMString& name);
+  void addNamedItem(const String& name);
+  void removeNamedItem(const String& name);
+  bool hasNamedItem(const String& name);
 
-  void addDocExtraNamedItem(const DOMString& name);
-  void removeDocExtraNamedItem(const DOMString& name);
-  bool hasDocExtraNamedItem(const DOMString& name);
+  void addDocExtraNamedItem(const String& name);
+  void removeDocExtraNamedItem(const String& name);
+  bool hasDocExtraNamedItem(const String& name);
 
   HTMLCollectionImpl::CollectionInfo* collectionInfo(int type) {
     if (type < HTMLCollectionImpl::NUM_CACHEABLE_TYPES)
@@ -77,7 +77,7 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
 
   virtual DocumentTypeImpl* doctype() const;
 
-  typedef HashMap<DOMStringImpl*, int> NameCountMap;
+  typedef HashMap<StringImpl*, int> NameCountMap;
 
  protected:
   HTMLElementImpl* bodyElement;
@@ -91,6 +91,6 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   NameCountMap docExtraNamedItemCounts;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

@@ -413,7 +413,8 @@ class MacFrame : public Frame {
   bool _dragSrcMayBeDHTML,
       _dragSrcMayBeUA;  // Are DHTML and/or the UserAgent allowed to drag out?
   bool _dragSrcIsDHTML;
-  KWQClipboard* _dragClipboard;  // used on only the source side of dragging
+  RefPtr<KWQClipboard>
+      _dragClipboard;  // used on only the source side of dragging
 
   RefPtr<RangeImpl> m_markedTextRange;
 };
