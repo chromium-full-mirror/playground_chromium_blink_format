@@ -103,6 +103,7 @@ static bool betweenMidpoints;
 
 static bool isLineEmpty = true;
 static bool previousLineBrokeCleanly = true;
+static bool skipTrailingNewline = false;
 static bool emptyRun = true;
 static int numSpaces;
 
@@ -1052,18 +1053,17 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   bidi.current = start;
   bidi.last = bidi.current;
   bool pastEnd = false;
-  bool resetBidiAtEnd = false;
   BidiState stateAtEnd;
 
   while (true) {
     QChar::Direction dirCurrent;
-    if (pastEnd && (resetBidiAtEnd || bidi.current.atEnd())) {
+    if (pastEnd && (previousLineBrokeCleanly || bidi.current.atEnd())) {
       // kdDebug(6041) << "atEnd" << endl;
       BidiContext* c = bidi.context.get();
       while (c->parent)
         c = c->parent;
       dirCurrent = c->dir;
-      if (resetBidiAtEnd) {
+      if (previousLineBrokeCleanly) {
         // A deviation from the Unicode Bidi Algorithm in order to match
         // Mac OS X text and WinIE: a hard line break resets bidi state.
         stateAtEnd.context = c;
@@ -1425,9 +1425,6 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
       stateAtEnd = bidi;
       bidi.endOfLine = bidi.last;
       pastEnd = true;
-      resetBidiAtEnd = previousLineBrokeCleanly ||
-                       (end.obj && end.obj->style()->preserveNewline() &&
-                        end.current() == '\n');
     }
   }
 
@@ -1717,9 +1714,7 @@ IntRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           }
         }
 
-        if (end == start ||
-            (!previousLineBrokeCleanly && end.obj &&
-             end.obj->style()->preserveNewline() && end.current() == '\n')) {
+        if (end == start || skipTrailingNewline) {
           bidi.adjustEmbedding = true;
           end.increment(bidi);
           bidi.adjustEmbedding = false;
@@ -2108,6 +2103,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
   bool prevLineBrokeCleanly = previousLineBrokeCleanly;
   previousLineBrokeCleanly = false;
+  skipTrailingNewline = false;
 
   while (o) {
     if (o->isBR()) {
@@ -2416,6 +2412,13 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                   skipWhitespace(lBreak, bidi);
                 }
               }
+              if (lBreak.obj && lBreak.obj->style()->preserveNewline() &&
+                  lBreak.obj->isText() &&
+                  static_cast<RenderText*>(lBreak.obj)->text()[lBreak.pos] ==
+                      '\n') {
+                previousLineBrokeCleanly = true;
+                skipTrailingNewline = true;
+              }
               goto end;  // Didn't fit. Jump to the end.
             } else {
               if (midWordBreak)
@@ -2427,9 +2430,11 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             }
           }
 
-          if (*(str + pos) == '\n' && o->style()->preserveNewline()) {
+          if (c == '\n' && o->style()->preserveNewline()) {
             lBreak.obj = o;
             lBreak.pos = pos;
+            previousLineBrokeCleanly = true;
+            skipTrailingNewline = true;
             return lBreak;
           }
 
