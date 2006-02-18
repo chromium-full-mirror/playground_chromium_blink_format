@@ -195,7 +195,6 @@
 - (void)_setTriggeringAction:(NSDictionary*)action;
 - (NSURLRequest*)_lastCheckedRequest;
 - (void)_setLastCheckedRequest:(NSURLRequest*)request;
-- (void)_setStoredInPageCache:(BOOL)f;
 - (BOOL)_loadingFromPageCache;
 
 - (void)_addResponse:(NSURLResponse*)r;
