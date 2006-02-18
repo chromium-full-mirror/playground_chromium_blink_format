@@ -1828,6 +1828,7 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
           case CSS_PROP_FONT_FAMILY:
           case CSS_PROP_FONT_WEIGHT:
           case CSS_PROP__KHTML_TEXT_SIZE_ADJUST:
+          case CSS_PROP_FONT_VARIANT:
             // these have to be applied first, because other properties use the
             // computed
             // values of these porperties.
