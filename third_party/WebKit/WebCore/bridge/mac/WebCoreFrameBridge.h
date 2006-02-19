@@ -222,6 +222,7 @@ typedef enum {
 
 - (WebCoreFrameBridge*)childFrameNamed:(NSString*)name;
 - (WebCoreFrameBridge*)findFrameNamed:(NSString*)name;
+
 - (void)setFrameNamespace:(NSString*)ns;
 - (NSString*)frameNamespace;
 
@@ -550,10 +551,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 @protocol WebCoreFrameBridge
 
-- (WebCoreFrameBridge*)mainFrame;
 - (void)frameDetached;
 - (NSView*)documentView;
-- (WebView*)webView;
 
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
@@ -572,13 +571,12 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                form:(DOMElement*)form
          formValues:(NSDictionary*)values;
 
-- (WebCoreFrameBridge*)createWindowWithURL:(NSURL*)URL
-                                 frameName:(NSString*)name;
+- (WebCorePageBridge*)createWindowWithURL:(NSURL*)URL;
 - (void)showWindow;
 
 - (BOOL)canRunModal;
 - (BOOL)canRunModalNow;
-- (WebCoreFrameBridge*)createModalDialogWithURL:(NSURL*)URL;
+- (WebCorePageBridge*)createModalDialogWithURL:(NSURL*)URL;
 - (void)runModal;
 
 - (NSString*)userAgentForURL:(NSURL*)URL;

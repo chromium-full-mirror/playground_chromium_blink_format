@@ -29,9 +29,6 @@
 // WebView in WebKit. It is a two-way bridge, with subclasses expected
 // to implement a protocol of bridging methods.
 
-// The WebCorePageBridge interface contains methods for use by the
-// non-WebCore side of the bridge.
-
 #ifdef __cplusplus
 namespace WebCore {
 class Page;
@@ -47,6 +44,9 @@ typedef WebCore::Page WebCorePage;
 class WebCoreFrameBridge;
 #endif
 
+// The WebCorePageBridge interface contains methods for use by the
+// non-WebCore side of the bridge.
+
 @interface WebCorePageBridge : NSObject {
   WebCorePage* _page;
 }
@@ -61,6 +61,9 @@ class WebCoreFrameBridge;
 // of the bridge.
 
 @protocol WebCorePageBridge
+
+- (NSView*)outerView;
+
 @end
 
 // This interface definition allows those who hold a WebCorePageBridge * to call
