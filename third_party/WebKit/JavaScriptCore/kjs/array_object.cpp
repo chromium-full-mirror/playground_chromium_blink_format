@@ -517,6 +517,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
                          ->call(exec, o, List())
                          ->toString(exec);
             } else {
+              visitedElems.remove(thisObj);
               return throwError(
                   exec, RangeError,
                   "Can't convert " + o->className() + " object to string");
