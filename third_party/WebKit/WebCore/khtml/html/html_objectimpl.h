@@ -96,7 +96,9 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   virtual bool allParamsAvailable();
   void setupApplet() const;
 
+#if __APPLE__
   KJS::Bindings::Instance* getAppletInstance() const;
+#endif
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -105,7 +107,9 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   DOMString oldNameAttr;
   DOMString oldIdAttr;
 
+#if __APPLE__
   mutable RefPtr<KJS::Bindings::Instance> m_appletInstance;
+#endif
 
   bool m_allParamsAvailable;
 };
@@ -134,7 +138,9 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl*) const;
 
+#if __APPLE__
   KJS::Bindings::Instance* getEmbedInstance() const;
+#endif
 
   QString url;
   QString pluginPage;
@@ -143,7 +149,9 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
  private:
   DOMString oldNameAttr;
 
+#if __APPLE__
   mutable RefPtr<KJS::Bindings::Instance> m_embedInstance;
+#endif
 };
 
 // -------------------------------------------------------------------------
@@ -238,7 +246,9 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   bool isDocNamedItem() const { return m_docNamedItem; }
 
+#if __APPLE__
   KJS::Bindings::Instance* getObjectInstance() const;
+#endif
 
   QString serviceType;
   QString url;
@@ -252,7 +262,9 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   DOMString oldIdAttr;
   DOMString oldNameAttr;
 
+#if __APPLE__
   mutable RefPtr<KJS::Bindings::Instance> m_objectInstance;
+#endif
 
   bool m_complete;
   bool m_docNamedItem;

@@ -55,8 +55,10 @@ HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(appletTag, doc), m_allParamsAvailable(false) {}
 
 HTMLAppletElementImpl::~HTMLAppletElementImpl() {
+#if __APPLE__
   // m_appletInstance should have been cleaned up in detach().
   assert(!m_appletInstance);
+#endif
 }
 
 bool HTMLAppletElementImpl::checkDTD(const NodeImpl* newChild) {
@@ -185,6 +187,7 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 #endif
 }
 
+#if __APPLE__
 KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame || !frame->javaEnabled())
@@ -204,6 +207,7 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   }
   return m_appletInstance.get();
 }
+#endif
 
 void HTMLAppletElementImpl::closeRenderer() {
   // The parser just reached </applet>, so all the params are available now.
@@ -215,7 +219,9 @@ void HTMLAppletElementImpl::closeRenderer() {
 }
 
 void HTMLAppletElementImpl::detach() {
+#if __APPLE__
   m_appletInstance = 0;
+#endif
   HTMLElementImpl::detach();
 }
 
@@ -317,14 +323,17 @@ HTMLEmbedElementImpl::HTMLEmbedElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(embedTag, doc) {}
 
 HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {
+#if __APPLE__
   // m_embedInstance should have been cleaned up in detach().
   assert(!m_embedInstance);
+#endif
 }
 
 bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
 }
 
+#if __APPLE__
 KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame)
@@ -353,6 +362,7 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   }
   return m_embedInstance.get();
 }
+#endif
 
 bool HTMLEmbedElementImpl::mapToEntry(const QualifiedName& attrName,
                                       MappedAttributeEntry& result) const {
@@ -455,7 +465,9 @@ void HTMLEmbedElementImpl::attach() {
 }
 
 void HTMLEmbedElementImpl::detach() {
+#if __APPLE__
   m_embedInstance = 0;
+#endif
   HTMLElementImpl::detach();
 }
 
@@ -492,8 +504,10 @@ HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentImpl* doc)
 }
 
 HTMLObjectElementImpl::~HTMLObjectElementImpl() {
+#if __APPLE__
   // m_objectInstance should have been cleaned up in detach().
   assert(!m_objectInstance);
+#endif
 
   delete m_imageLoader;
 }
@@ -502,6 +516,7 @@ bool HTMLObjectElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
 }
 
+#if __APPLE__
 KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame)
@@ -526,6 +541,7 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
 
   return m_objectInstance.get();
 }
+#endif
 
 HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
   for (NodeImpl* p = parentNode(); p != 0; p = p->parentNode()) {
@@ -697,7 +713,9 @@ void HTMLObjectElementImpl::detach() {
     needWidgetUpdate = true;
   }
 
+#if __APPLE__
   m_objectInstance = 0;
+#endif
   HTMLElementImpl::detach();
 }
 
