@@ -54,7 +54,7 @@ KWQSignal::~KWQSignal() {
 void KWQSignal::connect(const KWQSlot& slot) {
 #if !ERROR_DISABLED
   if (_slots.contains(slot)) {
-    ERROR("connecting the same slot to a signal twice, %s", _name);
+    LOG_ERROR("connecting the same slot to a signal twice, %s", _name);
   }
 #endif
   _slots.append(slot);
@@ -70,7 +70,7 @@ void KWQSignal::disconnect(const KWQSlot& slot) {
                                                  khtml::CachedObject*))) &&
       !KWQNamesMatch(_name, SIGNAL(requestStarted(khtml::DocLoader*,
                                                   khtml::CachedObject*)))) {
-    ERROR("disconnecting a signal that wasn't connected, %s", _name);
+    LOG_ERROR("disconnecting a signal that wasn't connected, %s", _name);
   }
 #endif
   _slots.remove(slot);

@@ -75,8 +75,9 @@ void QObject::connect(const QObject* sender,
             member,
             SLOT(slotViewCleared()))  // FIXME: Should implement this one!
         )
-      ERROR("connecting member %s to signal %s, but that signal was not found",
-            member, signalName);
+      LOG_ERROR(
+          "connecting member %s to signal %s, but that signal was not found",
+          member, signalName);
 #endif
     return;
   }

@@ -107,7 +107,7 @@ void QRegExp::KWQRegExpPrivate::compile(bool caseSensitive, bool glob) {
                        caseSensitive ? 0 : PCRE_CASELESS, &errorMessage,
                        &errorOffset, NULL);
   if (regex == NULL) {
-    ERROR("KWQRegExp: pcre_compile failed with '%s'", errorMessage);
+    LOG_ERROR("KWQRegExp: pcre_compile failed with '%s'", errorMessage);
   }
 }
 
@@ -152,7 +152,8 @@ int QRegExp::match(const QString& str, int startFrom, int* matchLength) const {
       d->lastMatchOffsets, MAX_OFFSETS);
   if (d->lastMatchCount < 0) {
     if (d->lastMatchCount != PCRE_ERROR_NOMATCH)
-      ERROR("KWQRegExp: pcre_exec() failed with result %d", d->lastMatchCount);
+      LOG_ERROR("KWQRegExp: pcre_exec() failed with result %d",
+                d->lastMatchCount);
     d->lastMatchPos = -1;
     d->lastMatchLength = -1;
     d->lastMatchString = QString();

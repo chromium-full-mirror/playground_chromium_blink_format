@@ -1235,7 +1235,7 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
 #endif
   }
 
-  ERROR("unimplemented propertyID: %d", propertyID);
+  LOG_ERROR("unimplemented propertyID: %d", propertyID);
   return 0;
 }
 
