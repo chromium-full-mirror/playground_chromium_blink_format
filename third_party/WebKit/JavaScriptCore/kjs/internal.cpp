@@ -763,7 +763,7 @@ InternalFunctionImp::InternalFunctionImp(FunctionPrototype* funcProto,
                                          const Identifier& name)
     : JSObject(funcProto), m_name(name) {}
 
-bool InternalFunctionImp::implementsHasCall() const {
+bool InternalFunctionImp::implementsCall() const {
   return true;
 }
 
