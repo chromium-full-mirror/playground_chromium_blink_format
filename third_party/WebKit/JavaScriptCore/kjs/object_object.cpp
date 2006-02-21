@@ -102,10 +102,6 @@ ObjectProtoFunc::ObjectProtoFunc(ExecState*,
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
-bool ObjectProtoFunc::implementsCall() const {
-  return true;
-}
-
 // ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5, 15.2.4.7
 
 JSValue* ObjectProtoFunc::callAsFunction(ExecState* exec,
@@ -237,10 +233,6 @@ JSObject* ObjectObjectImp::construct(ExecState* exec, const List& args) {
     case UndefinedType:
       return new JSObject(exec->lexicalInterpreter()->builtinObjectPrototype());
   }
-}
-
-bool ObjectObjectImp::implementsCall() const {
-  return true;
 }
 
 JSValue* ObjectObjectImp::callAsFunction(ExecState* exec,

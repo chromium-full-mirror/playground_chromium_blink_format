@@ -41,7 +41,6 @@ class ArrayProtoFunc : public InternalFunctionImp {
  public:
   ArrayProtoFunc(ExecState* exec, int i, int len, const Identifier& name);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -81,7 +80,6 @@ class ArrayObjectImp : public InternalFunctionImp {
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState* exec, const List& args);
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

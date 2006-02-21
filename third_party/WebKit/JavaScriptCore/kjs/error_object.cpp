@@ -63,10 +63,6 @@ ErrorProtoFunc::ErrorProtoFunc(ExecState*,
   putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);
 }
 
-bool ErrorProtoFunc::implementsCall() const {
-  return true;
-}
-
 JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
                                         JSObject* thisObj,
                                         const List& /*args*/) {
@@ -116,10 +112,6 @@ JSObject* ErrorObjectImp::construct(ExecState* exec, const List& args) {
   return obj;
 }
 
-bool ErrorObjectImp::implementsCall() const {
-  return true;
-}
-
 // ECMA 15.9.2
 JSValue* ErrorObjectImp::callAsFunction(ExecState* exec,
                                         JSObject* /*thisObj*/,
@@ -165,10 +157,6 @@ JSObject* NativeErrorImp::construct(ExecState* exec, const List& args) {
   if (!args[0]->isUndefined())
     imp->putDirect(messagePropertyName, jsString(args[0]->toString(exec)));
   return obj;
-}
-
-bool NativeErrorImp::implementsCall() const {
-  return true;
 }
 
 JSValue* NativeErrorImp::callAsFunction(ExecState* exec,

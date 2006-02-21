@@ -72,10 +72,6 @@ BooleanProtoFunc::BooleanProtoFunc(ExecState*,
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
-bool BooleanProtoFunc::implementsCall() const {
-  return true;
-}
-
 // ECMA 15.6.4.2 + 15.6.4.3
 JSValue* BooleanProtoFunc::callAsFunction(ExecState* exec,
                                           JSObject* thisObj,
@@ -125,10 +121,6 @@ JSObject* BooleanObjectImp::construct(ExecState* exec, const List& args) {
   obj->setInternalValue(jsBoolean(b));
 
   return obj;
-}
-
-bool BooleanObjectImp::implementsCall() const {
-  return true;
 }
 
 // ECMA 15.6.1

@@ -63,7 +63,6 @@ class NumberProtoFunc : public InternalFunctionImp {
                   int len,
                   const Identifier&);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -95,7 +94,6 @@ class NumberObjectImp : public InternalFunctionImp {
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState* exec, const List& args);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

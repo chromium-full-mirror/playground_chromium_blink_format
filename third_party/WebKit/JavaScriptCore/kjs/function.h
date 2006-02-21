@@ -49,7 +49,6 @@ class FunctionImp : public InternalFunctionImp {
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -185,7 +184,6 @@ class GlobalFuncImp : public InternalFunctionImp {
                 int i,
                 int len,
                 const Identifier&);
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

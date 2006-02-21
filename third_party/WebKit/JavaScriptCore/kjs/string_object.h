@@ -79,7 +79,6 @@ class StringProtoFunc : public InternalFunctionImp {
  public:
   StringProtoFunc(ExecState* exec, int i, int len, const Identifier&);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -138,7 +137,6 @@ class StringObjectImp : public InternalFunctionImp {
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState* exec, const List& args);
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
@@ -153,7 +151,6 @@ class StringObjectImp : public InternalFunctionImp {
 class StringObjectFuncImp : public InternalFunctionImp {
  public:
   StringObjectFuncImp(ExecState*, FunctionPrototype*, const Identifier&);
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);

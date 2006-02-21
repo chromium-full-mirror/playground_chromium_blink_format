@@ -85,7 +85,6 @@ class DateProtoFunc : public InternalFunctionImp {
  public:
   DateProtoFunc(ExecState*, int i, int len, const Identifier& date);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
@@ -143,7 +142,6 @@ class DateObjectFuncImp : public InternalFunctionImp {
                     int len,
                     const Identifier&);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
@@ -641,10 +639,6 @@ DateProtoFunc::DateProtoFunc(ExecState* exec,
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
-bool DateProtoFunc::implementsCall() const {
-  return true;
-}
-
 JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
                                        JSObject* thisObj,
                                        const List& args) {
@@ -893,10 +887,6 @@ JSObject* DateObjectImp::construct(ExecState* exec, const List& args) {
   return ret;
 }
 
-bool DateObjectImp::implementsCall() const {
-  return true;
-}
-
 // ECMA 15.9.2
 JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
                                        JSObject* /*thisObj*/,
@@ -915,10 +905,6 @@ DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
                                      const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
-}
-
-bool DateObjectFuncImp::implementsCall() const {
-  return true;
 }
 
 // ECMA 15.9.4.2 - 3

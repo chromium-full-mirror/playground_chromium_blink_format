@@ -54,7 +54,6 @@ class ObjectProtoFunc : public InternalFunctionImp {
                   int len,
                   const Identifier&);
 
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);
 
   enum {
@@ -87,7 +86,6 @@ class ObjectObjectImp : public InternalFunctionImp {
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List& args);
-  virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);
 };
 

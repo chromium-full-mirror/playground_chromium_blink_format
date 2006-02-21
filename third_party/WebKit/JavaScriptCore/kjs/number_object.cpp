@@ -94,10 +94,6 @@ NumberProtoFunc::NumberProtoFunc(ExecState*,
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
-bool NumberProtoFunc::implementsCall() const {
-  return true;
-}
-
 static UString integer_part_noexp(double d) {
   int decimalPoint;
   int sign;
@@ -466,10 +462,6 @@ JSObject* NumberObjectImp::construct(ExecState* exec, const List& args) {
   obj->setInternalValue(jsNumber(n));
 
   return obj;
-}
-
-bool NumberObjectImp::implementsCall() const {
-  return true;
 }
 
 // ECMA 15.7.2

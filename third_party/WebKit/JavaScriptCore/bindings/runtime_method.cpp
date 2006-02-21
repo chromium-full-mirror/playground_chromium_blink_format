@@ -67,10 +67,6 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
   return FunctionImp::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-bool RuntimeMethod::implementsCall() const {
-  return true;
-}
-
 JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
                                        JSObject* thisObj,
                                        const List& args) {
