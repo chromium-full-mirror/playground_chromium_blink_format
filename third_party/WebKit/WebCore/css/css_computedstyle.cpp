@@ -941,13 +941,13 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       return 0;
     case CSS_PROP_POSITION:
       switch (style->position()) {
-        case STATIC:
+        case StaticPosition:
           return new CSSPrimitiveValueImpl(CSS_VAL_STATIC);
-        case RELATIVE:
+        case RelativePosition:
           return new CSSPrimitiveValueImpl(CSS_VAL_RELATIVE);
-        case ABSOLUTE:
+        case AbsolutePosition:
           return new CSSPrimitiveValueImpl(CSS_VAL_ABSOLUTE);
-        case FIXED:
+        case FixedPosition:
           return new CSSPrimitiveValueImpl(CSS_VAL_FIXED);
       }
       ASSERT_NOT_REACHED();

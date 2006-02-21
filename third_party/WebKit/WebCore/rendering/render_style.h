@@ -108,7 +108,12 @@ struct LengthBox {
   }
 };
 
-enum EPosition { STATIC, RELATIVE, ABSOLUTE, FIXED };
+enum EPosition {
+  StaticPosition,
+  RelativePosition,
+  AbsolutePosition,
+  FixedPosition
+};
 
 enum EFloat { FNONE = 0, FLEFT, FRIGHT };
 
@@ -1945,7 +1950,7 @@ class RenderStyle {
   static EListStyleType initialListStyleType() { return DISC; }
   static EOverflow initialOverflow() { return OVISIBLE; }
   static EPageBreak initialPageBreak() { return PBAUTO; }
-  static EPosition initialPosition() { return STATIC; }
+  static EPosition initialPosition() { return StaticPosition; }
   static ETableLayout initialTableLayout() { return TAUTO; }
   static EUnicodeBidi initialUnicodeBidi() { return UBNormal; }
   static ETextTransform initialTextTransform() { return TTNONE; }

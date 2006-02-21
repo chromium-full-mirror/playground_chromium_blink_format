@@ -79,8 +79,8 @@ void RenderBox::setStyle(RenderStyle* _style) {
   setInline(_style->isDisplayInlineType());
 
   switch (_style->position()) {
-    case ABSOLUTE:
-    case FIXED:
+    case AbsolutePosition:
+    case FixedPosition:
       setPositioned(true);
       break;
     default:
@@ -89,7 +89,7 @@ void RenderBox::setStyle(RenderStyle* _style) {
       if (_style->isFloating())
         setFloating(true);
 
-      if (_style->position() == RELATIVE)
+      if (_style->position() == RelativePosition)
         setRelPositioned(true);
   }
 
@@ -705,11 +705,11 @@ int RenderBox::containingBlockWidth() const {
 }
 
 bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
-  if (style()->position() == FIXED)
+  if (style()->position() == FixedPosition)
     f = true;
   RenderObject* o = container();
   if (o && o->absolutePosition(xPos, yPos, f)) {
-    if (style()->position() == ABSOLUTE && o->isRelPositioned() &&
+    if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
         o->isInlineFlow()) {
       // When we have an enclosing relpositioned inline, we need to add in the
       // offset of the first line
@@ -853,15 +853,15 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   // right dirty rect.  Since this is called from RenderObject::setStyle, the
   // relative position
   // flag on the RenderObject has been cleared, so use the one on the style().
-  if (style()->position() == RELATIVE && m_layer)
+  if (style()->position() == RelativePosition && m_layer)
     m_layer->relativePositionOffset(x, y);
 
-  if (style()->position() == FIXED)
+  if (style()->position() == FixedPosition)
     f = true;
 
   RenderObject* o = container();
   if (o) {
-    if (style()->position() == ABSOLUTE && o->isRelPositioned() &&
+    if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
         o->isInlineFlow()) {
       // When we have an enclosing relpositioned inline, we need to add in the
       // offset of the first line

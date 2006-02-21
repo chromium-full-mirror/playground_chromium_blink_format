@@ -989,7 +989,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
     // fix a crash where a site tries to position these objects.  They also
     // never honor display.
     if (e && (e->hasTagName(frameTag) || e->hasTagName(framesetTag))) {
-      style->setPosition(STATIC);
+      style->setPosition(StaticPosition);
       style->setDisplay(BLOCK);
     }
 
@@ -1007,8 +1007,8 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
     // positions.  We also force inline-level roots to be block-level.
     if (style->display() != BLOCK && style->display() != TABLE &&
         style->display() != BOX &&
-        (style->position() == ABSOLUTE || style->position() == FIXED ||
-         style->floating() != FNONE ||
+        (style->position() == AbsolutePosition ||
+         style->position() == FixedPosition || style->floating() != FNONE ||
          (e && e->getDocument()->documentElement() == e))) {
       if (style->display() == INLINE_TABLE)
         style->setDisplay(TABLE);
@@ -1033,13 +1033,13 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
          style->display() == TABLE_ROW_GROUP ||
          style->display() == TABLE_FOOTER_GROUP ||
          style->display() == TABLE_ROW || style->display() == TABLE_CELL) &&
-        style->position() == RELATIVE)
-      style->setPosition(STATIC);
+        style->position() == RelativePosition)
+      style->setPosition(StaticPosition);
   }
 
   // Make sure our z-index value is only applied if the object is positioned,
   // relatively positioned, or transparent.
-  if (style->position() == STATIC && style->opacity() == 1.0f) {
+  if (style->position() == StaticPosition && style->opacity() == 1.0f) {
     if (e && e->getDocument()->documentElement() == e)
       style->setZIndex(
           0);  // The root has a z-index of 0 if not positioned or transparent.
@@ -2273,18 +2273,18 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       EPosition p;
       switch (primitiveValue->getIdent()) {
         case CSS_VAL_STATIC:
-          p = STATIC;
+          p = StaticPosition;
           break;
         case CSS_VAL_RELATIVE:
-          p = RELATIVE;
+          p = RelativePosition;
           break;
         case CSS_VAL_ABSOLUTE:
-          p = ABSOLUTE;
+          p = AbsolutePosition;
           break;
         case CSS_VAL_FIXED: {
           if (view)
             view->useSlowRepaints();
-          p = FIXED;
+          p = FixedPosition;
           break;
         }
         default:

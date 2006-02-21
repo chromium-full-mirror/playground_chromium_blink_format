@@ -3664,7 +3664,7 @@ void RenderBlock::updateFirstLetter() {
     // Force inline display (except for floating first-letters)
     pseudoStyle->setDisplay(pseudoStyle->isFloating() ? BLOCK : INLINE);
     pseudoStyle->setPosition(
-        STATIC);  // CSS2 says first-letter can't be positioned.
+        StaticPosition);  // CSS2 says first-letter can't be positioned.
 
     RenderObject* firstLetter = RenderFlow::createAnonymousFlow(
         document(), pseudoStyle);  // anonymous box
