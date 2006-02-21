@@ -534,6 +534,10 @@ void JSObject::putDirect(const Identifier& propertyName, int value, int attr) {
   _prop.put(propertyName, jsNumber(value), attr);
 }
 
+void JSObject::putDirectFunction(InternalFunctionImp* func, int attr) {
+  putDirect(func->functionName(), func, attr);
+}
+
 void JSObject::fillGetterPropertySlot(PropertySlot& slot, JSValue** location) {
   GetterSetterImp* gs = static_cast<GetterSetterImp*>(*location);
   JSObject* getterFunc = gs->getGetter();
@@ -607,7 +611,7 @@ JSObject* Error::create(ExecState* exec,
 
   /*
   #ifndef NDEBUG
-    const char *msg = err->get("message")->toString().value().ascii();
+    const char *msg = err->get(messagePropertyName)->toString().value().ascii();
     if (l >= 0)
         fprintf(stderr, "KJS: %s at line %d. %s\n", estr, l, msg);
     else

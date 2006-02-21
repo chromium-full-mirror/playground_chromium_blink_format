@@ -50,23 +50,25 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
     : BooleanInstance(objectProto) {
   // The constructor will be added later by InterpreterImp::InterpreterImp()
 
-  putDirect(
-      toStringPropertyName,
-      new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ToString, 0),
+  putDirectFunction(
+      new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ToString, 0,
+                           toStringPropertyName),
       DontEnum);
-  putDirect(valueOfPropertyName,
-            new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ValueOf, 0),
-            DontEnum);
+  putDirectFunction(
+      new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ValueOf, 0,
+                           valueOfPropertyName),
+      DontEnum);
   setInternalValue(jsBoolean(false));
 }
 
 // ------------------------------ BooleanProtoFunc --------------------------
 
-BooleanProtoFunc::BooleanProtoFunc(ExecState* exec,
+BooleanProtoFunc::BooleanProtoFunc(ExecState*,
                                    FunctionPrototype* funcProto,
                                    int i,
-                                   int len)
-    : InternalFunctionImp(funcProto), id(i) {
+                                   int len,
+                                   const Identifier& name)
+    : InternalFunctionImp(funcProto, name), id(i) {
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 

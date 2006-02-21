@@ -31,6 +31,8 @@
 
 namespace KJS {
 
+class FunctionPrototype;
+
 /**
  * An entry in a hash table.
  */
@@ -136,7 +138,7 @@ inline JSValue* staticFunctionGetter(ExecState* exec,
     return cachedVal;
 
   const HashEntry* entry = slot.staticEntry();
-  JSValue* val = new FuncImp(exec, entry->value, entry->params);
+  JSValue* val = new FuncImp(exec, entry->value, entry->params, propertyName);
   thisObj->putDirect(propertyName, val, entry->attr);
   return val;
 }
@@ -381,20 +383,25 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
                                                        slot);                 \
   }
 
-#define KJS_IMPLEMENT_PROTOFUNC(ClassFunc)                           \
-  class ClassFunc : public DOMFunction {                             \
-   public:                                                           \
-    ClassFunc(ExecState* exec, int i, int len) : id(i) {             \
-      put(exec, lengthPropertyName, jsNumber(len),                   \
-          DontDelete | ReadOnly | DontEnum);                         \
-    }                                                                \
-    /* Macro user needs to implement the callAsFunction function. */ \
-    virtual JSValue* callAsFunction(ExecState* exec,                 \
-                                    JSObject* thisObj,               \
-                                    const List& args);               \
-                                                                     \
-   private:                                                          \
-    int id;                                                          \
+#define KJS_IMPLEMENT_PROTOFUNC(ClassFunc)                                 \
+  class ClassFunc : public InternalFunctionImp {                           \
+   public:                                                                 \
+    ClassFunc(ExecState* exec, int i, int len, const Identifier& name)     \
+        : InternalFunctionImp(                                             \
+              static_cast<FunctionPrototype*>(                             \
+                  exec->lexicalInterpreter()->builtinFunctionPrototype()), \
+              name),                                                       \
+          id(i) {                                                          \
+      put(exec, lengthPropertyName, jsNumber(len),                         \
+          DontDelete | ReadOnly | DontEnum);                               \
+    }                                                                      \
+    /* Macro user needs to implement the callAsFunction function. */       \
+    virtual JSValue* callAsFunction(ExecState* exec,                       \
+                                    JSObject* thisObj,                     \
+                                    const List& args);                     \
+                                                                           \
+   private:                                                                \
+    int id;                                                                \
   };
 
 /*

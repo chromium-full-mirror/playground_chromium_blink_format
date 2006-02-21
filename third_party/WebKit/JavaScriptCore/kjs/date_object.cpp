@@ -83,7 +83,7 @@ namespace KJS {
  */
 class DateProtoFunc : public InternalFunctionImp {
  public:
-  DateProtoFunc(ExecState*, int i, int len);
+  DateProtoFunc(ExecState*, int i, int len, const Identifier& date);
 
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*,
@@ -137,7 +137,11 @@ class DateProtoFunc : public InternalFunctionImp {
  */
 class DateObjectFuncImp : public InternalFunctionImp {
  public:
-  DateObjectFuncImp(ExecState*, FunctionPrototype*, int i, int len);
+  DateObjectFuncImp(ExecState*,
+                    FunctionPrototype*,
+                    int i,
+                    int len,
+                    const Identifier&);
 
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*,
@@ -622,9 +626,14 @@ bool DatePrototype::getOwnPropertySlot(ExecState* exec,
 
 // ------------------------------ DateProtoFunc -----------------------------
 
-DateProtoFunc::DateProtoFunc(ExecState* exec, int i, int len)
-    : InternalFunctionImp(static_cast<FunctionPrototype*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype())),
+DateProtoFunc::DateProtoFunc(ExecState* exec,
+                             int i,
+                             int len,
+                             const Identifier& name)
+    : InternalFunctionImp(
+          static_cast<FunctionPrototype*>(
+              exec->lexicalInterpreter()->builtinFunctionPrototype()),
+          name),
       id(abs(i)),
       utc(i < 0)
 // We use a negative ID to denote the "UTC" variant.
@@ -804,13 +813,15 @@ DateObjectImp::DateObjectImp(ExecState* exec,
   putDirect(prototypePropertyName, dateProto, DontEnum | DontDelete | ReadOnly);
 
   static const Identifier parsePropertyName("parse");
-  putDirect(parsePropertyName,
-            new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1),
-            DontEnum);
+  putDirectFunction(
+      new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1,
+                            parsePropertyName),
+      DontEnum);
   static const Identifier UTCPropertyName("UTC");
-  putDirect(UTCPropertyName,
-            new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7),
-            DontEnum);
+  putDirectFunction(
+      new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
+                            UTCPropertyName),
+      DontEnum);
 
   // no. of arguments for constructor
   putDirect(lengthPropertyName, 7, ReadOnly | DontDelete | DontEnum);
@@ -900,8 +911,9 @@ JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
 DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      int i,
-                                     int len)
-    : InternalFunctionImp(funcProto), id(i) {
+                                     int len,
+                                     const Identifier& name)
+    : InternalFunctionImp(funcProto, name), id(i) {
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 

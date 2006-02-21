@@ -194,9 +194,14 @@ bool StringPrototype::getOwnPropertySlot(ExecState* exec,
 
 // ------------------------------ StringProtoFunc ---------------------------
 
-StringProtoFunc::StringProtoFunc(ExecState* exec, int i, int len)
-    : InternalFunctionImp(static_cast<FunctionPrototype*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype())),
+StringProtoFunc::StringProtoFunc(ExecState* exec,
+                                 int i,
+                                 int len,
+                                 const Identifier& name)
+    : InternalFunctionImp(
+          static_cast<FunctionPrototype*>(
+              exec->lexicalInterpreter()->builtinFunctionPrototype()),
+          name),
       id(i) {
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
@@ -766,8 +771,9 @@ StringObjectImp::StringObjectImp(ExecState* exec,
   putDirect(prototypePropertyName, stringProto,
             DontEnum | DontDelete | ReadOnly);
 
-  putDirect(fromCharCodePropertyName, new StringObjectFuncImp(exec, funcProto),
-            DontEnum);
+  putDirectFunction(
+      new StringObjectFuncImp(exec, funcProto, fromCharCodePropertyName),
+      DontEnum);
 
   // no. of arguments for constructor
   putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
@@ -804,9 +810,10 @@ JSValue* StringObjectImp::callAsFunction(ExecState* exec,
 // ------------------------------ StringObjectFuncImp --------------------------
 
 // ECMA 15.5.3.2 fromCharCode()
-StringObjectFuncImp::StringObjectFuncImp(ExecState* exec,
-                                         FunctionPrototype* funcProto)
-    : InternalFunctionImp(funcProto) {
+StringObjectFuncImp::StringObjectFuncImp(ExecState*,
+                                         FunctionPrototype* funcProto,
+                                         const Identifier& name)
+    : InternalFunctionImp(funcProto, name) {
   putDirect(lengthPropertyName, jsNumber(1), DontDelete | ReadOnly | DontEnum);
 }
 

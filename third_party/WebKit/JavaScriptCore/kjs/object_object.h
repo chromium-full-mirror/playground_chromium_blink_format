@@ -51,7 +51,8 @@ class ObjectProtoFunc : public InternalFunctionImp {
   ObjectProtoFunc(ExecState* exec,
                   FunctionPrototype* funcProto,
                   int i,
-                  int len);
+                  int len,
+                  const Identifier&);
 
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);

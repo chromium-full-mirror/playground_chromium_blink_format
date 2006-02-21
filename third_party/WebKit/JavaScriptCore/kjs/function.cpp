@@ -57,10 +57,11 @@ class Parameter {
 };
 
 FunctionImp::FunctionImp(ExecState* exec, const Identifier& n)
-    : InternalFunctionImp(static_cast<FunctionPrototype*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype())),
-      param(0L),
-      ident(n) {}
+    : InternalFunctionImp(
+          static_cast<FunctionPrototype*>(
+              exec->lexicalInterpreter()->builtinFunctionPrototype()),
+          n),
+      param(0L) {}
 
 FunctionImp::~FunctionImp() {}
 
@@ -563,11 +564,12 @@ void ActivationImp::createArgumentsObject(ExecState* exec) const {
 
 // ------------------------------ GlobalFunc -----------------------------------
 
-GlobalFuncImp::GlobalFuncImp(ExecState* exec,
+GlobalFuncImp::GlobalFuncImp(ExecState*,
                              FunctionPrototype* funcProto,
                              int i,
-                             int len)
-    : InternalFunctionImp(funcProto), id(i) {
+                             int len,
+                             const Identifier& name)
+    : InternalFunctionImp(funcProto, name), id(i) {
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 

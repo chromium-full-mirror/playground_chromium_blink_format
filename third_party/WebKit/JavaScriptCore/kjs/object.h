@@ -49,6 +49,7 @@ namespace KJS {
 class HashTable;
 class HashEntry;
 class ListImp;
+class InternalFunctionImp;
 
 // ECMA 262-3 8.6.1
 // Property attributes
@@ -529,6 +530,10 @@ class JSObject : public JSCell {
   }
   void putDirect(const Identifier& propertyName, JSValue* value, int attr = 0);
   void putDirect(const Identifier& propertyName, int value, int attr = 0);
+
+  // convenience to add a function property under the function's own built-in
+  // name
+  void putDirectFunction(InternalFunctionImp*, int attr = 0);
 
   void fillGetterPropertySlot(PropertySlot& slot, JSValue** location);
 

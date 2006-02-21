@@ -41,10 +41,11 @@ class RegExpPrototype : public JSObject {
 
 class RegExpProtoFunc : public InternalFunctionImp {
  public:
-  RegExpProtoFunc(ExecState* exec,
-                  FunctionPrototype* funcProto,
+  RegExpProtoFunc(ExecState*,
+                  FunctionPrototype*,
                   int i,
-                  int len);
+                  int len,
+                  const Identifier&);
 
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,

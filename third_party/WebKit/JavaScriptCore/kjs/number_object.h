@@ -57,10 +57,11 @@ class NumberPrototype : public NumberInstance {
  */
 class NumberProtoFunc : public InternalFunctionImp {
  public:
-  NumberProtoFunc(ExecState* exec,
-                  FunctionPrototype* funcProto,
+  NumberProtoFunc(ExecState*,
+                  FunctionPrototype*,
                   int i,
-                  int len);
+                  int len,
+                  const Identifier&);
 
   virtual bool implementsCall() const;
   virtual JSValue* callAsFunction(ExecState* exec,
