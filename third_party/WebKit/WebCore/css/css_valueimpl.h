@@ -26,6 +26,7 @@
 #include "CachedObjectClient.h"
 #include "css_base.h"
 #include "css_value.h"
+#include <qptrlist.h>
 #include <qvaluelist.h>
 #include <kxmlcore/PassRefPtr.h>
 
@@ -106,6 +107,8 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 
 class CSSValueImpl : public StyleBaseImpl {
  public:
+  CSSValueImpl() : StyleBaseImpl(0) {}
+
   virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
   virtual String cssText() const = 0;
   void setCssText(const String&) {}  // FIXME: Not implemented.

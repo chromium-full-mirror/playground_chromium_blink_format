@@ -452,26 +452,14 @@ void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     HTMLElementImpl::parseMappedAttribute(attr);
 }
 
-template <class T, size_t i>
-static void insertIntoVector(Vector<T*, i>& vec, unsigned pos, T* item) {
-  vec.resize(vec.size() + 1);
-  typename Vector<T*, i>::iterator it;
-  for (it = &vec.last(); it != vec.begin() + pos; --it)
-    *it = it[-1];
-  *it = item;
-}
-
-template <class T, size_t i>
-static void removeFromVector(Vector<T*, i>& vec, T* item) {
-  for (typename Vector<T*, i>::iterator it = vec.begin(); it != vec.end();
-       ++it) {
-    if (*it == item) {
-      for (typename Vector<T*, i>::iterator it2 = it; it2 != &vec.last(); ++it2)
-        *it2 = it2[1];
-      vec.removeLast();
-      return;
+template <class T, size_t n>
+static void removeFromVector(Vector<T*, n>& vec, T* item) {
+  size_t size = vec.size();
+  for (size_t i = 0; i != size; ++i)
+    if (vec[i] == item) {
+      vec.remove(i);
+      break;
     }
-  }
 }
 
 unsigned HTMLFormElementImpl::formElementIndex(HTMLGenericFormElementImpl* e) {
@@ -497,14 +485,13 @@ void HTMLFormElementImpl::registerFormElement(HTMLGenericFormElementImpl* e) {
   DocumentImpl* doc = getDocument();
   if (doc && e->isRadioButton() && !e->name().isEmpty()) {
     HTMLGenericFormElementImpl* currentCheckedRadio =
-        doc->checkedRadioButtonForGroup(e->name().impl(),
-                                        (HTMLFormElementImpl*)0);
+        doc->checkedRadioButtonForGroup(e->name().impl(), 0);
     if (currentCheckedRadio == e)
-      doc->removeRadioButtonGroup(e->name().impl(), (HTMLFormElementImpl*)0);
+      doc->removeRadioButtonGroup(e->name().impl(), 0);
     if (e->isChecked())
-      doc->radioButtonChecked((HTMLInputElementImpl*)e, this);
+      doc->radioButtonChecked(static_cast<HTMLInputElementImpl*>(e), this);
   }
-  insertIntoVector(formElements, formElementIndex(e), e);
+  formElements.insert(formElementIndex(e), e);
 }
 
 void HTMLFormElementImpl::removeFormElement(HTMLGenericFormElementImpl* e) {

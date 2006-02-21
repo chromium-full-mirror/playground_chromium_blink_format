@@ -42,36 +42,36 @@
 namespace WebCore {
 
 XSLStyleSheetImpl::XSLStyleSheetImpl(XSLImportRuleImpl* parentRule,
-                                     DOMString href)
+                                     const String& href)
     : StyleSheetImpl(parentRule, href),
       m_ownerDocument(0),
       m_stylesheetDoc(0),
       m_embedded(false),
       m_processed(false)  // Child sheets get marked as processed when the
                           // libxslt engine has finally seen them.
-{
-  m_lstChildren = new QPtrList<StyleBaseImpl>;
-}
+      ,
+      m_stylesheetDocTaken(false) {}
 
 XSLStyleSheetImpl::XSLStyleSheetImpl(NodeImpl* parentNode,
-                                     DOMString href,
+                                     const String& href,
                                      bool embedded)
     : StyleSheetImpl(parentNode, href),
       m_ownerDocument(parentNode->getDocument()),
       m_stylesheetDoc(0),
       m_embedded(embedded),
       m_processed(true)  // The root sheet starts off processed.
-{
-  m_lstChildren = new QPtrList<StyleBaseImpl>;
-}
+      ,
+      m_stylesheetDocTaken(false) {}
 
 XSLStyleSheetImpl::~XSLStyleSheetImpl() {
-  xmlFreeDoc(m_stylesheetDoc);
+  if (!m_stylesheetDocTaken)
+    xmlFreeDoc(m_stylesheetDoc);
 }
 
 bool XSLStyleSheetImpl::isLoading() {
-  for (StyleBaseImpl* rule = m_lstChildren->first(); rule;
-       rule = m_lstChildren->next()) {
+  unsigned len = length();
+  for (unsigned i = 0; i < len; ++i) {
+    StyleBaseImpl* rule = item(i);
     if (rule->isImportRule()) {
       XSLImportRuleImpl* import = static_cast<XSLImportRuleImpl*>(rule);
       if (import->isLoading())
@@ -98,8 +98,9 @@ xmlDocPtr XSLStyleSheetImpl::document() {
 
 void XSLStyleSheetImpl::clearDocuments() {
   m_stylesheetDoc = 0;
-  for (StyleBaseImpl* rule = m_lstChildren->first(); rule;
-       rule = m_lstChildren->next()) {
+  unsigned len = length();
+  for (unsigned i = 0; i < len; ++i) {
+    StyleBaseImpl* rule = item(i);
     if (rule->isImportRule()) {
       XSLImportRuleImpl* import = static_cast<XSLImportRuleImpl*>(rule);
       if (import->styleSheet())
@@ -120,7 +121,9 @@ bool XSLStyleSheetImpl::parseString(const DOMString& string, bool strict) {
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
   setLoaderForLibXMLCallbacks(docLoader());
-  xmlFreeDoc(m_stylesheetDoc);
+  if (!m_stylesheetDocTaken)
+    xmlFreeDoc(m_stylesheetDoc);
+  m_stylesheetDocTaken = false;
   m_stylesheetDoc = xmlReadMemory(
       reinterpret_cast<const char*>(string.unicode()),
       string.length() * sizeof(QChar), m_ownerDocument->URL().ascii(),
@@ -187,8 +190,8 @@ void XSLStyleSheetImpl::loadChildSheets() {
 }
 
 void XSLStyleSheetImpl::loadChildSheet(const QString& href) {
-  XSLImportRuleImpl* childRule = new XSLImportRuleImpl(this, href);
-  m_lstChildren->append(childRule);
+  RefPtr<XSLImportRuleImpl> childRule = new XSLImportRuleImpl(this, href);
+  append(childRule);
   childRule->loadSheet();
 }
 
@@ -202,15 +205,22 @@ xsltStylesheetPtr XSLStyleSheetImpl::compileStyleSheet() {
   // FIXME: Hook up error reporting for the stylesheet compilation process.
   if (m_embedded)
     return xsltLoadStylesheetPI(document());
-  else
-    return xsltParseStylesheetDoc(document());
+
+  // xsltParseStylesheetDoc makes the document part of the stylesheet
+  // so we have to release our pointer to it.
+  ASSERT(!m_stylesheetDocTaken);
+  xsltStylesheetPtr result = xsltParseStylesheetDoc(m_stylesheetDoc);
+  if (result)
+    m_stylesheetDocTaken = true;
+  return result;
 }
 
 xmlDocPtr XSLStyleSheetImpl::locateStylesheetSubResource(xmlDocPtr parentDoc,
                                                          const xmlChar* uri) {
   bool matchedParent = (parentDoc == document());
-  for (StyleBaseImpl* rule = m_lstChildren->first(); rule;
-       rule = m_lstChildren->next()) {
+  unsigned len = length();
+  for (unsigned i = 0; i < len; ++i) {
+    StyleBaseImpl* rule = item(i);
     if (rule->isImportRule()) {
       XSLImportRuleImpl* import = static_cast<XSLImportRuleImpl*>(rule);
       XSLStyleSheetImpl* child = import->styleSheet();
@@ -247,6 +257,13 @@ xmlDocPtr XSLStyleSheetImpl::locateStylesheetSubResource(xmlDocPtr parentDoc,
   }
 
   return 0;
+}
+
+void XSLStyleSheetImpl::markAsProcessed() {
+  ASSERT(!m_processed);
+  ASSERT(!m_stylesheetDocTaken);
+  m_processed = true;
+  m_stylesheetDocTaken = true;
 }
 
 // ----------------------------------------------------------------------------------------------
