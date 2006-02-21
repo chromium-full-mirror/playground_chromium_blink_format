@@ -360,8 +360,11 @@ class InternalFunctionImp : public JSObject {
   InternalFunctionImp();
   InternalFunctionImp(FunctionPrototype*);
   InternalFunctionImp(FunctionPrototype*, const Identifier&);
-  bool implementsHasInstance() const;
-  bool hasInstance(ExecState* exec, JSValue* value);
+
+  virtual bool implementsCall() const;
+
+  virtual bool implementsHasInstance() const;
+  virtual bool hasInstance(ExecState* exec, JSValue* value);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
