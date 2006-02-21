@@ -3,7 +3,7 @@
 
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller <mueller@kde.org>
-    Copyright (C) 2004 Apple Computer, Inc.
+    Copyright (C) 2004, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,8 +32,6 @@
 #include <qobject.h>
 #include <qptrlist.h>
 
-class KWQLoader;
-
 namespace KIO {
 class Job;
 }
@@ -47,10 +45,11 @@ class NSURLResponse;
 #endif
 
 namespace WebCore {
+
 class CachedObject;
-class DOMString;
 class DocLoader;
 class Request;
+class String;
 
 class Loader : public QObject {
  public:
@@ -65,16 +64,7 @@ class Loader : public QObject {
   void removeBackgroundDecodingRequest(Request*);
 
   // may return 0L
-  KIO::Job* jobForRequest(const DOMString& URL) const;
-
-  KWQLoader* kwq;
-
- signals:
-  friend class CachedImageCallback;
-
-  void requestStarted(DocLoader*, CachedObject*);
-  void requestDone(DocLoader*, CachedObject*);
-  void requestFailed(DocLoader*, CachedObject*);
+  KIO::Job* jobForRequest(const String& URL) const;
 
  protected slots:
   void slotFinished(KIO::Job*, NSData*);

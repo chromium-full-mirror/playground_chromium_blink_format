@@ -35,7 +35,6 @@
 #include "decoder.h"
 #include "loader.h"
 #include <kxmlcore/Assertions.h>
-#include <qbuffer.h>
 
 namespace WebCore {
 
@@ -78,13 +77,12 @@ void CachedXSLStyleSheet::setCharset(const QString& chs) {
     m_decoder->setEncoding(chs.latin1(), Decoder::EncodingFromHTTPHeader);
 }
 
-void CachedXSLStyleSheet::data(QBuffer& buffer, bool eof) {
+void CachedXSLStyleSheet::data(ByteArray& data, bool eof) {
   if (!eof)
     return;
-  buffer.close();
-  setSize(buffer.buffer().size());
-  QString data = m_decoder->decode(buffer.buffer().data(), size());
-  m_sheet = DOMString(data);
+
+  setSize(data.size());
+  m_sheet = DOMString(m_decoder->decode(data.data(), size()));
   m_loading = false;
 
   checkNotify();

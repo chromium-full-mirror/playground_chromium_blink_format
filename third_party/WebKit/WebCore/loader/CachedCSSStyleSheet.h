@@ -51,7 +51,7 @@ class CachedCSSStyleSheet : public CachedObject {
   virtual void deref(CachedObjectClient*);
 
   virtual void setCharset(const QString&);
-  virtual void data(QBuffer&, bool atEnd);
+  virtual void data(ByteArray&, bool atEnd);
   virtual void error(int code, const char* message);
 
   virtual bool schedule() const { return true; }

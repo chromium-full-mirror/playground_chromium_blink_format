@@ -151,9 +151,6 @@ class QPainter : public Qt {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
 
-  RasterOp rasterOp() const;
-  void setRasterOp(RasterOp);
-
   void drawText(int x,
                 int y,
                 int tabWidth,

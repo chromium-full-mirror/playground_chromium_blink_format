@@ -27,8 +27,7 @@
 #define QEVENT_H_
 
 #include "KWQNamespace.h"
-#include "KWQRegion.h"
-#include "IntPointArray.h"
+#include "IntPoint.h"
 #include "QString.h"
 
 #ifdef __OBJC__
@@ -37,12 +36,9 @@
 class NSEvent;
 #endif
 
-class QEvent : public Qt {
+class QEvent {
  public:
   enum Type {
-    None,
-    Enter,
-    Leave,
     MouseButtonPress,
     MouseButtonRelease,
     MouseButtonDblClick,
@@ -51,10 +47,7 @@ class QEvent : public Qt {
     FocusOut,
     KeyPress,
     KeyRelease,
-    Paint,
-    Resize,
-    Wheel,
-    KParts
+    Wheel
   };
 
   QEvent(Type type) : _type(type) {}
@@ -66,8 +59,6 @@ class QEvent : public Qt {
   Type _type;
 };
 
-typedef QEvent QCustomEvent;
-
 class QMouseEvent : public QEvent {
  public:
   QMouseEvent(Type, NSEvent*);
@@ -78,10 +69,12 @@ class QMouseEvent : public QEvent {
   int y() const { return _position.y(); }
   int globalX() const { return _globalPosition.x(); }
   int globalY() const { return _globalPosition.y(); }
-  ButtonState button() const { return static_cast<ButtonState>(_button); }
-  ButtonState state() const { return static_cast<ButtonState>(_state); }
-  ButtonState stateAfter() const {
-    return static_cast<ButtonState>(_stateAfter);
+  Qt::ButtonState button() const {
+    return static_cast<Qt::ButtonState>(_button);
+  }
+  Qt::ButtonState state() const { return static_cast<Qt::ButtonState>(_state); }
+  Qt::ButtonState stateAfter() const {
+    return static_cast<Qt::ButtonState>(_stateAfter);
   }
 
   int clickCount() const { return _clickCount; }
@@ -101,7 +94,7 @@ class QKeyEvent : public QEvent {
  public:
   QKeyEvent(NSEvent*, bool forceAutoRepeat = false);
 
-  ButtonState state() const { return static_cast<ButtonState>(_state); }
+  Qt::ButtonState state() const { return static_cast<Qt::ButtonState>(_state); }
   bool isAccepted() const { return _isAccepted; }
   QString text() const { return _text; }
   bool isAutoRepeat() const { return _autoRepeat; }
@@ -122,22 +115,13 @@ class QKeyEvent : public QEvent {
   int _WindowsKeyCode;
 };
 
-class QFocusEvent : public QEvent {
- public:
-  enum Reason { Popup, Other };
-
-  QFocusEvent(Type type) : QEvent(type) {}
-
-  static Reason reason() { return Other; }
-};
-
 class QWheelEvent : public QEvent {
  public:
   QWheelEvent(const IntPoint& position,
               const IntPoint& globalPosition,
               int delta,
               int state,
-              Orientation orientation)
+              Qt::Orientation orientation)
       : QEvent(Wheel),
         _position(position),
         _globalPosition(globalPosition),
@@ -151,7 +135,7 @@ class QWheelEvent : public QEvent {
   const IntPoint& globalPos() const { return _globalPosition; }
   int delta() const { return _delta; }
   int state() const { return _state; }
-  Orientation orientation() const { return _orientation; }
+  Qt::Orientation orientation() const { return _orientation; }
   bool isAccepted() const { return _isAccepted; }
 
   int x() const { return _position.x(); }
@@ -167,17 +151,8 @@ class QWheelEvent : public QEvent {
   IntPoint _globalPosition;
   int _delta;
   int _state;
-  Orientation _orientation;
+  Qt::Orientation _orientation;
   bool _isAccepted;
-};
-
-class QHideEvent;
-class QShowEvent;
-class QContextMenuEvent;
-
-class QResizeEvent : public QEvent {
- public:
-  QResizeEvent() : QEvent(Resize) {}
 };
 
 #endif

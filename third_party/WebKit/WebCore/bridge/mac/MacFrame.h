@@ -133,7 +133,7 @@ class MacFrame : public Frame {
   QString advanceToNextMisspelling(bool startBeforeSelection = false);
 
   virtual void setTitle(const DOMString&);
-  void setStatusBarText(const QString& status);
+  virtual void setStatusBarText(const String&);
 
   virtual void urlSelected(const KURL& url,
                            int button,
@@ -369,10 +369,6 @@ class MacFrame : public Frame {
   virtual void detachFromView();
 
   WebCoreFrameBridge* _bridge;
-
-  KWQSignal _started;
-  KWQSignal _completed;
-  KWQSignal _completedWithBool;
 
   NSView* _mouseDownView;
   bool _mouseDownWasInSubframe;

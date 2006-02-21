@@ -38,8 +38,6 @@
 #include "DocumentImpl.h"
 #include "SVGDocumentExtensions.h"
 
-#include <kdebug.h>
-
 #include <cmath>
 
 using namespace WebCore;
@@ -154,9 +152,8 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
       case VALUES_ANIMATION:
         break;
       default: {
-        kdError() << k_funcinfo
-                  << " Unable to detect animation mode! Aborting creation!"
-                  << endl;
+        // kdError() << k_funcinfo << " Unable to detect animation mode!
+        // Aborting creation!" << endl;
         return;
       }
     }

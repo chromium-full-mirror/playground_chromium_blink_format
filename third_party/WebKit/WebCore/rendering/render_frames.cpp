@@ -26,23 +26,23 @@
 #include "config.h"
 #include "render_frames.h"
 
+#include "Cursor.h"
 #include "DocumentImpl.h"
+#include "EventNames.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
+#include "TextImpl.h"
+#include "dom2_eventsimpl.h"
 #include "html/html_baseimpl.h"
 #include "html/html_objectimpl.h"
 #include "html/htmltokenizer.h"
+#include "htmlnames.h"
 #include "render_arena.h"
 #include "render_canvas.h"
-#include "EventNames.h"
-#include "dom2_eventsimpl.h"
-#include "TextImpl.h"
-#include <kcursor.h>
-#include <kdebug.h>
 #include <klocale.h>
 #include <qpainter.h>
-#include "htmlnames.h"
+#include <qtextstream.h>
 
 namespace WebCore {
 
@@ -60,7 +60,7 @@ RenderFrameSet::RenderFrameSet(HTMLFrameSetElementImpl* frameSet)
     m_gridLayout[k] = 0;
   }
 
-  m_resizing = m_clientresizing = false;
+  m_resizing = m_clientResizing = false;
 
   m_hSplit = -1;
   m_vSplit = -1;
@@ -100,7 +100,7 @@ bool RenderFrameSet::nodeAtPoint(NodeInfo& info,
     info.setInnerNonSharedNode(element());
   }
 
-  return inside || m_clientresizing;
+  return inside || m_clientResizing;
 }
 
 void RenderFrameSet::layout() {
@@ -490,21 +490,13 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
       pos += m_gridLayout[0][r] + element()->border();
     }
 
-    QCursor cursor;
-    if (m_hSplit != -1 && m_vSplit != -1)
-      cursor = KCursor::sizeAllCursor();
-    else if (m_vSplit != -1)
-      cursor = KCursor::sizeHorCursor();
-    else if (m_hSplit != -1)
-      cursor = KCursor::sizeVerCursor();
-
     if (evt->type() == mousedownEvent) {
       setResizing(true);
       m_vSplitPos = _x;
       m_hSplitPos = _y;
       m_oldpos = -1;
     } else
-      canvas()->view()->viewport()->setCursor(cursor);
+      canvas()->view()->viewport()->setCursor(pointerCursor());
   }
 
   // ### check the resize is not going out of bounds.
@@ -576,7 +568,7 @@ void RenderFrameSet::setResizing(bool e) {
   m_resizing = e;
   for (RenderObject* p = parent(); p; p = p->parent())
     if (p->isFrameSet())
-      static_cast<RenderFrameSet*>(p)->m_clientresizing = m_resizing;
+      static_cast<RenderFrameSet*>(p)->m_clientResizing = m_resizing;
 }
 
 bool RenderFrameSet::canResize(int _x, int _y) {
@@ -637,7 +629,6 @@ void RenderPart::setWidget(Widget* widget) {
   if (widget && widget->isFrameView()) {
     static_cast<FrameView*>(widget)->ref();
     setQWidget(widget, false);
-    connect(widget, SIGNAL(cleared()), this, SLOT(slotViewCleared()));
   } else {
     setQWidget(widget);
   }
@@ -645,10 +636,10 @@ void RenderPart::setWidget(Widget* widget) {
 
   // make sure the scrollbars are set correctly for restore
   // ### find better fix
-  slotViewCleared();
+  viewCleared();
 }
 
-void RenderPart::slotViewCleared() {}
+void RenderPart::viewCleared() {}
 
 /***************************************************************************************/
 
@@ -656,7 +647,7 @@ RenderFrame::RenderFrame(DOM::HTMLFrameElementImpl* frame) : RenderPart(frame) {
   setInline(false);
 }
 
-void RenderFrame::slotViewCleared() {
+void RenderFrame::viewCleared() {
   if (element() && m_widget && m_widget->isFrameView()) {
     FrameView* view = static_cast<FrameView*>(m_widget);
     HTMLFrameSetElementImpl* frameSet =
@@ -913,7 +904,7 @@ void RenderPartObject::layout() {
   setNeedsLayout(false);
 }
 
-void RenderPartObject::slotViewCleared() {
+void RenderPartObject::viewCleared() {
   if (element() && m_widget && m_widget->isFrameView()) {
     FrameView* view = static_cast<FrameView*>(m_widget);
     bool hasBorder = false;

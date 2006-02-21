@@ -38,8 +38,6 @@
 #include "JSMutationEvent.h"
 #include "JSWheelEvent.h"
 
-#include <kdebug.h>
-
 using namespace WebCore;
 using namespace EventNames;
 using namespace HTMLNames;
@@ -423,8 +421,6 @@ JSValue* DOMEvent::getValueProperty(ExecState* exec, int token) const {
       }
     }
     default:
-      kdWarning() << "Unhandled token in DOMEvent::getValueProperty : " << token
-                  << endl;
       return NULL;
   }
 }
@@ -599,8 +595,6 @@ JSValue* DOMUIEvent::getValueProperty(ExecState* exec, int token) const {
     case Which:
       return jsNumber(event.which());
     default:
-      kdWarning() << "Unhandled token in DOMUIEvent::getValueProperty : "
-                  << token << endl;
       return jsUndefined();
   }
 }
@@ -705,8 +699,6 @@ JSValue* DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
     case Y:
       return jsNumber(event.y());
     default:
-      kdWarning() << "Unhandled token in DOMMouseEvent::getValueProperty : "
-                  << token << endl;
       return NULL;
   }
 }
@@ -798,8 +790,6 @@ JSValue* DOMKeyboardEvent::getValueProperty(ExecState* exec, int token) const {
     case AltGraphKey:
       return jsBoolean(event.altGraphKey());
     default:
-      kdWarning() << "Unhandled token in DOMKeyboardEvent::getValueProperty : "
-                  << token << endl;
       return NULL;
   }
 }
@@ -886,8 +876,6 @@ JSValue* Clipboard::getValueProperty(ExecState* exec, int token) const {
       }
     }
     default:
-      kdWarning() << "Clipboard::getValueProperty unhandled token " << token
-                  << endl;
       return NULL;
   }
 }
@@ -917,9 +905,6 @@ void Clipboard::putValueProperty(ExecState* exec,
       if (clipboard->isForDragging())
         clipboard->setEffectAllowed(value->toString(exec).domString());
       break;
-    default:
-      kdWarning() << "Clipboard::putValueProperty unhandled token " << token
-                  << endl;
   }
 }
 

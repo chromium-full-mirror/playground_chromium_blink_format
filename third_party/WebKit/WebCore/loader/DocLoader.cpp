@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "DocLoader.h"
+
 #include "CachedImage.h"
 #include "CachedScript.h"
 #include "CachedCSSStyleSheet.h"
@@ -40,9 +41,7 @@
 
 #include <kurl.h>
 
-using namespace DOM;
-
-namespace khtml {
+namespace WebCore {
 
 DocLoader::DocLoader(Frame* frame, DocumentImpl* doc) {
   m_cachePolicy = KIO::CC_Verify;
@@ -223,5 +222,7 @@ void DocLoader::removeCachedObject(CachedObject* o) const {
 
 void DocLoader::setLoadInProgress(bool load) {
   m_loadInProgress = load;
+  if (!load)
+    m_frame->loadDone();
 }
-};
+}

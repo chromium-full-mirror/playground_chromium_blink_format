@@ -65,7 +65,6 @@
 #include "VisiblePosition.h"
 #include "visible_text.h"
 #include "xml_tokenizer.h"
-#include <kdebug.h>
 #include <qregexp.h>
 #include "HTMLNameCollectionImpl.h"
 
@@ -220,7 +219,6 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* impl, FrameView* v)
       m_transformSource(0)
 #endif
       ,
-      m_finishedParsing(this, SIGNAL(finishedParsing())),
       m_savedRenderer(0),
       m_passwordFields(0),
       m_secureForms(0),
@@ -1116,8 +1114,6 @@ void DocumentImpl::implicitOpen() {
 
   clear();
   m_tokenizer = createTokenizer();
-  connect(m_tokenizer, SIGNAL(finishedParsing()), this,
-          SIGNAL(finishedParsing()));
   setParsing(true);
 }
 
@@ -1363,7 +1359,6 @@ void DocumentImpl::determineParseMode(const QString& /*str*/) {
   // determine their parse mode.
   pMode = Strict;
   hMode = XHtml;
-  kdDebug(6020) << " using strict parseMode" << endl;
 }
 
 NodeImpl* DocumentImpl::nextFocusNode(NodeImpl* fromNode) {
@@ -3105,5 +3100,11 @@ PassRefPtr<HTMLCollectionImpl> DocumentImpl::documentNamedItems(
 PassRefPtr<NameNodeListImpl> DocumentImpl::getElementsByName(
     const String& elementName) {
   return new NameNodeListImpl(this, elementName);
+}
+
+void DocumentImpl::finishedParsing() {
+  setParsing(false);
+  if (Frame* f = frame())
+    f->finishedParsing();
 }
 }

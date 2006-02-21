@@ -41,8 +41,6 @@
 #include "dom/css_stylesheet.h"
 #include "Frame.h"
 
-#include <kdebug.h>
-
 using namespace WebCore;
 using namespace EventNames;
 
@@ -191,19 +189,13 @@ bool ScriptInterpreter::wasRunByUserGesture() const {
         type == blurEvent || type == submitEvent);
     if (eventOk)
       return true;
-  } else  // no event
-  {
-    if (m_inlineCode && !m_timerCallback) {
+  } else {  // no event
+    if (m_inlineCode && !m_timerCallback)
       // This is the <a href="javascript:window.open('...')> case -> we let it
       // through
       return true;
-      kdDebug(6070) << "Window.open, smart policy, no event, inline code -> ok"
-                    << endl;
-    } else  // This is the <script>window.open(...)</script> case or a timer
-            // callback -> block it
-      kdDebug(6070)
-          << "Window.open, smart policy, no event, <script> tag -> refused"
-          << endl;
+    // This is the <script>window.open(...)</script> case or a timer callback ->
+    // block it
   }
   return false;
 }

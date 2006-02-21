@@ -110,7 +110,7 @@ class DOMStyleSheet : public DOMObject {
   RefPtr<DOM::StyleSheetImpl> m_impl;
 };
 
-JSValue* getDOMStyleSheet(ExecState* exec, DOM::StyleSheetImpl* ss);
+JSValue* getDOMStyleSheet(ExecState*, PassRefPtr<WebCore::StyleSheetImpl>);
 
 class DOMStyleSheetList : public DOMObject {
  public:

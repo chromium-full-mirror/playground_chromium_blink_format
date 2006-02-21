@@ -24,9 +24,10 @@
  */
 
 #include "config.h"
-#include "KWQLogging.h"
-
 #include "KWQTextStream.h"
+
+#include "QString.h"
+#include "KWQLogging.h"
 
 const size_t integerOrPointerAsStringBufferSize =
     100;  // large enough for any integer or pointer in string format, including
@@ -44,10 +45,8 @@ QTextStream::QTextStream(const ByteArray& ba)
       _string(0),
       _precision(defaultPrecision) {}
 
-QTextStream::QTextStream(QString* s, int mode)
-    : _hasByteArray(false), _string(s), _precision(defaultPrecision) {
-  ASSERT(mode == IO_WriteOnly);
-}
+QTextStream::QTextStream(QString* s)
+    : _hasByteArray(false), _string(s), _precision(defaultPrecision) {}
 
 QTextStream& QTextStream::operator<<(char c) {
   if (_hasByteArray) {

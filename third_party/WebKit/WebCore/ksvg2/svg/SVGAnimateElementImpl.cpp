@@ -27,8 +27,6 @@
 #include "DocumentImpl.h"
 #include "SVGDocumentExtensions.h"
 
-#include <kdebug.h>
-
 using namespace WebCore;
 
 SVGAnimateElementImpl::SVGAnimateElementImpl(const QualifiedName& tagName,
@@ -109,9 +107,8 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                   case VALUES_ANIMATION:
                       break;*/
       default: {
-        kdError() << k_funcinfo
-                  << " Unable to detect animation mode! Aborting creation!"
-                  << endl;
+        // kdError() << k_funcinfo << " Unable to detect animation mode!
+        // Aborting creation!" << endl;
         return;
       }
     }

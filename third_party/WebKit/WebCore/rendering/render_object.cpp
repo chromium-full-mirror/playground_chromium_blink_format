@@ -778,7 +778,8 @@ void RenderObject::drawBorder(QPainter* p,
 
   if (!c.isValid()) {
     if (invalidisInvert) {
-      p->setRasterOp(Qt::XorROP);
+      // FIXME: The original KHTML did XOR here -- what do we want to do
+      // instead?
       c = Color::white;
     } else {
       if (style == INSET || style == OUTSET || style == RIDGE ||
@@ -792,10 +793,6 @@ void RenderObject::drawBorder(QPainter* p,
   switch (style) {
     case BNONE:
     case BHIDDEN:
-      // should not happen
-      if (invalidisInvert && p->rasterOp() == Qt::XorROP)
-        p->setRasterOp(Qt::CopyROP);
-
       return;
     case DOTTED:
       p->setPen(Pen(c, width == 1 ? 0 : width, Pen::DotLine));
@@ -996,9 +993,6 @@ void RenderObject::drawBorder(QPainter* p,
       p->drawConvexPolygon(quad);
       break;
   }
-
-  if (invalidisInvert && p->rasterOp() == Qt::XorROP)
-    p->setRasterOp(Qt::CopyROP);
 }
 
 bool RenderObject::paintBorderImage(QPainter* p,
@@ -1566,7 +1560,7 @@ void RenderObject::dirtyLinesFromChangedChild(RenderObject* child) {}
 
 QString RenderObject::information() const {
   QString str;
-  QTextStream ts(&str, IO_WriteOnly);
+  QTextStream ts(&str);
   ts << renderName() << "(" << (style() ? style()->refCount() : 0) << ")"
      << ": " << (void*)this << "  ";
   if (isInline())

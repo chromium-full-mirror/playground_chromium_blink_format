@@ -39,11 +39,10 @@ class MouseEventImpl;
 struct ChildFrame;
 
 class RenderFrameSet : public RenderContainer {
-  friend class DOM::HTMLFrameSetElementImpl;
+  friend class HTMLFrameSetElementImpl;
 
  public:
-  RenderFrameSet(DOM::HTMLFrameSetElementImpl* frameSet);
-
+  RenderFrameSet(HTMLFrameSetElementImpl*);
   virtual ~RenderFrameSet();
 
   virtual const char* renderName() const { return "RenderFrameSet"; }
@@ -55,19 +54,19 @@ class RenderFrameSet : public RenderContainer {
 
   bool resizing() const { return m_resizing; }
 
-  bool userResize(DOM::MouseEventImpl* evt);
-  bool canResize(int _x, int _y);
-  void setResizing(bool e);
+  bool userResize(MouseEventImpl*);
+  bool canResize(int x, int y);
+  void setResizing(bool);
 
-  bool nodeAtPoint(NodeInfo& info,
-                   int x,
-                   int y,
-                   int tx,
-                   int ty,
-                   HitTestAction hitTestAction);
+  virtual bool nodeAtPoint(NodeInfo&,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
+                           HitTestAction);
 
-  DOM::HTMLFrameSetElementImpl* element() const {
-    return static_cast<DOM::HTMLFrameSetElementImpl*>(RenderObject::element());
+  HTMLFrameSetElementImpl* element() const {
+    return static_cast<HTMLFrameSetElementImpl*>(RenderContainer::element());
   }
 
 #ifndef NDEBUG
@@ -89,61 +88,55 @@ class RenderFrameSet : public RenderContainer {
   int m_vSplitPos;
 
   bool m_resizing;
-  bool m_clientresizing;
+  bool m_clientResizing;
 };
 
 class RenderPart : public RenderWidget {
-  Q_OBJECT
  public:
-  RenderPart(DOM::HTMLElementImpl* node);
-  RenderPart::~RenderPart();
+  RenderPart(HTMLElementImpl*);
+  virtual ~RenderPart();
 
   virtual const char* renderName() const { return "RenderPart"; }
 
-  virtual void setWidget(Widget* widget);
+  virtual void setWidget(Widget*);
 
-  // FIXME: This should not be necessary.  Remove this once WebKit knows to
-  // properly schedule
-  // layouts using WebCore when objects resize.
+  // FIXME: This should not be necessary.
+  // Remove this once WebKit knows to properly schedule layouts using WebCore
+  // when objects resize.
   void updateWidgetPosition();
 
   bool hasFallbackContent() const { return m_hasFallbackContent; }
 
- public slots:
-  virtual void slotViewCleared();
+  virtual void viewCleared();
 
  protected:
   bool m_hasFallbackContent;
 };
 
 class RenderFrame : public RenderPart {
-  Q_OBJECT
  public:
-  RenderFrame(DOM::HTMLFrameElementImpl* frame);
+  RenderFrame(HTMLFrameElementImpl*);
 
   virtual const char* renderName() const { return "RenderFrame"; }
 
-  DOM::HTMLFrameElementImpl* element() const {
-    return static_cast<DOM::HTMLFrameElementImpl*>(RenderObject::element());
+  HTMLFrameElementImpl* element() const {
+    return static_cast<HTMLFrameElementImpl*>(RenderPart::element());
   }
 
- public slots:
-  void slotViewCleared();
+  virtual void viewCleared();
 };
 
 // I can hardly call the class RenderObject ;-)
 class RenderPartObject : public RenderPart {
-  Q_OBJECT
  public:
-  RenderPartObject(DOM::HTMLElementImpl*);
+  RenderPartObject(HTMLElementImpl*);
 
   virtual const char* renderName() const { return "RenderPartObject"; }
 
   virtual void layout();
   virtual void updateWidget();
 
- public slots:
-  void slotViewCleared();
+  virtual void viewCleared();
 };
 }
 

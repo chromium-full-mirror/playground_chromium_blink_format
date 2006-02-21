@@ -145,18 +145,16 @@ void SVGAnimationElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
         // Register keyDownEventListener for the character
         QString character = current.mid(current.length() - 2, 1);
 
-        kdDebug() << k_funcinfo
-                  << " Supposed to register accessKey Character: " << character
-                  << " UNSUPPORTED!" << endl;
+        // kdDebug() << k_funcinfo << " Supposed to register accessKey
+        // Character: " << character << " UNSUPPORTED!" << endl;
       } else if (current.startsWith(QString::fromLatin1("wallclock"))) {
         int firstBrace = current.find('(');
         int secondBrace = current.find(')');
 
         QString wallclockValue =
             current.mid(firstBrace + 1, secondBrace - firstBrace - 2);
-        kdDebug() << k_funcinfo
-                  << " Supposed to use wallClock value: " << wallclockValue
-                  << " UNSUPPORTED!" << endl;
+        // kdDebug() << k_funcinfo << " Supposed to use wallClock value: " <<
+        // wallclockValue << " UNSUPPORTED!" << endl;
       } else if (current.contains('.')) {
         int dotPosition = current.find('.');
 
@@ -181,8 +179,8 @@ void SVGAnimationElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
               current.mid(dotPosition + 1, plusMinusPosition - dotPosition - 1);
           clockValue = current.mid(dotPosition + event.length() + 1);
 
-          kdDebug() << k_funcinfo << " Supposed to use DOM Event: " << event
-                    << " UNSUPPORTED!" << endl;
+          // kdDebug() << k_funcinfo << " Supposed to use DOM Event: " << event
+          // << " UNSUPPORTED!" << endl;
         }
       } else {
         if (attr->name() == SVGNames::beginAttr) {
@@ -190,15 +188,15 @@ void SVGAnimationElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
           if (!isIndefinite(m_begin))
             m_begin *= 1000.0;
 
-          kdDebug() << k_funcinfo << " Setting begin time to " << m_begin
-                    << " ms!" << endl;
+          // kdDebug() << k_funcinfo << " Setting begin time to " << m_begin <<
+          // " ms!" << endl;
         } else {
           m_end = parseClockValue(current);
           if (!isIndefinite(m_end))
             m_end *= 1000.0;
 
-          kdDebug() << k_funcinfo << " Setting end time to " << m_end << " ms!"
-                    << endl;
+          // kdDebug() << k_funcinfo << " Setting end time to " << m_end << "
+          // ms!" << endl;
         }
       }
     }

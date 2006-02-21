@@ -52,21 +52,9 @@ class Qt {
     AlignHCenter = 0x0004,
     AlignVCenter = 0x0020,
     AlignCenter = AlignVCenter | AlignHCenter,
-
-    DontClip = 0x0080,  // misc. flags
-    ShowPrefix = 0x0200,
-    WordBreak = 0x0400,
   };
-
-  enum LayoutDirection { LeftToRight = 0, RightToLeft = 1 };
 
   enum Orientation { Horizontal, Vertical };
-
-  enum RasterOp {  // raster op mode
-    CopyROP,
-    OrROP,
-    XorROP,
-  };
 };
 
 #endif

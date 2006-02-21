@@ -37,9 +37,7 @@
 
 #include <kxmlcore/Assertions.h>
 
-using namespace DOM;
-
-namespace khtml {
+namespace WebCore {
 
 CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
                                      const DOMString& url,
@@ -80,7 +78,7 @@ void CachedXBLDocument::setCharset(const QString& chs) {
     m_decoder->setEncoding(chs.latin1(), Decoder::EncodingFromHTTPHeader);
 }
 
-void CachedXBLDocument::data(QBuffer& buffer, bool eof) {
+void CachedXBLDocument::data(ByteArray& data, bool eof) {
   if (!eof)
     return;
 
@@ -90,11 +88,8 @@ void CachedXBLDocument::data(QBuffer& buffer, bool eof) {
   m_document->ref();
   m_document->open();
 
-  QString data =
-      m_decoder->decode(buffer.buffer().data(), buffer.buffer().size());
-  m_document->write(data);
-  setSize(buffer.buffer().size());
-  buffer.close();
+  m_document->write(m_decoder->decode(data.data(), data.size()));
+  setSize(data.size());
 
   m_document->finishParsing();
   m_document->close();

@@ -28,19 +28,17 @@
 
 #include "config.h"
 #include "Request.h"
+
 #include "CachedObject.h"
 
-namespace khtml {
+namespace WebCore {
 
-Request::Request(DocLoader* dl, CachedObject* _object, bool _incremental) {
-  object = _object;
+Request::Request(DocLoader* docLoader, CachedObject* obj, bool inc)
+    : incremental(inc), object(obj), m_docLoader(docLoader), multipart(false) {
   object->setRequest(this);
-  incremental = _incremental;
-  m_docLoader = dl;
-  multipart = false;
 }
 
 Request::~Request() {
   object->setRequest(0);
 }
-};
+}

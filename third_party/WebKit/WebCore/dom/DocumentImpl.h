@@ -609,7 +609,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   void setDocType(PassRefPtr<DocumentTypeImpl>);
 
- signals:
   void finishedParsing();
 
  protected:
@@ -739,8 +738,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                 // document-specific mapped attributes.
 
  public:
-  KWQSignal m_finishedParsing;
-
   bool inPageCache();
   void setInPageCache(bool flag);
   void restoreRenderer(RenderObject*);

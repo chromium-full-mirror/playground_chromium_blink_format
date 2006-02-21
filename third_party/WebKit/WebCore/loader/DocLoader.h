@@ -30,7 +30,6 @@
 
 #include <khtml_settings.h>
 #include <kio/global.h>
-#include <qbuffer.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
 

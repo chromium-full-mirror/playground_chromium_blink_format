@@ -35,8 +35,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-class QBuffer;
-
 namespace KIO {
 class Job;
 }
@@ -113,7 +111,7 @@ class CachedObject {
   virtual ~CachedObject();
 
   virtual void setCharset(const QString&) {}
-  virtual void data(QBuffer&, bool atEnd) = 0;
+  virtual void data(ByteArray&, bool atEnd) = 0;
   virtual void error(int code, const char* message) = 0;
 
   const DOMString& url() const { return m_url; }

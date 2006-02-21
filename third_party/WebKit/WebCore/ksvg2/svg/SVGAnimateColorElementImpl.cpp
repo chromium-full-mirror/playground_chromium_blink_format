@@ -28,8 +28,6 @@
 #include "DocumentImpl.h"
 #include "SVGDocumentExtensions.h"
 
-#include <kdebug.h>
-
 using namespace WebCore;
 
 SVGAnimateColorElementImpl::SVGAnimateColorElementImpl(
@@ -118,9 +116,8 @@ void SVGAnimateColorElementImpl::handleTimerEvent(double timePercentage) {
       case VALUES_ANIMATION:
         break;
       default: {
-        kdError() << k_funcinfo
-                  << " Unable to detect animation mode! Aborting creation!"
-                  << endl;
+        // kdError() << k_funcinfo << " Unable to detect animation mode!
+        // Aborting creation!" << endl;
         return;
       }
     }

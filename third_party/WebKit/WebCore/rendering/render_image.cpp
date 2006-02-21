@@ -97,8 +97,8 @@ void RenderImage::imageChanged(CachedImage* o) {
     if (!m_altText.isEmpty()) {
       const QFontMetrics& fm = style()->fontMetrics();
       IntRect br =
-          fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto | Qt::WordBreak,
-                          m_altText.qstring(), 0, 0);  // FIX: correct tabwidth?
+          fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto, m_altText.qstring(),
+                          0, 0);  // FIX: correct tabwidth?
       if (br.width() > iw)
         iw = br.width();
       if (br.height() > ih)
@@ -257,11 +257,10 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         if (errorPictureDrawn) {
           if (usableWidth >= textWidth && fm.height() <= imageY)
             p->drawText(ax, ay + ascent, tabWidth(), 0, 0 /* ignored */,
-                        0 /* ignored */, Qt::WordBreak /* not supported */,
-                        text);
+                        0 /* ignored */, 0, text);
         } else if (usableWidth >= textWidth && cHeight >= fm.height())
           p->drawText(ax, ay + ascent, tabWidth(), 0, 0 /* ignored */,
-                      0 /* ignored */, Qt::WordBreak /* not supported */, text);
+                      0 /* ignored */, 0, text);
       }
     }
   } else if (m_cachedImage) {

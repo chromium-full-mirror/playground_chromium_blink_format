@@ -55,7 +55,6 @@
 #include "kjs_views.h"
 #include "kjs_window.h"
 #include "render_canvas.h"
-#include <kdebug.h>
 
 #if __APPLE__
 #include <JavaScriptCore/runtime_object.h>
@@ -425,8 +424,6 @@ JSValue* DOMNode::getValueProperty(ExecState* exec, int token) const {
           return jsNumber(rend && rend->layer() ? rend->layer()->scrollYOffset()
                                                 : 0);
         default:
-          kdWarning() << "Unhandled token in DOMNode::getValueProperty : "
-                      << token << endl;
           break;
       }
   }
@@ -596,9 +593,6 @@ void DOMNode::putValueProperty(ExecState* exec,
         rend->layer()->scrollToXOffset(value->toInt32(exec));
       break;
     }
-    default:
-      kdWarning() << "DOMNode::putValueProperty unhandled token " << token
-                  << endl;
   }
 }
 
@@ -957,8 +951,6 @@ JSValue* DOMDocument::getValueProperty(ExecState* exec, int token) const {
     case DOMDocument::DefaultView:  // DOM2
       return getDOMAbstractView(exec, doc.defaultView());
     default:
-      kdWarning() << "DOMDocument::getValueProperty unhandled token " << token
-                  << endl;
       return NULL;
   }
 }

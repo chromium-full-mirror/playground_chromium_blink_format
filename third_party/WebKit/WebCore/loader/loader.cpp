@@ -69,20 +69,15 @@ static bool crossDomain(const QString& a, const QString& b) {
 
 Loader::Loader() {
   m_requestsPending.setAutoDelete(true);
-  kwq = new KWQLoader(this);
 }
 
 Loader::~Loader() {
   deleteAllValues(m_requestsLoading);
-  delete kwq;
 }
 
 void Loader::load(DocLoader* dl, CachedObject* object, bool incremental) {
   Request* req = new Request(dl, object, incremental);
   m_requestsPending.append(req);
-
-  emit requestStarted(req->m_docLoader, req->object);
-
   servePendingRequests();
 }
 
@@ -141,16 +136,12 @@ void Loader::slotFinished(KIO::Job* job, NSData* allData) {
     docLoader->setLoadInProgress(true);
     r->object->error(job->error(), job->errorText().ascii());
     docLoader->setLoadInProgress(false);
-    emit requestFailed(docLoader, object);
     Cache::remove(object);
   } else {
     docLoader->setLoadInProgress(true);
     object->data(r->m_buffer, true);
     r->object->setAllData(allData);
     docLoader->setLoadInProgress(false);
-
-    emit requestDone(docLoader, object);
-
     object->finish();
   }
 
@@ -174,10 +165,9 @@ void Loader::slotReceivedResponse(KIO::Job* job, NSURLResponse* response) {
   if (r->multipart) {
     ASSERT(r->object->isImage());
     static_cast<CachedImage*>(r->object)->clear();
-    r->m_buffer = QBuffer();
+    r->m_buffer.resize(0);
     if (r->m_docLoader->frame())
       r->m_docLoader->frame()->checkCompleted();
-
   } else if (KWQResponseIsMultipart(response)) {
     r->multipart = true;
     if (!r->object->isImage())
@@ -190,10 +180,9 @@ void Loader::slotData(KIO::Job* job, const char* data, int size) {
   if (!r)
     return;
 
-  if (!r->m_buffer.isOpen())
-    r->m_buffer.open(IO_WriteOnly);
-
-  r->m_buffer.writeBlock(data, size);
+  unsigned oldSize = r->m_buffer.size();
+  r->m_buffer.resize(oldSize + size);
+  memcpy(r->m_buffer.data() + oldSize, data, size);
 
   if (r->multipart)
     r->object->data(r->m_buffer, true);  // the loader delivers the data in a

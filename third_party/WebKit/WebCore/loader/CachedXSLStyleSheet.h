@@ -29,32 +29,28 @@
 #define KHTML_CachedXSLStyleSheet_h
 
 #include "CachedObject.h"
-
 #include <kio/global.h>
 
-class QString;
-class QBuffer;
+namespace WebCore {
 
-namespace khtml {
 class DocLoader;
 class Decoder;
-class CachedObjectClient;
 
 #ifdef KHTML_XSLT
 class CachedXSLStyleSheet : public CachedObject {
  public:
-  CachedXSLStyleSheet(DocLoader* dl,
-                      const DOM::DOMString& url,
+  CachedXSLStyleSheet(DocLoader*,
+                      const String& url,
                       KIO::CacheControl cachePolicy,
-                      time_t _expireDate);
+                      time_t expireDate);
 
-  const DOM::DOMString& sheet() const { return m_sheet; }
+  const String& sheet() const { return m_sheet; }
 
-  virtual void ref(CachedObjectClient* consumer);
-  virtual void deref(CachedObjectClient* consumer);
+  virtual void ref(CachedObjectClient*);
+  virtual void deref(CachedObjectClient*);
 
-  virtual void setCharset(const QString& chs);
-  virtual void data(QBuffer& buffer, bool eof);
+  virtual void setCharset(const QString&);
+  virtual void data(ByteArray&, bool eof);
   virtual void error(int err, const char* text);
 
   virtual bool schedule() const { return true; }
@@ -62,11 +58,11 @@ class CachedXSLStyleSheet : public CachedObject {
   void checkNotify();
 
  protected:
-  DOM::DOMString m_sheet;
+  String m_sheet;
   RefPtr<Decoder> m_decoder;
 };
 
 #endif
-};
+}
 
 #endif

@@ -31,10 +31,9 @@
 
 #include "QString.h"
 
-class QFocusEvent;
+class QEvent;
 class QKeyEvent;
 class QMouseEvent;
-class QResizeEvent;
 class QStringList;
 class QWheelEvent;
 
@@ -172,21 +171,14 @@ class FrameView : public QScrollView {
 
   void clear();
 
- signals:
-  void cleared();
-
  public:
   void clearPart();
-  virtual void resizeEvent(QResizeEvent* event);
+
   virtual void viewportMousePressEvent(QMouseEvent*);
-  virtual void focusInEvent(QFocusEvent*);
-  virtual void focusOutEvent(QFocusEvent*);
   virtual void viewportMouseDoubleClickEvent(QMouseEvent*);
   virtual void viewportMouseMoveEvent(QMouseEvent*);
   virtual void viewportMouseReleaseEvent(QMouseEvent*);
-#ifndef QT_NO_WHEELEVENT
   virtual void viewportWheelEvent(QWheelEvent*);
-#endif
 
   void keyPressEvent(QKeyEvent* _ke);
   void doAutoScroll();
@@ -230,11 +222,10 @@ class FrameView : public QScrollView {
       delete this;
   }
 
- protected slots:
-  void slotPaletteChanged();
-  void slotScrollBarMoved();
-
  private:
+  void cleared();
+  void scrollBarMoved();
+
   void resetCursor();
   void invalidateClick();
 

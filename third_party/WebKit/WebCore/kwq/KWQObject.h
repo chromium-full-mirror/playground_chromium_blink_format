@@ -66,11 +66,7 @@ class QObject : public Qt {
 
   virtual bool eventFilter(QObject* object, QEvent* event) { return false; }
 
-  void blockSignals(bool b) { _signalsBlocked = b; }
-
   virtual bool event(QEvent*);
-
-  static const QObject* sender() { return _sender; }
 
   virtual bool isKHTMLLoader() const;
   virtual bool isFrame() const;
@@ -86,8 +82,6 @@ class QObject : public Qt {
   QPtrList<QObject> _guardedPtrDummyList;
 
   mutable KWQSignal* _signalListHead;
-  bool _signalsBlocked;
-  static const QObject* _sender;
 
   KWQSignal _destroyed;
 
@@ -95,18 +89,6 @@ class QObject : public Qt {
 
   friend class KWQGuardedPtrBase;
   friend class KWQSignal;
-  friend class KWQObjectSenderScope;
-};
-
-class KWQObjectSenderScope {
- public:
-  KWQObjectSenderScope(const QObject* o) : m_savedSender(QObject::_sender) {
-    QObject::_sender = o;
-  }
-  ~KWQObjectSenderScope() { QObject::_sender = m_savedSender; }
-
- private:
-  const QObject* m_savedSender;
 };
 
 #endif

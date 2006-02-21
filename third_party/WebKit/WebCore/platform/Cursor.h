@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,32 +23,65 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QBUFFER_H_
-#define QBUFFER_H_
+#ifndef CURSOR_H
+#define CURSOR_H
 
-#include "KWQDef.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
-#include "Array.h"
-#include "QString.h"
-#include "KWQIODevice.h"
+#ifdef __APPLE__
+#ifdef __OBJC__
+@class NSCursor;
+#else
+class NSCursor;
+#endif
+#endif
 
-class QBuffer {
+namespace WebCore {
+
+class Image;
+
+#ifdef WIN32
+typedef HCURSOR PlatformCursor;
+#endif
+#ifdef __APPLE__
+typedef NSCursor* PlatformCursor;
+#endif
+
+class Cursor {
  public:
-  QBuffer() : opened(false), pos(0) {}
-  QBuffer(ByteArray b) : opened(false), ba(b), pos(0) {}
+  Cursor() : m_impl(0) {}
+  Cursor(Image*);
+  Cursor(const Cursor&);
+  ~Cursor();
+  Cursor& operator=(const Cursor&);
 
-  bool setBuffer(ByteArray);
-  ByteArray buffer() const { return ba; }
-  uint size() const { return ba.size(); }
-  bool isOpen() const { return opened; }
-  void open(int);
-  void close() { opened = false; }
-  int writeBlock(const char*, uint);
+  Cursor(PlatformCursor);
+  PlatformCursor impl() const { return m_impl; }
 
  private:
-  bool opened;
-  ByteArray ba;
-  uint pos;
+  PlatformCursor m_impl;
 };
+
+inline Cursor pointerCursor() {
+  return Cursor();
+}
+const Cursor& crossCursor();
+const Cursor& handCursor();
+const Cursor& moveCursor();
+const Cursor& iBeamCursor();
+const Cursor& waitCursor();
+const Cursor& helpCursor();
+
+const Cursor& eastResizeCursor();
+const Cursor& northResizeCursor();
+const Cursor& northEastResizeCursor();
+const Cursor& northWestResizeCursor();
+const Cursor& southResizeCursor();
+const Cursor& southEastResizeCursor();
+const Cursor& southWestResizeCursor();
+const Cursor& westResizeCursor();
+}
 
 #endif

@@ -33,23 +33,25 @@
 class QTextCodec;
 
 namespace WebCore {
+class DocLoader;
+
 class CachedScript : public CachedObject {
  public:
   CachedScript(DocLoader*,
-               const DOMString& URL,
+               const String& URL,
                KIO::CacheControl,
                time_t expireDate,
                const QString& charset);
-  CachedScript(const DOMString& URL, const QString& scriptData);
+  CachedScript(const String& URL, const QString& scriptData);
   virtual ~CachedScript();
 
-  const DOMString& script() const { return m_script; }
+  const String& script() const { return m_script; }
 
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
 
   virtual void setCharset(const QString&);
-  virtual void data(QBuffer&, bool atEnd);
+  virtual void data(ByteArray&, bool atEnd);
   virtual void error(int code, const char* message);
 
   virtual bool schedule() const { return false; }
@@ -59,7 +61,7 @@ class CachedScript : public CachedObject {
   void checkNotify();
 
  private:
-  DOMString m_script;
+  String m_script;
   QTextCodec* m_codec;
   bool m_errorOccurred;
 };

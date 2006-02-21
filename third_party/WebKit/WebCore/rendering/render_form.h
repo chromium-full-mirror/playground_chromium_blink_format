@@ -357,6 +357,7 @@ class RenderTextArea : public RenderFormElement {
   virtual bool isEditable() const { return true; }
 
   bool m_dirty;
+  bool m_updating;
 };
 
 // -------------------------------------------------------------------------
