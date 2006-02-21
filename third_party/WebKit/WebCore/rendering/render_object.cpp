@@ -1398,9 +1398,9 @@ void RenderObject::paintOutline(QPainter* p,
     if (!theme()->supportsFocusRing(style)) {
       // Only paint the focus ring by hand if the theme isn't able to draw the
       // focus ring.
-      p->initFocusRing(ow, offset, oc);
+      p->initFocusRing(ow, offset);
       addFocusRingRects(p, _tx, _ty);
-      p->drawFocusRing();
+      p->drawFocusRing(oc);
       p->clearFocusRing();
     }
     return;
