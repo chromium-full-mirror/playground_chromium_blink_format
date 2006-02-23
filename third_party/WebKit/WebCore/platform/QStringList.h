@@ -29,10 +29,12 @@
 #include "QString.h"
 #include "KWQValueList.h"
 
+#ifdef __APPLE__
 #ifdef __OBJC__
 @class NSArray;
 #else
 class NSArray;
+#endif
 #endif
 
 class QStringList : public QValueList<QString> {
@@ -48,7 +50,9 @@ class QStringList : public QValueList<QString> {
 
   QString pop_front();
 
+#ifdef __APPLE__
   NSArray* getNSArray() const;
+#endif
 };
 
 #endif
