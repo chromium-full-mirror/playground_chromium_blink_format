@@ -417,7 +417,9 @@ class ArgumentsNode : public Node {
     l->next = 0;
   }
   JSValue* evaluate(ExecState* exec);
-  List evaluateList(ExecState* exec);
+  List evaluateList(ExecState* exec) {
+    return list ? list->evaluateList(exec) : List();
+  }
   virtual void streamTo(SourceStream& s) const;
 
  private:

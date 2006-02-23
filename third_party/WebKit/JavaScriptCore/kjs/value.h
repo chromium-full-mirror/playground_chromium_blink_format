@@ -356,6 +356,11 @@ inline UString JSValue::toString(ExecState* exec) const {
                                         : downcast()->toString(exec);
 }
 
+inline JSObject* JSValue::toObject(ExecState* exec) const {
+  return JSImmediate::isImmediate(this) ? JSImmediate::toObject(this, exec)
+                                        : downcast()->toObject(exec);
+}
+
 }  // namespace
 
 #endif  // KJS_VALUE_H
