@@ -26,6 +26,8 @@
 #include "KWQKJavaAppletWidget.h"
 #include "KWQScrollBar.h"
 
+using namespace WebCore;
+
 static void notImplemented() {
   puts("Not yet implemented");
   abort();
@@ -33,63 +35,60 @@ static void notImplemented() {
 void QLineEdit::selectAll(void) {
   notImplemented();
 }
-void WebCore::QPainter::save(void) {
+void QPainter::save(void) {
   notImplemented();
 }
-void WebCore::Widget::enableFlushDrawing(void) {
+void Widget::enableFlushDrawing(void) {
   notImplemented();
 }
-void WebCore::QPainter::drawHighlightForText(
-    int,
-    int,
-    int,
-    int,
-    int,
-    class QChar const*,
-    int,
-    int,
-    int,
-    int,
-    class WebCore::Color const&,
-    enum WebCore::QPainter::TextDirection,
-    bool,
-    int,
-    int,
-    bool) {
+void QPainter::drawHighlightForText(int,
+                                    int,
+                                    int,
+                                    int,
+                                    int,
+                                    class QChar const*,
+                                    int,
+                                    int,
+                                    int,
+                                    int,
+                                    class Color const&,
+                                    enum QPainter::TextDirection,
+                                    bool,
+                                    int,
+                                    int,
+                                    bool) {
   notImplemented();
 }
 void QFont::setPrinterFont(bool) {
   notImplemented();
 }
-class WebCore::String QTextEdit::textWithHardLineBreaks(void) const {
+class String QTextEdit::textWithHardLineBreaks(void) const {
   notImplemented();
-  return WebCore::String();
+  return String();
 }
-class WebCore::IntPoint WebCore::Widget::mapFromGlobal(
-    class WebCore::IntPoint const&) const {
+class IntPoint Widget::mapFromGlobal(class IntPoint const&) const {
   notImplemented();
-  return WebCore::IntPoint();
+  return IntPoint();
 }
-void WebCore::QPainter::addClip(class WebCore::IntRect const&) {
+void QPainter::addClip(class IntRect const&) {
   notImplemented();
 }
 int QLineEdit::cursorPosition(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::QPainter::setPen(enum WebCore::Pen::PenStyle) {
+void QPainter::setPen(enum Pen::PenStyle) {
   notImplemented();
 }
-class WebCore::Color WebCore::QPainter::selectedTextBackgroundColor(
-    void) const {
+class Color QPainter::selectedTextBackgroundColor(void) const {
   notImplemented();
-  return WebCore::Color();
+  return Color();
 }
-class QFontMetrics WebCore::QPainter::fontMetrics(void) const {
+class QFontMetrics QPainter::fontMetrics(void) const {
   notImplemented();
   return QFontMetrics();
 }
-void WebCore::Widget::show(void) {
+void Widget::show(void) {
   notImplemented();
 }
 void QFont::setItalic(bool) {
@@ -104,75 +103,73 @@ void QLineEdit::addSearchResult(void) {
 void KWQFileButton::click(bool) {
   notImplemented();
 }
-void QLineEdit::setWritingDirection(enum WebCore::QPainter::TextDirection) {
+void QLineEdit::setWritingDirection(enum QPainter::TextDirection) {
   notImplemented();
 }
-void WebCore::QPainter::drawFocusRing(class WebCore::Color const&) {
+void QPainter::drawFocusRing(class Color const&) {
   notImplemented();
 }
-class WebCore::IntSize KWQFileButton::sizeForCharacterWidth(int) const {
+class IntSize KWQFileButton::sizeForCharacterWidth(int) const {
   notImplemented();
-  return WebCore::IntSize();
+  return IntSize();
 }
-class WebCore::IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
+class IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
   notImplemented();
-  return WebCore::IntSize();
+  return IntSize();
 }
-static WebCore::Cursor localCursor;
-class WebCore::Cursor const& WebCore::iBeamCursor(void) {
+static Cursor localCursor;
+class Cursor const& iBeamCursor(void) {
   notImplemented();
   return localCursor;
 }
 void QComboBox::clear(void) {
   notImplemented();
 }
-int WebCore::QPainter::misspellingLineThickness(void) const {
+int QPainter::misspellingLineThickness(void) const {
   notImplemented();
   return 0;
 }
-void QComboBox::setFrameGeometry(class WebCore::IntRect const&) {
+void QComboBox::setFrameGeometry(class IntRect const&) {
   notImplemented();
 }
 int QLineEdit::maxLength(void) const {
   notImplemented();
   return 0;
 }
-class WebCore::Cursor const& WebCore::westResizeCursor(void) {
+class Cursor const& westResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
-bool WebCore::Widget::isEnabled(void) const {
+bool Widget::isEnabled(void) const {
   notImplemented();
   return 0;
 }
-bool __cdecl KWQServeRequest(class WebCore::Loader*,
-                             class WebCore::DocLoader*,
+bool __cdecl KWQServeRequest(class Loader*,
+                             class DocLoader*,
                              class KIO::TransferJob*) {
   notImplemented();
   return 0;
 }
-void QTextEdit::setText(class WebCore::String const&) {
+void QTextEdit::setText(class String const&) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::northWestResizeCursor(void) {
+class Cursor const& __cdecl northWestResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
-void WebCore::Widget::paint(class WebCore::QPainter*,
-                            class WebCore::IntRect const&) {
+void Widget::paint(class QPainter*, class IntRect const&) {
   notImplemented();
 }
-void WebCore::QPainter::addRoundedRectClip(class WebCore::IntRect const&,
-                                           class WebCore::IntSize const&,
-                                           class WebCore::IntSize const&,
-                                           class WebCore::IntSize const&,
-                                           class WebCore::IntSize const&) {
+void QPainter::addRoundedRectClip(class IntRect const&,
+                                  class IntSize const&,
+                                  class IntSize const&,
+                                  class IntSize const&,
+                                  class IntSize const&) {
   notImplemented();
 }
-class WebCore::IntPoint WebCore::FrameView::viewportToGlobal(
-    class WebCore::IntPoint const&) const {
+class IntPoint FrameView::viewportToGlobal(class IntPoint const&) const {
   notImplemented();
-  return WebCore::IntPoint();
+  return IntPoint();
 }
 int QTextEdit::selectionEnd(void) {
   notImplemented();
@@ -184,14 +181,14 @@ void QFont::determinePitch(void) const {
 void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
-void WebCore::QPainter::drawEllipse(int, int, int, int) {
+void QPainter::drawEllipse(int, int, int, int) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::southWestResizeCursor(void) {
+class Cursor const& __cdecl southWestResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
-void WebCore::QPainter::setPen(unsigned int) {
+void QPainter::setPen(unsigned int) {
   notImplemented();
 }
 void QTextEdit::setReadOnly(bool) {
@@ -200,40 +197,36 @@ void QTextEdit::setReadOnly(bool) {
 void QListBox::appendItem(class QString const&, enum KWQListBoxItemType, bool) {
   notImplemented();
 }
-void QLineEdit::setPlaceholderString(class WebCore::String const&) {
+void QLineEdit::setPlaceholderString(class String const&) {
   notImplemented();
 }
-WebCore::Cursor::Cursor(class WebCore::Cursor const&) {
+Cursor::Cursor(class Cursor const&) {
   notImplemented();
 }
-enum WebCore::Widget::FocusPolicy WebCore::Widget::focusPolicy(void) const {
+enum Widget::FocusPolicy Widget::focusPolicy(void) const {
   notImplemented();
   return NoFocus;
 }
-void ScrollView::removeChild(class WebCore::Widget*) {
+void ScrollView::removeChild(class Widget*) {
   notImplemented();
 }
 void QTextEdit::selectAll(void) {
   notImplemented();
 }
-void WebCore::QPainter::fillRect(int,
-                                 int,
-                                 int,
-                                 int,
-                                 class WebCore::Brush const&) {
+void QPainter::fillRect(int, int, int, int, class Brush const&) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::waitCursor(void) {
+class Cursor const& __cdecl waitCursor(void) {
   notImplemented();
   return localCursor;
 }
-void WebCore::QPainter::endTransparencyLayer(void) {
+void QPainter::endTransparencyLayer(void) {
   notImplemented();
 }
 QFont::QFont(class QFont const&) {
   notImplemented();
 }
-void ScrollView::addChild(class WebCore::Widget*, int, int) {
+void ScrollView::addChild(class Widget*, int, int) {
   notImplemented();
 }
 void QTextEdit::setDisabled(bool) {
@@ -243,17 +236,16 @@ bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
   notImplemented();
   return 0;
 }
-WebCore::Widget::~Widget(void) {
+Widget::~Widget(void) {
   notImplemented();
 }
-class WebCore::IntRect WebCore::QPainter::xForm(
-    class WebCore::IntRect const&) const {
+class IntRect QPainter::xForm(class IntRect const&) const {
   notImplemented();
-  return WebCore::IntRect();
+  return IntRect();
 }
-class WebCore::IntSize QListBox::sizeForNumberOfLines(int) const {
+class IntSize QListBox::sizeForNumberOfLines(int) const {
   notImplemented();
-  return WebCore::IntSize();
+  return IntSize();
 }
 void ScrollView::resizeContents(int, int) {
   notImplemented();
@@ -265,20 +257,20 @@ int QLineEdit::selectionStart(void) const {
 QLineEdit::QLineEdit(enum QLineEdit::Type) {
   notImplemented();
 }
-void WebCore::FrameView::updateBorder(void) {
+void FrameView::updateBorder(void) {
   notImplemented();
 }
 bool QLineEdit::hasSelectedText(void) const {
   notImplemented();
   return 0;
 }
-QScrollBar::QScrollBar(enum Qt::Orientation, class WebCore::Widget*) {
+QScrollBar::QScrollBar(enum Qt::Orientation, class Widget*) {
   notImplemented();
 }
 void QListBox::doneAppendingItems(void) {
   notImplemented();
 }
-QTextEdit::QTextEdit(class WebCore::Widget*) {
+QTextEdit::QTextEdit(class Widget*) {
   notImplemented();
 }
 bool ScrollView::inWindow(void) const {
@@ -289,7 +281,7 @@ bool QScrollBar::setValue(int) {
   notImplemented();
   return 0;
 }
-void QFont::setFirstFamily(class WebCore::FontFamily const&) {
+void QFont::setFirstFamily(class FontFamily const&) {
   notImplemented();
 }
 bool QTextEdit::hasSelectedText(void) const {
@@ -314,7 +306,7 @@ bool QListBox::isSelected(int) const {
 void QLineEdit::setReadOnly(bool) {
   notImplemented();
 }
-void WebCore::QPainter::drawLineForText(int, int, int, int) {
+void QPainter::drawLineForText(int, int, int, int) {
   notImplemented();
 }
 void QObject::disconnect(class QObject const*,
@@ -323,62 +315,61 @@ void QObject::disconnect(class QObject const*,
                          char const*) {
   notImplemented();
 }
-WebCore::QPainter::QPainter(void) {
+QPainter::QPainter(void) {
   notImplemented();
 }
 QComboBox::~QComboBox(void) {
   notImplemented();
 }
-WebCore::Cursor::Cursor(class WebCore::Image*) {
+Cursor::Cursor(class Image*) {
   notImplemented();
 }
-enum WebCore::Widget::FocusPolicy QComboBox::focusPolicy(void) const {
+enum Widget::FocusPolicy QComboBox::focusPolicy(void) const {
   notImplemented();
   return NoFocus;
 }
-void WebCore::QPainter::drawImageAtPoint(
-    class WebCore::Image*,
-    class WebCore::IntPoint const&,
-    enum WebCore::Image::CompositeOperator) {
+void QPainter::drawImageAtPoint(class Image*,
+                                class IntPoint const&,
+                                enum Image::CompositeOperator) {
   notImplemented();
 }
-void WebCore::QPainter::clearShadow(void) {
+void QPainter::clearShadow(void) {
   notImplemented();
 }
-void WebCore::QPainter::setPen(class WebCore::Pen const&) {
+void QPainter::setPen(class Pen const&) {
   notImplemented();
 }
 void QTextEdit::setLineHeight(int) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::eastResizeCursor(void) {
+class Cursor const& __cdecl eastResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
 void QScrollBar::setKnobProportion(int, int) {
   notImplemented();
 }
-KWQFileButton::KWQFileButton(class WebCore::Frame*) {
+KWQFileButton::KWQFileButton(class Frame*) {
   notImplemented();
 }
-class WebCore::IntRect QFontMetrics::boundingRect(int,
-                                                  int,
-                                                  int,
-                                                  int,
-                                                  int,
-                                                  class QString const&,
-                                                  int,
-                                                  int) const {
+class IntRect QFontMetrics::boundingRect(int,
+                                         int,
+                                         int,
+                                         int,
+                                         int,
+                                         class QString const&,
+                                         int,
+                                         int) const {
   notImplemented();
-  return WebCore::IntRect();
+  return IntRect();
 }
 void QTextEdit::setSelectionStart(int) {
   notImplemented();
 }
-void WebCore::QPainter::beginTransparencyLayer(float) {
+void QPainter::beginTransparencyLayer(float) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::northEastResizeCursor(void) {
+class Cursor const& __cdecl northEastResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
@@ -388,27 +379,27 @@ void QFontMetrics::setFont(class QFont const&) {
 void QComboBox::setFont(class QFont const&) {
   notImplemented();
 }
-class WebCore::IntRect WebCore::Widget::frameGeometry(void) const {
+class IntRect Widget::frameGeometry(void) const {
   notImplemented();
-  return WebCore::IntRect();
+  return IntRect();
 }
 void QListBox::setSelected(int, bool) {
   notImplemented();
 }
-void WebCore::QPainter::addFocusRingRect(int, int, int, int) {
+void QPainter::addFocusRingRect(int, int, int, int) {
   notImplemented();
 }
 void QTextEdit::setCursorPosition(int, int) {
   notImplemented();
 }
-void WebCore::QPainter::restore(void) {
+void QPainter::restore(void) {
   notImplemented();
 }
 int QFontMetrics::width(class QString const&, int, int, int) const {
   notImplemented();
   return 0;
 }
-void WebCore::Widget::setEnabled(bool) {
+void Widget::setEnabled(bool) {
   notImplemented();
 }
 void QTextEdit::setSelectionEnd(int) {
@@ -421,7 +412,7 @@ void ScrollView::setStaticBackground(bool) {
   notImplemented();
 }
 static QFont localFont;
-class QFont const& WebCore::QPainter::font(void) const {
+class QFont const& QPainter::font(void) const {
   notImplemented();
   return localFont;
 }
@@ -431,30 +422,29 @@ void QTextEdit::setAlignment(enum Qt::AlignmentFlags) {
 void QLineEdit::setCursorPosition(int) {
   notImplemented();
 }
-void WebCore::QPainter::drawText(int,
-                                 int,
-                                 int,
-                                 int,
-                                 int,
-                                 int,
-                                 int,
-                                 class QString const&) {
+void QPainter::drawText(int,
+                        int,
+                        int,
+                        int,
+                        int,
+                        int,
+                        int,
+                        class QString const&) {
   notImplemented();
 }
-static WebCore::Pen localPen;
-class WebCore::Pen const& WebCore::QPainter::pen(void) const {
+static Pen localPen;
+class Pen const& QPainter::pen(void) const {
   notImplemented();
   return localPen;
 }
 KJavaAppletWidget::KJavaAppletWidget(
-    class WebCore::IntSize const&,
-    class WebCore::Frame*,
-    class KXMLCore::HashMap<
-        class WebCore::String,
-        class WebCore::String,
-        struct KXMLCore::StrHash<class WebCore::String>,
-        struct KXMLCore::HashTraits<class WebCore::String>,
-        struct KXMLCore::HashTraits<class WebCore::String>> const&) {
+    class IntSize const&,
+    class Frame*,
+    class KXMLCore::HashMap<class String,
+                            class String,
+                            struct KXMLCore::StrHash<class String>,
+                            struct KXMLCore::HashTraits<class String>,
+                            struct KXMLCore::HashTraits<class String>> const&) {
   notImplemented();
 }
 int QFontMetrics::descent(void) const {
@@ -472,105 +462,105 @@ class QString QLineEdit::selectedText(void) const {
   notImplemented();
   return QString();
 }
-class WebCore::Cursor const& __cdecl WebCore::crossCursor(void) {
+class Cursor const& __cdecl crossCursor(void) {
   notImplemented();
   return localCursor;
 }
-void WebCore::Widget::setIsSelected(bool) {
+void Widget::setIsSelected(bool) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::handCursor(void) {
+class Cursor const& __cdecl handCursor(void) {
   notImplemented();
   return localCursor;
 }
-class WebCore::String QLineEdit::text(void) const {
+class String QLineEdit::text(void) const {
   notImplemented();
-  return WebCore::String();
+  return String();
 }
-void WebCore::Widget::unlockDrawingFocus(void) {
+void Widget::unlockDrawingFocus(void) {
   notImplemented();
 }
 void QLineEdit::setLiveSearch(bool) {
   notImplemented();
 }
-bool WebCore::QPainter::paintingDisabled(void) const {
+bool QPainter::paintingDisabled(void) const {
   notImplemented();
   return 0;
 }
-class WebCore::Cursor const& __cdecl WebCore::northResizeCursor(void) {
+class Cursor const& __cdecl northResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
 QComboBox::QComboBox(void) {
   notImplemented();
 }
-void WebCore::QPainter::drawConvexPolygon(class WebCore::IntPointArray const&) {
+void QPainter::drawConvexPolygon(class IntPointArray const&) {
   notImplemented();
 }
-void WebCore::Widget::setFont(class QFont const&) {
+void Widget::setFont(class QFont const&) {
   notImplemented();
 }
 void QSlider::setMaxValue(double) {
   notImplemented();
 }
-void WebCore::Widget::lockDrawingFocus(void) {
+void Widget::lockDrawingFocus(void) {
   notImplemented();
 }
-void WebCore::QPainter::drawLine(int, int, int, int) {
+void QPainter::drawLine(int, int, int, int) {
   notImplemented();
 }
-void WebCore::QPainter::setBrush(enum WebCore::Brush::BrushStyle) {
+void QPainter::setBrush(enum Brush::BrushStyle) {
   notImplemented();
 }
 void QTextEdit::setSelectionRange(int, int) {
   notImplemented();
 }
-void WebCore::QPainter::drawText(int,
-                                 int,
-                                 int,
-                                 int,
-                                 class QChar const*,
-                                 int,
-                                 int,
-                                 int,
-                                 int,
-                                 class WebCore::Color const&,
-                                 enum WebCore::QPainter::TextDirection,
-                                 bool,
-                                 int,
-                                 int,
-                                 bool) {
+void QPainter::drawText(int,
+                        int,
+                        int,
+                        int,
+                        class QChar const*,
+                        int,
+                        int,
+                        int,
+                        int,
+                        class Color const&,
+                        enum QPainter::TextDirection,
+                        bool,
+                        int,
+                        int,
+                        bool) {
   notImplemented();
 }
 void ScrollView::scrollPointRecursively(int, int) {
   notImplemented();
 }
-class WebCore::IntSize QLineEdit::sizeForCharacterWidth(int) const {
+class IntSize QLineEdit::sizeForCharacterWidth(int) const {
   notImplemented();
-  return WebCore::IntSize();
+  return IntSize();
 }
-WebCore::Cursor::~Cursor(void) {
+Cursor::~Cursor(void) {
   notImplemented();
 }
-class WebCore::IntRect QFontMetrics::selectionRectForText(int,
-                                                          int,
-                                                          int,
-                                                          int,
-                                                          int,
-                                                          class QChar const*,
-                                                          int,
-                                                          int,
-                                                          int,
-                                                          int,
-                                                          bool,
-                                                          bool,
-                                                          int,
-                                                          int,
-                                                          bool) const {
+class IntRect QFontMetrics::selectionRectForText(int,
+                                                 int,
+                                                 int,
+                                                 int,
+                                                 int,
+                                                 class QChar const*,
+                                                 int,
+                                                 int,
+                                                 int,
+                                                 int,
+                                                 bool,
+                                                 bool,
+                                                 int,
+                                                 int,
+                                                 bool) const {
   notImplemented();
-  return WebCore::IntRect();
+  return IntRect();
 }
-class WebCore::Cursor const& __cdecl WebCore::southResizeCursor(void) {
+class Cursor const& __cdecl southResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
@@ -597,11 +587,11 @@ int QFontMetrics::checkSelectionPoint(class QChar*,
 void QTextEdit::getCursorPosition(int*, int*) const {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::moveCursor(void) {
+class Cursor const& __cdecl moveCursor(void) {
   notImplemented();
   return localCursor;
 }
-bool WebCore::FrameView::isFrameView(void) const {
+bool FrameView::isFrameView(void) const {
   notImplemented();
   return 0;
 }
@@ -611,10 +601,10 @@ void QScrollBar::setSteps(int, int) {
 void QLineEdit::setMaxLength(int) {
   notImplemented();
 }
-void WebCore::Widget::setCursor(class WebCore::Cursor const&) {
+void Widget::setCursor(class Cursor const&) {
   notImplemented();
 }
-void QLineEdit::setAutoSaveName(class WebCore::String const&) {
+void QLineEdit::setAutoSaveName(class String const&) {
   notImplemented();
 }
 int QComboBox::baselinePosition(int) const {
@@ -626,61 +616,61 @@ void QComboBox::appendItem(class QString const&,
                            bool) {
   notImplemented();
 }
-void WebCore::QPainter::setShadow(int, int, int, class WebCore::Color const&) {
+void QPainter::setShadow(int, int, int, class Color const&) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::helpCursor(void) {
+class Cursor const& __cdecl helpCursor(void) {
   notImplemented();
   return localCursor;
 }
-void QTextEdit::setWritingDirection(enum WebCore::QPainter::TextDirection) {
+void QTextEdit::setWritingDirection(enum QPainter::TextDirection) {
   notImplemented();
 }
-void WebCore::Widget::setDrawingAlpha(float) {
+void Widget::setDrawingAlpha(float) {
   notImplemented();
 }
 QSlider::QSlider(void) {
   notImplemented();
 }
-class WebCore::Cursor const& __cdecl WebCore::southEastResizeCursor(void) {
+class Cursor const& __cdecl southEastResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
 void ScrollView::setVScrollBarMode(ScrollBarMode) {
   notImplemented();
 }
-void WebCore::QPainter::drawScaledAndTiledImage(class WebCore::Image*,
-                                                int,
-                                                int,
-                                                int,
-                                                int,
-                                                int,
-                                                int,
-                                                int,
-                                                int,
-                                                enum WebCore::Image::TileRule,
-                                                enum WebCore::Image::TileRule,
-                                                void*) {
+void QPainter::drawScaledAndTiledImage(class Image*,
+                                       int,
+                                       int,
+                                       int,
+                                       int,
+                                       int,
+                                       int,
+                                       int,
+                                       int,
+                                       enum Image::TileRule,
+                                       enum Image::TileRule,
+                                       void*) {
   notImplemented();
 }
 int ScrollView::scrollYOffset(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::QPainter::drawImage(class WebCore::Image*,
-                                  int,
-                                  int,
-                                  int,
-                                  int,
-                                  int,
-                                  int,
-                                  int,
-                                  int,
-                                  enum WebCore::Image::CompositeOperator,
-                                  void*) {
+void QPainter::drawImage(class Image*,
+                         int,
+                         int,
+                         int,
+                         int,
+                         int,
+                         int,
+                         int,
+                         int,
+                         enum Image::CompositeOperator,
+                         void*) {
   notImplemented();
 }
-void WebCore::QPainter::setBrush(class WebCore::Brush const&) {
+void QPainter::setBrush(class Brush const&) {
   notImplemented();
 }
 void QComboBox::setCurrentItem(int) {
@@ -690,23 +680,23 @@ int QFontMetrics::height(void) const {
   notImplemented();
   return 0;
 }
-void QComboBox::setWritingDirection(enum WebCore::QPainter::TextDirection) {
+void QComboBox::setWritingDirection(enum QPainter::TextDirection) {
   notImplemented();
 }
 void ScrollView::setScrollBarsMode(ScrollBarMode) {
   notImplemented();
 }
-class WebCore::IntSize QComboBox::sizeHint(void) const {
+class IntSize QComboBox::sizeHint(void) const {
   notImplemented();
-  return WebCore::IntSize();
+  return IntSize();
 }
-void WebCore::QPainter::drawRect(int, int, int, int) {
+void QPainter::drawRect(int, int, int, int) {
   notImplemented();
 }
 void QFont::setPixelSize(float) {
   notImplemented();
 }
-void WebCore::Widget::setFrameGeometry(class WebCore::IntRect const&) {
+void Widget::setFrameGeometry(class IntRect const&) {
   notImplemented();
 }
 void QLineEdit::setSelection(int, int) {
@@ -722,43 +712,42 @@ bool QLineEdit::edited(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::QPainter::drawTiledImage(class WebCore::Image*,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       void*) {
+void QPainter::drawTiledImage(class Image*,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              void*) {
   notImplemented();
 }
-void WebCore::QPainter::clearFocusRing(void) {
+void QPainter::clearFocusRing(void) {
   notImplemented();
 }
 bool QFont::operator==(class QFont const&) const {
   notImplemented();
   return 0;
 }
-WebCore::Widget::Widget(void) {
+Widget::Widget(void) {
   notImplemented();
 }
-class WebCore::String QTextEdit::text(void) const {
+class String QTextEdit::text(void) const {
   notImplemented();
-  return WebCore::String();
+  return String();
 }
-void WebCore::QPainter::drawImageInRect(
-    class WebCore::Image*,
-    class WebCore::IntRect const&,
-    enum WebCore::Image::CompositeOperator) {
-  notImplemented();
-}
-void WebCore::QPainter::setFont(class QFont const&) {
+void QPainter::drawImageInRect(class Image*,
+                               class IntRect const&,
+                               enum Image::CompositeOperator) {
   notImplemented();
 }
-void WebCore::Widget::disableFlushDrawing(void) {
+void QPainter::setFont(class QFont const&) {
   notImplemented();
 }
-void WebCore::QPainter::initFocusRing(int, int) {
+void Widget::disableFlushDrawing(void) {
+  notImplemented();
+}
+void QPainter::initFocusRing(int, int) {
   notImplemented();
 }
 void QSlider::setMinValue(double) {
@@ -767,17 +756,17 @@ void QSlider::setMinValue(double) {
 void QTextEdit::setWordWrap(enum QTextEdit::WrapStyle) {
   notImplemented();
 }
-void WebCore::QPainter::drawLineForMisspelling(int, int, int) {
+void QPainter::drawLineForMisspelling(int, int, int) {
   notImplemented();
 }
-void QLineEdit::setText(class WebCore::String const&) {
+void QLineEdit::setText(class String const&) {
   notImplemented();
 }
 double QSlider::value(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::QPainter::setBrush(unsigned int) {
+void QPainter::setBrush(unsigned int) {
   notImplemented();
 }
 void QListBox::setSelectionMode(enum QListBox::SelectionMode) {
@@ -796,17 +785,17 @@ int QFontMetrics::lineSpacing(void) const {
 void QLineEdit::setEdited(bool) {
   notImplemented();
 }
-class WebCore::IntRect QComboBox::frameGeometry(void) const {
+class IntRect QComboBox::frameGeometry(void) const {
   notImplemented();
-  return WebCore::IntRect();
+  return IntRect();
 }
-void QListBox::setWritingDirection(enum WebCore::QPainter::TextDirection) {
+void QListBox::setWritingDirection(enum QPainter::TextDirection) {
   notImplemented();
 }
 void QLineEdit::setAlignment(enum Qt::AlignmentFlags) {
   notImplemented();
 }
-void ScrollView::updateContents(int, int, int, int, bool) {
+void ScrollView::updateContents(const IntRect&, bool) {
   notImplemented();
 }
 float QFontMetrics::floatWidth(class QChar const*,
