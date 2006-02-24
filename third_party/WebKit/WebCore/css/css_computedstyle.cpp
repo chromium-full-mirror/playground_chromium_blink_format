@@ -656,13 +656,14 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       ASSERT_NOT_REACHED();
       return 0;
     case CSS_PROP_FONT_FAMILY: {
-      FontDef def = style->htmlFont().getFontDef();
-      return new CSSPrimitiveValueImpl(def.firstFamily().family().domString(),
+      // FIXME: This only returns the first family.
+      const FontDescription& desc = style->htmlFont().fontDescription();
+      return new CSSPrimitiveValueImpl(desc.family().family().domString(),
                                        CSSPrimitiveValue::CSS_STRING);
     }
     case CSS_PROP_FONT_SIZE: {
-      FontDef def = style->htmlFont().getFontDef();
-      return new CSSPrimitiveValueImpl(def.specifiedSize,
+      FontDescription def = style->htmlFont().fontDescription();
+      return new CSSPrimitiveValueImpl(def.specifiedSize(),
                                        CSSPrimitiveValue::CSS_PX);
     }
     case CSS_PROP_FONT_STRETCH:
@@ -670,15 +671,15 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       break;
     case CSS_PROP_FONT_STYLE: {
       // FIXME: handle oblique?
-      FontDef def = style->htmlFont().getFontDef();
-      if (def.italic)
+      const FontDescription& desc = style->htmlFont().fontDescription();
+      if (desc.italic())
         return new CSSPrimitiveValueImpl(CSS_VAL_ITALIC);
       else
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
     }
     case CSS_PROP_FONT_VARIANT: {
-      FontDef def = style->htmlFont().getFontDef();
-      if (def.smallCaps)
+      const FontDescription& desc = style->htmlFont().fontDescription();
+      if (desc.smallCaps())
         return new CSSPrimitiveValueImpl(CSS_VAL_SMALL_CAPS);
       else
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
@@ -686,8 +687,8 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
     case CSS_PROP_FONT_WEIGHT: {
       // FIXME: this does not reflect the full range of weights
       // that can be expressed with CSS
-      FontDef def = style->htmlFont().getFontDef();
-      if (def.weight == QFont::Bold)
+      const FontDescription& desc = style->htmlFont().fontDescription();
+      if (desc.weight() == QFont::Bold)
         return new CSSPrimitiveValueImpl(CSS_VAL_BOLD);
       else
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
@@ -717,7 +718,7 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         // On the other hand, since font-size doesn't include the zoom factor,
         // we really can't do
         // that here either.
-        float fontSize = style->htmlFont().getFontDef().specifiedSize;
+        float fontSize = style->htmlFont().fontDescription().specifiedSize();
         return new CSSPrimitiveValueImpl((int)(length.value() * fontSize) / 100,
                                          CSSPrimitiveValue::CSS_PX);
       } else {

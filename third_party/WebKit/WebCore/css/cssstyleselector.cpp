@@ -2054,74 +2054,76 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       break; /* Not supported. */
 
     case CSS_PROP_FONT_STYLE: {
-      FontDef fontDef = style->htmlFont().fontDef;
+      FontDescription fontDescription = style->htmlFont().fontDescription();
       if (isInherit)
-        fontDef.italic = parentStyle->htmlFont().fontDef.italic;
+        fontDescription.setItalic(
+            parentStyle->htmlFont().fontDescription().italic());
       else if (isInitial)
-        fontDef.italic = false;
+        fontDescription.setItalic(false);
       else {
         if (!primitiveValue)
           return;
         switch (primitiveValue->getIdent()) {
           case CSS_VAL_OBLIQUE:
-          // ### oblique is the same as italic for the moment...
+          // FIXME: oblique is the same as italic for the moment...
           case CSS_VAL_ITALIC:
-            fontDef.italic = true;
+            fontDescription.setItalic(true);
             break;
           case CSS_VAL_NORMAL:
-            fontDef.italic = false;
+            fontDescription.setItalic(false);
             break;
           default:
             return;
         }
       }
-      if (style->setFontDef(fontDef))
+      if (style->setFontDescription(fontDescription))
         fontDirty = true;
       break;
     }
 
     case CSS_PROP_FONT_VARIANT: {
-      FontDef fontDef = style->htmlFont().fontDef;
+      FontDescription fontDescription = style->htmlFont().fontDescription();
       if (isInherit)
-        fontDef.smallCaps = parentStyle->htmlFont().fontDef.smallCaps;
+        fontDescription.setSmallCaps(
+            parentStyle->htmlFont().fontDescription().smallCaps());
       else if (isInitial)
-        fontDef.smallCaps = false;
+        fontDescription.setSmallCaps(false);
       else {
         if (!primitiveValue)
           return;
         int id = primitiveValue->getIdent();
         if (id == CSS_VAL_NORMAL)
-          fontDef.smallCaps = false;
+          fontDescription.setSmallCaps(false);
         else if (id == CSS_VAL_SMALL_CAPS)
-          fontDef.smallCaps = true;
+          fontDescription.setSmallCaps(true);
         else
           return;
       }
-      if (style->setFontDef(fontDef))
+      if (style->setFontDescription(fontDescription))
         fontDirty = true;
       break;
     }
 
     case CSS_PROP_FONT_WEIGHT: {
-      FontDef fontDef = style->htmlFont().fontDef;
+      FontDescription fontDescription = style->htmlFont().fontDescription();
       if (isInherit)
-        fontDef.weight = parentStyle->htmlFont().fontDef.weight;
+        fontDescription.setWeight(
+            parentStyle->htmlFont().fontDescription().weight());
       else if (isInitial)
-        fontDef.weight = QFont::Normal;
+        fontDescription.setWeight(QFont::Normal);
       else {
         if (!primitiveValue)
           return;
         if (primitiveValue->getIdent()) {
           switch (primitiveValue->getIdent()) {
-            // ### we just support normal and bold fonts at the moment...
-            // setWeight can actually accept values between 0 and 99...
+            // FIXME: We aren't genuinely supporting specific weight values.
             case CSS_VAL_BOLD:
             case CSS_VAL_BOLDER:
             case CSS_VAL_600:
             case CSS_VAL_700:
             case CSS_VAL_800:
             case CSS_VAL_900:
-              fontDef.weight = QFont::Bold;
+              fontDescription.setWeight(QFont::Bold);
               break;
             case CSS_VAL_NORMAL:
             case CSS_VAL_LIGHTER:
@@ -2130,7 +2132,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
             case CSS_VAL_300:
             case CSS_VAL_400:
             case CSS_VAL_500:
-              fontDef.weight = QFont::Normal;
+              fontDescription.setWeight(QFont::Normal);
               break;
             default:
               return;
@@ -2139,7 +2141,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
           // ### fix parsing of 100-900 values in parser, apply them here
         }
       }
-      if (style->setFontDef(fontDef))
+      if (style->setFontDescription(fontDescription))
         fontDirty = true;
       break;
     }
@@ -3029,14 +3031,15 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       break;
 
     case CSS_PROP_FONT_SIZE: {
-      FontDef fontDef = style->htmlFont().fontDef;
+      FontDescription fontDescription = style->htmlFont().fontDescription();
       float oldSize = 0;
       float size = 0;
 
       bool parentIsAbsoluteSize = false;
       if (parentNode) {
-        oldSize = parentStyle->htmlFont().fontDef.specifiedSize;
-        parentIsAbsoluteSize = parentStyle->htmlFont().fontDef.isAbsoluteSize;
+        oldSize = parentStyle->htmlFont().fontDescription().specifiedSize();
+        parentIsAbsoluteSize =
+            parentStyle->htmlFont().fontDescription().isAbsoluteSize();
       }
 
       if (isInherit)
@@ -3067,16 +3070,17 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
             return;
         }
 
-        fontDef.isAbsoluteSize =
+        fontDescription.setIsAbsoluteSize(
             parentIsAbsoluteSize &&
             (primitiveValue->getIdent() == CSS_VAL_LARGER ||
-             primitiveValue->getIdent() == CSS_VAL_SMALLER);
+             primitiveValue->getIdent() == CSS_VAL_SMALLER));
       } else {
         int type = primitiveValue->primitiveType();
-        fontDef.isAbsoluteSize = parentIsAbsoluteSize ||
-                                 (type != CSSPrimitiveValue::CSS_PERCENTAGE &&
-                                  type != CSSPrimitiveValue::CSS_EMS &&
-                                  type != CSSPrimitiveValue::CSS_EXS);
+        fontDescription.setIsAbsoluteSize(
+            parentIsAbsoluteSize ||
+            (type != CSSPrimitiveValue::CSS_PERCENTAGE &&
+             type != CSSPrimitiveValue::CSS_EMS &&
+             type != CSSPrimitiveValue::CSS_EXS));
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
           size = primitiveValue->computeLengthFloat(parentStyle, false);
@@ -3092,8 +3096,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       if (size <= 0)
         return;
 
-      setFontSize(fontDef, size);
-      if (style->setFontDef(fontDef))
+      setFontSize(fontDescription, size);
+      if (style->setFontDescription(fontDescription))
         fontDirty = true;
       return;
     } break;
@@ -3281,91 +3285,91 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
     case CSS_PROP_COUNTER_RESET:
       // list of CSS2CounterReset
       break;
-    case CSS_PROP_FONT_FAMILY:
+    case CSS_PROP_FONT_FAMILY: {
       // list of strings and ids
-      {
-        if (isInherit) {
-          FontDef parentFontDef = parentStyle->htmlFont().fontDef;
-          FontDef fontDef = style->htmlFont().fontDef;
-          fontDef.genericFamily = parentFontDef.genericFamily;
-          fontDef.family = parentFontDef.family;
-          if (style->setFontDef(fontDef))
-            fontDirty = true;
-          return;
-        } else if (isInitial) {
-          FontDef fontDef = style->htmlFont().fontDef;
-          FontDef initialDef = FontDef();
-          fontDef.genericFamily = initialDef.genericFamily;
-          fontDef.family = initialDef.firstFamily();
-          if (style->setFontDef(fontDef))
-            fontDirty = true;
-          return;
-        }
-
-        if (!value->isValueList())
-          return;
-        FontDef fontDef = style->htmlFont().fontDef;
-        CSSValueListImpl* list = static_cast<CSSValueListImpl*>(value);
-        int len = list->length();
-        FontFamily& firstFamily = fontDef.firstFamily();
-        FontFamily* currFamily = 0;
-
-        for (int i = 0; i < len; i++) {
-          CSSValueImpl* item = list->item(i);
-          if (!item->isPrimitiveValue())
-            continue;
-          CSSPrimitiveValueImpl* val =
-              static_cast<CSSPrimitiveValueImpl*>(item);
-          QString face;
-          if (val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
-            face = static_cast<FontFamilyValueImpl*>(val)->fontName();
-          else if (val->primitiveType() == CSSPrimitiveValue::CSS_IDENT) {
-            switch (val->getIdent()) {
-              case CSS_VAL__KHTML_BODY:
-                face = settings->stdFontName();
-                break;
-              case CSS_VAL_SERIF:
-                face = settings->serifFontName();
-                fontDef.setGenericFamily(FontDef::eSerif);
-                break;
-              case CSS_VAL_SANS_SERIF:
-                face = settings->sansSerifFontName();
-                fontDef.setGenericFamily(FontDef::eSansSerif);
-                break;
-              case CSS_VAL_CURSIVE:
-                face = settings->cursiveFontName();
-                fontDef.setGenericFamily(FontDef::eCursive);
-                break;
-              case CSS_VAL_FANTASY:
-                face = settings->fantasyFontName();
-                fontDef.setGenericFamily(FontDef::eFantasy);
-                break;
-              case CSS_VAL_MONOSPACE:
-                face = settings->fixedFontName();
-                fontDef.setGenericFamily(FontDef::eMonospace);
-                break;
-            }
-          }
-
-          if (!face.isEmpty()) {
-            if (!currFamily) {
-              // Filling in the first family.
-              firstFamily.setFamily(face);
-              currFamily = &firstFamily;
-            } else {
-              FontFamily* newFamily = new FontFamily;
-              newFamily->setFamily(face);
-              currFamily->appendFamily(newFamily);
-              currFamily = newFamily;
-            }
-
-            if (style->setFontDef(fontDef)) {
-              fontDirty = true;
-            }
-          }
-        }
-        break;
+      if (isInherit) {
+        FontDescription parentFontDescription =
+            parentStyle->htmlFont().fontDescription();
+        FontDescription fontDescription = style->htmlFont().fontDescription();
+        fontDescription.setGenericFamily(parentFontDescription.genericFamily());
+        fontDescription.setFamily(parentFontDescription.firstFamily());
+        if (style->setFontDescription(fontDescription))
+          fontDirty = true;
+        return;
+      } else if (isInitial) {
+        FontDescription initialDesc = FontDescription();
+        FontDescription fontDescription = style->htmlFont().fontDescription();
+        fontDescription.setGenericFamily(initialDesc.genericFamily());
+        fontDescription.setFamily(initialDesc.firstFamily());
+        if (style->setFontDescription(fontDescription))
+          fontDirty = true;
+        return;
       }
+
+      if (!value->isValueList())
+        return;
+      FontDescription fontDescription = style->htmlFont().fontDescription();
+      CSSValueListImpl* list = static_cast<CSSValueListImpl*>(value);
+      int len = list->length();
+      FontFamily& firstFamily = fontDescription.firstFamily();
+      FontFamily* currFamily = 0;
+
+      for (int i = 0; i < len; i++) {
+        CSSValueImpl* item = list->item(i);
+        if (!item->isPrimitiveValue())
+          continue;
+        CSSPrimitiveValueImpl* val = static_cast<CSSPrimitiveValueImpl*>(item);
+        QString face;
+        if (val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
+          face = static_cast<FontFamilyValueImpl*>(val)->fontName();
+        else if (val->primitiveType() == CSSPrimitiveValue::CSS_IDENT) {
+          switch (val->getIdent()) {
+            case CSS_VAL__KHTML_BODY:
+              face = settings->stdFontName();
+              break;
+            case CSS_VAL_SERIF:
+              face = settings->serifFontName();
+              fontDescription.setGenericFamily(FontDescription::SerifFamily);
+              break;
+            case CSS_VAL_SANS_SERIF:
+              face = settings->sansSerifFontName();
+              fontDescription.setGenericFamily(
+                  FontDescription::SansSerifFamily);
+              break;
+            case CSS_VAL_CURSIVE:
+              face = settings->cursiveFontName();
+              fontDescription.setGenericFamily(FontDescription::CursiveFamily);
+              break;
+            case CSS_VAL_FANTASY:
+              face = settings->fantasyFontName();
+              fontDescription.setGenericFamily(FontDescription::FantasyFamily);
+              break;
+            case CSS_VAL_MONOSPACE:
+              face = settings->fixedFontName();
+              fontDescription.setGenericFamily(
+                  FontDescription::MonospaceFamily);
+              break;
+          }
+        }
+
+        if (!face.isEmpty()) {
+          if (!currFamily) {
+            // Filling in the first family.
+            firstFamily.setFamily(face);
+            currFamily = &firstFamily;
+          } else {
+            FontFamily* newFamily = new FontFamily;
+            newFamily->setFamily(face);
+            currFamily->appendFamily(newFamily);
+            currFamily = newFamily;
+          }
+
+          if (style->setFontDescription(fontDescription))
+            fontDirty = true;
+        }
+      }
+      break;
+    }
     case CSS_PROP_QUOTES:
     // list of strings or i
     case CSS_PROP_SIZE:
@@ -3523,14 +3527,15 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       return;
     case CSS_PROP_FONT:
       if (isInherit) {
-        FontDef fontDef = parentStyle->htmlFont().fontDef;
+        FontDescription fontDescription =
+            parentStyle->htmlFont().fontDescription();
         style->setLineHeight(parentStyle->lineHeight());
-        if (style->setFontDef(fontDef))
+        if (style->setFontDescription(fontDescription))
           fontDirty = true;
       } else if (isInitial) {
-        FontDef fontDef;
+        FontDescription fontDescription;
         style->setLineHeight(RenderStyle::initialLineHeight());
-        if (style->setFontDef(fontDef))
+        if (style->setFontDescription(fontDescription))
           fontDirty = true;
       } else if (value->isFontValue()) {
         FontValueImpl* font = static_cast<FontValueImpl*>(value);
@@ -4425,45 +4430,47 @@ void CSSStyleSelector::checkForTextSizeAdjust() {
   if (style->textSizeAdjust())
     return;
 
-  FontDef newFontDef(style->htmlFont().fontDef);
-  newFontDef.computedSize = newFontDef.specifiedSize;
-  style->setFontDef(newFontDef);
+  FontDescription newFontDescription(style->htmlFont().fontDescription());
+  newFontDescription.setComputedSize(newFontDescription.specifiedSize());
+  style->setFontDescription(newFontDescription);
 }
 
 void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* aStyle,
                                                    RenderStyle* aParentStyle) {
-  const FontDef& childFont = aStyle->htmlFont().fontDef;
+  const FontDescription& childFont = aStyle->htmlFont().fontDescription();
 
-  if (childFont.isAbsoluteSize || !aParentStyle)
+  if (childFont.isAbsoluteSize() || !aParentStyle)
     return;
 
-  const FontDef& parentFont = aParentStyle->htmlFont().fontDef;
+  const FontDescription& parentFont =
+      aParentStyle->htmlFont().fontDescription();
 
-  if (childFont.genericFamily == parentFont.genericFamily)
+  if (childFont.genericFamily() == parentFont.genericFamily())
     return;
 
   // For now, lump all families but monospace together.
-  if (childFont.genericFamily != FontDef::eMonospace &&
-      parentFont.genericFamily != FontDef::eMonospace)
+  if (childFont.genericFamily() != FontDescription::MonospaceFamily &&
+      parentFont.genericFamily() != FontDescription::MonospaceFamily)
     return;
 
   // We know the parent is monospace or the child is monospace, and that font
   // size was unspecified.  We want to scale our font size as appropriate.
   float fixedScaleFactor =
       ((float)settings->mediumFixedFontSize()) / settings->mediumFontSize();
-  float size = (parentFont.genericFamily == FontDef::eMonospace)
-                   ? childFont.specifiedSize / fixedScaleFactor
-                   : childFont.specifiedSize * fixedScaleFactor;
+  float size = (parentFont.genericFamily() == FontDescription::MonospaceFamily)
+                   ? childFont.specifiedSize() / fixedScaleFactor
+                   : childFont.specifiedSize() * fixedScaleFactor;
 
-  FontDef newFontDef(childFont);
-  setFontSize(newFontDef, size);
-  aStyle->setFontDef(newFontDef);
+  FontDescription newFontDescription(childFont);
+  setFontSize(newFontDescription, size);
+  aStyle->setFontDescription(newFontDescription);
 }
 
-void CSSStyleSelector::setFontSize(FontDef& fontDef, float size) {
-  fontDef.specifiedSize = size;
-  fontDef.computedSize =
-      getComputedSizeFromSpecifiedSize(fontDef.isAbsoluteSize, size);
+void CSSStyleSelector::setFontSize(FontDescription& fontDescription,
+                                   float size) {
+  fontDescription.setSpecifiedSize(size);
+  fontDescription.setComputedSize(
+      getComputedSizeFromSpecifiedSize(fontDescription.isAbsoluteSize(), size));
 }
 
 float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,

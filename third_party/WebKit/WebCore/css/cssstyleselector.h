@@ -131,7 +131,7 @@ class CSSStyleSelector : public StyleSelector {
   // Like the previous function, but for the keyword "smaller".
   float smallerFontSize(float size, bool quirksMode) const;
 
-  void setFontSize(FontDef& fontDef, float size);
+  void setFontSize(FontDescription& FontDescription, float size);
   float getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
                                          float specifiedSize);
 

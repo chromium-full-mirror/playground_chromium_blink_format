@@ -474,7 +474,7 @@ ALWAYS_INLINE int RenderText::widthFromCache(const Font* f,
         } else
           w += m_monospaceCharacterWidth;
         if (c.isSpace() && i > start && !str->s[i - 1].isSpace())
-          w += f->getWordSpacing();
+          w += f->wordSpacing();
       }
     }
 
@@ -529,7 +529,7 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
     QChar space[1];
     space[0] = ' ';
     int spaceWidth = f->width(space, 1, 0, 0);
-    maxW -= spaceWidth + f->getWordSpacing();
+    maxW -= spaceWidth + f->wordSpacing();
   }
 
   stripFrontSpaces = collapseWhiteSpace && m_hasEndWS;
