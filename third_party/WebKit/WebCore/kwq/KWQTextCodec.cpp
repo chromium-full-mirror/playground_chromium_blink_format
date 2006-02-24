@@ -113,6 +113,10 @@ QTextCodec* QTextCodec::codecForName(const char* name) {
   return codecForCFStringEncoding(encoding, flags);
 }
 
+QTextCodec* QTextCodec::utf8Codec() {
+  return codecForCFStringEncoding(kCFStringEncodingUTF8, NoEncodingFlags);
+}
+
 QTextCodec* QTextCodec::codecForNameEightBitOnly(const char* name) {
   KWQEncodingFlags flags;
   CFStringEncoding encoding =

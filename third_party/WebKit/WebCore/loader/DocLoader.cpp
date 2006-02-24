@@ -39,7 +39,7 @@
 #include "KWQLoader.h"
 #include "Frame.h"
 
-#include <kurl.h>
+#include <KURL.h>
 
 namespace WebCore {
 

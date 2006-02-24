@@ -37,6 +37,7 @@ class QTextCodec {
   static QTextCodec* codecForName(const char*);
   static QTextCodec* codecForNameEightBitOnly(const char*);
   static QTextCodec* codecForLocale();
+  static QTextCodec* utf8Codec();
 
 #if __APPLE__
   explicit QTextCodec(CFStringEncoding e, KWQEncodingFlags f = NoEncodingFlags)
