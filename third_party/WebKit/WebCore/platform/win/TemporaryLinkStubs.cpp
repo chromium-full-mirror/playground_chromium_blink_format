@@ -118,11 +118,6 @@ class IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
   notImplemented();
   return IntSize();
 }
-static Cursor localCursor;
-class Cursor const& iBeamCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void QComboBox::clear(void) {
   notImplemented();
 }
@@ -137,10 +132,6 @@ int QLineEdit::maxLength(void) const {
   notImplemented();
   return 0;
 }
-class Cursor const& westResizeCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 bool Widget::isEnabled(void) const {
   notImplemented();
   return 0;
@@ -153,10 +144,6 @@ bool __cdecl KWQServeRequest(class Loader*,
 }
 void QTextEdit::setText(class String const&) {
   notImplemented();
-}
-class Cursor const& __cdecl northWestResizeCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 void Widget::paint(class QPainter*, class IntRect const&) {
   notImplemented();
@@ -185,10 +172,6 @@ void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
 void QPainter::drawEllipse(int, int, int, int) {
   notImplemented();
 }
-class Cursor const& __cdecl southWestResizeCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void QPainter::setPen(unsigned int) {
   notImplemented();
 }
@@ -216,10 +199,6 @@ void QTextEdit::selectAll(void) {
 }
 void QPainter::fillRect(int, int, int, int, class Brush const&) {
   notImplemented();
-}
-class Cursor const& __cdecl waitCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 void QPainter::endTransparencyLayer(void) {
   notImplemented();
@@ -343,10 +322,6 @@ void QPainter::setPen(class Pen const&) {
 void QTextEdit::setLineHeight(int) {
   notImplemented();
 }
-class Cursor const& __cdecl eastResizeCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void QScrollBar::setKnobProportion(int, int) {
   notImplemented();
 }
@@ -369,10 +344,6 @@ void QTextEdit::setSelectionStart(int) {
 }
 void QPainter::beginTransparencyLayer(float) {
   notImplemented();
-}
-class Cursor const& __cdecl northEastResizeCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 void QFontMetrics::setFont(class QFont const&) {
   notImplemented();
@@ -463,16 +434,8 @@ class QString QLineEdit::selectedText(void) const {
   notImplemented();
   return QString();
 }
-class Cursor const& __cdecl crossCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void Widget::setIsSelected(bool) {
   notImplemented();
-}
-class Cursor const& __cdecl handCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 class String QLineEdit::text(void) const {
   notImplemented();
@@ -487,10 +450,6 @@ void QLineEdit::setLiveSearch(bool) {
 bool QPainter::paintingDisabled(void) const {
   notImplemented();
   return 0;
-}
-class Cursor const& __cdecl northResizeCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 QComboBox::QComboBox(void) {
   notImplemented();
@@ -561,10 +520,6 @@ class IntRect QFontMetrics::selectionRectForText(int,
   notImplemented();
   return IntRect();
 }
-class Cursor const& __cdecl southResizeCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void ScrollView::suppressScrollBars(bool, bool) {
   notImplemented();
 }
@@ -587,10 +542,6 @@ int QFontMetrics::checkSelectionPoint(class QChar*,
 }
 void QTextEdit::getCursorPosition(int*, int*) const {
   notImplemented();
-}
-class Cursor const& __cdecl moveCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 bool FrameView::isFrameView(void) const {
   notImplemented();
@@ -620,10 +571,6 @@ void QComboBox::appendItem(class QString const&,
 void QPainter::setShadow(int, int, int, class Color const&) {
   notImplemented();
 }
-class Cursor const& __cdecl helpCursor(void) {
-  notImplemented();
-  return localCursor;
-}
 void QTextEdit::setWritingDirection(enum QPainter::TextDirection) {
   notImplemented();
 }
@@ -632,10 +579,6 @@ void Widget::setDrawingAlpha(float) {
 }
 QSlider::QSlider(void) {
   notImplemented();
-}
-class Cursor const& __cdecl southEastResizeCursor(void) {
-  notImplemented();
-  return localCursor;
 }
 void ScrollView::setVScrollBarMode(ScrollBarMode) {
   notImplemented();
@@ -927,4 +870,61 @@ void Path::translate(int deltaX, int deltaY) {
 IntRect Path::boundingRect() const {
   notImplemented();
   return IntRect();
+}
+static Cursor localCursor;
+const Cursor& WebCore::crossCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::handCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::moveCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::iBeamCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::waitCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::helpCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::eastResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::northResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::northEastResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::northWestResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::southResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::southEastResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::southWestResizeCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& WebCore::westResizeCursor() {
+  notImplemented();
+  return localCursor;
 }
