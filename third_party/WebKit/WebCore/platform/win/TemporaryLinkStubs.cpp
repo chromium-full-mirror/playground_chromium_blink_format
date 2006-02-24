@@ -25,7 +25,6 @@
 #include "dom2_events.h"
 #include "KWQKJavaAppletWidget.h"
 #include "KWQScrollBar.h"
-#include "KWQPalette.h"
 
 static void notImplemented() {
   puts("Not yet implemented");
@@ -220,9 +219,6 @@ void QScrollView::removeChild(class WebCore::Widget*) {
   notImplemented();
 }
 void QTextEdit::selectAll(void) {
-  notImplemented();
-}
-void WebCore::Widget::setPalette(class QPalette const&) {
   notImplemented();
 }
 void WebCore::QPainter::fillRect(int,
@@ -449,11 +445,6 @@ void WebCore::QPainter::drawText(int,
                                  int,
                                  class QString const&) {
   notImplemented();
-}
-static QPalette localPalette;
-class QPalette const& WebCore::Widget::palette(void) const {
-  notImplemented();
-  return localPalette;
 }
 static WebCore::Pen localPen;
 class WebCore::Pen const& WebCore::QPainter::pen(void) const {
