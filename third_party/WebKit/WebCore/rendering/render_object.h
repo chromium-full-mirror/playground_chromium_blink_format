@@ -987,7 +987,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual void destroy();
 
-  const QFont& font(bool firstLine) const { return style(firstLine)->font(); }
+  const QFont& font(bool firstLine) const { return style(firstLine)->qfont(); }
 
   const QFontMetrics& fontMetrics(bool firstLine) const {
     return style(firstLine)->fontMetrics();

@@ -837,9 +837,8 @@ double CSSPrimitiveValueImpl::computeLengthFloat(RenderStyle* style,
   double factor = 1.;
   switch (type) {
     case CSSPrimitiveValue::CSS_EMS:
-      factor = applyZoomFactor
-                   ? style->htmlFont().fontDescription().computedSize()
-                   : style->htmlFont().fontDescription().specifiedSize();
+      factor = applyZoomFactor ? style->fontDescription().computedSize()
+                               : style->fontDescription().specifiedSize();
       break;
     case CSSPrimitiveValue::CSS_EXS: {
       // FIXME: We have a bug right now where the zoom will be applied multiple

@@ -285,9 +285,9 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   // Set our font.
   RenderStyle* styleToUse = object()->style(m_firstLine);
   int d = styleToUse->textDecorationsInEffect();
-  if (styleToUse->font() != i.p->font())
-    i.p->setFont(styleToUse->font());
-  const Font* font = &styleToUse->htmlFont();
+  if (styleToUse->qfont() != i.p->font())
+    i.p->setFont(styleToUse->qfont());
+  const Font* font = &styleToUse->font();
 
   // 1. Paint backgrounds behind text if needed.  Examples of such backgrounds
   // include selection
@@ -782,7 +782,7 @@ int InlineTextBox::textPos() const {
 int InlineTextBox::offsetForPosition(int _x, bool includePartialGlyphs) const {
   RenderText* text = static_cast<RenderText*>(m_object);
   RenderStyle* style = text->style(m_firstLine);
-  const Font* f = &style->htmlFont();
+  const Font* f = &style->font();
   return f->checkSelectionPoint(
       text->str->s, text->str->l, m_start, m_len, m_toAdd, text->tabWidth(),
       textPos(), _x - m_x, m_reversed ? QPainter::RTL : QPainter::LTR,

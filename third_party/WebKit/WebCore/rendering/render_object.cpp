@@ -2311,7 +2311,7 @@ short RenderObject::lineHeight(bool firstLine, bool) const {
     return s->fontMetrics().lineSpacing();
 
   if (lh.isPercent())
-    return lh.calcMinValue(s->font().pixelSize());
+    return lh.calcMinValue(s->qfont().pixelSize());
 
   // its fixed
   return lh.value();
