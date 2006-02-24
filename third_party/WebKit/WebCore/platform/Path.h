@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,26 +23,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QREGION_H_
-#define QREGION_H_
+#ifndef Path_h
+#define Path_h
 
-#include "IntPointArray.h"
-#include "IntRect.h"
+#if __APPLE__
+typedef const struct CGPath* CGPathRef;
+#endif
 
-typedef struct CGPath* CGMutablePathRef;
+namespace WebCore {
 
-class QRegion {
+class IntPoint;
+class IntPointArray;
+class IntRect;
+
+class Path {
  public:
-  enum RegionType { Ellipse, Rectangle };
+  enum Type { Ellipse, Rectangle };
 
-  QRegion() : path(0) {}
-  QRegion(const IntRect&);
-  QRegion(int, int, int, int, RegionType = Rectangle);
-  QRegion(const IntPointArray&);
-  ~QRegion();
+  Path();
+  Path(const IntRect&, Type = Rectangle);
+  Path(const IntPointArray&);
+  ~Path();
 
-  QRegion(const QRegion&);
-  QRegion& operator=(const QRegion&);
+  Path(const Path&);
+  Path& operator=(const Path&);
 
   bool contains(const IntPoint&) const;
   IntRect boundingRect() const;
@@ -50,7 +54,10 @@ class QRegion {
   void translate(int deltaX, int deltaY);
 
  private:
-  CGMutablePathRef path;
+#if __APPLE__
+  CGPathRef m_path;
+#endif
 };
+}
 
 #endif

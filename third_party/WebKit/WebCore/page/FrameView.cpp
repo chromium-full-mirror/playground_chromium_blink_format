@@ -148,7 +148,7 @@ FrameView::FrameView(Frame* frame)
       m_medium("screen") {
   init();
 
-  viewport()->show();
+  show();
 }
 
 FrameView::~FrameView() {
@@ -621,7 +621,7 @@ void FrameView::viewportMouseMoveEvent(MouseEvent* mouseEvent) {
       true, xm, ym, mouseEvent);
 
   if (!m_frame->passSubframeEventToSubframe(mev))
-    viewport()->setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
+    setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
 
   bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.innerNode(), false,
                                          0, mouseEvent, true);
