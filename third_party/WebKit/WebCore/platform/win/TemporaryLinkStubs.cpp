@@ -181,8 +181,7 @@ int QTextEdit::selectionEnd(void) {
 void QFont::determinePitch(void) const {
   notImplemented();
 }
-void QTextEdit::setScrollBarModes(enum QScrollView::ScrollBarMode,
-                                  enum QScrollView::ScrollBarMode) {
+void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
 void WebCore::QPainter::drawEllipse(int, int, int, int) {
@@ -211,7 +210,7 @@ enum WebCore::Widget::FocusPolicy WebCore::Widget::focusPolicy(void) const {
   notImplemented();
   return NoFocus;
 }
-void QScrollView::removeChild(class WebCore::Widget*) {
+void ScrollView::removeChild(class WebCore::Widget*) {
   notImplemented();
 }
 void QTextEdit::selectAll(void) {
@@ -234,7 +233,7 @@ void WebCore::QPainter::endTransparencyLayer(void) {
 QFont::QFont(class QFont const&) {
   notImplemented();
 }
-void QScrollView::addChild(class WebCore::Widget*, int, int) {
+void ScrollView::addChild(class WebCore::Widget*, int, int) {
   notImplemented();
 }
 void QTextEdit::setDisabled(bool) {
@@ -256,7 +255,7 @@ class WebCore::IntSize QListBox::sizeForNumberOfLines(int) const {
   notImplemented();
   return WebCore::IntSize();
 }
-void QScrollView::resizeContents(int, int) {
+void ScrollView::resizeContents(int, int) {
   notImplemented();
 }
 int QLineEdit::selectionStart(void) const {
@@ -282,7 +281,7 @@ void QListBox::doneAppendingItems(void) {
 QTextEdit::QTextEdit(class WebCore::Widget*) {
   notImplemented();
 }
-bool QScrollView::inWindow(void) const {
+bool ScrollView::inWindow(void) const {
   notImplemented();
   return 0;
 }
@@ -304,7 +303,7 @@ int QTextEdit::selectionStart(void) {
 void QFont::setWeight(int) {
   notImplemented();
 }
-int QScrollView::scrollXOffset(void) const {
+int ScrollView::scrollXOffset(void) const {
   notImplemented();
   return 0;
 }
@@ -418,7 +417,7 @@ void QTextEdit::setSelectionEnd(int) {
 void QComboBox::populate(void) {
   notImplemented();
 }
-void QScrollView::setStaticBackground(bool) {
+void ScrollView::setStaticBackground(bool) {
   notImplemented();
 }
 static QFont localFont;
@@ -543,7 +542,7 @@ void WebCore::QPainter::drawText(int,
                                  bool) {
   notImplemented();
 }
-void QScrollView::scrollPointRecursively(int, int) {
+void ScrollView::scrollPointRecursively(int, int) {
   notImplemented();
 }
 class WebCore::IntSize QLineEdit::sizeForCharacterWidth(int) const {
@@ -575,7 +574,7 @@ class WebCore::Cursor const& __cdecl WebCore::southResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
-void QScrollView::suppressScrollBars(bool, bool) {
+void ScrollView::suppressScrollBars(bool, bool) {
   notImplemented();
 }
 int QFontMetrics::checkSelectionPoint(class QChar*,
@@ -647,7 +646,7 @@ class WebCore::Cursor const& __cdecl WebCore::southEastResizeCursor(void) {
   notImplemented();
   return localCursor;
 }
-void QScrollView::setVScrollBarMode(enum QScrollView::ScrollBarMode) {
+void ScrollView::setVScrollBarMode(ScrollBarMode) {
   notImplemented();
 }
 void WebCore::QPainter::drawScaledAndTiledImage(class WebCore::Image*,
@@ -664,7 +663,7 @@ void WebCore::QPainter::drawScaledAndTiledImage(class WebCore::Image*,
                                                 void*) {
   notImplemented();
 }
-int QScrollView::scrollYOffset(void) const {
+int ScrollView::scrollYOffset(void) const {
   notImplemented();
   return 0;
 }
@@ -694,7 +693,7 @@ int QFontMetrics::height(void) const {
 void QComboBox::setWritingDirection(enum WebCore::QPainter::TextDirection) {
   notImplemented();
 }
-void QScrollView::setScrollBarsMode(enum QScrollView::ScrollBarMode) {
+void ScrollView::setScrollBarsMode(ScrollBarMode) {
   notImplemented();
 }
 class WebCore::IntSize QComboBox::sizeHint(void) const {
@@ -807,7 +806,7 @@ void QListBox::setWritingDirection(enum WebCore::QPainter::TextDirection) {
 void QLineEdit::setAlignment(enum Qt::AlignmentFlags) {
   notImplemented();
 }
-void QScrollView::updateContents(int, int, int, int, bool) {
+void ScrollView::updateContents(int, int, int, int, bool) {
   notImplemented();
 }
 float QFontMetrics::floatWidth(class QChar const*,
@@ -822,6 +821,6 @@ float QFontMetrics::floatWidth(class QChar const*,
   notImplemented();
   return 0;
 }
-void QScrollView::setHScrollBarMode(enum QScrollView::ScrollBarMode) {
+void ScrollView::setHScrollBarMode(ScrollBarMode) {
   notImplemented();
 }

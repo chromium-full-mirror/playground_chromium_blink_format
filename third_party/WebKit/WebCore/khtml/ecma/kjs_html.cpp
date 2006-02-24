@@ -3069,7 +3069,7 @@ void HTMLElement::bodySetter(ExecState* exec,
     }
     case BodyScrollLeft:
     case BodyScrollTop: {
-      QScrollView* sview = body.ownerDocument()->view();
+      FrameView* sview = body.ownerDocument()->view();
       if (sview) {
         // Update the document's layout before we compute these attributes.
         if (DocumentImpl* doc = body.getDocument())

@@ -3002,8 +3002,8 @@ bool Frame::scrollbarsVisible() {
   if (!view())
     return false;
 
-  if (view()->hScrollBarMode() == QScrollView::AlwaysOff ||
-      view()->vScrollBarMode() == QScrollView::AlwaysOff)
+  if (view()->hScrollBarMode() == ScrollBarAlwaysOff ||
+      view()->vScrollBarMode() == ScrollBarAlwaysOff)
     return false;
 
   return true;

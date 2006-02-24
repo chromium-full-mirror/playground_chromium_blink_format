@@ -26,12 +26,11 @@
 #ifndef QTEXTEDIT_H_
 #define QTEXTEDIT_H_
 
-#include "KWQScrollView.h"
-
 #include "KWQSignal.h"
 #include "KWQPainter.h"
+#include "ScrollView.h"
 
-class QTextEdit : public QScrollView {
+class QTextEdit : public WebCore::ScrollView {
  public:
   typedef enum { NoWrap, WidgetWidth } WrapStyle;
 
@@ -69,7 +68,8 @@ class QTextEdit : public QScrollView {
   void setWordWrap(WrapStyle);
   WrapStyle wordWrap() const;
 
-  void setScrollBarModes(ScrollBarMode hMode, ScrollBarMode vMode);
+  void setScrollBarModes(WebCore::ScrollBarMode hMode,
+                         WebCore::ScrollBarMode vMode);
 
   void setWritingDirection(QPainter::TextDirection);
 

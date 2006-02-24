@@ -27,21 +27,17 @@
 #define HTML_BASEIMPL_H
 
 #include "HTMLElementImpl.h"
+#include "ScrollBarMode.h"
 
-#include <qscrollview.h>
-
-namespace khtml {
-class RenderFrameSet;
-class RenderFrame;
-class RenderPartObject;
-}
-
-namespace DOM {
+namespace WebCore {
 
 class CSSStyleSheetImpl;
 class DOMString;
 class Frame;
 class HTMLFrameElement;
+class RenderFrameSet;
+class RenderFrame;
+class RenderPartObject;
 
 struct Length;
 
@@ -85,8 +81,8 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 // -------------------------------------------------------------------------
 
 class HTMLFrameElementImpl : public HTMLElementImpl {
-  friend class khtml::RenderFrame;
-  friend class khtml::RenderPartObject;
+  friend class RenderFrame;
+  friend class RenderPartObject;
 
  public:
   HTMLFrameElementImpl(DocumentImpl* doc);
@@ -103,9 +99,8 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   void close();
   virtual void willRemove();
   virtual void detach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   bool noResize() { return m_noResize; }
 
@@ -119,7 +114,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-  QScrollView::ScrollBarMode scrollingMode() const { return m_scrolling; }
+  ScrollBarMode scrollingMode() const { return m_scrolling; }
   int getMarginWidth() const { return m_marginWidth; }
   int getMarginHeight() const { return m_marginHeight; }
 
@@ -158,7 +153,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   int m_marginWidth;
   int m_marginHeight;
-  QScrollView::ScrollBarMode m_scrolling;
+  ScrollBarMode m_scrolling;
 
   bool m_frameBorder : 1;
   bool m_frameBorderSet : 1;
@@ -168,7 +163,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 // -------------------------------------------------------------------------
 
 class HTMLFrameSetElementImpl : public HTMLElementImpl {
-  friend class khtml::RenderFrameSet;
+  friend class RenderFrameSet;
 
  public:
   HTMLFrameSetElementImpl(DocumentImpl* doc);
@@ -180,9 +175,8 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
   virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   virtual void defaultEventHandler(EventImpl* evt);
 
@@ -263,9 +257,8 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
   virtual void removedFromDocument();
 
   virtual void attach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange ch);
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;

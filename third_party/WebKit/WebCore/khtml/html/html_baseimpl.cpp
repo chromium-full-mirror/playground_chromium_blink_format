@@ -246,7 +246,7 @@ void HTMLFrameElementImpl::init() {
   m_frameBorderSet = false;
   m_marginWidth = -1;
   m_marginHeight = -1;
-  m_scrolling = QScrollView::Auto;
+  m_scrolling = ScrollBarAuto;
   m_noResize = false;
 }
 
@@ -351,9 +351,9 @@ void HTMLFrameElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     // scrolling."
     if (equalIgnoringCase(attr->value(), "auto") ||
         equalIgnoringCase(attr->value(), "yes"))
-      m_scrolling = QScrollView::Auto;
+      m_scrolling = ScrollBarAuto;
     else if (equalIgnoringCase(attr->value(), "no"))
-      m_scrolling = QScrollView::AlwaysOff;
+      m_scrolling = ScrollBarAlwaysOff;
     // FIXME: If we are already attached, this has no effect.
   } else if (attr->name() == onloadAttr) {
     setHTMLEventListener(loadEvent, attr);

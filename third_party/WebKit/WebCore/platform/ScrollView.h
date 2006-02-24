@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,18 +26,13 @@
 #ifndef QSCROLLVIEW_H_
 #define QSCROLLVIEW_H_
 
+#include "ScrollBarMode.h"
 #include "Widget.h"
 
-#ifdef __OBJC__
-@class NSView;
-#else
-class NSView;
-#endif
+namespace WebCore {
 
-class QScrollView : public Widget {
+class ScrollView : public Widget {
  public:
-  enum ScrollBarMode { Auto, AlwaysOff, AlwaysOn };
-
   int visibleWidth() const;
   int visibleHeight() const;
   int contentsWidth() const;
@@ -51,16 +46,14 @@ class QScrollView : public Widget {
 
   void setContentsPos(int x, int y);
 
-  virtual void setVScrollBarMode(ScrollBarMode vMode);
-  virtual void setHScrollBarMode(ScrollBarMode hMode);
+  virtual void setVScrollBarMode(ScrollBarMode);
+  virtual void setHScrollBarMode(ScrollBarMode);
 
-  // The following method is not defined in Qt, but we provide it so that we can
-  // set the mode for both scrollbars at once.
-  virtual void setScrollBarsMode(ScrollBarMode mode);
+  // Set the mode for both scroll bars at once.
+  virtual void setScrollBarsMode(ScrollBarMode);
 
-  // This method is also not defined in Qt.  It gives us a means of blocking
-  // painting on our
-  // scrollbars until the first layout has occurred.
+  // This gives us a means of blocking painting on our scrollbars until the
+  // first layout has occurred.
   void suppressScrollBars(bool suppressed, bool repaintOnUnsuppress = false);
 
   ScrollBarMode vScrollBarMode() const;
@@ -70,18 +63,20 @@ class QScrollView : public Widget {
   void removeChild(Widget*);
 
   virtual void resizeContents(int w, int h);
-  void updateContents(int x, int y, int w, int h, bool now = false);
-  void updateContents(const IntRect& r, bool now = false);
-  void repaintContents(int x, int y, int w, int h, bool erase = true);
+  void updateContents(const IntRect&, bool now = false);
+
   IntPoint contentsToViewport(const IntPoint&);
   void contentsToViewport(int x, int y, int& vx, int& vy);
   void viewportToContents(int vx, int vy, int& x, int& y);
 
   void setStaticBackground(bool);
 
-  NSView* getDocumentView() const;
-
   bool inWindow() const;
+
+#if __APPLE__
+  NSView* getDocumentView() const;
+#endif
 };
+}
 
 #endif
