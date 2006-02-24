@@ -154,10 +154,6 @@ bool __cdecl KWQServeRequest(class WebCore::Loader*,
 void QTextEdit::setText(class WebCore::String const&) {
   notImplemented();
 }
-int QScrollView::childY(class WebCore::Widget*) {
-  notImplemented();
-  return 0;
-}
 class WebCore::Cursor const& __cdecl WebCore::northWestResizeCursor(void) {
   notImplemented();
   return localCursor;
@@ -800,10 +796,6 @@ int QFontMetrics::lineSpacing(void) const {
 }
 void QLineEdit::setEdited(bool) {
   notImplemented();
-}
-int QScrollView::childX(class WebCore::Widget*) {
-  notImplemented();
-  return 0;
 }
 class WebCore::IntRect QComboBox::frameGeometry(void) const {
   notImplemented();
