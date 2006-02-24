@@ -41,10 +41,7 @@ class FrameWin : public Frame {
 
   virtual void setTitle(const String&);
 
-  virtual void urlSelected(const KURL& url,
-                           int button,
-                           int state,
-                           const URLArgs& args);
+  virtual void urlSelected(const KURL& url, const URLArgs& args);
 
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const QString& mimeType);
@@ -92,7 +89,7 @@ class FrameWin : public Frame {
 
   virtual bool lastEventIsMouseUp() const;
 
-  virtual bool passSubframeEventToSubframe(NodeImpl::MouseEvent&);
+  virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&);
   virtual bool passWheelEventToChildWidget(NodeImpl*);
 
   virtual void clearRecordedFormValues();

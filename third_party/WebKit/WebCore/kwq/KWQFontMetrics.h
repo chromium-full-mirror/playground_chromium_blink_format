@@ -111,7 +111,9 @@ class QFontMetrics {
   int baselineOffset() const { return ascent(); }
 
  private:
+#ifndef WIN32_COMPILE_HACK
   RefPtr<QFontMetricsPrivate> data;
+#endif
 };
 
 #endif
