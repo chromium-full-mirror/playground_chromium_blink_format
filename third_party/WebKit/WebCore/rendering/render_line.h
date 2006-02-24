@@ -1,7 +1,7 @@
 /*
  * This file is part of the line box implementation for KDE.
  *
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,24 +19,23 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef RENDER_LINE_H
 #define RENDER_LINE_H
 
-#include "rendering/render_object.h"
 #include "bidi.h"
-#include "Shared.h"
+#include "render_object.h"
 
-namespace DOM {
+namespace WebCore {
+
 class AtomicString;
-};
-
-namespace khtml {
-
 class EllipsisBox;
 class InlineFlowBox;
 class RootInlineBox;
 class RenderBlock;
 class RenderFlow;
+
+struct GapRects;
 
 // InlineBox represents a rectangle that occurs on a line.  It corresponds to
 // some RenderObject (i.e., it represents a portion of that RenderObject).
@@ -437,7 +436,7 @@ class RootInlineBox : public InlineFlowBox {
                               int blockEdge,
                               int lineBoxEdge,
                               int ellipsisWidth);
-  void placeEllipsis(const DOM::AtomicString& ellipsisStr,
+  void placeEllipsis(const AtomicString& ellipsisStr,
                      bool ltr,
                      int blockEdge,
                      int ellipsisWidth,
@@ -525,6 +524,6 @@ class RootInlineBox : public InlineFlowBox {
   EllipsisBox* m_ellipsisBox;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

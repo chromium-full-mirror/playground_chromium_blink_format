@@ -64,13 +64,9 @@ class EditCommandPtr;
 class FramePrivate;
 class FrameTree;
 class KJSProxyImpl;
-class MouseDoubleClickEvent;
-class MouseEvent;
-class MouseMoveEvent;
-class MousePressEvent;
-class MouseReleaseEvent;
 class Page;
 class Plugin;
+class MouseEventWithHitTestResults;
 class RangeImpl;
 class Selection;
 class SelectionController;
@@ -664,13 +660,12 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
    */
   void htmlError(int errorCode, const QString& text, const KURL& reqUrl);
 
-  virtual void khtmlMouseDoubleClickEvent(MouseDoubleClickEvent* event);
-  virtual void khtmlMousePressEvent(MousePressEvent* event);
-  virtual void khtmlMouseMoveEvent(MouseMoveEvent* event);
-  virtual void khtmlMouseReleaseEvent(MouseReleaseEvent* event);
-  virtual void khtmlDrawContentsEvent(DrawContentsEvent*) {}
+  virtual void khtmlMouseDoubleClickEvent(MouseEventWithHitTestResults*);
+  virtual void khtmlMousePressEvent(MouseEventWithHitTestResults*);
+  virtual void khtmlMouseMoveEvent(MouseEventWithHitTestResults*);
+  virtual void khtmlMouseReleaseEvent(MouseEventWithHitTestResults*);
 
-  void selectClosestWordFromMouseEvent(QMouseEvent* mouse,
+  void selectClosestWordFromMouseEvent(MouseEvent*,
                                        NodeImpl* innerNode,
                                        int x,
                                        int y);
@@ -678,10 +673,8 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
   virtual bool openFile();
 
   virtual void urlSelected(const QString& url,
-                           int button,
-                           int state,
-                           const QString& _target,
-                           URLArgs args = URLArgs());
+                           const QString& target,
+                           const URLArgs& args = URLArgs());
 
   // Methods with platform-specific overrides (and no base class
   // implementation).
@@ -740,11 +733,8 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
   virtual bool canGoBackOrForward(int distance) const = 0;
   virtual void openURLRequest(const KURL&, const URLArgs&) = 0;
   virtual void submitForm(const KURL&, const URLArgs&) = 0;
-  virtual void urlSelected(const KURL& url,
-                           int button,
-                           int state,
-                           const URLArgs& args) = 0;
-  virtual bool passSubframeEventToSubframe(NodeImpl::MouseEvent&) = 0;
+  virtual void urlSelected(const KURL&, const URLArgs& args) = 0;
+  virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&) = 0;
   virtual bool passWheelEventToChildWidget(NodeImpl*) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
   virtual QString overrideMediaType() const = 0;
@@ -945,7 +935,8 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
   bool scrollbarsVisible();
   void scrollToAnchor(const KURL&);
   bool canMouseDownStartSelect(NodeImpl* node);
-  bool passWidgetMouseDownEventToWidget(MouseEvent*, bool isDoubleClick);
+  bool passWidgetMouseDownEventToWidget(MouseEventWithHitTestResults*,
+                                        bool isDoubleClick);
   bool passWidgetMouseDownEventToWidget(RenderWidget*);
   virtual bool passMouseDownEventToWidget(Widget*) = 0;
 
@@ -985,18 +976,18 @@ class Frame : public Shared<Frame>, public QObject, Noncopyable {
 
   void receivedFirstData();
 
-  bool handleMouseMoveEventDrag(MouseMoveEvent* event);
-  bool handleMouseMoveEventOver(MouseMoveEvent* event);
-  void handleMouseMoveEventSelection(MouseMoveEvent* event);
+  bool handleMouseMoveEventDrag(MouseEventWithHitTestResults*);
+  bool handleMouseMoveEventOver(MouseEventWithHitTestResults*);
+  void handleMouseMoveEventSelection(MouseEventWithHitTestResults*);
 
   /**
    * @internal Extracts anchor and tries both encoded and decoded form.
    */
   void gotoAnchor();
 
-  void handleMousePressEventSingleClick(MousePressEvent* event);
-  void handleMousePressEventDoubleClick(MousePressEvent* event);
-  void handleMousePressEventTripleClick(MousePressEvent* event);
+  void handleMousePressEventSingleClick(MouseEventWithHitTestResults*);
+  void handleMousePressEventDoubleClick(MouseEventWithHitTestResults*);
+  void handleMousePressEventTripleClick(MouseEventWithHitTestResults*);
 
   CSSComputedStyleDeclarationImpl* selectionComputedStyle(
       NodeImpl*& nodeToRemove) const;

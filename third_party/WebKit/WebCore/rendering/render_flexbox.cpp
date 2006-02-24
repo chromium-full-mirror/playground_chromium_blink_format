@@ -122,18 +122,17 @@ void RenderFlexibleBox::calcHorizontalMinMaxWidth() {
     // calculated its margins (which are computed inside calcWidth).
     child->calcWidth();
 
-    if (!(ml.type == Auto) && !(mr.type == Auto)) {
-      if (!(child->style()->width().type == Auto)) {
+    if (!ml.isAuto() && !mr.isAuto()) {
+      if (!child->style()->width().isAuto()) {
         if (child->style()->direction() == LTR)
           margin = child->marginLeft();
         else
           margin = child->marginRight();
       } else
         margin = child->marginLeft() + child->marginRight();
-
-    } else if (!(ml.type == Auto))
+    } else if (!ml.isAuto())
       margin = child->marginLeft();
-    else if (!(mr.type == Auto))
+    else if (!mr.isAuto())
       margin = child->marginRight();
 
     if (margin < 0)
@@ -161,7 +160,7 @@ void RenderFlexibleBox::calcVerticalMinMaxWidth() {
     // Call calcWidth on the child to ensure that our margins are
     // up to date.  This method can be called before the child has actually
     // calculated its margins (which are computed inside calcWidth).
-    if (ml.type == Percent || mr.type == Percent)
+    if (ml.isPercent() || mr.isPercent())
       calcWidth();
 
     // A margin basically has three types: fixed, percentage, and auto
@@ -174,14 +173,14 @@ void RenderFlexibleBox::calcVerticalMinMaxWidth() {
     // values on
     // the RenderObject itself.
     int margin = 0;
-    if (ml.type == Fixed)
-      margin += ml.value;
-    else if (ml.type == Percent)
+    if (ml.isFixed())
+      margin += ml.value();
+    else if (ml.isPercent())
       margin += child->marginLeft();
 
-    if (mr.type == Fixed)
-      margin += mr.value;
-    else if (mr.type == Percent)
+    if (mr.isFixed())
+      margin += mr.value();
+    else if (mr.isAuto())
       margin += child->marginRight();
 
     if (margin < 0)
@@ -214,21 +213,22 @@ void RenderFlexibleBox::calcMinMaxWidth() {
   if (m_maxWidth < m_minWidth)
     m_maxWidth = m_minWidth;
 
-  if (style()->width().isFixed() && style()->width().value > 0)
-    m_minWidth = m_maxWidth = calcContentBoxWidth(style()->width().value);
+  if (style()->width().isFixed() && style()->width().value() > 0)
+    m_minWidth = m_maxWidth = calcContentBoxWidth(style()->width().value());
 
-  if (style()->minWidth().isFixed() && style()->minWidth().value > 0) {
+  if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxWidth =
-        kMax(m_maxWidth, calcContentBoxWidth(style()->minWidth().value));
+        kMax(m_maxWidth, calcContentBoxWidth(style()->minWidth().value()));
     m_minWidth =
-        kMax(m_minWidth, calcContentBoxWidth(style()->minWidth().value));
+        kMax(m_minWidth, calcContentBoxWidth(style()->minWidth().value()));
   }
 
-  if (style()->maxWidth().isFixed() && style()->maxWidth().value != UNDEFINED) {
+  if (style()->maxWidth().isFixed() &&
+      style()->maxWidth().value() != undefinedLength) {
     m_maxWidth =
-        kMin(m_maxWidth, calcContentBoxWidth(style()->maxWidth().value));
+        kMin(m_maxWidth, calcContentBoxWidth(style()->maxWidth().value()));
     m_minWidth =
-        kMin(m_minWidth, calcContentBoxWidth(style()->maxWidth().value));
+        kMin(m_minWidth, calcContentBoxWidth(style()->maxWidth().value()));
   }
 
   int toAdd = borderLeft() + borderRight() + paddingLeft() + paddingRight();
@@ -1129,12 +1129,12 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
       int w = child->overrideWidth() -
               (child->borderLeft() + child->borderRight() +
                child->paddingLeft() + child->paddingRight());
-      if (child->style()->maxWidth().value != UNDEFINED &&
+      if (child->style()->maxWidth().value() != undefinedLength &&
           child->style()->maxWidth().isFixed())
-        maxW = child->style()->maxWidth().value;
-      else if (child->style()->maxWidth().type == Intrinsic)
+        maxW = child->style()->maxWidth().value();
+      else if (child->style()->maxWidth().type() == Intrinsic)
         maxW = child->maxWidth();
-      else if (child->style()->maxWidth().type == MinIntrinsic)
+      else if (child->style()->maxWidth().type() == MinIntrinsic)
         maxW = child->minWidth();
       int allowedGrowth = kMax(0, maxW - w);
       return allowedGrowth;
@@ -1144,9 +1144,9 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
       int h = child->overrideHeight() -
               (child->borderTop() + child->borderBottom() +
                child->paddingTop() + child->paddingBottom());
-      if (child->style()->maxHeight().value != UNDEFINED &&
+      if (child->style()->maxHeight().value() != undefinedLength &&
           child->style()->maxHeight().isFixed())
-        maxH = child->style()->maxHeight().value;
+        maxH = child->style()->maxHeight().value();
       int allowedGrowth = kMax(0, maxH - h);
       return allowedGrowth;
     }
@@ -1157,17 +1157,17 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
     int minW = child->minWidth();
     int w = child->contentWidth();
     if (child->style()->minWidth().isFixed())
-      minW = child->style()->minWidth().value;
-    else if (child->style()->minWidth().type == Intrinsic)
+      minW = child->style()->minWidth().value();
+    else if (child->style()->minWidth().type() == Intrinsic)
       minW = child->maxWidth();
-    else if (child->style()->minWidth().type == MinIntrinsic)
+    else if (child->style()->minWidth().type() == MinIntrinsic)
       minW = child->minWidth();
 
     int allowedShrinkage = kMin(0, minW - w);
     return allowedShrinkage;
   } else {
     if (child->style()->minHeight().isFixed()) {
-      int minH = child->style()->minHeight().value;
+      int minH = child->style()->minHeight().value();
       int h = child->contentHeight();
       int allowedShrinkage = kMin(0, minH - h);
       return allowedShrinkage;

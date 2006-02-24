@@ -25,26 +25,24 @@
  */
 
 #include "config.h"
-#include <qpainter.h>
-#include "Pen.h"
-
 #include "render_box.h"
-#include "render_replaced.h"
-#include "render_canvas.h"
-#include "render_flexbox.h"
-#include "render_arena.h"
-#include "render_theme.h"
-#include "RenderTableCell.h"
 
+#include "CachedImage.h"
 #include "DocumentImpl.h"
 #include "HTMLElementImpl.h"
-#include "CachedImage.h"
-
+#include "Pen.h"
+#include "RenderTableCell.h"
+#include "htmlnames.h"
+#include "render_arena.h"
+#include "render_canvas.h"
+#include "render_flexbox.h"
 #include "render_line.h"
-
+#include "render_replaced.h"
+#include "render_theme.h"
 #include <FrameView.h>
 #include <assert.h>
-#include "htmlnames.h"
+#include <qpainter.h>
+#include <qpalette.h>
 
 namespace WebCore {
 
@@ -533,7 +531,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       EBackgroundRepeat bgr = bgLayer->backgroundRepeat();
       if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && w > pixw) {
         cw = pixw;
-        int xPosition = bgLayer->backgroundXPosition().minWidth(pw - pixw);
+        int xPosition = bgLayer->backgroundXPosition().calcMinValue(pw - pixw);
         if (xPosition >= 0)
           cx = _tx + xPosition;
         else {
@@ -549,7 +547,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
         cw = w;
         cx = _tx;
         if (pixw > 0) {
-          int xPosition = bgLayer->backgroundXPosition().minWidth(pw - pixw);
+          int xPosition =
+              bgLayer->backgroundXPosition().calcMinValue(pw - pixw);
           if ((xPosition > 0) && (bgr == NO_REPEAT)) {
             cx += xPosition;
             cw -= xPosition;
@@ -562,7 +561,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
 
       if ((bgr == NO_REPEAT || bgr == REPEAT_X) && h > pixh) {
         ch = pixh;
-        int yPosition = bgLayer->backgroundYPosition().minWidth(ph - pixh);
+        int yPosition = bgLayer->backgroundYPosition().calcMinValue(ph - pixh);
         if (yPosition >= 0)
           cy = _ty + yPosition;
         else {
@@ -579,7 +578,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
         ch = h;
         cy = _ty;
         if (pixh > 0) {
-          int yPosition = bgLayer->backgroundYPosition().minWidth(ph - pixh);
+          int yPosition =
+              bgLayer->backgroundYPosition().calcMinValue(ph - pixh);
           if ((yPosition > 0) && (bgr == NO_REPEAT)) {
             cy += yPosition;
             ch -= yPosition;
@@ -600,22 +600,24 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       EBackgroundRepeat bgr = bgLayer->backgroundRepeat();
       if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && pw > pixw) {
         cw = pixw;
-        cx = vr.x() + bgLayer->backgroundXPosition().minWidth(pw - pixw);
+        cx = vr.x() + bgLayer->backgroundXPosition().calcMinValue(pw - pixw);
       } else {
         cw = pw;
         cx = vr.x();
         if (pixw > 0)
-          sx = pixw - bgLayer->backgroundXPosition().minWidth(pw - pixw) % pixw;
+          sx = pixw -
+               bgLayer->backgroundXPosition().calcMinValue(pw - pixw) % pixw;
       }
 
       if ((bgr == NO_REPEAT || bgr == REPEAT_X) && ph > pixh) {
         ch = pixh;
-        cy = vr.y() + bgLayer->backgroundYPosition().minWidth(ph - pixh);
+        cy = vr.y() + bgLayer->backgroundYPosition().calcMinValue(ph - pixh);
       } else {
         ch = ph;
         cy = vr.y();
         if (pixh > 0)
-          sy = pixh - bgLayer->backgroundYPosition().minWidth(ph - pixh) % pixh;
+          sy = pixh -
+               bgLayer->backgroundYPosition().calcMinValue(ph - pixh) % pixh;
       }
 
       IntRect b =
@@ -670,28 +672,28 @@ IntRect RenderBox::getClipRect(int tx, int ty) {
   int cliph = m_height;
 
   if (!style()->clipLeft().isAuto()) {
-    int c = style()->clipLeft().width(m_width);
+    int c = style()->clipLeft().calcValue(m_width);
     clipx += c;
     clipw -= c;
   }
 
   if (!style()->clipRight().isAuto()) {
-    int w = style()->clipRight().width(m_width);
+    int w = style()->clipRight().calcValue(m_width);
     clipw -= m_width - w;
   }
 
   if (!style()->clipTop().isAuto()) {
-    int c = style()->clipTop().width(m_height);
+    int c = style()->clipTop().calcValue(m_height);
     clipy += c;
     cliph -= c;
   }
+
   if (!style()->clipBottom().isAuto()) {
-    int h = style()->clipBottom().width(m_height);
+    int h = style()->clipBottom().calcValue(m_height);
     cliph -= m_height - h;
   }
 
-  IntRect cr(clipx, clipy, clipw, cliph);
-  return cr;
+  return IntRect(clipx, clipy, clipw, cliph);
 }
 
 int RenderBox::containingBlockWidth() const {
@@ -943,17 +945,17 @@ void RenderBox::repaintDuringLayoutIfMoved(int oldX, int oldY) {
 
 void RenderBox::relativePositionOffset(int& tx, int& ty) {
   if (!style()->left().isAuto())
-    tx += style()->left().width(containingBlockWidth());
+    tx += style()->left().calcValue(containingBlockWidth());
   else if (!style()->right().isAuto())
-    tx -= style()->right().width(containingBlockWidth());
+    tx -= style()->right().calcValue(containingBlockWidth());
   if (!style()->top().isAuto()) {
     if (!style()->top().isPercent() ||
         containingBlock()->style()->height().isFixed())
-      ty += style()->top().width(containingBlockHeight());
+      ty += style()->top().calcValue(containingBlockHeight());
   } else if (!style()->bottom().isAuto()) {
     if (!style()->bottom().isPercent() ||
         containingBlock()->style()->height().isFixed())
-      ty -= style()->bottom().width(containingBlockHeight());
+      ty -= style()->bottom().calcValue(containingBlockHeight());
   }
 }
 
@@ -996,24 +998,24 @@ void RenderBox::calcWidth() {
 
     if (isInline() && !isInlineBlockOrInlineTable()) {
       // just calculate margins
-      m_marginLeft = ml.minWidth(cw);
-      m_marginRight = mr.minWidth(cw);
+      m_marginLeft = ml.calcMinValue(cw);
+      m_marginRight = mr.calcMinValue(cw);
       if (treatAsReplaced) {
-        m_width = w.width(cw) + borderLeft() + borderRight() + paddingLeft() +
-                  paddingRight();
+        m_width = w.calcValue(cw) + borderLeft() + borderRight() +
+                  paddingLeft() + paddingRight();
         m_width = kMax(m_width, m_minWidth);
       }
       return;
     } else {
       LengthType widthType, minWidthType, maxWidthType;
       if (treatAsReplaced) {
-        m_width = w.width(cw) + borderLeft() + borderRight() + paddingLeft() +
-                  paddingRight();
-        widthType = w.type;
+        m_width = w.calcValue(cw) + borderLeft() + borderRight() +
+                  paddingLeft() + paddingRight();
+        widthType = w.type();
       } else {
         m_width = calcWidthUsing(Width, cw, widthType);
         int minW = calcWidthUsing(MinWidth, cw, minWidthType);
-        int maxW = style()->maxWidth().value == UNDEFINED
+        int maxW = style()->maxWidth().value() == undefinedLength
                        ? m_width
                        : calcWidthUsing(MaxWidth, cw, maxWidthType);
 
@@ -1028,8 +1030,8 @@ void RenderBox::calcWidth() {
       }
 
       if (widthType == Auto) {
-        m_marginLeft = ml.minWidth(cw);
-        m_marginRight = mr.minWidth(cw);
+        m_marginLeft = ml.calcMinValue(cw);
+        m_marginRight = mr.calcMinValue(cw);
       } else {
         calcHorizontalMargins(ml, mr, cw);
       }
@@ -1057,11 +1059,11 @@ int RenderBox::calcWidthUsing(WidthType widthType,
   else
     w = style()->maxWidth();
 
-  lengthType = w.type;
+  lengthType = w.type();
 
   if (w.isIntrinsicOrAuto()) {
-    int marginLeft = style()->marginLeft().minWidth(cw);
-    int marginRight = style()->marginRight().minWidth(cw);
+    int marginLeft = style()->marginLeft().calcMinValue(cw);
+    int marginRight = style()->marginRight().calcMinValue(cw);
     if (cw)
       width = cw - marginLeft - marginRight;
 
@@ -1070,7 +1072,7 @@ int RenderBox::calcWidthUsing(WidthType widthType,
       width = kMin(width, m_maxWidth);
     }
   } else
-    width = calcBorderBoxWidth(w.width(cw));
+    width = calcBorderBoxWidth(w.calcValue(cw));
 
   return width;
 }
@@ -1087,7 +1089,7 @@ bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
   // the size when testing both
   // min-width and width.  max-width is only clamped if it is also intrinsic.
   Length width = widthType == MaxWidth ? style()->maxWidth() : style()->width();
-  if (width.type == Intrinsic)
+  if (width.type() == Intrinsic)
     return true;
 
   // Children of a horizontal marquee do not fill the container by default.
@@ -1117,33 +1119,33 @@ void RenderBox::calcHorizontalMargins(const Length& ml,
   if (isFloating() || isInline())  // Inline blocks/tables and floats don't have
                                    // their margins increased.
   {
-    m_marginLeft = ml.minWidth(cw);
-    m_marginRight = mr.minWidth(cw);
+    m_marginLeft = ml.calcMinValue(cw);
+    m_marginRight = mr.calcMinValue(cw);
   } else {
-    if ((ml.type == Auto && mr.type == Auto && m_width < cw) ||
-        (ml.type != Auto && mr.type != Auto &&
+    if ((ml.isAuto() && mr.isAuto() && m_width < cw) ||
+        (!ml.isAuto() && !mr.isAuto() &&
          containingBlock()->style()->textAlign() == KHTML_CENTER)) {
       m_marginLeft = (cw - m_width) / 2;
       if (m_marginLeft < 0)
         m_marginLeft = 0;
       m_marginRight = cw - m_width - m_marginLeft;
-    } else if ((mr.type == Auto && m_width < cw) ||
-               (ml.type != Auto &&
+    } else if ((mr.isAuto() && m_width < cw) ||
+               (!ml.isAuto() &&
                 containingBlock()->style()->direction() == RTL &&
                 containingBlock()->style()->textAlign() == KHTML_LEFT)) {
-      m_marginLeft = ml.width(cw);
+      m_marginLeft = ml.calcValue(cw);
       m_marginRight = cw - m_width - m_marginLeft;
-    } else if ((ml.type == Auto && m_width < cw) ||
-               (mr.type != Auto &&
+    } else if ((ml.isAuto() && m_width < cw) ||
+               (!mr.isAuto() &&
                 containingBlock()->style()->direction() == LTR &&
                 containingBlock()->style()->textAlign() == KHTML_RIGHT)) {
-      m_marginRight = mr.width(cw);
+      m_marginRight = mr.calcValue(cw);
       m_marginLeft = cw - m_width - m_marginRight;
     } else {
       // this makes auto margins 0 if we failed a m_width<cw test above (css2.1,
       // 10.3.3)
-      m_marginLeft = ml.minWidth(cw);
-      m_marginRight = mr.minWidth(cw);
+      m_marginLeft = ml.calcMinValue(cw);
+      m_marginRight = mr.calcMinValue(cw);
     }
   }
 }
@@ -1205,7 +1207,7 @@ void RenderBox::calcHeight() {
         height = m_height;
       int minH =
           calcHeightUsing(style()->minHeight());  // Leave as -1 if unset.
-      int maxH = style()->maxHeight().value == UNDEFINED
+      int maxH = style()->maxHeight().value() == undefinedLength
                      ? height
                      : calcHeightUsing(style()->maxHeight());
       if (maxH == -1)
@@ -1218,7 +1220,7 @@ void RenderBox::calcHeight() {
       // been given as an override.  Just use that.  The value has already been
       // adjusted
       // for box-sizing.
-      height = h.value + borderTop() + borderBottom() + paddingTop() +
+      height = h.value() + borderTop() + borderBottom() + paddingTop() +
                paddingBottom();
 
     m_height = height;
@@ -1257,7 +1259,7 @@ int RenderBox::calcHeightUsing(const Length& h) {
   int height = -1;
   if (!h.isAuto()) {
     if (h.isFixed())
-      height = h.value;
+      height = h.value();
     else if (h.isPercent())
       height = calcPercentageHeight(h);
     if (height != -1) {
@@ -1321,7 +1323,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
   // specified
   // height.
   else if (cb->style()->height().isFixed())
-    result = cb->calcContentBoxHeight(cb->style()->height().value);
+    result = cb->calcContentBoxHeight(cb->style()->height().value());
   else if (cb->style()->height().isPercent()) {
     // We need to recur and compute the percentage height for our containing
     // block.
@@ -1345,7 +1347,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
   }
 
   if (result != -1) {
-    result = height.width(result);
+    result = height.calcValue(result);
     if (includeBorderPadding) {
       // It is necessary to use the border-box to match WinIE's broken
       // box model.  This is essential for sizing inside
@@ -1360,7 +1362,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
 int RenderBox::calcReplacedWidth() const {
   int width = calcReplacedWidthUsing(Width);
   int minW = calcReplacedWidthUsing(MinWidth);
-  int maxW = style()->maxWidth().value == UNDEFINED
+  int maxW = style()->maxWidth().value() == undefinedLength
                  ? width
                  : calcReplacedWidthUsing(MaxWidth);
 
@@ -1379,13 +1381,13 @@ int RenderBox::calcReplacedWidthUsing(WidthType widthType) const {
   else
     w = style()->maxWidth();
 
-  switch (w.type) {
+  switch (w.type()) {
     case Fixed:
-      return calcContentBoxWidth(w.value);
+      return calcContentBoxWidth(w.value());
     case Percent: {
       const int cw = containingBlockWidth();
       if (cw > 0)
-        return calcContentBoxWidth(w.minWidth(cw));
+        return calcContentBoxWidth(w.calcMinValue(cw));
     }
     // fall through
     default:
@@ -1396,7 +1398,7 @@ int RenderBox::calcReplacedWidthUsing(WidthType widthType) const {
 int RenderBox::calcReplacedHeight() const {
   int height = calcReplacedHeightUsing(Height);
   int minH = calcReplacedHeightUsing(MinHeight);
-  int maxH = style()->maxHeight().value == UNDEFINED
+  int maxH = style()->maxHeight().value() == undefinedLength
                  ? height
                  : calcReplacedHeightUsing(MaxHeight);
 
@@ -1417,14 +1419,14 @@ int RenderBox::calcReplacedHeightUsing(HeightType heightType) const {
     h = style()->minHeight();
   else
     h = style()->maxHeight();
-  switch (h.type) {
+  switch (h.type()) {
     case Percent:
       return availableHeightUsing(h);
     case Fixed:
-      return calcContentBoxHeight(h.value);
+      return calcContentBoxHeight(h.value());
     default:
       return intrinsicHeight();
-  };
+  }
 }
 
 int RenderBox::availableHeight() const {
@@ -1433,7 +1435,7 @@ int RenderBox::availableHeight() const {
 
 int RenderBox::availableHeightUsing(const Length& h) const {
   if (h.isFixed())
-    return calcContentBoxHeight(h.value);
+    return calcContentBoxHeight(h.value());
 
   if (isCanvas())
     return static_cast<const RenderCanvas*>(this)->view()->visibleHeight();
@@ -1448,7 +1450,8 @@ int RenderBox::availableHeightUsing(const Length& h) const {
            (borderLeft() + borderRight() + paddingLeft() + paddingRight());
 
   if (h.isPercent())
-    return calcContentBoxHeight(h.width(containingBlock()->availableHeight()));
+    return calcContentBoxHeight(
+        h.calcValue(containingBlock()->availableHeight()));
 
   return containingBlock()->availableHeight();
 }
@@ -1468,8 +1471,8 @@ void RenderBox::calcVerticalMargins() {
   // the containing block (8.3)
   int cw = containingBlock()->contentWidth();
 
-  m_marginTop = tm.minWidth(cw);
-  m_marginBottom = bm.minWidth(cw);
+  m_marginTop = tm.calcMinValue(cw);
+  m_marginBottom = bm.calcMinValue(cw);
 }
 
 void RenderBox::setStaticX(int staticX) {
@@ -1494,9 +1497,9 @@ void RenderBox::calcAbsoluteHorizontal() {
   cw = containingBlockWidth() + cb->paddingLeft() + cb->paddingRight();
 
   if (!style()->left().isAuto())
-    l = style()->left().width(cw);
+    l = style()->left().calcValue(cw);
   if (!style()->right().isAuto())
-    r = style()->right().width(cw);
+    r = style()->right().calcValue(cw);
 
   int static_distance = 0;
   if ((parent()->style()->direction() == LTR && (l == AUTO && r == AUTO)) ||
@@ -1536,7 +1539,7 @@ void RenderBox::calcAbsoluteHorizontal() {
                                minW, minML, minMR, minX);
 
   int maxW = m_width, maxML, maxMR, maxX;
-  if (style()->maxWidth().value != UNDEFINED)
+  if (style()->maxWidth().value() != undefinedLength)
     calcAbsoluteHorizontalValues(MaxWidth, cb, cw, static_distance, pab, l, r,
                                  maxW, maxML, maxMR, maxX);
 
@@ -1570,9 +1573,9 @@ void RenderBox::calcAbsoluteHorizontalValues(WidthType widthType,
   w = ml = mr = AUTO;
 
   if (!style()->marginLeft().isAuto())
-    ml = style()->marginLeft().width(cw);
+    ml = style()->marginLeft().calcValue(cw);
   if (!style()->marginRight().isAuto())
-    mr = style()->marginRight().width(cw);
+    mr = style()->marginRight().calcValue(cw);
 
   Length width;
   if (widthType == Width)
@@ -1583,7 +1586,7 @@ void RenderBox::calcAbsoluteHorizontalValues(WidthType widthType,
     width = style()->maxWidth();
 
   if (!width.isIntrinsicOrAuto())
-    w = calcContentBoxWidth(width.width(cw));
+    w = calcContentBoxWidth(width.calcValue(cw));
   else if (isReplaced())
     w = calcReplacedWidth();
 
@@ -1691,9 +1694,9 @@ void RenderBox::calcAbsoluteVertical() {
     ch = cb->height() - cb->borderTop() - cb->borderBottom();
 
   if (!style()->top().isAuto())
-    t = style()->top().width(ch);
+    t = style()->top().calcValue(ch);
   if (!style()->bottom().isAuto())
-    b = style()->bottom().width(ch);
+    b = style()->bottom().calcValue(ch);
 
   int h, mt, mb, y;
   calcAbsoluteVerticalValues(Height, cb, ch, pab, t, b, h, mt, mb, y);
@@ -1705,7 +1708,7 @@ void RenderBox::calcAbsoluteVertical() {
                              minY);
 
   int maxH = h, maxMT, maxMB, maxY;
-  if (style()->maxHeight().value != UNDEFINED)
+  if (style()->maxHeight().value() != undefinedLength)
     calcAbsoluteVerticalValues(MaxHeight, cb, ch, pab, t, b, maxH, maxMT, maxMB,
                                maxY);
 
@@ -1750,9 +1753,9 @@ void RenderBox::calcAbsoluteVerticalValues(HeightType heightType,
   h = mt = mb = AUTO;
 
   if (!style()->marginTop().isAuto())
-    mt = style()->marginTop().width(ch);
+    mt = style()->marginTop().calcValue(ch);
   if (!style()->marginBottom().isAuto())
-    mb = style()->marginBottom().width(ch);
+    mb = style()->marginBottom().calcValue(ch);
 
   Length height;
   if (heightType == Height)
@@ -1769,7 +1772,7 @@ void RenderBox::calcAbsoluteVerticalValues(HeightType heightType,
     // height instead.
     h = ourHeight - pab;
   else if (!height.isAuto()) {
-    h = calcContentBoxHeight(height.width(ch));
+    h = calcContentBoxHeight(height.calcValue(ch));
     if (ourHeight - pab > h)
       ourHeight = h + pab;
   } else if (isReplaced())

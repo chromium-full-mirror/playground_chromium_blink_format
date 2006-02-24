@@ -25,19 +25,20 @@
 #include "config.h"
 #include "NodeImpl.h"
 
+#include "AtomicString.h"
 #include "ChildNodeListImpl.h"
 #include "DOMImplementationImpl.h"
 #include "DocumentImpl.h"
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameView.h"
-#include "KWQEvent.h"
+#include "MouseEvent.h"
+#include "TextImpl.h"
+#include "WheelEvent.h"
 #include "dom2_events.h"
 #include "dom2_eventsimpl.h"
-#include "AtomicString.h"
 #include "dom_exception.h"
 #include "dom_node.h"
-#include "TextImpl.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
 #include "kjs_binding.h"
@@ -641,65 +642,21 @@ void NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
   }
 }
 
-bool NodeImpl::dispatchMouseEvent(QMouseEvent* _mouse,
-                                  const AtomicString& overrideType,
-                                  int overrideDetail,
+bool NodeImpl::dispatchMouseEvent(MouseEvent* _mouse,
+                                  const AtomicString& eventType,
+                                  int detail,
                                   NodeImpl* relatedTarget) {
   assert(!eventDispatchForbidden());
-  int detail = overrideDetail;  // defaults to 0
-  AtomicString eventType;
-  if (!overrideType.isEmpty()) {
-    eventType = overrideType;
-  } else {
-    switch (_mouse->type()) {
-      case QEvent::MouseButtonPress:
-        eventType = mousedownEvent;
-        break;
-      case QEvent::MouseButtonRelease:
-        eventType = mouseupEvent;
-        break;
-      case QEvent::MouseButtonDblClick:
-        eventType = clickEvent;
-        detail = _mouse->clickCount();
-        break;
-      case QEvent::MouseMove:
-        eventType = mousemoveEvent;
-        break;
-      default:
-        break;
-    }
-  }
 
   int clientX = 0;
   int clientY = 0;
   if (FrameView* view = getDocument()->view())
     view->viewportToContents(_mouse->x(), _mouse->y(), clientX, clientY);
-  int screenX = _mouse->globalX();
-  int screenY = _mouse->globalY();
 
-  int button = -1;
-  switch (_mouse->button()) {
-    case Qt::LeftButton:
-      button = 0;
-      break;
-    case Qt::MidButton:
-      button = 1;
-      break;
-    case Qt::RightButton:
-      button = 2;
-      break;
-    default:
-      break;
-  }
-
-  bool ctrlKey = (_mouse->state() & Qt::ControlButton);
-  bool altKey = (_mouse->state() & Qt::AltButton);
-  bool shiftKey = (_mouse->state() & Qt::ShiftButton);
-  bool metaKey = (_mouse->state() & Qt::MetaButton);
-
-  return dispatchMouseEvent(eventType, button, detail, clientX, clientY,
-                            screenX, screenY, ctrlKey, altKey, shiftKey,
-                            metaKey, false, relatedTarget);
+  return dispatchMouseEvent(
+      eventType, _mouse->button(), detail, clientX, clientY, _mouse->globalX(),
+      _mouse->globalY(), _mouse->ctrlKey(), _mouse->altKey(),
+      _mouse->shiftKey(), _mouse->metaKey(), false, relatedTarget);
 }
 
 bool NodeImpl::dispatchSimulatedMouseEvent(const AtomicString& eventType) {
@@ -857,7 +814,7 @@ bool NodeImpl::dispatchSubtreeModifiedEvent(bool sendChildrenChanged) {
       exceptioncode, true);
 }
 
-bool NodeImpl::dispatchKeyEvent(QKeyEvent* key) {
+bool NodeImpl::dispatchKeyEvent(KeyEvent* key) {
   assert(!eventDispatchForbidden());
   int exceptioncode = 0;
   RefPtr<KeyboardEventImpl> keyboardEventImpl =
@@ -873,7 +830,7 @@ bool NodeImpl::dispatchKeyEvent(QKeyEvent* key) {
   return r;
 }
 
-void NodeImpl::dispatchWheelEvent(QWheelEvent* e) {
+void NodeImpl::dispatchWheelEvent(WheelEvent* e) {
   assert(!eventDispatchForbidden());
   if (e->delta() == 0)
     return;
@@ -890,13 +847,10 @@ void NodeImpl::dispatchWheelEvent(QWheelEvent* e) {
   int y;
   view->viewportToContents(e->x(), e->y(), x, y);
 
-  int state = e->state();
-
   RefPtr<WheelEventImpl> we = new WheelEventImpl(
-      e->orientation() == Qt::Horizontal, e->delta(),
-      getDocument()->defaultView(), e->globalX(), e->globalY(), x, y,
-      state & Qt::ControlButton, state & Qt::AltButton, state & Qt::ShiftButton,
-      state & Qt::MetaButton);
+      e->isHorizontal(), e->delta(), getDocument()->defaultView(), e->globalX(),
+      e->globalY(), x, y, e->ctrlKey(), e->altKey(), e->shiftKey(),
+      e->metaKey());
 
   int exceptionCode = 0;
   if (!dispatchEvent(we, exceptionCode, true))

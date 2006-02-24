@@ -24,22 +24,22 @@
 #ifndef RenderBlock_H
 #define RenderBlock_H
 
-#include <qptrlist.h>
-
+#include "GapRects.h"
 #include "render_flow.h"
-
-typedef enum {
-  CursorCaret,
-  DragCaret,
-} CaretType;
+#include <qptrlist.h>
 
 namespace WebCore {
 
 class Position;
 
+enum CaretType {
+  CursorCaret,
+  DragCaret,
+};
+
 class RenderBlock : public RenderFlow {
  public:
-  RenderBlock(DOM::NodeImpl* node);
+  RenderBlock(NodeImpl*);
   virtual ~RenderBlock();
 
   virtual const char* renderName() const;
@@ -369,9 +369,8 @@ class RenderBlock : public RenderFlow {
   void newLine();
 
  private:
-  DOM::Position positionForBox(InlineBox* box, bool start = true) const;
-  DOM::Position positionForRenderer(RenderObject* renderer,
-                                    bool start = true) const;
+  Position positionForBox(InlineBox* box, bool start = true) const;
+  Position positionForRenderer(RenderObject* renderer, bool start = true) const;
 
  protected:
   struct FloatingObject {
@@ -584,6 +583,6 @@ class RenderBlock : public RenderFlow {
   int m_tabWidth;
 };
 
-};  // namespace
+}  // namespace
 
 #endif  // RENDER_BLOCK_H

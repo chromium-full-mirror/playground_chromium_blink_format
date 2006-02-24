@@ -29,16 +29,15 @@
 #include "render_image.h"
 #include "RenderBlock.h"
 
-class QListboxItem;
-class QListBox;
-
 #include <qtextedit.h>
 #include <qlineedit.h>
-#include <qcombobox.h>
 
 #include "HTMLInputElementImpl.h"
 #include "HTMLSelectElementImpl.h"
 #include "HTMLTextAreaElementImpl.h"
+
+class QComboBox;
+class QListBox;
 
 namespace WebCore {
 
@@ -163,16 +162,6 @@ class RenderLineEdit : public RenderFormElement {
 
 // -------------------------------------------------------------------------
 
-class LineEditWidget : public QLineEdit {
- public:
-  LineEditWidget(Widget* parent);
-
- protected:
-  virtual bool event(QEvent* e);
-};
-
-// -------------------------------------------------------------------------
-
 class RenderFieldset : public RenderBlock {
  public:
   RenderFieldset(DOM::HTMLGenericFormElementImpl* element);
@@ -244,17 +233,6 @@ class RenderLegend : public RenderBlock {
 
 // -------------------------------------------------------------------------
 
-class ComboBoxWidget : public QComboBox {
- public:
-  ComboBoxWidget(Widget* parent);
-
- protected:
-  virtual bool event(QEvent*);
-  virtual bool eventFilter(QObject* dest, QEvent* e);
-};
-
-// -------------------------------------------------------------------------
-
 class RenderSelect : public RenderFormElement {
  public:
   RenderSelect(DOM::HTMLSelectElementImpl* element);
@@ -289,7 +267,7 @@ class RenderSelect : public RenderFormElement {
 
  protected:
   QListBox* createListBox();
-  ComboBoxWidget* createComboBox();
+  QComboBox* createComboBox();
   void setWidgetWritingDirection();
 
   unsigned m_size;
@@ -306,18 +284,7 @@ class RenderSelect : public RenderFormElement {
 
 // -------------------------------------------------------------------------
 
-class TextAreaWidget : public QTextEdit {
- public:
-  TextAreaWidget(Widget* parent);
-
- protected:
-  virtual bool event(QEvent* e);
-};
-
-// -------------------------------------------------------------------------
-
 class RenderTextArea : public RenderFormElement {
-  Q_OBJECT
  public:
   RenderTextArea(DOM::HTMLTextAreaElementImpl* element);
 

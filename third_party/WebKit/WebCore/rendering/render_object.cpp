@@ -741,8 +741,8 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
 
   // These are always percents or auto.
   if (shouldPaintBackgroundImage &&
-      (bgLayer->backgroundXPosition().length() != 0 ||
-       bgLayer->backgroundYPosition().length() != 0))
+      (bgLayer->backgroundXPosition().value() != 0 ||
+       bgLayer->backgroundYPosition().value() != 0))
     return true;  // The background image will shift unpredictably if the size
                   // changes.
 
@@ -1022,15 +1022,16 @@ bool RenderObject::paintBorderImage(QPainter* p,
   int imageWidth = borderImage->image()->width();
   int imageHeight = borderImage->image()->height();
 
-  int topSlice = kMin(imageHeight, style->borderImage().m_slices.top.width(
+  int topSlice = kMin(imageHeight, style->borderImage().m_slices.top.calcValue(
                                        borderImage->image()->height()));
   int bottomSlice =
-      kMin(imageHeight, style->borderImage().m_slices.bottom.width(
+      kMin(imageHeight, style->borderImage().m_slices.bottom.calcValue(
                             borderImage->image()->height()));
-  int leftSlice = kMin(imageWidth, style->borderImage().m_slices.left.width(
+  int leftSlice = kMin(imageWidth, style->borderImage().m_slices.left.calcValue(
                                        borderImage->image()->width()));
-  int rightSlice = kMin(imageWidth, style->borderImage().m_slices.right.width(
-                                        borderImage->image()->width()));
+  int rightSlice =
+      kMin(imageWidth, style->borderImage().m_slices.right.calcValue(
+                           borderImage->image()->width()));
 
   EBorderImageRule hRule = style->borderImage().m_horizontalRule;
   EBorderImageRule vRule = style->borderImage().m_verticalRule;
@@ -1990,7 +1991,7 @@ int RenderObject::paddingTop() const {
   Length padding = m_style->paddingTop();
   if (padding.isPercent())
     w = containingBlock()->contentWidth();
-  w = padding.minWidth(w);
+  w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
   return w;
@@ -2001,7 +2002,7 @@ int RenderObject::paddingBottom() const {
   Length padding = style()->paddingBottom();
   if (padding.isPercent())
     w = containingBlock()->contentWidth();
-  w = padding.minWidth(w);
+  w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
   return w;
@@ -2012,7 +2013,7 @@ int RenderObject::paddingLeft() const {
   Length padding = style()->paddingLeft();
   if (padding.isPercent())
     w = containingBlock()->contentWidth();
-  w = padding.minWidth(w);
+  w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
   return w;
@@ -2023,7 +2024,7 @@ int RenderObject::paddingRight() const {
   Length padding = style()->paddingRight();
   if (padding.isPercent())
     w = containingBlock()->contentWidth();
-  w = padding.minWidth(w);
+  w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
   return w;
@@ -2265,7 +2266,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
   } else if (va == BOTTOM) {
     vpos = PositionBottom;
   } else if (va == LENGTH) {
-    vpos = -style()->verticalAlignLength().width(lineHeight(firstLine));
+    vpos = -style()->verticalAlignLength().calcValue(lineHeight(firstLine));
   } else {
     bool checkParent = parent()->isInline() &&
                        !parent()->isInlineBlockOrInlineTable() &&
@@ -2306,14 +2307,14 @@ short RenderObject::lineHeight(bool firstLine, bool) const {
   Length lh = s->lineHeight();
 
   // its "unset", choose nice default
-  if (lh.value < 0)
+  if (lh.value() < 0)
     return s->fontMetrics().lineSpacing();
 
   if (lh.isPercent())
-    return lh.minWidth(s->font().pixelSize());
+    return lh.calcMinValue(s->font().pixelSize());
 
   // its fixed
-  return lh.value;
+  return lh.value();
 }
 
 short RenderObject::baselinePosition(bool firstLine, bool isRootLineBox) const {
@@ -2513,10 +2514,12 @@ void RenderObject::addDashboardRegions(
 
       DashboardRegionValue region;
       region.label = styleRegion.label;
-      region.bounds = IntRect(
-          styleRegion.offset.left.value, styleRegion.offset.top.value,
-          w - styleRegion.offset.left.value - styleRegion.offset.right.value,
-          h - styleRegion.offset.top.value - styleRegion.offset.bottom.value);
+      region.bounds = IntRect(styleRegion.offset.left.value(),
+                              styleRegion.offset.top.value(),
+                              w - styleRegion.offset.left.value() -
+                                  styleRegion.offset.right.value(),
+                              h - styleRegion.offset.top.value() -
+                                  styleRegion.offset.bottom.value());
       region.type = styleRegion.type;
 
       region.clip = region.bounds;
@@ -2528,8 +2531,8 @@ void RenderObject::addDashboardRegions(
 
       int x, y;
       absolutePosition(x, y);
-      region.bounds.setX(x + styleRegion.offset.left.value);
-      region.bounds.setY(y + styleRegion.offset.top.value);
+      region.bounds.setX(x + styleRegion.offset.left.value());
+      region.bounds.setY(y + styleRegion.offset.top.value());
 
       regions.append(region);
     }

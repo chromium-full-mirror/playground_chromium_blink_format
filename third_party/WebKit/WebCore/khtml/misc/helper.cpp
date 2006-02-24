@@ -26,13 +26,7 @@
 
 #include "KWQTextUtilities.h"
 
-namespace khtml {
-
-QPainter* printpainter = 0;
-
-void setPrintPainter(QPainter* printer) {
-  printpainter = printer;
-}
+namespace WebCore {
 
 void findWordBoundary(const QChar* chars,
                       int len,

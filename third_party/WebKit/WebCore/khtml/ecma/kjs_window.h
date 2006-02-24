@@ -21,12 +21,10 @@
 #ifndef KJS_WINDOW_H_
 #define KJS_WINDOW_H_
 
+#include "QString.h"
 #include "kjs_binding.h"
 #include <kjs/protect.h>
 #include <kxmlcore/HashMap.h>
-#include <qguardedptr.h>
-#include <qobject.h>
-#include <QString.h>
 
 namespace WebCore {
 class AtomicString;
@@ -73,35 +71,6 @@ class PausedTimeouts {
 
 class DOMWindowTimer;
 
-class WindowQObject : public QObject {
-  Q_OBJECT
- public:
-  WindowQObject(Window*);
-  ~WindowQObject() { parentDestroyed(); }
-
-  int installTimeout(const UString& handler, int interval, bool singleShot);
-  int installTimeout(JSValue* function,
-                     const List&,
-                     int interval,
-                     bool singleShot);
-  void clearTimeout(int timerId, bool delAction = true);
-
-  PausedTimeouts* pauseTimeouts();
-  void resumeTimeouts(PausedTimeouts*);
-
-  void timerFired(DOMWindowTimer*);
-
- private slots:
-  void parentDestroyed();
-
- private:
-  int installTimeout(ScheduledAction*, int interval, bool singleShot);
-
-  Window* m_parent;
-  typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
-  TimeoutsMap m_timeouts;
-};
-
 class Screen : public JSObject {
  public:
   enum {
@@ -122,38 +91,37 @@ class Screen : public JSObject {
  private:
   friend class Window;
   Screen(ExecState*, WebCore::Frame*);
-  QGuardedPtr<WebCore::Frame> m_frame;
+  WebCore::Frame* m_frame;
 };
 
 class Window : public JSObject {
-  friend QGuardedPtr<WebCore::Frame> getInstance();
   friend class Location;
   friend class WindowFunc;
-  friend class WindowQObject;
   friend class ScheduledAction;
 
  public:
-  Window(WebCore::Frame* p);
+  Window(WebCore::Frame*);
 
  public:
   ~Window();
+  void disconnectFrame();
   /**
    * Returns and registers a window object. In case there's already a Window
    * for the specified frame p this will be returned in order to have unique
    * bindings.
    */
-  static JSValue* retrieve(WebCore::Frame* p);
+  static JSValue* retrieve(WebCore::Frame*);
   /**
    * Returns the Window object for a given HTML frame
    */
-  static Window* retrieveWindow(WebCore::Frame* p);
+  static Window* retrieveWindow(WebCore::Frame*);
   /**
    * returns a pointer to the Window object this javascript interpreting
    * instance
    * was called from.
    */
   static Window* retrieveActive(ExecState*);
-  QGuardedPtr<WebCore::Frame> frame() const { return m_frame; }
+  WebCore::Frame* frame() const { return m_frame; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -163,15 +131,16 @@ class Window : public JSObject {
                    int attr = None);
   virtual bool toBoolean(ExecState*) const;
 
-  int installTimeout(const UString& handler, int t, bool singleShot) {
-    return winq->installTimeout(handler, t, singleShot);
-  }
-  int installTimeout(JSValue* function, List& args, int t, bool singleShot) {
-    return winq->installTimeout(function, args, t, singleShot);
-  }
-  void clearTimeout(int timerId) { winq->clearTimeout(timerId); }
-  PausedTimeouts* pauseTimeouts() { return winq->pauseTimeouts(); }
-  void resumeTimeouts(PausedTimeouts* t) { winq->resumeTimeouts(t); }
+  int installTimeout(const UString& handler, int t, bool singleShot);
+  int installTimeout(JSValue* function,
+                     const List& args,
+                     int t,
+                     bool singleShot);
+  void clearTimeout(int timerId, bool delAction = true);
+  PausedTimeouts* pauseTimeouts();
+  void resumeTimeouts(PausedTimeouts*);
+
+  void timerFired(DOMWindowTimer*);
 
   KJS::ScriptInterpreter* interpreter() const;
 
@@ -195,7 +164,7 @@ class Window : public JSObject {
   virtual UString toString(ExecState*) const;
 
   // Set the current "event" object
-  void setCurrentEvent(DOM::EventImpl* evt);
+  void setCurrentEvent(WebCore::EventImpl*);
 
   // Set a place to put a dialog return value when the window is cleared.
   void setReturnValueSlot(JSValue** slot) { m_returnValueSlot = slot; }
@@ -314,14 +283,13 @@ class Window : public JSObject {
     ShowModalDialog
   };
 
- protected:
-  JSValue* getListener(ExecState* exec,
-                       const DOM::AtomicString& eventType) const;
-  void setListener(ExecState* exec,
-                   const DOM::AtomicString& eventType,
+ private:
+  JSValue* getListener(ExecState*,
+                       const WebCore::AtomicString& eventType) const;
+  void setListener(ExecState*,
+                   const WebCore::AtomicString& eventType,
                    JSValue* func);
 
- private:
   static JSValue* childFrameGetter(ExecState* exec,
                                    JSObject*,
                                    const Identifier&,
@@ -341,21 +309,25 @@ class Window : public JSObject {
 
   void updateLayout() const;
 
-  QGuardedPtr<WebCore::Frame> m_frame;
+  void clearAllTimeouts();
+  int installTimeout(ScheduledAction*, int interval, bool singleShot);
+
+  WebCore::Frame* m_frame;
   mutable Screen* screen;
   mutable History* history;
   mutable FrameArray* frames;
-  Location* loc;
-  Selection* m_selection;
-  BarInfo* m_locationbar;
-  BarInfo* m_menubar;
-  BarInfo* m_personalbar;
-  BarInfo* m_scrollbars;
-  BarInfo* m_statusbar;
-  BarInfo* m_toolbar;
-  WindowQObject* winq;
-  DOM::EventImpl* m_evt;
+  mutable Location* loc;
+  mutable Selection* m_selection;
+  mutable BarInfo* m_locationbar;
+  mutable BarInfo* m_menubar;
+  mutable BarInfo* m_personalbar;
+  mutable BarInfo* m_scrollbars;
+  mutable BarInfo* m_statusbar;
+  mutable BarInfo* m_toolbar;
+  WebCore::EventImpl* m_evt;
   JSValue** m_returnValueSlot;
+  typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
+  TimeoutsMap m_timeouts;
 };
 
 /**
@@ -407,8 +379,8 @@ class Location : public JSObject {
 
  private:
   friend class Window;
-  Location(WebCore::Frame* p);
-  QGuardedPtr<WebCore::Frame> m_frame;
+  Location(WebCore::Frame*);
+  WebCore::Frame* m_frame;
 };
 
 class Selection : public JSObject {
@@ -445,8 +417,8 @@ class Selection : public JSObject {
 
  private:
   friend class Window;
-  Selection(WebCore::Frame* p);
-  QGuardedPtr<WebCore::Frame> m_frame;
+  Selection(WebCore::Frame*);
+  WebCore::Frame* m_frame;
 };
 
 class BarInfo : public JSObject {
@@ -468,8 +440,8 @@ class BarInfo : public JSObject {
 
  private:
   friend class Window;
-  BarInfo(ExecState* exec, WebCore::Frame* p, Type barType);
-  QGuardedPtr<WebCore::Frame> m_frame;
+  BarInfo(ExecState*, WebCore::Frame*, Type);
+  WebCore::Frame* m_frame;
   Type m_type;
 };
 

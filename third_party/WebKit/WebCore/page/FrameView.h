@@ -31,11 +31,7 @@
 
 #include "QString.h"
 
-class QEvent;
-class QKeyEvent;
-class QMouseEvent;
 class QStringList;
-class QWheelEvent;
 
 namespace WebCore {
 
@@ -55,7 +51,9 @@ class HTMLGenericFormElementImpl;
 class HTMLTitleElementImpl;
 class InlineBox;
 class IntRect;
+class KeyEvent;
 class MacFrame;
+class MouseEvent;
 class NodeImpl;
 class QPainter;
 class RenderBox;
@@ -66,6 +64,7 @@ class RenderPart;
 class RenderPartObject;
 class RenderStyle;
 class RenderWidget;
+class WheelEvent;
 
 template <typename T>
 class Timer;
@@ -174,13 +173,13 @@ class FrameView : public QScrollView {
  public:
   void clearPart();
 
-  virtual void viewportMousePressEvent(QMouseEvent*);
-  virtual void viewportMouseDoubleClickEvent(QMouseEvent*);
-  virtual void viewportMouseMoveEvent(QMouseEvent*);
-  virtual void viewportMouseReleaseEvent(QMouseEvent*);
-  virtual void viewportWheelEvent(QWheelEvent*);
+  void viewportMousePressEvent(MouseEvent*);
+  void viewportMouseDoubleClickEvent(MouseEvent*);
+  void viewportMouseMoveEvent(MouseEvent*);
+  void viewportMouseReleaseEvent(MouseEvent*);
+  void viewportWheelEvent(WheelEvent*);
+  void keyPressEvent(KeyEvent*);
 
-  void keyPressEvent(QKeyEvent* _ke);
   void doAutoScroll();
 
   bool updateDragAndDrop(const IntPoint&, ClipboardImpl* clipboard);
@@ -270,14 +269,13 @@ class FrameView : public QScrollView {
   void addFormCompletionItem(const QString& name, const QString& value);
 
   bool dispatchMouseEvent(const AtomicString& eventType,
-                          NodeImpl* targetNode,
+                          NodeImpl* target,
                           bool cancelable,
                           int detail,
-                          QMouseEvent*,
-                          bool setUnder,
-                          int mouseEventType);
+                          MouseEvent*,
+                          bool setUnder);
   bool dispatchDragEvent(const AtomicString& eventType,
-                         NodeImpl* dragTarget,
+                         NodeImpl* target,
                          const IntPoint& loc,
                          ClipboardImpl*);
 

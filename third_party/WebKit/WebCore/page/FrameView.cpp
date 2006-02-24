@@ -31,16 +31,18 @@
 #include "Frame.h"
 #include "HTMLInputElementImpl.h"
 #include "KWQAccObjectCache.h"
-#include "KWQEvent.h"
+#include "KeyEvent.h"
+#include "MouseEvent.h"
+#include "MouseEventWithHitTestResults.h"
 #include "RenderText.h"
 #include "SelectionController.h"
+#include "WheelEvent.h"
 #include "cssstyleselector.h"
 #include "dom2_eventsimpl.h"
 #include "helper.h"
 #include "html_documentimpl.h"
 #include "html_inlineimpl.h"
 #include "htmlnames.h"
-#include "khtml_events.h"
 #include "khtml_settings.h"
 #include "render_arena.h"
 #include "render_canvas.h"
@@ -455,36 +457,33 @@ void FrameView::layout() {
 //
 /////////////////
 
-void FrameView::viewportMousePressEvent(QMouseEvent* _mouse) {
+void FrameView::viewportMousePressEvent(MouseEvent* mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
+  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
 
   d->mousePressed = true;
 
-  NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MousePress);
-  m_frame->document()->prepareMouseEvent(false, xm, ym, &mev);
+  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
+      false, true, false, xm, ym, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev)) {
     invalidateClick();
     return;
   }
 
-  d->clickCount = _mouse->clickCount();
-  d->clickNode = mev.innerNode;
+  d->clickCount = mouseEvent->clickCount();
+  d->clickNode = mev.innerNode();
 
-  bool swallowEvent =
-      dispatchMouseEvent(mousedownEvent, mev.innerNode.get(), true,
-                         d->clickCount, _mouse, true, NodeImpl::MousePress);
+  bool swallowEvent = dispatchMouseEvent(mousedownEvent, mev.innerNode(), true,
+                                         d->clickCount, mouseEvent, true);
 
   if (!swallowEvent) {
-    MousePressEvent event(_mouse, xm, ym, mev.url, mev.target,
-                          mev.innerNode.get());
-    m_frame->khtmlMousePressEvent(&event);
+    m_frame->khtmlMousePressEvent(&mev);
     // Many AK widgets run their own event loops and consume events while the
     // mouse is down.
     // When they finish, currentEvent is the mouseUp that they exited on.  We
@@ -498,42 +497,36 @@ void FrameView::viewportMousePressEvent(QMouseEvent* _mouse) {
   }
 }
 
-void FrameView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
+void FrameView::viewportMouseDoubleClickEvent(MouseEvent* mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
+  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
 
   // We get this instead of a second mouse-up
   d->mousePressed = false;
 
-  NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MouseDblClick);
-  m_frame->document()->prepareMouseEvent(false, xm, ym, &mev);
+  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
+      false, true, false, xm, ym, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev))
     return;
 
-  d->clickCount = _mouse->clickCount();
-  bool swallowEvent =
-      dispatchMouseEvent(mouseupEvent, mev.innerNode.get(), true, d->clickCount,
-                         _mouse, false, NodeImpl::MouseRelease);
+  d->clickCount = mouseEvent->clickCount();
+  bool swallowEvent = dispatchMouseEvent(mouseupEvent, mev.innerNode(), true,
+                                         d->clickCount, mouseEvent, false);
 
-  if (mev.innerNode == d->clickNode)
-    dispatchMouseEvent(clickEvent, mev.innerNode.get(), true, d->clickCount,
-                       _mouse, true, NodeImpl::MouseRelease);
+  if (mev.innerNode() == d->clickNode)
+    dispatchMouseEvent(clickEvent, mev.innerNode(), true, d->clickCount,
+                       mouseEvent, true);
 
   // Qt delivers a release event AND a double click event.
   if (!swallowEvent) {
-    MouseReleaseEvent event1(_mouse, xm, ym, mev.url, mev.target,
-                             mev.innerNode.get());
-    m_frame->khtmlMouseReleaseEvent(&event1);
-
-    MouseDoubleClickEvent event2(_mouse, xm, ym, mev.url, mev.target,
-                                 mev.innerNode.get());
-    m_frame->khtmlMouseDoubleClickEvent(&event2);
+    m_frame->khtmlMouseReleaseEvent(&mev);
+    m_frame->khtmlMouseDoubleClickEvent(&mev);
   }
 
   invalidateClick();
@@ -545,14 +538,14 @@ static bool isSubmitImage(NodeImpl* node) {
              HTMLInputElementImpl::IMAGE;
 }
 
-static Cursor selectCursor(const NodeImpl::MouseEvent& event,
+static Cursor selectCursor(const MouseEventWithHitTestResults& event,
                            Frame* frame,
                            bool mousePressed) {
   // During selection, use an I-beam no matter what we're over.
   if (mousePressed && frame->hasSelection())
     return iBeamCursor();
 
-  NodeImpl* node = event.innerNode.get();
+  NodeImpl* node = event.innerNode();
   RenderObject* renderer = node ? node->renderer() : 0;
   RenderStyle* style = renderer ? renderer->style() : 0;
 
@@ -561,7 +554,7 @@ static Cursor selectCursor(const NodeImpl::MouseEvent& event,
 
   switch (style ? style->cursor() : CURSOR_AUTO) {
     case CURSOR_AUTO:
-      if (!event.url.isNull() || isSubmitImage(node))
+      if (!event.url().isNull() || isSubmitImage(node))
         return handCursor();
       if ((node && node->isContentEditable()) ||
           (renderer && renderer->isText() && renderer->canSelect()))
@@ -601,7 +594,7 @@ static Cursor selectCursor(const NodeImpl::MouseEvent& event,
   return pointerCursor();
 }
 
-void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
+void FrameView::viewportMouseMoveEvent(MouseEvent* mouseEvent) {
   // in Radar 3703768 we saw frequent crashes apparently due to the
   // part being null here, which seems impossible, so check for nil
   // but also assert so that we can try to figure this out in debug
@@ -614,7 +607,7 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
     d->hoverTimer.stop();
 
   int xm, ym;
-  viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
+  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
 
   // Treat mouse move events while the mouse is pressed as "read-only" in
   // prepareMouseEvent
@@ -623,23 +616,17 @@ void FrameView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   // the mouse
   // was pressed, rather than updating for nodes the mouse moves over as you
   // hold the mouse down.
-  NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MouseMove);
-  m_frame->document()->prepareMouseEvent(
+  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
       d->mousePressed && m_frame->mouseDownMayStartSelect(), d->mousePressed,
-      xm, ym, &mev);
+      true, xm, ym, mouseEvent);
 
   if (!m_frame->passSubframeEventToSubframe(mev))
     viewport()->setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
 
-  bool swallowEvent =
-      dispatchMouseEvent(mousemoveEvent, mev.innerNode.get(), false, 0, _mouse,
-                         true, NodeImpl::MouseMove);
-
-  if (!swallowEvent) {
-    MouseMoveEvent event(_mouse, xm, ym, mev.url, mev.target,
-                         mev.innerNode.get());
-    m_frame->khtmlMouseMoveEvent(&event);
-  }
+  bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.innerNode(), false,
+                                         0, mouseEvent, true);
+  if (!swallowEvent)
+    m_frame->khtmlMouseMoveEvent(&mev);
 }
 
 void FrameView::invalidateClick() {
@@ -647,41 +634,37 @@ void FrameView::invalidateClick() {
   d->clickNode = 0;
 }
 
-void FrameView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
+void FrameView::viewportMouseReleaseEvent(MouseEvent* mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
+  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
 
   d->mousePressed = false;
 
-  NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MouseRelease);
-  m_frame->document()->prepareMouseEvent(false, xm, ym, &mev);
+  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
+      false, false, false, xm, ym, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev))
     return;
 
-  bool swallowEvent =
-      dispatchMouseEvent(mouseupEvent, mev.innerNode.get(), true, d->clickCount,
-                         _mouse, false, NodeImpl::MouseRelease);
+  bool swallowEvent = dispatchMouseEvent(mouseupEvent, mev.innerNode(), true,
+                                         d->clickCount, mouseEvent, false);
 
-  if (d->clickCount > 0 && mev.innerNode == d->clickNode)
-    dispatchMouseEvent(clickEvent, mev.innerNode.get(), true, d->clickCount,
-                       _mouse, true, NodeImpl::MouseRelease);
+  if (d->clickCount > 0 && mev.innerNode() == d->clickNode)
+    dispatchMouseEvent(clickEvent, mev.innerNode(), true, d->clickCount,
+                       mouseEvent, true);
 
-  if (!swallowEvent) {
-    MouseReleaseEvent event(_mouse, xm, ym, mev.url, mev.target,
-                            mev.innerNode.get());
-    m_frame->khtmlMouseReleaseEvent(&event);
-  }
+  if (!swallowEvent)
+    m_frame->khtmlMouseReleaseEvent(&mev);
 
   invalidateClick();
 }
 
-void FrameView::keyPressEvent(QKeyEvent* ke) {
+void FrameView::keyPressEvent(KeyEvent* ke) {
   if (m_frame->document() && m_frame->document()->focusNode()) {
     if (m_frame->document()->focusNode()->dispatchKeyEvent(ke))
       ke->accept();
@@ -717,26 +700,24 @@ bool FrameView::updateDragAndDrop(const IntPoint& loc,
   bool accept = false;
   int xm, ym;
   viewportToContents(loc.x(), loc.y(), xm, ym);
-  NodeImpl::MouseEvent mev(0, NodeImpl::MouseMove);
-  m_frame->document()->prepareMouseEvent(true, xm, ym, &mev);
-  NodeImpl* newTarget = mev.innerNode.get();
+  MouseEventWithHitTestResults mev =
+      m_frame->document()->prepareMouseEvent(true, false, false, xm, ym, 0);
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
-  if (newTarget && newTarget->isTextNode()) {
+  NodeImpl* newTarget = mev.innerNode();
+  if (newTarget && newTarget->isTextNode())
     newTarget = newTarget->parentNode();
-  }
 
   if (d->dragTarget != newTarget) {
     // note this ordering is explicitly chosen to match WinIE
-    if (newTarget) {
+    if (newTarget)
       accept = dispatchDragEvent(dragenterEvent, newTarget, loc, clipboard);
-    }
-    if (d->dragTarget) {
+    if (d->dragTarget)
       dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
-    }
-  } else if (newTarget) {
-    accept = dispatchDragEvent(dragoverEvent, newTarget, loc, clipboard);
+  } else {
+    if (newTarget)
+      accept = dispatchDragEvent(dragoverEvent, newTarget, loc, clipboard);
   }
   d->dragTarget = newTarget;
 
@@ -745,18 +726,16 @@ bool FrameView::updateDragAndDrop(const IntPoint& loc,
 
 void FrameView::cancelDragAndDrop(const IntPoint& loc,
                                   ClipboardImpl* clipboard) {
-  if (d->dragTarget) {
+  if (d->dragTarget)
     dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
-  }
   d->dragTarget = 0;
 }
 
 bool FrameView::performDragAndDrop(const IntPoint& loc,
                                    ClipboardImpl* clipboard) {
   bool accept = false;
-  if (d->dragTarget) {
+  if (d->dragTarget)
     accept = dispatchDragEvent(dropEvent, d->dragTarget.get(), loc, clipboard);
-  }
   d->dragTarget = 0;
   return accept;
 }
@@ -968,9 +947,8 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
                                    NodeImpl* targetNode,
                                    bool cancelable,
                                    int detail,
-                                   QMouseEvent* _mouse,
-                                   bool setUnder,
-                                   int mouseEventType) {
+                                   MouseEvent* mouseEvent,
+                                   bool setUnder) {
   // if the target node is a text node, dispatch on the parent node -
   // rdar://4196646
   if (targetNode && targetNode->isTextNode())
@@ -980,7 +958,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   // mouseout/mouseover
   if (setUnder) {
     int clientX, clientY;
-    viewportToContents(_mouse->x(), _mouse->y(), clientX, clientY);
+    viewportToContents(mouseEvent->x(), mouseEvent->y(), clientX, clientY);
     if (d->prevMouseX != clientX || d->prevMouseY != clientY) {
       // ### this code sucks. we should save the oldUnder instead of calculating
       // it again. calculating is expensive! (Dirk)
@@ -989,12 +967,10 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
       // so we could be sending a mouseout to a node that never got a mouseover.
       RefPtr<NodeImpl> oldUnder;
       if (d->prevMouseX >= 0) {
-        NodeImpl::MouseEvent mev(
-            _mouse->stateAfter(),
-            static_cast<NodeImpl::MouseEventType>(mouseEventType));
-        m_frame->document()->prepareMouseEvent(true, d->prevMouseX,
-                                               d->prevMouseY, &mev);
-        oldUnder = mev.innerNode;
+        oldUnder = m_frame->document()
+                       ->prepareMouseEvent(true, false, true, d->prevMouseX,
+                                           d->prevMouseY, mouseEvent)
+                       .innerNode();
         if (oldUnder && oldUnder->isTextNode())
           oldUnder = oldUnder->parentNode();
       }
@@ -1003,10 +979,11 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
       if (oldUnder != targetNode) {
         // send mouseout event to the old node
         if (oldUnder)
-          oldUnder->dispatchMouseEvent(_mouse, mouseoutEvent, 0, targetNode);
+          oldUnder->dispatchMouseEvent(mouseEvent, mouseoutEvent, 0,
+                                       targetNode);
         // send mouseover event to the new node
         if (targetNode)
-          targetNode->dispatchMouseEvent(_mouse, mouseoverEvent, 0,
+          targetNode->dispatchMouseEvent(mouseEvent, mouseoverEvent, 0,
                                          oldUnder.get());
       }
     }
@@ -1015,7 +992,8 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   bool swallowEvent = false;
 
   if (targetNode)
-    swallowEvent = targetNode->dispatchMouseEvent(_mouse, eventType, detail);
+    swallowEvent =
+        targetNode->dispatchMouseEvent(mouseEvent, eventType, detail);
 
   if (!swallowEvent && eventType == mousedownEvent) {
     // Focus should be shifted on mouse down, not on a click.  -dwh
@@ -1053,7 +1031,7 @@ void FrameView::setIgnoreWheelEvents(bool e) {
   d->ignoreWheelEvents = e;
 }
 
-void FrameView::viewportWheelEvent(QWheelEvent* e) {
+void FrameView::viewportWheelEvent(WheelEvent* e) {
   DocumentImpl* doc = m_frame->document();
   if (doc) {
     RenderObject* docRenderer = doc->renderer();
@@ -1098,9 +1076,8 @@ void FrameView::layoutTimerFired(Timer<FrameView>*) {
 
 void FrameView::hoverTimerFired(Timer<FrameView>*) {
   d->hoverTimer.stop();
-  NodeImpl::MouseEvent mev(false, NodeImpl::MouseMove);
-  m_frame->document()->prepareMouseEvent(false, false, d->prevMouseX,
-                                         d->prevMouseY, &mev);
+  m_frame->document()->prepareMouseEvent(false, false, true, d->prevMouseX,
+                                         d->prevMouseY, 0);
 }
 
 void FrameView::scheduleRelayout() {

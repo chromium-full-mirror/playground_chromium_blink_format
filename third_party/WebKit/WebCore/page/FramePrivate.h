@@ -27,12 +27,12 @@
 #ifndef khtmlpart_p_h
 #define khtmlpart_p_h
 
+#include "EditCommand.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "SelectionController.h"
 #include "Timer.h"
 #include "css_valueimpl.h"
-#include "EditCommand.h"
 #include "kjs_proxy.h"
 #include <kio/global.h>
 #include <kxmlcore/Vector.h>
@@ -42,7 +42,9 @@ class TransferJob;
 }
 
 namespace WebCore {
+
 class Decoder;
+class UserStyleSheetLoader;
 
 enum RedirectionScheduled {
   noRedirectionScheduled,
@@ -105,7 +107,8 @@ class FramePrivate {
         m_bPendingChildRedirection(false),
         m_executingJavaScriptFormAction(false),
         m_cancelWithLoadInProgress(false),
-        m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired) {
+        m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired),
+        m_userStyleSheetLoader(0) {
     // inherit settings from parent
     if (parent && parent->isFrame()) {
       Frame* frame = static_cast<Frame*>(parent);
@@ -226,6 +229,8 @@ class FramePrivate {
   bool m_cancelWithLoadInProgress;
 
   Timer<Frame> m_lifeSupportTimer;
+
+  UserStyleSheetLoader* m_userStyleSheetLoader;
 };
 }
 

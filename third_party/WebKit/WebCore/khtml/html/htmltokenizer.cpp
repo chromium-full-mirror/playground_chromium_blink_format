@@ -35,7 +35,6 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "HTMLElementImpl.h"
-#include "KWQEvent.h"
 #include "SystemTime.h"
 #include "csshelper.h"
 #include "html_documentimpl.h"
@@ -1566,18 +1565,15 @@ void HTMLTokenizer::timerFired(Timer<HTMLTokenizer>*) {
     return;
   }
 
+  RefPtr<Frame> frame = view ? view->frame() : 0;
+
   // Invoke write() as though more data came in.
-  QGuardedPtr<FrameView> savedView = view;
   bool didCallEnd = write(SegmentedString(), true);
 
   // If we called end() during the write,  we need to let WebKit know that we're
   // done processing the data.
-  if (didCallEnd && savedView) {
-    Frame* frame = savedView->frame();
-    if (frame) {
-      frame->tokenizerProcessedData();
-    }
-  }
+  if (didCallEnd && frame)
+    frame->tokenizerProcessedData();
 }
 
 void HTMLTokenizer::end() {
