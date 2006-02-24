@@ -19,13 +19,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _DOM_AtomicStringList_h_
-#define _DOM_AtomicStringList_h_
+#ifndef AtomicStringList_h
+#define AtomicStringList_h
 
 #include "PlatformString.h"
 #include "AtomicString.h"
 
-namespace DOM {
+namespace WebCore {
 
 class AtomicStringList {
  public:

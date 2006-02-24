@@ -16,4 +16,4 @@ typedef NodeImpl EventTargetImpl;
 
 #include "Shared.h"
 #include "AtomicString.h"
-#include "dom_qname.h"
+#include "QualifiedName.h"
