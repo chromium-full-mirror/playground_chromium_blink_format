@@ -2382,19 +2382,6 @@ CSSComputedStyleDeclarationImpl* Frame::selectionComputedStyle(
   return new CSSComputedStyleDeclarationImpl(styleElement);
 }
 
-static CSSMutableStyleDeclarationImpl* editingStyle() {
-  static CSSMutableStyleDeclarationImpl* editingStyle = 0;
-  if (!editingStyle) {
-    editingStyle = new CSSMutableStyleDeclarationImpl;
-    int exceptionCode;
-    editingStyle->setCssText(
-        "word-wrap: break-word; -khtml-nbsp-mode: space; -khtml-line-break: "
-        "after-white-space;",
-        exceptionCode);
-  }
-  return editingStyle;
-}
-
 void Frame::applyEditingStyleToBodyElement() const {
   if (!d->m_doc)
     return;
@@ -2421,39 +2408,14 @@ void Frame::applyEditingStyleToElement(ElementImpl* element) const {
   if (!element || !element->isHTMLElement())
     return;
 
-  RenderObject* renderer = element->renderer();
-  if (!renderer || !renderer->isBlockFlow())
-    return;
-
-  CSSMutableStyleDeclarationImpl* currentStyle =
-      static_cast<HTMLElementImpl*>(element)->getInlineStyleDecl();
-  CSSMutableStyleDeclarationImpl* mergeStyle = editingStyle();
-  if (mergeStyle) {
-    currentStyle->merge(mergeStyle);
-    element->setAttribute(styleAttr, currentStyle->cssText());
-  }
+  static_cast<HTMLElementImpl*>(element)->setContentEditable("true");
 }
 
 void Frame::removeEditingStyleFromElement(ElementImpl* element) const {
   if (!element || !element->isHTMLElement())
     return;
 
-  RenderObject* renderer = element->renderer();
-  if (!renderer || !renderer->isBlockFlow())
-    return;
-
-  CSSMutableStyleDeclarationImpl* currentStyle =
-      static_cast<HTMLElementImpl*>(element)->getInlineStyleDecl();
-  bool changed = false;
-  changed |= !currentStyle->removeProperty(CSS_PROP_WORD_WRAP, false).isNull();
-  changed |=
-      !currentStyle->removeProperty(CSS_PROP__KHTML_NBSP_MODE, false).isNull();
-  changed |=
-      !currentStyle->removeProperty(CSS_PROP__KHTML_LINE_BREAK, false).isNull();
-  if (changed)
-    currentStyle->setChanged();
-
-  element->setAttribute(styleAttr, currentStyle->cssText());
+  static_cast<HTMLElementImpl*>(element)->setContentEditable("false");
 }
 
 bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
