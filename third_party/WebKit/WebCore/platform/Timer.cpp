@@ -215,7 +215,7 @@ TimerBase::TimerBase()
 TimerBase::~TimerBase() {
   stop();
 
-  ASSERT(m_heapIndex == -1);
+  ASSERT(!inHeap());
 }
 
 void TimerBase::start(double nextFireInterval, double repeatInterval) {
@@ -229,7 +229,12 @@ void TimerBase::stop() {
 
   ASSERT(m_nextFireTime == 0);
   ASSERT(m_repeatInterval == 0);
-  ASSERT(m_heapIndex == -1);
+  ASSERT(!inHeap());
+}
+
+bool TimerBase::isActive() const {
+  return m_nextFireTime ||
+         (timersReadyToFire && timersReadyToFire->contains(this));
 }
 
 double TimerBase::nextFireInterval() const {
@@ -249,13 +254,10 @@ inline void TimerBase::checkHeapIndex() const {
 }
 
 inline void TimerBase::checkConsistency() const {
-  // Active timers must be in the heap or the "ready to fire set".
-  // But timers that do have a next-fire time must be in either one or the
-  // other.
-  ASSERT(isActive() ==
-         (m_heapIndex != -1 ||
-          (timersReadyToFire && timersReadyToFire->contains(this))));
-  if (m_heapIndex != -1)
+  // Timers should be in the heap if and only if they have a non-zero next fire
+  // time.
+  ASSERT(inHeap() == (m_nextFireTime != 0));
+  if (inHeap())
     checkHeapIndex();
 }
 
@@ -287,7 +289,7 @@ inline void TimerBase::heapIncreaseKey() {
 }
 
 inline void TimerBase::heapInsert() {
-  ASSERT(m_heapIndex == -1);
+  ASSERT(!inHeap());
   if (!timerHeap)
     timerHeap = new Vector<TimerBase*>;
   timerHeap->append(this);
