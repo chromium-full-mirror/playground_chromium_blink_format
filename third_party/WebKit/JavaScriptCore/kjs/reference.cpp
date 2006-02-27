@@ -35,7 +35,7 @@ Reference::Reference(JSObject* b, const Identifier& p)
 Reference::Reference(JSObject* b, unsigned p)
     : base(b), propertyNameAsNumber(p), propertyNameIsNumber(true) {}
 
-Identifier Reference::getPropertyName(ExecState* exec) const {
+Identifier Reference::getPropertyName(ExecState*) const {
   if (propertyNameIsNumber && prop.isNull())
     prop = Identifier::from(propertyNameAsNumber);
   return prop;

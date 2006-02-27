@@ -248,13 +248,15 @@ class HashTableConstIterator {
 #endif
   }
 
-  void checkValidity(const const_iterator& other) const {
 #if CHECK_HASHTABLE_ITERATORS
+  void checkValidity(const const_iterator& other) const {
     assert(m_table);
     assert(other.m_table);
     assert(m_table == other.m_table);
-#endif
   }
+#else
+  void checkValidity(const const_iterator&) const {}
+#endif
 
   PointerType m_position;
   PointerType m_endPosition;
@@ -368,7 +370,7 @@ class IdentityHashTranslator {
     return HashFunctions::equal(a, b);
   }
   static void translate(Value& location,
-                        const Key& key,
+                        const Key&,
                         const Value& value,
                         unsigned) {
     location = value;

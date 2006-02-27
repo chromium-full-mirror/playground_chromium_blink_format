@@ -51,7 +51,7 @@ class CClass : public KJS::Bindings::Class {
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const;
 
-  virtual Constructor* constructorAt(int i) const { return 0; };
+  virtual Constructor* constructorAt(int) const { return 0; };
 
   virtual int numConstructors() const { return 0; };
 

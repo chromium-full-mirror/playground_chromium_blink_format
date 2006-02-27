@@ -28,8 +28,8 @@ namespace KJS {
 
 JSValue* PropertySlot::undefinedGetter(ExecState*,
                                        JSObject*,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
+                                       const Identifier&,
+                                       const PropertySlot&) {
   return jsUndefined();
 }
 

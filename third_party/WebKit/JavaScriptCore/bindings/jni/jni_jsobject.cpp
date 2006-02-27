@@ -448,31 +448,31 @@ List JavaJSObject::listFromJArray(jobjectArray jArray) const {
 
 extern "C" {
 
-jlong KJS_JSCreateNativeJSObject(JNIEnv* env,
-                                 jclass clazz,
-                                 jstring jurl,
+jlong KJS_JSCreateNativeJSObject(JNIEnv*,
+                                 jclass,
+                                 jstring,
                                  jlong nativeHandle,
-                                 jboolean ctx) {
+                                 jboolean) {
   JSObjectCallContext context;
   context.type = CreateNative;
   context.nativeHandle = nativeHandle;
   return JavaJSObject::invoke(&context).j;
 }
 
-void KJS_JSObject_JSFinalize(JNIEnv* env, jclass jsClass, jlong nativeHandle) {
+void KJS_JSObject_JSFinalize(JNIEnv*, jclass, jlong nativeHandle) {
   JSObjectCallContext context;
   context.type = Finalize;
   context.nativeHandle = nativeHandle;
   JavaJSObject::invoke(&context);
 }
 
-jobject KJS_JSObject_JSObjectCall(JNIEnv* env,
-                                  jclass jsClass,
+jobject KJS_JSObject_JSObjectCall(JNIEnv*,
+                                  jclass,
                                   jlong nativeHandle,
-                                  jstring jurl,
+                                  jstring,
                                   jstring methodName,
                                   jobjectArray args,
-                                  jboolean ctx) {
+                                  jboolean) {
   JSObjectCallContext context;
   context.type = Call;
   context.nativeHandle = nativeHandle;
@@ -481,12 +481,12 @@ jobject KJS_JSObject_JSObjectCall(JNIEnv* env,
   return JavaJSObject::invoke(&context).l;
 }
 
-jobject KJS_JSObject_JSObjectEval(JNIEnv* env,
-                                  jclass jsClass,
+jobject KJS_JSObject_JSObjectEval(JNIEnv*,
+                                  jclass,
                                   jlong nativeHandle,
-                                  jstring jurl,
+                                  jstring,
                                   jstring jscript,
-                                  jboolean ctx) {
+                                  jboolean) {
   JSObjectCallContext context;
   context.type = Eval;
   context.nativeHandle = nativeHandle;
@@ -494,12 +494,12 @@ jobject KJS_JSObject_JSObjectEval(JNIEnv* env,
   return JavaJSObject::invoke(&context).l;
 }
 
-jobject KJS_JSObject_JSObjectGetMember(JNIEnv* env,
-                                       jclass jsClass,
+jobject KJS_JSObject_JSObjectGetMember(JNIEnv*,
+                                       jclass,
                                        jlong nativeHandle,
-                                       jstring jurl,
+                                       jstring,
                                        jstring jname,
-                                       jboolean ctx) {
+                                       jboolean) {
   JSObjectCallContext context;
   context.type = GetMember;
   context.nativeHandle = nativeHandle;
@@ -507,13 +507,13 @@ jobject KJS_JSObject_JSObjectGetMember(JNIEnv* env,
   return JavaJSObject::invoke(&context).l;
 }
 
-void KJS_JSObject_JSObjectSetMember(JNIEnv* env,
-                                    jclass jsClass,
+void KJS_JSObject_JSObjectSetMember(JNIEnv*,
+                                    jclass,
                                     jlong nativeHandle,
-                                    jstring jurl,
+                                    jstring,
                                     jstring jname,
                                     jobject value,
-                                    jboolean ctx) {
+                                    jboolean) {
   JSObjectCallContext context;
   context.type = SetMember;
   context.nativeHandle = nativeHandle;
@@ -522,12 +522,12 @@ void KJS_JSObject_JSObjectSetMember(JNIEnv* env,
   JavaJSObject::invoke(&context);
 }
 
-void KJS_JSObject_JSObjectRemoveMember(JNIEnv* env,
-                                       jclass jsClass,
+void KJS_JSObject_JSObjectRemoveMember(JNIEnv*,
+                                       jclass,
                                        jlong nativeHandle,
-                                       jstring jurl,
+                                       jstring,
                                        jstring jname,
-                                       jboolean ctx) {
+                                       jboolean) {
   JSObjectCallContext context;
   context.type = RemoveMember;
   context.nativeHandle = nativeHandle;
@@ -535,12 +535,12 @@ void KJS_JSObject_JSObjectRemoveMember(JNIEnv* env,
   JavaJSObject::invoke(&context);
 }
 
-jobject KJS_JSObject_JSObjectGetSlot(JNIEnv* env,
-                                     jclass jsClass,
+jobject KJS_JSObject_JSObjectGetSlot(JNIEnv*,
+                                     jclass,
                                      jlong nativeHandle,
-                                     jstring jurl,
+                                     jstring,
                                      jint jindex,
-                                     jboolean ctx) {
+                                     jboolean) {
   JSObjectCallContext context;
   context.type = GetSlot;
   context.nativeHandle = nativeHandle;
@@ -548,13 +548,13 @@ jobject KJS_JSObject_JSObjectGetSlot(JNIEnv* env,
   return JavaJSObject::invoke(&context).l;
 }
 
-void KJS_JSObject_JSObjectSetSlot(JNIEnv* env,
-                                  jclass jsClass,
+void KJS_JSObject_JSObjectSetSlot(JNIEnv*,
+                                  jclass,
                                   jlong nativeHandle,
-                                  jstring jurl,
+                                  jstring,
                                   jint jindex,
                                   jobject value,
-                                  jboolean ctx) {
+                                  jboolean) {
   JSObjectCallContext context;
   context.type = SetSlot;
   context.nativeHandle = nativeHandle;
@@ -563,9 +563,7 @@ void KJS_JSObject_JSObjectSetSlot(JNIEnv* env,
   JavaJSObject::invoke(&context);
 }
 
-jstring KJS_JSObject_JSObjectToString(JNIEnv* env,
-                                      jclass clazz,
-                                      jlong nativeHandle) {
+jstring KJS_JSObject_JSObjectToString(JNIEnv*, jclass, jlong nativeHandle) {
   JSObjectCallContext context;
   context.type = ToString;
   context.nativeHandle = nativeHandle;

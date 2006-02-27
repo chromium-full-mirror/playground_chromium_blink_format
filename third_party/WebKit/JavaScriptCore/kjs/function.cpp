@@ -194,7 +194,7 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
 void FunctionImp::processVarDecls(ExecState* /*exec*/) {}
 
 JSValue* FunctionImp::argumentsGetter(ExecState* exec,
-                                      JSObject* originalObject,
+                                      JSObject*,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -209,9 +209,9 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
   return jsNull();
 }
 
-JSValue* FunctionImp::lengthGetter(ExecState* exec,
-                                   JSObject* originalObject,
-                                   const Identifier& propertyName,
+JSValue* FunctionImp::lengthGetter(ExecState*,
+                                   JSObject*,
+                                   const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
   const Parameter* p = thisObj->param.get();
@@ -436,7 +436,7 @@ void Arguments::mark() {
 }
 
 JSValue* Arguments::mappedIndexGetter(ExecState* exec,
-                                      JSObject* originalObject,
+                                      JSObject*,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   Arguments* thisObj = static_cast<Arguments*>(slot.slotBase());
@@ -488,8 +488,8 @@ ActivationImp::ActivationImp(FunctionImp* function, const List& arguments)
 }
 
 JSValue* ActivationImp::argumentsGetter(ExecState* exec,
-                                        JSObject* originalObject,
-                                        const Identifier& propertyName,
+                                        JSObject*,
+                                        const Identifier&,
                                         const PropertySlot& slot) {
   ActivationImp* thisObj = static_cast<ActivationImp*>(slot.slotBase());
 
@@ -531,7 +531,7 @@ bool ActivationImp::deleteProperty(ExecState* exec,
   return JSObject::deleteProperty(exec, propertyName);
 }
 
-void ActivationImp::put(ExecState* exec,
+void ActivationImp::put(ExecState*,
                         const Identifier& propertyName,
                         JSValue* value,
                         int attr) {

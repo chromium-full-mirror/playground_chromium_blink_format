@@ -898,7 +898,7 @@ JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
 
 // ------------------------------ DateObjectFuncImp ----------------------------
 
-DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
+DateObjectFuncImp::DateObjectFuncImp(ExecState*,
                                      FunctionPrototype* funcProto,
                                      int i,
                                      int len,
@@ -909,7 +909,7 @@ DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
 
 // ECMA 15.9.4.2 - 3
 JSValue* DateObjectFuncImp::callAsFunction(ExecState* exec,
-                                           JSObject* thisObj,
+                                           JSObject*,
                                            const List& args) {
   if (id == Parse) {
     return jsNumber(parseDate(args[0]->toString(exec)));

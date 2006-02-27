@@ -140,7 +140,7 @@ void GetterSetterImp::mark() {
     setter->mark();
 }
 
-JSValue* GetterSetterImp::toPrimitive(ExecState* exec, JSType) const {
+JSValue* GetterSetterImp::toPrimitive(ExecState*, JSType) const {
   assert(false);
   return jsNull();
 }

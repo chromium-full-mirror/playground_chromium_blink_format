@@ -101,7 +101,7 @@ bool Interpreter::checkSyntax(const UString& code) {
 Completion Interpreter::evaluate(const UString& sourceURL,
                                  int startingLineNumber,
                                  const UString& code,
-                                 JSValue* thisV) {
+                                 JSValue*) {
   return evaluate(sourceURL, startingLineNumber, code.data(), code.size());
 }
 

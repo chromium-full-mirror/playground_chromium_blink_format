@@ -52,8 +52,8 @@ StringInstance::StringInstance(JSObject* proto, const UString& string)
 }
 
 JSValue* StringInstance::lengthGetter(ExecState* exec,
-                                      JSObject* originalObject,
-                                      const Identifier& propertyName,
+                                      JSObject*,
+                                      const Identifier&,
                                       const PropertySlot& slot) {
   return jsNumber(static_cast<StringInstance*>(slot.slotBase())
                       ->internalValue()
@@ -62,8 +62,8 @@ JSValue* StringInstance::lengthGetter(ExecState* exec,
 }
 
 JSValue* StringInstance::indexGetter(ExecState* exec,
-                                     JSObject* originalObject,
-                                     const Identifier& propertyName,
+                                     JSObject*,
+                                     const Identifier&,
                                      const PropertySlot& slot) {
   const UChar c = static_cast<StringInstance*>(slot.slotBase())
                       ->internalValue()
@@ -179,7 +179,7 @@ const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
 @end
 */
 // ECMA 15.5.4
-StringPrototype::StringPrototype(ExecState* exec, ObjectPrototype* objProto)
+StringPrototype::StringPrototype(ExecState*, ObjectPrototype* objProto)
     : StringInstance(objProto) {
   // The constructor will be added later, after StringObjectImp has been built
   putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);

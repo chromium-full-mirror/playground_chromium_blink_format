@@ -194,7 +194,7 @@ JSValue* ObjectProtoFunc::callAsFunction(ExecState* exec,
 // ------------------------------ ObjectObjectImp
 // --------------------------------
 
-ObjectObjectImp::ObjectObjectImp(ExecState* exec,
+ObjectObjectImp::ObjectObjectImp(ExecState*,
                                  ObjectPrototype* objProto,
                                  FunctionPrototype* funcProto)
     : InternalFunctionImp(funcProto) {

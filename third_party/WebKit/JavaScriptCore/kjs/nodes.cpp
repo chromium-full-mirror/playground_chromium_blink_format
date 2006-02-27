@@ -238,7 +238,7 @@ bool StatementNode::hitStatement(ExecState* exec) {
     return true;  // continue
 }
 
-void StatementNode::processFuncDecl(ExecState* exec) {}
+void StatementNode::processFuncDecl(ExecState*) {}
 
 // ------------------------------ NullNode -------------------------------------
 
@@ -415,7 +415,7 @@ void PropertyListNode::breakCycle() {
 
 // ------------------------------ PropertyNode -----------------------------
 // ECMA 11.1.5
-JSValue* PropertyNode::evaluate(ExecState* exec) {
+JSValue* PropertyNode::evaluate(ExecState*) {
   assert(false);
   return jsNull();
 }

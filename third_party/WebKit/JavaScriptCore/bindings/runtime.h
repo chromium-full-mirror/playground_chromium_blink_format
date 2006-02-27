@@ -160,14 +160,14 @@ class Instance {
 
   virtual JSValue* getValueOfField(ExecState*, const Field*) const;
   virtual JSValue* getValueOfUndefinedField(ExecState*,
-                                            const Identifier& property,
-                                            JSType hint) const {
+                                            const Identifier&,
+                                            JSType) const {
     return jsUndefined();
   }
   virtual void setValueOfField(ExecState*, const Field*, JSValue*) const;
   virtual bool supportsSetValueOfUndefinedField() { return false; }
   virtual void setValueOfUndefinedField(ExecState*,
-                                        const Identifier& property,
+                                        const Identifier&,
                                         JSValue*) {}
 
   virtual JSValue* invokeMethod(ExecState*,

@@ -195,7 +195,7 @@ const ClassInfo RegExpObjectImp::info = {"Function", &InternalFunctionImp::info,
 @end
 */
 
-RegExpObjectImp::RegExpObjectImp(ExecState* exec,
+RegExpObjectImp::RegExpObjectImp(ExecState*,
                                  FunctionPrototype* funcProto,
                                  RegExpPrototype* regProto)
 
@@ -324,7 +324,7 @@ bool RegExpObjectImp::getOwnPropertySlot(ExecState* exec,
       exec, &RegExpTable, this, propertyName, slot);
 }
 
-JSValue* RegExpObjectImp::getValueProperty(ExecState* exec, int token) const {
+JSValue* RegExpObjectImp::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case Dollar1:
       return getBackref(1);
@@ -374,7 +374,7 @@ void RegExpObjectImp::put(ExecState* exec,
 void RegExpObjectImp::putValueProperty(ExecState* exec,
                                        int token,
                                        JSValue* value,
-                                       int attr) {
+                                       int) {
   switch (token) {
     case Input:
       lastInput = value->toString(exec);

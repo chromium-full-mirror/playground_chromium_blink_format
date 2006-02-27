@@ -130,7 +130,7 @@ class UString;
  */
 template <class FuncImp>
 inline JSValue* staticFunctionGetter(ExecState* exec,
-                                     JSObject* originalObject,
+                                     JSObject*,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   // Look for cached value in dynamic map of properties (in JSObject)
@@ -151,7 +151,7 @@ inline JSValue* staticFunctionGetter(ExecState* exec,
  */
 template <class ThisImp>
 inline JSValue* staticValueGetter(ExecState* exec,
-                                  JSObject* originalObject,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot) {
   ThisImp* thisObj = static_cast<ThisImp*>(slot.slotBase());

@@ -84,7 +84,7 @@ JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ ErrorObjectImp -------------------------------
 
-ErrorObjectImp::ErrorObjectImp(ExecState* exec,
+ErrorObjectImp::ErrorObjectImp(ExecState*,
                                FunctionPrototype* funcProto,
                                ErrorPrototype* errorProto)
     : InternalFunctionImp(funcProto) {
@@ -122,7 +122,7 @@ JSValue* ErrorObjectImp::callAsFunction(ExecState* exec,
 
 // ------------------------------ NativeErrorPrototype ----------------------
 
-NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
+NativeErrorPrototype::NativeErrorPrototype(ExecState*,
                                            ErrorPrototype* errorProto,
                                            ErrorType et,
                                            UString name,
@@ -138,7 +138,7 @@ NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
 const ClassInfo NativeErrorImp::info = {"Function", &InternalFunctionImp::info,
                                         0, 0};
 
-NativeErrorImp::NativeErrorImp(ExecState* exec,
+NativeErrorImp::NativeErrorImp(ExecState*,
                                FunctionPrototype* funcProto,
                                JSObject* prot)
     : InternalFunctionImp(funcProto), proto(prot) {

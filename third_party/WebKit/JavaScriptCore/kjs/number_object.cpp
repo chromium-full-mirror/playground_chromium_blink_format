@@ -408,7 +408,7 @@ DontEnum|DontDelete|ReadOnly
   MIN_VALUE             NumberObjectImp::MinValue DontEnum|DontDelete|ReadOnly
 @end
 */
-NumberObjectImp::NumberObjectImp(ExecState* exec,
+NumberObjectImp::NumberObjectImp(ExecState*,
                                  FunctionPrototype* funcProto,
                                  NumberPrototype* numberProto)
     : InternalFunctionImp(funcProto) {

@@ -92,7 +92,7 @@ JSValue* BooleanProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ BooleanObjectImp -----------------------------
 
-BooleanObjectImp::BooleanObjectImp(ExecState* exec,
+BooleanObjectImp::BooleanObjectImp(ExecState*,
                                    FunctionPrototype* funcProto,
                                    BooleanPrototype* booleanProto)
     : InternalFunctionImp(funcProto) {

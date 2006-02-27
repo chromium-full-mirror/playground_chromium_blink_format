@@ -74,9 +74,9 @@ ArrayInstance::~ArrayInstance() {
   fastFree(storage);
 }
 
-JSValue* ArrayInstance::lengthGetter(ExecState* exec,
-                                     JSObject* originalObject,
-                                     const Identifier& propertyName,
+JSValue* ArrayInstance::lengthGetter(ExecState*,
+                                     JSObject*,
+                                     const Identifier&,
                                      const PropertySlot& slot) {
   return jsNumber(static_cast<ArrayInstance*>(slot.slotBase())->length);
 }
@@ -423,7 +423,7 @@ const ClassInfo ArrayPrototype::info = {"Array", &ArrayInstance::info,
 */
 
 // ECMA 15.4.4
-ArrayPrototype::ArrayPrototype(ExecState* exec, ObjectPrototype* objProto)
+ArrayPrototype::ArrayPrototype(ExecState*, ObjectPrototype* objProto)
     : ArrayInstance(objProto, 0) {
   setInternalValue(jsNull());
 }
