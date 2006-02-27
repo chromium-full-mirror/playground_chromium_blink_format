@@ -120,6 +120,8 @@ void Loader::servePendingRequests() {
     m_requestsLoading.add(job, req);
 }
 
+#if __APPLE__
+
 void Loader::slotFinished(KIO::Job* job, NSData* allData) {
   RequestMap::iterator i = m_requestsLoading.find(job);
   if (i == m_requestsLoading.end())
@@ -174,6 +176,8 @@ void Loader::slotReceivedResponse(KIO::Job* job, NSURLResponse* response) {
       static_cast<KIO::TransferJob*>(job)->cancel();
   }
 }
+
+#endif
 
 void Loader::slotData(KIO::Job* job, const char* data, int size) {
   Request* r = m_requestsLoading.get(job);

@@ -97,8 +97,10 @@ class CachedObject {
     m_free = false;
     m_cachePolicy = cachePolicy;
     m_request = 0;
+#if __APPLE__
     m_response = 0;
     m_allData = 0;
+#endif
     m_expireDate = expireDate;
     m_deleted = false;
     m_expireDateChanged = false;
