@@ -37,10 +37,6 @@
 #include <kio/global.h>
 #include <kxmlcore/Vector.h>
 
-namespace KIO {
-class TransferJob;
-}
-
 namespace WebCore {
 
 class Decoder;
@@ -147,7 +143,7 @@ class FramePrivate {
 
   KHTMLSettings* m_settings;
 
-  KIO::TransferJob* m_job;
+  TransferJob* m_job;
 
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;

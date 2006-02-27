@@ -220,19 +220,13 @@ bool Frame::didOpenURL(const KURL& url) {
   else
     d->m_cachePolicy = KIO::CC_Verify;
 
-  if (args.doPost() && (url.protocol().startsWith("http"))) {
-    d->m_job = KIO::http_post(url, args.postData, false);
+  if (args.doPost() && url.protocol().startsWith("http")) {
+    d->m_job = new TransferJob(this, url, args.postData);
     d->m_job->addMetaData("content-type", args.contentType());
-  } else {
-    d->m_job = KIO::get(url, false, false);
-  }
+  } else
+    d->m_job = new TransferJob(this, url);
 
   d->m_job->addMetaData(args.metaData());
-
-  connect(d->m_job, SIGNAL(result(KIO::Job*)), SLOT(slotFinished(KIO::Job*)));
-
-  connect(d->m_job, SIGNAL(redirection(KIO::Job*, const KURL&)),
-          SLOT(slotRedirection(KIO::Job*, const KURL&)));
 
   d->m_bComplete = false;
   d->m_bLoadingMainResource = true;
@@ -544,16 +538,15 @@ void Frame::receivedFirstData() {
   d->m_lastModified = d->m_job->queryMetaData("modified");
 }
 
-void Frame::slotFinished(KIO::Job* job) {
+void Frame::receivedAllData(TransferJob* job) {
+  d->m_job = 0;
+
   if (job->error()) {
-    d->m_job = 0L;
-    // TODO: what else ?
     checkCompleted();
     return;
   }
 
   d->m_workingURL = KURL();
-  d->m_job = 0L;
 
   if (d->m_doc->parsing())
     end();  // will call completed()
@@ -1004,7 +997,7 @@ void Frame::redirectionTimerFired(Timer<Frame>*) {
   changeLocation(URL, referrer, lockHistory, userGesture);
 }
 
-void Frame::slotRedirection(KIO::Job*, const KURL& url) {
+void Frame::receivedRedirect(TransferJob*, const KURL& url) {
   d->m_workingURL = url;
 }
 
