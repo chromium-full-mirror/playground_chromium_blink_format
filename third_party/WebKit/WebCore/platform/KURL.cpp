@@ -28,13 +28,14 @@
 
 #include <kxmlcore/Assertions.h>
 #include "KWQRegExp.h"
-#include "KWQTextCodec.h"
+#include "TextEncoding.h"
 #include <kxmlcore/Vector.h>
 #include <unicode/uidna.h>
 #include <utility>
 
 using std::pair;
 using std::make_pair;
+using namespace WebCore;
 
 typedef enum {
   // alpha
@@ -234,7 +235,7 @@ static int copyPathRemovingDots(char* dst,
                                 int srcEnd);
 static char* encodeRelativeString(const KURL& base,
                                   const QString& rel,
-                                  const QTextCodec* codec);
+                                  const WebCore::TextEncoding& encoding);
 static QString substituteBackslashes(const QString& string);
 
 static inline bool isSchemeFirstChar(unsigned char c) {
@@ -305,7 +306,9 @@ KURL::KURL(const QString& url) {
     parse(url.ascii(), &url);
 }
 
-KURL::KURL(const KURL& base, const QString& relative, const QTextCodec* codec) {
+KURL::KURL(const KURL& base,
+           const QString& relative,
+           const WebCore::TextEncoding& encoding) {
   // Allow at lest absolute URLs to resolve against an empty URL.
   if (!base.m_isValid && !base.isEmpty()) {
     m_isValid = false;
@@ -331,7 +334,7 @@ KURL::KURL(const KURL& base, const QString& relative, const QTextCodec* codec) {
     strBuffer = 0;
     str = rel.ascii();
   } else {
-    strBuffer = encodeRelativeString(base, rel, codec);
+    strBuffer = encodeRelativeString(base, rel, encoding);
     str = strBuffer;
   }
 
@@ -775,8 +778,9 @@ QString KURL::prettyURL() const {
   return result;
 }
 
-QString KURL::decode_string(const QString& urlString, const QTextCodec* codec) {
-  static const QTextCodec* UTF8Codec = QTextCodec::utf8Codec();
+QString KURL::decode_string(const QString& urlString,
+                            const WebCore::TextEncoding& encoding) {
+  static const WebCore::TextEncoding utf8Encoding(UTF8Encoding);
 
   QString result("");
 
@@ -814,8 +818,8 @@ QString KURL::decode_string(const QString& urlString, const QTextCodec* codec) {
     }
 
     // Decode the bytes into Unicode characters.
-    QString decoded =
-        (codec ? codec : UTF8Codec)->toUnicode(buffer, p - buffer);
+    QString decoded = (encoding.isValid() ? encoding : utf8Encoding)
+                          .toUnicode(buffer, p - buffer);
     if (decoded.isEmpty()) {
       continue;
     }
@@ -1475,15 +1479,16 @@ static QString encodeHostnames(const QString& s) {
 
 static char* encodeRelativeString(const KURL& base,
                                   const QString& rel,
-                                  const QTextCodec* codec) {
+                                  const WebCore::TextEncoding& encoding) {
   QString s = encodeHostnames(rel);
 
   char* strBuffer;
 
-  static const QTextCodec* UTF8Codec = QTextCodec::utf8Codec();
+  static const WebCore::TextEncoding utf8Encoding(UTF8Encoding);
 
-  const QTextCodec* pathCodec = codec ? codec : UTF8Codec;
-  const QTextCodec* otherCodec = pathCodec;
+  WebCore::TextEncoding pathEncoding =
+      encoding.isValid() ? encoding : utf8Encoding;
+  WebCore::TextEncoding otherEncoding = pathEncoding;
 
   // Always use UTF-8 for mailto URLs because that's what mail applications
   // expect.
@@ -1492,7 +1497,7 @@ static char* encodeRelativeString(const KURL& base,
   // and help content is often defined with this in mind, but use native
   // encoding for the
   // non-path parts of the URL.
-  if (pathCodec != UTF8Codec) {
+  if (pathEncoding != utf8Encoding) {
     QString protocol;
     if (rel.length() > 0 && isSchemeFirstChar(rel.at(0).latin1())) {
       for (uint i = 1; i < rel.length(); i++) {
@@ -1511,26 +1516,26 @@ static char* encodeRelativeString(const KURL& base,
     }
     protocol = protocol.lower();
     if (protocol == "file" || protocol == "help") {
-      pathCodec = UTF8Codec;
+      pathEncoding = utf8Encoding;
     } else if (protocol == "mailto") {
-      pathCodec = UTF8Codec;
-      otherCodec = UTF8Codec;
+      pathEncoding = utf8Encoding;
+      otherEncoding = utf8Encoding;
     }
   }
 
   int pathEnd = -1;
-  if (*pathCodec != *otherCodec) {
+  if (pathEncoding != otherEncoding) {
     pathEnd = s.find(QRegExp("[?#]"));
   }
   if (pathEnd == -1) {
-    QCString decoded = pathCodec->fromUnicode(s);
+    QCString decoded = pathEncoding.fromUnicode(s);
     int decodedLength = decoded.length();
     strBuffer = static_cast<char*>(fastMalloc(decodedLength + 1));
     memcpy(strBuffer, decoded, decodedLength);
     strBuffer[decodedLength] = 0;
   } else {
-    QCString pathDecoded = pathCodec->fromUnicode(s.left(pathEnd));
-    QCString otherDecoded = otherCodec->fromUnicode(s.mid(pathEnd));
+    QCString pathDecoded = pathEncoding.fromUnicode(s.left(pathEnd));
+    QCString otherDecoded = otherEncoding.fromUnicode(s.mid(pathEnd));
     int pathDecodedLength = pathDecoded.length();
     int otherDecodedLength = otherDecoded.length();
     strBuffer = static_cast<char*>(

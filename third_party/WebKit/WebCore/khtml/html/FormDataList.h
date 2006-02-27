@@ -30,8 +30,7 @@
 #include <QString.h>
 #include <qvaluelist.h>
 #include "PlatformString.h"
-
-class QTextCodec;
+#include "TextEncoding.h"
 
 namespace DOM {
 
@@ -45,7 +44,7 @@ struct FormDataListItem {
 
 class FormDataList {
  public:
-  FormDataList(QTextCodec*);
+  FormDataList(const TextEncoding&);
 
   void appendData(const DOMString& key, const DOMString& value) {
     appendString(key.qstring());
@@ -74,7 +73,7 @@ class FormDataList {
   void appendString(const QCString& s);
   void appendString(const QString& s);
 
-  QTextCodec* m_codec;
+  TextEncoding m_encoding;
   QValueList<FormDataListItem> m_list;
 };
 };

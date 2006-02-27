@@ -923,7 +923,7 @@ JSValue* DOMDocument::getValueProperty(ExecState* exec, int token) const {
     case ActualEncoding:
     case InputEncoding:
       if (Decoder* decoder = doc.decoder())
-        return jsString(decoder->encoding());
+        return jsString(decoder->encodingName());
       return jsNull();
     case DefaultCharset:
       if (Frame* frame = doc.frame())
@@ -973,8 +973,8 @@ void DOMDocument::putValueProperty(ExecState* exec,
       doc.setSelectedStylesheetSet(value->toString(exec).domString());
       break;
     case Charset:
-      doc.decoder()->setEncoding(value->toString(exec).cstring().c_str(),
-                                 Decoder::UserChosenEncoding);
+      doc.decoder()->setEncodingName(value->toString(exec).cstring().c_str(),
+                                     Decoder::UserChosenEncoding);
       break;
   }
 }

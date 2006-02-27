@@ -34,7 +34,7 @@
 #include "CachedObjectClientWalker.h"
 #include "KWQLoader.h"
 #include "loader.h"
-#include <qtextcodec.h>
+#include "TextEncoding.h"
 
 namespace WebCore {
 
@@ -43,16 +43,15 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          KIO::CacheControl _cachePolicy,
                                          time_t _expireDate,
                                          const QString& charset)
-    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate), m_codec(0) {
+    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate),
+      m_encoding(charset.latin1()) {
   // It's css we want.
   setAccept("text/css");
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
-  if (!charset.isEmpty())
-    m_codec = QTextCodec::codecForName(charset.latin1());
-  if (!m_codec)
-    m_codec = QTextCodec::codecForName("iso8859-1");
+  if (!m_encoding.isValid())
+    m_encoding = TextEncoding(Latin1Encoding);
 }
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
@@ -61,10 +60,10 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
                    CSSStyleSheet,
                    KIO::CC_Verify,
                    0,
-                   stylesheet_data.length()) {
+                   stylesheet_data.length()),
+      m_encoding(InvalidEncoding) {
   m_loading = false;
   m_status = Persistent;
-  m_codec = 0;
   m_sheet = DOMString(stylesheet_data);
 }
 
@@ -86,9 +85,9 @@ void CachedCSSStyleSheet::deref(CachedObjectClient* c) {
 
 void CachedCSSStyleSheet::setCharset(const QString& chs) {
   if (!chs.isEmpty()) {
-    QTextCodec* codec = QTextCodec::codecForName(chs.latin1());
-    if (codec)
-      m_codec = codec;
+    TextEncoding encoding = TextEncoding(chs.latin1());
+    if (encoding.isValid())
+      m_encoding = encoding;
   }
 }
 
@@ -97,7 +96,7 @@ void CachedCSSStyleSheet::data(ByteArray& data, bool eof) {
     return;
 
   setSize(data.size());
-  m_sheet = DOMString(m_codec->toUnicode(data.data(), size()));
+  m_sheet = DOMString(m_encoding.toUnicode(data.data(), size()));
   m_loading = false;
 
   checkNotify();

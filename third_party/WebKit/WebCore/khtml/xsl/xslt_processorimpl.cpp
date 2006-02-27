@@ -236,7 +236,7 @@ RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
       documentSource);  // Make sure we parse in the correct mode.
 
   RefPtr<Decoder> decoder = new Decoder;
-  decoder->setEncoding(
+  decoder->setEncodingName(
       sourceEncoding.isEmpty() ? "UTF-8" : sourceEncoding.latin1(),
       Decoder::EncodingFromXMLHeader);
   result->setDecoder(decoder.get());

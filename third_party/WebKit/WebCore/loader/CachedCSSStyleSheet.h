@@ -29,8 +29,7 @@
 #define KHTML_CachedCSSStyleSheet_h
 
 #include "CachedObject.h"
-
-class QTextCodec;
+#include "TextEncoding.h"
 
 namespace khtml {
 class DocLoader;
@@ -60,7 +59,7 @@ class CachedCSSStyleSheet : public CachedObject {
 
  protected:
   DOMString m_sheet;
-  QTextCodec* m_codec;
+  TextEncoding m_encoding;
 };
 }
 

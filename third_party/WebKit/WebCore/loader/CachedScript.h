@@ -29,8 +29,7 @@
 #define KHTML_CachedScript_h
 
 #include "CachedObject.h"
-
-class QTextCodec;
+#include "TextEncoding.h"
 
 namespace WebCore {
 class DocLoader;
@@ -62,7 +61,7 @@ class CachedScript : public CachedObject {
 
  private:
   String m_script;
-  QTextCodec* m_codec;
+  TextEncoding m_encoding;
   bool m_errorOccurred;
 };
 }

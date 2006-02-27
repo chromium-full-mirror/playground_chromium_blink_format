@@ -33,7 +33,7 @@
 #include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "loader.h"
-#include <qtextcodec.h>
+#include "TextEncoding.h"
 
 namespace WebCore {
 
@@ -42,7 +42,8 @@ CachedScript::CachedScript(DocLoader* dl,
                            KIO::CacheControl _cachePolicy,
                            time_t _expireDate,
                            const QString& charset)
-    : CachedObject(url, Script, _cachePolicy, _expireDate), m_codec(0) {
+    : CachedObject(url, Script, _cachePolicy, _expireDate),
+      m_encoding(charset.latin1()) {
   // It's javascript we want.
   // But some websites think their scripts are <some wrong mimetype here>
   // and refuse to serve them if we only accept application/x-javascript.
@@ -51,18 +52,16 @@ CachedScript::CachedScript(DocLoader* dl,
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
-  if (!charset.isEmpty())
-    m_codec = QTextCodec::codecForName(charset.latin1());
-  if (!m_codec)
-    m_codec = QTextCodec::codecForName("iso8859-1");
+  if (!m_encoding.isValid())
+    m_encoding = TextEncoding(Latin1Encoding);
 }
 
 CachedScript::CachedScript(const DOMString& url, const QString& script_data)
-    : CachedObject(url, Script, KIO::CC_Verify, 0, script_data.length()) {
+    : CachedObject(url, Script, KIO::CC_Verify, 0, script_data.length()),
+      m_encoding(InvalidEncoding) {
   m_errorOccurred = false;
   m_loading = false;
   m_status = Persistent;
-  m_codec = 0;
   m_script = DOMString(script_data);
 }
 
@@ -83,18 +82,16 @@ void CachedScript::deref(CachedObjectClient* c) {
 }
 
 void CachedScript::setCharset(const QString& chs) {
-  if (!chs.isEmpty()) {
-    QTextCodec* codec = QTextCodec::codecForName(chs.latin1());
-    if (codec)
-      m_codec = codec;
-  }
+  TextEncoding encoding = TextEncoding(chs.latin1());
+  if (encoding.isValid())
+    m_encoding = encoding;
 }
 
 void CachedScript::data(ByteArray& data, bool eof) {
   if (!eof)
     return;
   setSize(data.size());
-  m_script = String(m_codec->toUnicode(data.data(), size()));
+  m_script = String(m_encoding.toUnicode(data.data(), size()));
   m_loading = false;
   checkNotify();
 }
