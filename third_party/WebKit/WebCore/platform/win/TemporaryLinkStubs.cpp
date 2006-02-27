@@ -293,12 +293,6 @@ void QLineEdit::setReadOnly(bool) {
 void QPainter::drawLineForText(int, int, int, int) {
   notImplemented();
 }
-void QObject::disconnect(class QObject const*,
-                         char const*,
-                         class QObject const*,
-                         char const*) {
-  notImplemented();
-}
 QPainter::QPainter(void) {
   notImplemented();
 }
@@ -416,11 +410,7 @@ class Pen const& QPainter::pen(void) const {
 KJavaAppletWidget::KJavaAppletWidget(
     class IntSize const&,
     class Frame*,
-    class KXMLCore::HashMap<class String,
-                            class String,
-                            struct KXMLCore::StrHash<class String>,
-                            struct KXMLCore::HashTraits<class String>,
-                            struct KXMLCore::HashTraits<class String>> const&) {
+    class KXMLCore::HashMap<class String, class String> const&) {
   notImplemented();
 }
 int QFontMetrics::descent(void) const {
@@ -998,3 +988,52 @@ void WebCore::Widget::setFocus(void) {
   notImplemented();
 }
 void WebCore::ScrollView::setContentsPos(int, int) {}
+void WebCore::QPainter::setPaintingDisabled(bool) {
+  notImplemented();
+}
+void WebCore::QPainter::fillRect(class WebCore::IntRect const&,
+                                 class WebCore::Brush const&) {
+  notImplemented();
+}
+WebCore::QPainter::~QPainter(void) {
+  notImplemented();
+}
+WebCore::QPainter::QPainter(bool) {
+  notImplemented();
+}
+void WebCore::ScrollView::viewportToContents(int, int, int&, int&) {
+  notImplemented();
+}
+void WebCore::TransferJob::kill(void) {
+  notImplemented();
+}
+void WebCore::TransferJob::addMetaData(class QString const&,
+                                       class QString const&) {
+  notImplemented();
+}
+void WebCore::TransferJob::addMetaData(
+    class KXMLCore::HashMap<class WebCore::String,
+                            class WebCore::String> const&) {
+  notImplemented();
+}
+class QString WebCore::TransferJob::queryMetaData(class QString const&) const {
+  notImplemented();
+  return QString();
+}
+int WebCore::TransferJob::error(void) const {
+  notImplemented();
+  return 0;
+}
+WebCore::TransferJob::TransferJob(class WebCore::TransferJobClient*,
+                                  class KURL const&) {
+  notImplemented();
+}
+WebCore::TransferJob::TransferJob(class WebCore::TransferJobClient*,
+                                  class KURL const&,
+                                  class WebCore::FormData const&) {
+  notImplemented();
+}
+void WebCore::Widget::hide(void) {}
+class QString KLocale::language(void) {
+  return "en";
+}
