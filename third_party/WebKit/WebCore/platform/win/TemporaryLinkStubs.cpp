@@ -963,3 +963,37 @@ void WebCore::ScrollView::scrollBy(int, int) {
 void WebCore::Widget::clearFocus(void) {
   notImplemented();
 }
+bool WebCore::historyContains(class QString const&) {
+  return false;
+}
+int KWQFindNextSentenceFromIndex(class QChar const*, int, int, bool) {
+  notImplemented();
+  return 0;
+}
+void KWQFindSentenceBoundary(class QChar const*, int, int, int*, int*) {
+  notImplemented();
+}
+int KWQFindNextWordFromIndex(class QChar const*, int, int, bool) {
+  notImplemented();
+  return 0;
+}
+void KWQFindWordBoundary(class QChar const*, int, int, int*, int*) {
+  notImplemented();
+}
+class QString submitButtonDefaultLabel(void) {
+  return "Submit";
+}
+class QString inputElementAltText(void) {
+  return QString();
+}
+class QString resetButtonDefaultLabel(void) {
+  return "Reset";
+}
+bool KWQKCookieJar::cookieEnabled(void) {
+  notImplemented();
+  return false;
+}
+void WebCore::Widget::setFocus(void) {
+  notImplemented();
+}
+void WebCore::ScrollView::setContentsPos(int, int) {}
