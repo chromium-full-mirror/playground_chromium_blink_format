@@ -417,7 +417,7 @@ void CompositeEditCommand::deleteInsignificantText(TextImpl* textNode,
 
   if (str) {
     // Replace the text between start and end with our pruned version.
-    if (str->l > 0) {
+    if (str->length() > 0) {
       replaceTextInNode(textNode, start, end - start, str.get());
     } else {
       // Assert that we are not going to delete all of the text in the node.

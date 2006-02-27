@@ -495,10 +495,10 @@ bool HTMLParser::handleError(NodeImpl* n,
             return false;
           DOMStringImpl* i = t->string();
           unsigned int pos = 0;
-          while (pos < i->l &&
-                 (*(i->s + pos) == QChar(' ') || *(i->s + pos) == QChar(0xa0)))
+          while (pos < i->length() &&
+                 ((*i)[pos] == ' ' || (*i)[pos] == QChar(0xa0)))
             pos++;
-          if (pos == i->l)
+          if (pos == i->length())
             possiblyMoveStrayContent = false;
         }
         if (possiblyMoveStrayContent) {
