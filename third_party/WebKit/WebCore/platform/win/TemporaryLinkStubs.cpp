@@ -142,7 +142,7 @@ bool Widget::isEnabled(void) const {
 }
 bool __cdecl KWQServeRequest(class Loader*,
                              class DocLoader*,
-                             class KIO::TransferJob*) {
+                             class WebCore::TransferJob*) {
   notImplemented();
   return 0;
 }
