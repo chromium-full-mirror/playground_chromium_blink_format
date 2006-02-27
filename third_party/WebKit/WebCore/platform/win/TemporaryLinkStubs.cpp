@@ -844,27 +844,27 @@ QScrollBar::~QScrollBar(void) {
 Path::Path() {
   notImplemented();
 }
-Path::Path(const IntRect& r, Type t) {
+Path::Path(const IntRect&, Type) {
   notImplemented();
 }
-Path::Path(const IntPointArray& arr) {
+Path::Path(const IntPointArray&) {
   notImplemented();
 }
 Path::~Path() {
   notImplemented();
 }
-Path::Path(const Path& other) {
+Path::Path(const Path&) {
   notImplemented();
 }
-Path& Path::operator=(const Path& other) {
+Path& Path::operator=(const Path&) {
   notImplemented();
   return *this;
 }
-bool Path::contains(const IntPoint& point) const {
+bool Path::contains(const IntPoint&) const {
   notImplemented();
   return false;
 }
-void Path::translate(int deltaX, int deltaY) {
+void Path::translate(int, int) {
   notImplemented();
 }
 IntRect Path::boundingRect() const {
@@ -927,4 +927,36 @@ const Cursor& WebCore::southWestResizeCursor() {
 const Cursor& WebCore::westResizeCursor() {
   notImplemented();
   return localCursor;
+}
+WebCore::MouseEvent::MouseEvent() {
+  notImplemented();
+}
+void QLineEdit::setColors(class Color const&, class Color const&) {
+  notImplemented();
+}
+void QTextEdit::setColors(class Color const&, class Color const&) {
+  notImplemented();
+}
+class QString searchableIndexIntroduction(void) {
+  notImplemented();
+  return QString();
+}
+void KWQKCookieJar::setCookie(class KURL const&,
+                              class KURL const&,
+                              class QString const&) {
+  notImplemented();
+}
+class QString KWQKCookieJar::cookie(class KURL const&) {
+  notImplemented();
+  return QString();
+}
+class IntRect WebCore::screenRect(class Widget*) {
+  notImplemented();
+  return IntRect();
+}
+void WebCore::ScrollView::scrollBy(int, int) {
+  notImplemented();
+}
+void WebCore::Widget::clearFocus(void) {
+  notImplemented();
 }
