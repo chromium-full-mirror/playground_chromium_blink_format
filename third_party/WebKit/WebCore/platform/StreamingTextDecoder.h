@@ -53,7 +53,7 @@ class StreamingTextDecoder : Noncopyable {
   UErrorCode createICUConverter();
 
   static void appendOmittingUnwanted(QString& s,
-                                     const UniChar* characters,
+                                     const UChar* characters,
                                      int byteCount);
 
   TextEncoding m_encoding;
