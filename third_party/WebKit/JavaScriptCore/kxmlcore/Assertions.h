@@ -80,11 +80,7 @@
 extern "C" {
 #endif
 
-typedef enum {
-  KXCLogChannelUninitialized,
-  KXCLogChannelOff,
-  KXCLogChannelOn
-} KXCLogChannelState;
+typedef enum { KXCLogChannelOff, KXCLogChannelOn } KXCLogChannelState;
 
 typedef struct {
   unsigned mask;
