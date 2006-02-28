@@ -930,7 +930,7 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
 }
 
 void RenderTextArea::destroy() {
-  element()->updateValue();
+  element()->rendererWillBeDestroyed();
   RenderFormElement::destroy();
 }
 
@@ -989,37 +989,31 @@ void RenderTextArea::updateFromElement() {
   w->setReadOnly(e->readOnly());
   w->setDisabled(e->disabled());
 
-  e->updateValue();
-  if (!e->valueMatchesRenderer()) {
-    DOMString widgetText = text();
-    DOMString text = e->value();
-    text.replace(QChar('\\'), backslashAsCurrencySymbol());
-    if (widgetText != text) {
-      int line, col;
-      w->getCursorPosition(&line, &col);
-      m_updating = true;
-      w->setText(text);
-      m_updating = false;
-      w->setCursorPosition(line, col);
-    }
-    e->setValueMatchesRenderer();
-    m_dirty = false;
+  String widgetText = text();
+  String text = e->value();
+  text.replace(QChar('\\'), backslashAsCurrencySymbol());
+  if (widgetText != text) {
+    int line, col;
+    w->getCursorPosition(&line, &col);
+    m_updating = true;
+    w->setText(text);
+    m_updating = false;
+    w->setCursorPosition(line, col);
   }
+  m_dirty = false;
 
   w->setColors(style()->backgroundColor(), style()->color());
 
   RenderFormElement::updateFromElement();
 }
 
-DOMString RenderTextArea::text() {
-  DOMString txt;
-  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+String RenderTextArea::text() {
+  String txt = static_cast<QTextEdit*>(m_widget)->text();
+  return txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
+}
 
-  if (element()->wrap() == HTMLTextAreaElementImpl::ta_Physical)
-    txt = w->textWithHardLineBreaks();
-  else
-    txt = w->text();
-
+String RenderTextArea::textWithHardLineBreaks() {
+  String txt = static_cast<QTextEdit*>(m_widget)->textWithHardLineBreaks();
   return txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
 }
 

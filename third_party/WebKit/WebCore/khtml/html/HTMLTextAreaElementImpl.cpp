@@ -42,8 +42,7 @@ using namespace HTMLNames;
 HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentImpl* doc,
                                                  HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(textareaTag, doc, f),
-      m_valueIsValid(false),
-      m_valueMatchesRenderer(false) {
+      m_valueMatchesRenderer(true) {
   // DTD requires rows & cols be specified, but we will provide reasonable
   // defaults
   m_rows = 2;
@@ -156,7 +155,13 @@ RenderObject* HTMLTextAreaElementImpl::createRenderer(RenderArena* arena,
 bool HTMLTextAreaElementImpl::appendFormData(FormDataList& encoding, bool) {
   if (name().isEmpty())
     return false;
-  encoding.appendData(name(), value());
+
+  bool hardWrap = renderer() && wrap() == ta_Physical;
+  String v =
+      hardWrap
+          ? static_cast<RenderTextArea*>(renderer())->textWithHardLineBreaks()
+          : value();
+  encoding.appendData(name(), v);
   return true;
 }
 
@@ -164,33 +169,35 @@ void HTMLTextAreaElementImpl::reset() {
   setValue(defaultValue());
 }
 
+void HTMLTextAreaElementImpl::rendererWillBeDestroyed() {
+  updateValue();
+}
+
 void HTMLTextAreaElementImpl::updateValue() {
-  if (!m_valueIsValid) {
-    if (renderer()) {
-      m_value = static_cast<RenderTextArea*>(renderer())->text().qstring();
-      m_valueMatchesRenderer = true;
-    } else {
-      m_value = defaultValue().qstring();
-      m_valueMatchesRenderer = false;
-    }
-    m_valueIsValid = true;
+  if (!m_valueMatchesRenderer) {
+    ASSERT(renderer());
+    m_value = static_cast<RenderTextArea*>(renderer())->text();
+    m_valueMatchesRenderer = true;
   }
 }
 
 DOMString HTMLTextAreaElementImpl::value() {
   updateValue();
-  return m_value.isNull() ? DOMString("") : m_value;
+  return m_value;
 }
 
 void HTMLTextAreaElementImpl::setValue(const DOMString& value) {
-  m_value = value.qstring();
-  m_valueMatchesRenderer = false;
-  m_valueIsValid = true;
+  QString string = value.qstring();
+  // KWQTextArea normalizes line endings added by the user via the keyboard or
+  // pasting.
+  // We must normalize line endings coming from JS.
+  string.replace("\r\n", "\n");
+  string.replace("\r", "\n");
+
+  m_value = String(string);
+  m_valueMatchesRenderer = true;
   if (renderer())
     renderer()->updateFromElement();
-  // FIXME: Force reload from renderer, as renderer may have normalized line
-  // endings.
-  m_valueIsValid = false;
   setChanged(true);
 }
 
@@ -202,13 +209,12 @@ DOMString HTMLTextAreaElementImpl::defaultValue() {
     if (n->isTextNode())
       val += static_cast<TextImpl*>(n)->data();
 
-  if (val[0] == '\r' && val[1] == '\n') {
-    val = val.copy();
+  // FIXME: We should only drop the first carriage return for the default
+  // value in the original source, not defaultValues set from JS.
+  if (val.length() >= 2 && val[0] == '\r' && val[1] == '\n')
     val.remove(0, 2);
-  } else if (val[0] == '\r' || val[0] == '\n') {
-    val = val.copy();
+  else if (val.length() >= 1 && (val[0] == '\r' || val[0] == '\n'))
     val.remove(0, 1);
-  }
 
   return val;
 }
@@ -237,17 +243,6 @@ bool HTMLTextAreaElementImpl::isEditable() {
 
 void HTMLTextAreaElementImpl::accessKeyAction(bool sendToAnyElement) {
   focus();
-}
-
-void HTMLTextAreaElementImpl::attach() {
-  m_valueIsValid = true;
-  HTMLGenericFormElementImpl::attach();
-  updateValue();
-}
-
-void HTMLTextAreaElementImpl::detach() {
-  HTMLGenericFormElementImpl::detach();
-  m_valueMatchesRenderer = false;
 }
 
 DOMString HTMLTextAreaElementImpl::accessKey() const {
