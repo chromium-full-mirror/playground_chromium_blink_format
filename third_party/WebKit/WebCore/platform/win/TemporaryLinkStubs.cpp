@@ -1131,3 +1131,14 @@ void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {
 bool KWQServeRequest(Loader*, Request*, TransferJob*) {
   notImplemented();
 }
+Array<char> KWQServeSynchronousRequest(Loader*,
+                                       DocLoader*,
+                                       TransferJob*,
+                                       KURL&,
+                                       QString&) {
+  notImplemented();
+}
+Widget* WebCore::FrameView::topLevelWidget() const {
+  notImplemented();
+  return 0;
+}
