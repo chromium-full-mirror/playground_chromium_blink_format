@@ -1043,9 +1043,7 @@ int WebCore::screenDepth(WebCore::Widget*) {
   notImplemented();
   return 96;
 }
-QFont::QFont() {
-  notImplemented();
-}
+QFont::QFont() {}
 QFont::~QFont() {
   notImplemented();
 }
@@ -1058,9 +1056,7 @@ int QFont::weight() const {
   return QFont::Normal;
 }
 static QFontMetrics localFontMetrics;
-QFontMetrics::QFontMetrics() {
-  notImplemented();
-}
+QFontMetrics::QFontMetrics() {}
 QFontMetrics::~QFontMetrics() {
   notImplemented();
 }
