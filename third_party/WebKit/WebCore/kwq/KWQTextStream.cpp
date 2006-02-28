@@ -27,7 +27,7 @@
 #include "KWQTextStream.h"
 
 #include "QString.h"
-#include "KWQLogging.h"
+#include "Logging.h"
 
 const size_t integerOrPointerAsStringBufferSize =
     100;  // large enough for any integer or pointer in string format, including

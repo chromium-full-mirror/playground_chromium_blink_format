@@ -32,6 +32,7 @@
 #include "History.h"
 #include "KWQKLocale.h"
 #include "PlugInInfoStore.h"
+#include "render_theme.h"
 
 using namespace WebCore;
 
@@ -1142,4 +1143,8 @@ WebCore::ScrollBarMode WebCore::ScrollView::hScrollBarMode(void) const {
 WebCore::ScrollBarMode WebCore::ScrollView::vScrollBarMode(void) const {
   notImplemented();
   return ScrollBarAlwaysOff;
+}
+RenderTheme* WebCore::theme() {
+  notImplemented();
+  return 0;
 }

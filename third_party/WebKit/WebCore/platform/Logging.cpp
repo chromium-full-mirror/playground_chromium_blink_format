@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,18 +20,25 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "KWQLogging.h"
+#include "Logging.h"
 
-KXCLogChannel KWQLogNotYetImplemented = { 0x00000001, "WebCoreLogLevel", KXCLogChannelUninitialized };
+KXCLogChannel KWQLogNotYetImplemented = {0x00000001, "WebCoreLogLevel",
+                                         KXCLogChannelUninitialized};
 
-KXCLogChannel KWQLogFrames =            { 0x00000010, "WebCoreLogLevel", KXCLogChannelUninitialized };
-KXCLogChannel KWQLogLoading =           { 0x00000020, "WebCoreLogLevel", KXCLogChannelUninitialized };
+KXCLogChannel KWQLogFrames = {0x00000010, "WebCoreLogLevel",
+                              KXCLogChannelUninitialized};
+KXCLogChannel KWQLogLoading = {0x00000020, "WebCoreLogLevel",
+                               KXCLogChannelUninitialized};
 
-KXCLogChannel KWQLogPopupBlocking =     { 0x00000040, "WebCoreLogLevel", KXCLogChannelUninitialized };
+KXCLogChannel KWQLogPopupBlocking = {0x00000040, "WebCoreLogLevel",
+                                     KXCLogChannelUninitialized};
 
-KXCLogChannel KWQLogEvents =            { 0x00000080, "WebCoreLogLevel", KXCLogChannelUninitialized };
-KXCLogChannel KWQLogEditing =           { 0x00000100, "WebCoreLogLevel", KXCLogChannelUninitialized };
-KXCLogChannel KWQLogTextConversion =    { 0x00000200, "WebCoreLogLevel", KXCLogChannelUninitialized };
+KXCLogChannel KWQLogEvents = {0x00000080, "WebCoreLogLevel",
+                              KXCLogChannelUninitialized};
+KXCLogChannel KWQLogEditing = {0x00000100, "WebCoreLogLevel",
+                               KXCLogChannelUninitialized};
+KXCLogChannel KWQLogTextConversion = {0x00000200, "WebCoreLogLevel",
+                                      KXCLogChannelUninitialized};
