@@ -1384,3 +1384,7 @@ WebCore::String WebCore::FrameWin::generateFrameName(void) {
   notImplemented();
   return String();
 }
+QCString WebCore::TextEncoding::fromUnicode(QString const&, bool) const {
+  notImplemented();
+  return QCString();
+}
