@@ -32,6 +32,8 @@
 #include "css_valueimpl.h"
 #include "cssproperties.h"
 #include "htmlediting.h"
+#include "markup.h"
+#include "ReplaceSelectionCommand.h"
 #include "TypingCommand.h"
 #include <kxmlcore/HashMap.h>
 
@@ -225,6 +227,17 @@ bool execFontSizeDelta(Frame* frame,
 
 bool execForeColor(Frame* frame, bool userInterface, const DOMString& value) {
   return execStyleChange(frame, CSS_PROP_COLOR, value);
+}
+
+bool execInsertHTML(Frame* frame, bool userInterface, const String& value) {
+  QString baseURL = "";
+  bool selectReplacement = false;
+  RefPtr<DocumentFragmentImpl> fragment =
+      createFragmentFromMarkup(frame->document(), value.qstring(), baseURL);
+  EditCommandPtr cmd(new ReplaceSelectionCommand(
+      frame->document(), fragment.get(), selectReplacement));
+  cmd.apply();
+  return true;
 }
 
 bool execIndent(Frame* frame, bool userInterface, const DOMString& value) {
@@ -495,6 +508,8 @@ CommandMap* createCommandDictionary() {
       {"ForwardDelete",
        {execForwardDelete, enabledAnySelection, stateNone, valueNull}},
       {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
+      {"InsertHTML",
+       {execInsertHTML, enabledAnySelection, stateNone, valueNull}},
       {"InsertLineBreak",
        {execInsertLineBreak, enabledAnySelection, stateNone, valueNull}},
       {"InsertParagraph",
