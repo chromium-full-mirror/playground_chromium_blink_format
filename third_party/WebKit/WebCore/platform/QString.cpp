@@ -36,6 +36,8 @@
 #include "Windows.h"
 #endif
 
+using namespace WebCore;
+
 #define CHECK_FOR_HANDLE_LEAKS 0
 
 #define ALLOC_QCHAR_GOOD_SIZE(X) (X)
@@ -2504,4 +2506,10 @@ QString QString::fromUtf8(const char* chs) {
 
 QString QString::fromUtf8(const char* chs, int len) {
   return WebCore::TextEncoding(WebCore::UTF8Encoding).toUnicode(chs, len);
+}
+
+QCString QString::utf8(int& length) const {
+  QCString result = WebCore::TextEncoding(UTF8Encoding).fromUnicode(*this);
+  length = result.length();
+  return result;
 }
