@@ -313,7 +313,6 @@ class Frame : public Shared<Frame>,
    */
   void setUserStyleSheet(const QString& styleSheet);
 
- public:
   /**
    * Sets the standard font style.
    *
@@ -439,8 +438,8 @@ class Frame : public Shared<Frame>,
   void paintCaret(QPainter* p, const IntRect& rect) const;
 
   /**
-    * Paints the drag caret.
-    */
+   * Paints the drag caret.
+   */
   void paintDragCaret(QPainter* p, const IntRect& rect) const;
 
   /**
