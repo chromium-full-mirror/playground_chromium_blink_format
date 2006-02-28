@@ -31,6 +31,7 @@
 #include "Screen.h"
 #include "History.h"
 #include "KWQKLocale.h"
+#include "PlugInInfoStore.h"
 
 using namespace WebCore;
 
@@ -1025,6 +1026,14 @@ int WebCore::TransferJob::error(void) const {
   notImplemented();
   return 0;
 }
+QString WebCore::TransferJob::errorText(void) const {
+  notImplemented();
+  return "Houston, we have a problem.";
+}
+bool WebCore::TransferJob::isErrorPage(void) const {
+  notImplemented();
+  return 0;
+}
 WebCore::TransferJob::TransferJob(class WebCore::TransferJobClient*,
                                   class KURL const&) {
   notImplemented();
@@ -1034,7 +1043,103 @@ WebCore::TransferJob::TransferJob(class WebCore::TransferJobClient*,
                                   class WebCore::FormData const&) {
   notImplemented();
 }
-void WebCore::Widget::hide(void) {}
+void WebCore::Widget::hide(void) {
+  notImplemented();
+}
 class QString KLocale::language(void) {
   return "en";
+}
+PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
+  notImplemented();
+  return 0;
+}
+unsigned PlugInInfoStore::pluginCount() const {
+  notImplemented();
+  return 0;
+}
+void WebCore::refreshPlugins(bool) {
+  notImplemented();
+}
+int WebCore::screenDepth(class WebCore::Widget*) {
+  notImplemented();
+  return 96;
+}
+QFont::QFont() {
+  notImplemented();
+}
+QFont::~QFont() {
+  notImplemented();
+}
+bool QFont::italic(void) const {
+  notImplemented();
+  return false;
+}
+int QFont::weight() const {
+  notImplemented();
+  return QFont::Normal;
+}
+static QFontMetrics localFontMetrics;
+QFontMetrics::QFontMetrics() {
+  notImplemented();
+}
+QFontMetrics::~QFontMetrics() {
+  notImplemented();
+}
+QFontMetrics::QFontMetrics(class QFontMetrics const&) {
+  notImplemented();
+}
+QFontMetrics& QFontMetrics::operator=(class QFontMetrics const&) {
+  notImplemented();
+  return localFontMetrics;
+}
+float QFontMetrics::xHeight(void) const {
+  notImplemented();
+  return 0;
+}
+IntRect WebCore::usableScreenRect(class WebCore::Widget*) {
+  notImplemented();
+  return IntRect(0, 0, 800, 600);
+}
+QFont& QFont::operator=(class QFont const&) {
+  notImplemented();
+  return localFont;
+}
+void Widget::setActiveWindow(void) {
+  notImplemented();
+}
+bool KWQCheckIfReloading(class WebCore::DocLoader*) {
+  notImplemented();
+  return false;
+}
+int WebCore::ScrollView::contentsX(void) const {
+  notImplemented();
+  return 0;
+}
+int WebCore::ScrollView::contentsY(void) const {
+  notImplemented();
+  return 0;
+}
+int WebCore::ScrollView::contentsHeight(void) const {
+  notImplemented();
+  return 0;
+}
+int WebCore::ScrollView::contentsWidth(void) const {
+  notImplemented();
+  return 0;
+}
+int WebCore::ScrollView::visibleHeight(void) const {
+  notImplemented();
+  return 0;
+}
+int WebCore::ScrollView::visibleWidth(void) const {
+  notImplemented();
+  return 0;
+}
+WebCore::ScrollBarMode WebCore::ScrollView::hScrollBarMode(void) const {
+  notImplemented();
+  return ScrollBarAlwaysOff;
+}
+WebCore::ScrollBarMode WebCore::ScrollView::vScrollBarMode(void) const {
+  notImplemented();
+  return ScrollBarAlwaysOff;
 }
