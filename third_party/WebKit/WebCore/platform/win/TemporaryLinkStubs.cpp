@@ -34,6 +34,7 @@
 #include "PlugInInfoStore.h"
 #include "render_theme.h"
 #include "FrameWin.h"
+#include "BrowserExtensionWin.h"
 
 using namespace WebCore;
 
@@ -488,9 +489,7 @@ IntSize QLineEdit::sizeForCharacterWidth(int) const {
   notImplemented();
   return IntSize();
 }
-Cursor::~Cursor() {
-  notImplemented();
-}
+Cursor::~Cursor() {}
 IntRect QFontMetrics::selectionRectForText(int,
                                            int,
                                            int,
@@ -1044,9 +1043,7 @@ int WebCore::screenDepth(WebCore::Widget*) {
   return 96;
 }
 QFont::QFont() {}
-QFont::~QFont() {
-  notImplemented();
-}
+QFont::~QFont() {}
 bool QFont::italic() const {
   notImplemented();
   return false;
@@ -1057,9 +1054,7 @@ int QFont::weight() const {
 }
 static QFontMetrics localFontMetrics;
 QFontMetrics::QFontMetrics() {}
-QFontMetrics::~QFontMetrics() {
-  notImplemented();
-}
+QFontMetrics::~QFontMetrics() {}
 QFontMetrics::QFontMetrics(QFontMetrics const&) {
   notImplemented();
 }
@@ -1176,9 +1171,7 @@ bool WebCore::FrameWin::canRedo(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::restoreDocumentState(void) {
-  notImplemented();
-}
+void WebCore::FrameWin::restoreDocumentState(void) {}
 bool WebCore::FrameWin::canUndo(void) const {
   notImplemented();
   return 0;
@@ -1258,9 +1251,7 @@ bool WebCore::FrameWin::passWheelEventToChildWidget(class WebCore::NodeImpl*) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::partClearedInBegin(void) {
-  notImplemented();
-}
+void WebCore::FrameWin::partClearedInBegin(void) {}
 void WebCore::FrameWin::issueUndoCommand(void) {
   notImplemented();
 }
@@ -1306,9 +1297,7 @@ bool WebCore::FrameWin::personalbarVisible(void) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::createEmptyDocument(void) {
-  notImplemented();
-}
+void WebCore::FrameWin::createEmptyDocument(void) {}
 bool WebCore::FrameWin::lastEventIsMouseUp(void) const {
   notImplemented();
   return 0;
@@ -1379,4 +1368,50 @@ void WebCore::FrameWin::handledOnloadEvents(void) {
 WebCore::String WebCore::FrameWin::generateFrameName(void) {
   notImplemented();
   return String();
+}
+WebCore::BrowserExtensionWin::BrowserExtensionWin(class WebCore::Frame*) {}
+void WebCore::BrowserExtensionWin::setTypedIconURL(class KURL const&,
+                                                   class QString const&) {
+  notImplemented();
+}
+void WebCore::BrowserExtensionWin::openURLRequest(
+    class KURL const&,
+    struct WebCore::URLArgs const&) {
+  notImplemented();
+}
+int WebCore::BrowserExtensionWin::getHistoryLength(void) {
+  notImplemented();
+  return 0;
+}
+bool WebCore::BrowserExtensionWin::canRunModal(void) {
+  notImplemented();
+  return 0;
+}
+void WebCore::BrowserExtensionWin::openURLNotify(void) {
+  notImplemented();
+}
+void WebCore::BrowserExtensionWin::createNewWindow(
+    class KURL const&,
+    struct WebCore::URLArgs const&,
+    struct WebCore::WindowArgs const&,
+    class WebCore::Frame*&) {
+  notImplemented();
+}
+bool WebCore::BrowserExtensionWin::canRunModalNow(void) {
+  notImplemented();
+  return 0;
+}
+void WebCore::BrowserExtensionWin::runModal(void) {
+  notImplemented();
+}
+void WebCore::BrowserExtensionWin::goBackOrForward(int) {
+  notImplemented();
+}
+void WebCore::BrowserExtensionWin::setIconURL(class KURL const&) {
+  notImplemented();
+}
+void WebCore::BrowserExtensionWin::createNewWindow(
+    class KURL const&,
+    struct WebCore::URLArgs const&) {
+  notImplemented();
 }
