@@ -40,7 +40,7 @@ using namespace WebCore;
 
 static void notImplemented() {
   puts("Not yet implemented");
-  abort();
+  _CrtDbgBreak();
 }
 
 void QLineEdit::selectAll() {
@@ -70,9 +70,6 @@ void QPainter::drawHighlightForText(int,
                                     bool) {
   notImplemented();
 }
-void QFont::setPrinterFont(bool) {
-  notImplemented();
-}
 String QTextEdit::textWithHardLineBreaks() const {
   notImplemented();
   return String();
@@ -98,12 +95,6 @@ Color QPainter::selectedTextBackgroundColor() const {
 QFontMetrics QPainter::fontMetrics() const {
   notImplemented();
   return QFontMetrics();
-}
-void Widget::show() {
-  notImplemented();
-}
-void QFont::setItalic(bool) {
-  notImplemented();
 }
 void QSlider::setValue(double) {
   notImplemented();
@@ -211,9 +202,6 @@ void QPainter::fillRect(int, int, int, int, Brush const&) {
 void QPainter::endTransparencyLayer() {
   notImplemented();
 }
-QFont::QFont(QFont const&) {
-  notImplemented();
-}
 void ScrollView::addChild(Widget*, int, int) {
   notImplemented();
 }
@@ -234,9 +222,6 @@ IntRect QPainter::xForm(IntRect const&) const {
 IntSize QListBox::sizeForNumberOfLines(int) const {
   notImplemented();
   return IntSize();
-}
-void ScrollView::resizeContents(int, int) {
-  notImplemented();
 }
 int QLineEdit::selectionStart() const {
   notImplemented();
@@ -269,9 +254,6 @@ bool QScrollBar::setValue(int) {
   notImplemented();
   return 0;
 }
-void QFont::setFirstFamily(FontFamily const&) {
-  notImplemented();
-}
 bool QTextEdit::hasSelectedText() const {
   notImplemented();
   return 0;
@@ -279,9 +261,6 @@ bool QTextEdit::hasSelectedText() const {
 int QTextEdit::selectionStart() {
   notImplemented();
   return 0;
-}
-void QFont::setWeight(int) {
-  notImplemented();
 }
 int ScrollView::scrollXOffset() const {
   notImplemented();
@@ -347,9 +326,6 @@ void QTextEdit::setSelectionStart(int) {
 void QPainter::beginTransparencyLayer(float) {
   notImplemented();
 }
-void QFontMetrics::setFont(QFont const&) {
-  notImplemented();
-}
 void QComboBox::setFont(QFont const&) {
   notImplemented();
 }
@@ -382,9 +358,6 @@ void QTextEdit::setSelectionEnd(int) {
 void QComboBox::populate() {
   notImplemented();
 }
-void ScrollView::setStaticBackground(bool) {
-  notImplemented();
-}
 static QFont localFont;
 QFont const& QPainter::font() const {
   notImplemented();
@@ -409,16 +382,8 @@ KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
                                      KXMLCore::HashMap<String, String> const&) {
   notImplemented();
 }
-int QFontMetrics::descent() const {
-  notImplemented();
-  return 0;
-}
 QListBox::QListBox() {
   notImplemented();
-}
-int QFontMetrics::ascent() const {
-  notImplemented();
-  return 0;
 }
 QString QLineEdit::selectedText() const {
   notImplemented();
@@ -489,7 +454,6 @@ IntSize QLineEdit::sizeForCharacterWidth(int) const {
   notImplemented();
   return IntSize();
 }
-Cursor::~Cursor() {}
 IntRect QFontMetrics::selectionRectForText(int,
                                            int,
                                            int,
@@ -507,9 +471,6 @@ IntRect QFontMetrics::selectionRectForText(int,
                                            bool) const {
   notImplemented();
   return IntRect();
-}
-void ScrollView::suppressScrollBars(bool, bool) {
-  notImplemented();
 }
 int QFontMetrics::checkSelectionPoint(QChar*,
                                       int,
@@ -566,9 +527,6 @@ void Widget::setDrawingAlpha(float) {
 QSlider::QSlider() {
   notImplemented();
 }
-void ScrollView::setVScrollBarMode(ScrollBarMode) {
-  notImplemented();
-}
 void QPainter::drawScaledAndTiledImage(Image*,
                                        int,
                                        int,
@@ -606,14 +564,7 @@ void QPainter::setBrush(Brush const&) {
 void QComboBox::setCurrentItem(int) {
   notImplemented();
 }
-int QFontMetrics::height() const {
-  notImplemented();
-  return 0;
-}
 void QComboBox::setWritingDirection(QPainter::TextDirection) {
-  notImplemented();
-}
-void ScrollView::setScrollBarsMode(ScrollBarMode) {
   notImplemented();
 }
 IntSize QComboBox::sizeHint() const {
@@ -621,9 +572,6 @@ IntSize QComboBox::sizeHint() const {
   return IntSize();
 }
 void QPainter::drawRect(int, int, int, int) {
-  notImplemented();
-}
-void QFont::setPixelSize(float) {
   notImplemented();
 }
 void Widget::setFrameGeometry(IntRect const&) {
@@ -651,9 +599,6 @@ void QPainter::clearFocusRing() {
 bool QFont::operator==(QFont const&) const {
   notImplemented();
   return 0;
-}
-Widget::Widget() {
-  notImplemented();
 }
 String QTextEdit::text() const {
   notImplemented();
@@ -701,10 +646,6 @@ void KWQFileButton::setFilename(QString const&) {
 QFontMetrics::QFontMetrics(QFont const&) {
   notImplemented();
 }
-int QFontMetrics::lineSpacing() const {
-  notImplemented();
-  return 0;
-}
 void QLineEdit::setEdited(bool) {
   notImplemented();
 }
@@ -716,24 +657,6 @@ void QListBox::setWritingDirection(QPainter::TextDirection) {
   notImplemented();
 }
 void QLineEdit::setAlignment(Qt::AlignmentFlags) {
-  notImplemented();
-}
-void ScrollView::updateContents(const IntRect&, bool) {
-  notImplemented();
-}
-float QFontMetrics::floatWidth(QChar const*,
-                               int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               bool) const {
-  notImplemented();
-  return 0;
-}
-void ScrollView::setHScrollBarMode(ScrollBarMode) {
   notImplemented();
 }
 WebCore::Widget::FocusPolicy KWQFileButton::focusPolicy() const {
@@ -937,9 +860,6 @@ void WebCore::ScrollView::scrollBy(int, int) {
 void WebCore::Widget::clearFocus() {
   notImplemented();
 }
-bool WebCore::historyContains(QString const&) {
-  return false;
-}
 int KWQFindNextSentenceFromIndex(QChar const*, int, int, bool) {
   notImplemented();
   return 0;
@@ -954,15 +874,6 @@ int KWQFindNextWordFromIndex(QChar const*, int, int, bool) {
 void KWQFindWordBoundary(QChar const*, int, int, int*, int*) {
   notImplemented();
 }
-QString submitButtonDefaultLabel() {
-  return "Submit";
-}
-QString inputElementAltText() {
-  return QString();
-}
-QString resetButtonDefaultLabel() {
-  return "Reset";
-}
 bool KWQKCookieJar::cookieEnabled() {
   notImplemented();
   return false;
@@ -970,7 +881,6 @@ bool KWQKCookieJar::cookieEnabled() {
 void WebCore::Widget::setFocus() {
   notImplemented();
 }
-void WebCore::ScrollView::setContentsPos(int, int) {}
 void WebCore::QPainter::setPaintingDisabled(bool) {
   notImplemented();
 }
@@ -988,9 +898,6 @@ void WebCore::ScrollView::viewportToContents(int, int, int&, int&) {
   notImplemented();
 }
 void WebCore::TransferJob::kill() {
-  notImplemented();
-}
-void WebCore::TransferJob::addMetaData(QString const&, QString const&) {
   notImplemented();
 }
 void WebCore::TransferJob::addMetaData(
@@ -1013,9 +920,6 @@ bool WebCore::TransferJob::isErrorPage() const {
   notImplemented();
   return 0;
 }
-WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*, KURL const&) {
-  notImplemented();
-}
 WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
                                   KURL const&,
                                   WebCore::FormData const&) {
@@ -1023,9 +927,6 @@ WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
 }
 void WebCore::Widget::hide() {
   notImplemented();
-}
-QString KLocale::language() {
-  return "en";
 }
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   notImplemented();
@@ -1042,26 +943,7 @@ int WebCore::screenDepth(WebCore::Widget*) {
   notImplemented();
   return 96;
 }
-QFont::QFont() {}
-QFont::~QFont() {}
-bool QFont::italic() const {
-  notImplemented();
-  return false;
-}
-int QFont::weight() const {
-  notImplemented();
-  return QFont::Normal;
-}
 static QFontMetrics localFontMetrics;
-QFontMetrics::QFontMetrics() {}
-QFontMetrics::~QFontMetrics() {}
-QFontMetrics::QFontMetrics(QFontMetrics const&) {
-  notImplemented();
-}
-QFontMetrics& QFontMetrics::operator=(QFontMetrics const&) {
-  notImplemented();
-  return localFontMetrics;
-}
 float QFontMetrics::xHeight() const {
   notImplemented();
   return 0;
@@ -1070,57 +952,10 @@ IntRect WebCore::usableScreenRect(WebCore::Widget*) {
   notImplemented();
   return IntRect(0, 0, 800, 600);
 }
-QFont& QFont::operator=(QFont const&) {
-  notImplemented();
-  return localFont;
-}
 void Widget::setActiveWindow() {
   notImplemented();
 }
-bool KWQCheckIfReloading(WebCore::DocLoader*) {
-  notImplemented();
-  return false;
-}
-int WebCore::ScrollView::contentsX() const {
-  notImplemented();
-  return 0;
-}
-int WebCore::ScrollView::contentsY() const {
-  notImplemented();
-  return 0;
-}
-int WebCore::ScrollView::contentsHeight() const {
-  notImplemented();
-  return 0;
-}
-int WebCore::ScrollView::contentsWidth() const {
-  notImplemented();
-  return 0;
-}
-int WebCore::ScrollView::visibleHeight() const {
-  notImplemented();
-  return 0;
-}
-int WebCore::ScrollView::visibleWidth() const {
-  notImplemented();
-  return 0;
-}
-WebCore::ScrollBarMode WebCore::ScrollView::hScrollBarMode() const {
-  notImplemented();
-  return ScrollBarAlwaysOff;
-}
-WebCore::ScrollBarMode WebCore::ScrollView::vScrollBarMode() const {
-  notImplemented();
-  return ScrollBarAlwaysOff;
-}
 RenderTheme* WebCore::theme() {
-  notImplemented();
-  return 0;
-}
-void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {
-  notImplemented();
-}
-bool KWQServeRequest(Loader*, Request*, TransferJob*) {
   notImplemented();
   return 0;
 }
@@ -1147,7 +982,7 @@ bool WebCore::FrameWin::locationbarVisible(void) {
   return 0;
 }
 void WebCore::FrameWin::respondToChangedSelection(
-    class WebCore::SelectionController const&,
+    WebCore::SelectionController const&,
     bool) {
   notImplemented();
 }
@@ -1157,13 +992,13 @@ void WebCore::FrameWin::clearUndoRedoOperations(void) {
 void WebCore::FrameWin::issueRedoCommand(void) {
   notImplemented();
 }
-class KJS::Bindings::Instance* WebCore::FrameWin::getObjectInstanceForWidget(
-    class WebCore::Widget*) {
+KJS::Bindings::Instance* WebCore::FrameWin::getObjectInstanceForWidget(
+    WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-class KJS::Bindings::Instance* WebCore::FrameWin::getEmbedInstanceForWidget(
-    class WebCore::Widget*) {
+KJS::Bindings::Instance* WebCore::FrameWin::getEmbedInstanceForWidget(
+    WebCore::Widget*) {
   notImplemented();
   return 0;
 }
@@ -1171,45 +1006,36 @@ bool WebCore::FrameWin::canRedo(void) const {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::restoreDocumentState(void) {}
 bool WebCore::FrameWin::canUndo(void) const {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::runJavaScriptPrompt(class WebCore::String const&,
-                                            class WebCore::String const&,
-                                            class WebCore::String&) {
+bool WebCore::FrameWin::runJavaScriptPrompt(WebCore::String const&,
+                                            WebCore::String const&,
+                                            WebCore::String&) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::recordFormValue(class QString const&,
-                                        class QString const&,
-                                        class WebCore::HTMLFormElementImpl*) {
+void WebCore::FrameWin::recordFormValue(QString const&,
+                                        QString const&,
+                                        WebCore::HTMLFormElementImpl*) {
   notImplemented();
 }
-class QString WebCore::FrameWin::overrideMediaType(void) const {
-  notImplemented();
-  return QString();
-}
-void WebCore::FrameWin::registerCommandForRedo(
-    class WebCore::EditCommandPtr const&) {
+void WebCore::FrameWin::registerCommandForRedo(WebCore::EditCommandPtr const&) {
   notImplemented();
 }
-void WebCore::FrameWin::runJavaScriptAlert(class WebCore::String const&) {
+void WebCore::FrameWin::runJavaScriptAlert(WebCore::String const&) {
   notImplemented();
 }
-void WebCore::FrameWin::setTitle(class WebCore::String const&) {
-  notImplemented();
-}
-bool WebCore::FrameWin::runJavaScriptConfirm(class WebCore::String const&) {
+bool WebCore::FrameWin::runJavaScriptConfirm(WebCore::String const&) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::openURL(class KURL const&) {
+bool WebCore::FrameWin::openURL(KURL const&) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::urlSelected(class KURL const&,
+void WebCore::FrameWin::urlSelected(KURL const&,
                                     struct WebCore::URLArgs const&) {
   notImplemented();
 }
@@ -1219,17 +1045,16 @@ void WebCore::FrameWin::saveDocumentState(void) {
 void WebCore::FrameWin::print(void) {
   notImplemented();
 }
-class KJS::Bindings::Instance* WebCore::FrameWin::getAppletInstanceForWidget(
-    class WebCore::Widget*) {
+KJS::Bindings::Instance* WebCore::FrameWin::getAppletInstanceForWidget(
+    WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::passMouseDownEventToWidget(class WebCore::Widget*) {
+bool WebCore::FrameWin::passMouseDownEventToWidget(WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::registerCommandForUndo(
-    class WebCore::EditCommandPtr const&) {
+void WebCore::FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {
   notImplemented();
 }
 void WebCore::FrameWin::issueCutCommand(void) {
@@ -1238,25 +1063,23 @@ void WebCore::FrameWin::issueCutCommand(void) {
 void WebCore::FrameWin::issueCopyCommand(void) {
   notImplemented();
 }
-void WebCore::FrameWin::openURLRequest(class KURL const&,
+void WebCore::FrameWin::openURLRequest(KURL const&,
                                        struct WebCore::URLArgs const&) {
   notImplemented();
 }
-void WebCore::FrameWin::addMessageToConsole(class WebCore::String const&,
+void WebCore::FrameWin::addMessageToConsole(WebCore::String const&,
                                             unsigned int,
-                                            class WebCore::String const&) {
+                                            WebCore::String const&) {
   notImplemented();
 }
-bool WebCore::FrameWin::passWheelEventToChildWidget(class WebCore::NodeImpl*) {
+bool WebCore::FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::partClearedInBegin(void) {}
 void WebCore::FrameWin::issueUndoCommand(void) {
   notImplemented();
 }
-class QString WebCore::FrameWin::mimeTypeForFileName(
-    class QString const&) const {
+QString WebCore::FrameWin::mimeTypeForFileName(QString const&) const {
   notImplemented();
   return QString();
 }
@@ -1266,13 +1089,13 @@ void WebCore::FrameWin::clearRecordedFormValues(void) {
 void WebCore::FrameWin::issuePasteCommand(void) {
   notImplemented();
 }
-class WebCore::RangeImpl* WebCore::FrameWin::markedTextRange(void) const {
+WebCore::RangeImpl* WebCore::FrameWin::markedTextRange(void) const {
   notImplemented();
   return 0;
 }
 bool WebCore::FrameWin::shouldChangeSelection(
-    class WebCore::SelectionController const&,
-    class WebCore::SelectionController const&,
+    WebCore::SelectionController const&,
+    WebCore::SelectionController const&,
     WebCore::EAffinity,
     bool) const {
   notImplemented();
@@ -1282,11 +1105,10 @@ void WebCore::FrameWin::scheduleClose(void) {
   notImplemented();
 }
 void WebCore::FrameWin::markMisspellingsInAdjacentWords(
-    class WebCore::VisiblePosition const&) {
+    WebCore::VisiblePosition const&) {
   notImplemented();
 }
-void WebCore::FrameWin::markMisspellings(
-    class WebCore::SelectionController const&) {
+void WebCore::FrameWin::markMisspellings(WebCore::SelectionController const&) {
   notImplemented();
 }
 bool WebCore::FrameWin::menubarVisible(void) {
@@ -1297,7 +1119,6 @@ bool WebCore::FrameWin::personalbarVisible(void) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::createEmptyDocument(void) {}
 bool WebCore::FrameWin::lastEventIsMouseUp(void) const {
   notImplemented();
   return 0;
@@ -1313,11 +1134,11 @@ bool WebCore::FrameWin::toolbarVisible(void) {
 void WebCore::FrameWin::issueTransposeCommand(void) {
   notImplemented();
 }
-class QString WebCore::FrameWin::userAgent(void) const {
+QString WebCore::FrameWin::userAgent(void) const {
   notImplemented();
   return QString();
 }
-void WebCore::FrameWin::submitForm(class KURL const&,
+void WebCore::FrameWin::submitForm(KURL const&,
                                    struct WebCore::URLArgs const&) {
   notImplemented();
 }
@@ -1325,26 +1146,25 @@ bool WebCore::FrameWin::canPaste(void) const {
   notImplemented();
   return 0;
 }
-class QString WebCore::FrameWin::incomingReferrer(void) const {
+QString WebCore::FrameWin::incomingReferrer(void) const {
   notImplemented();
   return QString();
 }
 enum WebCore::ObjectContentType WebCore::FrameWin::objectContentType(
-    class KURL const&,
-    class QString const&) {
+    KURL const&,
+    QString const&) {
   notImplemented();
   return (ObjectContentType)0;
 }
 bool WebCore::FrameWin::passSubframeEventToSubframe(
-    class WebCore::MouseEventWithHitTestResults&) {
+    WebCore::MouseEventWithHitTestResults&) {
   notImplemented();
   return 0;
 }
-class WebCore::Frame* WebCore::FrameWin::createFrame(
-    class KURL const&,
-    class QString const&,
-    class WebCore::RenderPart*,
-    class WebCore::String const&) {
+WebCore::Frame* WebCore::FrameWin::createFrame(KURL const&,
+                                               QString const&,
+                                               WebCore::RenderPart*,
+                                               WebCore::String const&) {
   notImplemented();
   return 0;
 }
@@ -1355,27 +1175,23 @@ bool WebCore::FrameWin::canGoBackOrForward(int) const {
 void WebCore::FrameWin::issuePasteAndMatchStyleCommand(void) {
   notImplemented();
 }
-class WebCore::Plugin* WebCore::FrameWin::createPlugin(class KURL const&,
-                                                       class QStringList const&,
-                                                       class QStringList const&,
-                                                       class QString const&) {
+WebCore::Plugin* WebCore::FrameWin::createPlugin(KURL const&,
+                                                 QStringList const&,
+                                                 QStringList const&,
+                                                 QString const&) {
   notImplemented();
   return 0;
-}
-void WebCore::FrameWin::handledOnloadEvents(void) {
-  notImplemented();
 }
 WebCore::String WebCore::FrameWin::generateFrameName(void) {
   notImplemented();
   return String();
 }
-WebCore::BrowserExtensionWin::BrowserExtensionWin(class WebCore::Frame*) {}
-void WebCore::BrowserExtensionWin::setTypedIconURL(class KURL const&,
-                                                   class QString const&) {
+void WebCore::BrowserExtensionWin::setTypedIconURL(KURL const&,
+                                                   QString const&) {
   notImplemented();
 }
 void WebCore::BrowserExtensionWin::openURLRequest(
-    class KURL const&,
+    KURL const&,
     struct WebCore::URLArgs const&) {
   notImplemented();
 }
@@ -1391,10 +1207,10 @@ void WebCore::BrowserExtensionWin::openURLNotify(void) {
   notImplemented();
 }
 void WebCore::BrowserExtensionWin::createNewWindow(
-    class KURL const&,
+    KURL const&,
     struct WebCore::URLArgs const&,
     struct WebCore::WindowArgs const&,
-    class WebCore::Frame*&) {
+    WebCore::Frame*&) {
   notImplemented();
 }
 bool WebCore::BrowserExtensionWin::canRunModalNow(void) {
@@ -1407,11 +1223,138 @@ void WebCore::BrowserExtensionWin::runModal(void) {
 void WebCore::BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::setIconURL(class KURL const&) {
+void WebCore::BrowserExtensionWin::setIconURL(KURL const&) {
   notImplemented();
 }
 void WebCore::BrowserExtensionWin::createNewWindow(
-    class KURL const&,
+    KURL const&,
     struct WebCore::URLArgs const&) {
   notImplemented();
 }
+
+// Completely empty stubs (mostly to allow DRT to run):
+bool WebCore::historyContains(QString const&) {
+  return false;
+}
+QString submitButtonDefaultLabel() {
+  return "Submit";
+}
+QString inputElementAltText() {
+  return QString();
+}
+QString resetButtonDefaultLabel() {
+  return "Reset";
+}
+QString KLocale::language() {
+  return "en";
+}
+
+Cursor::~Cursor() {}
+
+QFont::QFont() {}
+QFont::~QFont() {}
+QFont::QFont(QFont const&) {}
+QFont& QFont::operator=(QFont const&) {
+  return localFont;
+}
+bool QFont::italic() const {
+  return false;
+}
+int QFont::weight() const {
+  return QFont::Normal;
+}
+void QFont::setPrinterFont(bool) {}
+void QFont::setItalic(bool) {}
+void QFont::setFirstFamily(FontFamily const&) {}
+void QFont::setWeight(int) {}
+void QFontMetrics::setFont(QFont const&) {}
+void QFont::setPixelSize(float) {}
+
+QFontMetrics::QFontMetrics() {}
+QFontMetrics::~QFontMetrics() {}
+QFontMetrics::QFontMetrics(QFontMetrics const&) {}
+QFontMetrics& QFontMetrics::operator=(QFontMetrics const&) {
+  return localFontMetrics;
+}
+float QFontMetrics::floatWidth(QChar const*,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               bool) const {
+  return 14.0;
+}
+int QFontMetrics::lineSpacing() const {
+  return 10;
+}
+int QFontMetrics::ascent() const {
+  return 10;
+}
+int QFontMetrics::height() const {
+  return 10;
+}
+int QFontMetrics::descent() const {
+  return 10;
+}
+
+void WebCore::FrameWin::restoreDocumentState() {}
+void WebCore::FrameWin::partClearedInBegin() {}
+void WebCore::FrameWin::createEmptyDocument() {}
+
+WebCore::BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
+
+bool KWQServeRequest(Loader*, Request*, TransferJob*) {
+  return false;
+}  // false may not be "right" as a stub.
+bool KWQCheckIfReloading(WebCore::DocLoader*) {
+  return false;
+}
+void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
+
+Widget::Widget() {}
+void Widget::show() {}
+
+QString WebCore::FrameWin::overrideMediaType() const {
+  return QString();
+}
+void WebCore::FrameWin::setTitle(WebCore::String const&) {}
+void WebCore::FrameWin::handledOnloadEvents(void) {}
+
+void ScrollView::resizeContents(int, int) {}
+WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
+  return ScrollBarAlwaysOff;
+}
+WebCore::ScrollBarMode ScrollView::vScrollBarMode() const {
+  return ScrollBarAlwaysOff;
+}
+void ScrollView::suppressScrollBars(bool, bool) {}
+void ScrollView::setHScrollBarMode(ScrollBarMode) {}
+void ScrollView::setVScrollBarMode(ScrollBarMode) {}
+void ScrollView::setScrollBarsMode(ScrollBarMode) {}
+int WebCore::ScrollView::visibleHeight() const {
+  return 600;
+}
+int WebCore::ScrollView::visibleWidth() const {
+  return 800;
+}
+void WebCore::ScrollView::setContentsPos(int, int) {}
+int WebCore::ScrollView::contentsX() const {
+  return 0;
+}
+int WebCore::ScrollView::contentsY() const {
+  return 0;
+}
+int WebCore::ScrollView::contentsHeight() const {
+  return 600;
+}
+int WebCore::ScrollView::contentsWidth() const {
+  return 800;
+}
+void ScrollView::updateContents(const IntRect&, bool) {}
+void ScrollView::setStaticBackground(bool) {}
+
+WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*, KURL const&) {}
+void WebCore::TransferJob::addMetaData(QString const&, QString const&) {}

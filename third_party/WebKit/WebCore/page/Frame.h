@@ -124,6 +124,8 @@ class Frame : public Shared<Frame>,
    */
   FrameView* view() const;
 
+  virtual void setView(FrameView*);
+
   /**
    * Returns @p true if Javascript is enabled, @p false otherwise.
    */

@@ -120,7 +120,7 @@ class MacFrame : public Frame {
 
   void setBridge(WebCoreFrameBridge* p);
   WebCoreFrameBridge* bridge() const { return _bridge; }
-  void setView(FrameView* view);
+  virtual void setView(FrameView*);
   virtual void frameDetached();
 
   virtual bool openURL(const KURL&);

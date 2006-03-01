@@ -325,6 +325,10 @@ FrameView* Frame::view() const {
   return d->m_view.get();
 }
 
+void Frame::setView(FrameView* view) {
+  d->m_view = view;
+}
+
 bool Frame::jScriptEnabled() const {
   return d->m_bJScriptEnabled;
 }
