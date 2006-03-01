@@ -1175,7 +1175,7 @@ bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
   NodeImpl* node = info.innerNode();
   while (node) {
     if (node->isLink() && !info.URLElement())
-      info.setURLElement(node);
+      info.setURLElement(static_cast<ElementImpl*>(node));
     node = node->parentNode();
   }
 

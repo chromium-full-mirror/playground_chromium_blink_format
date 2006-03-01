@@ -27,6 +27,7 @@
 
 #include "CDATASectionImpl.h"
 #include "CommentImpl.h"
+#include "decoder.h"
 #include "DOMImplementationImpl.h"
 #include "DocLoader.h"
 #include "DocumentFragmentImpl.h"
@@ -1666,8 +1667,7 @@ MouseEventWithHitTestResults DocumentImpl::prepareMouseEvent(
   String href;
   String target;
   if (renderInfo.URLElement()) {
-    assert(renderInfo.URLElement()->isElementNode());
-    ElementImpl* e = static_cast<ElementImpl*>(renderInfo.URLElement());
+    ElementImpl* e = renderInfo.URLElement();
     href = parseURL(e->getAttribute(hrefAttr));
     if (!href.isNull())
       target = e->getAttribute(targetAttr);
@@ -2511,6 +2511,12 @@ HTMLMapElementImpl* DocumentImpl::getImageMap(const DOMString& URL) const {
 
 void DocumentImpl::setDecoder(Decoder* decoder) {
   m_decoder = decoder;
+}
+
+QChar DocumentImpl::backslashAsCurrencySymbol() const {
+  if (!m_decoder)
+    return '\\';
+  return m_decoder->encoding().backslashAsCurrencySymbol();
 }
 
 QString DocumentImpl::completeURL(const QString& URL) {

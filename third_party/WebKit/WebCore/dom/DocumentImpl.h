@@ -758,6 +758,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setDecoder(Decoder*);
   Decoder* decoder() const { return m_decoder.get(); }
 
+  QChar backslashAsCurrencySymbol() const;
+
 #if __APPLE__
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
