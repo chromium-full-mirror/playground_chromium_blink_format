@@ -26,10 +26,10 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "Color.h"
-#include <qfont.h>
-#include <qfontmetrics.h>
+#include "FontFamily.h"
 #include "FontDescription.h"
+#include <qfontmetrics.h>
+#include "Color.h"
 #include <qpainter.h>
 
 #undef min
@@ -38,25 +38,32 @@
 
 namespace WebCore {
 
-class RenderStyle;
-class CSSStyleSelector;
+enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 
 class Font {
-  friend class RenderStyle;
-  friend class CSSStyleSelector;
-
  public:
   Font() : m_letterSpacing(0), m_wordSpacing(0) {}
-  Font(const FontDescription& fd, int l, int w)
-      : m_fontDescription(fd), m_letterSpacing(l), m_wordSpacing(w) {}
+  Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
+      : m_fontDescription(fd),
+        m_letterSpacing(letterSpacing),
+        m_wordSpacing(wordSpacing) {}
 
   bool operator==(const Font& other) const {
+    // The platform-specific pointers don't have to be checked, since
+    // any result will be fine.
     return (m_fontDescription == other.m_fontDescription &&
             m_letterSpacing == other.m_letterSpacing &&
             m_wordSpacing == other.m_wordSpacing);
   }
 
+  bool operator!=(const Font& other) const { return !(*this == other); }
+
   const FontDescription& fontDescription() const { return m_fontDescription; }
+
+  const QFontMetrics& fontMetrics() const { return fm; }
+
+  int pixelSize() const { return fontDescription().computedPixelSize(); }
+  float size() const { return fontDescription().computedSize(); }
 
   void update() const;
 
@@ -81,7 +88,7 @@ class Font {
                    int len,
                    int tabWidth,
                    int xpos) const;
-  bool isFixedPitch() const;
+
   int checkSelectionPoint(QChar* s,
                           int slen,
                           int pos,
@@ -129,12 +136,35 @@ class Font {
   int width(QChar* str, int slen, int tabWidth, int xpos) const;
 
   bool isSmallCaps() const { return m_fontDescription.smallCaps(); }
+
   short wordSpacing() const { return m_wordSpacing; }
+  short letterSpacing() const { return m_letterSpacing; }
+  void setWordSpacing(short s) { m_wordSpacing = s; }
+  void setLetterSpacing(short s) { m_letterSpacing = s; }
+
+  bool isFixedPitch() const { return fm.isFixedPitch(); };
+
+  bool isPrinterFont() const { return m_fontDescription.usePrinterFont(); }
+
+  FontFamily& firstFamily() { return m_fontDescription.firstFamily(); }
+  const FontFamily& family() const { return m_fontDescription.family(); }
+
+  bool italic() const { return m_fontDescription.italic(); }
+  unsigned weight() const { return m_fontDescription.weight(); }
+
+#if __APPLE__
+  NSString* getNSFamily() const {
+    return m_fontDescription.family().getNSFamily();
+  }
+  NSFont* getNSFont() const { return getWebCoreFont().font; }
+  const WebCoreFont& getWebCoreFont() const { return fm.getWebCoreFont(); }
+#endif
 
  private:
   FontDescription m_fontDescription;
-  mutable QFont f;
-  mutable QFontMetrics fm;
+  mutable QFontMetrics fm;  // FIXME: This is going to morph into the
+                            // platform-specific wrapper for
+                            // measurement/drawing.
   short m_letterSpacing;
   short m_wordSpacing;
 };
@@ -187,10 +217,6 @@ inline int Font::width(QChar* chs,
 
 inline int Font::width(QChar* chs, int slen, int tabWidth, int xpos) const {
   return width(chs, slen, 0, 1, tabWidth, xpos);
-}
-
-inline bool Font::isFixedPitch() const {
-  return f.isFixedPitch();
 }
 }
 

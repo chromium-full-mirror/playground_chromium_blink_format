@@ -91,24 +91,24 @@ class FontFamily {
 // performance critical code.  Create a NSSString ** name families
 // and populates with a NSString * for each family name.  Null terminates
 // the array.
-#define CREATE_FAMILY_ARRAY(font, families)        \
-  int __numFamilies = 0;                           \
-  {                                                \
-    const FontFamily* __ff = (font).firstFamily(); \
-    while (__ff) {                                 \
-      __numFamilies++;                             \
-      __ff = __ff->next();                         \
-    }                                              \
-  }                                                \
-  NSString* families[__numFamilies + 1];           \
-  {                                                \
-    int __i = 0;                                   \
-    const FontFamily* __ff = (font).firstFamily(); \
-    while (__ff) {                                 \
-      families[__i++] = __ff->getNSFamily();       \
-      __ff = __ff->next();                         \
-    }                                              \
-    families[__i] = 0;                             \
+#define CREATE_FAMILY_ARRAY(fontDescription, families)    \
+  int __numFamilies = 0;                                  \
+  {                                                       \
+    const FontFamily* __ff = &(fontDescription).family(); \
+    while (__ff) {                                        \
+      __numFamilies++;                                    \
+      __ff = __ff->next();                                \
+    }                                                     \
+  }                                                       \
+  NSString* families[__numFamilies + 1];                  \
+  {                                                       \
+    int __i = 0;                                          \
+    const FontFamily* __ff = &(fontDescription).family(); \
+    while (__ff) {                                        \
+      families[__i++] = __ff->getNSFamily();              \
+      __ff = __ff->next();                                \
+    }                                                     \
+    families[__i] = 0;                                    \
   }
 #endif
 }

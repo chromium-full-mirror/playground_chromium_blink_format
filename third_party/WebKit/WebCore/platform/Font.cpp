@@ -95,12 +95,6 @@ void Font::drawText(QPainter* p,
 }
 
 void Font::update() const {
-  f.setFirstFamily(m_fontDescription.family());
-  f.setItalic(m_fontDescription.italic());
-  f.setWeight(m_fontDescription.weight());
-  f.setPixelSize(m_fontDescription.computedPixelSize());
-  f.setPrinterFont(m_fontDescription.usePrinterFont());
-
-  fm.setFont(f);
+  fm.setFontDescription(fontDescription());
 }
 }

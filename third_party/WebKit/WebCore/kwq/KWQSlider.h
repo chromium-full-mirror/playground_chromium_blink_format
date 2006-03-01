@@ -35,7 +35,7 @@ class QSlider : public Widget {
   ~QSlider();
 
   IntSize sizeHint() const;
-  virtual void setFont(const QFont& f);
+  virtual void setFont(const WebCore::Font&);
 
   void setValue(double v);
   void setMinValue(double v);

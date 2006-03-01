@@ -26,6 +26,9 @@
 
 namespace WebCore {
 
+const unsigned cNormalWeight = 50;
+const unsigned cBoldWeight = 63;
+
 class FontDescription {
  public:
   enum GenericFamilyType {
@@ -44,7 +47,7 @@ class FontDescription {
         m_italic(false),
         m_smallCaps(false),
         m_isAbsoluteSize(false),
-        m_weight(50),
+        m_weight(cNormalWeight),
         m_genericFamily(NoFamily),
         m_usePrinterFont(false) {}
 

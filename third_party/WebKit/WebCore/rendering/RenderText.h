@@ -145,7 +145,7 @@ class RenderText : public RenderObject {
   virtual int xPos() const;
   virtual int yPos() const;
 
-  virtual const QFont& font();
+  virtual const Font& font();
   virtual short verticalPositionHint(bool firstLine) const;
 
   void setText(DOM::DOMStringImpl*, bool force = false);
@@ -173,7 +173,7 @@ class RenderText : public RenderObject {
   virtual IntRect getAbsoluteRepaintRect();
 
   const QFontMetrics& metrics(bool firstLine) const;
-  const Font* htmlFont(bool firstLine) const;
+  const Font* font(bool firstLine) const;
 
   DOM::TextImpl* element() const {
     return static_cast<DOM::TextImpl*>(RenderObject::element());

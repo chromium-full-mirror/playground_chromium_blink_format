@@ -892,7 +892,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
       int rtLength = rt->length();
       if (rtLength != 0) {
         if (r->start == 0 && needsWordSpacing && rt->text()[r->start].isSpace())
-          effectiveWidth += rt->htmlFont(m_firstLine)->wordSpacing();
+          effectiveWidth += rt->font(m_firstLine)->wordSpacing();
         needsWordSpacing =
             !rt->text()[r->stop - 1].isSpace() && r->stop == rtLength;
       }
@@ -2257,7 +2257,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       int len = strlen - pos;
       QChar* str = t->text();
 
-      const Font* f = t->htmlFont(m_firstLine);
+      const Font* f = t->font(m_firstLine);
       // proportional font, needs a bit more work.
       int lastSpace = pos;
       int wordSpacing = o->style()->wordSpacing();

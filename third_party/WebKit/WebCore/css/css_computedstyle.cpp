@@ -662,8 +662,8 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
                                        CSSPrimitiveValue::CSS_STRING);
     }
     case CSS_PROP_FONT_SIZE: {
-      FontDescription def = style->fontDescription();
-      return new CSSPrimitiveValueImpl(def.specifiedSize(),
+      FontDescription desc = style->fontDescription();
+      return new CSSPrimitiveValueImpl(desc.computedPixelSize(),
                                        CSSPrimitiveValue::CSS_PX);
     }
     case CSS_PROP_FONT_STRETCH:
@@ -688,7 +688,7 @@ PassRefPtr<CSSValueImpl> CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       // FIXME: this does not reflect the full range of weights
       // that can be expressed with CSS
       const FontDescription& desc = style->fontDescription();
-      if (desc.weight() == QFont::Bold)
+      if (desc.weight() == cBoldWeight)
         return new CSSPrimitiveValueImpl(CSS_VAL_BOLD);
       else
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
