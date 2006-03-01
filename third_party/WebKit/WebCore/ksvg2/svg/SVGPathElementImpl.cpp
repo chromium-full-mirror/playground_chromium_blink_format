@@ -485,7 +485,7 @@ KCanvasPath* SVGPathElementImpl::toPathData() const {
   if (len < 1)
     return 0;
 
-  KCanvasPath* pathData = QPainter::renderingDevice()->createPath();
+  KCanvasPath* pathData = renderingDevice()->createPath();
   for (int i = 0; i < len; ++i) {
     SVGPathSegImpl* p = pathSegList()->getItem(i);
     switch (p->pathSegType()) {

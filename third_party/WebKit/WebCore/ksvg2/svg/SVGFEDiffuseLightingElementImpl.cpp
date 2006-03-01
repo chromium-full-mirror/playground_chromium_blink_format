@@ -110,7 +110,7 @@ KCanvasFEDiffuseLighting* SVGFEDiffuseLightingElementImpl::filterEffect()
     const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEDiffuseLighting*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
+        renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
   m_filterEffect->setIn(DOMString(in1()->baseVal()).qstring());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setDiffuseConstant((diffuseConstant()->baseVal()));

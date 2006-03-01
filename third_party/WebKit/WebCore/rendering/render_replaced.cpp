@@ -27,6 +27,7 @@
 #include "DocumentImpl.h"  // ### remove dependency
 #include "EventNames.h"
 #include "FrameView.h"
+#include "GraphicsContext.h"
 #include "dom2_eventsimpl.h"
 #include "dom_position.h"
 #include "BrowserExtension.h"
@@ -34,7 +35,6 @@
 #include "render_canvas.h"
 #include "render_line.h"
 #include "VisiblePosition.h"
-#include <qpainter.h>
 #include "Widget.h"
 
 namespace WebCore {
@@ -220,7 +220,7 @@ bool RenderReplaced::isSelected() {
   return false;
 }
 
-Color RenderReplaced::selectionColor(QPainter* p) const {
+Color RenderReplaced::selectionColor(GraphicsContext* p) const {
   Color color = RenderBox::selectionColor(p);
 
   // Force a 60% alpha so that no user-specified selection color can obscure

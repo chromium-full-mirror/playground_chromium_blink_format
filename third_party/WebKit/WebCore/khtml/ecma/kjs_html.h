@@ -1001,7 +1001,7 @@ class Context2D : public DOMObject {
   void restore();
 
 #if __APPLE__
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  // FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
   CGContextRef drawingContext();
   CGAffineTransform _lastFillImagePatternCTM;
   CGAffineTransform _lastStrokeImagePatternCTM;
@@ -1033,7 +1033,7 @@ class Context2D : public DOMObject {
 };
 
 #if __APPLE__
-// FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+// FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
 CGColorRef colorRefFromValue(ExecState* exec, JSValue* value);
 #endif
 
@@ -1076,7 +1076,7 @@ class Gradient : public DOMObject {
   enum { Radial, Linear };
 
 #if __APPLE__
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  // FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
   CGShadingRef getShading();
 #endif
 
@@ -1093,7 +1093,7 @@ class Gradient : public DOMObject {
   float _x0, _y0, _r0, _x1, _y1, _r1;
 
 #if __APPLE__
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  // FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
   CGShadingRef _shadingRef;
 #endif
 
@@ -1125,7 +1125,7 @@ class ImagePattern : public DOMObject, public WebCore::CachedObjectClient {
   static const ClassInfo info;
 
 #if __APPLE__
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  // FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
   CGPatternRef createPattern(CGAffineTransform transform);
 #endif
 
@@ -1137,7 +1137,7 @@ class ImagePattern : public DOMObject, public WebCore::CachedObjectClient {
   float _rw, _rh;
   WebCore::CachedImage* m_cachedImage;
 #if __APPLE__
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  // FIXME: Macintosh specific, and should be abstracted by GraphicsContext.
   CGRect _bounds;
 #endif
 };

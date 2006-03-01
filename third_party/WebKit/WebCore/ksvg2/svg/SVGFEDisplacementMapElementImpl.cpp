@@ -111,7 +111,7 @@ KCanvasFEDisplacementMap* SVGFEDisplacementMapElementImpl::filterEffect()
     const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEDisplacementMap*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_DISPLACEMENT_MAP));
+        renderingDevice()->createFilterEffect(FE_DISPLACEMENT_MAP));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setXChannelSelector(

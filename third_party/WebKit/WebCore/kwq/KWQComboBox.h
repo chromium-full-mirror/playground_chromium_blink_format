@@ -64,7 +64,7 @@ class QComboBox : public Widget {
 
   virtual FocusPolicy focusPolicy() const;
 
-  void setWritingDirection(QPainter::TextDirection);
+  void setWritingDirection(WebCore::TextDirection);
 
   virtual void populate();
   void populateMenu();

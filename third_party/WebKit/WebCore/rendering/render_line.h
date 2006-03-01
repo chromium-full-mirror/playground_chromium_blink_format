@@ -263,7 +263,7 @@ class InlineFlowBox : public InlineRunBox {
   virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                         int _tx,
                                         int _ty);
-  void paintBackgrounds(QPainter* p,
+  void paintBackgrounds(GraphicsContext* p,
                         const Color& c,
                         const BackgroundLayer* bgLayer,
                         int my,
@@ -272,7 +272,7 @@ class InlineFlowBox : public InlineRunBox {
                         int _ty,
                         int w,
                         int h);
-  void paintBackground(QPainter* p,
+  void paintBackground(GraphicsContext* p,
                        const Color& c,
                        const BackgroundLayer* bgLayer,
                        int my,

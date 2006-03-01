@@ -25,16 +25,16 @@
 #include "config.h"
 #include "render_flow.h"
 
-#include <assert.h>
-#include <qpainter.h>
-#include "InlineTextBox.h"
-#include "rendering/render_canvas.h"
 #include "DocumentImpl.h"
-#include "render_inline.h"
+#include "GraphicsContext.h"
+#include "InlineTextBox.h"
 #include "RenderBlock.h"
-#include "render_arena.h"
-#include "render_line.h"
 #include "htmlnames.h"
+#include "render_arena.h"
+#include "render_canvas.h"
+#include "render_inline.h"
+#include "render_line.h"
+#include <assert.h>
 
 namespace WebCore {
 
@@ -700,7 +700,7 @@ IntRect RenderFlow::caretRect(int offset,
   return IntRect(_x, _y, width, height);
 }
 
-void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
+void RenderFlow::addFocusRingRects(GraphicsContext* p, int _tx, int _ty) {
   if (isRenderBlock())
     p->addFocusRingRect(_tx, _ty, width(), height());
 
@@ -720,7 +720,7 @@ void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
         _ty - containingBlock()->yPos() + continuation()->yPos());
 }
 
-void RenderFlow::paintFocusRing(QPainter* p, int tx, int ty) {
+void RenderFlow::paintFocusRing(GraphicsContext* p, int tx, int ty) {
   int ow = style()->outlineWidth();
   Color oc = style()->outlineColor();
   if (!oc.isValid())
@@ -732,7 +732,7 @@ void RenderFlow::paintFocusRing(QPainter* p, int tx, int ty) {
   p->clearFocusRing();
 }
 
-void RenderFlow::paintOutlines(QPainter* p, int _tx, int _ty) {
+void RenderFlow::paintOutlines(GraphicsContext* p, int _tx, int _ty) {
   if (style()->outlineStyle() <= BHIDDEN)
     return;
 
@@ -751,7 +751,7 @@ void RenderFlow::paintOutlines(QPainter* p, int _tx, int _ty) {
                         *rects.at(i + 1));
 }
 
-void RenderFlow::paintOutlineForLine(QPainter* p,
+void RenderFlow::paintOutlineForLine(GraphicsContext* p,
                                      int tx,
                                      int ty,
                                      const IntRect& lastline,

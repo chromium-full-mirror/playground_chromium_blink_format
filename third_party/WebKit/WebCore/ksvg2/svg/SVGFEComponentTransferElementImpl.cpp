@@ -75,7 +75,7 @@ KCanvasFEComponentTransfer* SVGFEComponentTransferElementImpl::filterEffect()
     const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEComponentTransfer*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
+        renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
   if (!m_filterEffect)
     return 0;
 

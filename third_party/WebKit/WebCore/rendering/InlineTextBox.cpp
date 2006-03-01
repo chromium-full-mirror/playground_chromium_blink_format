@@ -27,7 +27,7 @@
 
 #include "DocumentImpl.h"
 #include "Frame.h"
-#include "Pen.h"
+#include "GraphicsContext.h"
 #include "RenderBlock.h"
 #include "break_lines.h"
 #include "dom2_rangeimpl.h"
@@ -361,37 +361,35 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     int endPoint = m_len;
     if (m_truncation != cNoTruncation)
       endPoint = m_truncation - m_start;
-    font->drawText(
-        i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
-        textPos(), textObject()->string()->s, textObject()->string()->l,
-        m_start, endPoint, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
-        m_dirOverride || styleToUse->visuallyOrdered());
+    font->drawText(i.p, m_x + tx, m_y + ty + m_baseline,
+                   textObject()->tabWidth(), textPos(),
+                   textObject()->string()->s, textObject()->string()->l,
+                   m_start, endPoint, m_toAdd, m_reversed ? RTL : LTR,
+                   m_dirOverride || styleToUse->visuallyOrdered());
   } else {
     int sPos, ePos;
     selectionStartEnd(sPos, ePos);
     if (paintSelectedTextSeparately) {
       // paint only the text that is not selected
       if (sPos >= ePos) {
-        font->drawText(
-            i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
-            textPos(), textObject()->string()->s, textObject()->string()->l,
-            m_start, m_len, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
-            m_dirOverride || styleToUse->visuallyOrdered());
+        font->drawText(i.p, m_x + tx, m_y + ty + m_baseline,
+                       textObject()->tabWidth(), textPos(),
+                       textObject()->string()->s, textObject()->string()->l,
+                       m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
+                       m_dirOverride || styleToUse->visuallyOrdered());
       } else {
         if (sPos - 1 >= 0) {
           font->drawText(
               i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
               textPos(), textObject()->string()->s, textObject()->string()->l,
-              m_start, m_len, m_toAdd,
-              m_reversed ? QPainter::RTL : QPainter::LTR,
+              m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
               m_dirOverride || styleToUse->visuallyOrdered(), 0, sPos);
         }
         if (ePos < m_start + m_len) {
           font->drawText(
               i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
               textPos(), textObject()->string()->s, textObject()->string()->l,
-              m_start, m_len, m_toAdd,
-              m_reversed ? QPainter::RTL : QPainter::LTR,
+              m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
               m_dirOverride || styleToUse->visuallyOrdered(), ePos, -1);
         }
       }
@@ -408,7 +406,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       font->drawText(
           i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
           textPos(), textObject()->string()->s, textObject()->string()->l,
-          m_start, m_len, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
+          m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
           m_dirOverride || styleToUse->visuallyOrdered(), sPos, ePos);
       if (selectionTextShadow)
         i.p->clearShadow();
@@ -472,7 +470,7 @@ void InlineTextBox::selectionStartEnd(int& sPos, int& ePos) {
   ePos = kMin(endPos - m_start, (int)m_len);
 }
 
-void InlineTextBox::paintSelection(QPainter* p,
+void InlineTextBox::paintSelection(GraphicsContext* p,
                                    int tx,
                                    int ty,
                                    RenderStyle* style,
@@ -503,15 +501,15 @@ void InlineTextBox::paintSelection(QPainter* p,
   int y = r->selectionTop();
   int h = r->selectionHeight();
   p->addClip(IntRect(m_x + tx, y + ty, m_width, h));
-  f->drawHighlightForText(
-      p, m_x + tx, y + ty, h, textObject()->tabWidth(), textPos(),
-      textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
-      m_reversed ? QPainter::RTL : QPainter::LTR,
-      m_dirOverride || style->visuallyOrdered(), sPos, ePos, c);
+  f->drawHighlightForText(p, m_x + tx, y + ty, h, textObject()->tabWidth(),
+                          textPos(), textObject()->str->s, textObject()->str->l,
+                          m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
+                          m_dirOverride || style->visuallyOrdered(), sPos, ePos,
+                          c);
   p->restore();
 }
 
-void InlineTextBox::paintMarkedTextBackground(QPainter* p,
+void InlineTextBox::paintMarkedTextBackground(GraphicsContext* p,
                                               int tx,
                                               int ty,
                                               RenderStyle* style,
@@ -534,15 +532,18 @@ void InlineTextBox::paintMarkedTextBackground(QPainter* p,
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
-  f->drawHighlightForText(
-      p, m_x + tx, y + ty, h, textObject()->tabWidth(), textPos(),
-      textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
-      m_reversed ? QPainter::RTL : QPainter::LTR,
-      m_dirOverride || style->visuallyOrdered(), sPos, ePos, c);
+  f->drawHighlightForText(p, m_x + tx, y + ty, h, textObject()->tabWidth(),
+                          textPos(), textObject()->str->s, textObject()->str->l,
+                          m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
+                          m_dirOverride || style->visuallyOrdered(), sPos, ePos,
+                          c);
   p->restore();
 }
 
-void InlineTextBox::paintDecoration(QPainter* pt, int _tx, int _ty, int deco) {
+void InlineTextBox::paintDecoration(GraphicsContext* pt,
+                                    int _tx,
+                                    int _ty,
+                                    int deco) {
   _tx += m_x;
   _ty += m_y;
 
@@ -575,7 +576,7 @@ void InlineTextBox::paintDecoration(QPainter* pt, int _tx, int _ty, int deco) {
   }
 }
 
-void InlineTextBox::paintSpellingMarker(QPainter* pt,
+void InlineTextBox::paintSpellingMarker(GraphicsContext* pt,
                                         int _tx,
                                         int _ty,
                                         DocumentMarker marker) {
@@ -635,7 +636,7 @@ void InlineTextBox::paintSpellingMarker(QPainter* pt,
   pt->drawLineForMisspelling(_tx + start, _ty + underlineOffset, width);
 }
 
-void InlineTextBox::paintTextMatchMarker(QPainter* pt,
+void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
                                          int _tx,
                                          int _ty,
                                          DocumentMarker marker,
@@ -654,15 +655,15 @@ void InlineTextBox::paintTextMatchMarker(QPainter* pt,
   int sPos = kMax(marker.startOffset - m_start, (unsigned)0);
   int ePos = kMin(marker.endOffset - m_start, (unsigned)m_len);
 
-  f->drawHighlightForText(
-      pt, m_x + _tx, y + _ty, h, textObject()->tabWidth(), textPos(),
-      textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
-      m_reversed ? QPainter::RTL : QPainter::LTR,
-      m_dirOverride || style->visuallyOrdered(), sPos, ePos, yellow);
+  f->drawHighlightForText(pt, m_x + _tx, y + _ty, h, textObject()->tabWidth(),
+                          textPos(), textObject()->str->s, textObject()->str->l,
+                          m_start, m_len, m_toAdd, m_reversed ? RTL : LTR,
+                          m_dirOverride || style->visuallyOrdered(), sPos, ePos,
+                          yellow);
   pt->restore();
 }
 
-void InlineTextBox::paintAllMarkersOfType(QPainter* pt,
+void InlineTextBox::paintAllMarkersOfType(GraphicsContext* pt,
                                           int _tx,
                                           int _ty,
                                           DocumentMarker::MarkerType markerType,
@@ -712,7 +713,7 @@ void InlineTextBox::paintAllMarkersOfType(QPainter* pt,
   }
 }
 
-void InlineTextBox::paintMarkedTextUnderline(QPainter* pt,
+void InlineTextBox::paintMarkedTextUnderline(GraphicsContext* pt,
                                              int _tx,
                                              int _ty,
                                              MarkedTextUnderline& underline) {
@@ -782,7 +783,7 @@ int InlineTextBox::offsetForPosition(int _x, bool includePartialGlyphs) const {
   const Font* f = &style->font();
   return f->checkSelectionPoint(
       text->str->s, text->str->l, m_start, m_len, m_toAdd, text->tabWidth(),
-      textPos(), _x - m_x, m_reversed ? QPainter::RTL : QPainter::LTR,
+      textPos(), _x - m_x, m_reversed ? RTL : LTR,
       m_dirOverride || style->visuallyOrdered(), includePartialGlyphs);
 }
 

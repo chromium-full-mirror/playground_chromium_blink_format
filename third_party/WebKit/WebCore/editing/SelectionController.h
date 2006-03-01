@@ -34,7 +34,7 @@
 namespace WebCore {
 
 class Frame;
-class QPainter;
+class GraphicsContext;
 class RenderObject;
 class VisiblePosition;
 class SelectionController;
@@ -198,7 +198,7 @@ class SelectionController {
 
   void layout();
   void needsCaretRepaint();
-  void paintCaret(QPainter*, const IntRect& rect);
+  void paintCaret(GraphicsContext*, const IntRect& rect);
   IntRect caretRepaintRect() const;
 
   int xPosForVerticalArrowNavigation(EPositionType, bool recalc = false) const;

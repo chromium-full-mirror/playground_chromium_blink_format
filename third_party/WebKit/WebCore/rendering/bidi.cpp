@@ -277,7 +277,7 @@ static inline RenderObject* bidiNext(RenderBlock* block,
       if (next && bidi.adjustEmbedding && next->isInlineFlow()) {
         EUnicodeBidi ub = next->style()->unicodeBidi();
         if (ub != UBNormal) {
-          EDirection dir = next->style()->direction();
+          TextDirection dir = next->style()->direction();
           QChar::Direction d =
               (ub == Embed ? (dir == RTL ? QChar::DirRLE : QChar::DirLRE)
                            : (dir == RTL ? QChar::DirRLO : QChar::DirLRO));
@@ -304,7 +304,7 @@ static inline RenderObject* bidiNext(RenderBlock* block,
           if (bidi.adjustEmbedding && next->isInlineFlow()) {
             EUnicodeBidi ub = next->style()->unicodeBidi();
             if (ub != UBNormal) {
-              EDirection dir = next->style()->direction();
+              TextDirection dir = next->style()->direction();
               QChar::Direction d =
                   (ub == Embed ? (dir == RTL ? QChar::DirRLE : QChar::DirLRE)
                                : (dir == RTL ? QChar::DirRLO : QChar::DirLRO));
@@ -349,7 +349,7 @@ static RenderObject* bidiFirst(RenderBlock* block,
     if (bidi.adjustEmbedding) {
       EUnicodeBidi ub = o->style()->unicodeBidi();
       if (ub != UBNormal) {
-        EDirection dir = o->style()->direction();
+        TextDirection dir = o->style()->direction();
         QChar::Direction d =
             (ub == Embed ? (dir == RTL ? QChar::DirRLE : QChar::DirLRE)
                          : (dir == RTL ? QChar::DirRLO : QChar::DirLRO));
@@ -2255,7 +2255,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       RenderText* t = static_cast<RenderText*>(o);
       int strlen = t->stringLength();
       int len = strlen - pos;
-      QChar* str = t->text();
+      const QChar* str = t->text();
 
       const Font* f = t->font(m_firstLine);
       // proportional font, needs a bit more work.

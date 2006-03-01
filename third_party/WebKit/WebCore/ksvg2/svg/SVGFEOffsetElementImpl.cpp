@@ -81,7 +81,7 @@ void SVGFEOffsetElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 KCanvasFEOffset* SVGFEOffsetElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEOffset*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_OFFSET));
+        renderingDevice()->createFilterEffect(FE_OFFSET));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(DOMString(in1()->baseVal()).qstring());

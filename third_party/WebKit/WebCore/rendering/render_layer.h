@@ -224,7 +224,7 @@ class RenderLayer {
 
   bool isTransparent() const;
   RenderLayer* transparentAncestor();
-  void beginTransparencyLayers(QPainter* p);
+  void beginTransparencyLayers(GraphicsContext*);
 
   RenderLayer* root() {
     RenderLayer* curr = this;
@@ -278,7 +278,7 @@ class RenderLayer {
   int horizontalScrollbarHeight();
   void moveScrollbarsAside();
   void positionScrollbars(const IntRect& absBounds);
-  void paintScrollbars(QPainter* p, const IntRect& damageRect);
+  void paintScrollbars(GraphicsContext*, const IntRect& damageRect);
   void updateScrollInfoAfterLayout();
   void slotValueChanged(int);
   void updateScrollPositionFromScrollbars();
@@ -326,7 +326,7 @@ class RenderLayer {
   // paints the layers that intersect the damage rect from back to
   // front.  The hitTest method looks for mouse events by walking
   // layers that intersect the point from front to back.
-  void paint(QPainter* p,
+  void paint(GraphicsContext*,
              const IntRect& damageRect,
              bool selectionOnly = false,
              RenderObject* paintingRoot = 0);
@@ -375,7 +375,7 @@ class RenderLayer {
   void collectLayers(Vector<RenderLayer*>*&, Vector<RenderLayer*>*&);
 
   void paintLayer(RenderLayer* rootLayer,
-                  QPainter* p,
+                  GraphicsContext*,
                   const IntRect& paintDirtyRect,
                   bool haveTransparency,
                   bool selectionOnly,

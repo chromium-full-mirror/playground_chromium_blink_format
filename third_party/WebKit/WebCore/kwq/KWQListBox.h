@@ -26,8 +26,9 @@
 #ifndef KWQLISTBOX_H_
 #define KWQLISTBOX_H_
 
-#include "KWQPainter.h"
+#include "QString.h"
 #include "ScrollView.h"
+#include "TextDirection.h"
 
 enum KWQListBoxItemType {
   KWQListBoxOption,
@@ -74,7 +75,7 @@ class QListBox : public WebCore::ScrollView {
 
   const KWQListBoxItem& itemAtIndex(int index) const { return _items[index]; }
 
-  void setWritingDirection(QPainter::TextDirection);
+  void setWritingDirection(WebCore::TextDirection);
 
   bool changingSelection() { return _changingSelection; }
   void clicked() { _clicked.call(); }

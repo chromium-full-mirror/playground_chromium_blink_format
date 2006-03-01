@@ -23,15 +23,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QPAINTER_H_
-#define QPAINTER_H_
+#ifndef GraphicsContext_h
+#define GraphicsContext_h
 
 #include "Brush.h"
 #include "Image.h"
 #include "Pen.h"
+#include "TextDirection.h"
+#include <kxmlcore/Noncopyable.h>
 
 #if __APPLE__
-#include <ApplicationServices/ApplicationServices.h>
+typedef struct CGContext* CGContextRef;
 #endif
 
 class QFontMetrics;
@@ -39,23 +41,21 @@ class QString;
 
 namespace WebCore {
 
+class Font;
+class GraphicsContextPrivate;
+class IntPoint;
+class IntPointArray;
+
 #if SVG_SUPPORT
 class KRenderingDevice;
 class KRenderingDeviceContext;
 #endif
 
-class Font;
-class IntPoint;
-class IntPointArray;
-class QPainterPrivate;
-
-class QPainter : public Qt {
+class GraphicsContext : Noncopyable {
  public:
-  enum TextDirection { RTL, LTR };
-
-  QPainter();
-  QPainter(bool forPrinting);
-  ~QPainter();
+  GraphicsContext();
+  GraphicsContext(bool forPrinting);
+  ~GraphicsContext();
 
   const Font& font() const;
   void setFont(const Font&);
@@ -70,8 +70,6 @@ class QPainter : public Qt {
   void setBrush(const Brush&);
   void setBrush(Brush::BrushStyle);
   void setBrush(RGBA32);
-
-  IntRect xForm(const IntRect&) const;
 
   void save();
   void restore();
@@ -196,16 +194,16 @@ class QPainter : public Qt {
 
   Color selectedTextBackgroundColor() const;
   void setUsesInactiveTextBackgroundColor(bool u) {
-    _usesInactiveTextBackgroundColor = u;
+    m_usesInactiveTextBackgroundColor = u;
   }
 
   bool paintingDisabled() const;
   void setPaintingDisabled(bool);
 
-  bool updatingControlTints() const { return _updatingControlTints; }
+  bool updatingControlTints() const { return m_updatingControlTints; }
   void setUpdatingControlTints(bool b) {
     setPaintingDisabled(b);
-    _updatingControlTints = b;
+    m_updatingControlTints = b;
   }
 
   void beginTransparencyLayer(float opacity);
@@ -220,8 +218,7 @@ class QPainter : public Qt {
   void clearFocusRing();
 
 #if __APPLE__
-  CGContextRef currentContext();
-
+  static CGContextRef currentCGContext();
   static int getCompositeOperation(CGContextRef);
   static void setCompositeOperation(CGContextRef, const QString& operation);
   static void setCompositeOperation(CGContextRef, int operation);
@@ -232,28 +229,19 @@ class QPainter : public Qt {
   static KRenderingDevice* renderingDevice();
 #endif
 
-  bool printing() const { return _isForPrinting; }
+  bool printing() const { return m_isForPrinting; }
 
  private:
-  // no copying or assignment
-  QPainter(const QPainter&);
-  QPainter& operator=(const QPainter&);
+  void setColorFromBrush();
+  void setColorFromPen();
 
-  void _setColorFromBrush();
-  void _setColorFromPen();
+  void updateTextRenderer();
 
-  void _fillRect(float x, float y, float w, float h, const Color&);
-
-  void _updateRenderer();
-
-  QPainterPrivate* data;
-  bool _isForPrinting;
-  bool _usesInactiveTextBackgroundColor;
-  bool _updatingControlTints;
+  GraphicsContextPrivate* m_data;
+  bool m_isForPrinting;
+  bool m_usesInactiveTextBackgroundColor;
+  bool m_updatingControlTints;
 };
 }
-
-// FIXME: Remove when everything is in the WebCore namespace.
-using WebCore::QPainter;
 
 #endif

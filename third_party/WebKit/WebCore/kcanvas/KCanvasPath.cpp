@@ -27,7 +27,6 @@
 #include "config.h"
 #if SVG_SUPPORT
 
-#include <qpainter.h>
 #include <qtextstream.h>
 
 #include "KCanvasPath.h"
@@ -54,8 +53,7 @@ QTextStream& operator<<(QTextStream& ts, const KCClipData& d) {
   ts << "[winding=" << d.windRule << "]";
   if (d.bboxUnits)
     ts << " [bounding box mode=" << d.bboxUnits << "]";
-  ts << " [path=" << QPainter::renderingDevice()->stringForPath(d.path.get())
-     << "]";
+  ts << " [path=" << renderingDevice()->stringForPath(d.path.get()) << "]";
   return ts;
 }
 }

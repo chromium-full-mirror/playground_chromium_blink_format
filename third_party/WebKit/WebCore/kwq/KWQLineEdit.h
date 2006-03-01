@@ -28,8 +28,12 @@
 
 #include "PlatformString.h"
 #include "QString.h"
+#include "TextDirection.h"
 #include "Widget.h"
-#include "KWQPainter.h"
+
+namespace WebCore {
+class Color;
+}
 
 #ifdef __OBJC__
 @class KWQTextFieldController;
@@ -45,7 +49,8 @@ class QLineEdit : public Widget {
   QLineEdit(Type);
   ~QLineEdit();
 
-  void setColors(const Color& background, const Color& foreground);
+  void setColors(const WebCore::Color& background,
+                 const WebCore::Color& foreground);
 
   void setAlignment(AlignmentFlags);
 
@@ -66,7 +71,7 @@ class QLineEdit : public Widget {
   void setText(const DOM::DOMString&);
   DOM::DOMString text() const;
 
-  void setWritingDirection(QPainter::TextDirection);
+  void setWritingDirection(WebCore::TextDirection);
 
   void selectAll();
   bool hasSelectedText() const;

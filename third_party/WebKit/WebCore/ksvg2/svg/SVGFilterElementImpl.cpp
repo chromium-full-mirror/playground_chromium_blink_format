@@ -165,7 +165,7 @@ KCanvasFilter* SVGFilterElementImpl::canvasResource() {
 
   if (!m_filter)
     m_filter = static_cast<KCanvasFilter*>(
-        QPainter::renderingDevice()->createResource(RS_FILTER));
+        renderingDevice()->createResource(RS_FILTER));
 
   bool filterBBoxMode =
       filterUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;

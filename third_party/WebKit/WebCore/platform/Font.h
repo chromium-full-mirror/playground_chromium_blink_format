@@ -4,7 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -26,17 +26,19 @@
 #ifndef FONT_H
 #define FONT_H
 
+#include "Color.h"
+#include "TextDirection.h"
 #include "FontFamily.h"
 #include "FontDescription.h"
 #include <qfontmetrics.h>
-#include "Color.h"
-#include <qpainter.h>
 
 #undef min
 #undef max
 #include <algorithm>
 
 namespace WebCore {
+
+class GraphicsContext;
 
 enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 
@@ -67,29 +69,29 @@ class Font {
 
   void update() const;
 
-  void drawText(QPainter* p,
+  void drawText(GraphicsContext*,
                 int x,
                 int y,
                 int tabWidth,
                 int xpos,
-                QChar* str,
+                const QChar*,
                 int slen,
                 int pos,
                 int len,
                 int width,
-                QPainter::TextDirection d,
+                TextDirection,
                 bool visuallyOrdered = false,
                 int from = -1,
                 int to = -1,
                 Color bg = Color()) const;
-  float floatWidth(QChar* str,
+  float floatWidth(const QChar*,
                    int slen,
                    int pos,
                    int len,
                    int tabWidth,
                    int xpos) const;
 
-  int checkSelectionPoint(QChar* s,
+  int checkSelectionPoint(const QChar*,
                           int slen,
                           int pos,
                           int len,
@@ -97,7 +99,7 @@ class Font {
                           int tabWidth,
                           int xpos,
                           int x,
-                          QPainter::TextDirection d,
+                          TextDirection,
                           bool visuallyOrdered,
                           bool includePartialGlyphs) const;
   IntRect selectionRectForText(int x,
@@ -105,7 +107,7 @@ class Font {
                                int h,
                                int tabWidth,
                                int xpos,
-                               QChar* str,
+                               const QChar*,
                                int slen,
                                int pos,
                                int len,
@@ -114,26 +116,26 @@ class Font {
                                bool visuallyOrdered = false,
                                int from = -1,
                                int to = -1) const;
-  void drawHighlightForText(QPainter* p,
+  void drawHighlightForText(GraphicsContext*,
                             int x,
                             int y,
                             int h,
                             int tabWidth,
                             int xpos,
-                            QChar* str,
+                            const QChar*,
                             int slen,
                             int pos,
                             int len,
                             int width,
-                            QPainter::TextDirection d,
+                            TextDirection,
                             bool visuallyOrdered = false,
                             int from = -1,
                             int to = -1,
                             Color bg = Color()) const;
 
-  int width(QChar* str, int slen, int pos, int len, int tabWidth, int xpos)
+  int width(const QChar*, int slen, int pos, int len, int tabWidth, int xpos)
       const;
-  int width(QChar* str, int slen, int tabWidth, int xpos) const;
+  int width(const QChar*, int slen, int tabWidth, int xpos) const;
 
   bool isSmallCaps() const { return m_fontDescription.smallCaps(); }
 
@@ -169,7 +171,7 @@ class Font {
   short m_wordSpacing;
 };
 
-inline float Font::floatWidth(QChar* chs,
+inline float Font::floatWidth(const QChar* chs,
                               int slen,
                               int pos,
                               int len,
@@ -179,7 +181,7 @@ inline float Font::floatWidth(QChar* chs,
                        m_wordSpacing, m_fontDescription.smallCaps());
 }
 
-inline int Font::checkSelectionPoint(QChar* s,
+inline int Font::checkSelectionPoint(const QChar* s,
                                      int slen,
                                      int pos,
                                      int len,
@@ -187,16 +189,16 @@ inline int Font::checkSelectionPoint(QChar* s,
                                      int tabWidth,
                                      int xpos,
                                      int x,
-                                     QPainter::TextDirection d,
+                                     TextDirection d,
                                      bool visuallyOrdered,
                                      bool includePartialGlyphs) const {
   return fm.checkSelectionPoint(
       s + pos, std::min(slen - pos, len), 0, len, toAdd, tabWidth, xpos,
       m_letterSpacing, m_wordSpacing, m_fontDescription.smallCaps(), x,
-      d == QPainter::RTL, visuallyOrdered, includePartialGlyphs);
+      d == RTL, visuallyOrdered, includePartialGlyphs);
 }
 
-inline int Font::width(QChar* chs,
+inline int Font::width(const QChar* chs,
                        int slen,
                        int pos,
                        int len,
@@ -215,7 +217,10 @@ inline int Font::width(QChar* chs,
 #endif
 }
 
-inline int Font::width(QChar* chs, int slen, int tabWidth, int xpos) const {
+inline int Font::width(const QChar* chs,
+                       int slen,
+                       int tabWidth,
+                       int xpos) const {
   return width(chs, slen, 0, 1, tabWidth, xpos);
 }
 }

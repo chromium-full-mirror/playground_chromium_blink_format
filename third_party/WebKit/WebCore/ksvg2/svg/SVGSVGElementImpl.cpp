@@ -399,7 +399,7 @@ SVGMatrixImpl* SVGSVGElementImpl::getScreenCTM() const {
 RenderObject* SVGSVGElementImpl::createRenderer(RenderArena* arena,
                                                 RenderStyle* style) {
   KCanvasContainer* rootContainer =
-      QPainter::renderingDevice()->createContainer(arena, style, this);
+      renderingDevice()->createContainer(arena, style, this);
 
   // FIXME: all this setup should be done after attributesChanged, not here.
   float _x = x()->baseVal()->value();

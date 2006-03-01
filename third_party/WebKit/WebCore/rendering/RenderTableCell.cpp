@@ -26,9 +26,11 @@
 
 #include "config.h"
 #include "RenderTableCell.h"
+
+#include "GraphicsContext.h"
 #include "RenderTableCol.h"
-#include "htmlnames.h"
 #include "html_tableimpl.h"
+#include "htmlnames.h"
 #include <qtextstream.h>
 
 namespace WebCore {
@@ -560,7 +562,7 @@ int RenderTableCell::borderBottom() const {
 }
 
 #ifdef BOX_DEBUG
-static void outlineBox(QPainter* p, int _tx, int _ty, int w, int h) {
+static void outlineBox(GraphicsContext* p, int _tx, int _ty, int w, int h) {
   p->setPen(Pen(Color("yellow"), 3, Qt::DotLine));
   p->setBrush(Qt::NoBrush);
   p->drawRect(_tx, _ty, w, h);
@@ -679,7 +681,7 @@ void RenderTableCell::collectBorders(
   addBorderStyle(borderStyles, collapsedBottomBorder());
 }
 
-void RenderTableCell::paintCollapsedBorder(QPainter* p,
+void RenderTableCell::paintCollapsedBorder(GraphicsContext* p,
                                            int _tx,
                                            int _ty,
                                            int w,
@@ -814,7 +816,6 @@ void RenderTableCell::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
       IntRect clipRect(_tx + borderLeft(), _ty + borderTop(),
                        w - borderLeft() - borderRight(),
                        h - borderTop() - borderBottom());
-      clipRect = i.p->xForm(clipRect);
       i.p->save();
       i.p->addClip(clipRect);
     }

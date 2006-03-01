@@ -164,22 +164,22 @@ class RenderLineEdit : public RenderFormElement {
 
 class RenderFieldset : public RenderBlock {
  public:
-  RenderFieldset(DOM::HTMLGenericFormElementImpl* element);
+  RenderFieldset(HTMLGenericFormElementImpl*);
 
   virtual const char* renderName() const { return "RenderFieldSet"; }
 
   virtual RenderObject* layoutLegend(bool relayoutChildren);
 
-  virtual void setStyle(RenderStyle* _style);
+  virtual void setStyle(RenderStyle*);
 
- protected:
-  virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
-  void paintBorderMinusLegend(QPainter* p,
-                              int _tx,
-                              int _ty,
+ private:
+  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  void paintBorderMinusLegend(GraphicsContext*,
+                              int tx,
+                              int ty,
                               int w,
                               int h,
-                              const RenderStyle* style,
+                              const RenderStyle*,
                               int lx,
                               int lw);
   RenderObject* findLegend();

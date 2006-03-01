@@ -22,33 +22,33 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include <kdom/core/AttrImpl.h>
+#include "SVGPatternElementImpl.h"
+
+#include "GraphicsContext.h"
 #include "DocumentImpl.h"
-
-#include <kcanvas/KCanvas.h>
-#include <kcanvas/KCanvasMatrix.h>
-#include <kcanvas/KCanvasContainer.h>
-#include <kcanvas/KCanvasCreator.h>
-#include <kcanvas/KCanvasImage.h>
-#include <kcanvas/device/KRenderingDevice.h>
-#include <kcanvas/device/KRenderingPaintServerPattern.h>
-
-#include "ksvg.h"
-#include "SVGNames.h"
+#include "KCanvasContainer.h"
+#include "KCanvasCreator.h"
+#include "KCanvasImage.h"
+#include "KCanvasMatrix.h"
+#include "KCanvasRenderingStyle.h"
+#include "KRenderingDevice.h"
+#include "KRenderingPaintServerPattern.h"
+#include "SVGAnimatedEnumerationImpl.h"
+#include "SVGAnimatedLengthImpl.h"
+#include "SVGAnimatedStringImpl.h"
+#include "SVGAnimatedTransformListImpl.h"
+#include "SVGDOMImplementationImpl.h"
 #include "SVGHelper.h"
 #include "SVGMatrixImpl.h"
+#include "SVGNames.h"
 #include "SVGSVGElementImpl.h"
-#include "SVGTransformableImpl.h"
 #include "SVGTransformListImpl.h"
-#include "KCanvasRenderingStyle.h"
-#include "SVGPatternElementImpl.h"
-#include "SVGAnimatedStringImpl.h"
-#include "SVGAnimatedLengthImpl.h"
-#include "SVGDOMImplementationImpl.h"
-#include "SVGAnimatedEnumerationImpl.h"
-#include "SVGAnimatedTransformListImpl.h"
+#include "SVGTransformableImpl.h"
+#include "ksvg.h"
+#include <kcanvas/KCanvas.h>
+#include <kdom/core/AttrImpl.h>
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPatternElementImpl::SVGPatternElementImpl(const QualifiedName& tagName,
                                              DocumentImpl* doc)
@@ -206,7 +206,7 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
     const SVGPatternElementImpl* target,
     const IntSize& newSize,
     KCanvasMatrix patternTransformMatrix) const {
-  KRenderingDevice* device = QPainter::renderingDevice();
+  KRenderingDevice* device = renderingDevice();
 
   SVGStyledElementImpl* activeElement = static_cast<SVGStyledElementImpl*>(
       m_paintServer->activeClient()->element());
@@ -279,7 +279,7 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
         }
 #endif
 
-    QPainter p;
+    GraphicsContext p;
     RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground, 0);
     item->paint(info, 0, 0);
 #if 0
@@ -370,7 +370,7 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
 RenderObject* SVGPatternElementImpl::createRenderer(RenderArena* arena,
                                                     RenderStyle* style) {
   KCanvasContainer* patternContainer =
-      QPainter::renderingDevice()->createContainer(arena, style, this);
+      renderingDevice()->createContainer(arena, style, this);
   patternContainer->setDrawsContents(false);
   return patternContainer;
 }
@@ -378,8 +378,7 @@ RenderObject* SVGPatternElementImpl::createRenderer(RenderArena* arena,
 KRenderingPaintServerPattern* SVGPatternElementImpl::canvasResource() {
   if (!m_paintServer) {
     KRenderingPaintServer* pserver =
-        QPainter::renderingDevice()->createPaintServer(
-            KCPaintServerType(PS_PATTERN));
+        renderingDevice()->createPaintServer(KCPaintServerType(PS_PATTERN));
     m_paintServer = static_cast<KRenderingPaintServerPattern*>(pserver);
     m_paintServer->setListener(const_cast<SVGPatternElementImpl*>(this));
   }
@@ -396,6 +395,7 @@ SVGMatrixImpl* SVGPatternElementImpl::getCTM() const {
   }
 
   return mat;
+}
 }
 
 // vim:ts=4:noet

@@ -93,7 +93,7 @@ void SVGFEColorMatrixElementImpl::parseMappedAttribute(
 KCanvasFEColorMatrix* SVGFEColorMatrixElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEColorMatrix*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));
+        renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));
   if (!m_filterEffect)
     return 0;
 

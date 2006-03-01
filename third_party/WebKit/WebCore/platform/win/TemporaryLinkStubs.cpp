@@ -13,7 +13,7 @@
 #include "IntPoint.h"
 #include "Widget.h"
 #include "KWQFontMetrics.h"
-#include "KWQPainter.h"
+#include "GraphicsContext.h"
 #include "KWQSlider.h"
 #include "Cursor.h"
 #include "loader.h"
@@ -46,28 +46,28 @@ static void notImplemented() {
 void QLineEdit::selectAll() {
   notImplemented();
 }
-void QPainter::save() {
+void GraphicsContext::save() {
   notImplemented();
 }
 void Widget::enableFlushDrawing() {
   notImplemented();
 }
-void QPainter::drawHighlightForText(int,
-                                    int,
-                                    int,
-                                    int,
-                                    int,
-                                    QChar const*,
-                                    int,
-                                    int,
-                                    int,
-                                    int,
-                                    Color const&,
-                                    QPainter::TextDirection,
-                                    bool,
-                                    int,
-                                    int,
-                                    bool) {
+void GraphicsContext::drawHighlightForText(int,
+                                           int,
+                                           int,
+                                           int,
+                                           int,
+                                           QChar const*,
+                                           int,
+                                           int,
+                                           int,
+                                           int,
+                                           Color const&,
+                                           TextDirection,
+                                           bool,
+                                           int,
+                                           int,
+                                           bool) {
   notImplemented();
 }
 String QTextEdit::textWithHardLineBreaks() const {
@@ -78,21 +78,21 @@ IntPoint Widget::mapFromGlobal(IntPoint const&) const {
   notImplemented();
   return IntPoint();
 }
-void QPainter::addClip(IntRect const&) {
+void GraphicsContext::addClip(IntRect const&) {
   notImplemented();
 }
 int QLineEdit::cursorPosition() const {
   notImplemented();
   return 0;
 }
-void QPainter::setPen(Pen::PenStyle) {
+void GraphicsContext::setPen(Pen::PenStyle) {
   notImplemented();
 }
-Color QPainter::selectedTextBackgroundColor() const {
+Color GraphicsContext::selectedTextBackgroundColor() const {
   notImplemented();
   return Color();
 }
-QFontMetrics QPainter::fontMetrics() const {
+QFontMetrics GraphicsContext::fontMetrics() const {
   notImplemented();
   return QFontMetrics();
 }
@@ -105,10 +105,10 @@ void QLineEdit::addSearchResult() {
 void KWQFileButton::click(bool) {
   notImplemented();
 }
-void QLineEdit::setWritingDirection(QPainter::TextDirection) {
+void QLineEdit::setWritingDirection(TextDirection) {
   notImplemented();
 }
-void QPainter::drawFocusRing(Color const&) {
+void GraphicsContext::drawFocusRing(Color const&) {
   notImplemented();
 }
 IntSize KWQFileButton::sizeForCharacterWidth(int) const {
@@ -122,7 +122,7 @@ IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
 void QComboBox::clear() {
   notImplemented();
 }
-int QPainter::misspellingLineThickness() const {
+int GraphicsContext::misspellingLineThickness() const {
   notImplemented();
   return 0;
 }
@@ -144,14 +144,14 @@ bool KWQServeRequest(Loader*, DocLoader*, WebCore::TransferJob*) {
 void QTextEdit::setText(String const&) {
   notImplemented();
 }
-void Widget::paint(QPainter*, IntRect const&) {
+void Widget::paint(GraphicsContext*, IntRect const&) {
   notImplemented();
 }
-void QPainter::addRoundedRectClip(IntRect const&,
-                                  IntSize const&,
-                                  IntSize const&,
-                                  IntSize const&,
-                                  IntSize const&) {
+void GraphicsContext::addRoundedRectClip(IntRect const&,
+                                         IntSize const&,
+                                         IntSize const&,
+                                         IntSize const&,
+                                         IntSize const&) {
   notImplemented();
 }
 IntPoint FrameView::viewportToGlobal(IntPoint const&) const {
@@ -168,10 +168,10 @@ void QFont::determinePitch() const {
 void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
-void QPainter::drawEllipse(int, int, int, int) {
+void GraphicsContext::drawEllipse(int, int, int, int) {
   notImplemented();
 }
-void QPainter::setPen(unsigned int) {
+void GraphicsContext::setPen(unsigned int) {
   notImplemented();
 }
 void QTextEdit::setReadOnly(bool) {
@@ -196,10 +196,10 @@ void ScrollView::removeChild(Widget*) {
 void QTextEdit::selectAll() {
   notImplemented();
 }
-void QPainter::fillRect(int, int, int, int, Brush const&) {
+void GraphicsContext::fillRect(int, int, int, int, Brush const&) {
   notImplemented();
 }
-void QPainter::endTransparencyLayer() {
+void GraphicsContext::endTransparencyLayer() {
   notImplemented();
 }
 void ScrollView::addChild(Widget*, int, int) {
@@ -215,7 +215,7 @@ bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
 Widget::~Widget() {
   notImplemented();
 }
-IntRect QPainter::xForm(IntRect const&) const {
+IntRect GraphicsContext::xForm(IntRect const&) const {
   notImplemented();
   return IntRect();
 }
@@ -273,10 +273,10 @@ bool QListBox::isSelected(int) const {
 void QLineEdit::setReadOnly(bool) {
   notImplemented();
 }
-void QPainter::drawLineForText(int, int, int, int) {
+void GraphicsContext::drawLineForText(int, int, int, int) {
   notImplemented();
 }
-QPainter::QPainter() {
+GraphicsContext::GraphicsContext() {
   notImplemented();
 }
 QComboBox::~QComboBox() {
@@ -289,15 +289,15 @@ Widget::FocusPolicy QComboBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-void QPainter::drawImageAtPoint(Image*,
-                                IntPoint const&,
-                                Image::CompositeOperator) {
+void GraphicsContext::drawImageAtPoint(Image*,
+                                       IntPoint const&,
+                                       Image::CompositeOperator) {
   notImplemented();
 }
-void QPainter::clearShadow() {
+void GraphicsContext::clearShadow() {
   notImplemented();
 }
-void QPainter::setPen(Pen const&) {
+void GraphicsContext::setPen(Pen const&) {
   notImplemented();
 }
 void QTextEdit::setLineHeight(int) {
@@ -323,7 +323,7 @@ IntRect QFontMetrics::boundingRect(int,
 void QTextEdit::setSelectionStart(int) {
   notImplemented();
 }
-void QPainter::beginTransparencyLayer(float) {
+void GraphicsContext::beginTransparencyLayer(float) {
   notImplemented();
 }
 void QComboBox::setFont(QFont const&) {
@@ -336,13 +336,13 @@ IntRect Widget::frameGeometry() const {
 void QListBox::setSelected(int, bool) {
   notImplemented();
 }
-void QPainter::addFocusRingRect(int, int, int, int) {
+void GraphicsContext::addFocusRingRect(int, int, int, int) {
   notImplemented();
 }
 void QTextEdit::setCursorPosition(int, int) {
   notImplemented();
 }
-void QPainter::restore() {
+void GraphicsContext::restore() {
   notImplemented();
 }
 int QFontMetrics::width(QString const&, int, int, int) const {
@@ -359,7 +359,7 @@ void QComboBox::populate() {
   notImplemented();
 }
 static QFont localFont;
-QFont const& QPainter::font() const {
+QFont const& GraphicsContext::font() const {
   notImplemented();
   return localFont;
 }
@@ -369,11 +369,18 @@ void QTextEdit::setAlignment(Qt::AlignmentFlags) {
 void QLineEdit::setCursorPosition(int) {
   notImplemented();
 }
-void QPainter::drawText(int, int, int, int, int, int, int, QString const&) {
+void GraphicsContext::drawText(int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               QString const&) {
   notImplemented();
 }
 static Pen localPen;
-Pen const& QPainter::pen() const {
+Pen const& GraphicsContext::pen() const {
   notImplemented();
   return localPen;
 }
@@ -402,14 +409,14 @@ void Widget::unlockDrawingFocus() {
 void QLineEdit::setLiveSearch(bool) {
   notImplemented();
 }
-bool QPainter::paintingDisabled() const {
+bool GraphicsContext::paintingDisabled() const {
   notImplemented();
   return 0;
 }
 QComboBox::QComboBox() {
   notImplemented();
 }
-void QPainter::drawConvexPolygon(IntPointArray const&) {
+void GraphicsContext::drawConvexPolygon(IntPointArray const&) {
   notImplemented();
 }
 void Widget::setFont(QFont const&) {
@@ -421,30 +428,30 @@ void QSlider::setMaxValue(double) {
 void Widget::lockDrawingFocus() {
   notImplemented();
 }
-void QPainter::drawLine(int, int, int, int) {
+void GraphicsContext::drawLine(int, int, int, int) {
   notImplemented();
 }
-void QPainter::setBrush(Brush::BrushStyle) {
+void GraphicsContext::setBrush(Brush::BrushStyle) {
   notImplemented();
 }
 void QTextEdit::setSelectionRange(int, int) {
   notImplemented();
 }
-void QPainter::drawText(int,
-                        int,
-                        int,
-                        int,
-                        QChar const*,
-                        int,
-                        int,
-                        int,
-                        int,
-                        Color const&,
-                        QPainter::TextDirection,
-                        bool,
-                        int,
-                        int,
-                        bool) {
+void GraphicsContext::drawText(int,
+                               int,
+                               int,
+                               int,
+                               QChar const*,
+                               int,
+                               int,
+                               int,
+                               int,
+                               Color const&,
+                               TextDirection,
+                               bool,
+                               int,
+                               int,
+                               bool) {
   notImplemented();
 }
 void ScrollView::scrollPointRecursively(int, int) {
@@ -515,10 +522,10 @@ int QComboBox::baselinePosition(int) const {
 void QComboBox::appendItem(QString const&, KWQListBoxItemType, bool) {
   notImplemented();
 }
-void QPainter::setShadow(int, int, int, Color const&) {
+void GraphicsContext::setShadow(int, int, int, Color const&) {
   notImplemented();
 }
-void QTextEdit::setWritingDirection(QPainter::TextDirection) {
+void QTextEdit::setWritingDirection(GraphicsContext::TextDirection) {
   notImplemented();
 }
 void Widget::setDrawingAlpha(float) {
@@ -527,51 +534,51 @@ void Widget::setDrawingAlpha(float) {
 QSlider::QSlider() {
   notImplemented();
 }
-void QPainter::drawScaledAndTiledImage(Image*,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       int,
-                                       Image::TileRule,
-                                       Image::TileRule,
-                                       void*) {
+void GraphicsContext::drawScaledAndTiledImage(Image*,
+                                              int,
+                                              int,
+                                              int,
+                                              int,
+                                              int,
+                                              int,
+                                              int,
+                                              int,
+                                              Image::TileRule,
+                                              Image::TileRule,
+                                              void*) {
   notImplemented();
 }
 int ScrollView::scrollYOffset() const {
   notImplemented();
   return 0;
 }
-void QPainter::drawImage(Image*,
-                         int,
-                         int,
-                         int,
-                         int,
-                         int,
-                         int,
-                         int,
-                         int,
-                         Image::CompositeOperator,
-                         void*) {
+void GraphicsContext::drawImage(Image*,
+                                int,
+                                int,
+                                int,
+                                int,
+                                int,
+                                int,
+                                int,
+                                int,
+                                Image::CompositeOperator,
+                                void*) {
   notImplemented();
 }
-void QPainter::setBrush(Brush const&) {
+void GraphicsContext::setBrush(Brush const&) {
   notImplemented();
 }
 void QComboBox::setCurrentItem(int) {
   notImplemented();
 }
-void QComboBox::setWritingDirection(QPainter::TextDirection) {
+void QComboBox::setWritingDirection(TextDirection) {
   notImplemented();
 }
 IntSize QComboBox::sizeHint() const {
   notImplemented();
   return IntSize();
 }
-void QPainter::drawRect(int, int, int, int) {
+void GraphicsContext::drawRect(int, int, int, int) {
   notImplemented();
 }
 void Widget::setFrameGeometry(IntRect const&) {
@@ -590,10 +597,17 @@ bool QLineEdit::edited() const {
   notImplemented();
   return 0;
 }
-void QPainter::drawTiledImage(Image*, int, int, int, int, int, int, void*) {
+void GraphicsContext::drawTiledImage(Image*,
+                                     int,
+                                     int,
+                                     int,
+                                     int,
+                                     int,
+                                     int,
+                                     void*) {
   notImplemented();
 }
-void QPainter::clearFocusRing() {
+void GraphicsContext::clearFocusRing() {
   notImplemented();
 }
 bool QFont::operator==(QFont const&) const {
@@ -604,18 +618,18 @@ String QTextEdit::text() const {
   notImplemented();
   return String();
 }
-void QPainter::drawImageInRect(Image*,
-                               IntRect const&,
-                               Image::CompositeOperator) {
+void GraphicsContext::drawImageInRect(Image*,
+                                      IntRect const&,
+                                      Image::CompositeOperator) {
   notImplemented();
 }
-void QPainter::setFont(QFont const&) {
+void GraphicsContext::setFont(QFont const&) {
   notImplemented();
 }
 void Widget::disableFlushDrawing() {
   notImplemented();
 }
-void QPainter::initFocusRing(int, int) {
+void GraphicsContext::initFocusRing(int, int) {
   notImplemented();
 }
 void QSlider::setMinValue(double) {
@@ -624,7 +638,7 @@ void QSlider::setMinValue(double) {
 void QTextEdit::setWordWrap(QTextEdit::WrapStyle) {
   notImplemented();
 }
-void QPainter::drawLineForMisspelling(int, int, int) {
+void GraphicsContext::drawLineForMisspelling(int, int, int) {
   notImplemented();
 }
 void QLineEdit::setText(String const&) {
@@ -634,7 +648,7 @@ double QSlider::value() const {
   notImplemented();
   return 0;
 }
-void QPainter::setBrush(unsigned int) {
+void GraphicsContext::setBrush(unsigned int) {
   notImplemented();
 }
 void QListBox::setSelectionMode(QListBox::SelectionMode) {
@@ -653,7 +667,7 @@ IntRect QComboBox::frameGeometry() const {
   notImplemented();
   return IntRect();
 }
-void QListBox::setWritingDirection(QPainter::TextDirection) {
+void QListBox::setWritingDirection(TextDirection) {
   notImplemented();
 }
 void QLineEdit::setAlignment(Qt::AlignmentFlags) {
@@ -881,17 +895,17 @@ bool KWQKCookieJar::cookieEnabled() {
 void WebCore::Widget::setFocus() {
   notImplemented();
 }
-void WebCore::QPainter::setPaintingDisabled(bool) {
+void WebCore::GraphicsContext::setPaintingDisabled(bool) {
   notImplemented();
 }
-void WebCore::QPainter::fillRect(WebCore::IntRect const&,
-                                 WebCore::Brush const&) {
+void WebCore::GraphicsContext::fillRect(WebCore::IntRect const&,
+                                        WebCore::Brush const&) {
   notImplemented();
 }
-WebCore::QPainter::~QPainter() {
+WebCore::GraphicsContext::~GraphicsContext() {
   notImplemented();
 }
-WebCore::QPainter::QPainter(bool) {
+WebCore::GraphicsContext::GraphicsContext(bool) {
   notImplemented();
 }
 void WebCore::ScrollView::viewportToContents(int, int, int&, int&) {

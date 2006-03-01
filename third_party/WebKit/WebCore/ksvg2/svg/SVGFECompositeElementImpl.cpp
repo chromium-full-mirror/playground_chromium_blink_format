@@ -125,7 +125,7 @@ void SVGFECompositeElementImpl::parseMappedAttribute(
 KCanvasFEComposite* SVGFECompositeElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEComposite*>(
-        QPainter::renderingDevice()->createFilterEffect(FE_COMPOSITE));
+        renderingDevice()->createFilterEffect(FE_COMPOSITE));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setOperation(

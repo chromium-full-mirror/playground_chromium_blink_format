@@ -83,7 +83,7 @@ class QFontMetrics {
                                int letterSpacing,
                                int wordSpacing,
                                bool smallCaps) const;
-  int checkSelectionPoint(QChar* s,
+  int checkSelectionPoint(const QChar*,
                           int slen,
                           int pos,
                           int len,

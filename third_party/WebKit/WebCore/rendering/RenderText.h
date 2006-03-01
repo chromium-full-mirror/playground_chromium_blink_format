@@ -32,28 +32,25 @@
 
 class QFontMetrics;
 
-namespace DOM {
-class DOMString;
-class DOMStringImpl;
-class DocumentMarker;
-class Position;
-class QPainter;
-};
+namespace WebCore {
 
 // Define a constant for soft hyphen's unicode value.
 const unsigned short SOFT_HYPHEN = 173;
 
-namespace khtml {
+class DocumentMarker;
 class InlineBox;
+class Position;
+class String;
+class StringImpl;
 
 class RenderText : public RenderObject {
   friend class InlineTextBox;
 
  public:
-  RenderText(DOM::NodeImpl*, DOM::DOMStringImpl*);
+  RenderText(NodeImpl*, StringImpl*);
 
   virtual bool isTextFragment() const;
-  virtual PassRefPtr<DOM::DOMStringImpl> originalString() const;
+  virtual PassRefPtr<StringImpl> originalString() const;
 
   virtual const char* renderName() const { return "RenderText"; }
 
@@ -65,8 +62,8 @@ class RenderText : public RenderObject {
   void deleteTextBoxes();
   virtual void destroy();
 
-  DOM::DOMString data() const { return str.get(); }
-  DOM::DOMStringImpl* string() const { return str.get(); }
+  String data() const { return str.get(); }
+  StringImpl* string() const { return str.get(); }
 
   virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootInlineBox = false);
@@ -89,10 +86,10 @@ class RenderText : public RenderObject {
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
-  unsigned int length() const { return str->l; }
-  QChar* text() const { return str->s; }
+  unsigned int length() const { return str->length(); }
+  const QChar* text() const { return str->unicode(); }
   unsigned int stringLength() const {
-    return str->l;
+    return str->length();
   }  // non virtual implementation of length()
   virtual void position(InlineBox* box,
                         int from,
@@ -148,8 +145,8 @@ class RenderText : public RenderObject {
   virtual const Font& font();
   virtual short verticalPositionHint(bool firstLine) const;
 
-  void setText(DOM::DOMStringImpl*, bool force = false);
-  void setTextWithOffset(DOM::DOMStringImpl*,
+  void setText(StringImpl*, bool force = false);
+  void setTextWithOffset(StringImpl*,
                          uint offset,
                          uint len,
                          bool force = false);
@@ -175,8 +172,8 @@ class RenderText : public RenderObject {
   const QFontMetrics& metrics(bool firstLine) const;
   const Font* font(bool firstLine) const;
 
-  DOM::TextImpl* element() const {
-    return static_cast<DOM::TextImpl*>(RenderObject::element());
+  TextImpl* element() const {
+    return static_cast<TextImpl*>(RenderObject::element());
   }
 
   InlineTextBox* firstTextBox() const { return m_firstTextBox; }
@@ -207,7 +204,7 @@ class RenderText : public RenderObject {
   InlineTextBox* findNextInlineTextBox(int offset, int& pos) const;
 
  protected:  // members
-  RefPtr<DOM::DOMStringImpl> str;
+  RefPtr<StringImpl> str;
 
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
