@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "NodeImpl.h"
 #include "KWQLineEdit.h"
-#include "KWQFont.h"
+#include "Font.h"
 #include "KWQFileButton.h"
 #include "KWQTextEdit.h"
 #include "KWQComboBox.h"
@@ -162,9 +162,6 @@ int QTextEdit::selectionEnd() {
   notImplemented();
   return 0;
 }
-void QFont::determinePitch() const {
-  notImplemented();
-}
 void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
@@ -214,10 +211,6 @@ bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
 }
 Widget::~Widget() {
   notImplemented();
-}
-IntRect GraphicsContext::xForm(IntRect const&) const {
-  notImplemented();
-  return IntRect();
 }
 IntSize QListBox::sizeForNumberOfLines(int) const {
   notImplemented();
@@ -326,9 +319,6 @@ void QTextEdit::setSelectionStart(int) {
 void GraphicsContext::beginTransparencyLayer(float) {
   notImplemented();
 }
-void QComboBox::setFont(QFont const&) {
-  notImplemented();
-}
 IntRect Widget::frameGeometry() const {
   notImplemented();
   return IntRect();
@@ -357,11 +347,6 @@ void QTextEdit::setSelectionEnd(int) {
 }
 void QComboBox::populate() {
   notImplemented();
-}
-static QFont localFont;
-QFont const& GraphicsContext::font() const {
-  notImplemented();
-  return localFont;
 }
 void QTextEdit::setAlignment(Qt::AlignmentFlags) {
   notImplemented();
@@ -417,9 +402,6 @@ QComboBox::QComboBox() {
   notImplemented();
 }
 void GraphicsContext::drawConvexPolygon(IntPointArray const&) {
-  notImplemented();
-}
-void Widget::setFont(QFont const&) {
   notImplemented();
 }
 void QSlider::setMaxValue(double) {
@@ -479,23 +461,6 @@ IntRect QFontMetrics::selectionRectForText(int,
   notImplemented();
   return IntRect();
 }
-int QFontMetrics::checkSelectionPoint(QChar*,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      bool,
-                                      int,
-                                      bool,
-                                      bool,
-                                      bool) const {
-  notImplemented();
-  return 0;
-}
 void QTextEdit::getCursorPosition(int*, int*) const {
   notImplemented();
 }
@@ -523,9 +488,6 @@ void QComboBox::appendItem(QString const&, KWQListBoxItemType, bool) {
   notImplemented();
 }
 void GraphicsContext::setShadow(int, int, int, Color const&) {
-  notImplemented();
-}
-void QTextEdit::setWritingDirection(GraphicsContext::TextDirection) {
   notImplemented();
 }
 void Widget::setDrawingAlpha(float) {
@@ -610,10 +572,6 @@ void GraphicsContext::drawTiledImage(Image*,
 void GraphicsContext::clearFocusRing() {
   notImplemented();
 }
-bool QFont::operator==(QFont const&) const {
-  notImplemented();
-  return 0;
-}
 String QTextEdit::text() const {
   notImplemented();
   return String();
@@ -621,9 +579,6 @@ String QTextEdit::text() const {
 void GraphicsContext::drawImageInRect(Image*,
                                       IntRect const&,
                                       Image::CompositeOperator) {
-  notImplemented();
-}
-void GraphicsContext::setFont(QFont const&) {
   notImplemented();
 }
 void Widget::disableFlushDrawing() {
@@ -657,9 +612,6 @@ void QListBox::setSelectionMode(QListBox::SelectionMode) {
 void KWQFileButton::setFilename(QString const&) {
   notImplemented();
 }
-QFontMetrics::QFontMetrics(QFont const&) {
-  notImplemented();
-}
 void QLineEdit::setEdited(bool) {
   notImplemented();
 }
@@ -676,9 +628,6 @@ void QLineEdit::setAlignment(Qt::AlignmentFlags) {
 WebCore::Widget::FocusPolicy KWQFileButton::focusPolicy() const {
   notImplemented();
   return NoFocus;
-}
-void QListBox::setFont(QFont const&) {
-  notImplemented();
 }
 bool QLineEdit::checksDescendantsForFocus() const {
   notImplemented();
@@ -701,12 +650,6 @@ WebCore::IntRect KWQFileButton::frameGeometry() const {
   notImplemented();
   return IntRect();
 }
-void QTextEdit::setFont(QFont const&) {
-  notImplemented();
-}
-void QLineEdit::setFont(QFont const&) {
-  notImplemented();
-}
 KWQFileButton::~KWQFileButton() {
   notImplemented();
 }
@@ -717,9 +660,6 @@ WebCore::Widget::FocusPolicy QTextEdit::focusPolicy() const {
 WebCore::Widget::FocusPolicy QSlider::focusPolicy() const {
   notImplemented();
   return NoFocus;
-}
-void QSlider::setFont(QFont const&) {
-  notImplemented();
 }
 void QListBox::setEnabled(bool) {
   notImplemented();
@@ -1245,6 +1185,55 @@ void WebCore::BrowserExtensionWin::createNewWindow(
     struct WebCore::URLArgs const&) {
   notImplemented();
 }
+void QSlider::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+void QLineEdit::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+static WebCore::Font localFont;
+class WebCore::Font const& WebCore::GraphicsContext::font(void) const {
+  notImplemented();
+  return localFont;
+}
+void QListBox::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+QFontMetrics::QFontMetrics(class WebCore::FontDescription const&) {
+  notImplemented();
+}
+void WebCore::Widget::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+void QComboBox::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+void QTextEdit::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+void WebCore::GraphicsContext::setFont(class WebCore::Font const&) {
+  notImplemented();
+}
+void QTextEdit::setWritingDirection(enum WebCore::TextDirection) {
+  notImplemented();
+}
+int QFontMetrics::checkSelectionPoint(class QChar const*,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      bool,
+                                      int,
+                                      bool,
+                                      bool,
+                                      bool) const {
+  notImplemented();
+  return 0;
+}
 
 // Completely empty stubs (mostly to allow DRT to run):
 bool WebCore::historyContains(QString const&) {
@@ -1264,25 +1253,6 @@ QString KLocale::language() {
 }
 
 Cursor::~Cursor() {}
-
-QFont::QFont() {}
-QFont::~QFont() {}
-QFont::QFont(QFont const&) {}
-QFont& QFont::operator=(QFont const&) {
-  return localFont;
-}
-bool QFont::italic() const {
-  return false;
-}
-int QFont::weight() const {
-  return QFont::Normal;
-}
-void QFont::setPrinterFont(bool) {}
-void QFont::setItalic(bool) {}
-void QFont::setFirstFamily(FontFamily const&) {}
-void QFont::setWeight(int) {}
-void QFontMetrics::setFont(QFont const&) {}
-void QFont::setPixelSize(float) {}
 
 QFontMetrics::QFontMetrics() {}
 QFontMetrics::~QFontMetrics() {}
@@ -1312,6 +1282,10 @@ int QFontMetrics::height() const {
 }
 int QFontMetrics::descent() const {
   return 10;
+}
+void QFontMetrics::setFontDescription(class WebCore::FontDescription const&) {}
+bool QFontMetrics::isFixedPitch(void) const {
+  return 0;
 }
 
 void WebCore::FrameWin::restoreDocumentState() {}
