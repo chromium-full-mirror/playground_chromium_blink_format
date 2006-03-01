@@ -242,8 +242,10 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
         } else {
           // converting certain values (like null) to object can set an
           // exception
-          exec->clearException();
-          body = args[0]->toString(exec).domString();
+          if (exec->hadException())
+            exec->clearException();
+          else
+            body = args[0]->toString(exec).domString();
         }
       }
 
