@@ -403,9 +403,6 @@ void QScrollBar::setSteps(int, int) {
 void QLineEdit::setMaxLength(int) {
   notImplemented();
 }
-void Widget::setCursor(Cursor const&) {
-  notImplemented();
-}
 void QLineEdit::setAutoSaveName(String const&) {
   notImplemented();
 }
@@ -686,7 +683,7 @@ IntRect WebCore::screenRect(Widget*) {
   notImplemented();
   return IntRect();
 }
-void WebCore::ScrollView::scrollBy(int, int) {
+void ScrollView::scrollBy(int, int) {
   notImplemented();
 }
 void WebCore::Widget::clearFocus() {
@@ -711,9 +708,6 @@ bool KWQKCookieJar::cookieEnabled() {
   return false;
 }
 void WebCore::Widget::setFocus() {
-  notImplemented();
-}
-void WebCore::ScrollView::viewportToContents(int, int, int&, int&) {
   notImplemented();
 }
 void WebCore::TransferJob::kill() {
@@ -926,10 +920,6 @@ bool FrameWin::personalbarVisible(void) {
   notImplemented();
   return 0;
 }
-bool FrameWin::lastEventIsMouseUp(void) const {
-  notImplemented();
-  return 0;
-}
 bool FrameWin::statusbarVisible(void) {
   notImplemented();
   return 0;
@@ -961,11 +951,6 @@ enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
   notImplemented();
   return (ObjectContentType)0;
 }
-bool FrameWin::passSubframeEventToSubframe(
-    WebCore::MouseEventWithHitTestResults&) {
-  notImplemented();
-  return 0;
-}
 WebCore::Frame* FrameWin::createFrame(KURL const&,
                                       QString const&,
                                       WebCore::RenderPart*,
@@ -991,49 +976,45 @@ String FrameWin::generateFrameName(void) {
   notImplemented();
   return String();
 }
-void WebCore::BrowserExtensionWin::setTypedIconURL(KURL const&,
-                                                   QString const&) {
+void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::openURLRequest(
-    KURL const&,
-    struct WebCore::URLArgs const&) {
+void BrowserExtensionWin::openURLRequest(KURL const&,
+                                         struct WebCore::URLArgs const&) {
   notImplemented();
 }
-int WebCore::BrowserExtensionWin::getHistoryLength(void) {
+int BrowserExtensionWin::getHistoryLength(void) {
   notImplemented();
   return 0;
 }
-bool WebCore::BrowserExtensionWin::canRunModal(void) {
+bool BrowserExtensionWin::canRunModal(void) {
   notImplemented();
   return 0;
 }
-void WebCore::BrowserExtensionWin::openURLNotify(void) {
+void BrowserExtensionWin::openURLNotify(void) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::createNewWindow(
-    KURL const&,
-    struct WebCore::URLArgs const&,
-    struct WebCore::WindowArgs const&,
-    WebCore::Frame*&) {
+void BrowserExtensionWin::createNewWindow(KURL const&,
+                                          struct WebCore::URLArgs const&,
+                                          struct WebCore::WindowArgs const&,
+                                          WebCore::Frame*&) {
   notImplemented();
 }
-bool WebCore::BrowserExtensionWin::canRunModalNow(void) {
+bool BrowserExtensionWin::canRunModalNow(void) {
   notImplemented();
   return 0;
 }
-void WebCore::BrowserExtensionWin::runModal(void) {
+void BrowserExtensionWin::runModal(void) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::goBackOrForward(int) {
+void BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::setIconURL(KURL const&) {
+void BrowserExtensionWin::setIconURL(KURL const&) {
   notImplemented();
 }
-void WebCore::BrowserExtensionWin::createNewWindow(
-    KURL const&,
-    struct WebCore::URLArgs const&) {
+void BrowserExtensionWin::createNewWindow(KURL const&,
+                                          struct WebCore::URLArgs const&) {
   notImplemented();
 }
 void QSlider::setFont(class WebCore::Font const&) {
@@ -1146,8 +1127,15 @@ void FrameWin::handledOnloadEvents() {}
 RangeImpl* FrameWin::markedTextRange() const {
   return 0;
 }
+bool FrameWin::passSubframeEventToSubframe(
+    WebCore::MouseEventWithHitTestResults&) {
+  return false;
+}
+bool FrameWin::lastEventIsMouseUp() const {
+  return false;
+}
 
-WebCore::BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
+BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
 bool KWQServeRequest(Loader*, Request*, TransferJob*) {
   return false;
@@ -1159,6 +1147,7 @@ void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
 Widget::Widget() {}
 void Widget::show() {}
+void Widget::setCursor(Cursor const&) {}
 
 void ScrollView::resizeContents(int, int) {}
 WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
@@ -1171,32 +1160,37 @@ void ScrollView::suppressScrollBars(bool, bool) {}
 void ScrollView::setHScrollBarMode(ScrollBarMode) {}
 void ScrollView::setVScrollBarMode(ScrollBarMode) {}
 void ScrollView::setScrollBarsMode(ScrollBarMode) {}
-int WebCore::ScrollView::visibleHeight() const {
+int ScrollView::visibleHeight() const {
   return 600;
 }
-int WebCore::ScrollView::visibleWidth() const {
+int ScrollView::visibleWidth() const {
   return 800;
 }
-void WebCore::ScrollView::setContentsPos(int, int) {}
-int WebCore::ScrollView::contentsX() const {
+void ScrollView::setContentsPos(int, int) {}
+int ScrollView::contentsX() const {
   return 0;
 }
-int WebCore::ScrollView::contentsY() const {
+int ScrollView::contentsY() const {
   return 0;
 }
-int WebCore::ScrollView::contentsHeight() const {
+int ScrollView::contentsHeight() const {
   return 600;
 }
-int WebCore::ScrollView::contentsWidth() const {
+int ScrollView::contentsWidth() const {
   return 800;
 }
+void ScrollView::viewportToContents(int x1, int y1, int& x2, int& y2) {
+  x2 = x1;
+  y2 = y2;
+}
+
 void ScrollView::updateContents(const IntRect&, bool) {}
 void ScrollView::setStaticBackground(bool) {}
 
-WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
-                                  const String&,
-                                  KURL const&) {}
-void WebCore::TransferJob::addMetaData(QString const&, QString const&) {}
+TransferJob::TransferJob(WebCore::TransferJobClient*,
+                         const String&,
+                         KURL const&) {}
+void TransferJob::addMetaData(QString const&, QString const&) {}
 
 Font const& GraphicsContext::font() const {
   return localFont;
