@@ -477,6 +477,11 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                selectReplacement:(BOOL)selectReplacement
                     smartReplace:(BOOL)smartReplace;
 
+- (bool)canIncreaseSelectionListLevel;
+- (bool)canDecreaseSelectionListLevel;
+- (void)increaseSelectionListLevel;
+- (void)decreaseSelectionListLevel;
+
 - (void)insertLineBreak;
 - (void)insertParagraphSeparator;
 - (void)insertParagraphSeparatorInQuotedContent;
