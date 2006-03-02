@@ -409,7 +409,7 @@ class Interpreter {
    */
   virtual bool isSafeScript(const Interpreter*) { return true; }
 
-#if __APPLE__
+#if PLATFORM(MAC)
   virtual void* createLanguageInstanceForValue(
       ExecState*,
       int language,

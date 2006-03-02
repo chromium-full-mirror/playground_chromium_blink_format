@@ -40,15 +40,11 @@ using KXMLCore::fastCalloc;
 using KXMLCore::fastRealloc;
 using KXMLCore::fastFree;
 
-#if __GNUC__
-
-#if __APPLE__
+#if PLATFORM(GCC) && PLATFORM(DARWIN)
 #define KXMLCORE_PRIVATE_INLINE \
   __private_extern__ inline __attribute__((always_inline))
-#else
+#elif PLATFORM(GCC)
 #define KXMLCORE_PRIVATE_INLINE inline __attribute__((always_inline))
-#endif
-
 #else
 #define KXMLCORE_PRIVATE_INLINE inline
 #endif

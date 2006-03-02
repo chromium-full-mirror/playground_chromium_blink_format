@@ -38,15 +38,36 @@ namespace KJS {
 // It would be good to figure out a 100% clean way that still avoids code that
 // runs at init time.
 
-#if __APPLE__
+#if PLATFORM(DARWIN)
 
-#ifdef WORDS_BIGENDIAN
+#if PLATFORM(BIG_ENDIAN)
 extern const unsigned char NaN[sizeof(double)] = {0x7f, 0xf8, 0, 0, 0, 0, 0, 0};
 extern const unsigned char Inf[sizeof(double)] = {0x7f, 0xf0, 0, 0, 0, 0, 0, 0};
+#elif PLATFORM(MIDDLE_ENDIAN)
+extern const unsigned char NaN[] = {0, 0, 0xf8, 0x7f, 0, 0, 0, 0};
+extern const unsigned char Inf[] = {0, 0, 0xf0, 0x7f, 0, 0, 0, 0};
 #else
 extern const unsigned char NaN[sizeof(double)] = {0, 0, 0, 0, 0, 0, 0xf8, 0x7f};
 extern const unsigned char Inf[sizeof(double)] = {0, 0, 0, 0, 0, 0, 0xf0, 0x7f};
-#endif
+#endif  // PLATFORM(MIDDLE_ENDIAN)
 
+#else  // !PLATFORM(DARWIN)
+
+#include "value.h"
+
+#if PLATFORM(BIG_ENDIAN)
+const unsigned char NaN_Bytes[] = {0x7f, 0xf8, 0, 0, 0, 0, 0, 0};
+const unsigned char Inf_Bytes[] = {0x7f, 0xf0, 0, 0, 0, 0, 0, 0};
+#elif PLATFORM(MIDDLE_ENDIAN)
+const unsigned char NaN_Bytes[] = {0, 0, 0xf8, 0x7f, 0, 0, 0, 0};
+const unsigned char Inf_Bytes[] = {0, 0, 0xf0, 0x7f, 0, 0, 0, 0};
+#else
+const unsigned char NaN_Bytes[] = {0, 0, 0, 0, 0, 0, 0xf8, 0x7f};
+const unsigned char Inf_Bytes[] = {0, 0, 0, 0, 0, 0, 0xf0, 0x7f};
 #endif
-}
+const double NaN = *(const double*)NaN_Bytes;
+const double Inf = *(const double*)Inf_Bytes;
+
+#endif  // !PLATFORM(DARWIN)
+
+}  // namespace KJS

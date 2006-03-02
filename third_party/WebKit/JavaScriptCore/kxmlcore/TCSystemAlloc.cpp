@@ -31,14 +31,14 @@
 // Author: Sanjay Ghemawat
 
 #include "config.h"
-#if defined HAVE_STDINT_H
+#if HAVE(STDINT_H)
 #include <stdint.h>
-#elif defined HAVE_INTTYPES_H
+#elif HAVE(INTTYPES_H)
 #include <inttypes.h>
 #else
 #include <sys/types.h>
 #endif
-#ifndef WIN32
+#if !PLATFORM(WIN_OS)
 #include <unistd.h>
 #include <sys/mman.h>
 #endif
@@ -93,7 +93,7 @@ static const int32_t FLAGS_malloc_devmem_start = 0;
 static const int32_t FLAGS_malloc_devmem_limit = 0;
 #endif
 
-#ifdef HAVE_SBRK
+#if HAVE(SBRK)
 
 static void* TrySbrk(size_t size, size_t alignment) {
   size = ((size + alignment - 1) / alignment) * alignment;
@@ -130,9 +130,9 @@ static void* TrySbrk(size_t size, size_t alignment) {
   return reinterpret_cast<void*>(ptr);
 }
 
-#endif /* HAVE_SBRK */
+#endif /* HAVE(SBRK) */
 
-#ifdef HAVE_MMAP
+#if HAVE(MMAP)
 
 static void* TryMmap(size_t size, size_t alignment) {
   // Enforce page alignment
@@ -173,7 +173,7 @@ static void* TryMmap(size_t size, size_t alignment) {
   return reinterpret_cast<void*>(ptr);
 }
 
-#endif /* HAVE_MMAP */
+#endif /* HAVE(MMAP) */
 
 #ifndef KXC_CHANGES
 static void* TryDevMem(size_t size, size_t alignment) {
@@ -273,7 +273,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
     }
 #endif
 
-#ifdef HAVE_SBRK
+#if HAVE(SBRK)
     if (use_sbrk && !sbrk_failure) {
       void* result = TrySbrk(size, alignment);
       if (result != NULL)
@@ -281,7 +281,7 @@ void* TCMalloc_SystemAlloc(size_t size, size_t alignment) {
     }
 #endif
 
-#ifdef HAVE_MMAP
+#if HAVE(MMAP)
     if (use_mmap && !mmap_failure) {
       void* result = TryMmap(size, alignment);
       if (result != NULL)

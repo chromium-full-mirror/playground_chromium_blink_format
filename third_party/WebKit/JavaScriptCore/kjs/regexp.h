@@ -27,13 +27,13 @@
 
 #include "config.h"
 
-#ifdef HAVE_PCREPOSIX
+#if HAVE(PCREPOSIX)
 #include <pcre.h>
 #else  // POSIX regex - not so good...
 extern "C" {  // bug with some libc5 distributions
 #include <regex.h>
 }
-#endif  // HAVE_PCREPOSIX
+#endif  // HAVE(PCREPOSIX)
 
 #include "ustring.h"
 
@@ -52,7 +52,7 @@ class RegExp {
   unsigned subPatterns() const { return _numSubPatterns; }
 
  private:
-#ifdef HAVE_PCREPOSIX
+#if HAVE(PCREPOSIX)
   pcre* _regex;
 #else
   regex_t _regex;
