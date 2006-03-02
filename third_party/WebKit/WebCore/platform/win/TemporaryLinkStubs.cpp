@@ -46,9 +46,6 @@ static void notImplemented() {
 void QLineEdit::selectAll() {
   notImplemented();
 }
-void GraphicsContext::save() {
-  notImplemented();
-}
 void Widget::enableFlushDrawing() {
   notImplemented();
 }
@@ -78,23 +75,13 @@ IntPoint Widget::mapFromGlobal(IntPoint const&) const {
   notImplemented();
   return IntPoint();
 }
-void GraphicsContext::addClip(IntRect const&) {
-  notImplemented();
-}
 int QLineEdit::cursorPosition() const {
   notImplemented();
   return 0;
 }
-void GraphicsContext::setPen(Pen::PenStyle) {
-  notImplemented();
-}
 Color GraphicsContext::selectedTextBackgroundColor() const {
   notImplemented();
   return Color();
-}
-QFontMetrics GraphicsContext::fontMetrics() const {
-  notImplemented();
-  return QFontMetrics();
 }
 void QSlider::setValue(double) {
   notImplemented();
@@ -165,12 +152,6 @@ int QTextEdit::selectionEnd() {
 void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
-void GraphicsContext::drawEllipse(int, int, int, int) {
-  notImplemented();
-}
-void GraphicsContext::setPen(unsigned int) {
-  notImplemented();
-}
 void QTextEdit::setReadOnly(bool) {
   notImplemented();
 }
@@ -191,9 +172,6 @@ void ScrollView::removeChild(Widget*) {
   notImplemented();
 }
 void QTextEdit::selectAll() {
-  notImplemented();
-}
-void GraphicsContext::fillRect(int, int, int, int, Brush const&) {
   notImplemented();
 }
 void GraphicsContext::endTransparencyLayer() {
@@ -279,15 +257,7 @@ Widget::FocusPolicy QComboBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-void GraphicsContext::drawImageAtPoint(Image*,
-                                       IntPoint const&,
-                                       Image::CompositeOperator) {
-  notImplemented();
-}
 void GraphicsContext::clearShadow() {
-  notImplemented();
-}
-void GraphicsContext::setPen(Pen const&) {
   notImplemented();
 }
 void QTextEdit::setLineHeight(int) {
@@ -329,9 +299,6 @@ void GraphicsContext::addFocusRingRect(int, int, int, int) {
 void QTextEdit::setCursorPosition(int, int) {
   notImplemented();
 }
-void GraphicsContext::restore() {
-  notImplemented();
-}
 int QFontMetrics::width(QString const&, int, int, int) const {
   notImplemented();
   return 0;
@@ -361,11 +328,6 @@ void GraphicsContext::drawText(int,
                                QString const&) {
   notImplemented();
 }
-static Pen localPen;
-Pen const& GraphicsContext::pen() const {
-  notImplemented();
-  return localPen;
-}
 KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
                                      Frame*,
                                      KXMLCore::HashMap<String, String> const&) {
@@ -391,14 +353,7 @@ void Widget::unlockDrawingFocus() {
 void QLineEdit::setLiveSearch(bool) {
   notImplemented();
 }
-bool GraphicsContext::paintingDisabled() const {
-  notImplemented();
-  return 0;
-}
 QComboBox::QComboBox() {
-  notImplemented();
-}
-void GraphicsContext::drawConvexPolygon(IntPointArray const&) {
   notImplemented();
 }
 void QSlider::setMaxValue(double) {
@@ -407,30 +362,7 @@ void QSlider::setMaxValue(double) {
 void Widget::lockDrawingFocus() {
   notImplemented();
 }
-void GraphicsContext::drawLine(int, int, int, int) {
-  notImplemented();
-}
-void GraphicsContext::setBrush(Brush::BrushStyle) {
-  notImplemented();
-}
 void QTextEdit::setSelectionRange(int, int) {
-  notImplemented();
-}
-void GraphicsContext::drawText(int,
-                               int,
-                               int,
-                               int,
-                               QChar const*,
-                               int,
-                               int,
-                               int,
-                               int,
-                               Color const&,
-                               TextDirection,
-                               bool,
-                               int,
-                               int,
-                               bool) {
   notImplemented();
 }
 void ScrollView::scrollPointRecursively(int, int) {
@@ -493,39 +425,9 @@ void Widget::setDrawingAlpha(float) {
 QSlider::QSlider() {
   notImplemented();
 }
-void GraphicsContext::drawScaledAndTiledImage(Image*,
-                                              int,
-                                              int,
-                                              int,
-                                              int,
-                                              int,
-                                              int,
-                                              int,
-                                              int,
-                                              Image::TileRule,
-                                              Image::TileRule,
-                                              void*) {
-  notImplemented();
-}
 int ScrollView::scrollYOffset() const {
   notImplemented();
   return 0;
-}
-void GraphicsContext::drawImage(Image*,
-                                int,
-                                int,
-                                int,
-                                int,
-                                int,
-                                int,
-                                int,
-                                int,
-                                Image::CompositeOperator,
-                                void*) {
-  notImplemented();
-}
-void GraphicsContext::setBrush(Brush const&) {
-  notImplemented();
 }
 void QComboBox::setCurrentItem(int) {
   notImplemented();
@@ -536,9 +438,6 @@ void QComboBox::setWritingDirection(TextDirection) {
 IntSize QComboBox::sizeHint() const {
   notImplemented();
   return IntSize();
-}
-void GraphicsContext::drawRect(int, int, int, int) {
-  notImplemented();
 }
 void Widget::setFrameGeometry(IntRect const&) {
   notImplemented();
@@ -556,27 +455,12 @@ bool QLineEdit::edited() const {
   notImplemented();
   return 0;
 }
-void GraphicsContext::drawTiledImage(Image*,
-                                     int,
-                                     int,
-                                     int,
-                                     int,
-                                     int,
-                                     int,
-                                     void*) {
-  notImplemented();
-}
 void GraphicsContext::clearFocusRing() {
   notImplemented();
 }
 String QTextEdit::text() const {
   notImplemented();
   return String();
-}
-void GraphicsContext::drawImageInRect(Image*,
-                                      IntRect const&,
-                                      Image::CompositeOperator) {
-  notImplemented();
 }
 void Widget::disableFlushDrawing() {
   notImplemented();
@@ -599,9 +483,6 @@ void QLineEdit::setText(String const&) {
 double QSlider::value() const {
   notImplemented();
   return 0;
-}
-void GraphicsContext::setBrush(unsigned int) {
-  notImplemented();
 }
 void QListBox::setSelectionMode(QListBox::SelectionMode) {
   notImplemented();
@@ -832,16 +713,6 @@ bool KWQKCookieJar::cookieEnabled() {
 void WebCore::Widget::setFocus() {
   notImplemented();
 }
-void WebCore::GraphicsContext::setPaintingDisabled(bool) {
-  notImplemented();
-}
-void WebCore::GraphicsContext::fillRect(WebCore::IntRect const&,
-                                        WebCore::Brush const&) {
-  notImplemented();
-}
-WebCore::GraphicsContext::GraphicsContext(bool) {
-  notImplemented();
-}
 void WebCore::ScrollView::viewportToContents(int, int, int&, int&) {
   notImplemented();
 }
@@ -849,7 +720,7 @@ void WebCore::TransferJob::kill() {
   notImplemented();
 }
 void WebCore::TransferJob::addMetaData(
-    KXMLCore::HashMap<WebCore::String, WebCore::String> const&) {
+    KXMLCore::HashMap<String, String> const&) {
   notImplemented();
 }
 QString WebCore::TransferJob::queryMetaData(QString const&) const {
@@ -920,218 +791,203 @@ Widget* WebCore::FrameView::topLevelWidget() const {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::respondToChangedContents(void) {
+void FrameWin::respondToChangedContents(void) {
   notImplemented();
 }
-void WebCore::FrameWin::unfocusWindow(void) {
+void FrameWin::unfocusWindow(void) {
   notImplemented();
 }
-bool WebCore::FrameWin::locationbarVisible(void) {
+bool FrameWin::locationbarVisible(void) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::respondToChangedSelection(
-    WebCore::SelectionController const&,
-    bool) {
+void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
+                                         bool) {
   notImplemented();
 }
-void WebCore::FrameWin::clearUndoRedoOperations(void) {
+void FrameWin::clearUndoRedoOperations(void) {
   notImplemented();
 }
-void WebCore::FrameWin::issueRedoCommand(void) {
+void FrameWin::issueRedoCommand(void) {
   notImplemented();
 }
-KJS::Bindings::Instance* WebCore::FrameWin::getObjectInstanceForWidget(
+KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(
     WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-KJS::Bindings::Instance* WebCore::FrameWin::getEmbedInstanceForWidget(
+KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(WebCore::Widget*) {
+  notImplemented();
+  return 0;
+}
+bool FrameWin::canRedo(void) const {
+  notImplemented();
+  return 0;
+}
+bool FrameWin::canUndo(void) const {
+  notImplemented();
+  return 0;
+}
+bool FrameWin::runJavaScriptPrompt(String const&, String const&, String&) {
+  notImplemented();
+  return 0;
+}
+void FrameWin::recordFormValue(QString const&,
+                               QString const&,
+                               WebCore::HTMLFormElementImpl*) {
+  notImplemented();
+}
+void FrameWin::registerCommandForRedo(WebCore::EditCommandPtr const&) {
+  notImplemented();
+}
+void FrameWin::runJavaScriptAlert(String const&) {
+  notImplemented();
+}
+bool FrameWin::runJavaScriptConfirm(String const&) {
+  notImplemented();
+  return 0;
+}
+bool FrameWin::openURL(KURL const&) {
+  notImplemented();
+  return 0;
+}
+void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {
+  notImplemented();
+}
+void FrameWin::saveDocumentState(void) {
+  notImplemented();
+}
+void FrameWin::print(void) {
+  notImplemented();
+}
+KJS::Bindings::Instance* FrameWin::getAppletInstanceForWidget(
     WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::canRedo(void) const {
+bool FrameWin::passMouseDownEventToWidget(WebCore::Widget*) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::canUndo(void) const {
+void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {
+  notImplemented();
+}
+void FrameWin::issueCutCommand(void) {
+  notImplemented();
+}
+void FrameWin::issueCopyCommand(void) {
+  notImplemented();
+}
+void FrameWin::openURLRequest(KURL const&, struct WebCore::URLArgs const&) {
+  notImplemented();
+}
+void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
+  notImplemented();
+}
+bool FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::runJavaScriptPrompt(WebCore::String const&,
-                                            WebCore::String const&,
-                                            WebCore::String&) {
-  notImplemented();
-  return 0;
-}
-void WebCore::FrameWin::recordFormValue(QString const&,
-                                        QString const&,
-                                        WebCore::HTMLFormElementImpl*) {
+void FrameWin::issueUndoCommand(void) {
   notImplemented();
 }
-void WebCore::FrameWin::registerCommandForRedo(WebCore::EditCommandPtr const&) {
-  notImplemented();
-}
-void WebCore::FrameWin::runJavaScriptAlert(WebCore::String const&) {
-  notImplemented();
-}
-bool WebCore::FrameWin::runJavaScriptConfirm(WebCore::String const&) {
-  notImplemented();
-  return 0;
-}
-bool WebCore::FrameWin::openURL(KURL const&) {
-  notImplemented();
-  return 0;
-}
-void WebCore::FrameWin::urlSelected(KURL const&,
-                                    struct WebCore::URLArgs const&) {
-  notImplemented();
-}
-void WebCore::FrameWin::saveDocumentState(void) {
-  notImplemented();
-}
-void WebCore::FrameWin::print(void) {
-  notImplemented();
-}
-KJS::Bindings::Instance* WebCore::FrameWin::getAppletInstanceForWidget(
-    WebCore::Widget*) {
-  notImplemented();
-  return 0;
-}
-bool WebCore::FrameWin::passMouseDownEventToWidget(WebCore::Widget*) {
-  notImplemented();
-  return 0;
-}
-void WebCore::FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {
-  notImplemented();
-}
-void WebCore::FrameWin::issueCutCommand(void) {
-  notImplemented();
-}
-void WebCore::FrameWin::issueCopyCommand(void) {
-  notImplemented();
-}
-void WebCore::FrameWin::openURLRequest(KURL const&,
-                                       struct WebCore::URLArgs const&) {
-  notImplemented();
-}
-void WebCore::FrameWin::addMessageToConsole(WebCore::String const&,
-                                            unsigned int,
-                                            WebCore::String const&) {
-  notImplemented();
-}
-bool WebCore::FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
-  notImplemented();
-  return 0;
-}
-void WebCore::FrameWin::issueUndoCommand(void) {
-  notImplemented();
-}
-QString WebCore::FrameWin::mimeTypeForFileName(QString const&) const {
+QString FrameWin::mimeTypeForFileName(QString const&) const {
   notImplemented();
   return QString();
 }
-void WebCore::FrameWin::clearRecordedFormValues(void) {
+void FrameWin::clearRecordedFormValues(void) {
   notImplemented();
 }
-void WebCore::FrameWin::issuePasteCommand(void) {
+void FrameWin::issuePasteCommand(void) {
   notImplemented();
 }
-WebCore::RangeImpl* WebCore::FrameWin::markedTextRange(void) const {
-  notImplemented();
-  return 0;
-}
-bool WebCore::FrameWin::shouldChangeSelection(
-    WebCore::SelectionController const&,
-    WebCore::SelectionController const&,
-    WebCore::EAffinity,
-    bool) const {
+bool FrameWin::shouldChangeSelection(WebCore::SelectionController const&,
+                                     WebCore::SelectionController const&,
+                                     WebCore::EAffinity,
+                                     bool) const {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::scheduleClose(void) {
+void FrameWin::scheduleClose(void) {
   notImplemented();
 }
-void WebCore::FrameWin::markMisspellingsInAdjacentWords(
+void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {
   notImplemented();
 }
-void WebCore::FrameWin::markMisspellings(WebCore::SelectionController const&) {
+void FrameWin::markMisspellings(WebCore::SelectionController const&) {
   notImplemented();
 }
-bool WebCore::FrameWin::menubarVisible(void) {
-  notImplemented();
-  return 0;
-}
-bool WebCore::FrameWin::personalbarVisible(void) {
+bool FrameWin::menubarVisible(void) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::lastEventIsMouseUp(void) const {
+bool FrameWin::personalbarVisible(void) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::statusbarVisible(void) {
+bool FrameWin::lastEventIsMouseUp(void) const {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::toolbarVisible(void) {
+bool FrameWin::statusbarVisible(void) {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::issueTransposeCommand(void) {
+bool FrameWin::toolbarVisible(void) {
+  notImplemented();
+  return 0;
+}
+void FrameWin::issueTransposeCommand(void) {
   notImplemented();
 }
-QString WebCore::FrameWin::userAgent(void) const {
+QString FrameWin::userAgent(void) const {
   notImplemented();
   return QString();
 }
-void WebCore::FrameWin::submitForm(KURL const&,
-                                   struct WebCore::URLArgs const&) {
+void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {
   notImplemented();
 }
-bool WebCore::FrameWin::canPaste(void) const {
+bool FrameWin::canPaste(void) const {
   notImplemented();
   return 0;
 }
-QString WebCore::FrameWin::incomingReferrer(void) const {
+QString FrameWin::incomingReferrer(void) const {
   notImplemented();
   return QString();
 }
-enum WebCore::ObjectContentType WebCore::FrameWin::objectContentType(
-    KURL const&,
-    QString const&) {
+enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
+                                                            QString const&) {
   notImplemented();
   return (ObjectContentType)0;
 }
-bool WebCore::FrameWin::passSubframeEventToSubframe(
+bool FrameWin::passSubframeEventToSubframe(
     WebCore::MouseEventWithHitTestResults&) {
   notImplemented();
   return 0;
 }
-WebCore::Frame* WebCore::FrameWin::createFrame(KURL const&,
-                                               QString const&,
-                                               WebCore::RenderPart*,
-                                               WebCore::String const&) {
+WebCore::Frame* FrameWin::createFrame(KURL const&,
+                                      QString const&,
+                                      WebCore::RenderPart*,
+                                      String const&) {
   notImplemented();
   return 0;
 }
-bool WebCore::FrameWin::canGoBackOrForward(int) const {
+bool FrameWin::canGoBackOrForward(int) const {
   notImplemented();
   return 0;
 }
-void WebCore::FrameWin::issuePasteAndMatchStyleCommand(void) {
+void FrameWin::issuePasteAndMatchStyleCommand(void) {
   notImplemented();
 }
-WebCore::Plugin* WebCore::FrameWin::createPlugin(KURL const&,
-                                                 QStringList const&,
-                                                 QStringList const&,
-                                                 QString const&) {
+WebCore::Plugin* FrameWin::createPlugin(KURL const&,
+                                        QStringList const&,
+                                        QStringList const&,
+                                        QString const&) {
   notImplemented();
   return 0;
 }
-WebCore::String WebCore::FrameWin::generateFrameName(void) {
+String FrameWin::generateFrameName(void) {
   notImplemented();
   return String();
 }
@@ -1187,10 +1043,6 @@ void QLineEdit::setFont(class WebCore::Font const&) {
   notImplemented();
 }
 static WebCore::Font localFont;
-class WebCore::Font const& WebCore::GraphicsContext::font(void) const {
-  notImplemented();
-  return localFont;
-}
 void QListBox::setFont(class WebCore::Font const&) {
   notImplemented();
 }
@@ -1204,9 +1056,6 @@ void QComboBox::setFont(class WebCore::Font const&) {
   notImplemented();
 }
 void QTextEdit::setFont(class WebCore::Font const&) {
-  notImplemented();
-}
-void WebCore::GraphicsContext::setFont(class WebCore::Font const&) {
   notImplemented();
 }
 void QTextEdit::setWritingDirection(enum WebCore::TextDirection) {
@@ -1228,6 +1077,9 @@ int QFontMetrics::checkSelectionPoint(class QChar const*,
                                       bool) const {
   notImplemented();
   return 0;
+}
+GraphicsContext::GraphicsContext() {
+  notImplemented();
 }
 
 // Completely empty stubs (mostly to allow DRT to run):
@@ -1283,9 +1135,17 @@ bool QFontMetrics::isFixedPitch(void) const {
   return 0;
 }
 
-void WebCore::FrameWin::restoreDocumentState() {}
-void WebCore::FrameWin::partClearedInBegin() {}
-void WebCore::FrameWin::createEmptyDocument() {}
+void FrameWin::restoreDocumentState() {}
+void FrameWin::partClearedInBegin() {}
+void FrameWin::createEmptyDocument() {}
+QString FrameWin::overrideMediaType() const {
+  return QString();
+}
+void FrameWin::setTitle(String const&) {}
+void FrameWin::handledOnloadEvents() {}
+RangeImpl* FrameWin::markedTextRange() const {
+  return 0;
+}
 
 WebCore::BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
@@ -1299,12 +1159,6 @@ void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
 Widget::Widget() {}
 void Widget::show() {}
-
-QString WebCore::FrameWin::overrideMediaType() const {
-  return QString();
-}
-void WebCore::FrameWin::setTitle(WebCore::String const&) {}
-void WebCore::FrameWin::handledOnloadEvents(void) {}
 
 void ScrollView::resizeContents(int, int) {}
 WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
@@ -1344,5 +1198,25 @@ WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
                                   KURL const&) {}
 void WebCore::TransferJob::addMetaData(QString const&, QString const&) {}
 
-GraphicsContext::GraphicsContext() {}
-WebCore::GraphicsContext::~GraphicsContext() {}
+Font const& GraphicsContext::font() const {
+  return localFont;
+}
+void GraphicsContext::setFont(Font const&) {}
+void GraphicsContext::drawText(int,
+                               int,
+                               int,
+                               int,
+                               QChar const*,
+                               int,
+                               int,
+                               int,
+                               int,
+                               Color const&,
+                               TextDirection,
+                               bool,
+                               int,
+                               int,
+                               bool) {}
+QFontMetrics GraphicsContext::fontMetrics() const {
+  return QFontMetrics();
+}
