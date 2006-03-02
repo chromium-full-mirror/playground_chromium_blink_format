@@ -269,9 +269,6 @@ void QLineEdit::setReadOnly(bool) {
 void GraphicsContext::drawLineForText(int, int, int, int) {
   notImplemented();
 }
-GraphicsContext::GraphicsContext() {
-  notImplemented();
-}
 QComboBox::~QComboBox() {
   notImplemented();
 }
@@ -842,9 +839,6 @@ void WebCore::GraphicsContext::fillRect(WebCore::IntRect const&,
                                         WebCore::Brush const&) {
   notImplemented();
 }
-WebCore::GraphicsContext::~GraphicsContext() {
-  notImplemented();
-}
 WebCore::GraphicsContext::GraphicsContext(bool) {
   notImplemented();
 }
@@ -875,6 +869,7 @@ bool WebCore::TransferJob::isErrorPage() const {
   return 0;
 }
 WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
+                                  const String&,
                                   KURL const&,
                                   WebCore::FormData const&) {
   notImplemented();
@@ -1344,5 +1339,10 @@ int WebCore::ScrollView::contentsWidth() const {
 void ScrollView::updateContents(const IntRect&, bool) {}
 void ScrollView::setStaticBackground(bool) {}
 
-WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*, KURL const&) {}
+WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
+                                  const String&,
+                                  KURL const&) {}
 void WebCore::TransferJob::addMetaData(QString const&, QString const&) {}
+
+GraphicsContext::GraphicsContext() {}
+WebCore::GraphicsContext::~GraphicsContext() {}
