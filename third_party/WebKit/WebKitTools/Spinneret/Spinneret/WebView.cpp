@@ -102,28 +102,34 @@ WebView::WebView(HWND hWnd) {
   d->frame = new FrameWin(page, 0);
   FrameView* frameView = new FrameView(d->frame);
   d->frame->setView(frameView);
+
+  d->frame->begin();
+  d->frame->write(
+      "<img "
+      "src=\"data:image/gif;base64,R0lGODdhMAAwAPAAAAAAAP///"
+      "ywAAAAAMAAwAAAC8IyPqcvt3wCcDkiLc7C0qwyGHhSWpjQu5yqmCYsapyuvUUlvONmOZtfzg"
+      "FzByTB10QgxOR0TqBQejhRNzOfkVJ+5YiUqrXF5Y5lKh/DeuNcP5yLWGsEbtLiOSpa/"
+      "TPg7JpJHxyendzWTBfX0cxOnKPjgBzi4diinWGdkF8kjdfnycQZXZeYGejmJlZeGl9i2icVq"
+      "aNVailT6F5iJ90m6mvuTS4OK05M0vDk0Q4XUtwvKOzrcd3iq9uisF81M1OIcR7lEewwcLp7t"
+      "uNNkM3uNna3F2JQFo97Vriy/Xl4/f1cf5VWzXyym7PHhhx4dbgYKAAA7\" "
+      "alt=\"Larry\"><div style=\"border: 1px "
+      "black\">foo</div><ul><li>foo<li>bar<li>baz</ul>");
+  d->frame->end();
 }
 
-WebView::~WebView() {}
+WebView::~WebView() {
+  delete d;
+}
 
-void WebView::drawRect(const RECT& dirtyRect) {
-  GraphicsContext context;
-  d->frame->paint(&context, dirtyRect);
+void WebView::drawRect(const PAINTSTRUCT& ps) {
+  GraphicsContext context(ps.hdc);
+  d->frame->paint(&context, ps.rcPaint);
 }
 
 HWND WebView::windowHandle() {
   return d->windowHandle;
 }
 
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE:  Processes messages for the main window.
-//
-//  WM_COMMAND    - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY    - post a quit message and return
-//
 LRESULT CALLBACK WndProc(HWND hWnd,
                          UINT message,
                          WPARAM wParam,
@@ -148,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,
       PAINTSTRUCT ps;
       hdc = BeginPaint(hWnd, &ps);
       // TODO: Add any drawing code here...
-      gSharedWebViewHack->drawRect(ps.rcPaint);
+      gSharedWebViewHack->drawRect(ps);
       EndPaint(hWnd, &ps);
       break;
     case WM_DESTROY:

@@ -34,7 +34,7 @@ class WebView {
 
   ~WebView();
 
-  void drawRect(const RECT&);
+  void drawRect(const PAINTSTRUCT&);
 
   HWND windowHandle();
 
