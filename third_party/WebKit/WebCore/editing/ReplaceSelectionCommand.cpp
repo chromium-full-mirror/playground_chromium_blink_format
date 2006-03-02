@@ -523,13 +523,9 @@ void ReplaceSelectionCommand::doApply() {
   // decide whether to later append nodes to the end
   NodeImpl* beyondEndNode = 0;
   if (!isEndOfParagraph(visibleEnd) &&
-      !m_fragment.hasInterchangeNewlineAtEnd()) {
-    Position beyondEndPos = selection.end().downstream();
-    if (!isFirstVisiblePositionInSpecialElement(beyondEndPos))
-      beyondEndNode = beyondEndPos.node();
-  }
-  bool moveNodesAfterEnd = beyondEndNode && (startBlock != endBlock ||
-                                             m_fragment.hasMoreThanOneBlock());
+      !m_fragment.hasInterchangeNewlineAtEnd() &&
+      (startBlock != endBlock || m_fragment.hasMoreThanOneBlock()))
+    beyondEndNode = selection.end().downstream().node();
 
   Position startPos = selection.start();
 
@@ -816,7 +812,7 @@ void ReplaceSelectionCommand::doApply() {
       }
     }
 
-    if (moveNodesAfterEnd) {
+    if (beyondEndNode) {
       updateLayout();
       QValueList<NodeDesiredStyle> styles;
       QPtrList<NodeImpl> blocks;
