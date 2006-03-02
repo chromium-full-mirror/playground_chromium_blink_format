@@ -207,7 +207,6 @@ bool Frame::didOpenURL(const KURL& url) {
 
   // clear last edit command
   d->m_lastEditCommand = EditCommandPtr();
-  clearUndoRedoOperations();
 
   URLArgs args(d->m_extension->urlArgs());
 
@@ -2998,6 +2997,7 @@ void Frame::scrollToAnchor(const KURL& URL) {
 bool Frame::closeURL() {
   saveDocumentState();
   stopLoading(true);
+  clearUndoRedoOperations();
   return true;
 }
 
