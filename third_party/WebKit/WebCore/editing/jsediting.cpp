@@ -199,8 +199,8 @@ bool execCut(Frame* frame, bool userInterface, const DOMString& value) {
 }
 
 bool execDelete(Frame* frame, bool userInterface, const DOMString& value) {
-  TypingCommand::deleteKeyPressed(frame->document(),
-                                  frame->selectionGranularity() == khtml::WORD);
+  TypingCommand::deleteKeyPressed(
+      frame->document(), frame->selectionGranularity() == WordGranularity);
   return true;
 }
 

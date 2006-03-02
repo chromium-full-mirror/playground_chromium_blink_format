@@ -326,7 +326,7 @@ void TypingCommand::deleteKeyPressed() {
           SelectionController(endingSelection().start(),
                               endingSelection().end(), SEL_DEFAULT_AFFINITY);
       sc.modify(SelectionController::EXTEND, SelectionController::BACKWARD,
-                CHARACTER);
+                CharacterGranularity);
       selectionToDelete = sc.selection();
       break;
     }
@@ -357,7 +357,7 @@ void TypingCommand::forwardDeleteKeyPressed() {
           SelectionController(endingSelection().start(),
                               endingSelection().end(), SEL_DEFAULT_AFFINITY);
       sc.modify(SelectionController::EXTEND, SelectionController::FORWARD,
-                CHARACTER);
+                CharacterGranularity);
       selectionToDelete = sc.selection();
       break;
     }
