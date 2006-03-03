@@ -50,9 +50,7 @@ class Array;
 typedef Array<char> ByteArray;
 }
 
-bool KWQServeRequest(WebCore::Loader*,
-                     WebCore::DocLoader*,
-                     WebCore::TransferJob*);
+bool KWQServeRequest(WebCore::DocLoader*, WebCore::TransferJob*);
 
 WebCore::ByteArray KWQServeSynchronousRequest(WebCore::Loader*,
                                               WebCore::DocLoader*,
