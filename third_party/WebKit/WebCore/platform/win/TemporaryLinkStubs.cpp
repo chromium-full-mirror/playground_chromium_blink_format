@@ -240,9 +240,6 @@ bool QListBox::isSelected(int) const {
 void QLineEdit::setReadOnly(bool) {
   notImplemented();
 }
-void GraphicsContext::drawLineForText(int, int, int, int) {
-  notImplemented();
-}
 QComboBox::~QComboBox() {
   notImplemented();
 }
@@ -295,10 +292,6 @@ void GraphicsContext::addFocusRingRect(int, int, int, int) {
 void QTextEdit::setCursorPosition(int, int) {
   notImplemented();
 }
-int QFontMetrics::width(QString const&, int, int, int) const {
-  notImplemented();
-  return 0;
-}
 void Widget::setEnabled(bool) {
   notImplemented();
 }
@@ -312,16 +305,6 @@ void QTextEdit::setAlignment(Qt::AlignmentFlags) {
   notImplemented();
 }
 void QLineEdit::setCursorPosition(int) {
-  notImplemented();
-}
-void GraphicsContext::drawText(int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               int,
-                               QString const&) {
   notImplemented();
 }
 KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
@@ -1104,6 +1087,9 @@ int QFontMetrics::ascent() const {
 int QFontMetrics::height() const {
   return 10;
 }
+int QFontMetrics::width(QString const&, int, int, int) const {
+  return 10;
+}
 int QFontMetrics::descent() const {
   return 10;
 }
@@ -1184,11 +1170,22 @@ TransferJob::TransferJob(WebCore::TransferJobClient*,
                          const String&,
                          KURL const&) {}
 void TransferJob::addMetaData(QString const&, QString const&) {}
+bool TransferJob::start(class WebCore::DocLoader*) {
+  return false;
+}
 
 Font const& GraphicsContext::font() const {
   return localFont;
 }
 void GraphicsContext::setFont(Font const&) {}
+void GraphicsContext::drawText(int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               int,
+                               QString const&) {}
 void GraphicsContext::drawText(int,
                                int,
                                int,
@@ -1204,6 +1201,7 @@ void GraphicsContext::drawText(int,
                                int,
                                int,
                                bool) {}
+void GraphicsContext::drawLineForText(int, int, int, int) {}
 QFontMetrics GraphicsContext::fontMetrics() const {
   return QFontMetrics();
 }
