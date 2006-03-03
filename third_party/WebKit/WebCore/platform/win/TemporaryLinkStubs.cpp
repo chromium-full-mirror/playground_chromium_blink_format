@@ -71,10 +71,6 @@ String QTextEdit::textWithHardLineBreaks() const {
   notImplemented();
   return String();
 }
-IntPoint Widget::mapFromGlobal(IntPoint const&) const {
-  notImplemented();
-  return IntPoint();
-}
 int QLineEdit::cursorPosition() const {
   notImplemented();
   return 0;
@@ -157,9 +153,6 @@ void QListBox::appendItem(QString const&, KWQListBoxItemType, bool) {
 void QLineEdit::setPlaceholderString(String const&) {
   notImplemented();
 }
-Cursor::Cursor(Cursor const&) {
-  notImplemented();
-}
 Widget::FocusPolicy Widget::focusPolicy() const {
   notImplemented();
   return NoFocus;
@@ -182,9 +175,6 @@ void QTextEdit::setDisabled(bool) {
 bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
   notImplemented();
   return 0;
-}
-Widget::~Widget() {
-  notImplemented();
 }
 IntSize QListBox::sizeForNumberOfLines(int) const {
   notImplemented();
@@ -279,10 +269,6 @@ void QTextEdit::setSelectionStart(int) {
 void GraphicsContext::beginTransparencyLayer(float) {
   notImplemented();
 }
-IntRect Widget::frameGeometry() const {
-  notImplemented();
-  return IntRect();
-}
 void QListBox::setSelected(int, bool) {
   notImplemented();
 }
@@ -299,6 +285,9 @@ void QTextEdit::setSelectionEnd(int) {
   notImplemented();
 }
 void QComboBox::populate() {
+  notImplemented();
+}
+void Widget::setIsSelected(bool) {
   notImplemented();
 }
 void QTextEdit::setAlignment(Qt::AlignmentFlags) {
@@ -318,9 +307,6 @@ QListBox::QListBox() {
 QString QLineEdit::selectedText() const {
   notImplemented();
   return QString();
-}
-void Widget::setIsSelected(bool) {
-  notImplemented();
 }
 String QLineEdit::text() const {
   notImplemented();
@@ -415,9 +401,6 @@ IntSize QComboBox::sizeHint() const {
   notImplemented();
   return IntSize();
 }
-void Widget::setFrameGeometry(IntRect const&) {
-  notImplemented();
-}
 void QLineEdit::setSelection(int, int) {
   notImplemented();
 }
@@ -479,7 +462,7 @@ void QListBox::setWritingDirection(TextDirection) {
 void QLineEdit::setAlignment(Qt::AlignmentFlags) {
   notImplemented();
 }
-WebCore::Widget::FocusPolicy KWQFileButton::focusPolicy() const {
+Widget::FocusPolicy KWQFileButton::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -507,11 +490,11 @@ WebCore::IntRect KWQFileButton::frameGeometry() const {
 KWQFileButton::~KWQFileButton() {
   notImplemented();
 }
-WebCore::Widget::FocusPolicy QTextEdit::focusPolicy() const {
+Widget::FocusPolicy QTextEdit::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-WebCore::Widget::FocusPolicy QSlider::focusPolicy() const {
+Widget::FocusPolicy QSlider::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -522,7 +505,7 @@ bool QListBox::checksDescendantsForFocus() const {
   notImplemented();
   return 0;
 }
-WebCore::Widget::FocusPolicy QListBox::focusPolicy() const {
+Widget::FocusPolicy QListBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -544,7 +527,7 @@ bool QTextEdit::checksDescendantsForFocus() const {
   notImplemented();
   return false;
 }
-WebCore::Widget::FocusPolicy QLineEdit::focusPolicy() const {
+Widget::FocusPolicy QLineEdit::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -582,59 +565,7 @@ IntRect Path::boundingRect() const {
   return IntRect();
 }
 static Cursor localCursor;
-const Cursor& WebCore::crossCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::handCursor() {
-  notImplemented();
-  return localCursor;
-}
 const Cursor& WebCore::moveCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::iBeamCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::waitCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::helpCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::eastResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::northResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::northEastResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::northWestResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::southResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::southEastResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::southWestResizeCursor() {
-  notImplemented();
-  return localCursor;
-}
-const Cursor& WebCore::westResizeCursor() {
   notImplemented();
   return localCursor;
 }
@@ -665,9 +596,6 @@ IntRect WebCore::screenRect(Widget*) {
 void ScrollView::scrollBy(int, int) {
   notImplemented();
 }
-void WebCore::Widget::clearFocus() {
-  notImplemented();
-}
 int KWQFindNextSentenceFromIndex(QChar const*, int, int, bool) {
   notImplemented();
   return 0;
@@ -685,9 +613,6 @@ void KWQFindWordBoundary(QChar const*, int, int, int*, int*) {
 bool KWQKCookieJar::cookieEnabled() {
   notImplemented();
   return false;
-}
-void WebCore::Widget::setFocus() {
-  notImplemented();
 }
 void WebCore::TransferJob::kill() {
   notImplemented();
@@ -718,9 +643,6 @@ WebCore::TransferJob::TransferJob(WebCore::TransferJobClient*,
                                   WebCore::FormData const&) {
   notImplemented();
 }
-void WebCore::Widget::hide() {
-  notImplemented();
-}
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   notImplemented();
   return 0;
@@ -732,7 +654,7 @@ unsigned PlugInInfoStore::pluginCount() const {
 void WebCore::refreshPlugins(bool) {
   notImplemented();
 }
-int WebCore::screenDepth(WebCore::Widget*) {
+int WebCore::screenDepth(Widget*) {
   notImplemented();
   return 96;
 }
@@ -741,12 +663,9 @@ float QFontMetrics::xHeight() const {
   notImplemented();
   return 0;
 }
-IntRect WebCore::usableScreenRect(WebCore::Widget*) {
+IntRect WebCore::usableScreenRect(Widget*) {
   notImplemented();
   return IntRect(0, 0, 800, 600);
-}
-void Widget::setActiveWindow() {
-  notImplemented();
 }
 RenderTheme* WebCore::theme() {
   notImplemented();
@@ -784,12 +703,11 @@ void FrameWin::clearUndoRedoOperations(void) {
 void FrameWin::issueRedoCommand(void) {
   notImplemented();
 }
-KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(
-    WebCore::Widget*) {
+KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
-KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(WebCore::Widget*) {
+KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
@@ -833,12 +751,11 @@ void FrameWin::saveDocumentState(void) {
 void FrameWin::print(void) {
   notImplemented();
 }
-KJS::Bindings::Instance* FrameWin::getAppletInstanceForWidget(
-    WebCore::Widget*) {
+KJS::Bindings::Instance* FrameWin::getAppletInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
-bool FrameWin::passMouseDownEventToWidget(WebCore::Widget*) {
+bool FrameWin::passMouseDownEventToWidget(Widget*) {
   notImplemented();
   return 0;
 }
@@ -852,9 +769,6 @@ void FrameWin::issueCopyCommand(void) {
   notImplemented();
 }
 void FrameWin::openURLRequest(KURL const&, struct WebCore::URLArgs const&) {
-  notImplemented();
-}
-void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
   notImplemented();
 }
 bool FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
@@ -873,13 +787,6 @@ void FrameWin::clearRecordedFormValues(void) {
 }
 void FrameWin::issuePasteCommand(void) {
   notImplemented();
-}
-bool FrameWin::shouldChangeSelection(WebCore::SelectionController const&,
-                                     WebCore::SelectionController const&,
-                                     WebCore::EAffinity,
-                                     bool) const {
-  notImplemented();
-  return 0;
 }
 void FrameWin::scheduleClose(void) {
   notImplemented();
@@ -909,10 +816,6 @@ bool FrameWin::toolbarVisible(void) {
 }
 void FrameWin::issueTransposeCommand(void) {
   notImplemented();
-}
-QString FrameWin::userAgent(void) const {
-  notImplemented();
-  return QString();
 }
 void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {
   notImplemented();
@@ -996,47 +899,27 @@ void BrowserExtensionWin::createNewWindow(KURL const&,
                                           struct WebCore::URLArgs const&) {
   notImplemented();
 }
-void QSlider::setFont(class WebCore::Font const&) {
+void QSlider::setFont(WebCore::Font const&) {
   notImplemented();
 }
-void QLineEdit::setFont(class WebCore::Font const&) {
+void QLineEdit::setFont(WebCore::Font const&) {
   notImplemented();
 }
 static WebCore::Font localFont;
-void QListBox::setFont(class WebCore::Font const&) {
+void QListBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
-QFontMetrics::QFontMetrics(class WebCore::FontDescription const&) {
+QFontMetrics::QFontMetrics(WebCore::FontDescription const&) {
   notImplemented();
 }
-void WebCore::Widget::setFont(class WebCore::Font const&) {
+void QComboBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
-void QComboBox::setFont(class WebCore::Font const&) {
-  notImplemented();
-}
-void QTextEdit::setFont(class WebCore::Font const&) {
+void QTextEdit::setFont(WebCore::Font const&) {
   notImplemented();
 }
 void QTextEdit::setWritingDirection(enum WebCore::TextDirection) {
   notImplemented();
-}
-int QFontMetrics::checkSelectionPoint(class QChar const*,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      bool,
-                                      int,
-                                      bool,
-                                      bool,
-                                      bool) const {
-  notImplemented();
-  return 0;
 }
 GraphicsContext::GraphicsContext() {
   notImplemented();
@@ -1058,8 +941,6 @@ QString resetButtonDefaultLabel() {
 QString KLocale::language() {
   return "en";
 }
-
-Cursor::~Cursor() {}
 
 QFontMetrics::QFontMetrics() {}
 QFontMetrics::~QFontMetrics() {}
@@ -1093,8 +974,24 @@ int QFontMetrics::width(QString const&, int, int, int) const {
 int QFontMetrics::descent() const {
   return 10;
 }
-void QFontMetrics::setFontDescription(class WebCore::FontDescription const&) {}
+void QFontMetrics::setFontDescription(WebCore::FontDescription const&) {}
 bool QFontMetrics::isFixedPitch(void) const {
+  return 0;
+}
+int QFontMetrics::checkSelectionPoint(QChar const*,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      int,
+                                      bool,
+                                      int,
+                                      bool,
+                                      bool,
+                                      bool) const {
   return 0;
 }
 
@@ -1116,6 +1013,14 @@ bool FrameWin::passSubframeEventToSubframe(
 bool FrameWin::lastEventIsMouseUp() const {
   return false;
 }
+void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
+}
+bool FrameWin::shouldChangeSelection(SelectionController const&,
+                                     SelectionController const&,
+                                     WebCore::EAffinity,
+                                     bool) const {
+  return 0;
+}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
@@ -1124,11 +1029,9 @@ bool KWQCheckIfReloading(WebCore::DocLoader*) {
 }
 void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
-Widget::Widget() {}
-void Widget::show() {}
-void Widget::setCursor(Cursor const&) {}
-
-void ScrollView::resizeContents(int, int) {}
+void ScrollView::resizeContents(int w, int h) {
+  resize(w, h);
+}
 WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
   return ScrollBarAlwaysOff;
 }
@@ -1140,30 +1043,30 @@ void ScrollView::setHScrollBarMode(ScrollBarMode) {}
 void ScrollView::setVScrollBarMode(ScrollBarMode) {}
 void ScrollView::setScrollBarsMode(ScrollBarMode) {}
 int ScrollView::visibleHeight() const {
-  return 600;
+  return 800;
 }
 int ScrollView::visibleWidth() const {
-  return 800;
+  return 1000;
 }
-void ScrollView::setContentsPos(int, int) {}
+void ScrollView::setContentsPos(int x, int y) {
+  move(x, y);
+}
 int ScrollView::contentsX() const {
-  return 0;
+  return x();
 }
 int ScrollView::contentsY() const {
-  return 0;
+  return y();
 }
 int ScrollView::contentsHeight() const {
-  return 600;
+  return 800;
 }
 int ScrollView::contentsWidth() const {
-  return 800;
+  return 1000;
 }
 void ScrollView::viewportToContents(int x1, int y1, int& x2, int& y2) {
   x2 = x1;
-  y2 = y2;
+  y2 = y1;
 }
-
-void ScrollView::updateContents(const IntRect&, bool) {}
 void ScrollView::setStaticBackground(bool) {}
 
 TransferJob::TransferJob(WebCore::TransferJobClient*,
