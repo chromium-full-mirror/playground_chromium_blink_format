@@ -5,6 +5,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2006 Andrew Wellington (proton@wiretapped.net)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -147,6 +148,13 @@ void RenderContainer::addChild(RenderObject* newChild,
   } else {
     // just add it...
     insertChildNode(newChild, beforeChild);
+  }
+
+  if (newChild->isText() && newChild->style()->textTransform() == CAPITALIZE) {
+    RefPtr<DOMStringImpl> textToTransform =
+        static_cast<RenderText*>(newChild)->originalString();
+    if (textToTransform)
+      static_cast<RenderText*>(newChild)->setText(textToTransform.get(), true);
   }
 }
 
