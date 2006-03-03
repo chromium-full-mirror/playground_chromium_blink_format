@@ -931,13 +931,13 @@ QFontMetrics& QFontMetrics::operator=(QFontMetrics const&) {
 float QFontMetrics::floatWidth(QChar const*,
                                int,
                                int,
-                               int,
+                               int len,
                                int,
                                int,
                                int,
                                int,
                                bool) const {
-  return 14.0;
+  return len * 10;
 }
 int QFontMetrics::lineSpacing() const {
   return 10;
@@ -946,17 +946,17 @@ int QFontMetrics::ascent() const {
   return 10;
 }
 int QFontMetrics::height() const {
-  return 10;
+  return 24;
 }
-int QFontMetrics::width(QString const&, int, int, int) const {
-  return 10;
+int QFontMetrics::width(QString const& str, int, int, int) const {
+  return str.length() * 10;
 }
 int QFontMetrics::descent() const {
   return 10;
 }
 void QFontMetrics::setFontDescription(WebCore::FontDescription const&) {}
-bool QFontMetrics::isFixedPitch(void) const {
-  return 0;
+bool QFontMetrics::isFixedPitch() const {
+  return false;
 }
 int QFontMetrics::checkSelectionPoint(QChar const*,
                                       int,
