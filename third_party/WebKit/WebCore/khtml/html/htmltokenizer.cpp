@@ -422,8 +422,6 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
         prependingSrc = src;
       setSrc(SegmentedString());
       scriptCodeSize = scriptCodeResync = 0;
-      // QTime dt;
-      // dt.start();
       state =
           scriptExecution(exScript, state, QString::null, scriptStartLineno);
     }
@@ -1266,8 +1264,9 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         RefPtr<NodeImpl> n = processToken();
 
         if (tagName == preTag) {
-          state.setDiscardLF(
-              true);  // Discard the first LF after we open a pre.
+          if (beginTag)
+            state.setDiscardLF(
+                true);  // Discard the first LF after we open a pre.
         } else if (tagName == scriptTag) {
           ASSERT(!scriptNode);
           scriptNode = n;
