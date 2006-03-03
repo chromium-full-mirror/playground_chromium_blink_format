@@ -51,9 +51,6 @@ typedef Array<char> ByteArray;
 }
 
 bool KWQServeRequest(WebCore::Loader*,
-                     WebCore::Request*,
-                     WebCore::TransferJob*);
-bool KWQServeRequest(WebCore::Loader*,
                      WebCore::DocLoader*,
                      WebCore::TransferJob*);
 

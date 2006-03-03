@@ -124,10 +124,6 @@ bool Widget::isEnabled() const {
   notImplemented();
   return 0;
 }
-bool KWQServeRequest(Loader*, DocLoader*, WebCore::TransferJob*) {
-  notImplemented();
-  return 0;
-}
 void QTextEdit::setText(String const&) {
   notImplemented();
 }
@@ -1137,7 +1133,7 @@ bool FrameWin::lastEventIsMouseUp() const {
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
-bool KWQServeRequest(Loader*, Request*, TransferJob*) {
+bool KWQServeRequest(Loader*, DocLoader*, WebCore::TransferJob*) {
   return false;
 }  // false may not be "right" as a stub.
 bool KWQCheckIfReloading(WebCore::DocLoader*) {
