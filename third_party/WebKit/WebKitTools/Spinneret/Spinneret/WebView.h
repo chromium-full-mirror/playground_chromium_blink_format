@@ -30,6 +30,8 @@
 
 namespace WebKit {
 
+class WebFrame;
+
 class WebView {
  public:
   static WebView* createWebView(HINSTANCE, HWND parent = 0);
@@ -42,6 +44,8 @@ class WebView {
   void mouseDown(HWND, WPARAM, LPARAM);
   void mouseUp(HWND, WPARAM, LPARAM);
   void mouseDoubleClick(HWND, WPARAM, LPARAM);
+
+  WebFrame* mainFrame();
 
   HWND windowHandle();
 
