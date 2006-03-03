@@ -44,6 +44,7 @@ namespace WebCore {
 
 class FormData;
 class TransferJobPrivate;
+class DocLoader;
 
 class TransferJob {
  public:
@@ -53,6 +54,8 @@ class TransferJob {
               const KURL&,
               const FormData& postData);
   ~TransferJob();
+
+  bool start(DocLoader*);
 
   int error() const;
   void setError(int);

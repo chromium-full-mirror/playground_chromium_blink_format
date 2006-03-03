@@ -27,6 +27,11 @@
 @class NSDictionary;
 @class NSString;
 @class NSURLResponse;
+
+@interface NSDictionary (WebCore_Extras)
++ (id)_webcore_dictionaryWithHeaderString:(NSString*)string;
+@end
+
 #else
 class NSDictionary;
 class NSString;
@@ -49,8 +54,6 @@ class Array;
 
 typedef Array<char> ByteArray;
 }
-
-bool KWQServeRequest(WebCore::DocLoader*, WebCore::TransferJob*);
 
 WebCore::ByteArray KWQServeSynchronousRequest(WebCore::Loader*,
                                               WebCore::DocLoader*,
