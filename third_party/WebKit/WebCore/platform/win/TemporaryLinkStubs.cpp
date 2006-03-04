@@ -35,6 +35,7 @@
 #include "FrameWin.h"
 #include "BrowserExtensionWin.h"
 #include "TransferJob.h"
+#include "RenderThemeWin.h"
 
 using namespace WebCore;
 
@@ -630,17 +631,9 @@ int WebCore::screenDepth(Widget*) {
   return 96;
 }
 static QFontMetrics localFontMetrics;
-float QFontMetrics::xHeight() const {
-  notImplemented();
-  return 0;
-}
 IntRect WebCore::usableScreenRect(Widget*) {
   notImplemented();
   return IntRect(0, 0, 800, 600);
-}
-RenderTheme* WebCore::theme() {
-  notImplemented();
-  return 0;
 }
 Array<char> KWQServeSynchronousRequest(Loader*,
                                        DocLoader*,
@@ -654,13 +647,13 @@ Widget* WebCore::FrameView::topLevelWidget() const {
   notImplemented();
   return 0;
 }
-void FrameWin::respondToChangedContents(void) {
+void FrameWin::respondToChangedContents() {
   notImplemented();
 }
-void FrameWin::unfocusWindow(void) {
+void FrameWin::unfocusWindow() {
   notImplemented();
 }
-bool FrameWin::locationbarVisible(void) {
+bool FrameWin::locationbarVisible() {
   notImplemented();
   return 0;
 }
@@ -668,10 +661,10 @@ void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
                                          bool) {
   notImplemented();
 }
-void FrameWin::clearUndoRedoOperations(void) {
+void FrameWin::clearUndoRedoOperations() {
   notImplemented();
 }
-void FrameWin::issueRedoCommand(void) {
+void FrameWin::issueRedoCommand() {
   notImplemented();
 }
 KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(Widget*) {
@@ -682,11 +675,11 @@ KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
-bool FrameWin::canRedo(void) const {
+bool FrameWin::canRedo() const {
   notImplemented();
   return 0;
 }
-bool FrameWin::canUndo(void) const {
+bool FrameWin::canUndo() const {
   notImplemented();
   return 0;
 }
@@ -716,10 +709,10 @@ bool FrameWin::openURL(KURL const&) {
 void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {
   notImplemented();
 }
-void FrameWin::saveDocumentState(void) {
+void FrameWin::saveDocumentState() {
   notImplemented();
 }
-void FrameWin::print(void) {
+void FrameWin::print() {
   notImplemented();
 }
 KJS::Bindings::Instance* FrameWin::getAppletInstanceForWidget(Widget*) {
@@ -733,10 +726,10 @@ bool FrameWin::passMouseDownEventToWidget(Widget*) {
 void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {
   notImplemented();
 }
-void FrameWin::issueCutCommand(void) {
+void FrameWin::issueCutCommand() {
   notImplemented();
 }
-void FrameWin::issueCopyCommand(void) {
+void FrameWin::issueCopyCommand() {
   notImplemented();
 }
 void FrameWin::openURLRequest(KURL const&, struct WebCore::URLArgs const&) {
@@ -746,20 +739,20 @@ bool FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
   notImplemented();
   return 0;
 }
-void FrameWin::issueUndoCommand(void) {
+void FrameWin::issueUndoCommand() {
   notImplemented();
 }
 QString FrameWin::mimeTypeForFileName(QString const&) const {
   notImplemented();
   return QString();
 }
-void FrameWin::clearRecordedFormValues(void) {
+void FrameWin::clearRecordedFormValues() {
   notImplemented();
 }
-void FrameWin::issuePasteCommand(void) {
+void FrameWin::issuePasteCommand() {
   notImplemented();
 }
-void FrameWin::scheduleClose(void) {
+void FrameWin::scheduleClose() {
   notImplemented();
 }
 void FrameWin::markMisspellingsInAdjacentWords(
@@ -769,33 +762,33 @@ void FrameWin::markMisspellingsInAdjacentWords(
 void FrameWin::markMisspellings(WebCore::SelectionController const&) {
   notImplemented();
 }
-bool FrameWin::menubarVisible(void) {
+bool FrameWin::menubarVisible() {
   notImplemented();
   return 0;
 }
-bool FrameWin::personalbarVisible(void) {
+bool FrameWin::personalbarVisible() {
   notImplemented();
   return 0;
 }
-bool FrameWin::statusbarVisible(void) {
+bool FrameWin::statusbarVisible() {
   notImplemented();
   return 0;
 }
-bool FrameWin::toolbarVisible(void) {
+bool FrameWin::toolbarVisible() {
   notImplemented();
   return 0;
 }
-void FrameWin::issueTransposeCommand(void) {
+void FrameWin::issueTransposeCommand() {
   notImplemented();
 }
 void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {
   notImplemented();
 }
-bool FrameWin::canPaste(void) const {
+bool FrameWin::canPaste() const {
   notImplemented();
   return 0;
 }
-QString FrameWin::incomingReferrer(void) const {
+QString FrameWin::incomingReferrer() const {
   notImplemented();
   return QString();
 }
@@ -804,18 +797,11 @@ enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
   notImplemented();
   return (ObjectContentType)0;
 }
-WebCore::Frame* FrameWin::createFrame(KURL const&,
-                                      QString const&,
-                                      WebCore::RenderPart*,
-                                      String const&) {
-  notImplemented();
-  return 0;
-}
 bool FrameWin::canGoBackOrForward(int) const {
   notImplemented();
   return 0;
 }
-void FrameWin::issuePasteAndMatchStyleCommand(void) {
+void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
 WebCore::Plugin* FrameWin::createPlugin(KURL const&,
@@ -825,10 +811,6 @@ WebCore::Plugin* FrameWin::createPlugin(KURL const&,
   notImplemented();
   return 0;
 }
-String FrameWin::generateFrameName(void) {
-  notImplemented();
-  return String();
-}
 void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {
   notImplemented();
 }
@@ -836,15 +818,15 @@ void BrowserExtensionWin::openURLRequest(KURL const&,
                                          struct WebCore::URLArgs const&) {
   notImplemented();
 }
-int BrowserExtensionWin::getHistoryLength(void) {
+int BrowserExtensionWin::getHistoryLength() {
   notImplemented();
   return 0;
 }
-bool BrowserExtensionWin::canRunModal(void) {
+bool BrowserExtensionWin::canRunModal() {
   notImplemented();
   return 0;
 }
-void BrowserExtensionWin::openURLNotify(void) {
+void BrowserExtensionWin::openURLNotify() {
   notImplemented();
 }
 void BrowserExtensionWin::createNewWindow(KURL const&,
@@ -853,11 +835,11 @@ void BrowserExtensionWin::createNewWindow(KURL const&,
                                           WebCore::Frame*&) {
   notImplemented();
 }
-bool BrowserExtensionWin::canRunModalNow(void) {
+bool BrowserExtensionWin::canRunModalNow() {
   notImplemented();
   return 0;
 }
-void BrowserExtensionWin::runModal(void) {
+void BrowserExtensionWin::runModal() {
   notImplemented();
 }
 void BrowserExtensionWin::goBackOrForward(int) {
@@ -880,9 +862,6 @@ static WebCore::Font localFont;
 void QListBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
-QFontMetrics::QFontMetrics(WebCore::FontDescription const&) {
-  notImplemented();
-}
 void QComboBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
@@ -898,10 +877,10 @@ GraphicsContext::GraphicsContext() {
 void WebCore::TransferJob::retrieveCharset() const {
   notImplemented();
 }
-void WebCore::TransferJob::assembleResponseHeaders(void) const {
+void WebCore::TransferJob::assembleResponseHeaders() const {
   notImplemented();
 }
-WebCore::TransferJob::~TransferJob(void) {
+WebCore::TransferJob::~TransferJob() {
   notImplemented();
 }
 
@@ -925,6 +904,7 @@ QString KLocale::language() {
 QFontMetrics::QFontMetrics() {}
 QFontMetrics::~QFontMetrics() {}
 QFontMetrics::QFontMetrics(QFontMetrics const&) {}
+QFontMetrics::QFontMetrics(WebCore::FontDescription const&) {}
 QFontMetrics& QFontMetrics::operator=(QFontMetrics const&) {
   return localFontMetrics;
 }
@@ -942,14 +922,17 @@ float QFontMetrics::floatWidth(QChar const*,
 int QFontMetrics::lineSpacing() const {
   return 10;
 }
-int QFontMetrics::ascent() const {
-  return 10;
-}
 int QFontMetrics::height() const {
   return 24;
 }
 int QFontMetrics::width(QString const& str, int, int, int) const {
   return str.length() * 10;
+}
+float QFontMetrics::xHeight() const {
+  return 5;
+}
+int QFontMetrics::ascent() const {
+  return 10;
 }
 int QFontMetrics::descent() const {
   return 10;
@@ -999,6 +982,16 @@ bool FrameWin::shouldChangeSelection(SelectionController const&,
                                      SelectionController const&,
                                      WebCore::EAffinity,
                                      bool) const {
+  return 0;
+}
+static int frameNumber = 0;
+String FrameWin::generateFrameName() {
+  return QString::number(frameNumber++);
+}
+Frame* FrameWin::createFrame(KURL const&,
+                             QString const&,
+                             RenderPart*,
+                             String const&) {
   return 0;
 }
 
@@ -1083,4 +1076,29 @@ void GraphicsContext::drawText(int,
 void GraphicsContext::drawLineForText(int, int, int, int) {}
 QFontMetrics GraphicsContext::fontMetrics() const {
   return QFontMetrics();
+}
+
+bool RenderThemeWin::paintCheckbox(RenderObject*,
+                                   const RenderObject::PaintInfo&,
+                                   const IntRect&) {
+  notImplemented();
+  return false;
+}
+bool RenderThemeWin::paintRadio(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&) {
+  notImplemented();
+  return false;
+}
+bool RenderThemeWin::paintButton(RenderObject*,
+                                 const RenderObject::PaintInfo&,
+                                 const IntRect&) {
+  notImplemented();
+  return false;
+}
+bool RenderThemeWin::paintTextField(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&) {
+  notImplemented();
+  return false;
 }
