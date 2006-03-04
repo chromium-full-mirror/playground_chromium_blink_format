@@ -29,6 +29,9 @@
 
 #include "KURL.h"
 #include "formdata.h"
+#if WIN32
+#include "windows.h"
+#endif
 
 // The allocations and releases in TransferJobInternal are
 // definitely Cocoa-exception-free (either simple Foundation
@@ -39,7 +42,10 @@ namespace WebCore {
 
 class TransferJobInternal {
  public:
-  TransferJobInternal(TransferJobClient* c, const String& method, const KURL& u)
+  TransferJobInternal(TransferJob* job,
+                      TransferJobClient* c,
+                      const String& method,
+                      const KURL& u)
       : client(c),
         status(0),
         URL(u),
@@ -51,10 +57,16 @@ class TransferJobInternal {
         loader(nil),
         response(nil)
 #endif
+#if WIN32
+        ,
+        m_fileHandle(0),
+        m_fileLoadTimer(job, &TransferJob::fileLoadTimer)
+#endif
   {
   }
 
-  TransferJobInternal(TransferJobClient* c,
+  TransferJobInternal(TransferJob* job,
+                      TransferJobClient* c,
                       const String& method,
                       const KURL& u,
                       const FormData& p)
@@ -69,6 +81,11 @@ class TransferJobInternal {
         ,
         loader(nil),
         response(nil)
+#endif
+#if WIN32
+        ,
+        m_fileHandle(0),
+        m_fileLoadTimer(job, &TransferJob::fileLoadTimer)
 #endif
   {
   }
@@ -90,6 +107,10 @@ class TransferJobInternal {
 #if __APPLE__
   KWQResourceLoader* loader;
   NSURLResponse* response;
+#endif
+#if WIN32
+  HANDLE m_fileHandle;
+  Timer<TransferJob> m_fileLoadTimer;
 #endif
 };
 

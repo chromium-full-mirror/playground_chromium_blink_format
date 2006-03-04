@@ -661,10 +661,7 @@ void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
                                          bool) {
   notImplemented();
 }
-void FrameWin::clearUndoRedoOperations() {
-  notImplemented();
-}
-void FrameWin::issueRedoCommand() {
+void FrameWin::issueRedoCommand(void) {
   notImplemented();
 }
 KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(Widget*) {
@@ -707,9 +704,6 @@ bool FrameWin::openURL(KURL const&) {
   return 0;
 }
 void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {
-  notImplemented();
-}
-void FrameWin::saveDocumentState() {
   notImplemented();
 }
 void FrameWin::print() {
@@ -880,9 +874,6 @@ void WebCore::TransferJob::retrieveCharset() const {
 void WebCore::TransferJob::assembleResponseHeaders() const {
   notImplemented();
 }
-WebCore::TransferJob::~TransferJob() {
-  notImplemented();
-}
 
 // Completely empty stubs (mostly to allow DRT to run):
 bool WebCore::historyContains(QString const&) {
@@ -994,6 +985,8 @@ Frame* FrameWin::createFrame(KURL const&,
                              String const&) {
   return 0;
 }
+void FrameWin::saveDocumentState(void) {}
+void FrameWin::clearUndoRedoOperations(void) {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
@@ -1041,10 +1034,6 @@ void ScrollView::viewportToContents(int x1, int y1, int& x2, int& y2) {
   y2 = y1;
 }
 void ScrollView::setStaticBackground(bool) {}
-
-bool TransferJob::start(class WebCore::DocLoader*) {
-  return false;
-}
 
 Font const& GraphicsContext::font() const {
   return localFont;

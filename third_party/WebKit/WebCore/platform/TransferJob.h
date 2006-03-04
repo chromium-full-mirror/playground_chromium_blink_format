@@ -29,6 +29,7 @@
 #include "PlatformString.h"
 #include "TransferJobClient.h"  // for PlatformResponse
 #include <kxmlcore/HashMap.h>
+#include "Timer.h"
 
 #if __APPLE__
 #ifdef __OBJC__
@@ -72,6 +73,9 @@ class TransferJob {
 
 #if __APPLE__
   void setLoader(KWQResourceLoader*);
+#endif
+#if WIN32
+  void TransferJob::fileLoadTimer(Timer<TransferJob>* timer);
 #endif
 
   void cancel();

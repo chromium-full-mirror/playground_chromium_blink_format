@@ -39,13 +39,13 @@ namespace WebCore {
 TransferJob::TransferJob(TransferJobClient* client,
                          const String& method,
                          const KURL& url)
-    : d(new TransferJobInternal(client, method, url)) {}
+    : d(new TransferJobInternal(this, client, method, url)) {}
 
 TransferJob::TransferJob(TransferJobClient* client,
                          const String& method,
                          const KURL& url,
                          const FormData& postData)
-    : d(new TransferJobInternal(client, method, url, postData)) {}
+    : d(new TransferJobInternal(this, client, method, url, postData)) {}
 
 bool TransferJob::isErrorPage() const {
   return d->status != 0;
