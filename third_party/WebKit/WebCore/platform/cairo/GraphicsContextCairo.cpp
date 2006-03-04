@@ -439,6 +439,9 @@ void GraphicsContext::drawTiledImage(Image* image,
                                      int sx,
                                      int sy,
                                      void* context) {
+  if (!context)
+    context = m_data->context;
+
   if (m_data->state.paintingDisabled)
     return;
 
@@ -457,6 +460,9 @@ void GraphicsContext::drawScaledAndTiledImage(Image* image,
                                               Image::TileRule hRule,
                                               Image::TileRule vRule,
                                               void* context) {
+  if (!context)
+    context = m_data->context;
+
   if (m_data->state.paintingDisabled)
     return;
 
