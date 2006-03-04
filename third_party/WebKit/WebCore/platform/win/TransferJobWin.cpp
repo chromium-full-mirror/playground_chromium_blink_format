@@ -49,7 +49,7 @@ bool TransferJob::start(DocLoader* docLoader) {
                                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   }
 
-  if (d->m_fileHandle == INVALID_HANDLE_VALUE) {
+  if (!d->m_fileHandle || d->m_fileHandle == INVALID_HANDLE_VALUE) {
     delete this;
     return false;
   }
