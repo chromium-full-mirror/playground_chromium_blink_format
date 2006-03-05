@@ -170,11 +170,6 @@ LRESULT CALLBACK WndProc(HWND hWnd,
           return DefWindowProc(hWnd, message, wParam, lParam);
       }
       break;
-    case WM_PAINT:
-      hdc = BeginPaint(hWnd, &ps);
-      // TODO: Add any drawing code here...
-      EndPaint(hWnd, &ps);
-      break;
     case WM_DESTROY:
       PostQuitMessage(0);
       break;
@@ -202,8 +197,6 @@ LRESULT CALLBACK MyEditProc(HWND hDlg,
         char cstrPtr[MAX_URL_LENGTH];
         *((LPWORD)strPtr) = MAX_URL_LENGTH;
         int strLen = SendMessage(hDlg, EM_GETLINE, 0, (LPARAM)strPtr);
-
-        MessageBox(hMainWnd, strPtr, L"Foo", MB_OK);
 
         int x;
         for (x = 0; x < strLen; x++)
