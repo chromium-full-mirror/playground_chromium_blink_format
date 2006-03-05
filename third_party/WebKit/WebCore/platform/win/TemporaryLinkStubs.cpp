@@ -570,7 +570,7 @@ const Cursor& WebCore::moveCursor() {
   notImplemented();
   return localCursor;
 }
-WebCore::MouseEvent::MouseEvent() {
+MouseEvent::MouseEvent() {
   notImplemented();
 }
 void QLineEdit::setColors(Color const&, Color const&) {
@@ -702,9 +702,6 @@ bool FrameWin::runJavaScriptConfirm(String const&) {
 bool FrameWin::openURL(KURL const&) {
   notImplemented();
   return 0;
-}
-void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {
-  notImplemented();
 }
 void FrameWin::print() {
   notImplemented();
@@ -914,19 +911,19 @@ int QFontMetrics::lineSpacing() const {
   return 10;
 }
 int QFontMetrics::height() const {
-  return 24;
+  return ascent() + descent();
 }
 int QFontMetrics::width(QString const& str, int, int, int) const {
   return str.length() * 10;
 }
 float QFontMetrics::xHeight() const {
-  return 5;
+  return 10;
 }
 int QFontMetrics::ascent() const {
-  return 10;
+  return 12;
 }
 int QFontMetrics::descent() const {
-  return 10;
+  return 12;
 }
 void QFontMetrics::setFontDescription(WebCore::FontDescription const&) {}
 bool QFontMetrics::isFixedPitch() const {
@@ -987,6 +984,7 @@ Frame* FrameWin::createFrame(KURL const&,
 }
 void FrameWin::saveDocumentState(void) {}
 void FrameWin::clearUndoRedoOperations(void) {}
+void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 
@@ -995,9 +993,7 @@ bool KWQCheckIfReloading(WebCore::DocLoader*) {
 }
 void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
-void ScrollView::resizeContents(int w, int h) {
-  resize(w, h);
-}
+void ScrollView::resizeContents(int w, int h) {}
 WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
   return ScrollBarAlwaysOff;
 }
@@ -1014,9 +1010,7 @@ int ScrollView::visibleHeight() const {
 int ScrollView::visibleWidth() const {
   return 1000;
 }
-void ScrollView::setContentsPos(int x, int y) {
-  move(x, y);
-}
+void ScrollView::setContentsPos(int x, int y) {}
 int ScrollView::contentsX() const {
   return x();
 }
