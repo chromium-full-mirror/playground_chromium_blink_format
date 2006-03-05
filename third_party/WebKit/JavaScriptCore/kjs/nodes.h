@@ -167,7 +167,6 @@ class StatementNode : public Node {
   JSValue* evaluate(ExecState* /*exec*/) { return jsUndefined(); }
   int l0, l1;
   int sid;
-  bool breakPoint;
 };
 
 class NullNode : public Node {
