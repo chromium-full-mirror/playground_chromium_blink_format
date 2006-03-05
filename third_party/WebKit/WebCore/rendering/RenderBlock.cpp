@@ -3100,7 +3100,7 @@ static inline void stripTrailingSpace(int& inlineMax,
     const Font* f = t->font(false);  // FIXME: Why are we ignoring first-line?
     QChar space[1];
     space[0] = ' ';
-    int spaceWidth = f->width(space, 1, 0, 0);
+    int spaceWidth = f->width(space, 1);
     inlineMax -= spaceWidth;
     if (inlineMin > inlineMax)
       inlineMin = inlineMax;

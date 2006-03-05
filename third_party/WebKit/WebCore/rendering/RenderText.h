@@ -30,8 +30,6 @@
 #include <assert.h>
 #include <kxmlcore/PassRefPtr.h>
 
-class QFontMetrics;
-
 namespace WebCore {
 
 // Define a constant for soft hyphen's unicode value.
@@ -108,10 +106,7 @@ class RenderText : public RenderObject {
   virtual int width() const;
   virtual int height() const;
 
-  // height of the contents (without paddings, margins and borders)
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool firstLine,
-                                 bool isRootLineBox = false) const;
 
   // overrides
   virtual void calcMinMaxWidth();
@@ -169,7 +164,6 @@ class RenderText : public RenderObject {
 
   virtual IntRect getAbsoluteRepaintRect();
 
-  const QFontMetrics& metrics(bool firstLine) const;
   const Font* font(bool firstLine) const;
 
   TextImpl* element() const {
