@@ -12,7 +12,6 @@
 #include "KWQComboBox.h"
 #include "IntPoint.h"
 #include "Widget.h"
-#include "KWQFontMetrics.h"
 #include "GraphicsContext.h"
 #include "KWQSlider.h"
 #include "Cursor.h"
@@ -36,6 +35,7 @@
 #include "BrowserExtensionWin.h"
 #include "TransferJob.h"
 #include "RenderThemeWin.h"
+#include "FontRenderer.h"
 
 using namespace WebCore;
 
@@ -253,17 +253,6 @@ void QScrollBar::setKnobProportion(int, int) {
 KWQFileButton::KWQFileButton(Frame*) {
   notImplemented();
 }
-IntRect QFontMetrics::boundingRect(int,
-                                   int,
-                                   int,
-                                   int,
-                                   int,
-                                   QString const&,
-                                   int,
-                                   int) const {
-  notImplemented();
-  return IntRect();
-}
 void QTextEdit::setSelectionStart(int) {
   notImplemented();
 }
@@ -337,24 +326,6 @@ void ScrollView::scrollPointRecursively(int, int) {
 IntSize QLineEdit::sizeForCharacterWidth(int) const {
   notImplemented();
   return IntSize();
-}
-IntRect QFontMetrics::selectionRectForText(int,
-                                           int,
-                                           int,
-                                           int,
-                                           int,
-                                           QChar const*,
-                                           int,
-                                           int,
-                                           int,
-                                           int,
-                                           bool,
-                                           bool,
-                                           int,
-                                           int,
-                                           bool) const {
-  notImplemented();
-  return IntRect();
 }
 void QTextEdit::getCursorPosition(int*, int*) const {
   notImplemented();
@@ -630,7 +601,6 @@ int WebCore::screenDepth(Widget*) {
   notImplemented();
   return 96;
 }
-static QFontMetrics localFontMetrics;
 IntRect WebCore::usableScreenRect(Widget*) {
   notImplemented();
   return IntRect(0, 0, 800, 600);
@@ -802,9 +772,6 @@ WebCore::Plugin* FrameWin::createPlugin(KURL const&,
   notImplemented();
   return 0;
 }
-void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {
-  notImplemented();
-}
 void BrowserExtensionWin::openURLRequest(KURL const&,
                                          struct WebCore::URLArgs const&) {
   notImplemented();
@@ -871,6 +838,41 @@ void WebCore::TransferJob::retrieveCharset() const {
 void WebCore::TransferJob::assembleResponseHeaders() const {
   notImplemented();
 }
+IntRect Font::selectionRectForText(int,
+                                   int,
+                                   int,
+                                   int,
+                                   int,
+                                   const QChar*,
+                                   int,
+                                   int,
+                                   int,
+                                   int,
+                                   bool,
+                                   bool,
+                                   int,
+                                   int) const {
+  notImplemented();
+  return IntRect();
+}
+void Font::drawHighlightForText(WebCore::GraphicsContext*,
+                                int,
+                                int,
+                                int,
+                                int,
+                                int,
+                                const QChar*,
+                                int,
+                                int,
+                                int,
+                                int,
+                                WebCore::TextDirection,
+                                bool,
+                                int,
+                                int,
+                                WebCore::Color) const {
+  notImplemented();
+}
 
 // Completely empty stubs (mostly to allow DRT to run):
 bool WebCore::historyContains(QString const&) {
@@ -887,63 +889,6 @@ QString resetButtonDefaultLabel() {
 }
 QString KLocale::language() {
   return "en";
-}
-
-QFontMetrics::QFontMetrics() {}
-QFontMetrics::~QFontMetrics() {}
-QFontMetrics::QFontMetrics(QFontMetrics const&) {}
-QFontMetrics::QFontMetrics(WebCore::FontDescription const&) {}
-QFontMetrics& QFontMetrics::operator=(QFontMetrics const&) {
-  return localFontMetrics;
-}
-float QFontMetrics::floatWidth(QChar const*,
-                               int,
-                               int,
-                               int len,
-                               int,
-                               int,
-                               int,
-                               int,
-                               bool) const {
-  return len * 10;
-}
-int QFontMetrics::lineSpacing() const {
-  return 10;
-}
-int QFontMetrics::height() const {
-  return ascent() + descent();
-}
-int QFontMetrics::width(QString const& str, int, int, int) const {
-  return str.length() * 10;
-}
-float QFontMetrics::xHeight() const {
-  return 10;
-}
-int QFontMetrics::ascent() const {
-  return 12;
-}
-int QFontMetrics::descent() const {
-  return 12;
-}
-void QFontMetrics::setFontDescription(WebCore::FontDescription const&) {}
-bool QFontMetrics::isFixedPitch() const {
-  return false;
-}
-int QFontMetrics::checkSelectionPoint(QChar const*,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      int,
-                                      bool,
-                                      int,
-                                      bool,
-                                      bool,
-                                      bool) const {
-  return 0;
 }
 
 void FrameWin::restoreDocumentState() {}
@@ -987,6 +932,7 @@ void FrameWin::clearUndoRedoOperations(void) {}
 void FrameWin::urlSelected(KURL const&, struct WebCore::URLArgs const&) {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
+void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {}
 
 bool KWQCheckIfReloading(WebCore::DocLoader*) {
   return false;
@@ -1029,6 +975,56 @@ void ScrollView::viewportToContents(int x1, int y1, int& x2, int& y2) {
 }
 void ScrollView::setStaticBackground(bool) {}
 
+float Font::floatWidth(QChar const*, int, int, int len, int, int) const {
+  return len * 10;
+}
+int Font::descent() const {
+  return 10;
+}
+float Font::xHeight() const {
+  return 10;
+}
+int Font::ascent() const {
+  return 10;
+}
+int Font::lineSpacing() const {
+  return 10;
+}
+bool Font::isFixedPitch() const {
+  return true;
+}
+void Font::drawText(WebCore::GraphicsContext*,
+                    int,
+                    int,
+                    int,
+                    int,
+                    const QChar*,
+                    int,
+                    int,
+                    int,
+                    int,
+                    WebCore::TextDirection,
+                    bool,
+                    int,
+                    int,
+                    WebCore::Color) const {}
+int Font::checkSelectionPoint(const QChar*,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              WebCore::TextDirection,
+                              bool,
+                              bool) const {
+  return 0;
+}
+
+FontRenderer::FontRenderer() {}
+void FontRenderer::update(FontDescription const&) {}
+
 Font const& GraphicsContext::font() const {
   return localFont;
 }
@@ -1057,9 +1053,6 @@ void GraphicsContext::drawText(int,
                                int,
                                bool) {}
 void GraphicsContext::drawLineForText(int, int, int, int) {}
-QFontMetrics GraphicsContext::fontMetrics() const {
-  return QFontMetrics();
-}
 
 bool RenderThemeWin::paintCheckbox(RenderObject*,
                                    const RenderObject::PaintInfo&,
