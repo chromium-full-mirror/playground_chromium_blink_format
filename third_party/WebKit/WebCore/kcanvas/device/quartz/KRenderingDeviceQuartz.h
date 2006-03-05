@@ -36,7 +36,6 @@ typedef struct CGContext* CGContextRef;
 @class NSGraphicsContext;
 #else
 class NSGraphicsContext;
-#endif  // SVG_SUPPORT
 #endif
 
 namespace WebCore {
@@ -105,4 +104,5 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
 };
 }
 
+#endif  // SVG_SUPPORT
 #endif
