@@ -862,12 +862,9 @@ DontDelete|Function 2
   queryCommandValue DOMDocument::QueryCommandValue DontDelete|Function 1
 @end
 */
-KJS_DEFINE_PROTOTYPE(DOMDocumentProto)
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMDocumentProto, DOMNodeProto)
 KJS_IMPLEMENT_PROTOFUNC(DOMDocumentProtoFunc)
-KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMDocument",
-                                    DOMDocumentProto,
-                                    DOMDocumentProtoFunc,
-                                    DOMNodeProto)
+KJS_IMPLEMENT_PROTOTYPE("DOMDocument", DOMDocumentProto, DOMDocumentProtoFunc)
 
 const ClassInfo DOMDocument::info = {"Document", &DOMNode::info,
                                      &DOMDocumentTable, 0};
@@ -1129,10 +1126,7 @@ DontDelete|Function 1
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(DOMElementProtoFunc)
-KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMElement",
-                                    DOMElementProto,
-                                    DOMElementProtoFunc,
-                                    DOMNodeProto)
+KJS_IMPLEMENT_PROTOTYPE("DOMElement", DOMElementProto, DOMElementProtoFunc)
 
 const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
                                     0};
