@@ -189,9 +189,6 @@ bool QListBox::isSelected(int) const {
   notImplemented();
   return 0;
 }
-QComboBox::~QComboBox() {
-  notImplemented();
-}
 Cursor::Cursor(Image*) {
   notImplemented();
 }
@@ -381,9 +378,6 @@ WebCore::IntSize QSlider::sizeHint() const {
   notImplemented();
   return IntSize();
 }
-QLineEdit::~QLineEdit() {
-  notImplemented();
-}
 QTextEdit::~QTextEdit() {
   notImplemented();
 }
@@ -396,9 +390,6 @@ Widget::FocusPolicy QLineEdit::focusPolicy() const {
   return NoFocus;
 }
 QScrollBar::~QScrollBar() {
-  notImplemented();
-}
-Path::Path() {
   notImplemented();
 }
 Path::Path(const IntRect&, Type) {
@@ -585,7 +576,7 @@ void FrameWin::issueCopyCommand() {
 void FrameWin::openURLRequest(KURL const&, struct WebCore::URLArgs const&) {
   notImplemented();
 }
-bool FrameWin::passWheelEventToChildWidget(WebCore::NodeImpl*) {
+bool FrameWin::passWheelEventToChildWidget(NodeImpl*) {
   notImplemented();
   return 0;
 }
@@ -679,7 +670,7 @@ void BrowserExtensionWin::openURLNotify() {
 void BrowserExtensionWin::createNewWindow(KURL const&,
                                           struct WebCore::URLArgs const&,
                                           struct WebCore::WindowArgs const&,
-                                          WebCore::Frame*&) {
+                                          Frame*&) {
   notImplemented();
 }
 bool BrowserExtensionWin::canRunModalNow() {
@@ -949,6 +940,8 @@ void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
 void GraphicsContext::endTransparencyLayer() {}
 
+Path::Path() {}
+
 bool RenderThemeWin::paintCheckbox(RenderObject*,
                                    const RenderObject::PaintInfo&,
                                    const IntRect&) {
@@ -971,6 +964,7 @@ bool RenderThemeWin::paintTextField(RenderObject*,
 }
 
 QLineEdit::QLineEdit(QLineEdit::Type) {}
+QLineEdit::~QLineEdit() {}
 void QLineEdit::setFont(WebCore::Font const&) {}
 void QLineEdit::setAlignment(Qt::AlignmentFlags) {}
 void QLineEdit::setWritingDirection(TextDirection) {}
@@ -996,8 +990,10 @@ IntSize QLineEdit::sizeForCharacterWidth(int) const {
 int QLineEdit::baselinePosition(int) const {
   return 0;
 }
+void QLineEdit::setLiveSearch(bool) {}
 
 QComboBox::QComboBox() {}
+QComboBox::~QComboBox() {}
 void QComboBox::setFont(WebCore::Font const&) {}
 int QComboBox::baselinePosition(int) const {
   return 0;
@@ -1013,5 +1009,3 @@ IntRect QComboBox::frameGeometry() const {
   return IntRect();
 }
 void QComboBox::setFrameGeometry(IntRect const&) {}
-
-void QLineEdit::setLiveSearch(bool) {}
