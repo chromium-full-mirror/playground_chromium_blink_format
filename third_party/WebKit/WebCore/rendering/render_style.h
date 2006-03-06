@@ -49,7 +49,7 @@
 #endif
 
 template <typename T, typename U>
-compareEqual(const T& t, const U& u) {
+bool compareEqual(const T& t, const U& u) {
   return a == static_cast<const T>(u);
 }
 
