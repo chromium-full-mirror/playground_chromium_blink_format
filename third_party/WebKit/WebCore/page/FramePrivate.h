@@ -82,7 +82,7 @@ class FramePrivate {
         m_redirectionTimer(thisFrame, &Frame::redirectionTimerFired),
         m_scheduledRedirection(noRedirectionScheduled),
         m_delayRedirect(0),
-        m_zoomFactor(100),
+        m_zoomFactor(parent ? parent->d->m_zoomFactor : 100),
         m_submitForm(0),
         m_bMousePressed(false),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
@@ -104,14 +104,7 @@ class FramePrivate {
         m_executingJavaScriptFormAction(false),
         m_cancelWithLoadInProgress(false),
         m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired),
-        m_userStyleSheetLoader(0) {
-    // inherit settings from parent
-    if (parent && parent->isFrame()) {
-      Frame* frame = static_cast<Frame*>(parent);
-      if (frame->d)
-        m_zoomFactor = frame->d->m_zoomFactor;
-    }
-  }
+        m_userStyleSheetLoader(0) {}
 
   ~FramePrivate() {
     delete m_extension;
@@ -123,7 +116,7 @@ class FramePrivate {
 
   Vector<RefPtr<Plugin>> m_plugins;
 
-  QGuardedPtr<RenderPart> m_ownerRenderer;
+  RenderPart* m_ownerRenderer;
   RefPtr<FrameView> m_view;
   BrowserExtension* m_extension;
   RefPtr<DocumentImpl> m_doc;
@@ -217,7 +210,8 @@ class FramePrivate {
 
   IntPoint m_dragStartPos;
 
-  QGuardedPtr<Frame> m_opener;
+  Frame* m_opener;
+  HashSet<Frame*> m_openedFrames;
   bool m_openedByJS;
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open
   bool m_bPendingChildRedirection;

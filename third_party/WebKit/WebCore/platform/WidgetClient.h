@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,38 +23,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KWQSIGNAL_H
-#define KWQSIGNAL_H
+#ifndef WidgetClient_h
+#define WidgetClient_h
 
-#include "KWQSlot.h"
-#include "KWQValueList.h"
+namespace WebCore {
 
-class KWQSignal {
+class ElementImpl;
+class Widget;
+
+class WidgetClient {
  public:
-  KWQSignal(QObject*, const char* name);
-#ifdef WIN32_COMPILE_HACK
-  KWQSignal() {}
-#endif
-  ~KWQSignal();
+  virtual ~WidgetClient() {}
 
-  void connect(const KWQSlot&);
-  void disconnect(const KWQSlot&);
+  virtual void scrollToVisible(Widget*) {}
 
-  void call() const;  // should be "emit"; can't be due to define in qobject.h
-  void call(int) const;
-  void call(const DOM::DOMString&) const;
+  virtual void focusIn(Widget*) {}
+  virtual void focusOut(Widget*) {}
 
- private:
-  // forbid copying and assignment
-  KWQSignal(const KWQSignal&);
-  KWQSignal& operator=(const KWQSignal&);
+  virtual void clicked(Widget*) {}
+  virtual void valueChanged(Widget*) {}
+  virtual void selectionChanged(Widget*) {}
 
-  QObject* _object;
-  KWQSignal* _next;
-  const char* _name;
-  QValueList<KWQSlot> _slots;
+  virtual void returnPressed(Widget*) {}
+  virtual void performSearch(Widget*) {}
 
-  friend class QObject;
+  virtual ElementImpl* element(Widget*) { return 0; }
+  virtual void sendConsumedMouseUp(Widget*) {}
+  virtual bool isVisible(Widget*) { return false; }
 };
+}
 
 #endif

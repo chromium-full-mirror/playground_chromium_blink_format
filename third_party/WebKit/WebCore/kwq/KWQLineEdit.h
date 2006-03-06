@@ -52,7 +52,7 @@ class QLineEdit : public Widget {
   void setColors(const WebCore::Color& background,
                  const WebCore::Color& foreground);
 
-  void setAlignment(AlignmentFlags);
+  void setAlignment(WebCore::HorizontalAlignment);
 
   void setCursorPosition(int);
   int cursorPosition() const;
@@ -83,13 +83,6 @@ class QLineEdit : public Widget {
   IntSize sizeForCharacterWidth(int numCharacters) const;
   int baselinePosition(int height) const;
 
-  void returnPressed() { m_returnPressed.call(); }
-  void textChanged() { m_textChanged.call(text()); }
-  void performSearch() { m_performSearch.call(); }
-  void selectionChanged() { m_selectionChanged.call(); }
-
-  void clicked();
-
   virtual FocusPolicy focusPolicy() const;
   virtual bool checksDescendantsForFocus() const;
 
@@ -102,18 +95,12 @@ class QLineEdit : public Widget {
   void addSearchResult();
 
  private:
-  KWQSignal m_returnPressed;
-  KWQSignal m_textChanged;
-  KWQSignal m_clicked;
-  KWQSignal m_performSearch;
-  KWQSignal m_selectionChanged;
-
   Type m_type;
   KWQTextFieldController* m_controller;
 };
 
 #ifdef __OBJC__
-NSTextAlignment KWQNSTextAlignmentForAlignmentFlags(Qt::AlignmentFlags);
+NSTextAlignment KWQNSTextAlignment(WebCore::HorizontalAlignment);
 #endif
 
 #endif

@@ -49,10 +49,8 @@ class Token;
  */
 class HTMLParser {
  public:
-  HTMLParser(FrameView* w, DocumentImpl* i, bool includesComments = false);
-  HTMLParser(DocumentFragmentImpl* frag,
-             DocumentImpl* doc,
-             bool includesComments = false);
+  HTMLParser(DocumentImpl*);
+  HTMLParser(DocumentFragmentImpl*);
   virtual ~HTMLParser();
 
   /**
@@ -78,13 +76,12 @@ class HTMLParser {
     return static_cast<HTMLDocumentImpl*>(document);
   }
 
- protected:
+ private:
   void setCurrent(NodeImpl* newCurrent);
   void setSkipMode(const QualifiedName& qName) {
     discard_until = qName.localName();
   }
 
-  FrameView* HTMLWidget;
   DocumentImpl* document;
 
   /*
@@ -192,9 +189,8 @@ class HTMLParser {
   AtomicString discard_until;
 
   bool headLoaded;
+  bool m_fragment;
   int inStrayTableContent;
-
-  bool includesCommentsInDOM;
 };
 }
 

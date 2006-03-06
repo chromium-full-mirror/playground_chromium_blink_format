@@ -4,7 +4,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,21 +22,18 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef RENDER_FORM_H
 #define RENDER_FORM_H
-
-#include "render_replaced.h"
-#include "render_image.h"
-#include "RenderBlock.h"
-
-#include <qtextedit.h>
-#include <qlineedit.h>
 
 #include "HTMLInputElementImpl.h"
 #include "HTMLSelectElementImpl.h"
 #include "HTMLTextAreaElementImpl.h"
+#include "RenderBlock.h"
+#include "render_image.h"
+#include "render_replaced.h"
+#include <qlineedit.h>
 
-class QComboBox;
 class QListBox;
 
 namespace WebCore {
@@ -49,7 +46,7 @@ class HTMLGenericFormElementImpl;
 
 class RenderFormElement : public khtml::RenderWidget {
  public:
-  RenderFormElement(DOM::HTMLGenericFormElementImpl* node);
+  RenderFormElement(HTMLGenericFormElementImpl* node);
   virtual ~RenderFormElement();
 
   virtual const char* renderName() const { return "RenderForm"; }
@@ -87,29 +84,24 @@ class RenderFormElement : public khtml::RenderWidget {
   virtual void layout();
   virtual short baselinePosition(bool, bool) const;
 
-  DOM::HTMLGenericFormElementImpl* element() const {
-    return static_cast<DOM::HTMLGenericFormElementImpl*>(
-        RenderObject::element());
+  HTMLGenericFormElementImpl* element() const {
+    return static_cast<HTMLGenericFormElementImpl*>(RenderObject::element());
   }
 
- public slots:
-  virtual void slotClicked();
-  virtual void slotSelectionChanged();
-
-  // Hack to make KWQSlot code work.
-  virtual void slotTextChanged(const DOM::DOMString& string);
+ private:
+  virtual void clicked(Widget*);
 
  protected:
   virtual bool isEditable() const { return false; }
 
-  AlignmentFlags textAlignment() const;
+  WebCore::HorizontalAlignment textAlignment() const;
 };
 
 // -------------------------------------------------------------------------
 
 class RenderImageButton : public RenderImage {
  public:
-  RenderImageButton(DOM::HTMLInputElementImpl* element);
+  RenderImageButton(HTMLInputElementImpl* element);
 
   virtual const char* renderName() const { return "RenderImageButton"; }
   virtual bool isImageButton() const { return true; }
@@ -119,7 +111,7 @@ class RenderImageButton : public RenderImage {
 
 class RenderLineEdit : public RenderFormElement {
  public:
-  RenderLineEdit(DOM::HTMLInputElementImpl* element);
+  RenderLineEdit(HTMLInputElementImpl* element);
 
   virtual void calcMinMaxWidth();
   int calcReplacedHeight() const { return intrinsicHeight(); }
@@ -141,20 +133,19 @@ class RenderLineEdit : public RenderFormElement {
   void setSelectionRange(int, int);
 
   QLineEdit* widget() const { return static_cast<QLineEdit*>(m_widget); }
-  DOM::HTMLInputElementImpl* element() const {
-    return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
+  HTMLInputElementImpl* element() const {
+    return static_cast<HTMLInputElementImpl*>(RenderObject::element());
   }
-
- public slots:
-  void slotReturnPressed();
-  void slotTextChanged(const DOM::DOMString& string);
-  void slotSelectionChanged();
-  void slotPerformSearch();
 
  public:
   void addSearchResult();
 
  private:
+  virtual void returnPressed(Widget*);
+  virtual void valueChanged(Widget*);
+  virtual void selectionChanged(Widget*);
+  virtual void performSearch(Widget*);
+
   virtual bool isEditable() const { return true; }
 
   bool m_updating;
@@ -189,7 +180,7 @@ class RenderFieldset : public RenderBlock {
 
 class RenderFileButton : public RenderFormElement {
  public:
-  RenderFileButton(DOM::HTMLInputElementImpl* element);
+  RenderFileButton(HTMLInputElementImpl* element);
 
   virtual const char* renderName() const { return "RenderFileButton"; }
   virtual void calcMinMaxWidth();
@@ -198,26 +189,25 @@ class RenderFileButton : public RenderFormElement {
 
   int calcReplacedHeight() const { return intrinsicHeight(); }
 
-  DOM::HTMLInputElementImpl* element() const {
-    return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
+  HTMLInputElementImpl* element() const {
+    return static_cast<HTMLInputElementImpl*>(RenderObject::element());
   }
 
   void click(bool sendMouseEvents);
 
- public slots:
-  virtual void slotClicked();
-  virtual void slotReturnPressed();
-  virtual void slotTextChanged(const DOM::DOMString& string);
-
  protected:
   virtual bool isEditable() const { return true; }
+
+ private:
+  virtual void returnPressed(Widget*);
+  virtual void valueChanged(Widget*);
 };
 
 // -------------------------------------------------------------------------
 
 class RenderLabel : public RenderFormElement {
  public:
-  RenderLabel(DOM::HTMLGenericFormElementImpl* element);
+  RenderLabel(HTMLGenericFormElementImpl* element);
 
   virtual const char* renderName() const { return "RenderLabel"; }
 };
@@ -226,7 +216,7 @@ class RenderLabel : public RenderFormElement {
 
 class RenderLegend : public RenderBlock {
  public:
-  RenderLegend(DOM::HTMLGenericFormElementImpl* element);
+  RenderLegend(HTMLGenericFormElementImpl* element);
 
   virtual const char* renderName() const { return "RenderLegend"; }
 };
@@ -235,7 +225,7 @@ class RenderLegend : public RenderBlock {
 
 class RenderSelect : public RenderFormElement {
  public:
-  RenderSelect(DOM::HTMLSelectElementImpl* element);
+  RenderSelect(HTMLSelectElementImpl* element);
 
   virtual const char* renderName() const { return "RenderSelect"; }
 
@@ -261,13 +251,12 @@ class RenderSelect : public RenderFormElement {
 
   void updateSelection();
 
-  DOM::HTMLSelectElementImpl* element() const {
-    return static_cast<DOM::HTMLSelectElementImpl*>(RenderObject::element());
+  HTMLSelectElementImpl* element() const {
+    return static_cast<HTMLSelectElementImpl*>(RenderObject::element());
   }
 
  protected:
   QListBox* createListBox();
-  QComboBox* createComboBox();
   void setWidgetWritingDirection();
 
   unsigned m_size;
@@ -277,16 +266,16 @@ class RenderSelect : public RenderFormElement {
   bool m_ignoreSelectEvents;
   bool m_optionsChanged;
 
- protected slots:
-  void slotSelected(int index);
-  void slotSelectionChanged();
+ private:
+  virtual void valueChanged(Widget*);
+  virtual void selectionChanged(Widget*);
 };
 
 // -------------------------------------------------------------------------
 
 class RenderTextArea : public RenderFormElement {
  public:
-  RenderTextArea(DOM::HTMLTextAreaElementImpl* element);
+  RenderTextArea(HTMLTextAreaElementImpl* element);
 
   virtual void destroy();
 
@@ -300,8 +289,8 @@ class RenderTextArea : public RenderFormElement {
   void setEdited(bool);
 
   // don't even think about making this method virtual!
-  DOM::HTMLTextAreaElementImpl* element() const {
-    return static_cast<DOM::HTMLTextAreaElementImpl*>(RenderObject::element());
+  HTMLTextAreaElementImpl* element() const {
+    return static_cast<HTMLTextAreaElementImpl*>(RenderObject::element());
   }
 
   String text();
@@ -317,9 +306,9 @@ class RenderTextArea : public RenderFormElement {
 
   virtual bool canHaveIntrinsicMargins() const { return true; }
 
- protected slots:
-  void slotTextChanged();
-  void slotSelectionChanged();
+ private:
+  virtual void valueChanged(Widget*);
+  virtual void selectionChanged(Widget*);
 
  protected:
   virtual bool isEditable() const { return true; }
@@ -332,10 +321,10 @@ class RenderTextArea : public RenderFormElement {
 
 class RenderSlider : public RenderFormElement {
  public:
-  RenderSlider(DOM::HTMLInputElementImpl* element);
+  RenderSlider(HTMLInputElementImpl* element);
 
-  DOM::HTMLInputElementImpl* element() const {
-    return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
+  HTMLInputElementImpl* element() const {
+    return static_cast<HTMLInputElementImpl*>(RenderObject::element());
   }
 
   virtual const char* renderName() const { return "RenderSlider"; }
@@ -343,11 +332,10 @@ class RenderSlider : public RenderFormElement {
   virtual void calcMinMaxWidth();
   virtual void updateFromElement();
 
- protected slots:
-  void slotSliderValueChanged();
-  void slotClicked();
+ private:
+  virtual void valueChanged(Widget*);
 };
 
-};  // namespace
+}  // namespace
 
 #endif

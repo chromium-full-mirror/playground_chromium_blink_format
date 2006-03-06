@@ -104,33 +104,23 @@ class HTMLStackElem {
  *    element or ignore the tag.
  *
  */
-HTMLParser::HTMLParser(FrameView* _parent,
-                       DocumentImpl* doc,
-                       bool includesComments)
-    : current(0),
+HTMLParser::HTMLParser(DocumentImpl* doc)
+    : document(doc),
+      current(0),
       currentIsReferenced(false),
-      includesCommentsInDOM(includesComments) {
-  HTMLWidget = _parent;
-  document = doc;
-
-  blockStack = 0;
-
+      blockStack(0),
+      m_fragment(false) {
   reset();
 }
 
-HTMLParser::HTMLParser(DocumentFragmentImpl* i,
-                       DocumentImpl* doc,
-                       bool includesComments)
-    : current(0),
+HTMLParser::HTMLParser(DocumentFragmentImpl* frag)
+    : document(frag->getDocument()),
+      current(0),
       currentIsReferenced(false),
-      includesCommentsInDOM(includesComments) {
-  HTMLWidget = 0;
-  document = doc;
-
-  blockStack = 0;
-
+      blockStack(0),
+      m_fragment(true) {
   reset();
-  setCurrent(i);
+  setCurrent(frag);
   inBody = true;
 }
 
@@ -273,10 +263,10 @@ bool HTMLParser::insertNode(NodeImpl* n, bool flat) {
         popBlock(localName);
       else
         setCurrent(newNode);
-      if (parentAttached && !n->attached() && HTMLWidget)
+      if (parentAttached && !n->attached() && !m_fragment)
         n->attach();
     } else {
-      if (parentAttached && !n->attached() && HTMLWidget)
+      if (parentAttached && !n->attached() && !m_fragment)
         n->attach();
       if (n->maintainsState()) {
         doc()->registerMaintainsState(n);
@@ -325,7 +315,7 @@ bool HTMLParser::handleError(NodeImpl* n,
         createHead();
       if (head) {
         if (head->addChild(n)) {
-          if (!n->attached() && HTMLWidget)
+          if (!n->attached() && !m_fragment)
             n->attach();
           return true;
         } else
@@ -357,7 +347,7 @@ bool HTMLParser::handleError(NodeImpl* n,
         if (newNode) {
           pushBlock(localName, tagPriority);
           setCurrent(newNode);
-          if (!n->attached() && HTMLWidget)
+          if (!n->attached() && !m_fragment)
             n->attach();
         } else {
           setSkipMode(styleTag);
@@ -387,7 +377,7 @@ bool HTMLParser::handleError(NodeImpl* n,
     } else if (h->hasLocalName(inputTag)) {
       if (equalIgnoringCase(h->getAttribute(typeAttr), "hidden") && form) {
         form->addChild(n);
-        if (!n->attached() && HTMLWidget)
+        if (!n->attached() && !m_fragment)
           n->attach();
         return true;
       }
@@ -400,7 +390,7 @@ bool HTMLParser::handleError(NodeImpl* n,
     } else if (h->hasLocalName(areaTag)) {
       if (map) {
         map->addChild(n);
-        if (!n->attached() && HTMLWidget)
+        if (!n->attached() && !m_fragment)
           n->attach();
         handled = true;
         return true;
@@ -614,8 +604,7 @@ bool HTMLParser::textCreateErrorCheck(Token* t, RefPtr<NodeImpl>& result) {
 }
 
 bool HTMLParser::commentCreateErrorCheck(Token* t, RefPtr<NodeImpl>& result) {
-  if (includesCommentsInDOM)
-    result = new CommentImpl(document, t->text.get());
+  result = new CommentImpl(document, t->text.get());
   return false;
 }
 
@@ -734,7 +723,7 @@ bool HTMLParser::noframesCreateErrorCheck(Token* t, RefPtr<NodeImpl>& result) {
 }
 
 bool HTMLParser::noscriptCreateErrorCheck(Token* t, RefPtr<NodeImpl>& result) {
-  if (HTMLWidget && HTMLWidget->frame()->jScriptEnabled())
+  if (!m_fragment && document->frame()->jScriptEnabled())
     setSkipMode(noscriptTag);
   return true;
 }
@@ -915,8 +904,8 @@ bool HTMLParser::isInline(NodeImpl* node) const {
         e->hasLocalName(spanTag) || e->hasLocalName(nobrTag) ||
         e->hasLocalName(wbrTag) || e->hasLocalName(noframesTag) ||
         e->hasLocalName(nolayerTag) || e->hasLocalName(noembedTag) ||
-        (e->hasLocalName(noscriptTag) && HTMLWidget &&
-         HTMLWidget->frame()->jScriptEnabled()))
+        (e->hasLocalName(noscriptTag) && !m_fragment &&
+         document->frame()->jScriptEnabled()))
       return true;
   }
 
@@ -1407,7 +1396,7 @@ void HTMLParser::finished() {
 
   // Warning, this may delete the tokenizer and parser, so don't try to do
   // anything else after this.
-  if (HTMLWidget)
+  if (!m_fragment)
     document->finishedParsing();
 }
 }

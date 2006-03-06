@@ -98,7 +98,8 @@ class RenderPart : public RenderWidget {
 
   virtual const char* renderName() const { return "RenderPart"; }
 
-  virtual void setWidget(Widget*);
+  void setFrame(Frame*);
+  void setWidget(Widget*);
 
   // FIXME: This should not be necessary.
   // Remove this once WebKit knows to properly schedule layouts using WebCore
@@ -111,6 +112,11 @@ class RenderPart : public RenderWidget {
 
  protected:
   bool m_hasFallbackContent;
+
+ private:
+  virtual void deleteWidget();
+
+  Frame* m_frame;
 };
 
 class RenderFrame : public RenderPart {

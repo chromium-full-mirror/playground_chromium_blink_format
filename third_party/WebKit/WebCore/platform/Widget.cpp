@@ -81,4 +81,8 @@ int Widget::baselinePosition(int height) const {
 bool Widget::checksDescendantsForFocus() const {
   return false;
 }
+
+bool Widget::isFrameView() const {
+  return false;
+}
 }

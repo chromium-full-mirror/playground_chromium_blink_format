@@ -92,10 +92,7 @@ enum ObjectContentType {
   ObjectContentPlugin,
 };
 
-class Frame : public Shared<Frame>,
-              public QObject,
-              Noncopyable,
-              TransferJobClient {
+class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
@@ -628,7 +625,7 @@ class Frame : public Shared<Frame>,
 
   static void endAllLifeSupport();
 
- signals:
+ protected:
   /**
    * Emitted if the cursor is moved over an URL.
    */
@@ -950,12 +947,13 @@ class Frame : public Shared<Frame>,
   // Currently, all this does is clear the "don't submit form twice" data
   // member.
   void prepareForUserAction();
-  virtual bool isFrame() const;
   NodeImpl* mousePressNode();
 
   bool isComplete();
 
   void replaceContentsWithScriptResult(const KURL& url);
+
+  void disconnectOwnerRenderer();
 
  protected:
   virtual void startRedirectionTimer();

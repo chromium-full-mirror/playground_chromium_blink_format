@@ -47,6 +47,7 @@
 #include "Color.h"
 #include "IntRect.h"
 #include "Timer.h"
+#include "WidgetClient.h"
 #include "render_object.h"
 #include <assert.h>
 #include <kxmlcore/Vector.h>
@@ -62,16 +63,6 @@ class RenderObject;
 class RenderStyle;
 class RenderTable;
 class RenderText;
-
-class RenderScrollMediator : public QObject {
- public:
-  RenderScrollMediator(RenderLayer* layer) : m_layer(layer) {}
-
-  void slotValueChanged(int);
-
- private:
-  RenderLayer* m_layer;
-};
 
 class ClipRects {
  public:
@@ -163,7 +154,7 @@ class Marquee {
   EMarqueeDirection m_direction : 4;
 };
 
-class RenderLayer {
+class RenderLayer : WidgetClient {
  public:
   enum ScrollBehavior {
     noScroll,
@@ -199,7 +190,7 @@ class RenderLayer {
 
   static QScrollBar* gScrollBar;
 
-  RenderLayer(RenderObject* object);
+  RenderLayer(RenderObject*);
   ~RenderLayer();
 
   RenderObject* renderer() const { return m_object; }
@@ -211,7 +202,7 @@ class RenderLayer {
   RenderLayer* lastChild() const { return m_last; }
 
   void addChild(RenderLayer* newChild, RenderLayer* beforeChild = 0);
-  RenderLayer* removeChild(RenderLayer* oldChild);
+  RenderLayer* removeChild(RenderLayer*);
 
   void removeOnlyThisLayer();
   void insertOnlyThisLayer();
@@ -282,7 +273,6 @@ class RenderLayer {
   void paintScrollbars(GraphicsContext*, const IntRect& damageRect);
   void updateScrollInfoAfterLayout();
   void slotValueChanged(int);
-  void updateScrollPositionFromScrollbars();
   bool scroll(KWQScrollDirection direction,
               KWQScrollGranularity granularity,
               float multiplier = 1.0);
@@ -388,6 +378,8 @@ class RenderLayer {
                             const IntRect& hitTestRect);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
+  virtual void valueChanged(Widget*);
+
  protected:
   RenderObject* m_object;
 
@@ -428,7 +420,6 @@ class RenderLayer {
   // For layers with overflow, we have a pair of scrollbars.
   QScrollBar* m_hBar;
   QScrollBar* m_vBar;
-  RenderScrollMediator* m_scrollMediator;
 
   // For layers that establish stacking contexts, m_posZOrderList holds a sorted
   // list of all the

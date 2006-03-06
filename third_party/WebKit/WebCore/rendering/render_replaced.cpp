@@ -234,7 +234,7 @@ Color RenderReplaced::selectionColor(GraphicsContext* p) const {
 // -----------------------------------------------------------------------------
 
 RenderWidget::RenderWidget(DOM::NodeImpl* node)
-    : RenderReplaced(node), m_deleteWidget(false), m_refCount(0) {
+    : RenderReplaced(node), m_refCount(0) {
   m_widget = 0;
   // a replaced element doesn't support being anonymous
   ASSERT(node);
@@ -263,8 +263,7 @@ void RenderWidget::destroy() {
   if (m_widget) {
     if (m_view)
       m_view->removeChild(m_widget);
-
-    m_widget->removeEventFilter();
+    m_widget->setClient(0);
   }
 
   RenderLayer* layer = m_layer;
@@ -282,9 +281,7 @@ void RenderWidget::destroy() {
 
 RenderWidget::~RenderWidget() {
   KHTMLAssert(m_refCount <= 0);
-
-  if (m_deleteWidget)
-    delete m_widget;
+  deleteWidget();
 }
 
 void RenderWidget::resizeWidget(Widget* widget, int w, int h) {
@@ -297,16 +294,15 @@ void RenderWidget::resizeWidget(Widget* widget, int w, int h) {
   }
 }
 
-void RenderWidget::setQWidget(Widget* widget, bool deleteWidget) {
+void RenderWidget::setWidget(Widget* widget) {
   if (widget != m_widget) {
     if (m_widget) {
-      m_widget->removeEventFilter();
-      if (m_deleteWidget)
-        delete m_widget;
+      m_widget->setClient(0);
+      deleteWidget();
     }
     m_widget = widget;
     if (m_widget) {
-      m_widget->installEventFilter(this);
+      m_widget->setClient(this);
       // if we've already received a layout, apply the calculated space to the
       // widget immediately, but we have to have really been full constructed
       // (with a non-null
@@ -327,7 +323,6 @@ void RenderWidget::setQWidget(Widget* widget, bool deleteWidget) {
       m_view->addChild(m_widget, -500000, 0);
     }
   }
-  m_deleteWidget = deleteWidget;
 }
 
 void RenderWidget::layout() {
@@ -337,9 +332,9 @@ void RenderWidget::layout() {
   setNeedsLayout(false);
 }
 
-void RenderWidget::sendConsumedMouseUp() {
+void RenderWidget::sendConsumedMouseUp(Widget*) {
   RenderArena* arena = ref();
-  element()->dispatchSimulatedMouseEvent(mouseupEvent);
+  node()->dispatchSimulatedMouseEvent(mouseupEvent);
   deref(arena);
 }
 
@@ -386,20 +381,34 @@ void RenderWidget::paint(PaintInfo& i, int _tx, int _ty) {
     i.p->fillRect(selectionRect(), selectionColor(i.p));
 }
 
-void RenderWidget::eventFilterFocusIn() const {
-  RenderArena* arena = const_cast<RenderWidget*>(this)->ref();
+void RenderWidget::focusIn(Widget*) {
+  RenderArena* arena = ref();
   RefPtr<NodeImpl> elem = element();
   if (elem)
     elem->getDocument()->setFocusNode(elem);
-  const_cast<RenderWidget*>(this)->deref(arena);
+  deref(arena);
 }
 
-void RenderWidget::eventFilterFocusOut() const {
-  RenderArena* arena = const_cast<RenderWidget*>(this)->ref();
+void RenderWidget::focusOut(Widget*) {
+  RenderArena* arena = ref();
   RefPtr<NodeImpl> elem = element();
   if (elem && elem == elem->getDocument()->focusNode())
     elem->getDocument()->setFocusNode(0);
-  const_cast<RenderWidget*>(this)->deref(arena);
+  deref(arena);
+}
+
+void RenderWidget::scrollToVisible(Widget* widget) {
+  if (RenderLayer* layer = enclosingLayer())
+    layer->scrollRectToVisible(absoluteBoundingBoxRect());
+}
+
+bool RenderWidget::isVisible(Widget* widget) {
+  return style()->visibility() == VISIBLE;
+}
+
+ElementImpl* RenderWidget::element(Widget* widget) {
+  NodeImpl* n = node();
+  return n->isElementNode() ? static_cast<ElementImpl*>(n) : 0;
 }
 
 void RenderWidget::deref(RenderArena* arena) {
@@ -446,5 +455,9 @@ void RenderWidget::setSelectionState(SelectionState s) {
     if (m_widget)
       m_widget->setIsSelected(m_selectionState != SelectionNone);
   }
+}
+
+void RenderWidget::deleteWidget() {
+  delete m_widget;
 }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +26,7 @@
 #ifndef KWQLISTBOX_H_
 #define KWQLISTBOX_H_
 
+#include "KWQValueList.h"
 #include "QString.h"
 #include "ScrollView.h"
 #include "TextDirection.h"
@@ -78,8 +79,6 @@ class QListBox : public WebCore::ScrollView {
   void setWritingDirection(WebCore::TextDirection);
 
   bool changingSelection() { return _changingSelection; }
-  void clicked() { _clicked.call(); }
-  void selectionChanged() { _selectionChanged.call(); }
 
   virtual FocusPolicy focusPolicy() const;
   virtual bool checksDescendantsForFocus() const;
@@ -98,9 +97,6 @@ class QListBox : public WebCore::ScrollView {
 
   mutable float _width;
   mutable bool _widthGood;
-
-  KWQSignal _clicked;
-  KWQSignal _selectionChanged;
 };
 
 #endif

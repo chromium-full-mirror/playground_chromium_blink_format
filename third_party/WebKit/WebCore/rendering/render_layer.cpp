@@ -110,10 +110,6 @@ void ClipRects::destroy(RenderArena* renderArena) {
   renderArena->free(*(size_t*)this, this);
 }
 
-void RenderScrollMediator::slotValueChanged(int val) {
-  m_layer->updateScrollPositionFromScrollbars();
-}
-
 RenderLayer::RenderLayer(RenderObject* object)
     : m_object(object),
       m_parent(0),
@@ -135,7 +131,6 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_scrollHeight(0),
       m_hBar(0),
       m_vBar(0),
-      m_scrollMediator(0),
       m_posZOrderList(0),
       m_negZOrderList(0),
       m_clipRects(0),
@@ -149,7 +144,6 @@ RenderLayer::~RenderLayer() {
   // our destructor doesn't have to do anything.
   delete m_hBar;
   delete m_vBar;
-  delete m_scrollMediator;
   delete m_posZOrderList;
   delete m_negZOrderList;
   delete m_marquee;
@@ -744,7 +738,9 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
   return IntRect(IntPoint(x, y), visibleRect.size());
 }
 
-void RenderLayer::updateScrollPositionFromScrollbars() {
+void RenderLayer::valueChanged(Widget*) {
+  // Update scroll position from scroll bars.
+
   bool needUpdate = false;
   int newX = scrollXOffset();
   int newY = m_scrollY;
@@ -768,18 +764,12 @@ void RenderLayer::updateScrollPositionFromScrollbars() {
 void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
   if (hasScrollbar && !m_hBar) {
     FrameView* scrollView = m_object->element()->getDocument()->view();
-    m_hBar = new QScrollBar(Qt::Horizontal, 0);
+    m_hBar = new QScrollBar(HorizontalScrollBar);
+    m_hBar->setClient(this);
     scrollView->addChild(m_hBar, 0, -50000);
-    if (!m_scrollMediator)
-      m_scrollMediator = new RenderScrollMediator(this);
-    m_scrollMediator->connect(m_hBar, SIGNAL(valueChanged(int)),
-                              SLOT(slotValueChanged(int)));
   } else if (!hasScrollbar && m_hBar) {
     FrameView* scrollView = m_object->element()->getDocument()->view();
     scrollView->removeChild(m_hBar);
-
-    m_scrollMediator->disconnect(m_hBar, SIGNAL(valueChanged(int)),
-                                 m_scrollMediator, SLOT(slotValueChanged(int)));
     delete m_hBar;
     m_hBar = 0;
   }
@@ -788,18 +778,12 @@ void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
 void RenderLayer::setHasVerticalScrollbar(bool hasScrollbar) {
   if (hasScrollbar && !m_vBar) {
     FrameView* scrollView = m_object->element()->getDocument()->view();
-    m_vBar = new QScrollBar(Qt::Vertical, 0);
+    m_vBar = new QScrollBar(VerticalScrollBar);
+    m_vBar->setClient(this);
     scrollView->addChild(m_vBar, 0, -50000);
-    if (!m_scrollMediator)
-      m_scrollMediator = new RenderScrollMediator(this);
-    m_scrollMediator->connect(m_vBar, SIGNAL(valueChanged(int)),
-                              SLOT(slotValueChanged(int)));
   } else if (!hasScrollbar && m_vBar) {
     FrameView* scrollView = m_object->element()->getDocument()->view();
     scrollView->removeChild(m_vBar);
-
-    m_scrollMediator->disconnect(m_vBar, SIGNAL(valueChanged(int)),
-                                 m_scrollMediator, SLOT(slotValueChanged(int)));
     delete m_vBar;
     m_vBar = 0;
   }
@@ -1161,8 +1145,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 }
 
 bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
-  // Clear our our scrollbar variable
-  RenderLayer::gScrollBar = 0;
+  gScrollBar = 0;
 
   renderer()->document()->updateLayout();
 
