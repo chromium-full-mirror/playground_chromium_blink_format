@@ -18,8 +18,6 @@
 #include "loader.h"
 #include "FrameView.h"
 #include "KWQScrollBar.h"
-#include "KWQObject.h"
-#include "KWQSignal.h"
 #include "KWQKJavaAppletWidget.h"
 #include "KWQScrollBar.h"
 #include "Path.h"
@@ -69,7 +67,7 @@ bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
   notImplemented();
   return 0;
 }
-QScrollBar::QScrollBar(Qt::Orientation, Widget*) {
+QScrollBar::QScrollBar(ScrollBarOrientation) {
   notImplemented();
 }
 bool QScrollBar::setValue(int) {
@@ -180,7 +178,7 @@ String QTextEdit::text() const {
 void QTextEdit::setWordWrap(QTextEdit::WrapStyle) {
   notImplemented();
 }
-void QTextEdit::setAlignment(Qt::AlignmentFlags) {
+void QTextEdit::setAlignment(HorizontalAlignment) {
   notImplemented();
 }
 void QTextEdit::setSelectionEnd(int) {
@@ -221,6 +219,13 @@ void Widget::unlockDrawingFocus() {
   notImplemented();
 }
 void Widget::setDrawingAlpha(float) {
+  notImplemented();
+}
+WidgetClient* Widget::client() const {
+  notImplemented();
+  return 0;
+}
+void Widget::setClient(WidgetClient*) {
   notImplemented();
 }
 
@@ -982,7 +987,7 @@ bool RenderThemeWin::paintTextField(RenderObject*,
 QLineEdit::QLineEdit(QLineEdit::Type) {}
 QLineEdit::~QLineEdit() {}
 void QLineEdit::setFont(WebCore::Font const&) {}
-void QLineEdit::setAlignment(Qt::AlignmentFlags) {}
+void QLineEdit::setAlignment(HorizontalAlignment) {}
 void QLineEdit::setWritingDirection(TextDirection) {}
 int QLineEdit::maxLength() const {
   return 0;
