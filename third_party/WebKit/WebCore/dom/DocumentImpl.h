@@ -179,7 +179,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   // DOM methods overridden from  parent classes
 
   virtual String nodeName() const;
-  virtual unsigned short nodeType() const;
+  virtual NodeType nodeType() const;
 
   // Other methods (not part of DOM)
   virtual bool isDocumentNode() const { return true; }
@@ -365,7 +365,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                                  MouseEvent*);
 
   virtual bool childAllowed(NodeImpl*);
-  virtual bool childTypeAllowed(unsigned short nodeType);
+  virtual bool childTypeAllowed(NodeType);
   virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
   StyleSheetListImpl* styleSheets();

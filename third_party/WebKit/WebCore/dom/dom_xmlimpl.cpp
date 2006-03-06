@@ -27,10 +27,9 @@
 #include "CachedXSLStyleSheet.h"
 #include "DocLoader.h"
 #include "DocumentImpl.h"
+#include "ExceptionCode.h"
 #include "StringImpl.h"
 #include "css_stylesheetimpl.h"
-#include "dom_exception.h"
-#include "dom_node.h"
 #include "xml_tokenizer.h"
 
 #if KHTML_XSLT
@@ -57,8 +56,8 @@ DOMString EntityImpl::nodeName() const {
   return m_name.get();
 }
 
-unsigned short EntityImpl::nodeType() const {
-  return Node::ENTITY_NODE;
+NodeImpl::NodeType EntityImpl::nodeType() const {
+  return ENTITY_NODE;
 }
 
 PassRefPtr<NodeImpl> EntityImpl::cloneNode(bool /*deep*/) {
@@ -68,14 +67,14 @@ PassRefPtr<NodeImpl> EntityImpl::cloneNode(bool /*deep*/) {
 }
 
 // DOM Section 1.1.1
-bool EntityImpl::childTypeAllowed(unsigned short type) {
+bool EntityImpl::childTypeAllowed(NodeType type) {
   switch (type) {
-    case Node::ELEMENT_NODE:
-    case Node::PROCESSING_INSTRUCTION_NODE:
-    case Node::COMMENT_NODE:
-    case Node::TEXT_NODE:
-    case Node::CDATA_SECTION_NODE:
-    case Node::ENTITY_REFERENCE_NODE:
+    case ELEMENT_NODE:
+    case PROCESSING_INSTRUCTION_NODE:
+    case COMMENT_NODE:
+    case TEXT_NODE:
+    case CDATA_SECTION_NODE:
+    case ENTITY_REFERENCE_NODE:
       return true;
       break;
     default:
@@ -126,8 +125,8 @@ DOMString EntityReferenceImpl::nodeName() const {
   return m_entityName.get();
 }
 
-unsigned short EntityReferenceImpl::nodeType() const {
-  return Node::ENTITY_REFERENCE_NODE;
+NodeImpl::NodeType EntityReferenceImpl::nodeType() const {
+  return ENTITY_REFERENCE_NODE;
 }
 
 PassRefPtr<NodeImpl> EntityReferenceImpl::cloneNode(bool deep) {
@@ -142,14 +141,14 @@ PassRefPtr<NodeImpl> EntityReferenceImpl::cloneNode(bool deep) {
 }
 
 // DOM Section 1.1.1
-bool EntityReferenceImpl::childTypeAllowed(unsigned short type) {
+bool EntityReferenceImpl::childTypeAllowed(NodeType type) {
   switch (type) {
-    case Node::ELEMENT_NODE:
-    case Node::PROCESSING_INSTRUCTION_NODE:
-    case Node::COMMENT_NODE:
-    case Node::TEXT_NODE:
-    case Node::CDATA_SECTION_NODE:
-    case Node::ENTITY_REFERENCE_NODE:
+    case ELEMENT_NODE:
+    case PROCESSING_INSTRUCTION_NODE:
+    case COMMENT_NODE:
+    case TEXT_NODE:
+    case CDATA_SECTION_NODE:
+    case ENTITY_REFERENCE_NODE:
       return true;
       break;
     default:
@@ -182,8 +181,8 @@ DOMString NotationImpl::nodeName() const {
   return m_name.get();
 }
 
-unsigned short NotationImpl::nodeType() const {
-  return Node::NOTATION_NODE;
+NodeImpl::NodeType NotationImpl::nodeType() const {
+  return NOTATION_NODE;
 }
 
 PassRefPtr<NodeImpl> NotationImpl::cloneNode(bool /*deep*/) {
@@ -193,7 +192,7 @@ PassRefPtr<NodeImpl> NotationImpl::cloneNode(bool /*deep*/) {
 }
 
 // DOM Section 1.1.1
-bool NotationImpl::childTypeAllowed(unsigned short /*type*/) {
+bool NotationImpl::childTypeAllowed(NodeType) {
   return false;
 }
 
@@ -229,10 +228,10 @@ ProcessingInstructionImpl::~ProcessingInstructionImpl() {
 }
 
 void ProcessingInstructionImpl::setData(const DOMString& data,
-                                        int& exceptioncode) {
+                                        ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly.
   if (isReadOnly()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
   m_data = data.impl();
@@ -242,8 +241,8 @@ DOMString ProcessingInstructionImpl::nodeName() const {
   return m_target.get();
 }
 
-unsigned short ProcessingInstructionImpl::nodeType() const {
-  return Node::PROCESSING_INSTRUCTION_NODE;
+NodeImpl::NodeType ProcessingInstructionImpl::nodeType() const {
+  return PROCESSING_INSTRUCTION_NODE;
 }
 
 DOMString ProcessingInstructionImpl::nodeValue() const {
@@ -251,9 +250,9 @@ DOMString ProcessingInstructionImpl::nodeValue() const {
 }
 
 void ProcessingInstructionImpl::setNodeValue(const DOMString& nodeValue,
-                                             int& exceptioncode) {
+                                             ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: taken care of by setData()
-  setData(nodeValue, exceptioncode);
+  setData(nodeValue, ec);
 }
 
 PassRefPtr<NodeImpl> ProcessingInstructionImpl::cloneNode(bool /*deep*/) {
@@ -263,7 +262,7 @@ PassRefPtr<NodeImpl> ProcessingInstructionImpl::cloneNode(bool /*deep*/) {
 }
 
 // DOM Section 1.1.1
-bool ProcessingInstructionImpl::childTypeAllowed(unsigned short /*type*/) {
+bool ProcessingInstructionImpl::childTypeAllowed(NodeType) {
   return false;
 }
 
@@ -383,6 +382,10 @@ DOMString ProcessingInstructionImpl::toString() const {
 
 void ProcessingInstructionImpl::setStyleSheet(StyleSheetImpl* sheet) {
   m_sheet = sheet;
+}
+
+bool ProcessingInstructionImpl::offsetInCharacters() const {
+  return true;
 }
 
 }  // namespace

@@ -122,7 +122,7 @@ class AttrImpl : public ContainerNodeImpl {
 
   // DOM methods overridden from parent classes
   virtual DOMString nodeName() const;
-  virtual unsigned short nodeType() const;
+  virtual NodeType nodeType() const;
   virtual const AtomicString& localName() const;
   virtual const AtomicString& namespaceURI() const;
   virtual const AtomicString& prefix() const;
@@ -134,7 +134,7 @@ class AttrImpl : public ContainerNodeImpl {
 
   // Other methods (not part of DOM)
   virtual bool isAttributeNode() const { return true; }
-  virtual bool childTypeAllowed(unsigned short type);
+  virtual bool childTypeAllowed(NodeType);
 
   virtual void childrenChanged();
   virtual DOMString toString() const;
@@ -169,8 +169,8 @@ class ElementImpl : public ContainerNodeImpl {
   const AtomicString& getAttribute(const QualifiedName& name) const;
   void setAttribute(const QualifiedName& name,
                     DOMStringImpl* value,
-                    int& exceptioncode);
-  void removeAttribute(const QualifiedName& name, int& exceptioncode);
+                    ExceptionCode&);
+  void removeAttribute(const QualifiedName& name, ExceptionCode&);
 
   bool hasAttributes() const;
 
@@ -188,32 +188,33 @@ class ElementImpl : public ContainerNodeImpl {
 
   void setAttribute(const DOMString& name,
                     const DOMString& value,
-                    int& exception);
+                    ExceptionCode&);
   void setAttributeNS(const DOMString& namespaceURI,
                       const DOMString& qualifiedName,
                       const DOMString& value,
-                      int& exception);
+                      ExceptionCode&);
 
   void scrollIntoView(bool alignToTop);
   void scrollIntoViewIfNeeded(bool centerIfNeeded);
 
-  void removeAttribute(const DOMString& name, int& exception) {
-    removeAttributeNS(DOMString(), name, exception);
+  void removeAttribute(const DOMString& name, ExceptionCode& ec) {
+    removeAttributeNS(DOMString(), name, ec);
   }
   void removeAttributeNS(const DOMString& namespaceURI,
                          const DOMString& localName,
-                         int& exception);
+                         ExceptionCode&);
 
   PassRefPtr<AttrImpl> getAttributeNode(const DOMString& name) {
     return getAttributeNodeNS(DOMString(), name);
   }
   PassRefPtr<AttrImpl> getAttributeNodeNS(const DOMString& namespaceURI,
                                           const DOMString& localName);
-  PassRefPtr<AttrImpl> setAttributeNode(AttrImpl*, int& exception);
-  PassRefPtr<AttrImpl> setAttributeNodeNS(AttrImpl* newAttr, int& exception) {
-    return setAttributeNode(newAttr, exception);
+  PassRefPtr<AttrImpl> setAttributeNode(AttrImpl*, ExceptionCode&);
+  PassRefPtr<AttrImpl> setAttributeNodeNS(AttrImpl* newAttr,
+                                          ExceptionCode& ec) {
+    return setAttributeNode(newAttr, ec);
   }
-  PassRefPtr<AttrImpl> removeAttributeNode(AttrImpl*, int& exception);
+  PassRefPtr<AttrImpl> removeAttributeNode(AttrImpl*, ExceptionCode&);
 
   virtual CSSStyleDeclarationImpl* style();
 
@@ -234,13 +235,13 @@ class ElementImpl : public ContainerNodeImpl {
     return m_tagName.localName();
   }
   virtual const AtomicString& prefix() const { return m_tagName.prefix(); }
-  virtual void setPrefix(const AtomicString& _prefix, int& exceptioncode);
+  virtual void setPrefix(const AtomicString& _prefix, ExceptionCode&);
   virtual const AtomicString& namespaceURI() const {
     return m_tagName.namespaceURI();
   }
 
   // DOM methods overridden from  parent classes
-  virtual unsigned short nodeType() const;
+  virtual NodeType nodeType() const;
   virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
   virtual DOMString nodeName() const;
   virtual bool isElementNode() const { return true; }
@@ -270,7 +271,7 @@ class ElementImpl : public ContainerNodeImpl {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
-  virtual bool childTypeAllowed(unsigned short type);
+  virtual bool childTypeAllowed(NodeType);
 
   virtual AttributeImpl* createAttribute(const QualifiedName& name,
                                          DOMStringImpl* value);
@@ -321,13 +322,13 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
                                               const DOMString& localName) const;
   virtual PassRefPtr<NodeImpl> removeNamedItemNS(const DOMString& namespaceURI,
                                                  const DOMString& localName,
-                                                 int& exception);
+                                                 ExceptionCode& ec);
 
   virtual PassRefPtr<NodeImpl> getNamedItem(const QualifiedName& name) const;
 
   virtual PassRefPtr<NodeImpl> removeNamedItem(const QualifiedName& name,
-                                               int& exceptioncode);
-  virtual PassRefPtr<NodeImpl> setNamedItem(NodeImpl* arg, int& exceptioncode);
+                                               ExceptionCode&);
+  virtual PassRefPtr<NodeImpl> setNamedItem(NodeImpl* arg, ExceptionCode&);
 
   virtual PassRefPtr<NodeImpl> item(unsigned index) const;
   unsigned length() const { return len; }
@@ -495,7 +496,7 @@ class StyledElementImpl : public ElementImpl {
       MappedAttributeImpl* attr,
       int id,
       const DOMString& value,
-      CSSPrimitiveValue::UnitTypes = CSSPrimitiveValue::CSS_STRING);
+      CSSPrimitiveValueImpl::UnitTypes = CSSPrimitiveValue::CSS_STRING);
   void addCSSImageProperty(MappedAttributeImpl* attr,
                            int id,
                            const DOMString& URL);

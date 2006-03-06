@@ -81,10 +81,10 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
 }
 
 PassRefPtr<ElementImpl> createListItemElement(DocumentImpl* document) {
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "li", exceptionCode);
-  ASSERT(exceptionCode == 0);
+      document->createElementNS(xhtmlNamespaceURI, "li", ec);
+  ASSERT(ec == 0);
   return breakNode.release();
 }
 

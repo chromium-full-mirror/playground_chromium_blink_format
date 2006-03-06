@@ -27,19 +27,18 @@
 #include "config.h"
 #include "html_tableimpl.h"
 
+#include "ExceptionCode.h"
 #include "NodeListImpl.h"
+#include "RenderTable.h"
+#include "RenderTableCell.h"
+#include "RenderTableCol.h"
 #include "css_stylesheetimpl.h"
 #include "css_valueimpl.h"
 #include "csshelper.h"
 #include "cssproperties.h"
 #include "cssstyleselector.h"
 #include "cssvalues.h"
-#include "dom_exception.h"
-#include "dom_node.h"
 #include "html_documentimpl.h"
-#include "RenderTable.h"
-#include "RenderTableCell.h"
-#include "RenderTableCol.h"
 
 namespace WebCore {
 
@@ -72,75 +71,75 @@ bool HTMLTableElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 NodeImpl* HTMLTableElementImpl::setCaption(HTMLTableCaptionElementImpl* c) {
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   if (NodeImpl* oc = tCaption)
-    replaceChild(c, oc, exceptioncode);
+    replaceChild(c, oc, ec);
   else
-    insertBefore(c, firstChild(), exceptioncode);
+    insertBefore(c, firstChild(), ec);
   tCaption = c;
   return tCaption;
 }
 
 NodeImpl* HTMLTableElementImpl::setTHead(HTMLTableSectionElementImpl* s) {
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   if (NodeImpl* h = head)
-    replaceChild(s, h, exceptioncode);
+    replaceChild(s, h, ec);
   else if (foot)
-    insertBefore(s, foot, exceptioncode);
+    insertBefore(s, foot, ec);
   else if (firstBody)
-    insertBefore(s, firstBody, exceptioncode);
+    insertBefore(s, firstBody, ec);
   else
-    appendChild(s, exceptioncode);
+    appendChild(s, ec);
   head = s;
   return head;
 }
 
 NodeImpl* HTMLTableElementImpl::setTFoot(HTMLTableSectionElementImpl* s) {
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   if (NodeImpl* f = foot)
-    replaceChild(s, f, exceptioncode);
+    replaceChild(s, f, ec);
   else if (firstBody)
-    insertBefore(s, firstBody, exceptioncode);
+    insertBefore(s, firstBody, ec);
   else
-    appendChild(s, exceptioncode);
+    appendChild(s, ec);
   foot = s;
   return foot;
 }
 
 NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   NodeImpl* r;
   s->ref();
   if (NodeImpl* fb = firstBody) {
-    replaceChild(s, fb, exceptioncode);
+    replaceChild(s, fb, ec);
     fb->deref();
     r = s;
   } else
-    appendChild(s, exceptioncode);
+    appendChild(s, ec);
   firstBody = s;
   return firstBody;
 }
 
 HTMLElementImpl* HTMLTableElementImpl::createTHead() {
   if (!head) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     head = new HTMLTableSectionElementImpl(theadTag, getDocument(),
                                            true /* implicit */);
     if (foot)
-      insertBefore(head, foot, exceptioncode);
+      insertBefore(head, foot, ec);
     else if (firstBody)
-      insertBefore(head, firstBody, exceptioncode);
+      insertBefore(head, firstBody, ec);
     else
-      appendChild(head, exceptioncode);
+      appendChild(head, ec);
   }
   return head;
 }
 
 void HTMLTableElementImpl::deleteTHead() {
   if (head) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     head->ref();
-    HTMLElementImpl::removeChild(head, exceptioncode);
+    HTMLElementImpl::removeChild(head, ec);
     head->deref();
   }
   head = 0;
@@ -148,22 +147,22 @@ void HTMLTableElementImpl::deleteTHead() {
 
 HTMLElementImpl* HTMLTableElementImpl::createTFoot() {
   if (!foot) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     foot = new HTMLTableSectionElementImpl(tfootTag, getDocument(),
                                            true /*implicit */);
     if (firstBody)
-      insertBefore(foot, firstBody, exceptioncode);
+      insertBefore(foot, firstBody, ec);
     else
-      appendChild(foot, exceptioncode);
+      appendChild(foot, ec);
   }
   return foot;
 }
 
 void HTMLTableElementImpl::deleteTFoot() {
   if (foot) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     foot->ref();
-    HTMLElementImpl::removeChild(foot, exceptioncode);
+    HTMLElementImpl::removeChild(foot, ec);
     foot->deref();
   }
   foot = 0;
@@ -171,25 +170,24 @@ void HTMLTableElementImpl::deleteTFoot() {
 
 HTMLElementImpl* HTMLTableElementImpl::createCaption() {
   if (!tCaption) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     tCaption = new HTMLTableCaptionElementImpl(getDocument());
-    insertBefore(tCaption, firstChild(), exceptioncode);
+    insertBefore(tCaption, firstChild(), ec);
   }
   return tCaption;
 }
 
 void HTMLTableElementImpl::deleteCaption() {
   if (tCaption) {
-    int exceptioncode = 0;
+    ExceptionCode ec = 0;
     tCaption->ref();
-    HTMLElementImpl::removeChild(tCaption, exceptioncode);
+    HTMLElementImpl::removeChild(tCaption, ec);
     tCaption->deref();
   }
   tCaption = 0;
 }
 
-HTMLElementImpl* HTMLTableElementImpl::insertRow(int index,
-                                                 int& exceptioncode) {
+HTMLElementImpl* HTMLTableElementImpl::insertRow(int index, ExceptionCode& ec) {
   // The DOM requires that we create a tbody if the table is empty
   // (cf DOM2TS HTMLTableElement31 test)
   // (note: this is different from "if the table has no sections", since we can
@@ -235,15 +233,15 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(int index,
     index = section ? section->numRows() : 0;
   }
   if (section && (index >= 0 || append))
-    return section->insertRow(index, exceptioncode);
+    return section->insertRow(index, ec);
   else {
     // No more sections => index is too big
-    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
     return 0L;
   }
 }
 
-void HTMLTableElementImpl::deleteRow(int index, int& exceptioncode) {
+void HTMLTableElementImpl::deleteRow(int index, ExceptionCode& ec) {
   HTMLTableSectionElementImpl* section = 0L;
   NodeImpl* node = firstChild();
   bool lastRow = index == -1;
@@ -270,11 +268,11 @@ void HTMLTableElementImpl::deleteRow(int index, int& exceptioncode) {
     section = static_cast<HTMLTableSectionElementImpl*>(foot);
 
   if (lastRow)
-    lastSection->deleteRow(-1, exceptioncode);
+    lastSection->deleteRow(-1, ec);
   else if (section && index >= 0 && index < section->numRows())
-    section->deleteRow(index, exceptioncode);
+    section->deleteRow(index, ec);
   else
-    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
 }
 
 ContainerNodeImpl* HTMLTableElementImpl::addChild(PassRefPtr<NodeImpl> child) {
@@ -290,7 +288,7 @@ ContainerNodeImpl* HTMLTableElementImpl::addChild(PassRefPtr<NodeImpl> child) {
 
   // The creation of <tbody> elements relies on the "childAllowed" check,
   // so we need to do it even for XML documents.
-  assert(child->nodeType() != Node::DOCUMENT_FRAGMENT_NODE);
+  assert(child->nodeType() != DOCUMENT_FRAGMENT_NODE);
   if (!getDocument()->isHTMLDocument() && !childAllowed(child.get()))
     return 0;
 
@@ -682,38 +680,38 @@ ContainerNodeImpl* HTMLTableSectionElementImpl::addChild(
 // these functions are rather slow, since we need to get the row at
 // the index... but they aren't used during usual HTML parsing anyway
 HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
-                                                        int& exceptioncode) {
+                                                        ExceptionCode& ec) {
   HTMLTableRowElementImpl* r = 0L;
   RefPtr<NodeListImpl> children = childNodes();
   int numRows = children ? (int)children->length() : 0;
   if (index < -1 || index > numRows) {
-    exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
+    ec = INDEX_SIZE_ERR;  // per the DOM
   } else {
     r = new HTMLTableRowElementImpl(getDocument());
     if (numRows == index || index == -1)
-      appendChild(r, exceptioncode);
+      appendChild(r, ec);
     else {
       NodeImpl* n;
       if (index < 1)
         n = firstChild();
       else
         n = children->item(index);
-      insertBefore(r, n, exceptioncode);
+      insertBefore(r, n, ec);
     }
   }
   return r;
 }
 
-void HTMLTableSectionElementImpl::deleteRow(int index, int& exceptioncode) {
+void HTMLTableSectionElementImpl::deleteRow(int index, ExceptionCode& ec) {
   RefPtr<NodeListImpl> children = childNodes();
   int numRows = children ? (int)children->length() : 0;
   if (index == -1)
     index = numRows - 1;
   if (index >= 0 && index < numRows) {
     RefPtr<NodeImpl> row = children->item(index);
-    HTMLElementImpl::removeChild(row.get(), exceptioncode);
+    HTMLElementImpl::removeChild(row.get(), ec);
   } else
-    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
 }
 
 int HTMLTableSectionElementImpl::numRows() const {
@@ -852,38 +850,38 @@ int HTMLTableRowElementImpl::sectionRowIndex() const {
 }
 
 HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
-                                                     int& exceptioncode) {
+                                                     ExceptionCode& ec) {
   HTMLTableCellElementImpl* c = 0L;
   RefPtr<NodeListImpl> children = childNodes();
   int numCells = children ? children->length() : 0;
   if (index < -1 || index > numCells)
-    exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
+    ec = INDEX_SIZE_ERR;  // per the DOM
   else {
     c = new HTMLTableCellElementImpl(tdTag, getDocument());
     if (numCells == index || index == -1)
-      appendChild(c, exceptioncode);
+      appendChild(c, ec);
     else {
       NodeImpl* n;
       if (index < 1)
         n = firstChild();
       else
         n = children->item(index);
-      insertBefore(c, n, exceptioncode);
+      insertBefore(c, n, ec);
     }
   }
   return c;
 }
 
-void HTMLTableRowElementImpl::deleteCell(int index, int& exceptioncode) {
+void HTMLTableRowElementImpl::deleteCell(int index, ExceptionCode& ec) {
   RefPtr<NodeListImpl> children = childNodes();
   int numCells = children ? children->length() : 0;
   if (index == -1)
     index = numCells - 1;
   if (index >= 0 && index < numCells) {
     RefPtr<NodeImpl> row = children->item(index);
-    HTMLElementImpl::removeChild(row.get(), exceptioncode);
+    HTMLElementImpl::removeChild(row.get(), ec);
   } else
-    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
 }
 
 RefPtr<HTMLCollectionImpl> HTMLTableRowElementImpl::cells() {
@@ -891,8 +889,8 @@ RefPtr<HTMLCollectionImpl> HTMLTableRowElementImpl::cells() {
       new HTMLCollectionImpl(this, HTMLCollectionImpl::TR_CELLS));
 }
 
-void HTMLTableRowElementImpl::setCells(HTMLCollectionImpl*, int& exception) {
-  exception = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+void HTMLTableRowElementImpl::setCells(HTMLCollectionImpl*, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 DOMString HTMLTableRowElementImpl::align() const {

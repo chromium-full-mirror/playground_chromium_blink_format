@@ -31,7 +31,6 @@
 #include "HTMLElementImpl.h"
 #include "TextImpl.h"
 #include "VisiblePosition.h"
-#include "dom2_range.h"
 #include "html_interchange.h"
 #include "htmlnames.h"
 #include "render_object.h"
@@ -92,7 +91,7 @@ Position rangeCompliantEquivalent(const Position& pos) {
     return Position(node, 0);
   }
 
-  if (offsetInCharacters(node->nodeType()))
+  if (node->offsetInCharacters())
     return Position(node, kMin(node->maxOffset(), pos.offset()));
 
   int maxCompliantOffset = node->childNodeCount();
@@ -130,7 +129,7 @@ Position rangeCompliantEquivalent(const VisiblePosition& vpos) {
 // on a Position before using it to create a DOM Range, or an exception will be
 // thrown.
 int maxDeepOffset(const NodeImpl* node) {
-  if (offsetInCharacters(node->nodeType()))
+  if (node->offsetInCharacters())
     return node->maxOffset();
 
   if (node->hasChildNodes())
@@ -199,7 +198,7 @@ const String& nonBreakingSpaceString() {
 
 // FIXME: Why use this instead of maxDeepOffset???
 static int maxRangeOffset(NodeImpl* n) {
-  if (offsetInCharacters(n->nodeType()))
+  if (n->offsetInCharacters())
     return n->maxOffset();
 
   if (n->isElementNode())
@@ -461,18 +460,18 @@ Position positionAvoidingSpecialElementBoundary(const Position& pos) {
 }
 
 PassRefPtr<ElementImpl> createDefaultParagraphElement(DocumentImpl* document) {
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> element =
-      document->createElementNS(xhtmlNamespaceURI, "div", exceptionCode);
-  ASSERT(exceptionCode == 0);
+      document->createElementNS(xhtmlNamespaceURI, "div", ec);
+  ASSERT(ec == 0);
   return element.release();
 }
 
 PassRefPtr<ElementImpl> createBreakElement(DocumentImpl* document) {
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "br", exceptionCode);
-  ASSERT(exceptionCode == 0);
+      document->createElementNS(xhtmlNamespaceURI, "br", ec);
+  ASSERT(ec == 0);
   return breakNode.release();
 }
 
@@ -503,18 +502,18 @@ Position positionBeforeTabSpan(const Position& pos) {
 PassRefPtr<ElementImpl> createTabSpanElement(DocumentImpl* document,
                                              PassRefPtr<NodeImpl> tabTextNode) {
   // make the span to hold the tab
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> spanElement =
-      document->createElementNS(xhtmlNamespaceURI, "span", exceptionCode);
-  assert(exceptionCode == 0);
+      document->createElementNS(xhtmlNamespaceURI, "span", ec);
+  assert(ec == 0);
   spanElement->setAttribute(classAttr, AppleTabSpanClass);
   spanElement->setAttribute(styleAttr, "white-space:pre");
 
   // add tab text to that span
   if (!tabTextNode)
     tabTextNode = document->createEditingTextNode("\t");
-  spanElement->appendChild(tabTextNode, exceptionCode);
-  assert(exceptionCode == 0);
+  spanElement->appendChild(tabTextNode, ec);
+  assert(ec == 0);
 
   return spanElement.release();
 }

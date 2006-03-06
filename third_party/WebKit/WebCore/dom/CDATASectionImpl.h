@@ -37,9 +37,9 @@ class CDATASectionImpl : public TextImpl {
   virtual ~CDATASectionImpl();
 
   virtual DOMString nodeName() const;
-  virtual unsigned short nodeType() const;
+  virtual NodeType nodeType() const;
   virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
-  virtual bool childTypeAllowed(unsigned short type);
+  virtual bool childTypeAllowed(NodeType);
   virtual DOMString toString() const;
 
  protected:

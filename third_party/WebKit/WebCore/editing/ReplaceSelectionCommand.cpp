@@ -236,9 +236,9 @@ void ReplacementFragment::removeNode(PassRefPtr<NodeImpl> node) {
   if (!parent)
     return;
 
-  int exceptionCode = 0;
-  parent->removeChild(node.get(), exceptionCode);
-  ASSERT(exceptionCode == 0);
+  ExceptionCode ec = 0;
+  parent->removeChild(node.get(), ec);
+  ASSERT(ec == 0);
 }
 
 void ReplacementFragment::insertNodeBefore(NodeImpl* node, NodeImpl* refNode) {
@@ -249,9 +249,9 @@ void ReplacementFragment::insertNodeBefore(NodeImpl* node, NodeImpl* refNode) {
   if (!parent)
     return;
 
-  int exceptionCode = 0;
-  parent->insertBefore(node, refNode, exceptionCode);
-  ASSERT(exceptionCode == 0);
+  ExceptionCode ec = 0;
+  parent->insertBefore(node, refNode, ec);
+  ASSERT(ec == 0);
 }
 
 PassRefPtr<NodeImpl> ReplacementFragment::insertFragmentForTestRendering() {
@@ -261,12 +261,12 @@ PassRefPtr<NodeImpl> ReplacementFragment::insertFragmentForTestRendering() {
 
   RefPtr<ElementImpl> holder = createDefaultParagraphElement(m_document.get());
 
-  int exceptionCode = 0;
-  holder->appendChild(m_fragment.get(), exceptionCode);
-  ASSERT(exceptionCode == 0);
+  ExceptionCode ec = 0;
+  holder->appendChild(m_fragment.get(), ec);
+  ASSERT(ec == 0);
 
-  body->appendChild(holder.get(), exceptionCode);
-  ASSERT(exceptionCode == 0);
+  body->appendChild(holder.get(), ec);
+  ASSERT(ec == 0);
 
   m_document->updateLayoutIgnorePendingStylesheets();
 
@@ -278,12 +278,12 @@ void ReplacementFragment::restoreTestRenderingNodesToFragment(
   if (!holder)
     return;
 
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   while (RefPtr<NodeImpl> node = holder->firstChild()) {
-    holder->removeChild(node.get(), exceptionCode);
-    ASSERT(exceptionCode == 0);
-    m_fragment->appendChild(node.get(), exceptionCode);
-    ASSERT(exceptionCode == 0);
+    holder->removeChild(node.get(), ec);
+    ASSERT(ec == 0);
+    m_fragment->appendChild(node.get(), ec);
+    ASSERT(ec == 0);
   }
 }
 

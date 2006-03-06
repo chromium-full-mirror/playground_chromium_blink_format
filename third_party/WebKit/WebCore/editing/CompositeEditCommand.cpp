@@ -602,10 +602,10 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
 }
 
 PassRefPtr<ElementImpl> createBlockPlaceholderElement(DocumentImpl* document) {
-  int exceptionCode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "br", exceptionCode);
-  ASSERT(exceptionCode == 0);
+      document->createElementNS(xhtmlNamespaceURI, "br", ec);
+  ASSERT(ec == 0);
   breakNode->setAttribute(classAttr, blockPlaceholderClassString());
   return breakNode.release();
 }

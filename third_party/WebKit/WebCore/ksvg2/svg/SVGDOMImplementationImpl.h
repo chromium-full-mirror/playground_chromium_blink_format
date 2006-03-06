@@ -25,19 +25,18 @@
 #if SVG_SUPPORT
 
 #include "DOMImplementationImpl.h"
-#include <QStringList.h>
+#include "QStringList.h"
 
 namespace WebCore {
-class DOMString;
+class CSSStyleSheetImpl;
 class DocumentImpl;
 class DocumentTypeImpl;
-class CSSStyleSheetImpl;
+class String;
+class StringImpl;
 
 typedef FrameView KDOMView;
-}
 
-namespace WebCore {
-class SVGDOMImplementationImpl : public DOM::DOMImplementationImpl {
+class SVGDOMImplementationImpl : public DOMImplementationImpl {
  public:
   SVGDOMImplementationImpl();
   virtual ~SVGDOMImplementationImpl();
@@ -49,17 +48,17 @@ class SVGDOMImplementationImpl : public DOM::DOMImplementationImpl {
   PassRefPtr<DocumentTypeImpl> createDocumentType(DOMStringImpl* qualifiedName,
                                                   DOMStringImpl* publicId,
                                                   DOMStringImpl* systemId,
-                                                  int& exceptioncode) const;
+                                                  ExceptionCode&) const;
   PassRefPtr<DocumentImpl> createDocument(DOMStringImpl* namespaceURI,
                                           DOMStringImpl* qualifiedName,
                                           DocumentTypeImpl* doctype,
-                                          int& exceptioncode) const;
+                                          ExceptionCode&) const;
   PassRefPtr<DocumentImpl> createDocument(DOMStringImpl* namespaceURI,
                                           DOMStringImpl* qualifiedName,
                                           DocumentTypeImpl* doctype,
                                           bool createDocElement,
-                                          KDOMView* view,
-                                          int& exceptioncode) const;
+                                          FrameView*,
+                                          ExceptionCode&) const;
 
   virtual PassRefPtr<CSSStyleSheetImpl> createCSSStyleSheet(
       DOMStringImpl* title,

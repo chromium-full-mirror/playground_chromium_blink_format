@@ -1,8 +1,8 @@
 /**
  * css_computedstyle.cpp
  *
- * Copyright (C)  2004  Zack Rusin <zack@kde.org>
- * Copyright (C) 2004, 2005 Apple Computer, Inc.
+ * Copyright (C) 2004 Zack Rusin <zack@kde.org>
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,10 @@
 #include "AtomicString.h"
 #include "CachedImage.h"
 #include "DocumentImpl.h"
+#include "ExceptionCode.h"
 #include "PlatformString.h"
 #include "cssproperties.h"
 #include "cssvalues.h"
-#include "dom_exception.h"
 #include "Font.h"
 #include "render_object.h"
 #include "render_style.h"
@@ -293,8 +293,8 @@ String CSSComputedStyleDeclarationImpl::cssText() const {
 }
 
 void CSSComputedStyleDeclarationImpl::setCssText(const String&,
-                                                 int& exceptionCode) {
-  exceptionCode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+                                                 ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 // Display integers in integer format instead of "1.0".
@@ -1251,17 +1251,16 @@ bool CSSComputedStyleDeclarationImpl::getPropertyPriority(int) const {
   return false;
 }
 
-String CSSComputedStyleDeclarationImpl::removeProperty(int,
-                                                       int& exceptionCode) {
-  exceptionCode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+String CSSComputedStyleDeclarationImpl::removeProperty(int, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
   return String();
 }
 
 void CSSComputedStyleDeclarationImpl::setProperty(int,
                                                   const String&,
                                                   bool,
-                                                  int& exceptionCode) {
-  exceptionCode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+                                                  ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 unsigned CSSComputedStyleDeclarationImpl::length() const {

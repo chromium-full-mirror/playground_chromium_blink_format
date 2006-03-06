@@ -37,12 +37,12 @@ class TextImpl : public CharacterDataImpl {
 
   // DOM methods & attributes for CharacterData
 
-  TextImpl* splitText(const unsigned offset, int& exceptioncode);
+  TextImpl* splitText(const unsigned offset, ExceptionCode&);
 
   // DOM methods overridden from  parent classes
   const AtomicString& localName() const;
   virtual DOMString nodeName() const;
-  virtual unsigned short nodeType() const;
+  virtual NodeType nodeType() const;
   virtual PassRefPtr<NodeImpl> cloneNode(bool deep);
 
   // Other methods (not part of DOM)
@@ -52,7 +52,7 @@ class TextImpl : public CharacterDataImpl {
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
-  virtual bool childTypeAllowed(unsigned short type);
+  virtual bool childTypeAllowed(NodeType);
 
   virtual DOMString toString() const;
 

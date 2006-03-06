@@ -705,8 +705,8 @@ bool FrameView::dispatchDragEvent(const AtomicString& eventType,
       screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, 0, 0,
       clipboard);
 
-  int exceptioncode = 0;
-  dragTarget->dispatchEvent(me.get(), exceptioncode, true);
+  ExceptionCode ec = 0;
+  dragTarget->dispatchEvent(me.get(), ec, true);
   return me->defaultPrevented();
 }
 

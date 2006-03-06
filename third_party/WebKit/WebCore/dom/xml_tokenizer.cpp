@@ -36,7 +36,6 @@
 #include "FrameView.h"
 #include "KWQLoader.h"
 #include "SegmentedString.h"
-#include "dom_node.h"
 #include "dom_xmlimpl.h"
 #include "html_headimpl.h"
 #include "html_tableimpl.h"
@@ -377,7 +376,7 @@ typedef struct _xmlSAX2Namespace xmlSAX2Namespace;
 static inline void handleElementNamespaces(ElementImpl* newElement,
                                            const xmlChar** libxmlNamespaces,
                                            int nb_namespaces,
-                                           int& exceptioncode) {
+                                           ExceptionCode& ec) {
   xmlSAX2Namespace* namespaces =
       reinterpret_cast<xmlSAX2Namespace*>(libxmlNamespaces);
   for (int i = 0; i < nb_namespaces; i++) {
@@ -386,8 +385,8 @@ static inline void handleElementNamespaces(ElementImpl* newElement,
     if (namespaces[i].prefix)
       namespaceQName = "xmlns:" + toString(namespaces[i].prefix);
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
-                               namespaceURI, exceptioncode);
-    if (exceptioncode)  // exception setting attributes
+                               namespaceURI, ec);
+    if (ec)  // exception setting attributes
       return;
   }
 }
@@ -404,7 +403,7 @@ typedef struct _xmlSAX2Attributes xmlSAX2Attributes;
 static inline void handleElementAttributes(ElementImpl* newElement,
                                            const xmlChar** libxmlAttributes,
                                            int nb_attributes,
-                                           int& exceptioncode) {
+                                           ExceptionCode& ec) {
   xmlSAX2Attributes* attributes =
       reinterpret_cast<xmlSAX2Attributes*>(libxmlAttributes);
   for (int i = 0; i < nb_attributes; i++) {
@@ -418,8 +417,8 @@ static inline void handleElementAttributes(ElementImpl* newElement,
                               ? attrLocalName
                               : attrPrefix + DOMString(":") + attrLocalName;
 
-    newElement->setAttributeNS(attrURI, attrQName, attrValue, exceptioncode);
-    if (exceptioncode)  // exception setting attributes
+    newElement->setAttributeNS(attrURI, attrQName, attrValue, ec);
+    if (ec)  // exception setting attributes
       return;
   }
 }
@@ -453,24 +452,23 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
       uri = m_defaultNamespaceURI;
   }
 
-  int exceptioncode = 0;
-  RefPtr<ElementImpl> newElement =
-      m_doc->createElementNS(uri, qName, exceptioncode);
+  ExceptionCode ec = 0;
+  RefPtr<ElementImpl> newElement = m_doc->createElementNS(uri, qName, ec);
   if (!newElement) {
     stopParsing();
     return;
   }
 
   handleElementNamespaces(newElement.get(), libxmlNamespaces, nb_namespaces,
-                          exceptioncode);
-  if (exceptioncode) {
+                          ec);
+  if (ec) {
     stopParsing();
     return;
   }
 
   handleElementAttributes(newElement.get(), libxmlAttributes, nb_attributes,
-                          exceptioncode);
-  if (exceptioncode) {
+                          ec);
+  if (ec) {
     stopParsing();
     return;
   }
@@ -522,9 +520,8 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
     return;
 
   if (m_currentNode->isTextNode() || enterText()) {
-    int exceptioncode = 0;
-    static_cast<TextImpl*>(m_currentNode)
-        ->appendData(toQString(s, len), exceptioncode);
+    ExceptionCode ec = 0;
+    static_cast<TextImpl*>(m_currentNode)->appendData(toQString(s, len), ec);
   }
 }
 
@@ -888,33 +885,31 @@ void XMLTokenizer::finish() {
 static inline RefPtr<ElementImpl> createXHTMLParserErrorHeader(
     DocumentImpl* doc,
     const DOMString& errorMessages) {
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   RefPtr<ElementImpl> reportElement =
-      doc->createElementNS(xhtmlNamespaceURI, "parsererror", exceptioncode);
+      doc->createElementNS(xhtmlNamespaceURI, "parsererror", ec);
   reportElement->setAttribute(styleAttr,
                               "white-space: pre; border: 2px solid #c77; "
                               "padding: 0 1em 0 1em; margin: 1em; "
                               "background-color: #fdd; color: black");
 
-  RefPtr<ElementImpl> h3 =
-      doc->createElementNS(xhtmlNamespaceURI, "h3", exceptioncode);
-  reportElement->appendChild(h3.get(), exceptioncode);
+  RefPtr<ElementImpl> h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
+  reportElement->appendChild(h3.get(), ec);
   h3->appendChild(
-      doc->createTextNode("This page contains the following errors:"),
-      exceptioncode);
+      doc->createTextNode("This page contains the following errors:"), ec);
 
   RefPtr<ElementImpl> fixed =
-      doc->createElementNS(xhtmlNamespaceURI, "div", exceptioncode);
-  reportElement->appendChild(fixed.get(), exceptioncode);
+      doc->createElementNS(xhtmlNamespaceURI, "div", ec);
+  reportElement->appendChild(fixed.get(), ec);
   fixed->setAttribute(styleAttr, "font-family:monospace;font-size:12px");
-  fixed->appendChild(doc->createTextNode(errorMessages), exceptioncode);
+  fixed->appendChild(doc->createTextNode(errorMessages), ec);
 
-  h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", exceptioncode);
-  reportElement->appendChild(h3.get(), exceptioncode);
+  h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
+  reportElement->appendChild(h3.get(), ec);
   h3->appendChild(
       doc->createTextNode(
           "Below is a rendering of the page up to the first error."),
-      exceptioncode);
+      ec);
 
   return reportElement;
 }
@@ -927,16 +922,15 @@ void XMLTokenizer::insertErrorMessageBlock() {
   // where the errors are located)
 
   // Create elements for display
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   DocumentImpl* doc = m_doc;
   NodeImpl* documentElement = doc->documentElement();
   if (!documentElement) {
     RefPtr<NodeImpl> rootElement =
-        doc->createElementNS(xhtmlNamespaceURI, "html", exceptioncode);
-    doc->appendChild(rootElement, exceptioncode);
-    RefPtr<NodeImpl> body =
-        doc->createElementNS(xhtmlNamespaceURI, "body", exceptioncode);
-    rootElement->appendChild(body, exceptioncode);
+        doc->createElementNS(xhtmlNamespaceURI, "html", ec);
+    doc->appendChild(rootElement, ec);
+    RefPtr<NodeImpl> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+    rootElement->appendChild(body, ec);
     documentElement = body.get();
   }
 #if SVG_SUPPORT
@@ -945,12 +939,11 @@ void XMLTokenizer::insertErrorMessageBlock() {
     // wrap the erroneous SVG document in an xhtml document and render
     // the combined document with error messages.
     RefPtr<NodeImpl> rootElement =
-        doc->createElementNS(xhtmlNamespaceURI, "html", exceptioncode);
-    RefPtr<NodeImpl> body =
-        doc->createElementNS(xhtmlNamespaceURI, "body", exceptioncode);
-    rootElement->appendChild(body, exceptioncode);
-    body->appendChild(documentElement, exceptioncode);
-    doc->appendChild(rootElement.get(), exceptioncode);
+        doc->createElementNS(xhtmlNamespaceURI, "html", ec);
+    RefPtr<NodeImpl> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+    rootElement->appendChild(body, ec);
+    body->appendChild(documentElement, ec);
+    doc->appendChild(rootElement.get(), ec);
     documentElement = body.get();
   }
 #endif
@@ -958,18 +951,17 @@ void XMLTokenizer::insertErrorMessageBlock() {
   RefPtr<ElementImpl> reportElement =
       createXHTMLParserErrorHeader(doc, m_errorMessages);
   documentElement->insertBefore(reportElement, documentElement->firstChild(),
-                                exceptioncode);
+                                ec);
 #ifdef KHTML_XSLT
   if (doc->transformSourceDocument()) {
-    RefPtr<ElementImpl> par =
-        doc->createElementNS(xhtmlNamespaceURI, "p", exceptioncode);
-    reportElement->appendChild(par, exceptioncode);
+    RefPtr<ElementImpl> par = doc->createElementNS(xhtmlNamespaceURI, "p", ec);
+    reportElement->appendChild(par, ec);
     par->setAttribute(styleAttr, "white-space: normal");
     par->appendChild(
         doc->createTextNode("This document was created as the result of an XSL "
                             "transformation. The line and column numbers given "
                             "are from the transformed result."),
-        exceptioncode);
+        ec);
   }
 #endif
   doc->updateRendering();
@@ -1021,7 +1013,7 @@ void XMLTokenizer::executeScripts() {
       for (NodeImpl* child = scriptElement->firstChild(); child;
            child = child->nextSibling()) {
         if (child->isTextNode() ||
-            child->nodeType() == Node::CDATA_SECTION_NODE)
+            child->nodeType() == NodeImpl::CDATA_SECTION_NODE)
           scriptCode +=
               static_cast<CharacterDataImpl*>(child)->data().qstring();
       }

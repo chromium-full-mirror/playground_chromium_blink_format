@@ -26,12 +26,11 @@
 
 #include "AtomicString.h"
 #include "DocumentImpl.h"
-#include "dom_node.h"
 
 namespace WebCore {
 
-CommentImpl::CommentImpl(DocumentImpl* doc, const DOMString& _text)
-    : CharacterDataImpl(doc, _text) {}
+CommentImpl::CommentImpl(DocumentImpl* doc, const String& text)
+    : CharacterDataImpl(doc, text) {}
 
 CommentImpl::CommentImpl(DocumentImpl* doc) : CharacterDataImpl(doc) {}
 
@@ -41,12 +40,12 @@ const AtomicString& CommentImpl::localName() const {
   return commentAtom;
 }
 
-DOMString CommentImpl::nodeName() const {
+String CommentImpl::nodeName() const {
   return commentAtom.domString();
 }
 
-unsigned short CommentImpl::nodeType() const {
-  return Node::COMMENT_NODE;
+NodeImpl::NodeType CommentImpl::nodeType() const {
+  return COMMENT_NODE;
 }
 
 PassRefPtr<NodeImpl> CommentImpl::cloneNode(bool /*deep*/) {
@@ -54,13 +53,17 @@ PassRefPtr<NodeImpl> CommentImpl::cloneNode(bool /*deep*/) {
 }
 
 // DOM Section 1.1.1
-bool CommentImpl::childTypeAllowed(unsigned short /*type*/) {
+bool CommentImpl::childTypeAllowed(NodeType) {
   return false;
 }
 
-DOMString CommentImpl::toString() const {
-  // FIXME: substitute entity references as needed!
-  return DOMString("<!--") + nodeValue() + "-->";
+String CommentImpl::toString() const {
+  // FIXME: We need to substitute entity references here.
+  return "<!--" + nodeValue() + "-->";
+}
+
+bool CommentImpl::offsetInCharacters() const {
+  return true;
 }
 
 }  // namespace WebCore

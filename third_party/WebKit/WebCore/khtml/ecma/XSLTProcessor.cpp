@@ -98,11 +98,10 @@ JSValue* XSLTProcessorProtoFunc::callAsFunction(ExecState* exec,
       JSValue* docVal = args[1];
       if (nodeVal->isObject(&DOMNode::info) &&
           docVal->isObject(&DOMDocument::info)) {
-        DOMNode* node = static_cast<DOMNode*>(nodeVal);
-        DOMDocument* doc = static_cast<DOMDocument*>(docVal);
-        DocumentImpl* docImpl = static_cast<DocumentImpl*>(doc->impl());
-        return getDOMNode(
-            exec, processor.transformToFragment(node->impl(), docImpl).get());
+        NodeImpl* node = static_cast<DOMNode*>(nodeVal)->impl();
+        DocumentImpl* doc = static_cast<DocumentImpl*>(
+            static_cast<DOMDocument*>(docVal)->impl());
+        return getDOMNode(exec, processor.transformToFragment(node, doc).get());
       }
       // Throw exception?
       break;

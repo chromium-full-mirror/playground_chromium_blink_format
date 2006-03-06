@@ -27,14 +27,13 @@
 
 #include "DocumentImpl.h"
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "FrameView.h"
 #include "InlineTextBox.h"
 #include "IntRect.h"
 #include "RenderText.h"
 #include "SystemTime.h"
 #include "dom2_eventsimpl.h"
-#include "dom_exception.h"
-#include "dom_node.h"
 #include "render_theme.h"
 
 namespace WebCore {
@@ -131,11 +130,11 @@ bool ContainerNodeImpl::insertBefore(PassRefPtr<NodeImpl> newChild,
 
   // NOT_FOUND_ERR: Raised if refChild is not a child of this node
   if (refChild->parentNode() != this) {
-    ec = DOMException::NOT_FOUND_ERR;
+    ec = NOT_FOUND_ERR;
     return false;
   }
 
-  bool isFragment = newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE;
+  bool isFragment = newChild->nodeType() == DOCUMENT_FRAGMENT_NODE;
 
   // If newChild is a DocumentFragment with no children; there's nothing to do.
   // Just return true
@@ -229,7 +228,7 @@ bool ContainerNodeImpl::replaceChild(PassRefPtr<NodeImpl> newChild,
 
   // NOT_FOUND_ERR: Raised if oldChild is not a child of this node.
   if (!oldChild || oldChild->parentNode() != this) {
-    ec = DOMException::NOT_FOUND_ERR;
+    ec = NOT_FOUND_ERR;
     return false;
   }
 
@@ -246,7 +245,7 @@ bool ContainerNodeImpl::replaceChild(PassRefPtr<NodeImpl> newChild,
   // that no callers call with ref count == 0 and parent = 0 (as of this
   // writing, there are definitely callers who call that way).
 
-  bool isFragment = newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE;
+  bool isFragment = newChild->nodeType() == DOCUMENT_FRAGMENT_NODE;
 
   // Add the new child(ren)
   RefPtr<NodeImpl> child = isFragment ? newChild->firstChild() : newChild;
@@ -345,13 +344,13 @@ bool ContainerNodeImpl::removeChild(NodeImpl* oldChild, ExceptionCode& ec) {
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
   if (isReadOnly()) {
-    ec = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    ec = NO_MODIFICATION_ALLOWED_ERR;
     return false;
   }
 
   // NOT_FOUND_ERR: Raised if oldChild is not a child of this node.
   if (!oldChild || oldChild->parentNode() != this) {
-    ec = DOMException::NOT_FOUND_ERR;
+    ec = NOT_FOUND_ERR;
     return false;
   }
 
@@ -373,7 +372,7 @@ bool ContainerNodeImpl::removeChild(NodeImpl* oldChild, ExceptionCode& ec) {
 
   // Mutation events might have moved this child into a different parent.
   if (child->parentNode() != this) {
-    ec = DOMException::NOT_FOUND_ERR;
+    ec = NOT_FOUND_ERR;
     return false;
   }
 
@@ -477,7 +476,7 @@ bool ContainerNodeImpl::appendChild(PassRefPtr<NodeImpl> newChild,
   if (newChild == m_lastChild)  // nothing to do
     return newChild;
 
-  bool isFragment = newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE;
+  bool isFragment = newChild->nodeType() == DOCUMENT_FRAGMENT_NODE;
 
   // If newChild is a DocumentFragment with no children.... there's nothing to
   // do.
@@ -558,7 +557,7 @@ ContainerNodeImpl* ContainerNodeImpl::addChild(PassRefPtr<NodeImpl> newChild) {
     newChild->insertedIntoDocument();
   childrenChanged();
 
-  if (newChild->nodeType() == Node::ELEMENT_NODE)
+  if (newChild->isElementNode())
     return static_cast<ContainerNodeImpl*>(newChild.get());
   return this;
 }

@@ -27,20 +27,21 @@
 
 #include "CDATASectionImpl.h"
 #include "CommentImpl.h"
-#include "decoder.h"
 #include "DOMImplementationImpl.h"
 #include "DocLoader.h"
 #include "DocumentFragmentImpl.h"
 #include "DocumentTypeImpl.h"
 #include "EditingTextImpl.h"
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
+#include "HTMLInputElementImpl.h"
 #include "HTMLNameCollectionImpl.h"
 #include "KWQAccObjectCache.h"
-#include "Logging.h"
 #include "KeyEvent.h"
+#include "Logging.h"
 #include "MouseEventWithHitTestResults.h"
 #include "NameNodeListImpl.h"
 #include "SegmentedString.h"
@@ -52,15 +53,20 @@
 #include "csshelper.h"
 #include "cssstyleselector.h"
 #include "cssvalues.h"
-#include "dom2_events.h"
+#include "decoder.h"
 #include "dom2_eventsimpl.h"
 #include "dom2_rangeimpl.h"
 #include "dom2_viewsimpl.h"
-#include "dom_exception.h"
 #include "dom_xmlimpl.h"
 #include "ecma/kjs_binding.h"
 #include "ecma/kjs_proxy.h"
 #include "helper.h"
+#include "html_baseimpl.h"
+#include "html_documentimpl.h"
+#include "html_headimpl.h"
+#include "html_imageimpl.h"
+#include "htmlfactory.h"
+#include "htmlnames.h"
 #include "jsediting.h"
 #include "khtml_settings.h"
 #include "render_arena.h"
@@ -70,23 +76,13 @@
 #include "xml_tokenizer.h"
 #include <qregexp.h>
 
-// FIXME: We want to cut the remaining HTML dependencies so that we don't need
-// to include these files.
-#include "HTMLInputElementImpl.h"
-#include "html/html_baseimpl.h"
-#include "html/html_documentimpl.h"
-#include "html/html_headimpl.h"
-#include "html/html_imageimpl.h"
-#include "htmlfactory.h"
-#include "htmlnames.h"
-
 #ifdef KHTML_XSLT
 #include "xsl_stylesheetimpl.h"
 #include "xslt_processorimpl.h"
 #endif
 
 #ifndef KHTML_NO_XBL
-#include "xbl/xbl_binding_manager.h"
+#include "xbl_binding_manager.h"
 using XBL::XBLBindingManager;
 #endif
 
@@ -402,14 +398,14 @@ DOMImplementationImpl* DocumentImpl::implementation() const {
 
 ElementImpl* DocumentImpl::documentElement() const {
   NodeImpl* n = firstChild();
-  while (n && n->nodeType() != Node::ELEMENT_NODE)
+  while (n && !n->isElementNode())
     n = n->nextSibling();
   return static_cast<ElementImpl*>(n);
 }
 
 PassRefPtr<ElementImpl> DocumentImpl::createElement(const DOMString& name,
-                                                    int& exceptionCode) {
-  return createElementNS(nullAtom, name, exceptionCode);
+                                                    ExceptionCode& ec) {
+  return createElementNS(nullAtom, name, ec);
 }
 
 PassRefPtr<DocumentFragmentImpl> DocumentImpl::createDocumentFragment() {
@@ -426,9 +422,9 @@ PassRefPtr<CommentImpl> DocumentImpl::createComment(const DOMString& data) {
 
 PassRefPtr<CDATASectionImpl> DocumentImpl::createCDATASection(
     const DOMString& data,
-    int& exception) {
+    ExceptionCode& ec) {
   if (isHTMLDocument()) {
-    exception = DOMException::NOT_SUPPORTED_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
   return new CDATASectionImpl(this, data);
@@ -437,13 +433,13 @@ PassRefPtr<CDATASectionImpl> DocumentImpl::createCDATASection(
 PassRefPtr<ProcessingInstructionImpl> DocumentImpl::createProcessingInstruction(
     const DOMString& target,
     const DOMString& data,
-    int& exception) {
+    ExceptionCode& ec) {
   if (!isValidName(target)) {
-    exception = DOMException::INVALID_CHARACTER_ERR;
+    ec = INVALID_CHARACTER_ERR;
     return 0;
   }
   if (isHTMLDocument()) {
-    exception = DOMException::NOT_SUPPORTED_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
   return new ProcessingInstructionImpl(this, target, data);
@@ -451,13 +447,13 @@ PassRefPtr<ProcessingInstructionImpl> DocumentImpl::createProcessingInstruction(
 
 PassRefPtr<EntityReferenceImpl> DocumentImpl::createEntityReference(
     const DOMString& name,
-    int& exception) {
+    ExceptionCode& ec) {
   if (!isValidName(name)) {
-    exception = DOMException::INVALID_CHARACTER_ERR;
+    ec = INVALID_CHARACTER_ERR;
     return 0;
   }
   if (isHTMLDocument()) {
-    exception = DOMException::NOT_SUPPORTED_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
   return new EntityReferenceImpl(this, name.impl());
@@ -474,28 +470,27 @@ PassRefPtr<CSSStyleDeclarationImpl> DocumentImpl::createCSSStyleDeclaration() {
 
 PassRefPtr<NodeImpl> DocumentImpl::importNode(NodeImpl* importedNode,
                                               bool deep,
-                                              int& exceptioncode) {
-  exceptioncode = 0;
+                                              ExceptionCode& ec) {
+  ec = 0;
 
   switch (importedNode->nodeType()) {
-    case Node::TEXT_NODE:
+    case TEXT_NODE:
       return createTextNode(importedNode->nodeValue());
-    case Node::CDATA_SECTION_NODE:
-      return createCDATASection(importedNode->nodeValue(), exceptioncode);
-    case Node::ENTITY_REFERENCE_NODE:
-      return createEntityReference(importedNode->nodeName(), exceptioncode);
-    case Node::PROCESSING_INSTRUCTION_NODE:
-      return createProcessingInstruction(
-          importedNode->nodeName(), importedNode->nodeValue(), exceptioncode);
-    case Node::COMMENT_NODE:
+    case CDATA_SECTION_NODE:
+      return createCDATASection(importedNode->nodeValue(), ec);
+    case ENTITY_REFERENCE_NODE:
+      return createEntityReference(importedNode->nodeName(), ec);
+    case PROCESSING_INSTRUCTION_NODE:
+      return createProcessingInstruction(importedNode->nodeName(),
+                                         importedNode->nodeValue(), ec);
+    case COMMENT_NODE:
       return createComment(importedNode->nodeValue());
-    case Node::ELEMENT_NODE: {
+    case ELEMENT_NODE: {
       ElementImpl* oldElement = static_cast<ElementImpl*>(importedNode);
-      RefPtr<ElementImpl> newElement =
-          createElementNS(oldElement->namespaceURI(),
-                          oldElement->tagName().toString(), exceptioncode);
+      RefPtr<ElementImpl> newElement = createElementNS(
+          oldElement->namespaceURI(), oldElement->tagName().toString(), ec);
 
-      if (exceptioncode != 0)
+      if (ec != 0)
         return 0;
 
       NamedAttrMapImpl* attrs = oldElement->attributes(true);
@@ -503,9 +498,8 @@ PassRefPtr<NodeImpl> DocumentImpl::importNode(NodeImpl* importedNode,
         unsigned length = attrs->length();
         for (unsigned i = 0; i < length; i++) {
           AttributeImpl* attr = attrs->attributeItem(i);
-          newElement->setAttribute(attr->name(), attr->value().impl(),
-                                   exceptioncode);
-          if (exceptioncode != 0)
+          newElement->setAttribute(attr->name(), attr->value().impl(), ec);
+          if (ec != 0)
             return 0;
         }
       }
@@ -515,46 +509,53 @@ PassRefPtr<NodeImpl> DocumentImpl::importNode(NodeImpl* importedNode,
       if (deep) {
         for (NodeImpl* oldChild = oldElement->firstChild(); oldChild;
              oldChild = oldChild->nextSibling()) {
-          RefPtr<NodeImpl> newChild = importNode(oldChild, true, exceptioncode);
-          if (exceptioncode != 0)
+          RefPtr<NodeImpl> newChild = importNode(oldChild, true, ec);
+          if (ec != 0)
             return 0;
-          newElement->appendChild(newChild.release(), exceptioncode);
-          if (exceptioncode != 0)
+          newElement->appendChild(newChild.release(), ec);
+          if (ec != 0)
             return 0;
         }
       }
 
       return newElement.release();
     }
+    case ATTRIBUTE_NODE:
+    case ENTITY_NODE:
+    case DOCUMENT_NODE:
+    case DOCUMENT_TYPE_NODE:
+    case DOCUMENT_FRAGMENT_NODE:
+    case NOTATION_NODE:
+      break;
   }
 
-  exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+  ec = NOT_SUPPORTED_ERR;
   return 0;
 }
 
 PassRefPtr<NodeImpl> DocumentImpl::adoptNode(PassRefPtr<NodeImpl> source,
-                                             int& exceptioncode) {
+                                             ExceptionCode& ec) {
   if (!source)
     return 0;
 
   switch (source->nodeType()) {
-    case Node::ENTITY_NODE:
-    case Node::NOTATION_NODE:
+    case ENTITY_NODE:
+    case NOTATION_NODE:
       return 0;
-    case Node::DOCUMENT_NODE:
-    case Node::DOCUMENT_TYPE_NODE:
-      exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+    case DOCUMENT_NODE:
+    case DOCUMENT_TYPE_NODE:
+      ec = NOT_SUPPORTED_ERR;
       return 0;
-    case Node::ATTRIBUTE_NODE: {
+    case ATTRIBUTE_NODE: {
       AttrImpl* attr = static_cast<AttrImpl*>(source.get());
       if (attr->ownerElement())
-        attr->ownerElement()->removeAttributeNode(attr, exceptioncode);
+        attr->ownerElement()->removeAttributeNode(attr, ec);
       attr->m_specified = true;
       break;
     }
     default:
       if (source->parentNode())
-        source->parentNode()->removeChild(source.get(), exceptioncode);
+        source->parentNode()->removeChild(source.get(), ec);
   }
 
   for (NodeImpl* node = source.get(); node;
@@ -570,12 +571,12 @@ PassRefPtr<NodeImpl> DocumentImpl::adoptNode(PassRefPtr<NodeImpl> source,
 PassRefPtr<ElementImpl> DocumentImpl::createElementNS(
     const DOMString& _namespaceURI,
     const DOMString& qualifiedName,
-    int& exceptioncode) {
+    ExceptionCode& ec) {
   // FIXME: We'd like a faster code path that skips this check for calls from
   // inside the engine where the name is known to be valid.
   DOMString prefix, localName;
   if (!parseQualifiedName(qualifiedName, prefix, localName)) {
-    exceptioncode = DOMException::INVALID_CHARACTER_ERR;
+    ec = INVALID_CHARACTER_ERR;
     return 0;
   }
 
@@ -590,8 +591,8 @@ PassRefPtr<ElementImpl> DocumentImpl::createElementNS(
     e = HTMLElementFactory::createHTMLElement(qName.localName(), this, 0,
                                               false);
     if (e && !prefix.isNull()) {
-      e->setPrefix(qName.prefix(), exceptioncode);
-      if (exceptioncode)
+      e->setPrefix(qName.prefix(), ec);
+      if (ec)
         return 0;
     }
   }
@@ -721,8 +722,8 @@ DOMString DocumentImpl::nodeName() const {
   return "#document";
 }
 
-unsigned short DocumentImpl::nodeType() const {
-  return Node::DOCUMENT_NODE;
+NodeImpl::NodeType DocumentImpl::nodeType() const {
+  return DOCUMENT_NODE;
 }
 
 QString DocumentImpl::nextState() {
@@ -755,9 +756,9 @@ PassRefPtr<NodeIteratorImpl> DocumentImpl::createNodeIterator(
     unsigned whatToShow,
     PassRefPtr<NodeFilterImpl> filter,
     bool expandEntityReferences,
-    int& exceptioncode) {
+    ExceptionCode& ec) {
   if (!root) {
-    exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
   return new NodeIteratorImpl(root, whatToShow, filter, expandEntityReferences);
@@ -768,9 +769,9 @@ PassRefPtr<TreeWalkerImpl> DocumentImpl::createTreeWalker(
     unsigned whatToShow,
     PassRefPtr<NodeFilterImpl> filter,
     bool expandEntityReferences,
-    int& exceptioncode) {
+    ExceptionCode& ec) {
   if (!root) {
-    exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
   return new TreeWalkerImpl(root, whatToShow, filter, expandEntityReferences);
@@ -1171,9 +1172,9 @@ void DocumentImpl::implicitClose() {
     NodeImpl* de = documentElement();
     if (de) {
       body = new HTMLBodyElementImpl(this);
-      int exceptionCode = 0;
-      de->appendChild(body, exceptionCode);
-      if (exceptionCode != 0)
+      ExceptionCode ec = 0;
+      de->appendChild(body, ec);
+      if (ec != 0)
         body = 0;
     }
   }
@@ -1683,19 +1684,19 @@ MouseEventWithHitTestResults DocumentImpl::prepareMouseEvent(
 // DOM Section 1.1.1
 bool DocumentImpl::childAllowed(NodeImpl* newChild) {
   // Documents may contain a maximum of one Element child
-  if (newChild->nodeType() == Node::ELEMENT_NODE) {
+  if (newChild->isElementNode()) {
     NodeImpl* c;
     for (c = firstChild(); c; c = c->nextSibling()) {
-      if (c->nodeType() == Node::ELEMENT_NODE)
+      if (c->isElementNode())
         return false;
     }
   }
 
   // Documents may contain a maximum of one DocumentType child
-  if (newChild->nodeType() == Node::DOCUMENT_TYPE_NODE) {
+  if (newChild->nodeType() == DOCUMENT_TYPE_NODE) {
     NodeImpl* c;
     for (c = firstChild(); c; c = c->nextSibling()) {
-      if (c->nodeType() == Node::DOCUMENT_TYPE_NODE)
+      if (c->nodeType() == DOCUMENT_TYPE_NODE)
         return false;
     }
   }
@@ -1703,12 +1704,12 @@ bool DocumentImpl::childAllowed(NodeImpl* newChild) {
   return childTypeAllowed(newChild->nodeType());
 }
 
-bool DocumentImpl::childTypeAllowed(unsigned short type) {
+bool DocumentImpl::childTypeAllowed(NodeType type) {
   switch (type) {
-    case Node::ELEMENT_NODE:
-    case Node::PROCESSING_INSTRUCTION_NODE:
-    case Node::COMMENT_NODE:
-    case Node::DOCUMENT_TYPE_NODE:
+    case ELEMENT_NODE:
+    case PROCESSING_INSTRUCTION_NODE:
+    case COMMENT_NODE:
+    case DOCUMENT_TYPE_NODE:
       return true;
     default:
       return false;
@@ -1797,7 +1798,7 @@ void DocumentImpl::recalcStyleSelector() {
   for (n = this; n; n = n->traverseNextNode()) {
     StyleSheetImpl* sheet = 0;
 
-    if (n->nodeType() == Node::PROCESSING_INSTRUCTION_NODE) {
+    if (n->nodeType() == PROCESSING_INSTRUCTION_NODE) {
       // Processing instruction (XML documents only)
       ProcessingInstructionImpl* pi =
           static_cast<ProcessingInstructionImpl*>(n);
@@ -1823,8 +1824,8 @@ void DocumentImpl::recalcStyleSelector() {
           DOMString sheetText("");
           NodeImpl* c;
           for (c = elem->firstChild(); c; c = c->nextSibling()) {
-            if (c->nodeType() == Node::TEXT_NODE ||
-                c->nodeType() == Node::CDATA_SECTION_NODE)
+            if (c->nodeType() == TEXT_NODE ||
+                c->nodeType() == CDATA_SECTION_NODE)
               sheetText += c->nodeValue();
           }
 
@@ -2179,7 +2180,7 @@ AbstractViewImpl* DocumentImpl::defaultView() const {
 }
 
 PassRefPtr<EventImpl> DocumentImpl::createEvent(const DOMString& eventType,
-                                                int& exceptioncode) {
+                                                ExceptionCode& ec) {
   if (eventType == "UIEvents" || eventType == "UIEvent")
     return new UIEventImpl();
   if (eventType == "MouseEvents" || eventType == "MouseEvent")
@@ -2197,7 +2198,7 @@ PassRefPtr<EventImpl> DocumentImpl::createEvent(const DOMString& eventType,
   if (eventType == "SVGZoomEvents")
     return new KSVG::SVGZoomEventImpl();
 #endif
-  exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+  ec = NOT_SUPPORTED_ERR;
   return 0;
 }
 
@@ -2218,7 +2219,7 @@ void DocumentImpl::handleWindowEvent(EventImpl* evt, bool useCapture) {
   for (; it.current(); ++it)
     if (it.current()->eventType() == evt->type() &&
         it.current()->useCapture() == useCapture)
-      it.current()->listener()->handleEventImpl(evt, true);
+      it.current()->listener()->handleEvent(evt, true);
 }
 
 void DocumentImpl::defaultEventHandler(EventImpl* evt) {
@@ -2251,8 +2252,7 @@ EventListener* DocumentImpl::getHTMLWindowEventListener(
   QPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
   for (; it.current(); ++it)
     if (it.current()->eventType() == eventType &&
-        it.current()->listener()->eventListenerType() ==
-            "_khtml_HTMLEventListener")
+        it.current()->listener()->isHTMLEventListener())
       return it.current()->listener();
   return 0;
 }
@@ -2262,8 +2262,7 @@ void DocumentImpl::removeHTMLWindowEventListener(
   QPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
   for (; it.current(); ++it)
     if (it.current()->eventType() == eventType &&
-        it.current()->listener()->eventListenerType() ==
-            "_khtml_HTMLEventListener") {
+        it.current()->listener()->isHTMLEventListener()) {
       m_windowEventListeners.removeRef(it.current());
       return;
     }
@@ -2959,9 +2958,9 @@ DocumentImpl* DocumentImpl::topDocument() const {
 PassRefPtr<AttrImpl> DocumentImpl::createAttributeNS(
     const DOMString& namespaceURI,
     const DOMString& qualifiedName,
-    int& exception) {
+    ExceptionCode& ec) {
   if (qualifiedName.isNull()) {
-    exception = DOMException::NAMESPACE_ERR;
+    ec = NAMESPACE_ERR;
     return 0;
   }
 
@@ -2976,7 +2975,7 @@ PassRefPtr<AttrImpl> DocumentImpl::createAttributeNS(
   }
 
   if (!isValidName(localName)) {
-    exception = DOMException::INVALID_CHARACTER_ERR;
+    ec = INVALID_CHARACTER_ERR;
     return 0;
   }
 

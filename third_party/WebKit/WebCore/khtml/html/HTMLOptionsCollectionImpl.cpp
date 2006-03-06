@@ -23,8 +23,8 @@
 #include "config.h"
 #include "HTMLOptionsCollectionImpl.h"
 
+#include "ExceptionCode.h"
 #include "HTMLSelectElementImpl.h"
-#include "dom_exception.h"
 
 namespace WebCore {
 
@@ -33,7 +33,7 @@ HTMLOptionsCollectionImpl::HTMLOptionsCollectionImpl(
     : HTMLCollectionImpl(select, SELECT_OPTIONS) {}
 
 void HTMLOptionsCollectionImpl::setLength(unsigned, ExceptionCode& ec) {
-  ec = DOMException::NOT_SUPPORTED_ERR;
+  ec = NOT_SUPPORTED_ERR;
 }
 
 }  // namespace

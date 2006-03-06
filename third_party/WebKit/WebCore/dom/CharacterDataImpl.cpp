@@ -24,12 +24,12 @@
 #include "config.h"
 #include "CharacterDataImpl.h"
 
-#include "dom_exception.h"
-#include "dom2_eventsimpl.h"
 #include "DocumentImpl.h"
 #include "EventNames.h"
-#include "qtextstream.h"
+#include "ExceptionCode.h"
 #include "RenderText.h"
+#include "dom2_eventsimpl.h"
+#include <qtextstream.h>
 
 namespace WebCore {
 
@@ -54,10 +54,10 @@ DOMString CharacterDataImpl::data() const {
   return str;
 }
 
-void CharacterDataImpl::setData(const DOMString& _data, int& exceptioncode) {
+void CharacterDataImpl::setData(const DOMString& _data, ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
   if (isReadOnly()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 
@@ -83,21 +83,21 @@ unsigned CharacterDataImpl::length() const {
 
 DOMString CharacterDataImpl::substringData(const unsigned offset,
                                            const unsigned count,
-                                           int& exceptioncode) {
-  exceptioncode = 0;
-  checkCharDataOperation(offset, exceptioncode);
-  if (exceptioncode)
+                                           ExceptionCode& ec) {
+  ec = 0;
+  checkCharDataOperation(offset, ec);
+  if (ec)
     return DOMString();
 
   return str->substring(offset, count);
 }
 
-void CharacterDataImpl::appendData(const DOMString& arg, int& exceptioncode) {
-  exceptioncode = 0;
+void CharacterDataImpl::appendData(const DOMString& arg, ExceptionCode& ec) {
+  ec = 0;
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly
   if (isReadOnly()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 
@@ -114,10 +114,10 @@ void CharacterDataImpl::appendData(const DOMString& arg, int& exceptioncode) {
 
 void CharacterDataImpl::insertData(const unsigned offset,
                                    const DOMString& arg,
-                                   int& exceptioncode) {
-  exceptioncode = 0;
-  checkCharDataOperation(offset, exceptioncode);
-  if (exceptioncode)
+                                   ExceptionCode& ec) {
+  ec = 0;
+  checkCharDataOperation(offset, ec);
+  if (ec)
     return;
 
   DOMStringImpl* oldStr = str;
@@ -137,10 +137,10 @@ void CharacterDataImpl::insertData(const unsigned offset,
 
 void CharacterDataImpl::deleteData(const unsigned offset,
                                    const unsigned count,
-                                   int& exceptioncode) {
-  exceptioncode = 0;
-  checkCharDataOperation(offset, exceptioncode);
-  if (exceptioncode)
+                                   ExceptionCode& ec) {
+  ec = 0;
+  checkCharDataOperation(offset, ec);
+  if (ec)
     return;
 
   DOMStringImpl* oldStr = str;
@@ -161,10 +161,10 @@ void CharacterDataImpl::deleteData(const unsigned offset,
 void CharacterDataImpl::replaceData(const unsigned offset,
                                     const unsigned count,
                                     const DOMString& arg,
-                                    int& exceptioncode) {
-  exceptioncode = 0;
-  checkCharDataOperation(offset, exceptioncode);
-  if (exceptioncode)
+                                    ExceptionCode& ec) {
+  ec = 0;
+  checkCharDataOperation(offset, ec);
+  if (ec)
     return;
 
   unsigned realCount;
@@ -208,9 +208,9 @@ bool CharacterDataImpl::containsOnlyWhitespace() const {
 }
 
 void CharacterDataImpl::setNodeValue(const DOMString& _nodeValue,
-                                     int& exceptioncode) {
+                                     ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: taken care of by setData()
-  setData(_nodeValue, exceptioncode);
+  setData(_nodeValue, ec);
 }
 
 void CharacterDataImpl::dispatchModifiedEvent(DOMStringImpl* prevValue) {
@@ -222,30 +222,30 @@ void CharacterDataImpl::dispatchModifiedEvent(DOMStringImpl* prevValue) {
 
   DOMStringImpl* newValue = str->copy();
   newValue->ref();
-  int exceptioncode = 0;
+  ExceptionCode ec = 0;
   dispatchEvent(
       new MutationEventImpl(DOMCharacterDataModifiedEvent, true, false, 0,
                             prevValue, newValue, DOMString(), 0),
-      exceptioncode);
+      ec);
   newValue->deref();
   dispatchSubtreeModifiedEvent();
 }
 
 void CharacterDataImpl::checkCharDataOperation(const unsigned offset,
-                                               int& exceptioncode) {
-  exceptioncode = 0;
+                                               ExceptionCode& ec) {
+  ec = 0;
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or greater than
   // the number of 16-bit
   // units in data.
   if (offset > str->l) {
-    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
     return;
   }
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly
   if (isReadOnly()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 }
@@ -273,6 +273,10 @@ bool CharacterDataImpl::rendererIsNeeded(RenderStyle* style) {
   if (!str || str->l == 0)
     return false;
   return NodeImpl::rendererIsNeeded(style);
+}
+
+bool CharacterDataImpl::offsetInCharacters() const {
+  return true;
 }
 
 #ifndef NDEBUG

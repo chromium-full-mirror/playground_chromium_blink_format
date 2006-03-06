@@ -116,7 +116,7 @@ void SVGUseElementImpl::closeRenderer() {
   DOMString wString = QString::number(_w);
   DOMString hString = QString::number(_h);
 
-  int exceptioncode;
+  ExceptionCode ec;
   QString trans = QString::fromLatin1("translate(%1, %2)").arg(_x).arg(_y);
   if (target->hasTagName(SVGNames::symbolTag)) {
     RefPtr<SVGElementImpl> dummy =
@@ -138,8 +138,8 @@ void SVGUseElementImpl::closeRenderer() {
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
     dummy2->setAttribute(SVGNames::transformAttr, DOMString(trans));
 
-    appendChild(dummy2, exceptioncode);
-    dummy2->appendChild(dummy, exceptioncode);
+    appendChild(dummy2, ec);
+    dummy2->appendChild(dummy, ec);
   } else if (target->hasTagName(SVGNames::svgTag)) {
     RefPtr<SVGDummyElementImpl> dummy =
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
@@ -153,8 +153,8 @@ void SVGUseElementImpl::closeRenderer() {
     if (hasAttribute(SVGNames::heightAttr))
       root->setAttribute(SVGNames::heightAttr, hString.impl());
 
-    appendChild(dummy, exceptioncode);
-    dummy->appendChild(root.release(), exceptioncode);
+    appendChild(dummy, ec);
+    dummy->appendChild(root.release(), ec);
   } else {
     RefPtr<SVGDummyElementImpl> dummy =
         new SVGDummyElementImpl(SVGNames::gTag, getDocument());
@@ -162,8 +162,8 @@ void SVGUseElementImpl::closeRenderer() {
 
     RefPtr<NodeImpl> root = target->cloneNode(true);
 
-    appendChild(dummy, exceptioncode);
-    dummy->appendChild(root.release(), exceptioncode);
+    appendChild(dummy, ec);
+    dummy->appendChild(root.release(), ec);
   }
 
   SVGElementImpl::closeRenderer();

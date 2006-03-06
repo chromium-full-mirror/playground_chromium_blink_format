@@ -23,11 +23,11 @@
  *
  */
 
-#ifndef _dom2_traversal_h
-#define _dom2_traversal_h
+#ifndef dom2_traversal_h
+#define dom2_traversal_h
 
-#include "dom/dom2_traversal.h"
 #include "Shared.h"
+#include <kxmlcore/Noncopyable.h>
 
 namespace KXMLCore {
 template <class T>
@@ -40,25 +40,57 @@ namespace WebCore {
 class NodeImpl;
 class DocumentImpl;
 
-class NodeFilterImpl : public Shared<NodeFilterImpl> {
+typedef int ExceptionCode;
+
+class NodeFilterCondition : public Shared<NodeFilterCondition> {
  public:
+  virtual ~NodeFilterCondition() {}
+  virtual short acceptNode(NodeImpl*) const;
+  virtual void mark() {}
+};
+
+class NodeFilterImpl : public Shared<NodeFilterImpl>, Noncopyable {
+ public:
+  /**
+   * The following constants are returned by the acceptNode()
+   * method:
+   */
+  enum { FILTER_ACCEPT = 1, FILTER_REJECT = 2, FILTER_SKIP = 3 };
+
+  /**
+   * These are the available values for the whatToShow parameter.
+   * They are the same as the set of possible types for Node, and
+   * their values are derived by using a bit position corresponding
+   * to the value of NodeType for the equivalent node type.
+   */
+  enum {
+    SHOW_ALL = 0xFFFFFFFF,
+    SHOW_ELEMENT = 0x00000001,
+    SHOW_ATTRIBUTE = 0x00000002,
+    SHOW_TEXT = 0x00000004,
+    SHOW_CDATA_SECTION = 0x00000008,
+    SHOW_ENTITY_REFERENCE = 0x00000010,
+    SHOW_ENTITY = 0x00000020,
+    SHOW_PROCESSING_INSTRUCTION = 0x00000040,
+    SHOW_COMMENT = 0x00000080,
+    SHOW_DOCUMENT = 0x00000100,
+    SHOW_DOCUMENT_TYPE = 0x00000200,
+    SHOW_DOCUMENT_FRAGMENT = 0x00000400,
+    SHOW_NOTATION = 0x00000800
+  };
+
   NodeFilterImpl(NodeFilterCondition*);
-
   short acceptNode(NodeImpl*) const;
-
   void mark() { m_condition->mark(); };
 
  private:
-  NodeFilterImpl(const NodeFilterImpl&);
-  NodeFilterImpl& operator=(const NodeFilterImpl&);
-
   RefPtr<NodeFilterCondition> m_condition;
 };
 
 class TraversalImpl : public Shared<TraversalImpl> {
  public:
   TraversalImpl(NodeImpl*,
-                int whatToShow,
+                unsigned whatToShow,
                 PassRefPtr<NodeFilterImpl>,
                 bool expandEntityReferences);
   virtual ~TraversalImpl();
@@ -75,7 +107,7 @@ class TraversalImpl : public Shared<TraversalImpl> {
   TraversalImpl& operator=(const TraversalImpl&);
 
   RefPtr<NodeImpl> m_root;
-  int m_whatToShow;
+  unsigned m_whatToShow;
   RefPtr<NodeFilterImpl> m_filter;
   bool m_expandEntityReferences;
 };
@@ -83,14 +115,14 @@ class TraversalImpl : public Shared<TraversalImpl> {
 class NodeIteratorImpl : public TraversalImpl {
  public:
   NodeIteratorImpl(NodeImpl*,
-                   int whatToShow,
+                   unsigned whatToShow,
                    PassRefPtr<NodeFilterImpl>,
                    bool expandEntityReferences);
   ~NodeIteratorImpl();
 
-  NodeImpl* nextNode(int& exceptioncode);
-  NodeImpl* previousNode(int& exceptioncode);
-  void detach(int& exceptioncode);
+  NodeImpl* nextNode(ExceptionCode&);
+  NodeImpl* previousNode(ExceptionCode&);
+  void detach(ExceptionCode&);
 
   NodeImpl* referenceNode() const { return m_referenceNode.get(); }
   bool pointerBeforeReferenceNode() const { return m_beforeReferenceNode; }
@@ -122,12 +154,12 @@ class NodeIteratorImpl : public TraversalImpl {
 class TreeWalkerImpl : public TraversalImpl {
  public:
   TreeWalkerImpl(NodeImpl*,
-                 int whatToShow,
+                 unsigned whatToShow,
                  PassRefPtr<NodeFilterImpl>,
                  bool expandEntityReferences);
 
   NodeImpl* currentNode() const { return m_current.get(); }
-  void setCurrentNode(NodeImpl*, int& exceptioncode);
+  void setCurrentNode(NodeImpl*, ExceptionCode&);
 
   NodeImpl* parentNode();
   NodeImpl* firstChild();
@@ -140,7 +172,6 @@ class TreeWalkerImpl : public TraversalImpl {
  private:
   // convenience for when it is known there will be no exception
   void setCurrentNode(NodeImpl*);
-
   bool ancestorRejected(const NodeImpl*) const;
 
   RefPtr<NodeImpl> m_current;

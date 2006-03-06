@@ -60,12 +60,12 @@ class HTMLTableElementImpl : public HTMLElementImpl {
     Box = 0x0f
   };
 
-  HTMLTableElementImpl(DocumentImpl* doc);
+  HTMLTableElementImpl(DocumentImpl*);
   ~HTMLTableElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 9; }
-  virtual bool checkDTD(const NodeImpl* newChild);
+  virtual bool checkDTD(const NodeImpl*);
 
   HTMLTableCaptionElementImpl* caption() const { return tCaption; }
   NodeImpl* setCaption(HTMLTableCaptionElementImpl*);
@@ -84,41 +84,41 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   void deleteTFoot();
   HTMLElementImpl* createCaption();
   void deleteCaption();
-  HTMLElementImpl* insertRow(int index, int& exceptioncode);
-  void deleteRow(int index, int& exceptioncode);
+  HTMLElementImpl* insertRow(int index, ExceptionCode&);
+  void deleteRow(int index, ExceptionCode&);
 
   RefPtr<HTMLCollectionImpl> rows();
   RefPtr<HTMLCollectionImpl> tBodies();
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString bgColor() const;
-  void setBgColor(const DOMString&);
+  String bgColor() const;
+  void setBgColor(const String&);
 
-  DOMString border() const;
-  void setBorder(const DOMString&);
+  String border() const;
+  void setBorder(const String&);
 
-  DOMString cellPadding() const;
-  void setCellPadding(const DOMString&);
+  String cellPadding() const;
+  void setCellPadding(const String&);
 
-  DOMString cellSpacing() const;
-  void setCellSpacing(const DOMString&);
+  String cellSpacing() const;
+  void setCellSpacing(const String&);
 
-  DOMString frame() const;
-  void setFrame(const DOMString&);
+  String frame() const;
+  void setFrame(const String&);
 
-  DOMString rules() const;
-  void setRules(const DOMString&);
+  String rules() const;
+  void setRules(const String&);
 
-  DOMString summary() const;
-  void setSummary(const DOMString&);
+  String summary() const;
+  void setSummary(const String&);
 
-  DOMString width() const;
-  void setWidth(const DOMString&);
+  String width() const;
+  void setWidth(const String&);
 
   // overrides
-  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl> newChild);
+  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl>);
   virtual void childrenChanged();
 
   virtual bool mapToEntry(const QualifiedName& attrName,
@@ -131,7 +131,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   virtual void attach();
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
  protected:
   HTMLTableSectionElementImpl* head;
@@ -157,7 +157,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 };
 
 // -------------------------------------------------------------------------
@@ -170,25 +170,25 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 8; }
-  virtual bool checkDTD(const NodeImpl* newChild);
-  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl> newChild);
+  virtual bool checkDTD(const NodeImpl*);
+  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl>);
 
-  HTMLElementImpl* insertRow(int index, int& exceptioncode);
-  void deleteRow(int index, int& exceptioncode);
+  HTMLElementImpl* insertRow(int index, ExceptionCode&);
+  void deleteRow(int index, ExceptionCode&);
 
   int numRows() const;
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString ch() const;
-  void setCh(const DOMString&);
+  String ch() const;
+  void setCh(const String&);
 
-  DOMString chOff() const;
-  void setChOff(const DOMString&);
+  String chOff() const;
+  void setChOff(const String&);
 
-  DOMString vAlign() const;
-  void setVAlign(const DOMString&);
+  String vAlign() const;
+  void setVAlign(const String&);
 
   RefPtr<HTMLCollectionImpl> rows();
 };
@@ -202,36 +202,36 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 7; }
-  virtual bool checkDTD(const NodeImpl* newChild);
-  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl> newChild);
+  virtual bool checkDTD(const NodeImpl*);
+  virtual ContainerNodeImpl* addChild(PassRefPtr<NodeImpl>);
 
   int rowIndex() const;
   int sectionRowIndex() const;
 
-  HTMLElementImpl* insertCell(int index, int& exceptioncode);
-  void deleteCell(int index, int& exceptioncode);
+  HTMLElementImpl* insertCell(int index, ExceptionCode&);
+  void deleteCell(int index, ExceptionCode&);
 
   void setRowIndex(int);
 
   void setSectionRowIndex(int);
 
   RefPtr<HTMLCollectionImpl> cells();
-  void setCells(HTMLCollectionImpl*, int& exception);
+  void setCells(HTMLCollectionImpl*, ExceptionCode&);
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString bgColor() const;
-  void setBgColor(const DOMString&);
+  String bgColor() const;
+  void setBgColor(const String&);
 
-  DOMString ch() const;
-  void setCh(const DOMString&);
+  String ch() const;
+  void setCh(const String&);
 
-  DOMString chOff() const;
-  void setChOff(const DOMString&);
+  String chOff() const;
+  void setChOff(const String&);
 
-  DOMString vAlign() const;
-  void setVAlign(const DOMString&);
+  String vAlign() const;
+  void setVAlign(const String&);
 
  protected:
   int ncols;
@@ -241,7 +241,7 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableCellElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
+  HTMLTableCellElementImpl(const QualifiedName& tagName, DocumentImpl*);
   ~HTMLTableCellElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
@@ -259,54 +259,54 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   // used by table cells to share style decls created by the enclosing table.
   virtual CSSMutableStyleDeclarationImpl* additionalAttributeStyleDecl();
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
   void setCellIndex(int);
 
-  DOMString abbr() const;
-  void setAbbr(const DOMString&);
+  String abbr() const;
+  void setAbbr(const String&);
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString axis() const;
-  void setAxis(const DOMString&);
+  String axis() const;
+  void setAxis(const String&);
 
-  DOMString bgColor() const;
-  void setBgColor(const DOMString&);
+  String bgColor() const;
+  void setBgColor(const String&);
 
-  DOMString ch() const;
-  void setCh(const DOMString&);
+  String ch() const;
+  void setCh(const String&);
 
-  DOMString chOff() const;
-  void setChOff(const DOMString&);
+  String chOff() const;
+  void setChOff(const String&);
 
   void setColSpan(int);
 
-  DOMString headers() const;
-  void setHeaders(const DOMString&);
+  String headers() const;
+  void setHeaders(const String&);
 
-  DOMString height() const;
-  void setHeight(const DOMString&);
+  String height() const;
+  void setHeight(const String&);
 
   bool noWrap() const;
   void setNoWrap(bool);
 
   void setRowSpan(int);
 
-  DOMString scope() const;
-  void setScope(const DOMString&);
+  String scope() const;
+  void setScope(const String&);
 
-  DOMString vAlign() const;
-  void setVAlign(const DOMString&);
+  String vAlign() const;
+  void setVAlign(const String&);
 
-  DOMString width() const;
-  void setWidth(const DOMString&);
+  String width() const;
+  void setWidth(const String&);
 
  protected:
   int _row;
@@ -321,7 +321,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableColElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
+  HTMLTableColElementImpl(const QualifiedName& tagName, DocumentImpl*);
 
   virtual HTMLTagStatus endTagRequirement() const {
     return hasLocalName(HTMLNames::colTag) ? TagStatusForbidden
@@ -339,26 +339,26 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
   // overrides
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   int span() const { return _span; }
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString ch() const;
-  void setCh(const DOMString&);
+  String ch() const;
+  void setCh(const String&);
 
-  DOMString chOff() const;
-  void setChOff(const DOMString&);
+  String chOff() const;
+  void setChOff(const String&);
 
   void setSpan(int);
 
-  DOMString vAlign() const;
-  void setVAlign(const DOMString&);
+  String vAlign() const;
+  void setVAlign(const String&);
 
-  DOMString width() const;
-  void setWidth(const DOMString&);
+  String width() const;
+  void setWidth(const String&);
 
  protected:
   int _span;
@@ -377,10 +377,10 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 };
 
 }  // namespace

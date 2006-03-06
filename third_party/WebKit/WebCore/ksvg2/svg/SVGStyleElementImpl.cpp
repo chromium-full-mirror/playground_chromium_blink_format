@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2006 Apple Computer, Inc.
 
     This file is part of the KDE project
 
@@ -22,14 +23,14 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include <kdom/kdom.h>
-#include "PlatformString.h"
-#include "DocumentImpl.h"
-#include "css_stylesheetimpl.h"
-
 #include "SVGStyleElementImpl.h"
 
-#include <QString.h>
+#include "DocumentImpl.h"
+#include "ExceptionCode.h"
+#include "PlatformString.h"
+#include "QString.h"
+#include "css_stylesheetimpl.h"
+#include <kdom/kdom.h>
 
 using namespace WebCore;
 
@@ -45,32 +46,32 @@ AtomicString SVGStyleElementImpl::xmlspace() const {
   return tryGetAttribute("xml:space");
 }
 
-void SVGStyleElementImpl::setXmlspace(const AtomicString&, int& exceptioncode) {
-  exceptioncode = NO_MODIFICATION_ALLOWED_ERR;
+void SVGStyleElementImpl::setXmlspace(const AtomicString&, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 AtomicString SVGStyleElementImpl::type() const {
   return tryGetAttribute("type", "text/css");
 }
 
-void SVGStyleElementImpl::setType(const AtomicString&, int& exceptioncode) {
-  exceptioncode = NO_MODIFICATION_ALLOWED_ERR;
+void SVGStyleElementImpl::setType(const AtomicString&, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 AtomicString SVGStyleElementImpl::media() const {
   return tryGetAttribute("media", "all");
 }
 
-void SVGStyleElementImpl::setMedia(const AtomicString&, int& exceptioncode) {
-  exceptioncode = NO_MODIFICATION_ALLOWED_ERR;
+void SVGStyleElementImpl::setMedia(const AtomicString&, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 AtomicString SVGStyleElementImpl::title() const {
   return tryGetAttribute("title");
 }
 
-void SVGStyleElementImpl::setTitle(const AtomicString&, int& exceptioncode) {
-  exceptioncode = NO_MODIFICATION_ALLOWED_ERR;
+void SVGStyleElementImpl::setTitle(const AtomicString&, ExceptionCode& ec) {
+  ec = NO_MODIFICATION_ALLOWED_ERR;
 }
 
 CSSStyleSheetImpl* SVGStyleElementImpl::sheet() {

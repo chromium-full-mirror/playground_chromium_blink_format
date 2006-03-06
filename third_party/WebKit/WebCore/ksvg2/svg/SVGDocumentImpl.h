@@ -49,7 +49,7 @@ class SVGDocumentImpl : public DocumentImpl, public CachedObjectClient {
   DOMString title() const;
 
   virtual PassRefPtr<ElementImpl> createElement(const DOMString& tagName,
-                                                int& exceptionCode);
+                                                ExceptionCode&);
 
   // Derived from: 'CachedObjectClient'
   virtual void notifyFinished(CachedObject* finishedObj);

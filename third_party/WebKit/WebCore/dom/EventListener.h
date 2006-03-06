@@ -1,8 +1,5 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
- * (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,31 +16,23 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * This file includes excerpts from the Document Object Model (DOM)
- * Level 2 Specification (Candidate Recommendation)
- * http://www.w3.org/TR/2000/CR-DOM-Level-2-20000510/
- * Copyright © 2000 W3C® (MIT, INRIA, Keio), All Rights Reserved.
- *
  */
 
-#ifndef _CSS_css_stylesheet_h_
-#define _CSS_css_stylesheet_h_
+#ifndef EventListener_h
+#define EventListener_h
 
-namespace DOM {
+#include "Shared.h"
 
-/**
- * This exception is raised when a specific CSS operation is impossible
- * to perform.
- */
-class CSSException {
+namespace WebCore {
+
+class EventImpl;
+
+class EventListener : public Shared<EventListener> {
  public:
-  enum ExceptionCode {
-    SYNTAX_ERR = 0,
-    INVALID_MODIFICATION_ERR = 1,
-    _EXCEPTION_OFFSET = 1000,
-    _EXCEPTION_MAX = 1999
-  };
+  virtual ~EventListener() {}
+  virtual void handleEvent(EventImpl*, bool isWindowEvent) = 0;
+  virtual bool isHTMLEventListener() const { return false; }
 };
-};  // namespace
+}
 
 #endif

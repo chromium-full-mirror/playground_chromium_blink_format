@@ -30,10 +30,8 @@
 #include "HTMLElementImpl.h"
 #include "History.h"
 #include "UserAgentStyleSheets.h"
-#include "css_rule.h"
 #include "css_ruleimpl.h"
 #include "css_stylesheetimpl.h"
-#include "css_value.h"
 #include "css_valueimpl.h"
 #include "cssproperties.h"
 #include "cssvalues.h"
@@ -1717,10 +1715,6 @@ static Length convertToLength(CSSPrimitiveValueImpl* primitiveValue,
           int(primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER) *
               100),
           Percent);
-    else if (type == CSSPrimitiveValue::CSS_HTML_RELATIVE)
-      l = Length(int(primitiveValue->getFloatValue(
-                     CSSPrimitiveValue::CSS_HTML_RELATIVE)),
-                 Relative);
     else if (ok)
       *ok = false;
   }
@@ -1846,9 +1840,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
 
   unsigned short valueType = value->cssValueType();
 
-  bool isInherit = parentNode && valueType == CSSValue::CSS_INHERIT;
-  bool isInitial = valueType == CSSValue::CSS_INITIAL ||
-                   (!parentNode && valueType == CSSValue::CSS_INHERIT);
+  bool isInherit = parentNode && valueType == CSSValueImpl::CSS_INHERIT;
+  bool isInitial = valueType == CSSValueImpl::CSS_INITIAL ||
+                   (!parentNode && valueType == CSSValueImpl::CSS_INHERIT);
 
   // These properties are used to set the correct margins/padding on RTL lists.
   if (id == CSS_PROP__KHTML_MARGIN_START)
@@ -2834,10 +2828,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
             l = Length((int)primitiveValue->getFloatValue(
                            CSSPrimitiveValue::CSS_PERCENTAGE),
                        Percent);
-          else if (type == CSSPrimitiveValue::CSS_HTML_RELATIVE)
-            l = Length(int(primitiveValue->getFloatValue(
-                           CSSPrimitiveValue::CSS_HTML_RELATIVE)),
-                       Relative);
           else
             return;
           if (id == CSS_PROP_PADDING_LEFT || id == CSS_PROP_PADDING_RIGHT ||
@@ -3945,7 +3935,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
         style->setBoxSizing(BORDER_BOX);
       break;
     case CSS_PROP__KHTML_MARQUEE:
-      if (valueType != CSSValue::CSS_INHERIT || !parentNode)
+      if (valueType != CSSValueImpl::CSS_INHERIT || !parentNode)
         return;
       style->setMarqueeDirection(parentStyle->marqueeDirection());
       style->setMarqueeIncrement(parentStyle->marqueeIncrement());
@@ -4251,7 +4241,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
 
 void CSSStyleSelector::mapBackgroundAttachment(BackgroundLayer* layer,
                                                CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundAttachment(RenderStyle::initialBackgroundAttachment());
     return;
   }
@@ -4274,7 +4264,7 @@ void CSSStyleSelector::mapBackgroundAttachment(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundClip(BackgroundLayer* layer,
                                          CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundClip(RenderStyle::initialBackgroundClip());
     return;
   }
@@ -4298,7 +4288,7 @@ void CSSStyleSelector::mapBackgroundClip(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundOrigin(BackgroundLayer* layer,
                                            CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundOrigin(RenderStyle::initialBackgroundOrigin());
     return;
   }
@@ -4322,7 +4312,7 @@ void CSSStyleSelector::mapBackgroundOrigin(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
                                           CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundImage(RenderStyle::initialBackgroundImage());
     return;
   }
@@ -4337,7 +4327,7 @@ void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,
                                            CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundRepeat(RenderStyle::initialBackgroundRepeat());
     return;
   }
@@ -4366,7 +4356,7 @@ void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
                                               CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundXPosition(RenderStyle::initialBackgroundXPosition());
     return;
   }
@@ -4391,7 +4381,7 @@ void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
 
 void CSSStyleSelector::mapBackgroundYPosition(BackgroundLayer* layer,
                                               CSSValueImpl* value) {
-  if (value->cssValueType() == CSSValue::CSS_INITIAL) {
+  if (value->cssValueType() == CSSValueImpl::CSS_INITIAL) {
     layer->setBackgroundYPosition(RenderStyle::initialBackgroundYPosition());
     return;
   }

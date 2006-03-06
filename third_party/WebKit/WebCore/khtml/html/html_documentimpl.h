@@ -50,7 +50,7 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   String cookie() const;
   void setCookie(const String&);
 
-  void setBody(HTMLElementImpl*, ExceptionCode& exceptioncode);
+  void setBody(HTMLElementImpl*, ExceptionCode& ec);
 
   virtual Tokenizer* createTokenizer();
 

@@ -20,23 +20,23 @@
 
 #include "config.h"
 #include "kjs_events.h"
-#include "kjs_events.lut.h"
 
-#include "Frame.h"
-#include "kjs_window.h"
-#include "kjs_views.h"
-#include "kjs_proxy.h"
-#include "html/html_imageimpl.h"
-#include "DocumentImpl.h"
-#include "dom2_eventsimpl.h"
-#include "dom2_viewsimpl.h"
-#include "EventNames.h"
-#include "rendering/render_object.h"
 #include "CachedImage.h"
-#include "htmlnames.h"
-
+#include "DocumentImpl.h"
+#include "EventNames.h"
+#include "Frame.h"
 #include "JSMutationEvent.h"
 #include "JSWheelEvent.h"
+#include "dom2_eventsimpl.h"
+#include "dom2_viewsimpl.h"
+#include "html/html_imageimpl.h"
+#include "htmlnames.h"
+#include "kjs_proxy.h"
+#include "kjs_views.h"
+#include "kjs_window.h"
+#include "rendering/render_object.h"
+
+#include "kjs_events.lut.h"
 
 using namespace WebCore;
 using namespace EventNames;
@@ -46,8 +46,7 @@ namespace KJS {
 
 JSAbstractEventListener::JSAbstractEventListener(bool _html) : html(_html) {}
 
-void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
-                                          bool isWindowEvent) {
+void JSAbstractEventListener::handleEvent(EventImpl* ele, bool isWindowEvent) {
 #ifdef KJS_DEBUGGER
   if (KJSDebugWin::instance() && KJSDebugWin::instance()->inSession())
     return;
@@ -133,10 +132,8 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
   }
 }
 
-DOMString JSAbstractEventListener::eventListenerType() {
-  if (html)
-    return "_khtml_HTMLEventListener";
-  return "_khtml_JSEventListener";
+bool JSAbstractEventListener::isHTMLEventListener() const {
+  return html;
 }
 
 // -------------------------------------------------------------------------
@@ -288,9 +285,9 @@ const ClassInfo EventConstructor::info = {"EventConstructor", 0,
                                           &EventConstructorTable, 0};
 /*
 @begin EventConstructorTable 3
-  CAPTURING_PHASE       DOM::Event::CAPTURING_PHASE     DontDelete|ReadOnly
-  AT_TARGET             DOM::Event::AT_TARGET           DontDelete|ReadOnly
-  BUBBLING_PHASE        DOM::Event::BUBBLING_PHASE      DontDelete|ReadOnly
+  CAPTURING_PHASE       WebCore::EventImpl::CAPTURING_PHASE DontDelete|ReadOnly
+  AT_TARGET             WebCore::EventImpl::AT_TARGET DontDelete|ReadOnly
+  BUBBLING_PHASE        WebCore::EventImpl::BUBBLING_PHASE DontDelete|ReadOnly
 # Reverse-engineered from Netscape
   MOUSEDOWN             1                               DontDelete|ReadOnly
   MOUSEUP               2                               DontDelete|ReadOnly
@@ -512,7 +509,8 @@ const ClassInfo EventExceptionConstructor::info = {
     "EventExceptionConstructor", 0, &EventExceptionConstructorTable, 0};
 /*
 @begin EventExceptionConstructorTable 1
-  UNSPECIFIED_EVENT_TYPE_ERR    DOM::EventException::UNSPECIFIED_EVENT_TYPE_ERR
+  UNSPECIFIED_EVENT_TYPE_ERR
+WebCore::UNSPECIFIED_EVENT_TYPE_ERR-WebCore::EventExceptionOffset
 DontDelete|ReadOnly
 @end
 */
