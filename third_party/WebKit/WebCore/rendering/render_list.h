@@ -70,8 +70,6 @@ class RenderListMarker : public RenderBox {
 
   bool isInside() const;
 
-  virtual bool nodeAtPoint(NodeInfo&, int, int, int, int, HitTestAction);
-
   IntRect getRelativeMarkerRect();
 
  private:
