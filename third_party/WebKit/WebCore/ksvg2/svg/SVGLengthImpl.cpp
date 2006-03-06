@@ -92,7 +92,7 @@ float SVGLengthImpl::value() const {
   // element off of which to establish the viewport.
   return SVGHelper::PercentageOfViewport(
       value, m_context ? m_context->viewportElement() : m_viewportElement,
-      m_mode);
+      static_cast<LengthMode>(m_mode));
 }
 
 void SVGLengthImpl::setValueInSpecifiedUnits(float valueInSpecifiedUnits) {

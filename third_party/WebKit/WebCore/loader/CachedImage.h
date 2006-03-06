@@ -85,7 +85,7 @@ class CachedImage : public CachedObject, public ImageAnimationObserver {
   int m_dataSize;
 
   bool m_errorOccurred : 1;
-  KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
+  unsigned m_showAnimations : 2;  // KHTMLSettings::KAnimationAdvice
 
   friend class Cache;
 };

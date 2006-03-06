@@ -69,7 +69,7 @@ class DocLoader {
   bool autoloadImages() const { return m_bautoloadImages; }
   KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
   KHTMLSettings::KAnimationAdvice showAnimations() const {
-    return m_showAnimations;
+    return static_cast<KHTMLSettings::KAnimationAdvice>(m_showAnimations);
   }
   time_t expireDate() const { return m_expireDate; }
   Frame* frame() const { return m_frame; }
@@ -95,7 +95,7 @@ class DocLoader {
   time_t m_expireDate;
   KIO::CacheControl m_cachePolicy;
   bool m_bautoloadImages : 1;
-  KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
+  unsigned m_showAnimations : 2;  // KHTMLSettings::KAnimationAdvice
   Frame* m_frame;
   DOM::DocumentImpl* m_doc;
   bool m_loadInProgress;

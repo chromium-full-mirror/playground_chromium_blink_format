@@ -1031,8 +1031,8 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
       kMin(imageWidth, style->borderImage().m_slices.right.calcValue(
                            borderImage->image()->width()));
 
-  EBorderImageRule hRule = style->borderImage().m_horizontalRule;
-  EBorderImageRule vRule = style->borderImage().m_verticalRule;
+  EBorderImageRule hRule = style->borderImage().horizontalRule();
+  EBorderImageRule vRule = style->borderImage().verticalRule();
 
   bool drawLeft = leftSlice > 0 && style->borderLeftWidth() > 0;
   bool drawTop = topSlice > 0 && style->borderTopWidth() > 0;

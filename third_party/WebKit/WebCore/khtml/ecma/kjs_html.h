@@ -1102,8 +1102,8 @@ class Gradient : public DOMObject {
   ColorStop* stops;
   mutable int adjustedStopCount;
   mutable ColorStop* adjustedStops;
-  mutable unsigned stopsNeedAdjusting : 1;
-  mutable unsigned regenerateShading : 1;
+  mutable bool stopsNeedAdjusting : 1;
+  mutable bool regenerateShading : 1;
 };
 
 class ImagePattern : public DOMObject, public WebCore::CachedObjectClient {

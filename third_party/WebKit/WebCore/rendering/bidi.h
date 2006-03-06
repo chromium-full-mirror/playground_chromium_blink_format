@@ -52,10 +52,15 @@ class BidiContext {
   void ref() const;
   void deref() const;
 
+  QChar::Direction dir() const { return static_cast<QChar::Direction>(m_dir); }
+  QChar::Direction basicDir() const {
+    return static_cast<QChar::Direction>(m_basicDir);
+  }
+
   unsigned char level;
   bool override : 1;
-  QChar::Direction dir : 5;
-  QChar::Direction basicDir : 5;
+  unsigned m_dir : 5;       // QChar::Direction
+  unsigned m_basicDir : 5;  // QChar::Direction
 
   BidiContext* parent;
 
@@ -76,7 +81,7 @@ struct BidiRun {
         override(context->override),
         nextRun(0) {
     if (dir == QChar::DirON)
-      dir = context->dir;
+      dir = context->dir();
 
     level = context->level;
 
@@ -114,7 +119,6 @@ struct BidiRun {
   // explicit + implicit levels here
   unsigned char level;
   bool override : 1;
-
   bool compact : 1;
 
   BidiRun* nextRun;

@@ -2372,8 +2372,8 @@ struct HandlePageNode {
 struct HandleNode {
   union {
     struct {
-      uint next : 16;
-      uint previous : 16;
+      unsigned short next;
+      unsigned short previous;
     } internalNode;
 
     HandleNode* freeNodes;  // Always at block[0] in page.

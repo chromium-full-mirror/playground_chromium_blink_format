@@ -36,8 +36,7 @@ XBLPrototypeHandler::XBLPrototypeHandler(const DOMString& event,
       m_preventDefault(false),
       m_keyMask(0),
       m_misc(0),
-      m_button(-1),
-      m_unused(0) {
+      m_button(-1) {
   if (event.isEmpty())
     return;
 

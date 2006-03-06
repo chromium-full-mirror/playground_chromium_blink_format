@@ -60,7 +60,9 @@ class RenderReplaced : public RenderBox {
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
   virtual bool canBeSelectionLeaf() const { return true; }
-  virtual SelectionState selectionState() const { return m_selectionState; }
+  virtual SelectionState selectionState() const {
+    return static_cast<SelectionState>(m_selectionState);
+  }
   virtual void setSelectionState(SelectionState);
   virtual IntRect selectionRect();
   bool isSelected();
@@ -70,7 +72,7 @@ class RenderReplaced : public RenderBox {
   int m_intrinsicWidth;
   int m_intrinsicHeight;
 
-  SelectionState m_selectionState : 3;
+  unsigned m_selectionState : 3;  // SelectionState
 };
 
 class RenderWidget : public QObject, public RenderReplaced {

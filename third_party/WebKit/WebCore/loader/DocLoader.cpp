@@ -202,7 +202,8 @@ void DocLoader::setCachePolicy(KIO::CacheControl cachePolicy) {
 
 void DocLoader::setShowAnimations(
     KHTMLSettings::KAnimationAdvice showAnimations) {
-  if (showAnimations == m_showAnimations)
+  if (showAnimations ==
+      static_cast<KHTMLSettings::KAnimationAdvice>(m_showAnimations))
     return;
   m_showAnimations = showAnimations;
 

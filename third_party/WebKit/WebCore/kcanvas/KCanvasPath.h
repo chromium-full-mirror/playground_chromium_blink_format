@@ -72,7 +72,8 @@ class KCanvasPath : public Shared<KCanvasPath> {
 
 // Clipping paths
 struct KCClipData {
-  KCWindRule windRule : 1;
+  KCWindRule windRule() const { return static_cast<KCWindRule>(m_windRule); }
+  unsigned m_windRule : 1;  // KCWindRule
   bool bboxUnits : 1;
   RefPtr<KCanvasPath> path;
 };
@@ -86,7 +87,7 @@ class KCClipDataList : public Q3ValueList<KCClipData> {
                       bool bboxUnits) {
     ASSERT(pathData);
     KCClipData clipData;
-    clipData.windRule = windRule;
+    clipData.m_windRule = windRule;
     clipData.bboxUnits = bboxUnits;
     clipData.path = pathData;
     append(clipData);

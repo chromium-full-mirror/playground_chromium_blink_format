@@ -1562,14 +1562,14 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& i, int _tx, int _ty) {
 }
 
 void RenderBlock::setSelectionState(SelectionState s) {
-  if (m_selectionState == s)
+  if (selectionState() == s)
     return;
 
-  if (s == SelectionInside && m_selectionState != SelectionNone)
+  if (s == SelectionInside && selectionState() != SelectionNone)
     return;
 
-  if ((s == SelectionStart && m_selectionState == SelectionEnd) ||
-      (s == SelectionEnd && m_selectionState == SelectionStart))
+  if ((s == SelectionStart && selectionState() == SelectionEnd) ||
+      (s == SelectionEnd && selectionState() == SelectionStart))
     m_selectionState = SelectionBoth;
   else
     m_selectionState = s;
@@ -2194,7 +2194,7 @@ int RenderBlock::leftRelOffset(int y,
       // kdDebug( 6040 ) <<(void *)this << " left: sy, ey, x, w " << r->startY
       // << "," << r->endY << "," << r->left << "," << r->width << " " << endl;
       if (r->startY <= y && r->endY > y &&
-          r->type == FloatingObject::FloatLeft && r->left + r->width > left) {
+          r->type() == FloatingObject::FloatLeft && r->left + r->width > left) {
         left = r->left + r->width;
         if (heightRemaining)
           *heightRemaining = r->endY - y;
@@ -2235,7 +2235,7 @@ int RenderBlock::rightRelOffset(int y,
       // kdDebug( 6040 ) << "right: sy, ey, x, w " << r->startY << "," <<
       // r->endY << "," << r->left << "," << r->width << " " << endl;
       if (r->startY <= y && r->endY > y &&
-          r->type == FloatingObject::FloatRight && r->left < right) {
+          r->type() == FloatingObject::FloatRight && r->left < right) {
         right = r->left;
         if (heightRemaining)
           *heightRemaining = r->endY - y;
@@ -2443,7 +2443,7 @@ int RenderBlock::leftBottom() {
   FloatingObject* r;
   QPtrListIterator<FloatingObject> it(*m_floatingObjects);
   for (; (r = it.current()); ++it)
-    if (r->endY > bottom && r->type == FloatingObject::FloatLeft)
+    if (r->endY > bottom && r->type() == FloatingObject::FloatLeft)
       bottom = r->endY;
 
   return bottom;
@@ -2456,7 +2456,7 @@ int RenderBlock::rightBottom() {
   FloatingObject* r;
   QPtrListIterator<FloatingObject> it(*m_floatingObjects);
   for (; (r = it.current()); ++it)
-    if (r->endY > bottom && r->type == FloatingObject::FloatRight)
+    if (r->endY > bottom && r->type() == FloatingObject::FloatRight)
       bottom = r->endY;
 
   return bottom;
@@ -2538,7 +2538,7 @@ void RenderBlock::addOverhangingFloats(RenderBlock* child, int xoff, int yoff) {
 
       // If the object is not in the list, we add it now.
       if (!f) {
-        FloatingObject* floatingObj = new FloatingObject(r->type);
+        FloatingObject* floatingObj = new FloatingObject(r->type());
         floatingObj->startY = r->startY - yoff;
         floatingObj->endY = r->endY - yoff;
         floatingObj->left = r->left - xoff;
@@ -2589,7 +2589,7 @@ void RenderBlock::addIntrudingFloats(RenderBlock* prev, int xoff, int yoff) {
         }
       }
       if (!f) {
-        FloatingObject* floatingObj = new FloatingObject(r->type);
+        FloatingObject* floatingObj = new FloatingObject(r->type());
         floatingObj->startY = r->startY - yoff;
         floatingObj->endY = r->endY - yoff;
         floatingObj->left = r->left - xoff;

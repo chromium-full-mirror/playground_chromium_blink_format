@@ -381,7 +381,7 @@ DOMString SVGAnimationElementImpl::targetAttribute() const {
 
   DOMString ret;
 
-  EAttributeType attributeType = m_attributeType;
+  EAttributeType attributeType = static_cast<EAttributeType>(m_attributeType);
   if (attributeType == ATTRIBUTETYPE_AUTO) {
     attributeType = ATTRIBUTETYPE_XML;
 
@@ -408,9 +408,9 @@ DOMString SVGAnimationElementImpl::targetAttribute() const {
 }
 
 void SVGAnimationElementImpl::setTargetAttribute(DOMStringImpl* value) {
-  SVGAnimationElementImpl::setTargetAttribute(targetElement(),
-                                              DOMString(m_attributeName).impl(),
-                                              value, m_attributeType);
+  SVGAnimationElementImpl::setTargetAttribute(
+      targetElement(), DOMString(m_attributeName).impl(), value,
+      static_cast<EAttributeType>(m_attributeType));
 }
 
 void SVGAnimationElementImpl::setTargetAttribute(SVGElementImpl* target,

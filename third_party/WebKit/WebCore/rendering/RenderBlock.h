@@ -260,7 +260,9 @@ class RenderBlock : public RenderFlow {
   virtual bool hasSelectedChildren() const {
     return m_selectionState != SelectionNone;
   }
-  virtual SelectionState selectionState() const { return m_selectionState; }
+  virtual SelectionState selectionState() const {
+    return static_cast<SelectionState>(m_selectionState);
+  }
   virtual void setSelectionState(SelectionState s);
 
   struct BlockSelectionInfo {
@@ -376,22 +378,24 @@ class RenderBlock : public RenderFlow {
   struct FloatingObject {
     enum Type { FloatLeft, FloatRight };
 
-    FloatingObject(Type _type) {
+    FloatingObject(Type type) {
       node = 0;
       startY = 0;
       endY = 0;
-      type = _type;
+      m_type = type;
       left = 0;
       width = 0;
       noPaint = false;
     }
+
+    Type type() { return static_cast<Type>(m_type); }
 
     RenderObject* node;
     int startY;
     int endY;
     int left;
     int width;
-    Type type : 1;  // left or right aligned
+    unsigned m_type : 1;  // Type (left or right aligned)
     bool noPaint : 1;
   };
 
@@ -554,11 +558,11 @@ class RenderBlock : public RenderFlow {
 
   bool m_childrenInline : 1;
   bool m_firstLine : 1;
-  EClear m_clearStatus : 2;
+  unsigned m_clearStatus : 2;  // EClear
   bool m_topMarginQuirk : 1;
   bool m_bottomMarginQuirk : 1;
   bool m_hasMarkupTruncation : 1;
-  SelectionState m_selectionState : 3;
+  unsigned m_selectionState : 3;  // SelectionState
 
   int m_maxTopPosMargin;
   int m_maxTopNegMargin;

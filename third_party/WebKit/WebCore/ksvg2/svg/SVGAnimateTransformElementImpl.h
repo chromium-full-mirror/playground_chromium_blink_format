@@ -63,7 +63,8 @@ class SVGAnimateTransformElementImpl : public SVGAnimationElementImpl {
   RefPtr<SVGMatrixImpl> m_transformMatrix;
 
   mutable bool m_rotateSpecialCase : 1;
-  bool m_toRotateSpecialCase : 1, m_fromRotateSpecialCase : 1;
+  bool m_toRotateSpecialCase : 1;
+  bool m_fromRotateSpecialCase : 1;
 };
 };
 

@@ -67,7 +67,7 @@ class RenderCanvasImage : public RenderImage {
   void* _drawingContextData;
   CGImageRef _drawnImage;
 
-  unsigned _needsImageUpdate : 1;
+  bool _needsImageUpdate : 1;
 };
 
 }  // namespace

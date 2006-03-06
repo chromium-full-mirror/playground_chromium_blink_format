@@ -81,7 +81,7 @@ class CSSSelector {
         nextSelector(0),
         attr(anyQName()),
         tag(anyQName()),
-        relation(Descendant),
+        m_relation(Descendant),
         match(None),
         pseudoId(0),
         _pseudoType(PseudoNotParsed) {}
@@ -92,7 +92,7 @@ class CSSSelector {
         nextSelector(0),
         attr(anyQName()),
         tag(qName),
-        relation(Descendant),
+        m_relation(Descendant),
         match(None),
         pseudoId(0),
         _pseudoType(PseudoNotParsed) {}
@@ -187,7 +187,7 @@ class CSSSelector {
   PseudoType pseudoType() const {
     if (_pseudoType == PseudoNotParsed)
       extractPseudoType();
-    return _pseudoType;
+    return static_cast<PseudoType>(_pseudoType);
   }
 
   bool hasTag() const { return tag != anyQName(); }
@@ -201,10 +201,12 @@ class CSSSelector {
   QualifiedName attr;
   QualifiedName tag;
 
-  Relation relation : 3;
-  mutable Match match : 4;
-  unsigned int pseudoId : 3;
-  mutable PseudoType _pseudoType : 5;
+  Relation relation() const { return static_cast<Relation>(m_relation); }
+
+  unsigned m_relation : 3;     // enum Relation
+  mutable unsigned match : 4;  // enum Match
+  unsigned pseudoId : 3;
+  mutable unsigned _pseudoType : 5;  // PseudoType
 
  private:
   void extractPseudoType() const;

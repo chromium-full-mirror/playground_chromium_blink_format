@@ -1156,7 +1156,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, ElementImpl* e) {
     return false;
 
   // check the subselectors
-  CSSSelector::Relation relation = sel->relation;
+  CSSSelector::Relation relation = sel->relation();
   while ((sel = sel->tagHistory)) {
     if (!n->isElementNode())
       return false;
@@ -1223,7 +1223,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, ElementImpl* e) {
         break;
       }
     }
-    relation = sel->relation;
+    relation = sel->relation();
   }
 
   if (subject && havePseudo && dynamicPseudo != pseudoStyle)
@@ -1466,7 +1466,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         // href and *:hover should not match anything.  This is important for
         // sites like wsj.com.
         if (strictParsing || isSubSelector ||
-            sel->relation == CSSSelector::SubSelector ||
+            sel->relation() == CSSSelector::SubSelector ||
             (sel->hasTag() && !e->hasTagName(aTag)) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByHoverRules(true);
@@ -1501,7 +1501,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         // no
         // href and *:active should not match anything.
         if (strictParsing || isSubSelector ||
-            sel->relation == CSSSelector::SubSelector ||
+            sel->relation() == CSSSelector::SubSelector ||
             (sel->hasTag() && !e->hasTagName(aTag)) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByActiveRules(true);
