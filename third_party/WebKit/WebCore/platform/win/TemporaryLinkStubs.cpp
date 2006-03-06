@@ -96,15 +96,9 @@ IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
   notImplemented();
   return IntSize();
 }
-void QComboBox::clear() {
-  notImplemented();
-}
 int GraphicsContext::misspellingLineThickness() const {
   notImplemented();
   return 0;
-}
-void QComboBox::setFrameGeometry(IntRect const&) {
-  notImplemented();
 }
 bool Widget::isEnabled() const {
   notImplemented();
@@ -142,9 +136,6 @@ Widget::FocusPolicy Widget::focusPolicy() const {
   return NoFocus;
 }
 void QTextEdit::selectAll() {
-  notImplemented();
-}
-void GraphicsContext::endTransparencyLayer() {
   notImplemented();
 }
 void QTextEdit::setDisabled(bool) {
@@ -220,9 +211,6 @@ KWQFileButton::KWQFileButton(Frame*) {
 void QTextEdit::setSelectionStart(int) {
   notImplemented();
 }
-void GraphicsContext::beginTransparencyLayer(float) {
-  notImplemented();
-}
 void QListBox::setSelected(int, bool) {
   notImplemented();
 }
@@ -259,12 +247,6 @@ QString QLineEdit::selectedText() const {
 void Widget::unlockDrawingFocus() {
   notImplemented();
 }
-void QLineEdit::setLiveSearch(bool) {
-  notImplemented();
-}
-QComboBox::QComboBox() {
-  notImplemented();
-}
 void QSlider::setMaxValue(double) {
   notImplemented();
 }
@@ -290,13 +272,6 @@ void QScrollBar::setSteps(int, int) {
 void QLineEdit::setAutoSaveName(String const&) {
   notImplemented();
 }
-int QComboBox::baselinePosition(int) const {
-  notImplemented();
-  return 0;
-}
-void QComboBox::appendItem(QString const&, KWQListBoxItemType, bool) {
-  notImplemented();
-}
 void Widget::setDrawingAlpha(float) {
   notImplemented();
 }
@@ -306,16 +281,6 @@ QSlider::QSlider() {
 int ScrollView::scrollYOffset() const {
   notImplemented();
   return 0;
-}
-void QComboBox::setCurrentItem(int) {
-  notImplemented();
-}
-void QComboBox::setWritingDirection(TextDirection) {
-  notImplemented();
-}
-IntSize QComboBox::sizeHint() const {
-  notImplemented();
-  return IntSize();
 }
 void QLineEdit::setSelection(int, int) {
   notImplemented();
@@ -361,10 +326,6 @@ void QListBox::setSelectionMode(QListBox::SelectionMode) {
 }
 void KWQFileButton::setFilename(QString const&) {
   notImplemented();
-}
-IntRect QComboBox::frameGeometry() const {
-  notImplemented();
-  return IntRect();
 }
 void QListBox::setWritingDirection(TextDirection) {
   notImplemented();
@@ -745,9 +706,6 @@ static WebCore::Font localFont;
 void QListBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
-void QComboBox::setFont(WebCore::Font const&) {
-  notImplemented();
-}
 void QTextEdit::setFont(WebCore::Font const&) {
   notImplemented();
 }
@@ -988,6 +946,8 @@ void GraphicsContext::drawText(int,
 void GraphicsContext::drawLineForText(int, int, int, int) {}
 void GraphicsContext::setShadow(int, int, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
+void GraphicsContext::beginTransparencyLayer(float) {}
+void GraphicsContext::endTransparencyLayer() {}
 
 bool RenderThemeWin::paintCheckbox(RenderObject*,
                                    const RenderObject::PaintInfo&,
@@ -1036,3 +996,22 @@ IntSize QLineEdit::sizeForCharacterWidth(int) const {
 int QLineEdit::baselinePosition(int) const {
   return 0;
 }
+
+QComboBox::QComboBox() {}
+void QComboBox::setFont(WebCore::Font const&) {}
+int QComboBox::baselinePosition(int) const {
+  return 0;
+}
+void QComboBox::setWritingDirection(TextDirection) {}
+void QComboBox::clear() {}
+void QComboBox::appendItem(QString const&, KWQListBoxItemType, bool) {}
+void QComboBox::setCurrentItem(int) {}
+IntSize QComboBox::sizeHint() const {
+  return IntSize();
+}
+IntRect QComboBox::frameGeometry() const {
+  return IntRect();
+}
+void QComboBox::setFrameGeometry(IntRect const&) {}
+
+void QLineEdit::setLiveSearch(bool) {}
