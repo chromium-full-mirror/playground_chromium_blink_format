@@ -49,8 +49,8 @@
 #endif
 
 template <typename T, typename U>
-bool compareEqual(const T& t, const U& u) {
-  return a == static_cast<const T>(u);
+inline bool compareEqual(const T& t, const U& u) {
+  return t == static_cast<T>(u);
 }
 
 #define SET_VAR(group, variable, value)      \
