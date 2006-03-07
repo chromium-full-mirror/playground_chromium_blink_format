@@ -166,12 +166,7 @@ class GraphicsContext : Noncopyable {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
 
-  void drawText(int x,
-                int y,
-                int tabWidth,
-                int xpos,
-                int alignmentFlags,
-                const QString&);
+  void drawText(int x, int y, int alignmentFlags, const QString&);
   void drawHighlightForText(int x,
                             int y,
                             int h,
