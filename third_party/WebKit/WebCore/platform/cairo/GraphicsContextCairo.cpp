@@ -525,8 +525,6 @@ void GraphicsContext::drawText(int x,
                                int y,
                                int tabWidth,
                                int xpos,
-                               int,
-                               int,
                                int alignmentFlags,
                                const QString& qstring) {
   if (m_data->state.paintingDisabled)
