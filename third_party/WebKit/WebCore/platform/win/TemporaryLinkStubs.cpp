@@ -22,10 +22,11 @@
 #include "KWQScrollBar.h"
 #include "Path.h"
 #include "MouseEvent.h"
-#include "KWQKCookieJar.h"
+#include "CookieJar.h"
 #include "Screen.h"
 #include "History.h"
-#include "KWQKLocale.h"
+#include "Language.h"
+#include "LocalizedStrings.h"
 #include "PlugInInfoStore.h"
 #include "render_theme.h"
 #include "FrameWin.h"
@@ -33,6 +34,7 @@
 #include "TransferJob.h"
 #include "RenderThemeWin.h"
 #include "FontRenderer.h"
+#include "TextBoundaries.h"
 
 using namespace WebCore;
 
@@ -438,19 +440,19 @@ const Cursor& WebCore::moveCursor() {
 MouseEvent::MouseEvent() {
   notImplemented();
 }
-QString searchableIndexIntroduction() {
+String WebCore::searchableIndexIntroduction() {
   notImplemented();
-  return QString();
+  return String();
 }
 
-void KWQKCookieJar::setCookie(KURL const&, KURL const&, QString const&) {
+void WebCore::setCookies(KURL const&, KURL const&, String const&) {
   notImplemented();
 }
-QString KWQKCookieJar::cookie(KURL const&) {
+String WebCore::cookies(KURL const&) {
   notImplemented();
-  return QString();
+  return String();
 }
-bool KWQKCookieJar::cookieEnabled() {
+bool WebCore::cookiesEnabled() {
   notImplemented();
   return false;
 }
@@ -468,18 +470,18 @@ IntRect WebCore::usableScreenRect(Widget*) {
   return IntRect(0, 0, 800, 600);
 }
 
-int KWQFindNextSentenceFromIndex(QChar const*, int, int, bool) {
+int WebCore::findNextSentenceFromIndex(QChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
-void KWQFindSentenceBoundary(QChar const*, int, int, int*, int*) {
+void WebCore::findSentenceBoundary(QChar const*, int, int, int*, int*) {
   notImplemented();
 }
-int KWQFindNextWordFromIndex(QChar const*, int, int, bool) {
+int WebCore::findNextWordFromIndex(QChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
-void KWQFindWordBoundary(QChar const*, int, int, int*, int*) {
+void WebCore::findWordBoundary(QChar const*, int, int, int*, int*) {
   notImplemented();
 }
 
@@ -746,16 +748,16 @@ void Font::drawHighlightForText(WebCore::GraphicsContext*,
 bool WebCore::historyContains(QString const&) {
   return false;
 }
-QString submitButtonDefaultLabel() {
+String WebCore::submitButtonDefaultLabel() {
   return "Submit";
 }
-QString inputElementAltText() {
+String WebCore::inputElementAltText() {
   return QString();
 }
-QString resetButtonDefaultLabel() {
+String WebCore::resetButtonDefaultLabel() {
   return "Reset";
 }
-QString KLocale::language() {
+String WebCore::defaultLanguage() {
   return "en";
 }
 
