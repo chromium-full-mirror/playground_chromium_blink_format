@@ -221,13 +221,6 @@ void Widget::unlockDrawingFocus() {
 void Widget::setDrawingAlpha(float) {
   notImplemented();
 }
-WidgetClient* Widget::client() const {
-  notImplemented();
-  return 0;
-}
-void Widget::setClient(WidgetClient*) {
-  notImplemented();
-}
 
 KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
                                      Frame*,
