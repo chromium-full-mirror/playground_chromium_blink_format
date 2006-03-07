@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,28 +23,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _KWQTextUtilities_h_
-#define _KWQTextUtilities_h_
+#ifndef Language_h
+#define Language_h
 
-class QChar;
+namespace WebCore {
 
-void KWQFindWordBoundary(const QChar* chars,
-                         int len,
-                         int position,
-                         int* start,
-                         int* end);
-int KWQFindNextWordFromIndex(const QChar* chars,
-                             int len,
-                             int position,
-                             bool forward);
-void KWQFindSentenceBoundary(const QChar* chars,
-                             int len,
-                             int position,
-                             int* start,
-                             int* end);
-int KWQFindNextSentenceFromIndex(const QChar* chars,
-                                 int len,
-                                 int position,
-                                 bool forward);
+class String;
+
+String defaultLanguage();
+}
 
 #endif

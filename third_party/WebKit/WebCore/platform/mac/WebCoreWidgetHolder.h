@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +29,7 @@ namespace WebCore {
 class Widget;
 }
 
-// all AK View subclasses in KWQ should implement this protocol
-@protocol KWQWidgetHolder
+// NSView subclasses in WebCore should implement this protocol
+@protocol WebCoreWidgetHolder
 - (WebCore::Widget*)widget;
 @end

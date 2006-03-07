@@ -41,7 +41,6 @@
 #include "htmltokenizer.h"
 #include "render_arena.h"
 #include "render_canvas.h"
-#include <klocale.h>
 #include <qtextstream.h>
 
 namespace WebCore {
@@ -618,11 +617,14 @@ RenderPart::RenderPart(HTMLElementImpl* node) : RenderWidget(node), m_frame(0) {
 }
 
 RenderPart::~RenderPart() {
-  // Must call this here because by the time we get to ~RenderWidget,
-  // the RenderPart will be destroyed and it won't call our version
-  // of deleteWidget.
-  deleteWidget();
+  // Since deref ends up calling setWidget back on us, need to make sure
+  // that widget is already 0 so it won't do any work.
+  Widget* widget = m_widget;
   m_widget = 0;
+  if (widget && widget->isFrameView())
+    static_cast<FrameView*>(widget)->deref();
+  else
+    delete widget;
 
   setFrame(0);
 }

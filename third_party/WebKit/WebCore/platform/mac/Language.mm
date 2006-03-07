@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,15 +20,24 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-class QString;
-class KURL;
+#import "config.h"
+#import "Language.h"
 
-class KWQKCookieJar {
- public:
-  static QString cookie(const KURL&);
-  static void setCookie(const KURL&, const KURL& policyBaseURL, const QString&);
-  static bool cookieEnabled();
-};
+#import "KWQExceptions.h"
+#import "PlatformString.h"
+#import "WebCoreViewFactory.h"
+
+namespace WebCore {
+
+String defaultLanguage()
+{
+    KWQ_BLOCK_EXCEPTIONS;
+    return [[WebCoreViewFactory sharedFactory] defaultLanguageCode];
+    KWQ_UNBLOCK_EXCEPTIONS;
+    return String();
+}
+
+}

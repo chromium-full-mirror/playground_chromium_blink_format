@@ -30,9 +30,9 @@
 #include "InlineTextBox.h"
 #include "QString.h"
 #include "RenderBlock.h"
+#include "TextBoundaries.h"
 #include "VisiblePosition.h"
 #include "dom_elementimpl.h"
-#include "helper.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
 #include "visible_text.h"
@@ -257,7 +257,7 @@ VisiblePosition endOfWord(const VisiblePosition& c, EWordSide side) {
 
 static unsigned previousWordPositionBoundary(const QChar* characters,
                                              unsigned length) {
-  return nextWordFromIndex(characters, length, length, false);
+  return findNextWordFromIndex(characters, length, length, false);
 }
 
 VisiblePosition previousWordPosition(const VisiblePosition& c) {
@@ -266,7 +266,7 @@ VisiblePosition previousWordPosition(const VisiblePosition& c) {
 
 static unsigned nextWordPositionBoundary(const QChar* characters,
                                          unsigned length) {
-  return nextWordFromIndex(characters, length, 0, true);
+  return findNextWordFromIndex(characters, length, 0, true);
 }
 
 VisiblePosition nextWordPosition(const VisiblePosition& c) {
@@ -530,7 +530,7 @@ VisiblePosition endOfSentence(const VisiblePosition& c) {
 
 static unsigned previousSentencePositionBoundary(const QChar* characters,
                                                  unsigned length) {
-  return nextSentenceFromIndex(characters, length, length, false);
+  return findNextSentenceFromIndex(characters, length, length, false);
 }
 
 VisiblePosition previousSentencePosition(const VisiblePosition& c, int x) {
@@ -539,7 +539,7 @@ VisiblePosition previousSentencePosition(const VisiblePosition& c, int x) {
 
 static unsigned nextSentencePositionBoundary(const QChar* characters,
                                              unsigned length) {
-  return nextSentenceFromIndex(characters, length, 0, true);
+  return findNextSentenceFromIndex(characters, length, 0, true);
 }
 
 VisiblePosition nextSentencePosition(const VisiblePosition& c, int x) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,41 +20,48 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include "config.h"
-#import "KWQKCookieJar.h"
+#import "config.h"
+#import "LocalizedStrings.h"
 
 #import "KWQExceptions.h"
-#import "KWQKURL.h"
-#import "WebCoreCookieAdapter.h"
-#import <Foundation/NSString.h>
+#import "PlatformString.h"
+#import "WebCoreViewFactory.h"
 
-QString KWQKCookieJar::cookie(const KURL &url)
+namespace WebCore {
+
+String inputElementAltText()
 {
     KWQ_BLOCK_EXCEPTIONS;
-    return QString::fromNSString([[WebCoreCookieAdapter sharedAdapter] cookiesForURL:url.url().getNSString()]);
+    return [[WebCoreViewFactory sharedFactory] inputElementAltText];
     KWQ_UNBLOCK_EXCEPTIONS;
-
-    return QString();
+    return String();
 }
 
-void KWQKCookieJar::setCookie(const KURL &url, const KURL &policyBaseURL, const QString &cookie)
+String resetButtonDefaultLabel()
 {
     KWQ_BLOCK_EXCEPTIONS;
-
-    [[WebCoreCookieAdapter sharedAdapter] setCookies:cookie.getNSString()
-     forURL:url.url().getNSString() policyBaseURL:policyBaseURL.url().getNSString()];
-
+    return [[WebCoreViewFactory sharedFactory] resetButtonDefaultLabel];
     KWQ_UNBLOCK_EXCEPTIONS;
+    return String();
 }
 
-bool KWQKCookieJar::cookieEnabled()
+String searchableIndexIntroduction()
 {
     KWQ_BLOCK_EXCEPTIONS;
-    return [[WebCoreCookieAdapter sharedAdapter] cookiesEnabled];
+    return [[WebCoreViewFactory sharedFactory] searchableIndexIntroduction];
     KWQ_UNBLOCK_EXCEPTIONS;
+    return String();
+}
 
-    return false;
+String submitButtonDefaultLabel()
+{
+    KWQ_BLOCK_EXCEPTIONS;
+    return [[WebCoreViewFactory sharedFactory] submitButtonDefaultLabel];
+    KWQ_UNBLOCK_EXCEPTIONS;
+    return String();
+}
+
 }

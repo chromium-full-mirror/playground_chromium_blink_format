@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,28 +23,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QCOLLECTION_H
-#define QCOLLECTION_H
+#ifndef CookieJar_h
+#define CookieJar_h
 
-#include "KWQDef.h"
+class KURL;
 
-class QPtrCollection {
- public:
-  typedef void* Item;
+namespace WebCore {
 
-  bool autoDelete() { return del_item; }
-  void setAutoDelete(bool autoDelete) { del_item = autoDelete; }
+class String;
 
-  QPtrCollection(const QPtrCollection&) : del_item(false) {}
-  QPtrCollection& operator=(const QPtrCollection&) { return *this; }
-
- protected:
-  QPtrCollection() : del_item(false) {}
-  virtual ~QPtrCollection() {}
-
-  bool del_item;
-};
-
-#define Q3PtrCollection QPtrCollection
+String cookies(const KURL&);
+void setCookies(const KURL&, const KURL& policyBaseURL, const String&);
+bool cookiesEnabled();
+}
 
 #endif

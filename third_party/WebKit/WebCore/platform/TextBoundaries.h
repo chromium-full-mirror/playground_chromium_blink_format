@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,19 +23,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KLOCALE_H_
-#define KLOCALE_H_
+#ifndef TextBoundaries_h
+#define TextBoundaries_h
 
-#include "QStringList.h"
+// FIXME: Change clients to use ICU and remove these functions.
 
-QString inputElementAltText();
-QString resetButtonDefaultLabel();
-QString searchableIndexIntroduction();
-QString submitButtonDefaultLabel();
+class QChar;
 
-class KLocale {
- public:
-  static QString language();
-};
+namespace WebCore {
+
+void findWordBoundary(const QChar*,
+                      int len,
+                      int position,
+                      int* start,
+                      int* end);
+int findNextWordFromIndex(const QChar*, int len, int position, bool forward);
+
+void findSentenceBoundary(const QChar*,
+                          int len,
+                          int position,
+                          int* start,
+                          int* end);
+int findNextSentenceFromIndex(const QChar*,
+                              int len,
+                              int position,
+                              bool forward);
+}
 
 #endif
