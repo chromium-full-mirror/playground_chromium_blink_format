@@ -148,6 +148,14 @@ const Brush& GraphicsContext::brush() const {
   return m_data->state.brush;
 }
 
+const Font& GraphicsContext::font() const {
+  return m_data->state.font;
+}
+
+void GraphicsContext::setFont(const Font& aFont) {
+  m_data->state.font = aFont;
+}
+
 void GraphicsContext::save() {
   if (m_data->state.paintingDisabled)
     return;
@@ -511,5 +519,46 @@ void GraphicsContext::setPaintingDisabled(bool f) {
 
 bool GraphicsContext::paintingDisabled() const {
   return m_data->state.paintingDisabled;
+}
+
+void GraphicsContext::drawText(int x,
+                               int y,
+                               int tabWidth,
+                               int xpos,
+                               int,
+                               int,
+                               int alignmentFlags,
+                               const QString& qstring) {
+  if (m_data->state.paintingDisabled)
+    return;
+
+  cairo_surface_t* surface = cairo_get_target(m_data->context);
+  HDC dc = cairo_win32_surface_get_dc(surface);
+
+  TextOut(dc, x, y, (LPCWSTR)qstring.unicode(), qstring.length());
+}
+
+void GraphicsContext::drawText(int x,
+                               int y,
+                               int tabWidth,
+                               int xpos,
+                               const QChar* str,
+                               int len,
+                               int from,
+                               int to,
+                               int toAdd,
+                               const Color& backgroundColor,
+                               TextDirection d,
+                               bool visuallyOrdered,
+                               int letterSpacing,
+                               int wordSpacing,
+                               bool smallCaps) {
+  if (m_data->state.paintingDisabled || len <= 0)
+    return;
+
+  cairo_surface_t* surface = cairo_get_target(m_data->context);
+  HDC dc = cairo_win32_surface_get_dc(surface);
+
+  TextOut(dc, x, y, (LPCWSTR)(str + from), to - from);
 }
 }
