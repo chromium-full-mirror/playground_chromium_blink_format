@@ -1295,8 +1295,20 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           if (beginTag) {
             searchStopper = titleEnd;
             searchStopperLen = 7;
+            State savedState = state;
+            SegmentedString savedSrc = src;
+            long savedLineno = lineno;
             state.setInTitle(true);
             state = parseSpecial(src, state);
+            if (state.inTitle() && src.isEmpty()) {
+              // We just ate the rest of the document as the title #text node!
+              // Reset the state then retokenize without special title handling.
+              // Let the html parser clean up the missing </title> tag.
+              state = savedState;
+              src = savedSrc;
+              lineno = savedLineno;
+              scriptCodeSize = 0;
+            }
           }
         } else if (tagName == xmpTag) {
           if (beginTag) {

@@ -468,6 +468,9 @@ bool HTMLParser::handleError(NodeImpl* n,
           handled = true;
         }
       }
+    } else if (h->hasLocalName(titleTag)) {
+      popBlock(currentTagName);
+      handled = true;
     } else if (h->hasLocalName(captionTag)) {
       // Illegal content in a caption. Close the caption and try again.
       popBlock(currentTagName);
