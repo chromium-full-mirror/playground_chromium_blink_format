@@ -196,7 +196,7 @@ const String& nonBreakingSpaceString() {
   return nonBreakingSpaceString;
 }
 
-// FIXME: Why use this instead of maxDeepOffset???
+// FIXME: Why use this instead of maxDeepOffset?
 static int maxRangeOffset(NodeImpl* n) {
   if (n->offsetInCharacters())
     return n->maxOffset();

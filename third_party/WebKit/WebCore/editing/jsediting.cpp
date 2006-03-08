@@ -32,6 +32,8 @@
 #include "css_valueimpl.h"
 #include "cssproperties.h"
 #include "htmlediting.h"
+#include "htmlnames.h"
+#include "html_imageimpl.h"
 #include "markup.h"
 #include "ReplaceSelectionCommand.h"
 #include "TypingCommand.h"
@@ -40,6 +42,8 @@
 namespace WebCore {
 
 class DocumentImpl;
+
+using namespace HTMLNames;
 
 namespace {
 
@@ -237,6 +241,28 @@ bool execInsertHTML(Frame* frame, bool userInterface, const String& value) {
   EditCommandPtr cmd(new ReplaceSelectionCommand(
       frame->document(), fragment.get(), selectReplacement));
   cmd.apply();
+  return true;
+}
+
+bool execInsertImage(Frame* frame, bool userInterface, const String& value) {
+  // FIXME: If userInterface is true, we should display a dialog box and let the
+  // user choose a local image.
+  if (userInterface)
+    LOG_ERROR("A dialog box for image insertion is not yet implemented.\n");
+
+  RefPtr<HTMLImageElementImpl> image =
+      new HTMLImageElementImpl(imgTag, frame->document());
+  image->setSrc(value);
+  RefPtr<DocumentFragmentImpl> fragment =
+      new DocumentFragmentImpl(frame->document());
+  ExceptionCode ec = 0;
+  fragment->appendChild(image, ec);
+  if (ec)
+    return false;
+
+  EditCommandPtr(
+      new ReplaceSelectionCommand(frame->document(), fragment.get(), false))
+      .apply();
   return true;
 }
 
@@ -510,6 +536,8 @@ CommandMap* createCommandDictionary() {
       {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
       {"InsertHTML",
        {execInsertHTML, enabledAnySelection, stateNone, valueNull}},
+      {"InsertImage",
+       {execInsertImage, enabledAnySelection, stateNone, valueNull}},
       {"InsertLineBreak",
        {execInsertLineBreak, enabledAnySelection, stateNone, valueNull}},
       {"InsertParagraph",
@@ -574,7 +602,6 @@ CommandMap* createCommandDictionary() {
       // InsertFieldSet (not supported)
       // InsertHorizontalRule (not supported)
       // InsertIFrame (not supported)
-      // InsertImage (not supported)
       // InsertInputButton (not supported)
       // InsertInputCheckbox (not supported)
       // InsertInputFileUpload (not supported)

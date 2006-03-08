@@ -133,6 +133,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void updateNodesInserted(NodeImpl*);
   void fixupNodeStyles(const QValueList<NodeDesiredStyle>&);
   void removeLinePlaceholderIfNeeded(NodeImpl*);
+  void removeNodeAndPruneAncestors(NodeImpl*);
 
   ReplacementFragment m_fragment;
   RefPtr<NodeImpl> m_firstNodeInserted;
