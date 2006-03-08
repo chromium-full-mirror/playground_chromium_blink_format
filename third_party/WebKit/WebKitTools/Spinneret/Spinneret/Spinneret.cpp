@@ -203,7 +203,7 @@ LRESULT CALLBACK MyEditProc(HWND hDlg,
           cstrPtr[x] = strPtr[x];
         cstrPtr[x] = 0;
 
-        gWebView->mainFrame()->loadFilePath(cstrPtr);
+        gWebView->mainFrame()->loadURL(cstrPtr);
 
         return 0;
       } else
