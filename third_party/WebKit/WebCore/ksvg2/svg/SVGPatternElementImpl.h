@@ -74,7 +74,9 @@ class SVGPatternElementImpl : public SVGStyledLocatableElementImpl,
   virtual void resourceNotification() const;
   virtual void notifyAttributeChange() const;
 
-  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual bool rendererIsNeeded(RenderStyle* style) {
+    return StyledElementImpl::rendererIsNeeded(style);
+  }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
   virtual KRenderingPaintServerPattern* canvasResource();
 

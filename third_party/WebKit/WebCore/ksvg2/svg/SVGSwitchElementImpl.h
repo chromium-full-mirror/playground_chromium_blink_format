@@ -40,7 +40,9 @@ class SVGSwitchElementImpl : public SVGStyledTransformableElementImpl,
 
   virtual bool isValid() const { return SVGTestsImpl::isValid(); }
 
-  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual bool rendererIsNeeded(RenderStyle* style) {
+    return StyledElementImpl::rendererIsNeeded(style);
+  }
   virtual bool childShouldCreateRenderer(NodeImpl*) const;
 
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);

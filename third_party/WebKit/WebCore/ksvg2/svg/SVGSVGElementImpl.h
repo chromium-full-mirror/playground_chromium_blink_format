@@ -118,7 +118,9 @@ class SVGSVGElementImpl : public SVGStyledLocatableElementImpl,
   virtual SVGMatrixImpl* getCTM() const;
   virtual SVGMatrixImpl* getScreenCTM() const;
 
-  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual bool rendererIsNeeded(RenderStyle* style) {
+    return StyledElementImpl::rendererIsNeeded(style);
+  }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
   // 'virtual SVGZoomAndPan functions
