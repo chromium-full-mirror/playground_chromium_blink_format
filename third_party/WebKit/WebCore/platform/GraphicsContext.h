@@ -173,31 +173,28 @@ class GraphicsContext : Noncopyable {
                             int tabWidth,
                             int xpos,
                             const QChar*,
-                            int length,
+                            int slen,
+                            int pos,
+                            int len,
+                            int toAdd,
+                            TextDirection d,
+                            bool visuallyOrdered,
                             int from,
                             int to,
-                            int toAdd,
-                            const Color& backgroundColor,
-                            TextDirection,
-                            bool visuallyOrdered,
-                            int letterSpacing,
-                            int wordSpacing,
-                            bool smallCaps);
+                            const Color& backgroundColor);
   void drawText(int x,
                 int y,
                 int tabWidth,
                 int xpos,
                 const QChar*,
-                int length,
-                int from,
-                int to,
+                int slen,
+                int pos,
+                int len,
                 int toAdd,
-                const Color& backgroundColor,
-                TextDirection,
-                bool visuallyOrdered,
-                int letterSpacing,
-                int wordSpacing,
-                bool smallCaps);
+                TextDirection d = LTR,
+                bool visuallyOrdered = false,
+                int from = -1,
+                int to = -1);
   void drawLineForText(int x, int y, int yOffset, int width);
   void drawLineForMisspelling(int x, int y, int width);
   int misspellingLineThickness() const;
@@ -234,6 +231,13 @@ class GraphicsContext : Noncopyable {
   static void setCompositeOperation(CGContextRef, int operation);
 #endif
 
+#if __APPLE__
+  CGContextRef platformContext() const { return currentCGContext(); }
+#endif
+#if WIN32
+  cairo_t* platformContext() const;
+#endif
+
 #if SVG_SUPPORT
   KRenderingDeviceContext* createRenderingDeviceContext();
   static KRenderingDevice* renderingDevice();
@@ -244,8 +248,6 @@ class GraphicsContext : Noncopyable {
  private:
   void setColorFromBrush();
   void setColorFromPen();
-
-  void updateTextRenderer();
 
   GraphicsContextPrivate* m_data;
   bool m_isForPrinting;

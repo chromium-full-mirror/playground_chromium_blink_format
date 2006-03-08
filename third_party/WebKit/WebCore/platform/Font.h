@@ -74,21 +74,43 @@ class Font {
 
   void update() const;
 
-  void drawText(GraphicsContext*,
+  void drawText(const GraphicsContext*,
                 int x,
                 int y,
                 int tabWidth,
                 int xpos,
                 const QChar*,
-                int slen,
-                int pos,
                 int len,
-                int width,
+                int from,
+                int to,
+                int toAdd,
                 TextDirection,
-                bool visuallyOrdered = false,
-                int from = -1,
-                int to = -1,
-                Color bg = Color()) const;
+                bool visuallyOrdered) const;
+  void drawHighlightForText(const GraphicsContext*,
+                            int x,
+                            int y,
+                            int h,
+                            int tabWidth,
+                            int xpos,
+                            const QChar*,
+                            int len,
+                            int from,
+                            int to,
+                            int toAdd,
+                            TextDirection d,
+                            bool visuallyOrdered,
+                            const Color& backgroundColor) const;
+  void drawLineForText(const GraphicsContext*,
+                       int x,
+                       int y,
+                       int yOffset,
+                       int width) const;
+  void drawLineForMisspelling(const GraphicsContext*,
+                              int x,
+                              int y,
+                              int width) const;
+  int misspellingLineThickness(const GraphicsContext*) const;
+
   float floatWidth(const QChar*,
                    int slen,
                    int pos,
@@ -121,22 +143,6 @@ class Font {
                                bool visuallyOrdered = false,
                                int from = -1,
                                int to = -1) const;
-  void drawHighlightForText(GraphicsContext*,
-                            int x,
-                            int y,
-                            int h,
-                            int tabWidth,
-                            int xpos,
-                            const QChar*,
-                            int slen,
-                            int pos,
-                            int len,
-                            int width,
-                            TextDirection,
-                            bool visuallyOrdered = false,
-                            int from = -1,
-                            int to = -1,
-                            Color bg = Color()) const;
 
   int width(const QChar*, int slen, int pos, int len, int tabWidth, int xpos)
       const;
