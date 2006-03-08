@@ -285,37 +285,12 @@ void GraphicsContext::addFocusRingRect(int, int, int, int) {
 void GraphicsContext::clearFocusRing() {
   notImplemented();
 }
-void GraphicsContext::drawLineForMisspelling(int, int, int) {
-  notImplemented();
-}
 void GraphicsContext::drawFocusRing(Color const&) {
   notImplemented();
 }
 Color GraphicsContext::selectedTextBackgroundColor() const {
   notImplemented();
   return Color();
-}
-void GraphicsContext::drawHighlightForText(int,
-                                           int,
-                                           int,
-                                           int,
-                                           int,
-                                           QChar const*,
-                                           int,
-                                           int,
-                                           int,
-                                           int,
-                                           Color const&,
-                                           TextDirection,
-                                           bool,
-                                           int,
-                                           int,
-                                           bool) {
-  notImplemented();
-}
-int GraphicsContext::misspellingLineThickness() const {
-  notImplemented();
-  return 0;
 }
 void GraphicsContext::addRoundedRectClip(IntRect const&,
                                          IntSize const&,
@@ -724,24 +699,6 @@ IntRect Font::selectionRectForText(int,
   notImplemented();
   return IntRect();
 }
-void Font::drawHighlightForText(WebCore::GraphicsContext*,
-                                int,
-                                int,
-                                int,
-                                int,
-                                int,
-                                const QChar*,
-                                int,
-                                int,
-                                int,
-                                int,
-                                WebCore::TextDirection,
-                                bool,
-                                int,
-                                int,
-                                WebCore::Color) const {
-  notImplemented();
-}
 
 // Completely empty stubs (mostly to allow DRT to run):
 bool WebCore::historyContains(QString const&) {
@@ -891,7 +848,6 @@ int Font::checkSelectionPoint(const QChar*,
 FontRenderer::FontRenderer() {}
 void FontRenderer::update(FontDescription const&) {}
 
-void GraphicsContext::drawLineForText(int, int, int, int) {}
 void GraphicsContext::setShadow(int, int, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
