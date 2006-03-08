@@ -29,9 +29,6 @@
 
 #include "KURL.h"
 #include "formdata.h"
-#if WIN32
-#include "windows.h"
-#endif
 
 // The allocations and releases in TransferJobInternal are
 // definitely Cocoa-exception-free (either simple Foundation
@@ -111,6 +108,7 @@ class TransferJobInternal {
 #if WIN32
   HANDLE m_fileHandle;
   Timer<TransferJob> m_fileLoadTimer;
+  HINTERNET m_resourceHandle;
 #endif
 };
 
