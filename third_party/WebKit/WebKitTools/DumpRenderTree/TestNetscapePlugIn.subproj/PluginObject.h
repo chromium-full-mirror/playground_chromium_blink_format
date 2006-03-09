@@ -54,17 +54,14 @@
  OR
  OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#import <WebKit/npapi.h>
+
 #import <WebKit/npfunctions.h>
-#import <WebKit/npruntime.h>
 
 extern NPNetscapeFuncs* browser;
 
 typedef struct {
-  NPClass* _class;
-  uint32_t referenceCount;
+  NPObject header;
   NPP npp;
-  NPWindow* window;
 } PluginObject;
 
 extern NPClass* getPluginClass(void);
