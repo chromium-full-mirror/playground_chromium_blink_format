@@ -36,10 +36,10 @@
 
 namespace WebCore {
 
-static bool canIncreaseListLevel(Selection selection,
+static bool canIncreaseListLevel(const Selection& selection,
                                  NodeImpl** start,
                                  NodeImpl** end);
-static bool canDecreaseListLevel(Selection selection,
+static bool canDecreaseListLevel(const Selection& selection,
                                  NodeImpl** start,
                                  NodeImpl** end);
 static void modifySelectionListLevel(DocumentImpl* document,
@@ -104,7 +104,7 @@ static void modifySelectionListLevel(DocumentImpl* document,
   cmd.apply();
 }
 
-static bool getStartEndListChildren(Selection selection,
+static bool getStartEndListChildren(const Selection& selection,
                                     NodeImpl** start,
                                     NodeImpl** end) {
   if (selection.isNone())
@@ -155,7 +155,7 @@ static bool getStartEndListChildren(Selection selection,
   return true;
 }
 
-static bool canIncreaseListLevel(Selection selection,
+static bool canIncreaseListLevel(const Selection& selection,
                                  NodeImpl** start,
                                  NodeImpl** end) {
   if (!getStartEndListChildren(selection, start, end))
@@ -169,7 +169,7 @@ static bool canIncreaseListLevel(Selection selection,
   return true;
 }
 
-static bool canDecreaseListLevel(Selection selection,
+static bool canDecreaseListLevel(const Selection& selection,
                                  NodeImpl** start,
                                  NodeImpl** end) {
   if (!getStartEndListChildren(selection, start, end))
@@ -232,7 +232,8 @@ void ModifySelectionListLevelCommand::appendSiblingNodeRange(
   }
 }
 
-void ModifySelectionListLevelCommand::increaseListLevel(Selection selection) {
+void ModifySelectionListLevelCommand::increaseListLevel(
+    const Selection& selection) {
   NodeImpl* startListChild;
   NodeImpl* endListChild;
   if (!canIncreaseListLevel(selection, &startListChild, &endListChild))
@@ -251,7 +252,8 @@ void ModifySelectionListLevelCommand::increaseListLevel(Selection selection) {
   }
 }
 
-void ModifySelectionListLevelCommand::decreaseListLevel(Selection selection) {
+void ModifySelectionListLevelCommand::decreaseListLevel(
+    const Selection& selection) {
   NodeImpl* startListChild;
   NodeImpl* endListChild;
   if (!canDecreaseListLevel(selection, &startListChild, &endListChild))
