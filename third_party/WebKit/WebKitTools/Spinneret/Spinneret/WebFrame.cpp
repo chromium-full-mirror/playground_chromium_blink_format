@@ -115,7 +115,6 @@ void WebFrame::receivedData(WebCore::TransferJob*,
 void WebFrame::receivedAllData(WebCore::TransferJob* job,
                                WebCore::PlatformData) {
   d->frame->end();
-  delete job;
 }
 
 void WebFrame::paint() {

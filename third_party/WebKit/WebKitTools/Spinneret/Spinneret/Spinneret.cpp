@@ -85,12 +85,13 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   if (!InitInstance(hInstance, nCmdShow))
     return FALSE;
 
-  hURLBarWnd =
-      CreateWindow(L"EDIT", 0, WS_CHILD | WS_VISIBLE | ES_LEFT | ES_AUTOVSCROLL,
-                   0, 0, 0, 0, hMainWnd, 0, hInstance, 0);
+  hURLBarWnd = CreateWindow(
+      L"EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT | ES_AUTOVSCROLL,
+      0, 0, 0, 0, hMainWnd, 0, hInstance, 0);
 
   DefEditProc = GetWindowLong(hURLBarWnd, GWL_WNDPROC);
   SetWindowLong(hURLBarWnd, GWL_WNDPROC, (long)MyEditProc);
+  SetFocus(hURLBarWnd);
 
   gWebView = WebView::createWebView(hInstance, hMainWnd);
   resizeSubViews();

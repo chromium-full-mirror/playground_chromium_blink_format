@@ -77,11 +77,13 @@ static ATOM registerWebViewWithInstance(HINSTANCE hInstance) {
 
 // FIXME: This should eventually just use the DLL instance, I think.
 WebView* WebView::createWebView(HINSTANCE hInstance, HWND parent) {
+  // Save away our instace handle for WebCore to use.
+  Widget::instanceHandle = hInstance;
+
   registerWebViewWithInstance(hInstance);
 
-  HWND hWnd =
-      CreateWindow(kWebViewWindowClassName, 0, WS_CHILD | WS_BORDER,
-                   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, parent, 0, hInstance, 0);
+  HWND hWnd = CreateWindow(kWebViewWindowClassName, 0, WS_CHILD, CW_USEDEFAULT,
+                           0, CW_USEDEFAULT, 0, parent, 0, hInstance, 0);
 
   if (!hWnd)
     return 0;
