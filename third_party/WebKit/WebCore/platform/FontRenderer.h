@@ -26,17 +26,27 @@
 // This is a private header
 // and so this should catch anyone trying to include this file in public cpp
 // files.
+
+#if WIN32
+#include <kxmlcore/Vector.h>
+#endif
+
 namespace WebCore {
 
 class Font;
 class GraphicsContext;
 class IntRect;
 
+#if WIN32
+class CairoFont;
+#endif
+
 class FontRenderer : public Shared<FontRenderer>, Noncopyable {
  public:
   FontRenderer();
+  ~FontRenderer();
 
-  void update(const FontDescription&);
+  void invalidate();
 
   bool isFixedPitch(const FontDescription& f) const {
     if (m_pitch == UnknownPitch)
@@ -56,6 +66,11 @@ class FontRenderer : public Shared<FontRenderer>, Noncopyable {
 #endif
   mutable WebCoreFont m_webCoreFont;
   const WebCoreFont& getWebCoreFont(const FontDescription&) const;
+#endif
+
+#if WIN32
+  mutable Vector<CairoFont*> m_fontSet;
+  CairoFont* primaryCairoFont(const FontDescription& desc) const;
 #endif
 
   friend class Font;
