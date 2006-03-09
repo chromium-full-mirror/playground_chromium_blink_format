@@ -627,13 +627,6 @@ void BrowserExtensionWin::createNewWindow(KURL const&,
   notImplemented();
 }
 
-void WebCore::TransferJob::retrieveCharset() const {
-  notImplemented();
-}
-void WebCore::TransferJob::assembleResponseHeaders() const {
-  notImplemented();
-}
-
 IntRect Font::selectionRectForText(int,
                                    int,
                                    int,
@@ -684,6 +677,9 @@ unsigned PlugInInfoStore::pluginCount() const {
   return 0;
 }
 void WebCore::refreshPlugins(bool) {}
+
+void WebCore::TransferJob::assembleResponseHeaders() const {}
+void WebCore::TransferJob::retrieveCharset() const {}
 
 void FrameWin::restoreDocumentState() {}
 void FrameWin::partClearedInBegin() {}
