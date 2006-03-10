@@ -42,7 +42,7 @@
 
 namespace WebCore {
 
-class FontRenderer;
+class FontDataSet;
 class GraphicsContext;
 class IntRect;
 
@@ -177,7 +177,7 @@ class Font {
   const WebCoreFont& getWebCoreFont() const;
 #endif
 
-  // Metrics that we query the FontRenderer for.
+  // Metrics that we query the FontDataSet for.
   int ascent() const;
   int descent() const;
   int height() const { return ascent() + descent(); }
@@ -186,7 +186,7 @@ class Font {
 
  private:
   FontDescription m_fontDescription;
-  mutable RefPtr<FontRenderer> m_renderer;
+  mutable RefPtr<FontDataSet> m_renderer;
   short m_letterSpacing;
   short m_wordSpacing;
 };
