@@ -138,9 +138,11 @@ CairoFont* getCairoFont(const FontDescription& fontDescription,
   }
 
   WCHAR name[LF_FACESIZE];
-  int resultLength = GetTextFaceW(dc, LF_FACESIZE, name);
+  unsigned resultLength = GetTextFaceW(dc, LF_FACESIZE, name);
+  if (resultLength > 0)
+    resultLength--;  // Subtract the null terminator.
   RestoreDC(dc, -1);
-  if (!equalIgnoringCase(fontFace, String((QChar*)name, resultLength - 1))) {
+  if (!equalIgnoringCase(fontFace, String((QChar*)name, resultLength))) {
     DeleteObject(font);
     return 0;
   }

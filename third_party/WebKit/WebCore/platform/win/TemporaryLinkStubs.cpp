@@ -644,20 +644,6 @@ IntRect Font::selectionRectForText(int,
   notImplemented();
   return IntRect();
 }
-int Font::checkSelectionPoint(const QChar*,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              WebCore::TextDirection,
-                              bool,
-                              bool) const {
-  notImplemented();
-  return 0;
-}
 
 // Completely empty stubs (mostly to allow DRT to run):
 bool WebCore::historyContains(QString const&) {
@@ -735,6 +721,20 @@ void FrameWin::saveDocumentState(void) {}
 void FrameWin::clearUndoRedoOperations(void) {}
 QString FrameWin::incomingReferrer() const {
   return QString();
+}
+
+int Font::checkSelectionPoint(const QChar*,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              int,
+                              WebCore::TextDirection,
+                              bool,
+                              bool) const {
+  return 0;
 }
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
