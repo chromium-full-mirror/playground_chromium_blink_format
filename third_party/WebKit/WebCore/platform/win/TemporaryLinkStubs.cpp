@@ -225,21 +225,6 @@ KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
   notImplemented();
 }
 
-int ScrollView::scrollXOffset() const {
-  notImplemented();
-  return 0;
-}
-int ScrollView::scrollYOffset() const {
-  notImplemented();
-  return 0;
-}
-void ScrollView::scrollPointRecursively(int, int) {
-  notImplemented();
-}
-void ScrollView::scrollBy(int, int) {
-  notImplemented();
-}
-
 void QLineEdit::selectAll() {
   notImplemented();
 }
@@ -619,9 +604,6 @@ void BrowserExtensionWin::runModal() {
 void BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
-void BrowserExtensionWin::setIconURL(KURL const&) {
-  notImplemented();
-}
 void BrowserExtensionWin::createNewWindow(KURL const&,
                                           struct WebCore::URLArgs const&) {
   notImplemented();
@@ -739,6 +721,7 @@ int Font::checkSelectionPoint(const QChar*,
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {}
+void BrowserExtensionWin::setIconURL(KURL const&) {}
 
 bool KWQCheckIfReloading(WebCore::DocLoader*) {
   return false;
@@ -748,47 +731,9 @@ void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}
 
-void ScrollView::resizeContents(int w, int h) {
-  resize(w, h);
-}
-WebCore::ScrollBarMode ScrollView::hScrollBarMode() const {
-  return ScrollBarAlwaysOff;
-}
-WebCore::ScrollBarMode ScrollView::vScrollBarMode() const {
-  return ScrollBarAlwaysOff;
-}
-void ScrollView::suppressScrollBars(bool, bool) {}
-void ScrollView::setHScrollBarMode(ScrollBarMode) {}
-void ScrollView::setVScrollBarMode(ScrollBarMode) {}
-void ScrollView::setScrollBarsMode(ScrollBarMode) {}
-int ScrollView::visibleHeight() const {
-  return height();
-}
-int ScrollView::visibleWidth() const {
-  return width();
-}
-void ScrollView::setContentsPos(int x, int y) {
-  move(x, y);
-}
-int ScrollView::contentsX() const {
-  return x();
-}
-int ScrollView::contentsY() const {
-  return y();
-}
-int ScrollView::contentsHeight() const {
-  return height();
-}
-int ScrollView::contentsWidth() const {
-  return width();
-}
-void ScrollView::viewportToContents(int x1, int y1, int& x2, int& y2) {
-  x2 = x1;
-  y2 = y1;
-}
-void ScrollView::setStaticBackground(bool) {}
 void ScrollView::addChild(Widget*, int, int) {}
 void ScrollView::removeChild(Widget*) {}
+void ScrollView::scrollPointRecursively(int x, int y) {}
 bool ScrollView::inWindow() const {
   return true;
 }
