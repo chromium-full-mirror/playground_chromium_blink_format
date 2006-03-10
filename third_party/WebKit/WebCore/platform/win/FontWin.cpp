@@ -33,9 +33,9 @@
 
 namespace WebCore {
 
-class CairoFont {
+class FontData {
  public:
-  CairoFont(HFONT font, const FontDescription& fontDescription) {
+  FontData(HFONT font, const FontDescription& fontDescription) {
     m_font = font;
     m_fontFace = cairo_win32_font_face_create_for_hfont(font);
     cairo_matrix_t sizeMatrix, ctm;
@@ -48,7 +48,7 @@ class CairoFont {
     cairo_font_options_destroy(fontOptions);
   }
 
-  ~CairoFont() {
+  ~FontData() {
     cairo_font_face_destroy(m_fontFace);
     cairo_scaled_font_destroy(m_scaledFont);
     DeleteObject(m_font);
@@ -81,8 +81,8 @@ class CairoFont {
   cairo_scaled_font_t* m_scaledFont;
 };
 
-CairoFont* getCairoFont(const FontDescription& fontDescription,
-                        const AtomicString& fontFace) {
+FontData* getFontData(const FontDescription& fontDescription,
+                      const AtomicString& fontFace) {
   // FIXME: Look this up in a hashtable so that we can cache Cairo fonts.  For
   // now we just grab the
   // font over and over.
@@ -147,8 +147,8 @@ CairoFont* getCairoFont(const FontDescription& fontDescription,
     return 0;
   }
 
-  // This font face is valid.  Create a CairoFont now.
-  CairoFont* result = new CairoFont(font, fontDescription);
+  // This font face is valid.  Create a FontData now.
+  FontData* result = new FontData(font, fontDescription);
   result->setMetrics(ascent, descent, xHeight, lineSpacing);
   return result;
 }
@@ -170,7 +170,7 @@ void FontDataSet::invalidate() {
   deleteAllValues(m_fontSet);
 }
 
-CairoFont* FontDataSet::primaryCairoFont(
+FontData* FontDataSet::primaryFont(
     const FontDescription& fontDescription) const {
   if (!m_fontSet.isEmpty())
     return m_fontSet[0];
@@ -179,8 +179,8 @@ CairoFont* FontDataSet::primaryCairoFont(
   for (const FontFamily* currFamily = &fontDescription.family(); currFamily;
        currFamily = currFamily->next()) {
     if (!currFamily->familyIsEmpty()) {
-      // Attempt to create a CairoFont.
-      CairoFont* font = getCairoFont(fontDescription, currFamily->family());
+      // Attempt to create a FontData.
+      FontData* font = getFontData(fontDescription, currFamily->family());
       if (font) {
         m_fontSet.append(font);
         return font;
@@ -193,8 +193,8 @@ CairoFont* FontDataSet::primaryCairoFont(
   // We'll need a way to either get to the settings without going through a
   // frame, or we'll
   // need this to be passed in as part of the fallback list.
-  CairoFont* defaultFont =
-      getCairoFont(fontDescription, AtomicString("Times New Roman"));
+  FontData* defaultFont =
+      getFontData(fontDescription, AtomicString("Times New Roman"));
   if (defaultFont)
     m_fontSet.append(defaultFont);
   return defaultFont;
@@ -206,7 +206,7 @@ float Font::floatWidth(const QChar* str,
                        int len,
                        int tabWidth,
                        int xpos) const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (!font)
     return 0;
 
@@ -234,35 +234,35 @@ float Font::floatWidth(const QChar* str,
 }
 
 int Font::ascent() const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (font)
     return font->ascent();
   return 0;
 }
 
 int Font::descent() const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (font)
     return font->descent();
   return 0;
 }
 
 float Font::xHeight() const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (font)
     return font->xHeight();
   return 0;
 }
 
 int Font::lineSpacing() const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (font)
     return font->lineSpacing();
   return 0;
 }
 
 bool Font::isFixedPitch() const {
-  return m_renderer->isFixedPitch(fontDescription());
+  return m_dataSet->isFixedPitch(fontDescription());
 }
 
 void Font::drawText(const GraphicsContext* context,
@@ -277,7 +277,7 @@ void Font::drawText(const GraphicsContext* context,
                     int toAdd,
                     TextDirection d,
                     bool visuallyOrdered) const {
-  CairoFont* font = m_renderer->primaryCairoFont(fontDescription());
+  FontData* font = m_dataSet->primaryFont(fontDescription());
   if (!font)
     return;
 

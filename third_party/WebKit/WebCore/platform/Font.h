@@ -186,7 +186,7 @@ class Font {
 
  private:
   FontDescription m_fontDescription;
-  mutable RefPtr<FontDataSet> m_renderer;
+  mutable RefPtr<FontDataSet> m_dataSet;
   short m_letterSpacing;
   short m_wordSpacing;
 };

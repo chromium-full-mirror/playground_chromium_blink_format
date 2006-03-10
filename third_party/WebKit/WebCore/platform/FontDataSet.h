@@ -27,9 +27,7 @@
 // and so this should catch anyone trying to include this file in public cpp
 // files.
 
-#if WIN32
 #include <kxmlcore/Vector.h>
-#endif
 
 namespace WebCore {
 
@@ -37,9 +35,7 @@ class Font;
 class GraphicsContext;
 class IntRect;
 
-#if WIN32
-class CairoFont;
-#endif
+class FontData;
 
 class FontDataSet : public Shared<FontDataSet>, Noncopyable {
  public:
@@ -66,11 +62,9 @@ class FontDataSet : public Shared<FontDataSet>, Noncopyable {
 #endif
   mutable WebCoreFont m_webCoreFont;
   const WebCoreFont& getWebCoreFont(const FontDescription&) const;
-#endif
-
-#if WIN32
-  mutable Vector<CairoFont*> m_fontSet;
-  CairoFont* primaryCairoFont(const FontDescription& desc) const;
+#else
+  mutable Vector<FontData*> m_fontSet;
+  FontData* primaryFont(const FontDescription& desc) const;
 #endif
 
   friend class Font;
