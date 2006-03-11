@@ -219,9 +219,9 @@ JSValue* HTMLDocument::namedItemGetter(ExecState* exec,
     NodeImpl* node = collection->firstItem();
     Frame* frame;
     if (node->hasTagName(iframeTag) &&
-        (frame = static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentPart()))
+        (frame =
+             static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentFrame()))
       return Window::retrieve(frame);
-
     return getDOMNode(exec, node);
   }
 
@@ -2490,7 +2490,7 @@ JSValue* HTMLElement::frameGetter(ExecState* exec, int token) const {
                  : jsUndefined();
     case FrameContentWindow:
       return checkNodeSecurity(exec, frameElement.contentDocument())
-                 ? Window::retrieve(frameElement.contentPart())
+                 ? Window::retrieve(frameElement.contentFrame())
                  : jsUndefined();
     case FrameFrameBorder:
       return jsString(frameElement.frameBorder());
@@ -2530,7 +2530,7 @@ JSValue* HTMLElement::iFrameGetter(ExecState* exec, int token) const {
                  : jsUndefined();
     case IFrameContentWindow:
       return checkNodeSecurity(exec, iFrame.contentDocument())
-                 ? Window::retrieve(iFrame.contentPart())
+                 ? Window::retrieve(iFrame.contentFrame())
                  : jsUndefined();
     case IFrameFrameBorder:
       return jsString(iFrame.frameBorder());

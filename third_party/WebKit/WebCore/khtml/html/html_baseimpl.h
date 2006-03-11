@@ -109,7 +109,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   virtual bool isFocusable() const;
   virtual void setFocus(bool);
 
-  Frame* contentPart() const;
+  Frame* contentFrame() const;
   DocumentImpl* contentDocument() const;
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;

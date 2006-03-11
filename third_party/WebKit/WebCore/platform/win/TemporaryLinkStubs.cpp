@@ -689,9 +689,6 @@ bool FrameWin::shouldChangeSelection(SelectionController const&,
   return 0;
 }
 static int frameNumber = 0;
-String FrameWin::generateFrameName() {
-  return QString::number(frameNumber++);
-}
 Frame* FrameWin::createFrame(KURL const&,
                              QString const&,
                              RenderPart*,

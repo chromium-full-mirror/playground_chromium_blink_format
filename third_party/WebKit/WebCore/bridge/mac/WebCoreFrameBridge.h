@@ -169,8 +169,6 @@ typedef enum {
 @interface WebCoreFrameBridge : NSObject {
   WebCoreMacFrame* m_frame;
   BOOL _shouldCreateRenderers;
-
-  NSString* _frameNamespace;
 }
 
 + (WebCoreFrameBridge*)bridgeForDOMDocument:(DOMDocument*)document;
@@ -184,9 +182,6 @@ typedef enum {
 
 - (void)setName:(NSString*)name;
 - (NSString*)name;
-/* Creates a name for an frame unnamed in the HTML.  It should produce
- * repeatable results for loads of the same frameset. */
-- (NSString*)generateFrameName;
 
 - (WebCorePageBridge*)page;
 
@@ -210,9 +205,6 @@ typedef enum {
 
 - (WebCoreFrameBridge*)childFrameNamed:(NSString*)name;
 - (WebCoreFrameBridge*)findFrameNamed:(NSString*)name;
-
-- (void)setFrameNamespace:(NSString*)ns;
-- (NSString*)frameNamespace;
 
 - (void)provisionalLoadStarted;
 
