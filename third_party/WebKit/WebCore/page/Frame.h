@@ -175,17 +175,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    */
   bool autoloadImages() const;
 
-  void autoloadImages(bool e) { setAutoloadImages(e); }
-  void enableMetaRefresh(bool e) { setMetaRefreshEnabled(e); }
-  bool setCharset(const QString&, bool) { return true; }
-
   KURL baseURL() const;
   QString baseTarget() const;
-
-  /**
-   * Returns the URL for the background Image (used by save background)
-   */
-  KURL backgroundURL() const;
 
   /**
    * Schedules a redirection after @p delay seconds.
@@ -335,21 +326,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * been found.
    */
   bool gotoAnchor(const QString& name);
-
-  /**
-   * Initiates a text search.
-   */
-  void findTextBegin(NodeImpl* startNode = 0, int startPos = -1);
-
-  /**
-   * Finds the next occurrence of the string or expression.
-   * If isRegExp is true then str is converted to a QRegExp, and caseSensitive
-   * is ignored.
-   */
-  bool findTextNext(const QString& str,
-                    bool forward,
-                    bool caseSensitive,
-                    bool isRegExp);
 
   /**
    * Sets the Zoom factor. The value is given in percent, larger values mean a
@@ -541,23 +517,12 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    */
   QString lastModified() const;
 
-  /**
-   * Loads into the cache.
-   */
-  void preloadStyleSheet(const QString& url, const QString& stylesheet);
-  void preloadScript(const QString& url, const QString& script);
-
   bool isPointInsideSelection(int x, int y);
 
   virtual bool tabsToLinks() const;
   virtual bool tabsToAllControls() const;
 
-  bool restored() const;
-
   // Editing operations.
-  // Not clear if these will be wanted in Frame by KDE,
-  // but for now these bridge so we don't have to pepper the
-  // KHTML code with WebCore-specific stuff.
   enum TriState { falseTriState, trueTriState, mixedTriState };
   void copyToPasteboard();
   void cutToPasteboard();
@@ -590,31 +555,11 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   static void endAllLifeSupport();
 
- protected:
-  /**
-   * Emitted if the cursor is moved over an URL.
-   */
-  void onURL(const QString& url);
-
-  /**
-   * This signal is emitted when the selection changes.
-   */
-  void selectionChanged();
-
- public:
   /**
    * returns a KURL object for the given url. Use when
    * you know what you're doing.
    */
   KURL completeURL(const QString& url);
-
-  /**
-   * presents a detailed error message to the user.
-   * @p errorCode kio error code, eg KIO::ERR_SERVER_TIMEOUT.
-   * @p text kio additional information text.
-   * @p url the url that triggered the error.
-   */
-  void htmlError(int errorCode, const QString& text, const KURL& reqUrl);
 
   virtual void khtmlMouseDoubleClickEvent(MouseEventWithHitTestResults*);
   virtual void khtmlMousePressEvent(MouseEventWithHitTestResults*);
@@ -625,8 +570,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                                        NodeImpl* innerNode,
                                        int x,
                                        int y);
-
-  virtual bool openFile();
 
   virtual void urlSelected(const QString& url,
                            const QString& target,
@@ -731,8 +674,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   void submitFormAgain();
 
-  void updateActions();
-
   void started();
 
   void completed(bool);
@@ -748,11 +689,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void setFocusNodeIfNeeded();
   void selectionLayoutChanged();
   void caretBlinkTimerFired(Timer<Frame>*);
-  bool openURLInFrame(const KURL& url, const URLArgs& urlArgs);
-
-  void overURL(const QString& url,
-               const QString& target,
-               bool shiftPressed = false);
 
   bool shouldUsePlugin(NodeImpl* element,
                        const KURL& url,
@@ -801,10 +737,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void handleFallbackContent();
 
  private:
-  bool checkLinkSecurity(const KURL& linkURL,
-                         const QString& message = QString::null,
-                         const QString& button = QString::null);
-
   void cancelRedirection(bool newLoadInProgress = false);
 
  public:
@@ -923,8 +855,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual void stopRedirectionTimer();
 
  private:
-  int cacheId() const;
-
   void emitLoadEvent();
 
   void receivedFirstData();

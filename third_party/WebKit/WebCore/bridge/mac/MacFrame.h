@@ -128,8 +128,6 @@ class MacFrame : public Frame {
   virtual void openURLRequest(const KURL&, const URLArgs&);
   virtual void submitForm(const KURL&, const URLArgs&);
 
-  void scheduleHistoryNavigation(int steps);
-
   QString advanceToNextMisspelling(bool startBeforeSelection = false);
 
   virtual void setTitle(const DOMString&);
@@ -192,7 +190,6 @@ class MacFrame : public Frame {
 
   static WebCoreFrameBridge* bridgeForWidget(const Widget*);
 
-  QString requestedURLString() const;
   virtual QString incomingReferrer() const;
   virtual QString userAgent() const;
 
@@ -247,7 +244,7 @@ class MacFrame : public Frame {
 
   bool sendContextMenuEvent(NSEvent*);
 
-  bool passMouseDownEventToWidget(Widget*);
+  virtual bool passMouseDownEventToWidget(Widget*);
   virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&);
   virtual bool passWheelEventToChildWidget(NodeImpl*);
 
@@ -265,7 +262,7 @@ class MacFrame : public Frame {
 
   KWQWindowWidget* topLevelWidget();
 
-  void tokenizerProcessedData();
+  virtual void tokenizerProcessedData();
 
   virtual QString overrideMediaType() const;
 
@@ -315,7 +312,7 @@ class MacFrame : public Frame {
   virtual void partClearedInBegin();
 
   // Implementation of CSS property -khtml-user-drag == auto
-  bool shouldDragAutoNode(NodeImpl*, int x, int y) const;
+  virtual bool shouldDragAutoNode(NodeImpl*, int x, int y) const;
 
   void setMarkedTextRange(const RangeImpl*,
                           NSArray* attributes,
@@ -324,7 +321,7 @@ class MacFrame : public Frame {
 
   virtual bool canGoBackOrForward(int distance) const;
 
-  void didFirstLayout();
+  virtual void didFirstLayout();
 
   NSMutableDictionary* dashboardRegionsDictionary();
   void dashboardRegionsChanged();
