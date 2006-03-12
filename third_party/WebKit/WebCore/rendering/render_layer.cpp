@@ -1385,7 +1385,10 @@ bool RenderLayer::intersectsDamageRect(const IntRect& layerBounds,
 }
 
 bool RenderLayer::containsPoint(int x, int y, const IntRect& damageRect) const {
-  return damageRect.contains(x, y);
+  // Always returning true for the root object to ensure that mouse events
+  // occurring
+  // outside the window (when dragging) always target some node.
+  return renderer()->isRoot() || damageRect.contains(x, y);
 }
 
 void RenderLayer::clearClipRects() {
