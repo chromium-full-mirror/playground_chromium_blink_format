@@ -69,28 +69,30 @@ KCanvasPath* KCanvasCreator::createRoundedRectangle(float x,
     nry = height / 2;
 
   path->moveTo(x + nrx, y);
-  path->curveTo(x + nrx * (1 - 0.552), y, x, y + nry * (1 - 0.552), x, y + nry);
-
-  if (nry < height / 2)
-    path->lineTo(x, y + height - nry);
-
-  path->curveTo(x, y + height - nry * (1 - 0.552), x + nrx * (1 - 0.552),
-                y + height, x + nrx, y + height);
 
   if (nrx < width / 2)
-    path->lineTo(x + width - nrx, y + height);
+    path->lineTo(x + width - rx, y);
 
-  path->curveTo(x + width - nrx * (1 - 0.552), y + height, x + width,
-                y + height - nry * (1 - 0.552), x + width, y + height - nry);
+  path->curveTo(x + width - nrx * (1 - 0.552), y, x + width,
+                y + nry * (1 - 0.552), x + width, y + nry);
 
   if (nry < height / 2)
-    path->lineTo(x + width, y + nry);
+    path->lineTo(x + width, y + height - nry);
 
-  path->curveTo(x + width, y + nry * (1 - 0.552), x + width - nrx * (1 - 0.552),
-                y, x + width - nrx, y);
+  path->curveTo(x + width, y + height - nry * (1 - 0.552),
+                x + width - nrx * (1 - 0.552), y + height, x + width - nrx,
+                y + height);
 
   if (nrx < width / 2)
-    path->lineTo(x + nrx, y);
+    path->lineTo(x + nrx, y + height);
+
+  path->curveTo(x + nrx * (1 - 0.552), y + height, x,
+                y + height - nry * (1 - 0.552), x, y + height - nry);
+
+  if (nry < height / 2)
+    path->lineTo(x, y + nry);
+
+  path->curveTo(x, y + nry * (1 - 0.552), x + nrx * (1 - 0.552), y, x + nrx, y);
 
   path->closeSubpath();
   return path;
