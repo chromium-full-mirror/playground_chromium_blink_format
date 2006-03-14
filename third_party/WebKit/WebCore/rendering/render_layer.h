@@ -216,10 +216,10 @@ class RenderLayer : WidgetClient {
 
   bool isTransparent() const;
   RenderLayer* transparentAncestor();
-  void beginTransparencyLayers(GraphicsContext*);
+  void beginTransparencyLayers(GraphicsContext*, const IntRect&);
 
-  RenderLayer* root() {
-    RenderLayer* curr = this;
+  const RenderLayer* root() const {
+    const RenderLayer* curr = this;
     while (curr->parent())
       curr = curr->parent();
     return curr;
@@ -338,6 +338,9 @@ class RenderLayer : WidgetClient {
   bool intersectsDamageRect(const IntRect& layerBounds,
                             const IntRect& damageRect) const;
   bool containsPoint(int x, int y, const IntRect& damageRect) const;
+
+  // Returns a bounding box for this layer only.
+  IntRect absoluteBoundingBox() const;
 
   void updateHoverActiveState(RenderObject::NodeInfo& info);
 
