@@ -138,6 +138,7 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_scrollDimensionsDirty(true),
       m_zOrderListsDirty(true),
       m_usedTransparency(false),
+      m_inOverflowRelayout(false),
       m_marquee(0) {}
 
 RenderLayer::~RenderLayer() {
@@ -947,12 +948,16 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     m_object->repaint();
 
     if (m_object->style()->overflow() == OAUTO) {
-      // Our proprietary overflow: overlay value doesn't trigger a layout.
-      m_object->setNeedsLayout(true);
-      if (m_object->isRenderBlock())
-        static_cast<RenderBlock*>(m_object)->layoutBlock(true);
-      else
-        m_object->layout();
+      if (!m_inOverflowRelayout) {
+        // Our proprietary overflow: overlay value doesn't trigger a layout.
+        m_inOverflowRelayout = true;
+        m_object->setNeedsLayout(true);
+        if (m_object->isRenderBlock())
+          static_cast<RenderBlock*>(m_object)->layoutBlock(true);
+        else
+          m_object->layout();
+        m_inOverflowRelayout = false;
+      }
     }
   }
 
