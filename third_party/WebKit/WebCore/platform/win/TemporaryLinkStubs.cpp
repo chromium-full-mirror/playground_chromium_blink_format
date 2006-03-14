@@ -386,13 +386,8 @@ Widget::FocusPolicy QLineEdit::focusPolicy() const {
   return NoFocus;
 }
 
-static Cursor localCursor;
 Cursor::Cursor(Image*) {
   notImplemented();
-}
-const Cursor& WebCore::moveCursor() {
-  notImplemented();
-  return localCursor;
 }
 
 MouseEvent::MouseEvent() {
@@ -626,7 +621,14 @@ IntRect Font::selectionRectForText(int,
   return IntRect();
 }
 
-// Completely empty stubs (mostly to allow DRT to run):
+/********************************************************/
+/* Completely empty stubs (mostly to allow DRT to run): */
+/********************************************************/
+static Cursor localCursor;
+const Cursor& WebCore::moveCursor() {
+  return localCursor;
+}
+
 bool WebCore::historyContains(QString const&) {
   return false;
 }
