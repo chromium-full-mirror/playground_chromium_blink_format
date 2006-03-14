@@ -209,6 +209,7 @@ LRESULT CALLBACK MyEditProc(HWND hDlg,
         cstrPtr[x] = 0;
 
         gWebView->mainFrame()->loadURL(cstrPtr);
+        SetFocus(gWebView->windowHandle());
 
         return 0;
       } else
