@@ -1361,7 +1361,7 @@ JSValue* DOMNamedNodeMapProtoFunc::callAsFunction(ExecState* exec,
       return getDOMNode(exec, map.item(args[0]->toInt32(exec)));
     case DOMNamedNodeMap::GetNamedItemNS:  // DOM2
       return getDOMNode(
-          exec, map.getNamedItemNS(args[0]->toString(exec).domString(),
+          exec, map.getNamedItemNS(valueToStringWithNullCheck(exec, args[0]),
                                    args[1]->toString(exec).domString()));
     case DOMNamedNodeMap::SetNamedItemNS:  // DOM2
       return getDOMNode(exec,
@@ -1369,7 +1369,7 @@ JSValue* DOMNamedNodeMapProtoFunc::callAsFunction(ExecState* exec,
     case DOMNamedNodeMap::RemoveNamedItemNS:  // DOM2
       return getDOMNode(
           exec,
-          map.removeNamedItemNS(args[0]->toString(exec).domString(),
+          map.removeNamedItemNS(valueToStringWithNullCheck(exec, args[0]),
                                 args[1]->toString(exec).domString(), exception)
               .get());
     default:
