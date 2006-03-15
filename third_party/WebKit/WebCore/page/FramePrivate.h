@@ -96,7 +96,9 @@ class FramePrivate {
         m_executingJavaScriptFormAction(false),
         m_cancelWithLoadInProgress(false),
         m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired),
-        m_userStyleSheetLoader(0) {}
+        m_userStyleSheetLoader(0),
+        m_autoscrollTimer(thisFrame, &Frame::autoscrollTimerFired),
+        m_autoscrollLayer(0) {}
 
   ~FramePrivate() {
     delete m_extension;
@@ -202,6 +204,9 @@ class FramePrivate {
   Timer<Frame> m_lifeSupportTimer;
 
   UserStyleSheetLoader* m_userStyleSheetLoader;
+
+  Timer<Frame> m_autoscrollTimer;
+  RenderLayer* m_autoscrollLayer;
 };
 }
 

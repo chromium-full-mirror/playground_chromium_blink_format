@@ -69,6 +69,7 @@ class Page;
 class Plugin;
 class MouseEventWithHitTestResults;
 class RangeImpl;
+class RenderLayer;
 class Selection;
 class SelectionController;
 class VisiblePosition;
@@ -854,6 +855,10 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
 
+  void handleAutoscroll(RenderLayer*);
+  void startAutoscrollTimer();
+  void stopAutoscrollTimer();
+
  private:
   void emitLoadEvent();
 
@@ -876,6 +881,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
       NodeImpl*& nodeToRemove) const;
 
   virtual void setStatusBarText(const String&);
+
+  void autoscrollTimerFired(Timer<Frame>*);
 
  public:
   friend class MacFrame;
