@@ -39,10 +39,12 @@ class ApplyStyleCommand : public CompositeEditCommand {
 
   ApplyStyleCommand(DocumentImpl*,
                     CSSStyleDeclarationImpl*,
+                    ElementImpl*,
                     EditAction = EditActionChangeAttributes,
                     EPropertyLevel = PropertyDefault);
   ApplyStyleCommand(DocumentImpl*,
                     CSSStyleDeclarationImpl*,
+                    ElementImpl*,
                     const Position& start,
                     const Position& end,
                     EditAction = EditActionChangeAttributes,
@@ -115,12 +117,13 @@ class ApplyStyleCommand : public CompositeEditCommand {
   Position startPosition();
   Position endPosition();
 
-  Position m_start;
-  Position m_end;
   RefPtr<CSSMutableStyleDeclarationImpl> m_style;
   EditAction m_editingAction;
   EPropertyLevel m_propertyLevel;
+  Position m_start;
+  Position m_end;
   bool m_useEndingSelection;
+  RefPtr<ElementImpl> m_styledInlineElement;
 };
 
 bool isStyleSpan(const NodeImpl*);
