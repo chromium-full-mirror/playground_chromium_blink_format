@@ -175,11 +175,18 @@ bool LabelStack::contains(const Identifier& id) const {
 ContextImp::ContextImp(JSObject* glob,
                        InterpreterImp* interpreter,
                        JSObject* thisV,
+                       FunctionBodyNode* currentBody,
+
                        CodeType type,
                        ContextImp* callingCon,
                        FunctionImp* func,
                        const List* args)
-    : _interpreter(interpreter), _function(func), _arguments(args) {
+    : _interpreter(interpreter),
+      m_currentBody(currentBody),
+      _function(func),
+      _arguments(args),
+      m_iterationDepth(0),
+      m_switchDepth(0) {
   m_codeType = type;
   _callingContext = callingCon;
 
@@ -486,8 +493,8 @@ void InterpreterImp::mark() {
     _context->mark();
   if (global)
     global->mark();
-  if (globExec._exception)
-    globExec._exception->mark();
+  if (globExec.exception())
+    globExec.exception()->mark();
 }
 
 bool InterpreterImp::checkSyntax(const UString& code) {
@@ -550,7 +557,7 @@ Completion InterpreterImp::evaluate(const UChar* code,
     res = Completion(Throw, globExec.exception());
   else {
     // execute the code
-    ContextImp ctx(globalObj, this, thisObj);
+    ContextImp ctx(globalObj, this, thisObj, progNode.get());
     ExecState newExec(m_interpreter, &ctx);
     progNode->processVarDecls(&newExec);
     res = progNode->execute(&newExec);

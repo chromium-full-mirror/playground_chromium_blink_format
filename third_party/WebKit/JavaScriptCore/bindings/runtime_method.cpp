@@ -32,10 +32,11 @@
 using namespace KJS::Bindings;
 using namespace KJS;
 
+// FIXME: this should probably use InternalFunctionImp, not FunctionImp
 RuntimeMethod::RuntimeMethod(ExecState* exec,
                              const Identifier& ident,
                              Bindings::MethodList& m)
-    : FunctionImp(exec, ident) {
+    : FunctionImp(exec, ident, 0) {
   _methodList = m;
 }
 

@@ -40,7 +40,7 @@ class FunctionImp : public InternalFunctionImp {
   friend class ActivationImp;
 
  public:
-  FunctionImp(ExecState* exec, const Identifier& n = Identifier::null());
+  FunctionImp(ExecState* exec, const Identifier& n, FunctionBodyNode* b);
   virtual ~FunctionImp();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -64,6 +64,8 @@ class FunctionImp : public InternalFunctionImp {
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+
+  RefPtr<FunctionBodyNode> body;
 
  protected:
   OwnPtr<Parameter> param;
@@ -94,7 +96,6 @@ class DeclaredFunctionImp : public FunctionImp {
 
   virtual Completion execute(ExecState* exec);
   CodeType codeType() const { return FunctionCode; }
-  RefPtr<FunctionBodyNode> body;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

@@ -56,11 +56,14 @@ class Parameter {
   OwnPtr<Parameter> next;
 };
 
-FunctionImp::FunctionImp(ExecState* exec, const Identifier& n)
+FunctionImp::FunctionImp(ExecState* exec,
+                         const Identifier& n,
+                         FunctionBodyNode* b)
     : InternalFunctionImp(
           static_cast<FunctionPrototype*>(
               exec->lexicalInterpreter()->builtinFunctionPrototype()),
-          n) {}
+          n),
+      body(b) {}
 
 FunctionImp::~FunctionImp() {}
 
@@ -71,7 +74,7 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
 
   // enter a new execution context
   ContextImp ctx(globalObj, exec->dynamicInterpreter()->imp(), thisObj,
-                 codeType(), exec->context().imp(), this, &args);
+                 body.get(), codeType(), exec->context().imp(), this, &args);
   ExecState newExec(exec->dynamicInterpreter(), &ctx);
   newExec.setException(exec->exception());  // could be null
 
@@ -198,7 +201,7 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
-  ContextImp* context = exec->_context;
+  ContextImp* context = exec->m_context;
   while (context) {
     if (context->function() == thisObj) {
       return static_cast<ActivationImp*>(context->activationObject())
@@ -300,7 +303,7 @@ DeclaredFunctionImp::DeclaredFunctionImp(ExecState* exec,
                                          const Identifier& n,
                                          FunctionBodyNode* b,
                                          const ScopeChain& sc)
-    : FunctionImp(exec, n), body(b) {
+    : FunctionImp(exec, n, b) {
   setScope(sc);
 }
 
@@ -816,8 +819,8 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         // enter a new execution context
         JSObject* thisVal = static_cast<JSObject*>(exec->context().thisValue());
         ContextImp ctx(exec->dynamicInterpreter()->globalObject(),
-                       exec->dynamicInterpreter()->imp(), thisVal, EvalCode,
-                       exec->context().imp());
+                       exec->dynamicInterpreter()->imp(), thisVal,
+                       progNode.get(), EvalCode, exec->context().imp());
 
         ExecState newExec(exec->dynamicInterpreter(), &ctx);
         newExec.setException(exec->exception());  // could be null

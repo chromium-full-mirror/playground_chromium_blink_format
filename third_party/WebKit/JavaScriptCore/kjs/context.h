@@ -35,14 +35,17 @@ namespace KJS {
  */
 class ContextImp {
  public:
-  ContextImp(JSObject* glob,
+  ContextImp(JSObject* global,
              InterpreterImp*,
              JSObject* thisV,
+             FunctionBodyNode* currentBody,
              CodeType type = GlobalCode,
              ContextImp* callingContext = 0,
-             FunctionImp* functiion = 0,
+             FunctionImp* function = 0,
              const List* args = 0);
   ~ContextImp();
+
+  FunctionBodyNode* currentBody() { return m_currentBody; }
 
   const ScopeChain& scopeChain() const { return scope; }
   CodeType codeType() { return m_codeType; }
@@ -58,11 +61,21 @@ class ContextImp {
   void popScope() { scope.pop(); }
   LabelStack* seenLabels() { return &ls; }
 
+  void pushIteration() { m_iterationDepth++; }
+  void popIteration() { m_iterationDepth--; }
+  bool inIteration() const { return (m_iterationDepth > 0); }
+
+  void pushSwitch() { m_switchDepth++; }
+  void popSwitch() { m_switchDepth--; }
+  bool inSwitch() const { return (m_switchDepth > 0); }
+
   void mark();
 
  private:
   InterpreterImp* _interpreter;
   ContextImp* _callingContext;
+  FunctionBodyNode* m_currentBody;
+
   FunctionImp* _function;
   const List* _arguments;
   // because ContextImp is always allocated on the stack,
@@ -75,6 +88,8 @@ class ContextImp {
   JSObject* thisVal;
 
   LabelStack ls;
+  int m_iterationDepth;
+  int m_switchDepth;
   CodeType m_codeType;
 };
 

@@ -95,7 +95,7 @@ class NumberImp : public JSCell {
  */
 class LabelStack : Noncopyable {
  public:
-  LabelStack() : tos(0), iterationDepth(0), switchDepth(0) {}
+  LabelStack() : tos(0) {}
   ~LabelStack();
 
   /**
@@ -112,14 +112,6 @@ class LabelStack : Noncopyable {
    */
   void pop();
 
-  void pushIteration() { iterationDepth++; }
-  void popIteration() { iterationDepth--; }
-  bool inIteration() const { return (iterationDepth > 0); }
-
-  void pushSwitch() { switchDepth++; }
-  void popSwitch() { switchDepth--; }
-  bool inSwitch() const { return (switchDepth > 0); }
-
  private:
   struct StackElem {
     Identifier id;
@@ -127,8 +119,6 @@ class LabelStack : Noncopyable {
   };
 
   StackElem* tos;
-  int iterationDepth;
-  int switchDepth;
 };
 
 // ---------------------------------------------------------------------------
