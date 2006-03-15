@@ -900,17 +900,15 @@ void RenderText::setText(DOMStringImpl* text, bool force) {
         case CAPITALIZE: {
           // find previous text renderer if one exists
           RenderObject* o;
-          bool runOnString = false;
+          QChar previous = ' ';
           for (o = previousRenderer(); o && o->isInlineFlow();
                o = o->previousRenderer())
             ;
           if (o && o->isText()) {
             DOMStringImpl* prevStr = static_cast<RenderText*>(o)->string();
-            QChar c = (*prevStr)[prevStr->length() - 1];
-            if (!c.isSpace())
-              runOnString = true;
+            previous = (*prevStr)[prevStr->length() - 1];
           }
-          str = str->capitalize(runOnString);
+          str = str->capitalize(previous);
         } break;
         case UPPERCASE:
           str = str->upper();
