@@ -158,7 +158,7 @@ class MacFrame : public Frame {
   virtual void addMessageToConsole(const DOMString& message,
                                    unsigned int lineNumber,
                                    const DOMString& sourceID);
-  void setDisplaysWithFocusAttributes(bool flag);
+  virtual void setDisplaysWithFocusAttributes(bool flag);
 
   NSView* nextKeyView(NodeImpl* startingPoint, KWQSelectionDirection);
   NSView* nextKeyViewInFrameHierarchy(NodeImpl* startingPoint,
@@ -195,7 +195,6 @@ class MacFrame : public Frame {
 
   virtual QString mimeTypeForFileName(const QString&) const;
 
-  NSRect visibleSelectionRect() const;
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(NodeImpl* node,
                              NSRect* imageRect,

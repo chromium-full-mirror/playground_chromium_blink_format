@@ -768,6 +768,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   RenderPart* ownerRenderer();
 
   IntRect selectionRect() const;
+  FloatRect visibleSelectionRect() const;
   bool isFrameSet() const;
 
   HTMLFormElementImpl* currentForm() const;
@@ -828,6 +829,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   static void clearTimers(FrameView*);
 
   bool displaysWithFocusAttributes() const;
+  virtual void setDisplaysWithFocusAttributes(bool flag);
   void setWindowHasFocus(bool flag);
   // Convenience, to avoid repeating the code to dig down to get this.
 
