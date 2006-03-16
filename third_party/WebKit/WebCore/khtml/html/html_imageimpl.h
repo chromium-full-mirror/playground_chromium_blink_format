@@ -33,16 +33,16 @@
 
 namespace WebCore {
 
-class DOMString;
 class HTMLCollectionImpl;
 class HTMLFormElementImpl;
 class Image;
+class String;
 
 struct Length;
 
 class HTMLImageLoader : public CachedObjectClient {
  public:
-  HTMLImageLoader(ElementImpl* elt);
+  HTMLImageLoader(ElementImpl*);
   virtual ~HTMLImageLoader();
 
   virtual void updateFromElement();
@@ -54,10 +54,10 @@ class HTMLImageLoader : public CachedObjectClient {
   CachedImage* image() const { return m_image; }
 
   // CachedObjectClient API
-  virtual void notifyFinished(CachedObject* finishedObj);
+  virtual void notifyFinished(CachedObject*);
 
  protected:
-  void setLoadingImage(CachedImage* loadingImage);
+  void setLoadingImage(CachedImage*);
 
  private:
   ElementImpl* m_element;
@@ -70,8 +70,8 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   friend class HTMLFormElementImpl;
 
  public:
-  HTMLImageElementImpl(DocumentImpl* doc, HTMLFormElementImpl* f = 0);
-  HTMLImageElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
+  HTMLImageElementImpl(DocumentImpl*, HTMLFormElementImpl* = 0);
+  HTMLImageElementImpl(const QualifiedName& tagName, DocumentImpl*);
   ~HTMLImageElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
@@ -89,28 +89,28 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   int width(bool ignorePendingStylesheets = false) const;
   int height(bool ignorePendingStylesheets = false) const;
 
-  bool isServerMap() const { return (ismap && !usemap.length()); }
+  bool isServerMap() const { return ismap && usemap.isEmpty(); }
 
-  DOMString altText() const;
+  String altText() const;
 
-  DOMString imageMap() const { return usemap; }
+  String imageMap() const { return usemap; }
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl*) const;
 
   Image::CompositeOperator compositeOperator() const {
     return Image::compositeOperatorFromString(_compositeOperator.ascii());
   }
 
-  CachedImage* cachedImage() { return m_imageLoader.image(); }
+  CachedImage* cachedImage() const { return m_imageLoader.image(); }
 
-  DOMString name() const;
-  void setName(const DOMString&);
+  String name() const;
+  void setName(const String&);
 
-  DOMString align() const;
-  void setAlign(const DOMString&);
+  String align() const;
+  void setAlign(const String&);
 
-  DOMString alt() const;
-  void setAlt(const DOMString&);
+  String alt() const;
+  void setAlt(const String&);
 
   int border() const;
   void setBorder(int);
@@ -123,14 +123,14 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   bool isMap() const;
   void setIsMap(bool);
 
-  DOMString longDesc() const;
-  void setLongDesc(const DOMString&);
+  String longDesc() const;
+  void setLongDesc(const String&);
 
-  DOMString src() const;
-  void setSrc(const DOMString&);
+  String src() const;
+  void setSrc(const String&);
 
-  DOMString useMap() const;
-  void setUseMap(const DOMString&);
+  String useMap() const;
+  void setUseMap(const String&);
 
   int vspace() const;
   void setVspace(int);
@@ -144,10 +144,10 @@ class HTMLImageElementImpl : public HTMLElementImpl {
 
  protected:
   HTMLImageLoader m_imageLoader;
-  DOMString usemap;
+  String usemap;
   bool ismap;
   HTMLFormElementImpl* m_form;
-  DOMString oldNameAttr;
+  String oldNameAttr;
   QString _compositeOperator;
 };
 
@@ -163,7 +163,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
 
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   bool isDefault() const { return m_shape == Default; }
 
@@ -175,29 +175,29 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
   virtual IntRect getRect(RenderObject*) const;
 
-  DOMString accessKey() const;
-  void setAccessKey(const DOMString&);
+  String accessKey() const;
+  void setAccessKey(const String&);
 
-  DOMString alt() const;
-  void setAlt(const DOMString&);
+  String alt() const;
+  void setAlt(const String&);
 
-  DOMString coords() const;
-  void setCoords(const DOMString&);
+  String coords() const;
+  void setCoords(const String&);
 
-  DOMString href() const;
-  void setHref(const DOMString&);
+  String href() const;
+  void setHref(const String&);
 
   bool noHref() const;
   void setNoHref(bool);
 
-  DOMString shape() const;
-  void setShape(const DOMString&);
+  String shape() const;
+  void setShape(const String&);
 
   int tabIndex() const;
   void setTabIndex(int);
 
-  DOMString target() const;
-  void setTarget(const DOMString&);
+  String target() const;
+  void setTarget(const String&);
 
  protected:
   Path getRegion(int width, int height) const;
@@ -212,7 +212,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
 class HTMLMapElementImpl : public HTMLElementImpl {
  public:
-  HTMLMapElementImpl(DocumentImpl* doc);
+  HTMLMapElementImpl(DocumentImpl*);
   ~HTMLMapElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -229,10 +229,10 @@ class HTMLMapElementImpl : public HTMLElementImpl {
                      int height,
                      RenderObject::NodeInfo&);
 
-  RefPtr<HTMLCollectionImpl> areas();
+  PassRefPtr<HTMLCollectionImpl> areas();
 
-  DOMString name() const;
-  void setName(const DOMString&);
+  String name() const;
+  void setName(const String&);
 
  private:
   AtomicString m_name;

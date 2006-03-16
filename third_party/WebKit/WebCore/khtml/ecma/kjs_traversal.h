@@ -119,10 +119,10 @@ class DOMTreeWalker : public DOMObject {
   RefPtr<WebCore::TreeWalkerImpl> m_impl;
 };
 
-JSValue* getDOMNodeIterator(ExecState*, WebCore::NodeIteratorImpl*);
+JSValue* toJS(ExecState*, WebCore::NodeIteratorImpl*);
 JSValue* getNodeFilterConstructor(ExecState*);
-JSValue* getDOMNodeFilter(ExecState*, WebCore::NodeFilterImpl*);
-JSValue* getDOMTreeWalker(ExecState*, WebCore::TreeWalkerImpl*);
+JSValue* toJS(ExecState*, WebCore::NodeFilterImpl*);
+JSValue* toJS(ExecState*, WebCore::TreeWalkerImpl*);
 
 WebCore::NodeFilterImpl* toNodeFilter(
     const JSValue*);  // returns 0 if value is not a DOMNodeFilter

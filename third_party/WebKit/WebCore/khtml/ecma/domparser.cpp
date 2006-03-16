@@ -91,7 +91,7 @@ JSValue* DOMParserProtoFunc::callAsFunction(ExecState* exec,
         doc->finishParsing();
         doc->close();
 
-        return getDOMNode(exec, doc.get());
+        return toJS(exec, doc.get());
       }
     }
   }

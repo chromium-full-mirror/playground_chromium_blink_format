@@ -3,7 +3,7 @@
  *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2004 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _KJS_CSS_H_
-#define _KJS_CSS_H_
-
-#include "kjs_binding.h"
+#ifndef KJS_CSS_H_
+#define KJS_CSS_H_
 
 #include "Color.h"
+#include "kjs_binding.h"
 
 namespace DOM {
 class CounterImpl;
@@ -83,8 +82,7 @@ class DOMCSSStyleDeclaration : public DOMObject {
   RefPtr<DOM::CSSStyleDeclarationImpl> m_impl;
 };
 
-JSValue* getDOMCSSStyleDeclaration(ExecState* exec,
-                                   DOM::CSSStyleDeclarationImpl* d);
+JSValue* toJS(ExecState*, WebCore::CSSStyleDeclarationImpl*);
 
 class DOMStyleSheet : public DOMObject {
  public:
@@ -110,7 +108,7 @@ class DOMStyleSheet : public DOMObject {
   RefPtr<DOM::StyleSheetImpl> m_impl;
 };
 
-JSValue* getDOMStyleSheet(ExecState*, PassRefPtr<WebCore::StyleSheetImpl>);
+JSValue* toJS(ExecState*, PassRefPtr<WebCore::StyleSheetImpl>);
 
 class DOMStyleSheetList : public DOMObject {
  public:
@@ -172,7 +170,7 @@ class DOMMediaList : public DOMObject {
   RefPtr<DOM::MediaListImpl> m_impl;
 };
 
-JSValue* getDOMMediaList(ExecState* exec, DOM::MediaListImpl* ml);
+JSValue* toJS(ExecState*, WebCore::MediaListImpl*);
 
 class DOMCSSStyleSheet : public DOMStyleSheet {
  public:
@@ -215,7 +213,7 @@ class DOMCSSRuleList : public DOMObject {
   RefPtr<DOM::CSSRuleListImpl> m_impl;
 };
 
-JSValue* getDOMCSSRuleList(ExecState* exec, DOM::CSSRuleListImpl* rl);
+JSValue* toJS(ExecState*, WebCore::CSSRuleListImpl*);
 
 class DOMCSSRule : public DOMObject {
  public:
@@ -257,7 +255,7 @@ class DOMCSSRule : public DOMObject {
   RefPtr<DOM::CSSRuleImpl> m_impl;
 };
 
-JSValue* getDOMCSSRule(ExecState* exec, DOM::CSSRuleImpl* r);
+JSValue* toJS(ExecState*, WebCore::CSSRuleImpl*);
 
 // Constructor for CSSRule - currently only used for some global values
 class CSSRuleConstructor : public DOMObject {
@@ -304,7 +302,7 @@ class DOMCSSValue : public DOMObject {
   RefPtr<DOM::CSSValueImpl> m_impl;
 };
 
-JSValue* getDOMCSSValue(ExecState* exec, DOM::CSSValueImpl* v);
+JSValue* toJS(ExecState*, WebCore::CSSValueImpl*);
 
 // Constructor for CSSValue - currently only used for some global values
 class CSSValueConstructor : public DOMObject {
@@ -403,7 +401,7 @@ class DOMRect : public DOMObject {
   RefPtr<DOM::RectImpl> m_rect;
 };
 
-JSValue* getDOMRect(ExecState* exec, DOM::RectImpl* r);
+JSValue* toJS(ExecState*, WebCore::RectImpl*);
 
 class DOMCounter : public DOMObject {
  public:
@@ -420,7 +418,7 @@ class DOMCounter : public DOMObject {
   RefPtr<DOM::CounterImpl> m_counter;
 };
 
-JSValue* getDOMCounter(ExecState* exec, DOM::CounterImpl* c);
+JSValue* toJS(ExecState*, WebCore::CounterImpl*);
 
 }  // namespace
 

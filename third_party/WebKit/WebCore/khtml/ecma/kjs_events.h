@@ -151,7 +151,7 @@ class DOMEvent : public DOMObject {
   mutable Clipboard* clipboard;
 };
 
-JSValue* getDOMEvent(ExecState*, DOM::EventImpl*);
+JSValue* toJS(ExecState*, WebCore::EventImpl*);
 
 DOM::EventImpl* toEvent(
     JSValue*);  // returns 0 if value is not a DOMEvent object

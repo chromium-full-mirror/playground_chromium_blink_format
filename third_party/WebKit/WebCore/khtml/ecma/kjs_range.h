@@ -82,7 +82,7 @@ class RangeConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* getDOMRange(ExecState* exec, DOM::RangeImpl* r);
+JSValue* toJS(ExecState*, WebCore::RangeImpl*);
 JSValue* getRangeConstructor(ExecState* exec);
 
 DOM::RangeImpl* toRange(

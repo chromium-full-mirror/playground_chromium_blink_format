@@ -171,6 +171,11 @@ JSValue* jsStringOrUndefined(const WebCore::DOMString&);
  */
 DOM::DOMString valueToStringWithNullCheck(ExecState* exec, JSValue* val);
 
+template <typename T>
+inline JSValue* toJS(ExecState* exec, PassRefPtr<T> ptr) {
+  return toJS(exec, ptr.get());
+}
+
 }  // namespace
 
 #endif

@@ -62,6 +62,7 @@ class FloatPoint;
 class FloatRect;
 class IntRect;
 class IntSize;
+class String;
 
 template <typename T>
 class Timer;
@@ -164,8 +165,7 @@ class Image {
 
   enum TileRule { StretchTile, RoundTile, RepeatTile };
 
-  static CompositeOperator compositeOperatorFromString(
-      const char* compositeOperator);
+  static CompositeOperator compositeOperatorFromString(const String&);
 
   // Drawing routines.
   void drawInRect(const FloatRect& dstRect,

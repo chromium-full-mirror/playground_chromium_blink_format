@@ -66,7 +66,7 @@ JSValue* KJSProxyImpl::evaluate(const DOMString& filename,
   JSLock lock;
 
   JSValue* thisNode =
-      n ? Window::retrieve(m_frame) : getDOMNode(m_script->globalExec(), n);
+      n ? Window::retrieve(m_frame) : toJS(m_script->globalExec(), n);
   Completion comp = m_script->evaluate(
       filename, baseLine, reinterpret_cast<KJS::UChar*>(str.unicode()),
       str.length(), thisNode);

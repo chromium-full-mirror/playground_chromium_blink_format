@@ -70,7 +70,7 @@ DOMAbstractView::~DOMAbstractView() {
 
 JSValue* DOMAbstractView::getValueProperty(ExecState* exec, int token) {
   assert(token == Document);
-  return getDOMNode(exec, impl()->document());
+  return toJS(exec, impl()->document());
 }
 
 bool DOMAbstractView::getOwnPropertySlot(ExecState* exec,
@@ -95,9 +95,9 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
       else {
         if (DocumentImpl* doc = arg0->getDocument())
           doc->updateLayoutIgnorePendingStylesheets();
-        return getDOMCSSStyleDeclaration(
-            exec, abstractView.getComputedStyle(
-                      arg0, args[1]->toString(exec).domString().impl()));
+        return toJS(exec,
+                    abstractView.getComputedStyle(
+                        arg0, args[1]->toString(exec).domString().impl()));
       }
     }
     case DOMAbstractView::GetMatchedCSSRules: {
@@ -106,18 +106,18 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
         return jsUndefined();  // throw exception?
       else {
         // No need to update layout, since we just want the back-end rules.
-        return getDOMCSSRuleList(
-            exec, abstractView
-                      .getMatchedCSSRules(
-                          arg0, args[1]->toString(exec).domString().impl())
-                      .get());
+        return toJS(exec,
+                    abstractView
+                        .getMatchedCSSRules(
+                            arg0, args[1]->toString(exec).domString().impl())
+                        .get());
       }
     }
   }
   return jsUndefined();
 }
 
-JSValue* getDOMAbstractView(ExecState* exec, AbstractViewImpl* av) {
+JSValue* toJS(ExecState* exec, AbstractViewImpl* av) {
   return cacheDOMObject<AbstractViewImpl, DOMAbstractView>(exec, av);
 }
 
