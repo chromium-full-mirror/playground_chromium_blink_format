@@ -145,6 +145,7 @@ class FramePrivate {
 
   KURL m_url;
   KURL m_workingURL;
+  ResourceRequest m_request;
 
   KIO::CacheControl m_cachePolicy;
   Timer<Frame> m_redirectionTimer;

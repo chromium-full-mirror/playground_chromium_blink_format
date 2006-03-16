@@ -229,22 +229,20 @@ bool Frame::didOpenURL(const KURL& url) {
   // clear last edit command
   d->m_lastEditCommand = EditCommandPtr();
 
-  URLArgs args(d->m_extension->urlArgs());
-
   closeURL();
 
-  if (args.reload)
+  if (d->m_request.reload)
     d->m_cachePolicy = KIO::CC_Refresh;
   else
     d->m_cachePolicy = KIO::CC_Verify;
 
-  if (args.doPost() && url.protocol().startsWith("http")) {
-    d->m_job = new TransferJob(this, "POST", url, args.postData);
-    d->m_job->addMetaData("content-type", args.contentType());
+  if (d->m_request.doPost() && url.protocol().startsWith("http")) {
+    d->m_job = new TransferJob(this, "POST", url, d->m_request.postData);
+    d->m_job->addMetaData("content-type", d->m_request.contentType());
   } else
     d->m_job = new TransferJob(this, "GET", url);
 
-  d->m_job->addMetaData(args.metaData());
+  d->m_job->addMetaData(d->m_request.metaData());
 
   d->m_bComplete = false;
   d->m_bLoadingMainResource = true;
@@ -500,8 +498,7 @@ void Frame::setDocument(DocumentImpl* newDoc) {
 }
 
 void Frame::receivedFirstData() {
-  begin(d->m_workingURL, d->m_extension->urlArgs().xOffset,
-        d->m_extension->urlArgs().yOffset);
+  begin(d->m_workingURL, d->m_request.xOffset, d->m_request.yOffset);
 
   d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
   d->m_workingURL = KURL();
@@ -575,6 +572,14 @@ void Frame::childBegin() {
   d->m_bComplete = false;
 }
 
+void Frame::setResourceRequest(const ResourceRequest& request) {
+  d->m_request = request;
+}
+
+const ResourceRequest& Frame::resourceRequest() const {
+  return d->m_request;
+}
+
 void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   if (d->m_workingURL.isEmpty())
     createEmptyDocument();  // Creates an empty document if we don't have one
@@ -588,10 +593,8 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_bLoadEventEmitted = false;
   d->m_bLoadingMainResource = true;
 
-  URLArgs args(d->m_extension->urlArgs());
-  args.xOffset = xOffset;
-  args.yOffset = yOffset;
-  d->m_extension->setURLArgs(args);
+  d->m_request.xOffset = xOffset;
+  d->m_request.yOffset = yOffset;
 
   KURL ref(url);
   ref.setUser(QSTRING_NULL);
@@ -605,7 +608,7 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   if (!d->m_url.isEmpty())
     baseurl = d->m_url;
 
-  if (DOMImplementationImpl::isXMLMIMEType(args.serviceType))
+  if (DOMImplementationImpl::isXMLMIMEType(d->m_request.serviceType))
     d->m_doc =
         DOMImplementationImpl::instance()->createDocument(d->m_view.get());
   else
@@ -971,13 +974,13 @@ void Frame::changeLocation(const QString& URL,
     return;
   }
 
-  URLArgs args;
+  ResourceRequest request;
 
-  args.setLockHistory(lockHistory);
+  request.setLockHistory(lockHistory);
   if (!referrer.isEmpty())
-    args.metaData().set("referrer", referrer);
+    request.metaData().set("referrer", referrer);
 
-  urlSelected(URL, "_self", args);
+  urlSelected(URL, "_self", request);
 }
 
 void Frame::redirectionTimerFired(Timer<Frame>*) {
@@ -1291,7 +1294,7 @@ void Frame::paintDragCaret(GraphicsContext* p, const IntRect& rect) const {
 
 void Frame::urlSelected(const QString& url,
                         const QString& _target,
-                        const URLArgs& args) {
+                        const ResourceRequest& request) {
   QString target = _target;
   if (target.isEmpty() && d->m_doc)
     target = d->m_doc->baseTarget();
@@ -1306,7 +1309,7 @@ void Frame::urlSelected(const QString& url,
     // ### ERROR HANDLING
     return;
 
-  URLArgs argsCopy = args;
+  ResourceRequest argsCopy = request;
   argsCopy.frameName = target;
 
   if (d->m_bHTTPRefresh) {
@@ -1334,11 +1337,11 @@ bool Frame::requestFrame(RenderPart* renderer,
 
   Frame* frame = tree()->child(frameName);
   if (frame) {
-    URLArgs args;
-    args.metaData().set("referrer", d->m_referrer);
-    args.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
-                  (d->m_cachePolicy == KIO::CC_Refresh);
-    frame->openURLRequest(url, args);
+    ResourceRequest request;
+    request.metaData().set("referrer", d->m_referrer);
+    request.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
+                     (d->m_cachePolicy == KIO::CC_Refresh);
+    frame->openURLRequest(url, request);
   } else
     frame = loadSubframe(renderer, url, frameName, d->m_referrer);
 
@@ -1477,12 +1480,12 @@ void Frame::submitForm(const char* action,
     return;
   }
 
-  URLArgs args;
+  ResourceRequest request;
 
   if (!d->m_referrer.isEmpty())
-    args.metaData().set("referrer", d->m_referrer);
+    request.metaData().set("referrer", d->m_referrer);
 
-  args.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
+  request.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
 
   // Handle mailto: forms
   if (u.protocol() == "mailto") {
@@ -1525,18 +1528,18 @@ void Frame::submitForm(const char* action,
   if (strcmp(action, "get") == 0) {
     if (u.protocol() != "mailto")
       u.setQuery(formData.flattenToString());
-    args.setDoPost(false);
+    request.setDoPost(false);
   } else {
-    args.postData = formData;
-    args.setDoPost(true);
+    request.postData = formData;
+    request.setDoPost(true);
 
     // construct some user headers if necessary
     if (contentType.isNull() ||
         contentType == "application/x-www-form-urlencoded")
-      args.setContentType("Content-Type: application/x-www-form-urlencoded");
+      request.setContentType("Content-Type: application/x-www-form-urlencoded");
     else  // contentType must be "multipart/form-data"
-      args.setContentType("Content-Type: " + contentType + "; boundary=" +
-                          boundary);
+      request.setContentType("Content-Type: " + contentType + "; boundary=" +
+                             boundary);
   }
 
   if (d->m_doc->parsing() || d->m_runningScripts > 0) {
@@ -1550,7 +1553,7 @@ void Frame::submitForm(const char* action,
     d->m_submitForm->submitContentType = contentType;
     d->m_submitForm->submitBoundary = boundary;
   } else
-    submitForm(u, args);
+    submitForm(u, request);
 }
 
 void Frame::parentCompleted() {

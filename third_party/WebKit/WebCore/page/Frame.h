@@ -574,7 +574,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   virtual void urlSelected(const QString& url,
                            const QString& target,
-                           const URLArgs& args = URLArgs());
+                           const ResourceRequest& request = ResourceRequest());
 
   // Methods with platform-specific overrides (and no base class
   // implementation).
@@ -631,9 +631,9 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual void saveDocumentState() = 0;
   virtual void restoreDocumentState() = 0;
   virtual bool canGoBackOrForward(int distance) const = 0;
-  virtual void openURLRequest(const KURL&, const URLArgs&) = 0;
-  virtual void submitForm(const KURL&, const URLArgs&) = 0;
-  virtual void urlSelected(const KURL&, const URLArgs& args) = 0;
+  virtual void openURLRequest(const KURL&, const ResourceRequest&) = 0;
+  virtual void submitForm(const KURL&, const ResourceRequest&) = 0;
+  virtual void urlSelected(const KURL&, const ResourceRequest&) = 0;
   virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&) = 0;
   virtual bool passWheelEventToChildWidget(NodeImpl*) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
@@ -900,6 +900,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void updateBaseURLForEmptyDocument();
 
   KURL url() const;
+  void setResourceRequest(const ResourceRequest& request);
+  const ResourceRequest& resourceRequest() const;
 
   // split out controller objects
   FrameTree* tree() const;

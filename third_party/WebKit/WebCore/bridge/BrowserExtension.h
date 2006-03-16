@@ -29,46 +29,13 @@
 #include "PlatformString.h"
 #include "formdata.h"
 #include <kxmlcore/HashMap.h>
+#include "ResourceRequest.h"
 
 class KURL;
 
 namespace WebCore {
 
 class Frame;
-
-struct URLArgs {
-  QString frameName;
-  FormData postData;
-  bool reload;
-  QString serviceType;
-  int xOffset;
-  int yOffset;
-
-  URLArgs()
-      : reload(false),
-        xOffset(0),
-        yOffset(0),
-        m_doPost(false),
-        m_lockHistory(false) {}
-
-  QString contentType() const { return m_contentType; }
-  void setContentType(const QString& t) { m_contentType = t; }
-
-  bool doPost() const { return m_doPost; }
-  void setDoPost(bool post) { m_doPost = post; }
-
-  bool lockHistory() const { return m_lockHistory; }
-  void setLockHistory(bool lock) { m_lockHistory = lock; }
-
-  HashMap<DOMString, DOMString>& metaData() { return m_metadata; }
-  const HashMap<DOMString, DOMString>& metaData() const { return m_metadata; }
-
- private:
-  QString m_contentType;
-  bool m_doPost;
-  bool m_lockHistory;
-  HashMap<DOMString, DOMString> m_metadata;
-};
 
 struct WindowArgs {
   int x;
@@ -95,14 +62,17 @@ class BrowserExtension {
  public:
   virtual ~BrowserExtension() {}
 
-  virtual void openURLRequest(const KURL&, const URLArgs& args = URLArgs()) = 0;
+  virtual void openURLRequest(
+      const KURL&,
+      const ResourceRequest& request = ResourceRequest()) = 0;
   virtual void openURLNotify() = 0;
 
-  virtual void createNewWindow(const KURL& url,
-                               const URLArgs& urlArgs = URLArgs()) = 0;
+  virtual void createNewWindow(
+      const KURL& url,
+      const ResourceRequest& request = ResourceRequest()) = 0;
 
   virtual void createNewWindow(const KURL& url,
-                               const URLArgs& urlArgs,
+                               const ResourceRequest& request,
                                const WindowArgs& winArgs,
                                Frame*& part) = 0;
 
@@ -112,18 +82,12 @@ class BrowserExtension {
   virtual int getHistoryLength() = 0;
   virtual void goBackOrForward(int distance) = 0;
 
-  void setURLArgs(const URLArgs& args) { m_args = args; }
-  URLArgs urlArgs() const { return m_args; }
-
   virtual bool canRunModal() = 0;
   virtual bool canRunModalNow() = 0;
   virtual void runModal() = 0;
 
  protected:
   BrowserExtension(){};
-
- private:
-  URLArgs m_args;
 };
 }
 

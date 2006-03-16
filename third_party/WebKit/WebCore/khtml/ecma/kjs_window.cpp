@@ -548,12 +548,12 @@ static Frame* createNewWindow(ExecState* exec,
   Frame* openerPart = openerWindow->frame();
   Frame* activePart = Window::retrieveActive(exec)->frame();
 
-  URLArgs uargs;
+  ResourceRequest request;
 
-  uargs.frameName = frameName;
+  request.frameName = frameName;
   if (activePart)
-    uargs.metaData().set("referrer", activePart->referrer());
-  uargs.serviceType = "text/html";
+    request.metaData().set("referrer", activePart->referrer());
+  request.serviceType = "text/html";
 
   // FIXME: It's much better for client API if a new window starts with a URL,
   // here where we
@@ -568,7 +568,7 @@ static Frame* createNewWindow(ExecState* exec,
   // We'd have to resolve all those issues to pass the URL instead of "".
 
   Frame* newFrame = 0;
-  openerPart->browserExtension()->createNewWindow("", uargs, windowArgs,
+  openerPart->browserExtension()->createNewWindow("", request, windowArgs,
                                                   newFrame);
 
   if (!newFrame)
@@ -1679,9 +1679,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!str.isEmpty() && activePart)
         url = activePart->document()->completeURL(str.qstring());
 
-      URLArgs uargs;
-      uargs.frameName = frameName.qstring();
-      if (uargs.frameName == "_top") {
+      ResourceRequest request;
+      request.frameName = frameName.qstring();
+      if (request.frameName == "_top") {
         while (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1697,7 +1697,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         }
         return Window::retrieve(frame);
       }
-      if (uargs.frameName == "_parent") {
+      if (request.frameName == "_parent") {
         if (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1713,12 +1713,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         }
         return Window::retrieve(frame);
       }
-      uargs.serviceType = "text/html";
+      request.serviceType = "text/html";
 
       // request window (new or existing if framename is set)
       Frame* newFrame = 0;
-      uargs.metaData().set("referrer", activePart->referrer());
-      frame->browserExtension()->createNewWindow("", uargs, windowArgs,
+      request.metaData().set("referrer", activePart->referrer());
+      frame->browserExtension()->createNewWindow("", request, windowArgs,
                                                  newFrame);
       if (!newFrame)
         return jsUndefined();
