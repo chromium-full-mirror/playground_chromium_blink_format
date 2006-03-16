@@ -803,7 +803,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   static NodeImpl* nodeForWidget(const Widget*);
   static Frame* frameForNode(NodeImpl*);
 
-  static void setDocumentFocus(Widget*);
   static void clearDocumentFocus(Widget*);
 
   static const QPtrList<Frame>& instances() { return mutableInstances(); }
