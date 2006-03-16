@@ -220,7 +220,7 @@ class GraphicsContext : Noncopyable {
   void clearShadow();
 
   void initFocusRing(int width, int offset);
-  void addFocusRingRect(int x, int y, int width, int height);
+  void addFocusRingRect(const IntRect&);
   void drawFocusRing(const Color&);
   void clearFocusRing();
 
@@ -250,6 +250,9 @@ class GraphicsContext : Noncopyable {
   void setColorFromPen();
 
   GraphicsContextPrivate* m_data;
+  Vector<IntRect> m_focusRingRects;
+  int m_focusRingWidth;
+  int m_focusRingOffset;
   bool m_isForPrinting;
   bool m_usesInactiveTextBackgroundColor;
   bool m_updatingControlTints;

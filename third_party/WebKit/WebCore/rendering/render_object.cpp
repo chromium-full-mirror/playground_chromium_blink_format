@@ -1364,13 +1364,13 @@ void RenderObject::addFocusRingRects(GraphicsContext* p, int _tx, int _ty) {
   // shape).
   if (continuation()) {
     p->addFocusRingRect(
-        _tx, _ty - collapsedMarginTop(), width(),
-        height() + collapsedMarginTop() + collapsedMarginBottom());
+        IntRect(_tx, _ty - collapsedMarginTop(), width(),
+                height() + collapsedMarginTop() + collapsedMarginBottom()));
     continuation()->addFocusRingRects(
         p, _tx - xPos() + continuation()->containingBlock()->xPos(),
         _ty - yPos() + continuation()->containingBlock()->yPos());
   } else
-    p->addFocusRingRect(_tx, _ty, width(), height());
+    p->addFocusRingRect(IntRect(_tx, _ty, width(), height()));
 }
 
 void RenderObject::paintOutline(GraphicsContext* p,
