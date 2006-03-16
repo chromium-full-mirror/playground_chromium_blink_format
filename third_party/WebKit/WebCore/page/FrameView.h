@@ -237,7 +237,7 @@ class FrameView : public ScrollView {
   bool dispatchMouseEvent(const AtomicString& eventType,
                           NodeImpl* target,
                           bool cancelable,
-                          int detail,
+                          int clickCount,
                           MouseEvent*,
                           bool setUnder);
   bool dispatchDragEvent(const AtomicString& eventType,

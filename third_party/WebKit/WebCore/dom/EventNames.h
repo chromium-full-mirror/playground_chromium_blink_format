@@ -32,15 +32,15 @@ namespace EventNames {
                                                                                  \
   macro(abort) macro(beforecopy) macro(beforecut) macro(beforepaste) macro(      \
       blur) macro(change) macro(click) macro(contextmenu) macro(copy)            \
-      macro(cut) macro(drag) macro(dragend) macro(dragenter) macro(              \
-          dragleave) macro(dragover) macro(dragstart) macro(drop) macro(error)   \
-          macro(focus) macro(input) macro(keydown) macro(keypress) macro(        \
-              keyup) macro(load) macro(mousedown) macro(mousemove)               \
-              macro(mouseout) macro(mouseover) macro(mouseup) macro(             \
-                  mousewheel) macro(beforeunload) macro(paste)                   \
-                  macro(readystatechange) macro(reset) macro(resize) macro(      \
-                      scroll) macro(search) macro(select) macro(selectstart)     \
-                      macro(submit) macro(textInput) macro(unload) macro(zoom)   \
+      macro(cut) macro(dblclick) macro(drag) macro(dragend) macro(dragenter)     \
+          macro(dragleave) macro(dragover) macro(dragstart) macro(drop) macro(   \
+              error) macro(focus) macro(input) macro(keydown) macro(keypress)    \
+              macro(keyup) macro(load) macro(mousedown) macro(                   \
+                  mousemove) macro(mouseout) macro(mouseover) macro(mouseup)     \
+                  macro(mousewheel) macro(beforeunload) macro(paste) macro(      \
+                      readystatechange) macro(reset) macro(resize) macro(scroll) \
+                      macro(search) macro(select) macro(selectstart) macro(      \
+                          submit) macro(textInput) macro(unload) macro(zoom)     \
                                                                                  \
                           macro(DOMActivate) macro(DOMAttrModified) macro(       \
                               DOMCharacterDataModified) macro(DOMFocusIn)        \
@@ -50,8 +50,7 @@ namespace EventNames {
                                       macro(DOMNodeRemovedFromDocument) macro(   \
                                           DOMSubtreeModified)                    \
                                                                                  \
-                                          macro(khtmlBeforeTextInserted) macro(  \
-                                              khtmlDblclick)                     \
+                                          macro(khtmlBeforeTextInserted)         \
                                               macro(khtmlDragdrop) macro(        \
                                                   khtmlEditableContentChanged)   \
                                                   macro(khtmlError) macro(       \

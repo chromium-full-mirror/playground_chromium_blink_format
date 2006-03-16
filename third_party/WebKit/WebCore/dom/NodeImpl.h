@@ -304,12 +304,12 @@ class NodeImpl : public TreeShared<NodeImpl> {
                            bool cancelable);
   bool dispatchMouseEvent(MouseEvent*,
                           const AtomicString& eventType,
-                          int detail = 0,
+                          int clickCount = 0,
                           NodeImpl* relatedTarget = 0);
   bool dispatchSimulatedMouseEvent(const AtomicString& eventType);
   bool dispatchMouseEvent(const AtomicString& eventType,
                           int button,
-                          int detail,
+                          int clickCount,
                           int clientX,
                           int clientY,
                           int screenX,

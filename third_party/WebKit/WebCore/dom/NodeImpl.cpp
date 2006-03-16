@@ -639,7 +639,7 @@ void NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
 
 bool NodeImpl::dispatchMouseEvent(MouseEvent* _mouse,
                                   const AtomicString& eventType,
-                                  int detail,
+                                  int clickCount,
                                   NodeImpl* relatedTarget) {
   assert(!eventDispatchForbidden());
 
@@ -649,8 +649,8 @@ bool NodeImpl::dispatchMouseEvent(MouseEvent* _mouse,
     view->viewportToContents(_mouse->x(), _mouse->y(), clientX, clientY);
 
   return dispatchMouseEvent(
-      eventType, _mouse->button(), detail, clientX, clientY, _mouse->globalX(),
-      _mouse->globalY(), _mouse->ctrlKey(), _mouse->altKey(),
+      eventType, _mouse->button(), clickCount, clientX, clientY,
+      _mouse->globalX(), _mouse->globalY(), _mouse->ctrlKey(), _mouse->altKey(),
       _mouse->shiftKey(), _mouse->metaKey(), false, relatedTarget);
 }
 
@@ -664,7 +664,7 @@ bool NodeImpl::dispatchSimulatedMouseEvent(const AtomicString& eventType) {
 
 bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
                                   int button,
-                                  int detail,
+                                  int clickCount,
                                   int clientX,
                                   int clientY,
                                   int screenX,
@@ -695,7 +695,7 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
   bool swallowEvent = false;
 
   RefPtr<EventImpl> me = new MouseEventImpl(
-      eventType, true, cancelable, getDocument()->defaultView(), detail,
+      eventType, true, cancelable, getDocument()->defaultView(), clickCount,
       screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey,
       button, relatedTarget, 0, isSimulated);
 
@@ -705,17 +705,17 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
   if (defaultHandled || defaultPrevented)
     swallowEvent = true;
 
-  // Special case: If it's a double click event, we also send the KHTML_DBLCLICK
+  // Special case: If it's a double click event, we also send the "dblclick"
   // event. This is not part
   // of the DOM specs, but is used for compatibility with the ondblclick=""
   // attribute.  This is treated
-  // as a separate event in other DOM-compliant browsers like Firefox, and so we
+  // as a separate event in other browsers like Firefox, WinIE, & Opera, so we
   // do the same.
-  if (eventType == clickEvent && detail == 2) {
+  if (eventType == clickEvent && clickCount == 2) {
     me = new MouseEventImpl(
-        khtmlDblclickEvent, true, cancelable, getDocument()->defaultView(),
-        detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey,
-        metaKey, button, relatedTarget, 0, isSimulated);
+        dblclickEvent, true, cancelable, getDocument()->defaultView(),
+        clickCount, screenX, screenY, clientX, clientY, ctrlKey, altKey,
+        shiftKey, metaKey, button, relatedTarget, 0, isSimulated);
     if (defaultHandled)
       me->setDefaultHandled();
     dispatchEvent(me, ec, true);
@@ -726,7 +726,7 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
   // Also send a DOMActivate event, which causes things like form submissions to
   // occur.
   if (eventType == clickEvent && !defaultPrevented)
-    dispatchUIEvent(DOMActivateEvent, detail);
+    dispatchUIEvent(DOMActivateEvent, clickCount);
 
   return swallowEvent;
 }
