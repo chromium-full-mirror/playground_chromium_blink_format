@@ -393,6 +393,10 @@ Cursor::Cursor(Image*) {
 MouseEvent::MouseEvent() {
   notImplemented();
 }
+bool MouseEvent::isMouseButtonDown(MouseButton) {
+  notImplemented();
+  return false;
+}
 String WebCore::searchableIndexIntroduction() {
   notImplemented();
   return String();
