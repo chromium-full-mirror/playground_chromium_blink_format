@@ -26,13 +26,13 @@
 #ifndef RENDER_CANVASIMAGE_H
 #define RENDER_CANVASIMAGE_H
 
-#if __APPLE__
-
 #include "HTMLElementImpl.h"
 #include "render_image.h"
 
+#if __APPLE__
 // FIXME: Mac-specific parts need to move to the platform directory.
 #include <ApplicationServices/ApplicationServices.h>
+#endif
 
 namespace WebCore {
 
@@ -56,6 +56,7 @@ class RenderCanvasImage : public RenderImage {
     return static_cast<HTMLElementImpl*>(RenderImage::element());
   }
 
+#if __APPLE__
   void updateDrawnImage();
   CGContextRef drawingContext();
 
@@ -68,10 +69,9 @@ class RenderCanvasImage : public RenderImage {
   CGImageRef _drawnImage;
 
   bool _needsImageUpdate : 1;
+#endif
 };
 
 }  // namespace
-
-#endif
 
 #endif

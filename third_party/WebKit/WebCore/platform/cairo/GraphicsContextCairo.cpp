@@ -524,4 +524,24 @@ void GraphicsContext::setPaintingDisabled(bool f) {
 bool GraphicsContext::paintingDisabled() const {
   return m_data->state.paintingDisabled;
 }
+
+void GraphicsContext::drawFocusRing(const Color& color) {
+  if (m_data->state.paintingDisabled)
+    return;
+  int radius = (m_focusRingWidth - 1) / 2;
+  int offset = radius + m_focusRingOffset;
+
+  unsigned rectCount = m_focusRingRects.size();
+  IntRect finalFocusRect;
+  for (unsigned i = 0; i < rectCount; i++) {
+    IntRect focusRect = m_focusRingRects[i];
+    focusRect.inflate(offset);
+    finalFocusRect.unite(focusRect);
+  }
+  // FIXME: These rects should be rounded
+  cairo_rectangle(m_data->context, finalFocusRect.x(), finalFocusRect.y(),
+                  finalFocusRect.width(), finalFocusRect.height());
+  setPen(color);
+  cairo_stroke(m_data->context);
+}
 }

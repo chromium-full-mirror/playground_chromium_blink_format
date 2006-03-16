@@ -34,6 +34,7 @@
 #include "TransferJob.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
+#include "render_canvasimage.h"
 
 using namespace WebCore;
 
@@ -56,48 +57,6 @@ bool FrameView::isFrameView() const {
 Widget* FrameView::topLevelWidget() const {
   notImplemented();
   return 0;
-}
-
-QScrollBar::~QScrollBar() {
-  notImplemented();
-}
-void QScrollBar::setSteps(int, int) {
-  notImplemented();
-}
-bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
-  notImplemented();
-  return 0;
-}
-QScrollBar::QScrollBar(ScrollBarOrientation) {
-  notImplemented();
-}
-bool QScrollBar::setValue(int) {
-  notImplemented();
-  return 0;
-}
-void QScrollBar::setKnobProportion(int, int) {
-  notImplemented();
-}
-
-QListBox::QListBox() {
-  notImplemented();
-}
-void QListBox::setSelected(int, bool) {
-  notImplemented();
-}
-IntSize QListBox::sizeForNumberOfLines(int) const {
-  notImplemented();
-  return IntSize();
-}
-bool QListBox::isSelected(int) const {
-  notImplemented();
-  return 0;
-}
-void QListBox::appendItem(QString const&, KWQListBoxItemType, bool) {
-  notImplemented();
-}
-void QListBox::doneAppendingItems() {
-  notImplemented();
 }
 
 QTextEdit::QTextEdit(Widget*) {
@@ -205,9 +164,6 @@ Widget::FocusPolicy Widget::focusPolicy() const {
 void Widget::disableFlushDrawing() {
   notImplemented();
 }
-void Widget::setIsSelected(bool) {
-  notImplemented();
-}
 void Widget::lockDrawingFocus() {
   notImplemented();
 }
@@ -263,29 +219,6 @@ bool QLineEdit::edited() const {
 GraphicsContext::GraphicsContext() {
   notImplemented();
 }
-void GraphicsContext::addFocusRingRect(int, int, int, int) {
-  notImplemented();
-}
-void GraphicsContext::clearFocusRing() {
-  notImplemented();
-}
-void GraphicsContext::drawFocusRing(Color const&) {
-  notImplemented();
-}
-Color GraphicsContext::selectedTextBackgroundColor() const {
-  notImplemented();
-  return Color();
-}
-void GraphicsContext::addRoundedRectClip(IntRect const&,
-                                         IntSize const&,
-                                         IntSize const&,
-                                         IntSize const&,
-                                         IntSize const&) {
-  notImplemented();
-}
-void GraphicsContext::initFocusRing(int, int) {
-  notImplemented();
-}
 
 QSlider::QSlider() {
   notImplemented();
@@ -314,13 +247,21 @@ double QSlider::value() const {
   return 0;
 }
 
-void QListBox::setFont(WebCore::Font const&) {
+void QListBox::setSelected(int, bool) {
   notImplemented();
 }
-QListBox::~QListBox() {
+IntSize QListBox::sizeForNumberOfLines(int) const {
+  notImplemented();
+  return IntSize();
+}
+bool QListBox::isSelected(int) const {
+  notImplemented();
+  return 0;
+}
+void QListBox::appendItem(QString const&, KWQListBoxItemType, bool) {
   notImplemented();
 }
-void QListBox::setSelectionMode(QListBox::SelectionMode) {
+void QListBox::doneAppendingItems() {
   notImplemented();
 }
 void QListBox::setWritingDirection(TextDirection) {
@@ -436,10 +377,6 @@ bool FrameWin::locationbarVisible() {
   notImplemented();
   return 0;
 }
-void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
-                                         bool) {
-  notImplemented();
-}
 void FrameWin::issueRedoCommand(void) {
   notImplemented();
 }
@@ -458,11 +395,6 @@ bool FrameWin::canRedo() const {
 bool FrameWin::canUndo() const {
   notImplemented();
   return 0;
-}
-void FrameWin::recordFormValue(QString const&,
-                               QString const&,
-                               WebCore::HTMLFormElementImpl*) {
-  notImplemented();
 }
 void FrameWin::registerCommandForRedo(WebCore::EditCommandPtr const&) {
   notImplemented();
@@ -509,9 +441,6 @@ QString FrameWin::mimeTypeForFileName(QString const&) const {
   notImplemented();
   return QString();
 }
-void FrameWin::clearRecordedFormValues() {
-  notImplemented();
-}
 void FrameWin::issuePasteCommand() {
   notImplemented();
 }
@@ -544,9 +473,6 @@ bool FrameWin::toolbarVisible() {
 void FrameWin::issueTransposeCommand() {
   notImplemented();
 }
-void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {
-  notImplemented();
-}
 bool FrameWin::canPaste() const {
   notImplemented();
   return 0;
@@ -574,10 +500,6 @@ Plugin* FrameWin::createPlugin(KURL const&,
 void BrowserExtensionWin::openURLRequest(KURL const&,
                                          struct WebCore::URLArgs const&) {
   notImplemented();
-}
-int BrowserExtensionWin::getHistoryLength() {
-  notImplemented();
-  return 0;
 }
 bool BrowserExtensionWin::canRunModal() {
   notImplemented();
@@ -607,22 +529,8 @@ void BrowserExtensionWin::createNewWindow(KURL const&,
   notImplemented();
 }
 
-IntRect Font::selectionRectForText(int,
-                                   int,
-                                   int,
-                                   int,
-                                   int,
-                                   const QChar*,
-                                   int,
-                                   int,
-                                   int,
-                                   int,
-                                   bool,
-                                   bool,
-                                   int,
-                                   int) const {
+void RenderCanvasImage::setNeedsImageUpdate() {
   notImplemented();
-  return IntRect();
 }
 
 /********************************************************/
@@ -692,8 +600,10 @@ bool FrameWin::shouldChangeSelection(SelectionController const&,
                                      SelectionController const&,
                                      WebCore::EAffinity,
                                      bool) const {
-  return 0;
+  return true;
 }
+void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
+                                         bool) {}
 static int frameNumber = 0;
 Frame* FrameWin::createFrame(KURL const&,
                              QString const&,
@@ -706,24 +616,18 @@ void FrameWin::clearUndoRedoOperations(void) {}
 QString FrameWin::incomingReferrer() const {
   return QString();
 }
-
-int Font::checkSelectionPoint(const QChar*,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              int,
-                              WebCore::TextDirection,
-                              bool,
-                              bool) const {
-  return 0;
-}
+void FrameWin::clearRecordedFormValues() {}
+void FrameWin::recordFormValue(QString const&,
+                               QString const&,
+                               WebCore::HTMLFormElementImpl*) {}
+void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {}
 void BrowserExtensionWin::setIconURL(KURL const&) {}
+int BrowserExtensionWin::getHistoryLength() {
+  return 0;
+}
 
 bool KWQCheckIfReloading(WebCore::DocLoader*) {
   return false;
@@ -732,6 +636,7 @@ void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}
+void Widget::setIsSelected(bool) {}
 
 void ScrollView::addChild(Widget*, int, int) {}
 void ScrollView::removeChild(Widget*) {}
@@ -744,6 +649,14 @@ void GraphicsContext::setShadow(int, int, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
 void GraphicsContext::endTransparencyLayer() {}
+Color GraphicsContext::selectedTextBackgroundColor() const {
+  return Color(0, 0, 255);
+}
+void GraphicsContext::addRoundedRectClip(IntRect const&,
+                                         IntSize const&,
+                                         IntSize const&,
+                                         IntSize const&,
+                                         IntSize const&) {}
 
 Path::Path() {}
 Path::~Path() {}
@@ -828,3 +741,19 @@ IntRect QComboBox::frameGeometry() const {
   return IntRect();
 }
 void QComboBox::setFrameGeometry(IntRect const&) {}
+
+QScrollBar::QScrollBar(ScrollBarOrientation) {}
+QScrollBar::~QScrollBar() {}
+void QScrollBar::setSteps(int, int) {}
+bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
+  return 0;
+}
+bool QScrollBar::setValue(int) {
+  return 0;
+}
+void QScrollBar::setKnobProportion(int, int) {}
+
+QListBox::QListBox() {}
+QListBox::~QListBox() {}
+void QListBox::setSelectionMode(QListBox::SelectionMode) {}
+void QListBox::setFont(WebCore::Font const&) {}
