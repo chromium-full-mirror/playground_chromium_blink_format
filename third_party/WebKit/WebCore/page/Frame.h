@@ -845,7 +845,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void prepareForUserAction();
   NodeImpl* mousePressNode();
 
-  bool isComplete();
+  bool isComplete() const;
+  bool isLoadingMainResource() const;
 
   void replaceContentsWithScriptResult(const KURL& url);
 

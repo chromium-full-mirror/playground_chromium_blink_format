@@ -1083,7 +1083,7 @@ Tokenizer* DocumentImpl::createTokenizer() {
 }
 
 void DocumentImpl::open() {
-  if (parsing())
+  if (frame() && frame()->isLoadingMainResource())
     return;
 
   implicitOpen();
