@@ -43,10 +43,6 @@ static void notImplemented() {
   _CrtDbgBreak();
 }
 
-IntPoint FrameView::viewportToGlobal(IntPoint const&) const {
-  notImplemented();
-  return IntPoint();
-}
 void FrameView::updateBorder() {
   notImplemented();
 }
@@ -350,9 +346,6 @@ int WebCore::findNextWordFromIndex(QChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
-void WebCore::findWordBoundary(QChar const*, int, int, int*, int*) {
-  notImplemented();
-}
 
 Array<char> KWQServeSynchronousRequest(Loader*,
                                        DocLoader*,
@@ -363,9 +356,6 @@ Array<char> KWQServeSynchronousRequest(Loader*,
   return 0;
 }
 
-void FrameWin::respondToChangedContents() {
-  notImplemented();
-}
 void FrameWin::unfocusWindow() {
   notImplemented();
 }
@@ -414,16 +404,14 @@ bool FrameWin::passMouseDownEventToWidget(Widget*) {
   notImplemented();
   return 0;
 }
-void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {
-  notImplemented();
-}
 void FrameWin::issueCutCommand() {
   notImplemented();
 }
 void FrameWin::issueCopyCommand() {
   notImplemented();
 }
-void FrameWin::openURLRequest(KURL const&, struct WebCore::URLArgs const&) {
+void FrameWin::openURLRequest(KURL const&,
+                              struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
 bool FrameWin::passWheelEventToChildWidget(NodeImpl*) {
@@ -441,10 +429,6 @@ void FrameWin::issuePasteCommand() {
   notImplemented();
 }
 void FrameWin::scheduleClose() {
-  notImplemented();
-}
-void FrameWin::markMisspellingsInAdjacentWords(
-    WebCore::VisiblePosition const&) {
   notImplemented();
 }
 void FrameWin::markMisspellings(WebCore::SelectionController const&) {
@@ -493,8 +477,9 @@ Plugin* FrameWin::createPlugin(KURL const&,
   return 0;
 }
 
-void BrowserExtensionWin::openURLRequest(KURL const&,
-                                         struct WebCore::URLArgs const&) {
+void BrowserExtensionWin::openURLRequest(
+    KURL const&,
+    struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
 bool BrowserExtensionWin::canRunModal() {
@@ -504,10 +489,11 @@ bool BrowserExtensionWin::canRunModal() {
 void BrowserExtensionWin::openURLNotify() {
   notImplemented();
 }
-void BrowserExtensionWin::createNewWindow(KURL const&,
-                                          struct WebCore::URLArgs const&,
-                                          struct WebCore::WindowArgs const&,
-                                          Frame*&) {
+void BrowserExtensionWin::createNewWindow(
+    KURL const&,
+    struct WebCore::ResourceRequest const&,
+    struct WebCore::WindowArgs const&,
+    Frame*&) {
   notImplemented();
 }
 bool BrowserExtensionWin::canRunModalNow() {
@@ -520,8 +506,9 @@ void BrowserExtensionWin::runModal() {
 void BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
-void BrowserExtensionWin::createNewWindow(KURL const&,
-                                          struct WebCore::URLArgs const&) {
+void BrowserExtensionWin::createNewWindow(
+    KURL const&,
+    struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
 
@@ -551,6 +538,15 @@ String WebCore::resetButtonDefaultLabel() {
 }
 String WebCore::defaultLanguage() {
   return "en";
+}
+
+void WebCore::findWordBoundary(QChar const* str,
+                               int len,
+                               int position,
+                               int* start,
+                               int* end) {
+  *start = position;
+  *end = position;
 }
 
 void WebCore::setCookies(KURL const&, KURL const&, String const&) {}
@@ -608,6 +604,7 @@ Frame* FrameWin::createFrame(KURL const&,
   return 0;
 }
 void FrameWin::saveDocumentState(void) {}
+void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
 void FrameWin::clearUndoRedoOperations(void) {}
 QString FrameWin::incomingReferrer() const {
   return QString();
@@ -616,7 +613,11 @@ void FrameWin::clearRecordedFormValues() {}
 void FrameWin::recordFormValue(QString const&,
                                QString const&,
                                WebCore::HTMLFormElementImpl*) {}
-void FrameWin::submitForm(KURL const&, struct WebCore::URLArgs const&) {}
+void FrameWin::submitForm(KURL const&, struct WebCore::ResourceRequest const&) {
+}
+void FrameWin::markMisspellingsInAdjacentWords(
+    WebCore::VisiblePosition const&) {}
+void FrameWin::respondToChangedContents() {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {}

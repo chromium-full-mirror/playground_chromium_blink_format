@@ -55,7 +55,7 @@ FrameWin::FrameWin(Page* page, RenderPart* renderPart, FrameWinClient* client)
 
 FrameWin::~FrameWin() {}
 
-void FrameWin::urlSelected(const KURL& url, const URLArgs&) {
+void FrameWin::urlSelected(const KURL& url, const ResourceRequest&) {
   if (m_client)
     m_client->openURL(url.url());
 }
@@ -84,7 +84,7 @@ bool FrameWin::runJavaScriptConfirm(String const& message) {
 }
 
 // FIXME: This needs to be unified with the keyPress method on MacFrame
-bool FrameWin::keyPress(KeyEvent* keyEvent) {
+bool FrameWin::keyPress(const KeyEvent& keyEvent) {
   bool result;
   // Check for cases where we are too early for events -- possible unmatched key
   // up
@@ -102,7 +102,7 @@ bool FrameWin::keyPress(KeyEvent* keyEvent) {
       return false;
   }
 
-  if (!keyEvent->isKeyUp())
+  if (!keyEvent.isKeyUp())
     prepareForUserAction();
 
   result = !node->dispatchKeyEvent(keyEvent);

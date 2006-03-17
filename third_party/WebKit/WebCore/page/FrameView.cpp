@@ -700,8 +700,8 @@ bool FrameView::updateDragAndDrop(const MouseEvent& event,
   bool accept = false;
   int xm, ym;
   viewportToContents(event.x(), event.y(), xm, ym);
-  MouseEventWithHitTestResults mev =
-      m_frame->document()->prepareMouseEvent(true, false, false, xm, ym, 0);
+  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
+      true, false, false, xm, ym, MouseEvent());
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
@@ -1070,7 +1070,7 @@ void FrameView::layoutTimerFired(Timer<FrameView>*) {
 void FrameView::hoverTimerFired(Timer<FrameView>*) {
   d->hoverTimer.stop();
   m_frame->document()->prepareMouseEvent(false, false, true, d->prevMouseX,
-                                         d->prevMouseY, 0);
+                                         d->prevMouseY, MouseEvent());
 }
 
 void FrameView::scheduleRelayout() {

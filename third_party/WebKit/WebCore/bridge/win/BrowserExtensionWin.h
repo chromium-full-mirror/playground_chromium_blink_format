@@ -34,13 +34,15 @@ class BrowserExtensionWin : public BrowserExtension {
  public:
   BrowserExtensionWin(Frame*);
 
-  virtual void openURLRequest(const KURL&, const URLArgs& args = URLArgs());
+  virtual void openURLRequest(const KURL&,
+                              const ResourceRequest& args = ResourceRequest());
   virtual void openURLNotify();
 
+  virtual void createNewWindow(
+      const KURL& url,
+      const ResourceRequest& ResourceRequest = ResourceRequest());
   virtual void createNewWindow(const KURL& url,
-                               const URLArgs& urlArgs = URLArgs());
-  virtual void createNewWindow(const KURL& url,
-                               const URLArgs& urlArgs,
+                               const ResourceRequest& ResourceRequest,
                                const WindowArgs& winArgs,
                                Frame*& part);
 
