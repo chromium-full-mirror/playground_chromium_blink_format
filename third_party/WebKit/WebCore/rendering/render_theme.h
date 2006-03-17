@@ -66,6 +66,10 @@ class RenderTheme {
   bool paint(RenderObject* o,
              const RenderObject::PaintInfo& i,
              const IntRect& r);
+  bool paintBorder(RenderObject* o,
+                   const RenderObject::PaintInfo& i,
+                   const IntRect& r);
+  bool shouldPaintBorder(RenderObject* o);
 
   // The remaining methods should be implemented by the platform-specific
   // portion of the theme, e.g.,

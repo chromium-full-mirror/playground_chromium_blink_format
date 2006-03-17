@@ -32,5 +32,6 @@
                        radius:(float)radius
                         color:(CGColorRef)color;
 - (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
+- (void)drawBezeledTextFieldCell:(NSRect)rect enabled:(BOOL)active;
 
 @end
