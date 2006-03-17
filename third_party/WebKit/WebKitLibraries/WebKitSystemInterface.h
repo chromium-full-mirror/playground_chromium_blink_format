@@ -115,6 +115,8 @@ void WKSetFocusRingStyle(NSFocusRingPlacement placement,
 
 void WKSetDragImage(NSImage* image, NSPoint offset);
 
+void WKDrawBezeledTextFieldCell(NSRect, BOOL enabled);
+
 void WKSendUserChangeNotifications(void);
 BOOL WKConvertNSEventToCarbonEvent(EventRecord* carbonEvent,
                                    NSEvent* cocoaEvent);
