@@ -3718,7 +3718,7 @@ void RenderBlock::updateFirstLetter() {
       // NOTE: this might empty
       RenderTextFragment* remainingText = new (renderArena())
           RenderTextFragment(textObj->node(), oldText.get(), length,
-                             oldText->length() - length);
+                             oldText->length() - length, firstLetter);
       remainingText->setStyle(textObj->style());
       if (remainingText->element())
         remainingText->element()->setRenderer(remainingText);

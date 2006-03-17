@@ -32,17 +32,20 @@ namespace khtml {
 RenderTextFragment::RenderTextFragment(DOM::NodeImpl* node,
                                        DOM::DOMStringImpl* str,
                                        int startOffset,
-                                       int length)
+                                       int length,
+                                       RenderObject* firstLetter)
     : RenderText(node, str ? str->substring(startOffset, length) : 0),
       m_start(startOffset),
-      m_end(length) {}
+      m_end(length),
+      m_firstLetter(firstLetter) {}
 
 RenderTextFragment::RenderTextFragment(DOM::NodeImpl* node,
                                        DOM::DOMStringImpl* str)
     : RenderText(node, str),
       m_start(0),
       m_end(str ? str->length() : 0),
-      m_generatedContentStr(str) {}
+      m_generatedContentStr(str),
+      m_firstLetter(0) {}
 
 bool RenderTextFragment::isTextFragment() const {
   return true;
@@ -57,5 +60,11 @@ PassRefPtr<DOMStringImpl> RenderTextFragment::originalString() const {
   if (result && (start() > 0 || start() < result->length()))
     result = result->substring(start(), end());
   return result;
+}
+
+void RenderTextFragment::destroy() {
+  if (firstLetter())
+    firstLetter()->destroy();
+  RenderText::destroy();
 }
 }
