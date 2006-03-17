@@ -681,7 +681,7 @@ bool ContainerNodeImpl::getLowerRightCorner(int& xPos, int& yPos) const {
   if (!o->isInline() || o->isReplaced()) {
     o->absolutePosition(xPos, yPos);
     xPos += o->width();
-    yPos += o->height();
+    yPos += o->height() + o->borderTopExtra() + o->borderBottomExtra();
     return true;
   }
   // find the last text/image child, to get a position

@@ -708,6 +708,7 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
     f = true;
   RenderObject* o = container();
   if (o && o->absolutePosition(xPos, yPos, f)) {
+    yPos += o->borderTopExtra();
     if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
         o->isInlineFlow()) {
       // When we have an enclosing relpositioned inline, we need to add in the
@@ -749,8 +750,10 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
     if (o->hasOverflowClip())
       o->layer()->subtractScrollOffset(xPos, yPos);
 
-    if (!isInline() || isReplaced())
-      xPos += m_x, yPos += m_y;
+    if (!isInline() || isReplaced()) {
+      xPos += m_x;
+      yPos += m_y;
+    }
 
     if (isRelPositioned())
       relativePositionOffset(xPos, yPos);
