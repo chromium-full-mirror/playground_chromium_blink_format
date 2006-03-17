@@ -61,7 +61,6 @@ class SVGDocumentImpl : public DocumentImpl, public CachedObjectClient {
   void dispatchRecursiveEvent(EventImpl* event, NodeImpl* obj);
   void dispatchZoomEvent(float prevScale, float newScale);
   void dispatchScrollEvent();
-  bool dispatchKeyEvent(NodeImpl* target, KeyEvent* key, bool keypress);
 
   virtual void recalcStyle(StyleChange = NoChange);
 

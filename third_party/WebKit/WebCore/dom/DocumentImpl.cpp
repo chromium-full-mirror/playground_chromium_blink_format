@@ -1658,9 +1658,9 @@ MouseEventWithHitTestResults DocumentImpl::prepareMouseEvent(
     bool mouseMove,
     int x,
     int y,
-    MouseEvent* event) {
+    const MouseEvent& event) {
   if (!renderer())
-    return MouseEventWithHitTestResults();
+    return MouseEventWithHitTestResults(event, String(), String(), 0);
 
   assert(renderer()->isCanvas());
   RenderObject::NodeInfo renderInfo(readonly, active, mouseMove);
@@ -2228,7 +2228,7 @@ void DocumentImpl::defaultEventHandler(EventImpl* evt) {
   if (evt->type() == keydownEvent) {
     KeyboardEventImpl* kevt = static_cast<KeyboardEventImpl*>(evt);
     if (kevt->ctrlKey()) {
-      KeyEvent* ev = kevt->keyEvent();
+      const KeyEvent* ev = kevt->keyEvent();
       String key = (ev ? ev->unmodifiedText() : kevt->keyIdentifier()).lower();
       ElementImpl* elem = getElementByAccessKey(key);
       if (elem) {

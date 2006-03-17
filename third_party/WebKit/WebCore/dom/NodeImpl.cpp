@@ -637,7 +637,7 @@ void NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
   }
 }
 
-bool NodeImpl::dispatchMouseEvent(MouseEvent* _mouse,
+bool NodeImpl::dispatchMouseEvent(const MouseEvent& _mouse,
                                   const AtomicString& eventType,
                                   int clickCount,
                                   NodeImpl* relatedTarget) {
@@ -646,12 +646,12 @@ bool NodeImpl::dispatchMouseEvent(MouseEvent* _mouse,
   int clientX = 0;
   int clientY = 0;
   if (FrameView* view = getDocument()->view())
-    view->viewportToContents(_mouse->x(), _mouse->y(), clientX, clientY);
+    view->viewportToContents(_mouse.x(), _mouse.y(), clientX, clientY);
 
   return dispatchMouseEvent(
-      eventType, _mouse->button(), clickCount, clientX, clientY,
-      _mouse->globalX(), _mouse->globalY(), _mouse->ctrlKey(), _mouse->altKey(),
-      _mouse->shiftKey(), _mouse->metaKey(), false, relatedTarget);
+      eventType, _mouse.button(), clickCount, clientX, clientY,
+      _mouse.globalX(), _mouse.globalY(), _mouse.ctrlKey(), _mouse.altKey(),
+      _mouse.shiftKey(), _mouse.metaKey(), false, relatedTarget);
 }
 
 bool NodeImpl::dispatchSimulatedMouseEvent(const AtomicString& eventType) {
@@ -809,7 +809,7 @@ bool NodeImpl::dispatchSubtreeModifiedEvent(bool sendChildrenChanged) {
       ec, true);
 }
 
-bool NodeImpl::dispatchKeyEvent(KeyEvent* key) {
+bool NodeImpl::dispatchKeyEvent(const KeyEvent& key) {
   assert(!eventDispatchForbidden());
   ExceptionCode ec = 0;
   RefPtr<KeyboardEventImpl> keyboardEventImpl =
@@ -825,9 +825,9 @@ bool NodeImpl::dispatchKeyEvent(KeyEvent* key) {
   return r;
 }
 
-void NodeImpl::dispatchWheelEvent(WheelEvent* e) {
+void NodeImpl::dispatchWheelEvent(WheelEvent& e) {
   assert(!eventDispatchForbidden());
-  if (e->delta() == 0)
+  if (e.delta() == 0)
     return;
 
   DocumentImpl* doc = getDocument();
@@ -840,16 +840,15 @@ void NodeImpl::dispatchWheelEvent(WheelEvent* e) {
 
   int x;
   int y;
-  view->viewportToContents(e->x(), e->y(), x, y);
+  view->viewportToContents(e.x(), e.y(), x, y);
 
   RefPtr<WheelEventImpl> we = new WheelEventImpl(
-      e->isHorizontal(), e->delta(), getDocument()->defaultView(), e->globalX(),
-      e->globalY(), x, y, e->ctrlKey(), e->altKey(), e->shiftKey(),
-      e->metaKey());
+      e.isHorizontal(), e.delta(), getDocument()->defaultView(), e.globalX(),
+      e.globalY(), x, y, e.ctrlKey(), e.altKey(), e.shiftKey(), e.metaKey());
 
   ExceptionCode ec = 0;
   if (!dispatchEvent(we, ec, true))
-    e->accept();
+    e.accept();
 }
 
 void NodeImpl::handleLocalEvents(EventImpl* evt, bool useCapture) {

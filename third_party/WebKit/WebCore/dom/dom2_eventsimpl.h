@@ -301,7 +301,7 @@ class KeyboardEventImpl : public UIEventWithKeyStateImpl {
     DOM_KEY_LOCATION_NUMPAD = 0x03,
   };
   KeyboardEventImpl();
-  KeyboardEventImpl(KeyEvent*, AbstractViewImpl*);
+  KeyboardEventImpl(const KeyEvent&, AbstractViewImpl*);
   KeyboardEventImpl(const AtomicString& type,
                     bool canBubbleArg,
                     bool cancelableArg,
@@ -332,7 +332,7 @@ class KeyboardEventImpl : public UIEventWithKeyStateImpl {
 
   bool altGraphKey() const { return m_altGraphKey; }
 
-  KeyEvent* keyEvent() const { return m_keyEvent; }
+  const KeyEvent* keyEvent() const { return m_keyEvent; }
 
   int keyCode()
       const;  // key code for keydown and keyup, character for other events

@@ -30,6 +30,7 @@
 #include "IntRect.h"
 #include "KWQClipboard.h"
 #include "KWQScrollBar.h"
+#include "MouseEvent.h"
 #include "NodeImpl.h"
 #include "WebCoreKeyboardAccess.h"
 #include "text_affinity.h"
@@ -37,7 +38,6 @@
 
 #import <CoreFoundation/CoreFoundation.h>
 
-class KWQWindowWidget;
 class NPObject;
 
 namespace KJS {
@@ -201,7 +201,7 @@ class MacFrame : public Frame {
                              NSRect* elementRect) const;
 
   bool dispatchDragSrcEvent(const AtomicString& eventType,
-                            const IntPoint& loc) const;
+                            const MouseEvent&) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
   NSDictionary* fontAttributesForSelectionStart() const;
@@ -231,8 +231,8 @@ class MacFrame : public Frame {
 
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
   bool eventMayStartDrag(NSEvent*) const;
-  void dragSourceMovedTo(const IntPoint& loc);
-  void dragSourceEndedAt(const IntPoint& loc, NSDragOperation operation);
+  void dragSourceMovedTo(const MouseEvent&);
+  void dragSourceEndedAt(const MouseEvent&, NSDragOperation);
 
   bool mayCut();
   bool mayCopy();
@@ -258,8 +258,6 @@ class MacFrame : public Frame {
   NSString* matchLabelsAgainstElement(NSArray* labels, ElementImpl* element);
 
   bool findString(NSString* str, bool forward, bool caseFlag, bool wrapFlag);
-
-  KWQWindowWidget* topLevelWidget();
 
   virtual void tokenizerProcessedData();
 
@@ -344,9 +342,9 @@ class MacFrame : public Frame {
   virtual void redirectionTimerFired(Timer<Frame>*);
 
  private:
-  virtual void khtmlMousePressEvent(MouseEventWithHitTestResults*);
-  virtual void khtmlMouseMoveEvent(MouseEventWithHitTestResults*);
-  virtual void khtmlMouseReleaseEvent(MouseEventWithHitTestResults*);
+  virtual void khtmlMousePressEvent(const MouseEventWithHitTestResults&);
+  virtual void khtmlMouseMoveEvent(const MouseEventWithHitTestResults&);
+  virtual void khtmlMouseReleaseEvent(const MouseEventWithHitTestResults&);
 
   NSView* mouseDownViewIfStillGood();
 
@@ -371,8 +369,7 @@ class MacFrame : public Frame {
   bool _sendingEventToSubview;
   bool _mouseDownMayStartDrag;
   bool _mouseDownMayStartSelect;
-  // in our window's coords
-  int _mouseDownWinX, _mouseDownWinY;
+  MouseEvent m_mouseDown;
   // in our view's coords
   int _mouseDownX, _mouseDownY;
   float _mouseDownTimestamp;
@@ -382,8 +379,6 @@ class MacFrame : public Frame {
 
   NSMutableDictionary* _formValuesAboutToBeSubmitted;
   ObjCDOMElement* _formAboutToBeSubmitted;
-
-  KWQWindowWidget* _windowWidget;
 
   bool _haveUndoRedoOperations;
 

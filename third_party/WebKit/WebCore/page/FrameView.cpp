@@ -459,14 +459,14 @@ void FrameView::layout() {
 //
 /////////////////
 
-void FrameView::viewportMousePressEvent(MouseEvent* mouseEvent) {
+void FrameView::viewportMousePressEvent(const MouseEvent& mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
+  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
 
   d->mousePressed = true;
 
@@ -478,14 +478,14 @@ void FrameView::viewportMousePressEvent(MouseEvent* mouseEvent) {
     return;
   }
 
-  d->clickCount = mouseEvent->clickCount();
+  d->clickCount = mouseEvent.clickCount();
   d->clickNode = mev.innerNode();
 
   bool swallowEvent = dispatchMouseEvent(mousedownEvent, mev.innerNode(), true,
                                          d->clickCount, mouseEvent, true);
 
   if (!swallowEvent) {
-    m_frame->khtmlMousePressEvent(&mev);
+    m_frame->khtmlMousePressEvent(mev);
     // Many AK widgets run their own event loops and consume events while the
     // mouse is down.
     // When they finish, currentEvent is the mouseUp that they exited on.  We
@@ -499,14 +499,14 @@ void FrameView::viewportMousePressEvent(MouseEvent* mouseEvent) {
   }
 }
 
-void FrameView::viewportMouseDoubleClickEvent(MouseEvent* mouseEvent) {
+void FrameView::viewportMouseDoubleClickEvent(const MouseEvent& mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
+  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
 
   // We get this instead of a second mouse-up
   d->mousePressed = false;
@@ -517,7 +517,7 @@ void FrameView::viewportMouseDoubleClickEvent(MouseEvent* mouseEvent) {
   if (m_frame->passSubframeEventToSubframe(mev))
     return;
 
-  d->clickCount = mouseEvent->clickCount();
+  d->clickCount = mouseEvent.clickCount();
   bool swallowEvent = dispatchMouseEvent(mouseupEvent, mev.innerNode(), true,
                                          d->clickCount, mouseEvent, false);
 
@@ -527,8 +527,8 @@ void FrameView::viewportMouseDoubleClickEvent(MouseEvent* mouseEvent) {
 
   // Qt delivers a release event AND a double click event.
   if (!swallowEvent) {
-    m_frame->khtmlMouseReleaseEvent(&mev);
-    m_frame->khtmlMouseDoubleClickEvent(&mev);
+    m_frame->khtmlMouseReleaseEvent(mev);
+    m_frame->khtmlMouseDoubleClickEvent(mev);
   }
 
   invalidateClick();
@@ -596,7 +596,7 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
   return pointerCursor();
 }
 
-void FrameView::viewportMouseMoveEvent(MouseEvent* mouseEvent) {
+void FrameView::viewportMouseMoveEvent(const MouseEvent& mouseEvent) {
   // in Radar 3703768 we saw frequent crashes apparently due to the
   // part being null here, which seems impossible, so check for nil
   // but also assert so that we can try to figure this out in debug
@@ -609,7 +609,7 @@ void FrameView::viewportMouseMoveEvent(MouseEvent* mouseEvent) {
     d->hoverTimer.stop();
 
   int xm, ym;
-  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
+  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
 
   if (d->resizingFrameSet) {
     dispatchMouseEvent(mousemoveEvent, d->resizingFrameSet.get(), false, 0,
@@ -634,7 +634,7 @@ void FrameView::viewportMouseMoveEvent(MouseEvent* mouseEvent) {
   bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.innerNode(), false,
                                          0, mouseEvent, true);
   if (!swallowEvent)
-    m_frame->khtmlMouseMoveEvent(&mev);
+    m_frame->khtmlMouseMoveEvent(mev);
 }
 
 void FrameView::invalidateClick() {
@@ -642,14 +642,14 @@ void FrameView::invalidateClick() {
   d->clickNode = 0;
 }
 
-void FrameView::viewportMouseReleaseEvent(MouseEvent* mouseEvent) {
+void FrameView::viewportMouseReleaseEvent(const MouseEvent& mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
   int xm, ym;
-  viewportToContents(mouseEvent->x(), mouseEvent->y(), xm, ym);
+  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
 
   d->mousePressed = false;
 
@@ -673,47 +673,33 @@ void FrameView::viewportMouseReleaseEvent(MouseEvent* mouseEvent) {
                        mouseEvent, true);
 
   if (!swallowEvent)
-    m_frame->khtmlMouseReleaseEvent(&mev);
+    m_frame->khtmlMouseReleaseEvent(mev);
 
   invalidateClick();
 }
 
-void FrameView::keyPressEvent(KeyEvent* ke) {
-  if (m_frame->document() && m_frame->document()->focusNode()) {
-    if (m_frame->document()->focusNode()->dispatchKeyEvent(ke))
-      ke->accept();
-  }
-}
-
 bool FrameView::dispatchDragEvent(const AtomicString& eventType,
                                   NodeImpl* dragTarget,
-                                  const IntPoint& loc,
+                                  const MouseEvent& event,
                                   ClipboardImpl* clipboard) {
   int clientX, clientY;
-  viewportToContents(loc.x(), loc.y(), clientX, clientY);
-  IntPoint screenLoc = viewportToGlobal(loc);
-  int screenX = screenLoc.x();
-  int screenY = screenLoc.y();
-  bool ctrlKey = 0;  // FIXME - set up modifiers, grab from AK or CG
-  bool altKey = 0;
-  bool shiftKey = 0;
-  bool metaKey = 0;
+  viewportToContents(event.x(), event.y(), clientX, clientY);
 
   RefPtr<MouseEventImpl> me = new MouseEventImpl(
-      eventType, true, true, m_frame->document()->defaultView(), 0, screenX,
-      screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, 0, 0,
-      clipboard);
+      eventType, true, true, m_frame->document()->defaultView(), 0,
+      event.globalX(), event.globalY(), clientX, clientY, event.ctrlKey(),
+      event.altKey(), event.shiftKey(), event.metaKey(), 0, 0, clipboard);
 
   ExceptionCode ec = 0;
   dragTarget->dispatchEvent(me.get(), ec, true);
   return me->defaultPrevented();
 }
 
-bool FrameView::updateDragAndDrop(const IntPoint& loc,
+bool FrameView::updateDragAndDrop(const MouseEvent& event,
                                   ClipboardImpl* clipboard) {
   bool accept = false;
   int xm, ym;
-  viewportToContents(loc.x(), loc.y(), xm, ym);
+  viewportToContents(event.x(), event.y(), xm, ym);
   MouseEventWithHitTestResults mev =
       m_frame->document()->prepareMouseEvent(true, false, false, xm, ym, 0);
 
@@ -726,30 +712,31 @@ bool FrameView::updateDragAndDrop(const IntPoint& loc,
   if (d->dragTarget != newTarget) {
     // note this ordering is explicitly chosen to match WinIE
     if (newTarget)
-      accept = dispatchDragEvent(dragenterEvent, newTarget, loc, clipboard);
+      accept = dispatchDragEvent(dragenterEvent, newTarget, event, clipboard);
     if (d->dragTarget)
-      dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
+      dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), event, clipboard);
   } else {
     if (newTarget)
-      accept = dispatchDragEvent(dragoverEvent, newTarget, loc, clipboard);
+      accept = dispatchDragEvent(dragoverEvent, newTarget, event, clipboard);
   }
   d->dragTarget = newTarget;
 
   return accept;
 }
 
-void FrameView::cancelDragAndDrop(const IntPoint& loc,
+void FrameView::cancelDragAndDrop(const MouseEvent& event,
                                   ClipboardImpl* clipboard) {
   if (d->dragTarget)
-    dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
+    dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), event, clipboard);
   d->dragTarget = 0;
 }
 
-bool FrameView::performDragAndDrop(const IntPoint& loc,
+bool FrameView::performDragAndDrop(const MouseEvent& event,
                                    ClipboardImpl* clipboard) {
   bool accept = false;
   if (d->dragTarget)
-    accept = dispatchDragEvent(dropEvent, d->dragTarget.get(), loc, clipboard);
+    accept =
+        dispatchDragEvent(dropEvent, d->dragTarget.get(), event, clipboard);
   d->dragTarget = 0;
   return accept;
 }
@@ -953,7 +940,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
                                    NodeImpl* targetNode,
                                    bool cancelable,
                                    int clickCount,
-                                   MouseEvent* mouseEvent,
+                                   const MouseEvent& mouseEvent,
                                    bool setUnder) {
   // if the target node is a text node, dispatch on the parent node -
   // rdar://4196646
@@ -964,7 +951,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   // mouseout/mouseover
   if (setUnder) {
     int clientX, clientY;
-    viewportToContents(mouseEvent->x(), mouseEvent->y(), clientX, clientY);
+    viewportToContents(mouseEvent.x(), mouseEvent.y(), clientX, clientY);
     if (d->prevMouseX != clientX || d->prevMouseY != clientY) {
       // ### this code sucks. we should save the oldUnder instead of calculating
       // it again. calculating is expensive! (Dirk)
@@ -1037,25 +1024,25 @@ void FrameView::setIgnoreWheelEvents(bool e) {
   d->ignoreWheelEvents = e;
 }
 
-void FrameView::viewportWheelEvent(WheelEvent* e) {
+void FrameView::viewportWheelEvent(WheelEvent& e) {
   DocumentImpl* doc = m_frame->document();
   if (doc) {
     RenderObject* docRenderer = doc->renderer();
     if (docRenderer) {
       int x, y;
-      viewportToContents(e->x(), e->y(), x, y);
+      viewportToContents(e.x(), e.y(), x, y);
 
       RenderObject::NodeInfo hitTestResult(true, false);
       doc->renderer()->layer()->hitTest(hitTestResult, x, y);
       NodeImpl* node = hitTestResult.innerNode();
 
       if (m_frame->passWheelEventToChildWidget(node)) {
-        e->accept();
+        e.accept();
         return;
       }
       if (node) {
         node->dispatchWheelEvent(e);
-        if (e->isAccepted())
+        if (e.isAccepted())
           return;
       }
     }

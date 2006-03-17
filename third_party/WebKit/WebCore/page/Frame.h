@@ -562,12 +562,12 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    */
   KURL completeURL(const QString& url);
 
-  virtual void khtmlMouseDoubleClickEvent(MouseEventWithHitTestResults*);
-  virtual void khtmlMousePressEvent(MouseEventWithHitTestResults*);
-  virtual void khtmlMouseMoveEvent(MouseEventWithHitTestResults*);
-  virtual void khtmlMouseReleaseEvent(MouseEventWithHitTestResults*);
+  virtual void khtmlMouseDoubleClickEvent(const MouseEventWithHitTestResults&);
+  virtual void khtmlMousePressEvent(const MouseEventWithHitTestResults&);
+  virtual void khtmlMouseMoveEvent(const MouseEventWithHitTestResults&);
+  virtual void khtmlMouseReleaseEvent(const MouseEventWithHitTestResults&);
 
-  void selectClosestWordFromMouseEvent(MouseEvent*,
+  void selectClosestWordFromMouseEvent(const MouseEvent&,
                                        NodeImpl* innerNode,
                                        int x,
                                        int y);
@@ -819,8 +819,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void sendScrollEvent();
   bool scrollbarsVisible();
   void scrollToAnchor(const KURL&);
-  bool canMouseDownStartSelect(NodeImpl* node);
-  bool passWidgetMouseDownEventToWidget(MouseEventWithHitTestResults*,
+  bool canMouseDownStartSelect(NodeImpl*);
+  bool passWidgetMouseDownEventToWidget(const MouseEventWithHitTestResults&,
                                         bool isDoubleClick);
   bool passWidgetMouseDownEventToWidget(RenderWidget*);
   virtual bool passMouseDownEventToWidget(Widget*) = 0;
@@ -866,18 +866,18 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   void receivedFirstData();
 
-  bool handleMouseMoveEventDrag(MouseEventWithHitTestResults*);
-  bool handleMouseMoveEventOver(MouseEventWithHitTestResults*);
-  void handleMouseMoveEventSelection(MouseEventWithHitTestResults*);
+  bool handleMouseMoveEventDrag(const MouseEventWithHitTestResults&);
+  bool handleMouseMoveEventOver(const MouseEventWithHitTestResults&);
+  void handleMouseMoveEventSelection(const MouseEventWithHitTestResults&);
 
   /**
    * @internal Extracts anchor and tries both encoded and decoded form.
    */
   void gotoAnchor();
 
-  void handleMousePressEventSingleClick(MouseEventWithHitTestResults*);
-  void handleMousePressEventDoubleClick(MouseEventWithHitTestResults*);
-  void handleMousePressEventTripleClick(MouseEventWithHitTestResults*);
+  void handleMousePressEventSingleClick(const MouseEventWithHitTestResults&);
+  void handleMousePressEventDoubleClick(const MouseEventWithHitTestResults&);
+  void handleMousePressEventTripleClick(const MouseEventWithHitTestResults&);
 
   CSSComputedStyleDeclarationImpl* selectionComputedStyle(
       NodeImpl*& nodeToRemove) const;

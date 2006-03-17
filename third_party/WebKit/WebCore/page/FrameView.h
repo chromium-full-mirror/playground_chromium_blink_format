@@ -137,18 +137,17 @@ class FrameView : public ScrollView {
  public:
   void clearPart();
 
-  void viewportMousePressEvent(MouseEvent*);
-  void viewportMouseDoubleClickEvent(MouseEvent*);
-  void viewportMouseMoveEvent(MouseEvent*);
-  void viewportMouseReleaseEvent(MouseEvent*);
-  void viewportWheelEvent(WheelEvent*);
-  void keyPressEvent(KeyEvent*);
+  void viewportMousePressEvent(const MouseEvent&);
+  void viewportMouseDoubleClickEvent(const MouseEvent&);
+  void viewportMouseMoveEvent(const MouseEvent&);
+  void viewportMouseReleaseEvent(const MouseEvent&);
+  void viewportWheelEvent(WheelEvent&);
 
   void doAutoScroll();
 
-  bool updateDragAndDrop(const IntPoint&, ClipboardImpl* clipboard);
-  void cancelDragAndDrop(const IntPoint&, ClipboardImpl* clipboard);
-  bool performDragAndDrop(const IntPoint&, ClipboardImpl* clipboard);
+  bool updateDragAndDrop(const MouseEvent&, ClipboardImpl*);
+  void cancelDragAndDrop(const MouseEvent&, ClipboardImpl*);
+  bool performDragAndDrop(const MouseEvent&, ClipboardImpl*);
 
   void layoutTimerFired(Timer<FrameView>*);
   void hoverTimerFired(Timer<FrameView>*);
@@ -165,10 +164,6 @@ class FrameView : public ScrollView {
 
   void scheduleHoverStateUpdate();
 
-  Widget* topLevelWidget() const;
-  IntPoint mapToGlobal(const IntPoint&) const;
-  // maps "viewport" (actually Cocoa window coords) to screen coords
-  IntPoint viewportToGlobal(const IntPoint&) const;
   void adjustViewSize();
   void initScrollBars();
 
@@ -193,16 +188,6 @@ class FrameView : public ScrollView {
 
   void resetCursor();
   void invalidateClick();
-
-  /**
-   * Paints the HTML document.
-   * The document will be scaled to match the width of
-   * the rectangle and clipped to fit in the height.
-   * yOffset determines the vertical offset in the document to start with.
-   * more, if not null, will be set to true if the documents extends
-   * beyond the rc or false if everything below yOffset was painted.
-   **/
-  void paint(GraphicsContext, const IntRect&, int yOffset = 0, bool* more = 0);
 
   /**
    * Get/set the CSS Media Type.
@@ -238,11 +223,11 @@ class FrameView : public ScrollView {
                           NodeImpl* target,
                           bool cancelable,
                           int clickCount,
-                          MouseEvent*,
+                          const MouseEvent&,
                           bool setUnder);
   bool dispatchDragEvent(const AtomicString& eventType,
                          NodeImpl* target,
-                         const IntPoint& loc,
+                         const MouseEvent&,
                          ClipboardImpl*);
 
   void applyOverflowToViewport(RenderObject* o,

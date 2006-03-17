@@ -360,7 +360,7 @@ class DocumentImpl : public ContainerNodeImpl {
                                                  bool mouseMove,
                                                  int x,
                                                  int y,
-                                                 MouseEvent*);
+                                                 const MouseEvent&);
 
   virtual bool childAllowed(NodeImpl*);
   virtual bool childTypeAllowed(NodeType);

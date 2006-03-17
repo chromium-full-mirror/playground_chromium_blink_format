@@ -54,10 +54,6 @@ bool FrameView::isFrameView() const {
   notImplemented();
   return 0;
 }
-Widget* FrameView::topLevelWidget() const {
-  notImplemented();
-  return 0;
-}
 
 QTextEdit::QTextEdit(Widget*) {
   notImplemented();
