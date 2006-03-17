@@ -549,12 +549,12 @@ static Frame* createNewWindow(ExecState* exec,
   Frame* openerPart = openerWindow->frame();
   Frame* activePart = Window::retrieveActive(exec)->frame();
 
-  ResourceRequest request;
-
+  ResourceRequest request(KURL(""));
   request.frameName = frameName;
   if (activePart)
-    request.metaData().set("referrer", activePart->referrer());
-  request.serviceType = "text/html";
+    request.setReferrer(activePart->referrer());
+  // FIXME: is this needed?
+  request.m_responseMIMEType = "text/html";
 
   // FIXME: It's much better for client API if a new window starts with a URL,
   // here where we
@@ -569,7 +569,7 @@ static Frame* createNewWindow(ExecState* exec,
   // We'd have to resolve all those issues to pass the URL instead of "".
 
   Frame* newFrame = 0;
-  openerPart->browserExtension()->createNewWindow("", request, windowArgs,
+  openerPart->browserExtension()->createNewWindow(request, windowArgs,
                                                   newFrame);
 
   if (!newFrame)
@@ -1696,13 +1696,13 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         }
         return Window::retrieve(frame);
       }
-      request.serviceType = "text/html";
+      // FIXME: is this needed?
+      request.m_responseMIMEType = "text/html";
 
       // request window (new or existing if framename is set)
       Frame* newFrame = 0;
-      request.metaData().set("referrer", activePart->referrer());
-      frame->browserExtension()->createNewWindow("", request, windowArgs,
-                                                 newFrame);
+      request.setReferrer(activePart->referrer());
+      frame->browserExtension()->createNewWindow(request, windowArgs, newFrame);
       if (!newFrame)
         return jsUndefined();
       newFrame->setOpener(frame);

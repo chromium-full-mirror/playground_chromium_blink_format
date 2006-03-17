@@ -34,21 +34,13 @@ class BrowserExtensionMac : public BrowserExtension {
  public:
   BrowserExtensionMac(Frame*);
 
-  virtual void openURLRequest(
-      const KURL&,
-      const ResourceRequest& request = ResourceRequest());
-  virtual void openURLNotify();
-
-  virtual void createNewWindow(
-      const KURL& url,
-      const ResourceRequest& request = ResourceRequest());
-  virtual void createNewWindow(const KURL& url,
-                               const ResourceRequest& request,
-                               const WindowArgs& winArgs,
+  virtual void createNewWindow(const ResourceRequest&);
+  virtual void createNewWindow(const ResourceRequest&,
+                               const WindowArgs&,
                                Frame*& part);
 
-  virtual void setIconURL(const KURL& request);
-  virtual void setTypedIconURL(const KURL& url, const QString& type);
+  virtual void setIconURL(const KURL&);
+  virtual void setTypedIconURL(const KURL&, const QString& type);
 
   virtual int getHistoryLength();
   virtual void goBackOrForward(int distance);
@@ -58,10 +50,7 @@ class BrowserExtensionMac : public BrowserExtension {
   virtual void runModal();
 
  private:
-  void createNewWindow(const KURL& url,
-                       const ResourceRequest& request,
-                       const WindowArgs& winArgs,
-                       Frame** part);
+  void createNewWindow(const ResourceRequest&, const WindowArgs&, Frame** part);
 
   MacFrame* m_frame;
 };

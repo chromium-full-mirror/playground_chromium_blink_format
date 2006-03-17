@@ -242,8 +242,6 @@ bool Frame::didOpenURL(const KURL& url) {
   } else
     d->m_job = new TransferJob(this, "GET", url);
 
-  d->m_job->addMetaData(d->m_request.metaData());
-
   d->m_bComplete = false;
   d->m_bLoadingMainResource = true;
   d->m_bLoadEventEmitted = false;
@@ -498,7 +496,7 @@ void Frame::setDocument(DocumentImpl* newDoc) {
 }
 
 void Frame::receivedFirstData() {
-  begin(d->m_workingURL, d->m_request.xOffset, d->m_request.yOffset);
+  begin(d->m_workingURL);
 
   d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
   d->m_workingURL = KURL();
@@ -580,7 +578,7 @@ const ResourceRequest& Frame::resourceRequest() const {
   return d->m_request;
 }
 
-void Frame::begin(const KURL& url, int xOffset, int yOffset) {
+void Frame::begin(const KURL& url) {
   if (d->m_workingURL.isEmpty())
     createEmptyDocument();  // Creates an empty document if we don't have one
                             // already
@@ -592,9 +590,6 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_bComplete = false;
   d->m_bLoadEventEmitted = false;
   d->m_bLoadingMainResource = true;
-
-  d->m_request.xOffset = xOffset;
-  d->m_request.yOffset = yOffset;
 
   KURL ref(url);
   ref.setUser(QSTRING_NULL);
@@ -608,7 +603,7 @@ void Frame::begin(const KURL& url, int xOffset, int yOffset) {
   if (!d->m_url.isEmpty())
     baseurl = d->m_url;
 
-  if (DOMImplementationImpl::isXMLMIMEType(d->m_request.serviceType))
+  if (DOMImplementationImpl::isXMLMIMEType(d->m_request.m_responseMIMEType))
     d->m_doc =
         DOMImplementationImpl::instance()->createDocument(d->m_view.get());
   else
@@ -974,13 +969,12 @@ void Frame::changeLocation(const QString& URL,
     return;
   }
 
-  ResourceRequest request;
-
+  ResourceRequest request(completeURL(URL));
   request.setLockHistory(lockHistory);
   if (!referrer.isEmpty())
-    request.metaData().set("referrer", referrer);
+    request.setReferrer(referrer);
 
-  urlSelected(URL, "_self", request);
+  urlSelected(request, "_self");
 }
 
 void Frame::redirectionTimerFired(Timer<Frame>*) {
@@ -1292,35 +1286,37 @@ void Frame::paintDragCaret(GraphicsContext* p, const IntRect& rect) const {
   d->m_dragCaret.paintCaret(p, rect);
 }
 
-void Frame::urlSelected(const QString& url,
-                        const QString& _target,
-                        const ResourceRequest& request) {
+void Frame::urlSelected(const QString& url, const QString& target) {
+  urlSelected(ResourceRequest(completeURL(url)), target);
+}
+
+void Frame::urlSelected(const ResourceRequest& request,
+                        const QString& _target) {
   QString target = _target;
   if (target.isEmpty() && d->m_doc)
     target = d->m_doc->baseTarget();
 
-  if (url.startsWith("javascript:", false)) {
-    executeScript(0, KURL::decode_string(url.mid(11)), true);
+  const KURL& url = request.url();
+
+  if (url.url().startsWith("javascript:", false)) {
+    executeScript(0, KURL::decode_string(url.url().mid(11)), true);
     return;
   }
 
-  KURL cURL = completeURL(url);
-  if (!cURL.isValid())
+  if (!url.isValid())
     // ### ERROR HANDLING
     return;
 
-  ResourceRequest argsCopy = request;
-  argsCopy.frameName = target;
+  ResourceRequest requestCopy = request;
+  requestCopy.frameName = target;
 
-  if (d->m_bHTTPRefresh) {
+  if (d->m_bHTTPRefresh)
     d->m_bHTTPRefresh = false;
-    argsCopy.metaData().set("cache", "refresh");
-  }
 
   if (!d->m_referrer.isEmpty())
-    argsCopy.metaData().set("referrer", d->m_referrer);
+    requestCopy.setReferrer(d->m_referrer);
 
-  urlSelected(cURL, argsCopy);
+  urlSelected(requestCopy);
 }
 
 bool Frame::requestFrame(RenderPart* renderer,
@@ -1337,11 +1333,11 @@ bool Frame::requestFrame(RenderPart* renderer,
 
   Frame* frame = tree()->child(frameName);
   if (frame) {
-    ResourceRequest request;
-    request.metaData().set("referrer", d->m_referrer);
+    ResourceRequest request(url);
+    request.setReferrer(d->m_referrer);
     request.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
                      (d->m_cachePolicy == KIO::CC_Refresh);
-    frame->openURLRequest(url, request);
+    frame->openURLRequest(request);
   } else
     frame = loadSubframe(renderer, url, frameName, d->m_referrer);
 
@@ -1483,7 +1479,7 @@ void Frame::submitForm(const char* action,
   ResourceRequest request;
 
   if (!d->m_referrer.isEmpty())
-    request.metaData().set("referrer", d->m_referrer);
+    request.setReferrer(d->m_referrer);
 
   request.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
 
@@ -1552,8 +1548,10 @@ void Frame::submitForm(const char* action,
     d->m_submitForm->target = _target;
     d->m_submitForm->submitContentType = contentType;
     d->m_submitForm->submitBoundary = boundary;
-  } else
-    submitForm(u, request);
+  } else {
+    request.setURL(u);
+    submitForm(request);
+  }
 }
 
 void Frame::parentCompleted() {

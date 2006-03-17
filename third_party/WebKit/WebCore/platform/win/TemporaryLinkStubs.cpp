@@ -477,11 +477,6 @@ Plugin* FrameWin::createPlugin(KURL const&,
   return 0;
 }
 
-void BrowserExtensionWin::openURLRequest(
-    KURL const&,
-    struct WebCore::ResourceRequest const&) {
-  notImplemented();
-}
 bool BrowserExtensionWin::canRunModal() {
   notImplemented();
   return 0;
@@ -490,7 +485,6 @@ void BrowserExtensionWin::openURLNotify() {
   notImplemented();
 }
 void BrowserExtensionWin::createNewWindow(
-    KURL const&,
     struct WebCore::ResourceRequest const&,
     struct WebCore::WindowArgs const&,
     Frame*&) {
@@ -507,7 +501,6 @@ void BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
 void BrowserExtensionWin::createNewWindow(
-    KURL const&,
     struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
@@ -613,8 +606,7 @@ void FrameWin::clearRecordedFormValues() {}
 void FrameWin::recordFormValue(QString const&,
                                QString const&,
                                WebCore::HTMLFormElementImpl*) {}
-void FrameWin::submitForm(KURL const&, struct WebCore::ResourceRequest const&) {
-}
+void FrameWin::submitForm(struct WebCore::ResourceRequest const&) {}
 void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
 void FrameWin::respondToChangedContents() {}
