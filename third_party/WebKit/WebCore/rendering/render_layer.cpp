@@ -1161,6 +1161,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                                  paintingRootForRenderer);
     renderer()->paint(info, x - renderer()->xPos(),
                       y - renderer()->yPos() + renderer()->borderTopExtra());
+
     // Our scrollbar widgets paint exactly when we tell them to, so that they
     // work properly with
     // z-index.  We paint after we painted the background/border, so that the
