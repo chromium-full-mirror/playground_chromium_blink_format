@@ -156,4 +156,24 @@ bool RenderTableRow::nodeAtPoint(NodeInfo& info,
 
   return false;
 }
+
+void RenderTableRow::paint(PaintInfo& i, int tx, int ty) {
+  assert(m_layer);
+  if (!m_layer)
+    return;
+
+  for (RenderObject* child = firstChild(); child;
+       child = child->nextSibling()) {
+    if (child->isTableCell()) {
+      // Paint the row background behind the cell.
+      if (i.phase == PaintActionBlockBackground ||
+          i.phase == PaintActionChildBlockBackground) {
+        RenderTableCell* cell = static_cast<RenderTableCell*>(child);
+        cell->paintBackgroundsBehindCell(i, tx, ty, this);
+      }
+      if (!child->layer())
+        child->paint(i, tx, ty);
+    }
+  }
+}
 }

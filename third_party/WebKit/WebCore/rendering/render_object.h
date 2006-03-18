@@ -882,6 +882,9 @@ class RenderObject : public CachedObjectClient {
   // positioning of inline children (bidi)
   virtual void position(InlineBox*, int, int, bool, bool) {}
 
+  bool isTransparent() const { return style()->opacity() < 1.0f; }
+  float opacity() const { return style()->opacity(); }
+
   // Applied as a "slop" to dirty rect checks during the outline painting
   // phase's dirty-rect checks.
   int maximalOutlineSize(PaintAction p) const;
