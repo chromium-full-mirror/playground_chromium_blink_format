@@ -21,11 +21,10 @@
 #ifndef KJS_DOM_H
 #define KJS_DOM_H
 
-#include "kjs_binding.h"
-
-#include <qvaluelist.h>
 #include "NodeListImpl.h"
 #include "Shared.h"
+#include "kjs_binding.h"
+#include <qvaluelist.h>
 
 namespace DOM {
 class AtomicString;
@@ -35,6 +34,7 @@ class DocumentTypeImpl;
 class DOMImplementationImpl;
 class ElementImpl;
 class EntityImpl;
+class EventTargetNodeImpl;
 class NamedNodeMapImpl;
 class NotationImpl;
 class ProcessingInstructionImpl;
@@ -65,11 +65,6 @@ class DOMNode : public DOMObject {
   virtual JSValue* toPrimitive(ExecState* exec,
                                JSType preferred = UndefinedType) const;
   virtual UString toString(ExecState* exec) const;
-  void setListener(ExecState* exec,
-                   const DOM::AtomicString& eventType,
-                   JSValue* func) const;
-  JSValue* getListener(const DOM::AtomicString& eventType) const;
-  virtual void pushEventHandlerScope(ExecState* exec, ScopeChain& scope) const;
 
   enum {
     NodeName,
@@ -97,9 +92,6 @@ class DOMNode : public DOMObject {
     CloneNode,
     Normalize,
     IsSupported,
-    AddEventListener,
-    RemoveEventListener,
-    DispatchEvent,
     Contains,
     IsSameNode,
     IsEqualNode,
@@ -107,6 +99,40 @@ class DOMNode : public DOMObject {
     IsDefaultNamespace,
     LookupNamespaceURI,
     LookupPrefix,
+  };
+
+ protected:
+  // Constructor for inherited classes; doesn't set up a prototype.
+  DOMNode(DOM::NodeImpl* n);
+  RefPtr<DOM::NodeImpl> m_impl;
+};
+
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMEventTargetNodeProto, DOMNodeProto)
+
+class DOMEventTargetNode : public DOMNode {
+ public:
+  DOMEventTargetNode(ExecState* exec, DOM::NodeImpl* n);
+
+  void setListener(ExecState* exec,
+                   const DOM::AtomicString& eventType,
+                   JSValue* func) const;
+  JSValue* getListener(const DOM::AtomicString& eventType) const;
+  virtual void pushEventHandlerScope(ExecState* exec, ScopeChain& scope) const;
+
+  bool getOwnPropertySlot(ExecState* exec,
+                          const Identifier& propertyName,
+                          PropertySlot& slot);
+  JSValue* getValueProperty(ExecState* exec, int token) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   JSValue* value,
+                   int attr);
+  void putValueProperty(ExecState* exec, int token, JSValue* value, int);
+
+  enum {
+    AddEventListener,
+    RemoveEventListener,
+    DispatchEvent,
     OnAbort,
     OnBlur,
     OnChange,
@@ -148,26 +174,12 @@ class DOMNode : public DOMObject {
     OnSearch,
     OnSelect,
     OnSubmit,
-    OnUnload,
-    OffsetLeft,
-    OffsetTop,
-    OffsetWidth,
-    OffsetHeight,
-    OffsetParent,
-    ClientWidth,
-    ClientHeight,
-    ScrollLeft,
-    ScrollTop,
-    ScrollWidth,
-    ScrollHeight,
-    ScrollIntoView,
-    ScrollIntoViewIfNeeded
+    OnUnload
   };
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
-  DOMNode(DOM::NodeImpl* n);
-  RefPtr<DOM::NodeImpl> m_impl;
+  DOMEventTargetNode(DOM::NodeImpl* n);
 };
 
 DOM::NodeImpl* toNode(
@@ -206,7 +218,7 @@ class DOMNodeList : public DOMObject {
   RefPtr<DOM::NodeListImpl> m_impl;
 };
 
-class DOMDocument : public DOMNode {
+class DOMDocument : public DOMEventTargetNode {
  public:
   DOMDocument(ExecState* exec, DOM::DocumentImpl* d);
   ~DOMDocument();
@@ -271,17 +283,41 @@ class DOMDocument : public DOMNode {
 DOM::AttrImpl* toAttr(
     JSValue*);  // returns 0 if passed-in value is not a DOMAttr object
 
-KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMElementProto, DOMNodeProto)
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMElementProto, DOMEventTargetNodeProto)
 
-class DOMElement : public DOMNode {
+class DOMElement : public DOMEventTargetNode {
  public:
   DOMElement(ExecState* exec, DOM::ElementImpl* e);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
-  // no put - all read-only
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        JSValue* value,
+                        int /*attr*/);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   JSValue* value,
+                   int attr = None);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum { TagName, ScrollByLines, ScrollByPages, ScrollIntoView };
+  enum {
+    TagName,
+    ScrollByLines,
+    ScrollByPages,
+    ScrollIntoView,
+    ScrollIntoViewIfNeeded,
+    OffsetLeft,
+    OffsetTop,
+    OffsetWidth,
+    OffsetHeight,
+    OffsetParent,
+    ClientWidth,
+    ClientHeight,
+    ScrollLeft,
+    ScrollTop,
+    ScrollWidth,
+    ScrollHeight
+  };
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.

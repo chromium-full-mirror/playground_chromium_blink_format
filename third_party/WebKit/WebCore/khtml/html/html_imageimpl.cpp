@@ -46,8 +46,7 @@ HTMLImageLoader::HTMLImageLoader(ElementImpl* elt)
 HTMLImageLoader::~HTMLImageLoader() {
   if (m_image)
     m_image->deref(this);
-  if (m_element->getDocument())
-    m_element->getDocument()->removeImage(this);
+  m_element->getDocument()->removeImage(this);
 }
 
 void HTMLImageLoader::setLoadingImage(CachedImage* loadingImage) {
@@ -63,7 +62,7 @@ void HTMLImageLoader::updateFromElement() {
   // display.
   ElementImpl* elem = element();
   DocumentImpl* doc = elem->getDocument();
-  if (!doc || !doc->renderer())
+  if (!doc->renderer())
     return;
 
   AtomicString attr =
@@ -102,13 +101,12 @@ void HTMLImageLoader::dispatchLoadEvent() {
 void HTMLImageLoader::notifyFinished(CachedObject* image) {
   m_imageComplete = true;
   ElementImpl* elem = element();
-  if (DocumentImpl* doc = elem->getDocument()) {
-    doc->dispatchImageLoadEventSoon(this);
+  DocumentImpl* doc = elem->getDocument();
+  doc->dispatchImageLoadEventSoon(this);
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
-    if (!doc->ownerElement())
-      printf("Image loaded at %d\n", doc->elapsedTime());
+  if (!doc->ownerElement())
+    printf("Image loaded at %d\n", doc->elapsedTime());
 #endif
-  }
   if (RenderImage* renderer = static_cast<RenderImage*>(elem->renderer()))
     renderer->setCachedImage(m_image);
 }
@@ -264,12 +262,11 @@ int HTMLImageElementImpl::width(bool ignorePendingStylesheets) const {
       return m_imageLoader.image()->imageSize().width();
   }
 
-  if (DocumentImpl* doc = getDocument()) {
-    if (ignorePendingStylesheets)
-      doc->updateLayoutIgnorePendingStylesheets();
-    else
-      doc->updateLayout();
-  }
+  DocumentImpl* doc = getDocument();
+  if (ignorePendingStylesheets)
+    doc->updateLayoutIgnorePendingStylesheets();
+  else
+    doc->updateLayout();
 
   return renderer() ? renderer()->contentWidth() : 0;
 }
@@ -287,12 +284,11 @@ int HTMLImageElementImpl::height(bool ignorePendingStylesheets) const {
       return m_imageLoader.image()->imageSize().height();
   }
 
-  if (DocumentImpl* doc = getDocument()) {
-    if (ignorePendingStylesheets)
-      doc->updateLayoutIgnorePendingStylesheets();
-    else
-      doc->updateLayout();
-  }
+  DocumentImpl* doc = getDocument();
+  if (ignorePendingStylesheets)
+    doc->updateLayoutIgnorePendingStylesheets();
+  else
+    doc->updateLayout();
 
   return renderer() ? renderer()->contentHeight() : 0;
 }
@@ -421,8 +417,7 @@ HTMLMapElementImpl::HTMLMapElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(mapTag, doc) {}
 
 HTMLMapElementImpl::~HTMLMapElementImpl() {
-  if (getDocument())
-    getDocument()->removeImageMap(this);
+  getDocument()->removeImageMap(this);
 }
 
 bool HTMLMapElementImpl::checkDTD(const NodeImpl* newChild) {

@@ -121,7 +121,7 @@ NodeImpl* RangeImpl::commonAncestorContainer(NodeImpl* containerA,
       break;
   }
 
-  if (!parentStart && containerA->getDocument())
+  if (!parentStart)
     return containerA->getDocument()->documentElement();
 
   return parentStart;

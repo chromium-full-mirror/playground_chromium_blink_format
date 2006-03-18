@@ -35,12 +35,13 @@ namespace WebCore {
 
 using namespace EventNames;
 
-CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc) : NodeImpl(doc) {
+CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc)
+    : EventTargetNodeImpl(doc) {
   str = 0;
 }
 
 CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc, const DOMString& _text)
-    : NodeImpl(doc) {
+    : EventTargetNodeImpl(doc) {
   str = _text.impl() ? _text.impl() : new DOMStringImpl((QChar*)0, 0);
   str->ref();
 }
@@ -272,7 +273,7 @@ unsigned CharacterDataImpl::caretMaxRenderedOffset() const {
 bool CharacterDataImpl::rendererIsNeeded(RenderStyle* style) {
   if (!str || str->l == 0)
     return false;
-  return NodeImpl::rendererIsNeeded(style);
+  return EventTargetNodeImpl::rendererIsNeeded(style);
 }
 
 bool CharacterDataImpl::offsetInCharacters() const {
@@ -283,7 +284,7 @@ bool CharacterDataImpl::offsetInCharacters() const {
 void CharacterDataImpl::dump(QTextStream* stream, QString ind) const {
   *stream << " str=\"" << DOMString(str).qstring().ascii() << "\"";
 
-  NodeImpl::dump(stream, ind);
+  EventTargetNodeImpl::dump(stream, ind);
 }
 #endif
 

@@ -51,8 +51,7 @@ HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentImpl* doc,
 }
 
 HTMLTextAreaElementImpl::~HTMLTextAreaElementImpl() {
-  if (getDocument())
-    getDocument()->deregisterMaintainsState(this);
+  getDocument()->deregisterMaintainsState(this);
 }
 
 DOMString HTMLTextAreaElementImpl::type() const {

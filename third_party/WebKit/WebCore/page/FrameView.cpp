@@ -691,7 +691,7 @@ bool FrameView::dispatchDragEvent(const AtomicString& eventType,
       event.altKey(), event.shiftKey(), event.metaKey(), 0, 0, clipboard);
 
   ExceptionCode ec = 0;
-  dragTarget->dispatchEvent(me.get(), ec, true);
+  EventTargetNodeCast(dragTarget)->dispatchEvent(me.get(), ec, true);
   return me->defaultPrevented();
 }
 
@@ -972,12 +972,13 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
       if (oldUnder != targetNode) {
         // send mouseout event to the old node
         if (oldUnder)
-          oldUnder->dispatchMouseEvent(mouseEvent, mouseoutEvent, 0,
-                                       targetNode);
+          EventTargetNodeCast(oldUnder.get())
+              ->dispatchMouseEvent(mouseEvent, mouseoutEvent, 0, targetNode);
         // send mouseover event to the new node
         if (targetNode)
-          targetNode->dispatchMouseEvent(mouseEvent, mouseoverEvent, 0,
-                                         oldUnder.get());
+          EventTargetNodeCast(targetNode)
+              ->dispatchMouseEvent(mouseEvent, mouseoverEvent, 0,
+                                   oldUnder.get());
       }
     }
   }
@@ -985,8 +986,8 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   bool swallowEvent = false;
 
   if (targetNode)
-    swallowEvent =
-        targetNode->dispatchMouseEvent(mouseEvent, eventType, clickCount);
+    swallowEvent = EventTargetNodeCast(targetNode)
+                       ->dispatchMouseEvent(mouseEvent, eventType, clickCount);
 
   if (!swallowEvent && eventType == mousedownEvent) {
     // Focus should be shifted on mouse down, not on a click.  -dwh
@@ -1041,7 +1042,7 @@ void FrameView::viewportWheelEvent(WheelEvent& e) {
         return;
       }
       if (node) {
-        node->dispatchWheelEvent(e);
+        EventTargetNodeCast(node)->dispatchWheelEvent(e);
         if (e.isAccepted())
           return;
       }

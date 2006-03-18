@@ -1626,9 +1626,8 @@ JSValue* HTMLElement::bodyGetter(ExecState* exec, int token) const {
     default: {
       // Update the document's layout before we compute these attributes.
       DocumentImpl* doc = body.getDocument();
-      if (doc)
-        doc->updateLayoutIgnorePendingStylesheets();
-      FrameView* view = doc ? doc->view() : 0;
+      doc->updateLayoutIgnorePendingStylesheets();
+      FrameView* view = doc->view();
       switch (token) {
         case BodyScrollLeft:
           return jsNumber(view ? view->contentsX() : 0);
@@ -2092,8 +2091,7 @@ JSValue* HTMLElement::anchorGetter(ExecState* exec, int token) const {
     case AnchorType:
       return jsString(anchor.type());
     case AnchorText:
-      if (DocumentImpl* doc = anchor.getDocument())
-        doc->updateLayoutIgnorePendingStylesheets();
+      anchor.getDocument()->updateLayoutIgnorePendingStylesheets();
       return jsString(anchor.innerText());
   }
   return jsUndefined();
@@ -2559,8 +2557,7 @@ JSValue* HTMLElement::getValueProperty(ExecState* exec, int token) const {
     case ElementInnerHTML:
       return jsString(element.innerHTML());
     case ElementInnerText:
-      if (DocumentImpl* doc = impl()->getDocument())
-        doc->updateLayoutIgnorePendingStylesheets();
+      impl()->getDocument()->updateLayoutIgnorePendingStylesheets();
       return jsString(element.innerText());
     case ElementOuterHTML:
       return jsString(element.outerHTML());
@@ -3043,8 +3040,7 @@ void HTMLElement::bodySetter(ExecState* exec,
       FrameView* sview = body.ownerDocument()->view();
       if (sview) {
         // Update the document's layout before we compute these attributes.
-        if (DocumentImpl* doc = body.getDocument())
-          doc->updateLayoutIgnorePendingStylesheets();
+        body.getDocument()->updateLayoutIgnorePendingStylesheets();
         if (token == BodyScrollLeft)
           sview->setContentsPos(value->toInt32(exec), sview->contentsY());
         else

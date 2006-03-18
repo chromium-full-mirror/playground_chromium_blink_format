@@ -337,12 +337,6 @@ String CSSMutableStyleDeclarationImpl::removeProperty(int propertyID,
                                                       ExceptionCode& ec) {
   ec = 0;
 
-  if (m_node && !m_node->getDocument())
-    return "";  // FIXME: This (not well-understood) situation happens on
-                // albertsons.com.
-  // We don't really know how they managed to run a script on a node
-  // with no document pointer, but this sidesteps the crash.
-
   String value;
 
   QValueListIterator<CSSProperty> end;
@@ -428,11 +422,6 @@ bool CSSMutableStyleDeclarationImpl::setProperty(int propertyID,
                                                  bool important,
                                                  bool notifyChanged,
                                                  ExceptionCode& ec) {
-  if (m_node && !m_node->getDocument())
-    return false;  // FIXME: This (not well-understood) situation happens on
-                   // albertsons.com.  We don't really know how they managed to
-                   // run a script on a node
-                   // with no document pointer, but this sidesteps the crash.
   ec = 0;
 
   removeProperty(propertyID);

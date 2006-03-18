@@ -85,6 +85,13 @@ void Position::clear() {
   m_offset = 0;
 }
 
+ElementImpl* Position::documentElement() const {
+  if (NodeImpl* n = node())
+    if (ElementImpl* e = n->getDocument()->documentElement())
+      return e;
+  return 0;
+}
+
 ElementImpl* Position::element() const {
   NodeImpl* n;
   for (n = node(); n && !n->isElementNode(); n = n->parentNode())

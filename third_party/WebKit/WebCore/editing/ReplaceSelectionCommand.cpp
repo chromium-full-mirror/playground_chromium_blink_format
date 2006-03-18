@@ -391,17 +391,14 @@ static void computeAndStoreNodeDesiredStyle(
       return;
     }
   }
-  NodeImpl* documentElement =
-      node->getDocument() ? node->getDocument()->documentElement() : 0;
-  if (documentElement) {
-    RefPtr<CSSComputedStyleDeclarationImpl> documentStyle =
-        Position(documentElement, 0).computedStyle();
-    bool match = (documentStyle->getPropertyValue(CSS_PROP_COLOR) ==
-                  style->getPropertyValue(CSS_PROP_COLOR));
-    if (match)
-      style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
-                         matchNearestBlockquoteColorString());
-  }
+  NodeImpl* documentElement = node->getDocument()->documentElement();
+  RefPtr<CSSComputedStyleDeclarationImpl> documentStyle =
+      Position(documentElement, 0).computedStyle();
+  bool match = (documentStyle->getPropertyValue(CSS_PROP_COLOR) ==
+                style->getPropertyValue(CSS_PROP_COLOR));
+  if (match)
+    style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
+                       matchNearestBlockquoteColorString());
 }
 
 void ReplacementFragment::computeStylesUsingTestRendering(NodeImpl* holder) {

@@ -365,9 +365,8 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
 }
 
 void SVGAnimationElementImpl::closeRenderer() {
-  if (DocumentImpl* doc = getDocument())
-    doc->accessSVGExtensions()->timeScheduler()->addTimer(
-        this, lround(getStartTime()));
+  getDocument()->accessSVGExtensions()->timeScheduler()->addTimer(
+      this, lround(getStartTime()));
 }
 
 DOMString SVGAnimationElementImpl::targetAttribute() const {

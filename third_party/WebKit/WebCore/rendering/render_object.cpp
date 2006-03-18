@@ -1686,10 +1686,11 @@ bool RenderObject::canSelect() const {
 }
 
 bool RenderObject::shouldSelect() const {
-  NodeImpl* node = selectStartNode(this);
-  if (!node)
-    return false;
-  return node->dispatchHTMLEvent(selectstartEvent, true, true);
+  if (NodeImpl* node = selectStartNode(this))
+    return EventTargetNodeCast(node)->dispatchHTMLEvent(selectstartEvent, true,
+                                                        true);
+
+  return false;
 }
 
 Color RenderObject::selectionColor(GraphicsContext* p) const {
@@ -2575,16 +2576,10 @@ bool RenderObject::usesLineWidth() const {
 }
 
 QChar RenderObject::backslashAsCurrencySymbol() const {
-  NodeImpl* node = element();
-  if (!node)
-    return '\\';
-  DocumentImpl* document = node->getDocument();
-  if (!document)
-    return '\\';
-  Decoder* decoder = document->decoder();
-  if (!decoder)
-    return '\\';
-  return decoder->encoding().backslashAsCurrencySymbol();
+  if (NodeImpl* node = element())
+    if (Decoder* decoder = node->getDocument()->decoder())
+      return decoder->encoding().backslashAsCurrencySymbol();
+  return '\\';
 }
 
 void RenderObject::imageChanged(CachedImage* image) {

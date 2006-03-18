@@ -49,8 +49,6 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   if (!n)
     return VisiblePosition();
   DocumentImpl* d = n->getDocument();
-  if (!d)
-    return VisiblePosition();
   NodeImpl* de = d->documentElement();
   if (!de)
     return VisiblePosition();
@@ -137,8 +135,6 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   if (!n)
     return VisiblePosition();
   DocumentImpl* d = n->getDocument();
-  if (!d)
-    return VisiblePosition();
   NodeImpl* de = d->documentElement();
   if (!de)
     return VisiblePosition();
@@ -378,7 +374,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
                                      int x) {
   Position p = visiblePosition.deepEquivalent();
   NodeImpl* node = p.node();
-  if (!node || !node->getDocument())
+  if (!node)
     return VisiblePosition();
 
   node->getDocument()->updateLayoutIgnorePendingStylesheets();
@@ -443,7 +439,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
                                  int x) {
   Position p = visiblePosition.deepEquivalent();
   NodeImpl* node = p.node();
-  if (!node || !node->getDocument())
+  if (!node)
     return VisiblePosition();
 
   node->getDocument()->updateLayoutIgnorePendingStylesheets();
@@ -731,33 +727,17 @@ bool isEndOfBlock(const VisiblePosition& pos) {
 // ---------
 
 VisiblePosition startOfDocument(const VisiblePosition& c) {
-  Position p = c.deepEquivalent();
-  NodeImpl* node = p.node();
-  if (!node)
-    return VisiblePosition();
-
-  DocumentImpl* doc = node->getDocument();
-  if (!doc)
-    return VisiblePosition();
-
-  return VisiblePosition(doc->documentElement(), 0, DOWNSTREAM);
+  ElementImpl* documentElement = c.deepEquivalent().documentElement();
+  return documentElement ? VisiblePosition(documentElement, 0, DOWNSTREAM)
+                         : VisiblePosition();
 }
 
 VisiblePosition endOfDocument(const VisiblePosition& c) {
-  Position p = c.deepEquivalent();
-  NodeImpl* node = p.node();
-  if (!node)
-    return VisiblePosition();
-
-  DocumentImpl* doc = node->getDocument();
-  if (!doc)
-    return VisiblePosition();
-
-  NodeImpl* docElem = doc->documentElement();
-  if (!node)
-    return VisiblePosition();
-
-  return VisiblePosition(docElem, docElem->childNodeCount(), DOWNSTREAM);
+  ElementImpl* documentElement = c.deepEquivalent().documentElement();
+  return documentElement
+             ? VisiblePosition(documentElement,
+                               documentElement->childNodeCount(), DOWNSTREAM)
+             : VisiblePosition();
 }
 
 bool inSameDocument(const VisiblePosition& a, const VisiblePosition& b) {

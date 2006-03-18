@@ -804,9 +804,6 @@ void SelectionController::needsCaretRepaint() {
   if (!isCaret())
     return;
 
-  if (!m_sel.start().node()->getDocument())
-    return;
-
   FrameView* v = m_sel.start().node()->getDocument()->view();
   if (!v)
     return;

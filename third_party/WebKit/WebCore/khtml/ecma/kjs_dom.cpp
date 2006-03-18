@@ -70,7 +70,7 @@ namespace KJS {
 
 // -------------------------------------------------------------------------
 /* Source for DOMNodeProtoTable. Use "make hashtables" to regenerate.
-@begin DOMNodeProtoTable 18
+@begin DOMNodeProtoTable 25
   insertBefore  DOMNode::InsertBefore   DontDelete|Function 2
   replaceChild  DOMNode::ReplaceChild   DontDelete|Function 2
   removeChild   DOMNode::RemoveChild    DontDelete|Function 1
@@ -87,10 +87,7 @@ namespace KJS {
   isDefaultNamespace    DOMNode::IsDefaultNamespace DontDelete|Function 1
   lookupNamespaceURI    DOMNode::LookupNamespaceURI DontDelete|Function 1
   lookupPrefix  DOMNode::LookupPrefix   DontDelete|Function 1
-# from the EventTarget interface
-  addEventListener  DOMNode::AddEventListener   DontDelete|Function 3
-  removeEventListener   DOMNode::RemoveEventListener    DontDelete|Function 3
-  dispatchEvent DOMNode::DispatchEvent  DontDelete|Function 1
+# IE extension
   contains      DOMNode::Contains       DontDelete|Function 1
 # "DOM level 0" (from Gecko DOM reference; also in WinIE)
   item          DOMNode::Item           DontDelete|Function 1
@@ -142,14 +139,12 @@ void DOMNode::mark() {
     return;
   }
 
-  DocumentImpl* document = m_impl->getDocument();
-
   // Mark the whole tree; use the global set of roots to avoid reentering.
   markingRoots.add(root);
   for (NodeImpl* nodeToMark = root; nodeToMark;
        nodeToMark = nodeToMark->traverseNextNode()) {
-    DOMNode* wrapper =
-        ScriptInterpreter::getDOMNodeForDocument(document, nodeToMark);
+    DOMNode* wrapper = ScriptInterpreter::getDOMNodeForDocument(
+        m_impl->getDocument(), nodeToMark);
     if (wrapper) {
       if (!wrapper->marked())
         wrapper->mark();
@@ -175,7 +170,7 @@ bool DOMNode::toBoolean(ExecState*) const {
 }
 
 /* Source for DOMNodeTable. Use "make hashtables" to regenerate.
-@begin DOMNodeTable 69
+@begin DOMNodeTable 25
   nodeName      DOMNode::NodeName       DontDelete|ReadOnly
   nodeValue     DOMNode::NodeValue      DontDelete
   nodeType      DOMNode::NodeType       DontDelete|ReadOnly
@@ -194,61 +189,6 @@ bool DOMNode::toBoolean(ExecState*) const {
   ownerDocument DOMNode::OwnerDocument  DontDelete|ReadOnly
 # DOM3
   textContent   DOMNode::TextContent    DontDelete
-#
-  onabort       DOMNode::OnAbort                DontDelete
-  onblur        DOMNode::OnBlur                 DontDelete
-  onchange      DOMNode::OnChange               DontDelete
-  onclick       DOMNode::OnClick                DontDelete
-  oncontextmenu DOMNode::OnContextMenu          DontDelete
-  ondblclick    DOMNode::OnDblClick             DontDelete
-  onbeforecut   DOMNode::OnBeforeCut            DontDelete
-  oncut         DOMNode::OnCut                  DontDelete
-  onbeforecopy  DOMNode::OnBeforeCopy           DontDelete
-  oncopy        DOMNode::OnCopy                 DontDelete
-  onbeforepaste DOMNode::OnBeforePaste          DontDelete
-  onpaste       DOMNode::OnPaste                DontDelete
-  ondrag        DOMNode::OnDrag                 DontDelete
-  ondragdrop    DOMNode::OnDragDrop             DontDelete
-  ondragend     DOMNode::OnDragEnd              DontDelete
-  ondragenter   DOMNode::OnDragEnter            DontDelete
-  ondragleave   DOMNode::OnDragLeave            DontDelete
-  ondragover    DOMNode::OnDragOver             DontDelete
-  ondragstart   DOMNode::OnDragStart            DontDelete
-  ondrop        DOMNode::OnDrop                 DontDelete
-  onerror       DOMNode::OnError                DontDelete
-  onfocus       DOMNode::OnFocus                DontDelete
-  oninput       DOMNode::OnInput                DontDelete
-  onkeydown     DOMNode::OnKeyDown              DontDelete
-  onkeypress    DOMNode::OnKeyPress             DontDelete
-  onkeyup       DOMNode::OnKeyUp                DontDelete
-  onload        DOMNode::OnLoad                 DontDelete
-  onmousedown   DOMNode::OnMouseDown            DontDelete
-  onmousemove   DOMNode::OnMouseMove            DontDelete
-  onmouseout    DOMNode::OnMouseOut             DontDelete
-  onmouseover   DOMNode::OnMouseOver            DontDelete
-  onmouseup     DOMNode::OnMouseUp              DontDelete
-  onmousewheel  DOMNode::OnMouseWheel           DontDelete
-  onmove        DOMNode::OnMove                 DontDelete
-  onreset       DOMNode::OnReset                DontDelete
-  onresize      DOMNode::OnResize               DontDelete
-  onscroll      DOMNode::OnScroll               DontDelete
-  onsearch      DOMNode::OnSearch               DontDelete
-  onselect      DOMNode::OnSelect               DontDelete
-  onselectstart DOMNode::OnSelectStart          DontDelete
-  onsubmit      DOMNode::OnSubmit               DontDelete
-  onunload      DOMNode::OnUnload               DontDelete
-# IE extensions
-  offsetLeft    DOMNode::OffsetLeft             DontDelete|ReadOnly
-  offsetTop     DOMNode::OffsetTop              DontDelete|ReadOnly
-  offsetWidth   DOMNode::OffsetWidth            DontDelete|ReadOnly
-  offsetHeight  DOMNode::OffsetHeight           DontDelete|ReadOnly
-  offsetParent  DOMNode::OffsetParent           DontDelete|ReadOnly
-  clientWidth   DOMNode::ClientWidth            DontDelete|ReadOnly
-  clientHeight  DOMNode::ClientHeight           DontDelete|ReadOnly
-  scrollLeft    DOMNode::ScrollLeft             DontDelete
-  scrollTop     DOMNode::ScrollTop              DontDelete
-  scrollWidth   DOMNode::ScrollWidth            DontDelete|ReadOnly
-  scrollHeight  DOMNode::ScrollHeight           DontDelete|ReadOnly
 @end
 */
 bool DOMNode::getOwnPropertySlot(ExecState* exec,
@@ -292,6 +232,188 @@ JSValue* DOMNode::getValueProperty(ExecState* exec, int token) const {
       return toJS(exec, node.ownerDocument());
     case TextContent:
       return jsStringOrNull(node.textContent());
+  }
+
+  return jsUndefined();
+}
+
+void DOMNode::put(ExecState* exec,
+                  const Identifier& propertyName,
+                  JSValue* value,
+                  int attr) {
+  lookupPut<DOMNode, DOMObject>(exec, propertyName, value, attr, &DOMNodeTable,
+                                this);
+}
+
+void DOMNode::putValueProperty(ExecState* exec,
+                               int token,
+                               JSValue* value,
+                               int /*attr*/) {
+  DOMExceptionTranslator exception(exec);
+  NodeImpl& node = *m_impl;
+  switch (token) {
+    case NodeValue:
+      node.setNodeValue(value->toString(exec).domString(), exception);
+      break;
+    case Prefix:
+      node.setPrefix(value->toString(exec).domString().impl(), exception);
+      break;
+    case TextContent:
+      node.setTextContent(valueToStringWithNullCheck(exec, value), exception);
+      break;
+  }
+}
+
+JSValue* DOMNode::toPrimitive(ExecState* exec, JSType) const {
+  if (!m_impl)
+    return jsNull();
+
+  return jsString(toString(exec));
+}
+
+UString DOMNode::toString(ExecState*) const {
+  if (!m_impl)
+    return "null";
+  return "[object " +
+         (m_impl->isElementNode() ? m_impl->nodeName() : className()) + "]";
+}
+
+JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
+                                          JSObject* thisObj,
+                                          const List& args) {
+  if (!thisObj->inherits(&DOMNode::info))
+    return throwError(exec, TypeError);
+  DOMExceptionTranslator exception(exec);
+  NodeImpl& node = *static_cast<DOMNode*>(thisObj)->impl();
+  switch (id) {
+    case DOMNode::HasAttributes:
+      return jsBoolean(node.hasAttributes());
+    case DOMNode::HasChildNodes:
+      return jsBoolean(node.hasChildNodes());
+    case DOMNode::CloneNode:
+      return toJS(exec, node.cloneNode(args[0]->toBoolean(exec)));
+    case DOMNode::Normalize:
+      node.normalize();
+      return jsUndefined();
+    case DOMNode::IsSupported:
+      return jsBoolean(
+          node.isSupported(args[0]->toString(exec).domString(),
+                           valueToStringWithNullCheck(exec, args[1])));
+    case DOMNode::IsSameNode:
+      return jsBoolean(node.isSameNode(toNode(args[0])));
+    case DOMNode::IsEqualNode:
+      return jsBoolean(node.isEqualNode(toNode(args[0])));
+    case DOMNode::IsDefaultNamespace:
+      return jsBoolean(
+          node.isDefaultNamespace(valueToStringWithNullCheck(exec, args[0])));
+    case DOMNode::LookupNamespaceURI:
+      return jsStringOrNull(
+          node.lookupNamespaceURI(valueToStringWithNullCheck(exec, args[0])));
+    case DOMNode::LookupPrefix:
+      return jsStringOrNull(
+          node.lookupPrefix(valueToStringWithNullCheck(exec, args[0])));
+    case DOMNode::AppendChild:
+      if (node.appendChild(toNode(args[0]), exception))
+        return args[0];
+      return jsNull();
+    case DOMNode::RemoveChild:
+      if (node.removeChild(toNode(args[0]), exception))
+        return args[0];
+      return jsNull();
+    case DOMNode::InsertBefore:
+      if (node.insertBefore(toNode(args[0]), toNode(args[1]), exception))
+        return args[0];
+      return jsNull();
+    case DOMNode::ReplaceChild:
+      if (node.replaceChild(toNode(args[0]), toNode(args[1]), exception))
+        return args[1];
+      return jsNull();
+    case DOMNode::Contains:
+      if (node.isElementNode())
+        if (NodeImpl* node0 = toNode(args[0]))
+          return jsBoolean(node.isAncestor(node0));
+      // FIXME: Is there a good reason to return undefined rather than false
+      // when the parameter is not a node? When the object is not an element?
+      return jsUndefined();
+    case DOMNode::Item:
+      return thisObj->get(exec, args[0]->toInt32(exec));
+  }
+
+  return jsUndefined();
+}
+
+NodeImpl* toNode(JSValue* val) {
+  if (!val || !val->isObject(&DOMNode::info))
+    return 0;
+  return static_cast<DOMNode*>(val)->impl();
+}
+
+// -------------------------------------------------------------------------
+
+/* Source for DOMEventTargetNodeTable
+@begin DOMEventTargetNodeTable 50
+onabort       DOMEventTargetNode::OnAbort                DontDelete
+onblur        DOMEventTargetNode::OnBlur                 DontDelete
+onchange      DOMEventTargetNode::OnChange               DontDelete
+onclick       DOMEventTargetNode::OnClick                DontDelete
+oncontextmenu DOMEventTargetNode::OnContextMenu          DontDelete
+ondblclick    DOMEventTargetNode::OnDblClick             DontDelete
+onbeforecut   DOMEventTargetNode::OnBeforeCut            DontDelete
+oncut         DOMEventTargetNode::OnCut                  DontDelete
+onbeforecopy  DOMEventTargetNode::OnBeforeCopy           DontDelete
+oncopy        DOMEventTargetNode::OnCopy                 DontDelete
+onbeforepaste DOMEventTargetNode::OnBeforePaste          DontDelete
+onpaste       DOMEventTargetNode::OnPaste                DontDelete
+ondrag        DOMEventTargetNode::OnDrag                 DontDelete
+ondragdrop    DOMEventTargetNode::OnDragDrop             DontDelete
+ondragend     DOMEventTargetNode::OnDragEnd              DontDelete
+ondragenter   DOMEventTargetNode::OnDragEnter            DontDelete
+ondragleave   DOMEventTargetNode::OnDragLeave            DontDelete
+ondragover    DOMEventTargetNode::OnDragOver             DontDelete
+ondragstart   DOMEventTargetNode::OnDragStart            DontDelete
+ondrop        DOMEventTargetNode::OnDrop                 DontDelete
+onerror       DOMEventTargetNode::OnError                DontDelete
+onfocus       DOMEventTargetNode::OnFocus                DontDelete
+oninput       DOMEventTargetNode::OnInput                DontDelete
+onkeydown     DOMEventTargetNode::OnKeyDown              DontDelete
+onkeypress    DOMEventTargetNode::OnKeyPress             DontDelete
+onkeyup       DOMEventTargetNode::OnKeyUp                DontDelete
+onload        DOMEventTargetNode::OnLoad                 DontDelete
+onmousedown   DOMEventTargetNode::OnMouseDown            DontDelete
+onmousemove   DOMEventTargetNode::OnMouseMove            DontDelete
+onmouseout    DOMEventTargetNode::OnMouseOut             DontDelete
+onmouseover   DOMEventTargetNode::OnMouseOver            DontDelete
+onmouseup     DOMEventTargetNode::OnMouseUp              DontDelete
+onmousewheel  DOMEventTargetNode::OnMouseWheel           DontDelete
+onmove        DOMEventTargetNode::OnMove                 DontDelete
+onreset       DOMEventTargetNode::OnReset                DontDelete
+onresize      DOMEventTargetNode::OnResize               DontDelete
+onscroll      DOMEventTargetNode::OnScroll               DontDelete
+onsearch      DOMEventTargetNode::OnSearch               DontDelete
+onselect      DOMEventTargetNode::OnSelect               DontDelete
+onselectstart DOMEventTargetNode::OnSelectStart          DontDelete
+onsubmit      DOMEventTargetNode::OnSubmit               DontDelete
+onunload      DOMEventTargetNode::OnUnload               DontDelete
+@end
+*/
+
+DOMEventTargetNode::DOMEventTargetNode(NodeImpl* n) : DOMNode(n) {}
+
+DOMEventTargetNode::DOMEventTargetNode(ExecState* exec, NodeImpl* n)
+    : DOMNode(n) {
+  setPrototype(DOMEventTargetNodeProto::self(exec));
+}
+
+bool DOMEventTargetNode::getOwnPropertySlot(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            PropertySlot& slot) {
+  return getStaticValueSlot<DOMEventTargetNode, DOMNode>(
+      exec, &DOMEventTargetNodeTable, this, propertyName, slot);
+}
+
+JSValue* DOMEventTargetNode::getValueProperty(ExecState* exec,
+                                              int token) const {
+  switch (token) {
     case OnAbort:
       return getListener(abortEvent);
     case OnBlur:
@@ -376,85 +498,24 @@ JSValue* DOMNode::getValueProperty(ExecState* exec, int token) const {
       return getListener(submitEvent);
     case OnUnload:
       return getListener(unloadEvent);
-    default:
-      // no DOM standard, found in IE only
-
-      // Make sure our layout is up to date before we allow a query on these
-      // attributes.
-      DOM::DocumentImpl* docimpl = node.getDocument();
-      if (docimpl) {
-        docimpl->updateLayoutIgnorePendingStylesheets();
-      }
-
-      RenderObject* rend = node.renderer();
-
-      switch (token) {
-        case OffsetLeft:
-          return rend ? jsNumber(rend->offsetLeft())
-                      : static_cast<JSValue*>(jsUndefined());
-        case OffsetTop:
-          return rend ? jsNumber(rend->offsetTop())
-                      : static_cast<JSValue*>(jsUndefined());
-        case OffsetWidth:
-          return rend ? jsNumber(rend->offsetWidth())
-                      : static_cast<JSValue*>(jsUndefined());
-        case OffsetHeight:
-          return rend ? jsNumber(rend->offsetHeight())
-                      : static_cast<JSValue*>(jsUndefined());
-        case OffsetParent: {
-          RenderObject* par = rend ? rend->offsetParent() : 0;
-          return toJS(exec, par ? par->element() : 0);
-        }
-        case ClientWidth:
-          return rend ? jsNumber(rend->clientWidth())
-                      : static_cast<JSValue*>(jsUndefined());
-        case ClientHeight:
-          return rend ? jsNumber(rend->clientHeight())
-                      : static_cast<JSValue*>(jsUndefined());
-        case ScrollWidth:
-          return rend ? jsNumber(rend->scrollWidth())
-                      : static_cast<JSValue*>(jsUndefined());
-        case ScrollHeight:
-          return rend ? jsNumber(rend->scrollHeight())
-                      : static_cast<JSValue*>(jsUndefined());
-        case ScrollLeft:
-          return jsNumber(rend && rend->layer() ? rend->layer()->scrollXOffset()
-                                                : 0);
-        case ScrollTop:
-          return jsNumber(rend && rend->layer() ? rend->layer()->scrollYOffset()
-                                                : 0);
-        default:
-          break;
-      }
   }
 
-  return NULL;
+  return jsUndefined();
 }
 
-void DOMNode::put(ExecState* exec,
-                  const Identifier& propertyName,
-                  JSValue* value,
-                  int attr) {
-  lookupPut<DOMNode, DOMObject>(exec, propertyName, value, attr, &DOMNodeTable,
-                                this);
+void DOMEventTargetNode::put(ExecState* exec,
+                             const Identifier& propertyName,
+                             JSValue* value,
+                             int attr) {
+  lookupPut<DOMEventTargetNode, DOMNode>(exec, propertyName, value, attr,
+                                         &DOMEventTargetNodeTable, this);
 }
 
-void DOMNode::putValueProperty(ExecState* exec,
-                               int token,
-                               JSValue* value,
-                               int /*attr*/) {
-  DOMExceptionTranslator exception(exec);
-  NodeImpl& node = *m_impl;
+void DOMEventTargetNode::putValueProperty(ExecState* exec,
+                                          int token,
+                                          JSValue* value,
+                                          int /*attr*/) {
   switch (token) {
-    case NodeValue:
-      node.setNodeValue(value->toString(exec).domString(), exception);
-      break;
-    case Prefix:
-      node.setPrefix(value->toString(exec).domString().impl(), exception);
-      break;
-    case TextContent:
-      node.setTextContent(valueToStringWithNullCheck(exec, value), exception);
-      break;
     case OnAbort:
       setListener(exec, abortEvent, value);
       break;
@@ -581,44 +642,19 @@ void DOMNode::putValueProperty(ExecState* exec,
     case OnUnload:
       setListener(exec, unloadEvent, value);
       break;
-    case ScrollTop: {
-      RenderObject* rend = node.renderer();
-      if (rend && rend->hasOverflowClip())
-        rend->layer()->scrollToYOffset(value->toInt32(exec));
-      break;
-    }
-    case ScrollLeft: {
-      RenderObject* rend = node.renderer();
-      if (rend && rend->hasOverflowClip())
-        rend->layer()->scrollToXOffset(value->toInt32(exec));
-      break;
-    }
   }
 }
 
-JSValue* DOMNode::toPrimitive(ExecState* exec, JSType) const {
-  if (!m_impl)
-    return jsNull();
-
-  return jsString(toString(exec));
-}
-
-UString DOMNode::toString(ExecState*) const {
-  if (!m_impl)
-    return "null";
-  return "[object " +
-         (m_impl->isElementNode() ? m_impl->nodeName() : className()) + "]";
-}
-
-void DOMNode::setListener(ExecState* exec,
-                          const AtomicString& eventType,
-                          JSValue* func) const {
-  m_impl->setHTMLEventListener(
+void DOMEventTargetNode::setListener(ExecState* exec,
+                                     const AtomicString& eventType,
+                                     JSValue* func) const {
+  EventTargetNodeCast(impl())->setHTMLEventListener(
       eventType, Window::retrieveActive(exec)->getJSEventListener(func, true));
 }
 
-JSValue* DOMNode::getListener(const AtomicString& eventType) const {
-  DOM::EventListener* listener = m_impl->getHTMLEventListener(eventType);
+JSValue* DOMEventTargetNode::getListener(const AtomicString& eventType) const {
+  DOM::EventListener* listener =
+      EventTargetNodeCast(impl())->getHTMLEventListener(eventType);
   JSEventListener* jsListener = static_cast<JSEventListener*>(listener);
   if (jsListener && jsListener->listenerObj())
     return jsListener->listenerObj();
@@ -626,95 +662,57 @@ JSValue* DOMNode::getListener(const AtomicString& eventType) const {
     return jsNull();
 }
 
-void DOMNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}
+void DOMEventTargetNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}
 
-JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
-                                          JSObject* thisObj,
-                                          const List& args) {
-  if (!thisObj->inherits(&DOMNode::info))
+/*
+@begin DOMEventTargetNodeProtoTable 5
+# from the EventTarget interface
+addEventListener        DOMEventTargetNode::AddEventListener
+DontDelete|Function 3
+removeEventListener     DOMEventTargetNode::RemoveEventListener
+DontDelete|Function 3
+dispatchEvent           DOMEventTargetNode::DispatchEvent  DontDelete|Function 1
+@end
+*/
+
+KJS_IMPLEMENT_PROTOFUNC(DOMEventTargetNodeProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMEventTargetNode",
+                        DOMEventTargetNodeProto,
+                        DOMEventTargetNodeProtoFunc)
+
+JSValue* DOMEventTargetNodeProtoFunc::callAsFunction(ExecState* exec,
+                                                     JSObject* thisObj,
+                                                     const List& args) {
+  if (!thisObj->inherits(&DOMEventTargetNode::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
-  NodeImpl& node = *static_cast<DOMNode*>(thisObj)->impl();
+  DOMEventTargetNode* DOMNode = static_cast<DOMEventTargetNode*>(thisObj);
+  EventTargetNodeImpl* node =
+      static_cast<EventTargetNodeImpl*>(DOMNode->impl());
   switch (id) {
-    case DOMNode::HasAttributes:
-      return jsBoolean(node.hasAttributes());
-    case DOMNode::HasChildNodes:
-      return jsBoolean(node.hasChildNodes());
-    case DOMNode::CloneNode:
-      return toJS(exec, node.cloneNode(args[0]->toBoolean(exec)));
-    case DOMNode::Normalize:
-      node.normalize();
-      return jsUndefined();
-    case DOMNode::IsSupported:
-      return jsBoolean(
-          node.isSupported(args[0]->toString(exec).domString(),
-                           valueToStringWithNullCheck(exec, args[1])));
-    case DOMNode::IsSameNode:
-      return jsBoolean(node.isSameNode(toNode(args[0])));
-    case DOMNode::IsEqualNode:
-      return jsBoolean(node.isEqualNode(toNode(args[0])));
-    case DOMNode::IsDefaultNamespace:
-      return jsBoolean(
-          node.isDefaultNamespace(valueToStringWithNullCheck(exec, args[0])));
-    case DOMNode::LookupNamespaceURI:
-      return jsStringOrNull(
-          node.lookupNamespaceURI(valueToStringWithNullCheck(exec, args[0])));
-    case DOMNode::LookupPrefix:
-      return jsStringOrNull(
-          node.lookupPrefix(valueToStringWithNullCheck(exec, args[0])));
-    case DOMNode::AddEventListener: {
+    case DOMEventTargetNode::AddEventListener: {
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       if (listener)
-        node.addEventListener(AtomicString(args[0]->toString(exec).domString()),
-                              listener, args[2]->toBoolean(exec));
-      return jsUndefined();
-    }
-    case DOMNode::RemoveEventListener: {
-      JSEventListener* listener =
-          Window::retrieveActive(exec)->getJSEventListener(args[1]);
-      if (listener)
-        node.removeEventListener(
+        node->addEventListener(
             AtomicString(args[0]->toString(exec).domString()), listener,
             args[2]->toBoolean(exec));
       return jsUndefined();
     }
-    case DOMNode::DispatchEvent:
-      return jsBoolean(node.dispatchEvent(toEvent(args[0]), exception));
-    case DOMNode::AppendChild:
-      if (node.appendChild(toNode(args[0]), exception))
-        return args[0];
-      return jsNull();
-    case DOMNode::RemoveChild:
-      if (node.removeChild(toNode(args[0]), exception))
-        return args[0];
-      return jsNull();
-    case DOMNode::InsertBefore:
-      if (node.insertBefore(toNode(args[0]), toNode(args[1]), exception))
-        return args[0];
-      return jsNull();
-    case DOMNode::ReplaceChild:
-      if (node.replaceChild(toNode(args[0]), toNode(args[1]), exception))
-        return args[1];
-      return jsNull();
-    case DOMNode::Contains:
-      if (node.isElementNode())
-        if (NodeImpl* node0 = toNode(args[0]))
-          return jsBoolean(node.isAncestor(node0));
-      // FIXME: Is there a good reason to return undefined rather than false
-      // when the parameter is not a node? When the object is not an element?
+    case DOMEventTargetNode::RemoveEventListener: {
+      JSEventListener* listener =
+          Window::retrieveActive(exec)->getJSEventListener(args[1]);
+      if (listener)
+        node->removeEventListener(
+            AtomicString(args[0]->toString(exec).domString()), listener,
+            args[2]->toBoolean(exec));
       return jsUndefined();
-    case DOMNode::Item:
-      return thisObj->get(exec, args[0]->toInt32(exec));
+    }
+    case DOMEventTargetNode::DispatchEvent:
+      return jsBoolean(node->dispatchEvent(toEvent(args[0]), exception));
   }
 
   return jsUndefined();
-}
-
-NodeImpl* toNode(JSValue* val) {
-  if (!val || !val->isObject(&DOMNode::info))
-    return 0;
-  return static_cast<DOMNode*>(val)->impl();
 }
 
 // -------------------------------------------------------------------------
@@ -861,15 +859,15 @@ DontDelete|Function 2
   queryCommandValue DOMDocument::QueryCommandValue DontDelete|Function 1
 @end
 */
-KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMDocumentProto, DOMNodeProto)
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMDocumentProto, DOMEventTargetNodeProto)
 KJS_IMPLEMENT_PROTOFUNC(DOMDocumentProtoFunc)
 KJS_IMPLEMENT_PROTOTYPE("DOMDocument", DOMDocumentProto, DOMDocumentProtoFunc)
 
-const ClassInfo DOMDocument::info = {"Document", &DOMNode::info,
+const ClassInfo DOMDocument::info = {"Document", &DOMEventTargetNode::info,
                                      &DOMDocumentTable, 0};
 
 /* Source for DOMDocumentTable. Use "make hashtables" to regenerate.
-@begin DOMDocumentTable 4
+@begin DOMDocumentTable 17
   doctype         DOMDocument::DocType DontDelete|ReadOnly
   implementation  DOMDocument::Implementation DontDelete|ReadOnly
   documentElement DOMDocument::DocumentElement DontDelete|ReadOnly
@@ -887,11 +885,12 @@ DontDelete|ReadOnly
 @end
 */
 
-DOMDocument::DOMDocument(ExecState* exec, DocumentImpl* d) : DOMNode(d) {
+DOMDocument::DOMDocument(ExecState* exec, DocumentImpl* d)
+    : DOMEventTargetNode(d) {
   setPrototype(DOMDocumentProto::self(exec));
 }
 
-DOMDocument::DOMDocument(DocumentImpl* d) : DOMNode(d) {}
+DOMDocument::DOMDocument(DocumentImpl* d) : DOMEventTargetNode(d) {}
 
 DOMDocument::~DOMDocument() {
   ScriptInterpreter::forgetDOMObject(static_cast<DocumentImpl*>(m_impl.get()));
@@ -900,8 +899,8 @@ DOMDocument::~DOMDocument() {
 bool DOMDocument::getOwnPropertySlot(ExecState* exec,
                                      const Identifier& propertyName,
                                      PropertySlot& slot) {
-  return getStaticValueSlot<DOMDocument, DOMNode>(exec, &DOMDocumentTable, this,
-                                                  propertyName, slot);
+  return getStaticValueSlot<DOMDocument, DOMEventTargetNode>(
+      exec, &DOMDocumentTable, this, propertyName, slot);
 }
 
 JSValue* DOMDocument::getValueProperty(ExecState* exec, int token) const {
@@ -955,14 +954,14 @@ void DOMDocument::put(ExecState* exec,
                       const Identifier& propertyName,
                       JSValue* value,
                       int attr) {
-  lookupPut<DOMDocument, DOMNode>(exec, propertyName, value, attr,
-                                  &DOMDocumentTable, this);
+  lookupPut<DOMDocument, DOMEventTargetNode>(exec, propertyName, value, attr,
+                                             &DOMDocumentTable, this);
 }
 
 void DOMDocument::putValueProperty(ExecState* exec,
                                    int token,
                                    JSValue* value,
-                                   int /*attr*/) {
+                                   int) {
   DocumentImpl& doc = *static_cast<DocumentImpl*>(impl());
   switch (token) {
     case SelectedStylesheetSet:
@@ -978,7 +977,7 @@ void DOMDocument::putValueProperty(ExecState* exec,
 JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
                                               JSObject* thisObj,
                                               const List& args) {
-  if (!thisObj->inherits(&KJS::DOMNode::info))
+  if (!thisObj->inherits(&KJS::DOMDocument::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
   NodeImpl& node = *static_cast<DOMNode*>(thisObj)->impl();
@@ -1107,41 +1106,128 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
 // -------------------------------------------------------------------------
 
 /* Source for DOMElementProtoTable. Use "make hashtables" to regenerate.
-@begin DOMElementProtoTable 17
-  scrollIntoView        DOMElement::ScrollIntoView      DontDelete|Function 1
+@begin DOMElementProtoTable 8
+  scrollIntoView                DOMElement::ScrollIntoView DontDelete|Function 1
   scrollIntoViewIfNeeded        DOMElement::ScrollIntoViewIfNeeded
 DontDelete|Function 1
 
 # extension for Safari RSS
   scrollByLines         DOMElement::ScrollByLines       DontDelete|Function 1
   scrollByPages         DOMElement::ScrollByPages       DontDelete|Function 1
-
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(DOMElementProtoFunc)
 KJS_IMPLEMENT_PROTOTYPE("DOMElement", DOMElementProto, DOMElementProtoFunc)
 
-const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
-                                    0};
+const ClassInfo DOMElement::info = {"Element", &DOMEventTargetNode::info,
+                                    &DOMElementTable, 0};
 /* Source for DOMElementTable. Use "make hashtables" to regenerate.
-@begin DOMElementTable 3
-  tagName       DOMElement::TagName                         DontDelete|ReadOnly
+@begin DOMElementTable 17
+    tagName       DOMElement::TagName DontDelete|ReadOnly
+
+# IE extensions
+    offsetLeft    DOMElement::OffsetLeft             DontDelete|ReadOnly
+    offsetTop     DOMElement::OffsetTop              DontDelete|ReadOnly
+    offsetWidth   DOMElement::OffsetWidth            DontDelete|ReadOnly
+    offsetHeight  DOMElement::OffsetHeight           DontDelete|ReadOnly
+    offsetParent  DOMElement::OffsetParent           DontDelete|ReadOnly
+    clientWidth   DOMElement::ClientWidth            DontDelete|ReadOnly
+    clientHeight  DOMElement::ClientHeight           DontDelete|ReadOnly
+    scrollLeft    DOMElement::ScrollLeft             DontDelete
+    scrollTop     DOMElement::ScrollTop              DontDelete
+    scrollWidth   DOMElement::ScrollWidth            DontDelete|ReadOnly
+    scrollHeight  DOMElement::ScrollHeight           DontDelete|ReadOnly
 @end
 */
-DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
+DOMElement::DOMElement(ExecState* exec, ElementImpl* e)
+    : DOMEventTargetNode(e) {
   setPrototype(DOMElementProto::self(exec));
 }
 
-DOMElement::DOMElement(ElementImpl* e) : DOMNode(e) {}
+DOMElement::DOMElement(ElementImpl* e) : DOMEventTargetNode(e) {}
 
 JSValue* DOMElement::getValueProperty(ExecState* exec, int token) const {
   ElementImpl* element = static_cast<ElementImpl*>(impl());
   switch (token) {
     case TagName:
       return jsStringOrNull(element->nodeName());
+
     default:
-      assert(0);
-      return jsUndefined();
+      // no DOM standard -- IE extension
+
+      // Make sure our layout is up to date before we allow a query on these
+      // attributes.
+      element->getDocument()->updateLayoutIgnorePendingStylesheets();
+
+      RenderObject* rend = element->renderer();
+
+      switch (token) {
+        case OffsetLeft:
+          return rend ? jsNumber(rend->offsetLeft())
+                      : static_cast<JSValue*>(jsUndefined());
+        case OffsetTop:
+          return rend ? jsNumber(rend->offsetTop())
+                      : static_cast<JSValue*>(jsUndefined());
+        case OffsetWidth:
+          return rend ? jsNumber(rend->offsetWidth())
+                      : static_cast<JSValue*>(jsUndefined());
+        case OffsetHeight:
+          return rend ? jsNumber(rend->offsetHeight())
+                      : static_cast<JSValue*>(jsUndefined());
+        case OffsetParent: {
+          RenderObject* par = rend ? rend->offsetParent() : 0;
+          return toJS(exec, par ? par->element() : 0);
+        }
+        case ClientWidth:
+          return rend ? jsNumber(rend->clientWidth())
+                      : static_cast<JSValue*>(jsUndefined());
+        case ClientHeight:
+          return rend ? jsNumber(rend->clientHeight())
+                      : static_cast<JSValue*>(jsUndefined());
+        case ScrollWidth:
+          return rend ? jsNumber(rend->scrollWidth())
+                      : static_cast<JSValue*>(jsUndefined());
+        case ScrollHeight:
+          return rend ? jsNumber(rend->scrollHeight())
+                      : static_cast<JSValue*>(jsUndefined());
+        case ScrollLeft:
+          return jsNumber(rend && rend->layer() ? rend->layer()->scrollXOffset()
+                                                : 0);
+        case ScrollTop:
+          return jsNumber(rend && rend->layer() ? rend->layer()->scrollYOffset()
+                                                : 0);
+      }
+  }
+
+  return jsUndefined();
+}
+
+void DOMElement::put(ExecState* exec,
+                     const Identifier& propertyName,
+                     JSValue* value,
+                     int attr) {
+  lookupPut<DOMElement, DOMEventTargetNode>(exec, propertyName, value, attr,
+                                            &DOMElementTable, this);
+}
+
+void DOMElement::putValueProperty(ExecState* exec,
+                                  int token,
+                                  JSValue* value,
+                                  int /*attr*/) {
+  NodeImpl& node = *m_impl;
+  switch (token) {
+    case ScrollTop: {
+      RenderObject* rend = node.renderer();
+      if (rend && rend->hasOverflowClip())
+        rend->layer()->scrollToYOffset(value->toInt32(exec));
+      break;
+    }
+    case ScrollLeft: {
+      RenderObject* rend = node.renderer();
+      if (rend && rend->hasOverflowClip())
+        rend->layer()->scrollToXOffset(value->toInt32(exec));
+      break;
+    }
   }
 }
 
@@ -1165,11 +1251,12 @@ bool DOMElement::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  // We have to check in DOMNode before giving access to attributes, otherwise
+  // We have to check in DOMEventTargetNode before giving access to attributes,
+  // otherwise
   // onload="..." would make onload return the string (attribute value) instead
   // of
   // the listener object (function).
-  if (DOMNode::getOwnPropertySlot(exec, propertyName, slot))
+  if (DOMEventTargetNode::getOwnPropertySlot(exec, propertyName, slot))
     return true;
 
   JSValue* proto = prototype();
@@ -1194,7 +1281,7 @@ bool DOMElement::getOwnPropertySlot(ExecState* exec,
 JSValue* DOMElementProtoFunc::callAsFunction(ExecState* exec,
                                              JSObject* thisObj,
                                              const List& args) {
-  if (!thisObj->inherits(&KJS::DOMNode::info))
+  if (!thisObj->inherits(&KJS::DOMElement::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
   NodeImpl& node = *static_cast<DOMNode*>(thisObj)->impl();
@@ -1211,25 +1298,23 @@ JSValue* DOMElementProtoFunc::callAsFunction(ExecState* exec,
       return jsUndefined();
     case DOMElement::ScrollByLines:
     case DOMElement::ScrollByPages:
-      if (DocumentImpl* doc = element.getDocument()) {
-        doc->updateLayoutIgnorePendingStylesheets();
-        if (RenderObject* rend = element.renderer())
-          if (rend->hasOverflowClip()) {
-            KWQScrollDirection direction = KWQScrollDown;
-            int multiplier = args[0]->toInt32(exec);
-            if (multiplier < 0) {
-              direction = KWQScrollUp;
-              multiplier = -multiplier;
-            }
-            KWQScrollGranularity granularity =
-                id == DOMElement::ScrollByLines ? KWQScrollLine : KWQScrollPage;
-            rend->layer()->scroll(direction, granularity, multiplier);
+      element.getDocument()->updateLayoutIgnorePendingStylesheets();
+      if (RenderObject* rend = element.renderer())
+        if (rend->hasOverflowClip()) {
+          KWQScrollDirection direction = KWQScrollDown;
+          int multiplier = args[0]->toInt32(exec);
+          if (multiplier < 0) {
+            direction = KWQScrollUp;
+            multiplier = -multiplier;
           }
-      }
-      return jsUndefined();
-    default:
+          KWQScrollGranularity granularity =
+              id == DOMElement::ScrollByLines ? KWQScrollLine : KWQScrollPage;
+          rend->layer()->scroll(direction, granularity, multiplier);
+        }
       return jsUndefined();
   }
+
+  return jsUndefined();
 }
 
 ElementImpl* toElement(JSValue* val) {
@@ -1247,7 +1332,7 @@ DocumentTypeImpl* toDocumentType(JSValue* val) {
 // -------------------------------------------------------------------------
 
 /* Source for DOMNamedNodeMapProtoTable. Use "make hashtables" to regenerate.
-@begin DOMNamedNodeMapProtoTable 7
+@begin DOMNamedNodeMapProtoTable 10
   getNamedItem          DOMNamedNodeMap::GetNamedItem DontDelete|Function 1
   setNamedItem          DOMNamedNodeMap::SetNamedItem DontDelete|Function 1
   removeNamedItem       DOMNamedNodeMap::RemoveNamedItem DontDelete|Function 1
@@ -1398,10 +1483,7 @@ bool checkNodeSecurity(ExecState* exec, NodeImpl* n) {
 
   // Check to see if the currently executing interpreter is allowed to access
   // the specified node
-  Frame* frame = n->getDocument()->frame();
-  if (!frame)
-    return false;
-  Window* win = Window::retrieveWindow(frame);
+  Window* win = Window::retrieveWindow(n->getDocument()->frame());
   return win && win->isSafeScript(exec);
 }
 

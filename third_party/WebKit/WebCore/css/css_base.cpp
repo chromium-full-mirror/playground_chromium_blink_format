@@ -64,9 +64,7 @@ DOMString StyleBaseImpl::baseURL() {
   if (!sheet->ownerNode())
     return DOMString();
 
-  DocumentImpl* doc = sheet->ownerNode()->getDocument();
-
-  return doc->baseURL();
+  return sheet->ownerNode()->getDocument()->baseURL();
 }
 
 // ------------------------------------------------------------------------------

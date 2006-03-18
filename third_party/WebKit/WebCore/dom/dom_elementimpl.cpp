@@ -376,7 +376,7 @@ void ElementImpl::scrollIntoViewIfNeeded(bool centerIfNeeded) {
 }
 
 static inline bool inHTMLDocument(const ElementImpl* e) {
-  return e && e->getDocument() && e->getDocument()->isHTMLDocument();
+  return e && e->getDocument()->isHTMLDocument();
 }
 
 const AtomicString& ElementImpl::getAttribute(const String& name) const {
@@ -831,24 +831,22 @@ CSSStyleDeclarationImpl* ElementImpl::style() {
 
 void ElementImpl::focus() {
   DocumentImpl* doc = getDocument();
-  if (doc) {
-    doc->updateLayout();
-    if (isFocusable()) {
-      doc->setFocusNode(this);
-      if (rootEditableElement() == this) {
-        // FIXME: we should restore the previous selection if there is one,
-        // instead of always selecting all.
-        if (doc->frame()->selectContentsOfNode(this))
-          doc->frame()->revealSelection();
-      } else if (renderer() && !renderer()->isWidget())
-        renderer()->enclosingLayer()->scrollRectToVisible(getRect());
-    }
+  doc->updateLayout();
+  if (isFocusable()) {
+    doc->setFocusNode(this);
+    if (rootEditableElement() == this) {
+      // FIXME: we should restore the previous selection if there is one,
+      // instead of always selecting all.
+      if (doc->frame()->selectContentsOfNode(this))
+        doc->frame()->revealSelection();
+    } else if (renderer() && !renderer()->isWidget())
+      renderer()->enclosingLayer()->scrollRectToVisible(getRect());
   }
 }
 
 void ElementImpl::blur() {
   DocumentImpl* doc = getDocument();
-  if (doc && doc->focusNode() == this)
+  if (doc->focusNode() == this)
     doc->setFocusNode(0);
 }
 
@@ -1387,7 +1385,7 @@ void StyledElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     if (namedAttrMap) {
       if (attr->isNull())
         namedAttrMap->setID(nullAtom);
-      else if (getDocument() && getDocument()->inCompatMode() &&
+      else if (getDocument()->inCompatMode() &&
                !attr->value().impl()->isLower())
         namedAttrMap->setID(AtomicString(attr->value().domString().lower()));
       else

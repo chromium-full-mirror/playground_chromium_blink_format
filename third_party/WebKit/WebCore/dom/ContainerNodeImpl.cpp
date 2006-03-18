@@ -44,7 +44,7 @@ static void dispatchChildInsertionEvents(NodeImpl*, ExceptionCode&);
 static void dispatchChildRemovalEvents(NodeImpl*, ExceptionCode&);
 
 ContainerNodeImpl::ContainerNodeImpl(DocumentImpl* doc)
-    : NodeImpl(doc), m_firstChild(0), m_lastChild(0) {}
+    : EventTargetNodeImpl(doc), m_firstChild(0), m_lastChild(0) {}
 
 void ContainerNodeImpl::removeAllChildren() {
   // Avoid deep recursion when destroying the node tree.
@@ -358,10 +358,11 @@ bool ContainerNodeImpl::removeChild(NodeImpl* oldChild, ExceptionCode& ec) {
 
   // dispatch pre-removal mutation events
   if (getDocument()->hasListenerType(DocumentImpl::DOMNODEREMOVED_LISTENER)) {
-    child->dispatchEvent(
-        new MutationEventImpl(DOMNodeRemovedEvent, true, false, this,
-                              DOMString(), DOMString(), DOMString(), 0),
-        ec, true);
+    EventTargetNodeCast(child.get())
+        ->dispatchEvent(
+            new MutationEventImpl(DOMNodeRemovedEvent, true, false, this,
+                                  DOMString(), DOMString(), DOMString(), 0),
+            ec, true);
     if (ec)
       return false;
   }
@@ -565,29 +566,29 @@ ContainerNodeImpl* ContainerNodeImpl::addChild(PassRefPtr<NodeImpl> newChild) {
 void ContainerNodeImpl::attach() {
   for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
     child->attach();
-  NodeImpl::attach();
+  EventTargetNodeImpl::attach();
 }
 
 void ContainerNodeImpl::detach() {
   for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
     child->detach();
-  NodeImpl::detach();
+  EventTargetNodeImpl::detach();
 }
 
 void ContainerNodeImpl::insertedIntoDocument() {
-  NodeImpl::insertedIntoDocument();
+  EventTargetNodeImpl::insertedIntoDocument();
   for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
     child->insertedIntoDocument();
 }
 
 void ContainerNodeImpl::removedFromDocument() {
-  NodeImpl::removedFromDocument();
+  EventTargetNodeImpl::removedFromDocument();
   for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
     child->removedFromDocument();
 }
 
 void ContainerNodeImpl::insertedIntoTree(bool deep) {
-  NodeImpl::insertedIntoTree(deep);
+  EventTargetNodeImpl::insertedIntoTree(deep);
   if (deep) {
     for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
       child->insertedIntoTree(deep);
@@ -595,7 +596,7 @@ void ContainerNodeImpl::insertedIntoTree(bool deep) {
 }
 
 void ContainerNodeImpl::removedFromTree(bool deep) {
-  NodeImpl::removedFromTree(deep);
+  EventTargetNodeImpl::removedFromTree(deep);
   if (deep) {
     for (NodeImpl* child = m_firstChild; child; child = child->nextSibling())
       child->removedFromTree(deep);
@@ -742,7 +743,7 @@ void ContainerNodeImpl::setFocus(bool received) {
   if (m_focused == received)
     return;
 
-  NodeImpl::setFocus(received);
+  EventTargetNodeImpl::setFocus(received);
 
   // note that we need to recalc the style
   setChanged();
@@ -752,7 +753,7 @@ void ContainerNodeImpl::setActive(bool down, bool pause) {
   if (down == active())
     return;
 
-  NodeImpl::setActive(down);
+  EventTargetNodeImpl::setActive(down);
 
   // note that we need to recalc the style
   // FIXME: Move to ElementImpl
@@ -798,7 +799,7 @@ void ContainerNodeImpl::setHovered(bool over) {
   if (over == hovered())
     return;
 
-  NodeImpl::setHovered(over);
+  EventTargetNodeImpl::setHovered(over);
 
   // note that we need to recalc the style
   // FIXME: Move to ElementImpl
@@ -838,12 +839,14 @@ static void dispatchChildInsertionEvents(NodeImpl* child, ExceptionCode& ec) {
     c->insertedIntoTree(true);
 
   if (c->parentNode() &&
-      doc->hasListenerType(DocumentImpl::DOMNODEINSERTED_LISTENER)) {
+      doc->hasListenerType(DocumentImpl::DOMNODEINSERTED_LISTENER) &&
+      c->isEventTargetNode()) {
     ec = 0;
-    child->dispatchEvent(new MutationEventImpl(
-                             DOMNodeInsertedEvent, true, false, c->parentNode(),
-                             DOMString(), DOMString(), DOMString(), 0),
-                         ec, true);
+    EventTargetNodeCast(c.get())->dispatchEvent(
+        new MutationEventImpl(DOMNodeInsertedEvent, true, false,
+                              c->parentNode(), DOMString(), DOMString(),
+                              DOMString(), 0),
+        ec, true);
     if (ec)
       return;
   }
@@ -852,8 +855,11 @@ static void dispatchChildInsertionEvents(NodeImpl* child, ExceptionCode& ec) {
   if (c->inDocument() &&
       doc->hasListenerType(DocumentImpl::DOMNODEINSERTEDINTODOCUMENT_LISTENER))
     for (; c; c = c->traverseNextNode(child)) {
+      if (!c->isEventTargetNode())
+        continue;
+
       ec = 0;
-      c->dispatchEvent(
+      EventTargetNodeCast(c.get())->dispatchEvent(
           new MutationEventImpl(DOMNodeInsertedIntoDocumentEvent, false, false,
                                 0, DOMString(), DOMString(), DOMString(), 0),
           ec, true);
@@ -872,9 +878,10 @@ static void dispatchChildRemovalEvents(NodeImpl* child, ExceptionCode& ec) {
 
   // dispatch pre-removal mutation events
   if (c->parentNode() &&
-      doc->hasListenerType(DocumentImpl::DOMNODEREMOVED_LISTENER)) {
+      doc->hasListenerType(DocumentImpl::DOMNODEREMOVED_LISTENER) &&
+      c->isEventTargetNode()) {
     ec = 0;
-    child->dispatchEvent(
+    EventTargetNodeCast(c.get())->dispatchEvent(
         new MutationEventImpl(DOMNodeRemovedEvent, true, false, c->parentNode(),
                               DOMString(), DOMString(), DOMString(), 0),
         ec, true);
@@ -886,8 +893,10 @@ static void dispatchChildRemovalEvents(NodeImpl* child, ExceptionCode& ec) {
   if (c->inDocument() &&
       doc->hasListenerType(DocumentImpl::DOMNODEREMOVEDFROMDOCUMENT_LISTENER))
     for (; c; c = c->traverseNextNode(child)) {
+      if (!c->isEventTargetNode())
+        continue;
       ec = 0;
-      c->dispatchEvent(
+      EventTargetNodeCast(c.get())->dispatchEvent(
           new MutationEventImpl(DOMNodeRemovedFromDocumentEvent, false, false,
                                 0, DOMString(), DOMString(), DOMString(), 0),
           ec, true);

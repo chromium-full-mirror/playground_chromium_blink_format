@@ -158,8 +158,7 @@ void HTMLBodyElementImpl::insertedIntoDocument() {
 
   // FIXME: perhaps this code should be in attach() instead of here
 
-  DocumentImpl* d = getDocument();
-  FrameView* w = d ? d->view() : 0;
+  FrameView* w = getDocument()->view();
   if (w && w->marginWidth() != -1) {
     QString s;
     s.sprintf("%d", w->marginWidth());
@@ -252,16 +251,12 @@ void HTMLFrameElementImpl::init() {
 HTMLFrameElementImpl::~HTMLFrameElementImpl() {}
 
 bool HTMLFrameElementImpl::isURLAllowed(const AtomicString& URLString) const {
-  if (URLString.isEmpty()) {
+  if (URLString.isEmpty())
     return true;
-  }
 
-  DocumentImpl* d = getDocument();
-  FrameView* w = d ? d->view() : 0;
-
-  if (!w) {
+  FrameView* w = getDocument()->view();
+  if (!w)
     return false;
-  }
 
   KURL newURL(getDocument()->completeURL(URLString.qstring()));
   newURL.setRef(QString::null);
@@ -296,8 +291,7 @@ bool HTMLFrameElementImpl::isURLAllowed(const AtomicString& URLString) const {
 }
 
 void HTMLFrameElementImpl::openURL() {
-  DocumentImpl* d = getDocument();
-  FrameView* w = d ? d->view() : 0;
+  FrameView* w = getDocument()->view();
   if (!w)
     return;
 
@@ -559,20 +553,18 @@ void HTMLFrameElementImpl::setSrc(const DOMString& value) {
 }
 
 int HTMLFrameElementImpl::frameWidth() const {
-  DocumentImpl* d = getDocument();
-  if (!d || !renderer())
+  if (!renderer())
     return 0;
 
-  d->updateLayoutIgnorePendingStylesheets();
+  getDocument()->updateLayoutIgnorePendingStylesheets();
   return renderer()->width();
 }
 
 int HTMLFrameElementImpl::frameHeight() const {
-  DocumentImpl* d = getDocument();
-  if (!d || !renderer())
+  if (!renderer())
     return 0;
 
-  d->updateLayoutIgnorePendingStylesheets();
+  getDocument()->updateLayoutIgnorePendingStylesheets();
   return renderer()->height();
 }
 

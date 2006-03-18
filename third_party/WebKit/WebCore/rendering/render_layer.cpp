@@ -613,7 +613,8 @@ void RenderLayer::scrollToOffset(int x,
   }
 
   // Fire the scroll DOM event.
-  m_object->element()->dispatchHTMLEvent(scrollEvent, true, false);
+  EventTargetNodeCast(m_object->element())
+      ->dispatchHTMLEvent(scrollEvent, true, false);
 }
 
 void RenderLayer::scrollRectToVisible(const IntRect& rect,

@@ -256,7 +256,8 @@ void JSLazyEventListener::parseCode() const {
 
       JSValue* thisObj = toJS(exec, originalNode);
       if (thisObj->isObject()) {
-        static_cast<DOMNode*>(thisObj)->pushEventHandlerScope(exec, scope);
+        static_cast<DOMEventTargetNode*>(thisObj)->pushEventHandlerScope(exec,
+                                                                         scope);
         listener->setScope(scope);
       }
     }
@@ -270,7 +271,8 @@ void JSLazyEventListener::parseCode() const {
                                       const_cast<JSLazyEventListener*>(this));
 }
 
-JSValue* getNodeEventListener(NodeImpl* n, const AtomicString& eventType) {
+JSValue* getNodeEventListener(EventTargetNodeImpl* n,
+                              const AtomicString& eventType) {
   if (JSAbstractEventListener* listener = static_cast<JSAbstractEventListener*>(
           n->getHTMLEventListener(eventType)))
     if (JSValue* obj = listener->listenerObj())
