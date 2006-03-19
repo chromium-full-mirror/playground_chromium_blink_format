@@ -58,7 +58,8 @@ void RenderContainer::destroy() {
 void RenderContainer::destroyLeftoverChildren() {
   while (m_first) {
     if (m_first->isListMarker() ||
-        m_first->style()->styleType() == RenderStyle::FIRST_LETTER)
+        (m_first->style()->styleType() == RenderStyle::FIRST_LETTER &&
+         !m_first->isText()))
       m_first->remove();  // List markers are owned by their enclosing list and
                           // so don't get destroyed by this container.
                           // Similarly, first letters are destroyed by their
