@@ -410,8 +410,7 @@ void FrameWin::issueCutCommand() {
 void FrameWin::issueCopyCommand() {
   notImplemented();
 }
-void FrameWin::openURLRequest(KURL const&,
-                              struct WebCore::ResourceRequest const&) {
+void FrameWin::openURLRequest(struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
 bool FrameWin::passWheelEventToChildWidget(NodeImpl*) {
@@ -480,9 +479,6 @@ Plugin* FrameWin::createPlugin(KURL const&,
 bool BrowserExtensionWin::canRunModal() {
   notImplemented();
   return 0;
-}
-void BrowserExtensionWin::openURLNotify() {
-  notImplemented();
 }
 void BrowserExtensionWin::createNewWindow(
     struct WebCore::ResourceRequest const&,
