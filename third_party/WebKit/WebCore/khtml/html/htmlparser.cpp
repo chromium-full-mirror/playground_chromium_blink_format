@@ -470,7 +470,7 @@ bool HTMLParser::handleError(NodeImpl* n,
       }
     } else if (h->hasLocalName(addressTag) || h->hasLocalName(dlTag) ||
                h->hasLocalName(dtTag) || h->hasLocalName(fontTag) ||
-               h->hasLocalName(titleTag)) {
+               h->hasLocalName(styleTag) || h->hasLocalName(titleTag)) {
       popBlock(currentTagName);
       handled = true;
     } else if (h->hasLocalName(captionTag)) {
