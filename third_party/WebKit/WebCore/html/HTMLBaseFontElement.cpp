@@ -1,11 +1,9 @@
-/*
+/**
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
- *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
+ * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,36 +21,38 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-
 #include "config.h"
-#include "HTMLIsIndexElement.h"
-#include "htmlnames.h"
+#include "HTMLBaseFontElement.h"
+#include "HTMLNames.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLIsIndexElement::HTMLIsIndexElement(Document* doc, HTMLFormElement* f)
-    : HTMLInputElement(isindexTag, doc, f) {
-  m_type = TEXT;
-  m_name = "isindex";
+HTMLBaseFontElement::HTMLBaseFontElement(Document* doc)
+    : HTMLElement(basefontTag, doc) {}
+
+String HTMLBaseFontElement::color() const {
+  return getAttribute(colorAttr);
 }
 
-void HTMLIsIndexElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == promptAttr)
-    setValue(attr->value());
-  else
-    // don't call HTMLInputElement::parseMappedAttribute here, as it would
-    // accept attributes this element does not support
-    HTMLGenericFormElement::parseMappedAttribute(attr);
+void HTMLBaseFontElement::setColor(const String& value) {
+  setAttribute(colorAttr, value);
 }
 
-String HTMLIsIndexElement::prompt() const {
-  return getAttribute(promptAttr);
+String HTMLBaseFontElement::face() const {
+  return getAttribute(faceAttr);
 }
 
-void HTMLIsIndexElement::setPrompt(const String& value) {
-  setAttribute(promptAttr, value);
+void HTMLBaseFontElement::setFace(const String& value) {
+  setAttribute(faceAttr, value);
 }
 
-}  // namespace
+String HTMLBaseFontElement::size() const {
+  return getAttribute(sizeAttr);
+}
+
+void HTMLBaseFontElement::setSize(const String& value) {
+  setAttribute(sizeAttr, value);
+}
+}

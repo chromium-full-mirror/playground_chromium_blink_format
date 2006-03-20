@@ -1,9 +1,11 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ *           (C) 2001 Dirk Mueller (mueller@kde.org)
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,38 +23,37 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #include "config.h"
-#include "HTMLBaseFontElement.h"
-#include "htmlnames.h"
+#include "HTMLFieldSetElement.h"
+
+#include "rendering/render_form.h"
+#include "HTMLNames.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLBaseFontElement::HTMLBaseFontElement(Document* doc)
-    : HTMLElement(basefontTag, doc) {}
+HTMLFieldSetElement::HTMLFieldSetElement(Document* doc, HTMLFormElement* f)
+    : HTMLGenericFormElement(fieldsetTag, doc, f) {}
 
-String HTMLBaseFontElement::color() const {
-  return getAttribute(colorAttr);
-}
+HTMLFieldSetElement::~HTMLFieldSetElement() {}
 
-void HTMLBaseFontElement::setColor(const String& value) {
-  setAttribute(colorAttr, value);
+bool HTMLFieldSetElement::checkDTD(const Node* newChild) {
+  return newChild->hasTagName(legendTag) || HTMLElement::checkDTD(newChild);
 }
 
-String HTMLBaseFontElement::face() const {
-  return getAttribute(faceAttr);
+bool HTMLFieldSetElement::isFocusable() const {
+  return false;
 }
 
-void HTMLBaseFontElement::setFace(const String& value) {
-  setAttribute(faceAttr, value);
+String HTMLFieldSetElement::type() const {
+  return "fieldset";
 }
 
-String HTMLBaseFontElement::size() const {
-  return getAttribute(sizeAttr);
+RenderObject* HTMLFieldSetElement::createRenderer(RenderArena* arena,
+                                                  RenderStyle* style) {
+  return new (arena) RenderFieldset(this);
 }
 
-void HTMLBaseFontElement::setSize(const String& value) {
-  setAttribute(sizeAttr, value);
-}
-}
+}  // namespace
