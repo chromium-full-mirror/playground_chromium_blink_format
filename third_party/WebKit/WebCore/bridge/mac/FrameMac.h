@@ -244,7 +244,8 @@ class FrameMac : public Frame {
   bool sendContextMenuEvent(NSEvent*);
 
   virtual bool passMouseDownEventToWidget(Widget*);
-  virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&);
+  virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&,
+                                           Frame* subframePart);
   virtual bool passWheelEventToChildWidget(Node*);
 
   NSString* searchForLabelsAboveCell(RegularExpression* regExp,

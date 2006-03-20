@@ -71,6 +71,8 @@ class FrameViewPrivate {
   ~FrameViewPrivate() { delete repaintRects; }
   void reset() {
     underMouse = 0;
+    oldUnder = 0;
+    oldSubframe = 0;
     linkPressed = false;
     useSlowRepaints = false;
     dragTarget = 0;
@@ -79,8 +81,6 @@ class FrameViewPrivate {
     ignoreWheelEvents = false;
     borderX = 30;
     borderY = 30;
-    prevMouseX = -1;
-    prevMouseY = -1;
     clickCount = 0;
     clickNode = 0;
     scrollingSelf = false;
@@ -99,6 +99,8 @@ class FrameViewPrivate {
   }
 
   RefPtr<Node> underMouse;
+  RefPtr<Node> oldUnder;
+  RefPtr<Frame> oldSubframe;
 
   bool borderTouched : 1;
   bool borderStart : 1;
@@ -116,7 +118,6 @@ class FrameViewPrivate {
   int clickCount;
   RefPtr<Node> clickNode;
 
-  int prevMouseX, prevMouseY;
   bool scrollingSelf;
   Timer<FrameView> layoutTimer;
   bool delayedLayout;
@@ -459,19 +460,31 @@ void FrameView::layout() {
 //
 /////////////////
 
+static Frame* subframeForEvent(const MouseEventWithHitTestResults& mev) {
+  if (!mev.innerNode())
+    return 0;
+
+  RenderObject* renderer = mev.innerNode()->renderer();
+  if (!renderer || !renderer->isWidget())
+    return 0;
+
+  Widget* widget = static_cast<RenderWidget*>(renderer)->widget();
+  if (!widget || !widget->isFrameView())
+    return 0;
+
+  return static_cast<FrameView*>(widget)->frame();
+}
+
 void FrameView::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   if (!m_frame->document())
     return;
 
   RefPtr<FrameView> protector(this);
 
-  int xm, ym;
-  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
-
   d->mousePressed = true;
 
-  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
-      false, true, false, xm, ym, mouseEvent);
+  MouseEventWithHitTestResults mev =
+      prepareMouseEvent(false, true, false, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev)) {
     invalidateClick();
@@ -506,14 +519,11 @@ void FrameView::handleMouseDoubleClickEvent(
 
   RefPtr<FrameView> protector(this);
 
-  int xm, ym;
-  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
-
   // We get this instead of a second mouse-up
   d->mousePressed = false;
 
-  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
-      false, true, false, xm, ym, mouseEvent);
+  MouseEventWithHitTestResults mev =
+      prepareMouseEvent(false, true, false, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev))
     return;
@@ -606,11 +616,10 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   if (!m_frame || !m_frame->document())
     return;
 
+  RefPtr<FrameView> protector(this);
+
   if (d->hoverTimer.isActive())
     d->hoverTimer.stop();
-
-  int xm, ym;
-  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
 
   if (d->resizingFrameSet) {
     dispatchMouseEvent(mousemoveEvent, d->resizingFrameSet.get(), false, 0,
@@ -625,17 +634,26 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   // the mouse
   // was pressed, rather than updating for nodes the mouse moves over as you
   // hold the mouse down.
-  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
-      d->mousePressed && m_frame->mouseDownMayStartSelect(), d->mousePressed,
-      true, xm, ym, mouseEvent);
+  MouseEventWithHitTestResults mev =
+      prepareMouseEvent(d->mousePressed && m_frame->mouseDownMayStartSelect(),
+                        d->mousePressed, true, mouseEvent);
 
-  if (!m_frame->passSubframeEventToSubframe(mev))
-    setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
+  if (d->oldSubframe)
+    m_frame->passSubframeEventToSubframe(mev, d->oldSubframe.get());
 
   bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.innerNode(), false,
                                          0, mouseEvent, true);
   if (!swallowEvent)
     m_frame->handleMouseMoveEvent(mev);
+
+  RefPtr<Frame> newSubframe = subframeForEvent(mev);
+
+  if (newSubframe && d->oldSubframe != newSubframe)
+    m_frame->passSubframeEventToSubframe(mev, newSubframe.get());
+  else
+    setCursor(selectCursor(mev, m_frame.get(), d->mousePressed));
+
+  d->oldSubframe = newSubframe;
 }
 
 void FrameView::invalidateClick() {
@@ -649,9 +667,6 @@ void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent) {
 
   RefPtr<FrameView> protector(this);
 
-  int xm, ym;
-  viewportToContents(mouseEvent.x(), mouseEvent.y(), xm, ym);
-
   d->mousePressed = false;
 
   if (d->resizingFrameSet) {
@@ -660,8 +675,8 @@ void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent) {
     return;
   }
 
-  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
-      false, false, false, xm, ym, mouseEvent);
+  MouseEventWithHitTestResults mev =
+      prepareMouseEvent(false, false, false, mouseEvent);
 
   if (m_frame->passSubframeEventToSubframe(mev))
     return;
@@ -699,10 +714,9 @@ bool FrameView::dispatchDragEvent(const AtomicString& eventType,
 bool FrameView::updateDragAndDrop(const PlatformMouseEvent& event,
                                   Clipboard* clipboard) {
   bool accept = false;
-  int xm, ym;
-  viewportToContents(event.x(), event.y(), xm, ym);
-  MouseEventWithHitTestResults mev = m_frame->document()->prepareMouseEvent(
-      true, false, false, xm, ym, PlatformMouseEvent());
+
+  MouseEventWithHitTestResults mev =
+      prepareMouseEvent(true, false, false, PlatformMouseEvent());
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
@@ -937,6 +951,21 @@ void FrameView::setResizingFrameSet(HTMLFrameSetElement* frameSet) {
   d->resizingFrameSet = frameSet;
 }
 
+MouseEventWithHitTestResults FrameView::prepareMouseEvent(
+    bool readonly,
+    bool active,
+    bool mouseMove,
+    const PlatformMouseEvent& mev) {
+  ASSERT(m_frame);
+  ASSERT(m_frame->document());
+
+  int xm, ym;
+  viewportToContents(mev.x(), mev.y(), xm, ym);
+
+  return m_frame->document()->prepareMouseEvent(readonly, active, mouseMove, xm,
+                                                ym, mev);
+}
+
 bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
                                    Node* targetNode,
                                    bool cancelable,
@@ -951,37 +980,21 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
 
   // mouseout/mouseover
   if (setUnder) {
-    int clientX, clientY;
-    viewportToContents(mouseEvent.x(), mouseEvent.y(), clientX, clientY);
-    if (d->prevMouseX != clientX || d->prevMouseY != clientY) {
-      // ### this code sucks. we should save the oldUnder instead of calculating
-      // it again. calculating is expensive! (Dirk)
-      // Also, there's no guarantee that the old under node is even around any
-      // more,
-      // so we could be sending a mouseout to a node that never got a mouseover.
-      RefPtr<Node> oldUnder;
-      if (d->prevMouseX >= 0) {
-        oldUnder = m_frame->document()
-                       ->prepareMouseEvent(true, false, true, d->prevMouseX,
-                                           d->prevMouseY, mouseEvent)
-                       .innerNode();
-        if (oldUnder && oldUnder->isTextNode())
-          oldUnder = oldUnder->parentNode();
-      }
-      d->prevMouseX = clientX;
-      d->prevMouseY = clientY;
-      if (oldUnder != targetNode) {
-        // send mouseout event to the old node
-        if (oldUnder)
-          EventTargetNodeCast(oldUnder.get())
-              ->dispatchMouseEvent(mouseEvent, mouseoutEvent, 0, targetNode);
-        // send mouseover event to the new node
-        if (targetNode)
-          EventTargetNodeCast(targetNode)
-              ->dispatchMouseEvent(mouseEvent, mouseoverEvent, 0,
-                                   oldUnder.get());
-      }
+    if (d->oldUnder && d->oldUnder->getDocument() != frame()->document())
+      d->oldUnder = 0;
+
+    if (d->oldUnder != targetNode) {
+      // send mouseout event to the old node
+      if (d->oldUnder)
+        EventTargetNodeCast(d->oldUnder.get())
+            ->dispatchMouseEvent(mouseEvent, mouseoutEvent, 0, targetNode);
+      // send mouseover event to the new node
+      if (targetNode)
+        EventTargetNodeCast(targetNode)
+            ->dispatchMouseEvent(mouseEvent, mouseoverEvent, 0,
+                                 d->oldUnder.get());
     }
+    d->oldUnder = targetNode;
   }
 
   bool swallowEvent = false;
@@ -1071,8 +1084,7 @@ void FrameView::layoutTimerFired(Timer<FrameView>*) {
 
 void FrameView::hoverTimerFired(Timer<FrameView>*) {
   d->hoverTimer.stop();
-  m_frame->document()->prepareMouseEvent(false, false, true, d->prevMouseX,
-                                         d->prevMouseY, PlatformMouseEvent());
+  prepareMouseEvent(false, false, true, PlatformMouseEvent());
 }
 
 void FrameView::scheduleRelayout() {
