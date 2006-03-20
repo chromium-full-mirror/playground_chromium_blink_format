@@ -39,17 +39,17 @@
 
 namespace WebCore {
 
-class HTMLCanvasElementImpl;
+class HTMLCanvasElement;
 class CanvasStyle;
-class HTMLImageElementImpl;
+class HTMLImageElement;
 class CanvasGradient;
 class CanvasPattern;
 
 class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
  public:
-  CanvasRenderingContext2D(HTMLCanvasElementImpl*);
+  CanvasRenderingContext2D(HTMLCanvasElement*);
 
-  HTMLCanvasElementImpl* canvas() const { return m_canvas; }
+  HTMLCanvasElement* canvas() const { return m_canvas; }
 
   CanvasStyle* strokeStyle() const;
   void setStrokeStyle(PassRefPtr<CanvasStyle>);
@@ -164,13 +164,13 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
 
   void clearShadow();
 
-  void drawImage(HTMLImageElementImpl*, float x, float y);
-  void drawImage(HTMLImageElementImpl*,
+  void drawImage(HTMLImageElement*, float x, float y);
+  void drawImage(HTMLImageElement*,
                  float x,
                  float y,
                  float width,
                  float height);
-  void drawImage(HTMLImageElementImpl*,
+  void drawImage(HTMLImageElement*,
                  float sx,
                  float sy,
                  float sw,
@@ -180,7 +180,7 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float dw,
                  float dh);
 
-  void drawImageFromRect(HTMLImageElementImpl*,
+  void drawImageFromRect(HTMLImageElement*,
                          float sx,
                          float sy,
                          float sw,
@@ -205,7 +205,7 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                                                   float x1,
                                                   float y1,
                                                   float r1);
-  PassRefPtr<CanvasPattern> createPattern(HTMLImageElementImpl*,
+  PassRefPtr<CanvasPattern> createPattern(HTMLImageElement*,
                                           const String& repetitionType);
 
   void reset();
@@ -249,7 +249,7 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
   CGContextRef drawingContext() const;
 #endif
 
-  HTMLCanvasElementImpl* m_canvas;
+  HTMLCanvasElement* m_canvas;
   Vector<State, 1> m_stateStack;
 };
 

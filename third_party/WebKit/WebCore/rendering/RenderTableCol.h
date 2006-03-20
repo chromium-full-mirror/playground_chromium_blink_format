@@ -33,7 +33,7 @@ namespace WebCore {
 
 class RenderTableCol : public RenderContainer {
  public:
-  RenderTableCol(NodeImpl*);
+  RenderTableCol(Node*);
 
   virtual const char* renderName() const { return "RenderTableCol"; }
   virtual bool isTableCol() const { return true; }
@@ -43,7 +43,7 @@ class RenderTableCol : public RenderContainer {
   virtual bool requiresLayer() { return false; }
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream*, QString) const;
+  virtual void dump(QTextStream*, DeprecatedString) const;
 #endif
 
   int span() const { return m_span; }

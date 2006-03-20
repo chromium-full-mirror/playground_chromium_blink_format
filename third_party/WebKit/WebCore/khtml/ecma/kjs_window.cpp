@@ -38,11 +38,11 @@
 #include "css_ruleimpl.h"
 #include "css_stylesheetimpl.h"
 #include "dom2_eventsimpl.h"
-#include "dom2_rangeimpl.h"
+#include "Range.h"
 #include "dom_elementimpl.h"
-#include "dom_position.h"
-#include "domparser.h"
-#include "html_documentimpl.h"
+#include "Position.h"
+#include "JSDOMParser.h"
+#include "HTMLDocument.h"
 #include "htmlediting.h"
 #include "khtml_settings.h"
 #include "kjs_css.h"
@@ -52,12 +52,12 @@
 #include "kjs_proxy.h"
 #include "kjs_range.h"
 #include "kjs_traversal.h"
-#include "render_canvas.h"
-#include "xmlserializer.h"
+#include "RenderCanvas.h"
+#include "JSXMLSerializer.h"
 #include <kjs/collector.h>
 
 #if KHTML_XSLT
-#include "XSLTProcessor.h"
+#include "JSXSLTProcessor.h"
 #endif
 
 using namespace WebCore;
@@ -215,7 +215,7 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable, 0};
   defaultStatus Window::DefaultStatus   DontDelete
   defaultstatus Window::DefaultStatus   DontDelete
   status        Window::Status          DontDelete
-  document      Window::Document        DontDelete|ReadOnly
+  document      Window::Document_       DontDelete|ReadOnly
   Node          Window::Node            DontDelete
   Event         Window::EventCtor       DontDelete
   Range         Window::Range           DontDelete
@@ -224,15 +224,15 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable, 0};
   CSSRule       Window::CSSRule         DontDelete
   MutationEvent Window::MutationEventCtor   DontDelete
   frames        Window::Frames          DontDelete|ReadOnly
-  history       Window::_History        DontDelete|ReadOnly
-  event         Window::Event           DontDelete
+  history       Window::History_        DontDelete|ReadOnly
+  event         Window::Event_          DontDelete
   innerHeight   Window::InnerHeight     DontDelete|ReadOnly
   innerWidth    Window::InnerWidth      DontDelete|ReadOnly
   length        Window::Length          DontDelete|ReadOnly
-  location      Window::_Location       DontDelete
+  location      Window::Location_       DontDelete
   locationbar   Window::Locationbar     DontDelete
   name          Window::Name            DontDelete
-  navigator     Window::_Navigator      DontDelete|ReadOnly
+  navigator     Window::Navigator_      DontDelete|ReadOnly
   clientInformation     Window::ClientInformation       DontDelete|ReadOnly
   menubar       Window::Menubar         DontDelete|ReadOnly
   offscreenBuffering    Window::OffscreenBuffering      DontDelete|ReadOnly
@@ -260,15 +260,15 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable, 0};
   resizeBy      Window::ResizeBy        DontDelete|Function 2
   resizeTo      Window::ResizeTo        DontDelete|Function 2
   self          Window::Self            DontDelete|ReadOnly
-  window        Window::_Window         DontDelete|ReadOnly
+  window        Window::Window_         DontDelete|ReadOnly
   top           Window::Top             DontDelete|ReadOnly
-  screen        Window::_Screen         DontDelete|ReadOnly
+  screen        Window::Screen_         DontDelete|ReadOnly
   Image         Window::Image           DontDelete|ReadOnly
   Option        Window::Option          DontDelete|ReadOnly
   XMLHttpRequest        Window::XMLHttpRequest  DontDelete|ReadOnly
   XMLSerializer Window::XMLSerializer   DontDelete|ReadOnly
-  DOMParser     Window::DOMParser       DontDelete|ReadOnly
-  XSLTProcessor Window::XSLTProcessor   DontDelete|ReadOnly
+  DOMParser     Window::DOMParser_      DontDelete|ReadOnly
+  XSLTProcessor Window::XSLTProcessor_  DontDelete|ReadOnly
   alert         Window::Alert           DontDelete|Function 1
   confirm       Window::Confirm         DontDelete|Function 1
   prompt        Window::Prompt          DontDelete|Function 2
@@ -373,7 +373,7 @@ Window* Window::retrieveActive(ExecState* exec) {
 
 JSValue* Window::retrieve(Frame* p) {
   ASSERT(p);
-  if (KJSProxyImpl* proxy = p->jScript())
+  if (KJSProxy* proxy = p->jScript())
     return proxy->interpreter()
         ->globalObject();  // the Global object is the "window"
 
@@ -469,16 +469,16 @@ static bool allowPopUp(ExecState* exec, Window* window) {
               ->wasRunByUserGesture());
 }
 
-static HashMap<DOMString, DOMString> parseModalDialogFeatures(
-    ExecState* exec,
-    JSValue* featuresArg) {
-  HashMap<DOMString, DOMString> map;
+static HashMap<String, String> parseModalDialogFeatures(ExecState* exec,
+                                                        JSValue* featuresArg) {
+  HashMap<String, String> map;
 
-  QStringList features =
-      QStringList::split(';', featuresArg->toString(exec).qstring());
-  QStringList::ConstIterator end = features.end();
-  for (QStringList::ConstIterator it = features.begin(); it != end; ++it) {
-    QString s = *it;
+  DeprecatedStringList features = DeprecatedStringList::split(
+      ';', featuresArg->toString(exec).deprecatedString());
+  DeprecatedStringList::ConstIterator end = features.end();
+  for (DeprecatedStringList::ConstIterator it = features.begin(); it != end;
+       ++it) {
+    DeprecatedString s = *it;
     int pos = s.find('=');
     int colonPos = s.find(':');
     if (pos >= 0 && colonPos >= 0)
@@ -487,10 +487,10 @@ static HashMap<DOMString, DOMString> parseModalDialogFeatures(
       pos = colonPos;
     if (pos < 0) {
       // null string for value means key without value
-      map.set(s.stripWhiteSpace().lower(), DOMString());
+      map.set(s.stripWhiteSpace().lower(), String());
     } else {
-      QString key = s.left(pos).stripWhiteSpace().lower();
-      QString val = s.mid(pos + 1).stripWhiteSpace().lower();
+      DeprecatedString key = s.left(pos).stripWhiteSpace().lower();
+      DeprecatedString val = s.mid(pos + 1).stripWhiteSpace().lower();
       int spacePos = val.find(' ');
       if (spacePos != -1)
         val = val.left(spacePos);
@@ -501,25 +501,25 @@ static HashMap<DOMString, DOMString> parseModalDialogFeatures(
   return map;
 }
 
-static bool boolFeature(const HashMap<DOMString, DOMString>& features,
+static bool boolFeature(const HashMap<String, String>& features,
                         const char* key,
                         bool defaultValue = false) {
-  HashMap<DOMString, DOMString>::const_iterator it = features.find(key);
+  HashMap<String, String>::const_iterator it = features.find(key);
   if (it == features.end())
     return defaultValue;
-  const DOMString& value = it->second;
+  const String& value = it->second;
   return value.isNull() || value == "1" || value == "yes" || value == "on";
 }
 
-static int intFeature(const HashMap<DOMString, DOMString>& features,
+static int intFeature(const HashMap<String, String>& features,
                       const char* key,
                       int min,
                       int max,
                       int defaultValue) {
-  HashMap<DOMString, DOMString>::const_iterator it = features.find(key);
+  HashMap<String, String>::const_iterator it = features.find(key);
   if (it == features.end())
     return defaultValue;
-  QString value = it->second.qstring();
+  DeprecatedString value = it->second.deprecatedString();
   // FIXME: Can't distinguish "0q" from string with no digits in it -- both
   // return d == 0 and ok == false.
   // Would be good to tell them apart somehow since string with no digits should
@@ -542,8 +542,8 @@ static int intFeature(const HashMap<DOMString, DOMString>& features,
 
 static Frame* createNewWindow(ExecState* exec,
                               Window* openerWindow,
-                              const QString& URL,
-                              const QString& frameName,
+                              const DeprecatedString& URL,
+                              const DeprecatedString& frameName,
                               const WindowArgs& windowArgs,
                               JSValue* dialogArgs) {
   Frame* openerPart = openerWindow->frame();
@@ -582,9 +582,9 @@ static Frame* createNewWindow(ExecState* exec,
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
 
-  DocumentImpl* activeDoc = activePart ? activePart->document() : 0;
+  Document* activeDoc = activePart ? activePart->document() : 0;
   if (!URL.isEmpty() && activeDoc) {
-    QString completedURL = activeDoc->completeURL(URL);
+    DeprecatedString completedURL = activeDoc->completeURL(URL);
     if (!completedURL.startsWith("javascript:", false) ||
         newWindow->isSafeScript(exec)) {
       bool userGesture =
@@ -620,7 +620,7 @@ static JSValue* showModalDialog(ExecState* exec,
   if (!canShowModalDialogNow(openerWindow) || !allowPopUp(exec, openerWindow))
     return jsUndefined();
 
-  const HashMap<DOMString, DOMString> features =
+  const HashMap<String, String> features =
       parseModalDialogFeatures(exec, args[2]);
 
   bool trusted = false;
@@ -675,8 +675,8 @@ static JSValue* showModalDialog(ExecState* exec,
   wargs.locationBarVisible = false;
   wargs.fullscreen = false;
 
-  Frame* dialogPart =
-      createNewWindow(exec, openerWindow, URL.qstring(), "", wargs, args[1]);
+  Frame* dialogPart = createNewWindow(
+      exec, openerWindow, URL.deprecatedString(), "", wargs, args[1]);
   if (!dialogPart)
     return jsUndefined();
 
@@ -718,11 +718,11 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       if (!frames)
         frames = new FrameArray(exec, m_frame);
       return frames;
-    case _History:
+    case History_:
       if (!history)
         history = new History(exec, m_frame);
       return history;
-    case Event:
+    case Event_:
       if (!m_evt)
         return jsUndefined();
       return toJS(exec, m_evt);
@@ -736,11 +736,11 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return jsNumber(m_frame->view()->visibleWidth());
     case Length:
       return jsNumber(m_frame->tree()->childCount());
-    case _Location:
+    case Location_:
       return location();
     case Name:
       return jsString(m_frame->tree()->name());
-    case _Navigator:
+    case Navigator_:
     case ClientInformation: {
       // Store the navigator in the object so we get the same one each time.
       Navigator* n = new Navigator(exec, m_frame);
@@ -807,11 +807,11 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
     case Toolbar:
       return toolbar(exec);
     case Self:
-    case _Window:
+    case Window_:
       return retrieve(m_frame);
     case Top:
       return retrieve(m_frame->page()->mainFrame());
-    case _Screen:
+    case Screen_:
       if (!screen)
         screen = new Screen(exec, m_frame);
       return screen;
@@ -826,18 +826,18 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return new JSXMLHttpRequestConstructorImp(exec, m_frame->document());
     case XMLSerializer:
       return new XMLSerializerConstructorImp(exec);
-    case DOMParser:
+    case DOMParser_:
       return new DOMParserConstructorImp(exec, m_frame->document());
 #ifdef KHTML_XSLT
-    case XSLTProcessor:
+    case XSLTProcessor_:
       return new XSLTProcessorConstructorImp(exec);
 #else
-    case XSLTProcessor:
+    case XSLTProcessor_:
       return jsUndefined();
 #endif
     case FrameElement:
-      if (DocumentImpl* doc = m_frame->document())
-        if (ElementImpl* fe = doc->ownerElement())
+      if (Document* doc = m_frame->document())
+        if (Element* fe = doc->ownerElement())
           if (checkNodeSecurity(exec, fe)) {
             return toJS(exec, fe);
           }
@@ -848,7 +848,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
     return jsUndefined();
 
   switch (token) {
-    case Document:
+    case Document_:
       if (!m_frame->document()) {
         m_frame->createEmptyDocument();
         m_frame->begin();
@@ -954,11 +954,11 @@ JSValue* Window::namedItemGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
-  DocumentImpl* doc = thisObj->m_frame->document();
+  Document* doc = thisObj->m_frame->document();
   ASSERT(thisObj->isSafeScript(exec) && doc && doc->isHTMLDocument());
 
-  DOMString name = propertyName.domString();
-  RefPtr<DOM::HTMLCollectionImpl> collection = doc->windowNamedItems(name);
+  String name = propertyName.domString();
+  RefPtr<WebCore::HTMLCollection> collection = doc->windowNamedItems(name);
   if (collection->length() == 1)
     return toJS(exec, collection->firstItem());
   else
@@ -1051,9 +1051,9 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   }
 
   // allow shortcuts like 'Image1' instead of document.images.Image1
-  DocumentImpl* doc = m_frame->document();
+  Document* doc = m_frame->document();
   if (isSafeScript(exec) && doc && doc->isHTMLDocument()) {
-    if (static_cast<HTMLDocumentImpl*>(doc)->hasNamedItem(atomicPropertyName) ||
+    if (static_cast<HTMLDocument*>(doc)->hasNamedItem(atomicPropertyName) ||
         doc->getElementById(atomicPropertyName)) {
       slot.setCustom(this, namedItemGetter);
       return true;
@@ -1085,16 +1085,17 @@ void Window::put(ExecState* exec,
   if (entry) {
     switch (entry->value) {
       case Status:
-        m_frame->setJSStatusBarText(value->toString(exec).qstring());
+        m_frame->setJSStatusBarText(value->toString(exec).deprecatedString());
         return;
       case DefaultStatus:
-        m_frame->setJSDefaultStatusBarText(value->toString(exec).qstring());
+        m_frame->setJSDefaultStatusBarText(
+            value->toString(exec).deprecatedString());
         return;
-      case _Location: {
+      case Location_: {
         Frame* p = Window::retrieveActive(exec)->m_frame;
         if (p) {
-          QString dstUrl =
-              p->document()->completeURL(value->toString(exec).qstring());
+          DeprecatedString dstUrl = p->document()->completeURL(
+              value->toString(exec).deprecatedString());
           if (!dstUrl.startsWith("javascript:", false) || isSafeScript(exec)) {
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
@@ -1217,7 +1218,7 @@ void Window::put(ExecState* exec,
         return;
       case Name:
         if (isSafeScript(exec))
-          m_frame->tree()->setName(value->toString(exec).qstring());
+          m_frame->tree()->setName(value->toString(exec).deprecatedString());
         return;
       default:
         break;
@@ -1254,20 +1255,20 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
   if (!targetPart->document())
     return true;
 
-  DOM::DocumentImpl* originDocument = originPart->document();
-  DOM::DocumentImpl* targetDocument = targetPart->document();
+  WebCore::Document* originDocument = originPart->document();
+  WebCore::Document* targetDocument = targetPart->document();
 
   if (!targetDocument) {
     return false;
   }
 
-  DOM::DOMString targetDomain = targetDocument->domain();
+  WebCore::String targetDomain = targetDocument->domain();
 
   // Always allow local pages to execute any JS.
   if (targetDomain.isNull())
     return true;
 
-  DOM::DOMString originDomain = originDocument->domain();
+  WebCore::String originDomain = originDocument->domain();
 
   // if this document is being initially loaded as empty by its parent
   // or opener, allow access from any document in the same domain as
@@ -1292,14 +1293,14 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
         "URL %s. Domains must match.\n",
         targetDocument->URL().latin1(), originDocument->URL().latin1());
   }
-  QString message;
+  DeprecatedString message;
   message.sprintf(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       targetDocument->URL().latin1(), originDocument->URL().latin1());
   targetPart->addMessageToConsole(
-      DOMString(message), 1,
-      DOMString());  // fixme: provide a real line number and sourceurl
+      String(message), 1,
+      String());  // fixme: provide a real line number and sourceurl
 
   return false;
 }
@@ -1320,10 +1321,10 @@ bool Window::isSafeScript(ExecState* exec) const {
   if (!m_frame->document())
     return true;
 
-  DOM::DocumentImpl* thisDocument = m_frame->document();
-  DOM::DocumentImpl* actDocument = activePart->document();
+  WebCore::Document* thisDocument = m_frame->document();
+  WebCore::Document* actDocument = activePart->document();
 
-  DOM::DOMString actDomain;
+  WebCore::String actDomain;
 
   if (!actDocument)
     actDomain = activePart->url().host();
@@ -1336,7 +1337,7 @@ bool Window::isSafeScript(ExecState* exec) const {
   if (actDomain.isNull())
     return true;
 
-  DOM::DOMString thisDomain = thisDocument->domain();
+  WebCore::String thisDomain = thisDocument->domain();
 
   // if this document is being initially loaded as empty by its parent
   // or opener, allow access from any document in the same domain as
@@ -1362,12 +1363,12 @@ bool Window::isSafeScript(ExecState* exec) const {
         "URL %s. Domains must match.\n",
         thisDocument->URL().latin1(), actDocument->URL().latin1());
   }
-  QString message;
+  DeprecatedString message;
   message.sprintf(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       thisDocument->URL().latin1(), actDocument->URL().latin1());
-  m_frame->addMessageToConsole(DOMString(message), 1, DOMString());
+  m_frame->addMessageToConsole(String(message), 1, String());
 
   return false;
 }
@@ -1377,7 +1378,7 @@ void Window::setListener(ExecState* exec,
                          JSValue* func) {
   if (!isSafeScript(exec))
     return;
-  DOM::DocumentImpl* doc = m_frame->document();
+  WebCore::Document* doc = m_frame->document();
   if (!doc)
     return;
 
@@ -1388,11 +1389,11 @@ JSValue* Window::getListener(ExecState* exec,
                              const AtomicString& eventType) const {
   if (!isSafeScript(exec))
     return jsUndefined();
-  DOM::DocumentImpl* doc = m_frame->document();
+  WebCore::Document* doc = m_frame->document();
   if (!doc)
     return jsUndefined();
 
-  DOM::EventListener* listener = doc->getHTMLWindowEventListener(eventType);
+  WebCore::EventListener* listener = doc->getHTMLWindowEventListener(eventType);
   if (listener && static_cast<JSEventListener*>(listener)->listenerObj())
     return static_cast<JSEventListener*>(listener)->listenerObj();
   else
@@ -1445,12 +1446,12 @@ void Window::clear() {
   interpreter()->initGlobalObject();
 }
 
-void Window::setCurrentEvent(EventImpl* evt) {
+void Window::setCurrentEvent(Event* evt) {
   m_evt = evt;
 }
 
-static void setWindowFeature(const DOMString& keyString,
-                             const DOMString& valueString,
+static void setWindowFeature(const String& keyString,
+                             const String& valueString,
                              WindowArgs& windowArgs) {
   int value;
 
@@ -1495,7 +1496,7 @@ static bool isSeparator(QChar c) {
          c == ',' || c == '\0';
 }
 
-static void parseWindowFeatures(const DOMString& features,
+static void parseWindowFeatures(const String& features,
                                 WindowArgs& windowArgs) {
   /*
    The IE rule is: all features except for channelmode and fullscreen default to
@@ -1540,7 +1541,7 @@ static void parseWindowFeatures(const DOMString& features,
 
   int i = 0;
   int length = features.length();
-  DOMString buffer = features.lower();
+  String buffer = features.lower();
   while (i < length) {
     // skip to first non-separator, but don't skip past the end of the string
     while (isSeparator(buffer[i])) {
@@ -1578,8 +1579,8 @@ static void parseWindowFeatures(const DOMString& features,
 
     assert(i <= length);
 
-    DOMString keyString(buffer.substring(keyBegin, keyEnd - keyBegin));
-    DOMString valueString(buffer.substring(valueBegin, valueEnd - valueBegin));
+    String keyString(buffer.substring(keyBegin, keyEnd - keyBegin));
+    String valueString(buffer.substring(valueBegin, valueEnd - valueBegin));
     setWindowFeature(keyString, valueString, windowArgs);
   }
 }
@@ -1617,8 +1618,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
   FrameView* widget = frame->view();
   JSValue* v = args[0];
   UString s = v->toString(exec);
-  DOMString str = s.domString();
-  DOMString str2;
+  String str = s.domString();
+  String str2;
 
   switch (id) {
     case Window::Alert:
@@ -1633,8 +1634,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::Prompt: {
       if (frame && frame->document())
         frame->document()->updateRendering();
-      DOMString message =
-          args.size() >= 2 ? args[1]->toString(exec).domString() : DOMString();
+      String message =
+          args.size() >= 2 ? args[1]->toString(exec).domString() : String();
       bool ok = frame->runJavaScriptPrompt(str, message, str2);
       if (ok)
         return jsString(str2);
@@ -1650,9 +1651,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
 
       WindowArgs windowArgs;
-      DOMString features = args[2]->isUndefinedOrNull()
-                               ? DOMString()
-                               : args[2]->toString(exec).domString();
+      String features = args[2]->isUndefinedOrNull()
+                            ? String()
+                            : args[2]->toString(exec).domString();
       parseWindowFeatures(features, windowArgs);
       constrainToVisible(screenRect(widget), windowArgs);
 
@@ -1660,10 +1661,10 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       KURL url;
       Frame* activePart = Window::retrieveActive(exec)->m_frame;
       if (!str.isEmpty() && activePart)
-        url = activePart->document()->completeURL(str.qstring());
+        url = activePart->document()->completeURL(str.deprecatedString());
 
       ResourceRequest request;
-      request.frameName = frameName.qstring();
+      request.frameName = frameName.deprecatedString();
       if (request.frameName == "_top") {
         while (frame->tree()->parent())
           frame = frame->tree()->parent();
@@ -1709,7 +1710,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       newFrame->setOpenedByJS(true);
 
       if (!newFrame->document()) {
-        DocumentImpl* oldDoc = frame->document();
+        Document* oldDoc = frame->document();
         if (oldDoc && oldDoc->baseURL() != 0)
           newFrame->begin(oldDoc->baseURL());
         else
@@ -1896,7 +1897,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
-        if (DocumentImpl* doc = frame->document())
+        if (Document* doc = frame->document())
           doc->addWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
@@ -1906,7 +1907,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
-        if (DocumentImpl* doc = frame->document())
+        if (Document* doc = frame->document())
           doc->removeWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
@@ -1918,7 +1919,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 }
 
 void Window::updateLayout() const {
-  DOM::DocumentImpl* docimpl = m_frame->document();
+  WebCore::Document* docimpl = m_frame->document();
   if (docimpl)
     docimpl->updateLayoutIgnorePendingStylesheets();
 }
@@ -1942,13 +1943,13 @@ void ScheduledAction::execute(Window* window) {
       if (exec->hadException()) {
         JSObject* exception = exec->exception()->toObject(exec);
         exec->clearException();
-        DOMString message = exception->get(exec, messagePropertyName)
-                                ->toString(exec)
-                                .domString();
+        String message = exception->get(exec, messagePropertyName)
+                             ->toString(exec)
+                             .domString();
         int lineNumber = exception->get(exec, "line")->toInt32(exec);
         if (Interpreter::shouldPrintExceptions())
-          printf("(timer):%s\n", message.qstring().utf8().data());
-        window->m_frame->addMessageToConsole(message, lineNumber, DOMString());
+          printf("(timer):%s\n", message.deprecatedString().utf8().data());
+        window->m_frame->addMessageToConsole(message, lineNumber, String());
       }
     }
   } else
@@ -1957,7 +1958,7 @@ void ScheduledAction::execute(Window* window) {
   // Update our document's rendering following the execution of the timeout
   // callback.
   // FIXME: Why? Why not other documents, for example?
-  DocumentImpl* doc = window->m_frame->document();
+  Document* doc = window->m_frame->document();
   if (doc)
     doc->updateRendering();
 
@@ -1987,7 +1988,8 @@ int Window::installTimeout(ScheduledAction* a, int t, bool singleShot) {
 }
 
 int Window::installTimeout(const UString& handler, int t, bool singleShot) {
-  return installTimeout(new ScheduledAction(handler.qstring()), t, singleShot);
+  return installTimeout(new ScheduledAction(handler.deprecatedString()), t,
+                        singleShot);
 }
 
 int Window::installTimeout(JSValue* func,
@@ -2189,7 +2191,8 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
   KURL url = m_frame->url();
   switch (token) {
     case Hash:
-      return jsString(url.ref().isNull() ? QString("") : "#" + url.ref());
+      return jsString(url.ref().isNull() ? DeprecatedString("")
+                                         : "#" + url.ref());
     case Host: {
       // Note: this is the IE spec. The NS spec swaps the two, it says
       // "The hostname property is the concatenation of the host and port
@@ -2197,7 +2200,7 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
       // Bleh.
       UString str = url.host();
       if (url.port())
-        str += ":" + QString::number((int)url.port());
+        str += ":" + DeprecatedString::number((int)url.port());
       return jsString(str);
     }
     case Hostname:
@@ -2208,10 +2211,11 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
       else
         return jsString(url.prettyURL());
     case Pathname:
-      return jsString(url.path().isEmpty() ? QString("/") : url.path());
+      return jsString(url.path().isEmpty() ? DeprecatedString("/")
+                                           : url.path());
     case Port:
-      return jsString(url.port() ? QString::number((int)url.port())
-                                 : QString::fromLatin1(""));
+      return jsString(url.port() ? DeprecatedString::number((int)url.port())
+                                 : DeprecatedString::fromLatin1(""));
     case Protocol:
       return jsString(url.protocol() + ":");
     case Search:
@@ -2242,7 +2246,7 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
   if (!m_frame)
     return;
 
-  QString str = v->toString(exec).qstring();
+  DeprecatedString str = v->toString(exec).deprecatedString();
   KURL url = m_frame->url();
   const HashEntry* entry = Lookup::findEntry(&LocationTable, p);
   if (entry)
@@ -2259,8 +2263,8 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
         url.setRef(str);
         break;
       case Host: {
-        QString host = str.left(str.find(":"));
-        QString port = str.mid(str.find(":") + 1);
+        DeprecatedString host = str.left(str.find(":"));
+        DeprecatedString port = str.mid(str.find(":") + 1);
         url.setHost(host);
         url.setPort(port.toUInt());
         break;
@@ -2324,7 +2328,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
 
     switch (id) {
       case Location::Replace: {
-        QString str = args[0]->toString(exec).qstring();
+        DeprecatedString str = args[0]->toString(exec).deprecatedString();
         Frame* p = Window::retrieveActive(exec)->frame();
         if (p) {
           const Window* window = Window::retrieveWindow(frame);
@@ -2358,8 +2362,8 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
         Frame* p = Window::retrieveActive(exec)->frame();
         if (p) {
           const Window* window = Window::retrieveWindow(frame);
-          QString dstUrl =
-              p->document()->completeURL(args[0]->toString(exec).qstring());
+          DeprecatedString dstUrl = p->document()->completeURL(
+              args[0]->toString(exec).deprecatedString());
           if (!dstUrl.startsWith("javascript:", false) ||
               (window && window->isSafeScript(exec))) {
             bool userGesture =

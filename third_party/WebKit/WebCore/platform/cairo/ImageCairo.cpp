@@ -27,7 +27,7 @@
 #include <math.h>
 #include <cairo.h>
 #include <kxmlcore/Vector.h>
-#include "Array.h"
+#include "DeprecatedArray.h"
 #include "IntSize.h"
 #include "FloatRect.h"
 #include "Image.h"
@@ -58,7 +58,7 @@ Image* Image::loadResource(const char* name) {
   return new Image();
 }
 
-bool Image::supportsType(const QString& type) {
+bool Image::supportsType(const DeprecatedString& type) {
   // FIXME: Implement.
   return true;
 }

@@ -25,7 +25,7 @@
 #define render_replaced_h
 
 #include "WidgetClient.h"
-#include "render_box.h"
+#include "RenderBox.h"
 
 namespace WebCore {
 
@@ -35,7 +35,7 @@ class Widget;
 
 class RenderReplaced : public RenderBox {
  public:
-  RenderReplaced(NodeImpl*);
+  RenderReplaced(Node*);
 
   virtual const char* renderName() const { return "RenderReplaced"; }
 
@@ -77,7 +77,7 @@ class RenderReplaced : public RenderBox {
 
 class RenderWidget : public RenderReplaced, public WidgetClient {
  public:
-  RenderWidget(NodeImpl*);
+  RenderWidget(Node*);
   virtual ~RenderWidget();
 
   virtual void setStyle(RenderStyle*);
@@ -110,7 +110,7 @@ class RenderWidget : public RenderReplaced, public WidgetClient {
   virtual void focusIn(Widget*);
   virtual void focusOut(Widget*);
   virtual void scrollToVisible(Widget*);
-  virtual ElementImpl* element(Widget*);
+  virtual Element* element(Widget*);
   virtual bool isVisible(Widget*);
   virtual void sendConsumedMouseUp(Widget*);
 

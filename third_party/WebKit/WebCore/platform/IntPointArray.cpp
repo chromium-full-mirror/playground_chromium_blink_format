@@ -65,14 +65,14 @@ IntRect IntPointArray::boundingRect() const {
   return IntRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
 }
 
-void IntPointArray::point(uint index, int* x, int* y) {
+void IntPointArray::point(unsigned index, int* x, int* y) {
   IntPoint p = at(index);
   *x = p.x();
   *y = p.y();
 }
 
-void IntPointArray::setPoint(uint index, int x, int y) {
-  Array<IntPoint>::at(index) = IntPoint(x, y);
+void IntPointArray::setPoint(unsigned index, int x, int y) {
+  DeprecatedArray<IntPoint>::at(index) = IntPoint(x, y);
 }
 
 bool IntPointArray::setPoints(int nPoints, const int* points) {

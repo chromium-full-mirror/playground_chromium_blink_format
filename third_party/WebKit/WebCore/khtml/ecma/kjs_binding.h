@@ -30,10 +30,10 @@
 #endif
 
 namespace WebCore {
-class DocumentImpl;
-class EventImpl;
+class Document;
+class Event;
 class Frame;
-class NodeImpl;
+class Node;
 
 typedef int ExceptionCode;
 }
@@ -67,17 +67,17 @@ class ScriptInterpreter : public Interpreter {
   static void putDOMObject(void* objectHandle, DOMObject* obj);
   static void forgetDOMObject(void* objectHandle);
 
-  static DOMNode* getDOMNodeForDocument(DOM::DocumentImpl* document,
-                                        DOM::NodeImpl* node);
-  static void putDOMNodeForDocument(DOM::DocumentImpl* document,
-                                    DOM::NodeImpl* nodeHandle,
+  static DOMNode* getDOMNodeForDocument(WebCore::Document* document,
+                                        WebCore::Node* node);
+  static void putDOMNodeForDocument(WebCore::Document* document,
+                                    WebCore::Node* nodeHandle,
                                     DOMNode* nodeWrapper);
-  static void forgetDOMNodeForDocument(DOM::DocumentImpl* document,
-                                       DOM::NodeImpl* node);
-  static void forgetAllDOMNodesForDocument(DOM::DocumentImpl* document);
-  static void updateDOMNodeDocument(DOM::NodeImpl* nodeHandle,
-                                    DOM::DocumentImpl* oldDoc,
-                                    DOM::DocumentImpl* newDoc);
+  static void forgetDOMNodeForDocument(WebCore::Document* document,
+                                       WebCore::Node* node);
+  static void forgetAllDOMNodesForDocument(WebCore::Document* document);
+  static void updateDOMNodeDocument(WebCore::Node* nodeHandle,
+                                    WebCore::Document* oldDoc,
+                                    WebCore::Document* newDoc);
 
   WebCore::Frame* frame() const { return m_frame; }
 
@@ -86,7 +86,7 @@ class ScriptInterpreter : public Interpreter {
   /**
    * Set the event that is triggering the execution of a script, if any
    */
-  void setCurrentEvent(DOM::EventImpl* evt) { m_evt = evt; }
+  void setCurrentEvent(WebCore::Event* evt) { m_evt = evt; }
   void setInlineCode(bool inlineCode) { m_inlineCode = inlineCode; }
   void setProcessingTimerCallback(bool timerCallback) {
     m_timerCallback = timerCallback;
@@ -99,7 +99,7 @@ class ScriptInterpreter : public Interpreter {
   virtual void mark();
   virtual ExecState* globalExec();
 
-  DOM::EventImpl* getCurrentEvent() const { return m_evt; }
+  WebCore::Event* getCurrentEvent() const { return m_evt; }
 
   virtual bool isGlobalObject(JSValue* v);
   virtual Interpreter* interpreterForGlobalObject(const JSValue* imp);
@@ -118,7 +118,7 @@ class ScriptInterpreter : public Interpreter {
  private:
   WebCore::Frame* m_frame;
 
-  DOM::EventImpl* m_evt;
+  WebCore::Event* m_evt;
   bool m_inlineCode;
   bool m_timerCallback;
 };
@@ -159,17 +159,17 @@ class DOMExceptionTranslator {
 /**
  *  Get a String object, or jsNull() if s is null
  */
-JSValue* jsStringOrNull(const DOM::DOMString&);
+JSValue* jsStringOrNull(const WebCore::String&);
 
 /**
  *  Get a String object, or jsUndefined() if s is null
  */
-JSValue* jsStringOrUndefined(const WebCore::DOMString&);
+JSValue* jsStringOrUndefined(const WebCore::String&);
 
 /**
- *  Get a DOMString object or a null DOMString if the value is null
+ *  Get a String object or a null String if the value is null
  */
-DOM::DOMString valueToStringWithNullCheck(ExecState* exec, JSValue* val);
+WebCore::String valueToStringWithNullCheck(ExecState* exec, JSValue* val);
 
 template <typename T>
 inline JSValue* toJS(ExecState* exec, PassRefPtr<T> ptr) {

@@ -23,15 +23,15 @@
 
 #include "ecma/kjs_dom.h"
 
-namespace DOM {
-class RangeImpl;
+namespace WebCore {
+class Range;
 }
 
 namespace KJS {
 
 class DOMRange : public DOMObject {
  public:
-  DOMRange(ExecState* exec, DOM::RangeImpl* r);
+  DOMRange(ExecState* exec, WebCore::Range* r);
   ~DOMRange();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -65,10 +65,10 @@ class DOMRange : public DOMObject {
     Detach,
     CreateContextualFragment
   };
-  DOM::RangeImpl* impl() const { return m_impl.get(); }
+  WebCore::Range* impl() const { return m_impl.get(); }
 
  private:
-  RefPtr<DOM::RangeImpl> m_impl;
+  RefPtr<WebCore::Range> m_impl;
 };
 
 // Constructor object Range
@@ -82,10 +82,10 @@ class RangeConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* toJS(ExecState*, WebCore::RangeImpl*);
+JSValue* toJS(ExecState*, WebCore::Range*);
 JSValue* getRangeConstructor(ExecState* exec);
 
-DOM::RangeImpl* toRange(
+WebCore::Range* toRange(
     JSValue*);  // returns 0 if the value is not a DOMRange object
 
 }  // namespace

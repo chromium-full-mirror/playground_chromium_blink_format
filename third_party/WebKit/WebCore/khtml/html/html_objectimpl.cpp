@@ -27,21 +27,21 @@
 
 #include "EventNames.h"
 #include "Frame.h"
-#include "HTMLFormElementImpl.h"
+#include "HTMLFormElement.h"
 #include "csshelper.h"
-#include "cssproperties.h"
+#include "CSSPropertyNames.h"
 #include "cssstyleselector.h"
-#include "cssvalues.h"
+#include "CSSValueKeywords.h"
 #include "dom2_eventsimpl.h"
 #include "PlatformString.h"
-#include "TextImpl.h"
-#include "html_documentimpl.h"
+#include "Text.h"
+#include "HTMLDocument.h"
 #include "html_imageimpl.h"
 #include "render_applet.h"
 #include "render_frames.h"
-#include "render_image.h"
+#include "RenderImage.h"
 #include <java/kjavaappletwidget.h>
-#include <QString.h>
+#include <DeprecatedString.h>
 #include "htmlnames.h"
 
 namespace WebCore {
@@ -51,22 +51,22 @@ using namespace HTMLNames;
 
 // -------------------------------------------------------------------------
 
-HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(appletTag, doc), m_allParamsAvailable(false) {}
+HTMLAppletElement::HTMLAppletElement(Document* doc)
+    : HTMLElement(appletTag, doc), m_allParamsAvailable(false) {}
 
-HTMLAppletElementImpl::~HTMLAppletElementImpl() {
+HTMLAppletElement::~HTMLAppletElement() {
 #if __APPLE__
   // m_appletInstance should have been cleaned up in detach().
   assert(!m_appletInstance);
 #endif
 }
 
-bool HTMLAppletElementImpl::checkDTD(const NodeImpl* newChild) {
-  return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
+bool HTMLAppletElement::checkDTD(const Node* newChild) {
+  return newChild->hasTagName(paramTag) || HTMLElement::checkDTD(newChild);
 }
 
-bool HTMLAppletElementImpl::mapToEntry(const QualifiedName& attrName,
-                                       MappedAttributeEntry& result) const {
+bool HTMLAppletElement::mapToEntry(const QualifiedName& attrName,
+                                   MappedAttributeEntry& result) const {
   if (attrName == widthAttr || attrName == heightAttr ||
       attrName == vspaceAttr || attrName == hspaceAttr) {
     result = eUniversal;
@@ -79,10 +79,10 @@ bool HTMLAppletElementImpl::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLElementImpl::mapToEntry(attrName, result);
+  return HTMLElement::mapToEntry(attrName, result);
 }
 
-void HTMLAppletElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLAppletElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == altAttr || attr->name() == archiveAttr ||
       attr->name() == codeAttr || attr->name() == codebaseAttr ||
       attr->name() == mayscriptAttr || attr->name() == objectAttr) {
@@ -100,68 +100,66 @@ void HTMLAppletElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == alignAttr) {
     addHTMLAlignment(attr);
   } else if (attr->name() == nameAttr) {
-    DOMString newNameAttr = attr->value();
+    String newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocumentImpl* document =
-          static_cast<HTMLDocumentImpl*>(getDocument());
+      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
       document->removeNamedItem(oldNameAttr);
       document->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
   } else if (attr->name() == idAttr) {
-    DOMString newIdAttr = attr->value();
+    String newIdAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocumentImpl* document =
-          static_cast<HTMLDocumentImpl*>(getDocument());
+      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
       document->removeDocExtraNamedItem(oldIdAttr);
       document->addDocExtraNamedItem(newIdAttr);
     }
     oldIdAttr = newIdAttr;
     // also call superclass
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLAppletElementImpl::insertedIntoDocument() {
+void HTMLAppletElement::insertedIntoDocument() {
   if (getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->addNamedItem(oldNameAttr);
     document->addDocExtraNamedItem(oldIdAttr);
   }
 
-  HTMLElementImpl::insertedIntoDocument();
+  HTMLElement::insertedIntoDocument();
 }
 
-void HTMLAppletElementImpl::removedFromDocument() {
+void HTMLAppletElement::removedFromDocument() {
   if (getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->removeNamedItem(oldNameAttr);
     document->removeDocExtraNamedItem(oldIdAttr);
   }
 
-  HTMLElementImpl::removedFromDocument();
+  HTMLElement::removedFromDocument();
 }
 
-bool HTMLAppletElementImpl::rendererIsNeeded(RenderStyle* style) {
+bool HTMLAppletElement::rendererIsNeeded(RenderStyle* style) {
   return !getAttribute(codeAttr).isNull();
 }
 
-RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
-                                                    RenderStyle* style) {
+RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
+                                                RenderStyle* style) {
 #ifndef Q_WS_QWS  // FIXME(E)? I don't think this is possible with Qt
                   // Embedded...
   Frame* frame = getDocument()->frame();
 
   if (frame && frame->javaEnabled()) {
-    HashMap<DOMString, DOMString> args;
+    HashMap<String, String> args;
 
     args.set("code", getAttribute(codeAttr));
     const AtomicString& codeBase = getAttribute(codebaseAttr);
     if (!codeBase.isNull())
       args.set("codeBase", codeBase);
     const AtomicString& name = getAttribute(
-        getDocument()->htmlMode() != DocumentImpl::XHtml ? nameAttr : idAttr);
+        getDocument()->htmlMode() != Document::XHtml ? nameAttr : idAttr);
     if (!name.isNull())
       args.set("name", name);
     const AtomicString& archive = getAttribute(archiveAttr);
@@ -188,7 +186,7 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 }
 
 #if __APPLE__
-KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
+KJS::Bindings::Instance* HTMLAppletElement::getAppletInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame || !frame->javaEnabled())
     return 0;
@@ -209,132 +207,132 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
 }
 #endif
 
-void HTMLAppletElementImpl::closeRenderer() {
+void HTMLAppletElement::closeRenderer() {
   // The parser just reached </applet>, so all the params are available now.
   m_allParamsAvailable = true;
   if (renderer())
     renderer()->setNeedsLayout(
         true);  // This will cause it to create its widget & the Java applet
-  HTMLElementImpl::closeRenderer();
+  HTMLElement::closeRenderer();
 }
 
-void HTMLAppletElementImpl::detach() {
+void HTMLAppletElement::detach() {
 #if __APPLE__
   m_appletInstance = 0;
 #endif
-  HTMLElementImpl::detach();
+  HTMLElement::detach();
 }
 
-bool HTMLAppletElementImpl::allParamsAvailable() {
+bool HTMLAppletElement::allParamsAvailable() {
   return m_allParamsAvailable;
 }
 
-DOMString HTMLAppletElementImpl::align() const {
+String HTMLAppletElement::align() const {
   return getAttribute(alignAttr);
 }
 
-void HTMLAppletElementImpl::setAlign(const DOMString& value) {
+void HTMLAppletElement::setAlign(const String& value) {
   setAttribute(alignAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::alt() const {
+String HTMLAppletElement::alt() const {
   return getAttribute(altAttr);
 }
 
-void HTMLAppletElementImpl::setAlt(const DOMString& value) {
+void HTMLAppletElement::setAlt(const String& value) {
   setAttribute(altAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::archive() const {
+String HTMLAppletElement::archive() const {
   return getAttribute(archiveAttr);
 }
 
-void HTMLAppletElementImpl::setArchive(const DOMString& value) {
+void HTMLAppletElement::setArchive(const String& value) {
   setAttribute(archiveAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::code() const {
+String HTMLAppletElement::code() const {
   return getAttribute(codeAttr);
 }
 
-void HTMLAppletElementImpl::setCode(const DOMString& value) {
+void HTMLAppletElement::setCode(const String& value) {
   setAttribute(codeAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::codeBase() const {
+String HTMLAppletElement::codeBase() const {
   return getAttribute(codebaseAttr);
 }
 
-void HTMLAppletElementImpl::setCodeBase(const DOMString& value) {
+void HTMLAppletElement::setCodeBase(const String& value) {
   setAttribute(codebaseAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::height() const {
+String HTMLAppletElement::height() const {
   return getAttribute(heightAttr);
 }
 
-void HTMLAppletElementImpl::setHeight(const DOMString& value) {
+void HTMLAppletElement::setHeight(const String& value) {
   setAttribute(heightAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::hspace() const {
+String HTMLAppletElement::hspace() const {
   return getAttribute(hspaceAttr);
 }
 
-void HTMLAppletElementImpl::setHspace(const DOMString& value) {
+void HTMLAppletElement::setHspace(const String& value) {
   setAttribute(hspaceAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::name() const {
+String HTMLAppletElement::name() const {
   return getAttribute(nameAttr);
 }
 
-void HTMLAppletElementImpl::setName(const DOMString& value) {
+void HTMLAppletElement::setName(const String& value) {
   setAttribute(nameAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::object() const {
+String HTMLAppletElement::object() const {
   return getAttribute(objectAttr);
 }
 
-void HTMLAppletElementImpl::setObject(const DOMString& value) {
+void HTMLAppletElement::setObject(const String& value) {
   setAttribute(objectAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::vspace() const {
+String HTMLAppletElement::vspace() const {
   return getAttribute(vspaceAttr);
 }
 
-void HTMLAppletElementImpl::setVspace(const DOMString& value) {
+void HTMLAppletElement::setVspace(const String& value) {
   setAttribute(vspaceAttr, value);
 }
 
-DOMString HTMLAppletElementImpl::width() const {
+String HTMLAppletElement::width() const {
   return getAttribute(widthAttr);
 }
 
-void HTMLAppletElementImpl::setWidth(const DOMString& value) {
+void HTMLAppletElement::setWidth(const String& value) {
   setAttribute(widthAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLEmbedElementImpl::HTMLEmbedElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(embedTag, doc) {}
+HTMLEmbedElement::HTMLEmbedElement(Document* doc)
+    : HTMLElement(embedTag, doc) {}
 
-HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {
+HTMLEmbedElement::~HTMLEmbedElement() {
 #if __APPLE__
   // m_embedInstance should have been cleaned up in detach().
   assert(!m_embedInstance);
 #endif
 }
 
-bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
-  return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
+bool HTMLEmbedElement::checkDTD(const Node* newChild) {
+  return newChild->hasTagName(paramTag) || HTMLElement::checkDTD(newChild);
 }
 
 #if __APPLE__
-KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
+KJS::Bindings::Instance* HTMLEmbedElement::getEmbedInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame)
     return 0;
@@ -344,7 +342,7 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
 
   RenderObject* r = renderer();
   if (!r) {
-    NodeImpl* p = parentNode();
+    Node* p = parentNode();
     if (p && p->hasTagName(objectTag))
       r = p->renderer();
   }
@@ -364,8 +362,8 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
 }
 #endif
 
-bool HTMLEmbedElementImpl::mapToEntry(const QualifiedName& attrName,
-                                      MappedAttributeEntry& result) const {
+bool HTMLEmbedElement::mapToEntry(const QualifiedName& attrName,
+                                  MappedAttributeEntry& result) const {
   if (attrName == widthAttr || attrName == heightAttr ||
       attrName == borderAttr || attrName == vspaceAttr ||
       attrName == hspaceAttr || attrName == valignAttr ||
@@ -380,11 +378,11 @@ bool HTMLEmbedElementImpl::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLElementImpl::mapToEntry(attrName, result);
+  return HTMLElement::mapToEntry(attrName, result);
 }
 
-void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  QString val = attr->value().qstring();
+void HTMLEmbedElement::parseMappedAttribute(MappedAttribute* attr) {
+  DeprecatedString val = attr->value().deprecatedString();
 
   int pos;
   if (attr->name() == typeAttr) {
@@ -393,7 +391,7 @@ void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     if (pos != -1)
       serviceType = serviceType.left(pos);
   } else if (attr->name() == codeAttr || attr->name() == srcAttr) {
-    url = khtml::parseURL(attr->value()).qstring();
+    url = WebCore::parseURL(attr->value()).deprecatedString();
   } else if (attr->name() == widthAttr) {
     addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
   } else if (attr->name() == heightAttr) {
@@ -426,24 +424,23 @@ void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       addCSSLength(attr, CSS_PROP_HEIGHT, "0");
     }
   } else if (attr->name() == nameAttr) {
-    DOMString newNameAttr = attr->value();
+    String newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocumentImpl* document =
-          static_cast<HTMLDocumentImpl*>(getDocument());
+      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
       document->removeNamedItem(oldNameAttr);
       document->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-bool HTMLEmbedElementImpl::rendererIsNeeded(RenderStyle* style) {
+bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
   Frame* frame = getDocument()->frame();
   if (!frame || !frame->pluginsEnabled())
     return false;
 
-  NodeImpl* p = parentNode();
+  Node* p = parentNode();
   if (p && p->hasTagName(objectTag)) {
     assert(p->renderer());
     return false;
@@ -452,58 +449,58 @@ bool HTMLEmbedElementImpl::rendererIsNeeded(RenderStyle* style) {
   return true;
 }
 
-RenderObject* HTMLEmbedElementImpl::createRenderer(RenderArena* arena,
-                                                   RenderStyle* style) {
+RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
+                                               RenderStyle* style) {
   return new (arena) RenderPartObject(this);
 }
 
-void HTMLEmbedElementImpl::attach() {
-  HTMLElementImpl::attach();
+void HTMLEmbedElement::attach() {
+  HTMLElement::attach();
 
   if (renderer())
     static_cast<RenderPartObject*>(renderer())->updateWidget();
 }
 
-void HTMLEmbedElementImpl::detach() {
+void HTMLEmbedElement::detach() {
 #if __APPLE__
   m_embedInstance = 0;
 #endif
-  HTMLElementImpl::detach();
+  HTMLElement::detach();
 }
 
-void HTMLEmbedElementImpl::insertedIntoDocument() {
+void HTMLEmbedElement::insertedIntoDocument() {
   if (getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->addNamedItem(oldNameAttr);
   }
 
-  HTMLElementImpl::insertedIntoDocument();
+  HTMLElement::insertedIntoDocument();
 }
 
-void HTMLEmbedElementImpl::removedFromDocument() {
+void HTMLEmbedElement::removedFromDocument() {
   if (getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->removeNamedItem(oldNameAttr);
   }
 
-  HTMLElementImpl::removedFromDocument();
+  HTMLElement::removedFromDocument();
 }
 
-bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
+bool HTMLEmbedElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == srcAttr;
 }
 
 // -------------------------------------------------------------------------
 
-HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(objectTag, doc), m_imageLoader(0) {
+HTMLObjectElement::HTMLObjectElement(Document* doc)
+    : HTMLElement(objectTag, doc), m_imageLoader(0) {
   needWidgetUpdate = false;
   m_useFallbackContent = false;
   m_complete = false;
   m_docNamedItem = true;
 }
 
-HTMLObjectElementImpl::~HTMLObjectElementImpl() {
+HTMLObjectElement::~HTMLObjectElement() {
 #if __APPLE__
   // m_objectInstance should have been cleaned up in detach().
   assert(!m_objectInstance);
@@ -512,12 +509,12 @@ HTMLObjectElementImpl::~HTMLObjectElementImpl() {
   delete m_imageLoader;
 }
 
-bool HTMLObjectElementImpl::checkDTD(const NodeImpl* newChild) {
-  return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
+bool HTMLObjectElement::checkDTD(const Node* newChild) {
+  return newChild->hasTagName(paramTag) || HTMLElement::checkDTD(newChild);
 }
 
 #if __APPLE__
-KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
+KJS::Bindings::Instance* HTMLObjectElement::getObjectInstance() const {
   Frame* frame = getDocument()->frame();
   if (!frame)
     return 0;
@@ -543,17 +540,17 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
 }
 #endif
 
-HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
-  for (NodeImpl* p = parentNode(); p != 0; p = p->parentNode()) {
+HTMLFormElement* HTMLObjectElement::form() const {
+  for (Node* p = parentNode(); p != 0; p = p->parentNode()) {
     if (p->hasTagName(formTag))
-      return static_cast<HTMLFormElementImpl*>(p);
+      return static_cast<HTMLFormElement*>(p);
   }
 
   return 0;
 }
 
-bool HTMLObjectElementImpl::mapToEntry(const QualifiedName& attrName,
-                                       MappedAttributeEntry& result) const {
+bool HTMLObjectElement::mapToEntry(const QualifiedName& attrName,
+                                   MappedAttributeEntry& result) const {
   if (attrName == widthAttr || attrName == heightAttr ||
       attrName == vspaceAttr || attrName == hspaceAttr) {
     result = eUniversal;
@@ -566,14 +563,14 @@ bool HTMLObjectElementImpl::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLElementImpl::mapToEntry(attrName, result);
+  return HTMLElement::mapToEntry(attrName, result);
 }
 
-void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  DOMString val = attr->value();
+void HTMLObjectElement::parseMappedAttribute(MappedAttribute* attr) {
+  String val = attr->value();
   int pos;
   if (attr->name() == typeAttr) {
-    serviceType = val.qstring().lower();
+    serviceType = val.deprecatedString().lower();
     pos = serviceType.find(";");
     if (pos != -1)
       serviceType = serviceType.left(pos);
@@ -584,7 +581,7 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       m_imageLoader = 0;
     }
   } else if (attr->name() == dataAttr) {
-    url = khtml::parseURL(val).qstring();
+    url = WebCore::parseURL(val).deprecatedString();
     if (renderer())
       needWidgetUpdate = true;
     if (renderer() && isImageType()) {
@@ -613,37 +610,35 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onunloadAttr) {
     setHTMLEventListener(unloadEvent, attr);
   } else if (attr->name() == nameAttr) {
-    DOMString newNameAttr = attr->value();
+    String newNameAttr = attr->value();
     if (isDocNamedItem() && inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocumentImpl* document =
-          static_cast<HTMLDocumentImpl*>(getDocument());
+      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
       document->removeNamedItem(oldNameAttr);
       document->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
   } else if (attr->name() == idAttr) {
-    DOMString newIdAttr = attr->value();
+    String newIdAttr = attr->value();
     if (isDocNamedItem() && inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocumentImpl* document =
-          static_cast<HTMLDocumentImpl*>(getDocument());
+      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
       document->removeDocExtraNamedItem(oldIdAttr);
       document->addDocExtraNamedItem(newIdAttr);
     }
     oldIdAttr = newIdAttr;
     // also call superclass
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-DocumentImpl* HTMLObjectElementImpl::contentDocument() const {
+Document* HTMLObjectElement::contentDocument() const {
   // ###
   return 0;
 }
 
-bool HTMLObjectElementImpl::rendererIsNeeded(RenderStyle* style) {
+bool HTMLObjectElement::rendererIsNeeded(RenderStyle* style) {
   if (m_useFallbackContent || isImageType())
-    return HTMLElementImpl::rendererIsNeeded(style);
+    return HTMLElement::rendererIsNeeded(style);
 
   Frame* frame = getDocument()->frame();
   if (!frame || !frame->pluginsEnabled())
@@ -652,8 +647,8 @@ bool HTMLObjectElementImpl::rendererIsNeeded(RenderStyle* style) {
   return true;
 }
 
-RenderObject* HTMLObjectElementImpl::createRenderer(RenderArena* arena,
-                                                    RenderStyle* style) {
+RenderObject* HTMLObjectElement::createRenderer(RenderArena* arena,
+                                                RenderStyle* style) {
   if (m_useFallbackContent)
     return RenderObject::createObject(this, style);
   if (isImageType())
@@ -661,8 +656,8 @@ RenderObject* HTMLObjectElementImpl::createRenderer(RenderArena* arena,
   return new (arena) RenderPartObject(this);
 }
 
-void HTMLObjectElementImpl::attach() {
-  HTMLElementImpl::attach();
+void HTMLObjectElement::attach() {
+  HTMLElement::attach();
 
   if (renderer() && !m_useFallbackContent) {
     if (isImageType()) {
@@ -689,14 +684,14 @@ void HTMLObjectElementImpl::attach() {
   }
 }
 
-void HTMLObjectElementImpl::closeRenderer() {
+void HTMLObjectElement::closeRenderer() {
   // The parser just reached </object>.
   setComplete(true);
 
-  HTMLElementImpl::closeRenderer();
+  HTMLElement::closeRenderer();
 }
 
-void HTMLObjectElementImpl::setComplete(bool complete) {
+void HTMLObjectElement::setComplete(bool complete) {
   if (complete != m_complete) {
     m_complete = complete;
     if (complete && inDocument() && !m_useFallbackContent) {
@@ -706,7 +701,7 @@ void HTMLObjectElementImpl::setComplete(bool complete) {
   }
 }
 
-void HTMLObjectElementImpl::detach() {
+void HTMLObjectElement::detach() {
   if (attached() && renderer() && !m_useFallbackContent) {
     // Update the widget the next time we attach (detaching destroys the
     // plugin).
@@ -716,39 +711,39 @@ void HTMLObjectElementImpl::detach() {
 #if __APPLE__
   m_objectInstance = 0;
 #endif
-  HTMLElementImpl::detach();
+  HTMLElement::detach();
 }
 
-void HTMLObjectElementImpl::insertedIntoDocument() {
+void HTMLObjectElement::insertedIntoDocument() {
   if (isDocNamedItem() && getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->addNamedItem(oldNameAttr);
     document->addDocExtraNamedItem(oldIdAttr);
   }
 
-  HTMLElementImpl::insertedIntoDocument();
+  HTMLElement::insertedIntoDocument();
 }
 
-void HTMLObjectElementImpl::removedFromDocument() {
+void HTMLObjectElement::removedFromDocument() {
   if (isDocNamedItem() && getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     document->removeNamedItem(oldNameAttr);
     document->removeDocExtraNamedItem(oldIdAttr);
   }
 
-  HTMLElementImpl::removedFromDocument();
+  HTMLElement::removedFromDocument();
 }
 
-void HTMLObjectElementImpl::recalcStyle(StyleChange ch) {
+void HTMLObjectElement::recalcStyle(StyleChange ch) {
   if (!m_useFallbackContent && needWidgetUpdate && renderer() &&
       !isImageType()) {
     detach();
     attach();
   }
-  HTMLElementImpl::recalcStyle(ch);
+  HTMLElement::recalcStyle(ch);
 }
 
-void HTMLObjectElementImpl::childrenChanged() {
+void HTMLObjectElement::childrenChanged() {
   updateDocNamedItem();
   if (inDocument() && !m_useFallbackContent) {
     needWidgetUpdate = true;
@@ -756,12 +751,12 @@ void HTMLObjectElementImpl::childrenChanged() {
   }
 }
 
-bool HTMLObjectElementImpl::isURLAttribute(AttributeImpl* attr) const {
+bool HTMLObjectElement::isURLAttribute(Attribute* attr) const {
   return (attr->name() == dataAttr ||
           (attr->name() == usemapAttr && attr->value().domString()[0] != '#'));
 }
 
-bool HTMLObjectElementImpl::isImageType() {
+bool HTMLObjectElement::isImageType() {
   if (serviceType.isEmpty() && url.startsWith("data:")) {
     // Extract the MIME type from the data URL.
     int index = url.find(';');
@@ -780,7 +775,7 @@ bool HTMLObjectElementImpl::isImageType() {
   return Image::supportsType(serviceType);
 }
 
-void HTMLObjectElementImpl::renderFallbackContent() {
+void HTMLObjectElement::renderFallbackContent() {
   if (m_useFallbackContent)
     return;
 
@@ -793,26 +788,26 @@ void HTMLObjectElementImpl::renderFallbackContent() {
   attach();
 }
 
-void HTMLObjectElementImpl::updateDocNamedItem() {
+void HTMLObjectElement::updateDocNamedItem() {
   // The rule is "<object> elements with no children other than
   // <param> elements and whitespace can be found by name in a
   // document, and other <object> elements cannot."
   bool wasNamedItem = m_docNamedItem;
   bool isNamedItem = true;
-  NodeImpl* child = firstChild();
+  Node* child = firstChild();
   while (child && isNamedItem) {
     if (child->isElementNode()) {
-      if (!static_cast<ElementImpl*>(child)->hasTagName(paramTag))
+      if (!static_cast<Element*>(child)->hasTagName(paramTag))
         isNamedItem = false;
     } else if (child->isTextNode()) {
-      if (!static_cast<TextImpl*>(child)->containsOnlyWhitespace())
+      if (!static_cast<Text*>(child)->containsOnlyWhitespace())
         isNamedItem = false;
     } else
       isNamedItem = false;
     child = child->nextSibling();
   }
   if (isNamedItem != wasNamedItem && getDocument()->isHTMLDocument()) {
-    HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
+    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
     if (isNamedItem) {
       document->addNamedItem(oldNameAttr);
       document->addDocExtraNamedItem(oldIdAttr);
@@ -824,154 +819,154 @@ void HTMLObjectElementImpl::updateDocNamedItem() {
   m_docNamedItem = isNamedItem;
 }
 
-DOMString HTMLObjectElementImpl::code() const {
+String HTMLObjectElement::code() const {
   return getAttribute(codeAttr);
 }
 
-void HTMLObjectElementImpl::setCode(const DOMString& value) {
+void HTMLObjectElement::setCode(const String& value) {
   setAttribute(codeAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::align() const {
+String HTMLObjectElement::align() const {
   return getAttribute(alignAttr);
 }
 
-void HTMLObjectElementImpl::setAlign(const DOMString& value) {
+void HTMLObjectElement::setAlign(const String& value) {
   setAttribute(alignAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::archive() const {
+String HTMLObjectElement::archive() const {
   return getAttribute(archiveAttr);
 }
 
-void HTMLObjectElementImpl::setArchive(const DOMString& value) {
+void HTMLObjectElement::setArchive(const String& value) {
   setAttribute(archiveAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::border() const {
+String HTMLObjectElement::border() const {
   return getAttribute(borderAttr);
 }
 
-void HTMLObjectElementImpl::setBorder(const DOMString& value) {
+void HTMLObjectElement::setBorder(const String& value) {
   setAttribute(borderAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::codeBase() const {
+String HTMLObjectElement::codeBase() const {
   return getAttribute(codebaseAttr);
 }
 
-void HTMLObjectElementImpl::setCodeBase(const DOMString& value) {
+void HTMLObjectElement::setCodeBase(const String& value) {
   setAttribute(codebaseAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::codeType() const {
+String HTMLObjectElement::codeType() const {
   return getAttribute(codetypeAttr);
 }
 
-void HTMLObjectElementImpl::setCodeType(const DOMString& value) {
+void HTMLObjectElement::setCodeType(const String& value) {
   setAttribute(codetypeAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::data() const {
+String HTMLObjectElement::data() const {
   return getAttribute(dataAttr);
 }
 
-void HTMLObjectElementImpl::setData(const DOMString& value) {
+void HTMLObjectElement::setData(const String& value) {
   setAttribute(dataAttr, value);
 }
 
-bool HTMLObjectElementImpl::declare() const {
+bool HTMLObjectElement::declare() const {
   return !getAttribute(declareAttr).isNull();
 }
 
-void HTMLObjectElementImpl::setDeclare(bool declare) {
+void HTMLObjectElement::setDeclare(bool declare) {
   setAttribute(declareAttr, declare ? "" : 0);
 }
 
-DOMString HTMLObjectElementImpl::height() const {
+String HTMLObjectElement::height() const {
   return getAttribute(heightAttr);
 }
 
-void HTMLObjectElementImpl::setHeight(const DOMString& value) {
+void HTMLObjectElement::setHeight(const String& value) {
   setAttribute(heightAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::hspace() const {
+String HTMLObjectElement::hspace() const {
   return getAttribute(hspaceAttr);
 }
 
-void HTMLObjectElementImpl::setHspace(const DOMString& value) {
+void HTMLObjectElement::setHspace(const String& value) {
   setAttribute(hspaceAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::name() const {
+String HTMLObjectElement::name() const {
   return getAttribute(nameAttr);
 }
 
-void HTMLObjectElementImpl::setName(const DOMString& value) {
+void HTMLObjectElement::setName(const String& value) {
   setAttribute(nameAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::standby() const {
+String HTMLObjectElement::standby() const {
   return getAttribute(standbyAttr);
 }
 
-void HTMLObjectElementImpl::setStandby(const DOMString& value) {
+void HTMLObjectElement::setStandby(const String& value) {
   setAttribute(standbyAttr, value);
 }
 
-int HTMLObjectElementImpl::tabIndex() const {
+int HTMLObjectElement::tabIndex() const {
   return getAttribute(tabindexAttr).toInt();
 }
 
-void HTMLObjectElementImpl::setTabIndex(int tabIndex) {
-  setAttribute(tabindexAttr, QString::number(tabIndex));
+void HTMLObjectElement::setTabIndex(int tabIndex) {
+  setAttribute(tabindexAttr, DeprecatedString::number(tabIndex));
 }
 
-DOMString HTMLObjectElementImpl::type() const {
+String HTMLObjectElement::type() const {
   return getAttribute(typeAttr);
 }
 
-void HTMLObjectElementImpl::setType(const DOMString& value) {
+void HTMLObjectElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::useMap() const {
+String HTMLObjectElement::useMap() const {
   return getAttribute(usemapAttr);
 }
 
-void HTMLObjectElementImpl::setUseMap(const DOMString& value) {
+void HTMLObjectElement::setUseMap(const String& value) {
   setAttribute(usemapAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::vspace() const {
+String HTMLObjectElement::vspace() const {
   return getAttribute(vspaceAttr);
 }
 
-void HTMLObjectElementImpl::setVspace(const DOMString& value) {
+void HTMLObjectElement::setVspace(const String& value) {
   setAttribute(vspaceAttr, value);
 }
 
-DOMString HTMLObjectElementImpl::width() const {
+String HTMLObjectElement::width() const {
   return getAttribute(widthAttr);
 }
 
-void HTMLObjectElementImpl::setWidth(const DOMString& value) {
+void HTMLObjectElement::setWidth(const String& value) {
   setAttribute(widthAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLParamElementImpl::HTMLParamElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(paramTag, doc) {}
+HTMLParamElement::HTMLParamElement(Document* doc)
+    : HTMLElement(paramTag, doc) {}
 
-HTMLParamElementImpl::~HTMLParamElementImpl() {}
+HTMLParamElement::~HTMLParamElement() {}
 
-void HTMLParamElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLParamElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == idAttr) {
     // Must call base class so that hasID bit gets set.
-    HTMLElementImpl::parseMappedAttribute(attr);
-    if (getDocument()->htmlMode() != DocumentImpl::XHtml)
+    HTMLElement::parseMappedAttribute(attr);
+    if (getDocument()->htmlMode() != Document::XHtml)
       return;
     m_name = attr->value();
   } else if (attr->name() == nameAttr) {
@@ -979,14 +974,14 @@ void HTMLParamElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == valueAttr) {
     m_value = attr->value();
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-bool HTMLParamElementImpl::isURLAttribute(AttributeImpl* attr) const {
+bool HTMLParamElement::isURLAttribute(Attribute* attr) const {
   if (attr->name() == valueAttr) {
-    AttributeImpl* attr = attributes()->getAttributeItem(nameAttr);
+    Attribute* attr = attributes()->getAttributeItem(nameAttr);
     if (attr) {
-      DOMString value = attr->value().domString().lower();
+      String value = attr->value().domString().lower();
       if (value == "src" || value == "movie" || value == "data")
         return true;
     }
@@ -994,27 +989,27 @@ bool HTMLParamElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return false;
 }
 
-void HTMLParamElementImpl::setName(const DOMString& value) {
+void HTMLParamElement::setName(const String& value) {
   setAttribute(nameAttr, value);
 }
 
-DOMString HTMLParamElementImpl::type() const {
+String HTMLParamElement::type() const {
   return getAttribute(typeAttr);
 }
 
-void HTMLParamElementImpl::setType(const DOMString& value) {
+void HTMLParamElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
 
-void HTMLParamElementImpl::setValue(const DOMString& value) {
+void HTMLParamElement::setValue(const String& value) {
   setAttribute(valueAttr, value);
 }
 
-DOMString HTMLParamElementImpl::valueType() const {
+String HTMLParamElement::valueType() const {
   return getAttribute(valuetypeAttr);
 }
 
-void HTMLParamElementImpl::setValueType(const DOMString& value) {
+void HTMLParamElement::setValueType(const String& value) {
   setAttribute(valuetypeAttr, value);
 }
 }

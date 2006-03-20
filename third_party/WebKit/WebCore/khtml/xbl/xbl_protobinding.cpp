@@ -30,12 +30,12 @@
 #include "xbl_protobinding.h"
 #include "xbl_docimpl.h"
 
-using DOM::DOMString;
-using DOM::ElementImpl;
+using WebCore::String;
+using WebCore::Element;
 
 namespace XBL {
 
-XBLPrototypeBinding::XBLPrototypeBinding(const DOMString& id, ElementImpl* elt)
+XBLPrototypeBinding::XBLPrototypeBinding(const String& id, Element* elt)
     : m_id(id), m_element(elt), m_handler(0) {
   // Add ourselves to the document's prototype table.
   document()->setPrototypeBinding(id, this);
@@ -43,12 +43,11 @@ XBLPrototypeBinding::XBLPrototypeBinding(const DOMString& id, ElementImpl* elt)
 
 void XBLPrototypeBinding::initialize() {}
 
-XBLDocumentImpl* XBLPrototypeBinding::document() const {
-  return static_cast<XBLDocumentImpl*>(m_element->getDocument());
+XBLDocument* XBLPrototypeBinding::document() const {
+  return static_cast<XBLDocument*>(m_element->getDocument());
 }
 
-void XBLPrototypeBinding::addResource(const DOMString& type,
-                                      const DOMString& src) {
+void XBLPrototypeBinding::addResource(const String& type, const String& src) {
   // FIXME: Implement!
 }
 }

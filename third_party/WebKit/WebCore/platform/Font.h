@@ -149,7 +149,7 @@ class Font {
   int width(const QChar* chs, int slen, int tabWidth = 0, int xpos = 0) const {
     return width(chs, slen, 0, slen, tabWidth, xpos);
   }
-  int width(const QString& s) const {
+  int width(const DeprecatedString& s) const {
     return width(s.unicode(), s.length(), 0, 0);
   }
 

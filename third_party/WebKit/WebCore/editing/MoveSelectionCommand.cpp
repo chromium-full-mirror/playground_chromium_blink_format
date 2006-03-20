@@ -27,19 +27,19 @@
 #include "MoveSelectionCommand.h"
 #include "ReplaceSelectionCommand.h"
 
-#include "DocumentFragmentImpl.h"
+#include "DocumentFragment.h"
 
 #include <kxmlcore/Assertions.h>
 
-using DOM::DocumentImpl;
-using DOM::DocumentFragmentImpl;
-using DOM::NodeImpl;
-using DOM::Position;
+using WebCore::Document;
+using WebCore::DocumentFragment;
+using WebCore::Node;
+using WebCore::Position;
 
-namespace khtml {
+namespace WebCore {
 
-MoveSelectionCommand::MoveSelectionCommand(DocumentImpl* document,
-                                           DocumentFragmentImpl* fragment,
+MoveSelectionCommand::MoveSelectionCommand(Document* document,
+                                           DocumentFragment* fragment,
                                            Position& position,
                                            bool smartMove)
     : CompositeEditCommand(document),
@@ -61,7 +61,7 @@ void MoveSelectionCommand::doApply() {
 
   // Update the position otherwise it may become invalid after the selection is
   // deleted.
-  NodeImpl* positionNode = m_position.node();
+  Node* positionNode = m_position.node();
   int positionOffset = m_position.offset();
   Position selectionEnd = selection.end();
   int selectionEndOffset = selectionEnd.offset();
@@ -96,4 +96,4 @@ EditAction MoveSelectionCommand::editingAction() const {
   return EditActionDrag;
 }
 
-}  // namespace khtml
+}  // namespace WebCore

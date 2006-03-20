@@ -26,7 +26,7 @@
 #ifndef KURL_H_
 #define KURL_H_
 
-#include "QString.h"
+#include "DeprecatedString.h"
 #include "TextEncoding.h"
 
 #if __APPLE__
@@ -44,10 +44,10 @@ class KURL {
   KURL();
   KURL(const char*);
   KURL(const KURL&,
-       const QString&,
+       const DeprecatedString&,
        const WebCore::TextEncoding& encoding =
            WebCore::TextEncoding(WebCore::UTF8Encoding));
-  KURL(const QString&);
+  KURL(const DeprecatedString&);
 #if __APPLE__
   KURL(NSURL*);
 #endif
@@ -57,30 +57,30 @@ class KURL {
   bool isValid() const { return m_isValid; }
   bool hasPath() const;
 
-  QString url() const { return urlString; }
+  DeprecatedString url() const { return urlString; }
 
-  QString protocol() const;
-  QString host() const;
+  DeprecatedString protocol() const;
+  DeprecatedString host() const;
   unsigned short int port() const;
-  QString user() const;
-  QString pass() const;
-  QString path() const;
-  QString query() const;
-  QString ref() const;
+  DeprecatedString user() const;
+  DeprecatedString pass() const;
+  DeprecatedString path() const;
+  DeprecatedString query() const;
+  DeprecatedString ref() const;
   bool hasRef() const;
 
-  QString encodedHtmlRef() const { return ref(); }
+  DeprecatedString encodedHtmlRef() const { return ref(); }
 
-  void setProtocol(const QString&);
-  void setHost(const QString&);
+  void setProtocol(const DeprecatedString&);
+  void setHost(const DeprecatedString&);
   void setPort(unsigned short int);
-  void setUser(const QString&);
-  void setPass(const QString&);
-  void setPath(const QString&);
-  void setQuery(const QString&);
-  void setRef(const QString&);
+  void setUser(const DeprecatedString&);
+  void setPass(const DeprecatedString&);
+  void setPath(const DeprecatedString&);
+  void setQuery(const DeprecatedString&);
+  void setRef(const DeprecatedString&);
 
-  QString prettyURL() const;
+  DeprecatedString prettyURL() const;
 
 #if __APPLE__
   CFURLRef createCFURL() const;
@@ -89,19 +89,19 @@ class KURL {
 
   bool isLocalFile() const;
 
-  static QString decode_string(
-      const QString&,
+  static DeprecatedString decode_string(
+      const DeprecatedString&,
       const WebCore::TextEncoding& encoding =
           WebCore::TextEncoding(WebCore::UTF8Encoding));
-  static QString encode_string(const QString&);
+  static DeprecatedString encode_string(const DeprecatedString&);
 
   friend bool operator==(const KURL&, const KURL&);
 
  private:
   bool isHierarchical() const;
-  void parse(const char* url, const QString* originalString);
+  void parse(const char* url, const DeprecatedString* originalString);
 
-  QString urlString;
+  DeprecatedString urlString;
   bool m_isValid;
   int schemeEndPos;
   int userStartPos;
@@ -114,8 +114,8 @@ class KURL {
   int fragmentEndPos;
 
   // True if both URLs are the same.
-  friend bool urlcmp(const QString& URLA,
-                     const QString& URLB,
+  friend bool urlcmp(const DeprecatedString& URLA,
+                     const DeprecatedString& URLB,
                      bool ignoreTrailingSlash,
                      bool ignoreRef);
 };

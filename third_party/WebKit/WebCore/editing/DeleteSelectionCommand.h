@@ -28,14 +28,14 @@
 
 #include "CompositeEditCommand.h"
 
-namespace khtml {
+namespace WebCore {
 
 class DeleteSelectionCommand : public CompositeEditCommand {
  public:
-  DeleteSelectionCommand(DOM::DocumentImpl* document,
+  DeleteSelectionCommand(WebCore::Document* document,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
-  DeleteSelectionCommand(DOM::DocumentImpl* document,
+  DeleteSelectionCommand(WebCore::Document* document,
                          const Selection& selection,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
@@ -55,7 +55,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void fixupWhitespace();
   void moveNodesAfterNode();
   void calculateEndingPosition();
-  void calculateTypingStyleAfterDelete(DOM::NodeImpl* insertedPlaceholder);
+  void calculateTypingStyleAfterDelete(WebCore::Node* insertedPlaceholder);
   void clearTransientState();
 
   bool m_hasSelectionToDelete;
@@ -66,20 +66,20 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   // This data is transient and should be cleared at the end of the doApply
   // function.
   Selection m_selectionToDelete;
-  DOM::Position m_upstreamStart;
-  DOM::Position m_downstreamStart;
-  DOM::Position m_upstreamEnd;
-  DOM::Position m_downstreamEnd;
-  DOM::Position m_endingPosition;
-  DOM::Position m_leadingWhitespace;
-  DOM::Position m_trailingWhitespace;
-  RefPtr<DOM::NodeImpl> m_startBlock;
-  RefPtr<DOM::NodeImpl> m_endBlock;
-  RefPtr<DOM::NodeImpl> m_startNode;
-  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_typingStyle;
-  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_deleteIntoBlockquoteStyle;
+  WebCore::Position m_upstreamStart;
+  WebCore::Position m_downstreamStart;
+  WebCore::Position m_upstreamEnd;
+  WebCore::Position m_downstreamEnd;
+  WebCore::Position m_endingPosition;
+  WebCore::Position m_leadingWhitespace;
+  WebCore::Position m_trailingWhitespace;
+  RefPtr<WebCore::Node> m_startBlock;
+  RefPtr<WebCore::Node> m_endBlock;
+  RefPtr<WebCore::Node> m_startNode;
+  RefPtr<WebCore::CSSMutableStyleDeclaration> m_typingStyle;
+  RefPtr<WebCore::CSSMutableStyleDeclaration> m_deleteIntoBlockquoteStyle;
 };
 
-}  // namespace khtml
+}  // namespace WebCore
 
 #endif  // __delete_selection_command_h__

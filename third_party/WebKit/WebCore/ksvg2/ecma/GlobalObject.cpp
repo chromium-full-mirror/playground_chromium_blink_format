@@ -22,8 +22,8 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include <kdom/core/NodeImpl.h>
-#include <kdom/core/DocumentImpl.h>
+#include <kdom/core/Node.h>
+#include <kdom/core/Document.h>
 
 #include "GlobalObject.h"
 #include "Constructors.h"
@@ -52,7 +52,7 @@ DontDelete|Function 1
 @end
 */
 
-GlobalObject::GlobalObject(DocumentImpl* doc) : GlobalObject(doc) {}
+GlobalObject::GlobalObject(Document* doc) : GlobalObject(doc) {}
 
 GlobalObject::~GlobalObject() {}
 
@@ -63,8 +63,8 @@ void GlobalObject::afterTimeout() const {
 
 KJS::JSValue* GlobalObject::get(KJS::ExecState* exec,
                                 const KJS::Identifier& p) const {
-  kdDebug(26004) << "KSVG::GlobalObject (" << this << ")::get " << p.qstring()
-                 << endl;
+  kdDebug(26004) << "WebCore::GlobalObject (" << this << ")::get "
+                 << p.deprecatedString() << endl;
 
   KJS::JSValue* ret = GlobalObject::get(exec, p);
   if (ret->type() != KJS::UndefinedType)
@@ -101,8 +101,8 @@ KJS::JSValue* GlobalObject::get(KJS::ExecState* exec,
 
   // This isn't necessarily a bug. Some code uses if(!window.blah) window.blah=1
   // But it can also mean something isn't loaded or implemented...
-  kdDebug(26004) << "GlobalObject::get property not found: " << p.qstring()
-                 << endl;
+  kdDebug(26004) << "GlobalObject::get property not found: "
+                 << p.deprecatedString() << endl;
   return KJS::jsUndefined();
 }
 

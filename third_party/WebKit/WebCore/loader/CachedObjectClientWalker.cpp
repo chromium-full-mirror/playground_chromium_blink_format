@@ -29,7 +29,7 @@
 #include "config.h"
 #include "CachedObjectClientWalker.h"
 
-namespace khtml {
+namespace WebCore {
 
 CachedObjectClient* CachedObjectClientWalker::next() {
   while (!m_remaining.isEmpty()) {

@@ -27,13 +27,13 @@
 #define __edit_command_h__
 
 #include "Shared.h"
-#include "edit_actions.h"
+#include "EditAction.h"
 #include "Selection.h"
 
 namespace WebCore {
 
-class CSSMutableStyleDeclarationImpl;
-class DocumentImpl;
+class CSSMutableStyleDeclaration;
+class Document;
 class VisiblePosition;
 
 //------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class VisiblePosition;
 
 class EditCommand : public Shared<EditCommand> {
  public:
-  EditCommand(DocumentImpl*);
+  EditCommand(Document*);
   virtual ~EditCommand();
 
   bool isCompositeStep() const { return m_parent != 0; }
@@ -60,7 +60,7 @@ class EditCommand : public Shared<EditCommand> {
 
   virtual EditAction editingAction() const;
 
-  virtual DocumentImpl* const document() const { return m_document.get(); }
+  virtual Document* const document() const { return m_document.get(); }
 
   Selection startingSelection() const { return m_startingSelection; }
   Selection endingSelection() const { return m_endingSelection; }
@@ -75,12 +75,12 @@ class EditCommand : public Shared<EditCommand> {
   void setEndingSelection(const VisiblePosition& p);
   void setEndingSelection(const Position& p, EAffinity affinity);
 
-  CSSMutableStyleDeclarationImpl* typingStyle() const {
+  CSSMutableStyleDeclaration* typingStyle() const {
     return m_typingStyle.get();
   };
-  void setTypingStyle(PassRefPtr<CSSMutableStyleDeclarationImpl>);
+  void setTypingStyle(PassRefPtr<CSSMutableStyleDeclaration>);
 
-  PassRefPtr<CSSMutableStyleDeclarationImpl> styleAtPosition(const Position&);
+  PassRefPtr<CSSMutableStyleDeclaration> styleAtPosition(const Position&);
 
   virtual bool isInsertTextCommand() const;
   virtual bool isTypingCommand() const;
@@ -90,11 +90,11 @@ class EditCommand : public Shared<EditCommand> {
  private:
   virtual bool preservesTypingStyle() const;
 
-  RefPtr<DocumentImpl> m_document;
+  RefPtr<Document> m_document;
   ECommandState m_state;
   Selection m_startingSelection;
   Selection m_endingSelection;
-  RefPtr<CSSMutableStyleDeclarationImpl> m_typingStyle;
+  RefPtr<CSSMutableStyleDeclaration> m_typingStyle;
   EditCommand* m_parent;
 };
 
@@ -111,7 +111,7 @@ class EditCommandPtr : public RefPtr<EditCommand> {
 
   EditAction editingAction() const;
 
-  DocumentImpl* const document() const;
+  Document* const document() const;
 
   Selection startingSelection() const;
   Selection endingSelection() const;
@@ -123,8 +123,8 @@ class EditCommandPtr : public RefPtr<EditCommand> {
   void setEndingSelection(const VisiblePosition& p) const;
   void setEndingSelection(const Position& p, EAffinity affinity) const;
 
-  CSSMutableStyleDeclarationImpl* typingStyle() const;
-  void setTypingStyle(PassRefPtr<CSSMutableStyleDeclarationImpl>) const;
+  CSSMutableStyleDeclaration* typingStyle() const;
+  void setTypingStyle(PassRefPtr<CSSMutableStyleDeclaration>) const;
 
   EditCommandPtr parent() const;
   void setParent(const EditCommandPtr&) const;

@@ -77,7 +77,7 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   CGContextRef currentCGContext() const;
   virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
-  virtual QString stringForPath(const KCanvasPath* path);
+  virtual DeprecatedString stringForPath(const KCanvasPath* path);
 
   // Resource creation
   virtual KCanvasResource* createResource(const KCResourceType& type) const;
@@ -90,11 +90,11 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   // item creation
   virtual RenderPath* createItem(RenderArena* arena,
                                  RenderStyle* style,
-                                 SVGStyledElementImpl* node,
+                                 SVGStyledElement* node,
                                  KCanvasPath* path) const;
   virtual KCanvasContainer* createContainer(RenderArena* arena,
                                             RenderStyle* style,
-                                            SVGStyledElementImpl* node) const;
+                                            SVGStyledElement* node) const;
 
   // filters (mostly debugging)
   static bool filtersEnabled();

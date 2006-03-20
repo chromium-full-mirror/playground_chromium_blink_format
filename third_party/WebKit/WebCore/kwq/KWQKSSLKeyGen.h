@@ -26,16 +26,16 @@
 #ifndef KSSLKEYGEN_H_
 #define KSSLKEYGEN_H_
 
-#include "QStringList.h"
+#include "DeprecatedStringList.h"
 
 class KURL;
 
 class KSSLKeyGen {
  public:
-  static QStringList supportedKeySizes();
-  static QString signedPublicKeyAndChallengeString(
+  static DeprecatedStringList supportedKeySizes();
+  static DeprecatedString signedPublicKeyAndChallengeString(
       unsigned keySizeIndex,
-      const QString& challengeString,
+      const DeprecatedString& challengeString,
       const KURL& url);
 };
 

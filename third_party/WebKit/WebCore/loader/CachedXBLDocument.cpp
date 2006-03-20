@@ -40,7 +40,7 @@
 namespace WebCore {
 
 CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
-                                     const DOMString& url,
+                                     const String& url,
                                      KIO::CacheControl _cachePolicy,
                                      time_t _expireDate)
     : CachedObject(url, XBL, _cachePolicy, _expireDate), m_document(0) {
@@ -73,18 +73,18 @@ void CachedXBLDocument::deref(CachedObjectClient* c) {
     delete this;
 }
 
-void CachedXBLDocument::setCharset(const QString& chs) {
+void CachedXBLDocument::setCharset(const DeprecatedString& chs) {
   if (!chs.isEmpty())
     m_decoder->setEncoding(chs.latin1(), Decoder::EncodingFromHTTPHeader);
 }
 
-void CachedXBLDocument::data(ByteArray& data, bool eof) {
+void CachedXBLDocument::data(DeprecatedByteArray& data, bool eof) {
   if (!eof)
     return;
 
   assert(!m_document);
 
-  m_document = new XBL::XBLDocumentImpl();
+  m_document = new XBL::XBLDocument();
   m_document->ref();
   m_document->open();
 

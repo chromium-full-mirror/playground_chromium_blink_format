@@ -29,11 +29,11 @@
 #include "EditCommand.h"
 #include "PlatformString.h"
 
-namespace khtml {
+namespace WebCore {
 
 class RebalanceWhitespaceCommand : public EditCommand {
  public:
-  RebalanceWhitespaceCommand(DOM::DocumentImpl*, const DOM::Position&);
+  RebalanceWhitespaceCommand(WebCore::Document*, const WebCore::Position&);
   virtual ~RebalanceWhitespaceCommand() {}
 
   virtual void doApply();
@@ -44,13 +44,13 @@ class RebalanceWhitespaceCommand : public EditCommand {
 
   virtual bool preservesTypingStyle() const;
 
-  DOM::DOMString m_beforeString;
-  DOM::DOMString m_afterString;
-  DOM::Position m_position;
+  WebCore::String m_beforeString;
+  WebCore::String m_afterString;
+  WebCore::Position m_position;
   int m_upstreamOffset;
   int m_downstreamOffset;
 };
 
-}  // namespace khtml
+}  // namespace WebCore
 
 #endif  // __rebalance_whitespace_command_h__

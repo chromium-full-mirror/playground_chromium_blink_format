@@ -21,7 +21,7 @@
 #define __SVGPATHPARSER_H__
 #if SVG_SUPPORT
 
-class QString;
+class DeprecatedString;
 
 namespace WebCore {
 const char* parseCoord(const char* ptr, double& number);
@@ -29,7 +29,7 @@ const char* parseCoord(const char* ptr, double& number);
 class SVGPolyParser {
  public:
   virtual ~SVGPolyParser() {}
-  void parsePoints(const QString& points) const;
+  void parsePoints(const DeprecatedString& points) const;
 
  protected:
   virtual void svgPolyTo(double x1, double y1, int nr) const = 0;
@@ -51,7 +51,7 @@ class SVGPolyParser {
 class SVGPathParser {
  public:
   virtual ~SVGPathParser() {}
-  void parseSVG(const QString& d, bool process = false);
+  void parseSVG(const DeprecatedString& d, bool process = false);
 
  protected:
   virtual void svgMoveTo(double x1,

@@ -103,7 +103,7 @@ class TransferJobInternal {
 
   bool assembledResponseHeaders;
   bool retrievedCharset;
-  QString responseHeaders;
+  DeprecatedString responseHeaders;
 
 #if __APPLE__
   KWQResourceLoader* loader;

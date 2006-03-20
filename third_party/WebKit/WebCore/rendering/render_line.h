@@ -24,7 +24,7 @@
 #define RENDER_LINE_H
 
 #include "bidi.h"
-#include "render_object.h"
+#include "RenderObject.h"
 
 namespace WebCore {
 
@@ -415,7 +415,7 @@ class RootInlineBox : public InlineFlowBox {
     m_rightOverflow = right;
   }
   void setLineBreakInfo(RenderObject* obj,
-                        uint breakPos,
+                        unsigned breakPos,
                         BidiStatus* status,
                         BidiContext* context);
   void setLineBreakPos(int p) { m_lineBreakPos = p; }
@@ -426,7 +426,7 @@ class RootInlineBox : public InlineFlowBox {
   int blockHeight() const { return m_blockHeight; }
   bool endsWithBreak() const { return m_endsWithBreak; }
   RenderObject* lineBreakObj() const { return m_lineBreakObj; }
-  uint lineBreakPos() const { return m_lineBreakPos; }
+  unsigned lineBreakPos() const { return m_lineBreakPos; }
   BidiStatus lineBreakBidiStatus() const { return m_lineBreakBidiStatus; }
   BidiContext* lineBreakBidiContext() const { return m_lineBreakContext.get(); }
 
@@ -503,7 +503,7 @@ class RootInlineBox : public InlineFlowBox {
   // object are stored so that
   // we can create a BidiIterator beginning just after the end of this line.
   RenderObject* m_lineBreakObj;
-  uint m_lineBreakPos;
+  unsigned m_lineBreakPos;
 
   BidiStatus m_lineBreakBidiStatus;
   RefPtr<BidiContext> m_lineBreakContext;

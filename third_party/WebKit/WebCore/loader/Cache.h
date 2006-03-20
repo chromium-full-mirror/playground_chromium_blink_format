@@ -31,11 +31,11 @@
 #include "PlatformString.h"
 #include <kio/global.h>
 #include <qptrlist.h>
-#include <QString.h>
+#include <DeprecatedString.h>
 
 class KURL;
 
-namespace khtml {
+namespace WebCore {
 class CachedCSSStyleSheet;
 class CachedImage;
 class CachedObject;
@@ -67,7 +67,7 @@ class Cache {
    * Otherwise, it is automatically base-url expanded
    */
   static CachedImage* requestImage(DocLoader*,
-                                   const DOM::DOMString& URL,
+                                   const WebCore::String& URL,
                                    bool reload = false,
                                    time_t expireDate = 0);
   static CachedImage* requestImage(DocLoader*,
@@ -81,36 +81,38 @@ class Cache {
    */
   static CachedCSSStyleSheet* requestStyleSheet(
       DocLoader*,
-      const DOM::DOMString& URL,
+      const WebCore::String& URL,
       bool reload = false,
       time_t expireDate = 0,
-      const QString& charset = QString::null);
+      const DeprecatedString& charset = DeprecatedString::null);
 
   /**
    * Pre-loads a stylesheet into the cache.
    */
-  static void preloadStyleSheet(const QString& url,
-                                const QString& stylesheetData);
+  static void preloadStyleSheet(const DeprecatedString& url,
+                                const DeprecatedString& stylesheetData);
 
   /**
    * Ask the cache for some url. Will return a cachedObject, and
    * load the requested data in case it's not cahced
    */
-  static CachedScript* requestScript(DocLoader*,
-                                     const DOM::DOMString& URL,
-                                     bool reload = false,
-                                     time_t expireDate = 0,
-                                     const QString& charset = QString::null);
+  static CachedScript* requestScript(
+      DocLoader*,
+      const WebCore::String& URL,
+      bool reload = false,
+      time_t expireDate = 0,
+      const DeprecatedString& charset = DeprecatedString::null);
 
   /**
    * Pre-loads a script into the cache.
    */
-  static void preloadScript(const QString& url, const QString& scriptData);
+  static void preloadScript(const DeprecatedString& url,
+                            const DeprecatedString& scriptData);
 
 #ifdef KHTML_XSLT
   // Ask the cache for an XSL stylesheet.
   static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader*,
-                                                   const DOM::DOMString& URL,
+                                                   const WebCore::String& URL,
                                                    bool reload = false,
                                                    time_t expireDate = 0);
 #endif
@@ -118,7 +120,7 @@ class Cache {
 #ifndef KHTML_NO_XBL
   // Ask the cache for an XBL document.
   static CachedXBLDocument* requestXBLDocument(DocLoader*,
-                                               const DOM::DOMString& URL,
+                                               const WebCore::String& URL,
                                                bool reload = false,
                                                time_t expireDate = 0);
 #endif
@@ -137,7 +139,7 @@ class Cache {
   static int maxCacheableObjectSize() { return maxCacheable; }
 
   // Get an existing cache entry by URL.
-  static CachedObject* get(const DOM::DOMString& URL);
+  static CachedObject* get(const WebCore::String& URL);
 
   // Remove an existing cache entry.
   static void remove(CachedObject*);
@@ -192,7 +194,7 @@ class Cache {
   static void checkLRUAndUncacheableListIntegrity();
 
  private:
-  static QPtrList<DocLoader>* docloader;
+  static DeprecatedPtrList<DocLoader>* docloader;
 
   static int maxSize;
   static int maxCacheable;

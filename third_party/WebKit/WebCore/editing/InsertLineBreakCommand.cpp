@@ -26,12 +26,12 @@
 #include "config.h"
 #include "InsertLineBreakCommand.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "Frame.h"
 #include "Logging.h"
-#include "TextImpl.h"
+#include "Text.h"
 #include "VisiblePosition.h"
-#include "dom2_rangeimpl.h"
+#include "Range.h"
 #include "dom_elementimpl.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
@@ -42,33 +42,33 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-InsertLineBreakCommand::InsertLineBreakCommand(DocumentImpl* document)
+InsertLineBreakCommand::InsertLineBreakCommand(Document* document)
     : CompositeEditCommand(document) {}
 
 bool InsertLineBreakCommand::preservesTypingStyle() const {
   return true;
 }
 
-void InsertLineBreakCommand::insertNodeAfterPosition(NodeImpl* node,
+void InsertLineBreakCommand::insertNodeAfterPosition(Node* node,
                                                      const Position& pos) {
   // Insert the BR after the caret position. In the case the
   // position is a block, do an append. We don't want to insert
   // the BR *after* the block.
   Position upstream(pos.upstream());
-  NodeImpl* cb = pos.node()->enclosingBlockFlowElement();
+  Node* cb = pos.node()->enclosingBlockFlowElement();
   if (cb == pos.node())
     appendNode(node, cb);
   else
     insertNodeAfter(node, pos.node());
 }
 
-void InsertLineBreakCommand::insertNodeBeforePosition(NodeImpl* node,
+void InsertLineBreakCommand::insertNodeBeforePosition(Node* node,
                                                       const Position& pos) {
   // Insert the BR after the caret position. In the case the
   // position is a block, do an append. We don't want to insert
   // the BR *before* the block.
   Position upstream(pos.upstream());
-  NodeImpl* cb = pos.node()->enclosingBlockFlowElement();
+  Node* cb = pos.node()->enclosingBlockFlowElement();
   if (cb == pos.node())
     appendNode(node, cb);
   else
@@ -79,8 +79,8 @@ void InsertLineBreakCommand::doApply() {
   deleteSelection();
   Selection selection = endingSelection();
 
-  RefPtr<ElementImpl> breakNode = createBreakElement(document());
-  NodeImpl* nodeToInsert = breakNode.get();
+  RefPtr<Element> breakNode = createBreakElement(document());
+  Node* nodeToInsert = breakNode.get();
 
   Position pos(selection.start().upstream());
 
@@ -104,7 +104,7 @@ void InsertLineBreakCommand::doApply() {
       // the selection alone.
       insertNodeBefore(nodeToInsert, pos.node());
     } else {
-      NodeImpl* next = pos.node()->traverseNextNode();
+      Node* next = pos.node()->traverseNextNode();
       bool hasTrailingBR = next && next->hasTagName(brTag) &&
                            pos.node()->enclosingBlockFlowElement() ==
                                next->enclosingBlockFlowElement();
@@ -113,7 +113,7 @@ void InsertLineBreakCommand::doApply() {
         setEndingSelection(Selection(Position(next, 0), DOWNSTREAM));
       else if (!document()->inStrictMode()) {
         // Insert an "extra" BR at the end of the block.
-        RefPtr<ElementImpl> extraBreakNode = createBreakElement(document());
+        RefPtr<Element> extraBreakNode = createBreakElement(document());
         insertNodeAfter(extraBreakNode.get(), nodeToInsert);
         setEndingSelection(Position(extraBreakNode.get(), 0), DOWNSTREAM);
       }
@@ -138,8 +138,8 @@ void InsertLineBreakCommand::doApply() {
 
     // Do the split
     ExceptionCode ec = 0;
-    TextImpl* textNode = static_cast<TextImpl*>(pos.node());
-    RefPtr<TextImpl> textBeforeNode = document()->createTextNode(
+    Text* textNode = static_cast<Text*>(pos.node());
+    RefPtr<Text> textBeforeNode = document()->createTextNode(
         textNode->substringData(0, selection.start().offset(), ec));
     deleteTextFromNode(textNode, 0, pos.offset());
     insertNodeBefore(textBeforeNode.get(), textNode);
@@ -162,8 +162,7 @@ void InsertLineBreakCommand::doApply() {
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
 
-  CSSMutableStyleDeclarationImpl* typingStyle =
-      document()->frame()->typingStyle();
+  CSSMutableStyleDeclaration* typingStyle = document()->frame()->typingStyle();
 
   if (typingStyle && typingStyle->length() > 0) {
     Selection selectionBeforeStyle = endingSelection();

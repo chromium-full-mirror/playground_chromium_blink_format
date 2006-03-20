@@ -24,15 +24,15 @@
 #include "config.h"
 #include "render_replaced.h"
 
-#include "DocumentImpl.h"  // ### remove dependency
+#include "Document.h"  // ### remove dependency
 #include "EventNames.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "dom2_eventsimpl.h"
-#include "dom_position.h"
+#include "Position.h"
 #include "BrowserExtension.h"
-#include "render_arena.h"
-#include "render_canvas.h"
+#include "RenderArena.h"
+#include "RenderCanvas.h"
 #include "render_line.h"
 #include "VisiblePosition.h"
 #include "Widget.h"
@@ -41,7 +41,7 @@ namespace WebCore {
 
 using namespace EventNames;
 
-RenderReplaced::RenderReplaced(DOM::NodeImpl* node) : RenderBox(node) {
+RenderReplaced::RenderReplaced(WebCore::Node* node) : RenderBox(node) {
   // init RenderObject attributes
   setReplaced(true);
 
@@ -233,7 +233,7 @@ Color RenderReplaced::selectionColor(GraphicsContext* p) const {
 
 // -----------------------------------------------------------------------------
 
-RenderWidget::RenderWidget(DOM::NodeImpl* node)
+RenderWidget::RenderWidget(WebCore::Node* node)
     : RenderReplaced(node), m_refCount(0) {
   m_widget = 0;
   // a replaced element doesn't support being anonymous
@@ -383,7 +383,7 @@ void RenderWidget::paint(PaintInfo& i, int _tx, int _ty) {
 
 void RenderWidget::focusIn(Widget*) {
   RenderArena* arena = ref();
-  RefPtr<NodeImpl> elem = element();
+  RefPtr<Node> elem = element();
   if (elem)
     elem->getDocument()->setFocusNode(elem);
   deref(arena);
@@ -391,7 +391,7 @@ void RenderWidget::focusIn(Widget*) {
 
 void RenderWidget::focusOut(Widget*) {
   RenderArena* arena = ref();
-  RefPtr<NodeImpl> elem = element();
+  RefPtr<Node> elem = element();
   if (elem && elem == elem->getDocument()->focusNode())
     elem->getDocument()->setFocusNode(0);
   deref(arena);
@@ -406,9 +406,9 @@ bool RenderWidget::isVisible(Widget* widget) {
   return style()->visibility() == VISIBLE;
 }
 
-ElementImpl* RenderWidget::element(Widget* widget) {
-  NodeImpl* n = node();
-  return n->isElementNode() ? static_cast<ElementImpl*>(n) : 0;
+Element* RenderWidget::element(Widget* widget) {
+  Node* n = node();
+  return n->isElementNode() ? static_cast<Element*>(n) : 0;
 }
 
 void RenderWidget::deref(RenderArena* arena) {

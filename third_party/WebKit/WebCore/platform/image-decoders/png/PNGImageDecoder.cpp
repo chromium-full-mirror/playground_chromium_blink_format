@@ -93,7 +93,7 @@ class PNGImageReader {
     m_readOffset = 0;
   }
 
-  void decode(const ByteArray& data, bool sizeOnly) {
+  void decode(const DeprecatedByteArray& data, bool sizeOnly) {
     m_decodingSizeOnly = sizeOnly;
 
     // We need to do the setjmp here. Otherwise bad things will happen
@@ -142,7 +142,8 @@ PNGImageDecoder::~PNGImageDecoder() {
 }
 
 // Take the data and store it.
-void PNGImageDecoder::setData(const ByteArray& data, bool allDataReceived) {
+void PNGImageDecoder::setData(const DeprecatedByteArray& data,
+                              bool allDataReceived) {
   if (m_failed)
     return;
 

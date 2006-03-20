@@ -25,7 +25,7 @@
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "KCanvasContainer.h"
-#include "SVGStyledElementImpl.h"
+#include "SVGStyledElement.h"
 
 namespace WebCore {
 
@@ -39,7 +39,7 @@ class KCanvasContainer::Private {
   QMatrix matrix;
 };
 
-KCanvasContainer::KCanvasContainer(SVGStyledElementImpl* node)
+KCanvasContainer::KCanvasContainer(SVGStyledElement* node)
     : RenderContainer(node), d(new Private()) {
   setReplaced(true);
 }

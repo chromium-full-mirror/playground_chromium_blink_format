@@ -44,7 +44,7 @@ class KWQFileButton : public Widget {
   KWQFileButton(WebCore::Frame*);
   ~KWQFileButton();
 
-  void setFilename(const QString&);
+  void setFilename(const DeprecatedString&);
   void click(bool sendMouseEvents);
 
   IntSize sizeForCharacterWidth(int characters) const;
@@ -54,7 +54,7 @@ class KWQFileButton : public Widget {
 
   virtual FocusPolicy focusPolicy() const;
 
-  void filenameChanged(const QString&);
+  void filenameChanged(const DeprecatedString&);
 
   const WebCore::String& filename() const { return m_name; }
 

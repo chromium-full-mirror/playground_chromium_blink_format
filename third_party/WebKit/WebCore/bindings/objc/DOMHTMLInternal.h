@@ -25,11 +25,11 @@
 
 #import "DOMHTML.h"
 
-namespace DOM {
-class HTMLOptionsCollectionImpl;
+namespace WebCore {
+class HTMLOptionsCollection;
 }
 
 @interface DOMHTMLOptionsCollection (WebCoreInternal)
-+ (DOMHTMLOptionsCollection*)_optionsCollectionWithImpl:
-    (DOM::HTMLOptionsCollectionImpl*)impl;
++ (DOMHTMLOptionsCollection*)_optionsCollectionWith:
+    (WebCore::HTMLOptionsCollection*)impl;
 @end

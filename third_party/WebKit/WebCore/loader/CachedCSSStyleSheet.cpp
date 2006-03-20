@@ -39,10 +39,10 @@
 namespace WebCore {
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
-                                         const DOMString& url,
+                                         const String& url,
                                          KIO::CacheControl _cachePolicy,
                                          time_t _expireDate,
-                                         const QString& charset)
+                                         const DeprecatedString& charset)
     : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate),
       m_encoding(charset.latin1()) {
   // It's css we want.
@@ -54,8 +54,9 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
     m_encoding = TextEncoding(Latin1Encoding);
 }
 
-CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
-                                         const QString& stylesheet_data)
+CachedCSSStyleSheet::CachedCSSStyleSheet(
+    const String& url,
+    const DeprecatedString& stylesheet_data)
     : CachedObject(url,
                    CSSStyleSheet,
                    KIO::CC_Verify,
@@ -64,7 +65,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
       m_encoding(InvalidEncoding) {
   m_loading = false;
   m_status = Persistent;
-  m_sheet = DOMString(stylesheet_data);
+  m_sheet = String(stylesheet_data);
 }
 
 CachedCSSStyleSheet::~CachedCSSStyleSheet() {}
@@ -83,7 +84,7 @@ void CachedCSSStyleSheet::deref(CachedObjectClient* c) {
     delete this;
 }
 
-void CachedCSSStyleSheet::setCharset(const QString& chs) {
+void CachedCSSStyleSheet::setCharset(const DeprecatedString& chs) {
   if (!chs.isEmpty()) {
     TextEncoding encoding = TextEncoding(chs.latin1());
     if (encoding.isValid())
@@ -91,12 +92,12 @@ void CachedCSSStyleSheet::setCharset(const QString& chs) {
   }
 }
 
-void CachedCSSStyleSheet::data(ByteArray& data, bool eof) {
+void CachedCSSStyleSheet::data(DeprecatedByteArray& data, bool eof) {
   if (!eof)
     return;
 
   setSize(data.size());
-  m_sheet = DOMString(m_encoding.toUnicode(data.data(), size()));
+  m_sheet = String(m_encoding.toUnicode(data.data(), size()));
   m_loading = false;
 
   checkNotify();
@@ -110,7 +111,7 @@ void CachedCSSStyleSheet::checkNotify() {
   while (CachedObjectClient* c = w.next()) {
 #if __APPLE__
     if (m_response && !KWQIsResponseURLEqualToURL(m_response, m_url))
-      c->setStyleSheet(DOMString(KWQResponseURL(m_response)), m_sheet);
+      c->setStyleSheet(String(KWQResponseURL(m_response)), m_sheet);
     else
 #endif
       c->setStyleSheet(m_url, m_sheet);

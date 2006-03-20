@@ -27,21 +27,21 @@
 #include "render_frames.h"
 
 #include "Cursor.h"
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "Page.h"
-#include "TextImpl.h"
+#include "Text.h"
 #include "dom2_eventsimpl.h"
 #include "html_baseimpl.h"
 #include "html_objectimpl.h"
 #include "htmlnames.h"
 #include "htmltokenizer.h"
-#include "render_arena.h"
-#include "render_canvas.h"
+#include "RenderArena.h"
+#include "RenderCanvas.h"
 #include <qtextstream.h>
 
 namespace WebCore {
@@ -49,7 +49,7 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
-RenderFrameSet::RenderFrameSet(HTMLFrameSetElementImpl* frameSet)
+RenderFrameSet::RenderFrameSet(HTMLFrameSetElement* frameSet)
     : RenderContainer(frameSet) {
   // init RenderObject attributes
   setInline(false);
@@ -154,7 +154,7 @@ void RenderFrameSet::layout() {
     int countPercent = 0;
     int gridLen = m_gridLen[k];
     int* gridDelta = m_gridDelta[k];
-    khtml::Length* grid = k ? element()->m_cols : element()->m_rows;
+    WebCore::Length* grid = k ? element()->m_cols : element()->m_rows;
     int* gridLayout = m_gridLayout[k];
 
     if (grid) {
@@ -414,7 +414,7 @@ void RenderFrameSet::positionFrames() {
   if (!child)
     return;
 
-  //  NodeImpl *child = _first;
+  //  Node *child = _first;
   //  if(!child) return;
 
   int yPos = 0;
@@ -453,7 +453,7 @@ void RenderFrameSet::positionFrames() {
   }
 }
 
-bool RenderFrameSet::userResize(MouseEventImpl* evt) {
+bool RenderFrameSet::userResize(MouseEvent* evt) {
   if (needsLayout())
     return false;
 
@@ -595,15 +595,15 @@ bool RenderFrameSet::canResize(int _x, int _y) {
 }
 
 #ifndef NDEBUG
-void RenderFrameSet::dump(QTextStream* stream, QString ind) const {
+void RenderFrameSet::dump(QTextStream* stream, DeprecatedString ind) const {
   *stream << " totalrows=" << element()->totalRows();
   *stream << " totalcols=" << element()->totalCols();
 
-  uint i;
-  for (i = 0; i < (uint)element()->totalRows(); i++)
+  unsigned i;
+  for (i = 0; i < (unsigned)element()->totalRows(); i++)
     *stream << " hSplitvar(" << i << ")=" << m_hSplitVar[i];
 
-  for (i = 0; i < (uint)element()->totalCols(); i++)
+  for (i = 0; i < (unsigned)element()->totalCols(); i++)
     *stream << " vSplitvar(" << i << ")=" << m_vSplitVar[i];
 
   RenderContainer::dump(stream, ind);
@@ -612,7 +612,7 @@ void RenderFrameSet::dump(QTextStream* stream, QString ind) const {
 
 /**************************************************************************************/
 
-RenderPart::RenderPart(HTMLElementImpl* node) : RenderWidget(node), m_frame(0) {
+RenderPart::RenderPart(HTMLElement* node) : RenderWidget(node), m_frame(0) {
   // init RenderObject attributes
   setInline(false);
 }
@@ -663,15 +663,15 @@ void RenderPart::deleteWidget() {
 
 /***************************************************************************************/
 
-RenderFrame::RenderFrame(HTMLFrameElementImpl* frame) : RenderPart(frame) {
+RenderFrame::RenderFrame(HTMLFrameElement* frame) : RenderPart(frame) {
   setInline(false);
 }
 
 void RenderFrame::viewCleared() {
   if (element() && m_widget && m_widget->isFrameView()) {
     FrameView* view = static_cast<FrameView*>(m_widget);
-    HTMLFrameSetElementImpl* frameSet =
-        static_cast<HTMLFrameSetElementImpl*>(element()->parentNode());
+    HTMLFrameSetElement* frameSet =
+        static_cast<HTMLFrameSetElement*>(element()->parentNode());
     bool hasBorder = element()->m_frameBorder && frameSet->frameBorder();
     int marginw = element()->m_marginWidth;
     int marginh = element()->m_marginHeight;
@@ -686,16 +686,15 @@ void RenderFrame::viewCleared() {
 
 /****************************************************************************************/
 
-RenderPartObject::RenderPartObject(HTMLElementImpl* element)
-    : RenderPart(element) {
+RenderPartObject::RenderPartObject(HTMLElement* element) : RenderPart(element) {
   // init RenderObject attributes
   setInline(true);
   m_hasFallbackContent = false;
 }
 
-static bool isURLAllowed(DOM::DocumentImpl* doc, const QString& url) {
+static bool isURLAllowed(WebCore::Document* doc, const DeprecatedString& url) {
   KURL newURL(doc->completeURL(url));
-  newURL.setRef(QString::null);
+  newURL.setRef(DeprecatedString::null);
 
   if (doc->frame()->page()->frameCount() >= 200)
     return false;
@@ -705,7 +704,7 @@ static bool isURLAllowed(DOM::DocumentImpl* doc, const QString& url) {
   bool foundSelfReference = false;
   for (Frame* frame = doc->frame(); frame; frame = frame->tree()->parent()) {
     KURL frameURL = frame->url();
-    frameURL.setRef(QString::null);
+    frameURL.setRef(DeprecatedString::null);
     if (frameURL == newURL) {
       if (foundSelfReference)
         return false;
@@ -715,8 +714,8 @@ static bool isURLAllowed(DOM::DocumentImpl* doc, const QString& url) {
   return true;
 }
 
-static inline void mapClassIdToServiceType(const QString& classId,
-                                           QString& serviceType) {
+static inline void mapClassIdToServiceType(const DeprecatedString& classId,
+                                           DeprecatedString& serviceType) {
   // It is ActiveX, but the nsplugin system handling
   // should also work, that's why we don't override the
   // serviceType with application/x-activex-handler
@@ -740,24 +739,24 @@ static inline void mapClassIdToServiceType(const QString& classId,
 }
 
 void RenderPartObject::updateWidget() {
-  QString url;
-  QString serviceType;
-  QStringList paramNames;
-  QStringList paramValues;
+  DeprecatedString url;
+  DeprecatedString serviceType;
+  DeprecatedStringList paramNames;
+  DeprecatedStringList paramValues;
   Frame* frame = m_view->frame();
 
   setNeedsLayoutAndMinMaxRecalc();
 
   if (element()->hasTagName(objectTag)) {
-    HTMLObjectElementImpl* o = static_cast<HTMLObjectElementImpl*>(element());
+    HTMLObjectElement* o = static_cast<HTMLObjectElement*>(element());
 
     if (!o->isComplete())
       return;
     // Check for a child EMBED tag.
-    HTMLEmbedElementImpl* embed = 0;
-    for (NodeImpl* child = o->firstChild(); child;) {
+    HTMLEmbedElement* embed = 0;
+    for (Node* child = o->firstChild(); child;) {
       if (child->hasTagName(embedTag)) {
-        embed = static_cast<HTMLEmbedElementImpl*>(child);
+        embed = static_cast<HTMLEmbedElement*>(child);
         break;
       } else if (child->hasTagName(objectTag)) {
         child = child->nextSibling();  // Don't descend into nested OBJECT tags
@@ -769,10 +768,10 @@ void RenderPartObject::updateWidget() {
 
     // Use the attributes from the EMBED tag instead of the OBJECT tag including
     // WIDTH and HEIGHT.
-    HTMLElementImpl* embedOrObject;
+    HTMLElement* embedOrObject;
     if (embed) {
-      embedOrObject = (HTMLElementImpl*)embed;
-      DOMString attribute = embedOrObject->getAttribute(widthAttr);
+      embedOrObject = (HTMLElement*)embed;
+      String attribute = embedOrObject->getAttribute(widthAttr);
       if (!attribute.isEmpty()) {
         o->setAttribute(widthAttr, attribute);
       }
@@ -783,7 +782,7 @@ void RenderPartObject::updateWidget() {
       url = embed->url;
       serviceType = embed->serviceType;
     } else {
-      embedOrObject = (HTMLElementImpl*)o;
+      embedOrObject = (HTMLElement*)o;
     }
 
     // If there was no URL or type defined in EMBED, try the OBJECT tag.
@@ -794,21 +793,21 @@ void RenderPartObject::updateWidget() {
       serviceType = o->serviceType;
     }
 
-    HashSet<DOMStringImpl*, CaseInsensitiveHash> uniqueParamNames;
+    HashSet<StringImpl*, CaseInsensitiveHash> uniqueParamNames;
 
     // Scan the PARAM children.
     // Get the URL and type from the params if we don't already have them.
     // Get the attributes from the params if there is no EMBED tag.
-    NodeImpl* child = o->firstChild();
+    Node* child = o->firstChild();
     while (child && (url.isEmpty() || serviceType.isEmpty() || !embed)) {
       if (child->hasTagName(paramTag)) {
-        HTMLParamElementImpl* p = static_cast<HTMLParamElementImpl*>(child);
-        DOMString name = p->name().lower();
+        HTMLParamElement* p = static_cast<HTMLParamElement*>(child);
+        String name = p->name().lower();
         if (url.isEmpty() && (name == "src" || name == "movie" ||
                               name == "code" || name == "url"))
-          url = p->value().qstring();
+          url = p->value().deprecatedString();
         if (serviceType.isEmpty() && name == "type") {
-          serviceType = p->value().qstring();
+          serviceType = p->value().deprecatedString();
           int pos = serviceType.find(";");
           if (pos != -1) {
             serviceType = serviceType.left(pos);
@@ -816,8 +815,8 @@ void RenderPartObject::updateWidget() {
         }
         if (!embed && !name.isEmpty()) {
           uniqueParamNames.add(p->name().impl());
-          paramNames.append(p->name().qstring());
-          paramValues.append(p->value().qstring());
+          paramNames.append(p->name().deprecatedString());
+          paramValues.append(p->value().deprecatedString());
         }
       }
       child = child->nextSibling();
@@ -832,7 +831,7 @@ void RenderPartObject::updateWidget() {
     // we have to explicitly suppress the tag's CODEBASE attribute if there is
     // none in a PARAM,
     // else our Java plugin will misinterpret it. [4004531]
-    DOMString codebase;
+    String codebase;
     if (!embed && serviceType.lower() == "application/x-java-applet") {
       codebase = "codebase";
       uniqueParamNames.add(
@@ -841,14 +840,14 @@ void RenderPartObject::updateWidget() {
 
     // Turn the attributes of either the EMBED tag or OBJECT tag into arrays,
     // but don't override PARAM values.
-    NamedAttrMapImpl* attributes = embedOrObject->attributes();
+    NamedAttrMap* attributes = embedOrObject->attributes();
     if (attributes) {
       for (unsigned i = 0; i < attributes->length(); ++i) {
-        AttributeImpl* it = attributes->attributeItem(i);
+        Attribute* it = attributes->attributeItem(i);
         const AtomicString& name = it->name().localName();
         if (embed || !uniqueParamNames.contains(name.impl())) {
-          paramNames.append(name.qstring());
-          paramValues.append(it->value().qstring());
+          paramNames.append(name.deprecatedString());
+          paramValues.append(it->value().deprecatedString());
         }
       }
     }
@@ -856,7 +855,7 @@ void RenderPartObject::updateWidget() {
     // If we still don't have a type, try to map from a specific CLASSID to a
     // type.
     if (serviceType.isEmpty() && !o->classId.isEmpty())
-      mapClassIdToServiceType(o->classId.qstring(), serviceType);
+      mapClassIdToServiceType(o->classId.deprecatedString(), serviceType);
 
     // If no URL and type, abort.
     if (url.isEmpty() && serviceType.isEmpty())
@@ -866,20 +865,20 @@ void RenderPartObject::updateWidget() {
 
     // Find out if we support fallback content.
     m_hasFallbackContent = false;
-    for (NodeImpl* child = o->firstChild(); child && !m_hasFallbackContent;
+    for (Node* child = o->firstChild(); child && !m_hasFallbackContent;
          child = child->nextSibling()) {
       if ((!child->isTextNode() && !child->hasTagName(embedTag) &&
            !child->hasTagName(paramTag)) ||  // Discount <embed> and <param>
           (child->isTextNode() &&
-           !static_cast<TextImpl*>(child)->containsOnlyWhitespace()))
+           !static_cast<Text*>(child)->containsOnlyWhitespace()))
         m_hasFallbackContent = true;
     }
-    bool success = frame->requestObject(this, url, o->name().qstring(),
+    bool success = frame->requestObject(this, url, o->name().deprecatedString(),
                                         serviceType, paramNames, paramValues);
     if (!success && m_hasFallbackContent)
       o->renderFallbackContent();
   } else if (element()->hasTagName(embedTag)) {
-    HTMLEmbedElementImpl* o = static_cast<HTMLEmbedElementImpl*>(element());
+    HTMLEmbedElement* o = static_cast<HTMLEmbedElement*>(element());
     url = o->url;
     serviceType = o->serviceType;
 
@@ -889,26 +888,27 @@ void RenderPartObject::updateWidget() {
       return;
 
     // add all attributes set on the embed object
-    NamedAttrMapImpl* a = o->attributes();
+    NamedAttrMap* a = o->attributes();
     if (a) {
       for (unsigned i = 0; i < a->length(); ++i) {
-        AttributeImpl* it = a->attributeItem(i);
-        paramNames.append(it->name().localName().qstring());
-        paramValues.append(it->value().qstring());
+        Attribute* it = a->attributeItem(i);
+        paramNames.append(it->name().localName().deprecatedString());
+        paramValues.append(it->value().deprecatedString());
       }
     }
-    frame->requestObject(this, url, o->getAttribute(nameAttr).qstring(),
+    frame->requestObject(this, url,
+                         o->getAttribute(nameAttr).deprecatedString(),
                          serviceType, paramNames, paramValues);
   } else {
     assert(element()->hasTagName(iframeTag));
-    HTMLIFrameElementImpl* o = static_cast<HTMLIFrameElementImpl*>(element());
-    url = o->m_URL.qstring();
+    HTMLIFrameElement* o = static_cast<HTMLIFrameElement*>(element());
+    url = o->m_URL.deprecatedString();
     if (!isURLAllowed(document(), url))
       return;
     if (url.isEmpty())
       url = "about:blank";
     FrameView* v = static_cast<FrameView*>(m_view);
-    v->frame()->requestFrame(this, url, o->m_name.qstring());
+    v->frame()->requestFrame(this, url, o->m_name.deprecatedString());
   }
 }
 
@@ -931,8 +931,7 @@ void RenderPartObject::viewCleared() {
     int marginw = -1;
     int marginh = -1;
     if (element()->hasTagName(iframeTag)) {
-      HTMLIFrameElementImpl* frame =
-          static_cast<HTMLIFrameElementImpl*>(element());
+      HTMLIFrameElement* frame = static_cast<HTMLIFrameElement*>(element());
       hasBorder = frame->m_frameBorder;
       marginw = frame->m_marginWidth;
       marginh = frame->m_marginHeight;

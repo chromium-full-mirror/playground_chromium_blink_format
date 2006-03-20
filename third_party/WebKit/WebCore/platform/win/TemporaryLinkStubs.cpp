@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "NodeImpl.h"
+#include "Node.h"
 #include "KWQLineEdit.h"
 #include "Font.h"
 #include "KWQFileButton.h"
@@ -18,23 +18,23 @@
 #include "loader.h"
 #include "FrameView.h"
 #include "KWQScrollBar.h"
-#include "KWQKJavaAppletWidget.h"
+#include "JavaAppletWidget.h"
 #include "KWQScrollBar.h"
 #include "Path.h"
-#include "MouseEvent.h"
+#include "PlatformMouseEvent.h"
 #include "CookieJar.h"
 #include "Screen.h"
 #include "History.h"
 #include "Language.h"
 #include "LocalizedStrings.h"
 #include "PlugInInfoStore.h"
-#include "render_theme.h"
+#include "RenderTheme.h"
 #include "FrameWin.h"
 #include "BrowserExtensionWin.h"
 #include "TransferJob.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
-#include "render_canvasimage.h"
+#include "RenderHTMLCanvas.h"
 
 using namespace WebCore;
 
@@ -166,9 +166,9 @@ void Widget::setDrawingAlpha(float) {
   notImplemented();
 }
 
-KJavaAppletWidget::KJavaAppletWidget(IntSize const&,
-                                     Frame*,
-                                     KXMLCore::HashMap<String, String> const&) {
+JavaAppletWidget::JavaAppletWidget(IntSize const&,
+                                   Frame*,
+                                   KXMLCore::HashMap<String, String> const&) {
   notImplemented();
 }
 
@@ -186,9 +186,9 @@ bool QLineEdit::hasSelectedText() const {
   notImplemented();
   return 0;
 }
-QString QLineEdit::selectedText() const {
+DeprecatedString QLineEdit::selectedText() const {
   notImplemented();
-  return QString();
+  return DeprecatedString();
 }
 void QLineEdit::setAutoSaveName(String const&) {
   notImplemented();
@@ -250,7 +250,7 @@ bool QListBox::isSelected(int) const {
   notImplemented();
   return 0;
 }
-void QListBox::appendItem(QString const&, KWQListBoxItemType, bool) {
+void QListBox::appendItem(DeprecatedString const&, KWQListBoxItemType, bool) {
   notImplemented();
 }
 void QListBox::doneAppendingItems() {
@@ -288,7 +288,7 @@ WebCore::IntRect KWQFileButton::frameGeometry() const {
   notImplemented();
   return IntRect();
 }
-void KWQFileButton::setFilename(QString const&) {
+void KWQFileButton::setFilename(DeprecatedString const&) {
   notImplemented();
 }
 int KWQFileButton::baselinePosition(int) const {
@@ -323,10 +323,10 @@ Cursor::Cursor(Image*) {
   notImplemented();
 }
 
-MouseEvent::MouseEvent() {
+PlatformMouseEvent::PlatformMouseEvent() {
   notImplemented();
 }
-bool MouseEvent::isMouseButtonDown(MouseButton) {
+bool PlatformMouseEvent::isMouseButtonDown(MouseButton) {
   notImplemented();
   return false;
 }
@@ -347,11 +347,11 @@ int WebCore::findNextWordFromIndex(QChar const*, int, int, bool) {
   return 0;
 }
 
-Array<char> KWQServeSynchronousRequest(Loader*,
-                                       DocLoader*,
-                                       TransferJob*,
-                                       KURL&,
-                                       QString&) {
+DeprecatedArray<char> KWQServeSynchronousRequest(Loader*,
+                                                 DocLoader*,
+                                                 TransferJob*,
+                                                 KURL&,
+                                                 DeprecatedString&) {
   notImplemented();
   return 0;
 }
@@ -413,16 +413,16 @@ void FrameWin::issueCopyCommand() {
 void FrameWin::openURLRequest(struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
-bool FrameWin::passWheelEventToChildWidget(NodeImpl*) {
+bool FrameWin::passWheelEventToChildWidget(Node*) {
   notImplemented();
   return 0;
 }
 void FrameWin::issueUndoCommand() {
   notImplemented();
 }
-QString FrameWin::mimeTypeForFileName(QString const&) const {
+DeprecatedString FrameWin::mimeTypeForFileName(DeprecatedString const&) const {
   notImplemented();
-  return QString();
+  return DeprecatedString();
 }
 void FrameWin::issuePasteCommand() {
   notImplemented();
@@ -456,8 +456,9 @@ bool FrameWin::canPaste() const {
   notImplemented();
   return 0;
 }
-enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
-                                                            QString const&) {
+enum WebCore::ObjectContentType FrameWin::objectContentType(
+    KURL const&,
+    DeprecatedString const&) {
   notImplemented();
   return (ObjectContentType)0;
 }
@@ -469,9 +470,9 @@ void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
 Plugin* FrameWin::createPlugin(KURL const&,
-                               QStringList const&,
-                               QStringList const&,
-                               QString const&) {
+                               DeprecatedStringList const&,
+                               DeprecatedStringList const&,
+                               DeprecatedString const&) {
   notImplemented();
   return 0;
 }
@@ -501,7 +502,7 @@ void BrowserExtensionWin::createNewWindow(
   notImplemented();
 }
 
-void RenderCanvasImage::setNeedsImageUpdate() {
+void RenderHTMLCanvas::setNeedsImageUpdate() {
   notImplemented();
 }
 
@@ -513,14 +514,14 @@ const Cursor& WebCore::moveCursor() {
   return localCursor;
 }
 
-bool WebCore::historyContains(QString const&) {
+bool WebCore::historyContains(DeprecatedString const&) {
   return false;
 }
 String WebCore::submitButtonDefaultLabel() {
   return "Submit";
 }
 String WebCore::inputElementAltText() {
-  return QString();
+  return DeprecatedString();
 }
 String WebCore::resetButtonDefaultLabel() {
   return "Reset";
@@ -560,12 +561,12 @@ void WebCore::TransferJob::retrieveCharset() const {}
 void FrameWin::restoreDocumentState() {}
 void FrameWin::partClearedInBegin() {}
 void FrameWin::createEmptyDocument() {}
-QString FrameWin::overrideMediaType() const {
-  return QString();
+DeprecatedString FrameWin::overrideMediaType() const {
+  return DeprecatedString();
 }
 void FrameWin::setTitle(String const&) {}
 void FrameWin::handledOnloadEvents() {}
-RangeImpl* FrameWin::markedTextRange() const {
+Range* FrameWin::markedTextRange() const {
   return 0;
 }
 bool FrameWin::passSubframeEventToSubframe(
@@ -587,7 +588,7 @@ void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
                                          bool) {}
 static int frameNumber = 0;
 Frame* FrameWin::createFrame(KURL const&,
-                             QString const&,
+                             DeprecatedString const&,
                              RenderPart*,
                              String const&) {
   return 0;
@@ -595,20 +596,21 @@ Frame* FrameWin::createFrame(KURL const&,
 void FrameWin::saveDocumentState(void) {}
 void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
 void FrameWin::clearUndoRedoOperations(void) {}
-QString FrameWin::incomingReferrer() const {
-  return QString();
+DeprecatedString FrameWin::incomingReferrer() const {
+  return DeprecatedString();
 }
 void FrameWin::clearRecordedFormValues() {}
-void FrameWin::recordFormValue(QString const&,
-                               QString const&,
-                               WebCore::HTMLFormElementImpl*) {}
+void FrameWin::recordFormValue(DeprecatedString const&,
+                               DeprecatedString const&,
+                               WebCore::HTMLFormElement*) {}
 void FrameWin::submitForm(struct WebCore::ResourceRequest const&) {}
 void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
 void FrameWin::respondToChangedContents() {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
-void BrowserExtensionWin::setTypedIconURL(KURL const&, QString const&) {}
+void BrowserExtensionWin::setTypedIconURL(KURL const&,
+                                          DeprecatedString const&) {}
 void BrowserExtensionWin::setIconURL(KURL const&) {}
 int BrowserExtensionWin::getHistoryLength() {
   return 0;
@@ -717,7 +719,7 @@ int QComboBox::baselinePosition(int) const {
 }
 void QComboBox::setWritingDirection(TextDirection) {}
 void QComboBox::clear() {}
-void QComboBox::appendItem(QString const&, KWQListBoxItemType, bool) {}
+void QComboBox::appendItem(DeprecatedString const&, KWQListBoxItemType, bool) {}
 void QComboBox::setCurrentItem(int) {}
 IntSize QComboBox::sizeHint() const {
   return IntSize();

@@ -31,7 +31,7 @@
 #include <khtml_settings.h>
 #include <kio/global.h>
 #include <qptrlist.h>
-#include <QStringList.h>
+#include <DeprecatedStringList.h>
 
 class KURL;
 class KWQLoader;
@@ -42,7 +42,7 @@ class CachedImage;
 class CachedObject;
 class CachedScript;
 class CachedXSLStyleSheet;
-class DocumentImpl;
+class Document;
 class Frame;
 
 /**
@@ -50,20 +50,20 @@ class Frame;
  */
 class DocLoader {
  public:
-  DocLoader(Frame*, DOM::DocumentImpl*);
+  DocLoader(Frame*, WebCore::Document*);
   ~DocLoader();
 
-  CachedImage* requestImage(const DOM::DOMString& url);
-  CachedCSSStyleSheet* requestStyleSheet(const DOM::DOMString& url,
-                                         const QString& charset);
-  CachedScript* requestScript(const DOM::DOMString& url,
-                              const QString& charset);
+  CachedImage* requestImage(const WebCore::String& url);
+  CachedCSSStyleSheet* requestStyleSheet(const WebCore::String& url,
+                                         const DeprecatedString& charset);
+  CachedScript* requestScript(const WebCore::String& url,
+                              const DeprecatedString& charset);
 
 #ifdef KHTML_XSLT
-  CachedXSLStyleSheet* requestXSLStyleSheet(const DOM::DOMString& url);
+  CachedXSLStyleSheet* requestXSLStyleSheet(const WebCore::String& url);
 #endif
 #ifndef KHTML_NO_XBL
-  CachedXBLDocument* requestXBLDocument(const DOM::DOMString& url);
+  CachedXBLDocument* requestXBLDocument(const WebCore::String& url);
 #endif
 
   bool autoloadImages() const { return m_bautoloadImages; }
@@ -73,7 +73,7 @@ class DocLoader {
   }
   time_t expireDate() const { return m_expireDate; }
   Frame* frame() const { return m_frame; }
-  DOM::DocumentImpl* doc() const { return m_doc; }
+  WebCore::Document* doc() const { return m_doc; }
 
   void setExpireDate(time_t);
   void setAutoloadImages(bool);
@@ -88,16 +88,16 @@ class DocLoader {
   bool needReload(const KURL& fullUrl);
 
   friend class Cache;
-  friend class DOM::DocumentImpl;
+  friend class WebCore::Document;
 
-  QStringList m_reloadedURLs;
-  mutable QPtrList<CachedObject> m_docObjects;
+  DeprecatedStringList m_reloadedURLs;
+  mutable DeprecatedPtrList<CachedObject> m_docObjects;
   time_t m_expireDate;
   KIO::CacheControl m_cachePolicy;
   bool m_bautoloadImages : 1;
   unsigned m_showAnimations : 2;  // KHTMLSettings::KAnimationAdvice
   Frame* m_frame;
-  DOM::DocumentImpl* m_doc;
+  WebCore::Document* m_doc;
   bool m_loadInProgress;
 };
 }

@@ -24,13 +24,13 @@
 #include "render_line.h"
 
 #include "CachedImage.h"
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
 #include "RenderBlock.h"
 #include "RenderTableCell.h"
-#include "render_arena.h"
-#include "render_inline.h"
+#include "RenderArena.h"
+#include "RenderInline.h"
 #include <assert.h>
 
 namespace WebCore {
@@ -42,7 +42,7 @@ static bool inInlineBoxDetach;
 class EllipsisBox : public InlineBox {
  public:
   EllipsisBox(RenderObject* obj,
-              const DOM::AtomicString& ellipsisStr,
+              const WebCore::AtomicString& ellipsisStr,
               InlineFlowBox* p,
               int w,
               int y,
@@ -69,7 +69,7 @@ class EllipsisBox : public InlineBox {
                            int _ty);
 
  private:
-  DOM::AtomicString m_str;
+  WebCore::AtomicString m_str;
   InlineBox* m_markupBox;
 };
 
@@ -940,12 +940,12 @@ static bool shouldDrawDecoration(RenderObject* obj) {
     if (curr->isText() && !curr->isBR()) {
       if (!curr->style()->collapseWhiteSpace())
         return true;
-      NodeImpl* currElement = curr->element();
+      Node* currElement = curr->element();
       if (!currElement)
         return true;
       if (!currElement->isTextNode())
         return true;
-      if (!static_cast<TextImpl*>(currElement)->containsOnlyWhitespace())
+      if (!static_cast<Text*>(currElement)->containsOnlyWhitespace())
         return true;
     }
   }
@@ -1419,7 +1419,7 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int _x, int _tx) {
 }
 
 void RootInlineBox::setLineBreakInfo(RenderObject* obj,
-                                     uint breakPos,
+                                     unsigned breakPos,
                                      BidiStatus* status,
                                      BidiContext* context) {
   m_lineBreakObj = obj;

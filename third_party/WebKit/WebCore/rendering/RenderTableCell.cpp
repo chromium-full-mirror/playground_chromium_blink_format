@@ -37,7 +37,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderTableCell::RenderTableCell(NodeImpl* _node) : RenderBlock(_node) {
+RenderTableCell::RenderTableCell(Node* _node) : RenderBlock(_node) {
   _col = -1;
   _row = -1;
   cSpan = rSpan = 1;
@@ -58,9 +58,9 @@ void RenderTableCell::destroy() {
 void RenderTableCell::updateFromElement() {
   int oldRSpan = rSpan;
   int oldCSpan = cSpan;
-  NodeImpl* node = element();
+  Node* node = element();
   if (node && (node->hasTagName(tdTag) || node->hasTagName(thTag))) {
-    HTMLTableCellElementImpl* tc = static_cast<HTMLTableCellElementImpl*>(node);
+    HTMLTableCellElement* tc = static_cast<HTMLTableCellElement*>(node);
     cSpan = tc->colSpan();
     rSpan = tc->rowSpan();
   }
@@ -83,8 +83,7 @@ void RenderTableCell::calcMinMaxWidth() {
   if (element() && style()->autoWrap()) {
     // See if nowrap was set.
     Length w = styleOrColWidth();
-    DOMString nowrap =
-        static_cast<ElementImpl*>(element())->getAttribute(nowrapAttr);
+    String nowrap = static_cast<Element*>(element())->getAttribute(nowrapAttr);
     if (!nowrap.isNull() && w.isFixed())
       // Nowrap is set, but we didn't actually use it because of the
       // fixed width set on the cell.  Even so, it is a WinIE/Moz trait
@@ -658,13 +657,14 @@ class CollapsedBorders {
   int count;
 };
 
-static void addBorderStyle(QValueList<CollapsedBorderValue>& borderStyles,
-                           CollapsedBorderValue borderValue) {
+static void addBorderStyle(
+    DeprecatedValueList<CollapsedBorderValue>& borderStyles,
+    CollapsedBorderValue borderValue) {
   if (!borderValue.exists() || borderStyles.contains(borderValue))
     return;
 
-  QValueListIterator<CollapsedBorderValue> it = borderStyles.begin();
-  QValueListIterator<CollapsedBorderValue> end = borderStyles.end();
+  DeprecatedValueListIterator<CollapsedBorderValue> it = borderStyles.begin();
+  DeprecatedValueListIterator<CollapsedBorderValue> end = borderStyles.end();
   for (; it != end; ++it) {
     CollapsedBorderValue result = compareBorders(*it, borderValue);
     if (result == *it) {
@@ -677,7 +677,7 @@ static void addBorderStyle(QValueList<CollapsedBorderValue>& borderStyles,
 }
 
 void RenderTableCell::collectBorders(
-    QValueList<CollapsedBorderValue>& borderStyles) {
+    DeprecatedValueList<CollapsedBorderValue>& borderStyles) {
   bool rtl = table()->style()->direction() == RTL;
   addBorderStyle(borderStyles, collapsedLeftBorder(rtl));
   addBorderStyle(borderStyles, collapsedRightBorder(rtl));
@@ -823,7 +823,7 @@ void RenderTableCell::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
 }
 
 #ifndef NDEBUG
-void RenderTableCell::dump(QTextStream* stream, QString ind) const {
+void RenderTableCell::dump(QTextStream* stream, DeprecatedString ind) const {
   *stream << " row=" << _row;
   *stream << " col=" << _col;
   *stream << " rSpan=" << rSpan;

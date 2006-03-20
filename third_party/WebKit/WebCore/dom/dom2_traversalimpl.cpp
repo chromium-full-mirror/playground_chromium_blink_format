@@ -25,21 +25,21 @@
 #include "config.h"
 #include "dom2_traversalimpl.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "ExceptionCode.h"
 
-namespace DOM {
+namespace WebCore {
 
-short NodeFilterCondition::acceptNode(NodeImpl*) const {
-  return NodeFilterImpl::FILTER_ACCEPT;
+short NodeFilterCondition::acceptNode(Node*) const {
+  return NodeFilter::FILTER_ACCEPT;
 }
 
 // --------------------------------------------------------------
 
-NodeFilterImpl::NodeFilterImpl(NodeFilterCondition* condition)
+NodeFilter::NodeFilter(NodeFilterCondition* condition)
     : m_condition(condition) {}
 
-short NodeFilterImpl::acceptNode(NodeImpl* node) const {
+short NodeFilter::acceptNode(Node* node) const {
   // cast to short silences "enumeral and non-enumeral types in return" warning
   return m_condition ? m_condition->acceptNode(node)
                      : static_cast<short>(FILTER_ACCEPT);
@@ -47,18 +47,18 @@ short NodeFilterImpl::acceptNode(NodeImpl* node) const {
 
 // --------------------------------------------------------------
 
-TraversalImpl::TraversalImpl(NodeImpl* rootNode,
-                             unsigned whatToShow,
-                             PassRefPtr<NodeFilterImpl> nodeFilter,
-                             bool expandEntityReferences)
+Traversal::Traversal(Node* rootNode,
+                     unsigned whatToShow,
+                     PassRefPtr<NodeFilter> nodeFilter,
+                     bool expandEntityReferences)
     : m_root(rootNode),
       m_whatToShow(whatToShow),
       m_filter(nodeFilter),
       m_expandEntityReferences(expandEntityReferences) {}
 
-TraversalImpl::~TraversalImpl() {}
+Traversal::~Traversal() {}
 
-short TraversalImpl::acceptNode(NodeImpl* node) const {
+short Traversal::acceptNode(Node* node) const {
   // FIXME: If XML is implemented we have to check expandEntityRerefences in
   // this function.
   // The bid twiddling here is done to map DOM node types, which are given as
@@ -68,17 +68,17 @@ short TraversalImpl::acceptNode(NodeImpl* node) const {
     // cast to short silences "enumeral and non-enumeral types in return"
     // warning
     return m_filter ? m_filter->acceptNode(node)
-                    : static_cast<short>(NodeFilterImpl::FILTER_ACCEPT);
-  return NodeFilterImpl::FILTER_SKIP;
+                    : static_cast<short>(NodeFilter::FILTER_ACCEPT);
+  return NodeFilter::FILTER_SKIP;
 }
 
 // --------------------------------------------------------------
 
-NodeIteratorImpl::NodeIteratorImpl(NodeImpl* rootNode,
-                                   unsigned whatToShow,
-                                   PassRefPtr<NodeFilterImpl> filter,
-                                   bool expandEntityReferences)
-    : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
+NodeIterator::NodeIterator(Node* rootNode,
+                           unsigned whatToShow,
+                           PassRefPtr<NodeFilter> filter,
+                           bool expandEntityReferences)
+    : Traversal(rootNode, whatToShow, filter, expandEntityReferences),
       m_beforeReferenceNode(true),
       m_detached(false),
       m_doc(rootNode ? rootNode->getDocument() : 0) {
@@ -86,31 +86,31 @@ NodeIteratorImpl::NodeIteratorImpl(NodeImpl* rootNode,
     document()->attachNodeIterator(this);
 }
 
-NodeIteratorImpl::~NodeIteratorImpl() {
+NodeIterator::~NodeIterator() {
   if (document())
     document()->detachNodeIterator(this);
 }
 
-NodeImpl* NodeIteratorImpl::findNextNode(NodeImpl* node) const {
+Node* NodeIterator::findNextNode(Node* node) const {
   while ((node = node->traverseNextNode())) {
     // NodeIterators treat the DOM tree as a flat list of nodes.
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT)
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT)
       break;
   }
   return node;
 }
 
-NodeImpl* NodeIteratorImpl::nextNode(ExceptionCode& ec) {
+Node* NodeIterator::nextNode(ExceptionCode& ec) {
   if (detached()) {
     ec = INVALID_STATE_ERR;
     return 0;
   }
 
-  NodeImpl* node = referenceNode() ? referenceNode() : root();
+  Node* node = referenceNode() ? referenceNode() : root();
   if (!pointerBeforeReferenceNode() ||
-      acceptNode(node) != NodeFilterImpl::FILTER_ACCEPT)
+      acceptNode(node) != NodeFilter::FILTER_ACCEPT)
     node = findNextNode(node);
   if (node)
     setReferenceNode(node);
@@ -118,21 +118,21 @@ NodeImpl* NodeIteratorImpl::nextNode(ExceptionCode& ec) {
   return node;
 }
 
-NodeImpl* NodeIteratorImpl::findPreviousNode(NodeImpl* node) const {
+Node* NodeIterator::findPreviousNode(Node* node) const {
   while ((node = node->traversePreviousNode())) {
     // NodeIterators treat the DOM tree as a flat list of nodes.
     // In other words, FILTER_REJECT does not pass over descendants
     // of the rejected node. Hence, FILTER_REJECT is the same as FILTER_SKIP.
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT)
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT)
       break;
   }
   return node;
 }
 
-NodeImpl* NodeIteratorImpl::previousNode(ExceptionCode&) {
-  NodeImpl* node = referenceNode() ? referenceNode() : root();
+Node* NodeIterator::previousNode(ExceptionCode&) {
+  Node* node = referenceNode() ? referenceNode() : root();
   if (pointerBeforeReferenceNode() ||
-      acceptNode(node) != NodeFilterImpl::FILTER_ACCEPT)
+      acceptNode(node) != NodeFilter::FILTER_ACCEPT)
     node = findPreviousNode(node);
   if (node)
     setReferenceNode(node);
@@ -140,17 +140,17 @@ NodeImpl* NodeIteratorImpl::previousNode(ExceptionCode&) {
   return node;
 }
 
-void NodeIteratorImpl::detach(ExceptionCode&) {
+void NodeIterator::detach(ExceptionCode&) {
   if (!detached() && document())
     document()->detachNodeIterator(this);
   setDetached();
 }
 
-void NodeIteratorImpl::setReferenceNode(NodeImpl* node) {
+void NodeIterator::setReferenceNode(Node* node) {
   m_referenceNode = node;
 }
 
-void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
+void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
   // Iterator is not affected if the removed node is the reference node and is
   // the root.
   // or if removed node is not the reference node, or the ancestor of the
@@ -164,7 +164,7 @@ void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
     return;
 
   if (pointerBeforeReferenceNode()) {
-    NodeImpl* node = findNextNode(removedNode);
+    Node* node = findNextNode(removedNode);
     if (node) {
       // Move out from under the node being removed if the reference node is
       // a descendant of the node being removed.
@@ -193,7 +193,7 @@ void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
       }
     }
   } else {
-    NodeImpl* node = findPreviousNode(removedNode);
+    Node* node = findPreviousNode(removedNode);
     if (node) {
       // Move out from under the node being removed if the reference node is
       // a descendant of the node being removed.
@@ -219,14 +219,14 @@ void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* removedNode) {
 
 // --------------------------------------------------------------
 
-TreeWalkerImpl::TreeWalkerImpl(NodeImpl* rootNode,
-                               unsigned whatToShow,
-                               PassRefPtr<NodeFilterImpl> filter,
-                               bool expandEntityReferences)
-    : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
+TreeWalker::TreeWalker(Node* rootNode,
+                       unsigned whatToShow,
+                       PassRefPtr<NodeFilter> filter,
+                       bool expandEntityReferences)
+    : Traversal(rootNode, whatToShow, filter, expandEntityReferences),
       m_current(rootNode) {}
 
-void TreeWalkerImpl::setCurrentNode(NodeImpl* node, ExceptionCode& ec) {
+void TreeWalker::setCurrentNode(Node* node, ExceptionCode& ec) {
   if (!node) {
     ec = NOT_SUPPORTED_ERR;
     return;
@@ -235,17 +235,17 @@ void TreeWalkerImpl::setCurrentNode(NodeImpl* node, ExceptionCode& ec) {
   m_current = node;
 }
 
-void TreeWalkerImpl::setCurrentNode(NodeImpl* node) {
+void TreeWalker::setCurrentNode(Node* node) {
   assert(node);
   int dummy;
   setCurrentNode(node, dummy);
 }
 
-NodeImpl* TreeWalkerImpl::parentNode() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->parentNode(); node && node != root();
+Node* TreeWalker::parentNode() {
+  Node* result = 0;
+  for (Node* node = currentNode()->parentNode(); node && node != root();
        node = node->parentNode()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT) {
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT) {
       setCurrentNode(node);
       result = node;
       break;
@@ -254,11 +254,11 @@ NodeImpl* TreeWalkerImpl::parentNode() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::firstChild() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->firstChild(); node;
+Node* TreeWalker::firstChild() {
+  Node* result = 0;
+  for (Node* node = currentNode()->firstChild(); node;
        node = node->nextSibling()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT) {
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT) {
       setCurrentNode(node);
       result = node;
       break;
@@ -267,11 +267,11 @@ NodeImpl* TreeWalkerImpl::firstChild() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::lastChild() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->lastChild(); node;
+Node* TreeWalker::lastChild() {
+  Node* result = 0;
+  for (Node* node = currentNode()->lastChild(); node;
        node = node->previousSibling()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT) {
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT) {
       setCurrentNode(node);
       result = node;
       break;
@@ -280,11 +280,11 @@ NodeImpl* TreeWalkerImpl::lastChild() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::previousSibling() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->previousSibling(); node;
+Node* TreeWalker::previousSibling() {
+  Node* result = 0;
+  for (Node* node = currentNode()->previousSibling(); node;
        node = node->previousSibling()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT) {
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT) {
       setCurrentNode(node);
       result = node;
       break;
@@ -293,11 +293,11 @@ NodeImpl* TreeWalkerImpl::previousSibling() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::nextSibling() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->nextSibling(); node;
+Node* TreeWalker::nextSibling() {
+  Node* result = 0;
+  for (Node* node = currentNode()->nextSibling(); node;
        node = node->nextSibling()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT) {
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT) {
       setCurrentNode(node);
       result = node;
       break;
@@ -306,11 +306,11 @@ NodeImpl* TreeWalkerImpl::nextSibling() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::previousNode() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->traversePreviousNode(); node;
+Node* TreeWalker::previousNode() {
+  Node* result = 0;
+  for (Node* node = currentNode()->traversePreviousNode(); node;
        node = node->traversePreviousNode()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT &&
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT &&
         !ancestorRejected(node)) {
       setCurrentNode(node);
       result = node;
@@ -320,11 +320,11 @@ NodeImpl* TreeWalkerImpl::previousNode() {
   return result;
 }
 
-NodeImpl* TreeWalkerImpl::nextNode() {
-  NodeImpl* result = 0;
-  for (NodeImpl* node = currentNode()->traverseNextNode(); node;
+Node* TreeWalker::nextNode() {
+  Node* result = 0;
+  for (Node* node = currentNode()->traverseNextNode(); node;
        node = node->traverseNextNode()) {
-    if (acceptNode(node) == NodeFilterImpl::FILTER_ACCEPT &&
+    if (acceptNode(node) == NodeFilter::FILTER_ACCEPT &&
         !ancestorRejected(node)) {
       setCurrentNode(node);
       result = node;
@@ -334,11 +334,11 @@ NodeImpl* TreeWalkerImpl::nextNode() {
   return result;
 }
 
-bool TreeWalkerImpl::ancestorRejected(const NodeImpl* node) const {
-  for (NodeImpl* a = node->parentNode(); a && a != root(); a = a->parentNode())
-    if (acceptNode(a) == NodeFilterImpl::FILTER_REJECT)
+bool TreeWalker::ancestorRejected(const Node* node) const {
+  for (Node* a = node->parentNode(); a && a != root(); a = a->parentNode())
+    if (acceptNode(a) == NodeFilter::FILTER_REJECT)
       return true;
   return false;
 }
 
-}  // namespace DOM
+}  // namespace WebCore

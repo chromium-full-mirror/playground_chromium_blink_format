@@ -69,7 +69,7 @@ class KRenderingDevice {
   virtual KRenderingDeviceContext* contextForImage(
       KCanvasImage* image) const = 0;
 
-  virtual QString stringForPath(const KCanvasPath* path) = 0;
+  virtual DeprecatedString stringForPath(const KCanvasPath* path) = 0;
 
   // Creation tools
   virtual KCanvasResource* createResource(const KCResourceType& type) const = 0;
@@ -80,12 +80,11 @@ class KRenderingDevice {
 
   virtual RenderPath* createItem(RenderArena* arena,
                                  RenderStyle* style,
-                                 SVGStyledElementImpl* node,
+                                 SVGStyledElement* node,
                                  KCanvasPath* path) const = 0;
-  virtual KCanvasContainer* createContainer(
-      RenderArena* arena,
-      RenderStyle* style,
-      SVGStyledElementImpl* node) const = 0;
+  virtual KCanvasContainer* createContainer(RenderArena* arena,
+                                            RenderStyle* style,
+                                            SVGStyledElement* node) const = 0;
   virtual KCanvasPath* createPath() const = 0;
 
  private:

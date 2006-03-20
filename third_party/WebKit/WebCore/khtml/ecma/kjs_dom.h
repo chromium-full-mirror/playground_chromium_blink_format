@@ -21,24 +21,24 @@
 #ifndef KJS_DOM_H
 #define KJS_DOM_H
 
-#include "NodeListImpl.h"
+#include "NodeList.h"
 #include "Shared.h"
 #include "kjs_binding.h"
 #include <qvaluelist.h>
 
-namespace DOM {
+namespace WebCore {
 class AtomicString;
-class AttrImpl;
-class CharacterDataImpl;
-class DocumentTypeImpl;
-class DOMImplementationImpl;
-class ElementImpl;
-class EntityImpl;
-class EventTargetNodeImpl;
-class NamedNodeMapImpl;
-class NotationImpl;
-class ProcessingInstructionImpl;
-class TextImpl;
+class Attr;
+class CharacterData;
+class DocumentType;
+class DOMImplementation;
+class Element;
+class Entity;
+class EventTargetNode;
+class NamedNodeMap;
+class Notation;
+class ProcessingInstruction;
+class Text;
 }
 
 namespace KJS {
@@ -47,7 +47,7 @@ KJS_DEFINE_PROTOTYPE(DOMNodeProto)
 
 class DOMNode : public DOMObject {
  public:
-  DOMNode(ExecState* exec, DOM::NodeImpl* n);
+  DOMNode(ExecState* exec, WebCore::Node* n);
   virtual ~DOMNode();
   virtual bool toBoolean(ExecState*) const;
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -58,7 +58,7 @@ class DOMNode : public DOMObject {
                    JSValue* value,
                    int attr = None);
   void putValueProperty(ExecState* exec, int token, JSValue* value, int attr);
-  DOM::NodeImpl* impl() const { return m_impl.get(); }
+  WebCore::Node* impl() const { return m_impl.get(); }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -103,20 +103,20 @@ class DOMNode : public DOMObject {
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
-  DOMNode(DOM::NodeImpl* n);
-  RefPtr<DOM::NodeImpl> m_impl;
+  DOMNode(WebCore::Node* n);
+  RefPtr<WebCore::Node> m_impl;
 };
 
 KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMEventTargetNodeProto, DOMNodeProto)
 
 class DOMEventTargetNode : public DOMNode {
  public:
-  DOMEventTargetNode(ExecState* exec, DOM::NodeImpl* n);
+  DOMEventTargetNode(ExecState* exec, WebCore::Node* n);
 
   void setListener(ExecState* exec,
-                   const DOM::AtomicString& eventType,
+                   const WebCore::AtomicString& eventType,
                    JSValue* func) const;
-  JSValue* getListener(const DOM::AtomicString& eventType) const;
+  JSValue* getListener(const WebCore::AtomicString& eventType) const;
   virtual void pushEventHandlerScope(ExecState* exec, ScopeChain& scope) const;
 
   bool getOwnPropertySlot(ExecState* exec,
@@ -179,15 +179,15 @@ class DOMEventTargetNode : public DOMNode {
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
-  DOMEventTargetNode(DOM::NodeImpl* n);
+  DOMEventTargetNode(WebCore::Node* n);
 };
 
-DOM::NodeImpl* toNode(
+WebCore::Node* toNode(
     JSValue*);  // returns 0 if passed-in value is not a DOMNode object
 
 class DOMNodeList : public DOMObject {
  public:
-  DOMNodeList(ExecState*, DOM::NodeListImpl* l) : m_impl(l) {}
+  DOMNodeList(ExecState*, WebCore::NodeList* l) : m_impl(l) {}
   ~DOMNodeList();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -200,7 +200,7 @@ class DOMNodeList : public DOMObject {
   virtual bool toBoolean(ExecState*) const { return true; }
   static const ClassInfo info;
   enum { Length, Item };
-  DOM::NodeListImpl* impl() const { return m_impl.get(); }
+  WebCore::NodeList* impl() const { return m_impl.get(); }
 
   virtual JSValue* toPrimitive(ExecState* exec,
                                JSType preferred = UndefinedType) const;
@@ -215,12 +215,12 @@ class DOMNodeList : public DOMObject {
                              const Identifier&,
                              const PropertySlot& slot);
 
-  RefPtr<DOM::NodeListImpl> m_impl;
+  RefPtr<WebCore::NodeList> m_impl;
 };
 
 class DOMDocument : public DOMEventTargetNode {
  public:
-  DOMDocument(ExecState* exec, DOM::DocumentImpl* d);
+  DOMDocument(ExecState* exec, WebCore::Document* d);
   ~DOMDocument();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -277,17 +277,17 @@ class DOMDocument : public DOMEventTargetNode {
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
-  DOMDocument(DOM::DocumentImpl* d);
+  DOMDocument(WebCore::Document* d);
 };
 
-DOM::AttrImpl* toAttr(
+WebCore::Attr* toAttr(
     JSValue*);  // returns 0 if passed-in value is not a DOMAttr object
 
 KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMElementProto, DOMEventTargetNodeProto)
 
 class DOMElement : public DOMEventTargetNode {
  public:
-  DOMElement(ExecState* exec, DOM::ElementImpl* e);
+  DOMElement(ExecState* exec, WebCore::Element* e);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   void putValueProperty(ExecState* exec,
@@ -321,7 +321,7 @@ class DOMElement : public DOMEventTargetNode {
 
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
-  DOMElement(DOM::ElementImpl* e);
+  DOMElement(WebCore::Element* e);
 
  private:
   static JSValue* attributeGetter(ExecState* exec,
@@ -330,15 +330,15 @@ class DOMElement : public DOMEventTargetNode {
                                   const PropertySlot& slot);
 };
 
-DOM::ElementImpl* toElement(
+WebCore::Element* toElement(
     JSValue*);  // returns 0 if passed-in value is not a DOMElement object
 
-DOM::DocumentTypeImpl* toDocumentType(
+WebCore::DocumentType* toDocumentType(
     JSValue*);  // returns 0 if passed-in value is not a DOMDocumentType object
 
 class DOMNamedNodeMap : public DOMObject {
  public:
-  DOMNamedNodeMap(ExecState*, DOM::NamedNodeMapImpl* m);
+  DOMNamedNodeMap(ExecState*, WebCore::NamedNodeMap* m);
   ~DOMNamedNodeMap();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   // no put - all read-only
@@ -354,7 +354,7 @@ class DOMNamedNodeMap : public DOMObject {
     SetNamedItemNS,
     RemoveNamedItemNS
   };
-  DOM::NamedNodeMapImpl* impl() const { return m_impl.get(); }
+  WebCore::NamedNodeMap* impl() const { return m_impl.get(); }
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
@@ -370,7 +370,7 @@ class DOMNamedNodeMap : public DOMObject {
                              const Identifier&,
                              const PropertySlot& slot);
 
-  RefPtr<DOM::NamedNodeMapImpl> m_impl;
+  RefPtr<WebCore::NamedNodeMap> m_impl;
 };
 
 // Constructor for Node - constructor stuff not implemented yet
@@ -395,12 +395,12 @@ class DOMExceptionConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* toJS(ExecState*, WebCore::DocumentImpl*);
-bool checkNodeSecurity(ExecState* exec, DOM::NodeImpl* n);
-JSValue* getRuntimeObject(ExecState* exec, DOM::NodeImpl* n);
-JSValue* toJS(ExecState*, PassRefPtr<WebCore::NodeImpl>);
-JSValue* toJS(ExecState*, WebCore::NamedNodeMapImpl*);
-JSValue* toJS(ExecState*, PassRefPtr<WebCore::NodeListImpl>);
+JSValue* toJS(ExecState*, WebCore::Document*);
+bool checkNodeSecurity(ExecState* exec, WebCore::Node* n);
+JSValue* getRuntimeObject(ExecState* exec, WebCore::Node* n);
+JSValue* toJS(ExecState*, PassRefPtr<WebCore::Node>);
+JSValue* toJS(ExecState*, WebCore::NamedNodeMap*);
+JSValue* toJS(ExecState*, PassRefPtr<WebCore::NodeList>);
 JSObject* getNodeConstructor(ExecState* exec);
 JSObject* getDOMExceptionConstructor(ExecState* exec);
 
@@ -408,8 +408,9 @@ JSObject* getDOMExceptionConstructor(ExecState* exec);
 // when multiple nodes have the same name.
 class DOMNamedNodesCollection : public DOMObject {
  public:
-  DOMNamedNodesCollection(ExecState* exec,
-                          const QValueList<RefPtr<DOM::NodeImpl>>& nodes);
+  DOMNamedNodesCollection(
+      ExecState* exec,
+      const DeprecatedValueList<RefPtr<WebCore::Node>>& nodes);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
  private:
@@ -422,7 +423,7 @@ class DOMNamedNodesCollection : public DOMObject {
                               const Identifier&,
                               const PropertySlot& slot);
 
-  QValueList<RefPtr<DOM::NodeImpl>> m_nodes;
+  DeprecatedValueList<RefPtr<WebCore::Node>> m_nodes;
 };
 
 }  // namespace

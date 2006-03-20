@@ -26,17 +26,17 @@
 #include "config.h"
 #include "InsertParagraphSeparatorCommand.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "Logging.h"
-#include "css_computedstyle.h"
-#include "cssproperties.h"
+#include "CSSComputedStyleDeclaration.h"
+#include "CSSPropertyNames.h"
 #include "dom_elementimpl.h"
-#include "dom_position.h"
-#include "TextImpl.h"
+#include "Position.h"
+#include "Text.h"
 #include "htmlediting.h"
-#include "HTMLElementImpl.h"
+#include "HTMLElement.h"
 #include "htmlnames.h"
-#include "render_object.h"
+#include "RenderObject.h"
 #include "VisiblePosition.h"
 #include "visible_units.h"
 #include <kxmlcore/Assertions.h>
@@ -46,7 +46,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 InsertParagraphSeparatorCommand::InsertParagraphSeparatorCommand(
-    DocumentImpl* document)
+    Document* document)
     : CompositeEditCommand(document) {}
 
 bool InsertParagraphSeparatorCommand::preservesTypingStyle() const {
@@ -74,25 +74,25 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
   if (!m_style)
     return;
 
-  CSSComputedStyleDeclarationImpl endingStyle(endingSelection().start().node());
+  CSSComputedStyleDeclaration endingStyle(endingSelection().start().node());
   endingStyle.diff(m_style.get());
   if (m_style->length() > 0)
     applyStyle(m_style.get());
 }
 
-PassRefPtr<ElementImpl> createListItemElement(DocumentImpl* document) {
+PassRefPtr<Element> createListItemElement(Document* document) {
   ExceptionCode ec = 0;
-  RefPtr<ElementImpl> breakNode =
+  RefPtr<Element> breakNode =
       document->createElementNS(xhtmlNamespaceURI, "li", ec);
   ASSERT(ec == 0);
   return breakNode.release();
 }
 
-static NodeImpl* embeddedSublist(NodeImpl* listItem) {
+static Node* embeddedSublist(Node* listItem) {
   // check for sublist embedded in the list item
   // NOTE: Must allow for collapsed sublist (i.e. no renderer), so just check
   // DOM
-  for (NodeImpl* n = listItem->firstChild(); n; n = n->nextSibling()) {
+  for (Node* n = listItem->firstChild(); n; n = n->nextSibling()) {
     if (isListElement(n))
       return n;
   }
@@ -100,11 +100,11 @@ static NodeImpl* embeddedSublist(NodeImpl* listItem) {
   return 0;
 }
 
-static NodeImpl* appendedSublist(NodeImpl* listItem) {
+static Node* appendedSublist(Node* listItem) {
   // check for sublist between regular list items
   // NOTE: Must allow for collapsed sublist (i.e. no renderer), so just check
   // DOM
-  for (NodeImpl* n = listItem->nextSibling(); n; n = n->nextSibling()) {
+  for (Node* n = listItem->nextSibling(); n; n = n->nextSibling()) {
     if (isListElement(n))
       return n;
     if (n->renderer() && n->renderer()->isListItem())
@@ -114,10 +114,9 @@ static NodeImpl* appendedSublist(NodeImpl* listItem) {
   return 0;
 }
 
-static NodeImpl* enclosingEmptyListItem(const VisiblePosition& visiblePos) {
+static Node* enclosingEmptyListItem(const VisiblePosition& visiblePos) {
   // check that position is on a line by itself inside a list item
-  NodeImpl* listChildNode =
-      enclosingListChild(visiblePos.deepEquivalent().node());
+  Node* listChildNode = enclosingListChild(visiblePos.deepEquivalent().node());
   if (!listChildNode || !isStartOfLine(visiblePos) || !isEndOfLine(visiblePos))
     return 0;
 
@@ -156,16 +155,16 @@ void InsertParagraphSeparatorCommand::doApply() {
 
   //---------------------------------------------------------------------
   // Handle special case of typing return on an empty list item
-  NodeImpl* emptyListItem = enclosingEmptyListItem(visiblePos);
+  Node* emptyListItem = enclosingEmptyListItem(visiblePos);
   if (emptyListItem) {
-    NodeImpl* listNode = emptyListItem->parentNode();
-    RefPtr<NodeImpl> newBlock = isListElement(listNode->parentNode())
-                                    ? createListItemElement(document())
-                                    : createDefaultParagraphElement(document());
+    Node* listNode = emptyListItem->parentNode();
+    RefPtr<Node> newBlock = isListElement(listNode->parentNode())
+                                ? createListItemElement(document())
+                                : createDefaultParagraphElement(document());
 
     if (emptyListItem->renderer()->nextSibling()) {
       if (emptyListItem->renderer()->previousSibling())
-        splitElement(static_cast<ElementImpl*>(listNode), emptyListItem);
+        splitElement(static_cast<Element*>(listNode), emptyListItem);
       insertNodeBefore(newBlock.get(), listNode);
       removeNode(emptyListItem);
     } else {
@@ -182,8 +181,8 @@ void InsertParagraphSeparatorCommand::doApply() {
 
   //---------------------------------------------------------------------
   // Prepare for more general cases.
-  NodeImpl* startNode = pos.node();
-  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
+  Node* startNode = pos.node();
+  Node* startBlock = startNode->enclosingBlockFlowElement();
   if (!startBlock || !startBlock->parentNode())
     return;
 
@@ -192,10 +191,10 @@ void InsertParagraphSeparatorCommand::doApply() {
   bool nestNewBlock = false;
 
   // Create block to be inserted.
-  RefPtr<NodeImpl> blockToInsert;
+  RefPtr<Node> blockToInsert;
   if (startBlock == startBlock->rootEditableElement()) {
-    blockToInsert = static_pointer_cast<NodeImpl>(
-        createDefaultParagraphElement(document()));
+    blockToInsert =
+        static_pointer_cast<Node>(createDefaultParagraphElement(document()));
     nestNewBlock = true;
   } else
     blockToInsert = startBlock->cloneNode(false);
@@ -208,7 +207,7 @@ void InsertParagraphSeparatorCommand::doApply() {
       if (isFirstInBlock) {
         // block is empty: create an empty paragraph to
         // represent the content before the new one.
-        RefPtr<NodeImpl> extraBlock = createDefaultParagraphElement(document());
+        RefPtr<Node> extraBlock = createDefaultParagraphElement(document());
         appendNode(extraBlock.get(), startBlock);
         appendBlockPlaceholder(extraBlock.get());
       }
@@ -230,7 +229,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   if (isFirstInBlock || !inSameBlock(visiblePos, visiblePos.previous())) {
     pos = pos.downstream();
     Position refPos;
-    NodeImpl* refNode;
+    Node* refNode;
     if (isFirstInBlock && !nestNewBlock)
       refNode = startBlock;
     else if (pos.node() == startBlock && nestNewBlock) {
@@ -264,9 +263,9 @@ void InsertParagraphSeparatorCommand::doApply() {
   startNode = pos.node();
 
   // Build up list of ancestors in between the start node and the start block.
-  QPtrList<NodeImpl> ancestors;
+  DeprecatedPtrList<Node> ancestors;
   if (startNode != startBlock) {
-    for (NodeImpl* n = startNode->parentNode(); n && n != startBlock;
+    for (Node* n = startNode->parentNode(); n && n != startBlock;
          n = n->parentNode())
       ancestors.prepend(n);
   }
@@ -276,14 +275,14 @@ void InsertParagraphSeparatorCommand::doApply() {
   Position leadingWhitespace =
       pos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY);
   if (leadingWhitespace.isNotNull()) {
-    TextImpl* textNode = static_cast<TextImpl*>(leadingWhitespace.node());
+    Text* textNode = static_cast<Text*>(leadingWhitespace.node());
     replaceTextInNode(textNode, leadingWhitespace.offset(), 1,
                       nonBreakingSpaceString());
   }
 
   // Split at pos if in the middle of a text node.
   if (startNode->isTextNode()) {
-    TextImpl* textNode = static_cast<TextImpl*>(startNode);
+    Text* textNode = static_cast<Text*>(startNode);
     bool atEnd = (unsigned)pos.offset() >= textNode->length();
     if (pos.offset() > 0 && !atEnd) {
       splitTextNode(textNode, pos.offset());
@@ -299,9 +298,9 @@ void InsertParagraphSeparatorCommand::doApply() {
     insertNodeAfter(blockToInsert.get(), startBlock);
 
   // Make clones of ancestors in between the start node and the start block.
-  RefPtr<NodeImpl> parent = blockToInsert;
-  for (QPtrListIterator<NodeImpl> it(ancestors); it.current(); ++it) {
-    RefPtr<NodeImpl> child = it.current()->cloneNode(false);  // shallow clone
+  RefPtr<Node> parent = blockToInsert;
+  for (DeprecatedPtrListIterator<Node> it(ancestors); it.current(); ++it) {
+    RefPtr<Node> child = it.current()->cloneNode(false);  // shallow clone
     appendNode(child.get(), parent.get());
     parent = child.release();
   }
@@ -318,12 +317,12 @@ void InsertParagraphSeparatorCommand::doApply() {
 
   // Move the start node and the siblings of the start node.
   if (startNode != startBlock) {
-    NodeImpl* n = startNode;
+    Node* n = startNode;
     if (pos.offset() >= startNode->caretMaxOffset())
       n = startNode->nextSibling();
 
     while (n && n != blockToInsert) {
-      NodeImpl* next = n->nextSibling();
+      Node* next = n->nextSibling();
       removeNode(n);
       appendNode(n, parent.get());
       n = next;
@@ -331,12 +330,12 @@ void InsertParagraphSeparatorCommand::doApply() {
   }
 
   // Move everything after the start node.
-  NodeImpl* leftParent = ancestors.last();
+  Node* leftParent = ancestors.last();
   while (leftParent && leftParent != startBlock) {
     parent = parent->parentNode();
-    NodeImpl* n = leftParent->nextSibling();
+    Node* n = leftParent->nextSibling();
     while (n && n != blockToInsert) {
-      NodeImpl* next = n->nextSibling();
+      Node* next = n->nextSibling();
       removeNode(n);
       appendNode(n, parent.get());
       n = next;
@@ -352,7 +351,7 @@ void InsertParagraphSeparatorCommand::doApply() {
       // Clear out all whitespace and insert one non-breaking space
       ASSERT(startNode && startNode->isTextNode());
       deleteInsignificantTextDownstream(pos);
-      insertTextIntoNode(static_cast<TextImpl*>(startNode), 0,
+      insertTextIntoNode(static_cast<Text*>(startNode), 0,
                          nonBreakingSpaceString());
     }
   }

@@ -29,11 +29,11 @@
 
 namespace WebCore {
 
-class SVGTextElementImpl;
+class SVGTextElement;
 
 class RenderSVGText : public RenderBlock {
  public:
-  RenderSVGText(SVGTextElementImpl* node);
+  RenderSVGText(SVGTextElement* node);
 
   const char* renderName() const { return "RenderSVGText"; }
   void paint(PaintInfo&, int parentX, int parentY);

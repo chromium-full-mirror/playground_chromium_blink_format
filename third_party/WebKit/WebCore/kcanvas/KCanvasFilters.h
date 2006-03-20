@@ -28,7 +28,7 @@
 #include "KCanvasResources.h"
 #include "FloatSize.h"
 #include "Color.h"
-#include <QStringList.h>
+#include <DeprecatedStringList.h>
 
 #ifdef __OBJC__
 @class CIFilter;
@@ -121,7 +121,7 @@ class KCanvasFilter : public KCanvasResource {
   bool m_effectBBoxMode;
 };
 
-KCanvasFilter* getFilterById(DocumentImpl* document, const AtomicString& id);
+KCanvasFilter* getFilterById(Document* document, const AtomicString& id);
 
 class KCanvasFilterEffect {
  public:
@@ -134,11 +134,11 @@ class KCanvasFilterEffect {
   FloatRect subRegion() const;
   void setSubRegion(const FloatRect& subregion);
 
-  QString in() const;
-  void setIn(const QString& in);
+  DeprecatedString in() const;
+  void setIn(const DeprecatedString& in);
 
-  QString result() const;
-  void setResult(const QString& result);
+  DeprecatedString result() const;
+  void setResult(const DeprecatedString& result);
 
 #if __APPLE__
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz*) const = 0;
@@ -148,8 +148,8 @@ class KCanvasFilterEffect {
 
  private:
   FloatRect m_subregion;
-  QString m_in;
-  QString m_result;
+  DeprecatedString m_in;
+  DeprecatedString m_result;
 };
 
 QTextStream& operator<<(QTextStream&, const KCanvasFilterEffect&);
@@ -164,8 +164,8 @@ typedef enum {
 
 class KCanvasFEBlend : public KCanvasFilterEffect {
  public:
-  QString in2() const { return m_in2; }
-  void setIn2(const QString& in2) { m_in2 = in2; }
+  DeprecatedString in2() const { return m_in2; }
+  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
 
   KCBlendModeType blendMode() const { return m_mode; }
   void setBlendMode(KCBlendModeType mode) { m_mode = mode; }
@@ -174,7 +174,7 @@ class KCanvasFEBlend : public KCanvasFilterEffect {
 
  private:
   KCBlendModeType m_mode;
-  QString m_in2;
+  DeprecatedString m_in2;
 };
 
 typedef enum {
@@ -259,8 +259,8 @@ typedef enum {
 
 class KCanvasFEComposite : public KCanvasFilterEffect {
  public:
-  QString in2() const { return m_in2; }
-  void setIn2(const QString& in2) { m_in2 = in2; }
+  DeprecatedString in2() const { return m_in2; }
+  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
 
   KCCompositeOperationType operation() const { return m_operation; }
   void setOperation(KCCompositeOperationType oper) { m_operation = oper; }
@@ -277,7 +277,7 @@ class KCanvasFEComposite : public KCanvasFilterEffect {
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QString m_in2;
+  DeprecatedString m_in2;
   KCCompositeOperationType m_operation;
   float m_k1;
   float m_k2;
@@ -457,8 +457,8 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
   KCanvasFEDisplacementMap()
       : m_xChannelSelector(CS_RED), m_yChannelSelector(CS_RED), m_scale(0) {}
 
-  QString in2() const { return m_in2; }
-  void setIn2(const QString& in2) { m_in2 = in2; }
+  DeprecatedString in2() const { return m_in2; }
+  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
 
   KCChannelSelectorType xChannelSelector() const { return m_xChannelSelector; }
   void setXChannelSelector(const KCChannelSelectorType xChannelSelector) {
@@ -476,7 +476,7 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QString m_in2;
+  DeprecatedString m_in2;
   KCChannelSelectorType m_xChannelSelector;
   KCChannelSelectorType m_yChannelSelector;
   float m_scale;
@@ -531,15 +531,15 @@ class KCanvasFEImage : public KCanvasFilterEffect, public CachedObjectClient {
 
 class KCanvasFEMerge : public KCanvasFilterEffect {
  public:
-  QStringList mergeInputs() const { return m_mergeInputs; }
-  void setMergeInputs(const QStringList& mergeInputs) {
+  DeprecatedStringList mergeInputs() const { return m_mergeInputs; }
+  void setMergeInputs(const DeprecatedStringList& mergeInputs) {
     m_mergeInputs = mergeInputs;
   }
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  QStringList m_mergeInputs;
+  DeprecatedStringList m_mergeInputs;
 };
 
 typedef enum { MO_ERODE = 0, MO_DIALATE = 1 } KCMorphologyOperatorType;

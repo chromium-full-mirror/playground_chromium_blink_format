@@ -126,7 +126,7 @@ class StyleFillData : public Shared<StyleFillData> {
   }
 
   float opacity;
-  SVGPaintImpl* paint;
+  SVGPaint* paint;
 
  private:
   StyleFillData& operator=(const StyleFillData&);
@@ -145,11 +145,11 @@ class StyleStrokeData : public Shared<StyleStrokeData> {
   float opacity;
   unsigned int miterLimit;
 
-  CSSValueImpl* width;
-  CSSValueImpl* dashOffset;
+  CSSValue* width;
+  CSSValue* dashOffset;
 
-  SVGPaintImpl* paint;
-  CSSValueListImpl* dashArray;
+  SVGPaint* paint;
+  CSSValueList* dashArray;
 
  private:
   StyleStrokeData& operator=(const StyleStrokeData&);
@@ -182,7 +182,7 @@ class StyleClipData : public Shared<StyleClipData> {
     return !(*this == other);
   }
 
-  QString clipPath;
+  DeprecatedString clipPath;
 
  private:
   StyleClipData& operator=(const StyleClipData&);
@@ -198,7 +198,7 @@ class StyleMaskData : public Shared<StyleMaskData> {
     return !(*this == other);
   }
 
-  QString maskElement;
+  DeprecatedString maskElement;
 
  private:
   StyleMaskData& operator=(const StyleMaskData&);
@@ -214,9 +214,9 @@ class StyleMarkerData : public Shared<StyleMarkerData> {
     return !(*this == other);
   }
 
-  QString startMarker;
-  QString midMarker;
-  QString endMarker;
+  DeprecatedString startMarker;
+  DeprecatedString midMarker;
+  DeprecatedString endMarker;
 
  private:
   StyleMarkerData& operator=(const StyleMarkerData&);
@@ -233,7 +233,7 @@ class StyleMiscData : public Shared<StyleMiscData> {
     return !(*this == other);
   }
 
-  QString filter;
+  DeprecatedString filter;
   Color floodColor;
   float floodOpacity;
 

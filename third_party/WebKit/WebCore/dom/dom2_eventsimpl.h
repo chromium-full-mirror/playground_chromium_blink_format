@@ -26,19 +26,19 @@
 #define DOM_EVENTSIMPL_H
 
 #include "AtomicString.h"
-#include "NodeImpl.h"
+#include "Node.h"
 #include "Shared.h"
-#include "dom2_viewsimpl.h"
+#include "AbstractView.h"
 
-class QStringList;
+class DeprecatedStringList;
 
 namespace WebCore {
 
-class ClipboardImpl;
+class Clipboard;
 class EventListener;
 class Image;
 class IntPoint;
-class KeyEvent;
+class PlatformKeyboardEvent;
 
 typedef unsigned long long DOMTimeStamp;
 
@@ -46,18 +46,18 @@ const int EventExceptionOffset = 100;
 const int EventExceptionMax = 199;
 enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = EventExceptionOffset };
 
-class EventImpl : public Shared<EventImpl> {
+class Event : public Shared<Event> {
  public:
   enum PhaseType { CAPTURING_PHASE = 1, AT_TARGET = 2, BUBBLING_PHASE = 3 };
-  EventImpl();
-  EventImpl(const AtomicString& type, bool canBubbleArg, bool cancelableArg);
-  virtual ~EventImpl();
+  Event();
+  Event(const AtomicString& type, bool canBubbleArg, bool cancelableArg);
+  virtual ~Event();
 
   const AtomicString& type() const { return m_type; }
-  NodeImpl* target() const { return m_target.get(); }
-  void setTarget(NodeImpl*);
-  NodeImpl* currentTarget() const { return m_currentTarget; }
-  void setCurrentTarget(NodeImpl* currentTarget) {
+  Node* target() const { return m_target.get(); }
+  void setTarget(Node*);
+  Node* currentTarget() const { return m_currentTarget; }
+  void setCurrentTarget(Node* currentTarget) {
     m_currentTarget = currentTarget;
   }
   unsigned short eventPhase() const { return m_eventPhase; }
@@ -96,7 +96,7 @@ class EventImpl : public Shared<EventImpl> {
   bool getCancelBubble() const { return m_cancelBubble; }
 
   virtual bool storesResultAsString() const;
-  virtual void storeResult(const DOMString&);
+  virtual void storeResult(const String&);
 
  protected:
   virtual void receivedTarget();
@@ -112,26 +112,26 @@ class EventImpl : public Shared<EventImpl> {
   bool m_defaultHandled;
   bool m_cancelBubble;
 
-  NodeImpl* m_currentTarget;  // ref > 0 maintained externally
+  Node* m_currentTarget;  // ref > 0 maintained externally
   unsigned short m_eventPhase;
-  RefPtr<NodeImpl> m_target;
+  RefPtr<Node> m_target;
   DOMTimeStamp m_createTime;
 };
 
-class UIEventImpl : public EventImpl {
+class UIEvent : public Event {
  public:
-  UIEventImpl();
-  UIEventImpl(const AtomicString& type,
-              bool canBubbleArg,
-              bool cancelableArg,
-              AbstractViewImpl* viewArg,
-              int detailArg);
-  AbstractViewImpl* view() const { return m_view.get(); }
+  UIEvent();
+  UIEvent(const AtomicString& type,
+          bool canBubbleArg,
+          bool cancelableArg,
+          AbstractView* viewArg,
+          int detailArg);
+  AbstractView* view() const { return m_view.get(); }
   int detail() const { return m_detail; }
   void initUIEvent(const AtomicString& typeArg,
                    bool canBubbleArg,
                    bool cancelableArg,
-                   AbstractViewImpl* viewArg,
+                   AbstractView* viewArg,
                    int detailArg);
   virtual bool isUIEvent() const;
 
@@ -147,27 +147,27 @@ class UIEventImpl : public EventImpl {
   virtual int which() const;
 
  private:
-  RefPtr<AbstractViewImpl> m_view;
+  RefPtr<AbstractView> m_view;
   int m_detail;
 };
 
-class UIEventWithKeyStateImpl : public UIEventImpl {
+class UIEventWithKeyState : public UIEvent {
  public:
-  UIEventWithKeyStateImpl()
+  UIEventWithKeyState()
       : m_ctrlKey(false),
         m_altKey(false),
         m_shiftKey(false),
         m_metaKey(false) {}
-  UIEventWithKeyStateImpl(const AtomicString& type,
-                          bool canBubbleArg,
-                          bool cancelableArg,
-                          AbstractViewImpl* viewArg,
-                          int detailArg,
-                          bool ctrlKeyArg,
-                          bool altKeyArg,
-                          bool shiftKeyArg,
-                          bool metaKeyArg)
-      : UIEventImpl(type, canBubbleArg, cancelableArg, viewArg, detailArg),
+  UIEventWithKeyState(const AtomicString& type,
+                      bool canBubbleArg,
+                      bool cancelableArg,
+                      AbstractView* viewArg,
+                      int detailArg,
+                      bool ctrlKeyArg,
+                      bool altKeyArg,
+                      bool shiftKeyArg,
+                      bool metaKeyArg)
+      : UIEvent(type, canBubbleArg, cancelableArg, viewArg, detailArg),
         m_ctrlKey(ctrlKeyArg),
         m_altKey(altKeyArg),
         m_shiftKey(shiftKeyArg),
@@ -186,23 +186,23 @@ class UIEventWithKeyStateImpl : public UIEventImpl {
 };
 
 // Internal only: Helper class for what's common between mouse and wheel events.
-class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
+class MouseRelatedEvent : public UIEventWithKeyState {
  public:
-  MouseRelatedEventImpl();
-  MouseRelatedEventImpl(const AtomicString& type,
-                        bool canBubbleArg,
-                        bool cancelableArg,
-                        AbstractViewImpl* viewArg,
-                        int detailArg,
-                        int screenXArg,
-                        int screenYArg,
-                        int clientXArg,
-                        int clientYArg,
-                        bool ctrlKeyArg,
-                        bool altKeyArg,
-                        bool shiftKeyArg,
-                        bool metaKeyArg,
-                        bool isSimulated = false);
+  MouseRelatedEvent();
+  MouseRelatedEvent(const AtomicString& type,
+                    bool canBubbleArg,
+                    bool cancelableArg,
+                    AbstractView* viewArg,
+                    int detailArg,
+                    int screenXArg,
+                    int screenYArg,
+                    int clientXArg,
+                    int clientYArg,
+                    bool ctrlKeyArg,
+                    bool altKeyArg,
+                    bool shiftKeyArg,
+                    bool metaKeyArg,
+                    bool isSimulated = false);
   int screenX() const { return m_screenX; }
   int screenY() const { return m_screenY; }
   int clientX() const { return m_clientX; }
@@ -217,7 +217,7 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
   int x() const;
   int y() const;
 
- protected:  // expose these so MouseEventImpl::initMouseEvent can set them
+ protected:  // expose these so MouseEvent::initMouseEvent can set them
   int m_screenX;
   int m_screenY;
   int m_clientX;
@@ -236,39 +236,39 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
 };
 
 // Introduced in DOM Level 2
-class MouseEventImpl : public MouseRelatedEventImpl {
+class MouseEvent : public MouseRelatedEvent {
  public:
-  MouseEventImpl();
-  MouseEventImpl(const AtomicString& type,
-                 bool canBubbleArg,
-                 bool cancelableArg,
-                 AbstractViewImpl* viewArg,
-                 int detailArg,
-                 int screenXArg,
-                 int screenYArg,
-                 int clientXArg,
-                 int clientYArg,
-                 bool ctrlKeyArg,
-                 bool altKeyArg,
-                 bool shiftKeyArg,
-                 bool metaKeyArg,
-                 unsigned short buttonArg,
-                 NodeImpl* relatedTargetArg,
-                 ClipboardImpl* clipboardArg = 0,
-                 bool isSimulated = false);
-  virtual ~MouseEventImpl();
+  MouseEvent();
+  MouseEvent(const AtomicString& type,
+             bool canBubbleArg,
+             bool cancelableArg,
+             AbstractView* viewArg,
+             int detailArg,
+             int screenXArg,
+             int screenYArg,
+             int clientXArg,
+             int clientYArg,
+             bool ctrlKeyArg,
+             bool altKeyArg,
+             bool shiftKeyArg,
+             bool metaKeyArg,
+             unsigned short buttonArg,
+             Node* relatedTargetArg,
+             Clipboard* clipboardArg = 0,
+             bool isSimulated = false);
+  virtual ~MouseEvent();
   // WinIE uses 1,4,2 for left/middle/right but not for click (just for
   // mousedown/up, maybe others), but we will match the standard DOM.
   unsigned short button() const { return m_button; }
-  NodeImpl* relatedTarget() const { return m_relatedTarget.get(); }
-  ClipboardImpl* clipboard() const { return m_clipboard.get(); }
+  Node* relatedTarget() const { return m_relatedTarget.get(); }
+  Clipboard* clipboard() const { return m_clipboard.get(); }
   bool isSimulated() const { return m_isSimulated; }
-  NodeImpl* toElement() const;
-  NodeImpl* fromElement() const;
+  Node* toElement() const;
+  Node* fromElement() const;
   void initMouseEvent(const AtomicString& typeArg,
                       bool canBubbleArg,
                       bool cancelableArg,
-                      AbstractViewImpl* viewArg,
+                      AbstractView* viewArg,
                       int detailArg,
                       int screenXArg,
                       int screenYArg,
@@ -279,20 +279,20 @@ class MouseEventImpl : public MouseRelatedEventImpl {
                       bool shiftKeyArg,
                       bool metaKeyArg,
                       unsigned short buttonArg,
-                      NodeImpl* relatedTargetArg);
+                      Node* relatedTargetArg);
   virtual bool isMouseEvent() const;
   virtual bool isDragEvent() const;
   virtual int which() const;
 
  private:
   unsigned short m_button;
-  RefPtr<NodeImpl> m_relatedTarget;
-  RefPtr<ClipboardImpl> m_clipboard;
+  RefPtr<Node> m_relatedTarget;
+  RefPtr<Clipboard> m_clipboard;
   bool m_isSimulated;
 };
 
 // Introduced in DOM Level 3
-class KeyboardEventImpl : public UIEventWithKeyStateImpl {
+class KeyboardEvent : public UIEventWithKeyState {
  public:
   enum KeyLocationCode {
     DOM_KEY_LOCATION_STANDARD = 0x00,
@@ -300,26 +300,26 @@ class KeyboardEventImpl : public UIEventWithKeyStateImpl {
     DOM_KEY_LOCATION_RIGHT = 0x02,
     DOM_KEY_LOCATION_NUMPAD = 0x03,
   };
-  KeyboardEventImpl();
-  KeyboardEventImpl(const KeyEvent&, AbstractViewImpl*);
-  KeyboardEventImpl(const AtomicString& type,
-                    bool canBubbleArg,
-                    bool cancelableArg,
-                    AbstractViewImpl* viewArg,
-                    const DOMString& keyIdentifierArg,
-                    unsigned keyLocationArg,
-                    bool ctrlKeyArg,
-                    bool altKeyArg,
-                    bool shiftKeyArg,
-                    bool metaKeyArg,
-                    bool altGraphKeyArg);
-  virtual ~KeyboardEventImpl();
+  KeyboardEvent();
+  KeyboardEvent(const PlatformKeyboardEvent&, AbstractView*);
+  KeyboardEvent(const AtomicString& type,
+                bool canBubbleArg,
+                bool cancelableArg,
+                AbstractView* viewArg,
+                const String& keyIdentifierArg,
+                unsigned keyLocationArg,
+                bool ctrlKeyArg,
+                bool altKeyArg,
+                bool shiftKeyArg,
+                bool metaKeyArg,
+                bool altGraphKeyArg);
+  virtual ~KeyboardEvent();
 
   void initKeyboardEvent(const AtomicString& typeArg,
                          bool canBubbleArg,
                          bool cancelableArg,
-                         AbstractViewImpl* viewArg,
-                         const DOMString& keyIdentifierArg,
+                         AbstractView* viewArg,
+                         const String& keyIdentifierArg,
                          unsigned keyLocationArg,
                          bool ctrlKeyArg,
                          bool altKeyArg,
@@ -327,12 +327,12 @@ class KeyboardEventImpl : public UIEventWithKeyStateImpl {
                          bool metaKeyArg,
                          bool altGraphKeyArg);
 
-  DOMString keyIdentifier() const { return m_keyIdentifier.get(); }
+  String keyIdentifier() const { return m_keyIdentifier.get(); }
   unsigned keyLocation() const { return m_keyLocation; }
 
   bool altGraphKey() const { return m_altGraphKey; }
 
-  const KeyEvent* keyEvent() const { return m_keyEvent; }
+  const PlatformKeyboardEvent* keyEvent() const { return m_keyEvent; }
 
   int keyCode()
       const;  // key code for keydown and keyup, character for other events
@@ -342,77 +342,77 @@ class KeyboardEventImpl : public UIEventWithKeyStateImpl {
   virtual int which() const;
 
  private:
-  KeyEvent* m_keyEvent;
-  RefPtr<DOMStringImpl> m_keyIdentifier;
+  PlatformKeyboardEvent* m_keyEvent;
+  RefPtr<StringImpl> m_keyIdentifier;
   unsigned m_keyLocation;
   bool m_altGraphKey : 1;
 };
 
-class MutationEventImpl : public EventImpl {
+class MutationEvent : public Event {
  public:
   enum attrChangeType { MODIFICATION = 1, ADDITION = 2, REMOVAL = 3 };
-  MutationEventImpl();
-  MutationEventImpl(const AtomicString& type,
-                    bool canBubbleArg,
-                    bool cancelableArg,
-                    NodeImpl* relatedNodeArg,
-                    const DOMString& prevValueArg,
-                    const DOMString& newValueArg,
-                    const DOMString& attrNameArg,
-                    unsigned short attrChangeArg);
-  NodeImpl* relatedNode() const { return m_relatedNode.get(); }
-  DOMString prevValue() const { return m_prevValue.get(); }
-  DOMString newValue() const { return m_newValue.get(); }
-  DOMString attrName() const { return m_attrName.get(); }
+  MutationEvent();
+  MutationEvent(const AtomicString& type,
+                bool canBubbleArg,
+                bool cancelableArg,
+                Node* relatedNodeArg,
+                const String& prevValueArg,
+                const String& newValueArg,
+                const String& attrNameArg,
+                unsigned short attrChangeArg);
+  Node* relatedNode() const { return m_relatedNode.get(); }
+  String prevValue() const { return m_prevValue.get(); }
+  String newValue() const { return m_newValue.get(); }
+  String attrName() const { return m_attrName.get(); }
   unsigned short attrChange() const { return m_attrChange; }
   void initMutationEvent(const AtomicString& typeArg,
                          bool canBubbleArg,
                          bool cancelableArg,
-                         NodeImpl* relatedNodeArg,
-                         const DOMString& prevValueArg,
-                         const DOMString& newValueArg,
-                         const DOMString& attrNameArg,
+                         Node* relatedNodeArg,
+                         const String& prevValueArg,
+                         const String& newValueArg,
+                         const String& attrNameArg,
                          unsigned short attrChangeArg);
   virtual bool isMutationEvent() const;
 
  private:
-  RefPtr<NodeImpl> m_relatedNode;
-  RefPtr<DOMStringImpl> m_prevValue;
-  RefPtr<DOMStringImpl> m_newValue;
-  RefPtr<DOMStringImpl> m_attrName;
+  RefPtr<Node> m_relatedNode;
+  RefPtr<StringImpl> m_prevValue;
+  RefPtr<StringImpl> m_newValue;
+  RefPtr<StringImpl> m_attrName;
   unsigned short m_attrChange;
 };
 
-class ClipboardEventImpl : public EventImpl {
+class ClipboardEvent : public Event {
  public:
-  ClipboardEventImpl();
-  ClipboardEventImpl(const AtomicString& type,
-                     bool canBubbleArg,
-                     bool cancelableArg,
-                     ClipboardImpl* clipboardArg);
+  ClipboardEvent();
+  ClipboardEvent(const AtomicString& type,
+                 bool canBubbleArg,
+                 bool cancelableArg,
+                 Clipboard* clipboardArg);
 
-  ClipboardImpl* clipboard() const { return m_clipboard.get(); }
+  Clipboard* clipboard() const { return m_clipboard.get(); }
   virtual bool isClipboardEvent() const;
 
  private:
-  RefPtr<ClipboardImpl> m_clipboard;
+  RefPtr<Clipboard> m_clipboard;
 };
 
 // extension: mouse wheel event
-class WheelEventImpl : public MouseRelatedEventImpl {
+class WheelEvent : public MouseRelatedEvent {
  public:
-  WheelEventImpl();
-  WheelEventImpl(bool horizontal,
-                 int wheelDelta,
-                 AbstractViewImpl*,
-                 int screenXArg,
-                 int screenYArg,
-                 int clientXArg,
-                 int clientYArg,
-                 bool ctrlKeyArg,
-                 bool altKeyArg,
-                 bool shiftKeyArg,
-                 bool metaKeyArg);
+  WheelEvent();
+  WheelEvent(bool horizontal,
+             int wheelDelta,
+             AbstractView*,
+             int screenXArg,
+             int screenYArg,
+             int clientXArg,
+             int clientYArg,
+             bool ctrlKeyArg,
+             bool altKeyArg,
+             bool shiftKeyArg,
+             bool metaKeyArg);
   bool isHorizontal() const { return m_horizontal; }
   int wheelDelta() const { return m_wheelDelta; }
 
@@ -446,44 +446,44 @@ inline bool operator!=(const RegisteredEventListener& a,
 }
 
 // State available during IE's events for drag and drop and copy/paste
-class ClipboardImpl : public Shared<ClipboardImpl> {
+class Clipboard : public Shared<Clipboard> {
  public:
-  virtual ~ClipboardImpl();
+  virtual ~Clipboard();
 
   // Is this operation a drag-drop or a copy-paste?
   virtual bool isForDragging() const = 0;
 
-  virtual DOMString dropEffect() const = 0;
-  virtual void setDropEffect(const DOMString& s) = 0;
-  virtual DOMString effectAllowed() const = 0;
-  virtual void setEffectAllowed(const DOMString& s) = 0;
+  virtual String dropEffect() const = 0;
+  virtual void setDropEffect(const String& s) = 0;
+  virtual String effectAllowed() const = 0;
+  virtual void setEffectAllowed(const String& s) = 0;
 
-  virtual void clearData(const DOMString& type) = 0;
+  virtual void clearData(const String& type) = 0;
   virtual void clearAllData() = 0;
-  virtual DOMString getData(const DOMString& type, bool& success) const = 0;
-  virtual bool setData(const DOMString& type, const DOMString& data) = 0;
+  virtual String getData(const String& type, bool& success) const = 0;
+  virtual bool setData(const String& type, const String& data) = 0;
 
   // extensions beyond IE's API
-  virtual QStringList types() const = 0;
+  virtual DeprecatedStringList types() const = 0;
 
   virtual WebCore::IntPoint dragLocation() const = 0;
   virtual CachedImage* dragImage() const = 0;
   virtual void setDragImage(CachedImage*, const WebCore::IntPoint&) = 0;
-  virtual NodeImpl* dragImageElement() = 0;
-  virtual void setDragImageElement(NodeImpl*, const WebCore::IntPoint&) = 0;
+  virtual Node* dragImageElement() = 0;
+  virtual void setDragImageElement(Node*, const WebCore::IntPoint&) = 0;
 };
 
-class BeforeUnloadEventImpl : public EventImpl {
+class BeforeUnloadEvent : public Event {
  public:
-  BeforeUnloadEventImpl();
+  BeforeUnloadEvent();
 
   virtual bool storesResultAsString() const;
-  virtual void storeResult(const DOMString&);
+  virtual void storeResult(const String&);
 
-  DOMString result() const { return m_result.get(); }
+  String result() const { return m_result.get(); }
 
  private:
-  RefPtr<DOMStringImpl> m_result;
+  RefPtr<StringImpl> m_result;
 };
 
 }  // namespace

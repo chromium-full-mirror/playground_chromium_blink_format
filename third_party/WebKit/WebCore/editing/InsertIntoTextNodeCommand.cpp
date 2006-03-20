@@ -26,20 +26,20 @@
 #include "config.h"
 #include "InsertIntoTextNodeCommand.h"
 
-#include "TextImpl.h"
+#include "Text.h"
 
 #include <kxmlcore/Assertions.h>
 
-using DOM::DocumentImpl;
-using DOM::TextImpl;
-using DOM::DOMString;
+using WebCore::Document;
+using WebCore::Text;
+using WebCore::String;
 
-namespace khtml {
+namespace WebCore {
 
-InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(DocumentImpl* document,
-                                                     TextImpl* node,
+InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(Document* document,
+                                                     Text* node,
                                                      int offset,
-                                                     const DOMString& text)
+                                                     const String& text)
     : EditCommand(document), m_node(node), m_offset(offset) {
   ASSERT(m_node);
   ASSERT(m_offset >= 0);
@@ -68,4 +68,4 @@ void InsertIntoTextNodeCommand::doUnapply() {
   ASSERT(ec == 0);
 }
 
-}  // namespace khtml
+}  // namespace WebCore

@@ -26,10 +26,10 @@
 #include "khtml/html/html_imageimpl.h"
 
 namespace WebCore {
-class SVGImageElementImpl;
-class SVGImageLoader : public DOM::HTMLImageLoader {
+class SVGImageElement;
+class SVGImageLoader : public WebCore::HTMLImageLoader {
  public:
-  SVGImageLoader(SVGImageElementImpl* node);
+  SVGImageLoader(SVGImageElement* node);
   virtual ~SVGImageLoader();
 
   virtual void updateFromElement();

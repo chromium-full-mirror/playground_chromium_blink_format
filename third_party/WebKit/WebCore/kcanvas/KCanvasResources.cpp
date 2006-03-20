@@ -24,7 +24,7 @@
 #if SVG_SUPPORT
 #include "KCanvasResources.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "KCanvasContainer.h"
@@ -33,7 +33,7 @@
 #include "KCanvasTreeDebug.h"
 #include "KRenderingDevice.h"
 #include "RenderPath.h"
-#include "SVGStyledElementImpl.h"
+#include "SVGStyledElement.h"
 #include <kcanvas/KCanvas.h>
 #include <qtextstream.h>
 
@@ -67,11 +67,11 @@ void KCanvasResource::invalidate() {
     const_cast<RenderPath*>(*it)->repaint();
 }
 
-QString KCanvasResource::idInRegistry() const {
+DeprecatedString KCanvasResource::idInRegistry() const {
   return registryId;
 }
 
-void KCanvasResource::setIdInRegistry(const QString& newId) {
+void KCanvasResource::setIdInRegistry(const DeprecatedString& newId) {
   registryId = newId;
 }
 
@@ -227,42 +227,41 @@ QTextStream& KCanvasMarker::externalRepresentation(QTextStream& ts) const {
   return ts;
 }
 
-KCanvasResource* getResourceById(DocumentImpl* document,
-                                 const AtomicString& id) {
+KCanvasResource* getResourceById(Document* document, const AtomicString& id) {
   if (id.isEmpty())
     return 0;
-  ElementImpl* element = document->getElementById(id);
-  SVGElementImpl* svgElement = svg_dynamic_cast(element);
+  Element* element = document->getElementById(id);
+  SVGElement* svgElement = svg_dynamic_cast(element);
   if (svgElement && svgElement->isStyled())
-    return static_cast<SVGStyledElementImpl*>(svgElement)->canvasResource();
+    return static_cast<SVGStyledElement*>(svgElement)->canvasResource();
   else
     fprintf(stderr, "Failed to find resource with id: %s\n",
-            id.qstring().ascii());
+            id.deprecatedString().ascii());
   return 0;
 }
 
-KCanvasMarker* getMarkerById(DocumentImpl* document, const AtomicString& id) {
+KCanvasMarker* getMarkerById(Document* document, const AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isMarker())
     return static_cast<KCanvasMarker*>(resource);
   return 0;
 }
 
-KCanvasClipper* getClipperById(DocumentImpl* document, const AtomicString& id) {
+KCanvasClipper* getClipperById(Document* document, const AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isClipper())
     return static_cast<KCanvasClipper*>(resource);
   return 0;
 }
 
-KCanvasMasker* getMaskerById(DocumentImpl* document, const AtomicString& id) {
+KCanvasMasker* getMaskerById(Document* document, const AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isMasker())
     return static_cast<KCanvasMasker*>(resource);
   return 0;
 }
 
-KRenderingPaintServer* getPaintServerById(DocumentImpl* document,
+KRenderingPaintServer* getPaintServerById(Document* document,
                                           const AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isPaintServer())

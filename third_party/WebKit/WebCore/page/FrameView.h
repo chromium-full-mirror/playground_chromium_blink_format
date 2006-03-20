@@ -26,35 +26,35 @@
 #ifndef FRAMEVIEW_H
 #define FRAMEVIEW_H
 
-#include "QString.h"
+#include "DeprecatedString.h"
 #include "ScrollView.h"
 
-class QStringList;
+class DeprecatedStringList;
 
 namespace WebCore {
 
 class AtomicString;
 class CSSProperty;
 class CSSStyleSelector;
-class ClipboardImpl;
-class DocumentImpl;
-class ElementImpl;
+class Clipboard;
+class Document;
+class Element;
 class Frame;
 class FrameViewPrivate;
 class GraphicsContext;
-class HTMLAnchorElementImpl;
-class HTMLDocumentImpl;
-class HTMLElementImpl;
-class HTMLFormElementImpl;
-class HTMLFrameSetElementImpl;
-class HTMLGenericFormElementImpl;
-class HTMLTitleElementImpl;
+class HTMLAnchorElement;
+class HTMLDocument;
+class HTMLElement;
+class HTMLFormElement;
+class HTMLFrameSetElement;
+class HTMLGenericFormElement;
+class HTMLTitleElement;
 class InlineBox;
 class IntRect;
-class KeyEvent;
-class MacFrame;
-class MouseEvent;
-class NodeImpl;
+class PlatformKeyboardEvent;
+class FrameMac;
+class PlatformMouseEvent;
+class Node;
 class RenderBox;
 class RenderCanvas;
 class RenderLineEdit;
@@ -63,7 +63,7 @@ class RenderPart;
 class RenderPartObject;
 class RenderStyle;
 class RenderWidget;
-class WheelEvent;
+class PlatformWheelEvent;
 
 template <typename T>
 class Timer;
@@ -72,14 +72,14 @@ void applyRule(CSSProperty*);
 
 class FrameView : public ScrollView {
   friend class CSSStyleSelector;
-  friend class DocumentImpl;
+  friend class Document;
   friend class Frame;
-  friend class HTMLAnchorElementImpl;
-  friend class HTMLDocumentImpl;
-  friend class HTMLFormElementImpl;
-  friend class HTMLGenericFormElementImpl;
-  friend class HTMLTitleElementImpl;
-  friend class MacFrame;
+  friend class HTMLAnchorElement;
+  friend class HTMLDocument;
+  friend class HTMLFormElement;
+  friend class HTMLGenericFormElement;
+  friend class HTMLTitleElement;
+  friend class FrameMac;
   friend class RenderBox;
   friend class RenderCanvas;
   friend class RenderLineEdit;
@@ -137,17 +137,17 @@ class FrameView : public ScrollView {
  public:
   void clearPart();
 
-  void viewportMousePressEvent(const MouseEvent&);
-  void viewportMouseDoubleClickEvent(const MouseEvent&);
-  void viewportMouseMoveEvent(const MouseEvent&);
-  void viewportMouseReleaseEvent(const MouseEvent&);
-  void viewportWheelEvent(WheelEvent&);
+  void handleMousePressEvent(const PlatformMouseEvent&);
+  void handleMouseDoubleClickEvent(const PlatformMouseEvent&);
+  void handleMouseMoveEvent(const PlatformMouseEvent&);
+  void handleMouseReleaseEvent(const PlatformMouseEvent&);
+  void handleWheelEvent(PlatformWheelEvent&);
 
   void doAutoScroll();
 
-  bool updateDragAndDrop(const MouseEvent&, ClipboardImpl*);
-  void cancelDragAndDrop(const MouseEvent&, ClipboardImpl*);
-  bool performDragAndDrop(const MouseEvent&, ClipboardImpl*);
+  bool updateDragAndDrop(const PlatformMouseEvent&, Clipboard*);
+  void cancelDragAndDrop(const PlatformMouseEvent&, Clipboard*);
+  bool performDragAndDrop(const PlatformMouseEvent&, Clipboard*);
 
   void layoutTimerFired(Timer<FrameView>*);
   void hoverTimerFired(Timer<FrameView>*);
@@ -170,7 +170,7 @@ class FrameView : public ScrollView {
   void setHasBorder(bool);
   bool hasBorder() const;
 
-  void setResizingFrameSet(HTMLFrameSetElementImpl*);
+  void setResizingFrameSet(HTMLFrameSetElement*);
 
 #if __APPLE__
   void updateDashboardRegions();
@@ -199,8 +199,8 @@ class FrameView : public ScrollView {
    * you only need to enable the media type in the view and if necessary
    * add the media type dependent changes to the renderer.
    */
-  void setMediaType(const QString&);
-  QString mediaType() const;
+  void setMediaType(const DeprecatedString&);
+  DeprecatedString mediaType() const;
 
   bool scrollTo(const IntRect&);
 
@@ -212,23 +212,24 @@ class FrameView : public ScrollView {
 
   void init();
 
-  NodeImpl* nodeUnderMouse() const;
+  Node* nodeUnderMouse() const;
 
   void restoreScrollBar();
 
-  QStringList formCompletionItems(const QString& name) const;
-  void addFormCompletionItem(const QString& name, const QString& value);
+  DeprecatedStringList formCompletionItems(const DeprecatedString& name) const;
+  void addFormCompletionItem(const DeprecatedString& name,
+                             const DeprecatedString& value);
 
   bool dispatchMouseEvent(const AtomicString& eventType,
-                          NodeImpl* target,
+                          Node* target,
                           bool cancelable,
                           int clickCount,
-                          const MouseEvent&,
+                          const PlatformMouseEvent&,
                           bool setUnder);
   bool dispatchDragEvent(const AtomicString& eventType,
-                         NodeImpl* target,
-                         const MouseEvent&,
-                         ClipboardImpl*);
+                         Node* target,
+                         const PlatformMouseEvent&,
+                         Clipboard*);
 
   void applyOverflowToViewport(RenderObject* o,
                                ScrollBarMode& hMode,
@@ -249,7 +250,7 @@ class FrameView : public ScrollView {
   RefPtr<Frame> m_frame;
   FrameViewPrivate* d;
 
-  QString m_medium;  // media type
+  DeprecatedString m_medium;  // media type
 };
 }
 

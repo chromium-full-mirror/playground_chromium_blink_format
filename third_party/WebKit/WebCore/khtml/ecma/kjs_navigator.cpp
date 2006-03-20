@@ -27,7 +27,7 @@
 #include "CookieJar.h"
 #include "Frame.h"
 #include "Language.h"
-#include "NodeImpl.h"
+#include "Node.h"
 #include "PlugInInfoStore.h"
 #include "kjs_binding.h"
 
@@ -172,7 +172,7 @@ bool Navigator::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* Navigator::getValueProperty(ExecState* exec, int token) const {
-  QString userAgent = m_frame->userAgent();
+  DeprecatedString userAgent = m_frame->userAgent();
   switch (token) {
     case AppCodeName:
       return jsString("Mozilla");

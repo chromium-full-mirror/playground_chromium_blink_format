@@ -40,8 +40,8 @@ class CachedScript : public CachedObject {
                const String& URL,
                KIO::CacheControl,
                time_t expireDate,
-               const QString& charset);
-  CachedScript(const String& URL, const QString& scriptData);
+               const DeprecatedString& charset);
+  CachedScript(const String& URL, const DeprecatedString& scriptData);
   virtual ~CachedScript();
 
   const String& script() const { return m_script; }
@@ -49,8 +49,8 @@ class CachedScript : public CachedObject {
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
 
-  virtual void setCharset(const QString&);
-  virtual void data(ByteArray&, bool atEnd);
+  virtual void setCharset(const DeprecatedString&);
+  virtual void data(DeprecatedByteArray&, bool atEnd);
   virtual void error(int code, const char* message);
 
   virtual bool schedule() const { return false; }

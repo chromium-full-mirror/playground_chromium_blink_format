@@ -37,7 +37,7 @@ class RenderListItem;
 */
 class RenderListMarker : public RenderBox {
  public:
-  RenderListMarker(DOM::DocumentImpl* document);
+  RenderListMarker(WebCore::Document* document);
   ~RenderListMarker();
 
   virtual void setStyle(RenderStyle* style);
@@ -66,14 +66,14 @@ class RenderListMarker : public RenderBox {
   RenderListItem* listItem() { return m_listItem; }
   void setListItem(RenderListItem* listItem) { m_listItem = listItem; }
 
-  const QString& text() const { return m_item; }
+  const DeprecatedString& text() const { return m_item; }
 
   bool isInside() const;
 
   IntRect getRelativeMarkerRect();
 
  private:
-  QString m_item;
+  DeprecatedString m_item;
   CachedImage* m_listImage;
   RenderListItem* m_listItem;
 };
@@ -88,7 +88,7 @@ class ListMarkerBox : public InlineBox {
 
 class RenderListItem : public RenderBlock {
  public:
-  RenderListItem(DOM::NodeImpl*);
+  RenderListItem(WebCore::Node*);
 
   virtual void destroy();
 
@@ -116,7 +116,9 @@ class RenderListItem : public RenderBlock {
   void setNotInList(bool notInList) { _notInList = notInList; }
   bool notInList() const { return _notInList; }
 
-  QString markerStringValue() { return m_marker ? m_marker->text() : ""; }
+  DeprecatedString markerStringValue() {
+    return m_marker ? m_marker->text() : "";
+  }
 
   virtual bool nodeAtPoint(NodeInfo&, int, int, int, int, HitTestAction);
 

@@ -27,23 +27,23 @@
 #include "CreateLinkCommand.h"
 
 #include "css_valueimpl.h"
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "html_inlineimpl.h"
 #include <kxmlcore/Assertions.h>
 
 namespace WebCore {
 
-CreateLinkCommand::CreateLinkCommand(DocumentImpl* document, const String& url)
+CreateLinkCommand::CreateLinkCommand(Document* document, const String& url)
     : CompositeEditCommand(document) {
   m_url = url;
 }
 
 void CreateLinkCommand::doApply() {
-  HTMLAnchorElementImpl* anchorElement = new HTMLAnchorElementImpl(document());
+  HTMLAnchorElement* anchorElement = new HTMLAnchorElement(document());
   anchorElement->setHref(m_url);
   EditCommandPtr cmd(
-      new ApplyStyleCommand(document(), new CSSMutableStyleDeclarationImpl(),
-                            static_cast<ElementImpl*>(anchorElement)));
+      new ApplyStyleCommand(document(), new CSSMutableStyleDeclaration(),
+                            static_cast<Element*>(anchorElement)));
   applyCommandToComposite(cmd);
 }
 }

@@ -33,11 +33,11 @@
 #include "Frame.h"
 #include "FrameTree.h"
 #include "KURL.h"
-#include "TextImpl.h"
+#include "Text.h"
 #include "css_stylesheetimpl.h"
 #include "csshelper.h"
 #include "cssstyleselector.h"
-#include "html_documentimpl.h"
+#include "HTMLDocument.h"
 #include "htmlnames.h"
 #include "kjs_proxy.h"
 
@@ -46,12 +46,11 @@ namespace WebCore {
 using namespace HTMLNames;
 using namespace EventNames;
 
-HTMLBaseElementImpl::HTMLBaseElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(baseTag, doc) {}
+HTMLBaseElement::HTMLBaseElement(Document* doc) : HTMLElement(baseTag, doc) {}
 
-HTMLBaseElementImpl::~HTMLBaseElementImpl() {}
+HTMLBaseElement::~HTMLBaseElement() {}
 
-void HTMLBaseElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLBaseElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == hrefAttr) {
     m_href = parseURL(attr->value());
     process();
@@ -59,63 +58,62 @@ void HTMLBaseElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     m_target = attr->value();
     process();
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLBaseElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLBaseElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
   process();
 }
 
-void HTMLBaseElementImpl::removedFromDocument() {
-  HTMLElementImpl::removedFromDocument();
+void HTMLBaseElement::removedFromDocument() {
+  HTMLElement::removedFromDocument();
 
   // Since the document doesn't have a base element...
   // (This will break in the case of multiple base elements, but that's not
   // valid anyway (?))
-  getDocument()->setBaseURL(QString::null);
-  getDocument()->setBaseTarget(QString::null);
+  getDocument()->setBaseURL(DeprecatedString::null);
+  getDocument()->setBaseTarget(DeprecatedString::null);
 }
 
-void HTMLBaseElementImpl::process() {
+void HTMLBaseElement::process() {
   if (!inDocument())
     return;
 
   if (!m_href.isEmpty() && getDocument()->frame())
     getDocument()->setBaseURL(
-        KURL(getDocument()->frame()->url(), m_href.qstring()).url());
+        KURL(getDocument()->frame()->url(), m_href.deprecatedString()).url());
 
   if (!m_target.isEmpty())
-    getDocument()->setBaseTarget(m_target.qstring());
+    getDocument()->setBaseTarget(m_target.deprecatedString());
 
   // ### should changing a document's base URL dynamically automatically update
   // all images, stylesheets etc?
 }
 
-void HTMLBaseElementImpl::setHref(const DOMString& value) {
+void HTMLBaseElement::setHref(const String& value) {
   setAttribute(hrefAttr, value);
 }
 
-void HTMLBaseElementImpl::setTarget(const DOMString& value) {
+void HTMLBaseElement::setTarget(const String& value) {
   setAttribute(targetAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLLinkElementImpl::HTMLLinkElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(linkTag, doc) {
+HTMLLinkElement::HTMLLinkElement(Document* doc) : HTMLElement(linkTag, doc) {
   m_loading = false;
   m_cachedSheet = 0;
   m_isStyleSheet = m_isIcon = m_alternate = false;
   m_disabledState = 0;
 }
 
-HTMLLinkElementImpl::~HTMLLinkElementImpl() {
+HTMLLinkElement::~HTMLLinkElement() {
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
 }
 
-void HTMLLinkElementImpl::setDisabledState(bool _disabled) {
+void HTMLLinkElement::setDisabledState(bool _disabled) {
   int oldDisabledState = m_disabledState;
   m_disabledState = _disabled ? 2 : 1;
   if (oldDisabledState != m_disabledState) {
@@ -157,7 +155,7 @@ void HTMLLinkElementImpl::setDisabledState(bool _disabled) {
   }
 }
 
-void HTMLLinkElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLLinkElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == relAttr) {
     tokenizeRelAttribute(attr->value());
     process();
@@ -168,17 +166,17 @@ void HTMLLinkElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     m_type = attr->value();
     process();
   } else if (attr->name() == mediaAttr) {
-    m_media = attr->value().qstring().lower();
+    m_media = attr->value().deprecatedString().lower();
     process();
   } else if (attr->name() == disabledAttr) {
     setDisabledState(!attr->isNull());
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLLinkElementImpl::tokenizeRelAttribute(const AtomicString& relStr) {
+void HTMLLinkElement::tokenizeRelAttribute(const AtomicString& relStr) {
   m_isStyleSheet = m_isIcon = m_alternate = false;
-  QString rel = relStr.qstring().lower();
+  DeprecatedString rel = relStr.deprecatedString().lower();
   if (rel == "stylesheet")
     m_isStyleSheet = true;
   else if (rel == "icon" || rel == "shortcut icon")
@@ -189,8 +187,9 @@ void HTMLLinkElementImpl::tokenizeRelAttribute(const AtomicString& relStr) {
     // Tokenize the rel attribute and set bits based on specific keywords that
     // we find.
     rel.replace('\n', ' ');
-    QStringList list = QStringList::split(' ', rel);
-    for (QStringList::Iterator i = list.begin(); i != list.end(); ++i) {
+    DeprecatedStringList list = DeprecatedStringList::split(' ', rel);
+    for (DeprecatedStringList::Iterator i = list.begin(); i != list.end();
+         ++i) {
       if (*i == "stylesheet")
         m_isStyleSheet = true;
       else if (*i == "alternate")
@@ -201,11 +200,11 @@ void HTMLLinkElementImpl::tokenizeRelAttribute(const AtomicString& relStr) {
   }
 }
 
-void HTMLLinkElementImpl::process() {
+void HTMLLinkElement::process() {
   if (!inDocument())
     return;
 
-  QString type = m_type.qstring().lower();
+  DeprecatedString type = m_type.deprecatedString().lower();
 
   Frame* frame = getDocument()->frame();
 
@@ -213,9 +212,10 @@ void HTMLLinkElementImpl::process() {
   if (frame && m_isIcon && !m_url.isEmpty() && !frame->tree()->parent()) {
     if (!type.isEmpty())  // Mozilla extension to IE extension: icon specified
                           // with type
-      frame->browserExtension()->setTypedIconURL(KURL(m_url.qstring()), type);
+      frame->browserExtension()->setTypedIconURL(KURL(m_url.deprecatedString()),
+                                                 type);
     else
-      frame->browserExtension()->setIconURL(KURL(m_url.qstring()));
+      frame->browserExtension()->setIconURL(KURL(m_url.deprecatedString()));
   }
 
   // Stylesheet
@@ -235,7 +235,7 @@ void HTMLLinkElementImpl::process() {
       if (!isAlternate())
         getDocument()->addPendingSheet();
 
-      QString chset = getAttribute(charsetAttr).qstring();
+      DeprecatedString chset = getAttribute(charsetAttr).deprecatedString();
       if (m_cachedSheet) {
         if (m_loading) {
           getDocument()->stylesheetLoaded();
@@ -255,22 +255,21 @@ void HTMLLinkElementImpl::process() {
   }
 }
 
-void HTMLLinkElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLLinkElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
   process();
 }
 
-void HTMLLinkElementImpl::removedFromDocument() {
-  HTMLElementImpl::removedFromDocument();
+void HTMLLinkElement::removedFromDocument() {
+  HTMLElement::removedFromDocument();
   process();
 }
 
-void HTMLLinkElementImpl::setStyleSheet(const DOMString& url,
-                                        const DOMString& sheetStr) {
-  m_sheet = new CSSStyleSheetImpl(this, url);
+void HTMLLinkElement::setStyleSheet(const String& url, const String& sheetStr) {
+  m_sheet = new CSSStyleSheet(this, url);
   m_sheet->parseString(sheetStr, !getDocument()->inCompatMode());
 
-  MediaListImpl* media = new MediaListImpl(m_sheet.get(), m_media);
+  MediaList* media = new MediaList(m_sheet.get(), m_media);
   m_sheet->setMedia(media);
 
   m_loading = false;
@@ -280,103 +279,102 @@ void HTMLLinkElementImpl::setStyleSheet(const DOMString& url,
     getDocument()->stylesheetLoaded();
 }
 
-bool HTMLLinkElementImpl::isLoading() const {
+bool HTMLLinkElement::isLoading() const {
   if (m_loading)
     return true;
   if (!m_sheet)
     return false;
-  return static_cast<CSSStyleSheetImpl*>(m_sheet.get())->isLoading();
+  return static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading();
 }
 
-void HTMLLinkElementImpl::sheetLoaded() {
+void HTMLLinkElement::sheetLoaded() {
   if (!isLoading() && !isDisabled() && !isAlternate())
     getDocument()->stylesheetLoaded();
 }
 
-bool HTMLLinkElementImpl::isURLAttribute(AttributeImpl* attr) const {
+bool HTMLLinkElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == hrefAttr;
 }
 
-bool HTMLLinkElementImpl::disabled() const {
+bool HTMLLinkElement::disabled() const {
   return !getAttribute(disabledAttr).isNull();
 }
 
-void HTMLLinkElementImpl::setDisabled(bool disabled) {
+void HTMLLinkElement::setDisabled(bool disabled) {
   setAttribute(disabledAttr, disabled ? "" : 0);
 }
 
-DOMString HTMLLinkElementImpl::charset() const {
+String HTMLLinkElement::charset() const {
   return getAttribute(charsetAttr);
 }
 
-void HTMLLinkElementImpl::setCharset(const DOMString& value) {
+void HTMLLinkElement::setCharset(const String& value) {
   setAttribute(charsetAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::href() const {
+String HTMLLinkElement::href() const {
   return getDocument()->completeURL(getAttribute(hrefAttr));
 }
 
-void HTMLLinkElementImpl::setHref(const DOMString& value) {
+void HTMLLinkElement::setHref(const String& value) {
   setAttribute(hrefAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::hreflang() const {
+String HTMLLinkElement::hreflang() const {
   return getAttribute(hreflangAttr);
 }
 
-void HTMLLinkElementImpl::setHreflang(const DOMString& value) {
+void HTMLLinkElement::setHreflang(const String& value) {
   setAttribute(hreflangAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::media() const {
+String HTMLLinkElement::media() const {
   return getAttribute(mediaAttr);
 }
 
-void HTMLLinkElementImpl::setMedia(const DOMString& value) {
+void HTMLLinkElement::setMedia(const String& value) {
   setAttribute(mediaAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::rel() const {
+String HTMLLinkElement::rel() const {
   return getAttribute(relAttr);
 }
 
-void HTMLLinkElementImpl::setRel(const DOMString& value) {
+void HTMLLinkElement::setRel(const String& value) {
   setAttribute(relAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::rev() const {
+String HTMLLinkElement::rev() const {
   return getAttribute(revAttr);
 }
 
-void HTMLLinkElementImpl::setRev(const DOMString& value) {
+void HTMLLinkElement::setRev(const String& value) {
   setAttribute(revAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::target() const {
+String HTMLLinkElement::target() const {
   return getAttribute(targetAttr);
 }
 
-void HTMLLinkElementImpl::setTarget(const DOMString& value) {
+void HTMLLinkElement::setTarget(const String& value) {
   setAttribute(targetAttr, value);
 }
 
-DOMString HTMLLinkElementImpl::type() const {
+String HTMLLinkElement::type() const {
   return getAttribute(typeAttr);
 }
 
-void HTMLLinkElementImpl::setType(const DOMString& value) {
+void HTMLLinkElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLMetaElementImpl::HTMLMetaElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(metaTag, doc) {}
+HTMLMetaElement::HTMLMetaElement(Document* doc) : HTMLElement(metaTag, doc) {}
 
-HTMLMetaElementImpl::~HTMLMetaElementImpl() {}
+HTMLMetaElement::~HTMLMetaElement() {}
 
-void HTMLMetaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLMetaElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == http_equivAttr) {
     m_equiv = attr->value();
     process();
@@ -386,15 +384,15 @@ void HTMLMetaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == nameAttr) {
     // Do nothing.
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLMetaElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLMetaElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
   process();
 }
 
-void HTMLMetaElementImpl::process() {
+void HTMLMetaElement::process() {
   // Get the document to process the tag, but only if we're actually part of DOM
   // tree (changing a meta tag while
   // it's not in the tree shouldn't have any effect on the document)
@@ -402,56 +400,56 @@ void HTMLMetaElementImpl::process() {
     getDocument()->processHttpEquiv(m_equiv, m_content);
 }
 
-DOMString HTMLMetaElementImpl::content() const {
+String HTMLMetaElement::content() const {
   return getAttribute(contentAttr);
 }
 
-void HTMLMetaElementImpl::setContent(const DOMString& value) {
+void HTMLMetaElement::setContent(const String& value) {
   setAttribute(contentAttr, value);
 }
 
-DOMString HTMLMetaElementImpl::httpEquiv() const {
+String HTMLMetaElement::httpEquiv() const {
   return getAttribute(http_equivAttr);
 }
 
-void HTMLMetaElementImpl::setHttpEquiv(const DOMString& value) {
+void HTMLMetaElement::setHttpEquiv(const String& value) {
   setAttribute(http_equivAttr, value);
 }
 
-DOMString HTMLMetaElementImpl::name() const {
+String HTMLMetaElement::name() const {
   return getAttribute(nameAttr);
 }
 
-void HTMLMetaElementImpl::setName(const DOMString& value) {
+void HTMLMetaElement::setName(const String& value) {
   setAttribute(nameAttr, value);
 }
 
-DOMString HTMLMetaElementImpl::scheme() const {
+String HTMLMetaElement::scheme() const {
   return getAttribute(schemeAttr);
 }
 
-void HTMLMetaElementImpl::setScheme(const DOMString& value) {
+void HTMLMetaElement::setScheme(const String& value) {
   setAttribute(schemeAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLScriptElementImpl::HTMLScriptElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(scriptTag, doc),
+HTMLScriptElement::HTMLScriptElement(Document* doc)
+    : HTMLElement(scriptTag, doc),
       m_cachedScript(0),
       m_createdByParser(false),
       m_evaluated(false) {}
 
-HTMLScriptElementImpl::~HTMLScriptElementImpl() {
+HTMLScriptElement::~HTMLScriptElement() {
   if (m_cachedScript)
     m_cachedScript->deref(this);
 }
 
-bool HTMLScriptElementImpl::isURLAttribute(AttributeImpl* attr) const {
+bool HTMLScriptElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == srcAttr;
 }
 
-void HTMLScriptElementImpl::childrenChanged() {
+void HTMLScriptElement::childrenChanged() {
   // If a node is inserted as a child of the script element
   // and the script element has been inserted in the document
   // we evaluate the script.
@@ -459,7 +457,7 @@ void HTMLScriptElementImpl::childrenChanged() {
     evaluateScript(getDocument()->URL(), text());
 }
 
-void HTMLScriptElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLScriptElement::parseMappedAttribute(MappedAttribute* attr) {
   const QualifiedName& attrName = attr->name();
   if (attrName == srcAttr) {
     if (m_evaluated || m_cachedScript || m_createdByParser || !inDocument())
@@ -472,7 +470,7 @@ void HTMLScriptElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 
     const AtomicString& url = attr->value();
     if (!url.isEmpty()) {
-      QString charset = getAttribute(charsetAttr).qstring();
+      DeprecatedString charset = getAttribute(charsetAttr).deprecatedString();
       m_cachedScript = getDocument()->docLoader()->requestScript(url, charset);
       m_cachedScript->ref(this);
     }
@@ -481,19 +479,19 @@ void HTMLScriptElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attrName == onloadAttr) {
     setHTMLEventListener(loadEvent, attr);
   } else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLScriptElementImpl::closeRenderer() {
+void HTMLScriptElement::closeRenderer() {
   // The parser just reached </script>. If we have no src and no text,
   // allow dynamic loading later.
   if (getAttribute(srcAttr).isEmpty() && text().isEmpty())
     setCreatedByParser(false);
-  HTMLElementImpl::closeRenderer();
+  HTMLElement::closeRenderer();
 }
 
-void HTMLScriptElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLScriptElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
 
   assert(!m_cachedScript);
 
@@ -508,7 +506,7 @@ void HTMLScriptElementImpl::insertedIntoDocument() {
 
   const AtomicString& url = getAttribute(srcAttr);
   if (!url.isEmpty()) {
-    QString charset = getAttribute(charsetAttr).qstring();
+    DeprecatedString charset = getAttribute(charsetAttr).deprecatedString();
     m_cachedScript = getDocument()->docLoader()->requestScript(url, charset);
     m_cachedScript->ref(this);
     return;
@@ -517,13 +515,13 @@ void HTMLScriptElementImpl::insertedIntoDocument() {
   // If there's an empty script node, we shouldn't evaluate the script
   // because if a script is inserted afterwards (by setting text or innerText)
   // it should be evaluated, and evaluateScript only evaluates a script once.
-  DOMString scriptString = text();
+  String scriptString = text();
   if (!scriptString.isEmpty())
     evaluateScript(getDocument()->URL(), scriptString);
 }
 
-void HTMLScriptElementImpl::removedFromDocument() {
-  HTMLElementImpl::removedFromDocument();
+void HTMLScriptElement::removedFromDocument() {
+  HTMLElement::removedFromDocument();
 
   if (m_cachedScript) {
     m_cachedScript->deref(this);
@@ -531,7 +529,7 @@ void HTMLScriptElementImpl::removedFromDocument() {
   }
 }
 
-void HTMLScriptElementImpl::notifyFinished(CachedObject* o) {
+void HTMLScriptElement::notifyFinished(CachedObject* o) {
   CachedScript* cs = static_cast<CachedScript*>(o);
 
   assert(cs == m_cachedScript);
@@ -547,39 +545,39 @@ void HTMLScriptElementImpl::notifyFinished(CachedObject* o) {
   m_cachedScript = 0;
 }
 
-void HTMLScriptElementImpl::evaluateScript(const DOMString& URL,
-                                           const DOMString& script) {
+void HTMLScriptElement::evaluateScript(const String& URL,
+                                       const String& script) {
   if (m_evaluated)
     return;
 
   Frame* frame = getDocument()->frame();
   if (frame) {
-    KJSProxyImpl* proxy = frame->jScript();
+    KJSProxy* proxy = frame->jScript();
     if (proxy) {
       m_evaluated = true;
       proxy->evaluate(URL, 0, script, 0);
-      DocumentImpl::updateDocumentsRendering();
+      Document::updateDocumentsRendering();
     }
   }
 }
 
-DOMString HTMLScriptElementImpl::text() const {
-  DOMString val = "";
+String HTMLScriptElement::text() const {
+  String val = "";
 
-  for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+  for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->isTextNode())
-      val += static_cast<TextImpl*>(n)->data();
+      val += static_cast<Text*>(n)->data();
   }
 
   return val;
 }
 
-void HTMLScriptElementImpl::setText(const DOMString& value) {
+void HTMLScriptElement::setText(const String& value) {
   ExceptionCode ec = 0;
   int numChildren = childNodeCount();
 
   if (numChildren == 1 && firstChild()->isTextNode()) {
-    static_cast<TextImpl*>(firstChild())->setData(value, ec);
+    static_cast<Text*>(firstChild())->setData(value, ec);
     return;
   }
 
@@ -590,95 +588,94 @@ void HTMLScriptElementImpl::setText(const DOMString& value) {
   appendChild(getDocument()->createTextNode(value.impl()), ec);
 }
 
-DOMString HTMLScriptElementImpl::htmlFor() const {
+String HTMLScriptElement::htmlFor() const {
   // DOM Level 1 says: reserved for future use.
-  return DOMString();
+  return String();
 }
 
-void HTMLScriptElementImpl::setHtmlFor(const DOMString& /*value*/) {
-  // DOM Level 1 says: reserved for future use.
-}
-
-DOMString HTMLScriptElementImpl::event() const {
-  // DOM Level 1 says: reserved for future use.
-  return DOMString();
-}
-
-void HTMLScriptElementImpl::setEvent(const DOMString& /*value*/) {
+void HTMLScriptElement::setHtmlFor(const String& /*value*/) {
   // DOM Level 1 says: reserved for future use.
 }
 
-DOMString HTMLScriptElementImpl::charset() const {
+String HTMLScriptElement::event() const {
+  // DOM Level 1 says: reserved for future use.
+  return String();
+}
+
+void HTMLScriptElement::setEvent(const String& /*value*/) {
+  // DOM Level 1 says: reserved for future use.
+}
+
+String HTMLScriptElement::charset() const {
   return getAttribute(charsetAttr);
 }
 
-void HTMLScriptElementImpl::setCharset(const DOMString& value) {
+void HTMLScriptElement::setCharset(const String& value) {
   setAttribute(charsetAttr, value);
 }
 
-bool HTMLScriptElementImpl::defer() const {
+bool HTMLScriptElement::defer() const {
   return !getAttribute(deferAttr).isNull();
 }
 
-void HTMLScriptElementImpl::setDefer(bool defer) {
+void HTMLScriptElement::setDefer(bool defer) {
   setAttribute(deferAttr, defer ? "" : 0);
 }
 
-DOMString HTMLScriptElementImpl::src() const {
+String HTMLScriptElement::src() const {
   return getDocument()->completeURL(getAttribute(srcAttr));
 }
 
-void HTMLScriptElementImpl::setSrc(const DOMString& value) {
+void HTMLScriptElement::setSrc(const String& value) {
   setAttribute(srcAttr, value);
 }
 
-DOMString HTMLScriptElementImpl::type() const {
+String HTMLScriptElement::type() const {
   return getAttribute(typeAttr);
 }
 
-void HTMLScriptElementImpl::setType(const DOMString& value) {
+void HTMLScriptElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLStyleElementImpl::HTMLStyleElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(styleTag, doc) {
+HTMLStyleElement::HTMLStyleElement(Document* doc) : HTMLElement(styleTag, doc) {
   m_loading = false;
 }
 
 // other stuff...
-void HTMLStyleElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
+void HTMLStyleElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == typeAttr)
     m_type = attr->value().domString().lower();
   else if (attr->name() == mediaAttr)
-    m_media = attr->value().qstring().lower();
+    m_media = attr->value().deprecatedString().lower();
   else
-    HTMLElementImpl::parseMappedAttribute(attr);
+    HTMLElement::parseMappedAttribute(attr);
 }
 
-void HTMLStyleElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLStyleElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
   if (m_sheet)
     getDocument()->updateStyleSelector();
 }
 
-void HTMLStyleElementImpl::removedFromDocument() {
-  HTMLElementImpl::removedFromDocument();
+void HTMLStyleElement::removedFromDocument() {
+  HTMLElement::removedFromDocument();
   if (m_sheet)
     getDocument()->updateStyleSelector();
 }
 
-void HTMLStyleElementImpl::childrenChanged() {
-  DOMString text = "";
+void HTMLStyleElement::childrenChanged() {
+  String text = "";
 
-  for (NodeImpl* c = firstChild(); c; c = c->nextSibling())
+  for (Node* c = firstChild(); c; c = c->nextSibling())
     if (c->nodeType() == TEXT_NODE || c->nodeType() == CDATA_SECTION_NODE ||
         c->nodeType() == COMMENT_NODE)
       text += c->nodeValue();
 
   if (m_sheet) {
-    if (static_cast<CSSStyleSheetImpl*>(m_sheet.get())->isLoading())
+    if (static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading())
       getDocument()
           ->stylesheetLoaded();  // Remove ourselves from the sheet list.
     m_sheet = 0;
@@ -690,9 +687,9 @@ void HTMLStyleElementImpl::childrenChanged() {
           m_media.contains("all") || m_media.contains("print"))) {
     getDocument()->addPendingSheet();
     m_loading = true;
-    m_sheet = new CSSStyleSheetImpl(this);
+    m_sheet = new CSSStyleSheet(this);
     m_sheet->parseString(text, !getDocument()->inCompatMode());
-    MediaListImpl* media = new MediaListImpl(m_sheet.get(), m_media);
+    MediaList* media = new MediaList(m_sheet.get(), m_media);
     m_sheet->setMedia(media);
     m_loading = false;
   }
@@ -701,87 +698,87 @@ void HTMLStyleElementImpl::childrenChanged() {
     getDocument()->stylesheetLoaded();
 }
 
-bool HTMLStyleElementImpl::isLoading() const {
+bool HTMLStyleElement::isLoading() const {
   if (m_loading)
     return true;
   if (!m_sheet)
     return false;
-  return static_cast<CSSStyleSheetImpl*>(m_sheet.get())->isLoading();
+  return static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading();
 }
 
-void HTMLStyleElementImpl::sheetLoaded() {
+void HTMLStyleElement::sheetLoaded() {
   if (!isLoading())
     getDocument()->stylesheetLoaded();
 }
 
-bool HTMLStyleElementImpl::disabled() const {
+bool HTMLStyleElement::disabled() const {
   return !getAttribute(disabledAttr).isNull();
 }
 
-void HTMLStyleElementImpl::setDisabled(bool disabled) {
+void HTMLStyleElement::setDisabled(bool disabled) {
   setAttribute(disabledAttr, disabled ? "" : 0);
 }
 
-DOMString HTMLStyleElementImpl::media() const {
+String HTMLStyleElement::media() const {
   return getAttribute(mediaAttr);
 }
 
-void HTMLStyleElementImpl::setMedia(const DOMString& value) {
+void HTMLStyleElement::setMedia(const String& value) {
   setAttribute(mediaAttr, value);
 }
 
-DOMString HTMLStyleElementImpl::type() const {
+String HTMLStyleElement::type() const {
   return getAttribute(typeAttr);
 }
 
-void HTMLStyleElementImpl::setType(const DOMString& value) {
+void HTMLStyleElement::setType(const String& value) {
   setAttribute(typeAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
-HTMLTitleElementImpl::HTMLTitleElementImpl(DocumentImpl* doc)
-    : HTMLElementImpl(titleTag, doc), m_title("") {}
+HTMLTitleElement::HTMLTitleElement(Document* doc)
+    : HTMLElement(titleTag, doc), m_title("") {}
 
-HTMLTitleElementImpl::~HTMLTitleElementImpl() {}
+HTMLTitleElement::~HTMLTitleElement() {}
 
-void HTMLTitleElementImpl::insertedIntoDocument() {
-  HTMLElementImpl::insertedIntoDocument();
+void HTMLTitleElement::insertedIntoDocument() {
+  HTMLElement::insertedIntoDocument();
   getDocument()->setTitle(m_title, this);
 }
 
-void HTMLTitleElementImpl::removedFromDocument() {
-  HTMLElementImpl::removedFromDocument();
+void HTMLTitleElement::removedFromDocument() {
+  HTMLElement::removedFromDocument();
   getDocument()->removeTitle(this);
 }
 
-void HTMLTitleElementImpl::childrenChanged() {
-  HTMLElementImpl::childrenChanged();
+void HTMLTitleElement::childrenChanged() {
+  HTMLElement::childrenChanged();
   m_title = "";
-  for (NodeImpl* c = firstChild(); c != 0; c = c->nextSibling())
+  for (Node* c = firstChild(); c != 0; c = c->nextSibling())
     if (c->nodeType() == TEXT_NODE || c->nodeType() == CDATA_SECTION_NODE)
       m_title += c->nodeValue();
   if (inDocument())
     getDocument()->setTitle(m_title, this);
 }
 
-DOMString HTMLTitleElementImpl::text() const {
-  DOMString val = "";
+String HTMLTitleElement::text() const {
+  String val = "";
 
-  for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+  for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->isTextNode())
-      val += static_cast<TextImpl*>(n)->data();
+      val += static_cast<Text*>(n)->data();
   }
 
   return val;
 }
 
-void HTMLTitleElementImpl::setText(const DOMString& value) {
+void HTMLTitleElement::setText(const String& value) {
   ExceptionCode ec = 0;
   int numChildren = childNodeCount();
 
   if (numChildren == 1 && firstChild()->isTextNode()) {
-    static_cast<TextImpl*>(firstChild())->setData(value, ec);
+    static_cast<Text*>(firstChild())->setData(value, ec);
   } else {
     if (numChildren > 0) {
       removeChildren();

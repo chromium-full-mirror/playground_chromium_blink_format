@@ -24,7 +24,7 @@
 #define KSVG_SVGAnimatedTemplate_H
 #if SVG_SUPPORT
 
-#include "SVGStyledElementImpl.h"
+#include "SVGStyledElement.h"
 
 namespace WebCore {
 // SVGAnimatedTemplate
@@ -70,7 +70,7 @@ class SVGAnimatedTemplate : public Shared<SVGAnimatedTemplate<T>> {
   }
 
  protected:
-  SVGAnimatedTemplate(const SVGStyledElementImpl* context)
+  SVGAnimatedTemplate(const SVGStyledElement* context)
       : Shared<SVGAnimatedTemplate>() {
     m_context = context;
   }
@@ -80,7 +80,7 @@ class SVGAnimatedTemplate : public Shared<SVGAnimatedTemplate<T>> {
   // virtual void assign(T *src, T *dst) const = 0;
 
   // Attribute notification context
-  const SVGStyledElementImpl* m_context;
+  const SVGStyledElement* m_context;
 
  private:
   SVGAnimatedTemplate(const SVGAnimatedTemplate&) {}

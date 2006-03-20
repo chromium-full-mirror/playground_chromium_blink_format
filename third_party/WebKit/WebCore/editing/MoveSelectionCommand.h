@@ -28,17 +28,17 @@
 
 #include "CompositeEditCommand.h"
 
-namespace DOM {
-class DocumentFragmentImpl;
+namespace WebCore {
+class DocumentFragment;
 }
 
-namespace khtml {
+namespace WebCore {
 
 class MoveSelectionCommand : public CompositeEditCommand {
  public:
-  MoveSelectionCommand(DOM::DocumentImpl* document,
-                       DOM::DocumentFragmentImpl* fragment,
-                       DOM::Position& position,
+  MoveSelectionCommand(WebCore::Document* document,
+                       WebCore::DocumentFragment* fragment,
+                       WebCore::Position& position,
                        bool smartMove = false);
   virtual ~MoveSelectionCommand();
 
@@ -46,11 +46,11 @@ class MoveSelectionCommand : public CompositeEditCommand {
   virtual EditAction editingAction() const;
 
  private:
-  RefPtr<DOM::DocumentFragmentImpl> m_fragment;
-  DOM::Position m_position;
+  RefPtr<WebCore::DocumentFragment> m_fragment;
+  WebCore::Position m_position;
   bool m_smartMove;
 };
 
-}  // namespace khtml
+}  // namespace WebCore
 
 #endif  // __move_selection_command_h__

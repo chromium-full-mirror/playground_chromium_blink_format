@@ -29,13 +29,13 @@
 #include "KCanvasMatrix.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
-#include "SVGAnimatedLengthListImpl.h"
-#include "SVGTextElementImpl.h"
-#include "render_object.h"
+#include "SVGAnimatedLengthList.h"
+#include "SVGTextElement.h"
+#include "RenderObject.h"
 
 namespace WebCore {
 
-RenderSVGText::RenderSVGText(SVGTextElementImpl* node) : RenderBlock(node) {}
+RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderBlock(node) {}
 
 QMatrix RenderSVGText::translationTopToBaseline() {
   int offset = baselinePosition(true, true);
@@ -43,7 +43,7 @@ QMatrix RenderSVGText::translationTopToBaseline() {
 }
 
 QMatrix RenderSVGText::translationForAttributes() {
-  SVGTextElementImpl* text = static_cast<SVGTextElementImpl*>(element());
+  SVGTextElement* text = static_cast<SVGTextElement*>(element());
 
   float xOffset = text->x()->baseVal()->getFirst()
                       ? text->x()->baseVal()->getFirst()->value()

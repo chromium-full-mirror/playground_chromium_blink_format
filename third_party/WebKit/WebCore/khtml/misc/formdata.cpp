@@ -21,11 +21,11 @@
 #include "config.h"
 #include "formdata.h"
 
-namespace khtml {
+namespace WebCore {
 
 FormData::FormData() {}
 
-FormData::FormData(const QCString& s) {
+FormData::FormData(const DeprecatedCString& s) {
   appendData(s.data(), s.length());
 }
 
@@ -40,14 +40,15 @@ void FormData::appendData(const void* data, size_t size) {
   memcpy(e.m_data.data() + oldSize, data, size);
 }
 
-void FormData::appendFile(const QString& filename) {
+void FormData::appendFile(const DeprecatedString& filename) {
   m_elements.append(filename);
 }
 
-ByteArray FormData::flatten() const {
+DeprecatedByteArray FormData::flatten() const {
   // Concatenate all the byte arrays, but omit any files.
-  ByteArray a;
-  for (QValueListConstIterator<FormDataElement> it = m_elements.begin();
+  DeprecatedByteArray a;
+  for (DeprecatedValueListConstIterator<FormDataElement> it =
+           m_elements.begin();
        it != m_elements.end(); ++it) {
     const FormDataElement& e = *it;
     if (e.m_type == FormDataElement::data) {
@@ -65,9 +66,9 @@ ByteArray FormData::flatten() const {
   return a;
 }
 
-QString FormData::flattenToString() const {
-  ByteArray bytes = flatten();
-  return QString::fromLatin1(bytes.data(), bytes.size());
+DeprecatedString FormData::flattenToString() const {
+  DeprecatedByteArray bytes = flatten();
+  return DeprecatedString::fromLatin1(bytes.data(), bytes.size());
 }
 
-}  // namespace khtml
+}  // namespace WebCore

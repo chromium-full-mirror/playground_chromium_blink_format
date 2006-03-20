@@ -27,7 +27,7 @@
 
 #include "PlatformString.h"
 
-#include <QString.h>
+#include <DeprecatedString.h>
 #include <qvaluelist.h>
 
 #include <assert.h>
@@ -41,7 +41,7 @@ class SegmentedSubstring {
   friend class SegmentedString;
 
   SegmentedSubstring() : m_length(0), m_current(0) {}
-  SegmentedSubstring(const QString& str)
+  SegmentedSubstring(const DeprecatedString& str)
       : m_string(str), m_length(str.length()) {
     m_current = m_length == 0 ? 0 : m_string.stableUnicode();
   }
@@ -54,7 +54,7 @@ class SegmentedSubstring {
     m_current = 0;
   }
 
-  void appendTo(QString& str) const {
+  void appendTo(DeprecatedString& str) const {
     if (m_string.unicode() == m_current) {
       if (str.isEmpty())
         str = m_string;
@@ -65,7 +65,7 @@ class SegmentedSubstring {
     }
   }
 
-  QString m_string;
+  DeprecatedString m_string;
   int m_length;
   const QChar* m_current;
 };
@@ -78,7 +78,7 @@ class SegmentedString {
         m_currentChar(m_currentString.m_current),
         m_lines(0),
         m_composite(false) {}
-  SegmentedString(const QString& str)
+  SegmentedString(const DeprecatedString& str)
       : m_currentString(str),
         m_currentChar(m_currentString.m_current),
         m_lines(0),
@@ -104,7 +104,7 @@ class SegmentedString {
   }
 
   bool isEmpty() const { return !current(); }
-  uint length() const;
+  unsigned length() const;
 
   void advance() {
     if (!m_pushedChar1.isNull()) {
@@ -124,7 +124,7 @@ class SegmentedString {
   int lineCount() const { return m_lines; }
   void resetLineCount() { m_lines = 0; }
 
-  QString toString() const;
+  DeprecatedString toString() const;
 
   void operator++() { advance(); }
   const QChar& operator*() const { return *current(); }
@@ -141,7 +141,7 @@ class SegmentedString {
   QChar m_pushedChar2;
   SegmentedSubstring m_currentString;
   const QChar* m_currentChar;
-  QValueList<SegmentedSubstring> m_substrings;
+  DeprecatedValueList<SegmentedSubstring> m_substrings;
   int m_lines;
   bool m_composite;
 };

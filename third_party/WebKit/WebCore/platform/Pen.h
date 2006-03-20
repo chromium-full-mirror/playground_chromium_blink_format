@@ -34,14 +34,14 @@ class Pen {
  public:
   enum PenStyle { NoPen, SolidLine, DotLine, DashLine };
 
-  Pen(const Color& c = Color::black, uint w = 0, PenStyle ps = SolidLine);
+  Pen(const Color& c = Color::black, unsigned w = 0, PenStyle ps = SolidLine);
 
   const Color& color() const;
-  uint width() const;
+  unsigned width() const;
   PenStyle style() const;
 
   void setColor(const Color&);
-  void setWidth(uint);
+  void setWidth(unsigned);
   void setStyle(PenStyle);
 
   bool operator==(const Pen&) const;
@@ -49,7 +49,7 @@ class Pen {
 
  private:
   PenStyle m_style;
-  uint m_width;
+  unsigned m_width;
   Color m_color;
 };
 }

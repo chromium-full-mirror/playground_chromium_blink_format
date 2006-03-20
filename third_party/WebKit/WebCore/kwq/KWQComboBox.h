@@ -42,14 +42,14 @@ class QComboBox : public Widget {
   ~QComboBox();
 
   void clear();
-  void appendItem(const QString& text, bool enabled) {
+  void appendItem(const DeprecatedString& text, bool enabled) {
     appendItem(text, KWQListBoxOption, enabled);
   }
-  void appendGroupLabel(const QString& text) {
+  void appendGroupLabel(const DeprecatedString& text) {
     appendItem(text, KWQListBoxGroupLabel, false);
   }
   void appendSeparator() {
-    appendItem(QString::null, KWQListBoxSeparator, true);
+    appendItem(DeprecatedString::null, KWQListBoxSeparator, true);
   }
 
   int currentItem() const { return _currentItem; }
@@ -71,7 +71,7 @@ class QComboBox : public Widget {
   void populateMenu();
 
  private:
-  void appendItem(const QString&, KWQListBoxItemType, bool);
+  void appendItem(const DeprecatedString&, KWQListBoxItemType, bool);
   const int* dimensions() const;
   NSFont* labelFont() const;
   void setTitle(NSMenuItem*, const KWQListBoxItem&);
@@ -82,7 +82,7 @@ class QComboBox : public Widget {
   mutable int _currentItem;
 
   // A Vector<KWQListBoxItem> may be more efficient for large menus.
-  QValueList<KWQListBoxItem> _items;
+  DeprecatedValueList<KWQListBoxItem> _items;
   mutable bool _menuPopulated;
 
   mutable NSFont* _labelFont;

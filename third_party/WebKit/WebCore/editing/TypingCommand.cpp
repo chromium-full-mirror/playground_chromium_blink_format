@@ -26,9 +26,9 @@
 #include "config.h"
 #include "TypingCommand.h"
 
-#include "BeforeTextInsertedEventImpl.h"
+#include "BeforeTextInsertedEvent.h"
 #include "BreakBlockquoteCommand.h"
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "dom2_eventsimpl.h"
 #include "Frame.h"
 #include "InsertLineBreakCommand.h"
@@ -42,9 +42,9 @@
 
 namespace WebCore {
 
-TypingCommand::TypingCommand(DocumentImpl* document,
+TypingCommand::TypingCommand(Document* document,
                              ETypingCommand commandType,
-                             const DOMString& textToInsert,
+                             const String& textToInsert,
                              bool selectInsertedText)
     : CompositeEditCommand(document),
       m_commandType(commandType),
@@ -54,7 +54,7 @@ TypingCommand::TypingCommand(DocumentImpl* document,
       m_selectInsertedText(selectInsertedText),
       m_smartDelete(false) {}
 
-void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
+void TypingCommand::deleteKeyPressed(Document* document, bool smartDelete) {
   ASSERT(document);
 
   Frame* frame = document->frame();
@@ -72,7 +72,7 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
   cmd.apply();
 }
 
-void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
+void TypingCommand::forwardDeleteKeyPressed(Document* document,
                                             bool smartDelete) {
   ASSERT(document);
 
@@ -92,8 +92,8 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
   cmd.apply();
 }
 
-void TypingCommand::insertText(DocumentImpl* document,
-                               const DOMString& text,
+void TypingCommand::insertText(Document* document,
+                               const String& text,
                                bool selectInsertedText) {
   ASSERT(document);
 
@@ -101,13 +101,13 @@ void TypingCommand::insertText(DocumentImpl* document,
   ASSERT(frame);
 
   String newText = text.copy();
-  NodeImpl* startNode = frame->selection().start().node();
+  Node* startNode = frame->selection().start().node();
 
   if (startNode && startNode->rootEditableElement()) {
     // Send khtmlBeforeTextInsertedEvent.  The event handler will update text if
     // necessary.
     ExceptionCode ec = 0;
-    RefPtr<EventImpl> evt = new BeforeTextInsertedEventImpl(newText);
+    RefPtr<Event> evt = new BeforeTextInsertedEvent(newText);
     startNode->rootEditableElement()->dispatchEvent(evt, ec, true);
   }
 
@@ -126,7 +126,7 @@ void TypingCommand::insertText(DocumentImpl* document,
   cmd.apply();
 }
 
-void TypingCommand::insertLineBreak(DocumentImpl* document) {
+void TypingCommand::insertLineBreak(Document* document) {
   ASSERT(document);
 
   Frame* frame = document->frame();
@@ -143,7 +143,7 @@ void TypingCommand::insertLineBreak(DocumentImpl* document) {
 }
 
 void TypingCommand::insertParagraphSeparatorInQuotedContent(
-    DocumentImpl* document) {
+    Document* document) {
   ASSERT(document);
 
   Frame* frame = document->frame();
@@ -161,7 +161,7 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent(
   cmd.apply();
 }
 
-void TypingCommand::insertParagraphSeparator(DocumentImpl* document) {
+void TypingCommand::insertParagraphSeparator(Document* document) {
   ASSERT(document);
 
   Frame* frame = document->frame();
@@ -252,7 +252,7 @@ void TypingCommand::typingAddedToOpenCommand() {
   m_applyEditing = true;
 }
 
-void TypingCommand::insertText(const DOMString& text, bool selectInsertedText) {
+void TypingCommand::insertText(const String& text, bool selectInsertedText) {
   // FIXME: Need to implement selectInsertedText for cases where more than one
   // insert is involved.
   // This requires support from insertTextRunWithoutNewlines and
@@ -283,7 +283,7 @@ void TypingCommand::insertText(const DOMString& text, bool selectInsertedText) {
   }
 }
 
-void TypingCommand::insertTextRunWithoutNewlines(const DOMString& text,
+void TypingCommand::insertTextRunWithoutNewlines(const String& text,
                                                  bool selectInsertedText) {
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
@@ -331,10 +331,10 @@ void TypingCommand::deleteKeyPressed() {
   Selection selectionToDelete;
 
   switch (endingSelection().state()) {
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case khtml::Selection::CARET: {
+    case WebCore::Selection::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
@@ -346,7 +346,7 @@ void TypingCommand::deleteKeyPressed() {
       selectionToDelete = sc.selection();
       break;
     }
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       ASSERT_NOT_REACHED();
       break;
   }
@@ -362,10 +362,10 @@ void TypingCommand::forwardDeleteKeyPressed() {
   Selection selectionToDelete;
 
   switch (endingSelection().state()) {
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case khtml::Selection::CARET: {
+    case WebCore::Selection::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
@@ -377,7 +377,7 @@ void TypingCommand::forwardDeleteKeyPressed() {
       selectionToDelete = sc.selection();
       break;
     }
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       ASSERT_NOT_REACHED();
       break;
   }
@@ -408,4 +408,4 @@ bool TypingCommand::isTypingCommand() const {
   return true;
 }
 
-}  // namespace khtml
+}  // namespace WebCore

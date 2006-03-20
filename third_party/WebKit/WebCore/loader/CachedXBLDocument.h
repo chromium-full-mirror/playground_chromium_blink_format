@@ -32,7 +32,7 @@
 
 #include <kio/global.h>
 
-namespace khtml {
+namespace WebCore {
 class CachedObject;
 class Request;
 class DocLoader;
@@ -43,18 +43,18 @@ class CachedObjectClient;
 class CachedXBLDocument : public CachedObject {
  public:
   CachedXBLDocument(DocLoader* dl,
-                    const DOM::DOMString& url,
+                    const WebCore::String& url,
                     KIO::CacheControl cachePolicy,
                     time_t _expireDate);
   virtual ~CachedXBLDocument();
 
-  XBL::XBLDocumentImpl* document() const { return m_document; }
+  XBL::XBLDocument* document() const { return m_document; }
 
   virtual void ref(CachedObjectClient* consumer);
   virtual void deref(CachedObjectClient* consumer);
 
-  virtual void setCharset(const QString& chs);
-  virtual void data(ByteArray&, bool eof);
+  virtual void setCharset(const DeprecatedString& chs);
+  virtual void data(DeprecatedByteArray&, bool eof);
   virtual void error(int err, const char* text);
 
   virtual bool schedule() const { return true; }
@@ -62,7 +62,7 @@ class CachedXBLDocument : public CachedObject {
   void checkNotify();
 
  protected:
-  XBL::XBLDocumentImpl* m_document;
+  XBL::XBLDocument* m_document;
   RefPtr<Decoder> m_decoder;
 };
 

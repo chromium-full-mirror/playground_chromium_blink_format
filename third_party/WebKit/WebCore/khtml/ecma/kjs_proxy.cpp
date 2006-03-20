@@ -23,7 +23,7 @@
 
 #include "kjs_window.h"
 #include "kjs_events.h"
-#include "NodeImpl.h"
+#include "Node.h"
 #include "Frame.h"
 #include <kjs/collector.h>
 
@@ -35,22 +35,22 @@ using namespace KJS;
 
 namespace WebCore {
 
-KJSProxyImpl::KJSProxyImpl(Frame* frame) {
+KJSProxy::KJSProxy(Frame* frame) {
   m_script = 0;
   m_frame = frame;
   m_handlerLineno = 0;
 }
 
-KJSProxyImpl::~KJSProxyImpl() {
+KJSProxy::~KJSProxy() {
   JSLock lock;
   delete m_script;
   Collector::collect();
 }
 
-JSValue* KJSProxyImpl::evaluate(const DOMString& filename,
-                                int baseLine,
-                                const DOMString& str,
-                                NodeImpl* n) {
+JSValue* KJSProxy::evaluate(const String& filename,
+                            int baseLine,
+                            const String& str,
+                            Node* n) {
   // evaluate code. Returns the JS return value or 0
   // if there was none, an error occured or the type couldn't be converted.
 
@@ -91,7 +91,7 @@ JSValue* KJSProxyImpl::evaluate(const DOMString& filename,
   return 0;
 }
 
-void KJSProxyImpl::clear() {
+void KJSProxy::clear() {
   // clear resources allocated by the interpreter, and make it ready to be used
   // by another page
   // We have to keep it, so that the Window object for the frame remains the
@@ -104,8 +104,8 @@ void KJSProxyImpl::clear() {
   }
 }
 
-EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
-                                                    NodeImpl* node) {
+EventListener* KJSProxy::createHTMLEventHandler(const String& code,
+                                                Node* node) {
   initScriptIfNeeded();
   JSLock lock;
   return new JSLazyEventListener(code, Window::retrieveWindow(m_frame), node,
@@ -113,8 +113,7 @@ EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
 }
 
 #if SVG_SUPPORT
-EventListener* KJSProxyImpl::createSVGEventHandler(const DOMString& code,
-                                                   NodeImpl* node) {
+EventListener* KJSProxy::createSVGEventHandler(const String& code, Node* node) {
   initScriptIfNeeded();
   JSLock lock;
   return new JSSVGLazyEventListener(code, Window::retrieveWindow(m_frame), node,
@@ -122,7 +121,7 @@ EventListener* KJSProxyImpl::createSVGEventHandler(const DOMString& code,
 }
 #endif
 
-void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
+void KJSProxy::finishedWithEvent(Event* event) {
   // This is called when the DOM implementation has finished with a particular
   // event. This
   // is the case in sitations where an event has been created just for temporary
@@ -134,7 +133,7 @@ void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
   m_script->forgetDOMObject(event);
 }
 
-ScriptInterpreter* KJSProxyImpl::interpreter() {
+ScriptInterpreter* KJSProxy::interpreter() {
   initScriptIfNeeded();
   assert(m_script);
   return m_script;
@@ -157,7 +156,7 @@ JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-void KJSProxyImpl::initScriptIfNeeded() {
+void KJSProxy::initScriptIfNeeded() {
   if (m_script)
     return;
 
@@ -170,7 +169,7 @@ void KJSProxyImpl::initScriptIfNeeded() {
   globalObject->put(m_script->globalExec(), "debug", new TestFunctionImp(),
                     Internal);
 
-  QString userAgent = m_frame->userAgent();
+  DeprecatedString userAgent = m_frame->userAgent();
   if (userAgent.find("Microsoft") >= 0 || userAgent.find("MSIE") >= 0)
     m_script->setCompatMode(Interpreter::IECompat);
   else

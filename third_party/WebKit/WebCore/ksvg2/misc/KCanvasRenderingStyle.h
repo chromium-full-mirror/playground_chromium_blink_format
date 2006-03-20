@@ -60,7 +60,7 @@ class KSVGPainterFactory {
                                                 const RenderObject*);
 
   static double cssPrimitiveToLength(const RenderObject*,
-                                     CSSValueImpl*,
+                                     CSSValue*,
                                      double defaultValue = 0.0);
 };
 };

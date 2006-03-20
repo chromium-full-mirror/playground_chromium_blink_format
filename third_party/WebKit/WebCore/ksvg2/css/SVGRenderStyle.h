@@ -28,7 +28,7 @@
 #include "Shared.h"
 #include "DataRef.h"
 
-#include <ksvg2/svg/SVGPaintImpl.h>
+#include <ksvg2/svg/SVGPaint.h>
 #include <ksvg2/css/SVGRenderStyleDefs.h>
 
 #if WIN32
@@ -132,7 +132,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            FillOpacity,
                                            fillOpacity,
                                            1.0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(SVGPaintImpl*,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(SVGPaint*,
                                            fill,
                                            paint,
                                            FillPaint,
@@ -145,13 +145,13 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            StrokeOpacity,
                                            strokeOpacity,
                                            1.0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(SVGPaintImpl*,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(SVGPaint*,
                                            stroke,
                                            paint,
                                            StrokePaint,
                                            strokePaint,
                                            0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueListImpl*,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueList*,
                                            stroke,
                                            dashArray,
                                            StrokeDashArray,
@@ -164,13 +164,13 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            strokeMiterLimit,
                                            4)
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueImpl*,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValue*,
                                            stroke,
                                            width,
                                            StrokeWidth,
                                            strokeWidth,
                                            0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueImpl*,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValue*,
                                            stroke,
                                            dashOffset,
                                            StrokeDashOffset,
@@ -190,43 +190,43 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            stopColor,
                                            Color(0, 0, 0))
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            clip,
                                            clipPath,
                                            ClipPath,
                                            clipPath,
-                                           QString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+                                           DeprecatedString())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            mask,
                                            maskElement,
                                            MaskElement,
                                            maskElement,
-                                           QString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+                                           DeprecatedString())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            markers,
                                            startMarker,
                                            StartMarker,
                                            startMarker,
-                                           QString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+                                           DeprecatedString())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            markers,
                                            midMarker,
                                            MidMarker,
                                            midMarker,
-                                           QString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+                                           DeprecatedString())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            markers,
                                            endMarker,
                                            EndMarker,
                                            endMarker,
-                                           QString())
+                                           DeprecatedString())
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
                                            misc,
                                            filter,
                                            Filter,
                                            filter,
-                                           QString())
+                                           DeprecatedString())
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
                                            misc,
                                            floodOpacity,

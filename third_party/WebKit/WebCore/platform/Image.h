@@ -28,10 +28,10 @@
 
 #include <kxmlcore/Vector.h>
 #include "ImageSource.h"
-#include "Array.h"
+#include "DeprecatedArray.h"
 #include "IntSize.h"
 
-class QString;
+class DeprecatedString;
 
 #if __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
@@ -78,7 +78,7 @@ class PDFDocumentImage;
 typedef CFDataRef NativeBytePtr;
 #else
 typedef cairo_surface_t* NativeImagePtr;
-typedef const ByteArray* NativeBytePtr;
+typedef const DeprecatedByteArray* NativeBytePtr;
 #endif
 
 // This class gets notified when an image advances animation frames.
@@ -111,7 +111,7 @@ class Image {
   ~Image();
 
   static Image* loadResource(const char* name);
-  static bool supportsType(const QString& type);
+  static bool supportsType(const DeprecatedString& type);
 
   bool isNull() const;
 
@@ -120,7 +120,7 @@ class Image {
   int width() const;
   int height() const;
 
-  bool setData(const ByteArray& bytes, bool allDataReceived);
+  bool setData(const DeprecatedByteArray& bytes, bool allDataReceived);
   bool setNativeData(NativeBytePtr bytePtr, bool allDataReceived);
 
   // It may look unusual that there is no start animation call as public API.
@@ -223,7 +223,7 @@ class Image {
   void invalidateNativeData();
 
   // Members
-  ByteArray m_data;  // The encoded raw data for the image.
+  DeprecatedByteArray m_data;  // The encoded raw data for the image.
   ImageSource m_source;
   mutable IntSize m_size;  // The size to use for the overall image (will just
                            // be the size of the first image).

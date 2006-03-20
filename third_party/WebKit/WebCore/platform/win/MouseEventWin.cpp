@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MouseEvent.h"
+#include "PlatformMouseEvent.h"
 
 #include <windows.h>
 
@@ -43,7 +43,10 @@ static IntPoint globalPositionForEvent(HWND hWnd, LPARAM lParam) {
   return point;
 }
 
-MouseEvent::MouseEvent(HWND hWnd, WPARAM wParam, LPARAM lParam, int clkCount)
+PlatformMouseEvent::PlatformMouseEvent(HWND hWnd,
+                                       WPARAM wParam,
+                                       LPARAM lParam,
+                                       int clkCount)
     : m_position(positionForEvent(hWnd, lParam)),
       m_globalPosition(globalPositionForEvent(hWnd, lParam)),
       m_clickCount(clkCount),

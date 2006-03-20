@@ -27,7 +27,7 @@
 #include "KURL.h"
 
 #include <kxmlcore/Assertions.h>
-#include "KWQRegExp.h"
+#include "RegularExpression.h"
 #include "TextEncoding.h"
 #include <kxmlcore/Vector.h>
 #include <unicode/uidna.h>
@@ -234,9 +234,9 @@ static int copyPathRemovingDots(char* dst,
                                 int srcStart,
                                 int srcEnd);
 static char* encodeRelativeString(const KURL& base,
-                                  const QString& rel,
+                                  const DeprecatedString& rel,
                                   const WebCore::TextEncoding& encoding);
-static QString substituteBackslashes(const QString& string);
+static DeprecatedString substituteBackslashes(const DeprecatedString& string);
 
 static inline bool isSchemeFirstChar(unsigned char c) {
   return characterClassTable[c] & SchemeFirstChar;
@@ -291,7 +291,7 @@ KURL::KURL(const char* url) {
     parse(url, 0);
 }
 
-KURL::KURL(const QString& url) {
+KURL::KURL(const DeprecatedString& url) {
   if (!url.isEmpty() && url[0] == '/') {
     // 5 for "file:", 1 for terminator
     Vector<char, 2048> buffer(url.length() + 6);
@@ -307,7 +307,7 @@ KURL::KURL(const QString& url) {
 }
 
 KURL::KURL(const KURL& base,
-           const QString& relative,
+           const DeprecatedString& relative,
            const WebCore::TextEncoding& encoding) {
   // Allow at lest absolute URLs to resolve against an empty URL.
   if (!base.m_isValid && !base.isEmpty()) {
@@ -319,13 +319,14 @@ KURL::KURL(const KURL& base,
 
   // for compatibility with Win IE, we must treat backslashes as if they were
   // slashes
-  QString substitutedRelative;
+  DeprecatedString substitutedRelative;
   bool containsBackslash = relative.contains('\\');
   if (containsBackslash) {
     substitutedRelative = substituteBackslashes(relative);
   }
 
-  const QString& rel = containsBackslash ? substitutedRelative : relative;
+  const DeprecatedString& rel =
+      containsBackslash ? substitutedRelative : relative;
 
   bool allASCII = rel.isAllASCII();
   char* strBuffer;
@@ -376,7 +377,7 @@ KURL::KURL(const KURL& base,
     }
     if (*p == ':') {
       if (p[1] != '/' &&
-          base.protocol().lower() == QString(str, p - str).lower() &&
+          base.protocol().lower() == DeprecatedString(str, p - str).lower() &&
           base.isHierarchical())
         str = p + 1;
       else
@@ -391,7 +392,7 @@ KURL::KURL(const KURL& base,
     // if the base is invalid, just append the relative
     // portion. The RFC does not specify what to do in this case.
     if (!base.m_isValid) {
-      QString newURL = base.urlString + str;
+      DeprecatedString newURL = base.urlString + str;
       parse(newURL.ascii(), &newURL);
       if (strBuffer) {
         fastFree(strBuffer);
@@ -410,14 +411,14 @@ KURL::KURL(const KURL& base,
       case '#':
         // must be fragment-only reference
         {
-          QString newURL = base.urlString.left(base.queryEndPos) + str;
+          DeprecatedString newURL = base.urlString.left(base.queryEndPos) + str;
           parse(newURL.ascii(), &newURL);
           break;
         }
       case '?':
         // query-only reference, special case needed for non-URL results
         {
-          QString newURL = base.urlString.left(base.pathEndPos) + str;
+          DeprecatedString newURL = base.urlString.left(base.pathEndPos) + str;
           parse(newURL.ascii(), &newURL);
           break;
         }
@@ -426,11 +427,13 @@ KURL::KURL(const KURL& base,
         {
           if (str[1] == '/') {
             // net-path
-            QString newURL = base.urlString.left(base.schemeEndPos + 1) + str;
+            DeprecatedString newURL =
+                base.urlString.left(base.schemeEndPos + 1) + str;
             parse(newURL.ascii(), &newURL);
           } else {
             // abs-path
-            QString newURL = base.urlString.left(base.portEndPos) + str;
+            DeprecatedString newURL =
+                base.urlString.left(base.portEndPos) + str;
             parse(newURL.ascii(), &newURL);
           }
           break;
@@ -532,17 +535,17 @@ bool KURL::hasPath() const {
   return m_isValid && pathEndPos != portEndPos;
 }
 
-QString KURL::protocol() const {
+DeprecatedString KURL::protocol() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   return urlString.left(schemeEndPos);
 }
 
-QString KURL::host() const {
+DeprecatedString KURL::host() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   int start =
@@ -569,30 +572,30 @@ unsigned short int KURL::port() const {
   return 0;
 }
 
-QString KURL::pass() const {
+DeprecatedString KURL::pass() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   if (passwordEndPos == userEndPos) {
-    return QString();
+    return DeprecatedString();
   }
 
   return decode_string(
       urlString.mid(userEndPos + 1, passwordEndPos - userEndPos - 1));
 }
 
-QString KURL::user() const {
+DeprecatedString KURL::user() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   return decode_string(urlString.mid(userStartPos, userEndPos - userStartPos));
 }
 
-QString KURL::ref() const {
+DeprecatedString KURL::ref() const {
   if (!m_isValid || fragmentEndPos == queryEndPos) {
-    return QString();
+    return DeprecatedString();
   }
 
   return urlString.mid(queryEndPos + 1, fragmentEndPos - (queryEndPos + 1));
@@ -602,42 +605,42 @@ bool KURL::hasRef() const {
   return m_isValid && fragmentEndPos != queryEndPos;
 }
 
-QString KURL::query() const {
+DeprecatedString KURL::query() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   return urlString.mid(pathEndPos, queryEndPos - pathEndPos);
 }
 
-QString KURL::path() const {
+DeprecatedString KURL::path() const {
   if (!m_isValid) {
-    return QString();
+    return DeprecatedString();
   }
 
   return decode_string(urlString.mid(portEndPos, pathEndPos - portEndPos));
 }
 
-void KURL::setProtocol(const QString& s) {
+void KURL::setProtocol(const DeprecatedString& s) {
   if (!m_isValid) {
-    QString newURL = s + ":" + urlString;
+    DeprecatedString newURL = s + ":" + urlString;
     parse(newURL.ascii(), &newURL);
     return;
   }
 
-  QString newURL = s + urlString.mid(schemeEndPos);
+  DeprecatedString newURL = s + urlString.mid(schemeEndPos);
   parse(newURL.ascii(), &newURL);
 }
 
-void KURL::setHost(const QString& s) {
+void KURL::setHost(const DeprecatedString& s) {
   if (m_isValid) {
     bool slashSlashNeeded = userStartPos == schemeEndPos + 1;
     int hostStart =
         (passwordEndPos == userStartPos) ? passwordEndPos : passwordEndPos + 1;
 
-    QString newURL = urlString.left(hostStart) +
-                     (slashSlashNeeded ? "//" : QString()) + s +
-                     urlString.mid(hostEndPos);
+    DeprecatedString newURL = urlString.left(hostStart) +
+                              (slashSlashNeeded ? "//" : DeprecatedString()) +
+                              s + urlString.mid(hostEndPos);
     parse(newURL.ascii(), &newURL);
   }
 }
@@ -646,16 +649,16 @@ void KURL::setPort(unsigned short i) {
   if (m_isValid) {
     bool colonNeeded = portEndPos == hostEndPos;
     int portStart = (colonNeeded ? hostEndPos : hostEndPos + 1);
-    QString newURL = urlString.left(portStart) +
-                     (colonNeeded ? ":" : QString()) + QString::number(i) +
-                     urlString.mid(portEndPos);
+    DeprecatedString newURL =
+        urlString.left(portStart) + (colonNeeded ? ":" : DeprecatedString()) +
+        DeprecatedString::number(i) + urlString.mid(portEndPos);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-void KURL::setUser(const QString& user) {
+void KURL::setUser(const DeprecatedString& user) {
   if (m_isValid) {
-    QString u;
+    DeprecatedString u;
     int end = userEndPos;
     if (!user.isEmpty()) {
       // Untested code, but this is never used.
@@ -677,15 +680,15 @@ void KURL::setUser(const QString& user) {
         end += 1;
       }
     }
-    const QString newURL =
+    const DeprecatedString newURL =
         urlString.left(userStartPos) + u + urlString.mid(end);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-void KURL::setPass(const QString& password) {
+void KURL::setPass(const DeprecatedString& password) {
   if (m_isValid) {
-    QString p;
+    DeprecatedString p;
     int end = passwordEndPos;
     if (!password.isEmpty()) {
       // Untested code, but this is never used.
@@ -707,50 +710,51 @@ void KURL::setPass(const QString& password) {
         end += 1;
       }
     }
-    const QString newURL = urlString.left(userEndPos) + p + urlString.mid(end);
+    const DeprecatedString newURL =
+        urlString.left(userEndPos) + p + urlString.mid(end);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-void KURL::setRef(const QString& s) {
+void KURL::setRef(const DeprecatedString& s) {
   if (m_isValid) {
-    QString newURL =
-        urlString.left(queryEndPos) + (s.isEmpty() ? QString() : "#" + s);
+    DeprecatedString newURL = urlString.left(queryEndPos) +
+                              (s.isEmpty() ? DeprecatedString() : "#" + s);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-void KURL::setQuery(const QString& query) {
+void KURL::setQuery(const DeprecatedString& query) {
   if (m_isValid) {
-    QString q;
+    DeprecatedString q;
     if (!query.isEmpty() && query[0] != '?') {
       q = "?" + query;
     } else {
       q = query;
     }
 
-    QString newURL =
+    DeprecatedString newURL =
         urlString.left(pathEndPos) + q + urlString.mid(queryEndPos);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-void KURL::setPath(const QString& s) {
+void KURL::setPath(const DeprecatedString& s) {
   if (m_isValid) {
-    QString newURL = urlString.left(portEndPos) + encode_string(s) +
-                     urlString.mid(pathEndPos);
+    DeprecatedString newURL = urlString.left(portEndPos) + encode_string(s) +
+                              urlString.mid(pathEndPos);
     parse(newURL.ascii(), &newURL);
   }
 }
 
-QString KURL::prettyURL() const {
+DeprecatedString KURL::prettyURL() const {
   if (!m_isValid) {
     return urlString;
   }
 
-  QString result = protocol() + ":";
+  DeprecatedString result = protocol() + ":";
 
-  QString authority;
+  DeprecatedString authority;
 
   if (hostEndPos != passwordEndPos) {
     if (userEndPos != userStartPos) {
@@ -760,7 +764,7 @@ QString KURL::prettyURL() const {
     authority += host();
     if (port() != 0) {
       authority += ":";
-      authority += QString::number(port());
+      authority += DeprecatedString::number(port());
     }
   }
 
@@ -778,11 +782,11 @@ QString KURL::prettyURL() const {
   return result;
 }
 
-QString KURL::decode_string(const QString& urlString,
-                            const WebCore::TextEncoding& encoding) {
+DeprecatedString KURL::decode_string(const DeprecatedString& urlString,
+                                     const WebCore::TextEncoding& encoding) {
   static const WebCore::TextEncoding utf8Encoding(UTF8Encoding);
 
-  QString result("");
+  DeprecatedString result("");
 
   Vector<char, 2048> buffer(0);
 
@@ -818,8 +822,8 @@ QString KURL::decode_string(const QString& urlString,
     }
 
     // Decode the bytes into Unicode characters.
-    QString decoded = (encoding.isValid() ? encoding : utf8Encoding)
-                          .toUnicode(buffer, p - buffer);
+    DeprecatedString decoded = (encoding.isValid() ? encoding : utf8Encoding)
+                                   .toUnicode(buffer, p - buffer);
     if (decoded.isEmpty()) {
       continue;
     }
@@ -944,7 +948,7 @@ static inline bool matchLetter(char c, char lowercaseLetter) {
   return (c | 0x20) == lowercaseLetter;
 }
 
-void KURL::parse(const char* url, const QString* originalString) {
+void KURL::parse(const char* url, const DeprecatedString* originalString) {
   m_isValid = true;
 
   if (!url || url[0] == '\0') {
@@ -1255,12 +1259,12 @@ void KURL::parse(const char* url, const QString* originalString) {
   fragmentEndPos = p - buffer;
 
   // If we didn't end up actually changing the original string and
-  // it started as a QString, just reuse it, to avoid extra
+  // it started as a DeprecatedString, just reuse it, to avoid extra
   // allocation.
   if (originalString && strncmp(buffer, url, fragmentEndPos) == 0) {
     urlString = *originalString;
   } else {
-    urlString = QString(buffer, fragmentEndPos);
+    urlString = DeprecatedString(buffer, fragmentEndPos);
   }
 
   ASSERT(p - buffer <= (int)buffer.size());
@@ -1270,8 +1274,8 @@ bool operator==(const KURL& a, const KURL& b) {
   return a.urlString == b.urlString;
 }
 
-bool urlcmp(const QString& a,
-            const QString& b,
+bool urlcmp(const DeprecatedString& a,
+            const DeprecatedString& b,
             bool ignoreTrailingSlash,
             bool ignoreRef) {
   if (ignoreRef) {
@@ -1285,8 +1289,8 @@ bool urlcmp(const QString& a,
   return a == b;
 }
 
-QString KURL::encode_string(const QString& notEncodedString) {
-  QCString asUTF8 = notEncodedString.utf8();
+DeprecatedString KURL::encode_string(const DeprecatedString& notEncodedString) {
+  DeprecatedCString asUTF8 = notEncodedString.utf8();
 
   Vector<char, 4096> buffer(asUTF8.length() * 3 + 1);
   char* p = buffer;
@@ -1304,14 +1308,14 @@ QString KURL::encode_string(const QString& notEncodedString) {
     }
   }
 
-  QString result(buffer, p - buffer);
+  DeprecatedString result(buffer, p - buffer);
 
   ASSERT(p - buffer <= (int)buffer.size());
 
   return result;
 }
 
-static QString encodeHostname(const QString& s) {
+static DeprecatedString encodeHostname(const DeprecatedString& s) {
   // Needs to be big enough to hold an IDN-encoded name.
   // For host names bigger than this, we won't do IDN encoding, which is almost
   // certainly OK.
@@ -1329,10 +1333,12 @@ static QString encodeHostname(const QString& s) {
   if (error != U_ZERO_ERROR) {
     return s;
   }
-  return QString(reinterpret_cast<QChar*>(buffer), numCharactersConverted);
+  return DeprecatedString(reinterpret_cast<QChar*>(buffer),
+                          numCharactersConverted);
 }
 
-static Vector<pair<int, int>> findHostnamesInMailToURL(const QString& s) {
+static Vector<pair<int, int>> findHostnamesInMailToURL(
+    const DeprecatedString& s) {
   // In a mailto: URL, host names come after a '@' character and end with a '>'
   // or ',' or '?' or end of string character.
   // Skip quoted strings so that characters in them don't confuse us.
@@ -1344,7 +1350,7 @@ static Vector<pair<int, int>> findHostnamesInMailToURL(const QString& s) {
   int p = 0;
   while (1) {
     // Find start of host name or of quoted string.
-    int hostnameOrStringStart = s.find(QRegExp("[\"@?]"), p);
+    int hostnameOrStringStart = s.find(RegularExpression("[\"@?]"), p);
     if (hostnameOrStringStart == -1) {
       return a;
     }
@@ -1358,7 +1364,7 @@ static Vector<pair<int, int>> findHostnamesInMailToURL(const QString& s) {
     if (c == '@') {
       // Find end of host name.
       int hostnameStart = p;
-      int hostnameEnd = s.find(QRegExp("[>,?]"), p);
+      int hostnameEnd = s.find(RegularExpression("[>,?]"), p);
       bool done;
       if (hostnameEnd == -1) {
         hostnameEnd = s.length();
@@ -1376,7 +1382,8 @@ static Vector<pair<int, int>> findHostnamesInMailToURL(const QString& s) {
       // Skip quoted string.
       ASSERT(c == '"');
       while (1) {
-        int escapedCharacterOrStringEnd = s.find(QRegExp("[\"\\]"), p);
+        int escapedCharacterOrStringEnd =
+            s.find(RegularExpression("[\"\\]"), p);
         if (escapedCharacterOrStringEnd == -1)
           return a;
 
@@ -1399,7 +1406,7 @@ static Vector<pair<int, int>> findHostnamesInMailToURL(const QString& s) {
   }
 }
 
-static bool findHostnameInHierarchicalURL(const QString& s,
+static bool findHostnameInHierarchicalURL(const DeprecatedString& s,
                                           int& startOffset,
                                           int& endOffset) {
   // Find the host name in a hierarchical URL.
@@ -1450,13 +1457,13 @@ static bool findHostnameInHierarchicalURL(const QString& s,
   return true;
 }
 
-static QString encodeHostnames(const QString& s) {
+static DeprecatedString encodeHostnames(const DeprecatedString& s) {
   if (s.startsWith("mailto:", false)) {
     const Vector<pair<int, int>> hostnameRanges = findHostnamesInMailToURL(s);
     int n = hostnameRanges.size();
     if (n != 0) {
-      QString result;
-      uint p = 0;
+      DeprecatedString result;
+      unsigned p = 0;
       for (int i = 0; i < n; ++i) {
         const pair<int, int>& r = hostnameRanges[i];
         result += s.mid(p, r.first);
@@ -1478,9 +1485,9 @@ static QString encodeHostnames(const QString& s) {
 }
 
 static char* encodeRelativeString(const KURL& base,
-                                  const QString& rel,
+                                  const DeprecatedString& rel,
                                   const WebCore::TextEncoding& encoding) {
-  QString s = encodeHostnames(rel);
+  DeprecatedString s = encodeHostnames(rel);
 
   char* strBuffer;
 
@@ -1498,9 +1505,9 @@ static char* encodeRelativeString(const KURL& base,
   // encoding for the
   // non-path parts of the URL.
   if (pathEncoding != utf8Encoding) {
-    QString protocol;
+    DeprecatedString protocol;
     if (rel.length() > 0 && isSchemeFirstChar(rel.at(0).latin1())) {
-      for (uint i = 1; i < rel.length(); i++) {
+      for (unsigned i = 1; i < rel.length(); i++) {
         char p = rel.at(i).latin1();
         if (p == ':') {
           protocol = rel.left(i);
@@ -1525,17 +1532,17 @@ static char* encodeRelativeString(const KURL& base,
 
   int pathEnd = -1;
   if (pathEncoding != otherEncoding) {
-    pathEnd = s.find(QRegExp("[?#]"));
+    pathEnd = s.find(RegularExpression("[?#]"));
   }
   if (pathEnd == -1) {
-    QCString decoded = pathEncoding.fromUnicode(s);
+    DeprecatedCString decoded = pathEncoding.fromUnicode(s);
     int decodedLength = decoded.length();
     strBuffer = static_cast<char*>(fastMalloc(decodedLength + 1));
     memcpy(strBuffer, decoded, decodedLength);
     strBuffer[decodedLength] = 0;
   } else {
-    QCString pathDecoded = pathEncoding.fromUnicode(s.left(pathEnd));
-    QCString otherDecoded = otherEncoding.fromUnicode(s.mid(pathEnd));
+    DeprecatedCString pathDecoded = pathEncoding.fromUnicode(s.left(pathEnd));
+    DeprecatedCString otherDecoded = otherEncoding.fromUnicode(s.mid(pathEnd));
     int pathDecodedLength = pathDecoded.length();
     int otherDecodedLength = otherDecoded.length();
     strBuffer = static_cast<char*>(
@@ -1548,7 +1555,7 @@ static char* encodeRelativeString(const KURL& base,
   return strBuffer;
 }
 
-static QString substituteBackslashes(const QString& string) {
+static DeprecatedString substituteBackslashes(const DeprecatedString& string) {
   int questionPos = string.find('?');
   int hashPos = string.find('#');
   unsigned pathEnd;

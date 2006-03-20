@@ -20,7 +20,7 @@
 #include "config.h"
 #include "kjs_traversal.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "Frame.h"
 #include "kjs_proxy.h"
 
@@ -60,7 +60,7 @@ KJS_IMPLEMENT_PROTOTYPE("DOMNodeIterator",
                         DOMNodeIteratorProto,
                         DOMNodeIteratorProtoFunc)
 
-DOMNodeIterator::DOMNodeIterator(ExecState* exec, NodeIteratorImpl* ni)
+DOMNodeIterator::DOMNodeIterator(ExecState* exec, NodeIterator* ni)
     : m_impl(ni) {
   setPrototype(DOMNodeIteratorProto::self(exec));
 }
@@ -82,7 +82,7 @@ bool DOMNodeIterator::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* DOMNodeIterator::getValueProperty(ExecState* exec, int token) const {
-  NodeIteratorImpl& ni = *m_impl;
+  NodeIterator& ni = *m_impl;
   switch (token) {
     case Root:
       return toJS(exec, ni.root());
@@ -107,8 +107,7 @@ JSValue* DOMNodeIteratorProtoFunc::callAsFunction(ExecState* exec,
   if (!thisObj->inherits(&KJS::DOMNodeIterator::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
-  NodeIteratorImpl& nodeIterator =
-      *static_cast<DOMNodeIterator*>(thisObj)->impl();
+  NodeIterator& nodeIterator = *static_cast<DOMNodeIterator*>(thisObj)->impl();
   switch (id) {
     case DOMNodeIterator::PreviousNode:
       return toJS(exec, nodeIterator.previousNode(exception));
@@ -121,8 +120,8 @@ JSValue* DOMNodeIteratorProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* toJS(ExecState* exec, NodeIteratorImpl* ni) {
-  return cacheDOMObject<NodeIteratorImpl, DOMNodeIterator>(exec, ni);
+JSValue* toJS(ExecState* exec, NodeIterator* ni) {
+  return cacheDOMObject<NodeIterator, DOMNodeIterator>(exec, ni);
 }
 
 // -------------------------------------------------------------------------
@@ -131,37 +130,35 @@ const ClassInfo NodeFilterConstructor::info = {"NodeFilterConstructor", 0,
                                                &NodeFilterConstructorTable, 0};
 /*
 @begin NodeFilterConstructorTable 17
-  FILTER_ACCEPT		WebCore::NodeFilterImpl::FILTER_ACCEPT
+  FILTER_ACCEPT		WebCore::NodeFilter::FILTER_ACCEPT
 DontDelete|ReadOnly
-  FILTER_REJECT		WebCore::NodeFilterImpl::FILTER_REJECT
+  FILTER_REJECT		WebCore::NodeFilter::FILTER_REJECT
 DontDelete|ReadOnly
-  FILTER_SKIP		WebCore::NodeFilterImpl::FILTER_SKIP
+  FILTER_SKIP		WebCore::NodeFilter::FILTER_SKIP
 DontDelete|ReadOnly
-  SHOW_ALL		WebCore::NodeFilterImpl::SHOW_ALL
+  SHOW_ALL		WebCore::NodeFilter::SHOW_ALL	DontDelete|ReadOnly
+  SHOW_ELEMENT		WebCore::NodeFilter::SHOW_ELEMENT
 DontDelete|ReadOnly
-  SHOW_ELEMENT		WebCore::NodeFilterImpl::SHOW_ELEMENT
+  SHOW_ATTRIBUTE	WebCore::NodeFilter::SHOW_ATTRIBUTE
 DontDelete|ReadOnly
-  SHOW_ATTRIBUTE	WebCore::NodeFilterImpl::SHOW_ATTRIBUTE
+  SHOW_TEXT		WebCore::NodeFilter::SHOW_TEXT	DontDelete|ReadOnly
+  SHOW_CDATA_SECTION	WebCore::NodeFilter::SHOW_CDATA_SECTION
 DontDelete|ReadOnly
-  SHOW_TEXT		WebCore::NodeFilterImpl::SHOW_TEXT
+  SHOW_ENTITY_REFERENCE	WebCore::NodeFilter::SHOW_ENTITY_REFERENCE
 DontDelete|ReadOnly
-  SHOW_CDATA_SECTION	WebCore::NodeFilterImpl::SHOW_CDATA_SECTION
-DontDelete|ReadOnly
-  SHOW_ENTITY_REFERENCE	WebCore::NodeFilterImpl::SHOW_ENTITY_REFERENCE
-DontDelete|ReadOnly
-  SHOW_ENTITY		WebCore::NodeFilterImpl::SHOW_ENTITY
+  SHOW_ENTITY		WebCore::NodeFilter::SHOW_ENTITY
 DontDelete|ReadOnly
   SHOW_PROCESSING_INSTRUCTION
-WebCore::NodeFilterImpl::SHOW_PROCESSING_INSTRUCTION	DontDelete|ReadOnly
-  SHOW_COMMENT		WebCore::NodeFilterImpl::SHOW_COMMENT
+WebCore::NodeFilter::SHOW_PROCESSING_INSTRUCTION	DontDelete|ReadOnly
+  SHOW_COMMENT		WebCore::NodeFilter::SHOW_COMMENT
 DontDelete|ReadOnly
-  SHOW_DOCUMENT		WebCore::NodeFilterImpl::SHOW_DOCUMENT
+  SHOW_DOCUMENT		WebCore::NodeFilter::SHOW_DOCUMENT
 DontDelete|ReadOnly
-  SHOW_DOCUMENT_TYPE	WebCore::NodeFilterImpl::SHOW_DOCUMENT_TYPE
+  SHOW_DOCUMENT_TYPE	WebCore::NodeFilter::SHOW_DOCUMENT_TYPE
 DontDelete|ReadOnly
-  SHOW_DOCUMENT_FRAGMENT	WebCore::NodeFilterImpl::SHOW_DOCUMENT_FRAGMENT
+  SHOW_DOCUMENT_FRAGMENT	WebCore::NodeFilter::SHOW_DOCUMENT_FRAGMENT
 DontDelete|ReadOnly
-  SHOW_NOTATION		WebCore::NodeFilterImpl::SHOW_NOTATION
+  SHOW_NOTATION		WebCore::NodeFilter::SHOW_NOTATION
 DontDelete|ReadOnly
 @end
 */
@@ -196,7 +193,7 @@ KJS_IMPLEMENT_PROTOTYPE("DOMNodeFilter",
                         DOMNodeFilterProto,
                         DOMNodeFilterProtoFunc)
 
-DOMNodeFilter::DOMNodeFilter(ExecState* exec, NodeFilterImpl* nf) : m_impl(nf) {
+DOMNodeFilter::DOMNodeFilter(ExecState* exec, NodeFilter* nf) : m_impl(nf) {
   setPrototype(DOMNodeFilterProto::self(exec));
 }
 
@@ -214,7 +211,7 @@ JSValue* DOMNodeFilterProtoFunc::callAsFunction(ExecState* exec,
                                                 const List& args) {
   if (!thisObj->inherits(&KJS::DOMNodeFilter::info))
     return throwError(exec, TypeError);
-  NodeFilterImpl& nodeFilter = *static_cast<DOMNodeFilter*>(thisObj)->impl();
+  NodeFilter& nodeFilter = *static_cast<DOMNodeFilter*>(thisObj)->impl();
   switch (id) {
     case DOMNodeFilter::AcceptNode:
       return jsNumber(nodeFilter.acceptNode(toNode(args[0])));
@@ -222,11 +219,11 @@ JSValue* DOMNodeFilterProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* toJS(ExecState* exec, NodeFilterImpl* nf) {
-  return cacheDOMObject<NodeFilterImpl, DOMNodeFilter>(exec, nf);
+JSValue* toJS(ExecState* exec, NodeFilter* nf) {
+  return cacheDOMObject<NodeFilter, DOMNodeFilter>(exec, nf);
 }
 
-NodeFilterImpl* toNodeFilter(JSValue* val) {
+NodeFilter* toNodeFilter(JSValue* val) {
   if (!val || !val->isObject(&DOMNodeFilter::info))
     return 0;
   return static_cast<DOMNodeFilter*>(val)->impl();
@@ -260,7 +257,7 @@ KJS_IMPLEMENT_PROTOTYPE("DOMTreeWalker",
                         DOMTreeWalkerProto,
                         DOMTreeWalkerProtoFunc)
 
-DOMTreeWalker::DOMTreeWalker(ExecState* exec, TreeWalkerImpl* tw) : m_impl(tw) {
+DOMTreeWalker::DOMTreeWalker(ExecState* exec, TreeWalker* tw) : m_impl(tw) {
   setPrototype(DOMTreeWalkerProto::self(exec));
 }
 
@@ -281,7 +278,7 @@ bool DOMTreeWalker::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* DOMTreeWalker::getValueProperty(ExecState* exec, int token) const {
-  TreeWalkerImpl& tw = *m_impl;
+  TreeWalker& tw = *m_impl;
   switch (token) {
     case Root:
       return toJS(exec, tw.root());
@@ -314,7 +311,7 @@ JSValue* DOMTreeWalkerProtoFunc::callAsFunction(ExecState* exec,
                                                 const List&) {
   if (!thisObj->inherits(&KJS::DOMTreeWalker::info))
     return throwError(exec, TypeError);
-  TreeWalkerImpl& treeWalker = *static_cast<DOMTreeWalker*>(thisObj)->impl();
+  TreeWalker& treeWalker = *static_cast<DOMTreeWalker*>(thisObj)->impl();
   switch (id) {
     case DOMTreeWalker::ParentNode:
       return toJS(exec, treeWalker.parentNode());
@@ -334,8 +331,8 @@ JSValue* DOMTreeWalkerProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* toJS(ExecState* exec, TreeWalkerImpl* tw) {
-  return cacheDOMObject<TreeWalkerImpl, DOMTreeWalker>(exec, tw);
+JSValue* toJS(ExecState* exec, TreeWalker* tw) {
+  return cacheDOMObject<TreeWalker, DOMTreeWalker>(exec, tw);
 }
 
 // -------------------------------------------------------------------------
@@ -347,10 +344,10 @@ void JSNodeFilterCondition::mark() {
   filter->mark();
 }
 
-short JSNodeFilterCondition::acceptNode(NodeImpl* filterNode) const {
-  NodeImpl* node = filterNode;
+short JSNodeFilterCondition::acceptNode(Node* filterNode) const {
+  Node* node = filterNode;
   Frame* frame = node->getDocument()->frame();
-  KJSProxyImpl* proxy = frame->jScript();
+  KJSProxy* proxy = frame->jScript();
   if (proxy && filter->implementsCall()) {
     JSLock lock;
     ExecState* exec = proxy->interpreter()->globalExec();
@@ -361,7 +358,7 @@ short JSNodeFilterCondition::acceptNode(NodeImpl* filterNode) const {
     return result->toInt32(exec);
   }
 
-  return NodeFilterImpl::FILTER_REJECT;
+  return NodeFilter::FILTER_REJECT;
 }
 
 }  // namespace

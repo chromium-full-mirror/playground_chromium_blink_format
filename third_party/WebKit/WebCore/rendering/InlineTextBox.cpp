@@ -25,13 +25,13 @@
 #include "config.h"
 #include "InlineTextBox.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "RenderBlock.h"
 #include "break_lines.h"
-#include "dom2_rangeimpl.h"
-#include "render_arena.h"
+#include "Range.h"
+#include "RenderArena.h"
 #include <kxmlcore/AlwaysInline.h>
 
 namespace WebCore {
@@ -271,7 +271,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     return;
 
   // Determine whether or not we have marked text.
-  RangeImpl* markedTextRange = object()->document()->frame()->markedTextRange();
+  Range* markedTextRange = object()->document()->frame()->markedTextRange();
   int exception = 0;
   bool haveMarkedText =
       markedTextRange &&
@@ -307,11 +307,12 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   if (m_len <= 0)
     return;
 
-  QValueList<MarkedTextUnderline> underlines;
+  DeprecatedValueList<MarkedTextUnderline> underlines;
   if (haveMarkedText && markedTextUsesUnderlines) {
     underlines = object()->document()->frame()->markedTextUnderlines();
   }
-  QValueListIterator<MarkedTextUnderline> underlineIt = underlines.begin();
+  DeprecatedValueListIterator<MarkedTextUnderline> underlineIt =
+      underlines.begin();
 
   Color textColor = styleToUse->color();
 
@@ -669,9 +670,9 @@ void InlineTextBox::paintAllMarkersOfType(GraphicsContext* pt,
                                           DocumentMarker::MarkerType markerType,
                                           RenderStyle* style,
                                           const Font* f) {
-  QValueList<DocumentMarker> markers =
+  DeprecatedValueList<DocumentMarker> markers =
       object()->document()->markersForNode(object()->node());
-  QValueListIterator<DocumentMarker> markerIt = markers.begin();
+  DeprecatedValueListIterator<DocumentMarker> markerIt = markers.begin();
 
   // Give any document markers that touch this run a chance to draw before the
   // text has been drawn.

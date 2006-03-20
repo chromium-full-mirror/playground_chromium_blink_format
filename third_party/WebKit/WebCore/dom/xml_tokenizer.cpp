@@ -24,14 +24,14 @@
 #include "config.h"
 #include "xml_tokenizer.h"
 
-#include "CDATASectionImpl.h"
+#include "CDATASection.h"
 #include "Cache.h"
 #include "CachedScript.h"
-#include "CommentImpl.h"
+#include "Comment.h"
 #include "DocLoader.h"
-#include "DocumentFragmentImpl.h"
-#include "DocumentImpl.h"
-#include "DocumentTypeImpl.h"
+#include "DocumentFragment.h"
+#include "Document.h"
+#include "DocumentType.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "KWQLoader.h"
@@ -58,12 +58,12 @@ using namespace HTMLNames;
 
 const int maxErrors = 25;
 
-typedef HashMap<DOMStringImpl*, DOMStringImpl*> PrefixForNamespaceMap;
+typedef HashMap<StringImpl*, StringImpl*> PrefixForNamespaceMap;
 
 class XMLTokenizer : public Tokenizer, public CachedObjectClient {
  public:
-  XMLTokenizer(DocumentImpl*, FrameView* = 0);
-  XMLTokenizer(DocumentFragmentImpl*, ElementImpl*);
+  XMLTokenizer(Document*, FrameView* = 0);
+  XMLTokenizer(DocumentFragment*, Element*);
   ~XMLTokenizer();
 
   enum ErrorType { warning, nonFatal, fatal };
@@ -101,7 +101,7 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
 
  private:
   void initializeParserContext();
-  void setCurrentNode(NodeImpl*);
+  void setCurrentNode(Node*);
 
   int lineNumber() const;
   int columnNumber() const;
@@ -109,18 +109,18 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   void insertErrorMessageBlock();
 
   void executeScripts();
-  void addScripts(NodeImpl* n);
+  void addScripts(Node* n);
 
   bool enterText();
   void exitText();
 
-  DocumentImpl* m_doc;
+  Document* m_doc;
   FrameView* m_view;
 
-  QString m_originalSourceForTransform;
+  DeprecatedString m_originalSourceForTransform;
 
   xmlParserCtxtPtr m_context;
-  NodeImpl* m_currentNode;
+  Node* m_currentNode;
   bool m_currentNodeIsReferenced;
 
   bool m_sawError;
@@ -131,14 +131,14 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   int m_errorCount;
   int m_lastErrorLine;
   int m_lastErrorColumn;
-  DOMString m_errorMessages;
+  String m_errorMessages;
 
-  QPtrList<ElementImpl> m_scripts;
-  QPtrListIterator<ElementImpl>* m_scriptsIt;
+  DeprecatedPtrList<Element> m_scripts;
+  DeprecatedPtrListIterator<Element>* m_scriptsIt;
   CachedScript* m_cachedScript;
 
   bool m_parsingFragment;
-  DOMString m_defaultNamespaceURI;
+  String m_defaultNamespaceURI;
   PrefixForNamespaceMap m_prefixToNamespaceMap;
 };
 
@@ -150,11 +150,12 @@ static int matchFunc(const char* uri) {
   return 1;  // Match everything.
 }
 
-static khtml::DocLoader* globalDocLoader = 0;
+static WebCore::DocLoader* globalDocLoader = 0;
 
 class OffsetBuffer {
  public:
-  OffsetBuffer(const ByteArray& b) : m_buffer(b), m_currentOffset(0) {}
+  OffsetBuffer(const DeprecatedByteArray& b)
+      : m_buffer(b), m_currentOffset(0) {}
 
   int readOutBytes(char* outputBuffer, unsigned askedToRead) {
     unsigned bytesLeft = m_buffer.size() - m_currentOffset;
@@ -167,12 +168,12 @@ class OffsetBuffer {
   }
 
  private:
-  ByteArray m_buffer;
+  DeprecatedByteArray m_buffer;
   unsigned m_currentOffset;
 };
 
 static bool shouldAllowExternalLoad(const char* inURI) {
-  QString url(inURI);
+  DeprecatedString url(inURI);
   if (url.contains("/etc/catalog") ||
       url.startsWith("http://www.w3.org/Graphics/SVG") ||
       url.startsWith("http://www.w3.org/TR/xhtml"))
@@ -186,9 +187,9 @@ static void* openFunc(const char* uri) {
 
   KURL finalURL;
   TransferJob* job = new TransferJob(0, "GET", uri);
-  QString headers;
-  ByteArray data = KWQServeSynchronousRequest(Cache::loader(), globalDocLoader,
-                                              job, finalURL, headers);
+  DeprecatedString headers;
+  DeprecatedByteArray data = KWQServeSynchronousRequest(
+      Cache::loader(), globalDocLoader, job, finalURL, headers);
 
   return new OffsetBuffer(data);
 }
@@ -242,7 +243,7 @@ static xmlParserCtxtPtr createQStringParser(xmlSAXHandlerPtr handlers,
 
 // --------------------------------
 
-XMLTokenizer::XMLTokenizer(DocumentImpl* _doc, FrameView* _view)
+XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
     : m_doc(_doc),
       m_view(_view),
       m_context(0),
@@ -259,8 +260,7 @@ XMLTokenizer::XMLTokenizer(DocumentImpl* _doc, FrameView* _view)
       m_cachedScript(0),
       m_parsingFragment(false) {}
 
-XMLTokenizer::XMLTokenizer(DocumentFragmentImpl* fragment,
-                           ElementImpl* parentElement)
+XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
     : m_doc(fragment->getDocument()),
       m_view(0),
       m_context(0),
@@ -282,20 +282,20 @@ XMLTokenizer::XMLTokenizer(DocumentFragmentImpl* fragment,
     m_doc->ref();
 
   // Add namespaces based on the parent node
-  Vector<ElementImpl*> elemStack;
+  Vector<Element*> elemStack;
   while (parentElement) {
     elemStack.append(parentElement);
 
-    NodeImpl* n = parentElement->parentNode();
+    Node* n = parentElement->parentNode();
     if (!n || !n->isElementNode())
       break;
-    parentElement = static_cast<ElementImpl*>(n);
+    parentElement = static_cast<Element*>(n);
   }
-  for (ElementImpl* element = elemStack.last(); !elemStack.isEmpty();
+  for (Element* element = elemStack.last(); !elemStack.isEmpty();
        elemStack.removeLast()) {
-    if (NamedAttrMapImpl* attrs = element->attributes()) {
+    if (NamedAttrMap* attrs = element->attributes()) {
       for (unsigned i = 0; i < attrs->length(); i++) {
-        AttributeImpl* attr = attrs->attributeItem(i);
+        Attribute* attr = attrs->attributeItem(i);
         if (attr->localName() == "xmlns")
           m_defaultNamespaceURI = attr->value();
         else if (attr->prefix() == "xmlns")
@@ -315,7 +315,7 @@ XMLTokenizer::~XMLTokenizer() {
     m_cachedScript->deref(this);
 }
 
-void XMLTokenizer::setCurrentNode(NodeImpl* n) {
+void XMLTokenizer::setCurrentNode(Node* n) {
   bool nodeNeedsReference = n && n != m_doc;
   if (nodeNeedsReference)
     n->ref();
@@ -326,7 +326,7 @@ void XMLTokenizer::setCurrentNode(NodeImpl* n) {
 }
 
 bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
-  QString parseString = s.toString();
+  DeprecatedString parseString = s.toString();
   if (m_sawXSLTransform || !m_sawFirstElement)
     m_originalSourceForTransform += parseString;
 
@@ -351,20 +351,22 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
   return false;
 }
 
-inline QString toQString(const xmlChar* str, unsigned int len) {
-  return QString::fromUtf8(reinterpret_cast<const char*>(str), len);
+inline DeprecatedString toQString(const xmlChar* str, unsigned int len) {
+  return DeprecatedString::fromUtf8(reinterpret_cast<const char*>(str), len);
 }
 
-inline QString toQString(const xmlChar* str) {
-  return QString::fromUtf8(str ? reinterpret_cast<const char*>(str) : "");
+inline DeprecatedString toQString(const xmlChar* str) {
+  return DeprecatedString::fromUtf8(str ? reinterpret_cast<const char*>(str)
+                                        : "");
 }
 
-inline DOMString toString(const xmlChar* str, unsigned int len) {
-  return QString::fromUtf8(reinterpret_cast<const char*>(str), len);
+inline String toString(const xmlChar* str, unsigned int len) {
+  return DeprecatedString::fromUtf8(reinterpret_cast<const char*>(str), len);
 }
 
-inline DOMString toString(const xmlChar* str) {
-  return QString::fromUtf8(str ? reinterpret_cast<const char*>(str) : "");
+inline String toString(const xmlChar* str) {
+  return DeprecatedString::fromUtf8(str ? reinterpret_cast<const char*>(str)
+                                        : "");
 }
 
 struct _xmlSAX2Namespace {
@@ -373,15 +375,15 @@ struct _xmlSAX2Namespace {
 };
 typedef struct _xmlSAX2Namespace xmlSAX2Namespace;
 
-static inline void handleElementNamespaces(ElementImpl* newElement,
+static inline void handleElementNamespaces(Element* newElement,
                                            const xmlChar** libxmlNamespaces,
                                            int nb_namespaces,
                                            ExceptionCode& ec) {
   xmlSAX2Namespace* namespaces =
       reinterpret_cast<xmlSAX2Namespace*>(libxmlNamespaces);
   for (int i = 0; i < nb_namespaces; i++) {
-    DOMString namespaceQName = "xmlns";
-    DOMString namespaceURI = toString(namespaces[i].uri);
+    String namespaceQName = "xmlns";
+    String namespaceURI = toString(namespaces[i].uri);
     if (namespaces[i].prefix)
       namespaceQName = "xmlns:" + toString(namespaces[i].prefix);
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
@@ -400,22 +402,22 @@ struct _xmlSAX2Attributes {
 };
 typedef struct _xmlSAX2Attributes xmlSAX2Attributes;
 
-static inline void handleElementAttributes(ElementImpl* newElement,
+static inline void handleElementAttributes(Element* newElement,
                                            const xmlChar** libxmlAttributes,
                                            int nb_attributes,
                                            ExceptionCode& ec) {
   xmlSAX2Attributes* attributes =
       reinterpret_cast<xmlSAX2Attributes*>(libxmlAttributes);
   for (int i = 0; i < nb_attributes; i++) {
-    DOMString attrLocalName = toQString(attributes[i].localname);
+    String attrLocalName = toQString(attributes[i].localname);
     int valueLength = (int)(attributes[i].end - attributes[i].value);
-    DOMString attrValue = toQString(attributes[i].value, valueLength);
-    DOMString attrPrefix = toQString(attributes[i].prefix);
-    DOMString attrURI =
-        attrPrefix.isEmpty() ? DOMString() : toQString(attributes[i].uri);
-    DOMString attrQName = attrPrefix.isEmpty()
-                              ? attrLocalName
-                              : attrPrefix + DOMString(":") + attrLocalName;
+    String attrValue = toQString(attributes[i].value, valueLength);
+    String attrPrefix = toQString(attributes[i].prefix);
+    String attrURI =
+        attrPrefix.isEmpty() ? String() : toQString(attributes[i].uri);
+    String attrQName = attrPrefix.isEmpty()
+                           ? attrLocalName
+                           : attrPrefix + String(":") + attrLocalName;
 
     newElement->setAttributeNS(attrURI, attrQName, attrValue, ec);
     if (ec)  // exception setting attributes
@@ -438,22 +440,22 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
 
   exitText();
 
-  DOMString localName = toQString(xmlLocalName);
-  DOMString uri = toQString(xmlURI);
-  DOMString prefix = toQString(xmlPrefix);
-  DOMString qName = prefix.isEmpty()
-                        ? localName
-                        : prefix + QString::fromLatin1(":") + localName;
+  String localName = toQString(xmlLocalName);
+  String uri = toQString(xmlURI);
+  String prefix = toQString(xmlPrefix);
+  String qName = prefix.isEmpty()
+                     ? localName
+                     : prefix + DeprecatedString::fromLatin1(":") + localName;
 
   if (m_parsingFragment && uri.isEmpty()) {
     if (!prefix.isEmpty())
-      uri = DOMString(m_prefixToNamespaceMap.get(prefix.impl()));
+      uri = String(m_prefixToNamespaceMap.get(prefix.impl()));
     else
       uri = m_defaultNamespaceURI;
   }
 
   ExceptionCode ec = 0;
-  RefPtr<ElementImpl> newElement = m_doc->createElementNS(uri, qName, ec);
+  RefPtr<Element> newElement = m_doc->createElementNS(uri, qName, ec);
   if (!newElement) {
     stopParsing();
     return;
@@ -479,8 +481,8 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   // point.
   // For now, it's too risky to rip that code up.
   if (m_currentNode->hasTagName(tableTag) && newElement->hasTagName(trTag)) {
-    RefPtr<NodeImpl> implicitTBody =
-        new HTMLTableSectionElementImpl(tbodyTag, m_doc, true /* implicit */);
+    RefPtr<Node> implicitTBody =
+        new HTMLTableSectionElement(tbodyTag, m_doc, true /* implicit */);
     m_currentNode->addChild(implicitTBody.get());
     setCurrentNode(implicitTBody.get());
     if (m_view && !implicitTBody->attached())
@@ -488,8 +490,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   }
 
   if (newElement->hasTagName(scriptTag))
-    static_cast<HTMLScriptElementImpl*>(newElement.get())
-        ->setCreatedByParser(true);
+    static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
 
   if (!m_currentNode->addChild(newElement.get())) {
     stopParsing();
@@ -507,10 +508,10 @@ void XMLTokenizer::endElementNs() {
 
   exitText();
 
-  NodeImpl* n = m_currentNode;
+  Node* n = m_currentNode;
   while (n->implicitNode())
     n = n->parentNode();
-  RefPtr<NodeImpl> parent = n->parentNode();
+  RefPtr<Node> parent = n->parentNode();
   n->closeRenderer();
   setCurrentNode(parent.get());
 }
@@ -521,12 +522,12 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
 
   if (m_currentNode->isTextNode() || enterText()) {
     ExceptionCode ec = 0;
-    static_cast<TextImpl*>(m_currentNode)->appendData(toQString(s, len), ec);
+    static_cast<Text*>(m_currentNode)->appendData(toQString(s, len), ec);
   }
 }
 
 bool XMLTokenizer::enterText() {
-  RefPtr<NodeImpl> newNode = new TextImpl(m_doc, "");
+  RefPtr<Node> newNode = new Text(m_doc, "");
   if (!m_currentNode->addChild(newNode.get()))
     return false;
   setCurrentNode(newNode.get());
@@ -545,7 +546,7 @@ void XMLTokenizer::exitText() {
 
   // FIXME: What's the right thing to do if the parent is really 0?
   // Just leaving the current node set to the text node doesn't make much sense.
-  if (NodeImpl* par = m_currentNode->parentNode())
+  if (Node* par = m_currentNode->parentNode())
     setCurrentNode(par);
 }
 
@@ -556,15 +557,15 @@ void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
   if (type == fatal ||
       (m_errorCount < maxErrors && m_lastErrorLine != lineNumber() &&
        m_lastErrorColumn != columnNumber())) {
-    QString format;
+    DeprecatedString format;
     switch (type) {
       case warning:
-        format = QString("warning on line %2 at column %3: %1");
+        format = DeprecatedString("warning on line %2 at column %3: %1");
         break;
       case fatal:
       // fall through
       case nonFatal:
-        format = QString("error on line %2 at column %3: %1");
+        format = DeprecatedString("error on line %2 at column %3: %1");
     }
 
 #if WIN32
@@ -600,7 +601,7 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
 
   // ### handle exceptions
   int exception = 0;
-  RefPtr<ProcessingInstructionImpl> pi = m_doc->createProcessingInstruction(
+  RefPtr<ProcessingInstruction> pi = m_doc->createProcessingInstruction(
       toQString(target), toQString(data), exception);
   if (exception)
     return;
@@ -630,7 +631,7 @@ void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
 
   exitText();
 
-  RefPtr<NodeImpl> newNode = new CDATASectionImpl(m_doc, toQString(s, len));
+  RefPtr<Node> newNode = new CDATASection(m_doc, toQString(s, len));
   if (!m_currentNode->addChild(newNode.get()))
     return;
   if (m_view && !newNode->attached())
@@ -643,7 +644,7 @@ void XMLTokenizer::comment(const xmlChar* s) {
 
   exitText();
 
-  RefPtr<NodeImpl> newNode = new CommentImpl(m_doc, toQString(s));
+  RefPtr<Node> newNode = new Comment(m_doc, toQString(s));
   m_currentNode->addChild(newNode.get());
   if (m_view && !newNode->attached())
     newNode->attach();
@@ -655,12 +656,12 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
   if (m_parserStopped)
     return;
 
-  DocumentImpl* doc = m_doc;
+  Document* doc = m_doc;
   if (!doc)
     return;
 
-  doc->setDocType(new DocumentTypeImpl(
-      doc, toQString(name), toQString(externalID), toQString(systemID)));
+  doc->setDocType(new DocumentType(doc, toQString(name), toQString(externalID),
+                                   toQString(systemID)));
 }
 
 inline XMLTokenizer* getTokenizer(void* closure) {
@@ -758,7 +759,7 @@ static xmlEntityPtr getXHTMLEntity(const xmlChar* name) {
   if (!c)
     return 0;
 
-  QCString value = QString(QChar(c)).utf8();
+  DeprecatedCString value = DeprecatedString(QChar(c)).utf8();
   assert(value.length() < 5);
   sharedXHTMLEntity.length = value.length();
   sharedXHTMLEntity.name = name;
@@ -798,7 +799,7 @@ static void externalSubsetHandler(void* closure,
                                   const xmlChar* name,
                                   const xmlChar* externalId,
                                   const xmlChar* systemId) {
-  QString extId = toQString(externalId);
+  DeprecatedString extId = toQString(externalId);
   if ((extId == "-//W3C//DTD XHTML 1.0 Transitional//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1//EN") ||
       (extId == "-//W3C//DTD XHTML 1.0 Strict//EN") ||
@@ -874,7 +875,7 @@ void XMLTokenizer::finish() {
     // one by one.
     exitText();
     addScripts(m_doc);
-    m_scriptsIt = new QPtrListIterator<ElementImpl>(m_scripts);
+    m_scriptsIt = new DeprecatedPtrListIterator<Element>(m_scripts);
     executeScripts();
   }
 
@@ -882,24 +883,23 @@ void XMLTokenizer::finish() {
   m_doc->finishedParsing();
 }
 
-static inline RefPtr<ElementImpl> createXHTMLParserErrorHeader(
-    DocumentImpl* doc,
-    const DOMString& errorMessages) {
+static inline RefPtr<Element> createXHTMLParserErrorHeader(
+    Document* doc,
+    const String& errorMessages) {
   ExceptionCode ec = 0;
-  RefPtr<ElementImpl> reportElement =
+  RefPtr<Element> reportElement =
       doc->createElementNS(xhtmlNamespaceURI, "parsererror", ec);
   reportElement->setAttribute(styleAttr,
                               "white-space: pre; border: 2px solid #c77; "
                               "padding: 0 1em 0 1em; margin: 1em; "
                               "background-color: #fdd; color: black");
 
-  RefPtr<ElementImpl> h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
+  RefPtr<Element> h3 = doc->createElementNS(xhtmlNamespaceURI, "h3", ec);
   reportElement->appendChild(h3.get(), ec);
   h3->appendChild(
       doc->createTextNode("This page contains the following errors:"), ec);
 
-  RefPtr<ElementImpl> fixed =
-      doc->createElementNS(xhtmlNamespaceURI, "div", ec);
+  RefPtr<Element> fixed = doc->createElementNS(xhtmlNamespaceURI, "div", ec);
   reportElement->appendChild(fixed.get(), ec);
   fixed->setAttribute(styleAttr, "font-family:monospace;font-size:12px");
   fixed->appendChild(doc->createTextNode(errorMessages), ec);
@@ -923,24 +923,25 @@ void XMLTokenizer::insertErrorMessageBlock() {
 
   // Create elements for display
   ExceptionCode ec = 0;
-  DocumentImpl* doc = m_doc;
-  NodeImpl* documentElement = doc->documentElement();
+  Document* doc = m_doc;
+  Node* documentElement = doc->documentElement();
   if (!documentElement) {
-    RefPtr<NodeImpl> rootElement =
+    RefPtr<Node> rootElement =
         doc->createElementNS(xhtmlNamespaceURI, "html", ec);
     doc->appendChild(rootElement, ec);
-    RefPtr<NodeImpl> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+    RefPtr<Node> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
     rootElement->appendChild(body, ec);
     documentElement = body.get();
   }
 #if SVG_SUPPORT
-  else if (documentElement->namespaceURI() == KSVG::SVGNames::svgNamespaceURI) {
+  else if (documentElement->namespaceURI() ==
+           WebCore::SVGNames::svgNamespaceURI) {
     // Until our SVG implementation has text support, it is best if we
     // wrap the erroneous SVG document in an xhtml document and render
     // the combined document with error messages.
-    RefPtr<NodeImpl> rootElement =
+    RefPtr<Node> rootElement =
         doc->createElementNS(xhtmlNamespaceURI, "html", ec);
-    RefPtr<NodeImpl> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
+    RefPtr<Node> body = doc->createElementNS(xhtmlNamespaceURI, "body", ec);
     rootElement->appendChild(body, ec);
     body->appendChild(documentElement, ec);
     doc->appendChild(rootElement.get(), ec);
@@ -948,13 +949,13 @@ void XMLTokenizer::insertErrorMessageBlock() {
   }
 #endif
 
-  RefPtr<ElementImpl> reportElement =
+  RefPtr<Element> reportElement =
       createXHTMLParserErrorHeader(doc, m_errorMessages);
   documentElement->insertBefore(reportElement, documentElement->firstChild(),
                                 ec);
 #ifdef KHTML_XSLT
   if (doc->transformSourceDocument()) {
-    RefPtr<ElementImpl> par = doc->createElementNS(xhtmlNamespaceURI, "p", ec);
+    RefPtr<Element> par = doc->createElementNS(xhtmlNamespaceURI, "p", ec);
     reportElement->appendChild(par, ec);
     par->setAttribute(styleAttr, "white-space: normal");
     par->appendChild(
@@ -967,19 +968,19 @@ void XMLTokenizer::insertErrorMessageBlock() {
   doc->updateRendering();
 }
 
-void XMLTokenizer::addScripts(NodeImpl* n) {
+void XMLTokenizer::addScripts(Node* n) {
   // Recursively go through the entire document tree, looking for html <script>
   // tags. For each of these
   // that is found, add it to the m_scripts list from which they will be
   // executed
   if (n->hasTagName(scriptTag)
 #if SVG_SUPPORT
-      || n->hasTagName(KSVG::SVGNames::scriptTag)
+      || n->hasTagName(WebCore::SVGNames::scriptTag)
 #endif
           )
-    m_scripts.append(static_cast<ElementImpl*>(n));
+    m_scripts.append(static_cast<Element*>(n));
 
-  NodeImpl* child;
+  Node* child;
   for (child = n->firstChild(); child; child = child->nextSibling())
     addScripts(child);
 }
@@ -992,30 +993,31 @@ void XMLTokenizer::executeScripts() {
   // and continue where it left off). For scripts that don't have a src
   // attribute, execute the code
   // inside the tag
-  while (ElementImpl* scriptElement = m_scriptsIt->current()) {
+  while (Element* scriptElement = m_scriptsIt->current()) {
     ++(*m_scriptsIt);
-    DOMString scriptHref = scriptElement->getAttribute(srcAttr);
+    String scriptHref = scriptElement->getAttribute(srcAttr);
 #if SVG_SUPPORT
-    if (scriptElement->hasTagName(KSVG::SVGNames::scriptTag))
+    if (scriptElement->hasTagName(WebCore::SVGNames::scriptTag))
       scriptHref = scriptElement->getAttribute(XLinkNames::hrefAttr);
 #endif
     // don't load external scripts for standalone documents (for now)
     if (!scriptHref.isEmpty() && m_doc->frame()) {
       // we have a src attribute
-      QString charset = scriptElement->getAttribute(charsetAttr).qstring();
+      DeprecatedString charset =
+          scriptElement->getAttribute(charsetAttr).deprecatedString();
       m_cachedScript = m_doc->docLoader()->requestScript(scriptHref, charset);
       m_cachedScript->ref(
           this);  // will call executeScripts() again if already cached
       return;
     } else {
       // no src attribute - execute from contents of tag
-      QString scriptCode = "";
-      for (NodeImpl* child = scriptElement->firstChild(); child;
+      DeprecatedString scriptCode = "";
+      for (Node* child = scriptElement->firstChild(); child;
            child = child->nextSibling()) {
         if (child->isTextNode() ||
-            child->nodeType() == NodeImpl::CDATA_SECTION_NODE)
+            child->nodeType() == Node::CDATA_SECTION_NODE)
           scriptCode +=
-              static_cast<CharacterDataImpl*>(child)->data().qstring();
+              static_cast<CharacterData*>(child)->data().deprecatedString();
       }
       // the script cannot do document.write until we support incremental
       // parsing
@@ -1041,10 +1043,10 @@ void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
   // through the list of scripts in
   // the document
   if (finishedObj == m_cachedScript) {
-    DOMString scriptSource = m_cachedScript->script();
+    String scriptSource = m_cachedScript->script();
     m_cachedScript->deref(this);
     m_cachedScript = 0;
-    m_view->frame()->executeScript(0, scriptSource.qstring());
+    m_view->frame()->executeScript(0, scriptSource.deprecatedString());
     executeScripts();
   }
 }
@@ -1054,7 +1056,8 @@ bool XMLTokenizer::isWaitingForScripts() const {
 }
 
 #ifdef KHTML_XSLT
-void* xmlDocPtrForString(const QString& source, const QString& url) {
+void* xmlDocPtrForString(const DeprecatedString& source,
+                         const DeprecatedString& url) {
   if (source.isEmpty())
     return 0;
   // Parse in a single chunk into an xmlDocPtr
@@ -1073,7 +1076,7 @@ void* xmlDocPtrForString(const QString& source, const QString& url) {
 }
 #endif
 
-Tokenizer* newXMLTokenizer(DocumentImpl* d, FrameView* v) {
+Tokenizer* newXMLTokenizer(Document* d, FrameView* v) {
   return new XMLTokenizer(d, v);
 }
 
@@ -1141,9 +1144,9 @@ static void balancedWarningHandler(void* closure, const char* message, ...) {
   va_end(args);
 }
 
-bool parseXMLDocumentFragment(const DOMString& string,
-                              DocumentFragmentImpl* fragment,
-                              ElementImpl* parent) {
+bool parseXMLDocumentFragment(const String& string,
+                              DocumentFragment* fragment,
+                              Element* parent) {
   XMLTokenizer tokenizer(fragment, parent);
 
   xmlSAXHandler sax;
@@ -1161,14 +1164,14 @@ bool parseXMLDocumentFragment(const DOMString& string,
 
   int result = xmlParseBalancedChunkMemory(
       0, &sax, &tokenizer, 0,
-      (const xmlChar*)(const char*)(string.qstring().utf8()), 0);
+      (const xmlChar*)(const char*)(string.deprecatedString().utf8()), 0);
   return result == 0;
 }
 
 // --------------------------------
 
 struct AttributeParseState {
-  HashMap<DOMString, DOMString> attributes;
+  HashMap<String, String> attributes;
   bool gotAttributes;
 };
 
@@ -1193,19 +1196,18 @@ static void attributesStartElementNsHandler(void* closure,
   xmlSAX2Attributes* attributes =
       reinterpret_cast<xmlSAX2Attributes*>(libxmlAttributes);
   for (int i = 0; i < nb_attributes; i++) {
-    QString attrLocalName = toQString(attributes[i].localname);
+    DeprecatedString attrLocalName = toQString(attributes[i].localname);
     int valueLength = (int)(attributes[i].end - attributes[i].value);
-    DOMString attrValue = toString(attributes[i].value, valueLength);
-    DOMString attrPrefix = toString(attributes[i].prefix);
-    DOMString attrQName =
+    String attrValue = toString(attributes[i].value, valueLength);
+    String attrPrefix = toString(attributes[i].prefix);
+    String attrQName =
         attrPrefix.isEmpty() ? attrLocalName : attrPrefix + ":" + attrLocalName;
 
     state->attributes.set(attrQName, attrValue);
   }
 }
 
-HashMap<DOMString, DOMString> parseAttributes(const DOMString& string,
-                                              bool& attrsOK) {
+HashMap<String, String> parseAttributes(const String& string, bool& attrsOK) {
   AttributeParseState state;
   state.gotAttributes = false;
 
@@ -1214,8 +1216,8 @@ HashMap<DOMString, DOMString> parseAttributes(const DOMString& string,
   sax.startElementNs = attributesStartElementNsHandler;
   sax.initialized = XML_SAX2_MAGIC;
   xmlParserCtxtPtr parser = createQStringParser(&sax, &state);
-  QString parseString =
-      "<?xml version=\"1.0\"?><attrs " + string.qstring() + " />";
+  DeprecatedString parseString =
+      "<?xml version=\"1.0\"?><attrs " + string.deprecatedString() + " />";
   xmlParseChunk(parser, reinterpret_cast<const char*>(parseString.unicode()),
                 parseString.length() * sizeof(QChar), 1);
   if (parser->myDoc)

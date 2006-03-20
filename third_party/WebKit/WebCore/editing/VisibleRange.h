@@ -28,33 +28,33 @@
 
 #include "VisiblePosition.h"
 
-namespace khtml {
+namespace WebCore {
 
 class VisibleRange {
  public:
-  typedef DOM::NodeImpl NodeImpl;
-  typedef DOM::Position Position;
-  typedef DOM::RangeImpl RangeImpl;
+  typedef WebCore::Node Node;
+  typedef WebCore::Position Position;
+  typedef WebCore::Range Range;
 
   VisibleRange() {}
-  VisibleRange(NodeImpl* startContainer,
+  VisibleRange(Node* startContainer,
                int startOffset,
-               NodeImpl* endContainer,
+               Node* endContainer,
                int endOffset);
   VisibleRange(const VisiblePosition&);
   VisibleRange(const VisiblePosition&, const VisiblePosition&);
-  VisibleRange(const RangeImpl*);
+  VisibleRange(const Range*);
   VisibleRange(const Position&);
   VisibleRange(const Position&, const Position&);
 
   VisibleRange& operator=(const VisiblePosition&);
-  VisibleRange& operator=(const RangeImpl*);
+  VisibleRange& operator=(const Range*);
   VisibleRange& operator=(const Position&);
 
   VisiblePosition start() const { return m_start; }
   VisiblePosition end() const { return m_end; }
 
-  RefPtr<RangeImpl> range() const;
+  RefPtr<Range> range() const;
 
   void clear() {
     m_start.clear();
@@ -79,6 +79,6 @@ inline bool operator!=(const VisibleRange& a, const VisibleRange& b) {
   return !(a == b);
 }
 
-}  // namespace khtml
+}  // namespace WebCore
 
 #endif

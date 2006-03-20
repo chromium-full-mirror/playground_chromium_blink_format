@@ -305,7 +305,7 @@ static void skipComment(const char*& ptr, const char* pEnd) {
 }
 
 // Returns the position of the encoding string.
-static int findXMLEncoding(const QCString& str, int& encodingLength) {
+static int findXMLEncoding(const DeprecatedCString& str, int& encodingLength) {
   int len = str.length();
 
   int pos = str.find("encoding");
@@ -344,7 +344,7 @@ static int findXMLEncoding(const QCString& str, int& encodingLength) {
   return pos;
 }
 
-QString Decoder::decode(const char* data, int len) {
+DeprecatedString Decoder::decode(const char* data, int len) {
   // Check for UTF-16 or UTF-8 BOM mark at the beginning, which is a sure sign
   // of a Unicode encoding.
   int bufferLength = buffer.length();
@@ -432,7 +432,7 @@ QString Decoder::decode(const char* data, int len) {
               end++;
             if (*end == '\0')
               break;
-            QCString str(ptr, end - ptr);
+            DeprecatedCString str(ptr, end - ptr);
             int len;
             int pos = findXMLEncoding(str, len);
             if (pos != -1)
@@ -475,7 +475,7 @@ QString Decoder::decode(const char* data, int len) {
               end++;
             if (*end == '\0')
               break;
-            QCString str(ptr, (end - ptr) + 1);
+            DeprecatedCString str(ptr, (end - ptr) + 1);
             str = str.lower();
             int pos = 0;
             while (pos < (int)str.length()) {
@@ -496,7 +496,7 @@ QString Decoder::decode(const char* data, int len) {
               // end ?
               if (pos == (int)str.length())
                 break;
-              uint endpos = pos;
+              unsigned endpos = pos;
               while (endpos < str.length() &&
                      (str[endpos] != ' ' && str[endpos] != '"' &&
                       str[endpos] != '\'' && str[endpos] != ';' &&
@@ -523,7 +523,7 @@ QString Decoder::decode(const char* data, int len) {
         } else
           ptr++;
       }
-      return QString::null;
+      return DeprecatedString::null;
     }
   }
 
@@ -563,7 +563,7 @@ found:
     }
     m_decoder.set(new StreamingTextDecoder(m_encoding));
   }
-  QString out;
+  DeprecatedString out;
 
   if (!buffer.isEmpty()) {
     if (!lookForMetaTag)
@@ -577,7 +577,7 @@ found:
   return out;
 }
 
-QString Decoder::flush() const {
+DeprecatedString Decoder::flush() const {
   return m_decoder->toUnicode(buffer.latin1(), buffer.length(), true);
 }
 

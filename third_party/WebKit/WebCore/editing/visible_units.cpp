@@ -26,16 +26,16 @@
 #include "config.h"
 #include "visible_units.h"
 
-#include "DocumentImpl.h"
+#include "Document.h"
 #include "InlineTextBox.h"
-#include "QString.h"
+#include "DeprecatedString.h"
 #include "RenderBlock.h"
 #include "TextBoundaries.h"
 #include "VisiblePosition.h"
 #include "dom_elementimpl.h"
 #include "htmlediting.h"
 #include "htmlnames.h"
-#include "visible_text.h"
+#include "TextIterator.h"
 
 namespace WebCore {
 
@@ -45,14 +45,14 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
                                         unsigned (*searchFunction)(const QChar*,
                                                                    unsigned)) {
   Position pos = c.deepEquivalent();
-  NodeImpl* n = pos.node();
+  Node* n = pos.node();
   if (!n)
     return VisiblePosition();
-  DocumentImpl* d = n->getDocument();
-  NodeImpl* de = d->documentElement();
+  Document* d = n->getDocument();
+  Node* de = d->documentElement();
   if (!de)
     return VisiblePosition();
-  NodeImpl* boundary = n->enclosingBlockFlowElement();
+  Node* boundary = n->enclosingBlockFlowElement();
   if (!boundary)
     return VisiblePosition();
   bool isContentEditable = boundary->isContentEditable();
@@ -62,7 +62,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
 
   Position start = rangeCompliantEquivalent(Position(boundary, 0));
   Position end = rangeCompliantEquivalent(pos);
-  RefPtr<RangeImpl> searchRange = new RangeImpl(d);
+  RefPtr<Range> searchRange = new Range(d);
 
   int exception = 0;
   searchRange->setStart(start.node(), start.offset(), exception);
@@ -73,7 +73,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     return VisiblePosition();
 
   SimplifiedBackwardsTextIterator it(searchRange.get());
-  QString string;
+  DeprecatedString string;
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
     // iterate to get chunks until the searchFunction returns a non-zero value.
@@ -85,7 +85,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == 0) {
-    RefPtr<RangeImpl> range(it.range());
+    RefPtr<Range> range(it.range());
     pos = Position(range->startContainer(exception),
                    range->startOffset(exception));
   } else if (!it.atEnd() && it.length() == 0) {
@@ -101,7 +101,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     chars[1] = ' ';
     string.prepend(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    RefPtr<RangeImpl> range(it.range());
+    RefPtr<Range> range(it.range());
     if (pastImage == 0)
       pos = Position(range->startContainer(exception),
                      range->startOffset(exception));
@@ -114,7 +114,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     // nextWordPosition(), gives us results we can use directly without having
     // to
     // iterate again to translate the next value into a DOM position.
-    NodeImpl* node = it.range()->startContainer(exception);
+    Node* node = it.range()->startContainer(exception);
     if (node->isTextNode() || (node->renderer() && node->renderer()->isBR()))
       // The next variable contains a usable index into a text node
       pos = Position(node, next);
@@ -131,14 +131,14 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
                                     unsigned (*searchFunction)(const QChar*,
                                                                unsigned)) {
   Position pos = c.deepEquivalent();
-  NodeImpl* n = pos.node();
+  Node* n = pos.node();
   if (!n)
     return VisiblePosition();
-  DocumentImpl* d = n->getDocument();
-  NodeImpl* de = d->documentElement();
+  Document* d = n->getDocument();
+  Node* de = d->documentElement();
   if (!de)
     return VisiblePosition();
-  NodeImpl* boundary = n->enclosingBlockFlowElement();
+  Node* boundary = n->enclosingBlockFlowElement();
   if (!boundary)
     return VisiblePosition();
   bool isContentEditable = boundary->isContentEditable();
@@ -146,13 +146,13 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
          isContentEditable == boundary->parentNode()->isContentEditable())
     boundary = boundary->parentNode();
 
-  RefPtr<RangeImpl> searchRange(d->createRange());
+  RefPtr<Range> searchRange(d->createRange());
   Position start(rangeCompliantEquivalent(pos));
   int exception = 0;
   searchRange->setStart(start.node(), start.offset(), exception);
   searchRange->setEndAfter(boundary, exception);
   TextIterator it(searchRange.get(), RUNFINDER);
-  QString string;
+  DeprecatedString string;
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
     // Keep asking the iterator for chunks until the search function
@@ -165,7 +165,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == string.length()) {
-    RefPtr<RangeImpl> range(it.range());
+    RefPtr<Range> range(it.range());
     int exception = 0;
     pos = Position(range->startContainer(exception),
                    range->startOffset(exception));
@@ -182,7 +182,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     chars[1] = 'X';
     string.append(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    RefPtr<RangeImpl> range(it.range());
+    RefPtr<Range> range(it.range());
     int exception = 0;
     if (next != pastImage)
       pos =
@@ -273,7 +273,7 @@ VisiblePosition nextWordPosition(const VisiblePosition& c) {
 
 static RootInlineBox* rootBoxForLine(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
-  NodeImpl* node = p.node();
+  Node* node = p.node();
   if (!node)
     return 0;
 
@@ -297,7 +297,7 @@ VisiblePosition startOfLine(const VisiblePosition& c) {
   // pseudoelements) have no corresponding DOM element, and so cannot be
   // represented by a VisiblePosition.  Use whatever follows instead.
   InlineBox* startBox = rootBox->firstLeafChild();
-  NodeImpl* startNode;
+  Node* startNode;
   while (1) {
     if (!startBox)
       return VisiblePosition();
@@ -330,7 +330,7 @@ VisiblePosition endOfLine(const VisiblePosition& c) {
   // Generated content (e.g. list markers and CSS :before and :after
   // pseudoelements) have no corresponding DOM element, and so cannot be
   // represented by a VisiblePosition.  Use whatever precedes instead.
-  NodeImpl* endNode;
+  Node* endNode;
   InlineBox* endBox = rootBox->lastLeafChild();
   while (1) {
     if (!endBox)
@@ -373,7 +373,7 @@ bool isEndOfLine(const VisiblePosition& p) {
 VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
                                      int x) {
   Position p = visiblePosition.deepEquivalent();
-  NodeImpl* node = p.node();
+  Node* node = p.node();
   if (!node)
     return VisiblePosition();
 
@@ -397,8 +397,8 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
     // Need to move back to previous containing editable block in this root
     // editable
     // block and find the last root line box in that block.
-    NodeImpl* startBlock = node->enclosingBlockFlowElement();
-    NodeImpl* n = node->previousEditable();
+    Node* startBlock = node->enclosingBlockFlowElement();
+    Node* n = node->previousEditable();
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->previousEditable();
     while (n) {
@@ -438,7 +438,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
 VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
                                  int x) {
   Position p = visiblePosition.deepEquivalent();
-  NodeImpl* node = p.node();
+  Node* node = p.node();
   if (!node)
     return VisiblePosition();
 
@@ -462,8 +462,8 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
     // Need to move forward to next containing editable block in this root
     // editable
     // block and find the first root line box in that block.
-    NodeImpl* startBlock = node->enclosingBlockFlowElement();
-    NodeImpl* n = node->nextEditable(p.offset());
+    Node* startBlock = node->enclosingBlockFlowElement();
+    Node* n = node->nextEditable(p.offset());
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->nextEditable();
     while (n) {
@@ -496,7 +496,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
   // Could not find a next line. This means we must already be on the last line.
   // Move to the end of the content in this block, which effectively moves us
   // to the end of the line we're on.
-  ElementImpl* rootElement = node->rootEditableElement();
+  Element* rootElement = node->rootEditableElement();
   return VisiblePosition(
       rootElement, rootElement ? rootElement->childNodeCount() : 0, DOWNSTREAM);
 }
@@ -544,16 +544,16 @@ VisiblePosition nextSentencePosition(const VisiblePosition& c, int x) {
 
 VisiblePosition startOfParagraph(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
-  NodeImpl* startNode = p.node();
+  Node* startNode = p.node();
   if (!startNode)
     return VisiblePosition();
 
-  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
+  Node* startBlock = startNode->enclosingBlockFlowElement();
 
-  NodeImpl* node = startNode;
+  Node* node = startNode;
   int offset = p.offset();
 
-  NodeImpl* n = startNode;
+  Node* n = startNode;
   while (n) {
     RenderObject* r = n->renderer();
     if (!r) {
@@ -600,14 +600,14 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
     return VisiblePosition();
 
   Position p = c.deepEquivalent();
-  NodeImpl* startNode = p.node();
-  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
-  NodeImpl* stayInsideBlock = startBlock;
+  Node* startNode = p.node();
+  Node* startBlock = startNode->enclosingBlockFlowElement();
+  Node* stayInsideBlock = startBlock;
 
-  NodeImpl* node = startNode;
+  Node* node = startNode;
   int offset = p.offset();
 
-  NodeImpl* n = startNode;
+  Node* n = startNode;
   while (n) {
     if (n->isContentEditable() != startNode->isContentEditable())
       break;
@@ -691,7 +691,7 @@ VisiblePosition nextParagraphPosition(const VisiblePosition& p, int x) {
 
 VisiblePosition startOfBlock(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
-  NodeImpl* startNode = p.node();
+  Node* startNode = p.node();
   if (!startNode)
     return VisiblePosition();
   return VisiblePosition(Position(startNode->enclosingBlockFlowElement(), 0),
@@ -701,11 +701,11 @@ VisiblePosition startOfBlock(const VisiblePosition& c) {
 VisiblePosition endOfBlock(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
 
-  NodeImpl* startNode = p.node();
+  Node* startNode = p.node();
   if (!startNode)
     return VisiblePosition();
 
-  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
+  Node* startBlock = startNode->enclosingBlockFlowElement();
 
   return VisiblePosition(startBlock, startBlock->childNodeCount(),
                          VP_DEFAULT_AFFINITY);
@@ -727,13 +727,13 @@ bool isEndOfBlock(const VisiblePosition& pos) {
 // ---------
 
 VisiblePosition startOfDocument(const VisiblePosition& c) {
-  ElementImpl* documentElement = c.deepEquivalent().documentElement();
+  Element* documentElement = c.deepEquivalent().documentElement();
   return documentElement ? VisiblePosition(documentElement, 0, DOWNSTREAM)
                          : VisiblePosition();
 }
 
 VisiblePosition endOfDocument(const VisiblePosition& c) {
-  ElementImpl* documentElement = c.deepEquivalent().documentElement();
+  Element* documentElement = c.deepEquivalent().documentElement();
   return documentElement
              ? VisiblePosition(documentElement,
                                documentElement->childNodeCount(), DOWNSTREAM)
@@ -742,11 +742,11 @@ VisiblePosition endOfDocument(const VisiblePosition& c) {
 
 bool inSameDocument(const VisiblePosition& a, const VisiblePosition& b) {
   Position ap = a.deepEquivalent();
-  NodeImpl* an = ap.node();
+  Node* an = ap.node();
   if (!an)
     return false;
   Position bp = b.deepEquivalent();
-  NodeImpl* bn = bp.node();
+  Node* bn = bp.node();
   if (an == bn)
     return true;
 
@@ -765,7 +765,7 @@ bool isEndOfDocument(const VisiblePosition& p) {
 
 VisiblePosition startOfEditableContent(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
-  NodeImpl* node = p.node();
+  Node* node = p.node();
   if (!node)
     return VisiblePosition();
 
@@ -774,7 +774,7 @@ VisiblePosition startOfEditableContent(const VisiblePosition& c) {
 
 VisiblePosition endOfEditableContent(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
-  NodeImpl* node = p.node();
+  Node* node = p.node();
   if (!node)
     return VisiblePosition();
 
@@ -787,12 +787,12 @@ VisiblePosition endOfEditableContent(const VisiblePosition& c) {
 
 bool inSameEditableContent(const VisiblePosition& a, const VisiblePosition& b) {
   Position ap = a.deepEquivalent();
-  NodeImpl* an = ap.node();
+  Node* an = ap.node();
   if (!an)
     return false;
 
   Position bp = b.deepEquivalent();
-  NodeImpl* bn = bp.node();
+  Node* bn = bp.node();
   if (!bn)
     return false;
 

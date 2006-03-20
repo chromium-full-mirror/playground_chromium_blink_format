@@ -35,7 +35,7 @@ class RenderTableCell;
 
 class RenderTableSection : public RenderContainer {
  public:
-  RenderTableSection(DOM::NodeImpl* node);
+  RenderTableSection(WebCore::Node* node);
   ~RenderTableSection();
   virtual void destroy();
 
@@ -51,7 +51,7 @@ class RenderTableSection : public RenderContainer {
   virtual void position(int, int, int, int, int, bool, bool, int) {}
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream* stream, QString ind = "") const;
+  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
 #endif
 
   void addCell(RenderTableCell* cell, RenderObject* row);
@@ -66,7 +66,7 @@ class RenderTableSection : public RenderContainer {
     RenderTableCell* cell;
     bool inColSpan;  // true for columns after the first in a colspan
   };
-  typedef Array<CellStruct> Row;
+  typedef DeprecatedArray<CellStruct> Row;
   struct RowStruct {
     Row* row;
     RenderObject* rowRenderer;
@@ -107,9 +107,9 @@ class RenderTableSection : public RenderContainer {
 
   // this gets a cell grid data structure. changing the number of
   // columns is done by the table
-  Array<RowStruct> grid;
+  DeprecatedArray<RowStruct> grid;
   int gridRows;
-  Array<int> rowPos;
+  DeprecatedArray<int> rowPos;
 
   // the current insertion position
   int cCol;

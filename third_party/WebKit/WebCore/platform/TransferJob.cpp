@@ -59,12 +59,12 @@ void TransferJob::setError(int e) {
   d->status = e;
 }
 
-QString TransferJob::errorText() const {
+DeprecatedString TransferJob::errorText() const {
   LOG(NotYetImplemented, "not yet implemented");
-  return QString::null;
+  return DeprecatedString::null;
 }
 
-QString TransferJob::queryMetaData(const QString& key) const {
+DeprecatedString TransferJob::queryMetaData(const DeprecatedString& key) const {
   if (key == "HTTP-Headers") {
     assembleResponseHeaders();
     return d->responseHeaders;
@@ -74,10 +74,11 @@ QString TransferJob::queryMetaData(const QString& key) const {
     // this will put it in the regular metadata dictionary
     retrieveCharset();
 
-  return d->metaData.get(key).qstring();
+  return d->metaData.get(key).deprecatedString();
 }
 
-void TransferJob::addMetaData(const QString& key, const QString& value) {
+void TransferJob::addMetaData(const DeprecatedString& key,
+                              const DeprecatedString& value) {
   d->metaData.set(key, value);
 }
 

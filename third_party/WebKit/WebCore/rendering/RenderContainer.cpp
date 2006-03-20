@@ -28,22 +28,22 @@
 #include "RenderContainer.h"
 #include "RenderTable.h"
 #include "RenderTextFragment.h"
-#include "render_image.h"
-#include "render_canvas.h"
+#include "RenderImage.h"
+#include "RenderCanvas.h"
 #include "render_list.h"
-#include "DocumentImpl.h"
-#include "dom_position.h"
+#include "Document.h"
+#include "Position.h"
 #include "VisiblePosition.h"
 
 #include <assert.h>
 
 // For accessibility
-#include "KWQAccObjectCache.h"
+#include "AccessibilityObjectCache.h"
 
-using DOM::Position;
+using WebCore::Position;
 namespace WebCore {
 
-RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderBox(node) {
+RenderContainer::RenderContainer(WebCore::Node* node) : RenderBox(node) {
   m_first = 0;
   m_last = 0;
 }
@@ -155,7 +155,7 @@ void RenderContainer::addChild(RenderObject* newChild,
   }
 
   if (newChild->isText() && newChild->style()->textTransform() == CAPITALIZE) {
-    RefPtr<DOMStringImpl> textToTransform =
+    RefPtr<StringImpl> textToTransform =
         static_cast<RenderText*>(newChild)->originalString();
     if (textToTransform)
       static_cast<RenderText*>(newChild)->setText(textToTransform.get(), true);
@@ -209,7 +209,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   oldChild->setParent(0);
 
 #if __APPLE__
-  if (KWQAccObjectCache::accessibilityEnabled())
+  if (AccessibilityObjectCache::accessibilityEnabled())
     document()->getAccObjectCache()->childrenChanged(this);
 #endif
 
@@ -380,7 +380,7 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
     dirtyLinesFromChangedChild(newChild);
 
 #if __APPLE__
-  if (KWQAccObjectCache::accessibilityEnabled())
+  if (AccessibilityObjectCache::accessibilityEnabled())
     document()->getAccObjectCache()->childrenChanged(this);
 #endif
 }
@@ -427,7 +427,7 @@ void RenderContainer::insertChildNode(RenderObject* child,
     dirtyLinesFromChangedChild(child);
 
 #if __APPLE__
-  if (KWQAccObjectCache::accessibilityEnabled())
+  if (AccessibilityObjectCache::accessibilityEnabled())
     document()->getAccObjectCache()->childrenChanged(this);
 #endif
 }
@@ -547,9 +547,9 @@ VisiblePosition RenderContainer::positionForCoordinates(int _x, int _y) {
   return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
-QValueList<IntRect> RenderContainer::lineBoxRects() {
+DeprecatedValueList<IntRect> RenderContainer::lineBoxRects() {
   if (!firstChild() && (isInline() || isAnonymousBlock())) {
-    QValueList<IntRect> rects;
+    DeprecatedValueList<IntRect> rects;
     int x = 0, y = 0;
     absolutePositionForContent(x, y);
     absoluteRects(rects, x, y);
@@ -557,9 +557,9 @@ QValueList<IntRect> RenderContainer::lineBoxRects() {
   }
 
   if (!firstChild())
-    return QValueList<IntRect>();
+    return DeprecatedValueList<IntRect>();
 
-  QValueList<IntRect> rects;
+  DeprecatedValueList<IntRect> rects;
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
     if (child->isText() || child->isInline() || child->isAnonymousBlock()) {

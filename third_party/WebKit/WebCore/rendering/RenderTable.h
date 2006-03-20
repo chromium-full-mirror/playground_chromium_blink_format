@@ -57,7 +57,7 @@ class RenderTable : public RenderBlock {
     Box = 0x0f
   };
 
-  RenderTable(NodeImpl*);
+  RenderTable(Node*);
   ~RenderTable();
 
   virtual const char* renderName() const { return "RenderTable"; }
@@ -105,7 +105,7 @@ class RenderTable : public RenderBlock {
   virtual void calcWidth();
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream* stream, QString ind = "") const;
+  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
 #endif
   struct ColumnStruct {
     enum { WidthUndefined = 0xffff };
@@ -117,8 +117,8 @@ class RenderTable : public RenderBlock {
     unsigned width;  // the calculated position of the column
   };
 
-  Array<int> columnPos;
-  Array<ColumnStruct> columns;
+  DeprecatedArray<int> columnPos;
+  DeprecatedArray<ColumnStruct> columns;
 
   void splitColumn(int pos, int firstSpan);
   void appendColumn(int span);

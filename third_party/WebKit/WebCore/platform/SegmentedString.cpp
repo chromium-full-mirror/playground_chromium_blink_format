@@ -56,16 +56,17 @@ const SegmentedString& SegmentedString::operator=(
   return *this;
 }
 
-uint SegmentedString::length() const {
-  uint length = m_currentString.m_length;
+unsigned SegmentedString::length() const {
+  unsigned length = m_currentString.m_length;
   if (!m_pushedChar1.isNull()) {
     ++length;
     if (!m_pushedChar2.isNull())
       ++length;
   }
   if (m_composite) {
-    QValueListConstIterator<SegmentedSubstring> i = m_substrings.begin();
-    QValueListConstIterator<SegmentedSubstring> e = m_substrings.end();
+    DeprecatedValueListConstIterator<SegmentedSubstring> i =
+        m_substrings.begin();
+    DeprecatedValueListConstIterator<SegmentedSubstring> e = m_substrings.end();
     for (; i != e; ++i)
       length += (*i).m_length;
   }
@@ -111,8 +112,10 @@ void SegmentedString::append(const SegmentedString& s) {
   assert(!s.escaped());
   append(s.m_currentString);
   if (s.m_composite) {
-    QValueListConstIterator<SegmentedSubstring> i = s.m_substrings.begin();
-    QValueListConstIterator<SegmentedSubstring> e = s.m_substrings.end();
+    DeprecatedValueListConstIterator<SegmentedSubstring> i =
+        s.m_substrings.begin();
+    DeprecatedValueListConstIterator<SegmentedSubstring> e =
+        s.m_substrings.end();
     for (; i != e; ++i)
       append(*i);
   }
@@ -124,8 +127,10 @@ void SegmentedString::prepend(const SegmentedString& s) {
   assert(!escaped());
   assert(!s.escaped());
   if (s.m_composite) {
-    QValueListConstIterator<SegmentedSubstring> i = s.m_substrings.fromLast();
-    QValueListConstIterator<SegmentedSubstring> e = s.m_substrings.end();
+    DeprecatedValueListConstIterator<SegmentedSubstring> i =
+        s.m_substrings.fromLast();
+    DeprecatedValueListConstIterator<SegmentedSubstring> e =
+        s.m_substrings.end();
     for (; i != e; --i)
       prepend(*i);
   }
@@ -145,8 +150,8 @@ void SegmentedString::advanceSubstring() {
   }
 }
 
-QString SegmentedString::toString() const {
-  QString result;
+DeprecatedString SegmentedString::toString() const {
+  DeprecatedString result;
   if (!m_pushedChar1.isNull()) {
     result.append(m_pushedChar1);
     if (!m_pushedChar2.isNull())
@@ -154,8 +159,9 @@ QString SegmentedString::toString() const {
   }
   m_currentString.appendTo(result);
   if (m_composite) {
-    QValueListConstIterator<SegmentedSubstring> i = m_substrings.begin();
-    QValueListConstIterator<SegmentedSubstring> e = m_substrings.end();
+    DeprecatedValueListConstIterator<SegmentedSubstring> i =
+        m_substrings.begin();
+    DeprecatedValueListConstIterator<SegmentedSubstring> e = m_substrings.end();
     for (; i != e; ++i)
       (*i).appendTo(result);
   }

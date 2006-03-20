@@ -41,7 +41,7 @@ typedef struct HDC__* HDC;
 typedef struct _cairo cairo_t;
 #endif
 
-class QString;
+class DeprecatedString;
 class QChar;
 
 namespace WebCore {
@@ -166,7 +166,7 @@ class GraphicsContext : Noncopyable {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
 
-  void drawText(int x, int y, int alignmentFlags, const QString&);
+  void drawText(int x, int y, int alignmentFlags, const DeprecatedString&);
   void drawHighlightForText(int x,
                             int y,
                             int h,
@@ -227,7 +227,8 @@ class GraphicsContext : Noncopyable {
 #if __APPLE__
   static CGContextRef currentCGContext();
   static int getCompositeOperation(CGContextRef);
-  static void setCompositeOperation(CGContextRef, const QString& operation);
+  static void setCompositeOperation(CGContextRef,
+                                    const DeprecatedString& operation);
   static void setCompositeOperation(CGContextRef, int operation);
 #endif
 

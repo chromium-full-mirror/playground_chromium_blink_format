@@ -23,16 +23,16 @@
 
 #include "kjs_css.h"
 
-#include "dom2_viewsimpl.h"
-#include "DocumentImpl.h"
+#include "AbstractView.h"
+#include "Document.h"
 #include "css/css_stylesheetimpl.h"
 #include "css/css_ruleimpl.h"
 
-using DOM::AbstractViewImpl;
-using DOM::DocumentImpl;
-using DOM::ElementImpl;
-using DOM::NodeImpl;
-using DOM::CSSRuleListImpl;
+using WebCore::AbstractView;
+using WebCore::Document;
+using WebCore::Element;
+using WebCore::Node;
+using WebCore::CSSRuleList;
 
 #include "kjs_views.lut.h"
 
@@ -44,7 +44,7 @@ const ClassInfo DOMAbstractView::info = {"AbstractView", 0,
                                          &DOMAbstractViewTable, 0};
 /*
 @begin DOMAbstractViewTable 2
-  document              DOMAbstractView::Document DontDelete|ReadOnly
+  document              DOMAbstractView::Document_ DontDelete|ReadOnly
 @end
 @begin DOMAbstractViewProtoTable 1
   getComputedStyle      DOMAbstractView::GetComputedStyle DontDelete|Function 2
@@ -59,7 +59,7 @@ KJS_IMPLEMENT_PROTOTYPE("DOMAbstractView",
                         DOMAbstractViewProto,
                         DOMAbstractViewProtoFunc)
 
-DOMAbstractView::DOMAbstractView(ExecState* exec, AbstractViewImpl* av)
+DOMAbstractView::DOMAbstractView(ExecState* exec, AbstractView* av)
     : m_impl(av) {
   setPrototype(DOMAbstractViewProto::self(exec));
 }
@@ -69,7 +69,7 @@ DOMAbstractView::~DOMAbstractView() {
 }
 
 JSValue* DOMAbstractView::getValueProperty(ExecState* exec, int token) {
-  assert(token == Document);
+  assert(token == Document_);
   return toJS(exec, impl()->document());
 }
 
@@ -85,11 +85,10 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
                                                   const List& args) {
   if (!thisObj->inherits(&DOMAbstractView::info))
     return throwError(exec, TypeError);
-  AbstractViewImpl& abstractView =
-      *static_cast<DOMAbstractView*>(thisObj)->impl();
+  AbstractView& abstractView = *static_cast<DOMAbstractView*>(thisObj)->impl();
   switch (id) {
     case DOMAbstractView::GetComputedStyle: {
-      ElementImpl* arg0 = toElement(args[0]);
+      Element* arg0 = toElement(args[0]);
       if (!arg0)
         return jsUndefined();  // throw exception?
       else {
@@ -100,7 +99,7 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
       }
     }
     case DOMAbstractView::GetMatchedCSSRules: {
-      ElementImpl* arg0 = toElement(args[0]);
+      Element* arg0 = toElement(args[0]);
       if (!arg0)
         return jsUndefined();  // throw exception?
       else {
@@ -116,11 +115,11 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue* toJS(ExecState* exec, AbstractViewImpl* av) {
-  return cacheDOMObject<AbstractViewImpl, DOMAbstractView>(exec, av);
+JSValue* toJS(ExecState* exec, AbstractView* av) {
+  return cacheDOMObject<AbstractView, DOMAbstractView>(exec, av);
 }
 
-AbstractViewImpl* toAbstractView(JSValue* val) {
+AbstractView* toAbstractView(JSValue* val) {
   if (!val || !val->isObject(&DOMAbstractView::info))
     return 0;
   return static_cast<DOMAbstractView*>(val)->impl();

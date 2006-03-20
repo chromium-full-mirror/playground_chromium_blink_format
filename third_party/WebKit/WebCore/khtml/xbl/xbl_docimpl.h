@@ -1,5 +1,5 @@
-namespace DOM {
-class DOMString;
+namespace WebCore {
+class String;
 }
 
 namespace XBL {
@@ -10,16 +10,16 @@ class XBLPrototypeBinding;
 // The DOM of an XBL document is optimized to avoid creating full-blown DOM
 // elements for most sections of the various
 // bindings.  Custom prototype binding data structures are created instead.
-class XBLDocumentImpl : public DOM::DocumentImpl {
+class XBLDocument : public WebCore::Document {
  public:
-  XBLDocumentImpl();
-  ~XBLDocumentImpl();
+  XBLDocument();
+  ~XBLDocument();
 
-  virtual khtml::XMLHandler* createTokenHandler();
+  virtual WebCore::XMLHandler* createTokenHandler();
 
-  void setPrototypeBinding(const DOM::DOMString& id,
+  void setPrototypeBinding(const WebCore::String& id,
                            XBLPrototypeBinding* binding);
-  XBLPrototypeBinding* prototypeBinding(const DOM::DOMString& id);
+  XBLPrototypeBinding* prototypeBinding(const WebCore::String& id);
 
  private:
   // A mapping from URIs to bindings.  Used to look up specific prototype

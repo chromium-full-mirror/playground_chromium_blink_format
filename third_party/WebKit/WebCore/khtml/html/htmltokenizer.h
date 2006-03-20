@@ -42,12 +42,12 @@ using KXMLCore::PassRefPtr;
 namespace WebCore {
 
 class CachedScript;
-class DocumentFragmentImpl;
-class DocumentImpl;
+class DocumentFragment;
+class Document;
 class FrameView;
 class HTMLParser;
-class NamedMappedAttrMapImpl;
-class NodeImpl;
+class NamedMappedAttrMap;
+class Node;
 
 /**
  * @internal
@@ -59,7 +59,7 @@ class Token {
  public:
   Token() : beginTag(true), flat(false) {}
 
-  void addAttribute(DocumentImpl*,
+  void addAttribute(Document*,
                     const AtomicString& attrName,
                     const AtomicString& v);
 
@@ -78,8 +78,8 @@ class Token {
     flat = false;
   }
 
-  RefPtr<NamedMappedAttrMapImpl> attrs;
-  RefPtr<DOMStringImpl> text;
+  RefPtr<NamedMappedAttrMap> attrs;
+  RefPtr<StringImpl> text;
   AtomicString tagName;
   bool beginTag;
   bool flat;
@@ -89,8 +89,8 @@ class Token {
 
 class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
  public:
-  HTMLTokenizer(DocumentImpl*);
-  HTMLTokenizer(DocumentFragmentImpl*);
+  HTMLTokenizer(Document*);
+  HTMLTokenizer(DocumentFragment*);
   virtual ~HTMLTokenizer();
 
   virtual bool write(const SegmentedString& str, bool appendData);
@@ -108,7 +108,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void end();
 
   void reset();
-  PassRefPtr<NodeImpl> processToken();
+  PassRefPtr<Node> processToken();
 
   State processListing(SegmentedString, State);
   State parseComment(SegmentedString&, State);
@@ -124,9 +124,9 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
                     bool parsingTag);
   State parseProcessingInstruction(SegmentedString&, State);
   State scriptHandler(State);
-  State scriptExecution(const QString& script,
+  State scriptExecution(const DeprecatedString& script,
                         State state,
-                        QString scriptURL = QString(),
+                        DeprecatedString scriptURL = DeprecatedString(),
                         int baseLine = 0);
   void setSrc(const SegmentedString& source);
 
@@ -323,8 +323,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // may be still downloading) and finish
   bool noMoreData;
   // URL to get source code of script from
-  QString scriptSrc;
-  QString scriptSrcCharset;
+  DeprecatedString scriptSrc;
+  DeprecatedString scriptSrcCharset;
   bool javascript;
   // the HTML code we will parse after the external script we are waiting for
   // has loaded
@@ -339,8 +339,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // the output of the script to be postponed until after the script has
   // finished executing
   int m_executingScript;
-  QPtrQueue<CachedScript> pendingScripts;
-  RefPtr<NodeImpl> scriptNode;
+  DeprecatedPtrQueue<CachedScript> pendingScripts;
+  RefPtr<Node> scriptNode;
 
   // if we found one broken comment, there are most likely others as well
   // store a flag to get rid of the O(n^2) behaviour in such a case.
@@ -364,13 +364,13 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   unsigned int m_cBufferPos;
 
   SegmentedString src;
-  DocumentImpl* m_doc;
+  Document* m_doc;
   HTMLParser* parser;
   bool inWrite;
   bool m_fragment;
 };
 
-void parseHTMLDocumentFragment(const String&, DocumentFragmentImpl*);
+void parseHTMLDocumentFragment(const String&, DocumentFragment*);
 
 unsigned short decodeNamedEntity(const char*);
 }

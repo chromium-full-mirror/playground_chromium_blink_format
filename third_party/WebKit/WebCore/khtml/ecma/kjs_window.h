@@ -21,7 +21,7 @@
 #ifndef KJS_WINDOW_H_
 #define KJS_WINDOW_H_
 
-#include "QString.h"
+#include "DeprecatedString.h"
 #include "kjs_binding.h"
 #include <kjs/protect.h>
 #include <kxmlcore/HashMap.h>
@@ -30,7 +30,7 @@ namespace WebCore {
 class AtomicString;
 class Frame;
 class FrameView;
-class NodeImpl;
+class Node;
 }
 
 namespace KJS {
@@ -164,7 +164,7 @@ class Window : public JSObject {
   virtual UString toString(ExecState*) const;
 
   // Set the current "event" object
-  void setCurrentEvent(WebCore::EventImpl*);
+  void setCurrentEvent(WebCore::Event*);
 
   // Set a place to put a dialog return value when the window is cleared.
   void setReturnValueSlot(JSValue** slot) { m_returnValueSlot = slot; }
@@ -181,7 +181,7 @@ class Window : public JSObject {
     Crypto,
     DefaultStatus,
     Status,
-    Document,
+    Document_,
     Node,
     EventCtor,
     MutationEventCtor,
@@ -190,15 +190,15 @@ class Window : public JSObject {
     DOMException,
     CSSRule,
     Frames,
-    _History,
-    Event,
+    History_,
+    Event_,
     InnerHeight,
     InnerWidth,
     Length,
-    _Location,
+    Location_,
     Locationbar,
     Name,
-    _Navigator,
+    Navigator_,
     ClientInformation,
     Menubar,
     OffscreenBuffering,
@@ -224,9 +224,9 @@ class Window : public JSObject {
     ResizeBy,
     ResizeTo,
     Self,
-    _Window,
+    Window_,
     Top,
-    _Screen,
+    Screen_,
     Image,
     Option,
     Alert,
@@ -248,8 +248,8 @@ class Window : public JSObject {
     RemoveEventListener,
     XMLHttpRequest,
     XMLSerializer,
-    DOMParser,
-    XSLTProcessor,
+    DOMParser_,
+    XSLTProcessor_,
     Onabort,
     Onblur,
     Onchange,
@@ -324,7 +324,7 @@ class Window : public JSObject {
   mutable BarInfo* m_scrollbars;
   mutable BarInfo* m_statusbar;
   mutable BarInfo* m_toolbar;
-  WebCore::EventImpl* m_evt;
+  WebCore::Event* m_evt;
   JSValue** m_returnValueSlot;
   typedef HashMap<int, DOMWindowTimer*> TimeoutsMap;
   TimeoutsMap m_timeouts;
@@ -339,13 +339,13 @@ class ScheduledAction {
  public:
   ScheduledAction(JSValue* func, const List& args)
       : m_func(func), m_args(args) {}
-  ScheduledAction(const QString& code) : m_code(code) {}
+  ScheduledAction(const DeprecatedString& code) : m_code(code) {}
   void execute(Window*);
 
  private:
   ProtectedPtr<JSValue> m_func;
   List m_args;
-  QString m_code;
+  DeprecatedString m_code;
 };
 
 class Location : public JSObject {
