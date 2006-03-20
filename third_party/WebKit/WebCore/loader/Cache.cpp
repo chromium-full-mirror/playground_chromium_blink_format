@@ -118,20 +118,20 @@ void Cache::clear() {
 CachedImage* Cache::requestImage(DocLoader* dl,
                                  const String& url,
                                  bool reload,
-                                 time_t _expireDate) {
+                                 time_t expireDate) {
   // this brings the _url to a standard form...
   KURL kurl;
   if (dl)
     kurl = dl->m_doc->completeURL(url.deprecatedString());
   else
     kurl = url.deprecatedString();
-  return requestImage(dl, kurl, reload, _expireDate);
+  return requestImage(dl, kurl, reload, expireDate);
 }
 
 CachedImage* Cache::requestImage(DocLoader* dl,
                                  const KURL& url,
                                  bool reload,
-                                 time_t _expireDate) {
+                                 time_t expireDate) {
   KIO::CacheControl cachePolicy;
   if (dl)
     cachePolicy = dl->cachePolicy();
@@ -140,9 +140,8 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
-  if (!dl->doc()->shouldCreateRenderers()) {
+  if (!dl->doc()->shouldCreateRenderers())
     return 0;
-  }
 
   CachedObject* o = 0;
   if (!reload)
@@ -151,7 +150,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << url.url() << endl;
 #endif
-    CachedImage* im = new CachedImage(dl, url.url(), cachePolicy, _expireDate);
+    CachedImage* im = new CachedImage(dl, url.url(), cachePolicy, expireDate);
     if (dl && dl->autoloadImages())
       Cache::loader()->load(dl, im, true);
     if (cacheDisabled)
@@ -186,7 +185,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
                                               const String& url,
                                               bool reload,
-                                              time_t _expireDate,
+                                              time_t expireDate,
                                               const DeprecatedString& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
@@ -207,7 +206,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
 #endif
     CachedCSSStyleSheet* sheet = new CachedCSSStyleSheet(
-        dl, kurl.url(), cachePolicy, _expireDate, charset);
+        dl, kurl.url(), cachePolicy, expireDate, charset);
     if (cacheDisabled)
       sheet->setFree(true);
     else {
@@ -250,9 +249,9 @@ void Cache::preloadStyleSheet(const DeprecatedString& url,
 }
 
 CachedScript* Cache::requestScript(DocLoader* dl,
-                                   const WebCore::String& url,
+                                   const String& url,
                                    bool reload,
-                                   time_t _expireDate,
+                                   time_t expireDate,
                                    const DeprecatedString& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
@@ -273,7 +272,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
 #endif
     CachedScript* script =
-        new CachedScript(dl, kurl.url(), cachePolicy, _expireDate, charset);
+        new CachedScript(dl, kurl.url(), cachePolicy, expireDate, charset);
     if (cacheDisabled)
       script->setFree(true);
     else {
@@ -319,7 +318,7 @@ void Cache::preloadScript(const DeprecatedString& url,
 CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
                                                  const String& url,
                                                  bool reload,
-                                                 time_t _expireDate) {
+                                                 time_t expireDate) {
   // this brings the _url to a standard form...
   KURL kurl;
   KIO::CacheControl cachePolicy;
@@ -339,7 +338,7 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
 #endif
     CachedXSLStyleSheet* doc =
-        new CachedXSLStyleSheet(dl, kurl.url(), cachePolicy, _expireDate);
+        new CachedXSLStyleSheet(dl, kurl.url(), cachePolicy, expireDate);
     if (cacheDisabled)
       doc->setFree(true);
     else {
@@ -378,7 +377,7 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
 CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
                                              const String& url,
                                              bool reload,
-                                             time_t _expireDate) {
+                                             time_t expireDate) {
   // this brings the _url to a standard form...
   KURL kurl;
   KIO::CacheControl cachePolicy;
@@ -398,7 +397,7 @@ CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
 #endif
     CachedXBLDocument* doc =
-        new CachedXBLDocument(dl, kurl.url(), cachePolicy, _expireDate);
+        new CachedXBLDocument(dl, kurl.url(), cachePolicy, expireDate);
     if (cacheDisabled)
       doc->setFree(true);
     else {

@@ -80,7 +80,7 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
   } else if (fill->paintType() == SVG_PAINTTYPE_URI) {
     String id(fill->uri());
     fillPaintServer =
-        getPaintServerById(item->document(), id.deprecatedString().mid(1));
+        getPaintServerById(item->document(), AtomicString(id.substring(1)));
     if (item && fillPaintServer && item->isRenderPath())
       fillPaintServer->addClient(static_cast<const RenderPath*>(item));
   } else {
@@ -115,7 +115,7 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
   if (stroke && stroke->paintType() == SVG_PAINTTYPE_URI) {
     String id(stroke->uri());
     strokePaintServer =
-        getPaintServerById(item->document(), id.deprecatedString().mid(1));
+        getPaintServerById(item->document(), AtomicString(id.substring(1)));
     if (item && strokePaintServer && item->isRenderPath())
       strokePaintServer->addClient(static_cast<const RenderPath*>(item));
   } else {

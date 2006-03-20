@@ -217,7 +217,7 @@ class CSSStyleSelector : public StyleSelector {
   CSSRuleList* m_ruleList;
   bool m_collectRulesOnly;
 
-  DeprecatedString m_medium;
+  String m_mediaType;
 
   RenderStyle::PseudoId dynamicPseudo;
 

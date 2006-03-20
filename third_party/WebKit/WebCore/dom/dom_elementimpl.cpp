@@ -630,7 +630,7 @@ void Element::dispatchAttrAdditionEvent(Attribute* attr) {
 }
 
 String Element::openTagStartToString() const {
-  String result = String("<") + nodeName();
+  String result = "<" + nodeName();
 
   NamedAttrMap* attrMap = attributes(true);
 

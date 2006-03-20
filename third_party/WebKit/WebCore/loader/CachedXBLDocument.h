@@ -55,7 +55,7 @@ class CachedXBLDocument : public CachedObject {
 
   virtual void setCharset(const DeprecatedString& chs);
   virtual void data(DeprecatedByteArray&, bool eof);
-  virtual void error(int err, const char* text);
+  virtual void error();
 
   virtual bool schedule() const { return true; }
 

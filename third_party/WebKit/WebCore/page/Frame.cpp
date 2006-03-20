@@ -117,7 +117,7 @@ class UserStyleSheetLoader : public CachedObjectClient {
 
  private:
   virtual void setStyleSheet(const String&, const String& sheet) {
-    m_frame->setUserStyleSheet(sheet.deprecatedString());
+    m_frame->setUserStyleSheet(sheet);
   }
   Frame* m_frame;
   CachedCSSStyleSheet* m_cachedSheet;
@@ -245,9 +245,9 @@ bool Frame::didOpenURL(const KURL& url) {
   d->m_kjsStatusBarText = String();
   d->m_kjsDefaultStatusBarText = String();
 
-  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled(url.host());
-  d->m_bJavaEnabled = d->m_settings->isJavaEnabled(url.host());
-  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled(url.host());
+  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled();
+  d->m_bJavaEnabled = d->m_settings->isJavaEnabled();
+  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled();
 
   // initializing d->m_url to the new url breaks relative links when opening
   // such a link after this call and _before_ begin() is called (when the first
@@ -501,7 +501,7 @@ void Frame::receivedFirstData() {
   DeprecatedString qData;
 
   // Support for http-refresh
-  qData = d->m_job->queryMetaData("http-refresh");
+  qData = d->m_job->queryMetaData("http-refresh").deprecatedString();
   if (!qData.isEmpty() && d->m_metaRefreshEnabled) {
     double delay;
     int pos = qData.find(';');
@@ -613,12 +613,12 @@ void Frame::begin(const KURL& url) {
   d->m_doc->setBaseURL(baseurl.url());
   if (d->m_decoder)
     d->m_doc->setDecoder(d->m_decoder.get());
-  d->m_doc->docLoader()->setShowAnimations(d->m_settings->showAnimations());
+  d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationEnabled);
 
   updatePolicyBaseURL();
 
   setAutoloadImages(d->m_settings->autoLoadImages());
-  DeprecatedString userStyleSheet = d->m_settings->userStyleSheet();
+  String userStyleSheet = d->m_settings->userStyleSheet();
 
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
@@ -850,7 +850,7 @@ KURL Frame::baseURL() const {
   return d->m_doc->baseURL();
 }
 
-DeprecatedString Frame::baseTarget() const {
+String Frame::baseTarget() const {
   if (!d->m_doc)
     return DeprecatedString();
   return d->m_doc->baseTarget();
@@ -1013,7 +1013,7 @@ DeprecatedString Frame::encoding() const {
     return d->m_encoding;
 
   if (d->m_decoder && d->m_decoder->encoding().isValid())
-    return DeprecatedString(d->m_decoder->encodingName());
+    return d->m_decoder->encodingName();
 
   return settings()->encoding();
 }
@@ -1033,11 +1033,11 @@ void Frame::setUserStyleSheet(const DeprecatedString& styleSheet) {
     d->m_doc->setUserStyleSheet(styleSheet);
 }
 
-bool Frame::gotoAnchor(const DeprecatedString& name) {
+bool Frame::gotoAnchor(const String& name) {
   if (!d->m_doc)
     return false;
 
-  Node* n = d->m_doc->getElementById(name);
+  Node* n = d->m_doc->getElementById(AtomicString(name));
   if (!n) {
     HTMLCollection* anchors =
         new HTMLCollection(d->m_doc.get(), HTMLCollection::DOC_ANCHORS);
@@ -1085,15 +1085,15 @@ bool Frame::gotoAnchor(const DeprecatedString& name) {
   return true;
 }
 
-void Frame::setStandardFont(const DeprecatedString& name) {
-  d->m_settings->setStdFontName(name);
+void Frame::setStandardFont(const String& name) {
+  d->m_settings->setStdFontName(AtomicString(name));
 }
 
-void Frame::setFixedFont(const DeprecatedString& name) {
-  d->m_settings->setFixedFontName(name);
+void Frame::setFixedFont(const String& name) {
+  d->m_settings->setFixedFontName(AtomicString(name));
 }
 
-DeprecatedString Frame::selectedText() const {
+String Frame::selectedText() const {
   return plainText(selection().toRange().get());
 }
 
@@ -1281,14 +1281,12 @@ void Frame::paintDragCaret(GraphicsContext* p, const IntRect& rect) const {
   d->m_dragCaret.paintCaret(p, rect);
 }
 
-void Frame::urlSelected(const DeprecatedString& url,
-                        const DeprecatedString& target) {
+void Frame::urlSelected(const DeprecatedString& url, const String& target) {
   urlSelected(ResourceRequest(completeURL(url)), target);
 }
 
-void Frame::urlSelected(const ResourceRequest& request,
-                        const DeprecatedString& _target) {
-  DeprecatedString target = _target;
+void Frame::urlSelected(const ResourceRequest& request, const String& _target) {
+  String target = _target;
   if (target.isEmpty() && d->m_doc)
     target = d->m_doc->baseTarget();
 
@@ -1316,8 +1314,9 @@ void Frame::urlSelected(const ResourceRequest& request,
 }
 
 bool Frame::requestFrame(RenderPart* renderer,
-                         const DeprecatedString& _url,
-                         const DeprecatedString& frameName) {
+                         const String& urlParam,
+                         const AtomicString& frameName) {
+  DeprecatedString _url = urlParam.deprecatedString();
   // Support for <frame src="javascript:string">
   KURL scriptURL;
   KURL url;
@@ -1347,14 +1346,14 @@ bool Frame::requestFrame(RenderPart* renderer,
 }
 
 bool Frame::requestObject(RenderPart* renderer,
-                          const DeprecatedString& url,
-                          const DeprecatedString& frameName,
-                          const DeprecatedString& mimeType,
+                          const String& url,
+                          const AtomicString& frameName,
+                          const String& mimeType,
                           const DeprecatedStringList& paramNames,
                           const DeprecatedStringList& paramValues) {
   KURL completedURL;
   if (!url.isEmpty())
-    completedURL = completeURL(url);
+    completedURL = completeURL(url.deprecatedString());
 
   if (url.isEmpty() && mimeType.isEmpty())
     return true;
@@ -1371,7 +1370,7 @@ bool Frame::requestObject(RenderPart* renderer,
 
 bool Frame::shouldUsePlugin(Node* element,
                             const KURL& url,
-                            const DeprecatedString& mimeType,
+                            const String& mimeType,
                             bool hasFallback,
                             bool& useFallback) {
   useFallback = false;
@@ -1387,7 +1386,7 @@ bool Frame::shouldUsePlugin(Node* element,
 
 bool Frame::loadPlugin(RenderPart* renderer,
                        const KURL& url,
-                       const DeprecatedString& mimeType,
+                       const String& mimeType,
                        const DeprecatedStringList& paramNames,
                        const DeprecatedStringList& paramValues,
                        bool useFallback) {
@@ -1413,7 +1412,7 @@ bool Frame::loadPlugin(RenderPart* renderer,
 
 Frame* Frame::loadSubframe(RenderPart* renderer,
                            const KURL& url,
-                           const DeprecatedString& name,
+                           const String& name,
                            const String& referrer) {
   Frame* frame = createFrame(url, name, renderer, referrer);
   if (!frame) {
@@ -1464,12 +1463,12 @@ void Frame::submitFormAgain() {
 }
 
 void Frame::submitForm(const char* action,
-                       const DeprecatedString& url,
+                       const String& url,
                        const FormData& formData,
-                       const DeprecatedString& _target,
-                       const DeprecatedString& contentType,
-                       const DeprecatedString& boundary) {
-  KURL u = completeURL(url);
+                       const String& _target,
+                       const String& contentType,
+                       const String& boundary) {
+  KURL u = completeURL(url.deprecatedString());
 
   if (!u.isValid())
     // ### ERROR HANDLING!
@@ -1618,18 +1617,18 @@ DeprecatedString Frame::referrer() const {
   return d->m_referrer;
 }
 
-DeprecatedString Frame::lastModified() const {
+String Frame::lastModified() const {
   return d->m_lastModified;
 }
 
 void Frame::reparseConfiguration() {
   setAutoloadImages(d->m_settings->autoLoadImages());
   if (d->m_doc)
-    d->m_doc->docLoader()->setShowAnimations(d->m_settings->showAnimations());
+    d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationEnabled);
 
-  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled(d->m_url.host());
-  d->m_bJavaEnabled = d->m_settings->isJavaEnabled(d->m_url.host());
-  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled(d->m_url.host());
+  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled();
+  d->m_bJavaEnabled = d->m_settings->isJavaEnabled();
+  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled();
 
   DeprecatedString userStyleSheet = d->m_settings->userStyleSheet();
   if (!userStyleSheet.isEmpty())
@@ -2036,7 +2035,7 @@ void Frame::clearTypingStyle() {
   d->m_typingStyle = 0;
 }
 
-JSValue* Frame::executeScript(const DeprecatedString& filename,
+JSValue* Frame::executeScript(const String& filename,
                               int baseLine,
                               Node* n,
                               const DeprecatedString& script) {
@@ -2959,8 +2958,7 @@ bool Frame::scrollbarsVisible() {
   return true;
 }
 
-void Frame::addMetaData(const DeprecatedString& key,
-                        const DeprecatedString& value) {
+void Frame::addMetaData(const String& key, const String& value) {
   d->m_job->addMetaData(key, value);
 }
 
@@ -3125,7 +3123,7 @@ RenderStyle* Frame::styleForSelectionStart(Node*& nodeToRemove) const {
   return styleElement->renderer()->style();
 }
 
-void Frame::setMediaType(const DeprecatedString& type) {
+void Frame::setMediaType(const String& type) {
   if (d->m_view)
     d->m_view->setMediaType(type);
 }
@@ -3214,11 +3212,10 @@ DeprecatedValueList<MarkedTextUnderline> Frame::markedTextUnderlines() const {
   return d->m_markedTextUnderlines;
 }
 
-unsigned Frame::highlightAllMatchesForString(const DeprecatedString& target,
+unsigned Frame::highlightAllMatchesForString(const String& target,
                                              bool caseFlag) {
-  if (target.isEmpty()) {
+  if (target.isEmpty())
     return 0;
-  }
 
   RefPtr<Range> searchRange(rangeOfContents(document()));
 

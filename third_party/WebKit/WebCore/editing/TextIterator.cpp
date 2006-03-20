@@ -53,7 +53,7 @@ const unsigned short nonBreakingSpace = 0xA0;
 // but no more.
 class CircularSearchBuffer {
  public:
-  CircularSearchBuffer(const DeprecatedString& target, bool isCaseSensitive);
+  CircularSearchBuffer(const String& target, bool isCaseSensitive);
   ~CircularSearchBuffer() { fastFree(m_buffer); }
 
   void clear() {
@@ -68,7 +68,7 @@ class CircularSearchBuffer {
   int length() const { return m_target.length(); }
 
  private:
-  DeprecatedString m_target;
+  String m_target;
   bool m_isCaseSensitive;
 
   QChar* m_buffer;
@@ -150,9 +150,8 @@ void TextIterator::advance() {
   // handle remembered text box
   if (m_textBox) {
     handleTextBox();
-    if (m_positionNode) {
+    if (m_positionNode)
       return;
-    }
   }
 
   while (m_node && m_node != m_pastEndNode) {
@@ -162,19 +161,15 @@ void TextIterator::advance() {
       if (renderer && renderer->isText() &&
           m_node->nodeType() == Node::TEXT_NODE) {
         // FIXME: What about CDATA_SECTION_NODE?
-        if (renderer->style()->visibility() == VISIBLE) {
+        if (renderer->style()->visibility() == VISIBLE)
           m_handledNode = handleTextNode();
-        }
       } else if (renderer && (renderer->isImage() || renderer->isWidget())) {
-        if (renderer->style()->visibility() == VISIBLE) {
+        if (renderer->style()->visibility() == VISIBLE)
           m_handledNode = handleReplacedElement();
-        }
-      } else {
+      } else
         m_handledNode = handleNonTextNode();
-      }
-      if (m_positionNode) {
+      if (m_positionNode)
         return;
-      }
     }
 
     // find a new current node to handle in depth-first manner,
@@ -205,9 +200,8 @@ void TextIterator::advance() {
     m_handledChildren = false;
 
     // how would this ever be?
-    if (m_positionNode) {
+    if (m_positionNode)
       return;
-    }
   }
 }
 
@@ -314,9 +308,8 @@ void TextIterator::handleTextBox() {
         m_offset = runStart + 1;
       } else {
         int subrunEnd = str.find('\n', runStart);
-        if (subrunEnd == -1 || subrunEnd > runEnd) {
+        if (subrunEnd == -1 || subrunEnd > runEnd)
           subrunEnd = runEnd;
-        }
 
         m_offset = subrunEnd;
 
@@ -334,16 +327,14 @@ void TextIterator::handleTextBox() {
       // If we are doing a subrun that doesn't go to the end of the text box,
       // come back again to finish handling this text box; don't advance to the
       // next one.
-      if (m_positionEndOffset < textBoxEnd) {
+      if (m_positionEndOffset < textBoxEnd)
         return;
-      }
 
       // Advance and return
       int nextRunStart = nextTextBox ? nextTextBox->m_start : str.length();
-      if (nextRunStart > runEnd) {
+      if (nextRunStart > runEnd)
         m_lastTextNodeEndedWithCollapsedSpace =
             true;  // collapsed space between runs or at the end
-      }
       m_textBox = nextTextBox;
       if (renderer->containsReversedText())
         ++m_sortedTextBoxesPosition;
@@ -379,9 +370,8 @@ bool TextIterator::handleNonTextNode() {
   if (m_node->hasTagName(brTag)) {
     emitCharacter('\n', m_node->parentNode(), m_node, 0, 1);
   } else if (m_node->hasTagName(tdTag) || m_node->hasTagName(thTag)) {
-    if (m_lastCharacter != '\n' && m_lastTextNode) {
+    if (m_lastCharacter != '\n' && m_lastTextNode)
       emitCharacter('\t', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
-    }
   } else if (m_node->hasTagName(blockquoteTag) || m_node->hasTagName(ddTag) ||
              m_node->hasTagName(divTag) || m_node->hasTagName(dlTag) ||
              m_node->hasTagName(dtTag) || m_node->hasTagName(h1Tag) ||
@@ -391,9 +381,8 @@ bool TextIterator::handleNonTextNode() {
              m_node->hasTagName(liTag) || m_node->hasTagName(olTag) ||
              m_node->hasTagName(pTag) || m_node->hasTagName(preTag) ||
              m_node->hasTagName(trTag) || m_node->hasTagName(ulTag)) {
-    if (m_lastCharacter != '\n' && m_lastTextNode) {
+    if (m_lastCharacter != '\n' && m_lastTextNode)
       emitCharacter('\n', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
-    }
   }
 
   return true;
@@ -429,9 +418,8 @@ void TextIterator::exitNode() {
       if (style) {
         int bottomMargin = renderer->collapsedMarginBottom();
         int fontSize = style->fontDescription().computedPixelSize();
-        if (bottomMargin * 2 >= fontSize) {
+        if (bottomMargin * 2 >= fontSize)
           addNewline = true;
-        }
       }
     }
   }
@@ -570,19 +558,15 @@ void SimplifiedBackwardsTextIterator::advance() {
       if (renderer && renderer->isText() &&
           m_node->nodeType() == Node::TEXT_NODE) {
         // FIXME: What about CDATA_SECTION_NODE?
-        if (renderer->style()->visibility() == VISIBLE && m_offset > 0) {
+        if (renderer->style()->visibility() == VISIBLE && m_offset > 0)
           m_handledNode = handleTextNode();
-        }
       } else if (renderer && (renderer->isImage() || renderer->isWidget())) {
-        if (renderer->style()->visibility() == VISIBLE && m_offset > 0) {
+        if (renderer->style()->visibility() == VISIBLE && m_offset > 0)
           m_handledNode = handleReplacedElement();
-        }
-      } else {
+      } else
         m_handledNode = handleNonTextNode();
-      }
-      if (m_positionNode) {
+      if (m_positionNode)
         return;
-      }
     }
 
     if (m_node == m_startNode)
@@ -629,9 +613,8 @@ void SimplifiedBackwardsTextIterator::advance() {
       m_offset = 0;
     m_handledNode = false;
 
-    if (m_positionNode) {
+    if (m_positionNode)
       return;
-    }
   }
 }
 
@@ -641,9 +624,8 @@ bool SimplifiedBackwardsTextIterator::handleTextNode() {
   RenderText* renderer = static_cast<RenderText*>(m_node->renderer());
   String str = m_node->nodeValue();
 
-  if (!renderer->firstTextBox() && str.length() > 0) {
+  if (!renderer->firstTextBox() && str.length() > 0)
     return true;
-  }
 
   m_positionEndOffset = m_offset;
 
@@ -786,9 +768,9 @@ void CharacterIterator::advance(int count) {
   // move to a subsequent m_textIterator run
   for (m_textIterator.advance(); !atEnd(); m_textIterator.advance()) {
     int runLength = m_textIterator.length();
-    if (runLength == 0) {
+    if (runLength == 0)
       m_atBreak = true;
-    } else {
+    else {
       // see whether this is m_textIterator to use
       if (count < runLength) {
         m_runOffset = count;
@@ -857,15 +839,13 @@ void WordAwareIterator::advance() {
   }
   m_range = m_textIterator.range();
 
-  if (m_textIterator.atEnd()) {
+  if (m_textIterator.atEnd())
     return;
-  }
 
   while (1) {
     // If this chunk ends in whitespace we can just use it as our chunk.
-    if (m_textIterator.characters()[m_textIterator.length() - 1].isSpace()) {
+    if (m_textIterator.characters()[m_textIterator.length() - 1].isSpace())
       return;
-    }
 
     // If this is the first chunk that failed, save it in previousText before
     // look ahead
@@ -896,33 +876,30 @@ void WordAwareIterator::advance() {
 }
 
 int WordAwareIterator::length() const {
-  if (!m_buffer.isEmpty()) {
+  if (!m_buffer.isEmpty())
     return m_buffer.length();
-  } else if (m_previousText) {
+  else if (m_previousText)
     return m_previousLength;
-  } else {
+  else
     return m_textIterator.length();
-  }
 }
 
 const QChar* WordAwareIterator::characters() const {
-  if (!m_buffer.isEmpty()) {
+  if (!m_buffer.isEmpty())
     return m_buffer.unicode();
-  } else if (m_previousText) {
+  else if (m_previousText)
     return m_previousText;
-  } else {
+  else
     return m_textIterator.characters();
-  }
 }
 
-CircularSearchBuffer::CircularSearchBuffer(const DeprecatedString& s,
+CircularSearchBuffer::CircularSearchBuffer(const String& s,
                                            bool isCaseSensitive)
     : m_target(s) {
   assert(!s.isEmpty());
 
-  if (!isCaseSensitive) {
+  if (!isCaseSensitive)
     m_target = s.lower();
-  }
   m_target.replace(nonBreakingSpace, ' ');
   m_isCaseSensitive = isCaseSensitive;
 
@@ -932,11 +909,10 @@ CircularSearchBuffer::CircularSearchBuffer(const DeprecatedString& s,
 }
 
 void CircularSearchBuffer::append(const QChar& c) {
-  if (m_isCaseSensitive) {
+  if (m_isCaseSensitive)
     *m_cursor++ = c.unicode() == nonBreakingSpace ? ' ' : c.unicode();
-  } else {
+  else
     *m_cursor++ = c.unicode() == nonBreakingSpace ? ' ' : c.lower().unicode();
-  }
   if (m_cursor == m_buffer + length()) {
     m_cursor = m_buffer;
     m_bufferFull = true;
@@ -963,9 +939,9 @@ void CircularSearchBuffer::append(int count, const QChar* characters) {
       m_cursor[i] = c.unicode() == nonBreakingSpace ? ' ' : c.lower().unicode();
     }
   }
-  if (count < tailSpace) {
+  if (count < tailSpace)
     m_cursor += count;
-  } else {
+  else {
     m_bufferFull = true;
     m_cursor = m_buffer;
   }
@@ -1035,14 +1011,13 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
                               offset + textRunRange->startOffset(exception),
                               exception);
       } else {
-        if (rangeLocation == docTextPosition) {
+        if (rangeLocation == docTextPosition)
           resultRange->setStart(textRunRange->startContainer(exception),
                                 textRunRange->startOffset(exception),
                                 exception);
-        } else {
+        else
           resultRange->setStart(textRunRange->endContainer(exception),
                                 textRunRange->endOffset(exception), exception);
-        }
       }
     }
 
@@ -1054,13 +1029,12 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
                             offset + textRunRange->startOffset(exception),
                             exception);
       } else {
-        if (rangeEnd == docTextPosition) {
+        if (rangeEnd == docTextPosition)
           resultRange->setEnd(textRunRange->startContainer(exception),
                               textRunRange->startOffset(exception), exception);
-        } else {
+        else
           resultRange->setEnd(textRunRange->endContainer(exception),
                               textRunRange->endOffset(exception), exception);
-        }
       }
       if (!(rangeLength == 0 && rangeEnd == docTextPosition + len)) {
         docTextPosition += len;
@@ -1092,7 +1066,7 @@ DeprecatedString plainText(const Range* r) {
 }
 
 PassRefPtr<Range> findPlainText(const Range* r,
-                                const DeprecatedString& s,
+                                const String& s,
                                 bool forward,
                                 bool caseSensitive) {
   // FIXME: Can we do Boyer-Moore or equivalent instead for speed?
@@ -1118,9 +1092,8 @@ PassRefPtr<Range> findPlainText(const Range* r,
       // Fill the buffer.
       while (int needed = buffer.neededCharacters()) {
         if (it.atBreak()) {
-          if (it.atEnd()) {
+          if (it.atEnd())
             goto done;
-          }
           buffer.clear();
         }
         int available = it.length();
@@ -1138,9 +1111,8 @@ PassRefPtr<Range> findPlainText(const Range* r,
           // If searching forward, stop on the first match.
           // If searching backward, don't stop, so we end up with the last
           // match.
-          if (forward) {
+          if (forward)
             goto done;
-          }
         }
         if (it.atBreak())
           break;
@@ -1154,9 +1126,9 @@ PassRefPtr<Range> findPlainText(const Range* r,
 done:
   int exception = 0;
   RefPtr<Range> result = r->cloneRange(exception);
-  if (!found) {
+  if (!found)
     result->collapse(!forward, exception);
-  } else {
+  else {
     CharacterIterator it(r);
     it.advance(rangeEnd.characterOffset() - buffer.length());
     result->setStart(it.range()->startContainer(exception),

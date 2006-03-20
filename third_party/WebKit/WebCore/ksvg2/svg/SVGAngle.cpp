@@ -81,18 +81,16 @@ float SVGAngle::valueInSpecifiedUnits() const {
 void SVGAngle::setValueAsString(StringImpl* valueAsString) {
   m_valueAsString = String(valueAsString);
 
-  DeprecatedString s = m_valueAsString.deprecatedString();
-
   bool bOK;
-  m_valueInSpecifiedUnits = s.toDouble(&bOK);
+  m_valueInSpecifiedUnits = m_valueAsString.deprecatedString().toDouble(&bOK);
   m_unitType = SVG_ANGLETYPE_UNSPECIFIED;
 
   if (!bOK) {
-    if (s.endsWith(DeprecatedString::fromLatin1("deg")))
+    if (m_valueAsString.endsWith("deg"))
       m_unitType = SVG_ANGLETYPE_DEG;
-    else if (s.endsWith(DeprecatedString::fromLatin1("grad")))
+    else if (m_valueAsString.endsWith("grad"))
       m_unitType = SVG_ANGLETYPE_GRAD;
-    else if (s.endsWith(DeprecatedString::fromLatin1("rad")))
+    else if (m_valueAsString.endsWith("rad"))
       m_unitType = SVG_ANGLETYPE_RAD;
   }
 
@@ -100,19 +98,18 @@ void SVGAngle::setValueAsString(StringImpl* valueAsString) {
 }
 
 StringImpl* SVGAngle::valueAsString() const {
-  m_valueAsString.deprecatedString().setNum(m_valueInSpecifiedUnits);
+  m_valueAsString = DeprecatedString::number(m_valueInSpecifiedUnits);
 
   switch (m_unitType) {
     case SVG_ANGLETYPE_UNSPECIFIED:
     case SVG_ANGLETYPE_DEG:
-      m_valueAsString.deprecatedString() += DeprecatedString::fromLatin1("deg");
+      m_valueAsString += "deg";
       break;
     case SVG_ANGLETYPE_RAD:
-      m_valueAsString.deprecatedString() += DeprecatedString::fromLatin1("rad");
+      m_valueAsString += "rad";
       break;
     case SVG_ANGLETYPE_GRAD:
-      m_valueAsString.deprecatedString() +=
-          DeprecatedString::fromLatin1("grad");
+      m_valueAsString += "grad";
       break;
   }
 

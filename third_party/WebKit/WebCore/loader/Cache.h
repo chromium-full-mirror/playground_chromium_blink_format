@@ -67,7 +67,7 @@ class Cache {
    * Otherwise, it is automatically base-url expanded
    */
   static CachedImage* requestImage(DocLoader*,
-                                   const WebCore::String& URL,
+                                   const String& URL,
                                    bool reload = false,
                                    time_t expireDate = 0);
   static CachedImage* requestImage(DocLoader*,
@@ -81,7 +81,7 @@ class Cache {
    */
   static CachedCSSStyleSheet* requestStyleSheet(
       DocLoader*,
-      const WebCore::String& URL,
+      const String& URL,
       bool reload = false,
       time_t expireDate = 0,
       const DeprecatedString& charset = DeprecatedString::null);
@@ -98,7 +98,7 @@ class Cache {
    */
   static CachedScript* requestScript(
       DocLoader*,
-      const WebCore::String& URL,
+      const String& URL,
       bool reload = false,
       time_t expireDate = 0,
       const DeprecatedString& charset = DeprecatedString::null);
@@ -112,7 +112,7 @@ class Cache {
 #ifdef KHTML_XSLT
   // Ask the cache for an XSL stylesheet.
   static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader*,
-                                                   const WebCore::String& URL,
+                                                   const String& URL,
                                                    bool reload = false,
                                                    time_t expireDate = 0);
 #endif
@@ -120,7 +120,7 @@ class Cache {
 #ifndef KHTML_NO_XBL
   // Ask the cache for an XBL document.
   static CachedXBLDocument* requestXBLDocument(DocLoader*,
-                                               const WebCore::String& URL,
+                                               const String& URL,
                                                bool reload = false,
                                                time_t expireDate = 0);
 #endif
@@ -139,7 +139,7 @@ class Cache {
   static int maxCacheableObjectSize() { return maxCacheable; }
 
   // Get an existing cache entry by URL.
-  static CachedObject* get(const WebCore::String& URL);
+  static CachedObject* get(const String& URL);
 
   // Remove an existing cache entry.
   static void remove(CachedObject*);

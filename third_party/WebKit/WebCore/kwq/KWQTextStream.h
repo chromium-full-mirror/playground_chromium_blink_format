@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QTEXTSTREAM_H_
-#define QTEXTSTREAM_H_
+#ifndef QTextStream_H
+#define QTextStream_H
 
 #include "DeprecatedArray.h"
 
@@ -32,6 +32,10 @@ class DeprecatedCString;
 class QChar;
 class DeprecatedString;
 class QTextStream;
+
+namespace WebCore {
+class String;
+}
 
 typedef QTextStream& (*QTextStreamManipulator)(QTextStream&);
 
@@ -53,21 +57,22 @@ class QTextStream {
   QTextStream& operator<<(float);
   QTextStream& operator<<(double);
   QTextStream& operator<<(const char*);
+  QTextStream& operator<<(const WebCore::String&);
   QTextStream& operator<<(const DeprecatedString&);
   QTextStream& operator<<(const DeprecatedCString&);
   QTextStream& operator<<(void*);
 
   QTextStream& operator<<(const QTextStreamManipulator&);
-  int precision(int p);
+  int precision(int);
 
  private:
   QTextStream(const QTextStream&);
   QTextStream& operator=(const QTextStream&);
 
-  bool _hasByteArray;
-  DeprecatedByteArray _byteArray;
-  DeprecatedString* _string;
-  int _precision;
+  bool m_hasByteArray;
+  DeprecatedByteArray m_byteArray;
+  DeprecatedString* m_string;
+  int m_precision;
 };
 
 #endif

@@ -97,7 +97,7 @@ void CachedXSLStyleSheet::checkNotify() {
     c->setStyleSheet(m_url, m_sheet);
 }
 
-void CachedXSLStyleSheet::error(int /*err*/, const char* /*text*/) {
+void CachedXSLStyleSheet::error() {
   m_loading = false;
   checkNotify();
 }

@@ -241,22 +241,22 @@ static QTextStream& operator<<(QTextStream& ts, const RenderObject& o) {
   return ts;
 }
 
-static DeprecatedString quoteAndEscapeNonPrintables(const DeprecatedString& s) {
+static String quoteAndEscapeNonPrintables(const String& s) {
   DeprecatedString result;
   result += '"';
   for (unsigned i = 0; i != s.length(); ++i) {
-    QChar c = s.at(i);
-    if (c == '\\') {
+    QChar c = s[i];
+    if (c == '\\')
       result += "\\\\";
-    } else if (c == '"') {
+    else if (c == '"')
       result += "\\\"";
-    } else if (c == '\n' || c.unicode() == 0x00A0) {
+    else if (c == '\n' || c.unicode() == 0x00A0)
       result += ' ';
-    } else {
+    else {
       unsigned short u = c.unicode();
-      if (u >= 0x20 && u < 0x7F) {
+      if (u >= 0x20 && u < 0x7F)
         result += c;
-      } else {
+      else {
         DeprecatedString hex;
         hex.sprintf("\\x{%X}", u);
         result += hex;
@@ -277,8 +277,8 @@ static void writeTextRun(QTextStream& ts,
     if (run.m_dirOverride)
       ts << " override";
   }
-  ts << ": " << quoteAndEscapeNonPrintables(
-                    o.data().deprecatedString().mid(run.m_start, run.m_len))
+  ts << ": "
+     << quoteAndEscapeNonPrintables(o.data().substring(run.m_start, run.m_len))
      << "\n";
 }
 
@@ -309,9 +309,8 @@ void write(QTextStream& ts, const RenderObject& o, int indent) {
 
   for (RenderObject* child = o.firstChild(); child;
        child = child->nextSibling()) {
-    if (child->layer()) {
+    if (child->layer())
       continue;
-    }
     write(ts, *child, indent + 1);
   }
 

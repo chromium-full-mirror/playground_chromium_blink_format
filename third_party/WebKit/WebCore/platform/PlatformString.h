@@ -90,6 +90,8 @@ class String {
   void remove(unsigned pos, int len = 1);
 
   String substring(unsigned pos, unsigned len = UINT_MAX) const;
+  String left(unsigned len) const { return substring(0, len); }
+  String right(unsigned len) const { return substring(length() - len, len); }
 
   // Splits the string into two. The original string gets truncated to pos, and
   // the rest is returned.
@@ -102,7 +104,7 @@ class String {
   QChar* unicode() const;
   DeprecatedString deprecatedString() const;
 
-  int toInt() const;
+  int toInt(bool* ok = 0) const;
   Length* toLengthArray(int& len) const;
   Length* toCoordsArray(int& len) const;
   bool percentage(int& _percentage) const;

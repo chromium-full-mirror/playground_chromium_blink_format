@@ -39,6 +39,10 @@ class NSURL;
 #endif
 #endif
 
+namespace WebCore {
+class String;
+}
+
 class KURL {
  public:
   KURL();
@@ -48,6 +52,7 @@ class KURL {
        const WebCore::TextEncoding& encoding =
            WebCore::TextEncoding(WebCore::UTF8Encoding));
   KURL(const DeprecatedString&);
+  KURL(const WebCore::String&);
 #if __APPLE__
   KURL(NSURL*);
 #endif

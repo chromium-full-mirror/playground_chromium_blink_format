@@ -128,7 +128,7 @@ class FrameMac : public Frame {
   virtual void openURLRequest(const ResourceRequest&);
   virtual void submitForm(const ResourceRequest&);
 
-  DeprecatedString advanceToNextMisspelling(bool startBeforeSelection = false);
+  String advanceToNextMisspelling(bool startBeforeSelection = false);
 
   virtual void setTitle(const String&);
   virtual void setStatusBarText(const String&);
@@ -136,13 +136,13 @@ class FrameMac : public Frame {
   virtual void urlSelected(const ResourceRequest&);
 
   virtual ObjectContentType objectContentType(const KURL& url,
-                                              const DeprecatedString& mimeType);
+                                              const String& mimeType);
   virtual Plugin* createPlugin(const KURL& url,
                                const DeprecatedStringList& paramNames,
                                const DeprecatedStringList& paramValues,
-                               const DeprecatedString& mimeType);
+                               const String& mimeType);
   virtual Frame* createFrame(const KURL& url,
-                             const DeprecatedString& name,
+                             const String& name,
                              RenderPart* renderer,
                              const String& referrer);
 
@@ -190,10 +190,10 @@ class FrameMac : public Frame {
 
   static WebCoreFrameBridge* bridgeForWidget(const Widget*);
 
-  virtual DeprecatedString incomingReferrer() const;
-  virtual DeprecatedString userAgent() const;
+  virtual String incomingReferrer() const;
+  virtual String userAgent() const;
 
-  virtual DeprecatedString mimeTypeForFileName(const DeprecatedString&) const;
+  virtual String mimeTypeForFileName(const String&) const;
 
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(Node* node,
@@ -257,7 +257,7 @@ class FrameMac : public Frame {
 
   virtual void tokenizerProcessedData();
 
-  virtual DeprecatedString overrideMediaType() const;
+  virtual String overrideMediaType() const;
 
   NSColor* bodyBackgroundColor() const;
 

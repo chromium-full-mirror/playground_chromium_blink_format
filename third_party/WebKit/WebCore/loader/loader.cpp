@@ -123,7 +123,7 @@ void Loader::receivedAllData(TransferJob* job, PlatformData allData) {
 
   if (job->error() || job->isErrorPage()) {
     docLoader->setLoadInProgress(true);
-    r->object->error(job->error(), job->errorText().ascii());
+    r->object->error();
     docLoader->setLoadInProgress(false);
     Cache::remove(object);
   } else {
@@ -150,7 +150,7 @@ void Loader::receivedResponse(TransferJob* job, PlatformResponse response) {
   r->object->setExpireDate(KWQCacheObjectExpiresTime(r->m_docLoader, response),
                            false);
 
-  DeprecatedString chs = job->queryMetaData("charset");
+  DeprecatedString chs = job->queryMetaData("charset").deprecatedString();
   if (!chs.isNull())
     r->object->setCharset(chs);
 

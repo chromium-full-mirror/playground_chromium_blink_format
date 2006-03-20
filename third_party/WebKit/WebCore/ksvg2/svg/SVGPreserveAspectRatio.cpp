@@ -69,30 +69,29 @@ void SVGPreserveAspectRatio::parsePreserveAspectRatio(StringImpl* strImpl) {
   DeprecatedStringList params =
       DeprecatedStringList::split(' ', str.simplifyWhiteSpace());
 
-  if (params[0].compare(DeprecatedString::fromLatin1("none")) == 0)
+  if (params[0] == "none")
     m_align = SVG_PRESERVEASPECTRATIO_NONE;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMinYMin")) == 0)
+  else if (params[0] == "xMinYMin")
     m_align = SVG_PRESERVEASPECTRATIO_XMINYMIN;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMidYMin")) == 0)
+  else if (params[0] == "xMidYMin")
     m_align = SVG_PRESERVEASPECTRATIO_XMIDYMIN;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMaxYMin")) == 0)
+  else if (params[0] == "xMaxYMin")
     m_align = SVG_PRESERVEASPECTRATIO_XMAXYMIN;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMinYMid")) == 0)
+  else if (params[0] == "xMinYMid")
     m_align = SVG_PRESERVEASPECTRATIO_XMINYMID;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMidYMid")) == 0)
+  else if (params[0] == "xMidYMid")
     m_align = SVG_PRESERVEASPECTRATIO_XMIDYMID;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMaxYMid")) == 0)
+  else if (params[0] == "xMaxYMid")
     m_align = SVG_PRESERVEASPECTRATIO_XMAXYMID;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMinYMax")) == 0)
+  else if (params[0] == "xMinYMax")
     m_align = SVG_PRESERVEASPECTRATIO_XMINYMAX;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMidYMax")) == 0)
+  else if (params[0] == "xMidYMax")
     m_align = SVG_PRESERVEASPECTRATIO_XMIDYMAX;
-  else if (params[0].compare(DeprecatedString::fromLatin1("xMaxYMax")) == 0)
+  else if (params[0] == "xMaxYMax")
     m_align = SVG_PRESERVEASPECTRATIO_XMAXYMAX;
 
   if (m_align != SVG_PRESERVEASPECTRATIO_NONE) {
-    if ((params.count() > 1) &&
-        params[1].compare(DeprecatedString::fromLatin1("slice")) == 0)
+    if ((params.count() > 1) && (params[1] == "slice"))
       m_meetOrSlice = SVG_MEETORSLICE_SLICE;
     else
       m_meetOrSlice = SVG_MEETORSLICE_MEET;

@@ -240,7 +240,8 @@ bool HTMLFormElement::formData(FormData& form_data) const {
 
             if (!static_cast<HTMLInputElement*>(current)->value().isEmpty()) {
               DeprecatedString mimeType =
-                  frame ? frame->mimeTypeForFileName(path) : DeprecatedString();
+                  frame ? frame->mimeTypeForFileName(path).deprecatedString()
+                        : DeprecatedString();
               if (!mimeType.isEmpty()) {
                 hstr += "\r\nContent-Type: ";
                 hstr += mimeType.ascii();

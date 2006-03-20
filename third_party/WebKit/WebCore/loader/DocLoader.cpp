@@ -87,12 +87,11 @@ bool DocLoader::needReload(const KURL& fullURL) {
   return reload;
 }
 
-CachedImage* DocLoader::requestImage(const WebCore::String& url) {
+CachedImage* DocLoader::requestImage(const String& url) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
-  if (KWQCheckIfReloading(this)) {
+  if (KWQCheckIfReloading(this))
     setCachePolicy(KIO::CC_Reload);
-  }
 
   bool reload = needReload(fullURL);
 
@@ -103,13 +102,12 @@ CachedImage* DocLoader::requestImage(const WebCore::String& url) {
 }
 
 CachedCSSStyleSheet* DocLoader::requestStyleSheet(
-    const WebCore::String& url,
+    const String& url,
     const DeprecatedString& charset) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
-  if (KWQCheckIfReloading(this)) {
+  if (KWQCheckIfReloading(this))
     setCachePolicy(KIO::CC_Reload);
-  }
 
   bool reload = needReload(fullURL);
 
@@ -119,13 +117,12 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(
   return cachedObject;
 }
 
-CachedScript* DocLoader::requestScript(const WebCore::String& url,
+CachedScript* DocLoader::requestScript(const String& url,
                                        const DeprecatedString& charset) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
-  if (KWQCheckIfReloading(this)) {
+  if (KWQCheckIfReloading(this))
     setCachePolicy(KIO::CC_Reload);
-  }
 
   bool reload = needReload(fullURL);
 
@@ -136,8 +133,7 @@ CachedScript* DocLoader::requestScript(const WebCore::String& url,
 }
 
 #ifdef KHTML_XSLT
-CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(
-    const WebCore::String& url) {
+CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(const String& url) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (KWQCheckIfReloading(this))
@@ -153,16 +149,15 @@ CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(
 #endif
 
 #ifndef KHTML_NO_XBL
-CachedXBLDocument* DocLoader::requestXBLDocument(const WebCore::String& url) {
+CachedXBLDocument* DocLoader::requestXBLDocument(const String& url) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   // FIXME: Is this right for XBL?
   if (m_frame && m_frame->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
-  if (KWQCheckIfReloading(this)) {
+  if (KWQCheckIfReloading(this))
     setCachePolicy(KIO::CC_Reload);
-  }
 
   bool reload = needReload(fullURL);
 

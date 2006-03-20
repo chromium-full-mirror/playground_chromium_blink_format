@@ -25,8 +25,8 @@
 * Boston, MA 02111-1307, USA.
 */
 
-#ifndef FRAME_H
-#define FRAME_H
+#ifndef Frame_H
+#define Frame_H
 
 #include "BrowserExtension.h"
 #include "Color.h"
@@ -177,7 +177,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   bool autoloadImages() const;
 
   KURL baseURL() const;
-  DeprecatedString baseTarget() const;
+  String baseTarget() const;
 
   /**
    * Schedules a redirection after @p delay seconds.
@@ -212,7 +212,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * If you want @ref url() to return
    * for example "file:/tmp/test.html", you can use the following code:
    * <PRE>
-   * view->begin( KURL("file:/tmp/test.html" ) );
+   * view->begin(KURL("file:/tmp/test.html"));
    * </PRE>
    *
    * @param url is the url of the document to be displayed.  Even if you
@@ -239,8 +239,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * you're using isn't utf-16, you can safely leave out the length
    * parameter.
    *
-   * Attention: Don't mix calls to @ref write( const char *) with calls
-   * to @ref write( const DeprecatedString & ).
+   * Attention: Don't mix calls to @ref write(const char*) with calls
+   * to @ref write(const DeprecatedString&  ).
    *
    * The result might not be what you want.
    */
@@ -301,7 +301,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    *
    * @param name The font name to use for standard text.
    */
-  void setStandardFont(const DeprecatedString& name);
+  void setStandardFont(const String& name);
 
   /**
    * Sets the fixed font style.
@@ -309,7 +309,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * @param name The font name to use for fixed text, e.g.
    * the <tt>&lt;pre&gt;</tt> tag.
    */
-  void setFixedFont(const DeprecatedString& name);
+  void setFixedFont(const String& name);
 
   /**
    * Finds the anchor named @p name.
@@ -318,7 +318,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * scrolls to the closest position. Returns @p if the anchor has
    * been found.
    */
-  bool gotoAnchor(const DeprecatedString& name);
+  bool gotoAnchor(const String& name);
 
   /**
    * Sets the Zoom factor. The value is given in percent, larger values mean a
@@ -340,7 +340,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   /**
    * Returns the text the user has marked.
    */
-  virtual DeprecatedString selectedText() const;
+  virtual String selectedText() const;
 
   /**
    * Returns the granularity of the selection (character, word, line,
@@ -508,7 +508,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * Last-modified date (in raw string format), if received in the [HTTP]
    * headers.
    */
-  DeprecatedString lastModified() const;
+  String lastModified() const;
 
   bool isPointInsideSelection(int x, int y);
 
@@ -565,19 +565,16 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                                        int x,
                                        int y);
 
-  virtual void urlSelected(const DeprecatedString& url,
-                           const DeprecatedString& target);
-  virtual void urlSelected(const ResourceRequest&,
-                           const DeprecatedString& target);
+  virtual void urlSelected(const DeprecatedString& url, const String& target);
+  virtual void urlSelected(const ResourceRequest&, const String& target);
 
   // Methods with platform-specific overrides (and no base class
   // implementation).
   virtual void setTitle(const String&) = 0;
   virtual void handledOnloadEvents() = 0;
-  virtual DeprecatedString userAgent() const = 0;
-  virtual DeprecatedString incomingReferrer() const = 0;
-  virtual DeprecatedString mimeTypeForFileName(
-      const DeprecatedString&) const = 0;
+  virtual String userAgent() const = 0;
+  virtual String incomingReferrer() const = 0;
+  virtual String mimeTypeForFileName(const String&) const = 0;
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*) = 0;
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*) = 0;
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*) = 0;
@@ -629,20 +626,19 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                                            Frame* subframePart = 0) = 0;
   virtual bool passWheelEventToChildWidget(Node*) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
-  virtual DeprecatedString overrideMediaType() const = 0;
+  virtual String overrideMediaType() const = 0;
 
  protected:
   virtual Plugin* createPlugin(const KURL& url,
                                const DeprecatedStringList& paramNames,
                                const DeprecatedStringList& paramValues,
-                               const DeprecatedString& mimeType) = 0;
+                               const String& mimeType) = 0;
   virtual Frame* createFrame(const KURL& url,
-                             const DeprecatedString& name,
+                             const String& name,
                              RenderPart* renderer,
                              const String& referrer) = 0;
-  virtual ObjectContentType objectContentType(
-      const KURL& url,
-      const DeprecatedString& mimeType) = 0;
+  virtual ObjectContentType objectContentType(const KURL& url,
+                                              const String& mimeType) = 0;
 
   virtual void redirectionTimerFired(Timer<Frame>*);
 
@@ -686,37 +682,37 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   bool shouldUsePlugin(Node* element,
                        const KURL& url,
-                       const DeprecatedString& mimeType,
+                       const String& mimeType,
                        bool hasFallback,
                        bool& useFallback);
   bool loadPlugin(RenderPart* renderer,
                   const KURL& url,
-                  const DeprecatedString& mimeType,
+                  const String& mimeType,
                   const DeprecatedStringList& paramNames,
                   const DeprecatedStringList& paramValues,
                   bool useFallback);
   Frame* loadSubframe(RenderPart* renderer,
                       const KURL& url,
-                      const DeprecatedString& name,
+                      const String& name,
                       const String& referrer);
 
  public:
   void submitForm(const char* action,
-                  const DeprecatedString& url,
+                  const String& url,
                   const FormData& formData,
-                  const DeprecatedString& target,
-                  const DeprecatedString& contentType = DeprecatedString::null,
-                  const DeprecatedString& boundary = DeprecatedString::null);
+                  const String& target,
+                  const String& contentType = String(),
+                  const String& boundary = String());
 
   bool requestObject(RenderPart* frame,
-                     const DeprecatedString& url,
-                     const DeprecatedString& frameName,
-                     const DeprecatedString& serviceType,
+                     const String& url,
+                     const AtomicString& frameName,
+                     const String& serviceType,
                      const DeprecatedStringList& paramNames,
                      const DeprecatedStringList& paramValues);
   bool requestFrame(RenderPart* frame,
-                    const DeprecatedString& url,
-                    const DeprecatedString& frameName);
+                    const String& url,
+                    const AtomicString& frameName);
 
   Document* document() const;
   void setDocument(Document* newDoc);
@@ -734,7 +730,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void cancelRedirection(bool newLoadInProgress = false);
 
  public:
-  KJS::JSValue* executeScript(const DeprecatedString& filename,
+  KJS::JSValue* executeScript(const String& filename,
                               int baseLine,
                               Node*,
                               const DeprecatedString& script);
@@ -750,8 +746,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   bool userGestureHint();
   void didNotOpenURL(const KURL&);
   void addData(const char* bytes, int length);
-  void addMetaData(const DeprecatedString& key, const DeprecatedString& value);
-  void setMediaType(const DeprecatedString&);
+  void addMetaData(const String& key, const String& value);
+  void setMediaType(const String&);
 
   // root renderer for the document contained in this frame
   RenderObject* renderer() const;
@@ -832,7 +828,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   DeprecatedValueList<MarkedTextUnderline> markedTextUnderlines() const;
   bool markedTextUsesUnderlines() const;
-  unsigned highlightAllMatchesForString(const DeprecatedString&, bool caseFlag);
+  unsigned highlightAllMatchesForString(const String&, bool caseFlag);
 
   // Call this method before handling a new user action, like on a mouse down or
   // key down.

@@ -303,10 +303,8 @@ class Document : public ContainerNode {
   }
   void setBaseURL(const DeprecatedString& baseURL) { m_baseURL = baseURL; }
 
-  DeprecatedString baseTarget() const { return m_baseTarget; }
-  void setBaseTarget(const DeprecatedString& baseTarget) {
-    m_baseTarget = baseTarget;
-  }
+  String baseTarget() const { return m_baseTarget; }
+  void setBaseTarget(const String& baseTarget) { m_baseTarget = baseTarget; }
 
   DeprecatedString completeURL(const DeprecatedString&);
   String completeURL(const String&);
@@ -623,7 +621,7 @@ class Document : public ContainerNode {
   Tokenizer* m_tokenizer;
   DeprecatedString m_url;
   DeprecatedString m_baseURL;
-  DeprecatedString m_baseTarget;
+  String m_baseTarget;
 
   RefPtr<DocumentType> m_docType;
   RefPtr<DOMImplementation> m_implementation;

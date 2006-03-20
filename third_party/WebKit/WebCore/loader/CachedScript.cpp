@@ -106,7 +106,7 @@ void CachedScript::checkNotify() {
     c->notifyFinished(this);
 }
 
-void CachedScript::error(int /*err*/, const char* /*text*/) {
+void CachedScript::error() {
   m_loading = false;
   m_errorOccurred = true;
   checkNotify();

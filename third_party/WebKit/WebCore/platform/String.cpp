@@ -158,10 +158,13 @@ DeprecatedString String::deprecatedString() const {
   return DeprecatedString(m_impl->s, m_impl->l);
 }
 
-int String::toInt() const {
-  if (!m_impl)
+int String::toInt(bool* ok) const {
+  if (!m_impl) {
+    if (ok)
+      *ok = false;
     return 0;
-  return m_impl->toInt();
+  }
+  return m_impl->toInt(ok);
 }
 
 String String::copy() const {

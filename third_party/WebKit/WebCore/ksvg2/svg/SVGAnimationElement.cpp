@@ -139,14 +139,13 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
     for (unsigned int i = 0; i < temp->numberOfItems(); i++) {
       DeprecatedString current = String(temp->getItem(i)).deprecatedString();
 
-      if (current.startsWith(DeprecatedString::fromLatin1("accessKey"))) {
+      if (current.startsWith("accessKey")) {
         // Register keyDownEventListener for the character
         DeprecatedString character = current.mid(current.length() - 2, 1);
 
         // kdDebug() << k_funcinfo << " Supposed to register accessKey
         // Character: " << character << " UNSUPPORTED!" << endl;
-      } else if (current.startsWith(
-                     DeprecatedString::fromLatin1("wallclock"))) {
+      } else if (current.startsWith("wallclock")) {
         int firstBrace = current.find('(');
         int secondBrace = current.find(')');
 
@@ -159,11 +158,11 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
 
         DeprecatedString element = current.mid(0, dotPosition);
         DeprecatedString clockValue;
-        if (current.contains(DeprecatedString::fromLatin1("begin")))
+        if (current.contains("begin"))
           clockValue = current.mid(dotPosition + 6);
-        else if (current.contains(DeprecatedString::fromLatin1("end")))
+        else if (current.contains("end"))
           clockValue = current.mid(dotPosition + 4);
-        else if (current.contains(DeprecatedString::fromLatin1("repeat")))
+        else if (current.contains("repeat"))
           clockValue = current.mid(dotPosition + 7);
         else  // DOM2 Event Reference
         {
@@ -281,8 +280,7 @@ double SVGAnimationElement::parseClockValue(
     const DeprecatedString& data) const {
   DeprecatedString parse = data.stripWhiteSpace();
 
-  if (parse ==
-      DeprecatedString::fromLatin1("indefinite"))  // Saves some time...
+  if (parse == "indefinite")  // Saves some time...
     return DBL_MAX;
 
   double result;
@@ -323,7 +321,7 @@ double SVGAnimationElement::parseClockValue(
   {
     int dotPosition = parse.find('.');
 
-    if (parse.endsWith(DeprecatedString::fromLatin1("h"))) {
+    if (parse.endsWith("h")) {
       if (dotPosition == -1)
         result = parse.mid(0, parse.length() - 1).toUInt() * 3600;
       else {
@@ -333,7 +331,7 @@ double SVGAnimationElement::parseClockValue(
         result +=
             (3600.0 * temp.toUInt()) * (1 / pow(10.0, int(temp.length())));
       }
-    } else if (parse.endsWith(DeprecatedString::fromLatin1("min"))) {
+    } else if (parse.endsWith("min")) {
       if (dotPosition == -1)
         result = parse.mid(0, parse.length() - 3).toUInt() * 60;
       else {
@@ -342,7 +340,7 @@ double SVGAnimationElement::parseClockValue(
             parse.mid(dotPosition + 1, parse.length() - dotPosition - 4);
         result += (60.0 * temp.toUInt()) * (1 / pow(10.0, int(temp.length())));
       }
-    } else if (parse.endsWith(DeprecatedString::fromLatin1("ms"))) {
+    } else if (parse.endsWith("ms")) {
       if (dotPosition == -1)
         result = parse.mid(0, parse.length() - 2).toUInt() / 1000.0;
       else {
@@ -352,7 +350,7 @@ double SVGAnimationElement::parseClockValue(
         result +=
             (temp.toUInt() / 1000.0) * (1 / pow(10.0, int(temp.length())));
       }
-    } else if (parse.endsWith(DeprecatedString::fromLatin1("s"))) {
+    } else if (parse.endsWith("s")) {
       if (dotPosition == -1)
         result = parse.mid(0, parse.length() - 1).toUInt();
       else {

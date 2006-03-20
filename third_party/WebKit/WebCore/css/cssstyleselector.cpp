@@ -218,7 +218,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   settings = view ? view->frame()->settings() : 0;
   if (!defaultStyle)
     loadDefaultStyle();
-  m_medium = view ? view->mediaType() : DeprecatedString("all");
+  m_mediaType = view ? view->mediaType() : String("all");
 
   m_userStyle = 0;
   m_userSheet = 0;
@@ -229,7 +229,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
     m_userSheet->parseString(String(userStyleSheet), strictParsing);
 
     m_userStyle = new CSSRuleSet();
-    m_userStyle->addRulesFromSheet(m_userSheet, m_medium);
+    m_userStyle->addRulesFromSheet(m_userSheet, m_mediaType);
   }
 
   // add stylesheets from document
@@ -239,7 +239,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   for (; it.current(); ++it)
     if (it.current()->isCSSStyleSheet() && !it.current()->disabled())
       m_authorStyle->addRulesFromSheet(
-          static_cast<CSSStyleSheet*>(it.current()), m_medium);
+          static_cast<CSSStyleSheet*>(it.current()), m_mediaType);
 
   m_ruleList = 0;
   m_collectRulesOnly = false;
@@ -251,10 +251,10 @@ CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
   if (!defaultStyle)
     loadDefaultStyle();
   FrameView* view = sheet->doc()->view();
-  m_medium = view ? view->mediaType() : DeprecatedString("all");
+  m_mediaType = view ? view->mediaType() : String("all");
 
   m_authorStyle = new CSSRuleSet();
-  m_authorStyle->addRulesFromSheet(sheet, m_medium);
+  m_authorStyle->addRulesFromSheet(sheet, m_mediaType);
 }
 
 void CSSStyleSelector::init() {
@@ -751,7 +751,7 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
     matchRules(defaultQuirksStyle, firstUARule, lastUARule);
 
   // 3. If our medium is print, then we match rules from the print sheet.
-  if (m_medium == "print")
+  if (m_mediaType == "print")
     matchRules(defaultPrintStyle, firstUARule, lastUARule);
 
   // 4. Now we check user sheet rules.
@@ -1103,7 +1103,7 @@ RefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(Element* e,
       matchRules(defaultQuirksStyle, firstUARule, lastUARule);
 
     // If our medium is print, then we match rules from the print sheet.
-    if (m_medium == "print")
+    if (m_mediaType == "print")
       matchRules(defaultPrintStyle, firstUARule, lastUARule);
 
     // Now we check user sheet rules.
@@ -3298,7 +3298,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         if (!item->isPrimitiveValue())
           continue;
         CSSPrimitiveValue* val = static_cast<CSSPrimitiveValue*>(item);
-        DeprecatedString face;
+        AtomicString face;
         if (val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
           face = static_cast<FontFamilyValue*>(val)->fontName();
         else if (val->primitiveType() == CSSPrimitiveValue::CSS_IDENT) {

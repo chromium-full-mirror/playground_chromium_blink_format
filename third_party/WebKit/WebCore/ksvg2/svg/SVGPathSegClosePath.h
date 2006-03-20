@@ -36,9 +36,7 @@ class SVGPathSegClosePath : public SVGPathSeg {
   virtual StringImpl* pathSegTypeAsLetter() const {
     return new StringImpl("Z");
   }
-  virtual DeprecatedString toString() const {
-    return DeprecatedString::fromLatin1("Z");
-  }
+  virtual DeprecatedString toString() const { return "Z"; }
 };
 };
 

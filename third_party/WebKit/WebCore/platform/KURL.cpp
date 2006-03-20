@@ -27,6 +27,7 @@
 #include "KURL.h"
 
 #include <kxmlcore/Assertions.h>
+#include "PlatformString.h"
 #include "RegularExpression.h"
 #include "TextEncoding.h"
 #include <kxmlcore/Vector.h>
@@ -292,6 +293,22 @@ KURL::KURL(const char* url) {
 }
 
 KURL::KURL(const DeprecatedString& url) {
+  if (!url.isEmpty() && url[0] == '/') {
+    // 5 for "file:", 1 for terminator
+    Vector<char, 2048> buffer(url.length() + 6);
+    buffer[0] = 'f';
+    buffer[1] = 'i';
+    buffer[2] = 'l';
+    buffer[3] = 'e';
+    buffer[4] = ':';
+    url.copyLatin1(&buffer[5]);
+    parse(buffer, 0);
+  } else
+    parse(url.ascii(), &url);
+}
+
+KURL::KURL(const String& stringURL) {
+  DeprecatedString url = stringURL.deprecatedString();
   if (!url.isEmpty() && url[0] == '/') {
     // 5 for "file:", 1 for terminator
     Vector<char, 2048> buffer(url.length() + 6);
@@ -1263,9 +1280,8 @@ void KURL::parse(const char* url, const DeprecatedString* originalString) {
   // allocation.
   if (originalString && strncmp(buffer, url, fragmentEndPos) == 0) {
     urlString = *originalString;
-  } else {
+  } else
     urlString = DeprecatedString(buffer, fragmentEndPos);
-  }
 
   ASSERT(p - buffer <= (int)buffer.size());
 }
@@ -1281,10 +1297,9 @@ bool urlcmp(const DeprecatedString& a,
   if (ignoreRef) {
     KURL aURL(a);
     KURL bURL(b);
-    if (aURL.m_isValid && bURL.m_isValid) {
+    if (aURL.m_isValid && bURL.m_isValid)
       return aURL.urlString.left(aURL.queryEndPos) ==
              bURL.urlString.left(bURL.queryEndPos);
-    }
   }
   return a == b;
 }
@@ -1303,9 +1318,8 @@ DeprecatedString KURL::encode_string(const DeprecatedString& notEncodedString) {
       *p++ = '%';
       *p++ = hexDigits[c >> 4];
       *p++ = hexDigits[c & 0xF];
-    } else {
+    } else
       *p++ = c;
-    }
   }
 
   DeprecatedString result(buffer, p - buffer);
@@ -1321,9 +1335,8 @@ static DeprecatedString encodeHostname(const DeprecatedString& s) {
   // certainly OK.
   const unsigned hostnameBufferLength = 2048;
 
-  if (s.isAllASCII() || s.length() > hostnameBufferLength) {
+  if (s.isAllASCII() || s.length() > hostnameBufferLength)
     return s;
-  }
 
   UChar buffer[hostnameBufferLength];
   UErrorCode error = U_ZERO_ERROR;

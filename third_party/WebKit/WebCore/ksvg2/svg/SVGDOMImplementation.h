@@ -73,7 +73,6 @@ class SVGDOMImplementation : public DOMImplementation {
   bool m_animationContext : 1;
 
   static SVGDOMImplementation* s_instance;
-  static DeprecatedStringList s_features;
 };
 }
 

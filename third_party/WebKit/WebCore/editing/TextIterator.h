@@ -49,7 +49,7 @@ inline bool isCollapsibleWhitespace(const QChar& c) {
 
 DeprecatedString plainText(const Range*);
 PassRefPtr<Range> findPlainText(const Range*,
-                                const DeprecatedString&,
+                                const String&,
                                 bool forward,
                                 bool caseSensitive);
 
