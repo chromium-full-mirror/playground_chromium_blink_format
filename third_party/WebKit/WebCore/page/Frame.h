@@ -578,10 +578,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual DeprecatedString incomingReferrer() const = 0;
   virtual DeprecatedString mimeTypeForFileName(
       const DeprecatedString&) const = 0;
-  virtual void clearRecordedFormValues() = 0;
-  virtual void recordFormValue(const DeprecatedString& name,
-                               const DeprecatedString& value,
-                               HTMLFormElement* element) = 0;
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*) = 0;
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*) = 0;
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*) = 0;
@@ -844,6 +840,11 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void prepareForUserAction();
   Node* mousePressNode();
 
+  void clearRecordedFormValues();
+  void recordFormValue(const String& name,
+                       const String& value,
+                       PassRefPtr<HTMLFormElement>);
+
   bool isComplete() const;
   bool isLoadingMainResource() const;
 
@@ -908,14 +909,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
  private:
   friend class FramePrivate;
   FramePrivate* d;
-
-  mutable RefPtr<Node> _elementToDraw;
-  mutable bool _drawSelectionOnly;
-  KURL _submittedFormURL;
-  bool m_markedTextUsesUnderlines;
-  DeprecatedValueList<MarkedTextUnderline> m_markedTextUnderlines;
-  bool m_windowHasFocus;
-  int frameCount;
 };
 }
 

@@ -247,11 +247,6 @@ class FrameMac : public Frame {
   virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&);
   virtual bool passWheelEventToChildWidget(Node*);
 
-  virtual void clearRecordedFormValues();
-  virtual void recordFormValue(const DeprecatedString& name,
-                               const DeprecatedString& value,
-                               HTMLFormElement* element);
-
   NSString* searchForLabelsAboveCell(RegularExpression* regExp,
                                      HTMLTableCellElement* cell);
   NSString* searchForLabelsBeforeElement(NSArray* labels, Element* element);

@@ -48,6 +48,7 @@ namespace WebCore {
 
 class Font;
 class GraphicsContextPrivate;
+class GraphicsContextPlatformPrivate;
 class IntPoint;
 class IntPointArray;
 
@@ -91,13 +92,12 @@ class GraphicsContext : Noncopyable {
   void save();
   void restore();
 
-  void drawRect(int, int, int, int);
-  void drawLine(int, int, int, int);
-  void drawEllipse(int, int, int, int);
+  void drawRect(const IntRect&);
+  void drawLine(const IntPoint&, const IntPoint&);
+  void drawEllipse(const IntRect&);
   void drawArc(int, int, int, int, int, int);
   void drawConvexPolygon(const IntPointArray&);
 
-  void fillRect(int, int, int, int, const Brush&);
   void fillRect(const IntRect&, const Brush&);
 
   void drawImageAtPoint(Image*,
@@ -108,8 +108,7 @@ class GraphicsContext : Noncopyable {
                        Image::CompositeOperator = Image::CompositeSourceOver);
 
   void drawImage(Image*,
-                 int x,
-                 int y,
+                 const IntPoint&,
                  int sx = 0,
                  int sy = 0,
                  int sw = -1,
@@ -117,40 +116,28 @@ class GraphicsContext : Noncopyable {
                  Image::CompositeOperator = Image::CompositeSourceOver,
                  void* nativeData = 0);
   void drawImage(Image*,
-                 int x,
-                 int y,
-                 int w,
-                 int h,
+                 const IntRect&,
                  int sx = 0,
                  int sy = 0,
                  int sw = -1,
                  int sh = -1,
                  Image::CompositeOperator = Image::CompositeSourceOver,
                  void* nativeData = 0);
-  void drawFloatImage(Image*,
-                      float x,
-                      float y,
-                      float w,
-                      float h,
-                      float sx = 0,
-                      float sy = 0,
-                      float sw = -1,
-                      float sh = -1,
-                      Image::CompositeOperator = Image::CompositeSourceOver,
-                      void* nativeData = 0);
+  void drawImage(Image*,
+                 const FloatRect&,
+                 float sx = 0,
+                 float sy = 0,
+                 float sw = -1,
+                 float sh = -1,
+                 Image::CompositeOperator = Image::CompositeSourceOver,
+                 void* nativeData = 0);
   void drawTiledImage(Image*,
-                      int,
-                      int,
-                      int,
-                      int,
+                      const IntRect& dest,
                       int sx = 0,
                       int sy = 0,
                       void* nativeData = 0);
   void drawScaledAndTiledImage(Image*,
-                               int,
-                               int,
-                               int,
-                               int,
+                               const IntRect&,
                                int,
                                int,
                                int,
@@ -200,18 +187,14 @@ class GraphicsContext : Noncopyable {
   int misspellingLineThickness() const;
 
   Color selectedTextBackgroundColor() const;
-  void setUsesInactiveTextBackgroundColor(bool u) {
-    m_usesInactiveTextBackgroundColor = u;
-  }
+  void setUsesInactiveTextBackgroundColor(bool);
+  bool usesInactiveTextBackgroundColor() const;
 
   bool paintingDisabled() const;
   void setPaintingDisabled(bool);
 
-  bool updatingControlTints() const { return m_updatingControlTints; }
-  void setUpdatingControlTints(bool b) {
-    setPaintingDisabled(b);
-    m_updatingControlTints = b;
-  }
+  bool updatingControlTints() const;
+  void setUpdatingControlTints(bool);
 
   void beginTransparencyLayer(float opacity);
   void endTransparencyLayer();
@@ -244,19 +227,25 @@ class GraphicsContext : Noncopyable {
   static KRenderingDevice* renderingDevice();
 #endif
 
-  bool printing() const { return m_isForPrinting; }
+  bool printing() const;
 
  private:
   void setColorFromBrush();
   void setColorFromPen();
 
-  GraphicsContextPrivate* m_data;
-  Vector<IntRect> m_focusRingRects;
-  int m_focusRingWidth;
-  int m_focusRingOffset;
-  bool m_isForPrinting;
-  bool m_usesInactiveTextBackgroundColor;
-  bool m_updatingControlTints;
+  void savePlatformState();
+  void restorePlatformState();
+
+  int focusRingWidth() const;
+  int focusRingOffset() const;
+  const Vector<IntRect>& focusRingRects() const;
+
+  static GraphicsContextPrivate* createGraphicsContextPrivate(
+      bool isForPrinting = false);
+  static void destroyGraphicsContextPrivate(GraphicsContextPrivate*);
+
+  GraphicsContextPrivate* m_common;
+  GraphicsContextPlatformPrivate* m_data;
 };
 }
 

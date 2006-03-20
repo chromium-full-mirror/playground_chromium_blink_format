@@ -174,10 +174,9 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     FloatRect srcRect(0, 0, image()->width(), image()->height());
     adjustRectsForAspectRatio(destRect, srcRect,
                               imageElt->preserveAspectRatio()->baseVal());
-    paintInfo.p->drawFloatImage(image(), destRect.x(), destRect.y(),
-                                destRect.width(), destRect.height(),
-                                srcRect.x(), srcRect.y(), srcRect.width(),
-                                srcRect.height(), Image::CompositeSourceOver);
+    paintInfo.p->drawImage(image(), destRect, srcRect.x(), srcRect.y(),
+                           srcRect.width(), srcRect.height(),
+                           Image::CompositeSourceOver);
   }
 
   if (filter)

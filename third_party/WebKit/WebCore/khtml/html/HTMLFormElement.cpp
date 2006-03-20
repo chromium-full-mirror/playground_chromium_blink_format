@@ -346,38 +346,34 @@ void HTMLFormElement::submit(bool activateSubmitButton) {
     }
 
     if (needButtonActivation) {
-      if (current->isActivatedSubmit()) {
+      if (current->isActivatedSubmit())
         needButtonActivation = false;
-      } else if (firstSuccessfulSubmitButton == 0 &&
-                 current->isSuccessfulSubmitButton()) {
+      else if (firstSuccessfulSubmitButton == 0 &&
+               current->isSuccessfulSubmitButton())
         firstSuccessfulSubmitButton = current;
-      }
     }
   }
 
-  if (needButtonActivation && firstSuccessfulSubmitButton) {
+  if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
-  }
 
   if (!m_post)
     m_multipart = false;
 
   FormData form_data;
   if (formData(form_data)) {
-    if (m_post) {
+    if (m_post)
       frame->submitForm("post", m_url.deprecatedString(), form_data,
                         m_target.deprecatedString(),
                         enctype().deprecatedString(),
                         boundary().deprecatedString());
-    } else {
+    else
       frame->submitForm("get", m_url.deprecatedString(), form_data,
                         m_target.deprecatedString());
-    }
   }
 
-  if (needButtonActivation && firstSuccessfulSubmitButton) {
+  if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(false);
-  }
 
   m_doingsubmit = m_insubmit = false;
 }
@@ -413,28 +409,28 @@ void HTMLFormElement::parseMappedAttribute(MappedAttribute* attr) {
         getDocument()->secureFormAdded();
       else
         getDocument()->secureFormRemoved();
-  } else if (attr->name() == targetAttr) {
+  } else if (attr->name() == targetAttr)
     m_target = attr->value();
-  } else if (attr->name() == methodAttr) {
+  else if (attr->name() == methodAttr) {
     if (equalIgnoringCase(attr->value(), "post"))
       m_post = true;
     else if (equalIgnoringCase(attr->value(), "get"))
       m_post = false;
-  } else if (attr->name() == enctypeAttr) {
+  } else if (attr->name() == enctypeAttr)
     parseEnctype(attr->value());
-  } else if (attr->name() == accept_charsetAttr) {
+  else if (attr->name() == accept_charsetAttr)
     // space separated list of charsets the server
     // accepts - see rfc2045
     m_acceptcharset = attr->value();
-  } else if (attr->name() == acceptAttr) {
+  else if (attr->name() == acceptAttr) {
     // ignore this one for the moment...
-  } else if (attr->name() == autocompleteAttr) {
+  } else if (attr->name() == autocompleteAttr)
     m_autocomplete = !equalIgnoringCase(attr->value(), "off");
-  } else if (attr->name() == onsubmitAttr) {
+  else if (attr->name() == onsubmitAttr)
     setHTMLEventListener(submitEvent, attr);
-  } else if (attr->name() == onresetAttr) {
+  else if (attr->name() == onresetAttr)
     setHTMLEventListener(resetEvent, attr);
-  } else if (attr->name() == nameAttr) {
+  else if (attr->name() == nameAttr) {
     String newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
       HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
