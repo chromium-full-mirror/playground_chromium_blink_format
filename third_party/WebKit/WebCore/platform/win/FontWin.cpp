@@ -314,7 +314,7 @@ void Font::drawHighlightForText(const GraphicsContext* context,
 
   // FIXME: this const_cast should be removed when this code is made real.
   const_cast<GraphicsContext*>(context)->fillRect(
-      x, y, runSize.width(), runSize.height(), backgroundColor);
+      IntRect(IntPoint(x, y), runSize), backgroundColor);
 }
 
 IntRect Font::selectionRectForText(int x,
@@ -391,8 +391,8 @@ void Font::drawLineForText(const GraphicsContext* context,
                            int yOffset,
                            int width) const {
   IntPoint origin(x, y + yOffset + 1);
-  const_cast<GraphicsContext*>(context)->drawLine(
-      origin.x(), origin.y(), origin.x() + width, origin.y());
+  IntPoint endPoint = origin + IntPoint(width, 0);
+  const_cast<GraphicsContext*>(context)->drawLine(origin, endPoint);
 }
 
 void Font::drawLineForMisspelling(const GraphicsContext* context,

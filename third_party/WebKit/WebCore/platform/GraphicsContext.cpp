@@ -63,13 +63,13 @@ GraphicsContextPrivate::GraphicsContextPrivate(bool isForPrinting)
       m_usesInactiveTextBackgroundColor(false),
       m_updatingControlTints(false) {}
 
-GraphicsContextPrivate* GraphicsContext::createGraphicsContextPrivate(
-    bool isForPrinting) {
-  return new GraphicsContextPrivate(isForPrinting);
+WebCore::GraphicsContextPrivate*
+WebCore::GraphicsContext::createGraphicsContextPrivate(bool isForPrinting) {
+  return new WebCore::GraphicsContextPrivate(isForPrinting);
 }
 
-void GraphicsContext::destroyGraphicsContextPrivate(
-    GraphicsContextPrivate* deleteMe) {
+void WebCore::GraphicsContext::destroyGraphicsContextPrivate(
+    WebCore::GraphicsContextPrivate* deleteMe) {
   delete deleteMe;
 }
 
