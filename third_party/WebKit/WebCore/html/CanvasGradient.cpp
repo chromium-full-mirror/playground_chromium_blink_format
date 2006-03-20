@@ -93,19 +93,13 @@ static void gradientCallback(void* info, const float* in, float* out) {
                                                &out[3]);
 }
 
-static void gradientReleaseCallback(void* info) {
-  static_cast<CanvasGradient*>(info)->deref();
-}
-
 CGShadingRef CanvasGradient::platformShading() {
   if (m_shading)
     return m_shading;
 
   const float intervalRanges[2] = {0, 1};
   const float colorComponentRanges[4 * 2] = {0, 1, 0, 1, 0, 1, 0, 1};
-  const CGFunctionCallbacks gradientCallbacks = {0, gradientCallback,
-                                                 gradientReleaseCallback};
-  ref();
+  const CGFunctionCallbacks gradientCallbacks = {0, gradientCallback, 0};
   CGFunctionRef colorFunction = CGFunctionCreate(
       this, 1, intervalRanges, 4, colorComponentRanges, &gradientCallbacks);
 
