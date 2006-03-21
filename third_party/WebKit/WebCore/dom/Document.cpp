@@ -1072,7 +1072,8 @@ Tokenizer* Document::createTokenizer() {
 }
 
 void Document::open() {
-  if (frame() && frame()->isLoadingMainResource())
+  if ((frame() && frame()->isLoadingMainResource()) ||
+      (tokenizer() && tokenizer()->executingScript()))
     return;
 
   implicitOpen();
