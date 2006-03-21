@@ -62,7 +62,7 @@ SVGAnimatedEnumeration* SVGClipPathElement::clipPathUnits() const {
 }
 
 void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::clipPathUnitsAttr) {
     if (value == "userSpaceOnUse")
       clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);

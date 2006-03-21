@@ -84,8 +84,7 @@ JSValue* KJSProxy::evaluate(const String& filename,
                             ->toObject(m_script->globalExec())
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
-    m_frame->addMessageToConsole(errorMessage.domString(), lineNumber,
-                                 sourceURL.domString());
+    m_frame->addMessageToConsole(errorMessage, lineNumber, sourceURL);
   }
 
   return 0;

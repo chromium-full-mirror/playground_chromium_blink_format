@@ -29,8 +29,9 @@
 
 #include "EventNames.h"
 #include "Frame.h"
-#include "dom2_eventsimpl.h"
+#include "PlatformString.h"
 #include "Range.h"
+#include "dom2_eventsimpl.h"
 #include "kjs_dom.h"
 #include "kjs_window.h"
 #include <kjs/collector.h>
@@ -222,72 +223,6 @@ void* ScriptInterpreter::createLanguageInstanceForValue(
 
 //////
 
-UString::UString(const DeprecatedString& d) {
-  // reinterpret_cast is ugly but in this case safe, since QChar and UChar have
-  // the same memory layout
-  m_rep = UString::Rep::createCopying(
-      reinterpret_cast<const UChar*>(d.unicode()), d.length());
-}
-
-UString::UString(const String& d) {
-  if (d.isNull()) {
-    m_rep = &Rep::null;
-    return;
-  }
-  // reinterpret_cast is ugly but in this case safe, since QChar and UChar have
-  // the same memory layout
-  m_rep = UString::Rep::createCopying(
-      reinterpret_cast<const UChar*>(d.unicode()), d.length());
-}
-
-UString::UString(const AtomicString& d) {
-  if (d.isNull()) {
-    m_rep = &Rep::null;
-    return;
-  }
-  // reinterpret_cast is ugly but in this case safe, since QChar and UChar have
-  // the same memory layout
-  m_rep = UString::Rep::createCopying(
-      reinterpret_cast<const UChar*>(d.domString().unicode()),
-      d.domString().length());
-}
-
-String UString::domString() const {
-  if (isNull())
-    return String();
-  if (isEmpty())
-    return "";
-  return String((QChar*)data(), size());
-}
-
-DeprecatedString UString::deprecatedString() const {
-  if (isNull())
-    return DeprecatedString();
-  if (isEmpty())
-    return "";
-  return DeprecatedString((QChar*)data(), size());
-}
-
-QConstString UString::qconststring() const {
-  return QConstString((QChar*)data(), size());
-}
-
-String Identifier::domString() const {
-  if (isNull())
-    return String();
-  if (isEmpty())
-    return "";
-  return String((QChar*)data(), size());
-}
-
-DeprecatedString Identifier::deprecatedString() const {
-  if (isNull())
-    return DeprecatedString();
-  if (isEmpty())
-    return "";
-  return DeprecatedString((QChar*)data(), size());
-}
-
 JSValue* jsStringOrNull(const String& s) {
   if (s.isNull())
     return jsNull();
@@ -303,7 +238,7 @@ JSValue* jsStringOrUndefined(const String& s) {
 String valueToStringWithNullCheck(ExecState* exec, JSValue* val) {
   if (val->isNull())
     return String();
-  return val->toString(exec).domString();
+  return val->toString(exec);
 }
 
 static const char* const exceptionNames[] = {

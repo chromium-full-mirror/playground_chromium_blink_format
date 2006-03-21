@@ -66,7 +66,7 @@ SVGAnimatedEnumeration* SVGFEBlendElement::mode() const {
 }
 
 void SVGFEBlendElement::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::modeAttr) {
     if (value == "normal")
       mode()->setBaseVal(SVG_FEBLEND_MODE_NORMAL);

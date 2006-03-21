@@ -252,10 +252,10 @@ void DOMNode::putValueProperty(ExecState* exec,
   Node& node = *m_impl;
   switch (token) {
     case NodeValue:
-      node.setNodeValue(value->toString(exec).domString(), exception);
+      node.setNodeValue(value->toString(exec), exception);
       break;
     case Prefix:
-      node.setPrefix(value->toString(exec).domString().impl(), exception);
+      node.setPrefix(value->toString(exec), exception);
       break;
     case TextContent:
       node.setTextContent(valueToStringWithNullCheck(exec, value), exception);
@@ -274,7 +274,8 @@ UString DOMNode::toString(ExecState*) const {
   if (!m_impl)
     return "null";
   return "[object " +
-         (m_impl->isElementNode() ? m_impl->nodeName() : className()) + "]";
+         (m_impl->isElementNode() ? UString(m_impl->nodeName()) : className()) +
+         "]";
 }
 
 JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
@@ -295,9 +296,8 @@ JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
       node.normalize();
       return jsUndefined();
     case DOMNode::IsSupported:
-      return jsBoolean(
-          node.isSupported(args[0]->toString(exec).domString(),
-                           valueToStringWithNullCheck(exec, args[1])));
+      return jsBoolean(node.isSupported(
+          args[0]->toString(exec), valueToStringWithNullCheck(exec, args[1])));
     case DOMNode::IsSameNode:
       return jsBoolean(node.isSameNode(toNode(args[0])));
     case DOMNode::IsEqualNode:
@@ -691,18 +691,16 @@ JSValue* DOMEventTargetNodeProtoFunc::callAsFunction(ExecState* exec,
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       if (listener)
-        node->addEventListener(
-            AtomicString(args[0]->toString(exec).domString()), listener,
-            args[2]->toBoolean(exec));
+        node->addEventListener(args[0]->toString(exec), listener,
+                               args[2]->toBoolean(exec));
       return jsUndefined();
     }
     case DOMEventTargetNode::RemoveEventListener: {
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       if (listener)
-        node->removeEventListener(
-            AtomicString(args[0]->toString(exec).domString()), listener,
-            args[2]->toBoolean(exec));
+        node->removeEventListener(args[0]->toString(exec), listener,
+                                  args[2]->toBoolean(exec));
       return jsUndefined();
     }
     case DOMEventTargetNode::DispatchEvent:
@@ -754,7 +752,7 @@ JSValue* DOMNodeList::nameGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
-  return toJS(exec, thisObj->m_impl->itemById(propertyName.domString().impl()));
+  return toJS(exec, thisObj->m_impl->itemById(propertyName));
 }
 
 bool DOMNodeList::getOwnPropertySlot(ExecState* exec,
@@ -778,7 +776,7 @@ bool DOMNodeList::getOwnPropertySlot(ExecState* exec,
   if (ok && idx < list.length()) {
     slot.setCustomIndex(this, idx, indexGetter);
     return true;
-  } else if (list.itemById(propertyName.domString().impl())) {
+  } else if (list.itemById(String(propertyName).impl())) {
     slot.setCustom(this, nameGetter);
     return true;
   }
@@ -961,7 +959,7 @@ void DOMDocument::putValueProperty(ExecState* exec,
   Document& doc = *static_cast<Document*>(impl());
   switch (token) {
     case SelectedStylesheetSet:
-      doc.setSelectedStylesheetSet(value->toString(exec).domString());
+      doc.setSelectedStylesheetSet(value->toString(exec));
       break;
     case Charset:
       doc.decoder()->setEncodingName(value->toString(exec).cstring().c_str(),
@@ -979,7 +977,7 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
   Node& node = *static_cast<DOMNode*>(thisObj)->impl();
   Document& doc = static_cast<Document&>(node);
   UString str = args[0]->toString(exec);
-  WebCore::String s = str.domString();
+  WebCore::String s = str;
 
   switch (id) {
     case DOMDocument::AdoptNode:
@@ -995,9 +993,9 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
     case DOMDocument::CreateCDATASection:
       return toJS(exec, doc.createCDATASection(s, exception));
     case DOMDocument::CreateProcessingInstruction:
-      return toJS(exec, doc.createProcessingInstruction(
-                            args[0]->toString(exec).domString(),
-                            args[1]->toString(exec).domString(), exception));
+      return toJS(exec, doc.createProcessingInstruction(args[0]->toString(exec),
+                                                        args[1]->toString(exec),
+                                                        exception));
     case DOMDocument::CreateAttribute:
       return toJS(exec, doc.createAttribute(s, exception));
     case DOMDocument::CreateEntityReference:
@@ -1011,18 +1009,16 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
       return toJS(exec, doc.importNode(toNode(args[0]),
                                        args[1]->toBoolean(exec), exception));
     case DOMDocument::CreateElementNS:  // DOM2
-      return toJS(exec, doc.createElementNS(
-                            s, args[1]->toString(exec).domString(), exception));
+      return toJS(exec,
+                  doc.createElementNS(s, args[1]->toString(exec), exception));
     case DOMDocument::CreateAttributeNS:  // DOM2
-      return toJS(exec, doc.createAttributeNS(
-                            s, args[1]->toString(exec).domString(), exception));
+      return toJS(exec,
+                  doc.createAttributeNS(s, args[1]->toString(exec), exception));
     case DOMDocument::GetElementsByTagNameNS:  // DOM2
-      return toJS(exec, doc.getElementsByTagNameNS(
-                               s, args[1]->toString(exec).domString())
-                            .get());
+      return toJS(exec,
+                  doc.getElementsByTagNameNS(s, args[1]->toString(exec)).get());
     case DOMDocument::GetElementById:
-      return toJS(
-          exec, doc.getElementById(args[0]->toString(exec).domString().impl()));
+      return toJS(exec, doc.getElementById(args[0]->toString(exec)));
     case DOMDocument::CreateRange:
       return toJS(exec, doc.createRange().get());
     case DOMDocument::CreateNodeIterator: {
@@ -1055,34 +1051,30 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
       return toJS(exec, doc.createEvent(s, exception).get());
     case DOMDocument::GetOverrideStyle:
       if (Element* element0 = toElement(args[0]))
-        return toJS(exec, doc.getOverrideStyle(
-                              element0, args[1]->toString(exec).domString()));
+        return toJS(exec,
+                    doc.getOverrideStyle(element0, args[1]->toString(exec)));
       // FIXME: Is undefined right here, or should we raise an exception?
       return jsUndefined();
     case DOMDocument::ExecCommand: {
-      return jsBoolean(doc.execCommand(args[0]->toString(exec).domString(),
+      return jsBoolean(doc.execCommand(args[0]->toString(exec),
                                        args[1]->toBoolean(exec),
-                                       args[2]->toString(exec).domString()));
+                                       args[2]->toString(exec)));
     }
     case DOMDocument::QueryCommandEnabled: {
-      return jsBoolean(
-          doc.queryCommandEnabled(args[0]->toString(exec).domString()));
+      return jsBoolean(doc.queryCommandEnabled(args[0]->toString(exec)));
     }
     case DOMDocument::QueryCommandIndeterm: {
-      return jsBoolean(
-          doc.queryCommandIndeterm(args[0]->toString(exec).domString()));
+      return jsBoolean(doc.queryCommandIndeterm(args[0]->toString(exec)));
     }
     case DOMDocument::QueryCommandState: {
-      return jsBoolean(
-          doc.queryCommandState(args[0]->toString(exec).domString()));
+      return jsBoolean(doc.queryCommandState(args[0]->toString(exec)));
     }
     case DOMDocument::QueryCommandSupported: {
-      return jsBoolean(
-          doc.queryCommandSupported(args[0]->toString(exec).domString()));
+      return jsBoolean(doc.queryCommandSupported(args[0]->toString(exec)));
     }
     case DOMDocument::QueryCommandValue: {
       WebCore::String commandValue(
-          doc.queryCommandValue(args[0]->toString(exec).domString()));
+          doc.queryCommandValue(args[0]->toString(exec)));
       // Method returns null String to signal command is unsupported.
       // Microsoft documentation for this method says:
       // "If not supported [for a command identifier], this method returns a
@@ -1233,7 +1225,7 @@ JSValue* DOMElement::attributeGetter(ExecState* exec,
   DOMElement* thisObj = static_cast<DOMElement*>(slot.slotBase());
 
   Element* element = static_cast<Element*>(thisObj->impl());
-  WebCore::String attr = element->getAttribute(propertyName.domString());
+  WebCore::String attr = element->getAttribute(propertyName);
   return jsStringOrNull(attr);
 }
 
@@ -1264,7 +1256,7 @@ bool DOMElement::getOwnPropertySlot(ExecState* exec,
   // FIXME: do we really want to do this attribute lookup thing? Mozilla doesn't
   // do it,
   // and it seems like it could interfere with XBL.
-  WebCore::String attr = element.getAttribute(propertyName.domString());
+  WebCore::String attr = element.getAttribute(propertyName);
   if (!attr.isNull()) {
     slot.setCustom(this, attributeGetter);
     return true;
@@ -1375,7 +1367,7 @@ JSValue* DOMNamedNodeMap::nameGetter(ExecState* exec,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
-  return toJS(exec, thisObj->m_impl->getNamedItem(propertyName.domString()));
+  return toJS(exec, thisObj->m_impl->getNamedItem(propertyName));
 }
 
 bool DOMNamedNodeMap::getOwnPropertySlot(ExecState* exec,
@@ -1399,7 +1391,7 @@ bool DOMNamedNodeMap::getOwnPropertySlot(ExecState* exec,
       return true;
     }
 
-    if (m_impl->getNamedItem(propertyName.domString())) {
+    if (m_impl->getNamedItem(propertyName)) {
       slot.setCustom(this, nameGetter);
       return true;
     }
@@ -1417,26 +1409,25 @@ JSValue* DOMNamedNodeMapProtoFunc::callAsFunction(ExecState* exec,
   NamedNodeMap& map = *static_cast<DOMNamedNodeMap*>(thisObj)->impl();
   switch (id) {
     case DOMNamedNodeMap::GetNamedItem:
-      return toJS(exec, map.getNamedItem(args[0]->toString(exec).domString()));
+      return toJS(exec, map.getNamedItem(args[0]->toString(exec)));
     case DOMNamedNodeMap::SetNamedItem:
       return toJS(exec, map.setNamedItem(toNode(args[0]), exception).get());
     case DOMNamedNodeMap::RemoveNamedItem:
-      return toJS(exec, map.removeNamedItem(args[0]->toString(exec).domString(),
-                                            exception)
-                            .get());
+      return toJS(
+          exec, map.removeNamedItem(args[0]->toString(exec), exception).get());
     case DOMNamedNodeMap::Item:
       return toJS(exec, map.item(args[0]->toInt32(exec)));
     case DOMNamedNodeMap::GetNamedItemNS:  // DOM2
       return toJS(exec,
                   map.getNamedItemNS(valueToStringWithNullCheck(exec, args[0]),
-                                     args[1]->toString(exec).domString()));
+                                     args[1]->toString(exec)));
     case DOMNamedNodeMap::SetNamedItemNS:  // DOM2
       return toJS(exec, map.setNamedItemNS(toNode(args[0]), exception).get());
     case DOMNamedNodeMap::RemoveNamedItemNS:  // DOM2
-      return toJS(exec, map.removeNamedItemNS(
-                               valueToStringWithNullCheck(exec, args[0]),
-                               args[1]->toString(exec).domString(), exception)
-                            .get());
+      return toJS(
+          exec, map.removeNamedItemNS(valueToStringWithNullCheck(exec, args[0]),
+                                      args[1]->toString(exec), exception)
+                    .get());
   }
   return jsUndefined();
 }
@@ -1704,13 +1695,14 @@ bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
   // For IE compatibility, we need to be able to look up elements in a
   // document.formName.name result by id as well as be index.
 
+  AtomicString atomicPropertyName = propertyName;
   DeprecatedValueListConstIterator<RefPtr<Node>> end = m_nodes.end();
   int i = 0;
   for (DeprecatedValueListConstIterator<RefPtr<Node>> it = m_nodes.begin();
        it != end; ++it, ++i) {
     Node* node = (*it).get();
     if (node->hasAttributes() &&
-        node->attributes()->id() == propertyName.domString()) {
+        node->attributes()->id() == atomicPropertyName) {
       slot.setCustomIndex(this, i, indexGetter);
       return true;
     }

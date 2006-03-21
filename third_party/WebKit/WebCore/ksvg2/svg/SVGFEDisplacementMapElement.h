@@ -32,8 +32,7 @@ class SVGAnimatedEnumeration;
 class SVGFEDisplacementMapElement
     : public SVGFilterPrimitiveStandardAttributes {
  public:
-  SVGFEDisplacementMapElement(const WebCore::QualifiedName& tagName,
-                              WebCore::Document* doc);
+  SVGFEDisplacementMapElement(const QualifiedName& tagName, Document*);
   virtual ~SVGFEDisplacementMapElement();
 
   // 'SVGFEDisplacementMapElement' functions
@@ -43,10 +42,10 @@ class SVGFEDisplacementMapElement
   SVGAnimatedEnumeration* yChannelSelector() const;
   SVGAnimatedNumber* scale() const;
 
-  static KCChannelSelectorType stringToChannel(WebCore::String& key);
+  static KCChannelSelectorType stringToChannel(const String&);
 
   // Derived from: 'Element'
-  virtual void parseMappedAttribute(WebCore::MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual KCanvasFEDisplacementMap* filterEffect() const;
 
@@ -58,7 +57,7 @@ class SVGFEDisplacementMapElement
   mutable RefPtr<SVGAnimatedNumber> m_scale;
   mutable KCanvasFEDisplacementMap* m_filterEffect;
 };
-};
+}
 
 #endif  // SVG_SUPPORT
 #endif  // KSVG_SVGFEDisplacementMapElementImpl_H

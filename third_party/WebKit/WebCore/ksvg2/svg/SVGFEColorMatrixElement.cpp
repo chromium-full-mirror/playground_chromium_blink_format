@@ -70,7 +70,7 @@ SVGAnimatedNumberList* SVGFEColorMatrixElement::values() const {
 }
 
 void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "matrix")
       type()->setBaseVal(SVG_FECOLORMATRIX_TYPE_MATRIX);

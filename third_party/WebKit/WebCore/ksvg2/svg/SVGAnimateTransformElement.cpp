@@ -59,8 +59,8 @@ SVGAnimateTransformElement::SVGAnimateTransformElement(
 SVGAnimateTransformElement::~SVGAnimateTransformElement() {}
 
 void SVGAnimateTransformElement::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
   if (attr->name() == SVGNames::typeAttr) {
+    const String& value = attr->value();
     if (value == "translate")
       m_type = SVG_TRANSFORM_TRANSLATE;
     else if (value == "scale")

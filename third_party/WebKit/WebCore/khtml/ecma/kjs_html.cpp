@@ -122,19 +122,16 @@ JSValue* HTMLDocFunction::callAsFunction(ExecState* exec,
     case JSHTMLDocument::WriteLn: {
       // DOM only specifies single string argument, but NS & IE allow multiple
       // or no arguments
-      UString str = "";
+      String str = "";
       for (int i = 0; i < args.size(); i++)
         str += args[i]->toString(exec);
       if (id == JSHTMLDocument::WriteLn)
         str += "\n";
-      // kdDebug() << "document.write: " << str.ascii() << endl;
-      doc.write(str.domString());
+      doc.write(str);
       return jsUndefined();
     }
     case JSHTMLDocument::GetElementsByName:
-      return toJS(
-          exec,
-          doc.getElementsByName(args[0]->toString(exec).domString()).get());
+      return toJS(exec, doc.getElementsByName(args[0]->toString(exec)).get());
     case JSHTMLDocument::CaptureEvents:
     case JSHTMLDocument::ReleaseEvents:
       // Do nothing for now. These are NS-specific legacy calls.
@@ -202,7 +199,7 @@ JSValue* JSHTMLDocument::namedItemGetter(ExecState* exec,
   JSHTMLDocument* thisObj = static_cast<JSHTMLDocument*>(slot.slotBase());
   HTMLDocument& doc = *static_cast<HTMLDocument*>(thisObj->impl());
 
-  String name = propertyName.domString();
+  String name = propertyName;
   RefPtr<WebCore::HTMLCollection> collection = doc.documentNamedItems(name);
 
   if (collection->length() == 1) {
@@ -315,7 +312,7 @@ bool JSHTMLDocument::getOwnPropertySlot(ExecState* exec,
                                         PropertySlot& slot) {
   HTMLDocument& doc = *static_cast<HTMLDocument*>(impl());
 
-  String name = propertyName.domString();
+  String name = propertyName;
   if (doc.hasNamedItem(name) || doc.hasDocExtraNamedItem(name)) {
     slot.setCustom(this, namedItemGetter);
     return true;
@@ -354,21 +351,21 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
 
   switch (token) {
     case Title:
-      doc.setTitle(value->toString(exec).domString());
+      doc.setTitle(value->toString(exec));
       break;
     case Body:
       doc.setBody(toHTMLElement(value), exception);
       break;
     case Domain:  // not part of the DOM
-      doc.setDomain(value->toString(exec).domString());
+      doc.setDomain(value->toString(exec));
       break;
     case Cookie:
-      doc.setCookie(value->toString(exec).domString());
+      doc.setCookie(value->toString(exec));
       break;
     case Location: {
       Frame* frame = doc.frame();
       if (frame) {
-        DeprecatedString str = value->toString(exec).deprecatedString();
+        DeprecatedString str = value->toString(exec);
 
         // When assigning location, IE and Mozilla both resolve the URL
         // relative to the frame where the JavaScript is executing not
@@ -390,18 +387,18 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
     }
     case BgColor:
       if (bodyElement)
-        bodyElement->setBgColor(value->toString(exec).domString());
+        bodyElement->setBgColor(value->toString(exec));
       break;
     case FgColor:
       if (bodyElement)
-        bodyElement->setText(value->toString(exec).domString());
+        bodyElement->setText(value->toString(exec));
       break;
     case AlinkColor:
       if (bodyElement) {
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec).domString();
+        String newColor = value->toString(exec);
         if (bodyElement->aLink() != newColor)
           bodyElement->setALink(newColor);
       }
@@ -411,7 +408,7 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec).domString();
+        String newColor = value->toString(exec);
         if (bodyElement->link() != newColor)
           bodyElement->setLink(newColor);
       }
@@ -421,16 +418,16 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec).domString();
+        String newColor = value->toString(exec);
         if (bodyElement->vLink() != newColor)
           bodyElement->setVLink(newColor);
       }
       break;
     case Dir:
-      body->setDir(value->toString(exec).domString());
+      body->setDir(value->toString(exec));
       break;
     case DesignMode: {
-      String modeString = value->toString(exec).domString();
+      String modeString = value->toString(exec);
       Document::InheritedBool mode;
       if (equalIgnoringCase(modeString, "on"))
         mode = Document::on;
@@ -1358,7 +1355,7 @@ JSValue* JSHTMLElement::framesetNameGetter(ExecState* exec,
   JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
 
-  Node* frame = element->children()->namedItem(propertyName.domString());
+  Node* frame = element->children()->namedItem(propertyName);
   if (Document* doc = static_cast<HTMLFrameElement*>(frame)->contentDocument())
     if (Window* window = Window::retrieveWindow(doc->frame()))
       return window;
@@ -1422,7 +1419,7 @@ bool JSHTMLElement::getOwnPropertySlot(ExecState* exec,
       return true;
     }
   } else if (element.hasLocalName(framesetTag)) {
-    Node* frame = element.children()->namedItem(propertyName.domString());
+    Node* frame = element.children()->namedItem(propertyName);
     if (frame && frame->hasTagName(frameTag)) {
       slot.setCustom(this, framesetNameGetter);
       return true;
@@ -2794,7 +2791,7 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
   } else if (element.hasLocalName(canvasTag)) {
     if (id == JSHTMLElement::GetContext)
       return toJS(exec, static_cast<HTMLCanvasElement*>(&element)->getContext(
-                            args[0]->toString(exec).domString()));
+                            args[0]->toString(exec)));
   }
 
   return jsUndefined();
@@ -4329,7 +4326,7 @@ void JSHTMLElement::putValueProperty(ExecState* exec,
                                      JSValue* value,
                                      int) {
   DOMExceptionTranslator exception(exec);
-  WebCore::String str = value->toString(exec).domString();
+  WebCore::String str = value->toString(exec);
 
   // Check our set of generic properties first.
   HTMLElement& element = *static_cast<HTMLElement*>(impl());
@@ -4499,7 +4496,7 @@ JSValue* JSHTMLCollection::callAsFunction(ExecState* exec,
     UString s = args[0]->toString(exec);
     unsigned int u = args[1]->toString(exec).toUInt32(&ok);
     if (ok) {
-      WebCore::String pstr = s.domString();
+      WebCore::String pstr = s;
       Node* node = collection.namedItem(pstr);
       while (node) {
         if (!u)
@@ -4515,7 +4512,7 @@ JSValue* JSHTMLCollection::callAsFunction(ExecState* exec,
 JSValue* JSHTMLCollection::getNamedItems(ExecState* exec,
                                          const Identifier& propertyName) const {
   DeprecatedValueList<RefPtr<Node>> namedItems =
-      m_impl->namedItems(AtomicString(propertyName.domString()));
+      m_impl->namedItems(propertyName);
 
   if (namedItems.isEmpty())
     return jsUndefined();
@@ -4538,9 +4535,8 @@ JSValue* HTMLCollectionProtoFunc::callAsFunction(ExecState* exec,
       return toJS(exec, coll.item(args[0]->toUInt32(exec)));
     case JSHTMLCollection::Tags:
       return toJS(
-          exec, coll.base()
-                    ->getElementsByTagName(args[0]->toString(exec).domString())
-                    .get());
+          exec,
+          coll.base()->getElementsByTagName(args[0]->toString(exec)).get());
     case JSHTMLCollection::NamedItem:
       return static_cast<JSHTMLCollection*>(thisObj)->getNamedItems(
           exec, Identifier(args[0]->toString(exec)));
@@ -4690,10 +4686,9 @@ JSObject* OptionConstructorImp::construct(ExecState* exec, const List& args) {
     RefPtr<Text> t = m_doc->createTextNode("");
     opt->appendChild(t, exception);
     if (exception == 0 && sz > 0)
-      t->setData(args[0]->toString(exec).domString(),
-                 exception);  // set the text
+      t->setData(args[0]->toString(exec), exception);  // set the text
     if (exception == 0 && sz > 1)
-      opt->setValue(args[1]->toString(exec).domString());
+      opt->setValue(args[1]->toString(exec));
     if (exception == 0 && sz > 2)
       opt->setDefaultSelected(args[2]->toBoolean(exec));
     if (exception == 0 && sz > 3)

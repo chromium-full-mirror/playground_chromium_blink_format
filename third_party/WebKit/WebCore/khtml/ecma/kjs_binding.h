@@ -34,6 +34,7 @@ class Document;
 class Event;
 class Frame;
 class Node;
+class String;
 
 typedef int ExceptionCode;
 }

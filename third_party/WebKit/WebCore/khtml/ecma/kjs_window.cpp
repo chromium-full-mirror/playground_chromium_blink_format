@@ -473,8 +473,8 @@ static HashMap<String, String> parseModalDialogFeatures(ExecState* exec,
                                                         JSValue* featuresArg) {
   HashMap<String, String> map;
 
-  DeprecatedStringList features = DeprecatedStringList::split(
-      ';', featuresArg->toString(exec).deprecatedString());
+  DeprecatedStringList features =
+      DeprecatedStringList::split(';', featuresArg->toString(exec));
   DeprecatedStringList::ConstIterator end = features.end();
   for (DeprecatedStringList::ConstIterator it = features.begin(); it != end;
        ++it) {
@@ -675,8 +675,8 @@ static JSValue* showModalDialog(ExecState* exec,
   wargs.locationBarVisible = false;
   wargs.fullscreen = false;
 
-  Frame* dialogPart = createNewWindow(
-      exec, openerWindow, URL.deprecatedString(), "", wargs, args[1]);
+  Frame* dialogPart =
+      createNewWindow(exec, openerWindow, URL, "", wargs, args[1]);
   if (!dialogPart)
     return jsUndefined();
 
@@ -921,7 +921,7 @@ JSValue* Window::childFrameGetter(ExecState*,
                                   const PropertySlot& slot) {
   return retrieve(static_cast<Window*>(slot.slotBase())
                       ->m_frame->tree()
-                      ->child(AtomicString(propertyName.domString())));
+                      ->child(AtomicString(propertyName)));
 }
 
 JSValue* Window::namedFrameGetter(ExecState*,
@@ -937,7 +937,7 @@ JSValue* Window::namedFrameGetter(ExecState*,
   // so I'm leaving this as-is for now.
   return retrieve(static_cast<Window*>(slot.slotBase())
                       ->m_frame->tree()
-                      ->child(AtomicString(propertyName.domString())));
+                      ->child(AtomicString(propertyName)));
 }
 
 JSValue* Window::indexGetter(ExecState*,
@@ -957,7 +957,7 @@ JSValue* Window::namedItemGetter(ExecState* exec,
   Document* doc = thisObj->m_frame->document();
   ASSERT(thisObj->isSafeScript(exec) && doc && doc->isHTMLDocument());
 
-  String name = propertyName.domString();
+  String name = propertyName;
   RefPtr<WebCore::HTMLCollection> collection = doc->windowNamedItems(name);
   if (collection->length() == 1)
     return toJS(exec, collection->firstItem());
@@ -1000,7 +1000,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   // naming frames things that conflict with window properties that
   // are in Moz but not IE. Since we have some of these, we have to do
   // it the Moz way.
-  AtomicString atomicPropertyName = AtomicString(propertyName.domString());
+  AtomicString atomicPropertyName = propertyName;
   if (m_frame->tree()->child(atomicPropertyName)) {
     slot.setCustom(this, childFrameGetter);
     return true;
@@ -1085,17 +1085,16 @@ void Window::put(ExecState* exec,
   if (entry) {
     switch (entry->value) {
       case Status:
-        m_frame->setJSStatusBarText(value->toString(exec).deprecatedString());
+        m_frame->setJSStatusBarText(value->toString(exec));
         return;
       case DefaultStatus:
-        m_frame->setJSDefaultStatusBarText(
-            value->toString(exec).deprecatedString());
+        m_frame->setJSDefaultStatusBarText(value->toString(exec));
         return;
       case Location_: {
         Frame* p = Window::retrieveActive(exec)->m_frame;
         if (p) {
           DeprecatedString dstUrl = p->document()->completeURL(
-              value->toString(exec).deprecatedString());
+              DeprecatedString(value->toString(exec)));
           if (!dstUrl.startsWith("javascript:", false) || isSafeScript(exec)) {
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
@@ -1218,7 +1217,7 @@ void Window::put(ExecState* exec,
         return;
       case Name:
         if (isSafeScript(exec))
-          m_frame->tree()->setName(value->toString(exec).deprecatedString());
+          m_frame->tree()->setName(value->toString(exec));
         return;
       default:
         break;
@@ -1618,7 +1617,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
   FrameView* widget = frame->view();
   JSValue* v = args[0];
   UString s = v->toString(exec);
-  String str = s.domString();
+  String str = s;
   String str2;
 
   switch (id) {
@@ -1634,8 +1633,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::Prompt: {
       if (frame && frame->document())
         frame->document()->updateRendering();
-      String message =
-          args.size() >= 2 ? args[1]->toString(exec).domString() : String();
+      String message = args.size() >= 2 ? args[1]->toString(exec) : UString();
       bool ok = frame->runJavaScriptPrompt(str, message, str2);
       if (ok)
         return jsString(str2);
@@ -1643,17 +1641,15 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         return jsNull();
     }
     case Window::Open: {
-      AtomicString frameName =
-          args[1]->isUndefinedOrNull()
-              ? "_blank"
-              : AtomicString(args[1]->toString(exec).domString());
+      AtomicString frameName = args[1]->isUndefinedOrNull()
+                                   ? "_blank"
+                                   : AtomicString(args[1]->toString(exec));
       if (!allowPopUp(exec, window) && !frame->tree()->find(frameName))
         return jsUndefined();
 
       WindowArgs windowArgs;
-      String features = args[2]->isUndefinedOrNull()
-                            ? String()
-                            : args[2]->toString(exec).domString();
+      String features =
+          args[2]->isUndefinedOrNull() ? UString() : args[2]->toString(exec);
       parseWindowFeatures(features, windowArgs);
       constrainToVisible(screenRect(widget), windowArgs);
 
@@ -1898,9 +1894,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
         if (Document* doc = frame->document())
-          doc->addWindowEventListener(
-              AtomicString(args[0]->toString(exec).domString()), listener,
-              args[2]->toBoolean(exec));
+          doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
+                                      listener, args[2]->toBoolean(exec));
       return jsUndefined();
     case Window::RemoveEventListener:
       if (!window->isSafeScript(exec))
@@ -1908,9 +1903,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
         if (Document* doc = frame->document())
-          doc->removeWindowEventListener(
-              AtomicString(args[0]->toString(exec).domString()), listener,
-              args[2]->toBoolean(exec));
+          doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
+                                         listener, args[2]->toBoolean(exec));
       return jsUndefined();
     case Window::ShowModalDialog:
       return showModalDialog(exec, window, args);
@@ -1943,9 +1937,8 @@ void ScheduledAction::execute(Window* window) {
       if (exec->hadException()) {
         JSObject* exception = exec->exception()->toObject(exec);
         exec->clearException();
-        String message = exception->get(exec, messagePropertyName)
-                             ->toString(exec)
-                             .domString();
+        String message =
+            exception->get(exec, messagePropertyName)->toString(exec);
         int lineNumber = exception->get(exec, "line")->toInt32(exec);
         if (Interpreter::shouldPrintExceptions())
           printf("(timer):%s\n", message.deprecatedString().utf8().data());
@@ -1988,8 +1981,7 @@ int Window::installTimeout(ScheduledAction* a, int t, bool singleShot) {
 }
 
 int Window::installTimeout(const UString& handler, int t, bool singleShot) {
-  return installTimeout(new ScheduledAction(handler.deprecatedString()), t,
-                        singleShot);
+  return installTimeout(new ScheduledAction(handler), t, singleShot);
 }
 
 int Window::installTimeout(JSValue* func,
@@ -2127,7 +2119,7 @@ JSValue* FrameArray::nameGetter(ExecState*,
                                 const PropertySlot& slot) {
   return Window::retrieve(static_cast<FrameArray*>(slot.slotBase())
                               ->m_frame->tree()
-                              ->child(AtomicString(propertyName.domString())));
+                              ->child(AtomicString(propertyName)));
 }
 
 bool FrameArray::getOwnPropertySlot(ExecState* exec,
@@ -2145,7 +2137,7 @@ bool FrameArray::getOwnPropertySlot(ExecState* exec,
   }
 
   // check for the name or number
-  if (m_frame->tree()->child(AtomicString(propertyName.domString()))) {
+  if (m_frame->tree()->child(propertyName)) {
     slot.setCustom(this, nameGetter);
     return true;
   }
@@ -2244,7 +2236,7 @@ void Location::put(ExecState* exec, const Identifier& p, JSValue* v, int attr) {
   if (!m_frame)
     return;
 
-  DeprecatedString str = v->toString(exec).deprecatedString();
+  DeprecatedString str = v->toString(exec);
   KURL url = m_frame->url();
   const HashEntry* entry = Lookup::findEntry(&LocationTable, p);
   if (entry)
@@ -2326,7 +2318,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
 
     switch (id) {
       case Location::Replace: {
-        DeprecatedString str = args[0]->toString(exec).deprecatedString();
+        DeprecatedString str = args[0]->toString(exec);
         Frame* p = Window::retrieveActive(exec)->frame();
         if (p) {
           const Window* window = Window::retrieveWindow(frame);
@@ -2361,7 +2353,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
         if (p) {
           const Window* window = Window::retrieveWindow(frame);
           DeprecatedString dstUrl = p->document()->completeURL(
-              args[0]->toString(exec).deprecatedString());
+              DeprecatedString(args[0]->toString(exec)));
           if (!dstUrl.startsWith("javascript:", false) ||
               (window && window->isSafeScript(exec))) {
             bool userGesture =
@@ -2494,9 +2486,8 @@ JSValue* SelectionFunc::callAsFunction(ExecState* exec,
         s.setPosition(toNode(args[0]), args[1]->toInt32(exec));
         break;
       case Selection::Modify:
-        s.modify(args[0]->toString(exec).domString(),
-                 args[1]->toString(exec).domString(),
-                 args[2]->toString(exec).domString());
+        s.modify(args[0]->toString(exec), args[1]->toString(exec),
+                 args[2]->toString(exec));
         break;
       case Selection::GetRangeAt:
         return toJS(exec, s.getRangeAt(args[0]->toInt32(exec)).get());

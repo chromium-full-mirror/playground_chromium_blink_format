@@ -43,7 +43,7 @@ SVGAnimatedBoolean* SVGExternalResourcesRequired::externalResourcesRequired()
 }
 
 bool SVGExternalResourcesRequired::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::externalResourcesRequiredAttr) {
     externalResourcesRequired()->setBaseVal(value == "true");
     return true;

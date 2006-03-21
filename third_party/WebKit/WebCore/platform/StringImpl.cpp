@@ -29,10 +29,12 @@
 
 #include "AtomicString.h"
 #include "Length.h"
+#include <kjs/identifier.h>
 #include <kxmlcore/Assertions.h>
 #include <string.h>
 #include <unicode/ubrk.h>
 
+using namespace KJS;
 using namespace KXMLCore;
 
 namespace WebCore {
@@ -367,7 +369,7 @@ static UBreakIterator* getWordBreakIterator(const QChar* string, int length) {
     return 0;
 
   status = U_ZERO_ERROR;
-  ubrk_setText(iterator, reinterpret_cast<const UChar*>(string), length,
+  ubrk_setText(iterator, reinterpret_cast<const ::UChar*>(string), length,
                &status);
   if (status != U_ZERO_ERROR)
     return 0;
@@ -517,7 +519,7 @@ int StringImpl::find(const QChar c, int start) const {
   return -1;
 }
 
-// This was copied from KWQ's DeprecatedString and made to work here w/ small
+// This was copied from DeprecatedString and made to work here w/ small
 // modifications.
 // FIXME comments were from the DeprecatedString version.
 int StringImpl::find(const StringImpl* str,
@@ -804,6 +806,14 @@ const char* StringImpl::ascii() const {
   }
   *p++ = '\0';
   return buffer;
+}
+
+StringImpl::StringImpl(const Identifier& str) {
+  initWithQChar(reinterpret_cast<const QChar*>(str.data()), str.size());
+}
+
+StringImpl::StringImpl(const UString& str) {
+  initWithQChar(reinterpret_cast<const QChar*>(str.data()), str.size());
 }
 
 }  // namespace WebCore

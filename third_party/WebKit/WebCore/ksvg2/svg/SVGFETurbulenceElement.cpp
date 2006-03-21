@@ -84,7 +84,7 @@ SVGAnimatedEnumeration* SVGFETurbulenceElement::type() const {
 }
 
 void SVGFETurbulenceElement::parseMappedAttribute(MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "fractalNoise")
       type()->setBaseVal(SVG_TURBULENCE_TYPE_FRACTALNOISE);

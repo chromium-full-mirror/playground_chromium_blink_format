@@ -83,7 +83,7 @@ SVGAnimatedNumber* SVGComponentTransferFunctionElement::offset() const {
 
 void SVGComponentTransferFunctionElement::parseMappedAttribute(
     MappedAttribute* attr) {
-  String value(attr->value());
+  const String& value = attr->value();
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "identity")
       type()->setBaseVal(SVG_FECOMPONENTTRANSFER_TYPE_IDENTITY);

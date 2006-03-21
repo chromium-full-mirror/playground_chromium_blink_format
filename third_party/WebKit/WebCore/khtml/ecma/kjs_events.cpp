@@ -108,10 +108,9 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
     if (exec->hadException()) {
       JSObject* exception = exec->exception()->toObject(exec);
       String message =
-          exception->get(exec, messagePropertyName)->toString(exec).domString();
+          exception->get(exec, messagePropertyName)->toString(exec);
       int lineNumber = exception->get(exec, "line")->toInt32(exec);
-      String sourceURL =
-          exception->get(exec, "sourceURL")->toString(exec).domString();
+      String sourceURL = exception->get(exec, "sourceURL")->toString(exec);
       if (Interpreter::shouldPrintExceptions())
         printf("(event handler):%s\n",
                message.deprecatedString().utf8().data());
@@ -119,7 +118,7 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
       exec->clearException();
     } else {
       if (!retval->isUndefinedOrNull() && event->storesResultAsString())
-        event->storeResult(retval->toString(exec).domString());
+        event->storeResult(retval->toString(exec));
       if (html) {
         bool retvalbool;
         if (retval->getBoolean(retvalbool) && !retvalbool)
@@ -379,7 +378,7 @@ JSValue* DOMEvent::getValueProperty(ExecState* exec, int token) const {
   Event& event = *m_impl;
   switch (token) {
     case Type:
-      return jsString(event.type().domString());
+      return jsString(event.type());
     case Target:
     case SrcElement: /*MSIE extension - "the object that fired the event"*/
       return toJS(exec, event.target());
@@ -463,7 +462,7 @@ JSValue* DOMEventProtoFunc::callAsFunction(ExecState* exec,
       event.preventDefault();
       return jsUndefined();
     case DOMEvent::InitEvent:
-      event.initEvent(AtomicString(args[0]->toString(exec).domString()),
+      event.initEvent(AtomicString(args[0]->toString(exec)),
                       args[1]->toBoolean(exec), args[2]->toBoolean(exec));
       return jsUndefined();
   };
@@ -605,7 +604,7 @@ JSValue* DOMUIEventProtoFunc::callAsFunction(ExecState* exec,
       *static_cast<UIEvent*>(static_cast<DOMUIEvent*>(thisObj)->impl());
   switch (id) {
     case DOMUIEvent::InitUIEvent:
-      uiEvent.initUIEvent(AtomicString(args[0]->toString(exec).domString()),
+      uiEvent.initUIEvent(AtomicString(args[0]->toString(exec)),
                           args[1]->toBoolean(exec), args[2]->toBoolean(exec),
                           toAbstractView(args[3]), args[4]->toInt32(exec));
       return jsUndefined();
@@ -709,21 +708,21 @@ JSValue* DOMMouseEventProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMMouseEvent::InitMouseEvent:
       mouseEvent.initMouseEvent(
-          AtomicString(args[0]->toString(exec).domString()),  // typeArg
-          args[1]->toBoolean(exec),                           // canBubbleArg
-          args[2]->toBoolean(exec),                           // cancelableArg
-          toAbstractView(args[3]),                            // viewArg
-          args[4]->toInt32(exec),                             // detailArg
-          args[5]->toInt32(exec),                             // screenXArg
-          args[6]->toInt32(exec),                             // screenYArg
-          args[7]->toInt32(exec),                             // clientXArg
-          args[8]->toInt32(exec),                             // clientYArg
-          args[9]->toBoolean(exec),                           // ctrlKeyArg
-          args[10]->toBoolean(exec),                          // altKeyArg
-          args[11]->toBoolean(exec),                          // shiftKeyArg
-          args[12]->toBoolean(exec),                          // metaKeyArg
-          args[13]->toInt32(exec),                            // buttonArg
-          toNode(args[14]));  // relatedTargetArg
+          AtomicString(args[0]->toString(exec)),  // typeArg
+          args[1]->toBoolean(exec),               // canBubbleArg
+          args[2]->toBoolean(exec),               // cancelableArg
+          toAbstractView(args[3]),                // viewArg
+          args[4]->toInt32(exec),                 // detailArg
+          args[5]->toInt32(exec),                 // screenXArg
+          args[6]->toInt32(exec),                 // screenYArg
+          args[7]->toInt32(exec),                 // clientXArg
+          args[8]->toInt32(exec),                 // clientYArg
+          args[9]->toBoolean(exec),               // ctrlKeyArg
+          args[10]->toBoolean(exec),              // altKeyArg
+          args[11]->toBoolean(exec),              // shiftKeyArg
+          args[12]->toBoolean(exec),              // metaKeyArg
+          args[13]->toInt32(exec),                // buttonArg
+          toNode(args[14]));                      // relatedTargetArg
       return jsUndefined();
   }
   return jsUndefined();
@@ -798,18 +797,17 @@ JSValue* DOMKeyboardEventProtoFunc::callAsFunction(ExecState* exec,
       *static_cast<KeyboardEvent*>(static_cast<DOMUIEvent*>(thisObj)->impl());
   switch (id) {
     case DOMKeyboardEvent::InitKeyboardEvent:
-      event.initKeyboardEvent(
-          AtomicString(args[0]->toString(exec).domString()),  // typeArg
-          args[1]->toBoolean(exec),                           // canBubbleArg
-          args[2]->toBoolean(exec),                           // cancelableArg
-          toAbstractView(args[3]),                            // viewArg
-          args[4]->toString(exec).domString(),                // keyIdentifier
-          args[5]->toInt32(exec),                             // keyLocationArg
-          args[6]->toBoolean(exec),                           // ctrlKeyArg
-          args[7]->toBoolean(exec),                           // altKeyArg
-          args[8]->toBoolean(exec),                           // shiftKeyArg
-          args[9]->toBoolean(exec),                           // metaKeyArg
-          args[10]->toBoolean(exec));                         // altGraphKeyArg
+      event.initKeyboardEvent(AtomicString(args[0]->toString(exec)),  // typeArg
+                              args[1]->toBoolean(exec),    // canBubbleArg
+                              args[2]->toBoolean(exec),    // cancelableArg
+                              toAbstractView(args[3]),     // viewArg
+                              args[4]->toString(exec),     // keyIdentifier
+                              args[5]->toInt32(exec),      // keyLocationArg
+                              args[6]->toBoolean(exec),    // ctrlKeyArg
+                              args[7]->toBoolean(exec),    // altKeyArg
+                              args[8]->toBoolean(exec),    // shiftKeyArg
+                              args[9]->toBoolean(exec),    // metaKeyArg
+                              args[10]->toBoolean(exec));  // altGraphKeyArg
       return jsUndefined();
   }
   return jsUndefined();
@@ -892,13 +890,13 @@ void Clipboard::putValueProperty(ExecState* exec,
       // can never set this when not for dragging, thus getting always returns
       // NULL string
       if (clipboard->isForDragging())
-        clipboard->setDropEffect(value->toString(exec).domString());
+        clipboard->setDropEffect(value->toString(exec));
       break;
     case EffectAllowed:
       // can never set this when not for dragging, thus getting always returns
       // NULL string
       if (clipboard->isForDragging())
-        clipboard->setEffectAllowed(value->toString(exec).domString());
+        clipboard->setEffectAllowed(value->toString(exec));
       break;
   }
 }
@@ -916,7 +914,7 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
         cb->clipboard->clearAllData();
         return jsUndefined();
       } else if (args.size() == 1) {
-        cb->clipboard->clearData(args[0]->toString(exec).domString());
+        cb->clipboard->clearData(args[0]->toString(exec));
         return jsUndefined();
       } else {
         return throwError(exec, SyntaxError,
@@ -925,8 +923,8 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
     case Clipboard::GetData: {
       if (args.size() == 1) {
         bool success;
-        WebCore::String result = cb->clipboard->getData(
-            args[0]->toString(exec).domString(), success);
+        WebCore::String result =
+            cb->clipboard->getData(args[0]->toString(exec), success);
         if (success) {
           return jsString(result);
         } else {
@@ -939,9 +937,8 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
     }
     case Clipboard::SetData:
       if (args.size() == 2) {
-        return jsBoolean(
-            cb->clipboard->setData(args[0]->toString(exec).domString(),
-                                   args[1]->toString(exec).domString()));
+        return jsBoolean(cb->clipboard->setData(args[0]->toString(exec),
+                                                args[1]->toString(exec)));
       } else {
         return throwError(exec, SyntaxError,
                           "setData: Invalid number of arguments");

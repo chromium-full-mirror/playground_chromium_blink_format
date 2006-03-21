@@ -39,8 +39,8 @@
 using namespace WebCore;
 
 SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
-    const WebCore::QualifiedName& tagName,
-    WebCore::Document* doc)
+    const QualifiedName& tagName,
+    Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc) {
   m_filterEffect = 0;
 }
@@ -75,7 +75,7 @@ SVGAnimatedNumber* SVGFEDisplacementMapElement::scale() const {
 }
 
 KCChannelSelectorType SVGFEDisplacementMapElement::stringToChannel(
-    WebCore::String& key) {
+    const String& key) {
   if (key == "R")
     return CS_RED;
   else if (key == "G")
@@ -88,9 +88,8 @@ KCChannelSelectorType SVGFEDisplacementMapElement::stringToChannel(
   return (KCChannelSelectorType)-1;
 }
 
-void SVGFEDisplacementMapElement::parseMappedAttribute(
-    WebCore::MappedAttribute* attr) {
-  WebCore::String value(attr->value());
+void SVGFEDisplacementMapElement::parseMappedAttribute(MappedAttribute* attr) {
+  const String& value = attr->value();
   if (attr->name() == SVGNames::xChannelSelectorAttr)
     xChannelSelector()->setBaseVal(stringToChannel(value));
   else if (attr->name() == SVGNames::yChannelSelectorAttr)
@@ -115,8 +114,8 @@ KCanvasFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
       (KCChannelSelectorType)(xChannelSelector()->baseVal()));
   m_filterEffect->setYChannelSelector(
       (KCChannelSelectorType)(yChannelSelector()->baseVal()));
-  m_filterEffect->setIn(WebCore::String(in1()->baseVal()).deprecatedString());
-  m_filterEffect->setIn2(WebCore::String(in2()->baseVal()).deprecatedString());
+  m_filterEffect->setIn(String(in1()->baseVal()).deprecatedString());
+  m_filterEffect->setIn2(String(in2()->baseVal()).deprecatedString());
   m_filterEffect->setScale(scale()->baseVal());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;

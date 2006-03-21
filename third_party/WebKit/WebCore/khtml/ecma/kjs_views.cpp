@@ -95,7 +95,7 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
         arg0->getDocument()->updateLayoutIgnorePendingStylesheets();
         return toJS(exec,
                     abstractView.getComputedStyle(
-                        arg0, args[1]->toString(exec).domString().impl()));
+                        arg0, WebCore::String(args[1]->toString(exec)).impl()));
       }
     }
     case DOMAbstractView::GetMatchedCSSRules: {
@@ -104,11 +104,11 @@ JSValue* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
         return jsUndefined();  // throw exception?
       else {
         // No need to update layout, since we just want the back-end rules.
-        return toJS(exec,
-                    abstractView
-                        .getMatchedCSSRules(
-                            arg0, args[1]->toString(exec).domString().impl())
-                        .get());
+        return toJS(
+            exec, abstractView
+                      .getMatchedCSSRules(
+                          arg0, WebCore::String(args[1]->toString(exec)).impl())
+                      .get());
       }
     }
   }

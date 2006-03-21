@@ -39,6 +39,8 @@ class AtomicString {
       : m_string(add((QChar*)s, length)) {}
   AtomicString(const DeprecatedString& s)
       : m_string(add(s.unicode(), s.length())) {}
+  AtomicString(const KJS::UString& s) : m_string(add(s)) {}
+  AtomicString(const KJS::Identifier& s) : m_string(add(s)) {}
   AtomicString(StringImpl* imp) : m_string(add(imp)) {}
   AtomicString(AtomicStringImpl* imp) : m_string(imp) {}
   explicit AtomicString(const String& s) : m_string(add(s.impl())) {}
@@ -48,6 +50,9 @@ class AtomicString {
   DeprecatedString deprecatedString() const {
     return m_string.deprecatedString();
   };
+
+  operator KJS::Identifier() const;
+  operator KJS::UString() const;
 
   AtomicStringImpl* impl() const {
     return static_cast<AtomicStringImpl*>(m_string.impl());
@@ -98,6 +103,8 @@ class AtomicString {
   static StringImpl* add(const char*);
   static StringImpl* add(const QChar*, int length);
   static StringImpl* add(StringImpl*);
+  static StringImpl* add(const KJS::UString&);
+  static StringImpl* add(const KJS::Identifier&);
 };
 
 inline bool operator==(const AtomicString& a, const AtomicString& b) {

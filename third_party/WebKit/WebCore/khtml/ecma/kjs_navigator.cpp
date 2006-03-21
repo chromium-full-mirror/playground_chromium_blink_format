@@ -24,6 +24,7 @@
 #include "config.h"
 #include "kjs_navigator.h"
 
+#include "AtomicString.h"
 #include "CookieJar.h"
 #include "Frame.h"
 #include "Language.h"
@@ -297,11 +298,12 @@ JSValue* Plugins::nameGetter(ExecState* exec,
                              JSObject* originalObject,
                              const Identifier& propertyName,
                              const PropertySlot& slot) {
+  AtomicString atomicPropertyName = propertyName;
   Vector<PluginInfo*>::iterator end = plugins->end();
   for (Vector<PluginInfo*>::iterator itr = plugins->begin(); itr != end;
        itr++) {
     PluginInfo* pl = *itr;
-    if (pl->name == propertyName.domString())
+    if (pl->name == atomicPropertyName)
       return new Plugin(exec, pl);
   }
   return jsUndefined();
@@ -327,10 +329,11 @@ bool Plugins::getOwnPropertySlot(ExecState* exec,
     }
 
     // plugin[name]
+    AtomicString atomicPropertyName = propertyName;
     Vector<PluginInfo*>::iterator end = plugins->end();
     for (Vector<PluginInfo*>::iterator itr = plugins->begin(); itr != end;
          itr++) {
-      if ((*itr)->name == propertyName.domString()) {
+      if ((*itr)->name == atomicPropertyName) {
         slot.setCustom(this, nameGetter);
         return true;
       }
@@ -364,11 +367,12 @@ JSValue* MimeTypes::nameGetter(ExecState* exec,
                                JSObject* originalObject,
                                const Identifier& propertyName,
                                const PropertySlot& slot) {
+  AtomicString atomicPropertyName = propertyName;
   Vector<MimeClassInfo*>::iterator end = mimes->end();
   for (Vector<MimeClassInfo*>::iterator itr = mimes->begin(); itr != end;
        itr++) {
     MimeClassInfo* m = (*itr);
-    if (m->type == propertyName.domString())
+    if (m->type == atomicPropertyName)
       return new MimeType(exec, m);
   }
   return jsUndefined();
@@ -391,10 +395,11 @@ bool MimeTypes::getOwnPropertySlot(ExecState* exec,
     }
 
     // mimeTypes[name]
+    AtomicString atomicPropertyName = propertyName;
     Vector<MimeClassInfo*>::iterator end = mimes->end();
     for (Vector<MimeClassInfo*>::iterator itr = mimes->begin(); itr != end;
          itr++) {
-      if ((*itr)->type == propertyName.domString()) {
+      if ((*itr)->type == atomicPropertyName) {
         slot.setCustom(this, nameGetter);
         return true;
       }
@@ -444,11 +449,12 @@ JSValue* Plugin::nameGetter(ExecState* exec,
                             const Identifier& propertyName,
                             const PropertySlot& slot) {
   Plugin* thisObj = static_cast<Plugin*>(slot.slotBase());
+  AtomicString atomicPropertyName = propertyName;
   Vector<MimeClassInfo*>::iterator end = thisObj->m_info->mimes.end();
   for (Vector<MimeClassInfo*>::iterator itr = thisObj->m_info->mimes.begin();
        itr != end; itr++) {
     MimeClassInfo* m = (*itr);
-    if (m->type == propertyName.domString())
+    if (m->type == atomicPropertyName)
       return new MimeType(exec, m);
   }
   return jsUndefined();
@@ -471,10 +477,11 @@ bool Plugin::getOwnPropertySlot(ExecState* exec,
     }
 
     // plugin["name"]
+    AtomicString atomicPropertyName = propertyName;
     Vector<MimeClassInfo*>::iterator end = m_info->mimes.end();
     for (Vector<MimeClassInfo*>::iterator itr = m_info->mimes.begin();
          itr != end; itr++) {
-      if ((*itr)->type == propertyName.domString()) {
+      if ((*itr)->type == atomicPropertyName) {
         slot.setCustom(this, nameGetter);
         return true;
       }
