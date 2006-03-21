@@ -280,8 +280,7 @@ class DOMDocument : public DOMEventTargetNode {
   DOMDocument(WebCore::Document* d);
 };
 
-WebCore::Attr* toAttr(
-    JSValue*);  // returns 0 if passed-in value is not a DOMAttr object
+WebCore::Attr* toAttr(JSValue*, bool& ok);
 
 KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(DOMElementProto, DOMEventTargetNodeProto)
 

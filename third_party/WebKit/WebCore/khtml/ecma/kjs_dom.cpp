@@ -812,9 +812,13 @@ JSValue* DOMNodeListFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-Attr* toAttr(JSValue* val) {
-  if (!val || !val->isObject(&JSAttr::info))
+Attr* toAttr(JSValue* val, bool& ok) {
+  if (!val || !val->isObject(&JSAttr::info)) {
+    ok = false;
     return 0;
+  }
+
+  ok = true;
   return static_cast<Attr*>(static_cast<DOMNode*>(val)->impl());
 }
 
