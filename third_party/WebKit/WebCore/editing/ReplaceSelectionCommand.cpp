@@ -170,16 +170,16 @@ static bool isProbablyBlock(const Node* node) {
 
   // FIXME: This function seems really broken to me.  It isn't even including
   // all the block-level elements.
-  return (node->hasTagName(blockquoteTag) || node->hasTagName(ddTag) ||
-          node->hasTagName(divTag) || node->hasTagName(dlTag) ||
-          node->hasTagName(dtTag) || node->hasTagName(h1Tag) ||
-          node->hasTagName(h2Tag) || node->hasTagName(h3Tag) ||
-          node->hasTagName(h4Tag) || node->hasTagName(h5Tag) ||
-          node->hasTagName(h6Tag) || node->hasTagName(hrTag) ||
-          node->hasTagName(liTag) || node->hasTagName(olTag) ||
-          node->hasTagName(pTag) || node->hasTagName(preTag) ||
-          node->hasTagName(tdTag) || node->hasTagName(thTag) ||
-          node->hasTagName(ulTag));
+  return node->hasTagName(blockquoteTag) || node->hasTagName(ddTag) ||
+         node->hasTagName(divTag) || node->hasTagName(dlTag) ||
+         node->hasTagName(dtTag) || node->hasTagName(h1Tag) ||
+         node->hasTagName(h2Tag) || node->hasTagName(h3Tag) ||
+         node->hasTagName(h4Tag) || node->hasTagName(h5Tag) ||
+         node->hasTagName(h6Tag) || node->hasTagName(hrTag) ||
+         node->hasTagName(liTag) || node->hasTagName(listingTag) ||
+         node->hasTagName(olTag) || node->hasTagName(pTag) ||
+         node->hasTagName(preTag) || node->hasTagName(tdTag) ||
+         node->hasTagName(thTag) || node->hasTagName(ulTag);
 }
 
 static bool isMailPasteAsQuotationNode(const Node* node) {

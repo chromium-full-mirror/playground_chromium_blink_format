@@ -38,8 +38,8 @@ namespace HTMLNames {
                   head) macro(h1) macro(h2) macro(h3) macro(h4) macro(h5)        \
                   macro(h6) macro(hr) macro(html) macro(i) macro(iframe) macro(  \
                       image) macro(img) macro(input) macro(ins) macro(isindex)   \
-                      macro(kbd) macro(keygen) macro(label) macro(               \
-                          layer) macro(legend) macro(li) macro(link)             \
+                      macro(kbd) macro(keygen) macro(label) macro(layer) macro(  \
+                          legend) macro(li) macro(link) macro(listing)           \
                           macro(map) macro(marquee) macro(menu) macro(           \
                               meta) macro(nobr) macro(noembed) macro(noframes)   \
                               macro(nolayer) macro(noscript) macro(              \
