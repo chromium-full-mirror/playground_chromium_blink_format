@@ -193,6 +193,9 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
     evt->setCurrentTarget(it.current());
 
     if (!evt->propagationStopped())
+      EventTargetNodeCast(it.current())->handleLocalEvents(evt.get(), true);
+
+    if (!evt->propagationStopped())
       EventTargetNodeCast(it.current())->handleLocalEvents(evt.get(), false);
   }
   --it;
