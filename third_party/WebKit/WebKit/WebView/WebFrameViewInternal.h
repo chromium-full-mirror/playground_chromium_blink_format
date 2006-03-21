@@ -41,7 +41,6 @@
 - (int)_marginHeight;
 - (void)_setMarginWidth:(int)w;
 - (void)_setMarginHeight:(int)h;
-- (NSClipView*)_contentView;
 - (float)_verticalPageScrollDistance;
 + (NSMutableDictionary*)_viewTypesAllowImageTypeOmission:
     (BOOL)allowImageTypeOmission;
