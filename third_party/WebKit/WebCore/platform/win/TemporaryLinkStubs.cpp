@@ -420,9 +420,9 @@ bool FrameWin::passWheelEventToChildWidget(Node*) {
 void FrameWin::issueUndoCommand() {
   notImplemented();
 }
-DeprecatedString FrameWin::mimeTypeForFileName(DeprecatedString const&) const {
+String FrameWin::mimeTypeForFileName(String const&) const {
   notImplemented();
-  return DeprecatedString();
+  return String();
 }
 void FrameWin::issuePasteCommand() {
   notImplemented();
@@ -456,9 +456,8 @@ bool FrameWin::canPaste() const {
   notImplemented();
   return 0;
 }
-enum WebCore::ObjectContentType FrameWin::objectContentType(
-    KURL const&,
-    DeprecatedString const&) {
+enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
+                                                            String const&) {
   notImplemented();
   return (ObjectContentType)0;
 }
@@ -472,7 +471,7 @@ void FrameWin::issuePasteAndMatchStyleCommand() {
 Plugin* FrameWin::createPlugin(KURL const&,
                                DeprecatedStringList const&,
                                DeprecatedStringList const&,
-                               DeprecatedString const&) {
+                               String const&) {
   notImplemented();
   return 0;
 }
@@ -561,8 +560,8 @@ void WebCore::TransferJob::retrieveCharset() const {}
 void FrameWin::restoreDocumentState() {}
 void FrameWin::partClearedInBegin() {}
 void FrameWin::createEmptyDocument() {}
-DeprecatedString FrameWin::overrideMediaType() const {
-  return DeprecatedString();
+String FrameWin::overrideMediaType() const {
+  return String();
 }
 void FrameWin::setTitle(String const&) {}
 void FrameWin::handledOnloadEvents() {}
@@ -570,7 +569,8 @@ Range* FrameWin::markedTextRange() const {
   return 0;
 }
 bool FrameWin::passSubframeEventToSubframe(
-    WebCore::MouseEventWithHitTestResults&) {
+    WebCore::MouseEventWithHitTestResults&,
+    Frame*) {
   return false;
 }
 bool FrameWin::lastEventIsMouseUp() const {
@@ -588,7 +588,7 @@ void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
                                          bool) {}
 static int frameNumber = 0;
 Frame* FrameWin::createFrame(KURL const&,
-                             DeprecatedString const&,
+                             String const&,
                              RenderPart*,
                              String const&) {
   return 0;
@@ -596,8 +596,8 @@ Frame* FrameWin::createFrame(KURL const&,
 void FrameWin::saveDocumentState(void) {}
 void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
 void FrameWin::clearUndoRedoOperations(void) {}
-DeprecatedString FrameWin::incomingReferrer() const {
-  return DeprecatedString();
+String FrameWin::incomingReferrer() const {
+  return String();
 }
 void FrameWin::clearRecordedFormValues() {}
 void FrameWin::recordFormValue(DeprecatedString const&,
