@@ -117,7 +117,7 @@ class UserStyleSheetLoader : public CachedObjectClient {
 
  private:
   virtual void setStyleSheet(const String&, const String& sheet) {
-    m_frame->setUserStyleSheet(sheet);
+    m_frame->setUserStyleSheet(sheet.deprecatedString());
   }
   Frame* m_frame;
   CachedCSSStyleSheet* m_cachedSheet;
@@ -621,7 +621,7 @@ void Frame::begin(const KURL& url) {
   String userStyleSheet = d->m_settings->userStyleSheet();
 
   if (!userStyleSheet.isEmpty())
-    setUserStyleSheet(KURL(userStyleSheet));
+    setUserStyleSheetLocation(KURL(userStyleSheet));
 
   restoreDocumentState();
 
@@ -1018,7 +1018,7 @@ DeprecatedString Frame::encoding() const {
   return settings()->encoding();
 }
 
-void Frame::setUserStyleSheet(const KURL& url) {
+void Frame::setUserStyleSheetLocation(const KURL& url) {
   delete d->m_userStyleSheetLoader;
   d->m_userStyleSheetLoader = 0;
   if (d->m_doc && d->m_doc->docLoader())
@@ -1632,7 +1632,7 @@ void Frame::reparseConfiguration() {
 
   DeprecatedString userStyleSheet = d->m_settings->userStyleSheet();
   if (!userStyleSheet.isEmpty())
-    setUserStyleSheet(KURL(userStyleSheet));
+    setUserStyleSheetLocation(KURL(userStyleSheet));
   else
     setUserStyleSheet(DeprecatedString());
 
