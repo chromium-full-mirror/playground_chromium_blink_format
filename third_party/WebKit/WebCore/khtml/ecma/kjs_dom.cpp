@@ -1227,10 +1227,8 @@ JSValue* DOMElement::attributeGetter(ExecState* exec,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   DOMElement* thisObj = static_cast<DOMElement*>(slot.slotBase());
-
-  Element* element = static_cast<Element*>(thisObj->impl());
-  WebCore::String attr = element->getAttribute(propertyName);
-  return jsStringOrNull(attr);
+  return jsStringOrNull(static_cast<Element*>(thisObj->impl())
+                            ->getAttributeNS(nullAtom, propertyName));
 }
 
 bool DOMElement::getOwnPropertySlot(ExecState* exec,
@@ -1255,12 +1253,11 @@ bool DOMElement::getOwnPropertySlot(ExecState* exec,
       static_cast<JSObject*>(proto)->hasProperty(exec, propertyName))
     return false;
 
-  Element& element = *static_cast<Element*>(impl());
-
   // FIXME: do we really want to do this attribute lookup thing? Mozilla doesn't
   // do it,
   // and it seems like it could interfere with XBL.
-  WebCore::String attr = element.getAttribute(propertyName);
+  WebCore::String attr =
+      static_cast<Element*>(impl())->getAttributeNS(nullAtom, propertyName);
   if (!attr.isNull()) {
     slot.setCustom(this, attributeGetter);
     return true;
