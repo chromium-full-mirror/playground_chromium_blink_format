@@ -1076,6 +1076,8 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   //
   // Step 1: Remove |blockElem| from its parent, doing a batch detach of all the
   // kids.
+  if (form)
+    form->setPreserveAcrossRemove(true);
   if (isBlockStillInTree)
     blockElem->parentNode()->removeChild(blockElem, ec);
 
@@ -1154,6 +1156,9 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   reopenResidualStyleTags(residualStyleStack,
                           0);  // FIXME: Deal with stray table content some day
                                // if it becomes necessary to do so.
+
+  if (form)
+    form->setPreserveAcrossRemove(false);
 }
 
 void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,

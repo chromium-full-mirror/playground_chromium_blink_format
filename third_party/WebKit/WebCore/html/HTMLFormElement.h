@@ -76,6 +76,9 @@ class HTMLFormElement : public HTMLElement {
   void setMalformed(bool malformed) { m_malformed = malformed; }
   virtual bool isMalformed() { return m_malformed; }
 
+  void setPreserveAcrossRemove(bool b) { m_preserveAcrossRemove = b; }
+  bool preserveAcrossRemove() const { return m_preserveAcrossRemove; }
+
   virtual bool isURLAttribute(Attribute* attr) const;
 
   void submitClick();
@@ -116,6 +119,7 @@ class HTMLFormElement : public HTMLElement {
   bool m_doingsubmit : 1;
   bool m_inreset : 1;
   bool m_malformed : 1;
+  bool m_preserveAcrossRemove : 1;
 
  private:
   void parseEnctype(const String&);
