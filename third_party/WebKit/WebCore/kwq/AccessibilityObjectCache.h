@@ -37,8 +37,6 @@ class WebCoreAXObject;
 class WebCoreTextMarker;
 #endif
 
-class DeprecatedString;
-
 namespace WebCore {
 class RenderObject;
 class VisiblePosition;
@@ -68,9 +66,9 @@ class AccessibilityObjectCache {
   void childrenChanged(WebCore::RenderObject* renderer);
 
   void postNotification(WebCore::RenderObject* renderer,
-                        const DeprecatedString& msg);
+                        const WebCore::String& msg);
   void postNotificationToTopWebArea(WebCore::RenderObject* renderer,
-                                    const DeprecatedString& msg);
+                                    const WebCore::String& msg);
   void handleFocusedUIElementChanged(void);
 
   static void enableAccessibility() { gAccessibilityEnabled = true; }

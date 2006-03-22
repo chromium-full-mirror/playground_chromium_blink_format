@@ -356,12 +356,10 @@ DeprecatedString createMarkup(const Range* range,
   doc->updateLayoutIgnorePendingStylesheets();
 
   Node* commonAncestorBlock = 0;
-  if (commonAncestor != 0) {
+  if (commonAncestor)
     commonAncestorBlock = commonAncestor->enclosingBlockFlowElement();
-  }
-  if (commonAncestorBlock == 0) {
+  if (!commonAncestorBlock)
     return "";
-  }
 
   DeprecatedStringList markups;
   Node* pastEnd = range->pastEndNode();
@@ -389,17 +387,15 @@ DeprecatedString createMarkup(const Range* range,
   for (Node* n = startNode; n != pastEnd; n = next) {
     next = n->traverseNextNode();
 
-    if (n->isBlockFlow() && next == pastEnd) {
+    if (n->isBlockFlow() && next == pastEnd)
       // Don't write out an empty block.
       continue;
-    }
 
     // Add the node to the markup.
     if (n->renderer()) {
       markups.append(startMarkup(n, range, annotate, defaultStyle.get()));
-      if (nodes) {
+      if (nodes)
         nodes->append(n);
-      }
     }
 
     if (n->firstChild() == 0) {
@@ -414,9 +410,8 @@ DeprecatedString createMarkup(const Range* range,
         if (!ancestorsToClose.isEmpty()) {
           // Close up the ancestors.
           while (Node* ancestor = ancestorsToClose.last()) {
-            if (next != pastEnd && ancestor == next->parentNode()) {
+            if (next != pastEnd && ancestor == next->parentNode())
               break;
-            }
             // Not at the end of the range, close ancestors up to sibling of
             // next node.
             markups.append(endMarkup(ancestor));
@@ -435,19 +430,17 @@ DeprecatedString createMarkup(const Range* range,
                 markups.prepend(
                     startMarkup(parent, range, annotate, defaultStyle.get()));
                 markups.append(endMarkup(parent));
-                if (nodes) {
+                if (nodes)
                   nodes->append(parent);
-                }
                 lastClosed = parent;
               }
             }
           }
         }
       }
-    } else if (n->renderer()) {
+    } else if (n->renderer())
       // Node is an ancestor, set it to close eventually.
       ancestorsToClose.append(n);
-    }
   }
 
   Node* rangeStartNode = range->startNode();
@@ -472,9 +465,8 @@ DeprecatedString createMarkup(const Range* range,
             ancestor->hasTagName(preTag) || ancestor->hasTagName(tableTag) ||
             ancestor->hasTagName(ulTag)) {
           breakAtEnd = true;
-        } else {
+        } else
           break;
-        }
       }
       markups.prepend(
           startMarkup(ancestor, range, annotate, defaultStyle.get()));
@@ -482,9 +474,8 @@ DeprecatedString createMarkup(const Range* range,
       if (nodes) {
         nodes->append(ancestor);
       }
-      if (breakAtEnd) {
+      if (breakAtEnd)
         break;
-      }
     }
   }
 
@@ -514,10 +505,9 @@ DeprecatedString createMarkup(const Range* range,
   return markups.join("");
 }
 
-PassRefPtr<DocumentFragment> createFragmentFromMarkup(
-    Document* document,
-    const DeprecatedString& markup,
-    const DeprecatedString& baseURL) {
+PassRefPtr<DocumentFragment> createFragmentFromMarkup(Document* document,
+                                                      const String& markup,
+                                                      const String& baseURL) {
   ASSERT(document->documentElement()->isHTMLElement());
   // FIXME: What if the document element is not an HTML element?
   HTMLElement* element = static_cast<HTMLElement*>(document->documentElement());
@@ -526,7 +516,7 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(
   ASSERT(fragment);
 
   if (!baseURL.isEmpty() && baseURL != document->baseURL())
-    completeURLs(fragment.get(), baseURL);
+    completeURLs(fragment.get(), baseURL.deprecatedString());
 
   return fragment.release();
 }
@@ -598,7 +588,7 @@ PassRefPtr<DocumentFragment> createFragmentFromText(
 
     // Break string into paragraphs. Extra line breaks turn into empty
     // paragraphs.
-    string.replace(DeprecatedString("\r\n"), "\n");
+    string.replace("\r\n", "\n");
     string.replace('\r', '\n');
     DeprecatedStringList list = DeprecatedStringList::split(
         '\n', string, true);  // true gets us empty strings in the list

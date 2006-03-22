@@ -77,10 +77,10 @@ class CSSStyleSelector : public StyleSelector {
    * goes through all StyleSheets defined in the document and
    * creates a list of rules it needs to apply to objects
    */
-  CSSStyleSelector(Document* doc,
-                   DeprecatedString userStyleSheet,
+  CSSStyleSelector(Document*,
+                   const String& userStyleSheet,
                    StyleSheetList* styleSheets,
-                   bool _strictParsing);
+                   bool strictParsing);
   /**
    * same as above but for a single stylesheet.
    */

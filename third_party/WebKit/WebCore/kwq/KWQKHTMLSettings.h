@@ -28,6 +28,7 @@
 
 #include "PlatformString.h"
 #include "Font.h"
+#include "KURL.h"
 
 class KHTMLSettings {
  public:
@@ -66,7 +67,7 @@ class KHTMLSettings {
 
   const DeprecatedString& encoding() const { return m_encoding; }
 
-  DeprecatedString userStyleSheet() const { return m_userStyleSheetLocation; }
+  KURL userStyleSheetLocation() const { return m_userStyleSheetLocation; }
   bool shouldPrintBackgrounds() const { return m_shouldPrintBackgrounds; }
   bool textAreasAreResizable() const { return m_textAreasAreResizable; }
 
@@ -98,7 +99,7 @@ class KHTMLSettings {
 
   void setEncoding(const DeprecatedString& s) { m_encoding = s; }
 
-  void setUserStyleSheet(const DeprecatedString& s) {
+  void setUserStyleSheetLocation(const KURL& s) {
     m_userStyleSheetLocation = s;
   }
   void setShouldPrintBackgrounds(bool f) { m_shouldPrintBackgrounds = f; }
@@ -114,8 +115,7 @@ class KHTMLSettings {
   DeprecatedString m_encoding;  // FIXME: TextEncoding takes a latin1 string,
                                 // which String & AtomicString don't easily
                                 // produce
-  DeprecatedString
-      m_userStyleSheetLocation;  // FIXME: KURLs still use DeprecatedString
+  KURL m_userStyleSheetLocation;
 
   int m_minimumFontSize;
   int m_minimumLogicalFontSize;

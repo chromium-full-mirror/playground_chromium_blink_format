@@ -208,7 +208,7 @@ static CSSStyleSelector::Encodedurl* currentEncodedURL = 0;
 static PseudoState pseudoState;
 
 CSSStyleSelector::CSSStyleSelector(Document* doc,
-                                   DeprecatedString userStyleSheet,
+                                   const String& userStyleSheet,
                                    StyleSheetList* styleSheets,
                                    bool _strictParsing) {
   init();
@@ -226,7 +226,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   // FIXME: This sucks! The user sheet is reparsed every time!
   if (!userStyleSheet.isEmpty()) {
     m_userSheet = new CSSStyleSheet(doc);
-    m_userSheet->parseString(String(userStyleSheet), strictParsing);
+    m_userSheet->parseString(userStyleSheet, strictParsing);
 
     m_userStyle = new CSSRuleSet();
     m_userStyle->addRulesFromSheet(m_userSheet, m_mediaType);

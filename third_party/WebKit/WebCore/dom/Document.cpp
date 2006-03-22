@@ -382,7 +382,7 @@ void Document::resetVisitedLinkColor() {
 }
 
 void Document::resetActiveLinkColor() {
-  m_activeLinkColor.setNamedColor(DeprecatedString("red"));
+  m_activeLinkColor.setNamedColor("red");
 }
 
 void Document::setDocType(PassRefPtr<DocumentType> docType) {
@@ -1333,7 +1333,7 @@ void Document::setStyleSheet(const String& url, const String& sheet) {
   updateStyleSelector();
 }
 
-void Document::setUserStyleSheet(const DeprecatedString& sheet) {
+void Document::setUserStyleSheet(const String& sheet) {
   if (m_usersheet != sheet) {
     m_usersheet = sheet;
     updateStyleSelector();
@@ -1590,8 +1590,7 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
     m_selectedStylesheetSet = content;
     m_preferredStylesheetSet = content;
     updateStyleSelector();
-  } else if (equalIgnoringCase(equiv, "refresh") &&
-             frame->metaRefreshEnabled()) {
+  } else if (equalIgnoringCase(equiv, "refresh")) {
     // get delay and url
     DeprecatedString str = content.deprecatedString().stripWhiteSpace();
     int pos = str.find(RegularExpression("[;,]"));
@@ -1636,8 +1635,8 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
     DeprecatedString str = content.deprecatedString().lower().stripWhiteSpace();
     KURL url = frame->url();
   } else if (equalIgnoringCase(equiv, "set-cookie")) {
-    // ### make setCookie work on XML documents too; e.g. in case of <html:meta
-    // .....>
+    // ### FIXME: make setCookie work on XML documents too; e.g. in case of
+    // <html:meta .....>
     if (isHTMLDocument())
       static_cast<HTMLDocument*>(this)->setCookie(content);
   }
@@ -1918,7 +1917,7 @@ void Document::recalcStyleSelector() {
 
   // Create a new style selector
   delete m_styleSelector;
-  DeprecatedString usersheet = m_usersheet;
+  String usersheet = m_usersheet;
   if (m_view && m_view->mediaType() == "print")
     usersheet += m_printSheet;
   m_styleSelector = new CSSStyleSelector(this, usersheet, m_styleSheets.get(),

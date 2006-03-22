@@ -41,6 +41,7 @@
 #include <qscrollbar.h>
 #include <DeprecatedStringList.h>
 #include <kxmlcore/Noncopyable.h>
+#include <kxmlcore/Vector.h>
 
 class KHTMLSettings;
 
@@ -138,16 +139,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * Returns true if plugins are enabled, false otherwise.
    */
   bool pluginsEnabled() const;
-
-  /**
-   * Enable/disable the automatic forwarding by <meta http-equiv="refresh" ....>
-   */
-  void setMetaRefreshEnabled(bool enable);
-
-  /**
-   * Returns @p true if automtaic forwarding is enabled.
-   */
-  bool metaRefreshEnabled() const;
 
   /**
    * Execute the specified snippet of JavaScript code.
@@ -279,22 +270,11 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   DeprecatedString encoding() const;
 
   /**
-   * Sets a user defined style sheet to be used on top of the HTML 4
-   * default style sheet.
-   *
-   * This gives a wide range of possibilities to
-   * change the layout of the page.
+   * Sets a user defined style sheet to be used on top of the HTML4,
+   * SVG and printing default style sheets.
    */
   void setUserStyleSheetLocation(const KURL& url);
-
-  /**
-   * Sets a user defined style sheet to be used on top of the HTML 4
-   * default style sheet.
-   *
-   * This gives a wide range of possibilities to
-   * change the layout of the page.
-   */
-  void setUserStyleSheet(const DeprecatedString& styleSheet);
+  void setUserStyleSheet(const String& styleSheetData);
 
   /**
    * Sets the standard font style.
@@ -630,8 +610,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
  protected:
   virtual Plugin* createPlugin(const KURL& url,
-                               const DeprecatedStringList& paramNames,
-                               const DeprecatedStringList& paramValues,
+                               const Vector<String>& paramNames,
+                               const Vector<String>& paramValues,
                                const String& mimeType) = 0;
   virtual Frame* createFrame(const KURL& url,
                              const String& name,
@@ -688,8 +668,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   bool loadPlugin(RenderPart* renderer,
                   const KURL& url,
                   const String& mimeType,
-                  const DeprecatedStringList& paramNames,
-                  const DeprecatedStringList& paramValues,
+                  const Vector<String>& paramNames,
+                  const Vector<String>& paramValues,
                   bool useFallback);
   Frame* loadSubframe(RenderPart* renderer,
                       const KURL& url,
@@ -708,8 +688,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                      const String& url,
                      const AtomicString& frameName,
                      const String& serviceType,
-                     const DeprecatedStringList& paramNames,
-                     const DeprecatedStringList& paramValues);
+                     const Vector<String>& paramNames,
+                     const Vector<String>& paramValues);
   bool requestFrame(RenderPart* frame,
                     const String& url,
                     const AtomicString& frameName);

@@ -204,7 +204,7 @@ void HTMLLinkElement::process() {
   if (!inDocument())
     return;
 
-  DeprecatedString type = m_type.deprecatedString().lower();
+  String type = m_type.lower();
 
   Frame* frame = getDocument()->frame();
 

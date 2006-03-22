@@ -43,6 +43,7 @@ namespace WebCore {
 class String {
  public:
   String() {}  // gives null string, distinguishable from an empty string
+  String(QChar c) : m_impl(new StringImpl(&c, 1)) {}
   String(const QChar*, unsigned length);
   String(const DeprecatedString&);
   String(const KJS::Identifier&);
@@ -87,6 +88,11 @@ class String {
   String& replace(QChar a, QChar b) {
     if (m_impl)
       m_impl = m_impl->replace(a, b);
+    return *this;
+  }
+  String& replace(QChar a, const String& b) {
+    if (m_impl)
+      m_impl = m_impl->replace(a, b.impl());
     return *this;
   }
 
@@ -146,6 +152,12 @@ class String {
 };
 
 String operator+(const String&, const String&);
+String operator+(const String&, const char*);
+String operator+(const char*, const String&);
+String operator+(const String&, QChar);
+String operator+(QChar, const String&);
+String operator+(const String&, char);
+String operator+(char, const String&);
 
 inline bool operator==(const String& a, const String& b) {
   return equal(a.impl(), b.impl());

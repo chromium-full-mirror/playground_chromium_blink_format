@@ -1630,9 +1630,8 @@ class RenderStyle {
     region.offset.bottom = b;
     region.offset.left = l;
     region.type = type;
-    if (!append) {
+    if (!append)
       css3NonInheritedData.access()->m_dashboardRegions.clear();
-    }
     css3NonInheritedData.access()->m_dashboardRegions.append(region);
   }
 

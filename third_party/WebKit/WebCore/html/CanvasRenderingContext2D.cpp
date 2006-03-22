@@ -253,8 +253,7 @@ void CanvasRenderingContext2D::setGlobalCompositeOperation(
 
 // FIXME: Do this through platform-independent GraphicsContext API.
 #if __APPLE__
-  GraphicsContext::setCompositeOperation(drawingContext(),
-                                         operation.deprecatedString());
+  GraphicsContext::setCompositeOperation(drawingContext(), operation);
 #endif
 }
 

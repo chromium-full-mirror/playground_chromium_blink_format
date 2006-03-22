@@ -43,8 +43,8 @@ PassRefPtr<WebCore::DocumentFragment> createFragmentFromText(
     const DeprecatedString& text);
 PassRefPtr<WebCore::DocumentFragment> createFragmentFromMarkup(
     WebCore::Document* document,
-    const DeprecatedString& markup,
-    const DeprecatedString& baseURL);
+    const String& markup,
+    const String& baseURL);
 PassRefPtr<WebCore::DocumentFragment> createFragmentFromNodeList(
     WebCore::Document* document,
     const DeprecatedPtrList<WebCore::Node>& nodeList);

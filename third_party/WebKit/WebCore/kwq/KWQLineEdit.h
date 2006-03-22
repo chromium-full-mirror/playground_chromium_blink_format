@@ -23,11 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QLINEEDIT_H_
-#define QLINEEDIT_H_
+#ifndef QLineEdit_H
+#define QLineEdit_H
 
 #include "PlatformString.h"
-#include "DeprecatedString.h"
 #include "TextDirection.h"
 #include "Widget.h"
 
@@ -77,7 +76,7 @@ class QLineEdit : public Widget {
   bool hasSelectedText() const;
 
   int selectionStart() const;
-  DeprecatedString selectedText() const;
+  WebCore::String selectedText() const;
   void setSelection(int, int);
 
   IntSize sizeForCharacterWidth(int numCharacters) const;

@@ -666,9 +666,8 @@ void RenderSelect::updateFromElement() {
           static_cast<QComboBox*>(m_widget)->appendItem(
               itemText, groupEnabled && optionElement->isEnabled());
       } else if (listItems[listIndex]->hasTagName(hrTag)) {
-        if (!m_useListBox) {
+        if (!m_useListBox)
           static_cast<QComboBox*>(m_widget)->appendSeparator();
-        }
       } else
         KHTMLAssert(false);
       m_selectionChanged = true;
