@@ -919,6 +919,13 @@ int Node::nextOffset(int current) const {
   return renderer() ? renderer()->nextOffset(current) : current + 1;
 }
 
+Node* Node::shadowAncestorNode() {
+  Node* n = rootEditableElement();
+  if (n && n->isShadowNode())
+    return n->shadowParentNode();
+  return this;
+}
+
 bool Node::isBlockFlow() const {
   return renderer() && renderer()->isBlockFlow();
 }

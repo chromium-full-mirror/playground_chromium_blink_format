@@ -37,6 +37,7 @@ class HTMLTextFieldInnerElement : public HTMLDivElement {
   HTMLTextFieldInnerElement(Document*, Node* shadowParent = 0);
 
   virtual void defaultEventHandler(Event*);
+  virtual bool isShadowNode() const { return true; }
 
   Node* shadowParentNode() { return m_shadowParent; }
   void setShadowParentNode(Node* node) { m_shadowParent = node; }

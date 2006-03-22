@@ -215,4 +215,8 @@ void RenderTextField::calcMinMaxWidth() {
                             paddingRight() + borderLeft() + borderRight();
   setMinMaxKnown();
 }
+
+void RenderTextField::forwardEvent(Event* evt) {
+  m_div->defaultEventHandler(evt);
+}
 }

@@ -718,6 +718,8 @@ bool FrameView::updateDragAndDrop(const PlatformMouseEvent& event,
   Node* newTarget = mev.innerNode();
   if (newTarget && newTarget->isTextNode())
     newTarget = newTarget->parentNode();
+  if (newTarget)
+    newTarget = newTarget->shadowAncestorNode();
 
   if (d->dragTarget != newTarget) {
     // note this ordering is explicitly chosen to match WinIE
@@ -971,6 +973,8 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   // rdar://4196646
   if (targetNode && targetNode->isTextNode())
     targetNode = targetNode->parentNode();
+  if (targetNode)
+    targetNode = targetNode->shadowAncestorNode();
   d->underMouse = targetNode;
 
   // mouseout/mouseover
@@ -1051,6 +1055,7 @@ void FrameView::handleWheelEvent(PlatformWheelEvent& e) {
         return;
       }
       if (node) {
+        node = node->shadowAncestorNode();
         EventTargetNodeCast(node)->dispatchWheelEvent(e);
         if (e.isAccepted())
           return;

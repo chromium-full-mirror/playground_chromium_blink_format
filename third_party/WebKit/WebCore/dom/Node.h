@@ -150,6 +150,9 @@ class Node : public TreeShared<Node> {
   virtual bool isCommentNode() const { return false; }
   virtual bool isDocumentNode() const { return false; }
   virtual bool isEventTargetNode() const { return false; }
+  virtual bool isShadowNode() const { return false; }
+  virtual Node* shadowParentNode() { return 0; }
+  Node* shadowAncestorNode();
   bool isBlockFlow() const;
   bool isBlockFlowOrBlockTable() const;
 
