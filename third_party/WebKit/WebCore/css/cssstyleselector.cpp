@@ -4204,15 +4204,14 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         Length right = convertToLength(region->right(), style);
         Length bottom = convertToLength(region->bottom(), style);
         Length left = convertToLength(region->left(), style);
-        if (region->m_isCircle) {
+        if (region->m_isCircle)
           style->setDashboardRegion(StyleDashboardRegion::Circle,
                                     region->m_label, top, right, bottom, left,
                                     region == first ? false : true);
-        } else if (region->m_isRectangle) {
+        else if (region->m_isRectangle)
           style->setDashboardRegion(StyleDashboardRegion::Rectangle,
                                     region->m_label, top, right, bottom, left,
                                     region == first ? false : true);
-        }
         region = region->m_next.get();
       }
 

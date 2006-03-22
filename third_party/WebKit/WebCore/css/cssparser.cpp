@@ -676,7 +676,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_THIN || id == CSS_VAL_MEDIUM || id == CSS_VAL_THICK)
         valid_primitive = true;
       else
-        valid_primitive = (validUnit(value, FLength, strict));
+        valid_primitive = validUnit(value, FLength, strict);
       break;
 
     case CSS_PROP_LETTER_SPACING:  // normal | <length> | inherit
@@ -793,7 +793,6 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
 
     case CSS_PROP_Z_INDEX:  // auto | <integer> | inherit
-      // qDebug("parsing z-index: id=%d, fValue=%f", id, value->fValue );
       if (id == CSS_VAL_AUTO) {
         valid_primitive = true;
         break;
@@ -843,14 +842,11 @@ bool CSSParser::parseValue(int propId, bool important) {
           }
           value = valueList->next();
         }
-        // kdDebug( 6080 ) << "got " << list->length() << "d decorations" <<
-        // endl;
         if (list->length() && is_valid) {
           parsedValue = list;
           valueList->next();
-        } else {
+        } else
           delete list;
-        }
       }
       break;
 
@@ -1229,23 +1225,18 @@ bool CSSParser::parseValue(int propId, bool important) {
   }
 
   if (valid_primitive) {
-    if (id != 0) {
-      // qDebug(" new value: id=%d", id );
+    if (id != 0)
       parsedValue = new CSSPrimitiveValue(id);
-    } else if (value->unit == CSSPrimitiveValue::CSS_STRING)
+    else if (value->unit == CSSPrimitiveValue::CSS_STRING)
       parsedValue = new CSSPrimitiveValue(
           domString(value->string), (CSSPrimitiveValue::UnitTypes)value->unit);
     else if (value->unit >= CSSPrimitiveValue::CSS_NUMBER &&
-             value->unit <= CSSPrimitiveValue::CSS_KHZ) {
-      // qDebug(" new value: value=%.2f, unit=%d", value->fValue, value->unit );
+             value->unit <= CSSPrimitiveValue::CSS_KHZ)
       parsedValue = new CSSPrimitiveValue(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
-    } else if (value->unit >= Value::Q_EMS) {
-      // qDebug(" new quirks value: value=%.2f, unit=%d", value->fValue,
-      // value->unit );
+    else if (value->unit >= Value::Q_EMS)
       parsedValue =
           new CSSQuirkPrimitiveValue(value->fValue, CSSPrimitiveValue::CSS_EMS);
-    }
     valueList->next();
   }
   if (parsedValue) {
@@ -1507,7 +1498,7 @@ bool CSSParser::parseContent(int propId, bool important) {
     } else if (val->unit == Value::Function) {
       // attr(X)
       ValueList* args = val->function->args;
-      DeprecatedString fname = qString(val->function->name).lower();
+      String fname = domString(val->function->name).lower();
       if (fname != "attr(" || !args)
         return false;
       if (args->size() != 1)
@@ -1846,7 +1837,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
       break;
     }
 
-    DeprecatedString fname = qString(value->function->name).lower();
+    String fname = domString(value->function->name).lower();
     if (fname != "dashboard-region(") {
       valid = false;
       break;
@@ -1859,7 +1850,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
       break;
     }
 
-    region->m_label = qString(arg->string);
+    region->m_label = domString(arg->string);
 
     // Second arg is a type.
     arg = args->next();
@@ -1869,7 +1860,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
       break;
     }
 
-    DeprecatedString geometryType = qString(arg->string).lower();
+    String geometryType = domString(arg->string).lower();
     if (geometryType == "circle")
       region->m_isCircle = true;
     else if (geometryType == "rectangle")
@@ -1879,7 +1870,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
       break;
     }
 
-    region->m_geometryType = qString(arg->string);
+    region->m_geometryType = domString(arg->string);
 
     if (numArgs == DASHBOARD_REGION_SHORT_NUM_PARAMETERS ||
         numArgs == (DASHBOARD_REGION_SHORT_NUM_PARAMETERS * 2 - 1)) {
@@ -1935,11 +1926,11 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 bool CSSParser::parseShape(int propId, bool important) {
   Value* value = valueList->current();
   ValueList* args = value->function->args;
-  DeprecatedString fname = qString(value->function->name).lower();
+  String fname = domString(value->function->name).lower();
   if (fname != "rect(" || !args)
     return false;
 
-  // rect( t, r, b, l ) || rect( t r b l )
+  // rect(t, r, b, l) || rect(t r b l)
   if (args->size() != 4 && args->size() != 7)
     return false;
   RectImpl* rect = new RectImpl();
@@ -1997,7 +1988,7 @@ bool CSSParser::parseFont(bool important) {
         // do nothing, it's the inital value for all three
       }
       /*
-        else if ( id == CSS_VAL_INHERIT ) {
+        else if (id == CSS_VAL_INHERIT) {
         // set all non set ones to inherit
         // This is not that simple as the inherit could also apply to the
         following font-size.
@@ -2063,22 +2054,16 @@ bool CSSParser::parseFont(bool important) {
   if (!font->weight)
     font->weight = new CSSPrimitiveValue(CSS_VAL_NORMAL);
 
-  //     kdDebug( 6080 ) << "  got style, variant and weight current=" <<
-  //     valueList->currentValue << endl;
-
   // now a font size _must_ come
   // <absolute-size> | <relative-size> | <length> | <percentage> | inherit
   if (value->id >= CSS_VAL_XX_SMALL && value->id <= CSS_VAL_LARGER)
     font->size = new CSSPrimitiveValue(value->id);
-  else if (validUnit(value, FLength | FPercent, strict)) {
+  else if (validUnit(value, FLength | FPercent, strict))
     font->size = new CSSPrimitiveValue(
         value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
-  }
   value = valueList->next();
   if (!font->size || !value)
     goto invalid;
-
-  // kdDebug( 6080 ) << "  got size" << endl;
 
   if (value->unit == Value::Operator && value->iValue == '/') {
     // line-height
@@ -2087,12 +2072,11 @@ bool CSSParser::parseFont(bool important) {
       goto invalid;
     if (value->id == CSS_VAL_NORMAL) {
       // default value, nothing to do
-    } else if (validUnit(value, FNumber | FLength | FPercent, strict)) {
+    } else if (validUnit(value, FNumber | FLength | FPercent, strict))
       font->lineHeight = new CSSPrimitiveValue(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
-    } else {
+    else
       goto invalid;
-    }
     value = valueList->next();
     if (!value)
       goto invalid;
@@ -2101,27 +2085,21 @@ bool CSSParser::parseFont(bool important) {
   if (!font->lineHeight)
     font->lineHeight = new CSSPrimitiveValue(CSS_VAL_NORMAL);
 
-  //     kdDebug( 6080 ) << "  got line height current=" <<
-  //     valueList->currentValue << endl;
   // font family must come now
   font->family = parseFontFamily();
 
   if (valueList->current() || !font->family)
     goto invalid;
-  //     kdDebug( 6080 ) << "  got family, parsing ok!" << endl;
 
   addProperty(CSS_PROP_FONT, font, important);
   return true;
 
 invalid:
-  //     kdDebug(6080) << "   -> invalid" << endl;
   delete font;
   return false;
 }
 
 CSSValueList* CSSParser::parseFontFamily() {
-  //     kdDebug( 6080 ) << "CSSParser::parseFontFamily current=" <<
-  //     valueList->currentValue << endl;
   CSSValueList* list = new CSSValueList;
   Value* value = valueList->current();
   FontFamilyValue* currFamily = 0;
@@ -2139,23 +2117,25 @@ CSSValueList* CSSParser::parseFontFamily() {
     if (value->id >= CSS_VAL_SERIF && value->id <= CSS_VAL__KHTML_BODY) {
       if (currFamily) {
         currFamily->parsedFontName += ' ';
-        currFamily->parsedFontName += qString(value->string);
+        currFamily->parsedFontName += deprecatedString(value->string);
       } else if (nextValBreaksFont || !nextValIsFontName)
         list->append(new CSSPrimitiveValue(value->id));
       else
-        list->append(currFamily = new FontFamilyValue(qString(value->string)));
+        list->append(currFamily =
+                         new FontFamilyValue(deprecatedString(value->string)));
     } else if (value->unit == CSSPrimitiveValue::CSS_STRING) {
       // Strings never share in a family name.
       currFamily = 0;
-      list->append(new FontFamilyValue(qString(value->string)));
+      list->append(new FontFamilyValue(deprecatedString(value->string)));
     } else if (value->unit == CSSPrimitiveValue::CSS_IDENT) {
       if (currFamily) {
         currFamily->parsedFontName += ' ';
-        currFamily->parsedFontName += qString(value->string);
+        currFamily->parsedFontName += deprecatedString(value->string);
       } else if (nextValBreaksFont || !nextValIsFontName)
-        list->append(new FontFamilyValue(qString(value->string)));
+        list->append(new FontFamilyValue(deprecatedString(value->string)));
       else
-        list->append(currFamily = new FontFamilyValue(qString(value->string)));
+        list->append(currFamily =
+                         new FontFamilyValue(deprecatedString(value->string)));
     } else {
       break;
     }
@@ -2228,11 +2208,11 @@ CSSPrimitiveValue* CSSParser::parseColorFromValue(Value* value) {
   } else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR ||
              value->unit == CSSPrimitiveValue::CSS_IDENT ||
              (!strict && value->unit == CSSPrimitiveValue::CSS_DIMENSION)) {
-    if (!CSSParser::parseColor(qString(value->string), c))
+    if (!CSSParser::parseColor(deprecatedString(value->string), c))
       return 0;
   } else if (value->unit == Value::Function && value->function->args != 0 &&
              value->function->args->size() == 5 /* rgb + two commas */ &&
-             qString(value->function->name).lower() == "rgb(") {
+             domString(value->function->name).lower() == "rgb(") {
     ValueList* args = value->function->args;
     Value* v = args->current();
     if (!validUnit(v, FInteger | FPercent, true))
@@ -2264,7 +2244,7 @@ CSSPrimitiveValue* CSSParser::parseColorFromValue(Value* value) {
     c = makeRGB(r, g, b);
   } else if (value->unit == Value::Function && value->function->args != 0 &&
              value->function->args->size() == 7 /* rgba + three commas */ &&
-             qString(value->function->name).lower() == "rgba(") {
+             domString(value->function->name).lower() == "rgba(") {
     ValueList* args = value->function->args;
     Value* v = args->current();
     if (!validUnit(v, FInteger | FPercent, true))
@@ -2761,8 +2741,6 @@ int CSSParser::lex(void* _yylval) {
       length--;
     case NUMBER:
       yylval->val = DeprecatedString((QChar*)t, length).toDouble();
-      // qDebug("value = %s, converted=%.2f", DeprecatedString( (QChar *)t,
-      // length ).latin1(), yylval->val );
       break;
 
     default:

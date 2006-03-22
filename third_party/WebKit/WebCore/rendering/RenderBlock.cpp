@@ -1271,8 +1271,6 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 
 void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
   if (m_positionedObjects) {
-    // kdDebug( 6040 ) << renderName() << " " << this <<
-    // "::layoutPositionedObjects() start" << endl;
     RenderObject* r;
     DeprecatedPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
@@ -2098,8 +2096,6 @@ void RenderBlock::positionNewFloats() {
     int ro = rightOffset();  // Constant part of right offset.
     int lo = leftOffset();   // Constat part of left offset.
     int fwidth = f->width;   // The width we look for.
-    // kdDebug( 6040 ) << " Object width: " << fwidth << " available width: " <<
-    // ro - lo << endl;
     if (ro - lo < fwidth)
       fwidth = ro - lo;  // Never look for more than what will be available.
 
@@ -2123,8 +2119,6 @@ void RenderBlock::positionNewFloats() {
       if (fx < 0)
         fx = 0;
       f->left = fx;
-      // kdDebug( 6040 ) << "positioning left aligned float at (" << fx +
-      // o->marginLeft()  << "/" << y + o->marginTop() << ") fx=" << fx << endl;
       o->setPos(fx + o->marginLeft(), y + o->marginTop());
     } else {
       int heightRemainingLeft = 1;
@@ -2137,9 +2131,6 @@ void RenderBlock::positionNewFloats() {
       if (fx < f->width)
         fx = f->width;
       f->left = fx - f->width;
-      // kdDebug( 6040 ) << "positioning right aligned float at (" << fx -
-      // o->marginRight() - o->width() << "/" << y + o->marginTop() << ")" <<
-      // endl;
       o->setPos(fx - o->marginRight() - o->width(), y + o->marginTop());
     }
     f->startY = y;
@@ -2148,9 +2139,6 @@ void RenderBlock::positionNewFloats() {
     // If the child moved, we have to repaint it.
     if (o->checkForRepaintDuringLayout())
       o->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
-
-    // kdDebug( 6040 ) << "floatingObject x/y= (" << f->left << "/" << f->startY
-    // << "-" << f->width << "/" << f->endY - f->startY << ")" << endl;
 
     f = m_floatingObjects->next();
   }
@@ -2172,10 +2160,8 @@ void RenderBlock::newLine() {
     default:
       break;
   }
-  if (m_height < newY) {
-    //      kdDebug( 6040 ) << "adjusting y position" << endl;
+  if (m_height < newY)
     m_height = newY;
-  }
   m_clearStatus = CNONE;
 }
 

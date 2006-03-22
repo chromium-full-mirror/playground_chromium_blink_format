@@ -839,7 +839,6 @@ int AutoTableLayout::calcEffectiveWidth() {
   }
   effWidthDirty = false;
 
-  //     qDebug("calcEffectiveWidth: tMaxWidth=%d",  tMaxWidth );
   return tMaxWidth;
 }
 
@@ -850,7 +849,6 @@ void AutoTableLayout::insertSpanCell(RenderTableCell* cell) {
   if (!cell || cell->colSpan() == 1)
     return;
 
-  //     qDebug("inserting span cell %p with span %d", cell, cell->colSpan() );
   int size = spanCells.size();
   if (!size || spanCells[size - 1] != 0) {
     spanCells.resize(size + 10);
@@ -964,8 +962,6 @@ void AutoTableLayout::layout() {
           int newWidth = kMax(int(layoutStruct[i].effMinWidth), w - reduction);
           available += w - newWidth;
           layoutStruct[i].calcWidth = newWidth;
-          // qDebug("col %d: reducing to %d px (reduction=%d)", i, newWidth,
-          // reduction );
         }
       }
     }
@@ -1004,8 +1000,6 @@ void AutoTableLayout::layout() {
   // now satisfy variable
   if (available > 0 && numAuto) {
     available += allocAuto;  // this gets redistributed
-    // qDebug("redistributing %dpx to %d variable columns. totalAuto=%d",
-    // available,  numAuto,  totalAuto );
     for (int i = 0; i < nEffCols; i++) {
       Length& width = layoutStruct[i].effWidth;
       if (width.isAuto() && totalAuto != 0) {
@@ -1179,8 +1173,6 @@ void AutoTableLayout::layout() {
     }
   }
 
-  // qDebug( "    final available=%d", available );
-
   int pos = 0;
   for (int i = 0; i < nEffCols; i++) {
 #ifdef DEBUG_LAYOUT
@@ -1194,7 +1186,7 @@ void AutoTableLayout::layout() {
 
 void AutoTableLayout::calcPercentages() const {
   total_percent = 0;
-  for (unsigned int i = 0; i < layoutStruct.size(); i++) {
+  for (unsigned i = 0; i < layoutStruct.size(); i++) {
     if (layoutStruct[i].width.isPercent())
       total_percent += layoutStruct[i].width.value();
   }

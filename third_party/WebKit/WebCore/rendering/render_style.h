@@ -372,7 +372,7 @@ class StyleBoxData : public Shared<StyleBoxData> {
 // Dashboard region attributes. Not inherited.
 
 struct StyleDashboardRegion {
-  DeprecatedString label;
+  String label;
   LengthBox offset;
   int type;
 
@@ -1617,7 +1617,7 @@ class RenderStyle {
     SET_VAR(css3NonInheritedData, m_dashboardRegions, regions);
   }
   void setDashboardRegion(int type,
-                          DeprecatedString label,
+                          const String& label,
                           Length t,
                           Length r,
                           Length b,

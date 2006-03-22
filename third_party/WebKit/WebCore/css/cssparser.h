@@ -72,7 +72,7 @@ struct Value {
   int unit;
 };
 
-static inline DeprecatedString qString(const ParseString& ps) {
+static inline DeprecatedString deprecatedString(const ParseString& ps) {
   return DeprecatedString((QChar*)ps.string, ps.length);
 }
 static inline String domString(const ParseString& ps) {

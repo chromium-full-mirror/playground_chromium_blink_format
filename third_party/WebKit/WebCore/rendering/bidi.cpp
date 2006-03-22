@@ -1058,7 +1058,6 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   while (true) {
     QChar::Direction dirCurrent;
     if (pastEnd && (previousLineBrokeCleanly || bidi.current.atEnd())) {
-      // kdDebug(6041) << "atEnd" << endl;
       BidiContext* c = bidi.context.get();
       while (c->parent)
         c = c->parent;
@@ -1828,9 +1827,6 @@ IntRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 #if BIDI_DEBUG > 1
   kdDebug(6041) << " ------- bidi end " << this << " -------" << endl;
 #endif
-  // kdDebug() << "RenderBlock::layoutInlineChildren time used " << qt.elapsed()
-  // << endl;
-  // kdDebug(6040) << "height = " << m_height <<endl;
 }
 
 RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
