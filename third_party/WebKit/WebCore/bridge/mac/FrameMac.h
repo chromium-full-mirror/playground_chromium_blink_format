@@ -333,7 +333,6 @@ class FrameMac : public Frame {
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
-  virtual void redirectionTimerFired(Timer<Frame>*);
 
  private:
   virtual void handleMousePressEvent(const MouseEventWithHitTestResults&);
