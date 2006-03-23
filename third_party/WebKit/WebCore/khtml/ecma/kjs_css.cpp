@@ -299,6 +299,11 @@ const ClassInfo DOMStyleSheet::info = {"StyleSheet", 0, &DOMStyleSheetTable, 0};
 @end
 */
 
+DOMStyleSheet::DOMStyleSheet(ExecState*, WebCore::StyleSheet* ss)
+    : m_impl(ss) {}
+
+DOMStyleSheet::DOMStyleSheet(WebCore::StyleSheet* ss) : m_impl(ss) {}
+
 DOMStyleSheet::~DOMStyleSheet() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
@@ -372,6 +377,11 @@ const ClassInfo DOMStyleSheetList::info = {"StyleSheetList", 0,
 */
 KJS_IMPLEMENT_PROTOFUNC(
     DOMStyleSheetListFunc)  // not really a proto, but doesn't matter
+
+DOMStyleSheetList::DOMStyleSheetList(ExecState*,
+                                     WebCore::StyleSheetList* ssl,
+                                     WebCore::Document* doc)
+    : m_impl(ssl), m_doc(doc) {}
 
 DOMStyleSheetList::~DOMStyleSheetList() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -680,6 +690,9 @@ const ClassInfo DOMCSSRuleList::info = {"CSSRuleList", 0, &DOMCSSRuleListTable,
 KJS_IMPLEMENT_PROTOFUNC(
     DOMCSSRuleListFunc)  // not really a proto, but doesn't matter
 
+DOMCSSRuleList::DOMCSSRuleList(ExecState*, WebCore::CSSRuleList* rl)
+    : m_impl(rl) {}
+
 DOMCSSRuleList::~DOMCSSRuleList() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
@@ -750,6 +763,8 @@ JSValue* toJS(ExecState* exec, CSSRuleList* rl) {
 // -------------------------------------------------------------------------
 
 KJS_IMPLEMENT_PROTOFUNC(DOMCSSRuleFunc)  // Not a proto, but doesn't matter
+
+DOMCSSRule::DOMCSSRule(ExecState*, WebCore::CSSRule* r) : m_impl(r) {}
 
 DOMCSSRule::~DOMCSSRule() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());

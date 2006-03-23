@@ -59,6 +59,8 @@ Range::Range(Document* ownerDocument,
       m_endOffset(endOffset),
       m_detached(false) {}
 
+Range::~Range() {}
+
 Node* Range::startContainer(ExceptionCode& ec) const {
   if (m_detached) {
     ec = INVALID_STATE_ERR;

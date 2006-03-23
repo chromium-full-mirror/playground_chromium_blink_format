@@ -21,25 +21,39 @@
 
 namespace WebCore {
 
-    class CanvasRenderingContext2D;
+class CanvasRenderingContext2D;
 
-    KJS_DEFINE_PROTOTYPE(JSCanvasRenderingContext2DBaseProto)
+KJS_DEFINE_PROTOTYPE(JSCanvasRenderingContext2DBaseProto)
 
-    class JSCanvasRenderingContext2DBase : public KJS::DOMObject {
-    public:
-        JSCanvasRenderingContext2DBase(KJS::ExecState*, PassRefPtr<CanvasRenderingContext2D>);
-        virtual ~JSCanvasRenderingContext2DBase();
-        virtual bool getOwnPropertySlot(KJS::ExecState*, const KJS::Identifier&, KJS::PropertySlot&);
-        KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
-        virtual void put(KJS::ExecState*, const KJS::Identifier&, KJS::JSValue*, int attr = KJS::None);
-        void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*, int attr);
-        virtual const KJS::ClassInfo* classInfo() const { return &info; }
-        static const KJS::ClassInfo info;
-        enum { StrokeStyle, FillStyle };
-        enum { SetStrokeColor, SetFillColor, StrokeRect, DrawImage, DrawImageFromRect, SetShadow, CreatePattern };
-        CanvasRenderingContext2D* impl() const { return m_impl.get(); }
-    private:
-        RefPtr<CanvasRenderingContext2D> m_impl;
-    };
+class JSCanvasRenderingContext2DBase : public KJS::DOMObject {
+ public:
+  JSCanvasRenderingContext2DBase(KJS::ExecState*,
+                                 PassRefPtr<CanvasRenderingContext2D>);
+  virtual ~JSCanvasRenderingContext2DBase();
+  virtual bool getOwnPropertySlot(KJS::ExecState*,
+                                  const KJS::Identifier&,
+                                  KJS::PropertySlot&);
+  KJS::JSValue* getValueProperty(KJS::ExecState*, int token) const;
+  virtual void put(KJS::ExecState*,
+                   const KJS::Identifier&,
+                   KJS::JSValue*,
+                   int attr = KJS::None);
+  void putValueProperty(KJS::ExecState*, int token, KJS::JSValue*, int attr);
+  virtual const KJS::ClassInfo* classInfo() const { return &info; }
+  static const KJS::ClassInfo info;
+  enum { StrokeStyle, FillStyle };
+  enum {
+    SetStrokeColor,
+    SetFillColor,
+    StrokeRect,
+    DrawImage,
+    DrawImageFromRect,
+    SetShadow,
+    CreatePattern
+  };
+  CanvasRenderingContext2D* impl() const { return m_impl.get(); }
 
+ private:
+  RefPtr<CanvasRenderingContext2D> m_impl;
+};
 }

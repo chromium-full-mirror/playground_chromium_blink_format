@@ -61,6 +61,7 @@ class Range : public Shared<Range> {
         int startOffset,
         Node* endContainer,
         int endOffset);
+  ~Range();
 
   Node* startContainer(ExceptionCode&) const;
   int startOffset(ExceptionCode&) const;
