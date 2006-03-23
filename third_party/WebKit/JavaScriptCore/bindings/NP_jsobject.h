@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,10 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _NP_JSOBJECT_H
-#define _NP_JSOBJECT_H
+#ifndef NP_JSOBJECT_H
+#define NP_JSOBJECT_H
 
-#include <JavaScriptCore/npruntime.h>
+#include "npruntime.h"
 
 namespace KJS {
 class JSObject;
@@ -46,7 +46,7 @@ struct JavaScriptObject {
 
 NPObject* _NPN_CreateScriptObject(
     NPP npp,
-    KJS::JSObject* imp,
+    KJS::JSObject*,
     const KJS::Bindings::RootObject* originExecutionContext,
     const KJS::Bindings::RootObject* executionContext);
 NPObject* _NPN_CreateNoScriptObject(void);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,14 +22,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
-#include <c_class.h>
-#include <c_instance.h>
-#include <c_runtime.h>
+#include "c_class.h"
 
-using namespace KJS::Bindings;
+#include "c_instance.h"
+#include "c_runtime.h"
+#include "npruntime_impl.h"
 
-bool NPN_IsValidIdentifier(const NPUTF8* name);
+// FIXME: Should use HashMap instead of CFDictionary for better performance and
+// for portability.
+
+namespace KJS {
+namespace Bindings {
 
 CClass::CClass(NPClass* aClass) {
   _isa = aClass;
@@ -40,22 +45,18 @@ CClass::CClass(NPClass* aClass) {
 }
 
 CClass::~CClass() {
-  CFRelease(_fields);
   CFRelease(_methods);
+  CFRelease(_fields);
 }
 
 static CFMutableDictionaryRef classesByIsA = 0;
 
-static void _createClassesByIsAIfNecessary() {
-  if (classesByIsA == 0)
-    classesByIsA = CFDictionaryCreateMutable(NULL, 0, NULL, NULL);
-}
-
 CClass* CClass::classForIsA(NPClass* isa) {
-  _createClassesByIsAIfNecessary();
+  if (!classesByIsA)
+    classesByIsA = CFDictionaryCreateMutable(NULL, 0, NULL, NULL);
 
   CClass* aClass = (CClass*)CFDictionaryGetValue(classesByIsA, isa);
-  if (aClass == NULL) {
+  if (!aClass) {
     aClass = new CClass(isa);
     CFDictionaryAddValue(classesByIsA, isa, aClass);
   }
@@ -85,12 +86,11 @@ MethodList CClass::methodsNamed(const char* _name, Instance* instance) const {
   if (_isa->hasMethod && _isa->hasMethod(obj, ident)) {
     Method* aMethod =
         new CMethod(ident);  // deleted when the dictionary is destroyed
-    CFDictionaryAddValue((CFMutableDictionaryRef)_methods, methodName, aMethod);
+    CFDictionaryAddValue(_methods, methodName, aMethod);
     methodList.addMethod(aMethod);
   }
 
   CFRelease(methodName);
-
   return methodList;
 }
 
@@ -108,10 +108,11 @@ Field* CClass::fieldNamed(const char* name, Instance* instance) const {
   NPObject* obj = inst->getObject();
   if (_isa->hasProperty && _isa->hasProperty(obj, ident)) {
     aField = new CField(ident);  // deleted when the dictionary is destroyed
-    CFDictionaryAddValue((CFMutableDictionaryRef)_fields, fieldName, aField);
+    CFDictionaryAddValue(_fields, fieldName, aField);
   }
 
   CFRelease(fieldName);
-
   return aField;
-};
+}
+}
+}
