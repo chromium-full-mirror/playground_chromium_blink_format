@@ -610,6 +610,7 @@ bool Element::childTypeAllowed(NodeType type) {
 }
 
 void Element::dispatchAttrRemovalEvent(Attribute*) {
+  assert(!eventDispatchForbidden());
 #if 0
     if (!getDocument()->hasListenerType(Document::DOMATTRMODIFIED_LISTENER))
         return;
@@ -620,6 +621,7 @@ void Element::dispatchAttrRemovalEvent(Attribute*) {
 }
 
 void Element::dispatchAttrAdditionEvent(Attribute* attr) {
+  assert(!eventDispatchForbidden());
 #if 0
     if (!getDocument()->hasListenerType(Document::DOMATTRMODIFIED_LISTENER))
         return;
@@ -1020,10 +1022,9 @@ NamedAttrMap& NamedAttrMap::operator=(const NamedAttrMap& other) {
   Attribute* oldId = getAttributeItem(idAttr);
   Attribute* newId = other.getAttributeItem(idAttr);
 
-  if (oldId || newId) {
+  if (oldId || newId)
     element->updateId(oldId ? oldId->value() : nullAtom,
                       newId ? newId->value() : nullAtom);
-  }
 
   clearAttributes();
   len = other.len;
@@ -1072,8 +1073,12 @@ void NamedAttrMap::addAttribute(Attribute* attribute) {
   if (element) {
     RefPtr<Attribute> a = attribute;
     element->attributeChanged(a.get());
-    element->dispatchAttrAdditionEvent(a.get());
-    element->dispatchSubtreeModifiedEvent(false);
+    // Because of our updateStyleAttributeIfNeeded() style modification events
+    // are never sent at the right time, so don't bother sending them.
+    if (a->name() != styleAttr) {
+      element->dispatchAttrAdditionEvent(a.get());
+      element->dispatchSubtreeModifiedEvent(false);
+    }
   }
 }
 
