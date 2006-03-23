@@ -149,7 +149,7 @@ extern NSString* WebPageCacheDocumentViewKey;
                    fireDate:(NSDate*)date
                 lockHistory:(BOOL)lockHistory
      isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
-- (void)_clientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
+- (void)_clientRedirectCancelledOrFinished:(BOOL)cancelWithLoadInProgress;
 
 - (void)_defersCallbacksChanged;
 
