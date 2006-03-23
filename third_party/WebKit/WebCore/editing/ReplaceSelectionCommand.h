@@ -54,7 +54,7 @@ class ReplacementFragment {
 
   enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
 
-  DocumentFragment* root() const { return m_fragment.get(); }
+  Node* root() const { return m_holder.get(); }
   Node* firstChild() const;
   Node* lastChild() const;
 
@@ -85,11 +85,10 @@ class ReplacementFragment {
   static bool isInterchangeNewlineNode(const Node*);
   static bool isInterchangeConvertedSpaceSpan(const Node*);
 
-  PassRefPtr<Node> insertFragmentForTestRendering();
-  void restoreTestRenderingNodesToFragment(Node*);
-  void computeStylesUsingTestRendering(Node*);
-  void removeUnrenderedNodesUsingTestRendering(Node*);
-  int countRenderedBlocks(Node* holder);
+  void insertFragmentForTestRendering(DocumentFragment*);
+  void computeAndStoreNodeStyles();
+  void removeUnrenderedNodes();
+  int renderedBlocks();
   void removeStyleNodes();
 
   // A couple simple DOM helpers
@@ -100,7 +99,7 @@ class ReplacementFragment {
 
   EFragmentType m_type;
   RefPtr<Document> m_document;
-  RefPtr<DocumentFragment> m_fragment;
+  RefPtr<Node> m_holder;
   DeprecatedValueList<NodeDesiredStyle> m_styles;
   bool m_matchStyle;
   bool m_hasInterchangeNewlineAtStart;
@@ -135,7 +134,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void removeLinePlaceholderIfNeeded(Node*);
   void removeNodeAndPruneAncestors(Node*);
 
-  ReplacementFragment m_fragment;
+  RefPtr<DocumentFragment> m_documentFragment;
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastNodeInserted;
   RefPtr<Node> m_lastTopNodeInserted;
