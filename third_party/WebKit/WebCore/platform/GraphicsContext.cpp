@@ -43,7 +43,8 @@ struct GraphicsContextState {
   bool paintingDisabled;
 };
 
-struct GraphicsContextPrivate {
+class GraphicsContextPrivate {
+ public:
   GraphicsContextPrivate(bool isForPrinting);
 
   GraphicsContextState state;
@@ -63,13 +64,13 @@ GraphicsContextPrivate::GraphicsContextPrivate(bool isForPrinting)
       m_usesInactiveTextBackgroundColor(false),
       m_updatingControlTints(false) {}
 
-WebCore::GraphicsContextPrivate*
-WebCore::GraphicsContext::createGraphicsContextPrivate(bool isForPrinting) {
-  return new WebCore::GraphicsContextPrivate(isForPrinting);
+GraphicsContextPrivate* GraphicsContext::createGraphicsContextPrivate(
+    bool isForPrinting) {
+  return new GraphicsContextPrivate(isForPrinting);
 }
 
-void WebCore::GraphicsContext::destroyGraphicsContextPrivate(
-    WebCore::GraphicsContextPrivate* deleteMe) {
+void GraphicsContext::destroyGraphicsContextPrivate(
+    GraphicsContextPrivate* deleteMe) {
   delete deleteMe;
 }
 

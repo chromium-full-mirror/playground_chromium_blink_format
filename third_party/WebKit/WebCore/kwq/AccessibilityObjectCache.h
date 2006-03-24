@@ -23,6 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef AccessibilityObjectCache_h
+#define AccessibilityObjectCache_h
+
 #include <kxmlcore/HashMap.h>
 #include <kxmlcore/HashSet.h>
 
@@ -91,3 +94,5 @@ inline void AccessibilityObjectCache::postNotificationToTopWebArea(
 inline void AccessibilityObjectCache::handleFocusedUIElementChanged() {}
 #endif
 }
+
+#endif

@@ -35,6 +35,7 @@
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "RenderHTMLCanvas.h"
+#include "AccessibilityObjectCache.h"
 
 using namespace WebCore;
 
@@ -186,9 +187,9 @@ bool QLineEdit::hasSelectedText() const {
   notImplemented();
   return 0;
 }
-DeprecatedString QLineEdit::selectedText() const {
+String QLineEdit::selectedText() const {
   notImplemented();
-  return DeprecatedString();
+  return String();
 }
 void QLineEdit::setAutoSaveName(String const&) {
   notImplemented();
@@ -469,8 +470,8 @@ void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
 Plugin* FrameWin::createPlugin(KURL const&,
-                               DeprecatedStringList const&,
-                               DeprecatedStringList const&,
+                               const Vector<String>&,
+                               const Vector<String>&,
                                String const&) {
   notImplemented();
   return 0;
@@ -512,6 +513,8 @@ static Cursor localCursor;
 const Cursor& WebCore::moveCursor() {
   return localCursor;
 }
+
+bool AccessibilityObjectCache::gAccessibilityEnabled = false;
 
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;
@@ -609,8 +612,7 @@ void FrameWin::markMisspellingsInAdjacentWords(
 void FrameWin::respondToChangedContents() {}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
-void BrowserExtensionWin::setTypedIconURL(KURL const&,
-                                          DeprecatedString const&) {}
+void BrowserExtensionWin::setTypedIconURL(KURL const&, const String&) {}
 void BrowserExtensionWin::setIconURL(KURL const&) {}
 int BrowserExtensionWin::getHistoryLength() {
   return 0;

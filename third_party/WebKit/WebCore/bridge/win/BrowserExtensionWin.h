@@ -40,7 +40,7 @@ class BrowserExtensionWin : public BrowserExtension {
                                Frame*& part);
 
   virtual void setIconURL(const KURL& url);
-  virtual void setTypedIconURL(const KURL& url, const DeprecatedString& type);
+  virtual void setTypedIconURL(const KURL& url, const String& type);
 
   virtual int getHistoryLength();
   virtual void goBackOrForward(int distance);
