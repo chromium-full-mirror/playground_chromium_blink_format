@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,9 +28,6 @@
 
 namespace WebCore {
 class HTMLAreaElement;
-}
-
-namespace WebCore {
 class RenderObject;
 }
 
@@ -39,7 +36,7 @@ class RenderObject;
   id m_data;
   WebCore::HTMLAreaElement* m_areaElement;
   NSMutableArray* m_children;
-  WebCoreAXID m_accObjectID;
+  WebCore::AXID m_id;
 }
 
 - (id)initWithRenderer:(WebCore::RenderObject*)renderer;
@@ -50,8 +47,8 @@ class RenderObject;
 - (id)data;
 - (void)setData:(id)data;
 
-- (WebCoreAXID)axObjectID;
-- (void)setAXObjectID:(WebCoreAXID)axObjectID;
+- (WebCore::AXID)axObjectID;
+- (void)setAXObjectID:(WebCore::AXID)axObjectID;
 - (void)removeAXObjectID;
 
 - (WebCoreAXObject*)firstChild;

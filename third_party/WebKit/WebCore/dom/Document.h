@@ -39,7 +39,6 @@
 #include <qptrlist.h>
 #include <DeprecatedStringList.h>
 
-class AccessibilityObjectCache;
 class RenderArena;
 
 #ifndef KHTML_NO_XBL
@@ -50,6 +49,7 @@ class XBLBindingManager;
 
 namespace WebCore {
 
+class AccessibilityObjectCache;
 class AbstractView;
 class Attr;
 class CDATASection;
@@ -75,12 +75,12 @@ class HTMLImageLoader;
 class HTMLInputElement;
 class HTMLMapElement;
 class JSEditor;
+class MouseEventWithHitTestResults;
 class NameNodeList;
 class NodeFilter;
 class NodeIterator;
 class NodeList;
 class PlatformMouseEvent;
-class MouseEventWithHitTestResults;
 class ProcessingInstruction;
 class Range;
 class RegisteredEventListener;
@@ -274,7 +274,7 @@ class Document : public ContainerNode {
 
   RenderArena* renderArena() { return m_renderArena; }
 
-  AccessibilityObjectCache* getAccObjectCache();
+  AccessibilityObjectCache* getAccObjectCache() const;
 
   // to get visually ordered hebrew and arabic pages right
   void setVisuallyOrdered();
@@ -505,7 +505,7 @@ class Document : public ContainerNode {
 
   // Returns the owning element in the parent document.
   // Returns 0 if this is the top level document.
-  Element* ownerElement();
+  Element* ownerElement() const;
 
   String referrer() const;
   String domain() const;
@@ -704,7 +704,7 @@ class Document : public ContainerNode {
   typedef HashMap<Node*, DeprecatedValueList<DocumentMarker>*> MarkerMap;
   MarkerMap m_markers;
 
-  AccessibilityObjectCache* m_accCache;
+  mutable AccessibilityObjectCache* m_accCache;
 
   DeprecatedPtrList<HTMLImageLoader> m_imageLoadEventDispatchSoonList;
   DeprecatedPtrList<HTMLImageLoader> m_imageLoadEventDispatchingList;
