@@ -194,20 +194,22 @@ void JSEventListener::clearWindowObj() {
 
 // -------------------------------------------------------------------------
 
-JSLazyEventListener::JSLazyEventListener(const String& _code,
-                                         Window* _win,
-                                         Node* _originalNode,
+JSLazyEventListener::JSLazyEventListener(const String& functionName,
+                                         const String& code,
+                                         Window* win,
+                                         Node* node,
                                          int lineno)
-    : JSEventListener(0, _win, true), code(_code), parsed(false) {
-  lineNumber = lineno;
-
-  // We don't retain the original node, because we assume it
+    : JSEventListener(0, win, true),
+      m_functionName(functionName),
+      code(code),
+      parsed(false),
+      lineNumber(lineno),
+      originalNode(node) {
+  // We don't retain the original node because we assume it
   // will stay alive as long as this handler object is around
   // and we need to avoid a reference cycle. If JS transfers
   // this handler to another node, parseCode will be called and
   // then originalNode is no longer needed.
-
-  originalNode = _originalNode;
 }
 
 JSObject* JSLazyEventListener::listenerObj() const {
@@ -241,7 +243,7 @@ void JSLazyEventListener::parseCode() const {
     UString sourceURL(frame->url().url());
     args.append(eventParameterName());
     args.append(jsString(code));
-    listener = constr->construct(exec, args, sourceURL,
+    listener = constr->construct(exec, args, m_functionName, sourceURL,
                                  lineNumber);  // ### is globalExec ok ?
 
     if (exec->hadException()) {
@@ -264,6 +266,7 @@ void JSLazyEventListener::parseCode() const {
   }
 
   // no more need to keep the unparsed code around
+  m_functionName = String();
   code = String();
 
   if (listener)

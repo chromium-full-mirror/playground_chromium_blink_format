@@ -29,7 +29,8 @@ namespace WebCore {
 
 class JSSVGLazyEventListener : public KJS::JSLazyEventListener {
  public:
-  JSSVGLazyEventListener(const String& code,
+  JSSVGLazyEventListener(const String& functionName,
+                         const String& code,
                          KJS::Window*,
                          Node*,
                          int lineno = 0);

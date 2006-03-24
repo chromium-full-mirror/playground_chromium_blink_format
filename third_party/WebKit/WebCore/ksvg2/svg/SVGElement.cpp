@@ -105,7 +105,7 @@ void SVGElement::addSVGEventListener(const AtomicString& eventType,
                                      const Attribute* attr) {
   Element::setHTMLEventListener(
       eventType, getDocument()->accessSVGExtensions()->createSVGEventListener(
-                     attr->value(), this));
+                     attr->localName().domString(), attr->value(), this));
 }
 
 void SVGElement::parseMappedAttribute(MappedAttribute* attr) {

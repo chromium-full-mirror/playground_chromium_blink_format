@@ -442,7 +442,9 @@ class Document : public ContainerNode {
                                  bool useCapture);
   bool hasWindowEventListener(const AtomicString& eventType);
 
-  PassRefPtr<EventListener> createHTMLEventListener(const String& code, Node*);
+  PassRefPtr<EventListener> createHTMLEventListener(const String& functionName,
+                                                    const String& code,
+                                                    Node*);
 
   /**
    * Searches through the document, starting from fromNode, for the next

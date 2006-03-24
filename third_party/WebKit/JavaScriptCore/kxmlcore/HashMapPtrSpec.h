@@ -35,6 +35,9 @@ namespace KXMLCore {
 struct VoidPtrHash : public PtrHash<void*> {};
 
 template <typename P, typename Mapped>
+class PtrHashConstIteratorAdapter;
+
+template <typename P, typename Mapped>
 class PtrHashIteratorAdapter {
  private:
   typedef HashMap<P*, Mapped, PtrHash<P*>, HashTraits<P*>, HashTraits<Mapped>>
@@ -55,6 +58,7 @@ class PtrHashIteratorAdapter {
                        PtrHash<P*>,
                        HashTraits<P*>,
                        HashTraits<Mapped>>;
+  friend class PtrHashConstIteratorAdapter<P, Mapped>;
 
  public:
   PtrHashIteratorAdapter() {}

@@ -2,7 +2,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -175,6 +175,7 @@ bool FunctionObjectImp::implementsConstruct() const {
 // ECMA 15.3.2 The Function Constructor
 JSObject* FunctionObjectImp::construct(ExecState* exec,
                                        const List& args,
+                                       const Identifier& functionName,
                                        const UString& sourceURL,
                                        int lineNumber) {
   UString p("");
@@ -220,7 +221,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   FunctionBodyNode* bodyNode = progNode.get();
 
   FunctionImp* fimp =
-      new DeclaredFunctionImp(exec, Identifier::null(), bodyNode, scopeChain);
+      new DeclaredFunctionImp(exec, functionName, bodyNode, scopeChain);
 
   // parse parameter list. throw syntax error on illegal identifiers
   int len = p.size();
@@ -266,7 +267,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
 
 // ECMA 15.3.2 The Function Constructor
 JSObject* FunctionObjectImp::construct(ExecState* exec, const List& args) {
-  return FunctionObjectImp::construct(exec, args, UString(), 0);
+  return construct(exec, args, "anonymous", UString(), 0);
 }
 
 // ECMA 15.3.1 The Function Constructor Called as a Function

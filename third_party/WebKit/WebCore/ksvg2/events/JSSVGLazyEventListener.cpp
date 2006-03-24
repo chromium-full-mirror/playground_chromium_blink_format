@@ -28,11 +28,12 @@ using namespace KJS;
 
 namespace WebCore {
 
-JSSVGLazyEventListener::JSSVGLazyEventListener(const String& code,
+JSSVGLazyEventListener::JSSVGLazyEventListener(const String& functionName,
+                                               const String& code,
                                                KJS::Window* win,
                                                Node* node,
                                                int lineno)
-    : JSLazyEventListener(code, win, node, lineno) {}
+    : JSLazyEventListener(functionName, code, win, node, lineno) {}
 
 JSValue* JSSVGLazyEventListener::eventParameterName() const {
   static ProtectedPtr<JSValue> eventString = jsString("evt");

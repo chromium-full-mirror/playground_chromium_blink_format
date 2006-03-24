@@ -84,7 +84,8 @@ class JSEventListener : public JSAbstractEventListener {
 
 class JSLazyEventListener : public JSEventListener {
  public:
-  JSLazyEventListener(const WebCore::String& code,
+  JSLazyEventListener(const WebCore::String& functionName,
+                      const WebCore::String& code,
                       Window*,
                       WebCore::Node*,
                       int lineno = 0);
@@ -94,6 +95,7 @@ class JSLazyEventListener : public JSEventListener {
   virtual JSValue* eventParameterName() const;
   void parseCode() const;
 
+  mutable WebCore::String m_functionName;
   mutable WebCore::String code;
   mutable bool parsed;
   int lineNumber;
