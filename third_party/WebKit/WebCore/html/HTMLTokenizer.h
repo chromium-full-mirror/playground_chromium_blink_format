@@ -27,6 +27,7 @@
 #define HTMLTOKENIZER_H
 
 #include "CachedObjectClient.h"
+#include "NamedMappedAttrMap.h"
 #include "SegmentedString.h"
 #include "Timer.h"
 #include "QualifiedName.h"
@@ -46,7 +47,6 @@ class DocumentFragment;
 class Document;
 class FrameView;
 class HTMLParser;
-class NamedMappedAttrMap;
 class Node;
 
 /**
