@@ -28,22 +28,27 @@
 
 #include "CompositeEditCommand.h"
 #include <kxmlcore/PassRefPtr.h>
+#include <kxmlcore/HashMap.h>
+#include <kxmlcore/Vector.h>
 
 namespace WebCore {
 
 class DocumentFragment;
 
-class NodeDesiredStyle {
+class RenderingInfo : public Shared<RenderingInfo> {
  public:
-  NodeDesiredStyle(PassRefPtr<Node>, PassRefPtr<CSSMutableStyleDeclaration>);
+  RenderingInfo(PassRefPtr<CSSMutableStyleDeclaration>, bool);
 
-  Node* node() const { return m_node.get(); }
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
+  bool isBlockFlow() const { return m_isBlockFlow; }
 
  private:
-  RefPtr<Node> m_node;
   RefPtr<CSSMutableStyleDeclaration> m_style;
+  bool m_isBlockFlow;
 };
+
+typedef Vector<RefPtr<Node>> NodeVector;
+typedef HashMap<Node*, RefPtr<RenderingInfo>> RenderingInfoMap;
 
 // --- ReplacementFragment helper class
 
@@ -54,15 +59,13 @@ class ReplacementFragment {
 
   enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
 
-  Node* root() const { return m_holder.get(); }
   Node* firstChild() const;
   Node* lastChild() const;
 
   Node* mergeStartNode() const;
 
-  const DeprecatedValueList<NodeDesiredStyle>& desiredStyles() {
-    return m_styles;
-  }
+  const RenderingInfoMap& renderingInfo() const { return m_renderingInfo; }
+  const NodeVector& nodes() const { return m_nodes; }
 
   EFragmentType type() const { return m_type; }
   bool isEmpty() const { return m_type == EmptyFragment; }
@@ -77,6 +80,8 @@ class ReplacementFragment {
     return m_hasInterchangeNewlineAtEnd;
   }
 
+  bool isBlockFlow(Node*) const;
+
  private:
   // no copy construction or assignment
   ReplacementFragment(const ReplacementFragment&);
@@ -85,10 +90,12 @@ class ReplacementFragment {
   static bool isInterchangeNewlineNode(const Node*);
   static bool isInterchangeConvertedSpaceSpan(const Node*);
 
-  void insertFragmentForTestRendering(DocumentFragment*);
-  void computeAndStoreNodeStyles();
-  void removeUnrenderedNodes();
-  int renderedBlocks();
+  PassRefPtr<Node> insertFragmentForTestRendering();
+  void saveRenderingInfo(Node*);
+  void computeStylesUsingTestRendering(Node*);
+  void removeUnrenderedNodes(Node*);
+  void restoreTestRenderingNodesToFragment(Node*);
+  int renderedBlocks(Node*);
   void removeStyleNodes();
 
   // A couple simple DOM helpers
@@ -99,8 +106,9 @@ class ReplacementFragment {
 
   EFragmentType m_type;
   RefPtr<Document> m_document;
-  RefPtr<Node> m_holder;
-  DeprecatedValueList<NodeDesiredStyle> m_styles;
+  RefPtr<DocumentFragment> m_fragment;
+  RenderingInfoMap m_renderingInfo;
+  NodeVector m_nodes;
   bool m_matchStyle;
   bool m_hasInterchangeNewlineAtStart;
   bool m_hasInterchangeNewlineAtEnd;
@@ -130,11 +138,11 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                                               Node* refChild);
 
   void updateNodesInserted(Node*);
-  void fixupNodeStyles(const DeprecatedValueList<NodeDesiredStyle>&);
+  void fixupNodeStyles(const NodeVector&, const RenderingInfoMap&);
   void removeLinePlaceholderIfNeeded(Node*);
   void removeNodeAndPruneAncestors(Node*);
 
-  RefPtr<DocumentFragment> m_documentFragment;
+  ReplacementFragment m_fragment;
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastNodeInserted;
   RefPtr<Node> m_lastTopNodeInserted;

@@ -57,6 +57,7 @@ ReplacementFragment::ReplacementFragment(Document* document,
                                          DocumentFragment* fragment,
                                          bool matchStyle)
     : m_document(document),
+      m_fragment(fragment),
       m_matchStyle(matchStyle),
       m_hasInterchangeNewlineAtStart(false),
       m_hasInterchangeNewlineAtEnd(false),
@@ -115,46 +116,47 @@ ReplacementFragment::ReplacementFragment(Document* document,
   if (newlineAtEndNode)
     removeNode(newlineAtEndNode);
 
-  insertFragmentForTestRendering(fragment);
+  RefPtr<Node> holder = insertFragmentForTestRendering();
 
   // Send khtmlBeforeTextInsertedEvent.  The event handler will update text if
   // necessary.
   if (m_document->frame()) {
     Node* selectionStartNode = m_document->frame()->selection().start().node();
     if (selectionStartNode && selectionStartNode->rootEditableElement()) {
-      RefPtr<Range> range = new Range(m_holder->getDocument());
+      RefPtr<Range> range = new Range(holder->getDocument());
       ExceptionCode ec = 0;
-      range->selectNodeContents(m_holder.get(), ec);
+      range->selectNodeContents(holder.get(), ec);
       String text = plainText(range.get());
       String newText = text.copy();
       RefPtr<Event> evt = new BeforeTextInsertedEvent(newText);
       selectionStartNode->rootEditableElement()->dispatchEvent(evt, ec, true);
       if (text != newText) {
-        fragment->removeChildren();
-        fragment->appendChild(new Text(m_document.get(), newText), ec);
-        insertFragmentForTestRendering(fragment);
+        // If the event handler has changed the text, create a new holder node
+        // for test rendering
+        m_fragment->removeChildren();
+        m_fragment->appendChild(new Text(m_document.get(), newText), ec);
+        removeNode(holder);
+        holder = insertFragmentForTestRendering();
       }
     }
   }
 
-  if (!m_matchStyle)
-    computeAndStoreNodeStyles();
-  removeUnrenderedNodes();
-  m_hasMoreThanOneBlock = renderedBlocks() > 1;
+  saveRenderingInfo(holder.get());
+  removeUnrenderedNodes(holder.get());
+  m_hasMoreThanOneBlock = renderedBlocks(holder.get()) > 1;
+  restoreTestRenderingNodesToFragment(holder.get());
+  removeNode(holder);
   removeStyleNodes();
 }
 
-ReplacementFragment::~ReplacementFragment() {
-  if (m_holder && m_holder->inDocument())
-    removeNode(m_holder);
-}
+ReplacementFragment::~ReplacementFragment() {}
 
 Node* ReplacementFragment::firstChild() const {
-  return m_holder->firstChild();
+  return m_fragment->firstChild();
 }
 
 Node* ReplacementFragment::lastChild() const {
-  return m_holder->lastChild();
+  return m_fragment->lastChild();
 }
 
 static bool isMailPasteAsQuotationNode(const Node* node) {
@@ -164,8 +166,8 @@ static bool isMailPasteAsQuotationNode(const Node* node) {
 }
 
 Node* ReplacementFragment::mergeStartNode() const {
-  Node* node = m_holder->firstChild();
-  while (node && node->isBlockFlow() && !isMailPasteAsQuotationNode(node))
+  Node* node = m_fragment->firstChild();
+  while (node && isBlockFlow(node) && !isMailPasteAsQuotationNode(node))
     node = node->traverseNextNode();
   return node;
 }
@@ -185,9 +187,9 @@ bool ReplacementFragment::isInterchangeConvertedSpaceSpan(const Node* node) {
 }
 
 Node* ReplacementFragment::enclosingBlock(Node* node) const {
-  while (node && !node->isBlockFlow())
+  while (node && !isBlockFlow(node))
     node = node->parentNode();
-  return node ? node : m_holder.get();
+  return node ? node : m_fragment.get();
 }
 
 void ReplacementFragment::removeNodePreservingChildren(Node* node) {
@@ -227,25 +229,45 @@ void ReplacementFragment::insertNodeBefore(Node* node, Node* refNode) {
   ASSERT(ec == 0);
 }
 
-void ReplacementFragment::insertFragmentForTestRendering(
-    DocumentFragment* fragment) {
+PassRefPtr<Node> ReplacementFragment::insertFragmentForTestRendering() {
   Node* body = m_document->body();
   if (!body)
-    return;
+    return 0;
 
-  if (m_holder && m_holder->inDocument())
-    removeNode(m_holder);
-
-  m_holder = createDefaultParagraphElement(m_document.get());
+  RefPtr<Node> holder = createDefaultParagraphElement(m_document.get());
 
   ExceptionCode ec = 0;
-  m_holder->appendChild(fragment, ec);
+  holder->appendChild(m_fragment, ec);
   ASSERT(ec == 0);
 
-  body->appendChild(m_holder.get(), ec);
+  body->appendChild(holder.get(), ec);
   ASSERT(ec == 0);
 
   m_document->updateLayoutIgnorePendingStylesheets();
+
+  return holder.release();
+}
+
+void ReplacementFragment::restoreTestRenderingNodesToFragment(Node* holder) {
+  if (!holder)
+    return;
+
+  ExceptionCode ec = 0;
+  while (RefPtr<Node> node = holder->firstChild()) {
+    holder->removeChild(node.get(), ec);
+    ASSERT(ec == 0);
+    m_fragment->appendChild(node.get(), ec);
+    ASSERT(ec == 0);
+  }
+}
+
+bool ReplacementFragment::isBlockFlow(Node* node) const {
+  RefPtr<RenderingInfo> info = m_renderingInfo.get(node);
+  ASSERT(info);
+  if (!info)
+    return false;
+
+  return info->isBlockFlow();
 }
 
 static String& matchNearestBlockquoteColorString() {
@@ -269,17 +291,22 @@ void ReplaceSelectionCommand::removeNodeAndPruneAncestors(Node* node) {
 }
 
 void ReplaceSelectionCommand::fixupNodeStyles(
-    const DeprecatedValueList<NodeDesiredStyle>& list) {
+    const NodeVector& nodes,
+    const RenderingInfoMap& renderingInfo) {
   // This function uses the mapped "desired style" to apply the additional style
   // needed, if any,
   // to make the node have the desired style.
 
   updateLayout();
 
-  DeprecatedValueListConstIterator<NodeDesiredStyle> it;
-  for (it = list.begin(); it != list.end(); ++it) {
-    Node* node = (*it).node();
-    CSSMutableStyleDeclaration* desiredStyle = (*it).style();
+  NodeVector::const_iterator e = nodes.end();
+  for (NodeVector::const_iterator it = nodes.begin(); it != e; ++it) {
+    Node* node = (*it).get();
+    RefPtr<RenderingInfo> info = renderingInfo.get(node);
+    ASSERT(info);
+    if (!info)
+      continue;
+    CSSMutableStyleDeclaration* desiredStyle = info->style();
     ASSERT(desiredStyle);
 
     if (!node->inDocument())
@@ -324,17 +351,14 @@ void ReplaceSelectionCommand::fixupNodeStyles(
   }
 }
 
-static void computeAndStoreNodeDesiredStyle(
-    WebCore::Node* node,
-    DeprecatedValueList<NodeDesiredStyle>& list) {
+static PassRefPtr<CSSMutableStyleDeclaration> styleForNode(Node* node) {
   if (!node || !node->inDocument())
-    return;
+    return 0;
 
   RefPtr<CSSComputedStyleDeclaration> computedStyle =
       Position(node, 0).computedStyle();
   RefPtr<CSSMutableStyleDeclaration> style =
       computedStyle->copyInheritableProperties();
-  list.append(NodeDesiredStyle(node, style));
 
   // In either of the color-matching tests below, set the color to a
   // pseudo-color that will
@@ -349,7 +373,7 @@ static void computeAndStoreNodeDesiredStyle(
     if (match) {
       style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                          matchNearestBlockquoteColorString());
-      return;
+      return style.release();
     }
   }
   Node* documentElement = node->getDocument()->documentElement();
@@ -360,25 +384,34 @@ static void computeAndStoreNodeDesiredStyle(
   if (match)
     style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                        matchNearestBlockquoteColorString());
+
+  return style.release();
 }
 
-void ReplacementFragment::computeAndStoreNodeStyles() {
-  ASSERT(m_holder && m_holder->inDocument());
-
+void ReplacementFragment::saveRenderingInfo(Node* holder) {
   m_document->updateLayoutIgnorePendingStylesheets();
 
-  for (Node* node = m_holder->firstChild(); node;
-       node = node->traverseNextNode(m_holder.get()))
-    computeAndStoreNodeDesiredStyle(node, m_styles);
+  if (m_matchStyle) {
+    // No style restoration will be done, so we don't need to save styles or
+    // keep a node vector.
+    for (Node* node = holder->firstChild(); node;
+         node = node->traverseNextNode(holder))
+      m_renderingInfo.add(node, new RenderingInfo(0, node->isBlockFlow()));
+  } else {
+    for (Node* node = holder->firstChild(); node;
+         node = node->traverseNextNode(holder)) {
+      m_renderingInfo.add(
+          node, new RenderingInfo(styleForNode(node), node->isBlockFlow()));
+      m_nodes.append(node);
+    }
+  }
 }
 
-void ReplacementFragment::removeUnrenderedNodes() {
-  ASSERT(m_holder && m_holder->inDocument());
-
+void ReplacementFragment::removeUnrenderedNodes(Node* holder) {
   DeprecatedPtrList<Node> unrendered;
 
-  for (Node* node = m_holder->firstChild(); node;
-       node = node->traverseNextNode(m_holder.get())) {
+  for (Node* node = holder->firstChild(); node;
+       node = node->traverseNextNode(holder)) {
     if (!isNodeRendered(node) && !isTableStructureNode(node))
       unrendered.append(node);
   }
@@ -387,13 +420,11 @@ void ReplacementFragment::removeUnrenderedNodes() {
     removeNode(it.current());
 }
 
-int ReplacementFragment::renderedBlocks() {
-  ASSERT(m_holder && m_holder->inDocument());
-
+int ReplacementFragment::renderedBlocks(Node* holder) {
   int count = 0;
   Node* prev = 0;
-  for (Node* node = m_holder->firstChild(); node;
-       node = node->traverseNextNode(m_holder.get())) {
+  for (Node* node = holder->firstChild(); node;
+       node = node->traverseNextNode(holder)) {
     if (node->isBlockFlow()) {
       if (!prev) {
         count++;
@@ -415,7 +446,7 @@ void ReplacementFragment::removeStyleNodes() {
   // Since style information has been computed and cached away in
   // computeStylesUsingTestRendering(), these style nodes can be removed, since
   // the correct styles will be added back in fixupNodeStyles().
-  Node* node = m_holder->firstChild();
+  Node* node = m_fragment->firstChild();
   while (node) {
     Node* next = node->traverseNextNode();
     // This list of tags change the appearance of content
@@ -444,9 +475,9 @@ void ReplacementFragment::removeStyleNodes() {
   }
 }
 
-NodeDesiredStyle::NodeDesiredStyle(PassRefPtr<Node> node,
-                                   PassRefPtr<CSSMutableStyleDeclaration> style)
-    : m_node(node), m_style(style) {}
+RenderingInfo::RenderingInfo(PassRefPtr<CSSMutableStyleDeclaration> style,
+                             bool isBlockFlow = false)
+    : m_style(style), m_isBlockFlow(isBlockFlow) {}
 
 ReplaceSelectionCommand::ReplaceSelectionCommand(Document* document,
                                                  DocumentFragment* fragment,
@@ -454,7 +485,7 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(Document* document,
                                                  bool smartReplace,
                                                  bool matchStyle)
     : CompositeEditCommand(document),
-      m_documentFragment(fragment),
+      m_fragment(document, fragment, matchStyle),
       m_selectReplacement(selectReplacement),
       m_smartReplace(smartReplace),
       m_matchStyle(matchStyle) {}
@@ -462,9 +493,6 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(Document* document,
 ReplaceSelectionCommand::~ReplaceSelectionCommand() {}
 
 void ReplaceSelectionCommand::doApply() {
-  ReplacementFragment fragment(document(), m_documentFragment.get(),
-                               m_matchStyle);
-
   // collect information about the current selection, prior to deleting the
   // selection
   Selection selection = endingSelection();
@@ -492,10 +520,10 @@ void ReplaceSelectionCommand::doApply() {
   } else {
     // merge if current selection starts inside a paragraph, or there is only
     // one block and no interchange newline to add
-    mergeStart = !fragment.hasInterchangeNewlineAtStart() &&
+    mergeStart = !m_fragment.hasInterchangeNewlineAtStart() &&
                  (!isStartOfParagraph(visibleStart) ||
-                  (!fragment.hasInterchangeNewlineAtEnd() &&
-                   !fragment.hasMoreThanOneBlock()));
+                  (!m_fragment.hasInterchangeNewlineAtEnd() &&
+                   !m_fragment.hasMoreThanOneBlock()));
 
     // This is a workaround for this bug:
     // <rdar://problem/4013642> Copied quoted word does not paste as a quote if
@@ -504,7 +532,7 @@ void ReplaceSelectionCommand::doApply() {
     // to come out right without
     // breaking other cases.
     if (isStartOfParagraph(visibleStart) &&
-        isMailBlockquote(fragment.firstChild()))
+        isMailBlockquote(m_fragment.firstChild()))
       mergeStart = false;
 
     // prevent first list item from getting merged into target, thereby pulled
@@ -515,7 +543,7 @@ void ReplaceSelectionCommand::doApply() {
     // paste.
     // Any better ideas?
     if (mergeStart) {
-      for (Node* n = fragment.mergeStartNode(); n; n = n->parentNode()) {
+      for (Node* n = m_fragment.mergeStartNode(); n; n = n->parentNode()) {
         if (isListElement(n)) {
           mergeStart = false;
           break;
@@ -526,8 +554,9 @@ void ReplaceSelectionCommand::doApply() {
 
   // decide whether to later append nodes to the end
   Node* beyondEndNode = 0;
-  if (!isEndOfParagraph(visibleEnd) && !fragment.hasInterchangeNewlineAtEnd() &&
-      (startBlock != endBlock || fragment.hasMoreThanOneBlock()))
+  if (!isEndOfParagraph(visibleEnd) &&
+      !m_fragment.hasInterchangeNewlineAtEnd() &&
+      (startBlock != endBlock || m_fragment.hasMoreThanOneBlock()))
     beyondEndNode = selection.end().downstream().node();
 
   Position startPos = selection.start();
@@ -535,14 +564,14 @@ void ReplaceSelectionCommand::doApply() {
   // delete the current range selection, or insert paragraph for caret
   // selection, as needed
   if (selection.isRange()) {
-    bool mergeBlocksAfterDelete = !(fragment.hasInterchangeNewlineAtStart() ||
-                                    fragment.hasInterchangeNewlineAtEnd() ||
-                                    fragment.hasMoreThanOneBlock());
+    bool mergeBlocksAfterDelete = !(m_fragment.hasInterchangeNewlineAtStart() ||
+                                    m_fragment.hasInterchangeNewlineAtEnd() ||
+                                    m_fragment.hasMoreThanOneBlock());
     deleteSelection(false, mergeBlocksAfterDelete);
     updateLayout();
     visibleStart =
         VisiblePosition(endingSelection().start(), VP_DEFAULT_AFFINITY);
-    if (fragment.hasInterchangeNewlineAtStart()) {
+    if (m_fragment.hasInterchangeNewlineAtStart()) {
       if (isEndOfParagraph(visibleStart) && !isStartOfParagraph(visibleStart)) {
         if (!isEndOfDocument(visibleStart))
           setEndingSelection(visibleStart.next());
@@ -555,7 +584,7 @@ void ReplaceSelectionCommand::doApply() {
     startPos = endingSelection().start();
   } else {
     ASSERT(selection.isCaret());
-    if (fragment.hasInterchangeNewlineAtStart()) {
+    if (m_fragment.hasInterchangeNewlineAtStart()) {
       if (isEndOfParagraph(visibleStart) && !isStartOfParagraph(visibleStart)) {
         if (!isEndOfDocument(visibleStart))
           setEndingSelection(visibleStart.next());
@@ -565,8 +594,8 @@ void ReplaceSelectionCommand::doApply() {
             VisiblePosition(endingSelection().start(), VP_DEFAULT_AFFINITY));
       }
     }
-    if (!fragment.hasInterchangeNewlineAtEnd() &&
-        fragment.hasMoreThanOneBlock() && !startAtBlockBoundary &&
+    if (!m_fragment.hasInterchangeNewlineAtEnd() &&
+        m_fragment.hasMoreThanOneBlock() && !startAtBlockBoundary &&
         !isEndOfParagraph(visibleEnd)) {
       // The start and the end need to wind up in separate blocks.
       // Insert a paragraph separator to make that happen.
@@ -596,7 +625,7 @@ void ReplaceSelectionCommand::doApply() {
   setTypingStyle(0);
 
   // done if there is nothing to add
-  if (!fragment.firstChild())
+  if (!m_fragment.firstChild())
     return;
 
   // check for a line placeholder, and store it away for possible removal later.
@@ -609,7 +638,7 @@ void ReplaceSelectionCommand::doApply() {
     // now a "second deepest position"
     downstream = positionAvoidingSpecialElementBoundary(downstream);
     if (downstream.node()->hasTagName(brTag) && downstream.offset() == 0 &&
-        fragment.hasInterchangeNewlineAtEnd() &&
+        m_fragment.hasInterchangeNewlineAtEnd() &&
         isStartOfLine(VisiblePosition(downstream, VP_DEFAULT_AFFINITY)))
       linePlaceholder = downstream.node();
   }
@@ -657,13 +686,13 @@ void ReplaceSelectionCommand::doApply() {
 
   // step 1: merge content into the start block
   if (mergeStart) {
-    Node* refNode = fragment.mergeStartNode();
+    Node* refNode = m_fragment.mergeStartNode();
     if (refNode) {
       Node* parent = refNode->parentNode();
       Node* node = refNode->nextSibling();
       insertNodeAtAndUpdateNodesInserted(refNode, startPos.node(),
                                          startPos.offset());
-      while (node && !node->isBlockFlow()) {
+      while (node && !m_fragment.isBlockFlow(node)) {
         Node* next = node->nextSibling();
         insertNodeAfterAndUpdateNodesInserted(node, refNode);
         refNode = node;
@@ -688,20 +717,20 @@ void ReplaceSelectionCommand::doApply() {
   }
 
   // step 2 : merge everything remaining in the fragment
-  if (fragment.firstChild()) {
-    Node* refNode = fragment.firstChild();
+  if (m_fragment.firstChild()) {
+    Node* refNode = m_fragment.firstChild();
     Node* node = refNode ? refNode->nextSibling() : 0;
     Node* insertionBlock = insertionPos.node()->enclosingBlockFlowElement();
     bool insertionBlockIsRoot =
         insertionBlock == insertionBlock->rootEditableElement();
     VisiblePosition visiblePos(insertionPos, DOWNSTREAM);
-    if (!insertionBlockIsRoot && refNode->isBlockFlow() &&
+    if (!insertionBlockIsRoot && m_fragment.isBlockFlow(refNode) &&
         isStartOfBlock(visiblePos))
       insertNodeBeforeAndUpdateNodesInserted(refNode, insertionBlock);
-    else if (!insertionBlockIsRoot && refNode->isBlockFlow() &&
+    else if (!insertionBlockIsRoot && m_fragment.isBlockFlow(refNode) &&
              isEndOfBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
-    } else if (m_lastNodeInserted && !refNode->isBlockFlow()) {
+    } else if (m_lastNodeInserted && !m_fragment.isBlockFlow(refNode)) {
       Position pos = visiblePos.next().deepEquivalent().downstream();
       insertNodeAtAndUpdateNodesInserted(refNode, pos.node(), pos.offset());
     } else {
@@ -763,7 +792,7 @@ void ReplaceSelectionCommand::doApply() {
   Position lastPositionToSelect;
 
   // step 4 : handle trailing newline
-  if (fragment.hasInterchangeNewlineAtEnd()) {
+  if (m_fragment.hasInterchangeNewlineAtEnd()) {
     removeLinePlaceholderIfNeeded(linePlaceholder);
 
     if (!m_lastNodeInserted) {
@@ -773,7 +802,7 @@ void ReplaceSelectionCommand::doApply() {
       VisiblePosition pos(insertionPos, VP_DEFAULT_AFFINITY);
 
       if (startBlock == endBlock &&
-          !m_lastTopNodeInserted.get()->isBlockFlow()) {
+          !m_fragment.isBlockFlow(m_lastTopNodeInserted.get())) {
         insertParagraph = true;
       } else {
         // Handle end-of-document case.
@@ -815,7 +844,8 @@ void ReplaceSelectionCommand::doApply() {
 
     if (beyondEndNode) {
       updateLayout();
-      DeprecatedValueList<NodeDesiredStyle> styles;
+      RenderingInfoMap renderingInfo;
+      NodeVector nodes;
       Node* node = beyondEndNode->enclosingInlineElement();
       Node* refNode = m_lastNodeInserted.get();
 
@@ -824,7 +854,8 @@ void ReplaceSelectionCommand::doApply() {
           break;
 
         Node* next = node->nextSibling();
-        computeAndStoreNodeDesiredStyle(node, styles);
+        nodes.append(node);
+        renderingInfo.add(node, new RenderingInfo(styleForNode(node)));
         removeNodeAndPruneAncestors(node);
         // No need to update inserted node variables.
         insertNodeAfter(node, refNode);
@@ -835,12 +866,12 @@ void ReplaceSelectionCommand::doApply() {
         node = next;
       }
 
-      fixupNodeStyles(styles);
+      fixupNodeStyles(nodes, renderingInfo);
     }
   }
 
   if (!m_matchStyle)
-    fixupNodeStyles(fragment.desiredStyles());
+    fixupNodeStyles(m_fragment.nodes(), m_fragment.renderingInfo());
   completeHTMLReplacement(lastPositionToSelect);
 
   // step 5 : mop up
