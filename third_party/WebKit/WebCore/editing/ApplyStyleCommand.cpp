@@ -272,7 +272,6 @@ PassRefPtr<HTMLElement> createStyleSpanElement(Document* document) {
 
 ApplyStyleCommand::ApplyStyleCommand(Document* document,
                                      CSSStyleDeclaration* style,
-                                     Element* element,
                                      EditAction editingAction,
                                      EPropertyLevel propertyLevel)
     : CompositeEditCommand(document),
@@ -282,11 +281,11 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_start(endingSelection().start().downstream()),
       m_end(endingSelection().end().upstream()),
       m_useEndingSelection(true),
-      m_styledInlineElement(element) {}
+      m_styledInlineElement(0),
+      m_removeOnly(false) {}
 
 ApplyStyleCommand::ApplyStyleCommand(Document* document,
                                      CSSStyleDeclaration* style,
-                                     Element* element,
                                      const Position& start,
                                      const Position& end,
                                      EditAction editingAction,
@@ -298,7 +297,22 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_start(start),
       m_end(end),
       m_useEndingSelection(false),
-      m_styledInlineElement(element) {}
+      m_styledInlineElement(0),
+      m_removeOnly(false) {}
+
+ApplyStyleCommand::ApplyStyleCommand(Document* document,
+                                     Element* element,
+                                     bool removeOnly,
+                                     EditAction editingAction)
+    : CompositeEditCommand(document),
+      m_style(new CSSMutableStyleDeclaration()),
+      m_editingAction(editingAction),
+      m_propertyLevel(PropertyDefault),
+      m_start(endingSelection().start().downstream()),
+      m_end(endingSelection().end().upstream()),
+      m_useEndingSelection(true),
+      m_styledInlineElement(element),
+      m_removeOnly(removeOnly) {}
 
 void ApplyStyleCommand::updateStartEnd(const Position& newStart,
                                        const Position& newEnd) {
@@ -390,6 +404,9 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
       prevBlock = block;
     }
   }
+
+  if (m_removeOnly)
+    return;
 
   // apply specified styles to the block flow elements in the selected range
   prevBlock = 0;
@@ -1300,6 +1317,9 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
     CSSMutableStyleDeclaration* style,
     Node* startNode,
     Node* endNode) {
+  if (m_removeOnly)
+    return;
+
   StyleChange styleChange(
       style, Position(startNode, 0),
       StyleChange::styleModeForParseMode(document()->inCompatMode()));

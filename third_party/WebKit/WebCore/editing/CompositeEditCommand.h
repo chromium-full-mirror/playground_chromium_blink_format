@@ -58,6 +58,8 @@ class CompositeEditCommand : public EditCommand {
                   WebCore::Position start,
                   WebCore::Position end,
                   EditAction editingAction = EditActionChangeAttributes);
+  void applyStyledElement(Element*);
+  void removeStyledElement(Element*);
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
@@ -114,6 +116,9 @@ class CompositeEditCommand : public EditCommand {
   WebCore::Node* findBlockPlaceholder(WebCore::Node*);
 
   void moveParagraphContentsToNewBlockIfNecessary(const WebCore::Position&);
+
+  void pushAnchorElementDown(WebCore::Node*);
+  void pushPartiallySelectedAnchorElementsDown();
 
   DeprecatedValueList<EditCommandPtr> m_cmds;
 };

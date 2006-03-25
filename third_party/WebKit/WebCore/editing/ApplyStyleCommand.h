@@ -39,16 +39,18 @@ class ApplyStyleCommand : public CompositeEditCommand {
 
   ApplyStyleCommand(Document*,
                     CSSStyleDeclaration*,
-                    Element*,
                     EditAction = EditActionChangeAttributes,
                     EPropertyLevel = PropertyDefault);
   ApplyStyleCommand(Document*,
                     CSSStyleDeclaration*,
-                    Element*,
                     const Position& start,
                     const Position& end,
                     EditAction = EditActionChangeAttributes,
                     EPropertyLevel = PropertyDefault);
+  ApplyStyleCommand(Document*,
+                    Element*,
+                    bool = false,
+                    EditAction = EditActionChangeAttributes);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
@@ -118,6 +120,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   Position m_end;
   bool m_useEndingSelection;
   RefPtr<Element> m_styledInlineElement;
+  bool m_removeOnly;
 };
 
 bool isStyleSpan(const Node*);

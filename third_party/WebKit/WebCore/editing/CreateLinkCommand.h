@@ -23,10 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __create_link_command_h__
-#define __create_link_command_h__
+#ifndef CreateLinkCommand_h
+#define CreateLinkCommand_h
 
-#include "ApplyStyleCommand.h"
+#include "CompositeEditCommand.h"
 
 namespace WebCore {
 
@@ -41,4 +41,4 @@ class CreateLinkCommand : public CompositeEditCommand {
 
 }  // namespace WebCore
 
-#endif  // __create_link_command_h__
+#endif  // CreateLinkCommand_h

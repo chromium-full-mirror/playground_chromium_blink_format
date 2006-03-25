@@ -44,6 +44,8 @@ class Selection {
   Selection(const Position&, EAffinity);
   Selection(const Position&, const Position&, EAffinity);
 
+  static Selection selectionFromContentsOfNode(Node*);
+
   EState state() const { return m_state; }
 
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }

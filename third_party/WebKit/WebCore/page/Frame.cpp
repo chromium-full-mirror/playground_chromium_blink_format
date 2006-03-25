@@ -1900,8 +1900,8 @@ void Frame::selectAll() {
 }
 
 bool Frame::selectContentsOfNode(Node* node) {
-  SelectionController sel = SelectionController(
-      Position(node, 0), Position(node, maxDeepOffset(node)), DOWNSTREAM);
+  SelectionController sel =
+      SelectionController(Selection::selectionFromContentsOfNode(node));
   if (shouldChangeSelection(sel)) {
     setSelection(sel);
     return true;
@@ -2112,7 +2112,7 @@ void Frame::computeAndSetTypingStyle(CSSStyleDeclaration* style,
   blockStyle->diff(mutableStyle.get());
   if (document() && blockStyle->length() > 0) {
     EditCommandPtr cmd(
-        new ApplyStyleCommand(document(), blockStyle.get(), 0, editingAction));
+        new ApplyStyleCommand(document(), blockStyle.get(), editingAction));
     cmd.apply();
   }
 
@@ -2132,7 +2132,7 @@ void Frame::applyStyle(CSSStyleDeclaration* style, EditAction editingAction) {
     case Selection::RANGE:
       if (document() && style) {
         EditCommandPtr cmd(
-            new ApplyStyleCommand(document(), style, 0, editingAction));
+            new ApplyStyleCommand(document(), style, editingAction));
         cmd.apply();
       }
       break;
@@ -2149,7 +2149,7 @@ void Frame::applyParagraphStyle(CSSStyleDeclaration* style,
     case Selection::RANGE:
       if (document() && style) {
         EditCommandPtr cmd(
-            new ApplyStyleCommand(document(), style, 0, editingAction,
+            new ApplyStyleCommand(document(), style, editingAction,
                                   ApplyStyleCommand::ForceBlockProperties));
         cmd.apply();
       }
