@@ -78,8 +78,7 @@ void RenderObject::operator delete(void* ptr, size_t sz) {
   *(size_t*)ptr = sz;
 }
 
-RenderObject* RenderObject::createObject(WebCore::Node* node,
-                                         RenderStyle* style) {
+RenderObject* RenderObject::createObject(Node* node, RenderStyle* style) {
   RenderObject* o = 0;
   RenderArena* arena = node->getDocument()->renderArena();
   switch (style->display()) {
@@ -143,7 +142,7 @@ int RenderObjectCounter::count;
 static RenderObjectCounter renderObjectCounter;
 #endif NDEBUG
 
-RenderObject::RenderObject(WebCore::Node* node)
+RenderObject::RenderObject(Node* node)
     : CachedObjectClient(),
       m_style(0),
       m_node(node),
@@ -1667,7 +1666,7 @@ void showTree(const RenderObject* ro) {
 #endif
 
 static Node* selectStartNode(const RenderObject* object) {
-  WebCore::Node* node = 0;
+  Node* node = 0;
   bool forcedOn = false;
 
   for (const RenderObject* curr = object; curr; curr = curr->parent()) {
@@ -1711,17 +1710,17 @@ Color RenderObject::selectionColor(GraphicsContext* p) const {
   return color;
 }
 
-WebCore::Node* RenderObject::draggableNode(bool dhtmlOK,
-                                           bool uaOK,
-                                           int x,
-                                           int y,
-                                           bool& dhtmlWillDrag) const {
+Node* RenderObject::draggableNode(bool dhtmlOK,
+                                  bool uaOK,
+                                  int x,
+                                  int y,
+                                  bool& dhtmlWillDrag) const {
   if (!dhtmlOK && !uaOK)
     return 0;
 
   const RenderObject* curr = this;
   while (curr) {
-    WebCore::Node* elt = curr->element();
+    Node* elt = curr->element();
     if (elt && elt->nodeType() == Node::TEXT_NODE) {
       // Since there's no way for the author to address the -khtml-user-drag
       // style for a text node,
@@ -2433,20 +2432,22 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   if (result)
     return result;
 
-  WebCore::Node* node = element();
+  Node* node = element();
   if (isText())
     node = element()->parentNode();
   if (!node)
     return 0;
 
   if (pseudo == RenderStyle::FIRST_LINE_INHERITED)
-    result = document()->styleSelector()->styleForElement(
-        static_cast<WebCore::Element*>(node), parentStyle, false);
+    result = document()->styleSelector()->createStyleForElement(
+        static_cast<Element*>(node), parentStyle, false);
   else
-    result = document()->styleSelector()->pseudoStyleForElement(
-        pseudo, static_cast<WebCore::Element*>(node), parentStyle);
-  if (result)
+    result = document()->styleSelector()->createPseudoStyleForElement(
+        pseudo, static_cast<Element*>(node), parentStyle);
+  if (result) {
     style()->addPseudoStyle(result);
+    result->deref(document()->renderArena());
+  }
   return result;
 }
 

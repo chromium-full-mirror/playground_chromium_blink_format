@@ -711,15 +711,16 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
   return 0;
 }
 
-RenderStyle* CSSStyleSelector::styleForElement(Element* e,
-                                               RenderStyle* defaultParent,
-                                               bool allowSharing) {
+RenderStyle* CSSStyleSelector::createStyleForElement(Element* e,
+                                                     RenderStyle* defaultParent,
+                                                     bool allowSharing) {
   if (!e->getDocument()->haveStylesheetsLoaded()) {
     if (!styleNotYetAvailable) {
       styleNotYetAvailable = ::new RenderStyle();
       styleNotYetAvailable->setDisplay(NONE);
       styleNotYetAvailable->ref();
     }
+    styleNotYetAvailable->ref();
     return styleNotYetAvailable;
   }
 
@@ -731,12 +732,15 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
     total++;
     printf("Sharing %d out of %d\n", fraction, total);
 #endif
-    if (style)
+    if (style) {
+      style->ref();
       return style;
+    }
   }
   initForStyleResolve(e, defaultParent);
 
   style = new (e->getDocument()->renderArena()) RenderStyle();
+  style->ref();
   if (parentStyle)
     style->inheritFrom(parentStyle);
   else
@@ -865,7 +869,7 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
   return style;
 }
 
-RenderStyle* CSSStyleSelector::pseudoStyleForElement(
+RenderStyle* CSSStyleSelector::createPseudoStyleForElement(
     RenderStyle::PseudoId pseudo,
     Element* e,
     RenderStyle* parentStyle) {
@@ -891,6 +895,7 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
     return 0;
 
   style = new (e->getDocument()->renderArena()) RenderStyle();
+  style->ref();
   if (parentStyle)
     style->inheritFrom(parentStyle);
   else
