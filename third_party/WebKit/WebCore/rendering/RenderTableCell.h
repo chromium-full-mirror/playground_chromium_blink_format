@@ -110,8 +110,6 @@ class RenderTableCell : public RenderBlock {
   virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
 #endif
 
-  virtual IntRect getAbsoluteRepaintRect();
-
   void paintBackgroundsBehindCell(PaintInfo&,
                                   int tx,
                                   int ty,
