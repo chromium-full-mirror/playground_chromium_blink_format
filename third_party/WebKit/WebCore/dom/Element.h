@@ -166,6 +166,10 @@ class Element : public ContainerNode {
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 
+  Node* insertAdjacentElement(const String& where,
+                              Node* newChild,
+                              int& exception);
+
  protected:
   virtual void createAttributeMap() const;
   String openTagStartToString() const;
