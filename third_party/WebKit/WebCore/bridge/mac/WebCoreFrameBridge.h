@@ -144,6 +144,8 @@ typedef enum {
   WebUndoActionPasteFont,
   WebUndoActionPasteRuler,
   WebUndoActionTyping,
+  WebUndoActionCreateLink,
+  WebUndoActionUnlink,
 } WebUndoAction;
 
 typedef enum {

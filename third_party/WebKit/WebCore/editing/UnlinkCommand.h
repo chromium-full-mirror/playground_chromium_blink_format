@@ -34,6 +34,7 @@ class UnlinkCommand : public CompositeEditCommand {
  public:
   UnlinkCommand(WebCore::Document*);
   virtual void doApply();
+  virtual EditAction editingAction() const { return EditActionUnlink; }
 
  private:
 };
