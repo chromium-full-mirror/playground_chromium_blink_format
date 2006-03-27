@@ -60,14 +60,12 @@ inline bool compareEqual(const T& t, const U& u) {
 class RenderArena;
 
 namespace WebCore {
-class StringImpl;
-class ShadowValue;
-}
 
-namespace WebCore {
-
+class CSSStyleSelector;
 class CachedImage;
 class CachedObject;
+class ShadowValue;
+class StringImpl;
 
 enum PseudoState {
   PseudoUnknown,
@@ -653,7 +651,7 @@ struct ShadowData {
 
 #ifndef KHTML_NO_XBL
 struct BindingURI {
-  BindingURI(WebCore::StringImpl*);
+  BindingURI(StringImpl*);
   ~BindingURI();
 
   BindingURI* copy();
@@ -664,10 +662,10 @@ struct BindingURI {
   BindingURI* next() { return m_next; }
   void setNext(BindingURI* n) { m_next = n; }
 
-  WebCore::StringImpl* uri() { return m_uri; }
+  StringImpl* uri() { return m_uri; }
 
   BindingURI* m_next;
-  WebCore::StringImpl* m_uri;
+  StringImpl* m_uri;
 };
 #endif
 
@@ -845,7 +843,7 @@ class StyleInheritedData : public Shared<StyleInheritedData> {
   CachedImage* style_image;
   CachedImage* cursor_image;
 
-  WebCore::Font font;
+  Font font;
   Color color;
 
   short horizontal_border_spacing;
@@ -922,7 +920,7 @@ struct ContentData {
 
   ContentType contentType() { return _contentType; }
 
-  WebCore::StringImpl* contentText() {
+  StringImpl* contentText() {
     if (contentType() == CONTENT_TEXT)
       return _content.text;
     return 0;
@@ -937,7 +935,7 @@ struct ContentData {
 
   union {
     CachedObject* object;
-    WebCore::StringImpl* text;
+    StringImpl* text;
     // counters...
   } _content;
 
@@ -1126,7 +1124,7 @@ class RenderStyle {
   int m_ref;
 
 #if SVG_SUPPORT
-  DataRef<WebCore::SVGRenderStyle> m_svgStyle;
+  DataRef<SVGRenderStyle> m_svgStyle;
 #endif
 
   // !END SYNC!
@@ -1879,7 +1877,7 @@ class RenderStyle {
   void inheritBindingURIs(BindingURI* other) {
     SET_VAR(css3NonInheritedData, bindingURI, other->copy());
   }
-  void addBindingURI(WebCore::StringImpl* uri);
+  void addBindingURI(StringImpl* uri);
 #endif
   void setOutlineOffset(unsigned short v) {
     SET_VAR(background, m_outline._offset, v)
@@ -1960,13 +1958,13 @@ class RenderStyle {
   }
 
 #if SVG_SUPPORT
-  const WebCore::SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
-  WebCore::SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
+  const SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
+  SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
 #endif
 
   ContentData* contentData() { return content; }
   bool contentDataEquivalent(const RenderStyle* otherStyle) const;
-  void setContent(WebCore::StringImpl* s, bool add = false);
+  void setContent(StringImpl* s, bool add = false);
   void setContent(CachedObject* o, bool add = false);
 
   bool inheritedNotEqual(RenderStyle* other) const;
@@ -2096,6 +2094,6 @@ class RenderStyle {
   noneDashboardRegions();
 };
 
-}  // namespace
+}  // namespace WebCore
 
 #endif
