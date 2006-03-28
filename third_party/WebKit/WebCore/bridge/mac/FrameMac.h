@@ -269,7 +269,7 @@ class FrameMac : public Frame {
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*);
-  void addPluginRootObject(const KJS::Bindings::RootObject* root);
+  void addPluginRootObject(KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
   virtual void registerCommandForUndo(const EditCommandPtr&);
@@ -381,7 +381,7 @@ class FrameMac : public Frame {
 
   KJS::Bindings::RootObject* _bindingRoot;  // The root object used for objects
   // bound outside the context of a plugin.
-  DeprecatedPtrList<KJS::Bindings::RootObject> rootObjects;
+  Vector<KJS::Bindings::RootObject*> m_rootObjects;
   WebScriptObject* _windowScriptObject;
   NPObject* _windowScriptNPObject;
 
