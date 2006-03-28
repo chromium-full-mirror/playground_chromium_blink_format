@@ -68,7 +68,7 @@ JSValue* KJSProxy::evaluate(const String& filename,
   JSValue* thisNode =
       n ? Window::retrieve(m_frame) : toJS(m_script->globalExec(), n);
   Completion comp = m_script->evaluate(
-      filename, baseLine, reinterpret_cast<KJS::UChar*>(str.unicode()),
+      filename, baseLine, reinterpret_cast<const KJS::UChar*>(str.unicode()),
       str.length(), thisNode);
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue)

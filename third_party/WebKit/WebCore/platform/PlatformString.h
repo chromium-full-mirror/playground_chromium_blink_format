@@ -112,7 +112,7 @@ class String {
   String lower() const;
   String upper() const;
 
-  QChar* unicode() const;
+  const QChar* unicode() const;
   DeprecatedString deprecatedString() const;
 
   int toInt(bool* ok = 0) const;

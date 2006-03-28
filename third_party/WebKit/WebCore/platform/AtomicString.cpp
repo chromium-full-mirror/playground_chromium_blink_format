@@ -54,17 +54,17 @@ struct CStringTranslator {
                         const char* const& c,
                         unsigned hash) {
     StringImpl* r = new StringImpl(c);
-    r->_hash = hash;
-    r->_inTable = true;
+    r->m_hash = hash;
+    r->m_inTable = true;
     location = r;
   }
 };
 
 bool operator==(const AtomicString& a, const char* b) {
   StringImpl* impl = a.impl();
-  if ((!impl || !impl->s) && !b)
+  if ((!impl || !impl->unicode()) && !b)
     return true;
-  if ((!impl || !impl->s) || !b)
+  if ((!impl || !impl->unicode()) || !b)
     return false;
   return CStringTranslator::equal(impl, b);
 }
@@ -117,8 +117,8 @@ struct QCharBufferTranslator {
                         const QCharBuffer& buf,
                         unsigned hash) {
     StringImpl* r = new StringImpl(buf.s, buf.length);
-    r->_hash = hash;
-    r->_inTable = true;
+    r->m_hash = hash;
+    r->m_inTable = true;
 
     location = r;
   }
@@ -136,7 +136,7 @@ StringImpl* AtomicString::add(const QChar* s, int length) {
 }
 
 StringImpl* AtomicString::add(StringImpl* r) {
-  if (!r || r->_inTable)
+  if (!r || r->m_inTable)
     return r;
 
   if (r->length() == 0)
@@ -144,7 +144,7 @@ StringImpl* AtomicString::add(StringImpl* r) {
 
   StringImpl* result = *stringTable->add(r).first;
   if (result == r)
-    r->_inTable = true;
+    r->m_inTable = true;
   return result;
 }
 
