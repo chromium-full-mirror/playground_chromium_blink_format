@@ -131,6 +131,12 @@ inline IntRect intersection(const IntRect& a, const IntRect& b) {
   return c;
 }
 
+inline IntRect unionRect(const IntRect& a, const IntRect& b) {
+  IntRect c = a;
+  c.unite(b);
+  return c;
+}
+
 inline bool operator==(const IntRect& a, const IntRect& b) {
   return a.location() == b.location() && a.size() == b.size();
 }
