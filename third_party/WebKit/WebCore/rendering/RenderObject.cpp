@@ -238,31 +238,40 @@ void RenderObject::insertChildNode(RenderObject*, RenderObject*) {
   KHTMLAssert(0);
 }
 
-RenderObject* RenderObject::nextRenderer() const {
-  if (firstChild())
-    return firstChild();
+RenderObject* RenderObject::nextInPreOrder() const {
+  if (RenderObject* o = firstChild())
+    return o;
 
-  if (nextSibling())
-    return nextSibling();
-
-  const RenderObject* r = this;
-  while (r && !r->nextSibling())
-    r = r->parent();
-  if (r)
-    return r->nextSibling();
-
-  return 0;
+  return nextInPreOrderAfterChildren();
 }
 
-RenderObject* RenderObject::previousRenderer() const {
-  if (previousSibling()) {
-    RenderObject* r = previousSibling();
-    while (r->lastChild())
-      r = r->lastChild();
-    return r;
+RenderObject* RenderObject::nextInPreOrderAfterChildren() const {
+  RenderObject* o;
+  if (!(o = nextSibling())) {
+    o = parent();
+    while (o && !o->nextSibling())
+      o = o->parent();
+    if (o)
+      o = o->nextSibling();
+  }
+  return o;
+}
+
+RenderObject* RenderObject::previousInPreOrder() const {
+  if (RenderObject* o = previousSibling()) {
+    while (o->lastChild())
+      o = o->lastChild();
+    return o;
   }
 
   return parent();
+}
+
+RenderObject* RenderObject::childAt(unsigned index) const {
+  RenderObject* child = firstChild();
+  for (unsigned i = 0; child && i < index; i++)
+    child = child->nextSibling();
+  return child;
 }
 
 bool RenderObject::isEditable() const {

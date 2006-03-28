@@ -247,25 +247,20 @@ void RenderCanvas::absoluteRects(DeprecatedValueList<IntRect>& rects,
   rects.append(IntRect(_tx, _ty, m_layer->width(), m_layer->height()));
 }
 
+RenderObject* rendererAfterPosition(RenderObject* object, unsigned offset) {
+  if (!object)
+    return 0;
+  RenderObject* child = object->childAt(offset);
+  return child ? child : object->nextInPreOrderAfterChildren();
+}
+
 IntRect RenderCanvas::selectionRect() const {
   typedef HashMap<RenderObject*, SelectionInfo*> SelectionMap;
   SelectionMap selectedObjects;
 
   RenderObject* os = m_selectionStart;
-  while (os) {
-    RenderObject* no = 0;
-    if (os != m_selectionEnd) {
-      if (!(no = os->firstChild())) {
-        if (!(no = os->nextSibling())) {
-          no = os->parent();
-          while (no && no != m_selectionEnd && !no->nextSibling())
-            no = no->parent();
-          if (no && no != m_selectionEnd)
-            no = no->nextSibling();
-        }
-      }
-    }
-
+  RenderObject* stop = rendererAfterPosition(m_selectionEnd, m_selectionEndPos);
+  while (os && os != stop) {
     if ((os->canBeSelectionLeaf() || os == m_selectionStart ||
          os == m_selectionEnd) &&
         os->selectionState() != SelectionNone) {
@@ -283,7 +278,7 @@ IntRect RenderCanvas::selectionRect() const {
       }
     }
 
-    os = no;
+    os = os->nextInPreOrder();
   }
 
   // Now create a single bounding box rect that encloses the whole selection.
@@ -333,20 +328,8 @@ void RenderCanvas::setSelection(RenderObject* s,
   SelectedBlockMap newSelectedBlocks;
 
   RenderObject* os = m_selectionStart;
-  while (os) {
-    RenderObject* no = 0;
-    if (os != m_selectionEnd) {
-      if (!(no = os->firstChild())) {
-        if (!(no = os->nextSibling())) {
-          no = os->parent();
-          while (no && no != m_selectionEnd && !no->nextSibling())
-            no = no->parent();
-          if (no && no != m_selectionEnd)
-            no = no->nextSibling();
-        }
-      }
-    }
-
+  RenderObject* stop = rendererAfterPosition(m_selectionEnd, m_selectionEndPos);
+  while (os && os != stop) {
     if ((os->canBeSelectionLeaf() || os == m_selectionStart ||
          os == m_selectionEnd) &&
         os->selectionState() != SelectionNone) {
@@ -363,7 +346,7 @@ void RenderCanvas::setSelection(RenderObject* s,
       }
     }
 
-    os = no;
+    os = os->nextInPreOrder();
   }
 
   // Now clear the selection.
@@ -390,44 +373,19 @@ void RenderCanvas::setSelection(RenderObject* s,
   }
 
   RenderObject* o = s;
-  while (o) {
-    RenderObject* no = 0;
+  stop = rendererAfterPosition(e, ep);
+
+  while (o && o != stop) {
     if (o != s && o != e && o->canBeSelectionLeaf())
       o->setSelectionState(SelectionInside);
-
-    if (o != e) {
-      if (!(no = o->firstChild())) {
-        if (!(no = o->nextSibling())) {
-          no = o->parent();
-          while (no && no != e && !no->nextSibling())
-            no = no->parent();
-          if (no && no != e)
-            no = no->nextSibling();
-        }
-      }
-    }
-
-    o = no;
+    o = o->nextInPreOrder();
   }
 
   // Now that the selection state has been updated for the new objects, walk
   // them again and
   // put them in the new objects list.
   o = s;
-  while (o) {
-    RenderObject* no = 0;
-    if (o != e) {
-      if (!(no = o->firstChild())) {
-        if (!(no = o->nextSibling())) {
-          no = o->parent();
-          while (no && no != e && !no->nextSibling())
-            no = no->parent();
-          if (no && no != e)
-            no = no->nextSibling();
-        }
-      }
-    }
-
+  while (o && o != stop) {
     if ((o->canBeSelectionLeaf() || o == s || o == e) &&
         o->selectionState() != SelectionNone) {
       newSelectedObjects.set(o, new SelectionInfo(o));
@@ -441,7 +399,7 @@ void RenderCanvas::setSelection(RenderObject* s,
       }
     }
 
-    o = no;
+    o = o->nextInPreOrder();
   }
 
   if (!m_view)
