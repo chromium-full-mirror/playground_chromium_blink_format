@@ -27,6 +27,7 @@
 #include "Color.h"
 
 #include "DeprecatedString.h"
+#include "PlatformString.h"
 #include <kxmlcore/Assertions.h>
 
 // Turn off inlining to avoid warning with newer gcc.
@@ -121,12 +122,13 @@ Color::Color(const char* name) {
   }
 }
 
-DeprecatedString Color::name() const {
-  DeprecatedString name;
+String Color::name() const {
+  String name;
   if (alpha() < 0xFF)
-    name.sprintf("#%02X%02X%02X%02X", red(), green(), blue(), alpha());
+    name =
+        String::sprintf("#%02X%02X%02X%02X", red(), green(), blue(), alpha());
   else
-    name.sprintf("#%02X%02X%02X", red(), green(), blue());
+    name = String::sprintf("#%02X%02X%02X", red(), green(), blue());
   return name;
 }
 

@@ -1291,14 +1291,12 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
         "URL %s. Domains must match.\n",
         targetDocument->URL().latin1(), originDocument->URL().latin1());
   }
-  DeprecatedString message;
-  message.sprintf(
+  String message = String::sprintf(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       targetDocument->URL().latin1(), originDocument->URL().latin1());
   targetPart->addMessageToConsole(
-      String(message), 1,
-      String());  // fixme: provide a real line number and sourceurl
+      message, 1, String());  // fixme: provide a real line number and sourceurl
 
   return false;
 }
@@ -1361,12 +1359,11 @@ bool Window::isSafeScript(ExecState* exec) const {
         "URL %s. Domains must match.\n",
         thisDocument->URL().latin1(), actDocument->URL().latin1());
   }
-  DeprecatedString message;
-  message.sprintf(
+  String message = String::sprintf(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       thisDocument->URL().latin1(), actDocument->URL().latin1());
-  m_frame->addMessageToConsole(String(message), 1, String());
+  m_frame->addMessageToConsole(message, 1, String());
 
   return false;
 }
@@ -2190,7 +2187,7 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
       // Bleh.
       UString str = url.host();
       if (url.port())
-        str += ":" + DeprecatedString::number((int)url.port());
+        str += ":" + String::number((int)url.port());
       return jsString(str);
     }
     case Hostname:
@@ -2203,8 +2200,7 @@ JSValue* Location::getValueProperty(ExecState* exec, int token) const {
     case Pathname:
       return jsString(url.path().isEmpty() ? "/" : url.path());
     case Port:
-      return jsString(url.port() ? DeprecatedString::number((int)url.port())
-                                 : "");
+      return jsString(url.port() ? String::number((int)url.port()) : "");
     case Protocol:
       return jsString(url.protocol() + ":");
     case Search:

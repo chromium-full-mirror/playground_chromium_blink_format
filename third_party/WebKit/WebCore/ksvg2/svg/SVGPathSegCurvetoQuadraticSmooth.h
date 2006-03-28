@@ -35,11 +35,9 @@ class SVGPathSegCurvetoQuadraticSmoothAbs : public SVGPathSeg {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_SMOOTH_ABS;
   }
-  virtual StringImpl* pathSegTypeAsLetter() const {
-    return new StringImpl("T");
-  }
-  virtual DeprecatedString toString() const {
-    return DeprecatedString::fromLatin1("T %1 %2").arg(m_x).arg(m_y);
+  virtual String pathSegTypeAsLetter() const { return "T"; }
+  virtual String toString() const {
+    return String::sprintf("T %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);
@@ -61,11 +59,9 @@ class SVGPathSegCurvetoQuadraticSmoothRel : public SVGPathSeg {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL;
   }
-  virtual StringImpl* pathSegTypeAsLetter() const {
-    return new StringImpl("t");
-  }
-  virtual DeprecatedString toString() const {
-    return DeprecatedString::fromLatin1("t %1 %2").arg(m_x).arg(m_y);
+  virtual String pathSegTypeAsLetter() const { return "t"; }
+  virtual String toString() const {
+    return String::sprintf("t %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);

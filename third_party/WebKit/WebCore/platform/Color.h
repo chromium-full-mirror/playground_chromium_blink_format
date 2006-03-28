@@ -40,6 +40,8 @@ typedef struct CGColor* CGColorRef;
 
 namespace WebCore {
 
+class String;
+
 typedef unsigned int RGBA32;  // RGBA quadruplet
 
 RGBA32 makeRGB(int r, int g, int b);
@@ -55,7 +57,7 @@ class Color {
   explicit Color(const DeprecatedString&);
   explicit Color(const char*);
 
-  DeprecatedString name() const;
+  String name() const;
   void setNamedColor(const DeprecatedString&);
 
   bool isValid() const { return valid; }

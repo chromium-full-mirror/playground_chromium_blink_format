@@ -33,11 +33,9 @@ class SVGPathSegLinetoAbs : public SVGPathSeg {
   virtual ~SVGPathSegLinetoAbs();
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_ABS; }
-  virtual StringImpl* pathSegTypeAsLetter() const {
-    return new StringImpl("L");
-  }
-  virtual DeprecatedString toString() const {
-    return DeprecatedString::fromLatin1("L %1 %2").arg(m_x).arg(m_y);
+  virtual String pathSegTypeAsLetter() const { return "L"; }
+  virtual String toString() const {
+    return String::sprintf("L %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);
@@ -57,11 +55,9 @@ class SVGPathSegLinetoRel : public SVGPathSeg {
   virtual ~SVGPathSegLinetoRel();
 
   virtual unsigned short pathSegType() const { return PATHSEG_LINETO_REL; }
-  virtual StringImpl* pathSegTypeAsLetter() const {
-    return new StringImpl("l");
-  }
-  virtual DeprecatedString toString() const {
-    return DeprecatedString::fromLatin1("l %1 %2").arg(m_x).arg(m_y);
+  virtual String pathSegTypeAsLetter() const { return "l"; }
+  virtual String toString() const {
+    return String::sprintf("l %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);

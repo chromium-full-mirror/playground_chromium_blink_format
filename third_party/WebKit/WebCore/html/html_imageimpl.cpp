@@ -245,7 +245,7 @@ int HTMLImageElement::width(bool ignorePendingStylesheets) const {
   if (!renderer()) {
     // check the attribute first for an explicit pixel value
     bool ok;
-    int width = getAttribute(widthAttr).deprecatedString().toInt(&ok);
+    int width = getAttribute(widthAttr).toInt(&ok);
     if (ok)
       return width;
 
@@ -267,7 +267,7 @@ int HTMLImageElement::height(bool ignorePendingStylesheets) const {
   if (!renderer()) {
     // check the attribute first for an explicit pixel value
     bool ok;
-    int height = getAttribute(heightAttr).deprecatedString().toInt(&ok);
+    int height = getAttribute(heightAttr).toInt(&ok);
     if (ok)
       return height;
 
@@ -320,11 +320,11 @@ int HTMLImageElement::border() const {
 }
 
 void HTMLImageElement::setBorder(int value) {
-  setAttribute(borderAttr, DeprecatedString::number(value));
+  setAttribute(borderAttr, String::number(value));
 }
 
 void HTMLImageElement::setHeight(int value) {
-  setAttribute(heightAttr, DeprecatedString::number(value));
+  setAttribute(heightAttr, String::number(value));
 }
 
 int HTMLImageElement::hspace() const {
@@ -333,7 +333,7 @@ int HTMLImageElement::hspace() const {
 }
 
 void HTMLImageElement::setHspace(int value) {
-  setAttribute(hspaceAttr, DeprecatedString::number(value));
+  setAttribute(hspaceAttr, String::number(value));
 }
 
 bool HTMLImageElement::isMap() const {
@@ -374,11 +374,11 @@ int HTMLImageElement::vspace() const {
 }
 
 void HTMLImageElement::setVspace(int value) {
-  setAttribute(vspaceAttr, DeprecatedString::number(value));
+  setAttribute(vspaceAttr, String::number(value));
 }
 
 void HTMLImageElement::setWidth(int value) {
-  setAttribute(widthAttr, DeprecatedString::number(value));
+  setAttribute(widthAttr, String::number(value));
 }
 
 int HTMLImageElement::x() const {
@@ -635,7 +635,7 @@ int HTMLAreaElement::tabIndex() const {
 }
 
 void HTMLAreaElement::setTabIndex(int tabIndex) {
-  setAttribute(tabindexAttr, DeprecatedString::number(tabIndex));
+  setAttribute(tabindexAttr, String::number(tabIndex));
 }
 
 String HTMLAreaElement::target() const {

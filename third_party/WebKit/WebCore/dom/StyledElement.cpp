@@ -351,7 +351,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
   if (attr->decl()->setProperty(id, c, false))
     return;
 
-  DeprecatedString color = c.deprecatedString();
+  String color = c.copy();
   // not something that fits the specs.
 
   // we're emulating IEs color parser here. It maps transparent to black,
@@ -406,10 +406,10 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
       colors[0] >>= 4 * maxDigit;
       colors[1] >>= 4 * maxDigit;
       colors[2] >>= 4 * maxDigit;
-      // assert( colors[0] < 0x100 && colors[1] < 0x100 && colors[2] < 0x100 );
+      // assert(colors[0] < 0x100 && colors[1] < 0x100 && colors[2] < 0x100);
 
-      color.sprintf("#%02x%02x%02x", colors[0], colors[1], colors[2]);
-      if (attr->decl()->setProperty(id, String(color), false))
+      color = String::sprintf("#%02x%02x%02x", colors[0], colors[1], colors[2]);
+      if (attr->decl()->setProperty(id, color, false))
         return;
     }
   }

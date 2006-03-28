@@ -277,7 +277,7 @@ DeprecatedString HTMLGenericFormElement::findMatchingState(
     assert(sep1 >= 0);
     assert(sep2 >= 0);
 
-    DeprecatedString nameAndType = state.left(sep2);
+    String nameAndType = state.left(sep2);
     if (encName.length() + typeStr.length() + 1 == (unsigned)sep2 &&
         nameAndType.startsWith(encName) && nameAndType.endsWith(typeStr)) {
       states.remove(it);
@@ -292,7 +292,7 @@ int HTMLGenericFormElement::tabIndex() const {
 }
 
 void HTMLGenericFormElement::setTabIndex(int value) {
-  setAttribute(tabindexAttr, DeprecatedString::number(value));
+  setAttribute(tabindexAttr, String::number(value));
 }
 
 }  // namespace

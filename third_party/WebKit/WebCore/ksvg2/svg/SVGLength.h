@@ -50,8 +50,8 @@ class SVGLength : public Shared<SVGLength> {
   float valueInSpecifiedUnits() const;
   void setValueInSpecifiedUnits(float valueInSpecifiedUnits);
 
-  StringImpl* valueAsString() const;
-  void setValueAsString(StringImpl* valueAsString);
+  String valueAsString() const;
+  void setValueAsString(const String&);
 
   void newValueSpecifiedUnits(unsigned short unitType,
                               float valueInSpecifiedUnits);

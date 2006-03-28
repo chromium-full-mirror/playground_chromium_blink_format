@@ -33,10 +33,8 @@ class SVGPathSegClosePath : public SVGPathSeg {
   virtual ~SVGPathSegClosePath();
 
   virtual unsigned short pathSegType() const { return PATHSEG_CLOSEPATH; }
-  virtual StringImpl* pathSegTypeAsLetter() const {
-    return new StringImpl("Z");
-  }
-  virtual DeprecatedString toString() const { return "Z"; }
+  virtual String pathSegTypeAsLetter() const { return "Z"; }
+  virtual String toString() const { return "Z"; }
 };
 };
 
