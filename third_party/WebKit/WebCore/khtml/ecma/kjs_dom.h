@@ -182,6 +182,8 @@ class DOMEventTargetNode : public DOMNode {
   DOMEventTargetNode(WebCore::Node* n);
 };
 
+WebCore::EventTargetNode* toEventTargetNode(
+    JSValue*);  // returns 0 if passed-in value is not a EventTargetNode object
 WebCore::Node* toNode(
     JSValue*);  // returns 0 if passed-in value is not a DOMNode object
 

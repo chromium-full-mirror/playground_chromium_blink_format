@@ -393,7 +393,7 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
                                          bool shiftKey,
                                          bool metaKey,
                                          bool isSimulated,
-                                         Node* relatedTarget) {
+                                         Node* relatedTargetArg) {
   assert(!eventDispatchForbidden());
   if (disabled())  // Don't even send DOM events for disabled controls..
     return true;
@@ -412,6 +412,13 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
   ExceptionCode ec = 0;
 
   bool swallowEvent = false;
+
+  // Attempting to dispatch with a non-EventTarget relatedTarget causes the
+  // relatedTarget to be silently ignored.
+  EventTargetNode* relatedTarget =
+      (relatedTargetArg && relatedTargetArg->isEventTargetNode())
+          ? static_cast<EventTargetNode*>(relatedTargetArg)
+          : 0;
 
   RefPtr<Event> me = new MouseEvent(
       eventType, true, cancelable, document()->defaultView(), detail, screenX,

@@ -340,6 +340,13 @@ JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
+EventTargetNode* toEventTargetNode(JSValue* val) {
+  if (!val || !val->isObject(&DOMEventTargetNode::info))
+    return 0;
+  return static_cast<EventTargetNode*>(
+      static_cast<DOMEventTargetNode*>(val)->impl());
+}
+
 Node* toNode(JSValue* val) {
   if (!val || !val->isObject(&DOMNode::info))
     return 0;

@@ -36,6 +36,7 @@ namespace WebCore {
 
 class Clipboard;
 class EventListener;
+class EventTargetNode;
 class Image;
 class IntPoint;
 class PlatformKeyboardEvent;
@@ -253,14 +254,14 @@ class MouseEvent : public MouseRelatedEvent {
              bool shiftKeyArg,
              bool metaKeyArg,
              unsigned short buttonArg,
-             Node* relatedTargetArg,
+             EventTargetNode* relatedTargetArg,
              Clipboard* clipboardArg = 0,
              bool isSimulated = false);
   virtual ~MouseEvent();
   // WinIE uses 1,4,2 for left/middle/right but not for click (just for
   // mousedown/up, maybe others), but we will match the standard DOM.
   unsigned short button() const { return m_button; }
-  Node* relatedTarget() const { return m_relatedTarget.get(); }
+  EventTargetNode* relatedTarget() const { return m_relatedTarget.get(); }
   Clipboard* clipboard() const { return m_clipboard.get(); }
   bool isSimulated() const { return m_isSimulated; }
   Node* toElement() const;
@@ -279,14 +280,14 @@ class MouseEvent : public MouseRelatedEvent {
                       bool shiftKeyArg,
                       bool metaKeyArg,
                       unsigned short buttonArg,
-                      Node* relatedTargetArg);
+                      EventTargetNode* relatedTargetArg);
   virtual bool isMouseEvent() const;
   virtual bool isDragEvent() const;
   virtual int which() const;
 
  private:
   unsigned short m_button;
-  RefPtr<Node> m_relatedTarget;
+  RefPtr<EventTargetNode> m_relatedTarget;
   RefPtr<Clipboard> m_clipboard;
   bool m_isSimulated;
 };

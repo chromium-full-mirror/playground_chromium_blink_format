@@ -325,7 +325,7 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                        bool shiftKeyArg,
                        bool metaKeyArg,
                        unsigned short buttonArg,
-                       Node* relatedTargetArg,
+                       EventTargetNode* relatedTargetArg,
                        Clipboard* clipboardArg,
                        bool isSimulated)
     : MouseRelatedEvent(eventType,
@@ -362,7 +362,7 @@ void MouseEvent::initMouseEvent(const AtomicString& typeArg,
                                 bool shiftKeyArg,
                                 bool metaKeyArg,
                                 unsigned short buttonArg,
-                                Node* relatedTargetArg) {
+                                EventTargetNode* relatedTargetArg) {
   if (dispatched())
     return;
 
