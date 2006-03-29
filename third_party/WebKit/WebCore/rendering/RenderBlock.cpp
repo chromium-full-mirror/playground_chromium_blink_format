@@ -1329,6 +1329,13 @@ void RenderBlock::getAbsoluteRepaintRectIncludingFloats(IntRect& bounds,
 void RenderBlock::repaintFloatingDescendants() {
   // Repaint any overhanging floats (if we know we're the one to paint them).
   if (hasOverhangingFloats()) {
+    // We think that we must be in a bad state if m_floatingObjects is nil at
+    // this point, so
+    // we assert on Debug builds and nil-check Release builds.
+    ASSERT(m_floatingObjects);
+    if (!m_floatingObjects)
+      return;
+
     FloatingObject* r;
     DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
@@ -2499,7 +2506,14 @@ void RenderBlock::addOverhangingFloats(RenderBlock* child, int xoff, int yoff) {
   // Prevent floats from being added to the canvas by the root element, e.g.,
   // <html>.
   if (child->hasOverflowClip() || !child->hasOverhangingFloats() ||
-      !child->m_floatingObjects || child->isRoot())
+      child->isRoot())
+    return;
+
+  // We think that we must be in a bad state if child->m_floatingObjects is nil
+  // at this point,
+  // so we assert on Debug builds and nil-check Release builds.
+  ASSERT(child->m_floatingObjects);
+  if (!child->m_floatingObjects)
     return;
 
   DeprecatedPtrListIterator<FloatingObject> it(*child->m_floatingObjects);
