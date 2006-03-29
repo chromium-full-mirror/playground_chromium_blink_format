@@ -169,6 +169,7 @@ class Element : public ContainerNode {
   Node* insertAdjacentElement(const String& where,
                               Node* newChild,
                               int& exception);
+  bool contains(const Element*) const;
 
  protected:
   virtual void createAttributeMap() const;

@@ -289,6 +289,12 @@ Node* Element::insertAdjacentElement(const String& where,
   return 0;
 }
 
+bool Element::contains(const Element* element) const {
+  if (!element)
+    return false;
+  return this == element || element->isAncestor(this);
+}
+
 void Element::createAttributeMap() const {
   namedAttrMap = new NamedAttrMap(const_cast<Element*>(this));
 }
