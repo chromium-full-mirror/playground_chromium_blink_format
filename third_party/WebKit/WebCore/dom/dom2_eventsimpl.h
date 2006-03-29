@@ -263,7 +263,6 @@ class MouseEvent : public MouseRelatedEvent {
   unsigned short button() const { return m_button; }
   EventTargetNode* relatedTarget() const { return m_relatedTarget.get(); }
   Clipboard* clipboard() const { return m_clipboard.get(); }
-  bool isSimulated() const { return m_isSimulated; }
   Node* toElement() const;
   Node* fromElement() const;
   void initMouseEvent(const AtomicString& typeArg,
@@ -289,7 +288,6 @@ class MouseEvent : public MouseRelatedEvent {
   unsigned short m_button;
   RefPtr<EventTargetNode> m_relatedTarget;
   RefPtr<Clipboard> m_clipboard;
-  bool m_isSimulated;
 };
 
 // Introduced in DOM Level 3

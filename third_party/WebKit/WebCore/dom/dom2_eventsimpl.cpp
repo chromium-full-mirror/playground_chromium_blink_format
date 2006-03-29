@@ -194,7 +194,7 @@ MouseRelatedEvent::MouseRelatedEvent()
       m_layerY(0),
       m_offsetX(0),
       m_offsetY(0),
-      m_isSimulated(0) {}
+      m_isSimulated(false) {}
 
 MouseRelatedEvent::MouseRelatedEvent(const AtomicString& eventType,
                                      bool canBubbleArg,
@@ -222,7 +222,8 @@ MouseRelatedEvent::MouseRelatedEvent(const AtomicString& eventType,
       m_screenX(screenXArg),
       m_screenY(screenYArg),
       m_clientX(clientXArg),
-      m_clientY(clientYArg) {
+      m_clientY(clientYArg),
+      m_isSimulated(isSimulated) {
   initCoordinates();
 }
 
@@ -340,11 +341,11 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                         ctrlKeyArg,
                         altKeyArg,
                         shiftKeyArg,
-                        metaKeyArg),
+                        metaKeyArg,
+                        isSimulated),
       m_button(buttonArg),
       m_relatedTarget(relatedTargetArg),
-      m_clipboard(clipboardArg),
-      m_isSimulated(isSimulated) {}
+      m_clipboard(clipboardArg) {}
 
 MouseEvent::~MouseEvent() {}
 
