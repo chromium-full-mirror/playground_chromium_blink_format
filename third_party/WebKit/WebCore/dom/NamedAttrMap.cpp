@@ -34,7 +34,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 static inline bool inHTMLDocument(const Element* e) {
-  return e && e->getDocument()->isHTMLDocument();
+  return e && e->document()->isHTMLDocument();
 }
 
 NamedAttrMap::NamedAttrMap(Element* e) : element(e), attrs(0), len(0) {}
@@ -95,7 +95,7 @@ PassRefPtr<Node> NamedAttrMap::setNamedItem(Node* arg, ExceptionCode& ec) {
 
   // WRONG_DOCUMENT_ERR: Raised if arg was created from a different document
   // than the one that created this map.
-  if (arg->getDocument() != element->getDocument()) {
+  if (arg->document() != element->document()) {
     ec = WRONG_DOCUMENT_ERR;
     return 0;
   }

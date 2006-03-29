@@ -80,7 +80,7 @@ void NamedMappedAttrMap::parseClassAttribute(const String& classStr) {
     return;
 
   String classAttr =
-      element->getDocument()->inCompatMode()
+      element->document()->inCompatMode()
           ? (classStr.impl()->isLower() ? classStr
                                         : String(classStr.impl()->lower()))
           : classStr;

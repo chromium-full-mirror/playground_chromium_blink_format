@@ -141,9 +141,9 @@ Attribute* StyledElement::createAttribute(const QualifiedName& name,
 
 void StyledElement::createInlineStyleDecl() {
   m_inlineStyleDecl = new CSSMutableStyleDeclaration;
-  m_inlineStyleDecl->setParent(getDocument()->elementSheet());
+  m_inlineStyleDecl->setParent(document()->elementSheet());
   m_inlineStyleDecl->setNode(this);
-  m_inlineStyleDecl->setStrictParsing(!getDocument()->inCompatMode());
+  m_inlineStyleDecl->setStrictParsing(!document()->inCompatMode());
 }
 
 void StyledElement::destroyInlineStyleDecl() {
@@ -214,8 +214,7 @@ void StyledElement::parseMappedAttribute(MappedAttribute* attr) {
     if (namedAttrMap) {
       if (attr->isNull())
         namedAttrMap->setID(nullAtom);
-      else if (getDocument()->inCompatMode() &&
-               !attr->value().impl()->isLower())
+      else if (document()->inCompatMode() && !attr->value().impl()->isLower())
         namedAttrMap->setID(AtomicString(attr->value().domString().lower()));
       else
         namedAttrMap->setID(attr->value());
@@ -419,7 +418,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
 void StyledElement::createMappedDecl(MappedAttribute* attr) {
   CSSMappedAttributeDeclaration* decl = new CSSMappedAttributeDeclaration(0);
   attr->setDecl(decl);
-  decl->setParent(getDocument()->elementSheet());
+  decl->setParent(document()->elementSheet());
   decl->setNode(this);
   decl->setStrictParsing(false);  // Mapped attributes are just always quirky.
 }
