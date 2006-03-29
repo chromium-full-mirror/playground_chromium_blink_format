@@ -170,8 +170,7 @@ void SVGPatternElement::fillAttributesFromReferencePattern(
     const SVGPatternElement* target,
     KCanvasMatrix& patternTransformMatrix) const {
   DeprecatedString ref = String(href()->baseVal()).deprecatedString();
-  KRenderingPaintServer* refServer =
-      getPaintServerById(getDocument(), ref.mid(1));
+  KRenderingPaintServer* refServer = getPaintServerById(document(), ref.mid(1));
 
   if (!refServer || refServer->type() != PS_PATTERN)
     return;

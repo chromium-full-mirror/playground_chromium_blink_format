@@ -64,7 +64,7 @@ String StyleBase::baseURL() {
   if (!sheet->ownerNode())
     return String();
 
-  return sheet->ownerNode()->getDocument()->baseURL();
+  return sheet->ownerNode()->document()->baseURL();
 }
 
 // ------------------------------------------------------------------------------

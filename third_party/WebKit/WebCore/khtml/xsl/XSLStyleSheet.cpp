@@ -54,7 +54,7 @@ XSLStyleSheet::XSLStyleSheet(Node* parentNode,
                              const String& href,
                              bool embedded)
     : StyleSheet(parentNode, href),
-      m_ownerDocument(parentNode->getDocument()),
+      m_ownerDocument(parentNode->document()),
       m_stylesheetDoc(0),
       m_embedded(embedded),
       m_processed(true)  // The root sheet starts off processed.

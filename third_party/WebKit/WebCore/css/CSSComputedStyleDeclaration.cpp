@@ -315,7 +315,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
   // Make sure our layout is up to date before we allow a query on these
   // attributes.
   if (updateLayout)
-    node->getDocument()->updateLayout();
+    node->document()->updateLayout();
 
   RenderObject* renderer = node->renderer();
   if (!renderer)

@@ -98,7 +98,7 @@ void HTMLGenericFormElement::attach() {
     // making a widget
     // block instead of inline, and focus should be restored in that case as
     // well.)
-    if (getDocument()->focusNode() == this && renderer()->isWidget() &&
+    if (document()->focusNode() == this && renderer()->isWidget() &&
         static_cast<RenderWidget*>(renderer())->widget())
       static_cast<RenderWidget*>(renderer())->widget()->setFocus();
   }
@@ -114,7 +114,7 @@ void HTMLGenericFormElement::insertedIntoTree(bool deep) {
     if (m_form)
       m_form->registerFormElement(this);
     else if (isRadioButton() && !name().isEmpty() && isChecked())
-      getDocument()->radioButtonChecked((HTMLInputElement*)this, m_form);
+      document()->radioButtonChecked((HTMLInputElement*)this, m_form);
   }
 
   HTMLElement::insertedIntoTree(deep);
@@ -201,8 +201,8 @@ bool HTMLGenericFormElement::isKeyboardFocusable() const {
              (static_cast<RenderWidget*>(renderer())->widget()->focusPolicy() &
               Widget::TabFocus);
     }
-    if (getDocument()->frame())
-      return getDocument()->frame()->tabsToAllControls();
+    if (document()->frame())
+      return document()->frame()->tabsToAllControls();
   }
   return false;
 }

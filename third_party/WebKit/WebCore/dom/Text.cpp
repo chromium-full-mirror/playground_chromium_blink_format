@@ -89,7 +89,7 @@ Node::NodeType Text::nodeType() const {
 }
 
 PassRefPtr<Node> Text::cloneNode(bool /*deep*/) {
-  return getDocument()->createTextNode(str);
+  return document()->createTextNode(str);
 }
 
 bool Text::rendererIsNeeded(RenderStyle* style) {
@@ -159,7 +159,7 @@ bool Text::childTypeAllowed(NodeType) {
 }
 
 Text* Text::createNew(StringImpl* _str) {
-  return new Text(getDocument(), _str);
+  return new Text(document(), _str);
 }
 
 String Text::toString() const {

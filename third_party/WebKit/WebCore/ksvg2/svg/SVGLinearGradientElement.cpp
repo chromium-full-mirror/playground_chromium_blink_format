@@ -119,8 +119,7 @@ void SVGLinearGradientElement::buildGradient(
         gradientTransform()->baseVal()->consolidate()->matrix()->qmatrix());
 
   DeprecatedString ref = String(href()->baseVal()).deprecatedString();
-  KRenderingPaintServer* pserver =
-      getPaintServerById(getDocument(), ref.mid(1));
+  KRenderingPaintServer* pserver = getPaintServerById(document(), ref.mid(1));
 
   if (pserver && (pserver->type() == PS_RADIAL_GRADIENT ||
                   pserver->type() == PS_LINEAR_GRADIENT)) {

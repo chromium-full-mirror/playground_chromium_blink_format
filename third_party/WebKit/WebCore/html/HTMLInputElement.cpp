@@ -89,7 +89,7 @@ void HTMLInputElement::init() {
 }
 
 HTMLInputElement::~HTMLInputElement() {
-  getDocument()->deregisterMaintainsState(this);
+  document()->deregisterMaintainsState(this);
   delete m_imageLoader;
 }
 
@@ -114,7 +114,7 @@ bool HTMLInputElement::isKeyboardFocusable() const {
 
     // Never allow keyboard tabbing to leave you in the same radio group. Always
     // skip any other elements in the group.
-    Node* currentFocusNode = getDocument()->focusNode();
+    Node* currentFocusNode = document()->focusNode();
     if (currentFocusNode && currentFocusNode->hasTagName(inputTag)) {
       HTMLInputElement* focusedInput =
           static_cast<HTMLInputElement*>(currentFocusNode);
@@ -126,7 +126,7 @@ bool HTMLInputElement::isKeyboardFocusable() const {
     // Allow keyboard focus if we're checked or if nothing in the group is
     // checked.
     return checked() ||
-           !getDocument()->checkedRadioButtonForGroup(name().impl(), m_form);
+           !document()->checkedRadioButtonForGroup(name().impl(), m_form);
   }
 
   return true;
@@ -135,7 +135,7 @@ bool HTMLInputElement::isKeyboardFocusable() const {
 void HTMLInputElement::focus() {
   if ((m_type == TEXT || m_type == PASSWORD) && renderer() &&
       renderer()->style()->appearance() == TextFieldAppearance) {
-    Document* doc = getDocument();
+    Document* doc = document();
     doc->updateLayout();
     if (isFocusable()) {
       doc->setFocusNode(this);
@@ -195,9 +195,9 @@ void HTMLInputElement::setInputType(const String& t) {
       setAttribute(typeAttr, type());
     } else {
       if (inputType() == RADIO && !name().isEmpty()) {
-        if (getDocument()->checkedRadioButtonForGroup(name().impl(), m_form) ==
+        if (document()->checkedRadioButtonForGroup(name().impl(), m_form) ==
             this)
-          getDocument()->removeRadioButtonGroup(name().impl(), m_form);
+          document()->removeRadioButtonGroup(name().impl(), m_form);
       }
       bool wasAttached = m_attached;
       if (wasAttached)
@@ -219,7 +219,7 @@ void HTMLInputElement::setInputType(const String& t) {
       // ahead
       // and signal this to the form.
       if (m_type == RADIO && checked())
-        getDocument()->radioButtonChecked(this, m_form);
+        document()->radioButtonChecked(this, m_form);
     }
   }
   m_haveType = true;
@@ -516,7 +516,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     if (m_type == RADIO && checked()) {
       // Remove the radio from its old group.
       if (m_type == RADIO && !m_name.isEmpty())
-        getDocument()->removeRadioButtonGroup(m_name.impl(), m_form);
+        document()->removeRadioButtonGroup(m_name.impl(), m_form);
     }
 
     // Update our cached reference to the name.
@@ -529,7 +529,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
         setChecked(m_defaultChecked);
       // Add the button to its new group.
       if (checked())
-        getDocument()->radioButtonChecked(this, m_form);
+        document()->radioButtonChecked(this, m_form);
     }
 
   } else if (attr->name() == autocompleteAttr) {
@@ -706,7 +706,7 @@ void HTMLInputElement::attach() {
   // the timing
   // was such that it cleared our state too early
   if (m_type == PASSWORD)
-    getDocument()->passwordFieldAdded();
+    document()->passwordFieldAdded();
 }
 
 void HTMLInputElement::detach() {
@@ -833,7 +833,7 @@ void HTMLInputElement::setChecked(bool nowChecked) {
     return;
 
   if (m_type == RADIO && nowChecked)
-    getDocument()->radioButtonChecked(this, m_form);
+    document()->radioButtonChecked(this, m_form);
 
   m_useDefaultChecked = false;
   m_checked = nowChecked;
@@ -997,7 +997,7 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
       // to be "undone", since
       // we want some object in the radio group to actually get selected.
       HTMLInputElement* currRadio =
-          getDocument()->checkedRadioButtonForGroup(name().impl(), m_form);
+          document()->checkedRadioButtonForGroup(name().impl(), m_form);
       if (currRadio) {
         // We have a radio button selected that is not us.  Cache it in our
         // result field and ref it so
@@ -1178,7 +1178,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
             if (inputElt->inputType() == RADIO && inputElt->name() == name() &&
                 inputElt->isFocusable()) {
               inputElt->setChecked(true);
-              getDocument()->setFocusNode(inputElt);
+              document()->setFocusNode(inputElt);
               inputElt->click(false, false);
               evt->setDefaultHandled();
               break;
@@ -1202,8 +1202,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     unsigned ml = maxLength();
     unsigned currentLength = value().length();
     String text = static_cast<BeforeTextInsertedEvent*>(evt)->text();
-    int selectionLength =
-        getDocument()->frame()->selection().toString().length();
+    int selectionLength = document()->frame()->selection().toString().length();
 
     // Truncate the inserted text if necessary
     if (currentLength + text.length() - selectionLength > ml) {
@@ -1286,7 +1285,7 @@ void HTMLInputElement::setSize(unsigned _size) {
 }
 
 String HTMLInputElement::src() const {
-  return getDocument()->completeURL(getAttribute(srcAttr));
+  return document()->completeURL(getAttribute(srcAttr));
 }
 
 void HTMLInputElement::setSrc(const String& value) {

@@ -121,7 +121,7 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
       }
     }
 
-    getDocument()->accessSVGExtensions()->timeScheduler()->connectIntervalTimer(
+    document()->accessSVGExtensions()->timeScheduler()->connectIntervalTimer(
         this);
     m_connected = true;
 
@@ -207,10 +207,8 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
       return;
     }
 
-    getDocument()
-        ->accessSVGExtensions()
-        ->timeScheduler()
-        ->disconnectIntervalTimer(this);
+    document()->accessSVGExtensions()->timeScheduler()->disconnectIntervalTimer(
+        this);
     m_connected = false;
 
     // Reset...

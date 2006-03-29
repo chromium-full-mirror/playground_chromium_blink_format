@@ -280,9 +280,9 @@ class Node : public TreeShared<Node> {
   // NULL, except in the case
   // of a DocumentType node that is not used with any Document yet. A Document
   // node returns itself.
-  Document* getDocument() const {
-    ASSERT(document || nodeType() == DOCUMENT_TYPE_NODE && !inDocument());
-    return document.get();
+  Document* document() const {
+    ASSERT(m_document || nodeType() == DOCUMENT_TYPE_NODE && !inDocument());
+    return m_document.get();
   }
   void setDocument(Document*);
 
@@ -290,7 +290,7 @@ class Node : public TreeShared<Node> {
   // associated document's
   // node tree, false otherwise.
   bool inDocument() const {
-    ASSERT(document || !m_inDocument);
+    ASSERT(m_document || !m_inDocument);
     return m_inDocument;
   }
 
@@ -504,7 +504,7 @@ class Node : public TreeShared<Node> {
                                               const String& localName);
 
  private:  // members
-  DocPtr<Document> document;
+  DocPtr<Document> m_document;
   Node* m_previous;
   Node* m_next;
   RenderObject* m_renderer;

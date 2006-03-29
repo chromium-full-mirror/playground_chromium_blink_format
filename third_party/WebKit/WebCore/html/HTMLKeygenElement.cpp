@@ -68,8 +68,7 @@ bool HTMLKeygenElement::appendFormData(FormDataList& encoded_values, bool) {
   if (!m_keyType.isNull() && !equalIgnoringCase(m_keyType, "rsa"))
     return false;
   DeprecatedString value = KSSLKeyGen::signedPublicKeyAndChallengeString(
-      selectedIndex(), m_challenge.deprecatedString(),
-      getDocument()->baseURL());
+      selectedIndex(), m_challenge.deprecatedString(), document()->baseURL());
   if (value.isNull())
     return false;
   encoded_values.appendData(name(), value.utf8());

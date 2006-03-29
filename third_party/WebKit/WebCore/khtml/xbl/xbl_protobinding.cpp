@@ -44,7 +44,7 @@ XBLPrototypeBinding::XBLPrototypeBinding(const String& id, Element* elt)
 void XBLPrototypeBinding::initialize() {}
 
 XBLDocument* XBLPrototypeBinding::document() const {
-  return static_cast<XBLDocument*>(m_element->getDocument());
+  return static_cast<XBLDocument*>(m_element->document());
 }
 
 void XBLPrototypeBinding::addResource(const String& type, const String& src) {

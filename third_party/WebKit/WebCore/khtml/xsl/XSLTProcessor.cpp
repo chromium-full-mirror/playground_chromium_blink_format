@@ -203,7 +203,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     const DeprecatedString& sourceMIMEType,
     Node* sourceNode,
     FrameView* view) {
-  RefPtr<Document> ownerDocument = sourceNode->getDocument();
+  RefPtr<Document> ownerDocument = sourceNode->document();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
   DeprecatedString documentSource = sourceString;
 
@@ -294,7 +294,7 @@ static xsltStylesheetPtr xsltStylesheetPointer(
 
 static inline xmlDocPtr xmlDocPtrFromNode(Node* sourceNode,
                                           bool& shouldDelete) {
-  RefPtr<Document> ownerDocument = sourceNode->getDocument();
+  RefPtr<Document> ownerDocument = sourceNode->document();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
 
   xmlDocPtr sourceDoc = 0;
@@ -332,7 +332,7 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
                                       DeprecatedString& mimeType,
                                       DeprecatedString& resultString,
                                       DeprecatedString& resultEncoding) {
-  RefPtr<Document> ownerDocument = sourceNode->getDocument();
+  RefPtr<Document> ownerDocument = sourceNode->document();
   RefPtr<XSLStyleSheet> cachedStylesheet = m_stylesheet;
 
   setXSLTLoadCallBack(docLoaderFunc, this, ownerDocument->docLoader());

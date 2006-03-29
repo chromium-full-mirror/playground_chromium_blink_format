@@ -138,7 +138,7 @@ static FrameCounter frameCounter;
 static inline Frame* parentFromOwnerRenderer(RenderPart* ownerRenderer) {
   if (!ownerRenderer)
     return 0;
-  return ownerRenderer->node()->getDocument()->frame();
+  return ownerRenderer->node()->document()->frame();
 }
 
 Frame::Frame(Page* page, RenderPart* ownerRenderer)
@@ -2831,7 +2831,7 @@ Frame* Frame::frameForWidget(const Widget* widget) {
 
 Frame* Frame::frameForNode(Node* node) {
   ASSERT_ARG(node, node);
-  return node->getDocument()->frame();
+  return node->document()->frame();
 }
 
 Node* Frame::nodeForWidget(const Widget* widget) {
@@ -2845,7 +2845,7 @@ Node* Frame::nodeForWidget(const Widget* widget) {
 void Frame::clearDocumentFocus(Widget* widget) {
   Node* node = nodeForWidget(widget);
   ASSERT(node);
-  node->getDocument()->setFocusNode(0);
+  node->document()->setFocusNode(0);
 }
 
 DeprecatedPtrList<Frame>& Frame::mutableInstances() {

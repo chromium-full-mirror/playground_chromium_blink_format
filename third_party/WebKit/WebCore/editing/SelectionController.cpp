@@ -131,9 +131,9 @@ SelectionController::SelectionController(const SelectionController& o)
 
 SelectionController::~SelectionController() {
   if (!isNone()) {
-    Document* document = m_sel.start().node()->getDocument();
-    document->removeEventListener(DOMNodeRemovedEvent, m_mutationListener.get(),
-                                  false);
+    Document* doc = m_sel.start().node()->document();
+    doc->removeEventListener(DOMNodeRemovedEvent, m_mutationListener.get(),
+                             false);
   }
 }
 
@@ -194,12 +194,10 @@ void SelectionController::moveTo(const Position& base,
 
 void SelectionController::setSelection(const Selection& newSelection) {
   Selection oldSelection = m_sel;
-  Document* oldDocument = oldSelection.start().node()
-                              ? oldSelection.start().node()->getDocument()
-                              : 0;
-  Document* newDocument = newSelection.start().node()
-                              ? newSelection.start().node()->getDocument()
-                              : 0;
+  Document* oldDocument =
+      oldSelection.start().node() ? oldSelection.start().node()->document() : 0;
+  Document* newDocument =
+      newSelection.start().node() ? newSelection.start().node()->document() : 0;
 
   if (oldDocument != newDocument) {
     if (oldDocument)
@@ -644,7 +642,7 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
       break;
   }
 
-  Frame* frame = pos.node()->getDocument()->frame();
+  Frame* frame = pos.node()->document()->frame();
   if (!frame)
     return x;
 
@@ -707,7 +705,7 @@ PassRefPtr<Range> SelectionController::getRangeAt(int index) const {
 }
 
 Frame* SelectionController::frame() const {
-  return !isNone() ? m_sel.start().node()->getDocument()->frame() : 0;
+  return !isNone() ? m_sel.start().node()->document()->frame() : 0;
 }
 
 void SelectionController::setBaseAndExtent(Node* baseNode,
@@ -754,7 +752,7 @@ void SelectionController::layout() {
     return;
   }
 
-  m_sel.start().node()->getDocument()->updateRendering();
+  m_sel.start().node()->document()->updateRendering();
 
   m_caretRect = IntRect();
   m_caretPositionOnLayout = IntPoint();
@@ -804,7 +802,7 @@ void SelectionController::needsCaretRepaint() {
   if (!isCaret())
     return;
 
-  FrameView* v = m_sel.start().node()->getDocument()->view();
+  FrameView* v = m_sel.start().node()->document()->view();
   if (!v)
     return;
 

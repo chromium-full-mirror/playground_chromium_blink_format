@@ -1483,7 +1483,7 @@ bool JSHTMLElement::implementsCall() const {
   HTMLElement* element = static_cast<HTMLElement*>(impl());
   if (element->hasTagName(embedTag) || element->hasTagName(objectTag) ||
       element->hasTagName(appletTag)) {
-    Document* doc = element->getDocument();
+    Document* doc = element->document();
     KJSProxy* proxy = doc->frame()->jScript();
     ExecState* exec = proxy->interpreter()->globalExec();
     if (JSValue* runtimeObject = getRuntimeObject(exec, element))
@@ -1621,7 +1621,7 @@ JSValue* JSHTMLElement::bodyGetter(ExecState* exec, int token) const {
       return jsString(body.vLink());
     default: {
       // Update the document's layout before we compute these attributes.
-      Document* doc = body.getDocument();
+      Document* doc = body.document();
       doc->updateLayoutIgnorePendingStylesheets();
       FrameView* view = doc->view();
       switch (token) {
@@ -2084,7 +2084,7 @@ JSValue* JSHTMLElement::anchorGetter(ExecState* exec, int token) const {
     case AnchorType:
       return jsString(anchor.type());
     case AnchorText:
-      anchor.getDocument()->updateLayoutIgnorePendingStylesheets();
+      anchor.document()->updateLayoutIgnorePendingStylesheets();
       return jsString(anchor.innerText());
   }
   return jsUndefined();
@@ -2548,7 +2548,7 @@ JSValue* JSHTMLElement::getValueProperty(ExecState* exec, int token) const {
     case ElementInnerHTML:
       return jsString(element.innerHTML());
     case ElementInnerText:
-      impl()->getDocument()->updateLayoutIgnorePendingStylesheets();
+      impl()->document()->updateLayoutIgnorePendingStylesheets();
       return jsString(element.innerText());
     case ElementOuterHTML:
       return jsString(element.outerHTML());
@@ -3022,7 +3022,7 @@ void JSHTMLElement::bodySetter(ExecState* exec,
       FrameView* sview = body.ownerDocument()->view();
       if (sview) {
         // Update the document's layout before we compute these attributes.
-        body.getDocument()->updateLayoutIgnorePendingStylesheets();
+        body.document()->updateLayoutIgnorePendingStylesheets();
         if (token == BodyScrollLeft)
           sview->setContentsPos(value->toInt32(exec), sview->contentsY());
         else

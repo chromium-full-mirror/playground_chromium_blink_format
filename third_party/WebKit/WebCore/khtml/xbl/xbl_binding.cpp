@@ -112,7 +112,7 @@ void XBLBindingChain::failed() {
   delete m_binding;
   m_binding = 0;
 
-  element()->getDocument()->bindingManager()->checkLoadState(element());
+  element()->document()->bindingManager()->checkLoadState(element());
 }
 
 // ==========================================================================================
@@ -144,7 +144,7 @@ XBLBinding::XBLBinding(XBLBindingChain* ch,
     m_id = "_xbl_first_binding";
 
   // Now kick off the load of the XBL document.
-  Document* doc = chain()->element()->getDocument();
+  Document* doc = chain()->element()->document();
   m_xblDocument = doc->docLoader()->requestXBLDocument(docURL);
   if (m_xblDocument)
     m_xblDocument->ref(this);
@@ -198,7 +198,7 @@ void XBLBinding::setXBLDocument(const String& url, XBLDocument* doc) {
     return;
   }
 
-  chain()->element()->getDocument()->bindingManager()->checkLoadState(
+  chain()->element()->document()->bindingManager()->checkLoadState(
       chain()->element());
 }
 }

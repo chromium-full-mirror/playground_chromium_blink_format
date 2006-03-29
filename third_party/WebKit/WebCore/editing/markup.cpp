@@ -148,7 +148,7 @@ static DeprecatedString startMarkup(const Node* node,
                                     const Range* range,
                                     EAnnotateForInterchange annotate,
                                     CSSMutableStyleDeclaration* defaultStyle) {
-  bool documentIsHTML = node->getDocument()->isHTMLDocument();
+  bool documentIsHTML = node->document()->isHTMLDocument();
   switch (node->nodeType()) {
     case Node::TEXT_NODE: {
       if (Node* parent = node->parentNode()) {
@@ -278,7 +278,7 @@ static inline bool doesHTMLForbidEndTag(const Node* node) {
 // separate end tag.
 // 4. Other elements self-close.
 static inline bool shouldSelfClose(const Node* node) {
-  if (node->getDocument()->isHTMLDocument())
+  if (node->document()->isHTMLDocument())
     return false;
   if (node->hasChildNodes())
     return false;
@@ -310,8 +310,7 @@ static DeprecatedString markup(const Node* startNode,
     }
     // print children
     if (Node* n = current->firstChild())
-      if (!(n->getDocument()->isHTMLDocument() &&
-            doesHTMLForbidEndTag(current)))
+      if (!(n->document()->isHTMLDocument() && doesHTMLForbidEndTag(current)))
         me += markup(n, false, true, nodes);
 
     // Print my ending tag
@@ -352,7 +351,7 @@ DeprecatedString createMarkup(const Range* range,
   Node* commonAncestor = range->commonAncestorContainer(ec);
   ASSERT(ec == 0);
 
-  Document* doc = commonAncestor->getDocument();
+  Document* doc = commonAncestor->document();
   doc->updateLayoutIgnorePendingStylesheets();
 
   Node* commonAncestorBlock = 0;
@@ -528,7 +527,7 @@ DeprecatedString createMarkup(const WebCore::Node* node,
   ASSERT(annotate == DoNotAnnotateForInterchange);  // annotation not yet
                                                     // implemented for this code
                                                     // path
-  node->getDocument()->updateLayoutIgnorePendingStylesheets();
+  node->document()->updateLayoutIgnorePendingStylesheets();
   return markup(node, includeChildren, false, nodes);
 }
 

@@ -63,7 +63,7 @@ void VisiblePosition::init(const Position& pos, EAffinity affinity) {
     return;
   }
 
-  pos.node()->getDocument()->updateLayoutIgnorePendingStylesheets();
+  pos.node()->document()->updateLayoutIgnorePendingStylesheets();
   Position deepPos = deepEquivalent(pos);
   if (deepPos.inRenderedContent()) {
     // If two visually equivalent positions are both candidates for being made
@@ -288,7 +288,7 @@ PassRefPtr<Range> makeRange(const VisiblePosition& start,
                             const VisiblePosition& end) {
   Position s = rangeCompliantEquivalent(start);
   Position e = rangeCompliantEquivalent(end);
-  return new Range(s.node()->getDocument(), s.node(), s.offset(), e.node(),
+  return new Range(s.node()->document(), s.node(), s.offset(), e.node(),
                    e.offset());
 }
 

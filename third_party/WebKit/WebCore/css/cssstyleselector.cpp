@@ -509,9 +509,9 @@ void CSSStyleSelector::initForStyleResolve(Element* e,
     parentStyle = (parentNode && parentNode->renderer())
                       ? parentNode->renderer()->style()
                       : 0;
-  view = element->getDocument()->view();
-  isXMLDoc = !element->getDocument()->isHTMLDocument();
-  frame = element->getDocument()->frame();
+  view = element->document()->view();
+  isXMLDoc = !element->document()->isHTMLDocument();
+  frame = element->document()->frame();
   settings = frame ? frame->settings() : 0;
 
   style = 0;
@@ -640,8 +640,8 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
         (s->isEnabled() == element->isEnabled()) &&
         (s->isIndeterminate() == element->isIndeterminate()) &&
         (s->isChecked() == element->isChecked()) &&
-        (s != s->getDocument()->getCSSTarget() &&
-         element != element->getDocument()->getCSSTarget()) &&
+        (s != s->document()->getCSSTarget() &&
+         element != element->document()->getCSSTarget()) &&
         (s->getAttribute(typeAttr) == element->getAttribute(typeAttr))) {
       bool classesMatch = true;
       if (s->hasClass()) {
@@ -659,8 +659,8 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
           bool linksMatch = true;
           if (s->isLink()) {
             // We need to check to see if the visited state matches.
-            Color linkColor = element->getDocument()->linkColor();
-            Color visitedColor = element->getDocument()->visitedLinkColor();
+            Color linkColor = element->document()->linkColor();
+            Color visitedColor = element->document()->visitedLinkColor();
             if (pseudoState == PseudoUnknown)
               checkPseudoState(element, s->renderer()->style()->pseudoState() !=
                                                 PseudoAnyLink ||
@@ -680,7 +680,7 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
 RenderStyle* CSSStyleSelector::locateSharedStyle() {
   if (styledElement && !styledElement->inlineStyleDecl() &&
       !styledElement->hasID() &&
-      !styledElement->getDocument()->usesSiblingRules()) {
+      !styledElement->document()->usesSiblingRules()) {
     // Check previous siblings.
     int count = 0;
     Node* n;
@@ -714,7 +714,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
 RenderStyle* CSSStyleSelector::createStyleForElement(Element* e,
                                                      RenderStyle* defaultParent,
                                                      bool allowSharing) {
-  if (!e->getDocument()->haveStylesheetsLoaded()) {
+  if (!e->document()->haveStylesheetsLoaded()) {
     if (!styleNotYetAvailable) {
       styleNotYetAvailable = ::new RenderStyle();
       styleNotYetAvailable->setDisplay(NONE);
@@ -739,7 +739,7 @@ RenderStyle* CSSStyleSelector::createStyleForElement(Element* e,
   }
   initForStyleResolve(e, defaultParent);
 
-  style = new (e->getDocument()->renderArena()) RenderStyle();
+  style = new (e->document()->renderArena()) RenderStyle();
   style->ref();
   if (parentStyle)
     style->inheritFrom(parentStyle);
@@ -894,7 +894,7 @@ RenderStyle* CSSStyleSelector::createPseudoStyleForElement(
   if (m_matchedDeclCount == 0)
     return 0;
 
-  style = new (e->getDocument()->renderArena()) RenderStyle();
+  style = new (e->document()->renderArena()) RenderStyle();
   style->ref();
   if (parentStyle)
     style->inheritFrom(parentStyle);
@@ -993,7 +993,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
         style->display() != BOX &&
         (style->position() == AbsolutePosition ||
          style->position() == FixedPosition || style->floating() != FNONE ||
-         (e && e->getDocument()->documentElement() == e))) {
+         (e && e->document()->documentElement() == e))) {
       if (style->display() == INLINE_TABLE)
         style->setDisplay(TABLE);
       else if (style->display() == INLINE_BOX)
@@ -1032,8 +1032,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
   // non-transparent
   // object wedged in between them.
   if (style->hasAutoZIndex() &&
-      ((e && e->getDocument()->documentElement() == e) ||
-       style->opacity() < 1.0f))
+      ((e && e->document()->documentElement() == e) || style->opacity() < 1.0f))
     style->setZIndex(0);
 
   // Button, legend, input, select and textarea all consider width values of
@@ -1088,7 +1087,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
 
 RefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(Element* e,
                                                            bool authorOnly) {
-  if (!e->getDocument()->haveStylesheetsLoaded())
+  if (!e->document()->haveStylesheetsLoaded())
     return 0;
 
   m_collectRulesOnly = true;
@@ -1441,7 +1440,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         break;
       }
       case CSSSelector::PseudoTarget:
-        if (e == e->getDocument()->getCSSTarget())
+        if (e == e->document()->getCSSTarget())
           return true;
         break;
       case CSSSelector::PseudoAnyLink:
@@ -1495,7 +1494,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
       }
       case CSSSelector::PseudoFocus:
         if (e && e->focused() &&
-            e->getDocument()->frame()->displaysWithFocusAttributes()) {
+            e->document()->frame()->displaysWithFocusAttributes()) {
           return true;
         }
         break;
@@ -1546,7 +1545,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
           return true;
         break;
       case CSSSelector::PseudoRoot:
-        if (e == e->getDocument()->documentElement())
+        if (e == e->document()->documentElement())
           return true;
         break;
       case CSSSelector::PseudoNot: {
@@ -2455,8 +2454,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         } else if (type == CSSPrimitiveValue::CSS_URI) {
           CSSImageValue* image = static_cast<CSSImageValue*>(primitiveValue);
           style->setCursor(CURSOR_AUTO);
-          style->setCursorImage(
-              image->image(element->getDocument()->docLoader()));
+          style->setCursorImage(image->image(element->document()->docLoader()));
         }
       }
       break;
@@ -2537,9 +2535,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       HANDLE_INHERIT_AND_INITIAL(listStyleImage, ListStyleImage)
       if (!primitiveValue)
         return;
-      style->setListStyleImage(
-          static_cast<CSSImageValue*>(primitiveValue)
-              ->image(element->getDocument()->docLoader()));
+      style->setListStyleImage(static_cast<CSSImageValue*>(primitiveValue)
+                                   ->image(element->document()->docLoader()));
       break;
     }
 
@@ -3252,7 +3249,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             style->setContent(element->getAttribute(attr).impl(), i != 0);
           } else if (val->primitiveType() == CSSPrimitiveValue::CSS_URI) {
             CSSImageValue* image = static_cast<CSSImageValue*>(val);
-            style->setContent(image->image(element->getDocument()->docLoader()),
+            style->setContent(image->image(element->document()->docLoader()),
                               i != 0);
           }
         }
@@ -3617,7 +3614,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
         // Set the image (this kicks off the load).
         image.m_image =
-            borderImage->m_image->image(element->getDocument()->docLoader());
+            borderImage->m_image->image(element->document()->docLoader());
 
         // Set up a length box to represent our image slices.
         LengthBox& l = image.m_slices;
@@ -4216,7 +4213,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         region = region->m_next.get();
       }
 
-      element->getDocument()->setHasDashboardRegions(true);
+      element->document()->setHasDashboardRegions(true);
 
       break;
     }
@@ -4316,7 +4313,7 @@ void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
     return;
   CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
   layer->setBackgroundImage(static_cast<CSSImageValue*>(primitiveValue)
-                                ->image(element->getDocument()->docLoader()));
+                                ->image(element->document()->docLoader()));
 }
 
 void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,
@@ -4566,10 +4563,10 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
   int ident = primitiveValue->getIdent();
   if (ident) {
     if (ident == CSS_VAL__KHTML_TEXT)
-      col = element->getDocument()->textColor();
+      col = element->document()->textColor();
     else if (ident == CSS_VAL__KHTML_LINK) {
-      Color linkColor = element->getDocument()->linkColor();
-      Color visitedColor = element->getDocument()->visitedLinkColor();
+      Color linkColor = element->document()->linkColor();
+      Color visitedColor = element->document()->visitedLinkColor();
       if (linkColor == visitedColor)
         col = linkColor;
       else {
@@ -4578,7 +4575,7 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
         col = (pseudoState == PseudoLink) ? linkColor : visitedColor;
       }
     } else if (ident == CSS_VAL__KHTML_ACTIVELINK)
-      col = element->getDocument()->activeLinkColor();
+      col = element->document()->activeLinkColor();
     else
       col = colorForCSSValue(ident);
   } else if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)

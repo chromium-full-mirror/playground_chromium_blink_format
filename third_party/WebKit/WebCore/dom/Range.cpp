@@ -123,7 +123,7 @@ Node* Range::commonAncestorContainer(Node* containerA, Node* containerB) {
   }
 
   if (!parentStart)
-    return containerA->getDocument()->documentElement();
+    return containerA->document()->documentElement();
 
   return parentStart;
 }
@@ -148,7 +148,7 @@ void Range::setStart(Node* refNode, int offset, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -186,7 +186,7 @@ void Range::setEnd(Node* refNode, int offset, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -246,7 +246,7 @@ short Range::compareBoundaryPoints(CompareHow how,
   if (ec)
     return 0;
 
-  if (thisCont->getDocument() != sourceCont->getDocument()) {
+  if (thisCont->document() != sourceCont->document()) {
     ec = WRONG_DOCUMENT_ERR;
     return 0;
   }
@@ -737,7 +737,7 @@ void Range::insertNode(PassRefPtr<Node> newNode, ExceptionCode& ec) {
   // WRONG_DOCUMENT_ERR: Raised if newParent and the container of the start of
   // the Range were
   // not created from the same document.
-  if (newNode->getDocument() != m_startContainer->getDocument()) {
+  if (newNode->document() != m_startContainer->document()) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -844,7 +844,7 @@ String Range::text() const {
   // tree.
   // FIXME: As with innerText, we'd like this to work even if there are no
   // render objects.
-  m_startContainer->getDocument()->updateLayout();
+  m_startContainer->document()->updateLayout();
 
   // FIXME: Maybe DOMRange constructor should take const DOMRange*; if it did we
   // would not need this const_cast.
@@ -963,7 +963,7 @@ void Range::setStartAfter(Node* refNode, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -986,7 +986,7 @@ void Range::setEndBefore(Node* refNode, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1009,7 +1009,7 @@ void Range::setEndAfter(Node* refNode, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1131,7 +1131,7 @@ void Range::surroundContents(PassRefPtr<Node> passNewParent,
   // WRONG_DOCUMENT_ERR: Raised if newParent and the container of the start of
   // the Range were
   // not created from the same document.
-  if (newParent->getDocument() != m_startContainer->getDocument()) {
+  if (newParent->document() != m_startContainer->document()) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1201,7 +1201,7 @@ void Range::setStartBefore(Node* refNode, ExceptionCode& ec) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument) {
+  if (refNode->document() != m_ownerDocument) {
     ec = WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1355,7 +1355,7 @@ bool operator==(const Range& a, const Range& b) {
 }
 
 PassRefPtr<Range> rangeOfContents(Node* node) {
-  RefPtr<Range> range = new Range(node->getDocument());
+  RefPtr<Range> range = new Range(node->document());
   int exception = 0;
   range->selectNodeContents(node, exception);
   return range.release();

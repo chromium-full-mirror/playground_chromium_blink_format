@@ -297,7 +297,7 @@ HTMLMapElement* RenderImage::imageMap() {
   HTMLImageElement* i = element() && element()->hasTagName(imgTag)
                             ? static_cast<HTMLImageElement*>(element())
                             : 0;
-  return i ? i->getDocument()->getImageMap(i->imageMap()) : 0;
+  return i ? i->document()->getImageMap(i->imageMap()) : 0;
 }
 
 bool RenderImage::nodeAtPoint(NodeInfo& info,

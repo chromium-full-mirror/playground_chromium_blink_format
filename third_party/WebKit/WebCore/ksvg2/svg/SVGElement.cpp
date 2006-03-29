@@ -104,7 +104,7 @@ AtomicString SVGElement::tryGetAttributeNS(const String& namespaceURI,
 void SVGElement::addSVGEventListener(const AtomicString& eventType,
                                      const Attribute* attr) {
   Element::setHTMLEventListener(
-      eventType, getDocument()->accessSVGExtensions()->createSVGEventListener(
+      eventType, document()->accessSVGExtensions()->createSVGEventListener(
                      attr->localName().domString(), attr->value(), this));
 }
 

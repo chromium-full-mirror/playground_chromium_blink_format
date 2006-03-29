@@ -56,7 +56,7 @@ float SVGHelper::PercentageOfViewport(float value,
                    SVG_LENGTHTYPE_PERCENTAGE) {
       // TODO: Shouldn't w/h be multiplied with the percentage values?!
       // AFAIK, this assumes width & height == 100%, Rob??
-      Document* doc = svg->getDocument();
+      Document* doc = svg->document();
       if (doc->documentElement() == svg) {
         // We have to ask the canvas for the full "canvas size"...
         RenderCanvas* canvas = static_cast<RenderCanvas*>(doc->renderer());

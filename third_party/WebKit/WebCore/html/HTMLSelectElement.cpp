@@ -57,7 +57,7 @@ HTMLSelectElement::HTMLSelectElement(const QualifiedName& tagName,
     : HTMLGenericFormElement(tagName, doc, f) {}
 
 HTMLSelectElement::~HTMLSelectElement() {
-  getDocument()->deregisterMaintainsState(this);
+  document()->deregisterMaintainsState(this);
 }
 
 bool HTMLSelectElement::checkDTD(const Node* newChild) {

@@ -72,7 +72,7 @@ bool HTMLFormElement::formWouldHaveSecureSubmission(const String& url) {
   if (url.isNull()) {
     return false;
   }
-  return getDocument()
+  return document()
       ->completeURL(url.deprecatedString())
       .startsWith("https:", false);
 }
@@ -84,22 +84,22 @@ void HTMLFormElement::attach() {
   // timing
   // was such that it cleared our state too early
   if (formWouldHaveSecureSubmission(m_url))
-    getDocument()->secureFormAdded();
+    document()->secureFormAdded();
 }
 
 void HTMLFormElement::insertedIntoDocument() {
-  if (getDocument()->isHTMLDocument()) {
-    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
-    document->addNamedItem(oldNameAttr);
+  if (document()->isHTMLDocument()) {
+    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
+    doc->addNamedItem(oldNameAttr);
   }
 
   HTMLElement::insertedIntoDocument();
 }
 
 void HTMLFormElement::removedFromDocument() {
-  if (getDocument()->isHTMLDocument()) {
-    HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
-    document->removeNamedItem(oldNameAttr);
+  if (document()->isHTMLDocument()) {
+    HTMLDocument* doc = static_cast<HTMLDocument*>(document());
+    doc->removeNamedItem(oldNameAttr);
   }
 
   HTMLElement::removedFromDocument();
@@ -178,7 +178,7 @@ bool HTMLFormElement::formData(FormData& form_data) const {
   str.replace(',', ' ');
   DeprecatedStringList charsets = DeprecatedStringList::split(' ', str);
   TextEncoding encoding(InvalidEncoding);
-  Frame* frame = getDocument()->frame();
+  Frame* frame = document()->frame();
   for (DeprecatedStringList::Iterator it = charsets.begin();
        it != charsets.end(); ++it) {
     if ((encoding = TextEncoding((*it).latin1())).isValid())
@@ -292,7 +292,7 @@ void HTMLFormElement::setBoundary(const String& bound) {
 }
 
 bool HTMLFormElement::prepareSubmit() {
-  Frame* frame = getDocument()->frame();
+  Frame* frame = document()->frame();
   if (m_insubmit || !frame)
     return m_insubmit;
 
@@ -311,8 +311,8 @@ bool HTMLFormElement::prepareSubmit() {
 }
 
 void HTMLFormElement::submit(bool activateSubmitButton) {
-  FrameView* view = getDocument()->view();
-  Frame* frame = getDocument()->frame();
+  FrameView* view = document()->view();
+  Frame* frame = document()->frame();
   if (!view || !frame) {
     return;
   }
@@ -381,7 +381,7 @@ void HTMLFormElement::submit(bool activateSubmitButton) {
 }
 
 void HTMLFormElement::reset() {
-  Frame* frame = getDocument()->frame();
+  Frame* frame = document()->frame();
   if (m_inreset || !frame)
     return;
 
@@ -408,9 +408,9 @@ void HTMLFormElement::parseMappedAttribute(MappedAttribute* attr) {
 
     if (m_attached && (oldURLWasSecure != newURLIsSecure))
       if (newURLIsSecure)
-        getDocument()->secureFormAdded();
+        document()->secureFormAdded();
       else
-        getDocument()->secureFormRemoved();
+        document()->secureFormRemoved();
   } else if (attr->name() == targetAttr)
     m_target = attr->value();
   else if (attr->name() == methodAttr) {
@@ -434,10 +434,10 @@ void HTMLFormElement::parseMappedAttribute(MappedAttribute* attr) {
     setHTMLEventListener(resetEvent, attr);
   else if (attr->name() == nameAttr) {
     String newNameAttr = attr->value();
-    if (inDocument() && getDocument()->isHTMLDocument()) {
-      HTMLDocument* document = static_cast<HTMLDocument*>(getDocument());
-      document->removeNamedItem(oldNameAttr);
-      document->addNamedItem(newNameAttr);
+    if (inDocument() && document()->isHTMLDocument()) {
+      HTMLDocument* doc = static_cast<HTMLDocument*>(document());
+      doc->removeNamedItem(oldNameAttr);
+      doc->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
   } else
@@ -474,7 +474,7 @@ unsigned HTMLFormElement::formElementIndex(HTMLGenericFormElement* e) {
 }
 
 void HTMLFormElement::registerFormElement(HTMLGenericFormElement* e) {
-  Document* doc = getDocument();
+  Document* doc = document();
   if (e->isRadioButton() && !e->name().isEmpty()) {
     HTMLGenericFormElement* currentCheckedRadio =
         doc->checkedRadioButtonForGroup(e->name().impl(), 0);
@@ -489,9 +489,9 @@ void HTMLFormElement::registerFormElement(HTMLGenericFormElement* e) {
 void HTMLFormElement::removeFormElement(HTMLGenericFormElement* e) {
   if (!e->name().isEmpty()) {
     HTMLGenericFormElement* currentCheckedRadio =
-        getDocument()->checkedRadioButtonForGroup(e->name().impl(), this);
+        document()->checkedRadioButtonForGroup(e->name().impl(), this);
     if (currentCheckedRadio == e)
-      getDocument()->removeRadioButtonGroup(e->name().impl(), this);
+      document()->removeRadioButtonGroup(e->name().impl(), this);
   }
   removeFromVector(formElements, e);
 }

@@ -31,8 +31,8 @@
 
 namespace WebCore {
 
-AbstractView::AbstractView(Document* _document) {
-  m_document = _document;
+AbstractView::AbstractView(Document* doc) {
+  m_document = doc;
 }
 
 AbstractView::~AbstractView() {}
