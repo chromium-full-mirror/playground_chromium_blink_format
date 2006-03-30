@@ -62,7 +62,6 @@ class WebFrame : public WebCore::TransferJobClient,
   void paint();
 
   WebCore::Frame* impl();
-  WebCore::FrameView* viewImpl();
 
  private:
   class WebFramePrivate;
