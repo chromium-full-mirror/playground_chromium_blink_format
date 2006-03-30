@@ -2136,7 +2136,8 @@ void Document::clearSelectionIfNeeded(Node* newFocusNode) {
   // contained by the current selection.
   Node* startContainer = frame()->selection().start().node();
   if (!newFocusNode || (startContainer && startContainer != newFocusNode &&
-                        !startContainer->isAncestor(newFocusNode)))
+                        !(startContainer->isAncestor(newFocusNode)) &&
+                        startContainer->shadowAncestorNode() != newFocusNode))
     // FIXME: 6498 Should just be able to call m_frame->selection().clear()
     frame()->setSelection(SelectionController());
 }

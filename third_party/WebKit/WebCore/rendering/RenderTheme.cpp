@@ -169,6 +169,8 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
               *style->backgroundLayers() != background ||
               style->backgroundColor() != backgroundColor);
     }
+    case TextFieldAppearance:
+      return style->border() != border;
     default:
       return false;
   }
