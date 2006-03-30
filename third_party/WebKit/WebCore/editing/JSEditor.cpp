@@ -414,8 +414,22 @@ bool enabled(Frame* frame) {
   return true;
 }
 
+bool enabledAnyCaret(Frame* frame) {
+  return frame->selection().isCaret() && frame->selection().isContentEditable();
+}
+
 bool enabledAnySelection(Frame* frame) {
   return frame->selection().isCaretOrRange();
+}
+
+bool enabledAnyEditableSelection(Frame* frame) {
+  return frame->selection().isCaretOrRange() &&
+         frame->selection().isContentEditable();
+}
+
+bool enabledAnyRichlyEditableSelection(Frame* frame) {
+  return frame->selection().isCaretOrRange() &&
+         frame->selection().isContentRichlyEditable();
 }
 
 bool enabledPaste(Frame* frame) {
@@ -426,8 +440,17 @@ bool enabledPasteAndMatchStyle(Frame* frame) {
   return supportsPasteCommand && frame->canPaste();
 }
 
-bool enabledRangeSelection(Frame* frame) {
+bool enabledAnyRangeSelection(Frame* frame) {
   return frame->selection().isRange();
+}
+
+bool enabledAnyEditableRangeSelection(Frame* frame) {
+  return frame->selection().isRange() && frame->selection().isContentEditable();
+}
+
+bool enabledAnyRichlyEditableRangeSelection(Frame* frame) {
+  return frame->selection().isRange() &&
+         frame->selection().isContentRichlyEditable();
 }
 
 bool enabledRedo(Frame* frame) {
@@ -523,13 +546,18 @@ CommandMap* createCommandDictionary() {
 
   static const EditorCommand commands[] = {
 
-      {"BackColor", {execBackColor, enabled, stateNone, valueBackColor}},
-      {"Bold", {execBold, enabledAnySelection, stateBold, valueNull}},
-      {"Copy", {execCopy, enabledRangeSelection, stateNone, valueNull}},
+      {"BackColor",
+       {execBackColor, enabledAnyRangeSelection, stateNone, valueBackColor}},
+      {"Bold",
+       {execBold, enabledAnyRichlyEditableSelection, stateBold, valueNull}},
+      {"Copy", {execCopy, enabledAnyRangeSelection, stateNone, valueNull}},
       {"CreateLink",
-       {execCreateLink, enabledRangeSelection, stateNone, valueNull}},
-      {"Cut", {execCut, enabledRangeSelection, stateNone, valueNull}},
-      {"Delete", {execDelete, enabledAnySelection, stateNone, valueNull}},
+       {execCreateLink, enabledAnyRichlyEditableRangeSelection, stateNone,
+        valueNull}},
+      {"Cut",
+       {execCut, enabledAnyEditableRangeSelection, stateNone, valueNull}},
+      {"Delete",
+       {execDelete, enabledAnyEditableSelection, stateNone, valueNull}},
       {"FontName",
        {execFontName, enabledAnySelection, stateNone, valueFontName}},
       {"FontSize",
@@ -539,33 +567,45 @@ CommandMap* createCommandDictionary() {
       {"ForeColor",
        {execForeColor, enabledAnySelection, stateNone, valueForeColor}},
       {"ForwardDelete",
-       {execForwardDelete, enabledAnySelection, stateNone, valueNull}},
-      {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
+       {execForwardDelete, enabledAnyEditableSelection, stateNone, valueNull}},
+      {"Indent",
+       {execIndent, enabledAnyRichlyEditableSelection, stateNone, valueNull}},
       {"InsertHTML",
-       {execInsertHTML, enabledAnySelection, stateNone, valueNull}},
-      {"InsertImage",
-       {execInsertImage, enabledAnySelection, stateNone, valueNull}},
-      {"InsertLineBreak",
-       {execInsertLineBreak, enabledAnySelection, stateNone, valueNull}},
-      {"InsertParagraph",
-       {execInsertParagraph, enabledAnySelection, stateNone, valueNull}},
-      {"InsertNewlineInQuotedContent",
-       {execInsertNewlineInQuotedContent, enabledAnySelection, stateNone,
+       {execInsertHTML, enabledAnyRichlyEditableSelection, stateNone,
         valueNull}},
+      {"InsertImage",
+       {execInsertImage, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
+      {"InsertLineBreak",
+       {execInsertLineBreak, enabledAnyEditableSelection, stateNone,
+        valueNull}},
+      {"InsertParagraph",
+       {execInsertParagraph, enabledAnyEditableSelection, stateNone,
+        valueNull}},
+      {"InsertNewlineInQuotedContent",
+       {execInsertNewlineInQuotedContent, enabledAnyRichlyEditableSelection,
+        stateNone, valueNull}},
       {"InsertText",
-       {execInsertText, enabledAnySelection, stateNone, valueNull}},
-      {"Italic", {execItalic, enabledAnySelection, stateItalic, valueNull}},
+       {execInsertText, enabledAnyEditableSelection, stateNone, valueNull}},
+      {"Italic",
+       {execItalic, enabledAnyRichlyEditableSelection, stateItalic, valueNull}},
       {"JustifyCenter",
-       {execJustifyCenter, enabledAnySelection, stateNone, valueNull}},
+       {execJustifyCenter, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"JustifyFull",
-       {execJustifyFull, enabledAnySelection, stateNone, valueNull}},
+       {execJustifyFull, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"JustifyLeft",
-       {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
+       {execJustifyLeft, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"JustifyNone",
-       {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
+       {execJustifyLeft, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"JustifyRight",
-       {execJustifyRight, enabledAnySelection, stateNone, valueNull}},
-      {"Outdent", {execOutdent, enabledAnySelection, stateNone, valueNull}},
+       {execJustifyRight, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
+      {"Outdent",
+       {execOutdent, enabledAnyRichlyEditableSelection, stateNone, valueNull}},
       {"Paste", {execPaste, enabledPaste, stateNone, valueNull}},
       {"PasteAndMatchStyle",
        {execPasteAndMatchStyle, enabledPasteAndMatchStyle, stateNone,
@@ -574,16 +614,22 @@ CommandMap* createCommandDictionary() {
       {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
       {"SelectAll", {execSelectAll, enabled, stateNone, valueNull}},
       {"Strikethrough",
-       {execStrikethrough, enabledAnySelection, stateStrikethrough, valueNull}},
+       {execStrikethrough, enabledAnyRichlyEditableSelection,
+        stateStrikethrough, valueNull}},
       {"Subscript",
-       {execSubscript, enabledAnySelection, stateSubscript, valueNull}},
+       {execSubscript, enabledAnyRichlyEditableSelection, stateSubscript,
+        valueNull}},
       {"Superscript",
-       {execSuperscript, enabledAnySelection, stateSuperscript, valueNull}},
-      {"Transpose", {execTranspose, enabled, stateNone, valueNull}},
+       {execSuperscript, enabledAnyRichlyEditableSelection, stateSuperscript,
+        valueNull}},
+      {"Transpose", {execTranspose, enabledAnyCaret, stateNone, valueNull}},
       {"Underline",
-       {execUnderline, enabledAnySelection, stateUnderline, valueNull}},
+       {execUnderline, enabledAnyRichlyEditableSelection, stateUnderline,
+        valueNull}},
       {"Undo", {execUndo, enabledUndo, stateNone, valueNull}},
-      {"Unlink", {execUnlink, enabledRangeSelection, stateNone, valueNull}},
+      {"Unlink",
+       {execUnlink, enabledAnyRichlyEditableRangeSelection, stateNone,
+        valueNull}},
       {"Unselect", {execUnselect, enabledAnySelection, stateNone, valueNull}}
 
       //

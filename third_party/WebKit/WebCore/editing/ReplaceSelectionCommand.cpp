@@ -43,6 +43,7 @@
 #include "HTMLInterchange.h"
 #include "htmlediting.h"
 #include "HTMLNames.h"
+#include "markup.h"
 #include "RenderObject.h"
 #include "SelectionController.h"
 #include "visible_units.h"
@@ -118,28 +119,30 @@ ReplacementFragment::ReplacementFragment(Document* document,
 
   RefPtr<Node> holder = insertFragmentForTestRendering();
 
-  // Send khtmlBeforeTextInsertedEvent.  The event handler will update text if
-  // necessary.
-  if (m_document->frame()) {
-    Node* selectionStartNode = m_document->frame()->selection().start().node();
-    if (selectionStartNode && selectionStartNode->rootEditableElement()) {
-      RefPtr<Range> range = new Range(holder->document());
-      ExceptionCode ec = 0;
-      range->selectNodeContents(holder.get(), ec);
-      String text = plainText(range.get());
-      String newText = text.copy();
-      RefPtr<Event> evt = new BeforeTextInsertedEvent(newText);
-      selectionStartNode->rootEditableElement()->dispatchEvent(evt, ec, true);
-      if (text != newText) {
-        // If the event handler has changed the text, create a new holder node
-        // for test rendering
-        m_fragment->removeChildren();
-        m_fragment->appendChild(new Text(m_document.get(), newText), ec);
-        removeNode(holder);
-        holder = insertFragmentForTestRendering();
-      }
-    }
+  Element* editableRoot =
+      document->frame() ? document->frame()->selection().rootEditableElement()
+                        : 0;
+  ASSERT(editableRoot);
+  if (!editableRoot)
+    return;
+
+  RefPtr<Range> range = new Range(holder->document());
+  ExceptionCode ec = 0;
+  range->selectNodeContents(holder.get(), ec);
+  ASSERT(ec == 0);
+  String text = plainText(range.get());
+  String newText = text.copy();
+  // Give the root a chance to change the text.
+  RefPtr<Event> evt = new BeforeTextInsertedEvent(newText);
+  editableRoot->dispatchEvent(evt, ec, true);
+  if (text != newText || !editableRoot->isContentRichlyEditable()) {
+    removeNode(holder);
+    m_fragment = createFragmentFromText(document, newText.deprecatedString());
+    holder = insertFragmentForTestRendering();
   }
+
+  if (!editableRoot->isContentRichlyEditable())
+    m_matchStyle = true;
 
   saveRenderingInfo(holder.get());
   removeUnrenderedNodes(holder.get());
@@ -497,6 +500,9 @@ void ReplaceSelectionCommand::doApply() {
   // selection
   Selection selection = endingSelection();
   ASSERT(selection.isCaretOrRange());
+
+  if (!selection.isContentRichlyEditable())
+    m_matchStyle = true;
 
   if (m_matchStyle)
     m_insertionStyle = styleAtPosition(selection.start());

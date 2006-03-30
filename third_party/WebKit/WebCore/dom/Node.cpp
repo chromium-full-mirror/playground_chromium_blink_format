@@ -305,6 +305,12 @@ bool Node::isContentEditable() const {
   return parent() && parent()->isContentEditable();
 }
 
+bool Node::isContentRichlyEditable() const {
+  Node* root = rootEditableElement();
+  return root && root->renderer() &&
+         root->renderer()->style()->userModify() != READ_WRITE_PLAINTEXT_ONLY;
+}
+
 IntRect Node::getRect() const {
   int _x, _y;
   if (renderer() && renderer()->absolutePosition(_x, _y))

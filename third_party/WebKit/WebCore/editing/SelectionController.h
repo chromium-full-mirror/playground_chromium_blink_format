@@ -79,6 +79,14 @@ class SelectionController {
     return *this;
   }
 
+  Element* rootEditableElement() const {
+    return selection().rootEditableElement();
+  }
+  bool isContentEditable() const { return selection().isContentEditable(); }
+  bool isContentRichlyEditable() const {
+    return selection().isContentRichlyEditable();
+  }
+
   void moveTo(const Range*, EAffinity affinity);
   void moveTo(const VisiblePosition&);
   void moveTo(const VisiblePosition&, const VisiblePosition&);

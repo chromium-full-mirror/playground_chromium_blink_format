@@ -843,6 +843,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           return new CSSPrimitiveValue(CSS_VAL_READ_ONLY);
         case READ_WRITE:
           return new CSSPrimitiveValue(CSS_VAL_READ_WRITE);
+        case READ_WRITE_PLAINTEXT_ONLY:
+          return new CSSPrimitiveValue(CSS_VAL_READ_WRITE_PLAINTEXT_ONLY);
       }
       ASSERT_NOT_REACHED();
       return 0;
