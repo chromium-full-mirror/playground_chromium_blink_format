@@ -897,7 +897,7 @@ class HTMLAllCollection : public JSHTMLCollection {
 
 ////////////////////// Option Object ////////////////////////
 
-class OptionConstructorImp : public JSObject {
+class OptionConstructorImp : public DOMObject {
  public:
   OptionConstructorImp(ExecState* exec, WebCore::Document* d);
   virtual bool implementsConstruct() const;
@@ -909,7 +909,7 @@ class OptionConstructorImp : public JSObject {
 
 ////////////////////// Image Object ////////////////////////
 
-class ImageConstructorImp : public JSObject {
+class ImageConstructorImp : public DOMObject {
  public:
   ImageConstructorImp(ExecState* exec, WebCore::Document* d);
   virtual bool implementsConstruct() const;

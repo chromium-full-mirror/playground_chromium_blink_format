@@ -99,13 +99,13 @@ class PausedTimeout {
 
 ////////////////////// History Object ////////////////////////
 
-class History : public JSObject {
+class History : public DOMObject {
   friend class HistoryFunc;
 
  public:
-  History(ExecState* exec, Frame* p)
-      : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
-        m_frame(p) {}
+  History(ExecState* exec, Frame* f) : m_frame(f) {
+    setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  }
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -118,11 +118,11 @@ class History : public JSObject {
   Frame* m_frame;
 };
 
-class FrameArray : public JSObject {
+class FrameArray : public DOMObject {
  public:
-  FrameArray(ExecState* exec, Frame* p)
-      : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
-        m_frame(p) {}
+  FrameArray(ExecState* exec, Frame* f) : m_frame(f) {
+    setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  }
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token);
   virtual UString toString(ExecState* exec) const;
@@ -169,9 +169,9 @@ namespace KJS {
 const ClassInfo Screen::info = {"Screen", 0, &ScreenTable, 0};
 
 // We set the object prototype so that toString is implemented
-Screen::Screen(ExecState* exec, Frame* f)
-    : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
-      m_frame(f) {}
+Screen::Screen(ExecState* exec, Frame* f) : m_frame(f) {
+  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+}
 
 bool Screen::getOwnPropertySlot(ExecState* exec,
                                 const Identifier& propertyName,
@@ -321,9 +321,8 @@ Window::get
 */
 KJS_IMPLEMENT_PROTOFUNC(WindowFunc)
 
-Window::Window(Frame* p)
-    : JSObject(/*no proto*/),
-      m_frame(p),
+Window::Window(Frame* f)
+    : m_frame(f),
       screen(0),
       history(0),
       frames(0),
@@ -2504,10 +2503,10 @@ const ClassInfo BarInfo::info = {"BarInfo", 0, 0, 0};
   visible                BarInfo::Visible DontDelete|ReadOnly
 @end
 */
-BarInfo::BarInfo(ExecState* exec, Frame* p, Type barType)
-    : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
-      m_frame(p),
-      m_type(barType) {}
+BarInfo::BarInfo(ExecState* exec, Frame* f, Type barType)
+    : m_frame(f), m_type(barType) {
+  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+}
 
 JSValue* BarInfo::getValueProperty(ExecState* exec, int token) const {
   ASSERT(token == Visible);

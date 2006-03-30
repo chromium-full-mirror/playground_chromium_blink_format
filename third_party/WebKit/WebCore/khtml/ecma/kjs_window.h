@@ -71,7 +71,7 @@ class PausedTimeouts {
 
 class DOMWindowTimer;
 
-class Screen : public JSObject {
+class Screen : public DOMObject {
  public:
   enum {
     Height,
@@ -94,7 +94,7 @@ class Screen : public JSObject {
   WebCore::Frame* m_frame;
 };
 
-class Window : public JSObject {
+class Window : public DOMObject {
   friend class Location;
   friend class WindowFunc;
   friend class ScheduledAction;
@@ -348,7 +348,7 @@ class ScheduledAction {
   DeprecatedString m_code;
 };
 
-class Location : public JSObject {
+class Location : public DOMObject {
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -383,7 +383,7 @@ class Location : public JSObject {
   WebCore::Frame* m_frame;
 };
 
-class Selection : public JSObject {
+class Selection : public DOMObject {
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -421,7 +421,7 @@ class Selection : public JSObject {
   WebCore::Frame* m_frame;
 };
 
-class BarInfo : public JSObject {
+class BarInfo : public DOMObject {
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;

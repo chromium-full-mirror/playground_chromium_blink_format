@@ -123,7 +123,7 @@ class JSCell : public JSValue {
   friend class GetterSetterImp;
 
  private:
-  JSCell();
+  explicit JSCell(bool destructorIsThreadSafe = true);
   virtual ~JSCell();
 
  public:
@@ -160,7 +160,8 @@ class JSCell : public JSValue {
   bool marked() const;
 
  private:
-  bool m_marked;
+  bool m_destructorIsThreadSafe : 1;
+  bool m_marked : 1;
 };
 
 JSValue* jsUndefined();
@@ -203,7 +204,8 @@ inline JSValue::JSValue() {}
 
 inline JSValue::~JSValue() {}
 
-inline JSCell::JSCell() : m_marked(false) {}
+inline JSCell::JSCell(bool destructorIsThreadSafe)
+    : m_destructorIsThreadSafe(destructorIsThreadSafe), m_marked(false) {}
 
 inline JSCell::~JSCell() {}
 

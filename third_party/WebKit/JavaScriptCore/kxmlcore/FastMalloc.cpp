@@ -97,7 +97,7 @@ void* fastRealloc(void* p, size_t n) {
 void fastMallocRegisterThread(pthread_t) {}
 #endif
 
-}  // namespace KJS
+}  // namespace KXMLCore
 
 #else
 
@@ -1400,13 +1400,12 @@ static SpinLock multiThreadedLock = SPINLOCK_INITIALIZER;
 void fastMallocRegisterThread(pthread_t thread) {
   if (thread != mainThreadID) {
     // We lock when writing isMultiThreaded but not when reading it.
-    // It's ok if the main thread temporarily gets it wrong - the global
-    // variable cache is the same as the thread-specific cache for the main
-    // thread.
+    // It's ok if the main thread gets it wrong - for the main thread, the
+    // global variable cache is the same as the thread-specific cache.
     // And other threads can't get it wrong because they must have gone through
     // this function before allocating so they've synchronized.
     // Also, mainThreadCache is only set when isMultiThreaded is false,
-    // to save a branchin some cases.
+    // to save a branch in some cases.
     SpinLockHolder lock(&multiThreadedLock);
     isMultiThreaded = true;
     mainThreadCache = 0;
@@ -2353,7 +2352,7 @@ int __posix_memalign(void** r, size_t a, size_t s) {
 #endif
 
 #if KXC_CHANGES
-}  // namespace KJS
+}  // namespace KXMLCore
 #endif
 
 #endif  // USE_SYSTEM_MALLOC
