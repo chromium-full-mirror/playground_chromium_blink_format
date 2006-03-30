@@ -260,8 +260,6 @@ bool Frame::didOpenURL(const KURL& url) {
 
   started();
 
-  begin(d->m_workingURL);
-
   return true;
 }
 
@@ -482,6 +480,8 @@ void Frame::setDocument(Document* newDoc) {
 }
 
 void Frame::receivedFirstData() {
+  begin(d->m_workingURL);
+
   d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
   d->m_workingURL = KURL();
 
@@ -589,11 +589,9 @@ void Frame::begin(const KURL& url) {
 
   if (DOMImplementation::isXMLMIMEType(d->m_request.m_responseMIMEType))
     d->m_doc = DOMImplementation::instance()->createDocument(d->m_view.get());
-  else if (d->m_request.m_responseMIMEType == "text/html")
+  else
     d->m_doc =
         DOMImplementation::instance()->createHTMLDocument(d->m_view.get());
-  else
-    return;
 
   if (!d->m_doc->attached())
     d->m_doc->attach();
