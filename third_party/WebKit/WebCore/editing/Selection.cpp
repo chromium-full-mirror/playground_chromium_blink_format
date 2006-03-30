@@ -347,6 +347,7 @@ void Selection::adjustForEditableContent() {
     if (endRoot) {
       VisiblePosition previous;
       do {
+        endRoot = endRoot->shadowAncestorNode();
         previous = VisiblePosition(Position(endRoot, 0)).previous();
         endRoot = previous.deepEquivalent().node()->rootEditableElement();
       } while (endRoot);
@@ -359,6 +360,7 @@ void Selection::adjustForEditableContent() {
     if (startRoot) {
       VisiblePosition next;
       do {
+        startRoot = startRoot->shadowAncestorNode();
         next = VisiblePosition(Position(startRoot, maxDeepOffset(startRoot)))
                    .next();
         startRoot = next.deepEquivalent().node()->rootEditableElement();
