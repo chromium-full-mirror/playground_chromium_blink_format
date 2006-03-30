@@ -4,7 +4,7 @@
  * Portions are Copyright (C) 2001 mozilla.org
  *
  * Other contributors:
- *   Stuart Parmenter <pavlov@mozilla.org>
+ *   Stuart Parmenter <stuart@mozilla.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -374,7 +374,7 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
     unsigned green = *row++;
     unsigned blue = *row++;
     unsigned alpha = (hasAlpha ? *row++ : 255);
-    RGBA32Buffer::setRGBA(*dst++, red, blue, green, alpha);
+    RGBA32Buffer::setRGBA(*dst++, red, green, blue, alpha);
     if (!sawAlpha && alpha < 255) {
       sawAlpha = true;
       buffer.setHasAlpha(true);
