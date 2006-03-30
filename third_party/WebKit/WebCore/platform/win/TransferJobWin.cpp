@@ -27,7 +27,9 @@
 #include "TransferJob.h"
 #include "TransferJobInternal.h"
 
+#include "DocLoader.h"
 #include "formdata.h"
+#include "Frame.h"
 #include "kxmlcore/HashMap.h"
 #include "KURL.h"
 #include "Widget.h"
@@ -196,8 +198,10 @@ bool TransferJob::start(DocLoader* docLoader) {
     return true;
   } else {
     // leak the Internet for now
+    LPCWSTR userAgent = reinterpret_cast<const WCHAR*>(
+        docLoader->frame()->userAgent().unicode());
     static HINTERNET internetHandle = InternetOpen(
-        L"Spinneret", INTERNET_OPEN_TYPE_PRECONFIG, 0, 0, INTERNET_FLAG_ASYNC);
+        userAgent, INTERNET_OPEN_TYPE_PRECONFIG, 0, 0, INTERNET_FLAG_ASYNC);
     if (!internetHandle) {
       delete this;
       return false;

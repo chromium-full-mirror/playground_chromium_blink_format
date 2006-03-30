@@ -602,11 +602,6 @@ void FrameWin::clearUndoRedoOperations(void) {}
 String FrameWin::incomingReferrer() const {
   return String();
 }
-void FrameWin::clearRecordedFormValues() {}
-void FrameWin::recordFormValue(DeprecatedString const&,
-                               DeprecatedString const&,
-                               WebCore::HTMLFormElement*) {}
-void FrameWin::submitForm(struct WebCore::ResourceRequest const&) {}
 void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
 void FrameWin::respondToChangedContents() {}
