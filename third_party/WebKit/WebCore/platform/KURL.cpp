@@ -728,7 +728,7 @@ void KURL::setRef(const DeprecatedString& s) {
 void KURL::setQuery(const DeprecatedString& query) {
   if (m_isValid) {
     DeprecatedString q;
-    if (!query.isEmpty() && query[0] != '?') {
+    if (!query.isNull() && (query.isEmpty() || query[0] != '?')) {
       q = "?" + query;
     } else {
       q = query;
