@@ -163,9 +163,6 @@ void Widget::lockDrawingFocus() {
 void Widget::unlockDrawingFocus() {
   notImplemented();
 }
-void Widget::setDrawingAlpha(float) {
-  notImplemented();
-}
 
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
                                    Frame*,
