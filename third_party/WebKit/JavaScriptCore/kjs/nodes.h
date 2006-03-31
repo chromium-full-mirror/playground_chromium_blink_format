@@ -79,7 +79,7 @@ class Node {
 
   virtual JSValue* evaluate(ExecState* exec) = 0;
   UString toString() const;
-  virtual void streamTo(SourceStream& s) const = 0;
+  virtual void streamTo(SourceStream&) const = 0;
   virtual void processVarDecls(ExecState*) {}
   int lineNo() const { return m_line; }
 
@@ -147,10 +147,10 @@ class StatementNode : public Node {
   void setLoc(int line0, int line1);
   int firstLine() const { return lineNo(); }
   int lastLine() const { return m_lastLine; }
-  bool hitStatement(ExecState* exec);
+  bool hitStatement(ExecState*);
   virtual Completion execute(ExecState* exec) = 0;
   void pushLabel(const Identifier& id) { ls.push(id); }
-  virtual void processFuncDecl(ExecState* exec);
+  virtual void processFuncDecl(ExecState*);
 
  protected:
   LabelStack ls;
@@ -164,14 +164,14 @@ class NullNode : public Node {
  public:
   NullNode() {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 };
 
 class BooleanNode : public Node {
  public:
   BooleanNode(bool v) : value(v) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   bool value;
@@ -181,7 +181,7 @@ class NumberNode : public Node {
  public:
   NumberNode(double v) : value(v) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   double value;
@@ -191,7 +191,7 @@ class StringNode : public Node {
  public:
   StringNode(const UString* v) { value = *v; }
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   UString value;
@@ -201,7 +201,7 @@ class RegExpNode : public Node {
  public:
   RegExpNode(const UString& p, const UString& f) : pattern(p), flags(f) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   UString pattern, flags;
@@ -211,14 +211,14 @@ class ThisNode : public Node {
  public:
   ThisNode() {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 };
 
 class ResolveNode : public Node {
  public:
   ResolveNode(const Identifier& s) : ident(s) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
   virtual bool isLocation() const { return true; }
   virtual bool isResolveNode() const { return true; }
@@ -233,7 +233,7 @@ class GroupNode : public Node {
   GroupNode(Node* g) : group(g) {}
   virtual JSValue* evaluate(ExecState*);
   virtual Node* nodeInsideAllParens();
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   virtual bool isGroupNode() const { return true; }
 
  private:
@@ -251,7 +251,7 @@ class ElementNode : public Node {
     l->next = this;
   }
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<ElementNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -275,7 +275,7 @@ class ArrayNode : public Node {
     ele->next = 0;
   }
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<ElementNode> element;
@@ -288,7 +288,7 @@ class PropertyNameNode : public Node {
   PropertyNameNode(double d) : numeric(d) {}
   PropertyNameNode(const Identifier& s) : str(s) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   double numeric;
@@ -301,7 +301,7 @@ class PropertyNode : public Node {
   PropertyNode(PropertyNameNode* n, Node* a, Type t)
       : name(n), assign(a), type(t) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   friend class PropertyListNode;
 
  private:
@@ -322,7 +322,7 @@ class PropertyListNode : public Node {
     l->next = this;
   }
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<PropertyListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -340,7 +340,7 @@ class ObjectLiteralNode : public Node {
     l->next = 0;
   }
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<PropertyListNode> list;
@@ -350,7 +350,7 @@ class BracketAccessorNode : public Node {
  public:
   BracketAccessorNode(Node* e1, Node* e2) : expr1(e1), expr2(e2) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
   virtual bool isLocation() const { return true; }
   virtual bool isBracketAccessorNode() const { return true; }
@@ -366,7 +366,7 @@ class DotAccessorNode : public Node {
  public:
   DotAccessorNode(Node* e, const Identifier& s) : expr(e), ident(s) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
   virtual bool isLocation() const { return true; }
   virtual bool isDotAccessorNode() const { return true; }
@@ -389,7 +389,7 @@ class ArgumentListNode : public Node {
   }
   JSValue* evaluate(ExecState*);
   List evaluateList(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<ArgumentListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -410,7 +410,7 @@ class ArgumentsNode : public Node {
   List evaluateList(ExecState* exec) {
     return list ? list->evaluateList(exec) : List();
   }
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<ArgumentListNode> list;
@@ -421,7 +421,7 @@ class NewExprNode : public Node {
   NewExprNode(Node* e) : expr(e) {}
   NewExprNode(Node* e, ArgumentsNode* a) : expr(e), args(a) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -432,7 +432,7 @@ class FunctionCallValueNode : public Node {
  public:
   FunctionCallValueNode(Node* e, ArgumentsNode* a) : expr(e), args(a) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -444,7 +444,7 @@ class FunctionCallResolveNode : public Node {
   FunctionCallResolveNode(const Identifier& i, ArgumentsNode* a)
       : ident(i), args(a) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier ident;
@@ -456,7 +456,7 @@ class FunctionCallBracketNode : public Node {
   FunctionCallBracketNode(Node* b, Node* s, ArgumentsNode* a)
       : base(b), subscript(s), args(a) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   RefPtr<Node> base;
@@ -468,7 +468,7 @@ class FunctionCallParenBracketNode : public FunctionCallBracketNode {
  public:
   FunctionCallParenBracketNode(Node* b, Node* s, ArgumentsNode* a)
       : FunctionCallBracketNode(b, s, a) {}
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 };
 
 class FunctionCallDotNode : public Node {
@@ -476,7 +476,7 @@ class FunctionCallDotNode : public Node {
   FunctionCallDotNode(Node* b, const Identifier& i, ArgumentsNode* a)
       : base(b), ident(i), args(a) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   RefPtr<Node> base;
@@ -488,14 +488,14 @@ class FunctionCallParenDotNode : public FunctionCallDotNode {
  public:
   FunctionCallParenDotNode(Node* b, const Identifier& i, ArgumentsNode* a)
       : FunctionCallDotNode(b, i, a) {}
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 };
 
 class PostfixResolveNode : public Node {
  public:
   PostfixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier m_ident;
@@ -507,7 +507,7 @@ class PostfixBracketNode : public Node {
   PostfixBracketNode(Node* b, Node* s, Operator o)
       : m_base(b), m_subscript(s), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -520,7 +520,7 @@ class PostfixDotNode : public Node {
   PostfixDotNode(Node* b, const Identifier& i, Operator o)
       : m_base(b), m_ident(i), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -532,7 +532,7 @@ class DeleteResolveNode : public Node {
  public:
   DeleteResolveNode(const Identifier& i) : m_ident(i) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier m_ident;
@@ -543,7 +543,7 @@ class DeleteBracketNode : public Node {
   DeleteBracketNode(Node* base, Node* subscript)
       : m_base(base), m_subscript(subscript) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -554,7 +554,7 @@ class DeleteDotNode : public Node {
  public:
   DeleteDotNode(Node* base, const Identifier& i) : m_base(base), m_ident(i) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -565,7 +565,7 @@ class DeleteValueNode : public Node {
  public:
   DeleteValueNode(Node* e) : m_expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_expr;
@@ -575,7 +575,7 @@ class VoidNode : public Node {
  public:
   VoidNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -585,7 +585,7 @@ class TypeOfResolveNode : public Node {
  public:
   TypeOfResolveNode(const Identifier& i) : m_ident(i) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier m_ident;
@@ -595,7 +595,7 @@ class TypeOfValueNode : public Node {
  public:
   TypeOfValueNode(Node* e) : m_expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_expr;
@@ -605,7 +605,7 @@ class PrefixResolveNode : public Node {
  public:
   PrefixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier m_ident;
@@ -617,7 +617,7 @@ class PrefixBracketNode : public Node {
   PrefixBracketNode(Node* b, Node* s, Operator o)
       : m_base(b), m_subscript(s), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -630,7 +630,7 @@ class PrefixDotNode : public Node {
   PrefixDotNode(Node* b, const Identifier& i, Operator o)
       : m_base(b), m_ident(i), m_oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> m_base;
@@ -642,7 +642,7 @@ class UnaryPlusNode : public Node {
  public:
   UnaryPlusNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -652,7 +652,7 @@ class NegateNode : public Node {
  public:
   NegateNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -662,7 +662,7 @@ class BitwiseNotNode : public Node {
  public:
   BitwiseNotNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -672,7 +672,7 @@ class LogicalNotNode : public Node {
  public:
   LogicalNotNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -682,7 +682,7 @@ class MultNode : public Node {
  public:
   MultNode(Node* t1, Node* t2, char op) : term1(t1), term2(t2), oper(op) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> term1;
@@ -694,7 +694,7 @@ class AddNode : public Node {
  public:
   AddNode(Node* t1, Node* t2, char op) : term1(t1), term2(t2), oper(op) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> term1;
@@ -706,7 +706,7 @@ class ShiftNode : public Node {
  public:
   ShiftNode(Node* t1, Operator o, Node* t2) : term1(t1), term2(t2), oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> term1;
@@ -719,7 +719,7 @@ class RelationalNode : public Node {
   RelationalNode(Node* e1, Operator o, Node* e2)
       : expr1(e1), expr2(e2), oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -731,7 +731,7 @@ class EqualNode : public Node {
  public:
   EqualNode(Node* e1, Operator o, Node* e2) : expr1(e1), expr2(e2), oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -743,7 +743,7 @@ class BitOperNode : public Node {
  public:
   BitOperNode(Node* e1, Operator o, Node* e2) : expr1(e1), expr2(e2), oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -759,7 +759,7 @@ class BinaryLogicalNode : public Node {
   BinaryLogicalNode(Node* e1, Operator o, Node* e2)
       : expr1(e1), expr2(e2), oper(o) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -775,7 +775,7 @@ class ConditionalNode : public Node {
   ConditionalNode(Node* l, Node* e1, Node* e2)
       : logical(l), expr1(e1), expr2(e2) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> logical;
@@ -788,7 +788,7 @@ class AssignResolveNode : public Node {
   AssignResolveNode(const Identifier& ident, Operator oper, Node* right)
       : m_ident(ident), m_oper(oper), m_right(right) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   Identifier m_ident;
@@ -801,7 +801,7 @@ class AssignBracketNode : public Node {
   AssignBracketNode(Node* base, Node* subscript, Operator oper, Node* right)
       : m_base(base), m_subscript(subscript), m_oper(oper), m_right(right) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   RefPtr<Node> m_base;
@@ -815,7 +815,7 @@ class AssignDotNode : public Node {
   AssignDotNode(Node* base, const Identifier& ident, Operator oper, Node* right)
       : m_base(base), m_ident(ident), m_oper(oper), m_right(right) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   RefPtr<Node> m_base;
@@ -828,7 +828,7 @@ class CommaNode : public Node {
  public:
   CommaNode(Node* e1, Node* e2) : expr1(e1), expr2(e2) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -840,9 +840,9 @@ class StatListNode : public StatementNode {
   // list pointer is tail of a circular list, cracked in the CaseClauseNode ctor
   StatListNode(StatementNode* s);
   StatListNode(StatListNode* l, StatementNode* s);
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<StatListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -856,7 +856,7 @@ class AssignExprNode : public Node {
  public:
   AssignExprNode(Node* e) : expr(e) {}
   JSValue* evaluate(ExecState*);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -867,8 +867,8 @@ class VarDeclNode : public Node {
   enum Type { Variable, Constant };
   VarDeclNode(const Identifier& id, AssignExprNode* in, Type t);
   JSValue* evaluate(ExecState*);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Type varType;
@@ -887,8 +887,8 @@ class VarDeclListNode : public Node {
     l->next = this;
   }
   JSValue* evaluate(ExecState*);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<VarDeclListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -905,9 +905,9 @@ class VarStatementNode : public StatementNode {
     Parser::removeNodeCycle(next.get());
     l->next = 0;
   }
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<VarDeclListNode> next;
@@ -916,9 +916,9 @@ class VarStatementNode : public StatementNode {
 class BlockNode : public StatementNode {
  public:
   BlockNode(SourceElementsNode* s);
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  protected:
   RefPtr<SourceElementsNode> source;
@@ -927,15 +927,15 @@ class BlockNode : public StatementNode {
 class EmptyStatementNode : public StatementNode {
  public:
   EmptyStatementNode() {}  // debug
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 };
 
 class ExprStatementNode : public StatementNode {
  public:
   ExprStatementNode(Node* e) : expr(e) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -945,9 +945,9 @@ class IfNode : public StatementNode {
  public:
   IfNode(Node* e, StatementNode* s1, StatementNode* s2)
       : expr(e), statement1(s1), statement2(s2) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -958,9 +958,9 @@ class IfNode : public StatementNode {
 class DoWhileNode : public StatementNode {
  public:
   DoWhileNode(StatementNode* s, Node* e) : statement(s), expr(e) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<StatementNode> statement;
@@ -970,9 +970,9 @@ class DoWhileNode : public StatementNode {
 class WhileNode : public StatementNode {
  public:
   WhileNode(Node* e, StatementNode* s) : expr(e), statement(s) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -988,9 +988,9 @@ class ForNode : public StatementNode {
     Parser::removeNodeCycle(expr1.get());
     e1->next = 0;
   }
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr1;
@@ -1003,9 +1003,9 @@ class ForInNode : public StatementNode {
  public:
   ForInNode(Node* l, Node* e, StatementNode* s);
   ForInNode(const Identifier& i, AssignExprNode* in, Node* e, StatementNode* s);
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier ident;
@@ -1020,8 +1020,8 @@ class ContinueNode : public StatementNode {
  public:
   ContinueNode() {}
   ContinueNode(const Identifier& i) : ident(i) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier ident;
@@ -1031,8 +1031,8 @@ class BreakNode : public StatementNode {
  public:
   BreakNode() {}
   BreakNode(const Identifier& i) : ident(i) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier ident;
@@ -1041,8 +1041,8 @@ class BreakNode : public StatementNode {
 class ReturnNode : public StatementNode {
  public:
   ReturnNode(Node* v) : value(v) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> value;
@@ -1051,9 +1051,9 @@ class ReturnNode : public StatementNode {
 class WithNode : public StatementNode {
  public:
   WithNode(Node* e, StatementNode* s) : expr(e), statement(s) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -1068,9 +1068,9 @@ class CaseClauseNode : public Node {
     l->next = 0;
   }
   JSValue* evaluate(ExecState*);
-  Completion evalStatements(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  Completion evalStatements(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -1090,8 +1090,8 @@ class ClauseListNode : public Node {
   JSValue* evaluate(ExecState*);
   CaseClauseNode* getClause() const { return clause.get(); }
   ClauseListNode* getNext() const { return next.get(); }
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<ClauseListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -1106,8 +1106,8 @@ class CaseBlockNode : public Node {
   CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2);
   JSValue* evaluate(ExecState*);
   Completion evalBlock(ExecState* exec, JSValue* input);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<ClauseListNode> list1;
@@ -1118,9 +1118,9 @@ class CaseBlockNode : public Node {
 class SwitchNode : public StatementNode {
  public:
   SwitchNode(Node* e, CaseBlockNode* b) : expr(e), block(b) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -1130,9 +1130,9 @@ class SwitchNode : public StatementNode {
 class LabelNode : public StatementNode {
  public:
   LabelNode(const Identifier& l, StatementNode* s) : label(l), statement(s) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier label;
@@ -1142,8 +1142,8 @@ class LabelNode : public StatementNode {
 class ThrowNode : public StatementNode {
  public:
   ThrowNode(Node* e) : expr(e) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<Node> expr;
@@ -1156,9 +1156,9 @@ class TryNode : public StatementNode {
           StatementNode* c,
           StatementNode* f)
       : tryBlock(b), exceptionIdent(e), catchBlock(c), finallyBlock(f) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   RefPtr<StatementNode> tryBlock;
@@ -1181,7 +1181,7 @@ class ParameterNode : public Node {
   JSValue* evaluate(ExecState*);
   Identifier ident() { return id; }
   ParameterNode* nextParam() { return next.get(); }
-  virtual void streamTo(SourceStream& s) const;
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<ParameterNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
@@ -1196,7 +1196,7 @@ class ParameterNode : public Node {
 class FunctionBodyNode : public BlockNode {
  public:
   FunctionBodyNode(SourceElementsNode*);
-  virtual void processFuncDecl(ExecState* exec);
+  virtual void processFuncDecl(ExecState*);
   int sourceId() { return m_sourceId; }
   const UString& sourceURL() { return m_sourceURL; }
 
@@ -1249,13 +1249,13 @@ class SourceElementsNode : public StatementNode {
   static int count;
   // list pointer is tail of a circular list, cracked in the BlockNode (or
   // subclass) ctor
-  SourceElementsNode(StatementNode* s1);
+  SourceElementsNode(StatementNode*);
   SourceElementsNode(SourceElementsNode* s1, StatementNode* s2);
 
-  Completion execute(ExecState* exec);
-  void processFuncDecl(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  Completion execute(ExecState*);
+  void processFuncDecl(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
   PassRefPtr<SourceElementsNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
 
