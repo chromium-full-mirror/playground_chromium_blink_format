@@ -130,7 +130,7 @@ void convertValueToNPVariant(ExecState* exec,
       _NPN_RetainObject(obj);
       OBJECT_TO_NPVARIANT(obj, *result);
     } else {
-      Interpreter* originInterpreter = exec->interpreter();
+      Interpreter* originInterpreter = exec->dynamicInterpreter();
       const Bindings::RootObject* originExecutionContext =
           rootForInterpreter(originInterpreter);
 
@@ -151,7 +151,7 @@ void convertValueToNPVariant(ExecState* exec,
       }
 
       NPObject* obj =
-          (NPObject*)exec->interpreter()->createLanguageInstanceForValue(
+          (NPObject*)exec->dynamicInterpreter()->createLanguageInstanceForValue(
               exec, Instance::CLanguage, value->toObject(exec),
               originExecutionContext, executionContext);
       OBJECT_TO_NPVARIANT(obj, *result);

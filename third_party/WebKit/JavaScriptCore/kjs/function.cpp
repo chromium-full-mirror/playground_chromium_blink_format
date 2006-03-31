@@ -812,9 +812,8 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         }
 
         // no program node means a syntax occurred
-        if (!progNode) {
+        if (!progNode)
           return throwError(exec, SyntaxError, errMsg, errLine, sid, NULL);
-        }
 
         // enter a new execution context
         JSObject* thisVal = static_cast<JSObject*>(exec->context().thisValue());
