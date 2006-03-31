@@ -258,6 +258,8 @@ static const char* const exceptionNames[] = {
     "INVALID_MODIFICATION_ERR",
     "NAMESPACE_ERR",
     "INVALID_ACCESS_ERR",
+    "VALIDATION_ERR",
+    "TYPE_MISMATCH_ERR",
 };
 
 static const char* const rangeExceptionNames[] = {0, "BAD_BOUNDARYPOINTS_ERR",
