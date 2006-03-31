@@ -391,7 +391,7 @@ void Font::drawLineForText(const GraphicsContext* context,
                            int yOffset,
                            int width) const {
   IntPoint origin(x, y + yOffset + 1);
-  IntPoint endPoint = origin + IntPoint(width, 0);
+  IntPoint endPoint = origin + IntSize(width, 0);
   const_cast<GraphicsContext*>(context)->drawLine(origin, endPoint);
 }
 

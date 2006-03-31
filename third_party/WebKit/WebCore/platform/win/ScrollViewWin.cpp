@@ -136,7 +136,7 @@ IntPoint ScrollView::contentsToViewport(const IntPoint& viewportPoint) {
   return point;
 }
 
-IntSize scrollOffset() const {
+IntSize ScrollView::scrollOffset() const {
   return m_data->scrollOffset;
 }
 
@@ -149,11 +149,10 @@ IntSize ScrollView::maximumScroll() const {
 void ScrollView::scrollBy(int dx, int dy) {
   IntSize scrollOffset = m_data->scrollOffset;
   IntSize maxScroll = maximumScroll();
-  IntSize newScrollOffset = scrollOffset;
-  newScrollOffset.move(dx, dy);
+  IntSize newScrollOffset = scrollOffset + IntSize(dx, dy);
   newScrollOffset.clampNegativeToZero();
 
-  if (newScrollOffset != scrollScrollOffset) {
+  if (newScrollOffset != scrollOffset) {
     m_data->scrollOffset = newScrollOffset;
     updateScrollBars();
     // ScrollBar updates can fail, so we check the final delta before scrolling
@@ -163,8 +162,8 @@ void ScrollView::scrollBy(int dx, int dy) {
     if (!m_data->hasStaticBackground)
       // FIXME: This could be made more efficient by passing a valid clip rect
       // for only the document content.
-      ScrollWindowEx(windowHandle(), -scrollDelta.x(), -scrollDelta.y(), 0, 0,
-                     0, 0, SW_INVALIDATE);
+      ScrollWindowEx(windowHandle(), -scrollDelta.width(),
+                     -scrollDelta.height(), 0, 0, 0, 0, SW_INVALIDATE);
     else
       InvalidateRect(windowHandle(), 0, true);
   }
