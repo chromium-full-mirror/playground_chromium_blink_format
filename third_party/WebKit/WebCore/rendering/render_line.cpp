@@ -473,8 +473,17 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
         needsWordSpacing = !rt->text()[text->end()].isSpace();
       }
       text->setXPos(x);
-      leftPosition = kMin(x, leftPosition);
-      rightPosition = kMax(x + text->width(), rightPosition);
+      int shadowLeft = 0;
+      int shadowRight = 0;
+      for (ShadowData* shadow = rt->style()->textShadow(); shadow;
+           shadow = shadow->next) {
+        shadowLeft = kMin(shadowLeft, shadow->x - shadow->blur);
+        shadowRight = kMax(shadowRight, shadow->x + shadow->blur);
+      }
+      leftPosition = kMin(x + shadowLeft, leftPosition);
+      rightPosition = kMax(x + text->width() + shadowRight, rightPosition);
+      m_maxHorizontalShadow =
+          kMax(kMax(shadowRight, -shadowLeft), m_maxHorizontalShadow);
       x += text->width();
     } else {
       if (curr->object()->isPositioned()) {
@@ -542,10 +551,14 @@ void InlineFlowBox::verticallyAlignBoxes(int& heightOfBlock) {
   int maxHeight = maxAscent + maxDescent;
   int topPosition = heightOfBlock;
   int bottomPosition = heightOfBlock;
+  int selectionTop = heightOfBlock;
+  int selectionBottom = heightOfBlock;
   placeBoxesVertically(heightOfBlock, maxHeight, maxAscent, strictMode,
-                       topPosition, bottomPosition);
+                       topPosition, bottomPosition, selectionTop,
+                       selectionBottom);
 
   setVerticalOverflowPositions(topPosition, bottomPosition);
+  setVerticalSelectionPositions(selectionTop, selectionBottom);
 
   // Shrink boxes with no text children in quirks and almost strict mode.
   if (!strictMode)
@@ -639,7 +652,9 @@ void InlineFlowBox::placeBoxesVertically(int y,
                                          int maxAscent,
                                          bool strictMode,
                                          int& topPosition,
-                                         int& bottomPosition) {
+                                         int& bottomPosition,
+                                         int& selectionTop,
+                                         int& selectionBottom) {
   if (isRootInlineBox())
     setYPos(y + maxAscent - baseline());  // Place our root box.
 
@@ -652,7 +667,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     // line-height).
     if (curr->isInlineFlowBox())
       static_cast<InlineFlowBox*>(curr)->placeBoxesVertically(
-          y, maxHeight, maxAscent, strictMode, topPosition, bottomPosition);
+          y, maxHeight, maxAscent, strictMode, topPosition, bottomPosition,
+          selectionTop, selectionBottom);
 
     bool childAffectsTopBottomPos = true;
     if (curr->yPos() == PositionTop)
@@ -668,11 +684,18 @@ void InlineFlowBox::placeBoxesVertically(int y,
     int newY = curr->yPos();
     int newHeight = curr->height();
     int newBaseline = curr->baseline();
+    int overflowTop = 0;
+    int overflowBottom = 0;
     if (curr->isText() || curr->isInlineFlowBox()) {
       const Font& font = curr->object()->font(m_firstLine);
       newBaseline = font.ascent();
       newY += curr->baseline() - newBaseline;
       newHeight = newBaseline + font.descent();
+      for (ShadowData* shadow = curr->object()->style()->textShadow(); shadow;
+           shadow = shadow->next) {
+        overflowTop = kMin(overflowTop, shadow->y - shadow->blur);
+        overflowBottom = kMax(overflowBottom, shadow->y + shadow->blur);
+      }
       if (curr->isInlineFlowBox()) {
         newHeight +=
             curr->object()->borderTop() + curr->object()->paddingTop() +
@@ -685,6 +708,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
       newY += curr->object()->marginTop();
       newHeight = curr->height() - (curr->object()->marginTop() +
                                     curr->object()->marginBottom());
+      overflowTop = curr->object()->overflowTop();
+      overflowBottom = curr->object()->overflowHeight() - newHeight;
     }
 
     curr->setYPos(newY);
@@ -692,11 +717,11 @@ void InlineFlowBox::placeBoxesVertically(int y,
     curr->setBaseline(newBaseline);
 
     if (childAffectsTopBottomPos) {
-      if (newY < topPosition)
-        topPosition = newY;
-      if (newY + newHeight > bottomPosition)
-        bottomPosition = newY + newHeight;
+      selectionTop = kMin(selectionTop, newY);
+      selectionBottom = kMax(selectionBottom, newY + newHeight);
     }
+    topPosition = kMin(topPosition, newY + overflowTop);
+    bottomPosition = kMax(bottomPosition, newY + newHeight + overflowBottom);
   }
 
   if (isRootInlineBox()) {
@@ -705,10 +730,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     setYPos(yPos() + baseline() - font.ascent());
     setBaseline(font.ascent());
     if (hasTextChildren() || strictMode) {
-      if (yPos() < topPosition)
-        topPosition = yPos();
-      if (yPos() + height() > bottomPosition)
-        bottomPosition = yPos() + height();
+      selectionTop = kMin(selectionTop, yPos());
+      selectionBottom = kMax(selectionBottom, yPos() + height());
     }
   }
 }
@@ -1370,10 +1393,10 @@ InlineBox* RootInlineBox::lastSelectedBox() {
 
 int RootInlineBox::selectionTop() {
   if (!prevRootBox())
-    return topOverflow();
+    return m_selectionTop;
 
-  int prevBottom = prevRootBox()->bottomOverflow();
-  if (prevBottom < m_topOverflow && block()->containsFloats()) {
+  int prevBottom = prevRootBox()->selectionBottom();
+  if (prevBottom < m_selectionTop && block()->containsFloats()) {
     // This line has actually been moved further down, probably from a large
     // line-height, but possibly because the
     // line was forced to clear floats.  If so, let's check the offsets, and
@@ -1381,10 +1404,10 @@ int RootInlineBox::selectionTop() {
     // line's bottom overflow if the offsets are greater on both sides.
     int prevLeft = block()->leftOffset(prevBottom);
     int prevRight = block()->rightOffset(prevBottom);
-    int newLeft = block()->leftOffset(m_topOverflow);
-    int newRight = block()->rightOffset(m_topOverflow);
+    int newLeft = block()->leftOffset(m_selectionTop);
+    int newRight = block()->rightOffset(m_selectionTop);
     if (prevLeft > newLeft || prevRight < newRight)
-      return m_topOverflow;
+      return m_selectionTop;
   }
 
   return prevBottom;

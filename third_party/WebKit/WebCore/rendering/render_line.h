@@ -225,6 +225,7 @@ class InlineFlowBox : public InlineRunBox {
     m_lastChild = 0;
     m_includeLeftEdge = m_includeRightEdge = false;
     m_hasTextChildren = false;
+    m_maxHorizontalShadow = 0;
   }
 
   RenderFlow* flowObject();
@@ -348,10 +349,14 @@ class InlineFlowBox : public InlineRunBox {
                             int maxAscent,
                             bool strictMode,
                             int& topPosition,
-                            int& bottomPosition);
+                            int& bottomPosition,
+                            int& selectionTop,
+                            int& selectionBottom);
   void shrinkBoxesWithNoTextChildren(int topPosition, int bottomPosition);
 
   virtual void setVerticalOverflowPositions(int top, int bottom) {}
+  virtual void setVerticalSelectionPositions(int top, int bottom) {}
+  int maxHorizontalShadow() const { return m_maxHorizontalShadow; }
 
   void removeChild(InlineBox* child);
 
@@ -368,6 +373,7 @@ class InlineFlowBox : public InlineRunBox {
  protected:
   InlineBox* m_firstChild;
   InlineBox* m_lastChild;
+  int m_maxHorizontalShadow;
   bool m_includeLeftEdge : 1;
   bool m_includeRightEdge : 1;
   bool m_hasTextChildren : 1;
@@ -409,6 +415,10 @@ class RootInlineBox : public InlineFlowBox {
   virtual void setVerticalOverflowPositions(int top, int bottom) {
     m_topOverflow = top;
     m_bottomOverflow = bottom;
+  }
+  virtual void setVerticalSelectionPositions(int top, int bottom) {
+    m_selectionTop = top;
+    m_selectionBottom = bottom;
   }
   void setHorizontalOverflowPositions(int left, int right) {
     m_leftOverflow = left;
@@ -484,7 +494,8 @@ class RootInlineBox : public InlineFlowBox {
   RenderBlock* block() const;
 
   int selectionTop();
-  int selectionHeight() { return kMax(0, m_bottomOverflow - selectionTop()); }
+  int selectionBottom() { return m_selectionBottom; }
+  int selectionHeight() { return kMax(0, selectionBottom() - selectionTop()); }
 
   InlineBox* closestLeafChildForXPos(int _x, int _tx);
 
@@ -498,6 +509,9 @@ class RootInlineBox : public InlineFlowBox {
   int m_bottomOverflow;
   int m_leftOverflow;
   int m_rightOverflow;
+
+  int m_selectionTop;
+  int m_selectionBottom;
 
   // Where this line ended.  The exact object and the position within that
   // object are stored so that
