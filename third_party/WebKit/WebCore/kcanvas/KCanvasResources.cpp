@@ -207,7 +207,7 @@ void KCanvasMarker::draw(const FloatRect& rect,
     // FIXME: bounding box fractions lost
     GraphicsContext p;
     RenderObject::PaintInfo info(&p, enclosingIntRect(rect),
-                                 PaintActionForeground, 0);
+                                 PaintPhaseForeground, 0, 0);
     m_marker->setLocalTransform(rotation.multiply(translation).qmatrix());
     static_cast<KCanvasContainer*>(m_marker)->setDrawsContents(true);
     m_marker->paint(info, 0, 0);

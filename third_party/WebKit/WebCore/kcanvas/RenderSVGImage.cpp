@@ -126,7 +126,7 @@ void RenderSVGImage::adjustRectsForAspectRatio(
 
 void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (paintInfo.p->paintingDisabled() ||
-      (paintInfo.phase != PaintActionForeground) ||
+      (paintInfo.phase != PaintPhaseForeground) ||
       style()->visibility() == HIDDEN)
     return;
 

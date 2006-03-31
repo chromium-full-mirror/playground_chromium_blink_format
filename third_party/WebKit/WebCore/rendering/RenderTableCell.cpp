@@ -582,7 +582,7 @@ void RenderTableCell::paint(PaintInfo& i, int _tx, int _ty) {
       _ty + _topExtra + m_height + _bottomExtra <= i.r.y() - os)
     return;
 
-  if (i.phase == PaintActionCollapsedTableBorders &&
+  if (i.phase == PaintPhaseCollapsedTableBorders &&
       style()->visibility() == VISIBLE) {
     int w = width();
     int h = height() + borderTopExtra() + borderBottomExtra();

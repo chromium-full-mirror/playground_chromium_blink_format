@@ -166,8 +166,8 @@ void RenderTableRow::paint(PaintInfo& i, int tx, int ty) {
        child = child->nextSibling()) {
     if (child->isTableCell()) {
       // Paint the row background behind the cell.
-      if (i.phase == PaintActionBlockBackground ||
-          i.phase == PaintActionChildBlockBackground) {
+      if (i.phase == PaintPhaseBlockBackground ||
+          i.phase == PaintPhaseChildBlockBackground) {
         RenderTableCell* cell = static_cast<RenderTableCell*>(child);
         cell->paintBackgroundsBehindCell(i, tx, ty, this);
       }

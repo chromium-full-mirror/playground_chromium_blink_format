@@ -277,7 +277,7 @@ void SVGPatternElement::drawPatternContentIntoTile(
 #endif
 
     GraphicsContext p;
-    RenderObject::PaintInfo info(&p, IntRect(), PaintActionForeground, 0);
+    RenderObject::PaintInfo info(&p, IntRect(), PaintPhaseForeground, 0, 0);
     item->paint(info, 0, 0);
 #if 0
         if(savedContext)

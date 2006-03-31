@@ -89,7 +89,7 @@ void RenderButton::updateFromElement() {
 
 void RenderButton::paintObject(PaintInfo& i, int _tx, int _ty) {
   // Push a clip.
-  if (m_inner && i.phase == PaintActionForeground) {
+  if (m_inner && i.phase == PaintPhaseForeground) {
     IntRect clipRect(_tx + borderLeft(), _ty + borderTop(),
                      width() - borderLeft() - borderRight(),
                      height() - borderBottom() - borderTop());
@@ -103,7 +103,7 @@ void RenderButton::paintObject(PaintInfo& i, int _tx, int _ty) {
   RenderBlock::paintObject(i, _tx, _ty);
 
   // Pop the clip.
-  if (m_inner && i.phase == PaintActionForeground)
+  if (m_inner && i.phase == PaintPhaseForeground)
     i.p->restore();
 }
 }

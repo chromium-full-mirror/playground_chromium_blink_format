@@ -253,8 +253,11 @@ bool InlineTextBox::nodeAtPoint(RenderObject::NodeInfo& i,
 void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   if (object()->isBR() || !object()->shouldPaintWithinRoot(i) ||
       object()->style()->visibility() != VISIBLE ||
-      m_truncation == cFullTruncation || i.phase == PaintActionOutline)
+      m_truncation == cFullTruncation || i.phase == PaintPhaseOutline)
     return;
+
+  assert(i.phase != PaintPhaseSelfOutline &&
+         i.phase != PaintPhaseChildOutlines);
 
   int xPos = tx + m_x;
   int w = width();
@@ -266,7 +269,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   // Determine whether or not we're selected.
   bool haveSelection =
       !isPrinting && selectionState() != RenderObject::SelectionNone;
-  if (!haveSelection && i.phase == PaintActionSelection)
+  if (!haveSelection && i.phase == PaintPhaseSelection)
     // When only painting the selection, don't bother to paint if there is none.
     return;
 
@@ -289,7 +292,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   // 1. Paint backgrounds behind text if needed.  Examples of such backgrounds
   // include selection
   // and marked text.
-  if (i.phase != PaintActionSelection && !isPrinting) {
+  if (i.phase != PaintPhaseSelection && !isPrinting) {
     if (haveMarkedText && !markedTextUsesUnderlines)
       paintMarkedTextBackground(i.p, tx, ty, styleToUse, font,
                                 markedTextRange->startOffset(exception),
@@ -334,7 +337,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     setShadow = true;
   }
 
-  bool paintSelectedTextOnly = (i.phase == PaintActionSelection);
+  bool paintSelectedTextOnly = (i.phase == PaintPhaseSelection);
   bool paintSelectedTextSeparately =
       false;  // Whether or not we have to do multiple paints.  Only
   // necessary when a custom ::selection foreground color is applied.
@@ -417,13 +420,13 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   }
 
   // Paint decorations
-  if (d != TDNONE && i.phase != PaintActionSelection &&
+  if (d != TDNONE && i.phase != PaintPhaseSelection &&
       styleToUse->htmlHacks()) {
     i.p->setPen(styleToUse->color());
     paintDecoration(i.p, tx, ty, d);
   }
 
-  if (i.phase != PaintActionSelection) {
+  if (i.phase != PaintPhaseSelection) {
     paintAllMarkersOfType(i.p, tx, ty, DocumentMarker::Spelling, styleToUse,
                           font);
 

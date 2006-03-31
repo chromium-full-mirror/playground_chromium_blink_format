@@ -2626,8 +2626,8 @@ bool RenderObject::willRenderImage(CachedImage*) {
   return !document()->inPageCache() && document()->view()->inWindow();
 }
 
-int RenderObject::maximalOutlineSize(PaintAction p) const {
-  if (p != PaintActionOutline)
+int RenderObject::maximalOutlineSize(PaintPhase p) const {
+  if (p != PaintPhaseOutline && p != PaintPhaseSelfOutline)
     return 0;
   return static_cast<RenderCanvas*>(document()->renderer())
       ->maximalOutlineSize();
