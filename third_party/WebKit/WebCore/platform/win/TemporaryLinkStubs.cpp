@@ -658,27 +658,6 @@ Path& Path::operator=(const Path&) {
   return *this;
 }
 
-bool RenderThemeWin::paintCheckbox(RenderObject*,
-                                   const RenderObject::PaintInfo&,
-                                   const IntRect&) {
-  return false;
-}
-bool RenderThemeWin::paintRadio(RenderObject*,
-                                const RenderObject::PaintInfo&,
-                                const IntRect&) {
-  return false;
-}
-bool RenderThemeWin::paintButton(RenderObject*,
-                                 const RenderObject::PaintInfo&,
-                                 const IntRect&) {
-  return false;
-}
-bool RenderThemeWin::paintTextField(RenderObject*,
-                                    const RenderObject::PaintInfo&,
-                                    const IntRect&) {
-  return false;
-}
-
 QLineEdit::QLineEdit(QLineEdit::Type) {}
 QLineEdit::~QLineEdit() {}
 void QLineEdit::setFont(WebCore::Font const&) {}

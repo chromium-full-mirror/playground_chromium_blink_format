@@ -28,19 +28,22 @@
 namespace WebCore {
 
 class RenderThemeWin : public RenderTheme {
- protected:
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+ public:
+  virtual void adjustCheckboxStyle(CSSStyleSelector* selector,
+                                   RenderStyle* style,
+                                   WebCore::Element* e) const;
+  virtual void adjustRadioStyle(CSSStyleSelector* selector,
+                                RenderStyle* style,
+                                WebCore::Element* e) const;
+  virtual void adjustButtonStyle(CSSStyleSelector* selector,
+                                 RenderStyle* style,
+                                 WebCore::Element* e) const;
+  virtual void adjustTextFieldStyle(CSSStyleSelector* selector,
+                                    RenderStyle* style,
+                                    WebCore::Element* e) const;
+
+ private:
+  void addIntrinsicMargins(RenderStyle* style) const;
 };
 };
 
