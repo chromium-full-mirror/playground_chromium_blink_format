@@ -1498,10 +1498,10 @@ void Frame::submitForm(const char* action,
 
     // 2)  Append body=
     DeprecatedString bodyEnc;
-    if (contentType.lower() == "multipart/form-data") {
+    if (contentType.lower() == "multipart/form-data")
       // FIXME: is this correct?  I suspect not
       bodyEnc = KURL::encode_string(formData.flattenToString());
-    } else if (contentType.lower() == "text/plain") {
+    else if (contentType.lower() == "text/plain") {
       // Convention seems to be to decode, and s/&/\n/
       DeprecatedString tmpbody = formData.flattenToString();
       tmpbody.replace('&', '\n');

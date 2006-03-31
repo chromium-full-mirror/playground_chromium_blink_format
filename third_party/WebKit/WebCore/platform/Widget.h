@@ -118,7 +118,6 @@ class Widget {
   void unlockDrawingFocus();
   void enableFlushDrawing();
   void disableFlushDrawing();
-  void setDrawingAlpha(float alpha);
 
   void setIsSelected(bool);
 

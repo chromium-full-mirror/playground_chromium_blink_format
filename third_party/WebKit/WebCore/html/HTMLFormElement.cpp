@@ -313,9 +313,8 @@ bool HTMLFormElement::prepareSubmit() {
 void HTMLFormElement::submit(bool activateSubmitButton) {
   FrameView* view = document()->view();
   Frame* frame = document()->frame();
-  if (!view || !frame) {
+  if (!view || !frame)
     return;
-  }
 
   if (m_insubmit) {
     m_doingsubmit = true;
@@ -365,13 +364,10 @@ void HTMLFormElement::submit(bool activateSubmitButton) {
   FormData form_data;
   if (formData(form_data)) {
     if (m_post)
-      frame->submitForm("post", m_url.deprecatedString(), form_data,
-                        m_target.deprecatedString(),
-                        enctype().deprecatedString(),
-                        boundary().deprecatedString());
+      frame->submitForm("post", m_url, form_data, m_target, enctype(),
+                        boundary());
     else
-      frame->submitForm("get", m_url.deprecatedString(), form_data,
-                        m_target.deprecatedString());
+      frame->submitForm("get", m_url, form_data, m_target);
   }
 
   if (needButtonActivation && firstSuccessfulSubmitButton)
