@@ -170,10 +170,14 @@ class Instance {
                                         const Identifier&,
                                         JSValue*) {}
 
+  virtual bool implementsCall() const { return false; }
+
   virtual JSValue* invokeMethod(ExecState*,
                                 const MethodList&,
                                 const List& args) = 0;
-  virtual JSValue* invokeDefaultMethod(ExecState*, const List& args) = 0;
+  virtual JSValue* invokeDefaultMethod(ExecState*, const List&) {
+    return jsUndefined();
+  }
 
   virtual JSValue* defaultValue(JSType hint) const = 0;
 

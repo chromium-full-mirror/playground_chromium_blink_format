@@ -270,10 +270,6 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
   return resultValue;
 }
 
-JSValue* JavaInstance::invokeDefaultMethod(ExecState*, const List&) {
-  return jsUndefined();
-}
-
 JSValue* JavaInstance::defaultValue(JSType hint) const {
   if (hint == StringType) {
     return stringValue();
