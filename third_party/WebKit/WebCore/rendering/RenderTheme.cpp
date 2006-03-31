@@ -124,7 +124,7 @@ bool RenderTheme::paintBorder(RenderObject* o,
       break;
   }
 
-  return true;
+  return false;
 }
 bool RenderTheme::shouldPaintBorder(RenderObject* o) {
   // Call the appropriate paint method based off the appearance value.
