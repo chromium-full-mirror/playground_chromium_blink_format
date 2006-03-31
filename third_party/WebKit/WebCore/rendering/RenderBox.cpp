@@ -1783,7 +1783,8 @@ void RenderBox::calcAbsoluteVerticalValues(HeightType heightType,
                                                // parent().
     RenderObject* po = parent();
     for (; po && po != cb; po = po->parent())
-      static_top += po->yPos();
+      if (!po->isTableRow())
+        static_top += po->yPos();
 
     if (h == AUTO || style()->top().isStatic())
       t = static_top;
