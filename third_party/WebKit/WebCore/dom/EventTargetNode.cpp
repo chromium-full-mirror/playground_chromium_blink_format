@@ -361,15 +361,14 @@ bool EventTargetNode::dispatchMouseEvent(const PlatformMouseEvent& _mouse,
                                          Node* relatedTarget) {
   assert(!eventDispatchForbidden());
 
-  int clientX = 0;
-  int clientY = 0;
+  IntPoint clientPos;
   if (FrameView* view = document()->view())
-    view->viewportToContents(_mouse.x(), _mouse.y(), clientX, clientY);
+    clientPos = view->viewportToContents(_mouse.pos());
 
   return dispatchMouseEvent(
-      eventType, _mouse.button(), detail, clientX, clientY, _mouse.globalX(),
-      _mouse.globalY(), _mouse.ctrlKey(), _mouse.altKey(), _mouse.shiftKey(),
-      _mouse.metaKey(), false, relatedTarget);
+      eventType, _mouse.button(), detail, clientPos.x(), clientPos.y(),
+      _mouse.globalX(), _mouse.globalY(), _mouse.ctrlKey(), _mouse.altKey(),
+      _mouse.shiftKey(), _mouse.metaKey(), false, relatedTarget);
 }
 
 bool EventTargetNode::dispatchSimulatedMouseEvent(
@@ -466,13 +465,12 @@ void EventTargetNode::dispatchWheelEvent(PlatformWheelEvent& e) {
   if (!view)
     return;
 
-  int x;
-  int y;
-  view->viewportToContents(e.x(), e.y(), x, y);
+  IntPoint pos = view->viewportToContents(e.pos());
 
-  RefPtr<WheelEvent> we = new WheelEvent(
-      e.isHorizontal(), e.delta(), document()->defaultView(), e.globalX(),
-      e.globalY(), x, y, e.ctrlKey(), e.altKey(), e.shiftKey(), e.metaKey());
+  RefPtr<WheelEvent> we =
+      new WheelEvent(e.isHorizontal(), e.delta(), document()->defaultView(),
+                     e.globalX(), e.globalY(), pos.x(), pos.y(), e.ctrlKey(),
+                     e.altKey(), e.shiftKey(), e.metaKey());
 
   ExceptionCode ec = 0;
   if (!dispatchEvent(we, ec, true))

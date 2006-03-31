@@ -1735,7 +1735,8 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
       // style for a text node,
       // we use our own judgement.
       if (uaOK &&
-          canvas()->view()->frame()->shouldDragAutoNode(curr->node(), x, y)) {
+          canvas()->view()->frame()->shouldDragAutoNode(curr->node(),
+                                                        IntPoint(x, y))) {
         dhtmlWillDrag = false;
         return curr->node();
       } else if (curr->shouldSelect()) {
@@ -1752,8 +1753,8 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
         dhtmlWillDrag = true;
         return curr->node();
       } else if (uaOK && dragMode == DRAG_AUTO &&
-                 canvas()->view()->frame()->shouldDragAutoNode(curr->node(), x,
-                                                               y)) {
+                 canvas()->view()->frame()->shouldDragAutoNode(
+                     curr->node(), IntPoint(x, y))) {
         dhtmlWillDrag = false;
         return curr->node();
       }
