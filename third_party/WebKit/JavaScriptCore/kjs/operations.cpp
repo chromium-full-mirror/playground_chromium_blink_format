@@ -172,11 +172,11 @@ bool strictEqual(ExecState* exec, JSValue* v1, JSValue* v2) {
     if (n1 == n2)
       return true;
     return false;
-  } else if (t1 == StringType) {
+  } else if (t1 == StringType)
     return v1->toString(exec) == v2->toString(exec);
-  } else if (t2 == BooleanType) {
+  else if (t2 == BooleanType)
     return v1->toBoolean(exec) == v2->toBoolean(exec);
-  }
+
   if (v1 == v2)
     return true;
   /* TODO: joined objects */
@@ -215,9 +215,8 @@ JSValue* add(ExecState* exec, JSValue* v1, JSValue* v2, char oper) {
   JSValue* p1 = v1->toPrimitive(exec, preferred);
   JSValue* p2 = v2->toPrimitive(exec, preferred);
 
-  if ((p1->isString() || p2->isString()) && oper == '+') {
+  if ((p1->isString() || p2->isString()) && oper == '+')
     return jsString(p1->toString(exec) + p2->toString(exec));
-  }
 
   if (oper == '+')
     return jsNumber(p1->toNumber(exec) + p2->toNumber(exec));
@@ -232,13 +231,12 @@ JSValue* mult(ExecState* exec, JSValue* v1, JSValue* v2, char oper) {
 
   double result;
 
-  if (oper == '*') {
+  if (oper == '*')
     result = n1 * n2;
-  } else if (oper == '/') {
+  else if (oper == '/')
     result = n1 / n2;
-  } else {
+  else
     result = fmod(n1, n2);
-  }
 
   return jsNumber(result);
 }
