@@ -335,8 +335,9 @@ void RenderBox::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   // background.
   // The theme will tell us whether or not we should also paint the CSS
   // background.
-  if (!style()->hasAppearance() ||
-      theme()->paint(this, i, IntRect(_tx, _ty, w, h))) {
+  bool themePainted = style()->hasAppearance() &&
+                      !theme()->paint(this, i, IntRect(_tx, _ty, w, h));
+  if (!themePainted) {
     // The <body> only paints its background if the root element has defined a
     // background
     // independent of the body.  Go through the DOM to get to the root element's
@@ -350,7 +351,8 @@ void RenderBox::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
 
   // The theme will tell us whether or not we should also paint the CSS border.
   if ((!style()->hasAppearance() ||
-       theme()->paintBorder(this, i, IntRect(_tx, _ty, w, h))) &&
+       (!themePainted &&
+        theme()->paintBorderOnly(this, i, IntRect(_tx, _ty, w, h)))) &&
       style()->hasBorder())
     paintBorder(i.p, _tx, _ty, w, h, style());
 }
