@@ -514,6 +514,8 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
       placeChild(child, xPos, childY);
       m_overflowHeight =
           kMax(m_overflowHeight, childY + child->overflowHeight(false));
+      m_overflowTop =
+          kMin(m_overflowTop, child->yPos() + child->overflowTop(false));
 
       xPos += child->width() + child->marginRight();
 
@@ -614,9 +616,6 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
 
   m_flexingChildren = false;
 
-  if (xPos > m_overflowWidth)
-    m_overflowWidth = xPos;
-
   if (remainingSpace > 0 &&
       ((style()->direction() == LTR && style()->boxPack() != BSTART) ||
        (style()->direction() == RTL && style()->boxPack() != BEND))) {
@@ -676,6 +675,24 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
         child = iterator.next();
       }
     }
+  }
+
+  child = iterator.first();
+  while (child && child->isPositioned()) {
+    child = iterator.next();
+  }
+
+  if (child) {
+    m_overflowLeft =
+        kMin(child->xPos() + child->overflowLeft(false), m_overflowLeft);
+
+    RenderObject* lastChild = child;
+    while ((child = iterator.next())) {
+      if (!child->isPositioned())
+        lastChild = child;
+    }
+    m_overflowWidth = kMax(lastChild->xPos() + lastChild->overflowWidth(false),
+                           m_overflowWidth);
   }
 
   // So that the calcHeight in layoutBlock() knows to relayout positioned
@@ -909,11 +926,10 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
       m_height += child->height() + child->marginBottom();
 
       // See if this child has made our overflow need to grow.
-      // XXXdwh Work with left overflow as well as right overflow.
-      int rightChildPos =
-          child->xPos() + kMax(child->overflowWidth(false), child->width());
-      if (rightChildPos > m_overflowWidth)
-        m_overflowWidth = rightChildPos;
+      m_overflowWidth =
+          kMax(child->xPos() + child->overflowWidth(false), m_overflowWidth);
+      m_overflowLeft =
+          kMin(child->xPos() + child->overflowLeft(false), m_overflowLeft);
 
       child = iterator.next();
     }
@@ -1086,6 +1102,24 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         child = iterator.next();
       }
     }
+  }
+
+  child = iterator.first();
+  while (child && child->isPositioned()) {
+    child = iterator.next();
+  }
+
+  if (child) {
+    m_overflowTop =
+        kMin(child->yPos() + child->overflowTop(false), m_overflowTop);
+
+    RenderObject* lastChild = child;
+    while ((child = iterator.next())) {
+      if (!child->isPositioned())
+        lastChild = child;
+    }
+    m_overflowHeight = kMax(
+        lastChild->yPos() + lastChild->overflowHeight(false), m_overflowHeight);
   }
 
   // So that the calcHeight in layoutBlock() knows to relayout positioned
