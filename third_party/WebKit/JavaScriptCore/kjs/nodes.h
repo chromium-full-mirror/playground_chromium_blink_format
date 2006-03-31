@@ -156,21 +156,21 @@ class StatementNode : public Node {
   LabelStack ls;
 
  private:
-  JSValue* evaluate(ExecState* /*exec*/) { return jsUndefined(); }
+  JSValue* evaluate(ExecState*) { return jsUndefined(); }
   int m_lastLine;
 };
 
 class NullNode : public Node {
  public:
   NullNode() {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 };
 
 class BooleanNode : public Node {
  public:
   BooleanNode(bool v) : value(v) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -180,7 +180,7 @@ class BooleanNode : public Node {
 class NumberNode : public Node {
  public:
   NumberNode(double v) : value(v) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -190,7 +190,7 @@ class NumberNode : public Node {
 class StringNode : public Node {
  public:
   StringNode(const UString* v) { value = *v; }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -200,7 +200,7 @@ class StringNode : public Node {
 class RegExpNode : public Node {
  public:
   RegExpNode(const UString& p, const UString& f) : pattern(p), flags(f) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -210,14 +210,14 @@ class RegExpNode : public Node {
 class ThisNode : public Node {
  public:
   ThisNode() {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 };
 
 class ResolveNode : public Node {
  public:
   ResolveNode(const Identifier& s) : ident(s) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -231,7 +231,7 @@ class ResolveNode : public Node {
 class GroupNode : public Node {
  public:
   GroupNode(Node* g) : group(g) {}
-  virtual JSValue* evaluate(ExecState* exec);
+  virtual JSValue* evaluate(ExecState*);
   virtual Node* nodeInsideAllParens();
   virtual void streamTo(SourceStream& s) const;
   virtual bool isGroupNode() const { return true; }
@@ -250,7 +250,7 @@ class ElementNode : public Node {
       : next(l->next), elision(e), node(n) {
     l->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
   PassRefPtr<ElementNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
@@ -264,7 +264,7 @@ class ElementNode : public Node {
 
 class ArrayNode : public Node {
  public:
-  ArrayNode(int e) : element(0), elision(e), opt(true) {}
+  ArrayNode(int e) : elision(e), opt(true) {}
   ArrayNode(ElementNode* ele) : element(ele->next), elision(0), opt(false) {
     Parser::removeNodeCycle(element.get());
     ele->next = 0;
@@ -274,7 +274,7 @@ class ArrayNode : public Node {
     Parser::removeNodeCycle(element.get());
     ele->next = 0;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -287,7 +287,7 @@ class PropertyNameNode : public Node {
  public:
   PropertyNameNode(double d) : numeric(d) {}
   PropertyNameNode(const Identifier& s) : str(s) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -300,7 +300,7 @@ class PropertyNode : public Node {
   enum Type { Constant, Getter, Setter };
   PropertyNode(PropertyNameNode* n, Node* a, Type t)
       : name(n), assign(a), type(t) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
   friend class PropertyListNode;
 
@@ -321,7 +321,7 @@ class PropertyListNode : public Node {
       : node(n), next(l->next) {
     l->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
   PassRefPtr<PropertyListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
@@ -334,12 +334,12 @@ class PropertyListNode : public Node {
 
 class ObjectLiteralNode : public Node {
  public:
-  ObjectLiteralNode() : list(0) {}
+  ObjectLiteralNode() {}
   ObjectLiteralNode(PropertyListNode* l) : list(l->next) {
     Parser::removeNodeCycle(list.get());
     l->next = 0;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -349,7 +349,7 @@ class ObjectLiteralNode : public Node {
 class BracketAccessorNode : public Node {
  public:
   BracketAccessorNode(Node* e1, Node* e2) : expr1(e1), expr2(e2) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -365,7 +365,7 @@ class BracketAccessorNode : public Node {
 class DotAccessorNode : public Node {
  public:
   DotAccessorNode(Node* e, const Identifier& s) : expr(e), ident(s) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -387,8 +387,8 @@ class ArgumentListNode : public Node {
   ArgumentListNode(ArgumentListNode* l, Node* e) : next(l->next), expr(e) {
     l->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
-  List evaluateList(ExecState* exec);
+  JSValue* evaluate(ExecState*);
+  List evaluateList(ExecState*);
   virtual void streamTo(SourceStream& s) const;
   PassRefPtr<ArgumentListNode> releaseNext() { return next.release(); }
   virtual void breakCycle();
@@ -401,12 +401,12 @@ class ArgumentListNode : public Node {
 
 class ArgumentsNode : public Node {
  public:
-  ArgumentsNode() : list(0) {}
+  ArgumentsNode() {}
   ArgumentsNode(ArgumentListNode* l) : list(l->next) {
     Parser::removeNodeCycle(list.get());
     l->next = 0;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   List evaluateList(ExecState* exec) {
     return list ? list->evaluateList(exec) : List();
   }
@@ -418,9 +418,9 @@ class ArgumentsNode : public Node {
 
 class NewExprNode : public Node {
  public:
-  NewExprNode(Node* e) : expr(e), args(0) {}
+  NewExprNode(Node* e) : expr(e) {}
   NewExprNode(Node* e, ArgumentsNode* a) : expr(e), args(a) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -431,7 +431,7 @@ class NewExprNode : public Node {
 class FunctionCallValueNode : public Node {
  public:
   FunctionCallValueNode(Node* e, ArgumentsNode* a) : expr(e), args(a) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -443,7 +443,7 @@ class FunctionCallResolveNode : public Node {
  public:
   FunctionCallResolveNode(const Identifier& i, ArgumentsNode* a)
       : ident(i), args(a) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -455,7 +455,7 @@ class FunctionCallBracketNode : public Node {
  public:
   FunctionCallBracketNode(Node* b, Node* s, ArgumentsNode* a)
       : base(b), subscript(s), args(a) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  protected:
@@ -475,7 +475,7 @@ class FunctionCallDotNode : public Node {
  public:
   FunctionCallDotNode(Node* b, const Identifier& i, ArgumentsNode* a)
       : base(b), ident(i), args(a) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  protected:
@@ -494,7 +494,7 @@ class FunctionCallParenDotNode : public FunctionCallDotNode {
 class PostfixResolveNode : public Node {
  public:
   PostfixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -506,7 +506,7 @@ class PostfixBracketNode : public Node {
  public:
   PostfixBracketNode(Node* b, Node* s, Operator o)
       : m_base(b), m_subscript(s), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -519,7 +519,7 @@ class PostfixDotNode : public Node {
  public:
   PostfixDotNode(Node* b, const Identifier& i, Operator o)
       : m_base(b), m_ident(i), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -531,7 +531,7 @@ class PostfixDotNode : public Node {
 class DeleteResolveNode : public Node {
  public:
   DeleteResolveNode(const Identifier& i) : m_ident(i) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -542,7 +542,7 @@ class DeleteBracketNode : public Node {
  public:
   DeleteBracketNode(Node* base, Node* subscript)
       : m_base(base), m_subscript(subscript) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -553,7 +553,7 @@ class DeleteBracketNode : public Node {
 class DeleteDotNode : public Node {
  public:
   DeleteDotNode(Node* base, const Identifier& i) : m_base(base), m_ident(i) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -564,7 +564,7 @@ class DeleteDotNode : public Node {
 class DeleteValueNode : public Node {
  public:
   DeleteValueNode(Node* e) : m_expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -574,7 +574,7 @@ class DeleteValueNode : public Node {
 class VoidNode : public Node {
  public:
   VoidNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -584,7 +584,7 @@ class VoidNode : public Node {
 class TypeOfResolveNode : public Node {
  public:
   TypeOfResolveNode(const Identifier& i) : m_ident(i) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -594,7 +594,7 @@ class TypeOfResolveNode : public Node {
 class TypeOfValueNode : public Node {
  public:
   TypeOfValueNode(Node* e) : m_expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -604,7 +604,7 @@ class TypeOfValueNode : public Node {
 class PrefixResolveNode : public Node {
  public:
   PrefixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -616,7 +616,7 @@ class PrefixBracketNode : public Node {
  public:
   PrefixBracketNode(Node* b, Node* s, Operator o)
       : m_base(b), m_subscript(s), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -629,7 +629,7 @@ class PrefixDotNode : public Node {
  public:
   PrefixDotNode(Node* b, const Identifier& i, Operator o)
       : m_base(b), m_ident(i), m_oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -641,7 +641,7 @@ class PrefixDotNode : public Node {
 class UnaryPlusNode : public Node {
  public:
   UnaryPlusNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -651,7 +651,7 @@ class UnaryPlusNode : public Node {
 class NegateNode : public Node {
  public:
   NegateNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -661,7 +661,7 @@ class NegateNode : public Node {
 class BitwiseNotNode : public Node {
  public:
   BitwiseNotNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -671,7 +671,7 @@ class BitwiseNotNode : public Node {
 class LogicalNotNode : public Node {
  public:
   LogicalNotNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -681,7 +681,7 @@ class LogicalNotNode : public Node {
 class MultNode : public Node {
  public:
   MultNode(Node* t1, Node* t2, char op) : term1(t1), term2(t2), oper(op) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -693,7 +693,7 @@ class MultNode : public Node {
 class AddNode : public Node {
  public:
   AddNode(Node* t1, Node* t2, char op) : term1(t1), term2(t2), oper(op) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -705,7 +705,7 @@ class AddNode : public Node {
 class ShiftNode : public Node {
  public:
   ShiftNode(Node* t1, Operator o, Node* t2) : term1(t1), term2(t2), oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -718,7 +718,7 @@ class RelationalNode : public Node {
  public:
   RelationalNode(Node* e1, Operator o, Node* e2)
       : expr1(e1), expr2(e2), oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -730,7 +730,7 @@ class RelationalNode : public Node {
 class EqualNode : public Node {
  public:
   EqualNode(Node* e1, Operator o, Node* e2) : expr1(e1), expr2(e2), oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -742,7 +742,7 @@ class EqualNode : public Node {
 class BitOperNode : public Node {
  public:
   BitOperNode(Node* e1, Operator o, Node* e2) : expr1(e1), expr2(e2), oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -758,7 +758,7 @@ class BinaryLogicalNode : public Node {
  public:
   BinaryLogicalNode(Node* e1, Operator o, Node* e2)
       : expr1(e1), expr2(e2), oper(o) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -774,7 +774,7 @@ class ConditionalNode : public Node {
  public:
   ConditionalNode(Node* l, Node* e1, Node* e2)
       : logical(l), expr1(e1), expr2(e2) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -787,7 +787,7 @@ class AssignResolveNode : public Node {
  public:
   AssignResolveNode(const Identifier& ident, Operator oper, Node* right)
       : m_ident(ident), m_oper(oper), m_right(right) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  protected:
@@ -800,7 +800,7 @@ class AssignBracketNode : public Node {
  public:
   AssignBracketNode(Node* base, Node* subscript, Operator oper, Node* right)
       : m_base(base), m_subscript(subscript), m_oper(oper), m_right(right) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  protected:
@@ -814,7 +814,7 @@ class AssignDotNode : public Node {
  public:
   AssignDotNode(Node* base, const Identifier& ident, Operator oper, Node* right)
       : m_base(base), m_ident(ident), m_oper(oper), m_right(right) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  protected:
@@ -827,7 +827,7 @@ class AssignDotNode : public Node {
 class CommaNode : public Node {
  public:
   CommaNode(Node* e1, Node* e2) : expr1(e1), expr2(e2) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -855,7 +855,7 @@ class StatListNode : public StatementNode {
 class AssignExprNode : public Node {
  public:
   AssignExprNode(Node* e) : expr(e) {}
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -866,7 +866,7 @@ class VarDeclNode : public Node {
  public:
   enum Type { Variable, Constant };
   VarDeclNode(const Identifier& id, AssignExprNode* in, Type t);
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
@@ -886,7 +886,7 @@ class VarDeclListNode : public Node {
   VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : next(l->next), var(v) {
     l->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
   PassRefPtr<VarDeclListNode> releaseNext() { return next.release(); }
@@ -1062,12 +1062,12 @@ class WithNode : public StatementNode {
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(Node* e) : expr(e), next(0) {}
+  CaseClauseNode(Node* e) : expr(e) {}
   CaseClauseNode(Node* e, StatListNode* l) : expr(e), next(l->next) {
     Parser::removeNodeCycle(next.get());
     l->next = 0;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   Completion evalStatements(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
@@ -1087,7 +1087,7 @@ class ClauseListNode : public Node {
       : clause(c), next(n->next) {
     n->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   CaseClauseNode* getClause() const { return clause.get(); }
   ClauseListNode* getNext() const { return next.get(); }
   virtual void processVarDecls(ExecState* exec);
@@ -1104,7 +1104,7 @@ class ClauseListNode : public Node {
 class CaseBlockNode : public Node {
  public:
   CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2);
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   Completion evalBlock(ExecState* exec, JSValue* input);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
@@ -1178,7 +1178,7 @@ class ParameterNode : public Node {
       : id(i), next(next->next) {
     next->next = this;
   }
-  JSValue* evaluate(ExecState* exec);
+  JSValue* evaluate(ExecState*);
   Identifier ident() { return id; }
   ParameterNode* nextParam() { return next.get(); }
   virtual void streamTo(SourceStream& s) const;
@@ -1227,8 +1227,7 @@ class FuncExprNode : public Node {
 
 class FuncDeclNode : public StatementNode {
  public:
-  FuncDeclNode(const Identifier& i, FunctionBodyNode* b)
-      : ident(i), param(0), body(b) {}
+  FuncDeclNode(const Identifier& i, FunctionBodyNode* b) : ident(i), body(b) {}
   FuncDeclNode(const Identifier& i, ParameterNode* p, FunctionBodyNode* b)
       : ident(i), param(p->next), body(b) {
     Parser::removeNodeCycle(param.get());
