@@ -323,7 +323,7 @@ class RenderLayer : WidgetClient {
              const IntRect& damageRect,
              bool selectionOnly = false,
              RenderObject* paintingRoot = 0);
-  bool hitTest(RenderObject::NodeInfo& info, int x, int y);
+  bool hitTest(RenderObject::NodeInfo&, const IntPoint&);
 
   // This method figures out our layerBounds in coordinates relative to
   // |rootLayer}.  It also computes our background and foreground clip rects
@@ -339,7 +339,6 @@ class RenderLayer : WidgetClient {
 
   bool intersectsDamageRect(const IntRect& layerBounds,
                             const IntRect& damageRect) const;
-  bool containsPoint(int x, int y, const IntRect& damageRect) const;
 
   // Returns a bounding box for this layer only.
   IntRect absoluteBoundingBox() const;
@@ -377,9 +376,8 @@ class RenderLayer : WidgetClient {
                   bool selectionOnly,
                   RenderObject* paintingRoot);
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
-                            RenderObject::NodeInfo& info,
-                            int x,
-                            int y,
+                            RenderObject::NodeInfo&,
+                            const IntPoint&,
                             const IntRect& hitTestRect);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 

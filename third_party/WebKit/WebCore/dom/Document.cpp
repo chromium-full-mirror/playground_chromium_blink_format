@@ -631,7 +631,7 @@ Element* Document::elementFromPoint(int x, int y) const {
     return 0;
 
   RenderObject::NodeInfo nodeInfo(true, true);
-  renderer()->layer()->hitTest(nodeInfo, x, y);
+  renderer()->layer()->hitTest(nodeInfo, IntPoint(x, y));
 
   Node* n = nodeInfo.innerNode();
   while (n && !n->isElementNode())
@@ -1646,15 +1646,14 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
     bool readonly,
     bool active,
     bool mouseMove,
-    int x,
-    int y,
+    const IntPoint& point,
     const PlatformMouseEvent& event) {
   if (!renderer())
     return MouseEventWithHitTestResults(event, String(), String(), 0);
 
   assert(renderer()->isCanvas());
   RenderObject::NodeInfo renderInfo(readonly, active, mouseMove);
-  renderer()->layer()->hitTest(renderInfo, x, y);
+  renderer()->layer()->hitTest(renderInfo, point);
 
   String href;
   String target;

@@ -959,8 +959,8 @@ MouseEventWithHitTestResults FrameView::prepareMouseEvent(
   int xm, ym;
   viewportToContents(mev.x(), mev.y(), xm, ym);
 
-  return m_frame->document()->prepareMouseEvent(readonly, active, mouseMove, xm,
-                                                ym, mev);
+  return m_frame->document()->prepareMouseEvent(readonly, active, mouseMove,
+                                                IntPoint(xm, ym), mev);
 }
 
 bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
@@ -1047,7 +1047,7 @@ void FrameView::handleWheelEvent(PlatformWheelEvent& e) {
       viewportToContents(e.x(), e.y(), x, y);
 
       RenderObject::NodeInfo hitTestResult(true, false);
-      doc->renderer()->layer()->hitTest(hitTestResult, x, y);
+      doc->renderer()->layer()->hitTest(hitTestResult, IntPoint(x, y));
       Node* node = hitTestResult.innerNode();
 
       if (m_frame->passWheelEventToChildWidget(node)) {

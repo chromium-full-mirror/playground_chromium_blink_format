@@ -75,6 +75,7 @@ class HTMLFormElement;
 class HTMLImageLoader;
 class HTMLInputElement;
 class HTMLMapElement;
+class IntPoint;
 class JSEditor;
 class MouseEventWithHitTestResults;
 class NameNodeList;
@@ -361,8 +362,7 @@ class Document : public ContainerNode {
   MouseEventWithHitTestResults prepareMouseEvent(bool readonly,
                                                  bool active,
                                                  bool mouseMove,
-                                                 int x,
-                                                 int y,
+                                                 const IntPoint& point,
                                                  const PlatformMouseEvent&);
 
   virtual bool childAllowed(Node*);
