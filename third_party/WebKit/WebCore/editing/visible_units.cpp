@@ -148,9 +148,9 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
 
   RefPtr<Range> searchRange(d->createRange());
   Position start(rangeCompliantEquivalent(pos));
-  int exception = 0;
-  searchRange->setStart(start.node(), start.offset(), exception);
-  searchRange->setEndAfter(boundary, exception);
+  ExceptionCode ec = 0;
+  searchRange->selectNodeContents(boundary, ec);
+  searchRange->setStart(start.node(), start.offset(), ec);
   TextIterator it(searchRange.get(), RUNFINDER);
   DeprecatedString string;
   unsigned next = 0;
@@ -195,8 +195,8 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     // position.
     CharacterIterator charIt(searchRange.get());
     charIt.advance(next - 1);
-    pos = Position(charIt.range()->endContainer(exception),
-                   charIt.range()->endOffset(exception));
+    pos = Position(charIt.range()->endContainer(ec),
+                   charIt.range()->endOffset(ec));
   }
 
   // generate VisiblePosition, use UPSTREAM affinity if possible
