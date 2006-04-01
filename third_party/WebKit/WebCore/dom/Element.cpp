@@ -117,7 +117,7 @@ const AtomicString& Element::getAttribute(const QualifiedName& name) const {
 }
 
 void Element::scrollIntoView(bool alignToTop) {
-  IntRect bounds = this->getRect();
+  IntRect bounds = getRect();
   if (renderer()) {
     // Align to the top / bottom and to the closest edge.
     if (alignToTop)
@@ -132,7 +132,7 @@ void Element::scrollIntoView(bool alignToTop) {
 }
 
 void Element::scrollIntoViewIfNeeded(bool centerIfNeeded) {
-  IntRect bounds = this->getRect();
+  IntRect bounds = getRect();
   if (renderer()) {
     if (centerIfNeeded)
       renderer()->enclosingLayer()->scrollRectToVisible(

@@ -1001,7 +1001,6 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
                        ->dispatchMouseEvent(mouseEvent, eventType, clickCount);
 
   if (!swallowEvent && eventType == mousedownEvent) {
-    // Focus should be shifted on mouse down, not on a click.  -dwh
     // Blur current focus node when a link/button is clicked; this
     // is expected by some sites that rely on onChange handlers running
     // from form fields before the button click is processed.

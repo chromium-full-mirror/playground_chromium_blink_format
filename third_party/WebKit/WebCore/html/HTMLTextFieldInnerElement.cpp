@@ -28,11 +28,8 @@
 
 #include "BeforeTextInsertedEvent.h"
 #include "EventNames.h"
-#include "dom2_eventsimpl.h"
-#include "HTMLDocument.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "RenderObject.h"
 #include "RenderTextField.h"
 
 namespace WebCore {
@@ -45,7 +42,7 @@ HTMLTextFieldInnerElement::HTMLTextFieldInnerElement(Document* doc,
     : HTMLDivElement(doc), m_shadowParent(shadowParent) {}
 
 void HTMLTextFieldInnerElement::defaultEventHandler(Event* evt) {
-  // FIXME:  In the future, we should add a way to have default event listeners.
+  // FIXME: In the future, we should add a way to have default event listeners.
   // Then we would add one to the text field's inner div, and we wouldn't need
   // this subclass.
   if (shadowParentNode() && shadowParentNode()->hasTagName(inputTag) &&
@@ -56,7 +53,7 @@ void HTMLTextFieldInnerElement::defaultEventHandler(Event* evt) {
           ->defaultEventHandler(evt);
 
     if (evt->type() == khtmlEditableContentChangedEvent) {
-      // FIXME:  When other text fields switch to the Non-NSView implementation,
+      // FIXME: When other text fields switch to the Non-NSView implementation,
       // we may beed to add them here.
       if (static_cast<HTMLInputElement*>(shadowParentNode())->inputType() ==
           HTMLInputElement::TEXT)
@@ -64,6 +61,7 @@ void HTMLTextFieldInnerElement::defaultEventHandler(Event* evt) {
             ->subtreeHasChanged();
     }
   }
+
   HTMLDivElement::defaultEventHandler(evt);
 }
 }
