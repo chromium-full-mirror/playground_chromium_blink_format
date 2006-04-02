@@ -1870,27 +1870,26 @@ IntRect RenderBox::caretRect(int offset,
   // along to the child instead of offset 0 or whatever?
 
   // propagate it downwards to its children, someone will feel responsible
-  RenderObject* child = firstChild();
-  if (child) {
+  if (RenderObject* child = firstChild()) {
     IntRect result = child->caretRect(offset, affinity, extraWidthToEndOfLine);
-    // FIXME: in-band signalling!
-    if (result.isEmpty())
+    if (!result.isEmpty())
       return result;
   }
 
-  int _x, _y, height;
-
   // if not, use the extents of this box
   // offset 0 means left, offset 1 means right
-  _x = xPos() + (offset == 0 ? 0 : m_width);
-  InlineBox* box = inlineBoxWrapper();
-  if (box) {
-    height = box->root()->bottomOverflow() - box->root()->topOverflow();
-    _y = box->root()->topOverflow();
-  } else {
-    _y = yPos();
-    height = m_height;
+  // FIXME: What about border and padding?
+  const int caretWidth = 1;
+  IntRect rect(xPos(), yPos(), caretWidth, m_height);
+  if (offset != 0)
+    rect.setWidth(m_width - caretWidth);
+  if (InlineBox* box = inlineBoxWrapper()) {
+    RootInlineBox* rootBox = box->root();
+    int top = rootBox->topOverflow();
+    rect.setY(top);
+    rect.setHeight(rootBox->bottomOverflow() - top);
   }
+
   // If height of box is smaller than font height, use the latter one,
   // otherwise the caret might become invisible.
   //
@@ -1901,24 +1900,20 @@ IntRect RenderBox::caretRect(int offset,
   //
   // FIXME: ignoring :first-line, missing good reason to take care of
   int fontHeight = style()->font().height();
-  if (fontHeight > height || !isReplaced())
-    height = fontHeight;
+  if (fontHeight > rect.height() || !isReplaced())
+    rect.setHeight(fontHeight);
 
-  int absx, absy;
   RenderObject* cb = containingBlock();
-  if (cb && cb != this && cb->absolutePosition(absx, absy)) {
-    _x += absx;
-    _y += absy;
-  } else {
-    // we don't know our absolute position, and there is no point returning
-    // just a relative one
+  int cbx, cby;
+  if (!cb || !cb->absolutePosition(cbx, cby))
+    // No point returning a relative position.
     return IntRect();
-  }
+  rect.move(cbx, cby);
 
   if (extraWidthToEndOfLine)
-    *extraWidthToEndOfLine = m_width - _x;
+    *extraWidthToEndOfLine = m_width - rect.right();
 
-  return IntRect(_x, _y, 1, height);
+  return rect;
 }
 
 int RenderBox::lowestPosition(bool includeOverflowInterior,
