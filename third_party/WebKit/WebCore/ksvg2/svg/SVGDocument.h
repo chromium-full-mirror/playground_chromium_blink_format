@@ -26,15 +26,14 @@
 
 #include <q3ptrlist.h>
 
-#include <kdom/cache/KDOMCachedScript.h>
-#include <kdom/cache/KDOMCachedObjectClient.h>
-#include <kdom/core/DOMConfiguration.h>
+#include "CachedObjectClient.h"
 #include <ksvg2/misc/KSVGTimeScheduler.h>
 
 #include "Document.h"
 
 namespace WebCore {
 
+class CachedScript;
 class SVGElement;
 class SVGSVGElement;
 class SVGScriptElement;
@@ -71,9 +70,6 @@ class SVGDocument : public Document, public CachedObjectClient {
   virtual CSSStyleSelector* createStyleSelector(const DeprecatedString&);
 
  private:
-  void dispatchUIEvent(EventTarget* target, const AtomicString& type);
-  void dispatchMouseEvent(EventTarget* target, const AtomicString& type);
-
   // <script> related
   void executeScripts(bool needsStyleSelectorUpdate);
   void addScripts(Node* obj);

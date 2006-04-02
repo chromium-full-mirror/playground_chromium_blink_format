@@ -24,12 +24,12 @@
 #define KSVG_SVGExternalResourcesRequiredImpl_H
 #if SVG_SUPPORT
 
-namespace WebCore {
-class Attribute;
-};
+#include <kxmlcore/RefPtr.h>
 
 namespace WebCore {
+class MappedAttribute;
 class SVGAnimatedBoolean;
+
 class SVGExternalResourcesRequired {
  public:
   SVGExternalResourcesRequired();
@@ -38,12 +38,12 @@ class SVGExternalResourcesRequired {
   // 'SVGExternalResourcesRequired' functions
   SVGAnimatedBoolean* externalResourcesRequired() const;
 
-  bool parseMappedAttribute(MappedAttribute* attr);
+  bool parseMappedAttribute(MappedAttribute*);
 
  private:
   mutable RefPtr<SVGAnimatedBoolean> m_external;
 };
-};
+}
 
 #endif  // SVG_SUPPORT
 #endif
