@@ -708,8 +708,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
       newY += curr->object()->marginTop();
       newHeight = curr->height() - (curr->object()->marginTop() +
                                     curr->object()->marginBottom());
-      overflowTop = curr->object()->overflowTop();
-      overflowBottom = curr->object()->overflowHeight() - newHeight;
+      overflowTop = curr->object()->overflowTop(false);
+      overflowBottom = curr->object()->overflowHeight(false) - newHeight;
     }
 
     curr->setYPos(newY);
