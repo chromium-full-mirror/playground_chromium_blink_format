@@ -48,7 +48,7 @@ UString DOMObject::toString(ExecState*) const {
 }
 
 typedef HashMap<void*, DOMObject*> DOMObjectMap;
-typedef HashMap<Node*, DOMNode*> NodeMap;
+typedef HashMap<WebCore::Node*, DOMNode*> NodeMap;
 typedef HashMap<Document*, NodeMap*> NodePerDocMap;
 
 static DOMObjectMap* domObjects() {
@@ -93,7 +93,7 @@ DOMNode* ScriptInterpreter::getDOMNodeForDocument(WebCore::Document* document,
 }
 
 void ScriptInterpreter::forgetDOMNodeForDocument(WebCore::Document* document,
-                                                 Node* node) {
+                                                 WebCore::Node* node) {
   if (!document) {
     domObjects()->remove(node);
     return;
@@ -104,7 +104,7 @@ void ScriptInterpreter::forgetDOMNodeForDocument(WebCore::Document* document,
 }
 
 void ScriptInterpreter::putDOMNodeForDocument(WebCore::Document* document,
-                                              Node* nodeHandle,
+                                              WebCore::Node* nodeHandle,
                                               DOMNode* nodeWrapper) {
   if (!document) {
     domObjects()->set(nodeHandle, nodeWrapper);

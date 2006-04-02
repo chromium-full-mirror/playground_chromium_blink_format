@@ -83,7 +83,7 @@ JSValue* XMLSerializerProtoFunc::callAsFunction(ExecState* exec,
         return jsUndefined();
       }
 
-      Node* node = static_cast<Node*>(
+      WebCore::Node* node = static_cast<WebCore::Node*>(
           static_cast<DOMNode*>(args[0]->toObject(exec))->impl());
       return jsStringOrNull(WebCore::createMarkup(node));
     }

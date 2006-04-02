@@ -92,7 +92,7 @@ JSValue* XSLTProcessorProtoFunc::callAsFunction(ExecState* exec,
       JSValue* docVal = args[1];
       if (nodeVal->isObject(&DOMNode::info) &&
           docVal->isObject(&DOMDocument::info)) {
-        Node* node = static_cast<DOMNode*>(nodeVal)->impl();
+        WebCore::Node* node = static_cast<DOMNode*>(nodeVal)->impl();
         Document* doc =
             static_cast<Document*>(static_cast<DOMDocument*>(docVal)->impl());
         return toJS(exec, processor.transformToFragment(node, doc).get());

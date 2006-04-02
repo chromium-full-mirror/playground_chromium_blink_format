@@ -1221,9 +1221,8 @@ void Window::put(ExecState* exec,
         break;
     }
   }
-  if (isSafeScript(exec)) {
+  if (isSafeScript(exec))
     JSObject::put(exec, propertyName, value, attr);
-  }
 }
 
 bool Window::toBoolean(ExecState*) const {
