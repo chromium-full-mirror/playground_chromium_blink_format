@@ -254,12 +254,14 @@ class Node : public TreeShared<Node> {
   virtual bool isFocusable() const;
   virtual bool isKeyboardFocusable() const;
   virtual bool isMouseFocusable() const;
+
   virtual bool isControl() const {
     return false;
   }  // Eventually the notion of what is a control will be extensible.
   virtual bool isEnabled() const { return true; }
   virtual bool isChecked() const { return false; }
   virtual bool isIndeterminate() const { return false; }
+  virtual bool isReadOnly() const { return false; }
 
   virtual bool isContentEditable() const;
   virtual bool isContentRichlyEditable() const;

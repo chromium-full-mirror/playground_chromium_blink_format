@@ -34,8 +34,7 @@ IntRect::IntRect(const RECT& r)
       m_size(IntSize(r.right - r.left, r.bottom - r.top)) {}
 
 IntRect::operator RECT() const {
-  RECT rect = {m_location.x(), m_location.y(), m_location.x() + m_size.width(),
-               m_location.y() + m_size.height()};
+  RECT rect = {x(), y(), right(), bottom()};
   return rect;
 }
 }
