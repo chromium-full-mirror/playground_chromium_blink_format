@@ -61,6 +61,8 @@ class RenderArena;
 
 namespace WebCore {
 
+using std::max;
+
 class CSSStyleSelector;
 class CachedImage;
 class CachedObject;
@@ -1311,7 +1313,7 @@ class RenderStyle {
   }
 
   unsigned short outlineSize() const {
-    return outlineWidth() + outlineOffset();
+    return max(0, outlineWidth() + outlineOffset());
   }
   unsigned short outlineWidth() const {
     if (background->m_outline.style() == BNONE ||
@@ -1879,9 +1881,7 @@ class RenderStyle {
   }
   void addBindingURI(StringImpl* uri);
 #endif
-  void setOutlineOffset(unsigned short v) {
-    SET_VAR(background, m_outline._offset, v)
-  }
+  void setOutlineOffset(int v) { SET_VAR(background, m_outline._offset, v) }
   void setTextShadow(ShadowData* val, bool add = false);
   void setOpacity(float f) { SET_VAR(css3NonInheritedData, opacity, f); }
   void setAppearance(EAppearance a) {

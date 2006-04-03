@@ -46,7 +46,7 @@ int snprintf(char* str, size_t size, const char* format, ...) {
 
 FrameTree::~FrameTree() {
   for (Frame* child = firstChild(); child; child = child->tree()->nextSibling())
-    child->detachFromView();
+    child->setView(0);
 }
 
 void FrameTree::setName(const AtomicString& name) {
@@ -78,7 +78,7 @@ void FrameTree::appendChild(PassRefPtr<Frame> child) {
 
 void FrameTree::removeChild(Frame* child) {
   child->tree()->m_parent = 0;
-  child->detachFromView();
+  child->setView(0);
 
   // Slightly tricky way to prevent deleting the child until we are done with
   // it, w/o

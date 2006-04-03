@@ -353,8 +353,6 @@ class FrameMac : public Frame {
 
   void registerCommandForUndoOrRedo(const EditCommandPtr& cmd, bool isRedo);
 
-  virtual void detachFromView();
-
   WebCoreFrameBridge* _bridge;
 
   NSView* _mouseDownView;

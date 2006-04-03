@@ -273,7 +273,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    * Sets a user defined style sheet to be used on top of the HTML4,
    * SVG and printing default style sheets.
    */
-  void setUserStyleSheetLocation(const KURL& url);
+  void setUserStyleSheetLocation(const KURL&);
   void setUserStyleSheet(const String& styleSheetData);
 
   /**
@@ -773,11 +773,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   static void clearDocumentFocus(Widget*);
 
-  static const DeprecatedPtrList<Frame>& instances() {
-    return mutableInstances();
-  }
-  static DeprecatedPtrList<Frame>& mutableInstances();
-
   void updatePolicyBaseURL();
   void setPolicyBaseURL(const String&);
 
@@ -827,6 +822,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   void disconnectOwnerRenderer();
 
+  void setNeedsReapplyStyles();
+
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
@@ -870,7 +867,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   virtual void frameDetached();
 
-  virtual void detachFromView();
   void updateBaseURLForEmptyDocument();
 
   KURL url() const;

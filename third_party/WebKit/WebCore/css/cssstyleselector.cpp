@@ -285,18 +285,18 @@ CSSStyleSelector::~CSSStyleSelector() {
   delete m_userSheet;
 }
 
-static CSSStyleSheet* parseUASheet(const unsigned short* characters, int size) {
+static CSSStyleSheet* parseUASheet(const char* characters, unsigned size) {
   CSSStyleSheet* const parent = 0;
   CSSStyleSheet* sheet = new CSSStyleSheet(parent);
   sheet->ref();  // leak the sheet on purpose since it will be stored in a
                  // global variable
-  sheet->parseString(String(reinterpret_cast<const QChar*>(characters), size));
+  sheet->parseString(String(characters, size));
   return sheet;
 }
 
 template <typename T>
 CSSStyleSheet* parseUASheet(const T& array) {
-  return parseUASheet(array, sizeof(array) / sizeof(unsigned short));
+  return parseUASheet(array, sizeof(array));
 }
 
 void CSSStyleSelector::loadDefaultStyle() {
@@ -1724,72 +1724,6 @@ static Length convertToLength(CSSPrimitiveValue* primitiveValue,
   return l;
 }
 
-// color mapping code
-struct colorMap {
-  int css_value;
-  RGBA32 color;
-};
-
-static const colorMap cmap[] = {{CSS_VAL_AQUA, 0xFF00FFFF},
-                                {CSS_VAL_BLACK, 0xFF000000},
-                                {CSS_VAL_BLUE, 0xFF0000FF},
-                                {CSS_VAL_FUCHSIA, 0xFFFF00FF},
-                                {CSS_VAL_GRAY, 0xFF808080},
-                                {CSS_VAL_GREEN, 0xFF008000},
-                                {CSS_VAL_LIME, 0xFF00FF00},
-                                {CSS_VAL_MAROON, 0xFF800000},
-                                {CSS_VAL_NAVY, 0xFF000080},
-                                {CSS_VAL_OLIVE, 0xFF808000},
-                                {CSS_VAL_ORANGE, 0xFFFFA500},
-                                {CSS_VAL_PURPLE, 0xFF800080},
-                                {CSS_VAL_RED, 0xFFFF0000},
-                                {CSS_VAL_SILVER, 0xFFC0C0C0},
-                                {CSS_VAL_TEAL, 0xFF008080},
-                                {CSS_VAL_WHITE, 0xFFFFFFFF},
-                                {CSS_VAL_YELLOW, 0xFFFFFF00},
-                                {CSS_VAL_TRANSPARENT, Color::transparent},
-                                {CSS_VAL_GREY, 0xFF808080},
-                                {CSS_VAL_ACTIVEBORDER, 0xFFE0E0E0},
-                                {CSS_VAL_ACTIVECAPTION, 0xFF000000},
-                                {CSS_VAL_APPWORKSPACE, 0xFF000000},
-                                {CSS_VAL_BUTTONFACE, 0xFFC0C0C0},
-                                {CSS_VAL_BUTTONHIGHLIGHT, 0xFFE0E0E0},
-                                {CSS_VAL_BUTTONSHADOW, 0xFFFFFFFF},
-                                {CSS_VAL_BUTTONTEXT, 0xFF000000},
-                                {CSS_VAL_CAPTIONTEXT, 0xFF000000},
-                                {CSS_VAL_GRAYTEXT, 0xFF808080},
-                                {CSS_VAL_HIGHLIGHT, 0xFFFFFFFF},
-                                {CSS_VAL_HIGHLIGHTTEXT, 0xFFFFFFFF},
-                                {CSS_VAL_INACTIVEBORDER, 0xFFFFFFFF},
-                                {CSS_VAL_INACTIVECAPTION, 0xFFFFFFFF},
-                                {CSS_VAL_INACTIVECAPTIONTEXT, 0xFF000000},
-                                {CSS_VAL_INFOBACKGROUND, 0xFF000000},
-                                {CSS_VAL_INFOTEXT, 0xFF000000},
-                                {CSS_VAL_MENU, 0xFFFFFFFF},
-                                {CSS_VAL_MENUTEXT, 0xFFFFFFFF},
-                                {CSS_VAL_SCROLLBAR, 0xFFFFFFFF},
-                                {CSS_VAL_TEXT, 0xFF000000},
-                                {CSS_VAL_THREEDDARKSHADOW, 0xFF404040},
-                                {CSS_VAL_THREEDFACE, 0xFFC0C0C0},
-                                {CSS_VAL_THREEDHIGHLIGHT, 0xFFE0E0E0},
-                                {CSS_VAL_THREEDLIGHTSHADOW, 0xFFC0C0C0},
-                                {CSS_VAL_THREEDSHADOW, 0xFFFFFFFF},
-                                {CSS_VAL_WINDOW, 0xFFFFFFFF},
-                                {CSS_VAL_WINDOWFRAME, 0xFFFFFFFF},
-                                {CSS_VAL_WINDOWTEXT, 0xFF000000},
-                                {0, 0}};
-
-static Color colorForCSSValue(int css_value) {
-  // try the regular ones first
-  const colorMap* col = cmap;
-  while (col->css_value && col->css_value != css_value)
-    ++col;
-  if (col->css_value)
-    return col->color;
-
-  return Color();
-}
-
 void CSSStyleSelector::applyDeclarations(bool applyFirst,
                                          bool isImportant,
                                          int startIndex,
@@ -2484,7 +2418,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           HANDLE_INHERIT_COND(CSS_PROP_OUTLINE_COLOR, outlineColor,
                               OutlineColor)
           return;
-        } else if (isInitial) {
+        }
+        if (isInitial) {
           // The border/outline colors will just map to the invalid color |col|
           // above.  This will have the
           // effect of forcing the use of the currentColor when it comes time to
@@ -2520,8 +2455,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           case CSS_PROP_OUTLINE_COLOR:
             style->setOutlineColor(col);
             break;
-          default:
-            return;
         }
         return;
       }
@@ -3761,16 +3694,10 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       }
     }
 
-    case CSS_PROP_OUTLINE_OFFSET: {
+    case CSS_PROP_OUTLINE_OFFSET:
       HANDLE_INHERIT_AND_INITIAL(outlineOffset, OutlineOffset)
-
-      int offset = primitiveValue->computeIntLength(style);
-      if (offset < 0)
-        return;
-
-      style->setOutlineOffset(offset);
+      style->setOutlineOffset(primitiveValue->computeIntLength(style));
       break;
-    }
 
     case CSS_PROP_TEXT_SHADOW: {
       if (isInherit) {
@@ -3778,7 +3705,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                                  ? new ShadowData(*parentStyle->textShadow())
                                  : 0);
         return;
-      } else if (isInitial) {
+      }
+      if (isInitial) {
         style->setTextShadow(0);
         return;
       }
@@ -3794,23 +3722,16 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       int len = list->length();
       for (int i = 0; i < len; i++) {
         ShadowValue* item = static_cast<ShadowValue*>(list->item(i));
-
         int x = item->x->computeIntLength(style);
         int y = item->y->computeIntLength(style);
         int blur = item->blur ? item->blur->computeIntLength(style) : 0;
-        Color col = Color::transparent;
-        if (item->color) {
-          int ident = item->color->getIdent();
-          if (ident)
-            col = colorForCSSValue(ident);
-          else if (item->color->primitiveType() ==
-                   CSSPrimitiveValue::CSS_RGBCOLOR)
-            col.setRgb(item->color->getRGBColorValue());
-        }
-        ShadowData* shadowData = new ShadowData(x, y, blur, col);
+        Color color;
+        if (item->color)
+          color = getColorFromPrimitiveValue(item->color.get());
+        ShadowData* shadowData = new ShadowData(
+            x, y, blur, color.isValid() ? color : Color::transparent);
         style->setTextShadow(shadowData, i != 0);
       }
-
       return;
     }
     case CSS_PROP_OPACITY:
@@ -3818,7 +3739,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (!primitiveValue ||
           primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
         return;  // Error case.
-
       // Clamp opacity to the range 0-1
       style->setOpacity(
           kMin(1.0, kMax(0.0, primitiveValue->getFloatValue(
@@ -4557,6 +4477,69 @@ float CSSStyleSelector::smallerFontSize(float size, bool quirksMode) const {
   return size / 1.2;
 }
 
+// color mapping code
+struct ColorValue {
+  int css_value;
+  RGBA32 color;
+};
+
+static const ColorValue colorValues[] = {
+    {CSS_VAL_AQUA, 0xFF00FFFF},
+    {CSS_VAL_BLACK, 0xFF000000},
+    {CSS_VAL_BLUE, 0xFF0000FF},
+    {CSS_VAL_FUCHSIA, 0xFFFF00FF},
+    {CSS_VAL_GRAY, 0xFF808080},
+    {CSS_VAL_GREEN, 0xFF008000},
+    {CSS_VAL_LIME, 0xFF00FF00},
+    {CSS_VAL_MAROON, 0xFF800000},
+    {CSS_VAL_NAVY, 0xFF000080},
+    {CSS_VAL_OLIVE, 0xFF808000},
+    {CSS_VAL_ORANGE, 0xFFFFA500},
+    {CSS_VAL_PURPLE, 0xFF800080},
+    {CSS_VAL_RED, 0xFFFF0000},
+    {CSS_VAL_SILVER, 0xFFC0C0C0},
+    {CSS_VAL_TEAL, 0xFF008080},
+    {CSS_VAL_WHITE, 0xFFFFFFFF},
+    {CSS_VAL_YELLOW, 0xFFFFFF00},
+    {CSS_VAL_TRANSPARENT, 0x00000000},
+    {CSS_VAL_GREY, 0xFF808080},
+    {CSS_VAL_ACTIVEBORDER, 0xFFE0E0E0},
+    {CSS_VAL_ACTIVECAPTION, 0xFF000000},
+    {CSS_VAL_APPWORKSPACE, 0xFF000000},
+    {CSS_VAL_BUTTONFACE, 0xFFC0C0C0},
+    {CSS_VAL_BUTTONHIGHLIGHT, 0xFFE0E0E0},
+    {CSS_VAL_BUTTONSHADOW, 0xFFFFFFFF},
+    {CSS_VAL_BUTTONTEXT, 0xFF000000},
+    {CSS_VAL_CAPTIONTEXT, 0xFF000000},
+    {CSS_VAL_GRAYTEXT, 0xFF808080},
+    {CSS_VAL_HIGHLIGHT, 0xFFFFFFFF},
+    {CSS_VAL_HIGHLIGHTTEXT, 0xFFFFFFFF},
+    {CSS_VAL_INACTIVEBORDER, 0xFFFFFFFF},
+    {CSS_VAL_INACTIVECAPTION, 0xFFFFFFFF},
+    {CSS_VAL_INACTIVECAPTIONTEXT, 0xFF000000},
+    {CSS_VAL_INFOBACKGROUND, 0xFF000000},
+    {CSS_VAL_INFOTEXT, 0xFF000000},
+    {CSS_VAL_MENU, 0xFFFFFFFF},
+    {CSS_VAL_MENUTEXT, 0xFFFFFFFF},
+    {CSS_VAL_SCROLLBAR, 0xFFFFFFFF},
+    {CSS_VAL_TEXT, 0xFF000000},
+    {CSS_VAL_THREEDDARKSHADOW, 0xFF404040},
+    {CSS_VAL_THREEDFACE, 0xFFC0C0C0},
+    {CSS_VAL_THREEDHIGHLIGHT, 0xFFE0E0E0},
+    {CSS_VAL_THREEDLIGHTSHADOW, 0xFFC0C0C0},
+    {CSS_VAL_THREEDSHADOW, 0xFFFFFFFF},
+    {CSS_VAL_WINDOW, 0xFFFFFFFF},
+    {CSS_VAL_WINDOWFRAME, 0xFFFFFFFF},
+    {CSS_VAL_WINDOWTEXT, 0xFF000000},
+    {0, 0}};
+
+static Color colorForCSSValue(int css_value) {
+  for (const ColorValue* col = colorValues; col->css_value; ++col)
+    if (col->css_value == css_value)
+      return col->color;
+  return Color();
+}
+
 Color CSSStyleSelector::getColorFromPrimitiveValue(
     CSSPrimitiveValue* primitiveValue) {
   Color col;
@@ -4576,6 +4559,8 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
       }
     } else if (ident == CSS_VAL__KHTML_ACTIVELINK)
       col = element->document()->activeLinkColor();
+    else if (ident == CSS_VAL__WEBKIT_FOCUS_RING_COLOR)
+      col = focusRingColor();
     else
       col = colorForCSSValue(ident);
   } else if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)

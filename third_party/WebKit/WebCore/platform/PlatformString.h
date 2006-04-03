@@ -49,6 +49,7 @@ class String {
   String(const KJS::Identifier&);
   String(const KJS::UString&);
   String(const char*);
+  String(const char*, unsigned length);
   String(StringImpl* i) : m_impl(i) {}
 
   operator KJS::Identifier() const;

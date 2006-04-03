@@ -2837,11 +2837,6 @@ void Frame::clearDocumentFocus(Widget* widget) {
   node->document()->setFocusNode(0);
 }
 
-DeprecatedPtrList<Frame>& Frame::mutableInstances() {
-  static DeprecatedPtrList<Frame> instancesList;
-  return instancesList;
-}
-
 void Frame::updatePolicyBaseURL() {
   if (tree()->parent() && tree()->parent()->document())
     setPolicyBaseURL(tree()->parent()->document()->policyBaseURL());
@@ -3230,8 +3225,6 @@ bool Frame::isLoadingMainResource() const {
 FrameTree* Frame::tree() const {
   return &d->m_treeNode;
 }
-
-void Frame::detachFromView() {}
 
 KURL Frame::url() const {
   return d->m_url;
