@@ -1500,20 +1500,22 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   // We didn't move, but we did change size.  Invalidate the delta, which will
   // consist of possibly
   // two rectangles (but typically only one).
+  int ow = style() ? style()->outlineSize() : 0;
   int width = abs(newBounds.width() - oldBounds.width());
   if (width)
     c->repaintViewRectangle(
         IntRect(kMin(newBounds.x() + newBounds.width(),
                      oldBounds.x() + oldBounds.width()) -
-                    borderRight(),
-                newBounds.y(), width + borderRight(),
+                    borderRight() - ow,
+                newBounds.y(), width + borderRight() + ow,
                 kMax(newBounds.height(), oldBounds.height())));
   int height = abs(newBounds.height() - oldBounds.height());
   if (height)
     c->repaintViewRectangle(IntRect(
         newBounds.x(),
-        kMin(newBounds.bottom(), oldBounds.bottom()) - borderBottom(),
-        kMax(newBounds.width(), oldBounds.width()), height + borderBottom()));
+        kMin(newBounds.bottom(), oldBounds.bottom()) - borderBottom() - ow,
+        kMax(newBounds.width(), oldBounds.width()),
+        height + borderBottom() + ow));
   return false;
 }
 
