@@ -1208,12 +1208,14 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     restoreClip(p, paintDirtyRect, clipRectToApply);
   }
 
-  // Paint our own outline
-  RenderObject::PaintInfo info(p, clipRectToApply, PaintPhaseSelfOutline,
-                               paintingRootForRenderer, 0);
-  setClip(p, paintDirtyRect, outlineRect);
-  renderer()->paint(info, tx, ty);
-  restoreClip(p, paintDirtyRect, outlineRect);
+  if (!outlineRect.isEmpty()) {
+    // Paint our own outline
+    RenderObject::PaintInfo info(p, outlineRect, PaintPhaseSelfOutline,
+                                 paintingRootForRenderer, 0);
+    setClip(p, paintDirtyRect, outlineRect);
+    renderer()->paint(info, tx, ty);
+    restoreClip(p, paintDirtyRect, outlineRect);
+  }
 
   // Now walk the sorted list of children with positive z-indices.
   if (m_posZOrderList)
@@ -1459,6 +1461,8 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
   convertToLayerCoords(rootLayer, x, y);
   layerBounds = IntRect(x, y, width(), height());
 
+  int outlineSize = renderer()->style()->outlineSize();
+  outlineRect.inflate(outlineSize);
   // Update the clip rects that will be passed to child layers.
   if (m_object->hasOverflowClip() || m_object->hasClip()) {
     // This layer establishes a clip of some kind.
@@ -1476,6 +1480,7 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
     // rect is intersected with our layer's bounds.
     backgroundRect.intersect(layerBounds);
   }
+  outlineRect.intersect(paintDirtyRect);
 }
 
 bool RenderLayer::intersectsDamageRect(const IntRect& layerBounds,
