@@ -53,7 +53,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   bool handleSpecialCaseBRDelete();
   void handleGeneralDelete();
   void fixupWhitespace();
-  void moveNodesAfterNode();
+  void mergeParagraphs();
   void calculateEndingPosition();
   void calculateTypingStyleAfterDelete(WebCore::Node* insertedPlaceholder);
   void clearTransientState();

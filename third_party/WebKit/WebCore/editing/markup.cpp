@@ -348,6 +348,9 @@ DeprecatedString createMarkup(const Range* range,
       DeprecatedString("<br class=\"") + AppleInterchangeNewline + "\">";
 
   ExceptionCode ec = 0;
+  if (range->collapsed(ec))
+    return "";
+  ASSERT(ec == 0);
   Node* commonAncestor = range->commonAncestorContainer(ec);
   ASSERT(ec == 0);
 

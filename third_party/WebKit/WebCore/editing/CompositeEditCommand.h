@@ -87,6 +87,8 @@ class CompositeEditCommand : public EditCommand {
   void removeChildrenInRange(WebCore::Node* node, int from, int to);
   void removeNode(WebCore::Node* removeChild);
   void removeNodePreservingChildren(WebCore::Node* node);
+  void removeNodeAndPruneAncestors(Node* node);
+  void prune(PassRefPtr<Node> node);
   void replaceTextInNode(WebCore::Text* node,
                          int offset,
                          int count,

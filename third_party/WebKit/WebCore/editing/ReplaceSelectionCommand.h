@@ -35,6 +35,8 @@ namespace WebCore {
 
 class DocumentFragment;
 
+enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
+
 class RenderingInfo : public Shared<RenderingInfo> {
  public:
   RenderingInfo(PassRefPtr<CSSMutableStyleDeclaration>, bool);
@@ -56,8 +58,6 @@ class ReplacementFragment {
  public:
   ReplacementFragment(Document*, DocumentFragment*, bool, Element*);
   ~ReplacementFragment();
-
-  enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
 
   Node* firstChild() const;
   Node* lastChild() const;
@@ -140,7 +140,6 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void updateNodesInserted(Node*);
   void fixupNodeStyles(const NodeVector&, const RenderingInfoMap&);
   void removeLinePlaceholderIfNeeded(Node*);
-  void removeNodeAndPruneAncestors(Node*);
 
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastNodeInserted;
