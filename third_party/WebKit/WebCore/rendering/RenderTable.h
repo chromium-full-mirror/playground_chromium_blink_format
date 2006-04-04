@@ -163,6 +163,8 @@ class RenderTable : public RenderBlock {
 
   virtual IntRect getOverflowClipRect(int tx, int ty);
 
+  void recalcSectionsIfNeeded();
+
  private:
   void recalcSections();
 

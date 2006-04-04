@@ -560,6 +560,11 @@ RenderTableCol* RenderTable::colElement(int col) {
   return 0;
 }
 
+void RenderTable::recalcSectionsIfNeeded() {
+  if (needSectionRecalc)
+    recalcSections();
+}
+
 void RenderTable::recalcSections() {
   tCaption = 0;
   head = foot = firstBody = 0;
