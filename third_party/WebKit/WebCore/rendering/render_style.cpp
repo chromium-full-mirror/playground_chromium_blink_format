@@ -701,10 +701,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 #endif
 
   // we anyway assume they are the same
-  // 	EDisplay _effectiveDisplay : 5;
+  //      EDisplay _effectiveDisplay : 5;
 
   // NonVisible:
-  // 	ECursor _cursor_style : 4;
+  //      ECursor _cursor_style : 4;
 
   // ### this needs work to know more exactly if we need a relayout
   //     or just a repaint
@@ -771,9 +771,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   // changes causing Layout changes:
 
   // only for tables:
-  // 	_border_collapse
-  // 	EEmptyCell _empty_cells : 2 ;
-  // 	ECaptionSide _caption_side : 2;
+  //     _border_collapse
+  //     EEmptyCell _empty_cells : 2 ;
+  //     ECaptionSide _caption_side : 2;
   //     ETableLayout _table_layout : 1;
   //     EPosition _position : 2;
   //     EFloat _floating : 2;
@@ -793,8 +793,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   }
 
   // only for lists:
-  // 	EListStyleType _list_style_type : 5 ;
-  // 	EListStylePosition _list_style_position :1;
+  //      EListStyleType _list_style_type : 5 ;
+  //      EListStylePosition _list_style_position :1;
   if (noninherited_flags._effectiveDisplay == LIST_ITEM) {
     if (!(inherited_flags._list_style_type ==
           other->inherited_flags._list_style_type) ||
@@ -804,11 +804,11 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   }
 
   // ### These could be better optimised
-  // 	ETextAlign _text_align : 3;
-  // 	ETextTransform _text_transform : 4;
-  // 	EDirection _direction : 1;
-  // 	EWhiteSpace _white_space : 2;
-  // 	EFontVariant _font_variant : 1;
+  //      ETextAlign _text_align : 3;
+  //      ETextTransform _text_transform : 4;
+  //      EDirection _direction : 1;
+  //      EWhiteSpace _white_space : 2;
+  //      EFontVariant _font_variant : 1;
   //     EClear _clear : 2;
   if (!(inherited_flags._text_align == other->inherited_flags._text_align) ||
       !(inherited_flags._text_transform ==
@@ -866,9 +866,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
     return RepaintLayer;
 
   // Repaint:
-  // 	EVisibility _visibility : 2;
+  //      EVisibility _visibility : 2;
   //     EOverflow _overflow : 4 ;
-  // 	int _text_decoration : 4;
+  //      int _text_decoration : 4;
   //     DataRef<StyleBackgroundData> background;
   if (inherited->color != other->inherited->color ||
       !(inherited_flags._visibility == other->inherited_flags._visibility) ||
