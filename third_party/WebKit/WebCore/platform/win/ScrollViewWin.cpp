@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Justin Haygood <jhaygood@spsu.edu>.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -223,7 +224,8 @@ int ScrollView::updateScrollInfo(short type,
 }
 
 void ScrollView::updateScrollBars() {
-  IntSize scroll = scrollOffset().shrunkTo(maximumScroll());
+  IntSize maxScrollPosition(contentsWidth(), contentsHeight());
+  IntSize scroll = scrollOffset().shrunkTo(maxScrollPosition);
   scroll.clampNegativeToZero();
 
   m_data->scrollOffset = IntSize(
