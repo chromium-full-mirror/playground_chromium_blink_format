@@ -1708,7 +1708,7 @@ static Length convertToLength(CSSPrimitiveValue* primitiveValue,
     int type = primitiveValue->primitiveType();
     if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
         type < CSSPrimitiveValue::CSS_DEG)
-      l = Length(primitiveValue->computeIntLength(style), Fixed);
+      l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
     else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
       l = Length(
           int(primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_PERCENTAGE)),
@@ -2356,7 +2356,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                                  HorizontalBorderSpacing)
       if (!primitiveValue)
         break;
-      short spacing = primitiveValue->computeShortLength(style);
+      short spacing = primitiveValue->computeLengthShort(style);
       style->setHorizontalBorderSpacing(spacing);
       break;
     }
@@ -2364,7 +2364,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       HANDLE_INHERIT_AND_INITIAL(verticalBorderSpacing, VerticalBorderSpacing)
       if (!primitiveValue)
         break;
-      short spacing = primitiveValue->computeShortLength(style);
+      short spacing = primitiveValue->computeLengthShort(style);
       style->setVerticalBorderSpacing(spacing);
       break;
     }
@@ -2518,7 +2518,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           width = 5;
           break;
         case CSS_VAL_INVALID:
-          width = primitiveValue->computeShortLength(style);
+          width = primitiveValue->computeLengthShort(style);
           break;
         default:
           return;
@@ -2569,7 +2569,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       } else {
         if (!primitiveValue)
           return;
-        width = primitiveValue->computeIntLength(style);
+        width = primitiveValue->computeLengthInt(style);
       }
       switch (id) {
         case CSS_PROP_LETTER_SPACING:
@@ -2756,7 +2756,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
               type < CSSPrimitiveValue::CSS_DEG)
             // Handle our quirky margin units if we have them.
-            l = Length(primitiveValue->computeIntLength(style), Fixed,
+            l = Length(primitiveValue->computeLengthIntForLength(style), Fixed,
                        primitiveValue->isQuirkValue());
           else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
             l = Length((int)primitiveValue->getFloatValue(
@@ -2862,7 +2862,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         unsigned short type = primitiveValue->primitiveType();
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
-          l = Length(primitiveValue->computeIntLength(style), Fixed);
+          l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
         else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           l = Length((int)primitiveValue->getFloatValue(
                          CSSPrimitiveValue::CSS_PERCENTAGE),
@@ -2930,7 +2930,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         Length l;
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG)
-          l = Length(primitiveValue->computeIntLength(style), Fixed);
+          l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
         else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           l = Length(int(primitiveValue->getFloatValue(
                          CSSPrimitiveValue::CSS_PERCENTAGE)),
@@ -3075,7 +3075,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           multiplier = view->frame()->zoomFactor() / 100.0;
         }
         lineHeight =
-            Length(primitiveValue->computeIntLength(style, multiplier), Fixed);
+            Length(primitiveValue->computeLengthIntForLength(style, multiplier),
+                   Fixed);
       } else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
         lineHeight = Length(
             (style->fontSize() * int(primitiveValue->getFloatValue(
@@ -3664,8 +3665,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (!pair)
         return;
 
-      int width = pair->first()->computeIntLength(style);
-      int height = pair->second()->computeIntLength(style);
+      int width = pair->first()->computeLengthInt(style);
+      int height = pair->second()->computeLengthInt(style);
       if (width < 0 || height < 0)
         return;
 
@@ -3696,7 +3697,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
     case CSS_PROP_OUTLINE_OFFSET:
       HANDLE_INHERIT_AND_INITIAL(outlineOffset, OutlineOffset)
-      style->setOutlineOffset(primitiveValue->computeIntLength(style));
+      style->setOutlineOffset(primitiveValue->computeLengthInt(style));
       break;
 
     case CSS_PROP_TEXT_SHADOW: {
@@ -3722,9 +3723,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       int len = list->length();
       for (int i = 0; i < len; i++) {
         ShadowValue* item = static_cast<ShadowValue*>(list->item(i));
-        int x = item->x->computeIntLength(style);
-        int y = item->y->computeIntLength(style);
-        int blur = item->blur ? item->blur->computeIntLength(style) : 0;
+        int x = item->x->computeLengthInt(style);
+        int y = item->y->computeLengthInt(style);
+        int blur = item->blur ? item->blur->computeLengthInt(style) : 0;
         Color color;
         if (item->color)
           color = getColorFromPrimitiveValue(item->color.get());
@@ -4278,7 +4279,7 @@ void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
   int type = primitiveValue->primitiveType();
   if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
       type < CSSPrimitiveValue::CSS_DEG)
-    l = Length(primitiveValue->computeIntLength(style), Fixed);
+    l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
   else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
     l = Length(
         (int)primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_PERCENTAGE),
@@ -4302,7 +4303,7 @@ void CSSStyleSelector::mapBackgroundYPosition(BackgroundLayer* layer,
   int type = primitiveValue->primitiveType();
   if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
       type < CSSPrimitiveValue::CSS_DEG)
-    l = Length(primitiveValue->computeIntLength(style), Fixed);
+    l = Length(primitiveValue->computeLengthIntForLength(style), Fixed);
   else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
     l = Length(
         (int)primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_PERCENTAGE),

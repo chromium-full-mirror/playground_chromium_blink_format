@@ -225,10 +225,12 @@ class CSSPrimitiveValue : public CSSValue {
    * this,
    * and some tool to calibrate.
    */
-  int computeIntLength(RenderStyle*);
-  short computeShortLength(RenderStyle*);
-  int computeIntLength(RenderStyle*, double multiplier);
-  short computeShortLength(RenderStyle*, double multiplier);
+  int computeLengthInt(RenderStyle*);
+  int computeLengthInt(RenderStyle*, double multiplier);
+  int computeLengthIntForLength(RenderStyle*);
+  int computeLengthIntForLength(RenderStyle*, double multiplier);
+  short computeLengthShort(RenderStyle*);
+  short computeLengthShort(RenderStyle*, double multiplier);
   double computeLengthFloat(RenderStyle*, bool applyZoomFactor = true);
 
   // use with care!!!
