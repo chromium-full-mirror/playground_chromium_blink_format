@@ -46,6 +46,7 @@ class KHTMLSettings;
   BOOL pluginsEnabled;
   BOOL JavaScriptEnabled;
   BOOL JavaScriptCanOpenWindowsAutomatically;
+  BOOL privateBrowsingEnabled;
   BOOL willLoadImagesAutomatically;
   BOOL shouldPrintBackgrounds;
   BOOL textAreasAreResizable;
@@ -96,6 +97,9 @@ class KHTMLSettings;
 
 - (void)setJavaScriptCanOpenWindowsAutomatically:(BOOL)enabled;
 - (BOOL)JavaScriptCanOpenWindowsAutomatically;
+
+- (void)setPrivateBrowsingEnabled:(BOOL)enabled;
+- (BOOL)privateBrowsingEnabled;
 
 - (void)setWillLoadImagesAutomatically:(BOOL)load;
 - (BOOL)willLoadImagesAutomatically;
