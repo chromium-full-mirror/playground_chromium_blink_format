@@ -36,7 +36,6 @@
 
 #endif
 
-#define HAVE_ICU 1
 #define HAVE_PCREPOSIX 1
 
 // FIXME: if all platforms have these, do they really need #defines?
