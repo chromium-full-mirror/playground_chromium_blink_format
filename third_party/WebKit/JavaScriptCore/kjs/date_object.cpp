@@ -89,7 +89,6 @@ class DateProtoFunc : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
-  Completion execute(const List&);
   enum {
     ToString,
     ToDateString,
