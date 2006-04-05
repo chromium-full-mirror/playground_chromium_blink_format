@@ -47,7 +47,7 @@ void InsertNodeBeforeCommand::doApply() {
   // from it's old location
   // in an non-undoable way.  We might eventually find it useful to do an
   // undoable remove in this case.
-  ASSERT(!m_appendChild->parent());
+  ASSERT(!m_insertChild->parent());
 
   ExceptionCode ec = 0;
   m_refChild->parentNode()->insertBefore(m_insertChild.get(), m_refChild.get(),
