@@ -630,7 +630,7 @@ void ReplaceSelectionCommand::doApply() {
     downstream = positionAvoidingSpecialElementBoundary(downstream);
     if (downstream.node()->hasTagName(brTag) && downstream.offset() == 0 &&
         fragment.hasInterchangeNewlineAtEnd() &&
-        isStartOfLine(VisiblePosition(downstream, VP_DEFAULT_AFFINITY)))
+        isStartOfParagraph(VisiblePosition(downstream, VP_DEFAULT_AFFINITY)))
       linePlaceholder = downstream.node();
   }
 
@@ -646,7 +646,7 @@ void ReplaceSelectionCommand::doApply() {
     addLeadingSpace =
         startPos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY, true)
             .isNull() &&
-        !isStartOfLine(visiblePos);
+        !isStartOfParagraph(visiblePos);
     if (addLeadingSpace) {
       QChar previousChar = visiblePos.previous().character();
       if (!previousChar.isNull()) {
@@ -657,7 +657,7 @@ void ReplaceSelectionCommand::doApply() {
     addTrailingSpace =
         startPos.trailingWhitespacePosition(VP_DEFAULT_AFFINITY, true)
             .isNull() &&
-        !isEndOfLine(visiblePos);
+        !isEndOfParagraph(visiblePos);
     if (addTrailingSpace) {
       QChar thisChar = visiblePos.character();
       if (!thisChar.isNull()) {
@@ -880,7 +880,8 @@ void ReplaceSelectionCommand::removeLinePlaceholderIfNeeded(
         linePlaceholder, linePlaceholder->renderer()->caretMinOffset(),
         DOWNSTREAM);
     if (placeholderPos.next().isNull() ||
-        !(isStartOfLine(placeholderPos) && isEndOfLine(placeholderPos))) {
+        !(isStartOfParagraph(placeholderPos) &&
+          isEndOfParagraph(placeholderPos))) {
       removeNodeAndPruneAncestors(linePlaceholder);
     }
   }

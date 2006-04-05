@@ -1817,8 +1817,7 @@ void Frame::handleMousePressEvent(const MouseEventWithHitTestResults& event) {
   }
 }
 
-void Frame::handleMouseMoveEventPart2(
-    const MouseEventWithHitTestResults& event) {
+void Frame::handleMouseMoveEvent(const MouseEventWithHitTestResults& event) {
   // Mouse not pressed. Do nothing.
   if (!d->m_bMousePressed)
     return;
@@ -1854,10 +1853,6 @@ void Frame::handleMouseMoveEventPart2(
 
   if (shouldChangeSelection(sel))
     setSelection(sel);
-}
-
-void Frame::handleMouseMoveEvent(const MouseEventWithHitTestResults& event) {
-  handleMouseMoveEventPart2(event);
 }
 
 void Frame::handleMouseReleaseEvent(const MouseEventWithHitTestResults& event) {
