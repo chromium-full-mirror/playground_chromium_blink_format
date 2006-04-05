@@ -82,6 +82,8 @@ class ReplacementFragment {
 
   bool isBlockFlow(Node*) const;
 
+  void removeNode(PassRefPtr<Node>);
+
  private:
   // no copy construction or assignment
   ReplacementFragment(const ReplacementFragment&);
@@ -98,9 +100,7 @@ class ReplacementFragment {
   int renderedBlocks(Node*);
   void removeStyleNodes();
 
-  // A couple simple DOM helpers
   Node* enclosingBlock(Node*) const;
-  void removeNode(PassRefPtr<Node>);
   void removeNodePreservingChildren(Node*);
   void insertNodeBefore(Node* node, Node* refNode);
 
