@@ -23,12 +23,13 @@
 #ifndef KXMLCORE_HASH_TRAITS_H
 #define KXMLCORE_HASH_TRAITS_H
 
-#include "RefPtr.h"
+#include "HashFunctions.h"
 #include <utility>
 
 namespace KXMLCore {
 
 using std::pair;
+using std::make_pair;
 
 template <typename T>
 struct IsInteger {
@@ -83,83 +84,137 @@ struct IsInteger<unsigned long long> {
   static const bool value = true;
 };
 
+template <typename T>
+struct HashTraits;
+
 template <bool isInteger, typename T>
 struct GenericHashTraitsBase;
 template <typename T>
 struct GenericHashTraitsBase<true, T> {
   typedef T TraitType;
+  typedef HashTraits<typename IntTypes<sizeof(T)>::SignedType> StorageTraits;
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static TraitType emptyValue() { return 0; }
 };
 template <typename T>
 struct GenericHashTraitsBase<false, T> {
   typedef T TraitType;
+  typedef HashTraits<T> StorageTraits;
   static const bool emptyValueIsZero = false;
   static const bool needsDestruction = true;
-  static TraitType emptyValue() { return TraitType(); }
 };
 
 template <typename T>
-struct GenericHashTraits : GenericHashTraitsBase<IsInteger<T>::value, T> {};
+struct GenericHashTraits : GenericHashTraitsBase<IsInteger<T>::value, T> {
+  static T emptyValue() { return T(); }
+  static const bool needsRef = false;
+};
 
 template <typename T>
 struct HashTraits : GenericHashTraits<T> {};
 
-// may not be appropriate for all uses since it disallows 0 and -1 as keys
+// signed integer traits may not be appropriate for all uses since they disallow
+// 0 and -1 as keys
+template <>
+struct HashTraits<signed char> : GenericHashTraits<int> {
+  static signed char deletedValue() { return -1; }
+};
+template <>
+struct HashTraits<short> : GenericHashTraits<int> {
+  static short deletedValue() { return -1; }
+};
 template <>
 struct HashTraits<int> : GenericHashTraits<int> {
-  static TraitType deletedValue() { return -1; }
+  static int deletedValue() { return -1; }
+};
+template <>
+struct HashTraits<long> : GenericHashTraits<long> {
+  static long deletedValue() { return -1; }
+};
+template <>
+struct HashTraits<long long> : GenericHashTraits<long long> {
+  static long deletedValue() { return -1; }
 };
 
 template <typename P>
 struct HashTraits<P*> : GenericHashTraits<P*> {
-  typedef P* TraitType;
+  typedef HashTraits<typename IntTypes<sizeof(P*)>::SignedType> StorageTraits;
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
-  static TraitType emptyValue() { return 0; }
-  static TraitType deletedValue() { return reinterpret_cast<P*>(-1); }
+  static P* deletedValue() { return reinterpret_cast<P*>(-1); }
 };
 
 template <typename P>
 struct HashTraits<RefPtr<P>> : GenericHashTraits<RefPtr<P>> {
+  typedef HashTraits<typename IntTypes<sizeof(P*)>::SignedType> StorageTraits;
   static const bool emptyValueIsZero = true;
+  static const bool needsRef = true;
+  static void ref(const RefPtr<P>& p) {
+    if (p)
+      p->ref();
+  }
+  static void deref(const RefPtr<P>& p) {
+    if (p)
+      p->deref();
+  }
+};
+
+// template to set deleted values
+
+template <typename Traits>
+struct DeletedValueAssigner {
+  static void assignDeletedValue(typename Traits::TraitType& location) {
+    location = Traits::deletedValue();
+  }
 };
 
 template <typename T, typename Traits>
-class DeletedValueAssigner;
-
-template <typename T, typename Traits>
 inline void assignDeleted(T& location) {
-  DeletedValueAssigner<T, Traits>::assignDeletedValue(location);
+  DeletedValueAssigner<Traits>::assignDeletedValue(location);
 }
 
-template <typename FirstTraits, typename SecondTraits>
-struct PairHashTraits
-    : GenericHashTraits<pair<typename FirstTraits::TraitType,
-                             typename SecondTraits::TraitType>> {
- private:
-  typedef typename FirstTraits::TraitType FirstType;
-  typedef typename SecondTraits::TraitType SecondType;
+// special traits for pairs, helpful for their use in HashMap implementation
 
- public:
-  typedef pair<FirstType, SecondType> TraitType;
+template <typename FirstTraits, typename SecondTraits>
+struct PairHashTraits;
+
+template <typename FirstTraitsArg, typename SecondTraitsArg>
+struct PairBaseHashTraits
+    : GenericHashTraits<pair<typename FirstTraitsArg::TraitType,
+                             typename SecondTraitsArg::TraitType>> {
+  typedef FirstTraitsArg FirstTraits;
+  typedef SecondTraitsArg SecondTraits;
+  typedef pair<typename FirstTraits::TraitType,
+               typename SecondTraits::TraitType>
+      TraitType;
+
+  typedef PairHashTraits<typename FirstTraits::StorageTraits,
+                         typename SecondTraits::StorageTraits>
+      StorageTraits;
 
   static const bool emptyValueIsZero =
       FirstTraits::emptyValueIsZero && SecondTraits::emptyValueIsZero;
-  static const bool needsDestruction =
-      FirstTraits::needsDestruction || SecondTraits::needsDestruction;
 
   static TraitType emptyValue() {
-    return TraitType(FirstTraits::emptyValue(), SecondTraits::emptyValue());
+    return make_pair(FirstTraits::emptyValue(), SecondTraits::emptyValue());
   }
+};
+
+template <typename FirstTraits, typename SecondTraits>
+struct PairHashTraits : PairBaseHashTraits<FirstTraits, SecondTraits> {
+  typedef pair<typename FirstTraits::TraitType,
+               typename SecondTraits::TraitType>
+      TraitType;
+
+  static const bool needsDestruction =
+      FirstTraits::needsDestruction || SecondTraits::needsDestruction;
 
   static TraitType deletedValue() {
     return TraitType(FirstTraits::deletedValue(), SecondTraits::emptyValue());
   }
 
   static void assignDeletedValue(TraitType& location) {
-    assignDeleted<FirstType, FirstTraits>(location.first);
+    assignDeleted<typename FirstTraits::TraitType, FirstTraits>(location.first);
     location.second = SecondTraits::emptyValue();
   }
 };
@@ -168,17 +223,8 @@ template <typename First, typename Second>
 struct HashTraits<pair<First, Second>>
     : public PairHashTraits<HashTraits<First>, HashTraits<Second>> {};
 
-template <typename T, typename Traits>
-struct DeletedValueAssigner {
-  static void assignDeletedValue(T& location) {
-    location = Traits::deletedValue();
-  }
-};
-
 template <typename FirstTraits, typename SecondTraits>
-struct DeletedValueAssigner<
-    pair<typename FirstTraits::TraitType, typename SecondTraits::TraitType>,
-    PairHashTraits<FirstTraits, SecondTraits>> {
+struct DeletedValueAssigner<PairHashTraits<FirstTraits, SecondTraits>> {
   static void assignDeletedValue(
       pair<typename FirstTraits::TraitType, typename SecondTraits::TraitType>&
           location) {
@@ -187,11 +233,30 @@ struct DeletedValueAssigner<
 };
 
 template <typename First, typename Second>
-struct DeletedValueAssigner<pair<First, Second>,
-                            HashTraits<pair<First, Second>>> {
+struct DeletedValueAssigner<HashTraits<pair<First, Second>>> {
   static void assignDeletedValue(pair<First, Second>& location) {
     HashTraits<pair<First, Second>>::assignDeletedValue(location);
   }
+};
+
+// hassh functions and traits that are equivalent (for code sharing)
+
+template <typename HashArg, typename TraitsArg>
+struct HashKeyStorageTraits {
+  typedef HashArg Hash;
+  typedef TraitsArg Traits;
+};
+template <typename P>
+struct HashKeyStorageTraits<PtrHash<P*>, HashTraits<P*>> {
+  typedef typename IntTypes<sizeof(P*)>::SignedType IntType;
+  typedef IntHash<IntType> Hash;
+  typedef HashTraits<IntType> Traits;
+};
+template <typename P>
+struct HashKeyStorageTraits<PtrHash<RefPtr<P>>, HashTraits<RefPtr<P>>> {
+  typedef typename IntTypes<sizeof(P*)>::SignedType IntType;
+  typedef IntHash<IntType> Hash;
+  typedef HashTraits<IntType> Traits;
 };
 
 }  // namespace KXMLCore

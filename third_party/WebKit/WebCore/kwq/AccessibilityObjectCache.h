@@ -75,7 +75,7 @@ class AccessibilityObjectCache {
   AXID getAXID(WebCoreAXObject*);
 
   HashMap<RenderObject*, WebCoreAXObject*> m_objects;
-  HashSet<AXID, PtrHash<AXID>, AXIDHashTraits> m_idsInUse;
+  HashSet<AXID, IntHash<AXID>, AXIDHashTraits> m_idsInUse;
 };
 
 #ifndef __APPLE__

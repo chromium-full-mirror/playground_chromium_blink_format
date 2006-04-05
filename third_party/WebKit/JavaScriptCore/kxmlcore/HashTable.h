@@ -215,11 +215,12 @@ class HashTableConstIterator {
   }
 #endif
 
-  ReferenceType operator*() const {
+  PointerType get() const {
     checkValidity();
-    return *m_position;
+    return m_position;
   }
-  PointerType operator->() const { return &**this; }
+  ReferenceType operator*() const { return *get(); }
+  PointerType operator->() const { return get(); }
 
   const_iterator& operator++() {
     checkValidity();
@@ -312,10 +313,9 @@ class HashTableIterator {
 
   // default copy, assignment and destructor are OK
 
-  ReferenceType operator*() const {
-    return const_cast<ReferenceType>(*m_iterator);
-  }
-  PointerType operator->() const { return &**this; }
+  PointerType get() const { return const_cast<PointerType>(m_iterator.get()); }
+  ReferenceType operator*() const { return *get(); }
+  PointerType operator->() const { return get(); }
 
   iterator& operator++() {
     ++m_iterator;
@@ -399,6 +399,7 @@ class HashTable {
                                  Traits,
                                  KeyTraits>
       const_iterator;
+  typedef Traits ValueTraits;
   typedef Key KeyType;
   typedef Value ValueType;
   typedef IdentityHashTranslator<Key, Value, HashFunctions>
@@ -423,6 +424,7 @@ class HashTable {
 
   int size() const { return m_keyCount; }
   int capacity() const { return m_tableSize; }
+  bool isEmpty() const { return !m_keyCount; }
 
   pair<iterator, bool> add(const ValueType& value) {
     return add<KeyType, ValueType, IdentityTranslatorType>(
@@ -680,14 +682,10 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline typename HashTable<Key,
-                          Value,
-                          Extractor,
-                          HashFunctions,
-                          Traits,
-                          KeyTraits>::iterator
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
-    const Key& key) {
+typename HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    iterator
+    HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
+        const Key& key) {
   if (!m_table)
     return end();
 
@@ -703,14 +701,10 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline typename HashTable<Key,
-                          Value,
-                          Extractor,
-                          HashFunctions,
-                          Traits,
-                          KeyTraits>::const_iterator
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
-    const Key& key) const {
+typename HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    const_iterator
+    HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::find(
+        const Key& key) const {
   if (!m_table)
     return end();
 
@@ -726,9 +720,8 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline bool
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::contains(
-    const KeyType& key) const {
+bool HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    contains(const KeyType& key) const {
   if (!m_table)
     return false;
 
@@ -741,8 +734,7 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline void
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     ValueType* pos) {
   invalidateIterators();
   checkTableConsistency();
@@ -769,21 +761,6 @@ template <typename Key,
           typename KeyTraits>
 inline void
 HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
-    const KeyType& key) {
-  if (!m_table)
-    return;
-
-  remove(find(key));
-}
-
-template <typename Key,
-          typename Value,
-          typename Extractor,
-          typename HashFunctions,
-          typename Traits,
-          typename KeyTraits>
-inline void
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
     iterator it) {
   if (it == end())
     return;
@@ -797,22 +774,10 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline Value*
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
-    allocateTable(int size) {
-  // would use a template member function with explicit specializations here,
-  // but
-  // gcc doesn't appear to support that
-  if (Traits::emptyValueIsZero)
-    return reinterpret_cast<ValueType*>(fastCalloc(size, sizeof(ValueType)));
-  else {
-    ValueType* result =
-        reinterpret_cast<ValueType*>(fastMalloc(size * sizeof(ValueType)));
-    for (int i = 0; i < size; i++) {
-      initializeBucket(result[i]);
-    }
-    return result;
-  }
+inline void
+HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
+    const KeyType& key) {
+  remove(find(key));
 }
 
 template <typename Key,
@@ -821,14 +786,31 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
-    deallocateTable(ValueType* table, int size) {
-  if (Traits::needsDestruction) {
-    for (int i = 0; i < size; ++i) {
-      (&table[i])->~ValueType();
-    }
-  }
+Value* HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    allocateTable(int size) {
+  // would use a template member function with explicit specializations here,
+  // but
+  // gcc doesn't appear to support that
+  if (Traits::emptyValueIsZero)
+    return static_cast<ValueType*>(fastCalloc(size, sizeof(ValueType)));
+  ValueType* result =
+      static_cast<ValueType*>(fastMalloc(size * sizeof(ValueType)));
+  for (int i = 0; i < size; i++)
+    initializeBucket(result[i]);
+  return result;
+}
 
+template <typename Key,
+          typename Value,
+          typename Extractor,
+          typename HashFunctions,
+          typename Traits,
+          typename KeyTraits>
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    deallocateTable(ValueType* table, int size) {
+  if (Traits::needsDestruction)
+    for (int i = 0; i < size; ++i)
+      table[i].~ValueType();
   fastFree(table);
 }
 
@@ -838,8 +820,8 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline void
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::expand() {
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    expand() {
   int newSize;
   if (m_tableSize == 0)
     newSize = m_minTableSize;
@@ -873,10 +855,9 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::rehash(
   m_tableSizeMask = newTableSize - 1;
   m_table = allocateTable(newTableSize);
 
-  for (int i = 0; i != oldTableSize; ++i) {
+  for (int i = 0; i != oldTableSize; ++i)
     if (!isEmptyOrDeletedBucket(oldTable[i]))
       reinsert(oldTable[i]);
-  }
 
   m_deletedCount = 0;
 
@@ -891,8 +872,8 @@ template <typename Key,
           typename HashFunctions,
           typename Traits,
           typename KeyTraits>
-inline void
-HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::clear() {
+void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
+    clear() {
   invalidateIterators();
   deallocateTable(m_table, m_tableSize);
   m_table = 0;
@@ -1120,6 +1101,186 @@ void removeIterator(HashTableConstIterator<Key,
 }
 
 #endif  // CHECK_HASHTABLE_ITERATORS
+
+// iterator adapters
+
+template <typename HashTableType, typename ValueType>
+struct HashTableConstIteratorAdapter {
+  HashTableConstIteratorAdapter(
+      const typename HashTableType::const_iterator& impl)
+      : m_impl(impl) {}
+
+  const ValueType* get() const { return (const ValueType*)m_impl.get(); }
+  const ValueType& operator*() const { return *get(); }
+  const ValueType* operator->() const { return get(); }
+
+  HashTableConstIteratorAdapter& operator++() {
+    ++m_impl;
+    return *this;
+  }
+  // postfix ++ intentionally omitted
+
+  typename HashTableType::const_iterator m_impl;
+};
+
+template <typename HashTableType, typename ValueType>
+struct HashTableIteratorAdapter {
+  HashTableIteratorAdapter(const typename HashTableType::iterator& impl)
+      : m_impl(impl) {}
+
+  ValueType* get() const { return (ValueType*)m_impl.get(); }
+  ValueType& operator*() const { return *get(); }
+  ValueType* operator->() const { return get(); }
+
+  HashTableIteratorAdapter& operator++() {
+    ++m_impl;
+    return *this;
+  }
+  // postfix ++ intentionally omitted
+
+  operator HashTableConstIteratorAdapter<HashTableType, ValueType>() {
+    typename HashTableType::const_iterator i = m_impl;
+    return i;
+  }
+
+  typename HashTableType::iterator m_impl;
+};
+
+template <typename T, typename U>
+inline bool operator==(const HashTableConstIteratorAdapter<T, U>& a,
+                       const HashTableConstIteratorAdapter<T, U>& b) {
+  return a.m_impl == b.m_impl;
+}
+
+template <typename T, typename U>
+inline bool operator!=(const HashTableConstIteratorAdapter<T, U>& a,
+                       const HashTableConstIteratorAdapter<T, U>& b) {
+  return a.m_impl != b.m_impl;
+}
+
+template <typename T, typename U>
+inline bool operator==(const HashTableIteratorAdapter<T, U>& a,
+                       const HashTableIteratorAdapter<T, U>& b) {
+  return a.m_impl == b.m_impl;
+}
+
+template <typename T, typename U>
+inline bool operator!=(const HashTableIteratorAdapter<T, U>& a,
+                       const HashTableIteratorAdapter<T, U>& b) {
+  return a.m_impl != b.m_impl;
+}
+
+// reference count manager
+
+template <typename ValueTraits, typename ValueStorageTraits>
+struct NeedsRef {
+  static const bool value =
+      ValueTraits::needsRef && !ValueStorageTraits::needsRef;
+};
+
+template <bool needsRef, typename ValueTraits>
+struct RefCounterBase;
+
+template <typename ValueTraits>
+struct RefCounterBase<false, ValueTraits> {
+  typedef typename ValueTraits::TraitType ValueType;
+  static void ref(const ValueType&) {}
+  static void deref(const ValueType&) {}
+};
+
+template <typename ValueTraits>
+struct RefCounterBase<true, ValueTraits> {
+  typedef typename ValueTraits::TraitType ValueType;
+  static void ref(const ValueType& v) {
+    ValueTraits::ref(*(const ValueType*)&v);
+  }
+  static void deref(const ValueType& v) {
+    ValueTraits::deref(*(const ValueType*)&v);
+  }
+};
+
+template <typename ValueTraits, typename ValueStorageTraits>
+struct RefCounter {
+  typedef typename ValueTraits::TraitType ValueType;
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  static const bool needsRef = NeedsRef<ValueTraits, ValueStorageTraits>::value;
+  typedef RefCounterBase<needsRef, ValueTraits> Base;
+  static void ref(const ValueStorageType& v) {
+    Base::ref(*(const ValueType*)&v);
+  }
+  static void deref(const ValueStorageType& v) {
+    Base::deref(*(const ValueType*)&v);
+  }
+};
+
+template <typename FirstTraits,
+          typename SecondTraits,
+          typename ValueStorageTraits>
+struct RefCounter<PairBaseHashTraits<FirstTraits, SecondTraits>,
+                  ValueStorageTraits> {
+  typedef typename FirstTraits::TraitType FirstType;
+  typedef typename SecondTraits::TraitType SecondType;
+  typedef typename ValueStorageTraits::FirstTraits FirstStorageTraits;
+  typedef typename ValueStorageTraits::SecondTraits SecondStorageTraits;
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  static const bool firstNeedsRef =
+      NeedsRef<FirstTraits, FirstStorageTraits>::value;
+  static const bool secondNeedsRef =
+      NeedsRef<SecondTraits, SecondStorageTraits>::value;
+  typedef RefCounterBase<firstNeedsRef, FirstTraits> FirstBase;
+  typedef RefCounterBase<secondNeedsRef, SecondTraits> SecondBase;
+  static void ref(const ValueStorageType& v) {
+    FirstBase::ref(*(const FirstType*)&v.first);
+    SecondBase::ref(*(const SecondType*)&v.second);
+  }
+  static void deref(const ValueStorageType& v) {
+    FirstBase::deref(*(const FirstType*)&v.first);
+    SecondBase::deref(*(const SecondType*)&v.second);
+  }
+};
+
+template <bool needsRef, typename HashTableType, typename ValueTraits>
+struct HashTableRefCounterBase;
+
+template <typename HashTableType, typename ValueTraits>
+struct HashTableRefCounterBase<false, HashTableType, ValueTraits> {
+  static void refAll(HashTableType&) {}
+  static void derefAll(HashTableType&) {}
+};
+
+template <typename HashTableType, typename ValueTraits>
+struct HashTableRefCounterBase<true, HashTableType, ValueTraits> {
+  typedef typename HashTableType::iterator iterator;
+  typedef RefCounter<ValueTraits, typename HashTableType::ValueTraits>
+      ValueRefCounter;
+  static void refAll(HashTableType&);
+  static void derefAll(HashTableType&);
+};
+
+template <typename HashTableType, typename ValueTraits>
+void HashTableRefCounterBase<true, HashTableType, ValueTraits>::refAll(
+    HashTableType& table) {
+  iterator end = table.end();
+  for (iterator it = table.begin(); it != end; ++it)
+    ValueRefCounter::ref(*it);
+}
+
+template <typename HashTableType, typename ValueTraits>
+void HashTableRefCounterBase<true, HashTableType, ValueTraits>::derefAll(
+    HashTableType& table) {
+  iterator end = table.end();
+  for (iterator it = table.begin(); it != end; ++it)
+    ValueRefCounter::deref(*it);
+}
+
+template <typename HashTableType, typename ValueTraits>
+struct HashTableRefCounter {
+  static const bool needsRef =
+      NeedsRef<ValueTraits, typename HashTableType::ValueTraits>::value;
+  typedef HashTableRefCounterBase<needsRef, HashTableType, ValueTraits> Base;
+  static void refAll(HashTableType& table) { Base::refAll(table); }
+  static void derefAll(HashTableType& table) { Base::derefAll(table); }
+};
 
 }  // namespace KXMLCore
 

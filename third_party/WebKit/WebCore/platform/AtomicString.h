@@ -164,14 +164,4 @@ extern const AtomicString starAtom;
 #endif
 }
 
-namespace KXMLCore {
-
-template <typename T>
-class StrHash;
-
-template <>
-struct StrHash<WebCore::AtomicStringImpl*>
-    : public StrHash<WebCore::StringImpl*> {};
-}
-
 #endif

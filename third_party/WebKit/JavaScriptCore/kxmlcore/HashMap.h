@@ -25,66 +25,61 @@
 #define KXMLCORE_HASH_MAP_H
 
 #include "HashTable.h"
-#include "HashTraits.h"
-#include "HashFunctions.h"
 
 namespace KXMLCore {
 
-template <typename Key, typename Mapped>
-class PairFirstExtractor {
-  typedef pair<Key, Mapped> ValueType;
+template <typename PairType>
+struct PairFirstExtractor;
 
- public:
-  static const Key& extract(const ValueType& value) { return value.first; }
-};
-
-template <typename Key, typename Mapped, typename HashFunctions>
-class HashMapTranslator {
-  typedef pair<Key, Mapped> ValueType;
-
- public:
-  static unsigned hash(const Key& key) { return HashFunctions::hash(key); }
-
-  static bool equal(const Key& a, const Key& b) {
-    return HashFunctions::equal(a, b);
-  }
-
-  static void translate(ValueType& location,
-                        const Key& key,
-                        const Mapped& mapped,
-                        unsigned) {
-    ValueType tmp(key, mapped);
-    swap(tmp, location);
-  }
-};
-
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions = typename DefaultHash<Key>::Hash,
-          typename KeyTraits = HashTraits<Key>,
-          typename MappedTraits = HashTraits<Mapped>>
+template <typename KeyArg,
+          typename MappedArg,
+          typename HashArg = typename DefaultHash<KeyArg>::Hash,
+          typename KeyTraitsArg = HashTraits<KeyArg>,
+          typename MappedTraitsArg = HashTraits<MappedArg>>
 class HashMap {
+ private:
+  typedef KeyTraitsArg KeyTraits;
+  typedef MappedTraitsArg MappedTraits;
+  typedef PairBaseHashTraits<KeyTraits, MappedTraits> ValueTraits;
+
  public:
-  typedef Key KeyType;
-  typedef Mapped MappedType;
-  typedef pair<Key, Mapped> ValueType;
-  typedef PairHashTraits<KeyTraits, MappedTraits> ValueTraits;
+  typedef typename KeyTraits::TraitType KeyType;
+  typedef typename MappedTraits::TraitType MappedType;
+  typedef typename ValueTraits::TraitType ValueType;
 
  private:
-  typedef HashTable<KeyType,
-                    ValueType,
-                    PairFirstExtractor<KeyType, MappedType>,
-                    HashFunctions,
-                    ValueTraits,
-                    KeyTraits>
-      ImplType;
-  typedef HashMapTranslator<Key, Mapped, HashFunctions> TranslatorType;
+  typedef HashArg HashFunctions;
+
+  typedef typename HashKeyStorageTraits<HashFunctions, KeyTraits>::Hash
+      StorageHashFunctions;
+
+  typedef typename HashKeyStorageTraits<HashFunctions, KeyTraits>::Traits
+      KeyStorageTraits;
+  typedef typename MappedTraits::StorageTraits MappedStorageTraits;
+  typedef PairHashTraits<KeyStorageTraits, MappedStorageTraits>
+      ValueStorageTraits;
+
+  typedef typename KeyStorageTraits::TraitType KeyStorageType;
+  typedef typename MappedStorageTraits::TraitType MappedStorageType;
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+
+  typedef HashTable<KeyStorageType,
+                    ValueStorageType,
+                    PairFirstExtractor<ValueStorageType>,
+                    StorageHashFunctions,
+                    ValueStorageTraits,
+                    KeyStorageTraits>
+      HashTableType;
 
  public:
-  typedef typename ImplType::iterator iterator;
-  typedef typename ImplType::const_iterator const_iterator;
+  typedef HashTableIteratorAdapter<HashTableType, ValueType> iterator;
+  typedef HashTableConstIteratorAdapter<HashTableType, ValueType>
+      const_iterator;
 
-  HashMap() {}
+  HashMap();
+  HashMap(const HashMap&);
+  HashMap& operator=(const HashMap&);
+  ~HashMap();
 
   int size() const;
   int capacity() const;
@@ -96,247 +91,251 @@ class HashMap {
   const_iterator begin() const;
   const_iterator end() const;
 
-  iterator find(const KeyType& key);
-  const_iterator find(const KeyType& key) const;
-  bool contains(const KeyType& key) const;
-  MappedType get(const KeyType& key) const;
+  iterator find(const KeyType&);
+  const_iterator find(const KeyType&) const;
+  bool contains(const KeyType&) const;
+  MappedType get(const KeyType&) const;
 
   // replaces value but not key if key is already present
   // return value is a pair of the iterator to the key location,
   // and a boolean that's true if a new value was actually added
-  pair<iterator, bool> set(const KeyType& key, const MappedType& mapped);
+  pair<iterator, bool> set(const KeyType&, const MappedType&);
 
   // does nothing if key is already present
   // return value is a pair of the iterator to the key location,
   // and a boolean that's true if a new value was actually added
-  pair<iterator, bool> add(const KeyType& key, const MappedType& mapped);
+  pair<iterator, bool> add(const KeyType&, const MappedType&);
 
-  void remove(const KeyType& key);
+  void remove(const KeyType&);
   void remove(iterator it);
   void clear();
 
  private:
-  pair<iterator, bool> inlineAdd(const KeyType& key, const MappedType& mapped);
+  pair<iterator, bool> inlineAdd(const KeyType&, const MappedType&);
+  void refAll();
+  void derefAll();
 
-  ImplType m_impl;
+  HashTableType m_impl;
 };
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline int HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::size()
-    const {
+template <typename PairType>
+struct PairFirstExtractor {
+  static const typename PairType::first_type& extract(const PairType& p) {
+    return p.first;
+  }
+};
+
+template <bool canReplaceDeletedKey,
+          typename ValueType,
+          typename ValueStorageTraits,
+          typename HashFunctions>
+struct HashMapTranslator;
+
+template <typename ValueType,
+          typename ValueStorageTraits,
+          typename HashFunctions>
+struct HashMapTranslator<true, ValueType, ValueStorageTraits, HashFunctions> {
+  typedef typename ValueType::first_type KeyType;
+  typedef typename ValueType::second_type MappedType;
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
+  typedef typename KeyStorageTraits::TraitType KeyStorageType;
+
+  static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
+  static bool equal(const KeyStorageType& a, const KeyType& b) {
+    return HashFunctions::equal(*(KeyType*)&a, b);
+  }
+  static void translate(ValueStorageType& location,
+                        const KeyType& key,
+                        const MappedType& mapped,
+                        unsigned) {
+    *(KeyType*)&location.first = key;
+    *(MappedType*)&location.second = mapped;
+  }
+};
+
+template <typename ValueType,
+          typename ValueStorageTraits,
+          typename HashFunctions>
+struct HashMapTranslator<false, ValueType, ValueStorageTraits, HashFunctions> {
+  typedef typename ValueType::first_type KeyType;
+  typedef typename ValueType::second_type MappedType;
+  typedef typename ValueStorageTraits::TraitType ValueStorageType;
+  typedef typename ValueStorageTraits::FirstTraits KeyStorageTraits;
+  typedef typename KeyStorageTraits::TraitType KeyStorageType;
+
+  static unsigned hash(const KeyType& key) { return HashFunctions::hash(key); }
+  static bool equal(const KeyStorageType& a, const KeyType& b) {
+    return HashFunctions::equal(*(KeyType*)&a, b);
+  }
+  static void translate(ValueStorageType& location,
+                        const KeyType& key,
+                        const MappedType& mapped,
+                        unsigned) {
+    if (location.first == KeyStorageTraits::deletedValue())
+      location.first = KeyStorageTraits::emptyValue();
+    *(KeyType*)&location.first = key;
+    *(MappedType*)&location.second = mapped;
+  }
+};
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::refAll() {
+  HashTableRefCounter<HashTableType, ValueTraits>::refAll(m_impl);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::derefAll() {
+  HashTableRefCounter<HashTableType, ValueTraits>::derefAll(m_impl);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline HashMap<T, U, V, W, X>::HashMap() {}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline HashMap<T, U, V, W, X>::HashMap(const HashMap& other)
+    : m_impl(other.m_impl) {
+  refAll();
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline HashMap<T, U, V, W, X>& HashMap<T, U, V, W, X>::operator=(
+    const HashMap& other) {
+  HashMap tmp(other);
+  m_impl.swap(tmp.m_impl);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline HashMap<T, U, V, W, X>::~HashMap() {
+  derefAll();
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline int HashMap<T, U, V, W, X>::size() const {
   return m_impl.size();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-int HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::capacity()
-    const {
+template <typename T, typename U, typename V, typename W, typename X>
+inline int HashMap<T, U, V, W, X>::capacity() const {
   return m_impl.capacity();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline bool
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::isEmpty() const {
-  return size() == 0;
+template <typename T, typename U, typename V, typename W, typename X>
+inline bool HashMap<T, U, V, W, X>::isEmpty() const {
+  return m_impl.isEmpty();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-    iterator
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::begin() {
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::iterator
+HashMap<T, U, V, W, X>::begin() {
   return m_impl.begin();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-    iterator
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::end() {
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::iterator HashMap<T, U, V, W, X>::end() {
   return m_impl.end();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-    const_iterator
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::begin()
-        const {
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::const_iterator
+HashMap<T, U, V, W, X>::begin() const {
   return m_impl.begin();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-    const_iterator
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::end() const {
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::const_iterator
+HashMap<T, U, V, W, X>::end() const {
   return m_impl.end();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::iterator
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::find(
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::iterator HashMap<T, U, V, W, X>::find(
     const KeyType& key) {
-  return m_impl.find(key);
+  return m_impl.find(*(const KeyStorageType*)&key);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-    const_iterator
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::find(
-        const KeyType& key) const {
-  return m_impl.find(key);
+template <typename T, typename U, typename V, typename W, typename X>
+inline typename HashMap<T, U, V, W, X>::const_iterator
+HashMap<T, U, V, W, X>::find(const KeyType& key) const {
+  return m_impl.find(*(const KeyStorageType*)&key);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-bool HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::contains(
-    const KeyType& key) const {
-  return m_impl.contains(key);
+template <typename T, typename U, typename V, typename W, typename X>
+inline bool HashMap<T, U, V, W, X>::contains(const KeyType& key) const {
+  return m_impl.contains(*(const KeyStorageType*)&key);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-pair<typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-         iterator,
-     bool>
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::inlineAdd(
-    const KeyType& key,
-    const MappedType& mapped) {
+template <typename T, typename U, typename V, typename W, typename X>
+inline pair<typename HashMap<T, U, V, W, X>::iterator, bool>
+HashMap<T, U, V, W, X>::inlineAdd(const KeyType& key,
+                                  const MappedType& mapped) {
+  const bool canReplaceDeletedKey =
+      !KeyTraits::needsDestruction || KeyStorageTraits::needsDestruction;
+  typedef HashMapTranslator<canReplaceDeletedKey, ValueType, ValueStorageTraits,
+                            HashFunctions>
+      TranslatorType;
   return m_impl.template add<KeyType, MappedType, TranslatorType>(key, mapped);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-pair<typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-         iterator,
-     bool>
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::set(
-    const KeyType& key,
-    const MappedType& mapped) {
+template <typename T, typename U, typename V, typename W, typename X>
+pair<typename HashMap<T, U, V, W, X>::iterator, bool>
+HashMap<T, U, V, W, X>::set(const KeyType& key, const MappedType& mapped) {
   pair<iterator, bool> result = inlineAdd(key, mapped);
-  // the add call above won't change anything if the key is
-  // already there; in that case, make sure to set the value.
   if (!result.second)
+    // add call above didn't change anything, so set the mapped value
     result.first->second = mapped;
   return result;
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-pair<typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
-         iterator,
-     bool>
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::add(
-    const KeyType& key,
-    const MappedType& mapped) {
+template <typename T, typename U, typename V, typename W, typename X>
+pair<typename HashMap<T, U, V, W, X>::iterator, bool>
+HashMap<T, U, V, W, X>::add(const KeyType& key, const MappedType& mapped) {
   return inlineAdd(key, mapped);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-inline Mapped HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::get(
-    const KeyType& key) const {
+template <typename T, typename U, typename V, typename W, typename MappedTraits>
+inline typename HashMap<T, U, V, W, MappedTraits>::MappedType
+HashMap<T, U, V, W, MappedTraits>::get(const KeyType& key) const {
   const_iterator it = find(key);
   if (it == end())
     return MappedTraits::emptyValue();
   return it->second;
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-void HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::remove(
-    const KeyType& key) {
-  m_impl.remove(key);
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::remove(iterator it) {
+  if (it.m_impl == m_impl.end())
+    return;
+  it->~ValueType();
+  m_impl.remove(it.m_impl);
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-void HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::remove(
-    iterator it) {
-  m_impl.remove(it);
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::remove(const KeyType& key) {
+  remove(find(key));
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-void HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::clear() {
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::clear() {
+  derefAll();
   m_impl.clear();
 }
 
-template <typename Key,
-          typename Mapped,
-          typename HashFunctions,
-          typename KeyTraits,
-          typename MappedTraits>
-void deleteAllValues(
-    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>& collection) {
-  typedef HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits> T;
-  typename T::iterator end = collection.end();
-  for (typename T::iterator it = collection.begin(); it != end; ++it)
-    delete it->second;
+template <typename MappedType, typename HashTableType>
+void deleteAllPairSeconds(HashTableType& collection) {
+  typedef typename HashTableType::iterator iterator;
+  iterator end = collection.end();
+  for (iterator it = collection.begin(); it != end; ++it)
+    delete *(MappedType*)&it->second;
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline void deleteAllValues(HashMap<T, U, V, W, X>& collection) {
+  deleteAllPairSeconds<typename HashMap<T, U, V, W, X>::MappedType>(collection);
 }
 
 }  // namespace KXMLCore
 
 using KXMLCore::HashMap;
-
-#ifndef HASH_MAP_PTR_SPEC_WORKAROUND
-#include "HashMapPtrSpec.h"
-#endif
 
 #endif /* KXMLCORE_HASH_MAP_H */
