@@ -49,6 +49,7 @@ class Navigator : public DOMObject {
     Product,
     ProductSub,
     Vendor,
+    VendorSub,
     CookieEnabled,
     JavaEnabled
   };
