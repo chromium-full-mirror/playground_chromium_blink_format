@@ -42,6 +42,7 @@
 #include "HTMLTextAreaElement.h"
 #include "Image.h"
 #include "JSCanvasRenderingContext2D.h"
+#include "JSDocument.h"
 #include "NameNodeList.h"
 #include "Text.h"
 #include "css_ruleimpl.h"
@@ -141,7 +142,8 @@ JSValue* HTMLDocFunction::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &DOMDocument::info,
+// FIXME: functions should be in the prototype
+const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &JSDocument::info,
                                         &HTMLDocumentTable, 0};
 /* Source for HTMLDocumentTable. Use "make hashtables" to regenerate.
 @begin HTMLDocumentTable 30
@@ -190,7 +192,7 @@ const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &DOMDocument::info,
 */
 
 JSHTMLDocument::JSHTMLDocument(ExecState* exec, HTMLDocument* d)
-    : DOMDocument(exec, d) {}
+    : JSDocument(exec, d) {}
 
 JSValue* JSHTMLDocument::namedItemGetter(ExecState* exec,
                                          JSObject* originalObject,
@@ -327,15 +329,15 @@ bool JSHTMLDocument::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return DOMDocument::getOwnPropertySlot(exec, propertyName, slot);
+  return JSDocument::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void JSHTMLDocument::put(ExecState* exec,
                          const Identifier& propertyName,
                          JSValue* value,
                          int attr) {
-  lookupPut<JSHTMLDocument, DOMDocument>(exec, propertyName, value, attr,
-                                         &HTMLDocumentTable, this);
+  lookupPut<JSHTMLDocument, JSDocument>(exec, propertyName, value, attr,
+                                        &HTMLDocumentTable, this);
 }
 
 void JSHTMLDocument::putValueProperty(ExecState* exec,

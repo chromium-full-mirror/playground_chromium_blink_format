@@ -141,9 +141,9 @@ class DOMStyleSheetList : public DOMObject {
 
 // The document is only used for get-stylesheet-by-name (make optional if
 // necessary)
-JSValue* getDOMStyleSheetList(ExecState* exec,
-                              WebCore::StyleSheetList* ss,
-                              WebCore::Document* doc);
+JSValue* toJS(ExecState* exec,
+              WebCore::StyleSheetList* ss,
+              WebCore::Document* doc);
 
 class DOMMediaList : public DOMObject {
  public:

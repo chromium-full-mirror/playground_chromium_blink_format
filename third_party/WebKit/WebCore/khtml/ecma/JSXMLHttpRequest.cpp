@@ -235,9 +235,9 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
       String body;
 
       if (args.size() >= 1) {
-        if (args[0]->toObject(exec)->inherits(&DOMDocument::info)) {
+        if (args[0]->toObject(exec)->inherits(&JSDocument::info)) {
           Document* doc = static_cast<Document*>(
-              static_cast<DOMDocument*>(args[0]->toObject(exec))->impl());
+              static_cast<JSDocument*>(args[0]->toObject(exec))->impl());
           body = doc->toString().deprecatedString();
         } else {
           // converting certain values (like null) to object can set an

@@ -80,29 +80,26 @@ static bool isCSSPropertyName(const Identifier& JSPropertyName) {
 
 /*
 @begin DOMCSSStyleDeclarationProtoTable 7
-  getPropertyValue	DOMCSSStyleDeclaration::GetPropertyValue
+  getPropertyValue      DOMCSSStyleDeclaration::GetPropertyValue
 DontDelete|Function 1
-  getPropertyCSSValue	DOMCSSStyleDeclaration::GetPropertyCSSValue
+  getPropertyCSSValue   DOMCSSStyleDeclaration::GetPropertyCSSValue
 DontDelete|Function 1
-  removeProperty	DOMCSSStyleDeclaration::RemoveProperty
+  removeProperty        DOMCSSStyleDeclaration::RemoveProperty
 DontDelete|Function 1
-  getPropertyPriority	DOMCSSStyleDeclaration::GetPropertyPriority
+  getPropertyPriority   DOMCSSStyleDeclaration::GetPropertyPriority
 DontDelete|Function 1
   getPropertyShorthand  DOMCSSStyleDeclaration::GetPropertyShorthand
 DontDelete|Function 1
   isPropertyImplicit    DOMCSSStyleDeclaration::IsPropertyImplicit
 DontDelete|Function 1
-  setProperty		DOMCSSStyleDeclaration::SetProperty
+  setProperty           DOMCSSStyleDeclaration::SetProperty
 DontDelete|Function 3
-  item			DOMCSSStyleDeclaration::Item
-DontDelete|Function 1
+  item                  DOMCSSStyleDeclaration::Item DontDelete|Function 1
 @end
 @begin DOMCSSStyleDeclarationTable 3
-  cssText		DOMCSSStyleDeclaration::CssText		DontDelete
-  length		DOMCSSStyleDeclaration::Length
-DontDelete|ReadOnly
-  parentRule		DOMCSSStyleDeclaration::ParentRule
-DontDelete|ReadOnly
+  cssText               DOMCSSStyleDeclaration::CssText         DontDelete
+  length                DOMCSSStyleDeclaration::Length DontDelete|ReadOnly
+  parentRule            DOMCSSStyleDeclaration::ParentRule DontDelete|ReadOnly
 @end
 */
 KJS_DEFINE_PROTOTYPE(DOMCSSStyleDeclarationProto)
@@ -289,13 +286,13 @@ JSValue* toJS(ExecState* exec, CSSStyleDeclaration* s) {
 const ClassInfo DOMStyleSheet::info = {"StyleSheet", 0, &DOMStyleSheetTable, 0};
 /*
 @begin DOMStyleSheetTable 7
-  type		DOMStyleSheet::Type		DontDelete|ReadOnly
-  disabled	DOMStyleSheet::Disabled		DontDelete
-  ownerNode	DOMStyleSheet::OwnerNode	DontDelete|ReadOnly
-  parentStyleSheet DOMStyleSheet::ParentStyleSheet	DontDelete|ReadOnly
-  href		DOMStyleSheet::Href		DontDelete|ReadOnly
-  title		DOMStyleSheet::Title		DontDelete|ReadOnly
-  media		DOMStyleSheet::Media		DontDelete|ReadOnly
+  type          DOMStyleSheet::Type             DontDelete|ReadOnly
+  disabled      DOMStyleSheet::Disabled         DontDelete
+  ownerNode     DOMStyleSheet::OwnerNode        DontDelete|ReadOnly
+  parentStyleSheet DOMStyleSheet::ParentStyleSheet      DontDelete|ReadOnly
+  href          DOMStyleSheet::Href             DontDelete|ReadOnly
+  title         DOMStyleSheet::Title            DontDelete|ReadOnly
+  media         DOMStyleSheet::Media            DontDelete|ReadOnly
 @end
 */
 
@@ -371,8 +368,8 @@ const ClassInfo DOMStyleSheetList::info = {"StyleSheetList", 0,
 
 /*
 @begin DOMStyleSheetListTable 2
-  length	DOMStyleSheetList::Length	DontDelete|ReadOnly
-  item		DOMStyleSheetList::Item		DontDelete|Function 1
+  length        DOMStyleSheetList::Length       DontDelete|ReadOnly
+  item          DOMStyleSheetList::Item         DontDelete|Function 1
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(
@@ -458,9 +455,7 @@ bool DOMStyleSheetList::getOwnPropertySlot(ExecState* exec,
   return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-JSValue* getDOMStyleSheetList(ExecState* exec,
-                              StyleSheetList* ssl,
-                              Document* doc) {
+JSValue* toJS(ExecState* exec, StyleSheetList* ssl, Document* doc) {
   // Can't use the cacheDOMObject macro because of the doc argument
   DOMObject* ret;
   if (!ssl)
@@ -494,13 +489,13 @@ const ClassInfo DOMMediaList::info = {"MediaList", 0, &DOMMediaListTable, 0};
 
 /*
 @begin DOMMediaListTable 2
-  mediaText	DOMMediaList::MediaText		DontDelete|ReadOnly
-  length	DOMMediaList::Length		DontDelete|ReadOnly
+  mediaText     DOMMediaList::MediaText         DontDelete|ReadOnly
+  length        DOMMediaList::Length            DontDelete|ReadOnly
 @end
 @begin DOMMediaListProtoTable 3
-  item		DOMMediaList::Item		DontDelete|Function 1
-  deleteMedium	DOMMediaList::DeleteMedium	DontDelete|Function 1
-  appendMedium	DOMMediaList::AppendMedium	DontDelete|Function 1
+  item          DOMMediaList::Item              DontDelete|Function 1
+  deleteMedium  DOMMediaList::DeleteMedium      DontDelete|Function 1
+  appendMedium  DOMMediaList::AppendMedium      DontDelete|Function 1
 @end
 */
 KJS_DEFINE_PROTOTYPE(DOMMediaListProto)
@@ -598,16 +593,16 @@ const ClassInfo DOMCSSStyleSheet::info = {"CSSStyleSheet", 0,
 
 /*
 @begin DOMCSSStyleSheetTable 5
-  ownerRule	DOMCSSStyleSheet::OwnerRule	DontDelete|ReadOnly
-  cssRules	DOMCSSStyleSheet::CssRules	DontDelete|ReadOnly
+  ownerRule     DOMCSSStyleSheet::OwnerRule     DontDelete|ReadOnly
+  cssRules      DOMCSSStyleSheet::CssRules      DontDelete|ReadOnly
 # MSIE extension
-  rules		DOMCSSStyleSheet::Rules		DontDelete|ReadOnly
+  rules         DOMCSSStyleSheet::Rules         DontDelete|ReadOnly
 @end
 @begin DOMCSSStyleSheetProtoTable 6
-  insertRule	DOMCSSStyleSheet::InsertRule	DontDelete|Function 2
-  deleteRule	DOMCSSStyleSheet::DeleteRule	DontDelete|Function 1
+  insertRule    DOMCSSStyleSheet::InsertRule    DontDelete|Function 2
+  deleteRule    DOMCSSStyleSheet::DeleteRule    DontDelete|Function 1
 # MSIE extensions
-  addRule	DOMCSSStyleSheet::AddRule	DontDelete|Function 2
+  addRule       DOMCSSStyleSheet::AddRule       DontDelete|Function 2
   removeRule    DOMCSSStyleSheet::RemoveRule    DontDelete|Function 1
 @end
 */
@@ -683,8 +678,8 @@ const ClassInfo DOMCSSRuleList::info = {"CSSRuleList", 0, &DOMCSSRuleListTable,
                                         0};
 /*
 @begin DOMCSSRuleListTable 2
-  length		DOMCSSRuleList::Length		DontDelete|ReadOnly
-  item			DOMCSSRuleList::Item		DontDelete|Function 1
+  length                DOMCSSRuleList::Length          DontDelete|ReadOnly
+  item                  DOMCSSRuleList::Item            DontDelete|Function 1
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(
@@ -806,35 +801,35 @@ const ClassInfo* DOMCSSRule::classInfo() const {
 }
 /*
 @begin DOMCSSRuleTable 4
-  type			DOMCSSRule::Type	DontDelete|ReadOnly
-  cssText		DOMCSSRule::CssText	DontDelete|ReadOnly
-  parentStyleSheet	DOMCSSRule::ParentStyleSheet	DontDelete|ReadOnly
-  parentRule		DOMCSSRule::ParentRule	DontDelete|ReadOnly
+  type                  DOMCSSRule::Type        DontDelete|ReadOnly
+  cssText               DOMCSSRule::CssText     DontDelete|ReadOnly
+  parentStyleSheet      DOMCSSRule::ParentStyleSheet    DontDelete|ReadOnly
+  parentRule            DOMCSSRule::ParentRule  DontDelete|ReadOnly
 @end
 @begin DOMCSSStyleRuleTable 2
-  selectorText		DOMCSSRule::Style_SelectorText	DontDelete
-  style			DOMCSSRule::Style_Style		DontDelete|ReadOnly
+  selectorText          DOMCSSRule::Style_SelectorText  DontDelete
+  style                 DOMCSSRule::Style_Style         DontDelete|ReadOnly
 @end
 @begin DOMCSSMediaRuleTable 4
-  media			DOMCSSRule::Media_Media		DontDelete|ReadOnly
-  cssRules		DOMCSSRule::Media_CssRules	DontDelete|ReadOnly
-  insertRule		DOMCSSRule::Media_InsertRule	DontDelete|Function 2
-  deleteRule		DOMCSSRule::Media_DeleteRule	DontDelete|Function 1
+  media                 DOMCSSRule::Media_Media         DontDelete|ReadOnly
+  cssRules              DOMCSSRule::Media_CssRules      DontDelete|ReadOnly
+  insertRule            DOMCSSRule::Media_InsertRule    DontDelete|Function 2
+  deleteRule            DOMCSSRule::Media_DeleteRule    DontDelete|Function 1
 @end
 @begin DOMCSSFontFaceRuleTable 1
-  style			DOMCSSRule::FontFace_Style	DontDelete|ReadOnly
+  style                 DOMCSSRule::FontFace_Style      DontDelete|ReadOnly
 @end
 @begin DOMCSSPageRuleTable 2
-  selectorText		DOMCSSRule::Page_SelectorText	DontDelete
-  style			DOMCSSRule::Page_Style		DontDelete|ReadOnly
+  selectorText          DOMCSSRule::Page_SelectorText   DontDelete
+  style                 DOMCSSRule::Page_Style          DontDelete|ReadOnly
 @end
 @begin DOMCSSImportRuleTable 3
-  href			DOMCSSRule::Import_Href		DontDelete|ReadOnly
-  media			DOMCSSRule::Import_Media	DontDelete|ReadOnly
-  styleSheet		DOMCSSRule::Import_StyleSheet	DontDelete|ReadOnly
+  href                  DOMCSSRule::Import_Href         DontDelete|ReadOnly
+  media                 DOMCSSRule::Import_Media        DontDelete|ReadOnly
+  styleSheet            DOMCSSRule::Import_StyleSheet   DontDelete|ReadOnly
 @end
 @begin DOMCSSCharsetRuleTable 1
-  encoding		DOMCSSRule::Charset_Encoding	DontDelete
+  encoding              DOMCSSRule::Charset_Encoding    DontDelete
 @end
 */
 bool DOMCSSRule::getOwnPropertySlot(ExecState* exec,
@@ -986,13 +981,13 @@ const ClassInfo CSSRuleConstructor::info = {"CSSRuleConstructor", 0,
                                             &CSSRuleConstructorTable, 0};
 /*
 @begin CSSRuleConstructorTable 7
-  UNKNOWN_RULE	CSSRuleConstructor::UNKNOWN_RULE	DontDelete|ReadOnly
-  STYLE_RULE	CSSRuleConstructor::STYLE_RULE		DontDelete|ReadOnly
-  CHARSET_RULE	CSSRuleConstructor::CHARSET_RULE	DontDelete|ReadOnly
-  IMPORT_RULE	CSSRuleConstructor::IMPORT_RULE		DontDelete|ReadOnly
-  MEDIA_RULE	CSSRuleConstructor::MEDIA_RULE		DontDelete|ReadOnly
-  FONT_FACE_RULE CSSRuleConstructor::FONT_FACE_RULE	DontDelete|ReadOnly
-  PAGE_RULE	CSSRuleConstructor::PAGE_RULE		DontDelete|ReadOnly
+  UNKNOWN_RULE   CSSRuleConstructor::UNKNOWN_RULE       DontDelete|ReadOnly
+  STYLE_RULE     CSSRuleConstructor::STYLE_RULE         DontDelete|ReadOnly
+  CHARSET_RULE   CSSRuleConstructor::CHARSET_RULE       DontDelete|ReadOnly
+  IMPORT_RULE    CSSRuleConstructor::IMPORT_RULE        DontDelete|ReadOnly
+  MEDIA_RULE     CSSRuleConstructor::MEDIA_RULE         DontDelete|ReadOnly
+  FONT_FACE_RULE CSSRuleConstructor::FONT_FACE_RULE     DontDelete|ReadOnly
+  PAGE_RULE      CSSRuleConstructor::PAGE_RULE          DontDelete|ReadOnly
 @end
 */
 
@@ -1035,8 +1030,8 @@ const ClassInfo DOMCSSValue::info = {"CSSValue", 0, &DOMCSSValueTable, 0};
 @begin DOMCSSValueProtoTable 0
 @end
 @begin DOMCSSValueTable 2
-  cssText	DOMCSSValue::CssText		DontDelete|ReadOnly
-  cssValueType	DOMCSSValue::CssValueType	DontDelete|ReadOnly
+  cssText       DOMCSSValue::CssText            DontDelete|ReadOnly
+  cssValueType  DOMCSSValue::CssValueType       DontDelete|ReadOnly
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(DOMCSSValueProtoFunc)
@@ -1109,14 +1104,11 @@ const ClassInfo CSSValueConstructor::info = {"CSSValueConstructor", 0,
                                              &CSSValueConstructorTable, 0};
 /*
 @begin CSSValueConstructorTable 5
-  CSS_INHERIT		CSSValueConstructor::CSS_INHERIT
+  CSS_INHERIT           CSSValueConstructor::CSS_INHERIT DontDelete|ReadOnly
+  CSS_PRIMITIVE_VALUE   CSSValueConstructor::CSS_PRIMITIVE_VALUE
 DontDelete|ReadOnly
-  CSS_PRIMITIVE_VALUE	CSSValueConstructor::CSS_PRIMITIVE_VALUE
-DontDelete|ReadOnly
-  CSS_VALUE_LIST	CSSValueConstructor::CSS_VALUE_LIST
-DontDelete|ReadOnly
-  CSS_CUSTOM		CSSValueConstructor::CSS_CUSTOM
-DontDelete|ReadOnly
+  CSS_VALUE_LIST        CSSValueConstructor::CSS_VALUE_LIST DontDelete|ReadOnly
+  CSS_CUSTOM            CSSValueConstructor::CSS_CUSTOM DontDelete|ReadOnly
 @end
 */
 bool CSSValueConstructor::getOwnPropertySlot(ExecState* exec,
@@ -1152,8 +1144,8 @@ const ClassInfo DOMCSSValueList::info = {"CSSValueList", 0,
 
 /*
 @begin DOMCSSValueListTable 3
-  length		DOMCSSValueList::Length		DontDelete|ReadOnly
-  item			DOMCSSValueList::Item		DontDelete|Function 1
+  length                DOMCSSValueList::Length         DontDelete|ReadOnly
+  item                  DOMCSSValueList::Item           DontDelete|Function 1
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(
@@ -1221,9 +1213,9 @@ const ClassInfo DOMRGBColor::info = {"RGBColor", 0, &DOMRGBColorTable, 0};
 
 /*
 @begin DOMRGBColorTable 3
-  red	DOMRGBColor::Red	DontDelete|ReadOnly
-  green	DOMRGBColor::Green	DontDelete|ReadOnly
-  blue	DOMRGBColor::Blue	DontDelete|ReadOnly
+  red   DOMRGBColor::Red        DontDelete|ReadOnly
+  green DOMRGBColor::Green      DontDelete|ReadOnly
+  blue  DOMRGBColor::Blue       DontDelete|ReadOnly
 @end
 */
 DOMRGBColor::~DOMRGBColor() {
@@ -1264,10 +1256,10 @@ JSValue* getDOMRGBColor(ExecState*, unsigned c) {
 const ClassInfo DOMRect::info = {"Rect", 0, &DOMRectTable, 0};
 /*
 @begin DOMRectTable 4
-  top	DOMRect::Top	DontDelete|ReadOnly
-  right	DOMRect::Right	DontDelete|ReadOnly
-  bottom DOMRect::Bottom DontDelete|ReadOnly
-  left	DOMRect::Left	DontDelete|ReadOnly
+  top    DOMRect::Top     DontDelete|ReadOnly
+  right  DOMRect::Right   DontDelete|ReadOnly
+  bottom DOMRect::Bottom  DontDelete|ReadOnly
+  left   DOMRect::Left    DontDelete|ReadOnly
 @end
 */
 DOMRect::~DOMRect() {

@@ -124,8 +124,8 @@ JSValue* getNodeFilterConstructor(ExecState*);
 JSValue* toJS(ExecState*, WebCore::NodeFilter*);
 JSValue* toJS(ExecState*, WebCore::TreeWalker*);
 
-WebCore::NodeFilter* toNodeFilter(
-    const JSValue*);  // returns 0 if value is not a DOMNodeFilter
+PassRefPtr<WebCore::NodeFilter> toNodeFilter(
+    JSValue*);  // returns 0 if value is not a DOMNodeFilter or JS function
 
 class JSNodeFilterCondition : public WebCore::NodeFilterCondition {
  public:

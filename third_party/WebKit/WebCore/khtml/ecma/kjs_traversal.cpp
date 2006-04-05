@@ -211,10 +211,20 @@ JSValue* toJS(ExecState* exec, NodeFilter* nf) {
   return cacheDOMObject<NodeFilter, DOMNodeFilter>(exec, nf);
 }
 
-NodeFilter* toNodeFilter(JSValue* val) {
-  if (!val || !val->isObject(&DOMNodeFilter::info))
+PassRefPtr<NodeFilter> toNodeFilter(JSValue* val) {
+  if (!val)
     return 0;
-  return static_cast<DOMNodeFilter*>(val)->impl();
+  if (!val->isObject())
+    return 0;
+
+  if (val->isObject(&DOMNodeFilter::info))
+    return static_cast<DOMNodeFilter*>(val)->impl();
+
+  JSObject* o = static_cast<JSObject*>(val);
+  if (o->implementsCall())
+    return new NodeFilter(new JSNodeFilterCondition(o));
+
+  return 0;
 }
 
 // -------------------------------------------------------------------------

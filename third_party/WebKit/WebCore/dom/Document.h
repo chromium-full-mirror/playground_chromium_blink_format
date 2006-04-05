@@ -152,7 +152,16 @@ class Document : public ContainerNode {
                                               const String& qualifiedName,
                                               ExceptionCode&);
   Element* getElementById(const AtomicString&) const;
+
   Element* elementFromPoint(int x, int y) const;
+  String readyState();
+  String inputEncoding();
+  String defaultCharset();
+
+  String charset() { return inputEncoding(); }
+  String characterSet() { return inputEncoding(); }
+
+  void setCharset(const String&);
 
   PassRefPtr<Node> adoptNode(PassRefPtr<Node> source, ExceptionCode&);
 

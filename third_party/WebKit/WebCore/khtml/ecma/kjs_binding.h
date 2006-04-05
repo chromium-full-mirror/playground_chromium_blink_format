@@ -169,6 +169,8 @@ JSValue* jsStringOrNull(const WebCore::String&);
  */
 JSValue* jsStringOrUndefined(const WebCore::String&);
 
+JSValue* jsStringOrFalse(const WebCore::String&);
+
 /**
  *  Get a String object or a null String if the value is null
  */
