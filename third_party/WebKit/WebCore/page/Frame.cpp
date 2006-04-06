@@ -1708,13 +1708,13 @@ void Frame::handleMousePressEventDoubleClick(
       // from setting caret selection.
       d->m_beganSelectingText = true;
     else
-      selectClosestWordFromMouseEvent(event.event(), event.innerNode());
+      selectClosestWordFromMouseEvent(event.event(), event.targetNode());
   }
 }
 
 void Frame::handleMousePressEventTripleClick(
     const MouseEventWithHitTestResults& event) {
-  Node* innerNode = event.innerNode();
+  Node* innerNode = event.targetNode();
 
   if (event.event().button() == LeftButton && innerNode &&
       innerNode->renderer() && mouseDownMayStartSelect() &&
@@ -1738,7 +1738,7 @@ void Frame::handleMousePressEventTripleClick(
 
 void Frame::handleMousePressEventSingleClick(
     const MouseEventWithHitTestResults& event) {
-  Node* innerNode = event.innerNode();
+  Node* innerNode = event.targetNode();
 
   if (event.event().button() == LeftButton) {
     if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
@@ -1747,7 +1747,7 @@ void Frame::handleMousePressEventSingleClick(
 
       // Extend the selection if the Shift key is down, unless the click is in a
       // link.
-      bool extendSelection = event.event().shiftKey() && event.url().isNull();
+      bool extendSelection = event.event().shiftKey() && !event.isOverLink();
 
       // Don't restart the selection when the mouse is pressed on an
       // existing selection so we can allow for text dragging.
@@ -1794,8 +1794,7 @@ void Frame::handleMousePressEventSingleClick(
 }
 
 void Frame::handleMousePressEvent(const MouseEventWithHitTestResults& event) {
-  String url = event.url();
-  Node* innerNode = event.innerNode();
+  Node* innerNode = event.targetNode();
 
   d->m_mousePressNode = innerNode;
   d->m_dragStartPos = event.event().pos();
@@ -1822,7 +1821,7 @@ void Frame::handleMouseMoveEvent(const MouseEventWithHitTestResults& event) {
   if (!d->m_bMousePressed)
     return;
 
-  Node* innerNode = event.innerNode();
+  Node* innerNode = event.targetNode();
 
   if (event.event().button() != 0 || !innerNode || !innerNode->renderer() ||
       !mouseDownMayStartSelect() || !innerNode->renderer()->shouldSelect())
@@ -1868,7 +1867,7 @@ void Frame::handleMouseReleaseEvent(const MouseEventWithHitTestResults& event) {
   if (mouseDownMayStartSelect() && !d->m_beganSelectingText &&
       d->m_dragStartPos == event.event().pos() && d->m_selection.isRange()) {
     SelectionController selection;
-    Node* node = event.innerNode();
+    Node* node = event.targetNode();
     if (node && node->isContentEditable() && node->renderer()) {
       IntPoint vPoint = view()->viewportToContents(event.event().pos());
       VisiblePosition pos = node->renderer()->positionForPoint(vPoint);
@@ -2981,7 +2980,8 @@ bool Frame::passWidgetMouseDownEventToWidget(
     const MouseEventWithHitTestResults& event,
     bool isDoubleClick) {
   // Figure out which view to send the event to.
-  RenderObject* target = event.innerNode() ? event.innerNode()->renderer() : 0;
+  RenderObject* target =
+      event.targetNode() ? event.targetNode()->renderer() : 0;
   if (!target)
     return false;
 
