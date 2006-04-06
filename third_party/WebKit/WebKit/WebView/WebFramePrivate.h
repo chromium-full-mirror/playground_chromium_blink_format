@@ -85,9 +85,6 @@ extern NSString* WebPageCacheDocumentViewKey;
                        textEncodingName:(NSString*)encodingName
                                 baseURL:(NSURL*)URL
                          unreachableURL:(NSURL*)unreachableURL;
-- (void)_loadRequest:(NSURLRequest*)request
-        subresources:(NSArray*)subresources
-    subframeArchives:(NSArray*)subframeArchives;
 
 - (void)_detachFromParent;
 - (void)_detachChildren;
