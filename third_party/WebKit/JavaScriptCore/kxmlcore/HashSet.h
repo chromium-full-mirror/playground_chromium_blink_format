@@ -315,7 +315,9 @@ template <typename T, typename U, typename V>
 inline void HashSet<T, U, V>::remove(iterator it) {
   if (it.m_impl == m_impl.end())
     return;
-  it->~ValueType();
+  // Use "(*it)." instead of "it->" to work around a problem seen with the
+  // Visual C++ compiler.
+  (*it).~ValueType();
   m_impl.remove(it.m_impl);
 }
 
