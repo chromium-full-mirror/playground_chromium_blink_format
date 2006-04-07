@@ -486,7 +486,7 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
     case ELEMENT_NODE: {
       Element* oldElement = static_cast<Element*>(importedNode);
       RefPtr<Element> newElement = createElementNS(
-          oldElement->namespaceURI(), oldElement->tagName().toString(), ec);
+          oldElement->namespaceURI(), oldElement->tagQName().toString(), ec);
 
       if (ec != 0)
         return 0;

@@ -629,8 +629,9 @@ Node* CSSStyleSelector::locateCousinList(Element* parent) {
 bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
   if (n->isStyledElement()) {
     StyledElement* s = static_cast<StyledElement*>(n);
-    if (s->renderer() && (s->tagName() == element->tagName()) && !s->hasID() &&
-        (s->hasClass() == element->hasClass()) && !s->inlineStyleDecl() &&
+    if (s->renderer() && (s->tagQName() == element->tagQName()) &&
+        !s->hasID() && (s->hasClass() == element->hasClass()) &&
+        !s->inlineStyleDecl() &&
         (s->hasMappedAttributes() == styledElement->hasMappedAttributes()) &&
         (s->isLink() == element->isLink()) &&
         !s->renderer()->style()->affectedByAttributeSelectors() &&
@@ -1365,7 +1366,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
       case CSSSelector::PseudoFirstOfType: {
         // first-of-type matches the first element of its type!
         if (e->parentNode() && e->parentNode()->isElementNode()) {
-          const QualifiedName& type = e->tagName();
+          const QualifiedName& type = e->tagQName();
           Node* n = e->previousSibling();
           while (n) {
             if (n->isElementNode() &&
@@ -1392,7 +1393,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
       case CSSSelector::PseudoLastOfType: {
         // last-of-type matches the last element of its type!
         if (e->parentNode() && e->parentNode()->isElementNode()) {
-          const QualifiedName& type = e->tagName();
+          const QualifiedName& type = e->tagQName();
           Node* n = e->nextSibling();
           while (n) {
             if (n->isElementNode() &&
@@ -1425,7 +1426,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         // If both first-of-type and last-of-type apply, then only-of-type
         // applies.
         if (e->parentNode() && e->parentNode()->isElementNode()) {
-          const QualifiedName& type = e->tagName();
+          const QualifiedName& type = e->tagQName();
           Node* n = e->previousSibling();
           while (n && !static_cast<Element*>(n)->hasTagName(type))
             n = n->previousSibling();
