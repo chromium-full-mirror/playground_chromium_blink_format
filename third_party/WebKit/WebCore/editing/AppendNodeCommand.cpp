@@ -49,6 +49,7 @@ void AppendNodeCommand::doApply() {
   // in an non-undoable way.  We might eventually find it useful to do an
   // undoable remove in this case.
   ASSERT(!m_appendChild->parent());
+  ASSERT(m_parentNode->isContentEditable());
 
   ExceptionCode ec = 0;
   m_parentNode->appendChild(m_appendChild.get(), ec);
