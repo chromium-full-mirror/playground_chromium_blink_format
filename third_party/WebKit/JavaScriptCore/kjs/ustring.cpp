@@ -44,8 +44,6 @@
 
 using std::max;
 
-#include <kxmlcore/unicode/Unicode.h>
-
 namespace KJS {
 
 extern const double NaN;
@@ -134,14 +132,6 @@ UString::Rep UString::Rep::empty = {
 const int normalStatBufferSize = 4096;
 static char* statBuffer = 0;
 static int statBufferSize = 0;
-
-UChar UChar::toLower() const {
-  return KXMLCore::Unicode::toLower(uc);
-}
-
-UChar UChar::toUpper() const {
-  return KXMLCore::Unicode::toUpper(uc);
-}
 
 UCharReference& UCharReference::operator=(UChar c) {
   str->copyForWriting();
