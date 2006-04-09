@@ -22,32 +22,19 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef HTML_HTMLInputElementImplL_H
-#define HTML_HTMLInputElementImplL_H
+
+#ifndef HTML_HTMLInputElement_H
+#define HTML_HTMLInputElement_H
 
 #include "HTMLGenericFormElement.h"
-
-namespace WebCore {
-class RenderLineEdit;
-class RenderFileButton;
-class RenderSlider;
-class RenderTextField;
-}
 
 namespace WebCore {
 
 class HTMLImageLoader;
 
 class HTMLInputElement : public HTMLGenericFormElement {
-  friend class WebCore::RenderLineEdit;
-  friend class WebCore::RenderFileButton;
-
-  friend class HTMLSelectElement;
-  friend class WebCore::RenderSlider;
-
  public:
-  // do not change the order!
-  enum typeEnum {
+  enum InputType {
     TEXT,
     PASSWORD,
     ISINDEX,
@@ -63,12 +50,11 @@ class HTMLInputElement : public HTMLGenericFormElement {
     RANGE
   };
 
-  HTMLInputElement(Document* doc, HTMLFormElement* f = 0);
+  HTMLInputElement(Document*, HTMLFormElement* = 0);
   HTMLInputElement(const QualifiedName& tagName,
-                   Document* doc,
-                   HTMLFormElement* f = 0);
+                   Document*,
+                   HTMLFormElement* = 0);
   virtual ~HTMLInputElement();
-  void init();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
@@ -98,7 +84,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
   int maxLength() const { return m_maxLen; }
   int size() const { return m_size; }
   String type() const;
-  void setType(const String& t);
+  void setType(const String&);
 
   String value() const;
   void setValue(const String&);
@@ -113,29 +99,26 @@ class HTMLInputElement : public HTMLGenericFormElement {
   virtual DeprecatedString state();
   virtual void restoreState(DeprecatedStringList&);
 
-  bool canHaveSelection();
-
-  int selectionStart();
-  int selectionEnd();
+  bool canHaveSelection() const;
+  int selectionStart() const;
+  int selectionEnd() const;
   void setSelectionStart(int);
   void setSelectionEnd(int);
-
   void select();
-  void setSelectionRange(int, int);
+  void setSelectionRange(int start, int end);
 
   virtual void click(bool sendMouseEvents = false, bool showPressedLook = true);
   virtual void accessKeyAction(bool sendToAnyElement);
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual void copyNonAttributeProperties(const Element* source);
 
   virtual void attach();
-  virtual bool rendererIsNeeded(WebCore::RenderStyle*);
-  virtual WebCore::RenderObject* createRenderer(RenderArena*,
-                                                WebCore::RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void detach();
   virtual bool appendFormData(FormDataList&, bool);
 
@@ -143,8 +126,8 @@ class HTMLInputElement : public HTMLGenericFormElement {
   virtual bool isActivatedSubmit() const;
   virtual void setActivatedSubmit(bool flag);
 
-  typeEnum inputType() const { return static_cast<typeEnum>(m_type); }
-  void setInputType(const String& value);
+  InputType inputType() const { return static_cast<InputType>(m_type); }
+  void setInputType(const String&);
 
   virtual void reset();
 
@@ -152,14 +135,13 @@ class HTMLInputElement : public HTMLGenericFormElement {
   int clickX() const { return xPos; }
   int clickY() const { return yPos; }
 
-  virtual void* preDispatchEventHandler(Event* evt);
-  virtual void postDispatchEventHandler(Event* evt, void* data);
-  virtual void defaultEventHandler(Event* evt);
-  virtual bool isEditable();
+  virtual void* preDispatchEventHandler(Event*);
+  virtual void postDispatchEventHandler(Event*, void* dataFromPreDispatch);
+  virtual void defaultEventHandler(Event*);
 
   String altText() const;
 
-  virtual bool isURLAttribute(Attribute* attr) const;
+  virtual bool isURLAttribute(Attribute*) const;
 
   int maxResults() const { return m_maxResults; }
 
@@ -192,9 +174,15 @@ class HTMLInputElement : public HTMLGenericFormElement {
   void setUseMap(const String&);
 
  protected:
-  bool storesValueSeparateFromAttribute() const;
-
   AtomicString m_name;
+
+ private:
+  void init();
+  bool storesValueSeparateFromAttribute() const;
+  String constrainValue(const String& proposedValue) const;
+  String constrainValue(const String& proposedValue, int maxLen) const;
+  void recheckValue();
+
   String m_value;
   int xPos;
   short m_maxLen;
@@ -205,7 +193,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
 
   HTMLImageLoader* m_imageLoader;
 
-  unsigned m_type : 4;  // typeEnum
+  unsigned m_type : 4;  // InputType
   bool m_checked : 1;
   bool m_defaultChecked : 1;
   bool m_useDefaultChecked : 1;

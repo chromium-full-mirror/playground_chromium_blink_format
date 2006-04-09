@@ -234,10 +234,6 @@ void HTMLTextAreaElement::setDefaultValue(const String& defaultValue) {
   setValue(defaultValue);
 }
 
-bool HTMLTextAreaElement::isEditable() {
-  return true;
-}
-
 void HTMLTextAreaElement::accessKeyAction(bool sendToAnyElement) {
   focus();
 }

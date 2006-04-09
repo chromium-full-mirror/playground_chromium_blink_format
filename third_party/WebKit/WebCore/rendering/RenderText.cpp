@@ -38,7 +38,10 @@
 
 namespace WebCore {
 
-static UBreakIterator* getCharacterBreakIterator(const StringImpl* i) {
+UBreakIterator* characterBreakIterator(const StringImpl* i) {
+  if (!i)
+    return 0;
+
   // The locale is currently ignored when determining character cluster breaks.
   // This may change in the future, according to Deborah Goldsmith.
   static bool createdIterator = false;
@@ -62,7 +65,7 @@ static UBreakIterator* getCharacterBreakIterator(const StringImpl* i) {
 }
 
 int RenderText::previousOffset(int current) const {
-  UBreakIterator* iterator = getCharacterBreakIterator(str.get());
+  UBreakIterator* iterator = characterBreakIterator(str.get());
   if (!iterator)
     return current - 1;
 
@@ -74,7 +77,7 @@ int RenderText::previousOffset(int current) const {
 }
 
 int RenderText::nextOffset(int current) const {
-  UBreakIterator* iterator = getCharacterBreakIterator(str.get());
+  UBreakIterator* iterator = characterBreakIterator(str.get());
   if (!iterator)
     return current + 1;
 

@@ -92,8 +92,6 @@ class HTMLGenericFormElement : public HTMLElement {
    */
   virtual bool appendFormData(FormDataList&, bool) { return false; }
 
-  virtual bool isEditable();
-
   virtual DeprecatedString state();
   DeprecatedString findMatchingState(DeprecatedStringList& states);
 

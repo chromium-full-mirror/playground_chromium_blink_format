@@ -80,8 +80,6 @@ class HTMLTextAreaElement : public HTMLGenericFormElement {
   void invalidateValue() { m_valueMatchesRenderer = false; }
   void rendererWillBeDestroyed();
 
-  virtual bool isEditable();
-
   virtual void accessKeyAction(bool sendToAnyElement);
 
   String accessKey() const;
