@@ -179,6 +179,21 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float dy,
                  float dw,
                  float dh);
+  void drawImage(HTMLCanvasElement*, float x, float y);
+  void drawImage(HTMLCanvasElement*,
+                 float x,
+                 float y,
+                 float width,
+                 float height);
+  void drawImage(HTMLCanvasElement*,
+                 float sx,
+                 float sy,
+                 float sw,
+                 float sh,
+                 float dx,
+                 float dy,
+                 float dw,
+                 float dh);
 
   void drawImageFromRect(HTMLImageElement*,
                          float sx,
