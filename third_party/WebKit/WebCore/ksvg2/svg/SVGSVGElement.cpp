@@ -95,8 +95,11 @@ SVGAnimatedLength* SVGSVGElement::width() const {
     String temp("100%");
     const SVGElement* viewport =
         ownerDocument()->documentElement() == this ? this : viewportElement();
-    lazy_create<SVGAnimatedLength>(m_width, (SVGStyledElement*)0, LM_WIDTH,
-                                   viewport);
+    lazy_create<SVGAnimatedLength>(
+        m_width,
+        (SVGStyledElement*)ownerDocument()->documentElement() == this ? 0
+                                                                      : this,
+        LM_WIDTH, viewport);
     m_width->baseVal()->setValueAsString(temp.impl());
   }
 
@@ -108,8 +111,11 @@ SVGAnimatedLength* SVGSVGElement::height() const {
     String temp("100%");
     const SVGElement* viewport =
         ownerDocument()->documentElement() == this ? this : viewportElement();
-    lazy_create<SVGAnimatedLength>(m_height, (SVGStyledElement*)0, LM_HEIGHT,
-                                   viewport);
+    lazy_create<SVGAnimatedLength>(
+        m_height,
+        (SVGStyledElement*)ownerDocument()->documentElement() == this ? 0
+                                                                      : this,
+        LM_HEIGHT, viewport);
     m_height->baseVal()->setValueAsString(temp.impl());
   }
 
