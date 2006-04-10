@@ -116,7 +116,6 @@ JSValue* HTMLDocFunction::callAsFunction(ExecState* exec,
       doc.open();
       return jsUndefined();
     case JSHTMLDocument::Close:
-      // see khtmltests/ecma/tokenizer-script-recursion.html
       doc.close();
       return jsUndefined();
     case JSHTMLDocument::Write:
