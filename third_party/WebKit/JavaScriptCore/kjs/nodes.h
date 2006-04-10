@@ -265,14 +265,13 @@ class ElementNode : public Node {
 class ArrayNode : public Node {
  public:
   ArrayNode(int e) : elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) : element(ele->next), elision(0), opt(false) {
+  ArrayNode(ElementNode* ele)
+      : element(ele->next.release()), elision(0), opt(false) {
     Parser::removeNodeCycle(element.get());
-    ele->next = 0;
   }
   ArrayNode(int eli, ElementNode* ele)
-      : element(ele->next), elision(eli), opt(true) {
+      : element(ele->next.release()), elision(eli), opt(true) {
     Parser::removeNodeCycle(element.get());
-    ele->next = 0;
   }
   JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream&) const;
@@ -335,9 +334,8 @@ class PropertyListNode : public Node {
 class ObjectLiteralNode : public Node {
  public:
   ObjectLiteralNode() {}
-  ObjectLiteralNode(PropertyListNode* l) : list(l->next) {
+  ObjectLiteralNode(PropertyListNode* l) : list(l->next.release()) {
     Parser::removeNodeCycle(list.get());
-    l->next = 0;
   }
   JSValue* evaluate(ExecState*);
   virtual void streamTo(SourceStream&) const;
@@ -402,9 +400,8 @@ class ArgumentListNode : public Node {
 class ArgumentsNode : public Node {
  public:
   ArgumentsNode() {}
-  ArgumentsNode(ArgumentListNode* l) : list(l->next) {
+  ArgumentsNode(ArgumentListNode* l) : list(l->next.release()) {
     Parser::removeNodeCycle(list.get());
-    l->next = 0;
   }
   JSValue* evaluate(ExecState*);
   List evaluateList(ExecState* exec) {
@@ -901,9 +898,8 @@ class VarDeclListNode : public Node {
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclListNode* l) : next(l->next) {
+  VarStatementNode(VarDeclListNode* l) : next(l->next.release()) {
     Parser::removeNodeCycle(next.get());
-    l->next = 0;
   }
   virtual Completion execute(ExecState*);
   virtual void processVarDecls(ExecState*);
@@ -984,9 +980,8 @@ class ForNode : public StatementNode {
   ForNode(Node* e1, Node* e2, Node* e3, StatementNode* s)
       : expr1(e1), expr2(e2), expr3(e3), statement(s) {}
   ForNode(VarDeclListNode* e1, Node* e2, Node* e3, StatementNode* s)
-      : expr1(e1->next), expr2(e2), expr3(e3), statement(s) {
+      : expr1(e1->next.release()), expr2(e2), expr3(e3), statement(s) {
     Parser::removeNodeCycle(expr1.get());
-    e1->next = 0;
   }
   virtual Completion execute(ExecState*);
   virtual void processVarDecls(ExecState*);
@@ -1063,9 +1058,8 @@ class WithNode : public StatementNode {
 class CaseClauseNode : public Node {
  public:
   CaseClauseNode(Node* e) : expr(e) {}
-  CaseClauseNode(Node* e, StatListNode* l) : expr(e), next(l->next) {
+  CaseClauseNode(Node* e, StatListNode* l) : expr(e), next(l->next.release()) {
     Parser::removeNodeCycle(next.get());
-    l->next = 0;
   }
   JSValue* evaluate(ExecState*);
   Completion evalStatements(ExecState*);
@@ -1208,10 +1202,9 @@ class FunctionBodyNode : public BlockNode {
 class FuncExprNode : public Node {
  public:
   FuncExprNode(const Identifier& i, FunctionBodyNode* b, ParameterNode* p = 0)
-      : ident(i), param(p ? p->next : 0), body(b) {
+      : ident(i), param(p ? p->next.release() : 0), body(b) {
     if (p) {
       Parser::removeNodeCycle(param.get());
-      p->next = 0;
     }
   }
   virtual JSValue* evaluate(ExecState*);
@@ -1229,9 +1222,8 @@ class FuncDeclNode : public StatementNode {
  public:
   FuncDeclNode(const Identifier& i, FunctionBodyNode* b) : ident(i), body(b) {}
   FuncDeclNode(const Identifier& i, ParameterNode* p, FunctionBodyNode* b)
-      : ident(i), param(p->next), body(b) {
+      : ident(i), param(p->next.release()), body(b) {
     Parser::removeNodeCycle(param.get());
-    p->next = 0;
   }
   virtual Completion execute(ExecState*);
   virtual void processFuncDecl(ExecState*);
