@@ -30,7 +30,8 @@
 + (WebCoreGraphicsBridge*)sharedBridge;
 - (void)drawFocusRingWithPath:(CGPathRef)path
                        radius:(float)radius
-                        color:(CGColorRef)color;
+                        color:(CGColorRef)color
+                     clipRect:(NSRect)rect;
 - (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
 - (void)drawBezeledTextFieldCell:(NSRect)rect enabled:(BOOL)active;
 

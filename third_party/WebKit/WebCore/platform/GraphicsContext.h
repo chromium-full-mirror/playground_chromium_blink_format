@@ -153,6 +153,11 @@ class GraphicsContext : Noncopyable {
                           const IntSize& bottomLeft,
                           const IntSize& bottomRight);
 
+#if __APPLE__
+  void setFocusRingClip(const IntRect&);
+  void clearFocusRingClip();
+#endif
+
   void drawText(int x, int y, int alignmentFlags, const DeprecatedString&);
   void drawHighlightForText(int x,
                             int y,
@@ -223,7 +228,6 @@ class GraphicsContext : Noncopyable {
 
 #if SVG_SUPPORT
   KRenderingDeviceContext* createRenderingDeviceContext();
-  static KRenderingDevice* renderingDevice();
 #endif
 
   bool printing() const;
