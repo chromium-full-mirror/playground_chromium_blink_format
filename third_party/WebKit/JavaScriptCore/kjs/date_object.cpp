@@ -50,6 +50,7 @@
 #include <time.h>
 
 #include "error_object.h"
+#include "lookup.h"
 #include "operations.h"
 
 #if PLATFORM(MAC)
