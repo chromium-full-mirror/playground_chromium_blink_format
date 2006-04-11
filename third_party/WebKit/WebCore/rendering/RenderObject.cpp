@@ -32,12 +32,9 @@
 #include "EventNames.h"
 #include "FloatRect.h"
 #include "Frame.h"
-#include "FrameView.h"
 #include "GraphicsContext.h"
 #include "IntPointArray.h"
 #include "AccessibilityObjectCache.h"
-#include "RenderBlock.h"
-#include "RenderTable.h"
 #include "RenderTableCell.h"
 #include "RenderTableCol.h"
 #include "RenderTableRow.h"
@@ -50,12 +47,9 @@
 #include "RenderCanvas.h"
 #include "RenderFlexibleBox.h"
 #include "RenderInline.h"
-#include "render_line.h"
 #include "render_list.h"
 #include "RenderTheme.h"
-#include "VisiblePosition.h"
 #include <qmatrix.h>
-#include "TextEncoding.h"
 #include <qtextstream.h>
 
 namespace WebCore {
@@ -140,7 +134,7 @@ struct RenderObjectCounter {
 };
 int RenderObjectCounter::count;
 static RenderObjectCounter renderObjectCounter;
-#endif NDEBUG
+#endif
 
 RenderObject::RenderObject(Node* node)
     : CachedObjectClient(),
@@ -1666,15 +1660,11 @@ void RenderObject::dump(QTextStream* stream, DeprecatedString ind) const {
   }
 }
 
-void RenderObject::showTree() const {
+void RenderObject::showTreeForThis() const {
   if (element())
-    element()->showTree();
+    element()->showTreeForThis();
 }
 
-void showTree(const RenderObject* ro) {
-  if (ro)
-    ro->showTree();
-}
 #endif
 
 static Node* selectStartNode(const RenderObject* object) {
@@ -2685,3 +2675,12 @@ QMatrix RenderObject::absoluteTransform() const {
 
 #endif
 }
+
+#ifndef NDEBUG
+
+void showTree(const WebCore::RenderObject* ro) {
+  if (ro)
+    ro->showTreeForThis();
+}
+
+#endif

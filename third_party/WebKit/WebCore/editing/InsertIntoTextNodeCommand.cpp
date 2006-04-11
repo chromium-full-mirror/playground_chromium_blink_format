@@ -28,12 +28,6 @@
 
 #include "Text.h"
 
-#include <kxmlcore/Assertions.h>
-
-using WebCore::Document;
-using WebCore::Text;
-using WebCore::String;
-
 namespace WebCore {
 
 InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(Document* document,

@@ -26,17 +26,7 @@
 #ifndef KHTML_EDITING_VISIBLE_POSITION_H
 #define KHTML_EDITING_VISIBLE_POSITION_H
 
-#include <DeprecatedString.h>  // for QChar
-#include <kxmlcore/PassRefPtr.h>
-
 #include "Position.h"
-#include "TextAffinity.h"
-#include "Shared.h"
-
-namespace WebCore {
-class Node;
-class Range;
-}
 
 namespace WebCore {
 
@@ -55,17 +45,12 @@ namespace WebCore {
 
 class VisiblePosition {
  public:
-  typedef WebCore::Node Node;
-  typedef WebCore::Position Position;
-
   // NOTE: UPSTREAM affinity will be used only if pos is at end of a wrapped
   // line,
   // otherwise it will be converted to DOWNSTREAM
-  VisiblePosition() { m_affinity = VP_DEFAULT_AFFINITY; };
+  VisiblePosition() : m_affinity(VP_DEFAULT_AFFINITY) {}
   VisiblePosition(Node*, int offset, EAffinity);
-  VisiblePosition(const Position& pos,
-                  EAffinity affinity = VP_DEFAULT_AFFINITY);
-  VisiblePosition(const VisiblePosition&);
+  VisiblePosition(const Position&, EAffinity = VP_DEFAULT_AFFINITY);
 
   void clear() { m_deepPosition.clear(); }
 
@@ -78,14 +63,6 @@ class VisiblePosition {
     return m_affinity;
   }
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }
-
-  friend bool operator==(const VisiblePosition& a, const VisiblePosition& b);
-  friend bool operator!=(const VisiblePosition& a, const VisiblePosition& b);
-
-  friend bool isEqualIgnoringAffinity(const VisiblePosition& a,
-                                      const VisiblePosition& b);
-  friend bool isNotEqualIgnoringAffinity(const VisiblePosition& a,
-                                         const VisiblePosition& b);
 
   // next() and previous() will increment/decrement by a character cluster.
   VisiblePosition next() const;
@@ -101,7 +78,7 @@ class VisiblePosition {
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
-  void showTree() const;
+  void showTreeForThis() const;
 #endif
 
  private:
@@ -117,28 +94,34 @@ class VisiblePosition {
 };
 
 inline bool operator==(const VisiblePosition& a, const VisiblePosition& b) {
-  return a.m_deepPosition == b.m_deepPosition && a.m_affinity == b.m_affinity;
+  return a.deepEquivalent() == b.deepEquivalent() &&
+         a.affinity() == b.affinity();
 }
 
 inline bool operator!=(const VisiblePosition& a, const VisiblePosition& b) {
   return !(a == b);
 }
 
-PassRefPtr<WebCore::Range> makeRange(const VisiblePosition&,
-                                     const VisiblePosition&);
-bool setStart(WebCore::Range*, const VisiblePosition&);
-bool setEnd(WebCore::Range*, const VisiblePosition&);
-VisiblePosition startVisiblePosition(const WebCore::Range*, EAffinity);
-VisiblePosition endVisiblePosition(const WebCore::Range*, EAffinity);
+bool isEqualIgnoringAffinity(const VisiblePosition&, const VisiblePosition&);
+bool isNotEqualIgnoringAffinity(const VisiblePosition&, const VisiblePosition&);
 
-WebCore::Node* enclosingBlockFlowElement(const VisiblePosition&);
+PassRefPtr<Range> makeRange(const VisiblePosition&, const VisiblePosition&);
+bool setStart(Range*, const VisiblePosition&);
+bool setEnd(Range*, const VisiblePosition&);
+VisiblePosition startVisiblePosition(const Range*, EAffinity);
+VisiblePosition endVisiblePosition(const Range*, EAffinity);
 
-bool isFirstVisiblePositionInNode(const VisiblePosition&, const WebCore::Node*);
-bool isLastVisiblePositionInNode(const VisiblePosition&, const WebCore::Node*);
-#ifndef NDEBUG
-void showTree(const VisiblePosition* vpos);
-void showTree(const VisiblePosition& vpos);
-#endif
+Node* enclosingBlockFlowElement(const VisiblePosition&);
+
+bool isFirstVisiblePositionInNode(const VisiblePosition&, const Node*);
+bool isLastVisiblePositionInNode(const VisiblePosition&, const Node*);
+
 }  // namespace WebCore
+
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showTree(const WebCore::VisiblePosition*);
+void showTree(const WebCore::VisiblePosition&);
+#endif
 
 #endif  // KHTML_EDITING_VISIBLE_POSITION_H

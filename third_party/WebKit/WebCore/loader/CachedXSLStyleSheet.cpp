@@ -34,7 +34,6 @@
 #include "CachedObjectClientWalker.h"
 #include "decoder.h"
 #include "loader.h"
-#include <kxmlcore/Assertions.h>
 
 namespace WebCore {
 

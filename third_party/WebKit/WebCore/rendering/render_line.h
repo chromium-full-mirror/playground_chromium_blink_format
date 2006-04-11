@@ -86,7 +86,7 @@ class InlineBox {
 
  public:
 #ifndef NDEBUG
-  void showTree() const;
+  void showTreeForThis() const;
 #endif
   virtual bool isInlineBox() { return false; }
   virtual bool isInlineFlowBox() { return false; }
@@ -539,5 +539,10 @@ class RootInlineBox : public InlineFlowBox {
 };
 
 }  // namespace
+
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showTree(const WebCore::InlineBox*);
+#endif
 
 #endif

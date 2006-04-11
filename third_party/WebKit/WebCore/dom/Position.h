@@ -90,7 +90,7 @@ class Position {
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
-  void showTree() const;
+  void showTreeForThis() const;
 #endif
 
  private:
@@ -116,11 +116,12 @@ inline bool operator!=(const Position& a, const Position& b) {
 Position startPosition(const Range*);
 Position endPosition(const Range*);
 
-#ifndef NDEBUG
-void showTree(const Position& pos);
-void showTree(const Position* pos);
-#endif
-
 }  // namespace WebCore
+
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showTree(const WebCore::Position&);
+void showTree(const WebCore::Position*);
+#endif
 
 #endif  // Position_H

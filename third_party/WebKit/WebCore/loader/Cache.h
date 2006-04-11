@@ -28,15 +28,15 @@
 #ifndef Cache_h
 #define Cache_h
 
-#include "DeprecatedString.h"
 #include "PlatformString.h"
 #include <kio/global.h>
 #include <qptrlist.h>
-#include <kxmlcore/HashSet.h>
+#include <kxmlcore/HashForward.h>
 
 class KURL;
 
 namespace WebCore {
+
 class CachedCSSStyleSheet;
 class CachedImage;
 class CachedObject;

@@ -25,8 +25,10 @@
 #if SVG_SUPPORT
 
 #include "Shared.h"
+#include <kxmlcore/RefPtr.h>
 
 namespace WebCore {
+
 class SVGMatrix;
 class SVGTransform : public Shared<SVGTransform> {
  public:
@@ -39,7 +41,7 @@ class SVGTransform : public Shared<SVGTransform> {
 
   double angle() const;
 
-  void setMatrix(SVGMatrix* matrix);
+  void setMatrix(SVGMatrix*);
   void setTranslate(double tx, double ty);
   void setScale(double sx, double sy);
   void setRotate(double angle, double cx, double cy);
@@ -51,7 +53,7 @@ class SVGTransform : public Shared<SVGTransform> {
   unsigned short m_type;
   RefPtr<SVGMatrix> m_matrix;
 };
-};
+}
 
 #endif  // SVG_SUPPORT
 #endif

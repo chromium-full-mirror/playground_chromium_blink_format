@@ -21,8 +21,8 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <kxmlcore/Noncopyable.h>
 #include "Shared.h"
+#include <kxmlcore/Noncopyable.h>
 
 namespace WebCore {
 

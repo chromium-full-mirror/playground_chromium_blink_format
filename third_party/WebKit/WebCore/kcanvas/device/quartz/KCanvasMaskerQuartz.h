@@ -25,7 +25,6 @@
  */
 
 #import "KCanvasImage.h"
-#import "KCanvasResources.h"
 
 namespace WebCore {
 

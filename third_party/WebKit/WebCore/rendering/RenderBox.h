@@ -21,10 +21,10 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef RENDER_BOX_H
 #define RENDER_BOX_H
 
-#include "RenderObject.h"
 #include "loader.h"
 #include "RenderLayer.h"
 
@@ -275,6 +275,6 @@ class RenderBox : public RenderObject {
   InlineBox* m_inlineBoxWrapper;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

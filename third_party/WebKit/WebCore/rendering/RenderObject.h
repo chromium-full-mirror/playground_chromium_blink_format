@@ -26,14 +26,9 @@
 #ifndef render_object_h
 #define render_object_h
 
-#include "CachedObjectClient.h"
 #include "KWQScrollBar.h"
-#include "Node.h"
-#include "render_style.h"
-#include "TextAffinity.h"
 #include "VisiblePosition.h"
-#include <kxmlcore/Assertions.h>
-#include <kxmlcore/HashSet.h>
+#include "render_style.h"
 
 class CSSStyle;
 class QMatrix;
@@ -226,11 +221,10 @@ class RenderObject : public CachedObjectClient {
 
  public:
   virtual const char* renderName() const { return "RenderObject"; }
-#if !NDEBUG
+#ifndef NDEBUG
   DeprecatedString information() const;
   virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
-  void showTree() const;
-  static void showTree(const RenderObject* ro);
+  void showTreeForThis() const;
 #endif
 
   static RenderObject* createObject(Node* node, RenderStyle* style);
@@ -1115,5 +1109,10 @@ enum VerticalPositionHint {
 };
 
 }  // namespace
+
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showTree(const WebCore::RenderObject*);
+#endif
 
 #endif

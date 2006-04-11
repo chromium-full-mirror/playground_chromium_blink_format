@@ -33,7 +33,6 @@
 #include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "loader.h"
-#include "TextEncoding.h"
 
 namespace WebCore {
 

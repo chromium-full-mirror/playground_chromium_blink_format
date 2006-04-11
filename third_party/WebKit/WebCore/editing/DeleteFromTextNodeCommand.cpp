@@ -28,8 +28,6 @@
 
 #include "Text.h"
 
-#include <kxmlcore/Assertions.h>
-
 namespace WebCore {
 
 DeleteFromTextNodeCommand::DeleteFromTextNodeCommand(Document* document,

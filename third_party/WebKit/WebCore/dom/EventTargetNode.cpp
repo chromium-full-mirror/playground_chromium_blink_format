@@ -31,19 +31,21 @@
 #include "EventListener.h"
 #include "EventNames.h"
 #include "Frame.h"
-#include "FrameView.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformWheelEvent.h"
 #include "dom2_eventsimpl.h"
 #include "kjs_proxy.h"
 #include "HTMLNames.h"
-#include <qptrlist.h>
 #include <qtextstream.h>
 
 namespace WebCore {
 
 using namespace EventNames;
 using namespace HTMLNames;
+
+#ifndef NDEBUG
+static int gEventDispatchForbidden = 0;
+#endif
 
 EventTargetNode::EventTargetNode(Document* doc)
     : Node(doc), m_regdListeners(0) {}
@@ -531,6 +533,7 @@ bool EventTargetNode::disabled() const {
 void EventTargetNode::defaultEventHandler(Event* evt) {}
 
 #ifndef NDEBUG
+
 void EventTargetNode::dump(QTextStream* stream, DeprecatedString ind) const {
   if (m_regdListeners)
     *stream << " #regdListeners="
@@ -538,6 +541,20 @@ void EventTargetNode::dump(QTextStream* stream, DeprecatedString ind) const {
 
   Node::dump(stream, ind);
 }
+
+void forbidEventDispatch() {
+  ++gEventDispatchForbidden;
+}
+
+void allowEventDispatch() {
+  if (gEventDispatchForbidden > 0)
+    --gEventDispatchForbidden;
+}
+
+bool eventDispatchForbidden() {
+  return gEventDispatchForbidden > 0;
+}
+
 #endif
 
 }  // namespace WebCore

@@ -30,9 +30,6 @@
 #include "Document.h"
 #include "Element.h"
 #include "HTMLNames.h"
-#include "InlineTextBox.h"
-#include "Position.h"
-#include "Range.h"
 
 // FIXME: These classes should probably use the render tree and not the DOM
 // tree, since elements could

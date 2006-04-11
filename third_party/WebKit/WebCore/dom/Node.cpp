@@ -25,21 +25,17 @@
 #include "config.h"
 #include "Node.h"
 
-#include "AtomicString.h"
 #include "ChildNodeList.h"
 #include "DOMImplementation.h"
 #include "Document.h"
-#include "Element.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
-#include "FrameView.h"
 #include "NamedAttrMap.h"
 #include "Text.h"
 #include "htmlediting.h"
 #include "HTMLNames.h"
 #include "kjs_binding.h"
 #include "RenderObject.h"
-#include <kxmlcore/Assertions.h>
 #include <qtextstream.h>
 
 namespace WebCore {
@@ -101,8 +97,6 @@ struct NodeImplCounter {
 };
 int NodeImplCounter::count = 0;
 static NodeImplCounter nodeImplCounter;
-
-int gEventDispatchForbidden = 0;
 #endif
 
 Node::Node(Document* doc)
@@ -1413,37 +1407,30 @@ void Node::showNode(const char* prefix) const {
   }
 }
 
-void Node::showTree() const {
-  showTreeAndMark((Node*)this, "*", NULL, NULL);
+void Node::showTreeForThis() const {
+  showTreeAndMark(this, "*");
 }
 
-void showTree(const Node* node) {
-  if (node)
-    node->showTree();
-}
-
-void Node::showTreeAndMark(Node* markedNode1,
+void Node::showTreeAndMark(const Node* markedNode1,
                            const char* markedLabel1,
-                           Node* markedNode2,
+                           const Node* markedNode2,
                            const char* markedLabel2) const {
-  Node* rootNode;
-  Node* node = (Node*)this;
+  const Node* rootNode;
+  const Node* node = this;
   while (node->parentNode() && !node->hasTagName(bodyTag))
     node = node->parentNode();
   rootNode = node;
 
   for (node = rootNode; node; node = node->traverseNextNode()) {
-    Node* tmpNode;
-
     if (node == markedNode1)
       fprintf(stderr, "%s", markedLabel1);
     if (node == markedNode2)
       fprintf(stderr, "%s", markedLabel2);
 
-    for (tmpNode = node; tmpNode && tmpNode != rootNode;
+    for (const Node* tmpNode = node; tmpNode && tmpNode != rootNode;
          tmpNode = tmpNode->parentNode())
       fprintf(stderr, "\t");
-    node->showNode(0);
+    node->showNode();
   }
 }
 
@@ -1462,3 +1449,12 @@ void Node::formatForDebugger(char* buffer, unsigned length) const {
 
 #endif
 }
+
+#ifndef NDEBUG
+
+void showTree(const WebCore::Node* node) {
+  if (node)
+    node->showTreeForThis();
+}
+
+#endif

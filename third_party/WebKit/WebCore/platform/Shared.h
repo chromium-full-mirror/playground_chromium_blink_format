@@ -22,8 +22,6 @@
 #ifndef SHARED_H
 #define SHARED_H
 
-#include <kxmlcore/RefPtr.h>
-
 namespace WebCore {
 
 template <class T>

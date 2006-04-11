@@ -38,7 +38,6 @@
 #include "Image.h"
 #include "TransferJob.h"
 #include "loader.h"
-#include <kxmlcore/Assertions.h>
 
 namespace WebCore {
 

@@ -30,8 +30,6 @@
 
 #include "CachedObject.h"
 
-#include <kio/global.h>
-
 namespace WebCore {
 class CachedObject;
 class Request;
