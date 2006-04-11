@@ -46,11 +46,14 @@
   NSMutableSet* iconsToSaveWithURLs;
   NSMutableSet* iconURLsWithNoIcons;
   NSMutableSet* originalIconsOnDiskWithURLs;
+  NSMutableSet* pageURLsBoundDuringPrivateBrowsing;
+  NSMutableSet* iconURLsBoundDuringPrivateBrowsing;
 
   int cleanupCount;
 
   BOOL didCleanup;
   BOOL waitingToCleanup;
+  BOOL privateBrowsingEnabled;
 
   NSMutableDictionary* htmlIcons;
   NSMutableDictionary* defaultIcons;
