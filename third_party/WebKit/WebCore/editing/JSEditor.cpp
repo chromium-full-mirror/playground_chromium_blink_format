@@ -239,6 +239,24 @@ bool execForeColor(Frame* frame, bool userInterface, const String& value) {
   return execStyleChange(frame, CSS_PROP_COLOR, value);
 }
 
+bool execInsertHorizontalRule(Frame* frame,
+                              bool userInterface,
+                              const String& value) {
+  RefPtr<HTMLElement> hr = new HTMLElement(hrTag, frame->document());
+  if (!value.isEmpty())
+    hr->setId(value);
+  RefPtr<DocumentFragment> fragment = new DocumentFragment(frame->document());
+  ExceptionCode ec = 0;
+  fragment->appendChild(hr, ec);
+  if (ec)
+    return false;
+
+  EditCommandPtr(
+      new ReplaceSelectionCommand(frame->document(), fragment.get(), false))
+      .apply();
+  return true;
+}
+
 bool execInsertHTML(Frame* frame, bool userInterface, const String& value) {
   DeprecatedString baseURL = "";
   bool selectReplacement = false;
@@ -569,6 +587,9 @@ CommandMap* createCommandDictionary() {
        {execForwardDelete, enabledAnyEditableSelection, stateNone, valueNull}},
       {"Indent",
        {execIndent, enabledAnyRichlyEditableSelection, stateNone, valueNull}},
+      {"InsertHorizontalRule",
+       {execInsertHorizontalRule, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"InsertHTML",
        {execInsertHTML, enabledAnyEditableSelection, stateNone, valueNull}},
       {"InsertImage",
@@ -651,7 +672,6 @@ CommandMap* createCommandDictionary() {
       // InlineDirRTL (not supported)
       // InsertButton (not supported)
       // InsertFieldSet (not supported)
-      // InsertHorizontalRule (not supported)
       // InsertIFrame (not supported)
       // InsertInputButton (not supported)
       // InsertInputCheckbox (not supported)
