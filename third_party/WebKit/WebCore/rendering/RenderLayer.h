@@ -210,6 +210,8 @@ class RenderLayer : WidgetClient {
   Marquee* marquee() const { return m_marquee; }
   void suspendMarquees();
 
+  bool isOverflowOnly() const { return m_isOverflowOnly; }
+
   bool isTransparent() const;
   RenderLayer* transparentAncestor();
   void beginTransparencyLayers(GraphicsContext*, const IntRect&);
@@ -300,6 +302,10 @@ class RenderLayer : WidgetClient {
   Vector<RenderLayer*>* posZOrderList() const { return m_posZOrderList; }
   Vector<RenderLayer*>* negZOrderList() const { return m_negZOrderList; }
 
+  void dirtyOverflowList();
+  void updateOverflowList();
+  Vector<RenderLayer*>* overflowList() const { return m_overflowList; }
+
   // Gets the nearest enclosing positioned ancestor layer (also includes
   // the <html> layer and the root layer).
   RenderLayer* enclosingPositionedAncestor() const;
@@ -377,6 +383,8 @@ class RenderLayer : WidgetClient {
                             const IntRect& hitTestRect);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
+  bool shouldBeOverflowOnly() const;
+
   virtual void valueChanged(Widget*);
 
  protected:
@@ -430,11 +438,16 @@ class RenderLayer : WidgetClient {
   Vector<RenderLayer*>* m_posZOrderList;
   Vector<RenderLayer*>* m_negZOrderList;
 
+  // This list contains our overflow child layers.
+  Vector<RenderLayer*>* m_overflowList;
+
   ClipRects*
       m_clipRects;  // Cached clip rects used when painting and hit testing.
 
   bool m_scrollDimensionsDirty : 1;
   bool m_zOrderListsDirty : 1;
+  bool m_overflowListDirty : 1;
+  bool m_isOverflowOnly : 1;
 
   bool m_usedTransparency : 1;  // Tracks whether we need to close a transparent
                                 // layer, i.e., whether
