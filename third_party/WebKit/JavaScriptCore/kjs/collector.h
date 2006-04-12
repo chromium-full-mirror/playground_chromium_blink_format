@@ -26,7 +26,7 @@
 #define KJSCOLLECTOR_H_
 
 #include "value.h"
-#include <kxmlcore/HashForward.h>
+#include <kxmlcore/HashCountedSet.h>
 
 #define KJS_MEM_LIMIT 500000
 
