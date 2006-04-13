@@ -27,6 +27,7 @@
 #include "CachedImage.h"
 #include "Frame.h"
 #include "HTMLElement.h"
+#include "HTMLInputElement.h"
 #include "History.h"
 #include "UserAgentStyleSheets.h"
 #include "css_stylesheetimpl.h"
@@ -1437,6 +1438,10 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         if (pseudoState == PseudoAnyLink || pseudoState == PseudoLink ||
             pseudoState == PseudoVisited)
           return true;
+        break;
+      case CSSSelector::PseudoAutofill:
+        if (e && e->hasTagName(inputTag))
+          return static_cast<HTMLInputElement*>(e)->autofilled();
         break;
       case CSSSelector::PseudoLink:
         if (pseudoState == PseudoUnknown || pseudoState == PseudoAnyLink)
@@ -4548,7 +4553,7 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
       }
     } else if (ident == CSS_VAL__KHTML_ACTIVELINK)
       col = element->document()->activeLinkColor();
-    else if (ident == CSS_VAL__WEBKIT_FOCUS_RING_COLOR)
+    else if (ident == CSS_VAL__KHTML_FOCUS_RING_COLOR)
       col = focusRingColor();
     else
       col = colorForCSSValue(ident);

@@ -133,6 +133,7 @@ void CSSSelector::extractPseudoType() const {
   static AtomicString active("active");
   static AtomicString after("after");
   static AtomicString anyLink("-khtml-any-link");
+  static AtomicString autofill("-khtml-autofill");
   static AtomicString before("before");
   static AtomicString checked("checked");
   static AtomicString disabled("disabled");
@@ -168,6 +169,8 @@ void CSSSelector::extractPseudoType() const {
     element = compat = true;
   } else if (value == anyLink)
     _pseudoType = PseudoAnyLink;
+  else if (value == autofill)
+    _pseudoType = PseudoAutofill;
   else if (value == before) {
     _pseudoType = PseudoBefore;
     element = compat = true;

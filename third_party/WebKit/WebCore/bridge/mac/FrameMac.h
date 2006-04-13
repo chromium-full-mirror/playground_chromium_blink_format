@@ -291,6 +291,13 @@ class FrameMac : public Frame {
   virtual void didBeginEditing() const;
   virtual void didEndEditing() const;
 
+  virtual void textFieldDidBeginEditing(Element*);
+  virtual void textFieldDidEndEditing(Element*);
+  virtual void textDidChangeInTextField(Element*);
+  virtual bool doTextFieldCommandFromEvent(Element*,
+                                           const PlatformKeyboardEvent*);
+  virtual void textWillBeDeletedInTextField(Element* input);
+
   KJS::Bindings::RootObject* executionContextForDOM();
   KJS::Bindings::RootObject* bindingRootObject();
 
@@ -362,9 +369,6 @@ class FrameMac : public Frame {
   int _activationEventNumber;
 
   static NSEvent* _currentEvent;
-
-  NSMutableDictionary* _formValuesAboutToBeSubmitted;
-  ObjCDOMElement* _formAboutToBeSubmitted;
 
   bool _haveUndoRedoOperations;
 

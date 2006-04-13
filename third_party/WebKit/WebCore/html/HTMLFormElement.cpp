@@ -333,9 +333,7 @@ void HTMLFormElement::submit(bool activateSubmitButton) {
     // save when.
     if (current->hasLocalName(inputTag)) {
       HTMLInputElement* input = static_cast<HTMLInputElement*>(current);
-      if (input->inputType() == HTMLInputElement::TEXT ||
-          input->inputType() == HTMLInputElement::PASSWORD ||
-          input->inputType() == HTMLInputElement::SEARCH) {
+      if (input->isTextField()) {
         frame->recordFormValue(input->name().deprecatedString(),
                                input->value().deprecatedString(), this);
         if (input->renderer() && input->inputType() == HTMLInputElement::SEARCH)

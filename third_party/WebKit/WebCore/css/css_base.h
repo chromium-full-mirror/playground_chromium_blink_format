@@ -159,6 +159,7 @@ class CSSSelector {
     PseudoLink,
     PseudoVisited,
     PseudoAnyLink,
+    PseudoAutofill,
     PseudoHover,
     PseudoDrag,
     PseudoFocus,
