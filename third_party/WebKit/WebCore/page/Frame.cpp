@@ -36,6 +36,7 @@
 #include "CachedCSSStyleSheet.h"
 #include "DOMImplementation.h"
 #include "DocLoader.h"
+#include "DOMWindow.h"
 #include "EditingText.h"
 #include "EventNames.h"
 #include "FloatRect.h"
@@ -172,6 +173,9 @@ Frame::~Frame() {
       // delete d below).
       w = 0;
     }
+
+  if (d->m_domWindow)
+    d->m_domWindow->disconnectFrame();
 
   setOpener(0);
   HashSet<Frame*> openedBy = d->m_openedFrames;
@@ -3217,6 +3221,13 @@ bool Frame::isLoadingMainResource() const {
 
 FrameTree* Frame::tree() const {
   return &d->m_treeNode;
+}
+
+DOMWindow* Frame::domWindow() const {
+  if (!d->m_domWindow)
+    d->m_domWindow = new DOMWindow(const_cast<Frame*>(this));
+
+  return d->m_domWindow.get();
 }
 
 KURL Frame::url() const {

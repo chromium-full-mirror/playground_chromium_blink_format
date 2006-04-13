@@ -49,13 +49,13 @@ class XBLBindingManager;
 namespace WebCore {
 
 class AccessibilityObjectCache;
-class AbstractView;
 class CDATASection;
 class CSSStyleDeclaration;
 class CSSStyleSelector;
 class CSSStyleSheet;
 class Comment;
 class DOMImplementation;
+class DOMWindow;
 class DocLoader;
 class DocumentFragment;
 class DocumentType;
@@ -409,7 +409,7 @@ class Document : public ContainerNode {
   void attachNodeIterator(NodeIterator*);
   void detachNodeIterator(NodeIterator*);
   void notifyBeforeNodeRemoval(Node*);
-  AbstractView* defaultView() const;
+  DOMWindow* defaultView() const;
   PassRefPtr<Event> createEvent(const String& eventType, ExceptionCode&);
 
   // keep track of what types of event listeners are registered, so we don't
@@ -678,7 +678,6 @@ class Document : public ContainerNode {
   unsigned short m_namespaceURICount;
 
   DeprecatedPtrList<NodeIterator> m_nodeIterators;
-  RefPtr<AbstractView> m_defaultView;
 
   unsigned short m_listenerTypes;
   RefPtr<StyleSheetList> m_styleSheets;

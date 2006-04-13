@@ -25,7 +25,6 @@
 #include "config.h"
 #include "Document.h"
 
-#include "AbstractView.h"
 #include "AccessibilityObjectCache.h"
 #include "CDATASection.h"
 #include "CSSValueKeywords.h"
@@ -254,7 +253,6 @@ Document::Document(DOMImplementation* impl, FrameView* v)
   m_attrNames = 0;
   m_attrNameAlloc = 0;
   m_attrNameCount = 0;
-  m_defaultView = new AbstractView(this);
   m_listenerTypes = 0;
   m_inDocument = true;
   m_styleSelectorDirty = false;
@@ -2192,8 +2190,11 @@ void Document::notifyBeforeNodeRemoval(Node* n) {
     it.current()->notifyBeforeNodeRemoval(n);
 }
 
-AbstractView* Document::defaultView() const {
-  return m_defaultView.get();
+DOMWindow* Document::defaultView() const {
+  if (!frame())
+    return 0;
+
+  return frame()->domWindow();
 }
 
 PassRefPtr<Event> Document::createEvent(const String& eventType,

@@ -32,6 +32,7 @@
 #include "Image.h"
 #include "IntPoint.h"
 #include "dom2_eventsimpl.h"
+#include "CachedObjectClient.h"
 
 #ifdef __OBJC__
 @class NSImage;
@@ -117,8 +118,5 @@ class ClipboardMac : public Clipboard, public CachedObjectClient {
   FrameMac* m_frame;  // used on the source side to generate dragging images
 };
 }
-
-// FIXME: Remove when everything is in the WebCore namespace.
-using WebCore::ClipboardMac;
 
 #endif

@@ -27,8 +27,10 @@
 
 namespace WebCore {
 class AtomicString;
+class DOMWindow;
 class Frame;
 class FrameView;
+class JSDOMWindow;
 class Node;
 }
 
@@ -98,11 +100,12 @@ class Window : public DOMObject {
   friend class WindowFunc;
   friend class ScheduledAction;
 
- public:
-  Window(WebCore::Frame*);
+ protected:
+  Window(WebCore::DOMWindow*);
 
  public:
   ~Window();
+  WebCore::DOMWindow* impl() const;
   void disconnectFrame();
   /**
    * Returns and registers a window object. In case there's already a Window
@@ -180,7 +183,6 @@ class Window : public DOMObject {
     Crypto,
     DefaultStatus,
     Status,
-    Document_,
     Node,
     EventCtor,
     MutationEventCtor,
@@ -445,5 +447,10 @@ class BarInfo : public DOMObject {
 };
 
 }  // namespace
+
+namespace WebCore {
+KJS::JSValue* toJS(KJS::ExecState*, DOMWindow*);
+DOMWindow* toDOMWindow(KJS::JSValue*);
+}  // namespace WebCore
 
 #endif
