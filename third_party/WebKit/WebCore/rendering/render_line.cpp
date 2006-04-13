@@ -31,6 +31,7 @@
 #include "RenderTableCell.h"
 #include "RenderArena.h"
 #include "RenderInline.h"
+#include "render_list.h"
 #include <assert.h>
 
 namespace WebCore {
@@ -510,7 +511,9 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
                                            needsWordSpacing);
           x += flow->marginRight();
         }
-      } else if (!curr->object()->isCompact()) {
+      } else if (!curr->object()->isCompact() &&
+                 (!curr->object()->isListMarker() ||
+                  static_cast<RenderListMarker*>(curr->object())->isInside())) {
         x += curr->object()->marginLeft();
         curr->setXPos(x);
         leftPosition = kMin(x, leftPosition);

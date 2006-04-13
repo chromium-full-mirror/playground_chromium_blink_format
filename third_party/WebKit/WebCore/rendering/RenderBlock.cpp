@@ -576,6 +576,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   layoutPositionedObjects(relayoutChildren || isRoot());
 
+  positionListMarker();
+
   // Always ensure our overflow width/height are at least as large as our
   // width/height.
   m_overflowWidth = kMax(m_overflowWidth, m_width);
@@ -3194,14 +3196,20 @@ void RenderBlock::calcInlineMinMaxWidth() {
         } else {
           // Inline replaced elts add in their margins to their min/max values.
           int margins = 0;
-          LengthType type = cstyle->marginLeft().type();
-          if (type != Auto)
-            margins += (type == Fixed ? cstyle->marginLeft().value()
-                                      : child->marginLeft());
-          type = cstyle->marginRight().type();
-          if (type != Auto)
-            margins += (type == Fixed ? cstyle->marginRight().value()
-                                      : child->marginRight());
+          Length leftMargin = cstyle->marginLeft();
+          Length rightMargin = cstyle->marginRight();
+          bool useCalculatedWidths = child->isListMarker();
+          if (leftMargin.isPercent() || rightMargin.isPercent() ||
+              useCalculatedWidths)
+            child->calcWidth();
+          if (useCalculatedWidths || leftMargin.isPercent())
+            margins += child->marginLeft();
+          else if (leftMargin.isFixed())
+            margins += leftMargin.value();
+          if (useCalculatedWidths || rightMargin.isPercent())
+            margins += child->marginRight();
+          else if (rightMargin.isFixed())
+            margins += rightMargin.value();
           childMin += margins;
           childMax += margins;
         }

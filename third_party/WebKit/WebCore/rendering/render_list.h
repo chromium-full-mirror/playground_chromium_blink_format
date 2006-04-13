@@ -109,8 +109,7 @@ class RenderListItem : public RenderBlock {
   virtual void layout();
   virtual void calcMinMaxWidth();
 
-  virtual IntRect getAbsoluteRepaintRect();
-
+  virtual void positionListMarker();
   void updateMarkerLocation();
 
   void setNotInList(bool notInList) { _notInList = notInList; }
@@ -119,8 +118,6 @@ class RenderListItem : public RenderBlock {
   DeprecatedString markerStringValue() {
     return m_marker ? m_marker->text() : "";
   }
-
-  virtual bool nodeAtPoint(NodeInfo&, int, int, int, int, HitTestAction);
 
  private:
   int predefVal;

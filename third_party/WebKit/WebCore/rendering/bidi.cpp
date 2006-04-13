@@ -2211,7 +2211,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         lBreak.pos = 0;
       }
 
-      tmpW += o->width() + o->marginLeft() + o->marginRight() + inlineWidth(o);
       if (ignoringSpaces) {
         BidiIterator startMid(0, o, 0);
         addMidpoint(startMid);
@@ -2246,7 +2245,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             addMidpoint(endMid);
           }
         }
-      }
+      } else
+        tmpW +=
+            o->width() + o->marginLeft() + o->marginRight() + inlineWidth(o);
     } else if (o->isText()) {
       RenderText* t = static_cast<RenderText*>(o);
       int strlen = t->stringLength();
