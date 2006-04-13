@@ -33,6 +33,8 @@
 #include "RenderCanvas.h"
 #include "RenderInline.h"
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -407,7 +409,7 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
       }
     }
 
-    int top = kMin(curr->root()->topOverflow(), curr->root()->selectionTop()) -
+    int top = min(curr->root()->topOverflow(), curr->root()->selectionTop()) -
               maximalOutlineSize(info.phase);
     int bottom =
         curr->root()->bottomOverflow() + maximalOutlineSize(info.phase);
@@ -560,7 +562,7 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
     if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
       int lp = c->yPos() + c->lowestPosition(false);
-      bottom = kMax(bottom, lp);
+      bottom = max(bottom, lp);
     }
   }
 
@@ -585,7 +587,7 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
     if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
       int rp = c->xPos() + c->rightmostPosition(false);
-      right = kMax(right, rp);
+      right = max(right, rp);
     }
   }
 
@@ -610,7 +612,7 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
     if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
       int lp = c->xPos() + c->leftmostPosition(false);
-      left = kMin(left, lp);
+      left = min(left, lp);
     }
   }
 
@@ -815,14 +817,14 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
   if (thisline.x() < lastline.x())
     drawBorder(
         p, l - ow, t - ow,
-        kMin(r + ow, (lastline.isEmpty() ? 1000000 : tx + lastline.x())), t,
+        min(r + ow, (lastline.isEmpty() ? 1000000 : tx + lastline.x())), t,
         BSTop, oc, style()->color(), os, ow,
         (!lastline.isEmpty() && tx + lastline.x() + 1 < r + ow) ? -ow : ow,
         true);
 
   if (lastline.right() < thisline.right())
     drawBorder(
-        p, kMax(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
+        p, max(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
         t - ow, r + ow, t, BSTop, oc, style()->color(), os,
         (!lastline.isEmpty() && l - ow < tx + lastline.right()) ? -ow : ow, ow,
         true);
@@ -831,14 +833,14 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
   if (thisline.x() < nextline.x())
     drawBorder(
         p, l - ow, b,
-        kMin(r + ow, !nextline.isEmpty() ? tx + nextline.x() + 1 : 1000000),
+        min(r + ow, !nextline.isEmpty() ? tx + nextline.x() + 1 : 1000000),
         b + ow, BSBottom, oc, style()->color(), os, ow,
         (!nextline.isEmpty() && tx + nextline.x() + 1 < r + ow) ? -ow : ow,
         true);
 
   if (nextline.right() < thisline.right())
     drawBorder(
-        p, kMax(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow),
+        p, max(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow),
         b, r + ow, b + ow, BSBottom, oc, style()->color(), os,
         (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow,
         true);

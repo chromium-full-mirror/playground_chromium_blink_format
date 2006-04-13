@@ -69,6 +69,8 @@
 
 #define MIN_INTERSECT_FOR_REVEAL 32
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace EventNames;
@@ -647,8 +649,8 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
     xOffset = r.x() - xPos();
     yOffset = r.y() - yPos();
     // Adjust offsets if they're outside of the allowable range.
-    xOffset = kMax(0, kMin(scrollWidth() - width(), xOffset));
-    yOffset = kMax(0, kMin(scrollHeight() - height(), yOffset));
+    xOffset = max(0, min(scrollWidth() - width(), xOffset));
+    yOffset = max(0, min(scrollHeight() - height(), yOffset));
 
     if (xOffset != scrollXOffset() || yOffset != scrollYOffset()) {
       int diffX = scrollXOffset();
@@ -674,8 +676,8 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
       xOffset = r.x();
       yOffset = r.y();
       // Adjust offsets if they're outside of the allowable range.
-      xOffset = kMax(0, kMin(view->contentsWidth(), xOffset));
-      yOffset = kMax(0, kMin(view->contentsHeight(), yOffset));
+      xOffset = max(0, min(view->contentsWidth(), xOffset));
+      yOffset = max(0, min(view->contentsHeight(), yOffset));
 
       if (m_object->document() && m_object->document()->ownerElement() &&
           m_object->document()->ownerElement()->renderer()) {
@@ -939,16 +941,16 @@ void RenderLayer::computeScrollDimensions(bool* needHBar, bool* needVBar) {
   int clientHeight = m_object->clientHeight();
 
   m_scrollLeftOverflow =
-      ltr ? 0 : kMin(0, m_object->leftmostPosition(true, false) -
-                            m_object->borderLeft());
+      ltr ? 0 : min(0, m_object->leftmostPosition(true, false) -
+                           m_object->borderLeft());
 
   int rightPos =
       ltr ? m_object->rightmostPosition(true, false) - m_object->borderLeft()
           : clientWidth - m_scrollLeftOverflow;
   int bottomPos = m_object->lowestPosition(true, false) - m_object->borderTop();
 
-  m_scrollWidth = kMax(rightPos, clientWidth);
-  m_scrollHeight = kMax(bottomPos, clientHeight);
+  m_scrollWidth = max(rightPos, clientWidth);
+  m_scrollHeight = max(bottomPos, clientHeight);
 
   m_scrollOriginX = ltr ? 0 : m_scrollWidth - clientWidth;
 
@@ -971,9 +973,9 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     // need
     // to pull our scroll offsets back to the max (or push them up to the min).
     int newX =
-        kMax(0, kMin(scrollXOffset(), scrollWidth() - m_object->clientWidth()));
+        max(0, min(scrollXOffset(), scrollWidth() - m_object->clientWidth()));
     int newY =
-        kMax(0, kMin(m_scrollY, scrollHeight() - m_object->clientHeight()));
+        max(0, min(m_scrollY, scrollHeight() - m_object->clientHeight()));
     if (newX != scrollXOffset() || newY != m_scrollY)
       scrollToOffset(newX, newY);
     // FIXME: At this point a scroll event fired, which could have deleted this
@@ -1561,7 +1563,7 @@ IntRect RenderLayer::absoluteBoundingBox() const {
     int left = firstBox->xPos();
     for (InlineRunBox* curr = firstBox->nextLineBox(); curr;
          curr = curr->nextLineBox())
-      left = kMin(left, curr->xPos());
+      left = min(left, curr->xPos());
     result = IntRect(m_x + left, m_y + (top - renderer()->yPos()), width(),
                      bottom - top);
   } else if (renderer()->isTableRow()) {
@@ -1872,7 +1874,7 @@ int Marquee::marqueeSpeed() const {
   WebCore::Node* elt = m_layer->renderer()->element();
   if (elt && elt->hasTagName(marqueeTag)) {
     HTMLMarqueeElement* marqueeElt = static_cast<HTMLMarqueeElement*>(elt);
-    result = kMax(result, marqueeElt->minimumDelay());
+    result = max(result, marqueeElt->minimumDelay());
   }
   return result;
 }
@@ -1925,14 +1927,14 @@ int Marquee::computePosition(EMarqueeDirection dir, bool stopAtContentEdge) {
     }
     if (dir == MRIGHT) {
       if (stopAtContentEdge)
-        return kMax(0, ltr ? (contentWidth - clientWidth)
-                           : (clientWidth - contentWidth));
+        return max(0, ltr ? (contentWidth - clientWidth)
+                          : (clientWidth - contentWidth));
       else
         return ltr ? contentWidth : clientWidth;
     } else {
       if (stopAtContentEdge)
-        return kMin(0, ltr ? (contentWidth - clientWidth)
-                           : (clientWidth - contentWidth));
+        return min(0, ltr ? (contentWidth - clientWidth)
+                          : (clientWidth - contentWidth));
       else
         return ltr ? -clientWidth : -contentWidth;
     }
@@ -1943,12 +1945,12 @@ int Marquee::computePosition(EMarqueeDirection dir, bool stopAtContentEdge) {
     int clientHeight = m_layer->renderer()->clientHeight();
     if (dir == MUP) {
       if (stopAtContentEdge)
-        return kMin(contentHeight - clientHeight, 0);
+        return min(contentHeight - clientHeight, 0);
       else
         return -clientHeight;
     } else {
       if (stopAtContentEdge)
-        return kMax(contentHeight - clientHeight, 0);
+        return max(contentHeight - clientHeight, 0);
       else
         return contentHeight;
     }
@@ -2120,17 +2122,17 @@ void Marquee::timerFired(Timer<Marquee>*) {
             : (isHorizontal() ? m_layer->renderer()->clientWidth()
                               : m_layer->renderer()->clientHeight());
     int increment =
-        kMax(1, abs(m_layer->renderer()->style()->marqueeIncrement().calcValue(
-                    clientSize)));
+        max(1, abs(m_layer->renderer()->style()->marqueeIncrement().calcValue(
+                   clientSize)));
     int currentPos = isUnfurlMarquee()
                          ? m_unfurlPos
                          : (isHorizontal() ? m_layer->scrollXOffset()
                                            : m_layer->scrollYOffset());
     newPos = currentPos + (addIncrement ? increment : -increment);
     if (positive)
-      newPos = kMin(newPos, endPoint);
+      newPos = min(newPos, endPoint);
     else
-      newPos = kMax(newPos, endPoint);
+      newPos = max(newPos, endPoint);
   }
 
   if (newPos == endPoint) {

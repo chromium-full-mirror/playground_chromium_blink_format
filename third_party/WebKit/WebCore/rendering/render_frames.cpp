@@ -164,7 +164,7 @@ void RenderFrameSet::layout() {
         // Count the total length of all of the fixed columns/rows -> totalFixed
         // Count the number of columns/rows which are fixed -> countFixed
         if (grid[i].isFixed()) {
-          gridLayout[i] = kMax(grid[i].value(), 0);
+          gridLayout[i] = max(grid[i].value(), 0);
           totalFixed += gridLayout[i];
           countFixed++;
         }
@@ -174,7 +174,7 @@ void RenderFrameSet::layout() {
         // Count the number of columns/rows which are percentages ->
         // countPercent
         if (grid[i].isPercent()) {
-          gridLayout[i] = kMax(grid[i].calcValue(availableLen[k]), 0);
+          gridLayout[i] = max(grid[i].calcValue(availableLen[k]), 0);
           totalPercent += gridLayout[i];
           countPercent++;
         }
@@ -183,7 +183,7 @@ void RenderFrameSet::layout() {
         // totalRelative
         // Count the number of columns/rows which are relative -> countRelative
         if (grid[i].isRelative()) {
-          totalRelative += kMax(grid[i].value(), 1);
+          totalRelative += max(grid[i].value(), 1);
           countRelative++;
         }
       }
@@ -236,7 +236,7 @@ void RenderFrameSet::layout() {
         for (int i = 0; i < gridLen; ++i) {
           if (grid[i].isRelative()) {
             gridLayout[i] =
-                (kMax(grid[i].value(), 1) * remainingRelative) / totalRelative;
+                (max(grid[i].value(), 1) * remainingRelative) / totalRelative;
             remainingLen[k] -= gridLayout[i];
             lastRelative = i;
           }

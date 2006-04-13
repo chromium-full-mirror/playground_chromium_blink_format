@@ -46,6 +46,8 @@
 
 #define TOKENIZER_CHUNK_SIZE 4096
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -530,7 +532,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
     scriptCode[scriptCodeSize++] = *src;
 #if defined(TOKEN_DEBUG) && TOKEN_DEBUG > 1
     qDebug("comment is now: *%s*",
-           QConstString((QChar*)src.operator->(), kMin(16U, src.length()))
+           QConstString((QChar*)src.operator->(), min(16U, src.length()))
                .deprecatedString()
                .latin1());
 #endif
@@ -709,7 +711,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
         break;
 
       case Hexadecimal: {
-        int ll = kMin(src.length(), 10 - cBufferPos);
+        int ll = min(src.length(), 10 - cBufferPos);
         while (ll--) {
           QChar csrc(src->lower());
           cc = csrc.cell();
@@ -729,7 +731,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
         break;
       }
       case Decimal: {
-        int ll = kMin(src.length(), 9 - cBufferPos);
+        int ll = min(src.length(), 9 - cBufferPos);
         while (ll--) {
           cc = src->cell();
 
@@ -747,7 +749,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
         break;
       }
       case EntityName: {
-        int ll = kMin(src.length(), 9 - cBufferPos);
+        int ll = min(src.length(), 9 - cBufferPos);
         while (ll--) {
           QChar csrc = *src;
           cc = csrc.cell();
@@ -875,7 +877,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         }
 
         bool finish = false;
-        unsigned int ll = kMin(src.length(), CBUFLEN - cBufferPos);
+        unsigned int ll = min(src.length(), CBUFLEN - cBufferPos);
         while (ll--) {
           unsigned short curchar = src->unicode();
           if (curchar <= ' ' || curchar == '>') {
@@ -950,7 +952,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
 #if defined(TOKEN_DEBUG) && TOKEN_DEBUG > 1
         qDebug("AttributeName");
 #endif
-        int ll = kMin(src.length(), CBUFLEN - cBufferPos);
+        int ll = min(src.length(), CBUFLEN - cBufferPos);
         while (ll--) {
           unsigned short curchar = src->unicode();
           if (curchar <= '>' && (curchar >= '=' || curchar <= ' ')) {
@@ -1704,7 +1706,7 @@ HTMLTokenizer::~HTMLTokenizer() {
 }
 
 void HTMLTokenizer::enlargeBuffer(int len) {
-  int newsize = kMax(size * 2, size + len);
+  int newsize = max(size * 2, size + len);
   int oldoffs = (dest - buffer);
 
   buffer = (QChar*)fastRealloc(buffer, newsize * sizeof(QChar));
@@ -1713,7 +1715,7 @@ void HTMLTokenizer::enlargeBuffer(int len) {
 }
 
 void HTMLTokenizer::enlargeScriptBuffer(int len) {
-  int newsize = kMax(scriptCodeMaxSize * 2, scriptCodeMaxSize + len);
+  int newsize = max(scriptCodeMaxSize * 2, scriptCodeMaxSize + len);
   scriptCode = (QChar*)fastRealloc(scriptCode, newsize * sizeof(QChar));
   scriptCodeMaxSize = newsize;
 }

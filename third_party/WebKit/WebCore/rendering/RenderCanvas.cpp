@@ -117,8 +117,8 @@ void RenderCanvas::layout() {
   // docsize changed.
   layoutPositionedObjects(true);
 
-  layer()->setHeight(kMax(doch, m_height));
-  layer()->setWidth(kMax(docw, m_width));
+  layer()->setHeight(max(doch, m_height));
+  layer()->setWidth(max(docw, m_width));
 
   setNeedsLayout(false);
 }

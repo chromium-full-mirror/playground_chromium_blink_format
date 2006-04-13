@@ -32,6 +32,8 @@
 #include "RenderCanvas.h"
 #include "html_listimpl.h"
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -310,7 +312,7 @@ void RenderListItem::positionListMarker() {
       m_marker->inlineBoxWrapper()->adjustPosition(markerXPos - markerOldX, 0);
       if (markerXPos < root->leftOverflow()) {
         root->setHorizontalOverflowPositions(markerXPos, root->rightOverflow());
-        m_overflowLeft = kMin(markerXPos, m_overflowLeft);
+        m_overflowLeft = min(markerXPos, m_overflowLeft);
       }
     } else {
       int rightLineOffset = rightRelOffset(yOffset, rightOffset(yOffset));
@@ -320,7 +322,7 @@ void RenderListItem::positionListMarker() {
       if (markerXPos + m_marker->width() > root->rightOverflow()) {
         root->setHorizontalOverflowPositions(root->leftOverflow(),
                                              markerXPos + m_marker->width());
-        m_overflowWidth = kMax(markerXPos + m_marker->width(), m_overflowLeft);
+        m_overflowWidth = max(markerXPos + m_marker->width(), m_overflowLeft);
       }
     }
   }

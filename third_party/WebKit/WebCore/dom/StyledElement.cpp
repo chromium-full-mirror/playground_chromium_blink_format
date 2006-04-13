@@ -31,6 +31,8 @@
 #include "HTMLNames.h"
 #include "css_stylesheetimpl.h"
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -385,7 +387,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
           colors[component] = (colors[component] << 4);
           if (hex > 0) {
             colors[component] += hex;
-            maxDigit = kMin(maxDigit, numDigits);
+            maxDigit = min(maxDigit, numDigits);
           }
           numDigits++;
           pos++;

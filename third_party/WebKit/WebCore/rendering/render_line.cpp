@@ -34,6 +34,8 @@
 #include "render_list.h"
 #include <assert.h>
 
+using namespace std;
+
 namespace WebCore {
 
 #ifndef NDEBUG
@@ -459,7 +461,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
                                           bool& needsWordSpacing) {
   // Set our x position.
   setXPos(x);
-  leftPosition = kMin(x, leftPosition);
+  leftPosition = min(x, leftPosition);
 
   int startX = x;
   x += borderLeft() + paddingLeft();
@@ -478,13 +480,13 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       int shadowRight = 0;
       for (ShadowData* shadow = rt->style()->textShadow(); shadow;
            shadow = shadow->next) {
-        shadowLeft = kMin(shadowLeft, shadow->x - shadow->blur);
-        shadowRight = kMax(shadowRight, shadow->x + shadow->blur);
+        shadowLeft = min(shadowLeft, shadow->x - shadow->blur);
+        shadowRight = max(shadowRight, shadow->x + shadow->blur);
       }
-      leftPosition = kMin(x + shadowLeft, leftPosition);
-      rightPosition = kMax(x + text->width() + shadowRight, rightPosition);
+      leftPosition = min(x + shadowLeft, leftPosition);
+      rightPosition = max(x + text->width() + shadowRight, rightPosition);
       m_maxHorizontalShadow =
-          kMax(kMax(shadowRight, -shadowLeft), m_maxHorizontalShadow);
+          max(max(shadowRight, -shadowLeft), m_maxHorizontalShadow);
       x += text->width();
     } else {
       if (curr->object()->isPositioned()) {
@@ -516,8 +518,8 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
                   static_cast<RenderListMarker*>(curr->object())->isInside())) {
         x += curr->object()->marginLeft();
         curr->setXPos(x);
-        leftPosition = kMin(x, leftPosition);
-        rightPosition = kMax(x + curr->width(), rightPosition);
+        leftPosition = min(x, leftPosition);
+        rightPosition = max(x + curr->width(), rightPosition);
         x += curr->width() + curr->object()->marginRight();
       }
     }
@@ -525,7 +527,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
 
   x += borderRight() + paddingRight();
   setWidth(x - startX);
-  rightPosition = kMax(xPos() + width(), rightPosition);
+  rightPosition = max(xPos() + width(), rightPosition);
 
   return x;
 }
@@ -547,7 +549,7 @@ void InlineFlowBox::verticallyAlignBoxes(int& heightOfBlock) {
   computeLogicalBoxHeights(maxPositionTop, maxPositionBottom, maxAscent,
                            maxDescent, strictMode);
 
-  if (maxAscent + maxDescent < kMax(maxPositionTop, maxPositionBottom))
+  if (maxAscent + maxDescent < max(maxPositionTop, maxPositionBottom))
     adjustMaxAscentAndDescent(maxAscent, maxDescent, maxPositionTop,
                               maxPositionBottom);
 
@@ -588,7 +590,7 @@ void InlineFlowBox::adjustMaxAscentAndDescent(int& maxAscent,
           maxAscent = curr->height() - maxDescent;
       }
 
-      if (maxAscent + maxDescent >= kMax(maxPositionTop, maxPositionBottom))
+      if (maxAscent + maxDescent >= max(maxPositionTop, maxPositionBottom))
         break;
     }
 
@@ -696,8 +698,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
       newHeight = newBaseline + font.descent();
       for (ShadowData* shadow = curr->object()->style()->textShadow(); shadow;
            shadow = shadow->next) {
-        overflowTop = kMin(overflowTop, shadow->y - shadow->blur);
-        overflowBottom = kMax(overflowBottom, shadow->y + shadow->blur);
+        overflowTop = min(overflowTop, shadow->y - shadow->blur);
+        overflowBottom = max(overflowBottom, shadow->y + shadow->blur);
       }
       if (curr->isInlineFlowBox()) {
         newHeight +=
@@ -720,10 +722,10 @@ void InlineFlowBox::placeBoxesVertically(int y,
     curr->setBaseline(newBaseline);
 
     if (childAffectsTopBottomPos) {
-      selectionTop = kMin(selectionTop, newY);
-      selectionBottom = kMax(selectionBottom, newY + newHeight);
-      topPosition = kMin(topPosition, newY + overflowTop);
-      bottomPosition = kMax(bottomPosition, newY + newHeight + overflowBottom);
+      selectionTop = min(selectionTop, newY);
+      selectionBottom = max(selectionBottom, newY + newHeight);
+      topPosition = min(topPosition, newY + overflowTop);
+      bottomPosition = max(bottomPosition, newY + newHeight + overflowBottom);
     }
   }
 
@@ -733,8 +735,8 @@ void InlineFlowBox::placeBoxesVertically(int y,
     setYPos(yPos() + baseline() - font.ascent());
     setBaseline(font.ascent());
     if (hasTextChildren() || strictMode) {
-      selectionTop = kMin(selectionTop, yPos());
-      selectionBottom = kMax(selectionBottom, yPos() + height());
+      selectionTop = min(selectionTop, yPos());
+      selectionBottom = max(selectionBottom, yPos() + height());
     }
   }
 }
@@ -902,12 +904,12 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
   int w = width();
   int h = height();
 
-  int my = kMax(_ty, i.r.y());
+  int my = max(_ty, i.r.y());
   int mh;
   if (_ty < i.r.y())
-    mh = kMax(0, h - (i.r.y() - _ty));
+    mh = max(0, h - (i.r.y() - _ty));
   else
-    mh = kMin(i.r.height(), h);
+    mh = min(i.r.height(), h);
 
   GraphicsContext* p = i.p;
 

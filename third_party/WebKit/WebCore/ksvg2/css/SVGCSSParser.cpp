@@ -33,6 +33,8 @@
 #include "ksvgcssproperties.c"
 #include "ksvgcssvalues.c"
 
+using namespace std;
+
 namespace WebCore {
 
 typedef Value KDOMCSSValue;
@@ -390,9 +392,9 @@ CSSValue* CSSParser::parseSVGPaint() {
     int b = (int)(v->fValue * (v->unit == CSSPrimitiveValue::CSS_PERCENTAGE
                                    ? 256. / 100.
                                    : 1.));
-    r = kMax(0, kMin(255, r));
-    g = kMax(0, kMin(255, g));
-    b = kMax(0, kMin(255, b));
+    r = max(0, min(255, r));
+    g = max(0, min(255, g));
+    b = max(0, min(255, b));
 
     return new SVGPaint(SVG_PAINTTYPE_RGBCOLOR, 0,
                         String::sprintf("rgb(%d, %d, %d)", r, g, b).impl());
@@ -442,9 +444,9 @@ CSSValue* CSSParser::parseSVGColor() {
     int b = (int)(v->fValue * (v->unit == CSSPrimitiveValue::CSS_PERCENTAGE
                                    ? 256. / 100.
                                    : 1.));
-    r = kMax(0, kMin(255, r));
-    g = kMax(0, kMin(255, g));
-    b = kMax(0, kMin(255, b));
+    r = max(0, min(255, r));
+    g = max(0, min(255, g));
+    b = max(0, min(255, b));
 
     return new SVGColor(String::sprintf("rgb(%d, %d, %d)", r, g, b).impl());
   } else

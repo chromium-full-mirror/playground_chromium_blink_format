@@ -39,6 +39,8 @@
 #include "css_stylesheetimpl.h"
 #include "loader.h"
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -3735,9 +3737,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
         return;  // Error case.
       // Clamp opacity to the range 0-1
-      style->setOpacity(
-          kMin(1.0, kMax(0.0, primitiveValue->getFloatValue(
-                                  CSSPrimitiveValue::CSS_NUMBER))));
+      style->setOpacity(min(1.0, max(0.0, primitiveValue->getFloatValue(
+                                              CSSPrimitiveValue::CSS_NUMBER))));
       return;
     case CSS_PROP__KHTML_BOX_ALIGN:
       HANDLE_INHERIT_AND_INITIAL(boxAlign, BoxAlign)
@@ -4393,7 +4394,7 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
       (specifiedSize >= minLogicalSize || !isAbsoluteSize))
     zoomedSize = minLogicalSize;
 
-  return kMax(zoomedSize, 1.0f);
+  return max(zoomedSize, 1.0f);
 }
 
 const int fontSizeTableMax = 16;
@@ -4453,9 +4454,9 @@ float CSSStyleSelector::fontSizeForKeyword(int keyword, bool quirksMode) const {
   }
 
   // Value is outside the range of the table. Apply the scale factor instead.
-  float minLogicalSize = kMax(settings->minLogicalFontSize(), 1);
-  return kMax(fontSizeFactors[keyword - CSS_VAL_XX_SMALL] * mediumSize,
-              minLogicalSize);
+  float minLogicalSize = max(settings->minLogicalFontSize(), 1);
+  return max(fontSizeFactors[keyword - CSS_VAL_XX_SMALL] * mediumSize,
+             minLogicalSize);
 }
 
 float CSSStyleSelector::largerFontSize(float size, bool quirksMode) const {

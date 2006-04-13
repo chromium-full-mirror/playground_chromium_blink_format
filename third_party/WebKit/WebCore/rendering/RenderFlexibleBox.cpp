@@ -25,7 +25,7 @@
 #include "config.h"
 #include "RenderFlexibleBox.h"
 
-using namespace WebCore;
+using namespace std;
 
 namespace WebCore {
 
@@ -218,17 +218,17 @@ void RenderFlexibleBox::calcMinMaxWidth() {
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
     m_maxWidth =
-        kMax(m_maxWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_maxWidth, calcContentBoxWidth(style()->minWidth().value()));
     m_minWidth =
-        kMax(m_minWidth, calcContentBoxWidth(style()->minWidth().value()));
+        max(m_minWidth, calcContentBoxWidth(style()->minWidth().value()));
   }
 
   if (style()->maxWidth().isFixed() &&
       style()->maxWidth().value() != undefinedLength) {
     m_maxWidth =
-        kMin(m_maxWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_maxWidth, calcContentBoxWidth(style()->maxWidth().value()));
     m_minWidth =
-        kMin(m_minWidth, calcContentBoxWidth(style()->maxWidth().value()));
+        min(m_minWidth, calcContentBoxWidth(style()->maxWidth().value()));
   }
 
   int toAdd = borderLeft() + borderRight() + paddingLeft() + paddingRight();
@@ -422,16 +422,16 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
             ascent;
 
         // Update our maximum ascent.
-        maxAscent = kMax(maxAscent, ascent);
+        maxAscent = max(maxAscent, ascent);
 
         // Update our maximum descent.
-        maxDescent = kMax(maxDescent, descent);
+        maxDescent = max(maxDescent, descent);
 
         // Now update our height.
-        m_height = kMax(yPos + maxAscent + maxDescent, m_height);
+        m_height = max(yPos + maxAscent + maxDescent, m_height);
       } else
-        m_height = kMax(m_height, yPos + child->marginTop() + child->height() +
-                                      child->marginBottom());
+        m_height = max(m_height, yPos + child->marginTop() + child->height() +
+                                     child->marginBottom());
 
       child = iterator.next();
     }
@@ -491,9 +491,9 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
         case BCENTER:
           childY +=
               child->marginTop() +
-              kMax(0, (contentHeight() - (child->height() + child->marginTop() +
-                                          child->marginBottom())) /
-                          2);
+              max(0, (contentHeight() - (child->height() + child->marginTop() +
+                                         child->marginBottom())) /
+                         2);
           break;
         case BBASELINE: {
           int ascent = child->marginTop() + child->getBaselineOfFirstLineBox();
@@ -513,9 +513,9 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
 
       placeChild(child, xPos, childY);
       m_overflowHeight =
-          kMax(m_overflowHeight, childY + child->overflowHeight(false));
+          max(m_overflowHeight, childY + child->overflowHeight(false));
       m_overflowTop =
-          kMin(m_overflowTop, child->yPos() + child->overflowTop(false));
+          min(m_overflowTop, child->yPos() + child->overflowTop(false));
 
       xPos += child->width() + child->marginRight();
 
@@ -571,8 +571,8 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
                       : (int)(allowedFlex *
                               (totalFlex / child->style()->boxFlex()));
               spaceAvailableThisPass =
-                  expanding ? kMin(spaceAvailableThisPass, projectedFlex)
-                            : kMax(spaceAvailableThisPass, projectedFlex);
+                  expanding ? min(spaceAvailableThisPass, projectedFlex)
+                            : max(spaceAvailableThisPass, projectedFlex);
             }
             child = iterator.next();
           }
@@ -684,15 +684,15 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
 
   if (child) {
     m_overflowLeft =
-        kMin(child->xPos() + child->overflowLeft(false), m_overflowLeft);
+        min(child->xPos() + child->overflowLeft(false), m_overflowLeft);
 
     RenderObject* lastChild = child;
     while ((child = iterator.next())) {
       if (!child->isPositioned())
         lastChild = child;
     }
-    m_overflowWidth = kMax(lastChild->xPos() + lastChild->overflowWidth(false),
-                           m_overflowWidth);
+    m_overflowWidth = max(lastChild->xPos() + lastChild->overflowWidth(false),
+                          m_overflowWidth);
   }
 
   // So that the calcHeight in layoutBlock() knows to relayout positioned
@@ -765,7 +765,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         child->layoutIfNeeded();
         if (child->style()->height().isAuto() && child->isBlockFlow())
           maxLineCount =
-              kMax(maxLineCount, static_cast<RenderBlock*>(child)->lineCount());
+              max(maxLineCount, static_cast<RenderBlock*>(child)->lineCount());
       }
       child = iterator.next();
     }
@@ -903,9 +903,9 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         case BBASELINE:  // Baseline just maps to center for vertical boxes
           childX +=
               child->marginLeft() +
-              kMax(0, (contentWidth() - (child->width() + child->marginLeft() +
-                                         child->marginRight())) /
-                          2);
+              max(0, (contentWidth() - (child->width() + child->marginLeft() +
+                                        child->marginRight())) /
+                         2);
           break;
         case BEND:
           if (style()->direction() == RTL)
@@ -927,9 +927,9 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
 
       // See if this child has made our overflow need to grow.
       m_overflowWidth =
-          kMax(child->xPos() + child->overflowWidth(false), m_overflowWidth);
+          max(child->xPos() + child->overflowWidth(false), m_overflowWidth);
       m_overflowLeft =
-          kMin(child->xPos() + child->overflowLeft(false), m_overflowLeft);
+          min(child->xPos() + child->overflowLeft(false), m_overflowLeft);
 
       child = iterator.next();
     }
@@ -1003,8 +1003,8 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
                       : (int)(allowedFlex *
                               (totalFlex / child->style()->boxFlex()));
               spaceAvailableThisPass =
-                  expanding ? kMin(spaceAvailableThisPass, projectedFlex)
-                            : kMax(spaceAvailableThisPass, projectedFlex);
+                  expanding ? min(spaceAvailableThisPass, projectedFlex)
+                            : max(spaceAvailableThisPass, projectedFlex);
             }
             child = iterator.next();
           }
@@ -1111,15 +1111,15 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
 
   if (child) {
     m_overflowTop =
-        kMin(child->yPos() + child->overflowTop(false), m_overflowTop);
+        min(child->yPos() + child->overflowTop(false), m_overflowTop);
 
     RenderObject* lastChild = child;
     while ((child = iterator.next())) {
       if (!child->isPositioned())
         lastChild = child;
     }
-    m_overflowHeight = kMax(
-        lastChild->yPos() + lastChild->overflowHeight(false), m_overflowHeight);
+    m_overflowHeight = max(lastChild->yPos() + lastChild->overflowHeight(false),
+                           m_overflowHeight);
   }
 
   // So that the calcHeight in layoutBlock() knows to relayout positioned
@@ -1169,7 +1169,7 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
         maxW = child->minWidth();
       if (maxW == INT_MAX)
         return maxW;
-      return kMax(0, maxW - w);
+      return max(0, maxW - w);
     } else {
       // FIXME: For now just handle fixed values.
       int maxH = INT_MAX;
@@ -1181,7 +1181,7 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
         maxH = child->style()->maxHeight().value();
       if (maxH == INT_MAX)
         return maxH;
-      return kMax(0, maxH - h);
+      return max(0, maxH - h);
     }
   }
 
@@ -1196,13 +1196,13 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
     else if (child->style()->minWidth().type() == MinIntrinsic)
       minW = child->minWidth();
 
-    int allowedShrinkage = kMin(0, minW - w);
+    int allowedShrinkage = min(0, minW - w);
     return allowedShrinkage;
   } else {
     if (child->style()->minHeight().isFixed()) {
       int minH = child->style()->minHeight().value();
       int h = child->contentHeight();
-      int allowedShrinkage = kMin(0, minH - h);
+      int allowedShrinkage = min(0, minH - h);
       return allowedShrinkage;
     }
   }

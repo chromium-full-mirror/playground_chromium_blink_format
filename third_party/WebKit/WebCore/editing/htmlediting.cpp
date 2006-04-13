@@ -36,6 +36,8 @@
 #include "RenderObject.h"
 #include "RegularExpression.h"
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -92,7 +94,7 @@ Position rangeCompliantEquivalent(const Position& pos) {
   }
 
   if (node->offsetInCharacters())
-    return Position(node, kMin(node->maxOffset(), pos.offset()));
+    return Position(node, min(node->maxOffset(), pos.offset()));
 
   int maxCompliantOffset = node->childNodeCount();
   if (pos.offset() > maxCompliantOffset) {
