@@ -40,12 +40,6 @@ StreamingTextDecoder::StreamingTextDecoder(const TextEncoding& encoding)
       m_numBufferedBytes(0),
       m_converterICU(0) {}
 
-DeprecatedString StreamingTextDecoder::convertLatin1(const unsigned char* s,
-                                                     int length) {
-  ASSERT(m_numBufferedBytes == 0);
-  return DeprecatedString(reinterpret_cast<const char*>(s), length);
-}
-
 static const UChar replacementCharacter = 0xFFFD;
 static const UChar BOM = 0xFEFF;
 static const int ConversionBufferSize = 16384;
@@ -236,10 +230,6 @@ DeprecatedString StreamingTextDecoder::convert(const unsigned char* chs,
   //#define PARTIAL_CHARACTER_HANDLING_TEST_CHUNK_SIZE 1000
 
   switch (m_encoding.encodingID()) {
-    case Latin1Encoding:
-    case WinLatin1Encoding:
-      return convertLatin1(chs, len);
-
     case UTF16Encoding:
       return convertUTF16(chs, len);
 
