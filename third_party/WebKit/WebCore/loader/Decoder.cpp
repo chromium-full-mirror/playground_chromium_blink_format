@@ -25,7 +25,7 @@
 
 #include "HTMLNames.h"
 #include "StreamingTextDecoder.h"
-#include <qregexp.h>
+#include "RegularExpression.h"
 
 using namespace WebCore;
 using namespace HTMLNames;

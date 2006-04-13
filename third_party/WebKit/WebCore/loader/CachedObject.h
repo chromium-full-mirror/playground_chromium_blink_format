@@ -29,7 +29,7 @@
 #define KHTML_CachedObject_h
 
 #include "PlatformString.h"
-#include <kio/global.h>
+#include "KWQKIOGlobal.h"
 #include <kxmlcore/HashSet.h>
 #include <time.h>
 

@@ -27,7 +27,7 @@
 #include "config.h"
 #if SVG_SUPPORT
 
-#include <qtextstream.h>
+#include "KWQTextStream.h"
 
 #include "KCanvasPath.h"
 #include "KCanvasTreeDebug.h"

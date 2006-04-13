@@ -582,7 +582,6 @@ void Frame::begin(const KURL& url) {
   d->m_doc->setBaseURL(baseurl.url());
   if (d->m_decoder)
     d->m_doc->setDecoder(d->m_decoder.get());
-  d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationEnabled);
 
   updatePolicyBaseURL();
 
@@ -695,15 +694,6 @@ void Frame::stop() {
     // subframe is the
     // last one to complete.
     checkCompleted();
-}
-
-void Frame::stopAnimations() {
-  if (d->m_doc)
-    d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationDisabled);
-
-  for (Frame* child = tree()->firstChild(); child;
-       child = child->tree()->nextSibling())
-    child->stopAnimations();
 }
 
 void Frame::gotoAnchor() {
@@ -1592,8 +1582,6 @@ String Frame::lastModified() const {
 
 void Frame::reparseConfiguration() {
   setAutoloadImages(d->m_settings->autoLoadImages());
-  if (d->m_doc)
-    d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationEnabled);
 
   d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled();
   d->m_bJavaEnabled = d->m_settings->isJavaEnabled();

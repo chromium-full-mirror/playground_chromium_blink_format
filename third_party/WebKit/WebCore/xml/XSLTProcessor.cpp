@@ -206,9 +206,6 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
       transformTextStringToXHTMLDocumentString(documentSource);
   }
 
-  result->docLoader()->setShowAnimations(
-      ownerDocument->docLoader()->showAnimations());
-
   // Before parsing, we need to save & detach the old document and get the new
   // document
   // in place. We have to do this only if we're rendering the result document.

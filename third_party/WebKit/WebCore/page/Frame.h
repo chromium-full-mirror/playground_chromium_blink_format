@@ -31,14 +31,14 @@
 #include "BrowserExtension.h"
 #include "Color.h"
 #include "DeprecatedStringList.h"
-#include "FrameView.h"
-#include "Node.h"
-#include "TransferJobClient.h"
 #include "EditAction.h"
+#include "FrameView.h"
+#include "KWQScrollBar.h"
+#include "Node.h"
 #include "TextAffinity.h"
 #include "TextGranularity.h"
+#include "TransferJobClient.h"
 #include <kxmlcore/Vector.h>
-#include <qscrollbar.h>
 
 class KHTMLSettings;
 
@@ -625,11 +625,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual void redirectionTimerFired(Timer<Frame>*);
 
  public:
-  /**
-   * Stops all animated images on the current and child pages
-   */
-  void stopAnimations();
-
   void loadDone();
 
   void finishedParsing();

@@ -28,10 +28,10 @@
 #ifndef KHTML_DocLoader_h
 #define KHTML_DocLoader_h
 
-#include <khtml_settings.h>
-#include <kio/global.h>
-#include <qptrlist.h>
-#include <DeprecatedStringList.h>
+#include "KWQKHTMLSettings.h"
+#include "KWQKIOGlobal.h"
+#include "DeprecatedPtrList.h"
+#include "DeprecatedStringList.h"
 
 class KURL;
 class KWQLoader;
@@ -68,9 +68,6 @@ class DocLoader {
 
   bool autoloadImages() const { return m_bautoloadImages; }
   KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
-  KHTMLSettings::KAnimationAdvice showAnimations() const {
-    return static_cast<KHTMLSettings::KAnimationAdvice>(m_showAnimations);
-  }
   time_t expireDate() const { return m_expireDate; }
   Frame* frame() const { return m_frame; }
   WebCore::Document* doc() const { return m_doc; }
@@ -78,7 +75,6 @@ class DocLoader {
   void setExpireDate(time_t);
   void setAutoloadImages(bool);
   void setCachePolicy(KIO::CacheControl cachePolicy);
-  void setShowAnimations(KHTMLSettings::KAnimationAdvice);
   void removeCachedObject(CachedObject*) const;
 
   void setLoadInProgress(bool);
@@ -95,7 +91,6 @@ class DocLoader {
   time_t m_expireDate;
   KIO::CacheControl m_cachePolicy;
   bool m_bautoloadImages : 1;
-  unsigned m_showAnimations : 2;  // KHTMLSettings::KAnimationAdvice
   Frame* m_frame;
   WebCore::Document* m_doc;
   bool m_loadInProgress;
