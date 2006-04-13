@@ -287,11 +287,17 @@ VisiblePosition SelectionController::modifyExtendingRightForward(
       else
         pos = nextWordPosition(pos);
       break;
-    case ParagraphGranularity:
-      pos = nextParagraphPosition(pos, xPosForVerticalArrowNavigation(EXTENT));
+    case SentenceGranularity:
+      pos = nextSentencePosition(pos);
       break;
     case LineGranularity:
       pos = nextLinePosition(pos, xPosForVerticalArrowNavigation(EXTENT));
+      break;
+    case ParagraphGranularity:
+      pos = nextParagraphPosition(pos, xPosForVerticalArrowNavigation(EXTENT));
+      break;
+    case SentenceBoundary:
+      pos = endOfSentence(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
     case LineBoundary:
       pos = endOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
@@ -320,10 +326,9 @@ VisiblePosition SelectionController::modifyMovingRightForward(
     case WordGranularity:
       pos = nextWordPosition(VisiblePosition(m_sel.extent(), m_sel.affinity()));
       break;
-    case ParagraphGranularity:
-      pos =
-          nextParagraphPosition(VisiblePosition(m_sel.end(), m_sel.affinity()),
-                                xPosForVerticalArrowNavigation(END, isRange()));
+    case SentenceGranularity:
+      pos = nextSentencePosition(
+          VisiblePosition(m_sel.extent(), m_sel.affinity()));
       break;
     case LineGranularity: {
       // down-arrowing from a range selection that ends at the start of a line
@@ -336,6 +341,14 @@ VisiblePosition SelectionController::modifyMovingRightForward(
                                xPosForVerticalArrowNavigation(END, isRange()));
       break;
     }
+    case ParagraphGranularity:
+      pos =
+          nextParagraphPosition(VisiblePosition(m_sel.end(), m_sel.affinity()),
+                                xPosForVerticalArrowNavigation(END, isRange()));
+      break;
+    case SentenceBoundary:
+      pos = endOfSentence(VisiblePosition(m_sel.end(), m_sel.affinity()));
+      break;
     case LineBoundary:
       pos = endOfLine(VisiblePosition(m_sel.end(), m_sel.affinity()));
       break;
@@ -377,12 +390,18 @@ VisiblePosition SelectionController::modifyExtendingLeftBackward(
       else
         pos = previousWordPosition(pos);
       break;
+    case SentenceGranularity:
+      pos = previousSentencePosition(pos);
+      break;
+    case LineGranularity:
+      pos = previousLinePosition(pos, xPosForVerticalArrowNavigation(EXTENT));
+      break;
     case ParagraphGranularity:
       pos = previousParagraphPosition(pos,
                                       xPosForVerticalArrowNavigation(EXTENT));
       break;
-    case LineGranularity:
-      pos = previousLinePosition(pos, xPosForVerticalArrowNavigation(EXTENT));
+    case SentenceBoundary:
+      pos = startOfSentence(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case LineBoundary:
       pos = startOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
@@ -411,15 +430,22 @@ VisiblePosition SelectionController::modifyMovingLeftBackward(
       pos = previousWordPosition(
           VisiblePosition(m_sel.extent(), m_sel.affinity()));
       break;
-    case ParagraphGranularity:
-      pos = previousParagraphPosition(
-          VisiblePosition(m_sel.start(), m_sel.affinity()),
-          xPosForVerticalArrowNavigation(START, isRange()));
+    case SentenceGranularity:
+      pos = previousSentencePosition(
+          VisiblePosition(m_sel.extent(), m_sel.affinity()));
       break;
     case LineGranularity:
       pos = previousLinePosition(
           VisiblePosition(m_sel.start(), m_sel.affinity()),
           xPosForVerticalArrowNavigation(START, isRange()));
+      break;
+    case ParagraphGranularity:
+      pos = previousParagraphPosition(
+          VisiblePosition(m_sel.start(), m_sel.affinity()),
+          xPosForVerticalArrowNavigation(START, isRange()));
+      break;
+    case SentenceBoundary:
+      pos = startOfSentence(VisiblePosition(m_sel.start(), m_sel.affinity()));
       break;
     case LineBoundary:
       pos = startOfLine(VisiblePosition(m_sel.start(), m_sel.affinity()));
@@ -465,6 +491,8 @@ bool SelectionController::modify(const String& alterString,
     granularity = CharacterGranularity;
   else if (granularityStringLower == "word")
     granularity = WordGranularity;
+  else if (granularityStringLower == "sentence")
+    granularity = SentenceGranularity;
   else if (granularityStringLower == "line")
     granularity = LineGranularity;
   else if (granularityStringLower == "paragraph")

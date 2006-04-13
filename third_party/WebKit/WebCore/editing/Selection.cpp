@@ -249,6 +249,13 @@ void Selection::validate() {
       m_end = endOfWord(end, side).deepEquivalent();
       break;
     }
+    case SentenceGranularity: {
+      m_start = startOfSentence(VisiblePosition(m_start, m_affinity))
+                    .deepEquivalent();
+      m_end =
+          endOfSentence(VisiblePosition(m_end, m_affinity)).deepEquivalent();
+      break;
+    }
     case LineGranularity: {
       m_start =
           startOfLine(VisiblePosition(m_start, m_affinity)).deepEquivalent();
@@ -299,6 +306,12 @@ void Selection::validate() {
                     .deepEquivalent();
       m_end =
           endOfParagraph(VisiblePosition(m_end, m_affinity)).deepEquivalent();
+      break;
+    case SentenceBoundary:
+      m_start = startOfSentence(VisiblePosition(m_start, m_affinity))
+                    .deepEquivalent();
+      m_end =
+          endOfSentence(VisiblePosition(m_end, m_affinity)).deepEquivalent();
       break;
   }
 

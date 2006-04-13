@@ -526,7 +526,7 @@ static unsigned previousSentencePositionBoundary(const QChar* characters,
   return findNextSentenceFromIndex(characters, length, length, false);
 }
 
-VisiblePosition previousSentencePosition(const VisiblePosition& c, int x) {
+VisiblePosition previousSentencePosition(const VisiblePosition& c) {
   return previousBoundary(c, previousSentencePositionBoundary);
 }
 
@@ -535,7 +535,7 @@ static unsigned nextSentencePositionBoundary(const QChar* characters,
   return findNextSentenceFromIndex(characters, length, 0, true);
 }
 
-VisiblePosition nextSentencePosition(const VisiblePosition& c, int x) {
+VisiblePosition nextSentencePosition(const VisiblePosition& c) {
   return nextBoundary(c, nextSentencePositionBoundary);
 }
 
