@@ -21,46 +21,30 @@
  *
  */
 
-#ifndef render_applet_h
-#define render_applet_h
+#ifndef RenderApplet_h
+#define RenderApplet_h
 
-#include "HTMLElement.h"
 #include "StringHash.h"
 #include "render_replaced.h"
 
 namespace WebCore {
 
+class HTMLAppletElement;
+
 class RenderApplet : public RenderWidget {
  public:
-  RenderApplet(HTMLElement*, const HashMap<String, String>& args);
+  RenderApplet(HTMLAppletElement*, const HashMap<String, String>& args);
   virtual ~RenderApplet();
-
   virtual const char* renderName() const { return "RenderApplet"; }
+  virtual bool isApplet() const { return true; }
+  virtual void layout();
+  virtual int intrinsicWidth() const;
+  virtual int intrinsicHeight() const;
 
   void createWidgetIfNecessary();
 
-  virtual void layout();
-  virtual int intrinsicWidth() const;
-  virtual int intrinsicHeight() const;
-  virtual bool isApplet() const { return true; }
-
-  HTMLElement* element() const {
-    return static_cast<HTMLElement*>(RenderObject::element());
-  }
-
  private:
   HashMap<String, String> m_args;
-};
-
-class RenderEmptyApplet : public RenderWidget {
- public:
-  RenderEmptyApplet(Node*);
-
-  virtual const char* renderName() const { return "RenderEmptyApplet"; }
-
-  virtual int intrinsicWidth() const;
-  virtual int intrinsicHeight() const;
-  virtual void layout();
 };
 }
 
