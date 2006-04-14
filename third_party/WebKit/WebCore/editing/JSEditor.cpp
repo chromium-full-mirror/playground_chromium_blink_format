@@ -232,7 +232,7 @@ bool execFontSize(Frame* frame, bool userInterface, const String& value) {
 }
 
 bool execFontSizeDelta(Frame* frame, bool userInterface, const String& value) {
-  return execStyleChange(frame, CSS_PROP__KHTML_FONT_SIZE_DELTA, value);
+  return execStyleChange(frame, CSS_PROP__WEBKIT_FONT_SIZE_DELTA, value);
 }
 
 bool execForeColor(Frame* frame, bool userInterface, const String& value) {
@@ -375,8 +375,8 @@ bool execSelectAll(Frame* frame, bool userInterface, const String& value) {
 
 bool execStrikethrough(Frame* frame, bool userInterface, const String& value) {
   bool isStrikethrough = selectionStartHasStyle(
-      frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "line-through");
-  return execStyleChange(frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
+      frame, CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT, "line-through");
+  return execStyleChange(frame, CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT,
                          isStrikethrough ? "none" : "line-through");
 }
 
@@ -395,8 +395,8 @@ bool execTranspose(Frame* frame, bool userInterface, const String& value) {
 
 bool execUnderline(Frame* frame, bool userInterface, const String& value) {
   bool isUnderlined = selectionStartHasStyle(
-      frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "underline");
-  return execStyleChange(frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
+      frame, CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT, "underline");
+  return execStyleChange(frame, CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT,
                          isUnderlined ? "none" : "underline");
 }
 
@@ -545,7 +545,7 @@ String valueFontSize(Frame* frame) {
 }
 
 String valueFontSizeDelta(Frame* frame) {
-  return valueStyle(frame, CSS_PROP__KHTML_FONT_SIZE_DELTA);
+  return valueStyle(frame, CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
 }
 
 String valueForeColor(Frame* frame) {

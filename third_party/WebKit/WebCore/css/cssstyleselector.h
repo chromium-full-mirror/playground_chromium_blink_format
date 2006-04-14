@@ -117,7 +117,7 @@ class CSSStyleSelector : public StyleSelector {
   } encodedurl;
   void setEncodedURL(const KURL& url);
 
-  // Given a CSS keyword in the range (xx-small to -khtml-xxx-large), this
+  // Given a CSS keyword in the range (xx-small to -webkit-xxx-large), this
   // function will return
   // the correct font size scaled relative to the user's default (medium).
   float fontSizeForKeyword(int keyword, bool quirksMode) const;

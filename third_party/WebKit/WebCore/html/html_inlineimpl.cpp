@@ -433,7 +433,7 @@ void HTMLFontElement::parseMappedAttribute(MappedAttribute* attr) {
           break;
         default:
           if (num > 6)
-            size = CSS_VAL__KHTML_XXX_LARGE;
+            size = CSS_VAL__WEBKIT_XXX_LARGE;
           else
             size = CSS_VAL_X_SMALL;
       }

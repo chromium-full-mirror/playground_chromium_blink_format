@@ -146,7 +146,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                               bool forceUserGesture = false);
 
   /**
-   * Implementation of CSS property -khtml-user-drag == auto
+   * Implementation of CSS property -webkit-user-drag == auto
    */
   virtual bool shouldDragAutoNode(Node*, const IntPoint&) const;
 

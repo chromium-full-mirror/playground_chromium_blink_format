@@ -306,7 +306,7 @@ class FrameMac : public Frame {
 
   virtual void partClearedInBegin();
 
-  // Implementation of CSS property -khtml-user-drag == auto
+  // Implementation of CSS property -webkit-user-drag == auto
   virtual bool shouldDragAutoNode(Node*, const IntPoint&) const;
 
   void setMarkedTextRange(const Range*, NSArray* attributes, NSArray* ranges);

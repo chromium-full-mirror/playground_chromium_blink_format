@@ -298,7 +298,7 @@ void ReplaceSelectionCommand::fixupNodeStyles(
     // resolve to the correct
     // color if necessary.
     String matchColorCheck = desiredStyle->getPropertyValue(
-        CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR);
+        CSS_PROP__WEBKIT_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR);
     if (matchColorCheck == matchNearestBlockquoteColorString()) {
       Node* blockquote = nearestMailBlockquote(node);
       Position pos(
@@ -310,7 +310,7 @@ void ReplaceSelectionCommand::fixupNodeStyles(
         desiredStyle->setProperty(CSS_PROP_COLOR, nearestColor);
     }
     desiredStyle->removeProperty(
-        CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR);
+        CSS_PROP__WEBKIT_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR);
 
     currentStyle->diff(desiredStyle);
 
@@ -348,7 +348,7 @@ static PassRefPtr<CSSMutableStyleDeclaration> styleForNode(Node* node) {
     bool match = (blockquoteStyle->getPropertyValue(CSS_PROP_COLOR) ==
                   style->getPropertyValue(CSS_PROP_COLOR));
     if (match) {
-      style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
+      style->setProperty(CSS_PROP__WEBKIT_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                          matchNearestBlockquoteColorString());
       return style.release();
     }
@@ -359,7 +359,7 @@ static PassRefPtr<CSSMutableStyleDeclaration> styleForNode(Node* node) {
   bool match = (documentStyle->getPropertyValue(CSS_PROP_COLOR) ==
                 style->getPropertyValue(CSS_PROP_COLOR));
   if (match)
-    style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
+    style->setProperty(CSS_PROP__WEBKIT_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                        matchNearestBlockquoteColorString());
 
   return style.release();

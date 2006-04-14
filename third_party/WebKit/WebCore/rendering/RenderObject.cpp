@@ -1725,7 +1725,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
   while (curr) {
     Node* elt = curr->element();
     if (elt && elt->nodeType() == Node::TEXT_NODE) {
-      // Since there's no way for the author to address the -khtml-user-drag
+      // Since there's no way for the author to address the -webkit-user-drag
       // style for a text node,
       // we use our own judgement.
       if (uaOK &&

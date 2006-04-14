@@ -123,7 +123,7 @@ void StyleChange::init(PassRefPtr<CSSStyleDeclaration> style,
 
     // Add this property
 
-    if (property->id() == CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT) {
+    if (property->id() == CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT) {
       // we have to special-case text decorations
       CSSProperty alteredProperty = CSSProperty(
           CSS_PROP_TEXT_DECORATION, property->value(), property->isImportant());
@@ -426,12 +426,12 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
   RefPtr<CSSValue> value = style->getPropertyCSSValue(CSS_PROP_FONT_SIZE);
   if (value) {
     // Explicit font size overrides any delta.
-    style->removeProperty(CSS_PROP__KHTML_FONT_SIZE_DELTA);
+    style->removeProperty(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
     return;
   }
 
   // Get the adjustment amount out of the style.
-  value = style->getPropertyCSSValue(CSS_PROP__KHTML_FONT_SIZE_DELTA);
+  value = style->getPropertyCSSValue(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
   if (!value)
     return;
   float adjustment = NoFontDelta;
@@ -444,7 +444,7 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
       adjustment = primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_PX);
     }
   }
-  style->removeProperty(CSS_PROP__KHTML_FONT_SIZE_DELTA);
+  style->removeProperty(CSS_PROP__WEBKIT_FONT_SIZE_DELTA);
   if (adjustment == NoFontDelta)
     return;
 
@@ -932,14 +932,15 @@ void ApplyStyleCommand::removeInlineStyle(
   ASSERT(Range::compareBoundaryPoints(start, end) <= 0);
 
   RefPtr<CSSValue> textDecorationSpecialProperty =
-      style->getPropertyCSSValue(CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT);
+      style->getPropertyCSSValue(CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT);
 
   if (textDecorationSpecialProperty) {
     pushDownTextDecorationStyleAtBoundaries(start.downstream(), end.upstream());
     style = style->copy();
-    style->setProperty(
-        CSS_PROP_TEXT_DECORATION, textDecorationSpecialProperty->cssText(),
-        style->getPropertyPriority(CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT));
+    style->setProperty(CSS_PROP_TEXT_DECORATION,
+                       textDecorationSpecialProperty->cssText(),
+                       style->getPropertyPriority(
+                           CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT));
   }
 
   // The s and e variables store the positions used to set the ending selection

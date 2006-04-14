@@ -67,7 +67,7 @@ static String cssPropertyName(const Identifier& p,
     if (hadPixelOrPosPrefix)
       *hadPixelOrPosPrefix = true;
   } else if (prop.startsWith("khtml-") || prop.startsWith("apple-") ||
-             prop.startsWith("moz-")) {
+             prop.startsWith("webkit-")) {
     prop.insert(0, '-');
   }
 
