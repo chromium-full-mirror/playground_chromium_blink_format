@@ -702,7 +702,7 @@ void CompositeEditCommand::moveParagraph(
 
   // Deleting a paragraph leaves a placeholder (it always does when a whole
   // paragraph is deleted).
-  // We remove it and prune it's parents since we want to remove all traces of
+  // We remove it and prune its parents since we want to remove all traces of
   // the paragraph we're moving.
   Node* placeholder = endingSelection().end().node();
   if (placeholder->hasTagName(brTag))

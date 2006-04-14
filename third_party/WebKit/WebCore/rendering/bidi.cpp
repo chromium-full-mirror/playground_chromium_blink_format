@@ -104,7 +104,6 @@ static bool betweenMidpoints;
 
 static bool isLineEmpty = true;
 static bool previousLineBrokeCleanly = true;
-static bool skipTrailingNewline = false;
 static bool emptyRun = true;
 static int numSpaces;
 
@@ -881,10 +880,11 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   BidiRun* r = 0;
   bool needsWordSpacing = false;
   for (r = sFirstBidiRun; r; r = r->nextRun) {
-    if (!r->box || r->obj->isPositioned())
+    if (!r->box || r->obj->isPositioned() || r->box->isLineBreak())
       continue;  // Positioned objects are only participating to figure out
                  // their
     // correct static x position.  They have no effect on the width.
+    // Similarly, line break boxes have no effect on the width.
     if (r->obj->isText()) {
       RenderText* rt = static_cast<RenderText*>(r->obj);
       int textWidth =
@@ -1714,7 +1714,7 @@ IntRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           }
         }
 
-        if (end == start || skipTrailingNewline) {
+        if (end == start) {
           bidi.adjustEmbedding = true;
           end.increment(bidi);
           bidi.adjustEmbedding = false;
@@ -2101,7 +2101,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
   bool prevLineBrokeCleanly = previousLineBrokeCleanly;
   previousLineBrokeCleanly = false;
-  skipTrailingNewline = false;
 
   while (o) {
     if (o->isBR()) {
@@ -2342,6 +2341,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             (o->style()->whiteSpace() != PRE &&
              isBreakable(str, pos, strlen, nextBreakable, breakNBSP)) ||
             midWordBreak) {
+          bool stoppedIgnoringSpaces = false;
           if (ignoringSpaces) {
             if (!currentCharacterIsSpace) {
               // Stop ignoring spaces and begin at this
@@ -2352,6 +2352,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                                 // ignored spaces.
               BidiIterator startMid(0, o, pos);
               addMidpoint(startMid);
+              stoppedIgnoringSpaces = true;
             } else {
               // Just keep ignoring these spaces.
               pos++;
@@ -2415,8 +2416,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                   lBreak.obj->isText() &&
                   static_cast<RenderText*>(lBreak.obj)->text()[lBreak.pos] ==
                       '\n') {
+                if (!stoppedIgnoringSpaces && pos > 0) {
+                  // We need to stop right before the newline and then start up
+                  // again.
+                  BidiIterator midpoint(0, o, pos);
+                  addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
+                  addMidpoint(BidiIterator(0, o, pos));      // Start
+                }
+                lBreak.increment(bidi);
                 previousLineBrokeCleanly = true;
-                skipTrailingNewline = true;
               }
               goto end;  // Didn't fit. Jump to the end.
             } else {
@@ -2430,10 +2438,17 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           }
 
           if (c == '\n' && o->style()->preserveNewline()) {
+            if (!stoppedIgnoringSpaces && pos > 0) {
+              // We need to stop right before the newline and then start up
+              // again.
+              BidiIterator midpoint(0, o, pos);
+              addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
+              addMidpoint(BidiIterator(0, o, pos));      // Start
+            }
             lBreak.obj = o;
             lBreak.pos = pos;
+            lBreak.increment(bidi);
             previousLineBrokeCleanly = true;
-            skipTrailingNewline = true;
             return lBreak;
           }
 

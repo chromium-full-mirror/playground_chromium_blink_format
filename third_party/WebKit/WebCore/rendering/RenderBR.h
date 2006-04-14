@@ -64,9 +64,6 @@ class RenderBR : public RenderText {
 
   // overrides
   virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
-  virtual void calcMinMaxWidth() {}
-  virtual int minWidth() const { return 0; }
-  virtual int maxWidth() const { return 0; }
 
   virtual bool isBR() const { return true; }
 
@@ -75,9 +72,6 @@ class RenderBR : public RenderText {
   virtual unsigned caretMaxRenderedOffset() const;
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
-  virtual IntRect caretRect(int offset,
-                            EAffinity affinity = UPSTREAM,
-                            int* extraWidthToEndOfLine = 0);
 
   virtual InlineBox* inlineBox(int offset, EAffinity affinity = UPSTREAM);
 
