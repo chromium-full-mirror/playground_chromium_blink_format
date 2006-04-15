@@ -65,6 +65,7 @@ extern NSString* _WebIsLoadingKey;
 extern NSString* _WebMainFrameIconKey;
 extern NSString* _WebMainFrameTitleKey;
 extern NSString* _WebMainFrameURLKey;
+extern NSString* _WebMainFrameDocumentKey;
 
 extern NSString* WebElementTitleKey;  // NSString of the title of the element
                                       // (pending public, used by Safari)
@@ -76,6 +77,13 @@ typedef enum {
   WebDashboardBehaviorAllowWheelScrolling
 } WebDashboardBehavior;
 
+@interface WebController : NSTreeController {
+  IBOutlet WebView* webView;
+}
+- (WebView*)webView;
+- (void)setWebView:(WebView*)newWebView;
+@end
+
 @interface WebView (WebPendingPublic)
 
 - (void)setMainFrameURL:(NSString*)URLString;
@@ -83,6 +91,7 @@ typedef enum {
 - (BOOL)isLoading;
 - (NSString*)mainFrameTitle;
 - (NSImage*)mainFrameIcon;
+- (DOMDocument*)mainFrameDocument;
 
 - (void)setDrawsBackground:(BOOL)drawsBackround;
 - (BOOL)drawsBackground;
