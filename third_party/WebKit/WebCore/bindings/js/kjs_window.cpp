@@ -1318,7 +1318,7 @@ bool Window::isSafeScript(ExecState* exec) const {
   // FIXME: this really should be explicitly checking for the "file:" protocol
   // instead
   // Always allow local pages to execute any JS.
-  if (actDomain.isNull())
+  if (actDomain.isEmpty())
     return true;
 
   WebCore::String thisDomain = thisDocument->domain();
