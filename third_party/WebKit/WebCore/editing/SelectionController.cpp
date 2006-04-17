@@ -43,71 +43,48 @@ namespace WebCore {
 
 using namespace EventNames;
 
-void MutationListener::handleEvent(Event* event, bool isWindowEvent) {
-  if (!m_selectionController)
-    return;
-
-  if (event->type() == DOMNodeRemovedEvent)
-    m_selectionController->nodeWillBeRemoved(event->target());
-}
-
-SelectionController::SelectionController()
-    : m_needsLayout(true), m_mutationListener(new MutationListener(this)) {
+SelectionController::SelectionController() : m_needsLayout(true) {
   setSelection(Selection());
 }
 
 SelectionController::SelectionController(const Selection& sel)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(sel);
 }
 
 SelectionController::SelectionController(const Position& pos,
                                          EAffinity affinity)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(Selection(pos, pos, affinity));
 }
 
 SelectionController::SelectionController(const Range* r, EAffinity affinity)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(Selection(startPosition(r), endPosition(r), affinity));
 }
 
 SelectionController::SelectionController(const Position& base,
                                          const Position& extent,
                                          EAffinity affinity)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(Selection(base, extent, affinity));
 }
 
 SelectionController::SelectionController(const VisiblePosition& visiblePos)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(Selection(visiblePos.deepEquivalent(),
                          visiblePos.deepEquivalent(), visiblePos.affinity()));
 }
 
 SelectionController::SelectionController(const VisiblePosition& base,
                                          const VisiblePosition& extent)
-    : m_needsLayout(true),
-      m_modifyBiasSet(false),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(true), m_modifyBiasSet(false) {
   setSelection(Selection(base.deepEquivalent(), extent.deepEquivalent(),
                          base.affinity()));
 }
 
 SelectionController::SelectionController(const SelectionController& o)
-    : m_needsLayout(o.m_needsLayout),
-      m_modifyBiasSet(o.m_modifyBiasSet),
-      m_mutationListener(new MutationListener(this)) {
+    : m_needsLayout(o.m_needsLayout), m_modifyBiasSet(o.m_modifyBiasSet) {
   setSelection(o.m_sel);
   // Only copy the coordinates over if the other object
   // has had a layout, otherwise keep the current
@@ -117,14 +94,6 @@ SelectionController::SelectionController(const SelectionController& o)
   if (!m_needsLayout) {
     m_caretRect = o.m_caretRect;
     m_caretPositionOnLayout = o.m_caretPositionOnLayout;
-  }
-}
-
-SelectionController::~SelectionController() {
-  if (!isNone()) {
-    Document* doc = m_sel.start().node()->document();
-    doc->removeEventListener(DOMNodeRemovedEvent, m_mutationListener.get(),
-                             false);
   }
 }
 
@@ -184,21 +153,6 @@ void SelectionController::moveTo(const Position& base,
 }
 
 void SelectionController::setSelection(const Selection& newSelection) {
-  Selection oldSelection = m_sel;
-  Document* oldDocument =
-      oldSelection.start().node() ? oldSelection.start().node()->document() : 0;
-  Document* newDocument =
-      newSelection.start().node() ? newSelection.start().node()->document() : 0;
-
-  if (oldDocument != newDocument) {
-    if (oldDocument)
-      oldDocument->removeEventListener(DOMNodeRemovedEvent,
-                                       m_mutationListener.get(), false);
-    if (newDocument)
-      newDocument->addEventListener(DOMNodeRemovedEvent,
-                                    m_mutationListener.get(), false);
-  }
-
   m_sel = newSelection;
 }
 
@@ -219,8 +173,10 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
   if (startRemoved || endRemoved) {
     // FIXME (6498): This doesn't notify the editing delegate of a selection
     // change.
+
     // FIXME: When endpoints are removed, we should just alter the selection,
     // instead of blowing it away.
+
     // FIXME: The SelectionController should be responsible for scheduling a
     // repaint,
     // but it can't do a proper job of it until it handles the other types of

@@ -26,7 +26,6 @@
 #ifndef KHTML_EDITING_SELECTIONCONTROLLER_H
 #define KHTML_EDITING_SELECTIONCONTROLLER_H
 
-#include "EventListener.h"
 #include "IntRect.h"
 #include "Selection.h"
 #include "Range.h"
@@ -37,24 +36,6 @@ class Frame;
 class GraphicsContext;
 class RenderObject;
 class VisiblePosition;
-class SelectionController;
-
-class MutationListener : public EventListener {
- public:
-  MutationListener() { m_selectionController = 0; }
-  MutationListener(SelectionController* s) { m_selectionController = s; }
-  SelectionController* selectionController() const {
-    return m_selectionController;
-  }
-  void setSelectionController(SelectionController* s) {
-    m_selectionController = s;
-  }
-
-  virtual void handleEvent(Event*, bool isWindowEvent);
-
- private:
-  SelectionController* m_selectionController;
-};
 
 class SelectionController {
  public:
@@ -63,17 +44,15 @@ class SelectionController {
 #define SEL_DEFAULT_AFFINITY DOWNSTREAM
 
   SelectionController();
-  SelectionController(const Selection& sel);
-  SelectionController(const Range*, EAffinity affinity);
+  SelectionController(const Selection&);
+  SelectionController(const Range*, EAffinity);
   SelectionController(const VisiblePosition&);
   SelectionController(const VisiblePosition&, const VisiblePosition&);
-  SelectionController(const Position&, EAffinity affinity);
+  SelectionController(const Position&, EAffinity);
   SelectionController(const Position&, const Position&, EAffinity);
   SelectionController(const SelectionController&);
 
-  ~SelectionController();
-
-  SelectionController& operator=(const SelectionController& o);
+  SelectionController& operator=(const SelectionController&);
   SelectionController& operator=(const VisiblePosition& r) {
     moveTo(r);
     return *this;
@@ -87,7 +66,7 @@ class SelectionController {
     return selection().isContentRichlyEditable();
   }
 
-  void moveTo(const Range*, EAffinity affinity);
+  void moveTo(const Range*, EAffinity);
   void moveTo(const VisiblePosition&);
   void moveTo(const VisiblePosition&, const VisiblePosition&);
   void moveTo(const Position&, EAffinity);
@@ -108,9 +87,9 @@ class SelectionController {
   void clear();
 
   void setBase(const VisiblePosition&);
-  void setBase(const Position& pos, EAffinity affinity);
+  void setBase(const Position&, EAffinity);
   void setExtent(const VisiblePosition&);
-  void setExtent(const Position& pos, EAffinity affinity);
+  void setExtent(const Position&, EAffinity);
 
   Position base() const { return m_sel.base(); }
   Position extent() const { return m_sel.extent(); }
@@ -148,7 +127,7 @@ class SelectionController {
                         int baseOffset,
                         Node* extentNode,
                         int extentOffset);
-  void setPosition(Node* node, int offset);
+  void setPosition(Node*, int offset);
   bool modify(const String& alterString,
               const String& directionString,
               const String& granularityString);
@@ -173,10 +152,10 @@ class SelectionController {
   }
   bool isCollapsed() const { return !isRange(); }
   String toString() const;
-  void collapse(Node* node, int offset);
+  void collapse(Node*, int offset);
   void collapseToEnd();
   void collapseToStart();
-  void extend(Node* node, int offset);
+  void extend(Node*, int offset);
   PassRefPtr<Range> getRangeAt(int index) const;
   // void deleteFromDocument();
   // bool containsNode(Node *node, bool entirelyContained);
@@ -226,7 +205,6 @@ class SelectionController {
                              // need to be calculated
   bool m_modifyBiasSet : 1;  // true if the selection has been horizontally
                              // modified with EAlter::EXTEND
-  RefPtr<MutationListener> m_mutationListener;
 };
 
 inline bool operator==(const SelectionController& a,

@@ -290,6 +290,25 @@ void HTMLElement::setInnerHTML(const String& html, ExceptionCode& ec) {
     return;
   }
 
+  Node* child = firstChild();
+  if (child && !child->nextSibling()) {
+    // Optimize the case where the element has exactly one text node as a child,
+    // and what we're replacing with is also exactly one text node.
+    if (child->isTextNode()) {
+      Node* fragmentChild = fragment->firstChild();
+      if (fragmentChild && !fragmentChild->nextSibling() &&
+          fragmentChild->isTextNode()) {
+        static_cast<Text*>(child)->setData(
+            static_cast<Text*>(fragmentChild)->data(), ec);
+        return;
+      }
+    }
+
+    // Optimize the case where the element has exactly one child.
+    replaceChild(fragment.release(), child, ec);
+    return;
+  }
+
   removeChildren();
   appendChild(fragment.release(), ec);
 }
@@ -300,9 +319,9 @@ void HTMLElement::setOuterHTML(const String& html, ExceptionCode& ec) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
+
   HTMLElement* parent = static_cast<HTMLElement*>(p);
   RefPtr<DocumentFragment> fragment = parent->createContextualFragment(html);
-
   if (!fragment) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
@@ -312,12 +331,11 @@ void HTMLElement::setOuterHTML(const String& html, ExceptionCode& ec) {
 }
 
 void HTMLElement::setInnerText(const String& text, ExceptionCode& ec) {
-  // following the IE specs.
+  // follow the IE specs about when this is allowed
   if (endTagRequirement() == TagStatusForbidden) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
-
   if (hasLocalName(colTag) || hasLocalName(colgroupTag) ||
       hasLocalName(framesetTag) || hasLocalName(headTag) ||
       hasLocalName(htmlTag) || hasLocalName(tableTag) ||
@@ -327,17 +345,30 @@ void HTMLElement::setInnerText(const String& text, ExceptionCode& ec) {
     return;
   }
 
+  Node* child = firstChild();
+  if (child && !child->nextSibling()) {
+    // Optimize the case where the element already has exactly one text node as
+    // a child.
+    if (child->isTextNode()) {
+      static_cast<Text*>(child)->setData(text, ec);
+      return;
+    }
+
+    // Optimize the case where the element has exactly one child.
+    replaceChild(new Text(document(), text), child, ec);
+    return;
+  }
+
   removeChildren();
   appendChild(new Text(document(), text), ec);
 }
 
 void HTMLElement::setOuterText(const String& text, ExceptionCode& ec) {
-  // following the IE specs.
+  // follow the IE specs about when this is allowed
   if (endTagRequirement() == TagStatusForbidden) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
-
   if (hasLocalName(colTag) || hasLocalName(colgroupTag) ||
       hasLocalName(framesetTag) || hasLocalName(headTag) ||
       hasLocalName(htmlTag) || hasLocalName(tableTag) ||
@@ -348,7 +379,6 @@ void HTMLElement::setOuterText(const String& text, ExceptionCode& ec) {
   }
 
   Node* parent = parentNode();
-
   if (!parent) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
