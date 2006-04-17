@@ -75,7 +75,8 @@ class Color {
     color = rgb;
     valid = true;
   }
-  void getRgbaF(float*, float*, float*, float*) const;
+  void getRGBA(float&, float&, float&, float&) const;
+  void getRGBA(double&, double&, double&, double&) const;
 
   void hsv(int*, int*, int*) const;
   void setHsv(int h, int s, int v);

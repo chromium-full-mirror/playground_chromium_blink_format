@@ -643,7 +643,7 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGContextRef c = drawingContext();
   if (!c)
     return;
-  const float components[2] = {grayLevel, 1};
+  const CGFloat components[2] = {grayLevel, 1};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -667,9 +667,9 @@ void CanvasRenderingContext2D::setShadow(float width,
   if (!c)
     return;
   RGBA32 rgba = CSSParser::parseColor(color);
-  const float components[4] = {((rgba >> 16) & 0xFF) / 255.0f,
-                               ((rgba >> 8) & 0xFF) / 255.0f,
-                               (rgba & 0xFF) / 255.0f, alpha};
+  const CGFloat components[4] = {((rgba >> 16) & 0xFF) / 255.0,
+                                 ((rgba >> 8) & 0xFF) / 255.0,
+                                 (rgba & 0xFF) / 255.0, alpha};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -692,7 +692,7 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGContextRef c = drawingContext();
   if (!c)
     return;
-  const float components[2] = {grayLevel, alpha};
+  const CGFloat components[2] = {grayLevel, alpha};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -717,7 +717,7 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGContextRef c = drawingContext();
   if (!c)
     return;
-  const float components[4] = {r, g, b, a};
+  const CGFloat components[4] = {r, g, b, a};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -743,7 +743,7 @@ void CanvasRenderingContext2D::setShadow(float width,
   CGContextRef dc = drawingContext();
   if (!dc)
     return;
-  const float components[5] = {c, m, y, k, a};
+  const CGFloat components[5] = {c, m, y, k, a};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceCMYK();
   CGColorRef shadowColor = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -768,9 +768,9 @@ void CanvasRenderingContext2D::applyShadow() {
   RGBA32 rgba = state().m_shadowColor.isEmpty()
                     ? 0
                     : CSSParser::parseColor(state().m_shadowColor);
-  const float components[4] = {
-      ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f,
-      (rgba & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f};
+  const CGFloat components[4] = {
+      ((rgba >> 16) & 0xFF) / 255.0, ((rgba >> 8) & 0xFF) / 255.0,
+      (rgba & 0xFF) / 255.0, ((rgba >> 24) & 0xFF) / 255.0};
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGColorRef color = CGColorCreate(colorSpace, components);
   CGColorSpaceRelease(colorSpace);
@@ -1025,7 +1025,7 @@ void CanvasRenderingContext2D::applyStrokePattern() {
   CGContextSetStrokeColorSpace(c, patternSpace);
   CGColorSpaceRelease(patternSpace);
 
-  const float patternAlpha = 1;
+  const CGFloat patternAlpha = 1;
   CGContextSetStrokePattern(c, platformPattern, &patternAlpha);
   CGPatternRelease(platformPattern);
 
@@ -1056,7 +1056,7 @@ void CanvasRenderingContext2D::applyFillPattern() {
   CGContextSetFillColorSpace(c, patternSpace);
   CGColorSpaceRelease(patternSpace);
 
-  const float patternAlpha = 1;
+  const CGFloat patternAlpha = 1;
   CGContextSetFillPattern(c, platformPattern, &patternAlpha);
   CGPatternRelease(platformPattern);
 

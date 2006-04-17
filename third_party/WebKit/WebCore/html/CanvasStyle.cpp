@@ -70,17 +70,17 @@ void CanvasStyle::applyStrokeColor(CGContextRef context) {
   switch (m_type) {
     case ColorString: {
       RGBA32 color = CSSParser::parseColor(m_color);
-      CGContextSetRGBStrokeColor(context, ((color >> 16) & 0xFF) / 255.0f,
-                                 ((color >> 8) & 0xFF) / 255.0f,
-                                 (color & 0xFF) / 255.0f,
-                                 ((color >> 24) & 0xFF) / 255.0f);
+      CGContextSetRGBStrokeColor(context, ((color >> 16) & 0xFF) / 255.0,
+                                 ((color >> 8) & 0xFF) / 255.0,
+                                 (color & 0xFF) / 255.0,
+                                 ((color >> 24) & 0xFF) / 255.0);
       break;
     }
     case ColorStringWithAlpha: {
       RGBA32 color = CSSParser::parseColor(m_color);
-      CGContextSetRGBStrokeColor(context, ((color >> 16) & 0xFF) / 255.0f,
-                                 ((color >> 8) & 0xFF) / 255.0f,
-                                 (color & 0xFF) / 255.0f, m_alpha);
+      CGContextSetRGBStrokeColor(context, ((color >> 16) & 0xFF) / 255.0,
+                                 ((color >> 8) & 0xFF) / 255.0,
+                                 (color & 0xFF) / 255.0, m_alpha);
       break;
     }
     case GrayLevel:
@@ -105,17 +105,17 @@ void CanvasStyle::applyFillColor(CGContextRef context) {
   switch (m_type) {
     case ColorString: {
       RGBA32 color = CSSParser::parseColor(m_color);
-      CGContextSetRGBFillColor(context, ((color >> 16) & 0xFF) / 255.0f,
-                               ((color >> 8) & 0xFF) / 255.0f,
-                               (color & 0xFF) / 255.0f,
-                               ((color >> 24) & 0xFF) / 255.0f);
+      CGContextSetRGBFillColor(context, ((color >> 16) & 0xFF) / 255.0,
+                               ((color >> 8) & 0xFF) / 255.0,
+                               (color & 0xFF) / 255.0,
+                               ((color >> 24) & 0xFF) / 255.0);
       break;
     }
     case ColorStringWithAlpha: {
       RGBA32 color = CSSParser::parseColor(m_color);
-      CGContextSetRGBFillColor(context, ((color >> 16) & 0xFF) / 255.0f,
-                               ((color >> 8) & 0xFF) / 255.0f,
-                               (color & 0xFF) / 255.0f, m_alpha);
+      CGContextSetRGBFillColor(context, ((color >> 16) & 0xFF) / 255.0,
+                               ((color >> 8) & 0xFF) / 255.0,
+                               (color & 0xFF) / 255.0, m_alpha);
       break;
     }
     case GrayLevel:

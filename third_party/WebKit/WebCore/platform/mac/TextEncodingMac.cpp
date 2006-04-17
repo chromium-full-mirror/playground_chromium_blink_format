@@ -67,11 +67,11 @@ DeprecatedCString TextEncoding::fromUnicode(const DeprecatedString& qcs,
                      0x7FFFFFFF, &bufferLength);
 
     DeprecatedCString chunk(bufferLength + 1);
+    unsigned char* buffer = reinterpret_cast<unsigned char*>(chunk.data());
     CFIndex charactersConverted =
         CFStringGetBytes(cfs, range, encoding, allowEntities ? 0 : '?', false,
-                         reinterpret_cast<unsigned char*>(chunk.data()),
-                         bufferLength, &bufferLength);
-    chunk[bufferLength] = 0;
+                         buffer, bufferLength, &bufferLength);
+    buffer[bufferLength] = 0;
     result.append(chunk);
 
     if (charactersConverted != charactersLeft) {
