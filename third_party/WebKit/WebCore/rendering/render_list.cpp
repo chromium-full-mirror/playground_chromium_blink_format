@@ -338,7 +338,7 @@ void RenderListItem::paint(PaintInfo& i, int _tx, int _ty) {
 // -----------------------------------------------------------
 
 RenderListMarker::RenderListMarker(Document* document)
-    : RenderBox(document), m_listImage(0) {
+    : RenderBox(document), m_listImage(0), m_selectionState(SelectionNone) {
   // init RenderObject attributes
   setInline(true);    // our object is Inline
   setReplaced(true);  // pretend to be replaced
@@ -409,6 +409,8 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
 
   if (m_listImage && !m_listImage->isErrorImage()) {
     p->drawImageAtPoint(m_listImage->image(), marker.location());
+    if (selectionState() != SelectionNone)
+      p->fillRect(selectionRect(), selectionColor(p));
     return;
   }
 
@@ -416,6 +418,9 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   p->setPen(red);
   p->drawRect(box.x(), box.y(), box.width(), box.height());
 #endif
+
+  if (selectionState() != SelectionNone)
+    p->fillRect(selectionRect(), selectionColor(p));
 
   const Color color(style()->color());
   p->setPen(color);
@@ -668,5 +673,40 @@ IntRect RenderListMarker::getRelativeMarkerRect() {
       return IntRect(m_x, m_y + ascent, font.width(m_item) + font.width(". "),
                      font.height());
   }
+}
+
+void RenderListMarker::setSelectionState(SelectionState state) {
+  m_selectionState = state;
+  RootInlineBox* root = inlineBoxWrapper()->root();
+  if (root)
+    root->setHasSelectedChildren(state != SelectionNone);
+  containingBlock()->setSelectionState(state);
+}
+
+IntRect RenderListMarker::selectionRect() {
+  if (selectionState() == SelectionNone)
+    return IntRect();
+
+  int absx, absy;
+  RenderBlock* cb = containingBlock();
+  cb->absolutePosition(absx, absy);
+  if (cb->hasOverflowClip())
+    cb->layer()->subtractScrollOffset(absx, absy);
+
+  RootInlineBox* root = inlineBoxWrapper()->root();
+  return IntRect(absx + xPos(), absy + root->selectionTop(), width(),
+                 root->selectionHeight());
+}
+
+Color RenderListMarker::selectionColor(GraphicsContext* p) const {
+  Color color = RenderBox::selectionColor(p);
+  if (!m_listImage || m_listImage->isErrorImage())
+    return color;
+  // Limit the opacity so that no user-specified selection color can obscure
+  // selected images.
+  if (color.alpha() > selectionColorImageOverlayAlpha)
+    color = Color(color.red(), color.green(), color.blue(),
+                  selectionColorImageOverlayAlpha);
+  return color;
 }
 }

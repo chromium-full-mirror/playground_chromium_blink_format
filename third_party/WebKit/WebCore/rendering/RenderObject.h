@@ -76,6 +76,8 @@ class RenderTable;
 class RenderText;
 class VisiblePosition;
 
+const int selectionColorImageOverlayAlpha = 60 * 255 / 100;
+
 enum PaintPhase {
   PaintPhaseBlockBackground,
   PaintPhaseChildBlockBackground,
