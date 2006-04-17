@@ -655,6 +655,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)focusWindow;
 - (void)unfocusWindow;
 
+- (void)formControlIsBecomingFirstResponder:(NSView*)formControl;
 - (void)formControlIsResigningFirstResponder:(NSView*)formControl;
 
 - (NSView*)nextKeyViewOutsideWebFrameViews;
