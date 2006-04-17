@@ -203,6 +203,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject* oldChild);
+  virtual bool allowsReusingAnonymousChild() const { return true; }
 
   // raw tree manipulation
   virtual RenderObject* removeChildNode(RenderObject* child);
