@@ -193,6 +193,7 @@ class CSSStyleSelector : public StyleSelector {
   void mapBackgroundOrigin(BackgroundLayer* layer, CSSValue* value);
   void mapBackgroundImage(BackgroundLayer* layer, CSSValue* value);
   void mapBackgroundRepeat(BackgroundLayer* layer, CSSValue* value);
+  void mapBackgroundSize(BackgroundLayer* layer, CSSValue* value);
   void mapBackgroundXPosition(BackgroundLayer* layer, CSSValue* value);
   void mapBackgroundYPosition(BackgroundLayer* layer, CSSValue* value);
 

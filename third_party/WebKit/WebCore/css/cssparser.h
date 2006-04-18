@@ -136,6 +136,7 @@ class CSSParser {
   CSSValue* parseBackgroundImage();
   CSSValue* parseBackgroundPositionXY(bool& xFound, bool& yFound);
   void parseBackgroundPosition(CSSValue*& value1, CSSValue*& value2);
+  CSSValue* parseBackgroundSize();
 
   bool parseBackgroundProperty(int propId,
                                int& propId1,

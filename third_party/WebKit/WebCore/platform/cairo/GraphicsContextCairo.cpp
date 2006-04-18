@@ -378,8 +378,8 @@ void GraphicsContext::drawImage(Image* image,
 
 void GraphicsContext::drawTiledImage(Image* image,
                                      const IntRect& dest,
-                                     int sx,
-                                     int sy,
+                                     const IntPoint& srcPoint,
+                                     const IntSize& tileSize,
                                      void* context) {
   if (!context)
     context = m_data->context;
@@ -387,7 +387,7 @@ void GraphicsContext::drawTiledImage(Image* image,
   if (paintingDisabled())
     return;
 
-  image->tileInRect(dest, FloatPoint(sx, sy), context);
+  image->tileInRect(dest, srcPoint, tileSize, noRepeat, context);
 }
 
 void GraphicsContext::drawScaledAndTiledImage(Image* image,

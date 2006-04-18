@@ -29,6 +29,7 @@
 #include "DeprecatedArray.h"
 #include "ImageSource.h"
 #include "IntSize.h"
+#include "FloatSize.h"
 #include <kxmlcore/Vector.h>
 
 #if __APPLE__
@@ -169,8 +170,9 @@ class Image {
                   const FloatRect& srcRect,
                   CompositeOperator compositeOp,
                   void* context);
-  void tileInRect(const FloatRect& dstRect,
+  void tileInRect(const FloatRect& destRect,
                   const FloatPoint& point,
+                  const FloatSize& tileSize,
                   void* context);
   void scaleAndTileInRect(const FloatRect& dstRect,
                           const FloatRect& srcRect,

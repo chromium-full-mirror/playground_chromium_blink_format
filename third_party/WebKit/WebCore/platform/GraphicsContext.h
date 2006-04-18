@@ -132,9 +132,9 @@ class GraphicsContext : Noncopyable {
                  Image::CompositeOperator = Image::CompositeSourceOver,
                  void* nativeData = 0);
   void drawTiledImage(Image*,
-                      const IntRect& dest,
-                      int sx = 0,
-                      int sy = 0,
+                      const IntRect& destRect,
+                      const IntPoint& srcPoint,
+                      const IntSize& tileSize,
                       void* nativeData = 0);
   void drawScaledAndTiledImage(Image*,
                                const IntRect&,
