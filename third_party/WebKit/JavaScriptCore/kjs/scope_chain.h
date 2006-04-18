@@ -27,6 +27,7 @@
 namespace KJS {
 
 class JSObject;
+class ExecState;
 
 class ScopeChainNode {
  public:
@@ -91,6 +92,10 @@ class ScopeChain {
   void pop();
 
   void mark();
+
+#ifndef NDEBUG
+  void print(ExecState*);
+#endif
 
  private:
   ScopeChainNode* _node;
