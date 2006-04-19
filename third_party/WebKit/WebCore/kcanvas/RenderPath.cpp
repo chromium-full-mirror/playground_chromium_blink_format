@@ -236,6 +236,12 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     paintInfo.p->restore();
 }
 
+void RenderPath::absoluteRects(DeprecatedValueList<IntRect>& rects,
+                               int _tx,
+                               int _ty) {
+  rects.append(getAbsoluteRepaintRect());
+}
+
 bool RenderPath::nodeAtPoint(NodeInfo& info,
                              int _x,
                              int _y,

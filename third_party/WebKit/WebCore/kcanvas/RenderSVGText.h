@@ -50,6 +50,10 @@ class RenderSVGText : public RenderBlock {
                    int _ty,
                    WebCore::HitTestAction);
 
+  virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
+                             int tx,
+                             int ty);
+
  private:
   QMatrix translationTopToBaseline();
   QMatrix translationForAttributes();

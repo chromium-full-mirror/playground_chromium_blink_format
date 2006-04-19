@@ -43,6 +43,10 @@ class RenderSVGImage : public RenderImage {
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
   virtual IntRect getAbsoluteRepaintRect();
 
+  virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
+                             int tx,
+                             int ty);
+
   virtual void imageChanged(CachedImage*);
   void adjustRectsForAspectRatio(FloatRect& destRect,
                                  FloatRect& srcRect,
