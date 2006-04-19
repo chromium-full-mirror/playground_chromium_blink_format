@@ -105,7 +105,8 @@ RenderObject* SVGTextElement::createRenderer(RenderArena* arena,
 }
 
 bool SVGTextElement::childShouldCreateRenderer(Node* child) const {
-  if (child->isTextNode() || child->hasTagName(SVGNames::tspanTag))
+  if (child->isTextNode() || child->hasTagName(SVGNames::tspanTag) ||
+      child->hasTagName(SVGNames::trefTag))
     return true;
   return false;
 }
