@@ -746,7 +746,9 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
   // These are always percents or auto.
   if (shouldPaintBackgroundImage &&
       (bgLayer->backgroundXPosition().value() != 0 ||
-       bgLayer->backgroundYPosition().value() != 0))
+       bgLayer->backgroundYPosition().value() != 0 ||
+       bgLayer->backgroundSize().width.isPercent() ||
+       bgLayer->backgroundSize().height.isPercent()))
     return true;  // The background image will shift unpredictably if the size
                   // changes.
 
