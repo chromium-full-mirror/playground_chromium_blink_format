@@ -251,7 +251,7 @@ void RenderLineEdit::updateFromElement() {
     e->setValueMatchesRenderer();
   }
 
-  w->setReadOnly(e->readOnly());
+  w->setReadOnly(e->isReadOnlyControl());
 
   // Handle updating the search attributes.
   w->setPlaceholderString(e->getAttribute(placeholderAttr).deprecatedString());
@@ -946,7 +946,7 @@ void RenderTextArea::updateFromElement() {
   HTMLTextAreaElement* e = element();
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
-  w->setReadOnly(e->readOnly());
+  w->setReadOnly(e->isReadOnlyControl());
   w->setDisabled(e->disabled());
 
   String widgetText = text();

@@ -70,7 +70,9 @@ class NamedAttrMap : public NamedNodeMap {
     return attrs ? attrs[index] : 0;
   }
   Attribute* getAttributeItem(const QualifiedName& name) const;
-  virtual bool isReadOnly() { return element ? element->isReadOnly() : false; }
+  virtual bool isReadOnlyNode() {
+    return element ? element->isReadOnlyNode() : false;
+  }
 
   // used during parsing: only inserts if not already there
   // no error checking!
