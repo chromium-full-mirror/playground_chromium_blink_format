@@ -144,6 +144,7 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_isOverflowOnly(shouldBeOverflowOnly()),
       m_usedTransparency(false),
       m_inOverflowRelayout(false),
+      m_repaintOverflowOnResize(false),
       m_marquee(0) {}
 
 RenderLayer::~RenderLayer() {
@@ -163,6 +164,9 @@ RenderLayer::~RenderLayer() {
 void RenderLayer::computeRepaintRects() {
   // FIXME: Child object could override visibility.
   if (m_object->style()->visibility() == VISIBLE) {
+    m_repaintOverflowOnResize =
+        m_object->selfNeedsLayout() ||
+        m_object->hasOverflowClip() && m_object->normalChildNeedsLayout();
     m_object->getAbsoluteRepaintRectIncludingFloats(m_repaintRect,
                                                     m_fullRepaintRect);
     m_object->absolutePosition(m_repaintX, m_repaintY);
@@ -193,18 +197,20 @@ void RenderLayer::updateLayerPositions(bool doFullRepaint,
 
   // FIXME: Child object could override visibility.
   if (checkForRepaint && (m_object->style()->visibility() == VISIBLE)) {
-    int x, y;
-    m_object->absolutePosition(x, y);
-    if (x == m_repaintX && y == m_repaintY)
-      m_object->repaintAfterLayoutIfNeeded(m_repaintRect, m_fullRepaintRect);
-    else {
-      RenderCanvas* c = m_object->canvas();
-      if (c && !c->printingMode()) {
-        c->repaintViewRectangle(m_fullRepaintRect);
-        IntRect newRect, newFullRect;
+    RenderCanvas* c = m_object->canvas();
+    if (c && !c->printingMode()) {
+      int x, y;
+      m_object->absolutePosition(x, y);
+      IntRect newRect, newFullRect;
+      bool didMove = x != m_repaintX || y != m_repaintY;
+      if (!didMove && !m_repaintOverflowOnResize)
+        m_object->repaintAfterLayoutIfNeeded(m_repaintRect, m_fullRepaintRect);
+      else {
         m_object->getAbsoluteRepaintRectIncludingFloats(newRect, newFullRect);
-        if (newRect != m_repaintRect)
+        if (didMove || newRect != m_repaintRect) {
+          c->repaintViewRectangle(m_fullRepaintRect);
           c->repaintViewRectangle(newFullRect);
+        }
       }
     }
   }
