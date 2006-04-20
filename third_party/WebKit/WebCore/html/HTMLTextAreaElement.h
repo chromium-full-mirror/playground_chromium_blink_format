@@ -57,6 +57,8 @@ class HTMLTextAreaElement : public HTMLGenericFormElement {
   virtual DeprecatedString state();
   virtual void restoreState(DeprecatedStringList&);
 
+  bool readOnly() const { return isReadOnlyControl(); }
+
   int selectionStart();
   int selectionEnd();
 

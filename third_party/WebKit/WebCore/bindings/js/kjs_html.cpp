@@ -1760,7 +1760,7 @@ JSValue* JSHTMLElement::inputGetter(ExecState* exec, int token) const {
     case InputName:
       return jsString(input.name());
     case InputReadOnly:
-      return jsBoolean(input.isReadOnlyControl());
+      return jsBoolean(input.readOnly());
     case InputSelectionStart:
       return getInputSelectionStart(input);
     case InputSelectionEnd:
@@ -1797,7 +1797,7 @@ JSValue* JSHTMLElement::textAreaGetter(ExecState* exec, int token) const {
     case TextAreaName:
       return jsString(textarea.name());
     case TextAreaReadOnly:
-      return jsBoolean(textarea.isReadOnlyControl());
+      return jsBoolean(textarea.readOnly());
     case TextAreaRows:
       return jsNumber(textarea.rows());
     case TextAreaSelectionStart:
