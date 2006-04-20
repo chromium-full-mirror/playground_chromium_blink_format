@@ -189,7 +189,8 @@ float Font::floatWidth(const QChar* str,
                        int pos,
                        int len,
                        int tabWidth,
-                       int xpos) const {
+                       int xpos,
+                       bool runRounding) const {
   FontData* font = m_dataSet->primaryFont(fontDescription());
   if (!font)
     return 0;

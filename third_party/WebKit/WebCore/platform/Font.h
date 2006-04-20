@@ -110,7 +110,8 @@ class Font {
                    int pos,
                    int len,
                    int tabWidth,
-                   int xpos) const;
+                   int xpos,
+                   bool runRounding = true) const;
 
   int checkSelectionPoint(const QChar*,
                           int slen,
