@@ -3506,6 +3506,13 @@ void RenderBlock::calcBlocminMaxWidth() {
   m_maxWidth = max(floatLeftWidth + floatRightWidth, m_maxWidth);
 }
 
+bool RenderBlock::hasLineIfEmpty() const {
+  return element() && (element()->isContentEditable() &&
+                           element()->rootEditableElement() == element() ||
+                       element()->isShadowNode() &&
+                           element()->shadowParentNode()->hasTagName(inputTag));
+}
+
 short RenderBlock::lineHeight(bool b, bool isRootLineBox) const {
   // Inline blocks are replaced elements. Otherwise, just pass off to
   // the base class.  If we're being queried as though we're the root line
@@ -3582,8 +3589,7 @@ int RenderBlock::getBaselineOfLastLineBox() const {
     return RenderFlow::getBaselineOfLastLineBox();
 
   if (childrenInline()) {
-    if (!firstLineBox() && element() && element()->isContentEditable() &&
-        element()->rootEditableElement() == element())
+    if (!firstLineBox() && hasLineIfEmpty())
       return RenderFlow::baselinePosition(true) + borderTop() + paddingTop();
     if (m_lastLineBox)
       return m_lastLineBox->yPos() + m_lastLineBox->baseline();

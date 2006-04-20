@@ -375,6 +375,8 @@ class RenderBlock : public RenderFlow {
   Position positionForBox(InlineBox* box, bool start = true) const;
   Position positionForRenderer(RenderObject* renderer, bool start = true) const;
 
+  bool hasLineIfEmpty() const;
+
  protected:
   struct FloatingObject {
     enum Type { FloatLeft, FloatRight };
