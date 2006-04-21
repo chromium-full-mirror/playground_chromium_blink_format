@@ -26,6 +26,7 @@
 #ifndef HTMLCanvas2DContext_h
 #define HTMLCanvas2DContext_h
 
+#include "CompositeOperator.h"
 #include "FloatRect.h"
 #include "PlatformString.h"
 #include <kxmlcore/Vector.h>
@@ -36,11 +37,14 @@
 
 namespace WebCore {
 
-class HTMLCanvasElement;
-class CanvasStyle;
-class HTMLImageElement;
 class CanvasGradient;
 class CanvasPattern;
+class CanvasStyle;
+class GraphicsContext;
+class HTMLCanvasElement;
+class HTMLImageElement;
+
+typedef int ExceptionCode;
 
 class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
  public:
@@ -117,18 +121,34 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                      float cp2y,
                      float x,
                      float y);
-  void arcTo(float x0, float y0, float x1, float y1, float radius);
-  void arc(float x, float y, float r, float sa, float ea, bool clockwise);
-  void rect(float x, float y, float width, float height);
+  void arcTo(float x0,
+             float y0,
+             float x1,
+             float y1,
+             float radius,
+             ExceptionCode&);
+  void arc(float x,
+           float y,
+           float r,
+           float sa,
+           float ea,
+           bool clockwise,
+           ExceptionCode&);
+  void rect(float x, float y, float width, float height, ExceptionCode&);
 
   void fill();
   void stroke();
   void clip();
 
-  void clearRect(float x, float y, float width, float height);
-  void fillRect(float x, float y, float width, float height);
-  void strokeRect(float x, float y, float width, float height);
-  void strokeRect(float x, float y, float width, float height, float lineWidth);
+  void clearRect(float x, float y, float width, float height, ExceptionCode&);
+  void fillRect(float x, float y, float width, float height, ExceptionCode&);
+  void strokeRect(float x, float y, float width, float height, ExceptionCode&);
+  void strokeRect(float x,
+                  float y,
+                  float width,
+                  float height,
+                  float lineWidth,
+                  ExceptionCode&);
 
   void setShadow(float width, float height, float blur);
   void setShadow(float width, float height, float blur, const String& color);
@@ -166,7 +186,8 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float x,
                  float y,
                  float width,
-                 float height);
+                 float height,
+                 ExceptionCode&);
   void drawImage(HTMLImageElement*,
                  float sx,
                  float sy,
@@ -175,13 +196,15 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float dx,
                  float dy,
                  float dw,
-                 float dh);
+                 float dh,
+                 ExceptionCode&);
   void drawImage(HTMLCanvasElement*, float x, float y);
   void drawImage(HTMLCanvasElement*,
                  float x,
                  float y,
                  float width,
-                 float height);
+                 float height,
+                 ExceptionCode&);
   void drawImage(HTMLCanvasElement*,
                  float sx,
                  float sy,
@@ -190,7 +213,8 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float dx,
                  float dy,
                  float dw,
-                 float dh);
+                 float dh,
+                 ExceptionCode&);
 
   void drawImageFromRect(HTMLImageElement*,
                          float sx,
@@ -218,26 +242,33 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                                                   float y1,
                                                   float r1);
   PassRefPtr<CanvasPattern> createPattern(HTMLImageElement*,
-                                          const String& repetitionType);
+                                          const String& repetitionType,
+                                          ExceptionCode&);
+  PassRefPtr<CanvasPattern> createPattern(HTMLCanvasElement*,
+                                          const String& repetitionType,
+                                          ExceptionCode&);
 
   void reset();
   void detachCanvas() { m_canvas = 0; }
 
  private:
+  enum Cap { ButtCap, RoundCap, SquareCap };
+  enum Join { MiterJoin, RoundJoin, BevelJoin };
+
   struct State {
     State();
 
     RefPtr<CanvasStyle> m_strokeStyle;
     RefPtr<CanvasStyle> m_fillStyle;
     float m_lineWidth;
-    String m_lineCap;
-    String m_lineJoin;
+    Cap m_lineCap;
+    Join m_lineJoin;
     float m_miterLimit;
     FloatSize m_shadowOffset;
     float m_shadowBlur;
     String m_shadowColor;
     float m_globalAlpha;
-    String m_globalComposite;
+    CompositeOperator m_globalComposite;
 #if __APPLE__
     bool m_platformContextStrokeStyleIsPattern;
     CGAffineTransform m_strokeStylePatternTransform;
@@ -253,12 +284,13 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
 
   void willDraw(const FloatRect&);
 
+  GraphicsContext* drawingContext() const;
+
 #if __APPLE__
   void applyStrokePattern();
   void applyFillPattern();
 
-  // FIXME: Use GraphicsContext instead.
-  CGContextRef drawingContext() const;
+  CGContextRef platformContext() const;
 #endif
 
   HTMLCanvasElement* m_canvas;

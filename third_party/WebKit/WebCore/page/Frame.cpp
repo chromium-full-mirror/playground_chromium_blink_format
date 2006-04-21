@@ -2697,14 +2697,12 @@ void Frame::adjustPageHeight(float* newBottom,
                              float bottomLimit) {
   RenderCanvas* root = static_cast<RenderCanvas*>(document()->renderer());
   if (root) {
-    // Use a printer device, with painting disabled for the pagination phase
-    GraphicsContext painter(true);
-    painter.setPaintingDisabled(true);
-
+    // Use a context with painting disabled but with "for printer" set to true.
+    GraphicsContext context(0, false, true);
     root->setTruncatedAt((int)floorf(oldBottom));
     IntRect dirtyRect(0, (int)floorf(oldTop), root->docWidth(),
                       (int)ceilf(oldBottom - oldTop));
-    root->layer()->paint(&painter, dirtyRect);
+    root->layer()->paint(&context, dirtyRect);
     *newBottom = root->bestTruncatedAt();
     if (*newBottom == 0)
       *newBottom = oldBottom;

@@ -44,6 +44,8 @@ class KRenderingDeviceContext {
 
   virtual void clearPath() = 0;
   virtual void addPath(const KCanvasPath*) = 0;
+
+  virtual GraphicsContext* createGraphicsContext() = 0;
 };
 
 class KCanvasImage;

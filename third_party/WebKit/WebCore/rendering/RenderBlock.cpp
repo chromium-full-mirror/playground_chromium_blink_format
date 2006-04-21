@@ -1852,13 +1852,9 @@ IntRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
                                                 const PaintInfo* i) {
   if (width <= 0 || height <= 0)
     return IntRect();
-
   IntRect gapRect(xPos, yPos, width, height);
-  if (i) {
-    // Paint the rect.
-    Brush selBrush(selObj->selectionColor(i->p));
-    i->p->fillRect(gapRect, selBrush);
-  }
+  if (i)
+    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
   return gapRect;
 }
 
@@ -1883,11 +1879,8 @@ IntRect RenderBlock::fillVerticalSelectionGap(int lastTop,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i) {
-    // Paint the rect.
-    Brush selBrush(selectionColor(i->p));
-    i->p->fillRect(gapRect, selBrush);
-  }
+  if (i)
+    i->p->fillRect(gapRect, selectionColor(i->p));
   return gapRect;
 }
 
@@ -1909,11 +1902,8 @@ IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i) {
-    // Paint the rect.
-    Brush selBrush(selObj->selectionColor(i->p));
-    i->p->fillRect(gapRect, selBrush);
-  }
+  if (i)
+    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
   return gapRect;
 }
 
@@ -1936,11 +1926,8 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i) {
-    // Paint the rect.
-    Brush selBrush(selObj->selectionColor(i->p));
-    i->p->fillRect(gapRect, selBrush);
-  }
+  if (i)
+    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
   return gapRect;
 }
 

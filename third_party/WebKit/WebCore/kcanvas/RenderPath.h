@@ -81,7 +81,8 @@ class RenderPath : public RenderObject {
                            HitTestAction);
 
  protected:
-  virtual void drawMarkersIfNeeded(const FloatRect&,
+  virtual void drawMarkersIfNeeded(GraphicsContext*,
+                                   const FloatRect&,
                                    const KCanvasPath*) const = 0;
 
  private:

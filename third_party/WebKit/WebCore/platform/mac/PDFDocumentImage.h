@@ -53,10 +53,10 @@ class PDFDocumentImage {
 
   void draw(NSRect fromRect,
             NSRect toRect,
-            Image::CompositeOperator op,
+            CompositeOperator,
             float alpha,
             bool flipped,
-            CGContextRef context);
+            CGContextRef);
 
  private:
   CGPDFDocumentRef m_document;

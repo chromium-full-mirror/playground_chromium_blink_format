@@ -114,8 +114,8 @@ class Widget {
 
   virtual void populate() {}
 
-  void lockDrawingFocus();
-  void unlockDrawingFocus();
+  GraphicsContext* lockDrawingFocus();
+  void unlockDrawingFocus(GraphicsContext*);
   void enableFlushDrawing();
   void disableFlushDrawing();
 

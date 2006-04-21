@@ -181,10 +181,11 @@ Widget::FocusPolicy Widget::focusPolicy() const {
 void Widget::disableFlushDrawing() {
   notImplemented();
 }
-void Widget::lockDrawingFocus() {
+GraphicsContext* Widget::lockDrawingFocus() {
   notImplemented();
+  return 0;
 }
-void Widget::unlockDrawingFocus() {
+void Widget::unlockDrawingFocus(GraphicsContext*) {
   notImplemented();
 }
 

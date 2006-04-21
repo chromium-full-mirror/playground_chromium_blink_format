@@ -45,6 +45,7 @@
 #include "dom_xmlimpl.h"
 #include "HTMLDocument.h"
 #include "html_objectimpl.h"
+#include "JSHTMLElementWrapperFactory.h"
 #include "HTMLNames.h"
 #include "KWQKHTMLSettings.h"
 #include "kjs_css.h"
@@ -1092,7 +1093,8 @@ JSValue* toJS(ExecState* exec, PassRefPtr<WebCore::Node> node) {
   switch (n->nodeType()) {
     case WebCore::Node::ELEMENT_NODE:
       if (n->isHTMLElement())
-        ret = new JSHTMLElement(exec, static_cast<HTMLElement*>(n));
+        ret = createJSWrapper(exec,
+                              static_pointer_cast<WebCore::HTMLElement>(node));
       else
         ret = new JSElement(exec, static_cast<Element*>(n));
       break;

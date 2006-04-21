@@ -97,9 +97,7 @@ class HTMLImageElement : public HTMLElement {
 
   virtual bool isURLAttribute(Attribute*) const;
 
-  Image::CompositeOperator compositeOperator() const {
-    return Image::compositeOperatorFromString(_compositeOperator);
-  }
+  CompositeOperator compositeOperator() const { return m_compositeOperator; }
 
   CachedImage* cachedImage() const { return m_imageLoader.image(); }
 
@@ -148,7 +146,7 @@ class HTMLImageElement : public HTMLElement {
   bool ismap;
   HTMLFormElement* m_form;
   String oldNameAttr;
-  String _compositeOperator;
+  CompositeOperator m_compositeOperator;
 };
 
 //------------------------------------------------------------------

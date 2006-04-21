@@ -38,6 +38,7 @@ namespace WebCore {
 
 class FontDataSet;
 class GraphicsContext;
+class IntPoint;
 class IntRect;
 
 enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
@@ -68,9 +69,8 @@ class Font {
 
   void update() const;
 
-  void drawText(const GraphicsContext*,
-                int x,
-                int y,
+  void drawText(GraphicsContext*,
+                const IntPoint&,
                 int tabWidth,
                 int xpos,
                 const QChar*,
@@ -80,9 +80,8 @@ class Font {
                 int toAdd,
                 TextDirection,
                 bool visuallyOrdered) const;
-  void drawHighlightForText(const GraphicsContext*,
-                            int x,
-                            int y,
+  void drawHighlightForText(GraphicsContext*,
+                            const IntPoint&,
                             int h,
                             int tabWidth,
                             int xpos,
@@ -94,16 +93,14 @@ class Font {
                             TextDirection d,
                             bool visuallyOrdered,
                             const Color& backgroundColor) const;
-  void drawLineForText(const GraphicsContext*,
-                       int x,
-                       int y,
+  void drawLineForText(GraphicsContext*,
+                       const IntPoint&,
                        int yOffset,
                        int width) const;
-  void drawLineForMisspelling(const GraphicsContext*,
-                              int x,
-                              int y,
+  void drawLineForMisspelling(GraphicsContext*,
+                              const IntPoint&,
                               int width) const;
-  int misspellingLineThickness(const GraphicsContext*) const;
+  int misspellingLineThickness(GraphicsContext*) const;
 
   float floatWidth(const QChar*,
                    int slen,
@@ -124,8 +121,7 @@ class Font {
                           TextDirection,
                           bool visuallyOrdered,
                           bool includePartialGlyphs) const;
-  IntRect selectionRectForText(int x,
-                               int y,
+  IntRect selectionRectForText(const IntPoint&,
                                int h,
                                int tabWidth,
                                int xpos,

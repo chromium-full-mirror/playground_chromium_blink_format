@@ -116,13 +116,21 @@ void HTMLImageLoader::notifyFinished(CachedObject* image) {
 // -------------------------------------------------------------------------
 
 HTMLImageElement::HTMLImageElement(Document* doc, HTMLFormElement* f)
-    : HTMLElement(imgTag, doc), m_imageLoader(this), ismap(false), m_form(f) {
+    : HTMLElement(imgTag, doc),
+      m_imageLoader(this),
+      ismap(false),
+      m_form(f),
+      m_compositeOperator(CompositeSourceOver) {
   if (f)
     f->registerImgElement(this);
 }
 
 HTMLImageElement::HTMLImageElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc), m_imageLoader(this), ismap(false), m_form(0) {}
+    : HTMLElement(tagName, doc),
+      m_imageLoader(this),
+      ismap(false),
+      m_form(0),
+      m_compositeOperator(CompositeSourceOver) {}
 
 HTMLImageElement::~HTMLImageElement() {
   if (m_form)
@@ -190,9 +198,10 @@ void HTMLImageElement::parseMappedAttribute(MappedAttribute* attr) {
     setHTMLEventListener(errorEvent, attr);
   else if (attrName == onloadAttr)
     setHTMLEventListener(loadEvent, attr);
-  else if (attrName == compositeAttr)
-    _compositeOperator = attr->value().domString();
-  else if (attrName == nameAttr) {
+  else if (attrName == compositeAttr) {
+    if (!parseCompositeOperator(attr->value(), m_compositeOperator))
+      m_compositeOperator = CompositeSourceOver;
+  } else if (attrName == nameAttr) {
     String newNameAttr = attr->value();
     if (inDocument() && document()->isHTMLDocument()) {
       HTMLDocument* doc = static_cast<HTMLDocument*>(document());

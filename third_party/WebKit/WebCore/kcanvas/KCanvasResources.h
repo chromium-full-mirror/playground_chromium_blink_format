@@ -134,12 +134,12 @@ class KCanvasMarker : public KCanvasResource {
   float scaleX() const;
   float scaleY() const;
 
-  // Draw onto the canvas
-  void draw(const FloatRect& rect,
+  void draw(GraphicsContext*,
+            const FloatRect&,
             double x,
             double y,
-            double strokeWidth = 1.,
-            double angle = 0.0);
+            double strokeWidth = 1,
+            double angle = 0);
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
