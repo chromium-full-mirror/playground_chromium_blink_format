@@ -59,17 +59,6 @@ class DOMNodeIterator : public DOMObject {
   RefPtr<WebCore::NodeIterator> m_impl;
 };
 
-// Constructor object NodeFilter
-class NodeFilterConstructor : public DOMObject {
- public:
-  NodeFilterConstructor(ExecState*) {}
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
-  // no put - all read-only
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-};
-
 class DOMNodeFilter : public DOMObject {
  public:
   DOMNodeFilter(ExecState*, WebCore::NodeFilter*);
@@ -119,7 +108,6 @@ class DOMTreeWalker : public DOMObject {
 };
 
 JSValue* toJS(ExecState*, WebCore::NodeIterator*);
-JSValue* getNodeFilterConstructor(ExecState*);
 JSValue* toJS(ExecState*, WebCore::NodeFilter*);
 JSValue* toJS(ExecState*, WebCore::TreeWalker*);
 

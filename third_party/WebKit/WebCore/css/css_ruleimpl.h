@@ -34,18 +34,18 @@ class CSSStyleSheet;
 class CSSStyleSheet;
 class MediaList;
 
-enum CSSRuleType {
-  UNKNOWN_RULE,
-  STYLE_RULE,
-  CHARSET_RULE,
-  IMPORT_RULE,
-  MEDIA_RULE,
-  FONT_FACE_RULE,
-  PAGE_RULE
-};
-
 class CSSRule : public StyleBase {
  public:
+  enum CSSRuleType {
+    UNKNOWN_RULE,
+    STYLE_RULE,
+    CHARSET_RULE,
+    IMPORT_RULE,
+    MEDIA_RULE,
+    FONT_FACE_RULE,
+    PAGE_RULE
+  };
+
   CSSRule(StyleBase* parent) : StyleBase(parent), m_type(UNKNOWN_RULE) {}
 
   virtual bool isRule() { return true; }

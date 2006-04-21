@@ -160,19 +160,6 @@ WebCore::Event* toEvent(
 
 KJS_DEFINE_PROTOTYPE(DOMEventProto)
 
-// Constructor object EventException
-class EventExceptionConstructor : public DOMObject {
- public:
-  EventExceptionConstructor(ExecState*) {}
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
-  // no put - all read-only
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-};
-
-JSValue* getEventExceptionConstructor(ExecState*);
-
 class Clipboard : public DOMObject {
   friend class ClipboardProtoFunc;
 

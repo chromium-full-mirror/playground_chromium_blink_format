@@ -190,6 +190,7 @@ class Window : public DOMObject {
     NodeFilter,
     DOMException,
     CSSRule,
+    CSSValue,
     Frames,
     History_,
     Event_,
