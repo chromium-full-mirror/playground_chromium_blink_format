@@ -491,6 +491,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)moveDragCaretToPoint:(NSPoint)point;
 - (void)removeDragCaret;
 - (DOMRange*)dragCaretDOMRange;
+- (BOOL)isDragCaretRichlyEditable;
 - (DOMRange*)editableDOMRangeForPoint:(NSPoint)point;
 - (DOMRange*)characterRangeAtPoint:(NSPoint)point;
 
