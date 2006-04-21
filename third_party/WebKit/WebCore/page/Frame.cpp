@@ -2691,6 +2691,8 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     LOG_ERROR("called Frame::paint with nil renderer");
 }
 
+#if __APPLE__
+
 void Frame::adjustPageHeight(float* newBottom,
                              float oldTop,
                              float oldBottom,
@@ -2709,6 +2711,8 @@ void Frame::adjustPageHeight(float* newBottom,
   } else
     *newBottom = oldBottom;
 }
+
+#endif
 
 PausedTimeouts* Frame::pauseTimeouts() {
 #if SVG_SUPPORT

@@ -78,7 +78,10 @@ CanvasPattern::CanvasPattern(CGImageRef image, bool repeatX, bool repeatY)
 CanvasPattern::CanvasPattern(CachedImage* cachedImage,
                              bool repeatX,
                              bool repeatY)
-    : m_platformImage(0),
+    :
+#if __APPLE__
+      m_platformImage(0),
+#endif
       m_cachedImage(cachedImage),
       m_repeatX(repeatX),
       m_repeatY(repeatY) {

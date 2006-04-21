@@ -231,10 +231,6 @@ bool QLineEdit::edited() const {
   return 0;
 }
 
-GraphicsContext::GraphicsContext() {
-  notImplemented();
-}
-
 QSlider::QSlider() {
   notImplemented();
 }
@@ -647,7 +643,7 @@ bool ScrollView::inWindow() const {
   return true;
 }
 
-void GraphicsContext::setShadow(int, int, int, Color const&) {}
+void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
 void GraphicsContext::endTransparencyLayer() {}
