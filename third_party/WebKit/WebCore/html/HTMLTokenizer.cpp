@@ -1755,7 +1755,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
 #endif
 
     if (errorOccurred)
-      EventTargetNodeCast(n.get())->dispatchHTMLEvent(errorEvent, false, false);
+      EventTargetNodeCast(n.get())->dispatchHTMLEvent(errorEvent, true, false);
     else {
       m_state = scriptExecution(scriptSource.deprecatedString(), m_state,
                                 cachedScriptUrl);

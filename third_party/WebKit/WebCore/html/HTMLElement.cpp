@@ -202,6 +202,10 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
     setHTMLEventListener(dragendEvent, attr);
   } else if (attr->name() == onselectstartAttr) {
     setHTMLEventListener(selectstartEvent, attr);
+  } else if (attr->name() == onsubmitAttr) {
+    setHTMLEventListener(submitEvent, attr);
+  } else if (attr->name() == onerrorAttr) {
+    setHTMLEventListener(errorEvent, attr);
   }
 }
 

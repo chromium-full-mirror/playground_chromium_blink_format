@@ -463,6 +463,11 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
                                       ExceptionCode& ec) {
   ec = 0;
 
+  if (!importedNode) {
+    ec = NOT_SUPPORTED_ERR;
+    return 0;
+  }
+
   switch (importedNode->nodeType()) {
     case TEXT_NODE:
       return createTextNode(importedNode->nodeValue());
@@ -525,13 +530,14 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
 
 PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
                                      ExceptionCode& ec) {
-  if (!source)
+  if (!source) {
+    ec = NOT_SUPPORTED_ERR;
     return 0;
+  }
 
   switch (source->nodeType()) {
     case ENTITY_NODE:
     case NOTATION_NODE:
-      return 0;
     case DOCUMENT_NODE:
     case DOCUMENT_TYPE_NODE:
       ec = NOT_SUPPORTED_ERR;
