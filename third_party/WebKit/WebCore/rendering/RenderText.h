@@ -83,7 +83,7 @@ class RenderText : public RenderObject {
   virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
                              int _tx,
                              int _ty);
-  virtual DeprecatedValueList<IntRect> RenderText::lineBoxRects();
+  virtual DeprecatedValueList<IntRect> lineBoxRects();
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
