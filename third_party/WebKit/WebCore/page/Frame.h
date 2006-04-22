@@ -39,6 +39,7 @@
 #include "TextGranularity.h"
 #include "TransferJobClient.h"
 #include <kxmlcore/Vector.h>
+#include "RenderObject.h"
 
 class KHTMLSettings;
 
@@ -840,6 +841,11 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
  public:
   friend class FrameMac;
   friend class FrameWin;
+
+  RenderObject::NodeInfo nodeInfoAtPoint(const IntPoint&,
+                                         bool allowShadowContent);
+  bool hasSelection();
+  String Frame::documentTypeString() const;
 
   void checkEmitLoadEvent();
   bool didOpenURL(const KURL&);
