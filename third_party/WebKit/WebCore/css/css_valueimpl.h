@@ -238,9 +238,8 @@ class CSSPrimitiveValue : public CSSValue {
   void setFloatValue(unsigned short unitType,
                      double floatValue,
                      ExceptionCode&);
-  double getFloatValue(unsigned short /* unitType */) const {
-    return m_value.num;
-  }
+  double getFloatValue(unsigned short unitType);
+  double getFloatValue() { return m_value.num; }
 
   void setStringValue(unsigned short stringType,
                       const String& stringValue,
