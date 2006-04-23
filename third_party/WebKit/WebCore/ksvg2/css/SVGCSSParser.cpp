@@ -49,10 +49,17 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
     return false;
 
   int id = value->id;
+
+  int num = inShorthand() ? 1 : valueList->size();
+
   if (id == CSS_VAL_INHERIT) {
+    if (num != 1)
+      return false;
     addProperty(propId, new CSSInheritedValue(), important);
     return true;
   } else if (id == CSS_VAL_INITIAL) {
+    if (num != 1)
+      return false;
     addProperty(propId, new CSSInitialValue(), important);
     return true;
   }
@@ -197,6 +204,7 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
         valid_primitive = true;
         break;
       }
+    /* fallthrough intentional */
     case SVGCSS_PROP_GLYPH_ORIENTATION_HORIZONTAL:  // <angle> | inherit
       if (value->unit == CSSPrimitiveValue::CSS_DEG)
         parsedValue =
@@ -277,13 +285,6 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
       else
         valid_primitive = validUnit(value, FLength, false);
       break;
-    /* shorthand properties */
-    case SVGCSS_PROP_MARKER: {
-      const int properties[3] = {SVGCSS_PROP_MARKER_START,
-                                 SVGCSS_PROP_MARKER_MID,
-                                 SVGCSS_PROP_MARKER_END};
-      return parseShorthand(propId, properties, 3, important);
-    }
 
     case SVGCSS_PROP_CLIP_PATH:  // <uri> | none | inherit
     case SVGCSS_PROP_FILTER:
@@ -298,6 +299,13 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
       }
       break;
 
+    /* shorthand properties */
+    case SVGCSS_PROP_MARKER: {
+      const int properties[3] = {SVGCSS_PROP_MARKER_START,
+                                 SVGCSS_PROP_MARKER_MID,
+                                 SVGCSS_PROP_MARKER_END};
+      return parseShorthand(propId, properties, 3, important);
+    }
     default:
       return false;
   }
@@ -316,14 +324,13 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
       parsedValue =
           new CSSQuirkPrimitiveValue(value->fValue, CSSPrimitiveValue::CSS_EMS);
     valueList->next();
-    if (valueList->current()) {
-      delete parsedValue;
-      parsedValue = 0;
-    }
   }
   if (parsedValue) {
-    addProperty(propId, parsedValue, important);
-    return true;
+    if (!valueList->current() || inShorthand()) {
+      addProperty(propId, parsedValue, important);
+      return true;
+    }
+    delete parsedValue;
   }
   return false;
 }
