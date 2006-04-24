@@ -54,8 +54,6 @@
 - (void)close;
 
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
-- (void)runOpenPanelForFileButtonWithResultListener:
-    (id<WebOpenPanelResultListener>)resultListener;
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;
