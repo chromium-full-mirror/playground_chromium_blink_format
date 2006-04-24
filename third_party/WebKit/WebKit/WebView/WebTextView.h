@@ -36,6 +36,7 @@
     : WebSearchableTextView<WebDocumentView, WebDocumentElement> {
   float _textSizeMultiplier;
   WebCoreTextDecoder* _decoder;
+  WebDataSource* _dataSource;
 }
 
 + (NSArray*)supportedMIMETypes;

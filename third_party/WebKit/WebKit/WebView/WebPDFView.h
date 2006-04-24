@@ -43,11 +43,12 @@
                                _WebDocumentViewState,
                                _WebDocumentTextSizing> {
   PDFView* PDFSubview;
-  WebDataSource* dataSource;
   NSString* path;
   id trackedFirstResponder;
   BOOL written;
   PDFView* PDFSubviewProxy;
+ @public
+  WebDataSource* dataSource;
 }
 
 + (NSArray*)supportedMIMETypes;
