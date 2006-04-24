@@ -38,8 +38,6 @@
 @interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
   WebFrame* _frame;
 
-  WebCoreKeyboardUIMode _keyboardUIMode;
-  BOOL _keyboardUIModeAccessed;
   BOOL _doingClientRedirect;
   BOOL _inNextKeyViewOutsideWebFrameViews;
   BOOL _haveUndoRedoOperations;
