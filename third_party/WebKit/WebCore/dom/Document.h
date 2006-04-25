@@ -748,7 +748,6 @@ class Document : public ContainerNode {
  public:
   bool inPageCache();
   void setInPageCache(bool flag);
-  void restoreRenderer(RenderObject*);
 
   void passwordFieldAdded();
   void passwordFieldRemoved();
