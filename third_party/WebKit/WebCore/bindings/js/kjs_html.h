@@ -124,9 +124,9 @@ class JSHTMLElement : public WebCore::JSElement {
       dir_info, menu_info, li_info, div_info, p_info, heading_info,
       blockQuote_info, q_info, pre_info, br_info, baseFont_info, font_info,
       hr_info, mod_info, a_info, img_info, object_info, param_info, applet_info,
-      map_info, area_info, script_info, table_info, caption_info, col_info,
-      tablesection_info, tr_info, tablecell_info, frameSet_info, frame_info,
-      iFrame_info, marquee_info;
+      embed_info, map_info, area_info, script_info, table_info, caption_info,
+      col_info, tablesection_info, tr_info, tablecell_info, frameSet_info,
+      frame_info, iFrame_info, marquee_info;
 
   // FIXME: Might make sense to combine this with ClassInfo some day.
   typedef JSValue* (JSHTMLElement::*GetterFunction)(ExecState* exec,
@@ -150,10 +150,10 @@ class JSHTMLElement : public WebCore::JSElement {
       blockQuote_accessors, q_accessors, pre_accessors, br_accessors,
       baseFont_accessors, font_accessors, hr_accessors, mod_accessors,
       a_accessors, img_accessors, object_accessors, param_accessors,
-      applet_accessors, map_accessors, area_accessors, script_accessors,
-      table_accessors, caption_accessors, col_accessors, tablesection_accessors,
-      tr_accessors, tablecell_accessors, frameSet_accessors, frame_accessors,
-      iFrame_accessors, marquee_accessors;
+      applet_accessors, embed_accessors, map_accessors, area_accessors,
+      script_accessors, table_accessors, caption_accessors, col_accessors,
+      tablesection_accessors, tr_accessors, tablecell_accessors,
+      frameSet_accessors, frame_accessors, iFrame_accessors, marquee_accessors;
 
   JSValue* htmlGetter(ExecState* exec, int token) const;
   void htmlSetter(ExecState* exec,
@@ -360,6 +360,8 @@ class JSHTMLElement : public WebCore::JSElement {
                     int token,
                     JSValue* value,
                     const WebCore::String& str);
+  JSValue* embedGetter(ExecState*, int token) const;
+  void embedSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* mapGetter(ExecState* exec, int token) const;
   void mapSetter(ExecState* exec,
                  int token,
@@ -661,6 +663,12 @@ class JSHTMLElement : public WebCore::JSElement {
     AppletHspace,
     AppletObject,
     AppletVspace,
+    EmbedAlign,
+    EmbedHeight,
+    EmbedName,
+    EmbedSrc,
+    EmbedType,
+    EmbedWidth,
     MapAreas,
     MapName,
     AreaHash,
