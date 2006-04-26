@@ -728,8 +728,8 @@ void CompositeEditCommand::moveParagraph(
                  beforeParagraph.deepEquivalent().offset());
 
   setEndingSelection(destination);
-  EditCommandPtr cmd(
-      new ReplaceSelectionCommand(document(), fragment.get(), false));
+  EditCommandPtr cmd(new ReplaceSelectionCommand(document(), fragment.get(),
+                                                 false, false, false, true));
   applyCommandToComposite(cmd);
 }
 
