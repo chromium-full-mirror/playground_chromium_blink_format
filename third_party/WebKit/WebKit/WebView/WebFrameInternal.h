@@ -68,6 +68,12 @@ _saveResourceAndSendRemainingDelegateMessagesWithRequest:(NSURLRequest*)request
                     webView:(WebView*)v
                      bridge:(WebFrameBridge*)bridge;
 
+- (void)_addPlugInView:(NSView*)plugInView;
+- (void)_removeAllPlugInViews;
+
+// This should be called when leaving a page or closing the WebView
+- (void)_willCloseURL;
+
 @end
 
 @interface NSObject (WebInternalFrameLoadDelegate)

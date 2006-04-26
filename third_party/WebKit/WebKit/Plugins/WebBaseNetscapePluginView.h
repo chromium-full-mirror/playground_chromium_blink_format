@@ -91,6 +91,7 @@
 
 - (BOOL)start;
 - (BOOL)isStarted;
+- (void)stop;
 
 - (WebFrame*)webFrame;
 - (WebDataSource*)dataSource;
