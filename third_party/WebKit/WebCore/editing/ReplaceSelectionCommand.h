@@ -139,7 +139,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   void updateNodesInserted(Node*);
   void fixupNodeStyles(const NodeVector&, const RenderingInfoMap&);
-  void removeLinePlaceholderIfNeeded(Node*);
+  void removeEndBRIfNeeded(Node*);
 
   bool shouldMergeStart(const ReplacementFragment&, const Selection&);
   bool shouldMergeEnd(const ReplacementFragment&, const Selection&);

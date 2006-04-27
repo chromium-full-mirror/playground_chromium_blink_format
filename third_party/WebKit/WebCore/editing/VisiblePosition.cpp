@@ -237,7 +237,10 @@ QChar VisiblePosition::character() const {
 
 bool isEqualIgnoringAffinity(const VisiblePosition& a,
                              const VisiblePosition& b) {
-  bool result = a.deepEquivalent() == b.deepEquivalent();
+  bool result =
+      a.deepEquivalent() == b.deepEquivalent() ||
+      // FIXME (8622): This is a slow but temporary workaround.
+      a.deepEquivalent().downstream() == b.deepEquivalent().downstream();
   if (result) {
     // We want to catch cases where positions are equal, but affinities are not,
     // since
