@@ -94,9 +94,6 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
                                  RenderStyle* style,
                                  SVGStyledElement* node,
                                  KCanvasPath* path) const;
-  virtual KCanvasContainer* createContainer(RenderArena* arena,
-                                            RenderStyle* style,
-                                            SVGStyledElement* node) const;
 
   // filters (mostly debugging)
   static bool filtersEnabled();

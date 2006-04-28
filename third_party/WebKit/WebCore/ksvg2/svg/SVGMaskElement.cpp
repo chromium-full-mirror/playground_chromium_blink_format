@@ -141,10 +141,8 @@ KCanvasImage* SVGMaskElement::drawMaskerContent() {
   return maskImage;
 }
 
-RenderObject* SVGMaskElement::createRenderer(RenderArena* arena,
-                                             RenderStyle* style) {
-  KCanvasContainer* maskContainer =
-      renderingDevice()->createContainer(arena, style, this);
+RenderObject* SVGMaskElement::createRenderer(RenderArena* arena, RenderStyle*) {
+  KCanvasContainer* maskContainer = new (arena) KCanvasContainer(this);
   maskContainer->setDrawsContents(false);
   return maskContainer;
 }

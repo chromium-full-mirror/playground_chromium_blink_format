@@ -366,9 +366,8 @@ void SVGPatternElement::notifyAttributeChange() const {
 }
 
 RenderObject* SVGPatternElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
-  KCanvasContainer* patternContainer =
-      renderingDevice()->createContainer(arena, style, this);
+                                                RenderStyle*) {
+  KCanvasContainer* patternContainer = new (arena) KCanvasContainer(this);
   patternContainer->setDrawsContents(false);
   return patternContainer;
 }
