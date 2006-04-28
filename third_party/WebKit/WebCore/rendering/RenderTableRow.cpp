@@ -109,8 +109,6 @@ void RenderTableRow::layout() {
       if (child->needsLayout()) {
         cell->calcVerticalMargins();
         cell->layout();
-        cell->setCellTopExtra(0);
-        cell->setCellBottomExtra(0);
       }
     }
   }
