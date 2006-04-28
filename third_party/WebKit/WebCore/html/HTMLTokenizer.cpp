@@ -521,51 +521,31 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
                                                  State state) {
   // FIXME: Why does this code even run for comments inside <script> and
   // <style>? This seems bogus.
-  bool strict =
-      !parser->doc()->inCompatMode() && !state.inScript() && !state.inStyle();
-  int delimiterCount = 0;
-  bool canClose = false;
   checkScriptBuffer(src.length());
   while (!src.isEmpty()) {
     scriptCode[scriptCodeSize++] = *src;
 #if defined(TOKEN_DEBUG) && TOKEN_DEBUG > 1
     qDebug("comment is now: *%s*",
            QConstString((QChar*)src.operator->(), min(16U, src.length()))
-               .deprecatedString()
+               .string()
                .latin1());
 #endif
 
-    if (strict) {
-      if (src->unicode() == '-') {
-        delimiterCount++;
-        if (delimiterCount == 2) {
-          delimiterCount = 0;
-          canClose = !canClose;
-        }
-      } else
-        delimiterCount = 0;
-    }
-
-    if ((!strict || canClose) && src->unicode() == '>') {
+    if (src->unicode() == '>') {
       bool handleBrokenComments =
           brokenComments && !(state.inScript() || state.inStyle());
       int endCharsCount = 1;  // start off with one for the '>' character
-      if (!strict) {
-        // In quirks mode just check for -->
-        if (scriptCodeSize > 2 && scriptCode[scriptCodeSize - 3] == '-' &&
-            scriptCode[scriptCodeSize - 2] == '-') {
-          endCharsCount = 3;
-        } else if (scriptCodeSize > 3 &&
-                   scriptCode[scriptCodeSize - 4] == '-' &&
-                   scriptCode[scriptCodeSize - 3] == '-' &&
-                   scriptCode[scriptCodeSize - 2] == '!') {
-          // Other browsers will accept --!> as a close comment, even though
-          // it's
-          // not technically valid.
-          endCharsCount = 4;
-        }
+      if (scriptCodeSize > 2 && scriptCode[scriptCodeSize - 3] == '-' &&
+          scriptCode[scriptCodeSize - 2] == '-') {
+        endCharsCount = 3;
+      } else if (scriptCodeSize > 3 && scriptCode[scriptCodeSize - 4] == '-' &&
+                 scriptCode[scriptCodeSize - 3] == '-' &&
+                 scriptCode[scriptCodeSize - 2] == '!') {
+        // Other browsers will accept --!> as a close comment, even though it's
+        // not technically valid.
+        endCharsCount = 4;
       }
-      if (canClose || handleBrokenComments || endCharsCount > 1) {
+      if (handleBrokenComments || endCharsCount > 1) {
         ++src;
         if (!(state.inScript() || state.inXmp() || state.inTextArea() ||
               state.inStyle())) {
