@@ -35,6 +35,7 @@ class CSSStyleDeclaration;
 class CSSStyleSheet;
 class CSSValue;
 class CSSValueList;
+class JSCSSStyleDeclaration;
 class MediaList;
 class RectImpl;
 class StyleSheet;
@@ -43,9 +44,10 @@ class StyleSheetList;
 
 namespace KJS {
 
+KJS_DEFINE_PROTOTYPE(DOMCSSStyleDeclarationProto)
+
 class DOMCSSStyleDeclaration : public DOMObject {
  public:
-  DOMCSSStyleDeclaration(ExecState* exec, WebCore::CSSStyleDeclaration* s);
   virtual ~DOMCSSStyleDeclaration();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
@@ -78,6 +80,10 @@ class DOMCSSStyleDeclaration : public DOMObject {
                                     JSObject*,
                                     const Identifier&,
                                     const PropertySlot&);
+
+  // Don't use this class directly -- use JSCSSStyleDeclaration instead
+  friend class WebCore::JSCSSStyleDeclaration;
+  DOMCSSStyleDeclaration(ExecState* exec, WebCore::CSSStyleDeclaration* s);
 
   RefPtr<WebCore::CSSStyleDeclaration> m_impl;
 };

@@ -126,6 +126,9 @@ class Window : public DOMObject {
   WebCore::Frame* frame() const { return m_frame; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  bool getOverridePropertySlot(ExecState*,
+                               const Identifier& propertyName,
+                               PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -183,14 +186,7 @@ class Window : public DOMObject {
     Crypto,
     DefaultStatus,
     Status,
-    Node,
-    EventCtor,
-    MutationEventCtor,
-    Range,
-    NodeFilter,
     DOMException,
-    CSSRule,
-    CSSValue,
     Frames,
     History_,
     Event_,

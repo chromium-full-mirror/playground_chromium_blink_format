@@ -217,14 +217,7 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable, 0};
   defaultStatus Window::DefaultStatus   DontDelete
   defaultstatus Window::DefaultStatus   DontDelete
   status        Window::Status          DontDelete
-  Node          Window::Node            DontDelete
-  Event         Window::EventCtor       DontDelete
-  Range         Window::Range           DontDelete
-  NodeFilter    Window::NodeFilter      DontDelete
   DOMException  Window::DOMException    DontDelete
-  CSSRule       Window::CSSRule         DontDelete
-  CSSValue      Window::CSSValue        DontDelete
-  MutationEvent Window::MutationEventCtor   DontDelete
   frames        Window::Frames          DontDelete|ReadOnly
   history       Window::History_        DontDelete|ReadOnly
   event         Window::Event_          DontDelete
@@ -705,22 +698,6 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return jsString(UString(m_frame->jsDefaultStatusBarText()));
     case Status:
       return jsString(UString(m_frame->jsStatusBarText()));
-    case Node:
-      return JSNode::getConstructor(exec);
-    case Range:
-      return JSRange::getConstructor(exec);
-    case NodeFilter:
-      return JSNodeFilter::getConstructor(exec);
-    case DOMException:
-      return getDOMExceptionConstructor(exec);
-    case CSSRule:
-      return JSCSSRule::getConstructor(exec);
-    case CSSValue:
-      return JSCSSValue::getConstructor(exec);
-    case EventCtor:
-      return JSEvent::getConstructor(exec);
-    case MutationEventCtor:
-      return JSMutationEvent::getConstructor(exec);
     case Frames:
       if (!frames)
         frames = new FrameArray(exec, m_frame);
@@ -922,22 +899,6 @@ JSValue* Window::childFrameGetter(ExecState*,
                       ->child(AtomicString(propertyName)));
 }
 
-JSValue* Window::namedFrameGetter(ExecState*,
-                                  JSObject*,
-                                  const Identifier& propertyName,
-                                  const PropertySlot& slot) {
-  // FIXME: I'm pretty sure this is wrong, because it's the same as the function
-  // above.
-  // There's no point in checking for child frames twice. I suspect this should
-  // be using
-  // find instead of "child". But I don't want to change the behavior without
-  // testing,
-  // so I'm leaving this as-is for now.
-  return retrieve(static_cast<Window*>(slot.slotBase())
-                      ->m_frame->tree()
-                      ->child(AtomicString(propertyName)));
-}
-
 JSValue* Window::indexGetter(ExecState*,
                              JSObject*,
                              const Identifier&,
@@ -963,9 +924,9 @@ JSValue* Window::namedItemGetter(ExecState* exec,
     return getHTMLCollection(exec, collection.get());
 }
 
-bool Window::getOwnPropertySlot(ExecState* exec,
-                                const Identifier& propertyName,
-                                PropertySlot& slot) {
+bool Window::getOverridePropertySlot(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     PropertySlot& slot) {
   // we don't want any properties other than "closed" on a closed window
   if (!m_frame) {
     if (propertyName == "closed") {
@@ -993,6 +954,12 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
+  return false;
+}
+
+bool Window::getOwnPropertySlot(ExecState* exec,
+                                const Identifier& propertyName,
+                                PropertySlot& slot) {
   // Check for child frames by name before built-in properties to
   // match Mozilla. This does not match IE, but some sites end up
   // naming frames things that conflict with window properties that
@@ -1028,17 +995,8 @@ bool Window::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  // FIXME: I'm pretty sure this is wrong, because it's the same as
-  // childFrameGetter above.
-  // There's no point in checking for child frames twice. I suspect this should
-  // be using
-  // find instead of "child". But I don't want to change the behavior without
-  // testing,
-  // so I'm leaving this as-is for now.
-  if (m_frame->tree()->child(atomicPropertyName)) {
-    slot.setCustom(this, namedFrameGetter);
-    return true;
-  }
+  // FIXME: Search the whole frame hierachy somewhere around here.
+  // We need to test the correct priority order.
 
   // allow window[1] or parent[1] etc. (#56983)
   bool ok;
@@ -1051,6 +1009,7 @@ bool Window::getOwnPropertySlot(ExecState* exec,
   // allow shortcuts like 'Image1' instead of document.images.Image1
   Document* doc = m_frame->document();
   if (isSafeScript(exec) && doc && doc->isHTMLDocument()) {
+    AtomicString atomicPropertyName = propertyName;
     if (static_cast<HTMLDocument*>(doc)->hasNamedItem(atomicPropertyName) ||
         doc->getElementById(atomicPropertyName)) {
       slot.setCustom(this, namedItemGetter);
