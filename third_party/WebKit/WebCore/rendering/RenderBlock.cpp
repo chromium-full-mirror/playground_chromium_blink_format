@@ -1403,7 +1403,7 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
   // backgrounds.
   PaintInfo paintInfo(i);
   paintInfo.phase = newPhase;
-  bool isPrinting = i.p->printing();
+  bool isPrinting = document()->printing();
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
@@ -1482,7 +1482,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   }
 
   // 3. paint selection
-  bool isPrinting = i.p->printing();
+  bool isPrinting = document()->printing();
   if (!inlineFlow && !isPrinting)
     paintSelection(
         i, scrolledX,

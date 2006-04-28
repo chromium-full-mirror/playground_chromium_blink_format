@@ -26,8 +26,9 @@
 #ifndef HTMLCanvas2DContext_h
 #define HTMLCanvas2DContext_h
 
-#include "CompositeOperator.h"
-#include "FloatRect.h"
+#include "FloatSize.h"
+#include "GraphicsTypes.h"
+#include "Path.h"
 #include "PlatformString.h"
 #include <kxmlcore/Vector.h>
 
@@ -40,6 +41,7 @@ namespace WebCore {
 class CanvasGradient;
 class CanvasPattern;
 class CanvasStyle;
+class FloatRect;
 class GraphicsContext;
 class HTMLCanvasElement;
 class HTMLImageElement;
@@ -252,27 +254,25 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
   void detachCanvas() { m_canvas = 0; }
 
  private:
-  enum Cap { ButtCap, RoundCap, SquareCap };
-  enum Join { MiterJoin, RoundJoin, BevelJoin };
-
   struct State {
     State();
 
     RefPtr<CanvasStyle> m_strokeStyle;
     RefPtr<CanvasStyle> m_fillStyle;
+    Path m_path;
     float m_lineWidth;
-    Cap m_lineCap;
-    Join m_lineJoin;
+    LineCap m_lineCap;
+    LineJoin m_lineJoin;
     float m_miterLimit;
     FloatSize m_shadowOffset;
     float m_shadowBlur;
     String m_shadowColor;
     float m_globalAlpha;
     CompositeOperator m_globalComposite;
+    bool m_appliedStrokePattern;
+    bool m_appliedFillPattern;
 #if __APPLE__
-    bool m_platformContextStrokeStyleIsPattern;
     CGAffineTransform m_strokeStylePatternTransform;
-    bool m_platformContextFillStyleIsPattern;
     CGAffineTransform m_fillStylePatternTransform;
 #endif
   };
@@ -286,12 +286,8 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
 
   GraphicsContext* drawingContext() const;
 
-#if __APPLE__
   void applyStrokePattern();
   void applyFillPattern();
-
-  CGContextRef platformContext() const;
-#endif
 
   HTMLCanvasElement* m_canvas;
   Vector<State, 1> m_stateStack;

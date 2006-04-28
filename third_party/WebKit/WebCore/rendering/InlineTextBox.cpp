@@ -256,7 +256,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   if (xPos >= i.r.right() || xPos + w <= i.r.x())
     return;
 
-  bool isPrinting = i.p->printing();
+  bool isPrinting = textObject()->document()->printing();
 
   // Determine whether or not we're selected.
   bool haveSelection =
