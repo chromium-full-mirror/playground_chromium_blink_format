@@ -45,6 +45,7 @@ class WebFrame : public WebCore::TransferJobClient,
                  public WebCore::FrameWinClient {
  public:
   WebFrame(char* name, WebView*);
+  ~WebFrame();
 
   void loadFilePath(char*);
   void loadHTMLString(char* html, char* baseURL = 0);
