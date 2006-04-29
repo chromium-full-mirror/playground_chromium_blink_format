@@ -36,6 +36,8 @@
 #include "KWQLoader.h"
 #include "Image.h"
 
+using std::max;
+
 namespace WebCore {
 
 CachedImage::CachedImage(DocLoader* dl,
@@ -133,9 +135,15 @@ void CachedImage::data(DeprecatedByteArray& data, bool eof) {
     } else
       notifyObservers();
 
+    // FIXME: An animated GIF with a huge frame count can't have its size
+    // properly estimated.  The reason is that we don't
+    // want to decode the image to determine the frame count, so what we do
+    // instead is max the projected size of a single
+    // RGBA32 buffer (width*height*4) with the data size.  This will help ensure
+    // that large animated GIFs with thousands of
+    // frames are properly designated as uncacheable.
     IntSize s = imageSize();
-    setSize(s.width() * s.height() *
-            2);  // This is really just a rough estimate of the decoded size.
+    setSize(max(s.width() * s.height() * 4, m_dataSize));
   }
   if (eof) {
     m_loading = false;
