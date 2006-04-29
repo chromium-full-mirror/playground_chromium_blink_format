@@ -607,7 +607,7 @@ Frame* FrameWin::createFrame(KURL const&,
                              String const&) {
   return 0;
 }
-void FrameWin::saveDocumentState(void) {}
+void FrameWin::saveDocumentState() {}
 void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
 void FrameWin::clearUndoRedoOperations(void) {}
 String FrameWin::incomingReferrer() const {
@@ -665,12 +665,12 @@ void GraphicsContext::clip(const Path&) {}
 Path::Path() {}
 Path::~Path() {}
 Path::Path(const Path&) {}
-bool Path::contains(const IntPoint&) const {
+bool Path::contains(const FloatPoint&) const {
   return false;
 }
 void Path::translate(const FloatSize&) {}
-IntRect Path::boundingRect() const {
-  return IntRect();
+FloatRect Path::boundingRect() const {
+  return FloatRect();
 }
 Path& Path::operator=(const Path&) {
   return *this;

@@ -32,6 +32,10 @@
 
 namespace WebCore {
 
+Page::Page() : m_frameCount(0) {
+  init();
+}
+
 static HWND rootWindowForFrame(const Frame* frame) {
   if (!frame)
     return 0;
