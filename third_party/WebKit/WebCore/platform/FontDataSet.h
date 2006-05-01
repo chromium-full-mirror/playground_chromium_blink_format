@@ -29,15 +29,11 @@
 
 #include <kxmlcore/Vector.h>
 
+namespace WebCore {
+
 #ifdef __APPLE__
-#ifdef __OBJC__
-@class WebTextRenderer;
-#else
 class WebTextRenderer;
 #endif
-#endif
-
-namespace WebCore {
 
 class Font;
 class GraphicsContext;
