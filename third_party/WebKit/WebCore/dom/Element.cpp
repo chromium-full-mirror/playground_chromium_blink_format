@@ -117,6 +117,7 @@ const AtomicString& Element::getAttribute(const QualifiedName& name) const {
 }
 
 void Element::scrollIntoView(bool alignToTop) {
+  document()->updateLayoutIgnorePendingStylesheets();
   IntRect bounds = getRect();
   if (renderer()) {
     // Align to the top / bottom and to the closest edge.
@@ -132,6 +133,7 @@ void Element::scrollIntoView(bool alignToTop) {
 }
 
 void Element::scrollIntoViewIfNeeded(bool centerIfNeeded) {
+  document()->updateLayoutIgnorePendingStylesheets();
   IntRect bounds = getRect();
   if (renderer()) {
     if (centerIfNeeded)
@@ -234,12 +236,14 @@ int Element::scrollTop() {
 }
 
 void Element::setScrollLeft(int newLeft) {
+  document()->updateLayoutIgnorePendingStylesheets();
   RenderObject* rend = renderer();
   if (rend && rend->hasOverflowClip())
     rend->layer()->scrollToXOffset(newLeft);
 }
 
 void Element::setScrollTop(int newTop) {
+  document()->updateLayoutIgnorePendingStylesheets();
   RenderObject* rend = renderer();
   if (rend && rend->hasOverflowClip())
     rend->layer()->scrollToYOffset(newTop);
