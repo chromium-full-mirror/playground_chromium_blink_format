@@ -203,6 +203,7 @@ inline HashMap<T, U, V, W, X>& HashMap<T, U, V, W, X>::operator=(
     const HashMap& other) {
   HashMap tmp(other);
   m_impl.swap(tmp.m_impl);
+  return *this;
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
