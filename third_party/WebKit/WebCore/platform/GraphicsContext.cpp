@@ -27,10 +27,7 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
-#include "FloatRect.h"
 #include "Font.h"
-#include "IntRect.h"
-#include "Widget.h"
 
 using namespace std;
 
@@ -40,7 +37,7 @@ struct GraphicsContextState {
   GraphicsContextState() : fillColor(Color::black), paintingDisabled(false) {}
   Font font;
   Pen pen;
-  RGBA32 fillColor;
+  Color fillColor;
   bool paintingDisabled;
 };
 
@@ -123,11 +120,11 @@ void GraphicsContext::setPen(RGBA32 rgb) {
   m_common->state.pen.setWidth(0);
 }
 
-void GraphicsContext::setFillColor(RGBA32 color) {
+void GraphicsContext::setFillColor(const Color& color) {
   m_common->state.fillColor = color;
 }
 
-const RGBA32 GraphicsContext::fillColor() const {
+Color GraphicsContext::fillColor() const {
   return m_common->state.fillColor;
 }
 

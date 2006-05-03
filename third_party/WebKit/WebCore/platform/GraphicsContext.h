@@ -73,8 +73,8 @@ class GraphicsContext : Noncopyable {
   void setPen(Pen::PenStyle);
   void setPen(RGBA32);
 
-  const RGBA32 fillColor() const;
-  void setFillColor(RGBA32);
+  Color fillColor() const;
+  void setFillColor(const Color&);
 
   void save();
   void restore();
@@ -191,6 +191,10 @@ class GraphicsContext : Noncopyable {
 
   void clip(const Path&);
 
+  void scale(const FloatSize&);
+  void rotate(float angleInRadians);
+  void translate(const FloatSize&);
+
 #if SVG_SUPPORT
   KRenderingDeviceContext* createRenderingDeviceContext();
 #endif
@@ -200,9 +204,6 @@ class GraphicsContext : Noncopyable {
 #endif
 
  private:
-  void setColorFromFillColor();
-  void setColorFromPen();
-
   void savePlatformState();
   void restorePlatformState();
 

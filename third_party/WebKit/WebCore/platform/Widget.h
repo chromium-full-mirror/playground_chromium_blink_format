@@ -53,8 +53,6 @@ class IntSize;
 class WidgetClient;
 class WidgetPrivate;
 
-enum HorizontalAlignment { AlignLeft, AlignRight, AlignHCenter };
-
 class Widget {
  public:
   enum FocusPolicy {
