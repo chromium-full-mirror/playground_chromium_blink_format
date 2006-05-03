@@ -74,8 +74,6 @@ class VisiblePosition {
 
   void debugPosition(const char* msg = "") const;
 
-  static Position deepEquivalent(const Position&);
-
   Element* rootEditableElement() const {
     return m_deepPosition.isNotNull()
                ? m_deepPosition.node()->rootEditableElement()

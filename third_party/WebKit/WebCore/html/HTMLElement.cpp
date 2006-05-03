@@ -312,6 +312,8 @@ void HTMLElement::setOuterHTML(const String& html, ExceptionCode& ec) {
     return;
   }
 
+  // FIXME: Why doesn't this have code to merge neighboring text nodes the
+  // way setOuterText does?
   parent->replaceChild(fragment.release(), this, ec);
 }
 
@@ -331,6 +333,7 @@ void HTMLElement::setInnerText(const String& text, ExceptionCode& ec) {
   }
 
   removeChildren();
+  // FIXME: This creates a new text node even when the text is empty.
   appendChild(new Text(document(), text), ec);
 }
 
@@ -355,6 +358,7 @@ void HTMLElement::setOuterText(const String& text, ExceptionCode& ec) {
     return;
   }
 
+  // FIXME: This creates a new text node even when the text is empy.
   RefPtr<Text> t = new Text(document(), text);
   ec = 0;
   parent->replaceChild(t, this, ec);
