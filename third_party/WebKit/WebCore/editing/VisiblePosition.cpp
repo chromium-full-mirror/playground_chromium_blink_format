@@ -221,8 +221,12 @@ int VisiblePosition::maxOffset(const Node* node) {
              : (int)node->childNodeCount();
 }
 
-QChar VisiblePosition::character() const {
-  Position pos = m_deepPosition;
+QChar VisiblePosition::characterAfter() const {
+  // We canonicalize to the first of two equivalent candidates, but the second
+  // of the two candidates
+  // is the one that will be inside the text node containing the character after
+  // this visible position.
+  Position pos = m_deepPosition.downstream();
   Node* node = pos.node();
   if (!node || !node->isTextNode()) {
     return QChar();

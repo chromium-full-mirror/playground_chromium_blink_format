@@ -381,6 +381,17 @@ bool isListElement(Node* n) {
                 n->hasTagName(dlTag)));
 }
 
+Node* enclosingTableCell(Node* node) {
+  if (!node)
+    return 0;
+
+  for (Node* n = node->parentNode(); n; n = n->parentNode())
+    if (n->renderer() && n->renderer()->isTableCell())
+      return n;
+
+  return 0;
+}
+
 Node* enclosingList(Node* node) {
   if (!node)
     return 0;
@@ -388,6 +399,7 @@ Node* enclosingList(Node* node) {
   for (Node* n = node->parentNode(); n; n = n->parentNode())
     if (n->hasTagName(ulTag) || n->hasTagName(olTag))
       return n;
+
   return 0;
 }
 
