@@ -45,4 +45,6 @@
 
 + (float)widthOfString:(NSString*)string font:(NSFont*)font;
 
++ (void)clear;
+
 @end
