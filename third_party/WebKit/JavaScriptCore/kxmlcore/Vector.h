@@ -324,6 +324,8 @@ class Vector {
   template <typename U>
   void append(const U&);
   template <typename U>
+  void append(const Vector<U>&);
+  template <typename U>
   void insert(size_t position, const U&);
   void remove(size_t position);
 
@@ -480,6 +482,15 @@ inline void Vector<T, inlineCapacity>::append(const U& val) {
     ptr = expandCapacity(size() + 1, ptr);
   new (end()) T(*ptr);
   ++m_size;
+}
+
+template <typename T, size_t inlineCapacity>
+template <typename U>
+inline void Vector<T, inlineCapacity>::append(const Vector<U>& val) {
+  if (size() + val.size() >= capacity())
+    expandCapacity(size() + val.size());
+  for (unsigned i = 0; i < val.size(); i++)
+    append(val[i]);
 }
 
 template <typename T, size_t inlineCapacity>
