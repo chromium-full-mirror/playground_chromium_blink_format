@@ -597,7 +597,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual String overrideMediaType() const = 0;
 
  protected:
-  virtual Plugin* createPlugin(const KURL& url,
+  virtual Plugin* createPlugin(Element* node,
+                               const KURL& url,
                                const Vector<String>& paramNames,
                                const Vector<String>& paramValues,
                                const String& mimeType) = 0;

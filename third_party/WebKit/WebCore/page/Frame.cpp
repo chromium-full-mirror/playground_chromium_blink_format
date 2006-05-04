@@ -1360,7 +1360,14 @@ bool Frame::loadPlugin(RenderPart* renderer,
     return false;
   }
 
-  Plugin* plugin = createPlugin(url, paramNames, paramValues, mimeType);
+  Element* pluginElement;
+  if (renderer && renderer->node() && renderer->node()->isElementNode())
+    pluginElement = static_cast<Element*>(renderer->node());
+  else
+    pluginElement = 0;
+
+  Plugin* plugin =
+      createPlugin(pluginElement, url, paramNames, paramValues, mimeType);
   if (!plugin) {
     checkEmitLoadEvent();
     return false;

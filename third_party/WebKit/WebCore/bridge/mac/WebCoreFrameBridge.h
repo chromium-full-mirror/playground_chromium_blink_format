@@ -685,7 +685,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (NSView*)viewForPluginWithURL:(NSURL*)URL
                  attributeNames:(NSArray*)attributeNames
                 attributeValues:(NSArray*)attributeValues
-                       MIMEType:(NSString*)MIMEType;
+                       MIMEType:(NSString*)MIMEType
+                     DOMElement:(DOMElement*)DOMElement;
 - (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
                        attributeNames:(NSArray*)attributeNames
                       attributeValues:(NSArray*)attributeValues
