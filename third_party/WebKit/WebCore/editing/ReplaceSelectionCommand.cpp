@@ -512,18 +512,18 @@ bool ReplaceSelectionCommand::shouldMergeStart(
 }
 
 bool ReplaceSelectionCommand::shouldMergeEnd(
-    const ReplacementFragment& incomingFragment,
     const VisiblePosition& endOfInsertedContent,
-    const VisiblePosition& destination) {
+    bool fragmentHadInterchangeNewlineAtEnd,
+    bool selectionEndWasEndOfParagraph) {
   Node* endNode = endOfInsertedContent.deepEquivalent().node();
-  Node* destinationNode = destination.deepEquivalent().node();
+  Node* nextNode = endOfInsertedContent.next().deepEquivalent().node();
   // FIXME: Unify the naming scheme for these enclosing element getters.
-  return !incomingFragment.hasInterchangeNewlineAtEnd() &&
+  return !selectionEndWasEndOfParagraph &&
+         !fragmentHadInterchangeNewlineAtEnd &&
          isEndOfParagraph(endOfInsertedContent) &&
-         nearestMailBlockquote(endNode) ==
-             nearestMailBlockquote(destinationNode) &&
-         enclosingListChild(endNode) == enclosingListChild(destinationNode) &&
-         enclosingTableCell(endNode) == enclosingTableCell(destinationNode) &&
+         nearestMailBlockquote(endNode) == nearestMailBlockquote(nextNode) &&
+         enclosingListChild(endNode) == enclosingListChild(nextNode) &&
+         enclosingTableCell(endNode) == enclosingTableCell(nextNode) &&
          !endNode->hasTagName(hrTag);
 }
 
@@ -878,12 +878,33 @@ void ReplaceSelectionCommand::doApply() {
   // last bit of content that was inserted.
   VisiblePosition endOfInsertedContent(Position(
       m_lastNodeInserted.get(), maxDeepOffset(m_lastNodeInserted.get())));
-  VisiblePosition destination = endOfInsertedContent.next();
-  if (!endWasEndOfParagraph &&
-      shouldMergeEnd(fragment, endOfInsertedContent, destination)) {
+  VisiblePosition startOfInsertedContent(
+      Position(m_firstNodeInserted.get(), 0));
+  if (shouldMergeEnd(endOfInsertedContent,
+                     fragment.hasInterchangeNewlineAtEnd(),
+                     endWasEndOfParagraph)) {
+    // Merging two paragraphs will destroy the moved one's block styles.  Always
+    // move forward to preserve
+    // the block style of the paragraph already in the document, unless the
+    // paragraph to move would include the
+    // what was the start of the selection that was pasted into.
+    bool mergeForward =
+        !inSameParagraph(startOfInsertedContent, endOfInsertedContent);
+
+    VisiblePosition destination =
+        mergeForward ? endOfInsertedContent.next() : endOfInsertedContent;
     VisiblePosition startOfParagraphToMove =
-        startOfParagraph(endOfInsertedContent);
-    moveParagraph(startOfParagraphToMove, endOfInsertedContent, destination);
+        mergeForward ? startOfParagraph(endOfInsertedContent)
+                     : endOfInsertedContent.next();
+
+    moveParagraph(startOfParagraphToMove,
+                  endOfParagraph(startOfParagraphToMove), destination);
+    // Merging forward will remove the last node inserted from the document.
+    // FIXME: Maintain positions for the start and end of inserted content
+    // instead of keeping nodes.  The nodes are
+    // only ever used to create positions where inserted content starts/ends.
+    if (mergeForward)
+      m_lastNodeInserted = destination.previous().deepEquivalent().node();
   }
 
   completeHTMLReplacement(lastPositionToSelect);
@@ -896,7 +917,8 @@ void ReplaceSelectionCommand::removeEndBRIfNeeded(Node* endBR) {
   VisiblePosition visiblePos(Position(endBR, 0));
 
   if (  // The br is collapsed away and so is unnecessary.
-      !document()->inStrictMode() && isEndOfBlock(visiblePos) ||
+      !document()->inStrictMode() && isEndOfBlock(visiblePos) &&
+          !isStartOfBlock(visiblePos) ||
       // A br that was originally holding a line open should be displaced by
       // inserted content.
       // A br that was originally acting as a line break should still be acting

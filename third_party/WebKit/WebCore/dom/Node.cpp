@@ -1009,9 +1009,12 @@ Element* Node::enclosingInlineElement() const {
 Element* Node::rootEditableElement() const {
   Element* result = 0;
   for (Node* n = const_cast<Node*>(this); n && n->isContentEditable();
-       n = n->parentNode())
+       n = n->parentNode()) {
     if (n->isBlockFlow() && n->isElementNode())
       result = static_cast<Element*>(n);
+    if (n->hasTagName(bodyTag))
+      break;
+  }
   return result;
 }
 

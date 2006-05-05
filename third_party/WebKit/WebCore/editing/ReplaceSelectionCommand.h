@@ -142,9 +142,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void removeEndBRIfNeeded(Node*);
 
   bool shouldMergeStart(const ReplacementFragment&, const Selection&);
-  bool shouldMergeEnd(const ReplacementFragment&,
-                      const VisiblePosition&,
-                      const VisiblePosition&);
+  bool shouldMergeEnd(const VisiblePosition&, bool, bool);
 
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastNodeInserted;
