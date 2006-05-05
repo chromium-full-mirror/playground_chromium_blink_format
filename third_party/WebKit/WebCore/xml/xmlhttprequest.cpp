@@ -102,7 +102,8 @@ static String getCharset(const String& contentTypeString) {
       return String();
 
     // is what we found a beginning of a word?
-    if (contentTypeString[pos - 1] > ' ' && contentTypeString[pos - 1] != ';') {
+    if (contentTypeString[pos - 1].unicode() > ' ' &&
+        contentTypeString[pos - 1] != ';') {
       pos += 7;
       continue;
     }
@@ -110,7 +111,7 @@ static String getCharset(const String& contentTypeString) {
     pos += 7;
 
     // skip whitespace
-    while (pos != length && contentTypeString[pos] <= ' ')
+    while (pos != length && contentTypeString[pos].unicode() <= ' ')
       ++pos;
 
     if (contentTypeString[pos++] != '=')  // this "charset" substring wasn't a
@@ -119,14 +120,14 @@ static String getCharset(const String& contentTypeString) {
       continue;
 
     while (pos != length &&
-           (contentTypeString[pos] <= ' ' || contentTypeString[pos] == '"' ||
-            contentTypeString[pos] == '\''))
+           (contentTypeString[pos].unicode() <= ' ' ||
+            contentTypeString[pos] == '"' || contentTypeString[pos] == '\''))
       ++pos;
 
     // we don't handle spaces within quoted parameter values, because charset
     // names cannot have any
     int endpos = pos;
-    while (pos != length && contentTypeString[endpos] > ' ' &&
+    while (pos != length && contentTypeString[endpos].unicode() > ' ' &&
            contentTypeString[endpos] != '"' &&
            contentTypeString[endpos] != '\'' &&
            contentTypeString[endpos] != ';')

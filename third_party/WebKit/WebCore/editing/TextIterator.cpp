@@ -280,7 +280,7 @@ void TextIterator::handleTextBox() {
         m_lastTextNodeEndedWithCollapsedSpace ||
         (m_textBox == firstTextBox && textBoxStart == runStart && runStart > 0);
     if (needSpace && !isCollapsibleWhitespace(m_lastCharacter) &&
-        !m_lastCharacter.isNull()) {
+        m_lastCharacter.unicode()) {
       emitCharacter(' ', m_node, 0, runStart, runStart);
       return;
     }

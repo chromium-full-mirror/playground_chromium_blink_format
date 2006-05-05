@@ -25,9 +25,9 @@
 #ifndef KHTMLSTRING_H
 #define KHTMLSTRING_H
 
+#include "DeprecatedValueList.h"
 #include "PlatformString.h"
 #include <assert.h>
-#include "DeprecatedValueList.h"
 
 namespace WebCore {
 
@@ -90,12 +90,12 @@ class SegmentedString {
   void prepend(const SegmentedString&);
 
   void push(QChar c) {
-    if (m_pushedChar1.isNull()) {
+    if (!m_pushedChar1.unicode()) {
       m_pushedChar1 = c;
       m_currentChar =
-          m_pushedChar1.isNull() ? m_currentString.m_current : &m_pushedChar1;
+          m_pushedChar1.unicode() ? &m_pushedChar1 : m_currentString.m_current;
     } else {
-      assert(m_pushedChar2.isNull());
+      assert(!m_pushedChar2.unicode());
       m_pushedChar2 = c;
     }
   }
@@ -104,7 +104,7 @@ class SegmentedString {
   unsigned length() const;
 
   void advance() {
-    if (!m_pushedChar1.isNull()) {
+    if (!m_pushedChar1.unicode()) {
       m_pushedChar1 = m_pushedChar2;
       m_pushedChar2 = 0;
     } else if (m_currentString.m_current) {
@@ -113,10 +113,10 @@ class SegmentedString {
         advanceSubstring();
     }
     m_currentChar =
-        m_pushedChar1.isNull() ? m_currentString.m_current : &m_pushedChar1;
+        m_pushedChar1.unicode() ? &m_pushedChar1 : m_currentString.m_current;
   }
 
-  bool escaped() const { return !m_pushedChar1.isNull(); }
+  bool escaped() const { return m_pushedChar1.unicode(); }
 
   int lineCount() const { return m_lines; }
   void resetLineCount() { m_lines = 0; }

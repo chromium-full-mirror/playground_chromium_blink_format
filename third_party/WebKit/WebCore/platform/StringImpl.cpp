@@ -267,7 +267,8 @@ Length* StringImpl::toCoordsArray(int& len) const {
   QChar space(' ');
   for (unsigned int i = 0; i < m_length; i++) {
     QChar cc = m_data[i];
-    if (cc > '9' || (cc < '0' && cc != '-' && cc != '*' && cc != '.'))
+    if (cc.unicode() > '9' ||
+        (cc.unicode() < '0' && cc != '-' && cc != '*' && cc != '.'))
       spacified[i] = space;
     else
       spacified[i] = cc;

@@ -29,8 +29,6 @@
 #include <kxmlcore/Assertions.h>
 #include <ctype.h>
 
-using std::ostream;
-
 DeprecatedCString::DeprecatedCString() {}
 
 DeprecatedCString::DeprecatedCString(int size) : DeprecatedByteArray(size) {

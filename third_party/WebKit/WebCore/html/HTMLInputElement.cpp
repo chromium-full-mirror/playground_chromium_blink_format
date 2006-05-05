@@ -1422,7 +1422,7 @@ String HTMLInputElement::constrainValue(const String& proposedValue,
     StringImpl* s = proposedValue.impl();
     int newLen = numCharactersInGraphemeClusters(s, maxLen);
     for (int i = 0; i < newLen; ++i)
-      if ((*s)[i] < ' ') {
+      if ((*s)[i].unicode() < ' ') {
         newLen = i;
         break;
       }

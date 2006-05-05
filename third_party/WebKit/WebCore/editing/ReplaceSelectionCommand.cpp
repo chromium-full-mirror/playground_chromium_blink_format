@@ -662,10 +662,9 @@ void ReplaceSelectionCommand::doApply() {
         !isStartOfParagraph(visiblePos);
     if (addLeadingSpace) {
       QChar previousChar = visiblePos.previous().characterAfter();
-      if (!previousChar.isNull()) {
+      if (previousChar.unicode())
         addLeadingSpace =
             !frame->isCharacterSmartReplaceExempt(previousChar, true);
-      }
     }
     addTrailingSpace =
         startPos.trailingWhitespacePosition(VP_DEFAULT_AFFINITY, true)
@@ -673,10 +672,9 @@ void ReplaceSelectionCommand::doApply() {
         !isEndOfParagraph(visiblePos);
     if (addTrailingSpace) {
       QChar thisChar = visiblePos.characterAfter();
-      if (!thisChar.isNull()) {
+      if (thisChar.unicode())
         addTrailingSpace =
             !frame->isCharacterSmartReplaceExempt(thisChar, false);
-      }
     }
   }
 
