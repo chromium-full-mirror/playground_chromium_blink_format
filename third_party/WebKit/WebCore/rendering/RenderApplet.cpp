@@ -82,7 +82,7 @@ void RenderApplet::createWidgetIfNecessary() {
         m_args.set(p->name(), p->value());
     }
   setWidget(new JavaAppletWidget(IntSize(width, height),
-                                 node()->document()->frame(), m_args));
+                                 static_cast<Element*>(node()), m_args));
 }
 
 void RenderApplet::layout() {

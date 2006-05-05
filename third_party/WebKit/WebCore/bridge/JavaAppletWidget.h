@@ -28,12 +28,12 @@
 #include <kxmlcore/HashMap.h>
 
 namespace WebCore {
-class Frame;
+class Element;
 }
 
 class JavaAppletWidget : public Widget {
  public:
   JavaAppletWidget(const IntSize&,
-                   WebCore::Frame*,
+                   WebCore::Element*,
                    const HashMap<WebCore::String, WebCore::String>& args);
 };
