@@ -120,7 +120,7 @@ class Document : public ContainerNode {
 
   // DOM methods & attributes for Document
 
-  virtual DocumentType* doctype() const;  // returns 0 for HTML documents
+  virtual DocumentType* doctype() const;  // May return 0 for HTML documents
   DocumentType* realDocType() const { return m_docType.get(); }
 
   DOMImplementation* implementation() const;

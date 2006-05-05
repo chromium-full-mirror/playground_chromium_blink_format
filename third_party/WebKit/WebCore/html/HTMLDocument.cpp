@@ -228,6 +228,7 @@ static bool containsString(const char* str,
 
 static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
                                     int* resultFlags,
+                                    DeprecatedString& name,
                                     DeprecatedString& publicID,
                                     DeprecatedString& systemID) {
   bool haveDocType = false;
@@ -262,6 +263,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
   if (!containsString("html", buffer, index))
     return false;
 
+  name = buffer.mid(index, 4);
   index = parseDocTypePart(buffer, index + 4);
   bool hasPublic = containsString("public", buffer, index);
   if (hasPublic) {
@@ -345,11 +347,11 @@ void HTMLDocument::determineParseMode(const DeprecatedString& str) {
   // STRICT - no quirks apply.  Web pages will obey the specifications to
   // the letter.
 
-  DeprecatedString systemID, publicID;
+  DeprecatedString name, systemID, publicID;
   int resultFlags = 0;
-  if (parseDocTypeDeclaration(str, &resultFlags, publicID, systemID)) {
+  if (parseDocTypeDeclaration(str, &resultFlags, name, publicID, systemID)) {
     if (resultFlags & PARSEMODE_HAVE_DOCTYPE)
-      setDocType(new DocumentType(this, "HTML", publicID, systemID));
+      setDocType(new DocumentType(this, name, publicID, systemID));
     if (!(resultFlags & PARSEMODE_HAVE_DOCTYPE)) {
       // No doctype found at all.  Default to quirks mode and Html4.
       pMode = Compat;
@@ -402,10 +404,5 @@ void HTMLDocument::determineParseMode(const DeprecatedString& str) {
   }
 
   m_styleSelector->strictParsing = !inCompatMode();
-}
-
-DocumentType* HTMLDocument::doctype() const {
-  // According to a comment in dom_doc.cpp, doctype is null for HTML documents.
-  return 0;
 }
 }
