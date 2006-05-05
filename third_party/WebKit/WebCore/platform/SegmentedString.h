@@ -104,7 +104,7 @@ class SegmentedString {
   unsigned length() const;
 
   void advance() {
-    if (!m_pushedChar1.unicode()) {
+    if (m_pushedChar1.unicode()) {
       m_pushedChar1 = m_pushedChar2;
       m_pushedChar2 = 0;
     } else if (m_currentString.m_current) {
