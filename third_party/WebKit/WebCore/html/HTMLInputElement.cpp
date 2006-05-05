@@ -107,12 +107,14 @@ void HTMLInputElement::init() {
 
   m_maxResults = -1;
 
-  if (m_form)
-    m_autocomplete = m_form->autoComplete();
+  if (form())
+    m_autocomplete = form()->autoComplete();
+
+  document()->registerFormElementWithState(this);
 }
 
 HTMLInputElement::~HTMLInputElement() {
-  document()->deregisterMaintainsState(this);
+  document()->deregisterFormElementWithState(this);
   delete m_imageLoader;
 }
 
@@ -141,14 +143,14 @@ bool HTMLInputElement::isKeyboardFocusable() const {
       HTMLInputElement* focusedInput =
           static_cast<HTMLInputElement*>(currentFocusNode);
       if (focusedInput->inputType() == RADIO &&
-          focusedInput->form() == m_form && focusedInput->name() == name())
+          focusedInput->form() == form() && focusedInput->name() == name())
         return false;
     }
 
     // Allow keyboard focus if we're checked or if nothing in the group is
     // checked.
     return checked() ||
-           !document()->checkedRadioButtonForGroup(name().impl(), m_form);
+           !document()->checkedRadioButtonForGroup(name().impl(), form());
   }
 
   return true;
@@ -235,18 +237,18 @@ void HTMLInputElement::setInputType(const String& t) {
       setAttribute(typeAttr, type());
     } else {
       if (inputType() == RADIO && !name().isEmpty()) {
-        if (document()->checkedRadioButtonForGroup(name().impl(), m_form) ==
+        if (document()->checkedRadioButtonForGroup(name().impl(), form()) ==
             this)
-          document()->removeRadioButtonGroup(name().impl(), m_form);
+          document()->removeRadioButtonGroup(name().impl(), form());
       }
       bool wasAttached = m_attached;
       if (wasAttached)
         detach();
       bool didStoreValue = storesValueSeparateFromAttribute();
-      bool didMaintainState = maintainsState();
+      bool didMaintainState = inputType() != PASSWORD;
       m_type = newType;
       bool willStoreValue = storesValueSeparateFromAttribute();
-      bool willMaintainState = maintainsState();
+      bool willMaintainState = inputType() != PASSWORD;
       if (didStoreValue && !willStoreValue && !m_value.isNull()) {
         setAttribute(valueAttr, m_value);
         m_value = String();
@@ -256,9 +258,9 @@ void HTMLInputElement::setInputType(const String& t) {
       else
         recheckValue();
       if (willMaintainState && !didMaintainState)
-        document()->registerMaintainsState(this);
+        document()->registerFormElementWithState(this);
       else if (!willMaintainState && didMaintainState)
-        document()->deregisterMaintainsState(this);
+        document()->deregisterFormElementWithState(this);
       if (wasAttached)
         attach();
 
@@ -266,7 +268,7 @@ void HTMLInputElement::setInputType(const String& t) {
       // ahead
       // and signal this to the form.
       if (inputType() == RADIO && checked())
-        document()->radioButtonChecked(this, m_form);
+        document()->radioButtonChecked(this, form());
     }
   }
   m_haveType = true;
@@ -277,43 +279,65 @@ void HTMLInputElement::setInputType(const String& t) {
   }
 }
 
-String HTMLInputElement::type() const {
+const AtomicString& HTMLInputElement::type() const {
   // needs to be lowercase according to DOM spec
   switch (inputType()) {
-    case BUTTON:
-      return "button";
-    case CHECKBOX:
-      return "checkbox";
-    case FILE:
-      return "file";
-    case HIDDEN:
-      return "hidden";
-    case IMAGE:
-      return "image";
+    case BUTTON: {
+      static const AtomicString button("button");
+      return button;
+    }
+    case CHECKBOX: {
+      static const AtomicString checkbox("checkbox");
+      return checkbox;
+    }
+    case FILE: {
+      static const AtomicString file("file");
+      return file;
+    }
+    case HIDDEN: {
+      static const AtomicString hidden("hidden");
+      return hidden;
+    }
+    case IMAGE: {
+      static const AtomicString image("image");
+      return image;
+    }
     case ISINDEX:
-      return "";
-    case PASSWORD:
-      return "password";
-    case RADIO:
-      return "radio";
-    case RANGE:
-      return "range";
-    case RESET:
-      return "reset";
-    case SEARCH:
-      return "search";
-    case SUBMIT:
-      return "submit";
-    case TEXT:
-      return "text";
+      return emptyAtom;
+    case PASSWORD: {
+      static const AtomicString password("password");
+      return password;
+    }
+    case RADIO: {
+      static const AtomicString radio("radio");
+      return radio;
+    }
+    case RANGE: {
+      static const AtomicString range("range");
+      return range;
+    }
+    case RESET: {
+      static const AtomicString reset("reset");
+      return reset;
+    }
+    case SEARCH: {
+      static const AtomicString search("search");
+      return search;
+    }
+    case SUBMIT: {
+      static const AtomicString submit("submit");
+      return submit;
+    }
+    case TEXT: {
+      static const AtomicString text("text");
+      return text;
+    }
   }
-  return "";
+  return emptyAtom;
 }
 
-DeprecatedString HTMLInputElement::state() {
-  assert(inputType() != PASSWORD);  // should never save/restore password fields
-
-  DeprecatedString state = HTMLGenericFormElement::state();
+String HTMLInputElement::stateValue() const {
+  ASSERT(inputType() != PASSWORD);  // should never save/restore password fields
   switch (inputType()) {
     case BUTTON:
     case FILE:
@@ -325,24 +349,18 @@ DeprecatedString HTMLInputElement::state() {
     case SEARCH:
     case SUBMIT:
     case TEXT:
-      return state + value().deprecatedString() +
-             '.';  // Add "." to make sure string is not empty.
+      return value();
     case CHECKBOX:
     case RADIO:
-      return state + (checked() ? "on" : "off");
+      return checked() ? "on" : "off";
     case PASSWORD:
       break;
   }
-  return DeprecatedString();
+  return String();
 }
 
-void HTMLInputElement::restoreState(DeprecatedStringList& states) {
-  assert(inputType() != PASSWORD);  // should never save/restore password fields
-
-  DeprecatedString state = HTMLGenericFormElement::findMatchingState(states);
-  if (state.isNull())
-    return;
-
+void HTMLInputElement::restoreState(const String& state) {
+  ASSERT(inputType() != PASSWORD);  // should never save/restore password fields
   switch (inputType()) {
     case BUTTON:
     case FILE:
@@ -354,7 +372,7 @@ void HTMLInputElement::restoreState(DeprecatedStringList& states) {
     case SEARCH:
     case SUBMIT:
     case TEXT:
-      setValue(state.left(state.length() - 1));
+      setValue(state);
       break;
     case CHECKBOX:
     case RADIO:
@@ -618,7 +636,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     if (inputType() == RADIO && checked()) {
       // Remove the radio from its old group.
       if (!m_name.isEmpty())
-        document()->removeRadioButtonGroup(m_name.impl(), m_form);
+        document()->removeRadioButtonGroup(m_name.impl(), form());
     }
 
     // Update our cached reference to the name.
@@ -631,7 +649,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
         setChecked(m_defaultChecked);
       // Add the button to its new group.
       if (checked())
-        document()->radioButtonChecked(this, m_form);
+        document()->radioButtonChecked(this, form());
     }
   } else if (attr->name() == autocompleteAttr) {
     m_autocomplete = !equalIgnoringCase(attr->value(), "off");
@@ -819,7 +837,7 @@ String HTMLInputElement::altText() const {
 bool HTMLInputElement::isSuccessfulSubmitButton() const {
   // HTML spec says that buttons must have names to be considered successful.
   // However, other browsers do not impose this constraint. So we do likewise.
-  return !m_disabled && (inputType() == IMAGE || inputType() == SUBMIT);
+  return !disabled() && (inputType() == IMAGE || inputType() == SUBMIT);
 }
 
 bool HTMLInputElement::isActivatedSubmit() const {
@@ -914,7 +932,7 @@ void HTMLInputElement::setChecked(bool nowChecked) {
     return;
 
   if (inputType() == RADIO && nowChecked)
-    document()->radioButtonChecked(this, m_form);
+    document()->radioButtonChecked(this, form());
 
   m_useDefaultChecked = false;
   m_checked = nowChecked;
@@ -1078,7 +1096,7 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
       // to be "undone", since
       // we want some object in the radio group to actually get selected.
       HTMLInputElement* currRadio =
-          document()->checkedRadioButtonForGroup(name().impl(), m_form);
+          document()->checkedRadioButtonForGroup(name().impl(), form());
       if (currRadio) {
         // We have a radio button selected that is not us.  Cache it in our
         // result field and ref it so
@@ -1152,13 +1170,13 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   // must dispatch a DOMActivate event - a click event will not do the job.
   if (evt->type() == DOMActivateEvent) {
     if (inputType() == IMAGE || inputType() == SUBMIT || inputType() == RESET) {
-      if (!m_form)
+      if (!form())
         return;
       if (inputType() == RESET)
-        m_form->reset();
+        form()->reset();
       else {
         m_activeSubmit = true;
-        if (!m_form->prepareSubmit()) {
+        if (!form()->prepareSubmit()) {
           xPos = 0;
           yPos = 0;
         }
@@ -1260,7 +1278,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         // Look for more radio buttons.
         if (n->hasTagName(inputTag)) {
           HTMLInputElement* elt = static_cast<HTMLInputElement*>(n);
-          if (elt->form() != m_form)
+          if (elt->form() != form())
             break;
           if (n->hasTagName(inputTag)) {
             HTMLInputElement* inputElt = static_cast<HTMLInputElement*>(n);
@@ -1280,8 +1298,8 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     if (clickElement) {
       click(false);
       evt->setDefaultHandled();
-    } else if (clickDefaultFormButton && m_form) {
-      m_form->submitClick();
+    } else if (clickDefaultFormButton && form()) {
+      form()->submitClick();
       evt->setDefaultHandled();
     }
   }

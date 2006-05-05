@@ -154,9 +154,6 @@ class Element : public ContainerNode {
 
   virtual void copyNonAttributeProperties(const Element* source) {}
 
-  // State of the element.
-  virtual DeprecatedString state() { return DeprecatedString::null; }
-
   virtual void attach();
   virtual RenderStyle* createStyleForRenderer(RenderObject* parent);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

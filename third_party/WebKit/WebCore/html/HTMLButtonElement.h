@@ -36,7 +36,7 @@ class HTMLButtonElement : public HTMLGenericFormElement {
 
   enum typeEnum { SUBMIT, RESET, BUTTON };
 
-  String type() const;
+  virtual const AtomicString& type() const;
 
   virtual WebCore::RenderObject* createRenderer(RenderArena*,
                                                 WebCore::RenderStyle*);

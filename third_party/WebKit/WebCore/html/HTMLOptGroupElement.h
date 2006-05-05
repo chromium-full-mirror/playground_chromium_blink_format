@@ -36,7 +36,7 @@ class HTMLOptGroupElement : public HTMLGenericFormElement {
   virtual ~HTMLOptGroupElement();
 
   virtual bool checkDTD(const Node*);
-  virtual String type() const;
+  virtual const AtomicString& type() const;
   virtual bool isFocusable() const;
   virtual bool insertBefore(PassRefPtr<Node> newChild,
                             Node* refChild,

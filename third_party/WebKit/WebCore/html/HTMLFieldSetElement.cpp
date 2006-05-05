@@ -47,8 +47,9 @@ bool HTMLFieldSetElement::isFocusable() const {
   return false;
 }
 
-String HTMLFieldSetElement::type() const {
-  return "fieldset";
+const AtomicString& HTMLFieldSetElement::type() const {
+  static const AtomicString fieldset("fieldset");
+  return fieldset;
 }
 
 RenderObject* HTMLFieldSetElement::createRenderer(RenderArena* arena,

@@ -48,8 +48,9 @@ RenderObject* HTMLLegendElement::createRenderer(RenderArena* arena,
   return new (arena) RenderLegend(this);
 }
 
-String HTMLLegendElement::type() const {
-  return "legend";
+const AtomicString& HTMLLegendElement::type() const {
+  static const AtomicString legend("legend");
+  return legend;
 }
 
 String HTMLLegendElement::accessKey() const {

@@ -47,7 +47,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   virtual int tagPriority() const { return 6; }
   virtual bool checkDTD(const Node* newChild);
 
-  String type() const;
+  virtual const AtomicString& type() const;
 
   virtual void recalcStyle(StyleChange);
 
@@ -72,9 +72,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   PassRefPtr<HTMLOptionsCollection> options();
 
-  virtual bool maintainsState() { return true; }
-  virtual DeprecatedString state();
-  virtual void restoreState(DeprecatedStringList&);
+  virtual String stateValue() const;
+  virtual void restoreState(const String&);
 
   virtual bool insertBefore(PassRefPtr<Node> newChild,
                             Node* refChild,

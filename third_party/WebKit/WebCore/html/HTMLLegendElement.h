@@ -22,6 +22,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef HTML_HTMLLegendElementImpl_H
 #define HTML_HTMLLegendElementImpl_H
 
@@ -29,20 +30,14 @@
 
 namespace WebCore {
 
-class HTMLFormElement;
-
 class HTMLLegendElement : public HTMLGenericFormElement {
  public:
-  HTMLLegendElement(Document* doc, HTMLFormElement* f = 0);
+  HTMLLegendElement(Document*, HTMLFormElement* = 0);
   virtual ~HTMLLegendElement();
 
   virtual bool isFocusable() const;
-
-  virtual WebCore::RenderObject* createRenderer(RenderArena*,
-                                                WebCore::RenderStyle*);
-
-  virtual String type() const;
-
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  virtual const AtomicString& type() const;
   virtual void accessKeyAction(bool sendToAnyElement);
 
   /**

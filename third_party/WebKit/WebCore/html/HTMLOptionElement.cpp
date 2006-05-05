@@ -29,6 +29,7 @@
 
 #include "Document.h"
 #include "ExceptionCode.h"
+#include "HTMLSelectElement.h"
 #include "Text.h"
 #include "render_form.h"
 
@@ -45,8 +46,9 @@ bool HTMLOptionElement::isFocusable() const {
   return false;
 }
 
-String HTMLOptionElement::type() const {
-  return "option";
+const AtomicString& HTMLOptionElement::type() const {
+  static const AtomicString option("option");
+  return option;
 }
 
 String HTMLOptionElement::text() const {

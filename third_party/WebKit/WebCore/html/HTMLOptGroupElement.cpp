@@ -43,8 +43,9 @@ bool HTMLOptGroupElement::isFocusable() const {
   return false;
 }
 
-String HTMLOptGroupElement::type() const {
-  return "optgroup";
+const AtomicString& HTMLOptGroupElement::type() const {
+  static const AtomicString optgroup("optgroup");
+  return optgroup;
 }
 
 bool HTMLOptGroupElement::insertBefore(PassRefPtr<Node> newChild,

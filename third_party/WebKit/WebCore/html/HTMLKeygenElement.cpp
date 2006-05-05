@@ -49,8 +49,9 @@ HTMLKeygenElement::HTMLKeygenElement(Document* doc, HTMLFormElement* f)
   }
 }
 
-String HTMLKeygenElement::type() const {
-  return "keygen";
+const AtomicString& HTMLKeygenElement::type() const {
+  static const AtomicString keygen("keygen");
+  return keygen;
 }
 
 void HTMLKeygenElement::parseMappedAttribute(MappedAttribute* attr) {

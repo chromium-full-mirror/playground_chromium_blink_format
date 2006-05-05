@@ -37,6 +37,7 @@
 #include "HTMLTextAreaElement.h"
 #include "KWQComboBox.h"
 #include "KWQFileButton.h"
+#include "KWQLineEdit.h"
 #include "KWQSlider.h"
 #include "KWQTextEdit.h"
 #include "PlatformMouseEvent.h"
@@ -73,7 +74,8 @@ void RenderFormElement::setStyle(RenderStyle* s) {
 }
 
 void RenderFormElement::updateFromElement() {
-  m_widget->setEnabled(!element()->disabled());
+  m_widget->setEnabled(
+      !static_cast<HTMLGenericFormElement*>(node())->disabled());
 }
 
 void RenderFormElement::layout() {
@@ -92,8 +94,9 @@ void RenderFormElement::layout() {
 void RenderFormElement::clicked(Widget*) {
   RenderArena* arena = ref();
   PlatformMouseEvent event;  // gets "current event"
-  if (element())
-    element()->dispatchMouseEvent(event, clickEvent, event.clickCount());
+  if (node())
+    static_cast<EventTargetNode*>(node())->dispatchMouseEvent(
+        event, clickEvent, event.clickCount());
   deref(arena);
 }
 
@@ -174,7 +177,7 @@ void RenderLineEdit::selectionChanged(Widget*) {
   // We only want to call onselect if there actually is a selection
   QLineEdit* w = static_cast<QLineEdit*>(m_widget);
   if (w->hasSelectedText())
-    element()->onSelect();
+    static_cast<HTMLGenericFormElement*>(node())->onSelect();
 }
 
 void RenderLineEdit::returnPressed(Widget*) {
@@ -182,22 +185,24 @@ void RenderLineEdit::returnPressed(Widget*) {
   // Works but might not be enough, dirk said he had another solution at
   // hand (can't remember which) - David
   if (isTextField() && isEdited()) {
-    element()->onChange();
+    static_cast<HTMLGenericFormElement*>(node())->onChange();
     setEdited(false);
   }
 
-  if (HTMLFormElement* fe = element()->form())
+  if (HTMLFormElement* fe =
+          static_cast<HTMLGenericFormElement*>(node())->form())
     fe->submitClick();
 }
 
 void RenderLineEdit::performSearch(Widget*) {
   // Fire the "search" DOM event.
-  element()->dispatchHTMLEvent(searchEvent, true, false);
+  static_cast<EventTargetNode*>(node())->dispatchHTMLEvent(searchEvent, true,
+                                                           false);
 }
 
 void RenderLineEdit::addSearchResult() {
   if (widget())
-    widget()->addSearchResult();
+    static_cast<QLineEdit*>(widget())->addSearchResult();
 }
 
 void RenderLineEdit::calcMinMaxWidth() {
@@ -205,8 +210,9 @@ void RenderLineEdit::calcMinMaxWidth() {
 
   // Let the widget tell us how big it wants to be.
   m_updating = true;
-  int size = element()->size();
-  IntSize s(widget()->sizeForCharacterWidth(size > 0 ? size : 20));
+  int size = static_cast<HTMLInputElement*>(node())->size();
+  IntSize s(static_cast<QLineEdit*>(widget())->sizeForCharacterWidth(
+      size > 0 ? size : 20));
   m_updating = false;
 
   setIntrinsicWidth(s.width());
@@ -218,14 +224,14 @@ void RenderLineEdit::calcMinMaxWidth() {
 void RenderLineEdit::setStyle(RenderStyle* s) {
   RenderFormElement::setStyle(s);
 
-  QLineEdit* w = widget();
+  QLineEdit* w = static_cast<QLineEdit*>(widget());
   w->setAlignment(textAlignment());
   w->setWritingDirection(style()->direction() == RTL ? RTL : LTR);
 }
 
 void RenderLineEdit::updateFromElement() {
-  HTMLInputElement* e = element();
-  QLineEdit* w = widget();
+  HTMLInputElement* e = static_cast<HTMLInputElement*>(node());
+  QLineEdit* w = static_cast<QLineEdit*>(widget());
 
   int ml = e->maxLength();
   if (ml <= 0 || ml > 1024)
@@ -271,7 +277,7 @@ void RenderLineEdit::valueChanged(Widget*) {
                    // the control, since
     return;  // we are getting the value from the DOM and it's not user input.
 
-  String newText = widget()->text();
+  String newText = static_cast<QLineEdit*>(widget())->text();
 
   // A null string value is used to indicate that the form control has not
   // altered the original
@@ -283,7 +289,7 @@ void RenderLineEdit::valueChanged(Widget*) {
     newText = "";
 
   newText.replace(backslashAsCurrencySymbol(), '\\');
-  element()->setValueFromRenderer(newText);
+  static_cast<HTMLInputElement*>(node())->setValueFromRenderer(newText);
 }
 
 int RenderLineEdit::selectionStart() {
@@ -497,7 +503,7 @@ void RenderFileButton::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
   // Let the widget tell us how big it wants to be.
-  int size = element()->size();
+  int size = static_cast<HTMLInputElement*>(node())->size();
   IntSize s(static_cast<KWQFileButton*>(widget())->sizeForCharacterWidth(
       size > 0 ? size : 20));
 
@@ -509,20 +515,20 @@ void RenderFileButton::calcMinMaxWidth() {
 
 void RenderFileButton::updateFromElement() {
   static_cast<KWQFileButton*>(widget())->setFilename(
-      element()->value().deprecatedString());
+      static_cast<HTMLInputElement*>(node())->value().deprecatedString());
 
   RenderFormElement::updateFromElement();
 }
 
 void RenderFileButton::returnPressed(Widget*) {
-  if (element()->form())
-    element()->form()->prepareSubmit();
+  if (static_cast<HTMLInputElement*>(node())->form())
+    static_cast<HTMLInputElement*>(node())->form()->prepareSubmit();
 }
 
 void RenderFileButton::valueChanged(Widget*) {
-  element()->setValueFromRenderer(
+  static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
       static_cast<KWQFileButton*>(widget())->filename());
-  element()->onChange();
+  static_cast<HTMLInputElement*>(node())->onChange();
 }
 
 void RenderFileButton::select() {}
@@ -579,8 +585,8 @@ void RenderSelect::updateFromElement() {
   unsigned oldSize = m_size;
   bool oldListbox = m_useListBox;
 
-  m_multiple = element()->multiple();
-  m_size = element()->size();
+  m_multiple = static_cast<HTMLSelectElement*>(node())->multiple();
+  m_size = static_cast<HTMLSelectElement*>(node())->size();
   m_useListBox = (m_multiple || m_size > 1);
 
   if (oldMultiple != m_multiple || oldSize != m_size) {
@@ -605,9 +611,10 @@ void RenderSelect::updateFromElement() {
 
   // update contents listbox/combobox based on options in m_element
   if (m_optionsChanged) {
-    if (element()->m_recalcListItems)
-      element()->recalcListItems();
-    DeprecatedArray<HTMLElement*> listItems = element()->listItems();
+    if (static_cast<HTMLSelectElement*>(node())->m_recalcListItems)
+      static_cast<HTMLSelectElement*>(node())->recalcListItems();
+    DeprecatedArray<HTMLElement*> listItems =
+        static_cast<HTMLSelectElement*>(node())->listItems();
     int listIndex;
 
     if (m_useListBox)
@@ -748,13 +755,15 @@ void RenderSelect::layout() {
   RenderFormElement::layout();
 
   // and now disable the widget in case there is no <option> given
-  DeprecatedArray<HTMLElement*> listItems = element()->listItems();
+  DeprecatedArray<HTMLElement*> listItems =
+      static_cast<HTMLSelectElement*>(node())->listItems();
 
   bool foundOption = false;
   for (unsigned i = 0; i < listItems.size() && !foundOption; i++)
     foundOption = (listItems[i]->hasTagName(optionTag));
 
-  m_widget->setEnabled(foundOption && !element()->disabled());
+  m_widget->setEnabled(foundOption &&
+                       !static_cast<HTMLSelectElement*>(node())->disabled());
 }
 
 void RenderSelect::valueChanged(Widget*) {
@@ -765,7 +774,8 @@ void RenderSelect::valueChanged(Widget*) {
 
   int index = static_cast<QComboBox*>(m_widget)->currentItem();
 
-  DeprecatedArray<HTMLElement*> listItems = element()->listItems();
+  DeprecatedArray<HTMLElement*> listItems =
+      static_cast<HTMLSelectElement*>(node())->listItems();
   if (index >= 0 && index < (int)listItems.size()) {
     bool found = listItems[index]->hasTagName(optionTag);
     if (!found) {
@@ -801,7 +811,7 @@ void RenderSelect::valueChanged(Widget*) {
     }
   }
 
-  element()->onChange();
+  static_cast<HTMLSelectElement*>(node())->onChange();
 }
 
 void RenderSelect::selectionChanged(Widget*) {
@@ -812,7 +822,8 @@ void RenderSelect::selectionChanged(Widget*) {
   // the
   // option list will make use update options not in the way the user expects
   // them
-  DeprecatedArray<HTMLElement*> listItems = element()->m_listItems;
+  DeprecatedArray<HTMLElement*> listItems =
+      static_cast<HTMLSelectElement*>(node())->m_listItems;
   int j = 0;
   for (unsigned i = 0; i < listItems.count(); i++) {
     // don't use setSelected() here because it will cause us to be called
@@ -824,7 +835,7 @@ void RenderSelect::selectionChanged(Widget*) {
         listItems[i]->hasTagName(optgroupTag))
       ++j;
   }
-  element()->onChange();
+  static_cast<HTMLSelectElement*>(node())->onChange();
 }
 
 void RenderSelect::setOptionsChanged(bool _optionsChanged) {
@@ -839,7 +850,8 @@ QListBox* RenderSelect::createListBox() {
 }
 
 void RenderSelect::updateSelection() {
-  DeprecatedArray<HTMLElement*> listItems = element()->listItems();
+  DeprecatedArray<HTMLElement*> listItems =
+      static_cast<HTMLSelectElement*>(node())->listItems();
   int i;
   if (m_useListBox) {
     // if multi-select, we select only the new selected index
@@ -891,7 +903,7 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElement* element)
 }
 
 void RenderTextArea::destroy() {
-  element()->rendererWillBeDestroyed();
+  static_cast<HTMLTextAreaElement*>(node())->rendererWillBeDestroyed();
   RenderFormElement::destroy();
 }
 
@@ -899,8 +911,9 @@ void RenderTextArea::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
-  IntSize size(w->sizeWithColumnsAndRows(max(element()->cols(), 1),
-                                         max(element()->rows(), 1)));
+  IntSize size(w->sizeWithColumnsAndRows(
+      max(static_cast<HTMLTextAreaElement*>(node())->cols(), 1),
+      max(static_cast<HTMLTextAreaElement*>(node())->rows(), 1)));
 
   setIntrinsicWidth(size.width());
   setIntrinsicHeight(size.height());
@@ -932,7 +945,8 @@ void RenderTextArea::setStyle(RenderStyle* s) {
       break;
   }
   ScrollBarMode horizontalScrollMode = scrollMode;
-  if (element()->wrap() != HTMLTextAreaElement::ta_NoWrap)
+  if (static_cast<HTMLTextAreaElement*>(node())->wrap() !=
+      HTMLTextAreaElement::ta_NoWrap)
     horizontalScrollMode = ScrollBarAlwaysOff;
 
   w->setScrollBarModes(horizontalScrollMode, scrollMode);
@@ -943,7 +957,7 @@ void RenderTextArea::setEdited(bool x) {
 }
 
 void RenderTextArea::updateFromElement() {
-  HTMLTextAreaElement* e = element();
+  HTMLTextAreaElement* e = static_cast<HTMLTextAreaElement*>(node());
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
   w->setReadOnly(e->isReadOnlyControl());
@@ -980,7 +994,7 @@ String RenderTextArea::textWithHardLineBreaks() {
 void RenderTextArea::valueChanged(Widget*) {
   if (m_updating)
     return;
-  element()->invalidateValue();
+  static_cast<HTMLTextAreaElement*>(node())->invalidateValue();
   m_dirty = true;
 }
 
@@ -1020,7 +1034,7 @@ void RenderTextArea::selectionChanged(Widget*) {
   if (!w->hasSelectedText())
     return;
 
-  element()->onSelect();
+  static_cast<HTMLTextAreaElement*>(node())->onSelect();
 }
 
 // ---------------------------------------------------------------------------
@@ -1049,10 +1063,13 @@ void RenderSlider::calcMinMaxWidth() {
 }
 
 void RenderSlider::updateFromElement() {
-  String value = element()->value();
-  const AtomicString& minStr = element()->getAttribute(minAttr);
-  const AtomicString& maxStr = element()->getAttribute(maxAttr);
-  const AtomicString& precision = element()->getAttribute(precisionAttr);
+  String value = static_cast<HTMLInputElement*>(node())->value();
+  const AtomicString& minStr =
+      static_cast<HTMLInputElement*>(node())->getAttribute(minAttr);
+  const AtomicString& maxStr =
+      static_cast<HTMLInputElement*>(node())->getAttribute(maxAttr);
+  const AtomicString& precision =
+      static_cast<HTMLInputElement*>(node())->getAttribute(precisionAttr);
 
   double minVal = minStr.isNull() ? 0.0 : minStr.deprecatedString().toDouble();
   double maxVal =
@@ -1067,7 +1084,7 @@ void RenderSlider::updateFromElement() {
   if (!equalIgnoringCase(precision, "float"))
     val = (int)(val + 0.5);
 
-  element()->setValue(String::number(val));
+  static_cast<HTMLInputElement*>(node())->setValue(String::number(val));
 
   QSlider* slider = (QSlider*)widget();
 
@@ -1082,15 +1099,17 @@ void RenderSlider::valueChanged(Widget*) {
   QSlider* slider = static_cast<QSlider*>(widget());
 
   double val = slider->value();
-  const AtomicString& precision = element()->getAttribute(precisionAttr);
+  const AtomicString& precision =
+      static_cast<HTMLInputElement*>(node())->getAttribute(precisionAttr);
 
   // Force integer value if not float.
   if (!equalIgnoringCase(precision, "float"))
     val = (int)(val + 0.5);
 
-  element()->setValue(String::number(val));
+  static_cast<HTMLInputElement*>(node())->setValue(String::number(val));
 
   // Fire the "input" DOM event.
-  element()->dispatchHTMLEvent(inputEvent, true, false);
+  static_cast<HTMLInputElement*>(node())->dispatchHTMLEvent(inputEvent, true,
+                                                            false);
 }
 }

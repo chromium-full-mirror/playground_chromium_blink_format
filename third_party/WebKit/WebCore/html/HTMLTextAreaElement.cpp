@@ -41,34 +41,28 @@ using namespace HTMLNames;
 
 HTMLTextAreaElement::HTMLTextAreaElement(Document* doc, HTMLFormElement* f)
     : HTMLGenericFormElement(textareaTag, doc, f),
+      m_rows(2),
+      m_cols(20),
+      m_wrap(ta_Virtual),
       m_valueMatchesRenderer(true) {
-  // DTD requires rows & cols be specified, but we will provide reasonable
-  // defaults
-  m_rows = 2;
-  m_cols = 20;
-  m_wrap = ta_Virtual;
+  document()->registerFormElementWithState(this);
 }
 
 HTMLTextAreaElement::~HTMLTextAreaElement() {
-  document()->deregisterMaintainsState(this);
+  document()->deregisterFormElementWithState(this);
 }
 
-String HTMLTextAreaElement::type() const {
-  return "textarea";
+const AtomicString& HTMLTextAreaElement::type() const {
+  static const AtomicString textarea("textarea");
+  return textarea;
 }
 
-DeprecatedString HTMLTextAreaElement::state() {
-  // Make sure the string is not empty!
-  return HTMLGenericFormElement::state() + value().deprecatedString() + '.';
+String HTMLTextAreaElement::stateValue() const {
+  return value();
 }
 
-void HTMLTextAreaElement::restoreState(DeprecatedStringList& states) {
-  DeprecatedString state = HTMLGenericFormElement::findMatchingState(states);
-  if (state.isNull())
-    return;
-  setDefaultValue(state.left(state.length() - 1));
-  // the close() in the rendertree will take care of transferring defaultvalue
-  // to 'value'
+void HTMLTextAreaElement::restoreState(const String& state) {
+  setDefaultValue(state);
 }
 
 int HTMLTextAreaElement::selectionStart() {
@@ -171,7 +165,7 @@ void HTMLTextAreaElement::rendererWillBeDestroyed() {
   updateValue();
 }
 
-void HTMLTextAreaElement::updateValue() {
+void HTMLTextAreaElement::updateValue() const {
   if (!m_valueMatchesRenderer) {
     ASSERT(renderer());
     m_value = static_cast<RenderTextArea*>(renderer())->text();
@@ -179,7 +173,7 @@ void HTMLTextAreaElement::updateValue() {
   }
 }
 
-String HTMLTextAreaElement::value() {
+String HTMLTextAreaElement::value() const {
   updateValue();
   return m_value;
 }
@@ -199,11 +193,11 @@ void HTMLTextAreaElement::setValue(const String& value) {
   setChanged(true);
 }
 
-String HTMLTextAreaElement::defaultValue() {
+String HTMLTextAreaElement::defaultValue() const {
   String val = "";
+
   // there may be comments - just grab the text nodes
-  Node* n;
-  for (n = firstChild(); n; n = n->nextSibling())
+  for (Node* n = firstChild(); n; n = n->nextSibling())
     if (n->isTextNode())
       val += static_cast<Text*>(n)->data();
 
