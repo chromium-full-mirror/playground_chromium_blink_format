@@ -190,7 +190,7 @@ void Widget::unlockDrawingFocus(GraphicsContext*) {
 }
 
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
-                                   Frame*,
+                                   Element*,
                                    KXMLCore::HashMap<String, String> const&) {
   notImplemented();
 }
