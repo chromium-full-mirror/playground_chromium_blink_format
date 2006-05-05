@@ -39,6 +39,18 @@ namespace WebCore {
 // calls in this file are all exception-safe, so we don't block
 // exceptions for those.
 
+static void setCGFillColor(CGContextRef context, const Color& color) {
+  CGFloat red, green, blue, alpha;
+  color.getRGBA(red, green, blue, alpha);
+  CGContextSetRGBFillColor(context, red, green, blue, alpha);
+}
+
+static void setCGStrokeColor(CGContextRef context, const Color& color) {
+  CGFloat red, green, blue, alpha;
+  color.getRGBA(red, green, blue, alpha);
+  CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
+}
+
 void GraphicsContext::savePlatformState() {
   CGContextSaveGState(platformContext());
 }
@@ -55,12 +67,12 @@ void GraphicsContext::drawRect(const IntRect& rect) {
   CGContextRef context = platformContext();
 
   if (fillColor().alpha()) {
-    CGContextSetFillColorWithColor(context, cgColor(fillColor()));
+    setCGFillColor(context, fillColor());
     CGContextFillRect(context, rect);
   }
 
   if (pen().style() != Pen::Pen::NoPen) {
-    CGContextSetFillColorWithColor(context, cgColor(pen().color()));
+    setCGFillColor(context, pen().color());
     CGRect rects[4] = {
         FloatRect(rect.x(), rect.y(), rect.width(), 1),
         FloatRect(rect.x(), rect.bottom() - 1, rect.width(), 1),
@@ -133,9 +145,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
 
   CGContextSaveGState(context);
 
-  CGColorRef colorRef = cgColor(pen().color());
-  CGContextSetFillColorWithColor(context, colorRef);
-  CGContextSetStrokeColorWithColor(context, colorRef);
+  setCGStrokeColor(context, pen().color());
 
   CGContextSetShouldAntialias(context, false);
 
@@ -143,6 +153,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
     // Do a rect fill of our endpoints.  This ensures we always have the
     // appearance of being a border.  We then draw the actual dotted/dashed
     // line.
+    setCGFillColor(context, pen().color());
     if (isVerticalLine) {
       CGContextFillRect(
           context, FloatRect(p1.x() - width / 2, p1.y() - width, width, width));
@@ -218,10 +229,10 @@ void GraphicsContext::drawEllipse(const IntRect& rect) {
   CGContextClosePath(context);
 
   if (fillColor().alpha()) {
-    CGContextSetFillColorWithColor(context, cgColor(fillColor()));
+    setCGFillColor(context, fillColor());
     if (pen().style() != Pen::NoPen) {
       // stroke and fill
-      CGContextSetStrokeColorWithColor(context, cgColor(pen().color()));
+      setCGStrokeColor(context, pen().color());
       unsigned penWidth = pen().width();
       if (penWidth == 0)
         penWidth++;
@@ -230,7 +241,7 @@ void GraphicsContext::drawEllipse(const IntRect& rect) {
     } else
       CGContextFillPath(context);
   } else if (pen().style() != Pen::NoPen) {
-    CGContextSetStrokeColorWithColor(context, cgColor(pen().color()));
+    setCGStrokeColor(context, pen().color());
     unsigned penWidth = pen().width();
     if (penWidth == 0)
       penWidth++;
@@ -256,7 +267,7 @@ void GraphicsContext::drawArc(int x, int y, int w, int h, int a, int alen) {
     CGContextAddArc(context, x + r, y + r, r, -fa * M_PI / 180,
                     -falen * M_PI / 180, true);
 
-    CGContextSetStrokeColorWithColor(context, cgColor(pen().color()));
+    setCGStrokeColor(context, pen().color());
     CGContextSetLineWidth(context, pen().width());
     CGContextStrokePath(context);
   }
@@ -283,12 +294,12 @@ void GraphicsContext::drawConvexPolygon(const IntPointArray& points) {
   CGContextClosePath(context);
 
   if (fillColor().alpha()) {
-    CGContextSetFillColorWithColor(context, cgColor(fillColor()));
+    setCGFillColor(context, fillColor());
     CGContextEOFillPath(context);
   }
 
   if (pen().style() != Pen::NoPen) {
-    CGContextSetStrokeColorWithColor(context, cgColor(pen().color()));
+    setCGStrokeColor(context, pen().color());
     CGContextSetLineWidth(context, pen().width());
     CGContextStrokePath(context);
   }
@@ -301,7 +312,7 @@ void GraphicsContext::fillRect(const IntRect& rect, const Color& color) {
     return;
   if (color.alpha()) {
     CGContextRef context = platformContext();
-    CGContextSetFillColorWithColor(context, cgColor(color));
+    setCGFillColor(context, color);
     CGContextFillRect(context, rect);
   }
 }
@@ -439,7 +450,7 @@ void GraphicsContext::setShadow(const IntSize& size,
 void GraphicsContext::clearShadow() {
   if (paintingDisabled())
     return;
-  CGContextSetShadowWithColor(platformContext(), CGSizeZero, 0, NULL);
+  CGContextSetShadowWithColor(platformContext(), CGSizeZero, 0, 0);
 }
 
 void GraphicsContext::setLineWidth(float width) {
