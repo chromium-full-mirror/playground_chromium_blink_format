@@ -484,7 +484,8 @@ bool FrameWin::canGoBackOrForward(int) const {
 void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
-Plugin* FrameWin::createPlugin(KURL const&,
+Plugin* FrameWin::createPlugin(Element*,
+                               KURL const&,
                                const Vector<String>&,
                                const Vector<String>&,
                                String const&) {

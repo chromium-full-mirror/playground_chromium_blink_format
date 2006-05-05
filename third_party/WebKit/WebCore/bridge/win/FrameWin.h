@@ -52,7 +52,8 @@ class FrameWin : public Frame {
 
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const String& mimeType);
-  virtual Plugin* createPlugin(const KURL&,
+  virtual Plugin* createPlugin(Element*,
+                               const KURL&,
                                const Vector<String>& paramNames,
                                const Vector<String>& paramValues,
                                const String& mimeType);
