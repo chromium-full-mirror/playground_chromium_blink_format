@@ -25,6 +25,26 @@
 #ifndef FontPlatformData_H
 #define FontPlatformData_H
 
+#ifdef __APPLE__
+
+#ifdef __OBJC__
+@class NSFont;
+#else
+class NSFont;
+#endif
+
+namespace WebCore {
+
+struct FontPlatformData {
+  NSFont* font;
+  bool syntheticBold;
+  bool syntheticOblique;
+  bool forPrinter;
+};
+}
+
+#else
+
 #include <kxmlcore/Noncopyable.h>
 
 #if WIN32
@@ -57,5 +77,7 @@ class FontPlatformData : Noncopyable {
 #endif
 };
 }
+
+#endif
 
 #endif
