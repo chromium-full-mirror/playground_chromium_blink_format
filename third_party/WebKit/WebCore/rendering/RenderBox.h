@@ -35,9 +35,6 @@ enum WidthType { Width, MinWidth, MaxWidth };
 enum HeightType { Height, MinHeight, MaxHeight };
 
 class RenderBox : public RenderObject {
-  // combines Elem & PosEl (all rendering objects are positioned)
-  // should contain all border and padding handling
-
  public:
   RenderBox(WebCore::Node* node);
   virtual ~RenderBox();
