@@ -90,6 +90,12 @@ class StyleSheetList;
 class Text;
 class Tokenizer;
 class TreeWalker;
+#if XPATH_SUPPORT
+class XPathEvaluator;
+class XPathExpression;
+class XPathNSResolver;
+class XPathResult;
+#endif
 
 #if __APPLE__
 struct DashboardRegionValue;
@@ -656,6 +662,20 @@ class Document : public ContainerNode {
 
   void finishedParsing();
 
+#if XPATH_SUPPORT
+  // XPathEvaluator methods
+  PassRefPtr<XPathExpression> createExpression(const String& expression,
+                                               XPathNSResolver* resolver,
+                                               ExceptionCode& ec);
+  PassRefPtr<XPathNSResolver> createNSResolver(Node* nodeResolver);
+  PassRefPtr<XPathResult> evaluate(const String& expression,
+                                   Node* contextNode,
+                                   XPathNSResolver* resolver,
+                                   unsigned short type,
+                                   XPathResult* result,
+                                   ExceptionCode& ec);
+#endif  // XPATH_SUPPORT
+
  protected:
   CSSStyleSelector* m_styleSelector;
   FrameView* m_view;
@@ -850,6 +870,10 @@ class Document : public ContainerNode {
   typedef HashMap<AtomicStringImpl*, HTMLInputElement*> NameToInputMap;
   typedef HashMap<HTMLFormElement*, NameToInputMap*> FormToGroupMap;
   FormToGroupMap m_selectedRadioButtons;
+
+#if XPATH_SUPPORT
+  RefPtr<XPathEvaluator> m_xpathEvaluator;
+#endif
 
 #if SVG_SUPPORT
   SVGDocumentExtensions* m_svgExtensions;

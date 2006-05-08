@@ -39,3 +39,4 @@ KXCLogChannel LogEvents = {0x00000080, "WebCoreLogLevel", KXCLogChannelOff};
 KXCLogChannel LogEditing = {0x00000100, "WebCoreLogLevel", KXCLogChannelOff};
 KXCLogChannel LogTextConversion = {0x00000200, "WebCoreLogLevel",
                                    KXCLogChannelOff};
+KXCLogChannel LogXPath = {0x00000400, "WebCoreLogLevel", KXCLogChannelOff};

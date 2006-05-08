@@ -256,6 +256,7 @@ static DeprecatedString startMarkup(const Node* node,
     case Node::ENTITY_NODE:
     case Node::ENTITY_REFERENCE_NODE:
     case Node::NOTATION_NODE:
+    case Node::XPATH_NAMESPACE_NODE:
       break;
   }
   return "";
