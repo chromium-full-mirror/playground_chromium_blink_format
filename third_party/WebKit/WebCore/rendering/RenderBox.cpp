@@ -1240,7 +1240,7 @@ void RenderBox::calcHeight() {
     bool stretching = parent()->style()->boxAlign() == BSTRETCH;
     bool treatAsReplaced = isReplaced() && !isInlineBlockOrInlineTable() &&
                            (!inHorizontalBox || !stretching);
-    bool checminMaxHeight = false;
+    bool checkMinMaxHeight = false;
 
     // The parent box is flexing us, so it has increased or decreased our
     // height.  We have to
@@ -1255,7 +1255,7 @@ void RenderBox::calcHeight() {
       h = Length(calcReplacedHeight(), Fixed);
     else {
       h = style()->height();
-      checminMaxHeight = true;
+      checkMinMaxHeight = true;
     }
 
     // Block children of horizontal flexible boxes fill the height of the box.
@@ -1266,11 +1266,11 @@ void RenderBox::calcHeight() {
                      borderTop() - paddingTop() - borderBottom() -
                      paddingBottom(),
                  Fixed);
-      checminMaxHeight = false;
+      checkMinMaxHeight = false;
     }
 
     int height;
-    if (checminMaxHeight) {
+    if (checkMinMaxHeight) {
       height = calcHeightUsing(style()->height());
       if (height == -1)
         height = m_height;
