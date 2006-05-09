@@ -72,7 +72,6 @@
 }
 - (void)setSupportsMultipartContent:(BOOL)flag;
 - (void)signalFinish;
-- (void)saveResource;
 
 - (BOOL)loadWithRequest:(NSURLRequest*)request;
 

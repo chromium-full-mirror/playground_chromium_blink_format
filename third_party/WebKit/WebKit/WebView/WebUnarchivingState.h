@@ -37,6 +37,7 @@
 }
 
 - (void)addArchive:(WebArchive*)archive;
+- (void)addResource:(WebResource*)resource;
 - (WebResource*)archivedResourceForURL:(NSURL*)URL;
 - (WebArchive*)popSubframeArchiveWithFrameName:(NSString*)frameName;
 

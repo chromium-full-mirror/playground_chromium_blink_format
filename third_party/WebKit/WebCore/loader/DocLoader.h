@@ -32,6 +32,8 @@
 #include "KWQKIOGlobal.h"
 #include "DeprecatedPtrList.h"
 #include "DeprecatedStringList.h"
+#include "kxmlcore/HashMap.h"
+#include "StringHash.h"
 
 class KURL;
 class KWQLoader;
@@ -53,18 +55,25 @@ class DocLoader {
   DocLoader(Frame*, WebCore::Document*);
   ~DocLoader();
 
-  CachedImage* requestImage(const WebCore::String& url);
-  CachedCSSStyleSheet* requestStyleSheet(const WebCore::String& url,
+  CachedImage* requestImage(const String& url);
+  CachedCSSStyleSheet* requestStyleSheet(const String& url,
                                          const DeprecatedString& charset);
-  CachedScript* requestScript(const WebCore::String& url,
+  CachedScript* requestScript(const String& url,
                               const DeprecatedString& charset);
 
 #ifdef KHTML_XSLT
-  CachedXSLStyleSheet* requestXSLStyleSheet(const WebCore::String& url);
+  CachedXSLStyleSheet* requestXSLStyleSheet(const String& url);
 #endif
 #ifndef KHTML_NO_XBL
-  CachedXBLDocument* requestXBLDocument(const WebCore::String& url);
+  CachedXBLDocument* requestXBLDocument(const String& url);
 #endif
+
+  CachedObject* cachedObject(const String& url) const {
+    return m_docObjects.get(url);
+  }
+  const HashMap<String, CachedObject*>& allCachedObjects() const {
+    return m_docObjects;
+  }
 
   bool autoloadImages() const { return m_bautoloadImages; }
   KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
@@ -87,7 +96,7 @@ class DocLoader {
   friend class WebCore::Document;
 
   DeprecatedStringList m_reloadedURLs;
-  mutable DeprecatedPtrList<CachedObject> m_docObjects;
+  mutable HashMap<String, CachedObject*> m_docObjects;
   time_t m_expireDate;
   KIO::CacheControl m_cachePolicy;
   bool m_bautoloadImages : 1;
