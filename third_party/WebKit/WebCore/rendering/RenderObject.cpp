@@ -2445,10 +2445,10 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
     return 0;
 
   if (pseudo == RenderStyle::FIRST_LINE_INHERITED)
-    result = document()->styleSelector()->createStyleForElement(
+    result = document()->styleSelector()->styleForElement(
         static_cast<Element*>(node), parentStyle, false);
   else
-    result = document()->styleSelector()->createPseudoStyleForElement(
+    result = document()->styleSelector()->pseudoStyleForElement(
         pseudo, static_cast<Element*>(node), parentStyle);
   if (result) {
     style()->addPseudoStyle(result);
