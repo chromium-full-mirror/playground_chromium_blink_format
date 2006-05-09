@@ -63,7 +63,7 @@ bool TextTokenizer::write(const SegmentedString& s, bool appendData) {
 
     RefPtr<Element> preElement =
         m_doc->createElementNS(xhtmlNamespaceURI, "pre", ec);
-    body->appendChild(m_preElement, ec);
+    body->appendChild(preElement, ec);
 
     m_preElement = preElement.get();
   }
