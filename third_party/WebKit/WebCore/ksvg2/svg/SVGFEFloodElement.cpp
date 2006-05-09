@@ -69,7 +69,7 @@ KCanvasFEFlood* SVGFEFloodElement::filterEffect() const {
   m_filterEffect->setIn(String(in1()->baseVal()).deprecatedString());
   setStandardAttributes(m_filterEffect);
   RenderStyle* filterStyle =
-      const_cast<SVGFEFloodElement*>(this)->createStyleForRenderer(
+      const_cast<SVGFEFloodElement*>(this)->styleForRenderer(
           parentNode()->renderer());
   const SVGRenderStyle* svgStyle = filterStyle->svgStyle();
   m_filterEffect->setFloodColor(svgStyle->floodColor());

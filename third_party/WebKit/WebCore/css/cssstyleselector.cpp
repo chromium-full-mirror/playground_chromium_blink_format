@@ -703,9 +703,9 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
   return 0;
 }
 
-RenderStyle* CSSStyleSelector::createStyleForElement(Element* e,
-                                                     RenderStyle* defaultParent,
-                                                     bool allowSharing) {
+RenderStyle* CSSStyleSelector::styleForElement(Element* e,
+                                               RenderStyle* defaultParent,
+                                               bool allowSharing) {
   if (!e->document()->haveStylesheetsLoaded()) {
     if (!styleNotYetAvailable) {
       styleNotYetAvailable = ::new RenderStyle();
@@ -861,7 +861,7 @@ RenderStyle* CSSStyleSelector::createStyleForElement(Element* e,
   return style;
 }
 
-RenderStyle* CSSStyleSelector::createPseudoStyleForElement(
+RenderStyle* CSSStyleSelector::pseudoStyleForElement(
     RenderStyle::PseudoId pseudo,
     Element* e,
     RenderStyle* parentStyle) {

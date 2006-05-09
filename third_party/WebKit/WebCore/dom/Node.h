@@ -392,7 +392,7 @@ class Node : public TreeShared<Node> {
 
   virtual void willRemove();
   void createRendererIfNeeded();
-  virtual RenderStyle* createStyleForRenderer(RenderObject* parent);
+  virtual RenderStyle* styleForRenderer(RenderObject* parent);
   virtual bool rendererIsNeeded(RenderStyle*);
 #if SVG_SUPPORT
   virtual bool childShouldCreateRenderer(Node*) const { return true; }
