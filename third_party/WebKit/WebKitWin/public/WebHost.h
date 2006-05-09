@@ -31,6 +31,7 @@ namespace WebKit {
 class WebHost {
  public:
   virtual void updateLocationBar(const char* URL) = 0;
+  virtual void loadEnd(BOOL successful, DWORD error, LPCTSTR errorString) = 0;
 };
 }
 
