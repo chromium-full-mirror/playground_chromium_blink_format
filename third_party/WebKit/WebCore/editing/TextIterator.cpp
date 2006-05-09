@@ -384,6 +384,12 @@ static bool shouldEmitTabBeforeNode(Node* node) {
   return t && (t->cellBefore(rc) || t->cellAbove(rc));
 }
 
+static bool shouldEmitSpaceBeforeAndAfterNode(Node* node) {
+  RenderObject* r = node->renderer();
+
+  return r && r->isTable() && r->isInline();
+}
+
 static bool shouldEmitNewlineForNode(Node* node) {
   // br elements are represented by a single newline.
   RenderObject* r = node->renderer();
@@ -463,6 +469,8 @@ bool TextIterator::handleNonTextNode() {
       emitCharacter('\t', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
     else if (shouldEmitNewlinesBeforeAndAfterNode(m_node))
       emitCharacter('\n', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
+    else if (shouldEmitSpaceBeforeAndAfterNode(m_node))
+      emitCharacter(' ', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
   }
 
   return true;
@@ -484,7 +492,8 @@ void TextIterator::exitNode() {
       // insert a newline with a position following this block
       emitCharacter('\n', m_node->parentNode(), m_node, 1, 1);
     }
-  }
+  } else if (shouldEmitSpaceBeforeAndAfterNode(m_node))
+    emitCharacter(' ', m_node->parentNode(), m_node, 1, 1);
 }
 
 void TextIterator::emitCharacter(QChar c,
