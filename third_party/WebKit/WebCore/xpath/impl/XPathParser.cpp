@@ -188,6 +188,9 @@ Token Parser::lexString() {
     if (m_data[m_nextPos] == delimiter) {
       String value =
           m_data.deprecatedString().mid(startPos, m_nextPos - startPos);
+      if (value.isNull())
+        value = "";
+
       ++m_nextPos;  // Consume the char;
       return Token(LITERAL, value);
     }
@@ -425,7 +428,7 @@ int Parser::lex(void* data) {
   YYSTYPE* yylval = static_cast<YYSTYPE*>(data);
   Token tok = nextToken();
 
-  if (!tok.value.isEmpty()) {
+  if (!tok.value.isNull()) {
     yylval->str = new String(tok.value);
     registerString(yylval->str);
   } else if (tok.intValue)
