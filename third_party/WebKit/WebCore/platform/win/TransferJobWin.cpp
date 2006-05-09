@@ -26,6 +26,7 @@
 #include "config.h"
 #include "TransferJob.h"
 #include "TransferJobInternal.h"
+#include "TransferJobWin.h"
 
 #include "DocLoader.h"
 #include "Frame.h"
@@ -96,7 +97,7 @@ LRESULT CALLBACK TransferJobWndProc(HWND hWnd,
         delete job;
       }
     } else if (internetStatus == INTERNET_STATUS_REQUEST_COMPLETE) {
-      bool ok = false;
+      BOOL ok = FALSE;
 
       static const int bufferSize = 32768;
       char buffer[bufferSize];
@@ -112,16 +113,32 @@ LRESULT CALLBACK TransferJobWndProc(HWND hWnd,
         buffers.dwBufferLength = bufferSize;
       }
 
+      PlatformDataStruct platformData;
+      platformData.errorString = 0;
+      platformData.error = 0;
+      platformData.loaded = ok;
+
       if (!ok) {
         int error = GetLastError();
         if (error == ERROR_IO_PENDING)
           return 0;
-        else
+        else {
+          DWORD errorStringChars = 0;
+          if (!InternetGetLastResponseInfo(&platformData.error, 0,
+                                           &errorStringChars)) {
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+              platformData.errorString = new TCHAR[errorStringChars];
+              InternetGetLastResponseInfo(&platformData.error,
+                                          platformData.errorString,
+                                          &errorStringChars);
+            }
+          }
           _RPTF1(_CRT_WARN, "Load error: %i\n", error);
+        }
       }
 
       InternetCloseHandle(job->d->m_resourceHandle);
-      job->client()->receivedAllData(job, 0);
+      job->client()->receivedAllData(job, &platformData);
       job->client()->receivedAllData(job);
       delete job;
     }
