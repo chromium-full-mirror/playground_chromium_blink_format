@@ -52,8 +52,7 @@ static inline bool operator==(const MappedAttributeKey& a,
   return a.type == b.type && a.name == b.name && a.value == b.value;
 }
 
-struct MappedAttributeKeyTraits
-    : KXMLCore::GenericHashTraits<MappedAttributeKey> {
+struct MappedAttributeKeyTraits : WTF::GenericHashTraits<MappedAttributeKey> {
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
   static MappedAttributeKey deletedValue() { return eLastEntry; }

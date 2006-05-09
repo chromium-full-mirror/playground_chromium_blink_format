@@ -29,7 +29,7 @@
 #include "interpreter.h"
 #include "nodes.h"
 #include "lookup.h"
-#include <kxmlcore/unicode/Unicode.h>
+#include <wtf/unicode/Unicode.h>
 
 static bool isDecimalDigit(unsigned short c);
 
@@ -138,7 +138,7 @@ void Lexer::shift(unsigned int p) {
         break;
       }
       next3 = code[pos++].uc;
-    } while (KXMLCore::Unicode::isFormatChar(next3));
+    } while (WTF::Unicode::isFormatChar(next3));
   }
 }
 
@@ -574,7 +574,7 @@ int Lexer::lex() {
 
 bool Lexer::isWhiteSpace() const {
   return current == '\t' || current == 0x0b || current == 0x0c ||
-         KXMLCore::Unicode::isSeparatorSpace(current);
+         WTF::Unicode::isSeparatorSpace(current);
 }
 
 bool Lexer::isLineTerminator() {
@@ -588,26 +588,21 @@ bool Lexer::isLineTerminator() {
 }
 
 bool Lexer::isIdentStart(unsigned short c) {
-  return (KXMLCore::Unicode::category(c) &
-          (KXMLCore::Unicode::Letter_Uppercase |
-           KXMLCore::Unicode::Letter_Lowercase |
-           KXMLCore::Unicode::Letter_Titlecase |
-           KXMLCore::Unicode::Letter_Modifier |
-           KXMLCore::Unicode::Letter_Other)) ||
+  return (WTF::Unicode::category(c) &
+          (WTF::Unicode::Letter_Uppercase | WTF::Unicode::Letter_Lowercase |
+           WTF::Unicode::Letter_Titlecase | WTF::Unicode::Letter_Modifier |
+           WTF::Unicode::Letter_Other)) ||
          c == '$' || c == '_';
 }
 
 bool Lexer::isIdentPart(unsigned short c) {
-  return (KXMLCore::Unicode::category(c) &
-          (KXMLCore::Unicode::Letter_Uppercase |
-           KXMLCore::Unicode::Letter_Lowercase |
-           KXMLCore::Unicode::Letter_Titlecase |
-           KXMLCore::Unicode::Letter_Modifier |
-           KXMLCore::Unicode::Letter_Other |
-           KXMLCore::Unicode::Mark_NonSpacing |
-           KXMLCore::Unicode::Mark_SpacingCombining |
-           KXMLCore::Unicode::Number_DecimalDigit |
-           KXMLCore::Unicode::Punctuation_Connector)) ||
+  return (WTF::Unicode::category(c) &
+          (WTF::Unicode::Letter_Uppercase | WTF::Unicode::Letter_Lowercase |
+           WTF::Unicode::Letter_Titlecase | WTF::Unicode::Letter_Modifier |
+           WTF::Unicode::Letter_Other | WTF::Unicode::Mark_NonSpacing |
+           WTF::Unicode::Mark_SpacingCombining |
+           WTF::Unicode::Number_DecimalDigit |
+           WTF::Unicode::Punctuation_Connector)) ||
          c == '$' || c == '_';
 }
 

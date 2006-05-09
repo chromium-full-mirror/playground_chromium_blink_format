@@ -74,43 +74,43 @@
 extern "C" {
 #endif
 
-typedef enum { KXCLogChannelOff, KXCLogChannelOn } KXCLogChannelState;
+typedef enum { WTFLogChannelOff, WTFLogChannelOn } WTFLogChannelState;
 
 typedef struct {
   unsigned mask;
   const char* defaultName;
-  KXCLogChannelState state;
-} KXCLogChannel;
+  WTFLogChannelState state;
+} WTFLogChannel;
 
-void KXCReportAssertionFailure(const char* file,
+void WTFReportAssertionFailure(const char* file,
                                int line,
                                const char* function,
                                const char* assertion);
-void KXCReportAssertionFailureWithMessage(const char* file,
+void WTFReportAssertionFailureWithMessage(const char* file,
                                           int line,
                                           const char* function,
                                           const char* assertion,
                                           const char* format,
                                           ...);
-void KXCReportArgumentAssertionFailure(const char* file,
+void WTFReportArgumentAssertionFailure(const char* file,
                                        int line,
                                        const char* function,
                                        const char* argName,
                                        const char* assertion);
-void KXCReportFatalError(const char* file,
+void WTFReportFatalError(const char* file,
                          int line,
                          const char* function,
                          const char* format,
                          ...);
-void KXCReportError(const char* file,
+void WTFReportError(const char* file,
                     int line,
                     const char* function,
                     const char* format,
                     ...);
-void KXCLog(const char* file,
+void WTFLog(const char* file,
             int line,
             const char* function,
-            KXCLogChannel* channel,
+            WTFLogChannel* channel,
             const char* format,
             ...);
 
@@ -142,7 +142,7 @@ void KXCLog(const char* file,
 #define ASSERT(assertion)                                                     \
   do                                                                          \
     if (!(assertion)) {                                                       \
-      KXCReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+      WTFReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
                                 #assertion);                                  \
       CRASH();                                                                \
     }                                                                         \
@@ -150,7 +150,7 @@ void KXCLog(const char* file,
 #define ASSERT_WITH_MESSAGE(assertion, ...)                          \
   do                                                                 \
     if (!(assertion)) {                                              \
-      KXCReportAssertionFailureWithMessage(__FILE__, __LINE__,       \
+      WTFReportAssertionFailureWithMessage(__FILE__, __LINE__,       \
                                            KXMLCORE_PRETTY_FUNCTION, \
                                            #assertion, __VA_ARGS__); \
       CRASH();                                                       \
@@ -158,7 +158,7 @@ void KXCLog(const char* file,
   while (0)
 #define ASSERT_NOT_REACHED()                                                \
   do {                                                                      \
-    KXCReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+    WTFReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
                               0);                                           \
     CRASH();                                                                \
   } while (0)
@@ -176,7 +176,7 @@ void KXCLog(const char* file,
 #define ASSERT_ARG(argName, assertion)                                         \
   do                                                                           \
     if (!(assertion)) {                                                        \
-      KXCReportArgumentAssertionFailure(                                       \
+      WTFReportArgumentAssertionFailure(                                       \
           __FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, #argName, #assertion); \
       CRASH();                                                                 \
     }                                                                          \
@@ -191,7 +191,7 @@ void KXCLog(const char* file,
 #else
 #define FATAL(...)                                                    \
   do {                                                                \
-    KXCReportFatalError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+    WTFReportFatalError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
                         __VA_ARGS__);                                 \
     CRASH();                                                          \
   } while (0)
@@ -203,7 +203,7 @@ void KXCLog(const char* file,
 #define LOG_ERROR(...) ((void)0)
 #else
 #define LOG_ERROR(...) \
-  KXCReportError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, __VA_ARGS__)
+  WTFReportError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, __VA_ARGS__)
 #endif
 
 // LOG
@@ -212,7 +212,7 @@ void KXCLog(const char* file,
 #define LOG(channel, ...) ((void)0)
 #else
 #define LOG(channel, ...)                                            \
-  KXCLog(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION,               \
+  WTFLog(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION,               \
          &JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
          __VA_ARGS__)
 #define JOIN_LOG_CHANNEL_WITH_PREFIX(prefix, channel) \

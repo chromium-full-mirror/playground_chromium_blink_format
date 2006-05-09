@@ -29,7 +29,7 @@
 #define KHTML_Loader_h
 
 #include "TransferJobClient.h"
-#include <kxmlcore/HashMap.h>
+#include <wtf/HashMap.h>
 #include "DeprecatedPtrList.h"
 
 #if __OBJC__

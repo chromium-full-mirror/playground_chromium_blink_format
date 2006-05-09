@@ -31,8 +31,8 @@
 #include "ImageSource.h"
 #include "IntSize.h"
 #include "FloatSize.h"
-#include <kxmlcore/Noncopyable.h>
-#include <kxmlcore/Vector.h>
+#include <wtf/Noncopyable.h>
+#include <wtf/Vector.h>
 
 #if __APPLE__
 #if __OBJC__
@@ -51,7 +51,7 @@ struct FrameData;
 // having to invoke our copy constructor. This allows us to not have to worry
 // about ref counting
 // the native frames.
-namespace KXMLCore {
+namespace WTF {
 template <>
 class VectorTraits<WebCore::FrameData> : public SimpleClassVectorTraits {};
 }

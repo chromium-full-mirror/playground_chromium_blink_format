@@ -28,7 +28,7 @@
 
 using std::pair;
 
-namespace KXMLCore {
+namespace WTF {
 
 template <typename T>
 struct IsPod {
@@ -158,9 +158,9 @@ struct VectorTraits<pair<First, Second>> {
   static const bool canFillWithMemset = false;
 };
 
-}  // namespace KXMLCore
+}  // namespace WTF
 
-using KXMLCore::VectorTraits;
-using KXMLCore::SimpleClassVectorTraits;
+using WTF::VectorTraits;
+using WTF::SimpleClassVectorTraits;
 
 #endif  // KXMLCORE_VECTOR_TRAITS_H

@@ -26,7 +26,7 @@
 #include "Assertions.h"
 #include "HashMap.h"
 
-namespace KXMLCore {
+namespace WTF {
 
 template <typename Value,
           typename HashFunctions = typename DefaultHash<Value>::Hash,
@@ -173,6 +173,6 @@ inline void HashCountedSet<Value, HashFunctions, Traits>::clear() {
 
 }  // namespace khtml
 
-using KXMLCore::HashCountedSet;
+using WTF::HashCountedSet;
 
 #endif /* KXMLCORE_HASH_COUNTED_SET_H */

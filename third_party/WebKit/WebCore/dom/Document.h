@@ -35,7 +35,7 @@
 #include "Timer.h"
 #include "Decoder.h"
 #include "dom2_traversalimpl.h"
-#include <kxmlcore/HashCountedSet.h>
+#include <wtf/HashCountedSet.h>
 #include "DeprecatedPtrList.h"
 
 class RenderArena;
@@ -132,7 +132,7 @@ struct FormElementKeyHash {
   }
 };
 
-struct FormElementKeyHashTraits : KXMLCore::GenericHashTraits<FormElementKey> {
+struct FormElementKeyHashTraits : WTF::GenericHashTraits<FormElementKey> {
   static FormElementKey deletedValue();
 };
 

@@ -26,7 +26,7 @@
 #include "HashFunctions.h"
 #include <utility>
 
-namespace KXMLCore {
+namespace WTF {
 
 using std::pair;
 using std::make_pair;
@@ -259,9 +259,9 @@ struct HashKeyStorageTraits<PtrHash<RefPtr<P>>, HashTraits<RefPtr<P>>> {
   typedef HashTraits<IntType> Traits;
 };
 
-}  // namespace KXMLCore
+}  // namespace WTF
 
-using KXMLCore::HashTraits;
-using KXMLCore::PairHashTraits;
+using WTF::HashTraits;
+using WTF::PairHashTraits;
 
 #endif  // KXMLCORE_HASH_TRAITS_H

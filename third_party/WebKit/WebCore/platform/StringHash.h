@@ -23,9 +23,9 @@
 
 #include "AtomicStringImpl.h"
 #include "PlatformString.h"
-#include <kxmlcore/HashTraits.h>
+#include <wtf/HashTraits.h>
 
-namespace KXMLCore {
+namespace WTF {
 
 template <typename T>
 struct StrHash;
@@ -234,6 +234,6 @@ struct HashKeyStorageTraits<StrHash<WebCore::String>,
 };
 }
 
-using KXMLCore::CaseInsensitiveHash;
+using WTF::CaseInsensitiveHash;
 
 #endif

@@ -27,7 +27,7 @@
 // and so this should catch anyone trying to include this file in public cpp
 // files.
 
-#include <kxmlcore/Vector.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 

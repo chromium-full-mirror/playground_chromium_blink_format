@@ -219,7 +219,7 @@ inline bool operator!=(const DeprecatedString& b, const String& a) {
 }
 }
 
-namespace KXMLCore {
+namespace WTF {
 
 // StrHash is the default hash for String
 template <typename T>

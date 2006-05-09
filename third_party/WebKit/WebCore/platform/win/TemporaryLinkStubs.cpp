@@ -191,7 +191,7 @@ void Widget::unlockDrawingFocus(GraphicsContext*) {
 
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
                                    Element*,
-                                   KXMLCore::HashMap<String, String> const&) {
+                                   WTF::HashMap<String, String> const&) {
   notImplemented();
 }
 

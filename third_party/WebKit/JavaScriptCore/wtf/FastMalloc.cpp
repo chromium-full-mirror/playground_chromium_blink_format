@@ -80,7 +80,7 @@
 #include <pthread.h>
 #endif
 
-namespace KXMLCore {
+namespace WTF {
 
 void* fastMalloc(size_t n) {
   return malloc(n);
@@ -102,7 +102,7 @@ void* fastRealloc(void* p, size_t n) {
 void fastMallocRegisterThread(pthread_t) {}
 #endif
 
-}  // namespace KXMLCore
+}  // namespace WTF
 
 #else
 
@@ -128,8 +128,8 @@ void fastMallocRegisterThread(pthread_t) {}
 #include <string.h>
 #include <unistd.h>
 
-#if KXC_CHANGES
-namespace KXMLCore {
+#if WTF_CHANGES
+namespace WTF {
 
 #define malloc fastMalloc
 #define calloc fastCalloc
@@ -533,7 +533,7 @@ static ALWAYS_INLINE bool DLL_IsEmpty(const Span* list) {
   return list->next == list;
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 static int DLL_Length(const Span* list) {
   int result = 0;
   for (Span* s = list->next; s != list; s = s->next) {
@@ -652,7 +652,7 @@ class TCMalloc_PageHeap {
   }
 
 // Dump state to stderr
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   void Dump(TCMalloc_Printer* out);
 #endif
 
@@ -855,7 +855,7 @@ void TCMalloc_PageHeap::RegisterSizeClass(Span* span, size_t sc) {
   }
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 void TCMalloc_PageHeap::Dump(TCMalloc_Printer* out) {
   int nonempty_sizes = 0;
   for (int s = 0; s < kMaxPages; s++) {
@@ -1376,7 +1376,7 @@ inline void TCMalloc_ThreadCache::Scavenge() {
 // that situation by dropping L/2 nodes from the free list.  This
 // may not release much memory, but if so we will call scavenge again
 // pretty soon and the low-water marks will be high on that call.
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   int64 start = CycleClock::Now();
 #endif
 
@@ -1390,7 +1390,7 @@ inline void TCMalloc_ThreadCache::Scavenge() {
     list->clear_lowwatermark();
   }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   int64 finish = CycleClock::Now();
   CycleTimer ct;
   MESSAGE("GC: %.0f ns\n", ct.CyclesToUsec(finish - start) * 1000.0);
@@ -1598,7 +1598,7 @@ struct TCMallocStats {
   uint64_t metadata_bytes;  // Bytes alloced for metadata
 };
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 // Get stats into "r".  Also get per-size-class counts if class_count != NULL
 static void ExtractStats(TCMallocStats* r, uint64_t* class_count) {
   r->central_bytes = 0;
@@ -1633,7 +1633,7 @@ static void ExtractStats(TCMallocStats* r, uint64_t* class_count) {
 }
 #endif
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 // WRITE stats to "out"
 static void DumpStats(TCMalloc_Printer* out, int level) {
   TCMallocStats stats;
@@ -1738,7 +1738,7 @@ static void** DumpStackTraces() {
 }
 #endif
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 
 // TCMalloc's support for extra malloc interfaces
 class TCMallocImplementation : public MallocExtension {
@@ -1827,7 +1827,7 @@ class TCMallocImplementation : public MallocExtension {
 //
 // We hack around this problem by disabling all deallocations
 // after a global object destructor in this module has been called.
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 static bool tcmalloc_is_destroyed = false;
 #endif
 
@@ -1835,7 +1835,7 @@ static bool tcmalloc_is_destroyed = false;
 // Helpers for the exported routines below
 //-------------------------------------------------------------------
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 
 static Span* DoSampledAllocation(size_t size) {
   SpinLockHolder h(&pageheap_lock);
@@ -1866,12 +1866,12 @@ static Span* DoSampledAllocation(size_t size) {
 
 static ALWAYS_INLINE void* do_malloc(size_t size) {
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   if (TCMallocDebug::level >= TCMallocDebug::kVerbose)
     MESSAGE("In tcmalloc do_malloc(%" PRIuS ")\n", size);
 #endif
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   // The following call forces module initialization
   TCMalloc_ThreadCache* heap = TCMalloc_ThreadCache::GetCache();
   if (heap->SampleAllocation(size)) {
@@ -1893,7 +1893,7 @@ static ALWAYS_INLINE void* do_malloc(size_t size) {
       return NULL;
     return reinterpret_cast<void*>(span->start << kPageShift);
   } else {
-#ifdef KXC_CHANGES
+#ifdef WTF_CHANGES
     TCMalloc_ThreadCache* heap = TCMalloc_ThreadCache::GetCache();
 #endif
     return heap->Allocate(size);
@@ -1901,14 +1901,14 @@ static ALWAYS_INLINE void* do_malloc(size_t size) {
 }
 
 static ALWAYS_INLINE void do_free(void* ptr) {
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   if (TCMallocDebug::level >= TCMallocDebug::kVerbose)
     MESSAGE("In tcmalloc do_free(%p)\n", ptr);
 #endif
-#if KXC_CHANGES
+#if WTF_CHANGES
   if (ptr == NULL)
     return;
-#else KXC_CHANGES
+#else WTF_CHANGES
   if (ptr == NULL || tcmalloc_is_destroyed)
     return;
 #endif
@@ -1917,7 +1917,7 @@ static ALWAYS_INLINE void do_free(void* ptr) {
   const PageID p = reinterpret_cast<uintptr_t>(ptr) >> kPageShift;
   Span* span = pageheap->GetDescriptor(p);
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   if (span == NULL) {
     // We've seen systems where a piece of memory allocated using the
     // allocator built in to libc is deallocated using free() and
@@ -1958,7 +1958,7 @@ static ALWAYS_INLINE void do_free(void* ptr) {
   }
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 // For use by exported routines below that want specific alignments
 //
 // Note: this code can be slow, and can significantly fragment memory.
@@ -2051,7 +2051,7 @@ static void* do_memalign(size_t align, size_t size) {
 class TCMallocGuard {
  public:
   TCMallocGuard() {
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     char* envval;
     if ((envval = getenv("TCMALLOC_DEBUG"))) {
       TCMallocDebug::level = atoi(envval);
@@ -2061,12 +2061,12 @@ class TCMallocGuard {
     do_free(do_malloc(1));
     TCMalloc_ThreadCache::InitTSD();
     do_free(do_malloc(1));
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     MallocExtension::Register(new TCMallocImplementation);
 #endif
   }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   ~TCMallocGuard() {
     const char* env = getenv("MALLOCSTATS");
     if (env != NULL) {
@@ -2090,30 +2090,30 @@ static TCMallocGuard module_enter_exit_hook;
 //         heap-checker.cc depends on this to start a stack trace from
 //         the call to the (de)allocation function.
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 extern "C"
 #endif
     void*
     malloc(size_t size) {
   void* result = do_malloc(size);
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   MallocHook::InvokeNewHook(result, size);
 #endif
   return result;
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 extern "C"
 #endif
     void
     free(void* ptr) {
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   MallocHook::InvokeDeleteHook(ptr);
 #endif
   do_free(ptr);
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 extern "C"
 #endif
     void*
@@ -2122,37 +2122,37 @@ extern "C"
   if (result != NULL) {
     memset(result, 0, n * elem_size);
   }
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   MallocHook::InvokeNewHook(result, n * elem_size);
 #endif
   return result;
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 extern "C"
 #endif
     void
     cfree(void* ptr) {
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
   MallocHook::InvokeDeleteHook(ptr);
 #endif
   do_free(ptr);
 }
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 extern "C"
 #endif
     void*
     realloc(void* old_ptr, size_t new_size) {
   if (old_ptr == NULL) {
     void* result = do_malloc(new_size);
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     MallocHook::InvokeNewHook(result, new_size);
 #endif
     return result;
   }
   if (new_size == 0) {
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     MallocHook::InvokeDeleteHook(old_ptr);
 #endif
     free(old_ptr);
@@ -2177,11 +2177,11 @@ extern "C"
     if (new_ptr == NULL) {
       return NULL;
     }
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     MallocHook::InvokeNewHook(new_ptr, new_size);
 #endif
     memcpy(new_ptr, old_ptr, ((old_size < new_size) ? old_size : new_size));
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
     MallocHook::InvokeDeleteHook(old_ptr);
 #endif
     free(old_ptr);
@@ -2199,7 +2199,7 @@ extern "C"
 #define OPDELETE_THROW throw()
 #endif
 
-#ifndef KXC_CHANGES
+#ifndef WTF_CHANGES
 
 void* operator new(size_t size) OPNEW_THROW {
   void* p = do_malloc(size);
@@ -2356,8 +2356,8 @@ int __posix_memalign(void** r, size_t a, size_t s) {
 
 #endif
 
-#if KXC_CHANGES
-}  // namespace KXMLCore
+#if WTF_CHANGES
+}  // namespace WTF
 #endif
 
 #endif  // USE_SYSTEM_MALLOC

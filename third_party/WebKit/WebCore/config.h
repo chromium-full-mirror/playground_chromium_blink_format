@@ -18,7 +18,7 @@
  *
  */
 
-#include <kxmlcore/Platform.h>
+#include <wtf/Platform.h>
 
 #define KHTML_NO_XBL 1
 #define KHTML_XSLT 1
@@ -58,7 +58,7 @@ typedef float CGFloat;
 // include "config.h".
 #undef new
 #undef delete
-#include <kxmlcore/FastMalloc.h>
+#include <wtf/FastMalloc.h>
 
 #endif
 

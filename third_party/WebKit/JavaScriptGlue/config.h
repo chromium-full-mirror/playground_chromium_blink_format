@@ -1,1 +1,1 @@
-#include <kxmlcore/Platform.h>
+#include <wtf/Platform.h>

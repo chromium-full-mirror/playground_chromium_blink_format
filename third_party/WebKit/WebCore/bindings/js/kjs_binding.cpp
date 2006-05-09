@@ -37,7 +37,7 @@
 #include "kjs_window.h"
 #include <kjs/collector.h>
 #include <kjs/internal.h>  // for InterpreterImp
-#include <kxmlcore/HashMap.h>
+#include <wtf/HashMap.h>
 
 using namespace WebCore;
 using namespace EventNames;

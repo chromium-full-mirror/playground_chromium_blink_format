@@ -26,7 +26,7 @@
 #include "RefPtr.h"
 #include <stdint.h>
 
-namespace KXMLCore {
+namespace WTF {
 
 template <size_t size>
 struct IntTypes;
@@ -149,10 +149,10 @@ struct DefaultHash<RefPtr<P>> {
   typedef PtrHash<RefPtr<P>> Hash;
 };
 
-}  // namespace KXMLCore
+}  // namespace WTF
 
-using KXMLCore::DefaultHash;
-using KXMLCore::IntHash;
-using KXMLCore::PtrHash;
+using WTF::DefaultHash;
+using WTF::IntHash;
+using WTF::PtrHash;
 
 #endif  // KXLMCORE_HASH_FUNCTIONS_H

@@ -65,7 +65,7 @@ static void vprintf_stderr_common(const char* format, va_list args) {
     vfprintf_no_warning(stderr, format, args);
 }
 
-void KXCReportAssertionFailure(const char* file,
+void WTFReportAssertionFailure(const char* file,
                                int line,
                                const char* function,
                                const char* assertion) {
@@ -81,7 +81,7 @@ void KXCReportAssertionFailure(const char* file,
             file, line, function);
 }
 
-void KXCReportAssertionFailureWithMessage(const char* file,
+void WTFReportAssertionFailureWithMessage(const char* file,
                                           int line,
                                           const char* function,
                                           const char* assertion,
@@ -96,7 +96,7 @@ void KXCReportAssertionFailureWithMessage(const char* file,
           function);
 }
 
-void KXCReportArgumentAssertionFailure(const char* file,
+void WTFReportArgumentAssertionFailure(const char* file,
                                        int line,
                                        const char* function,
                                        const char* argName,
@@ -107,7 +107,7 @@ void KXCReportArgumentAssertionFailure(const char* file,
       argName, assertion, file, line, function);
 }
 
-void KXCReportFatalError(const char* file,
+void WTFReportFatalError(const char* file,
                          int line,
                          const char* function,
                          const char* format,
@@ -120,7 +120,7 @@ void KXCReportFatalError(const char* file,
   fprintf(stderr, "\n(%s:%d %s)\n=================\n", file, line, function);
 }
 
-void KXCReportError(const char* file,
+void WTFReportError(const char* file,
                     int line,
                     const char* function,
                     const char* format,
@@ -133,13 +133,13 @@ void KXCReportError(const char* file,
   fprintf(stderr, "\n(%s:%d %s)\n=================\n", file, line, function);
 }
 
-void KXCLog(const char*,
+void WTFLog(const char*,
             int,
             const char*,
-            KXCLogChannel* channel,
+            WTFLogChannel* channel,
             const char* format,
             ...) {
-  if (channel->state != KXCLogChannelOn)
+  if (channel->state != WTFLogChannelOn)
     return;
 
   va_list args;
