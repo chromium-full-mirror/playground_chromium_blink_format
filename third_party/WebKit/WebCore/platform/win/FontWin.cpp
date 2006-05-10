@@ -97,7 +97,7 @@ FontData* getFontData(const FontDescription& fontDescription,
   RestoreDC(dc, -1);
   ReleaseDC(0, dc);
   dc = 0;
-  if (!equalIgnoringCase(fontFace, String((QChar*)name, resultLength))) {
+  if (!equalIgnoringCase(fontFace, String(name, resultLength))) {
     DeleteObject(font);
     return 0;
   }
@@ -159,7 +159,7 @@ FontData* FontFallbackList::primaryFont(
 
 static IntSize hackishExtentForString(HDC dc,
                                       FontData* font,
-                                      const QChar* str,
+                                      const UChar* str,
                                       int slen,
                                       int pos,
                                       int len,
@@ -186,7 +186,7 @@ static IntSize hackishExtentForString(HDC dc,
   return s;
 }
 
-float Font::floatWidth(const QChar* str,
+float Font::floatWidth(const UChar* str,
                        int slen,
                        int pos,
                        int len,
@@ -219,7 +219,7 @@ void Font::drawText(GraphicsContext* context,
                     const IntPoint& point,
                     int tabWidth,
                     int xpos,
-                    const QChar* str,
+                    const UChar* str,
                     int len,
                     int from,
                     int to,
@@ -260,7 +260,7 @@ void Font::drawHighlightForText(GraphicsContext* context,
                                 int h,
                                 int tabWidth,
                                 int xpos,
-                                const QChar* str,
+                                const UChar* str,
                                 int len,
                                 int from,
                                 int to,
@@ -292,7 +292,7 @@ IntRect Font::selectionRectForText(const IntPoint& point,
                                    int h,
                                    int tabWidth,
                                    int xpos,
-                                   const QChar* str,
+                                   const UChar* str,
                                    int slen,
                                    int pos,
                                    int len,
@@ -315,7 +315,7 @@ IntRect Font::selectionRectForText(const IntPoint& point,
   return IntRect(point, runSize);
 }
 
-int Font::checkSelectionPoint(const QChar* str,
+int Font::checkSelectionPoint(const UChar* str,
                               int slen,
                               int offset,
                               int len,

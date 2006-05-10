@@ -351,14 +351,14 @@ String WebCore::searchableIndexIntroduction() {
   return String();
 }
 
-int WebCore::findNextSentenceFromIndex(QChar const*, int, int, bool) {
+int WebCore::findNextSentenceFromIndex(UChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
-void WebCore::findSentenceBoundary(QChar const*, int, int, int*, int*) {
+void WebCore::findSentenceBoundary(UChar const*, int, int, int*, int*) {
   notImplemented();
 }
-int WebCore::findNextWordFromIndex(QChar const*, int, int, bool) {
+int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
@@ -544,7 +544,7 @@ String WebCore::defaultLanguage() {
   return "en";
 }
 
-void WebCore::findWordBoundary(QChar const* str,
+void WebCore::findWordBoundary(UChar const* str,
                                int len,
                                int position,
                                int* start,

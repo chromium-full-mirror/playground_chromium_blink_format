@@ -289,9 +289,10 @@ LRESULT CALLBACK WebViewWndProc(HWND hWnd,
     case WM_CHAR: {
       // FIXME: We need to use WM_UNICHAR to support international text.
       if (nextCharIsInputText) {
+        UChar c = wParam;
         TypingCommand::insertText(
             webview->mainFrame()->toPrivate()->impl()->document(),
-            QChar(wParam), false);
+            String(&c, 1), false);
         nextCharIsInputText = false;
       }
       break;
