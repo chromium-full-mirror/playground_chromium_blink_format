@@ -601,7 +601,7 @@ void Font::drawSimpleText(GraphicsContext* context,
                  startPoint);
       lastFrom = nextGlyph;
       fontData = nextFontData;
-      startX = nextX;
+      startPoint.setX(nextX);
     }
     nextX += glyphBuffer.advanceAt(nextGlyph);
     nextGlyph++;
