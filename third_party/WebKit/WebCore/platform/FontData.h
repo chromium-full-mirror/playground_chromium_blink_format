@@ -34,11 +34,17 @@ class NSColor;
 
 #include "FloatPoint.h"
 #include "FontPlatformData.h"
+#include "GlyphBuffer.h"
+
+// FIXME: Temporary.  Only needed to support API that's going to move.
+#include <unicode/uchar.h>
+#include <unicode/unorm.h>
 
 namespace WebCore {
 
 class FloatRect;
 class Color;
+class FontDescription;
 
 struct WebCoreTextStyle {
   NSColor* textColor;
@@ -89,8 +95,8 @@ class FontData {
   ~FontData();
 
  public:
-  static void setAlwaysUseATSU(bool);
-  static bool gAlwaysUseATSU;
+  const FontPlatformData& platformData() const { return m_font; }
+  FontData* smallCapsFontData() const;
 
   // vertical metrics
   int ascent() const { return m_ascent; }
@@ -128,6 +134,19 @@ class FontData {
                     int x,
                     bool includePartialGlyphs);
 
+  // FIXME: These are temporary API and will eventually move to the fallback
+  // list.
+  Glyph glyphForCharacter(const FontData** renderer, unsigned c) const;
+  const FontData* findSubstituteFontData(const UChar* characters,
+                                         unsigned numCharacters,
+                                         const FontDescription&) const;
+  void updateGlyphMapEntry(UChar c,
+                           Glyph glyph,
+                           const FontData* substituteRenderer) const;
+  // End temporary API
+
+  float widthForGlyph(Glyph glyph) const;
+
  private:
   int misspellingLinePatternWidth() const { return 4; }
   int misspellingLinePatternGapWidth() const {
@@ -143,8 +162,8 @@ class FontData {
   void* m_styleGroup;
 
   FontPlatformData m_font;
-  GlyphMap* m_characterToGlyphMap;
-  WidthMap* m_glyphToWidthMap;
+  mutable GlyphMap* m_characterToGlyphMap;
+  mutable WidthMap* m_glyphToWidthMap;
 
   bool m_treatAsFixedPitch;
   ATSGlyphRef m_spaceGlyph;
@@ -152,10 +171,10 @@ class FontData {
   float m_adjustedSpaceWidth;
   float m_syntheticBoldOffset;
 
-  FontData* m_smallCapsRenderer;
-  ATSUStyle m_ATSUStyle;
-  bool m_ATSUStyleInitialized;
-  bool m_ATSUMirrors;
+  mutable FontData* m_smallCapsFontData;
+  mutable ATSUStyle m_ATSUStyle;
+  mutable bool m_ATSUStyleInitialized;
+  mutable bool m_ATSUMirrors;
 };
 }
 
