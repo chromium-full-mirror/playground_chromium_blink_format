@@ -2444,10 +2444,11 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   if (!node)
     return 0;
 
-  if (pseudo == RenderStyle::FIRST_LINE_INHERITED)
+  if (pseudo == RenderStyle::FIRST_LINE_INHERITED) {
     result = document()->styleSelector()->styleForElement(
         static_cast<Element*>(node), parentStyle, false);
-  else
+    result->setStyleType(RenderStyle::FIRST_LINE_INHERITED);
+  } else
     result = document()->styleSelector()->pseudoStyleForElement(
         pseudo, static_cast<Element*>(node), parentStyle);
   if (result) {
