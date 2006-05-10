@@ -471,9 +471,9 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       InlineTextBox* text = static_cast<InlineTextBox*>(curr);
       RenderText* rt = static_cast<RenderText*>(text->object());
       if (rt->length()) {
-        if (needsWordSpacing && rt->text()[text->start()].isSpace())
+        if (needsWordSpacing && QChar(rt->text()[text->start()]).isSpace())
           x += rt->font(m_firstLine)->wordSpacing();
-        needsWordSpacing = !rt->text()[text->end()].isSpace();
+        needsWordSpacing = !QChar(rt->text()[text->end()]).isSpace();
       }
       text->setXPos(x);
       int shadowLeft = 0;
@@ -1148,9 +1148,9 @@ void EllipsisBox::paint(RenderObject::PaintInfo& i, int _tx, int _ty) {
   }
 
   const String& str = m_str;
-  p->drawText(IntPoint(m_x + _tx, m_y + _ty + m_baseline), 0, 0, str.unicode(),
-              str.length(), 0, str.length(), 0, LTR, _style->visuallyOrdered(),
-              0, str.length());
+  p->drawText(IntPoint(m_x + _tx, m_y + _ty + m_baseline), 0, 0,
+              str.characters(), str.length(), 0, str.length(), 0, LTR,
+              _style->visuallyOrdered(), 0, str.length());
 
   if (setShadow)
     p->clearShadow();

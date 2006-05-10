@@ -43,8 +43,7 @@ TextEncoding::TextEncoding(const char* name, bool eightBitOnly) {
 const char* TextEncoding::name() const {
   return charsetNameFromTextEncodingID(m_encodingID);
 }
-
-QChar TextEncoding::backslashAsCurrencySymbol() const {
+UChar TextEncoding::backslashAsCurrencySymbol() const {
   if (m_flags & BackslashIsYen)
     return 0x00A5;  // yen sign
 
@@ -125,7 +124,7 @@ DeprecatedCString TextEncoding::fromUnicode(const DeprecatedString& qcs,
   // until then, we change the backslash into a yen sign.
   // Encoding will change the yen sign back into a backslash.
   DeprecatedString copy = qcs;
-  copy.replace(QChar('\\'), backslashAsCurrencySymbol());
+  copy.replace('\\', backslashAsCurrencySymbol());
 
   UErrorCode err = U_ZERO_ERROR;
   UConverter* conv = getConverter(encoding, &err);

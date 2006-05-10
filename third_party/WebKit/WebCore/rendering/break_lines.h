@@ -20,16 +20,16 @@
  *
  */
 
-class QChar;
+#include <unicode/umachine.h>
 
 namespace WebCore {
 
-int nextBreakablePosition(const QChar* str,
+int nextBreakablePosition(const UChar*,
                           int pos,
                           int len,
                           bool breakNBSP = false);
 
-inline bool isBreakable(const QChar* str,
+inline bool isBreakable(const UChar* str,
                         int pos,
                         int len,
                         int& nextBreakable,

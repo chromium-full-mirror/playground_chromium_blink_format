@@ -362,27 +362,27 @@ static bool parseFontSizeNumber(const String& s, int& size) {
   unsigned pos = 0;
 
   // Skip leading spaces.
-  while (pos < s.length() && s[pos].isSpace())
+  while (QChar(s[pos]).isSpace())
     ++pos;
 
   // Skip a plus or minus.
   bool sawPlus = false;
   bool sawMinus = false;
-  if (pos < s.length() && s[pos] == '+') {
+  if (s[pos] == '+') {
     ++pos;
     sawPlus = true;
-  } else if (pos < s.length() && s[pos] == '-') {
+  } else if (s[pos] == '-') {
     ++pos;
     sawMinus = true;
   }
 
   // Parse a single digit.
-  if (pos >= s.length() || !s[pos].isNumber())
+  if (!u_isdigit(s[pos]))
     return false;
-  int num = s[pos++].digitValue();
+  int num = u_charDigitValue(s[pos++]);
 
   // Check for an additional digit.
-  if (pos < s.length() && s[pos].isNumber())
+  if (u_isdigit(s[pos]))
     num = 10;
 
   if (sawPlus) {

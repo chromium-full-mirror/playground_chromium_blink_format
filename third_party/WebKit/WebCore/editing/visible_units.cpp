@@ -39,7 +39,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 static VisiblePosition previousBoundary(const VisiblePosition& c,
-                                        unsigned (*searchFunction)(const QChar*,
+                                        unsigned (*searchFunction)(const UChar*,
                                                                    unsigned)) {
   Position pos = c.deepEquivalent();
   Node* n = pos.node();
@@ -74,8 +74,10 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
     // iterate to get chunks until the searchFunction returns a non-zero value.
-    string.prepend(it.characters(), it.length());
-    next = searchFunction(string.unicode(), string.length());
+    string.prepend(reinterpret_cast<const QChar*>(it.characters()),
+                   it.length());
+    next = searchFunction(reinterpret_cast<const UChar*>(string.unicode()),
+                          string.length());
     if (next != 0)
       break;
     it.advance();
@@ -97,7 +99,8 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     chars[0] = 'X';
     chars[1] = ' ';
     string.prepend(chars, 2);
-    unsigned pastImage = searchFunction(string.unicode(), string.length());
+    unsigned pastImage = searchFunction(
+        reinterpret_cast<const UChar*>(string.unicode()), string.length());
     RefPtr<Range> range(it.range());
     if (pastImage == 0)
       pos = Position(range->startContainer(exception),
@@ -125,7 +128,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
 }
 
 static VisiblePosition nextBoundary(const VisiblePosition& c,
-                                    unsigned (*searchFunction)(const QChar*,
+                                    unsigned (*searchFunction)(const UChar*,
                                                                unsigned)) {
   Position pos = c.deepEquivalent();
   Node* n = pos.node();
@@ -154,8 +157,9 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   while (!it.atEnd() && it.length() > 0) {
     // Keep asking the iterator for chunks until the search function
     // returns an end value not equal to the length of the string passed to it.
-    string.append(it.characters(), it.length());
-    next = searchFunction(string.unicode(), string.length());
+    string.append(reinterpret_cast<const QChar*>(it.characters()), it.length());
+    next = searchFunction(reinterpret_cast<const UChar*>(string.unicode()),
+                          string.length());
     if (next != string.length())
       break;
     it.advance();
@@ -178,7 +182,8 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     chars[0] = ' ';
     chars[1] = 'X';
     string.append(chars, 2);
-    unsigned pastImage = searchFunction(string.unicode(), string.length());
+    unsigned pastImage = searchFunction(
+        reinterpret_cast<const UChar*>(string.unicode()), string.length());
     RefPtr<Range> range(it.range());
     int exception = 0;
     if (next != pastImage)
@@ -202,7 +207,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
 
 // ---------
 
-static unsigned startWordBoundary(const QChar* characters, unsigned length) {
+static unsigned startWordBoundary(const UChar* characters, unsigned length) {
   int start, end;
   findWordBoundary(characters, length, length, &start, &end);
   return start;
@@ -222,7 +227,7 @@ VisiblePosition startOfWord(const VisiblePosition& c, EWordSide side) {
   return previousBoundary(p, startWordBoundary);
 }
 
-static unsigned endWordBoundary(const QChar* characters, unsigned length) {
+static unsigned endWordBoundary(const UChar* characters, unsigned length) {
   int start, end;
   findWordBoundary(characters, length, 0, &start, &end);
   return end;
@@ -248,7 +253,7 @@ VisiblePosition endOfWord(const VisiblePosition& c, EWordSide side) {
   return nextBoundary(p, endWordBoundary);
 }
 
-static unsigned previousWordPositionBoundary(const QChar* characters,
+static unsigned previousWordPositionBoundary(const UChar* characters,
                                              unsigned length) {
   return findNextWordFromIndex(characters, length, length, false);
 }
@@ -257,7 +262,7 @@ VisiblePosition previousWordPosition(const VisiblePosition& c) {
   return previousBoundary(c, previousWordPositionBoundary);
 }
 
-static unsigned nextWordPositionBoundary(const QChar* characters,
+static unsigned nextWordPositionBoundary(const UChar* characters,
                                          unsigned length) {
   return findNextWordFromIndex(characters, length, 0, true);
 }
@@ -500,7 +505,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
 
 // ---------
 
-static unsigned startSentenceBoundary(const QChar* characters,
+static unsigned startSentenceBoundary(const UChar* characters,
                                       unsigned length) {
   int start, end;
   findSentenceBoundary(characters, length, length, &start, &end);
@@ -511,7 +516,7 @@ VisiblePosition startOfSentence(const VisiblePosition& c) {
   return previousBoundary(c, startSentenceBoundary);
 }
 
-static unsigned endSentenceBoundary(const QChar* characters, unsigned length) {
+static unsigned endSentenceBoundary(const UChar* characters, unsigned length) {
   int start, end;
   findSentenceBoundary(characters, length, 0, &start, &end);
   return end;
@@ -521,7 +526,7 @@ VisiblePosition endOfSentence(const VisiblePosition& c) {
   return nextBoundary(c, endSentenceBoundary);
 }
 
-static unsigned previousSentencePositionBoundary(const QChar* characters,
+static unsigned previousSentencePositionBoundary(const UChar* characters,
                                                  unsigned length) {
   return findNextSentenceFromIndex(characters, length, length, false);
 }
@@ -530,7 +535,7 @@ VisiblePosition previousSentencePosition(const VisiblePosition& c) {
   return previousBoundary(c, previousSentencePositionBoundary);
 }
 
-static unsigned nextSentencePositionBoundary(const QChar* characters,
+static unsigned nextSentencePositionBoundary(const UChar* characters,
                                              unsigned length) {
   return findNextSentenceFromIndex(characters, length, 0, true);
 }
@@ -567,7 +572,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
       break;
     if (r->isText()) {
       if (style->preserveNewline()) {
-        const QChar* text = static_cast<RenderText*>(r)->text();
+        const UChar* text = static_cast<RenderText*>(r)->text();
         int i = static_cast<RenderText*>(r)->length();
         int o = offset;
         if (n == startNode && o < i)
@@ -628,7 +633,7 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
     if (r->isText() && r->caretMaxRenderedOffset() > 0) {
       int length = static_cast<RenderText*>(r)->length();
       if (style->preserveNewline()) {
-        const QChar* text = static_cast<RenderText*>(r)->text();
+        const UChar* text = static_cast<RenderText*>(r)->text();
         int o = n == startNode ? offset : 0;
         for (int i = o; i < length; ++i)
           if (text[i] == '\n')

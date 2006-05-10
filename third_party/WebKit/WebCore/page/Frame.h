@@ -783,7 +783,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void setWindowHasFocus(bool flag);
   // Convenience, to avoid repeating the code to dig down to get this.
 
-  QChar backslashAsCurrencySymbol() const;
+  UChar backslashAsCurrencySymbol() const;
 
   DeprecatedValueList<MarkedTextUnderline> markedTextUnderlines() const;
   bool markedTextUsesUnderlines() const;

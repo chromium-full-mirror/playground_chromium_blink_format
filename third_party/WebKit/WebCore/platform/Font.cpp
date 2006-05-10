@@ -74,7 +74,7 @@ void Font::update() const {
   m_fontList->invalidate();
 }
 
-int Font::width(const QChar* chs,
+int Font::width(const UChar* chs,
                 int slen,
                 int pos,
                 int len,

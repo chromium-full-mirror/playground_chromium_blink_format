@@ -27,6 +27,7 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
+#include "DeprecatedString.h"
 #include "Font.h"
 
 using namespace std;
@@ -181,27 +182,21 @@ void GraphicsContext::drawImage(Image* image,
 
 // FIXME: We should consider removing this function and having callers just call
 // the lower-level drawText directly.
-// FIXME: The int parameter should change to a HorizontalAlignment parameter.
-// FIXME: HorizontalAlignment should be moved into a separate header so it's not
-// in Widget.h.
 // FIXME: We should consider changing this function to take a character pointer
 // and length instead of a DeprecatedString.
 void GraphicsContext::drawText(const IntPoint& point,
-                               int horizontalAlignment,
                                const DeprecatedString& str) {
   if (paintingDisabled())
     return;
 
-  IntPoint p = point;
-  if (horizontalAlignment == AlignRight)
-    p.setX(p.x() - font().width(str.unicode(), str.length(), 0, 0));
-  drawText(p, 0, 0, str.unicode(), str.length(), 0, str.length(), 0);
+  drawText(point, 0, 0, reinterpret_cast<const UChar*>(str.unicode()),
+           str.length(), 0, str.length(), 0);
 }
 
 void GraphicsContext::drawText(const IntPoint& point,
                                int tabWidth,
                                int xpos,
-                               const QChar* str,
+                               const UChar* str,
                                int slen,
                                int pos,
                                int len,
@@ -225,7 +220,7 @@ void GraphicsContext::drawHighlightForText(const IntPoint& point,
                                            int h,
                                            int tabWidth,
                                            int xpos,
-                                           const QChar* str,
+                                           const UChar* str,
                                            int slen,
                                            int pos,
                                            int len,

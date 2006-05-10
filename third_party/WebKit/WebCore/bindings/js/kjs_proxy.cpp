@@ -67,7 +67,7 @@ JSValue* KJSProxy::evaluate(const String& filename,
   JSValue* thisNode =
       n ? Window::retrieve(m_frame) : toJS(m_script->globalExec(), n);
   Completion comp = m_script->evaluate(
-      filename, baseLine, reinterpret_cast<const KJS::UChar*>(str.unicode()),
+      filename, baseLine, reinterpret_cast<const KJS::UChar*>(str.characters()),
       str.length(), thisNode);
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue)
@@ -146,13 +146,11 @@ ScriptInterpreter* KJSProxy::interpreter() {
 class TestFunctionImp : public DOMObject {
  public:
   virtual bool implementsCall() const { return true; }
-  virtual JSValue* callAsFunction(ExecState* exec,
-                                  JSObject* thisObj,
-                                  const List& args);
+  virtual JSValue* callAsFunction(ExecState*, JSObject*, const List& args);
 };
 
 JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
-                                         JSObject* /*thisObj*/,
+                                         JSObject*,
                                          const List& args) {
   fprintf(stderr, "--> %s\n", args[0]->toString(exec).ascii());
   return jsUndefined();

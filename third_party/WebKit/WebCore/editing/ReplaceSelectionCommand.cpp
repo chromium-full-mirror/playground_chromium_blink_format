@@ -661,8 +661,8 @@ void ReplaceSelectionCommand::doApply() {
             .isNull() &&
         !isStartOfParagraph(visiblePos);
     if (addLeadingSpace) {
-      QChar previousChar = visiblePos.previous().characterAfter();
-      if (previousChar.unicode())
+      UChar previousChar = visiblePos.previous().characterAfter();
+      if (previousChar)
         addLeadingSpace =
             !frame->isCharacterSmartReplaceExempt(previousChar, true);
     }
@@ -671,8 +671,8 @@ void ReplaceSelectionCommand::doApply() {
             .isNull() &&
         !isEndOfParagraph(visiblePos);
     if (addTrailingSpace) {
-      QChar thisChar = visiblePos.characterAfter();
-      if (thisChar.unicode())
+      UChar thisChar = visiblePos.characterAfter();
+      if (thisChar)
         addTrailingSpace =
             !frame->isCharacterSmartReplaceExempt(thisChar, false);
     }

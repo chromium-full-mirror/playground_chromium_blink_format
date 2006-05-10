@@ -37,8 +37,8 @@ RebalanceWhitespaceCommand::RebalanceWhitespaceCommand(Document* document,
                                                        const Position& pos)
     : EditCommand(document), m_position(pos), m_upstreamOffset(InvalidOffset) {}
 
-static inline bool isWhitespace(const QChar& c) {
-  return c.unicode() == 0xa0 || isCollapsibleWhitespace(c);
+static inline bool isWhitespace(UChar c) {
+  return c == 0xa0 || isCollapsibleWhitespace(c);
 }
 
 // FIXME: This doesn't go into adjacent text in siblings, cousins, etc.

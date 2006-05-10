@@ -27,6 +27,7 @@
 #include "config.h"
 #include "Color.h"
 
+#include "DeprecatedString.h"
 #include "PlatformString.h"
 #include <wtf/Assertions.h>
 

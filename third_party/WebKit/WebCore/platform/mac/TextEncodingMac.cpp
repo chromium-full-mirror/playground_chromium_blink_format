@@ -53,7 +53,7 @@ DeprecatedCString TextEncoding::fromUnicode(const DeprecatedString& qcs,
   // backslash into a yen sign.
   // Encoding will change the yen sign back into a backslash.
   DeprecatedString copy = qcs;
-  copy.replace(QChar('\\'), backslashAsCurrencySymbol());
+  copy.replace('\\', backslashAsCurrencySymbol());
   CFStringRef cfs = copy.getCFString();
   CFMutableStringRef cfms = CFStringCreateMutableCopy(
       0, 0, cfs);  // in rare cases, normalization can make the string longer,

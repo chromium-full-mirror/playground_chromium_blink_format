@@ -242,7 +242,7 @@ void RenderLineEdit::updateFromElement() {
   if (!e->valueMatchesRenderer()) {
     String widgetText = w->text();
     String newText = e->value();
-    newText.replace(QChar('\\'), backslashAsCurrencySymbol());
+    newText.replace('\\', backslashAsCurrencySymbol());
     if (widgetText != newText) {
       int pos = w->cursorPosition();
 
@@ -629,7 +629,7 @@ void RenderSelect::updateFromElement() {
             static_cast<HTMLOptGroupElement*>(listItems[listIndex]);
         DeprecatedString label =
             optgroupElement->getAttribute(labelAttr).deprecatedString();
-        label.replace(QChar('\\'), backslashAsCurrencySymbol());
+        label.replace('\\', backslashAsCurrencySymbol());
 
         // In WinIE, an optgroup can't start or end with whitespace (other than
         // the indent
@@ -655,7 +655,7 @@ void RenderSelect::updateFromElement() {
         else
           itemText = optionElement->text().deprecatedString();
 
-        itemText.replace(QChar('\\'), backslashAsCurrencySymbol());
+        itemText.replace('\\', backslashAsCurrencySymbol());
 
         // In WinIE, leading and trailing whitespace is ignored in options. We
         // match this behavior.
@@ -965,7 +965,7 @@ void RenderTextArea::updateFromElement() {
 
   String widgetText = text();
   String text = e->value();
-  text.replace(QChar('\\'), backslashAsCurrencySymbol());
+  text.replace('\\', backslashAsCurrencySymbol());
   if (widgetText != text) {
     int line, col;
     w->getCursorPosition(&line, &col);
@@ -983,12 +983,12 @@ void RenderTextArea::updateFromElement() {
 
 String RenderTextArea::text() {
   String txt = static_cast<QTextEdit*>(m_widget)->text();
-  return txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
+  return txt.replace(backslashAsCurrencySymbol(), '\\');
 }
 
 String RenderTextArea::textWithHardLineBreaks() {
   String txt = static_cast<QTextEdit*>(m_widget)->textWithHardLineBreaks();
-  return txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
+  return txt.replace(backslashAsCurrencySymbol(), '\\');
 }
 
 void RenderTextArea::valueChanged(Widget*) {

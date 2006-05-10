@@ -85,7 +85,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   HTMLTokenizer(DocumentFragment*);
   virtual ~HTMLTokenizer();
 
-  virtual bool write(const SegmentedString& str, bool appendData);
+  virtual bool write(const SegmentedString&, bool appendData);
   virtual void finish();
   virtual void setForceSynchronous(bool force);
   virtual bool isWaitingForScripts() const;
@@ -110,7 +110,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   State parseSpecial(SegmentedString&, State);
   State parseTag(SegmentedString&, State);
   State parseEntity(SegmentedString&,
-                    QChar*& dest,
+                    UChar*& dest,
                     State,
                     unsigned& _cBufferPos,
                     bool start,
@@ -121,7 +121,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
                         State state,
                         DeprecatedString scriptURL = DeprecatedString(),
                         int baseLine = 0);
-  void setSrc(const SegmentedString& source);
+  void setSrc(const SegmentedString&);
 
   // check if we have enough space in the buffer.
   // if not enlarge it
@@ -137,7 +137,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void enlargeBuffer(int len);
   void enlargeScriptBuffer(int len);
 
-  bool continueProcessing(int& processedCount, double startTime, State& state);
+  bool continueProcessing(int& processedCount, double startTime, State&);
   void timerFired(Timer<HTMLTokenizer>*);
   void allDataProcessed();
 
@@ -146,8 +146,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   // Internal buffers
   ///////////////////
-  QChar* buffer;
-  QChar* dest;
+  UChar* buffer;
+  UChar* dest;
 
   Token currToken;
 
@@ -157,7 +157,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // Tokenizer flags
   //////////////////
   // are we in quotes within a html tag
-  enum { NoQuote = 0, SingleQuote, DoubleQuote } tquote;
+  enum { NoQuote, SingleQuote, DoubleQuote } tquote;
 
   // Are we in a &... character entity description?
   enum EntityState {
@@ -293,7 +293,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   AtomicString attrName;
 
   // Used to store the code of a srcipting sequence
-  QChar* scriptCode;
+  UChar* scriptCode;
   // Size of the script sequenze stored in @ref #scriptCode
   int scriptCodeSize;
   // Maximal size that can be stored in @ref #scriptCode
@@ -302,11 +302,11 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   int scriptCodeResync;
 
   // Stores characters if we are scanning for a string like "</script>"
-  QChar searchBuffer[10];
+  UChar searchBuffer[10];
   // Counts where we are in the string we are scanning for
   int searchCount;
   // The string we are searching for
-  const QChar* searchFor;
+  const UChar* searchFor;
   // the stopper string
   const char* searchStopper;
   // the stopper len
@@ -365,7 +365,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
 void parseHTMLDocumentFragment(const String&, DocumentFragment*);
 
-unsigned short decodeNamedEntity(const char*);
+UChar decodeNamedEntity(const char*);
 }
 
 #endif

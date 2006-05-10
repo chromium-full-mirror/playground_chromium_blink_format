@@ -74,7 +74,7 @@ class Font {
                 const IntPoint&,
                 int tabWidth,
                 int xpos,
-                const QChar*,
+                const UChar*,
                 int len,
                 int from,
                 int to,
@@ -86,7 +86,7 @@ class Font {
                             int h,
                             int tabWidth,
                             int xpos,
-                            const QChar*,
+                            const UChar*,
                             int len,
                             int from,
                             int to,
@@ -103,7 +103,7 @@ class Font {
                               int width) const;
   int misspellingLineThickness(GraphicsContext*) const;
 
-  float floatWidth(const QChar*,
+  float floatWidth(const UChar*,
                    int slen,
                    int pos,
                    int len,
@@ -111,7 +111,7 @@ class Font {
                    int xpos,
                    bool runRounding = true) const;
 
-  int checkSelectionPoint(const QChar*,
+  int checkSelectionPoint(const UChar*,
                           int slen,
                           int pos,
                           int len,
@@ -126,7 +126,7 @@ class Font {
                                int h,
                                int tabWidth,
                                int xpos,
-                               const QChar*,
+                               const UChar*,
                                int slen,
                                int pos,
                                int len,
@@ -136,13 +136,10 @@ class Font {
                                int from = -1,
                                int to = -1) const;
 
-  int width(const QChar*, int slen, int pos, int len, int tabWidth, int xpos)
+  int width(const UChar*, int slen, int pos, int len, int tabWidth, int xpos)
       const;
-  int width(const QChar* chs, int slen, int tabWidth = 0, int xpos = 0) const {
+  int width(const UChar* chs, int slen, int tabWidth = 0, int xpos = 0) const {
     return width(chs, slen, 0, slen, tabWidth, xpos);
-  }
-  int width(const DeprecatedString& s) const {
-    return width(s.unicode(), s.length(), 0, 0);
   }
 
   bool isSmallCaps() const { return m_fontDescription.smallCaps(); }

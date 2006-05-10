@@ -636,7 +636,7 @@ enum EPseudoBit {
   FIRST_LINE_INHERITED_BIT = 0x20
 };
 
-static int pseudoBit(RenderStyle::PseudoId pseudo) {
+static inline int pseudoBit(RenderStyle::PseudoId pseudo) {
   switch (pseudo) {
     case RenderStyle::BEFORE:
       return BEFORE_BIT;
@@ -656,7 +656,7 @@ static int pseudoBit(RenderStyle::PseudoId pseudo) {
 }
 
 bool RenderStyle::hasPseudoStyle(PseudoId pseudo) const {
-  return (pseudoBit(pseudo) & noninherited_flags._pseudoBits) != 0;
+  return pseudoBit(pseudo) & noninherited_flags._pseudoBits;
 }
 
 void RenderStyle::setHasPseudoStyle(PseudoId pseudo) {
@@ -664,19 +664,11 @@ void RenderStyle::setHasPseudoStyle(PseudoId pseudo) {
 }
 
 RenderStyle* RenderStyle::getPseudoStyle(PseudoId pid) {
-  if (!pseudoStyle)
-    return 0;
-
   RenderStyle* ps = 0;
-  if (noninherited_flags._styleType == NOPSEUDO) {
-    ps = pseudoStyle;
-    while (ps) {
-      if (styleType() == pid)
+  if (noninherited_flags._styleType == NOPSEUDO)
+    for (ps = pseudoStyle; ps; ps = ps->psuedoStyle)
+      if (ps->styleType() == pid)
         break;
-
-      ps = ps->pseudoStyle;
-    }
-  }
   return ps;
 }
 

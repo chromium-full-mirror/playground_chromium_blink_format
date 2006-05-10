@@ -24,6 +24,8 @@
 #include "AtomicStringImpl.h"
 #include "PlatformString.h"
 #include <wtf/HashTraits.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 
 namespace WTF {
 
@@ -45,8 +47,8 @@ struct StrHash<WebCore::StringImpl*> {
     if (aLength != bLength)
       return false;
 
-    const uint32_t* aChars = reinterpret_cast<const uint32_t*>(a->unicode());
-    const uint32_t* bChars = reinterpret_cast<const uint32_t*>(b->unicode());
+    const uint32_t* aChars = reinterpret_cast<const uint32_t*>(a->characters());
+    const uint32_t* bChars = reinterpret_cast<const uint32_t*>(b->characters());
 
     unsigned halfLength = aLength >> 1;
     for (unsigned i = 0; i != halfLength; ++i)
@@ -72,7 +74,7 @@ class CaseInsensitiveHash {
   // http://www.azillionmonkeys.com/qed/hash.html
   static unsigned hash(const WebCore::StringImpl* str) {
     unsigned l = str->length();
-    const QChar* s = str->unicode();
+    const UChar* s = str->characters();
     uint32_t hash = PHI;
     uint32_t tmp;
 
@@ -81,8 +83,8 @@ class CaseInsensitiveHash {
 
     // Main loop
     for (; l > 0; l--) {
-      hash += s[0].lower().unicode();
-      tmp = (s[1].lower().unicode() << 11) ^ hash;
+      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
+      tmp = (u_foldCase(s[1], U_FOLD_CASE_DEFAULT) << 11) ^ hash;
       hash = (hash << 16) ^ tmp;
       s += 2;
       hash += hash >> 11;
@@ -90,7 +92,7 @@ class CaseInsensitiveHash {
 
     // Handle end case
     if (rem) {
-      hash += s[0].lower().unicode();
+      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
       hash ^= hash << 11;
       hash += hash >> 17;
     }
@@ -128,8 +130,8 @@ class CaseInsensitiveHash {
 
     // Main loop
     for (; l > 0; l--) {
-      hash += QChar(s[0]).lower().unicode();
-      tmp = (QChar(s[1]).lower().unicode() << 11) ^ hash;
+      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
+      tmp = (u_foldCase(s[1], U_FOLD_CASE_DEFAULT) << 11) ^ hash;
       hash = (hash << 16) ^ tmp;
       s += 2;
       hash += hash >> 11;
@@ -137,7 +139,7 @@ class CaseInsensitiveHash {
 
     // Handle end case
     if (rem) {
-      hash += QChar(s[0]).lower().unicode();
+      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
       hash ^= hash << 11;
       hash += hash >> 17;
     }
@@ -167,12 +169,8 @@ class CaseInsensitiveHash {
     unsigned length = a->length();
     if (length != b->length())
       return false;
-    const QChar* as = a->unicode();
-    const QChar* bs = b->unicode();
-    for (unsigned i = 0; i != length; ++i)
-      if (as[i].lower() != bs[i].lower())
-        return false;
-    return true;
+    return u_memcasecmp(a->characters(), b->characters(), length,
+                        U_FOLD_CASE_DEFAULT) == 0;
   }
 };
 

@@ -26,25 +26,25 @@
 #ifndef TextBoundaries_h
 #define TextBoundaries_h
 
-// FIXME: Change clients to use ICU and remove these functions.
+#include <unicode/umachine.h>
 
-class QChar;
+// FIXME: Change clients to use ICU and remove these functions.
 
 namespace WebCore {
 
-void findWordBoundary(const QChar*,
+void findWordBoundary(const UChar*,
                       int len,
                       int position,
                       int* start,
                       int* end);
-int findNextWordFromIndex(const QChar*, int len, int position, bool forward);
+int findNextWordFromIndex(const UChar*, int len, int position, bool forward);
 
-void findSentenceBoundary(const QChar*,
+void findSentenceBoundary(const UChar*,
                           int len,
                           int position,
                           int* start,
                           int* end);
-int findNextSentenceFromIndex(const QChar*,
+int findNextSentenceFromIndex(const UChar*,
                               int len,
                               int position,
                               bool forward);

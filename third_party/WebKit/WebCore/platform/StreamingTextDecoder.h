@@ -45,15 +45,14 @@ class StreamingTextDecoder : Noncopyable {
     return convert(reinterpret_cast<const unsigned char*>(chs), len, flush);
   }
   DeprecatedString convert(const unsigned char* chs, int len, bool flush);
-  DeprecatedString convertUTF16(const unsigned char* chs, int len);
 
-  // ICU decoding.
-  DeprecatedString convertUsingICU(const unsigned char* chs,
-                                   int len,
-                                   bool flush);
-  UErrorCode createICUConverter();
+  bool convertIfASCII(const unsigned char*, int len, DeprecatedString&);
+  DeprecatedString convertUTF16(const unsigned char*, int len);
+  DeprecatedString convertUsingICU(const unsigned char*, int len, bool flush);
 
-  static void appendOmittingUnwanted(DeprecatedString& s,
+  void createICUConverter();
+
+  static void appendOmittingUnwanted(DeprecatedString&,
                                      const UChar* characters,
                                      int byteCount);
 

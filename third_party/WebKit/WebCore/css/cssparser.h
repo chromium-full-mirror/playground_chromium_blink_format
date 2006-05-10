@@ -45,7 +45,7 @@ class StyleBase;
 class StyleList;
 
 struct ParseString {
-  unsigned short* string;
+  UChar* characters;
   int length;
 
   void lower();
@@ -65,14 +65,12 @@ struct Value {
   int unit;
 };
 
-static inline DeprecatedString deprecatedString(const ParseString& ps) {
-  return DeprecatedString((QChar*)ps.string, ps.length);
-}
+DeprecatedString deprecatedString(const ParseString&);
 static inline String domString(const ParseString& ps) {
-  return String((QChar*)ps.string, ps.length);
+  return String(ps.characters, ps.length);
 }
 static inline AtomicString atomicString(const ParseString& ps) {
-  return AtomicString(ps.string, ps.length);
+  return AtomicString(ps.characters, ps.length);
 }
 
 class ValueList {
@@ -212,7 +210,7 @@ class CSSParser {
  public:
   int lex(void* yylval);
   int token() { return yyTok; }
-  unsigned short* text(int* length);
+  UChar* text(int* length);
   int lex();
 
  private:
@@ -222,12 +220,12 @@ class CSSParser {
 
   bool inShorthand() const { return m_inParseShorthand; }
 
-  unsigned short* data;
-  unsigned short* yytext;
-  unsigned short* yy_c_buf_p;
-  unsigned short yy_hold_char;
+  UChar* data;
+  UChar* yytext;
+  UChar* yy_c_buf_p;
+  UChar yy_hold_char;
   int yy_last_accepting_state;
-  unsigned short* yy_last_accepting_cpos;
+  UChar* yy_last_accepting_cpos;
   int yyleng;
   int yyTok;
   int yy_start;

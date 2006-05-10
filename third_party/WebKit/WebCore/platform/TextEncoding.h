@@ -76,7 +76,7 @@ class TextEncoding {
   bool usesVisualOrdering() const { return m_flags & VisualOrdering; }
   bool isJapanese() const { return m_flags & IsJapanese; }
 
-  QChar backslashAsCurrencySymbol() const;
+  UChar backslashAsCurrencySymbol() const;
 
   DeprecatedCString fromUnicode(const DeprecatedString&,
                                 bool allowEntities = false) const;

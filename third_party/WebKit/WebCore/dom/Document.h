@@ -811,7 +811,7 @@ class Document : public ContainerNode {
   void setDecoder(Decoder*);
   Decoder* decoder() const { return m_decoder.get(); }
 
-  QChar backslashAsCurrencySymbol() const;
+  UChar backslashAsCurrencySymbol() const;
 
 #if __APPLE__
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }

@@ -1414,8 +1414,8 @@ class RenderStyle {
     return ws != PRE && ws != PRE_WRAP;
   }
   bool collapseWhiteSpace() const { return collapseWhiteSpace(whiteSpace()); }
-  bool isCollapsibleWhiteSpace(const QChar& c) const {
-    switch (c.unicode()) {
+  bool isCollapsibleWhiteSpace(UChar c) const {
+    switch (c) {
       case ' ':
       case '\t':
         return collapseWhiteSpace();

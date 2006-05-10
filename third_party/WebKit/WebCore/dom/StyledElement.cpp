@@ -118,7 +118,7 @@ void StyledElement::updateStyleAttributeIfNeeded() const {
   }
 }
 
-inline static bool isClassWhitespace(QChar c) {
+inline static bool isClassWhitespace(UChar c) {
   return c == ' ' || c == '\r' || c == '\n' || c == '\t';
 }
 
@@ -310,11 +310,11 @@ void StyledElement::addCSSLength(MappedAttribute* attr,
   if (v) {
     unsigned int l = 0;
 
-    while (l < v->length() && (*v)[l].unicode() <= ' ')
+    while (l < v->length() && (*v)[l] <= ' ')
       l++;
 
     for (; l < v->length(); l++) {
-      char cc = (*v)[l].latin1();
+      UChar cc = (*v)[l];
       if (cc > '9' || (cc < '0' && cc != '*' && cc != '%' && cc != '.'))
         break;
     }
@@ -376,7 +376,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
         // search forward for digits in the string
         int numDigits = 0;
         while (pos < (int)color.length() && numDigits < basicLength) {
-          int hex = toHex(color[pos].unicode());
+          int hex = toHex(color[pos]);
           colors[component] = (colors[component] << 4);
           if (hex > 0) {
             colors[component] += hex;

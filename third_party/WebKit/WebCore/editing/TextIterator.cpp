@@ -43,7 +43,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-const unsigned short nonBreakingSpace = 0xA0;
+const UChar nonBreakingSpace = 0xA0;
 
 // Buffer that knows how to compare with a search target.
 // Keeps enough of the previous text to be able to search in the future,
@@ -57,8 +57,8 @@ class CircularSearchBuffer {
     m_cursor = m_buffer;
     m_bufferFull = false;
   }
-  void append(int length, const QChar* characters);
-  void append(const QChar&);
+  void append(int length, const UChar* characters);
+  void append(UChar);
 
   int neededCharacters() const;
   bool isMatch() const;
@@ -68,8 +68,8 @@ class CircularSearchBuffer {
   String m_target;
   bool m_isCaseSensitive;
 
-  QChar* m_buffer;
-  QChar* m_cursor;
+  UChar* m_buffer;
+  UChar* m_cursor;
   bool m_bufferFull;
 
   CircularSearchBuffer(const CircularSearchBuffer&);
@@ -77,7 +77,10 @@ class CircularSearchBuffer {
 };
 
 TextIterator::TextIterator()
-    : m_endContainer(0), m_endOffset(0), m_positionNode(0) {}
+    : m_endContainer(0),
+      m_endOffset(0),
+      m_positionNode(0),
+      m_lastCharacter(0) {}
 
 TextIterator::TextIterator(const Range* r, IteratorKind kind)
     : m_endContainer(0), m_endOffset(0), m_positionNode(0) {
@@ -231,7 +234,7 @@ bool TextIterator::handleTextNode() {
     m_positionOffsetBaseNode = 0;
     m_positionStartOffset = runStart;
     m_positionEndOffset = runEnd;
-    m_textCharacters = str.unicode() + runStart;
+    m_textCharacters = str.characters() + runStart;
     m_textLength = runEnd - runStart;
 
     m_lastCharacter = str[runEnd - 1];
@@ -280,7 +283,7 @@ void TextIterator::handleTextBox() {
         m_lastTextNodeEndedWithCollapsedSpace ||
         (m_textBox == firstTextBox && textBoxStart == runStart && runStart > 0);
     if (needSpace && !isCollapsibleWhitespace(m_lastCharacter) &&
-        m_lastCharacter.unicode()) {
+        m_lastCharacter) {
       emitCharacter(' ', m_node, 0, runStart, runStart);
       return;
     }
@@ -314,7 +317,7 @@ void TextIterator::handleTextBox() {
         m_positionOffsetBaseNode = 0;
         m_positionStartOffset = runStart;
         m_positionEndOffset = subrunEnd;
-        m_textCharacters = str.unicode() + runStart;
+        m_textCharacters = str.characters() + runStart;
         m_textLength = subrunEnd - runStart;
 
         m_lastTextNodeEndedWithCollapsedSpace = false;
@@ -496,7 +499,7 @@ void TextIterator::exitNode() {
     emitCharacter(' ', m_node->parentNode(), m_node, 1, 1);
 }
 
-void TextIterator::emitCharacter(QChar c,
+void TextIterator::emitCharacter(UChar c,
                                  Node* textNode,
                                  Node* offsetBaseNode,
                                  int textStartOffset,
@@ -688,7 +691,7 @@ bool SimplifiedBackwardsTextIterator::handleTextNode() {
   m_positionNode = m_node;
   m_positionStartOffset = m_offset;
   m_textLength = m_positionEndOffset - m_positionStartOffset;
-  m_textCharacters = str.unicode() + m_positionStartOffset;
+  m_textCharacters = str.characters() + m_positionStartOffset;
 
   m_lastCharacter = str[m_positionEndOffset - 1];
 
@@ -732,7 +735,7 @@ void SimplifiedBackwardsTextIterator::exitNode() {
   handleNonTextNode();
 }
 
-void SimplifiedBackwardsTextIterator::emitCharacter(QChar c,
+void SimplifiedBackwardsTextIterator::emitCharacter(UChar c,
                                                     Node* node,
                                                     int startOffset,
                                                     int endOffset) {
@@ -841,7 +844,7 @@ DeprecatedString CharacterIterator::string(int numChars) {
   result.reserve(numChars);
   while (numChars > 0 && !atEnd()) {
     int runSize = min(numChars, length());
-    result.append(characters(), runSize);
+    result.append(reinterpret_cast<const QChar*>(characters()), runSize);
     numChars -= runSize;
     advance(runSize);
   }
@@ -891,7 +894,8 @@ void WordAwareIterator::advance() {
 
   while (1) {
     // If this chunk ends in whitespace we can just use it as our chunk.
-    if (m_textIterator.characters()[m_textIterator.length() - 1].isSpace())
+    if (QChar(m_textIterator.characters()[m_textIterator.length() - 1])
+            .isSpace())
       return;
 
     // If this is the first chunk that failed, save it in previousText before
@@ -905,17 +909,19 @@ void WordAwareIterator::advance() {
     // previous stuff
     m_textIterator.advance();
     if (m_textIterator.atEnd() || m_textIterator.length() == 0 ||
-        m_textIterator.characters()[0].isSpace()) {
+        QChar(m_textIterator.characters()[0]).isSpace()) {
       m_didLookAhead = true;
       return;
     }
 
     if (m_buffer.isEmpty()) {
       // Start gobbling chunks until we get to a suitable stopping point
-      m_buffer.append(m_previousText, m_previousLength);
+      m_buffer.append(reinterpret_cast<const QChar*>(m_previousText),
+                      m_previousLength);
       m_previousText = 0;
     }
-    m_buffer.append(m_textIterator.characters(), m_textIterator.length());
+    m_buffer.append(reinterpret_cast<const QChar*>(m_textIterator.characters()),
+                    m_textIterator.length());
     int exception = 0;
     m_range->setEnd(m_textIterator.range()->endContainer(exception),
                     m_textIterator.range()->endOffset(exception), exception);
@@ -925,19 +931,17 @@ void WordAwareIterator::advance() {
 int WordAwareIterator::length() const {
   if (!m_buffer.isEmpty())
     return m_buffer.length();
-  else if (m_previousText)
+  if (m_previousText)
     return m_previousLength;
-  else
-    return m_textIterator.length();
+  return m_textIterator.length();
 }
 
-const QChar* WordAwareIterator::characters() const {
+const UChar* WordAwareIterator::characters() const {
   if (!m_buffer.isEmpty())
-    return m_buffer.unicode();
-  else if (m_previousText)
+    return reinterpret_cast<const UChar*>(m_buffer.unicode());
+  if (m_previousText)
     return m_previousText;
-  else
-    return m_textIterator.characters();
+  return m_textIterator.characters();
 }
 
 CircularSearchBuffer::CircularSearchBuffer(const String& s,
@@ -946,20 +950,21 @@ CircularSearchBuffer::CircularSearchBuffer(const String& s,
   assert(!s.isEmpty());
 
   if (!isCaseSensitive)
-    m_target = s.lower();
+    m_target = s.foldCase();
   m_target.replace(nonBreakingSpace, ' ');
   m_isCaseSensitive = isCaseSensitive;
 
-  m_buffer = static_cast<QChar*>(fastMalloc(s.length() * sizeof(QChar)));
+  m_buffer = static_cast<UChar*>(fastMalloc(s.length() * sizeof(UChar)));
   m_cursor = m_buffer;
   m_bufferFull = false;
 }
 
-void CircularSearchBuffer::append(const QChar& c) {
+void CircularSearchBuffer::append(UChar c) {
   if (m_isCaseSensitive)
-    *m_cursor++ = c.unicode() == nonBreakingSpace ? ' ' : c.unicode();
+    *m_cursor++ = c == nonBreakingSpace ? ' ' : c;
   else
-    *m_cursor++ = c.unicode() == nonBreakingSpace ? ' ' : c.lower().unicode();
+    *m_cursor++ =
+        c == nonBreakingSpace ? ' ' : u_foldCase(c, U_FOLD_CASE_DEFAULT);
   if (m_cursor == m_buffer + length()) {
     m_cursor = m_buffer;
     m_bufferFull = true;
@@ -969,7 +974,7 @@ void CircularSearchBuffer::append(const QChar& c) {
 // This function can only be used when the buffer is not yet full,
 // and when then count is small enough to fit in the buffer.
 // No need for a more general version for the search algorithm.
-void CircularSearchBuffer::append(int count, const QChar* characters) {
+void CircularSearchBuffer::append(int count, const UChar* characters) {
   int tailSpace = m_buffer + length() - m_cursor;
 
   assert(!m_bufferFull);
@@ -977,13 +982,14 @@ void CircularSearchBuffer::append(int count, const QChar* characters) {
 
   if (m_isCaseSensitive) {
     for (int i = 0; i != count; ++i) {
-      QChar c = characters[i];
-      m_cursor[i] = c.unicode() == nonBreakingSpace ? ' ' : c.unicode();
+      UChar c = characters[i];
+      m_cursor[i] = c == nonBreakingSpace ? ' ' : c;
     }
   } else {
     for (int i = 0; i != count; ++i) {
-      QChar c = characters[i];
-      m_cursor[i] = c.unicode() == nonBreakingSpace ? ' ' : c.lower().unicode();
+      UChar c = characters[i];
+      m_cursor[i] =
+          c == nonBreakingSpace ? ' ' : u_foldCase(c, U_FOLD_CASE_DEFAULT);
     }
   }
   if (count < tailSpace)
@@ -1003,9 +1009,10 @@ bool CircularSearchBuffer::isMatch() const {
 
   int headSpace = m_cursor - m_buffer;
   int tailSpace = length() - headSpace;
-  return memcmp(m_cursor, m_target.unicode(), tailSpace * sizeof(QChar)) == 0 &&
-         memcmp(m_buffer, m_target.unicode() + tailSpace,
-                headSpace * sizeof(QChar)) == 0;
+  return memcmp(m_cursor, m_target.characters(), tailSpace * sizeof(UChar)) ==
+             0 &&
+         memcmp(m_buffer, m_target.characters() + tailSpace,
+                headSpace * sizeof(UChar)) == 0;
 }
 
 int TextIterator::rangeLength(const Range* r) {
@@ -1106,9 +1113,8 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
 
 DeprecatedString plainText(const Range* r) {
   DeprecatedString result("");
-  for (TextIterator it(r); !it.atEnd(); it.advance()) {
-    result.append(it.characters(), it.length());
-  }
+  for (TextIterator it(r); !it.atEnd(); it.advance())
+    result.append(reinterpret_cast<const QChar*>(it.characters()), it.length());
   return result;
 }
 

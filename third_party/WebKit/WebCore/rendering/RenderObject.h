@@ -1025,7 +1025,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool isStretchingChildren() const { return false; }
 
   // Convenience, to avoid repeating the code to dig down to get this.
-  QChar backslashAsCurrencySymbol() const;
+  UChar backslashAsCurrencySymbol() const;
 
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;

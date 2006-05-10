@@ -110,8 +110,16 @@ CSSParser::~CSSParser() {
 }
 
 void ParseString::lower() {
+  // Fast case for all-ASCII.
+  UChar ored = 0;
   for (int i = 0; i < length; i++)
-    string[i] = QChar(string[i]).lower().unicode();
+    ored |= characters[i];
+  if (ored & ~0x7F)
+    for (int i = 0; i < length; i++)
+      characters[i] = u_tolower(characters[i]);
+  else
+    for (int i = 0; i < length; i++)
+      characters[i] = tolower(characters[i]);
 }
 
 void CSSParser::setupParser(const char* prefix,
@@ -119,12 +127,12 @@ void CSSParser::setupParser(const char* prefix,
                             const char* suffix) {
   int length = string.length() + strlen(prefix) + strlen(suffix) + 2;
 
-  data = (unsigned short*)fastMalloc(length * sizeof(unsigned short));
+  data = static_cast<UChar*>(fastMalloc(length * sizeof(UChar)));
   for (unsigned i = 0; i < strlen(prefix); i++)
     data[i] = prefix[i];
 
-  memcpy(data + strlen(prefix), string.unicode(),
-         string.length() * sizeof(unsigned short));
+  memcpy(data + strlen(prefix), string.characters(),
+         string.length() * sizeof(UChar));
 
   unsigned start = strlen(prefix) + string.length();
   unsigned end = start + strlen(suffix);
@@ -2732,11 +2740,11 @@ static inline int yyerror(const char*) {
 
 #include "CSSGrammar.h"
 
-int CSSParser::lex(void* _yylval) {
-  YYSTYPE* yylval = (YYSTYPE*)_yylval;
+int CSSParser::lex(void* yylvalWithoutType) {
+  YYSTYPE* yylval = static_cast<YYSTYPE*>(yylvalWithoutType);
   int token = lex();
   int length;
-  unsigned short* t = text(&length);
+  UChar* t = text(&length);
 
 #ifdef TOKEN_DEBUG
   qDebug(
@@ -2757,7 +2765,7 @@ int CSSParser::lex(void* _yylval) {
     case DIMEN:
     case UNICODERANGE:
     case FUNCTION:
-      yylval->string.string = t;
+      yylval->string.characters = t;
       yylval->string.length = length;
       break;
 
@@ -2814,8 +2822,8 @@ static inline int toHex(char c) {
   return 0;
 }
 
-unsigned short* CSSParser::text(int* length) {
-  unsigned short* start = yytext;
+UChar* CSSParser::text(int* length) {
+  UChar* start = yytext;
   int l = yyleng;
   switch (yyTok) {
     case STRING:
@@ -2855,11 +2863,11 @@ unsigned short* CSSParser::text(int* length) {
   }
 
   // process escapes
-  unsigned short* out = start;
-  unsigned short* escape = 0;
+  UChar* out = start;
+  UChar* escape = 0;
 
   for (int i = 0; i < l; i++) {
-    unsigned short* current = start + i;
+    UChar* current = start + i;
     if (escape == current - 1) {
       if ((*current >= '0' && *current <= '9') ||
           (*current >= 'a' && *current <= 'f') ||
@@ -2889,7 +2897,7 @@ unsigned short* CSSParser::text(int* length) {
       continue;
     if (escape) {
       // add escaped char
-      int uc = 0;
+      unsigned uc = 0;
       escape++;
       while (escape < current) {
         uc *= 16;
@@ -2899,7 +2907,7 @@ unsigned short* CSSParser::text(int* length) {
       // can't handle chars outside ucs2
       if (uc > 0xffff)
         uc = 0xfffd;
-      *(out++) = (unsigned short)uc;
+      *out++ = uc;
       escape = 0;
       if (*current == ' ' || *current == '\t' || *current == '\r' ||
           *current == '\n' || *current == '\f')
@@ -2909,11 +2917,11 @@ unsigned short* CSSParser::text(int* length) {
       escape = current;
       continue;
     }
-    *(out++) = *current;
+    *out++ = *current;
   }
   if (escape) {
     // add escaped char
-    int uc = 0;
+    unsigned uc = 0;
     escape++;
     while (escape < start + l) {
       uc *= 16;
@@ -2923,7 +2931,7 @@ unsigned short* CSSParser::text(int* length) {
     // can't handle chars outside ucs2
     if (uc > 0xffff)
       uc = 0xfffd;
-    *(out++) = (unsigned short)uc;
+    *out++ = uc;
   }
 
   *length = out - start;
@@ -3029,6 +3037,11 @@ CSSRule* CSSParser::createStyleRule(CSSSelector* selector) {
   }
   clearProperties();
   return rule;
+}
+
+DeprecatedString deprecatedString(const ParseString& ps) {
+  return DeprecatedString(reinterpret_cast<const QChar*>(ps.characters),
+                          ps.length);
 }
 
 #define YY_DECL int CSSParser::lex()

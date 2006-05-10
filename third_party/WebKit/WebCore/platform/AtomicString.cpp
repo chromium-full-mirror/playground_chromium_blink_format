@@ -23,17 +23,19 @@
 #include "config.h"
 
 #if AVOID_STATIC_CONSTRUCTORS
-#define KHTML_ATOMICSTRING_HIDE_GLOBALS 1
+#define ATOMICSTRING_HIDE_GLOBALS 1
 #endif
 
 #include "AtomicString.h"
 
+#include "DeprecatedString.h"
 #include "StaticConstructors.h"
 #include "StringHash.h"
 #include <kjs/identifier.h>
 #include <wtf/HashSet.h>
 
-using namespace KJS;
+using KJS::Identifier;
+using KJS::UString;
 
 namespace WebCore {
 
@@ -44,7 +46,7 @@ struct CStringTranslator {
 
   static bool equal(StringImpl* r, const char* s) {
     int length = r->length();
-    const QChar* d = r->unicode();
+    const UChar* d = r->characters();
     for (int i = 0; i != length; ++i)
       if (d[i] != s[i])
         return false;
@@ -63,9 +65,9 @@ struct CStringTranslator {
 
 bool operator==(const AtomicString& a, const char* b) {
   StringImpl* impl = a.impl();
-  if ((!impl || !impl->unicode()) && !b)
+  if ((!impl || !impl->characters()) && !b)
     return true;
-  if ((!impl || !impl->unicode()) || !b)
+  if ((!impl || !impl->characters()) || !b)
     return false;
   return CStringTranslator::equal(impl, b);
 }
@@ -80,24 +82,24 @@ StringImpl* AtomicString::add(const char* c) {
   return *stringTable->add<const char*, CStringTranslator>(c).first;
 }
 
-struct QCharBuffer {
-  const QChar* s;
+struct UCharBuffer {
+  const UChar* s;
   unsigned length;
 };
 
-struct QCharBufferTranslator {
-  static unsigned hash(const QCharBuffer& buf) {
+struct UCharBufferTranslator {
+  static unsigned hash(const UCharBuffer& buf) {
     return StringImpl::computeHash(buf.s, buf.length);
   }
 
-  static bool equal(StringImpl* const& str, const QCharBuffer& buf) {
+  static bool equal(StringImpl* const& str, const UCharBuffer& buf) {
     unsigned strLength = str->length();
     unsigned bufLength = buf.length;
     if (strLength != bufLength)
       return false;
 
     const uint32_t* strChars =
-        reinterpret_cast<const uint32_t*>(str->unicode());
+        reinterpret_cast<const uint32_t*>(str->characters());
     const uint32_t* bufChars = reinterpret_cast<const uint32_t*>(buf.s);
 
     unsigned halfLength = strLength >> 1;
@@ -115,7 +117,7 @@ struct QCharBufferTranslator {
   }
 
   static void translate(StringImpl*& location,
-                        const QCharBuffer& buf,
+                        const UCharBuffer& buf,
                         unsigned hash) {
     StringImpl* r = new StringImpl(buf.s, buf.length);
     r->m_hash = hash;
@@ -125,15 +127,15 @@ struct QCharBufferTranslator {
   }
 };
 
-StringImpl* AtomicString::add(const QChar* s, int length) {
+StringImpl* AtomicString::add(const UChar* s, int length) {
   if (!s)
     return 0;
 
   if (length == 0)
     return StringImpl::empty();
 
-  QCharBuffer buf = {s, length};
-  return *stringTable->add<QCharBuffer, QCharBufferTranslator>(buf).first;
+  UCharBuffer buf = {s, length};
+  return *stringTable->add<UCharBuffer, UCharBufferTranslator>(buf).first;
 }
 
 StringImpl* AtomicString::add(StringImpl* r) {
@@ -154,19 +156,26 @@ void AtomicString::remove(StringImpl* r) {
 }
 
 StringImpl* AtomicString::add(const KJS::Identifier& str) {
-  return add(reinterpret_cast<const QChar*>(str.data()), str.size());
+  return add(reinterpret_cast<const UChar*>(str.data()), str.size());
 }
 
 StringImpl* AtomicString::add(const KJS::UString& str) {
-  return add(reinterpret_cast<const QChar*>(str.data()), str.size());
+  return add(reinterpret_cast<const UChar*>(str.data()), str.size());
 }
 
 AtomicString::operator Identifier() const {
-  return domString();
+  return m_string;
 }
 
 AtomicString::operator UString() const {
-  return domString();
+  return m_string;
+}
+
+AtomicString::AtomicString(const DeprecatedString& s)
+    : m_string(add(reinterpret_cast<const UChar*>(s.unicode()), s.length())) {}
+
+DeprecatedString AtomicString::deprecatedString() const {
+  return m_string.deprecatedString();
 }
 
 DEFINE_GLOBAL(AtomicString, nullAtom)
