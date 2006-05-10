@@ -59,7 +59,7 @@ FontData* getFontData(const FontDescription& fontDescription,
                          ? 700
                          : 400;  // FIXME: Support weights for real.
   int len = min(fontFace.length(), LF_FACESIZE - 1);
-  memcpy(winfont.lfFaceName, fontFace.unicode(), len * sizeof(WORD));
+  memcpy(winfont.lfFaceName, fontFace.characters(), len * sizeof(WORD));
   winfont.lfFaceName[len] = '\0';
 
   HFONT font = CreateFontIndirectW(&winfont);
