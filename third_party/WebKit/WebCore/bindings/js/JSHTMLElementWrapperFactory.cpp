@@ -22,6 +22,7 @@
 #include "HTMLCanvasElement.h"
 #include "HTMLNames.h"
 #include "JSHTMLCanvasElement.h"
+#include "JSHTMLElement.h"
 #include "kjs_html.h"
 
 using namespace KJS;
@@ -48,6 +49,6 @@ DOMNode* createJSWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
   CreateHTMLElementWrapperFunction f = map.get(element->localName().impl());
   if (f)
     return f(exec, element);
-  return new JSHTMLElement(exec, element.get());
+  return new KJS::JSHTMLElement(exec, element.get());
 }
 }

@@ -75,11 +75,26 @@ class HTMLElementFunction : public InternalFunctionImp {
   int id;
 };
 
-KJS_IMPLEMENT_PROTOFUNC(HTMLDocFunction)
+/*
+@begin JSHTMLDocumentProtoTable 8
+clear                 JSHTMLDocument::Clear             DontDelete|Function 0
+open                  JSHTMLDocument::Open              DontDelete|Function 0
+close                 JSHTMLDocument::Close             DontDelete|Function 0
+write                 JSHTMLDocument::Write             DontDelete|Function 1
+writeln               JSHTMLDocument::WriteLn           DontDelete|Function 1
+getElementsByName     JSHTMLDocument::GetElementsByName DontDelete|Function 1
+captureEvents         JSHTMLDocument::CaptureEvents     DontDelete|Function 0
+releaseEvents         JSHTMLDocument::ReleaseEvents     DontDelete|Function 0
+@end
+*/
+KJS_IMPLEMENT_PROTOFUNC(JSHTMLDocumentProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("HTMLDocument",
+                        JSHTMLDocumentProto,
+                        JSHTMLDocumentProtoFunc)
 
-JSValue* HTMLDocFunction::callAsFunction(ExecState* exec,
-                                         JSObject* thisObj,
-                                         const List& args) {
+JSValue* JSHTMLDocumentProtoFunc::callAsFunction(ExecState* exec,
+                                                 JSObject* thisObj,
+                                                 const List& args) {
   if (!thisObj->inherits(&JSHTMLDocument::info))
     return throwError(exec, TypeError);
   HTMLDocument& doc = *static_cast<HTMLDocument*>(
@@ -87,7 +102,7 @@ JSValue* HTMLDocFunction::callAsFunction(ExecState* exec,
 
   switch (id) {
     case JSHTMLDocument::Clear:  // even IE doesn't support that one...
-      // doc.clear(); // TODO
+                                 // doc.clear(); // TODO
       return jsUndefined();
     case JSHTMLDocument::Open:
       // For compatibility with other browsers, pass open calls with more than 2
@@ -155,14 +170,6 @@ const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &JSDocument::info,
   anchors               JSHTMLDocument::Anchors           DontDelete|ReadOnly
   scripts               JSHTMLDocument::Scripts           DontDelete|ReadOnly
   all                   JSHTMLDocument::All
-  clear                 JSHTMLDocument::Clear             DontDelete|Function 0
-  open                  JSHTMLDocument::Open              DontDelete|Function 0
-  close                 JSHTMLDocument::Close             DontDelete|Function 0
-  write                 JSHTMLDocument::Write             DontDelete|Function 1
-  writeln               JSHTMLDocument::WriteLn           DontDelete|Function 1
-  getElementsByName     JSHTMLDocument::GetElementsByName DontDelete|Function 1
-  captureEvents         JSHTMLDocument::CaptureEvents     DontDelete|Function 0
-  releaseEvents         JSHTMLDocument::ReleaseEvents     DontDelete|Function 0
   bgColor               JSHTMLDocument::BgColor           DontDelete
   fgColor               JSHTMLDocument::FgColor           DontDelete
   alinkColor            JSHTMLDocument::AlinkColor        DontDelete
@@ -184,7 +191,9 @@ const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &JSDocument::info,
 */
 
 JSHTMLDocument::JSHTMLDocument(ExecState* exec, HTMLDocument* d)
-    : JSDocument(exec, d) {}
+    : JSDocument(exec, d) {
+  setPrototype(JSHTMLDocumentProto::self(exec));
+}
 
 JSValue* JSHTMLDocument::namedItemGetter(ExecState* exec,
                                          JSObject* originalObject,
@@ -312,12 +321,12 @@ bool JSHTMLDocument::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
+  return getStaticValueSlot<JSHTMLDocument, JSDocument>(
+      exec, &HTMLDocumentTable, this, propertyName, slot);
+
   const HashEntry* entry = Lookup::findEntry(&HTMLDocumentTable, propertyName);
   if (entry) {
-    if (entry->attr & Function)
-      slot.setStaticEntry(this, entry, staticFunctionGetter<HTMLDocFunction>);
-    else
-      slot.setStaticEntry(this, entry, staticValueGetter<JSHTMLDocument>);
+    slot.setStaticEntry(this, entry, staticValueGetter<JSHTMLDocument>);
     return true;
   }
 
@@ -831,7 +840,6 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
 
 @begin HTMLElementTable 14
   id            KJS::JSHTMLElement::ElementId     DontDelete
-  title         KJS::JSHTMLElement::ElementTitle  DontDelete
   lang          KJS::JSHTMLElement::ElementLang   DontDelete
   dir           KJS::JSHTMLElement::ElementDir    DontDelete
 ### isn't this "class" in the HTML spec?
@@ -1330,7 +1338,9 @@ JSValue* JSHTMLElementProtoFunc::callAsFunction(ExecState*,
 }
 
 JSHTMLElement::JSHTMLElement(ExecState* exec, HTMLElement* e)
-    : JSElement(exec, e) {}
+    : WebCore::JSHTMLElement(exec, e) {
+  setPrototype(JSHTMLElementProto::self(exec));
+}
 
 JSValue* JSHTMLElement::formIndexGetter(ExecState* exec,
                                         JSObject* originalObject,
@@ -1488,7 +1498,8 @@ bool JSHTMLElement::getOwnPropertySlot(ExecState* exec,
   }
 
   // Base JSHTMLElement stuff or parent class forward, as usual
-  return getStaticPropertySlot<HTMLElementFunction, JSHTMLElement, JSElement>(
+  return getStaticPropertySlot<HTMLElementFunction, JSHTMLElement,
+                               WebCore::JSHTMLElement>(
       exec, &HTMLElementTable, this, propertyName, slot);
 }
 
@@ -2569,8 +2580,6 @@ JSValue* JSHTMLElement::getValueProperty(ExecState* exec, int token) const {
       // browsers do this as well.
       // So we use jsString() instead of jsStringOrNull() here.
       return jsString(element.id());
-    case ElementTitle:
-      return jsString(element.title());
     case ElementLang:
       return jsString(element.lang());
     case ElementDir:
@@ -4391,9 +4400,6 @@ void JSHTMLElement::putValueProperty(ExecState* exec,
   switch (token) {
     case ElementId:
       element.setId(str);
-      return;
-    case ElementTitle:
-      element.setTitle(str);
       return;
     case ElementLang:
       element.setLang(str);
