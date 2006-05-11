@@ -46,6 +46,43 @@ class FloatPoint;
 
 enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 
+class TextRun {
+ public:
+  TextRun(const UChar* c, int len)
+      : m_characters(c), m_len(len), m_from(0), m_to(len) {}
+
+  TextRun(const UChar* c, int len, int from, int to)  // This constructor is
+                                                      // only used in one place
+                                                      // in Mac-specific code.
+      : m_characters(c),
+        m_len(len),
+        m_from(from),
+        m_to(to) {}
+
+  TextRun(const StringImpl* s, int offset = 0, int from = -1, int to = -1)
+      : m_characters(s->characters() + offset),
+        m_len(s->length() - offset),
+        m_from(adjustFrom(from)),
+        m_to(adjustTo(to)) {}
+
+  const UChar operator[](int i) const { return m_characters[i]; }
+  const UChar* data(int i) const { return &m_characters[i]; }
+
+  int adjustFrom(int from) const { return from == -1 ? 0 : from; }
+  int adjustTo(int to) const { return to == -1 ? m_len : to; }
+
+  const UChar* characters() const { return m_characters; }
+  int length() const { return m_len; }
+  int from() const { return m_from; }
+  int to() const { return m_to; }
+
+ private:
+  const UChar* m_characters;
+  int m_len;
+  int m_from;
+  int m_to;
+};
+
 class Font {
  public:
   Font();
@@ -73,25 +110,19 @@ class Font {
   void update() const;
 
   void drawText(GraphicsContext*,
+                const TextRun&,
                 const IntPoint&,
                 int tabWidth,
                 int xpos,
-                const UChar*,
-                int len,
-                int from,
-                int to,
                 int toAdd,
                 TextDirection,
                 bool visuallyOrdered) const;
   void drawHighlightForText(GraphicsContext*,
+                            const TextRun&,
                             const IntPoint&,
                             int h,
                             int tabWidth,
                             int xpos,
-                            const UChar*,
-                            int len,
-                            int from,
-                            int to,
                             int toAdd,
                             TextDirection d,
                             bool visuallyOrdered,
@@ -105,18 +136,12 @@ class Font {
                               int width) const;
   int misspellingLineThickness(GraphicsContext*) const;
 
-  float floatWidth(const UChar*,
-                   int slen,
-                   int pos,
-                   int len,
+  float floatWidth(const TextRun&,
                    int tabWidth,
                    int xpos,
                    bool runRounding = true) const;
 
-  int checkSelectionPoint(const UChar*,
-                          int slen,
-                          int pos,
-                          int len,
+  int checkSelectionPoint(const TextRun&,
                           int toAdd,
                           int tabWidth,
                           int xpos,
@@ -124,25 +149,16 @@ class Font {
                           TextDirection,
                           bool visuallyOrdered,
                           bool includePartialGlyphs) const;
-  IntRect selectionRectForText(const IntPoint&,
+  IntRect selectionRectForText(const TextRun&,
+                               const IntPoint&,
                                int h,
                                int tabWidth,
                                int xpos,
-                               const UChar*,
-                               int slen,
-                               int pos,
-                               int len,
                                int width,
                                bool rtl,
-                               bool visuallyOrdered = false,
-                               int from = -1,
-                               int to = -1) const;
+                               bool visuallyOrdered = false) const;
 
-  int width(const UChar*, int slen, int pos, int len, int tabWidth, int xpos)
-      const;
-  int width(const UChar* chs, int slen, int tabWidth = 0, int xpos = 0) const {
-    return width(chs, slen, 0, slen, tabWidth, xpos);
-  }
+  int width(const TextRun&, int tabWidth = 0, int xpos = 0) const;
 
   bool isSmallCaps() const { return m_fontDescription.smallCaps(); }
 
@@ -183,15 +199,12 @@ class Font {
 #if __APPLE__
   // FIXME: This will eventually be cross-platform, but we want to keep Windows
   // compiling for now.
-  bool canUseGlyphCache(const UChar* str, int to) const;
+  bool canUseGlyphCache(const TextRun&) const;
   void drawSimpleText(GraphicsContext*,
+                      const TextRun&,
                       const IntPoint&,
                       int tabWidth,
                       int xpos,
-                      const UChar*,
-                      int len,
-                      int from,
-                      int to,
                       int toAdd,
                       TextDirection,
                       bool visuallyOrdered) const;
@@ -202,20 +215,14 @@ class Font {
                   int to,
                   const FloatPoint&) const;
   void drawComplexText(GraphicsContext*,
+                       const TextRun&,
                        const IntPoint&,
                        int tabWidth,
                        int xpos,
-                       const UChar*,
-                       int len,
-                       int from,
-                       int to,
                        int toAdd,
                        TextDirection,
                        bool visuallyOrdered) const;
-  float floatWidthForSimpleText(const UChar*,
-                                int len,
-                                int from,
-                                int to,
+  float floatWidthForSimpleText(const TextRun&,
                                 int tabWidth,
                                 int xpos,
                                 int toAdd,
@@ -226,10 +233,7 @@ class Font {
                                 const FontData* substituteFont,
                                 float* startX,
                                 GlyphBuffer*) const;
-  float floatWidthForComplexText(const UChar*,
-                                 int slen,
-                                 int pos,
-                                 int len,
+  float floatWidthForComplexText(const TextRun&,
                                  int tabWidth,
                                  int xpos,
                                  bool runRounding = true) const;

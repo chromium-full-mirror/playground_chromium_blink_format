@@ -3117,7 +3117,7 @@ static inline void stripTrailingSpace(int& inlineMax,
     RenderText* t = static_cast<RenderText*>(trailingSpaceChild);
     const Font* f = t->font(false);  // FIXME: Why are we ignoring first-line?
     const UChar space = ' ';
-    int spaceWidth = f->width(&space, 1);
+    int spaceWidth = f->width(TextRun(&space, 1));
     inlineMax -= spaceWidth;
     if (inlineMin > inlineMax)
       inlineMin = inlineMax;
