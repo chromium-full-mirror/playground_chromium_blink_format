@@ -45,7 +45,7 @@ class QualifiedName {
                 const AtomicString& namespaceURI);
   ~QualifiedName();
 #ifdef QNAME_DEFAULT_CONSTRUCTOR
-  QualifiedName() {}
+  QualifiedName() : m_impl(0) {}
 #endif
 
   QualifiedName(const QualifiedName&);
