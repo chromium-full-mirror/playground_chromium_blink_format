@@ -606,8 +606,7 @@ void ReplaceSelectionCommand::doApply() {
     // separator. In the meantime, it appears that code below
     // depends on this split happening when the paste position is not the start
     // or end of a paragraph.
-    if (fragment.hasMoreThanOneBlock() && !isEndOfParagraph(visibleStart) &&
-        !isStartOfParagraph(visibleStart)) {
+    if (!isEndOfParagraph(visibleStart) && !isStartOfParagraph(visibleStart)) {
       insertParagraphSeparator();
       setEndingSelection(
           VisiblePosition(endingSelection().start(), VP_DEFAULT_AFFINITY)
