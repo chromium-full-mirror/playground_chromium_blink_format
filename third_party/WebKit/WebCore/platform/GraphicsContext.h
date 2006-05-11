@@ -87,6 +87,7 @@ class GraphicsContext : Noncopyable {
   void drawConvexPolygon(const IntPointArray&);
 
   void fillRect(const IntRect&, const Color&);
+  void fillRect(const FloatRect&, const Color&);
   void clearRect(const FloatRect&);
   void strokeRect(const FloatRect&, float lineWidth);
 

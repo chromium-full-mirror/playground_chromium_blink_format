@@ -117,9 +117,6 @@ class FontData {
   FloatRect selectionRectForRun(const WebCoreTextRun* run,
                                 const WebCoreTextStyle* style,
                                 const WebCoreTextGeometry* geometry);
-  void drawHighlightForRun(const WebCoreTextRun* run,
-                           const WebCoreTextStyle* style,
-                           const WebCoreTextGeometry* geometry);
   void drawLineForCharacters(const FloatPoint& point,
                              float yOffset,
                              int width,
