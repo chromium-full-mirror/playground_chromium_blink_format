@@ -49,7 +49,7 @@ class TableLayout {
 
 class FixedTableLayout : public TableLayout {
  public:
-  FixedTableLayout(RenderTable* table);
+  FixedTableLayout(RenderTable*);
   ~FixedTableLayout();
 
   void calcMinMaxWidth();
@@ -81,7 +81,7 @@ class AutoTableLayout : public TableLayout {
   }
   void calcPercentages() const;
   int calcEffectiveWidth();
-  void insertSpanCell(RenderTableCell* cell);
+  void insertSpanCell(RenderTableCell*);
 
   struct Layout {
     Layout()

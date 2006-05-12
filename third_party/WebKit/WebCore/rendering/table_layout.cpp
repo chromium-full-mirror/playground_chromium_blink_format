@@ -97,7 +97,7 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
   width.fill(Length(Auto));
 
 #ifdef DEBUG_LAYOUT
-  qDebug("FixedTableLayout::calcWidthArray( %d )", tableWidth);
+  qDebug("FixedTableLayout::calcWidthArray(%d)", tableWidth);
   qDebug("    col elements:");
 #endif
 
@@ -106,9 +106,9 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
     if (child->isTableCol()) {
       RenderTableCol* col = static_cast<RenderTableCol*>(child);
       int span = col->span();
-      if (col->firstChild()) {
+      if (col->firstChild())
         grpWidth = col->style()->width();
-      } else {
+      else {
         Length w = col->style()->width();
         if (w.isAuto())
           w = grpWidth;
@@ -144,9 +144,8 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
         }
         cCol += i;
       }
-    } else {
+    } else
       break;
-    }
 
     RenderObject* next = child->firstChild();
     if (!next)
@@ -230,7 +229,7 @@ void FixedTableLayout::calcMinMaxWidth() {
   // only need to calculate the minimum width as the sum of the
   // cols/cells with a fixed width.
   //
-  // The maximum width is max( minWidth, tableWidth ).
+  // The maximum width is max(minWidth, tableWidth).
   int bs = table->bordersPaddingAndSpacing();
 
   int tableWidth = table->style()->width().isFixed()

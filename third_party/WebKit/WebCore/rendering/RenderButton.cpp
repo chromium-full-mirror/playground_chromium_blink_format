@@ -21,7 +21,7 @@
  */
 
 #include "config.h"
-#include "render_button.h"
+#include "RenderButton.h"
 
 #include "Document.h"
 #include "GraphicsContext.h"
