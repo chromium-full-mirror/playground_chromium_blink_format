@@ -117,6 +117,11 @@ class TextStyle {
   bool applyWordRounding() const { return m_applyWordRounding; }
   bool attemptFontSubstitution() const { return m_attemptFontSubstitution; }
 
+  void disableRoundingHacks() {
+    m_applyRunRounding = m_applyWordRounding = false;
+  }
+  void setRTL(bool b) { m_rtl = b; }
+
  private:
   int m_tabWidth;
   int m_xpos;
@@ -132,6 +137,12 @@ class Font {
  public:
   Font();
   Font(const FontDescription&, short letterSpacing, short wordSpacing);
+#if __APPLE__
+  Font(const FontPlatformData& fontPlatformData);  // This constructor is only
+                                                   // used by Mac-specific code
+                                                   // that already has a native
+                                                   // font.
+#endif
   ~Font();
 
   Font(const Font&);
@@ -157,7 +168,7 @@ class Font {
   void drawText(GraphicsContext*,
                 const TextRun&,
                 const TextStyle&,
-                const IntPoint&) const;
+                const FloatPoint&) const;
 
   int width(const TextRun&, const TextStyle& = TextStyle()) const;
   float floatWidth(const TextRun&, const TextStyle& = TextStyle()) const;
@@ -214,7 +225,7 @@ class Font {
   void drawSimpleText(GraphicsContext*,
                       const TextRun&,
                       const TextStyle&,
-                      const IntPoint&) const;
+                      const FloatPoint&) const;
   void drawGlyphs(GraphicsContext*,
                   const FontData*,
                   const GlyphBuffer&,
@@ -224,7 +235,7 @@ class Font {
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
                        const TextStyle&,
-                       const IntPoint&) const;
+                       const FloatPoint&) const;
   float floatWidthForSimpleText(const TextRun&,
                                 const TextStyle&,
                                 const FontData* substituteFont,

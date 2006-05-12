@@ -200,7 +200,7 @@ float Font::floatWidth(const TextRun& run,
 
 void Font::drawText(GraphicsContext* context,
                     const TextRun& run,
-                    const IntPoint& point,
+                    const FloatPoint& point,
                     int tabWidth,
                     int xpos,
                     int toAdd,
@@ -216,8 +216,8 @@ void Font::drawText(GraphicsContext* context,
   SaveDC(dc);
   SelectObject(dc, font->platformData().hfont());
 
-  int x = point.x();
-  int y = point.y();
+  int x = (int)point.x();
+  int y = (int)point.y();
   y -= font->ascent();
 
   SetBkMode(dc, TRANSPARENT);

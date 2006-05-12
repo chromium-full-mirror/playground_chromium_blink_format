@@ -84,7 +84,6 @@ void WebCoreInitializeTextRun(WebCoreTextRun* run,
                               int to);
 void WebCoreInitializeEmptyTextStyle(WebCoreTextStyle* style);
 void WebCoreInitializeEmptyTextGeometry(WebCoreTextGeometry* geometry);
-void WebCoreInitializeFont(FontPlatformData* font);
 
 typedef struct WidthMap WidthMap;
 typedef struct GlyphMap GlyphMap;
@@ -106,14 +105,7 @@ class FontData {
 
   float xHeight() const;
 
-  // horizontal metrics
-  float floatWidthForRun(const WebCoreTextRun* run,
-                         const WebCoreTextStyle* style);
-
   // drawing
-  void drawRun(const WebCoreTextRun* run,
-               const WebCoreTextStyle* style,
-               const WebCoreTextGeometry* geometry);
   FloatRect selectionRectForRun(const WebCoreTextRun* run,
                                 const WebCoreTextStyle* style,
                                 const WebCoreTextGeometry* geometry);
