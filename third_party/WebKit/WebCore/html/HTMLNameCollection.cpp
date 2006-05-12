@@ -26,8 +26,9 @@
 #include "HTMLNameCollection.h"
 
 #include "Document.h"
-#include "html_objectimpl.h"
+#include "Element.h"
 #include "HTMLNames.h"
+#include "HTMLObjectElement.h"
 
 namespace WebCore {
 
