@@ -29,8 +29,8 @@
 
 #include "GraphicsContext.h"
 #include "RenderTableCol.h"
-#include "html_tableimpl.h"
 #include "HTMLNames.h"
+#include "HTMLTableCellElement.h"
 #include "KWQTextStream.h"
 
 using namespace std;
