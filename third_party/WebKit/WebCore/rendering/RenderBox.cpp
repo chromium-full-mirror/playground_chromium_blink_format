@@ -1950,7 +1950,7 @@ IntRect RenderBox::caretRect(int offset,
   const int caretWidth = 1;
   IntRect rect(xPos(), yPos(), caretWidth, m_height);
   if (offset != 0)
-    rect.setWidth(m_width - caretWidth);
+    rect.move(IntSize(m_width - caretWidth, 0));
   if (InlineBox* box = inlineBoxWrapper()) {
     RootInlineBox* rootBox = box->root();
     int top = rootBox->topOverflow();
@@ -1976,11 +1976,11 @@ IntRect RenderBox::caretRect(int offset,
   if (!cb || !cb->absolutePosition(cbx, cby))
     // No point returning a relative position.
     return IntRect();
-  rect.move(cbx, cby);
 
   if (extraWidthToEndOfLine)
-    *extraWidthToEndOfLine = m_width - rect.right();
+    *extraWidthToEndOfLine = xPos() + m_width - rect.right();
 
+  rect.move(cbx, cby);
   return rect;
 }
 
