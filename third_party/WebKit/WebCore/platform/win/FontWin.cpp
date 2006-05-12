@@ -291,11 +291,7 @@ int Font::checkSelectionPoint(const TextRun& run,
 void Font::drawLineForText(GraphicsContext* context,
                            const IntPoint& point,
                            int yOffset,
-                           int width) const {
-  IntPoint origin = point + IntSize(0, yOffset + 1);
-  IntPoint endPoint = origin + IntSize(width, 0);
-  const_cast<GraphicsContext*>(context)->drawLine(origin, endPoint);
-}
+                           int width) const {}
 
 void Font::drawLineForMisspelling(GraphicsContext* context,
                                   const IntPoint& point,

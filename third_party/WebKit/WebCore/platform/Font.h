@@ -122,10 +122,6 @@ class Font {
                 int toAdd,
                 TextDirection,
                 bool visuallyOrdered) const;
-  void drawLineForText(GraphicsContext*,
-                       const IntPoint&,
-                       int yOffset,
-                       int width) const;
   void drawLineForMisspelling(GraphicsContext*,
                               const IntPoint&,
                               int width) const;
