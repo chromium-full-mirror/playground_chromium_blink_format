@@ -117,8 +117,6 @@ class FontData {
   FloatRect selectionRectForRun(const WebCoreTextRun* run,
                                 const WebCoreTextStyle* style,
                                 const WebCoreTextGeometry* geometry);
-  void drawLineForMisspelling(const FloatPoint& point, int width);
-  int misspellingLineThickness() const { return 3; }
 
   // selection point check
   int pointToOffset(const WebCoreTextRun* run,
@@ -138,12 +136,6 @@ class FontData {
   // End temporary API
 
   float widthForGlyph(Glyph glyph) const;
-
- private:
-  int misspellingLinePatternWidth() const { return 4; }
-  int misspellingLinePatternGapWidth() const {
-    return 1;
-  }  // the number of transparent pixels after the dot
 
  public:
   int m_ascent;
