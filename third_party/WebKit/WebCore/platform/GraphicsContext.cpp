@@ -182,32 +182,22 @@ void GraphicsContext::drawImage(Image* image,
 
 void GraphicsContext::drawText(const TextRun& run,
                                const IntPoint& point,
-                               int tabWidth,
-                               int xpos,
-                               int toAdd,
-                               TextDirection d,
-                               bool visuallyOrdered) {
+                               const TextStyle& style) {
   if (paintingDisabled())
     return;
 
-  font().drawText(this, run, point, tabWidth, xpos, toAdd, d, visuallyOrdered);
+  font().drawText(this, run, style, point);
 }
 
 void GraphicsContext::drawHighlightForText(const TextRun& run,
                                            const IntPoint& point,
                                            int h,
-                                           int tabWidth,
-                                           int xpos,
-                                           int toAdd,
-                                           TextDirection d,
-                                           bool visuallyOrdered,
+                                           const TextStyle& style,
                                            const Color& backgroundColor) {
   if (paintingDisabled())
     return;
 
-  fillRect(font().selectionRectForText(run, point, h, tabWidth, xpos, toAdd,
-                                       d == RTL, visuallyOrdered),
-           backgroundColor);
+  fillRect(font().selectionRectForText(run, style, point, h), backgroundColor);
 }
 
 void GraphicsContext::initFocusRing(int width, int offset) {

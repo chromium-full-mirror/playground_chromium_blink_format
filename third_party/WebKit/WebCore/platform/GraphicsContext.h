@@ -26,6 +26,7 @@
 #ifndef GraphicsContext_h
 #define GraphicsContext_h
 
+#include "Font.h"
 #include "FloatRect.h"
 #include "Image.h"
 #include "IntRect.h"
@@ -57,7 +58,6 @@ class GraphicsContextPlatformPrivate;
 class IntPoint;
 class IntPointArray;
 class Path;
-class TextRun;
 
 #if SVG_SUPPORT
 class KRenderingDeviceContext;
@@ -136,19 +136,11 @@ class GraphicsContext : Noncopyable {
 
   void drawText(const TextRun&,
                 const IntPoint&,
-                int tabWidth = 0,
-                int xpos = 0,
-                int toAdd = 0,
-                TextDirection = LTR,
-                bool visuallyOrdered = false);
+                const TextStyle& = TextStyle());
   void drawHighlightForText(const TextRun&,
                             const IntPoint&,
                             int h,
-                            int tabWidth,
-                            int xpos,
-                            int toAdd,
-                            TextDirection,
-                            bool visuallyOrdered,
+                            const TextStyle&,
                             const Color& backgroundColor);
 
   void drawLineForText(const IntPoint&, int yOffset, int width, bool printing);
