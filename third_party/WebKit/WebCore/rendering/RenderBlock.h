@@ -26,10 +26,12 @@
 
 #include "GapRects.h"
 #include "RenderFlow.h"
+#include "RootInlineBox.h"
 
 namespace WebCore {
 
 class Position;
+class RootInlineBox;
 
 enum CaretType {
   CursorCaret,
@@ -109,14 +111,14 @@ class RenderBlock : public RenderFlow {
 
   virtual void addChildToFlow(RenderObject* newChild,
                               RenderObject* beforeChild);
-  virtual void removeChild(RenderObject* oldChild);
+  virtual void removeChild(RenderObject*);
 
   virtual void repaintObjectsBeforeLayout();
   virtual void repaintFloatingDescendants();
   virtual void getAbsoluteRepaintRectIncludingFloats(IntRect& bounds,
                                                      IntRect& fullBounds);
 
-  virtual void setStyle(RenderStyle* _style);
+  virtual void setStyle(RenderStyle*);
 
   virtual void layout();
   virtual void layoutBlock(bool relayoutChildren);
