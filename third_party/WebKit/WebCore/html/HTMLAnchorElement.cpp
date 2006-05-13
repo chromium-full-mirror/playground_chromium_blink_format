@@ -21,30 +21,23 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-// -------------------------------------------------------------------------
-
 #include "config.h"
-#include "html_inlineimpl.h"
+#include "HTMLAnchorElement.h"
 
+#include "csshelper.h"
+#include "Document.h"
+#include "dom2_eventsimpl.h"
 #include "EventNames.h"
 #include "Frame.h"
-#include "PlatformKeyboardEvent.h"
-#include "csshelper.h"
-#include "CSSPropertyNames.h"
-#include "cssstyleselector.h"
-#include "CSSValueKeywords.h"
-#include "dom2_eventsimpl.h"
-#include "HTMLDocument.h"
 #include "html_imageimpl.h"
 #include "HTMLNames.h"
 #include "RenderFlow.h"
 #include "RenderImage.h"
-#include "rendering/RenderBR.h"
 
 namespace WebCore {
 
-using namespace EventNames;
 using namespace HTMLNames;
+using namespace EventNames;
 
 HTMLAnchorElement::HTMLAnchorElement(Document* doc) : HTMLElement(aTag, doc) {
   m_hasTarget = false;
@@ -137,7 +130,7 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
       }
     }
 
-    url = WebCore::parseURL(getAttribute(hrefAttr)).deprecatedString();
+    url = parseURL(getAttribute(hrefAttr)).deprecatedString();
 
     utarget = getAttribute(targetAttr).deprecatedString();
 
@@ -147,8 +140,7 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
     if (evt->target()->hasTagName(imgTag)) {
       HTMLImageElement* img = static_cast<HTMLImageElement*>(evt->target());
       if (img && img->isServerMap()) {
-        WebCore::RenderImage* r =
-            static_cast<WebCore::RenderImage*>(img->renderer());
+        RenderImage* r = static_cast<RenderImage*>(img->renderer());
         if (r && e) {
           int absx, absy;
           r->absolutePosition(absx, absy);
@@ -174,12 +166,12 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
 }
 
 void HTMLAnchorElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == hrefAttr) {
+  if (attr->name() == hrefAttr)
     m_isLink = !attr->isNull();
-  } else if (attr->name() == targetAttr) {
+  else if (attr->name() == targetAttr)
     m_hasTarget = !attr->isNull();
-  } else if (attr->name() == nameAttr || attr->name() == titleAttr ||
-             attr->name() == relAttr) {
+  else if (attr->name() == nameAttr || attr->name() == titleAttr ||
+           attr->name() == relAttr) {
     // Do nothing.
   } else
     HTMLElement::parseMappedAttribute(attr);
@@ -302,208 +294,5 @@ void HTMLAnchorElement::blur() {
 
 void HTMLAnchorElement::focus() {
   document()->setFocusNode(this);
-}
-
-// -------------------------------------------------------------------------
-
-HTMLBRElement::HTMLBRElement(Document* doc) : HTMLElement(brTag, doc) {}
-
-HTMLBRElement::~HTMLBRElement() {}
-
-bool HTMLBRElement::mapToEntry(const QualifiedName& attrName,
-                               MappedAttributeEntry& result) const {
-  if (attrName == clearAttr) {
-    result = eUniversal;
-    return false;
-  }
-
-  return HTMLElement::mapToEntry(attrName, result);
-}
-
-void HTMLBRElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == clearAttr) {
-    // If the string is empty, then don't add the clear property.
-    // <br clear> and <br clear=""> are just treated like <br> by Gecko, Mac IE,
-    // etc. -dwh
-    const AtomicString& str = attr->value();
-    if (!str.isEmpty()) {
-      if (equalIgnoringCase(str, "all"))
-        addCSSProperty(attr, CSS_PROP_CLEAR, "both");
-      else
-        addCSSProperty(attr, CSS_PROP_CLEAR, str);
-    }
-  } else
-    HTMLElement::parseMappedAttribute(attr);
-}
-
-RenderObject* HTMLBRElement::createRenderer(RenderArena* arena,
-                                            RenderStyle* style) {
-  return new (arena) RenderBR(this);
-}
-
-String HTMLBRElement::clear() const {
-  return getAttribute(clearAttr);
-}
-
-void HTMLBRElement::setClear(const String& value) {
-  setAttribute(clearAttr, value);
-}
-
-// -------------------------------------------------------------------------
-
-HTMLFontElement::HTMLFontElement(Document* doc) : HTMLElement(fontTag, doc) {}
-
-HTMLFontElement::~HTMLFontElement() {}
-
-// Allows leading spaces.
-// Allows trailing nonnumeric characters.
-// Returns 10 for any size greater than 9.
-static bool parseFontSizeNumber(const String& s, int& size) {
-  unsigned pos = 0;
-
-  // Skip leading spaces.
-  while (QChar(s[pos]).isSpace())
-    ++pos;
-
-  // Skip a plus or minus.
-  bool sawPlus = false;
-  bool sawMinus = false;
-  if (s[pos] == '+') {
-    ++pos;
-    sawPlus = true;
-  } else if (s[pos] == '-') {
-    ++pos;
-    sawMinus = true;
-  }
-
-  // Parse a single digit.
-  if (!u_isdigit(s[pos]))
-    return false;
-  int num = u_charDigitValue(s[pos++]);
-
-  // Check for an additional digit.
-  if (u_isdigit(s[pos]))
-    num = 10;
-
-  if (sawPlus) {
-    size = num + 3;
-    return true;
-  }
-
-  // Don't return 0 (which means 3) or a negative number (which means the same
-  // as 1).
-  if (sawMinus) {
-    size = num == 1 ? 2 : 1;
-    return true;
-  }
-
-  size = num;
-  return true;
-}
-
-bool HTMLFontElement::mapToEntry(const QualifiedName& attrName,
-                                 MappedAttributeEntry& result) const {
-  if (attrName == sizeAttr || attrName == colorAttr || attrName == faceAttr) {
-    result = eUniversal;
-    return false;
-  }
-
-  return HTMLElement::mapToEntry(attrName, result);
-}
-
-void HTMLFontElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == sizeAttr) {
-    int num;
-    if (parseFontSizeNumber(attr->value(), num)) {
-      int size;
-      switch (num) {
-        case 2:
-          size = CSS_VAL_SMALL;
-          break;
-        case 0:  // treat 0 the same as 3, because people expect it to be
-                 // between -1 and +1
-        case 3:
-          size = CSS_VAL_MEDIUM;
-          break;
-        case 4:
-          size = CSS_VAL_LARGE;
-          break;
-        case 5:
-          size = CSS_VAL_X_LARGE;
-          break;
-        case 6:
-          size = CSS_VAL_XX_LARGE;
-          break;
-        default:
-          if (num > 6)
-            size = CSS_VAL__WEBKIT_XXX_LARGE;
-          else
-            size = CSS_VAL_X_SMALL;
-      }
-      addCSSProperty(attr, CSS_PROP_FONT_SIZE, size);
-    }
-  } else if (attr->name() == colorAttr) {
-    addCSSColor(attr, CSS_PROP_COLOR, attr->value());
-  } else if (attr->name() == faceAttr) {
-    addCSSProperty(attr, CSS_PROP_FONT_FAMILY, attr->value());
-  } else
-    HTMLElement::parseMappedAttribute(attr);
-}
-
-String HTMLFontElement::color() const {
-  return getAttribute(colorAttr);
-}
-
-void HTMLFontElement::setColor(const String& value) {
-  setAttribute(colorAttr, value);
-}
-
-String HTMLFontElement::face() const {
-  return getAttribute(faceAttr);
-}
-
-void HTMLFontElement::setFace(const String& value) {
-  setAttribute(faceAttr, value);
-}
-
-String HTMLFontElement::size() const {
-  return getAttribute(sizeAttr);
-}
-
-void HTMLFontElement::setSize(const String& value) {
-  setAttribute(sizeAttr, value);
-}
-
-// -------------------------------------------------------------------------
-
-HTMLModElement::HTMLModElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc) {}
-
-String HTMLModElement::cite() const {
-  return getAttribute(citeAttr);
-}
-
-void HTMLModElement::setCite(const String& value) {
-  setAttribute(citeAttr, value);
-}
-
-String HTMLModElement::dateTime() const {
-  return getAttribute(datetimeAttr);
-}
-
-void HTMLModElement::setDateTime(const String& value) {
-  setAttribute(datetimeAttr, value);
-}
-
-// -------------------------------------------------------------------------
-
-HTMLQuoteElement::HTMLQuoteElement(Document* doc) : HTMLElement(qTag, doc) {}
-
-String HTMLQuoteElement::cite() const {
-  return getAttribute(citeAttr);
-}
-
-void HTMLQuoteElement::setCite(const String& value) {
-  setAttribute(citeAttr, value);
 }
 }

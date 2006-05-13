@@ -35,7 +35,7 @@ class String;
 
 class HTMLBlockquoteElement : public HTMLElement {
  public:
-  HTMLBlockquoteElement(Document* doc);
+  HTMLBlockquoteElement(Document*);
   ~HTMLBlockquoteElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -51,15 +51,14 @@ class String;
 
 class HTMLDivElement : public HTMLElement {
  public:
-  HTMLDivElement(Document* doc);
+  HTMLDivElement(Document*);
   ~HTMLDivElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
 
-  virtual bool mapToEntry(const QualifiedName& attrName,
-                          MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   String align() const;
   void setAlign(const String&);
@@ -69,15 +68,14 @@ class HTMLDivElement : public HTMLElement {
 
 class HTMLHRElement : public HTMLElement {
  public:
-  HTMLHRElement(Document* doc);
+  HTMLHRElement(Document*);
   ~HTMLHRElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
 
-  virtual bool mapToEntry(const QualifiedName& attrName,
-                          MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   String align() const;
   void setAlign(const String&);
@@ -96,7 +94,7 @@ class HTMLHRElement : public HTMLElement {
 
 class HTMLHeadingElement : public HTMLElement {
  public:
-  HTMLHeadingElement(const QualifiedName& tagName, Document* doc);
+  HTMLHeadingElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
@@ -110,15 +108,14 @@ class HTMLHeadingElement : public HTMLElement {
 
 class HTMLParagraphElement : public HTMLElement {
  public:
-  HTMLParagraphElement(Document* doc);
+  HTMLParagraphElement(Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 3; }
   virtual bool checkDTD(const Node* newChild);
 
-  virtual bool mapToEntry(const QualifiedName& attrName,
-                          MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   String align() const;
   void setAlign(const String&);
@@ -128,14 +125,13 @@ class HTMLParagraphElement : public HTMLElement {
 
 class HTMLPreElement : public HTMLElement {
  public:
-  HTMLPreElement(const QualifiedName& tagName, Document* doc);
+  HTMLPreElement(const QualifiedName&, Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
 
-  bool mapToEntry(const QualifiedName& attrName,
-                  MappedAttributeEntry& result) const;
-  void parseMappedAttribute(MappedAttribute* attr);
+  bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
+  void parseMappedAttribute(MappedAttribute*);
 
   int width() const;
   void setWidth(int w);
@@ -148,14 +144,13 @@ class HTMLPreElement : public HTMLElement {
 
 class HTMLMarqueeElement : public HTMLElement {
  public:
-  HTMLMarqueeElement(Document* doc);
+  HTMLMarqueeElement(Document*);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 3; }
 
-  virtual bool mapToEntry(const QualifiedName& attrName,
-                          MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   int minimumDelay() const { return m_minimumDelay; }
 
