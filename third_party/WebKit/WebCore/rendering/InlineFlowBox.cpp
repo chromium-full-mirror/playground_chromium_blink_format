@@ -211,7 +211,7 @@ void InlineFlowBox::determineSpacingForFlowBoxes(bool lastLine,
                                nextOnLineExists() || onEndChain(endObject)))
           includeRightEdge = true;
       } else {
-        if ((!prevLineBox() || !prevLineBox()->isConstructed()) &&
+        if ((!prevLineBox() || prevLineBox()->isConstructed()) &&
             ((lastLine && !object()->continuation()) || prevOnLineExists() ||
              onEndChain(endObject)))
           includeLeftEdge = true;
