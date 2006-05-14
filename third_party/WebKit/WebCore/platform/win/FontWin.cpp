@@ -137,11 +137,11 @@ const FontData* FontFallbackList::fontDataAt(const Font* font,
        currFamily; currFamily = currFamily->next()) {
     if (!currFamily->familyIsEmpty()) {
       // Attempt to create a FontData.
-      FontData* font =
+      FontData* fontData =
           getFontData(font->fontDescription(), currFamily->family());
-      if (font) {
-        m_fontList.append(font);
-        return font;
+      if (fontData) {
+        m_fontList.append(fontData);
+        return fontData;
       }
     }
   }
@@ -166,7 +166,7 @@ const FontData* FontFallbackList::fontDataForCharacters(const Font*,
 }
 
 static IntSize hackishExtentForString(HDC dc,
-                                      FontData* font,
+                                      const FontData* font,
                                       const TextRun& run,
                                       int tabWidth,
                                       int xpos) {
@@ -193,7 +193,7 @@ static IntSize hackishExtentForString(HDC dc,
 }
 
 float Font::floatWidth(const TextRun& run, const TextStyle& textStyle) const {
-  FontData* font = m_fontList->primaryFont();
+  const FontData* font = primaryFont();
   if (!font)
     return 0;
 
@@ -208,7 +208,7 @@ void Font::drawText(GraphicsContext* context,
                     const TextRun& run,
                     const TextStyle& textStyle,
                     const FloatPoint& point) const {
-  FontData* font = m_fontList->primaryFont();
+  const FontData* font = primaryFont();
   if (!font)
     return;
 
@@ -238,7 +238,7 @@ FloatRect Font::selectionRectForText(const TextRun& run,
                                      const TextStyle& textStyle,
                                      const IntPoint& point,
                                      int h) const {
-  FontData* font = m_fontList->primaryFont();
+  const FontData* font = primaryFont();
   if (!font)
     return IntRect();
 
@@ -253,7 +253,7 @@ int Font::offsetForPosition(const TextRun& run,
                             const TextStyle& style,
                             int x,
                             bool includePartialGlyphs) const {
-  FontData* font = m_fontList->primaryFont();
+  const FontData* font = primaryFont();
   if (!font)
     return 0;
 
