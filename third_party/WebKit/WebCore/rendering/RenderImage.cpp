@@ -30,8 +30,9 @@
 
 #include "Document.h"
 #include "GraphicsContext.h"
+#include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
-#include "html_imageimpl.h"
+#include "HTMLMapElement.h"
 #include "HTMLNames.h"
 #include "RenderCanvas.h"
 
@@ -41,8 +42,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderImage::RenderImage(Node* _node) : RenderReplaced(_node) {
-  m_cachedImage = 0;
+RenderImage::RenderImage(Node* n) : RenderReplaced(n), m_cachedImage(0) {
   m_selectionState = SelectionNone;
   setIntrinsicWidth(0);
   setIntrinsicHeight(0);
@@ -323,8 +323,8 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
     HTMLMapElement* map = imageMap();
     if (map) {
       // we're a client side image map
-      inside = map->mapMouseEvent(_x - tx, _y - ty, contentWidth(),
-                                  contentHeight(), info);
+      inside = map->mapMouseEvent(
+          _x - tx, _y - ty, IntSize(contentWidth(), contentHeight()), info);
       info.setInnerNonSharedNode(element());
     }
   }
