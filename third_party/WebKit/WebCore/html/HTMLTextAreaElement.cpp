@@ -26,13 +26,13 @@
 
 #include "config.h"
 #include "HTMLTextAreaElement.h"
-#include "rendering/render_form.h"
-#include "Text.h"
-#include "FormDataList.h"
-#include "Document.h"
 
+#include "Document.h"
 #include "EventNames.h"
+#include "FormDataList.h"
 #include "HTMLNames.h"
+#include "RenderTextArea.h"
+#include "Text.h"
 
 namespace WebCore {
 
@@ -127,20 +127,20 @@ void HTMLTextAreaElement::parseMappedAttribute(MappedAttribute* attr) {
       renderer()->setNeedsLayoutAndMinMaxRecalc();
   } else if (attr->name() == accesskeyAttr) {
     // ignore for the moment
-  } else if (attr->name() == onfocusAttr) {
+  } else if (attr->name() == onfocusAttr)
     setHTMLEventListener(focusEvent, attr);
-  } else if (attr->name() == onblurAttr) {
+  else if (attr->name() == onblurAttr)
     setHTMLEventListener(blurEvent, attr);
-  } else if (attr->name() == onselectAttr) {
+  else if (attr->name() == onselectAttr)
     setHTMLEventListener(selectEvent, attr);
-  } else if (attr->name() == onchangeAttr) {
+  else if (attr->name() == onchangeAttr)
     setHTMLEventListener(changeEvent, attr);
-  } else
+  else
     HTMLGenericFormElement::parseMappedAttribute(attr);
 }
 
 RenderObject* HTMLTextAreaElement::createRenderer(RenderArena* arena,
-                                                  RenderStyle* style) {
+                                                  RenderStyle*) {
   return new (arena) RenderTextArea(this);
 }
 
