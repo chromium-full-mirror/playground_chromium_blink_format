@@ -35,8 +35,8 @@
 #include "HTMLNames.h"
 #include "InlineTextBox.h"
 #include "Logging.h"
+#include "ProcessingInstruction.h"
 #include "Range.h"
-#include "dom_xmlimpl.h"
 #include "htmlediting.h"
 #include "visible_units.h"
 

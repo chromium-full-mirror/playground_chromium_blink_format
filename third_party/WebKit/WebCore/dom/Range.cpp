@@ -30,9 +30,9 @@
 #include "DocumentFragment.h"
 #include "ExceptionCode.h"
 #include "HTMLElement.h"
+#include "ProcessingInstruction.h"
 #include "RenderBlock.h"
 #include "TextIterator.h"
-#include "dom_xmlimpl.h"
 #include "markup.h"
 #include "visible_units.h"
 
