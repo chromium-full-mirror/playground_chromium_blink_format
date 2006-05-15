@@ -30,7 +30,6 @@
 
 #include "XPathPredicate.h"
 
-#include "Logging.h"
 #include "Node.h"
 #include "XPathFunctions.h"
 #include "XPathValue.h"
@@ -66,10 +65,8 @@ Value StringExpression::doEvaluate() const {
 
 Value Negative::doEvaluate() const {
   Value p(subExpr(0)->evaluate());
-  if (!p.isNumber()) {
-    LOG(XPath, "Unary minus is undefined for non-numeric types.");
+  if (!p.isNumber())
     return Value();
-  }
   return -p.toNumber();
 }
 
@@ -83,10 +80,8 @@ Value NumericOp::doEvaluate() const {
   Value lhs(subExpr(0)->evaluate());
   Value rhs(subExpr(1)->evaluate());
 
-  if (!lhs.isNumber() || !rhs.isNumber()) {
-    LOG(XPath, "Cannot perform operation on non-numeric types.");
+  if (!lhs.isNumber() || !rhs.isNumber())
     return Value();
-  }
 
   double leftVal = lhs.toNumber(), rightVal = rhs.toNumber();
 
@@ -172,10 +167,8 @@ Value LogicalOp::doEvaluate() const {
 Value Union::doEvaluate() const {
   Value lhs = subExpr(0)->evaluate();
   Value rhs = subExpr(1)->evaluate();
-  if (!lhs.isNodeVector() || !rhs.isNodeVector()) {
-    LOG(XPath, "Union operator '|' works only with nodevectors.");
+  if (!lhs.isNodeVector() || !rhs.isNodeVector())
     return NodeVector();
-  }
 
   NodeVector lhsNodes = lhs.toNodeVector();
   NodeVector rhsNodes = rhs.toNodeVector();

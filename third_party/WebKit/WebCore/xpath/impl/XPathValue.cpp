@@ -31,7 +31,6 @@
 #include "XPathValue.h"
 
 #include "DeprecatedString.h"
-#include "Logging.h"
 
 #ifdef _MSC_VER  // math functions missing from Microsoft Visual Studio standard
                  // C library
@@ -64,8 +63,6 @@ Value::Value(double value) : m_type(Number), m_number(value) {}
 Value::Value(const String& value) : m_type(String_), m_string(value) {}
 
 const NodeVector& Value::toNodeVector() const {
-  if (m_type != NodeVector_)
-    LOG(XPath, "Cannot convert anything to a nodevector.");
   return m_nodeVector;
 }
 
