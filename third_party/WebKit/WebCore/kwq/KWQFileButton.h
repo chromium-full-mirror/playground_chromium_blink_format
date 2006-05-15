@@ -57,6 +57,8 @@ class KWQFileButton : public Widget {
 
   const WebCore::String& filename() const { return m_name; }
 
+  void setDisabled(bool);
+
  private:
   WebCoreFileButton* _buttonView;
   WebCore::String m_name;
