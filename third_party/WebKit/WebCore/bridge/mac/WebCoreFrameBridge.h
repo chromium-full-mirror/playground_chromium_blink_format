@@ -548,6 +548,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
          forURL:(NSURL*)URL;
 - (void)getAllResourceDatas:(NSArray**)datas andResponses:(NSArray**)responses;
 
+- (BOOL)canProvideDocumentSource;
+- (BOOL)canSaveAsWebArchive;
 @end
 
 // The WebCoreFrameBridge protocol contains methods for use by the WebCore side
