@@ -74,8 +74,8 @@ class RenderTable : public RenderBlock {
   int vBorderSpacing() const { return vspacing; }
 
   bool collapseBorders() const { return style()->borderCollapse(); }
-  int borderLeft() const;
-  int borderRight() const;
+  int borderLeft() const { return m_borderLeft; }
+  int borderRight() const { return m_borderRight; }
   int borderTop() const;
   int borderBottom() const;
 
@@ -86,12 +86,18 @@ class RenderTable : public RenderBlock {
   unsigned cellPadding() const { return padding; }
   void setCellPadding(unsigned p) { padding = p; }
 
+  int outerBorderTop() const;
+  int outerBorderBottom() const;
+  int outerBorderLeft() const;
+  int outerBorderRight() const;
+
+  int calcBorderLeft() const;
+  int calcBorderRight() const;
+  void recalcHorizontalBorders();
+
   // overrides
   virtual int overflowHeight(bool includeInterior = true) const {
     return height();
-  }
-  virtual int overflowWidth(bool includeInterior = true) const {
-    return width();
   }
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual void paint(PaintInfo&, int tx, int ty);
@@ -148,7 +154,7 @@ class RenderTable : public RenderBlock {
                                      (numEffCols() + 1) * hBorderSpacing()));
   }
 
-  RenderTableCol* colElement(int col);
+  RenderTableCol* colElement(int col) const;
 
   void setNeedSectionRecalc() { needSectionRecalc = true; }
 
@@ -191,6 +197,8 @@ class RenderTable : public RenderBlock {
 
   short hspacing;
   short vspacing;
+  int m_borderRight;
+  int m_borderLeft;
 };
 }
 
