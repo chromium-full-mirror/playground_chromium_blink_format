@@ -31,6 +31,7 @@
 #include "EventNames.h"
 #include "FormDataList.h"
 #include "HTMLFormElement.h"
+#include "HTMLNames.h"
 #include "HTMLOptionElement.h"
 #include "HTMLOptionsCollection.h"
 #include "RenderSelect.h"

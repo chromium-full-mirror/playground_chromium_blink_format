@@ -26,7 +26,6 @@
 #define HTML_HTMLOptionElementImpl_H
 
 #include "HTMLGenericFormElement.h"
-#include "HTMLNames.h"
 
 namespace WebCore {
 
@@ -44,9 +43,7 @@ class HTMLOptionElement : public HTMLGenericFormElement {
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 2; }
-  virtual bool checkDTD(const Node* newChild) {
-    return newChild->isTextNode() || newChild->hasTagName(HTMLNames::scriptTag);
-  }
+  virtual bool checkDTD(const Node* newChild);
   virtual bool isFocusable() const;
 
   virtual const AtomicString& type() const;

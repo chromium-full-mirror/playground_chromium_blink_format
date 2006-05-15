@@ -27,11 +27,11 @@
 #include "config.h"
 #include "RenderContainer.h"
 
+#include "RenderListItem.h"
 #include "RenderTable.h"
 #include "RenderTextFragment.h"
 #include "RenderImage.h"
 #include "RenderCanvas.h"
-#include "render_list.h"
 #include "Document.h"
 
 // For accessibility
