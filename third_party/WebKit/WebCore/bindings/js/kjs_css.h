@@ -92,7 +92,7 @@ JSValue* toJS(ExecState*, WebCore::CSSStyleDeclaration*);
 
 class DOMStyleSheet : public DOMObject {
  public:
-  DOMStyleSheet(ExecState*, WebCore::StyleSheet* ss);
+  DOMStyleSheet(ExecState*, WebCore::StyleShee*);
   virtual ~DOMStyleSheet();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -167,7 +167,7 @@ class DOMMediaList : public DOMObject {
   static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
+                              const PropertySlot&);
   RefPtr<WebCore::MediaList> m_impl;
 };
 
@@ -209,7 +209,7 @@ class DOMCSSRuleList : public DOMObject {
   static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
+                              const PropertySlot&);
 
   RefPtr<WebCore::CSSRuleList> m_impl;
 };
@@ -287,7 +287,7 @@ JSValue* toJS(ExecState*, WebCore::CSSValue*);
 
 class DOMCSSValueList : public DOMCSSValue {
  public:
-  DOMCSSValueList(ExecState*, WebCore::CSSValueList* l);
+  DOMCSSValueList(ExecState*, WebCore::CSSValueList*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   // no put - all read-only
@@ -299,7 +299,7 @@ class DOMCSSValueList : public DOMCSSValue {
   static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
+                              const PropertySlot&);
 };
 
 class DOMRGBColor : public DOMObject {
