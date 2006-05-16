@@ -92,7 +92,7 @@ JSValue* toJS(ExecState*, WebCore::CSSStyleDeclaration*);
 
 class DOMStyleSheet : public DOMObject {
  public:
-  DOMStyleSheet(ExecState*, WebCore::StyleShee*);
+  DOMStyleSheet(ExecState*, WebCore::StyleSheet*);
   virtual ~DOMStyleSheet();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
