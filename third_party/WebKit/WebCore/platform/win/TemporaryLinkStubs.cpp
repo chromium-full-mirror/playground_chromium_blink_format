@@ -761,3 +761,9 @@ Color WebCore::focusRingColor() {
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 
 void Frame::setNeedsReapplyStyles() {}
+
+void Image::drawTiled(GraphicsContext*,
+                      const FloatRect&,
+                      const FloatRect&,
+                      TileRule,
+                      TileRule) {}

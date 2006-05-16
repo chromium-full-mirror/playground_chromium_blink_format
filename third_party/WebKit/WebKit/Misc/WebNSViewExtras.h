@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,7 +31,6 @@
 #define WebDragImageAlpha 0.75
 
 @class DOMElement;
-@class WebImageRenderer;
 @class WebFrameView;
 
 @interface NSView (WebExtras)
@@ -62,13 +61,12 @@
 - (NSDragOperation)_web_dragOperationForDraggingInfo:(id<NSDraggingInfo>)sender;
 
 // Resizes and applies alpha to image and drags it.
-- (void)_web_dragImage:(WebImageRenderer*)image
-               element:(DOMElement*)element
-                  rect:(NSRect)rect
-                 event:(NSEvent*)event
-            pasteboard:(NSPasteboard*)pasteboard
-                source:(id)source
-                offset:(NSPoint*)dragImageOffset;
+- (void)_web_dragImageElement:(DOMElement*)element
+                         rect:(NSRect)rect
+                        event:(NSEvent*)event
+                   pasteboard:(NSPasteboard*)pasteboard
+                       source:(id)source
+                       offset:(NSPoint*)dragImageOffset;
 
 - (BOOL)_web_firstResponderIsSelfOrDescendantView;
 
