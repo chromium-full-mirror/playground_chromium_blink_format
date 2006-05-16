@@ -30,6 +30,8 @@
 #define KSVG_SVGRenderStyleDefs_H
 #if SVG_SUPPORT
 
+#include "DeprecatedString.h"
+
 // Helper macros for 'SVGRenderStyle'
 #define SVG_RS_DEFINE_ATTRIBUTE(Data, Type, Name, Initial)             \
   void set##Type(Data val) { svg_noninherited_flags.f._##Name = val; } \
@@ -113,6 +115,8 @@ enum EPointerEvents {
   PE_VISIBLE_PAINTED,
   PE_ALL
 };
+
+class CSSValueList;
 
 // Inherited/Non-Inherited Style Datastructures
 class StyleFillData : public Shared<StyleFillData> {

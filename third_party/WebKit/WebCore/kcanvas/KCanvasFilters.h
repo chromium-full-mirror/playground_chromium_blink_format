@@ -114,7 +114,7 @@ class KCanvasFilter : public KCanvasResource {
 
  protected:
   FloatRect m_filterRect;
-  Q3ValueList<KCanvasFilterEffect*> m_effects;
+  DeprecatedValueList<KCanvasFilterEffect*> m_effects;
   bool m_filterBBoxMode;
   bool m_effectBBoxMode;
 };
@@ -187,14 +187,16 @@ class KCanvasFEColorMatrix : public KCanvasFilterEffect {
   KCColorMatrixType type() const { return m_type; }
   void setType(KCColorMatrixType type) { m_type = type; }
 
-  Q3ValueList<float> values() const { return m_values; }
-  void setValues(const Q3ValueList<float>& values) { m_values = values; };
+  DeprecatedValueList<float> values() const { return m_values; }
+  void setValues(const DeprecatedValueList<float>& values) {
+    m_values = values;
+  };
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   KCColorMatrixType m_type;
-  Q3ValueList<float> m_values;
+  DeprecatedValueList<float> m_values;
 };
 
 typedef enum {
@@ -293,8 +295,8 @@ class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
   FloatSize kernelSize() const { return m_kernelSize; }
   void setKernelSize(FloatSize kernelSize) { m_kernelSize = kernelSize; }
 
-  Q3ValueList<float> kernel() const { return m_kernelMatrix; }
-  void setKernel(Q3ValueList<float> kernel) { m_kernelMatrix = kernel; }
+  DeprecatedValueList<float> kernel() const { return m_kernelMatrix; }
+  void setKernel(DeprecatedValueList<float> kernel) { m_kernelMatrix = kernel; }
 
   float divisor() const { return m_divisor; }
   void setDivisor(float divisor) { m_divisor = divisor; }
@@ -322,7 +324,7 @@ class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
 
  private:
   FloatSize m_kernelSize;
-  Q3ValueList<float> m_kernelMatrix;  // maybe should be a real matrix?
+  DeprecatedValueList<float> m_kernelMatrix;  // maybe should be a real matrix?
   float m_divisor;
   float m_bias;
   FloatSize m_targetOffset;

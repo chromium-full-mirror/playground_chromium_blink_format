@@ -94,7 +94,7 @@ class RenderPath : public RenderObject {
 };
 
 // Helper data structure
-typedef Q3ValueList<const RenderPath*> KCanvasItemList;
+typedef DeprecatedValueList<const RenderPath*> KCanvasItemList;
 }
 
 #endif  // SVG_SUPPORT

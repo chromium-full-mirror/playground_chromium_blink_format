@@ -26,7 +26,7 @@
 #include "config.h"
 #include "InsertLineBreakCommand.h"
 
-#include "css_valueimpl.h"
+#include "CSSMutableStyleDeclaration.h"
 #include "Document.h"
 #include "Element.h"
 #include "Frame.h"

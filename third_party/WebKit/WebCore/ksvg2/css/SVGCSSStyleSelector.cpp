@@ -37,8 +37,8 @@
 #include "SVGRenderStyle.h"
 #include "SVGRenderStyleDefs.h"
 #include "SVGStyledElement.h"
-#include "css_ruleimpl.h"
 #include "CSSValueKeywords.h"
+#include "CSSValueList.h"
 #include "ksvg.h"
 #include "ksvgcssvalues.h"
 #include "ksvgcssproperties.h"
@@ -596,17 +596,14 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
         case CSS_PROP_COLOR: // colors || inherit
         {
             Color col;
-            if(isInherit)
-            {
+            if (isInherit) {
                 HANDLE_INHERIT_COND(CSS_PROP_COLOR, color, Color)
                 return;
-            }
-            else if(isInitial)
+            } else if (isInitial)
                 col = RenderStyle::initialColor();
-            else
-            {
-                SVGColor *c = static_cast<SVGColor *>(value);
-                if(!c)
+            else {
+                SVGColor *c = static_cast<SVGColor*>(value);
+                if (!c)
                     return CSSStyleSelector::applyProperty(id, value);
                 
                 col = c->color();

@@ -24,15 +24,12 @@
 #define KSVG_SVGColorImpl_H
 #if SVG_SUPPORT
 
+#include "CSSValue.h"
 #include "Color.h"
-
-#include "css_valueimpl.h"
 
 namespace WebCore {
 class RGBColor;
-};
 
-namespace WebCore {
 class SVGColor : public CSSValue {
  public:
   SVGColor();

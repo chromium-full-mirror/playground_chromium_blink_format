@@ -22,8 +22,9 @@
 #include "config.h"
 #include "CSSStyleSheet.h"
 
-#include "css_ruleimpl.h"
-#include "CSSParser.h"
+#include "CSSImportRule.h"
+#include "cssparser.h"
+#include "CSSRuleList.h"
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Node.h"

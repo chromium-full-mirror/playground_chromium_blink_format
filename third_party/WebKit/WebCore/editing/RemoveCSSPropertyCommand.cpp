@@ -26,8 +26,7 @@
 #include "config.h"
 #include "RemoveCSSPropertyCommand.h"
 
-#include "css_valueimpl.h"
-
+#include "CSSMutableStyleDeclaration.h"
 #include <wtf/Assertions.h>
 
 namespace WebCore {
@@ -41,6 +40,8 @@ RemoveCSSPropertyCommand::RemoveCSSPropertyCommand(Document* document,
       m_important(false) {
   ASSERT(m_decl);
 }
+
+RemoveCSSPropertyCommand::~RemoveCSSPropertyCommand() {}
 
 void RemoveCSSPropertyCommand::doApply() {
   ASSERT(m_decl);

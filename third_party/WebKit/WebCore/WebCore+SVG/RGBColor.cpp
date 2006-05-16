@@ -23,9 +23,9 @@
 #include "config.h"
 #if SVG_SUPPORT
 #include "RGBColor.h"
-#include "css_valueimpl.h"
+#include "CSSPrimitiveValue.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 RGBColor::RGBColor(const RGBA32& color) : Shared<RGBColor>(), m_color(color) {}
 
@@ -46,6 +46,7 @@ CSSPrimitiveValue* RGBColor::green() const {
 CSSPrimitiveValue* RGBColor::blue() const {
   return new CSSPrimitiveValue(float(m_color.alpha() ? m_color.blue() : 0),
                                CSSPrimitiveValue::CSS_DIMENSION);
+}
 }
 
 // vim:ts=4:noet

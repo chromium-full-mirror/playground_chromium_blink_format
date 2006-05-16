@@ -221,8 +221,4 @@ inline bool operator==(const DeprecatedValueList<T>& a,
   return a.impl.isEqual(b.impl, DeprecatedValueList<T>::nodesEqual);
 }
 
-#define Q3ValueList DeprecatedValueList
-#define Q3ValueListIterator DeprecatedValueListIterator
-#define Q3ValueListConstIterator DeprecatedValueListConstIterator
-
 #endif

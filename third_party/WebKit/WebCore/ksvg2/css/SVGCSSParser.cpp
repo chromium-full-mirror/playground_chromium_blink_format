@@ -27,9 +27,13 @@
 #include "ksvg.h"
 
 #include "SVGPaint.h"
+#include "CSSInheritedValue.h"
+#include "CSSInitialValue.h"
 #include "cssparser.h"
 #include "CSSPropertyNames.h"
+#include "CSSQuirkPrimitiveValue.h"
 #include "CSSValueKeywords.h"
+#include "CSSValueList.h"
 #include "ksvgcssproperties.c"
 #include "ksvgcssvalues.c"
 

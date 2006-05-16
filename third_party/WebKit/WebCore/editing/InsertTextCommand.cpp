@@ -26,6 +26,7 @@
 #include "config.h"
 #include "InsertTextCommand.h"
 
+#include "CSSMutableStyleDeclaration.h"
 #include "Document.h"
 #include "Element.h"
 #include "EditingText.h"
