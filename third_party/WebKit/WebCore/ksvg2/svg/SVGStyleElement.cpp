@@ -25,13 +25,14 @@
 #if SVG_SUPPORT
 #include "SVGStyleElement.h"
 
+#include "CSSStyleSheet.h"
+#include "DeprecatedString.h"
 #include "Document.h"
 #include "ExceptionCode.h"
+#include "MediaList.h"
 #include "PlatformString.h"
-#include "DeprecatedString.h"
-#include "css_stylesheetimpl.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGStyleElement::SVGStyleElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc) {
@@ -106,6 +107,7 @@ void SVGStyleElement::childrenChanged() {
 
 bool SVGStyleElement::isLoading() const {
   return false;
+}
 }
 
 // vim:ts=4:noet

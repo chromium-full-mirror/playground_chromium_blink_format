@@ -26,8 +26,9 @@
 
 #include "Cache.h"
 #include "CachedCSSStyleSheet.h"
+#include "CSSStyleSheet.h"
 #include "DocLoader.h"
-#include "css_stylesheetimpl.h"
+#include "MediaList.h"
 #include "cssparser.h"
 #include <KURL.h>
 

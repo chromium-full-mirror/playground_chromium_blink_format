@@ -30,6 +30,7 @@
 #include "Frame.h"
 #include "FrameTree.h"
 #include "HTMLNames.h"
+#include "MediaList.h"
 #include "csshelper.h"
 
 namespace WebCore {
@@ -90,6 +91,10 @@ void HTMLLinkElement::setDisabledState(bool _disabled) {
     else
       document()->updateStyleSelector();  // Update the style selector.
   }
+}
+
+StyleSheet* HTMLLinkElement::sheet() const {
+  return m_sheet.get();
 }
 
 void HTMLLinkElement::parseMappedAttribute(MappedAttribute* attr) {

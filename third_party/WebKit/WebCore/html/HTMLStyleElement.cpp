@@ -26,6 +26,7 @@
 
 #include "Document.h"
 #include "HTMLNames.h"
+#include "MediaList.h"
 
 namespace WebCore {
 
@@ -33,6 +34,10 @@ using namespace HTMLNames;
 
 HTMLStyleElement::HTMLStyleElement(Document* doc)
     : HTMLElement(styleTag, doc), m_loading(false) {}
+
+StyleSheet* HTMLStyleElement::sheet() const {
+  return m_sheet.get();
+}
 
 // other stuff...
 void HTMLStyleElement::parseMappedAttribute(MappedAttribute* attr) {

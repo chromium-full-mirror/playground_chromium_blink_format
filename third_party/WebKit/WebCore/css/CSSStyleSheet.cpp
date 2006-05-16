@@ -19,78 +19,34 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-
 #include "config.h"
-#include "css_stylesheetimpl.h"
+#include "CSSStyleSheet.h"
 
-#include "ExceptionCode.h"
-#include "PlatformString.h"
 #include "css_ruleimpl.h"
-#include "css_valueimpl.h"
-#include "cssparser.h"
-#include "HTMLDocument.h"
-#include "loader.h"
+#include "CSSParser.h"
+#include "Document.h"
+#include "ExceptionCode.h"
+#include "Node.h"
 
 namespace WebCore {
 
-// --------------------------------------------------------------------------------
-
-StyleSheet::StyleSheet(StyleSheet* parentSheet, String href)
-    : StyleList(parentSheet) {
-  m_disabled = false;
-  m_parentNode = 0;
-  m_strHref = href;
-}
-
-StyleSheet::StyleSheet(WebCore::Node* parentNode, String href) : StyleList(0) {
-  m_parentNode = parentNode;
-  m_disabled = false;
-  m_strHref = href;
-}
-
-StyleSheet::StyleSheet(StyleBase* owner, String href) : StyleList(owner) {
-  m_disabled = false;
-  m_parentNode = 0;
-  m_strHref = href;
-}
-
-StyleSheet::~StyleSheet() {
-  if (m_media)
-    m_media->setParent(0);
-}
-
-StyleSheet* StyleSheet::parentStyleSheet() const {
-  return (parent() && parent()->isStyleSheet())
-             ? static_cast<StyleSheet*>(parent())
-             : 0;
-}
-
-void StyleSheet::setMedia(MediaList* media) {
-  m_media = media;
-}
-
-// -----------------------------------------------------------------------
-
 CSSStyleSheet::CSSStyleSheet(CSSStyleSheet* parentSheet, String href)
-    : StyleSheet(parentSheet, href) {
-  m_doc = parentSheet ? parentSheet->doc() : 0;
-  m_implicit = false;
-  m_namespaces = 0;
-}
+    : StyleSheet(parentSheet, href),
+      m_doc(parentSheet ? parentSheet->doc() : 0),
+      m_implicit(false),
+      m_namespaces(0) {}
 
 CSSStyleSheet::CSSStyleSheet(Node* parentNode, String href, bool _implicit)
-    : StyleSheet(parentNode, href) {
-  m_doc = parentNode->document();
-  m_implicit = _implicit;
-  m_namespaces = 0;
-}
+    : StyleSheet(parentNode, href),
+      m_doc(parentNode->document()),
+      m_implicit(_implicit),
+      m_namespaces(0) {}
 
 CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule, String href)
-    : StyleSheet(ownerRule, href) {
-  m_doc = 0;
-  m_implicit = false;
-  m_namespaces = 0;
-}
+    : StyleSheet(ownerRule, href),
+      m_doc(0),
+      m_implicit(false),
+      m_namespaces(0) {}
 
 CSSRule* CSSStyleSheet::ownerRule() const {
   return (parent() && parent()->isRule()) ? static_cast<CSSRule*>(parent()) : 0;
@@ -203,7 +159,7 @@ void CSSStyleSheet::checkLoaded() {
     m_parentNode->sheetLoaded();
 }
 
-WebCore::DocLoader* CSSStyleSheet::docLoader() {
+DocLoader* CSSStyleSheet::docLoader() {
   if (!m_doc)  // doc is 0 for the user- and default-sheet!
     return 0;
 
@@ -218,110 +174,5 @@ void CSSStyleSheet::styleSheetChanged() {
    */
   if (m_doc)
     m_doc->updateStyleSelector();
-}
-
-// ---------------------------------------------------------------------------
-
-StyleSheetList::~StyleSheetList() {
-  for (DeprecatedPtrListIterator<StyleSheet> it(styleSheets); it.current();
-       ++it)
-    it.current()->deref();
-}
-
-void StyleSheetList::add(StyleSheet* s) {
-  if (!styleSheets.containsRef(s)) {
-    s->ref();
-    styleSheets.append(s);
-  }
-}
-
-void StyleSheetList::remove(StyleSheet* s) {
-  if (styleSheets.removeRef(s))
-    s->deref();
-}
-
-unsigned StyleSheetList::length() const {
-  // hack so implicit BODY stylesheets don't get counted here
-  unsigned l = 0;
-  DeprecatedPtrListIterator<StyleSheet> it(styleSheets);
-  for (; it.current(); ++it) {
-    if (!it.current()->isCSSStyleSheet() ||
-        !static_cast<CSSStyleSheet*>(it.current())->implicit())
-      l++;
-  }
-  return l;
-}
-
-StyleSheet* StyleSheetList::item(unsigned index) {
-  unsigned l = 0;
-  DeprecatedPtrListIterator<StyleSheet> it(styleSheets);
-  for (; it.current(); ++it) {
-    if (!it.current()->isCSSStyleSheet() ||
-        !static_cast<CSSStyleSheet*>(it.current())->implicit()) {
-      if (l == index)
-        return it.current();
-      l++;
-    }
-  }
-  return 0;
-}
-
-// --------------------------------------------------------------------------------------------
-
-MediaList::MediaList(CSSStyleSheet* parentSheet, const String& media)
-    : StyleBase(parentSheet) {
-  setMediaText(media);
-}
-
-MediaList::MediaList(CSSRule* parentRule, const String& media)
-    : StyleBase(parentRule) {
-  setMediaText(media);
-}
-
-bool MediaList::contains(const String& medium) const {
-  return m_lstMedia.count() == 0 || m_lstMedia.contains(medium) ||
-         m_lstMedia.contains("all");
-}
-
-CSSStyleSheet* MediaList::parentStyleSheet() const {
-  return parent()->isCSSStyleSheet() ? static_cast<CSSStyleSheet*>(parent())
-                                     : 0;
-}
-
-CSSRule* MediaList::parentRule() const {
-  return parent()->isRule() ? static_cast<CSSRule*>(parent()) : 0;
-}
-
-void MediaList::deleteMedium(const String& oldMedium) {
-  for (DeprecatedValueList<String>::Iterator it = m_lstMedia.begin();
-       it != m_lstMedia.end(); ++it) {
-    if ((*it) == oldMedium) {
-      m_lstMedia.remove(it);
-      return;
-    }
-  }
-}
-
-WebCore::String MediaList::mediaText() const {
-  String text = "";
-  for (DeprecatedValueList<String>::ConstIterator it = m_lstMedia.begin();
-       it != m_lstMedia.end(); ++it) {
-    if (text.length() > 0)
-      text += ", ";
-    text += *it;
-  }
-  return text;
-}
-
-void MediaList::setMediaText(const WebCore::String& value) {
-  m_lstMedia.clear();
-  DeprecatedStringList list =
-      DeprecatedStringList::split(',', value.deprecatedString());
-  for (DeprecatedStringList::Iterator it = list.begin(); it != list.end();
-       ++it) {
-    String medium = (*it).stripWhiteSpace();
-    if (!medium.isEmpty())
-      m_lstMedia.append(medium);
-  }
 }
 }

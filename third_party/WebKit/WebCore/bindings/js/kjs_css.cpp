@@ -25,14 +25,15 @@
 
 #include "Document.h"
 #include "HTMLNames.h"
+#include "HTMLStyleElement.h"
 #include "JSCSSPrimitiveValue.h"
 #include "JSCSSRule.h"
 #include "JSCSSStyleDeclaration.h"
+#include "MediaList.h"
+#include "StyleSheetList.h"
 #include "css_base.h"
 #include "css_ruleimpl.h"
-#include "css_stylesheetimpl.h"
 #include "css_valueimpl.h"
-#include "HTMLStyleElement.h"
 #include "kjs_dom.h"
 
 #include "kjs_css.lut.h"
