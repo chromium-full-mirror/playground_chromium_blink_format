@@ -27,9 +27,12 @@
 
 namespace WebCore {
 
+class CSSNamespace;
 class CSSParser;
+class CSSRule;
 class CSSRuleList;
 class DocLoader;
+class Document;
 
 typedef int ExceptionCode;
 
@@ -41,7 +44,7 @@ class CSSStyleSheet : public StyleSheet {
   CSSStyleSheet(CSSStyleSheet* parentSheet, String href = String());
   CSSStyleSheet(CSSRule* ownerRule, String href = String());
 
-  ~CSSStyleSheet() { delete m_namespaces; }
+  ~CSSStyleSheet();
 
   virtual bool isCSSStyleSheet() const { return true; }
 

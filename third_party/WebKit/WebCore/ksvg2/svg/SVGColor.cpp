@@ -22,14 +22,14 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include "DeprecatedStringList.h"
-
-#include "ksvg.h"
 #include "SVGColor.h"
-#include "SVGDOMImplementation.h"
-#include "RGBColor.h"
 
-using namespace WebCore;
+#include "DeprecatedStringList.h"
+#include "RGBColor.h"
+#include "SVGDOMImplementation.h"
+#include "ksvg.h"
+
+namespace WebCore {
 
 SVGColor::SVGColor() : CSSValue() {
   m_colorType = SVG_COLORTYPE_UNKNOWN;
@@ -241,7 +241,7 @@ void SVGColor::setRGBColor(StringImpl* rgbColor) {
     String colorName = m_rgbColor.lower();
     DeprecatedString name = colorName.deprecatedString();
     //        int col = WebCore::getValueID(name.ascii(), name.length());
-    //        if(col == 0)
+    //        if (col == 0)
     m_qColor = Color(name);
     //        else
     //            m_qColor = cmap[col - SVGCSS_VAL_ALICEBLUE];
@@ -269,6 +269,7 @@ String SVGColor::cssText() const {
 
 const Color& SVGColor::color() const {
   return m_qColor;
+}
 }
 
 // vim:ts=4:noet

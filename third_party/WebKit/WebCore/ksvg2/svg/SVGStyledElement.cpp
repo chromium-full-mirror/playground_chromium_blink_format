@@ -26,7 +26,9 @@
 
 #include "Attr.h"
 #include "Document.h"
+#include "KCanvasCreator.h"
 #include "KCanvasRenderingStyle.h"
+#include "KRenderingDevice.h"
 #include "PlatformString.h"
 #include "RenderCanvas.h"
 #include "RenderPath.h"
@@ -38,21 +40,21 @@
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGSVGElement.h"
-#include "css_base.h"
 #include "ksvg.h"
 #include "ksvgcssproperties.h"
-#include <kcanvas/KCanvasCreator.h>
-#include <kcanvas/device/KRenderingDevice.h>
+
 #include <wtf/Assertions.h>
 
 namespace WebCore {
 
+// Defined in CSSGrammar.y, but not in any header, so just declare it here for
+// now.
+int getPropertyID(const char* str, int len);
+
 using namespace SVGNames;
 
 SVGStyledElement::SVGStyledElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc) {
-  m_updateVectorial = false;
-}
+    : SVGElement(tagName, doc), m_updateVectorial(false) {}
 
 SVGStyledElement::~SVGStyledElement() {}
 
