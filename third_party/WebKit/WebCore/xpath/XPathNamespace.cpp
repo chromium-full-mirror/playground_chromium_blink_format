@@ -69,6 +69,6 @@ const AtomicString& XPathNamespace::namespaceURI() const {
 Node::NodeType XPathNamespace::nodeType() const {
   return Node::XPATH_NAMESPACE_NODE;
 }
+}
 
 #endif  // XPATH_SUPPORT
-}
