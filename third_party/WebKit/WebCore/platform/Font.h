@@ -195,11 +195,9 @@ class Font {
 
   bool italic() const { return m_fontDescription.italic(); }
   unsigned weight() const { return m_fontDescription.weight(); }
+  bool bold() const { return m_fontDescription.bold(); }
 
 #if __APPLE__
-  NSString* getNSFamily() const {
-    return m_fontDescription.family().getNSFamily();
-  }
   NSFont* getNSFont() const { return primaryFont()->getNSFont(); }
 #endif
 

@@ -72,6 +72,7 @@ class FontData {
   float widthForGlyph(Glyph glyph) const;
   bool containsCharacters(const UChar* characters, int length) const;
 
+  void determinePitch();
   Pitch pitch() const {
     return m_treatAsFixedPitch ? FixedPitch : VariablePitch;
   }
