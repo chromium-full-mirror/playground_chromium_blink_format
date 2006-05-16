@@ -46,6 +46,7 @@ class CachedScript;
 class CachedXSLStyleSheet;
 class Document;
 class Frame;
+class HTMLImageLoader;
 
 /**
  * Manages the loading of scripts/images/stylesheets for a particular document
@@ -94,6 +95,7 @@ class DocLoader {
 
   friend class Cache;
   friend class WebCore::Document;
+  friend class WebCore::HTMLImageLoader;
 
   DeprecatedStringList m_reloadedURLs;
   mutable HashMap<String, CachedObject*> m_docObjects;

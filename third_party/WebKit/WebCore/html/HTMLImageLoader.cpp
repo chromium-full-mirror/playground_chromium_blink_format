@@ -40,7 +40,11 @@ using namespace EventNames;
 using namespace HTMLNames;
 
 HTMLImageLoader::HTMLImageLoader(Element* elt)
-    : m_element(elt), m_image(0), m_firedLoad(true), m_imageComplete(true) {}
+    : m_element(elt),
+      m_image(0),
+      m_firedLoad(true),
+      m_imageComplete(true),
+      m_loadManually(false) {}
 
 HTMLImageLoader::~HTMLImageLoader() {
   if (m_image)
@@ -69,8 +73,14 @@ void HTMLImageLoader::updateFromElement() {
 
   // Treat a lack of src or empty string for src as no image at all.
   CachedImage* newImage = 0;
-  if (!attr.isEmpty())
-    newImage = doc->docLoader()->requestImage(parseURL(attr));
+  if (!attr.isEmpty()) {
+    if (m_loadManually) {
+      newImage =
+          new CachedImage(doc->docLoader(), parseURL(attr), KIO::CC_Verify, 0);
+      doc->docLoader()->m_docObjects.set(newImage->url(), newImage);
+    } else
+      newImage = doc->docLoader()->requestImage(parseURL(attr));
+  }
 
   CachedImage* oldImage = m_image;
   if (newImage != oldImage) {

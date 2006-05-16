@@ -44,6 +44,8 @@ class HTMLImageLoader : public CachedObjectClient {
   bool imageComplete() const { return m_imageComplete; }
   CachedImage* image() const { return m_image; }
 
+  void setLoadManually(bool loadManually) { m_loadManually = loadManually; }
+
   // CachedObjectClient API
   virtual void notifyFinished(CachedObject*);
 
@@ -55,6 +57,7 @@ class HTMLImageLoader : public CachedObjectClient {
   CachedImage* m_image;
   bool m_firedLoad : 1;
   bool m_imageComplete : 1;
+  bool m_loadManually : 1;
 };
 
 }  // namespace

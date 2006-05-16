@@ -40,5 +40,6 @@
 + (WebArchive*)archiveRange:(DOMRange*)range;
 + (WebArchive*)archiveSelectionInFrame:(WebFrame*)frame;
 + (WebArchive*)archiveFrame:(WebFrame*)frame;
++ (WebArchive*)archiveMainResourceForFrame:(WebFrame*)frame;
 
 @end
