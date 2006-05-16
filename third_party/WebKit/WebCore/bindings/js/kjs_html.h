@@ -128,8 +128,8 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
-  static const ClassInfo html_info, head_info, link_info, title_info, meta_info,
-      base_info, isIndex_info, style_info, body_info, form_info, select_info,
+  static const ClassInfo html_info, head_info, link_info, title_info, base_info,
+      isIndex_info, style_info, body_info, form_info, select_info,
       optGroup_info, option_info, input_info, textArea_info, button_info,
       label_info, fieldSet_info, legend_info, ul_info, ol_info, dl_info,
       dir_info, menu_info, li_info, div_info, p_info, heading_info,
@@ -152,19 +152,19 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   };
   const Accessors* accessors() const;
   static const Accessors html_accessors, head_accessors, link_accessors,
-      title_accessors, meta_accessors, base_accessors, isIndex_accessors,
-      style_accessors, body_accessors, form_accessors, select_accessors,
-      optGroup_accessors, option_accessors, input_accessors, textArea_accessors,
-      button_accessors, label_accessors, fieldSet_accessors, legend_accessors,
-      ul_accessors, ol_accessors, dl_accessors, dir_accessors, menu_accessors,
-      li_accessors, div_accessors, p_accessors, heading_accessors,
-      blockQuote_accessors, q_accessors, pre_accessors, br_accessors,
-      baseFont_accessors, font_accessors, hr_accessors, mod_accessors,
-      a_accessors, img_accessors, object_accessors, param_accessors,
-      applet_accessors, embed_accessors, map_accessors, area_accessors,
-      script_accessors, table_accessors, caption_accessors, col_accessors,
-      tablesection_accessors, tr_accessors, tablecell_accessors,
-      frameSet_accessors, frame_accessors, iFrame_accessors, marquee_accessors;
+      title_accessors, base_accessors, isIndex_accessors, style_accessors,
+      body_accessors, form_accessors, select_accessors, optGroup_accessors,
+      option_accessors, input_accessors, textArea_accessors, button_accessors,
+      label_accessors, fieldSet_accessors, legend_accessors, ul_accessors,
+      ol_accessors, dl_accessors, dir_accessors, menu_accessors, li_accessors,
+      div_accessors, p_accessors, heading_accessors, blockQuote_accessors,
+      q_accessors, pre_accessors, br_accessors, baseFont_accessors,
+      font_accessors, hr_accessors, mod_accessors, a_accessors, img_accessors,
+      object_accessors, param_accessors, applet_accessors, embed_accessors,
+      map_accessors, area_accessors, script_accessors, table_accessors,
+      caption_accessors, col_accessors, tablesection_accessors, tr_accessors,
+      tablecell_accessors, frameSet_accessors, frame_accessors,
+      iFrame_accessors, marquee_accessors;
 
   JSValue* htmlGetter(ExecState* exec, int token) const;
   void htmlSetter(ExecState* exec,
@@ -186,11 +186,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
                    int token,
                    JSValue* value,
                    const WebCore::String& str);
-  JSValue* metaGetter(ExecState* exec, int token) const;
-  void metaSetter(ExecState* exec,
-                  int token,
-                  JSValue* value,
-                  const WebCore::String& str);
   JSValue* baseGetter(ExecState* exec, int token) const;
   void baseSetter(ExecState* exec,
                   int token,

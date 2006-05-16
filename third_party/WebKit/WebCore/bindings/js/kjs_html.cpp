@@ -558,8 +558,6 @@ const ClassInfo JSHTMLElement::marquee_info = {
     "HTMLMarqueeElement", &JSHTMLElement::info, &HTMLMarqueeElementTable, 0};
 const ClassInfo JSHTMLElement::menu_info = {
     "HTMLMenuElement", &JSHTMLElement::info, &HTMLMenuElementTable, 0};
-const ClassInfo JSHTMLElement::meta_info = {
-    "HTMLMetaElement", &JSHTMLElement::info, &HTMLMetaElementTable, 0};
 const ClassInfo JSHTMLElement::mod_info = {
     "HTMLModElement", &JSHTMLElement::info, &HTMLModElementTable, 0};
 const ClassInfo JSHTMLElement::object_info = {
@@ -648,7 +646,6 @@ const ClassInfo* JSHTMLElement::classInfo() const {
     classInfoMap.set(mapTag.localName().impl(), &map_info);
     classInfoMap.set(marqueeTag.localName().impl(), &marquee_info);
     classInfoMap.set(menuTag.localName().impl(), &menu_info);
-    classInfoMap.set(metaTag.localName().impl(), &meta_info);
     classInfoMap.set(objectTag.localName().impl(), &object_info);
     classInfoMap.set(olTag.localName().impl(), &ol_info);
     classInfoMap.set(optgroupTag.localName().impl(), &optGroup_info);
@@ -688,8 +685,6 @@ const JSHTMLElement::Accessors JSHTMLElement::link_accessors = {
     &JSHTMLElement::linkGetter, &JSHTMLElement::linkSetter};
 const JSHTMLElement::Accessors JSHTMLElement::title_accessors = {
     &JSHTMLElement::titleGetter, &JSHTMLElement::titleSetter};
-const JSHTMLElement::Accessors JSHTMLElement::meta_accessors = {
-    &JSHTMLElement::metaGetter, &JSHTMLElement::metaSetter};
 const JSHTMLElement::Accessors JSHTMLElement::base_accessors = {
     &JSHTMLElement::baseGetter, &JSHTMLElement::baseSetter};
 const JSHTMLElement::Accessors JSHTMLElement::isIndex_accessors = {
@@ -838,7 +833,6 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
     accessorMap.add(mapTag.localName().impl(), &map_accessors);
     accessorMap.add(marqueeTag.localName().impl(), &marquee_accessors);
     accessorMap.add(menuTag.localName().impl(), &menu_accessors);
-    accessorMap.add(metaTag.localName().impl(), &meta_accessors);
     accessorMap.add(objectTag.localName().impl(), &object_accessors);
     accessorMap.add(olTag.localName().impl(), &ol_accessors);
     accessorMap.add(optionTag.localName().impl(), &option_accessors);
@@ -1606,21 +1600,6 @@ JSValue* JSHTMLElement::titleGetter(ExecState* exec, int token) const {
   HTMLTitleElement& title = *static_cast<HTMLTitleElement*>(impl());
   if (token == TitleText)
     return jsString(title.text());
-  return jsUndefined();
-}
-
-JSValue* JSHTMLElement::metaGetter(ExecState* exec, int token) const {
-  HTMLMetaElement& meta = *static_cast<HTMLMetaElement*>(impl());
-  switch (token) {
-    case MetaContent:
-      return jsString(meta.content());
-    case MetaHttpEquiv:
-      return jsString(meta.httpEquiv());
-    case MetaName:
-      return jsString(meta.name());
-    case MetaScheme:
-      return jsString(meta.scheme());
-  }
   return jsUndefined();
 }
 
@@ -2978,31 +2957,6 @@ void JSHTMLElement::titleSetter(ExecState* exec,
   HTMLTitleElement& title = *static_cast<HTMLTitleElement*>(impl());
   if (token == TitleText)
     title.setText(str);
-}
-
-void JSHTMLElement::metaSetter(ExecState* exec,
-                               int token,
-                               JSValue* value,
-                               const WebCore::String& str) {
-  HTMLMetaElement& meta = *static_cast<HTMLMetaElement*>(impl());
-  switch (token) {
-    case MetaContent: {
-      meta.setContent(str);
-      return;
-    }
-    case MetaHttpEquiv: {
-      meta.setHttpEquiv(str);
-      return;
-    }
-    case MetaName: {
-      meta.setName(str);
-      return;
-    }
-    case MetaScheme: {
-      meta.setScheme(str);
-      return;
-    }
-  }
 }
 
 void JSHTMLElement::baseSetter(ExecState* exec,
