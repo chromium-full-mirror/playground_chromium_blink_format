@@ -329,9 +329,11 @@ typedef enum {
         direction:(BOOL)forward
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
-- (unsigned)highlightAllMatchesForString:(NSString*)string
-                           caseSensitive:(BOOL)caseFlag;
-- (void)clearHighlightedMatches;
+- (unsigned)markAllMatchesForText:(NSString*)string
+                    caseSensitive:(BOOL)caseFlag;
+- (BOOL)markedTextMatchesAreHighlighted;
+- (void)setMarkedTextMatchesAreHighlighted:(BOOL)doHighlight;
+- (void)unmarkAllTextMatches;
 
 - (NSString*)advanceToNextMisspelling;
 - (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;

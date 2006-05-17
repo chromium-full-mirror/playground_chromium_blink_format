@@ -787,7 +787,10 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
 
   DeprecatedValueList<MarkedTextUnderline> markedTextUnderlines() const;
   bool markedTextUsesUnderlines() const;
-  unsigned highlightAllMatchesForString(const String&, bool caseFlag);
+
+  unsigned markAllMatchesForText(const String&, bool caseFlag);
+  bool markedTextMatchesAreHighlighted() const;
+  void setMarkedTextMatchesAreHighlighted(bool flag);
 
   // Call this method before handling a new user action, like on a mouse down or
   // key down.
