@@ -47,9 +47,11 @@ struct CStringTranslator {
   static bool equal(StringImpl* r, const char* s) {
     int length = r->length();
     const UChar* d = r->characters();
-    for (int i = 0; i != length; ++i)
-      if (d[i] != s[i])
+    for (int i = 0; i != length; ++i) {
+      unsigned char c = s[i];
+      if (d[i] != c)
         return false;
+    }
     return s[length] == 0;
   }
 
