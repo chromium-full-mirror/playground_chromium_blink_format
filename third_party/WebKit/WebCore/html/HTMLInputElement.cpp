@@ -90,7 +90,6 @@ HTMLInputElement::HTMLInputElement(const QualifiedName& tagName,
 
 void HTMLInputElement::init() {
   m_imageLoader = 0;
-  m_valueMatchesRenderer = false;
   m_type = TEXT;
   m_maxLen = 1024;
   m_size = 20;
@@ -126,7 +125,8 @@ const AtomicString& HTMLInputElement::name() const {
 }
 
 bool HTMLInputElement::isKeyboardFocusable() const {
-  // If text fields can be focused, then they should always be keyboardFocusable
+  // If text fields can be focused, then they should always be keyboard
+  // focusable
   if (isNonWidgetTextField())
     return HTMLGenericFormElement::isFocusable();
 
@@ -667,7 +667,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     // right now.
     if (m_value.isNull())
       setChanged();
-    m_valueMatchesRenderer = false;
+    setValueMatchesRenderer(false);
   } else if (attr->name() == checkedAttr) {
     m_defaultChecked = !attr->isNull();
     if (m_useDefaultChecked) {
@@ -779,7 +779,7 @@ RenderObject* HTMLInputElement::createRenderer(RenderArena* arena,
     case RANGE:
       return new (arena) RenderSlider(this);
     case TEXT:
-      return new (arena) RenderTextField(this);
+      return new (arena) RenderTextField(this, false);
   }
   assert(false);
   return 0;
@@ -823,7 +823,7 @@ void HTMLInputElement::attach() {
 
 void HTMLInputElement::detach() {
   HTMLGenericFormElement::detach();
-  m_valueMatchesRenderer = false;
+  setValueMatchesRenderer(false);
 }
 
 String HTMLInputElement::altText() const {
@@ -1027,7 +1027,7 @@ void HTMLInputElement::setValue(const String& value) {
   if (inputType() == FILE)
     return;
 
-  m_valueMatchesRenderer = false;
+  setValueMatchesRenderer(false);
   if (storesValueSeparateFromAttribute()) {
     m_value = constrainValue(value);
     if (renderer())
@@ -1042,7 +1042,7 @@ void HTMLInputElement::setValueFromRenderer(const String& value) {
   ASSERT(value == constrainValue(value));
 
   m_value = value;
-  m_valueMatchesRenderer = true;
+  setValueMatchesRenderer();
 
   // Fire the "input" DOM event.
   dispatchHTMLEvent(inputEvent, true, false);

@@ -1949,6 +1949,8 @@ bool Frame::doTextFieldCommandFromEvent(Element* input,
 
 void Frame::textWillBeDeletedInTextField(Element* input) {}
 
+void Frame::textDidChangeInTextArea(Element* input) {}
+
 EditCommandPtr Frame::lastEditCommand() {
   return d->m_lastEditCommand;
 }

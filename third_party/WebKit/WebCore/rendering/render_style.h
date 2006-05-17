@@ -740,7 +740,8 @@ enum EAppearance {
   SearchFieldAppearance,
   SearchFieldResultsAppearance,
   SearchFieldCloseAppearance,
-  TextFieldAppearance
+  TextFieldAppearance,
+  TextAreaAppearance
 };
 
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
@@ -777,7 +778,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   unsigned
       matchNearestMailBlockquoteColor : 1;  // EMatchNearestMailBlockquoteColor
 
-  unsigned m_appearance : 5;  // EAppearance
+  unsigned m_appearance : 6;  // EAppearance
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.

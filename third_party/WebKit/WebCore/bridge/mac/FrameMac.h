@@ -297,7 +297,8 @@ class FrameMac : public Frame {
   virtual void textDidChangeInTextField(Element*);
   virtual bool doTextFieldCommandFromEvent(Element*,
                                            const PlatformKeyboardEvent*);
-  virtual void textWillBeDeletedInTextField(Element* input);
+  virtual void textWillBeDeletedInTextField(Element*);
+  virtual void textDidChangeInTextArea(Element*);
 
   KJS::Bindings::RootObject* executionContextForDOM();
   KJS::Bindings::RootObject* bindingRootObject();

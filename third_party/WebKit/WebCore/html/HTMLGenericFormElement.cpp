@@ -46,7 +46,8 @@ HTMLGenericFormElement::HTMLGenericFormElement(const QualifiedName& tagName,
     : HTMLElement(tagName, doc),
       m_form(f),
       m_disabled(false),
-      m_readOnly(false) {
+      m_readOnly(false),
+      m_valueMatchesRenderer(false) {
   if (!m_form)
     m_form = getForm();
   if (m_form)

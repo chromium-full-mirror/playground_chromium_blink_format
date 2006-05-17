@@ -84,6 +84,10 @@ class RenderThemeMac : public RenderTheme {
                                     RenderStyle* style,
                                     Element* e) const;
 
+  virtual void adjustTextAreaStyle(CSSStyleSelector* selector,
+                                   RenderStyle* style,
+                                   Element* e) const;
+
  private:
   IntRect inflateRect(const IntRect& r,
                       const IntSize& size,

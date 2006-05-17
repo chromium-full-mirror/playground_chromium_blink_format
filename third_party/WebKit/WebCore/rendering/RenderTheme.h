@@ -171,6 +171,15 @@ class RenderTheme {
                               const IntRect& r) {
     return true;
   }
+
+  virtual void adjustTextAreaStyle(CSSStyleSelector* selector,
+                                   RenderStyle* style,
+                                   WebCore::Element* e) const;
+  virtual bool paintTextArea(RenderObject* o,
+                             const RenderObject::PaintInfo& i,
+                             const IntRect& r) {
+    return true;
+  }
 };
 
 // Function to obtain the theme.  This is implemented in your platform-specific

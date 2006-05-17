@@ -26,6 +26,7 @@
 #include "Frame.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "HTMLTextAreaElement.h"
 #include "HTMLTextFieldInnerElement.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
@@ -38,10 +39,12 @@ using namespace EventNames;
 using namespace HTMLNames;
 using namespace std;
 
-RenderTextField::RenderTextField(Node* node)
-    : RenderBlock(node), m_dirty(false) {}
+RenderTextField::RenderTextField(Node* node, bool multiLine)
+    : RenderFlexibleBox(node), m_dirty(false), m_multiLine(multiLine) {}
 
 RenderTextField::~RenderTextField() {
+  if (m_multiLine && node())
+    static_cast<HTMLTextAreaElement*>(node())->rendererWillBeDestroyed();
   // The renderer for the div has already been destroyed by
   // destroyLeftoverChildren
   if (m_div)
@@ -49,7 +52,7 @@ RenderTextField::~RenderTextField() {
 }
 
 void RenderTextField::setStyle(RenderStyle* style) {
-  RenderBlock::setStyle(style);
+  RenderFlexibleBox::setStyle(style);
   if (m_div) {
     RenderBlock* divRenderer = static_cast<RenderBlock*>(m_div->renderer());
     RenderStyle* divStyle = createDivStyle(style);
@@ -58,26 +61,47 @@ void RenderTextField::setStyle(RenderStyle* style) {
       if (n->renderer())
         n->renderer()->setStyle(divStyle);
   }
+  setHasOverflowClip(false);
   setReplaced(isInline());
 }
 
 RenderStyle* RenderTextField::createDivStyle(RenderStyle* startStyle) {
   RenderStyle* divStyle = new (renderArena()) RenderStyle();
-  HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
+  HTMLGenericFormElement* element =
+      static_cast<HTMLGenericFormElement*>(node());
 
   divStyle->inheritFrom(startStyle);
   divStyle->setDisplay(BLOCK);
-  divStyle->setOverflow(OHIDDEN);
-  divStyle->setWhiteSpace(PRE);
-
+  divStyle->setBoxFlex(1.0f);
   divStyle->setUserModify(
-      input->isReadOnlyControl() ? READ_ONLY : READ_WRITE_PLAINTEXT_ONLY);
+      element->isReadOnlyControl() ? READ_ONLY : READ_WRITE_PLAINTEXT_ONLY);
+
+  if (m_multiLine) {
+    // Forward overflow property
+    if (startStyle->overflow() == OHIDDEN || startStyle->overflow() == OSCROLL)
+      divStyle->setOverflow(startStyle->overflow());
+    else
+      divStyle->setOverflow(OAUTO);
+    // Set word wrap property based on wrap attribute
+    if (static_cast<HTMLTextAreaElement*>(element)->wrap() ==
+        HTMLTextAreaElement::ta_NoWrap) {
+      divStyle->setWhiteSpace(PRE);
+      divStyle->setWordWrap(WBNORMAL);
+    } else {
+      divStyle->setWhiteSpace(PRE_WRAP);
+      divStyle->setWordWrap(BREAK_WORD);
+    }
+
+  } else {
+    divStyle->setWhiteSpace(PRE);
+    divStyle->setOverflow(OHIDDEN);
+  }
 
   // We're adding this extra pixel of padding to match WinIE.
   divStyle->setPaddingLeft(Length(1, Fixed));
   divStyle->setPaddingRight(Length(1, Fixed));
 
-  if (!input->isEnabled()) {
+  if (!element->isEnabled()) {
     Color textColor = startStyle->color();
     Color disabledTextColor;
     if (differenceSquared(textColor, Color::white) >
@@ -92,39 +116,41 @@ RenderStyle* RenderTextField::createDivStyle(RenderStyle* startStyle) {
 }
 
 void RenderTextField::updateFromElement() {
-  if (node()->hasTagName(inputTag)) {
-    if (!m_div) {
-      // Create the div and give it a parent, renderer, and style
-      m_div = new HTMLTextFieldInnerElement(document(), node());
-      RenderBlock* divRenderer = new (renderArena()) RenderBlock(m_div.get());
-      m_div->setRenderer(divRenderer);
-      m_div->setAttached();
-      m_div->setInDocument(true);
+  if (!m_div) {
+    // Create the div and give it a parent, renderer, and style
+    m_div = new HTMLTextFieldInnerElement(document(), node());
+    RenderBlock* divRenderer = new (renderArena()) RenderBlock(m_div.get());
+    m_div->setRenderer(divRenderer);
+    m_div->setAttached();
+    m_div->setInDocument(true);
 
-      RenderStyle* divStyle = createDivStyle(style());
-      divRenderer->setStyle(divStyle);
+    RenderStyle* divStyle = createDivStyle(style());
+    divRenderer->setStyle(divStyle);
 
-      // Add div to Render tree
-      RenderBlock::addChild(divRenderer);
+    // Add div to Render tree
+    RenderFlexibleBox::addChild(divRenderer);
+  }
+
+  HTMLGenericFormElement* element =
+      static_cast<HTMLGenericFormElement*>(node());
+  m_div->renderer()->style()->setUserModify(
+      element->isReadOnlyControl() ? READ_ONLY : READ_WRITE_PLAINTEXT_ONLY);
+  String value;
+  if (m_multiLine)
+    value = static_cast<HTMLTextAreaElement*>(element)->value().copy();
+  else
+    value = static_cast<HTMLInputElement*>(element)->value().copy();
+  if (!element->valueMatchesRenderer()) {
+    String oldText = text();
+    if (value.isNull())
+      value = "";
+    value.replace('\\', backslashAsCurrencySymbol());
+    if (value != oldText || !m_div->hasChildNodes()) {
+      ExceptionCode ec = 0;
+      m_div->setInnerText(value, ec);
+      setEdited(false);
     }
-
-    HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
-    m_div->renderer()->style()->setUserModify(
-        input->isReadOnlyControl() ? READ_ONLY : READ_WRITE_PLAINTEXT_ONLY);
-
-    if (!input->valueMatchesRenderer()) {
-      String oldText = text();
-      String value = input->value().copy();
-      if (value.isNull())
-        value = "";
-      value.replace('\\', backslashAsCurrencySymbol());
-      if (value != oldText) {
-        ExceptionCode ec = 0;
-        m_div->setInnerText(value, ec);
-        setEdited(false);
-      }
-      input->setValueMatchesRenderer();
-    }
+    element->setValueMatchesRenderer();
   }
 }
 
@@ -155,7 +181,11 @@ void RenderTextField::setSelectionRange(int start, int end) {
   document()->updateLayout();
 
   VisiblePosition startPosition = visiblePositionForIndex(start);
-  VisiblePosition endPosition = visiblePositionForIndex(end);
+  VisiblePosition endPosition;
+  if (start == end)
+    endPosition = startPosition;
+  else
+    endPosition = visiblePositionForIndex(end);
 
   ASSERT(startPosition.isNotNull() && endPosition.isNotNull());
   ASSERT(startPosition.deepEquivalent().node()->shadowAncestorNode() ==
@@ -191,20 +221,60 @@ int RenderTextField::indexForVisiblePosition(const VisiblePosition& pos) {
 }
 
 void RenderTextField::subtreeHasChanged() {
-  HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
-  if (input) {
-    input->setValueFromRenderer(text());
-    if (!isEdited())
-      document()->frame()->textFieldDidBeginEditing(input);
-    setEdited(true);
-    document()->frame()->textDidChangeInTextField(input);
+  setEdited(true);
+  HTMLGenericFormElement* element =
+      static_cast<HTMLGenericFormElement*>(node());
+  if (m_multiLine) {
+    element->setValueMatchesRenderer(false);
+    document()->frame()->textDidChangeInTextArea(element);
+  } else {
+    HTMLInputElement* input = static_cast<HTMLInputElement*>(element);
+    if (input) {
+      input->setValueFromRenderer(text());
+      if (!isEdited())
+        document()->frame()->textFieldDidBeginEditing(input);
+      document()->frame()->textDidChangeInTextField(input);
+    }
   }
 }
 
 String RenderTextField::text() {
   if (m_div)
-    return m_div->textContent();
+    return m_div->innerText().replace(backslashAsCurrencySymbol(), '\\');
   return String();
+}
+
+String RenderTextField::textWithHardLineBreaks() {
+  String txt = text();
+  // FIXME: add in line breaks in places where we wrap
+  return txt;
+}
+
+void RenderTextField::calcHeight() {
+  int rows = 1;
+  if (m_multiLine)
+    rows = static_cast<HTMLTextAreaElement*>(node())->rows();
+
+  int line = m_div->renderer()->lineHeight(true);
+  int toAdd = paddingTop() + paddingBottom() + borderTop() + borderBottom() +
+              m_div->renderer()->paddingTop() +
+              m_div->renderer()->paddingBottom();
+
+  int scrollbarSize = 0;
+  // FIXME: We should get the size of the scrollbar from the RenderTheme instead
+  // of hard coding it here.
+  if (m_div->renderer()->style()->overflow() != OHIDDEN)
+    scrollbarSize = 15;
+
+  m_height = line * rows + toAdd + scrollbarSize;
+
+  RenderFlexibleBox::calcHeight();
+}
+
+short RenderTextField::baselinePosition(bool b, bool isRootLineBox) const {
+  if (m_multiLine)
+    return height() + marginTop() + marginBottom();
+  return RenderFlexibleBox::baselinePosition(b, isRootLineBox);
 }
 
 void RenderTextField::calcMinMaxWidth() {
@@ -214,19 +284,26 @@ void RenderTextField::calcMinMaxWidth() {
   if (style()->width().isFixed() && style()->width().value() > 0)
     m_minWidth = m_maxWidth = calcContentBoxWidth(style()->width().value());
   else {
-    // Figure out how big a text field needs to be for a given number of
+    // Figure out how big a text control needs to be for a given number of
     // characters
     // (using "0" as the nominal character).
-    int size = static_cast<HTMLInputElement*>(node())->size();
-    if (size <= 0)
-      size = 20;
-
     const UChar ch = '0';
-    int sizeWidth = (int)ceilf(
-        style()->font().floatWidth(TextRun(&ch, 1),
-                                   TextStyle(0, 0, 0, false, false, false)) *
-        size);
-    m_maxWidth = sizeWidth;
+    float charWidth = style()->font().floatWidth(
+        TextRun(&ch, 1), TextStyle(0, 0, 0, false, false, false));
+    int factor;
+    int scrollbarSize = 0;
+    if (m_multiLine) {
+      factor = static_cast<HTMLTextAreaElement*>(node())->cols();
+      // FIXME: We should get the size of the scrollbar from the RenderTheme
+      // instead of hard coding it here.
+      if (m_div->renderer()->style()->overflow() != OHIDDEN)
+        scrollbarSize = 15;
+    } else {
+      factor = static_cast<HTMLInputElement*>(node())->size();
+      if (factor <= 0)
+        factor = 20;
+    }
+    m_maxWidth = (int)ceilf(charWidth * factor) + scrollbarSize;
   }
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
@@ -268,5 +345,13 @@ void RenderTextField::forwardEvent(Event* evt) {
     }
   } else
     m_div->defaultEventHandler(evt);
+}
+
+void RenderTextField::selectionChanged() {
+  // FIXME: Implement this, and find the right place to detect a selection
+  // change to call this method.
+  // We also want to retain more information about selection for text controls,
+  // so this would be the place
+  // to store that info.
 }
 }
