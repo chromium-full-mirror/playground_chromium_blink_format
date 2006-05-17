@@ -26,6 +26,7 @@
 
 #include "DeprecatedString.h"
 #include "render_style.h"
+#include <wtf/HashSet.h>
 
 class KHTMLSettings;
 class KURL;
@@ -140,6 +141,8 @@ class CSSStyleSelector : public StyleSelector {
 
   Color getColorFromPrimitiveValue(CSSPrimitiveValue* primitiveValue);
 
+  bool hasSelectorForAttribute(const AtomicString& attrname);
+
  protected:
   /* checks if a compound selector (which can consist of multiple simple
      selectors)
@@ -236,6 +239,8 @@ class CSSStyleSelector : public StyleSelector {
   const KHTMLSettings* settings;
   bool fontDirty;
   bool isXMLDoc;
+
+  HashSet<AtomicStringImpl*> m_selectorAttrs;
 
   void applyProperty(int id, CSSValue* value);
 #if SVG_SUPPORT

@@ -1292,10 +1292,12 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
       return e->hasID() && e->getIDAttribute() == sel->value;
     else if (style && (e != element || !styledElement ||
                        (!styledElement->isMappedAttribute(sel->attr) &&
-                        sel->attr != typeAttr)))
+                        sel->attr != typeAttr))) {
       style->setAffectedByAttributeSelectors();  // Special-case the "type"
                                                  // attribute so input form
                                                  // controls can share style.
+      m_selectorAttrs.add(sel->attr.localName().impl());
+    }
 
     const AtomicString& value = e->getAttribute(sel->attr);
     if (value.isNull())
@@ -4602,6 +4604,10 @@ Color CSSStyleSelector::getColorFromPrimitiveValue(
   } else if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)
     col.setRgb(primitiveValue->getRGBColorValue());
   return col;
+}
+
+bool CSSStyleSelector::hasSelectorForAttribute(const AtomicString& attrname) {
+  return m_selectorAttrs.contains(attrname.impl());
 }
 
 }  // namespace WebCore
