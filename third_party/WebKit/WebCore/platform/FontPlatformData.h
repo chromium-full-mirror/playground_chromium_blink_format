@@ -50,10 +50,10 @@ struct FontPlatformData {
   bool syntheticOblique;
 
   unsigned hash() const {
-    unsigned hashCodes[2] = {(unsigned)font,
-                             syntheticBold << 1 | syntheticOblique};
+    uintptr_t hashCodes[2] = {(uintptr_t)font,
+                              syntheticBold << 1 | syntheticOblique};
     return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                   2 * sizeof(unsigned) / sizeof(UChar));
+                                   sizeof(hashCodes) / sizeof(UChar));
   }
 
   bool operator==(const FontPlatformData& other) const {
