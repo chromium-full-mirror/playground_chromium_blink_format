@@ -37,20 +37,20 @@ class DOMNode : public DOMObject {
   virtual ~DOMNode();
   virtual bool toBoolean(ExecState*) const;
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
+  JSValue* getValueProperty(ExecState*, int token) const;
   virtual void mark();
-  virtual void put(ExecState* exec,
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
-  void putValueProperty(ExecState* exec, int token, JSValue* value, int attr);
+  void putValueProperty(ExecState*, int token, JSValue*, int attr);
   WebCore::Node* impl() const { return m_impl.get(); }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  virtual JSValue* toPrimitive(ExecState* exec,
+  virtual JSValue* toPrimitive(ExecState*,
                                JSType preferred = UndefinedType) const;
-  virtual UString toString(ExecState* exec) const;
+  virtual UString toString(ExecState*) const;
 
   enum {
     NodeName,
@@ -94,7 +94,7 @@ class DOMNode : public DOMObject {
   // Don't use this class directly -- use JSNode instead
   friend class WebCore::JSNode;
   DOMNode();
-  DOMNode(ExecState* exec, WebCore::Node* n);
+  DOMNode(ExecState*, WebCore::Node* n);
   DOMNode(WebCore::Node* n);
 };
 
