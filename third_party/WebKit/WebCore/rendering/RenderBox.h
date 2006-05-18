@@ -209,6 +209,7 @@ class RenderBox : public RenderObject {
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(Length width,
                                     const RenderObject* cb,
+                                    TextDirection containerDirection,
                                     const int containerWidth,
                                     const int bordersPlusPadding,
                                     const Length left,
