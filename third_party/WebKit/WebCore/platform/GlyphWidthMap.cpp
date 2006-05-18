@@ -53,6 +53,7 @@ inline GlyphWidthMap::GlyphWidthPage* GlyphWidthMap::locatePage(
     if (m_filledPrimaryPage)
       return &m_primaryPage;
     page = &m_primaryPage;
+    m_filledPrimaryPage = true;
   } else {
     if (m_pages) {
       GlyphWidthPage* result = m_pages->get(pageNumber);
