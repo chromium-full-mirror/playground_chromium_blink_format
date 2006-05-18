@@ -44,12 +44,13 @@ const TextEncodingID ASCIIEncoding = kCFStringEncodingASCII;
 const TextEncodingID WinLatin1Encoding = kCFStringEncodingWindowsLatin1;
 #else
 enum TextEncodingID {
-  InvalidEncoding2 = -2; InvalidEncoding = -1,
-                         UTF8Encoding,
-                         UTF16Encoding,
-                         Latin1Encoding,
-                         ASCIIEncoding,
-                         WinLatin1Encoding
+  InvalidEncoding2 = -2,
+  InvalidEncoding = -1,
+  UTF8Encoding,
+  UTF16Encoding,
+  Latin1Encoding,
+  ASCIIEncoding,
+  WinLatin1Encoding
 };
 #endif
 
