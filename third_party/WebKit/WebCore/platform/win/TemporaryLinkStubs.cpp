@@ -317,6 +317,9 @@ int KWQFileButton::baselinePosition(int) const {
 void KWQFileButton::setFrameGeometry(WebCore::IntRect const&) {
   notImplemented();
 }
+void KWQFileButton::setDisabled(bool) {
+  notImplemented();
+}
 
 Widget::FocusPolicy QTextEdit::focusPolicy() const {
   notImplemented();
