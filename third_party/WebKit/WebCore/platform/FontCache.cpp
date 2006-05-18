@@ -97,7 +97,7 @@ FontPlatformData* FontCache::getCachedFontPlatformData(
     const AtomicString& familyName) {
   if (!gFontPlatformDataCache) {
     gFontPlatformDataCache = new FontPlatformDataCache;
-    registerForFontChanges();
+    platformInit();
   }
 
   const FontDescription& desc = font.fontDescription();
@@ -191,19 +191,5 @@ const FontData* FontCache::getFontData(const Font& font, int& familyIndex) {
 
   // Now that we have a result, we need to go from FontPlatformData -> FontData.
   return getCachedFontData(result);
-}
-
-void FontCache::clearCommonCaches() {
-  if (gFontPlatformDataCache) {
-    deleteAllValues(*gFontPlatformDataCache);
-    delete gFontPlatformDataCache;
-    gFontPlatformDataCache = 0;
-  }
-
-  if (gFontDataCache) {
-    deleteAllValues(*gFontDataCache);
-    delete gFontDataCache;
-    gFontDataCache = 0;
-  }
 }
 }

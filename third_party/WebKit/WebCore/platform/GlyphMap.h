@@ -50,8 +50,10 @@ class GlyphMap : Noncopyable {
  public:
   GlyphMap() : m_filledPrimaryPage(false), m_pages(0) {}
   ~GlyphMap() {
-    deleteAllValues(*m_pages);
-    delete m_pages;
+    if (m_pages) {
+      deleteAllValues(*m_pages);
+      delete m_pages;
+    }
   }
 
   GlyphData glyphDataForCharacter(UChar32, const FontData*);

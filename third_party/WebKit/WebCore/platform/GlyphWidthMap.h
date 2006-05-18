@@ -46,8 +46,10 @@ class GlyphWidthMap : Noncopyable {
  public:
   GlyphWidthMap() : m_filledPrimaryPage(false), m_pages(0) {}
   ~GlyphWidthMap() {
-    deleteAllValues(*m_pages);
-    delete m_pages;
+    if (m_pages) {
+      deleteAllValues(*m_pages);
+      delete m_pages;
+    }
   }
 
   float widthForGlyph(Glyph g);
