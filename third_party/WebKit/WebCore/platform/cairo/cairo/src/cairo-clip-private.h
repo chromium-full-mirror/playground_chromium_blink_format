@@ -86,6 +86,10 @@ cairo_private void _cairo_clip_fini(cairo_clip_t* clip);
 cairo_private void _cairo_clip_init_copy(cairo_clip_t* clip,
                                          cairo_clip_t* other);
 
+cairo_private void _cairo_clip_init_deep_copy(cairo_clip_t* clip,
+                                              cairo_clip_t* other,
+                                              cairo_surface_t* target);
+
 cairo_private cairo_status_t _cairo_clip_reset(cairo_clip_t* clip);
 
 cairo_private cairo_status_t _cairo_clip_clip(cairo_clip_t* clip,
@@ -117,5 +121,9 @@ _cairo_clip_extract_rectangles(cairo_clip_t* clip,
                                int max_rectangles,
                                cairo_clip_rect_t* rectangles_out,
                                int* num_rectangles_out);
+
+cairo_private void _cairo_clip_translate(cairo_clip_t* clip,
+                                         cairo_fixed_t tx,
+                                         cairo_fixed_t ty);
 
 #endif /* CAIRO_CLIP_PRIVATE_H */
