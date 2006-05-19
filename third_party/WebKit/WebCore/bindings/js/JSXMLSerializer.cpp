@@ -45,8 +45,8 @@ KJS_IMPLEMENT_PROTOTYPE("XMLSerializer",
                         XMLSerializerProtoFunc)
 
 XMLSerializerConstructorImp::XMLSerializerConstructorImp(ExecState* exec) {
-  putDirect(prototypePropertyName, XMLSerializerProto::self(exec),
-            DontEnum | DontDelete | ReadOnly);
+  setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
+  putDirect(prototypePropertyName, XMLSerializerProto::self(exec), None);
 }
 
 bool XMLSerializerConstructorImp::implementsConstruct() const {
