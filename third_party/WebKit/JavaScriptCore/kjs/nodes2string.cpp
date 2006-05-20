@@ -476,11 +476,6 @@ void CommaNode::streamTo(SourceStream& s) const {
   s << expr1 << ", " << expr2;
 }
 
-void StatListNode::streamTo(SourceStream& s) const {
-  for (const StatListNode* n = this; n; n = n->next.get())
-    s << n->statement;
-}
-
 void AssignExprNode::streamTo(SourceStream& s) const {
   s << " = " << expr;
 }
@@ -583,8 +578,8 @@ void CaseClauseNode::streamTo(SourceStream& s) const {
   else
     s << "default";
   s << ":" << SourceStream::Indent;
-  if (next)
-    s << next;
+  if (source)
+    s << source;
   s << SourceStream::Unindent;
 }
 

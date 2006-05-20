@@ -831,23 +831,6 @@ class CommaNode : public Node {
   RefPtr<Node> expr2;
 };
 
-class StatListNode : public StatementNode {
- public:
-  // list pointer is tail of a circular list, cracked in the CaseClauseNode ctor
-  StatListNode(StatementNode* s);
-  StatListNode(StatListNode* l, StatementNode* s);
-  virtual Completion execute(ExecState*);
-  virtual void processVarDecls(ExecState*);
-  virtual void streamTo(SourceStream&) const;
-  PassRefPtr<StatListNode> releaseNext() { return next.release(); }
-  virtual void breakCycle();
-
- private:
-  friend class CaseClauseNode;
-  RefPtr<StatementNode> statement;
-  ListRefPtr<StatListNode> next;
-};
-
 class AssignExprNode : public Node {
  public:
   AssignExprNode(Node* e) : expr(e) {}
@@ -1054,72 +1037,6 @@ class WithNode : public StatementNode {
   RefPtr<StatementNode> statement;
 };
 
-class CaseClauseNode : public Node {
- public:
-  CaseClauseNode(Node* e) : expr(e) {}
-  CaseClauseNode(Node* e, StatListNode* l) : expr(e), next(l->next.release()) {
-    Parser::removeNodeCycle(next.get());
-  }
-  JSValue* evaluate(ExecState*);
-  Completion evalStatements(ExecState*);
-  virtual void processVarDecls(ExecState*);
-  virtual void streamTo(SourceStream&) const;
-
- private:
-  RefPtr<Node> expr;
-  RefPtr<StatListNode> next;
-};
-
-class ClauseListNode : public Node {
- public:
-  // list pointer is tail of a circular list, cracked in the CaseBlockNode ctor
-  ClauseListNode(CaseClauseNode* c) : clause(c), next(this) {
-    Parser::noteNodeCycle(this);
-  }
-  ClauseListNode(ClauseListNode* n, CaseClauseNode* c)
-      : clause(c), next(n->next) {
-    n->next = this;
-  }
-  JSValue* evaluate(ExecState*);
-  CaseClauseNode* getClause() const { return clause.get(); }
-  ClauseListNode* getNext() const { return next.get(); }
-  virtual void processVarDecls(ExecState*);
-  virtual void streamTo(SourceStream&) const;
-  PassRefPtr<ClauseListNode> releaseNext() { return next.release(); }
-  virtual void breakCycle();
-
- private:
-  friend class CaseBlockNode;
-  RefPtr<CaseClauseNode> clause;
-  ListRefPtr<ClauseListNode> next;
-};
-
-class CaseBlockNode : public Node {
- public:
-  CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2);
-  JSValue* evaluate(ExecState*);
-  Completion evalBlock(ExecState* exec, JSValue* input);
-  virtual void processVarDecls(ExecState*);
-  virtual void streamTo(SourceStream&) const;
-
- private:
-  RefPtr<ClauseListNode> list1;
-  RefPtr<CaseClauseNode> def;
-  RefPtr<ClauseListNode> list2;
-};
-
-class SwitchNode : public StatementNode {
- public:
-  SwitchNode(Node* e, CaseBlockNode* b) : expr(e), block(b) {}
-  virtual Completion execute(ExecState*);
-  virtual void processVarDecls(ExecState*);
-  virtual void streamTo(SourceStream&) const;
-
- private:
-  RefPtr<Node> expr;
-  RefPtr<CaseBlockNode> block;
-};
-
 class LabelNode : public StatementNode {
  public:
   LabelNode(const Identifier& l, StatementNode* s) : label(l), statement(s) {}
@@ -1252,8 +1169,80 @@ class SourceElementsNode : public StatementNode {
 
  private:
   friend class BlockNode;
+  friend class CaseClauseNode;
   RefPtr<StatementNode> node;
   ListRefPtr<SourceElementsNode> next;
+};
+
+class CaseClauseNode : public Node {
+ public:
+  CaseClauseNode(Node* e) : expr(e) {}
+  CaseClauseNode(Node* e, SourceElementsNode* s)
+      : expr(e), source(s->next.release()) {
+    Parser::removeNodeCycle(source.get());
+  }
+  JSValue* evaluate(ExecState*);
+  Completion evalStatements(ExecState*);
+  void processFuncDecl(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void streamTo(SourceStream&) const;
+
+ private:
+  RefPtr<Node> expr;
+  RefPtr<SourceElementsNode> source;
+};
+
+class ClauseListNode : public Node {
+ public:
+  // list pointer is tail of a circular list, cracked in the CaseBlockNode ctor
+  ClauseListNode(CaseClauseNode* c) : clause(c), next(this) {
+    Parser::noteNodeCycle(this);
+  }
+  ClauseListNode(ClauseListNode* n, CaseClauseNode* c)
+      : clause(c), next(n->next) {
+    n->next = this;
+  }
+  JSValue* evaluate(ExecState*);
+  CaseClauseNode* getClause() const { return clause.get(); }
+  ClauseListNode* getNext() const { return next.get(); }
+  virtual void processVarDecls(ExecState*);
+  void processFuncDecl(ExecState*);
+  virtual void streamTo(SourceStream&) const;
+  PassRefPtr<ClauseListNode> releaseNext() { return next.release(); }
+  virtual void breakCycle();
+
+ private:
+  friend class CaseBlockNode;
+  RefPtr<CaseClauseNode> clause;
+  ListRefPtr<ClauseListNode> next;
+};
+
+class CaseBlockNode : public Node {
+ public:
+  CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2);
+  JSValue* evaluate(ExecState*);
+  Completion evalBlock(ExecState* exec, JSValue* input);
+  virtual void processVarDecls(ExecState*);
+  void processFuncDecl(ExecState*);
+  virtual void streamTo(SourceStream&) const;
+
+ private:
+  RefPtr<ClauseListNode> list1;
+  RefPtr<CaseClauseNode> def;
+  RefPtr<ClauseListNode> list2;
+};
+
+class SwitchNode : public StatementNode {
+ public:
+  SwitchNode(Node* e, CaseBlockNode* b) : expr(e), block(b) {}
+  virtual Completion execute(ExecState*);
+  virtual void processVarDecls(ExecState*);
+  virtual void processFuncDecl(ExecState*);
+  virtual void streamTo(SourceStream&) const;
+
+ private:
+  RefPtr<Node> expr;
+  RefPtr<CaseBlockNode> block;
 };
 
 class ProgramNode : public FunctionBodyNode {
