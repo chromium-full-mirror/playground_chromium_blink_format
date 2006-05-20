@@ -183,7 +183,6 @@ class FramePrivate {
   bool m_beganSelectingText;
 
   SelectionController m_selection;
-  SelectionController m_dragCaret;
   Selection m_mark;
   Timer<Frame> m_caretBlinkTimer;
 

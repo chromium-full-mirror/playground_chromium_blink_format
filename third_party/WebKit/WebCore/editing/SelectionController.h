@@ -111,8 +111,6 @@ class SelectionController {
 
   void debugRenderer(RenderObject*, bool selected) const;
 
-  friend class Frame;
-
   Frame* frame() const;
 
   void nodeWillBeRemoved(Node*);
@@ -167,8 +165,11 @@ class SelectionController {
 
   // Microsoft Selection Object API
   void empty();
-// void clear();
-// TextRange *createRange();
+  // void clear();
+  // TextRange *createRange();
+
+  void needsCaretRepaint();
+  void paintCaret(GraphicsContext*, const IntRect& rect);
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
@@ -184,8 +185,6 @@ class SelectionController {
   VisiblePosition modifyMovingLeftBackward(TextGranularity);
 
   void layout();
-  void needsCaretRepaint();
-  void paintCaret(GraphicsContext*, const IntRect& rect);
   IntRect caretRepaintRect() const;
 
   int xPosForVerticalArrowNavigation(EPositionType, bool recalc = false) const;

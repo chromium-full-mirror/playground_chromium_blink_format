@@ -22,6 +22,7 @@
 #define PAGE_H
 
 #include "PlatformString.h"
+#include "SelectionController.h"
 #include <wtf/HashSet.h>
 
 #if __APPLE__
@@ -62,6 +63,11 @@ class Page : Noncopyable {
   static void setNeedsReapplyStyles();
   static void setNeedsReapplyStylesForSettingsChange(KHTMLSettings*);
 
+  // FIXME: Replace this with a function on the selection controller or change
+  // it to Selection instead?
+  void setDragCaret(const SelectionController&);
+  SelectionController& dragCaret() const;  // FIXME: Change to pointer?
+
 #if __APPLE__
   Page(WebCorePageBridge*);
   WebCorePageBridge* bridge() const { return m_bridge; }
@@ -77,6 +83,7 @@ class Page : Noncopyable {
   RefPtr<Frame> m_mainFrame;
   int m_frameCount;
   String m_groupName;
+  mutable SelectionController m_dragCaret;
 
 #if __APPLE__
   WebCorePageBridge* m_bridge;

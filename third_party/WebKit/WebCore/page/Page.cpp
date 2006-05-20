@@ -119,4 +119,16 @@ void Page::setNeedsReapplyStylesForSettingsChange(KHTMLSettings* settings) {
       if (frame->settings() == settings)
         frame->setNeedsReapplyStyles();
 }
+
+SelectionController& Page::dragCaret() const {
+  return m_dragCaret;
+}
+
+void Page::setDragCaret(const SelectionController& dragCaret) {
+  if (m_dragCaret != dragCaret) {
+    m_dragCaret.needsCaretRepaint();
+    m_dragCaret = dragCaret;
+    m_dragCaret.needsCaretRepaint();
+  }
+}
 }
