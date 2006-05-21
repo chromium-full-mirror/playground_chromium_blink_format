@@ -36,6 +36,9 @@
 
 #if __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
+#elif PLATFORM(WIN)
+#include <cairo.h>
+#include "FloatSize.h"
 #endif
 
 #include <wtf/Vector.h>
@@ -43,6 +46,14 @@
 namespace WebCore {
 typedef unsigned short Glyph;
 class FontData;
+
+#if __APPLE__
+typedef Glyph GlyphBufferGlyph;
+typedef CGSize GlyphBufferAdvance;
+#elif PLATFORM(WIN)
+typedef cairo_glyph_t GlyphBufferGlyph;
+typedef FloatSize GlyphBufferAdvance;
+#endif
 
 class GlyphBuffer {
  public:
@@ -53,18 +64,16 @@ class GlyphBuffer {
 
   void clear() {
     m_fontData.clear();
-#if __APPLE__
     m_glyphs.clear();
     m_advances.clear();
-#endif
   }
 
-#if __APPLE__
-  Glyph* glyphs(int from) const { return ((Glyph*)m_glyphs.data()) + from; }
-  CGSize* advances(int from) const {
-    return ((CGSize*)m_advances.data()) + from;
+  GlyphBufferGlyph* glyphs(int from) const {
+    return ((GlyphBufferGlyph*)m_glyphs.data()) + from;
   }
-#endif
+  GlyphBufferAdvance* advances(int from) const {
+    return ((GlyphBufferAdvance*)m_advances.data()) + from;
+  }
 
   const FontData* fontDataAt(int index) const { return m_fontData[index]; }
 
@@ -73,30 +82,28 @@ class GlyphBuffer {
     m_fontData[index1] = m_fontData[index2];
     m_fontData[index2] = f;
 
-#if __APPLE__
-    Glyph g = m_glyphs[index1];
+    GlyphBufferGlyph g = m_glyphs[index1];
     m_glyphs[index1] = m_glyphs[index2];
     m_glyphs[index2] = g;
 
-    CGSize s = m_advances[index1];
+    GlyphBufferAdvance s = m_advances[index1];
     m_advances[index1] = m_advances[index2];
     m_advances[index2] = s;
-#endif
   }
 
   Glyph glyphAt(int index) const {
 #if __APPLE__
     return m_glyphs[index];
-#else
-    return 0;
+#elif PLATFORM(WIN)
+    return m_glyphs[index].index;
 #endif
   }
 
   float advanceAt(int index) const {
 #if __APPLE__
     return m_advances[index].width;
-#else
-    return 0;
+#elif PLATFORM(WIN)
+    return m_advances[index].width();
 #endif
   }
 
@@ -108,19 +115,23 @@ class GlyphBuffer {
     advance.width = width;
     advance.height = 0;
     m_advances.append(advance);
+#elif PLATFORM(WIN)
+    cairo_glyph_t cairoGlyph;
+    cairoGlyph.index = glyph;
+    cairoGlyph.x = (m_glyphs.size()
+                        ? m_glyphs[m_glyphs.size() - 1].x +
+                              m_advances[m_glyphs.size() - 1].width()
+                        : 0);
+    cairoGlyph.y = 0;
+    m_glyphs.append(cairoGlyph);
+    m_advances.append(FloatSize(width, 0));
 #endif
   }
 
  private:
   Vector<const FontData*, GLYPH_BUFFER_SIZE> m_fontData;
-#if __APPLE__
-  // Store the advances as CGSizes separately from the glyph indices.
-  Vector<Glyph, GLYPH_BUFFER_SIZE> m_glyphs;
-  Vector<CGSize, GLYPH_BUFFER_SIZE> m_advances;
-#else
-// We will store cairo_glyphs, and they incorporate the glyph index as well as
-// the advances.
-#endif
+  Vector<GlyphBufferGlyph, GLYPH_BUFFER_SIZE> m_glyphs;
+  Vector<GlyphBufferAdvance, GLYPH_BUFFER_SIZE> m_advances;
 };
 }
 #endif

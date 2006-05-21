@@ -213,7 +213,6 @@ class Font {
   const FontData* fontDataForCharacters(const UChar*, int length) const;
 
  private:
-#if __APPLE__
   // FIXME: This will eventually be cross-platform, but we want to keep Windows
   // compiling for now.
   bool canUseGlyphCache(const TextRun&) const;
@@ -268,7 +267,6 @@ class Font {
   static bool isRoundingHackCharacter(UChar32 c) {
     return (((c & ~0xFF) == 0 && gRoundingHackCharacterTable[c]));
   }
-#endif
 
  private:
   FontDescription m_fontDescription;

@@ -36,11 +36,9 @@
 #include <unicode/umachine.h>
 #include <unicode/unorm.h>
 
+#include <wtf/MathExtras.h>
+
 namespace WebCore {
-
-#if __APPLE__
-
-// FIXME: Cross-platform eventually, but for now we compile only on OS X.
 
 // According to
 // http://www.unicode.org/Public/UNIDATA/UCD.html#Canonical_Combining_Class_Values
@@ -199,7 +197,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
         // Make sure we have another character and it's a low surrogate.
         if (currentCharacter + 1 >= m_run.length())
           break;
-        UniChar low = cp[1];
+        UChar low = cp[1];
         if (!U16_IS_TRAIL(low))
           break;
         c = U16_GET_SUPPLEMENTARY(c, low);
@@ -260,7 +258,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
       width = m_style.tabWidth() -
               fmodf(m_style.xPos() + runWidthSoFar, m_style.tabWidth());
     else {
-      width = fontData->widthForGlyph(glyph);
+      width = fontData->widthForGlyph(glyph, c);
       // We special case spaces in two ways when applying word rounding.
       // First, we round spaces to an adjusted width in all fonts.
       // Second, in fixed-pitch fonts we ensure that all characters that
@@ -374,7 +372,6 @@ UChar32 WidthIterator::normalizeVoicingMarks() {
   }
   return 0;
 }
-#endif
 
 // ============================================================================================
 // Font Implementation (Cross-Platform Portion)
@@ -438,12 +435,7 @@ void Font::update() const {
 }
 
 int Font::width(const TextRun& run, const TextStyle& style) const {
-// FIXME: Want to define an lroundf for win32.
-#if __APPLE__
   return lroundf(floatWidth(run, style));
-#else
-  return floatWidth(run, style) + 0.5f;
-#endif
 }
 
 int Font::ascent() const {
@@ -467,7 +459,6 @@ bool Font::isFixedPitch() const {
   return m_fontList->isFixedPitch(this);
 }
 
-#if __APPLE__
 // FIXME: These methods will eventually be cross-platform, but to keep Windows
 // compiling we'll make this Apple-only for now.
 bool Font::gAlwaysUseComplexPath = false;
@@ -708,6 +699,4 @@ int Font::offsetForPositionForSimpleText(const TextRun& run,
 
   return offset - run.from();
 }
-
-#endif
 }
