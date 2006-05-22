@@ -37,6 +37,7 @@ class AtomicString;
 class FontData;
 class FontPlatformData;
 class Font;
+class FontDescription;
 
 class FontCache {
  public:
@@ -52,14 +53,14 @@ class FontCache {
 
  private:
   static FontPlatformData* getCachedFontPlatformData(
-      const Font&,
+      const FontDescription&,
       const AtomicString& family);
   static FontData* getCachedFontData(const FontPlatformData*);
 
   // These three methods are implemented by each platform.
   static FontPlatformData* getSimilarFontPlatformData(const Font&);
   static FontPlatformData* getLastResortFallbackFont(const Font&);
-  static FontPlatformData* createFontPlatformData(const Font&,
+  static FontPlatformData* createFontPlatformData(const FontDescription&,
                                                   const AtomicString& family);
 
   friend class FontData;
