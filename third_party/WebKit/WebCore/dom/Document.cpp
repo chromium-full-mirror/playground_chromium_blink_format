@@ -2665,13 +2665,13 @@ void Document::addMarker(Node* node, DocumentMarker newMarker) {
   if (newMarker.endOffset == newMarker.startOffset)
     return;
 
-  DeprecatedValueList<DocumentMarker>* markers = m_markers.get(node);
+  Vector<DocumentMarker>* markers = m_markers.get(node);
   if (!markers) {
-    markers = new DeprecatedValueList<DocumentMarker>;
+    markers = new Vector<DocumentMarker>;
     markers->append(newMarker);
     m_markers.set(node, markers);
   } else {
-    DeprecatedValueListIterator<DocumentMarker> it;
+    Vector<DocumentMarker>::iterator it;
     for (it = markers->begin(); it != markers->end();) {
       DocumentMarker marker = *it;
 
@@ -2691,12 +2691,12 @@ void Document::addMarker(Node* node, DocumentMarker newMarker) {
         newMarker.startOffset = min(newMarker.startOffset, marker.startOffset);
         newMarker.endOffset = max(newMarker.endOffset, marker.endOffset);
         // remove old one, we'll add newMarker later
-        it = markers->remove(it);
+        markers->remove(it - markers->begin());
         // it points to the next marker to consider
       }
     }
     // at this point it points to the node before which we want to insert
-    markers->insert(it, newMarker);
+    markers->insert(it - markers->begin(), newMarker);
   }
 
   // repaint the affected node
@@ -2717,13 +2717,13 @@ void Document::copyMarkers(Node* srcNode,
   if (length <= 0)
     return;
 
-  DeprecatedValueList<DocumentMarker>* markers = m_markers.get(srcNode);
+  Vector<DocumentMarker>* markers = m_markers.get(srcNode);
   if (!markers)
     return;
 
   bool docDirty = false;
   unsigned endOffset = startOffset + length - 1;
-  DeprecatedValueListIterator<DocumentMarker> it;
+  Vector<DocumentMarker>::iterator it;
   for (it = markers->begin(); it != markers->end(); ++it) {
     DocumentMarker marker = *it;
 
@@ -2760,13 +2760,13 @@ void Document::removeMarkers(Node* node,
   if (length <= 0)
     return;
 
-  DeprecatedValueList<DocumentMarker>* markers = m_markers.get(node);
+  Vector<DocumentMarker>* markers = m_markers.get(node);
   if (!markers)
     return;
 
   bool docDirty = false;
   unsigned endOffset = startOffset + length - 1;
-  DeprecatedValueListIterator<DocumentMarker> it;
+  Vector<DocumentMarker>::iterator it;
   for (it = markers->begin(); it != markers->end();) {
     DocumentMarker marker = *it;
 
@@ -2787,7 +2787,7 @@ void Document::removeMarkers(Node* node,
     docDirty = true;
 
     // pitch the old marker
-    it = markers->remove(it);
+    markers->remove(it - markers->begin());
     // it now points to the next node
 
     // add either of the resulting slices that are left after removing target
@@ -2796,12 +2796,12 @@ void Document::removeMarkers(Node* node,
     if (startOffset > marker.startOffset) {
       DocumentMarker newLeft = marker;
       newLeft.endOffset = startOffset;
-      markers->insert(it, newLeft);
+      markers->insert(it - markers->begin(), newLeft);
     }
     if (marker.endOffset > endOffset) {
       DocumentMarker newRight = marker;
       newRight.startOffset = endOffset;
-      markers->insert(it, newRight);
+      markers->insert(it - markers->begin(), newRight);
     }
   }
 
@@ -2815,11 +2815,11 @@ void Document::removeMarkers(Node* node,
     node->renderer()->repaint();
 }
 
-DeprecatedValueList<DocumentMarker> Document::markersForNode(Node* node) {
-  DeprecatedValueList<DocumentMarker>* markers = m_markers.get(node);
+Vector<DocumentMarker> Document::markersForNode(Node* node) {
+  Vector<DocumentMarker>* markers = m_markers.get(node);
   if (markers)
     return *markers;
-  return DeprecatedValueList<DocumentMarker>();
+  return Vector<DocumentMarker>();
 }
 
 void Document::removeMarkers(Node* node) {
@@ -2840,8 +2840,8 @@ void Document::removeMarkers(DocumentMarker::MarkerType markerType) {
     Node* node = i->first;
 
     // inner loop: process each marker in the current node
-    DeprecatedValueList<DocumentMarker>* markers = i->second;
-    DeprecatedValueListIterator<DocumentMarker> markerIterator;
+    Vector<DocumentMarker>* markers = i->second;
+    Vector<DocumentMarker>::iterator markerIterator;
     for (markerIterator = markers->begin(); markerIterator != markers->end();) {
       DocumentMarker marker = *markerIterator;
 
@@ -2853,7 +2853,7 @@ void Document::removeMarkers(DocumentMarker::MarkerType markerType) {
       }
 
       // pitch the old marker
-      markerIterator = markers->remove(markerIterator);
+      markers->remove(markerIterator - markers->begin());
       // markerIterator now points to the next node
     }
 
@@ -2874,8 +2874,8 @@ void Document::repaintMarkers(DocumentMarker::MarkerType markerType) {
     Node* node = i->first;
 
     // inner loop: process each marker in the current node
-    DeprecatedValueList<DocumentMarker>* markers = i->second;
-    DeprecatedValueListIterator<DocumentMarker> markerIterator;
+    Vector<DocumentMarker>* markers = i->second;
+    Vector<DocumentMarker>::iterator markerIterator;
     bool nodeNeedsRepaint = false;
     for (markerIterator = markers->begin(); markerIterator != markers->end();
          ++markerIterator) {
@@ -2902,12 +2902,12 @@ void Document::shiftMarkers(Node* node,
                             unsigned startOffset,
                             int delta,
                             DocumentMarker::MarkerType markerType) {
-  DeprecatedValueList<DocumentMarker>* markers = m_markers.get(node);
+  Vector<DocumentMarker>* markers = m_markers.get(node);
   if (!markers)
     return;
 
   bool docDirty = false;
-  DeprecatedValueListIterator<DocumentMarker> it;
+  Vector<DocumentMarker>::iterator it;
   for (it = markers->begin(); it != markers->end(); ++it) {
     DocumentMarker& marker = *it;
     if (marker.startOffset >= startOffset &&

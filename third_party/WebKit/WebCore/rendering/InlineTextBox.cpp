@@ -661,9 +661,9 @@ void InlineTextBox::paintAllMarkersOfType(GraphicsContext* pt,
                                           DocumentMarker::MarkerType markerType,
                                           RenderStyle* style,
                                           const Font* f) {
-  DeprecatedValueList<DocumentMarker> markers =
+  Vector<DocumentMarker> markers =
       object()->document()->markersForNode(object()->node());
-  DeprecatedValueListIterator<DocumentMarker> markerIt = markers.begin();
+  Vector<DocumentMarker>::iterator markerIt = markers.begin();
 
   // Give any document markers that touch this run a chance to draw before the
   // text has been drawn.

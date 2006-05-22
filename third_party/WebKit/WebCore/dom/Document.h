@@ -620,7 +620,7 @@ class Document : public ContainerNode {
                     int delta,
                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
 
-  DeprecatedValueList<DocumentMarker> markersForNode(Node*);
+  Vector<DocumentMarker> markersForNode(Node*);
 
   // designMode support
   enum InheritedBool { off = false, on = true, inherit };
@@ -752,7 +752,7 @@ class Document : public ContainerNode {
 
   RenderArena* m_renderArena;
 
-  typedef HashMap<Node*, DeprecatedValueList<DocumentMarker>*> MarkerMap;
+  typedef HashMap<Node*, Vector<DocumentMarker>*> MarkerMap;
   MarkerMap m_markers;
 
   mutable AccessibilityObjectCache* m_accCache;
