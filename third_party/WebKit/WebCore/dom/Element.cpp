@@ -269,7 +269,14 @@ static inline bool inHTMLDocument(const Element* e) {
 
 const AtomicString& Element::getAttribute(const String& name) const {
   String localName = inHTMLDocument(this) ? name.lower() : name;
-  return getAttribute(QualifiedName(nullAtom, localName.impl(), nullAtom));
+  if (localName == styleAttr.localName())
+    updateStyleAttributeIfNeeded();
+
+  if (namedAttrMap)
+    if (Attribute* a = namedAttrMap->getAttributeItem(localName))
+      return a->value();
+
+  return nullAtom;
 }
 
 const AtomicString& Element::getAttributeNS(const String& namespaceURI,
@@ -285,9 +292,33 @@ void Element::setAttribute(const String& name,
     ec = INVALID_CHARACTER_ERR;
     return;
   }
+
+  // allocate attributemap if necessary
+  Attribute* old = attributes(false)->getAttributeItem(name);
+
+  // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
+  if (namedAttrMap->isReadOnlyNode()) {
+    ec = NO_MODIFICATION_ALLOWED_ERR;
+    return;
+  }
+
+  if (inDocument())
+    document()->incDOMTreeVersion();
+
   String localName = inHTMLDocument(this) ? name.lower() : name;
-  setAttribute(QualifiedName(nullAtom, localName.impl(), nullAtom),
-               value.impl(), ec);
+
+  if (localName == idAttr.localName())
+    updateId(old ? old->value() : nullAtom, value);
+
+  if (old && value.isNull())
+    namedAttrMap->removeAttribute(old->name());
+  else if (!old && !value.isNull())
+    namedAttrMap->addAttribute(createAttribute(
+        QualifiedName(nullAtom, localName.impl(), nullAtom), value.impl()));
+  else if (old && !value.isNull()) {
+    old->setValue(value);
+    attributeChanged(old);
+  }
 }
 
 void Element::setAttribute(const QualifiedName& name,
@@ -706,7 +737,12 @@ void Element::setAttributeNS(const String& namespaceURI,
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
   String localName = inHTMLDocument(this) ? name.lower() : name;
-  removeAttribute(QualifiedName(nullAtom, localName.impl(), nullAtom), ec);
+
+  if (namedAttrMap) {
+    namedAttrMap->removeNamedItem(localName, ec);
+    if (ec == NOT_FOUND_ERR)
+      ec = 0;
+  }
 }
 
 void Element::removeAttributeNS(const String& namespaceURI,
@@ -721,8 +757,7 @@ PassRefPtr<Attr> Element::getAttributeNode(const String& name) {
   if (!attrs)
     return 0;
   String localName = inHTMLDocument(this) ? name.lower() : name;
-  return static_pointer_cast<Attr>(
-      attrs->getNamedItem(QualifiedName(nullAtom, localName.impl(), nullAtom)));
+  return static_pointer_cast<Attr>(attrs->getNamedItem(localName));
 }
 
 PassRefPtr<Attr> Element::getAttributeNodeNS(const String& namespaceURI,
@@ -739,8 +774,7 @@ bool Element::hasAttribute(const String& name) const {
   if (!attrs)
     return false;
   String localName = inHTMLDocument(this) ? name.lower() : name;
-  return attrs->getAttributeItem(
-      QualifiedName(nullAtom, localName.impl(), nullAtom));
+  return attrs->getAttributeItem(localName);
 }
 
 bool Element::hasAttributeNS(const String& namespaceURI,
