@@ -258,7 +258,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
       width = m_style.tabWidth() -
               fmodf(m_style.xPos() + runWidthSoFar, m_style.tabWidth());
     else {
-      width = fontData->widthForGlyph(glyph, c);
+      width = fontData->widthForGlyph(glyph);
       // We special case spaces in two ways when applying word rounding.
       // First, we round spaces to an adjusted width in all fonts.
       // Second, in fixed-pitch fonts we ensure that all characters that
