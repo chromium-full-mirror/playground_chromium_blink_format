@@ -51,18 +51,14 @@
   BOOL supportsMultipartContent;
   BOOL signalledFinish;
  @private
-  WebView* webView;
   NSURLResponse* response;
   id identifier;
-  id resourceLoadDelegate;
-  id downloadDelegate;
   NSURLAuthenticationChallenge* currentConnectionChallenge;
   NSURLAuthenticationChallenge* currentWebChallenge;
   BOOL cancelledFlag;
   BOOL defersCallbacks;
   BOOL waitingToDeliverResource;
   BOOL deliveredResource;
-  WebResourceDelegateImplementationCache implementations;
   NSURL* originalURL;
   NSMutableData* resourceData;
   WebResource* resource;
@@ -77,9 +73,6 @@
 
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;
-
-- (id)resourceLoadDelegate;
-- (id)downloadDelegate;
 
 - (void)cancel;
 - (void)cancelWithError:(NSError*)error;
