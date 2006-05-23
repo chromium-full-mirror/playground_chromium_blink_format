@@ -44,17 +44,14 @@ KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLDocumentProto,
 
 class JSHTMLDocument : public WebCore::JSDocument {
  public:
-  JSHTMLDocument(ExecState* exec, WebCore::HTMLDocument* d);
+  JSHTMLDocument(ExecState*, WebCore::HTMLDocument*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
-  void putValueProperty(ExecState* exec,
-                        int token,
-                        JSValue* value,
-                        int /*attr*/);
+  void putValueProperty(ExecState*, int token, JSValue*, int /*attr*/);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
@@ -111,113 +108,78 @@ KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLElementProto,
 
 class JSHTMLElement : public WebCore::JSHTMLElement {
  public:
-  JSHTMLElement(ExecState* exec, WebCore::HTMLElement* e);
+  JSHTMLElement(ExecState*, WebCore::HTMLElement*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
-  void putValueProperty(ExecState* exec, int token, JSValue* value, int);
-  virtual UString toString(ExecState* exec) const;
-  virtual void pushEventHandlerScope(ExecState* exec, ScopeChain& scope) const;
-  virtual JSValue* callAsFunction(ExecState* exec,
+  void putValueProperty(ExecState*, int token, JSValue*, int);
+  virtual UString toString(ExecState*) const;
+  virtual void pushEventHandlerScope(ExecState*, ScopeChain& scope) const;
+  virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
   virtual bool implementsCall() const;
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
-  static const ClassInfo form_info, select_info, option_info, input_info,
-      object_info, embed_info, table_info, caption_info, col_info,
-      tablesection_info, tr_info, tablecell_info, frameSet_info, frame_info,
-      iFrame_info, marquee_info;
+  static const ClassInfo form_info, select_info, object_info, embed_info,
+      table_info, caption_info, col_info, tablesection_info, tr_info,
+      tablecell_info, frameSet_info, frame_info, iFrame_info, marquee_info;
 
   // FIXME: Might make sense to combine this with ClassInfo some day.
-  typedef JSValue* (JSHTMLElement::*GetterFunction)(ExecState* exec,
+  typedef JSValue* (JSHTMLElement::*GetterFunction)(ExecState*,
                                                     int token) const;
-  typedef void (JSHTMLElement::*SetterFunction)(ExecState* exec,
+  typedef void (JSHTMLElement::*SetterFunction)(ExecState*,
                                                 int token,
-                                                JSValue* value,
-                                                const WebCore::String& str);
+                                                JSValue*,
+                                                const WebCore::String&);
   struct Accessors {
     GetterFunction m_getter;
     SetterFunction m_setter;
   };
   const Accessors* accessors() const;
-  static const Accessors form_accessors, select_accessors, option_accessors,
-      input_accessors, object_accessors, embed_accessors, table_accessors,
-      caption_accessors, col_accessors, tablesection_accessors, tr_accessors,
-      tablecell_accessors, frameSet_accessors, frame_accessors,
-      iFrame_accessors, marquee_accessors;
+  static const Accessors form_accessors, select_accessors, object_accessors,
+      embed_accessors, table_accessors, caption_accessors, col_accessors,
+      tablesection_accessors, tr_accessors, tablecell_accessors,
+      frameSet_accessors, frame_accessors, iFrame_accessors, marquee_accessors;
 
   JSValue* formGetter(ExecState* exec, int token) const;
-  void formSetter(ExecState* exec,
-                  int token,
-                  JSValue* value,
-                  const WebCore::String& str);
+  void formSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* selectGetter(ExecState* exec, int token) const;
-  void selectSetter(ExecState* exec,
-                    int token,
-                    JSValue* value,
-                    const WebCore::String& str);
+  void selectSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* objectGetter(ExecState* exec, int token) const;
-  void objectSetter(ExecState* exec,
-                    int token,
-                    JSValue* value,
-                    const WebCore::String& str);
+  void objectSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* embedGetter(ExecState*, int token) const;
   void embedSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* tableGetter(ExecState* exec, int token) const;
-  void tableSetter(ExecState* exec,
-                   int token,
-                   JSValue* value,
-                   const WebCore::String& str);
+  void tableSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* tableCaptionGetter(ExecState* exec, int token) const;
-  void tableCaptionSetter(ExecState* exec,
+  void tableCaptionSetter(ExecState*,
                           int token,
-                          JSValue* value,
-                          const WebCore::String& str);
+                          JSValue*,
+                          const WebCore::String&);
   JSValue* tableColGetter(ExecState* exec, int token) const;
-  void tableColSetter(ExecState* exec,
-                      int token,
-                      JSValue* value,
-                      const WebCore::String& str);
+  void tableColSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* tableSectionGetter(ExecState* exec, int token) const;
-  void tableSectionSetter(ExecState* exec,
+  void tableSectionSetter(ExecState*,
                           int token,
-                          JSValue* value,
-                          const WebCore::String& str);
+                          JSValue*,
+                          const WebCore::String&);
   JSValue* tableRowGetter(ExecState* exec, int token) const;
-  void tableRowSetter(ExecState* exec,
-                      int token,
-                      JSValue* value,
-                      const WebCore::String& str);
+  void tableRowSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* tableCellGetter(ExecState* exec, int token) const;
-  void tableCellSetter(ExecState* exec,
-                       int token,
-                       JSValue* value,
-                       const WebCore::String& str);
+  void tableCellSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* frameSetGetter(ExecState* exec, int token) const;
-  void frameSetSetter(ExecState* exec,
-                      int token,
-                      JSValue* value,
-                      const WebCore::String& str);
+  void frameSetSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* frameGetter(ExecState* exec, int token) const;
-  void frameSetter(ExecState* exec,
-                   int token,
-                   JSValue* value,
-                   const WebCore::String& str);
+  void frameSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* iFrameGetter(ExecState* exec, int token) const;
-  void iFrameSetter(ExecState* exec,
-                    int token,
-                    JSValue* value,
-                    const WebCore::String& str);
+  void iFrameSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* marqueeGetter(ExecState* exec, int token) const;
-  void marqueeSetter(ExecState* exec,
-                     int token,
-                     JSValue* value,
-                     const WebCore::String& str);
+  void marqueeSetter(ExecState*, int token, JSValue*, const WebCore::String&);
 
   enum {
     FormAction,
@@ -377,34 +339,34 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   };
 
  private:
-  static JSValue* formIndexGetter(ExecState* exec,
+  static JSValue* formIndexGetter(ExecState*,
                                   JSObject*,
                                   const Identifier&,
-                                  const PropertySlot& slot);
-  static JSValue* formNameGetter(ExecState* exec,
+                                  const PropertySlot&);
+  static JSValue* formNameGetter(ExecState*,
                                  JSObject*,
                                  const Identifier&,
-                                 const PropertySlot& slot);
-  static JSValue* selectIndexGetter(ExecState* exec,
+                                 const PropertySlot&);
+  static JSValue* selectIndexGetter(ExecState*,
                                     JSObject*,
                                     const Identifier&,
-                                    const PropertySlot& slot);
-  static JSValue* framesetNameGetter(ExecState* exec,
+                                    const PropertySlot&);
+  static JSValue* framesetNameGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
-                                     const PropertySlot& slot);
-  static JSValue* frameWindowPropertyGetter(ExecState* exec,
+                                     const PropertySlot&);
+  static JSValue* frameWindowPropertyGetter(ExecState*,
                                             JSObject*,
                                             const Identifier&,
-                                            const PropertySlot& slot);
-  static JSValue* runtimeObjectGetter(ExecState* exec,
+                                            const PropertySlot&);
+  static JSValue* runtimeObjectGetter(ExecState*,
                                       JSObject*,
                                       const Identifier&,
-                                      const PropertySlot& slot);
-  static JSValue* runtimeObjectPropertyGetter(ExecState* exec,
+                                      const PropertySlot&);
+  static JSValue* runtimeObjectPropertyGetter(ExecState*,
                                               JSObject*,
                                               const Identifier&,
-                                              const PropertySlot& slot);
+                                              const PropertySlot&);
 };
 
 WebCore::HTMLElement* toHTMLElement(
@@ -418,16 +380,16 @@ WebCore::HTMLTableSectionElement* toHTMLTableSectionElement(
 
 class JSHTMLCollection : public DOMObject {
  public:
-  JSHTMLCollection(ExecState* exec, WebCore::HTMLCollection* c);
+  JSHTMLCollection(ExecState*, WebCore::HTMLCollection*);
   ~JSHTMLCollection();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual JSValue* callAsFunction(ExecState* exec,
+  virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
   virtual bool implementsCall() const { return true; }
   virtual bool toBoolean(ExecState*) const { return true; }
   enum { Item, NamedItem, Tags };
-  JSValue* getNamedItems(ExecState* exec, const Identifier& propertyName) const;
+  JSValue* getNamedItems(ExecState*, const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   WebCore::HTMLCollection* impl() const { return m_impl.get(); }
@@ -436,36 +398,36 @@ class JSHTMLCollection : public DOMObject {
   RefPtr<WebCore::HTMLCollection> m_impl;
 
  private:
-  static JSValue* lengthGetter(ExecState* exec,
+  static JSValue* lengthGetter(ExecState*,
                                JSObject*,
                                const Identifier&,
-                               const PropertySlot& slot);
-  static JSValue* indexGetter(ExecState* exec,
+                               const PropertySlot&);
+  static JSValue* indexGetter(ExecState*,
                               JSObject*,
                               const Identifier&,
-                              const PropertySlot& slot);
-  static JSValue* nameGetter(ExecState* exec,
+                              const PropertySlot&);
+  static JSValue* nameGetter(ExecState*,
                              JSObject*,
                              const Identifier&,
-                             const PropertySlot& slot);
+                             const PropertySlot&);
 };
 
 class JSHTMLSelectCollection : public JSHTMLCollection {
  public:
-  JSHTMLSelectCollection(ExecState* exec,
-                         WebCore::HTMLCollection* c,
-                         WebCore::HTMLSelectElement* e);
+  JSHTMLSelectCollection(ExecState*,
+                         WebCore::HTMLCollection*,
+                         WebCore::HTMLSelectElement*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState* exec,
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
-                   JSValue* value,
+                   JSValue*,
                    int attr = None);
 
  private:
-  static JSValue* selectedIndexGetter(ExecState* exec,
+  static JSValue* selectedIndexGetter(ExecState*,
                                       JSObject*,
                                       const Identifier&,
-                                      const PropertySlot& slot);
+                                      const PropertySlot&);
 
   RefPtr<WebCore::HTMLSelectElement> m_element;
 };
@@ -482,19 +444,19 @@ class HTMLAllCollection : public JSHTMLCollection {
 
 class ImageConstructorImp : public DOMObject {
  public:
-  ImageConstructorImp(ExecState* exec, WebCore::Document* d);
+  ImageConstructorImp(ExecState*, WebCore::Document*);
   virtual bool implementsConstruct() const;
-  virtual JSObject* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState*, const List& args);
 
  private:
   RefPtr<WebCore::Document> m_doc;
 };
 
-JSValue* getHTMLCollection(ExecState* exec, WebCore::HTMLCollection* c);
-JSValue* getSelectHTMLCollection(ExecState* exec,
-                                 WebCore::HTMLCollection* c,
-                                 WebCore::HTMLSelectElement* e);
-JSValue* getAllHTMLCollection(ExecState* exec, WebCore::HTMLCollection* c);
+JSValue* getHTMLCollection(ExecState*, WebCore::HTMLCollection*);
+JSValue* getSelectHTMLCollection(ExecState*,
+                                 WebCore::HTMLCollection*,
+                                 WebCore::HTMLSelectElement*);
+JSValue* getAllHTMLCollection(ExecState*, WebCore::HTMLCollection*);
 
 }  // namespace
 
