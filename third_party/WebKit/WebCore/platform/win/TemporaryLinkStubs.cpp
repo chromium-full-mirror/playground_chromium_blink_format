@@ -556,14 +556,6 @@ void WebCore::findWordBoundary(UChar const* str,
   *end = position;
 }
 
-void WebCore::setCookies(KURL const&, KURL const&, String const&) {}
-String WebCore::cookies(KURL const&) {
-  return String();
-}
-bool WebCore::cookiesEnabled() {
-  return false;
-}
-
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   return 0;
 }
