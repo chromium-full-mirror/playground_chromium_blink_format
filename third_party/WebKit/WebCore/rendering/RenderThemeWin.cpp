@@ -233,6 +233,43 @@ void RenderThemeWin::adjustButtonStyle(CSSStyleSelector* selector,
   addIntrinsicMargins(style);
 }
 
+static HDC prepareForDrawing(GraphicsContext* g) {
+  cairo_surface_t* surface = cairo_get_target(g->platformContext());
+  HDC hdc = cairo_win32_surface_get_dc(surface);
+  SaveDC(hdc);
+
+  // FIXME: We need to make sure a clip is really set on the HDC.  See what
+  // Mozilla does with
+  // UpdateSurfaceClip on its GraphicsContext. (Cairo may not have put its clip
+  // into native form yet.)
+
+  // Call SetWorldTransform to honor the current Cairo transform.
+  SetGraphicsMode(
+      hdc,
+      GM_ADVANCED);  // We need this call for themes to honor world transforms.
+  cairo_matrix_t mat;
+  cairo_get_matrix(g->platformContext(), &mat);
+  XFORM xform;
+  xform.eM11 = mat.xx;
+  xform.eM12 = mat.xy;
+  xform.eM21 = mat.yx;
+  xform.eM22 = mat.yy;
+  xform.eDx = mat.x0;
+  xform.eDy = mat.y0;
+  SetWorldTransform(hdc, &xform);
+
+  return hdc;
+}
+
+static void doneDrawing(GraphicsContext* g) {
+  cairo_surface_t* surface = cairo_get_target(g->platformContext());
+  HDC hdc = cairo_win32_surface_get_dc(surface);
+  RestoreDC(hdc, -1);
+
+  // We call this whenever we do drawing outside of cairo.
+  cairo_surface_mark_dirty(surface);
+}
+
 bool RenderThemeWin::paintButton(RenderObject* o,
                                  const RenderObject::PaintInfo& i,
                                  const IntRect& r) {
@@ -253,31 +290,11 @@ bool RenderThemeWin::paintButton(RenderObject* o,
   ThemeData themeData = getThemeData(o);
 
   // Now paint the button.
-  cairo_surface_t* surface = cairo_get_target(i.p->platformContext());
-  HDC hdc = cairo_win32_surface_get_dc(surface);
-  SaveDC(hdc);
-
-  // FIXME: We need to make sure a clip is really set on the HDC.  See what
-  // Mozilla does with
-  // UpdateSurfaceClip on its GraphicsContext. (Cairo may not have put its clip
-  // into native form yet.)
-
-  // FIXME: We need to call SetWorldTransform to honor the current Cairo
-  // transform.
-  SetGraphicsMode(hdc, GM_ADVANCED);  // We will need this call for themes to
-                                      // honor world transforms.
-
-  // FIXME: We need to remove viewportOrg offsets if we start honoring the Cairo
-  // transform, since it contains
-  // the scroll transform as well.
-
+  HDC hdc = prepareForDrawing(i.p);
   RECT widgetRect = r;
   drawThemeBG(m_buttonTheme, hdc, themeData.m_part, themeData.m_state,
               &widgetRect, NULL);
-
-  RestoreDC(hdc, -1);
-
-  cairo_surface_mark_dirty(surface);
+  doneDrawing(i.p);
 
   return false;
 }
@@ -331,31 +348,11 @@ bool RenderThemeWin::paintTextField(RenderObject* o,
   ThemeData themeData = getThemeData(o);
 
   // Now paint the text field.
-  cairo_surface_t* surface = cairo_get_target(i.p->platformContext());
-  HDC hdc = cairo_win32_surface_get_dc(surface);
-  SaveDC(hdc);
-
-  // FIXME: We need to make sure a clip is really set on the HDC.  See what
-  // Mozilla does with
-  // UpdateSurfaceClip on its GraphicsContext. (Cairo may not have put its clip
-  // into native form yet.)
-
-  // FIXME: We need to call SetWorldTransform to honor the current Cairo
-  // transform.
-  SetGraphicsMode(hdc, GM_ADVANCED);  // We will need this call for themes to
-                                      // honor world transforms.
-
-  // FIXME: We need to remove viewportOrg offsets if we start honoring the Cairo
-  // transform, since it contains
-  // the scroll transform as well.
-
+  HDC hdc = prepareForDrawing(i.p);
   RECT widgetRect = r;
   drawThemeBG(m_textFieldTheme, hdc, themeData.m_part, themeData.m_state,
               &widgetRect, NULL);
-
-  RestoreDC(hdc, -1);
-
-  cairo_surface_mark_dirty(surface);
+  doneDrawing(i.p);
 
   return false;
 }
