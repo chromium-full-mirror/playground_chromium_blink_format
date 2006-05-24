@@ -28,8 +28,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import <WebKit/WebViewPrivate.h>
-
 @class NSError;
 @class NSURLAuthenticationChallenge;
 @class NSURLConnection;
@@ -39,7 +37,6 @@
 @class NSURLResponse;
 @class WebDataSource;
 @class WebResource;
-@class WebView;
 
 @interface WebLoader : NSObject {
  @protected
@@ -48,7 +45,6 @@
   NSURLRequest* request;
   BOOL reachedTerminalState;
   BOOL loadingMultipartContent;
-  BOOL supportsMultipartContent;
   BOOL signalledFinish;
  @private
   NSURLResponse* response;
@@ -66,7 +62,6 @@
   BOOL isInitializingConnection;
 #endif
 }
-- (void)setSupportsMultipartContent:(BOOL)flag;
 - (void)signalFinish;
 
 - (BOOL)loadWithRequest:(NSURLRequest*)request;

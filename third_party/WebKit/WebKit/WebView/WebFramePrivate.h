@@ -101,9 +101,6 @@ extern NSString* WebPageCacheDocumentViewKey;
 - (void)_setLoadType:(WebFrameLoadType)loadType;
 - (WebFrameLoadType)_loadType;
 
-- (void)_addExtraFieldsToRequest:(NSMutableURLRequest*)request
-               alwaysFromRequest:(BOOL)f;
-
 - (void)_checkNewWindowPolicyForRequest:(NSURLRequest*)request
                                  action:(NSDictionary*)action
                               frameName:(NSString*)frameName
