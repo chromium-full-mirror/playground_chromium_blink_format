@@ -81,6 +81,10 @@ class FontData : Noncopyable {
   NSFont* getNSFont() const { return m_font.font; }
 #endif
 
+#if PLATFORM(WIN)
+  void setIsMLangFont() { m_isMLangFont = true; }
+#endif
+
  private:
   void platformInit();
   void platformDestroy();
@@ -109,6 +113,10 @@ class FontData : Noncopyable {
   mutable ATSUStyle m_ATSUStyle;
   mutable bool m_ATSUStyleInitialized;
   mutable bool m_ATSUMirrors;
+#endif
+
+#if PLATFORM(WIN)
+  bool m_isMLangFont;
 #endif
 };
 }

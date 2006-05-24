@@ -31,6 +31,10 @@
 
 #include <unicode/umachine.h>
 
+#if PLATFORM(WIN)
+#include <mlang.h>
+#endif
+
 namespace WebCore {
 
 class AtomicString;
@@ -50,6 +54,10 @@ class FontCache {
 
   // Also implemented by the platform.
   static void platformInit();
+
+#if PLATFORM(WIN)
+  static IMLangFontLink2* getFontLinkInterface();
+#endif
 
  private:
   static FontPlatformData* getCachedFontPlatformData(
