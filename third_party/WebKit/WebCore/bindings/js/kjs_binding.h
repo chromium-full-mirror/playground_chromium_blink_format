@@ -98,7 +98,7 @@ class ScriptInterpreter : public Interpreter {
    */
   bool wasRunByUserGesture() const;
 
-  virtual void mark();
+  virtual void mark(bool currentThreadIsMainThread);
   virtual ExecState* globalExec();
 
   WebCore::Event* getCurrentEvent() const { return m_evt; }

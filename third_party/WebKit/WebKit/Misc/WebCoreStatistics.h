@@ -42,6 +42,7 @@
 + (size_t)javaScriptProtectedObjectsCount;
 + (NSCountedSet*)javaScriptRootObjectTypeCounts;
 + (void)garbageCollectJavaScriptObjects;
++ (void)garbageCollectJavaScriptObjectsOnAlternateThread:(BOOL)waitUntilDone;
 
 // deprecated
 + (size_t)javaScriptNoGCAllowedObjectsCount;

@@ -356,7 +356,7 @@ class Interpreter {
    * Default implementation does nothing, this exist for classes that
    * reimplement Interpreter.
    */
-  virtual void mark() {}
+  virtual void mark(bool currentThreadIsMainThread);
 
   /**
    * Provides a way to distinguish derived classes.
