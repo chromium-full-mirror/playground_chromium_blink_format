@@ -216,6 +216,7 @@ class Document : public ContainerNode {
   PassRefPtr<HTMLCollection> anchors();
   PassRefPtr<HTMLCollection> all();
   PassRefPtr<HTMLCollection> objects();
+  PassRefPtr<HTMLCollection> scripts();
   PassRefPtr<HTMLCollection> windowNamedItems(const String& name);
   PassRefPtr<HTMLCollection> documentNamedItems(const String& name);
 
