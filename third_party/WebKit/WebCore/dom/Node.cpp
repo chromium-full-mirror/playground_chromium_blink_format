@@ -1285,7 +1285,7 @@ String Node::lookupNamespacePrefix(const String& _namespaceURI,
   return String();
 }
 
-String Node::textContent() const {
+String Node::textContent(bool convertBRsToNewlines) const {
   switch (nodeType()) {
     case TEXT_NODE:
     case CDATA_SECTION_NODE:
@@ -1294,6 +1294,8 @@ String Node::textContent() const {
       return nodeValue();
 
     case ELEMENT_NODE:
+      if (hasTagName(brTag) && convertBRsToNewlines)
+        return "\n";
     case ATTRIBUTE_NODE:
     case ENTITY_NODE:
     case ENTITY_REFERENCE_NODE:
@@ -1305,7 +1307,7 @@ String Node::textContent() const {
             child->nodeType() == PROCESSING_INSTRUCTION_NODE)
           continue;
 
-        s += child->textContent();
+        s += child->textContent(convertBRsToNewlines);
       }
 
       return s;

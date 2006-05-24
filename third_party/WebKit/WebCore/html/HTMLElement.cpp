@@ -215,6 +215,9 @@ String HTMLElement::outerHTML() const {
 }
 
 String HTMLElement::innerText() const {
+  if (!renderer())
+    return textContent(true);
+
   // We need to update layout, since plainText uses line boxes in the render
   // tree.
   document()->updateLayoutIgnorePendingStylesheets();

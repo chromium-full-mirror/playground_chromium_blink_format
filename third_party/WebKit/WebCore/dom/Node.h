@@ -130,7 +130,7 @@ class Node : public TreeShared<Node> {
   String lookupNamespacePrefix(const String& namespaceURI,
                                const Element* originalElement) const;
 
-  String textContent() const;
+  String textContent(bool convertBRsToNewlines = false) const;
   void setTextContent(const String&, ExceptionCode&);
 
   Node* lastDescendant() const;
