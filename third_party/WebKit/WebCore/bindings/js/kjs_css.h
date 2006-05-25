@@ -193,29 +193,6 @@ class DOMCSSStyleSheet : public DOMStyleSheet {
   };
 };
 
-class DOMCSSRuleList : public DOMObject {
- public:
-  DOMCSSRuleList(ExecState*, WebCore::CSSRuleList*);
-  virtual ~DOMCSSRuleList();
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
-  // no put - all read-only
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-  enum { Item, Length };
-  WebCore::CSSRuleList* impl() const { return m_impl.get(); }
-
- private:
-  static JSValue* indexGetter(ExecState*,
-                              JSObject*,
-                              const Identifier&,
-                              const PropertySlot&);
-
-  RefPtr<WebCore::CSSRuleList> m_impl;
-};
-
-JSValue* toJS(ExecState*, WebCore::CSSRuleList*);
-
 class DOMCSSRule : public DOMObject {
  public:
   DOMCSSRule(ExecState*, WebCore::CSSRule*);
@@ -284,23 +261,6 @@ class DOMCSSValue : public DOMObject {
 KJS_DEFINE_PROTOTYPE(DOMCSSValueProto)
 
 JSValue* toJS(ExecState*, WebCore::CSSValue*);
-
-class DOMCSSValueList : public DOMCSSValue {
- public:
-  DOMCSSValueList(ExecState*, WebCore::CSSValueList*);
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState*, int token) const;
-  // no put - all read-only
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-  enum { Length, Item };
-
- private:
-  static JSValue* indexGetter(ExecState*,
-                              JSObject*,
-                              const Identifier&,
-                              const PropertySlot&);
-};
 
 class DOMRGBColor : public DOMObject {
  public:

@@ -157,9 +157,8 @@ void HTMLTableRowElement::deleteCell(int index, ExceptionCode& ec) {
     ec = INDEX_SIZE_ERR;
 }
 
-RefPtr<HTMLCollection> HTMLTableRowElement::cells() {
-  return RefPtr<HTMLCollection>(
-      new HTMLCollection(this, HTMLCollection::TR_CELLS));
+PassRefPtr<HTMLCollection> HTMLTableRowElement::cells() {
+  return new HTMLCollection(this, HTMLCollection::TR_CELLS);
 }
 
 void HTMLTableRowElement::setCells(HTMLCollection*, ExceptionCode& ec) {

@@ -470,8 +470,6 @@ const ClassInfo JSHTMLElement::col_info = {
     "HTMLTableColElement", &JSHTMLElement::info, &HTMLTableColElementTable, 0};
 const ClassInfo JSHTMLElement::embed_info = {
     "HTMLEmbedElement", &JSHTMLElement::info, &HTMLEmbedElementTable, 0};
-const ClassInfo JSHTMLElement::form_info = {
-    "HTMLFormElement", &JSHTMLElement::info, &HTMLFormElementTable, 0};
 const ClassInfo JSHTMLElement::frameSet_info = {
     "HTMLFrameSetElement", &JSHTMLElement::info, &HTMLFrameSetElementTable, 0};
 const ClassInfo JSHTMLElement::frame_info = {
@@ -504,7 +502,6 @@ const ClassInfo* JSHTMLElement::classInfo() const {
     classInfoMap.set(colTag.localName().impl(), &col_info);
     classInfoMap.set(colgroupTag.localName().impl(), &col_info);
     classInfoMap.set(embedTag.localName().impl(), &embed_info);
-    classInfoMap.set(formTag.localName().impl(), &form_info);
     classInfoMap.set(frameTag.localName().impl(), &frame_info);
     classInfoMap.set(framesetTag.localName().impl(), &frameSet_info);
     classInfoMap.set(iframeTag.localName().impl(), &iFrame_info);
@@ -527,8 +524,6 @@ const ClassInfo* JSHTMLElement::classInfo() const {
   return &info;
 }
 
-const JSHTMLElement::Accessors JSHTMLElement::form_accessors = {
-    &JSHTMLElement::formGetter, &JSHTMLElement::formSetter};
 const JSHTMLElement::Accessors JSHTMLElement::select_accessors = {
     &JSHTMLElement::selectGetter, &JSHTMLElement::selectSetter};
 const JSHTMLElement::Accessors JSHTMLElement::object_accessors = {
@@ -563,7 +558,6 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
     accessorMap.add(colTag.localName().impl(), &col_accessors);
     accessorMap.add(colgroupTag.localName().impl(), &col_accessors);
     accessorMap.add(embedTag.localName().impl(), &embed_accessors);
-    accessorMap.add(formTag.localName().impl(), &form_accessors);
     accessorMap.add(frameTag.localName().impl(), &frame_accessors);
     accessorMap.add(framesetTag.localName().impl(), &frameSet_accessors);
     accessorMap.add(iframeTag.localName().impl(), &iFrame_accessors);
@@ -604,19 +598,6 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
   contentEditable   KJS::JSHTMLElement::ElementContentEditable  DontDelete
   isContentEditable KJS::JSHTMLElement::ElementIsContentEditable
 DontDelete|ReadOnly
-@end
-@begin HTMLFormElementTable 11
-# Also supported, by name/index
-  elements      KJS::JSHTMLElement::FormElements  DontDelete|ReadOnly
-  length        KJS::JSHTMLElement::FormLength    DontDelete|ReadOnly
-  name          KJS::JSHTMLElement::FormName      DontDelete
-  acceptCharset KJS::JSHTMLElement::FormAcceptCharset     DontDelete
-  action        KJS::JSHTMLElement::FormAction    DontDelete
-  enctype       KJS::JSHTMLElement::FormEncType   DontDelete
-  method        KJS::JSHTMLElement::FormMethod    DontDelete
-  target        KJS::JSHTMLElement::FormTarget    DontDelete
-  submit        KJS::JSHTMLElement::FormSubmit    DontDelete|Function 0
-  reset         KJS::JSHTMLElement::FormReset     DontDelete|Function 0
 @end
 @begin HTMLSelectElementTable 11
 # Also supported, by index
@@ -796,27 +777,6 @@ JSHTMLElement::JSHTMLElement(ExecState* exec, HTMLElement* e)
   setPrototype(JSHTMLElementProto::self(exec));
 }
 
-JSValue* JSHTMLElement::formIndexGetter(ExecState* exec,
-                                        JSObject* originalObject,
-                                        const Identifier& propertyName,
-                                        const PropertySlot& slot) {
-  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
-  HTMLFormElement* form = static_cast<HTMLFormElement*>(thisObj->impl());
-
-  return toJS(exec, form->elements()->item(slot.index()));
-}
-
-JSValue* JSHTMLElement::formNameGetter(ExecState* exec,
-                                       JSObject* originalObject,
-                                       const Identifier& propertyName,
-                                       const PropertySlot& slot) {
-  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
-  HTMLFormElement* form = static_cast<HTMLFormElement*>(thisObj->impl());
-
-  return JSHTMLCollection(exec, form->elements().get())
-      .getNamedItems(exec, propertyName);
-}
-
 JSValue* JSHTMLElement::selectIndexGetter(ExecState* exec,
                                           JSObject* originalObject,
                                           const Identifier& propertyName,
@@ -871,25 +831,7 @@ bool JSHTMLElement::getOwnPropertySlot(ExecState* exec,
   HTMLElement& element = *static_cast<HTMLElement*>(impl());
 
   // First look at dynamic properties
-  if (element.hasLocalName(formTag)) {
-    HTMLFormElement& form = static_cast<HTMLFormElement&>(element);
-    // Check if we're retrieving an element (by index or by name)
-    bool ok;
-    unsigned u = propertyName.toUInt32(&ok);
-    if (ok) {
-      slot.setCustomIndex(this, u, formIndexGetter);
-      return true;
-    }
-
-    // FIXME: need faster way to check for a named item and/or a way to pass on
-    // the named items subcollection
-    JSValue* namedItems = JSHTMLCollection(exec, form.elements().get())
-                              .getNamedItems(exec, propertyName);
-    if (!namedItems->isUndefined()) {
-      slot.setCustom(this, formNameGetter);
-      return true;
-    }
-  } else if (element.hasLocalName(selectTag)) {
+  if (element.hasLocalName(selectTag)) {
     bool ok;
     unsigned u = propertyName.toUInt32(&ok);
     if (ok) {
@@ -959,29 +901,6 @@ JSValue* JSHTMLElement::callAsFunction(ExecState* exec,
       element->hasTagName(appletTag)) {
     if (JSValue* runtimeObject = getRuntimeObject(exec, element))
       return static_cast<JSObject*>(runtimeObject)->call(exec, thisObj, args);
-  }
-  return jsUndefined();
-}
-
-JSValue* JSHTMLElement::formGetter(ExecState* exec, int token) const {
-  HTMLFormElement& form = *static_cast<HTMLFormElement*>(impl());
-  switch (token) {
-    case FormElements:
-      return getHTMLCollection(exec, form.elements().get());
-    case FormLength:
-      return jsNumber(form.length());
-    case FormName:
-      return jsString(form.name());
-    case FormAcceptCharset:
-      return jsString(form.acceptCharset());
-    case FormAction:
-      return jsString(form.action());
-    case FormEncType:
-      return jsString(form.enctype());
-    case FormMethod:
-      return jsString(form.method());
-    case FormTarget:
-      return jsString(form.target());
   }
   return jsUndefined();
 }
@@ -1470,16 +1389,7 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
   HTMLElement& element =
       *static_cast<HTMLElement*>(static_cast<JSHTMLElement*>(thisObj)->impl());
 
-  if (element.hasLocalName(formTag)) {
-    HTMLFormElement& form = static_cast<HTMLFormElement&>(element);
-    if (id == JSHTMLElement::FormSubmit) {
-      form.submit();
-      return jsUndefined();
-    } else if (id == JSHTMLElement::FormReset) {
-      form.reset();
-      return jsUndefined();
-    }
-  } else if (element.hasLocalName(selectTag)) {
+  if (element.hasLocalName(selectTag)) {
     HTMLSelectElement& select = static_cast<HTMLSelectElement&>(element);
     if (id == JSHTMLElement::SelectAdd) {
       select.add(toHTMLElement(args[0]), toHTMLElement(args[1]), exception);
@@ -1594,41 +1504,6 @@ void JSHTMLElement::put(ExecState* exec,
 
   lookupPut<JSHTMLElement, JSElement>(exec, propertyName, value, attr,
                                       &HTMLElementTable, this);
-}
-
-void JSHTMLElement::formSetter(ExecState* exec,
-                               int token,
-                               JSValue* value,
-                               const WebCore::String& str) {
-  HTMLFormElement& form = *static_cast<HTMLFormElement*>(impl());
-  switch (token) {
-    // read-only: elements
-    // read-only: length
-    case FormName: {
-      form.setName(str);
-      return;
-    }
-    case FormAcceptCharset: {
-      form.setAcceptCharset(str);
-      return;
-    }
-    case FormAction: {
-      form.setAction(str);
-      return;
-    }
-    case FormEncType: {
-      form.setEnctype(str);
-      return;
-    }
-    case FormMethod: {
-      form.setMethod(str);
-      return;
-    }
-    case FormTarget: {
-      form.setTarget(str);
-      return;
-    }
-  }
 }
 
 void JSHTMLElement::selectSetter(ExecState* exec,

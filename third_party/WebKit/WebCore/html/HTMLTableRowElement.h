@@ -51,7 +51,7 @@ class HTMLTableRowElement : public HTMLTablePartElement {
 
   void setSectionRowIndex(int);
 
-  RefPtr<HTMLCollection> cells();
+  PassRefPtr<HTMLCollection> cells();
   void setCells(HTMLCollection*, ExceptionCode&);
 
   String align() const;

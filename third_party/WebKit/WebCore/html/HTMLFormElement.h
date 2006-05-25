@@ -41,7 +41,7 @@ class HTMLFormCollection;
 
 class HTMLFormElement : public HTMLElement {
  public:
-  HTMLFormElement(Document* doc);
+  HTMLFormElement(Document*);
   virtual ~HTMLFormElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -51,8 +51,9 @@ class HTMLFormElement : public HTMLElement {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  RefPtr<HTMLCollection> elements();
-  int length() const;
+  PassRefPtr<HTMLCollection> elements();
+  unsigned length() const;
+  Node* item(unsigned index);
 
   String enctype() const { return m_enctype; }
   void setEnctype(const String&);
@@ -98,8 +99,6 @@ class HTMLFormElement : public HTMLElement {
 
   String target() const;
   void setTarget(const String&);
-
-  static void i18nData();
 
   friend class HTMLFormCollection;
 

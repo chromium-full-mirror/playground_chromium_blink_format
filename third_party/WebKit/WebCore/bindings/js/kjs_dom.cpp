@@ -754,7 +754,7 @@ JSValue* DOMNodeList::nameGetter(ExecState* exec,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
-  return toJS(exec, thisObj->m_impl->itemById(propertyName));
+  return toJS(exec, thisObj->m_impl->itemWithName(propertyName));
 }
 
 bool DOMNodeList::getOwnPropertySlot(ExecState* exec,
@@ -770,15 +770,13 @@ bool DOMNodeList::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  NodeList& list = *m_impl;
-
   // array index ?
   bool ok;
   unsigned idx = propertyName.toUInt32(&ok);
-  if (ok && idx < list.length()) {
+  if (ok && idx < m_impl->length()) {
     slot.setCustomIndex(this, idx, indexGetter);
     return true;
-  } else if (list.itemById(String(propertyName).impl())) {
+  } else if (m_impl->itemWithName(String(propertyName).impl())) {
     slot.setCustom(this, nameGetter);
     return true;
   }
