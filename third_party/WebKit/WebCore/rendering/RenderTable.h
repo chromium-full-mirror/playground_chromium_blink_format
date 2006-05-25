@@ -160,6 +160,11 @@ class RenderTable : public RenderBlock {
 
   virtual RenderObject* removeChildNode(RenderObject*);
 
+  RenderTableSection* sectionAbove(const RenderTableSection*,
+                                   bool skipEmptySections = false) const;
+  RenderTableSection* sectionBelow(const RenderTableSection*,
+                                   bool skipEmptySections = false) const;
+
   RenderTableCell* cellAbove(const RenderTableCell*) const;
   RenderTableCell* cellBelow(const RenderTableCell*) const;
   RenderTableCell* cellBefore(const RenderTableCell*) const;
