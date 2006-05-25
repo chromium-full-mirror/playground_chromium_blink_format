@@ -35,11 +35,6 @@ String SVGTitleElement::title() const {
   return textContent();
 }
 
-void SVGTitleElement::closeRenderer() {
-  SVGStyledElement::closeRenderer();
-  document()->setTitle(textContent(), this);
-}
-
 void SVGTitleElement::insertedIntoDocument() {
   SVGStyledElement::insertedIntoDocument();
   if (firstChild())

@@ -41,7 +41,7 @@ class SVGDOMImplementation : public DOMImplementation {
   SVGDOMImplementation();
   virtual ~SVGDOMImplementation();
 
-  static SVGDOMImplementation* self();
+  static SVGDOMImplementation* instance();
 
   // 'SVGDOMImplementation' functions
   bool hasFeature(StringImpl* feature, StringImpl* version) const;
@@ -69,10 +69,11 @@ class SVGDOMImplementation : public DOMImplementation {
   bool inAnimationContext() const;
   void setAnimationContext(bool value);
 
+  // Other methods (not part of DOM)
+  PassRefPtr<Document> createDocument(FrameView* = 0);
+
  private:
   bool m_animationContext : 1;
-
-  static SVGDOMImplementation* s_instance;
 };
 }
 
