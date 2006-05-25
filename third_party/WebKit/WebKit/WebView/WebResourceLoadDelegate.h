@@ -27,9 +27,9 @@
  */
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
-#define WebNSInt int
+#define WebNSInteger int
 #else
-#define WebNSInt NSInt
+#define WebNSInteger NSInteger
 #endif
 
 @class WebView;
@@ -167,7 +167,7 @@
 */
 - (void)webView:(WebView*)sender
                    resource:(id)identifier
-    didReceiveContentLength:(WebNSInt)length
+    didReceiveContentLength:(WebNSInteger)length
              fromDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -223,4 +223,4 @@
 
 @end
 
-#undef WebNSInt
+#undef WebNSInteger

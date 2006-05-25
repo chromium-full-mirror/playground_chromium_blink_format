@@ -30,9 +30,9 @@
 #import <Foundation/NSURLRequest.h>
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
-#define WebNSUInt unsigned int
+#define WebNSUInteger unsigned int
 #else
-#define WebNSUInt NSUInt
+#define WebNSUInteger NSUInteger
 #endif
 
 /*!
@@ -413,7 +413,7 @@ typedef enum {
 */
 - (void)webView:(WebView*)sender
     mouseDidMoveOverElement:(NSDictionary*)elementInformation
-              modifierFlags:(WebNSUInt)modifierFlags;
+              modifierFlags:(WebNSUInteger)modifierFlags;
 
 /*!
     @method webView:contextMenuItemsForElement:defaultMenuItems:
@@ -529,4 +529,4 @@ typedef enum {
 
 @end
 
-#undef WebNSUInt
+#undef WebNSUInteger
