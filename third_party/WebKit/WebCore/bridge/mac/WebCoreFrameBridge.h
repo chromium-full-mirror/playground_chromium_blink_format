@@ -484,7 +484,9 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (bool)canIncreaseSelectionListLevel;
 - (bool)canDecreaseSelectionListLevel;
-- (void)increaseSelectionListLevel;
+- (DOMNode*)increaseSelectionListLevel;
+- (DOMNode*)increaseSelectionListLevelOrdered;
+- (DOMNode*)increaseSelectionListLevelUnordered;
 - (void)decreaseSelectionListLevel;
 
 - (void)insertLineBreak;
