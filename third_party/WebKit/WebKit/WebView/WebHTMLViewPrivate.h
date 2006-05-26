@@ -102,7 +102,9 @@
 - (NSRect)_selectionDraggingRect;
 - (BOOL)_canIncreaseSelectionListLevel;
 - (BOOL)_canDecreaseSelectionListLevel;
-- (void)_increaseSelectionListLevel;
+- (DOMNode*)_increaseSelectionListLevel;
+- (DOMNode*)_increaseSelectionListLevelOrdered;
+- (DOMNode*)_increaseSelectionListLevelUnordered;
 - (void)_decreaseSelectionListLevel;
 
 // SPI for DumpRenderTree
