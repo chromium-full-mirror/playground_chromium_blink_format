@@ -114,6 +114,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   void setSize(int);
 
+  virtual Node* namedItem(const String& name, bool caseSensitive = true);
+
  private:
   void recalcListItems();
 

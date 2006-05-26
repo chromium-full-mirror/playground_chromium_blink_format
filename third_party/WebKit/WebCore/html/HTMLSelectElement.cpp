@@ -447,4 +447,8 @@ void HTMLSelectElement::setSize(int size) {
   setAttribute(sizeAttr, String::number(size));
 }
 
+Node* HTMLSelectElement::namedItem(const String& name, bool caseSensitive) {
+  return (options()->namedItem(name, caseSensitive));
+}
+
 }  // namespace

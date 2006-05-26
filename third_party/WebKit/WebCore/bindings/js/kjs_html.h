@@ -193,6 +193,7 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     SelectDisabled,
     SelectMultiple,
     SelectName,
+    SelectNamedItem,
     SelectSize,
     SelectFocus,
     ObjectHspace,

@@ -607,6 +607,7 @@ DontDelete|ReadOnly
   length        KJS::JSHTMLElement::SelectLength  DontDelete
   form          KJS::JSHTMLElement::SelectForm    DontDelete|ReadOnly
   options       KJS::JSHTMLElement::SelectOptions DontDelete|ReadOnly
+  namedItem     KJS::JSHTMLElement::SelectNamedItem       DontDelete|Function 1
   disabled      KJS::JSHTMLElement::SelectDisabled        DontDelete
   multiple      KJS::JSHTMLElement::SelectMultiple        DontDelete
   name          KJS::JSHTMLElement::SelectName    DontDelete
@@ -1403,6 +1404,8 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
     } else if (id == JSHTMLElement::SelectFocus) {
       select.focus();
       return jsUndefined();
+    } else if (id == JSHTMLElement::SelectNamedItem) {
+      return toJS(exec, select.namedItem(Identifier(args[0]->toString(exec))));
     }
   } else if (element.hasLocalName(tableTag)) {
     HTMLTableElement& table = static_cast<HTMLTableElement&>(element);
