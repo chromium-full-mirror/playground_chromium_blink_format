@@ -29,6 +29,7 @@
 #include "WebFrame.h"
 
 #include <commctrl.h>
+#include <objbase.h>
 
 #define MAX_LOADSTRING 100
 #define URLBAR_HEIGHT 24
@@ -99,6 +100,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
   if (!InitInstance(hInstance, nCmdShow))
     return FALSE;
 
+  // Init COM
+  CoInitialize(NULL);
+
   hURLBarWnd = CreateWindow(
       L"EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT | ES_AUTOVSCROLL,
       0, 0, 0, 0, hMainWnd, 0, hInstance, 0);
@@ -134,6 +138,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 #ifdef _CRTDBG_MAP_ALLOC
   _CrtDumpMemoryLeaks();
 #endif
+
+  // Shut down COM.
+  CoUninitialize();
 
   return (int)msg.wParam;
 }
