@@ -47,19 +47,15 @@ static const char* UnitText[] = {"",   "",   "%",  "em", "ex", "px",
 SVGLength::SVGLength(const SVGStyledElement* context,
                      LengthMode mode,
                      const SVGElement* viewport)
-    : Shared<SVGLength>() {
-  m_mode = mode;
-  m_context = context;
-  m_viewportElement = viewport;
-
-  m_value = 0;
-  m_valueInSpecifiedUnits = 0;
-
-  m_bboxRelative = false;
-  m_unitType = SVG_LENGTHTYPE_UNKNOWN;
-
-  m_requiresLayout = false;
-}
+    : Shared<SVGLength>(),
+      m_value(0),
+      m_valueInSpecifiedUnits(0),
+      m_mode(mode),
+      m_bboxRelative(false),
+      m_unitType(SVG_LENGTHTYPE_UNKNOWN),
+      m_requiresLayout(false),
+      m_context(context),
+      m_viewportElement(viewport) {}
 
 SVGLength::~SVGLength() {}
 

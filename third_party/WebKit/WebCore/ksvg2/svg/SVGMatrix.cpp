@@ -33,9 +33,7 @@ using namespace WebCore;
 
 SVGMatrix::SVGMatrix() : Shared<SVGMatrix>() {}
 
-SVGMatrix::SVGMatrix(QMatrix mat) : Shared<SVGMatrix>() {
-  m_mat = mat;
-}
+SVGMatrix::SVGMatrix(const QMatrix& mat) : Shared<SVGMatrix>(), m_mat(mat) {}
 
 SVGMatrix::SVGMatrix(double a, double b, double c, double d, double e, double f)
     : Shared<SVGMatrix>() {
@@ -232,7 +230,7 @@ SVGMatrix* SVGMatrix::skewY(double angle) {
   return this;
 }
 
-void SVGMatrix::setMatrix(QMatrix mat) {
+void SVGMatrix::setMatrix(const QMatrix& mat) {
   m_mat = mat;
 }
 
