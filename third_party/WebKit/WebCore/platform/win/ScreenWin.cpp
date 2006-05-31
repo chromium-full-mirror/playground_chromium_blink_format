@@ -23,9 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include "Screen.h"
 
 #include "IntRect.h"
+#include "FloatRect.h"
 #include "Widget.h"
 #include <windows.h>
 
@@ -48,7 +50,7 @@ static MONITORINFOEX monitorInfoForWidget(Widget* widget) {
   return info;
 }
 
-IntRect WebCore::screenRect(Widget* widget) {
+FloatRect WebCore::screenRect(Widget* widget) {
   return monitorInfoForWidget(widget).rcMonitor;
 }
 
@@ -60,7 +62,7 @@ int WebCore::screenDepth(Widget* widget) {
   return deviceInfo.dmBitsPerPel;
 }
 
-IntRect WebCore::usableScreenRect(Widget* widget) {
+FloatRect WebCore::usableScreenRect(Widget* widget) {
   return monitorInfoForWidget(widget).rcWork;
 }
 }
