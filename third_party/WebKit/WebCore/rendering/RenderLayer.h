@@ -53,7 +53,7 @@ class QScrollBar;
 namespace WebCore {
 
 class CachedObject;
-class RenderCanvas;
+class RenderView;
 class RenderFrameSet;
 class RenderObject;
 class RenderStyle;
@@ -294,7 +294,7 @@ class RenderLayer : WidgetClient {
   // that has a non-auto z-index.
   RenderLayer* stackingContext() const;
   bool isStackingContext() const {
-    return !hasAutoZIndex() || renderer()->isCanvas();
+    return !hasAutoZIndex() || renderer()->isRenderView();
   }
 
   void dirtyZOrderLists();

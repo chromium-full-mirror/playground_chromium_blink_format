@@ -31,7 +31,7 @@
 #include "InlineTextBox.h"
 #include "JSEditor.h"
 #include "RenderBR.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "RenderTableCell.h"
 #include "RenderWidget.h"
 #include "SelectionController.h"
@@ -443,7 +443,7 @@ DeprecatedString externalRepresentation(RenderObject* o) {
     ts.precision(2);
     writeRenderResources(ts, o->document());
 #endif
-    o->canvas()->view()->layout();
+    o->view()->view()->layout();
     RenderLayer* l = o->layer();
     if (l) {
       writeLayers(ts, l, l,

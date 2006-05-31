@@ -26,7 +26,7 @@
 
 #include "Attr.h"
 #include "Document.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "SVGAnimatedEnumeration.h"
 #include "SVGAnimatedNumber.h"
 #include "SVGAnimatedTransformList.h"
@@ -158,10 +158,10 @@ void SVGGradientElement::rebuildStops() const {
         stops.append(makeGradientStop(
             stopOffset,
             makeRGBA(c.red(), c.green(), c.blue(), int(opacity * 255.))));
-        stopStyle->deref(canvas()->renderArena());
+        stopStyle->deref(view()->renderArena());
       }
     }
-    gradientStyle->deref(canvas()->renderArena());
+    gradientStyle->deref(view()->renderArena());
     m_resource->setGradientStops(stops);
   }
 }

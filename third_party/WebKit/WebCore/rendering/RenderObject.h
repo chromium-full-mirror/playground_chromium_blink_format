@@ -68,7 +68,7 @@ class InlineBox;
 class InlineFlowBox;
 class Position;
 class RenderBlock;
-class RenderCanvas;
+class RenderView;
 class RenderFlow;
 class RenderFrameSet;
 class RenderLayer;
@@ -261,7 +261,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual bool isListItem() const { return false; }
   virtual bool isListMarker() const { return false; }
-  virtual bool isCanvas() const { return false; }
+  virtual bool isRenderView() const { return false; }
   bool isRoot() const;
   bool isBody() const;
   bool isHR() const;
@@ -350,7 +350,7 @@ class RenderObject : public CachedObjectClient {
 
   void updateDragState(bool dragOn);
 
-  RenderCanvas* canvas() const;
+  RenderView* view() const;
 
   // don't even think about making this method virtual!
   Node* element() const { return m_isAnonymous ? 0 : m_node; }
@@ -1102,7 +1102,7 @@ class RenderObject : public CachedObjectClient {
   // note: do not add unnecessary bitflags, we have 32 bit already!
   friend class RenderListItem;
   friend class RenderContainer;
-  friend class RenderCanvas;
+  friend class RenderView;
 };
 
 enum VerticalPositionHint {

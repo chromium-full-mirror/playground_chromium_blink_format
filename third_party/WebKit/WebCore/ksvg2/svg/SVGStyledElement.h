@@ -37,7 +37,7 @@ class KRenderingDevice;
 class KCanvasResource;
 class KCanvasRenderingStyle;
 class CSSStyleDeclaration;
-class RenderCanvas;
+class RenderView;
 class SVGStyledElement : public SVGElement {
  public:
   SVGStyledElement(const QualifiedName& tagName, Document* doc);
@@ -56,7 +56,7 @@ class SVGStyledElement : public SVGElement {
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  RenderCanvas* canvas() const;
+  RenderView* view() const;
   virtual void notifyAttributeChange() const;
   virtual void attributeChanged(Attribute* attr, bool preserveDecls = false);
 

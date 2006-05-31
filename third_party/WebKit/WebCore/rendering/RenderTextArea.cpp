@@ -34,7 +34,7 @@ namespace WebCore {
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElement* element)
     : RenderFormElement(element), m_dirty(false), m_updating(false) {
-  QTextEdit* edit = new QTextEdit(view());
+  QTextEdit* edit = new QTextEdit(m_view);
 
   if (element->wrap() != HTMLTextAreaElement::ta_NoWrap)
     edit->setWordWrap(QTextEdit::WidgetWidth);

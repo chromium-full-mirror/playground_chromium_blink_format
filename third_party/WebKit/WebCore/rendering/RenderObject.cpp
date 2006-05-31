@@ -40,7 +40,7 @@
 #include "KWQWMatrix.h"
 #include "Position.h"
 #include "RenderArena.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "RenderFlexibleBox.h"
 #include "RenderInline.h"
 #include "RenderListItem.h"
@@ -609,7 +609,7 @@ bool RenderObject::scroll(KWQScrollDirection direction,
     return true;
   }
   RenderBlock* b = containingBlock();
-  if (b != 0 && !b->isCanvas()) {
+  if (b != 0 && !b->isRenderView()) {
     return b->scroll(direction, granularity, multiplier);
   }
   return false;
@@ -677,17 +677,17 @@ void RenderObject::markContainingBlocksForLayout() {
 RenderBlock* RenderObject::containingBlock() const {
   if (isTableCell())
     return static_cast<const RenderTableCell*>(this)->table();
-  if (isCanvas())
+  if (isRenderView())
     return (RenderBlock*)this;
 
   RenderObject* o = parent();
   if (!isText() && m_style->position() == FixedPosition) {
-    while (o && !o->isCanvas())
+    while (o && !o->isRenderView())
       o = o->parent();
   } else if (!isText() && m_style->position() == AbsolutePosition) {
     while (o && (o->style()->position() == StaticPosition ||
                  (o->isInline() && !o->isReplaced())) &&
-           !o->isRoot() && !o->isCanvas()) {
+           !o->isRoot() && !o->isRenderView()) {
       // For relpositioned inlines, we return the nearest enclosing block.  We
       // don't try
       // to return the inline itself.  This allows us to avoid having a
@@ -1447,26 +1447,26 @@ void RenderObject::paintOutline(GraphicsContext* p,
 void RenderObject::paint(PaintInfo& i, int tx, int ty) {}
 
 void RenderObject::repaint(bool immediate) {
-  // Can't use canvas(), since we might be unrooted.
+  // Can't use view(), since we might be unrooted.
   RenderObject* o = this;
   while (o->parent())
     o = o->parent();
-  if (!o->isCanvas())
+  if (!o->isRenderView())
     return;
-  RenderCanvas* c = static_cast<RenderCanvas*>(o);
+  RenderView* c = static_cast<RenderView*>(o);
   if (c->printingMode())
     return;  // Don't repaint if we're printing.
   c->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
 }
 
 void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
-  // Can't use canvas(), since we might be unrooted.
+  // Can't use view(), since we might be unrooted.
   RenderObject* o = this;
   while (o->parent())
     o = o->parent();
-  if (!o->isCanvas())
+  if (!o->isRenderView())
     return;
-  RenderCanvas* c = static_cast<RenderCanvas*>(o);
+  RenderView* c = static_cast<RenderView*>(o);
   if (c->printingMode())
     return;  // Don't repaint if we're printing.
   IntRect absRect(r);
@@ -1476,7 +1476,7 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
 
 bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
                                               const IntRect& oldFullBounds) {
-  RenderCanvas* c = canvas();
+  RenderView* c = view();
   if (c->printingMode())
     return false;  // Don't repaint if we're printing.
 
@@ -1731,8 +1731,8 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
       // style for a text node,
       // we use our own judgement.
       if (uaOK &&
-          canvas()->view()->frame()->shouldDragAutoNode(curr->node(),
-                                                        IntPoint(x, y))) {
+          view()->frameView()->frame()->shouldDragAutoNode(curr->node(),
+                                                           IntPoint(x, y))) {
         dhtmlWillDrag = false;
         return curr->node();
       } else if (curr->shouldSelect()) {
@@ -1749,7 +1749,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
         dhtmlWillDrag = true;
         return curr->node();
       } else if (uaOK && dragMode == DRAG_AUTO &&
-                 canvas()->view()->frame()->shouldDragAutoNode(
+                 view()->frameView()->frame()->shouldDragAutoNode(
                      curr->node(), IntPoint(x, y))) {
         dhtmlWillDrag = false;
         return curr->node();
@@ -1761,7 +1761,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
 }
 
 void RenderObject::selectionStartEnd(int& spos, int& epos) {
-  canvas()->selectionStartEnd(spos, epos);
+  view()->selectionStartEnd(spos, epos);
 }
 
 RenderBlock* RenderObject::createAnonymousBlock() {
@@ -1846,7 +1846,7 @@ void RenderObject::setStyle(RenderStyle* style) {
     // substantially.
     if (d >= RenderStyle::Repaint && element() &&
         (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
-      canvas()->repaint();
+      view()->repaint();
     else if (m_parent && !isText()) {
       // Do a repaint with the old style first, e.g., for example if we go from
       // having an outline to not having an outline.
@@ -1971,7 +1971,7 @@ void RenderObject::updateBackgroundImages(RenderStyle* oldStyle) {
 }
 
 IntRect RenderObject::viewRect() const {
-  return canvas()->viewRect();
+  return view()->viewRect();
 }
 
 bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) {
@@ -2048,8 +2048,8 @@ int RenderObject::tabWidth() const {
   return containingBlock()->tabWidth(true);
 }
 
-RenderCanvas* RenderObject::canvas() const {
-  return static_cast<RenderCanvas*>(document()->renderer());
+RenderView* RenderObject::view() const {
+  return static_cast<RenderView*>(document()->renderer());
 }
 
 RenderObject* RenderObject::container() const {
@@ -2071,7 +2071,7 @@ RenderObject* RenderObject::container() const {
   RenderObject* o = 0;
   if (!isText() && pos == FixedPosition) {
     // container() can be called on an object that is not in the
-    // tree yet.  We don't call canvas() since it will assert if it
+    // tree yet.  We don't call view() since it will assert if it
     // can't get back to the canvas.  Instead we just walk as high up
     // as we can.  If we're in the tree, we'll get the root.  If we
     // aren't we'll get the root of our little subtree (most likely
@@ -2085,7 +2085,7 @@ RenderObject* RenderObject::container() const {
     // climb as high as we can though.
     o = parent();
     while (o && o->style()->position() == StaticPosition && !o->isRoot() &&
-           !o->isCanvas())
+           !o->isRenderView())
       o = o->parent();
   } else
     o = parent();
@@ -2108,7 +2108,7 @@ bool RenderObject::isSelectionBorder() const {
 void RenderObject::removeFromObjectLists() {
   if (isFloating()) {
     RenderBlock* outermostBlock = containingBlock();
-    for (RenderBlock* p = outermostBlock; p && !p->isCanvas();
+    for (RenderBlock* p = outermostBlock; p && !p->isRenderView();
          p = p->containingBlock()) {
       if (p->containsFloat(this))
         outermostBlock = p;
@@ -2383,9 +2383,9 @@ void RenderObject::recalcMinMaxWidths() {
 }
 
 void RenderObject::scheduleRelayout() {
-  if (!isCanvas())
+  if (!isRenderView())
     return;
-  FrameView* view = static_cast<RenderCanvas*>(this)->view();
+  FrameView* view = static_cast<RenderView*>(this)->frameView();
   if (view)
     view->scheduleRelayout();
 }
@@ -2602,10 +2602,10 @@ void RenderObject::imageChanged(CachedImage* image) {
   // would avoid putting this function and the CachedObjectClient base class
   // into RenderObject.
   if (image && image->canRender() && parent()) {
-    if (canvas() && element() &&
+    if (view() && element() &&
         (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
-      canvas()->repaint();  // repaint the entire canvas since the background
-                            // gets propagated up
+      view()->repaint();  // repaint the entire canvas since the background gets
+                          // propagated up
     else
       repaint();  // repaint object, which is a box or a container with boxes
                   // inside it
@@ -2627,8 +2627,7 @@ bool RenderObject::willRenderImage(CachedImage*) {
 int RenderObject::maximalOutlineSize(PaintPhase p) const {
   if (p != PaintPhaseOutline && p != PaintPhaseSelfOutline)
     return 0;
-  return static_cast<RenderCanvas*>(document()->renderer())
-      ->maximalOutlineSize();
+  return static_cast<RenderView*>(document()->renderer())->maximalOutlineSize();
 }
 
 int RenderObject::caretMinOffset() const {

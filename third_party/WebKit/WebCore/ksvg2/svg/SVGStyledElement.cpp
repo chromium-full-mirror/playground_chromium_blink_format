@@ -30,7 +30,7 @@
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "PlatformString.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "RenderPath.h"
 #include "SVGAnimatedString.h"
 #include "SVGDOMImplementation.h"
@@ -107,8 +107,8 @@ void SVGStyledElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   notifyAttributeChange();
 }
 
-RenderCanvas* SVGStyledElement::canvas() const {
-  return static_cast<RenderCanvas*>(document()->renderer());
+RenderView* SVGStyledElement::view() const {
+  return static_cast<RenderView*>(document()->renderer());
 }
 
 void SVGStyledElement::updateCanvasItem() {
@@ -133,7 +133,7 @@ void SVGStyledElement::updateCanvasItem() {
 
 const SVGStyledElement* SVGStyledElement::pushAttributeContext(
     const SVGStyledElement*) {
-  if (canvas())
+  if (view())
     static_cast<RenderPath*>(renderer())->setPath(toPathData());
 
   return 0;

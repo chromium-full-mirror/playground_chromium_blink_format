@@ -26,7 +26,7 @@
 
 #include "Attr.h"
 #include "Document.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "SVGAnimatedEnumeration.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
@@ -79,7 +79,7 @@ void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 KCanvasClipper* SVGClipPathElement::canvasResource() {
-  if (!canvas())
+  if (!view())
     return 0;
   if (!m_clipper)
     m_clipper = static_cast<KCanvasClipper*>(
@@ -100,10 +100,10 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
       if (KCanvasPath* pathData = styled->toPathData())
         m_clipper->addClipData(
             pathData, (KCWindRule)pathStyle->svgStyle()->clipRule(), bbox);
-      pathStyle->deref(canvas()->renderArena());
+      pathStyle->deref(view()->renderArena());
     }
   }
-  clipPathStyle->deref(canvas()->renderArena());
+  clipPathStyle->deref(view()->renderArena());
   return m_clipper;
 }
 

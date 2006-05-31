@@ -32,7 +32,7 @@
 #include "HTMLNames.h"
 #include "HTMLFrameSetElement.h"
 #include "dom2_eventsimpl.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "RenderFrame.h"
 #include "KWQTextStream.h"
 
@@ -98,9 +98,9 @@ void RenderFrameSet::layout() {
   KHTMLAssert(minMaxKnown());
 
   if (!parent()->isFrameSet()) {
-    FrameView* view = canvas()->view();
-    m_width = view->visibleWidth();
-    m_height = view->visibleHeight();
+    FrameView* v = view()->frameView();
+    m_width = v->visibleWidth();
+    m_height = v->visibleHeight();
   }
 
   int remainingLen[2];
@@ -485,7 +485,7 @@ bool RenderFrameSet::userResize(MouseEvent* evt) {
       m_hSplitPos = _y;
       m_oldpos = -1;
     } else
-      canvas()->view()->setCursor(pointerCursor());
+      view()->frameView()->setCursor(pointerCursor());
   }
 
   // ### check the resize is not going out of bounds.
@@ -507,7 +507,7 @@ bool RenderFrameSet::userResize(MouseEvent* evt) {
     // important, otherwise the moving indicator is not correctly erased
     setNeedsLayout(true);
   } else if (m_resizing || evt->type() == mouseupEvent) {
-    FrameView* v = canvas()->view();
+    FrameView* v = view()->frameView();
     v->disableFlushDrawing();
     GraphicsContext* context = v->lockDrawingFocus();
 
@@ -553,7 +553,7 @@ void RenderFrameSet::setResizing(bool e) {
   for (RenderObject* p = parent(); p; p = p->parent())
     if (p->isFrameSet())
       static_cast<RenderFrameSet*>(p)->m_clientResizing = m_resizing;
-  canvas()->view()->setResizingFrameSet(e ? element() : 0);
+  view()->frameView()->setResizingFrameSet(e ? element() : 0);
 }
 
 bool RenderFrameSet::canResize(int _x, int _y) {

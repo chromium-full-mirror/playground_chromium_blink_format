@@ -31,7 +31,7 @@
 #include "RenderTable.h"
 #include "RenderTextFragment.h"
 #include "RenderImage.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "Document.h"
 
 // For accessibility
@@ -179,7 +179,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
     // FIXME: The SelectionController should be responsible for this when it
     // is notified of DOM mutations.
     if (oldChild->isSelectionBorder())
-      canvas()->clearSelection();
+      view()->clearSelection();
 
     // renumber ordered lists
     if (oldChild->isListItem())

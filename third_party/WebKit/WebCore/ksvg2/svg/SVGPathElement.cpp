@@ -74,7 +74,7 @@ double SVGPathElement::getTotalLength() {
 SVGPoint* SVGPathElement::getPointAtLength(double /*distance*/) {
   SVGPoint* ret = SVGSVGElement::createSVGPoint();
   /*double totalDistance = getTotalLength();
-  T2P::BezierPath *path = ownerDoc()->canvas()->toBezierPath(m_item);
+  T2P::BezierPath *path = ownerDoc()->view()->toBezierPath(m_item);
   if(path)
   {
       T2P::Point p;

@@ -26,7 +26,7 @@
 
 #include "Document.h"
 #include "FrameView.h"
-#include "RenderCanvas.h"
+#include "RenderView.h"
 #include "SVGAnimatedLength.h"
 #include "SVGAnimatedRect.h"
 #include "SVGSVGElement.h"
@@ -59,10 +59,10 @@ float SVGHelper::PercentageOfViewport(float value,
       Document* doc = svg->document();
       if (doc->documentElement() == svg) {
         // We have to ask the canvas for the full "canvas size"...
-        RenderCanvas* canvas = static_cast<RenderCanvas*>(doc->renderer());
-        if (canvas) {
-          width = canvas->view()->visibleWidth();    // TODO: recheck!
-          height = canvas->view()->visibleHeight();  // TODO: recheck!
+        RenderView* view = static_cast<RenderView*>(doc->renderer());
+        if (view) {
+          width = view->frameView()->visibleWidth();    // TODO: recheck!
+          height = view->frameView()->visibleHeight();  // TODO: recheck!
         }
       }
     } else {
