@@ -821,6 +821,17 @@ class RenderObject : public CachedObjectClient {
                                bool quirksMode = false);
 
   enum BorderSide { BSTop, BSBottom, BSLeft, BSRight };
+  void drawBorderArc(GraphicsContext*,
+                     int x,
+                     int y,
+                     float thickness,
+                     IntSize radius,
+                     int angleStart,
+                     int angleSpan,
+                     BorderSide,
+                     Color,
+                     EBorderStyle,
+                     bool firstCorner);
   void drawBorder(GraphicsContext*,
                   int x1,
                   int y1,
