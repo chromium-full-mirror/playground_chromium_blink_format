@@ -1612,6 +1612,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         url = activePart->document()->completeURL(str.deprecatedString());
 
       ResourceRequest request;
+      request.setURL(url);
       request.frameName = frameName.deprecatedString();
       if (request.frameName == "_top") {
         while (frame->tree()->parent())
