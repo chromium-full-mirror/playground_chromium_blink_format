@@ -674,8 +674,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
            isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
 - (void)reportClientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 
-- (void)focusWindow;
-- (void)unfocusWindow;
+- (void)activateWindow;
+- (void)deactivateWindow;
 
 - (void)formControlIsBecomingFirstResponder:(NSView*)formControl;
 - (void)formControlIsResigningFirstResponder:(NSView*)formControl;

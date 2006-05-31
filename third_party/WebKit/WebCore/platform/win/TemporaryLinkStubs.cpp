@@ -375,6 +375,9 @@ DeprecatedArray<char> KWQServeSynchronousRequest(Loader*,
   return 0;
 }
 
+void FrameWin::focusWindow() {
+  notImplemented();
+}
 void FrameWin::unfocusWindow() {
   notImplemented();
 }

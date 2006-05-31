@@ -71,8 +71,6 @@ class Widget {
   virtual void setEnabled(bool);
   virtual bool isEnabled() const;
 
-  void setActiveWindow();
-
   int x() const;
   int y() const;
   int width() const;

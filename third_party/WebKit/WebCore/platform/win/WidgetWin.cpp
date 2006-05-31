@@ -64,10 +64,6 @@ void Widget::setWindowHandle(HWND hWnd) {
   data->windowHandle = hWnd;
 }
 
-void Widget::setActiveWindow() {
-  BringWindowToTop(data->windowHandle);
-}
-
 void Widget::setClient(WidgetClient* c) {
   data->client = c;
 }
