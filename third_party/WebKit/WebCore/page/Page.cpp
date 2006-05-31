@@ -24,6 +24,7 @@
 #include "Frame.h"
 #include "FrameTree.h"
 #include "StringHash.h"
+#include "Widget.h"
 #include <kjs/collector.h>
 #include <kjs/JSLock.h>
 #include <wtf/HashMap.h>
@@ -46,6 +47,7 @@ void Page::init() {
 
 Page::~Page() {
   m_mainFrame->setView(0);
+  delete m_widget;
   setGroupName(String());
   allPages->remove(this);
   if (allPages->isEmpty()) {
