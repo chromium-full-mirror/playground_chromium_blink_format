@@ -36,10 +36,15 @@ class DocumentPtr;
 
 class SVGElement : public StyledElement {
  public:
-  SVGElement(const QualifiedName& tagName, Document* doc);
+  SVGElement(const QualifiedName&, Document*);
   virtual ~SVGElement();
   virtual bool isSVGElement() const { return true; }
   virtual bool isSupported(StringImpl* feature, StringImpl* version) const;
+
+  String id() const;
+  void setId(const String&);
+  String xmlbase() const;
+  void setXmlbase(const String&);
 
   SVGSVGElement* ownerSVGElement() const;
   SVGElement* viewportElement() const;
@@ -56,7 +61,7 @@ class SVGElement : public StyledElement {
       AtomicString defaultValue = AtomicString()) const;
 
   // Internal
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   // To be implemented by any element which can establish new viewports...
   virtual DeprecatedString adjustViewportClipping() const {

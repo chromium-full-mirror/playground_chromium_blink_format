@@ -48,7 +48,7 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                           public SVGFitToViewBox,
                           public KCanvasResourceListener {
  public:
-  SVGPatternElement(const QualifiedName& tagName, Document* doc);
+  SVGPatternElement(const QualifiedName&, Document*);
   virtual ~SVGPatternElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

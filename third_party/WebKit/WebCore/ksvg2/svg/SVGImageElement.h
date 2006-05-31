@@ -42,7 +42,7 @@ class SVGImageElement : public SVGStyledTransformableElement,
                         public SVGExternalResourcesRequired,
                         public SVGURIReference {
  public:
-  SVGImageElement(const QualifiedName& tagName, Document* doc);
+  SVGImageElement(const QualifiedName&, Document*);
   virtual ~SVGImageElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

@@ -37,24 +37,23 @@
 #include "KSVGTimeScheduler.h"
 #include "Document.h"
 #include "SVGDocumentExtensions.h"
+#include "SVGSVGElement.h"
 
 #include <math.h>
 
-using namespace WebCore;
 using namespace std;
+
+namespace WebCore {
 
 SVGAnimateTransformElement::SVGAnimateTransformElement(
     const QualifiedName& tagName,
     Document* doc)
-    : SVGAnimationElement(tagName, doc) {
-  m_type = SVG_TRANSFORM_UNKNOWN;
-
-  m_currentItem = -1;
-
-  m_rotateSpecialCase = false;
-  m_toRotateSpecialCase = false;
-  m_fromRotateSpecialCase = false;
-}
+    : SVGAnimationElement(tagName, doc),
+      m_currentItem(-1),
+      m_type(SVG_TRANSFORM_UNKNOWN),
+      m_rotateSpecialCase(false),
+      m_toRotateSpecialCase(false),
+      m_fromRotateSpecialCase(false) {}
 
 SVGAnimateTransformElement::~SVGAnimateTransformElement() {}
 
@@ -71,9 +70,8 @@ void SVGAnimateTransformElement::parseMappedAttribute(MappedAttribute* attr) {
       m_type = SVG_TRANSFORM_SKEWX;
     else if (value == "skewY")
       m_type = SVG_TRANSFORM_SKEWY;
-  } else {
+  } else
     SVGAnimationElement::parseMappedAttribute(attr);
-  }
 }
 
 void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
@@ -157,8 +155,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       }
     }
 
-    document()->accessSVGExtensions()->timeScheduler()->connectIntervalTimer(
-        this);
+    ownerSVGElement()->timeScheduler()->connectIntervalTimer(this);
     m_connected = true;
 
     return;
@@ -307,8 +304,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       return;
     }
 
-    document()->accessSVGExtensions()->timeScheduler()->disconnectIntervalTimer(
-        this);
+    ownerSVGElement()->timeScheduler()->disconnectIntervalTimer(this);
     m_connected = false;
 
     // Reset...
@@ -470,6 +466,7 @@ SVGMatrix* SVGAnimateTransformElement::initialMatrix() const {
 
 SVGMatrix* SVGAnimateTransformElement::transformMatrix() const {
   return m_transformMatrix.get();
+}
 }
 
 // vim:ts=4:noet

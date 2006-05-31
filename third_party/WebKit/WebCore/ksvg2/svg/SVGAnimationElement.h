@@ -62,7 +62,7 @@ class SVGAnimationElement : public SVGElement,
                             public SVGTests,
                             public SVGExternalResourcesRequired {
  public:
-  SVGAnimationElement(const QualifiedName& tagName, Document* doc);
+  SVGAnimationElement(const QualifiedName&, Document*);
   virtual ~SVGAnimationElement();
 
   // 'SVGAnimationElement' functions

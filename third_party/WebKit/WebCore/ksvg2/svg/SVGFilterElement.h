@@ -41,7 +41,7 @@ class SVGFilterElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired {
  public:
-  SVGFilterElement(const QualifiedName& tagName, Document* doc);
+  SVGFilterElement(const QualifiedName&, Document*);
   virtual ~SVGFilterElement();
 
   virtual KCanvasFilter* canvasResource();

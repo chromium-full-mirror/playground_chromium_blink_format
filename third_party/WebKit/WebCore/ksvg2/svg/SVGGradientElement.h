@@ -39,7 +39,7 @@ class SVGGradientElement : public SVGStyledElement,
                            public SVGExternalResourcesRequired,
                            public KCanvasResourceListener {
  public:
-  SVGGradientElement(const QualifiedName& tagName, Document* doc);
+  SVGGradientElement(const QualifiedName&, Document*);
   virtual ~SVGGradientElement();
 
   // 'SVGGradientElement' functions

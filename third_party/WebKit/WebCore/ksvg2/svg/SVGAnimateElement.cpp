@@ -23,17 +23,17 @@
 #include "config.h"
 #if SVG_SUPPORT
 #include "SVGAnimateElement.h"
+
 #include "KSVGTimeScheduler.h"
 #include "Document.h"
 #include "SVGDocumentExtensions.h"
+#include "SVGSVGElement.h"
 
 using namespace WebCore;
 
 SVGAnimateElement::SVGAnimateElement(const QualifiedName& tagName,
                                      Document* doc)
-    : SVGAnimationElement(tagName, doc) {
-  m_currentItem = -1;
-}
+    : SVGAnimationElement(tagName, doc), m_currentItem(-1) {}
 
 SVGAnimateElement::~SVGAnimateElement() {}
 
@@ -53,7 +53,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                       m_toColor->setRGBColor(toColorString.impl());
 
                       String fromColorString;
-                      if(!m_from.isEmpty()) // from-to animation
+                      if (!m_from.isEmpty()) // from-to animation
                           fromColorString = m_from;
                       else // to animation
                           fromColorString = m_initialColor.name();
@@ -78,7 +78,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
 
                       String fromColorString;
 
-                      if(!m_from.isEmpty()) // from-by animation
+                      if (!m_from.isEmpty()) // from-by animation
                           fromColorString = m_from;
                       else // by animation
                           fromColorString = m_initialColor.name();
@@ -113,8 +113,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
       }
     }
 
-    document()->accessSVGExtensions()->timeScheduler()->connectIntervalTimer(
-        this);
+    ownerSVGElement()->timeScheduler()->connectIntervalTimer(this);
     m_connected = true;
 
     return;
@@ -125,25 +124,26 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
     timePercentage = 1.0;
 
   //    int r = 0, g = 0, b = 0;
-  //    if((m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0) && !m_values)
+  //    if ((m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0) &&
+  //    !m_values)
   //        calculateColor(timePercentage, r, g, b);
   /*    else */ if (m_values) {
     /*        int itemByPercentage = calculateCurrentValueItem(timePercentage);
 
-            if(itemByPercentage == -1)
+            if (itemByPercentage == -1)
                 return;
 
-            if(m_currentItem != itemByPercentage) // Item changed...
+            if (m_currentItem != itemByPercentage) // Item changed...
             {
                 // Extract current 'from' / 'to' values
                 String value1 = String(m_values->getItem(itemByPercentage));
                 String value2 = String(m_values->getItem(itemByPercentage + 1));
 
                 // Calculate r/g/b shifting values...
-                if(!value1.isEmpty() && !value2.isEmpty())
+                if (!value1.isEmpty() && !value2.isEmpty())
                 {
                     bool apply = false;
-                    if(m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0)
+                    if (m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0)
                     {
                         r = m_toColor->color().red();
                         g = m_toColor->color().green();
@@ -167,11 +167,11 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
 
                     m_currentItem = itemByPercentage;
 
-                    if(!apply)
+                    if (!apply)
                         return;
                 }
             }
-            else if(m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0)
+            else if (m_redDiff != 0 || m_greenDiff != 0 || m_blueDiff != 0)
             {
                 double relativeTime =
        calculateRelativeTimePercentage(timePercentage, m_currentItem);
@@ -195,8 +195,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
       return;
     }
 
-    document()->accessSVGExtensions()->timeScheduler()->disconnectIntervalTimer(
-        this);
+    ownerSVGElement()->timeScheduler()->disconnectIntervalTimer(this);
     m_connected = false;
 
     // Reset...

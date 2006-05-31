@@ -40,6 +40,20 @@ class SVGLength : public Shared<SVGLength> {
             const SVGElement* viewport = 0);
   virtual ~SVGLength();
 
+  enum SVGLengthType {
+    SVG_LENGTHTYPE_UNKNOWN = 0,
+    SVG_LENGTHTYPE_NUMBER = 1,
+    SVG_LENGTHTYPE_PERCENTAGE = 2,
+    SVG_LENGTHTYPE_EMS = 3,
+    SVG_LENGTHTYPE_EXS = 4,
+    SVG_LENGTHTYPE_PX = 5,
+    SVG_LENGTHTYPE_CM = 6,
+    SVG_LENGTHTYPE_MM = 7,
+    SVG_LENGTHTYPE_IN = 8,
+    SVG_LENGTHTYPE_PT = 9,
+    SVG_LENGTHTYPE_PC = 10
+  };
+
   // 'SVGLength' functions
   unsigned short unitType() const;
 
@@ -58,7 +72,7 @@ class SVGLength : public Shared<SVGLength> {
 
   // Helpers
   bool bboxRelative() const;
-  void setBboxRelative(bool relative);
+  void setBboxRelative(bool);
 
   const SVGStyledElement* context() const;
   void setContext(const SVGStyledElement* context);

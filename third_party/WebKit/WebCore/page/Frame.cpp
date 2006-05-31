@@ -81,6 +81,7 @@
 #if SVG_SUPPORT
 #include "SVGNames.h"
 #include "XLinkNames.h"
+#include "XMLNames.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGDOMImplementation.h"
 #endif
@@ -153,6 +154,7 @@ Frame::Frame(Page* page, RenderPart* ownerRenderer)
 #if SVG_SUPPORT
   SVGNames::init();
   XLinkNames::init();
+  XMLNames::init();
 #endif
 
   // FIXME: Frames were originally created with a refcount of 1, leave this

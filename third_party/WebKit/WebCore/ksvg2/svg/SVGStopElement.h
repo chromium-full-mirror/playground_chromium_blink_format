@@ -30,7 +30,7 @@ namespace WebCore {
 class SVGAnimatedNumber;
 class SVGStopElement : public SVGStyledElement {
  public:
-  SVGStopElement(const QualifiedName& tagName, Document* doc);
+  SVGStopElement(const QualifiedName&, Document*);
   virtual ~SVGStopElement();
 
   virtual bool isGradientStop() const { return true; }

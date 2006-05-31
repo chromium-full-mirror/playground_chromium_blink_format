@@ -36,7 +36,7 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
                           public SVGLangSpace,
                           public SVGExternalResourcesRequired {
  public:
-  SVGEllipseElement(const QualifiedName& tagName, Document* doc);
+  SVGEllipseElement(const QualifiedName&, Document*);
   virtual ~SVGEllipseElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

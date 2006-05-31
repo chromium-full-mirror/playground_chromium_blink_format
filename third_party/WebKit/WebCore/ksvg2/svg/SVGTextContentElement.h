@@ -30,8 +30,6 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGRect;
-class SVGPoint;
 class SVGAnimatedLength;
 class SVGAnimatedEnumeration;
 
@@ -40,7 +38,7 @@ class SVGTextContentElement : public SVGStyledElement,
                               public SVGLangSpace,
                               public SVGExternalResourcesRequired {
  public:
-  SVGTextContentElement(const QualifiedName& tagName, Document* doc);
+  SVGTextContentElement(const QualifiedName&, Document*);
   virtual ~SVGTextContentElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
@@ -52,14 +50,14 @@ class SVGTextContentElement : public SVGStyledElement,
   long getNumberOfChars() const;
   float getComputedTextLength() const;
   float getSubStringLength(unsigned long charnum, unsigned long nchars) const;
-  SVGPoint* getStartPositionOfChar(unsigned long charnum) const;
-  SVGPoint* getEndPositionOfChar(unsigned long charnum) const;
-  SVGRect* getExtentOfChar(unsigned long charnum) const;
+  FloatPoint getStartPositionOfChar(unsigned long charnum) const;
+  FloatPoint getEndPositionOfChar(unsigned long charnum) const;
+  FloatRect getExtentOfChar(unsigned long charnum) const;
   float getRotationOfChar(unsigned long charnum) const;
-  long getCharNumAtPosition(SVGPoint* point) const;
+  long getCharNumAtPosition(const FloatPoint&) const;
   void selectSubString(unsigned long charnum, unsigned long nchars) const;
 
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
  private:
   mutable RefPtr<SVGAnimatedLength> m_textLength;

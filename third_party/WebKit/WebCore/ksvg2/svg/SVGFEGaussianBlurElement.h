@@ -33,7 +33,7 @@ class SVGAnimatedNumber;
 
 class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  SVGFEGaussianBlurElement(const QualifiedName& tagName, Document* doc);
+  SVGFEGaussianBlurElement(const QualifiedName&, Document*);
   virtual ~SVGFEGaussianBlurElement();
 
   // 'SVGFEGaussianBlurElement' functions

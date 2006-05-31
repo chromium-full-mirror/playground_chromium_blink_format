@@ -41,7 +41,7 @@ class SVGMarkerElement : public SVGStyledElement,
                          public SVGExternalResourcesRequired,
                          public SVGFitToViewBox {
  public:
-  SVGMarkerElement(const QualifiedName& tagName, Document* doc);
+  SVGMarkerElement(const QualifiedName&, Document*);
   virtual ~SVGMarkerElement();
 
   // 'SVGMarkerElement' functions

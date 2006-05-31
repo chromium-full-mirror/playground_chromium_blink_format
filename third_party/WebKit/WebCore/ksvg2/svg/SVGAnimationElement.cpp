@@ -353,8 +353,7 @@ double SVGAnimationElement::parseClockValue(
 }
 
 void SVGAnimationElement::closeRenderer() {
-  document()->accessSVGExtensions()->timeScheduler()->addTimer(
-      this, lround(getStartTime()));
+  ownerSVGElement()->timeScheduler()->addTimer(this, lround(getStartTime()));
   SVGElement::closeRenderer();
 }
 

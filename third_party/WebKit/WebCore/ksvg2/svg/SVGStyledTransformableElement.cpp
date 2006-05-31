@@ -105,7 +105,7 @@ SVGElement* SVGStyledTransformableElement::farthestViewportElement() const {
   return SVGTransformable::farthestViewportElement(this);
 }
 
-SVGRect* SVGStyledTransformableElement::getBBox() const {
+FloatRect SVGStyledTransformableElement::getBBox() const {
   return SVGTransformable::getBBox(this);
 }
 

@@ -36,7 +36,7 @@ class SVGLineElement : public SVGStyledTransformableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired {
  public:
-  SVGLineElement(const QualifiedName& tagName, Document* doc);
+  SVGLineElement(const QualifiedName&, Document*);
   virtual ~SVGLineElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

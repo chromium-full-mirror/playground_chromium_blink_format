@@ -39,7 +39,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                           public SVGExternalResourcesRequired,
                           public CachedObjectClient {
  public:
-  SVGFEImageElement(const QualifiedName& tagName, Document* doc);
+  SVGFEImageElement(const QualifiedName&, Document*);
   virtual ~SVGFEImageElement();
 
   // 'SVGFEImageElement' functions

@@ -22,21 +22,16 @@
 
 #include "config.h"
 #if SVG_SUPPORT
-#include "SVGRect.h"
-#include "SVGPoint.h"
 #include "SVGZoomEvent.h"
 
 using namespace WebCore;
 
-SVGZoomEvent::SVGZoomEvent() {
-  m_newScale = 0.0;
-  m_previousScale = 0.0;
-}
+SVGZoomEvent::SVGZoomEvent() : m_newScale(0.0), m_previousScale(0.0) {}
 
 SVGZoomEvent::~SVGZoomEvent() {}
 
-SVGRect* SVGZoomEvent::zoomRectScreen() const {
-  return m_zoomRectScreen.get();
+FloatRect SVGZoomEvent::zoomRectScreen() const {
+  return m_zoomRectScreen;
 }
 
 float SVGZoomEvent::previousScale() const {
@@ -47,8 +42,8 @@ void SVGZoomEvent::setPreviousScale(float scale) {
   m_previousScale = scale;
 }
 
-SVGPoint* SVGZoomEvent::previousTranslate() const {
-  return m_previousTranslate.get();
+FloatPoint SVGZoomEvent::previousTranslate() const {
+  return m_previousTranslate;
 }
 
 float SVGZoomEvent::newScale() const {
@@ -59,8 +54,8 @@ void SVGZoomEvent::setNewScale(float scale) {
   m_newScale = scale;
 }
 
-SVGPoint* SVGZoomEvent::newTranslate() const {
-  return m_newTranslate.get();
+FloatPoint SVGZoomEvent::newTranslate() const {
+  return m_newTranslate;
 }
 
 // vim:ts=4:noet

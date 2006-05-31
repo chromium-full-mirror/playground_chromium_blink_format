@@ -36,12 +36,12 @@ enum HeightType { Height, MinHeight, MaxHeight };
 
 class RenderBox : public RenderObject {
  public:
-  RenderBox(WebCore::Node* node);
+  RenderBox(Node*);
   virtual ~RenderBox();
 
   virtual const char* renderName() const { return "RenderBox"; }
 
-  virtual void setStyle(RenderStyle* style);
+  virtual void setStyle(RenderStyle*);
   virtual void paint(PaintInfo& i, int _tx, int _ty);
   virtual bool nodeAtPoint(NodeInfo& i,
                            int _x,
@@ -110,7 +110,7 @@ class RenderBox : public RenderObject {
   // and to easily
   // iterate over structures on the line.
   virtual InlineBox* inlineBoxWrapper() const;
-  virtual void setInlineBoxWrapper(InlineBox* b);
+  virtual void setInlineBoxWrapper(InlineBox*);
   virtual void deleteLineBoxWrapper();
 
   virtual int lowestPosition(bool includeOverflowInterior = true,

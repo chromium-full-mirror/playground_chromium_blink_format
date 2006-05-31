@@ -33,8 +33,7 @@ class SVGAnimatedString;
 
 class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
  public:
-  SVGFilterPrimitiveStandardAttributes(const QualifiedName& tagName,
-                                       Document* doc);
+  SVGFilterPrimitiveStandardAttributes(const QualifiedName&, Document*);
   virtual ~SVGFilterPrimitiveStandardAttributes();
 
   virtual bool isFilterEffect() const { return true; }

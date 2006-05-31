@@ -24,17 +24,18 @@
 #if SVG_SUPPORT
 #include "SVGElement.h"
 
+#include "Attr.h"
 #include "Document.h"
 #include "EventListener.h"
 #include "EventNames.h"
+#include "HTMLNames.h"
+#include "PlatformString.h"
 #include "SVGDOMImplementation.h"
+#include "SVGDocumentExtensions.h"
 #include "SVGNames.h"
 #include "SVGSVGElement.h"
-#include "HTMLNames.h"
+#include "XMLNames.h"
 #include "ksvg.h"
-#include "PlatformString.h"
-#include "Attr.h"
-#include "SVGDocumentExtensions.h"
 
 namespace WebCore {
 
@@ -51,6 +52,22 @@ bool SVGElement::isSupported(StringImpl* feature, StringImpl* version) const {
     return true;
 
   return DOMImplementation::instance()->hasFeature(feature, version);
+}
+
+String SVGElement::id() const {
+  return getAttribute(idAttr);
+}
+
+void SVGElement::setId(const String& value) {
+  setAttribute(idAttr, value);
+}
+
+String SVGElement::xmlbase() const {
+  return getAttribute(XMLNames::baseAttr);
+}
+
+void SVGElement::setXmlbase(const String& value) {
+  setAttribute(XMLNames::baseAttr, value);
 }
 
 SVGSVGElement* SVGElement::ownerSVGElement() const {

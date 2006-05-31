@@ -38,7 +38,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                            public SVGLangSpace,
                            public SVGExternalResourcesRequired {
  public:
-  SVGClipPathElement(const QualifiedName& tagName, Document* doc);
+  SVGClipPathElement(const QualifiedName&, Document*);
   virtual ~SVGClipPathElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

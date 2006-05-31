@@ -38,7 +38,7 @@ class SVGAElement : public SVGStyledTransformableElement,
                     public SVGLangSpace,
                     public SVGExternalResourcesRequired {
  public:
-  SVGAElement(const QualifiedName& tagName, Document* doc);
+  SVGAElement(const QualifiedName&, Document*);
   virtual ~SVGAElement();
 
   // 'SVGAElement' functions

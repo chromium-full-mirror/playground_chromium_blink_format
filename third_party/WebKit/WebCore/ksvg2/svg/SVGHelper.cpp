@@ -34,8 +34,9 @@
 #include "ksvg.h"
 #include <math.h>
 
-using namespace WebCore;
 using namespace std;
+
+namespace WebCore {
 
 float SVGHelper::PercentageOfViewport(float value,
                                       const SVGElement* viewportElement,
@@ -51,9 +52,9 @@ float SVGHelper::PercentageOfViewport(float value,
       width = svg->viewBox()->baseVal()->width();
       height = svg->viewBox()->baseVal()->height();
     } else if (svg->width()->baseVal()->unitType() ==
-                   SVG_LENGTHTYPE_PERCENTAGE ||
+                   SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
                svg->height()->baseVal()->unitType() ==
-                   SVG_LENGTHTYPE_PERCENTAGE) {
+                   SVGLength::SVG_LENGTHTYPE_PERCENTAGE) {
       // TODO: Shouldn't w/h be multiplied with the percentage values?!
       // AFAIK, this assumes width & height == 100%, Rob??
       Document* doc = svg->document();
@@ -99,6 +100,7 @@ void SVGHelper::ParseSeperatedList(SVGStringList* list,
 
     list->appendItem(string);
   }
+}
 }
 
 // vim:ts=4:noet

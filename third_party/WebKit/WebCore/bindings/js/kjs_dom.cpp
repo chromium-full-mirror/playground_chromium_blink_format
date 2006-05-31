@@ -61,6 +61,11 @@
 #include "kjs_traversal.h"
 #include "kjs_window.h"
 
+#if SVG_SUPPORT
+#include "JSSVGElementWrapperFactory.h"
+#include "SVGElement.h"
+#endif
+
 #if __APPLE__
 #include <JavaScriptCore/runtime_object.h>
 #endif
@@ -1005,8 +1010,13 @@ JSValue* toJS(ExecState* exec, PassRefPtr<WebCore::Node> node) {
   switch (n->nodeType()) {
     case WebCore::Node::ELEMENT_NODE:
       if (n->isHTMLElement())
-        ret = createJSWrapper(exec,
-                              static_pointer_cast<WebCore::HTMLElement>(node));
+        ret = createJSHTMLWrapper(
+            exec, static_pointer_cast<WebCore::HTMLElement>(node));
+#if SVG_SUPPORT
+      else if (n->isSVGElement())
+        ret = createJSSVGWrapper(
+            exec, static_pointer_cast<WebCore::SVGElement>(node));
+#endif
       else
         ret = new JSElement(exec, static_cast<Element*>(n));
       break;
@@ -1187,7 +1197,5 @@ bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
 
   return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
-
-// -------------------------------------------------------------------------
 
 }  // namespace

@@ -40,7 +40,7 @@ namespace WebCore {
  */
 class RenderFlow : public RenderContainer {
  public:
-  RenderFlow(WebCore::Node* node) : RenderContainer(node), m_lineHeight(-1) {
+  RenderFlow(Node* node) : RenderContainer(node), m_lineHeight(-1) {
     m_continuation = 0;
     m_firstLineBox = 0;
     m_lastLineBox = 0;
@@ -56,8 +56,7 @@ class RenderFlow : public RenderContainer {
                               RenderObject* beforeChild) = 0;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
 
-  static RenderFlow* createAnonymousFlow(WebCore::Document* doc,
-                                         RenderStyle* style);
+  static RenderFlow* createAnonymousFlow(Document* doc, RenderStyle* style);
 
   void extractLineBox(InlineFlowBox* lineBox);
   void attachLineBox(InlineFlowBox* lineBox);

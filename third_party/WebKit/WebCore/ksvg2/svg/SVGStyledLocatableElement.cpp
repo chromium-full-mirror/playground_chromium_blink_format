@@ -47,7 +47,7 @@ SVGElement* SVGStyledLocatableElement::farthestViewportElement() const {
   return SVGLocatable::farthestViewportElement(this);
 }
 
-SVGRect* SVGStyledLocatableElement::getBBox() const {
+FloatRect SVGStyledLocatableElement::getBBox() const {
   return SVGLocatable::getBBox(this);
 }
 

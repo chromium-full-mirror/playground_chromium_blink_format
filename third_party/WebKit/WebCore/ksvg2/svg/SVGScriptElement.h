@@ -33,7 +33,7 @@ class SVGScriptElement : public SVGElement,
                          public SVGURIReference,
                          public SVGExternalResourcesRequired {
  public:
-  SVGScriptElement(const QualifiedName& tagName, Document* doc);
+  SVGScriptElement(const QualifiedName&, Document*);
   virtual ~SVGScriptElement();
 
   // 'SVGScriptElement' functions

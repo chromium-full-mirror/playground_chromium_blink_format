@@ -28,7 +28,6 @@
 #include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGRect.h"
-#include "SVGPoint.h"
 #include "SVGSVGElement.h"
 #include "SVGPathSegArc.h"
 #include "SVGPathSegList.h"
@@ -71,19 +70,19 @@ double SVGPathElement::getTotalLength() {
   return 0;
 }
 
-SVGPoint* SVGPathElement::getPointAtLength(double /*distance*/) {
-  SVGPoint* ret = SVGSVGElement::createSVGPoint();
-  /*double totalDistance = getTotalLength();
+FloatPoint SVGPathElement::getPointAtLength(double /*distance*/) {
+  /*
+  double totalDistance = getTotalLength();
   T2P::BezierPath *path = ownerDoc()->view()->toBezierPath(m_item);
-  if(path)
-  {
+  if (path) {
       T2P::Point p;
       path->pointTangentNormalAt(distance / totalDistance, &p);
       ret->setX(p.x());
       ret->setY(p.y());
-  }*/
+  }
+  */
 
-  return ret;
+  return FloatPoint();
 }
 
 unsigned long SVGPathElement::getPathSegAtLength(double) {

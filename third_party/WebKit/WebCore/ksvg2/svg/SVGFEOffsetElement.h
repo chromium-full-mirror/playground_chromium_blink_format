@@ -33,7 +33,7 @@ class SVGAnimatedNumber;
 
 class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  SVGFEOffsetElement(const QualifiedName& tagName, Document* doc);
+  SVGFEOffsetElement(const QualifiedName&, Document*);
   virtual ~SVGFEOffsetElement();
 
   // 'SVGFEOffsetElement' functions

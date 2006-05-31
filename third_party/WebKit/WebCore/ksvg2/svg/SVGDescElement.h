@@ -30,7 +30,7 @@
 namespace WebCore {
 class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
  public:
-  SVGDescElement(const QualifiedName& tagName, Document* doc);
+  SVGDescElement(const QualifiedName&, Document*);
   virtual ~SVGDescElement();
 
   StringImpl* description() const;

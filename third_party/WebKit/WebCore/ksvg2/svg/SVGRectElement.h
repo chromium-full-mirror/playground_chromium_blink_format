@@ -36,7 +36,7 @@ class SVGRectElement : public SVGStyledTransformableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired {
  public:
-  SVGRectElement(const QualifiedName& tagName, Document* doc);
+  SVGRectElement(const QualifiedName&, Document*);
   virtual ~SVGRectElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

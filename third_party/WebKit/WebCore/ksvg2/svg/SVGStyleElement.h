@@ -33,7 +33,7 @@ class CSSStyleSheet;
 namespace WebCore {
 class SVGStyleElement : public SVGElement {
  public:
-  SVGStyleElement(const QualifiedName& tagName, Document* doc);
+  SVGStyleElement(const QualifiedName&, Document*);
   virtual ~SVGStyleElement();
 
   // Derived from: 'Element'

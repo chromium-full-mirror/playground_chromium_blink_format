@@ -212,12 +212,14 @@ void SVGPatternElement::drawPatternContentIntoTile(
 
   const SVGStyledElement* savedContext = 0;
   if (bbox) {
-    if (width()->baseVal()->unitType() != SVG_LENGTHTYPE_PERCENTAGE)
+    if (width()->baseVal()->unitType() != SVGLength::SVG_LENGTHTYPE_PERCENTAGE)
       width()->baseVal()->newValueSpecifiedUnits(
-          SVG_LENGTHTYPE_PERCENTAGE, width()->baseVal()->value() * 100.);
-    if (height()->baseVal()->unitType() != SVG_LENGTHTYPE_PERCENTAGE)
+          SVGLength::SVG_LENGTHTYPE_PERCENTAGE,
+          width()->baseVal()->value() * 100.);
+    if (height()->baseVal()->unitType() != SVGLength::SVG_LENGTHTYPE_PERCENTAGE)
       height()->baseVal()->newValueSpecifiedUnits(
-          SVG_LENGTHTYPE_PERCENTAGE, height()->baseVal()->value() * 100.);
+          SVGLength::SVG_LENGTHTYPE_PERCENTAGE,
+          height()->baseVal()->value() * 100.);
     if (activeElement)
       savedContext = const_cast<SVGPatternElement*>(this)->pushAttributeContext(
           activeElement);
@@ -254,17 +256,17 @@ void SVGPatternElement::drawPatternContentIntoTile(
         // is failing due to lack of this code.
         KCanvasMatrix savedMatrix = item->localTransform();
 
-        const SVGStyledElement *savedContext = 0;
-        if(patternContentUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX)
+        const SVGStyledElement* savedContext = 0;
+        if (patternContentUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX)
         {
-            if(activeElement)
+            if (activeElement)
                 savedContext = e->pushAttributeContext(activeElement);
         }
 
         // Take into account viewportElement's viewBox, if existant...
-        if(viewportElement() && viewportElement()->hasTagName(SVGNames::svgTag))
+        if (viewportElement() && viewportElement()->hasTagName(SVGNames::svgTag))
         {
-            SVGSVGElement *svgElement = static_cast<SVGSVGElement *>(viewportElement());
+            SVGSVGElement* svgElement = static_cast<SVGSVGElement* >(viewportElement());
 
             RefPtr<SVGMatrix> svgCTM = svgElement->getCTM();
             RefPtr<SVGMatrix> ctm = getCTM();
@@ -282,7 +284,7 @@ void SVGPatternElement::drawPatternContentIntoTile(
     item->paint(info, 0, 0);
 
 #if 0
-        if(savedContext)
+        if (savedContext)
             e->pushAttributeContext(savedContext);
 
         item->setLocalTransform(savedMatrix.qmatrix());

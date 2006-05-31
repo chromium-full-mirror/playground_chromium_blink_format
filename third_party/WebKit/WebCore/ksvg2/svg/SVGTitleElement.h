@@ -30,7 +30,7 @@
 namespace WebCore {
 class SVGTitleElement : public SVGStyledElement, public SVGLangSpace {
  public:
-  SVGTitleElement(const QualifiedName& tagName, Document* doc);
+  SVGTitleElement(const QualifiedName&, Document*);
 
   String title() const;
 

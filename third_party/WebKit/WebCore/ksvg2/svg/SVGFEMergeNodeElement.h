@@ -30,7 +30,7 @@ namespace WebCore {
 class SVGAnimatedString;
 class SVGFEMergeNodeElement : public SVGElement {
  public:
-  SVGFEMergeNodeElement(const QualifiedName& tagName, Document* doc);
+  SVGFEMergeNodeElement(const QualifiedName&, Document*);
   virtual ~SVGFEMergeNodeElement();
 
   // Derived from: 'Element'

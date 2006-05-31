@@ -34,7 +34,7 @@ class SVGAnimatedEnumeration;
 
 class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  SVGFETurbulenceElement(const QualifiedName& tagName, Document* doc);
+  SVGFETurbulenceElement(const QualifiedName&, Document*);
   virtual ~SVGFETurbulenceElement();
 
   // 'SVGFETurbulenceElement' functions

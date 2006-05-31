@@ -29,7 +29,7 @@ namespace WebCore {
 
 class RenderFlexibleBox : public RenderBlock {
  public:
-  RenderFlexibleBox(WebCore::Node* node);
+  RenderFlexibleBox(Node*);
   virtual ~RenderFlexibleBox();
 
   virtual void calcMinMaxWidth();

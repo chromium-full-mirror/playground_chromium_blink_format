@@ -42,7 +42,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired {
  public:
-  SVGMaskElement(const QualifiedName& tagName, Document* doc);
+  SVGMaskElement(const QualifiedName&, Document*);
   virtual ~SVGMaskElement();
   virtual bool isValid() const { return SVGTests::isValid(); }
 

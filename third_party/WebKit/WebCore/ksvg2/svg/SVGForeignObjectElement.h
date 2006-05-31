@@ -39,7 +39,7 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                 public SVGExternalResourcesRequired,
                                 public SVGURIReference {
  public:
-  SVGForeignObjectElement(const QualifiedName& tagName, Document* doc);
+  SVGForeignObjectElement(const QualifiedName&, Document*);
   virtual ~SVGForeignObjectElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }

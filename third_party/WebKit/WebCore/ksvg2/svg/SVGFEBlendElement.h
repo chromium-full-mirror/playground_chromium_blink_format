@@ -33,7 +33,7 @@ class SVGAnimatedEnumeration;
 
 class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  SVGFEBlendElement(const QualifiedName& tagName, Document* doc);
+  SVGFEBlendElement(const QualifiedName&, Document*);
   virtual ~SVGFEBlendElement();
 
   // 'SVGFEBlendElement' functions

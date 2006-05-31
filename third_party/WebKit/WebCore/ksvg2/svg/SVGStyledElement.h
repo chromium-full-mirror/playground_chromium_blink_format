@@ -40,7 +40,7 @@ class CSSStyleDeclaration;
 class RenderView;
 class SVGStyledElement : public SVGElement {
  public:
-  SVGStyledElement(const QualifiedName& tagName, Document* doc);
+  SVGStyledElement(const QualifiedName&, Document*);
   virtual ~SVGStyledElement();
 
   virtual bool isStyled() const { return true; }

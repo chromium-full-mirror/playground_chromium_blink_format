@@ -25,6 +25,7 @@
 #if SVG_SUPPORT
 
 #include <wtf/Forward.h>
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 
@@ -32,6 +33,7 @@ class Document;
 class EventListener;
 class Node;
 class String;
+class SVGSVGElement;
 class TimeScheduler;
 
 class SVGDocumentExtensions {
@@ -43,18 +45,17 @@ class SVGDocumentExtensions {
                                                    const String& code,
                                                    Node*);
 
-  TimeScheduler* timeScheduler() const { return m_timeScheduler; }
+  void addTimeContainer(SVGSVGElement*);
+  void removeTimeContainer(SVGSVGElement*);
 
+  void startAnimations();
   void pauseAnimations();
   void unpauseAnimations();
-  bool animationsPaused() const;
-
-  float getCurrentTime() const;
-  void setCurrentTime(float seconds);
 
  private:
-  Document* m_doc;  // weak reference
-  TimeScheduler* m_timeScheduler;
+  Document* m_doc;                           // weak reference
+  HashSet<SVGSVGElement*> m_timeContainers;  // For SVG 1.2 support this will
+                                             // need to be made more general.
 
   SVGDocumentExtensions(const SVGDocumentExtensions&);
   SVGDocumentExtensions& operator=(const SVGDocumentExtensions&);
