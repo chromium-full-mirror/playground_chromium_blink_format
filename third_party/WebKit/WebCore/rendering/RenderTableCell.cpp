@@ -155,20 +155,24 @@ short RenderTableCell::baselinePosition(bool) const {
   return offset;
 }
 
-void RenderTableCell::setStyle(RenderStyle* style) {
-  style->setDisplay(TABLE_CELL);
+void RenderTableCell::setStyle(RenderStyle* newStyle) {
+  if (parent() && section() && style() &&
+      style()->height() != newStyle->height())
+    section()->setNeedCellRecalc();
 
-  if (style->whiteSpace() == KHTML_NOWRAP) {
+  newStyle->setDisplay(TABLE_CELL);
+
+  if (newStyle->whiteSpace() == KHTML_NOWRAP) {
     // Figure out if we are really nowrapping or if we should just
     // use normal instead.  If the width of the cell is fixed, then
     // we don't actually use NOWRAP.
-    if (style->width().isFixed())
-      style->setWhiteSpace(NORMAL);
+    if (newStyle->width().isFixed())
+      newStyle->setWhiteSpace(NORMAL);
     else
-      style->setWhiteSpace(NOWRAP);
+      newStyle->setWhiteSpace(NOWRAP);
   }
 
-  RenderBlock::setStyle(style);
+  RenderBlock::setStyle(newStyle);
   setShouldPaintBackgroundOrBorder(true);
 }
 
