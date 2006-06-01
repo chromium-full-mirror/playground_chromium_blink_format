@@ -369,14 +369,14 @@ bool RenderImage::isHeightSpecified() const {
 int RenderImage::calcReplacedWidth() const {
   int width;
   if (isWidthSpecified())
-    width = calcReplacedWidthUsing(Width);
+    width = calcReplacedWidthUsing(style()->width());
   else
     width = calcAspectRatioWidth();
 
-  int minW = calcReplacedWidthUsing(MinWidth);
+  int minW = calcReplacedWidthUsing(style()->minWidth());
   int maxW = style()->maxWidth().value() == undefinedLength
                  ? width
-                 : calcReplacedWidthUsing(MaxWidth);
+                 : calcReplacedWidthUsing(style()->maxWidth());
 
   return max(minW, min(width, maxW));
 }
@@ -384,14 +384,14 @@ int RenderImage::calcReplacedWidth() const {
 int RenderImage::calcReplacedHeight() const {
   int height;
   if (isHeightSpecified())
-    height = calcReplacedHeightUsing(Height);
+    height = calcReplacedHeightUsing(style()->height());
   else
     height = calcAspectRatioHeight();
 
-  int minH = calcReplacedHeightUsing(MinHeight);
+  int minH = calcReplacedHeightUsing(style()->minHeight());
   int maxH = style()->maxHeight().value() == undefinedLength
                  ? height
-                 : calcReplacedHeightUsing(MaxHeight);
+                 : calcReplacedHeightUsing(style()->maxHeight());
 
   return max(minH, min(height, maxH));
 }

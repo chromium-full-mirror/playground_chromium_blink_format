@@ -1156,7 +1156,8 @@ bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
   // This code may look a bit strange.  Basically width:intrinsic should clamp
   // the size when testing both
   // min-width and width.  max-width is only clamped if it is also intrinsic.
-  Length width = widthType == MaxWidth ? style()->maxWidth() : style()->width();
+  Length width =
+      (widthType == MaxWidth) ? style()->maxWidth() : style()->width();
   if (width.type() == Intrinsic)
     return true;
 
@@ -1430,31 +1431,23 @@ int RenderBox::calcPercentageHeight(const Length& height) {
 }
 
 int RenderBox::calcReplacedWidth() const {
-  int width = calcReplacedWidthUsing(Width);
-  int minW = calcReplacedWidthUsing(MinWidth);
+  int width = calcReplacedWidthUsing(style()->width());
+  int minW = calcReplacedWidthUsing(style()->minWidth());
   int maxW = style()->maxWidth().value() == undefinedLength
                  ? width
-                 : calcReplacedWidthUsing(MaxWidth);
+                 : calcReplacedWidthUsing(style()->maxWidth());
 
   return max(minW, min(width, maxW));
 }
 
-int RenderBox::calcReplacedWidthUsing(WidthType widthType) const {
-  Length w;
-  if (widthType == Width)
-    w = style()->width();
-  else if (widthType == MinWidth)
-    w = style()->minWidth();
-  else
-    w = style()->maxWidth();
-
-  switch (w.type()) {
+int RenderBox::calcReplacedWidthUsing(Length width) const {
+  switch (width.type()) {
     case Fixed:
-      return calcContentBoxWidth(w.value());
+      return calcContentBoxWidth(width.value());
     case Percent: {
       const int cw = containingBlockWidth();
       if (cw > 0)
-        return calcContentBoxWidth(w.calcMinValue(cw));
+        return calcContentBoxWidth(width.calcMinValue(cw));
     }
     // fall through
     default:
@@ -1463,27 +1456,19 @@ int RenderBox::calcReplacedWidthUsing(WidthType widthType) const {
 }
 
 int RenderBox::calcReplacedHeight() const {
-  int height = calcReplacedHeightUsing(Height);
-  int minH = calcReplacedHeightUsing(MinHeight);
+  int height = calcReplacedHeightUsing(style()->height());
+  int minH = calcReplacedHeightUsing(style()->minHeight());
   int maxH = style()->maxHeight().value() == undefinedLength
                  ? height
-                 : calcReplacedHeightUsing(MaxHeight);
+                 : calcReplacedHeightUsing(style()->maxHeight());
 
   return max(minH, min(height, maxH));
 }
 
-int RenderBox::calcReplacedHeightUsing(HeightType heightType) const {
-  Length h;
-  if (heightType == Height)
-    h = style()->height();
-  else if (heightType == MinHeight)
-    h = style()->minHeight();
-  else
-    h = style()->maxHeight();
-
-  switch (h.type()) {
+int RenderBox::calcReplacedHeightUsing(Length height) const {
+  switch (height.type()) {
     case Fixed:
-      return calcContentBoxHeight(h.value());
+      return calcContentBoxHeight(height.value());
     case Percent: {
       RenderBlock* cb = containingBlock();
       if (cb->isPositioned() && cb->style()->height().isAuto() &&
@@ -1493,10 +1478,10 @@ int RenderBox::calcReplacedHeightUsing(HeightType heightType) const {
         int newHeight = cb->calcContentBoxHeight(cb->contentHeight());
         cb->setHeight(oldHeight);
 
-        return calcContentBoxHeight(h.calcValue(newHeight));
+        return calcContentBoxHeight(height.calcValue(newHeight));
       }
 
-      return calcContentBoxHeight(h.calcValue(cb->availableHeight()));
+      return calcContentBoxHeight(height.calcValue(cb->availableHeight()));
     }
     default:
       return intrinsicHeight();
