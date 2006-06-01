@@ -256,7 +256,6 @@ typedef enum {
 - (void)installInFrame:(NSView*)view;
 - (void)removeFromFrame;
 
-- (void)scrollToAnchor:(NSString*)anchor;
 - (void)scrollToAnchorWithURL:(NSURL*)URL;
 
 - (BOOL)scrollOverflowInDirection:(WebScrollDirection)direction
@@ -732,6 +731,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (int)historyLength;
 - (void)goBackOrForward:(int)distance;
 - (BOOL)canGoBackOrForward:(int)distance;
+- (NSURL*)historyURL:(int)distance;
 
 - (void)textFieldDidBeginEditing:(DOMHTMLInputElement*)element;
 - (void)textFieldDidEndEditing:(DOMHTMLInputElement*)element;

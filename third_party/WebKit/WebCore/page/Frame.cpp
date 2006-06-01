@@ -894,6 +894,16 @@ void Frame::scheduleLocationChange(const DeprecatedString& url,
                                    const DeprecatedString& referrer,
                                    bool lockHistory,
                                    bool userGesture) {
+  KURL u(url);
+
+  // If the URL we're going to navigate to is the same as the current one,
+  // except for the
+  // fragment part, we don't need to schedule the location change.
+  if (u.hasRef() && equalIgnoringRef(d->m_url, u)) {
+    changeLocation(url, referrer, lockHistory, userGesture);
+    return;
+  }
+
   // Handle a location change of a page with no document as a special case.
   // This may happen when a frame changes the location of another frame.
   d->m_scheduledRedirection =
@@ -935,6 +945,18 @@ void Frame::scheduleHistoryNavigation(int steps) {
   if (!canGoBackOrForward(steps)) {
     cancelRedirection();
     return;
+  }
+
+  // If the URL we're going to navigate to is the same as the current one,
+  // except for the
+  // fragment part, we don't need to schedule the navigation.
+  if (d->m_extension) {
+    KURL u = d->m_extension->historyURL(steps);
+
+    if (equalIgnoringRef(d->m_url, u)) {
+      d->m_extension->goBackOrForward(steps);
+      return;
+    }
   }
 
   d->m_scheduledRedirection = historyNavigationScheduled;

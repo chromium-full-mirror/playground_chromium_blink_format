@@ -116,11 +116,7 @@ class KURL {
   int queryEndPos;
   int fragmentEndPos;
 
-  // True if both URLs are the same.
-  friend bool urlcmp(const DeprecatedString& URLA,
-                     const DeprecatedString& URLB,
-                     bool ignoreTrailingSlash,
-                     bool ignoreRef);
+  friend bool equalIgnoringRef(const KURL& a, const KURL& b);
 };
 
 #endif
