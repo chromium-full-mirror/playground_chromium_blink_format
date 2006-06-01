@@ -444,7 +444,7 @@ class WheelEvent : public MouseRelatedEvent {
   int m_wheelDelta;
 };
 
-class RegisteredEventListener {
+class RegisteredEventListener : public Shared<RegisteredEventListener> {
  public:
   RegisteredEventListener(const AtomicString& eventType,
                           PassRefPtr<EventListener>,
@@ -453,11 +453,14 @@ class RegisteredEventListener {
   const AtomicString& eventType() const { return m_eventType; }
   EventListener* listener() const { return m_listener.get(); }
   bool useCapture() const { return m_useCapture; }
+  bool removed() const { return m_removed; }
+  void setRemoved(bool removed) { m_removed = removed; }
 
  private:
   AtomicString m_eventType;
   RefPtr<EventListener> m_listener;
   bool m_useCapture;
+  bool m_removed;
 };
 
 bool operator==(const RegisteredEventListener&, const RegisteredEventListener&);

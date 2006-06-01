@@ -622,7 +622,10 @@ RegisteredEventListener::RegisteredEventListener(
     const AtomicString& eventType,
     PassRefPtr<EventListener> listener,
     bool useCapture)
-    : m_eventType(eventType), m_listener(listener), m_useCapture(useCapture) {}
+    : m_eventType(eventType),
+      m_listener(listener),
+      m_useCapture(useCapture),
+      m_removed(false) {}
 
 bool operator==(const RegisteredEventListener& a,
                 const RegisteredEventListener& b) {
