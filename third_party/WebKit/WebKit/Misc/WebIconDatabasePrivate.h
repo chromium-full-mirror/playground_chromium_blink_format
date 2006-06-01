@@ -30,10 +30,12 @@
 #import <WebKit/WebIconDatabase.h>
 
 @class WebFileDatabase;
+@class WebCoreIconDatabaseBridge;
 
 @interface WebIconDatabasePrivate : NSObject {
  @public
   WebFileDatabase* fileDatabase;
+  WebCoreIconDatabaseBridge* databaseBridge;
 
   NSMutableDictionary* iconURLToIcons;
   NSMutableDictionary* iconURLToPageURLs;

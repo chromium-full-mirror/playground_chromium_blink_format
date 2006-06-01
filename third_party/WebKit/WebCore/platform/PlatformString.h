@@ -82,6 +82,8 @@ class String {
   }
 
   void append(const String&);
+  void append(char);
+  void append(UChar);
   void insert(const String&, unsigned pos);
 
   String& replace(UChar a, UChar b) {
