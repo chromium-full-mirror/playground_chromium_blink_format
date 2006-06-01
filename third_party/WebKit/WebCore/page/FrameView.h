@@ -116,7 +116,7 @@ class FrameView : public ScrollView {
 
   void print();
 
-  void layout();
+  void layout(bool allowSubtree = true);
 
   bool inLayout() const;
   int layoutCount() const;
@@ -153,6 +153,7 @@ class FrameView : public ScrollView {
   void setTransparent(bool isTransparent);
 
   void scheduleRelayout();
+  void scheduleRelayoutOfSubtree(Node*);
   void unscheduleRelayout();
   bool haveDelayedLayoutScheduled();
   bool layoutPending();

@@ -651,7 +651,7 @@ void RenderObject::setChildNeedsLayout(bool b, bool markParents) {
   }
 }
 
-void RenderObject::markContainingBlocksForLayout() {
+void RenderObject::markContainingBlocksForLayout(bool scheduleRelayout) {
   RenderObject* o = container();
   RenderObject* last = this;
 
@@ -668,10 +668,13 @@ void RenderObject::markContainingBlocksForLayout() {
     }
 
     last = o;
+    if (scheduleRelayout && last->isTextField())
+      break;
     o = o->container();
   }
 
-  last->scheduleRelayout();
+  if (scheduleRelayout)
+    last->scheduleRelayout();
 }
 
 RenderBlock* RenderObject::containingBlock() const {
@@ -2695,11 +2698,15 @@ void RenderObject::recalcMinMaxWidths() {
 }
 
 void RenderObject::scheduleRelayout() {
-  if (!isRenderView())
-    return;
-  FrameView* view = static_cast<RenderView*>(this)->frameView();
-  if (view)
-    view->scheduleRelayout();
+  if (isRenderView()) {
+    FrameView* view = static_cast<RenderView*>(this)->frameView();
+    if (view)
+      view->scheduleRelayout();
+  } else {
+    FrameView* v = view() ? view()->frameView() : 0;
+    if (v)
+      v->scheduleRelayoutOfSubtree(node());
+  }
 }
 
 void RenderObject::removeLeftoverAnonymousBoxes() {}

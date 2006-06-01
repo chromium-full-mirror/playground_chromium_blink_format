@@ -367,7 +367,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
-  void markContainingBlocksForLayout();
+  void markContainingBlocksForLayout(bool scheduleRelayout = true);
   void setNeedsLayout(bool b, bool markParents = true);
   void setChildNeedsLayout(bool b, bool markParents = true);
   void setMinMaxKnown(bool b = true) {
