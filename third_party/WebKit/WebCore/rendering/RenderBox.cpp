@@ -506,7 +506,7 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* p,
   // iframes/frames with
   // no background in the child document should show the parent's background.
   if (!bgLayer->next() && isRoot() &&
-      !(bgColor.isValid() && bgColor.alpha() > 0) && view()->view()) {
+      !(bgColor.isValid() && bgColor.alpha() > 0) && view()->frameView()) {
     bool isTransparent;
     WebCore::Node* elt = document()->ownerElement();
     if (elt) {
@@ -526,7 +526,7 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* p,
                 framesetTag);  // Can't scroll a frameset document anyway.
       }
     } else
-      isTransparent = view()->view()->isTransparent();
+      isTransparent = view()->frameView()->isTransparent();
 
     if (isTransparent)
       view()
@@ -541,7 +541,8 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* p,
     IntRect rect(_tx, clipy, w, cliph);
     // If we have an alpha and we are painting the root element, go ahead and
     // blend with white.
-    if (bgColor.alpha() < 0xFF && isRoot() && !view()->view()->isTransparent())
+    if (bgColor.alpha() < 0xFF && isRoot() &&
+        !view()->frameView()->isTransparent())
       p->fillRect(rect, Color(Color::white));
     p->fillRect(rect, bgColor);
   }
