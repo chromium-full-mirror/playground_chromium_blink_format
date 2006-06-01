@@ -1259,8 +1259,9 @@ bool operator==(const KURL& a, const KURL& b) {
   return a.urlString == b.urlString;
 }
 
-bool equalIgnoringRef(const KURL& a, const KURL& b) const;
-{ return a.urlString.left(a.queryEndPos) == b.urlString.left(b.queryEndPos); }
+bool equalIgnoringRef(const KURL& a, const KURL& b) {
+  return a.urlString.left(a.queryEndPos) == b.urlString.left(b.queryEndPos);
+}
 
 DeprecatedString KURL::encode_string(const DeprecatedString& notEncodedString) {
   DeprecatedCString asUTF8 = notEncodedString.utf8();
