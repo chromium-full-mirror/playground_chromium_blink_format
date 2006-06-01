@@ -2275,6 +2275,12 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
 
     // Solve for 'margin-right'
     m_marginRight = availableSpace - (leftValue + rightValue + m_marginLeft);
+  } else {
+    // Nothing is 'auto', just calculate the values.
+    m_marginLeft = marginLeft.calcValue(containerWidth);
+    m_marginRight = marginRight.calcValue(containerWidth);
+    rightValue = right.calcValue(containerWidth);
+    leftValue = left.calcValue(containerWidth);
   }
 
   /*-----------------------------------------------------------------------*\
@@ -2414,6 +2420,13 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
 
     // Solve for 'margin-bottom'
     m_marginBottom = availableSpace - (topValue + bottomValue + m_marginTop);
+  } else {
+    // Nothing is 'auto', just calculate the values.
+    m_marginTop = marginTop.calcValue(containerHeight);
+    m_marginBottom = marginBottom.calcValue(containerHeight);
+    topValue = top.calcValue(containerHeight);
+    // NOTE: It is not necessary to solve for 'bottom' because we don't ever
+    // use the value.
   }
 
   /*-----------------------------------------------------------------------*\
