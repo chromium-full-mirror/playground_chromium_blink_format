@@ -132,6 +132,8 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
   return false;
 }
 
+void RenderTheme::paintResizeControl(GraphicsContext*, const IntRect&) {}
+
 short RenderTheme::baselinePosition(const RenderObject* o) const {
   return o->height() + o->marginTop();
 }

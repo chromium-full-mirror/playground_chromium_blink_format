@@ -2685,6 +2685,32 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       break;
     }
 
+    case CSS_PROP_RESIZE: {
+      HANDLE_INHERIT_AND_INITIAL(resize, Resize)
+
+      if (!primitiveValue->getIdent())
+        return;
+
+      EResize r;
+      switch (primitiveValue->getIdent()) {
+        case CSS_VAL_BOTH:
+          r = RESIZE_BOTH;
+          break;
+        case CSS_VAL_HORIZONTAL:
+          r = RESIZE_HORIZONTAL;
+          break;
+        case CSS_VAL_VERTICAL:
+          r = RESIZE_VERTICAL;
+          break;
+        case CSS_VAL_NONE:
+        default:
+          r = RESIZE_NONE;
+          break;
+      }
+      style->setResize(r);
+      break;
+    }
+
     // length, percent
     case CSS_PROP_MAX_WIDTH:
       // +none +inherit

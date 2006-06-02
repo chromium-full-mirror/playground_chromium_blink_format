@@ -57,6 +57,8 @@ class RenderThemeMac : public RenderTheme {
                                const BackgroundLayer& background,
                                const Color& backgroundColor) const;
 
+  virtual void paintResizeControl(GraphicsContext*, const IntRect&);
+
  protected:
   // Methods for each appearance value.
   virtual bool paintCheckbox(RenderObject* o,
@@ -131,6 +133,7 @@ class RenderThemeMac : public RenderTheme {
   NSButtonCell* checkbox;
   NSButtonCell* radio;
   NSButtonCell* button;
+  Image* resizeCornerImage;
 };
 }
 

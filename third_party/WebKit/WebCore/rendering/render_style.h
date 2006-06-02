@@ -708,6 +708,8 @@ enum EKHTMLLineBreak { LBNORMAL, AFTER_WHITE_SPACE };
 
 enum EMatchNearestMailBlockquoteColor { BCNORMAL, MATCH };
 
+enum EResize { RESIZE_NONE, RESIZE_BOTH, RESIZE_HORIZONTAL, RESIZE_VERTICAL };
+
 enum EAppearance {
   NoAppearance,
   CheckboxAppearance,
@@ -809,6 +811,7 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
   unsigned khtmlLineBreak : 1;  // EKHTMLLineBreak
   bool textSizeAdjust : 1;      // An Apple extension.  Not really CSS3 but not
                                 // worth making a new struct over.
+  unsigned resize : 2;          // EResize
 
  private:
   StyleCSS3InheritedData& operator=(const StyleCSS3InheritedData&);
@@ -1603,6 +1606,9 @@ class RenderStyle {
     return static_cast<EMatchNearestMailBlockquoteColor>(
         css3NonInheritedData->matchNearestMailBlockquoteColor);
   }
+  EResize resize() const {
+    return static_cast<EResize>(css3InheritedData->resize);
+  }
   // End CSS3 Getters
 
   // Apple-specific property getter methods
@@ -1970,6 +1976,7 @@ class RenderStyle {
   void setMatchNearestMailBlockquoteColor(EMatchNearestMailBlockquoteColor c) {
     SET_VAR(css3NonInheritedData, matchNearestMailBlockquoteColor, c);
   }
+  void setResize(EResize r) { SET_VAR(css3InheritedData, resize, r); }
   // End CSS3 Setters
 
   // Apple-specific property setters
@@ -2104,6 +2111,7 @@ class RenderStyle {
   initialMatchNearestMailBlockquoteColor() {
     return BCNORMAL;
   }
+  static EResize initialResize() { return RESIZE_NONE; }
   static EAppearance initialAppearance() { return NoAppearance; }
   static bool initialVisuallyOrdered() { return false; }
 

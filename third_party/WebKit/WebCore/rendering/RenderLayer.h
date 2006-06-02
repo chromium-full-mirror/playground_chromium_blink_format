@@ -268,7 +268,10 @@ class RenderLayer : WidgetClient {
   int horizontalScrollbarHeight();
   void moveScrollbarsAside();
   void positionScrollbars(const IntRect& absBounds);
+  void positionResizeControl();
+  bool isPointInResizeControl(const IntPoint&);
   void paintScrollbars(GraphicsContext*, const IntRect& damageRect);
+  void paintResizeControl(GraphicsContext*);
   void updateScrollInfoAfterLayout();
   void slotValueChanged(int);
   bool scroll(KWQScrollDirection direction,
@@ -276,6 +279,11 @@ class RenderLayer : WidgetClient {
               float multiplier = 1.0);
   void autoscroll();
   bool shouldAutoscroll();
+  IntRect resizeControlRect() { return m_resizeControlRect; }
+  void setResizeControlRect(const IntRect& r) { m_resizeControlRect = r; }
+  void resize();
+  bool inResizeMode() const { return m_inResizeMode; }
+  void setInResizeMode(bool b) { m_inResizeMode = b; }
 
   void updateLayerPosition();
   void updateLayerPositions(bool doFullRepaint = false,
@@ -427,6 +435,12 @@ class RenderLayer : WidgetClient {
   // For layers with overflow, we have a pair of scrollbars.
   QScrollBar* m_hBar;
   QScrollBar* m_vBar;
+
+  // The rectangle for the control to resize layers that have overflow.
+  IntRect m_resizeControlRect;
+  // Keeps track of whether the layer is currently resizing, so events can cause
+  // resizing to start and stop.
+  bool m_inResizeMode;
 
   // For layers that establish stacking contexts, m_posZOrderList holds a sorted
   // list of all the
