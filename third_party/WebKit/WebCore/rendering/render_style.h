@@ -990,8 +990,6 @@ class RenderStyle {
   friend class CSSStyleSelector;
 
  public:
-  static void cleanup();
-
   // static pseudo styles. Dynamic ones are produced on the fly.
   enum PseudoId {
     NOPSEUDO,
@@ -1140,7 +1138,7 @@ class RenderStyle {
 
   unsigned m_pseudoState : 3;  // PseudoState
   bool m_affectedByAttributeSelectors : 1;
-
+  bool m_unique : 1;
   int m_ref;
 
 #if SVG_SUPPORT
@@ -2032,6 +2030,9 @@ class RenderStyle {
   void setAffectedByAttributeSelectors() {
     m_affectedByAttributeSelectors = true;
   }
+
+  bool unique() const { return m_unique; }
+  void setUnique() { m_unique = true; }
 
   // Initial values for all the properties
   static bool initialBackgroundAttachment() { return true; }

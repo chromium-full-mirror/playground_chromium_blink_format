@@ -638,9 +638,9 @@ Node* CSSStyleSelector::locateCousinList(Element* parent) {
 bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
   if (n->isStyledElement()) {
     StyledElement* s = static_cast<StyledElement*>(n);
-    if (s->renderer() && (s->tagQName() == element->tagQName()) &&
-        !s->hasID() && (s->hasClass() == element->hasClass()) &&
-        !s->inlineStyleDecl() &&
+    if (s->renderer() && !s->renderer()->style()->unique() &&
+        (s->tagQName() == element->tagQName()) && !s->hasID() &&
+        (s->hasClass() == element->hasClass()) && !s->inlineStyleDecl() &&
         (s->hasMappedAttributes() == styledElement->hasMappedAttributes()) &&
         (s->isLink() == element->isLink()) &&
         !s->renderer()->style()->affectedByAttributeSelectors() &&
@@ -3207,9 +3207,15 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             style->setContent(val->getStringValue().impl(), i != 0);
           else if (val->primitiveType() == CSSPrimitiveValue::CSS_ATTR) {
             // FIXME: Can a namespace be specified for an attr(foo)?
+            if (style->styleType() == RenderStyle::NOPSEUDO)
+              style->setUnique();
+            else
+              parentStyle->setUnique();
             QualifiedName attr(nullAtom, val->getStringValue().impl(),
                                nullAtom);
             style->setContent(element->getAttribute(attr).impl(), i != 0);
+            // register the fact that the attribute value affects the style
+            m_selectorAttrs.add(attr.localName().impl());
           } else if (val->primitiveType() == CSSPrimitiveValue::CSS_URI) {
             CSSImageValue* image = static_cast<CSSImageValue*>(val);
             style->setContent(image->image(element->document()->docLoader()),
