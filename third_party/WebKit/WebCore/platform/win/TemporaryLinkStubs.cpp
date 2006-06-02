@@ -42,6 +42,7 @@
 #include "Cursor.h"
 #include "loader.h"
 #include "FrameView.h"
+#include "KURL.h"
 #include "KWQScrollBar.h"
 #include "JavaAppletWidget.h"
 #include "KWQScrollBar.h"
@@ -519,6 +520,10 @@ void BrowserExtensionWin::runModal() {
 void BrowserExtensionWin::goBackOrForward(int) {
   notImplemented();
 }
+KURL BrowserExtensionWin::historyURL(int distance) {
+  notImplemented();
+  return KURL();
+}
 void BrowserExtensionWin::createNewWindow(
     struct WebCore::ResourceRequest const&) {
   notImplemented();
@@ -639,6 +644,17 @@ bool ScrollView::inWindow() const {
   return true;
 }
 
+void GraphicsContext::addRoundedRectClip(const IntRect& rect,
+                                         const IntSize& topLeft,
+                                         const IntSize& topRight,
+                                         const IntSize& bottomLeft,
+                                         const IntSize& bottomRight) {
+  notImplemented();
+}
+void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
+                                              int thickness) {
+  notImplemented();
+}
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
@@ -646,11 +662,6 @@ void GraphicsContext::endTransparencyLayer() {}
 Color GraphicsContext::selectedTextBackgroundColor() const {
   return Color(0, 0, 255);
 }
-void GraphicsContext::addRoundedRectClip(IntRect const&,
-                                         IntSize const&,
-                                         IntSize const&,
-                                         IntSize const&,
-                                         IntSize const&) {}
 void GraphicsContext::clearRect(const FloatRect&) {}
 void GraphicsContext::strokeRect(const FloatRect&, float) {}
 void GraphicsContext::setLineWidth(float) {}

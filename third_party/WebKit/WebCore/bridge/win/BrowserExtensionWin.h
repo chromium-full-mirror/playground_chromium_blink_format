@@ -44,6 +44,7 @@ class BrowserExtensionWin : public BrowserExtension {
 
   virtual int getHistoryLength();
   virtual void goBackOrForward(int distance);
+  virtual KURL historyURL(int distance);
 
   virtual bool canRunModal();
   virtual bool canRunModalNow();
