@@ -422,7 +422,8 @@ StyleCSS3InheritedData::StyleCSS3InheritedData()
       wordWrap(WBNORMAL),
       nbspMode(NBNORMAL),
       khtmlLineBreak(LBNORMAL),
-      textSizeAdjust(RenderStyle::initialTextSizeAdjust()) {}
+      textSizeAdjust(RenderStyle::initialTextSizeAdjust()),
+      resize(RenderStyle::initialResize()) {}
 
 StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
     : Shared<StyleCSS3InheritedData>() {
