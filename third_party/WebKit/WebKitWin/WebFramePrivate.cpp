@@ -118,7 +118,8 @@ void WebFramePrivate::loadHTMLString(char* html, char* baseURL) {
   d->frame->end();
 }
 
-void WebFramePrivate::openURL(const DeprecatedString& str) {
+void WebFramePrivate::openURL(const DeprecatedString& str,
+                              bool /*lockHistory*/) {
   loadURL(str.ascii());
 }
 
@@ -139,6 +140,10 @@ void WebFramePrivate::submitForm(const String& method,
     d->m_host->updateLocationBar(urlString);
   }
 }
+
+void WebFramePrivate::setTitle(const String& /*title*/) {}
+
+void WebFramePrivate::setStatusText(const String& /*statusText*/) {}
 
 void WebFramePrivate::loadURL(const char* URL) {
   d->frame->didOpenURL(URL);
