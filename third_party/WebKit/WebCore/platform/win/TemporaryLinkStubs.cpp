@@ -581,7 +581,6 @@ void FrameWin::createEmptyDocument() {}
 String FrameWin::overrideMediaType() const {
   return String();
 }
-void FrameWin::setTitle(String const&) {}
 void FrameWin::handledOnloadEvents() {}
 Range* FrameWin::markedTextRange() const {
   return 0;

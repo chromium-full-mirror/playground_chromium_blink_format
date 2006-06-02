@@ -63,7 +63,7 @@ FrameWin::~FrameWin() {
 
 void FrameWin::urlSelected(const ResourceRequest& request) {
   if (m_client)
-    m_client->openURL(request.url().url());
+    m_client->openURL(request.url().url(), request.lockHistory());
 }
 
 void FrameWin::submitForm(const ResourceRequest& request) {
@@ -130,5 +130,19 @@ bool FrameWin::keyPress(const PlatformKeyboardEvent& keyEvent) {
   // FIXME: FrameMac has a keyDown/keyPress hack here which we are not copying.
 
   return result;
+}
+
+void FrameWin::setTitle(const String& title) {
+  String text = title;
+  text.replace('\\', backslashAsCurrencySymbol());
+
+  m_client->setTitle(text);
+}
+
+void FrameWin::setStatusBarText(const String& status) {
+  String text = status;
+  text.replace('\\', backslashAsCurrencySymbol());
+
+  m_client->setStatusText(text);
 }
 }
