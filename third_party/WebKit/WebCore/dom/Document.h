@@ -28,15 +28,12 @@
 
 #include "Attr.h"
 #include "Color.h"
+#include "DeprecatedPtrList.h"
 #include "DeprecatedStringList.h"
 #include "DocumentMarker.h"
-#include "KURL.h"
 #include "StringHash.h"
 #include "Timer.h"
-#include "Decoder.h"
-#include "dom2_traversalimpl.h"
 #include <wtf/HashCountedSet.h>
-#include "DeprecatedPtrList.h"
 
 class RenderArena;
 
@@ -49,6 +46,8 @@ class XBLBindingManager;
 namespace WebCore {
 
 class AccessibilityObjectCache;
+class Attr;
+class Attribute;
 class CDATASection;
 class CSSStyleDeclaration;
 class CSSStyleSelector;
@@ -56,6 +55,7 @@ class CSSStyleSheet;
 class Comment;
 class DOMImplementation;
 class DOMWindow;
+class Decoder;
 class DocLoader;
 class DocumentFragment;
 class DocumentType;
@@ -104,6 +104,8 @@ struct DashboardRegionValue;
 #if SVG_SUPPORT
 class SVGDocumentExtensions;
 #endif
+
+typedef int ExceptionCode;
 
 class FormElementKey {
  public:
@@ -599,8 +601,8 @@ class Document : public ContainerNode {
   bool queryCommandSupported(const String& command);
   String queryCommandValue(const String& command);
 
-  void addMarker(Range*, DocumentMarker::MarkerType type);
-  void addMarker(Node*, DocumentMarker marker);
+  void addMarker(Range*, DocumentMarker::MarkerType);
+  void addMarker(Node*, DocumentMarker);
   void copyMarkers(Node* srcNode,
                    unsigned startOffset,
                    int length,
