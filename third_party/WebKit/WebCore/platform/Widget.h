@@ -92,6 +92,8 @@ class Widget {
 
   virtual IntPoint mapFromGlobal(const IntPoint&) const;
 
+  float scaleFactor() const;
+
   bool hasFocus() const;
   void setFocus();
   void clearFocus();
@@ -136,8 +138,6 @@ class Widget {
   NSView* getView() const;
   NSView* getOuterView() const;
   void setView(NSView*);
-
-  float scaleFactor() const;
 
   void sendConsumedMouseUp();
 
