@@ -308,8 +308,9 @@ bool TransferJob::start(DocLoader* docLoader) {
     // InternetConnect followed by
     // HttpSendRequest.
     HINTERNET urlHandle;
+    DeprecatedString referrer = docLoader->frame()->referrer();
     if (method() == "POST") {
-      d->m_postReferrer = docLoader->frame()->referrer();
+      d->m_postReferrer = referrer;
       DeprecatedString host = d->URL.host();
       host += "\0";
       urlHandle =
@@ -320,9 +321,9 @@ bool TransferJob::start(DocLoader* docLoader) {
       int fragmentIndex = urlStr.find('#');
       if (fragmentIndex != -1)
         urlStr = urlStr.left(fragmentIndex);
-      DeprecatedString headers("Referer: ");
-      headers += docLoader->frame()->referrer();
-      headers += "\n";
+      DeprecatedString headers;
+      if (!referrer.isEmpty())
+        headers += DeprecatedString("Referer: ") + referrer + "\r\n";
 
       urlHandle = InternetOpenUrlA(
           internetHandle, urlStr.ascii(), headers.ascii(), headers.length(),
