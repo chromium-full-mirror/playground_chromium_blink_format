@@ -137,6 +137,8 @@ class Widget {
   NSView* getOuterView() const;
   void setView(NSView*);
 
+  float scaleFactor() const;
+
   void sendConsumedMouseUp();
 
   static void beforeMouseDown(NSView*);

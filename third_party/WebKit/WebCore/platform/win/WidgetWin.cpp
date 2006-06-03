@@ -130,4 +130,8 @@ IntPoint Widget::mapFromGlobal(const IntPoint& p) const {
   ScreenToClient(data->windowHandle, &point);
   return point;
 }
+
+float Widget::scaleFactor() const {
+  return 1.0f;
+}
 }
