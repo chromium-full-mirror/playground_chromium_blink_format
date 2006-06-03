@@ -244,7 +244,7 @@ void DOMCSSStyleDeclaration::put(ExecState* exec,
         // but it's likely that the Dashboard widgets are already using a strict
         // mode DOCTYPE.
         ExceptionCode ec = 0;
-        styleDecl.setProperty(prop, propvalue, "", ec);
+        styleDecl.setProperty(prop, propvalue, ec);
       }
     } else {
       DOMObject::put(exec, propertyName, value, attr);

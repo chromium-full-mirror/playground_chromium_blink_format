@@ -62,6 +62,9 @@ class CSSStyleDeclaration : public StyleBase {
 
   void setProperty(const String& propertyName,
                    const String& value,
+                   ExceptionCode&);
+  void setProperty(const String& propertyName,
+                   const String& value,
                    const String& priority,
                    ExceptionCode&);
   String removeProperty(const String& propertyName, ExceptionCode&);
