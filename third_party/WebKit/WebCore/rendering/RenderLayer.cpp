@@ -1252,6 +1252,11 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   updateZOrderLists();
   updateOverflowList();
 
+  // If this layer is totally invisible, then return as there is nothing to
+  // paint
+  if (!m_object->opacity())
+    return;
+
   if (isTransparent())
     haveTransparency = true;
 
