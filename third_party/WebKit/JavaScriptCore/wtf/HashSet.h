@@ -34,7 +34,7 @@ struct IdentityExtractor;
 template <typename Value, typename HashFunctions, typename Traits>
 class HashSet;
 template <typename Value, typename HashFunctions, typename Traits>
-void deleteAllValues(HashSet<Value, HashFunctions, Traits>&);
+void deleteAllValues(const HashSet<Value, HashFunctions, Traits>&);
 
 template <typename ValueArg,
           typename HashArg = typename DefaultHash<ValueArg>::Hash,
@@ -105,7 +105,7 @@ class HashSet {
   void refAll();
   void derefAll();
 
-  friend void deleteAllValues<>(HashSet&);
+  friend void deleteAllValues<>(const HashSet&);
 
   HashTableType m_impl;
 };
@@ -332,14 +332,14 @@ inline void HashSet<T, U, V>::clear() {
 
 template <typename ValueType, typename HashTableType>
 void deleteAllValues(HashTableType& collection) {
-  typedef typename HashTableType::iterator iterator;
+  typedef typename HashTableType::const_iterator iterator;
   iterator end = collection.end();
   for (iterator it = collection.begin(); it != end; ++it)
     delete *(ValueType*)&*it;
 }
 
 template <typename T, typename U, typename V>
-inline void deleteAllValues(HashSet<T, U, V>& collection) {
+inline void deleteAllValues(const HashSet<T, U, V>& collection) {
   deleteAllValues<typename HashSet<T, U, V>::ValueType>(collection.m_impl);
 }
 
