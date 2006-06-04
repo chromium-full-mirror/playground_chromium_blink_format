@@ -204,6 +204,11 @@ class RenderBox : public RenderObject {
                   int _ty,
                   const char* color = "red");
 
+  int containingBlockWidthForPositioned(
+      const RenderObject* containingBlock) const;
+  int containingBlockHeightForPositioned(
+      const RenderObject* containingBlock) const;
+
   void calcAbsoluteHorizontal();
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(Length width,
