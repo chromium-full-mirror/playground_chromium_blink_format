@@ -23,20 +23,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathPath_H
 #define XPathPath_H
 
 #if XPATH_SUPPORT
 
 #include "XPathExpressionNode.h"
-#include "XPathStep.h"
 
-#include <wtf/Vector.h>
-
-extern int xpathyyparse(void*);
+int xpathyyparse(void*);
 
 namespace WebCore {
+
 namespace XPath {
+
+class Predicate;
+class Step;
 
 class Filter : public Expression {
  public:
@@ -51,8 +53,6 @@ class Filter : public Expression {
 };
 
 class LocationPath : public Expression {
-  friend int ::xpathyyparse(void*);
-
  public:
   LocationPath();
   virtual ~LocationPath();
@@ -64,6 +64,8 @@ class LocationPath : public Expression {
 
   Vector<Step*> m_steps;
   bool m_absolute;
+
+  friend int ::xpathyyparse(void*);
 };
 
 class Path : public Expression {

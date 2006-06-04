@@ -95,10 +95,7 @@ SVGDOMImplementation::SVGDOMImplementation() : DOMImplementation() {
   m_animationContext = false;
 }
 
-SVGDOMImplementation::~SVGDOMImplementation() {
-  // clean up static data
-  // SVGRenderStyle::cleanup();
-}
+SVGDOMImplementation::~SVGDOMImplementation() {}
 
 SVGDOMImplementation* SVGDOMImplementation::instance() {
   static RefPtr<SVGDOMImplementation> i = new SVGDOMImplementation;
@@ -164,7 +161,7 @@ PassRefPtr<Document> SVGDOMImplementation::createDocument(
     StringImpl* qualifiedNameImpl,
     DocumentType* doctype,
     bool createDocElement,
-    KDOMView* view,
+    FrameView* view,
     ExceptionCode& ec) const {
   String namespaceURI(namespaceURIImpl);
   String qualifiedName(qualifiedNameImpl);

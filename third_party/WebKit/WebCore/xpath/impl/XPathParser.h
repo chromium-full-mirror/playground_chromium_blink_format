@@ -29,74 +29,36 @@
 
 #if XPATH_SUPPORT
 
-#include <wtf/Noncopyable.h>
-
-#include "StringHash.h"
-#include "PlatformString.h"
-
 #include "XPathStep.h"
-#include "XPathPath.h"
 #include "XPathPredicate.h"
-#include "XPathExpressionNode.h"
-#include "XPathUtil.h"
 
 namespace WebCore {
 
-class XPathResolver;
+typedef int ExceptionCode;
+
+class XPathNSResolver;
 
 namespace XPath {
 
+class Expression;
+class ParseNode;
+class Predicate;
+
 struct Token {
   int type;
-  String value;
-  int intValue;  // 0 if not set
+  String str;
+  Step::Axis axis;
+  NumericOp::Opcode numop;
+  EqTestOp::Opcode eqop;
 
-  Token(int t) : type(t), intValue(0) {}
-  Token(int t, const String& v) : type(t), value(v) {}
-  Token(int t, int v) : type(t), intValue(v) {}
+  Token(int t) : type(t) {}
+  Token(int t, const String& v) : type(t), str(v) {}
+  Token(int t, Step::Axis v) : type(t), axis(v) {}
+  Token(int t, NumericOp::Opcode v) : type(t), numop(v) {}
+  Token(int t, EqTestOp::Opcode v) : type(t), eqop(v) {}
 };
 
 class Parser : Noncopyable {
- private:
-  static Parser* currentParser;
-
-  unsigned m_nextPos;
-  String m_data;
-  int m_lastTokenType;
-  RefPtr<XPathNSResolver> m_resolver;
-
-  static HashMap<String, Step::AxisType>* s_axisNamesDict;
-  static HashSet<String>* s_nodeTypeNamesDict;
-
-  enum XMLCat { NameStart, NameCont, NotPartOfName };
-
-  XMLCat charCat(UChar);
-
-  bool isAxisName(const String& name, Step::AxisType& type);
-  bool isNodeTypeName(const String& name);
-  bool isOperatorContext();
-
-  void skipWS();
-  Token makeTokenAndAdvance(int code, int advance = 1);
-  Token makeIntTokenAndAdvance(int code, int val, int advance = 1);
-  char peekAheadHelper();
-  char peekCurHelper();
-
-  Token lexString();
-  Token lexNumber();
-  Token lexNCName();
-  Token lexQName();
-
-  Token nextToken();
-  Token nextTokenInternal();
-
-  void reset(const String& data);
-
-  HashSet<ParseNode*> m_parseNodes;
-  HashSet<Vector<Predicate*>*> m_predicateVectors;
-  HashSet<Vector<Expression*>*> m_expressionVectors;
-  HashSet<String*> m_strings;
-
  public:
   Parser();
 
@@ -117,13 +79,45 @@ class Parser : Noncopyable {
   void unregisterParseNode(ParseNode*);
 
   void registerPredicateVector(Vector<Predicate*>*);
-  void unregisterPredicateVector(Vector<Predicate*>*);
+  void deletePredicateVector(Vector<Predicate*>*);
 
   void registerExpressionVector(Vector<Expression*>*);
-  void unregisterExpressionVector(Vector<Expression*>*);
+  void deleteExpressionVector(Vector<Expression*>*);
 
   void registerString(String*);
-  void unregisterString(String*);
+  void deleteString(String*);
+
+ private:
+  bool isOperatorContext() const;
+
+  void skipWS();
+  Token makeTokenAndAdvance(int type, int advance = 1);
+  Token makeTokenAndAdvance(int type, NumericOp::Opcode, int advance = 1);
+  Token makeTokenAndAdvance(int type, EqTestOp::Opcode, int advance = 1);
+  char peekAheadHelper();
+  char peekCurHelper();
+
+  Token lexString();
+  Token lexNumber();
+  bool lexNCName(String&);
+  bool lexQName(String&);
+
+  Token nextToken();
+  Token nextTokenInternal();
+
+  void reset(const String& data);
+
+  static Parser* currentParser;
+
+  unsigned m_nextPos;
+  String m_data;
+  int m_lastTokenType;
+  RefPtr<XPathNSResolver> m_resolver;
+
+  HashSet<ParseNode*> m_parseNodes;
+  HashSet<Vector<Predicate*>*> m_predicateVectors;
+  HashSet<Vector<Expression*>*> m_expressionVectors;
+  HashSet<String*> m_strings;
 };
 }
 }

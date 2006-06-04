@@ -23,6 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathFunctions_H
 #define XPathFunctions_H
 
@@ -30,11 +31,8 @@
 
 #include "XPathExpressionNode.h"
 
-#include "StringHash.h"
-
-#include "PlatformString.h"
-
 namespace WebCore {
+
 namespace XPath {
 
 class Function : public Expression {
@@ -52,25 +50,9 @@ class Function : public Expression {
   String m_name;
 };
 
-class FunctionLibrary {
-  friend struct FunctionMapping;
-
- public:
-  static FunctionLibrary& self();
-
-  Function* createFunction(
-      const char* name,
-      const Vector<Expression*>& args = Vector<Expression*>()) const;
-
- private:
-  struct FunctionRec;
-
-  FunctionLibrary();
-  FunctionLibrary(const FunctionLibrary& rhs);
-  FunctionLibrary& operator=(const FunctionLibrary& rhs);
-
-  HashMap<String, FunctionRec> m_functionDict;
-};
+Function* createFunction(
+    const String& name,
+    const Vector<Expression*>& args = Vector<Expression*>());
 }
 }
 

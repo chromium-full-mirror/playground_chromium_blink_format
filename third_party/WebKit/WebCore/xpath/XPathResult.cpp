@@ -23,19 +23,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
+#include "XPathResult.h"
 
 #if XPATH_SUPPORT
 
-#include "XPathResult.h"
-#include "XPathEvaluator.h"
-
-#include "Document.h"
-#include "EventNames.h"
-#include "Node.h"
 #include "EventListener.h"
-#include "Logging.h"
+#include "EventNames.h"
+#include "EventTargetNode.h"
 #include "ExceptionCode.h"
+#include "XPathEvaluator.h"
 
 namespace WebCore {
 
@@ -43,40 +41,38 @@ using namespace XPath;
 
 class InvalidatingEventListener : public EventListener {
  public:
-  InvalidatingEventListener(EventTargetNode* node, XPathResult* result)
-      : m_node(node), m_result(result) {}
-
+  InvalidatingEventListener(XPathResult* result) : m_result(result) {}
   virtual void handleEvent(Event*, bool) {
     m_result->invalidateIteratorState();
   }
 
  private:
-  EventTargetNode* m_node;
   XPathResult* m_result;
 };
 
 XPathResult::XPathResult(EventTargetNode* eventTarget, const Value& value)
     : m_value(value), m_eventTarget(eventTarget) {
-  m_eventListener = new InvalidatingEventListener(m_eventTarget.get(), this);
+  m_eventListener = new InvalidatingEventListener(this);
   m_eventTarget->addEventListener(EventNames::DOMSubtreeModifiedEvent,
                                   m_eventListener, false);
-
   switch (m_value.type()) {
-    case Value::Boolean:
+    case Value::BooleanValue:
       m_resultType = BOOLEAN_TYPE;
-      break;
-    case Value::Number:
+      return;
+    case Value::NumberValue:
       m_resultType = NUMBER_TYPE;
-      break;
-    case Value::String_:
+      return;
+    case Value::StringValue:
       m_resultType = STRING_TYPE;
-      break;
-    case Value::NodeVector_:
+      return;
+    case Value::NodeVectorValue:
       m_resultType = UNORDERED_NODE_ITERATOR_TYPE;
       m_nodeSetPosition = 0;
       m_nodeSet = m_value.toNodeVector();
       m_invalidIteratorState = false;
+      return;
   }
+  ASSERT_NOT_REACHED();
 }
 
 XPathResult::~XPathResult() {

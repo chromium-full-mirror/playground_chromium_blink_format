@@ -25,16 +25,10 @@
 #if SVG_SUPPORT
 
 #include "DOMImplementation.h"
-#include "DeprecatedStringList.h"
 
 namespace WebCore {
-class CSSStyleSheet;
-class Document;
-class DocumentType;
-class String;
-class StringImpl;
 
-typedef FrameView KDOMView;
+class StringImpl;
 
 class SVGDOMImplementation : public DOMImplementation {
  public:
@@ -51,11 +45,11 @@ class SVGDOMImplementation : public DOMImplementation {
                                               ExceptionCode&) const;
   PassRefPtr<Document> createDocument(StringImpl* namespaceURI,
                                       StringImpl* qualifiedName,
-                                      DocumentType* doctype,
+                                      DocumentType*,
                                       ExceptionCode&) const;
   PassRefPtr<Document> createDocument(StringImpl* namespaceURI,
                                       StringImpl* qualifiedName,
-                                      DocumentType* doctype,
+                                      DocumentType*,
                                       bool createDocElement,
                                       FrameView*,
                                       ExceptionCode&) const;

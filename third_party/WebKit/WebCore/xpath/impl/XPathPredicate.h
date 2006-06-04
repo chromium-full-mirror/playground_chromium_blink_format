@@ -1,5 +1,5 @@
 /*
- * predicate.h - Copyright 2005 Frerich Raabe <raabe@kde.org>
+ * Copyright 2005 Frerich Raabe <raabe@kde.org>
  * Copyright (C) 2006 Apple Computer, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathPredicate_H
 #define XPathPredicate_H
 
@@ -31,29 +32,26 @@
 #include "XPathExpressionNode.h"
 
 namespace WebCore {
+
 namespace XPath {
 
 class Number : public Expression {
  public:
-  Number(double value);
-
+  Number(double);
   bool isConstant() const;
 
  private:
   virtual Value doEvaluate() const;
-
   double m_value;
 };
 
 class StringExpression : public Expression {
  public:
-  StringExpression(const String& value);
-
+  StringExpression(const String&);
   bool isConstant() const;
 
  private:
   virtual Value doEvaluate() const;
-
   String m_value;
 };
 
@@ -62,12 +60,10 @@ class Negative : public Expression {
   virtual Value doEvaluate() const;
 };
 
-class BinaryExprBase : public Expression {};
-
-class NumericOp : public BinaryExprBase {
+class NumericOp : public Expression {
  public:
-  enum {
-    OP_Add = 1,
+  enum Opcode {
+    OP_Add,
     OP_Sub,
     OP_Mul,
     OP_Div,
@@ -77,57 +73,48 @@ class NumericOp : public BinaryExprBase {
     OP_GE,
     OP_LE
   };
-
-  NumericOp(int opCode, Expression* lhs, Expression* rhs);
-
- private:
-  virtual Value doEvaluate() const;
-  int m_opCode;
-};
-
-class EqTestOp : public BinaryExprBase {
- public:
-  enum { OP_EQ = 1, OP_NE };
-
-  EqTestOp(int opCode, Expression* lhs, Expression* rhs);
+  NumericOp(Opcode, Expression* lhs, Expression* rhs);
 
  private:
   virtual Value doEvaluate() const;
-  int m_opCode;
+  Opcode m_opcode;
 };
 
-class LogicalOp : public BinaryExprBase {
+class EqTestOp : public Expression {
  public:
-  enum { OP_And = 1, OP_Or };
+  enum Opcode { OP_EQ, OP_NE };
+  EqTestOp(Opcode, Expression* lhs, Expression* rhs);
 
-  LogicalOp(int opCode, Expression* lhs, Expression* rhs);
+ private:
+  virtual Value doEvaluate() const;
+  Opcode m_opcode;
+};
 
+class LogicalOp : public Expression {
+ public:
+  enum Opcode { OP_And, OP_Or };
+  LogicalOp(Opcode, Expression* lhs, Expression* rhs);
   virtual bool isConstant() const;
 
  private:
   bool shortCircuitOn() const;
   virtual Value doEvaluate() const;
-  int m_opCode;
+  Opcode m_opcode;
 };
 
-class Union : public BinaryExprBase {
+class Union : public Expression {
  private:
   virtual Value doEvaluate() const;
 };
 
-class Predicate {
+class Predicate : Noncopyable {
  public:
   Predicate(Expression*);
   ~Predicate();
-
   bool evaluate() const;
-
   void optimize();
 
  private:
-  Predicate(const Predicate& rhs);
-  Predicate& operator=(const Predicate& rhs);
-
   Expression* m_expr;
 };
 }
@@ -135,4 +122,4 @@ class Predicate {
 
 #endif  // XPATH_SUPPORT
 
-#endif  // PREDICATE_H
+#endif  // XPathPredicate_H

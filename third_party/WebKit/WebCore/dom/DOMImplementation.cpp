@@ -49,6 +49,8 @@ static bool qualifiedNameIsMalformed(const String&) {
   return false;
 }
 
+DOMImplementation::~DOMImplementation() {}
+
 bool DOMImplementation::hasFeature(const String& feature,
                                    const String& version) const {
   String lower = feature.lower();

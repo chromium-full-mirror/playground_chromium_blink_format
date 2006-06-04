@@ -23,11 +23,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
+#include "XPathExpression.h"
 
 #if XPATH_SUPPORT
 
-#include "XPathExpression.h"
 #include "PlatformString.h"
 #include "Document.h"
 #include "Node.h"
@@ -53,7 +54,7 @@ PassRefPtr<XPathExpression> XPathExpression::createExpression(
   if (!expr->m_topExpression)
     return 0;
 
-  return expr;
+  return expr.release();
 }
 
 XPathExpression::~XPathExpression() {
@@ -69,18 +70,18 @@ PassRefPtr<XPathResult> XPathExpression::evaluate(Node* contextNode,
     return 0;
   }
 
-  Node* eventTarget =
-      contextNode->ownerDocument() ? contextNode->ownerDocument() : contextNode;
+  EventTargetNode* eventTarget =
+      contextNode->ownerDocument() ? contextNode->ownerDocument()
+                                   : static_cast<EventTargetNode*>(contextNode);
 
   Expression::evaluationContext().node = contextNode;
   m_topExpression->optimize();
-
-  RefPtr<XPathResult> result = new XPathResult(
-      static_cast<EventTargetNode*>(eventTarget), m_topExpression->evaluate());
+  RefPtr<XPathResult> result =
+      new XPathResult(eventTarget, m_topExpression->evaluate());
 
   if (type != XPathResult::ANY_TYPE) {
+    ec = 0;
     result->convertTo(type, ec);
-
     if (ec)
       return 0;
   }

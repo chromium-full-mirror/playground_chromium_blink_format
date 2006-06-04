@@ -23,26 +23,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathEvaluator_H
 #define XPathEvaluator_H
 
 #if XPATH_SUPPORT
 
 #include "Shared.h"
-
-#include "PlatformString.h"
-#include "ExceptionCode.h"
+#include <wtf/Forward.h>
 
 namespace WebCore {
-class Node;
 
+typedef int ExceptionCode;
+
+class Node;
+class String;
 class XPathExpression;
 class XPathNSResolver;
 class XPathResult;
 
+// FIXME: Should these exception codes move to another header?
 const int XPathExceptionOffset = 400;
 const int XPathExceptionMax = 499;
-
 enum XPathExceptionCode {
   INVALID_EXPRESSION_ERR = XPathExceptionOffset + 51,
   TYPE_ERR

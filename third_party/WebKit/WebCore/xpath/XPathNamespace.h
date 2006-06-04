@@ -23,17 +23,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathNamespace_H
 #define XPathNamespace_H
 
 #if XPATH_SUPPORT
 
-#include "Element.h"
 #include "AtomicString.h"
+#include "Node.h"
 
 namespace WebCore {
 
 class Document;
+class Element;
 
 class XPathNamespace : public Node {
  public:

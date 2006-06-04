@@ -23,21 +23,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef XPathResult_H
 #define XPathResult_H
 
 #if XPATH_SUPPORT
 
 #include "Shared.h"
-
 #include "XPathValue.h"
-#include "PlatformString.h"
 
 namespace WebCore {
 
-class Node;
-class EventTargetNode;
+typedef int ExceptionCode;
+
 class EventListener;
+class EventTargetNode;
+class Node;
+class String;
 
 class XPathResult : public Shared<XPathResult> {
  public:

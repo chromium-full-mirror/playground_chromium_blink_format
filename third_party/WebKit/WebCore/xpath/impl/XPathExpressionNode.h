@@ -1,5 +1,5 @@
 /*
- * expression.h - Copyright 2005 Frerich Raabe <raabe@kde.org>
+ * Copyright 2005 Frerich Raabe <raabe@kde.org>
  * Copyright (C) 2006 Apple Computer, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,6 @@
 
 #if XPATH_SUPPORT
 
-#include "XPathNSResolver.h"
-
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 #include <wtf/Vector.h>
@@ -50,10 +48,6 @@ struct EvaluationContext {
   unsigned long size;
   unsigned long position;
   HashMap<String, String> variableBindings;
-
-  /* The function library is globally accessible through
-   * FunctionLibrary::self()
-   */
 };
 
 class ParseNode {
@@ -61,7 +55,7 @@ class ParseNode {
   virtual ~ParseNode() {}
 };
 
-class Expression : public ParseNode {
+class Expression : public ParseNode, Noncopyable {
  public:
   static EvaluationContext& evaluationContext();
 
@@ -76,8 +70,8 @@ class Expression : public ParseNode {
 
  protected:
   unsigned subExprCount() const;
-  Expression* subExpr(unsigned i);
-  const Expression* subExpr(unsigned i) const;
+  Expression* subExpr(unsigned);
+  const Expression* subExpr(unsigned) const;
 
  private:
   virtual Value doEvaluate() const = 0;
