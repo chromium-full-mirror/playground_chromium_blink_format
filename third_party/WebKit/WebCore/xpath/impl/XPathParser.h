@@ -41,6 +41,9 @@
 #include "XPathUtil.h"
 
 namespace WebCore {
+
+class XPathResolver;
+
 namespace XPath {
 
 struct Token {
@@ -60,6 +63,7 @@ class Parser : Noncopyable {
   unsigned m_nextPos;
   String m_data;
   int m_lastTokenType;
+  RefPtr<XPathNSResolver> m_resolver;
 
   static HashMap<String, Step::AxisType>* s_axisNamesDict;
   static HashSet<String>* s_nodeTypeNamesDict;
@@ -96,7 +100,10 @@ class Parser : Noncopyable {
  public:
   Parser();
 
-  Expression* parseStatement(const String& statement, ExceptionCode&);
+  XPathNSResolver* resolver() const { return m_resolver.get(); }
+  Expression* parseStatement(const String& statement,
+                             PassRefPtr<XPathNSResolver>,
+                             ExceptionCode&);
 
   static Parser* current() { return currentParser; }
 
@@ -104,6 +111,7 @@ class Parser : Noncopyable {
 
   Expression* m_topExpr;
   bool m_gotNamespaceError;
+  String m_currentNamespaceURI;
 
   void registerParseNode(ParseNode*);
   void unregisterParseNode(ParseNode*);
