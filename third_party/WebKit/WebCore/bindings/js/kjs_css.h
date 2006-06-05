@@ -36,6 +36,7 @@ class CSSStyleDeclaration;
 class CSSStyleSheet;
 class CSSValue;
 class CSSValueList;
+class JSCSSRule;
 class JSCSSStyleDeclaration;
 class MediaList;
 class StyleSheet;
@@ -195,7 +196,6 @@ class DOMCSSStyleSheet : public DOMStyleSheet {
 
 class DOMCSSRule : public DOMObject {
  public:
-  DOMCSSRule(ExecState*, WebCore::CSSRule*);
   virtual ~DOMCSSRule();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -230,6 +230,8 @@ class DOMCSSRule : public DOMObject {
   WebCore::CSSRule* impl() const { return m_impl.get(); }
 
  private:
+  friend class WebCore::JSCSSRule;
+  DOMCSSRule(ExecState*, WebCore::CSSRule*);
   RefPtr<WebCore::CSSRule> m_impl;
 };
 
@@ -237,7 +239,7 @@ JSValue* toJS(ExecState*, WebCore::CSSRule*);
 
 class DOMCSSValue : public DOMObject {
  public:
-  DOMCSSValue(ExecState*, WebCore::CSSValue* v) : m_impl(v) {}
+  DOMCSSValue(ExecState*, WebCore::CSSValue*);
   virtual ~DOMCSSValue();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -264,7 +266,7 @@ JSValue* toJS(ExecState*, WebCore::CSSValue*);
 
 class DOMRGBColor : public DOMObject {
  public:
-  DOMRGBColor(unsigned color) : m_color(color) {}
+  DOMRGBColor(ExecState*, unsigned color);
   ~DOMRGBColor();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
@@ -281,7 +283,7 @@ JSValue* getDOMRGBColor(ExecState*, unsigned color);
 
 class DOMRect : public DOMObject {
  public:
-  DOMRect(ExecState*, WebCore::RectImpl* r) : m_rect(r) {}
+  DOMRect(ExecState*, WebCore::RectImpl* r);
   ~DOMRect();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;

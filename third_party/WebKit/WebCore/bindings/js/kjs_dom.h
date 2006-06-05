@@ -122,7 +122,7 @@ WebCore::Node* toNode(
 
 class DOMNodeList : public DOMObject {
  public:
-  DOMNodeList(ExecState*, WebCore::NodeList* l) : m_impl(l) {}
+  DOMNodeList(ExecState*, WebCore::NodeList* l);
   ~DOMNodeList();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
@@ -201,7 +201,7 @@ class DOMNamedNodeMap : public DOMObject {
 // Constructor for DOMException - constructor stuff not implemented yet
 class DOMExceptionConstructor : public DOMObject {
  public:
-  DOMExceptionConstructor(ExecState*) {}
+  DOMExceptionConstructor(ExecState*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
@@ -226,6 +226,8 @@ class DOMNamedNodesCollection : public DOMObject {
       ExecState* exec,
       const DeprecatedValueList<RefPtr<WebCore::Node>>& nodes);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
