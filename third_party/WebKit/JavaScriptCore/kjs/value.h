@@ -162,14 +162,7 @@ class JSCell : public JSValue {
   bool m_marked : 1;
 };
 
-JSValue* jsUndefined();
-JSValue* jsNull();
-
-JSValue* jsBoolean(bool);
-
 JSValue* jsNumberCell(double);
-JSValue* jsNumber(double);
-JSValue* jsNaN();
 
 JSCell* jsString(const UString&);  // returns empty string if passed null string
 JSCell* jsString(const char* = "");  // returns empty string if passed 0
