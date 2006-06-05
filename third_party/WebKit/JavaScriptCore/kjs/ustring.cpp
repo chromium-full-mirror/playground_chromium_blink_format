@@ -55,7 +55,7 @@ CString::CString(const char* c) {
   memcpy(data, c, length + 1);
 }
 
-CString::CString(const char* c, int len) {
+CString::CString(const char* c, size_t len) {
   length = len;
   data = new char[len + 1];
   memcpy(data, c, len);
@@ -118,7 +118,7 @@ CString& CString::operator=(const CString& str) {
 }
 
 bool operator==(const CString& c1, const CString& c2) {
-  int len = c1.size();
+  size_t len = c1.size();
   return len == c2.size() &&
          (len == 0 || memcmp(c1.c_str(), c2.c_str(), len) == 0);
 }
