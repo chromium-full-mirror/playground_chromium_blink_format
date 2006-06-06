@@ -151,6 +151,12 @@ bool WebView::keyPress(WPARAM wParam, LPARAM lParam) {
                                     SelectionController::FORWARD,
                                     ParagraphGranularity);
           break;
+        case VK_RETURN:
+          if (start->isContentRichlyEditable())
+            TypingCommand::insertParagraphSeparator(frame->document());
+          else
+            TypingCommand::insertLineBreak(frame->document());
+          break;
         default:
           nextCharIsInputText = true;
       }
