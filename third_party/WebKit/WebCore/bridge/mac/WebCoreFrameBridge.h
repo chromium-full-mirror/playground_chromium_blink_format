@@ -555,6 +555,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (BOOL)canProvideDocumentSource;
 - (BOOL)canSaveAsWebArchive;
+- (BOOL)containsPlugins;
 @end
 
 // The WebCoreFrameBridge protocol contains methods for use by the WebCore side
