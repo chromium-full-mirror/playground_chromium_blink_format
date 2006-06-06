@@ -755,7 +755,7 @@ class Document : public ContainerNode {
 
   RenderArena* m_renderArena;
 
-  typedef HashMap<Node*, Vector<DocumentMarker>*> MarkerMap;
+  typedef HashMap<RefPtr<Node>, Vector<DocumentMarker>*> MarkerMap;
   MarkerMap m_markers;
 
   mutable AccessibilityObjectCache* m_accCache;
