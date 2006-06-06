@@ -207,6 +207,8 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
         mainFrameImpl->dataSource(&dataSource);
         if (!dataSource || !mainFrameImpl->loading())
           mainFrameImpl->paint();
+        else
+          ValidateRect(hWnd, 0);
         if (dataSource)
           dataSource->Release();
       }
