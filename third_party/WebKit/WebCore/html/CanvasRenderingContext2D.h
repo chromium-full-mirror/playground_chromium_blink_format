@@ -191,14 +191,8 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float height,
                  ExceptionCode&);
   void drawImage(HTMLImageElement*,
-                 float sx,
-                 float sy,
-                 float sw,
-                 float sh,
-                 float dx,
-                 float dy,
-                 float dw,
-                 float dh,
+                 const FloatRect& srcRect,
+                 const FloatRect& dstRect,
                  ExceptionCode&);
   void drawImage(HTMLCanvasElement*, float x, float y);
   void drawImage(HTMLCanvasElement*,
@@ -208,14 +202,8 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
                  float height,
                  ExceptionCode&);
   void drawImage(HTMLCanvasElement*,
-                 float sx,
-                 float sy,
-                 float sw,
-                 float sh,
-                 float dx,
-                 float dy,
-                 float dw,
-                 float dh,
+                 const FloatRect& srcRect,
+                 const FloatRect& dstRect,
                  ExceptionCode&);
 
   void drawImageFromRect(HTMLImageElement*,
