@@ -67,7 +67,20 @@ RenderBox::RenderBox(WebCore::Node* node) : RenderObject(node) {
   m_inlineBoxWrapper = 0;
 }
 
+static RenderBlock* blockThatPaintsFloat(RenderObject* f) {
+  RenderBlock* lastBlock = 0;
+  for (RenderObject* o = f->parent(); o; o = o->parent()) {
+    if (lastBlock && o->layer())
+      break;
+    if (o->isRenderBlock())
+      lastBlock = static_cast<RenderBlock*>(o);
+  }
+  return lastBlock;
+}
+
 void RenderBox::setStyle(RenderStyle* _style) {
+  bool wasFloating = isFloating();
+
   RenderObject::setStyle(_style);
 
   // The root always paints its background/border.
@@ -99,6 +112,10 @@ void RenderBox::setStyle(RenderStyle* _style) {
 
   if (requiresLayer()) {
     if (!m_layer) {
+      if (wasFloating && isFloating()) {
+        if (RenderBlock* b = blockThatPaintsFloat(this))
+          b->setPaintsFloatingObject(this, false);
+      }
       m_layer = new (renderArena()) RenderLayer(this);
       m_layer->insertOnlyThisLayer();
       if (parent() && containingBlock())
@@ -109,6 +126,10 @@ void RenderBox::setStyle(RenderStyle* _style) {
     RenderLayer* layer = m_layer;
     m_layer = 0;
     layer->removeOnlyThisLayer();
+    if (wasFloating && isFloating()) {
+      if (RenderBlock* b = blockThatPaintsFloat(this))
+        b->setPaintsFloatingObject(this, true);
+    }
   }
 
   if (m_layer)
