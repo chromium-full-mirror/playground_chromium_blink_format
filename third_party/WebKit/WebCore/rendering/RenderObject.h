@@ -902,6 +902,8 @@ class RenderObject : public CachedObjectClient {
   virtual bool hasOverhangingFloats() { return false; }
   virtual IntRect floatRect() const { return borderBox(); }
 
+  virtual void removePositionedObjects(RenderBlock*) {}
+
   bool avoidsFloats() const;
   bool usesLineWidth() const;
 

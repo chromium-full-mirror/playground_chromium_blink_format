@@ -128,6 +128,7 @@ class RenderBlock : public RenderFlow {
   void layoutPositionedObjects(bool relayoutChildren);
   void insertPositionedObject(RenderObject* o);
   void removePositionedObject(RenderObject* o);
+  virtual void removePositionedObjects(RenderBlock*);
 
   virtual void positionListMarker() {}
 
