@@ -805,6 +805,8 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
 
   ShadowData*
       textShadow;  // Our text shadow information for shadowed text drawing.
+  AtomicString
+      highlight;  // Apple-specific extension for custom highlight rendering.
   unsigned userModify : 2;      // EUserModify  (editing)
   unsigned wordWrap : 1;        // EWordWrap
   unsigned nbspMode : 1;        // ENBSPMode
@@ -1604,6 +1606,7 @@ class RenderStyle {
     return static_cast<EMatchNearestMailBlockquoteColor>(
         css3NonInheritedData->matchNearestMailBlockquoteColor);
   }
+  const AtomicString& highlight() const { return css3InheritedData->highlight; }
   EResize resize() const {
     return static_cast<EResize>(css3InheritedData->resize);
   }
@@ -1974,6 +1977,9 @@ class RenderStyle {
   void setMatchNearestMailBlockquoteColor(EMatchNearestMailBlockquoteColor c) {
     SET_VAR(css3NonInheritedData, matchNearestMailBlockquoteColor, c);
   }
+  void setHighlight(const AtomicString& h) {
+    SET_VAR(css3InheritedData, highlight, h);
+  }
   void setResize(EResize r) { SET_VAR(css3InheritedData, resize, r); }
   // End CSS3 Setters
 
@@ -2112,6 +2118,7 @@ class RenderStyle {
   initialMatchNearestMailBlockquoteColor() {
     return BCNORMAL;
   }
+  static const AtomicString& initialHighlight() { return nullAtom; }
   static EResize initialResize() { return RESIZE_NONE; }
   static EAppearance initialAppearance() { return NoAppearance; }
   static bool initialVisuallyOrdered() { return false; }
