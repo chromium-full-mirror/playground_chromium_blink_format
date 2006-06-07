@@ -96,6 +96,7 @@ class FloatRect {
     inflateX(d);
     inflateY(d);
   }
+  void scale(float s);
 
 #if __APPLE__
 

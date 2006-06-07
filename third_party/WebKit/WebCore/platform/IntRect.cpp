@@ -83,4 +83,11 @@ void IntRect::unite(const IntRect& other) {
   m_size.setWidth(r - l);
   m_size.setHeight(b - t);
 }
+
+void IntRect::scale(float s) {
+  m_location.setX((int)(x() * s));
+  m_location.setY((int)(y() * s));
+  m_size.setWidth((int)(width() * s));
+  m_size.setHeight((int)(height() * s));
+}
 }

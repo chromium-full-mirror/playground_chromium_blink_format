@@ -106,6 +106,7 @@ class IntRect {
     inflateX(d);
     inflateY(d);
   }
+  void scale(float s);
 
 #if WIN32
   IntRect(const RECT&);
