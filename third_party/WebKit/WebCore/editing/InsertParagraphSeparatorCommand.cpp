@@ -140,7 +140,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   // Delete the current selection.
   if (selection.isRange()) {
     calculateStyleBeforeInsertion(pos);
-    deleteSelection(false, false);
+    deleteSelection(false, true);
     pos = endingSelection().start();
     affinity = endingSelection().affinity();
   }

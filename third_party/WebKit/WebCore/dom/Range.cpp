@@ -61,6 +61,16 @@ Range::Range(Document* ownerDocument,
       m_endOffset(endOffset),
       m_detached(false) {}
 
+Range::Range(Document* ownerDocument,
+             const Position& start,
+             const Position& end)
+    : m_ownerDocument(ownerDocument),
+      m_startContainer(start.node()),
+      m_startOffset(start.offset()),
+      m_endContainer(end.node()),
+      m_endOffset(end.offset()),
+      m_detached(false) {}
+
 Range::~Range() {}
 
 Node* Range::startContainer(ExceptionCode& ec) const {

@@ -134,6 +134,7 @@ class Node : public TreeShared<Node> {
   void setTextContent(const String&, ExceptionCode&);
 
   Node* lastDescendant() const;
+  Node* firstDescendant() const;
 
   // Other methods (not part of DOM)
 

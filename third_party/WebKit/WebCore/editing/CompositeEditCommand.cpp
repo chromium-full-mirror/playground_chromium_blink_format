@@ -53,6 +53,7 @@
 #include "SplitElementCommand.h"
 #include "SplitTextNodeCommand.h"
 #include "SplitTextNodeContainingElementCommand.h"
+#include "TextIterator.h"
 #include "WrapContentsInDummySpanCommand.h"
 #include "htmlediting.h"
 #include "visible_units.h"
@@ -154,8 +155,7 @@ void CompositeEditCommand::insertNodeAfter(Node* insertChild, Node* refChild) {
 void CompositeEditCommand::insertNodeAt(Node* insertChild,
                                         Node* refChild,
                                         int offset) {
-  if (refChild->hasChildNodes() ||
-      (refChild->renderer() && refChild->renderer()->isBlockFlow())) {
+  if (canHaveChildrenForEditing(refChild)) {
     Node* child = refChild->firstChild();
     for (int i = 0; child && i < offset; i++)
       child = child->nextSibling();
@@ -174,30 +174,9 @@ void CompositeEditCommand::insertNodeAt(Node* insertChild,
 }
 
 void CompositeEditCommand::appendNode(Node* appendChild, Node* parent) {
+  ASSERT(canHaveChildrenForEditing(parent));
   EditCommandPtr cmd(new AppendNodeCommand(document(), appendChild, parent));
   applyCommandToComposite(cmd);
-}
-
-void CompositeEditCommand::removeFullySelectedNode(Node* node) {
-  if (isTableStructureNode(node) || node == node->rootEditableElement()) {
-    // Do not remove an element of table structure; remove its contents.
-    // Likewise for the root editable element.
-    Node* child = node->firstChild();
-    while (child) {
-      Node* remove = child;
-      child = child->nextSibling();
-      removeFullySelectedNode(remove);
-    }
-
-    // make sure empty cell has some height
-    updateLayout();
-    RenderObject* r = node->renderer();
-    if (r && r->isTableCell() && r->contentHeight() <= 0)
-      insertBlockPlaceholder(Position(node, 0));
-    return;
-  }
-
-  removeNode(node);
 }
 
 void CompositeEditCommand::removeChildrenInRange(Node* node, int from, int to) {
@@ -549,46 +528,15 @@ Node* CompositeEditCommand::addBlockPlaceholderIfNeeded(Node* node) {
   return NULL;
 }
 
-bool CompositeEditCommand::removeBlockPlaceholder(Node* node) {
-  Node* placeholder = findBlockPlaceholder(node);
-  if (placeholder) {
-    removeNode(placeholder);
+bool CompositeEditCommand::removeBlockPlaceholder(
+    const VisiblePosition& visiblePosition) {
+  Position downstream = visiblePosition.deepEquivalent().downstream();
+  if (downstream.node()->hasTagName(brTag) && downstream.offset() == 0 &&
+      isEndOfBlock(visiblePosition)) {
+    removeNode(downstream.node());
     return true;
   }
   return false;
-}
-
-// FIXME: This function should never be used.  If we're in a state where a
-// webkit-block-placeholder
-// isn't the only thing in a block (there are bugs that can make this happen),
-// this function will
-// return a placeholder that might be far away from where the editing operation
-// that's using it intends
-// to operate.  Also a br is a placeholder if its acting like a placeholder,
-// i.e. <div><br></div>, and
-// this function only returs brs with our special class on them.
-Node* CompositeEditCommand::findBlockPlaceholder(Node* node) {
-  if (!node)
-    return 0;
-
-  updateLayout();
-
-  RenderObject* renderer = node->renderer();
-  if (!renderer || !renderer->isBlockFlow())
-    return 0;
-
-  for (Node* checkMe = node; checkMe;
-       checkMe = checkMe->traverseNextNode(node)) {
-    if (checkMe->isElementNode()) {
-      Element* element = static_cast<Element*>(checkMe);
-      if (element->enclosingBlockFlowElement() == node &&
-          element->getAttribute(classAttr) == blockPlaceholderClassString()) {
-        return element;
-      }
-    }
-  }
-
-  return 0;
 }
 
 void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
@@ -751,7 +699,7 @@ void CompositeEditCommand::moveParagraph(
 
   setEndingSelection(destination);
   EditCommandPtr cmd(new ReplaceSelectionCommand(document(), fragment.get(),
-                                                 false, false, false, true));
+                                                 true, false, false, true));
   applyCommandToComposite(cmd);
 }
 

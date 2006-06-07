@@ -66,7 +66,7 @@ class CompositeEditCommand : public EditCommand {
   void deleteSelection(const Selection& selection,
                        bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
-  void deleteTextFromNode(WebCore::Text* node, int offset, int count);
+  virtual void deleteTextFromNode(WebCore::Text* node, int offset, int count);
   void inputText(const WebCore::String& text, bool selectInsertedText = false);
   void insertNodeAfter(WebCore::Node* insertChild, WebCore::Node* refChild);
   void insertNodeAt(WebCore::Node* insertChild,
@@ -81,7 +81,6 @@ class CompositeEditCommand : public EditCommand {
   void rebalanceWhitespace();
   void rebalanceWhitespaceAt(const WebCore::Position& position);
   void removeCSSProperty(WebCore::CSSStyleDeclaration*, int property);
-  void removeFullySelectedNode(WebCore::Node* node);
   void removeNodeAttribute(WebCore::Element*,
                            const WebCore::QualifiedName& attribute);
   void removeChildrenInRange(WebCore::Node* node, int from, int to);
@@ -114,8 +113,7 @@ class CompositeEditCommand : public EditCommand {
   WebCore::Node* appendBlockPlaceholder(WebCore::Node*);
   WebCore::Node* insertBlockPlaceholder(const WebCore::Position& pos);
   WebCore::Node* addBlockPlaceholderIfNeeded(WebCore::Node*);
-  bool removeBlockPlaceholder(WebCore::Node*);
-  WebCore::Node* findBlockPlaceholder(WebCore::Node*);
+  bool removeBlockPlaceholder(const VisiblePosition&);
 
   void moveParagraphContentsToNewBlockIfNecessary(const WebCore::Position&);
 
