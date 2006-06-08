@@ -148,6 +148,9 @@ class InlineTextBox : public InlineRunBox {
                                 int tx,
                                 int ty,
                                 MarkedTextUnderline&);
+#if PLATFORM(MAC)
+  void paintCustomHighlight(int tx, int ty, const AtomicString& type);
+#endif
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;

@@ -40,6 +40,7 @@
 #else
 class NSImage;
 class NSPasteboard;
+typedef unsigned int NSDragOperation;
 #endif
 
 class DeprecatedStringList;
