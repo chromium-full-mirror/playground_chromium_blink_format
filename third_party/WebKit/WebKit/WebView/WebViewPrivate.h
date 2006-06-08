@@ -239,6 +239,33 @@ backforward list.
 
 + (NSString*)_minimumRequiredSafariBuildNumber;
 
+/*!
+    @method setAlwaysShowVerticalScroller:
+    @result Forces the vertical scroller to be visible if flag is YES, otherwise
+    if flag is NO the scroller with automatically show and hide as needed.
+ */
+- (void)setAlwaysShowVerticalScroller:(BOOL)flag;
+
+/*!
+    @method alwaysShowVerticalScroller
+    @result YES if the vertical scroller is always shown
+ */
+- (BOOL)alwaysShowVerticalScroller;
+
+/*!
+    @method setAlwaysShowHorizontalScroller:
+    @result Forces the horizontal scroller to be visible if flag is YES,
+   otherwise
+    if flag is NO the scroller with automatically show and hide as needed.
+ */
+- (void)setAlwaysShowHorizontalScroller:(BOOL)flag;
+
+/*!
+    @method alwaysShowHorizontalScroller
+    @result YES if the horizontal scroller is always shown
+ */
+- (BOOL)alwaysShowHorizontalScroller;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

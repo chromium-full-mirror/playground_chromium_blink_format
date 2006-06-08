@@ -34,6 +34,8 @@
 @interface WebDynamicScrollBarsView : NSScrollView<WebCoreFrameView> {
   WebCoreScrollBarMode hScroll;
   WebCoreScrollBarMode vScroll;
+  BOOL hScrollModeLocked;
+  BOOL vScrollModeLocked;
   BOOL suppressLayout;
   BOOL suppressScrollers;
   BOOL inUpdateScrollers;
@@ -43,6 +45,13 @@
 - (BOOL)allowsHorizontalScrolling;
 - (void)setAllowsVerticalScrolling:(BOOL)flag;
 - (BOOL)allowsVerticalScrolling;
+
+- (void)setHorizontalScrollingModeLocked:(BOOL)locked;
+- (void)setVerticalScrollingModeLocked:(BOOL)locked;
+- (void)setScrollingModesLocked:(BOOL)mode;
+
+- (BOOL)horizontalScrollingModeLocked;
+- (BOOL)verticalScrollingModeLocked;
 
 // Convenience method to affect both scrolling directions at once.
 - (void)setAllowsScrolling:(BOOL)flag;
