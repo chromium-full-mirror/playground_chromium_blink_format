@@ -113,7 +113,7 @@ class CompositeEditCommand : public EditCommand {
   WebCore::Node* appendBlockPlaceholder(WebCore::Node*);
   WebCore::Node* insertBlockPlaceholder(const WebCore::Position& pos);
   WebCore::Node* addBlockPlaceholderIfNeeded(WebCore::Node*);
-  bool removeBlockPlaceholder(const VisiblePosition&);
+  void removeBlockPlaceholder(const VisiblePosition&);
 
   void moveParagraphContentsToNewBlockIfNecessary(const WebCore::Position&);
 
