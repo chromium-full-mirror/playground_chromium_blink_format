@@ -31,6 +31,9 @@
 #include <cairo.h>
 #include <math.h>
 
+// This function loads resources from WebKit
+DeprecatedByteArray loadResourceIntoArray(const char*);
+
 namespace WebCore {
 
 void FrameData::clear() {
@@ -53,8 +56,10 @@ void Image::destroyNativeData() {}
 void Image::invalidateNativeData() {}
 
 Image* Image::loadResource(const char* name) {
-  // FIXME: Read the error image from disk.
-  return new Image();
+  DeprecatedByteArray arr = loadResourceIntoArray(name);
+  Image* img = new Image;
+  img->setData(arr, true);
+  return img;
 }
 
 bool Image::supportsType(const String& type) {

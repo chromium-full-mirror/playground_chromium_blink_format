@@ -140,6 +140,7 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_hBar(0),
       m_vBar(0),
       m_inResizeMode(false),
+      m_resizeCornerImage(0),
       m_posZOrderList(0),
       m_negZOrderList(0),
       m_overflowList(0),
@@ -158,6 +159,7 @@ RenderLayer::~RenderLayer() {
   // our destructor doesn't have to do anything.
   delete m_hBar;
   delete m_vBar;
+  delete m_resizeCornerImage;
   delete m_posZOrderList;
   delete m_negZOrderList;
   delete m_overflowList;
@@ -840,13 +842,12 @@ bool RenderLayer::shouldAutoscroll() {
   return false;
 }
 
-void RenderLayer::resize() {
+void RenderLayer::resize(const PlatformMouseEvent& evt) {
   if (!inResizeMode() || !renderer()->hasOverflowClip() ||
       m_object->style()->resize() == RESIZE_NONE)
     return;
 
-  PlatformMouseEvent* evt = new PlatformMouseEvent();
-  if (!evt->isMouseButtonDown(LeftButton))
+  if (!m_object->document()->frame()->view()->mousePressed())
     return;
 
   // FIXME Radar 4118559: This behaves very oddly for textareas that are in
@@ -857,7 +858,7 @@ void RenderLayer::resize() {
   // the cursor in view.
 
   IntPoint currentPoint =
-      m_object->document()->view()->viewportToContents(evt->pos());
+      m_object->document()->view()->viewportToContents(evt.pos());
 
   int x;
   int y;
@@ -898,8 +899,6 @@ void RenderLayer::resize() {
     m_object->node()->shadowAncestorNode()->renderer()->setNeedsLayout(true);
     m_object->document()->updateLayout();
   }
-
-  delete evt;
 }
 
 void RenderLayer::valueChanged(Widget*) {
@@ -1176,8 +1175,16 @@ void RenderLayer::paintScrollbars(GraphicsContext* p,
 }
 
 void RenderLayer::paintResizeControl(GraphicsContext* c) {
-  if (!resizeControlRect().isEmpty())
-    theme()->paintResizeControl(c, resizeControlRect());
+  if (resizeControlRect().isEmpty())
+    return;
+
+  if (!m_resizeCornerImage)
+    m_resizeCornerImage = Image::loadResource("textAreaResizeCorner");
+
+  IntPoint imagePoint(
+      resizeControlRect().right() - m_resizeCornerImage->width(),
+      resizeControlRect().bottom() - m_resizeCornerImage->height());
+  c->drawImage(m_resizeCornerImage, imagePoint);
 }
 
 bool RenderLayer::scroll(KWQScrollDirection direction,

@@ -79,7 +79,6 @@ class PlatformMouseEvent {
   bool altKey() const { return m_altKey; }
   bool metaKey() const { return m_metaKey; }
 
-  static bool isMouseButtonDown(MouseButton);
 #if __APPLE__
   PlatformMouseEvent(NSEvent*);
 #endif

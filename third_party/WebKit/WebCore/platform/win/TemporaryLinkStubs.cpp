@@ -346,10 +346,6 @@ Cursor::Cursor(Image*) {
 PlatformMouseEvent::PlatformMouseEvent() {
   notImplemented();
 }
-bool PlatformMouseEvent::isMouseButtonDown(MouseButton) {
-  notImplemented();
-  return false;
-}
 String WebCore::searchableIndexIntroduction() {
   notImplemented();
   return String();

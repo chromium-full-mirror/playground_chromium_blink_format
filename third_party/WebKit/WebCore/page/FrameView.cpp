@@ -690,7 +690,7 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
                                          false, 0, mouseEvent, true);
 
   if (d->m_resizeLayer && d->m_resizeLayer->inResizeMode())
-    d->m_resizeLayer->resize();
+    d->m_resizeLayer->resize(mouseEvent);
 
   if (!swallowEvent)
     m_frame->handleMouseMoveEvent(mev);
@@ -708,6 +708,10 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
 void FrameView::invalidateClick() {
   d->clickCount = 0;
   d->clickNode = 0;
+}
+
+bool FrameView::mousePressed() {
+  return d->mousePressed;
 }
 
 void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent) {
