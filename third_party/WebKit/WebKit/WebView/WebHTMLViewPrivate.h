@@ -117,7 +117,7 @@
 - (void)_removeHighlighterOfType:(NSString*)type;
 
 // SPI for DumpRenderTree
-- (void)_updateFocusState;
+- (void)_updateActiveState;
 
 // These methods might end up moving into a protocol, so different document
 // types can specify
