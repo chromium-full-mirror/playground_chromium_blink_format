@@ -525,6 +525,27 @@ void BrowserExtensionWin::createNewWindow(
   notImplemented();
 }
 
+void GraphicsContext::addRoundedRectClip(const IntRect& rect,
+                                         const IntSize& topLeft,
+                                         const IntSize& topRight,
+                                         const IntSize& bottomLeft,
+                                         const IntSize& bottomRight) {
+  notImplemented();
+}
+void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
+                                              int thickness) {
+  notImplemented();
+}
+
+int WebCore::screenDepthPerComponent(Widget*) {
+  notImplemented();
+  return 0;
+}
+bool WebCore::screenIsMonochrome(Widget*) {
+  notImplemented();
+  return false;
+}
+
 /********************************************************/
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
@@ -639,17 +660,6 @@ bool ScrollView::inWindow() const {
   return true;
 }
 
-void GraphicsContext::addRoundedRectClip(const IntRect& rect,
-                                         const IntSize& topLeft,
-                                         const IntSize& topRight,
-                                         const IntSize& bottomLeft,
-                                         const IntSize& bottomRight) {
-  notImplemented();
-}
-void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
-                                              int thickness) {
-  notImplemented();
-}
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
 void GraphicsContext::beginTransparencyLayer(float) {}
