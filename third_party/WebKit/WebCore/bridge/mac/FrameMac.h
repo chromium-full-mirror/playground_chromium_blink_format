@@ -155,7 +155,6 @@ class FrameMac : public Frame {
   virtual void addMessageToConsole(const String& message,
                                    unsigned int lineNumber,
                                    const String& sourceID);
-  virtual void setIsActive(bool);
 
   NSView* nextKeyView(Node* startingPoint, KWQSelectionDirection);
   NSView* nextKeyViewInFrameHierarchy(Node* startingPoint,
