@@ -171,7 +171,7 @@ PassRefPtr<CSSStyleSheet> DOMImplementation::createCSSStyleSheet(
   ec = 0;
   CSSStyleSheet* const nullSheet = 0;
   RefPtr<CSSStyleSheet> sheet = new CSSStyleSheet(nullSheet);
-  sheet->setMedia(new MediaList(sheet.get(), media));
+  sheet->setMedia(new MediaList(sheet.get(), media, true));
   return sheet.release();
 }
 

@@ -53,6 +53,10 @@ StyleSheet* StyleSheet::parentStyleSheet() const {
 }
 
 void StyleSheet::setMedia(MediaList* media) {
+  if (m_media)
+    m_media->setParent(0);
+
   m_media = media;
+  m_media->setParent(this);
 }
 }

@@ -48,6 +48,7 @@
 #include "History.h"
 #include "KWQKHTMLSettings.h"
 #include "MediaList.h"
+#include "MediaQueryEvaluator.h"
 #include "Pair.h"
 #include "RectImpl.h"
 #include "RenderTheme.h"
@@ -174,7 +175,7 @@ class CSSRuleSet {
 
   typedef HashMap<AtomicStringImpl*, CSSRuleDataList*> AtomRuleMap;
 
-  void addRulesFromSheet(CSSStyleSheet* sheet, const String& medium = "screen");
+  void addRulesFromSheet(CSSStyleSheet* sheet, MediaQueryEvaluator* medium);
 
   void addRule(CSSStyleRule* rule, CSSSelector* sel);
   void addToRuleSet(AtomicStringImpl* key,
@@ -226,10 +227,34 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   settings = view ? view->frame()->settings() : 0;
   if (!defaultStyle)
     loadDefaultStyle();
-  m_mediaType = view ? view->mediaType() : String("all");
 
   m_userStyle = 0;
   m_userSheet = 0;
+
+  // construct document root element default style. this is needed
+  // to evaluate media queries that contain relative constraints, like "screen
+  // and (max-width: 10em)"
+  // This is here instead of constructor, because when constructor is run,
+  // document doesn't have documentElement
+  // NOTE: this assumes that element that gets passed to styleForElement -call
+  // is always from the document that owns the style selector
+  if (view)
+    m_medium = new MediaQueryEvaluator(view->mediaType());
+  else
+    m_medium = new MediaQueryEvaluator("all");
+
+  Element* root = doc->documentElement();
+
+  if (root)
+    m_rootDefaultStyle = styleForElement(
+        root, 0, false, true);  // dont ref, because the RenderStyle is
+                                // allocated from global heap
+
+  if (m_rootDefaultStyle && view) {
+    delete m_medium;
+    m_medium =
+        new MediaQueryEvaluator(view->mediaType(), view, m_rootDefaultStyle);
+  }
 
   // FIXME: This sucks! The user sheet is reparsed every time!
   if (!userStyleSheet.isEmpty()) {
@@ -237,7 +262,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
     m_userSheet->parseString(userStyleSheet, strictParsing);
 
     m_userStyle = new CSSRuleSet();
-    m_userStyle->addRulesFromSheet(m_userSheet, m_mediaType);
+    m_userStyle->addRulesFromSheet(m_userSheet, m_medium);
   }
 
   // add stylesheets from document
@@ -247,10 +272,7 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   for (; it.current(); ++it)
     if (it.current()->isCSSStyleSheet() && !it.current()->disabled())
       m_authorStyle->addRulesFromSheet(
-          static_cast<CSSStyleSheet*>(it.current()), m_mediaType);
-
-  m_ruleList = 0;
-  m_collectRulesOnly = false;
+          static_cast<CSSStyleSheet*>(it.current()), m_medium);
 }
 
 CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
@@ -259,16 +281,34 @@ CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
   if (!defaultStyle)
     loadDefaultStyle();
   FrameView* view = sheet->doc()->view();
-  m_mediaType = view ? view->mediaType() : String("all");
+
+  if (view)
+    m_medium = new MediaQueryEvaluator(view->mediaType());
+  else
+    m_medium = new MediaQueryEvaluator("all");
+
+  Element* root = sheet->doc()->documentElement();
+  if (root)
+    m_rootDefaultStyle = styleForElement(root, 0, false, true);
+
+  if (m_rootDefaultStyle && view) {
+    delete m_medium;
+    m_medium =
+        new MediaQueryEvaluator(view->mediaType(), view, m_rootDefaultStyle);
+  }
 
   m_authorStyle = new CSSRuleSet();
-  m_authorStyle->addRulesFromSheet(sheet, m_mediaType);
+  m_authorStyle->addRulesFromSheet(sheet, m_medium);
 }
 
 void CSSStyleSelector::init() {
   element = 0;
   settings = 0;
   m_matchedRuleCount = m_matchedDeclCount = m_tmpRuleCount = 0;
+  m_ruleList = 0;
+  m_collectRulesOnly = false;
+  m_rootDefaultStyle = 0;
+  m_medium = 0;
 }
 
 void CSSStyleSelector::setEncodedURL(const KURL& url) {
@@ -288,6 +328,9 @@ void CSSStyleSelector::setEncodedURL(const KURL& url) {
 }
 
 CSSStyleSelector::~CSSStyleSelector() {
+  delete m_medium;
+  ::delete m_rootDefaultStyle;
+
   delete m_authorStyle;
   delete m_userStyle;
   delete m_userSheet;
@@ -315,21 +358,24 @@ void CSSStyleSelector::loadDefaultStyle() {
   defaultPrintStyle = new CSSRuleSet;
   defaultQuirksStyle = new CSSRuleSet;
 
+  MediaQueryEvaluator screenEval("screen");
+  MediaQueryEvaluator printEval("print");
+
   // Strict-mode rules.
   defaultSheet = parseUASheet(html4UserAgentStyleSheet);
-  defaultStyle->addRulesFromSheet(defaultSheet, "screen");
-  defaultPrintStyle->addRulesFromSheet(defaultSheet, "print");
+  defaultStyle->addRulesFromSheet(defaultSheet, &screenEval);
+  defaultPrintStyle->addRulesFromSheet(defaultSheet, &printEval);
 
 #if SVG_SUPPORT
   // SVG rules.
   svgSheet = parseUASheet(svgUserAgentStyleSheet);
-  defaultStyle->addRulesFromSheet(svgSheet, "screen");
-  defaultPrintStyle->addRulesFromSheet(svgSheet, "print");
+  defaultStyle->addRulesFromSheet(svgSheet, &screenEval);
+  defaultPrintStyle->addRulesFromSheet(svgSheet, &printEval);
 #endif
 
   // Quirks-mode rules.
   quirksSheet = parseUASheet(quirksUserAgentStyleSheet);
-  defaultQuirksStyle->addRulesFromSheet(quirksSheet, "screen");
+  defaultQuirksStyle->addRulesFromSheet(quirksSheet, &screenEval);
 }
 
 void CSSStyleSelector::addMatchedRule(CSSRuleData* rule) {
@@ -721,9 +767,28 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
   return 0;
 }
 
+void CSSStyleSelector::matchUARules(int& firstUARule, int& lastUARule) {
+  // 1. First we match rules from the user agent sheet.
+  matchRules(defaultStyle, firstUARule, lastUARule);
+
+  // 2. In quirks mode, we match rules from the quirks user agent sheet.
+  if (!strictParsing)
+    matchRules(defaultQuirksStyle, firstUARule, lastUARule);
+
+  // 3. If our medium is print, then we match rules from the print sheet.
+  if (m_medium->mediaTypeMatch("print"))
+    matchRules(defaultPrintStyle, firstUARule, lastUARule);
+}
+
+// If resolveForRootDefault is true, style based on user agent style sheet only.
+// This is used in media queries, where
+// relative units are interpreted according to document root element style,
+// styled only with UA stylesheet
+
 RenderStyle* CSSStyleSelector::styleForElement(Element* e,
                                                RenderStyle* defaultParent,
-                                               bool allowSharing) {
+                                               bool allowSharing,
+                                               bool resolveForRootDefault) {
   if (allowSharing && !e->document()->haveStylesheetsLoaded()) {
     if (!styleNotYetAvailable) {
       styleNotYetAvailable = ::new RenderStyle();
@@ -749,74 +814,72 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
   }
   initForStyleResolve(e, defaultParent);
 
-  style = new (e->document()->renderArena()) RenderStyle();
-  style->ref();
+  if (resolveForRootDefault) {
+    style = ::new RenderStyle();
+    // don't ref, because we want to delete this, but we cannot unref it
+  } else {
+    style = new (e->document()->renderArena()) RenderStyle();
+    style->ref();
+  }
   if (parentStyle)
     style->inheritFrom(parentStyle);
   else
     parentStyle = style;
 
-  // 1. First we match rules from the user agent sheet.
   int firstUARule = -1, lastUARule = -1;
-  matchRules(defaultStyle, firstUARule, lastUARule);
-
-  // 2. In quirks mode, we match rules from the quirks user agent sheet.
-  if (!strictParsing)
-    matchRules(defaultQuirksStyle, firstUARule, lastUARule);
-
-  // 3. If our medium is print, then we match rules from the print sheet.
-  if (m_mediaType == "print")
-    matchRules(defaultPrintStyle, firstUARule, lastUARule);
-
-  // 4. Now we check user sheet rules.
   int firstUserRule = -1, lastUserRule = -1;
-  matchRules(m_userStyle, firstUserRule, lastUserRule);
-
-  // 5. Now check author rules, beginning first with presentational attributes
-  // mapped from HTML.
   int firstAuthorRule = -1, lastAuthorRule = -1;
-  if (styledElement) {
-    // Ask if the HTML element has mapped attributes.
-    if (styledElement->hasMappedAttributes()) {
-      // Walk our attribute list and add in each decl.
-      const NamedMappedAttrMap* map = styledElement->mappedAttributes();
-      for (unsigned i = 0; i < map->length(); i++) {
-        MappedAttribute* attr = map->attributeItem(i);
-        if (attr->decl()) {
-          if (firstAuthorRule == -1)
-            firstAuthorRule = m_matchedDeclCount;
-          lastAuthorRule = m_matchedDeclCount;
-          addMatchedDeclaration(attr->decl());
+  matchUARules(firstUARule, lastUARule);
+
+  if (!resolveForRootDefault) {
+    // 4. Now we check user sheet rules.
+    matchRules(m_userStyle, firstUserRule, lastUserRule);
+
+    // 5. Now check author rules, beginning first with presentational attributes
+    // mapped from HTML.
+    if (styledElement) {
+      // Ask if the HTML element has mapped attributes.
+      if (styledElement->hasMappedAttributes()) {
+        // Walk our attribute list and add in each decl.
+        const NamedMappedAttrMap* map = styledElement->mappedAttributes();
+        for (unsigned i = 0; i < map->length(); i++) {
+          MappedAttribute* attr = map->attributeItem(i);
+          if (attr->decl()) {
+            if (firstAuthorRule == -1)
+              firstAuthorRule = m_matchedDeclCount;
+            lastAuthorRule = m_matchedDeclCount;
+            addMatchedDeclaration(attr->decl());
+          }
         }
+      }
+
+      // Now we check additional mapped declarations.
+      // Tables and table cells share an additional mapped rule that must be
+      // applied
+      // after all attributes, since their mapped style depends on the values of
+      // multiple attributes.
+      CSSMutableStyleDeclaration* attributeDecl =
+          styledElement->additionalAttributeStyleDecl();
+      if (attributeDecl) {
+        if (firstAuthorRule == -1)
+          firstAuthorRule = m_matchedDeclCount;
+        lastAuthorRule = m_matchedDeclCount;
+        addMatchedDeclaration(attributeDecl);
       }
     }
 
-    // Now we check additional mapped declarations.
-    // Tables and table cells share an additional mapped rule that must be
-    // applied
-    // after all attributes, since their mapped style depends on the values of
-    // multiple attributes.
-    CSSMutableStyleDeclaration* attributeDecl =
-        styledElement->additionalAttributeStyleDecl();
-    if (attributeDecl) {
-      if (firstAuthorRule == -1)
-        firstAuthorRule = m_matchedDeclCount;
-      lastAuthorRule = m_matchedDeclCount;
-      addMatchedDeclaration(attributeDecl);
-    }
-  }
+    // 6. Check the rules in author sheets next.
+    matchRules(m_authorStyle, firstAuthorRule, lastAuthorRule);
 
-  // 6. Check the rules in author sheets next.
-  matchRules(m_authorStyle, firstAuthorRule, lastAuthorRule);
-
-  // 7. Now check our inline style attribute.
-  if (styledElement) {
-    CSSMutableStyleDeclaration* inlineDecl = styledElement->inlineStyleDecl();
-    if (inlineDecl) {
-      if (firstAuthorRule == -1)
-        firstAuthorRule = m_matchedDeclCount;
-      lastAuthorRule = m_matchedDeclCount;
-      addMatchedDeclaration(inlineDecl);
+    // 7. Now check our inline style attribute.
+    if (styledElement) {
+      CSSMutableStyleDeclaration* inlineDecl = styledElement->inlineStyleDecl();
+      if (inlineDecl) {
+        if (firstAuthorRule == -1)
+          firstAuthorRule = m_matchedDeclCount;
+        lastAuthorRule = m_matchedDeclCount;
+        addMatchedDeclaration(inlineDecl);
+      }
     }
   }
 
@@ -828,44 +891,35 @@ RenderStyle* CSSStyleSelector::styleForElement(Element* e,
   // (3) normal not important
   // and (4) normal important.
   applyDeclarations(true, false, 0, m_matchedDeclCount - 1);
-  applyDeclarations(true, true, firstAuthorRule, lastAuthorRule);
-  applyDeclarations(true, true, firstUserRule, lastUserRule);
+  if (!resolveForRootDefault) {
+    applyDeclarations(true, true, firstAuthorRule, lastAuthorRule);
+    applyDeclarations(true, true, firstUserRule, lastUserRule);
+  }
   applyDeclarations(true, true, firstUARule, lastUARule);
 
   // If our font got dirtied, go ahead and update it now.
-  if (fontDirty) {
-    checkForTextSizeAdjust();
-    checkForGenericFamilyChange(style, parentStyle);
-    style->font().update();
-    fontDirty = false;
-  }
+  if (fontDirty)
+    updateFont();
 
   // Now do the normal priority UA properties.
   applyDeclarations(false, false, firstUARule, lastUARule);
 
   // Cache our border and background so that we can examine them later.
-  m_hasUAAppearance = style->hasAppearance();
-  if (m_hasUAAppearance) {
-    m_borderData = style->border();
-    m_backgroundData = *style->backgroundLayers();
-    m_backgroundColor = style->backgroundColor();
-  }
+  cacheBorderAndBackground();
 
   // Now do the author and user normal priority properties and all the
   // !important properties.
-  applyDeclarations(false, false, lastUARule + 1, m_matchedDeclCount - 1);
-  applyDeclarations(false, true, firstAuthorRule, lastAuthorRule);
-  applyDeclarations(false, true, firstUserRule, lastUserRule);
+  if (!resolveForRootDefault) {
+    applyDeclarations(false, false, lastUARule + 1, m_matchedDeclCount - 1);
+    applyDeclarations(false, true, firstAuthorRule, lastAuthorRule);
+    applyDeclarations(false, true, firstUserRule, lastUserRule);
+  }
   applyDeclarations(false, true, firstUARule, lastUARule);
 
   // If our font got dirtied by one of the non-essential font props,
   // go ahead and update it a second time.
-  if (fontDirty) {
-    checkForTextSizeAdjust();
-    checkForGenericFamilyChange(style, parentStyle);
-    style->font().update();
-    fontDirty = false;
-  }
+  if (fontDirty)
+    updateFont();
 
   // Clean up our style object's display and text decorations (among other
   // fixups).
@@ -919,23 +973,14 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
   applyDeclarations(true, true, firstUARule, lastUARule);
 
   // If our font got dirtied, go ahead and update it now.
-  if (fontDirty) {
-    checkForTextSizeAdjust();
-    checkForGenericFamilyChange(style, parentStyle);
-    style->font().update();
-    fontDirty = false;
-  }
+  if (fontDirty)
+    updateFont();
 
   // Now do the normal priority properties.
   applyDeclarations(false, false, firstUARule, lastUARule);
 
   // Cache our border and background so that we can examine them later.
-  m_hasUAAppearance = style->hasAppearance();
-  if (m_hasUAAppearance) {
-    m_borderData = style->border();
-    m_backgroundData = *style->backgroundLayers();
-    m_backgroundColor = style->backgroundColor();
-  }
+  cacheBorderAndBackground();
 
   applyDeclarations(false, false, lastUARule + 1, m_matchedDeclCount - 1);
   applyDeclarations(false, true, firstAuthorRule, lastAuthorRule);
@@ -944,13 +989,8 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
 
   // If our font got dirtied by one of the non-essential font props,
   // go ahead and update it a second time.
-  if (fontDirty) {
-    checkForTextSizeAdjust();
-    checkForGenericFamilyChange(style, parentStyle);
-    style->font().update();
-    fontDirty = false;
-  }
-
+  if (fontDirty)
+    updateFont();
   // Clean up our style object's display and text decorations (among other
   // fixups).
   adjustRenderStyle(style, 0);
@@ -1100,6 +1140,22 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
     view->useSlowRepaints();
 }
 
+void CSSStyleSelector::updateFont() {
+  checkForTextSizeAdjust();
+  checkForGenericFamilyChange(style, parentStyle);
+  style->font().update();
+  fontDirty = false;
+}
+
+void CSSStyleSelector::cacheBorderAndBackground() {
+  m_hasUAAppearance = style->hasAppearance();
+  if (m_hasUAAppearance) {
+    m_borderData = style->border();
+    m_backgroundData = *style->backgroundLayers();
+    m_backgroundColor = style->backgroundColor();
+  }
+}
+
 RefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(Element* e,
                                                            bool authorOnly) {
   if (!e->document()->haveStylesheetsLoaded())
@@ -1111,17 +1167,9 @@ RefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(Element* e,
   initForStyleResolve(e, 0);
 
   if (!authorOnly) {
-    // First we match rules from the user agent sheet.
     int firstUARule = -1, lastUARule = -1;
-    matchRules(defaultStyle, firstUARule, lastUARule);
-
-    // In quirks mode, we match rules from the quirks user agent sheet.
-    if (!strictParsing)
-      matchRules(defaultQuirksStyle, firstUARule, lastUARule);
-
-    // If our medium is print, then we match rules from the print sheet.
-    if (m_mediaType == "print")
-      matchRules(defaultPrintStyle, firstUARule, lastUARule);
+    // First we match rules from the user agent sheet.
+    matchUARules(firstUARule, lastUARule);
 
     // Now we check user sheet rules.
     int firstUserRule = -1, lastUserRule = -1;
@@ -1673,13 +1721,14 @@ void CSSRuleSet::addRule(CSSStyleRule* rule, CSSSelector* sel) {
     m_universalRules->append(m_ruleCount++, rule, sel);
 }
 
-void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet, const String& medium) {
+void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
+                                   MediaQueryEvaluator* medium) {
   if (!sheet || !sheet->isCSSStyleSheet())
     return;
 
   // No media implies "all", but if a media list exists it must
   // contain our current medium
-  if (sheet->media() && !sheet->media()->contains(medium))
+  if (sheet->media() && !medium->eval(sheet->media()))
     return;  // the style sheet doesn't apply
 
   int len = sheet->length();
@@ -1692,13 +1741,13 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet, const String& medium) {
         addRule(rule, s);
     } else if (item->isImportRule()) {
       CSSImportRule* import = static_cast<CSSImportRule*>(item);
-      if (!import->media() || import->media()->contains(medium))
+      if (!import->media() || medium->eval(import->media()))
         addRulesFromSheet(import->styleSheet(), medium);
     } else if (item->isMediaRule()) {
       CSSMediaRule* r = static_cast<CSSMediaRule*>(item);
       CSSRuleList* rules = r->cssRules();
 
-      if ((!r->media() || r->media()->contains(medium)) && rules) {
+      if ((!r->media() || medium->eval(r->media())) && rules) {
         // Traverse child elements of the @media rule.
         for (unsigned j = 0; j < rules->length(); j++) {
           CSSRule* childItem = rules->item(j);

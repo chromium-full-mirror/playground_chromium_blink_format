@@ -27,6 +27,7 @@
 #include "Color.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
+#include "MediaQuery.h"
 
 namespace WebCore {
 
@@ -43,6 +44,8 @@ class Document;
 class MediaList;
 class StyleBase;
 class StyleList;
+class MediaList;
+class MediaQueryExp;
 
 struct ParseString {
   UChar* characters;
@@ -114,6 +117,7 @@ class CSSParser {
   static RGBA32 parseColor(const String&);
   bool parseColor(CSSMutableStyleDeclaration*, const String&);
   bool parseDeclaration(CSSMutableStyleDeclaration*, const String&);
+  bool parseMediaQuery(MediaList*, const String&);
 
   static CSSParser* current() { return currentParser; }
 
@@ -188,12 +192,23 @@ class CSSParser {
   CSSRuleList* createRuleList();
   CSSRule* createStyleRule(CSSSelector*);
 
+  MediaQueryExp* createFloatingMediaQueryExp(const AtomicString&, ValueList*);
+  MediaQueryExp* sinkFloatingMediaQueryExp(MediaQueryExp*);
+  Vector<MediaQueryExp*>* createFloatingMediaQueryExpList();
+  Vector<MediaQueryExp*>* sinkFloatingMediaQueryExpList(
+      Vector<MediaQueryExp*>*);
+  MediaQuery* createFloatingMediaQuery(MediaQuery::Restrictor,
+                                       const String&,
+                                       Vector<MediaQueryExp*>*);
+  MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
+
  public:
   bool strict;
   bool important;
   int id;
   StyleList* styleElement;
   RefPtr<CSSRule> rule;
+  MediaQuery* mediaQuery;
   ValueList* valueList;
   CSSProperty** parsedProperties;
   int numParsedProperties;
@@ -236,6 +251,10 @@ class CSSParser {
   HashSet<CSSSelector*> m_floatingSelectors;
   HashSet<ValueList*> m_floatingValueLists;
   HashSet<Function*> m_floatingFunctions;
+
+  MediaQuery* m_floatingMediaQuery;
+  MediaQueryExp* m_floatingMediaQueryExp;
+  Vector<MediaQueryExp*>* m_floatingMediaQueryExpList;
 
   // defines units allowed for a certain property, used in parseUnit
   enum Units {
