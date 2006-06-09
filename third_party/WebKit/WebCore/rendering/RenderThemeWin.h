@@ -49,6 +49,9 @@ class RenderThemeWin : public RenderTheme {
   // hovered.
   virtual bool supportsHover(const RenderStyle*) const { return true; }
 
+  virtual Color platformActiveSelectionColor() const;
+  virtual Color platformInactiveSelectionColor() const;
+
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {

@@ -76,7 +76,7 @@ class RenderTable;
 class RenderText;
 class VisiblePosition;
 
-const int selectionColorImageOverlayAlpha = 60 * 255 / 100;
+const int selectionColorOverlayAlpha = 60 * 255 / 100;
 
 enum PaintPhase {
   PaintPhaseBlockBackground,
@@ -960,7 +960,7 @@ class RenderObject : public CachedObjectClient {
 
   // Obtains the selection background color that should be used when painting a
   // selection.
-  virtual Color selectionColor(GraphicsContext*) const;
+  Color selectionColor() const;
 
   // Whether or not a given block needs to paint selection gaps.
   virtual bool shouldPaintSelectionGaps() const { return false; }

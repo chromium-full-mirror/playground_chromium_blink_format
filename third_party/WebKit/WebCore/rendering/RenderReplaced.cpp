@@ -208,16 +208,4 @@ bool RenderReplaced::isSelected() {
   ASSERT(0);
   return false;
 }
-
-Color RenderReplaced::selectionColor(GraphicsContext* p) const {
-  Color color = RenderBox::selectionColor(p);
-
-  // Limit the opacity so that no user-specified selection color can obscure
-  // selected images.
-  if (color.alpha() > selectionColorImageOverlayAlpha)
-    color = Color(color.red(), color.green(), color.blue(),
-                  selectionColorImageOverlayAlpha);
-
-  return color;
-}
 }

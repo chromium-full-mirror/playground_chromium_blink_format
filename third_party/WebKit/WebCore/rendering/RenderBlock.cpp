@@ -1854,7 +1854,7 @@ IntRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
     return IntRect();
   IntRect gapRect(xPos, yPos, width, height);
   if (i)
-    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
+    i->p->fillRect(gapRect, selObj->selectionColor());
   return gapRect;
 }
 
@@ -1880,7 +1880,7 @@ IntRect RenderBlock::fillVerticalSelectionGap(int lastTop,
 
   IntRect gapRect(left, top, width, height);
   if (i)
-    i->p->fillRect(gapRect, selectionColor(i->p));
+    i->p->fillRect(gapRect, selectionColor());
   return gapRect;
 }
 
@@ -1903,7 +1903,7 @@ IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
 
   IntRect gapRect(left, top, width, height);
   if (i)
-    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
+    i->p->fillRect(gapRect, selObj->selectionColor());
   return gapRect;
 }
 
@@ -1927,7 +1927,7 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
 
   IntRect gapRect(left, top, width, height);
   if (i)
-    i->p->fillRect(gapRect, selObj->selectionColor(i->p));
+    i->p->fillRect(gapRect, selObj->selectionColor());
   return gapRect;
 }
 

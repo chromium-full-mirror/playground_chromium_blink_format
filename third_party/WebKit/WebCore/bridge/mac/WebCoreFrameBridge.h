@@ -359,7 +359,7 @@ typedef enum {
 - (NSString*)selectedString;
 
 - (void)setSelectionFromNone;
-- (void)setDisplaysWithFocusAttributes:(BOOL)flag;
+- (void)setIsActive:(BOOL)flag;
 
 - (void)setWindowHasFocus:(BOOL)flag;
 

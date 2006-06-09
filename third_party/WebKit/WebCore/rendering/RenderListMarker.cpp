@@ -179,7 +179,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   if (m_listImage && !m_listImage->isErrorImage()) {
     p->drawImage(m_listImage->image(), marker.location());
     if (selectionState() != SelectionNone)
-      p->fillRect(selectionRect(), selectionColor(p));
+      p->fillRect(selectionRect(), selectionColor());
     return;
   }
 
@@ -189,7 +189,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
 #endif
 
   if (selectionState() != SelectionNone)
-    p->fillRect(selectionRect(), selectionColor(p));
+    p->fillRect(selectionRect(), selectionColor());
 
   const Color color(style()->color());
   p->setPen(color);
@@ -500,17 +500,5 @@ IntRect RenderListMarker::selectionRect() {
   RootInlineBox* root = inlineBoxWrapper()->root();
   return IntRect(absx + xPos(), absy + root->selectionTop(), width(),
                  root->selectionHeight());
-}
-
-Color RenderListMarker::selectionColor(GraphicsContext* p) const {
-  Color color = RenderBox::selectionColor(p);
-  if (!m_listImage || m_listImage->isErrorImage())
-    return color;
-  // Limit the opacity so that no user-specified selection color can obscure
-  // selected images.
-  if (color.alpha() > selectionColorImageOverlayAlpha)
-    color = Color(color.red(), color.green(), color.blue(),
-                  selectionColorImageOverlayAlpha);
-  return color;
 }
 }
