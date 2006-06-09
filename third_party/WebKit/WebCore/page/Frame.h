@@ -321,6 +321,8 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
    */
   virtual String selectedText() const;
 
+  bool findString(const String&, bool, bool, bool);
+
   /**
    * Returns the granularity of the selection (character, word, line,
    * paragraph).

@@ -250,8 +250,6 @@ class FrameMac : public Frame {
   NSString* searchForLabelsBeforeElement(NSArray* labels, Element* element);
   NSString* matchLabelsAgainstElement(NSArray* labels, Element* element);
 
-  bool findString(NSString* str, bool forward, bool caseFlag, bool wrapFlag);
-
   virtual void tokenizerProcessedData();
 
   virtual String overrideMediaType() const;

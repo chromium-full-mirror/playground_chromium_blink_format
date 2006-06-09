@@ -219,6 +219,12 @@ bool execDelete(Frame* frame, bool userInterface, const String& value) {
   return true;
 }
 
+// FIXME: Come up with a way to send more parameters to execCommand so that we
+// can support all of the features of Frame::findString.
+bool execFindString(Frame* frame, bool userInterface, const String& value) {
+  return frame->findString(value, true, false, true);
+}
+
 bool execForwardDelete(Frame* frame, bool userInterface, const String& value) {
   TypingCommand::forwardDeleteKeyPressed(frame->document());
   return true;
@@ -599,6 +605,7 @@ CommandMap* createCommandDictionary() {
        {execCut, enabledAnyEditableRangeSelection, stateNone, valueNull}},
       {"Delete",
        {execDelete, enabledAnyEditableSelection, stateNone, valueNull}},
+      {"FindString", {execFindString, enabled, stateNone, valueNull}},
       {"FontName",
        {execFontName, enabledAnySelection, stateNone, valueFontName}},
       {"FontSize",
