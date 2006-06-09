@@ -506,6 +506,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                            EditAction editingAction = EditActionUnspecified);
   TriState selectionHasStyle(CSSStyleDeclaration*) const;
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
+  TriState selectionListState() const;
   String selectionStartStylePropertyValue(int stylePropertyID) const;
   void applyEditingStyleToBodyElement() const;
   void removeEditingStyleFromBodyElement() const;

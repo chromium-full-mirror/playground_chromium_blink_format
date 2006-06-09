@@ -33,6 +33,7 @@
 #include "Frame.h"
 #include "HTMLNames.h"
 #include "HTMLImageElement.h"
+#include "InsertListCommand.h"
 #include "ReplaceSelectionCommand.h"
 #include "SelectionController.h"
 #include "TypingCommand.h"
@@ -319,6 +320,26 @@ bool execInsertText(Frame* frame, bool userInterface, const String& value) {
   return true;
 }
 
+bool execInsertUnorderedList(Frame* frame,
+                             bool userInterface,
+                             const String& value) {
+  EditCommandPtr(new InsertListCommand(frame->document(),
+                                       InsertListCommand::UnorderedListType,
+                                       value))
+      .apply();
+  return true;
+}
+
+bool execInsertOrderedList(Frame* frame,
+                           bool userInterface,
+                           const String& value) {
+  EditCommandPtr(new InsertListCommand(frame->document(),
+                                       InsertListCommand::OrderedListType,
+                                       value))
+      .apply();
+  return true;
+}
+
 bool execItalic(Frame* frame, bool userInterface, const String& value) {
   bool isItalic = selectionStartHasStyle(frame, CSS_PROP_FONT_STYLE, "italic");
   return execStyleChange(frame, CSS_PROP_FONT_STYLE,
@@ -507,6 +528,10 @@ Frame::TriState stateItalic(Frame* frame) {
   return stateStyle(frame, CSS_PROP_FONT_STYLE, "italic");
 }
 
+Frame::TriState stateList(Frame* frame) {
+  return frame->selectionListState();
+}
+
 Frame::TriState stateStrikethrough(Frame* frame) {
   return stateStyle(frame, CSS_PROP_TEXT_DECORATION, "line-through");
 }
@@ -597,6 +622,9 @@ CommandMap* createCommandDictionary() {
       {"InsertLineBreak",
        {execInsertLineBreak, enabledAnyEditableSelection, stateNone,
         valueNull}},
+      {"InsertOrderedList",
+       {execInsertOrderedList, enabledAnyRichlyEditableSelection, stateList,
+        valueNull}},
       {"InsertParagraph",
        {execInsertParagraph, enabledAnyEditableSelection, stateNone,
         valueNull}},
@@ -605,6 +633,9 @@ CommandMap* createCommandDictionary() {
         stateNone, valueNull}},
       {"InsertText",
        {execInsertText, enabledAnyEditableSelection, stateNone, valueNull}},
+      {"InsertUnorderedList",
+       {execInsertUnorderedList, enabledAnyRichlyEditableSelection, stateList,
+        valueNull}},
       {"Italic",
        {execItalic, enabledAnyRichlyEditableSelection, stateItalic, valueNull}},
       {"JustifyCenter",
@@ -683,11 +714,9 @@ CommandMap* createCommandDictionary() {
       // InsertInputSubmit (not supported)
       // InsertInputText (not supported)
       // InsertMarquee (not supported)
-      // InsertOrderedList (not supported)
       // InsertSelectDropDown (not supported)
       // InsertSelectListBox (not supported)
       // InsertTextArea (not supported)
-      // InsertUnorderedList (not supported)
       // LiveResize (not supported)
       // MultipleSelection (not supported)
       // Open (not supported)

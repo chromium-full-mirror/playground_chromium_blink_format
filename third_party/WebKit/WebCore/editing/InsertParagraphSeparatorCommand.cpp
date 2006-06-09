@@ -76,14 +76,6 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
     applyStyle(m_style.get());
 }
 
-PassRefPtr<Element> createListItemElement(Document* document) {
-  ExceptionCode ec = 0;
-  RefPtr<Element> breakNode =
-      document->createElementNS(xhtmlNamespaceURI, "li", ec);
-  ASSERT(ec == 0);
-  return breakNode.release();
-}
-
 static Node* embeddedSublist(Node* listItem) {
   // check for sublist embedded in the list item
   // NOTE: Must allow for collapsed sublist (i.e. no renderer), so just check
