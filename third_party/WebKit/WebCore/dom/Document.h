@@ -618,12 +618,15 @@ class Document : public ContainerNode {
   void removeMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   void removeMarkers(Node*);
   void repaintMarkers(DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
+  void setRenderedRectForMarker(Node*, DocumentMarker, IntRect);
   void shiftMarkers(Node*,
                     unsigned startOffset,
                     int delta,
                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
 
   Vector<DocumentMarker> markersForNode(Node*);
+  Vector<IntRect> renderedRectsForMarkers(
+      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
 
   // designMode support
   enum InheritedBool { off = false, on = true, inherit };
@@ -755,7 +758,9 @@ class Document : public ContainerNode {
 
   RenderArena* m_renderArena;
 
-  typedef HashMap<RefPtr<Node>, Vector<DocumentMarker>*> MarkerMap;
+  typedef std::pair<Vector<DocumentMarker>, Vector<IntRect>>
+      MarkerMapVectorPair;
+  typedef HashMap<RefPtr<Node>, MarkerMapVectorPair*> MarkerMap;
   MarkerMap m_markers;
 
   mutable AccessibilityObjectCache* m_accCache;
