@@ -1505,8 +1505,8 @@ void JSHTMLElement::put(ExecState* exec,
     }
   }
 
-  lookupPut<JSHTMLElement, JSElement>(exec, propertyName, value, attr,
-                                      &HTMLElementTable, this);
+  lookupPut<JSHTMLElement, WebCore::JSHTMLElement>(
+      exec, propertyName, value, attr, &HTMLElementTable, this);
 }
 
 void JSHTMLElement::selectSetter(ExecState* exec,
