@@ -35,6 +35,10 @@
 typedef void* HANDLE;
 #endif
 
+#if PLATFORM(GDK)
+typedef void CURL;
+#endif
+
 // The allocations and releases in TransferJobInternal are
 // Cocoa-exception-free (either simple Foundation classes or
 // KWQResourceLoader which avoids doing work in dealloc).
@@ -71,6 +75,10 @@ class TransferJobInternal {
         m_formDataLength(0),
         m_bytesRemainingToWrite(0)
 #endif
+#if PLATFORM(GDK)
+        ,
+        m_handle(0)
+#endif
   {
   }
 
@@ -103,6 +111,10 @@ class TransferJobInternal {
         m_formDataString(0),
         m_formDataLength(0),
         m_bytesRemainingToWrite(0)
+#endif
+#if PLATFORM(GDK)
+        ,
+        m_handle(0)
 #endif
   {
   }
@@ -137,6 +149,9 @@ class TransferJobInternal {
   int m_formDataLength;
   int m_bytesRemainingToWrite;
   DeprecatedString m_postReferrer;
+#endif
+#if PLATFORM(GDK)
+  CURL* m_handle;
 #endif
 };
 

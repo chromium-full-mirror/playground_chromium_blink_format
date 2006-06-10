@@ -75,6 +75,9 @@
 #elif PLATFORM(WIN_OS)
 #define KXMLCORE_PLATFORM_WIN 1
 #endif
+#if defined(BUILDING_GDK__)
+#define KXMLCORE_PLATFORM_GDK 1
+#endif
 
 // CPU
 

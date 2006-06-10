@@ -99,6 +99,10 @@ class TransferJob {
                                               LPARAM);
 #endif
 
+#if PLATFORM(GDK)
+  TransferJobInternal* getInternal() { return d; }
+#endif
+
   void cancel();
 
   TransferJobClient* client() const;
