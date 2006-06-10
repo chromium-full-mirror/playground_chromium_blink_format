@@ -73,8 +73,8 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
   JSObject* globalObj = exec->dynamicInterpreter()->globalObject();
 
   // enter a new execution context
-  ContextImp ctx(globalObj, exec->dynamicInterpreter()->imp(), thisObj,
-                 body.get(), codeType(), exec->context().imp(), this, &args);
+  Context ctx(globalObj, exec->dynamicInterpreter()->imp(), thisObj, body.get(),
+              codeType(), exec->context(), this, &args);
   ExecState newExec(exec->dynamicInterpreter(), &ctx);
   newExec.setException(exec->exception());  // could be null
 
@@ -160,7 +160,7 @@ UString FunctionImp::parameterString() const {
 
 // ECMA 10.1.3q
 void FunctionImp::processParameters(ExecState* exec, const List& args) {
-  JSObject* variable = exec->context().imp()->variableObject();
+  JSObject* variable = exec->context()->variableObject();
 
 #ifdef KJS_VERBOSE
   fprintf(stderr,
@@ -201,7 +201,7 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
-  ContextImp* context = exec->m_context;
+  Context* context = exec->m_context;
   while (context) {
     if (context->function() == thisObj) {
       return static_cast<ActivationImp*>(context->activationObject())
@@ -816,10 +816,11 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
           return throwError(exec, SyntaxError, errMsg, errLine, sid, NULL);
 
         // enter a new execution context
-        JSObject* thisVal = static_cast<JSObject*>(exec->context().thisValue());
-        ContextImp ctx(exec->dynamicInterpreter()->globalObject(),
-                       exec->dynamicInterpreter()->imp(), thisVal,
-                       progNode.get(), EvalCode, exec->context().imp());
+        JSObject* thisVal =
+            static_cast<JSObject*>(exec->context()->thisValue());
+        Context ctx(exec->dynamicInterpreter()->globalObject(),
+                    exec->dynamicInterpreter()->imp(), thisVal, progNode.get(),
+                    EvalCode, exec->context());
 
         ExecState newExec(exec->dynamicInterpreter(), &ctx);
         newExec.setException(exec->exception());  // could be null
