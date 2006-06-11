@@ -17,6 +17,9 @@
  */
 
 #include "config.h"
+
+#if SVG_SUPPORT
+
 #include "JSSVGElementWrapperFactory.h"
 
 #include "JSSVGSVGElement.h"
@@ -64,3 +67,5 @@ DOMNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
   return new JSSVGElement(exec, element.get());
 }
 }
+
+#endif  // SVG_SUPPORT
