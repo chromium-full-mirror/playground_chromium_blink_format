@@ -29,8 +29,11 @@
 #import <WebKit/WebHTMLRepresentation.h>
 
 @class WebFrameBridge;
+@protocol WebPluginManualLoader;
 
 @interface WebHTMLRepresentation (WebPrivate)
 - (WebFrameBridge*)_bridge;
+- (void)_redirectDataToManualLoader:(id<WebPluginManualLoader>)manualLoader
+                      forPluginView:(NSView*)pluginView;
 - (void)printDOMTree;
 @end

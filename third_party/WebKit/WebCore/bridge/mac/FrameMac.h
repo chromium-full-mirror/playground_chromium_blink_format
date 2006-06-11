@@ -137,6 +137,8 @@ class FrameMac : public Frame {
                                const Vector<String>& paramNames,
                                const Vector<String>& paramValues,
                                const String& mimeType);
+  virtual void redirectDataToPlugin(Widget* pluginWidget);
+
   virtual Frame* createFrame(const KURL& url,
                              const String& name,
                              RenderPart* renderer,

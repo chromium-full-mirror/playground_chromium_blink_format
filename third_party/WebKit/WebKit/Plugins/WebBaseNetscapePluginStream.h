@@ -71,6 +71,7 @@
 - (void)setPluginPointer:(NPP)pluginPointer;
 
 - (uint16)transferMode;
+- (NPP)instance;
 
 - (void)startStreamResponseURL:(NSURL*)theResponseURL
          expectedContentLength:(long long)expectedContentLength

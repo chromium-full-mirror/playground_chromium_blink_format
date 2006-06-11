@@ -183,10 +183,6 @@ PassRefPtr<HTMLDocument> DOMImplementation::createHTMLDocument(FrameView* v) {
   return new HTMLDocument(this, v);
 }
 
-PassRefPtr<TextDocument> DOMImplementation::createTextDocument(FrameView* v) {
-  return new TextDocument(this, v);
-}
-
 DOMImplementation* DOMImplementation::instance() {
   static RefPtr<DOMImplementation> i = new DOMImplementation;
   return i.get();

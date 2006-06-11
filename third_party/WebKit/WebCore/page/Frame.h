@@ -600,6 +600,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   virtual bool passWheelEventToChildWidget(Node*) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
   virtual String overrideMediaType() const = 0;
+  virtual void redirectDataToPlugin(Widget* pluginWidget) {}
 
  protected:
   virtual Plugin* createPlugin(Element* node,

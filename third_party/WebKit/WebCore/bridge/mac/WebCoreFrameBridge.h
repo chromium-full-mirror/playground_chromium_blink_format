@@ -700,12 +700,14 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                  attributeNames:(NSArray*)attributeNames
                 attributeValues:(NSArray*)attributeValues
                        MIMEType:(NSString*)MIMEType
-                     DOMElement:(DOMElement*)element;
+                     DOMElement:(DOMElement*)element
+                   loadManually:(BOOL)loadManually;
 - (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
                        attributeNames:(NSArray*)attributeNames
                       attributeValues:(NSArray*)attributeValues
                               baseURL:(NSURL*)baseURL
                            DOMElement:(DOMElement*)element;
+- (void)redirectDataToPlugin:(NSView*)pluginView;
 
 - (BOOL)saveDocumentToPageCache:(id)documentInfo;
 

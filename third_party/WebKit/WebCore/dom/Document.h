@@ -230,6 +230,7 @@ class Document : public ContainerNode {
   // Other methods (not part of DOM)
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
+  virtual bool isPluginDocument() const { return false; }
 
   CSSStyleSelector* styleSelector() const { return m_styleSelector; }
 
