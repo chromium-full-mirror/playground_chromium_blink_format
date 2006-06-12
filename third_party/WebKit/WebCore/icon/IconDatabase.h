@@ -29,7 +29,7 @@
 #include "config.h"
 
 #include "PlatformString.h"
-#include "sqlite3.h"
+#include "SQLDatabase.h"
 
 namespace WebCore {
 
@@ -37,9 +37,9 @@ class IconDatabase {
  public:
   static IconDatabase* sharedIconDatabase();
 
-  void close();
   bool open(const String& path);
-  bool isOpen() { return m_db; }
+  bool isOpen() { return m_db.isOpen(); }
+  void close();
 
  private:
   IconDatabase();
@@ -47,7 +47,7 @@ class IconDatabase {
 
   static IconDatabase* m_sharedInstance;
 
-  sqlite3* m_db;
+  SQLDatabase m_db;
 };
 
 }  // namespace WebCore

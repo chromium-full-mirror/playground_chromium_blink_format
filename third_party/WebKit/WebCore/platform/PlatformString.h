@@ -42,6 +42,8 @@ class String {
  public:
   String() {}  // gives null string, distinguishable from an empty string
   String(const UChar*, unsigned length);
+  explicit String(
+      const UChar*);  // Specifically and explicitly for null terminated UTF-16
   String(const KJS::Identifier&);
   String(const KJS::UString&);
   String(const char*);
