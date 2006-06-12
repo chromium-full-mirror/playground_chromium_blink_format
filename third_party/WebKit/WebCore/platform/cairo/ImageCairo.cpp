@@ -32,7 +32,7 @@
 #include <math.h>
 
 // This function loads resources from WebKit
-DeprecatedByteArray loadResourceIntoArray(const char*);
+Vector<char> loadResourceIntoArray(const char*);
 
 namespace WebCore {
 
@@ -56,7 +56,7 @@ void Image::destroyNativeData() {}
 void Image::invalidateNativeData() {}
 
 Image* Image::loadResource(const char* name) {
-  DeprecatedByteArray arr = loadResourceIntoArray(name);
+  Vector<char> arr = loadResourceIntoArray(name);
   Image* img = new Image;
   img->setData(arr, true);
   return img;

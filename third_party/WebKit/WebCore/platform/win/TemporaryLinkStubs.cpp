@@ -369,7 +369,7 @@ Vector<char> KWQServeSynchronousRequest(Loader*,
                                         KURL&,
                                         DeprecatedString&) {
   notImplemented();
-  return 0;
+  return Vector<char>();
 }
 
 void FrameWin::focusWindow() {
