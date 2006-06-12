@@ -319,11 +319,11 @@ void GraphicsContext::drawArc(const IntRect& rect,
   }
 }
 
-void GraphicsContext::drawConvexPolygon(const IntPointArray& points) {
+void GraphicsContext::drawConvexPolygon(size_t npoints,
+                                        const IntPoint* points) {
   if (paintingDisabled())
     return;
 
-  int npoints = points.size();
   if (npoints <= 1)
     return;
 
@@ -332,7 +332,7 @@ void GraphicsContext::drawConvexPolygon(const IntPointArray& points) {
   cairo_save(context);
   cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
   cairo_move_to(context, points[0].x(), points[0].y());
-  for (int i = 1; i < npoints; i++)
+  for (size_t i = 1; i < npoints; i++)
     cairo_line_to(context, points[i].x(), points[i].y());
   cairo_close_path(context);
 

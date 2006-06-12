@@ -54,11 +54,6 @@ DeprecatedString TextEncoding::toUnicode(const char* chs, int len) const {
   return StreamingTextDecoder(*this).toUnicode(chs, len, true);
 }
 
-DeprecatedString TextEncoding::toUnicode(const DeprecatedByteArray& qba,
-                                         int len) const {
-  return StreamingTextDecoder(*this).toUnicode(qba, len, true);
-}
-
 // We'd like to use ICU for this on OS X as well eventually, but we need to make
 // sure
 // it covers all the encodings that we need

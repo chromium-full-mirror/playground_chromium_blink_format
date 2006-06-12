@@ -4,6 +4,7 @@
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller (mueller@kde.org)
     Copyright (C) 2002 Waldo Bastian (bastian@kde.org)
+    Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
@@ -34,9 +35,9 @@
 #include "CachedObject.h"
 #include "DocLoader.h"
 #include "Frame.h"
+#include "HTMLDocument.h"
 #include "KWQLoader.h"
 #include "Request.h"
-#include "HTMLDocument.h"
 #include "TransferJob.h"
 #include "TransferJob.h"
 #include <wtf/Assertions.h>
@@ -64,6 +65,7 @@ static bool crossDomain(const DeprecatedString& a, const DeprecatedString& b) {
     l1.pop_front();
     l2.pop_front();
   }
+
   return true;
 }
 
@@ -88,26 +90,26 @@ void Loader::servePendingRequests() {
   // get the first pending request
   Request* req = m_requestsPending.take(0);
 
-  KURL u(req->object->url().deprecatedString());
+  KURL u(req->cachedObject()->url().deprecatedString());
   TransferJob* job = new TransferJob(this, "GET", u);
 
-  if (!req->object->accept().isEmpty())
-    job->addMetaData("accept", req->object->accept());
-  if (req->m_docLoader) {
-    KURL r = req->m_docLoader->doc()->URL();
+  if (!req->cachedObject()->accept().isEmpty())
+    job->addMetaData("accept", req->cachedObject()->accept());
+  if (req->docLoader()) {
+    KURL r = req->docLoader()->doc()->URL();
     if (r.protocol().startsWith("http") && r.path().isEmpty())
       r.setPath("/");
     job->addMetaData("referrer", r.url());
     DeprecatedString domain = r.host();
-    if (req->m_docLoader->doc()->isHTMLDocument())
-      domain = static_cast<HTMLDocument*>(req->m_docLoader->doc())
+    if (req->docLoader()->doc()->isHTMLDocument())
+      domain = static_cast<HTMLDocument*>(req->docLoader()->doc())
                    ->domain()
                    .deprecatedString();
     if (crossDomain(u.host(), domain))
       job->addMetaData("cross-domain", "true");
   }
 
-  if (job->start(req->m_docLoader))
+  if (job->start(req->docLoader()))
     m_requestsLoading.add(job, req);
 }
 
@@ -115,74 +117,74 @@ void Loader::receivedAllData(TransferJob* job, PlatformData allData) {
   RequestMap::iterator i = m_requestsLoading.find(job);
   if (i == m_requestsLoading.end())
     return;
-  Request* r = i->second;
+
+  Request* req = i->second;
   m_requestsLoading.remove(i);
 
-  CachedObject* object = r->object;
-  DocLoader* docLoader = r->m_docLoader;
+  CachedObject* object = req->cachedObject();
+  DocLoader* docLoader = req->docLoader();
 
   if (job->error() || job->isErrorPage()) {
     docLoader->setLoadInProgress(true);
-    r->object->error();
+    object->error();
     docLoader->setLoadInProgress(false);
     Cache::remove(object);
   } else {
     docLoader->setLoadInProgress(true);
-    object->data(r->m_buffer, true);
+    object->data(req->buffer(), true);
 #ifdef __APPLE__
-    r->object->setAllData(allData);
+    object->setAllData(allData);
 #endif
     docLoader->setLoadInProgress(false);
     object->finish();
   }
 
-  delete r;
+  delete req;
 
   servePendingRequests();
 }
 
 void Loader::receivedResponse(TransferJob* job, PlatformResponse response) {
 #ifdef __APPLE__
-  Request* r = m_requestsLoading.get(job);
-  ASSERT(r);
+  Request* req = m_requestsLoading.get(job);
+  ASSERT(req);
   ASSERT(response);
-  r->object->setResponse(response);
-  r->object->setExpireDate(KWQCacheObjectExpiresTime(r->m_docLoader, response),
-                           false);
+  req->cachedObject()->setResponse(response);
+  req->cachedObject()->setExpireDate(
+      KWQCacheObjectExpiresTime(req->docLoader(), response), false);
 
   DeprecatedString chs = job->queryMetaData("charset").deprecatedString();
   if (!chs.isNull())
-    r->object->setCharset(chs);
+    req->cachedObject()->setCharset(chs);
 
-  if (r->multipart) {
-    ASSERT(r->object->isImage());
-    static_cast<CachedImage*>(r->object)->clear();
-    r->m_buffer.resize(0);
-    if (r->m_docLoader->frame())
-      r->m_docLoader->frame()->checkCompleted();
+  if (req->isMultipart()) {
+    ASSERT(req->cachedObject()->isImage());
+    static_cast<CachedImage*>(req->cachedObject())->clear();
+    if (req->docLoader()->frame())
+      req->docLoader()->frame()->checkCompleted();
   } else if (KWQResponseIsMultipart(response)) {
-    r->multipart = true;
-    if (!r->object->isImage())
+    req->setIsMultipart(true);
+    if (!req->cachedObject()->isImage())
       job->cancel();
   }
 #endif
 }
 
 void Loader::receivedData(TransferJob* job, const char* data, int size) {
-  Request* r = m_requestsLoading.get(job);
-  if (!r)
+  Request* request = m_requestsLoading.get(job);
+  if (!request)
     return;
 
-  unsigned oldSize = r->m_buffer.size();
-  r->m_buffer.resize(oldSize + size);
-  memcpy(r->m_buffer.data() + oldSize, data, size);
+  CachedObject* object = request->cachedObject();
+  Vector<char>& buffer = object->bufferData(data, size, request);
 
-  if (r->multipart)
-    r->object->data(r->m_buffer, true);  // the loader delivers the data in a
-                                         // multipart section all at once, send
-                                         // eof
-  else if (r->incremental)
-    r->object->data(r->m_buffer, false);
+  // Set the data.
+  if (request->isMultipart())
+    // The loader delivers the data in a multipart section all at once, send
+    // eof.
+    object->data(buffer, true);
+  else if (request->isIncremental())
+    object->data(buffer, false);
 }
 
 int Loader::numRequests(DocLoader* dl) const {
@@ -192,20 +194,21 @@ int Loader::numRequests(DocLoader* dl) const {
   int res = 0;
 
   DeprecatedPtrListIterator<Request> pIt(m_requestsPending);
-  for (; pIt.current(); ++pIt)
-    if (pIt.current()->m_docLoader == dl)
+  for (; pIt.current(); ++pIt) {
+    if (pIt.current()->docLoader() == dl)
       res++;
+  }
 
   RequestMap::const_iterator end = m_requestsLoading.end();
   for (RequestMap::const_iterator i = m_requestsLoading.begin(); !(i == end);
        ++i) {
     Request* r = i->second;
-    res += (r->m_docLoader == dl && !r->multipart);
+    res += (r->docLoader() == dl && !r->isMultipart());
   }
 
   DeprecatedPtrListIterator<Request> bdIt(m_requestsBackgroundDecoding);
   for (; bdIt.current(); ++bdIt)
-    if (bdIt.current()->m_docLoader == dl)
+    if (bdIt.current()->docLoader() == dl)
       res++;
 
   if (dl->loadInProgress())
@@ -217,8 +220,8 @@ int Loader::numRequests(DocLoader* dl) const {
 void Loader::cancelRequests(DocLoader* dl) {
   DeprecatedPtrListIterator<Request> pIt(m_requestsPending);
   while (pIt.current()) {
-    if (pIt.current()->m_docLoader == dl) {
-      Cache::remove(pIt.current()->object);
+    if (pIt.current()->docLoader() == dl) {
+      Cache::remove(pIt.current()->cachedObject());
       m_requestsPending.remove(pIt);
     } else
       ++pIt;
@@ -229,7 +232,7 @@ void Loader::cancelRequests(DocLoader* dl) {
   RequestMap::iterator end = m_requestsLoading.end();
   for (RequestMap::iterator i = m_requestsLoading.begin(); i != end; ++i) {
     Request* r = i->second;
-    if (r->m_docLoader == dl)
+    if (r->docLoader() == dl)
       jobsToCancel.append(i->first);
   }
 
@@ -237,14 +240,14 @@ void Loader::cancelRequests(DocLoader* dl) {
     TransferJob* job = jobsToCancel[i];
     Request* r = m_requestsLoading.get(job);
     m_requestsLoading.remove(job);
-    Cache::remove(r->object);
+    Cache::remove(r->cachedObject());
     job->kill();
   }
 
   DeprecatedPtrListIterator<Request> bdIt(m_requestsBackgroundDecoding);
   while (bdIt.current()) {
-    if (bdIt.current()->m_docLoader == dl) {
-      Cache::remove(bdIt.current()->object);
+    if (bdIt.current()->docLoader() == dl) {
+      Cache::remove(bdIt.current()->cachedObject());
       m_requestsBackgroundDecoding.remove(bdIt);
     } else
       ++bdIt;
@@ -252,8 +255,7 @@ void Loader::cancelRequests(DocLoader* dl) {
 }
 
 void Loader::removeBackgroundDecodingRequest(Request* r) {
-  bool present = m_requestsBackgroundDecoding.containsRef(r);
-  if (present)
+  if (m_requestsBackgroundDecoding.containsRef(r))
     m_requestsBackgroundDecoding.remove(r);
 }
 
@@ -261,10 +263,11 @@ TransferJob* Loader::jobForRequest(const String& URL) const {
   RequestMap::const_iterator end = m_requestsLoading.end();
   for (RequestMap::const_iterator i = m_requestsLoading.begin(); i != end;
        ++i) {
-    CachedObject* obj = i->second->object;
+    CachedObject* obj = i->second->cachedObject();
     if (obj && obj->url() == URL)
       return i->first;
   }
   return 0;
 }
-}
+
+}  // namespace WebCore

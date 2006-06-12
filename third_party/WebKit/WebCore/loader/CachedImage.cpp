@@ -4,6 +4,7 @@
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller (mueller@kde.org)
     Copyright (C) 2002 Waldo Bastian (bastian@kde.org)
+    Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
@@ -33,8 +34,10 @@
 #include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "DocLoader.h"
-#include "KWQLoader.h"
 #include "Image.h"
+#include "KWQLoader.h"
+#include "Request.h"
+#include <wtf/Vector.h>
 
 using std::max;
 
@@ -103,31 +106,49 @@ void CachedImage::clear() {
   setSize(0);
 }
 
-void CachedImage::data(DeprecatedByteArray& data, bool eof) {
+inline void CachedImage::createImage() {
+  // Create the image if it doesn't yet exist.
+  if (!m_image)
+#if __APPLE__
+    m_image =
+        new Image(this, KWQResponseMIMEType(m_response) == "application/pdf");
+#else
+    m_image = new Image(this, false);
+#endif
+}
+
+Vector<char>& CachedImage::bufferData(const char* bytes,
+                                      int addedSize,
+                                      Request* request) {
+  createImage();
+
+  // Add new bytes DIRECTLY to the buffer in the Image object.
+  Vector<char>& buffer = m_image->dataBuffer();
+
+  unsigned oldSize = buffer.size();
+  buffer.resize(oldSize + addedSize);
+  memcpy(buffer.data() + oldSize, bytes, addedSize);
+
+  return buffer;
+}
+
+void CachedImage::data(Vector<char>& data, bool allDataReceived) {
+  createImage();
+
   bool sizeAvailable = false;
 
   m_dataSize = data.size();
 
-  // Create the image if it doesn't yet exist.
-  if (!m_image)
-    m_image = new Image(this,
-#if __APPLE__
-                        KWQResponseMIMEType(m_response) == "application/pdf"
-#else
-                        false
-#endif
-                        );
-
-  // Give all the data so far to the image object for processing.
-  // It will not do anything now, but will delay decoding until queried for info
-  // (like size or specific image frames).
-  sizeAvailable = m_image->setData(data, eof);
+  // Have the image update its data from its internal buffer.
+  // It will not do anything now, but will delay decoding until
+  // queried for info (like size or specific image frames).
+  sizeAvailable = m_image->setData(allDataReceived);
 
   // Go ahead and tell our observers to try to draw if we have either
   // received all the data or the size is known.  Each chunk from the
   // network causes observers to repaint, which will force that chunk
   // to decode.
-  if (sizeAvailable || eof) {
+  if (sizeAvailable || allDataReceived) {
     if (m_image->isNull()) {
       m_errorOccurred = true;
       notifyObservers();
@@ -145,7 +166,8 @@ void CachedImage::data(DeprecatedByteArray& data, bool eof) {
     IntSize s = imageSize();
     setSize(max(s.width() * s.height() * 4, m_dataSize));
   }
-  if (eof) {
+
+  if (allDataReceived) {
     m_loading = false;
     checkNotify();
   }
@@ -173,9 +195,10 @@ bool CachedImage::shouldStopAnimation(const Image* image) {
     return false;
 
   CachedObjectClientWalker w(m_clients);
-  while (CachedObjectClient* c = w.next())
+  while (CachedObjectClient* c = w.next()) {
     if (c->willRenderImage(this))
       return false;
+  }
 
   return true;
 }
@@ -184,4 +207,5 @@ void CachedImage::animationAdvanced(const Image* image) {
   if (image == m_image)
     notifyObservers();
 }
-}
+
+}  // namespace WebCore

@@ -101,7 +101,7 @@ void RenderSelect::updateFromElement() {
   if (m_optionsChanged) {
     if (static_cast<HTMLSelectElement*>(node())->m_recalcListItems)
       static_cast<HTMLSelectElement*>(node())->recalcListItems();
-    DeprecatedArray<HTMLElement*> listItems =
+    Vector<HTMLElement*> listItems =
         static_cast<HTMLSelectElement*>(node())->listItems();
     int listIndex;
 
@@ -240,7 +240,7 @@ void RenderSelect::layout() {
   RenderFormElement::layout();
 
   // and now disable the widget in case there is no <option> given
-  DeprecatedArray<HTMLElement*> listItems =
+  Vector<HTMLElement*> listItems =
       static_cast<HTMLSelectElement*>(node())->listItems();
 
   bool foundOption = false;
@@ -259,7 +259,7 @@ void RenderSelect::valueChanged(Widget*) {
 
   int index = static_cast<QComboBox*>(m_widget)->currentItem();
 
-  DeprecatedArray<HTMLElement*> listItems =
+  Vector<HTMLElement*> listItems =
       static_cast<HTMLSelectElement*>(node())->listItems();
   if (index >= 0 && index < (int)listItems.size()) {
     bool found = listItems[index]->hasTagName(optionTag);
@@ -307,10 +307,11 @@ void RenderSelect::selectionChanged(Widget*) {
   // the
   // option list will make use update options not in the way the user expects
   // them
-  DeprecatedArray<HTMLElement*> listItems =
+  Vector<HTMLElement*> listItems =
       static_cast<HTMLSelectElement*>(node())->m_listItems;
   int j = 0;
-  for (unsigned i = 0; i < listItems.count(); i++) {
+  unsigned size = listItems.size();
+  for (unsigned i = 0; i < size; i++) {
     // don't use setSelected() here because it will cause us to be called
     // again with updateSelection.
     if (listItems[i]->hasTagName(optionTag))
@@ -335,7 +336,7 @@ QListBox* RenderSelect::createListBox() {
 }
 
 void RenderSelect::updateSelection() {
-  DeprecatedArray<HTMLElement*> listItems =
+  Vector<HTMLElement*> listItems =
       static_cast<HTMLSelectElement*>(node())->listItems();
   int i;
   if (m_useListBox) {

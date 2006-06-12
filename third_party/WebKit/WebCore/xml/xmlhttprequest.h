@@ -25,6 +25,7 @@
 #include "KURL.h"
 #include "PlatformString.h"
 #include "TransferJobClient.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -79,7 +80,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, TransferJobClient {
   virtual void receivedData(TransferJob*, const char* data, int size);
   virtual void receivedAllData(TransferJob*);
 
-  void processSyncLoadResults(const DeprecatedByteArray& data,
+  void processSyncLoadResults(const Vector<char>& data,
                               const KURL& finalURL,
                               const DeprecatedString& headers);
 

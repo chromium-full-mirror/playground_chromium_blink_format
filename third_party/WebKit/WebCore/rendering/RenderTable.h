@@ -27,8 +27,8 @@
 #ifndef RenderTable_H
 #define RenderTable_H
 
-#include "DeprecatedArray.h"
 #include "RenderBlock.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -125,22 +125,22 @@ class RenderTable : public RenderBlock {
     unsigned width;  // the calculated position of the column
   };
 
-  DeprecatedArray<int> columnPos;
-  DeprecatedArray<ColumnStruct> columns;
+  Vector<int> columnPos;
+  Vector<ColumnStruct> columns;
 
   void splitColumn(int pos, int firstSpan);
   void appendColumn(int span);
   int numEffCols() const { return columns.size(); }
   int spanOfEffCol(int effCol) const { return columns[effCol].span; }
+
   int colToEffCol(int col) const {
-    int c = 0;
     int i = 0;
-    while (c < col && i < (int)columns.size()) {
+    int effCol = numEffCols();
+    for (int c = 0; c < col && i < effCol; ++i)
       c += columns[i].span;
-      i++;
-    }
     return i;
   }
+
   int effColToCol(int effCol) const {
     int c = 0;
     for (int i = 0; i < effCol; i++)

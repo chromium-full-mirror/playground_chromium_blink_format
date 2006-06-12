@@ -4,6 +4,7 @@
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller (mueller@kde.org)
     Copyright (C) 2002 Waldo Bastian (bastian@kde.org)
+    Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
@@ -34,6 +35,7 @@
 #include "CachedObjectClientWalker.h"
 #include "Decoder.h"
 #include "loader.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -76,14 +78,13 @@ void CachedXSLStyleSheet::setCharset(const DeprecatedString& chs) {
     m_decoder->setEncodingName(chs.latin1(), Decoder::EncodingFromHTTPHeader);
 }
 
-void CachedXSLStyleSheet::data(DeprecatedByteArray& data, bool eof) {
-  if (!eof)
+void CachedXSLStyleSheet::data(Vector<char>& data, bool allDataReceived) {
+  if (!allDataReceived)
     return;
 
   setSize(data.size());
   m_sheet = String(m_decoder->decode(data.data(), size()));
   m_loading = false;
-
   checkNotify();
 }
 

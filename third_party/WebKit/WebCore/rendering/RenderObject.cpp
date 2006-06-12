@@ -36,7 +36,6 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "HTMLNames.h"
-#include "IntPointArray.h"
 #include "KWQTextStream.h"
 #include "KWQWMatrix.h"
 #include "Position.h"
@@ -52,6 +51,7 @@
 #include "RenderTheme.h"
 #include "cssstyleselector.h"
 #include "dom2_eventsimpl.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -1065,42 +1065,50 @@ void RenderObject::drawBorder(GraphicsContext* p,
     case INSET:
       if (s == BSTop || s == BSLeft)
         c = c.dark();
-
     /* nobreak; */
     case OUTSET:
       if (style == OUTSET && (s == BSBottom || s == BSRight))
         c = c.dark();
     /* nobreak; */
-    case SOLID:
-      IntPointArray quad(4);
+    case SOLID: {
       p->setPen(Pen::NoPen);
-      p->setFillColor(c.rgb());
+      p->setFillColor(c);
       ASSERT(x2 >= x1);
       ASSERT(y2 >= y1);
-      if (adjbw1 == 0 && adjbw2 == 0) {
+      if (!adjbw1 && !adjbw2) {
         p->drawRect(IntRect(x1, y1, x2 - x1, y2 - y1));
         return;
       }
+      IntPoint quad[4];
       switch (s) {
         case BSTop:
-          quad.setPoints(4, x1 + max(-adjbw1, 0), y1, x1 + max(adjbw1, 0), y2,
-                         x2 - max(adjbw2, 0), y2, x2 - max(-adjbw2, 0), y1);
+          quad[0] = IntPoint(x1 + max(-adjbw1, 0), y1);
+          quad[1] = IntPoint(x1 + max(adjbw1, 0), y2);
+          quad[2] = IntPoint(x2 - max(adjbw2, 0), y2);
+          quad[3] = IntPoint(x2 - max(-adjbw2, 0), y1);
           break;
         case BSBottom:
-          quad.setPoints(4, x1 + max(adjbw1, 0), y1, x1 + max(-adjbw1, 0), y2,
-                         x2 - max(-adjbw2, 0), y2, x2 - max(adjbw2, 0), y1);
+          quad[0] = IntPoint(x1 + max(adjbw1, 0), y1);
+          quad[1] = IntPoint(x1 + max(-adjbw1, 0), y2);
+          quad[2] = IntPoint(x2 - max(-adjbw2, 0), y2);
+          quad[3] = IntPoint(x2 - max(adjbw2, 0), y1);
           break;
         case BSLeft:
-          quad.setPoints(4, x1, y1 + max(-adjbw1, 0), x1, y2 - max(-adjbw2, 0),
-                         x2, y2 - max(adjbw2, 0), x2, y1 + max(adjbw1, 0));
+          quad[0] = IntPoint(x1, y1 + max(-adjbw1, 0));
+          quad[1] = IntPoint(x1, y2 - max(-adjbw2, 0));
+          quad[2] = IntPoint(x2, y2 - max(adjbw2, 0));
+          quad[3] = IntPoint(x2, y1 + max(adjbw1, 0));
           break;
         case BSRight:
-          quad.setPoints(4, x1, y1 + max(adjbw1, 0), x1, y2 - max(adjbw2, 0),
-                         x2, y2 - max(-adjbw2, 0), x2, y1 + max(-adjbw1, 0));
+          quad[0] = IntPoint(x1, y1 + max(adjbw1, 0));
+          quad[1] = IntPoint(x1, y2 - max(adjbw2, 0));
+          quad[2] = IntPoint(x2, y2 - max(-adjbw2, 0));
+          quad[3] = IntPoint(x2, y1 + max(-adjbw1, 0));
           break;
       }
-      p->drawConvexPolygon(quad);
+      p->drawConvexPolygon(4, quad);
       break;
+    }
   }
 }
 

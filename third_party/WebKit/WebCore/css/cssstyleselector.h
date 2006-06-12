@@ -27,6 +27,7 @@
 #include "DeprecatedString.h"
 #include "render_style.h"
 #include <wtf/HashSet.h>
+#include <wtf/Vector.h>
 
 class KHTMLSettings;
 class KURL;
@@ -162,13 +163,17 @@ class CSSStyleSelector : public StyleSelector {
 
   void adjustRenderStyle(RenderStyle* style, Element* e);
 
+  void addMatchedRule(CSSRuleData* rule) { m_matchedRules.append(rule); }
+  void addMatchedDeclaration(CSSMutableStyleDeclaration* decl) {
+    m_matchedDecls.append(decl);
+  }
+
   void matchRules(CSSRuleSet* rules, int& firstRuleIndex, int& lastRuleIndex);
   void matchRulesForList(CSSRuleDataList* rules,
                          int& firstRuleIndex,
                          int& lastRuleIndex);
-  void sortMatchedRules(unsigned firstRuleIndex, unsigned lastRuleIndex);
-  void addMatchedRule(CSSRuleData* rule);
-  void addMatchedDeclaration(CSSMutableStyleDeclaration* decl);
+  void sortMatchedRules(unsigned start, unsigned end);
+
   void applyDeclarations(bool firstPass,
                          bool important,
                          int startIndex,
@@ -217,16 +222,13 @@ class CSSStyleSelector : public StyleSelector {
   // and then a second time for all the remaining properties.  We then do the
   // same two passes
   // for any !important rules.
-  DeprecatedArray<CSSMutableStyleDeclaration*> m_matchedDecls;
-  unsigned m_matchedDeclCount;
+  Vector<CSSMutableStyleDeclaration*> m_matchedDecls;
 
   // A buffer used to hold the set of matched rules for an element, and a
   // temporary buffer used for
   // merge sorting.
-  DeprecatedArray<CSSRuleData*> m_matchedRules;
-  unsigned m_matchedRuleCount;
-  DeprecatedArray<CSSRuleData*> m_tmpRules;
-  unsigned m_tmpRuleCount;
+  Vector<CSSRuleData*> m_matchedRules;
+
   CSSRuleList* m_ruleList;
   bool m_collectRulesOnly;
 

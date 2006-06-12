@@ -23,6 +23,8 @@
 
 #ifdef KHTML_XSLT
 
+#include "XSLTProcessor.h"
+
 #include "Cache.h"
 #include "DOMImplementation.h"
 #include "Decoder.h"
@@ -34,9 +36,9 @@
 #include "KWQLoader.h"
 #include "Text.h"
 #include "TransferJob.h"
-#include "XSLTProcessor.h"
 #include "loader.h"
 #include "markup.h"
+#include <wtf/Vector.h>
 #include <libxslt/imports.h>
 #include <libxslt/xsltutils.h>
 
@@ -83,7 +85,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
       xmlGenericErrorFunc oldErrorFunc = xmlGenericError;
       void* oldErrorContext = xmlGenericErrorContext;
 
-      DeprecatedByteArray data = KWQServeSynchronousRequest(
+      Vector<char> data = KWQServeSynchronousRequest(
           Cache::loader(), globalDocLoader, job, finalURL, headers);
 
       xmlSetGenericErrorFunc(0, parseErrorFunc);

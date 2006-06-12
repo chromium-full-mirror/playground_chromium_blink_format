@@ -363,11 +363,11 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   return 0;
 }
 
-DeprecatedArray<char> KWQServeSynchronousRequest(Loader*,
-                                                 DocLoader*,
-                                                 TransferJob*,
-                                                 KURL&,
-                                                 DeprecatedString&) {
+Vector<char> KWQServeSynchronousRequest(Loader*,
+                                        DocLoader*,
+                                        TransferJob*,
+                                        KURL&,
+                                        DeprecatedString&) {
   notImplemented();
   return 0;
 }

@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <wtf/Vector.h>
+
 #if __OBJC__
 @class NSDictionary;
 @class NSString;
@@ -48,19 +50,13 @@ class TransferJob;
 class Loader;
 class Request;
 class String;
-
-template <typename T>
-class DeprecatedArray;
-
-typedef DeprecatedArray<char> DeprecatedByteArray;
 }
 
-WebCore::DeprecatedByteArray KWQServeSynchronousRequest(
-    WebCore::Loader*,
-    WebCore::DocLoader*,
-    WebCore::TransferJob*,
-    KURL& finalURL,
-    DeprecatedString& headers);
+Vector<char> KWQServeSynchronousRequest(WebCore::Loader*,
+                                        WebCore::DocLoader*,
+                                        WebCore::TransferJob*,
+                                        KURL& finalURL,
+                                        DeprecatedString& headers);
 
 void KWQCheckCacheObjectStatus(WebCore::DocLoader*, WebCore::CachedObject*);
 bool KWQCheckIfReloading(WebCore::DocLoader*);

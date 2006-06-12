@@ -610,14 +610,6 @@ DeprecatedString::DeprecatedString(QChar qc) {
   }
 }
 
-DeprecatedString::DeprecatedString(const DeprecatedByteArray& qba) {
-  dataHandle = allocateHandle();
-
-  // Copy data
-  *dataHandle = &internalData;
-  internalData.initialize(qba.data(), qba.size());
-}
-
 DeprecatedString::DeprecatedString(const QChar* unicode, unsigned length) {
   if (!unicode && !length) {
     internalData.deref();

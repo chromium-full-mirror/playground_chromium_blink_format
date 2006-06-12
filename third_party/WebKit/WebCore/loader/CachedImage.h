@@ -3,6 +3,7 @@
 
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller <mueller@kde.org>
+    Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
@@ -29,8 +30,9 @@
 #define KHTML_CachedImage_h
 
 #include "CachedObject.h"
-#include "IntRect.h"
 #include "ImageAnimationObserver.h"
+#include "IntRect.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -59,7 +61,8 @@ class CachedImage : public CachedObject, public ImageAnimationObserver {
   virtual void ref(CachedObjectClient*);
   virtual void deref(CachedObjectClient*);
 
-  virtual void data(DeprecatedByteArray&, bool atEnd);
+  virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
+  virtual void data(Vector<char>&, bool allDataReceived);
   virtual void error();
 
   bool isErrorImage() const { return m_errorOccurred; }
@@ -76,6 +79,7 @@ class CachedImage : public CachedObject, public ImageAnimationObserver {
   virtual void animationAdvanced(const Image* image);
 
  private:
+  void createImage();
   void notifyObservers();
 
   Image* m_image;

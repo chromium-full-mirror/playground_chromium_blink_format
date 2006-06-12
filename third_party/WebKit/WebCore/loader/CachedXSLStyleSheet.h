@@ -3,6 +3,7 @@
 
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller <mueller@kde.org>
+    Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
@@ -29,6 +30,7 @@
 #define KHTML_CachedXSLStyleSheet_h
 
 #include "CachedObject.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -49,7 +51,7 @@ class CachedXSLStyleSheet : public CachedObject {
   virtual void deref(CachedObjectClient*);
 
   virtual void setCharset(const DeprecatedString&);
-  virtual void data(DeprecatedByteArray&, bool eof);
+  virtual void data(Vector<char>&, bool allDataReceived);
   virtual void error();
 
   virtual bool schedule() const { return true; }

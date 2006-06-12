@@ -27,6 +27,7 @@
 #define HTML_HTMLSelectElementImpl_H
 
 #include "HTMLGenericFormElement.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -99,7 +100,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   void setRecalcListItems();
 
-  DeprecatedArray<HTMLElement*> listItems() const {
+  Vector<HTMLElement*> listItems() const {
     if (m_recalcListItems)
       const_cast<HTMLSelectElement*>(this)->recalcListItems();
     return m_listItems;
@@ -119,7 +120,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
  private:
   void recalcListItems();
 
-  mutable DeprecatedArray<HTMLElement*> m_listItems;
+  mutable Vector<HTMLElement*> m_listItems;
   int m_minwidth;
   int m_size;
   bool m_multiple;

@@ -206,7 +206,6 @@ class DeprecatedString {
 
   DeprecatedString();
   DeprecatedString(QChar);
-  DeprecatedString(const DeprecatedByteArray&);
   DeprecatedString(const QChar*, unsigned);
   DeprecatedString(const char*);
   DeprecatedString(const char*, int len);

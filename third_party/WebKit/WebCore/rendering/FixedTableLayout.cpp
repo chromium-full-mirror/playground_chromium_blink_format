@@ -20,6 +20,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "FixedTableLayout.h"
 
@@ -250,9 +251,7 @@ void FixedTableLayout::layout() {
          nEffCols);
 #endif
 
-  DeprecatedArray<int> calcWidth;
-  calcWidth.resize(nEffCols);
-  calcWidth.fill(-1);
+  Vector<int> calcWidth(nEffCols, -1);
 
   // assign  percent m_width
   if (available > 0) {
