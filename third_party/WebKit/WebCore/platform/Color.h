@@ -86,7 +86,7 @@ class Color {
   Color light() const;
   Color dark() const;
 
-  Color blendWithWhite(int alpha) const;
+  Color blendWithWhite() const;
 
   static const RGBA32 black = 0xFF000000;
   static const RGBA32 white = 0xFFFFFFFF;

@@ -59,8 +59,8 @@ class RenderThemeMac : public RenderTheme {
 
   virtual void paintResizeControl(GraphicsContext*, const IntRect&);
 
-  virtual Color platformActiveSelectionColor() const;
-  virtual Color platformInactiveSelectionColor() const;
+  virtual Color platformActiveSelectionBackgroundColor() const;
+  virtual Color platformInactiveSelectionBackgroundColor() const;
 
  protected:
   // Methods for each appearance value.

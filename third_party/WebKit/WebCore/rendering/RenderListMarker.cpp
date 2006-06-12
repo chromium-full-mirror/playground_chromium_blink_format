@@ -179,7 +179,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   if (m_listImage && !m_listImage->isErrorImage()) {
     p->drawImage(m_listImage->image(), marker.location());
     if (selectionState() != SelectionNone)
-      p->fillRect(selectionRect(), selectionColor());
+      p->fillRect(selectionRect(), selectionBackgroundColor());
     return;
   }
 
@@ -189,7 +189,7 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
 #endif
 
   if (selectionState() != SelectionNone)
-    p->fillRect(selectionRect(), selectionColor());
+    p->fillRect(selectionRect(), selectionBackgroundColor());
 
   const Color color(style()->color());
   p->setPen(color);

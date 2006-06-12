@@ -2023,17 +2023,31 @@ bool RenderObject::shouldSelect() const {
   return false;
 }
 
-Color RenderObject::selectionColor() const {
+Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
     RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION);
     if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
-      color = pseudoStyle->backgroundColor().blendWithWhite(
-          selectionColorOverlayAlpha);
+      color = pseudoStyle->backgroundColor().blendWithWhite();
     else
       color = document()->frame()->isActive()
-                  ? theme()->activeSelectionColor()
-                  : theme()->inactiveSelectionColor();
+                  ? theme()->activeSelectionBackgroundColor()
+                  : theme()->inactiveSelectionBackgroundColor();
+  }
+
+  return color;
+}
+
+Color RenderObject::selectionForegroundColor() const {
+  Color color;
+  if (style()->userSelect() != SELECT_NONE) {
+    RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION);
+    if (pseudoStyle)
+      color = pseudoStyle->color();
+    else
+      color = document()->frame()->isActive()
+                  ? theme()->platformActiveSelectionForegroundColor()
+                  : theme()->platformInactiveSelectionForegroundColor();
   }
 
   return color;

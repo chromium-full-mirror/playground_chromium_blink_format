@@ -146,14 +146,23 @@ void RenderThemeWin::close() {
   m_buttonTheme = m_textFieldTheme = 0;
 }
 
-Color RenderThemeWin::platformActiveSelectionColor() const {
+Color RenderThemeWin::platformActiveSelectionBackgroundColor() const {
+  COLORREF color = GetSysColor(COLOR_HIGHLIGHT);
+  return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
+}
+
+Color RenderThemeWin::platformInactiveSelectionBackgroundColor() const {
+  COLORREF color = GetSysColor(COLOR_GRAYTEXT);
+  return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
+}
+
+Color RenderThemeWin::platformActiveSelectionForegroundColor() const {
   COLORREF color = GetSysColor(COLOR_HIGHLIGHTTEXT);
   return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
 }
 
-Color RenderThemeWin::platformInactiveSelectionColor() const {
-  COLORREF color = GetSysColor(COLOR_HIGHLIGHT);
-  return Color(GetRValue(color), GetGValue(color), GetBValue(color), 255);
+Color RenderThemeWin::platformInactiveSelectionForegroundColor() const {
+  return Color::white;
 }
 
 void RenderThemeWin::addIntrinsicMargins(RenderStyle* style) const {
