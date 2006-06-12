@@ -587,6 +587,9 @@ PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
 unsigned PlugInInfoStore::pluginCount() const {
   return 0;
 }
+bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
+  return false;
+}
 void WebCore::refreshPlugins(bool) {}
 
 void WebCore::TransferJob::assembleResponseHeaders() const {}

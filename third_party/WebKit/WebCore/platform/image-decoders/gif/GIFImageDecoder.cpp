@@ -202,7 +202,7 @@ void GIFImageDecoder::initFrameBuffer(RGBA32Buffer& buffer,
   // anything outside our frame's rect, so if we don't overlay the entire image,
   // then also composite with the previous frame.
   if (previousBuffer && (compositeWithPreviousFrame || isSubRect)) {
-    bytes.duplicate(previousBuffer->bytes());
+    bytes = previousBuffer->bytes();
     buffer.ensureHeight(m_size.height());
     buffer.setHasAlpha(previousBuffer->hasAlpha());
   } else  // Resize to the width and height of the image.

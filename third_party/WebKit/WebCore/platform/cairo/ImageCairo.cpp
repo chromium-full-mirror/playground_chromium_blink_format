@@ -58,7 +58,7 @@ void Image::invalidateNativeData() {}
 Image* Image::loadResource(const char* name) {
   Vector<char> arr = loadResourceIntoArray(name);
   Image* img = new Image;
-  img->setData(arr, true);
+  img->setNativeData(&arr, true);
   return img;
 }
 
