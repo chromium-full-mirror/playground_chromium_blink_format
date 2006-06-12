@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "date_object.h"
+#include "date_object.lut.h"
 
 #if HAVE(ERRNO_H)
 #include <errno.h>
@@ -50,7 +51,6 @@
 #include <time.h>
 
 #include "error_object.h"
-#include "lookup.h"
 #include "operations.h"
 
 #if PLATFORM(MAC)
@@ -80,58 +80,6 @@ namespace KJS {
  * @internal
  *
  * Class to implement all methods that are properties of the
- * Date.prototype object
- */
-class DateProtoFunc : public InternalFunctionImp {
- public:
-  DateProtoFunc(ExecState*, int i, int len, const Identifier& date);
-
-  virtual JSValue* callAsFunction(ExecState*,
-                                  JSObject* thisObj,
-                                  const List& args);
-
-  enum {
-    ToString,
-    ToDateString,
-    ToTimeString,
-    ToLocaleString,
-    ToLocaleDateString,
-    ToLocaleTimeString,
-    ValueOf,
-    GetTime,
-    GetFullYear,
-    GetMonth,
-    GetDate,
-    GetDay,
-    GetHours,
-    GetMinutes,
-    GetSeconds,
-    GetMilliSeconds,
-    GetTimezoneOffset,
-    SetTime,
-    SetMilliSeconds,
-    SetSeconds,
-    SetMinutes,
-    SetHours,
-    SetDate,
-    SetMonth,
-    SetFullYear,
-    ToUTCString,
-    // non-normative properties (Appendix B)
-    GetYear,
-    SetYear,
-    ToGMTString
-  };
-
- private:
-  int id;
-  bool utc;
-};
-
-/**
- * @internal
- *
- * Class to implement all methods that are properties of the
  * Date object
  */
 class DateObjectFuncImp : public InternalFunctionImp {
@@ -151,11 +99,6 @@ class DateObjectFuncImp : public InternalFunctionImp {
  private:
   int id;
 };
-}
-
-#include "date_object.lut.h"
-
-namespace KJS {
 
 // some constants
 const double hoursPerDay = 24;
