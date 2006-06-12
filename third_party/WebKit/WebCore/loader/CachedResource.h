@@ -107,7 +107,7 @@ class CachedObject {
   virtual ~CachedObject();
 
   virtual void setCharset(const DeprecatedString&) {}
-  virtual void data(DeprecatedByteArray&, bool atEnd) = 0;
+  virtual void data(Vector<char>&, bool atEnd) = 0;
   virtual void error() = 0;
 
   const String& url() const { return m_url; }

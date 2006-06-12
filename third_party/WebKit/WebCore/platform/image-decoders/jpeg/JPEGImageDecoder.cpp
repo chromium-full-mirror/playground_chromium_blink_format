@@ -139,7 +139,7 @@ class JPEGImageReader {
       m_bytesToSkip = 0;
   }
 
-  bool decode(const DeprecatedByteArray& data, bool sizeOnly) {
+  bool decode(const Vector<char>& data, bool sizeOnly) {
     m_decodingSizeOnly = sizeOnly;
 
     unsigned newByteCount = data.size() - m_bufferLength;
@@ -369,8 +369,7 @@ JPEGImageDecoder::~JPEGImageDecoder() {
 }
 
 // Take the data and store it.
-void JPEGImageDecoder::setData(const DeprecatedByteArray& data,
-                               bool allDataReceived) {
+void JPEGImageDecoder::setData(const Vector<char>& data, bool allDataReceived) {
   if (m_failed)
     return;
 
