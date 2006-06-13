@@ -43,6 +43,7 @@
 @class WebHistoryItem;
 @class WebIconLoader;
 @class WebMainResourceLoader;
+@class WebPolicyDecisionListener;
 @class WebResource;
 @class WebUnarchivingState;
 @class WebView;
@@ -134,5 +135,11 @@
                               response:(NSURLResponse*)r
                                  proxy:(WKNSURLConnectionDelegateProxyPtr)proxy;
 - (BOOL)_privateBrowsingEnabled;
++ (NSString*)_generatedMIMETypeForURLScheme:(NSString*)URLScheme;
++ (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
++ (BOOL)_canShowMIMEType:(NSString*)MIMEType;
+- (void)_handleFallbackContent;
+- (void)_decidePolicyForMIMEType:(NSString*)MIMEType
+                decisionListener:(WebPolicyDecisionListener*)listener;
 
 @end
