@@ -32,6 +32,7 @@
 
 @interface WebPluginDatabase : NSObject {
   NSMutableSet* plugins;
+  NSMutableSet* registeredMIMETypes;
 }
 
 + (WebPluginDatabase*)installedPlugins;
@@ -40,6 +41,8 @@
 // Netscape
 - (WebBasePluginPackage*)pluginForMIMEType:(NSString*)mimeType;
 - (WebBasePluginPackage*)pluginForExtension:(NSString*)extension;
+
+- (BOOL)isMIMETypeRegistered:(NSString*)MIMEType;
 
 - (NSArray*)plugins;
 

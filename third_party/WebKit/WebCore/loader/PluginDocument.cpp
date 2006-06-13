@@ -94,6 +94,7 @@ bool PluginTokenizer::writeRawData(const char* data, int len) {
     createDocumentStructure();
     m_doc->frame()->redirectDataToPlugin(
         static_cast<RenderWidget*>(m_embedElement->renderer())->widget());
+    finish();
     return false;
   }
 
