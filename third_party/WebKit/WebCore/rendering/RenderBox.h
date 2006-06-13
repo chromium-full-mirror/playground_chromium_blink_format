@@ -150,7 +150,8 @@ class RenderBox : public RenderObject {
 
   void calcVerticalMargins();
 
-  void relativePositionOffset(int& tx, int& ty);
+  int relativePositionOffsetX() const;
+  int relativePositionOffsetY() const;
 
   virtual RenderLayer* layer() const { return m_layer; }
 

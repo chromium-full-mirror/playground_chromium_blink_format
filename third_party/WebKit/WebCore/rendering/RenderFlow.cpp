@@ -547,8 +547,7 @@ IntRect RenderFlow::getAbsoluteRepaintRect() {
 int RenderFlow::lowestPosition(bool includeOverflowInterior,
                                bool includeSelf) const {
   assert(!isInlineFlow());
-  int bottom =
-      RenderContainer::lowestPosition(includeOverflowInterior, includeSelf);
+  int bottom = includeSelf && m_width > 0 ? m_height : 0;
   if (!includeOverflowInterior && hasOverflowClip())
     return bottom;
 
@@ -566,14 +565,16 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
     }
   }
 
+  if (isRelPositioned())
+    bottom += relativePositionOffsetY();
+
   return bottom;
 }
 
 int RenderFlow::rightmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
   assert(!isInlineFlow());
-  int right =
-      RenderContainer::rightmostPosition(includeOverflowInterior, includeSelf);
+  int right = includeSelf && m_height > 0 ? m_width : 0;
   if (!includeOverflowInterior && hasOverflowClip())
     return right;
 
@@ -591,14 +592,16 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
     }
   }
 
+  if (isRelPositioned())
+    right += relativePositionOffsetX();
+
   return right;
 }
 
 int RenderFlow::leftmostPosition(bool includeOverflowInterior,
                                  bool includeSelf) const {
   assert(!isInlineFlow());
-  int left =
-      RenderContainer::leftmostPosition(includeOverflowInterior, includeSelf);
+  int left = includeSelf && m_height > 0 ? 0 : m_width;
   if (!includeOverflowInterior && hasOverflowClip())
     return left;
 
@@ -615,6 +618,9 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
       left = min(left, lp);
     }
   }
+
+  if (isRelPositioned())
+    left += relativePositionOffsetX();
 
   return left;
 }
