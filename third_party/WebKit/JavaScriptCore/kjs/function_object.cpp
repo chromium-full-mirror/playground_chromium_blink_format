@@ -200,7 +200,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
       sourceURL, lineNumber, body.data(), body.size(), &sid, &errLine, &errMsg);
 
   // notify debugger that source has been parsed
-  Debugger* dbg = exec->dynamicInterpreter()->imp()->debugger();
+  Debugger* dbg = exec->dynamicInterpreter()->debugger();
   if (dbg) {
     // send empty sourceURL to indicate constructed code
     bool cont = dbg->sourceParsed(exec, sid, UString(), body, errLine);

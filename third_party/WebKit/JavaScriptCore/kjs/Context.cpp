@@ -28,7 +28,7 @@ namespace KJS {
 
 // ECMA 10.2
 Context::Context(JSObject* glob,
-                 InterpreterImp* interpreter,
+                 Interpreter* interpreter,
                  JSObject* thisV,
                  FunctionBodyNode* currentBody,
                  CodeType type,

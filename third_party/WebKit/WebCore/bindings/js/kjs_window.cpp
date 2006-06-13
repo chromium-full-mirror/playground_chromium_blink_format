@@ -1027,7 +1027,7 @@ void Window::put(ExecState* exec,
                  const Identifier& propertyName,
                  JSValue* value,
                  int attr) {
-  // Called by an internal KJS call (e.g. InterpreterImp's constructor) ?
+  // Called by an internal KJS call.
   // If yes, save time and jump directly to JSObject.
   if ((attr != None && attr != DontDelete)
       // Same thing if we have a local override (e.g. "var location")
