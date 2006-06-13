@@ -28,6 +28,7 @@
 #include <kjs/identifier.h>
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/Vector.h>
 #include <unicode/umachine.h>
 #include <limits.h>
 
@@ -121,8 +122,7 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
 
   static StringImpl* empty();
 
-  // For debugging only, leaks memory.
-  const char* ascii() const;
+  Vector<char> ascii() const;
 
 #if __APPLE__
   StringImpl(CFStringRef);
