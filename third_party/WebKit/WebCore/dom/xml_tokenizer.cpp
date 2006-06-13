@@ -607,7 +607,7 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
 
   // don't load stylesheets for standalone documents
   if (m_doc->frame()) {
-    m_sawXSLTransform = !pi->checkStyleSheet();
+    m_sawXSLTransform = !m_sawFirstElement && !pi->checkStyleSheet();
 #ifdef KHTML_XSLT
     // Pretend we didn't see this PI if we're the result of a transform.
     if (m_sawXSLTransform && !m_doc->transformSourceDocument())
