@@ -178,7 +178,9 @@ class Window : public DOMObject {
   typedef HashMap<JSObject*, JSUnprotectedEventListener*>
       UnprotectedListenersMap;
   ListenersMap jsEventListeners;
+  ListenersMap jsHTMLEventListeners;
   UnprotectedListenersMap jsUnprotectedEventListeners;
+  UnprotectedListenersMap jsUnprotectedHTMLEventListeners;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {

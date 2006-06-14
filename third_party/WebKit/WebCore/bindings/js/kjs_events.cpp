@@ -140,13 +140,21 @@ JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* _listener,
                                                        Window* _win,
                                                        bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
-  if (_listener)
-    _win->jsUnprotectedEventListeners.set(_listener, this);
+  if (_listener) {
+    Window::UnprotectedListenersMap& listeners =
+        _html ? _win->jsUnprotectedHTMLEventListeners
+              : _win->jsUnprotectedEventListeners;
+    listeners.set(_listener, this);
+  }
 }
 
 JSUnprotectedEventListener::~JSUnprotectedEventListener() {
-  if (listener && win)
-    win->jsUnprotectedEventListeners.remove(listener);
+  if (listener && win) {
+    Window::UnprotectedListenersMap& listeners =
+        isHTMLEventListener() ? win->jsUnprotectedHTMLEventListeners
+                              : win->jsUnprotectedEventListeners;
+    listeners.remove(listener);
+  }
 }
 
 JSObject* JSUnprotectedEventListener::listenerObj() const {
@@ -170,13 +178,20 @@ void JSUnprotectedEventListener::mark() {
 
 JSEventListener::JSEventListener(JSObject* _listener, Window* _win, bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
-  if (_listener)
-    _win->jsEventListeners.set(_listener, this);
+  if (_listener) {
+    Window::ListenersMap& listeners =
+        _html ? _win->jsHTMLEventListeners : _win->jsEventListeners;
+    listeners.set(_listener, this);
+  }
 }
 
 JSEventListener::~JSEventListener() {
-  if (listener && win)
-    win->jsEventListeners.remove(listener);
+  if (listener && win) {
+    Window::ListenersMap& listeners = isHTMLEventListener()
+                                          ? win->jsHTMLEventListeners
+                                          : win->jsEventListeners;
+    listeners.remove(listener);
+  }
 }
 
 JSObject* JSEventListener::listenerObj() const {
@@ -268,9 +283,12 @@ void JSLazyEventListener::parseCode() const {
   m_functionName = String();
   code = String();
 
-  if (listener)
-    windowObj()->jsEventListeners.set(listener,
-                                      const_cast<JSLazyEventListener*>(this));
+  if (listener) {
+    Window::ListenersMap& listeners = isHTMLEventListener()
+                                          ? windowObj()->jsHTMLEventListeners
+                                          : windowObj()->jsEventListeners;
+    listeners.set(listener, const_cast<JSLazyEventListener*>(this));
+  }
 }
 
 JSValue* getNodeEventListener(EventTargetNode* n,
