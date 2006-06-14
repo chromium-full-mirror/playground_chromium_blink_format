@@ -156,6 +156,10 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 - (NSURL*)absoluteLinkURL;
 @end
 
+@interface DOMImplementation (DOMImplementationPendingPublic)
+- (DOMHTMLDocument*)createHTMLDocument:(NSString*)title;
+@end
+
 // END
 
 // Pending DOM3 APIs
