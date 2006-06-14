@@ -1396,7 +1396,12 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
       select.add(toHTMLElement(args[0]), toHTMLElement(args[1]), exception);
       return jsUndefined();
     } else if (id == JSHTMLElement::SelectRemove) {
-      select.remove(int(args[0]->toNumber(exec)));
+      // we support both options index and options objects
+      HTMLElement* element = toHTMLElement(args[0]);
+      if (element && element->hasTagName(optionTag))
+        select.remove(((HTMLOptionElement*)element)->index());
+      else
+        select.remove(int(args[0]->toNumber(exec)));
       return jsUndefined();
     } else if (id == JSHTMLElement::SelectBlur) {
       select.blur();
