@@ -181,10 +181,12 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
   evt->setEventPhase(Event::CAPTURING_PHASE);
 
   it.toFirst();
-  // Handle window events for capture phase
-  if (it.current()->isDocumentNode() && !evt->propagationStopped()) {
+  // Handle window events for capture phase, except load events, this quirk is
+  // needed
+  // because Mozilla used to never propagate load events to the window object
+  if (evt->type() != loadEvent && it.current()->isDocumentNode() &&
+      !evt->propagationStopped())
     static_cast<Document*>(it.current())->handleWindowEvent(evt.get(), true);
-  }
 
   for (; it.current() && it.current() != this && !evt->propagationStopped();
        ++it) {
@@ -227,10 +229,13 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
       evt->setCurrentTarget(it.current());
       EventTargetNodeCast(it.current())->handleLocalEvents(evt.get(), false);
     }
-    // Handle window events for bubbling phase
+    // Handle window events for bubbling phase, except load events, this quirk
+    // is needed
+    // because Mozilla used to never propagate load events at all
+
     it.toFirst();
-    if (it.current()->isDocumentNode() && !evt->propagationStopped() &&
-        !evt->getCancelBubble()) {
+    if (evt->type() != loadEvent && it.current()->isDocumentNode() &&
+        !evt->propagationStopped() && !evt->getCancelBubble()) {
       evt->setCurrentTarget(it.current());
       static_cast<Document*>(it.current())->handleWindowEvent(evt.get(), false);
     }
