@@ -660,20 +660,20 @@ void CompositeEditCommand::moveParagraph(
     const VisiblePosition& startOfParagraphToMove,
     const VisiblePosition& endOfParagraphToMove,
     const VisiblePosition& destination,
-    bool preserveSelection) {
+    bool preserveSelection,
+    bool preserveStyle) {
   ASSERT(isStartOfParagraph(startOfParagraphToMove));
   ASSERT(isEndOfParagraph(endOfParagraphToMove));
   moveParagraphs(startOfParagraphToMove, endOfParagraphToMove, destination,
-                 preserveSelection);
+                 preserveSelection, preserveStyle);
 }
 
-// FIXME: Always preserve the selection, and pass the paragraphs to operate on
-// using an endingSelection().
 void CompositeEditCommand::moveParagraphs(
     const VisiblePosition& startOfParagraphToMove,
     const VisiblePosition& endOfParagraphToMove,
     const VisiblePosition& destination,
-    bool preserveSelection) {
+    bool preserveSelection,
+    bool preserveStyle) {
   if (startOfParagraphToMove == destination)
     return;
 
@@ -715,11 +715,11 @@ void CompositeEditCommand::moveParagraphs(
 
   VisiblePosition beforeParagraph = startOfParagraphToMove.previous();
 
-  Position start = startOfParagraphToMove.deepEquivalent().upstream();
-  // We upstream() the end so that we don't include collapsed whitespace in the
-  // move.
-  // If we must later add a br after the moved paragraph, doing so would cause
-  // the moved unrendered space to become rendered.
+  // We upstream() the end and downstream() the start so that we don't include
+  // collapsed whitespace in the move.
+  // When we paste a fragment, spaces after the end and before the start are
+  // treated as though they were rendered.
+  Position start = startOfParagraphToMove.deepEquivalent().downstream();
   Position end = endOfParagraphToMove.deepEquivalent().upstream();
   RefPtr<Range> range = new Range(document(), start.node(), start.offset(),
                                   end.node(), end.offset());
@@ -729,7 +729,9 @@ void CompositeEditCommand::moveParagraphs(
   // shouldn't matter though, since moved paragraphs will usually be quite
   // small.
   RefPtr<DocumentFragment> fragment =
-      createFragmentFromMarkup(document(), range->toHTML(), "");
+      startOfParagraphToMove != endOfParagraphToMove
+          ? createFragmentFromMarkup(document(), range->toHTML(), "")
+          : 0;
 
   setEndingSelection(Selection(start, end, DOWNSTREAM));
   deleteSelection(false, false);
@@ -765,8 +767,8 @@ void CompositeEditCommand::moveParagraphs(
       document(), Position(document(), 0), destination.deepEquivalent()));
 
   setEndingSelection(destination);
-  EditCommandPtr cmd(new ReplaceSelectionCommand(document(), fragment.get(),
-                                                 true, false, false, true));
+  EditCommandPtr cmd(new ReplaceSelectionCommand(
+      document(), fragment.get(), true, false, !preserveStyle, true));
   applyCommandToComposite(cmd);
 
   if (preserveSelection && startIndex != -1) {

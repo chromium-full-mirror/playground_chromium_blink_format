@@ -61,6 +61,8 @@ typedef enum {
   EditActionTyping,
   EditActionCreateLink,
   EditActionUnlink,
+  EditActionFormatBlock,
+  EditActionInsertList
 } EditAction;
 }
 

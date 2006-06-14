@@ -146,6 +146,8 @@ typedef enum {
   WebUndoActionTyping,
   WebUndoActionCreateLink,
   WebUndoActionUnlink,
+  WebUndoActionFormatBlock,
+  WebUndoActionInsertList
 } WebUndoAction;
 
 typedef enum {

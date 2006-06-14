@@ -84,8 +84,8 @@ class CompositeEditCommand : public EditCommand {
   void removeNodeAttribute(WebCore::Element*,
                            const WebCore::QualifiedName& attribute);
   void removeChildrenInRange(WebCore::Node* node, int from, int to);
-  void removeNode(WebCore::Node* removeChild);
-  void removeNodePreservingChildren(WebCore::Node* node);
+  virtual void removeNode(WebCore::Node*);
+  void removeNodePreservingChildren(WebCore::Node*);
   void removeNodeAndPruneAncestors(Node* node);
   void prune(PassRefPtr<Node> node);
   void replaceTextInNode(WebCore::Text* node,
@@ -123,11 +123,13 @@ class CompositeEditCommand : public EditCommand {
   void moveParagraph(const VisiblePosition&,
                      const VisiblePosition&,
                      const VisiblePosition&,
-                     bool preserveSelection = false);
+                     bool preserveSelection = false,
+                     bool preserveStyle = true);
   void moveParagraphs(const VisiblePosition&,
                       const VisiblePosition&,
                       const VisiblePosition&,
-                      bool preserveSelection = false);
+                      bool preserveSelection = false,
+                      bool preserveStyle = true);
 
   DeprecatedValueList<EditCommandPtr> m_cmds;
 };
