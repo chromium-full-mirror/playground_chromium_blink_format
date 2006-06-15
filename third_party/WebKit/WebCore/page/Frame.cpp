@@ -3356,8 +3356,12 @@ bool Frame::findString(const String& target,
   RefPtr<Range> resultRange(
       findPlainText(searchRange.get(), target, forward, caseFlag));
   Selection sel = selection().selection();
-  // If the found range is one that's already selected, find again.
-  if (!sel.isNone() && Selection(resultRange.get()) == sel) {
+  // If the found range is already selected, find again.
+  // Build a selection with the found range to remove collapsed whitespace.
+  // Compare ranges instead of selection objects to ignore the way that the
+  // current selection was made.
+  if (!sel.isNone() &&
+      *Selection(resultRange.get()).toRange() == *sel.toRange()) {
     searchRange = rangeOfContents(document());
     if (forward)
       setStart(searchRange.get(), VisiblePosition(sel.end(), sel.affinity()));
