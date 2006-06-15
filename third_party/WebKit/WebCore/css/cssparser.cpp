@@ -2835,6 +2835,7 @@ int CSSParser::lex(void* yylvalWithoutType) {
     case DIMEN:
     case UNICODERANGE:
     case FUNCTION:
+    case NOTFUNCTION:
       yylval->string.characters = t;
       yylval->string.length = length;
       break;
