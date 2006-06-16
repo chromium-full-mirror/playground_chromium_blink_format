@@ -177,13 +177,7 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
     // FIXME: When endpoints are removed, we should just alter the selection,
     // instead of blowing it away.
 
-    // FIXME: The SelectionController should be responsible for scheduling a
-    // repaint,
-    // but it can't do a proper job of it until it handles the other types of
-    // DOM mutations.
-    // For now, we'll continue to let RenderObjects handle it when they are
-    // destroyed.
-
+    static_cast<RenderView*>(start->document()->renderer())->clearSelection();
     setSelection(Selection());
 
   } else if (baseRemoved || extentRemoved) {
@@ -194,6 +188,19 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
       m_sel.setBase(m_sel.start());
       m_sel.setExtent(m_sel.end());
     }
+    // FIXME: This could be more efficient if we had an isNodeInRange function
+    // on Ranges.
+  } else if (Range::compareBoundaryPoints(m_sel.start(), Position(node, 0)) ==
+                 -1 &&
+             Range::compareBoundaryPoints(m_sel.end(), Position(node, 0)) ==
+                 1) {
+    // If we did nothing here, when this node's renderer was destroyed, the rect
+    // that it
+    // occupied would be invalidated, but, selection gaps that change as a
+    // result of
+    // the removal wouldn't be invalidated.
+    // FIXME: Don't do so much unnecessary invalidation.
+    static_cast<RenderView*>(start->document()->renderer())->clearSelection();
   }
 }
 
