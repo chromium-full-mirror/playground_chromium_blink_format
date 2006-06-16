@@ -70,6 +70,7 @@ extern OSStatus (*wkConvertCharToGlyphs)(void* styleGroup,
                                          unsigned numCharacters,
                                          void* glyphs);
 extern void (*wkDrawBezeledTextFieldCell)(NSRect, BOOL enabled);
+extern void (*wkDrawBezeledTextArea)(NSRect, BOOL enabled);
 extern void (*wkDrawFocusRing)(CGContextRef,
                                CGRect clipRect,
                                CGColorRef,
