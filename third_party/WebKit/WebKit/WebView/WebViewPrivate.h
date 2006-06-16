@@ -158,6 +158,9 @@ typedef enum {
 
 @interface WebView (WebPrivate)
 
++ (BOOL)_developerExtrasEnabled;
++ (BOOL)_scriptDebuggerEnabled;
+
 /*!
 Could be worth adding to the API.
  @method loadItemsFromOtherView:
