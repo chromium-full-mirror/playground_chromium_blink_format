@@ -36,6 +36,7 @@ class Debugger;
 class RuntimeMethod;
 class SavedBuiltins;
 class ScopeChain;
+class TimeoutChecker;
 
 namespace Bindings {
 class RootObject;
@@ -49,6 +50,7 @@ class RootObject;
  */
 class Interpreter {
   friend class Collector;
+  friend class TimeoutChecker;
 
  public:
   /**
@@ -344,7 +346,22 @@ class Interpreter {
 
   static Interpreter* interpreterWithGlobalObject(JSObject*);
 
+  void setTimeoutTime(unsigned timeoutTime) { m_timeoutTime = timeoutTime; }
+
+  void startTimeoutCheck();
+  void stopTimeoutCheck();
+
+  void pauseTimeoutCheck();
+  void resumeTimeoutCheck();
+
+  bool checkTimeout();
+
+ protected:
+  virtual bool shouldInterruptScript() { return true; }
+  long m_timeoutTime;
+
  private:
+  bool handleTimeout();
   void init();
 
   /**
@@ -376,6 +393,12 @@ class Interpreter {
   Debugger* m_debugger;
   Context* m_context;
   CompatMode m_compatMode;
+
+  TimeoutChecker* m_timeoutChecker;
+  bool m_timedOut;
+
+  unsigned m_startTimeoutCheckCount;
+  unsigned m_pauseTimeoutCheckCount;
 
   ProtectedPtr<JSObject> m_Object;
   ProtectedPtr<JSObject> m_Function;
@@ -411,6 +434,13 @@ class Interpreter {
   ProtectedPtr<JSObject> m_TypeErrorPrototype;
   ProtectedPtr<JSObject> m_UriErrorPrototype;
 };
+
+inline bool Interpreter::checkTimeout() {
+  if (!m_timedOut)
+    return false;
+
+  return handleTimeout();
+}
 
 }  // namespace
 

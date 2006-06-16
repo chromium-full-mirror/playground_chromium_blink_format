@@ -1725,6 +1725,10 @@ Completion DoWhileNode::execute(ExecState* exec) {
     exec->context()->pushIteration();
     c = statement->execute(exec);
     exec->context()->popIteration();
+
+    if (exec->dynamicInterpreter()->checkTimeout())
+      return Completion(Interrupted);
+
     if (!((c.complType() == Continue) && ls.contains(c.target()))) {
       if ((c.complType() == Break) && ls.contains(c.target()))
         return Completion(Normal, 0);
@@ -1767,6 +1771,10 @@ Completion WhileNode::execute(ExecState* exec) {
     exec->context()->pushIteration();
     c = statement->execute(exec);
     exec->context()->popIteration();
+
+    if (exec->dynamicInterpreter()->checkTimeout())
+      return Completion(Interrupted);
+
     if (c.isValueCompletion())
       value = c.value();
 
@@ -1816,6 +1824,10 @@ Completion ForNode::execute(ExecState* exec) {
       if (c.complType() != Normal)
         return c;
     }
+
+    if (exec->dynamicInterpreter()->checkTimeout())
+      return Completion(Interrupted);
+
     if (expr3) {
       v = expr3->evaluate(exec);
       KJS_CHECKEXCEPTION
