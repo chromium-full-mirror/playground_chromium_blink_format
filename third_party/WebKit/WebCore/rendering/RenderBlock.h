@@ -189,6 +189,9 @@ class RenderBlock : public RenderFlow {
       RenderObject* floatToRemove = 0);
   void markPositionedObjectsForLayout();
 
+  // FIXME: containsFloats() should not return true if the floating objects list
+  // is empty. However, layoutInlineChildren() relies on the current behavior.
+  // http://bugzilla.opendarwin.org/show_bug.cgi?id=7395#c3
   virtual bool containsFloats() { return m_floatingObjects != 0; }
   virtual bool containsFloat(RenderObject* o);
 
