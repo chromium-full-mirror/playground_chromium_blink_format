@@ -53,7 +53,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   virtual void recalcStyle(StyleChange);
 
   int selectedIndex() const;
-  void setSelectedIndex(int index);
+  void setSelectedIndex(int index, bool = true);
 
   virtual bool isEnumeratable() const { return true; }
 
@@ -114,6 +114,9 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   void setMultiple(bool);
 
   void setSize(int);
+
+  void setOption(unsigned index, HTMLOptionElement*, ExceptionCode&);
+  void setLength(unsigned, ExceptionCode&);
 
   virtual Node* namedItem(const String& name, bool caseSensitive = true);
 
