@@ -130,4 +130,6 @@
       slideBack:(BOOL)slideFlag
         forView:(NSView*)view;
 
+- (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
+
 @end

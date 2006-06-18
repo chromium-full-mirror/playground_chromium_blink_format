@@ -138,6 +138,9 @@ void TimeoutChecker::alarmHandler(int) {
 #endif
 
 void TimeoutChecker::pauseTimeoutCheck(Interpreter* interpreter) {
+  if (interpreter->m_startTimeoutCheckCount == 0)
+    return;
+
 #if HAVE(SYS_TIME_H)
   ASSERT(interpreter == s_executingInterpreter);
 
@@ -158,6 +161,9 @@ void TimeoutChecker::pauseTimeoutCheck(Interpreter* interpreter) {
 }
 
 void TimeoutChecker::resumeTimeoutCheck(Interpreter* interpreter) {
+  if (interpreter->m_startTimeoutCheckCount == 0)
+    return;
+
 #if HAVE(SYS_TIME_H)
   ASSERT(interpreter == s_executingInterpreter);
 #endif
@@ -181,7 +187,7 @@ void TimeoutChecker::resumeTimeoutCheck(Interpreter* interpreter) {
   setitimer(ITIMER_REAL, 0L, &m_pausetv);
 
   // Unblock signal
-  currentSignalHandler = signal(SIGALRM, SIG_IGN);
+  currentSignalHandler = signal(SIGALRM, alarmHandler);
 #endif
 }
 
@@ -836,7 +842,11 @@ void Interpreter::resumeTimeoutCheck() {
 bool Interpreter::handleTimeout() {
   m_timedOut = false;
 
-  return shouldInterruptScript();
+  pauseTimeoutCheck();
+  bool retval = shouldInterruptScript();
+  resumeTimeoutCheck();
+
+  return retval;
 }
 
 SavedBuiltins::SavedBuiltins() : _internal(0) {}

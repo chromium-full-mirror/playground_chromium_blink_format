@@ -638,6 +638,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
                                   defaultText:(NSString*)defaultText
                                 returningText:(NSString**)result;
+- (BOOL)shouldInterruptJavaScript;
 - (BOOL)canRunBeforeUnloadConfirmPanel;
 - (BOOL)runBeforeUnloadConfirmPanelWithMessage:(NSString*)message;
 - (void)addMessageToConsole:(NSDictionary*)message;

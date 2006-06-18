@@ -117,6 +117,8 @@ class ScriptInterpreter : public Interpreter {
                                    const Bindings::RootObject* origin,
                                    const Bindings::RootObject* current);
 
+  virtual bool shouldInterruptScript() const;
+
  private:
   WebCore::Frame* m_frame;
 

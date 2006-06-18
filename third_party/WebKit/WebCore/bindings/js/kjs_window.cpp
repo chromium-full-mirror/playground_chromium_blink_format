@@ -1586,12 +1586,18 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::Alert:
       if (frame && frame->document())
         frame->document()->updateRendering();
+      exec->dynamicInterpreter()->pauseTimeoutCheck();
       frame->runJavaScriptAlert(str);
+      exec->dynamicInterpreter()->resumeTimeoutCheck();
       return jsUndefined();
-    case Window::Confirm:
+    case Window::Confirm: {
       if (frame && frame->document())
         frame->document()->updateRendering();
-      return jsBoolean(frame->runJavaScriptConfirm(str));
+      exec->dynamicInterpreter()->pauseTimeoutCheck();
+      bool result = frame->runJavaScriptConfirm(str);
+      exec->dynamicInterpreter()->resumeTimeoutCheck();
+      return jsBoolean(result);
+    }
     case Window::Prompt: {
       if (frame && frame->document())
         frame->document()->updateRendering();
@@ -1869,8 +1875,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
           doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
                                          listener, args[2]->toBoolean(exec));
       return jsUndefined();
-    case Window::ShowModalDialog:
-      return showModalDialog(exec, window, args);
+    case Window::ShowModalDialog: {
+      exec->dynamicInterpreter()->pauseTimeoutCheck();
+      JSValue* result = showModalDialog(exec, window, args);
+      exec->dynamicInterpreter()->resumeTimeoutCheck();
+      return result;
+    }
   }
   return jsUndefined();
 }
@@ -1896,7 +1906,9 @@ void ScheduledAction::execute(Window* window) {
       ExecState* exec = interpreter->globalExec();
       ASSERT(window == interpreter->globalObject());
       JSLock lock;
+      interpreter->startTimeoutCheck();
       static_cast<JSObject*>(func)->call(exec, window, m_args);
+      interpreter->stopTimeoutCheck();
       if (exec->hadException()) {
         JSObject* exception = exec->exception()->toObject(exec);
         exec->clearException();
