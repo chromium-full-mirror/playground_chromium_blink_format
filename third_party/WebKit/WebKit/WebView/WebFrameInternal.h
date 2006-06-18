@@ -31,6 +31,8 @@
 
 #import <WebKit/WebFramePrivate.h>
 
+@class WebInspector;
+
 @interface WebFrame (WebInternal)
 
 - (void)_updateDrawsBackground;
@@ -72,6 +74,8 @@
                alwaysFromRequest:(BOOL)f;
 - (BOOL)_isMainFrame;
 
+- (void)_addInspector:(WebInspector*)inspector;
+- (void)_removeInspector:(WebInspector*)inspector;
 @end
 
 @interface NSObject (WebInternalFrameLoadDelegate)
