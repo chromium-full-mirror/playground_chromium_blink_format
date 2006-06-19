@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MouseEvent_h
-#define MouseEvent_h
+#ifndef PlatformMouseEvent_h
+#define PlatformMouseEvent_h
 
 #include "IntPoint.h"
 
@@ -103,6 +103,7 @@ class PlatformMouseEvent {
   bool m_altKey;
   bool m_metaKey;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // PlatformMouseEvent_h

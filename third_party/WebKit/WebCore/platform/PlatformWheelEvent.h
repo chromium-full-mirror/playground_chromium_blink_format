@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WheelEvent_h
-#define WheelEvent_h
+#ifndef PlatformWheelEvent_h
+#define PlatformWheelEvent_h
 
 #include "IntPoint.h"
 
@@ -81,6 +81,7 @@ class PlatformWheelEvent {
   bool m_altKey;
   bool m_metaKey;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // PlatformWheelEvent_h

@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KeyEvent_H
-#define KeyEvent_H
+#ifndef PlatformKeyboardEvent_h
+#define PlatformKeyboardEvent_h
 
 #include "PlatformString.h"
 
@@ -85,6 +85,7 @@ class PlatformKeyboardEvent {
   bool m_altKey;
   bool m_metaKey;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // PlatformKeyboardEvent_h
