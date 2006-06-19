@@ -129,7 +129,7 @@
          source:(id)sourceObj
       slideBack:(BOOL)slideFlag
         forView:(NSView*)view;
-
+- (void)webView:(WebView*)sender didDrawRect:(NSRect)rect;
 - (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
 
 @end
