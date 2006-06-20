@@ -32,10 +32,10 @@ namespace WebCore {
 class HTMLSelectElement;
 class HTMLFormElement;
 class MappedAttribute;
-class RenderSelect;
+class DeprecatedRenderSelect;
 
 class HTMLOptionElement : public HTMLGenericFormElement {
-  friend class RenderSelect;
+  friend class DeprecatedRenderSelect;
   friend class HTMLSelectElement;
 
  public:
