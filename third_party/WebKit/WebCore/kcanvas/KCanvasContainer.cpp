@@ -27,6 +27,7 @@
 #include "KCanvasContainer.h"
 #include "SVGStyledElement.h"
 #include "GraphicsContext.h"
+#include "SVGStyledTransformableElement.h"
 
 namespace WebCore {
 
@@ -42,6 +43,7 @@ class KCanvasContainer::Private {
   FloatRect viewport;
   FloatRect viewBox;
   KCAlign align;
+  IntRect absoluteBounds;
 };
 
 KCanvasContainer::KCanvasContainer(SVGStyledElement* node)
@@ -97,13 +99,15 @@ void KCanvasContainer::layout() {
 
   IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint)
-    oldBounds = getAbsoluteRepaintRect();
+  if (selfNeedsLayout() && checkForRepaint)
+    oldBounds = d->absoluteBounds;
 
   calcWidth();
   calcHeight();
 
-  if (checkForRepaint)
+  d->absoluteBounds = getAbsoluteRepaintRect();
+
+  if (selfNeedsLayout() && checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
 
   RenderContainer::layout();
@@ -245,7 +249,18 @@ IntRect KCanvasContainer::getAbsoluteRepaintRect() {
     repaintRect.unite(
         enclosingIntRect(filter->filterBBoxForItemBBox(repaintRect)));
 
+  // FIXME: what about transform?
+
   return repaintRect;
+}
+
+void KCanvasContainer::computeAbsoluteRepaintRect(IntRect& r, bool f) {
+  QMatrix transform = localTransform();
+  r = transform.mapRect(r);
+
+  // FIXME: consider filter
+
+  RenderContainer::computeAbsoluteRepaintRect(r, f);
 }
 
 QMatrix KCanvasContainer::absoluteTransform() const {
