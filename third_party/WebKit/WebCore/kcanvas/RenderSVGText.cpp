@@ -91,10 +91,6 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (filter)
     filter->prepareFilter(boundingBox);
 
-  float opacity = style()->opacity();
-  if (opacity < 1.0f)
-    paintInfo.p->beginTransparencyLayer(opacity);
-
   OwnPtr<GraphicsContext> c(device->currentContext()->createGraphicsContext());
   PaintInfo pi = paintInfo;
   pi.p = c.get();
@@ -102,6 +98,10 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
           absoluteTransform())
              .invert()
              .mapRect(paintInfo.r);
+
+  float opacity = style()->opacity();
+  if (opacity < 1.0f)
+    c->beginTransparencyLayer(opacity);
 
   KRenderingPaintServer* fillPaintServer =
       KSVGPainterFactory::fillPaintServer(style(), this);
@@ -131,7 +131,7 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     filter->applyFilter(boundingBox);
 
   if (opacity < 1.0f)
-    paintInfo.p->endTransparencyLayer();
+    c->endTransparencyLayer();
 
   // restore drawing state
   if (!shouldPopContext)
