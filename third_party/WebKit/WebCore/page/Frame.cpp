@@ -66,7 +66,6 @@
 #include "SegmentedString.h"
 #include "TextDocument.h"
 #include "TextIterator.h"
-#include "TransferJob.h"
 #include "TypingCommand.h"
 #include "cssstyleselector.h"
 #include "htmlediting.h"
@@ -235,17 +234,6 @@ bool Frame::didOpenURL(const KURL& url) {
 
   closeURL();
 
-  if (d->m_request.reload)
-    d->m_cachePolicy = KIO::CC_Refresh;
-  else
-    d->m_cachePolicy = KIO::CC_Verify;
-
-  if (d->m_request.doPost() && url.protocol().startsWith("http")) {
-    d->m_job = new TransferJob(this, "POST", url, d->m_request.postData);
-    d->m_job->addMetaData("content-type", d->m_request.contentType());
-  } else
-    d->m_job = new TransferJob(this, "GET", url);
-
   d->m_bComplete = false;
   d->m_bLoadingMainResource = true;
   d->m_bLoadEventEmitted = false;
@@ -287,10 +275,7 @@ void Frame::stopLoading(bool sendUnload) {
   if (d->m_doc && d->m_doc->tokenizer())
     d->m_doc->tokenizer()->stopParsing();
 
-  if (d->m_job) {
-    d->m_job->kill();
-    d->m_job = 0;
-  }
+  d->m_metaData.clear();
 
   if (sendUnload) {
     if (d->m_doc) {
@@ -497,7 +482,7 @@ void Frame::receivedFirstData() {
   DeprecatedString qData;
 
   // Support for http-refresh
-  qData = d->m_job->queryMetaData("http-refresh").deprecatedString();
+  qData = d->m_metaData.get("http-refresh").deprecatedString();
   if (!qData.isEmpty()) {
     double delay;
     int pos = qData.find(';');
@@ -537,21 +522,7 @@ void Frame::receivedFirstData() {
   }
 
   // Support for http last-modified
-  d->m_lastModified = d->m_job->queryMetaData("modified");
-}
-
-void Frame::receivedAllData(TransferJob* job) {
-  d->m_job = 0;
-
-  if (job->error()) {
-    checkCompleted();
-    return;
-  }
-
-  d->m_workingURL = KURL();
-
-  if (d->m_doc->parsing())
-    end();  // will call completed()
+  d->m_lastModified = d->m_metaData.get("modified");
 }
 
 void Frame::childBegin() {
@@ -934,6 +905,29 @@ void Frame::scheduleLocationChange(const DeprecatedString& url,
     startRedirectionTimer();
 }
 
+void Frame::scheduleRefresh(bool userGesture) {
+  // Handle a location change of a page with no document as a special case.
+  // This may happen when a frame requests a refresh of another frame.
+  d->m_scheduledRedirection =
+      d->m_doc ? locationChangeScheduled : locationChangeScheduledDuringLoad;
+
+  // If a refresh was scheduled during a load, then stop the current load.
+  // Otherwise when the current load transitions from a provisional to a
+  // committed state, pending redirects may be cancelled.
+  if (d->m_scheduledRedirection == locationChangeScheduledDuringLoad)
+    stopLoading(true);
+
+  d->m_delayRedirect = 0;
+  d->m_redirectURL = url().url();
+  d->m_redirectReferrer = referrer();
+  d->m_redirectLockHistory = true;
+  d->m_redirectUserGesture = userGesture;
+  d->m_cachePolicy = KIO::CC_Refresh;
+  stopRedirectionTimer();
+  if (d->m_bComplete)
+    startRedirectionTimer();
+}
+
 bool Frame::isScheduledLocationChangePending() const {
   switch (d->m_scheduledRedirection) {
     case noRedirectionScheduled:
@@ -1006,6 +1000,9 @@ void Frame::changeLocation(const DeprecatedString& URL,
   if (!referrer.isEmpty())
     request.setReferrer(referrer);
 
+  request.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
+                   (d->m_cachePolicy == KIO::CC_Refresh);
+
   urlSelected(request, "_self");
 }
 
@@ -1039,10 +1036,6 @@ void Frame::redirectionTimerFired(Timer<Frame>*) {
   d->m_redirectReferrer = DeprecatedString::null;
 
   changeLocation(URL, referrer, lockHistory, userGesture);
-}
-
-void Frame::receivedRedirect(TransferJob*, const KURL& url) {
-  d->m_workingURL = url;
 }
 
 DeprecatedString Frame::encoding() const {
@@ -3073,7 +3066,7 @@ bool Frame::scrollbarsVisible() {
 }
 
 void Frame::addMetaData(const String& key, const String& value) {
-  d->m_job->addMetaData(key, value);
+  d->m_metaData.set(key, value);
 }
 
 // This does the same kind of work that Frame::openURL does, except it relies on

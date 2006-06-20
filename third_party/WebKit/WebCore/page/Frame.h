@@ -37,7 +37,6 @@
 #include "Node.h"
 #include "TextAffinity.h"
 #include "TextGranularity.h"
-#include "TransferJobClient.h"
 #include <wtf/Vector.h>
 #include "RenderObject.h"
 
@@ -93,7 +92,7 @@ enum ObjectContentType {
   ObjectContentPlugin,
 };
 
-class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
+class Frame : public Shared<Frame>, Noncopyable {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
@@ -188,6 +187,7 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
                               const DeprecatedString& referrer,
                               bool lockHistory = true,
                               bool userGesture = false);
+  void scheduleRefresh(bool userGesture = false);
   bool isScheduledLocationChangePending() const;
 
   /**
@@ -628,9 +628,6 @@ class Frame : public Shared<Frame>, Noncopyable, TransferJobClient {
   void reparseConfiguration();
 
  private:
-  virtual void receivedRedirect(TransferJob*, const KURL&);
-  virtual void receivedAllData(TransferJob*);
-
   void childBegin();
 
   void submitFormAgain();

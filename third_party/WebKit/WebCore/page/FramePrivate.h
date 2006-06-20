@@ -69,7 +69,6 @@ class FramePrivate {
         m_bJavaEnabled(true),
         m_bPluginsEnabled(true),
         m_settings(0),
-        m_job(0),
         m_bComplete(true),
         m_bLoadingMainResource(false),
         m_bLoadEventEmitted(true),
@@ -135,7 +134,7 @@ class FramePrivate {
 
   KHTMLSettings* m_settings;
 
-  TransferJob* m_job;
+  HashMap<String, String> m_metaData;
 
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;
