@@ -1140,7 +1140,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // their percentage isn't going to be turned into
     // an auto value.  Add a method to determine this, so that we can avoid the
     // relayout.
-    if (relayoutChildren || child->style()->height().isPercent())
+    if (relayoutChildren || (child->style()->height().isPercent() ||
+                             child->style()->minHeight().isPercent() ||
+                             child->style()->maxHeight().isPercent()))
       child->setChildNeedsLayout(true);
 
     // Handle the four types of special elements first.  These include
