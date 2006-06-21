@@ -408,7 +408,7 @@ bool FrameWin::runJavaScriptPrompt(String const&, String const&, String&) {
   notImplemented();
   return 0;
 }
-bool FrameWin::shouldInterruptJavaScript() const {
+bool FrameWin::shouldInterruptJavaScript() {
   notImplemented();
   return false;
 }
