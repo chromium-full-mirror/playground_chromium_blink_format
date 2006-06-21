@@ -854,6 +854,11 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !css3InheritedData->shadowDataEquivalent(*other->css3InheritedData.get()))
     return Layout;
 
+  // Overflow returns a layout hint.
+  if (noninherited_flags._overflowX != other->noninherited_flags._overflowX ||
+      noninherited_flags._overflowY != other->noninherited_flags._overflowY)
+    return Layout;
+
   // only for inline:
   //     EVerticalAlign _vertical_align : 4;
 
@@ -903,12 +908,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   // Repaint:
   //      EVisibility _visibility : 2;
-  //     EOverflow _overflow : 4 ;
   //      int _text_decoration : 4;
   //     DataRef<StyleBackgroundData> background;
   if (inherited->color != other->inherited->color ||
-      !(inherited_flags._visibility == other->inherited_flags._visibility) ||
-      !(noninherited_flags._overflow == other->noninherited_flags._overflow) ||
+      inherited_flags._visibility != other->inherited_flags._visibility ||
       !(inherited_flags._text_decorations ==
         other->inherited_flags._text_decorations) ||
       !(inherited_flags._force_backgrounds_to_white ==

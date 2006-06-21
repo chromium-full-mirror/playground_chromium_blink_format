@@ -330,17 +330,35 @@ class RenderObject : public CachedObjectClient {
   bool isSelectionBorder() const;
 
   bool hasOverflowClip() const { return m_hasOverflowClip; }
-  bool hasAutoScrollbars() const {
+
+  bool hasAutoVerticalScrollbar() const {
     return hasOverflowClip() &&
-           (style()->overflow() == OAUTO || style()->overflow() == OOVERLAY);
+           (style()->overflowY() == OAUTO || style()->overflowY() == OOVERLAY);
   }
+  bool hasAutoHorizontalScrollbar() const {
+    return hasOverflowClip() &&
+           (style()->overflowX() == OAUTO || style()->overflowX() == OOVERLAY);
+  }
+
   bool scrollsOverflow() const {
-    return hasOverflowClip() &&
-           (style()->overflow() == OSCROLL || hasAutoScrollbars());
+    return scrollsOverflowX() || scrollsOverflowY();
   }
-  bool includeScrollbarSize() const {
+  bool scrollsOverflowX() const {
     return hasOverflowClip() &&
-           (style()->overflow() == OSCROLL || style()->overflow() == OAUTO);
+           (style()->overflowX() == OSCROLL || hasAutoHorizontalScrollbar());
+  }
+  bool scrollsOverflowY() const {
+    return hasOverflowClip() &&
+           (style()->overflowY() == OSCROLL || hasAutoVerticalScrollbar());
+  }
+
+  bool includeVerticalScrollbarSize() const {
+    return hasOverflowClip() &&
+           (style()->overflowY() == OSCROLL || style()->overflowY() == OAUTO);
+  }
+  bool includeHorizontalScrollbarSize() const {
+    return hasOverflowClip() &&
+           (style()->overflowX() == OSCROLL || style()->overflowX() == OAUTO);
   }
 
   RenderStyle* getPseudoStyle(RenderStyle::PseudoId pseudo,
