@@ -231,7 +231,7 @@ void JSObject::put(ExecState* exec,
   if (hasGettersOrSetters) {
     obj = this;
     while (true) {
-      int attributes;
+      unsigned attributes;
       if (JSValue* gs = obj->_prop.get(propertyName, attributes)) {
         if (attributes & GetterSetter) {
           JSObject* setterFunc = static_cast<GetterSetterImp*>(gs)->getSetter();
@@ -272,7 +272,7 @@ void JSObject::put(ExecState* exec,
 
 // ECMA 8.6.2.3
 bool JSObject::canPut(ExecState*, const Identifier& propertyName) const {
-  int attributes;
+  unsigned attributes;
 
   // Don't look in the prototype here. We can always put an override
   // in the object, even if the prototype has a ReadOnly property.
@@ -298,7 +298,7 @@ bool JSObject::hasProperty(ExecState* exec, unsigned propertyName) const {
 // ECMA 8.6.2.5
 bool JSObject::deleteProperty(ExecState* /*exec*/,
                               const Identifier& propertyName) {
-  int attributes;
+  unsigned attributes;
   JSValue* v = _prop.get(propertyName, attributes);
   if (v) {
     if ((attributes & DontDelete))
@@ -450,7 +450,7 @@ bool JSObject::hasInstance(ExecState*, JSValue*) {
 
 bool JSObject::propertyIsEnumerable(ExecState*,
                                     const Identifier& propertyName) const {
-  int attributes;
+  unsigned attributes;
 
   if (!getPropertyAttributes(propertyName, attributes))
     return false;
@@ -459,7 +459,7 @@ bool JSObject::propertyIsEnumerable(ExecState*,
 }
 
 bool JSObject::getPropertyAttributes(const Identifier& propertyName,
-                                     int& attributes) const {
+                                     unsigned& attributes) const {
   if (_prop.get(propertyName, attributes))
     return true;
 
@@ -473,12 +473,10 @@ bool JSObject::getPropertyAttributes(const Identifier& propertyName,
   return false;
 }
 
-ReferenceList JSObject::propList(ExecState* exec, bool recursive) {
-  ReferenceList list;
-  if (_proto->isObject() && recursive)
-    list = static_cast<JSObject*>(_proto)->propList(exec, recursive);
-
-  _prop.addEnumerablesToReferenceList(list, this);
+void JSObject::getPropertyList(ExecState* exec,
+                               ReferenceList& propertyList,
+                               bool recursive) {
+  _prop.addEnumerablesToReferenceList(propertyList, this);
 
   // Add properties from the static hashtable of properties
   const ClassInfo* info = classInfo();
@@ -488,15 +486,16 @@ ReferenceList JSObject::propList(ExecState* exec, bool recursive) {
       const HashEntry* e = info->propHashTable->entries;
       for (int i = 0; i < size; ++i, ++e) {
         if (e->s && !(e->attr & DontEnum))
-          list.append(Reference(
+          propertyList.append(Reference(
               this,
               e->s));  /// ######### check for duplicates with the propertymap
       }
     }
     info = info->parentClass;
   }
-
-  return list;
+  if (_proto->isObject() && recursive)
+    static_cast<JSObject*>(_proto)->getPropertyList(exec, propertyList,
+                                                    recursive);
 }
 
 bool JSObject::toBoolean(ExecState* /*exec*/) const {

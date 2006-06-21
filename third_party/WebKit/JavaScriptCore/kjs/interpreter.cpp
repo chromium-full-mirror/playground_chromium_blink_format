@@ -484,8 +484,9 @@ bool Interpreter::checkSyntax(const UString& code) {
 Completion Interpreter::evaluate(const UString& sourceURL,
                                  int startingLineNumber,
                                  const UString& code,
-                                 JSValue*) {
-  return evaluate(sourceURL, startingLineNumber, code.data(), code.size());
+                                 JSValue* thisV) {
+  return evaluate(sourceURL, startingLineNumber, code.data(), code.size(),
+                  thisV);
 }
 
 Completion Interpreter::evaluate(const UString& sourceURL,

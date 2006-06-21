@@ -204,9 +204,9 @@ bool ArrayInstance::deleteProperty(ExecState* exec, unsigned index) {
   return JSObject::deleteProperty(exec, Identifier::from(index));
 }
 
-ReferenceList ArrayInstance::propList(ExecState* exec, bool recursive) {
-  ReferenceList properties = JSObject::propList(exec, recursive);
-
+void ArrayInstance::getPropertyList(ExecState* exec,
+                                    ReferenceList& propertyList,
+                                    bool recursive) {
   // avoid fetching this every time through the loop
   JSValue* undefined = jsUndefined();
 
@@ -214,10 +214,10 @@ ReferenceList ArrayInstance::propList(ExecState* exec, bool recursive) {
   for (unsigned i = 0; i < storageLength; ++i) {
     JSValue* imp = storage[i];
     if (imp && imp != undefined) {
-      properties.append(Reference(this, i));
+      propertyList.append(Reference(this, i));
     }
   }
-  return properties;
+  return JSObject::getPropertyList(exec, propertyList, recursive);
 }
 
 void ArrayInstance::resizeStorage(unsigned newLength) {

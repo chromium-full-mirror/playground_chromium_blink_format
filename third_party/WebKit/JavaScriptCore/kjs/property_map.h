@@ -79,7 +79,7 @@ class PropertyMap {
            bool roCheck = false);
   void remove(const Identifier& name);
   JSValue* get(const Identifier& name) const;
-  JSValue* get(const Identifier& name, int& attributes) const;
+  JSValue* get(const Identifier& name, unsigned& attributes) const;
   JSValue** getLocation(const Identifier& name);
 
   void mark() const;

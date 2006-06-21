@@ -46,7 +46,9 @@ class ArrayInstance : public JSObject {
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState* exec, unsigned propertyName);
-  virtual ReferenceList propList(ExecState* exec, bool recursive);
+  virtual void getPropertyList(ExecState*,
+                               ReferenceList& propertyList,
+                               bool recursive);
 
   virtual void mark();
 

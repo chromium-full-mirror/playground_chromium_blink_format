@@ -162,7 +162,7 @@ void PropertyMap::clear() {
   _table->sentinelCount = 0;
 }
 
-JSValue* PropertyMap::get(const Identifier& name, int& attributes) const {
+JSValue* PropertyMap::get(const Identifier& name, unsigned& attributes) const {
   assert(!name.isNull());
 
   UString::Rep* rep = name._ustring.rep();

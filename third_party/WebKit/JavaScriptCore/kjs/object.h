@@ -472,7 +472,9 @@ class JSObject : public JSCell {
    * included in the list.
    * @return A List of References to properties of the object.
    **/
-  virtual ReferenceList propList(ExecState* exec, bool recursive = true);
+  virtual void getPropertyList(ExecState* exec,
+                               ReferenceList& propertyList,
+                               bool recursive = true);
 
   /**
    * Returns the internal value of the object. This is used for objects such
@@ -493,15 +495,15 @@ class JSObject : public JSCell {
    */
   void setInternalValue(JSValue* v);
 
-  JSValue* toPrimitive(ExecState* exec,
-                       JSType preferredType = UnspecifiedType) const;
-  bool toBoolean(ExecState* exec) const;
-  double toNumber(ExecState* exec) const;
-  UString toString(ExecState* exec) const;
-  JSObject* toObject(ExecState* exec) const;
+  virtual JSValue* toPrimitive(ExecState* exec,
+                               JSType preferredType = UnspecifiedType) const;
+  virtual bool toBoolean(ExecState* exec) const;
+  virtual double toNumber(ExecState* exec) const;
+  virtual UString toString(ExecState* exec) const;
+  virtual JSObject* toObject(ExecState* exec) const;
 
   bool getPropertyAttributes(const Identifier& propertyName,
-                             int& attributes) const;
+                             unsigned& attributes) const;
 
   // Returns whether the object should be treated as undefined when doing
   // equality comparisons
