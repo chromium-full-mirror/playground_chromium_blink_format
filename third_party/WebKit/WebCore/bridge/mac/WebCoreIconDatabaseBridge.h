@@ -26,6 +26,7 @@
 #ifdef __cplusplus
 namespace WebCore {
 class IconDatabase;
+class Image;
 }
 typedef WebCore::IconDatabase WebCoreIconDatabase;
 #else
@@ -35,7 +36,22 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 @interface WebCoreIconDatabaseBridge : NSObject {
   WebCoreIconDatabase* _iconDB;
 }
++ (WebCoreIconDatabaseBridge*)sharedBridgeInstance;
+
 - (BOOL)openSharedDatabaseWithPath:(NSString*)path;
 - (void)closeSharedDatabase;
 - (BOOL)isOpen;
+
+- (NSImage*)iconForURL:(NSString*)url withSize:(NSSize)size;
+- (NSString*)iconURLForURL:(NSString*)url;
+- (NSImage*)defaultIconWithSize:(NSSize)size;
+- (void)retainIconForURL:(NSString*)url;
+- (void)releaseIconForURL:(NSString*)url;
+- (void)setPrivateBrowsingEnabled:(BOOL)flag;
+
+- (void)_setIconData:(NSData*)data forIconURL:(NSString*)iconURL;
+- (void)_setHaveNoIconForIconURL:(NSString*)iconURL;
+- (void)_setIconURL:(NSString*)iconURL forURL:(NSString*)url;
+- (BOOL)_hasIconForIconURL:(NSString*)iconURL;
+
 @end
