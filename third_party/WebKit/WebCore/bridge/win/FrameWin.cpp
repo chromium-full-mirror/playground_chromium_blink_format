@@ -103,7 +103,7 @@ bool FrameWin::runJavaScriptConfirm(String const& message) {
                     L"JavaScript Alert", MB_OKCANCEL) == IDOK;
 }
 
-bool shouldInterruptJavaScript() const {
+bool FrameWin::shouldInterruptJavaScript() {
   // FIXME: This should be implemented
   return false;
 }

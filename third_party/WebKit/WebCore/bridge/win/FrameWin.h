@@ -82,7 +82,7 @@ class FrameWin : public Frame {
   virtual bool runJavaScriptPrompt(const String& message,
                                    const String& defaultValue,
                                    String& result);
-  virtual bool shouldInterruptJavaScript() const;
+  virtual bool shouldInterruptJavaScript();
 
   virtual bool locationbarVisible();
   virtual bool menubarVisible();
