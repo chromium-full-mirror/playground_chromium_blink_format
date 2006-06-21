@@ -50,7 +50,7 @@ VisiblePosition::VisiblePosition(Node* node, int offset, EAffinity affinity) {
 void VisiblePosition::init(const Position& position, EAffinity affinity) {
   m_affinity = affinity;
 
-  initDeepPosition(position, affinity);
+  m_deepPosition = canonicalPosition(position);
 
   // When not at a line wrap, make sure to end up with DOWNSTREAM affinity.
   if (m_affinity == UPSTREAM &&
@@ -139,37 +139,32 @@ Position VisiblePosition::nextVisiblePosition(const Position& pos) {
   return Position();
 }
 
-void VisiblePosition::initDeepPosition(const Position& position,
-                                       EAffinity affinity) {
-  // FIXME: No need for affinity parameter.
-  // FIXME: Would read nicer if this was a function that returned a Position.
-
+Position VisiblePosition::canonicalPosition(const Position& position) {
+  // FIXME (9535):  Canonicalizing to the leftmost candidate means that if we're
+  // at a line wrap, we will
+  // ask renderers to paint downstream carets for other renderers.
+  // To fix this, we need to either a) add code to all paintCarets to pass the
+  // responsibility off to
+  // the appropriate renderer for VisiblePosition's like these, or b)
+  // canonicalize to the rightmost candidate
+  // unless the affinity is upstream.
   Node* node = position.node();
-  if (!node) {
-    m_deepPosition = Position();
-    return;
-  }
+  if (!node)
+    return Position();
 
   node->document()->updateLayoutIgnorePendingStylesheets();
 
-  // If two visually equivalent positions are both candidates for being made the
-  // m_deepPosition,
-  // (this can happen when two rendered positions have only collapsed whitespace
-  // between them),
-  // we always choose the one that occurs first in the DOM to canonicalize
-  // VisiblePositions.
-  m_deepPosition = position.upstream();
-  if (m_deepPosition.inRenderedContent())
-    return;
-  m_deepPosition = position;
-  if (m_deepPosition.inRenderedContent())
-    return;
-  m_deepPosition = position.downstream();
-  if (m_deepPosition.inRenderedContent())
-    return;
+  Position candidate = position.upstream();
+  if (candidate.inRenderedContent())
+    return candidate;
+  candidate = position.downstream();
+  if (candidate.inRenderedContent())
+    return candidate;
 
-  // When neither upstream or downstream gets us to a visible position,
-  // look at the next and previous visible position.
+  // When neither upstream or downstream gets us to a candidate
+  // (upstream/downstream won't leave
+  // blocks or enter new ones), we search forward and backward until we find
+  // one.
   Position next = nextVisiblePosition(position);
   Position prev = previousVisiblePosition(position);
   Node* nextNode = next.node();
@@ -182,26 +177,21 @@ void VisiblePosition::initDeepPosition(const Position& position,
   // from non-editable to editable content since rootEditableElement stops at
   // the body
   // even if the html element is editable.
-  if (editingRoot && editingRoot->hasTagName(htmlTag)) {
-    m_deepPosition = next.isNotNull() ? next : prev;
-    return;
-  }
+  if (editingRoot && editingRoot->hasTagName(htmlTag))
+    return next.isNotNull() ? next : prev;
+
   bool prevIsInSameEditableElement =
       prevNode && prevNode->rootEditableElement() == editingRoot;
   bool nextIsInSameEditableElement =
       nextNode && nextNode->rootEditableElement() == editingRoot;
-  if (prevIsInSameEditableElement && !nextIsInSameEditableElement) {
-    m_deepPosition = prev;
-    return;
-  }
-  if (nextIsInSameEditableElement && !prevIsInSameEditableElement) {
-    m_deepPosition = next;
-    return;
-  }
-  if (!nextIsInSameEditableElement && !prevIsInSameEditableElement) {
-    m_deepPosition = Position();
-    return;
-  }
+  if (prevIsInSameEditableElement && !nextIsInSameEditableElement)
+    return prev;
+
+  if (nextIsInSameEditableElement && !prevIsInSameEditableElement)
+    return next;
+
+  if (!nextIsInSameEditableElement && !prevIsInSameEditableElement)
+    return Position();
 
   // The new position should be in the same block flow element. Favor that.
   Node* originalBlock = node->enclosingBlockFlowElement();
@@ -210,9 +200,9 @@ void VisiblePosition::initDeepPosition(const Position& position,
   bool prevIsOutsideOriginalBlock =
       !prevNode->isAncestor(originalBlock) && prevNode != originalBlock;
   if (nextIsOutsideOriginalBlock && !prevIsOutsideOriginalBlock)
-    m_deepPosition = prev;
-  else
-    m_deepPosition = next;
+    return prev;
+
+  return next;
 }
 
 int VisiblePosition::maxOffset(const Node* node) {

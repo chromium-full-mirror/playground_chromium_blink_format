@@ -794,10 +794,9 @@ void ReplaceSelectionCommand::doApply() {
         next.rootEditableElement() != currentRoot) {
       setEndingSelection(insertionPos, DOWNSTREAM);
       insertParagraphSeparator();
-      next = pos.next();
 
       // Select up to the paragraph separator that was added.
-      lastPositionToSelect = next.deepEquivalent().downstream();
+      lastPositionToSelect = endingSelection().visibleStart().deepEquivalent();
       updateNodesInserted(lastPositionToSelect.node());
     } else {
       // Select up to the beginning of the next paragraph.

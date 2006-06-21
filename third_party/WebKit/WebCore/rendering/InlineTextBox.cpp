@@ -84,12 +84,6 @@ RenderObject::SelectionState InlineTextBox::selectionState() {
     int startPos, endPos;
     object()->selectionStartEnd(startPos, endPos);
 
-    // If we're at a line wrap, then the selection is going to extend onto the
-    // next line (and thus needs to be thought of as
-    // extending beyond our box.
-    if (textObject()->atLineWrap(this, endPos))
-      endPos++;
-
     bool start = (state != RenderObject::SelectionEnd && startPos >= m_start &&
                   startPos < m_start + m_len);
     bool end = (state != RenderObject::SelectionStart && endPos > m_start &&
