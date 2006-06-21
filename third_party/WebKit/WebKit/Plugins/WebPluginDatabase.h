@@ -33,6 +33,7 @@
 @interface WebPluginDatabase : NSObject {
   NSMutableSet* plugins;
   NSMutableSet* registeredMIMETypes;
+  NSArray* plugInPaths;
 }
 
 + (WebPluginDatabase*)installedPlugins;
@@ -47,6 +48,10 @@
 - (NSArray*)plugins;
 
 - (void)refresh;
+
+- (void)setPlugInPaths:(NSArray*)newPaths;
+
+- (void)close;
 
 @end
 

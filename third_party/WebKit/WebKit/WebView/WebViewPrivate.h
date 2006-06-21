@@ -273,6 +273,12 @@ backforward list.
  */
 - (BOOL)alwaysShowHorizontalScroller;
 
+/*!
+    @method _setAdditionalWebPlugInPaths:
+    @abstract Sets additional plugin search paths for a specific WebView.
+ */
+- (void)_setAdditionalWebPlugInPaths:(NSArray*)newPaths;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

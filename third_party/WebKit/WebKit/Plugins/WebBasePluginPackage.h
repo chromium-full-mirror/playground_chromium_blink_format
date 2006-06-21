@@ -29,6 +29,8 @@
 #import <WebCore/WebCoreViewFactory.h>
 #import <WebKit/npfunctions.h>
 
+@class WebPluginDatabase;
+
 @protocol WebPluginManualLoader
 - (void)pluginView:(NSView*)pluginView
     receivedResponse:(NSURLResponse*)response;
@@ -47,6 +49,8 @@
 #define WebPluginTypeEnabledKey @"WebPluginTypeEnabled"
 
 @interface WebBasePluginPackage : NSObject<WebCorePluginInfo> {
+  NSMutableSet* pluginDatabases;
+
   BOOL isLoaded;
 
   NSString* name;
@@ -99,5 +103,8 @@
 - (BOOL)isJavaPlugIn;
 
 - (BOOL)isNativeLibraryData:(NSData*)data;
+
+- (void)wasAddedToPluginDatabase:(WebPluginDatabase*)database;
+- (void)wasRemovedFromPluginDatabase:(WebPluginDatabase*)database;
 
 @end
