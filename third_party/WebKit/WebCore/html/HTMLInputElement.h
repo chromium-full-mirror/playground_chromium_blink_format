@@ -183,6 +183,11 @@ class HTMLInputElement : public HTMLGenericFormElement {
   bool autofilled() const { return m_autofilled; }
   void setAutofilled(bool b = true) { m_autofilled = b; }
 
+  void cacheSelection(int s, int e) {
+    cachedSelStart = s;
+    cachedSelEnd = e;
+  };
+
  protected:
   AtomicString m_name;
 
@@ -213,6 +218,9 @@ class HTMLInputElement : public HTMLGenericFormElement {
   bool m_autocomplete : 1;
   bool m_autofilled : 1;
   bool m_inited : 1;
+
+  int cachedSelStart;
+  int cachedSelEnd;
 };
 
 }  // namespace

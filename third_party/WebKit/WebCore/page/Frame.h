@@ -340,6 +340,8 @@ class Frame : public Shared<Frame>, Noncopyable {
                     bool keepTypingStyle = false);
   bool shouldChangeSelection(const SelectionController&) const;
 
+  void notifyRendererOfSelectionChange(bool userTriggered);
+
   /**
    * Returns a mark, to be used as emacs uses it.
    */

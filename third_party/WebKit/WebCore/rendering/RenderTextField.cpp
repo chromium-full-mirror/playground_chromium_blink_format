@@ -190,6 +190,13 @@ void RenderTextField::setSelectionRange(int start, int end) {
 
   document()->updateLayout();
 
+  if (style()->visibility() == HIDDEN) {
+    if (m_multiLine)
+      static_cast<HTMLTextAreaElement*>(node())->cacheSelection(start, end);
+    else
+      static_cast<HTMLInputElement*>(node())->cacheSelection(start, end);
+    return;
+  }
   VisiblePosition startPosition = visiblePositionForIndex(start);
   VisiblePosition endPosition;
   if (start == end)
@@ -392,11 +399,16 @@ void RenderTextField::forwardEvent(Event* evt) {
     m_div->defaultEventHandler(evt);
 }
 
-void RenderTextField::selectionChanged() {
-  // FIXME: Implement this, and find the right place to detect a selection
-  // change to call this method.
-  // We also want to retain more information about selection for text controls,
-  // so this would be the place
-  // to store that info.
+void RenderTextField::selectionChanged(bool userTriggered) {
+  HTMLGenericFormElement* element =
+      static_cast<HTMLGenericFormElement*>(node());
+  if (m_multiLine)
+    static_cast<HTMLTextAreaElement*>(element)->cacheSelection(selectionStart(),
+                                                               selectionEnd());
+  else
+    static_cast<HTMLInputElement*>(element)->cacheSelection(selectionStart(),
+                                                            selectionEnd());
+  if (document()->frame()->selection().isRange() && userTriggered)
+    element->onSelect();
 }
 }

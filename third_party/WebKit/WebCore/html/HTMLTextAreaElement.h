@@ -91,6 +91,11 @@ class HTMLTextAreaElement : public HTMLGenericFormElement {
   void setCols(int);
   void setRows(int);
 
+  void cacheSelection(int s, int e) {
+    cachedSelStart = s;
+    cachedSelEnd = e;
+  };
+
  private:
   void updateValue() const;
 
@@ -98,6 +103,8 @@ class HTMLTextAreaElement : public HTMLGenericFormElement {
   int m_cols;
   WrapMethod m_wrap;
   mutable String m_value;
+  int cachedSelStart;
+  int cachedSelEnd;
 };
 
 }  // namespace
