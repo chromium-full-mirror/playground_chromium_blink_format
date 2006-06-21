@@ -408,6 +408,10 @@ bool FrameWin::runJavaScriptPrompt(String const&, String const&, String&) {
   notImplemented();
   return 0;
 }
+bool FrameWin::shouldInterruptJavaScript() const {
+  notImplemented();
+  return false;
+}
 bool FrameWin::openURL(KURL const&) {
   notImplemented();
   return 0;
