@@ -45,6 +45,10 @@
 #include <libxml/parserInternals.h>
 #include <wtf/Vector.h>
 
+#ifdef KHTML_XSLT
+#include <libxslt/xslt.h>
+#endif
+
 #if SVG_SUPPORT
 #include "SVGNames.h"
 #include "XLinkNames.h"
@@ -427,7 +431,8 @@ class OffsetBuffer {
 
 static bool shouldAllowExternalLoad(const char* inURI) {
   DeprecatedString url(inURI);
-  if (url.contains("/etc/catalog") ||
+
+  if (url.contains("/etc/xml/catalog") ||
       url.startsWith("http://www.w3.org/Graphics/SVG") ||
       url.startsWith("http://www.w3.org/TR/xhtml"))
     return false;
@@ -467,6 +472,10 @@ static int closeFunc(void* context) {
     delete data;
   }
   return 0;
+}
+
+static void errorFunc(void*, const char*, ...) {
+  // FIXME: It would be nice to display error messages somewhere.
 }
 
 void setLoaderForLibXMLCallbacks(DocLoader* docLoader) {
@@ -593,7 +602,7 @@ bool XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
   if (m_parserStopped || m_sawXSLTransform)
     return false;
 
-  if (0 && m_parserPaused) {
+  if (m_parserPaused) {
     m_pendingSrc.append(s);
     return false;
   }
@@ -1215,8 +1224,8 @@ void XMLTokenizer::initializeParserContext() {
 
 void XMLTokenizer::end() {
   if (m_sawXSLTransform) {
-    m_doc->setTransformSource(
-        xmlDocPtrForString(m_originalSourceForTransform, m_doc->URL()));
+    m_doc->setTransformSource(xmlDocPtrForString(
+        m_doc->docLoader(), m_originalSourceForTransform, m_doc->URL()));
 
     m_doc->setParsing(
         false);  // Make the doc think it's done, so it will apply xsl sheets.
@@ -1370,7 +1379,8 @@ bool XMLTokenizer::isWaitingForScripts() const {
 }
 
 #ifdef KHTML_XSLT
-void* xmlDocPtrForString(const DeprecatedString& source,
+void* xmlDocPtrForString(DocLoader* docLoader,
+                         const DeprecatedString& source,
                          const DeprecatedString& url) {
   if (source.isEmpty())
     return 0;
@@ -1381,11 +1391,21 @@ void* xmlDocPtrForString(const DeprecatedString& source,
   const QChar BOM(0xFEFF);
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
-  xmlDocPtr sourceDoc =
-      xmlReadMemory(reinterpret_cast<const char*>(source.unicode()),
-                    source.length() * sizeof(QChar), url.ascii(),
-                    BOMHighByte == 0xFF ? "UTF-16LE" : "UTF-16BE",
-                    XML_PARSE_NOCDATA | XML_PARSE_DTDATTR | XML_PARSE_NOENT);
+
+  xmlGenericErrorFunc oldErrorFunc = xmlGenericError;
+  void* oldErrorContext = xmlGenericErrorContext;
+
+  setLoaderForLibXMLCallbacks(docLoader);
+  xmlSetGenericErrorFunc(0, errorFunc);
+
+  xmlDocPtr sourceDoc = xmlReadMemory(
+      reinterpret_cast<const char*>(source.unicode()),
+      source.length() * sizeof(QChar), url.ascii(),
+      BOMHighByte == 0xFF ? "UTF-16LE" : "UTF-16BE", XSLT_PARSE_OPTIONS);
+
+  setLoaderForLibXMLCallbacks(0);
+  xmlSetGenericErrorFunc(oldErrorContext, oldErrorFunc);
+
   return sourceDoc;
 }
 #endif

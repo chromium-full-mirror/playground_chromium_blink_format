@@ -292,7 +292,7 @@ static inline xmlDocPtr xmlDocPtrFromNode(Node* sourceNode,
     sourceDoc = (xmlDocPtr)ownerDocument->transformSource();
   if (!sourceDoc) {
     sourceDoc = (xmlDocPtr)xmlDocPtrForString(
-        createMarkup(sourceNode),
+        ownerDocument->docLoader(), createMarkup(sourceNode),
         sourceIsDocument ? ownerDocument->URL() : DeprecatedString());
     shouldDelete = (sourceDoc != 0);
   }
