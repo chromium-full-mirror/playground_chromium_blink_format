@@ -713,7 +713,7 @@ bool HTMLParser::noframesCreateErrorCheck(Token* t, RefPtr<Node>& result) {
 }
 
 bool HTMLParser::noscriptCreateErrorCheck(Token* t, RefPtr<Node>& result) {
-  if (!m_fragment && document->frame()->jScriptEnabled())
+  if (!m_fragment && document->frame() && document->frame()->jScriptEnabled())
     setSkipMode(noscriptTag);
   return true;
 }
@@ -725,7 +725,7 @@ bool HTMLParser::mapCreateErrorCheck(Token* t, RefPtr<Node>& result) {
 }
 
 bool HTMLParser::canvasCreateErrorCheck(Token* t, RefPtr<Node>& result) {
-  if (!m_fragment && document->frame()->jScriptEnabled())
+  if (!m_fragment && document->frame() && document->frame()->jScriptEnabled())
     setSkipMode(canvasTag);
   return true;
 }
@@ -902,7 +902,7 @@ bool HTMLParser::isInline(Node* node) const {
         e->hasLocalName(spanTag) || e->hasLocalName(nobrTag) ||
         e->hasLocalName(wbrTag) || e->hasLocalName(noframesTag) ||
         e->hasLocalName(nolayerTag) || e->hasLocalName(noembedTag) ||
-        (e->hasLocalName(noscriptTag) && !m_fragment &&
+        (e->hasLocalName(noscriptTag) && !m_fragment && document->frame() &&
          document->frame()->jScriptEnabled()))
       return true;
   }
