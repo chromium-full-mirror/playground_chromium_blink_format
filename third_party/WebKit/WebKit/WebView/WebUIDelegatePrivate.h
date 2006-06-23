@@ -130,6 +130,8 @@
       slideBack:(BOOL)slideFlag
         forView:(NSView*)view;
 - (void)webView:(WebView*)sender didDrawRect:(NSRect)rect;
+- (void)webView:(WebView*)sender
+    didScrollDocumentInFrameView:(WebFrameView*)frameView;
 - (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
 
 @end
