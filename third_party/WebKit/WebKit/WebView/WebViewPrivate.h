@@ -88,7 +88,7 @@ typedef enum {
 
 - (IBAction)toggleContinuousSpellChecking:(id)sender;
 
-- (void)toggleSmartInsertDelete:(id)sender;
+- (IBAction)toggleSmartInsertDelete:(id)sender;
 
 - (BOOL)canMakeTextStandardSize;
 - (IBAction)makeTextStandardSize:(id)sender;
@@ -148,11 +148,11 @@ typedef enum {
 
 @interface WebView (WebViewEditingPendingPublic)
 
-- (void)moveToBeginningOfSentence:(id)sender;
-- (void)moveToBeginningOfSentenceAndModifySelection:(id)sender;
-- (void)moveToEndOfSentence:(id)sender;
-- (void)moveToEndOfSentenceAndModifySelection:(id)sender;
-- (void)selectSentence:(id)sender;
+- (IBAction)moveToBeginningOfSentence:(id)sender;
+- (IBAction)moveToBeginningOfSentenceAndModifySelection:(id)sender;
+- (IBAction)moveToEndOfSentence:(id)sender;
+- (IBAction)moveToEndOfSentenceAndModifySelection:(id)sender;
+- (IBAction)selectSentence:(id)sender;
 
 @end
 
@@ -278,6 +278,20 @@ backforward list.
     @abstract Sets additional plugin search paths for a specific WebView.
  */
 - (void)_setAdditionalWebPlugInPaths:(NSArray*)newPaths;
+
+/*!
+    @method _attachScriptDebuggerToAllFrames
+    @abstract Attaches a script debugger to all frames belonging to the
+   receiver.
+ */
+- (void)_attachScriptDebuggerToAllFrames;
+
+/*!
+    @method _detachScriptDebuggerFromAllFrames
+    @abstract Detaches any script debuggers from all frames belonging to the
+   receiver.
+ */
+- (void)_detachScriptDebuggerFromAllFrames;
 
 @end
 
