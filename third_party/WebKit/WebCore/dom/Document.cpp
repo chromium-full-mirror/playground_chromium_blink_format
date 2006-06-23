@@ -3055,7 +3055,8 @@ void Document::shiftMarkers(Node* node,
       docDirty = true;
 
       // Marker moved, so previously-computed rendered rectangle is now invalid
-      rects[it - markers.begin()] = placeholderRectForMarker();
+      rects[(unsigned)(uintptr_t)(it - markers.begin())] =
+          placeholderRectForMarker();
     }
   }
 
