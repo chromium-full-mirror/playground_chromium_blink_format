@@ -3007,7 +3007,7 @@ void Document::repaintMarkers(DocumentMarker::MarkerType markerType) {
 
 void Document::setRenderedRectForMarker(Node* node,
                                         DocumentMarker marker,
-                                        IntRect r) {
+                                        const IntRect& r) {
   MarkerMapVectorPair* vectorPair = m_markers.get(node);
   if (!vectorPair) {
     ASSERT_NOT_REACHED();  // shouldn't be trying to set the rect for a marker
@@ -3028,6 +3028,21 @@ void Document::setRenderedRectForMarker(Node* node,
 
   ASSERT_NOT_REACHED();  // shouldn't be trying to set the rect for a marker we
                          // don't already know about
+}
+
+void Document::invalidateRenderedRectsForMarkersInRect(const IntRect& r) {
+  // outer loop: process each markered node in the document
+  MarkerMap::iterator end = m_markers.end();
+  for (MarkerMap::iterator i = m_markers.begin(); i != end; ++i) {
+    // inner loop: process each rect in the current node
+    MarkerMapVectorPair* vectorPair = i->second;
+    Vector<IntRect>& rects = vectorPair->second;
+
+    unsigned rectCount = rects.size();
+    for (unsigned rectIndex = 0; rectIndex < rectCount; ++rectIndex)
+      if (rects[rectIndex].intersects(r))
+        rects[rectIndex] = placeholderRectForMarker();
+  }
 }
 
 void Document::shiftMarkers(Node* node,

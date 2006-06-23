@@ -2847,6 +2847,8 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     // d->m_elementToDraw is used to draw only one element
     RenderObject* eltRenderer =
         d->m_elementToDraw ? d->m_elementToDraw->renderer() : 0;
+    if (!d->m_drawSelectionOnly)
+      renderer()->document()->invalidateRenderedRectsForMarkersInRect(rect);
     renderer()->layer()->paint(p, rect, d->m_drawSelectionOnly, eltRenderer);
 
 #if __APPLE__
