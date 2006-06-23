@@ -287,7 +287,7 @@ class RenderLayer : WidgetClient {
   void updateLayerPosition();
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
-  void computeRepaintRects();
+  void checkForRepaintOnResize();
   void relativePositionOffset(int& relX, int& relY) {
     relX += m_relX;
     relY += m_relY;
