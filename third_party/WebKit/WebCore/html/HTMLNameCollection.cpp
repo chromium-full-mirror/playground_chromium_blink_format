@@ -25,8 +25,8 @@
 #include "config.h"
 #include "HTMLNameCollection.h"
 
-#include "Document.h"
 #include "Element.h"
+#include "HTMLDocument.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
 
@@ -35,12 +35,15 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLNameCollection::HTMLNameCollection(Document* base,
-                                       int type,
+                                       HTMLCollection::Type type,
                                        const String& name)
-    : HTMLCollection(base, type), m_name(name) {}
+    : HTMLCollection(base, type), m_name(name) {
+  ASSERT(!info);
+  info = base->nameCollectionInfo(type, name);
+}
 
 Node* HTMLNameCollection::traverseNextItem(Node* current) const {
-  assert(current);
+  ASSERT(current);
 
   current = current->traverseNextNode(m_base.get());
 
@@ -49,7 +52,7 @@ Node* HTMLNameCollection::traverseNextItem(Node* current) const {
       bool found = false;
       Element* e = static_cast<Element*>(current);
       switch (type) {
-        case WINDOW_NAMED_ITEMS:
+        case WindowNamedItems:
           // find only images, forms, applets, embeds and objects by name,
           // but anything by id
           if (e->hasTagName(imgTag) || e->hasTagName(formTag) ||
@@ -58,7 +61,7 @@ Node* HTMLNameCollection::traverseNextItem(Node* current) const {
             found = e->getAttribute(nameAttr) == m_name;
           found |= e->getAttribute(idAttr) == m_name;
           break;
-        case DOCUMENT_NAMED_ITEMS:
+        case DocumentNamedItems:
           // find images, forms, applets, embeds, objects and iframes by name,
           // but only applets and object by id (this strange rule matches IE)
           if (e->hasTagName(imgTag) || e->hasTagName(formTag) ||
@@ -73,7 +76,7 @@ Node* HTMLNameCollection::traverseNextItem(Node* current) const {
                     static_cast<HTMLObjectElement*>(e)->isDocNamedItem();
           break;
         default:
-          assert(0);
+          ASSERT(0);
       }
 
       if (found)

@@ -37,7 +37,8 @@ using namespace HTMLNames;
 // since the collections are to be "live", we have to do the
 // calculation every time if anything has changed
 
-HTMLFormCollection::HTMLFormCollection(Node* _base) : HTMLCollection(_base, 0) {
+HTMLFormCollection::HTMLFormCollection(Node* _base)
+    : HTMLCollection(_base, HTMLCollection::Type(0)) {
   HTMLFormElement* formBase = static_cast<HTMLFormElement*>(m_base.get());
   if (!formBase->collectionInfo)
     formBase->collectionInfo = new CollectionInfo();

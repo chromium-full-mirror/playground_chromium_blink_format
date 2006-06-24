@@ -27,6 +27,7 @@
 #define HTML_HTMLSelectElementImpl_H
 
 #include "HTMLGenericFormElement.h"
+#include "HTMLCollection.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -120,6 +121,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   virtual Node* namedItem(const String& name, bool caseSensitive = true);
 
+  HTMLCollection::CollectionInfo* collectionInfo() { return &m_collectionInfo; }
+
  private:
   void recalcListItems();
 
@@ -128,6 +131,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   int m_size;
   bool m_multiple;
   bool m_recalcListItems;
+
+  HTMLCollection::CollectionInfo m_collectionInfo;
 };
 
 }  // namespace

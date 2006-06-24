@@ -31,6 +31,7 @@
 #include "DeprecatedPtrList.h"
 #include "DeprecatedStringList.h"
 #include "DocumentMarker.h"
+#include "HTMLCollection.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -66,7 +67,6 @@ class Event;
 class EventListener;
 class Frame;
 class FrameView;
-class HTMLCollection;
 class HTMLDocument;
 class HTMLElement;
 class HTMLFormElement;
@@ -221,6 +221,15 @@ class Document : public ContainerNode {
   PassRefPtr<HTMLCollection> scripts();
   PassRefPtr<HTMLCollection> windowNamedItems(const String& name);
   PassRefPtr<HTMLCollection> documentNamedItems(const String& name);
+
+  HTMLCollection::CollectionInfo* collectionInfo(HTMLCollection::Type type) {
+    if ((int)type < HTMLCollection::UnnamedCollectionTypes)
+      return m_collectionInfo + type;
+    return 0;
+  }
+
+  HTMLCollection::CollectionInfo* nameCollectionInfo(HTMLCollection::Type type,
+                                                     const String& name);
 
   // DOM methods overridden from  parent classes
 
@@ -875,6 +884,12 @@ class Document : public ContainerNode {
   typedef HashMap<AtomicStringImpl*, HTMLInputElement*> NameToInputMap;
   typedef HashMap<HTMLFormElement*, NameToInputMap*> FormToGroupMap;
   FormToGroupMap m_selectedRadioButtons;
+
+  HTMLCollection::CollectionInfo
+      m_collectionInfo[HTMLCollection::UnnamedCollectionTypes];
+  HashMap<AtomicStringImpl*, HTMLCollection::CollectionInfo>
+      m_nameCollectionInfo[HTMLCollection::CollectionTypes -
+                           HTMLCollection::UnnamedCollectionTypes];
 
 #if XPATH_SUPPORT
   RefPtr<XPathEvaluator> m_xpathEvaluator;

@@ -29,7 +29,11 @@
 namespace WebCore {
 
 HTMLOptionsCollection::HTMLOptionsCollection(HTMLSelectElement* select)
-    : HTMLCollection(select, SELECT_OPTIONS) {}
+    : HTMLCollection(select, SelectOptions) {
+  ASSERT(!info);
+
+  info = select->collectionInfo();
+}
 
 void HTMLOptionsCollection::setLength(unsigned, ExceptionCode& ec) {
   ec = NOT_SUPPORTED_ERR;
