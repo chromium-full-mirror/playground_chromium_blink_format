@@ -129,6 +129,10 @@ class RenderBox : public RenderObject {
   virtual void calcWidth();
   virtual void calcHeight();
 
+  bool stretchesToViewHeight() const {
+    return style()->htmlHacks() && style()->height().isAuto() &&
+           !isFloatingOrPositioned() && (isRoot() || isBody());
+  }
   // Whether or not the element shrinks to its intrinsic width (rather than
   // filling the width
   // of a containing block).  HTML4 buttons, <select>s, <input>s, legends, and
