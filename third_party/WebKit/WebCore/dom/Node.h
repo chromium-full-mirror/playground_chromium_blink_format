@@ -326,7 +326,7 @@ class Node : public TreeShared<Node> {
    *
    * see @ref traverseNextNode()
    */
-  Node* traversePreviousNode() const;
+  Node* traversePreviousNode(const Node* stayWithin = 0) const;
 
   /* Like traversePreviousNode, but visits nodes before their children. */
   Node* traversePreviousNodePostOrder(const Node* stayWithin = 0) const;
