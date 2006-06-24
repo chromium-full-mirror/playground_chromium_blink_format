@@ -923,6 +923,12 @@ enum ECursor {
   CURSOR_SW_RESIZE,
   CURSOR_S_RESIZE,
   CURSOR_W_RESIZE,
+  CURSOR_EW_RESIZE,
+  CURSOR_NS_RESIZE,
+  CURSOR_NESW_RESIZE,
+  CURSOR_NWSE_RESIZE,
+  CURSOR_COL_RESIZE,
+  CURSOR_ROW_RESIZE,
   CURSOR_TEXT,
   CURSOR_WAIT,
   CURSOR_HELP
@@ -1061,7 +1067,7 @@ class RenderStyle {
     unsigned _text_align : 4;           // ETextAlign
     unsigned _text_transform : 2;       // ETextTransform
     unsigned _text_decorations : 4;
-    unsigned _cursor_style : 4;  // ECursor
+    unsigned _cursor_style : 5;  // ECursor
     unsigned _direction : 1;     // TextDirection
     bool _border_collapse : 1;
     unsigned _white_space : 3;    // EWhiteSpace

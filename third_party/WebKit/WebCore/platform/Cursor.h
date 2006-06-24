@@ -87,6 +87,12 @@ const Cursor& southResizeCursor();
 const Cursor& southEastResizeCursor();
 const Cursor& southWestResizeCursor();
 const Cursor& westResizeCursor();
+const Cursor& northSouthResizeCursor();
+const Cursor& eastWestResizeCursor();
+const Cursor& northEastSouthWestResizeCursor();
+const Cursor& northWestSouthEastResizeCursor();
+const Cursor& columnResizeCursor();
+const Cursor& rowResizeCursor();
 }
 
 #endif
