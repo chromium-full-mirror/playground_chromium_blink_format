@@ -803,7 +803,7 @@ bool FrameView::updateDragAndDrop(const PlatformMouseEvent& event,
   bool accept = false;
 
   MouseEventWithHitTestResults mev =
-      prepareMouseEvent(true, false, false, PlatformMouseEvent());
+      prepareMouseEvent(true, false, false, event);
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
