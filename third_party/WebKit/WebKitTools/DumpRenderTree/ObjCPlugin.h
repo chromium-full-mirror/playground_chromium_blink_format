@@ -28,4 +28,6 @@
 @interface ObjCPlugin : NSObject {
 }
 
+- (void)removeBridgeRestrictions:(id)container;
+
 @end
