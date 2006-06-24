@@ -87,7 +87,6 @@ class FrameViewPrivate {
     mousePressed = false;
     doFullRepaint = true;
     layoutSchedulingEnabled = true;
-    layoutSuppressed = false;
     layoutCount = 0;
     firstLayout = true;
     hoverTimer.stop();
@@ -123,7 +122,6 @@ class FrameViewPrivate {
   RefPtr<Node> layoutRoot;
 
   bool layoutSchedulingEnabled;
-  bool layoutSuppressed;
   int layoutCount;
 
   bool firstLayout;
@@ -284,10 +282,6 @@ void FrameView::applyOverflowToViewport(RenderObject* o,
   }
 }
 
-bool FrameView::inLayout() const {
-  return d->layoutSuppressed;
-}
-
 int FrameView::layoutCount() const {
   return d->layoutCount;
 }
@@ -306,9 +300,6 @@ void FrameView::addRepaintInfo(RenderObject* o, const IntRect& r) {
 }
 
 void FrameView::layout(bool allowSubtree) {
-  if (d->layoutSuppressed)
-    return;
-
   d->layoutTimer.stop();
   d->delayedLayout = false;
 
@@ -451,7 +442,6 @@ void FrameView::layout(bool allowSubtree) {
   m_frame->invalidateSelection();
 
   d->layoutSchedulingEnabled = true;
-  d->layoutSuppressed = false;
 
   if (!subtree && !static_cast<RenderView*>(root)->printingMode())
     resizeContents(layer->width(), layer->height());

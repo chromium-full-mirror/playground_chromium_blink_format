@@ -90,8 +90,6 @@ void RenderView::calcMinMaxWidth() {
 }
 
 void RenderView::layout() {
-  KHTMLAssert(!frameView()->inLayout());
-
   if (m_printingMode)
     m_minWidth = m_width;
 
