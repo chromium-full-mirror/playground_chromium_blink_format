@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include "WheelEvent.h"
+#include "Frame.h"
 
 #include "EventNames.h"
 
@@ -54,6 +55,12 @@ WheelEvent::WheelEvent(bool horizontal,
           screenY,
           clientX,
           clientY,
+          clientX - (view && view->frame() && view->frame()->view())
+              ? view->frame()->view()->contentsX()
+              : 0,
+          clientY - (view && view->frame() && view->frame()->view())
+              ? view->frame()->view()->contentsY()
+              : 0,
           ctrlKey,
           altKey,
           shiftKey,
