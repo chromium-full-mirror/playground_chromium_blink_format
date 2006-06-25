@@ -47,6 +47,8 @@ class MouseRelatedEvent : public UIEventWithKeyState {
                     int screenY,
                     int clientX,
                     int clientY,
+                    int pageX,
+                    int pageY,
                     bool ctrlKey,
                     bool altKey,
                     bool shiftKey,
