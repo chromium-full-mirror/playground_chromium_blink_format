@@ -2190,7 +2190,8 @@ void RenderObject::setStyle(RenderStyle* style) {
         layer()->repaintIncludingDescendants();
         if (!(m_style->clip() == style->clip()))
           layer()->clearClipRects();
-      } else if (d == RenderStyle::Repaint)
+      } else if (d == RenderStyle::Repaint ||
+                 style->outlineSize() < m_style->outlineSize())
         repaint();
     }
 
