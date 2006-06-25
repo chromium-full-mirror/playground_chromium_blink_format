@@ -441,16 +441,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
           ? static_cast<EventTargetNode*>(relatedTargetArg)
           : 0;
 
-  int pageX = clientX;
-  int pageY = clientY;
-  if (FrameView* view = document()->view()) {
-    pageX -= view->contentsX();
-    pageY -= view->contentsY();
-  }
   RefPtr<Event> me = new MouseEvent(
       eventType, true, cancelable, document()->defaultView(), detail, screenX,
-      screenY, pageX, pageY, clientX, clientY, ctrlKey, altKey, shiftKey,
-      metaKey, button, relatedTarget, 0, isSimulated);
+      screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button,
+      relatedTarget, 0, isSimulated);
 
   dispatchEvent(me, ec, true);
   bool defaultHandled = me->defaultHandled();
@@ -465,10 +459,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
   // as a separate event in other DOM-compliant browsers like Firefox, and so we
   // do the same.
   if (eventType == clickEvent && detail == 2) {
-    me = new MouseEvent(
-        dblclickEvent, true, cancelable, document()->defaultView(), detail,
-        screenX, screenY, pageX, pageY, clientX, clientY, ctrlKey, altKey,
-        shiftKey, metaKey, button, relatedTarget, 0, isSimulated);
+    me = new MouseEvent(dblclickEvent, true, cancelable,
+                        document()->defaultView(), detail, screenX, screenY,
+                        clientX, clientY, ctrlKey, altKey, shiftKey, metaKey,
+                        button, relatedTarget, 0, isSimulated);
     if (defaultHandled)
       me->setDefaultHandled();
     dispatchEvent(me, ec, true);

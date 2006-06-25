@@ -55,8 +55,6 @@ MouseRelatedEvent::MouseRelatedEvent(const AtomicString& eventType,
                                      int screenY,
                                      int clientX,
                                      int clientY,
-                                     int pageX,
-                                     int pageY,
                                      bool ctrlKey,
                                      bool altKey,
                                      bool shiftKey,
@@ -75,8 +73,6 @@ MouseRelatedEvent::MouseRelatedEvent(const AtomicString& eventType,
       m_screenY(screenY),
       m_clientX(clientX),
       m_clientY(clientY),
-      m_pageX(pageX),
-      m_pageY(pageY),
       m_isSimulated(isSimulated) {
   initCoordinates();
 }
@@ -85,6 +81,8 @@ void MouseRelatedEvent::initCoordinates() {
   // Set up initial values for coordinates.
   // Correct values can't be computed until we have at target, so receivedTarget
   // does the "real" computation.
+  m_pageX = m_clientX;
+  m_pageY = m_clientY;
   m_layerX = m_pageX;
   m_layerY = m_pageY;
   m_offsetX = m_pageX;
