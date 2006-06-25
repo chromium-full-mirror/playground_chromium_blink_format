@@ -203,7 +203,8 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   Debugger* dbg = exec->dynamicInterpreter()->debugger();
   if (dbg) {
     // send empty sourceURL to indicate constructed code
-    bool cont = dbg->sourceParsed(exec, sid, UString(), body, errLine);
+    bool cont = dbg->sourceParsed(exec, sid, UString(), body, lineNumber,
+                                  errLine, errMsg);
     if (!cont) {
       dbg->imp()->abort();
       return new JSObject();

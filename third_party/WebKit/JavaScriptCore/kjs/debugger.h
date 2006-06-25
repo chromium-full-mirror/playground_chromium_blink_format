@@ -103,8 +103,11 @@ class Debugger {
    * sourceId supplied in other functions such as atStatement()
    * @param sourceURL Where the source code that was parsed came from
    * @param source The source code that was parsed
+   * @param startingLineNumber The line number at which parsing started
    * @param errorLine The line number at which parsing encountered an
    * error, or -1 if the source code was valid and parsed successfully
+   * @param errorMsg The error description, or null if the source code
+     was valid and parsed successfully
    * @return true if execution should be continue, false if it should
    * be aborted
    */
@@ -112,7 +115,9 @@ class Debugger {
                             int sourceId,
                             const UString& sourceURL,
                             const UString& source,
-                            int errorLine);
+                            int startingLineNumber,
+                            int errorLine,
+                            const UString& errorMsg);
 
   /**
    * Called when all functions/programs associated with a particular

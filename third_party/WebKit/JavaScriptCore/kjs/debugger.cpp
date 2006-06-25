@@ -84,7 +84,9 @@ bool Debugger::sourceParsed(ExecState* /*exec*/,
                             int /*sourceId*/,
                             const UString& /*sourceURL*/,
                             const UString& /*source*/,
-                            int /*errorLine*/) {
+                            int /*startingLineNumber*/,
+                            int /*errorLine*/,
+                            const UString& /*errorMsg*/) {
   return true;
 }
 
