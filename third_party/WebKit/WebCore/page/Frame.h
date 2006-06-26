@@ -105,6 +105,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void didExplicitOpen();
 
   Page* page() const;
+  void pageDestroyed();
 
   /**
    * Stop loading the document and kill all data requests (for images, etc.)
