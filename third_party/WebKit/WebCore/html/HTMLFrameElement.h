@@ -97,6 +97,8 @@ class HTMLFrameElement : public HTMLElement {
   int frameWidth() const;
   int frameHeight() const;
 
+  bool viewSourceMode() const { return m_viewSource; }
+
  protected:
   bool isURLAllowed(const AtomicString&) const;
   virtual void openURL();
@@ -111,6 +113,7 @@ class HTMLFrameElement : public HTMLElement {
   bool m_frameBorder : 1;
   bool m_frameBorderSet : 1;
   bool m_noResize : 1;
+  bool m_viewSource : 1;
 };
 
 }  // namespace

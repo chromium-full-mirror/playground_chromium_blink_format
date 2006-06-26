@@ -181,12 +181,16 @@ class CSSStyleSelector : public StyleSelector {
 
   static CSSStyleSheet* defaultSheet;
   static CSSStyleSheet* quirksSheet;
+  static CSSStyleSheet* viewSourceSheet;
 #if SVG_SUPPORT
   static CSSStyleSheet* svgSheet;
 #endif
+
   static CSSRuleSet* defaultStyle;
   static CSSRuleSet* defaultQuirksStyle;
   static CSSRuleSet* defaultPrintStyle;
+  static CSSRuleSet* defaultViewSourceStyle;
+
   CSSRuleSet* m_authorStyle;
   CSSRuleSet* m_userStyle;
   CSSStyleSheet* m_userSheet;

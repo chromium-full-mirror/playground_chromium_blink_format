@@ -104,6 +104,7 @@ class FramePrivate {
         m_markedTextUsesUnderlines(false),
         m_highlightTextMatches(false),
         m_windowHasFocus(false),
+        m_inViewSourceMode(false),
         frameCount(0) {}
 
   ~FramePrivate() {
@@ -225,6 +226,8 @@ class FramePrivate {
   DeprecatedValueList<MarkedTextUnderline> m_markedTextUnderlines;
   bool m_highlightTextMatches;
   bool m_windowHasFocus;
+
+  bool m_inViewSourceMode;
 
   unsigned frameCount;
 };

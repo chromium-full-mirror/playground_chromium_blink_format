@@ -46,7 +46,7 @@
 #include "FloatRect.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
-#include "HTMLDocument.h"
+#include "HTMLViewSourceDocument.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElement.h"
 #include "HTMLGenericFormElement.h"
@@ -583,6 +583,9 @@ void Frame::begin(const KURL& url) {
   else if (PlugInInfoStore::supportsMIMEType(d->m_request.m_responseMIMEType))
     d->m_doc =
         new PluginDocument(DOMImplementation::instance(), d->m_view.get());
+  else if (inViewSourceMode())
+    d->m_doc = new HTMLViewSourceDocument(DOMImplementation::instance(),
+                                          d->m_view.get());
   else
     d->m_doc =
         DOMImplementation::instance()->createHTMLDocument(d->m_view.get());
@@ -3321,6 +3324,14 @@ void Frame::setWindowHasFocus(bool flag) {
 
   if (Document* doc = document())
     doc->dispatchWindowEvent(flag ? focusEvent : blurEvent, false, false);
+}
+
+bool Frame::inViewSourceMode() const {
+  return d->m_inViewSourceMode;
+}
+
+void Frame::setInViewSourceMode(bool mode) const {
+  d->m_inViewSourceMode = mode;
 }
 
 UChar Frame::backslashAsCurrencySymbol() const {
