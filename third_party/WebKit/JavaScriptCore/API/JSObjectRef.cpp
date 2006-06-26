@@ -79,6 +79,17 @@ JSObjectRef JSFunctionMake(JSContextRef context,
       toRef(exec->lexicalInterpreter()->builtinFunctionPrototype()));
 }
 
+JSObjectRef JSConstructorMake(JSContextRef context,
+                              JSCallAsConstructorCallback callback) {
+  ExecState* exec = toJS(context);
+  JSObjectCallbacks callbacks = kJSObjectCallbacksNone;
+  callbacks.callAsConstructor = callback;
+
+  return JSObjectMake(
+      context, &callbacks,
+      toRef(exec->lexicalInterpreter()->builtinObjectPrototype()));
+}
+
 JSCharBufferRef JSObjectGetDescription(JSObjectRef object) {
   JSLock lock;
   JSObject* jsObject = toJS(object);

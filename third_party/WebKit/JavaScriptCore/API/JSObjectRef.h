@@ -106,6 +106,9 @@ JSObjectRef JSObjectMake(JSContextRef context,
 // Will be assigned the built-in function prototype
 JSObjectRef JSFunctionMake(JSContextRef context,
                            JSCallAsFunctionCallback callback);
+// Will be assigned the built-in object prototype
+JSObjectRef JSConstructorMake(JSContextRef context,
+                              JSCallAsConstructorCallback callback);
 
 JSCharBufferRef JSObjectGetDescription(JSObjectRef object);
 
