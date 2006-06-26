@@ -43,8 +43,6 @@ class MouseEvent : public MouseRelatedEvent {
              int detail,
              int screenX,
              int screenY,
-             int clientX,
-             int clientY,
              int pageX,
              int pageY,
              bool ctrlKey,

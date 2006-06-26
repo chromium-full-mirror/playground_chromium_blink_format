@@ -383,12 +383,12 @@ bool EventTargetNode::dispatchMouseEvent(const PlatformMouseEvent& _mouse,
                                          Node* relatedTarget) {
   assert(!eventDispatchForbidden());
 
-  IntPoint clientPos;
+  IntPoint contentsPos;
   if (FrameView* view = document()->view())
-    clientPos = view->viewportToContents(_mouse.pos());
+    contentsPos = view->viewportToContents(_mouse.pos());
 
   return dispatchMouseEvent(
-      eventType, _mouse.button(), detail, clientPos.x(), clientPos.y(),
+      eventType, _mouse.button(), detail, contentsPos.x(), contentsPos.y(),
       _mouse.globalX(), _mouse.globalY(), _mouse.ctrlKey(), _mouse.altKey(),
       _mouse.shiftKey(), _mouse.metaKey(), false, relatedTarget);
 }
@@ -405,8 +405,8 @@ bool EventTargetNode::dispatchSimulatedMouseEvent(
 bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
                                          int button,
                                          int detail,
-                                         int clientX,
-                                         int clientY,
+                                         int pageX,
+                                         int pageY,
                                          int screenX,
                                          int screenY,
                                          bool ctrlKey,
@@ -441,16 +441,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
           ? static_cast<EventTargetNode*>(relatedTargetArg)
           : 0;
 
-  int pageX = clientX;
-  int pageY = clientY;
-  if (FrameView* view = document()->view()) {
-    pageX -= view->contentsX();
-    pageY -= view->contentsY();
-  }
-  RefPtr<Event> me = new MouseEvent(
-      eventType, true, cancelable, document()->defaultView(), detail, screenX,
-      screenY, pageX, pageY, clientX, clientY, ctrlKey, altKey, shiftKey,
-      metaKey, button, relatedTarget, 0, isSimulated);
+  RefPtr<Event> me =
+      new MouseEvent(eventType, true, cancelable, document()->defaultView(),
+                     detail, screenX, screenY, pageX, pageY, ctrlKey, altKey,
+                     shiftKey, metaKey, button, relatedTarget, 0, isSimulated);
 
   dispatchEvent(me, ec, true);
   bool defaultHandled = me->defaultHandled();
@@ -465,10 +459,10 @@ bool EventTargetNode::dispatchMouseEvent(const AtomicString& eventType,
   // as a separate event in other DOM-compliant browsers like Firefox, and so we
   // do the same.
   if (eventType == clickEvent && detail == 2) {
-    me = new MouseEvent(
-        dblclickEvent, true, cancelable, document()->defaultView(), detail,
-        screenX, screenY, pageX, pageY, clientX, clientY, ctrlKey, altKey,
-        shiftKey, metaKey, button, relatedTarget, 0, isSimulated);
+    me = new MouseEvent(dblclickEvent, true, cancelable,
+                        document()->defaultView(), detail, screenX, screenY,
+                        pageX, pageY, ctrlKey, altKey, shiftKey, metaKey,
+                        button, relatedTarget, 0, isSimulated);
     if (defaultHandled)
       me->setDefaultHandled();
     dispatchEvent(me, ec, true);
@@ -499,7 +493,6 @@ void EventTargetNode::dispatchWheelEvent(PlatformWheelEvent& e) {
       new WheelEvent(e.isHorizontal(), e.delta(), document()->defaultView(),
                      e.globalX(), e.globalY(), pos.x(), pos.y(), e.ctrlKey(),
                      e.altKey(), e.shiftKey(), e.metaKey());
-
   ExceptionCode ec = 0;
   if (!dispatchEvent(we, ec, true))
     e.accept();

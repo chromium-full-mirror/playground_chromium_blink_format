@@ -21,6 +21,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "MouseEvent.h"
 
@@ -39,8 +40,6 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                        int detail,
                        int screenX,
                        int screenY,
-                       int clientX,
-                       int clientY,
                        int pageX,
                        int pageY,
                        bool ctrlKey,
@@ -58,8 +57,6 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                         detail,
                         screenX,
                         screenY,
-                        clientX,
-                        clientY,
                         pageX,
                         pageY,
                         ctrlKey,
@@ -105,6 +102,13 @@ void MouseEvent::initMouseEvent(const AtomicString& type,
   m_relatedTarget = relatedTarget;
 
   initCoordinates();
+
+  // FIXME: m_isSimulated is not set to false here.
+  // FIXME: m_clipboard is not set to 0 here.
+
+  // FIXME: m_pageX and m_pageY are not set here.
+  // Regression caused by the fix for
+  // <http://bugzilla.opendarwin.org/show_bug.cgi?id=8707>.
 }
 
 bool MouseEvent::isMouseEvent() const {
@@ -119,7 +123,7 @@ bool MouseEvent::isDragEvent() const {
 }
 
 int MouseEvent::which() const {
-  // For KHTML, the return values for left, middle and right mouse buttons are
+  // For the DOM, the return values for left, middle and right mouse buttons are
   // 0, 1, 2, respectively.
   // For the Netscape "which" property, the return values for left, middle and
   // right mouse buttons are 1, 2, 3, respectively.
