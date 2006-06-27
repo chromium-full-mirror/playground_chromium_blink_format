@@ -49,7 +49,11 @@ class SQLDatabase : public Noncopyable {
   void close();
 
   bool executeCommand(const String&);
+  bool returnsAtLeastOneResult(const String&);
+
   bool tableExists(const String&);
+
+  int64_t lastInsertRowID();
 
   void setBusyTimeout(int ms);
   void setBusyHandler(int (*)(void*, int));
@@ -90,10 +94,16 @@ class SQLStatement : public Noncopyable {
   bool isPrepared() { return m_statement; }
   int bindBlob(int index, const void* blob, int size, bool copy = true);
   int bindText(int index, const char* text, bool copy = true);
+  int bindInt64(int index, int64_t integer);
 
   int step();
   int finalize();
   int reset();
+
+  int prepareAndStep() {
+    prepare();
+    return step();
+  }
 
   // prepares, steps, and finalizes the query.
   // returns true if all 3 steps succeed with step() returning SQLITE_DONE
@@ -117,6 +127,7 @@ class SQLStatement : public Noncopyable {
   int getColumnInt(int col);
   int64_t getColumnInt64(int col);
   const void* getColumnBlob(int col, int& size);
+  Vector<char> getColumnBlobAsVector(int col);
 
   bool returnTextResults(int col, Vector<String>& v);
   bool returnTextResults16(int col, Vector<String>& v);
