@@ -171,6 +171,18 @@ inline bool cmpvalue(int a, int b, MediaFeaturePrefix op) {
   return false;
 }
 
+inline bool cmpvalue(float a, float b, MediaFeaturePrefix op) {
+  switch (op) {
+    case MinPrefix:
+      return a >= b;
+    case MaxPrefix:
+      return a <= b;
+    case NoPrefix:
+      return a == b;
+  }
+  return false;
+}
+
 static bool numberValue(CSSValue* value, float& result) {
   if (value->isPrimitiveValue() &&
       static_cast<CSSPrimitiveValue*>(value)->primitiveType() ==
@@ -221,6 +233,19 @@ static bool device_aspect_ratioMediaFeatureEval(CSSValue* value,
   // ({,min-,max-}device-aspect-ratio)
   // assume if we have a device, its aspect ratio is non-zero
   return true;
+}
+
+static bool device_pixel_ratioMediaFeatureEval(CSSValue* value,
+                                               RenderStyle* style,
+                                               FrameView* view,
+                                               MediaFeaturePrefix op) {
+  if (value)
+    return value->isPrimitiveValue() &&
+           cmpvalue(view->scaleFactor(),
+                    static_cast<CSSPrimitiveValue*>(value)->getFloatValue(),
+                    op);
+
+  return view->scaleFactor() != 0;
 }
 
 static bool gridMediaFeatureEval(CSSValue* value,
@@ -340,6 +365,20 @@ static bool max_device_aspect_ratioMediaFeatureEval(CSSValue* value,
                                                     FrameView* view,
                                                     MediaFeaturePrefix /*op*/) {
   return device_aspect_ratioMediaFeatureEval(value, style, view, MaxPrefix);
+}
+
+static bool min_device_pixel_ratioMediaFeatureEval(CSSValue* value,
+                                                   RenderStyle* style,
+                                                   FrameView* view,
+                                                   MediaFeaturePrefix /*op*/) {
+  return device_pixel_ratioMediaFeatureEval(value, style, view, MinPrefix);
+}
+
+static bool max_device_pixel_ratioMediaFeatureEval(CSSValue* value,
+                                                   RenderStyle* style,
+                                                   FrameView* view,
+                                                   MediaFeaturePrefix /*op*/) {
+  return device_pixel_ratioMediaFeatureEval(value, style, view, MaxPrefix);
 }
 
 static bool min_heightMediaFeatureEval(CSSValue* value,
