@@ -61,6 +61,14 @@ class NodeList : public Shared<NodeList> {
   mutable unsigned lastItemOffset;
   mutable bool isLengthCacheValid : 1;
   mutable bool isItemCacheValid : 1;
+
+ private:
+  Node* itemForwardsFromCurrent(Node* start,
+                                unsigned offset,
+                                int remainingOffset) const;
+  Node* itemBackwardsFromCurrent(Node* start,
+                                 unsigned offset,
+                                 int remainingOffset) const;
 };
 
 }  // namespace
