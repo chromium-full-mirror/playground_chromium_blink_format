@@ -1612,7 +1612,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       AtomicString frameName = args[1]->isUndefinedOrNull()
                                    ? "_blank"
                                    : AtomicString(args[1]->toString(exec));
-      if (!allowPopUp(exec, window) && !frame->tree()->find(frameName))
+      // Because FrameTree::find() returns true for empty strings, we must check
+      // for empty framenames.
+      // Otherwise, illegitimate window.open() calls with no name will pass
+      // right through the popup blocker.
+      if (!allowPopUp(exec, window) &&
+          (frameName.isEmpty() || !frame->tree()->find(frameName)))
         return jsUndefined();
 
       WindowArgs windowArgs;
