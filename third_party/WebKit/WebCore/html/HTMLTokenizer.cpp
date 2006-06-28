@@ -401,6 +401,9 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
   SegmentedString* savedPrependingSrc = currentPrependingSrc;
   SegmentedString prependingSrc;
   currentPrependingSrc = &prependingSrc;
+  state.setInScript(false);
+  scriptCodeSize = scriptCodeResync = 0;
+
   if (!parser->skipMode() && !followingFrameset) {
     if (cs) {
       if (savedPrependingSrc)
@@ -408,15 +411,16 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
       else
         pendingSrc.prepend(src);
       setSrc(SegmentedString());
-      scriptCodeSize = scriptCodeResync = 0;
 
       // the ref() call below may call notifyFinished if the script is already
       // in cache,
       // and that mucks with the state directly, so we must write it back to the
       // object.
+      state.setRequestingScript(true);
       m_state = state;
       cs->ref(this);
       state = m_state;
+      state.setRequestingScript(false);
       // will be 0 if script was already loaded and ref() executed it
       if (!pendingScripts.isEmpty())
         state.setLoadingExtScript(true);
@@ -426,14 +430,10 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
       else
         prependingSrc = src;
       setSrc(SegmentedString());
-      scriptCodeSize = scriptCodeResync = 0;
       state = scriptExecution(exScript, state, DeprecatedString::null,
                               scriptStartLineno);
     }
   }
-
-  state.setInScript(false);
-  scriptCodeSize = scriptCodeResync = 0;
 
   if (!m_executingScript && !state.loadingExtScript()) {
     src.append(pendingSrc);
@@ -470,9 +470,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const DeprecatedString& str,
                                                     int baseLine) {
   if (m_fragment || !m_doc->frame())
     return state;
-  bool oldscript = state.inScript();
   m_executingScript++;
-  state.setInScript(false);
   DeprecatedString url =
       scriptURL.isNull() ? m_doc->frame()->document()->URL() : scriptURL;
 
@@ -497,7 +495,6 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const DeprecatedString& str,
 #endif
 
   m_executingScript--;
-  state.setInScript(oldscript);
 
   if (!m_executingScript && !state.loadingExtScript()) {
     src.append(pendingSrc);
@@ -1766,10 +1763,10 @@ void HTMLTokenizer::notifyFinished(CachedObject*) {
 #endif
     }
 
-    // 'inScript' is true when we are called synchronously from
-    // parseScript(). In that case parseScript() will take care
-    // of 'scriptOutput'.
-    if (!m_state.inScript()) {
+    // 'requestingScript' is true when we are called synchronously from
+    // scriptHandler(). In that case scriptHandler() will take care
+    // of pendingSrc.
+    if (!m_state.requestingScript()) {
       SegmentedString rest = pendingSrc;
       pendingSrc.clear();
       write(rest, false);

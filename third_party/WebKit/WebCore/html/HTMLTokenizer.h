@@ -240,6 +240,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
     void setLoadingExtScript(bool v) { setBit(LoadingExtScript, v); }
     bool forceSynchronous() const { return testBit(ForceSynchronous); }
     void setForceSynchronous(bool v) { setBit(ForceSynchronous, v); }
+    bool requestingScript() const { return testBit(RequestingScript); }
+    void setRequestingScript(bool v) { setBit(RequestingScript, v); }
 
     bool inAnySpecial() const {
       return m_bits & (InScript | InStyle | InXmp | InTextArea | InTitle);
@@ -276,6 +278,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
       AllowYield = 1 << 21,
       LoadingExtScript = 1 << 22,
       ForceSynchronous = 1 << 23,
+      RequestingScript = 1 << 24,
     };
 
     void setBit(StateBits bit, bool value) {
