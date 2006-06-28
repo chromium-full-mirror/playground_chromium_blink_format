@@ -121,7 +121,8 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                           bool selectReplacement = true,
                           bool smartReplace = false,
                           bool matchStyle = false,
-                          bool forceMergeStart = false);
+                          bool forceMergeStart = false,
+                          EditAction action = EditActionPaste);
   virtual ~ReplaceSelectionCommand();
 
   virtual void doApply();
@@ -153,6 +154,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   bool m_matchStyle;
   RefPtr<DocumentFragment> m_documentFragment;
   bool m_forceMergeStart;
+  EditAction m_editAction;
 };
 
 }  // namespace WebCore

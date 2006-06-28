@@ -472,13 +472,15 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(Document* document,
                                                  bool selectReplacement,
                                                  bool smartReplace,
                                                  bool matchStyle,
-                                                 bool forceMergeStart)
+                                                 bool forceMergeStart,
+                                                 EditAction editAction)
     : CompositeEditCommand(document),
       m_selectReplacement(selectReplacement),
       m_smartReplace(smartReplace),
       m_matchStyle(matchStyle),
       m_documentFragment(fragment),
-      m_forceMergeStart(forceMergeStart) {}
+      m_forceMergeStart(forceMergeStart),
+      m_editAction(editAction) {}
 
 ReplaceSelectionCommand::~ReplaceSelectionCommand() {}
 
@@ -950,7 +952,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
 }
 
 EditAction ReplaceSelectionCommand::editingAction() const {
-  return EditActionPaste;
+  return m_editAction;
 }
 
 void ReplaceSelectionCommand::insertNodeAfterAndUpdateNodesInserted(
