@@ -69,6 +69,7 @@ class MouseRelatedEvent : public UIEventWithKeyState {
 
  protected:
   void initCoordinates();
+  void initCoordinates(int clientX, int clientY);
   virtual void receivedTarget();
 
   // Expose these so MouseEvent::initMouseEvent can set them.
