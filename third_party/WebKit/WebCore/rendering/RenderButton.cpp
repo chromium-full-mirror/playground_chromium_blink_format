@@ -87,6 +87,13 @@ void RenderButton::updateFromElement() {
   }
 }
 
+void RenderButton::updatePseudoChild(RenderStyle::PseudoId type) {
+  if (m_inner)
+    m_inner->updatePseudoChildForObject(type, this);
+  else
+    updatePseudoChildForObject(type, this);
+}
+
 void RenderButton::paintObject(PaintInfo& i, int _tx, int _ty) {
   // Push a clip.
   if (m_inner && i.phase == PaintPhaseForeground) {
