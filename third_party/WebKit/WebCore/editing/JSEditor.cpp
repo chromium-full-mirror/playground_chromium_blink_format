@@ -405,6 +405,15 @@ bool execRedo(Frame* frame, bool userInterface, const String& value) {
   return true;
 }
 
+bool execRemoveFormat(Frame* frame, bool userInterface, const String& value) {
+  RefPtr<DocumentFragment> fragment = createFragmentFromText(
+      frame->document(), frame->selection().toString().deprecatedString());
+  EditCommandPtr(
+      new ReplaceSelectionCommand(frame->document(), fragment.get(), false))
+      .apply();
+  return true;
+}
+
 bool execSelectAll(Frame* frame, bool userInterface, const String& value) {
   frame->selectAll();
   return true;
@@ -681,6 +690,9 @@ CommandMap* createCommandDictionary() {
         valueNull}},
       {"Print", {execPrint, enabled, stateNone, valueNull}},
       {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
+      {"RemoveFormat",
+       {execRemoveFormat, enabledAnyEditableRangeSelection, stateNone,
+        valueNull}},
       {"SelectAll", {execSelectAll, enabled, stateNone, valueNull}},
       {"Strikethrough",
        {execStrikethrough, enabledAnyRichlyEditableSelection,
@@ -742,7 +754,6 @@ CommandMap* createCommandDictionary() {
       // Overwrite (not supported)
       // PlayImage (not supported)
       // Refresh (not supported)
-      // RemoveFormat (not supported)
       // RemoveParaFormat (not supported)
       // SaveAs (not supported)
       // SizeToControl (not supported)
