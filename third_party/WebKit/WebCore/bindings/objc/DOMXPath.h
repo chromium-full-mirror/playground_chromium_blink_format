@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if XPATH_SUPPORT
+
 #import <WebCore/DOMCore.h>
 
 extern NSString* const DOMXPathException;
@@ -78,3 +80,5 @@ enum {
                    resolver:(unsigned short)
                        type:(DOMXPathResult*)result;
 @end
+
+#endif  // XPATH_SUPPORT
