@@ -727,6 +727,7 @@ bool CSSParser::parseValue(int propId, bool important) {
 
     case CSS_PROP_BACKGROUND_ATTACHMENT:
     case CSS_PROP__WEBKIT_BACKGROUND_CLIP:
+    case CSS_PROP__WEBKIT_BACKGROUND_COMPOSITE:
     case CSS_PROP_BACKGROUND_IMAGE:
     case CSS_PROP__WEBKIT_BACKGROUND_ORIGIN:
     case CSS_PROP_BACKGROUND_POSITION:
@@ -1846,6 +1847,13 @@ bool CSSParser::parseBackgroundProperty(int propId,
             valueList->next();
           break;
         }
+        case CSS_PROP__WEBKIT_BACKGROUND_COMPOSITE:
+          if ((val->id >= CSS_VAL_CLEAR && val->id <= CSS_VAL_PLUS_LIGHTER) ||
+              val->id == CSS_VAL_HIGHLIGHT) {
+            currValue = new CSSPrimitiveValue(val->id);
+            valueList->next();
+          }
+          break;
         case CSS_PROP_BACKGROUND_REPEAT:
           if (val->id >= CSS_VAL_REPEAT && val->id <= CSS_VAL_NO_REPEAT) {
             currValue = new CSSPrimitiveValue(val->id);

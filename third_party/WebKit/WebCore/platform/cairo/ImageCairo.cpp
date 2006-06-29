@@ -131,7 +131,8 @@ void Image::draw(GraphicsContext* ctxt,
 void Image::drawTiled(GraphicsContext* ctxt,
                       const FloatRect& dstRect,
                       const FloatPoint& srcPoint,
-                      const FloatSize& tileSize) {
+                      const FloatSize& tileSize,
+                      CompositeOperator op) {
   if (!m_source.initialized())
     return;
 
@@ -185,7 +186,7 @@ void Image::drawTiled(GraphicsContext* ctxt,
     draw(ctxt, dstRect,
          FloatRect(srcX * scaleX, srcY * scaleY, dstRect.width() * scaleX,
                    dstRect.height() * scaleY),
-         CompositeSourceOver);
+         op);
     return;
   }
 
@@ -195,9 +196,7 @@ void Image::drawTiled(GraphicsContext* ctxt,
   cairo_save(context);
 
   // Set the compositing operation.
-  // FIXME: This should be part of the drawTiled API.
-  setCompositingOperation(context, CompositeSourceOver,
-                          frameHasAlphaAtIndex(m_currentFrame));
+  setCompositingOperation(context, op, frameHasAlphaAtIndex(m_currentFrame));
 
   cairo_translate(context, dstTileRect.x(), dstTileRect.y());
   cairo_pattern_t* pattern = cairo_pattern_create_for_surface(image);

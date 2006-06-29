@@ -157,12 +157,14 @@ class Image : Noncopyable {
   void drawTiled(GraphicsContext*,
                  const FloatRect& dstRect,
                  const FloatPoint& srcPoint,
-                 const FloatSize& tileSize);
+                 const FloatSize& tileSize,
+                 CompositeOperator);
   void drawTiled(GraphicsContext*,
                  const FloatRect& dstRect,
                  const FloatRect& srcRect,
                  TileRule hRule,
-                 TileRule vRule);
+                 TileRule vRule,
+                 CompositeOperator);
 
   // Decodes and caches a frame. Never accessed except internally.
   void cacheFrame(size_t index);

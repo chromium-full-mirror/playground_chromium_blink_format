@@ -717,9 +717,11 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* p,
       ch = b.height();
     }
 
-    if (cw > 0 && ch > 0)
+    if (cw > 0 && ch > 0) {
       p->drawTiledImage(bg->image(), IntRect(cx, cy, cw, ch), IntPoint(sx, sy),
-                        IntSize(scaledImageWidth, scaledImageHeight));
+                        IntSize(scaledImageWidth, scaledImageHeight),
+                        bgLayer->backgroundComposite());
+    }
   }
 
   if (bgLayer->backgroundClip() != BGBORDER)

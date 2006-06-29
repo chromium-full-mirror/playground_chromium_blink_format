@@ -38,6 +38,7 @@
 #include "Color.h"
 #include "DataRef.h"
 #include "Font.h"
+#include "GraphicsTypes.h"
 #include "IntRect.h"
 #include "Length.h"
 #include "Shared.h"
@@ -459,6 +460,9 @@ struct BackgroundLayer {
   EBackgroundRepeat backgroundRepeat() const {
     return static_cast<EBackgroundRepeat>(m_bgRepeat);
   }
+  CompositeOperator backgroundComposite() const {
+    return static_cast<CompositeOperator>(m_bgComposite);
+  }
   LengthSize backgroundSize() const { return m_backgroundSize; }
 
   BackgroundLayer* next() const { return m_next; }
@@ -471,6 +475,7 @@ struct BackgroundLayer {
   bool isBackgroundClipSet() const { return m_clipSet; }
   bool isBackgroundOriginSet() const { return m_originSet; }
   bool isBackgroundRepeatSet() const { return m_repeatSet; }
+  bool isBackgroundCompositeSet() const { return m_compositeSet; }
   bool isBackgroundSizeSet() const { return m_backgroundSizeSet; }
 
   void setBackgroundImage(CachedImage* i) {
@@ -501,6 +506,10 @@ struct BackgroundLayer {
     m_bgRepeat = r;
     m_repeatSet = true;
   }
+  void setBackgroundComposite(CompositeOperator c) {
+    m_bgComposite = c;
+    m_compositeSet = true;
+  }
   void setBackgroundSize(const LengthSize& b) {
     m_backgroundSize = b;
     m_backgroundSizeSet = true;
@@ -513,6 +522,7 @@ struct BackgroundLayer {
   void clearBackgroundClip() { m_clipSet = false; }
   void clearBackgroundOrigin() { m_originSet = false; }
   void clearBackgroundRepeat() { m_repeatSet = false; }
+  void clearBackgroundComposite() { m_compositeSet = false; }
   void clearBackgroundSize() { m_backgroundSizeSet = false; }
 
   void setNext(BackgroundLayer* n) {
@@ -556,9 +566,10 @@ struct BackgroundLayer {
   Length m_yPosition;
 
   bool m_bgAttachment : 1;
-  unsigned m_bgClip : 2;    // EBackgroundBox
-  unsigned m_bgOrigin : 2;  // EBackgroundBox
-  unsigned m_bgRepeat : 2;  // EBackgroundRepeat
+  unsigned m_bgClip : 2;       // EBackgroundBox
+  unsigned m_bgOrigin : 2;     // EBackgroundBox
+  unsigned m_bgRepeat : 2;     // EBackgroundRepeat
+  unsigned m_bgComposite : 2;  // CompositeOperator
 
   LengthSize m_backgroundSize;
 
@@ -569,6 +580,7 @@ struct BackgroundLayer {
   bool m_repeatSet : 1;
   bool m_xPosSet : 1;
   bool m_yPosSet : 1;
+  bool m_compositeSet : 1;
   bool m_backgroundSizeSet : 1;
 
   BackgroundLayer* m_next;
@@ -1455,6 +1467,10 @@ class RenderStyle {
   EBackgroundRepeat backgroundRepeat() const {
     return static_cast<EBackgroundRepeat>(background->m_background.m_bgRepeat);
   }
+  CompositeOperator backgroundComposite() const {
+    return static_cast<CompositeOperator>(
+        background->m_background.m_bgComposite);
+  }
   bool backgroundAttachment() const {
     return background->m_background.m_bgAttachment;
   }
@@ -2059,6 +2075,9 @@ class RenderStyle {
   static EBackgroundBox initialBackgroundClip() { return BGBORDER; }
   static EBackgroundBox initialBackgroundOrigin() { return BGPADDING; }
   static EBackgroundRepeat initialBackgroundRepeat() { return REPEAT; }
+  static CompositeOperator initialBackgroundComposite() {
+    return CompositeSourceOver;
+  }
   static LengthSize initialBackgroundSize() { return LengthSize(); }
   static bool initialBorderCollapse() { return false; }
   static EBorderStyle initialBorderStyle() { return BNONE; }

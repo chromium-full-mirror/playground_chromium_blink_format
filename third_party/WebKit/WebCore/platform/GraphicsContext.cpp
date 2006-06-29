@@ -250,18 +250,20 @@ void GraphicsContext::drawImage(Image* image,
 void GraphicsContext::drawTiledImage(Image* image,
                                      const IntRect& rect,
                                      const IntPoint& srcPoint,
-                                     const IntSize& tileSize) {
+                                     const IntSize& tileSize,
+                                     CompositeOperator op) {
   if (paintingDisabled())
     return;
 
-  image->drawTiled(this, rect, srcPoint, tileSize);
+  image->drawTiled(this, rect, srcPoint, tileSize, op);
 }
 
 void GraphicsContext::drawTiledImage(Image* image,
                                      const IntRect& dest,
                                      const IntRect& srcRect,
                                      Image::TileRule hRule,
-                                     Image::TileRule vRule) {
+                                     Image::TileRule vRule,
+                                     CompositeOperator op) {
   if (paintingDisabled())
     return;
 
@@ -269,6 +271,6 @@ void GraphicsContext::drawTiledImage(Image* image,
     // Just do a scale.
     return drawImage(image, dest, srcRect);
 
-  image->drawTiled(this, dest, srcRect, hRule, vRule);
+  image->drawTiled(this, dest, srcRect, hRule, vRule, op);
 }
 }

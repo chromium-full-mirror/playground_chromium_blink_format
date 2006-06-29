@@ -116,12 +116,14 @@ class GraphicsContext : Noncopyable {
   void drawTiledImage(Image*,
                       const IntRect& destRect,
                       const IntPoint& srcPoint,
-                      const IntSize& tileSize);
+                      const IntSize& tileSize,
+                      CompositeOperator = CompositeSourceOver);
   void drawTiledImage(Image*,
                       const IntRect& destRect,
                       const IntRect& srcRect,
                       Image::TileRule hRule = Image::StretchTile,
-                      Image::TileRule vRule = Image::StretchTile);
+                      Image::TileRule vRule = Image::StretchTile,
+                      CompositeOperator = CompositeSourceOver);
 
   void addClip(const IntRect&);
   void addRoundedRectClip(const IntRect&,
