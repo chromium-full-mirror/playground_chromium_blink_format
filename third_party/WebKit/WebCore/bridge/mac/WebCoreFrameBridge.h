@@ -799,10 +799,12 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (void)dashboardRegionsChanged:(NSMutableDictionary*)regions;
 
+- (NSRect)customHighlightRect:(NSString*)type forLine:(NSRect)lineRect;
 - (void)paintCustomHighlight:(NSString*)type
                       forBox:(NSRect)boxRect
                       onLine:(NSRect)lineRect
-                  behindText:(BOOL)text;
+                  behindText:(BOOL)text
+                  entireLine:(BOOL)line;
 
 - (void)handledOnloadEvents;
 

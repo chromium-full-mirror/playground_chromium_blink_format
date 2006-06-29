@@ -37,9 +37,11 @@
 @class WebPluginController;
 
 @protocol WebHTMLHighlighter
+- (NSRect)highlightRectForLine:(NSRect)lineRect;
 - (void)paintHighlightForBox:(NSRect)boxRect
                       onLine:(NSRect)lineRect
-                  behindText:(BOOL)text;
+                  behindText:(BOOL)text
+                  entireLine:(BOOL)line;
 @end
 
 @interface WebHTMLView (WebPrivate)
