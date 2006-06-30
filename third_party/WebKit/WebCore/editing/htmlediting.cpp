@@ -80,7 +80,7 @@ bool editingIgnoresContent(const Node* node) {
 bool canHaveChildrenForEditing(const Node* node) {
   return !node->hasTagName(hrTag) && !node->hasTagName(brTag) &&
          !node->hasTagName(imgTag) && !node->hasTagName(buttonTag) &&
-         !node->isTextNode();
+         !node->hasTagName(objectTag) && !node->isTextNode();
 }
 
 Node* highestEditableRoot(Node* node) {
