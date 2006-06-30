@@ -2112,7 +2112,7 @@ void RenderBox::calcAbsoluteVerticalValues(Length height,
   bool bottomIsAuto = bottom.isAuto();
 
   // Height is never unsolved for tables.
-  if (isTable() && heightIsAuto) {
+  if (isTable()) {
     height.setValue(Fixed, contentHeight);
     heightIsAuto = false;
   }
