@@ -180,12 +180,15 @@ typedef enum {
 @interface WebCoreFrameBridge : NSObject {
   WebCoreMacFrame* m_frame;
   BOOL _shouldCreateRenderers;
+  BOOL _closed;
 }
 
 + (WebCoreFrameBridge*)bridgeForDOMDocument:(DOMDocument*)document;
 
 - (id)initMainFrameWithPage:(WebCorePageBridge*)page;
 - (id)initSubframeWithRenderer:(WebCoreRenderPart*)renderer;
+
+- (void)close;
 
 + (NSArray*)supportedNonImageMIMETypes;
 + (NSArray*)supportedImageMIMETypes;
