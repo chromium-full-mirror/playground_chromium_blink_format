@@ -278,12 +278,13 @@ VisiblePosition SelectionController::modifyExtendingRightForward(
 VisiblePosition SelectionController::modifyMovingRightForward(
     TextGranularity granularity) {
   VisiblePosition pos;
+  // FIXME: Stay in editable content for the less common granularities.
   switch (granularity) {
     case CharacterGranularity:
       if (isRange())
         pos = VisiblePosition(m_sel.end(), m_sel.affinity());
       else
-        pos = VisiblePosition(m_sel.extent(), m_sel.affinity()).next();
+        pos = VisiblePosition(m_sel.extent(), m_sel.affinity()).next(true);
       break;
     case WordGranularity:
       pos = nextWordPosition(VisiblePosition(m_sel.extent(), m_sel.affinity()));
@@ -381,12 +382,13 @@ VisiblePosition SelectionController::modifyExtendingLeftBackward(
 VisiblePosition SelectionController::modifyMovingLeftBackward(
     TextGranularity granularity) {
   VisiblePosition pos;
+  // FIXME: Stay in editable content for the less common granularities.
   switch (granularity) {
     case CharacterGranularity:
       if (isRange())
         pos = VisiblePosition(m_sel.start(), m_sel.affinity());
       else
-        pos = VisiblePosition(m_sel.extent(), m_sel.affinity()).previous();
+        pos = VisiblePosition(m_sel.extent(), m_sel.affinity()).previous(true);
       break;
     case WordGranularity:
       pos = previousWordPosition(
