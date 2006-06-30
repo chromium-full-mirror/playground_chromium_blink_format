@@ -449,9 +449,6 @@ int RenderTableSection::layoutRows(int toAdd) {
 
   int nEffCols = table()->numEffCols();
   for (int r = 0; r < totalRows; r++) {
-    Row* row = grid[r].row;
-    int totalCols = row->size();
-
     // Set the row's x/y position and width/height.
     if (grid[r].rowRenderer) {
       grid[r].rowRenderer->setPos(0, rowPos[r]);
@@ -555,7 +552,7 @@ int RenderTableSection::layoutRows(int toAdd) {
       int oldCellY = cell->yPos() - cell->borderTopExtra();
 
       if (style()->direction() == RTL) {
-        cell->setPos(table()->columnPos[(int)totalCols] -
+        cell->setPos(table()->columnPos[nEffCols] -
                          table()->columnPos[table()->colToEffCol(
                              cell->col() + cell->colSpan())] +
                          leftOffset,
