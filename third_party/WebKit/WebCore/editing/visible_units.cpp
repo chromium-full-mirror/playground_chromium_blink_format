@@ -663,11 +663,11 @@ bool inSameParagraph(const VisiblePosition& a, const VisiblePosition& b) {
 }
 
 bool isStartOfParagraph(const VisiblePosition& pos) {
-  return pos.isNotNull() && isEqualIgnoringAffinity(pos, startOfParagraph(pos));
+  return pos.isNotNull() && pos == startOfParagraph(pos);
 }
 
 bool isEndOfParagraph(const VisiblePosition& pos) {
-  return pos.isNotNull() && isEqualIgnoringAffinity(pos, endOfParagraph(pos));
+  return pos.isNotNull() && pos == endOfParagraph(pos);
 }
 
 VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {
@@ -722,11 +722,11 @@ bool inSameBlock(const VisiblePosition& a, const VisiblePosition& b) {
 }
 
 bool isStartOfBlock(const VisiblePosition& pos) {
-  return pos.isNotNull() && isEqualIgnoringAffinity(pos, startOfBlock(pos));
+  return pos.isNotNull() && pos == startOfBlock(pos);
 }
 
 bool isEndOfBlock(const VisiblePosition& pos) {
-  return pos.isNotNull() && isEqualIgnoringAffinity(pos, endOfBlock(pos));
+  return pos.isNotNull() && pos == endOfBlock(pos);
 }
 
 // ---------
