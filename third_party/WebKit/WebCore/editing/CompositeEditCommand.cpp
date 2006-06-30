@@ -560,6 +560,11 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   Position paragraphStart = visibleParagraphStart.deepEquivalent().upstream();
   Position end = visibleEnd.deepEquivalent().upstream();
 
+  // Perform some sanity checks. If there are no VisiblePositions in
+  // the same block as pos then paragraphStart will be outside the paragraph
+  if (Range::compareBoundaryPoints(pos, paragraphStart) < 0)
+    return;
+
   // Perform some checks to see if we need to perform work in this function.
   if (paragraphStart.node()->isBlockFlow()) {
     if (end.node()->isBlockFlow()) {
