@@ -884,7 +884,7 @@ class RenderObject : public CachedObjectClient {
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
 
   // Called to repaint a block's floats.
-  virtual void repaintFloatingDescendants();
+  virtual void repaintOverhangingFloats(bool paintAllDescendants = false);
 
   // Called before layout to repaint all dirty children (with selfNeedsLayout()
   // set).

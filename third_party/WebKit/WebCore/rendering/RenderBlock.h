@@ -114,7 +114,7 @@ class RenderBlock : public RenderFlow {
   virtual void removeChild(RenderObject*);
 
   virtual void repaintObjectsBeforeLayout();
-  virtual void repaintFloatingDescendants();
+  virtual void repaintOverhangingFloats(bool paintAllDescendants);
   virtual void getAbsoluteRepaintRectIncludingFloats(IntRect& bounds,
                                                      IntRect& fullBounds);
 

@@ -1838,7 +1838,7 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
 
 void RenderObject::repaintDuringLayoutIfMoved(int x, int y) {}
 
-void RenderObject::repaintFloatingDescendants() {}
+void RenderObject::repaintOverhangingFloats(bool paintAllDescendants) {}
 
 bool RenderObject::checkForRepaintDuringLayout() const {
   return !document()->view()->needsFullRepaint() && !layer();

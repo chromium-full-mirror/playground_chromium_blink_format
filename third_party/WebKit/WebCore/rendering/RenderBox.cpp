@@ -1033,11 +1033,11 @@ void RenderBox::repaintDuringLayoutIfMoved(int oldX, int oldY) {
     m_x = oldX;
     m_y = oldY;
     repaint();
-    repaintFloatingDescendants();
+    repaintOverhangingFloats(true);
     m_x = newX;
     m_y = newY;
     repaint();
-    repaintFloatingDescendants();
+    repaintOverhangingFloats(true);
   }
 }
 
