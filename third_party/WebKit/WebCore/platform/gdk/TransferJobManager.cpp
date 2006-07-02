@@ -74,7 +74,6 @@ void TransferJobManager::downloadTimerCallback(
     m_downloadTimer.stop();
     return;
   }
-
   if (m_useSimple) {
     for (HashSet<TransferJob*>::iterator it = jobs->begin(); it != jobs->end();
          ++it) {
@@ -104,11 +103,13 @@ void TransferJobManager::downloadTimerCallback(
     switch (retval) {
       case -1:  // select error
 #ifndef NDEBUG
-        printf("%s, select error(?)\n", __PRETTY_FUNCTION__);
+        printf("%s, select error(%d)\n", __PRETTY_FUNCTION__, retval);
 #endif
       /* fallthrough*/
       case 0:  // select timeout
-        printf("%s, select timout\n", __PRETTY_FUNCTION__);
+#ifndef NDEBUG
+        printf("%s, select timeout %d\n", __PRETTY_FUNCTION__, retval);
+#endif
       /* fallthrough. this can be the first perform to be made */
       default:  // 1+ descriptors have data
         while (CURLM_CALL_MULTI_PERFORM ==
@@ -151,11 +152,10 @@ void TransferJobManager::downloadTimerCallback(
           assert(0);
         }
       }
-
-      if (!jobs->isEmpty())
-        m_downloadTimer.startOneShot(pollTimeSeconds);
     }
   }
+  if (!jobs->isEmpty())
+    m_downloadTimer.startOneShot(pollTimeSeconds);
 }
 
 void TransferJobManager::remove(TransferJob* job) {
@@ -200,11 +200,12 @@ void TransferJobManager::add(TransferJob* job) {
     // timeout will occur and do curl_multi_perform
     if (ret && ret != CURLM_CALL_MULTI_PERFORM) {
       printf("Error %d starting job %s\n", ret, d->URL.url().ascii());
-      cancel(job);
+      job->setError(1);
+      startTimer = false;
     } else
       jobs->add(job);
   }
-  if (!jobs->isEmpty())
+  if (startTimer)
     m_downloadTimer.startOneShot(pollTimeSeconds);
 }
 
