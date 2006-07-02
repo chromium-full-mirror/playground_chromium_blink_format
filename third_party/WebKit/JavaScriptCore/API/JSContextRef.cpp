@@ -34,23 +34,25 @@
 
 using namespace KJS;
 
-JSContextRef JSContextCreate(const JSObjectCallbacks* globalObjectCallbacks,
+JSContextRef JSContextCreate(JSClassRef globalObjectClass,
                              JSObjectRef globalObjectPrototype) {
   JSLock lock;
 
   JSObject* jsPrototype = toJS(globalObjectPrototype);
 
   JSObject* globalObject;
-  if (globalObjectCallbacks ==
-      &kJSObjectCallbacksNone)  // slightly more efficient
+  if (globalObjectClass) {
+    if (jsPrototype)
+      globalObject = new JSCallbackObject(globalObjectClass, jsPrototype);
+    else
+      globalObject = new JSCallbackObject(globalObjectClass);
+  } else {
+    // creates a slightly more efficient object
     if (jsPrototype)
       globalObject = new JSObject(jsPrototype);
     else
       globalObject = new JSObject();
-  else if (jsPrototype)
-    globalObject = new JSCallbackObject(globalObjectCallbacks, jsPrototype);
-  else
-    globalObject = new JSCallbackObject(globalObjectCallbacks);
+  }
 
   Interpreter* interpreter = new Interpreter(
       globalObject);  // adds the built-in object prototype to the global object
@@ -83,7 +85,10 @@ bool JSEvaluate(JSContextRef context,
       UString(sourceURLRep), startingLineNumber, UString(scriptRep),
       jsThisValue);
 
-  *returnValue = toRef(completion.value());
+  if (returnValue)
+    *returnValue =
+        completion.value() ? toRef(completion.value()) : toRef(jsUndefined());
+
   return completion.complType() != Throw;
 }
 

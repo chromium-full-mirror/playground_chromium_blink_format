@@ -27,6 +27,8 @@
 #include "APICast.h"
 #include "JSValueRef.h"
 #include "JSObjectRef.h"
+#include "JSCallbackConstructor.h"
+#include "JSCallbackFunction.h"
 #include "JSCallbackObject.h"
 
 #include "identifier.h"
@@ -35,9 +37,6 @@
 #include "reference_list.h"
 
 using namespace KJS;
-
-const JSObjectCallbacks kJSObjectCallbacksNone = {0, 0, 0, 0, 0, 0, 0,
-                                                  0, 0, 0, 0, 0, 0};
 
 JSObjectRef JSValueToObject(JSContextRef context, JSValueRef value) {
   JSLock lock;
@@ -52,7 +51,7 @@ JSObjectRef JSValueToObject(JSContextRef context, JSValueRef value) {
 }
 
 JSObjectRef JSObjectMake(JSContextRef context,
-                         const JSObjectCallbacks* callbacks,
+                         JSClassRef jsClass,
                          JSObjectRef prototype) {
   JSLock lock;
 
@@ -62,32 +61,24 @@ JSObjectRef JSObjectMake(JSContextRef context,
   if (!prototype)
     jsPrototype = exec->lexicalInterpreter()->builtinObjectPrototype();
 
-  if (callbacks == &kJSObjectCallbacksNone)
+  if (!jsClass)
     return toRef(new JSObject(jsPrototype));  // slightly more efficient
   else
-    return toRef(new JSCallbackObject(callbacks, jsPrototype));
+    return toRef(new JSCallbackObject(jsClass, jsPrototype));
 }
 
 JSObjectRef JSFunctionMake(JSContextRef context,
                            JSCallAsFunctionCallback callback) {
+  JSLock lock;
   ExecState* exec = toJS(context);
-  JSObjectCallbacks callbacks = kJSObjectCallbacksNone;
-  callbacks.callAsFunction = callback;
-
-  return JSObjectMake(
-      context, &callbacks,
-      toRef(exec->lexicalInterpreter()->builtinFunctionPrototype()));
+  return toRef(new JSCallbackFunction(exec, callback));
 }
 
 JSObjectRef JSConstructorMake(JSContextRef context,
                               JSCallAsConstructorCallback callback) {
+  JSLock lock;
   ExecState* exec = toJS(context);
-  JSObjectCallbacks callbacks = kJSObjectCallbacksNone;
-  callbacks.callAsConstructor = callback;
-
-  return JSObjectMake(
-      context, &callbacks,
-      toRef(exec->lexicalInterpreter()->builtinObjectPrototype()));
+  return toRef(new JSCallbackConstructor(exec, callback));
 }
 
 JSCharBufferRef JSObjectGetDescription(JSObjectRef object) {
@@ -235,31 +226,30 @@ bool JSObjectCallAsConstructor(JSContextRef context,
   return true;
 }
 
-struct __JSPropertyListEnumerator {
-  __JSPropertyListEnumerator() : refCount(0), iterator(list.end()) {}
+struct __JSPropertyEnumerator {
+  __JSPropertyEnumerator() : refCount(0), iterator(list.end()) {}
 
   unsigned refCount;
   ReferenceList list;
   ReferenceListIterator iterator;
 };
 
-JSPropertyListEnumeratorRef JSObjectCreatePropertyEnumerator(
-    JSContextRef context,
-    JSObjectRef object) {
+JSPropertyEnumeratorRef JSObjectCreatePropertyEnumerator(JSContextRef context,
+                                                         JSObjectRef object) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsObject = toJS(object);
 
-  JSPropertyListEnumeratorRef enumerator = new __JSPropertyListEnumerator();
+  JSPropertyEnumeratorRef enumerator = new __JSPropertyEnumerator();
   jsObject->getPropertyList(exec, enumerator->list);
   enumerator->iterator = enumerator->list.begin();
 
-  return enumerator;
+  return JSPropertyEnumeratorRetain(enumerator);
 }
 
 JSCharBufferRef JSPropertyEnumeratorGetNext(
     JSContextRef context,
-    JSPropertyListEnumeratorRef enumerator) {
+    JSPropertyEnumeratorRef enumerator) {
   ExecState* exec = toJS(context);
   ReferenceListIterator& iterator = enumerator->iterator;
   if (iterator != enumerator->list.end()) {
@@ -269,13 +259,13 @@ JSCharBufferRef JSPropertyEnumeratorGetNext(
   return 0;
 }
 
-JSPropertyListEnumeratorRef JSPropertyEnumeratorRetain(
-    JSPropertyListEnumeratorRef enumerator) {
+JSPropertyEnumeratorRef JSPropertyEnumeratorRetain(
+    JSPropertyEnumeratorRef enumerator) {
   ++enumerator->refCount;
   return enumerator;
 }
 
-void JSPropertyEnumeratorRelease(JSPropertyListEnumeratorRef enumerator) {
+void JSPropertyEnumeratorRelease(JSPropertyEnumeratorRef enumerator) {
   if (--enumerator->refCount == 0)
     delete enumerator;
 }
