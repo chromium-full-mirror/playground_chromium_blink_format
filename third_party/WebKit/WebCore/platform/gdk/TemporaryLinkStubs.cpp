@@ -778,7 +778,8 @@ void Image::drawTiled(GraphicsContext*,
                       const FloatRect&,
                       const FloatRect&,
                       TileRule,
-                      TileRule) {}
+                      TileRule,
+                      CompositeOperator) {}
 
 void RenderThemeGdk::setCheckboxSize(RenderStyle*) const {}
 bool RenderThemeGdk::paintButton(RenderObject*,
