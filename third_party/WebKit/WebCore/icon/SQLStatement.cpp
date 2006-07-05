@@ -134,9 +134,9 @@ int SQLStatement::columnCount() {
 String SQLStatement::getColumnName(int col) {
   if (!m_statement)
     if (prepareAndStep() != SQLITE_ROW)
-      return "";
+      return String();
   if (columnCount() <= col)
-    return "";
+    return String();
 
   return String(sqlite3_column_name(m_statement, col));
 }
@@ -144,27 +144,27 @@ String SQLStatement::getColumnName(int col) {
 String SQLStatement::getColumnName16(int col) {
   if (!m_statement)
     if (prepareAndStep() != SQLITE_ROW)
-      return "";
+      return String();
   if (columnCount() <= col)
-    return "";
+    return String();
   return String((const UChar*)sqlite3_column_name16(m_statement, col));
 }
 
 String SQLStatement::getColumnText(int col) {
   if (!m_statement)
     if (prepareAndStep() != SQLITE_ROW)
-      return "";
+      return String();
   if (columnCount() <= col)
-    return "";
+    return String();
   return String((const char*)sqlite3_column_text(m_statement, col));
 }
 
 String SQLStatement::getColumnText16(int col) {
   if (!m_statement)
     if (prepareAndStep() != SQLITE_ROW)
-      return "";
+      return String();
   if (columnCount() <= col)
-    return "";
+    return String();
   return String((const UChar*)sqlite3_column_text16(m_statement, col));
 }
 
