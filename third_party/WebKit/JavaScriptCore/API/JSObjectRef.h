@@ -123,10 +123,16 @@ JSObjectRef JSObjectMake(JSContextRef context,
 
 // Will be assigned the built-in function prototype
 JSObjectRef JSFunctionMake(JSContextRef context,
-                           JSCallAsFunctionCallback callback);
+                           JSCallAsFunctionCallback callAsFunction);
 // Will be assigned the built-in object prototype
 JSObjectRef JSConstructorMake(JSContextRef context,
-                              JSCallAsConstructorCallback callback);
+                              JSCallAsConstructorCallback callAsConstructor);
+
+// returns NULL if functionBody has a syntax error
+JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
+                                   JSCharBufferRef body,
+                                   JSCharBufferRef sourceURL,
+                                   int startingLineNumber);
 
 JSCharBufferRef JSObjectGetDescription(JSObjectRef object);
 
@@ -149,6 +155,7 @@ bool JSObjectDeleteProperty(JSContextRef context,
                             JSObjectRef object,
                             JSCharBufferRef propertyName);
 
+// Only works with objects created by JSObjectMake
 void* JSObjectGetPrivate(JSObjectRef object);
 bool JSObjectSetPrivate(JSObjectRef object, void* data);
 
