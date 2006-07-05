@@ -55,7 +55,7 @@ inline bool signbit(double num) {
   return _copysign(1.0, num) < 0;
 }
 
-#if PLATFORM(WIN) && COMPILER(MSVC)
+#if COMPILER(MSVC)
 
 // Work around a bug in the Microsoft CRT, where fmod(x, +-infinity) yields NaN
 // instead of x.
@@ -64,5 +64,7 @@ inline double wtf_fmod(double x, double y) {
 }
 
 #define fmod(x, y) wtf_fmod(x, y)
+
+#endif
 
 #endif
