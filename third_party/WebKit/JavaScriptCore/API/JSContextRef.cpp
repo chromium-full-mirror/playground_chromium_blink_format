@@ -99,11 +99,25 @@ JSValueRef JSEvaluate(JSContextRef context,
   return toRef(jsUndefined());
 }
 
-bool JSCheckSyntax(JSContextRef context, JSCharBufferRef script) {
+bool JSCheckSyntax(JSContextRef context,
+                   JSCharBufferRef script,
+                   JSCharBufferRef sourceURL,
+                   int startingLineNumber,
+                   JSValueRef* exception) {
   JSLock lock;
+
   ExecState* exec = toJS(context);
-  UString::Rep* rep = toJS(script);
-  return exec->dynamicInterpreter()->checkSyntax(UString(rep));
+  UString::Rep* scriptRep = toJS(script);
+  UString::Rep* sourceURLRep = toJS(sourceURL);
+  Completion completion = exec->dynamicInterpreter()->checkSyntax(
+      UString(sourceURLRep), startingLineNumber, UString(scriptRep));
+  if (completion.complType() == Throw) {
+    if (exception)
+      *exception = toRef(completion.value());
+    return false;
+  }
+
+  return true;
 }
 
 JSValueRef JSContextGetException(JSContextRef context) {
