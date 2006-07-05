@@ -180,6 +180,19 @@ double JSValueToNumber(JSContextRef context, JSValueRef value) {
   return number;
 }
 
+JSObjectRef JSValueToObject(JSContextRef context, JSValueRef value) {
+  JSLock lock;
+  ExecState* exec = toJS(context);
+  JSValue* jsValue = toJS(value);
+
+  JSObjectRef objectRef = toRef(jsValue->toObject(exec));
+  if (exec->hadException()) {
+    exec->clearException();
+    objectRef = NULL;
+  }
+  return objectRef;
+}
+
 void JSGCProtect(JSValueRef value) {
   JSLock lock;
   JSValue* jsValue = toJS(value);
