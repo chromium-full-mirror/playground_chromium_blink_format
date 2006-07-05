@@ -29,8 +29,12 @@
 
 #include <xmath.h>
 
+#if HAVE(FLOAT_H)
+#include <float.h>
+#endif
+
 inline bool isinf(double num) {
-  return !_finite(num);
+  return !_finite(num) && !_isnan(num);
 }
 inline bool isnan(double num) {
   return _isnan(num);
@@ -50,5 +54,15 @@ inline float roundf(float num) {
 inline bool signbit(double num) {
   return _copysign(1.0, num) < 0;
 }
+
+#if PLATFORM(WIN) && COMPILER(MSVC)
+
+// Work around a bug in the Microsoft CRT, where fmod(x, +-infinity) yields NaN
+// instead of x.
+inline double wtf_fmod(double x, double y) {
+  return (!isinf(x) && isinf(y)) ? x : fmod(x, y);
+}
+
+#define fmod(x, y) wtf_fmod(x, y)
 
 #endif
