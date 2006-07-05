@@ -630,7 +630,7 @@ void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
 static int frameNumber = 0;
 Frame* FrameWin::createFrame(KURL const&,
                              String const&,
-                             RenderPart*,
+                             Element*,
                              String const&) {
   return 0;
 }
