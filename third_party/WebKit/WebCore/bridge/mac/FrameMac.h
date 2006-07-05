@@ -108,7 +108,7 @@ enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
 
 class FrameMac : public Frame {
  public:
-  FrameMac(Page*, RenderPart*);
+  FrameMac(Page*, Element*);
   ~FrameMac();
 
   void clear();
@@ -141,7 +141,7 @@ class FrameMac : public Frame {
 
   virtual Frame* createFrame(const KURL& url,
                              const String& name,
-                             RenderPart* renderer,
+                             Element* ownerElement,
                              const String& referrer);
 
   virtual void scheduleClose();

@@ -96,7 +96,7 @@ class Frame : public Shared<Frame>, Noncopyable {
  public:
   enum { NoXPosForVerticalArrowNavigation = INT_MIN };
 
-  Frame(Page*, RenderPart*);
+  Frame(Page*, Element*);
   virtual ~Frame();
 
   virtual bool openURL(const KURL&);
@@ -617,7 +617,7 @@ class Frame : public Shared<Frame>, Noncopyable {
                                const String& mimeType) = 0;
   virtual Frame* createFrame(const KURL& url,
                              const String& name,
-                             RenderPart* renderer,
+                             Element* ownerElement,
                              const String& referrer) = 0;
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const String& mimeType) = 0;
@@ -665,7 +665,7 @@ class Frame : public Shared<Frame>, Noncopyable {
                   const Vector<String>& paramNames,
                   const Vector<String>& paramValues,
                   bool useFallback);
-  Frame* loadSubframe(RenderPart* renderer,
+  Frame* loadSubframe(Element* ownerElement,
                       const KURL& url,
                       const String& name,
                       const String& referrer);
@@ -684,7 +684,7 @@ class Frame : public Shared<Frame>, Noncopyable {
                      const String& serviceType,
                      const Vector<String>& paramNames,
                      const Vector<String>& paramValues);
-  bool requestFrame(RenderPart* frame,
+  bool requestFrame(Element* ownerElement,
                     const String& url,
                     const AtomicString& frameName);
 
@@ -819,7 +819,7 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   void replaceContentsWithScriptResult(const KURL& url);
 
-  void disconnectOwnerRenderer();
+  void disconnectOwnerElement();
 
   void setNeedsReapplyStyles();
 

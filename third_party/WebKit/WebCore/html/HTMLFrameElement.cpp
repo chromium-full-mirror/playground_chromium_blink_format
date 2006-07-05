@@ -115,8 +115,7 @@ void HTMLFrameElement::openURL() {
     childFrame->openURL(
         document()->completeURL(relativeURL.deprecatedString()));
   else
-    parentFrame->requestFrame(static_cast<RenderFrame*>(renderer()),
-                              relativeURL, m_name);
+    parentFrame->requestFrame(this, relativeURL, m_name);
 }
 
 void HTMLFrameElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -215,8 +214,7 @@ void HTMLFrameElement::attach() {
   m_name = frame->tree()->uniqueChildName(m_name);
 
   // load the frame contents
-  frame->requestFrame(static_cast<RenderFrame*>(renderer()), relativeURL,
-                      m_name);
+  frame->requestFrame(this, relativeURL, m_name);
 
   if (contentFrame())
     contentFrame()->setInViewSourceMode(viewSourceMode());
@@ -259,7 +257,7 @@ void HTMLFrameElement::setLocation(const String& str) {
   // Handle the common case where we decided not to make a frame the first time.
   // Detach and the let attach() decide again whether to make the frame for this
   // URL.
-  if (!renderer()) {
+  if (!renderer() && !hasTagName(iframeTag)) {
     detach();
     attach();
     return;

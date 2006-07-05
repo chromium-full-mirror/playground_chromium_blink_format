@@ -45,6 +45,7 @@ class HTMLIFrameElement : public HTMLFrameElement {
   virtual void removedFromDocument();
 
   virtual void attach();
+  virtual void detach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange);

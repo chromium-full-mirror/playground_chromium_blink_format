@@ -58,8 +58,9 @@ RenderPart::~RenderPart() {
 void RenderPart::setFrame(Frame* frame) {
   if (frame == m_frame)
     return;
+
   if (m_frame)
-    m_frame->disconnectOwnerRenderer();
+    m_frame->disconnectOwnerElement();
   m_frame = frame;
 }
 

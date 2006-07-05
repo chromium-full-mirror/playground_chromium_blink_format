@@ -58,10 +58,10 @@ class FramePrivate {
   FramePrivate(Page* page,
                Frame* parent,
                Frame* thisFrame,
-               RenderPart* ownerRenderer)
+               Element* ownerElement)
       : m_page(page),
         m_treeNode(thisFrame, parent),
-        m_ownerRenderer(ownerRenderer),
+        m_ownerElement(ownerElement),
         m_extension(0),
         m_jscript(0),
         m_runningScripts(0),
@@ -118,7 +118,7 @@ class FramePrivate {
 
   Vector<RefPtr<Plugin>> m_plugins;
 
-  RenderPart* m_ownerRenderer;
+  Element* m_ownerElement;
   RefPtr<FrameView> m_view;
   BrowserExtension* m_extension;
   RefPtr<Document> m_doc;
