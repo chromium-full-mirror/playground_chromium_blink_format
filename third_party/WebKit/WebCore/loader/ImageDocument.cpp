@@ -23,21 +23,18 @@
  */
 
 #include "config.h"
-
 #include "ImageDocument.h"
 
 #include "CachedImage.h"
 #include "Element.h"
+#include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "SegmentedString.h"
 #include "Text.h"
-#include "HTMLImageElement.h"
 #include "xml_tokenizer.h"
 
-#ifdef __APPLE__
-#include <Cocoa/Cocoa.h>
-#include "FrameMac.h"
-#include "WebCoreFrameBridge.h"
+#if PLATFORM(MAC)
+#include "ImageDocumentMac.h"
 #endif
 
 namespace WebCore {
@@ -113,23 +110,8 @@ void ImageTokenizer::finish() {
     cachedImage->data(buffer, true);
 
 // FIXME: Need code to set the title for platforms other than Mac OS X.
-
-#ifdef __APPLE__
-    // FIXME: This is terrible! Makes an extra copy of the image data!
-    // Can't we get the NSData from NSURLConnection?
-    // Why is this different from image subresources?
-    NSData* nsData =
-        [[NSData alloc] initWithBytes:buffer.data() length:buffer.size()];
-    cachedImage->setAllData(nsData);
-    [nsData release];
-
-    WebCoreFrameBridge* bridge = Mac(m_doc->frame())->bridge();
-    NSURLResponse* response = [bridge mainResourceURLResponse];
-    cachedImage->setResponse(response);
-
-    if (cachedImage->imageSize().width() > 0)
-      m_doc->setTitle([bridge imageTitleForFilename:[response suggestedFilename]
-                                               size:cachedImage->imageSize()]);
+#if PLATFORM(MAC)
+    finishImageLoad(m_doc, cachedImage, buffer.data(), buffer.size());
 #endif
   }
 

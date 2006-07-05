@@ -144,7 +144,7 @@ bool eventDispatchForbidden();
 inline void forbidEventDispatch() {}
 inline void allowEventDispatch() {}
 
-#endif NDEBUG
+#endif  // NDEBUG
 
 }  // namespace WebCore
 
