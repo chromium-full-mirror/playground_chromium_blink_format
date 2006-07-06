@@ -395,6 +395,8 @@ class RenderLayer : WidgetClient {
 
   virtual void valueChanged(Widget*);
 
+  void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
+
  protected:
   RenderObject* m_object;
 
@@ -470,6 +472,10 @@ class RenderLayer : WidgetClient {
   // blend).
   bool m_inOverflowRelayout : 1;
   bool m_repaintOverflowOnResize : 1;
+
+  bool m_overflowStatusDirty : 1;
+  bool m_horizontalOverflow : 1;
+  bool m_verticalOverflow : 1;
 
   Marquee* m_marquee;  // Used by layers with overflow:marquee
 };

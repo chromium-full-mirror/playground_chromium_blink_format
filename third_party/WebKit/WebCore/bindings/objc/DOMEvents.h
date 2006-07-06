@@ -121,3 +121,12 @@ enum { DOM_MODIFICATION = 1, DOM_ADDITION = 2, DOM_REMOVAL = 3 };
               newValueArg:(NSString*)
               attrNameArg:(unsigned short)attrChangeArg;
 @end
+
+enum { DOM_HORIZONTAL = 0, DOM_VERTICAL = 1, DOM_BOTH = 2 };
+
+@interface DOMOverflowEvent : DOMEvent
+- (unsigned short)orient;
+- (BOOL)horizontalOverflow;
+- (BOOL)verticalOverflow;
+@end
+;
