@@ -115,7 +115,7 @@ static DeprecatedString startMarkup(const Node* node,
       if (Node* parent = node->parentNode()) {
         if (parent->hasTagName(listingTag) || parent->hasTagName(preTag) ||
             parent->hasTagName(scriptTag) || parent->hasTagName(styleTag) ||
-            parent->hasTagName(textareaTag))
+            parent->hasTagName(textareaTag) || parent->hasTagName(xmpTag))
           return stringValueForRange(node, range).deprecatedString();
       }
       DeprecatedString markup =
@@ -431,7 +431,7 @@ DeprecatedString createMarkup(const Range* range,
         // copied markup.
         if (ancestor->hasTagName(listingTag) || ancestor->hasTagName(olTag) ||
             ancestor->hasTagName(preTag) || ancestor->hasTagName(tableTag) ||
-            ancestor->hasTagName(ulTag)) {
+            ancestor->hasTagName(ulTag) || ancestor->hasTagName(xmpTag)) {
           breakAtEnd = true;
         } else
           break;
