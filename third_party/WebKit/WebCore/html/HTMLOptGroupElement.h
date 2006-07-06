@@ -33,7 +33,6 @@ namespace WebCore {
 class HTMLOptGroupElement : public HTMLGenericFormElement {
  public:
   HTMLOptGroupElement(Document*, HTMLFormElement* = 0);
-  virtual ~HTMLOptGroupElement();
 
   virtual bool checkDTD(const Node*);
   virtual const AtomicString& type() const;
@@ -48,11 +47,21 @@ class HTMLOptGroupElement : public HTMLGenericFormElement {
   virtual bool appendChild(PassRefPtr<Node> newChild, ExceptionCode&);
   virtual ContainerNode* addChild(PassRefPtr<Node>);
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+  virtual void attach();
+  virtual void detach();
+  virtual RenderStyle* renderStyle() const { return m_style; }
+  virtual void setRenderStyle(RenderStyle* s);
 
   void recalcSelectOptions();
 
   String label() const;
   void setLabel(const String&);
+
+  String groupLabelText();
+
+ private:
+  RenderStyle* m_style;
 };
 
 }  // namespace

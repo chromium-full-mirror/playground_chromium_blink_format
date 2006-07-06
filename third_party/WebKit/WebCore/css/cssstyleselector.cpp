@@ -561,9 +561,7 @@ void CSSStyleSelector::initForStyleResolve(Element* e,
   if (defaultParent)
     parentStyle = defaultParent;
   else
-    parentStyle = (parentNode && parentNode->renderer())
-                      ? parentNode->renderer()->style()
-                      : 0;
+    parentStyle = parentNode ? parentNode->renderStyle() : 0;
   view = element->document()->view();
   isXMLDoc = !element->document()->isHTMLDocument();
   frame = element->document()->frame();
@@ -657,12 +655,12 @@ const int siblingThreshold = 10;
 Node* CSSStyleSelector::locateCousinList(Element* parent) {
   if (parent && parent->isStyledElement()) {
     StyledElement* p = static_cast<StyledElement*>(parent);
-    if (p->renderer() && !p->inlineStyleDecl() && !p->hasID()) {
+    if (!p->inlineStyleDecl() && !p->hasID()) {
       Node* r = p->previousSibling();
       int subcount = 0;
-      RenderStyle* st = p->renderer()->style();
+      RenderStyle* st = p->renderStyle();
       while (r) {
-        if (r->renderer() && r->renderer()->style() == st)
+        if (r->renderStyle() == st)
           return r->lastChild();
         if (subcount++ == siblingThreshold)
           return 0;
@@ -671,7 +669,7 @@ Node* CSSStyleSelector::locateCousinList(Element* parent) {
       if (!r)
         r = locateCousinList(static_cast<Element*>(parent->parentNode()));
       while (r) {
-        if (r->renderer() && r->renderer()->style() == st)
+        if (r->renderStyle() == st)
           return r->lastChild();
         if (subcount++ == siblingThreshold)
           return 0;
@@ -685,12 +683,13 @@ Node* CSSStyleSelector::locateCousinList(Element* parent) {
 bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
   if (n->isStyledElement()) {
     StyledElement* s = static_cast<StyledElement*>(n);
-    if (s->renderer() && !s->renderer()->style()->unique() &&
-        (s->tagQName() == element->tagQName()) && !s->hasID() &&
-        (s->hasClass() == element->hasClass()) && !s->inlineStyleDecl() &&
+    RenderStyle* style = s->renderStyle();
+    if (style && !style->unique() && (s->tagQName() == element->tagQName()) &&
+        !s->hasID() && (s->hasClass() == element->hasClass()) &&
+        !s->inlineStyleDecl() &&
         (s->hasMappedAttributes() == styledElement->hasMappedAttributes()) &&
         (s->isLink() == element->isLink()) &&
-        !s->renderer()->style()->affectedByAttributeSelectors() &&
+        !style->affectedByAttributeSelectors() &&
         (s->hovered() == element->hovered()) &&
         (s->active() == element->active()) &&
         (s->focused() == element->focused()) &&
@@ -719,10 +718,9 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
             Color linkColor = element->document()->linkColor();
             Color visitedColor = element->document()->visitedLinkColor();
             if (pseudoState == PseudoUnknown)
-              checkPseudoState(element, s->renderer()->style()->pseudoState() !=
-                                                PseudoAnyLink ||
+              checkPseudoState(element, style->pseudoState() != PseudoAnyLink ||
                                             linkColor != visitedColor);
-            linksMatch = (pseudoState == s->renderer()->style()->pseudoState());
+            linksMatch = (pseudoState == style->pseudoState());
           }
 
           if (linksMatch)
@@ -746,7 +744,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
       ;
     while (n) {
       if (canShareStyleWithElement(n))
-        return n->renderer()->style();
+        return n->renderStyle();
       if (count++ == siblingThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
@@ -757,7 +755,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
       n = locateCousinList(static_cast<Element*>(element->parentNode()));
     while (n) {
       if (canShareStyleWithElement(n))
-        return n->renderer()->style();
+        return n->renderStyle();
       if (count++ == siblingThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
@@ -1560,24 +1558,20 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             (sel->hasTag() && !e->hasTagName(aTag)) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByHoverRules(true);
-          if (e->renderer()) {
-            if (element != e)
-              e->renderer()->style()->setAffectedByHoverRules(true);
-            if (e->hovered())
-              return true;
-          }
+          if (element != e && e->renderStyle())
+            e->renderStyle()->setAffectedByHoverRules(true);
+          if (e->hovered())
+            return true;
         }
         break;
       }
       case CSSSelector::PseudoDrag: {
         if (element == e && style)
           style->setAffectedByDragRules(true);
-        if (e->renderer()) {
-          if (element != e)
-            e->renderer()->style()->setAffectedByDragRules(true);
-          if (e->renderer()->isDragging())
-            return true;
-        }
+        if (element != e && e->renderStyle())
+          e->renderStyle()->setAffectedByDragRules(true);
+        if (e->renderer() && e->renderer()->isDragging())
+          return true;
         break;
       }
       case CSSSelector::PseudoFocus:
@@ -1593,8 +1587,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
             (sel->hasTag() && !e->hasTagName(aTag)) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByActiveRules(true);
-          else if (e->renderer())
-            e->renderer()->style()->setAffectedByActiveRules(true);
+          else if (e->renderStyle())
+            e->renderStyle()->setAffectedByActiveRules(true);
           if (e->active())
             return true;
         }

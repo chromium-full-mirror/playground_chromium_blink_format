@@ -37,6 +37,7 @@ class DeprecatedRenderSelect;
 class HTMLOptionElement : public HTMLGenericFormElement {
   friend class DeprecatedRenderSelect;
   friend class HTMLSelectElement;
+  friend class RenderMenuList;
 
  public:
   HTMLOptionElement(Document*, HTMLFormElement* = 0);
@@ -45,6 +46,11 @@ class HTMLOptionElement : public HTMLGenericFormElement {
   virtual int tagPriority() const { return 2; }
   virtual bool checkDTD(const Node* newChild);
   virtual bool isFocusable() const;
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+  virtual void attach();
+  virtual void detach();
+  virtual RenderStyle* renderStyle() const { return m_style; }
+  virtual void setRenderStyle(RenderStyle*);
 
   virtual const AtomicString& type() const;
 
@@ -71,9 +77,12 @@ class HTMLOptionElement : public HTMLGenericFormElement {
   String label() const;
   void setLabel(const String&);
 
+  String optionText();
+
  private:
   String m_value;
   bool m_selected;
+  RenderStyle* m_style;
 };
 
 }  // namespace

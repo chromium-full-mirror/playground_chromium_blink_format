@@ -28,6 +28,8 @@
 namespace WebCore {
 
 class Element;
+class RenderPopupMenu;
+
 enum ControlState {
   HoverState,
   PressedState,
@@ -132,6 +134,9 @@ class RenderTheme {
   virtual Color platformActiveSelectionForegroundColor() const;
   virtual Color platformInactiveSelectionForegroundColor() const;
 
+  virtual int sizeOfArrowControl(RenderStyle*) const { return 0; }
+  virtual RenderPopupMenu* createPopupMenu(RenderArena*, Document*) = 0;
+
  protected:
   // Methods for state querying
   bool isChecked(const RenderObject* o) const;
@@ -186,6 +191,15 @@ class RenderTheme {
                                    RenderStyle* style,
                                    WebCore::Element* e) const;
   virtual bool paintTextArea(RenderObject* o,
+                             const RenderObject::PaintInfo& i,
+                             const IntRect& r) {
+    return true;
+  }
+
+  virtual void adjustMenuListStyle(CSSStyleSelector* selector,
+                                   RenderStyle* style,
+                                   WebCore::Element* e) const;
+  virtual bool paintMenuList(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
     return true;

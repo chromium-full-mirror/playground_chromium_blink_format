@@ -61,6 +61,7 @@
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "AccessibilityObjectCache.h"
+#include "RenderPopupMenuWin.h"
 
 using namespace WebCore;
 
@@ -786,3 +787,40 @@ void Image::drawTiled(GraphicsContext*,
                       TileRule,
                       TileRule,
                       CompositeOperator) {}
+
+RenderPopupMenuWin::RenderPopupMenuWin(Node*) {
+  notImplemented();
+}
+RenderPopupMenuWin::~RenderPopupMenuWin() {
+  notImplemented();
+}
+void RenderPopupMenuWin::clear() {
+  notImplemented();
+}
+void RenderPopupMenuWin::populate() {
+  notImplemented();
+}
+void RenderPopupMenuWin::showPopup(const IntRect&, FrameView*, int index) {
+  notImplemented();
+}
+void RenderPopupMenuWin::addSeparator() {
+  notImplemented();
+}
+void RenderPopupMenuWin::addGroupLabel(HTMLOptGroupElement*) {
+  notImplemented();
+}
+void RenderPopupMenuWin::addOption(HTMLOptionElement*) {
+  notImplemented();
+}
+
+bool RenderThemeWin::paintMenuList(RenderObject*,
+                                   const RenderObject::PaintInfo&,
+                                   const IntRect&) {
+  notImplemented();
+  return false;
+}
+void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const {
+  notImplemented();
+}
