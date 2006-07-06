@@ -788,9 +788,6 @@ void Image::drawTiled(GraphicsContext*,
                       TileRule,
                       CompositeOperator) {}
 
-RenderPopupMenuWin::RenderPopupMenuWin(Node*) {
-  notImplemented();
-}
 RenderPopupMenuWin::~RenderPopupMenuWin() {
   notImplemented();
 }
