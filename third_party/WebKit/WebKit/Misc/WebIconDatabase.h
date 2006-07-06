@@ -76,6 +76,7 @@ extern NSSize WebIconLargeSize;   // 128 x 128
 @interface WebIconDatabase : NSObject {
  @private
   WebIconDatabasePrivate* _private;
+  BOOL _isClosing;
 }
 
 /*!
