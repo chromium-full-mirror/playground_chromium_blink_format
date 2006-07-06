@@ -758,8 +758,9 @@ void CompositeEditCommand::moveParagraphs(
                  beforeParagraph.deepEquivalent().node(),
                  beforeParagraph.deepEquivalent().offset());
 
-  destinationIndex = TextIterator::rangeLength(new Range(
+  RefPtr<Range> startToDestinationRange(new Range(
       document(), Position(document(), 0), destination.deepEquivalent()));
+  destinationIndex = TextIterator::rangeLength(startToDestinationRange.get());
 
   setEndingSelection(destination);
   EditCommandPtr cmd(new ReplaceSelectionCommand(
