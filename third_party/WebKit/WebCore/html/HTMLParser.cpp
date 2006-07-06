@@ -68,34 +68,14 @@ class HTMLStackElem {
       : tagName(_tagName),
         level(_level),
         strayTableContent(false),
-        nodeIsRefd(!_node->isDocumentNode()),
-        next(_next),
-        m_node(_node) {
-    if (nodeIsRefd)
-      m_node->ref();
-  }
-
-  ~HTMLStackElem() {
-    if (nodeIsRefd)
-      m_node->deref();
-  }
-
-  Node* node() { return m_node; }
-  void setNode(Node* _node) {
-    if (nodeIsRefd)
-      m_node->deref();
-    nodeIsRefd = !_node->isDocumentNode();
-    m_node = _node;
-  }
+        node(_node),
+        next(_next) {}
 
   AtomicString tagName;
   int level;
   bool strayTableContent;
-  bool nodeIsRefd;
+  RefPtr<Node> node;
   HTMLStackElem* next;
-
- private:
-  Node* m_node;
 };
 
 /**
@@ -898,7 +878,7 @@ void HTMLParser::popNestedHeaderTag() {
     }
     if (currNode && !isInline(currNode))
       return;
-    currNode = curr->node();
+    currNode = curr->node.get();
   }
 }
 
@@ -1014,9 +994,9 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   if (!curr || !maxElem || !isAffectedByResidualStyle(maxElem->tagName))
     return;
 
-  Node* residualElem = prev->node();
-  Node* blockElem = prevMaxElem ? prevMaxElem->node() : current;
-  Node* parentElem = elem->node();
+  Node* residualElem = prev->node.get();
+  Node* blockElem = prevMaxElem ? prevMaxElem->node.get() : current;
+  Node* parentElem = elem->node.get();
 
   // Check to see if the reparenting that is going to occur is allowed according
   // to the DOM.
@@ -1028,7 +1008,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   if (!parentElem->childAllowed(blockElem))
     return;
 
-  if (maxElem->node()->parentNode() != elem->node()) {
+  if (maxElem->node->parentNode() != elem->node) {
     // Walk the stack and remove any elements that aren't residual style tags.
     // These
     // are basically just being closed up.  Example:
@@ -1041,7 +1021,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
       HTMLStackElem* nextElem = currElem->next;
       if (!isResidualStyleTag(currElem->tagName)) {
         prevElem->next = nextElem;
-        prevElem->setNode(currElem->node());
+        prevElem->node = currElem->node;
         delete currElem;
       } else
         prevElem = currElem;
@@ -1061,13 +1041,13 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     // under the reopened residual tags (e.g., the <i> in the above example.)
     Node* prevNode = 0;
     currElem = maxElem;
-    while (currElem->node() != residualElem) {
-      if (isResidualStyleTag(currElem->node()->localName())) {
+    while (currElem->node != residualElem) {
+      if (isResidualStyleTag(currElem->node->localName())) {
         // Create a clone of this element.
-        RefPtr<Node> currNode = currElem->node()->cloneNode(false);
+        RefPtr<Node> currNode = currElem->node->cloneNode(false);
 
         // Change the stack element's node to point to the clone.
-        currElem->setNode(currNode.get());
+        currElem->node = currNode;
 
         // Attach the previous node as a child of this new node.
         if (prevNode)
@@ -1084,7 +1064,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
 
     // Now append the chain of new residual style elements if one exists.
     if (prevNode)
-      elem->node()->appendChild(prevNode, ec);
+      elem->node->appendChild(prevNode, ec);
   }
 
   // Check if the block is still in the tree. If it isn't, then we don't
@@ -1145,7 +1125,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     currElem = currElem->next;
   }
   prevElem->next = elem->next;
-  prevElem->setNode(elem->node());
+  prevElem->node = elem->node;
   delete elem;
 
   // Step 7: Reopen intermediate inlines, e.g., <b><p><i>Foo</b>Goo</p>.
@@ -1171,7 +1151,7 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
       // gets pulled off
       // the stack.
       popOneBlock(false);
-      curr->setNode(currNode);
+      curr->node = currNode;
       curr->next = residualStyleStack;
       residualStyleStack = curr;
     } else
@@ -1193,7 +1173,7 @@ void HTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
   // Loop for each tag that needs to be reopened.
   while (elem) {
     // Create a shallow clone of the DOM node for this element.
-    RefPtr<Node> newNode = elem->node()->cloneNode(false);
+    RefPtr<Node> newNode = elem->node->cloneNode(false);
 
     // Append the new node. In the malformed table case, we need to insert
     // before the table,
@@ -1307,7 +1287,7 @@ void HTMLParser::popBlock(const AtomicString& _tagName) {
         // the stack.
         popOneBlock(false);
         Elem->next = residualStyleStack;
-        Elem->setNode(currNode);
+        Elem->node = currNode;
         residualStyleStack = Elem;
       } else
         popOneBlock();
@@ -1324,11 +1304,11 @@ void HTMLParser::popOneBlock(bool delBlock) {
   // Form elements restore their state during the parsing process.
   // Also, a few elements (<applet>, <object>) need to know when all child
   // elements (<param>s) are available.
-  if (current && elem->node() != current)
+  if (current && elem->node != current)
     current->closeRenderer();
 
   blockStack = elem->next;
-  setCurrent(elem->node());
+  setCurrent(elem->node.get());
 
   if (elem->strayTableContent)
     inStrayTableContent--;
