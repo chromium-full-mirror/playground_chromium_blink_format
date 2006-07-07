@@ -76,7 +76,10 @@ class FrameViewPrivate {
     needToInitScrollBars = true;
     reset();
   }
-  ~FrameViewPrivate() { delete repaintRects; }
+  ~FrameViewPrivate() {
+    delete repaintRects;
+    delete m_scheduledEvents;
+  }
   void reset() {
     underMouse = 0;
     oldUnder = 0;
