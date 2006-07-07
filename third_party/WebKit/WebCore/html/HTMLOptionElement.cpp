@@ -28,12 +28,12 @@
 #include "HTMLOptionElement.h"
 
 #include "Document.h"
-#include "cssstyleselector.h"
 #include "ExceptionCode.h"
 #include "HTMLNames.h"
 #include "HTMLSelectElement.h"
 #include "RenderMenuList.h"
 #include "Text.h"
+#include "cssstyleselector.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -50,7 +50,9 @@ bool HTMLOptionElement::checkDTD(const Node* newChild) {
 }
 
 void HTMLOptionElement::attach() {
-  setRenderStyle(styleForRenderer(0));
+  RenderStyle* style = styleForRenderer(0);
+  setRenderStyle(style);
+  style->deref(document()->renderArena());
   HTMLGenericFormElement::attach();
 }
 
@@ -193,9 +195,8 @@ void HTMLOptionElement::setLabel(const String& value) {
 void HTMLOptionElement::setRenderStyle(RenderStyle* newStyle) {
   RenderStyle* oldStyle = m_style;
   m_style = newStyle;
-  if (m_style)
-    m_style->ref();
-
+  if (newStyle)
+    newStyle->ref();
   if (oldStyle)
     oldStyle->deref(document()->renderArena());
 }
