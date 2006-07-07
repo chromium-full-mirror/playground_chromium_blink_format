@@ -53,6 +53,9 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   virtual const AtomicString& type() const;
 
+  virtual bool isKeyboardFocusable() const;
+  virtual bool isMouseFocusable() const;
+
   virtual void recalcStyle(StyleChange);
 
   int selectedIndex() const;
@@ -127,7 +130,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
  private:
   void recalcListItems();
-  bool shouldUseMenuList(RenderStyle* style) {
+  bool shouldUseMenuList(RenderStyle* style) const {
     return !m_multiple && m_size <= 1 &&
            style->appearance() == MenulistAppearance;
   }

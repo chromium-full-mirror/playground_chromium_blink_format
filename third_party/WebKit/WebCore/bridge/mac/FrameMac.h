@@ -343,6 +343,8 @@ class FrameMac : public Frame {
                             bool text,
                             bool line);
 
+  NSEvent* currentEvent() { return _currentEvent; }
+
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
