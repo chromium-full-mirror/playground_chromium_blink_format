@@ -185,6 +185,7 @@ class FrameView : public ScrollView {
     if (!--m_refCount)
       delete this;
   }
+  bool hasOneRef() { return m_refCount == 1; }
 
  private:
   void cleared();
