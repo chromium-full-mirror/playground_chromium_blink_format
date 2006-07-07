@@ -288,6 +288,7 @@ class FrameMac : public Frame {
                                      const SelectionController& newSelection,
                                      EAffinity affinity,
                                      bool stillSelecting) const;
+  virtual bool shouldDeleteSelection(const SelectionController&) const;
   virtual bool shouldBeginEditing(const Range*) const;
   virtual bool shouldEndEditing(const Range*) const;
   virtual void didBeginEditing() const;
