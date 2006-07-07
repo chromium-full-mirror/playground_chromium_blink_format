@@ -43,6 +43,7 @@ class HTMLIFrameElement : public HTMLFrameElement {
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
+  virtual void willRemove();
 
   virtual void attach();
   virtual void detach();
