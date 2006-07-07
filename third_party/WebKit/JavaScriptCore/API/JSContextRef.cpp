@@ -72,19 +72,19 @@ JSObjectRef JSContextGetGlobalObject(JSContextRef context) {
 
 JSValueRef JSEvaluate(JSContextRef context,
                       JSStringBufferRef script,
-                      JSValueRef thisValue,
+                      JSObjectRef thisObject,
                       JSStringBufferRef sourceURL,
                       int startingLineNumber,
                       JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
-  JSValue* jsThisValue = toJS(thisValue);
+  JSObject* jsThisObject = toJS(thisObject);
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep = toJS(sourceURL);
-  // Interpreter::evaluate sets thisValue to the global object if it is NULL
+  // Interpreter::evaluate sets "this" to the global object if it is NULL
   Completion completion = exec->dynamicInterpreter()->evaluate(
       UString(sourceURLRep), startingLineNumber, UString(scriptRep),
-      jsThisValue);
+      jsThisObject);
 
   if (completion.complType() == Throw) {
     if (exception)

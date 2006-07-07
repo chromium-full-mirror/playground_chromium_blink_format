@@ -52,8 +52,8 @@ void JSContextClearException(JSContextRef context);
   @param context            execution context to use
   @param script             a character buffer containing the JavaScript to
   evaluate
-  @param thisValue          object to use as "this," or NULL to use the global
-  object as "this"
+  @param thisObject         the object to use as "this," or NULL to use the
+  global object as "this."
   @param sourceURL          URL to the file containing the JavaScript, or NULL -
   this is only used for error reporting
   @param startingLineNumber the JavaScript's starting line number in the file
@@ -65,7 +65,7 @@ void JSContextClearException(JSContextRef context);
 */
 JSValueRef JSEvaluate(JSContextRef context,
                       JSStringBufferRef script,
-                      JSValueRef thisValue,
+                      JSObjectRef thisObject,
                       JSStringBufferRef sourceURL,
                       int startingLineNumber,
                       JSValueRef* exception);
