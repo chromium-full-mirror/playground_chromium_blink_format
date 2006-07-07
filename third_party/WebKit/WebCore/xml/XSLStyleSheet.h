@@ -25,14 +25,12 @@
 
 #ifdef KHTML_XSLT
 
-#include "CachedObjectClient.h"
 #include "StyleSheet.h"
 #include <libxml/parser.h>
 #include <libxslt/transform.h>
 
 namespace WebCore {
 
-class CachedXSLStyleSheet;
 class DocLoader;
 class Document;
 class XSLImportRule;
@@ -82,29 +80,8 @@ class XSLStyleSheet : public StyleSheet {
   bool m_stylesheetDocTaken;
 };
 
-class XSLImportRule : public CachedObjectClient, public StyleBase {
- public:
-  XSLImportRule(StyleBase* parent, const String& href);
-  virtual ~XSLImportRule();
+}  // namespace WebCore
 
-  String href() const { return m_strHref; }
-  XSLStyleSheet* styleSheet() const { return m_styleSheet.get(); }
+#endif  // KHTML_XSLT
 
-  virtual bool isImportRule() { return true; }
-  XSLStyleSheet* parentStyleSheet() const;
-
-  // from CachedObjectClient
-  virtual void setStyleSheet(const String& url, const String& sheet);
-
-  bool isLoading();
-  void loadSheet();
-
- protected:
-  String m_strHref;
-  RefPtr<XSLStyleSheet> m_styleSheet;
-  CachedXSLStyleSheet* m_cachedSheet;
-  bool m_loading;
-};
-}
-#endif
-#endif
+#endif  // XSLStyleSheet_H
