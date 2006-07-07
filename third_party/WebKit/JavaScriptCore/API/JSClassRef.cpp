@@ -41,7 +41,7 @@ JSClassRef JSClassCreate(JSContextRef,
   JSClassRef jsClass = new __JSClass;
   if (staticValues) {
     jsClass->staticValues = new __JSClass::StaticValuesTable();
-    while (staticValues->name != 0) {
+    while (staticValues->name) {
       jsClass->staticValues->add(
           Identifier(staticValues->name).ustring().rep(),
           new StaticValueEntry(staticValues->getProperty,
@@ -53,7 +53,7 @@ JSClassRef JSClassCreate(JSContextRef,
 
   if (staticFunctions) {
     jsClass->staticFunctions = new __JSClass::StaticFunctionsTable();
-    while (staticFunctions->name != 0) {
+    while (staticFunctions->name) {
       jsClass->staticFunctions->add(
           Identifier(staticFunctions->name).ustring().rep(),
           new StaticFunctionEntry(staticFunctions->callAsFunction,
@@ -62,7 +62,11 @@ JSClassRef JSClassCreate(JSContextRef,
     }
   }
 
-  jsClass->callbacks = *callbacks;
+  if (callbacks)
+    jsClass->callbacks = *callbacks;
+  else
+    jsClass->callbacks = kJSObjectCallbacksNone;
+
   jsClass->parent = parentClass;
 
   return JSClassRetain(jsClass);
@@ -75,11 +79,15 @@ JSClassRef JSClassRetain(JSClassRef jsClass) {
 
 void JSClassRelease(JSClassRef jsClass) {
   if (--jsClass->refCount == 0) {
-    deleteAllValues(*jsClass->staticValues);
-    delete jsClass->staticValues;
+    if (jsClass->staticValues) {
+      deleteAllValues(*jsClass->staticValues);
+      delete jsClass->staticValues;
+    }
 
-    deleteAllValues(*jsClass->staticFunctions);
-    delete jsClass->staticFunctions;
+    if (jsClass->staticFunctions) {
+      deleteAllValues(*jsClass->staticFunctions);
+      delete jsClass->staticFunctions;
+    }
 
     delete jsClass;
   }
