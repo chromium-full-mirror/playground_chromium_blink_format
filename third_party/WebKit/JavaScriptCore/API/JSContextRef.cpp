@@ -80,7 +80,7 @@ JSValueRef JSEvaluate(JSContextRef context,
   if (completion.complType() == Throw) {
     if (exception)
       *exception = completion.value();
-    return NULL;
+    return 0;
   }
 
   if (completion.value())
