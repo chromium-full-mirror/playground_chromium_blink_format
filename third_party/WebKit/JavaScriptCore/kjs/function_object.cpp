@@ -215,7 +215,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   if (!progNode)
     // we can't return a Completion(Throw) here, so just set the exception
     // and return it
-    return throwError(exec, SyntaxError, errMsg, errLine, sid, &sourceURL);
+    return throwError(exec, SyntaxError, errMsg, errLine, sid, sourceURL);
 
   ScopeChain scopeChain;
   scopeChain.push(exec->lexicalInterpreter()->globalObject());

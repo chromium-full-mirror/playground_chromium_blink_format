@@ -33,8 +33,7 @@ using namespace KJS;
 const JSObjectCallbacks kJSObjectCallbacksNone = {0, 0, 0, 0, 0, 0,
                                                   0, 0, 0, 0, 0};
 
-JSClassRef JSClassCreate(JSContextRef,
-                         JSStaticValue* staticValues,
+JSClassRef JSClassCreate(JSStaticValue* staticValues,
                          JSStaticFunction* staticFunctions,
                          const JSObjectCallbacks* callbacks,
                          JSClassRef parentClass) {

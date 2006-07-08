@@ -192,7 +192,7 @@ Completion Node::createErrorCompletion(ExecState* exec,
                                        const char* msg) {
   return Completion(Throw,
                     Error::create(exec, e, msg, lineNo(), currentSourceId(exec),
-                                  &currentSourceURL(exec)));
+                                  currentSourceURL(exec)));
 }
 
 Completion Node::createErrorCompletion(ExecState* exec,
@@ -203,12 +203,12 @@ Completion Node::createErrorCompletion(ExecState* exec,
   substitute(message, ident.ustring());
   return Completion(
       Throw, Error::create(exec, e, message, lineNo(), currentSourceId(exec),
-                           &currentSourceURL(exec)));
+                           currentSourceURL(exec)));
 }
 
 JSValue* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
   return KJS::throwError(exec, e, msg, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwError(ExecState* exec,
@@ -220,7 +220,7 @@ JSValue* Node::throwError(ExecState* exec,
   substitute(message, v->toString(exec));
   substitute(message, expr->toString());
   return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwError(ExecState* exec,
@@ -230,7 +230,7 @@ JSValue* Node::throwError(ExecState* exec,
   UString message = msg;
   substitute(message, label.ustring());
   return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwError(ExecState* exec,
@@ -244,7 +244,7 @@ JSValue* Node::throwError(ExecState* exec,
   substitute(message, e1->toString());
   substitute(message, e2->toString());
   return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwError(ExecState* exec,
@@ -258,7 +258,7 @@ JSValue* Node::throwError(ExecState* exec,
   substitute(message, expr->toString());
   substitute(message, label.ustring());
   return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwError(ExecState* exec,
@@ -270,7 +270,7 @@ JSValue* Node::throwError(ExecState* exec,
   substitute(message, v->toString(exec));
   substitute(message, label.ustring());
   return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
-                         &currentSourceURL(exec));
+                         currentSourceURL(exec));
 }
 
 JSValue* Node::throwUndefinedVariableError(ExecState* exec,

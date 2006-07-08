@@ -127,13 +127,13 @@ bool JSValueIsStrictEqual(JSContextRef context, JSValueRef a, JSValueRef b) {
 
 bool JSValueIsInstanceOf(JSContextRef context,
                          JSValueRef value,
-                         JSObjectRef object) {
+                         JSObjectRef constructor) {
   ExecState* exec = toJS(context);
   JSValue* jsValue = toJS(value);
-  JSObject* jsObject = toJS(object);
-  if (!jsObject->implementsHasInstance())
+  JSObject* jsConstructor = toJS(constructor);
+  if (!jsConstructor->implementsHasInstance())
     return false;
-  bool result = jsObject->hasInstance(exec, jsValue);
+  bool result = jsConstructor->hasInstance(exec, jsValue);
   if (exec->hadException())
     exec->clearException();
   return result;

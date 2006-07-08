@@ -34,25 +34,14 @@
 
 using namespace KJS;
 
-JSContextRef JSContextCreate(JSClassRef globalObjectClass,
-                             JSObjectRef globalObjectPrototype) {
+JSContextRef JSContextCreate(JSClassRef globalObjectClass) {
   JSLock lock;
 
-  JSObject* jsPrototype = toJS(globalObjectPrototype);
-
   JSObject* globalObject;
-  if (globalObjectClass) {
-    if (jsPrototype)
-      globalObject = new JSCallbackObject(globalObjectClass, jsPrototype);
-    else
-      globalObject = new JSCallbackObject(globalObjectClass);
-  } else {
-    // creates a slightly more efficient object
-    if (jsPrototype)
-      globalObject = new JSObject(jsPrototype);
-    else
-      globalObject = new JSObject();
-  }
+  if (globalObjectClass)
+    globalObject = new JSCallbackObject(globalObjectClass);
+  else
+    globalObject = new JSObject();
 
   Interpreter* interpreter = new Interpreter(
       globalObject);  // adds the built-in object prototype to the global object
