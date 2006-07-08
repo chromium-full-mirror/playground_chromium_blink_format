@@ -230,6 +230,9 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
   JSObject* jsObject = toJS(object);
   JSObject* jsThisObject = toJS(thisObject);
 
+  if (!jsThisObject)
+    jsThisObject = exec->dynamicInterpreter()->globalObject();
+
   List argList;
   for (size_t i = 0; i < argc; i++)
     argList.append(toJS(argv[i]));
@@ -240,8 +243,8 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
   if (exec->hadException()) {
     if (exception)
       *exception = exec->exception();
-    result = NULL;
     exec->clearException();
+    result = NULL;
   }
   return result;
 }
