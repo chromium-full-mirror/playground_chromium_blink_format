@@ -165,7 +165,7 @@ class Window : public DOMObject {
   JSEventListener* getJSEventListener(JSValue*, bool html = false);
   JSUnprotectedEventListener* getJSUnprotectedEventListener(JSValue*,
                                                             bool html = false);
-  void clear(bool clearWindowProperties);
+  void clear();
   virtual UString toString(ExecState*) const;
 
   // Set the current "event" object

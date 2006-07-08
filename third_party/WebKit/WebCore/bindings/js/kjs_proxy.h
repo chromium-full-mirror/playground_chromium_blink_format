@@ -44,7 +44,7 @@ class KJSProxy {
                          int baseLine,
                          const String& code,
                          Node*);
-  void clear(bool clearWindowProperties);
+  void clear();
   EventListener* createHTMLEventHandler(const String& functionName,
                                         const String& code,
                                         Node*);
