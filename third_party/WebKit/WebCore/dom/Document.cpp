@@ -322,6 +322,7 @@ void Document::removedLastRef() {
 
     removeAllChildren();
 
+    deleteAllValues(m_markers);
     m_markers.clear();
 
     delete m_tokenizer;
