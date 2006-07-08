@@ -44,11 +44,17 @@ class TypingCommand : public CompositeEditCommand {
   TypingCommand(WebCore::Document* document,
                 ETypingCommand,
                 const WebCore::String& text = "",
-                bool selectInsertedText = false);
+                bool selectInsertedText = false,
+                TextGranularity granularity = CharacterGranularity);
 
-  static void deleteKeyPressed(WebCore::Document*, bool smartDelete = false);
-  static void forwardDeleteKeyPressed(WebCore::Document*,
-                                      bool smartDelete = false);
+  static void deleteKeyPressed(
+      WebCore::Document*,
+      bool smartDelete = false,
+      TextGranularity granularity = CharacterGranularity);
+  static void forwardDeleteKeyPressed(
+      WebCore::Document*,
+      bool smartDelete = false,
+      TextGranularity granularity = CharacterGranularity);
   static void insertText(WebCore::Document*,
                          const WebCore::String&,
                          bool selectInsertedText = false);
@@ -89,6 +95,7 @@ class TypingCommand : public CompositeEditCommand {
   bool m_applyEditing;
   bool m_selectInsertedText;
   bool m_smartDelete;
+  TextGranularity m_granularity;
 };
 
 }  // namespace WebCore
