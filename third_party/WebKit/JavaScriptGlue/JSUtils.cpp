@@ -257,7 +257,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
             ReferenceListIterator iter = propList.begin();
             ReferenceListIterator end = propList.end();
             while (iter != end && isArray) {
-              Identifier propName = iter->getPropertyName(exec);
+              Identifier propName = iter->getPropertyName();
               UString ustr = propName.ustring();
               const UniChar* uniChars = (const UniChar*)ustr.data();
               int size = ustr.size();
@@ -297,7 +297,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
               ReferenceListIterator iter = propList.begin();
               ReferenceListIterator end = propList.end();
               while (iter != end) {
-                Identifier propName = iter->getPropertyName(exec);
+                Identifier propName = iter->getPropertyName();
                 if (object->hasProperty(exec, propName)) {
                   CFStringRef cfKey = IdentifierToCFString(propName);
                   CFTypeRef cfValue = KJSValueToCFTypeInternal(
