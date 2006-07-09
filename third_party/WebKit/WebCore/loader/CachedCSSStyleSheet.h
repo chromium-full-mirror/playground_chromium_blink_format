@@ -29,14 +29,14 @@
 #ifndef CachedCSSStyleSheet_H
 #define CachedCSSStyleSheet_H
 
-#include "CachedObject.h"
+#include "CachedResource.h"
 #include "TextEncoding.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
 class DocLoader;
 
-class CachedCSSStyleSheet : public CachedObject {
+class CachedCSSStyleSheet : public CachedResource {
  public:
   CachedCSSStyleSheet(DocLoader*,
                       const String& URL,
@@ -49,8 +49,8 @@ class CachedCSSStyleSheet : public CachedObject {
 
   const String& sheet() const { return m_sheet; }
 
-  virtual void ref(CachedObjectClient*);
-  virtual void deref(CachedObjectClient*);
+  virtual void ref(CachedResourceClient*);
+  virtual void deref(CachedResourceClient*);
 
   virtual void setCharset(const DeprecatedString&);
   virtual void data(Vector<char>&, bool allDataReceived);

@@ -44,7 +44,7 @@ class KURL;
 class DeprecatedString;
 
 namespace WebCore {
-class CachedObject;
+class CachedResource;
 class DocLoader;
 class TransferJob;
 class Loader;
@@ -58,7 +58,7 @@ Vector<char> ServeSynchronousRequest(WebCore::Loader*,
                                      KURL& finalURL,
                                      DeprecatedString& headers);
 
-void CheckCacheObjectStatus(WebCore::DocLoader*, WebCore::CachedObject*);
+void CheckCacheObjectStatus(WebCore::DocLoader*, WebCore::CachedResource*);
 bool CheckIfReloading(WebCore::DocLoader*);
 bool IsResponseURLEqualToURL(NSURLResponse*, const WebCore::String& m_url);
 DeprecatedString ResponseURL(NSURLResponse* response);

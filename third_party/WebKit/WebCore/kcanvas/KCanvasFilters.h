@@ -513,7 +513,7 @@ class KCanvasFEGaussianBlur : public KCanvasFilterEffect {
   float m_y;
 };
 
-class KCanvasFEImage : public KCanvasFilterEffect, public CachedObjectClient {
+class KCanvasFEImage : public KCanvasFilterEffect, public CachedResourceClient {
  public:
   KCanvasFEImage() : m_cachedImage(0) {}
   virtual ~KCanvasFEImage();

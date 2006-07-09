@@ -31,8 +31,8 @@
 #include "CachedCSSStyleSheet.h"
 
 #include "Cache.h"
-#include "CachedObjectClient.h"
-#include "CachedObjectClientWalker.h"
+#include "CachedResourceClient.h"
+#include "CachedResourceClientWalker.h"
 #include "LoaderFunctions.h"
 #include "loader.h"
 #include <wtf/Vector.h>
@@ -44,7 +44,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          CachePolicy cachePolicy,
                                          time_t _expireDate,
                                          const DeprecatedString& charset)
-    : CachedObject(url, CSSStyleSheet, cachePolicy, _expireDate),
+    : CachedResource(url, CSSStyleSheet, cachePolicy, _expireDate),
       m_encoding(charset.latin1()) {
   // It's css we want.
   setAccept("text/css");
@@ -58,11 +58,11 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
 CachedCSSStyleSheet::CachedCSSStyleSheet(
     const String& url,
     const DeprecatedString& stylesheet_data)
-    : CachedObject(url,
-                   CSSStyleSheet,
-                   CachePolicyVerify,
-                   0,
-                   stylesheet_data.length()),
+    : CachedResource(url,
+                     CSSStyleSheet,
+                     CachePolicyVerify,
+                     0,
+                     stylesheet_data.length()),
       m_encoding(InvalidEncoding) {
   m_loading = false;
   m_status = Persistent;
@@ -71,16 +71,16 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(
 
 CachedCSSStyleSheet::~CachedCSSStyleSheet() {}
 
-void CachedCSSStyleSheet::ref(CachedObjectClient* c) {
-  CachedObject::ref(c);
+void CachedCSSStyleSheet::ref(CachedResourceClient* c) {
+  CachedResource::ref(c);
 
   if (!m_loading)
     c->setStyleSheet(m_url, m_sheet);
 }
 
-void CachedCSSStyleSheet::deref(CachedObjectClient* c) {
+void CachedCSSStyleSheet::deref(CachedResourceClient* c) {
   Cache::flush();
-  CachedObject::deref(c);
+  CachedResource::deref(c);
   if (canDelete() && m_free)
     delete this;
 }
@@ -107,8 +107,8 @@ void CachedCSSStyleSheet::checkNotify() {
   if (m_loading)
     return;
 
-  CachedObjectClientWalker w(m_clients);
-  while (CachedObjectClient* c = w.next()) {
+  CachedResourceClientWalker w(m_clients);
+  while (CachedResourceClient* c = w.next()) {
 #if __APPLE__
     if (m_response && !IsResponseURLEqualToURL(m_response, m_url))
       c->setStyleSheet(String(ResponseURL(m_response)), m_sheet);

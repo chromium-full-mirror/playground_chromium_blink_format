@@ -1724,7 +1724,7 @@ void HTMLTokenizer::enlargeScriptBuffer(int len) {
   scriptCodeMaxSize = newSize;
 }
 
-void HTMLTokenizer::notifyFinished(CachedObject*) {
+void HTMLTokenizer::notifyFinished(CachedResource*) {
 #if INSTRUMENT_LAYOUT_SCHEDULING
   if (!m_doc->ownerElement())
     printf("script loaded at %d\n", m_doc->elapsedTime());

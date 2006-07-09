@@ -40,7 +40,7 @@ SVGCursorElement::SVGCursorElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGExternalResourcesRequired(),
       SVGURIReference(),
-      CachedObjectClient() {
+      CachedResourceClient() {
   m_cachedImage = 0;
 }
 

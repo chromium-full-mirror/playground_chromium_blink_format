@@ -67,7 +67,7 @@ typedef HashMap<StringImpl*, StringImpl*> PrefixForNamespaceMap;
 
 class PendingCallbacks;
 
-class XMLTokenizer : public Tokenizer, public CachedObjectClient {
+class XMLTokenizer : public Tokenizer, public CachedResourceClient {
  public:
   XMLTokenizer(Document*, FrameView* = 0);
   XMLTokenizer(DocumentFragment*, Element*);
@@ -89,8 +89,8 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   void setIsXHTMLDocument(bool isXHTML) { m_isXHTMLDocument = isXHTML; }
   bool isXHTMLDocument() const { return m_isXHTMLDocument; }
 
-  // from CachedObjectClient
-  virtual void notifyFinished(CachedObject* finishedObj);
+  // from CachedResourceClient
+  virtual void notifyFinished(CachedResource* finishedObj);
 
   // callbacks from parser SAX
   void error(ErrorType, const char* message, va_list args);
@@ -1347,7 +1347,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
   doc->updateRendering();
 }
 
-void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
+void XMLTokenizer::notifyFinished(CachedResource* finishedObj) {
   ASSERT(m_pendingScript == finishedObj);
   ASSERT(m_pendingScript->accessCount() > 0);
 

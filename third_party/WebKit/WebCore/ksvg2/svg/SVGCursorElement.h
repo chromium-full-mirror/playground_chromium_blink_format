@@ -30,7 +30,7 @@
 #include "SVGTests.h"
 #include "SVGURIReference.h"
 #include "SVGExternalResourcesRequired.h"
-#include "CachedObjectClient.h"
+#include "CachedResourceClient.h"
 
 namespace WebCore {
 class SVGAnimatedLength;
@@ -39,7 +39,7 @@ class SVGCursorElement : public SVGElement,
                          public SVGTests,
                          public SVGExternalResourcesRequired,
                          public SVGURIReference,
-                         public CachedObjectClient {
+                         public CachedResourceClient {
  public:
   SVGCursorElement(const QualifiedName&, Document*);
   virtual ~SVGCursorElement();

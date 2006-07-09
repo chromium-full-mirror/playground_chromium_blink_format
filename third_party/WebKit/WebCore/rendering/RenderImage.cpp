@@ -60,7 +60,7 @@ void RenderImage::setStyle(RenderStyle* _style) {
   setShouldPaintBackgroundOrBorder(true);
 }
 
-void RenderImage::setContentObject(CachedObject* co) {
+void RenderImage::setContentObject(CachedResource* co) {
   if (co && m_cachedImage != co) {
     if (m_cachedImage)
       m_cachedImage->deref(this);

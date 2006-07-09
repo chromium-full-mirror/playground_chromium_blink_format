@@ -62,7 +62,7 @@
 #include "TransferJob.h"
 #include "RenderThemeGdk.h"
 #include "TextBoundaries.h"
-#include "AccessibilityObjectCache.h"
+#include "AXObjectCache.h"
 
 using namespace WebCore;
 
@@ -539,7 +539,7 @@ const Cursor& WebCore::moveCursor() {
   return localCursor;
 }
 
-bool AccessibilityObjectCache::gAccessibilityEnabled = false;
+bool AXObjectCache::gAccessibilityEnabled = false;
 
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;
@@ -630,7 +630,7 @@ int BrowserExtensionGdk::getHistoryLength() {
 bool CheckIfReloading(WebCore::DocLoader*) {
   return false;
 }
-void CheckCacheObjectStatus(DocLoader*, CachedObject*) {}
+void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}

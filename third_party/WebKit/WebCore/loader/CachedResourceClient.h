@@ -25,8 +25,8 @@
     pages from the web. It has a memory cache for these objects.
 */
 
-#ifndef LOADER_CACHED_OBJECT_CLIENT_H
-#define LOADER_CACHED_OBJECT_CLIENT_H
+#ifndef CachedResourceClient_h
+#define CachedResourceClient_h
 
 #ifndef KHTML_NO_XBL
 namespace XBL {
@@ -36,7 +36,7 @@ class XBLDocument;
 
 namespace WebCore {
 
-class CachedObject;
+class CachedResource;
 class CachedImage;
 class String;
 class Image;
@@ -49,9 +49,9 @@ class IntRect;
  * inherit from this class and overload one of the 3 functions
  *
  */
-class CachedObjectClient {
+class CachedResourceClient {
  public:
-  virtual ~CachedObjectClient() {}
+  virtual ~CachedResourceClient() {}
 
   // Called whenever a frame of an image changes, either because we got more
   // data from the network or
@@ -73,7 +73,7 @@ class CachedObjectClient {
   virtual void setXBLDocument(const String& /*URL*/, XBL::XBLDocument*) {}
 #endif
 
-  virtual void notifyFinished(CachedObject*) {}
+  virtual void notifyFinished(CachedResource*) {}
 };
 }
 

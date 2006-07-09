@@ -26,8 +26,8 @@
     pages from the web. It has a memory cache for these objects.
 */
 
-#ifndef CachedObject_h
-#define CachedObject_h
+#ifndef CachedResource_h
+#define CachedResource_h
 
 #include "DeprecatedString.h"
 #include "CachePolicy.h"
@@ -45,18 +45,18 @@ class NSURLResponse;
 #endif
 
 namespace WebCore {
-class CachedObjectClient;
+class CachedResourceClient;
 class Request;
 
 /**
  *
  * A cached object. Classes who want to use this object should derive
- * from CachedObjectClient, to get the function calls in case the requested data
- * has arrived.
+ * from CachedResourceClient, to get the function calls in case the requested
+ * data has arrived.
  *
  * This class also does the actual communication with kio and loads the file.
  */
-class CachedObject {
+class CachedResource {
  public:
   enum Type {
     ImageResource,
@@ -82,11 +82,11 @@ class CachedObject {
     Uncacheable  // too big to be cached, will be destroyed as soon as possible
   };
 
-  CachedObject(const String& URL,
-               Type type,
-               CachePolicy cachePolicy,
-               time_t expireDate,
-               int size = 0) {
+  CachedResource(const String& URL,
+                 Type type,
+                 CachePolicy cachePolicy,
+                 time_t expireDate,
+                 int size = 0) {
     m_url = URL;
     m_type = type;
     m_status = Pending;
@@ -107,7 +107,7 @@ class CachedObject {
     m_nextInLRUList = 0;
     m_prevInLRUList = 0;
   }
-  virtual ~CachedObject();
+  virtual ~CachedResource();
 
   virtual void setCharset(const DeprecatedString&) {}
   virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
@@ -117,8 +117,8 @@ class CachedObject {
   const String& url() const { return m_url; }
   Type type() const { return m_type; }
 
-  virtual void ref(CachedObjectClient*);
-  virtual void deref(CachedObjectClient*);
+  virtual void ref(CachedResourceClient*);
+  virtual void deref(CachedResourceClient*);
 
   int count() const { return m_clients.size(); }
 
@@ -174,7 +174,7 @@ class CachedObject {
  protected:
   void setSize(int size);
 
-  HashSet<CachedObjectClient*> m_clients;
+  HashSet<CachedResourceClient*> m_clients;
 
   String m_url;
   DeprecatedString m_accept;
@@ -201,8 +201,8 @@ class CachedObject {
  private:
   bool allowInLRUList() const { return canDelete() && status() != Persistent; }
 
-  CachedObject* m_nextInLRUList;
-  CachedObject* m_prevInLRUList;
+  CachedResource* m_nextInLRUList;
+  CachedResource* m_prevInLRUList;
   friend class Cache;
 };
 }

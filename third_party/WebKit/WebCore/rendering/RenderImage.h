@@ -85,7 +85,7 @@ class RenderImage : public RenderReplaced {
 
   // Called to set generated content images (e.g., :before/:after generated
   // images).
-  void setContentObject(CachedObject*);
+  void setContentObject(CachedResource*);
 
   bool errorOccurred() const {
     return m_cachedImage && m_cachedImage->isErrorImage();

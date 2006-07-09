@@ -41,7 +41,7 @@ class LoaderFunctions;
 namespace WebCore {
 class CachedCSSStyleSheet;
 class CachedImage;
-class CachedObject;
+class CachedResource;
 class CachedScript;
 class CachedXSLStyleSheet;
 class Document;
@@ -69,10 +69,10 @@ class DocLoader {
   CachedXBLDocument* requestXBLDocument(const String& url);
 #endif
 
-  CachedObject* cachedObject(const String& url) const {
+  CachedResource* cachedObject(const String& url) const {
     return m_docObjects.get(url);
   }
-  const HashMap<String, CachedObject*>& allCachedObjects() const {
+  const HashMap<String, CachedResource*>& allCachedObjects() const {
     return m_docObjects;
   }
 
@@ -85,7 +85,7 @@ class DocLoader {
   void setExpireDate(time_t);
   void setAutoloadImages(bool);
   void setCachePolicy(CachePolicy);
-  void removeCachedObject(CachedObject*) const;
+  void removeCachedObject(CachedResource*) const;
 
   void setLoadInProgress(bool);
   bool loadInProgress() const { return m_loadInProgress; }
@@ -98,7 +98,7 @@ class DocLoader {
   friend class WebCore::HTMLImageLoader;
 
   DeprecatedStringList m_reloadedURLs;
-  mutable HashMap<String, CachedObject*> m_docObjects;
+  mutable HashMap<String, CachedResource*> m_docObjects;
   time_t m_expireDate;
   CachePolicy m_cachePolicy;
   bool m_bautoloadImages : 1;

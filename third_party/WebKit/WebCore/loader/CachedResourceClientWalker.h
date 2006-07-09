@@ -25,27 +25,27 @@
     pages from the web. It has a memory cache for these objects.
 */
 
-#ifndef CachedObjectClientWalker_h
-#define CachedObjectClientWalker_h
+#ifndef CachedResourceClientWalker_h
+#define CachedResourceClientWalker_h
 
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
-class CachedObjectClient;
+class CachedResourceClient;
 
 // Call this "walker" instead of iterator so people won't expect Qt or STL-style
 // iterator interface.
 // Just keep calling next() on this. It's safe from deletions of items.
-class CachedObjectClientWalker {
+class CachedResourceClientWalker {
  public:
-  CachedObjectClientWalker(const HashSet<CachedObjectClient*>&);
-  CachedObjectClient* next();
+  CachedResourceClientWalker(const HashSet<CachedResourceClient*>&);
+  CachedResourceClient* next();
 
  private:
-  const HashSet<CachedObjectClient*>& m_clientSet;
-  Vector<CachedObjectClient*> m_clientVector;
+  const HashSet<CachedResourceClient*>& m_clientSet;
+  Vector<CachedResourceClient*> m_clientVector;
   size_t m_index;
 };
 }

@@ -25,14 +25,14 @@
 #define HTMLLinkElement_H
 
 #include "HTMLElement.h"
-#include "CachedObjectClient.h"
+#include "CachedResourceClient.h"
 #include "CSSStyleSheet.h"
 
 namespace WebCore {
 
 class CachedCSSStyleSheet;
 
-class HTMLLinkElement : public HTMLElement, public CachedObjectClient {
+class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
  public:
   HTMLLinkElement(Document*);
   ~HTMLLinkElement();
@@ -77,7 +77,7 @@ class HTMLLinkElement : public HTMLElement, public CachedObjectClient {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  // from CachedObjectClient
+  // from CachedResourceClient
   virtual void setStyleSheet(const String& url, const String& sheet);
   bool isLoading() const;
   void sheetLoaded();

@@ -26,7 +26,7 @@
 #include "config.h"
 #include "RenderObject.h"
 
-#include "AccessibilityObjectCache.h"
+#include "AXObjectCache.h"
 #include "CachedImage.h"
 #include "Decoder.h"
 #include "Document.h"
@@ -139,7 +139,7 @@ static RenderObjectCounter renderObjectCounter;
 #endif
 
 RenderObject::RenderObject(Node* node)
-    : CachedObjectClient(),
+    : CachedResourceClient(),
       m_style(0),
       m_node(node),
       m_parent(0),
@@ -2499,7 +2499,7 @@ RenderArena* RenderObject::renderArena() const {
 }
 
 void RenderObject::remove() {
-  document()->getAccObjectCache()->remove(this);
+  document()->axObjectCache()->remove(this);
 
   removeFromObjectLists();
 
@@ -2976,7 +2976,7 @@ void RenderObject::imageChanged(CachedImage* image) {
   // backgrounds that are then respected by the table cells (which are RenderBox
   // subclasses). It would be even better to find a more elegant way of doing
   // this that
-  // would avoid putting this function and the CachedObjectClient base class
+  // would avoid putting this function and the CachedResourceClient base class
   // into RenderObject.
   if (image && image->canRender() && parent()) {
     if (view() && element() &&
