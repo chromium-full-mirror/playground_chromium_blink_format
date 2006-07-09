@@ -43,7 +43,6 @@ class HTMLDocument : public WebCore::Document,
   ~HTMLDocument();
 
   virtual bool isHTMLDocument() const { return true; }
-  virtual Element* documentElement() const;
 
   String lastModified() const;
   String cookie() const;

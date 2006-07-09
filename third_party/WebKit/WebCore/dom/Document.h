@@ -164,7 +164,8 @@ class Document : public ContainerNode {
   DocumentType* realDocType() const { return m_docType.get(); }
 
   DOMImplementation* implementation() const;
-  virtual Element* documentElement() const;
+  virtual void childrenChanged();
+  Element* documentElement() const;
   virtual PassRefPtr<Element> createElement(const String& tagName,
                                             ExceptionCode&);
   PassRefPtr<DocumentFragment> createDocumentFragment();
@@ -728,6 +729,7 @@ class Document : public ContainerNode {
   RefPtr<Node> m_focusNode;
   RefPtr<Node> m_hoverNode;
   RefPtr<Node> m_activeNode;
+  mutable RefPtr<Element> m_documentElement;
 
   unsigned m_domtree_version;
 

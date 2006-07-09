@@ -80,10 +80,6 @@ HTMLDocument::HTMLDocument(DOMImplementation* _implementation, FrameView* v)
 
 HTMLDocument::~HTMLDocument() {}
 
-Element* HTMLDocument::documentElement() const {
-  return static_cast<Element*>(fastFirstChild());
-}
-
 String HTMLDocument::lastModified() const {
   if (frame())
     return frame()->lastModified();
