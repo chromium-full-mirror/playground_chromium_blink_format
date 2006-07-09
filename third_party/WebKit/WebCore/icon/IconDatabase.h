@@ -124,6 +124,10 @@ class IconDatabase {
   void setHaveNoIconForIconURL(const String&);
   void setIconURLForPageURL(const String& iconURL, const String& pageURL);
 
+  // Removes icons from the db that no longer have any PageURLs pointing to them
+  // If numberToPrune is negative, ALL dangling icons will be pruned
+  void pruneUnreferencedIcons(int numberToPrune);
+
   static const int currentDatabaseVersion;
 
  private:
