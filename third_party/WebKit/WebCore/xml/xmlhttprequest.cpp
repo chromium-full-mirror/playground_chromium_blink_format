@@ -29,7 +29,7 @@
 #include "EventNames.h"
 #include "FormData.h"
 #include "HTMLDocument.h"
-#include "KWQLoader.h"
+#include "LoaderFunctions.h"
 #include "PlatformString.h"
 #include "RegularExpression.h"
 #include "TextEncoding.h"
@@ -86,9 +86,9 @@ static inline String getMIMEType(const String& contentTypeString) {
     UChar c = contentTypeString[offset];
     if (c == ';')
       break;
-    else if (QChar(c).isSpace())  // FIXME: This seems wrong, " " is an invalid
-                                  // MIME type character according to RFC 2045.
-                                  // bug 8644
+    else if (DeprecatedChar(c).isSpace())  // FIXME: This seems wrong, " " is an
+                                           // invalid MIME type character
+                                           // according to RFC 2045.  bug 8644
       continue;
     // FIXME: This is a very slow way to build a string, given WebCore::String's
     // implementation.
@@ -344,8 +344,8 @@ void XMLHttpRequest::send(const String& body) {
       // avoid deadlock in case the loader wants to use JS on a background
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
-      data = KWQServeSynchronousRequest(Cache::loader(), m_doc->docLoader(),
-                                        m_job, finalURL, headers);
+      data = ServeSynchronousRequest(Cache::loader(), m_doc->docLoader(), m_job,
+                                     finalURL, headers);
     }
 
     m_job = 0;

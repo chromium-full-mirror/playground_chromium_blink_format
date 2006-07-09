@@ -29,13 +29,13 @@
 #include "FrameView.h"
 #include "HTMLFormElement.h"
 #include "HTMLInputElement.h"
-#include "KWQFileButton.h"
+#include "FileButton.h"
 
 namespace WebCore {
 
 RenderFileButton::RenderFileButton(HTMLInputElement* element)
     : RenderFormElement(element) {
-  setWidget(new KWQFileButton(m_view->frame()));
+  setWidget(new FileButton(m_view->frame()));
 }
 
 void RenderFileButton::calcMinMaxWidth() {
@@ -43,7 +43,7 @@ void RenderFileButton::calcMinMaxWidth() {
 
   // Let the widget tell us how big it wants to be.
   int size = static_cast<HTMLInputElement*>(node())->size();
-  IntSize s(static_cast<KWQFileButton*>(widget())->sizeForCharacterWidth(
+  IntSize s(static_cast<FileButton*>(widget())->sizeForCharacterWidth(
       size > 0 ? size : 20));
 
   setIntrinsicWidth(s.width());
@@ -53,10 +53,10 @@ void RenderFileButton::calcMinMaxWidth() {
 }
 
 void RenderFileButton::updateFromElement() {
-  static_cast<KWQFileButton*>(widget())->setFilename(
+  static_cast<FileButton*>(widget())->setFilename(
       static_cast<HTMLInputElement*>(node())->value().deprecatedString());
 
-  static_cast<KWQFileButton*>(widget())->setDisabled(
+  static_cast<FileButton*>(widget())->setDisabled(
       static_cast<HTMLInputElement*>(node())->disabled());
 
   RenderFormElement::updateFromElement();
@@ -69,14 +69,14 @@ void RenderFileButton::returnPressed(Widget*) {
 
 void RenderFileButton::valueChanged(Widget*) {
   static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
-      static_cast<KWQFileButton*>(widget())->filename());
+      static_cast<FileButton*>(widget())->filename());
   static_cast<HTMLInputElement*>(node())->onChange();
 }
 
 void RenderFileButton::select() {}
 
 void RenderFileButton::click(bool sendMouseEvents) {
-  static_cast<KWQFileButton*>(widget())->click(sendMouseEvents);
+  static_cast<FileButton*>(widget())->click(sendMouseEvents);
 }
 
 }  // namespace WebCore

@@ -113,7 +113,7 @@ class RenderTable : public RenderBlock {
   virtual void calcWidth();
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
 #endif
   struct ColumnStruct {
     enum { WidthUndefined = 0xffff };

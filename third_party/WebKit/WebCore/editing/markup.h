@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KHTML_EDITING_MARKUP_H
-#define KHTML_EDITING_MARKUP_H
+#ifndef markup_h
+#define markup_h
 
 #include "HTMLInterchange.h"
 #include <wtf/Forward.h>
@@ -63,4 +63,4 @@ DeprecatedString createMarkup(
     EAnnotateForInterchange = DoNotAnnotateForInterchange);
 }
 
-#endif  // KHTML_EDITING_MARKUP_H
+#endif  // markup_h

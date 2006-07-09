@@ -285,7 +285,7 @@ void RenderInline::absoluteRects(DeprecatedValueList<IntRect>& rects,
 }
 
 void RenderInline::calcMinMaxWidth() {
-  KHTMLAssert(!minMaxKnown());
+  ASSERT(!minMaxKnown());
 
 #ifdef DEBUG_LAYOUT
   kdDebug(6040) << renderName()

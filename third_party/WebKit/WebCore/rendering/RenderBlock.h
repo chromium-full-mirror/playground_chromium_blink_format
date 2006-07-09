@@ -366,7 +366,7 @@ class RenderBlock : public RenderFlow {
   int rightSelectionOffset(RenderBlock* rootBlock, int y);
 
 #if !NDEBUG
-  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
 #endif
 
   // Helper methods for computing line counts and heights for line counts.

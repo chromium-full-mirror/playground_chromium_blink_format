@@ -27,7 +27,7 @@
 
 #include <kcanvas/KCanvasResources.h>
 
-class QTextStream;
+class TextStream;
 
 namespace WebCore {
 
@@ -80,7 +80,7 @@ class KRenderingPaintServer : public KCanvasResource {
   bool isPaintingText() const { return m_paintingText; }
   void setPaintingText(bool paintingText) { m_paintingText = paintingText; }
 
-  virtual QTextStream& externalRepresentation(QTextStream&) const = 0;
+  virtual TextStream& externalRepresentation(TextStream&) const = 0;
 
   virtual void renderPath(KRenderingDeviceContext*,
                           const RenderPath*,
@@ -93,7 +93,7 @@ class KRenderingPaintServer : public KCanvasResource {
 };
 }
 
-QTextStream& operator<<(QTextStream&, const WebCore::KRenderingPaintServer&);
+TextStream& operator<<(TextStream&, const WebCore::KRenderingPaintServer&);
 
 #endif  // SVG_SUPPORT
 #endif

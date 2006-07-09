@@ -189,7 +189,7 @@ const int PARSEMODE_HAVE_INTERNAL = (1 << 3);
 
 static int parseDocTypePart(const DeprecatedString& buffer, int index) {
   while (true) {
-    QChar ch = buffer[index];
+    DeprecatedChar ch = buffer[index];
     if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
       ++index;
     else if (ch == '-') {
@@ -232,7 +232,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
     index = buffer.find('<', index);
     if (index == -1)
       break;
-    QChar nextChar = buffer[index + 1];
+    DeprecatedChar nextChar = buffer[index + 1];
     if (nextChar == '!') {
       if (containsString("doctype", buffer, index + 2)) {
         haveDocType = true;
@@ -264,7 +264,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
     // We've read <!DOCTYPE HTML PUBLIC (not case sensitive).
     // Now we find the beginning and end of the public identifers
     // and system identifiers (assuming they're even present).
-    QChar theChar = buffer[index];
+    DeprecatedChar theChar = buffer[index];
     if (theChar != '\"' && theChar != '\'')
       return false;
 
@@ -275,7 +275,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
     if (publicIDEnd == -1)
       return false;
     index = parseDocTypePart(buffer, publicIDEnd + 1);
-    QChar next = buffer[index];
+    DeprecatedChar next = buffer[index];
     if (next == '>') {
       // Public identifier present, but no system identifier.
       // Do nothing.  Note that this is the most common
@@ -303,7 +303,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
       // Doctype has a system ID but no public ID
       *resultFlags |= PARSEMODE_HAVE_SYSTEM_ID;
       index = parseDocTypePart(buffer, index + 6);
-      QChar next = buffer[index];
+      DeprecatedChar next = buffer[index];
       if (next != '\"' && next != '\'')
         return false;
       int systemIDStart = index + 1;
@@ -314,7 +314,7 @@ static bool parseDocTypeDeclaration(const DeprecatedString& buffer,
       index = parseDocTypePart(buffer, systemIDEnd + 1);
     }
 
-    QChar nextChar = buffer[index];
+    DeprecatedChar nextChar = buffer[index];
     if (nextChar == '[')
       *resultFlags |= PARSEMODE_HAVE_INTERNAL;
     else if (nextChar != '>')

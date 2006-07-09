@@ -379,7 +379,7 @@ bool isTableStructureNode(const Node* node) {
 
 const String& nonBreakingSpaceString() {
   static String nonBreakingSpaceString =
-      DeprecatedString(QChar(NON_BREAKING_SPACE));
+      DeprecatedString(DeprecatedChar(NON_BREAKING_SPACE));
   return nonBreakingSpaceString;
 }
 

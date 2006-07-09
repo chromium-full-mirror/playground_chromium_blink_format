@@ -33,7 +33,7 @@
 #include "Frame.h"
 #include "HTMLDocument.h"
 #include "HTMLTokenizer.h"
-#include "KWQLoader.h"
+#include "LoaderFunctions.h"
 #include "Text.h"
 #include "TransferJob.h"
 #include "loader.h"
@@ -85,7 +85,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
       xmlGenericErrorFunc oldErrorFunc = xmlGenericError;
       void* oldErrorContext = xmlGenericErrorContext;
 
-      Vector<char> data = KWQServeSynchronousRequest(
+      Vector<char> data = ServeSynchronousRequest(
           Cache::loader(), globalDocLoader, job, finalURL, headers);
 
       xmlSetGenericErrorFunc(0, parseErrorFunc);

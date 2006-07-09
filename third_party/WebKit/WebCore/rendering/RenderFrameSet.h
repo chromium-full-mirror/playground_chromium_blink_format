@@ -65,7 +65,7 @@ class RenderFrameSet : public RenderContainer {
   }
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
 #endif
 
  private:

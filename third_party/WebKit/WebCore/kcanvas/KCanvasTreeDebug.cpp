@@ -31,7 +31,7 @@
 
 #include "HTMLNames.h"
 #include "RenderTreeAsText.h"
-#include <kcanvas/KCanvasContainer.h>
+#include <kcanvas/RenderSVGContainer.h>
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingFillPainter.h>
 #include <kcanvas/device/KRenderingPaintServerGradient.h>
@@ -49,20 +49,20 @@ namespace WebCore {
  * one to be printed, but still want to avoid strings like ", b, c", works like
  * DeprecatedStringList::join for streams
  */
-class QTextStreamSeparator {
+class TextStreamSeparator {
  public:
-  QTextStreamSeparator(const DeprecatedString& s)
+  TextStreamSeparator(const DeprecatedString& s)
       : m_separator(s), m_needToSeparate(false) {}
 
  private:
-  friend QTextStream& operator<<(QTextStream& ts, QTextStreamSeparator& sep);
+  friend TextStream& operator<<(TextStream& ts, TextStreamSeparator& sep);
 
  private:
   DeprecatedString m_separator;
   bool m_needToSeparate;
 };
 
-QTextStream& operator<<(QTextStream& ts, QTextStreamSeparator& sep) {
+TextStream& operator<<(TextStream& ts, TextStreamSeparator& sep) {
   if (sep.m_needToSeparate)
     ts << sep.m_separator;
   else
@@ -70,11 +70,11 @@ QTextStream& operator<<(QTextStream& ts, QTextStreamSeparator& sep) {
   return ts;
 }
 
-QTextStream& operator<<(QTextStream& ts, const IntPoint& p) {
+TextStream& operator<<(TextStream& ts, const IntPoint& p) {
   return ts << "(" << p.x() << "," << p.y() << ")";
 }
 
-QTextStream& operator<<(QTextStream& ts, const IntRect& r) {
+TextStream& operator<<(TextStream& ts, const IntRect& r) {
   return ts << "at (" << r.x() << "," << r.y() << ") size " << r.width() << "x"
             << r.height();
 }
@@ -86,7 +86,7 @@ bool hasFractions(double val) {
   return (fabs(val - dval) > epsilon);
 }
 
-QTextStream& operator<<(QTextStream& ts, const FloatRect& r) {
+TextStream& operator<<(TextStream& ts, const FloatRect& r) {
   ts << "at (";
   if (hasFractions(r.x()))
     ts << r.x();
@@ -110,7 +110,7 @@ QTextStream& operator<<(QTextStream& ts, const FloatRect& r) {
   return ts;
 }
 
-QTextStream& operator<<(QTextStream& ts, const FloatPoint& p) {
+TextStream& operator<<(TextStream& ts, const FloatPoint& p) {
   ts << "(";
   if (hasFractions(p.x()))
     ts << p.x();
@@ -124,7 +124,7 @@ QTextStream& operator<<(QTextStream& ts, const FloatPoint& p) {
   return ts << ")";
 }
 
-QTextStream& operator<<(QTextStream& ts, const FloatSize& s) {
+TextStream& operator<<(TextStream& ts, const FloatSize& s) {
   ts << "width=";
   if (hasFractions(s.width()))
     ts << s.width();
@@ -138,7 +138,7 @@ QTextStream& operator<<(QTextStream& ts, const FloatSize& s) {
   return ts;
 }
 
-QTextStream& operator<<(QTextStream& ts, const QMatrix& m) {
+TextStream& operator<<(TextStream& ts, const AffineTransform& m) {
   if (m.isIdentity())
     ts << "identity";
   else {
@@ -149,18 +149,18 @@ QTextStream& operator<<(QTextStream& ts, const QMatrix& m) {
   return ts;
 }
 
-QTextStream& operator<<(QTextStream& ts, const Color& c) {
+TextStream& operator<<(TextStream& ts, const Color& c) {
   return ts << c.name();
 }
 
-static void writeIndent(QTextStream& ts, int indent) {
+static void writeIndent(TextStream& ts, int indent) {
   for (int i = 0; i != indent; ++i) {
     ts << "  ";
   }
 }
 
 // FIXME: This should be in KRenderingStyle.cpp
-static QTextStream& operator<<(QTextStream& ts, const KCDashArray& a) {
+static TextStream& operator<<(TextStream& ts, const KCDashArray& a) {
   ts << "{";
   for (KCDashArray::ConstIterator it = a.begin(); it != a.end(); ++it) {
     if (it != a.begin())
@@ -172,7 +172,7 @@ static QTextStream& operator<<(QTextStream& ts, const KCDashArray& a) {
 }
 
 // FIXME: This should be in KRenderingStyle.cpp
-static QTextStream& operator<<(QTextStream& ts, KCCapStyle style) {
+static TextStream& operator<<(TextStream& ts, KCCapStyle style) {
   switch (style) {
     case CAP_BUTT:
       ts << "BUTT";
@@ -188,7 +188,7 @@ static QTextStream& operator<<(QTextStream& ts, KCCapStyle style) {
 }
 
 // FIXME: This should be in KRenderingStyle.cpp
-static QTextStream& operator<<(QTextStream& ts, KCJoinStyle style) {
+static TextStream& operator<<(TextStream& ts, KCJoinStyle style) {
   switch (style) {
     case JOIN_MITER:
       ts << "MITER";
@@ -212,7 +212,7 @@ static QTextStream& operator<<(QTextStream& ts, KCJoinStyle style) {
   (!parentStyle ||                                          \
    ((!parentStyle->pred) || (parentStyle->path != childStyle->path)))
 
-static void writeStyle(QTextStream& ts, const RenderObject& object) {
+static void writeStyle(TextStream& ts, const RenderObject& object) {
   const RenderStyle* style = object.style();
   const SVGRenderStyle* svgStyle = style->svgStyle();
 
@@ -227,7 +227,7 @@ static void writeStyle(QTextStream& ts, const RenderObject& object) {
     KRenderingPaintServer* strokePaintServer =
         KSVGPainterFactory::strokePaintServer(style, &path);
     if (strokePaintServer) {
-      QTextStreamSeparator s(" ");
+      TextStreamSeparator s(" ");
       ts << " [stroke={";
       if (strokePaintServer) {
         if (!strokePaintServer->idInRegistry().isEmpty())
@@ -256,7 +256,7 @@ static void writeStyle(QTextStream& ts, const RenderObject& object) {
     KRenderingPaintServer* fillPaintServer =
         KSVGPainterFactory::fillPaintServer(style, &path);
     if (fillPaintServer) {
-      QTextStreamSeparator s(" ");
+      TextStreamSeparator s(" ");
       ts << " [fill={";
       if (fillPaintServer) {
         if (!fillPaintServer->idInRegistry().isEmpty())
@@ -286,7 +286,7 @@ static void writeStyle(QTextStream& ts, const RenderObject& object) {
 #undef DIFFERS_FROM_PARENT
 #undef DIFFERS_FROM_PARENT_AVOID_TEST_IF_FALSE
 
-static QTextStream& operator<<(QTextStream& ts, const RenderPath& o) {
+static TextStream& operator<<(TextStream& ts, const RenderPath& o) {
   ts << " " << o.absoluteTransform().mapRect(o.relativeBBox());
 
   writeStyle(ts, o);
@@ -296,7 +296,7 @@ static QTextStream& operator<<(QTextStream& ts, const RenderPath& o) {
   return ts;
 }
 
-static QTextStream& operator<<(QTextStream& ts, const KCanvasContainer& o) {
+static TextStream& operator<<(TextStream& ts, const RenderSVGContainer& o) {
   ts << " " << o.absoluteTransform().mapRect(o.relativeBBox());
 
   writeStyle(ts, o);
@@ -311,7 +311,7 @@ static DeprecatedString getTagName(void* node) {
   return DeprecatedString();
 }
 
-void write(QTextStream& ts, const KCanvasContainer& container, int indent) {
+void write(TextStream& ts, const RenderSVGContainer& container, int indent) {
   writeIndent(ts, indent);
   ts << container.renderName();
 
@@ -328,7 +328,7 @@ void write(QTextStream& ts, const KCanvasContainer& container, int indent) {
     write(ts, *child, indent + 1);
 }
 
-void write(QTextStream& ts, const RenderPath& path, int indent) {
+void write(TextStream& ts, const RenderPath& path, int indent) {
   writeIndent(ts, indent);
   ts << path.renderName();
 
@@ -341,7 +341,7 @@ void write(QTextStream& ts, const RenderPath& path, int indent) {
   ts << path << endl;
 }
 
-void writeRenderResources(QTextStream& ts, Node* parent) {
+void writeRenderResources(TextStream& ts, Node* parent) {
   ASSERT(parent);
   Node* node = parent;
   do {
@@ -367,7 +367,7 @@ void writeRenderResources(QTextStream& ts, Node* parent) {
   } while ((node = node->traverseNextNode(parent)));
 }
 
-QTextStream& operator<<(QTextStream& ts, const DeprecatedStringList& l) {
+TextStream& operator<<(TextStream& ts, const DeprecatedStringList& l) {
   ts << "[";
   DeprecatedStringList::ConstIterator it = l.begin();
   DeprecatedStringList::ConstIterator it_e = l.end();

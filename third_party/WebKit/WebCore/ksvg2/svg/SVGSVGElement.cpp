@@ -41,10 +41,10 @@
 #include "SVGTransform.h"
 #include "SVGZoomEvent.h"
 #include "ksvg.h"
-#include <kcanvas/KCanvasContainer.h>
+#include <kcanvas/RenderSVGContainer.h>
 #include <kcanvas/KCanvasCreator.h>
 #include <kcanvas/device/KRenderingDevice.h>
-#include "KWQTextStream.h"
+#include "TextStream.h"
 
 namespace WebCore {
 
@@ -133,8 +133,8 @@ FloatRect SVGSVGElement::viewport() const {
   double w = width()->baseVal()->value();
   double h = height()->baseVal()->value();
   RefPtr<SVGMatrix> viewBox = viewBoxToViewTransform(w, h);
-  viewBox->qmatrix().map(_x, _y, &_x, &_y);
-  viewBox->qmatrix().map(w, h, &w, &h);
+  viewBox->matrix().map(_x, _y, &_x, &_y);
+  viewBox->matrix().map(w, h, &w, &h);
   return FloatRect(_x, _y, w, h);
 }
 
@@ -249,7 +249,7 @@ void SVGSVGElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     if (SVGFitToViewBox::parseMappedAttribute(attr)) {
       if (renderer())
-        static_cast<KCanvasContainer*>(renderer())
+        static_cast<RenderSVGContainer*>(renderer())
             ->setViewBox(FloatRect(
                 viewBox()->baseVal()->x(), viewBox()->baseVal()->y(),
                 viewBox()->baseVal()->width(), viewBox()->baseVal()->height()));
@@ -375,7 +375,7 @@ SVGMatrix* SVGSVGElement::getScreenCTM() const {
 }
 
 RenderObject* SVGSVGElement::createRenderer(RenderArena* arena, RenderStyle*) {
-  KCanvasContainer* rootContainer = new (arena) KCanvasContainer(this);
+  RenderSVGContainer* rootContainer = new (arena) RenderSVGContainer(this);
 
   // FIXME: all this setup should be done after attributesChanged, not here.
   float _x = x()->baseVal()->value();

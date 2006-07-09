@@ -41,7 +41,7 @@ class SVGHelper {
 
   static void ParseSeperatedList(SVGStringList* list,
                                  const DeprecatedString& data,
-                                 const QChar& delimiter = ',');
+                                 const DeprecatedChar& delimiter = ',');
 };
 
 // Lazy creation, template-based

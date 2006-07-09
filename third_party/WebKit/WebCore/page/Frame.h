@@ -33,14 +33,14 @@
 #include "DeprecatedStringList.h"
 #include "EditAction.h"
 #include "FrameView.h"
-#include "KWQScrollBar.h"
+#include "WebCoreScrollBar.h"
 #include "Node.h"
 #include "TextAffinity.h"
 #include "TextGranularity.h"
 #include <wtf/Vector.h>
 #include "RenderObject.h"
 
-class KHTMLSettings;
+class Settings;
 
 namespace KJS {
 class JSValue;
@@ -472,7 +472,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   bool inViewSourceMode() const;
   void setInViewSourceMode(bool = true) const;
 
-  const KHTMLSettings* settings() const;
+  const Settings* settings() const;
 
   void setJSStatusBarText(const String&);
   void setJSDefaultStatusBarText(const String&);
@@ -522,7 +522,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void applyEditingStyleToElement(Element*) const;
   void removeEditingStyleFromElement(Element*) const;
   virtual void print() = 0;
-  virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
+  virtual bool isCharacterSmartReplaceExempt(const DeprecatedChar&, bool);
 
   // Used to keep the part alive when running a script that might destroy it.
   void keepAlive();
@@ -715,7 +715,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   bool openedByJS();
   void setOpenedByJS(bool _openedByJS);
 
-  void setSettings(KHTMLSettings*);
+  void setSettings(Settings*);
 
   void provisionalLoadStarted();
   bool userGestureHint();
@@ -745,8 +745,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void centerSelectionInVisibleArea() const;
   void setSelectionFromNone();
 
-  bool scrollOverflow(KWQScrollDirection direction,
-                      KWQScrollGranularity granularity);
+  bool scrollOverflow(ScrollDirection direction, ScrollGranularity granularity);
 
   void adjustPageHeight(float* newBottom,
                         float oldTop,

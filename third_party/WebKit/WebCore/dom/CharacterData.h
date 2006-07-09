@@ -70,7 +70,7 @@ class CharacterData : public EventTargetNode {
   virtual bool rendererIsNeeded(RenderStyle*);
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream*, DeprecatedString ind = "") const;
+  virtual void dump(TextStream*, DeprecatedString ind = "") const;
 #endif
 
  protected:

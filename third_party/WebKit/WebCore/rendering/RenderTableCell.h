@@ -105,7 +105,7 @@ class RenderTableCell : public RenderBlock {
   }
 
 #if !NDEBUG
-  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
 #endif
 
   void paintBackgroundsBehindCell(PaintInfo&,

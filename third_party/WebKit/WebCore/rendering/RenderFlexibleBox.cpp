@@ -200,7 +200,7 @@ void RenderFlexibleBox::calcVerticalMinMaxWidth() {
 }
 
 void RenderFlexibleBox::calcMinMaxWidth() {
-  KHTMLAssert(!minMaxKnown());
+  ASSERT(!minMaxKnown());
 
   m_minWidth = 0;
   m_maxWidth = 0;
@@ -239,8 +239,8 @@ void RenderFlexibleBox::calcMinMaxWidth() {
 }
 
 void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
-  KHTMLAssert(needsLayout());
-  KHTMLAssert(minMaxKnown());
+  ASSERT(needsLayout());
+  ASSERT(minMaxKnown());
 
   if (!relayoutChildren && posChildNeedsLayout() && !normalChildNeedsLayout() &&
       !selfNeedsLayout()) {

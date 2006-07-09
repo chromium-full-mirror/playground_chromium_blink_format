@@ -28,7 +28,7 @@
 #include <kcanvas/KCanvasPath.h>
 #include <kcanvas/KCanvasResourceListener.h>
 
-class QTextStream;
+class TextStream;
 
 namespace WebCore {
 
@@ -64,7 +64,7 @@ class KCanvasResource {
   virtual bool isMarker() const { return false; }
   virtual bool isMasker() const { return false; }
 
-  virtual QTextStream& externalRepresentation(QTextStream&) const;
+  virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:
   KCanvasItemList m_clients;
@@ -85,7 +85,7 @@ class KCanvasClipper : public KCanvasResource {
 
   KCClipDataList clipData() const;
 
-  QTextStream& externalRepresentation(QTextStream&) const;
+  TextStream& externalRepresentation(TextStream&) const;
 
  protected:
   KCClipDataList m_clipData;
@@ -104,7 +104,7 @@ class KCanvasMasker : public KCanvasResource {
 
   virtual void applyMask(const FloatRect& boundingBox) const = 0;
 
-  QTextStream& externalRepresentation(QTextStream&) const;
+  TextStream& externalRepresentation(TextStream&) const;
 
  protected:
   KCanvasImage* m_mask;
@@ -141,7 +141,7 @@ class KCanvasMarker : public KCanvasResource {
             double strokeWidth = 1,
             double angle = 0);
 
-  QTextStream& externalRepresentation(QTextStream&) const;
+  TextStream& externalRepresentation(TextStream&) const;
 
  private:
   double m_refX, m_refY;
@@ -157,7 +157,7 @@ KCanvasMasker* getMaskerById(Document* document, const AtomicString& id);
 KRenderingPaintServer* getPaintServerById(Document* document,
                                           const AtomicString& id);
 
-QTextStream& operator<<(QTextStream& ts, const KCanvasResource& r);
+TextStream& operator<<(TextStream& ts, const KCanvasResource& r);
 }
 
 #endif  // SVG_SUPPORT

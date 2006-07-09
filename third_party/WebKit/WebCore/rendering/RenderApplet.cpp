@@ -87,8 +87,8 @@ void RenderApplet::createWidgetIfNecessary() {
 }
 
 void RenderApplet::layout() {
-  KHTMLAssert(needsLayout());
-  KHTMLAssert(minMaxKnown());
+  ASSERT(needsLayout());
+  ASSERT(minMaxKnown());
 
   calcWidth();
   calcHeight();

@@ -41,7 +41,7 @@ typedef void CURL;
 
 // The allocations and releases in TransferJobInternal are
 // Cocoa-exception-free (either simple Foundation classes or
-// KWQResourceLoader which avoids doing work in dealloc).
+// WebCoreResourceLoaderImp which avoids doing work in dealloc).
 
 namespace WebCore {
 
@@ -134,7 +134,7 @@ class TransferJobInternal {
   DeprecatedString responseHeaders;
 
 #if __APPLE__
-  KWQResourceLoader* loader;
+  WebCoreResourceLoaderImp* loader;
   NSURLResponse* response;
 #endif
 #if WIN32

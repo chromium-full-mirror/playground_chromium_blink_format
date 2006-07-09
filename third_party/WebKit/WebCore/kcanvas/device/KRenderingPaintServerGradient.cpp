@@ -27,13 +27,13 @@
 #include "KRenderingPaintServerGradient.h"
 #include "KCanvasMatrix.h"
 
-#include "KWQTextStream.h"
+#include "TextStream.h"
 #include "KCanvasTreeDebug.h"
 
 namespace WebCore {
 
 // KCGradientSpreadMethod
-QTextStream& operator<<(QTextStream& ts, KCGradientSpreadMethod m) {
+TextStream& operator<<(TextStream& ts, KCGradientSpreadMethod m) {
   switch (m) {
     case SPREADMETHOD_PAD:
       ts << "PAD";
@@ -48,7 +48,7 @@ QTextStream& operator<<(QTextStream& ts, KCGradientSpreadMethod m) {
   return ts;
 }
 
-QTextStream& operator<<(QTextStream& ts, const Vector<KCGradientStop>& l) {
+TextStream& operator<<(TextStream& ts, const Vector<KCGradientStop>& l) {
   ts << "[";
   for (Vector<KCGradientStop>::const_iterator it = l.begin(); it != l.end();
        ++it) {
@@ -131,16 +131,16 @@ void KRenderingPaintServerGradient::setGradientTransform(
   d->gradientTransform = mat;
 }
 
-QTextStream& KRenderingPaintServerGradient::externalRepresentation(
-    QTextStream& ts) const {
+TextStream& KRenderingPaintServerGradient::externalRepresentation(
+    TextStream& ts) const {
   // abstract, don't stream type
   ts << "[stops=" << gradientStops() << "]";
   if (spreadMethod() != SPREADMETHOD_PAD)
     ts << "[method=" << spreadMethod() << "]";
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";
-  if (!gradientTransform().qmatrix().isIdentity())
-    ts << " [transform=" << gradientTransform().qmatrix() << "]";
+  if (!gradientTransform().matrix().isIdentity())
+    ts << " [transform=" << gradientTransform().matrix() << "]";
 
   return ts;
 }
@@ -183,8 +183,8 @@ KCPaintServerType KRenderingPaintServerLinearGradient::type() const {
   return PS_LINEAR_GRADIENT;
 }
 
-QTextStream& KRenderingPaintServerLinearGradient::externalRepresentation(
-    QTextStream& ts) const {
+TextStream& KRenderingPaintServerLinearGradient::externalRepresentation(
+    TextStream& ts) const {
   ts << "[type=LINEAR-GRADIENT] ";
   KRenderingPaintServerGradient::externalRepresentation(ts);
   ts << " [start=" << gradientStart() << "]"
@@ -248,8 +248,8 @@ void KRenderingPaintServerGradient::setListener(
   d->listener = listener;
 }
 
-QTextStream& KRenderingPaintServerRadialGradient::externalRepresentation(
-    QTextStream& ts) const {
+TextStream& KRenderingPaintServerRadialGradient::externalRepresentation(
+    TextStream& ts) const {
   ts << "[type=RADIAL-GRADIENT] ";
   KRenderingPaintServerGradient::externalRepresentation(ts);
   ts << " [center=" << gradientCenter() << "]"

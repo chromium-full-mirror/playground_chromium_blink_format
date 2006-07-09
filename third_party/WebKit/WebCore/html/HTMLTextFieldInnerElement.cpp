@@ -30,7 +30,7 @@
 #include "EventNames.h"
 #include "HTMLInputElement.h"
 #include "HTMLTextAreaElement.h"
-#include "RenderTextField.h"
+#include "RenderTextControl.h"
 
 namespace WebCore {
 
@@ -57,7 +57,7 @@ void HTMLTextFieldInnerElement::defaultEventHandler(Event* evt) {
         static_cast<HTMLTextAreaElement*>(shadowParentNode())
             ->defaultEventHandler(evt);
     if (evt->type() == khtmlEditableContentChangedEvent)
-      static_cast<RenderTextField*>(shadowParentNode()->renderer())
+      static_cast<RenderTextControl*>(shadowParentNode()->renderer())
           ->subtreeHasChanged();
   }
   HTMLDivElement::defaultEventHandler(evt);

@@ -105,7 +105,7 @@ class DOMList : public Shared<DOMList<T>> {
   }
 
  private:
-  Q3PtrList<T> m_impl;
+  DeprecatedPtrList<T> m_impl;
 };
 };
 

@@ -845,7 +845,8 @@ DeprecatedString CharacterIterator::string(int numChars) {
   result.reserve(numChars);
   while (numChars > 0 && !atEnd()) {
     int runSize = min(numChars, length());
-    result.append(reinterpret_cast<const QChar*>(characters()), runSize);
+    result.append(reinterpret_cast<const DeprecatedChar*>(characters()),
+                  runSize);
     numChars -= runSize;
     advance(runSize);
   }
@@ -895,7 +896,7 @@ void WordAwareIterator::advance() {
 
   while (1) {
     // If this chunk ends in whitespace we can just use it as our chunk.
-    if (QChar(m_textIterator.characters()[m_textIterator.length() - 1])
+    if (DeprecatedChar(m_textIterator.characters()[m_textIterator.length() - 1])
             .isSpace())
       return;
 
@@ -910,19 +911,20 @@ void WordAwareIterator::advance() {
     // previous stuff
     m_textIterator.advance();
     if (m_textIterator.atEnd() || m_textIterator.length() == 0 ||
-        QChar(m_textIterator.characters()[0]).isSpace()) {
+        DeprecatedChar(m_textIterator.characters()[0]).isSpace()) {
       m_didLookAhead = true;
       return;
     }
 
     if (m_buffer.isEmpty()) {
       // Start gobbling chunks until we get to a suitable stopping point
-      m_buffer.append(reinterpret_cast<const QChar*>(m_previousText),
+      m_buffer.append(reinterpret_cast<const DeprecatedChar*>(m_previousText),
                       m_previousLength);
       m_previousText = 0;
     }
-    m_buffer.append(reinterpret_cast<const QChar*>(m_textIterator.characters()),
-                    m_textIterator.length());
+    m_buffer.append(
+        reinterpret_cast<const DeprecatedChar*>(m_textIterator.characters()),
+        m_textIterator.length());
     int exception = 0;
     m_range->setEnd(m_textIterator.range()->endContainer(exception),
                     m_textIterator.range()->endOffset(exception), exception);
@@ -1115,7 +1117,8 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
 DeprecatedString plainText(const Range* r) {
   DeprecatedString result("");
   for (TextIterator it(r); !it.atEnd(); it.advance())
-    result.append(reinterpret_cast<const QChar*>(it.characters()), it.length());
+    result.append(reinterpret_cast<const DeprecatedChar*>(it.characters()),
+                  it.length());
   return result;
 }
 

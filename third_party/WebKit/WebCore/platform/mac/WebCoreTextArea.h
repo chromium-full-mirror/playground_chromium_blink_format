@@ -26,12 +26,12 @@
 #import <Cocoa/Cocoa.h>
 
 @class WebCoreTextView;
-class QTextEdit;
+class TextBox;
 @protocol WebCoreWidgetHolder;
 
 @interface WebCoreTextArea : NSScrollView<WebCoreWidgetHolder> {
   WebCoreTextView* textView;
-  QTextEdit* widget;
+  TextBox* widget;
   NSFont* _font;
   float _lineHeight;
   BOOL wrap;
@@ -43,7 +43,7 @@ class QTextEdit;
   BOOL normalizeLineEndings;
 }
 
-- initWithQTextEdit:(QTextEdit*)w;
+- initWithQTextEdit:(TextBox*)w;
 - (void)detachQTextEdit;
 
 - (void)setAlignment:(NSTextAlignment)alignment;
@@ -75,7 +75,7 @@ class QTextEdit;
 
 - (NSSize)sizeWithColumns:(int)columns rows:(int)rows;
 
-// paragraph-oriented functions for the benefit of QTextEdit
+// paragraph-oriented functions for the benefit of TextBox
 - (void)setCursorPositionToIndex:(int)index inParagraph:(int)paragraph;
 - (void)getCursorPositionAsIndex:(int*)index inParagraph:(int*)paragraph;
 

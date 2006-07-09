@@ -50,8 +50,10 @@ using namespace WebCore;
 #define REALLOC_CHAR(P, N) (char*)fastRealloc(P, N)
 #define DELETE_CHAR(P) fastFree(P)
 
-#define ALLOC_QCHAR(N) (QChar*)fastMalloc(sizeof(QChar) * (N))
-#define REALLOC_QCHAR(P, N) (QChar*)fastRealloc(P, sizeof(QChar) * (N))
+#define WEBCORE_ALLOCATE_CHARACTERS(N) \
+  (DeprecatedChar*)fastMalloc(sizeof(DeprecatedChar) * (N))
+#define WEBCORE_REALLOCATE_CHARACTERS(P, N) \
+  (DeprecatedChar*)fastRealloc(P, sizeof(DeprecatedChar) * (N))
 #define DELETE_QCHAR(P) fastFree(P)
 
 struct HandleNode;
@@ -68,18 +70,19 @@ static inline void initializeHandleNodes() {
     freeNodeAllocationPages = allocatePageNode();
 }
 
-static inline KWQStringData** allocateHandle() {
+static inline DeprecatedStringData** allocateHandle() {
 #if CHECK_FOR_HANDLE_LEAKS
-  return static_cast<KWQStringData**>(fastMalloc(sizeof(KWQStringData*)));
+  return static_cast<DeprecatedStringData**>(
+      fastMalloc(sizeof(DeprecatedStringData*)));
 #endif
 
   initializeHandleNodes();
 
-  return reinterpret_cast<KWQStringData**>(
+  return reinterpret_cast<DeprecatedStringData**>(
       allocateNode(freeNodeAllocationPages));
 }
 
-static void freeHandle(KWQStringData**);
+static void freeHandle(DeprecatedStringData**);
 
 #define IS_ASCII_QCHAR(c) ((c).unicode() > 0 && (c).unicode() <= 0xff)
 
@@ -87,8 +90,8 @@ static const int caseDelta = ('a' - 'A');
 
 const char* const DeprecatedString::null = 0;
 
-KWQStringData* DeprecatedString::shared_null = 0;
-KWQStringData** DeprecatedString::shared_null_handle = 0;
+DeprecatedStringData* DeprecatedString::shared_null = 0;
+DeprecatedStringData** DeprecatedString::shared_null_handle = 0;
 
 // -------------------------------------------------------------------------
 // Utility functions
@@ -96,8 +99,8 @@ KWQStringData** DeprecatedString::shared_null_handle = 0;
 
 static inline int ucstrcmp(const DeprecatedString& as,
                            const DeprecatedString& bs) {
-  const QChar* a = as.unicode();
-  const QChar* b = bs.unicode();
+  const DeprecatedChar* a = as.unicode();
+  const DeprecatedChar* b = bs.unicode();
   if (a == b)
     return 0;
   if (a == 0)
@@ -112,7 +115,7 @@ static inline int ucstrcmp(const DeprecatedString& as,
   return a->unicode() - b->unicode();
 }
 
-static bool equal(const QChar* a, const char* b, int l) {
+static bool equal(const DeprecatedChar* a, const char* b, int l) {
   ASSERT(l >= 0);
   while (l--) {
     if (*a != *b)
@@ -136,7 +139,9 @@ static bool equalCaseInsensitive(const char* a, const char* b, int l) {
   return true;
 }
 
-static bool equalCaseInsensitive(const QChar* a, const char* b, int l) {
+static bool equalCaseInsensitive(const DeprecatedChar* a,
+                                 const char* b,
+                                 int l) {
   ASSERT(l >= 0);
   while (l--) {
     if (tolower(a->unicode()) != tolower(*b))
@@ -147,7 +152,9 @@ static bool equalCaseInsensitive(const QChar* a, const char* b, int l) {
   return true;
 }
 
-static bool equalCaseInsensitive(const QChar* a, const QChar* b, int l) {
+static bool equalCaseInsensitive(const DeprecatedChar* a,
+                                 const DeprecatedChar* b,
+                                 int l) {
   ASSERT(l >= 0);
   while (l--) {
     if (tolower(a->unicode()) != tolower(b->unicode()))
@@ -162,11 +169,11 @@ static inline bool equalCaseInsensitive(char c1, char c2) {
   return tolower(c1) == tolower(c2);
 }
 
-static inline bool equalCaseInsensitive(QChar c1, char c2) {
+static inline bool equalCaseInsensitive(DeprecatedChar c1, char c2) {
   return tolower(c1.unicode()) == tolower(static_cast<unsigned char>(c2));
 }
 
-static bool ok_in_base(QChar c, int base) {
+static bool ok_in_base(DeprecatedChar c, int base) {
   int uc = c.unicode();
   if (isdigit(uc))
     return uc - '0' < base;
@@ -180,42 +187,44 @@ static bool ok_in_base(QChar c, int base) {
 }
 
 // -------------------------------------------------------------------------
-// KWQStringData
+// DeprecatedStringData
 // -------------------------------------------------------------------------
 
 // FIXME, make constructor explicity take a 'copy' flag.
 // This can be used to hand off ownership of allocated data when detaching and
 // deleting QStrings.
 
-KWQStringData::KWQStringData()
+DeprecatedStringData::DeprecatedStringData()
     : refCount(1),
       _length(0),
       _unicode(0),
       _ascii(0),
-      _maxUnicode(QS_INTERNAL_BUFFER_UCHARS),
+      _maxUnicode(WEBCORE_DS_INTERNAL_BUFFER_UCHARS),
       _isUnicodeValid(0),
       _isHeapAllocated(0),
-      _maxAscii(QS_INTERNAL_BUFFER_CHARS),
+      _maxAscii(WEBCORE_DS_INTERNAL_BUFFER_CHARS),
       _isAsciiValid(1) {
   _ascii = _internalBuffer;
   _internalBuffer[0] = 0;
 }
 
-void KWQStringData::initialize() {
+void DeprecatedStringData::initialize() {
   refCount = 1;
   _length = 0;
   _unicode = 0;
   _ascii = _internalBuffer;
-  _maxUnicode = QS_INTERNAL_BUFFER_UCHARS;
+  _maxUnicode = WEBCORE_DS_INTERNAL_BUFFER_UCHARS;
   _isUnicodeValid = 0;
-  _maxAscii = QS_INTERNAL_BUFFER_CHARS;
+  _maxAscii = WEBCORE_DS_INTERNAL_BUFFER_CHARS;
   _isAsciiValid = 1;
   _internalBuffer[0] = 0;
   _isHeapAllocated = 0;
 }
 
 // Don't copy data.
-KWQStringData::KWQStringData(QChar* u, unsigned l, unsigned m)
+DeprecatedStringData::DeprecatedStringData(DeprecatedChar* u,
+                                           unsigned l,
+                                           unsigned m)
     : refCount(1),
       _length(l),
       _unicode(u),
@@ -223,13 +232,15 @@ KWQStringData::KWQStringData(QChar* u, unsigned l, unsigned m)
       _maxUnicode(m),
       _isUnicodeValid(1),
       _isHeapAllocated(0),
-      _maxAscii(QS_INTERNAL_BUFFER_CHARS),
+      _maxAscii(WEBCORE_DS_INTERNAL_BUFFER_CHARS),
       _isAsciiValid(0) {
   ASSERT(m >= l);
 }
 
 // Don't copy data.
-void KWQStringData::initialize(QChar* u, unsigned l, unsigned m) {
+void DeprecatedStringData::initialize(DeprecatedChar* u,
+                                      unsigned l,
+                                      unsigned m) {
   ASSERT(m >= l);
   refCount = 1;
   _length = l;
@@ -243,12 +254,13 @@ void KWQStringData::initialize(QChar* u, unsigned l, unsigned m) {
 }
 
 // Copy data
-KWQStringData::KWQStringData(const QChar* u, unsigned l) {
+DeprecatedStringData::DeprecatedStringData(const DeprecatedChar* u,
+                                           unsigned l) {
   initialize(u, l);
 }
 
 // Copy data
-void KWQStringData::initialize(const QChar* u, unsigned l) {
+void DeprecatedStringData::initialize(const DeprecatedChar* u, unsigned l) {
   refCount = 1;
   _length = l;
   _ascii = 0;
@@ -257,25 +269,25 @@ void KWQStringData::initialize(const QChar* u, unsigned l) {
   _isAsciiValid = 0;
   _isHeapAllocated = 0;
 
-  if (l > QS_INTERNAL_BUFFER_UCHARS) {
+  if (l > WEBCORE_DS_INTERNAL_BUFFER_UCHARS) {
     _maxUnicode = ALLOC_QCHAR_GOOD_SIZE(l);
-    _unicode = ALLOC_QCHAR(_maxUnicode);
-    memcpy(_unicode, u, l * sizeof(QChar));
+    _unicode = WEBCORE_ALLOCATE_CHARACTERS(_maxUnicode);
+    memcpy(_unicode, u, l * sizeof(DeprecatedChar));
   } else {
-    _maxUnicode = QS_INTERNAL_BUFFER_UCHARS;
-    _unicode = (QChar*)_internalBuffer;
+    _maxUnicode = WEBCORE_DS_INTERNAL_BUFFER_UCHARS;
+    _unicode = (DeprecatedChar*)_internalBuffer;
     if (l)
-      memcpy(_internalBuffer, u, l * sizeof(QChar));
+      memcpy(_internalBuffer, u, l * sizeof(DeprecatedChar));
   }
 }
 
 // Copy data
-KWQStringData::KWQStringData(const char* a, unsigned l) {
+DeprecatedStringData::DeprecatedStringData(const char* a, unsigned l) {
   initialize(a, l);
 }
 
 // Copy data
-void KWQStringData::initialize(const char* a, unsigned l) {
+void DeprecatedStringData::initialize(const char* a, unsigned l) {
   refCount = 1;
   _length = l;
   _unicode = 0;
@@ -284,14 +296,14 @@ void KWQStringData::initialize(const char* a, unsigned l) {
   _isAsciiValid = 1;
   _isHeapAllocated = 0;
 
-  if (l > QS_INTERNAL_BUFFER_CHARS) {
+  if (l > WEBCORE_DS_INTERNAL_BUFFER_CHARS) {
     _maxAscii = ALLOC_CHAR_GOOD_SIZE(l + 1);
     _ascii = ALLOC_CHAR(_maxAscii);
     if (a)
       memcpy(_ascii, a, l);
     _ascii[l] = 0;
   } else {
-    _maxAscii = QS_INTERNAL_BUFFER_CHARS;
+    _maxAscii = WEBCORE_DS_INTERNAL_BUFFER_CHARS;
     _ascii = _internalBuffer;
     if (a)
       memcpy(_internalBuffer, a, l);
@@ -299,7 +311,7 @@ void KWQStringData::initialize(const char* a, unsigned l) {
   }
 }
 
-KWQStringData::KWQStringData(KWQStringData& o)
+DeprecatedStringData::DeprecatedStringData(DeprecatedStringData& o)
     : refCount(1),
       _length(o._length),
       _unicode(o._unicode),
@@ -312,19 +324,20 @@ KWQStringData::KWQStringData(KWQStringData& o)
   // Handle the case where either the Unicode or 8-bit pointer was
   // pointing to the internal buffer. We need to point at the
   // internal buffer in the new object, and copy the characters.
-  if (_unicode == reinterpret_cast<QChar*>(o._internalBuffer)) {
+  if (_unicode == reinterpret_cast<DeprecatedChar*>(o._internalBuffer)) {
     if (_isUnicodeValid) {
       ASSERT(!_isAsciiValid || _ascii != o._internalBuffer);
-      ASSERT(_length <= QS_INTERNAL_BUFFER_UCHARS);
-      memcpy(_internalBuffer, o._internalBuffer, _length * sizeof(QChar));
-      _unicode = reinterpret_cast<QChar*>(_internalBuffer);
+      ASSERT(_length <= WEBCORE_DS_INTERNAL_BUFFER_UCHARS);
+      memcpy(_internalBuffer, o._internalBuffer,
+             _length * sizeof(DeprecatedChar));
+      _unicode = reinterpret_cast<DeprecatedChar*>(_internalBuffer);
     } else {
       _unicode = 0;
     }
   }
   if (_ascii == o._internalBuffer) {
     if (_isAsciiValid) {
-      ASSERT(_length <= QS_INTERNAL_BUFFER_CHARS);
+      ASSERT(_length <= WEBCORE_DS_INTERNAL_BUFFER_CHARS);
       memcpy(_internalBuffer, o._internalBuffer, _length);
       _internalBuffer[_length] = 0;
       _ascii = _internalBuffer;
@@ -333,27 +346,29 @@ KWQStringData::KWQStringData(KWQStringData& o)
     }
   }
 
-  // Clean up the other KWQStringData just enough so that it can be destroyed
+  // Clean up the other DeprecatedStringData just enough so that it can be
+  // destroyed
   // cleanly. It's not in a good enough state to use, but that's OK. It just
-  // needs to be in a state where ~KWQStringData won't do anything harmful,
+  // needs to be in a state where ~DeprecatedStringData won't do anything
+  // harmful,
   // and setting these to 0 will do that (preventing any double-free problems).
   o._unicode = 0;
   o._ascii = 0;
 }
 
-KWQStringData* DeprecatedString::makeSharedNull() {
+DeprecatedStringData* DeprecatedString::makeSharedNull() {
   if (!shared_null) {
-    shared_null = new KWQStringData;
+    shared_null = new DeprecatedStringData;
     shared_null->ref();
     shared_null->_maxAscii = 0;
     shared_null->_maxUnicode = 0;
-    shared_null->_unicode = (QChar*)&shared_null->_internalBuffer[0];
+    shared_null->_unicode = (DeprecatedChar*)&shared_null->_internalBuffer[0];
     shared_null->_isUnicodeValid = 1;
   }
   return shared_null;
 }
 
-KWQStringData** DeprecatedString::makeSharedNullHandle() {
+DeprecatedStringData** DeprecatedString::makeSharedNullHandle() {
   if (!shared_null_handle) {
     shared_null_handle = allocateHandle();
     *shared_null_handle = makeSharedNull();
@@ -361,7 +376,7 @@ KWQStringData** DeprecatedString::makeSharedNullHandle() {
   return shared_null_handle;
 }
 
-KWQStringData::~KWQStringData() {
+DeprecatedStringData::~DeprecatedStringData() {
   ASSERT(refCount == 0);
   if (_unicode && !isUnicodeInternal())
     DELETE_QCHAR(_unicode);
@@ -369,7 +384,7 @@ KWQStringData::~KWQStringData() {
     DELETE_CHAR(_ascii);
 }
 
-void KWQStringData::increaseAsciiSize(unsigned size) {
+void DeprecatedStringData::increaseAsciiSize(unsigned size) {
   ASSERT(this != DeprecatedString::shared_null);
 
   unsigned newSize = (unsigned)ALLOC_CHAR_GOOD_SIZE((size * 3 + 1) / 2);
@@ -392,7 +407,7 @@ void KWQStringData::increaseAsciiSize(unsigned size) {
   _isUnicodeValid = 0;
 }
 
-void KWQStringData::increaseUnicodeSize(unsigned size) {
+void DeprecatedStringData::increaseUnicodeSize(unsigned size) {
   ASSERT(size > _length);
   ASSERT(this != DeprecatedString::shared_null);
 
@@ -403,12 +418,12 @@ void KWQStringData::increaseUnicodeSize(unsigned size) {
   ASSERT(_isUnicodeValid);
 
   if (isUnicodeInternal()) {
-    QChar* newUni = ALLOC_QCHAR(newSize);
+    DeprecatedChar* newUni = WEBCORE_ALLOCATE_CHARACTERS(newSize);
     if (_length)
-      memcpy(newUni, _unicode, _length * sizeof(QChar));
+      memcpy(newUni, _unicode, _length * sizeof(DeprecatedChar));
     _unicode = newUni;
   } else {
-    _unicode = REALLOC_QCHAR(_unicode, newSize);
+    _unicode = WEBCORE_REALLOCATE_CHARACTERS(_unicode, newSize);
   }
 
   _maxUnicode = newSize;
@@ -416,20 +431,20 @@ void KWQStringData::increaseUnicodeSize(unsigned size) {
   _isAsciiValid = 0;
 }
 
-char* KWQStringData::makeAscii() {
+char* DeprecatedStringData::makeAscii() {
   ASSERT(this != DeprecatedString::shared_null);
 
   if (_isUnicodeValid) {
-    QChar copyBuf[QS_INTERNAL_BUFFER_CHARS];
-    QChar* str;
+    DeprecatedChar copyBuf[WEBCORE_DS_INTERNAL_BUFFER_CHARS];
+    DeprecatedChar* str;
 
     if (_ascii && !isAsciiInternal())
       DELETE_QCHAR(_ascii);
 
-    if (_length < QS_INTERNAL_BUFFER_CHARS) {
+    if (_length < WEBCORE_DS_INTERNAL_BUFFER_CHARS) {
       if (isUnicodeInternal()) {
         unsigned i = _length;
-        QChar *tp = &copyBuf[0], *fp = _unicode;
+        DeprecatedChar *tp = &copyBuf[0], *fp = _unicode;
         while (i--)
           *tp++ = *fp++;
         str = &copyBuf[0];
@@ -437,7 +452,7 @@ char* KWQStringData::makeAscii() {
       } else
         str = _unicode;
       _ascii = _internalBuffer;
-      _maxAscii = QS_INTERNAL_BUFFER_CHARS;
+      _maxAscii = WEBCORE_DS_INTERNAL_BUFFER_CHARS;
     } else {
       unsigned newSize = ALLOC_CHAR_GOOD_SIZE(_length + 1);
       _ascii = ALLOC_CHAR(newSize);
@@ -458,17 +473,17 @@ char* KWQStringData::makeAscii() {
   return _ascii;
 }
 
-QChar* KWQStringData::makeUnicode() {
+DeprecatedChar* DeprecatedStringData::makeUnicode() {
   ASSERT(this != DeprecatedString::shared_null);
 
   if (_isAsciiValid) {
-    char copyBuf[QS_INTERNAL_BUFFER_CHARS];
+    char copyBuf[WEBCORE_DS_INTERNAL_BUFFER_CHARS];
     char* str;
 
     if (_unicode && !isUnicodeInternal())
       DELETE_QCHAR(_unicode);
 
-    if (_length <= QS_INTERNAL_BUFFER_UCHARS) {
+    if (_length <= WEBCORE_DS_INTERNAL_BUFFER_UCHARS) {
       if (isAsciiInternal()) {
         unsigned i = _length;
         char *tp = &copyBuf[0], *fp = _ascii;
@@ -478,16 +493,16 @@ QChar* KWQStringData::makeUnicode() {
         _isAsciiValid = 0;
       } else
         str = _ascii;
-      _unicode = (QChar*)_internalBuffer;
-      _maxUnicode = QS_INTERNAL_BUFFER_UCHARS;
+      _unicode = (DeprecatedChar*)_internalBuffer;
+      _maxUnicode = WEBCORE_DS_INTERNAL_BUFFER_UCHARS;
     } else {
       unsigned newSize = ALLOC_QCHAR_GOOD_SIZE(_length);
-      _unicode = ALLOC_QCHAR(newSize);
+      _unicode = WEBCORE_ALLOCATE_CHARACTERS(newSize);
       _maxUnicode = newSize;
       str = _ascii;
     }
     unsigned i = _length;
-    QChar* cp = _unicode;
+    DeprecatedChar* cp = _unicode;
     while (i--)
       *cp++ = *str++;
 
@@ -533,9 +548,9 @@ DeprecatedString DeprecatedString::number(double n) {
 }
 
 inline void DeprecatedString::detachIfInternal() {
-  KWQStringData* oldData = *dataHandle;
+  DeprecatedStringData* oldData = *dataHandle;
   if (oldData->refCount > 1 && oldData == &internalData) {
-    KWQStringData* newData = new KWQStringData(*oldData);
+    DeprecatedStringData* newData = new DeprecatedStringData(*oldData);
     newData->_isHeapAllocated = 1;
     newData->refCount = oldData->refCount;
     oldData->refCount = 1;
@@ -544,7 +559,7 @@ inline void DeprecatedString::detachIfInternal() {
   }
 }
 
-const QChar* DeprecatedString::stableUnicode() {
+const DeprecatedChar* DeprecatedString::stableUnicode() {
   // if we're using the internal data of another string, detach now
   if (!dataHandle[0]->_isHeapAllocated && *dataHandle != &internalData) {
     detach();
@@ -566,7 +581,8 @@ DeprecatedString::~DeprecatedString() {
   detachIfInternal();
 
   // Remove our reference. This should always be the last reference
-  // if *dataHandle points to our internal KWQStringData. If we just detached,
+  // if *dataHandle points to our internal DeprecatedStringData. If we just
+  // detached,
   // this will remove the extra ref from the new handle.
   dataHandle[0]->deref();
 
@@ -586,20 +602,21 @@ DeprecatedString::DeprecatedString() {
   dataHandle[0]->ref();
 }
 
-// Careful, just used by QConstString
-DeprecatedString::DeprecatedString(KWQStringData* constData, bool /*dummy*/) {
+// Careful, just used by DeprecatedConstString
+DeprecatedString::DeprecatedString(DeprecatedStringData* constData,
+                                   bool /*dummy*/) {
   internalData.deref();
   dataHandle = allocateHandle();
   *dataHandle = constData;
 
-  // The QConstString constructor allocated the KWQStringData.
+  // The DeprecatedConstString constructor allocated the DeprecatedStringData.
   constData->_isHeapAllocated = 1;
 }
 
-DeprecatedString::DeprecatedString(QChar qc) {
+DeprecatedString::DeprecatedString(DeprecatedChar qc) {
   dataHandle = allocateHandle();
 
-  // Copy the QChar.
+  // Copy the DeprecatedChar.
   if (IS_ASCII_QCHAR(qc)) {
     char c = qc.unicode();
     *dataHandle = &internalData;
@@ -610,7 +627,8 @@ DeprecatedString::DeprecatedString(QChar qc) {
   }
 }
 
-DeprecatedString::DeprecatedString(const QChar* unicode, unsigned length) {
+DeprecatedString::DeprecatedString(const DeprecatedChar* unicode,
+                                   unsigned length) {
   if (!unicode && !length) {
     internalData.deref();
     dataHandle = makeSharedNullHandle();
@@ -618,7 +636,7 @@ DeprecatedString::DeprecatedString(const QChar* unicode, unsigned length) {
   } else {
     dataHandle = allocateHandle();
 
-    // Copy the QChar *
+    // Copy the DeprecatedChar *
     *dataHandle = &internalData;
     internalData.initialize(unicode, length);
   }
@@ -676,16 +694,16 @@ DeprecatedString& DeprecatedString::operator=(const char* chs) {
   return setLatin1(chs);
 }
 
-DeprecatedString& DeprecatedString::operator=(QChar qc) {
+DeprecatedString& DeprecatedString::operator=(DeprecatedChar qc) {
   return *this = DeprecatedString(qc);
 }
 
 DeprecatedString& DeprecatedString::operator=(char ch) {
-  return *this = DeprecatedString(QChar(ch));
+  return *this = DeprecatedString(DeprecatedChar(ch));
 }
 
-QChar DeprecatedString::at(unsigned i) const {
-  KWQStringData* thisData = *dataHandle;
+DeprecatedChar DeprecatedString::at(unsigned i) const {
+  DeprecatedStringData* thisData = *dataHandle;
 
   if (i >= thisData->_length)
     return 0;
@@ -707,16 +725,16 @@ int DeprecatedString::compare(const DeprecatedString& s) const {
 int DeprecatedString::compare(const char* chs) const {
   if (!chs)
     return isEmpty() ? 0 : 1;
-  KWQStringData* d = dataHandle[0];
+  DeprecatedStringData* d = dataHandle[0];
   if (d->_isAsciiValid)
     return strcmp(ascii(), chs);
-  const QChar* s = unicode();
+  const DeprecatedChar* s = unicode();
   unsigned len = d->_length;
   for (unsigned i = 0; i != len; ++i) {
     char c2 = chs[i];
     if (!c2)
       return 1;
-    QChar c1 = s[i];
+    DeprecatedChar c1 = s[i];
     if (c1.unicode() < c2)
       return -1;
     if (c1.unicode() > c2)
@@ -734,7 +752,7 @@ bool DeprecatedString::startsWith(const DeprecatedString& s) const {
         return false;
     }
   } else if (dataHandle[0]->_isUnicodeValid) {
-    const QChar* uni = unicode();
+    const DeprecatedChar* uni = unicode();
 
     for (int i = 0; i < (int)s.dataHandle[0]->_length; i++) {
       if (i >= (int)dataHandle[0]->_length || uni[i] != s[i])
@@ -747,7 +765,7 @@ bool DeprecatedString::startsWith(const DeprecatedString& s) const {
 }
 
 bool DeprecatedString::startsWith(const char* prefix) const {
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   unsigned prefixLength = strlen(prefix);
   if (data->_isAsciiValid) {
@@ -757,7 +775,7 @@ bool DeprecatedString::startsWith(const char* prefix) const {
     if (prefixLength > data->_length) {
       return false;
     }
-    const QChar* uni = data->_unicode;
+    const DeprecatedChar* uni = data->_unicode;
     for (unsigned i = 0; i < prefixLength; ++i) {
       if (uni[i] != prefix[i]) {
         return false;
@@ -781,7 +799,7 @@ bool DeprecatedString::startsWith(const char* prefix,
     return startsWith(prefix);
   }
 
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   unsigned prefixLength = strlen(prefix);
   if (data->_isAsciiValid) {
@@ -791,7 +809,7 @@ bool DeprecatedString::startsWith(const char* prefix,
     if (prefixLength > data->_length) {
       return false;
     }
-    const QChar* uni = data->_unicode;
+    const DeprecatedChar* uni = data->_unicode;
     for (unsigned i = 0; i < prefixLength; ++i) {
       if (!equalCaseInsensitive(uni[i], prefix[i])) {
         return false;
@@ -802,7 +820,7 @@ bool DeprecatedString::startsWith(const char* prefix,
 }
 
 bool DeprecatedString::endsWith(const DeprecatedString& s) const {
-  const QChar* uni = unicode();
+  const DeprecatedChar* uni = unicode();
 
   int length = dataHandle[0]->_length;
   int slength = s.dataHandle[0]->_length;
@@ -821,7 +839,7 @@ bool DeprecatedString::isNull() const {
   return dataHandle == shared_null_handle;
 }
 
-int DeprecatedString::find(QChar qc, int index) const {
+int DeprecatedString::find(DeprecatedChar qc, int index) const {
   if (dataHandle[0]->_isAsciiValid) {
     if (!IS_ASCII_QCHAR(qc))
       return -1;
@@ -844,7 +862,7 @@ int DeprecatedString::find(char ch, int index) const {
       if (cp[i] == ch)
         return i;
   } else if (dataHandle[0]->_isUnicodeValid)
-    return find(QChar(ch), index, true);
+    return find(DeprecatedChar(ch), index, true);
   else
     FATAL("invalid character cache");
 
@@ -874,8 +892,8 @@ int DeprecatedString::find(const DeprecatedString& str,
   if (delta < 0)
     return -1;
 
-  const QChar* uthis = unicode() + index;
-  const QChar* ustr = str.unicode();
+  const DeprecatedChar* uthis = unicode() + index;
+  const DeprecatedChar* ustr = str.unicode();
   unsigned hthis = 0;
   unsigned hstr = 0;
   int i;
@@ -886,7 +904,8 @@ int DeprecatedString::find(const DeprecatedString& str,
     }
     i = 0;
     while (true) {
-      if (hthis == hstr && memcmp(uthis + i, ustr, lstr * sizeof(QChar)) == 0)
+      if (hthis == hstr &&
+          memcmp(uthis + i, ustr, lstr * sizeof(DeprecatedChar)) == 0)
         return index + i;
       if (i == delta)
         return -1;
@@ -922,7 +941,7 @@ int DeprecatedString::find(const char* chs,
   if (!chs || index < 0)
     return -1;
 
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   int chsLength = strlen(chs);
   int n = data->_length - index;
@@ -957,9 +976,9 @@ int DeprecatedString::find(const char* chs,
   } else {
     ASSERT(data->_isUnicodeValid);
 
-    const QChar* ptr = data->_unicode + index - 1;
+    const DeprecatedChar* ptr = data->_unicode + index - 1;
     if (caseSensitive) {
-      QChar c = *chs;
+      DeprecatedChar c = *chs;
       do {
         if (*++ptr == c && equal(ptr + 1, chsPlusOne, chsLengthMinusOne)) {
           return data->_length - chsLength - n + 1;
@@ -999,7 +1018,7 @@ int DeprecatedString::findRev(char ch, int index) const {
         return i;
     }
   } else if (dataHandle[0]->_isUnicodeValid)
-    return findRev(DeprecatedString(QChar(ch)), index);
+    return findRev(DeprecatedString(DeprecatedChar(ch)), index);
   else
     FATAL("invalid character cache");
 
@@ -1028,8 +1047,8 @@ int DeprecatedString::findRev(const DeprecatedString& str,
   if (index > delta)
     index = delta;
 
-  const QChar* uthis = unicode();
-  const QChar* ustr = str.unicode();
+  const DeprecatedChar* uthis = unicode();
+  const DeprecatedChar* ustr = str.unicode();
   unsigned hthis = 0;
   unsigned hstr = 0;
   int i;
@@ -1040,7 +1059,8 @@ int DeprecatedString::findRev(const DeprecatedString& str,
     }
     i = index;
     while (true) {
-      if (hthis == hstr && memcmp(uthis + i, ustr, lstr * sizeof(QChar)) == 0)
+      if (hthis == hstr &&
+          memcmp(uthis + i, ustr, lstr * sizeof(DeprecatedChar)) == 0)
         return i;
       if (i == 0)
         return -1;
@@ -1069,10 +1089,10 @@ int DeprecatedString::findRev(const DeprecatedString& str,
   return -1;
 }
 
-int DeprecatedString::contains(QChar c, bool cs) const {
+int DeprecatedString::contains(DeprecatedChar c, bool cs) const {
   int count = 0;
 
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   if (data->_isAsciiValid) {
     if (!IS_ASCII_QCHAR(c))
@@ -1091,7 +1111,7 @@ int DeprecatedString::contains(QChar c, bool cs) const {
     }
   } else {
     ASSERT(data->_isUnicodeValid);
-    const QChar* uc = data->_unicode;
+    const DeprecatedChar* uc = data->_unicode;
     int n = data->_length;
     if (cs) {  // case sensitive
       while (n--)
@@ -1109,7 +1129,7 @@ int DeprecatedString::contains(QChar c, bool cs) const {
 }
 
 int DeprecatedString::contains(char ch) const {
-  return contains(QChar(ch), true);
+  return contains(DeprecatedChar(ch), true);
 }
 
 int DeprecatedString::contains(const char* str, bool caseSensitive) const {
@@ -1119,7 +1139,7 @@ int DeprecatedString::contains(const char* str, bool caseSensitive) const {
   int len = strlen(str);
   char c = *str;
 
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
   int n = data->_length;
 
   n -= len - 1;
@@ -1145,7 +1165,7 @@ int DeprecatedString::contains(const char* str, bool caseSensitive) const {
     }
   } else {
     ASSERT(data->_isUnicodeValid);
-    const QChar* p = data->_unicode;
+    const DeprecatedChar* p = data->_unicode;
     if (caseSensitive) {
       do {
         count += *p == c && equal(p + 1, str + 1, len - 1);
@@ -1169,11 +1189,11 @@ int DeprecatedString::contains(const DeprecatedString& str,
   if (str.isEmpty())
     return 0;
 
-  const QChar* strP = str.unicode();
+  const DeprecatedChar* strP = str.unicode();
   int len = str.dataHandle[0]->_length;
-  QChar c = *strP;
+  DeprecatedChar c = *strP;
 
-  const QChar* p = unicode();
+  const DeprecatedChar* p = unicode();
   int n = dataHandle[0]->_length;
 
   n -= len - 1;
@@ -1183,7 +1203,7 @@ int DeprecatedString::contains(const DeprecatedString& str,
   int count = 0;
 
   if (caseSensitive) {
-    int byteCount = len * sizeof(QChar);
+    int byteCount = len * sizeof(DeprecatedChar);
     do {
       count += *p == c && memcmp(p, strP, byteCount) == 0;
       ++p;
@@ -1199,7 +1219,7 @@ int DeprecatedString::contains(const DeprecatedString& str,
 }
 
 bool DeprecatedString::isAllASCII() const {
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   int n = data->_length;
   if (data->_isAsciiValid) {
@@ -1212,7 +1232,7 @@ bool DeprecatedString::isAllASCII() const {
     }
   } else {
     ASSERT(data->_isUnicodeValid);
-    const QChar* p = data->_unicode;
+    const DeprecatedChar* p = data->_unicode;
     while (n--) {
       if ((*p++).unicode() > 0x7F) {
         return false;
@@ -1224,7 +1244,7 @@ bool DeprecatedString::isAllASCII() const {
 }
 
 bool DeprecatedString::isAllLatin1() const {
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   if (data->_isAsciiValid) {
     return true;
@@ -1232,7 +1252,7 @@ bool DeprecatedString::isAllLatin1() const {
 
   ASSERT(data->_isUnicodeValid);
   int n = data->_length;
-  const QChar* p = data->_unicode;
+  const DeprecatedChar* p = data->_unicode;
   while (n--) {
     if ((*p++).unicode() > 0xFF) {
       return false;
@@ -1243,14 +1263,14 @@ bool DeprecatedString::isAllLatin1() const {
 }
 
 bool DeprecatedString::hasFastLatin1() const {
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
   return data->_isAsciiValid;
 }
 
 void DeprecatedString::copyLatin1(char* buffer,
                                   unsigned position,
                                   unsigned maxLength) const {
-  KWQStringData* data = *dataHandle;
+  DeprecatedStringData* data = *dataHandle;
 
   int length = data->_length;
   if (position > static_cast<unsigned>(length))
@@ -1268,7 +1288,7 @@ void DeprecatedString::copyLatin1(char* buffer,
   }
 
   ASSERT(data->_isUnicodeValid);
-  const QChar* uc = data->_unicode + position;
+  const DeprecatedChar* uc = data->_unicode + position;
   while (length--)
     *buffer++ = (*uc++).latin1();
 }
@@ -1296,7 +1316,7 @@ unsigned short DeprecatedString::toUShort(bool* ok, int base) const {
 }
 
 int DeprecatedString::toInt(bool* ok, int base) const {
-  const QChar* p = unicode();
+  const DeprecatedChar* p = unicode();
   int val = 0;
   int l = dataHandle[0]->_length;
   const int max_mult = INT_MAX / base;
@@ -1348,7 +1368,7 @@ bye:
 }
 
 unsigned DeprecatedString::toUInt(bool* ok, int base) const {
-  const QChar* p = unicode();
+  const DeprecatedChar* p = unicode();
   unsigned val = 0;
   int l = dataHandle[0]->_length;
   const unsigned max_mult = UINT_MAX / base;
@@ -1415,7 +1435,7 @@ DeprecatedString DeprecatedString::right(unsigned len) const {
 
 DeprecatedString DeprecatedString::mid(unsigned start, unsigned len) const {
   if (dataHandle && *dataHandle) {
-    KWQStringData& data = **dataHandle;
+    DeprecatedStringData& data = **dataHandle;
 
     // clip length
     if (start >= data._length)
@@ -1453,7 +1473,7 @@ DeprecatedString DeprecatedString::copy() const {
 
 DeprecatedString DeprecatedString::lower() const {
   DeprecatedString s(*this);
-  KWQStringData* d = *s.dataHandle;
+  DeprecatedStringData* d = *s.dataHandle;
   int l = d->_length;
   if (l) {
     bool detached = false;
@@ -1475,9 +1495,9 @@ DeprecatedString DeprecatedString::lower() const {
       }
     } else {
       ASSERT(d->_isUnicodeValid);
-      QChar* p = d->_unicode;
+      DeprecatedChar* p = d->_unicode;
       while (l--) {
-        QChar c = *p;
+        DeprecatedChar c = *p;
         // FIXME: Doesn't work for 0x80-0xFF.
         if (IS_ASCII_QCHAR(c)) {
           if (c.unicode() >= 'A' && c.unicode() <= 'Z') {
@@ -1490,7 +1510,7 @@ DeprecatedString DeprecatedString::lower() const {
             *p = c.unicode() + ('a' - 'A');
           }
         } else {
-          QChar clower = c.lower();
+          DeprecatedChar clower = c.lower();
           if (clower != c) {
             if (!detached) {
               s.detach();
@@ -1535,7 +1555,8 @@ DeprecatedString DeprecatedString::stripWhiteSpace() const {
   } else if (dataHandle[0]->_isUnicodeValid) {
     result.setLength(l);
     if (l)
-      memcpy(result.forceUnicode(), &unicode()[start], sizeof(QChar) * l);
+      memcpy(result.forceUnicode(), &unicode()[start],
+             sizeof(DeprecatedChar) * l);
   } else
     FATAL("invalid character cache");
   return result;
@@ -1555,9 +1576,9 @@ DeprecatedString DeprecatedString::simplifyWhiteSpace() const {
 
     char* to = const_cast<char*>(result.ascii());
     while (true) {
-      while (from != fromend && QChar(*from).isSpace())
+      while (from != fromend && DeprecatedChar(*from).isSpace())
         from++;
-      while (from != fromend && !QChar(*from).isSpace())
+      while (from != fromend && !DeprecatedChar(*from).isSpace())
         to[outc++] = *from++;
       if (from != fromend)
         to[outc++] = ' ';
@@ -1569,11 +1590,11 @@ DeprecatedString DeprecatedString::simplifyWhiteSpace() const {
     result.truncate(outc);
   } else if (dataHandle[0]->_isUnicodeValid) {
     result.setLength(dataHandle[0]->_length);
-    const QChar* from = unicode();
-    const QChar* fromend = from + dataHandle[0]->_length;
+    const DeprecatedChar* from = unicode();
+    const DeprecatedChar* fromend = from + dataHandle[0]->_length;
     int outc = 0;
 
-    QChar* to = result.forceUnicode();
+    DeprecatedChar* to = result.forceUnicode();
     while (true) {
       while (from != fromend && from->isSpace())
         from++;
@@ -1597,7 +1618,8 @@ void DeprecatedString::deref() {
   dataHandle[0]->deref();
 }
 
-DeprecatedString& DeprecatedString::setUnicode(const QChar* uni, unsigned len) {
+DeprecatedString& DeprecatedString::setUnicode(const DeprecatedChar* uni,
+                                               unsigned len) {
   detachAndDiscardCharacters();
 
   // Free our handle if it isn't the shared null handle, and if no-one else is
@@ -1617,11 +1639,11 @@ DeprecatedString& DeprecatedString::setUnicode(const QChar* uni, unsigned len) {
     if (needToFreeHandle)
       freeHandle(dataHandle);
     dataHandle = allocateHandle();
-    *dataHandle = new KWQStringData(uni, len);
+    *dataHandle = new DeprecatedStringData(uni, len);
     dataHandle[0]->_isHeapAllocated = 1;
   } else {
     if (uni)
-      memcpy((void*)unicode(), uni, sizeof(QChar) * len);
+      memcpy((void*)unicode(), uni, sizeof(DeprecatedChar) * len);
     dataHandle[0]->_length = len;
     dataHandle[0]->_isAsciiValid = 0;
   }
@@ -1648,7 +1670,7 @@ DeprecatedString& DeprecatedString::setLatin1(const char* str, int len) {
     if (needToFreeHandle)
       freeHandle(dataHandle);
     dataHandle = allocateHandle();
-    *dataHandle = new KWQStringData(str, len);
+    *dataHandle = new DeprecatedStringData(str, len);
     dataHandle[0]->_isHeapAllocated = 1;
   } else {
     strcpy(const_cast<char*>(ascii()), str);
@@ -1714,7 +1736,7 @@ DeprecatedString& DeprecatedString::sprintf(const char* format, ...) {
     if (needToFreeHandle)
       freeHandle(dataHandle);
     dataHandle = allocateHandle();
-    *dataHandle = new KWQStringData((char*)0, len);
+    *dataHandle = new DeprecatedStringData((char*)0, len);
     dataHandle[0]->_isHeapAllocated = 1;
   } else {
     dataHandle[0]->_length = len;
@@ -1731,7 +1753,7 @@ DeprecatedString& DeprecatedString::prepend(const DeprecatedString& qs) {
   return insert(0, qs);
 }
 
-DeprecatedString& DeprecatedString::prepend(const QChar* characters,
+DeprecatedString& DeprecatedString::prepend(const DeprecatedChar* characters,
                                             unsigned length) {
   return insert(0, characters, length);
 }
@@ -1745,7 +1767,7 @@ DeprecatedString& DeprecatedString::append(const char* characters,
   return insert(dataHandle[0]->_length, characters, length);
 }
 
-DeprecatedString& DeprecatedString::append(const QChar* characters,
+DeprecatedString& DeprecatedString::append(const DeprecatedChar* characters,
                                            unsigned length) {
   return insert(dataHandle[0]->_length, characters, length);
 }
@@ -1776,19 +1798,19 @@ DeprecatedString& DeprecatedString::insert(unsigned index,
     dataHandle[0]->_isUnicodeValid = 0;
   } else if (dataHandle[0]->_isUnicodeValid) {
     unsigned originalLength = dataHandle[0]->_length;
-    QChar* targetChars;
+    DeprecatedChar* targetChars;
 
     // Ensure that we have enough space.
     setLength(originalLength + insertLength);
-    targetChars = (QChar*)unicode();
+    targetChars = (DeprecatedChar*)unicode();
 
     // Move tail to make space for inserted characters.
     memmove(targetChars + (index + insertLength), targetChars + index,
-            (originalLength - index) * sizeof(QChar));
+            (originalLength - index) * sizeof(DeprecatedChar));
 
     // Insert characters.
     unsigned i = insertLength;
-    QChar* target = targetChars + index;
+    DeprecatedChar* target = targetChars + index;
 
     while (i--)
       *target++ = *insertChars++;
@@ -1808,7 +1830,7 @@ DeprecatedString& DeprecatedString::insert(unsigned index,
   } else {
     unsigned insertLength = qs.dataHandle[0]->_length;
     unsigned originalLength = dataHandle[0]->_length;
-    QChar* targetChars;
+    DeprecatedChar* targetChars;
 
     // Ensure that we have enough space.
     setLength(originalLength + insertLength);
@@ -1816,19 +1838,20 @@ DeprecatedString& DeprecatedString::insert(unsigned index,
 
     // Move tail to make space for inserted characters.
     memmove(targetChars + (index + insertLength), targetChars + index,
-            (originalLength - index) * sizeof(QChar));
+            (originalLength - index) * sizeof(DeprecatedChar));
 
     // Insert characters.
     if (qs.dataHandle[0]->_isAsciiValid) {
       unsigned i = insertLength;
-      QChar* target = targetChars + index;
+      DeprecatedChar* target = targetChars + index;
       char* a = const_cast<char*>(qs.ascii());
 
       while (i--)
         *target++ = *a++;
     } else {
-      QChar* insertChars = (QChar*)qs.unicode();
-      memcpy(targetChars + index, insertChars, insertLength * sizeof(QChar));
+      DeprecatedChar* insertChars = (DeprecatedChar*)qs.unicode();
+      memcpy(targetChars + index, insertChars,
+             insertLength * sizeof(DeprecatedChar));
     }
 
     dataHandle[0]->_isAsciiValid = 0;
@@ -1838,7 +1861,7 @@ DeprecatedString& DeprecatedString::insert(unsigned index,
 }
 
 DeprecatedString& DeprecatedString::insert(unsigned index,
-                                           const QChar* insertChars,
+                                           const DeprecatedChar* insertChars,
                                            unsigned insertLength) {
   if (insertLength == 0)
     return *this;
@@ -1848,17 +1871,18 @@ DeprecatedString& DeprecatedString::insert(unsigned index,
   unsigned originalLength = dataHandle[0]->_length;
   setLength(originalLength + insertLength);
 
-  QChar* targetChars = const_cast<QChar*>(unicode());
+  DeprecatedChar* targetChars = const_cast<DeprecatedChar*>(unicode());
   if (originalLength > index) {
     memmove(targetChars + index + insertLength, targetChars + index,
-            (originalLength - index) * sizeof(QChar));
+            (originalLength - index) * sizeof(DeprecatedChar));
   }
-  memcpy(targetChars + index, insertChars, insertLength * sizeof(QChar));
+  memcpy(targetChars + index, insertChars,
+         insertLength * sizeof(DeprecatedChar));
 
   return *this;
 }
 
-DeprecatedString& DeprecatedString::insert(unsigned index, QChar qc) {
+DeprecatedString& DeprecatedString::insert(unsigned index, DeprecatedChar qc) {
   detach();
 
   if (dataHandle[0]->_isAsciiValid && IS_ASCII_QCHAR(qc)) {
@@ -1881,7 +1905,7 @@ DeprecatedString& DeprecatedString::insert(unsigned index, QChar qc) {
     dataHandle[0]->_isUnicodeValid = 0;
   } else {
     unsigned originalLength = dataHandle[0]->_length;
-    QChar* targetChars;
+    DeprecatedChar* targetChars;
 
     // Ensure that we have enough space.
     setLength(originalLength + 1);
@@ -1889,7 +1913,7 @@ DeprecatedString& DeprecatedString::insert(unsigned index, QChar qc) {
 
     // Move tail to make space for inserted character.
     memmove(targetChars + (index + 1), targetChars + index,
-            (originalLength - index) * sizeof(QChar));
+            (originalLength - index) * sizeof(DeprecatedChar));
 
     targetChars[index] = qc;
   }
@@ -1919,37 +1943,37 @@ DeprecatedString& DeprecatedString::insert(unsigned index, char ch) {
     dataHandle[0]->_isUnicodeValid = 0;
   } else if (dataHandle[0]->_isUnicodeValid) {
     unsigned originalLength = dataHandle[0]->_length;
-    QChar* targetChars;
+    DeprecatedChar* targetChars;
 
     // Ensure that we have enough space.
     setLength(originalLength + 1);
-    targetChars = (QChar*)unicode();
+    targetChars = (DeprecatedChar*)unicode();
 
     // Move tail to make space for inserted character.
     memmove(targetChars + (index + 1), targetChars + index,
-            (originalLength - index) * sizeof(QChar));
+            (originalLength - index) * sizeof(DeprecatedChar));
 
-    targetChars[index] = (QChar)ch;
+    targetChars[index] = (DeprecatedChar)ch;
   } else
     FATAL("invalid character cache");
 
   return *this;
 }
 
-// Copy KWQStringData if necessary. Must be called before the string data is
-// mutated.
+// Copy DeprecatedStringData if necessary. Must be called before the string data
+// is mutated.
 void DeprecatedString::detach() {
-  KWQStringData* oldData = *dataHandle;
+  DeprecatedStringData* oldData = *dataHandle;
 
   if (oldData->refCount == 1 && oldData != shared_null)
     return;
 
   // Copy data for this string so we can safely mutate it.
-  KWQStringData* newData;
+  DeprecatedStringData* newData;
   if (oldData->_isAsciiValid)
-    newData = new KWQStringData(oldData->ascii(), oldData->_length);
+    newData = new DeprecatedStringData(oldData->ascii(), oldData->_length);
   else
-    newData = new KWQStringData(oldData->unicode(), oldData->_length);
+    newData = new DeprecatedStringData(oldData->unicode(), oldData->_length);
   newData->_isHeapAllocated = 1;
 
   // There is now one less client for the old data.
@@ -1997,7 +2021,7 @@ DeprecatedString& DeprecatedString::remove(unsigned index, unsigned len) {
     } else if (dataHandle[0]->_isUnicodeValid) {
       memmove(dataHandle[0]->unicode() + index,
               dataHandle[0]->unicode() + index + len,
-              sizeof(QChar) * (olen - index - len));
+              sizeof(DeprecatedChar) * (olen - index - len));
       setLength(olen - len);
     } else
       FATAL("invalid character cache");
@@ -2022,7 +2046,7 @@ DeprecatedString& DeprecatedString::replace(char pattern,
   return *this;
 }
 
-DeprecatedString& DeprecatedString::replace(QChar pattern,
+DeprecatedString& DeprecatedString::replace(DeprecatedChar pattern,
                                             const DeprecatedString& str) {
   int slen = str.dataHandle[0]->_length;
   int index = 0;
@@ -2067,7 +2091,8 @@ DeprecatedString& DeprecatedString::replace(const RegularExpression& qre,
   return *this;
 }
 
-DeprecatedString& DeprecatedString::replace(QChar oldChar, QChar newChar) {
+DeprecatedString& DeprecatedString::replace(DeprecatedChar oldChar,
+                                            DeprecatedChar newChar) {
   if (oldChar != newChar && find(oldChar) != -1) {
     unsigned length = dataHandle[0]->_length;
 
@@ -2083,7 +2108,7 @@ DeprecatedString& DeprecatedString::replace(QChar oldChar, QChar newChar) {
         }
       }
     } else {
-      QChar* p = const_cast<QChar*>(unicode());
+      DeprecatedChar* p = const_cast<DeprecatedChar*>(unicode());
       dataHandle[0]->_isAsciiValid = 0;
       for (unsigned i = 0; i != length; ++i) {
         if (p[i] == oldChar) {
@@ -2096,9 +2121,9 @@ DeprecatedString& DeprecatedString::replace(QChar oldChar, QChar newChar) {
   return *this;
 }
 
-QChar* DeprecatedString::forceUnicode() {
+DeprecatedChar* DeprecatedString::forceUnicode() {
   detach();
-  QChar* result = const_cast<QChar*>(unicode());
+  DeprecatedChar* result = const_cast<DeprecatedChar*>(unicode());
   dataHandle[0]->_isAsciiValid = 0;
   return result;
 }
@@ -2139,7 +2164,7 @@ void DeprecatedString::truncate(unsigned newLen) {
     setLength(newLen);
 }
 
-void DeprecatedString::fill(QChar qc, int len) {
+void DeprecatedString::fill(DeprecatedChar qc, int len) {
   detachAndDiscardCharacters();
 
   // len == -1 means fill to string length.
@@ -2164,17 +2189,17 @@ void DeprecatedString::fill(QChar qc, int len) {
       dataHandle[0]->_isUnicodeValid = 0;
     } else {
       setLength(len);
-      QChar* nd = forceUnicode();
+      DeprecatedChar* nd = forceUnicode();
       while (len--)
         *nd++ = qc;
     }
   }
 }
 
-DeprecatedString& DeprecatedString::append(QChar qc) {
+DeprecatedString& DeprecatedString::append(DeprecatedChar qc) {
   detach();
 
-  KWQStringData* thisData = *dataHandle;
+  DeprecatedStringData* thisData = *dataHandle;
   if (thisData->_isUnicodeValid &&
       thisData->_length + 1 < thisData->_maxUnicode) {
     thisData->_unicode[thisData->_length] = qc;
@@ -2195,10 +2220,10 @@ DeprecatedString& DeprecatedString::append(QChar qc) {
 DeprecatedString& DeprecatedString::append(char ch) {
   detach();
 
-  KWQStringData* thisData = *dataHandle;
+  DeprecatedStringData* thisData = *dataHandle;
   if (thisData->_isUnicodeValid &&
       thisData->_length + 1 < thisData->_maxUnicode) {
-    thisData->_unicode[thisData->_length] = (QChar)ch;
+    thisData->_unicode[thisData->_length] = (DeprecatedChar)ch;
     thisData->_length++;
     thisData->_isAsciiValid = 0;
     return *this;
@@ -2226,13 +2251,13 @@ bool operator==(const DeprecatedString& s1, const DeprecatedString& s2) {
   }
   return s1.dataHandle[0]->_length == s2.dataHandle[0]->_length &&
          memcmp(s1.unicode(), s2.unicode(),
-                s1.dataHandle[0]->_length * sizeof(QChar)) == 0;
+                s1.dataHandle[0]->_length * sizeof(DeprecatedChar)) == 0;
 }
 
 bool operator==(const DeprecatedString& s1, const char* chs) {
   if (!chs)
     return s1.isNull();
-  KWQStringData* d = s1.dataHandle[0];
+  DeprecatedStringData* d = s1.dataHandle[0];
   unsigned len = d->_length;
   if (d->_isAsciiValid) {
     const char* s = s1.ascii();
@@ -2242,7 +2267,7 @@ bool operator==(const DeprecatedString& s1, const char* chs) {
         return false;
     }
   } else {
-    const QChar* s = s1.unicode();
+    const DeprecatedChar* s = s1.unicode();
     for (unsigned i = 0; i != len; ++i) {
       char c = chs[i];
       if (!c || s[i] != c)
@@ -2261,7 +2286,7 @@ DeprecatedString operator+(const DeprecatedString& qs, const char* chs) {
   return DeprecatedString(qs) += chs;
 }
 
-DeprecatedString operator+(const DeprecatedString& qs, QChar qc) {
+DeprecatedString operator+(const DeprecatedString& qs, DeprecatedChar qc) {
   return DeprecatedString(qs) += qc;
 }
 
@@ -2273,30 +2298,32 @@ DeprecatedString operator+(const char* chs, const DeprecatedString& qs) {
   return DeprecatedString(chs) += qs;
 }
 
-DeprecatedString operator+(QChar qc, const DeprecatedString& qs) {
+DeprecatedString operator+(DeprecatedChar qc, const DeprecatedString& qs) {
   return DeprecatedString(qc) += qs;
 }
 
 DeprecatedString operator+(char ch, const DeprecatedString& qs) {
-  return DeprecatedString(QChar(ch)) += qs;
+  return DeprecatedString(DeprecatedChar(ch)) += qs;
 }
 
-QConstString::QConstString(const QChar* unicode, unsigned length)
-    : DeprecatedString(new KWQStringData((QChar*)unicode, length, length),
-                       true) {}
+DeprecatedConstString::DeprecatedConstString(const DeprecatedChar* unicode,
+                                             unsigned length)
+    : DeprecatedString(
+          new DeprecatedStringData((DeprecatedChar*)unicode, length, length),
+          true) {}
 
-QConstString::~QConstString() {
-  KWQStringData* data = *dataHandle;
+DeprecatedConstString::~DeprecatedConstString() {
+  DeprecatedStringData* data = *dataHandle;
   if (data->refCount > 1) {
-    QChar* tp;
-    if (data->_length <= QS_INTERNAL_BUFFER_UCHARS) {
-      data->_maxUnicode = QS_INTERNAL_BUFFER_UCHARS;
-      tp = (QChar*)&data->_internalBuffer[0];
+    DeprecatedChar* tp;
+    if (data->_length <= WEBCORE_DS_INTERNAL_BUFFER_UCHARS) {
+      data->_maxUnicode = WEBCORE_DS_INTERNAL_BUFFER_UCHARS;
+      tp = (DeprecatedChar*)&data->_internalBuffer[0];
     } else {
       data->_maxUnicode = ALLOC_QCHAR_GOOD_SIZE(data->_length);
-      tp = ALLOC_QCHAR(data->_maxUnicode);
+      tp = WEBCORE_ALLOCATE_CHARACTERS(data->_maxUnicode);
     }
-    memcpy(tp, data->_unicode, data->_length * sizeof(QChar));
+    memcpy(tp, data->_unicode, data->_length * sizeof(DeprecatedChar));
     data->_unicode = tp;
     data->_isUnicodeValid = 1;
     data->_isAsciiValid = 0;
@@ -2400,7 +2427,7 @@ static HandleNode* allocateNode(HandlePageNode* pageNode) {
   return allocated;
 }
 
-void freeHandle(KWQStringData** _free) {
+void freeHandle(DeprecatedStringData** _free) {
 #if CHECK_FOR_HANDLE_LEAKS
   fastFree(_free);
   return;
@@ -2462,7 +2489,7 @@ DeprecatedString::DeprecatedString(const Identifier& str) {
   } else {
     dataHandle = allocateHandle();
     *dataHandle = &internalData;
-    internalData.initialize(reinterpret_cast<const QChar*>(str.data()),
+    internalData.initialize(reinterpret_cast<const DeprecatedChar*>(str.data()),
                             str.size());
   }
 }
@@ -2475,7 +2502,7 @@ DeprecatedString::DeprecatedString(const UString& str) {
   } else {
     dataHandle = allocateHandle();
     *dataHandle = &internalData;
-    internalData.initialize(reinterpret_cast<const QChar*>(str.data()),
+    internalData.initialize(reinterpret_cast<const DeprecatedChar*>(str.data()),
                             str.size());
   }
 }

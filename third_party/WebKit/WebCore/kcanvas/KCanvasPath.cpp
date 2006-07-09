@@ -27,7 +27,7 @@
 #include "config.h"
 #if SVG_SUPPORT
 
-#include "KWQTextStream.h"
+#include "TextStream.h"
 
 #include "KCanvasPath.h"
 #include "KCanvasTreeDebug.h"
@@ -36,7 +36,7 @@
 namespace WebCore {
 
 // KCWindRule
-QTextStream& operator<<(QTextStream& ts, KCWindRule rule) {
+TextStream& operator<<(TextStream& ts, KCWindRule rule) {
   switch (rule) {
     case RULE_NONZERO:
       ts << "NON-ZERO";
@@ -49,7 +49,7 @@ QTextStream& operator<<(QTextStream& ts, KCWindRule rule) {
 }
 
 // KCClipData
-QTextStream& operator<<(QTextStream& ts, const KCClipData& d) {
+TextStream& operator<<(TextStream& ts, const KCClipData& d) {
   ts << "[winding=" << d.windRule() << "]";
   if (d.bboxUnits)
     ts << " [bounding box mode=" << d.bboxUnits << "]";

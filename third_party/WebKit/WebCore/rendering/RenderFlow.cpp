@@ -77,8 +77,8 @@ RenderFlow* RenderFlow::continuationBefore(RenderObject* beforeChild) {
 void RenderFlow::addChildWithContinuation(RenderObject* newChild,
                                           RenderObject* beforeChild) {
   RenderFlow* flow = continuationBefore(beforeChild);
-  KHTMLAssert(!beforeChild || beforeChild->parent()->isRenderBlock() ||
-              beforeChild->parent()->isRenderInline());
+  ASSERT(!beforeChild || beforeChild->parent()->isRenderBlock() ||
+         beforeChild->parent()->isRenderInline());
   RenderFlow* beforeChildParent =
       beforeChild ? static_cast<RenderFlow*>(beforeChild->parent())
                   : (flow->continuation() ? flow->continuation() : flow);
@@ -357,8 +357,8 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
 
   bool inlineFlow = isInlineFlow();
   if (inlineFlow)
-    KHTMLAssert(m_layer);  // The only way a compact/run-in/inline could paint
-                           // like this is if it has a layer.
+    ASSERT(m_layer);  // The only way a compact/run-in/inline could paint like
+                      // this is if it has a layer.
 
   // If we have no lines then we have no work to do.
   if (!firstLineBox())
@@ -445,8 +445,8 @@ bool RenderFlow::hitTestLines(NodeInfo& i,
 
   bool inlineFlow = isInlineFlow();
   if (inlineFlow)
-    KHTMLAssert(m_layer);  // The only way a compact/run-in/inline could paint
-                           // like this is if it has a layer.
+    ASSERT(m_layer);  // The only way a compact/run-in/inline could paint like
+                      // this is if it has a layer.
 
   // If we have no lines then we have no work to do.
   if (!firstLineBox())

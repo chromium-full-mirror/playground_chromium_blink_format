@@ -28,7 +28,7 @@
 #define Element_h
 
 #include "Attr.h"
-#include "KWQScrollBar.h"
+#include "WebCoreScrollBar.h"
 
 namespace WebCore {
 
@@ -75,7 +75,7 @@ class Element : public ContainerNode {
   void scrollIntoView(bool alignToTop);
   void scrollIntoViewIfNeeded(bool centerIfNeeded);
 
-  void scrollByUnits(int units, KWQScrollGranularity granularity);
+  void scrollByUnits(int units, ScrollGranularity granularity);
   void scrollByLines(int lines);
   void scrollByPages(int pages);
 
@@ -179,7 +179,7 @@ class Element : public ContainerNode {
   void blur();
 
 #if !NDEBUG
-  virtual void dump(QTextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 

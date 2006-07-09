@@ -37,7 +37,7 @@
 #include "MediaList.h"
 #include "MediaQuery.h"
 #include "MediaQueryExp.h"
-#include "rendering/render_style.h"
+#include "rendering/RenderStyle.h"
 #include "page/FrameView.h"
 #include "Screen.h"
 #include <wtf/HashMap.h>
@@ -146,7 +146,8 @@ static bool parseAspectRatio(CSSValue* value, int& a, int& b) {
           static_cast<CSSPrimitiveValue*>(i2)->primitiveType() ==
               CSSPrimitiveValue::CSS_NUMBER) {
         String str = static_cast<CSSPrimitiveValue*>(i1)->getStringValue();
-        if (!str.isNull() && str.length() == 1 && str[0] == QChar('/')) {
+        if (!str.isNull() && str.length() == 1 &&
+            str[0] == DeprecatedChar('/')) {
           a = (int)static_cast<CSSPrimitiveValue*>(i0)->getFloatValue(
               CSSPrimitiveValue::CSS_NUMBER);
           b = (int)static_cast<CSSPrimitiveValue*>(i2)->getFloatValue(

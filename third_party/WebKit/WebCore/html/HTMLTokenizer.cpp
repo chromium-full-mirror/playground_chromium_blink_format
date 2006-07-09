@@ -400,7 +400,8 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
   }
 
   state = processListing(SegmentedString(scriptCode, scriptCodeSize), state);
-  DeprecatedString exScript(reinterpret_cast<QChar*>(buffer), dest - buffer);
+  DeprecatedString exScript(reinterpret_cast<DeprecatedChar*>(buffer),
+                            dest - buffer);
   processToken();
   currToken.tagName = scriptTag.localName();
   currToken.beginTag = false;
@@ -1600,16 +1601,18 @@ void HTMLTokenizer::finish() {
     int pos;
     DeprecatedString food;
     if (m_state.inScript() || m_state.inStyle())
-      food.setUnicode(reinterpret_cast<QChar*>(scriptCode), scriptCodeSize);
+      food.setUnicode(reinterpret_cast<DeprecatedChar*>(scriptCode),
+                      scriptCodeSize);
     else if (m_state.inServer()) {
       food = "<";
-      food += DeprecatedString(reinterpret_cast<QChar*>(scriptCode),
+      food += DeprecatedString(reinterpret_cast<DeprecatedChar*>(scriptCode),
                                scriptCodeSize);
     } else {
-      pos = QConstString(reinterpret_cast<QChar*>(scriptCode), scriptCodeSize)
+      pos = DeprecatedConstString(reinterpret_cast<DeprecatedChar*>(scriptCode),
+                                  scriptCodeSize)
                 .string()
                 .find('>');
-      food.setUnicode(reinterpret_cast<QChar*>(scriptCode) + pos + 1,
+      food.setUnicode(reinterpret_cast<DeprecatedChar*>(scriptCode) + pos + 1,
                       scriptCodeSize - pos - 1);  // deep copy
     }
     fastFree(scriptCode);
@@ -1639,7 +1642,9 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
     if (currToken.tagName.length()) {
       qDebug("unexpected token: %s, str: *%s*",
              currToken.tagName.deprecatedString().latin1(),
-             QConstString(buffer, dest - buffer).deprecatedString().latin1());
+             DeprecatedConstString(buffer, dest - buffer)
+                 .deprecatedString()
+                 .latin1());
       ASSERT(0);
     }
 
@@ -1660,7 +1665,8 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   DeprecatedString name = currToken.tagName.deprecatedString();
   DeprecatedString text;
   if (currToken.text)
-    text = QConstString(currToken.text->unicode(), currToken.text->length())
+    text = DeprecatedConstString(currToken.text->unicode(),
+                                 currToken.text->length())
                .deprecatedString();
 
   kdDebug(6036) << "Token --> " << name << endl;

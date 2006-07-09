@@ -26,7 +26,7 @@
 #include "KCanvasImage.h"
 #include "KRenderingPaintServerPattern.h"
 
-#include "KWQTextStream.h"
+#include "TextStream.h"
 #include "KCanvasTreeDebug.h"
 
 namespace WebCore {
@@ -100,14 +100,14 @@ void KRenderingPaintServerPattern::setListener(
   d->listener = listener;
 }
 
-QTextStream& KRenderingPaintServerPattern::externalRepresentation(
-    QTextStream& ts) const {
+TextStream& KRenderingPaintServerPattern::externalRepresentation(
+    TextStream& ts) const {
   ts << "[type=PATTERN]"
      << " [bbox=" << bbox() << "]";
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";
-  if (!patternTransform().qmatrix().isIdentity())
-    ts << " [pattern transform=" << patternTransform().qmatrix() << "]";
+  if (!patternTransform().matrix().isIdentity())
+    ts << " [pattern transform=" << patternTransform().matrix() << "]";
   return ts;
 }
 }

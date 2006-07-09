@@ -114,7 +114,7 @@ class EventTargetNode : public Node {
   virtual bool disabled() const;
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream*, DeprecatedString indent = "") const;
+  virtual void dump(TextStream*, DeprecatedString indent = "") const;
 #endif
 
  protected:

@@ -37,7 +37,7 @@
 #include "DOMImplementation.h"
 #include "BrowserExtensionGdk.h"
 #include "Document.h"
-#include "KWQKHTMLSettings.h"
+#include "Settings.h"
 #include "Plugin.h"
 #include "FramePrivate.h"
 #include "GraphicsContext.h"
@@ -49,14 +49,14 @@
 #include "MouseEventWithHitTestResults.h"
 #include "SelectionController.h"
 #include "TypingCommand.h"
-#include "KWQKSSLKeyGen.h"
+#include "SSLKeyGenerator.h"
 #include "KeyboardCodes.h"
 #include <gdk/gdk.h>
 
-DeprecatedStringList KSSLKeyGen::supportedKeySizes() {
+DeprecatedStringList SSLKeyGenerator::supportedKeySizes() {
   return DeprecatedStringList();
 };
-DeprecatedString KSSLKeyGen::signedPublicKeyAndChallengeString(
+DeprecatedString SSLKeyGenerator::signedPublicKeyAndChallengeString(
     unsigned keySizeIndex,
     const DeprecatedString& challengeString,
     const KURL& url) {
@@ -85,7 +85,7 @@ static void doScroll(const RenderObject* r, bool isHorizontal, int multiplier) {
 
   // broken since it calls scroll on scrollbars
   // and we have none now
-  // r->scroll(direction, KWQScrollWheel, multiplier);
+  // r->scroll(direction, ScrollByWheel, multiplier);
   if (!r->layer())
     return;
   int x = r->layer()->scrollXOffset();
@@ -104,7 +104,7 @@ bool FrameView::isFrameView() const {
 FrameGdk::FrameGdk(GdkDrawable* gdkdrawable)
     : Frame(new Page, 0), m_drawable(gdkdrawable) {
   d->m_extension = new BrowserExtensionGdk(this);
-  KHTMLSettings* settings = new KHTMLSettings;
+  Settings* settings = new Settings;
   settings->setAutoLoadImages(true);
   settings->setMinFontSize(5);
   settings->setMinLogicalFontSize(5);
@@ -128,7 +128,7 @@ FrameGdk::FrameGdk(GdkDrawable* gdkdrawable)
 FrameGdk::FrameGdk(Page* page, RenderPart* renderPart, FrameGdkClient* client)
     : Frame(page, renderPart) {
   d->m_extension = new BrowserExtensionGdk(this);
-  KHTMLSettings* settings = new KHTMLSettings;
+  Settings* settings = new Settings;
   settings->setAutoLoadImages(true);
   setSettings(settings);
 }

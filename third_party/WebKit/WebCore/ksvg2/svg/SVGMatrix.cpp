@@ -33,7 +33,8 @@ using namespace WebCore;
 
 SVGMatrix::SVGMatrix() : Shared<SVGMatrix>() {}
 
-SVGMatrix::SVGMatrix(const QMatrix& mat) : Shared<SVGMatrix>(), m_mat(mat) {}
+SVGMatrix::SVGMatrix(const AffineTransform& mat)
+    : Shared<SVGMatrix>(), m_mat(mat) {}
 
 SVGMatrix::SVGMatrix(double a, double b, double c, double d, double e, double f)
     : Shared<SVGMatrix>() {
@@ -102,8 +103,8 @@ void SVGMatrix::copy(const SVGMatrix* other) {
 }
 
 SVGMatrix* SVGMatrix::postMultiply(const SVGMatrix* secondMatrix) {
-  QMatrix temp(secondMatrix->a(), secondMatrix->b(), secondMatrix->c(),
-               secondMatrix->d(), secondMatrix->e(), secondMatrix->f());
+  AffineTransform temp(secondMatrix->a(), secondMatrix->b(), secondMatrix->c(),
+                       secondMatrix->d(), secondMatrix->e(), secondMatrix->f());
   m_mat *= temp;
   return this;
 }
@@ -117,14 +118,14 @@ SVGMatrix* SVGMatrix::inverse(ExceptionCode& ec) {
 
 SVGMatrix* SVGMatrix::postTranslate(double x, double y) {
   // Could optimise these.
-  QMatrix temp;
+  AffineTransform temp;
   temp.translate(x, y);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postScale(double scaleFactor) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.scale(scaleFactor, scaleFactor);
   m_mat *= temp;
   return this;
@@ -132,55 +133,55 @@ SVGMatrix* SVGMatrix::postScale(double scaleFactor) {
 
 SVGMatrix* SVGMatrix::postScaleNonUniform(double scaleFactorX,
                                           double scaleFactorY) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.scale(scaleFactorX, scaleFactorY);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postRotate(double angle) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.rotate(angle);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postRotateFromVector(double x, double y) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.rotate(SVGAngle::todeg(atan2(y, x)));
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postFlipX() {
-  QMatrix temp(-1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
+  AffineTransform temp(-1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postFlipY() {
-  QMatrix temp(1.0F, 0.0F, 0.0F, -1.0F, 0.0F, 0.0F);
+  AffineTransform temp(1.0F, 0.0F, 0.0F, -1.0F, 0.0F, 0.0F);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postSkewX(double angle) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.shear(tan(SVGAngle::torad(angle)), 0.0F);
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::postSkewY(double angle) {
-  QMatrix temp;
+  AffineTransform temp;
   temp.shear(0.0F, tan(SVGAngle::torad(angle)));
   m_mat *= temp;
   return this;
 }
 
 SVGMatrix* SVGMatrix::multiply(const SVGMatrix* secondMatrix) {
-  QMatrix temp(secondMatrix->a(), secondMatrix->b(), secondMatrix->c(),
-               secondMatrix->d(), secondMatrix->e(), secondMatrix->f());
+  AffineTransform temp(secondMatrix->a(), secondMatrix->b(), secondMatrix->c(),
+                       secondMatrix->d(), secondMatrix->e(), secondMatrix->f());
   temp *= m_mat;
   m_mat = temp;
   return this;
@@ -236,15 +237,15 @@ SVGMatrix* SVGMatrix::skewY(double angle) {
   return this;
 }
 
-void SVGMatrix::setMatrix(const QMatrix& mat) {
+void SVGMatrix::setMatrix(const AffineTransform& mat) {
   m_mat = mat;
 }
 
-QMatrix& SVGMatrix::qmatrix() {
+AffineTransform& SVGMatrix::matrix() {
   return m_mat;
 }
 
-const QMatrix& SVGMatrix::qmatrix() const {
+const AffineTransform& SVGMatrix::matrix() const {
   return m_mat;
 }
 

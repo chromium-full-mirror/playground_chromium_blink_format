@@ -30,7 +30,7 @@
 #include "Shared.h"
 #include "FloatRect.h"
 
-class QTextStream;
+class TextStream;
 
 namespace WebCore {
 
@@ -93,8 +93,8 @@ class KCClipDataList : public DeprecatedValueList<KCClipData> {
   }
 };
 
-QTextStream& operator<<(QTextStream& ts, KCWindRule rule);
-QTextStream& operator<<(QTextStream& ts, const KCClipData& d);
+TextStream& operator<<(TextStream& ts, KCWindRule rule);
+TextStream& operator<<(TextStream& ts, const KCClipData& d);
 }
 
 #endif  // SVG_SUPPORT

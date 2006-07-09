@@ -29,7 +29,7 @@
 #define Cache_h
 
 #include "PlatformString.h"
-#include "KWQKIOGlobal.h"
+#include "CacheControl.h"
 #include "DeprecatedPtrList.h"
 #include <wtf/HashSet.h>
 

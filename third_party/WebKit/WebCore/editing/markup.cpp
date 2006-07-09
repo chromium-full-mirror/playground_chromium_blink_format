@@ -164,7 +164,7 @@ static DeprecatedString startMarkup(const Node* node,
           ->toString()
           .deprecatedString();
     case Node::ELEMENT_NODE: {
-      DeprecatedString markup = QChar('<');
+      DeprecatedString markup = DeprecatedChar('<');
       const Element* el = static_cast<const Element*>(node);
       markup += el->nodeNamePreservingCase().deprecatedString();
       String additionalStyle;

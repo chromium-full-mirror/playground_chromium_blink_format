@@ -42,7 +42,7 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
 
   // Helpers
   RefPtr<SVGTransform> parseTransformValue(const DeprecatedString& data) const;
-  void calculateRotationFromMatrix(const QWMatrix& matrix,
+  void calculateRotationFromMatrix(const AffineTransform& matrix,
                                    double& angle,
                                    double& cx,
                                    double& cy) const;

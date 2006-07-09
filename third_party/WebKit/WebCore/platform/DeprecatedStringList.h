@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QSTRINGLIST_H_
-#define QSTRINGLIST_H_
+#ifndef DeprecatedStringList_h
+#define DeprecatedStringList_h
 
 #include "DeprecatedString.h"
 #include "DeprecatedValueList.h"
@@ -42,7 +42,7 @@ class DeprecatedStringList : public DeprecatedValueList<DeprecatedString> {
   static DeprecatedStringList split(const DeprecatedString&,
                                     const DeprecatedString&,
                                     bool allowEmptyEntries = false);
-  static DeprecatedStringList split(const QChar&,
+  static DeprecatedStringList split(const DeprecatedChar&,
                                     const DeprecatedString&,
                                     bool allowEmptyEntries = false);
 

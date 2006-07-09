@@ -630,7 +630,7 @@ Position Position::leadingWhitespacePosition(
     String string = static_cast<Text*>(prev.node())->data();
     UChar c = string[prev.offset()];
     if (considerNonCollapsibleWhitespace
-            ? (QChar(c).isSpace() || c == nonBreakingSpace)
+            ? (DeprecatedChar(c).isSpace() || c == nonBreakingSpace)
             : isCollapsibleWhitespace(c))
       return prev;
   }
@@ -650,7 +650,7 @@ Position Position::trailingWhitespacePosition(
       String string = textNode->data();
       UChar c = string[offset()];
       if (considerNonCollapsibleWhitespace
-              ? (QChar(c).isSpace() || c == nonBreakingSpace)
+              ? (DeprecatedChar(c).isSpace() || c == nonBreakingSpace)
               : isCollapsibleWhitespace(c))
         return *this;
       return Position();
@@ -666,7 +666,7 @@ Position Position::trailingWhitespacePosition(
     String string = static_cast<Text*>(next.node())->data();
     UChar c = string[0];
     if (considerNonCollapsibleWhitespace
-            ? (QChar(c).isSpace() || c == nonBreakingSpace)
+            ? (DeprecatedChar(c).isSpace() || c == nonBreakingSpace)
             : isCollapsibleWhitespace(c))
       return next;
   }

@@ -43,7 +43,7 @@ class RenderTableCol : public RenderContainer {
   virtual bool requiresLayer() { return false; }
 
 #ifndef NDEBUG
-  virtual void dump(QTextStream*, DeprecatedString) const;
+  virtual void dump(TextStream*, DeprecatedString) const;
 #endif
 
   int span() const { return m_span; }

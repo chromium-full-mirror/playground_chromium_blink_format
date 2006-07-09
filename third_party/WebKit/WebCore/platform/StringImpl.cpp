@@ -234,7 +234,7 @@ static Length parseLength(const UChar* m_data, unsigned int m_length) {
     return Length(1, Relative);
 
   unsigned i = 0;
-  while (i < m_length && QChar(m_data[i]).isSpace())
+  while (i < m_length && DeprecatedChar(m_data[i]).isSpace())
     ++i;
   if (i < m_length && (m_data[i] == '+' || m_data[i] == '-'))
     ++i;
@@ -242,16 +242,17 @@ static Length parseLength(const UChar* m_data, unsigned int m_length) {
     ++i;
 
   bool ok;
-  int r = QConstString(reinterpret_cast<const QChar*>(m_data), i)
-              .string()
-              .toInt(&ok);
+  int r =
+      DeprecatedConstString(reinterpret_cast<const DeprecatedChar*>(m_data), i)
+          .string()
+          .toInt(&ok);
 
   /* Skip over any remaining digits, we are not that accurate (5.5% => 5%) */
   while (i < m_length && (u_isdigit(m_data[i]) || m_data[i] == '.'))
     ++i;
 
   /* IE Quirk: Skip any whitespace (20 % => 20%) */
-  while (i < m_length && QChar(m_data[i]).isSpace())
+  while (i < m_length && DeprecatedChar(m_data[i]).isSpace())
     ++i;
 
   if (ok) {
@@ -288,7 +289,8 @@ Length* StringImpl::toCoordsArray(int& len) const {
     else
       spacified[i] = cc;
   }
-  DeprecatedString str(reinterpret_cast<const QChar*>(spacified), m_length);
+  DeprecatedString str(reinterpret_cast<const DeprecatedChar*>(spacified),
+                       m_length);
   deleteUCharVector(spacified);
 
   str = str.simplifyWhiteSpace();
@@ -316,7 +318,8 @@ Length* StringImpl::toLengthArray(int& len) const {
     len = 1;
     return 0;
   }
-  DeprecatedString str(reinterpret_cast<const QChar*>(m_data), m_length);
+  DeprecatedString str(reinterpret_cast<const DeprecatedChar*>(m_data),
+                       m_length);
   str = str.simplifyWhiteSpace();
 
   len = str.contains(',') + 1;
@@ -514,7 +517,7 @@ int StringImpl::toInt(bool* ok) const {
 
   // Allow leading spaces.
   for (; i != m_length; ++i)
-    if (!QChar(m_data[i]).isSpace())
+    if (!DeprecatedChar(m_data[i]).isSpace())
       break;
 
   // Allow sign.
@@ -526,7 +529,8 @@ int StringImpl::toInt(bool* ok) const {
     if (!u_isdigit(m_data[i]))
       break;
 
-  return QConstString(reinterpret_cast<const QChar*>(m_data), i)
+  return DeprecatedConstString(reinterpret_cast<const DeprecatedChar*>(m_data),
+                               i)
       .string()
       .toInt(ok);
 }

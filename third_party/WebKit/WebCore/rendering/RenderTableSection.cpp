@@ -30,7 +30,7 @@
 
 #include "Document.h"
 #include "HTMLNames.h"
-#include "KWQTextStream.h"
+#include "TextStream.h"
 #include "RenderTableCell.h"
 #include "RenderTableCol.h"
 #include "RenderTableRow.h"
@@ -1033,7 +1033,7 @@ bool RenderTableSection::nodeAtPoint(NodeInfo& info,
 }
 
 #ifndef NDEBUG
-void RenderTableSection::dump(QTextStream* stream, DeprecatedString ind) const {
+void RenderTableSection::dump(TextStream* stream, DeprecatedString ind) const {
   *stream << endl
           << ind << "grid=(" << gridRows << "," << table()->numEffCols() << ")"
           << endl

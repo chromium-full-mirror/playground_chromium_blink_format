@@ -74,7 +74,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
     // iterate to get chunks until the searchFunction returns a non-zero value.
-    string.prepend(reinterpret_cast<const QChar*>(it.characters()),
+    string.prepend(reinterpret_cast<const DeprecatedChar*>(it.characters()),
                    it.length());
     next = searchFunction(reinterpret_cast<const UChar*>(string.unicode()),
                           string.length());
@@ -95,7 +95,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     // by performing an additional check with a modified string which uses an
     // "X"
     // character to stand in for the replaced element.
-    QChar chars[2];
+    DeprecatedChar chars[2];
     chars[0] = 'X';
     chars[1] = ' ';
     string.prepend(chars, 2);
@@ -157,7 +157,8 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   while (!it.atEnd() && it.length() > 0) {
     // Keep asking the iterator for chunks until the search function
     // returns an end value not equal to the length of the string passed to it.
-    string.append(reinterpret_cast<const QChar*>(it.characters()), it.length());
+    string.append(reinterpret_cast<const DeprecatedChar*>(it.characters()),
+                  it.length());
     next = searchFunction(reinterpret_cast<const UChar*>(string.unicode()),
                           string.length());
     if (next != string.length())
@@ -178,7 +179,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     // by performing an additional check with a modified string which uses an
     // "X"
     // character to stand in for the replaced element.
-    QChar chars[2];
+    DeprecatedChar chars[2];
     chars[0] = ' ';
     chars[1] = 'X';
     string.append(chars, 2);

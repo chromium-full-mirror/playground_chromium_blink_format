@@ -58,8 +58,8 @@ class SegmentedSubstring {
       else
         str.append(m_string);
     } else {
-      str.insert(str.length(), reinterpret_cast<const QChar*>(m_current),
-                 m_length);
+      str.insert(str.length(),
+                 reinterpret_cast<const DeprecatedChar*>(m_current), m_length);
     }
   }
 

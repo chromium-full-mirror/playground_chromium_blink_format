@@ -25,7 +25,7 @@
 #if SVG_SUPPORT
 
 #include "RenderBlock.h"
-#include "KWQWMatrix.h"
+#include "AffineTransform.h"
 
 namespace WebCore {
 
@@ -38,8 +38,8 @@ class RenderSVGText : public RenderBlock {
   virtual const char* renderName() const { return "RenderSVGText"; }
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual QMatrix localTransform() const { return m_transform; }
-  virtual void setLocalTransform(const QMatrix& transform) {
+  virtual AffineTransform localTransform() const { return m_transform; }
+  virtual void setLocalTransform(const AffineTransform& transform) {
     m_transform = transform;
   }
 
@@ -59,9 +59,9 @@ class RenderSVGText : public RenderBlock {
   virtual void layout();
 
  private:
-  QMatrix translationTopToBaseline();
-  QMatrix translationForAttributes();
-  QMatrix m_transform;
+  AffineTransform translationTopToBaseline();
+  AffineTransform translationForAttributes();
+  AffineTransform m_transform;
   IntRect m_absoluteBounds;
 };
 }

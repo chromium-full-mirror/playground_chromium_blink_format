@@ -26,7 +26,7 @@
 #include "config.h"
 #include "RenderTextArea.h"
 
-#include "KWQTextEdit.h"
+#include "TextBox.h"
 #include "HTMLTextAreaElement.h"
 #include "FrameView.h"
 
@@ -34,12 +34,12 @@ namespace WebCore {
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElement* element)
     : RenderFormElement(element), m_dirty(false), m_updating(false) {
-  QTextEdit* edit = new QTextEdit(m_view);
+  TextBox* edit = new TextBox(m_view);
 
   if (element->wrap() != HTMLTextAreaElement::ta_NoWrap)
-    edit->setWordWrap(QTextEdit::WidgetWidth);
+    edit->setWordWrap(TextBox::WidgetWidth);
   else
-    edit->setWordWrap(QTextEdit::NoWrap);
+    edit->setWordWrap(TextBox::NoWrap);
 
   setWidget(edit);
 }
@@ -52,7 +52,7 @@ void RenderTextArea::destroy() {
 void RenderTextArea::calcMinMaxWidth() {
   ASSERT(!minMaxKnown());
 
-  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+  TextBox* w = static_cast<TextBox*>(m_widget);
   IntSize size(w->sizeWithColumnsAndRows(
       max(static_cast<HTMLTextAreaElement*>(node())->cols(), 1),
       max(static_cast<HTMLTextAreaElement*>(node())->rows(), 1)));
@@ -66,7 +66,7 @@ void RenderTextArea::calcMinMaxWidth() {
 void RenderTextArea::setStyle(RenderStyle* s) {
   RenderFormElement::setStyle(s);
 
-  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+  TextBox* w = static_cast<TextBox*>(m_widget);
   w->setAlignment(textAlignment());
   w->setLineHeight(RenderObject::lineHeight(true));
 
@@ -114,7 +114,7 @@ void RenderTextArea::setEdited(bool x) {
 
 void RenderTextArea::updateFromElement() {
   HTMLTextAreaElement* e = static_cast<HTMLTextAreaElement*>(node());
-  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+  TextBox* w = static_cast<TextBox*>(m_widget);
 
   w->setReadOnly(e->isReadOnlyControl());
   w->setDisabled(e->disabled());
@@ -138,12 +138,12 @@ void RenderTextArea::updateFromElement() {
 }
 
 String RenderTextArea::text() {
-  String txt = static_cast<QTextEdit*>(m_widget)->text();
+  String txt = static_cast<TextBox*>(m_widget)->text();
   return txt.replace(backslashAsCurrencySymbol(), '\\');
 }
 
 String RenderTextArea::textWithHardLineBreaks() {
-  String txt = static_cast<QTextEdit*>(m_widget)->textWithHardLineBreaks();
+  String txt = static_cast<TextBox*>(m_widget)->textWithHardLineBreaks();
   return txt.replace(backslashAsCurrencySymbol(), '\\');
 }
 
@@ -155,32 +155,32 @@ void RenderTextArea::valueChanged(Widget*) {
 }
 
 int RenderTextArea::selectionStart() {
-  return static_cast<QTextEdit*>(m_widget)->selectionStart();
+  return static_cast<TextBox*>(m_widget)->selectionStart();
 }
 
 int RenderTextArea::selectionEnd() {
-  return static_cast<QTextEdit*>(m_widget)->selectionEnd();
+  return static_cast<TextBox*>(m_widget)->selectionEnd();
 }
 
 void RenderTextArea::setSelectionStart(int start) {
-  static_cast<QTextEdit*>(m_widget)->setSelectionStart(start);
+  static_cast<TextBox*>(m_widget)->setSelectionStart(start);
 }
 
 void RenderTextArea::setSelectionEnd(int end) {
-  static_cast<QTextEdit*>(m_widget)->setSelectionEnd(end);
+  static_cast<TextBox*>(m_widget)->setSelectionEnd(end);
 }
 
 void RenderTextArea::select() {
-  static_cast<QTextEdit*>(m_widget)->selectAll();
+  static_cast<TextBox*>(m_widget)->selectAll();
 }
 
 void RenderTextArea::setSelectionRange(int start, int end) {
-  QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
+  TextBox* textEdit = static_cast<TextBox*>(m_widget);
   textEdit->setSelectionRange(start, end - start);
 }
 
 void RenderTextArea::selectionChanged(Widget*) {
-  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+  TextBox* w = static_cast<TextBox*>(m_widget);
 
   // We only want to call onselect if there actually is a selection
   if (!w->hasSelectedText())

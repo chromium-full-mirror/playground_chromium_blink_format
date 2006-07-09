@@ -32,22 +32,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Node.h"
-#include "KWQLineEdit.h"
+#include "TextField.h"
 #include "Font.h"
-#include "KWQFileButton.h"
-#include "KWQTextEdit.h"
-#include "KWQComboBox.h"
+#include "FileButton.h"
+#include "TextBox.h"
+#include "PopUpButton.h"
 #include "IntPoint.h"
 #include "Widget.h"
 #include "GraphicsContext.h"
-#include "KWQSlider.h"
+#include "WebCoreSlider.h"
 #include "Cursor.h"
 #include "loader.h"
 #include "FrameView.h"
 #include "KURL.h"
-#include "KWQScrollBar.h"
+#include "WebCoreScrollBar.h"
 #include "JavaAppletWidget.h"
-#include "KWQScrollBar.h"
+#include "WebCoreScrollBar.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
 #include "CookieJar.h"
@@ -75,94 +75,94 @@ void FrameView::updateBorder() {
 }
 // bool FrameView::isFrameView() const { notImplemented(); return 0; }
 
-QTextEdit::QTextEdit(Widget*) {
+TextBox::TextBox(Widget*) {
   notImplemented();
 }
-QTextEdit::~QTextEdit() {
+TextBox::~TextBox() {
   notImplemented();
 }
-String QTextEdit::textWithHardLineBreaks() const {
+String TextBox::textWithHardLineBreaks() const {
   notImplemented();
   return String();
 }
-IntSize QTextEdit::sizeWithColumnsAndRows(int, int) const {
+IntSize TextBox::sizeWithColumnsAndRows(int, int) const {
   notImplemented();
   return IntSize();
 }
-void QTextEdit::setText(String const&) {
+void TextBox::setText(String const&) {
   notImplemented();
 }
-void QTextEdit::setColors(Color const&, Color const&) {
+void TextBox::setColors(Color const&, Color const&) {
   notImplemented();
 }
-void QTextEdit::setFont(WebCore::Font const&) {
+void TextBox::setFont(WebCore::Font const&) {
   notImplemented();
 }
-void QTextEdit::setWritingDirection(enum WebCore::TextDirection) {
+void TextBox::setWritingDirection(enum WebCore::TextDirection) {
   notImplemented();
 }
-bool QTextEdit::checksDescendantsForFocus() const {
+bool TextBox::checksDescendantsForFocus() const {
   notImplemented();
   return false;
 }
-int QTextEdit::selectionStart() {
+int TextBox::selectionStart() {
   notImplemented();
   return 0;
 }
-bool QTextEdit::hasSelectedText() const {
+bool TextBox::hasSelectedText() const {
   notImplemented();
   return 0;
 }
-int QTextEdit::selectionEnd() {
+int TextBox::selectionEnd() {
   notImplemented();
   return 0;
 }
-void QTextEdit::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
+void TextBox::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
   notImplemented();
 }
-void QTextEdit::setReadOnly(bool) {
+void TextBox::setReadOnly(bool) {
   notImplemented();
 }
-void QTextEdit::selectAll() {
+void TextBox::selectAll() {
   notImplemented();
 }
-void QTextEdit::setDisabled(bool) {
+void TextBox::setDisabled(bool) {
   notImplemented();
 }
-void QTextEdit::setLineHeight(int) {
+void TextBox::setLineHeight(int) {
   notImplemented();
 }
-void QTextEdit::setSelectionStart(int) {
+void TextBox::setSelectionStart(int) {
   notImplemented();
 }
-void QTextEdit::setCursorPosition(int, int) {
+void TextBox::setCursorPosition(int, int) {
   notImplemented();
 }
-String QTextEdit::text() const {
+String TextBox::text() const {
   notImplemented();
   return String();
 }
-void QTextEdit::setWordWrap(QTextEdit::WrapStyle) {
+void TextBox::setWordWrap(TextBox::WrapStyle) {
   notImplemented();
 }
-void QTextEdit::setAlignment(HorizontalAlignment) {
+void TextBox::setAlignment(HorizontalAlignment) {
   notImplemented();
 }
-void QTextEdit::setSelectionEnd(int) {
+void TextBox::setSelectionEnd(int) {
   notImplemented();
 }
-void QTextEdit::getCursorPosition(int*, int*) const {
+void TextBox::getCursorPosition(int*, int*) const {
   notImplemented();
 }
-void QTextEdit::setSelectionRange(int, int) {
+void TextBox::setSelectionRange(int, int) {
   notImplemented();
 }
 
-Widget::FocusPolicy QComboBox::focusPolicy() const {
+Widget::FocusPolicy PopUpButton::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-void QComboBox::populate() {
+void PopUpButton::populate() {
   notImplemented();
 }
 
@@ -194,145 +194,145 @@ JavaAppletWidget::JavaAppletWidget(IntSize const&,
   notImplemented();
 }
 
-void QLineEdit::selectAll() {
+void TextField::selectAll() {
   notImplemented();
 }
-void QLineEdit::addSearchResult() {
+void TextField::addSearchResult() {
   notImplemented();
 }
-int QLineEdit::selectionStart() const {
-  notImplemented();
-  return 0;
-}
-bool QLineEdit::hasSelectedText() const {
+int TextField::selectionStart() const {
   notImplemented();
   return 0;
 }
-String QLineEdit::selectedText() const {
+bool TextField::hasSelectedText() const {
+  notImplemented();
+  return 0;
+}
+String TextField::selectedText() const {
   notImplemented();
   return String();
 }
-void QLineEdit::setAutoSaveName(String const&) {
+void TextField::setAutoSaveName(String const&) {
   notImplemented();
 }
-bool QLineEdit::checksDescendantsForFocus() const {
+bool TextField::checksDescendantsForFocus() const {
   notImplemented();
   return false;
 }
-void QLineEdit::setSelection(int, int) {
+void TextField::setSelection(int, int) {
   notImplemented();
 }
-void QLineEdit::setMaxResults(int) {
+void TextField::setMaxResults(int) {
   notImplemented();
 }
-bool QLineEdit::edited() const {
-  notImplemented();
-  return 0;
-}
-
-QSlider::QSlider() {
-  notImplemented();
-}
-IntSize QSlider::sizeHint() const {
-  notImplemented();
-  return IntSize();
-}
-void QSlider::setValue(double) {
-  notImplemented();
-}
-void QSlider::setMaxValue(double) {
-  notImplemented();
-}
-void QSlider::setMinValue(double) {
-  notImplemented();
-}
-QSlider::~QSlider() {
-  notImplemented();
-}
-void QSlider::setFont(WebCore::Font const&) {
-  notImplemented();
-}
-double QSlider::value() const {
+bool TextField::edited() const {
   notImplemented();
   return 0;
 }
 
-void QListBox::setSelected(int, bool) {
+Slider::Slider() {
   notImplemented();
 }
-IntSize QListBox::sizeForNumberOfLines(int) const {
+IntSize Slider::sizeHint() const {
   notImplemented();
   return IntSize();
 }
-bool QListBox::isSelected(int) const {
-  notImplemented();
-  return 0;
-}
-void QListBox::appendItem(DeprecatedString const&, KWQListBoxItemType, bool) {
+void Slider::setValue(double) {
   notImplemented();
 }
-void QListBox::doneAppendingItems() {
+void Slider::setMaxValue(double) {
   notImplemented();
 }
-void QListBox::setWritingDirection(TextDirection) {
+void Slider::setMinValue(double) {
   notImplemented();
 }
-void QListBox::setEnabled(bool) {
+Slider::~Slider() {
   notImplemented();
 }
-void QListBox::clear() {
+void Slider::setFont(WebCore::Font const&) {
   notImplemented();
 }
-bool QListBox::checksDescendantsForFocus() const {
+double Slider::value() const {
   notImplemented();
   return 0;
 }
 
-KWQFileButton::KWQFileButton(Frame*) {
+void ListBox::setSelected(int, bool) {
   notImplemented();
 }
-void KWQFileButton::click(bool) {
-  notImplemented();
-}
-IntSize KWQFileButton::sizeForCharacterWidth(int) const {
+IntSize ListBox::sizeForNumberOfLines(int) const {
   notImplemented();
   return IntSize();
 }
-Widget::FocusPolicy KWQFileButton::focusPolicy() const {
+bool ListBox::isSelected(int) const {
+  notImplemented();
+  return 0;
+}
+void ListBox::appendItem(DeprecatedString const&, ListBoxItemType, bool) {
+  notImplemented();
+}
+void ListBox::doneAppendingItems() {
+  notImplemented();
+}
+void ListBox::setWritingDirection(TextDirection) {
+  notImplemented();
+}
+void ListBox::setEnabled(bool) {
+  notImplemented();
+}
+void ListBox::clear() {
+  notImplemented();
+}
+bool ListBox::checksDescendantsForFocus() const {
+  notImplemented();
+  return 0;
+}
+
+FileButton::FileButton(Frame*) {
+  notImplemented();
+}
+void FileButton::click(bool) {
+  notImplemented();
+}
+IntSize FileButton::sizeForCharacterWidth(int) const {
+  notImplemented();
+  return IntSize();
+}
+Widget::FocusPolicy FileButton::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-WebCore::IntRect KWQFileButton::frameGeometry() const {
+WebCore::IntRect FileButton::frameGeometry() const {
   notImplemented();
   return IntRect();
 }
-void KWQFileButton::setFilename(DeprecatedString const&) {
+void FileButton::setFilename(DeprecatedString const&) {
   notImplemented();
 }
-int KWQFileButton::baselinePosition(int) const {
+int FileButton::baselinePosition(int) const {
   notImplemented();
   return 0;
 }
-void KWQFileButton::setFrameGeometry(WebCore::IntRect const&) {
+void FileButton::setFrameGeometry(WebCore::IntRect const&) {
   notImplemented();
 }
-void KWQFileButton::setDisabled(bool) {
+void FileButton::setDisabled(bool) {
   notImplemented();
 }
 
-Widget::FocusPolicy QTextEdit::focusPolicy() const {
+Widget::FocusPolicy TextBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-Widget::FocusPolicy QSlider::focusPolicy() const {
+Widget::FocusPolicy Slider::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-Widget::FocusPolicy QListBox::focusPolicy() const {
+Widget::FocusPolicy ListBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-Widget::FocusPolicy QLineEdit::focusPolicy() const {
+Widget::FocusPolicy TextField::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -361,11 +361,11 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   return 0;
 }
 
-DeprecatedArray<char> KWQServeSynchronousRequest(Loader*,
-                                                 DocLoader*,
-                                                 TransferJob*,
-                                                 KURL&,
-                                                 DeprecatedString&) {
+DeprecatedArray<char> ServeSynchronousRequest(Loader*,
+                                              DocLoader*,
+                                              TransferJob*,
+                                              KURL&,
+                                              DeprecatedString&) {
   notImplemented();
   return 0;
 }
@@ -627,10 +627,10 @@ int BrowserExtensionGdk::getHistoryLength() {
   return 0;
 }
 
-bool KWQCheckIfReloading(WebCore::DocLoader*) {
+bool CheckIfReloading(WebCore::DocLoader*) {
   return false;
 }
-void KWQCheckCacheObjectStatus(DocLoader*, CachedObject*) {}
+void CheckCacheObjectStatus(DocLoader*, CachedObject*) {}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}
@@ -704,68 +704,68 @@ void Path::addArc(const FloatPoint&, float, float, float, bool) {}
 void Path::addRect(const FloatRect&) {}
 void Path::addEllipse(const FloatRect&) {}
 
-QLineEdit::QLineEdit(QLineEdit::Type) {}
-QLineEdit::~QLineEdit() {}
-void QLineEdit::setFont(WebCore::Font const&) {}
-void QLineEdit::setAlignment(HorizontalAlignment) {}
-void QLineEdit::setWritingDirection(TextDirection) {}
-int QLineEdit::maxLength() const {
+TextField::TextField(TextField::Type) {}
+TextField::~TextField() {}
+void TextField::setFont(WebCore::Font const&) {}
+void TextField::setAlignment(HorizontalAlignment) {}
+void TextField::setWritingDirection(TextDirection) {}
+int TextField::maxLength() const {
   return 0;
 }
-void QLineEdit::setMaxLength(int) {}
-String QLineEdit::text() const {
+void TextField::setMaxLength(int) {}
+String TextField::text() const {
   return String();
 }
-void QLineEdit::setText(String const&) {}
-int QLineEdit::cursorPosition() const {
+void TextField::setText(String const&) {}
+int TextField::cursorPosition() const {
   return 0;
 }
-void QLineEdit::setCursorPosition(int) {}
-void QLineEdit::setEdited(bool) {}
-void QLineEdit::setReadOnly(bool) {}
-void QLineEdit::setPlaceholderString(String const&) {}
-void QLineEdit::setColors(Color const&, Color const&) {}
-IntSize QLineEdit::sizeForCharacterWidth(int) const {
+void TextField::setCursorPosition(int) {}
+void TextField::setEdited(bool) {}
+void TextField::setReadOnly(bool) {}
+void TextField::setPlaceholderString(String const&) {}
+void TextField::setColors(Color const&, Color const&) {}
+IntSize TextField::sizeForCharacterWidth(int) const {
   return IntSize();
 }
-int QLineEdit::baselinePosition(int) const {
+int TextField::baselinePosition(int) const {
   return 0;
 }
-void QLineEdit::setLiveSearch(bool) {}
+void TextField::setLiveSearch(bool) {}
 
-QComboBox::QComboBox() {}
-QComboBox::~QComboBox() {}
-void QComboBox::setFont(WebCore::Font const&) {}
-int QComboBox::baselinePosition(int) const {
+PopUpButton::PopUpButton() {}
+PopUpButton::~PopUpButton() {}
+void PopUpButton::setFont(WebCore::Font const&) {}
+int PopUpButton::baselinePosition(int) const {
   return 0;
 }
-void QComboBox::setWritingDirection(TextDirection) {}
-void QComboBox::clear() {}
-void QComboBox::appendItem(DeprecatedString const&, KWQListBoxItemType, bool) {}
-void QComboBox::setCurrentItem(int) {}
-IntSize QComboBox::sizeHint() const {
+void PopUpButton::setWritingDirection(TextDirection) {}
+void PopUpButton::clear() {}
+void PopUpButton::appendItem(DeprecatedString const&, ListBoxItemType, bool) {}
+void PopUpButton::setCurrentItem(int) {}
+IntSize PopUpButton::sizeHint() const {
   return IntSize();
 }
-IntRect QComboBox::frameGeometry() const {
+IntRect PopUpButton::frameGeometry() const {
   return IntRect();
 }
-void QComboBox::setFrameGeometry(IntRect const&) {}
+void PopUpButton::setFrameGeometry(IntRect const&) {}
 
-QScrollBar::QScrollBar(ScrollBarOrientation) {}
-QScrollBar::~QScrollBar() {}
-void QScrollBar::setSteps(int, int) {}
-bool QScrollBar::scroll(KWQScrollDirection, KWQScrollGranularity, float) {
+ScrollBar::ScrollBar(ScrollBarOrientation) {}
+ScrollBar::~ScrollBar() {}
+void ScrollBar::setSteps(int, int) {}
+bool ScrollBar::scroll(ScrollDirection, ScrollGranularity, float) {
   return 0;
 }
-bool QScrollBar::setValue(int) {
+bool ScrollBar::setValue(int) {
   return 0;
 }
-void QScrollBar::setKnobProportion(int, int) {}
+void ScrollBar::setKnobProportion(int, int) {}
 
-QListBox::QListBox() {}
-QListBox::~QListBox() {}
-void QListBox::setSelectionMode(QListBox::SelectionMode) {}
-void QListBox::setFont(WebCore::Font const&) {}
+ListBox::ListBox() {}
+ListBox::~ListBox() {}
+void ListBox::setSelectionMode(ListBox::SelectionMode) {}
+void ListBox::setFont(WebCore::Font const&) {}
 
 Color WebCore::focusRingColor() {
   return 0xFF0000FF;

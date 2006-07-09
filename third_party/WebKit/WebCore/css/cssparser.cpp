@@ -2864,9 +2864,10 @@ int CSSParser::lex(void* yylvalWithoutType) {
   UChar* t = text(&length);
 
 #ifdef TOKEN_DEBUG
-  qDebug(
-      "CSSTokenizer: got token %d: '%s'", token,
-      token == END_TOKEN ? "" : DeprecatedString((QChar*)t, length).latin1());
+  qDebug("CSSTokenizer: got token %d: '%s'", token,
+         token == END_TOKEN
+             ? ""
+             : DeprecatedString((DeprecatedChar*)t, length).latin1());
 #endif
   switch (token) {
     case WHITESPACE:
@@ -2921,7 +2922,7 @@ int CSSParser::lex(void* yylvalWithoutType) {
       length--;
     case FLOAT:
     case INTEGER:
-      yylval->val = DeprecatedString((QChar*)t, length).toDouble();
+      yylval->val = DeprecatedString((DeprecatedChar*)t, length).toDouble();
       break;
 
     default:
@@ -3203,8 +3204,8 @@ CSSRule* CSSParser::createStyleRule(CSSSelector* selector) {
 }
 
 DeprecatedString deprecatedString(const ParseString& ps) {
-  return DeprecatedString(reinterpret_cast<const QChar*>(ps.characters),
-                          ps.length);
+  return DeprecatedString(
+      reinterpret_cast<const DeprecatedChar*>(ps.characters), ps.length);
 }
 
 #define YY_DECL int CSSParser::lex()
