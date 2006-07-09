@@ -47,6 +47,8 @@ class HTMLPlugInElement : public HTMLElement {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
+  virtual void detach();
+
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual bool checkDTD(const Node* newChild);
 
@@ -66,12 +68,15 @@ class HTMLPlugInElement : public HTMLElement {
   virtual KJS::Bindings::Instance* getInstance() const = 0;
 #endif
 
+  void setFrameName(const AtomicString& frameName) { m_frameName = frameName; }
+
  protected:
   String oldNameAttr;
-
 #if __APPLE__
   mutable RefPtr<KJS::Bindings::Instance> m_instance;
 #endif
+ private:
+  AtomicString m_frameName;
 };
 }
 
