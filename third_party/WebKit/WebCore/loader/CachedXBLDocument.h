@@ -42,10 +42,10 @@ class CachedObjectClient;
 #ifndef KHTML_NO_XBL
 class CachedXBLDocument : public CachedObject {
  public:
-  CachedXBLDocument(DocLoader* dl,
+  CachedXBLDocument(DocLoader*,
                     const String& url,
-                    KIO::CacheControl cachePolicy,
-                    time_t _expireDate);
+                    CachePolicy,
+                    time_t expireDate);
   virtual ~CachedXBLDocument();
 
   XBL::XBLDocument* document() const { return m_document; }
@@ -67,6 +67,6 @@ class CachedXBLDocument : public CachedObject {
 };
 
 #endif
-};
+}
 
 #endif

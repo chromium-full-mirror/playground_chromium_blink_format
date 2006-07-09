@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,12 +23,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KIO_GLOBAL_H_
-#define KIO_GLOBAL_H_
+#ifndef CachePolicy_h
+#define CachePolicy_h
 
-namespace KIO {
+namespace WebCore {
 
-enum CacheControl { CC_Cache, CC_Verify, CC_Refresh, CC_Reload };
+enum CachePolicy {
+  CachePolicyCache,
+  CachePolicyVerify,
+  CachePolicyRefresh,
+  CachePolicyReload
+};
 }
 
-#endif /* KIO_GLOBAL_H_ */
+#endif

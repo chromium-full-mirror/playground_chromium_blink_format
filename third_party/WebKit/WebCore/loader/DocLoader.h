@@ -28,12 +28,12 @@
 #ifndef DocLoader_h
 #define DocLoader_h
 
-#include "Settings.h"
-#include "CacheControl.h"
+#include "CachePolicy.h"
 #include "DeprecatedPtrList.h"
 #include "DeprecatedStringList.h"
-#include "wtf/HashMap.h"
+#include "Settings.h"
 #include "StringHash.h"
+#include <wtf/HashMap.h>
 
 class KURL;
 class LoaderFunctions;
@@ -77,14 +77,14 @@ class DocLoader {
   }
 
   bool autoloadImages() const { return m_bautoloadImages; }
-  KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
+  CachePolicy cachePolicy() const { return m_cachePolicy; }
   time_t expireDate() const { return m_expireDate; }
   Frame* frame() const { return m_frame; }
   WebCore::Document* doc() const { return m_doc; }
 
   void setExpireDate(time_t);
   void setAutoloadImages(bool);
-  void setCachePolicy(KIO::CacheControl cachePolicy);
+  void setCachePolicy(CachePolicy);
   void removeCachedObject(CachedObject*) const;
 
   void setLoadInProgress(bool);
@@ -100,7 +100,7 @@ class DocLoader {
   DeprecatedStringList m_reloadedURLs;
   mutable HashMap<String, CachedObject*> m_docObjects;
   time_t m_expireDate;
-  KIO::CacheControl m_cachePolicy;
+  CachePolicy m_cachePolicy;
   bool m_bautoloadImages : 1;
   Frame* m_frame;
   WebCore::Document* m_doc;

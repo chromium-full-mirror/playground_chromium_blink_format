@@ -41,10 +41,10 @@ namespace WebCore {
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          const String& url,
-                                         KIO::CacheControl _cachePolicy,
+                                         CachePolicy cachePolicy,
                                          time_t _expireDate,
                                          const DeprecatedString& charset)
-    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate),
+    : CachedObject(url, CSSStyleSheet, cachePolicy, _expireDate),
       m_encoding(charset.latin1()) {
   // It's css we want.
   setAccept("text/css");
@@ -60,7 +60,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(
     const DeprecatedString& stylesheet_data)
     : CachedObject(url,
                    CSSStyleSheet,
-                   KIO::CC_Verify,
+                   CachePolicyVerify,
                    0,
                    stylesheet_data.length()),
       m_encoding(InvalidEncoding) {

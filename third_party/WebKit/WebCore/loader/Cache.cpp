@@ -142,11 +142,11 @@ CachedImage* Cache::requestImage(DocLoader* dl,
                                  const KURL& url,
                                  bool reload,
                                  time_t expireDate) {
-  KIO::CacheControl cachePolicy;
+  CachePolicy cachePolicy;
   if (dl)
     cachePolicy = dl->cachePolicy();
   else
-    cachePolicy = KIO::CC_Verify;
+    cachePolicy = CachePolicyVerify;
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
@@ -194,13 +194,13 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
                                               const DeprecatedString& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
-  KIO::CacheControl cachePolicy;
+  CachePolicy cachePolicy;
   if (dl) {
     kurl = dl->m_doc->completeURL(url.deprecatedString());
     cachePolicy = dl->cachePolicy();
   } else {
     kurl = url.deprecatedString();
-    cachePolicy = KIO::CC_Verify;
+    cachePolicy = CachePolicyVerify;
   }
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
@@ -247,13 +247,13 @@ CachedScript* Cache::requestScript(DocLoader* dl,
                                    const DeprecatedString& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
-  KIO::CacheControl cachePolicy;
+  CachePolicy cachePolicy;
   if (dl) {
     kurl = dl->m_doc->completeURL(url.deprecatedString());
     cachePolicy = dl->cachePolicy();
   } else {
     kurl = url.deprecatedString();
-    cachePolicy = KIO::CC_Verify;
+    cachePolicy = CachePolicyVerify;
   }
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
@@ -300,13 +300,13 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
                                                  time_t expireDate) {
   // this brings the _url to a standard form...
   KURL kurl;
-  KIO::CacheControl cachePolicy;
+  CachePolicy cachePolicy;
   if (dl) {
     kurl = dl->m_doc->completeURL(url.deprecatedString());
     cachePolicy = dl->cachePolicy();
   } else {
     kurl = url.deprecatedString();
-    cachePolicy = KIO::CC_Verify;
+    cachePolicy = CachePolicyVerify;
   }
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
@@ -354,13 +354,13 @@ CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
                                              time_t expireDate) {
   // this brings the _url to a standard form...
   KURL kurl;
-  KIO::CacheControl cachePolicy;
+  CachePolicy cachePolicy;
   if (dl) {
     kurl = dl->m_doc->completeURL(url.deprecatedString());
     cachePolicy = dl->cachePolicy();
   } else {
     kurl = url.deprecatedString();
-    cachePolicy = KIO::CC_Verify;
+    cachePolicy = CachePolicyVerify;
   }
 
   // Checking if the URL is malformed is lots of extra work for little benefit.

@@ -30,8 +30,8 @@
 #define CachedObject_h
 
 #include "DeprecatedString.h"
+#include "CachePolicy.h"
 #include "PlatformString.h"
-#include "CacheControl.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 #include <time.h>
@@ -84,7 +84,7 @@ class CachedObject {
 
   CachedObject(const String& URL,
                Type type,
-               KIO::CacheControl cachePolicy,
+               CachePolicy cachePolicy,
                time_t expireDate,
                int size = 0) {
     m_url = URL;
@@ -147,7 +147,7 @@ class CachedObject {
    */
   void setFree(bool b) { m_free = b; }
 
-  KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
+  CachePolicy cachePolicy() const { return m_cachePolicy; }
 
   void setRequest(Request*);
 
@@ -192,7 +192,7 @@ class CachedObject {
 
  protected:
   time_t m_expireDate;
-  KIO::CacheControl m_cachePolicy;
+  CachePolicy m_cachePolicy;
   bool m_free : 1;
   bool m_deleted : 1;
   bool m_loading : 1;

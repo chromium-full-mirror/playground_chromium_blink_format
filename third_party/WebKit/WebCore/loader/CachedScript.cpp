@@ -40,10 +40,10 @@ namespace WebCore {
 
 CachedScript::CachedScript(DocLoader* dl,
                            const String& url,
-                           KIO::CacheControl _cachePolicy,
+                           CachePolicy cachePolicy,
                            time_t _expireDate,
                            const DeprecatedString& charset)
-    : CachedObject(url, Script, _cachePolicy, _expireDate),
+    : CachedObject(url, Script, cachePolicy, _expireDate),
       m_encoding(charset.latin1()) {
   // It's javascript we want.
   // But some websites think their scripts are <some wrong mimetype here>
@@ -59,7 +59,7 @@ CachedScript::CachedScript(DocLoader* dl,
 
 CachedScript::CachedScript(const String& url,
                            const DeprecatedString& script_data)
-    : CachedObject(url, Script, KIO::CC_Verify, 0, script_data.length()),
+    : CachedObject(url, Script, CachePolicyVerify, 0, script_data.length()),
       m_encoding(InvalidEncoding) {
   m_errorOccurred = false;
   m_loading = false;

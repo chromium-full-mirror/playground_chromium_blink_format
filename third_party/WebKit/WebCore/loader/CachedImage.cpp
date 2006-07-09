@@ -45,9 +45,9 @@ namespace WebCore {
 
 CachedImage::CachedImage(DocLoader* dl,
                          const String& url,
-                         KIO::CacheControl _cachePolicy,
+                         CachePolicy cachePolicy,
                          time_t _expireDate)
-    : CachedObject(url, ImageResource, _cachePolicy, _expireDate),
+    : CachedObject(url, ImageResource, cachePolicy, _expireDate),
       m_dataSize(0) {
   m_image = 0;
   m_errorOccurred = false;

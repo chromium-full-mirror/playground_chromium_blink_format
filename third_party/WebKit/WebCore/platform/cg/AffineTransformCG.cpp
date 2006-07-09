@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -103,10 +103,6 @@ AffineTransform& AffineTransform::shear(double sx, double sy) {
 
 double AffineTransform::det() const {
   return m_transform.a * m_transform.d - m_transform.b * m_transform.c;
-}
-
-bool AffineTransform::isInvertible() const {
-  return det() != 0.0;
 }
 
 AffineTransform AffineTransform::invert() const {

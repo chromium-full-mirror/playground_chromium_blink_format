@@ -42,7 +42,7 @@
 namespace WebCore {
 
 DocLoader::DocLoader(Frame* frame, Document* doc) {
-  m_cachePolicy = KIO::CC_Verify;
+  m_cachePolicy = CachePolicyVerify;
   m_expireDate = 0;
   m_bautoloadImages = true;
   m_frame = frame;
@@ -63,7 +63,7 @@ void DocLoader::setExpireDate(time_t _expireDate) {
 
 bool DocLoader::needReload(const KURL& fullURL) {
   bool reload = false;
-  if (m_cachePolicy == KIO::CC_Verify) {
+  if (m_cachePolicy == CachePolicyVerify) {
     if (!m_reloadedURLs.contains(fullURL.url())) {
       CachedObject* existing = Cache::get(fullURL.url());
       if (existing && existing->isExpired()) {
@@ -72,8 +72,8 @@ bool DocLoader::needReload(const KURL& fullURL) {
         reload = true;
       }
     }
-  } else if ((m_cachePolicy == KIO::CC_Reload) ||
-             (m_cachePolicy == KIO::CC_Refresh)) {
+  } else if ((m_cachePolicy == CachePolicyReload) ||
+             (m_cachePolicy == CachePolicyRefresh)) {
     if (!m_reloadedURLs.contains(fullURL.url())) {
       CachedObject* existing = Cache::get(fullURL.url());
       if (existing)
@@ -89,7 +89,7 @@ CachedImage* DocLoader::requestImage(const String& url) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))
-    setCachePolicy(KIO::CC_Reload);
+    setCachePolicy(CachePolicyReload);
 
   bool reload = needReload(fullURL);
 
@@ -105,7 +105,7 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))
-    setCachePolicy(KIO::CC_Reload);
+    setCachePolicy(CachePolicyReload);
 
   bool reload = needReload(fullURL);
 
@@ -120,7 +120,7 @@ CachedScript* DocLoader::requestScript(const String& url,
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))
-    setCachePolicy(KIO::CC_Reload);
+    setCachePolicy(CachePolicyReload);
 
   bool reload = needReload(fullURL);
 
@@ -135,7 +135,7 @@ CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(const String& url) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))
-    setCachePolicy(KIO::CC_Reload);
+    setCachePolicy(CachePolicyReload);
 
   bool reload = needReload(fullURL);
 
@@ -155,7 +155,7 @@ CachedXBLDocument* DocLoader::requestXBLDocument(const String& url) {
     return 0;
 
   if (CheckIfReloading(this))
-    setCachePolicy(KIO::CC_Reload);
+    setCachePolicy(CachePolicyReload);
 
   bool reload = needReload(fullURL);
 
@@ -192,7 +192,7 @@ void DocLoader::setAutoloadImages(bool enable) {
   }
 }
 
-void DocLoader::setCachePolicy(KIO::CacheControl cachePolicy) {
+void DocLoader::setCachePolicy(CachePolicy cachePolicy) {
   m_cachePolicy = cachePolicy;
 }
 

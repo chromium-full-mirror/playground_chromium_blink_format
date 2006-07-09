@@ -42,7 +42,7 @@ class CachedXSLStyleSheet : public CachedObject {
  public:
   CachedXSLStyleSheet(DocLoader*,
                       const String& url,
-                      KIO::CacheControl cachePolicy,
+                      CachePolicy,
                       time_t expireDate);
 
   const String& sheet() const { return m_sheet; }

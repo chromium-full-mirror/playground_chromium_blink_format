@@ -40,7 +40,7 @@ class CachedScript : public CachedObject {
  public:
   CachedScript(DocLoader*,
                const String& URL,
-               KIO::CacheControl,
+               CachePolicy,
                time_t expireDate,
                const DeprecatedString& charset);
   CachedScript(const String& URL, const DeprecatedString& scriptData);

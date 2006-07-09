@@ -288,8 +288,8 @@ void Frame::stopLoading(bool sendUnload) {
   d->m_bComplete =
       true;  // to avoid calling completed() in finishedParsing() (David)
   d->m_bLoadingMainResource = false;
-  d->m_bLoadEventEmitted = true;      // don't want that one either
-  d->m_cachePolicy = KIO::CC_Verify;  // Why here?
+  d->m_bLoadEventEmitted = true;         // don't want that one either
+  d->m_cachePolicy = CachePolicyVerify;  // Why here?
 
   if (d->m_doc && d->m_doc->parsing()) {
     finishedParsing();
@@ -919,7 +919,7 @@ void Frame::scheduleRefresh(bool userGesture) {
   d->m_redirectReferrer = referrer();
   d->m_redirectLockHistory = true;
   d->m_redirectUserGesture = userGesture;
-  d->m_cachePolicy = KIO::CC_Refresh;
+  d->m_cachePolicy = CachePolicyRefresh;
   stopRedirectionTimer();
   if (d->m_bComplete)
     startRedirectionTimer();
@@ -997,8 +997,8 @@ void Frame::changeLocation(const DeprecatedString& URL,
   if (!referrer.isEmpty())
     request.setReferrer(referrer);
 
-  request.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
-                   (d->m_cachePolicy == KIO::CC_Refresh);
+  request.reload = (d->m_cachePolicy == CachePolicyReload) ||
+                   (d->m_cachePolicy == CachePolicyRefresh);
 
   urlSelected(request, "_self");
 }
@@ -1374,8 +1374,8 @@ bool Frame::requestFrame(Element* ownerElement,
   if (frame) {
     ResourceRequest request(url);
     request.setReferrer(d->m_referrer);
-    request.reload = (d->m_cachePolicy == KIO::CC_Reload) ||
-                     (d->m_cachePolicy == KIO::CC_Refresh);
+    request.reload = (d->m_cachePolicy == CachePolicyReload) ||
+                     (d->m_cachePolicy == CachePolicyRefresh);
     frame->openURLRequest(request);
   } else
     frame = loadSubframe(ownerElement, url, frameName, d->m_referrer);
