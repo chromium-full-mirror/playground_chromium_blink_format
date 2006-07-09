@@ -98,6 +98,7 @@ extern size_t (*wkGetGlyphVectorRecordSize)(void* glyphVector);
 extern NSString* (*wkGetMIMETypeForExtension)(NSString*);
 extern ATSUFontID (*wkGetNSFontATSUFontId)(NSFont*);
 extern OSStatus (*wkInitializeGlyphVector)(int count, void* glyphs);
+extern NSString* (*wkPathFromFont)(NSFont*);
 extern void (*wkPopupMenu)(NSMenu*,
                            NSPoint location,
                            float width,
