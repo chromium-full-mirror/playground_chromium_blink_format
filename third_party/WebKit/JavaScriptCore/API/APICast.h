@@ -47,7 +47,7 @@ inline KJS::JSValue* toJS(JSValueRef v) {
   return reinterpret_cast<KJS::JSValue*>(v);
 }
 
-inline KJS::UString::Rep* toJS(JSStringBufferRef b) {
+inline KJS::UString::Rep* toJS(JSInternalStringRef b) {
   return reinterpret_cast<KJS::UString::Rep*>(b);
 }
 
@@ -63,8 +63,8 @@ inline JSValueRef toRef(KJS::JSValue* v) {
   return reinterpret_cast<JSValueRef>(v);
 }
 
-inline JSStringBufferRef toRef(KJS::UString::Rep* s) {
-  return reinterpret_cast<JSStringBufferRef>(s);
+inline JSInternalStringRef toRef(KJS::UString::Rep* s) {
+  return reinterpret_cast<JSInternalStringRef>(s);
 }
 
 inline JSObjectRef toRef(KJS::JSObject* o) {

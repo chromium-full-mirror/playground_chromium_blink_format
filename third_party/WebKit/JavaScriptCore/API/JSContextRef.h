@@ -89,10 +89,10 @@ void JSContextClearException(JSContextRef context);
 @function
 @abstract                 Evaluates a string of JavaScript.
 @param context            The execution context to use.
-@param script             A JSStringBuffer containing the script to evaluate.
+@param script             A JSInternalString containing the script to evaluate.
 @param thisObject         The object to use as "this," or NULL to use the global
 object as "this."
-@param sourceURL          A JSStringBuffer containing a URL for the script's
+@param sourceURL          A JSInternalString containing a URL for the script's
 source file. This is only used when reporting exceptions. Pass NULL if you do
 not care to include source file information in exceptions.
 @param startingLineNumber An integer value specifying the script's starting line
@@ -105,9 +105,9 @@ exception.
 NULL if an uncaught exception is thrown.
 */
 JSValueRef JSEvaluate(JSContextRef context,
-                      JSStringBufferRef script,
+                      JSInternalStringRef script,
                       JSObjectRef thisObject,
-                      JSStringBufferRef sourceURL,
+                      JSInternalStringRef sourceURL,
                       int startingLineNumber,
                       JSValueRef* exception);
 
@@ -115,9 +115,9 @@ JSValueRef JSEvaluate(JSContextRef context,
 @function JSCheckSyntax
 @abstract                 Checks for syntax errors in a string of JavaScript.
 @param context            The execution context to use.
-@param script             A JSStringBuffer containing the JavaScript to check
+@param script             A JSInternalString containing the JavaScript to check
 for syntax errors.
-@param sourceURL          A JSStringBuffer containing a URL for the script's
+@param sourceURL          A JSInternalString containing a URL for the script's
 source file. This is only used when reporting exceptions. Pass NULL if you do
 not care to include source file information in exceptions.
 @param startingLineNumber An integer value specifying the script's starting line
@@ -130,8 +130,8 @@ exception.
 false.
 */
 bool JSCheckSyntax(JSContextRef context,
-                   JSStringBufferRef script,
-                   JSStringBufferRef sourceURL,
+                   JSInternalStringRef script,
+                   JSInternalStringRef sourceURL,
                    int startingLineNumber,
                    JSValueRef* exception);
 

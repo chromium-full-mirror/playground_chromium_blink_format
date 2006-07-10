@@ -88,13 +88,13 @@ typedef void (*JSFinalizeCallback)(JSObjectRef object);
 property.
 @param context The current execution context.
 @param object The JSObject to search for the property.
-@param propertyName A JSStringBuffer containing the name of the property look
+@param propertyName A JSInternalString containing the name of the property look
 up.
 @result true if object has the property, otherwise false.
 @discussion If you named your function HasProperty, you would declare it like
 this:
 
-bool HasProperty(JSContextRef context, JSObjectRef object, JSStringBufferRef
+bool HasProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
 propertyName);
 
 This callback enables optimization in cases where only a property's existence
@@ -104,14 +104,15 @@ hasProperty calls.
 */
 typedef bool (*JSHasPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
-                                      JSStringBufferRef propertyName);
+                                      JSInternalStringRef propertyName);
 
 /*!
 @typedef JSGetPropertyCallback
 @abstract The callback invoked when getting a property from an object.
 @param context The current execution context.
 @param object The JSObject to search for the property.
-@param propertyName A JSStringBuffer containing the name of the property to get.
+@param propertyName A JSInternalString containing the name of the property to
+get.
 @param returnValue A pointer to a JSValue in which to store the property's
 value.
 @result true if object has the property in question, otherwise false. If this
@@ -119,7 +120,7 @@ function returns true, returnValue is assumed to contain a valid JSValue.
 @discussion If you named your function GetProperty, you would declare it like
 this:
 
-bool GetProperty(JSContextRef context, JSObjectRef object, JSStringBufferRef
+bool GetProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
 propertyName, JSValueRef* returnValue);
 
 If this function returns false, the get request forwards to object's static
@@ -128,7 +129,7 @@ class), then its prototype chain.
 */
 typedef bool (*JSGetPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
-                                      JSStringBufferRef propertyName,
+                                      JSInternalStringRef propertyName,
                                       JSValueRef* returnValue);
 
 /*!
@@ -136,13 +137,14 @@ typedef bool (*JSGetPropertyCallback)(JSContextRef context,
 @abstract The callback invoked when setting the value of a given property.
 @param context The current execution context.
 @param object The JSObject on which to set the property's value.
-@param propertyName A JSStringBuffer containing the name of the property to set.
+@param propertyName A JSInternalString containing the name of the property to
+set.
 @param value A JSValue to use as the property's value.
 @result true if the property was successfully set, otherwise false.
 @discussion If you named your function SetProperty, you would declare it like
 this:
 
-bool SetProperty(JSContextRef context, JSObjectRef object, JSStringBufferRef
+bool SetProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
 propertyName, JSValueRef value);
 
 If this function returns false, the set request forwards to object's static
@@ -151,7 +153,7 @@ class).
 */
 typedef bool (*JSSetPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
-                                      JSStringBufferRef propertyName,
+                                      JSInternalStringRef propertyName,
                                       JSValueRef value);
 
 /*!
@@ -159,14 +161,14 @@ typedef bool (*JSSetPropertyCallback)(JSContextRef context,
 @abstract The callback invoked when deleting a given property.
 @param context The current execution context.
 @param object The JSObject in which to delete the property.
-@param propertyName A JSStringBuffer containing the name of the property to
+@param propertyName A JSInternalString containing the name of the property to
 delete.
 @result true if propertyName was successfully deleted, otherwise false.
 @discussion If you named your function DeleteProperty, you would declare it like
 this:
 
-bool DeleteProperty(JSContextRef context, JSObjectRef object, JSStringBufferRef
-propertyName);
+bool DeleteProperty(JSContextRef context, JSObjectRef object,
+JSInternalStringRef propertyName);
 
 If this function returns false, the delete request forwards to object's static
 property table, then its parent class chain (which includes the default object
@@ -174,7 +176,7 @@ class).
 */
 typedef bool (*JSDeletePropertyCallback)(JSContextRef context,
                                          JSObjectRef object,
-                                         JSStringBufferRef propertyName);
+                                         JSInternalStringRef propertyName);
 
 /*!
 @typedef JSGetPropertyListCallback
@@ -449,11 +451,11 @@ JSObjectRef JSConstructorMake(JSContextRef context,
 @function
 @abstract Creates a function with a given script as its body.
 @param context The execution context to use.
-@param body A JSStringBuffer containing the script to use as the function's
+@param body A JSInternalString containing the script to use as the function's
 body.
-@param sourceURL A JSStringBuffer containing a URL for the script's source file.
-This is only used when reporting exceptions. Pass NULL if you do not care to
-include source file information in exceptions.
+@param sourceURL A JSInternalString containing a URL for the script's source
+file. This is only used when reporting exceptions. Pass NULL if you do not care
+to include source file information in exceptions.
 @param startingLineNumber An integer value specifying the script's starting line
 number in the file located at sourceURL. This is only used when reporting
 exceptions.
@@ -467,8 +469,8 @@ prototype.
 avoid the cost of re-parsing the script before each execution.
 */
 JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
-                                   JSStringBufferRef body,
-                                   JSStringBufferRef sourceURL,
+                                   JSInternalStringRef body,
+                                   JSInternalStringRef sourceURL,
                                    int startingLineNumber,
                                    JSValueRef* exception);
 
@@ -477,10 +479,10 @@ JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
 @abstract Gets a short description of a JavaScript object.
 @param context The execution context to use.
 @param object The object whose description you want to get.
-@result A JSStringBuffer containing the object's description. This is usually
+@result A JSInternalString containing the object's description. This is usually
 the object's class name.
 */
-JSStringBufferRef JSObjectGetDescription(JSObjectRef object);
+JSInternalStringRef JSObjectGetDescription(JSObjectRef object);
 
 /*!
 @function
@@ -501,31 +503,31 @@ void JSObjectSetPrototype(JSObjectRef object, JSValueRef value);
 @function
 @abstract Tests whether an object has a certain property.
 @param object The JSObject to test.
-@param propertyName A JSStringBuffer containing the property's name.
+@param propertyName A JSInternalString containing the property's name.
 @result true if the object has a property whose name matches propertyName,
 otherwise false.
 */
 bool JSObjectHasProperty(JSContextRef context,
                          JSObjectRef object,
-                         JSStringBufferRef propertyName);
+                         JSInternalStringRef propertyName);
 /*!
 @function
 @abstract Gets a property from an object.
 @param context The execution context to use.
 @param object The JSObject whose property you want to get.
-@param propertyName A JSStringBuffer containing the property's name.
+@param propertyName A JSInternalString containing the property's name.
 @result The property's value, or NULL if the object does not have a property
 whose name matches propertyName.
 */
 JSValueRef JSObjectGetProperty(JSContextRef context,
                                JSObjectRef object,
-                               JSStringBufferRef propertyName);
+                               JSInternalStringRef propertyName);
 /*!
 @function
 @abstract Sets a property on an object.
 @param context The execution context to use.
 @param object The JSObject whose property you want to set.
-@param propertyName A JSStringBuffer containing the property's name.
+@param propertyName A JSInternalString containing the property's name.
 @param value A JSValue to use as the property's value.
 @param attributes A logically ORed set of JSPropertyAttributes to give to the
 property.
@@ -535,7 +537,7 @@ kJSPropertyAttributeReadOnly attribute set).
 */
 bool JSObjectSetProperty(JSContextRef context,
                          JSObjectRef object,
-                         JSStringBufferRef propertyName,
+                         JSInternalStringRef propertyName,
                          JSValueRef value,
                          JSPropertyAttributes attributes);
 /*!
@@ -543,13 +545,13 @@ bool JSObjectSetProperty(JSContextRef context,
 @abstract Deletes a property from an object.
 @param context The execution context to use.
 @param object The JSObject whose property you want to delete.
-@param propertyName A JSStringBuffer containing the property's name.
+@param propertyName A JSInternalString containing the property's name.
 @result true if the delete operation succeeds, otherwise false (for example, if
 the property has the kJSPropertyAttributeDontDelete attribute set).
 */
 bool JSObjectDeleteProperty(JSContextRef context,
                             JSObjectRef object,
-                            JSStringBufferRef propertyName);
+                            JSInternalStringRef propertyName);
 
 /*!
 @function
@@ -652,10 +654,10 @@ void JSPropertyEnumeratorRelease(JSPropertyEnumeratorRef enumerator);
 @function
 @abstract Gets a property enumerator's next property.
 @param enumerator The JSPropertyEnumerator whose next property you want to get.
-@result A JSStringBuffer containing the property's name, or NULL if all
+@result A JSInternalString containing the property's name, or NULL if all
 properties have been enumerated.
 */
-JSStringBufferRef JSPropertyEnumeratorGetNext(
+JSInternalStringRef JSPropertyEnumeratorGetNext(
     JSPropertyEnumeratorRef enumerator);
 
 /*!
@@ -665,11 +667,11 @@ JSStringBufferRef JSPropertyEnumeratorGetNext(
 property to an object's property list.
 @param propertyList The JSPropertyList to which you want to add a property.
 @param thisObject The JSObject to which the property belongs.
-@param propertyName A JSStringBuffer specifying the property's name.
+@param propertyName A JSInternalString specifying the property's name.
 */
 void JSPropertyListAdd(JSPropertyListRef propertyList,
                        JSObjectRef thisObject,
-                       JSStringBufferRef propertyName);
+                       JSInternalStringRef propertyName);
 
 #ifdef __cplusplus
 }

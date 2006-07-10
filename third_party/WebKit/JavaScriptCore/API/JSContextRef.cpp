@@ -62,9 +62,9 @@ JSObjectRef JSContextGetGlobalObject(JSContextRef context) {
 }
 
 JSValueRef JSEvaluate(JSContextRef context,
-                      JSStringBufferRef script,
+                      JSInternalStringRef script,
                       JSObjectRef thisObject,
-                      JSStringBufferRef sourceURL,
+                      JSInternalStringRef sourceURL,
                       int startingLineNumber,
                       JSValueRef* exception) {
   JSLock lock;
@@ -91,8 +91,8 @@ JSValueRef JSEvaluate(JSContextRef context,
 }
 
 bool JSCheckSyntax(JSContextRef context,
-                   JSStringBufferRef script,
-                   JSStringBufferRef sourceURL,
+                   JSInternalStringRef script,
+                   JSInternalStringRef sourceURL,
                    int startingLineNumber,
                    JSValueRef* exception) {
   JSLock lock;

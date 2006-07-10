@@ -26,7 +26,7 @@
 
 #include "APICast.h"
 #include "JSCallbackObject.h"
-#include "JSStringBufferRef.h"
+#include "JSInternalStringRef.h"
 #include "JSClassRef.h"
 #include "JSObjectRef.h"
 #include "internal.h"
@@ -80,7 +80,7 @@ bool JSCallbackObject::getOwnPropertySlot(ExecState* exec,
                                           PropertySlot& slot) {
   JSContextRef context = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringBufferRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parent) {
     // optional optimization to bypass getProperty in cases when we only need to
@@ -139,7 +139,7 @@ void JSCallbackObject::put(ExecState* exec,
                            int attr) {
   JSContextRef context = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringBufferRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parent) {
     if (JSSetPropertyCallback setPropertyCallback =
@@ -185,7 +185,7 @@ bool JSCallbackObject::deleteProperty(ExecState* exec,
                                       const Identifier& propertyName) {
   JSContextRef context = toRef(exec);
   JSObjectRef thisRef = toRef(this);
-  JSStringBufferRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parent) {
     if (JSDeletePropertyCallback deletePropertyCallback =
@@ -394,7 +394,7 @@ JSValue* JSCallbackObject::staticValueGetter(ExecState* exec,
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);
-  JSStringBufferRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parent) {
@@ -446,7 +446,7 @@ JSValue* JSCallbackObject::callbackGetter(ExecState* exec,
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   JSObjectRef thisRef = toRef(thisObj);
-  JSStringBufferRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parent) {
