@@ -420,7 +420,7 @@ default object prototype.
 */
 JSObjectRef JSObjectMake(JSContextRef context,
                          JSClassRef jsClass,
-                         JSObjectRef prototype);
+                         JSValueRef prototype);
 
 /*!
 @function

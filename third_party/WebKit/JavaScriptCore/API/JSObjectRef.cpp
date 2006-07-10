@@ -42,11 +42,11 @@ using namespace KJS;
 
 JSObjectRef JSObjectMake(JSContextRef context,
                          JSClassRef jsClass,
-                         JSObjectRef prototype) {
+                         JSValueRef prototype) {
   JSLock lock;
 
   ExecState* exec = toJS(context);
-  JSObject* jsPrototype = toJS(prototype);
+  JSValue* jsPrototype = toJS(prototype);
 
   if (!prototype)
     jsPrototype = exec->lexicalInterpreter()->builtinObjectPrototype();
@@ -93,8 +93,8 @@ JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
                     bodyRep->size(), &sid, &errLine, &errMsg);
   if (!bodyNode) {
     if (exception)
-      *exception =
-          Error::create(exec, SyntaxError, errMsg, errLine, sid, jsSourceURL);
+      *exception = toRef(
+          Error::create(exec, SyntaxError, errMsg, errLine, sid, jsSourceURL));
     return 0;
   }
 
@@ -144,7 +144,7 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
   JSValue* jsValue = jsObject->get(exec, Identifier(nameRep));
   if (jsValue->isUndefined())
     return 0;
-  return jsValue;
+  return toRef(jsValue);
 }
 
 bool JSObjectSetProperty(JSContextRef context,
@@ -241,7 +241,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
       argList));  // returns NULL if object->implementsCall() is false
   if (exec->hadException()) {
     if (exception)
-      *exception = exec->exception();
+      *exception = toRef(exec->exception());
     exec->clearException();
     result = 0;
   }
@@ -270,7 +270,7 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
       exec, argList));  // returns NULL if object->implementsCall() is false
   if (exec->hadException()) {
     if (exception)
-      *exception = exec->exception();
+      *exception = toRef(exec->exception());
     exec->clearException();
     result = 0;
   }

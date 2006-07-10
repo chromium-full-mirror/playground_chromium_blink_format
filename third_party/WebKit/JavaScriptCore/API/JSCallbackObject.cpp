@@ -44,7 +44,7 @@ JSCallbackObject::JSCallbackObject(JSContextRef context, JSClassRef jsClass)
 
 JSCallbackObject::JSCallbackObject(JSContextRef context,
                                    JSClassRef jsClass,
-                                   JSObject* prototype)
+                                   JSValue* prototype)
     : JSObject(prototype) {
   init(context, jsClass);
 }
@@ -99,7 +99,7 @@ bool JSCallbackObject::getOwnPropertySlot(ExecState* exec,
         // cache the value so we don't have to compute it again
         // FIXME: This violates the PropertySlot design a little bit.
         // We should either use this optimization everywhere, or nowhere.
-        slot.setCustom(reinterpret_cast<JSObject*>(returnValue),
+        slot.setCustom(reinterpret_cast<JSObject*>(toJS(returnValue)),
                        cachedValueGetter);
         return true;
       }
@@ -140,11 +140,12 @@ void JSCallbackObject::put(ExecState* exec,
   JSContextRef context = toRef(exec);
   JSObjectRef thisRef = toRef(this);
   JSInternalStringRef propertyNameRef = toRef(propertyName.ustring().rep());
+  JSValueRef valueRef = toRef(value);
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parent) {
     if (JSSetPropertyCallback setPropertyCallback =
             jsClass->callbacks.setProperty) {
-      if (setPropertyCallback(context, thisRef, propertyNameRef, value))
+      if (setPropertyCallback(context, thisRef, propertyNameRef, valueRef))
         return;
     }
 
@@ -154,7 +155,7 @@ void JSCallbackObject::put(ExecState* exec,
         if (entry->attributes & kJSPropertyAttributeReadOnly)
           return;
         if (JSSetPropertyCallback setPropertyCallback = entry->setProperty) {
-          if (setPropertyCallback(context, thisRef, propertyNameRef, value))
+          if (setPropertyCallback(context, thisRef, propertyNameRef, valueRef))
             return;
         }
       }
@@ -238,7 +239,7 @@ JSObject* JSCallbackObject::construct(ExecState* exec, const List& args) {
       size_t argc = args.size();
       JSValueRef argv[argc];
       for (size_t i = 0; i < argc; i++)
-        argv[i] = args[i];
+        argv[i] = toRef(args[i]);
       return toJS(callAsConstructorCallback(execRef, thisRef, argc, argv));
     }
   }
@@ -268,7 +269,7 @@ JSValue* JSCallbackObject::callAsFunction(ExecState* exec,
       size_t argc = args.size();
       JSValueRef argv[argc];
       for (size_t i = 0; i < argc; i++)
-        argv[i] = args[i];
+        argv[i] = toRef(args[i]);
       return toJS(
           callAsFunctionCallback(execRef, thisRef, thisObjRef, argc, argv));
     }
@@ -420,7 +421,7 @@ JSValue* JSCallbackObject::staticFunctionGetter(ExecState* exec,
   JSCallbackObject* thisObj = static_cast<JSCallbackObject*>(slot.slotBase());
 
   if (JSValue* cachedOrOverrideValue = thisObj->getDirect(propertyName))
-    return toJS(cachedOrOverrideValue);
+    return cachedOrOverrideValue;
 
   for (JSClassRef jsClass = thisObj->m_class; jsClass;
        jsClass = jsClass->parent) {
