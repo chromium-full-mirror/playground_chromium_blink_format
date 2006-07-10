@@ -28,7 +28,6 @@
 namespace WebCore {
 class TextField;
 }
-
 @class WebCoreTextFieldFormatter;
 @protocol WebCoreWidgetHolder;
 
@@ -45,7 +44,7 @@ class TextField;
   NSWritingDirection baseWritingDirection;
 }
 
-- (void)detachQLineEdit;
+- (void)detachWidget;
 
 - (BOOL)hasSelection;
 
@@ -65,6 +64,17 @@ class TextField;
 
 @end
 
+@interface WebCoreTextField : NSTextField<WebCoreWidgetHolder> {
+ @private
+  WebCoreTextFieldController* controller;
+  BOOL inNextValidKeyView;
+}
+
+- (id)initWithWidget:(WebCore::TextField*)widget;
+- (WebCoreTextFieldController*)controller;
+
+@end
+
 @interface WebCoreSecureTextField : NSSecureTextField<WebCoreWidgetHolder> {
  @private
   WebCoreTextFieldController* controller;
@@ -72,7 +82,7 @@ class TextField;
   BOOL inSetFrameSize;
 }
 
-- (id)initWithQLineEdit:(WebCore::TextField*)widget;
+- (id)initWithWidget:(WebCore::TextField*)widget;
 - (WebCoreTextFieldController*)controller;
 
 @end
@@ -83,7 +93,7 @@ class TextField;
   BOOL inNextValidKeyView;
 }
 
-- (id)initWithQLineEdit:(WebCore::TextField*)widget;
+- (id)initWithWidget:(WebCore::TextField*)widget;
 - (WebCoreTextFieldController*)controller;
 
 @end
