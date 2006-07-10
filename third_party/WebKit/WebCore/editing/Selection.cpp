@@ -374,7 +374,8 @@ void Selection::adjustForEditableContent() {
              !(lowestEditableAncestor(node) == baseEditableAncestor &&
                !node->isContentEditable() && previous.isNotNull())) {
         node = node->traversePreviousNode();
-        previous = VisiblePosition(Position(node, maxDeepOffset(node)));
+        previous =
+            VisiblePosition(Position(node, node ? maxDeepOffset(node) : 0));
       }
 
       if (previous.isNull()) {
