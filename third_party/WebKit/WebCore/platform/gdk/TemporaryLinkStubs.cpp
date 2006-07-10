@@ -361,13 +361,16 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   return 0;
 }
 
-DeprecatedArray<char> ServeSynchronousRequest(Loader*,
-                                              DocLoader*,
-                                              TransferJob*,
-                                              KURL&,
-                                              DeprecatedString&) {
+namespace WebCore {
+
+Vector<char> ServeSynchronousRequest(Loader*,
+                                     DocLoader*,
+                                     TransferJob*,
+                                     KURL&,
+                                     DeprecatedString&) {
   notImplemented();
-  return 0;
+  return Vector<char>();
+}
 }
 
 void FrameGdk::focusWindow() {
@@ -627,10 +630,13 @@ int BrowserExtensionGdk::getHistoryLength() {
   return 0;
 }
 
+namespace WebCore {
+
 bool CheckIfReloading(WebCore::DocLoader*) {
   return false;
 }
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
+}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}

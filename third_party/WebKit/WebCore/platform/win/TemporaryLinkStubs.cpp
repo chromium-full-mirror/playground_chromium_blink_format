@@ -364,6 +364,8 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   return 0;
 }
 
+namespace WebCore {
+
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
                                      TransferJob*,
@@ -371,6 +373,7 @@ Vector<char> ServeSynchronousRequest(Loader*,
                                      DeprecatedString&) {
   notImplemented();
   return Vector<char>();
+}
 }
 
 void FrameWin::focusWindow() {
@@ -652,10 +655,13 @@ int BrowserExtensionWin::getHistoryLength() {
   return 0;
 }
 
+namespace WebCore {
+
 bool CheckIfReloading(WebCore::DocLoader*) {
   return false;
 }
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
+}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}
