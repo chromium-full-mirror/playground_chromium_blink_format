@@ -31,11 +31,6 @@
 #include "ScrollBar.h"
 #include "VisiblePosition.h"
 
-class CSSStyle;
-class AffineTransform;
-class TextStream;
-class RenderArena;
-
 /*
  *  The painting of a layer occurs in three distinct phases.  Each phase
  * involves
@@ -51,9 +46,10 @@ class RenderArena;
  */
 
 namespace WebCore {
-class Color;
+
+class AffineTransform;
 class CollapsedBorderValue;
-class String;
+class Color;
 class Document;
 class Element;
 class Event;
@@ -63,13 +59,16 @@ class HTMLAreaElement;
 class InlineBox;
 class InlineFlowBox;
 class Position;
+class RenderArena;
 class RenderBlock;
-class RenderView;
 class RenderFlow;
 class RenderFrameSet;
 class RenderLayer;
 class RenderTable;
 class RenderText;
+class RenderView;
+class String;
+class TextStream;
 class VisiblePosition;
 
 enum PaintPhase {

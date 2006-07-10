@@ -36,6 +36,8 @@ class NSMenuItem;
 class NSFont;
 #endif
 
+namespace WebCore {
+
 class PopUpButton : public Widget {
  public:
   PopUpButton();
@@ -59,13 +61,13 @@ class PopUpButton : public Widget {
   IntRect frameGeometry() const;
   void setFrameGeometry(const IntRect&);
   int baselinePosition(int height) const;
-  void setFont(const WebCore::Font&);
+  void setFont(const Font&);
 
   void itemSelected();
 
   virtual FocusPolicy focusPolicy() const;
 
-  void setWritingDirection(WebCore::TextDirection);
+  void setWritingDirection(TextDirection);
 
   virtual void populate();
   void populateMenu();
@@ -87,5 +89,6 @@ class PopUpButton : public Widget {
 
   mutable NSFont* _labelFont;
 };
+}
 
 #endif

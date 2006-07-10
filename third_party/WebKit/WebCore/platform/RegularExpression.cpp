@@ -25,14 +25,16 @@
 
 #include "config.h"
 #include "RegularExpression.h"
+
 #include "Logging.h"
-
-#include <sys/types.h>
-#include <pcre/pcre.h>
 #include "Shared.h"
+#include <pcre/pcre.h>
+#include <sys/types.h>
 
-#define MAX_SUBSTRINGS 10
-#define MAX_OFFSETS (3 * MAX_SUBSTRINGS)
+namespace WebCore {
+
+const size_t maxSubstrings = 10;
+const size_t maxOffsets = 3 * maxSubstrings;
 
 class RegularExpression::Private : public Shared<RegularExpression::Private> {
  public:
@@ -46,7 +48,7 @@ class RegularExpression::Private : public Shared<RegularExpression::Private> {
   pcre* regex;
 
   DeprecatedString lastMatchString;
-  int lastMatchOffsets[MAX_OFFSETS];
+  int lastMatchOffsets[maxOffsets];
   int lastMatchCount;
   int lastMatchPos;
   int lastMatchLength;
@@ -153,7 +155,7 @@ int RegularExpression::match(const DeprecatedString& str,
       d->regex, NULL,
       reinterpret_cast<const uint16_t*>(d->lastMatchString.unicode()),
       d->lastMatchString.length(), startFrom, startFrom == 0 ? 0 : PCRE_NOTBOL,
-      d->lastMatchOffsets, MAX_OFFSETS);
+      d->lastMatchOffsets, maxOffsets);
   if (d->lastMatchCount < 0) {
     if (d->lastMatchCount != PCRE_ERROR_NOMATCH)
       LOG_ERROR("RegularExpression: pcre_exec() failed with result %d",
@@ -228,4 +230,5 @@ DeprecatedString RegularExpression::cap(int n) const {
     return capture;
   }
   return DeprecatedString();
+}
 }

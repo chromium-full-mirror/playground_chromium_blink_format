@@ -48,7 +48,7 @@ class RenderSVGText : public RenderBlock {
                            int _y,
                            int _tx,
                            int _ty,
-                           WebCore::HitTestAction);
+                           HitTestAction);
 
   virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
                              int tx,

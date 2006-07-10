@@ -21,9 +21,9 @@
 #define __SVGPATHPARSER_H__
 #if SVG_SUPPORT
 
+namespace WebCore {
 class DeprecatedString;
 
-namespace WebCore {
 const char* parseCoord(const char* ptr, double& number);
 
 class SVGPolyParser {

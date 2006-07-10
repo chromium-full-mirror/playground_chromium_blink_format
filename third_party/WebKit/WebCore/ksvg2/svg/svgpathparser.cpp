@@ -24,9 +24,9 @@
 #include "DeprecatedString.h"
 #include <math.h>
 
-using namespace WebCore;
+namespace WebCore {
 
-const char* WebCore::parseCoord(const char* ptr, double& number) {
+const char* parseCoord(const char* ptr, double& number) {
   int integer, exponent;
   double decimal, frac;
   int sign, expsign;
@@ -567,6 +567,7 @@ void SVGPathParser::svgArcTo(double,
                              bool,
                              bool,
                              bool) {}
+}
 
 // vim:ts=4:noet
 #endif  // SVG_SUPPORT

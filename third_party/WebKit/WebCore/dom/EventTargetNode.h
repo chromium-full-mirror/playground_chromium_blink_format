@@ -28,10 +28,10 @@
 
 #include "Node.h"
 
+namespace WebCore {
+
 template <typename T>
 class DeprecatedValueList;
-
-namespace WebCore {
 
 class EventTargetNode : public Node {
  public:

@@ -31,13 +31,15 @@
 #include "PlatformString.h"
 #include <wtf/Vector.h>
 
+namespace WebCore {
+
 const size_t integerOrPointerAsStringBufferSize =
     100;  // large enough for any integer or pointer in string format, including
           // trailing null character
-const char* precisionFormats[] = {"%.0f", "%.1f", "%.2f", "%.3f", "%.4f",
-                                  "%.5f"
-                                  "%.6f"};
-const int maxPrecision = 6;  // must match to precisionFormats
+const char* const precisionFormats[6] = {"%.0f", "%.1f", "%.2f", "%.3f", "%.4f",
+                                         "%.5f"
+                                         "%.6f"};
+const int maxPrecision = 6;  // must match size of precisionFormats
 const int defaultPrecision =
     6;  // matches qt and sprintf(.., "%f", ...) behaviour
 
@@ -130,7 +132,7 @@ TextStream& TextStream::operator<<(const DeprecatedString& s) {
   return *this;
 }
 
-TextStream& TextStream::operator<<(const WebCore::String& s) {
+TextStream& TextStream::operator<<(const String& s) {
   return (*this) << s.deprecatedString();
 }
 
@@ -155,4 +157,5 @@ int TextStream::precision(int p) {
 
 TextStream& endl(TextStream& stream) {
   return stream << '\n';
+}
 }

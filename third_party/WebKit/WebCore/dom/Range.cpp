@@ -957,7 +957,7 @@ String Range::text() const {
 
   // FIXME: Maybe DOMRange constructor should take const DOMRange*; if it did we
   // would not need this const_cast.
-  return WebCore::plainText(const_cast<Range*>(this));
+  return plainText(const_cast<Range*>(this));
 }
 
 PassRefPtr<DocumentFragment> Range::createContextualFragment(

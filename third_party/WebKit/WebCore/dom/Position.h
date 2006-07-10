@@ -70,10 +70,10 @@ class Position {
   // These aren't really basic "position" operations. More high level editing
   // helper functions.
   Position leadingWhitespacePosition(
-      WebCore::EAffinity affinity,
+      EAffinity,
       bool considerNonCollapsibleWhitespace = false) const;
   Position trailingWhitespacePosition(
-      WebCore::EAffinity affinity,
+      EAffinity,
       bool considerNonCollapsibleWhitespace = false) const;
 
   // p.upstream() through p.downstream() is the range of positions that map to
@@ -98,8 +98,8 @@ class Position {
 
   bool inRenderedText() const;
 
-  Position previousCharacterPosition(WebCore::EAffinity affinity) const;
-  Position nextCharacterPosition(WebCore::EAffinity affinity) const;
+  Position previousCharacterPosition(EAffinity) const;
+  Position nextCharacterPosition(EAffinity) const;
 
   RefPtr<Node> m_node;
   int m_offset;

@@ -262,7 +262,7 @@ JSValue* DOMCSSStyleDeclarationProtoFunc::callAsFunction(ExecState* exec,
   CSSStyleDeclaration& styleDecl =
       *static_cast<DOMCSSStyleDeclaration*>(thisObj)->impl();
   UString str = args[0]->toString(exec);
-  WebCore::String s = str;
+  String s = str;
 
   switch (id) {
     case DOMCSSStyleDeclaration::GetPropertyValue:
@@ -289,8 +289,7 @@ JSValue* DOMCSSStyleDeclarationProtoFunc::callAsFunction(ExecState* exec,
 }
 
 JSValue* toJS(ExecState* exec, CSSStyleDeclaration* s) {
-  return cacheDOMObject<CSSStyleDeclaration, WebCore::JSCSSStyleDeclaration>(
-      exec, s);
+  return cacheDOMObject<CSSStyleDeclaration, JSCSSStyleDeclaration>(exec, s);
 }
 
 // -------------------------------------------------------------------------
@@ -308,12 +307,11 @@ const ClassInfo DOMStyleSheet::info = {"StyleSheet", 0, &DOMStyleSheetTable, 0};
 @end
 */
 
-DOMStyleSheet::DOMStyleSheet(ExecState* exec, WebCore::StyleSheet* ss)
-    : m_impl(ss) {
+DOMStyleSheet::DOMStyleSheet(ExecState* exec, StyleSheet* ss) : m_impl(ss) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
 
-DOMStyleSheet::DOMStyleSheet(WebCore::StyleSheet* ss) : m_impl(ss) {}
+DOMStyleSheet::DOMStyleSheet(StyleSheet* ss) : m_impl(ss) {}
 
 DOMStyleSheet::~DOMStyleSheet() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -390,8 +388,8 @@ KJS_IMPLEMENT_PROTOFUNC(
     DOMStyleSheetListFunc)  // not really a proto, but doesn't matter
 
 DOMStyleSheetList::DOMStyleSheetList(ExecState* exec,
-                                     WebCore::StyleSheetList* ssl,
-                                     WebCore::Document* doc)
+                                     StyleSheetList* ssl,
+                                     Document* doc)
     : m_impl(ssl), m_doc(doc) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
@@ -694,7 +692,7 @@ JSValue* DOMCSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
 
 KJS_IMPLEMENT_PROTOFUNC(DOMCSSRuleFunc)  // Not a proto, but doesn't matter
 
-DOMCSSRule::DOMCSSRule(ExecState* exec, WebCore::CSSRule* r) : m_impl(r) {}
+DOMCSSRule::DOMCSSRule(ExecState* exec, CSSRule* r) : m_impl(r) {}
 
 DOMCSSRule::~DOMCSSRule() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -925,7 +923,7 @@ const ClassInfo DOMCSSValue::info = {"CSSValue", 0, &DOMCSSValueTable, 0};
 KJS_IMPLEMENT_PROTOFUNC(DOMCSSValueProtoFunc)
 KJS_IMPLEMENT_PROTOTYPE("DOMCSSValue", DOMCSSValueProto, DOMCSSValueProtoFunc)
 
-DOMCSSValue::DOMCSSValue(ExecState* exec, WebCore::CSSValue* v) : m_impl(v) {
+DOMCSSValue::DOMCSSValue(ExecState* exec, CSSValue* v) : m_impl(v) {
   setPrototype(DOMCSSValueProto::self(exec));
 }
 
@@ -1049,7 +1047,7 @@ const ClassInfo DOMRect::info = {"Rect", 0, &DOMRectTable, 0};
   left   DOMRect::Left    DontDelete|ReadOnly
 @end
 */
-DOMRect::DOMRect(ExecState* exec, WebCore::RectImpl* r) : m_rect(r) {
+DOMRect::DOMRect(ExecState* exec, RectImpl* r) : m_rect(r) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
 

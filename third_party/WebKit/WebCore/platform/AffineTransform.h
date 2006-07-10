@@ -34,9 +34,9 @@
 #include <ApplicationServices/ApplicationServices.h>
 
 namespace WebCore {
+
 class IntRect;
 class FloatRect;
-}
 
 class AffineTransform {
  public:
@@ -46,8 +46,8 @@ class AffineTransform {
 
   void setMatrix(double a, double b, double c, double d, double tx, double ty);
   void map(double x, double y, double* x2, double* y2) const;
-  WebCore::IntRect AffineTransform::mapRect(const WebCore::IntRect&) const;
-  WebCore::FloatRect AffineTransform::mapRect(const WebCore::FloatRect&) const;
+  IntRect mapRect(const IntRect&) const;
+  FloatRect mapRect(const FloatRect&) const;
 
   bool isIdentity() const;
 
@@ -78,6 +78,7 @@ class AffineTransform {
  private:
   CGAffineTransform m_transform;
 };
+}
 
 #endif  // __APPLE__
 

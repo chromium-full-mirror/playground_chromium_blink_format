@@ -29,17 +29,15 @@
 #include "Document.h"
 #include "HTMLCollection.h"
 
-class DeprecatedString;
-
 namespace WebCore {
 
+class DeprecatedString;
 class FrameView;
 class HTMLElement;
 
-class HTMLDocument : public WebCore::Document,
-                     public WebCore::CachedResourceClient {
+class HTMLDocument : public Document, public CachedResourceClient {
  public:
-  HTMLDocument(DOMImplementation* _implementation, FrameView* v = 0);
+  HTMLDocument(DOMImplementation*, FrameView* = 0);
   ~HTMLDocument();
 
   virtual bool isHTMLDocument() const { return true; }
@@ -48,7 +46,7 @@ class HTMLDocument : public WebCore::Document,
   String cookie() const;
   void setCookie(const String&);
 
-  void setBody(HTMLElement*, ExceptionCode& ec);
+  void setBody(HTMLElement*, ExceptionCode&);
 
   virtual Tokenizer* createTokenizer();
 

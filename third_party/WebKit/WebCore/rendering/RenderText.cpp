@@ -90,7 +90,7 @@ int RenderText::nextOffset(int current) const {
   return result;
 }
 
-RenderText::RenderText(WebCore::Node* node, StringImpl* _str)
+RenderText::RenderText(Node* node, StringImpl* _str)
     : RenderObject(node),
       str(_str),
       m_firstTextBox(0),

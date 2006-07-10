@@ -55,7 +55,7 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  bool childShouldCreateRenderer(WebCore::Node* child) const;
+  bool childShouldCreateRenderer(Node* child) const;
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
  private:

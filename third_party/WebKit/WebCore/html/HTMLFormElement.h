@@ -122,7 +122,7 @@ class HTMLFormElement : public HTMLElement {
 
  private:
   void parseEnctype(const String&);
-  bool formData(WebCore::FormData&) const;
+  bool formData(FormData&) const;
 
   unsigned formElementIndex(HTMLGenericFormElement*);
 

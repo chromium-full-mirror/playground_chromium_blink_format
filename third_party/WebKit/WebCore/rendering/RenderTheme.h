@@ -53,9 +53,7 @@ class RenderTheme {
   // selection of control size based off the font, the disabling of appearance
   // when certain other properties like
   // "border" are set, or if the appearance is not supported by the theme.
-  void adjustStyle(CSSStyleSelector* selector,
-                   RenderStyle* style,
-                   WebCore::Element* e);
+  void adjustStyle(CSSStyleSelector* selector, RenderStyle* style, Element* e);
 
   // This method is called to paint the widget as a background of the
   // RenderObject.  A widget's foreground, e.g., the
@@ -150,7 +148,7 @@ class RenderTheme {
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(CSSStyleSelector* selector,
                                    RenderStyle* style,
-                                   WebCore::Element* e) const;
+                                   Element* e) const;
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
@@ -160,7 +158,7 @@ class RenderTheme {
 
   virtual void adjustRadioStyle(CSSStyleSelector* selector,
                                 RenderStyle* style,
-                                WebCore::Element* e) const;
+                                Element* e) const;
   virtual bool paintRadio(RenderObject* o,
                           const RenderObject::PaintInfo& i,
                           const IntRect& r) {
@@ -170,7 +168,7 @@ class RenderTheme {
 
   virtual void adjustButtonStyle(CSSStyleSelector* selector,
                                  RenderStyle* style,
-                                 WebCore::Element* e) const;
+                                 Element* e) const;
   virtual bool paintButton(RenderObject* o,
                            const RenderObject::PaintInfo& i,
                            const IntRect& r) {
@@ -180,7 +178,7 @@ class RenderTheme {
 
   virtual void adjustTextFieldStyle(CSSStyleSelector* selector,
                                     RenderStyle* style,
-                                    WebCore::Element* e) const;
+                                    Element* e) const;
   virtual bool paintTextField(RenderObject* o,
                               const RenderObject::PaintInfo& i,
                               const IntRect& r) {
@@ -189,7 +187,7 @@ class RenderTheme {
 
   virtual void adjustTextAreaStyle(CSSStyleSelector* selector,
                                    RenderStyle* style,
-                                   WebCore::Element* e) const;
+                                   Element* e) const;
   virtual bool paintTextArea(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
@@ -198,7 +196,7 @@ class RenderTheme {
 
   virtual void adjustMenuListStyle(CSSStyleSelector* selector,
                                    RenderStyle* style,
-                                   WebCore::Element* e) const;
+                                   Element* e) const;
   virtual bool paintMenuList(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {

@@ -28,6 +28,8 @@
 
 #include "DeprecatedPtrListImpl.h"
 
+namespace WebCore {
+
 template <class T>
 class DeprecatedPtrListIterator;
 
@@ -117,8 +119,6 @@ class DeprecatedPtrListIterator {
  private:
   DeprecatedPtrListImplIterator impl;
 };
-
-#define DeprecatedPtrList DeprecatedPtrList
-#define DeprecatedPtrListIterator DeprecatedPtrListIterator
+}
 
 #endif

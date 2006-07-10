@@ -30,6 +30,8 @@
 #include <algorithm>
 #include <wtf/Assertions.h>
 
+namespace WebCore {
+
 class DeprecatedListNode {
  public:
   DeprecatedListNode(void* d) : data(d), next(0), prev(0) {}
@@ -328,8 +330,6 @@ unsigned DeprecatedPtrListImpl::containsRef(const void* item) const {
   return count;
 }
 
-// Only used for WebCore::Node::compareDocumentPosition(Node *other)
-// remove when no longer needed.
 int DeprecatedPtrListImpl::findRef(const void* item) {
   DeprecatedListNode* node = head;
   int index = 0;
@@ -466,4 +466,5 @@ DeprecatedPtrListImplIterator& DeprecatedPtrListImplIterator::operator=(
   }
 
   return *this;
+}
 }

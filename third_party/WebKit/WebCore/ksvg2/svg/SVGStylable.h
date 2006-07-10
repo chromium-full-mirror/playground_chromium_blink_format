@@ -43,7 +43,7 @@ class SVGStylable {
   // 'SVGStylable' functions
   virtual SVGAnimatedString* className() const = 0;
 
-  virtual WebCore::CSSStyleDeclaration* style() = 0;
+  virtual CSSStyleDeclaration* style() = 0;
   virtual CSSValue* getPresentationAttribute(StringImpl* name) = 0;
 };
 };

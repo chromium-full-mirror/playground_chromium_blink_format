@@ -73,8 +73,4 @@ class TreeShared {
 };
 }
 
-// FIXME: Remove when everything is in the WebCore namespace.
-using WebCore::Shared;
-using WebCore::TreeShared;
-
 #endif

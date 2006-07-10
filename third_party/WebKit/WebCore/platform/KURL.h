@@ -39,8 +39,12 @@ class NSURL;
 #endif
 
 namespace WebCore {
+
+class KURL;
 class String;
-}
+
+bool operator==(const KURL&, const KURL&);
+bool equalIgnoringRef(const KURL&, const KURL&);
 
 class KURL {
  public:
@@ -48,8 +52,7 @@ class KURL {
   KURL(const char*);
   KURL(const KURL&,
        const DeprecatedString&,
-       const WebCore::TextEncoding& encoding =
-           WebCore::TextEncoding(WebCore::UTF8Encoding));
+       const TextEncoding& encoding = TextEncoding(UTF8Encoding));
   KURL(const DeprecatedString&);
 #if __APPLE__
   KURL(NSURL*);
@@ -94,8 +97,7 @@ class KURL {
 
   static DeprecatedString decode_string(
       const DeprecatedString&,
-      const WebCore::TextEncoding& encoding =
-          WebCore::TextEncoding(WebCore::UTF8Encoding));
+      const TextEncoding& encoding = TextEncoding(UTF8Encoding));
   static DeprecatedString encode_string(const DeprecatedString&);
 
   friend bool operator==(const KURL&, const KURL&);
@@ -118,5 +120,6 @@ class KURL {
 
   friend bool equalIgnoringRef(const KURL& a, const KURL& b);
 };
+}
 
 #endif

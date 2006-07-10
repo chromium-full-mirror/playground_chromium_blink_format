@@ -224,7 +224,7 @@ class DOMNamedNodesCollection : public DOMObject {
  public:
   DOMNamedNodesCollection(
       ExecState* exec,
-      const DeprecatedValueList<RefPtr<WebCore::Node>>& nodes);
+      const WebCore::DeprecatedValueList<RefPtr<WebCore::Node>>& nodes);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -239,7 +239,7 @@ class DOMNamedNodesCollection : public DOMObject {
                               const Identifier&,
                               const PropertySlot& slot);
 
-  DeprecatedValueList<RefPtr<WebCore::Node>> m_nodes;
+  WebCore::DeprecatedValueList<RefPtr<WebCore::Node>> m_nodes;
 };
 
 }  // namespace

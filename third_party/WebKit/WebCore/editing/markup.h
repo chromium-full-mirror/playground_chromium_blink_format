@@ -29,9 +29,6 @@
 #include "HTMLInterchange.h"
 #include <wtf/Forward.h>
 
-template <class T>
-class DeprecatedPtrList;
-
 namespace WebCore {
 
 class Document;
@@ -39,6 +36,9 @@ class DocumentFragment;
 class Node;
 class Range;
 class String;
+
+template <class T>
+class DeprecatedPtrList;
 
 enum EChildrenOnly { IncludeNode, ChildrenOnly };
 

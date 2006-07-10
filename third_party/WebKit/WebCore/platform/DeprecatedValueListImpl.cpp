@@ -29,6 +29,8 @@
 #include "Shared.h"
 #include <stdlib.h>
 
+namespace WebCore {
+
 class DeprecatedValueListImpl::Private
     : public Shared<DeprecatedValueListImpl::Private> {
  public:
@@ -393,4 +395,5 @@ bool DeprecatedValueListImpl::isEqual(
     }
   }
   return !p && !q;
+}
 }

@@ -29,8 +29,8 @@ using namespace WebCore;
 
 namespace WebCore {
 
-RenderTextFragment::RenderTextFragment(WebCore::Node* node,
-                                       WebCore::StringImpl* str,
+RenderTextFragment::RenderTextFragment(Node* node,
+                                       StringImpl* str,
                                        int startOffset,
                                        int length,
                                        RenderObject* firstLetter)
@@ -39,8 +39,7 @@ RenderTextFragment::RenderTextFragment(WebCore::Node* node,
       m_end(length),
       m_firstLetter(firstLetter) {}
 
-RenderTextFragment::RenderTextFragment(WebCore::Node* node,
-                                       WebCore::StringImpl* str)
+RenderTextFragment::RenderTextFragment(Node* node, StringImpl* str)
     : RenderText(node, str),
       m_start(0),
       m_end(str ? str->length() : 0),
@@ -52,7 +51,7 @@ bool RenderTextFragment::isTextFragment() const {
 }
 
 PassRefPtr<StringImpl> RenderTextFragment::originalString() const {
-  WebCore::StringImpl* result = 0;
+  StringImpl* result = 0;
   if (element())
     result = element()->string();
   else

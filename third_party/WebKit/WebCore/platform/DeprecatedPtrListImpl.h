@@ -26,6 +26,8 @@
 #ifndef DeprecatedPtrListImpl_h
 #define DeprecatedPtrListImpl_h
 
+namespace WebCore {
+
 class DeprecatedListNode;
 class DeprecatedPtrListImplIterator;
 
@@ -113,5 +115,6 @@ class DeprecatedPtrListImplIterator {
 
   friend class DeprecatedPtrListImpl;
 };
+}
 
 #endif

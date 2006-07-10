@@ -25,14 +25,17 @@
 
 #import <Cocoa/Cocoa.h>
 
+namespace WebCore {
 class TextField;
+}
+
 @class WebCoreTextFieldFormatter;
 @protocol WebCoreWidgetHolder;
 
 @interface WebCoreTextFieldController : NSObject {
  @private
   NSTextField* field;
-  TextField* widget;
+  WebCore::TextField* widget;
   WebCoreTextFieldFormatter* formatter;
   BOOL hasFocus;
   BOOL hasFocusAndSelectionSet;
@@ -62,17 +65,6 @@ class TextField;
 
 @end
 
-@interface WebCoreTextField : NSTextField<WebCoreWidgetHolder> {
- @private
-  WebCoreTextFieldController* controller;
-  BOOL inNextValidKeyView;
-}
-
-- (id)initWithQLineEdit:(TextField*)widget;
-- (WebCoreTextFieldController*)controller;
-
-@end
-
 @interface WebCoreSecureTextField : NSSecureTextField<WebCoreWidgetHolder> {
  @private
   WebCoreTextFieldController* controller;
@@ -80,7 +72,7 @@ class TextField;
   BOOL inSetFrameSize;
 }
 
-- (id)initWithQLineEdit:(TextField*)widget;
+- (id)initWithQLineEdit:(WebCore::TextField*)widget;
 - (WebCoreTextFieldController*)controller;
 
 @end
@@ -91,7 +83,7 @@ class TextField;
   BOOL inNextValidKeyView;
 }
 
-- (id)initWithQLineEdit:(TextField*)widget;
+- (id)initWithQLineEdit:(WebCore::TextField*)widget;
 - (WebCoreTextFieldController*)controller;
 
 @end

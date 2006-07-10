@@ -37,7 +37,7 @@ class SVGPoint : public Shared<SVGPoint> {
  public:
   SVGPoint(const SVGStyledElement* context = 0);
   SVGPoint(float x, float y, const SVGStyledElement* context = 0);
-  SVGPoint(const WebCore::IntPoint& p, const SVGStyledElement* context = 0);
+  SVGPoint(const IntPoint& p, const SVGStyledElement* context = 0);
   ~SVGPoint();
 
   // 'SVGPoint' functions

@@ -89,7 +89,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
 
 // -------------------------------------------------------------------------------------------------------
 
-RenderBlock::RenderBlock(WebCore::Node* node) : RenderFlow(node) {
+RenderBlock::RenderBlock(Node* node) : RenderFlow(node) {
   m_childrenInline = true;
   m_floatingObjects = 0;
   m_positionedObjects = 0;

@@ -35,25 +35,25 @@ class NSScroller;
 typedef int NSScrollerPart;
 #endif
 
-typedef enum { ScrollUp, ScrollDown, ScrollLeft, ScrollRight } ScrollDirection;
+namespace WebCore {
 
-typedef enum {
+enum ScrollDirection { ScrollUp, ScrollDown, ScrollLeft, ScrollRight };
+
+enum ScrollGranularity {
   ScrollByLine,
   ScrollByPage,
   ScrollByDocument,
   ScrollByWheel
-} ScrollGranularity;
+};
 
-namespace WebCore {
 enum ScrollBarOrientation { HorizontalScrollBar, VerticalScrollBar };
-}
 
 class ScrollBar : public Widget {
  public:
-  ScrollBar(WebCore::ScrollBarOrientation);
+  ScrollBar(ScrollBarOrientation);
   virtual ~ScrollBar();
 
-  WebCore::ScrollBarOrientation orientation() { return m_orientation; }
+  ScrollBarOrientation orientation() { return m_orientation; }
 
   int value() { return m_currentPos; }
   bool setValue(int v);
@@ -67,12 +67,13 @@ class ScrollBar : public Widget {
   bool scroll(ScrollDirection, ScrollGranularity, float multiplier = 1.0);
 
  private:
-  WebCore::ScrollBarOrientation m_orientation;
+  ScrollBarOrientation m_orientation;
   int m_visibleSize;
   int m_totalSize;
   int m_currentPos;
   int m_lineStep;
   int m_pageStep;
 };
+}
 
 #endif

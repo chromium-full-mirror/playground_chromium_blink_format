@@ -26,6 +26,8 @@
 #include "config.h"
 #include "Logging.h"
 
+namespace WebCore {
+
 WTFLogChannel LogNotYetImplemented = {0x00000001, "WebCoreLogLevel",
                                       WTFLogChannelOff};
 
@@ -42,3 +44,4 @@ WTFLogChannel LogTextConversion = {0x00000200, "WebCoreLogLevel",
 
 WTFLogChannel LogIconDatabase = {0x00000400, "WebCoreLogLevel",
                                  WTFLogChannelOn};
+}

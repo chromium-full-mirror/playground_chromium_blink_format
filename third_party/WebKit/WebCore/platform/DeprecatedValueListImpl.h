@@ -28,6 +28,8 @@
 
 #include <wtf/RefPtr.h>
 
+namespace WebCore {
+
 class DeprecatedValueListImplNode;
 
 class DeprecatedValueListImplIterator {
@@ -187,5 +189,6 @@ inline DeprecatedValueListImplIterator::DeprecatedValueListImplIterator(
 
 inline DeprecatedValueListImplNode::DeprecatedValueListImplNode()
     : prev(NULL), next(NULL) {}
+}
 
 #endif

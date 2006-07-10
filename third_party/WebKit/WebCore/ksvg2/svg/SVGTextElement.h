@@ -51,7 +51,7 @@ class SVGTextElement : public SVGTextPositioningElement,
     return StyledElement::rendererIsNeeded(style);
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
-  virtual bool childShouldCreateRenderer(WebCore::Node*) const;
+  virtual bool childShouldCreateRenderer(Node*) const;
   virtual void attach();
 
   virtual SVGAnimatedTransformList* transform() const;

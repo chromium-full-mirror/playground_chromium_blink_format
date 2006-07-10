@@ -35,9 +35,6 @@
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 
-class KURL;
-class LoaderFunctions;
-
 namespace WebCore {
 class CachedCSSStyleSheet;
 class CachedImage;
@@ -47,13 +44,14 @@ class CachedXSLStyleSheet;
 class Document;
 class Frame;
 class HTMLImageLoader;
+class KURL;
 
 /**
  * Manages the loading of scripts/images/stylesheets for a particular document
  */
 class DocLoader {
  public:
-  DocLoader(Frame*, WebCore::Document*);
+  DocLoader(Frame*, Document*);
   ~DocLoader();
 
   CachedImage* requestImage(const String& url);
@@ -80,7 +78,7 @@ class DocLoader {
   CachePolicy cachePolicy() const { return m_cachePolicy; }
   time_t expireDate() const { return m_expireDate; }
   Frame* frame() const { return m_frame; }
-  WebCore::Document* doc() const { return m_doc; }
+  Document* doc() const { return m_doc; }
 
   void setExpireDate(time_t);
   void setAutoloadImages(bool);
@@ -94,8 +92,8 @@ class DocLoader {
   bool needReload(const KURL& fullUrl);
 
   friend class Cache;
-  friend class WebCore::Document;
-  friend class WebCore::HTMLImageLoader;
+  friend class Document;
+  friend class HTMLImageLoader;
 
   DeprecatedStringList m_reloadedURLs;
   mutable HashMap<String, CachedResource*> m_docObjects;
@@ -103,7 +101,7 @@ class DocLoader {
   CachePolicy m_cachePolicy;
   bool m_bautoloadImages : 1;
   Frame* m_frame;
-  WebCore::Document* m_doc;
+  Document* m_doc;
   bool m_loadInProgress;
 };
 }

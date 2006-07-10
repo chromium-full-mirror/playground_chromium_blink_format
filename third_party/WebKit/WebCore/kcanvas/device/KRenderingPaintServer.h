@@ -27,9 +27,12 @@
 
 #include <kcanvas/KCanvasResources.h>
 
-class TextStream;
-
 namespace WebCore {
+
+class KRenderingDeviceContext;
+class RenderPath;
+class RenderStyle;
+class TextStream;
 
 // Enumerations
 enum KCPaintServerType {
@@ -46,9 +49,6 @@ enum KCPaintTargetType {
   APPLY_TO_STROKE = 2
 };
 
-class RenderStyle;
-class RenderPath;
-class KRenderingDeviceContext;
 class KRenderingPaintServer : public KCanvasResource {
  public:
   KRenderingPaintServer()
@@ -91,9 +91,9 @@ class KRenderingPaintServer : public KCanvasResource {
   DeprecatedString m_registryId;
   bool m_paintingText;
 };
-}
 
-TextStream& operator<<(TextStream&, const WebCore::KRenderingPaintServer&);
+TextStream& operator<<(TextStream&, const KRenderingPaintServer&);
+}
 
 #endif  // SVG_SUPPORT
 #endif

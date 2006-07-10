@@ -28,18 +28,17 @@
 
 #include <wtf/Vector.h>
 
+namespace WebCore {
+
+class DeprecatedChar;
 class DeprecatedCString;
 class DeprecatedString;
-class DeprecatedChar;
-class TextStream;
-
-namespace WebCore {
 class String;
-}
+class TextStream;
 
 typedef TextStream& (*TextStreamManipulator)(TextStream&);
 
-TextStream& endl(TextStream& stream);
+TextStream& endl(TextStream&);
 
 class TextStream {
  public:
@@ -56,12 +55,13 @@ class TextStream {
   TextStream& operator<<(float);
   TextStream& operator<<(double);
   TextStream& operator<<(const char*);
-  TextStream& operator<<(const WebCore::String&);
+  TextStream& operator<<(const String&);
   TextStream& operator<<(const DeprecatedString&);
   TextStream& operator<<(const DeprecatedCString&);
   TextStream& operator<<(void*);
 
   TextStream& operator<<(const TextStreamManipulator&);
+
   int precision(int);
 
  private:
@@ -73,5 +73,6 @@ class TextStream {
   DeprecatedString* m_string;
   int m_precision;
 };
+}
 
 #endif

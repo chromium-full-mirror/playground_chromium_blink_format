@@ -489,9 +489,9 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(Document* document,
   return fragment.release();
 }
 
-DeprecatedString createMarkup(const WebCore::Node* node,
+DeprecatedString createMarkup(const Node* node,
                               EChildrenOnly includeChildren,
-                              DeprecatedPtrList<WebCore::Node>* nodes,
+                              DeprecatedPtrList<Node>* nodes,
                               EAnnotateForInterchange annotate) {
   ASSERT(annotate == DoNotAnnotateForInterchange);  // annotation not yet
                                                     // implemented for this code
@@ -500,7 +500,7 @@ DeprecatedString createMarkup(const WebCore::Node* node,
   return markup(node, includeChildren, false, nodes);
 }
 
-static void createParagraphContentsFromString(WebCore::Document* document,
+static void createParagraphContentsFromString(Document* document,
                                               Element* paragraph,
                                               const DeprecatedString& string) {
   ExceptionCode ec = 0;

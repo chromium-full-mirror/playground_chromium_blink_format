@@ -35,10 +35,9 @@
 
 #include "RenderImage.h"
 
-using namespace WebCore;
+namespace WebCore {
 
-SVGImageLoader::SVGImageLoader(SVGImageElement* node)
-    : WebCore::HTMLImageLoader(node) {}
+SVGImageLoader::SVGImageLoader(SVGImageElement* node) : HTMLImageLoader(node) {}
 
 SVGImageLoader::~SVGImageLoader() {}
 
@@ -66,3 +65,4 @@ void SVGImageLoader::updateFromElement() {
     renderer->resetAnimation();
 }
 #endif  // SVG_SUPPORT
+}

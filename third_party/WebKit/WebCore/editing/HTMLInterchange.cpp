@@ -29,7 +29,7 @@
 #include "Document.h"
 #include "TextIterator.h"
 
-using WebCore::isCollapsibleWhitespace;
+namespace WebCore {
 
 namespace {
 
@@ -109,4 +109,5 @@ DeprecatedString convertHTMLTextToInterchangeFormat(
   }
 
   return s;
+}
 }

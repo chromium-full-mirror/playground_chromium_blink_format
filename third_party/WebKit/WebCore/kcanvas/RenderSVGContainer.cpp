@@ -131,7 +131,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.p, parentX, parentY, width(), height(), style());
 
-  if (paintInfo.phase != WebCore::PaintPhaseForeground || !drawsContents() ||
+  if (paintInfo.phase != PaintPhaseForeground || !drawsContents() ||
       style()->visibility() == HIDDEN)
     return;
 

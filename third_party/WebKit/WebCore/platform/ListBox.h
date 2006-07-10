@@ -31,6 +31,8 @@
 #include "ScrollView.h"
 #include "TextDirection.h"
 
+namespace WebCore {
+
 enum ListBoxItemType { ListBoxOption, ListBoxGroupLabel, ListBoxSeparator };
 
 struct ListBoxItem {
@@ -42,7 +44,7 @@ struct ListBoxItem {
       : string(s), type(t), enabled(e) {}
 };
 
-class ListBox : public WebCore::ScrollView {
+class ListBox : public ScrollView {
  public:
   enum SelectionMode { Single, Extended };
 
@@ -72,7 +74,7 @@ class ListBox : public WebCore::ScrollView {
 
   const ListBoxItem& itemAtIndex(int index) const { return _items[index]; }
 
-  void setWritingDirection(WebCore::TextDirection);
+  void setWritingDirection(TextDirection);
 
   bool changingSelection() { return _changingSelection; }
 
@@ -80,7 +82,7 @@ class ListBox : public WebCore::ScrollView {
   virtual bool checksDescendantsForFocus() const;
 
   static void clearCachedTextRenderers();
-  void setFont(const WebCore::Font&);
+  void setFont(const Font&);
 
  private:
   void appendItem(const DeprecatedString&, ListBoxItemType, bool);
@@ -94,5 +96,6 @@ class ListBox : public WebCore::ScrollView {
   mutable float _width;
   mutable bool _widthGood;
 };
+}
 
 #endif

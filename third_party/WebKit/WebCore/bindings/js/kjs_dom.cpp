@@ -107,11 +107,11 @@ KJS_IMPLEMENT_PROTOTYPE("DOMNode", DOMNodeProto, DOMNodeProtoFunc)
 
 const ClassInfo DOMNode::info = {"Node", 0, &DOMNodeTable, 0};
 
-DOMNode::DOMNode(ExecState* exec, WebCore::Node* n) : m_impl(n) {
+DOMNode::DOMNode(ExecState* exec, Node* n) : m_impl(n) {
   setPrototype(DOMNodeProto::self(exec));
 }
 
-DOMNode::DOMNode(WebCore::Node* n) : m_impl(n) {}
+DOMNode::DOMNode(Node* n) : m_impl(n) {}
 
 DOMNode::~DOMNode() {
   ScriptInterpreter::forgetDOMNodeForDocument(m_impl->document(), m_impl.get());
@@ -120,7 +120,7 @@ DOMNode::~DOMNode() {
 void DOMNode::mark() {
   assert(!marked());
 
-  WebCore::Node* node = m_impl.get();
+  Node* node = m_impl.get();
 
   // Nodes in the document are kept alive by ScriptInterpreter::mark,
   // so we have no special responsibilities and can just call the base class
@@ -132,13 +132,12 @@ void DOMNode::mark() {
 
   // This is a node outside the document, so find the root of the tree it is in,
   // and start marking from there.
-  WebCore::Node* root = node;
-  for (WebCore::Node* current = m_impl.get(); current;
-       current = current->parentNode()) {
+  Node* root = node;
+  for (Node* current = m_impl.get(); current; current = current->parentNode()) {
     root = current;
   }
 
-  static HashSet<WebCore::Node*> markingRoots;
+  static HashSet<Node*> markingRoots;
 
   // If we're already marking this tree, then we can simply mark this wrapper
   // by calling the base class; our caller is iterating the tree.
@@ -149,7 +148,7 @@ void DOMNode::mark() {
 
   // Mark the whole tree; use the global set of roots to avoid reentering.
   markingRoots.add(root);
-  for (WebCore::Node* nodeToMark = root; nodeToMark;
+  for (Node* nodeToMark = root; nodeToMark;
        nodeToMark = nodeToMark->traverseNextNode()) {
     DOMNode* wrapper = ScriptInterpreter::getDOMNodeForDocument(
         m_impl->document(), nodeToMark);
@@ -207,7 +206,7 @@ bool DOMNode::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* DOMNode::getValueProperty(ExecState* exec, int token) const {
-  WebCore::Node& node = *m_impl;
+  Node& node = *m_impl;
   switch (token) {
     case NodeName:
       return jsStringOrNull(node.nodeName());
@@ -258,7 +257,7 @@ void DOMNode::putValueProperty(ExecState* exec,
                                JSValue* value,
                                int /*attr*/) {
   DOMExceptionTranslator exception(exec);
-  WebCore::Node& node = *m_impl;
+  Node& node = *m_impl;
   switch (token) {
     case NodeValue:
       node.setNodeValue(value->toString(exec), exception);
@@ -293,7 +292,7 @@ JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
   if (!thisObj->inherits(&DOMNode::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
-  WebCore::Node& node = *static_cast<DOMNode*>(thisObj)->impl();
+  Node& node = *static_cast<DOMNode*>(thisObj)->impl();
   switch (id) {
     case DOMNode::HasAttributes:
       return jsBoolean(node.hasAttributes());
@@ -350,7 +349,7 @@ EventTargetNode* toEventTargetNode(JSValue* val) {
       static_cast<DOMEventTargetNode*>(val)->impl());
 }
 
-WebCore::Node* toNode(JSValue* val) {
+Node* toNode(JSValue* val) {
   if (!val || !val->isObject(&DOMNode::info))
     return 0;
   return static_cast<DOMNode*>(val)->impl();
@@ -405,7 +404,7 @@ onunload      DOMEventTargetNode::OnUnload               DontDelete
 @end
 */
 
-DOMEventTargetNode::DOMEventTargetNode(ExecState* exec, WebCore::Node* n)
+DOMEventTargetNode::DOMEventTargetNode(ExecState* exec, Node* n)
     : JSNode(exec, n) {
   setPrototype(DOMEventTargetNodeProto::self(exec));
 }
@@ -659,7 +658,7 @@ void DOMEventTargetNode::setListener(ExecState* exec,
 }
 
 JSValue* DOMEventTargetNode::getListener(const AtomicString& eventType) const {
-  WebCore::EventListener* listener =
+  EventListener* listener =
       EventTargetNodeCast(impl())->getHTMLEventListener(eventType);
   JSEventListener* jsListener = static_cast<JSEventListener*>(listener);
   if (jsListener && jsListener->listenerObj())
@@ -731,7 +730,7 @@ KJS_IMPLEMENT_PROTOFUNC(DOMNodeListFunc)
 
 const ClassInfo DOMNodeList::info = {"NodeList", 0, &DOMNodeListTable, 0};
 
-DOMNodeList::DOMNodeList(ExecState* exec, WebCore::NodeList* l) : m_impl(l) {
+DOMNodeList::DOMNodeList(ExecState* exec, NodeList* l) : m_impl(l) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
 
@@ -814,7 +813,7 @@ JSValue* DOMNodeListFunc::callAsFunction(ExecState* exec,
                                          const List& args) {
   if (!thisObj->inherits(&KJS::DOMNodeList::info))
     return throwError(exec, TypeError);
-  WebCore::NodeList& list = *static_cast<DOMNodeList*>(thisObj)->impl();
+  NodeList& list = *static_cast<DOMNodeList*>(thisObj)->impl();
 
   if (id == DOMNodeList::Item)
     return toJS(exec, list.item(args[0]->toInt32(exec)));
@@ -974,7 +973,7 @@ JSValue* toJS(ExecState* exec, Document* n) {
     return ret;
 
   if (n->isHTMLDocument())
-    ret = new WebCore::JSHTMLDocument(exec, static_cast<HTMLDocument*>(n));
+    ret = new JSHTMLDocument(exec, static_cast<HTMLDocument*>(n));
   else
     ret = new JSDocument(exec, n);
 
@@ -990,7 +989,7 @@ JSValue* toJS(ExecState* exec, Document* n) {
   return ret;
 }
 
-bool checkNodeSecurity(ExecState* exec, WebCore::Node* n) {
+bool checkNodeSecurity(ExecState* exec, Node* n) {
   if (!n)
     return false;
 
@@ -1000,8 +999,8 @@ bool checkNodeSecurity(ExecState* exec, WebCore::Node* n) {
   return win && win->isSafeScript(exec);
 }
 
-JSValue* toJS(ExecState* exec, PassRefPtr<WebCore::Node> node) {
-  WebCore::Node* n = node.get();
+JSValue* toJS(ExecState* exec, PassRefPtr<Node> node) {
+  Node* n = node.get();
   DOMNode* ret = 0;
   if (!n)
     return jsNull();
@@ -1013,49 +1012,47 @@ JSValue* toJS(ExecState* exec, PassRefPtr<WebCore::Node> node) {
     return ret;
 
   switch (n->nodeType()) {
-    case WebCore::Node::ELEMENT_NODE:
+    case Node::ELEMENT_NODE:
       if (n->isHTMLElement())
-        ret = createJSHTMLWrapper(
-            exec, static_pointer_cast<WebCore::HTMLElement>(node));
+        ret = createJSHTMLWrapper(exec, static_pointer_cast<HTMLElement>(node));
 #if SVG_SUPPORT
       else if (n->isSVGElement())
-        ret = createJSSVGWrapper(
-            exec, static_pointer_cast<WebCore::SVGElement>(node));
+        ret = createJSSVGWrapper(exec, static_pointer_cast<SVGElement>(node));
 #endif
       else
         ret = new JSElement(exec, static_cast<Element*>(n));
       break;
-    case WebCore::Node::ATTRIBUTE_NODE:
+    case Node::ATTRIBUTE_NODE:
       ret = new JSAttr(exec, static_cast<Attr*>(n));
       break;
-    case WebCore::Node::TEXT_NODE:
-    case WebCore::Node::CDATA_SECTION_NODE:
+    case Node::TEXT_NODE:
+    case Node::CDATA_SECTION_NODE:
       ret = new JSText(exec, static_cast<Text*>(n));
       break;
-    case WebCore::Node::ENTITY_NODE:
+    case Node::ENTITY_NODE:
       ret = new JSEntity(exec, static_cast<Entity*>(n));
       break;
-    case WebCore::Node::PROCESSING_INSTRUCTION_NODE:
+    case Node::PROCESSING_INSTRUCTION_NODE:
       ret = new JSProcessingInstruction(exec,
                                         static_cast<ProcessingInstruction*>(n));
       break;
-    case WebCore::Node::COMMENT_NODE:
+    case Node::COMMENT_NODE:
       ret = new JSCharacterData(exec, static_cast<CharacterData*>(n));
       break;
-    case WebCore::Node::DOCUMENT_NODE:
+    case Node::DOCUMENT_NODE:
       // we don't want to cache the document itself in the per-document
       // dictionary
       return toJS(exec, static_cast<Document*>(n));
-    case WebCore::Node::DOCUMENT_TYPE_NODE:
+    case Node::DOCUMENT_TYPE_NODE:
       ret = new JSDocumentType(exec, static_cast<DocumentType*>(n));
       break;
-    case WebCore::Node::NOTATION_NODE:
+    case Node::NOTATION_NODE:
       ret = new JSNotation(exec, static_cast<Notation*>(n));
       break;
-    case WebCore::Node::DOCUMENT_FRAGMENT_NODE:
+    case Node::DOCUMENT_FRAGMENT_NODE:
       ret = new JSDocumentFragment(exec, static_cast<DocumentFragment*>(n));
       break;
-    case WebCore::Node::ENTITY_REFERENCE_NODE:
+    case Node::ENTITY_REFERENCE_NODE:
     default:
       ret = new JSNode(exec, n);
   }
@@ -1069,7 +1066,7 @@ JSValue* toJS(ExecState* exec, NamedNodeMap* m) {
   return cacheDOMObject<NamedNodeMap, DOMNamedNodeMap>(exec, m);
 }
 
-JSValue* getRuntimeObject(ExecState* exec, WebCore::Node* n) {
+JSValue* getRuntimeObject(ExecState* exec, Node* n) {
   if (!n)
     return 0;
 
@@ -1152,7 +1149,7 @@ const ClassInfo DOMNamedNodesCollection::info = {"Collection", 0, 0, 0};
 // name). (David)
 DOMNamedNodesCollection::DOMNamedNodesCollection(
     ExecState* exec,
-    const DeprecatedValueList<RefPtr<WebCore::Node>>& nodes)
+    const DeprecatedValueList<RefPtr<Node>>& nodes)
     : m_nodes(nodes) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
 }
@@ -1195,12 +1192,11 @@ bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
   // document.formName.name result by id as well as be index.
 
   AtomicString atomicPropertyName = propertyName;
-  DeprecatedValueListConstIterator<RefPtr<WebCore::Node>> end = m_nodes.end();
+  DeprecatedValueListConstIterator<RefPtr<Node>> end = m_nodes.end();
   int i = 0;
-  for (DeprecatedValueListConstIterator<RefPtr<WebCore::Node>>
-           it = m_nodes.begin();
+  for (DeprecatedValueListConstIterator<RefPtr<Node>> it = m_nodes.begin();
        it != end; ++it, ++i) {
-    WebCore::Node* node = (*it).get();
+    Node* node = (*it).get();
     if (node->hasAttributes() &&
         node->attributes()->id() == atomicPropertyName) {
       slot.setCustomIndex(this, i, indexGetter);

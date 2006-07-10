@@ -37,8 +37,9 @@
 
 #include "Arena.h"
 
+namespace WebCore {
+
 static const size_t gMaxRecycledSize = 400;
-#define ROUNDUP(x, y) ((((x) + ((y)-1)) / (y)) * (y))
 
 class RenderArena {
  public:
@@ -57,5 +58,6 @@ class RenderArena {
   // i.e., 0, 4, 8, 12, 16, 20, ...
   void* m_recyclers[gMaxRecycledSize >> 2];
 };
+}
 
 #endif

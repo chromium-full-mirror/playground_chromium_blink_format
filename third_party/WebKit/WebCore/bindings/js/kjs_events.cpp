@@ -223,7 +223,7 @@ void JSEventListener::clearWindowObj() {
 JSLazyEventListener::JSLazyEventListener(const String& functionName,
                                          const String& code,
                                          Window* win,
-                                         WebCore::Node* node,
+                                         Node* node,
                                          int lineno)
     : JSEventListener(0, win, true),
       m_functionName(functionName),
@@ -598,7 +598,7 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
     case Clipboard::GetData: {
       if (args.size() == 1) {
         bool success;
-        WebCore::String result =
+        String result =
             cb->clipboard->getData(args[0]->toString(exec), success);
         if (success)
           return jsString(result);
@@ -627,7 +627,7 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
       int y = (int)args[2]->toNumber(exec);
 
       // See if they passed us a node
-      WebCore::Node* node = toNode(args[0]);
+      Node* node = toNode(args[0]);
       if (!node)
         return throwError(exec, TypeError);
 

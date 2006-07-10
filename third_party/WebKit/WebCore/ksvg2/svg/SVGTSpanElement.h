@@ -36,7 +36,7 @@ class SVGTSpanElement : public SVGTextPositioningElement {
     return StyledElement::rendererIsNeeded(style);
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
-  bool childShouldCreateRenderer(WebCore::Node* child) const;
+  bool childShouldCreateRenderer(Node* child) const;
 };
 };
 

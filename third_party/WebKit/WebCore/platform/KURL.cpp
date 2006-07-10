@@ -32,11 +32,11 @@
 #include <unicode/uidna.h>
 #include <assert.h>
 
-using std::pair;
-using std::make_pair;
-using namespace WebCore;
+using namespace std;
 
-typedef enum {
+namespace WebCore {
+
+enum URLCharacterClasses {
   // alpha
   SchemeFirstChar = 1 << 0,
 
@@ -67,7 +67,7 @@ typedef enum {
   // not allowed in path
   BadChar = 1 << 7
 
-} URLCharacterClasses;
+};
 
 static const char hexDigits[17] = "0123456789ABCDEF";
 
@@ -234,7 +234,7 @@ static int copyPathRemovingDots(char* dst,
                                 int srcEnd);
 static char* encodeRelativeString(const KURL& base,
                                   const DeprecatedString& rel,
-                                  const WebCore::TextEncoding& encoding);
+                                  const TextEncoding&);
 static DeprecatedString substituteBackslashes(const DeprecatedString& string);
 
 static inline bool isSchemeFirstChar(unsigned char c) {
@@ -307,7 +307,7 @@ KURL::KURL(const DeprecatedString& url) {
 
 KURL::KURL(const KURL& base,
            const DeprecatedString& relative,
-           const WebCore::TextEncoding& encoding) {
+           const TextEncoding& encoding) {
   // Allow at lest absolute URLs to resolve against an empty URL.
   if (!base.m_isValid && !base.isEmpty()) {
     m_isValid = false;
@@ -769,8 +769,8 @@ DeprecatedString KURL::prettyURL() const {
 }
 
 DeprecatedString KURL::decode_string(const DeprecatedString& urlString,
-                                     const WebCore::TextEncoding& encoding) {
-  static const WebCore::TextEncoding utf8Encoding(UTF8Encoding);
+                                     const TextEncoding& encoding) {
+  static const TextEncoding utf8Encoding(UTF8Encoding);
 
   DeprecatedString result("");
 
@@ -1458,14 +1458,14 @@ static DeprecatedString encodeHostnames(const DeprecatedString& s) {
 
 static char* encodeRelativeString(const KURL& base,
                                   const DeprecatedString& rel,
-                                  const WebCore::TextEncoding& encoding) {
+                                  const TextEncoding& encoding) {
   DeprecatedString s = encodeHostnames(rel);
 
   char* strBuffer;
 
-  WebCore::TextEncoding pathEncoding(UTF8Encoding);
-  WebCore::TextEncoding otherEncoding =
-      encoding.isValid() ? encoding : WebCore::TextEncoding(UTF8Encoding);
+  TextEncoding pathEncoding(UTF8Encoding);
+  TextEncoding otherEncoding =
+      encoding.isValid() ? encoding : TextEncoding(UTF8Encoding);
 
   int pathEnd = -1;
   if (pathEncoding != otherEncoding) {
@@ -1513,4 +1513,5 @@ bool KURL::isHierarchical() const {
     return false;
   assert(urlString[schemeEndPos] == ':');
   return urlString[schemeEndPos + 1] == '/';
+}
 }

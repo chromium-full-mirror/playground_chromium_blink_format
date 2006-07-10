@@ -57,8 +57,6 @@ inline bool compareEqual(const T& t, const U& u) {
   if (!compareEqual(group->variable, value)) \
     group.access()->variable = value;
 
-class RenderArena;
-
 namespace WebCore {
 
 using std::max;
@@ -66,6 +64,7 @@ using std::max;
 class CSSStyleSelector;
 class CachedImage;
 class CachedResource;
+class RenderArena;
 class ShadowValue;
 class StringImpl;
 

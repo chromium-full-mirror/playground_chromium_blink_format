@@ -36,8 +36,8 @@ namespace WebCore {
 
 class DeleteFromTextNodeCommand : public EditCommand {
  public:
-  DeleteFromTextNodeCommand(WebCore::Document* document,
-                            WebCore::Text* node,
+  DeleteFromTextNodeCommand(Document* document,
+                            Text* node,
                             int offset,
                             int count);
   virtual ~DeleteFromTextNodeCommand() {}
@@ -45,15 +45,15 @@ class DeleteFromTextNodeCommand : public EditCommand {
   virtual void doApply();
   virtual void doUnapply();
 
-  WebCore::Text* node() const { return m_node.get(); }
+  Text* node() const { return m_node.get(); }
   int offset() const { return m_offset; }
   int count() const { return m_count; }
 
  private:
-  RefPtr<WebCore::Text> m_node;
+  RefPtr<Text> m_node;
   int m_offset;
   int m_count;
-  WebCore::String m_text;
+  String m_text;
 };
 
 }  // namespace WebCore

@@ -47,12 +47,14 @@
 #include "Arena.h"
 
 #include <algorithm>
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wtf/FastMalloc.h>
-#include <assert.h>
 
-using std::max;
+using namespace std;
+
+namespace WebCore {
 
 //#define DEBUG_ARENA_MALLOC
 #ifdef DEBUG_ARENA_MALLOC
@@ -288,4 +290,5 @@ void ArenaFinish(void) {
     a = 0;
   }
   arena_freelist = NULL;
+}
 }

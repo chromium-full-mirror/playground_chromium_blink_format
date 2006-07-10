@@ -40,7 +40,7 @@
 
 namespace WebCore {
 
-RenderContainer::RenderContainer(WebCore::Node* node) : RenderBox(node) {
+RenderContainer::RenderContainer(Node* node) : RenderBox(node) {
   m_first = 0;
   m_last = 0;
 }
