@@ -74,41 +74,10 @@ typedef enum {
 
 @interface WebView (WebPendingPublic)
 
-- (void)setMainFrameURL:(NSString*)URLString;
-- (NSString*)mainFrameURL;
-- (BOOL)isLoading;
-- (NSString*)mainFrameTitle;
-- (NSImage*)mainFrameIcon;
-
 - (void)setMainFrameDocumentReady:(BOOL)mainFrameDocumentReady;
-- (DOMDocument*)mainFrameDocument;
-
-- (void)setDrawsBackground:(BOOL)drawsBackround;
-- (BOOL)drawsBackground;
-
-- (IBAction)toggleContinuousSpellChecking:(id)sender;
-
-- (IBAction)toggleSmartInsertDelete:(id)sender;
-
-- (BOOL)canMakeTextStandardSize;
-- (IBAction)makeTextStandardSize:(id)sender;
 
 - (void)setTabKeyCyclesThroughElements:(BOOL)cyclesElements;
 - (BOOL)tabKeyCyclesThroughElements;
-
-// If true, the selection will be maintained even when the first responder is
-// outside
-// of the webview. Returns true only if self is editable at this level.
-// Subclasses can
-// override to enforce additional criteria.
-- (BOOL)maintainsInactiveSelection;
-
-// Returns the frame that contains the first responder, if any. Otherwise
-// returns the
-// frame that contains a non-zero-length selection, if any. Returns nil if no
-// frame
-// meets these criteria.
-- (WebFrame*)selectedFrame;
 
 /*!
 @method setScriptDebugDelegate:
@@ -125,11 +94,6 @@ typedef enum {
 - (id)scriptDebugDelegate;
 
 - (BOOL)shouldClose;
-
-- (void)close;
-
-- (void)setShouldCloseWithWindow:(BOOL)close;
-- (BOOL)shouldCloseWithWindow;
 
 /*!
     @method aeDescByEvaluatingJavaScriptFromString:
@@ -151,16 +115,6 @@ typedef enum {
                         highlight:(BOOL)highlight;
 - (void)unmarkAllTextMatches;
 - (NSArray*)rectsForTextMatches;
-
-@end
-
-@interface WebView (WebViewEditingPendingPublic)
-
-- (IBAction)moveToBeginningOfSentence:(id)sender;
-- (IBAction)moveToBeginningOfSentenceAndModifySelection:(id)sender;
-- (IBAction)moveToEndOfSentence:(id)sender;
-- (IBAction)moveToEndOfSentenceAndModifySelection:(id)sender;
-- (IBAction)selectSentence:(id)sender;
 
 @end
 
