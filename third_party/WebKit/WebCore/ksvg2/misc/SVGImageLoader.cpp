@@ -64,5 +64,6 @@ void SVGImageLoader::updateFromElement() {
           static_cast<RenderImage*>(imageElement->renderer()))
     renderer->resetAnimation();
 }
-#endif  // SVG_SUPPORT
 }
+
+#endif  // SVG_SUPPORT
