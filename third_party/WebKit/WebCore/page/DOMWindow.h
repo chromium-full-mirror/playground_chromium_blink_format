@@ -52,11 +52,10 @@ class DOMWindow : public Shared<DOMWindow>, Noncopyable {
       Element*,
       const String& pseudoElt) const;
 
-  // WebKit extension for the Web Inspector
+  // WebKit extensions
   PassRefPtr<CSSRuleList> getMatchedCSSRules(Element*,
                                              const String& pseudoElt,
                                              bool authorOnly = true) const;
-
   double devicePixelRatio() const;
 
  private:
