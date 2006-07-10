@@ -869,7 +869,7 @@ void IconDatabase::performSetIconURLForPageURL(int64_t iconID,
 }
 
 void IconDatabase::pruneUnreferencedIcons(int numberToPrune) {
-  if (!numberToPrune)
+  if (!numberToPrune || !isOpen())
     return;
 
   if (numberToPrune > 0) {
@@ -890,6 +890,9 @@ void IconDatabase::pruneUnreferencedIcons(int numberToPrune) {
 }
 
 void IconDatabase::pruneUnretainedIcons(Timer<IconDatabase>* timer) {
+  if (!isOpen())
+    return;
+
 // FIXME - The PageURL delete and the pruneunreferenced icons need to be in an
 // atomic transaction
 #ifndef NDEBUG
