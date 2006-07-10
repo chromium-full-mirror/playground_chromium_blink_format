@@ -33,10 +33,11 @@
 #include "RenderTheme.h"
 #include <math.h>
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace HTMLNames;
-using namespace std;
 
 RenderMenuList::RenderMenuList(HTMLSelectElement* element)
     : RenderFlexibleBox(element),
@@ -49,15 +50,23 @@ RenderMenuList::RenderMenuList(HTMLSelectElement* element)
       m_longestWidth(0),
       m_selectedIndex(0) {}
 
+void RenderMenuList::createInnerBlock() {
+  if (m_inner) {
+    ASSERT(firstChild() == m_inner);
+    ASSERT(!m_inner->nextSibling());
+    return;
+  }
+
+  // Create an anonymous block.
+  ASSERT(!firstChild());
+  m_inner = createAnonymousBlock();
+  m_inner->style()->setBoxFlex(1.0f);
+  RenderFlexibleBox::addChild(m_inner);
+}
+
 void RenderMenuList::addChild(RenderObject* newChild,
                               RenderObject* beforeChild) {
-  if (!m_inner) {
-    // Create an anonymous block.
-    assert(!m_first);
-    m_inner = createAnonymousBlock();
-    m_inner->style()->setBoxFlex(1.0f);
-    RenderFlexibleBox::addChild(m_inner);
-  }
+  createInnerBlock();
   m_inner->addChild(newChild, beforeChild);
 }
 
@@ -76,7 +85,7 @@ void RenderMenuList::setStyle(RenderStyle* style) {
   if (m_inner)
     m_inner->style()->setBoxFlex(1.0f);
   if (m_popupMenu) {
-    RenderStyle* newStyle = new (renderArena()) RenderStyle();
+    RenderStyle* newStyle = new (renderArena()) RenderStyle;
     newStyle->inheritFrom(style);
     m_popupMenu->setStyle(newStyle);
   }
@@ -120,7 +129,7 @@ void RenderMenuList::updateFromElement() {
   }
 }
 
-void RenderMenuList::setText(String s) {
+void RenderMenuList::setText(const String& s) {
   if (s.isEmpty()) {
     if (m_buttonText) {
       m_buttonText->destroy();
@@ -198,9 +207,13 @@ void RenderMenuList::calcMinMaxWidth() {
 
 void RenderMenuList::showPopup() {
   if (!m_popupMenu) {
-    RenderStyle* newStyle = new (renderArena()) RenderStyle();
-    newStyle->inheritFrom(style());
+    // Create m_inner here so it ends up as the first child.
+    // This is important because otherwise we might try to create m_inner
+    // inside the showPopup call and it would fail.
+    createInnerBlock();
     m_popupMenu = theme()->createPopupMenu(renderArena(), document());
+    RenderStyle* newStyle = new (renderArena()) RenderStyle;
+    newStyle->inheritFrom(style());
     m_popupMenu->setStyle(newStyle);
     RenderFlexibleBox::addChild(m_popupMenu);
   }
