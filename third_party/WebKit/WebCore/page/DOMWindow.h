@@ -57,6 +57,8 @@ class DOMWindow : public Shared<DOMWindow>, Noncopyable {
                                              const String& pseudoElt,
                                              bool authorOnly = true) const;
 
+  double devicePixelRatio() const;
+
  private:
   Frame* m_frame;
 };
