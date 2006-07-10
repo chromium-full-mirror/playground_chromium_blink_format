@@ -41,6 +41,7 @@
 #include "Position.h"
 #include "RenderArena.h"
 #include "RenderFlexibleBox.h"
+#include "RenderImage.h"
 #include "RenderInline.h"
 #include "RenderListItem.h"
 #include "RenderTableCell.h"
@@ -77,6 +78,17 @@ void RenderObject::operator delete(void* ptr, size_t sz) {
 RenderObject* RenderObject::createObject(Node* node, RenderStyle* style) {
   RenderObject* o = 0;
   RenderArena* arena = node->document()->renderArena();
+
+  if (ContentData* contentData = style->contentData()) {
+    RenderImage* contentImage = new (arena) RenderImage(node);
+    if (contentImage) {
+      contentImage->setStyle(style);
+      contentImage->setContentObject(contentData->contentObject());
+      contentImage->setIsAnonymousImage(true);
+    }
+    return contentImage;
+  }
+
   switch (style->display()) {
     case NONE:
       break;

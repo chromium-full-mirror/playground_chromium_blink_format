@@ -109,6 +109,9 @@ bool HTMLFrameSetElement::rendererIsNeeded(RenderStyle* style) {
 
 RenderObject* HTMLFrameSetElement::createRenderer(RenderArena* arena,
                                                   RenderStyle* style) {
+  if (style->contentData())
+    return RenderObject::createObject(this, style);
+
   return new (arena) RenderFrameSet(this);
 }
 

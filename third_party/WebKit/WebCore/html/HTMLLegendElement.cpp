@@ -44,7 +44,10 @@ bool HTMLLegendElement::isFocusable() const {
 }
 
 RenderObject* HTMLLegendElement::createRenderer(RenderArena* arena,
-                                                RenderStyle*) {
+                                                RenderStyle* style) {
+  if (style->contentData())
+    return RenderObject::createObject(this, style);
+
   return new (arena) RenderLegend(this);
 }
 
