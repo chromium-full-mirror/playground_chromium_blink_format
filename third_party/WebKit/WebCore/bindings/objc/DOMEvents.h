@@ -130,3 +130,38 @@ enum { DOM_HORIZONTAL = 0, DOM_VERTICAL = 1, DOM_BOTH = 2 };
 - (BOOL)verticalOverflow;
 @end
 ;
+
+enum {
+  DOM_KEY_LOCATION_STANDARD = 0x00,
+  DOM_KEY_LOCATION_LEFT = 0x01,
+  DOM_KEY_LOCATION_RIGHT = 0x02,
+  DOM_KEY_LOCATION_NUMPAD = 0x03,
+};
+
+@interface DOMKeyboardEvent : DOMUIEvent
+- (NSString*)keyIdentifier;
+- (unsigned)keyLocation;
+- (BOOL)ctrlKey;
+- (BOOL)shiftKey;
+- (BOOL)altKey;
+- (BOOL)metaKey;
+- (BOOL)getModifierState:(NSString*)keyIdentifierArg;
+@end
+
+@interface DOMKeyboardEvent (NonStandardAdditions)
+- (int)keyCode;
+- (int)charCode;
+@end
+
+@interface DOMWheelEvent : DOMUIEvent
+- (int)screenX;
+- (int)screenY;
+- (int)clientX;
+- (int)clientY;
+- (BOOL)ctrlKey;
+- (BOOL)shiftKey;
+- (BOOL)altKey;
+- (BOOL)metaKey;
+- (BOOL)isHorizontal;
+- (int)wheelDelta;
+@end
