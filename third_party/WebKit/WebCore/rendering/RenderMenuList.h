@@ -47,7 +47,7 @@ class RenderMenuList : public RenderFlexibleBox {
 
   virtual const char* renderName() const { return "RenderMenuList"; }
 
-  short baselinePosition(bool f, bool b) const;
+  RenderStyle* createInnerStyle(RenderStyle*);
   virtual void calcMinMaxWidth();
   virtual void layout();
 

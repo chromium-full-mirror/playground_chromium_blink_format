@@ -63,7 +63,7 @@ class RenderThemeMac : public RenderTheme {
   virtual Color platformActiveSelectionBackgroundColor() const;
   virtual Color platformInactiveSelectionBackgroundColor() const;
 
-  virtual int sizeOfArrowControl(RenderStyle*) const;
+  virtual int minimumTextSize(RenderStyle*) const;
   virtual RenderPopupMenu* createPopupMenu(RenderArena*, Document*);
 
  protected:
@@ -141,7 +141,11 @@ class RenderThemeMac : public RenderTheme {
   const int* buttonMargins() const;
   void setButtonCellState(const RenderObject*, const IntRect&);
 
+  void setPopupPaddingFromControlSize(RenderStyle*, NSControlSize) const;
   void setPopupButtonCellState(const RenderObject*, const IntRect&);
+  const IntSize* popupButtonSizes() const;
+  const int* popupButtonMargins() const;
+  const int* popupButtonPadding(NSControlSize) const;
 
  private:
   NSButtonCell* checkbox;

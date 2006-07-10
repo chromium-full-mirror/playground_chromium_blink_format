@@ -131,8 +131,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
  private:
   void recalcListItems();
   bool shouldUseMenuList(RenderStyle* style) const {
-    return !m_multiple && m_size <= 1 &&
-           style->appearance() == MenulistAppearance;
+    return !m_multiple && m_size <= 1;
   }
 
   mutable Vector<HTMLElement*> m_listItems;
