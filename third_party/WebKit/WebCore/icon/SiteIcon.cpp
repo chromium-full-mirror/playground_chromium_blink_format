@@ -22,7 +22,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include "IconDatabase.h"
 
 #include "Logging.h"
@@ -31,10 +30,13 @@
 
 using namespace WebCore;
 
-SiteIcon::SiteIcon(const String& url)
-    : m_iconURL(url), m_touch(0), m_image(0) {}
+SiteIcon::SiteIcon(const String& url) : m_iconURL(url), m_image(0) {}
 
-SiteIcon::~SiteIcon() {}
+SiteIcon::~SiteIcon() {
+  // Upon destruction of a SiteIcon, its image should no longer be in use
+  // anywhere
+  delete m_image;
+}
 
 Image* SiteIcon::getImage(const IntSize& size) {
   // FIXME - For size right now, we are resizing our one-and-only shared Image
@@ -52,12 +54,11 @@ Image* SiteIcon::getImage(const IntSize& size) {
     if (!imageData.size())
       return 0;
 
-    String hexdata;
     int checksum = 0;
-    for (unsigned int i = 0; i < imageData.size(); ++i) {
+#ifndef NDEBUG
+    for (unsigned int i = 0; i < imageData.size(); ++i)
       checksum += imageData[i];
-      hexdata.append(String::sprintf("%.2hhX", imageData[i]));
-    }
+#endif
 
     NativeBytePtr nativeData = 0;
 // FIXME - Any other platform will need their own method to create NativeBytePtr
@@ -67,7 +68,6 @@ Image* SiteIcon::getImage(const IntSize& size) {
 #endif
     m_image = new Image();
 
-    LOG(IconDatabase, "DUMP-\n%s", hexdata.ascii().data());
     if (m_image->setNativeData(nativeData, true)) {
       LOG(IconDatabase,
           "%s\nImage Creation SUCCESSFUL - %i bytes of data with a checksum of "
@@ -76,8 +76,7 @@ Image* SiteIcon::getImage(const IntSize& size) {
       return m_image;
     }
     LOG(IconDatabase,
-        "%s\nImage Creation FAILURE    - %i bytes of data with a checksum of "
-        "%i",
+        "%s\nImage Creation FAILURE - %i bytes of data with a checksum of %i",
         m_iconURL.ascii().data(), imageData.size(), checksum);
     delete m_image;
     return m_image = 0;
@@ -93,5 +92,3 @@ time_t SiteIcon::getExpiration() {
   // FIXME - Return expiration time from SQL
   return INT_MAX;
 }
-
-// void touch();
