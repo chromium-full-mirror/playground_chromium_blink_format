@@ -204,6 +204,13 @@ class RenderBox : public RenderObject {
                        int _ty,
                        int w,
                        int h);
+#if PLATFORM(MAC)
+  void paintCustomHighlight(int tx,
+                            int ty,
+                            const AtomicString& type,
+                            bool behindText);
+#endif
+
   void outlineBox(GraphicsContext*,
                   int _tx,
                   int _ty,

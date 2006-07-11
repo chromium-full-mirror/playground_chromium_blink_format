@@ -277,6 +277,11 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
     p->drawImage(image(), rect, compositeOperator);
 
+#if PLATFORM(MAC)
+    if (style()->highlight() != nullAtom && !i.p->paintingDisabled())
+      paintCustomHighlight(_tx - m_x, _ty - m_y, style()->highlight(), false);
+#endif
+
     if (drawSelectionTint)
       p->fillRect(selectionRect(), selectionBackgroundColor());
   }
