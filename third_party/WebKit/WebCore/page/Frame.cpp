@@ -2835,7 +2835,8 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     fillWithRed = false;  // Subframe, don't fill with red.
   else if (view() && view()->isTransparent())
     fillWithRed = false;  // Transparent, don't fill with red.
-  else if (d->m_drawSelectionOnly)
+  else if (d->m_paintRestriction == PaintRestrictionSelectionOnly ||
+           d->m_paintRestriction == PaintRestrictionSelectionOnlyWhiteText)
     fillWithRed = false;  // Selections are transparent, don't fill with red.
   else if (d->m_elementToDraw)
     fillWithRed =
@@ -2851,9 +2852,9 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     // d->m_elementToDraw is used to draw only one element
     RenderObject* eltRenderer =
         d->m_elementToDraw ? d->m_elementToDraw->renderer() : 0;
-    if (!d->m_drawSelectionOnly)
+    if (d->m_paintRestriction == PaintRestrictionNone)
       renderer()->document()->invalidateRenderedRectsForMarkersInRect(rect);
-    renderer()->layer()->paint(p, rect, d->m_drawSelectionOnly, eltRenderer);
+    renderer()->layer()->paint(p, rect, d->m_paintRestriction, eltRenderer);
 
 #if __APPLE__
     // Regions may have changed as a result of the visibility/z-index of element

@@ -131,7 +131,7 @@ KCanvasImage* SVGMaskElement::drawMaskerContent() {
   RenderSVGContainer* maskContainer =
       static_cast<RenderSVGContainer*>(renderer());
   RenderObject::PaintInfo info(context.get(), IntRect(), PaintPhaseForeground,
-                               0, 0);
+                               0, 0, 0);
   maskContainer->setDrawsContents(true);
   maskContainer->paint(info, 0, 0);
   maskContainer->setDrawsContents(false);

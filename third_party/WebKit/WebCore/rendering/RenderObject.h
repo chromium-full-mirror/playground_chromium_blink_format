@@ -84,6 +84,12 @@ enum PaintPhase {
   PaintPhaseCollapsedTableBorders
 };
 
+enum PaintRestriction {
+  PaintRestrictionNone,
+  PaintRestrictionSelectionOnly,
+  PaintRestrictionSelectionOnlyWhiteText
+};
+
 enum HitTestFilter { HitTestAll, HitTestSelf, HitTestDescendants };
 
 enum HitTestAction {
@@ -450,16 +456,19 @@ class RenderObject : public CachedResourceClient {
     PaintInfo(GraphicsContext* _p,
               const IntRect& _r,
               PaintPhase _phase,
+              bool _forceWhiteText,
               RenderObject* _paintingRoot,
               RenderFlowSequencedSet* _outlineObjects)
         : p(_p),
           r(_r),
           phase(_phase),
+          forceWhiteText(_forceWhiteText),
           paintingRoot(_paintingRoot),
           outlineObjects(_outlineObjects) {}
     GraphicsContext* p;
     IntRect r;
     PaintPhase phase;
+    bool forceWhiteText;
     RenderObject*
         paintingRoot;  // used to draw just one element and its visual kids
     RenderFlowSequencedSet* outlineObjects;  // used to list outlines that

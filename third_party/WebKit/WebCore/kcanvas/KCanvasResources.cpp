@@ -206,7 +206,7 @@ void KCanvasMarker::draw(GraphicsContext* context,
     // FIXME: PaintInfo should be passed into this method instead.
     // FIXME: bounding box fractions lost
     RenderObject::PaintInfo info(context, enclosingIntRect(rect),
-                                 PaintPhaseForeground, 0, 0);
+                                 PaintPhaseForeground, 0, 0, 0);
     m_marker->setLocalTransform(rotation.multiply(translation).matrix());
     static_cast<RenderSVGContainer*>(m_marker)->setDrawsContents(true);
     m_marker->paint(info, 0, 0);

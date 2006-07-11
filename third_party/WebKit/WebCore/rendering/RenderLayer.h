@@ -330,7 +330,7 @@ class RenderLayer : WidgetClient {
   // layers that intersect the point from front to back.
   void paint(GraphicsContext*,
              const IntRect& damageRect,
-             bool selectionOnly = false,
+             PaintRestriction = PaintRestrictionNone,
              RenderObject* paintingRoot = 0);
   bool hitTest(RenderObject::NodeInfo&, const IntPoint&);
 
@@ -382,7 +382,7 @@ class RenderLayer : WidgetClient {
                   GraphicsContext*,
                   const IntRect& paintDirtyRect,
                   bool haveTransparency,
-                  bool selectionOnly,
+                  PaintRestriction,
                   RenderObject* paintingRoot);
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
                             RenderObject::NodeInfo&,

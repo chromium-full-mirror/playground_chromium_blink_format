@@ -1289,9 +1289,9 @@ bool RenderLayer::scroll(ScrollDirection direction,
 
 void RenderLayer::paint(GraphicsContext* p,
                         const IntRect& damageRect,
-                        bool selectionOnly,
+                        PaintRestriction paintRestriction,
                         RenderObject* paintingRoot) {
-  paintLayer(this, p, damageRect, false, selectionOnly, paintingRoot);
+  paintLayer(this, p, damageRect, false, paintRestriction, paintingRoot);
 }
 
 static void setClip(GraphicsContext* p,
@@ -1319,7 +1319,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                              GraphicsContext* p,
                              const IntRect& paintDirtyRect,
                              bool haveTransparency,
-                             bool selectionOnly,
+                             PaintRestriction paintRestriction,
                              RenderObject* paintingRoot) {
   // Calculate the clip rects we should use.
   IntRect layerBounds, damageRect, clipRectToApply, outlineRect;
@@ -1338,6 +1338,12 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // paint
   if (!m_object->opacity())
     return;
+
+  bool selectionOnly =
+      paintRestriction == PaintRestrictionSelectionOnly ||
+      paintRestriction == PaintRestrictionSelectionOnlyWhiteText;
+  bool forceWhiteText =
+      paintRestriction == PaintRestrictionSelectionOnlyWhiteText;
 
   if (isTransparent())
     haveTransparency = true;
@@ -1367,7 +1373,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 
     // Paint the background.
     RenderObject::PaintInfo info(p, damageRect, PaintPhaseBlockBackground,
-                                 paintingRootForRenderer, 0);
+                                 false, paintingRootForRenderer, 0);
     renderer()->paint(info, tx, ty);
 
     // Our scrollbar widgets paint exactly when we tell them to, so that they
@@ -1386,7 +1392,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     for (Vector<RenderLayer*>::iterator it = m_negZOrderList->begin();
          it != m_negZOrderList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        selectionOnly, paintingRoot);
+                        paintRestriction, paintingRoot);
 
   // Now establish the appropriate clip and paint our child RenderObjects.
   if (shouldPaint && !clipRectToApply.isEmpty()) {
@@ -1400,7 +1406,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     RenderObject::PaintInfo info(
         p, clipRectToApply,
         selectionOnly ? PaintPhaseSelection : PaintPhaseChildBlockBackgrounds,
-        paintingRootForRenderer, 0);
+        forceWhiteText, paintingRootForRenderer, 0);
     renderer()->paint(info, tx, ty);
     if (!selectionOnly) {
       info.phase = PaintPhaseFloat;
@@ -1417,7 +1423,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 
   if (!outlineRect.isEmpty()) {
     // Paint our own outline
-    RenderObject::PaintInfo info(p, outlineRect, PaintPhaseSelfOutline,
+    RenderObject::PaintInfo info(p, outlineRect, PaintPhaseSelfOutline, false,
                                  paintingRootForRenderer, 0);
     setClip(p, paintDirtyRect, outlineRect);
     renderer()->paint(info, tx, ty);
@@ -1429,14 +1435,14 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     for (Vector<RenderLayer*>::iterator it = m_overflowList->begin();
          it != m_overflowList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        selectionOnly, paintingRoot);
+                        paintRestriction, paintingRoot);
 
   // Now walk the sorted list of children with positive z-indices.
   if (m_posZOrderList)
     for (Vector<RenderLayer*>::iterator it = m_posZOrderList->begin();
          it != m_posZOrderList->end(); ++it)
       it[0]->paintLayer(rootLayer, p, paintDirtyRect, haveTransparency,
-                        selectionOnly, paintingRoot);
+                        paintRestriction, paintingRoot);
 
   // End our transparency layer
   if (isTransparent() && m_usedTransparency) {
