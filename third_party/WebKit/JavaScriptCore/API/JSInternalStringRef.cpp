@@ -36,9 +36,9 @@
 
 using namespace KJS;
 
-JSValueRef JSStringMake(JSInternalStringRef buffer) {
+JSValueRef JSStringMake(JSInternalStringRef string) {
   JSLock lock;
-  UString::Rep* rep = toJS(buffer);
+  UString::Rep* rep = toJS(string);
   return toRef(jsString(UString(rep)));
 }
 
@@ -57,14 +57,14 @@ JSInternalStringRef JSInternalStringCreateUTF8(const char* string) {
   return toRef(UString(string).rep()->ref());
 }
 
-JSInternalStringRef JSInternalStringRetain(JSInternalStringRef buffer) {
-  UString::Rep* rep = toJS(buffer);
+JSInternalStringRef JSInternalStringRetain(JSInternalStringRef string) {
+  UString::Rep* rep = toJS(string);
   return toRef(rep->ref());
 }
 
-void JSInternalStringRelease(JSInternalStringRef buffer) {
+void JSInternalStringRelease(JSInternalStringRef string) {
   JSLock lock;
-  UString::Rep* rep = toJS(buffer);
+  UString::Rep* rep = toJS(string);
   rep->deref();
 }
 
@@ -74,49 +74,48 @@ JSInternalStringRef JSValueCopyStringValue(JSContextRef context,
   JSValue* jsValue = toJS(value);
   ExecState* exec = toJS(context);
 
-  JSInternalStringRef charBufferRef =
-      toRef(jsValue->toString(exec).rep()->ref());
+  JSInternalStringRef stringRef = toRef(jsValue->toString(exec).rep()->ref());
   if (exec->hadException())
     exec->clearException();
-  return charBufferRef;
+  return stringRef;
 }
 
-size_t JSInternalStringGetLength(JSInternalStringRef buffer) {
-  UString::Rep* rep = toJS(buffer);
+size_t JSInternalStringGetLength(JSInternalStringRef string) {
+  UString::Rep* rep = toJS(string);
   return rep->size();
 }
 
-const JSChar* JSInternalStringGetCharactersPtr(JSInternalStringRef buffer) {
-  UString::Rep* rep = toJS(buffer);
+const JSChar* JSInternalStringGetCharactersPtr(JSInternalStringRef string) {
+  UString::Rep* rep = toJS(string);
   return reinterpret_cast<const JSChar*>(rep->data());
 }
 
-void JSInternalStringGetCharacters(JSInternalStringRef inBuffer,
-                                   JSChar* outBuffer,
+void JSInternalStringGetCharacters(JSInternalStringRef string,
+                                   JSChar* buffer,
                                    size_t numChars) {
-  UString::Rep* rep = toJS(inBuffer);
+  UString::Rep* rep = toJS(string);
   const JSChar* data = reinterpret_cast<const JSChar*>(rep->data());
 
-  memcpy(outBuffer, data, numChars * sizeof(JSChar));
+  memcpy(buffer, data, numChars * sizeof(JSChar));
 }
 
-size_t JSInternalStringGetMaxLengthUTF8(JSInternalStringRef buffer) {
-  UString::Rep* rep = toJS(buffer);
+size_t JSInternalStringGetMaxLengthUTF8(JSInternalStringRef string) {
+  UString::Rep* rep = toJS(string);
 
   // Any UTF8 character > 3 bytes encodes as a UTF16 surrogate pair.
   return rep->size() * 3 + 1;  // + 1 for terminating '\0'
 }
 
-size_t JSInternalStringGetCharactersUTF8(JSInternalStringRef inBuffer,
-                                         char* outBuffer,
+size_t JSInternalStringGetCharactersUTF8(JSInternalStringRef string,
+                                         char* buffer,
                                          size_t bufferSize) {
   JSLock lock;
-  UString::Rep* rep = toJS(inBuffer);
+  UString::Rep* rep = toJS(string);
   CString cString = UString(rep).UTF8String();
 
   size_t length =
       std::min(bufferSize, cString.size() + 1);  // + 1 for terminating '\0'
-  memcpy(outBuffer, cString.c_str(), length);
+  memcpy(buffer, cString.c_str(), length);
   return length;
 }
 
@@ -155,8 +154,8 @@ JSInternalStringRef JSInternalStringCreateCF(CFStringRef string) {
 }
 
 CFStringRef CFStringCreateWithJSInternalString(CFAllocatorRef alloc,
-                                               JSInternalStringRef buffer) {
-  UString::Rep* rep = toJS(buffer);
+                                               JSInternalStringRef string) {
+  UString::Rep* rep = toJS(string);
   return CFStringCreateWithCharacters(
       alloc, reinterpret_cast<const JSChar*>(rep->data()), rep->size());
 }
