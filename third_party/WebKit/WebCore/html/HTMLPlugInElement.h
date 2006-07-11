@@ -26,15 +26,9 @@
 #define HTMLPlugInElement_H
 
 #include "HTMLElement.h"
-
-#if __APPLE__
+#if PLATFORM(MAC)
 #include <JavaScriptCore/runtime.h>
-#else
-namespace KJS {
-namespace Bindings {
-class Instance;
-}
-}
+#include <JavaScriptCore/npruntime.h>
 #endif
 
 namespace WebCore {
@@ -42,6 +36,7 @@ namespace WebCore {
 class HTMLPlugInElement : public HTMLElement {
  public:
   HTMLPlugInElement(const QualifiedName& tagName, Document*);
+  HTMLPlugInElement::~HTMLPlugInElement();
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
@@ -64,16 +59,23 @@ class HTMLPlugInElement : public HTMLElement {
   String width() const;
   void setWidth(const String&);
 
-#if __APPLE__
+#if PLATFORM(MAC)
   virtual KJS::Bindings::Instance* getInstance() const = 0;
+  virtual NPObject* getNPObject();
 #endif
 
   void setFrameName(const AtomicString& frameName) { m_frameName = frameName; }
 
+ private:
+#if PLATFORM(MAC)
+  NPObject* createNPObject();
+#endif
+
  protected:
   String oldNameAttr;
-#if __APPLE__
+#if PLATFORM(MAC)
   mutable RefPtr<KJS::Bindings::Instance> m_instance;
+  NPObject* m_NPObject;
 #endif
  private:
   AtomicString m_frameName;

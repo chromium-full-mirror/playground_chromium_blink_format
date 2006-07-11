@@ -27,7 +27,7 @@
 
 #include "HTMLPlugInElement.h"
 
-#if __APPLE__
+#if PLATFORM(MAC)
 #include <JavaScriptCore/runtime.h>
 #else
 namespace KJS {
@@ -59,7 +59,7 @@ class HTMLEmbedElement : public HTMLPlugInElement {
 
   virtual bool isURLAttribute(Attribute*) const;
 
-#if __APPLE__
+#if PLATFORM(MAC)
   virtual KJS::Bindings::Instance* getInstance() const;
 #endif
 
