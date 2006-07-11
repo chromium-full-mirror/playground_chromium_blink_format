@@ -64,12 +64,17 @@ typedef unsigned JSPropertyAttributes;
 @abstract The callback invoked when an object is first created.
 @param context The execution context to use.
 @param object The JSObject being created.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @discussion If you named your function Initialize, you would declare it like
 this:
 
-void Initialize(JSContextRef context, JSObjectRef object);
+void Initialize(JSContextRef context, JSObjectRef object, JSValueRef*
+exception);
 */
-typedef void (*JSInitializeCallback)(JSContextRef context, JSObjectRef object);
+typedef void (*JSInitializeCallback)(JSContextRef context,
+                                     JSObjectRef object,
+                                     JSValueRef* exception);
 
 /*!
 @typedef JSFinalizeCallback
@@ -90,12 +95,14 @@ property.
 @param object The JSObject to search for the property.
 @param propertyName A JSInternalString containing the name of the property look
 up.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result true if object has the property, otherwise false.
 @discussion If you named your function HasProperty, you would declare it like
 this:
 
 bool HasProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
-propertyName);
+propertyName, JSValueRef* exception);
 
 This callback enables optimization in cases where only a property's existence
 needs to be known, not its value, and computing its value would be expensive. If
@@ -104,7 +111,8 @@ hasProperty calls.
 */
 typedef bool (*JSHasPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
-                                      JSInternalStringRef propertyName);
+                                      JSInternalStringRef propertyName,
+                                      JSValueRef* exception);
 
 /*!
 @typedef JSGetPropertyCallback
@@ -115,13 +123,15 @@ typedef bool (*JSHasPropertyCallback)(JSContextRef context,
 get.
 @param returnValue A pointer to a JSValue in which to store the property's
 value.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result true if object has the property in question, otherwise false. If this
 function returns true, returnValue is assumed to contain a valid JSValue.
 @discussion If you named your function GetProperty, you would declare it like
 this:
 
 bool GetProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
-propertyName, JSValueRef* returnValue);
+propertyName, JSValueRef* returnValue, JSValueRef* exception);
 
 If this function returns false, the get request forwards to object's static
 property table, then its parent class chain (which includes the default object
@@ -130,7 +140,8 @@ class), then its prototype chain.
 typedef bool (*JSGetPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
                                       JSInternalStringRef propertyName,
-                                      JSValueRef* returnValue);
+                                      JSValueRef* returnValue,
+                                      JSValueRef* exception);
 
 /*!
 @typedef JSSetPropertyCallback
@@ -140,12 +151,14 @@ typedef bool (*JSGetPropertyCallback)(JSContextRef context,
 @param propertyName A JSInternalString containing the name of the property to
 set.
 @param value A JSValue to use as the property's value.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result true if the property was successfully set, otherwise false.
 @discussion If you named your function SetProperty, you would declare it like
 this:
 
 bool SetProperty(JSContextRef context, JSObjectRef object, JSInternalStringRef
-propertyName, JSValueRef value);
+propertyName, JSValueRef value, JSValueRef* exception);
 
 If this function returns false, the set request forwards to object's static
 property table, then its parent class chain (which includes the default object
@@ -154,7 +167,8 @@ class).
 typedef bool (*JSSetPropertyCallback)(JSContextRef context,
                                       JSObjectRef object,
                                       JSInternalStringRef propertyName,
-                                      JSValueRef value);
+                                      JSValueRef value,
+                                      JSValueRef* exception);
 
 /*!
 @typedef JSDeletePropertyCallback
@@ -163,12 +177,14 @@ typedef bool (*JSSetPropertyCallback)(JSContextRef context,
 @param object The JSObject in which to delete the property.
 @param propertyName A JSInternalString containing the name of the property to
 delete.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result true if propertyName was successfully deleted, otherwise false.
 @discussion If you named your function DeleteProperty, you would declare it like
 this:
 
 bool DeleteProperty(JSContextRef context, JSObjectRef object,
-JSInternalStringRef propertyName);
+JSInternalStringRef propertyName, JSValueRef* exception);
 
 If this function returns false, the delete request forwards to object's static
 property table, then its parent class chain (which includes the default object
@@ -176,7 +192,8 @@ class).
 */
 typedef bool (*JSDeletePropertyCallback)(JSContextRef context,
                                          JSObjectRef object,
-                                         JSInternalStringRef propertyName);
+                                         JSInternalStringRef propertyName,
+                                         JSValueRef* exception);
 
 /*!
 @typedef JSGetPropertyListCallback
@@ -186,11 +203,13 @@ list.
 @param object The JSObject whose properties need to be added to propertyList.
 @param propertyList A JavaScript property list that will be used to enumerate
 object's properties.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @discussion If you named your function GetPropertyList, you would declare it
 like this:
 
 void GetPropertyList(JSContextRef context, JSObjectRef object, JSPropertyListRef
-propertyList);
+propertyList, JSValueRef* exception);
 
 Use JSPropertyListAdd to add properties to propertyList.
 
@@ -198,7 +217,8 @@ Property lists are used by JSPropertyEnumerators and JavaScript for...in loops.
 */
 typedef void (*JSGetPropertyListCallback)(JSContextRef context,
                                           JSObjectRef object,
-                                          JSPropertyListRef propertyList);
+                                          JSPropertyListRef propertyList,
+                                          JSValueRef* exception);
 
 /*!
 @typedef JSCallAsFunctionCallback
@@ -209,12 +229,14 @@ typedef void (*JSGetPropertyListCallback)(JSContextRef context,
 scope.
 @param argc An integer count of the number of arguments in argv.
 @param argv A JSValue array of the  arguments passed to the function.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result A JSValue that is the function's return value.
 @discussion If you named your function CallAsFunction, you would declare it like
 this:
 
 JSValueRef CallAsFunction(JSContextRef context, JSObjectRef function,
-JSObjectRef thisObject, size_t argc, JSValueRef argv[]);
+JSObjectRef thisObject, size_t argc, JSValueRef argv[], JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression
 'myObject.myMemberFunction()', function would be set to myMemberFunction, and
@@ -227,7 +249,8 @@ typedef JSValueRef (*JSCallAsFunctionCallback)(JSContextRef context,
                                                JSObjectRef function,
                                                JSObjectRef thisObject,
                                                size_t argc,
-                                               JSValueRef argv[]);
+                                               JSValueRef argv[],
+                                               JSValueRef* exception);
 
 /*!
 @typedef JSCallAsConstructorCallback
@@ -237,12 +260,14 @@ typedef JSValueRef (*JSCallAsFunctionCallback)(JSContextRef context,
 @param constructor A JSObject that is the constructor being called.
 @param argc An integer count of the number of arguments in argv.
 @param argv A JSValue array of the  arguments passed to the function.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result A JSObject that is the constructor's return value.
 @discussion If you named your function CallAsConstructor, you would declare it
 like this:
 
 JSObjectRef CallAsConstructor(JSContextRef context, JSObjectRef constructor,
-size_t argc, JSValueRef argv[]);
+size_t argc, JSValueRef argv[], JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression 'new
 myConstructorFunction()', constructor would be set to myConstructorFunction.
@@ -253,7 +278,8 @@ statement will throw an exception.
 typedef JSObjectRef (*JSCallAsConstructorCallback)(JSContextRef context,
                                                    JSObjectRef constructor,
                                                    size_t argc,
-                                                   JSValueRef argv[]);
+                                                   JSValueRef argv[],
+                                                   JSValueRef* exception);
 
 /*!
 @typedef JSConvertToTypeCallback
@@ -263,13 +289,15 @@ JavaScript type.
 @param object The JSObject to convert.
 @param typeCode A JSTypeCode specifying the JavaScript type to convert to.
 @param returnValue A pointer to a JSValue in which to store the converted value.
+@param exception A pointer to a JSValueRef in which to return an exception, if
+any.
 @result true if the value was converted, otherwise false. If this function
 returns true, returnValue is assumed to contain a valid JSValue.
 @discussion If you named your function ConvertToType, you would declare it like
 this:
 
 bool ConvertToType(JSContextRef context, JSObjectRef object, JSTypeCode
-typeCode, JSValueRef* returnValue);
+typeCode, JSValueRef* returnValue, JSValueRef* exception);
 
 If this function returns false, the conversion request forwards to object's
 parent class chain (which includes the default object class).
@@ -277,7 +305,8 @@ parent class chain (which includes the default object class).
 typedef bool (*JSConvertToTypeCallback)(JSContextRef context,
                                         JSObjectRef object,
                                         JSTypeCode typeCode,
-                                        JSValueRef* returnValue);
+                                        JSValueRef* returnValue,
+                                        JSValueRef* exception);
 
 /*!
 @struct JSObjectCallbacks

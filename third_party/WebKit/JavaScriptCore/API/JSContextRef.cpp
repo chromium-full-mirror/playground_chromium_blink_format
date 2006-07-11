@@ -110,20 +110,3 @@ bool JSCheckSyntax(JSContextRef context,
 
   return true;
 }
-
-JSValueRef JSContextGetException(JSContextRef context) {
-  ExecState* exec = toJS(context);
-  return toRef(exec->exception());
-}
-
-void JSContextClearException(JSContextRef context) {
-  ExecState* exec = toJS(context);
-  if (exec->hadException())
-    exec->clearException();
-}
-
-void JSContextSetException(JSContextRef context, JSValueRef value) {
-  ExecState* exec = toJS(context);
-  JSValue* jsValue = toJS(value);
-  exec->setException(jsValue);
-}
