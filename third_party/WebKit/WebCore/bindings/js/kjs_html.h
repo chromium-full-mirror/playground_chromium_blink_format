@@ -30,6 +30,7 @@ namespace WebCore {
 class HTMLCollection;
 class HTMLDocument;
 class HTMLElement;
+class HTMLOptionsCollection;
 class HTMLSelectElement;
 class HTMLTableCaptionElement;
 class HTMLTableSectionElement;
@@ -359,6 +360,8 @@ WebCore::HTMLTableSectionElement* toHTMLTableSectionElement(
     JSValue*);  // returns 0 if passed-in value is not a JSHTMLElement object
                 // for a HTMLTableSectionElement
 
+KJS_DEFINE_PROTOTYPE(JSHTMLCollectionProto)
+
 class JSHTMLCollection : public DOMObject {
  public:
   JSHTMLCollection(ExecState*, WebCore::HTMLCollection*);
@@ -393,26 +396,6 @@ class JSHTMLCollection : public DOMObject {
                              const PropertySlot&);
 };
 
-class JSHTMLSelectCollection : public JSHTMLCollection {
- public:
-  JSHTMLSelectCollection(ExecState*,
-                         WebCore::HTMLCollection*,
-                         WebCore::HTMLSelectElement*);
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState*,
-                   const Identifier& propertyName,
-                   JSValue*,
-                   int attr = None);
-
- private:
-  static JSValue* selectedIndexGetter(ExecState*,
-                                      JSObject*,
-                                      const Identifier&,
-                                      const PropertySlot&);
-
-  RefPtr<WebCore::HTMLSelectElement> m_element;
-};
-
 class HTMLAllCollection : public JSHTMLCollection {
  public:
   HTMLAllCollection(ExecState* exec, WebCore::HTMLCollection* c)
@@ -434,9 +417,7 @@ class ImageConstructorImp : public DOMObject {
 };
 
 JSValue* getHTMLCollection(ExecState*, WebCore::HTMLCollection*);
-JSValue* getSelectHTMLCollection(ExecState*,
-                                 WebCore::HTMLCollection*,
-                                 WebCore::HTMLSelectElement*);
+JSValue* getHTMLOptionsCollection(ExecState*, WebCore::HTMLOptionsCollection*);
 JSValue* getAllHTMLCollection(ExecState*, WebCore::HTMLCollection*);
 
 }  // namespace

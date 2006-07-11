@@ -248,10 +248,11 @@ inline bool getStaticValueSlot(ExecState* exec,
 
 /**
  * This one is for "put".
- * Lookup hash entry for property to be set, and set the value.
+ * It looks up a hash entry for the property to be set.  If an entry
+ * is found it sets the value and returns true, else it returns false.
  */
-template <class ThisImp, class ParentImp>
-inline void lookupPut(ExecState* exec,
+template <class ThisImp>
+inline bool lookupPut(ExecState* exec,
                       const Identifier& propertyName,
                       JSValue* value,
                       int attr,
@@ -259,9 +260,10 @@ inline void lookupPut(ExecState* exec,
                       ThisImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
 
-  if (!entry)  // not found: forward to parent
-    thisObj->ParentImp::put(exec, propertyName, value, attr);
-  else if (entry->attr & Function)  // function: put as override property
+  if (!entry)
+    return false;
+
+  if (entry->attr & Function)  // function: put as override property
     thisObj->JSObject::put(exec, propertyName, value, attr);
   else if (entry->attr & ReadOnly)  // readonly! Can't put!
 #ifdef KJS_VERBOSE
@@ -273,6 +275,26 @@ inline void lookupPut(ExecState* exec,
 #endif
   else
     thisObj->putValueProperty(exec, entry->value, value, attr);
+
+  return true;
+}
+
+/**
+ * This one is for "put".
+ * It calls lookupPut<ThisImp>() to set the value.  If that call
+ * returns false (meaning no entry in the hash table was found),
+ * then it calls put() on the ParentImp class.
+ */
+template <class ThisImp, class ParentImp>
+inline void lookupPut(ExecState* exec,
+                      const Identifier& propertyName,
+                      JSValue* value,
+                      int attr,
+                      const HashTable* table,
+                      ThisImp* thisObj) {
+  if (!lookupPut<ThisImp>(exec, propertyName, value, attr, table, thisObj))
+    thisObj->ParentImp::put(exec, propertyName, value,
+                            attr);  // not found: forward to parent
 }
 
 }  // namespace

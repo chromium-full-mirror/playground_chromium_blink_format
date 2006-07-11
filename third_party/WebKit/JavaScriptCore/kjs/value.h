@@ -95,7 +95,8 @@ class JSValue {
 
   // Integer conversions.
   double toInteger(ExecState* exec) const;
-  int32_t toInt32(ExecState* exec) const;
+  int32_t toInt32(ExecState*) const;
+  int32_t toInt32(ExecState*, bool& Ok) const;
   uint32_t toUInt32(ExecState* exec) const;
   uint16_t toUInt16(ExecState* exec) const;
 
@@ -337,6 +338,11 @@ inline JSValue* JSValue::toPrimitive(ExecState* exec,
 inline bool JSValue::toBoolean(ExecState* exec) const {
   return JSImmediate::isImmediate(this) ? JSImmediate::toBoolean(this)
                                         : downcast()->toBoolean(exec);
+}
+
+inline int32_t JSValue::toInt32(ExecState* exec) const {
+  bool ignored;
+  return toInt32(exec, ignored);
 }
 
 inline double JSValue::toNumber(ExecState* exec) const {
