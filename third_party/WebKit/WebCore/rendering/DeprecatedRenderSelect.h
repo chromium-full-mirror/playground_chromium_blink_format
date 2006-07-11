@@ -62,7 +62,6 @@ class DeprecatedRenderSelect : public RenderFormElement {
   void updateSelection();
 
  private:
-  virtual void valueChanged(Widget*);
   virtual void selectionChanged(Widget*);
 
  protected:
