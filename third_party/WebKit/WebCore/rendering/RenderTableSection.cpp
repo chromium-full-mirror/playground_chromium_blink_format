@@ -147,7 +147,7 @@ bool RenderTableSection::ensureRows(int numRows) {
   if (numRows > nRows) {
     if (numRows > static_cast<int>(grid.size())) {
       if (numRows >
-          static_cast<int>(numeric_limits<size_t>::max() / sizeof(int)))
+          static_cast<int>(numeric_limits<size_t>::max() / sizeof(RowStruct)))
         return false;
       grid.resize(numRows);
     }
