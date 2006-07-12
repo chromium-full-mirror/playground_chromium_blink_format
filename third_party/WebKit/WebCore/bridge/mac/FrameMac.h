@@ -356,7 +356,9 @@ class FrameMac : public Frame {
 
   NSView* mouseDownViewIfStillGood();
 
-  NSView* nextKeyViewInFrame(Node* startingPoint, SelectionDirection);
+  NSView* nextKeyViewInFrame(Node* startingPoint,
+                             SelectionDirection,
+                             bool* focusCallResultedInViewBeingCreated = 0);
   static NSView* documentViewForNode(Node*);
 
   bool dispatchCPPEvent(const AtomicString& eventType,
