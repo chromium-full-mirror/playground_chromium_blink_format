@@ -128,7 +128,7 @@ void UserObjectImp::getPropertyList(ExecState* exec,
       CFRelease(cfPropertyNames);
     }
   }
-  JSObject::getPropertyList(exec, propertyList, recursive);
+  JSObject::getPropertyList(propertyList, recursive);
 }
 
 JSValue* UserObjectImp::userObjectGetter(ExecState*,
