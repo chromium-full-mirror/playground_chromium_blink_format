@@ -35,7 +35,6 @@ class HTMLOptGroupElement;
 class RenderPopupMenu : public RenderBlock {
  public:
   RenderPopupMenu(Node*);
-  virtual ~RenderPopupMenu() {}
 
   virtual const char* renderName() const { return "RenderPopupMenu"; }
 
@@ -43,7 +42,7 @@ class RenderPopupMenu : public RenderBlock {
   virtual void populate();
   virtual void showPopup(const IntRect&, FrameView*, int index) = 0;
 
-  RenderMenuList* getRenderMenuList() {
+  RenderMenuList* menuList() {
     return static_cast<RenderMenuList*>(parent() ? parent()->parent() : 0);
   }
 

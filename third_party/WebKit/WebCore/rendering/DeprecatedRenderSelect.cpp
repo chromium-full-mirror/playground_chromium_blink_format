@@ -74,9 +74,8 @@ void DeprecatedRenderSelect::updateFromElement() {
 
   // update contents listbox/combobox based on options in m_element
   if (m_optionsChanged) {
-    if (static_cast<HTMLSelectElement*>(node())->m_recalcListItems)
-      static_cast<HTMLSelectElement*>(node())->recalcListItems();
-    Vector<HTMLElement*> listItems =
+    static_cast<HTMLSelectElement*>(node())->recalcListItems();
+    const Vector<HTMLElement*>& listItems =
         static_cast<HTMLSelectElement*>(node())->listItems();
     int listIndex;
 
@@ -193,7 +192,7 @@ void DeprecatedRenderSelect::layout() {
   RenderFormElement::layout();
 
   // and now disable the widget in case there is no <option> given
-  Vector<HTMLElement*> listItems =
+  const Vector<HTMLElement*>& listItems =
       static_cast<HTMLSelectElement*>(node())->listItems();
 
   bool foundOption = false;
@@ -212,7 +211,7 @@ void DeprecatedRenderSelect::selectionChanged(Widget*) {
   // the
   // option list will make use update options not in the way the user expects
   // them
-  Vector<HTMLElement*> listItems =
+  const Vector<HTMLElement*>& listItems =
       static_cast<HTMLSelectElement*>(node())->m_listItems;
   int j = 0;
   unsigned size = listItems.size();
@@ -241,7 +240,7 @@ ListBox* DeprecatedRenderSelect::createListBox() {
 }
 
 void DeprecatedRenderSelect::updateSelection() {
-  Vector<HTMLElement*> listItems =
+  const Vector<HTMLElement*>& listItems =
       static_cast<HTMLSelectElement*>(node())->listItems();
   int i;
   // if multi-select, we select only the new selected index

@@ -97,7 +97,7 @@ const AtomicString& HTMLSelectElement::type() const {
 int HTMLSelectElement::selectedIndex() const {
   // return the number of the first option selected
   unsigned o = 0;
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   for (unsigned int i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElement*>(items[i])->selected())
@@ -110,7 +110,7 @@ int HTMLSelectElement::selectedIndex() const {
 
 void HTMLSelectElement::setSelectedIndex(int index, bool deselect) {
   // deselect all other options and select only the new one
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   int listIndex;
   if (deselect) {
     for (listIndex = 0; listIndex < int(items.size()); listIndex++) {
@@ -128,7 +128,7 @@ void HTMLSelectElement::setSelectedIndex(int index, bool deselect) {
 int HTMLSelectElement::length() const {
   int len = 0;
   unsigned i;
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag))
       len++;
@@ -156,7 +156,7 @@ void HTMLSelectElement::remove(int index) {
   ExceptionCode ec = 0;
   int listIndex = optionToListIndex(index);
 
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   if (listIndex < 0 || index >= int(items.size()))
     return;  // ### what should we do ? remove the last item?
 
@@ -167,7 +167,7 @@ void HTMLSelectElement::remove(int index) {
 
 String HTMLSelectElement::value() {
   unsigned i;
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElement*>(items[i])->selected())
@@ -181,7 +181,7 @@ void HTMLSelectElement::setValue(const String& value) {
     return;
   // find the option with value() matching the given parameter
   // and make it the current selection.
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   for (unsigned i = 0; i < items.size(); i++)
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElement*>(items[i])->value() == value) {
@@ -191,7 +191,7 @@ void HTMLSelectElement::setValue(const String& value) {
 }
 
 String HTMLSelectElement::stateValue() const {
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   int l = items.size();
   Vector<char, 1024> characters(l);
   for (int i = 0; i < l; ++i) {
@@ -206,7 +206,7 @@ String HTMLSelectElement::stateValue() const {
 void HTMLSelectElement::restoreState(const String& state) {
   recalcListItems();
 
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   int l = items.size();
   for (int i = 0; i < l; i++)
     if (items[i]->hasLocalName(optionTag))
@@ -303,7 +303,7 @@ RenderObject* HTMLSelectElement::createRenderer(RenderArena* arena,
 
 bool HTMLSelectElement::appendFormData(FormDataList& list, bool) {
   bool successful = false;
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
 
   unsigned i;
   for (i = 0; i < items.size(); i++) {
@@ -335,7 +335,7 @@ bool HTMLSelectElement::appendFormData(FormDataList& list, bool) {
 }
 
 int HTMLSelectElement::optionToListIndex(int optionIndex) const {
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   if (optionIndex < 0 || optionIndex >= int(items.size()))
     return -1;
 
@@ -351,15 +351,14 @@ int HTMLSelectElement::optionToListIndex(int optionIndex) const {
 }
 
 int HTMLSelectElement::listToOptionIndex(int listIndex) const {
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   if (listIndex < 0 || listIndex >= int(items.size()) ||
       !items[listIndex]->hasLocalName(optionTag))
     return -1;
 
   int optionIndex = 0;  // actual index of option not counting OPTGROUP entries
                         // that may be in list
-  int i;
-  for (i = 0; i < listIndex; i++)
+  for (int i = 0; i < listIndex; i++)
     if (items[i]->hasLocalName(optionTag))
       optionIndex++;
   return optionIndex;
@@ -369,7 +368,7 @@ PassRefPtr<HTMLOptionsCollection> HTMLSelectElement::options() {
   return new HTMLOptionsCollection(this);
 }
 
-void HTMLSelectElement::recalcListItems() {
+void HTMLSelectElement::recalcListItems() const {
   Node* current = firstChild();
   m_listItems.clear();
   HTMLOptionElement* foundSelected = 0;
@@ -424,7 +423,7 @@ void HTMLSelectElement::setRecalcListItems() {
 void HTMLSelectElement::reset() {
   bool optionSelected = false;
   HTMLOptionElement* firstOption = 0;
-  Vector<HTMLElement*> items = listItems();
+  const Vector<HTMLElement*>& items = listItems();
   unsigned i;
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
@@ -440,13 +439,8 @@ void HTMLSelectElement::reset() {
   }
   if (!optionSelected && firstOption)
     firstOption->setSelected(true);
-  if (renderer()) {
-    if (shouldUseMenuList())
-      static_cast<RenderMenuList*>(renderer())->setSelectionChanged(true);
-    else
-      static_cast<DeprecatedRenderSelect*>(renderer())
-          ->setSelectionChanged(true);
-  }
+  if (renderer() && !shouldUseMenuList())
+    static_cast<DeprecatedRenderSelect*>(renderer())->setSelectionChanged(true);
   setChanged(true);
 }
 
@@ -454,7 +448,7 @@ void HTMLSelectElement::notifyOptionSelected(HTMLOptionElement* selectedOption,
                                              bool selected) {
   if (selected && !m_multiple) {
     // deselect all other options
-    Vector<HTMLElement*> items = listItems();
+    const Vector<HTMLElement*>& items = listItems();
     unsigned i;
     for (i = 0; i < items.size(); i++) {
       if (items[i]->hasLocalName(optionTag))
@@ -462,13 +456,8 @@ void HTMLSelectElement::notifyOptionSelected(HTMLOptionElement* selectedOption,
             (items[i] == selectedOption);
     }
   }
-  if (renderer()) {
-    if (shouldUseMenuList())
-      static_cast<RenderMenuList*>(renderer())->setSelectionChanged(true);
-    else
-      static_cast<DeprecatedRenderSelect*>(renderer())
-          ->setSelectionChanged(true);
-  }
+  if (renderer() && !shouldUseMenuList())
+    static_cast<DeprecatedRenderSelect*>(renderer())->setSelectionChanged(true);
 
   setChanged(true);
 }
@@ -487,11 +476,13 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
     if ((keyIdentifier == "Down" || keyIdentifier == "Up" ||
          keyIdentifier == "U+000020") &&
         renderer() && shouldUseMenuList()) {
+      focus();
       static_cast<RenderMenuList*>(renderer())->showPopup();
       evt->setDefaultHandled();
     }
   }
   if (evt->type() == mousedownEvent && renderer() && shouldUseMenuList()) {
+    focus();
     static_cast<RenderMenuList*>(renderer())->showPopup();
     evt->setDefaultHandled();
   }
