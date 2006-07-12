@@ -34,7 +34,8 @@ namespace KJS {
 
 class JSCallbackConstructor : public JSObject {
  public:
-  JSCallbackConstructor(ExecState* exec, JSCallAsConstructorCallback callback);
+  JSCallbackConstructor(ExecState* exec,
+                        JSObjectCallAsConstructorCallback callback);
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List& args);
@@ -50,7 +51,7 @@ class JSCallbackConstructor : public JSObject {
   JSCallbackConstructor(const JSCallbackConstructor&);
 
   void* m_privateData;
-  JSCallAsConstructorCallback m_callback;
+  JSObjectCallAsConstructorCallback m_callback;
 };
 
 }  // namespace KJS

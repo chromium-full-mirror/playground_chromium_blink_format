@@ -33,7 +33,7 @@ const ClassInfo JSCallbackConstructor::info = {"CallbackConstructor", 0, 0, 0};
 
 JSCallbackConstructor::JSCallbackConstructor(
     ExecState* exec,
-    JSCallAsConstructorCallback callback)
+    JSObjectCallAsConstructorCallback callback)
     : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
       m_callback(callback) {}
 

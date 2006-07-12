@@ -57,25 +57,27 @@ JSObjectRef JSObjectMake(JSContextRef context,
     return toRef(new JSCallbackObject(context, jsClass, jsPrototype));
 }
 
-JSObjectRef JSFunctionMake(JSContextRef context,
-                           JSCallAsFunctionCallback callAsFunction) {
+JSObjectRef JSObjectMakeFunction(
+    JSContextRef context,
+    JSObjectCallAsFunctionCallback callAsFunction) {
   JSLock lock;
   ExecState* exec = toJS(context);
   return toRef(new JSCallbackFunction(exec, callAsFunction));
 }
 
-JSObjectRef JSConstructorMake(JSContextRef context,
-                              JSCallAsConstructorCallback callAsConstructor) {
+JSObjectRef JSObjectMakeConstructor(
+    JSContextRef context,
+    JSObjectCallAsConstructorCallback callAsConstructor) {
   JSLock lock;
   ExecState* exec = toJS(context);
   return toRef(new JSCallbackConstructor(exec, callAsConstructor));
 }
 
-JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
-                                   JSInternalStringRef body,
-                                   JSInternalStringRef sourceURL,
-                                   int startingLineNumber,
-                                   JSValueRef* exception) {
+JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
+                                         JSStringRef body,
+                                         JSStringRef sourceURL,
+                                         int startingLineNumber,
+                                         JSValueRef* exception) {
   JSLock lock;
 
   ExecState* exec = toJS(context);
@@ -104,7 +106,7 @@ JSObjectRef JSFunctionMakeWithBody(JSContextRef context,
       new DeclaredFunctionImp(exec, "anonymous", bodyNode.get(), scopeChain)));
 }
 
-JSInternalStringRef JSObjectGetDescription(JSObjectRef object) {
+JSStringRef JSObjectGetDescription(JSObjectRef object) {
   JSLock lock;
   JSObject* jsObject = toJS(object);
   return toRef(jsObject->className().rep());
@@ -124,7 +126,7 @@ void JSObjectSetPrototype(JSObjectRef object, JSValueRef value) {
 
 bool JSObjectHasProperty(JSContextRef context,
                          JSObjectRef object,
-                         JSInternalStringRef propertyName) {
+                         JSStringRef propertyName) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsObject = toJS(object);
@@ -135,7 +137,7 @@ bool JSObjectHasProperty(JSContextRef context,
 
 JSValueRef JSObjectGetProperty(JSContextRef context,
                                JSObjectRef object,
-                               JSInternalStringRef propertyName) {
+                               JSStringRef propertyName) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsObject = toJS(object);
@@ -149,7 +151,7 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
 
 bool JSObjectSetProperty(JSContextRef context,
                          JSObjectRef object,
-                         JSInternalStringRef propertyName,
+                         JSStringRef propertyName,
                          JSValueRef value,
                          JSPropertyAttributes attributes) {
   JSLock lock;
@@ -168,7 +170,7 @@ bool JSObjectSetProperty(JSContextRef context,
 
 bool JSObjectDeleteProperty(JSContextRef context,
                             JSObjectRef object,
-                            JSInternalStringRef propertyName) {
+                            JSStringRef propertyName) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsObject = toJS(object);
@@ -298,12 +300,11 @@ JSPropertyEnumeratorRef JSObjectCreatePropertyEnumerator(JSContextRef context,
   return JSPropertyEnumeratorRetain(enumerator);
 }
 
-JSInternalStringRef JSPropertyEnumeratorGetNext(
+JSStringRef JSPropertyEnumeratorGetNextName(
     JSPropertyEnumeratorRef enumerator) {
   ReferenceListIterator& iterator = enumerator->iterator;
   if (iterator != enumerator->list.end()) {
-    JSInternalStringRef result =
-        toRef(iterator->getPropertyName().ustring().rep());
+    JSStringRef result = toRef(iterator->getPropertyName().ustring().rep());
     iterator++;
     return result;
   }
@@ -323,7 +324,7 @@ void JSPropertyEnumeratorRelease(JSPropertyEnumeratorRef enumerator) {
 
 void JSPropertyListAdd(JSPropertyListRef propertyList,
                        JSObjectRef thisObject,
-                       JSInternalStringRef propertyName) {
+                       JSStringRef propertyName) {
   JSLock lock;
   ReferenceList* jsPropertyList = toJS(propertyList);
   JSObject* jsObject = toJS(thisObject);

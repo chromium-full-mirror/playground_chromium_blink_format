@@ -35,7 +35,7 @@ const ClassInfo JSCallbackFunction::info = {"CallbackFunction",
                                             &InternalFunctionImp::info, 0, 0};
 
 JSCallbackFunction::JSCallbackFunction(ExecState* exec,
-                                       JSCallAsFunctionCallback callback)
+                                       JSObjectCallAsFunctionCallback callback)
     : InternalFunctionImp(static_cast<FunctionPrototype*>(
           exec->lexicalInterpreter()->builtinFunctionPrototype())),
       m_callback(callback) {}
