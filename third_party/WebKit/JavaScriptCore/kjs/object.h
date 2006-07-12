@@ -472,8 +472,7 @@ class JSObject : public JSCell {
    * included in the list.
    * @return A List of References to properties of the object.
    **/
-  virtual void getPropertyList(ExecState* exec,
-                               ReferenceList& propertyList,
+  virtual void getPropertyList(ReferenceList& propertyList,
                                bool recursive = true);
 
   /**

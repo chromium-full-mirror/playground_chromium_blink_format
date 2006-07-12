@@ -473,9 +473,7 @@ bool JSObject::getPropertyAttributes(const Identifier& propertyName,
   return false;
 }
 
-void JSObject::getPropertyList(ExecState* exec,
-                               ReferenceList& propertyList,
-                               bool recursive) {
+void JSObject::getPropertyList(ReferenceList& propertyList, bool recursive) {
   _prop.addEnumerablesToReferenceList(propertyList, this);
 
   // Add properties from the static hashtable of properties
@@ -494,8 +492,7 @@ void JSObject::getPropertyList(ExecState* exec,
     info = info->parentClass;
   }
   if (_proto->isObject() && recursive)
-    static_cast<JSObject*>(_proto)->getPropertyList(exec, propertyList,
-                                                    recursive);
+    static_cast<JSObject*>(_proto)->getPropertyList(propertyList, recursive);
 }
 
 bool JSObject::toBoolean(ExecState* /*exec*/) const {

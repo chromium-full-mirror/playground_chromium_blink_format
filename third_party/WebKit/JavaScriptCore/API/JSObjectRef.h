@@ -198,27 +198,21 @@ typedef bool (*JSObjectDeletePropertyCallback)(JSContextRef context,
 @typedef JSObjectAddPropertiesToListCallback
 @abstract The callback invoked when adding an object's properties to a property
 list.
-@param context The current execution context.
 @param object The JSObject whose properties need to be added to propertyList.
 @param propertyList A JavaScript property list that will be used to enumerate
 object's properties.
-@param exception A pointer to a JSValueRef in which to return an exception, if
-any.
 @discussion If you named your function GetPropertyList, you would declare it
 like this:
 
-void AddPropertiesToList(JSContextRef context, JSObjectRef object,
-JSPropertyListRef propertyList, JSValueRef* exception);
+void AddPropertiesToList(JSObjectRef object, JSPropertyListRef propertyList);
 
 Use JSPropertyListAdd to add properties to propertyList.
 
 Property lists are used by JSPropertyEnumerators and JavaScript for...in loops.
 */
 typedef void (*JSObjectAddPropertiesToListCallback)(
-    JSContextRef context,
     JSObjectRef object,
-    JSPropertyListRef propertyList,
-    JSValueRef* exception);
+    JSPropertyListRef propertyList);
 
 /*!
 @typedef JSObjectCallAsFunctionCallback
@@ -360,8 +354,8 @@ property.
 @field setProperty The callback invoked when setting the value of a given
 property.
 @field deleteProperty The callback invoked when deleting a given property.
-@field getPropertyList The callback invoked when adding an object's properties
-to a property list.
+@field addPropertiesToList The callback invoked when adding an object's
+properties to a property list.
 @field callAsFunction The callback invoked when an object is called as a
 function.
 @field hasInstance The callback invoked when an object is used in an
@@ -694,13 +688,11 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
 /*!
 @function
 @abstract Creates an enumerator for an object's properties.
-@param context The execution context to use.
 @param object The object whose properties you want to enumerate.
 @result A JSPropertyEnumerator with a list of object's properties. Ownership
 follows the Create Rule.
 */
-JSPropertyEnumeratorRef JSObjectCreatePropertyEnumerator(JSContextRef context,
-                                                         JSObjectRef object);
+JSPropertyEnumeratorRef JSObjectCreatePropertyEnumerator(JSObjectRef object);
 /*!
 @function
 @abstract Retains a property enumerator.
