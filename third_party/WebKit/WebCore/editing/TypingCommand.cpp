@@ -66,7 +66,8 @@ void TypingCommand::deleteKeyPressed(Document* document,
 
   EditCommandPtr lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())->deleteKeyPressed();
+    static_cast<TypingCommand*>(lastEditCommand.get())
+        ->deleteKeyPressed(granularity);
     return;
   }
 
@@ -88,7 +89,7 @@ void TypingCommand::forwardDeleteKeyPressed(Document* document,
   EditCommandPtr lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())
-        ->forwardDeleteKeyPressed();
+        ->forwardDeleteKeyPressed(granularity);
     return;
   }
 
@@ -202,10 +203,10 @@ void TypingCommand::doApply() {
 
   switch (m_commandType) {
     case DeleteKey:
-      deleteKeyPressed();
+      deleteKeyPressed(m_granularity);
       return;
     case ForwardDeleteKey:
-      forwardDeleteKeyPressed();
+      forwardDeleteKeyPressed(m_granularity);
       return;
     case InsertLineBreak:
       insertLineBreak();
@@ -335,7 +336,7 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent() {
   typingAddedToOpenCommand();
 }
 
-void TypingCommand::deleteKeyPressed() {
+void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
   Selection selectionToDelete;
 
   switch (endingSelection().state()) {
@@ -350,7 +351,8 @@ void TypingCommand::deleteKeyPressed() {
           SelectionController(endingSelection().start(),
                               endingSelection().end(), SEL_DEFAULT_AFFINITY);
       sc.modify(SelectionController::EXTEND, SelectionController::BACKWARD,
-                m_granularity);
+                granularity);
+
       Position upstreamStart = endingSelection().start().upstream();
       VisiblePosition visibleStart = endingSelection().visibleStart();
       if (visibleStart == startOfParagraph(visibleStart))
@@ -364,7 +366,13 @@ void TypingCommand::deleteKeyPressed() {
         typingAddedToOpenCommand();
         return;
       }
+
       selectionToDelete = sc.selection();
+
+      // setStartingSelection so that undo selects what was deleted
+      if (selectionToDelete.isCaretOrRange() &&
+          granularity != CharacterGranularity)
+        setStartingSelection(selectionToDelete);
       break;
     }
     case Selection::NONE:
@@ -381,7 +389,7 @@ void TypingCommand::deleteKeyPressed() {
   }
 }
 
-void TypingCommand::forwardDeleteKeyPressed() {
+void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
   Selection selectionToDelete;
 
   switch (endingSelection().state()) {
@@ -396,7 +404,7 @@ void TypingCommand::forwardDeleteKeyPressed() {
           SelectionController(endingSelection().start(),
                               endingSelection().end(), SEL_DEFAULT_AFFINITY);
       sc.modify(SelectionController::EXTEND, SelectionController::FORWARD,
-                m_granularity);
+                granularity);
       Position downstreamEnd = endingSelection().end().downstream();
       VisiblePosition visibleEnd = endingSelection().visibleEnd();
       if (visibleEnd == endOfParagraph(visibleEnd))
@@ -413,6 +421,11 @@ void TypingCommand::forwardDeleteKeyPressed() {
         return;
       }
       selectionToDelete = sc.selection();
+
+      // setStartingSelection so that undo selects what was deleted
+      if (selectionToDelete.isCaretOrRange() &&
+          granularity != CharacterGranularity)
+        setStartingSelection(selectionToDelete);
       break;
     }
     case Selection::NONE:

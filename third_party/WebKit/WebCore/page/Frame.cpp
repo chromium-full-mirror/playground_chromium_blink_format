@@ -1152,9 +1152,12 @@ void Frame::setMark(const Selection& s) {
   d->m_mark = s;
 }
 
-void Frame::setSelection(const SelectionController& s,
-                         bool closeTyping,
-                         bool keepTypingStyle) {
+void Frame::setSelection(const SelectionController& s, bool closeTyping) {
+  if (closeTyping)
+    TypingCommand::closeTyping(lastEditCommand());
+
+  clearTypingStyle();
+
   if (d->m_selection == s)
     return;
 
@@ -1176,12 +1179,6 @@ void Frame::setSelection(const SelectionController& s,
   // Always clear the x position used for vertical arrow navigation.
   // It will be restored by the vertical arrow navigation code if necessary.
   d->m_xPosForVerticalArrowNavigation = NoXPosForVerticalArrowNavigation;
-
-  if (closeTyping)
-    TypingCommand::closeTyping(lastEditCommand());
-
-  if (!keepTypingStyle)
-    clearTypingStyle();
 
   notifyRendererOfSelectionChange(false);
 

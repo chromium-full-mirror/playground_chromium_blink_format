@@ -76,8 +76,8 @@ class TypingCommand : public CompositeEditCommand {
   void insertLineBreak();
   void insertParagraphSeparatorInQuotedContent();
   void insertParagraphSeparator();
-  void deleteKeyPressed();
-  void forwardDeleteKeyPressed();
+  void deleteKeyPressed(TextGranularity);
+  void forwardDeleteKeyPressed(TextGranularity);
 
   bool smartDelete() { return m_smartDelete; }
   void setSmartDelete(bool smartDelete) { m_smartDelete = smartDelete; }

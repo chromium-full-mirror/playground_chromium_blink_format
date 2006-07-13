@@ -335,9 +335,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void setSelectionGranularity(TextGranularity granularity) const;
 
   // FIXME: Replace these with functions on the selection controller.
-  void setSelection(const SelectionController&,
-                    bool closeTyping = true,
-                    bool keepTypingStyle = false);
+  void setSelection(const SelectionController&, bool closeTyping = true);
   bool shouldChangeSelection(const SelectionController&) const;
   virtual bool shouldDeleteSelection(const SelectionController&) const;
 
