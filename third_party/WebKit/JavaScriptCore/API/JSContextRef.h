@@ -79,20 +79,19 @@ to include source file information in exceptions.
 number in the file located at sourceURL. This is only used when reporting
 exceptions.
 @param exception          A pointer to a JSValueRef in which to store an
-uncaught exception, if any. Pass NULL if you do not care to store an uncaught
-exception.
+exception, if any. Pass NULL if you do not care to store an exception.
 @result                   The JSValue that results from evaluating script, or
-NULL if an uncaught exception is thrown.
+NULL if an exception is thrown.
 */
-JSValueRef JSEvaluate(JSContextRef context,
-                      JSStringRef script,
-                      JSObjectRef thisObject,
-                      JSStringRef sourceURL,
-                      int startingLineNumber,
-                      JSValueRef* exception);
+JSValueRef JSEvaluateScript(JSContextRef context,
+                            JSStringRef script,
+                            JSObjectRef thisObject,
+                            JSStringRef sourceURL,
+                            int startingLineNumber,
+                            JSValueRef* exception);
 
 /*!
-@function JSCheckSyntax
+@function JSCheckScriptSyntax
 @abstract                 Checks for syntax errors in a string of JavaScript.
 @param context            The execution context to use.
 @param script             A JSString containing the script to check for syntax
@@ -109,11 +108,11 @@ exception.
 @result                   true if the script is syntactically correct, otherwise
 false.
 */
-bool JSCheckSyntax(JSContextRef context,
-                   JSStringRef script,
-                   JSStringRef sourceURL,
-                   int startingLineNumber,
-                   JSValueRef* exception);
+bool JSCheckScriptSyntax(JSContextRef context,
+                         JSStringRef script,
+                         JSStringRef sourceURL,
+                         int startingLineNumber,
+                         JSValueRef* exception);
 
 #ifdef __cplusplus
 }

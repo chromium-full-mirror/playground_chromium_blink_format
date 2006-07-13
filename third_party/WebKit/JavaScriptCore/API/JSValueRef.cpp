@@ -102,15 +102,21 @@ bool JSValueIsObjectOfClass(JSValueRef value, JSClassRef jsClass) {
   return false;
 }
 
-bool JSValueIsEqual(JSContextRef context, JSValueRef a, JSValueRef b) {
+bool JSValueIsEqual(JSContextRef context,
+                    JSValueRef a,
+                    JSValueRef b,
+                    JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSValue* jsA = toJS(a);
   JSValue* jsB = toJS(b);
 
-  bool result = equal(exec, jsA, jsB);
-  if (exec->hadException())
+  bool result = equal(exec, jsA, jsB);  // false if an exception is thrown
+  if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
     exec->clearException();
+  }
   return result;
 }
 
@@ -120,9 +126,10 @@ bool JSValueIsStrictEqual(JSContextRef context, JSValueRef a, JSValueRef b) {
   JSValue* jsA = toJS(a);
   JSValue* jsB = toJS(b);
 
-  bool result = strictEqual(exec, jsA, jsB);
-  if (exec->hadException())
-    exec->clearException();
+  bool result = strictEqual(
+      exec, jsA,
+      jsB);  // can't throw because it doesn't perform value conversion
+  ASSERT(!exec->hadException());
   return result;
 }
 
@@ -157,39 +164,68 @@ JSValueRef JSValueMakeNumber(double value) {
   return toRef(jsNumber(value));
 }
 
-bool JSValueToBoolean(JSContextRef context, JSValueRef value) {
+bool JSValueToBoolean(JSContextRef context,
+                      JSValueRef value,
+                      JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSValue* jsValue = toJS(value);
 
   bool boolean = jsValue->toBoolean(exec);
   if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
     exec->clearException();
     boolean = false;
   }
   return boolean;
 }
 
-double JSValueToNumber(JSContextRef context, JSValueRef value) {
+double JSValueToNumber(JSContextRef context,
+                       JSValueRef value,
+                       JSValueRef* exception) {
   JSLock lock;
   JSValue* jsValue = toJS(value);
   ExecState* exec = toJS(context);
 
   double number = jsValue->toNumber(exec);
   if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
     exec->clearException();
     number = NaN;
   }
   return number;
 }
 
-JSObjectRef JSValueToObject(JSContextRef context, JSValueRef value) {
+JSStringRef JSValueToStringCopy(JSContextRef context,
+                                JSValueRef value,
+                                JSValueRef* exception) {
+  JSLock lock;
+  JSValue* jsValue = toJS(value);
+  ExecState* exec = toJS(context);
+
+  JSStringRef stringRef = toRef(jsValue->toString(exec).rep()->ref());
+  if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
+    exec->clearException();
+    stringRef = 0;
+  }
+  return stringRef;
+}
+
+JSObjectRef JSValueToObject(JSContextRef context,
+                            JSValueRef value,
+                            JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSValue* jsValue = toJS(value);
 
   JSObjectRef objectRef = toRef(jsValue->toObject(exec));
   if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
     exec->clearException();
     objectRef = 0;
   }

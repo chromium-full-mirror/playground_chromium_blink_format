@@ -61,12 +61,12 @@ JSObjectRef JSContextGetGlobalObject(JSContextRef context) {
   return toRef(exec->dynamicInterpreter()->globalObject());
 }
 
-JSValueRef JSEvaluate(JSContextRef context,
-                      JSStringRef script,
-                      JSObjectRef thisObject,
-                      JSStringRef sourceURL,
-                      int startingLineNumber,
-                      JSValueRef* exception) {
+JSValueRef JSEvaluateScript(JSContextRef context,
+                            JSStringRef script,
+                            JSObjectRef thisObject,
+                            JSStringRef sourceURL,
+                            int startingLineNumber,
+                            JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsThisObject = toJS(thisObject);
@@ -90,11 +90,11 @@ JSValueRef JSEvaluate(JSContextRef context,
   return toRef(jsUndefined());
 }
 
-bool JSCheckSyntax(JSContextRef context,
-                   JSStringRef script,
-                   JSStringRef sourceURL,
-                   int startingLineNumber,
-                   JSValueRef* exception) {
+bool JSCheckScriptSyntax(JSContextRef context,
+                         JSStringRef script,
+                         JSStringRef sourceURL,
+                         int startingLineNumber,
+                         JSValueRef* exception) {
   JSLock lock;
 
   ExecState* exec = toJS(context);
