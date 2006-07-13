@@ -554,8 +554,15 @@ VisiblePosition nextSentencePosition(const VisiblePosition& c) {
 VisiblePosition startOfParagraph(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
+
   if (!startNode)
     return VisiblePosition();
+
+  if (startNode->renderer() && ((startNode->renderer()->isTable() &&
+                                 !startNode->renderer()->isInline()) ||
+                                startNode->renderer()->isHR()) &&
+      p.offset() == maxDeepOffset(startNode))
+    return VisiblePosition(Position(startNode, 0));
 
   Node* startBlock = startNode->enclosingBlockFlowElement();
 
@@ -610,6 +617,13 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
 
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
+
+  if (startNode->renderer() && ((startNode->renderer()->isTable() &&
+                                 !startNode->renderer()->isInline()) ||
+                                startNode->renderer()->isHR()) &&
+      p.offset() == 0)
+    return VisiblePosition(Position(startNode, maxDeepOffset(startNode)));
+
   Node* startBlock = startNode->enclosingBlockFlowElement();
   Node* stayInsideBlock = startBlock;
 

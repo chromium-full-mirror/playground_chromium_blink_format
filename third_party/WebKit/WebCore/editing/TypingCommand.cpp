@@ -352,12 +352,16 @@ void TypingCommand::deleteKeyPressed() {
       sc.modify(SelectionController::EXTEND, SelectionController::BACKWARD,
                 m_granularity);
       Position upstreamStart = endingSelection().start().upstream();
+      VisiblePosition visibleStart = endingSelection().visibleStart();
+      if (visibleStart == startOfParagraph(visibleStart))
+        upstreamStart = visibleStart.previous(true).deepEquivalent().upstream();
       // When deleting tables: Select the table first, then perform the deletion
       if (upstreamStart.node()->renderer() &&
           upstreamStart.node()->renderer()->isTable() &&
           upstreamStart.offset() == maxDeepOffset(upstreamStart.node())) {
         setEndingSelection(Selection(Position(upstreamStart.node(), 0),
-                                     upstreamStart, DOWNSTREAM));
+                                     endingSelection().start(), DOWNSTREAM));
+        typingAddedToOpenCommand();
         return;
       }
       selectionToDelete = sc.selection();
@@ -394,14 +398,18 @@ void TypingCommand::forwardDeleteKeyPressed() {
       sc.modify(SelectionController::EXTEND, SelectionController::FORWARD,
                 m_granularity);
       Position downstreamEnd = endingSelection().end().downstream();
+      VisiblePosition visibleEnd = endingSelection().visibleEnd();
+      if (visibleEnd == endOfParagraph(visibleEnd))
+        downstreamEnd = visibleEnd.next(true).deepEquivalent().downstream();
       // When deleting tables: Select the table first, then perform the deletion
       if (downstreamEnd.node()->renderer() &&
           downstreamEnd.node()->renderer()->isTable() &&
           downstreamEnd.offset() == 0) {
         setEndingSelection(Selection(
-            downstreamEnd,
+            endingSelection().end(),
             Position(downstreamEnd.node(), maxDeepOffset(downstreamEnd.node())),
             DOWNSTREAM));
+        typingAddedToOpenCommand();
         return;
       }
       selectionToDelete = sc.selection();
