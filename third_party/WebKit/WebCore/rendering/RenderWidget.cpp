@@ -172,6 +172,11 @@ void RenderWidget::paint(PaintInfo& i, int tx, int ty) {
       style()->visibility() != VISIBLE)
     return;
 
+#if PLATFORM(MAC)
+  if (style()->highlight() != nullAtom && !i.p->paintingDisabled())
+    paintCustomHighlight(tx - m_x, ty - m_y, style()->highlight(), true);
+#endif
+
   if (m_widget) {
     // Move the widget if necessary.  We normally move and resize widgets during
     // layout, but sometimes
@@ -187,11 +192,6 @@ void RenderWidget::paint(PaintInfo& i, int tx, int ty) {
     // layers.
     m_widget->paint(i.p, i.r);
   }
-
-#if PLATFORM(MAC)
-  if (style()->highlight() != nullAtom && !i.p->paintingDisabled())
-    paintCustomHighlight(tx - m_x, ty - m_y, style()->highlight(), false);
-#endif
 
   // Paint a partially transparent wash over selected widgets.
   if (isSelected() && !document()->printing())
