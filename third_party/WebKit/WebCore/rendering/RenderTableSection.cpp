@@ -88,7 +88,7 @@ void RenderTableSection::addChild(RenderObject* child,
 
   if (!child->isTableRow()) {
     if (isTableSection && child->element() &&
-        child->element()->hasTagName(formTag)) {
+        child->element()->hasTagName(formTag) && document()->isHTMLDocument()) {
       RenderContainer::addChild(child, beforeChild);
       return;
     }
@@ -138,6 +138,11 @@ void RenderTableSection::addChild(RenderObject* child,
     if (grid[cRow].height.isRelative())
       grid[cRow].height = Length();
   }
+
+  // If the next renderer is actually wrapped in an anonymous table row, we need
+  // to go up and find that
+  while (beforeChild && !beforeChild->isTableRow())
+    beforeChild = beforeChild->parent();
 
   RenderContainer::addChild(child, beforeChild);
 }
