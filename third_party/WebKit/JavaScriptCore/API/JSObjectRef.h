@@ -558,6 +558,7 @@ otherwise false.
 bool JSObjectHasProperty(JSContextRef context,
                          JSObjectRef object,
                          JSStringRef propertyName);
+
 /*!
 @function
 @abstract Gets a property from an object.
@@ -569,6 +570,7 @@ bool JSObjectHasProperty(JSContextRef context,
 JSValueRef JSObjectGetProperty(JSContextRef context,
                                JSObjectRef object,
                                JSStringRef propertyName);
+
 /*!
 @function
 @abstract Sets a property on an object.
@@ -578,15 +580,13 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
 @param value A JSValue to use as the property's value.
 @param attributes A logically ORed set of JSPropertyAttributes to give to the
 property.
-@result true if the set operation succeeds, otherwise false (for example, if the
-object already has a property of the given name with the
-kJSPropertyAttributeReadOnly attribute set).
 */
-bool JSObjectSetProperty(JSContextRef context,
+void JSObjectSetProperty(JSContextRef context,
                          JSObjectRef object,
                          JSStringRef propertyName,
                          JSValueRef value,
                          JSPropertyAttributes attributes);
+
 /*!
 @function
 @abstract Deletes a property from an object.
@@ -602,6 +602,38 @@ bool JSObjectDeleteProperty(JSContextRef context,
 
 /*!
 @function
+@abstract Gets a property from an object by numeric index.
+@param context The execution context to use.
+@param object The JSObject whose property you want to get.
+@param propertyIndex The property's name as a number
+@result The property's value if object has the property, otherwise NULL.
+@discussion This is equivalent to getting a property by a string name containing
+the number, but allows faster access to JS arrays.
+*/
+JSValueRef JSObjectGetPropertyAtIndex(JSContextRef context,
+                                      JSObjectRef object,
+                                      unsigned propertyIndex);
+
+/*!
+@function
+@abstract Sets a property on an object by numeric index.
+@param context The execution context to use.
+@param object The JSObject whose property you want to set.
+@param propertyIndex The property's name as a number
+@param value A JSValue to use as the property's value.
+@param attributes A logically ORed set of JSPropertyAttributes to give to the
+property.
+@discussion This is equivalent to setting a property by a string name containing
+the number, but allows faster access to JS arrays.
+*/
+void JSObjectSetPropertyAtIndex(JSContextRef context,
+                                JSObjectRef object,
+                                unsigned propertyIndex,
+                                JSValueRef value,
+                                JSPropertyAttributes attributes);
+
+/*!
+@function
 @abstract Gets a pointer to private data from an object.
 @param object A JSObject whose private data you want to get.
 @result A void* that points to the object's private data, if the object has
@@ -611,6 +643,7 @@ objects created by JSObjectMake, JSObjectMakeFunction, and
 JSObjectMakeConstructor.
 */
 void* JSObjectGetPrivate(JSObjectRef object);
+
 /*!
 @function
 @abstract Sets a pointer to private data on an object.

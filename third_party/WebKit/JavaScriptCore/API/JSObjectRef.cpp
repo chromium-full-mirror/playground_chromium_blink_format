@@ -143,7 +143,7 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
   return toRef(jsValue);
 }
 
-bool JSObjectSetProperty(JSContextRef context,
+void JSObjectSetProperty(JSContextRef context,
                          JSObjectRef object,
                          JSStringRef propertyName,
                          JSValueRef value,
@@ -154,12 +154,32 @@ bool JSObjectSetProperty(JSContextRef context,
   UString::Rep* nameRep = toJS(propertyName);
   JSValue* jsValue = toJS(value);
 
-  Identifier jsNameID = Identifier(nameRep);
-  if (jsObject->canPut(exec, jsNameID)) {
-    jsObject->put(exec, jsNameID, jsValue, attributes);
-    return true;
-  } else
-    return false;
+  jsObject->put(exec, Identifier(nameRep), jsValue, attributes);
+}
+
+JSValueRef JSObjectGetPropertyAtIndex(JSContextRef context,
+                                      JSObjectRef object,
+                                      unsigned propertyIndex) {
+  JSLock lock;
+  ExecState* exec = toJS(context);
+  JSObject* jsObject = toJS(object);
+
+  JSValue* jsValue = jsObject->get(exec, propertyIndex);
+  if (jsValue->isUndefined())
+    return 0;
+  return toRef(jsValue);
+}
+
+void JSObjectSetPropertyAtIndex(JSContextRef context,
+                                JSObjectRef object,
+                                unsigned propertyIndex,
+                                JSValueRef value) {
+  JSLock lock;
+  ExecState* exec = toJS(context);
+  JSObject* jsObject = toJS(object);
+  JSValue* jsValue = toJS(value);
+
+  jsObject->put(exec, propertyIndex, jsValue);
 }
 
 bool JSObjectDeleteProperty(JSContextRef context,
