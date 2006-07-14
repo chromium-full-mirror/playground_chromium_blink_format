@@ -429,6 +429,8 @@ class Frame : public Shared<Frame>, Noncopyable {
   virtual void textWillBeDeletedInTextField(Element* input);
   virtual void textDidChangeInTextArea(Element*);
 
+  virtual bool inputManagerHasMarkedText() const { return false; }
+
   /**
    * Returns the most recent edit command applied.
    */
