@@ -418,9 +418,13 @@ IntRect RenderText::caretRect(int offset,
   top += absy;
 
   RenderBlock* cb = containingBlock();
-  int availableWidth = cb->lineWidth(top);
-  if (style()->autoWrap())
-    left = min(left, absx + box->m_x + availableWidth - 1);
+  if (style()->autoWrap()) {
+    int availableWidth = cb->lineWidth(top);
+    if (!box->m_reversed)
+      left = min(left, absx + availableWidth - 1);
+    else
+      left = max(left, absx + box->m_x);
+  }
 
   return IntRect(left, top, 1, height);
 }

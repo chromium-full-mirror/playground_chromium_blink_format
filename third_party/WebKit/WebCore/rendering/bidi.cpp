@@ -87,6 +87,7 @@ inline bool operator!=(const BidiStatus& status1, const BidiStatus& status2) {
 // Used to track a list of chained bidi runs.
 static BidiRun* sFirstBidiRun;
 static BidiRun* sLastBidiRun;
+static BidiRun* sLogicallyLastBidiRun;
 static int sBidiRunCount;
 static BidiRun* sCompactFirstBidiRun;
 static BidiRun* sCompactLastBidiRun;
@@ -900,14 +901,6 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
         needsWordSpacing = !DeprecatedChar(rt->text()[r->stop - 1]).isSpace() &&
                            r->stop == rtLength;
       }
-      if (!r->compact) {
-        RenderStyle* style = r->obj->style();
-        if (style->autoWrap() && style->breakOnlyAfterWhiteSpace()) {
-          // shrink the box as needed to keep the line from overflowing the
-          // available width
-          textWidth = min(effectiveWidth, availableWidth - totWidth);
-        }
-      }
       r->box->setWidth(textWidth);
     } else if (!r->obj->isInlineFlow()) {
       r->obj->calcWidth();
@@ -920,6 +913,16 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
     // in the margin.
     if (!r->compact)
       totWidth += r->box->width();
+  }
+
+  if (totWidth > availableWidth &&
+      sLogicallyLastBidiRun->obj->style(m_firstLine)->autoWrap() &&
+      sLogicallyLastBidiRun->obj->style(m_firstLine)
+          ->breakOnlyAfterWhiteSpace() &&
+      !sLogicallyLastBidiRun->compact) {
+    sLogicallyLastBidiRun->box->setWidth(sLogicallyLastBidiRun->box->width() -
+                                         totWidth + availableWidth);
+    totWidth = availableWidth;
   }
 
   // Armed with the total width of the line (without justification),
@@ -1438,6 +1441,8 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
       pastEnd = true;
     }
   }
+
+  sLogicallyLastBidiRun = sLastBidiRun;
 
   // reorder line according to run structure...
   // do not reverse for visually ordered web sites
@@ -2421,6 +2426,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                 if (w + tmpW <= width) {
                   lBreak.obj = o;
                   lBreak.pos = pos;
+                  if (pos > 0) {
+                    // Separate the trailing space into its own box, which we
+                    // will
+                    // resize to fit on the line in
+                    // computeHorizontalPositionsForLine().
+                    BidiIterator midpoint(0, o, pos);
+                    addMidpoint(BidiIterator(0, o, pos - 1));  // Stop
+                    addMidpoint(BidiIterator(0, o, pos));      // Start
+                  }
                   skipWhitespace(lBreak, bidi);
                 }
               }
