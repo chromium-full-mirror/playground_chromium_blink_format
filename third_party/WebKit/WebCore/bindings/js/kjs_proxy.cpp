@@ -35,14 +35,12 @@ using namespace KJS;
 namespace WebCore {
 
 KJSProxy::KJSProxy(Frame* frame) {
-  m_script = 0;
   m_frame = frame;
   m_handlerLineno = 0;
 }
 
 KJSProxy::~KJSProxy() {
   JSLock lock;
-  delete m_script;
   Collector::collect();
 }
 
@@ -142,7 +140,7 @@ void KJSProxy::finishedWithEvent(Event* event) {
 ScriptInterpreter* KJSProxy::interpreter() {
   initScriptIfNeeded();
   assert(m_script);
-  return m_script;
+  return m_script.get();
 }
 
 void KJSProxy::initScriptIfNeeded() {

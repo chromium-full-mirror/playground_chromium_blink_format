@@ -21,6 +21,8 @@
 #ifndef KJS_PROXY_H
 #define KJS_PROXY_H
 
+#include <wtf/RefPtr.h>
+
 namespace KJS {
 class JSValue;
 class ScriptInterpreter;
@@ -61,7 +63,7 @@ class KJSProxy {
   bool haveInterpreter() const { return m_script; }
 
  private:
-  KJS::ScriptInterpreter* m_script;
+  RefPtr<KJS::ScriptInterpreter> m_script;
   Frame* m_frame;
   int m_handlerLineno;
 };

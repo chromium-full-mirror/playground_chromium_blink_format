@@ -209,23 +209,23 @@ bool doIt(int argc, char** argv) {
   GlobalImp* global = new GlobalImp();
 
   // create interpreter
-  Interpreter interp(global);
+  RefPtr<Interpreter> interp = new Interpreter(global);
   // add debug() function
-  global->put(interp.globalExec(), "debug",
+  global->put(interp->globalExec(), "debug",
               new TestFunctionImp(TestFunctionImp::Debug, 1));
   // add "print" for compatibility with the mozilla js shell
-  global->put(interp.globalExec(), "print",
+  global->put(interp->globalExec(), "print",
               new TestFunctionImp(TestFunctionImp::Print, 1));
   // add "quit" for compatibility with the mozilla js shell
-  global->put(interp.globalExec(), "quit",
+  global->put(interp->globalExec(), "quit",
               new TestFunctionImp(TestFunctionImp::Quit, 0));
   // add "gc" for compatibility with the mozilla js shell
-  global->put(interp.globalExec(), "gc",
+  global->put(interp->globalExec(), "gc",
               new TestFunctionImp(TestFunctionImp::GC, 0));
   // add "version" for compatibility with the mozilla js shell
-  global->put(interp.globalExec(), "version",
+  global->put(interp->globalExec(), "version",
               new TestFunctionImp(TestFunctionImp::Version, 1));
-  global->put(interp.globalExec(), "run",
+  global->put(interp->globalExec(), "run",
               new TestFunctionImp(TestFunctionImp::Run, 1));
 
   Interpreter::setShouldPrintExceptions(true);
@@ -242,7 +242,7 @@ bool doIt(int argc, char** argv) {
       break;  // fail early so we can catch missing files
     }
 
-    Completion completion = interp.evaluate(fileName, 0, script);
+    Completion completion = interp->evaluate(fileName, 0, script);
     success = success && completion.complType() != Throw;
     free(script);
   }

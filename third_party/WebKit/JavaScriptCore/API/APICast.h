@@ -40,6 +40,10 @@ class ReferenceList;
 /* Opaque typing convenience methods */
 
 inline KJS::ExecState* toJS(JSContextRef c) {
+  return reinterpret_cast<KJS::ExecState*>(const_cast<__JSContext*>(c));
+}
+
+inline KJS::ExecState* toJS(JSGlobalContextRef c) {
   return reinterpret_cast<KJS::ExecState*>(c);
 }
 

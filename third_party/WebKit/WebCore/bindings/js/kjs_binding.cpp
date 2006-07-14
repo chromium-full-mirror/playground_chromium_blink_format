@@ -73,8 +73,6 @@ ScriptInterpreter::ScriptInterpreter(JSObject* global, Frame* frame)
   setTimeoutTime(ScriptTimeoutTimeMS);
 }
 
-ScriptInterpreter::~ScriptInterpreter() {}
-
 DOMObject* ScriptInterpreter::getDOMObject(void* objectHandle) {
   return domObjects()->get(objectHandle);
 }

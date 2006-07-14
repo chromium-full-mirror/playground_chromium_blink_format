@@ -201,38 +201,30 @@ static inline InterpreterMap& interpreterMap() {
 }
 
 Interpreter::Interpreter(JSObject* globalObject)
-    : m_timeoutTime(0),
-      m_globalExec(this, 0),
-      m_globalObject(globalObject),
-      m_argumentsPropertyName(&argumentsPropertyName),
-      m_specialPrototypePropertyName(&specialPrototypePropertyName),
-      m_timeoutChecker(0),
-      m_timedOut(false),
-      m_startTimeoutCheckCount(0),
-      m_pauseTimeoutCheckCount(0) {
+    : m_globalExec(this, 0), m_globalObject(globalObject) {
   init();
 }
 
 Interpreter::Interpreter()
-    : m_timeoutTime(0),
-      m_globalExec(this, 0),
-      m_globalObject(new JSObject()),
-      m_argumentsPropertyName(&argumentsPropertyName),
-      m_specialPrototypePropertyName(&specialPrototypePropertyName),
-      m_timeoutChecker(0),
-      m_timedOut(false),
-      m_startTimeoutCheckCount(0),
-      m_pauseTimeoutCheckCount(0) {
+    : m_globalExec(this, 0), m_globalObject(new JSObject()) {
   init();
 }
 
 void Interpreter::init() {
   JSLock lock;
 
+  m_refCount = 0;
+  m_timeoutTime = 0;
   m_recursion = 0;
   m_debugger = 0;
   m_context = 0;
+  m_timedOut = false;
+  m_timeoutChecker = 0;
+  m_startTimeoutCheckCount = 0;
+  m_pauseTimeoutCheckCount = 0;
   m_compatMode = NativeMode;
+  m_argumentsPropertyName = &argumentsPropertyName;
+  m_specialPrototypePropertyName = &specialPrototypePropertyName;
 
   interpreterMap().set(m_globalObject, this);
 
