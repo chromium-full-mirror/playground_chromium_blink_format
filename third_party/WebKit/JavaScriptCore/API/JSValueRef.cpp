@@ -243,8 +243,3 @@ void JSValueUnprotect(JSValueRef value) {
   JSValue* jsValue = toJS(value);
   gcUnprotect(jsValue);
 }
-
-void JSGarbageCollect() {
-  JSLock lock;
-  Collector::collect();
-}
