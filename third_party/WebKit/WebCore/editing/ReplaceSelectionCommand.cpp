@@ -587,7 +587,7 @@ void ReplaceSelectionCommand::doApply() {
     // will leave hanging block(s).
     bool mergeBlocksAfterDelete =
         isEndOfParagraph(visibleEnd) || isStartOfBlock(visibleStart);
-    deleteSelection(false, mergeBlocksAfterDelete);
+    deleteSelection(false, mergeBlocksAfterDelete, true);
     updateLayout();
     visibleStart = endingSelection().visibleStart();
     if (fragment.hasInterchangeNewlineAtStart()) {

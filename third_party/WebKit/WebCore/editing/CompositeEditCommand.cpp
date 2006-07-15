@@ -330,20 +330,22 @@ void CompositeEditCommand::insertNodeAtTabSpanPosition(Node* node,
 }
 
 void CompositeEditCommand::deleteSelection(bool smartDelete,
-                                           bool mergeBlocksAfterDelete) {
+                                           bool mergeBlocksAfterDelete,
+                                           bool replace) {
   if (endingSelection().isRange()) {
-    EditCommandPtr cmd(new DeleteSelectionCommand(document(), smartDelete,
-                                                  mergeBlocksAfterDelete));
+    EditCommandPtr cmd(new DeleteSelectionCommand(
+        document(), smartDelete, mergeBlocksAfterDelete, replace));
     applyCommandToComposite(cmd);
   }
 }
 
 void CompositeEditCommand::deleteSelection(const Selection& selection,
                                            bool smartDelete,
-                                           bool mergeBlocksAfterDelete) {
+                                           bool mergeBlocksAfterDelete,
+                                           bool replace) {
   if (selection.isRange()) {
     EditCommandPtr cmd(new DeleteSelectionCommand(
-        document(), selection, smartDelete, mergeBlocksAfterDelete));
+        document(), selection, smartDelete, mergeBlocksAfterDelete, replace));
     applyCommandToComposite(cmd);
   }
 }

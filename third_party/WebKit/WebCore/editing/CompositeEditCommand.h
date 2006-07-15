@@ -62,10 +62,12 @@ class CompositeEditCommand : public EditCommand {
   void removeStyledElement(Element*);
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
-                       bool mergeBlocksAfterDelete = true);
+                       bool mergeBlocksAfterDelete = true,
+                       bool replace = false);
   void deleteSelection(const Selection& selection,
                        bool smartDelete = false,
-                       bool mergeBlocksAfterDelete = true);
+                       bool mergeBlocksAfterDelete = true,
+                       bool replace = false);
   virtual void deleteTextFromNode(Text* node, int offset, int count);
   void inputText(const String& text, bool selectInsertedText = false);
   void insertNodeAfter(Node* insertChild, Node* refChild);
