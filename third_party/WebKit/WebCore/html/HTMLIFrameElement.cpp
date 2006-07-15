@@ -142,9 +142,11 @@ void HTMLIFrameElement::attach() {
     if (!contentFrame())
       openURL();
 
-    renderPart->setWidget(contentFrame()->view());
-    renderPart->updateWidget();
-    needWidgetUpdate = false;
+    if (contentFrame()) {
+      renderPart->setWidget(contentFrame()->view());
+      renderPart->updateWidget();
+      needWidgetUpdate = false;
+    }
   }
 }
 
