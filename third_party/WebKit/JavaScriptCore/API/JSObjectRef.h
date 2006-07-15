@@ -97,28 +97,26 @@ property.
 @param context The current execution context.
 @param object The JSObject to search for the property.
 @param propertyName A JSString containing the name of the property look up.
-@param exception A pointer to a JSValueRef in which to return an exception, if
-any.
 @result true if object has the property, otherwise false.
 @discussion If you named your function HasProperty, you would declare it like
 this:
 
 bool HasProperty(JSContextRef context, JSObjectRef object, JSStringRef
-propertyName, JSValueRef* exception);
+propertyName);
 
 If this function returns false, the hasProperty request forwards to object's
 static property table, then its parent class chain (which includes the default
 object class), then its prototype chain.
 
 This callback enables optimization in cases where only a property's existence
-needs to be known, not its value, and computing its value would be expensive. If
-this callback is NULL, the getProperty callback will be used to service
+needs to be known, not its value, and computing its value would be expensive.
+
+If this callback is NULL, the getProperty callback will be used to service
 hasProperty requests.
 */
 typedef bool (*JSObjectHasPropertyCallback)(JSContextRef context,
                                             JSObjectRef object,
-                                            JSStringRef propertyName,
-                                            JSValueRef* exception);
+                                            JSStringRef propertyName);
 
 /*!
 @typedef JSObjectGetPropertyCallback
@@ -278,15 +276,16 @@ typedef JSObjectRef (*JSObjectCallAsConstructorCallback)(
 
 /*!
 @typedef JSObjectHasInstanceCallback
-@abstract The callback invoked when an object is used in an 'instanceof'
-expression.
+@abstract hasInstance The callback invoked when an object is used as the target
+of an 'instanceof' expression.
 @param context The current execution context.
-@param constructor The JSObject receiving the hasInstance request
+@param constructor The JSObject that is the target of the 'instanceof'
+expression.
 @param possibleInstance The JSValue being tested to determine if it is an
 instance of constructor.
 @param exception A pointer to a JSValueRef in which to return an exception, if
 any.
-@result true if possibleInstance is an instance of constructor, otherwise false
+@result true if possibleInstance is an instance of constructor, otherwise false.
 
 @discussion If you named your function HasInstance, you would declare it like
 this:
@@ -296,9 +295,9 @@ possibleInstance, JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression 'someValue instanceof
 myObject', constructor would be set to myObject and possibleInstance would be
-set to someValue..
+set to someValue.
 
-If this callback is NULL, using your object in an 'instanceof' will always
+If this callback is NULL, 'instanceof' expressions that target your object will
 return false.
 
 Standard JavaScript practice calls for objects that implement the
@@ -327,6 +326,9 @@ JSValueRef* exception);
 
 If this function returns false, the conversion request forwards to object's
 parent class chain (which includes the default object class).
+
+This function is only invoked when converting an object to number or string. An
+object converted to boolean is 'true.' An object converted to object is itself.
 */
 typedef JSValueRef (*JSObjectConvertToTypeCallback)(JSContextRef context,
                                                     JSObjectRef object,
@@ -358,8 +360,8 @@ property.
 properties to a property list.
 @field callAsFunction The callback invoked when an object is called as a
 function.
-@field hasInstance The callback invoked when an object is used in an
-'instanceof' expression.
+@field hasInstance The callback invoked when an object is used as the target of
+an 'instanceof' expression.
 @field callAsConstructor The callback invoked when an object is used as a
 constructor in a 'new' expression.
 @field convertToType The callback invoked when converting an object to a
@@ -565,11 +567,14 @@ bool JSObjectHasProperty(JSContextRef context,
 @param context The execution context to use.
 @param object The JSObject whose property you want to get.
 @param propertyName A JSString containing the property's name.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
 @result The property's value if object has the property, otherwise NULL.
 */
 JSValueRef JSObjectGetProperty(JSContextRef context,
                                JSObjectRef object,
-                               JSStringRef propertyName);
+                               JSStringRef propertyName,
+                               JSValueRef* exception);
 
 /*!
 @function
@@ -578,6 +583,8 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
 @param object The JSObject whose property you want to set.
 @param propertyName A JSString containing the property's name.
 @param value A JSValue to use as the property's value.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
 @param attributes A logically ORed set of JSPropertyAttributes to give to the
 property.
 */
@@ -585,7 +592,8 @@ void JSObjectSetProperty(JSContextRef context,
                          JSObjectRef object,
                          JSStringRef propertyName,
                          JSValueRef value,
-                         JSPropertyAttributes attributes);
+                         JSPropertyAttributes attributes,
+                         JSValueRef* exception);
 
 /*!
 @function
@@ -593,12 +601,15 @@ void JSObjectSetProperty(JSContextRef context,
 @param context The execution context to use.
 @param object The JSObject whose property you want to delete.
 @param propertyName A JSString containing the property's name.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
 @result true if the delete operation succeeds, otherwise false (for example, if
 the property has the kJSPropertyAttributeDontDelete attribute set).
 */
 bool JSObjectDeleteProperty(JSContextRef context,
                             JSObjectRef object,
-                            JSStringRef propertyName);
+                            JSStringRef propertyName,
+                            JSValueRef* exception);
 
 /*!
 @function
@@ -672,10 +683,10 @@ bool JSObjectIsFunction(JSObjectRef object);
 as "this."
 @param argc An integer count of the number of arguments in argv.
 @param argv A JSValue array of the  arguments to pass to the function.
-@param exception A pointer to a JSValueRef in which to store an uncaught
-exception, if any. Pass NULL if you do not care to store an uncaught exception.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
 @result The JSValue that results from calling object as a function, or NULL if
-an uncaught exception is thrown or object is not a function.
+an exception is thrown or object is not a function.
 */
 JSValueRef JSObjectCallAsFunction(JSContextRef context,
                                   JSObjectRef object,
@@ -697,10 +708,10 @@ bool JSObjectIsConstructor(JSObjectRef object);
 @param object The JSObject to call as a constructor.
 @param argc An integer count of the number of arguments in argv.
 @param argv A JSValue array of the  arguments to pass to the function.
-@param exception A pointer to a JSValueRef in which to store an uncaught
-exception, if any. Pass NULL if you do not care to store an uncaught exception.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
 @result The JSObject that results from calling object as a constructor, or NULL
-if an uncaught exception is thrown or object is not a constructor.
+if an exception is thrown or object is not a constructor.
 */
 JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
                                       JSObjectRef object,

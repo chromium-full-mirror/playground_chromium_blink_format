@@ -153,18 +153,20 @@ bool JSValueIsStrictEqual(JSContextRef context, JSValueRef a, JSValueRef b);
 
 /*!
 @function
-@abstract       Tests whether a JavaScript value is an object constructed by
- a given constructor, as compared by the JS instanceof operator.
-@param context  The execution context to use.
-@param value    The JSValue to test.
-@param object   The constructor to test against.
-@result         true if value is an object constructed by constructor, as
-compared
- by the JS instanceof operator, otherwise false.
+@abstract Tests whether a JavaScript value is an object constructed by a given
+constructor, as compared by the JS instanceof operator.
+@param context The execution context to use.
+@param value The JSValue to test.
+@param object The constructor to test against.
+@param exception A pointer to a JSValueRef in which to store an exception, if
+any. Pass NULL if you do not care to store an exception.
+@result true if value is an object constructed by constructor, as compared by
+the JS instanceof operator, otherwise false.
 */
 bool JSValueIsInstanceOfConstructor(JSContextRef context,
                                     JSValueRef value,
-                                    JSObjectRef constructor);
+                                    JSObjectRef constructor,
+                                    JSValueRef* exception);
 
 // Creating values
 
@@ -217,14 +219,9 @@ JSValueRef JSValueMakeString(JSStringRef string);
 boolean.
 @param context  The execution context to use.
 @param value    The JSValue to convert.
-@param exception A pointer to a JSValueRef in which to store an exception, if
-any. Pass NULL if you do not care to store an exception.
-@result         The boolean result of conversion, or false if an exception is
-thrown.
+@result         The boolean result of conversion.
 */
-bool JSValueToBoolean(JSContextRef context,
-                      JSValueRef value,
-                      JSValueRef* exception);
+bool JSValueToBoolean(JSContextRef context, JSValueRef value);
 
 /*!
 @function
@@ -264,7 +261,8 @@ object.
 @param value    The JSValue to convert.
 @param exception A pointer to a JSValueRef in which to store an exception, if
 any. Pass NULL if you do not care to store an exception.
-@result         The JSObject result of conversion, or NULL if conversion fails.
+@result         The JSObject result of conversion, or NULL if an exception is
+thrown.
 */
 JSObjectRef JSValueToObject(JSContextRef context,
                             JSValueRef value,

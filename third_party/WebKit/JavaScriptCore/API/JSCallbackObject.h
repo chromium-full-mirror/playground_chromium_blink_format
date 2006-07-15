@@ -63,7 +63,6 @@ class JSCallbackObject : public JSObject {
 
   virtual void getPropertyList(ReferenceList& propertyList, bool recursive);
 
-  virtual bool toBoolean(ExecState*) const;
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;
 

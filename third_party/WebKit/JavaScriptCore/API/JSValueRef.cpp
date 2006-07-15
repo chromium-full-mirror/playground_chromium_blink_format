@@ -135,15 +135,20 @@ bool JSValueIsStrictEqual(JSContextRef context, JSValueRef a, JSValueRef b) {
 
 bool JSValueIsInstanceOfConstructor(JSContextRef context,
                                     JSValueRef value,
-                                    JSObjectRef constructor) {
+                                    JSObjectRef constructor,
+                                    JSValueRef* exception) {
   ExecState* exec = toJS(context);
   JSValue* jsValue = toJS(value);
   JSObject* jsConstructor = toJS(constructor);
   if (!jsConstructor->implementsHasInstance())
     return false;
-  bool result = jsConstructor->hasInstance(exec, jsValue);
-  if (exec->hadException())
+  bool result = jsConstructor->hasInstance(
+      exec, jsValue);  // false if an exception is thrown
+  if (exec->hadException()) {
+    if (exception)
+      *exception = toRef(exec->exception());
     exec->clearException();
+  }
   return result;
 }
 
@@ -164,21 +169,10 @@ JSValueRef JSValueMakeNumber(double value) {
   return toRef(jsNumber(value));
 }
 
-bool JSValueToBoolean(JSContextRef context,
-                      JSValueRef value,
-                      JSValueRef* exception) {
-  JSLock lock;
+bool JSValueToBoolean(JSContextRef context, JSValueRef value) {
   ExecState* exec = toJS(context);
   JSValue* jsValue = toJS(value);
-
-  bool boolean = jsValue->toBoolean(exec);
-  if (exec->hadException()) {
-    if (exception)
-      *exception = toRef(exec->exception());
-    exec->clearException();
-    boolean = false;
-  }
-  return boolean;
+  return jsValue->toBoolean(exec);
 }
 
 double JSValueToNumber(JSContextRef context,
