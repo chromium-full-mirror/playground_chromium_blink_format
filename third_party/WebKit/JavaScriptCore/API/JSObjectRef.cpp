@@ -256,8 +256,8 @@ bool JSObjectIsFunction(JSObjectRef object) {
 JSValueRef JSObjectCallAsFunction(JSContextRef context,
                                   JSObjectRef object,
                                   JSObjectRef thisObject,
-                                  size_t argc,
-                                  JSValueRef argv[],
+                                  size_t argumentCount,
+                                  JSValueRef arguments[],
                                   JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
@@ -268,8 +268,8 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
     jsThisObject = exec->dynamicInterpreter()->globalObject();
 
   List argList;
-  for (size_t i = 0; i < argc; i++)
-    argList.append(toJS(argv[i]));
+  for (size_t i = 0; i < argumentCount; i++)
+    argList.append(toJS(arguments[i]));
 
   JSValueRef result = toRef(jsObject->call(
       exec, jsThisObject,
@@ -290,16 +290,16 @@ bool JSObjectIsConstructor(JSObjectRef object) {
 
 JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
                                       JSObjectRef object,
-                                      size_t argc,
-                                      JSValueRef argv[],
+                                      size_t argumentCount,
+                                      JSValueRef arguments[],
                                       JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
   JSObject* jsObject = toJS(object);
 
   List argList;
-  for (size_t i = 0; i < argc; i++)
-    argList.append(toJS(argv[i]));
+  for (size_t i = 0; i < argumentCount; i++)
+    argList.append(toJS(arguments[i]));
 
   JSObjectRef result = toRef(jsObject->construct(
       exec, argList));  // returns NULL if object->implementsCall() is false

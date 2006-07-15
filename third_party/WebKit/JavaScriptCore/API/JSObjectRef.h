@@ -219,8 +219,8 @@ typedef void (*JSObjectAddPropertiesToListCallback)(
 @param function A JSObject that is the function being called.
 @param thisObject A JSObject that is the 'this' variable in the function's
 scope.
-@param argc An integer count of the number of arguments in argv.
-@param argv A JSValue array of the  arguments passed to the function.
+@param argumentCount An integer count of the number of arguments in arguments.
+@param arguments A JSValue array of the  arguments passed to the function.
 @param exception A pointer to a JSValueRef in which to return an exception, if
 any.
 @result A JSValue that is the function's return value.
@@ -228,7 +228,8 @@ any.
 this:
 
 JSValueRef CallAsFunction(JSContextRef context, JSObjectRef function,
-JSObjectRef thisObject, size_t argc, JSValueRef argv[], JSValueRef* exception);
+JSObjectRef thisObject, size_t argumentCount, JSValueRef arguments[],
+JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression
 'myObject.myMemberFunction()', function would be set to myMemberFunction, and
@@ -240,8 +241,8 @@ exception.
 typedef JSValueRef (*JSObjectCallAsFunctionCallback)(JSContextRef context,
                                                      JSObjectRef function,
                                                      JSObjectRef thisObject,
-                                                     size_t argc,
-                                                     JSValueRef argv[],
+                                                     size_t argumentCount,
+                                                     JSValueRef arguments[],
                                                      JSValueRef* exception);
 
 /*!
@@ -250,8 +251,8 @@ typedef JSValueRef (*JSObjectCallAsFunctionCallback)(JSContextRef context,
 'new' expression.
 @param context The current execution context.
 @param constructor A JSObject that is the constructor being called.
-@param argc An integer count of the number of arguments in argv.
-@param argv A JSValue array of the  arguments passed to the function.
+@param argumentCount An integer count of the number of arguments in arguments.
+@param arguments A JSValue array of the  arguments passed to the function.
 @param exception A pointer to a JSValueRef in which to return an exception, if
 any.
 @result A JSObject that is the constructor's return value.
@@ -259,7 +260,7 @@ any.
 like this:
 
 JSObjectRef CallAsConstructor(JSContextRef context, JSObjectRef constructor,
-size_t argc, JSValueRef argv[], JSValueRef* exception);
+size_t argumentCount, JSValueRef arguments[], JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression 'new
 myConstructorFunction()', constructor would be set to myConstructorFunction.
@@ -270,8 +271,8 @@ expression will throw an exception.
 typedef JSObjectRef (*JSObjectCallAsConstructorCallback)(
     JSContextRef context,
     JSObjectRef constructor,
-    size_t argc,
-    JSValueRef argv[],
+    size_t argumentCount,
+    JSValueRef arguments[],
     JSValueRef* exception);
 
 /*!
@@ -681,8 +682,8 @@ bool JSObjectIsFunction(JSObjectRef object);
 @param object The JSObject to call as a function.
 @param thisObject The object to use as "this," or NULL to use the global object
 as "this."
-@param argc An integer count of the number of arguments in argv.
-@param argv A JSValue array of the  arguments to pass to the function.
+@param argumentCount An integer count of the number of arguments in arguments.
+@param arguments A JSValue array of the  arguments to pass to the function.
 @param exception A pointer to a JSValueRef in which to store an exception, if
 any. Pass NULL if you do not care to store an exception.
 @result The JSValue that results from calling object as a function, or NULL if
@@ -691,8 +692,8 @@ an exception is thrown or object is not a function.
 JSValueRef JSObjectCallAsFunction(JSContextRef context,
                                   JSObjectRef object,
                                   JSObjectRef thisObject,
-                                  size_t argc,
-                                  JSValueRef argv[],
+                                  size_t argumentCount,
+                                  JSValueRef arguments[],
                                   JSValueRef* exception);
 /*!
 @function
@@ -706,8 +707,8 @@ bool JSObjectIsConstructor(JSObjectRef object);
 @abstract Calls an object as a constructor.
 @param context The execution context to use.
 @param object The JSObject to call as a constructor.
-@param argc An integer count of the number of arguments in argv.
-@param argv A JSValue array of the  arguments to pass to the function.
+@param argumentCount An integer count of the number of arguments in arguments.
+@param arguments A JSValue array of the  arguments to pass to the function.
 @param exception A pointer to a JSValueRef in which to store an exception, if
 any. Pass NULL if you do not care to store an exception.
 @result The JSObject that results from calling object as a constructor, or NULL
@@ -715,8 +716,8 @@ if an exception is thrown or object is not a constructor.
 */
 JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
                                       JSObjectRef object,
-                                      size_t argc,
-                                      JSValueRef argv[],
+                                      size_t argumentCount,
+                                      JSValueRef arguments[],
                                       JSValueRef* exception);
 
 /*!
