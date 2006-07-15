@@ -30,9 +30,7 @@
 
 namespace WebCore {
 
-class StreamingTextDecoder;
-
-#ifdef __APPLE__
+#if PLATFORM(MAC)
 typedef CFStringEncoding TextEncodingID;
 
 const TextEncodingID InvalidEncoding = kCFStringEncodingInvalidId;
@@ -72,6 +70,8 @@ class TextEncoding {
       : m_encodingID(encodingID), m_flags(flags) {}
 
   explicit TextEncoding(const char*, bool eightBitOnly = false);
+
+  TextEncoding effectiveEncoding() const;
 
   bool isValid() const { return m_encodingID != InvalidEncoding; }
   const char* name() const;
