@@ -45,6 +45,9 @@ enum DOMEventExceptionCode { DOM_UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 - (BOOL)dispatchEvent:(DOMEvent*)event;
 @end
 
+@interface DOMNode (DOMEventTarget)<DOMEventTarget>
+@end
+
 enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
 
 @interface DOMEvent : DOMObject
