@@ -169,11 +169,22 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
   bool startRemoved = node == start || (start && start->isAncestor(node));
   bool endRemoved = node == end || (end && end->isAncestor(node));
 
-  bool clearSelection = false;
+  bool clearRenderTreeSelection = false;
+  bool clearDOMTreeSelection = false;
+
   if (startRemoved || endRemoved) {
     // FIXME: When endpoints are removed, we should just alter the selection,
     // instead of blowing it away.
-    clearSelection = true;
+    clearRenderTreeSelection = true;
+    clearDOMTreeSelection = true;
+  } else if (baseRemoved || extentRemoved) {
+    if (m_sel.isBaseFirst()) {
+      m_sel.setBase(m_sel.start());
+      m_sel.setExtent(m_sel.end());
+    } else {
+      m_sel.setBase(m_sel.start());
+      m_sel.setExtent(m_sel.end());
+    }
     // FIXME: This could be more efficient if we had an isNodeInRange function
     // on Ranges.
   } else if (Range::compareBoundaryPoints(m_sel.start(), Position(node, 0)) ==
@@ -186,26 +197,20 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
     // result of
     // the removal wouldn't be invalidated.
     // FIXME: Don't do so much unnecessary invalidation.
-    clearSelection = true;
-  } else if (baseRemoved || extentRemoved) {
-    if (m_sel.isBaseFirst()) {
-      m_sel.setBase(m_sel.start());
-      m_sel.setExtent(m_sel.end());
-    } else {
-      m_sel.setBase(m_sel.start());
-      m_sel.setExtent(m_sel.end());
-    }
+    clearRenderTreeSelection = true;
   }
 
-  if (clearSelection) {
+  if (clearRenderTreeSelection) {
     // FIXME (6498): This doesn't notify the editing delegate of a selection
     // change.
     RefPtr<Document> document = start->document();
     document->updateRendering();
     if (RenderView* view = static_cast<RenderView*>(document->renderer()))
       view->clearSelection();
-    setSelection(Selection());
   }
+
+  if (clearDOMTreeSelection)
+    setSelection(Selection());
 }
 
 void SelectionController::setModifyBias(EAlter alter, EDirection direction) {
