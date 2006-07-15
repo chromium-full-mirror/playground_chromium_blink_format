@@ -31,10 +31,6 @@
 @class WebDataSource;
 @class WebHTMLViewPrivate;
 
-@protocol WebDocumentDragging;
-@protocol WebDocumentElement;
-@protocol WebDocumentSelection;
-
 /*!
     @class WebHTMLView
     @discussion A document view of WebFrameView that displays HTML content.
@@ -43,11 +39,7 @@
     renderer (and those cells must be hosted by an enclosing NSControl in order
    to paint properly).
 */
-@interface WebHTMLView : NSControl<WebDocumentView,
-                                   WebDocumentSearching,
-                                   WebDocumentDragging,
-                                   WebDocumentElement,
-                                   WebDocumentSelection> {
+@interface WebHTMLView : NSControl<WebDocumentView, WebDocumentSearching> {
  @private
   WebHTMLViewPrivate* _private;
 }

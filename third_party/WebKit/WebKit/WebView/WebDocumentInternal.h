@@ -27,6 +27,7 @@
  */
 
 #import <WebKit/WebDocumentPrivate.h>
+#import <WebKit/WebHTMLView.h>
 
 /*!
 @protocol _WebDocumentTextSizing
@@ -77,4 +78,8 @@
 - (void)setScrollPoint:(NSPoint)p;
 - (id)viewState;
 - (void)setViewState:(id)statePList;
+@end
+
+@interface WebHTMLView (
+    WebDocumentInternalProtocols)<WebDocumentDragging, WebDocumentElement>
 @end

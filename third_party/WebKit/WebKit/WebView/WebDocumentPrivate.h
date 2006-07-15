@@ -27,6 +27,7 @@
  */
 
 #import <WebKit/WebDocument.h>
+#import <WebKit/WebHTMLView.h>
 
 @class DOMDocument;
 
@@ -64,4 +65,7 @@
 // self but it could be
 // a nested view, as for example in the case of WebPDFView.
 - (NSView*)selectionView;
+@end
+
+@interface WebHTMLView (WebDocumentPrivateProtocols)<WebDocumentSelection>
 @end
