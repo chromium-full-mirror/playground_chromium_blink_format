@@ -25,6 +25,7 @@
  */
 
 #include "APICast.h"
+#include "JSCallbackFunction.h"
 #include "JSCallbackObject.h"
 #include "JSStringRef.h"
 #include "JSClassRef.h"
@@ -435,10 +436,10 @@ JSValue* JSCallbackObject::staticFunctionGetter(ExecState* exec,
             jsClass->staticFunctions) {
       if (StaticFunctionEntry* entry =
               staticFunctions->get(propertyName.ustring().rep())) {
-        JSValue* v =
-            toJS(JSObjectMakeFunction(toRef(exec), entry->callAsFunction));
-        thisObj->putDirect(propertyName, v, entry->attributes);
-        return v;
+        JSObject* o =
+            new JSCallbackFunction(exec, entry->callAsFunction, propertyName);
+        thisObj->putDirect(propertyName, o, entry->attributes);
+        return o;
       }
     }
   }

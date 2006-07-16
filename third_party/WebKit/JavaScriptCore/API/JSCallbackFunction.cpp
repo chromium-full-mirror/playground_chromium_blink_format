@@ -35,14 +35,13 @@ const ClassInfo JSCallbackFunction::info = {"CallbackFunction",
                                             &InternalFunctionImp::info, 0, 0};
 
 JSCallbackFunction::JSCallbackFunction(ExecState* exec,
-                                       JSObjectCallAsFunctionCallback callback)
-    : InternalFunctionImp(static_cast<FunctionPrototype*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype())),
+                                       JSObjectCallAsFunctionCallback callback,
+                                       const Identifier& name)
+    : InternalFunctionImp(
+          static_cast<FunctionPrototype*>(
+              exec->lexicalInterpreter()->builtinFunctionPrototype()),
+          name),
       m_callback(callback) {}
-
-bool JSCallbackFunction::implementsCall() const {
-  return true;
-}
 
 JSValue* JSCallbackFunction::callAsFunction(ExecState* exec,
                                             JSObject* thisObj,
@@ -57,14 +56,6 @@ JSValue* JSCallbackFunction::callAsFunction(ExecState* exec,
     arguments[i] = toRef(args[i]);
   return toJS(m_callback(execRef, thisRef, thisObjRef, argumentCount, arguments,
                          toRef(exec->exceptionSlot())));
-}
-
-void JSCallbackFunction::setPrivate(void* data) {
-  m_privateData = data;
-}
-
-void* JSCallbackFunction::getPrivate() {
-  return m_privateData;
 }
 
 }  // namespace KJS

@@ -40,9 +40,6 @@ class JSCallbackConstructor : public JSObject {
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List& args);
 
-  void setPrivate(void* data);
-  void* getPrivate();
-
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -50,7 +47,6 @@ class JSCallbackConstructor : public JSObject {
   JSCallbackConstructor();  // prevent default construction
   JSCallbackConstructor(const JSCallbackConstructor&);
 
-  void* m_privateData;
   JSObjectCallAsConstructorCallback m_callback;
 };
 
