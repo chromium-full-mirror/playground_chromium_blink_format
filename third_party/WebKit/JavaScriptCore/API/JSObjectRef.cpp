@@ -90,6 +90,9 @@ JSObjectRef JSObjectMakeConstructor(
 }
 
 JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
+                                         JSStringRef name,
+                                         unsigned parameterCount,
+                                         JSStringRef parameterNames[],
                                          JSStringRef body,
                                          JSStringRef sourceURL,
                                          int startingLineNumber,
@@ -97,29 +100,28 @@ JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
   JSLock lock;
 
   ExecState* exec = toJS(context);
+  UString::Rep* nameRep = name ? toJS(name) : &UString::Rep::null;
   UString::Rep* bodyRep = toJS(body);
-  UString jsSourceURL = UString(toJS(sourceURL));
+  UString::Rep* sourceURLRep =
+      sourceURL ? toJS(sourceURL) : &UString::Rep::null;
 
-  if (!bodyRep)
-    bodyRep = &UString::Rep::null;
+  Identifier nameIdentifier =
+      nameRep ? Identifier(nameRep) : Identifier("anonymous");
 
-  int sid;
-  int errLine;
-  UString errMsg;
-  RefPtr<FunctionBodyNode> bodyNode =
-      Parser::parse(jsSourceURL, startingLineNumber, bodyRep->data(),
-                    bodyRep->size(), &sid, &errLine, &errMsg);
-  if (!bodyNode) {
+  List args;
+  for (unsigned i = 0; i < parameterCount; i++)
+    args.append(jsString(UString(toJS(parameterNames[i]))));
+  args.append(jsString(UString(bodyRep)));
+
+  JSObject* result = exec->dynamicInterpreter()->builtinFunction()->construct(
+      exec, args, nameIdentifier, UString(sourceURLRep), startingLineNumber);
+  if (exec->hadException()) {
     if (exception)
-      *exception = toRef(
-          Error::create(exec, SyntaxError, errMsg, errLine, sid, jsSourceURL));
-    return 0;
+      *exception = toRef(exec->exception());
+    exec->clearException();
+    result = 0;
   }
-
-  ScopeChain scopeChain;
-  scopeChain.push(exec->dynamicInterpreter()->globalObject());
-  return toRef(static_cast<JSObject*>(
-      new DeclaredFunctionImp(exec, "anonymous", bodyNode.get(), scopeChain)));
+  return toRef(result);
 }
 
 JSValueRef JSObjectGetPrototype(JSObjectRef object) {
