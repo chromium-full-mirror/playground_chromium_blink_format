@@ -92,7 +92,7 @@ JSObjectRef JSObjectMakeConstructor(
 JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
                                          JSStringRef name,
                                          unsigned parameterCount,
-                                         JSStringRef parameterNames[],
+                                         const JSStringRef parameterNames[],
                                          JSStringRef body,
                                          JSStringRef sourceURL,
                                          int startingLineNumber,
@@ -275,7 +275,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
                                   JSObjectRef object,
                                   JSObjectRef thisObject,
                                   size_t argumentCount,
-                                  JSValueRef arguments[],
+                                  const JSValueRef arguments[],
                                   JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
@@ -309,7 +309,7 @@ bool JSObjectIsConstructor(JSObjectRef object) {
 JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
                                       JSObjectRef object,
                                       size_t argumentCount,
-                                      JSValueRef arguments[],
+                                      const JSValueRef arguments[],
                                       JSValueRef* exception) {
   JSLock lock;
   ExecState* exec = toJS(context);
