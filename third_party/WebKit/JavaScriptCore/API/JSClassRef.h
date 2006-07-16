@@ -54,21 +54,33 @@ struct StaticFunctionEntry {
 };
 
 struct __JSClass {
-  __JSClass() : refCount(0), staticValues(0), staticFunctions(0) {}
-
-  unsigned refCount;
+  __JSClass(JSClassDefinition*);
+  ~__JSClass();
 
   typedef HashMap<RefPtr<KJS::UString::Rep>, StaticValueEntry*>
       StaticValuesTable;
-  StaticValuesTable* staticValues;
-
   typedef HashMap<RefPtr<KJS::UString::Rep>, StaticFunctionEntry*>
       StaticFunctionsTable;
+
+  unsigned refCount;
+
+  KJS::UString className;
+  __JSClass* parentClass;
+
+  StaticValuesTable* staticValues;
   StaticFunctionsTable* staticFunctions;
 
-  KJS::UString name;  // FIXME: Not used yet
-  JSObjectCallbacks callbacks;
-  __JSClass* parent;
+  JSObjectInitializeCallback initialize;
+  JSObjectFinalizeCallback finalize;
+  JSObjectHasPropertyCallback hasProperty;
+  JSObjectGetPropertyCallback getProperty;
+  JSObjectSetPropertyCallback setProperty;
+  JSObjectDeletePropertyCallback deleteProperty;
+  JSObjectAddPropertiesToListCallback addPropertiesToList;
+  JSObjectCallAsFunctionCallback callAsFunction;
+  JSObjectCallAsConstructorCallback callAsConstructor;
+  JSObjectHasInstanceCallback hasInstance;
+  JSObjectConvertToTypeCallback convertToType;
 };
 
 #endif  // JSClassRef_h
