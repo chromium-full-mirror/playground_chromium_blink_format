@@ -24,7 +24,7 @@
 
 #include "object.h"
 #include "protect.h"
-#include "reference_list.h"
+#include "PropertyNameArray.h"
 #include <algorithm>
 #include <wtf/FastMalloc.h>
 #include <wtf/Vector.h>
@@ -77,7 +77,7 @@ PropertyMapStatisticsExitLogger::~PropertyMapStatisticsExitLogger() {
 
 // lastIndexUsed is an ever-increasing index used to identify the order items
 // were inserted into the property map. It's vital that
-// addEnumerablesToReferenceList
+// getEnumerablePropertyNames
 // return the properties in the order they were added for compatibility with
 // other
 // browsers' JavaScript implementations.
@@ -581,13 +581,13 @@ bool PropertyMap::containsGettersOrSetters() const {
   return false;
 }
 
-void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
-                                                JSObject* base) const {
+void PropertyMap::getEnumerablePropertyNames(
+    PropertyNameArray& propertyNames) const {
   if (!_table) {
 #if USE_SINGLE_ENTRY
     UString::Rep* key = _singleEntry.key;
     if (key && !(_singleEntry.attributes & DontEnum))
-      list.append(Reference(base, Identifier(key)));
+      propertyNames.add(Identifier(key));
 #endif
     return;
   }
@@ -609,14 +609,13 @@ void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
   qsort(sortedEnumerables.data(), p - sortedEnumerables.data(), sizeof(Entry*),
         comparePropertyMapEntryIndices);
 
-  // Put the keys of the sorted entries into the reference list.
+  // Put the keys of the sorted entries into the list.
   for (Entry** q = sortedEnumerables.data(); q != p; ++q)
-    list.append(Reference(base, Identifier((*q)->key)));
+    propertyNames.add(Identifier(q[0]->key));
 }
 
-void PropertyMap::addSparseArrayPropertiesToReferenceList(
-    ReferenceList& list,
-    JSObject* base) const {
+void PropertyMap::getSparseArrayPropertyNames(
+    PropertyNameArray& propertyNames) const {
   if (!_table) {
 #if USE_SINGLE_ENTRY
     UString::Rep* key = _singleEntry.key;
@@ -625,7 +624,7 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
       bool fitsInUInt32;
       k.toUInt32(&fitsInUInt32);
       if (fitsInUInt32)
-        list.append(Reference(base, Identifier(key)));
+        propertyNames.add(Identifier(key));
     }
 #endif
     return;
@@ -640,7 +639,7 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
       bool fitsInUInt32;
       k.toUInt32(&fitsInUInt32);
       if (fitsInUInt32)
-        list.append(Reference(base, Identifier(key)));
+        propertyNames.add(Identifier(key));
     }
   }
 }

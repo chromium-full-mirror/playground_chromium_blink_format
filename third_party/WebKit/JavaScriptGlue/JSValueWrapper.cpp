@@ -28,7 +28,7 @@
 
 #include "config.h"
 #include "JSValueWrapper.h"
-#include "JavaScriptCore/reference_list.h"
+#include <JavaScriptCore/PropertyNameArray.h>
 #include <pthread.h>
 
 JSValueWrapper::JSValueWrapper(JSValue* inValue) : fValue(inValue) {}
@@ -111,12 +111,12 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
   if (ptr) {
     ExecState* exec = getThreadGlobalExecState();
     JSObject* object = ptr->GetValue()->toObject(exec);
-    ReferenceList propList;
-    object->getPropertyList(propList);
-    ReferenceListIterator iterator = propList.begin();
+    PropertyNameArray propNames;
+    object->getPropertyNames(exec, propNames);
+    PropertyNameArrayIterator iterator = propNames.begin();
 
-    while (iterator != propList.end()) {
-      Identifier name = iterator->getPropertyName();
+    while (iterator != propNames.end()) {
+      Identifier name = *iterator;
       CFStringRef nameStr = IdentifierToCFString(name);
 
       if (!result) {

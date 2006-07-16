@@ -30,8 +30,7 @@
 #include "JSClassRef.h"
 #include "JSObjectRef.h"
 #include "internal.h"
-#include "reference.h"
-#include "reference_list.h"
+#include "PropertyNameArray.h"
 
 namespace KJS {
 
@@ -307,14 +306,15 @@ JSValue* JSCallbackObject::callAsFunction(ExecState* exec,
   return 0;
 }
 
-void JSCallbackObject::getPropertyList(ReferenceList& propertyList,
-                                       bool recursive) {
+void JSCallbackObject::getPropertyNames(ExecState* exec,
+                                        PropertyNameArray& propertyNames) {
+  JSContextRef execRef = toRef(exec);
   JSObjectRef thisRef = toRef(this);
 
   for (JSClassRef jsClass = m_class; jsClass; jsClass = jsClass->parentClass) {
-    if (JSObjectAddPropertiesToListCallback addPropertiesToList =
-            jsClass->addPropertiesToList)
-      addPropertiesToList(thisRef, toRef(&propertyList));
+    if (JSObjectGetPropertyNamesCallback getPropertyNames =
+            jsClass->getPropertyNames)
+      getPropertyNames(execRef, thisRef, toRef(&propertyNames));
 
     if (__JSClass::StaticValuesTable* staticValues = jsClass->staticValues) {
       typedef __JSClass::StaticValuesTable::const_iterator iterator;
@@ -324,7 +324,7 @@ void JSCallbackObject::getPropertyList(ReferenceList& propertyList,
         StaticValueEntry* entry = it->second;
         if (entry->getProperty &&
             !(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyList.append(Reference(this, Identifier(name)));
+          propertyNames.add(Identifier(name));
       }
     }
 
@@ -336,12 +336,12 @@ void JSCallbackObject::getPropertyList(ReferenceList& propertyList,
         UString::Rep* name = it->first.get();
         StaticFunctionEntry* entry = it->second;
         if (!(entry->attributes & kJSPropertyAttributeDontEnum))
-          propertyList.append(Reference(this, Identifier(name)));
+          propertyNames.add(Identifier(name));
       }
     }
   }
 
-  JSObject::getPropertyList(propertyList, recursive);
+  JSObject::getPropertyNames(exec, propertyNames);
 }
 
 double JSCallbackObject::toNumber(ExecState* exec) const {

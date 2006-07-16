@@ -43,9 +43,7 @@ class UserObjectImp : public JSObject {
 
   virtual bool implementsCall() const;
 
-  virtual void getPropertyList(ExecState* exec,
-                               ReferenceList& propertyList,
-                               bool recursive = true);
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
