@@ -34,7 +34,7 @@ extern JSObjectRef JSNode_new(JSContextRef context, Node* node);
 extern JSObjectRef JSNode_construct(JSContextRef context,
                                     JSObjectRef object,
                                     size_t argumentCount,
-                                    JSValueRef arguments[],
+                                    const JSValueRef arguments[],
                                     JSValueRef* exception);
 
 #endif  // JSNode_h

@@ -228,7 +228,7 @@ any.
 this:
 
 JSValueRef CallAsFunction(JSContextRef context, JSObjectRef function,
-JSObjectRef thisObject, size_t argumentCount, JSValueRef arguments[],
+JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[],
 JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression
@@ -238,12 +238,13 @@ thisObject would be set to myObject.
 If this callback is NULL, calling your object as a function will throw an
 exception.
 */
-typedef JSValueRef (*JSObjectCallAsFunctionCallback)(JSContextRef context,
-                                                     JSObjectRef function,
-                                                     JSObjectRef thisObject,
-                                                     size_t argumentCount,
-                                                     JSValueRef arguments[],
-                                                     JSValueRef* exception);
+typedef JSValueRef (*JSObjectCallAsFunctionCallback)(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception);
 
 /*!
 @typedef JSObjectCallAsConstructorCallback
@@ -260,7 +261,7 @@ any.
 like this:
 
 JSObjectRef CallAsConstructor(JSContextRef context, JSObjectRef constructor,
-size_t argumentCount, JSValueRef arguments[], JSValueRef* exception);
+size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception);
 
 If your callback were invoked by the JavaScript expression 'new
 myConstructorFunction()', constructor would be set to myConstructorFunction.
@@ -272,7 +273,7 @@ typedef JSObjectRef (*JSObjectCallAsConstructorCallback)(
     JSContextRef context,
     JSObjectRef constructor,
     size_t argumentCount,
-    JSValueRef arguments[],
+    const JSValueRef arguments[],
     JSValueRef* exception);
 
 /*!
@@ -532,7 +533,7 @@ JSObjectRef JSObjectMakeConstructor(
 @function
 @abstract Creates a function with a given script as its body.
 @param context The execution context to use.
-@param A JSString containting the function's name. Pass NULL to create an
+@param name A JSString containing the function's name. Pass NULL to create an
 anonymous function.
 @param parameterCount An integer count of the number of parameter names in
 parameterNames.
@@ -557,7 +558,7 @@ avoid the cost of re-parsing the script before each execution.
 JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
                                          JSStringRef name,
                                          unsigned parameterCount,
-                                         JSStringRef parameterNames[],
+                                         const JSStringRef parameterNames[],
                                          JSStringRef body,
                                          JSStringRef sourceURL,
                                          int startingLineNumber,
@@ -720,7 +721,7 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
                                   JSObjectRef object,
                                   JSObjectRef thisObject,
                                   size_t argumentCount,
-                                  JSValueRef arguments[],
+                                  const JSValueRef arguments[],
                                   JSValueRef* exception);
 /*!
 @function
@@ -745,7 +746,7 @@ if an exception is thrown or object is not a constructor.
 JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
                                       JSObjectRef object,
                                       size_t argumentCount,
-                                      JSValueRef arguments[],
+                                      const JSValueRef arguments[],
                                       JSValueRef* exception);
 
 /*!
