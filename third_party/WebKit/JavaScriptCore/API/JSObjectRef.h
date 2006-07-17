@@ -523,9 +523,10 @@ function is called.
 @result A JSObject that is an anonymous function. The object's prototype will be
 the default function prototype.
 */
-JSObjectRef JSObjectMakeFunction(JSContextRef context,
-                                 JSStringRef name,
-                                 JSObjectCallAsFunctionCallback callAsFunction);
+JSObjectRef JSObjectMakeFunctionWithCallback(
+    JSContextRef context,
+    JSStringRef name,
+    JSObjectCallAsFunctionCallback callAsFunction);
 /*!
 @function
 @abstract Convenience method for creating a JavaScript constructor with a given
@@ -566,14 +567,14 @@ prototype.
 @discussion Use this method when you want to execute a script repeatedly, to
 avoid the cost of re-parsing the script before each execution.
 */
-JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
-                                         JSStringRef name,
-                                         unsigned parameterCount,
-                                         const JSStringRef parameterNames[],
-                                         JSStringRef body,
-                                         JSStringRef sourceURL,
-                                         int startingLineNumber,
-                                         JSValueRef* exception);
+JSObjectRef JSObjectMakeFunction(JSContextRef context,
+                                 JSStringRef name,
+                                 unsigned parameterCount,
+                                 const JSStringRef parameterNames[],
+                                 JSStringRef body,
+                                 JSStringRef sourceURL,
+                                 int startingLineNumber,
+                                 JSValueRef* exception);
 
 /*!
 @function

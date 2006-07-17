@@ -40,7 +40,7 @@ class PropertyNameArray;
 /* Opaque typing convenience methods */
 
 inline KJS::ExecState* toJS(JSContextRef c) {
-  return reinterpret_cast<KJS::ExecState*>(const_cast<__JSContext*>(c));
+  return reinterpret_cast<KJS::ExecState*>(const_cast<OpaqueJSContext*>(c));
 }
 
 inline KJS::ExecState* toJS(JSGlobalContextRef c) {
@@ -48,7 +48,7 @@ inline KJS::ExecState* toJS(JSGlobalContextRef c) {
 }
 
 inline KJS::JSValue* toJS(JSValueRef v) {
-  return reinterpret_cast<KJS::JSValue*>(const_cast<__JSValue*>(v));
+  return reinterpret_cast<KJS::JSValue*>(const_cast<OpaqueJSValue*>(v));
 }
 
 inline KJS::UString::Rep* toJS(JSStringRef b) {

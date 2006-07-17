@@ -42,7 +42,7 @@
 using namespace KJS;
 
 JSClassRef JSClassCreate(JSClassDefinition* definition) {
-  JSClassRef jsClass = new __JSClass(definition);
+  JSClassRef jsClass = new OpaqueJSClass(definition);
   return JSClassRetain(jsClass);
 }
 
@@ -73,7 +73,7 @@ JSObjectRef JSObjectMake(JSContextRef context,
     return toRef(new JSCallbackObject(context, jsClass, jsPrototype));
 }
 
-JSObjectRef JSObjectMakeFunction(
+JSObjectRef JSObjectMakeFunctionWithCallback(
     JSContextRef context,
     JSStringRef name,
     JSObjectCallAsFunctionCallback callAsFunction) {
@@ -92,14 +92,14 @@ JSObjectRef JSObjectMakeConstructor(
   return toRef(new JSCallbackConstructor(exec, callAsConstructor));
 }
 
-JSObjectRef JSObjectMakeFunctionWithBody(JSContextRef context,
-                                         JSStringRef name,
-                                         unsigned parameterCount,
-                                         const JSStringRef parameterNames[],
-                                         JSStringRef body,
-                                         JSStringRef sourceURL,
-                                         int startingLineNumber,
-                                         JSValueRef* exception) {
+JSObjectRef JSObjectMakeFunction(JSContextRef context,
+                                 JSStringRef name,
+                                 unsigned parameterCount,
+                                 const JSStringRef parameterNames[],
+                                 JSStringRef body,
+                                 JSStringRef sourceURL,
+                                 int startingLineNumber,
+                                 JSValueRef* exception) {
   JSLock lock;
 
   ExecState* exec = toJS(context);
@@ -323,8 +323,8 @@ JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
   return result;
 }
 
-struct __JSPropertyNameArray {
-  __JSPropertyNameArray() : refCount(0) {}
+struct OpaqueJSPropertyNameArray {
+  OpaqueJSPropertyNameArray() : refCount(0) {}
 
   unsigned refCount;
   PropertyNameArray array;
@@ -336,7 +336,7 @@ JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef context,
   JSObject* jsObject = toJS(object);
   ExecState* exec = toJS(context);
 
-  JSPropertyNameArrayRef propertyNames = new __JSPropertyNameArray();
+  JSPropertyNameArrayRef propertyNames = new OpaqueJSPropertyNameArray();
   jsObject->getPropertyNames(exec, propertyNames->array);
 
   return JSPropertyNameArrayRetain(propertyNames);
