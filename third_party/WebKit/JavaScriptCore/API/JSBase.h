@@ -72,7 +72,7 @@ extern "C" {
 /*!
 @function
 @abstract                 Evaluates a string of JavaScript.
-@param context            The execution context to use.
+@param ctx            The execution context to use.
 @param script             A JSString containing the script to evaluate.
 @param thisObject         The object to use as "this," or NULL to use the global
 object as "this."
@@ -87,7 +87,7 @@ exception, if any. Pass NULL if you do not care to store an exception.
 @result                   The JSValue that results from evaluating script, or
 NULL if an exception is thrown.
 */
-JSValueRef JSEvaluateScript(JSContextRef context,
+JSValueRef JSEvaluateScript(JSContextRef ctx,
                             JSStringRef script,
                             JSObjectRef thisObject,
                             JSStringRef sourceURL,
@@ -97,7 +97,7 @@ JSValueRef JSEvaluateScript(JSContextRef context,
 /*!
 @function JSCheckScriptSyntax
 @abstract                 Checks for syntax errors in a string of JavaScript.
-@param context            The execution context to use.
+@param ctx            The execution context to use.
 @param script             A JSString containing the script to check for syntax
 errors.
 @param sourceURL          A JSString containing a URL for the script's source
@@ -112,7 +112,7 @@ exception.
 @result                   true if the script is syntactically correct, otherwise
 false.
 */
-bool JSCheckScriptSyntax(JSContextRef context,
+bool JSCheckScriptSyntax(JSContextRef ctx,
                          JSStringRef script,
                          JSStringRef sourceURL,
                          int startingLineNumber,
@@ -121,6 +121,7 @@ bool JSCheckScriptSyntax(JSContextRef context,
 /*!
 @function
 @abstract Performs a JavaScript garbage collection.
+@param ctx  The execution context to use.
 @discussion JavaScript values that are on the machine stack, in a register,
  protected by JSValueProtect, set as the global object of an execution context,
  or reachable from any such value will not be collected.
@@ -128,7 +129,7 @@ bool JSCheckScriptSyntax(JSContextRef context,
  You are not required to call this function; the JavaScript engine will garbage
  collect as needed.
 */
-void JSGarbageCollect(void);
+void JSGarbageCollect(JSContextRef ctx);
 
 #ifdef __cplusplus
 }

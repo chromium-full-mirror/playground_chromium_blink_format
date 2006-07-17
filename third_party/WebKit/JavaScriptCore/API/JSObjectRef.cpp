@@ -56,12 +56,12 @@ void JSClassRelease(JSClassRef jsClass) {
     delete jsClass;
 }
 
-JSObjectRef JSObjectMake(JSContextRef context,
+JSObjectRef JSObjectMake(JSContextRef ctx,
                          JSClassRef jsClass,
                          JSValueRef prototype) {
   JSLock lock;
 
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSValue* jsPrototype = toJS(prototype);
 
   if (!prototype)
@@ -70,29 +70,29 @@ JSObjectRef JSObjectMake(JSContextRef context,
   if (!jsClass)
     return toRef(new JSObject(jsPrototype));  // slightly more efficient
   else
-    return toRef(new JSCallbackObject(context, jsClass, jsPrototype));
+    return toRef(new JSCallbackObject(ctx, jsClass, jsPrototype));
 }
 
 JSObjectRef JSObjectMakeFunctionWithCallback(
-    JSContextRef context,
+    JSContextRef ctx,
     JSStringRef name,
     JSObjectCallAsFunctionCallback callAsFunction) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   Identifier nameID = name ? Identifier(toJS(name)) : Identifier("anonymous");
 
   return toRef(new JSCallbackFunction(exec, callAsFunction, nameID));
 }
 
 JSObjectRef JSObjectMakeConstructor(
-    JSContextRef context,
+    JSContextRef ctx,
     JSObjectCallAsConstructorCallback callAsConstructor) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   return toRef(new JSCallbackConstructor(exec, callAsConstructor));
 }
 
-JSObjectRef JSObjectMakeFunction(JSContextRef context,
+JSObjectRef JSObjectMakeFunction(JSContextRef ctx,
                                  JSStringRef name,
                                  unsigned parameterCount,
                                  const JSStringRef parameterNames[],
@@ -102,7 +102,7 @@ JSObjectRef JSObjectMakeFunction(JSContextRef context,
                                  JSValueRef* exception) {
   JSLock lock;
 
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   UString::Rep* bodyRep = toJS(body);
   UString::Rep* sourceURLRep =
       sourceURL ? toJS(sourceURL) : &UString::Rep::null;
@@ -125,35 +125,35 @@ JSObjectRef JSObjectMakeFunction(JSContextRef context,
   return toRef(result);
 }
 
-JSValueRef JSObjectGetPrototype(JSObjectRef object) {
+JSValueRef JSObjectGetPrototype(JSContextRef, JSObjectRef object) {
   JSObject* jsObject = toJS(object);
   return toRef(jsObject->prototype());
 }
 
-void JSObjectSetPrototype(JSObjectRef object, JSValueRef value) {
+void JSObjectSetPrototype(JSContextRef, JSObjectRef object, JSValueRef value) {
   JSObject* jsObject = toJS(object);
   JSValue* jsValue = toJS(value);
 
   jsObject->setPrototype(jsValue);
 }
 
-bool JSObjectHasProperty(JSContextRef context,
+bool JSObjectHasProperty(JSContextRef ctx,
                          JSObjectRef object,
                          JSStringRef propertyName) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
   return jsObject->hasProperty(exec, Identifier(nameRep));
 }
 
-JSValueRef JSObjectGetProperty(JSContextRef context,
+JSValueRef JSObjectGetProperty(JSContextRef ctx,
                                JSObjectRef object,
                                JSStringRef propertyName,
                                JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
@@ -166,14 +166,14 @@ JSValueRef JSObjectGetProperty(JSContextRef context,
   return toRef(jsValue);
 }
 
-void JSObjectSetProperty(JSContextRef context,
+void JSObjectSetProperty(JSContextRef ctx,
                          JSObjectRef object,
                          JSStringRef propertyName,
                          JSValueRef value,
                          JSPropertyAttributes attributes,
                          JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
   JSValue* jsValue = toJS(value);
@@ -186,12 +186,12 @@ void JSObjectSetProperty(JSContextRef context,
   }
 }
 
-JSValueRef JSObjectGetPropertyAtIndex(JSContextRef context,
+JSValueRef JSObjectGetPropertyAtIndex(JSContextRef ctx,
                                       JSObjectRef object,
                                       unsigned propertyIndex,
                                       JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
 
   JSValue* jsValue = jsObject->get(exec, propertyIndex);
@@ -203,13 +203,13 @@ JSValueRef JSObjectGetPropertyAtIndex(JSContextRef context,
   return toRef(jsValue);
 }
 
-void JSObjectSetPropertyAtIndex(JSContextRef context,
+void JSObjectSetPropertyAtIndex(JSContextRef ctx,
                                 JSObjectRef object,
                                 unsigned propertyIndex,
                                 JSValueRef value,
                                 JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   JSValue* jsValue = toJS(value);
 
@@ -221,12 +221,12 @@ void JSObjectSetPropertyAtIndex(JSContextRef context,
   }
 }
 
-bool JSObjectDeleteProperty(JSContextRef context,
+bool JSObjectDeleteProperty(JSContextRef ctx,
                             JSObjectRef object,
                             JSStringRef propertyName,
                             JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   UString::Rep* nameRep = toJS(propertyName);
 
@@ -259,19 +259,19 @@ bool JSObjectSetPrivate(JSObjectRef object, void* data) {
   return false;
 }
 
-bool JSObjectIsFunction(JSObjectRef object) {
+bool JSObjectIsFunction(JSContextRef, JSObjectRef object) {
   JSObject* jsObject = toJS(object);
   return jsObject->implementsCall();
 }
 
-JSValueRef JSObjectCallAsFunction(JSContextRef context,
+JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
                                   JSObjectRef object,
                                   JSObjectRef thisObject,
                                   size_t argumentCount,
                                   const JSValueRef arguments[],
                                   JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
   JSObject* jsThisObject = toJS(thisObject);
 
@@ -294,18 +294,18 @@ JSValueRef JSObjectCallAsFunction(JSContextRef context,
   return result;
 }
 
-bool JSObjectIsConstructor(JSObjectRef object) {
+bool JSObjectIsConstructor(JSContextRef, JSObjectRef object) {
   JSObject* jsObject = toJS(object);
   return jsObject->implementsConstruct();
 }
 
-JSObjectRef JSObjectCallAsConstructor(JSContextRef context,
+JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx,
                                       JSObjectRef object,
                                       size_t argumentCount,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsObject = toJS(object);
 
   List argList;
@@ -330,11 +330,11 @@ struct OpaqueJSPropertyNameArray {
   PropertyNameArray array;
 };
 
-JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef context,
+JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef ctx,
                                                  JSObjectRef object) {
   JSLock lock;
   JSObject* jsObject = toJS(object);
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
 
   JSPropertyNameArrayRef propertyNames = new OpaqueJSPropertyNameArray();
   jsObject->getPropertyNames(exec, propertyNames->array);

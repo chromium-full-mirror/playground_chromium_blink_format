@@ -47,25 +47,25 @@ JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass) {
 
   Interpreter* interpreter = new Interpreter(
       globalObject);  // adds the built-in object prototype to the global object
-  JSGlobalContextRef context =
+  JSGlobalContextRef ctx =
       reinterpret_cast<JSGlobalContextRef>(interpreter->globalExec());
-  return JSGlobalContextRetain(context);
+  return JSGlobalContextRetain(ctx);
 }
 
-JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef context) {
+JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef ctx) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   exec->dynamicInterpreter()->ref();
-  return context;
+  return ctx;
 }
 
-void JSGlobalContextRelease(JSGlobalContextRef context) {
+void JSGlobalContextRelease(JSGlobalContextRef ctx) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   exec->dynamicInterpreter()->deref();
 }
 
-JSObjectRef JSContextGetGlobalObject(JSContextRef context) {
-  ExecState* exec = toJS(context);
+JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {
+  ExecState* exec = toJS(ctx);
   return toRef(exec->dynamicInterpreter()->globalObject());
 }

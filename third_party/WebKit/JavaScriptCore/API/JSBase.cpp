@@ -35,14 +35,14 @@
 
 using namespace KJS;
 
-JSValueRef JSEvaluateScript(JSContextRef context,
+JSValueRef JSEvaluateScript(JSContextRef ctx,
                             JSStringRef script,
                             JSObjectRef thisObject,
                             JSStringRef sourceURL,
                             int startingLineNumber,
                             JSValueRef* exception) {
   JSLock lock;
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   JSObject* jsThisObject = toJS(thisObject);
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep = toJS(sourceURL);
@@ -64,14 +64,14 @@ JSValueRef JSEvaluateScript(JSContextRef context,
   return toRef(jsUndefined());
 }
 
-bool JSCheckScriptSyntax(JSContextRef context,
+bool JSCheckScriptSyntax(JSContextRef ctx,
                          JSStringRef script,
                          JSStringRef sourceURL,
                          int startingLineNumber,
                          JSValueRef* exception) {
   JSLock lock;
 
-  ExecState* exec = toJS(context);
+  ExecState* exec = toJS(ctx);
   UString::Rep* scriptRep = toJS(script);
   UString::Rep* sourceURLRep = toJS(sourceURL);
   Completion completion = exec->dynamicInterpreter()->checkSyntax(
@@ -85,7 +85,7 @@ bool JSCheckScriptSyntax(JSContextRef context,
   return true;
 }
 
-void JSGarbageCollect() {
+void JSGarbageCollect(JSContextRef) {
   JSLock lock;
   Collector::collect();
 }
