@@ -37,30 +37,33 @@ namespace KJS {
 
 const ClassInfo JSCallbackObject::info = {"CallbackObject", 0, 0, 0};
 
-JSCallbackObject::JSCallbackObject(JSContextRef ctx, JSClassRef jsClass)
+JSCallbackObject::JSCallbackObject(ExecState* exec, JSClassRef jsClass)
     : JSObject() {
-  init(ctx, jsClass);
+  init(exec, jsClass);
 }
 
-JSCallbackObject::JSCallbackObject(JSContextRef ctx,
+JSCallbackObject::JSCallbackObject(ExecState* exec,
                                    JSClassRef jsClass,
                                    JSValue* prototype)
     : JSObject(prototype) {
-  init(ctx, jsClass);
+  init(exec, jsClass);
 }
 
-void JSCallbackObject::init(JSContextRef ctx, JSClassRef jsClass) {
-  ExecState* exec = toJS(ctx);
-
+void JSCallbackObject::init(ExecState* exec, JSClassRef jsClass) {
   m_privateData = 0;
   m_class = JSClassRetain(jsClass);
 
-  JSObjectRef thisRef = toRef(this);
-
+  Vector<JSObjectInitializeCallback, 16> initRoutines;
   do {
     if (JSObjectInitializeCallback initialize = jsClass->initialize)
-      initialize(ctx, thisRef, toRef(exec->exceptionSlot()));
+      initRoutines.append(initialize);
   } while ((jsClass = jsClass->parentClass));
+
+  // initialize from base to derived
+  for (int i = initRoutines.size() - 1; i >= 0; i--) {
+    JSObjectInitializeCallback initialize = initRoutines[i];
+    initialize(toRef(exec), toRef(this), toRef(exec->exceptionSlot()));
+  }
 }
 
 JSCallbackObject::~JSCallbackObject() {
