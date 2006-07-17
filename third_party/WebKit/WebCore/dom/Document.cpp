@@ -1088,7 +1088,11 @@ void Document::updateSelection() {
     if (endPos.upstream().inRenderedContent())
       endPos = endPos.upstream();
 
-    if (startPos.isNotNull() && endPos.isNotNull()) {
+    // We can get into a state where the selection endpoints map to the same
+    // VisiblePosition when a selection is deleted
+    // because we don't yet notify the SelectionController of text removal.
+    if (startPos.isNotNull() && endPos.isNotNull() &&
+        s.selection().visibleStart() != s.selection().visibleEnd()) {
       RenderObject* startRenderer = startPos.node()->renderer();
       RenderObject* endRenderer = endPos.node()->renderer();
       static_cast<RenderView*>(renderer())
