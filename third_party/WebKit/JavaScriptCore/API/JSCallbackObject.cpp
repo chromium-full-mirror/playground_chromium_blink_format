@@ -108,12 +108,9 @@ bool JSCallbackObject::getOwnPropertySlot(ExecState* exec,
     }
 
     if (__JSClass::StaticValuesTable* staticValues = jsClass->staticValues) {
-      if (StaticValueEntry* entry =
-              staticValues->get(propertyName.ustring().rep())) {
-        if (entry->getProperty) {
-          slot.setCustom(this, staticValueGetter);
-          return true;
-        }
+      if (staticValues->contains(propertyName.ustring().rep())) {
+        slot.setCustom(this, staticValueGetter);
+        return true;
       }
     }
 
@@ -156,11 +153,13 @@ void JSCallbackObject::put(ExecState* exec,
               staticValues->get(propertyName.ustring().rep())) {
         if (entry->attributes & kJSPropertyAttributeReadOnly)
           return;
-        if (JSObjectSetPropertyCallback setProperty = entry->setProperty) {
-          if (setProperty(context, thisRef, propertyNameRef, valueRef,
-                          toRef(exec->exceptionSlot())))
-            return;
-        }
+        if (JSObjectSetPropertyCallback setProperty = entry->setProperty)
+          setProperty(context, thisRef, propertyNameRef, valueRef,
+                      toRef(exec->exceptionSlot()));
+        else
+          throwError(exec, ReferenceError,
+                     "Writable static value property defined with NULL "
+                     "setProperty callback.");
       }
     }
 
@@ -417,7 +416,9 @@ JSValue* JSCallbackObject::staticValueGetter(ExecState* exec,
                               toRef(exec->exceptionSlot())))
             return toJS(value);
 
-  return jsUndefined();
+  return throwError(
+      exec, ReferenceError,
+      "Static value property defined with NULL getProperty callback.");
 }
 
 JSValue* JSCallbackObject::staticFunctionGetter(ExecState* exec,
@@ -436,15 +437,20 @@ JSValue* JSCallbackObject::staticFunctionGetter(ExecState* exec,
             jsClass->staticFunctions) {
       if (StaticFunctionEntry* entry =
               staticFunctions->get(propertyName.ustring().rep())) {
-        JSObject* o =
-            new JSCallbackFunction(exec, entry->callAsFunction, propertyName);
-        thisObj->putDirect(propertyName, o, entry->attributes);
-        return o;
+        if (JSObjectCallAsFunctionCallback callAsFunction =
+                entry->callAsFunction) {
+          JSObject* o =
+              new JSCallbackFunction(exec, callAsFunction, propertyName);
+          thisObj->putDirect(propertyName, o, entry->attributes);
+          return o;
+        }
       }
     }
   }
 
-  return jsUndefined();
+  return throwError(
+      exec, ReferenceError,
+      "Static function property defined with NULL callAsFunction callback.");
 }
 
 JSValue* JSCallbackObject::callbackGetter(ExecState* exec,
@@ -464,7 +470,9 @@ JSValue* JSCallbackObject::callbackGetter(ExecState* exec,
                                          toRef(exec->exceptionSlot())))
         return toJS(value);
 
-  return jsUndefined();
+  return throwError(
+      exec, ReferenceError,
+      "hasProperty callback returned true for a property that doesn't exist.");
 }
 
 }  // namespace KJS

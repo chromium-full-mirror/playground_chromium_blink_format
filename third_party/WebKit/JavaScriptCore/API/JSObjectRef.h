@@ -352,7 +352,7 @@ typedef JSValueRef (*JSObjectConvertToTypeCallback)(JSContextRef context,
 @field getProperty A JSObjectGetPropertyCallback to invoke when getting the
 property's value.
 @field setProperty A JSObjectSetPropertyCallback to invoke when setting the
-property's value.
+property's value. May be NULL if the ReadOnly attribute is set.
 @field attributes A logically ORed set of JSPropertyAttributes to give to the
 property.
 */
