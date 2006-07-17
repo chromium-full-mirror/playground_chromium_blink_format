@@ -37,20 +37,16 @@ namespace KJS {
 
 const ClassInfo JSCallbackObject::info = {"CallbackObject", 0, 0, 0};
 
-JSCallbackObject::JSCallbackObject(ExecState* exec, JSClassRef jsClass)
-    : JSObject() {
-  init(exec, jsClass);
-}
-
 JSCallbackObject::JSCallbackObject(ExecState* exec,
                                    JSClassRef jsClass,
-                                   JSValue* prototype)
+                                   JSValue* prototype,
+                                   void* data)
     : JSObject(prototype) {
-  init(exec, jsClass);
+  init(exec, jsClass, data);
 }
 
-void JSCallbackObject::init(ExecState* exec, JSClassRef jsClass) {
-  m_privateData = 0;
+void JSCallbackObject::init(ExecState* exec, JSClassRef jsClass, void* data) {
+  m_privateData = data;
   m_class = JSClassRetain(jsClass);
 
   Vector<JSObjectInitializeCallback, 16> initRoutines;
@@ -62,7 +58,7 @@ void JSCallbackObject::init(ExecState* exec, JSClassRef jsClass) {
   // initialize from base to derived
   for (int i = initRoutines.size() - 1; i >= 0; i--) {
     JSObjectInitializeCallback initialize = initRoutines[i];
-    initialize(toRef(exec), toRef(this), toRef(exec->exceptionSlot()));
+    initialize(toRef(exec), toRef(this));
   }
 }
 
