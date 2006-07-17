@@ -37,6 +37,10 @@ JSCallbackConstructor::JSCallbackConstructor(
     : JSObject(exec->lexicalInterpreter()->builtinObjectPrototype()),
       m_callback(callback) {}
 
+bool JSCallbackConstructor::implementsHasInstance() const {
+  return true;
+}
+
 bool JSCallbackConstructor::implementsConstruct() const {
   return true;
 }

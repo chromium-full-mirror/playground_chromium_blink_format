@@ -84,12 +84,21 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
   return toRef(new JSCallbackFunction(exec, callAsFunction, nameID));
 }
 
-JSObjectRef JSObjectMakeConstructor(
+JSObjectRef JSObjectMakeConstructorWithCallback(
     JSContextRef ctx,
+    JSValueRef prototype,
     JSObjectCallAsConstructorCallback callAsConstructor) {
   JSLock lock;
   ExecState* exec = toJS(ctx);
-  return toRef(new JSCallbackConstructor(exec, callAsConstructor));
+  JSValue* jsPrototype = toJS(prototype);
+
+  if (!jsPrototype)
+    jsPrototype = exec->dynamicInterpreter()->builtinObjectPrototype();
+
+  JSObject* constructor = new JSCallbackConstructor(exec, callAsConstructor);
+  constructor->put(exec, prototypePropertyName, jsPrototype,
+                   DontEnum | DontDelete | ReadOnly);
+  return toRef(constructor);
 }
 
 JSObjectRef JSObjectMakeFunction(JSContextRef ctx,

@@ -28,7 +28,7 @@
 #define JSCallbackConstructor_h
 
 #include "JSObjectRef.h"
-#include "object.h"
+#include <kjs/object.h>
 
 namespace KJS {
 
@@ -36,6 +36,8 @@ class JSCallbackConstructor : public JSObject {
  public:
   JSCallbackConstructor(ExecState* exec,
                         JSObjectCallAsConstructorCallback callback);
+
+  virtual bool implementsHasInstance() const;
 
   virtual bool implementsConstruct() const;
   virtual JSObject* construct(ExecState*, const List& args);

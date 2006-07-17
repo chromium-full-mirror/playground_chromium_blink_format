@@ -39,6 +39,7 @@ class JSCallbackFunction : public InternalFunctionImp {
                      JSObjectCallAsFunctionCallback callback,
                      const Identifier& name);
 
+  virtual bool implementsHasInstance() const;
   virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
