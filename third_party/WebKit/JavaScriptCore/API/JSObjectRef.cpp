@@ -42,7 +42,10 @@
 using namespace KJS;
 
 JSClassRef JSClassCreate(JSClassDefinition* definition) {
-  JSClassRef jsClass = new OpaqueJSClass(definition);
+  JSClassRef jsClass = (definition->attributes & kJSClassAttributeNoPrototype)
+                           ? OpaqueJSClass::createNoPrototype(definition)
+                           : OpaqueJSClass::create(definition);
+
   return JSClassRetain(jsClass);
 }
 
@@ -56,16 +59,21 @@ void JSClassRelease(JSClassRef jsClass) {
     delete jsClass;
 }
 
-JSObjectRef JSObjectMake(JSContextRef ctx,
-                         JSClassRef jsClass,
-                         JSValueRef prototype) {
-  return JSObjectMakeWithData(ctx, jsClass, prototype, 0);
+JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
+  JSLock lock;
+  ExecState* exec = toJS(ctx);
+
+  JSValue* jsPrototype =
+      jsClass ? jsClass->prototype(ctx)
+              : exec->lexicalInterpreter()->builtinObjectPrototype();
+
+  return JSObjectMakeWithPrototype(ctx, jsClass, data, toRef(jsPrototype));
 }
 
-JSObjectRef JSObjectMakeWithData(JSContextRef ctx,
-                                 JSClassRef jsClass,
-                                 JSValueRef prototype,
-                                 void* data) {
+JSObjectRef JSObjectMakeWithPrototype(JSContextRef ctx,
+                                      JSClassRef jsClass,
+                                      void* data,
+                                      JSValueRef prototype) {
   JSLock lock;
 
   ExecState* exec = toJS(ctx);
@@ -77,8 +85,7 @@ JSObjectRef JSObjectMakeWithData(JSContextRef ctx,
   if (!jsClass)
     return toRef(new JSObject(jsPrototype));  // slightly more efficient
 
-  return toRef(new JSCallbackObject(exec, jsClass, jsPrototype,
-                                    data));  // initialize can't throw
+  return toRef(new JSCallbackObject(exec, jsClass, jsPrototype, data));
 }
 
 JSObjectRef JSObjectMakeFunctionWithCallback(
@@ -92,18 +99,19 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
   return toRef(new JSCallbackFunction(exec, callAsFunction, nameID));
 }
 
-JSObjectRef JSObjectMakeConstructorWithCallback(
+JSObjectRef JSObjectMakeConstructor(
     JSContextRef ctx,
-    JSValueRef prototype,
+    JSClassRef jsClass,
     JSObjectCallAsConstructorCallback callAsConstructor) {
   JSLock lock;
   ExecState* exec = toJS(ctx);
-  JSValue* jsPrototype = toJS(prototype);
 
-  if (!jsPrototype)
-    jsPrototype = exec->dynamicInterpreter()->builtinObjectPrototype();
+  JSValue* jsPrototype =
+      jsClass ? jsClass->prototype(ctx)
+              : exec->dynamicInterpreter()->builtinObjectPrototype();
 
-  JSObject* constructor = new JSCallbackConstructor(exec, callAsConstructor);
+  JSObject* constructor =
+      new JSCallbackConstructor(exec, jsClass, callAsConstructor);
   constructor->put(exec, prototypePropertyName, jsPrototype,
                    DontEnum | DontDelete | ReadOnly);
   return toRef(constructor);

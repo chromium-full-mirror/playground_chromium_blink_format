@@ -28,8 +28,11 @@
 #define JSClassRef_h
 
 #include "JSObjectRef.h"
-#include "HashMap.h"
-#include "ustring.h"
+
+#include <kjs/object.h>
+#include <kjs/protect.h>
+#include <kjs/ustring.h>
+#include <wtf/HashMap.h>
 
 struct StaticValueEntry {
   StaticValueEntry(JSObjectGetPropertyCallback _getProperty,
@@ -54,8 +57,11 @@ struct StaticFunctionEntry {
 };
 
 struct OpaqueJSClass {
-  OpaqueJSClass(JSClassDefinition*);
+  static OpaqueJSClass* create(const JSClassDefinition*);
+  static OpaqueJSClass* createNoPrototype(const JSClassDefinition*);
   ~OpaqueJSClass();
+
+  KJS::JSObject* prototype(JSContextRef ctx);
 
   typedef HashMap<RefPtr<KJS::UString::Rep>, StaticValueEntry*>
       StaticValuesTable;
@@ -66,6 +72,7 @@ struct OpaqueJSClass {
 
   KJS::UString className;
   OpaqueJSClass* parentClass;
+  OpaqueJSClass* prototypeClass;
 
   StaticValuesTable* staticValues;
   StaticFunctionsTable* staticFunctions;
@@ -81,6 +88,14 @@ struct OpaqueJSClass {
   JSObjectCallAsConstructorCallback callAsConstructor;
   JSObjectHasInstanceCallback hasInstance;
   JSObjectConvertToTypeCallback convertToType;
+
+ private:
+  OpaqueJSClass();
+  OpaqueJSClass(const OpaqueJSClass&);
+  OpaqueJSClass(const JSClassDefinition*, OpaqueJSClass* protoClass);
+
+  friend void clearReferenceToPrototype(JSObjectRef prototype);
+  KJS::JSObject* cachedPrototype;
 };
 
 #endif  // JSClassRef_h

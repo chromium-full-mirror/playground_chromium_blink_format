@@ -35,7 +35,9 @@ namespace KJS {
 class JSCallbackConstructor : public JSObject {
  public:
   JSCallbackConstructor(ExecState* exec,
+                        JSClassRef jsClass,
                         JSObjectCallAsConstructorCallback callback);
+  virtual ~JSCallbackConstructor();
 
   virtual bool implementsHasInstance() const;
 
@@ -49,6 +51,7 @@ class JSCallbackConstructor : public JSObject {
   JSCallbackConstructor();  // prevent default construction
   JSCallbackConstructor(const JSCallbackConstructor&);
 
+  JSClassRef m_class;
   JSObjectCallAsConstructorCallback m_callback;
 };
 
