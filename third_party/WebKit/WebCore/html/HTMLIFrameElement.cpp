@@ -94,9 +94,7 @@ void HTMLIFrameElement::insertedIntoDocument() {
   if (m_name.isNull())
     m_name = getAttribute(idAttr);
 
-  Frame* parentFrame = document()->frame();
-  if (parentFrame) {
-    parentFrame->page()->incrementFrameCount();
+  if (Frame* parentFrame = document()->frame()) {
     m_name = parentFrame->tree()->uniqueChildName(m_name);
 
     openURL();
@@ -106,7 +104,6 @@ void HTMLIFrameElement::insertedIntoDocument() {
 void HTMLIFrameElement::willRemove() {
   if (Frame* frame = contentFrame()) {
     frame->disconnectOwnerElement();
-    frame->page()->decrementFrameCount();
     frame->frameDetached();
     ASSERT(!contentFrame());
   }
