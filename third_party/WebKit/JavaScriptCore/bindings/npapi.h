@@ -311,7 +311,7 @@ typedef enum {
   NPNVWindowNPObject = 15,
 
   /* Get the NPObject wrapper for the plugins DOM element. */
-  NPNVPluginElementNPObject /* Not implemented in WebKit */
+  NPNVPluginElementNPObject
 
 #ifdef XP_MACOSX
   ,
