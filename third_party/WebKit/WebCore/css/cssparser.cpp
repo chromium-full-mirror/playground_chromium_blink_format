@@ -701,8 +701,8 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
 
     case CSS_PROP_CURSOR:
-      //  [ auto | crosshair | default | pointer | progress | move | e-resize |
-      //  ne-resize |
+      // [<uri>,]*  [ auto | crosshair | default | pointer | progress | move |
+      // e-resize | ne-resize |
       // nw-resize | n-resize | se-resize | sw-resize | s-resize | w-resize |
       // ew-resize |
       // ns-resize | nesw-resize | nwse-resize | col-resize | row-resize | text
@@ -720,7 +720,11 @@ bool CSSParser::parseValue(int propId, bool important) {
                           uri.deprecatedString())
                          .url()),
               styleElement);
-          valueList->next();
+          // FIXME: we don't support fallback cursors yet, but ignoring the
+          // remaining values
+          // will at least let compliant declarations parse.
+          addProperty(propId, parsedValue, important);
+          return true;
         }
       }
       break;
