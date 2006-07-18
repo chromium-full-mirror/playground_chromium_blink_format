@@ -61,7 +61,8 @@ bool editingIgnoresContent(const Node* node) {
 
   if (node->renderer())
     return node->renderer()->isWidget() || node->renderer()->isImage() ||
-           node->renderer()->isHR();
+           node->renderer()->isHR() || node->renderer()->isTextArea() ||
+           node->renderer()->isTextField();
 
   return node->hasTagName(appletTag) || node->hasTagName(embedTag) ||
          node->hasTagName(iframeTag) || node->hasTagName(imgTag) ||
