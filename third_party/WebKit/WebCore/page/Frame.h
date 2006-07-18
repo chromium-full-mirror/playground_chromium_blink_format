@@ -877,6 +877,9 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   bool containsPlugins() const;
 
+  bool prohibitsScrolling() const;
+  void setProhibitsScrolling(const bool);
+
   // split out controller objects
   FrameTree* tree() const;
   SelectionController& selection() const;  // FIXME: Change to pointer?

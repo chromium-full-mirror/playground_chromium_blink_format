@@ -105,7 +105,8 @@ class FramePrivate {
         m_highlightTextMatches(false),
         m_windowHasFocus(false),
         m_inViewSourceMode(false),
-        frameCount(0) {}
+        frameCount(0),
+        m_prohibitsScrolling(false) {}
 
   ~FramePrivate() {
     delete m_extension;
@@ -230,6 +231,8 @@ class FramePrivate {
   bool m_inViewSourceMode;
 
   unsigned frameCount;
+
+  bool m_prohibitsScrolling;
 };
 }
 

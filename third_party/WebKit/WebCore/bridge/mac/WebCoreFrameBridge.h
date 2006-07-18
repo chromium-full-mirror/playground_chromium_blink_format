@@ -567,6 +567,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)setInViewSourceMode:(BOOL)flag;
 - (BOOL)inViewSourceMode;
 
+- (void)setProhibitsScrolling:(BOOL)prohibits;
+
 @end
 
 // The WebCoreFrameBridge protocol contains methods for use by the WebCore side

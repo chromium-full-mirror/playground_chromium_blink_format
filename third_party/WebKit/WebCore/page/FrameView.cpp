@@ -1089,6 +1089,20 @@ void FrameView::setResizingFrameSet(HTMLFrameSetElement* frameSet) {
   d->resizingFrameSet = frameSet;
 }
 
+void FrameView::scrollPointRecursively(int x, int y) {
+  if (frame()->prohibitsScrolling())
+    return;
+
+  ScrollView::scrollPointRecursively(x, y);
+}
+
+void FrameView::setContentsPos(int x, int y) {
+  if (frame()->prohibitsScrolling())
+    return;
+
+  ScrollView::setContentsPos(x, y);
+}
+
 MouseEventWithHitTestResults FrameView::prepareMouseEvent(
     bool readonly,
     bool active,

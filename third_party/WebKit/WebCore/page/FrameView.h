@@ -175,6 +175,9 @@ class FrameView : public ScrollView {
   void updateDashboardRegions();
 #endif
 
+  virtual void scrollPointRecursively(int x, int y);
+  virtual void setContentsPos(int x, int y);
+
   void scheduleEvent(PassRefPtr<Event>,
                      PassRefPtr<EventTargetNode>,
                      bool tempEvent);

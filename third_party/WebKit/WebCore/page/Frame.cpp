@@ -3571,4 +3571,12 @@ bool Frame::containsPlugins() const {
   return d->m_plugins.size() != 0;
 }
 
+bool Frame::prohibitsScrolling() const {
+  return d->m_prohibitsScrolling;
+}
+
+void Frame::setProhibitsScrolling(const bool prohibit) {
+  d->m_prohibitsScrolling = prohibit;
+}
+
 }  // namespace WebCore
