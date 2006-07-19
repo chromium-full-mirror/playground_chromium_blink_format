@@ -211,6 +211,8 @@ class GlobalFuncImp : public InternalFunctionImp {
   int id;
 };
 
+UString escapeStringForPrettyPrinting(const UString& s);
+
 }  // namespace
 
 #endif

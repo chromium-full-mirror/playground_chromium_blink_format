@@ -84,6 +84,10 @@ inline bool isSeparatorSpace(int32_t c) {
   return u_charType(c) == U_SPACE_SEPARATOR;
 }
 
+inline bool isPrintableChar(int32_t c) {
+  return u_isprint(c);
+}
+
 inline CharCategory category(int32_t c) {
   switch (u_charType(c)) {
     case U_NON_SPACING_MARK:
