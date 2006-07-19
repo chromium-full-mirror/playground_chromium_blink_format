@@ -75,7 +75,8 @@ bool editingIgnoresContent(const Node* node) {
 bool canHaveChildrenForEditing(const Node* node) {
   return !node->hasTagName(hrTag) && !node->hasTagName(brTag) &&
          !node->hasTagName(imgTag) && !node->hasTagName(buttonTag) &&
-         !node->hasTagName(objectTag) && !node->isTextNode();
+         !node->hasTagName(objectTag) && !node->hasTagName(iframeTag) &&
+         !node->isTextNode();
 }
 
 // Compare two positions, taking into account the possibility that one or both
@@ -250,6 +251,28 @@ VisiblePosition lastEditablePositionBeforePositionInRoot(
                                : previousVisuallyDistinctCandidate(p);
 
   return VisiblePosition(p);
+}
+
+// Whether or not content before and after this node will collapse onto the same
+// line as it.
+bool isBlock(Node* node) {
+  return node && node->renderer() && !node->renderer()->isInline();
+}
+
+// FIXME: Deploy this in all of the places where
+// enclosingBlockFlow/enclosingBlockFlowOrTableElement are used.
+Node* enclosingBlock(Node* node) {
+  if (isBlock(node))
+    return node;
+
+  while (1) {
+    node = node->parentNode();
+    if (!node)
+      break;
+    if (isBlock(node))
+      return node;
+  }
+  return 0;
 }
 
 Position rangeCompliantEquivalent(const Position& pos) {
