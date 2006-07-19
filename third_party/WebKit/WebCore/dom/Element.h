@@ -29,6 +29,7 @@
 
 #include "Attr.h"
 #include "ScrollBar.h"
+#include "Timer.h"
 
 namespace WebCore {
 
@@ -157,6 +158,7 @@ class Element : public ContainerNode {
   virtual void copyNonAttributeProperties(const Element* source) {}
 
   virtual void attach();
+  virtual void detach();
   virtual RenderStyle* styleForRenderer(RenderObject* parent);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
@@ -176,7 +178,14 @@ class Element : public ContainerNode {
   virtual bool isURLAttribute(Attribute* attr) const;
 
   virtual void focus();
+  virtual void updateFocusAppearance();
   void blur();
+  bool needsFocusAppearanceUpdate() const {
+    return m_needsFocusAppearanceUpdate;
+  }
+  void setNeedsFocusAppearanceUpdate(bool b) {
+    m_needsFocusAppearanceUpdate = b;
+  }
 
 #if !NDEBUG
   virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
@@ -196,6 +205,11 @@ class Element : public ContainerNode {
   void updateId(const AtomicString& oldId, const AtomicString& newId);
 
   virtual void updateStyleAttributeIfNeeded() const {}
+
+  void updateFocusAppearanceTimerFired(Timer<Element>*);
+  void stopUpdateFocusAppearanceTimer();
+  Timer<Element> m_updateFocusAppearanceTimer;
+  bool m_needsFocusAppearanceUpdate;
 
  protected:  // member variables
   mutable RefPtr<NamedAttrMap> namedAttrMap;

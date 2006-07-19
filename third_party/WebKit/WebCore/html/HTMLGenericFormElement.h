@@ -26,6 +26,7 @@
 #ifndef HTML_HTMLGenericFormElementImpl_h
 #define HTML_HTMLGenericFormElementImpl_h
 
+#include "Document.h"
 #include "HTMLElement.h"
 
 namespace WebCore {
@@ -73,6 +74,10 @@ class HTMLGenericFormElement : public HTMLElement {
   bool disabled() const;
   void setDisabled(bool);
 
+  virtual bool supportsFocus() const {
+    return isFocusable() ||
+           (!disabled() && document() && !document()->haveStylesheetsLoaded());
+  }
   virtual bool isFocusable() const;
   virtual bool isKeyboardFocusable() const;
   virtual bool isMouseFocusable() const;
