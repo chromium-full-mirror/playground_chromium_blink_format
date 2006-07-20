@@ -341,7 +341,7 @@ Cursor::Cursor(Image*) {
   notImplemented();
 }
 
-PlatformMouseEvent::PlatformMouseEvent() {
+PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
   notImplemented();
 }
 String WebCore::searchableIndexIntroduction() {

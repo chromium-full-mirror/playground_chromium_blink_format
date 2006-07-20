@@ -53,7 +53,19 @@ enum MouseButton { LeftButton, MiddleButton, RightButton };
 
 class PlatformMouseEvent {
  public:
-  PlatformMouseEvent();  // "current event"
+  static const struct CurrentEventTag {
+  } currentEvent;
+
+  PlatformMouseEvent()
+      : m_button(LeftButton),
+        m_clickCount(0),
+        m_shiftKey(false),
+        m_ctrlKey(false),
+        m_altKey(false),
+        m_metaKey(false) {}
+
+  PlatformMouseEvent(const CurrentEventTag&);
+
   PlatformMouseEvent(const IntPoint& pos,
                      const IntPoint& globalPos,
                      MouseButton button,
