@@ -97,6 +97,9 @@ void EventTargetNode::addEventListener(const AtomicString& eventType,
     type = Document::DOMATTRMODIFIED_LISTENER;
   else if (eventType == DOMCharacterDataModifiedEvent)
     type = Document::DOMCHARACTERDATAMODIFIED_LISTENER;
+  else if (eventType == overflowchangedEvent)
+    type = Document::OVERFLOWCHANGED_LISTENER;
+
   if (type)
     document()->addListenerType(type);
 
