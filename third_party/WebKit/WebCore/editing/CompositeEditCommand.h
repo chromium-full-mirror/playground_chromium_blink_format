@@ -125,6 +125,8 @@ class CompositeEditCommand : public EditCommand {
                       bool preserveSelection = false,
                       bool preserveStyle = true);
 
+  bool breakOutOfEmptyListItem();
+
   DeprecatedValueList<EditCommandPtr> m_cmds;
 };
 
