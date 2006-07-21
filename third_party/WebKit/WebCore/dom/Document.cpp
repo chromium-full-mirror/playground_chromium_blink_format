@@ -283,7 +283,6 @@ Document::Document(DOMImplementation* impl, FrameView* v)
 
   m_styleSelector = new CSSStyleSelector(this, m_usersheet, m_styleSheets.get(),
                                          !inCompatMode());
-  m_windowEventListeners.setAutoDelete(true);
   m_pendingStylesheets = 0;
   m_ignorePendingStylesheets = false;
 
@@ -1364,9 +1363,12 @@ void Document::clear() {
   m_tokenizer = 0;
 
   removeChildren();
-  DeprecatedPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
-  for (; it.current();)
-    m_windowEventListeners.removeRef(it.current());
+
+  RegisteredEventListenerList::iterator end = m_windowEventListeners.end();
+  for (RegisteredEventListenerList::iterator it =
+           m_windowEventListeners.begin();
+       it != end; ++it)
+    m_windowEventListeners.remove(it);
 }
 
 void Document::setURL(const DeprecatedString& url) {
@@ -2254,13 +2256,13 @@ void Document::handleWindowEvent(Event* evt, bool useCapture) {
 
   // if any html event listeners are registered on the window, then dispatch
   // them here
-  DeprecatedPtrList<RegisteredEventListener> listenersCopy =
-      m_windowEventListeners;
-  DeprecatedPtrListIterator<RegisteredEventListener> it(listenersCopy);
-  for (; it.current(); ++it)
-    if (it.current()->eventType() == evt->type() &&
-        it.current()->useCapture() == useCapture)
-      it.current()->listener()->handleEvent(evt, true);
+  RegisteredEventListenerList listenersCopy = m_windowEventListeners;
+  RegisteredEventListenerList::iterator it = listenersCopy.begin();
+
+  for (; it != listenersCopy.end(); ++it)
+    if ((*it)->eventType() == evt->type() &&
+        (*it)->useCapture() == useCapture && !(*it)->removed())
+      (*it)->listener()->handleEvent(evt, true);
 }
 
 void Document::defaultEventHandler(Event* evt) {
@@ -2289,20 +2291,20 @@ void Document::setHTMLWindowEventListener(const AtomicString& eventType,
 
 EventListener* Document::getHTMLWindowEventListener(
     const AtomicString& eventType) {
-  DeprecatedPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
-  for (; it.current(); ++it)
-    if (it.current()->eventType() == eventType &&
-        it.current()->listener()->isHTMLEventListener())
-      return it.current()->listener();
+  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
+  for (; it != m_windowEventListeners.end(); ++it)
+    if ((*it)->eventType() == eventType &&
+        (*it)->listener()->isHTMLEventListener())
+      return (*it)->listener();
   return 0;
 }
 
 void Document::removeHTMLWindowEventListener(const AtomicString& eventType) {
-  DeprecatedPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
-  for (; it.current(); ++it)
-    if (it.current()->eventType() == eventType &&
-        it.current()->listener()->isHTMLEventListener()) {
-      m_windowEventListeners.removeRef(it.current());
+  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
+  for (; it != m_windowEventListeners.end(); ++it)
+    if ((*it)->eventType() == eventType &&
+        (*it)->listener()->isHTMLEventListener()) {
+      m_windowEventListeners.remove(it);
       return;
     }
 }
@@ -2321,22 +2323,20 @@ void Document::removeWindowEventListener(const AtomicString& eventType,
                                          EventListener* listener,
                                          bool useCapture) {
   RegisteredEventListener rl(eventType, listener, useCapture);
-  DeprecatedPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
-  for (; it.current(); ++it)
-    if (*(it.current()) == rl) {
-      m_windowEventListeners.removeRef(it.current());
+  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
+  for (; it != m_windowEventListeners.end(); ++it)
+    if (*(*it) == rl) {
+      m_windowEventListeners.remove(it);
       return;
     }
 }
 
 bool Document::hasWindowEventListener(const AtomicString& eventType) {
-  DeprecatedPtrListIterator<RegisteredEventListener> it(m_windowEventListeners);
-  for (; it.current(); ++it) {
-    if (it.current()->eventType() == eventType) {
+  RegisteredEventListenerList::iterator it = m_windowEventListeners.begin();
+  for (; it != m_windowEventListeners.end(); ++it)
+    if ((*it)->eventType() == eventType) {
       return true;
     }
-  }
-
   return false;
 }
 
