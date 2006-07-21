@@ -3030,7 +3030,7 @@ int RenderObject::caretMinOffset() const {
 }
 
 int RenderObject::caretMaxOffset() const {
-  return 0;
+  return isReplaced() ? 1 : 0;
 }
 
 unsigned RenderObject::caretMaxRenderedOffset() const {
