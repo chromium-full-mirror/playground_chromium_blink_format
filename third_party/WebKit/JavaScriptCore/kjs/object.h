@@ -488,8 +488,7 @@ class JSObject : public JSCell {
   bool getPropertyAttributes(const Identifier& propertyName,
                              unsigned& attributes) const;
 
-  // Returns whether the object should be treated as undefined when doing
-  // equality comparisons
+  // WebCore uses this to make document.all and style.filter undetectable
   virtual bool masqueradeAsUndefined() const { return false; }
 
   // This get function only looks at the property map.

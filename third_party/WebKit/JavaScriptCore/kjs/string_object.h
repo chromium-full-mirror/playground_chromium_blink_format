@@ -54,6 +54,16 @@ class StringInstance : public JSObject {
                               const PropertySlot& slot);
 };
 
+// WebCore uses this to make style.filter undetectable
+class StringInstanceThatMasqueradesAsUndefined : public StringInstance {
+ public:
+  StringInstanceThatMasqueradesAsUndefined(JSObject* proto,
+                                           const UString& string)
+      : StringInstance(proto, string) {}
+  virtual bool masqueradeAsUndefined() const { return true; }
+  virtual bool toBoolean(ExecState*) const { return false; }
+};
+
 /**
  * @internal
  *
