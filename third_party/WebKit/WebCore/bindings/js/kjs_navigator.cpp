@@ -364,7 +364,7 @@ bool Plugins::getOwnPropertySlot(ExecState* exec,
 
 JSValue* MimeTypes::getValueProperty(ExecState* exec, int token) const {
   assert(token == Length);
-  return jsNumber(plugins->size());
+  return jsNumber(mimes->size());
 }
 
 JSValue* MimeTypes::indexGetter(ExecState* exec,
@@ -394,7 +394,7 @@ bool MimeTypes::getOwnPropertySlot(ExecState* exec,
                                    PropertySlot& slot) {
   const HashEntry* entry = Lookup::findEntry(&MimeTypesTable, propertyName);
   if (entry) {
-    slot.setStaticEntry(this, entry, staticValueGetter<Plugins>);
+    slot.setStaticEntry(this, entry, staticValueGetter<MimeTypes>);
     return true;
   } else {
     // mimeTypes[#]
