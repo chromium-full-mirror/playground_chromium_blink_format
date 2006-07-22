@@ -393,7 +393,8 @@ bool RenderThemeWin::paintTextArea(RenderObject* o,
 }
 
 RenderPopupMenu* RenderThemeWin::createPopupMenu(RenderArena* arena,
-                                                 Document* doc) {
-  return new (arena) RenderPopupMenuWin(doc);
+                                                 Document* doc,
+                                                 RenderMenuList* menuList) {
+  return new (arena) RenderPopupMenuWin(doc, menuList);
 }
 }
