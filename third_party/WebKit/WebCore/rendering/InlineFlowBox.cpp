@@ -82,6 +82,8 @@ int InlineFlowBox::getFlowSpacingWidth() {
 }
 
 void InlineFlowBox::addToLine(InlineBox* child) {
+  ASSERT(!child->parent());
+
   if (!m_firstChild)
     m_firstChild = m_lastChild = child;
   else {
@@ -119,6 +121,7 @@ void InlineFlowBox::deleteLine(RenderArena* arena) {
   InlineBox* child = m_firstChild;
   InlineBox* next = 0;
   while (child) {
+    ASSERT(this == child->parent());
     next = child->nextOnLine();
     child->deleteLine(arena);
     child = next;
