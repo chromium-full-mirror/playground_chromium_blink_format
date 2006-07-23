@@ -106,6 +106,9 @@ class RenderView : public RenderBlock {
   void addWidget(RenderObject*);
   void removeWidget(RenderObject*);
 
+  void setFlexBoxInFirstLayout(RenderObject* r) { m_flexBoxInFirstLayout = r; }
+  RenderObject* flexBoxInFirstLayout() { return m_flexBoxInFirstLayout; }
+
  protected:
   FrameView* m_frameView;
 
@@ -126,6 +129,8 @@ class RenderView : public RenderBlock {
   typedef HashSet<RenderObject*> RenderObjectSet;
 
   RenderObjectSet m_widgets;
+
+  RenderObject* m_flexBoxInFirstLayout;
 };
 }
 
