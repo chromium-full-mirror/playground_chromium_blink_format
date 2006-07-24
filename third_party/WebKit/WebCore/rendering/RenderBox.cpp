@@ -912,7 +912,11 @@ void RenderBox::position(InlineBox* box,
       // up underneath
       // the inlines.
       m_staticX = box->xPos();
-    } else if (!wasInline && hasStaticY())
+      setChildNeedsLayout(true, false);  // Just go ahead and mark the
+                                         // positioned object as needing layout,
+                                         // so it will update its position
+                                         // properly.
+    } else if (!wasInline && hasStaticY()) {
       // Our object was a block originally, so we make our normal flow position
       // be
       // just below the line box (as though all the inlines that came before us
@@ -921,6 +925,11 @@ void RenderBox::position(InlineBox* box,
       // been
       // in flow).  This value was cached in the yPos() of the box.
       m_staticY = box->yPos();
+      setChildNeedsLayout(true, false);  // Just go ahead and mark the
+                                         // positioned object as needing layout,
+                                         // so it will update its position
+                                         // properly.
+    }
 
     // Nuke the box.
     box->remove();
