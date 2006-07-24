@@ -64,6 +64,9 @@ using KJS::ExecState;
 - (void)leavingFrame:(WebCoreScriptCallFrame*)frame
             sourceId:(int)sid
                 line:(int)lineno;
+- (void)exceptionRaised:(WebCoreScriptCallFrame*)frame
+               sourceId:(int)sid
+                   line:(int)lineno;
 
 @end
 

@@ -90,6 +90,12 @@ enum { WebScriptGeneralErrorCode = -100 };
                   line:(int)lineno
            forWebFrame:(WebFrame*)webFrame;
 
+// exception is being thrown
+- (void)webView:(WebView*)webView
+    exceptionWasRaised:(WebScriptCallFrame*)frame
+              sourceId:(int)sid
+                  line:(int)lineno
+           forWebFrame:(WebFrame*)webFrame;
 @end
 
 // WebScriptCallFrame interface

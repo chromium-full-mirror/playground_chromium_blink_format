@@ -24,12 +24,16 @@
 #ifndef _KJSDEBUGGER_H_
 #define _KJSDEBUGGER_H_
 
+#include <wtf/HashMap.h>
+#include "protect.h"
+
 namespace KJS {
 
 class DebuggerImp;
 class Interpreter;
 class ExecState;
 class JSObject;
+class JSValue;
 class UString;
 class List;
 
@@ -151,7 +155,9 @@ class Debugger {
   virtual bool exception(ExecState* exec,
                          int sourceId,
                          int lineno,
-                         JSObject* exceptionObj);
+                         JSValue* exception);
+
+  bool hasHandledException(ExecState*, JSValue*);
 
   /**
    * Called when a line of the script is reached (before it is executed)
@@ -223,6 +229,7 @@ class Debugger {
 
  private:
   DebuggerImp* rep;
+  HashMap<Interpreter*, ProtectedPtr<JSValue>> latestExceptions;
 
  public:
   static int debuggersPresent;
