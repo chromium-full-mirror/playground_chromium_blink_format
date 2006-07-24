@@ -154,7 +154,9 @@ class RenderBlock : public RenderFlow {
                       const BidiStatus& endLineStatus,
                       BidiContext* endLineContext,
                       RootInlineBox*& endLine,
-                      int& endYPos);
+                      int& endYPos,
+                      int& repaintBottom,
+                      int& repaintTop);
   int skipWhitespace(BidiIterator&, BidiState&);
   BidiIterator findNextLineBreak(BidiIterator& start, BidiState& info);
   RootInlineBox* constructLine(const BidiIterator& start,
