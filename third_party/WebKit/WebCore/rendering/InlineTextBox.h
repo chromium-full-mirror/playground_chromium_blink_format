@@ -159,6 +159,9 @@ class InlineTextBox : public InlineRunBox {
   int offsetForPosition(int _x, bool includePartialGlyphs = true) const;
   int positionForOffset(int offset) const;
 
+  bool containsCaretOffset(
+      int offset) const;  // false for offset after line break
+
   int m_start;
   unsigned short m_len;
 

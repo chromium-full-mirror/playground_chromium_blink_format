@@ -466,7 +466,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (DOMDocumentFragment*)documentFragmentWithMarkupString:(NSString*)markupString
                                            baseURLString:
                                                (NSString*)baseURLString;
-- (DOMDocumentFragment*)documentFragmentWithText:(NSString*)text;
+- (DOMDocumentFragment*)documentFragmentWithText:(NSString*)text
+                                       inContext:(DOMRange*)context;
 - (DOMDocumentFragment*)documentFragmentWithNodesAsParagraphs:(NSArray*)nodes;
 
 - (void)replaceSelectionWithFragment:(DOMDocumentFragment*)fragment

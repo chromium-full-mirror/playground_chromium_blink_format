@@ -488,7 +488,7 @@ bool Position::inRenderedText() const {
       // not rendered. Return false.
       return false;
     }
-    if (offset() >= box->m_start && offset() <= box->m_start + box->m_len)
+    if (box->containsCaretOffset(offset()))
       // Return false for offsets inside composed characters.
       return offset() == 0 ||
              offset() ==

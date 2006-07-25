@@ -217,6 +217,8 @@ void InsertParagraphSeparatorCommand::doApply() {
   // after the preserved newline, causing the newline to be turned into a nbsp.
   if (leadingWhitespace.isNotNull()) {
     Text* textNode = static_cast<Text*>(leadingWhitespace.node());
+    ASSERT(!textNode->renderer() ||
+           textNode->renderer()->style()->collapseWhiteSpace());
     replaceTextInNode(textNode, leadingWhitespace.offset(), 1,
                       nonBreakingSpaceString());
   }
@@ -292,7 +294,10 @@ void InsertParagraphSeparatorCommand::doApply() {
     pos = Position(startNode, 0);
     if (!pos.isRenderedCharacter()) {
       // Clear out all whitespace and insert one non-breaking space
-      ASSERT(startNode && startNode->isTextNode());
+      ASSERT(startNode);
+      ASSERT(startNode->isTextNode());
+      ASSERT(!startNode->renderer() ||
+             startNode->renderer()->style()->collapseWhiteSpace());
       deleteInsignificantTextDownstream(pos);
       insertTextIntoNode(static_cast<Text*>(startNode), 0,
                          nonBreakingSpaceString());
