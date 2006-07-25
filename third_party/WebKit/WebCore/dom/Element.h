@@ -73,8 +73,8 @@ class Element : public ContainerNode {
                       const String& value,
                       ExceptionCode&);
 
-  void scrollIntoView(bool alignToTop);
-  void scrollIntoViewIfNeeded(bool centerIfNeeded);
+  void scrollIntoView(bool alignToTop = true);
+  void scrollIntoViewIfNeeded(bool centerIfNeeded = true);
 
   void scrollByUnits(int units, ScrollGranularity granularity);
   void scrollByLines(int lines);
