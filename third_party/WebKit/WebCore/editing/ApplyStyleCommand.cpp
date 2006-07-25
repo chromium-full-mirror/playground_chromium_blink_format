@@ -619,23 +619,28 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
   updateLayout();
 
   Node* node = start.node();
+  Node* endNode = end.node();
+
   if (start.offset() >= start.node()->caretMaxOffset())
     node = node->traverseNextNode();
 
-  if (start.node() == end.node()) {
+  if (end.node()->renderer()->isTable() &&
+      end.offset() == maxDeepOffset(end.node()))
+    endNode = end.node()->lastDescendant();
+
+  if (start.node() == endNode) {
     addInlineStyleIfNeeded(style, node, node);
   } else {
     while (1) {
       if (node->childNodeCount() == 0 && node->renderer() &&
-          node->renderer()->isInline()) {
+          node->renderer()->isInline() && node->isContentRichlyEditable()) {
         Node* runStart = node;
         while (1) {
           Node* next = node->traverseNextNode();
           // Break if node is the end node, or if the next node does not fit in
           // with
           // the current group.
-          if (node == end.node() ||
-              runStart->parentNode() != next->parentNode() ||
+          if (node == endNode || runStart->parentNode() != next->parentNode() ||
               (next->isElementNode() && !next->hasTagName(brTag)) ||
               (next->renderer() && !next->renderer()->isInline()))
             break;
@@ -644,7 +649,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
         // Now apply style to the run we found.
         addInlineStyleIfNeeded(style, runStart, node);
       }
-      if (node == end.node())
+      if (node == endNode)
         break;
       node = node->traverseNextNode();
     }
