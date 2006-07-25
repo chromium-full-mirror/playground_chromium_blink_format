@@ -46,12 +46,12 @@
   BOOL reachedTerminalState;
   BOOL loadingMultipartContent;
   BOOL signalledFinish;
+  BOOL cancelledFlag;
+  id identifier;
  @private
   NSURLResponse* response;
-  id identifier;
   NSURLAuthenticationChallenge* currentConnectionChallenge;
   NSURLAuthenticationChallenge* currentWebChallenge;
-  BOOL cancelledFlag;
   BOOL defersCallbacks;
   BOOL waitingToDeliverResource;
   BOOL deliveredResource;
