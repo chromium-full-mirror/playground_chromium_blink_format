@@ -312,6 +312,7 @@ backforward list.
 - (void)_insertNewlineInQuotedContent;
 - (BOOL)_selectWordBeforeMenuEvent;
 - (void)_setSelectWordBeforeMenuEvent:(BOOL)flag;
+- (void)_replaceSelectionWithNode:(DOMNode*)node matchStyle:(BOOL)matchStyle;
 @end
 
 @interface _WebSafeForwarder : NSObject {

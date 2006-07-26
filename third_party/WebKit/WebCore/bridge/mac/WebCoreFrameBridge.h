@@ -476,7 +476,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                           matchStyle:(BOOL)matchStyle;
 - (void)replaceSelectionWithNode:(DOMNode*)node
                selectReplacement:(BOOL)selectReplacement
-                    smartReplace:(BOOL)smartReplace;
+                    smartReplace:(BOOL)smartReplace
+                      matchStyle:(BOOL)matchStyle;
 - (void)replaceSelectionWithMarkupString:(NSString*)markupString
                            baseURLString:(NSString*)baseURLString
                        selectReplacement:(BOOL)selectReplacement
