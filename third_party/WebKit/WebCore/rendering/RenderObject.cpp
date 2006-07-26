@@ -1951,8 +1951,8 @@ DeprecatedString RenderObject::information() const {
        << ")";
     if (isTableCell()) {
       const RenderTableCell* cell = static_cast<const RenderTableCell*>(this);
-      ts << " [r=" << cell->row() << " c=" + cell->col()
-         << " rs=" + cell->rowSpan() << " cs=" + cell->colSpan() << "]";
+      ts << " [r=" << cell->row() << " c=" << cell->col()
+         << " rs=" << cell->rowSpan() << " cs=" << cell->colSpan() << "]";
     }
   }
   return str;
