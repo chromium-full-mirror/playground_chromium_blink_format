@@ -76,6 +76,10 @@
 #include "kjs_window.h"
 #include <math.h>
 
+#if SVG_SUPPORT
+#include "SVGDocument.h"
+#endif
+
 #include "kjs_html.lut.h"
 
 using namespace WebCore;
@@ -625,6 +629,8 @@ DontDelete|ReadOnly
   declare         KJS::JSHTMLElement::ObjectDeclare         DontDelete
   height          KJS::JSHTMLElement::ObjectHeight          DontDelete
   hspace          KJS::JSHTMLElement::ObjectHspace          DontDelete
+  getSVGDocument  KJS::JSHTMLElement::ObjectGetSVGDocument  DontDelete|Function
+0
   name            KJS::JSHTMLElement::ObjectName            DontDelete
   standby         KJS::JSHTMLElement::ObjectStandby         DontDelete
   tabIndex        KJS::JSHTMLElement::ObjectTabIndex        DontDelete
@@ -636,6 +642,7 @@ DontDelete|ReadOnly
 @begin HTMLEmbedElementTable 6
   align         KJS::JSHTMLElement::EmbedAlign           DontDelete
   height        KJS::JSHTMLElement::EmbedHeight          DontDelete
+  getSVGDocument KJS::JSHTMLElement::EmbedGetSVGDocument DontDelete|Function 0
   name          KJS::JSHTMLElement::EmbedName            DontDelete
   src           KJS::JSHTMLElement::EmbedSrc             DontDelete
   type          KJS::JSHTMLElement::EmbedType            DontDelete
@@ -957,7 +964,7 @@ JSValue* JSHTMLElement::objectGetter(ExecState* exec, int token) const {
     case ObjectHeight:
       return jsString(object.height());
     case ObjectHspace:
-      return jsString(object.hspace());
+      return jsNumber(object.hspace());
     case ObjectName:
       return jsString(object.name());
     case ObjectStandby:
@@ -969,7 +976,7 @@ JSValue* JSHTMLElement::objectGetter(ExecState* exec, int token) const {
     case ObjectUseMap:
       return jsString(object.useMap());
     case ObjectVspace:
-      return jsString(object.vspace());
+      return jsNumber(object.vspace());
     case ObjectWidth:
       return jsString(object.width());
   }
@@ -1459,6 +1466,21 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
       return jsUndefined();
     }
   }
+#if SVG_SUPPORT
+  else if (element.hasLocalName(objectTag)) {
+    HTMLObjectElement& object = static_cast<HTMLObjectElement&>(element);
+    if (id == JSHTMLElement::ObjectGetSVGDocument)
+      return checkNodeSecurity(exec, object.getSVGDocument(exception))
+                 ? toJS(exec, object.getSVGDocument(exception))
+                 : jsUndefined();
+  } else if (element.hasLocalName(embedTag)) {
+    HTMLEmbedElement& embed = static_cast<HTMLEmbedElement&>(element);
+    if (id == JSHTMLElement::EmbedGetSVGDocument)
+      return checkNodeSecurity(exec, embed.getSVGDocument(exception))
+                 ? toJS(exec, embed.getSVGDocument(exception))
+                 : jsUndefined();
+  }
+#endif
 
   return jsUndefined();
 }
@@ -1599,7 +1621,7 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectHspace: {
-      object.setHspace(str);
+      object.setHspace(value->toInt32(exec));
       return;
     }
     case ObjectName: {
@@ -1623,7 +1645,7 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectVspace: {
-      object.setVspace(str);
+      object.setVspace(value->toInt32(exec));
       return;
     }
     case ObjectWidth: {

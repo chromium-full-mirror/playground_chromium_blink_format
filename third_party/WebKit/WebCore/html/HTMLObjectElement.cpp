@@ -25,6 +25,7 @@
 #include "HTMLObjectElement.h"
 
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "Frame.h"
 #include "HTMLFormElement.h"
 #include "HTMLDocument.h"
@@ -37,18 +38,22 @@
 #include "Text.h"
 #include "csshelper.h"
 
+#if SVG_SUPPORT
+#include "SVGDocument.h"
+#endif
+
 namespace WebCore {
 
 using namespace EventNames;
 using namespace HTMLNames;
 
 HTMLObjectElement::HTMLObjectElement(Document* doc)
-    : HTMLPlugInElement(objectTag, doc), m_imageLoader(0) {
-  needWidgetUpdate = false;
-  m_useFallbackContent = false;
-  m_complete = false;
-  m_docNamedItem = true;
-}
+    : HTMLPlugInElement(objectTag, doc),
+      needWidgetUpdate(false),
+      m_useFallbackContent(false),
+      m_imageLoader(0),
+      m_complete(false),
+      m_docNamedItem(true) {}
 
 HTMLObjectElement::~HTMLObjectElement() {
 #if PLATFORM(MAC)
@@ -149,7 +154,21 @@ void HTMLObjectElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 Document* HTMLObjectElement::contentDocument() const {
-  // ###
+  // FIXME: The frame loading code should be moved out of the render tree
+  // and into the DOM.  Once that happens, this function should look more like
+  // HTMLFrameElement::contentDocument() and not depend on the renderer.
+  RenderObject* object = renderer();
+  if (object && object->isWidget()) {
+    RenderWidget* renderWidget = static_cast<RenderWidget*>(object);
+    if (renderWidget) {
+      Widget* widget = renderWidget->widget();
+      if (widget && widget->isFrameView()) {
+        FrameView* frameView = static_cast<FrameView*>(widget);
+        if (frameView->frame())
+          return frameView->frame()->document();
+      }
+    }
+  }
   return 0;
 }
 
@@ -157,6 +176,8 @@ bool HTMLObjectElement::rendererIsNeeded(RenderStyle* style) {
   if (m_useFallbackContent || isImageType())
     return HTMLPlugInElement::rendererIsNeeded(style);
 
+  // FIXME: This check is WRONG.  We should check the content before disabling,
+  // or do so at a later stage.
   Frame* frame = document()->frame();
   if (!frame || !frame->pluginsEnabled())
     return false;
@@ -393,12 +414,12 @@ void HTMLObjectElement::setDeclare(bool declare) {
   setAttribute(declareAttr, declare ? "" : 0);
 }
 
-String HTMLObjectElement::hspace() const {
-  return getAttribute(hspaceAttr);
+int HTMLObjectElement::hspace() const {
+  return getAttribute(hspaceAttr).toInt();
 }
 
-void HTMLObjectElement::setHspace(const String& value) {
-  setAttribute(hspaceAttr, value);
+void HTMLObjectElement::setHspace(int value) {
+  setAttribute(hspaceAttr, String::number(value));
 }
 
 String HTMLObjectElement::standby() const {
@@ -433,11 +454,22 @@ void HTMLObjectElement::setUseMap(const String& value) {
   setAttribute(usemapAttr, value);
 }
 
-String HTMLObjectElement::vspace() const {
-  return getAttribute(vspaceAttr);
+int HTMLObjectElement::vspace() const {
+  return getAttribute(vspaceAttr).toInt();
 }
 
-void HTMLObjectElement::setVspace(const String& value) {
-  setAttribute(vspaceAttr, value);
+void HTMLObjectElement::setVspace(int value) {
+  setAttribute(vspaceAttr, String::number(value));
 }
+
+#if SVG_SUPPORT
+SVGDocument* HTMLObjectElement::getSVGDocument(ExceptionCode& ec) const {
+  Document* doc = contentDocument();
+  if (doc && doc->isSVGDocument())
+    return static_cast<SVGDocument*>(doc);
+  // Spec: http://www.w3.org/TR/SVG/struct.html#InterfaceGetSVGDocument
+  ec = NOT_SUPPORTED_ERR;
+  return 0;
+}
+#endif
 }

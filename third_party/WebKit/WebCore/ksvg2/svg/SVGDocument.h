@@ -37,6 +37,8 @@ class SVGDocument : public Document {
   SVGDocument(SVGDOMImplementation* i, FrameView* view);
   virtual ~SVGDocument();
 
+  virtual bool isSVGDocument() const { return true; }
+
   SVGSVGElement* rootElement() const;
 
   void dispatchZoomEvent(float prevScale, float newScale);

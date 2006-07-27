@@ -41,6 +41,9 @@ namespace WebCore {
 
 class HTMLFormElement;
 class HTMLImageLoader;
+#if SVG_SUPPORT
+class SVGDocument;
+#endif
 
 class HTMLObjectElement : public HTMLPlugInElement {
  public:
@@ -59,7 +62,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  virtual void recalcStyle(StyleChange ch);
+  virtual void recalcStyle(StyleChange);
   virtual void childrenChanged();
 
   virtual bool isURLAttribute(Attribute*) const;
@@ -97,8 +100,8 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
   HTMLFormElement* form() const;
 
-  String hspace() const;
-  void setHspace(const String&);
+  int hspace() const;
+  void setHspace(int);
 
   String standby() const;
   void setStandby(const String&);
@@ -112,13 +115,17 @@ class HTMLObjectElement : public HTMLPlugInElement {
   String useMap() const;
   void setUseMap(const String&);
 
-  String vspace() const;
-  void setVspace(const String&);
+  int vspace() const;
+  void setVspace(int);
 
   bool isComplete() const { return m_complete; }
   void setComplete(bool complete);
 
   bool isDocNamedItem() const { return m_docNamedItem; }
+
+#if SVG_SUPPORT
+  SVGDocument* getSVGDocument(ExceptionCode&) const;
+#endif
 
   DeprecatedString serviceType;
   DeprecatedString url;
