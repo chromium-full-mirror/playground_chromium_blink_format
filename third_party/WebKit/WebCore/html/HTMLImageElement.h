@@ -80,8 +80,8 @@ class HTMLImageElement : public HTMLElement {
   String alt() const;
   void setAlt(const String&);
 
-  int border() const;
-  void setBorder(int);
+  String border() const;
+  void setBorder(const String&);
 
   void setHeight(int);
 

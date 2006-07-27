@@ -48,11 +48,11 @@ void HTMLBaseFontElement::setFace(const String& value) {
   setAttribute(faceAttr, value);
 }
 
-String HTMLBaseFontElement::size() const {
-  return getAttribute(sizeAttr);
+int HTMLBaseFontElement::size() const {
+  return getAttribute(sizeAttr).toInt();
 }
 
-void HTMLBaseFontElement::setSize(const String& value) {
-  setAttribute(sizeAttr, value);
+void HTMLBaseFontElement::setSize(int value) {
+  setAttribute(sizeAttr, String::number(value));
 }
 }

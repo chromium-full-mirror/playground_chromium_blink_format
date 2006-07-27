@@ -41,8 +41,8 @@ class HTMLBaseFontElement : public HTMLElement {
   String face() const;
   void setFace(const String&);
 
-  String size() const;
-  void setSize(const String&);
+  int size() const;
+  void setSize(int);
 };
 
 }  // namespace
