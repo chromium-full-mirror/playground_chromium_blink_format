@@ -92,11 +92,7 @@ class RenderText : public RenderObject {
   unsigned stringLength() const {
     return str->length();
   }  // non virtual implementation of length()
-  virtual void position(InlineBox* box,
-                        int from,
-                        int len,
-                        bool reverse,
-                        bool override);
+  virtual void position(InlineBox*);
 
   virtual unsigned width(unsigned from,
                          unsigned len,

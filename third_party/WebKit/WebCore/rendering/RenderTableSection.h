@@ -49,7 +49,7 @@ class RenderTableSection : public RenderContainer {
   virtual bool isTableSection() const { return true; }
 
   virtual short lineHeight(bool) const { return 0; }
-  virtual void position(int, int, int, int, int, bool, bool, int) {}
+  virtual void position(InlineBox*) {}
 
 #ifndef NDEBUG
   virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
