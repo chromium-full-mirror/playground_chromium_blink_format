@@ -57,8 +57,6 @@ class SVGLineElement : public SVGStyledTransformableElement,
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);
 
-  virtual bool hasPercentageValues() const;
-
  private:
   mutable RefPtr<SVGAnimatedLength> m_x1;
   mutable RefPtr<SVGAnimatedLength> m_y1;

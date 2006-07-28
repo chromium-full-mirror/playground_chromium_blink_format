@@ -80,8 +80,6 @@ class RenderPath : public RenderObject {
                            int ty,
                            HitTestAction);
 
-  bool hasPercentageValues() const;
-
  protected:
   virtual void drawMarkersIfNeeded(GraphicsContext*,
                                    const FloatRect&,

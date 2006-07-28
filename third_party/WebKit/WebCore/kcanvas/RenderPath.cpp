@@ -273,10 +273,6 @@ bool RenderPath::nodeAtPoint(NodeInfo& info,
   }
   return false;
 }
-
-bool RenderPath::hasPercentageValues() const {
-  return static_cast<SVGStyledElement*>(element())->hasPercentageValues();
-}
 }
 
 // vim:ts=4:noet
