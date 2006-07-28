@@ -64,9 +64,6 @@ class SVGImageElement : public SVGStyledTransformableElement,
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
- protected:
-  virtual bool haveLoadedRequiredResources();
-
  private:
   mutable RefPtr<SVGAnimatedLength> m_x;
   mutable RefPtr<SVGAnimatedLength> m_y;

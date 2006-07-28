@@ -63,6 +63,11 @@ class SVGElement : public StyledElement {
   // Internal
   virtual void parseMappedAttribute(MappedAttribute*);
 
+  // To be implemented by any element which can establish new viewports...
+  virtual DeprecatedString adjustViewportClipping() const {
+    return DeprecatedString::null;
+  }
+
   virtual bool isStyled() const { return false; }
   virtual bool isStyledTransformable() const { return false; }
   virtual bool isStyledLocatable() const { return false; }
@@ -73,19 +78,23 @@ class SVGElement : public StyledElement {
   // For SVGTests
   virtual bool isValid() const { return true; }
 
-  virtual void closeRenderer();
+  virtual void closeRenderer() { m_closed = true; }
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual bool childShouldCreateRenderer(Node*) const;
 
-  void sendSVGLoadEventIfPossible(bool sendParentLoadEvents = false);
+  // helper:
+  bool isClosed() const { return m_closed; }
 
- protected:
-  void addSVGEventListener(const AtomicString& eventType, const Attribute*);
-  virtual bool haveLoadedRequiredResources();
+ private:
+  bool m_closed;
+  void addSVGEventListener(const AtomicString& eventType,
+                           const Attribute* attr);
+};
 };
 
+namespace WebCore {
 static inline SVGElement* svg_dynamic_cast(Node* node) {
-  SVGElement* svgElement = 0;
+  SVGElement* svgElement = NULL;
   if (node && node->isSVGElement())
     svgElement = static_cast<SVGElement*>(node);
   return svgElement;
