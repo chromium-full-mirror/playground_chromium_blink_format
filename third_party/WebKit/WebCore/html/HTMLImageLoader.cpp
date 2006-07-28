@@ -100,10 +100,10 @@ void HTMLImageLoader::updateFromElement() {
 }
 
 void HTMLImageLoader::dispatchLoadEvent() {
-  if (!m_firedLoad && m_image) {
-    m_firedLoad = true;
+  if (!haveFiredLoadEvent() && image()) {
+    setHaveFiredLoadEvent(true);
     element()->dispatchHTMLEvent(
-        m_image->isErrorImage() ? errorEvent : loadEvent, false, false);
+        image()->isErrorImage() ? errorEvent : loadEvent, false, false);
   }
 }
 

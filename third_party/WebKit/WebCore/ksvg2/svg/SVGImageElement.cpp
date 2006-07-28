@@ -29,6 +29,7 @@
 #include "CSSPropertyNames.h"
 #include "KCanvasRenderingStyle.h"
 #include "RenderSVGImage.h"
+#include "SVGAnimatedBoolean.h"
 #include "SVGAnimatedLength.h"
 #include "SVGAnimatedPreserveAspectRatio.h"
 #include "SVGAnimatedString.h"
@@ -112,6 +113,11 @@ void SVGImageElement::parseMappedAttribute(MappedAttribute* attr) {
 RenderObject* SVGImageElement::createRenderer(RenderArena* arena,
                                               RenderStyle* style) {
   return new (arena) RenderSVGImage(this);
+}
+
+bool SVGImageElement::haveLoadedRequiredResources() {
+  return (!externalResourcesRequired()->baseVal() ||
+          m_imageLoader.imageComplete());
 }
 
 void SVGImageElement::attach() {
