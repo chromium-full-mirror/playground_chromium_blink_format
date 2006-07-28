@@ -71,6 +71,8 @@ class SVGStyledElement : public SVGElement {
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);
 
+  virtual bool hasPercentageValues() const { return false; }
+
  protected:
   void updateCanvasItem();  // Handles "path data" object changes... (not for
                             // style/transform!)

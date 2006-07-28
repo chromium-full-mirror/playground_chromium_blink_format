@@ -56,6 +56,8 @@ class SVGCircleElement : public SVGStyledTransformableElement,
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);
 
+  virtual bool hasPercentageValues() const;
+
  private:
   mutable RefPtr<SVGAnimatedLength> m_cx;
   mutable RefPtr<SVGAnimatedLength> m_cy;

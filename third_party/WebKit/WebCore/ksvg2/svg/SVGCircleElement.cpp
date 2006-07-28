@@ -94,5 +94,14 @@ const SVGStyledElement* SVGCircleElement::pushAttributeContext(
   return restore;
 }
 
+bool SVGCircleElement::hasPercentageValues() const {
+  if (cx()->baseVal()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
+      cy()->baseVal()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
+      r()->baseVal()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE)
+    return true;
+
+  return false;
+}
+
 // vim:ts=4:noet
 #endif  // SVG_SUPPORT
