@@ -310,8 +310,10 @@ void Element::setAttribute(const String& name,
     return;
   }
 
+  String localName = inHTMLDocument(this) ? name.lower() : name;
+
   // allocate attributemap if necessary
-  Attribute* old = attributes(false)->getAttributeItem(name);
+  Attribute* old = attributes(false)->getAttributeItem(localName);
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
   if (namedAttrMap->isReadOnlyNode()) {
@@ -321,8 +323,6 @@ void Element::setAttribute(const String& name,
 
   if (inDocument())
     document()->incDOMTreeVersion();
-
-  String localName = inHTMLDocument(this) ? name.lower() : name;
 
   if (localName == idAttr.localName())
     updateId(old ? old->value() : nullAtom, value);
