@@ -38,7 +38,8 @@ class SVGTitleElement : public SVGStyledElement, public SVGLangSpace {
   virtual void removedFromDocument();
   virtual void childrenChanged();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

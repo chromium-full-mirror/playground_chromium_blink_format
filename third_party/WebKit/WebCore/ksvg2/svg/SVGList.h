@@ -28,6 +28,7 @@
 #include <ksvg2/svg/SVGStyledElement.h>
 
 namespace WebCore {
+
 template <class T>
 class SVGList : public DOMList<T> {
  public:
@@ -80,9 +81,10 @@ class SVGList : public DOMList<T> {
  protected:
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGList_H
 
 // vim:ts=4:noet

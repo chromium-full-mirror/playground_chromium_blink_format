@@ -55,7 +55,8 @@ class SVGPoint : public Shared<SVGPoint> {
 
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

@@ -59,6 +59,7 @@ typedef unsigned long long uint64_t;
     Group.access()->Variable = Value;
 
 namespace WebCore {
+
 class SVGRenderStyle : public Shared<SVGRenderStyle> {
  public:
   SVGRenderStyle();
@@ -329,9 +330,10 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
     svg_noninherited_flags.f._dominantBaseline = initialDominantBaseline();
   }
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGRenderStyle_H
 
 // vim:ts=4:noet

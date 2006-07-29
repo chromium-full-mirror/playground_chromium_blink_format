@@ -24,20 +24,21 @@
 #define KSVG_SVGStyledElementImpl_H
 #if SVG_SUPPORT
 
+#include "AffineTransform.h"
+#include "RenderStyle.h"
 #include "SVGElement.h"
 #include "SVGStylable.h"
-
-#include "AffineTransform.h"
 #include <kcanvas/KCanvasPath.h>
-#include "RenderStyle.h"
 
 namespace WebCore {
-class RenderPath;
-class KRenderingDevice;
-class KCanvasResource;
-class KCanvasRenderingStyle;
+
 class CSSStyleDeclaration;
+class KCanvasRenderingStyle;
+class KCanvasResource;
+class KRenderingDevice;
+class RenderPath;
 class RenderView;
+
 class SVGStyledElement : public SVGElement {
  public:
   SVGStyledElement(const QualifiedName&, Document*);
@@ -51,14 +52,14 @@ class SVGStyledElement : public SVGElement {
   // These need to be implemented.
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual KCanvasPath* toPathData() const { return 0; }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual KCanvasResource* canvasResource() { return 0; }
 
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   RenderView* view() const;
   virtual void notifyAttributeChange() const;
-  virtual void attributeChanged(Attribute* attr, bool preserveDecls = false);
+  virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
   // Imagine we're a <rect> inside of a <pattern> section with
   // patternContentUnits="objectBoundingBox"
@@ -82,9 +83,10 @@ class SVGStyledElement : public SVGElement {
   // Optimized updating logic
   bool m_updateVectorial : 1;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGStyledElementImpl_H
 
 // vim:ts=4:noet

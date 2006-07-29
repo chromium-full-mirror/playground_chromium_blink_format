@@ -44,6 +44,7 @@
   static Data initial##Type() { return Initial; }
 
 namespace WebCore {
+
 enum EWindRule { WR_NONZERO = 0, WR_EVENODD = 1 };
 
 enum ECapStyle { CS_BUTT = 1, CS_ROUND = 2, CS_SQUARE = 3 };
@@ -244,9 +245,10 @@ class StyleMiscData : public Shared<StyleMiscData> {
  private:
   StyleMiscData& operator=(const StyleMiscData&);
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGRenderStyleDefs_H
 
 // vim:ts=4:noet

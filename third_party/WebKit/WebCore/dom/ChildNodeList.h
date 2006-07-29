@@ -31,7 +31,7 @@ namespace WebCore {
 
 class ChildNodeList : public NodeList {
  public:
-  ChildNodeList(Node* n);
+  ChildNodeList(Node*);
 
   virtual unsigned length() const;
   virtual Node* item(unsigned index) const;
@@ -40,5 +40,6 @@ class ChildNodeList : public NodeList {
   virtual bool nodeMatches(Node* testNode) const;
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // DOM_ChildNodeListImpl_h

@@ -27,11 +27,9 @@
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
-class StringImpl;
-class MappedAttribute;
-};
 
-namespace WebCore {
+class MappedAttribute;
+class StringImpl;
 class SVGStringList;
 
 class SVGTests {
@@ -55,9 +53,10 @@ class SVGTests {
   mutable RefPtr<SVGStringList> m_extensions;
   mutable RefPtr<SVGStringList> m_systemLanguage;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGTestsImpl_H
 
 // vim:ts=4:noet

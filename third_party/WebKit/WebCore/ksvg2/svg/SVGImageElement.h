@@ -73,7 +73,8 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
   SVGImageLoader m_imageLoader;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

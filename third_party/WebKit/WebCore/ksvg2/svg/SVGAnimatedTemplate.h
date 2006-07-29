@@ -27,6 +27,7 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
+
 // SVGAnimatedTemplate
 // - lazy creation of baseVal/animVal
 //   (no more waste of mostly unused animVal variable!)
@@ -89,9 +90,10 @@ class SVGAnimatedTemplate : public Shared<SVGAnimatedTemplate<T>> {
   mutable RefPtr<T> m_baseVal;
   mutable RefPtr<T> m_animVal;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAnimatedTemplate_H
 
 // vim:ts=4:noet

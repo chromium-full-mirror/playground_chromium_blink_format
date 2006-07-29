@@ -24,14 +24,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "JSCallbackObject.h"
+
 #include "APICast.h"
 #include "JSCallbackFunction.h"
-#include "JSCallbackObject.h"
-#include "JSStringRef.h"
 #include "JSClassRef.h"
 #include "JSObjectRef.h"
-#include "internal.h"
+#include "JSStringRef.h"
 #include "PropertyNameArray.h"
+#include "internal.h"
+#include <wtf/Vector.h>
 
 namespace KJS {
 
@@ -245,7 +247,7 @@ JSObject* JSCallbackObject::construct(ExecState* exec, const List& args) {
     if (JSObjectCallAsConstructorCallback callAsConstructor =
             jsClass->callAsConstructor) {
       size_t argumentCount = args.size();
-      JSValueRef arguments[argumentCount];
+      Vector<JSValueRef, 16> arguments(argumentCount);
       for (size_t i = 0; i < argumentCount; i++)
         arguments[i] = toRef(args[i]);
       return toJS(callAsConstructor(execRef, thisRef, argumentCount, arguments,
@@ -297,7 +299,7 @@ JSValue* JSCallbackObject::callAsFunction(ExecState* exec,
     if (JSObjectCallAsFunctionCallback callAsFunction =
             jsClass->callAsFunction) {
       size_t argumentCount = args.size();
-      JSValueRef arguments[argumentCount];
+      Vector<JSValueRef, 16> arguments(argumentCount);
       for (size_t i = 0; i < argumentCount; i++)
         arguments[i] = toRef(args[i]);
       return toJS(callAsFunction(execRef, thisRef, thisObjRef, argumentCount,

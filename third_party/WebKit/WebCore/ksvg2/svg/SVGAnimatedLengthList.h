@@ -37,7 +37,8 @@ class SVGAnimatedLengthList : public SVGAnimatedTemplate<SVGLengthList> {
   virtual SVGLengthList* create() const;
   // virtual void assign(SVGLengthList *src, SVGLengthList *dst) const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

@@ -129,7 +129,7 @@ Field* JavaClass::fieldNamed(const char* name, Instance*) const {
   Field* aField = (Field*)CFDictionaryGetValue(_fields, fieldName);
   CFRelease(fieldName);
   return aField;
-};
+}
 
 bool JavaClass::isNumberClass() const {
   return ((strcmp(_name, "java.lang.Byte") == 0 ||

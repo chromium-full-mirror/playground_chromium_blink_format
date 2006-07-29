@@ -27,6 +27,7 @@
 #include "SVGAnimationElement.h"
 
 namespace WebCore {
+
 class SVGAnimateColorElement : public SVGAnimationElement {
  public:
   SVGAnimateColorElement(const QualifiedName&, Document*);
@@ -54,9 +55,10 @@ class SVGAnimateColorElement : public SVGAnimationElement {
   int m_greenDiff;
   int m_blueDiff;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAnimateColorElementImpl_H
 
 // vim:ts=4:noet

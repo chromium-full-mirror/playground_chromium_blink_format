@@ -50,7 +50,8 @@ class SVGSwitchElement : public SVGStyledTransformableElement,
  private:
   mutable bool m_insideRenderSection;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

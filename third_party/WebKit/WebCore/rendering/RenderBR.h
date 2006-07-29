@@ -24,16 +24,14 @@
 
 #include "RenderText.h"
 
-namespace WebCore {
-class Position;
-};
-
 /*
  * The whole class here is a hack to get <br> working, as long as we don't have
  * support for
  * CSS2 :before and :after pseudo elements
  */
 namespace WebCore {
+
+class Position;
 
 class RenderBR : public RenderText {
  public:
@@ -44,23 +42,23 @@ class RenderBR : public RenderText {
 
   virtual IntRect selectionRect() { return IntRect(); }
 
-  virtual unsigned int width(unsigned int from,
-                             unsigned int len,
-                             const Font* f,
-                             int xpos) const {
+  virtual unsigned width(unsigned /*from*/,
+                         unsigned /*len*/,
+                         const Font*,
+                         int /*xpos*/) const {
     return 0;
   }
-  virtual unsigned int width(unsigned int from,
-                             unsigned int len,
-                             int xpos,
-                             bool firstLine = false) const {
+  virtual unsigned width(unsigned /*from*/,
+                         unsigned /*len*/,
+                         int /*xpos*/,
+                         bool /*firstLine = false*/) const {
     return 0;
   }
 
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
   virtual short baselinePosition(bool firstLine,
                                  bool isRootLineBox = false) const;
-  virtual void setStyle(RenderStyle* _style);
+  virtual void setStyle(RenderStyle*);
 
   // overrides
   virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
@@ -78,6 +76,7 @@ class RenderBR : public RenderText {
  private:
   mutable short m_lineHeight;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RENDER_BR_H

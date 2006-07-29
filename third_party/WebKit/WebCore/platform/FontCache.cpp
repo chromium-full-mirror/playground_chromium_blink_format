@@ -28,9 +28,10 @@
 
 #include "config.h"
 #include "FontCache.h"
-#include "FontPlatformData.h"
+
 #include "Font.h"
 #include "FontFallbackList.h"
+#include "FontPlatformData.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 
@@ -247,4 +248,5 @@ const FontData* FontCache::getFontData(const Font& font, int& familyIndex) {
   // Now that we have a result, we need to go from FontPlatformData -> FontData.
   return getCachedFontData(result);
 }
-}
+
+}  // namespace WebCore

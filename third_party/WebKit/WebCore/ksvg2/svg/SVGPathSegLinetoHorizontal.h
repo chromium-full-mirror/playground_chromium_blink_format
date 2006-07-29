@@ -62,7 +62,8 @@ class SVGPathSegLinetoHorizontalRel : public SVGPathSeg {
  private:
   double m_x;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

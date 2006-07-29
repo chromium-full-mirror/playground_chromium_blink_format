@@ -30,7 +30,8 @@ class SVGFEDistantLightElement : public SVGFELightElement {
   virtual ~SVGFEDistantLightElement();
   virtual KCLightSource* lightSource() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

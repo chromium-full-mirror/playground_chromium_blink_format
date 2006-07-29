@@ -47,7 +47,8 @@ class SVGViewElement : public SVGStyledElement,
  private:
   mutable RefPtr<SVGStringList> m_viewTarget;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

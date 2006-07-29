@@ -65,7 +65,8 @@ class SVGFELightElement : public SVGElement {
   mutable RefPtr<SVGAnimatedNumber> m_specularExponent;
   mutable RefPtr<SVGAnimatedNumber> m_limitingConeAngle;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

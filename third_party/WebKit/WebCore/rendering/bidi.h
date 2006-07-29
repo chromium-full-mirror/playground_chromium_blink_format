@@ -130,6 +130,7 @@ struct BidiRun {
 
 struct BidiIterator;
 struct BidiState;
-};
 
-#endif
+}  // namespace WebCore
+
+#endif  // BIDI_H

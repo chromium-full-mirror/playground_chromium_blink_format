@@ -37,7 +37,8 @@ class SVGSetElement : public SVGAnimationElement {
  private:
   DeprecatedString m_savedTo;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

@@ -34,7 +34,8 @@ class SVGPolylineElement : public SVGPolyElement {
 
   virtual KCanvasPath* toPathData() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

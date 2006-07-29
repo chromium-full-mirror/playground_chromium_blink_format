@@ -48,7 +48,8 @@ class SVGScriptElement : public SVGElement,
  private:
   String m_type;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

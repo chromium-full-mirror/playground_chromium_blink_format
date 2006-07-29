@@ -63,7 +63,8 @@ class SVGFEDiffuseLightingElement
   // light management
   void updateLights() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

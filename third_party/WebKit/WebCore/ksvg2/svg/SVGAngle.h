@@ -27,6 +27,7 @@
 #include "PlatformString.h"
 
 namespace WebCore {
+
 class SVGStyledElement;
 
 class SVGAngle : public Shared<SVGAngle> {
@@ -76,9 +77,10 @@ class SVGAngle : public Shared<SVGAngle> {
 
   void calculate();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAngleImpl_H
 
 // vim:ts=4:noet

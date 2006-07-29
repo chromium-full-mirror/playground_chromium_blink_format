@@ -24,13 +24,14 @@
 #define KSVG_SVGStyledLocatableElementImpl_H
 #if SVG_SUPPORT
 
-#include "SVGStyledElement.h"
 #include "SVGLocatable.h"
+#include "SVGStyledElement.h"
 
 namespace WebCore {
 
 class SVGMatrix;
 class SVGElement;
+
 class SVGStyledLocatableElement : public SVGStyledElement, public SVGLocatable {
  public:
   SVGStyledLocatableElement(const QualifiedName&, Document*);
@@ -45,11 +46,12 @@ class SVGStyledLocatableElement : public SVGStyledElement, public SVGLocatable {
   virtual FloatRect getBBox() const;
   virtual SVGMatrix* getCTM() const;
   virtual SVGMatrix* getScreenCTM() const;
-  virtual SVGMatrix* getTransformToElement(SVGElement* element) const;
-};
+  virtual SVGMatrix* getTransformToElement(SVGElement*) const;
 };
 
+}  // namespace WebCore
+
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGStyledLocatableElementImpl_H
 
 // vim:ts=4:noet

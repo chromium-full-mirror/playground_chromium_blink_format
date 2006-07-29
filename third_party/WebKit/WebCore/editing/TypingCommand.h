@@ -38,7 +38,7 @@ class TypingCommand : public CompositeEditCommand {
     InsertText,
     InsertLineBreak,
     InsertParagraphSeparator,
-    InsertParagraphSeparatorInQuotedContent,
+    InsertParagraphSeparatorInQuotedContent
   };
 
   TypingCommand(Document* document,

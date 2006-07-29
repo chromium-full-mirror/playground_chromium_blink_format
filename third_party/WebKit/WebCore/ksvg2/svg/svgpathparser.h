@@ -101,7 +101,8 @@ class SVGPathParser {
                     bool largeArcFlag,
                     bool sweepFlag);
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

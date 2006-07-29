@@ -46,7 +46,8 @@ class SVGTRefElement : public SVGTextPositioningElement,
  private:
   void updateReferencedText();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

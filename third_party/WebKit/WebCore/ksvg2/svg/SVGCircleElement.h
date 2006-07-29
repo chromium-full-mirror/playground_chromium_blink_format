@@ -61,7 +61,8 @@ class SVGCircleElement : public SVGStyledTransformableElement,
   mutable RefPtr<SVGAnimatedLength> m_cy;
   mutable RefPtr<SVGAnimatedLength> m_r;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

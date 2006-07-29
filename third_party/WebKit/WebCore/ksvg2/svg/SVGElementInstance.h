@@ -46,7 +46,8 @@ class SVGElementInstance : public EventTarget {
   SVGElementInstance* firstChild() const;
   SVGElementInstance* lastChild() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

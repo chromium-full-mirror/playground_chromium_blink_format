@@ -33,12 +33,12 @@
 #include "DeprecatedStringList.h"
 #include "EditAction.h"
 #include "FrameView.h"
-#include "ScrollBar.h"
 #include "Node.h"
+#include "RenderObject.h"
+#include "ScrollBar.h"
 #include "TextAffinity.h"
 #include "TextGranularity.h"
 #include <wtf/Vector.h>
-#include "RenderObject.h"
 
 namespace KJS {
 class JSValue;
@@ -88,7 +88,7 @@ enum ObjectContentType {
   ObjectContentNone,
   ObjectContentImage,
   ObjectContentFrame,
-  ObjectContentPlugin,
+  ObjectContentPlugin
 };
 
 class Frame : public Shared<Frame>, Noncopyable {
@@ -890,6 +890,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   friend class FramePrivate;
   FramePrivate* d;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // Frame_H

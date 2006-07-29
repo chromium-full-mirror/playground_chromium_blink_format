@@ -40,7 +40,8 @@ class SVGDefsElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

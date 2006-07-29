@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef RENDER_FLOW_H
-#define RENDER_FLOW_H
+#ifndef RenderFlow_H
+#define RenderFlow_H
 
 #include "RenderContainer.h"
 
@@ -40,11 +40,12 @@ namespace WebCore {
  */
 class RenderFlow : public RenderContainer {
  public:
-  RenderFlow(Node* node) : RenderContainer(node), m_lineHeight(-1) {
-    m_continuation = 0;
-    m_firstLineBox = 0;
-    m_lastLineBox = 0;
-  }
+  RenderFlow(Node* node)
+      : RenderContainer(node),
+        m_continuation(0),
+        m_firstLineBox(0),
+        m_lastLineBox(0),
+        m_lineHeight(-1) {}
 
   virtual RenderFlow* continuation() const { return m_continuation; }
   void setContinuation(RenderFlow* c) { m_continuation = c; }
@@ -124,6 +125,6 @@ class RenderFlow : public RenderContainer {
   mutable short m_lineHeight;
 };
 
-};  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderFlow_H

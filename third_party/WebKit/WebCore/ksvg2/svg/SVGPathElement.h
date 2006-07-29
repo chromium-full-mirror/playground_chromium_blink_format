@@ -215,7 +215,8 @@ class SVGPathElement : public SVGStyledTransformableElement,
                         bool abs = true);
   virtual void svgClosePath();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

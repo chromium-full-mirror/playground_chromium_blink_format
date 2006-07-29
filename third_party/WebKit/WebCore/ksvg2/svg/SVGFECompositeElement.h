@@ -61,7 +61,8 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedNumber> m_k4;
   mutable KCanvasFEComposite* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

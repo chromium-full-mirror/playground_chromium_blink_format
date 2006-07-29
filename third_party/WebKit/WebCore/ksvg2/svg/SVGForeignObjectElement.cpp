@@ -95,7 +95,8 @@ bool SVGForeignObjectElement::childShouldCreateRenderer(Node* child) const {
   // Skip over SVG rules which disallow non-SVG kids
   return StyledElement::childShouldCreateRenderer(child);
 }
-};
+
+}  // namespace WebCore
 
 // vim:ts=4:noet
 #endif  // SVG_SUPPORT

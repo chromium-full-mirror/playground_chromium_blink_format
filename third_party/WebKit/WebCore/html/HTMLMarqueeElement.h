@@ -44,5 +44,6 @@ class HTMLMarqueeElement : public HTMLElement {
   int m_minimumDelay;
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLMarqueeElement_H

@@ -53,7 +53,8 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedNumberList> m_values;
   mutable KCanvasFEColorMatrix* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

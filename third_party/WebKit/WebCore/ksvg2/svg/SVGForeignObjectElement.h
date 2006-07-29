@@ -64,7 +64,8 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   mutable RefPtr<SVGAnimatedLength> m_width;
   mutable RefPtr<SVGAnimatedLength> m_height;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

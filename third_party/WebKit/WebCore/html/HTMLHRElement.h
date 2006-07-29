@@ -52,5 +52,6 @@ class HTMLHRElement : public HTMLElement {
   void setWidth(const String&);
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLHRElement_H

@@ -27,6 +27,7 @@
 #include <SVGColor.h>
 
 namespace WebCore {
+
 class SVGPaint : public SVGColor {
  public:
   SVGPaint();
@@ -54,9 +55,10 @@ class SVGPaint : public SVGColor {
   unsigned short m_paintType;
   String m_uri;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGPaintImpl_H
 
 // vim:ts=4:noet

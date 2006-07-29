@@ -47,7 +47,8 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedString> m_in1;
   mutable KCanvasFEFlood* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

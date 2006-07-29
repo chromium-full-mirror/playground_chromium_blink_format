@@ -27,12 +27,10 @@
 #include "PlatformString.h"
 
 namespace WebCore {
+
 class String;
 class CSSValue;
 class CSSStyleDeclaration;
-};
-
-namespace WebCore {
 class SVGAnimatedString;
 
 class SVGStylable {
@@ -46,9 +44,10 @@ class SVGStylable {
   virtual CSSStyleDeclaration* style() = 0;
   virtual CSSValue* getPresentationAttribute(StringImpl* name) = 0;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGStylableImpl_H
 
 // vim:ts=4:noet

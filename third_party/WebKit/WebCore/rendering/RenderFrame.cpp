@@ -53,4 +53,5 @@ void RenderFrame::viewCleared() {
       view->setMarginHeight(marginh);
   }
 }
-}
+
+}  // namespace WebCore

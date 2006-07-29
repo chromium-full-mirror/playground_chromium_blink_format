@@ -80,6 +80,7 @@ class HTMLPlugInElement : public HTMLElement {
  private:
   AtomicString m_frameName;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLPlugInElement_H

@@ -54,7 +54,8 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedNumber> m_stdDeviationY;
   mutable KCanvasFEGaussianBlur* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

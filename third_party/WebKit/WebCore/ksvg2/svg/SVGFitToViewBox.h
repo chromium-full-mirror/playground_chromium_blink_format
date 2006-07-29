@@ -27,12 +27,10 @@
 namespace WebCore {
 class Attribute;
 class StringImpl;
-};
-
-namespace WebCore {
-class SVGAnimatedRect;
 class SVGAnimatedPreserveAspectRatio;
+class SVGAnimatedRect;
 class SVGMatrix;
+
 class SVGFitToViewBox {
  public:
   SVGFitToViewBox();
@@ -51,9 +49,10 @@ class SVGFitToViewBox {
   mutable RefPtr<SVGAnimatedRect> m_viewBox;
   mutable RefPtr<SVGAnimatedPreserveAspectRatio> m_preserveAspectRatio;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGFitToViewBoxImpl_H
 
 // vim:ts=4:noet

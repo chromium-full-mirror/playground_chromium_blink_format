@@ -41,7 +41,8 @@ class SVGSymbolElement : public SVGStyledElement,
   virtual void parseMappedAttribute(MappedAttribute* attr);
   virtual bool shouldAttachChild(Element*) const { return false; }
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

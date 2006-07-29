@@ -28,6 +28,7 @@
 #include "SVGAnimatedTemplate.h"
 
 namespace WebCore {
+
 class SVGAnimatedAngle : public SVGAnimatedTemplate<SVGAngle> {
  public:
   SVGAnimatedAngle(const SVGStyledElement* context);
@@ -37,9 +38,10 @@ class SVGAnimatedAngle : public SVGAnimatedTemplate<SVGAngle> {
   virtual SVGAngle* create() const;
   virtual void assign(SVGAngle* src, SVGAngle* dst) const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAnimatedAngleImpl_H
 
 // vim:ts=4:noet

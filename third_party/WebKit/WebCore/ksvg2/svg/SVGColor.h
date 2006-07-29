@@ -74,9 +74,10 @@ class SVGColor : public CSSValue {
   unsigned short m_colorType;
   String m_rgbColor;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGColorImpl_H
 
 // vim:ts=4:noet

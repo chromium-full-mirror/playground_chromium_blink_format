@@ -90,7 +90,8 @@ class SVGPathSegCurvetoCubicSmoothRel : public SVGPathSeg {
   double m_x2;
   double m_y2;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

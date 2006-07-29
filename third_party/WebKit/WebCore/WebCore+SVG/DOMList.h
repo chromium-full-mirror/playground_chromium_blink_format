@@ -28,6 +28,7 @@
 #include "Shared.h"
 
 namespace WebCore {
+
 template <class T>
 class DOMList : public Shared<DOMList<T>> {
  public:
@@ -107,9 +108,10 @@ class DOMList : public Shared<DOMList<T>> {
  private:
   DeprecatedPtrList<T> m_impl;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KDOM_DOMList_H
 
 // vim:ts=4:noet

@@ -63,7 +63,8 @@ class SVGTransform : public Shared<SVGTransform> {
   unsigned short m_type;
   RefPtr<SVGMatrix> m_matrix;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

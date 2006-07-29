@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RENDER_FLEXIBLE_BOX_H
-#define RENDER_FLEXIBLE_BOX_H
+#ifndef RenderFlexibleBox_H
+#define RenderFlexibleBox_H
 
 #include "RenderBlock.h"
 
@@ -49,7 +49,7 @@ class RenderFlexibleBox : public RenderBlock {
   void placeChild(RenderObject* child, int x, int y);
 
  protected:
-  int allowedChildFlex(RenderObject* child, bool expanding, unsigned int group);
+  int allowedChildFlex(RenderObject* child, bool expanding, unsigned group);
 
   bool hasMultipleLines() { return style()->boxLines() == MULTIPLE; }
   bool isVertical() { return style()->boxOrient() == VERTICAL; }
@@ -59,6 +59,6 @@ class RenderFlexibleBox : public RenderBlock {
   bool m_stretchingChildren : 1;
 };
 
-};  // namespace
+}  // namespace WebCore
 
-#endif  // RENDER_FLEXIBLE_BOX_H
+#endif  // RenderFlexibleBox_H

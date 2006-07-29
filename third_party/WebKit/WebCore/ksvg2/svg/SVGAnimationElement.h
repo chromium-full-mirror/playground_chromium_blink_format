@@ -24,11 +24,12 @@
 #define KSVG_SVGAnimationElementImpl_H
 #if SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "SVGStringList.h"
 #include "SVGExternalResourcesRequired.h"
+#include "SVGStringList.h"
+#include "SVGTests.h"
 
 namespace WebCore {
+
 enum EFillMode { FILL_REMOVE = 0, FILL_FREEZE };
 
 enum EAdditiveMode { ADDITIVE_REPLACE = 0, ADDITIVE_SUM };
@@ -50,13 +51,15 @@ enum EAttributeType {
   ATTRIBUTETYPE_AUTO
 };
 
-enum EAnimationMode  // internal
-{ NO_ANIMATION = 0,
+// internal
+enum EAnimationMode {
+  NO_ANIMATION = 0,
   TO_ANIMATION,
   BY_ANIMATION,
   VALUES_ANIMATION,
   FROM_TO_ANIMATION,
-  FROM_BY_ANIMATION };
+  FROM_BY_ANIMATION
+};
 
 class SVGAnimationElement : public SVGElement,
                             public SVGTests,
@@ -145,9 +148,10 @@ class SVGAnimationElement : public SVGElement,
   RefPtr<SVGStringList> m_keyTimes;
   RefPtr<SVGStringList> m_keySplines;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAnimationElementImpl_H
 
 // vim:ts=4:noet

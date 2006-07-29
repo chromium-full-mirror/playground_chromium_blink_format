@@ -64,6 +64,7 @@ typedef enum {
 class KCanvasPoint3F {
  public:
   KCanvasPoint3F() : m_x(0), m_y(0), m_z(0) {}
+
   KCanvasPoint3F(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {}
 
   float x() const { return m_x; }
@@ -88,8 +89,8 @@ class KRenderingDevice;
 
 class KCanvasFilter : public KCanvasResource {
  public:
-  KCanvasFilter(){};
-  virtual ~KCanvasFilter(){};
+  KCanvasFilter() {}
+  virtual ~KCanvasFilter() {}
 
   virtual bool isFilter() const { return true; }
 
@@ -125,7 +126,7 @@ class KCanvasFilterEffect {
  public:
   // this default constructor is only needed for gcc 3.3
   KCanvasFilterEffect() {}
-  virtual ~KCanvasFilterEffect(){};
+  virtual ~KCanvasFilterEffect() {}
 
   virtual KCFilterEffectType effectType() const { return FE_TURBULENCE; }
 
@@ -209,6 +210,7 @@ typedef enum {
 
 struct KCComponentTransferFunction {
   KCComponentTransferFunction() : type(CT_IDENTITY) {}
+
   KCComponentTransferType type;
   Vector<float> tableValues;
   float slope;
@@ -255,7 +257,7 @@ typedef enum {
   CO_OUT = 2,
   CO_ATOP = 3,
   CO_XOR = 4,
-  CO_ARITHMETIC = 5,
+  CO_ARITHMETIC = 5
 } KCCompositeOperationType;
 
 class KCanvasFEComposite : public KCanvasFilterEffect {
@@ -290,7 +292,7 @@ typedef enum { EM_DUPLICATE = 0, EM_WRAP = 1, EM_NONE = 2 } KCEdgeModeType;
 
 class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
  public:
-  KCanvasFEConvolveMatrix(){};
+  KCanvasFEConvolveMatrix() {}
 
   FloatSize kernelSize() const { return m_kernelSize; }
   void setKernelSize(FloatSize kernelSize) { m_kernelSize = kernelSize; }
@@ -516,6 +518,7 @@ class KCanvasFEGaussianBlur : public KCanvasFilterEffect {
 class KCanvasFEImage : public KCanvasFilterEffect, public CachedResourceClient {
  public:
   KCanvasFEImage() : m_cachedImage(0) {}
+
   virtual ~KCanvasFEImage();
 
   // FIXME: Eventually we need to support <svg> (RenderObject *) as well as
@@ -667,8 +670,9 @@ class KCanvasFETurbulence : public KCanvasFilterEffect {
   bool m_stitchTiles;
   KCTurbulanceType m_type;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 
-#endif
+#endif  // KCanvasFilters_H

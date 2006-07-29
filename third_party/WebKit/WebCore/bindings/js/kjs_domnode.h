@@ -84,7 +84,7 @@ class DOMNode : public DOMObject {
     TextContent,
     IsDefaultNamespace,
     LookupNamespaceURI,
-    LookupPrefix,
+    LookupPrefix
   };
 
  protected:

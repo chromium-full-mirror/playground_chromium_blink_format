@@ -105,7 +105,8 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                                   KCanvasMatrix patternTransformMatrix) const;
   void notifyClientsToRepaint() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

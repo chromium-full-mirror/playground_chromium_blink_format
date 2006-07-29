@@ -132,13 +132,12 @@ enum { DOM_HORIZONTAL = 0, DOM_VERTICAL = 1, DOM_BOTH = 2 };
 - (BOOL)horizontalOverflow;
 - (BOOL)verticalOverflow;
 @end
-;
 
 enum {
   DOM_KEY_LOCATION_STANDARD = 0x00,
   DOM_KEY_LOCATION_LEFT = 0x01,
   DOM_KEY_LOCATION_RIGHT = 0x02,
-  DOM_KEY_LOCATION_NUMPAD = 0x03,
+  DOM_KEY_LOCATION_NUMPAD = 0x03
 };
 
 @interface DOMKeyboardEvent : DOMUIEvent

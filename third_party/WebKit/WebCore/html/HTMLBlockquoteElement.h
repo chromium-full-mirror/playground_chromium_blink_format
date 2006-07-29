@@ -40,5 +40,6 @@ class HTMLBlockquoteElement : public HTMLElement {
   void setCite(const String&);
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLBlockquoteElement_H

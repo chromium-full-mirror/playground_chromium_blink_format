@@ -44,10 +44,10 @@ class SVGDocument : public Document {
   void dispatchZoomEvent(float prevScale, float newScale);
   void dispatchScrollEvent();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-
-#endif
+#endif  // KSVG_SVGDocumentImpl_H
 
 // vim:ts=4:noet

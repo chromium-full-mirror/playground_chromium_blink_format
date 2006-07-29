@@ -59,7 +59,8 @@ class SVGCursorElement : public SVGElement,
   mutable RefPtr<SVGAnimatedLength> m_y;
   CachedImage* m_cachedImage;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

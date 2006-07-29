@@ -63,7 +63,8 @@ class SVGLineElement : public SVGStyledTransformableElement,
   mutable RefPtr<SVGAnimatedLength> m_x2;
   mutable RefPtr<SVGAnimatedLength> m_y2;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

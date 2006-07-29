@@ -59,7 +59,8 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
   mutable RefPtr<SVGAnimatedLength> m_height;
   mutable RefPtr<SVGAnimatedString> m_result;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

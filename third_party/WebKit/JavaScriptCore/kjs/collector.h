@@ -72,6 +72,7 @@ class Collector {
 
   static bool memoryFull;
 };
-};
 
-#endif /* _KJSCOLLECTOR_H_ */
+}  // namespace KJS
+
+#endif /* KJSCOLLECTOR_H_ */

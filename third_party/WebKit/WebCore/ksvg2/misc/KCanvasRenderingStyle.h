@@ -25,8 +25,8 @@
 #define KSVG_KCanvasRenderingStyle_H
 #if SVG_SUPPORT
 
-#include <kcanvas/KCanvasMatrix.h>
 #include "DeprecatedValueList.h"
+#include <kcanvas/KCanvasMatrix.h>
 
 namespace WebCore {
 
@@ -44,6 +44,7 @@ class KRenderingStrokePainter;
 class KRenderingPaintServer;
 class RenderStyle;
 class RenderObject;
+
 class KSVGPainterFactory {
  public:
   static KRenderingFillPainter fillPainter(const RenderStyle*,
@@ -63,9 +64,10 @@ class KSVGPainterFactory {
                                      CSSValue*,
                                      double defaultValue = 0.0);
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_KCanvasRenderingStyle_H
 
 // vim:ts=4:noet

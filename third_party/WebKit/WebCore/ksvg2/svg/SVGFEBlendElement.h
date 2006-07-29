@@ -52,7 +52,8 @@ class SVGFEBlendElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedEnumeration> m_mode;
   mutable KCanvasFEBlend* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

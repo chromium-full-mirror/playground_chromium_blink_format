@@ -43,5 +43,6 @@ class HTMLParagraphElement : public HTMLElement {
   void setAlign(const String&);
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLParagraphElement_H

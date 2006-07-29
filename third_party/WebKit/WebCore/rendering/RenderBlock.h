@@ -33,10 +33,7 @@ namespace WebCore {
 class Position;
 class RootInlineBox;
 
-enum CaretType {
-  CursorCaret,
-  DragCaret,
-};
+enum CaretType { CursorCaret, DragCaret };
 
 class RenderBlock : public RenderFlow {
  public:
@@ -126,8 +123,8 @@ class RenderBlock : public RenderFlow {
   IntRect layoutInlineChildren(bool relayoutChildren);
 
   void layoutPositionedObjects(bool relayoutChildren);
-  void insertPositionedObject(RenderObject* o);
-  void removePositionedObject(RenderObject* o);
+  void insertPositionedObject(RenderObject*);
+  void removePositionedObject(RenderObject*);
   virtual void removePositionedObjects(RenderBlock*);
 
   virtual void positionListMarker() {}
@@ -161,7 +158,7 @@ class RenderBlock : public RenderFlow {
   BidiIterator findNextLineBreak(BidiIterator& start, BidiState& info);
   RootInlineBox* constructLine(const BidiIterator& start,
                                const BidiIterator& end);
-  InlineFlowBox* createLineBoxes(RenderObject* obj);
+  InlineFlowBox* createLineBoxes(RenderObject*);
   int tabWidth(bool isWhitespacePre);
   void computeHorizontalPositionsForLine(RootInlineBox* lineBox,
                                          BidiState& bidi);
@@ -599,6 +596,6 @@ class RenderBlock : public RenderFlow {
   int m_tabWidth;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif  // RENDER_BLOCK_H
+#endif  // RenderBlock_H

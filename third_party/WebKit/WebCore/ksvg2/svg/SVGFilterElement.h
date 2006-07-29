@@ -74,7 +74,8 @@ class SVGFilterElement : public SVGStyledElement,
   mutable RefPtr<SVGAnimatedInteger> m_filterResY;
   KCanvasFilter* m_filter;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

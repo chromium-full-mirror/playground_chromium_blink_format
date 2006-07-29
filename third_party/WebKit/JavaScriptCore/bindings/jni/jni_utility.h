@@ -46,6 +46,7 @@ typedef enum {
 namespace KJS {
 
 namespace Bindings {
+
 class JavaParameter;
 
 const char* getCharactersFromJString(jstring aJString);
@@ -169,4 +170,4 @@ bool dispatchJNICall(const void* targetAppletView,
 
 }  // namespace KJS
 
-#endif
+#endif  // _JNI_UTILITY_H_

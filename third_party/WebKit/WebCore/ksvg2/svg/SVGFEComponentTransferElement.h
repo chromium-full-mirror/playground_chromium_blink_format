@@ -48,7 +48,8 @@ class SVGFEComponentTransferElement
   mutable RefPtr<SVGAnimatedString> m_in1;
   mutable KCanvasFEComponentTransfer* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

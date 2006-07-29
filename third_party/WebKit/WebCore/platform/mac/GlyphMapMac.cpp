@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "GlyphMap.h"
+
 #include "FontData.h"
 #include "WebCoreSystemInterface.h"
 
@@ -69,4 +70,5 @@ bool GlyphMap::fillPage(GlyphPage* page,
 
   return true;
 }
-}
+
+}  // namespace WebCore

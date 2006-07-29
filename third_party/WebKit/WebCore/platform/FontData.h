@@ -43,7 +43,7 @@ enum Pitch { UnknownPitch, FixedPitch, VariablePitch };
 
 class FontData : Noncopyable {
  public:
-  FontData(const FontPlatformData& f);
+  FontData(const FontPlatformData&);
   ~FontData();
 
  public:
@@ -124,6 +124,7 @@ class FontData : Noncopyable {
   bool m_isMLangFont;
 #endif
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // FONTDATA_H

@@ -28,21 +28,20 @@ namespace WebCore {
 // A range of a node within a document that is "marked", such as being
 // misspelled
 struct DocumentMarker {
-  enum MarkerType {
-    AllMarkers = -1,
-    Spelling = 0,
-    TextMatch,
-  };
+  enum MarkerType { AllMarkers = -1, Spelling = 0, TextMatch = 1 };
 
   enum MarkerType type;
-  unsigned startOffset, endOffset;
+  unsigned startOffset;
+  unsigned endOffset;
 
   bool operator==(const DocumentMarker& o) const {
     return type == o.type && startOffset == o.startOffset &&
            endOffset == o.endOffset;
   }
+
   bool operator!=(const DocumentMarker& o) const { return !(*this == o); }
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // DOM_DocumentMarker_h

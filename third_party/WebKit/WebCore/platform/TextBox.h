@@ -39,9 +39,7 @@ class TextBox : public ScrollView {
  public:
   typedef enum { NoWrap, WidgetWidth } WrapStyle;
 
-  typedef enum {
-    PlainText,
-  } TextFormat;
+  typedef enum { PlainText } TextFormat;
 
   TextBox(Widget* parent);
   ~TextBox();
@@ -90,6 +88,7 @@ class TextBox : public ScrollView {
   virtual FocusPolicy focusPolicy() const;
   virtual bool checksDescendantsForFocus() const;
 };
-}
+
+}  // namespace WebCore
 
 #endif /* TextBox_h */

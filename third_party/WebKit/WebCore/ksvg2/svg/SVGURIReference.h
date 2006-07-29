@@ -27,10 +27,8 @@
 #include "DeprecatedString.h"
 
 namespace WebCore {
-class MappedAttribute;
-};
 
-namespace WebCore {
+class MappedAttribute;
 class SVGAnimatedString;
 
 class SVGURIReference {
@@ -49,9 +47,10 @@ class SVGURIReference {
  private:
   mutable RefPtr<SVGAnimatedString> m_href;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGURIReferenceImpl_H
 
 // vim:ts=4:noet

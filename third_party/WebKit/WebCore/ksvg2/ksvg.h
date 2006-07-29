@@ -231,9 +231,10 @@ enum SVGStitchOptions {
   SVG_STITCHTYPE_STITCH = 1,
   SVG_STITCHTYPE_NOSTITCH = 2
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_H
 
 // vim:ts=4:noet

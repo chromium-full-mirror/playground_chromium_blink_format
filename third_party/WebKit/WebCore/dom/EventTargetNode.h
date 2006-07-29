@@ -148,4 +148,4 @@ inline void allowEventDispatch() {}
 
 }  // namespace WebCore
 
-#endif
+#endif  // DOM_EventTargetNodeImpl_h

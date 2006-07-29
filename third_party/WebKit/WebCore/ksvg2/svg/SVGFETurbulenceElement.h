@@ -59,7 +59,8 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   mutable RefPtr<SVGAnimatedEnumeration> m_type;
   mutable KCanvasFETurbulence* m_filterEffect;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

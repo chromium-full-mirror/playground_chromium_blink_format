@@ -69,7 +69,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 typedef enum {
   WebSelectionStateNone,
   WebSelectionStateCaret,
-  WebSelectionStateRange,
+  WebSelectionStateRange
 } WebSelectionState;
 
 typedef enum { WebSelectByMoving, WebSelectByExtending } WebSelectionAlteration;
@@ -151,7 +151,7 @@ typedef enum {
   ObjectElementNone,
   ObjectElementImage,
   ObjectElementFrame,
-  ObjectElementPlugin,
+  ObjectElementPlugin
 } ObjectElementType;
 
 @protocol WebCoreOpenPanelResultListener<NSObject>

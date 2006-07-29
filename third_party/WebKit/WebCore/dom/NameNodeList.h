@@ -35,7 +35,7 @@ namespace WebCore {
  */
 class NameNodeList : public NodeList {
  public:
-  NameNodeList(Node* doc, const String& t);
+  NameNodeList(Node* doc, const String& name);
 
   // DOM methods overridden from  parent classes
 
@@ -43,7 +43,7 @@ class NameNodeList : public NodeList {
   virtual Node* item(unsigned index) const;
 
   // Other methods (not part of DOM)
-  virtual void rootNodeChildrenChanged(){};
+  virtual void rootNodeChildrenChanged() {}
   virtual void rootNodeAttributeChanged() {
     NodeList::rootNodeChildrenChanged();
   }
@@ -54,5 +54,6 @@ class NameNodeList : public NodeList {
   String nodeName;
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // DOM_NameNodeListImpl_h

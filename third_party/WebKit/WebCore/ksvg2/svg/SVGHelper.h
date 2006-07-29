@@ -27,6 +27,7 @@
 #include "DeprecatedString.h"
 
 namespace WebCore {
+
 class SVGElement;
 class SVGStringList;
 
@@ -101,9 +102,10 @@ T* lazy_create(RefPtr<T>& variable,
 
   return variable.get();
 }
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGHelper_H
 
 // vim:ts=4:noet

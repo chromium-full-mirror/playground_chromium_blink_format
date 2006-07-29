@@ -68,8 +68,7 @@ class ObjcInstance : public Instance {
                                         const Identifier& property,
                                         JSValue* aValue);
 
-  virtual JSValue* ObjcInstance::getValueOfField(ExecState* exec,
-                                                 const Field* aField) const;
+  virtual JSValue* getValueOfField(ExecState* exec, const Field* aField) const;
   virtual JSValue* getValueOfUndefinedField(ExecState* exec,
                                             const Identifier& property,
                                             JSType hint) const;
@@ -91,4 +90,4 @@ class ObjcInstance : public Instance {
 
 }  // namespace KJS
 
-#endif
+#endif  // BINDINGS_OBJC_INSTANCE_H_

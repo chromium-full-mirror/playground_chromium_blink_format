@@ -53,7 +53,8 @@ class SVGRadialGradientElement : public SVGGradientElement {
   mutable RefPtr<SVGAnimatedLength> m_fx;
   mutable RefPtr<SVGAnimatedLength> m_fy;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

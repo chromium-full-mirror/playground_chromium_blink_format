@@ -71,6 +71,6 @@ class RuntimeArray : public ArrayInstance {
   Bindings::Array* _array;
 };
 
-};  // namespace KJS
+}  // namespace KJS
 
-#endif
+#endif  // RUNTIME_ARRAY_H_

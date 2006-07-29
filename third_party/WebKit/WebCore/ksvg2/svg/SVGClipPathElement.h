@@ -54,7 +54,8 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
   mutable RefPtr<SVGAnimatedEnumeration> m_clipPathUnits;
   KCanvasClipper* m_clipper;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

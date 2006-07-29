@@ -25,10 +25,9 @@
 #if SVG_SUPPORT
 
 namespace WebCore {
-class MappedAttribute;
-};
 
-namespace WebCore {
+class MappedAttribute;
+
 class SVGZoomAndPan {
  public:
   SVGZoomAndPan();
@@ -43,9 +42,10 @@ class SVGZoomAndPan {
  private:
   unsigned short m_zoomAndPan;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGZoomAndPanImpl_H
 
 // vim:ts=4:noet

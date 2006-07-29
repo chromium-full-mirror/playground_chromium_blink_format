@@ -41,7 +41,8 @@ class SVGNumber : public Shared<SVGNumber> {
   float m_value;
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

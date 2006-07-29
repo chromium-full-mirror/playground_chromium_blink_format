@@ -46,7 +46,8 @@ class SVGAnimatedNumber : public Shared<SVGAnimatedNumber> {
 
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

@@ -64,7 +64,8 @@ class SVGGradientElement : public SVGStyledElement,
   mutable RefPtr<SVGAnimatedTransformList> m_gradientTransform;
   mutable KRenderingPaintServerGradient* m_resource;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

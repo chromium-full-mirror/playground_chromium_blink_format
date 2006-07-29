@@ -27,9 +27,9 @@
 #ifndef HTML_FormDataList_h
 #define HTML_FormDataList_h
 
+#include "DeprecatedValueList.h"
 #include "PlatformString.h"
 #include "TextEncoding.h"
-#include "DeprecatedValueList.h"
 
 namespace WebCore {
 
@@ -71,12 +71,13 @@ class FormDataList {
   }
 
  private:
-  void appendString(const DeprecatedCString& s);
-  void appendString(const DeprecatedString& s);
+  void appendString(const DeprecatedCString&);
+  void appendString(const DeprecatedString&);
 
   TextEncoding m_encoding;
   DeprecatedValueList<FormDataListItem> m_list;
 };
-};
 
-#endif
+}  // namespace WebCore
+
+#endif  // HTML_FormDataList_h

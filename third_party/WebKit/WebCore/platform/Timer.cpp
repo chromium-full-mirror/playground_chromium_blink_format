@@ -29,6 +29,7 @@
 #include "SharedTimer.h"
 #include "SystemTime.h"
 #include <math.h>
+#include <limits>
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
@@ -299,7 +300,7 @@ inline void TimerBase::heapInsert() {
 inline void TimerBase::heapPop() {
   // Temporarily force this timer to have the minimum key so we can pop it.
   double fireTime = m_nextFireTime;
-  m_nextFireTime = -HUGE_VAL;
+  m_nextFireTime = -numeric_limits<double>::infinity();
   heapDecreaseKey();
   heapPopMin();
   m_nextFireTime = fireTime;

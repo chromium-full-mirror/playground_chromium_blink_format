@@ -78,8 +78,9 @@ class AffineTransform {
  private:
   CGAffineTransform m_transform;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // __APPLE__
 
-#endif
+#endif  // AffineTransform_h

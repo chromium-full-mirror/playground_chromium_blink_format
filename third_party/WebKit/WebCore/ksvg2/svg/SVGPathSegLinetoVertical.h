@@ -62,7 +62,8 @@ class SVGPathSegLinetoVerticalRel : public SVGPathSeg {
  private:
   double m_y;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

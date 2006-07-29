@@ -51,7 +51,8 @@ class SVGTextPositioningElement : public SVGTextContentElement {
   mutable RefPtr<SVGAnimatedLengthList> m_dy;
   mutable RefPtr<SVGAnimatedNumberList> m_rotate;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

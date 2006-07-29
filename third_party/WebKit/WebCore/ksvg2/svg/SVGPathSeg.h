@@ -43,7 +43,8 @@ class SVGPathSeg : public Shared<SVGPathSeg> {
  protected:
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

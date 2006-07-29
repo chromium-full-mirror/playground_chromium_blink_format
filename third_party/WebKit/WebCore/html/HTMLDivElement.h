@@ -43,5 +43,6 @@ class HTMLDivElement : public HTMLElement {
   void setAlign(const String&);
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLDivElement_H

@@ -33,7 +33,8 @@ class SVGElementInstanceList : public SVGList<SVGElementInstance> {
   SVGElementInstanceList(const SVGStyledElement* context = 0);
   virtual ~SVGElementInstanceList();
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

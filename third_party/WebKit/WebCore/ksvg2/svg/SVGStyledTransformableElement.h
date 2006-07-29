@@ -27,18 +27,16 @@
 #include "SVGStyledLocatableElement.h"
 #include "SVGTransformable.h"
 
-class AffineTransform;
-
 namespace WebCore {
+
+class AffineTransform;
+class Attribute;
 class Node;
 class StringImpl;
-class Attribute;
-};
-
-namespace WebCore {
+class SVGAnimatedTransformList;
 class SVGMatrix;
 class SVGTransformList;
-class SVGAnimatedTransformList;
+
 class SVGStyledTransformableElement : public SVGStyledLocatableElement,
                                       public SVGTransformable {
  public:
@@ -70,9 +68,10 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   mutable RefPtr<SVGMatrix> m_localMatrix;
   mutable RefPtr<SVGAnimatedTransformList> m_transform;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGStyledTransformableElementImpl_H
 
 // vim:ts=4:noet

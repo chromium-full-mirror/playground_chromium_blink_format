@@ -45,5 +45,6 @@ class HTMLPreElement : public HTMLElement {
   void setWrap(bool b);
 };
 
-};  // namespace
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLPreElement_H

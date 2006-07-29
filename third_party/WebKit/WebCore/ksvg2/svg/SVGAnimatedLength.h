@@ -43,7 +43,8 @@ class SVGAnimatedLength : public SVGAnimatedTemplate<SVGLength> {
   LengthMode m_mode;
   const SVGElement* m_viewportElement;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

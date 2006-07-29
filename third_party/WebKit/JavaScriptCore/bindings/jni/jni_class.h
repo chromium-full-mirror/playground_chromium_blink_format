@@ -67,4 +67,4 @@ class JavaClass : public Class {
 
 }  // namespace KJS
 
-#endif
+#endif  // JNI_CLASS_H_

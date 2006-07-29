@@ -63,7 +63,8 @@ class SVGTextContentElement : public SVGStyledElement,
   mutable RefPtr<SVGAnimatedLength> m_textLength;
   mutable RefPtr<SVGAnimatedEnumeration> m_lengthAdjust;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

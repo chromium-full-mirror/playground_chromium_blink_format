@@ -43,7 +43,8 @@ class SVGExternalResourcesRequired {
  private:
   mutable RefPtr<SVGAnimatedBoolean> m_external;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

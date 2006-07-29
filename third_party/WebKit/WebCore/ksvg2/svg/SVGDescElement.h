@@ -35,7 +35,8 @@ class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
 
   StringImpl* description() const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

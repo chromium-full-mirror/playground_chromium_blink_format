@@ -27,7 +27,9 @@
 #include "Shared.h"
 
 namespace WebCore {
+
 class SVGStyledElement;
+
 class SVGAnimatedBoolean : public Shared<SVGAnimatedBoolean> {
  public:
   SVGAnimatedBoolean(const SVGStyledElement* context);
@@ -45,9 +47,10 @@ class SVGAnimatedBoolean : public Shared<SVGAnimatedBoolean> {
 
   const SVGStyledElement* m_context;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // KSVG_SVGAnimatedBooleanImpl_H
 
 // vim:ts=4:noet

@@ -37,7 +37,8 @@ class SVGAnimatedNumberList : public SVGAnimatedTemplate<SVGNumberList> {
   virtual SVGNumberList* create() const;
   // virtual void assign(SVGNumberList *src, SVGNumberList *dst) const;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif

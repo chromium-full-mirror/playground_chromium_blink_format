@@ -59,7 +59,8 @@ class SVGDummyElement : public SVGGElement {
  private:
   AtomicString m_localName;
 };
-};
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
 #endif
