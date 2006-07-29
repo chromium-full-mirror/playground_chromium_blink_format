@@ -1477,8 +1477,9 @@ void XMLTokenizer::resumeParsing() {
   m_pendingSrc.clear();
   write(rest, false);
 
-  // Finally, if finish() has been called, call end()
-  if (m_finishCalled)
+  // Finally, if finish() has been called and write() didn't result
+  // in any further callbacks being queued, call end()
+  if (m_finishCalled && m_pendingCallbacks->isEmpty())
     end();
 }
 
