@@ -34,6 +34,8 @@
 
 namespace WebCore {
 
+class Element;
+
 class FrameGdkClient {
  public:
   virtual void openURL(const DeprecatedString&) = 0;
@@ -41,7 +43,7 @@ class FrameGdkClient {
 
 class FrameGdk : public Frame, TransferJobClient {
  public:
-  FrameGdk(Page*, RenderPart*, FrameGdkClient*);
+  FrameGdk(Page*, Element*);
   FrameGdk(GdkDrawable*);
   ~FrameGdk();
 
@@ -60,10 +62,6 @@ class FrameGdk : public Frame, TransferJobClient {
                                const Vector<String>&,
                                const Vector<String>&,
                                const String&);
-  virtual Frame* createFrame(const KURL&,
-                             const String& name,
-                             RenderPart*,
-                             const String& referrer);
 
   virtual void scheduleClose();
 
@@ -148,6 +146,10 @@ class FrameGdk : public Frame, TransferJobClient {
 
   IntRect frameGeometry() const;
   void setFrameGeometry(const IntRect&);
+  virtual Frame* createFrame(const KURL&,
+                             const String& name,
+                             Element* ownerElement,
+                             const String& referrer);
 
  private:
   virtual bool passMouseDownEventToWidget(Widget*);

@@ -73,6 +73,8 @@ class RenderThemeGdk : public RenderTheme {
                               const RenderObject::PaintInfo&,
                               const IntRect&);
 
+  virtual RenderPopupMenu* createPopupMenu(RenderArena*, Document*);
+
  private:
   void addIntrinsicMargins(RenderStyle*) const;
   void close();

@@ -53,16 +53,6 @@
 #include "KeyboardCodes.h"
 #include <gdk/gdk.h>
 
-DeprecatedStringList SSLKeyGenerator::supportedKeySizes() {
-  return DeprecatedStringList();
-};
-DeprecatedString SSLKeyGenerator::signedPublicKeyAndChallengeString(
-    unsigned keySizeIndex,
-    const DeprecatedString& challengeString,
-    const KURL& url) {
-  return DeprecatedString();
-};
-
 // This function loads resources from WebKit
 // This does not belong here and I'm not sure where
 // it should go
@@ -125,8 +115,7 @@ FrameGdk::FrameGdk(GdkDrawable* gdkdrawable)
   view->ScrollView::setDrawable(gdkdrawable);
 }
 
-FrameGdk::FrameGdk(Page* page, RenderPart* renderPart, FrameGdkClient* client)
-    : Frame(page, renderPart) {
+FrameGdk::FrameGdk(Page* page, Element* element) : Frame(page, element) {
   d->m_extension = new BrowserExtensionGdk(this);
   Settings* settings = new Settings;
   settings->setAutoLoadImages(true);

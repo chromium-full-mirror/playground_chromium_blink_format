@@ -47,7 +47,6 @@
 #include "KURL.h"
 #include "ScrollBar.h"
 #include "JavaAppletWidget.h"
-#include "WebCoreScrollBar.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
 #include "CookieJar.h"
@@ -63,6 +62,9 @@
 #include "RenderThemeGdk.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
+#include "DeprecatedString.h"
+#include "DeprecatedStringList.h"
+#include "SSLKeyGenerator.h"
 
 using namespace WebCore;
 
@@ -73,7 +75,6 @@ static void notImplemented() {
 void FrameView::updateBorder() {
   notImplemented();
 }
-// bool FrameView::isFrameView() const { notImplemented(); return 0; }
 
 TextBox::TextBox(Widget*) {
   notImplemented();
@@ -413,7 +414,6 @@ bool FrameGdk::shouldInterruptJavaScript() {
   notImplemented();
   return false;
 }
-// bool FrameWin::openURL(KURL const&) { notImplemented(); return 0; }
 void FrameGdk::print() {
   notImplemented();
 }
@@ -434,8 +434,6 @@ void FrameGdk::issueCopyCommand() {
 void FrameGdk::openURLRequest(struct WebCore::ResourceRequest const&) {
   notImplemented();
 }
-// bool FrameWin::passWheelEventToChildWidget(Node*) { notImplemented(); return
-// 0; }
 void FrameGdk::issueUndoCommand() {
   notImplemented();
 }
@@ -606,13 +604,13 @@ bool FrameGdk::shouldChangeSelection(SelectionController const&,
 }
 void FrameGdk::respondToChangedSelection(WebCore::SelectionController const&,
                                          bool) {}
-static int frameNumber = 0;
-Frame* FrameGdk::createFrame(KURL const&,
-                             String const&,
-                             RenderPart*,
-                             String const&) {
+Frame* FrameGdk::createFrame(const KURL& url,
+                             const String& name,
+                             Element* ownerElement,
+                             const String& referrer) {
   return 0;
 }
+
 void FrameGdk::saveDocumentState() {}
 void FrameGdk::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
 void FrameGdk::clearUndoRedoOperations(void) {}
@@ -825,4 +823,17 @@ int Font::offsetForPositionForComplexText(const TextRun&,
                                           bool) const {
   notImplemented();
   return 0;
+}
+
+namespace WebCore {
+
+DeprecatedStringList supportedKeySizes() {
+  return DeprecatedStringList();
+};
+DeprecatedString signedPublicKeyAndChallengeString(
+    unsigned keySizeIndex,
+    const DeprecatedString& challengeString,
+    const KURL& url) {
+  return DeprecatedString();
+};
 }
