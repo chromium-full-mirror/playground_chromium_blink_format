@@ -59,7 +59,6 @@ class JSHTMLDocument : public WebCore::JSDocument {
     Title,
     Referrer,
     Domain,
-    URL,
     Body,
     Location,
     Cookie,
