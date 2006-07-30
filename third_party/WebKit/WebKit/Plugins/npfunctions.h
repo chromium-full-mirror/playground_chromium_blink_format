@@ -1,5 +1,5 @@
-#ifndef _NPFUNCTIONS_H_
-#define _NPFUNCTIONS_H_
+#ifndef NPFUNCTIONS_H
+#define NPFUNCTIONS_H
 
 #include <WebKit/npruntime.h>
 #include <WebKit/npapi.h>

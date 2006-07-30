@@ -117,58 +117,41 @@ const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
                                          &stringTable, 0};
 /* Source for string_object.lut.h
 @begin stringTable 26
-  toString		StringProtoFunc::ToString	DontEnum|Function
-0
-  valueOf		StringProtoFunc::ValueOf	DontEnum|Function
-0
-  charAt		StringProtoFunc::CharAt	DontEnum|Function	1
-  charCodeAt		StringProtoFunc::CharCodeAt	DontEnum|Function
-1
-  concat		StringProtoFunc::Concat	DontEnum|Function	1
-  indexOf		StringProtoFunc::IndexOf	DontEnum|Function
-1
-  lastIndexOf		StringProtoFunc::LastIndexOf	DontEnum|Function
-1
-  match			StringProtoFunc::Match	DontEnum|Function	1
-  replace		StringProtoFunc::Replace	DontEnum|Function
-2
-  search		StringProtoFunc::Search	DontEnum|Function	1
-  slice			StringProtoFunc::Slice	DontEnum|Function	2
-  split			StringProtoFunc::Split	DontEnum|Function	2
-  substr		StringProtoFunc::Substr	DontEnum|Function	2
-  substring		StringProtoFunc::Substring	DontEnum|Function
-2
-  toLowerCase		StringProtoFunc::ToLowerCase	DontEnum|Function
-0
-  toUpperCase		StringProtoFunc::ToUpperCase	DontEnum|Function
-0
-  toLocaleLowerCase	StringProtoFunc::ToLocaleLowerCase DontEnum|Function
-0
-  toLocaleUpperCase     StringProtoFunc::ToLocaleUpperCase DontEnum|Function
-0
+  toString              StringProtoFunc::ToString       DontEnum|Function 0
+  valueOf               StringProtoFunc::ValueOf        DontEnum|Function 0
+  charAt                StringProtoFunc::CharAt         DontEnum|Function 1
+  charCodeAt            StringProtoFunc::CharCodeAt     DontEnum|Function 1
+  concat                StringProtoFunc::Concat         DontEnum|Function 1
+  indexOf               StringProtoFunc::IndexOf        DontEnum|Function 1
+  lastIndexOf           StringProtoFunc::LastIndexOf    DontEnum|Function 1
+  match                 StringProtoFunc::Match          DontEnum|Function 1
+  replace               StringProtoFunc::Replace        DontEnum|Function 2
+  search                StringProtoFunc::Search         DontEnum|Function 1
+  slice                 StringProtoFunc::Slice          DontEnum|Function 2
+  split                 StringProtoFunc::Split          DontEnum|Function 2
+  substr                StringProtoFunc::Substr         DontEnum|Function 2
+  substring             StringProtoFunc::Substring      DontEnum|Function 2
+  toLowerCase           StringProtoFunc::ToLowerCase    DontEnum|Function 0
+  toUpperCase           StringProtoFunc::ToUpperCase    DontEnum|Function 0
+  toLocaleLowerCase     StringProtoFunc::ToLocaleLowerCase DontEnum|Function 0
+  toLocaleUpperCase     StringProtoFunc::ToLocaleUpperCase DontEnum|Function 0
 #
 # Under here: html extension, should only exist if KJS_PURE_ECMA is not defined
 # I guess we need to generate two hashtables in the .lut.h file, and use #ifdef
 # to select the right one... TODO. #####
-  big			StringProtoFunc::Big		DontEnum|Function
-0
-  small			StringProtoFunc::Small	DontEnum|Function	0
-  blink			StringProtoFunc::Blink	DontEnum|Function	0
-  bold			StringProtoFunc::Bold	DontEnum|Function	0
-  fixed			StringProtoFunc::Fixed	DontEnum|Function	0
-  italics		StringProtoFunc::Italics	DontEnum|Function
-0
-  strike		StringProtoFunc::Strike	DontEnum|Function	0
-  sub			StringProtoFunc::Sub		DontEnum|Function
-0
-  sup			StringProtoFunc::Sup		DontEnum|Function
-0
-  fontcolor		StringProtoFunc::Fontcolor	DontEnum|Function
-1
-  fontsize		StringProtoFunc::Fontsize	DontEnum|Function
-1
-  anchor		StringProtoFunc::Anchor	DontEnum|Function	1
-  link			StringProtoFunc::Link	DontEnum|Function	1
+  big                   StringProtoFunc::Big            DontEnum|Function 0
+  small                 StringProtoFunc::Small          DontEnum|Function 0
+  blink                 StringProtoFunc::Blink          DontEnum|Function 0
+  bold                  StringProtoFunc::Bold           DontEnum|Function 0
+  fixed                 StringProtoFunc::Fixed          DontEnum|Function 0
+  italics               StringProtoFunc::Italics        DontEnum|Function 0
+  strike                StringProtoFunc::Strike         DontEnum|Function 0
+  sub                   StringProtoFunc::Sub            DontEnum|Function 0
+  sup                   StringProtoFunc::Sup            DontEnum|Function 0
+  fontcolor             StringProtoFunc::Fontcolor      DontEnum|Function 1
+  fontsize              StringProtoFunc::Fontsize       DontEnum|Function 1
+  anchor                StringProtoFunc::Anchor         DontEnum|Function 1
+  link                  StringProtoFunc::Link           DontEnum|Function 1
 @end
 */
 // ECMA 15.5.4

@@ -264,8 +264,7 @@ NPObject* myAllocate() {
 }
 
 void myInvalidate() {
-  // Make sure we've released any remainging references to JavaScript
-  // objects.
+  // Make sure we've released any remaining references to JavaScript objects.
 }
 
 void myDeallocate(MyObject* obj) {

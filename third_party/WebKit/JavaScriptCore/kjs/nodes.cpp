@@ -1255,7 +1255,7 @@ JSValue* RelationalNode::evaluate(ExecState* exec) {
                         v2, expr2.get());
 
     JSObject* o2(static_cast<JSObject*>(v2));
-    if (!o2->implementsHasInstance()) {
+    if (!o2->implementsHasInstance())
       // According to the spec, only some types of objects "implement" the
       // [[HasInstance]] property.
       // But we are supposed to throw an exception where the object does not
@@ -1264,10 +1264,6 @@ JSValue* RelationalNode::evaluate(ExecState* exec) {
       // implement it, so in this
       // case we return false (consistent with mozilla)
       return jsBoolean(false);
-      //      return throwError(exec, TypeError,
-      //			"Object does not implement the [[HasInstance]]
-      //method." );
-    }
     return jsBoolean(o2->hasInstance(exec, v1));
   }
 
