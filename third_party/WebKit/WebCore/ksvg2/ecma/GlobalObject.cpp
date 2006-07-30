@@ -55,11 +55,6 @@ GlobalObject::GlobalObject(Document* doc) : GlobalObject(doc) {}
 
 GlobalObject::~GlobalObject() {}
 
-void GlobalObject::afterTimeout() const {
-  if (doc())
-    doc()->updateRendering();
-}
-
 KJS::JSValue* GlobalObject::get(KJS::ExecState* exec,
                                 const KJS::Identifier& p) const {
   kdDebug(26004) << "WebCore::GlobalObject (" << this << ")::get "
