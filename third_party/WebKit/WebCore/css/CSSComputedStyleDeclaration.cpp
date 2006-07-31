@@ -50,11 +50,9 @@ static const int computedProperties[] = {
     CSS_PROP_BACKGROUND_ATTACHMENT,
     CSS_PROP__WEBKIT_BACKGROUND_CLIP,
     CSS_PROP__WEBKIT_BACKGROUND_ORIGIN,
-    CSS_PROP_BACKGROUND_POSITION,
     CSS_PROP_BACKGROUND_POSITION_X,
     CSS_PROP_BACKGROUND_POSITION_Y,
     CSS_PROP_BORDER_COLLAPSE,
-    CSS_PROP_BORDER_SPACING,
     CSS_PROP__WEBKIT_BORDER_HORIZONTAL_SPACING,
     CSS_PROP__WEBKIT_BORDER_VERTICAL_SPACING,
     CSS_PROP_BORDER_TOP_COLOR,
@@ -120,7 +118,6 @@ static const int computedProperties[] = {
     CSS_PROP_OPACITY,
     CSS_PROP_ORPHANS,
     CSS_PROP_OUTLINE_STYLE,
-    CSS_PROP_OVERFLOW,
     CSS_PROP_OVERFLOW_X,
     CSS_PROP_OVERFLOW_Y,
     CSS_PROP_PADDING_TOP,
@@ -131,6 +128,7 @@ static const int computedProperties[] = {
     CSS_PROP_PAGE_BREAK_BEFORE,
     CSS_PROP_PAGE_BREAK_INSIDE,
     CSS_PROP_POSITION,
+    CSS_PROP_RESIZE,
     CSS_PROP_RIGHT,
     CSS_PROP_TABLE_LAYOUT,
     CSS_PROP_TEXT_ALIGN,
@@ -157,15 +155,26 @@ const unsigned numComputedProperties =
 
 static CSSValue* valueForLength(const Length& length) {
   switch (length.type()) {
+    case Auto:
+      return new CSSPrimitiveValue(CSS_VAL_AUTO);
+    case WebCore::Fixed:
+      if (length.value() == undefinedLength)
+        return new CSSPrimitiveValue(CSS_VAL_NONE);
+      return new CSSPrimitiveValue(length.value(), CSSPrimitiveValue::CSS_PX);
+    case Intrinsic:
+      return new CSSPrimitiveValue(CSS_VAL_INTRINSIC);
+    case MinIntrinsic:
+      return new CSSPrimitiveValue(CSS_VAL_MIN_INTRINSIC);
     case Percent:
       return new CSSPrimitiveValue(length.value(),
                                    CSSPrimitiveValue::CSS_PERCENTAGE);
-    case WebCore::Fixed:
-      return new CSSPrimitiveValue(length.value(), CSSPrimitiveValue::CSS_PX);
-    default
-        :  // FIXME: Intrinsic and MinIntrinsic should probably return keywords.
-      return new CSSPrimitiveValue(CSS_VAL_AUTO);
+    case Relative:
+    case Static:
+      // Should never be reached.
+      break;
   }
+  // Should never be reached, but if we do, just return "auto".
+  return new CSSPrimitiveValue(CSS_VAL_AUTO);
 }
 
 static CSSValue* valueForBorderStyle(EBorderStyle style) {
@@ -320,8 +329,7 @@ CSSPrimitiveValue* primitiveValueFromLength(Length length,
   else if (length.isFixed())
     string = numberAsString(length.calcMinValue(0));
   else if (length.isAuto())
-    string += "auto";
-  string += " ";
+    string = "auto";
   return new CSSPrimitiveValue(string, CSSPrimitiveValue::CSS_STRING);
 }
 
@@ -783,6 +791,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(style->letterSpacing(),
                                    CSSPrimitiveValue::CSS_PX);
     case CSS_PROP__WEBKIT_LINE_CLAMP:
+      if (style->lineClamp() == -1)
+        return new CSSPrimitiveValue(CSS_VAL_NONE);
       return new CSSPrimitiveValue(style->lineClamp(),
                                    CSSPrimitiveValue::CSS_PERCENTAGE);
     case CSS_PROP_LINE_HEIGHT: {
@@ -1378,11 +1388,20 @@ void CSSComputedStyleDeclaration::setProperty(int,
 }
 
 unsigned CSSComputedStyleDeclaration::length() const {
+  Node* node = m_node.get();
+  if (!node)
+    return 0;
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return 0;
+  RenderStyle* style = renderer->style();
+  if (!style)
+    return 0;
   return numComputedProperties;
 }
 
 String CSSComputedStyleDeclaration::item(unsigned i) const {
-  if (i >= numComputedProperties)
+  if (i >= length())
     return String();
 
   return getPropertyName(computedProperties[i]);
@@ -1393,15 +1412,25 @@ String CSSComputedStyleDeclaration::item(unsigned i) const {
 // It is the intersection of the list of inherited CSS properties and the
 // properties for which we have a computed implementation in this file.
 const int inheritableProperties[] = {
-    CSS_PROP_BORDER_COLLAPSE, CSS_PROP_BORDER_SPACING,
-    CSS_PROP_COLOR,           CSS_PROP_FONT_FAMILY,
-    CSS_PROP_FONT_SIZE,       CSS_PROP_FONT_STYLE,
-    CSS_PROP_FONT_VARIANT,    CSS_PROP_FONT_WEIGHT,
-    CSS_PROP_LETTER_SPACING,  CSS_PROP_LINE_HEIGHT,
-    CSS_PROP_TEXT_ALIGN,      CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT,
-    CSS_PROP_TEXT_INDENT,     CSS_PROP__WEBKIT_TEXT_SIZE_ADJUST,
-    CSS_PROP_TEXT_TRANSFORM,  CSS_PROP_ORPHANS,
-    CSS_PROP_WHITE_SPACE,     CSS_PROP_WIDOWS,
+    CSS_PROP_BORDER_COLLAPSE,
+    CSS_PROP__WEBKIT_BORDER_HORIZONTAL_SPACING,
+    CSS_PROP__WEBKIT_BORDER_VERTICAL_SPACING,
+    CSS_PROP_COLOR,
+    CSS_PROP_FONT_FAMILY,
+    CSS_PROP_FONT_SIZE,
+    CSS_PROP_FONT_STYLE,
+    CSS_PROP_FONT_VARIANT,
+    CSS_PROP_FONT_WEIGHT,
+    CSS_PROP_LETTER_SPACING,
+    CSS_PROP_LINE_HEIGHT,
+    CSS_PROP_TEXT_ALIGN,
+    CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT,
+    CSS_PROP_TEXT_INDENT,
+    CSS_PROP__WEBKIT_TEXT_SIZE_ADJUST,
+    CSS_PROP_TEXT_TRANSFORM,
+    CSS_PROP_ORPHANS,
+    CSS_PROP_WHITE_SPACE,
+    CSS_PROP_WIDOWS,
     CSS_PROP_WORD_SPACING,
 };
 
