@@ -391,11 +391,11 @@ String::operator UString() const {
                  m_impl->length());
 }
 
+}  // namespace WebCore
+
 #ifndef NDEBUG
 // For debugging only -- leaks memory
-String* string(const char* s) {
-  return new String(s);
+WebCore::String* string(const char* s) {
+  return new WebCore::String(s);
 }
 #endif
-
-}  // namespace WebCore
