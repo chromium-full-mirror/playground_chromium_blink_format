@@ -973,7 +973,7 @@ void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
     FrameView* scrollView = m_object->element()->document()->view();
     m_hBar = new ScrollBar(HorizontalScrollBar);
     m_hBar->setClient(this);
-    scrollView->addChild(m_hBar, 0, -50000);
+    scrollView->addChild(m_hBar);
   } else {
     FrameView* scrollView = m_object->element()->document()->view();
     scrollView->removeChild(m_hBar);
@@ -996,7 +996,7 @@ void RenderLayer::setHasVerticalScrollbar(bool hasScrollbar) {
     FrameView* scrollView = m_object->element()->document()->view();
     m_vBar = new ScrollBar(VerticalScrollBar);
     m_vBar->setClient(this);
-    scrollView->addChild(m_vBar, 0, -50000);
+    scrollView->addChild(m_vBar);
   } else {
     FrameView* scrollView = m_object->element()->document()->view();
     scrollView->removeChild(m_vBar);
