@@ -86,6 +86,7 @@ class FrameViewPrivate {
     oldSubframe = 0;
     linkPressed = false;
     useSlowRepaints = false;
+    slowRepaintObjectCount = 0;
     dragTarget = 0;
     borderTouched = false;
     scrollBarMoved = false;
@@ -124,6 +125,7 @@ class FrameViewPrivate {
   ScrollBarMode hmode;
   bool linkPressed;
   bool useSlowRepaints;
+  unsigned slowRepaintObjectCount;
   bool ignoreWheelEvents;
 
   int borderX, borderY;
@@ -520,7 +522,7 @@ void FrameView::layout(bool allowSubtree) {
     scheduleRelayout();
     return;
   }
-  setStaticBackground(d->useSlowRepaints);
+  setStaticBackground(useSlowRepaints());
 
   if (document->hasListenerType(Document::OVERFLOWCHANGED_LISTENER))
     updateOverflowStatus(visibleWidth() < contentsWidth(),
@@ -1060,9 +1062,25 @@ String FrameView::mediaType() const {
   return d->m_mediaType;
 }
 
-void FrameView::useSlowRepaints() {
+bool FrameView::useSlowRepaints() const {
+  return d->useSlowRepaints || d->slowRepaintObjectCount > 0;
+}
+
+void FrameView::setUseSlowRepaints() {
   d->useSlowRepaints = true;
   setStaticBackground(true);
+}
+
+void FrameView::addSlowRepaintObject() {
+  if (d->slowRepaintObjectCount == 0)
+    setStaticBackground(true);
+  d->slowRepaintObjectCount++;
+}
+
+void FrameView::removeSlowRepaintObject() {
+  d->slowRepaintObjectCount--;
+  if (d->slowRepaintObjectCount == 0)
+    setStaticBackground(d->useSlowRepaints);
 }
 
 void FrameView::setScrollBarsMode(ScrollBarMode mode) {

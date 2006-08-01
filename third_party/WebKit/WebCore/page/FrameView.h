@@ -213,7 +213,10 @@ class FrameView : public ScrollView {
 
   void focusNextPrevNode(bool next);
 
-  void useSlowRepaints();
+  bool useSlowRepaints() const;
+  void setUseSlowRepaints();
+  void addSlowRepaintObject();
+  void removeSlowRepaintObject();
 
   void setIgnoreWheelEvents(bool e);
 
