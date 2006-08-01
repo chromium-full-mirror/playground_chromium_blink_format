@@ -46,7 +46,7 @@
 
 #include "RenderObject.h"
 #include "Timer.h"
-#include "WidgetClient.h"
+#include "ScrollBar.h"
 
 namespace WebCore {
 
@@ -58,6 +58,7 @@ class RenderStyle;
 class RenderTable;
 class RenderText;
 class ScrollBar;
+class PlatformScrollBar;
 
 class ClipRects {
  public:
@@ -149,7 +150,7 @@ class Marquee {
   EMarqueeDirection m_direction : 4;
 };
 
-class RenderLayer : WidgetClient {
+class RenderLayer : public ScrollBarClient {
  public:
   enum ScrollBehavior {
     noScroll,
@@ -183,7 +184,7 @@ class RenderLayer : WidgetClient {
     return s.m_rectHidden;
   }
 
-  static ScrollBar* gScrollBar;
+  static PlatformScrollBar* gScrollBar;
 
   RenderLayer(RenderObject*);
   ~RenderLayer();
@@ -263,6 +264,8 @@ class RenderLayer : WidgetClient {
   void setHasVerticalScrollbar(bool hasScrollbar);
   ScrollBar* horizontalScrollbar() { return m_hBar; }
   ScrollBar* verticalScrollbar() { return m_vBar; }
+  PlatformScrollBar* horizontalScrollbarWidget() const;
+  PlatformScrollBar* verticalScrollbarWidget() const;
   int verticalScrollbarWidth();
   int horizontalScrollbarHeight();
   void positionScrollbars(const IntRect& absBounds);
@@ -272,7 +275,6 @@ class RenderLayer : WidgetClient {
   void paintScrollbars(GraphicsContext*, const IntRect& damageRect);
   void paintResizeControl(GraphicsContext*);
   void updateScrollInfoAfterLayout();
-  void slotValueChanged(int);
   bool scroll(ScrollDirection direction,
               ScrollGranularity granularity,
               float multiplier = 1.0);
@@ -392,7 +394,7 @@ class RenderLayer : WidgetClient {
 
   bool shouldBeOverflowOnly() const;
 
-  virtual void valueChanged(Widget*);
+  virtual void valueChanged(ScrollBar*);
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
