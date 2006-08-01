@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TransferJobInternal_H_
-#define TransferJobInternal_H_
+#ifndef ResourceLoaderInternal_H_
+#define ResourceLoaderInternal_H_
 
 #include "KURL.h"
 #include "FormData.h"
@@ -39,18 +39,18 @@ typedef void* HANDLE;
 typedef void CURL;
 #endif
 
-// The allocations and releases in TransferJobInternal are
+// The allocations and releases in ResourceLoaderInternal are
 // Cocoa-exception-free (either simple Foundation classes or
 // WebCoreResourceLoaderImp which avoids doing work in dealloc).
 
 namespace WebCore {
 
-class TransferJobInternal {
+class ResourceLoaderInternal {
  public:
-  TransferJobInternal(TransferJob* job,
-                      TransferJobClient* c,
-                      const String& method,
-                      const KURL& u)
+  ResourceLoaderInternal(ResourceLoader* job,
+                         ResourceLoaderClient* c,
+                         const String& method,
+                         const KURL& u)
       : client(c),
         status(0),
         URL(u),
@@ -65,7 +65,7 @@ class TransferJobInternal {
 #if WIN32
         ,
         m_fileHandle(0),
-        m_fileLoadTimer(job, &TransferJob::fileLoadTimer),
+        m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
         m_jobId(0),
@@ -82,11 +82,11 @@ class TransferJobInternal {
   {
   }
 
-  TransferJobInternal(TransferJob* job,
-                      TransferJobClient* c,
-                      const String& method,
-                      const KURL& u,
-                      const FormData& p)
+  ResourceLoaderInternal(ResourceLoader* job,
+                         ResourceLoaderClient* c,
+                         const String& method,
+                         const KURL& u,
+                         const FormData& p)
       : client(c),
         status(0),
         URL(u),
@@ -102,7 +102,7 @@ class TransferJobInternal {
 #if WIN32
         ,
         m_fileHandle(0),
-        m_fileLoadTimer(job, &TransferJob::fileLoadTimer),
+        m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
         m_jobId(0),
@@ -119,9 +119,9 @@ class TransferJobInternal {
   {
   }
 
-  ~TransferJobInternal();
+  ~ResourceLoaderInternal();
 
-  TransferJobClient* client;
+  ResourceLoaderClient* client;
 
   int status;
   HashMap<String, String> metaData;
@@ -139,7 +139,7 @@ class TransferJobInternal {
 #endif
 #if WIN32
   HANDLE m_fileHandle;
-  Timer<TransferJob> m_fileLoadTimer;
+  Timer<ResourceLoader> m_fileLoadTimer;
   HINTERNET m_resourceHandle;
   HINTERNET m_secondaryHandle;
   unsigned m_jobId;
@@ -157,4 +157,4 @@ class TransferJobInternal {
 
 }  // namespace WebCore
 
-#endif  // TransferJobInternal_H_
+#endif  // ResourceLoaderInternal_H_

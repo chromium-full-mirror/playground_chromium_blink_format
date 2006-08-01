@@ -38,8 +38,8 @@
 #include "HTMLDocument.h"
 #include "LoaderFunctions.h"
 #include "Request.h"
-#include "TransferJob.h"
-#include "TransferJob.h"
+#include "ResourceLoader.h"
+#include "ResourceLoader.h"
 #include <wtf/Assertions.h>
 #include <wtf/Vector.h>
 
@@ -91,7 +91,7 @@ void Loader::servePendingRequests() {
   Request* req = m_requestsPending.take(0);
 
   KURL u(req->cachedObject()->url().deprecatedString());
-  TransferJob* job = new TransferJob(this, "GET", u);
+  ResourceLoader* job = new ResourceLoader(this, "GET", u);
 
   if (!req->cachedObject()->accept().isEmpty())
     job->addMetaData("accept", req->cachedObject()->accept());
@@ -113,7 +113,7 @@ void Loader::servePendingRequests() {
     m_requestsLoading.add(job, req);
 }
 
-void Loader::receivedAllData(TransferJob* job, PlatformData allData) {
+void Loader::receivedAllData(ResourceLoader* job, PlatformData allData) {
   RequestMap::iterator i = m_requestsLoading.find(job);
   if (i == m_requestsLoading.end())
     return;
@@ -144,7 +144,7 @@ void Loader::receivedAllData(TransferJob* job, PlatformData allData) {
   servePendingRequests();
 }
 
-void Loader::receivedResponse(TransferJob* job, PlatformResponse response) {
+void Loader::receivedResponse(ResourceLoader* job, PlatformResponse response) {
 #ifdef __APPLE__
   Request* req = m_requestsLoading.get(job);
   ASSERT(req);
@@ -170,7 +170,7 @@ void Loader::receivedResponse(TransferJob* job, PlatformResponse response) {
 #endif
 }
 
-void Loader::receivedData(TransferJob* job, const char* data, int size) {
+void Loader::receivedData(ResourceLoader* job, const char* data, int size) {
   Request* request = m_requestsLoading.get(job);
   if (!request)
     return;
@@ -227,7 +227,7 @@ void Loader::cancelRequests(DocLoader* dl) {
       ++pIt;
   }
 
-  Vector<TransferJob*, 256> jobsToCancel;
+  Vector<ResourceLoader*, 256> jobsToCancel;
 
   RequestMap::iterator end = m_requestsLoading.end();
   for (RequestMap::iterator i = m_requestsLoading.begin(); i != end; ++i) {
@@ -237,7 +237,7 @@ void Loader::cancelRequests(DocLoader* dl) {
   }
 
   for (unsigned i = 0; i < jobsToCancel.size(); ++i) {
-    TransferJob* job = jobsToCancel[i];
+    ResourceLoader* job = jobsToCancel[i];
     Request* r = m_requestsLoading.get(job);
     m_requestsLoading.remove(job);
     Cache::remove(r->cachedObject());
@@ -259,7 +259,7 @@ void Loader::removeBackgroundDecodingRequest(Request* r) {
     m_requestsBackgroundDecoding.remove(r);
 }
 
-TransferJob* Loader::jobForRequest(const String& URL) const {
+ResourceLoader* Loader::jobForRequest(const String& URL) const {
   RequestMap::const_iterator end = m_requestsLoading.end();
   for (RequestMap::const_iterator i = m_requestsLoading.begin(); i != end;
        ++i) {

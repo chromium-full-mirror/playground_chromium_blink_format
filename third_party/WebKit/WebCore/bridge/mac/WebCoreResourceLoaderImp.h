@@ -26,15 +26,15 @@
 #import "WebCoreResourceLoader.h"
 
 namespace WebCore {
-class TransferJob;
+class ResourceLoader;
 }
 
 @interface WebCoreResourceLoaderImp : NSObject<WebCoreResourceLoader> {
-  WebCore::TransferJob* _job;
+  WebCore::ResourceLoader* _job;
   id<WebCoreResourceHandle> _handle;
 }
 
-- (id)initWithJob:(WebCore::TransferJob*)job;
+- (id)initWithJob:(WebCore::ResourceLoader*)job;
 - (void)setHandle:(id<WebCoreResourceHandle>)handle;
 - (void)jobWillBeDeallocated;
 - (void)jobCanceledLoad;

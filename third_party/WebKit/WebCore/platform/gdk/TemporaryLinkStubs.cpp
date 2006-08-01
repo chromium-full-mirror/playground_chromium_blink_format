@@ -58,7 +58,7 @@
 #include "RenderTheme.h"
 #include "FrameGdk.h"
 #include "BrowserExtensionGdk.h"
-#include "TransferJob.h"
+#include "ResourceLoader.h"
 #include "RenderThemeGdk.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
@@ -366,7 +366,7 @@ namespace WebCore {
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
-                                     TransferJob*,
+                                     ResourceLoader*,
                                      KURL&,
                                      DeprecatedString&) {
   notImplemented();
@@ -578,8 +578,8 @@ bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
 }
 void WebCore::refreshPlugins(bool) {}
 
-void WebCore::TransferJob::assembleResponseHeaders() const {}
-void WebCore::TransferJob::retrieveCharset() const {}
+void WebCore::ResourceLoader::assembleResponseHeaders() const {}
+void WebCore::ResourceLoader::retrieveCharset() const {}
 
 void FrameGdk::restoreDocumentState() {}
 void FrameGdk::partClearedInBegin() {}

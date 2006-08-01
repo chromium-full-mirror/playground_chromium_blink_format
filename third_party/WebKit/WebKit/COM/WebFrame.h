@@ -31,7 +31,7 @@
 #include "WebDataSource.h"
 
 #pragma warning(push, 0)
-#include "TransferJobClient.h"
+#include "ResourceLoaderClient.h"
 #include "FrameWin.h"
 #include "PlatformString.h"
 #pragma warning(pop)
@@ -54,7 +54,7 @@ typedef enum {
 } WebFrameLoadType;
 
 class WebFrame : public IWebFrame,
-                 public WebCore::TransferJobClient,
+                 public WebCore::ResourceLoaderClient,
                  public WebCore::FrameWinClient {
  public:
   static WebFrame* createInstance();
@@ -133,13 +133,13 @@ class WebFrame : public IWebFrame,
       /* [out] */ int* frameCount,
       /* [retval][out] */ IWebFrame*** frames);
 
-  // TransferJobClient
-  virtual void receivedRedirect(WebCore::TransferJob*, const WebCore::KURL&);
-  virtual void receivedResponse(WebCore::TransferJob*,
+  // ResourceLoaderClient
+  virtual void receivedRedirect(WebCore::ResourceLoader*, const WebCore::KURL&);
+  virtual void receivedResponse(WebCore::ResourceLoader*,
                                 WebCore::PlatformResponse);
-  virtual void receivedData(WebCore::TransferJob*, const char*, int);
-  virtual void receivedAllData(WebCore::TransferJob*);
-  virtual void receivedAllData(WebCore::TransferJob*, WebCore::PlatformData);
+  virtual void receivedData(WebCore::ResourceLoader*, const char*, int);
+  virtual void receivedAllData(WebCore::ResourceLoader*);
+  virtual void receivedAllData(WebCore::ResourceLoader*, WebCore::PlatformData);
 
   // FrameWinClient
   virtual void openURL(const WebCore::DeprecatedString&, bool lockHistory);

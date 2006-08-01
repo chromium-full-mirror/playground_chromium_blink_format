@@ -24,7 +24,7 @@
 
 #include "KURL.h"
 #include "PlatformString.h"
-#include "TransferJobClient.h"
+#include "ResourceLoaderClient.h"
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -43,7 +43,7 @@ enum XMLHttpRequestState {
   Completed = 4     // Finished with all operations
 };
 
-class XMLHttpRequest : public Shared<XMLHttpRequest>, TransferJobClient {
+class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
  public:
   XMLHttpRequest(Document*);
   ~XMLHttpRequest();
@@ -76,9 +76,9 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, TransferJobClient {
  private:
   bool urlMatchesDocumentDomain(const KURL&) const;
 
-  virtual void receivedRedirect(TransferJob*, const KURL&);
-  virtual void receivedData(TransferJob*, const char* data, int size);
-  virtual void receivedAllData(TransferJob*);
+  virtual void receivedRedirect(ResourceLoader*, const KURL&);
+  virtual void receivedData(ResourceLoader*, const char* data, int size);
+  virtual void receivedAllData(ResourceLoader*);
 
   void processSyncLoadResults(const Vector<char>& data,
                               const KURL& finalURL,
@@ -102,7 +102,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, TransferJobClient {
   bool m_async;
   DeprecatedString m_requestHeaders;
 
-  TransferJob* m_job;
+  ResourceLoader* m_job;
 
   XMLHttpRequestState m_state;
 

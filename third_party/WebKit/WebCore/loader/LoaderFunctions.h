@@ -49,11 +49,11 @@ class KURL;
 class Loader;
 class Request;
 class String;
-class TransferJob;
+class ResourceLoader;
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
-                                     TransferJob*,
+                                     ResourceLoader*,
                                      KURL& finalURL,
                                      DeprecatedString& headers);
 

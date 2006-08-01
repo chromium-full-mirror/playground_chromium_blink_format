@@ -1,7 +1,5 @@
 /*
  * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
- * Copyright (C) 2005, 2006 Michael Emmel mike.emmel@gmail.com
- * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,28 +23,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "TransferJob.h"
+#ifndef ResourceLoaderWin_H
+#define ResourceLoaderWin_H
 
-#include "DocLoader.h"
-#include "TransferJobInternal.h"
-#include "TransferJobManager.h"
+#include <windows.h>
 
 namespace WebCore {
 
-TransferJobInternal::~TransferJobInternal() {}
+struct PlatformDataStruct {
+  DWORD error;
+  BOOL loaded;
+  LPTSTR errorString;
+};
 
-TransferJob::~TransferJob() {
-  cancel();
+struct PlatformResponseStruct {};
 }
 
-bool TransferJob::start(DocLoader* docLoader) {
-  TransferJobManager::get()->add(this);
-  return true;
-}
-
-void TransferJob::cancel() {
-  TransferJobManager::get()->cancel(this);
-}
-
-}  // namespace WebCore
+#endif

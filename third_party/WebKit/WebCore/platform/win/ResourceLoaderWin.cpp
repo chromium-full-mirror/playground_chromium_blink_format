@@ -24,9 +24,9 @@
  */
 
 #include "config.h"
-#include "TransferJob.h"
-#include "TransferJobInternal.h"
-#include "TransferJobWin.h"
+#include "ResourceLoader.h"
+#include "ResourceLoaderInternal.h"
+#include "ResourceLoaderWin.h"
 
 #include "DocLoader.h"
 #include "Frame.h"
@@ -37,15 +37,15 @@
 namespace WebCore {
 
 static unsigned transferJobId = 0;
-static HashMap<int, TransferJob*>* jobIdMap = 0;
+static HashMap<int, ResourceLoader*>* jobIdMap = 0;
 
 static HWND transferJobWindowHandle = 0;
 static UINT loadStatusMessage = 0;
-const LPCWSTR kTransferJobWindowClassName = L"TransferJobWindowClass";
+const LPCWSTR kResourceLoaderWindowClassName = L"ResourceLoaderWindowClass";
 
-static int addToOutstandingJobs(TransferJob* job) {
+static int addToOutstandingJobs(ResourceLoader* job) {
   if (!jobIdMap)
-    jobIdMap = new HashMap<int, TransferJob*>;
+    jobIdMap = new HashMap<int, ResourceLoader*>;
   transferJobId++;
   jobIdMap->set(transferJobId, job);
   return transferJobId;
@@ -57,7 +57,7 @@ static void removeFromOutstandingJobs(int jobId) {
   jobIdMap->remove(jobId);
 }
 
-static TransferJob* lookupTransferJob(int jobId) {
+static ResourceLoader* lookupResourceLoader(int jobId) {
   if (!jobIdMap)
     return 0;
   return jobIdMap->get(jobId);
@@ -68,10 +68,10 @@ struct JobLoadStatus {
   DWORD_PTR dwResult;
 };
 
-LRESULT CALLBACK TransferJobWndProc(HWND hWnd,
-                                    UINT message,
-                                    WPARAM wParam,
-                                    LPARAM lParam) {
+LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
+                                       UINT message,
+                                       WPARAM wParam,
+                                       LPARAM lParam) {
   if (message == loadStatusMessage) {
     JobLoadStatus* jobLoadStatus = (JobLoadStatus*)lParam;
     DWORD internetStatus = jobLoadStatus->internetStatus;
@@ -82,7 +82,7 @@ LRESULT CALLBACK TransferJobWndProc(HWND hWnd,
     // If we get a message about a job we no longer know about (already
     // deleted), ignore it.
     unsigned jobId = (unsigned)wParam;
-    TransferJob* job = lookupTransferJob(jobId);
+    ResourceLoader* job = lookupResourceLoader(jobId);
     if (!job)
       return 0;
 
@@ -222,31 +222,31 @@ LRESULT CALLBACK TransferJobWndProc(HWND hWnd,
   return 0;
 }
 
-static void initializeOffScreenTransferJobWindow() {
+static void initializeOffScreenResourceLoaderWindow() {
   if (transferJobWindowHandle)
     return;
 
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));
   wcex.cbSize = sizeof(WNDCLASSEX);
-  wcex.lpfnWndProc = TransferJobWndProc;
+  wcex.lpfnWndProc = ResourceLoaderWndProc;
   wcex.hInstance = Widget::instanceHandle;
-  wcex.lpszClassName = kTransferJobWindowClassName;
+  wcex.lpszClassName = kResourceLoaderWindowClassName;
   RegisterClassEx(&wcex);
 
   transferJobWindowHandle = CreateWindow(
-      kTransferJobWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
+      kResourceLoaderWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
       HWND_MESSAGE, 0, Widget::instanceHandle, 0);
   loadStatusMessage =
-      RegisterWindowMessage(L"com.apple.WebKit.TransferJobLoadStatus");
+      RegisterWindowMessage(L"com.apple.WebKit.ResourceLoaderLoadStatus");
 }
 
-TransferJobInternal::~TransferJobInternal() {
+ResourceLoaderInternal::~ResourceLoaderInternal() {
   if (m_fileHandle)
     CloseHandle(m_fileHandle);
 }
 
-TransferJob::~TransferJob() {
+ResourceLoader::~ResourceLoader() {
   if (d->m_jobId)
     removeFromOutstandingJobs(d->m_jobId);
 }
@@ -268,7 +268,7 @@ static void __stdcall transferJobStatusCallback(HINTERNET internetHandle,
   }
 }
 
-bool TransferJob::start(DocLoader* docLoader) {
+bool ResourceLoader::start(DocLoader* docLoader) {
   if (d->URL.isLocalFile()) {
     DeprecatedString path = d->URL.path();
     // windows does not enjoy a leading slash on paths
@@ -301,7 +301,7 @@ bool TransferJob::start(DocLoader* docLoader) {
     static INTERNET_STATUS_CALLBACK callbackHandle =
         InternetSetStatusCallback(internetHandle, transferJobStatusCallback);
 
-    initializeOffScreenTransferJobWindow();
+    initializeOffScreenResourceLoaderWindow();
     d->m_jobId = addToOutstandingJobs(this);
 
     // For form posting, we can't use InternetOpenURL.  We have to use
@@ -340,7 +340,7 @@ bool TransferJob::start(DocLoader* docLoader) {
   }
 }
 
-void TransferJob::fileLoadTimer(Timer<TransferJob>* timer) {
+void ResourceLoader::fileLoadTimer(Timer<ResourceLoader>* timer) {
   bool result = false;
   DWORD bytesRead = 0;
 
@@ -364,7 +364,7 @@ void TransferJob::fileLoadTimer(Timer<TransferJob>* timer) {
   d->client->receivedAllData(this);
 }
 
-void TransferJob::cancel() {
+void ResourceLoader::cancel() {
   if (d->m_resourceHandle)
     InternetCloseHandle(d->m_resourceHandle);
   else
