@@ -876,15 +876,19 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       ASSERT_NOT_REACHED();
       return 0;
     case CSS_PROP_MARGIN_TOP:
+      // FIXME: Supposed to return the percentage if percentage was specified.
       return new CSSPrimitiveValue(renderer->marginTop(),
                                    CSSPrimitiveValue::CSS_PX);
     case CSS_PROP_MARGIN_RIGHT:
+      // FIXME: Supposed to return the percentage if percentage was specified.
       return new CSSPrimitiveValue(renderer->marginRight(),
                                    CSSPrimitiveValue::CSS_PX);
     case CSS_PROP_MARGIN_BOTTOM:
+      // FIXME: Supposed to return the percentage if percentage was specified.
       return new CSSPrimitiveValue(renderer->marginBottom(),
                                    CSSPrimitiveValue::CSS_PX);
     case CSS_PROP_MARGIN_LEFT:
+      // FIXME: Supposed to return the percentage if percentage was specified.
       return new CSSPrimitiveValue(renderer->marginLeft(),
                                    CSSPrimitiveValue::CSS_PX);
     case CSS_PROP__WEBKIT_MARQUEE:
