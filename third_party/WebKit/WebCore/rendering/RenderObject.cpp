@@ -900,14 +900,14 @@ void RenderObject::drawBorder(GraphicsContext* p,
     style = SOLID;
 
   if (!c.isValid()) {
-    if (invalidisInvert) {
+    if (invalidisInvert)
       // FIXME: The original KHTML did XOR here -- what do we want to do
       // instead?
       c = Color::white;
-    } else {
+    else {
       if (style == INSET || style == OUTSET || style == RIDGE ||
           style == GROOVE)
-        c.setRgb(238, 238, 238);
+        c.setRGB(238, 238, 238);
       else
         c = textcolor;
     }

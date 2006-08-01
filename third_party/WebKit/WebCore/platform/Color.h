@@ -53,33 +53,34 @@ int differenceSquared(const Color&, const Color&);
 
 class Color {
  public:
-  Color() : color(0), valid(false) {}
-  Color(RGBA32 col) : color(col), valid(true) {}
-  Color(int r, int g, int b) : color(makeRGB(r, g, b)), valid(true) {}
+  Color() : m_color(0), m_valid(false) {}
+  Color(RGBA32 col) : m_color(col), m_valid(true) {}
+  Color(int r, int g, int b) : m_color(makeRGB(r, g, b)), m_valid(true) {}
   Color(int r, int g, int b, int a)
-      : color(makeRGBA(r, g, b, a)), valid(true) {}
+      : m_color(makeRGBA(r, g, b, a)), m_valid(true) {}
   explicit Color(const String&);
   explicit Color(const char*);
 
   String name() const;
   void setNamedColor(const String&);
 
-  bool isValid() const { return valid; }
+  bool isValid() const { return m_valid; }
 
   bool hasAlpha() const { return alpha() < 255; }
 
-  int red() const { return (color >> 16) & 0xFF; }
-  int green() const { return (color >> 8) & 0xFF; }
-  int blue() const { return color & 0xFF; }
-  int alpha() const { return (color >> 24) & 0xFF; }
-  RGBA32 rgb() const { return color; }  // Preserve the alpha.
-  void setRgb(int r, int g, int b) {
-    color = makeRGB(r, g, b);
-    valid = true;
+  int red() const { return (m_color >> 16) & 0xFF; }
+  int green() const { return (m_color >> 8) & 0xFF; }
+  int blue() const { return m_color & 0xFF; }
+  int alpha() const { return (m_color >> 24) & 0xFF; }
+
+  RGBA32 rgb() const { return m_color; }  // Preserve the alpha.
+  void setRGB(int r, int g, int b) {
+    m_color = makeRGB(r, g, b);
+    m_valid = true;
   }
-  void setRgb(RGBA32 rgb) {
-    color = rgb;
-    valid = true;
+  void setRGB(RGBA32 rgb) {
+    m_color = rgb;
+    m_valid = true;
   }
   void getRGBA(float& r, float& g, float& b, float& a) const;
   void getRGBA(double& r, double& g, double& b, double& a) const;
@@ -97,8 +98,8 @@ class Color {
   static const RGBA32 transparent = 0x00000000;
 
  private:
-  RGBA32 color;
-  bool valid : 1;
+  RGBA32 m_color;
+  bool m_valid : 1;
 };
 
 inline bool operator==(const Color& a, const Color& b) {
@@ -116,6 +117,7 @@ void setFocusRingColorChangeFunction(void (*)());
 NSColor* nsColor(const Color&);
 CGColorRef cgColor(const Color&);
 #endif
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // COLOR_H_
