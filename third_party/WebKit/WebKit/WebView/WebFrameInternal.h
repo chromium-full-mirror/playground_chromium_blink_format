@@ -32,6 +32,7 @@
 #import <WebKit/WebFramePrivate.h>
 
 @class WebInspector;
+@class WebFrameLoader;
 
 @interface WebFrame (WebInternal)
 
@@ -52,7 +53,6 @@
                                               length:(unsigned)length
                                                error:(NSError*)error;
 - (void)_safeLoadURL:(NSURL*)URL;
-- (void)_setupForReplace;
 
 - (BOOL)_hasSelection;
 - (void)_clearSelection;
@@ -76,6 +76,12 @@
 
 - (void)_addInspector:(WebInspector*)inspector;
 - (void)_removeInspector:(WebInspector*)inspector;
+
+- (WebFrameLoader*)_frameLoader;
+- (void)_provisionalLoadStarted;
+- (void)_prepareForDataSourceReplacement;
+- (void)_frameLoadCompleted;
+
 @end
 
 @interface NSObject (WebInternalFrameLoadDelegate)
