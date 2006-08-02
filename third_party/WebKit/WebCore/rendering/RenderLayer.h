@@ -262,6 +262,8 @@ class RenderLayer : public ScrollBarClient {
                           const ScrollAlignment& alignY);
   void setHasHorizontalScrollbar(bool hasScrollbar);
   void setHasVerticalScrollbar(bool hasScrollbar);
+  ScrollBar* createScrollbar(ScrollBarOrientation orientation);
+  void destroyScrollbar(ScrollBarOrientation orientation);
   ScrollBar* horizontalScrollbar() { return m_hBar; }
   ScrollBar* verticalScrollbar() { return m_vBar; }
   PlatformScrollBar* horizontalScrollbarWidget() const;
