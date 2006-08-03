@@ -36,7 +36,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#if __OBJC__
+#ifdef __OBJC__
 @class NSString;
 #endif
 
@@ -131,7 +131,7 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
   StringImpl(CFStringRef);
   CFStringRef createCFString() const;
 #endif
-#if __OBJC__
+#ifdef __OBJC__
   StringImpl(NSString*);
   operator NSString*() const;
 #endif

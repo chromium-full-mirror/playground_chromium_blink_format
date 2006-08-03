@@ -33,7 +33,7 @@
 
 typedef struct CGPoint CGPoint;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGPoint NSPoint;
 #else
 typedef struct _NSPoint NSPoint;
@@ -66,7 +66,7 @@ class FloatPoint {
   FloatPoint(const CGPoint&);
   operator CGPoint() const;
 
-#if !NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
   FloatPoint(const NSPoint&);
   operator NSPoint() const;
 #endif

@@ -33,7 +33,7 @@
 
 typedef struct CGRect CGRect;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGRect NSRect;
 #else
 typedef struct _NSRect NSRect;
@@ -103,7 +103,7 @@ class FloatRect {
   FloatRect(const CGRect&);
   operator CGRect() const;
 
-#if !NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
   FloatRect(const NSRect&);
   operator NSRect() const;
 #endif

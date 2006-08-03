@@ -31,7 +31,7 @@
 
 typedef struct CGSize CGSize;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGSize NSSize;
 #else
 typedef struct _NSSize NSSize;
@@ -111,6 +111,7 @@ inline bool operator==(const FloatSize& a, const FloatSize& b) {
 inline bool operator!=(const FloatSize& a, const FloatSize& b) {
   return a.width() != b.width() || a.height() != b.height();
 }
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // FloatSize_h

@@ -34,22 +34,24 @@
 #include "HTMLDocument.h"
 #include "HTMLTokenizer.h"
 #include "LoaderFunctions.h"
-#include "Text.h"
 #include "ResourceLoader.h"
+#include "Text.h"
 #include "loader.h"
 #include "markup.h"
-#include <wtf/Vector.h>
 #include <libxslt/imports.h>
 #include <libxslt/variables.h>
 #include <libxslt/xsltutils.h>
+#include <wtf/Assertions.h>
+#include <wtf/Platform.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
 static void parseErrorFunc(void* ctxt, const char* msg, ...) {
 // FIXME: It would be nice to display error messages somewhere.
-#if !WIN32
+#if !PLATFORM(WIN_OS)
 // FIXME: No vasprintf support.
-#if !ERROR_DISABLED
+#ifndef ERROR_DISABLED
   char* errorMessage = 0;
   va_list args;
   va_start(args, msg);
@@ -416,6 +418,7 @@ void XSLTProcessor::removeParameter(StringImpl* namespaceURI,
   // FIXME: namespace support?
   m_parameters.remove(localName);
 }
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // KHTML_XSLT

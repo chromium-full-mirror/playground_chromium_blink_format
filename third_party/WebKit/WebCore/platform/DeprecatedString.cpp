@@ -31,9 +31,11 @@
 #include "TextEncoding.h"
 #include <kjs/dtoa.h>
 #include <kjs/identifier.h>
-#include <stdio.h>
 #include <stdarg.h>
-#ifdef WIN32
+#include <stdio.h>
+#include <wtf/Platform.h>
+
+#if PLATFORM(WIN_OS)
 #include <windows.h>
 #endif
 
@@ -72,7 +74,7 @@ static inline void initializeHandleNodes() {
 }
 
 static inline DeprecatedStringData** allocateHandle() {
-#if CHECK_FOR_HANDLE_LEAKS
+#ifdef CHECK_FOR_HANDLE_LEAKS
   return static_cast<DeprecatedStringData**>(
       fastMalloc(sizeof(DeprecatedStringData*)));
 #endif
@@ -786,7 +788,7 @@ bool DeprecatedString::startsWith(const char* prefix) const {
   }
 }
 
-#ifdef WIN32
+#if PLATFORM(WIN_OS)
 inline int strncasecmp(const char* first,
                        const char* second,
                        size_t maxLength) {
@@ -2363,7 +2365,7 @@ static HandleNode* initializeHandleNodeBlock(HandlePageNode* pageNode) {
   HandleNode* block;
   HandleNode* aNode;
 
-#ifdef WIN32
+#if PLATFORM(WIN_OS)
   block = (HandleNode*)VirtualAlloc(0, pageSize, MEM_COMMIT | MEM_RESERVE,
                                     PAGE_READWRITE);
 #else
@@ -2429,7 +2431,7 @@ static HandleNode* allocateNode(HandlePageNode* pageNode) {
 }
 
 void freeHandle(DeprecatedStringData** _free) {
-#if CHECK_FOR_HANDLE_LEAKS
+#ifdef CHECK_FOR_HANDLE_LEAKS
   fastFree(_free);
   return;
 #endif

@@ -117,7 +117,9 @@ enum EPointerEvents {
   PE_ALL
 };
 
+class CSSValue;
 class CSSValueList;
+class SVGPaint;
 
 // Inherited/Non-Inherited Style Datastructures
 class StyleFillData : public Shared<StyleFillData> {

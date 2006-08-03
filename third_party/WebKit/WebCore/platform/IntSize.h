@@ -27,19 +27,21 @@
 #ifndef INTSIZE_H_
 #define INTSIZE_H_
 
+#include <wtf/Platform.h>
+
 #if __APPLE__
 
 typedef struct CGSize CGSize;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGSize NSSize;
 #else
 typedef struct _NSSize NSSize;
 #endif
 
-#endif
+#endif  // __APPLE__
 
-#if WIN32
+#if PLATFORM(WIN)
 typedef struct tagSIZE SIZE;
 #endif
 
@@ -82,7 +84,7 @@ class IntSize {
 
 #endif
 
-#if WIN32
+#if PLATFORM(WIN)
   IntSize(const SIZE&);
   operator SIZE() const;
 #endif
@@ -122,6 +124,7 @@ inline bool operator==(const IntSize& a, const IntSize& b) {
 inline bool operator!=(const IntSize& a, const IntSize& b) {
   return a.width() != b.width() || a.height() != b.height();
 }
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // INTSIZE_H_

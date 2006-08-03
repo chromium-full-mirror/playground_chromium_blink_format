@@ -118,7 +118,7 @@ class Range : public Shared<Range> {
 
   Position editingStartPosition() const;
 
-#if !NDEBUG
+#ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 

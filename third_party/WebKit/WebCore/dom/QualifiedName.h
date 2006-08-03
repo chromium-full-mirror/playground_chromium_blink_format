@@ -82,7 +82,7 @@ class QualifiedName {
   QualifiedNameImpl* m_impl;
 };
 
-#if !WEBCORE_QUALIFIEDNAME_HIDE_GLOBALS
+#ifndef WEBCORE_QUALIFIEDNAME_HIDE_GLOBALS
 extern const QualifiedName anyName;
 inline const QualifiedName& anyQName() {
   return anyName;

@@ -27,20 +27,21 @@
 #define INTPOINT_H_
 
 #include "IntSize.h"
+#include <wtf/Platform.h>
 
 #if __APPLE__
 
 typedef struct CGPoint CGPoint;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGPoint NSPoint;
 #else
 typedef struct _NSPoint NSPoint;
 #endif
 
-#endif
+#endif  // __APPLE__
 
-#if WIN32
+#if PLATFORM(WIN)
 typedef struct tagPOINT POINT;
 #endif
 
@@ -68,7 +69,7 @@ class IntPoint {
       const CGPoint&);  // don't do this implicitly since it's lossy
   operator CGPoint() const;
 
-#if !NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
   explicit IntPoint(
       const NSPoint&);  // don't do this implicitly since it's lossy
   operator NSPoint() const;
@@ -76,7 +77,7 @@ class IntPoint {
 
 #endif
 
-#if WIN32
+#if PLATFORM(WIN)
   IntPoint(const POINT&);
   operator POINT() const;
 #endif
@@ -114,6 +115,7 @@ inline bool operator==(const IntPoint& a, const IntPoint& b) {
 inline bool operator!=(const IntPoint& a, const IntPoint& b) {
   return a.x() != b.x() || a.y() != b.y();
 }
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // INTPOINT_H_

@@ -104,7 +104,7 @@ class RenderTableCell : public RenderBlock {
     return static_cast<RenderTableSection*>(parent()->parent());
   }
 
-#if !NDEBUG
+#ifndef NDEBUG
   virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
 #endif
 

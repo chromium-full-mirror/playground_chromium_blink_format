@@ -158,7 +158,7 @@ class String {
     return m_impl ? m_impl->createCFString() : CFSTR("");
   }
 #endif
-#if __OBJC__
+#ifdef __OBJC__
   String(NSString*);
   operator NSString*() const {
     if (!m_impl)

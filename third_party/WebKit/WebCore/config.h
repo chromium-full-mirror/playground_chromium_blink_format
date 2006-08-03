@@ -27,7 +27,7 @@
 #define HAVE_FUNC_USLEEP 1
 
 #ifndef CGFLOAT_DEFINED
-#if __LP64__
+#ifdef __LP64__
 typedef double CGFloat;
 #else
 typedef float CGFloat;
@@ -35,9 +35,9 @@ typedef float CGFloat;
 #define CGFLOAT_DEFINED 1
 #endif
 
-#endif
+#endif /* __APPLE__ */
 
-#if WIN32
+#if PLATFORM(WIN_OS)
 
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
@@ -54,10 +54,9 @@ typedef float CGFloat;
 // FIXME: Should probably just dump this eventually, but it's needed for now.
 // We get this from some system place on OS X; probably better not to use it
 // in WebCore code.
-
 #include <assert.h>
 
-#endif
+#endif /* PLATFORM(WIN_OS) */
 
 #ifdef __cplusplus
 
@@ -70,6 +69,6 @@ typedef float CGFloat;
 
 #endif
 
-#if !defined(WIN32)  // can't get this to compile on Visual C++ yet
+#if !COMPILER(MSVC)  // can't get this to compile on Visual C++ yet
 #define AVOID_STATIC_CONSTRUCTORS 1
 #endif

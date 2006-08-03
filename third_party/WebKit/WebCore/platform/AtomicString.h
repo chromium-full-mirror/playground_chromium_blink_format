@@ -150,13 +150,14 @@ inline bool equalIgnoringCase(const String& a, const AtomicString& b) {
 }
 
 // Define external global variables for the commonly used atomic strings.
-#if !ATOMICSTRING_HIDE_GLOBALS
+#ifndef ATOMICSTRING_HIDE_GLOBALS
 extern const AtomicString nullAtom;
 extern const AtomicString emptyAtom;
 extern const AtomicString textAtom;
 extern const AtomicString commentAtom;
 extern const AtomicString starAtom;
 #endif
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // AtomicString_h

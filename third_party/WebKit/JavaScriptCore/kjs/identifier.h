@@ -87,7 +87,7 @@ class Identifier {
   static PassRefPtr<UString::Rep> add(UString::Rep*);
 };
 
-#if !KJS_IDENTIFIER_HIDE_GLOBALS
+#ifndef KJS_IDENTIFIER_HIDE_GLOBALS
 extern const Identifier nullIdentifier;
 
 inline const Identifier& Identifier::null() {
@@ -116,7 +116,7 @@ inline bool operator==(const Identifier& a, const char* b) {
               macro(toExponential) macro(toPrecision) macro(valueOf)
 
 // Define external global variables for all property names above (and one more).
-#if !KJS_IDENTIFIER_HIDE_GLOBALS
+#ifndef KJS_IDENTIFIER_HIDE_GLOBALS
 extern const Identifier specialPrototypePropertyName;
 
 #define KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL(name) \
@@ -125,6 +125,7 @@ KJS_IDENTIFIER_EACH_PROPERTY_NAME_GLOBAL(
     KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL)
 #undef KJS_IDENTIFIER_DECLARE_PROPERTY_NAME_GLOBAL
 #endif
-}
 
-#endif
+}  // namespace KJS
+
+#endif  // KJS_IDENTIFIER_H

@@ -29,7 +29,7 @@
 // avoids code that
 // runs at init time.
 
-#if !AVOID_STATIC_CONSTRUCTORS
+#ifndef AVOID_STATIC_CONSTRUCTORS
 // Define an global in the normal way.
 #define DEFINE_GLOBAL(type, name, ...) const type name;
 #else

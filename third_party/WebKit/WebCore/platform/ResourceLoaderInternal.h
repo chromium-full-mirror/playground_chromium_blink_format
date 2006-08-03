@@ -27,11 +27,12 @@
 #ifndef ResourceLoaderInternal_H_
 #define ResourceLoaderInternal_H_
 
-#include "KURL.h"
 #include "FormData.h"
+#include "KURL.h"
 #include <wtf/HashMap.h>
+#include <wtf/Platform.h>
 
-#ifdef WIN32
+#if PLATFORM(WIN)
 typedef void* HANDLE;
 #endif
 
@@ -62,7 +63,7 @@ class ResourceLoaderInternal {
         loader(nil),
         response(nil)
 #endif
-#if WIN32
+#if PLATFORM(WIN)
         ,
         m_fileHandle(0),
         m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
@@ -99,7 +100,7 @@ class ResourceLoaderInternal {
         loader(nil),
         response(nil)
 #endif
-#if WIN32
+#if PLATFORM(WIN)
         ,
         m_fileHandle(0),
         m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
@@ -137,7 +138,7 @@ class ResourceLoaderInternal {
   WebCoreResourceLoaderImp* loader;
   NSURLResponse* response;
 #endif
-#if WIN32
+#if PLATFORM(WIN)
   HANDLE m_fileHandle;
   Timer<ResourceLoader> m_fileLoadTimer;
   HINTERNET m_resourceHandle;

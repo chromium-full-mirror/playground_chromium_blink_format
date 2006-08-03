@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#if AVOID_STATIC_CONSTRUCTORS
+#ifdef AVOID_STATIC_CONSTRUCTORS
 #define CSS_MEDIAQUERY_NAMES_HIDE_GLOBALS 1
 #endif
 
@@ -50,5 +50,6 @@ void init() {
     initialized = true;
   }
 }
-}
-}
+
+}  // namespace MediaFeatureNames
+}  // namespace WebCore

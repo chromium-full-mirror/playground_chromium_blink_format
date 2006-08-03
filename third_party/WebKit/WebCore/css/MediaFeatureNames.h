@@ -54,7 +54,7 @@ namespace MediaFeatureNames {
                                           macro(min_width,                     \
                                                 "min-width")  // end of macro
 
-#if !CSS_MEDIAQUERY_NAMES_HIDE_GLOBALS
+#ifndef CSS_MEDIAQUERY_NAMES_HIDE_GLOBALS
 #define CSS_MEDIAQUERY_NAMES_DECLARE(name, str) \
   extern const AtomicString name##MediaFeature;
 CSS_MEDIAQUERY_NAMES_FOR_EACH_MEDIAFEATURE(CSS_MEDIAQUERY_NAMES_DECLARE)
@@ -62,7 +62,8 @@ CSS_MEDIAQUERY_NAMES_FOR_EACH_MEDIAFEATURE(CSS_MEDIAQUERY_NAMES_DECLARE)
 #endif
 
 void init();
-}
-}
 
-#endif
+}  // namespace MediaFeatureNames
+}  // namespace WebCore
+
+#endif  // MEDIAFEATURENAMES_H

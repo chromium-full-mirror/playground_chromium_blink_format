@@ -2832,7 +2832,7 @@ bool CSSParser::parseBorderImage(int propId, bool important) {
   return context.failed();
 }
 
-#if CSS_DEBUG
+#ifdef CSS_DEBUG
 
 static inline int yyerror(const char* str) {
   kdDebug(6080) << "CSS parse error " << str << endl;

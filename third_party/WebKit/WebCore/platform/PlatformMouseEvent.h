@@ -27,6 +27,7 @@
 #define PlatformMouseEvent_h
 
 #include "IntPoint.h"
+#include <wtf/Platform.h>
 
 #if __APPLE__
 #ifdef __OBJC__
@@ -36,7 +37,7 @@ class NSEvent;
 #endif
 #endif
 
-#if WIN32
+#if PLATFORM(WIN)
 typedef struct HWND__* HWND;
 typedef unsigned WPARAM;
 typedef long LPARAM;
@@ -98,7 +99,7 @@ class PlatformMouseEvent {
 #if __APPLE__
   PlatformMouseEvent(NSEvent*);
 #endif
-#if WIN32
+#if PLATFORM(WIN)
   PlatformMouseEvent(HWND, WPARAM, LPARAM, int clickCount);
 #endif
 #if PLATFORM(GDK)

@@ -26,6 +26,8 @@
 #ifndef WEBCORE_PLATFORM_WIDGET_H_
 #define WEBCORE_PLATFORM_WIDGET_H_
 
+#include <wtf/Platform.h>
+
 #if __APPLE__
 #ifdef __OBJC__
 @class NSView;
@@ -34,7 +36,7 @@ class NSView;
 #endif
 #endif
 
-#if WIN32
+#if PLATFORM(WIN)
 typedef struct HWND__* HWND;
 typedef struct HINSTANCE__* HINSTANCE;
 #endif
@@ -125,7 +127,7 @@ class Widget {
 
   virtual bool isFrameView() const;
 
-#if WIN32
+#if PLATFORM(WIN)
   Widget(HWND);
   HWND windowHandle() const;
   void setWindowHandle(HWND);
@@ -160,6 +162,7 @@ class Widget {
  private:
   WidgetPrivate* data;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // WEBCORE_PLATFORM_WIDGET_H_

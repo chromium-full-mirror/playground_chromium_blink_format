@@ -187,7 +187,7 @@ class Element : public ContainerNode {
     m_needsFocusAppearanceUpdate = b;
   }
 
-#if !NDEBUG
+#ifndef NDEBUG
   virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif

@@ -27,20 +27,21 @@
 #define INTRECT_H_
 
 #include "IntPoint.h"
+#include <wtf/Platform.h>
 
 #if __APPLE__
 
 typedef struct CGRect CGRect;
 
-#if NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGRect NSRect;
 #else
 typedef struct _NSRect NSRect;
 #endif
 
-#endif
+#endif  // __APPLE__
 
-#if WIN32
+#if PLATFORM(WIN)
 typedef struct tagRECT RECT;
 #endif
 
@@ -108,7 +109,7 @@ class IntRect {
   }
   void scale(float s);
 
-#if WIN32
+#if PLATFORM(WIN)
   IntRect(const RECT&);
   operator RECT() const;
 #endif
@@ -117,7 +118,7 @@ class IntRect {
 
   operator CGRect() const;
 
-#if !NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
   operator NSRect() const;
 #endif
 
@@ -152,13 +153,14 @@ inline bool operator!=(const IntRect& a, const IntRect& b) {
 
 IntRect enclosingIntRect(const CGRect&);
 
-#if !NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 
 IntRect enclosingIntRect(const NSRect&);
 
 #endif
 
 #endif
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // INTRECT_H_

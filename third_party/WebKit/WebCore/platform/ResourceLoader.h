@@ -26,12 +26,13 @@
 #ifndef ResourceLoader_H_
 #define ResourceLoader_H_
 
+#include "ResourceLoaderClient.h"  // for PlatformResponse
 #include "StringHash.h"
 #include "Timer.h"
-#include "ResourceLoaderClient.h"  // for PlatformResponse
 #include <wtf/HashMap.h>
+#include <wtf/Platform.h>
 
-#ifdef WIN32
+#if PLATFORM(WIN)
 typedef unsigned long DWORD;
 typedef unsigned long DWORD_PTR;
 typedef void* LPVOID;
@@ -85,7 +86,7 @@ class ResourceLoader {
 #if __APPLE__
   void setLoader(WebCoreResourceLoaderImp*);
 #endif
-#if WIN32
+#if PLATFORM(WIN)
   void fileLoadTimer(Timer<ResourceLoader>* timer);
   friend void __stdcall transferJobStatusCallback(HINTERNET,
                                                   DWORD_PTR,

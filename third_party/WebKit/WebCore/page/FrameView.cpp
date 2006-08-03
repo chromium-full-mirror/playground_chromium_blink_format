@@ -221,7 +221,7 @@ void FrameView::clear() {
 
   d->reset();
 
-#if INSTRUMENT_LAYOUT_SCHEDULING
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (d->layoutTimer.isActive() && m_frame->document() &&
       !m_frame->document()->ownerElement())
     printf("Killing the layout timer from a clear at %d\n",
@@ -412,7 +412,7 @@ void FrameView::layout(bool allowSubtree) {
     } else if (rootRenderer)
       applyOverflowToViewport(rootRenderer, hMode,
                               vMode);  // XML/XHTML UAs use the root element.
-#if INSTRUMENT_LAYOUT_SCHEDULING
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
     if (d->firstLayout && !document->ownerElement())
       printf("Elapsed time before first layout: %d\n", document->elapsedTime());
 #endif
@@ -1245,7 +1245,7 @@ void FrameView::repaintRectangle(const IntRect& r, bool immediate) {
 }
 
 void FrameView::layoutTimerFired(Timer<FrameView>*) {
-#if INSTRUMENT_LAYOUT_SCHEDULING
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (m_frame->document() && !m_frame->document()->ownerElement())
     printf("Layout timer fired at %d\n", m_frame->document()->elapsedTime());
 #endif
@@ -1277,7 +1277,7 @@ void FrameView::scheduleRelayout() {
 
   d->delayedLayout = delay != 0;
 
-#if INSTRUMENT_LAYOUT_SCHEDULING
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!m_frame->document()->ownerElement())
     printf("Scheduling layout for %d\n", delay);
 #endif
@@ -1323,7 +1323,7 @@ void FrameView::unscheduleRelayout() {
   if (!d->layoutTimer.isActive())
     return;
 
-#if INSTRUMENT_LAYOUT_SCHEDULING
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (m_frame->document() && !m_frame->document()->ownerElement())
     printf("Layout timer unscheduled at %d\n",
            m_frame->document()->elapsedTime());
