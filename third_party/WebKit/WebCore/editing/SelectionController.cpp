@@ -201,8 +201,6 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
   }
 
   if (clearRenderTreeSelection) {
-    // FIXME (6498): This doesn't notify the editing delegate of a selection
-    // change.
     RefPtr<Document> document = start->document();
     document->updateRendering();
     if (RenderView* view = static_cast<RenderView*>(document->renderer()))
@@ -210,6 +208,8 @@ void SelectionController::nodeWillBeRemoved(Node* node) {
   }
 
   if (clearDOMTreeSelection)
+    // FIXME (6498): This doesn't notify the editing delegate of a selection
+    // change.
     setSelection(Selection());
 }
 

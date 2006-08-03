@@ -622,7 +622,8 @@ CommandMap* createCommandDictionary() {
   static const EditorCommand commands[] = {
 
       {"BackColor",
-       {execBackColor, enabledAnyRangeSelection, stateNone, valueBackColor}},
+       {execBackColor, enabledAnyRichlyEditableRangeSelection, stateNone,
+        valueBackColor}},
       {"Bold",
        {execBold, enabledAnyRichlyEditableSelection, stateBold, valueNull}},
       {"Copy", {execCopy, enabledAnyRangeSelection, stateNone, valueNull}},
@@ -647,6 +648,9 @@ CommandMap* createCommandDictionary() {
         valueNull}},
       {"ForwardDelete",
        {execForwardDelete, enabledAnyEditableSelection, stateNone, valueNull}},
+      {"HiliteColor",
+       {execBackColor, enabledAnyRichlyEditableSelection, stateNone,
+        valueNull}},
       {"Indent",
        {execIndent, enabledAnyRichlyEditableSelection, stateNone, valueNull}},
       {"InsertHorizontalRule",
