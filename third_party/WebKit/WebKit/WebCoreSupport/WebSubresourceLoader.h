@@ -29,7 +29,7 @@
 #import <WebKit/WebLoader.h>
 #import <WebCore/WebCoreResourceLoader.h>
 
-@class WebDataSource;
+@class WebFrameLoader;
 
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
@@ -45,7 +45,7 @@
                                           URL:(NSURL*)URL
                                 customHeaders:(NSDictionary*)customHeaders
                                      referrer:(NSString*)referrer
-                                forDataSource:(WebDataSource*)source;
+                               forFrameLoader:(WebFrameLoader*)loader;
 
 + (WebSubresourceLoader*)startLoadingResource:(id<WebCoreResourceLoader>)rLoader
                                    withMethod:(NSString*)method
@@ -53,6 +53,6 @@
                                 customHeaders:(NSDictionary*)customHeaders
                                      postData:(NSArray*)postData
                                      referrer:(NSString*)referrer
-                                forDataSource:(WebDataSource*)source;
+                               forFrameLoader:(WebFrameLoader*)loader;
 
 @end

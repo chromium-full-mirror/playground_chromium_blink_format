@@ -43,6 +43,6 @@
   NSURLRequest* _initialRequest;
 }
 
-- (id)initWithDataSource:(WebDataSource*)dataSource;
+- (id)initWithFrameLoader:(WebFrameLoader*)frameLoader;
 
 @end
