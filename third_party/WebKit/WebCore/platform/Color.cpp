@@ -31,6 +31,7 @@
 #include "PlatformString.h"
 #include <math.h>
 #include <wtf/Assertions.h>
+#include <wtf/MathExtras.h>
 
 #include "ColorData.c"
 

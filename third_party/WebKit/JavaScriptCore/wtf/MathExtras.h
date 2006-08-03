@@ -55,6 +55,13 @@ inline bool signbit(double num) {
   return _copysign(1.0, num) < 0;
 }
 
+inline double nextafter(double x, double y) {
+  return _nextafter(x, y);
+}
+inline float nextafterf(float x, float y) {
+  return x > y ? x - FLT_EPSILON : x + FLT_EPSILON;
+}
+
 #if COMPILER(MSVC)
 
 // Work around a bug in the Microsoft CRT, where fmod(x, +-infinity) yields NaN
