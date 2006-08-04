@@ -1092,7 +1092,10 @@ class RenderObject : public CachedResourceClient {
 
   virtual IntRect viewRect() const;
 
-  void remove();
+  void remove() {
+    if (parent())
+      parent()->removeChild(this);
+  }
 
   void invalidateVerticalPositions();
   short getVerticalPosition(bool firstLine) const;

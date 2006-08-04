@@ -2506,6 +2506,9 @@ bool RenderObject::isSelectionBorder() const {
 }
 
 void RenderObject::removeFromObjectLists() {
+  if (documentBeingDestroyed())
+    return;
+
   if (isFloating()) {
     RenderBlock* outermostBlock = containingBlock();
     for (RenderBlock* p = outermostBlock; p && !p->isRenderView();
@@ -2532,22 +2535,13 @@ RenderArena* RenderObject::renderArena() const {
   return doc ? doc->renderArena() : 0;
 }
 
-void RenderObject::remove() {
-  document()->axObjectCache()->remove(this);
-
-  removeFromObjectLists();
-
-  if (parent())
-    parent()->removeChild(this);
-
-  deleteLineBoxWrapper();
-}
-
 bool RenderObject::documentBeingDestroyed() const {
   return !document()->renderer();
 }
 
 void RenderObject::destroy() {
+  document()->axObjectCache()->remove(this);
+
   // By default no ref-counting. RenderWidget::destroy() doesn't call
   // this function because it needs to do ref-counting. If anything
   // in this function changes, be sure to fix RenderWidget::destroy() as well.
