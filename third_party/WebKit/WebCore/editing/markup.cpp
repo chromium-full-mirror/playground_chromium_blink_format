@@ -27,6 +27,10 @@
 #include "markup.h"
 
 #include "CSSComputedStyleDeclaration.h"
+#include "CSSRule.h"
+#include "CSSRuleList.h"
+#include "CSSStyleRule.h"
+#include "cssstyleselector.h"
 #include "Comment.h"
 #include "Document.h"
 #include "DocumentFragment.h"
@@ -173,6 +177,18 @@ static DeprecatedString startMarkup(const Node* node,
             Position(const_cast<Element*>(el), 0).computedStyle();
         RefPtr<CSSMutableStyleDeclaration> style =
             computedStyle->copyInheritableProperties();
+        RefPtr<CSSRuleList> matchedRules =
+            node->document()->styleSelector()->styleRulesForElement(
+                const_cast<Element*>(el), true);
+        if (matchedRules) {
+          for (unsigned i = 0; i < matchedRules->length(); i++) {
+            if (matchedRules->item(i)->type() == CSSRule::STYLE_RULE) {
+              RefPtr<CSSMutableStyleDeclaration> s =
+                  static_cast<CSSStyleRule*>(matchedRules->item(i))->style();
+              style->merge(s.get(), true);
+            }
+          }
+        }
         defaultStyle->diff(style.get());
         if (style->length() > 0) {
           CSSMutableStyleDeclaration* inlineStyleDecl =
