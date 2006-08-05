@@ -181,7 +181,7 @@ void RenderView::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   // blit
   // when scrolling, and we need to use slow repaints.
   Element* elt = element()->document()->ownerElement();
-  if (view() && elt) {
+  if (view() && elt && elt->renderer()) {
     RenderLayer* layer = elt->renderer()->enclosingLayer();
     if (layer->isTransparent() || layer->transparentAncestor())
       frameView()->setUseSlowRepaints();
