@@ -69,6 +69,8 @@ class SiteIcon {
   Image* getImage(const IntSize&);
   String getIconURL() { return m_iconURL; }
 
+  void manuallySetImageData(unsigned char* data, int size);
+
  private:
   String m_iconURL;
   time_t m_expire;
@@ -109,6 +111,9 @@ class IconDatabase {
 
   bool hasIconForIconURL(const String&);
 
+  bool isIconExpiredForIconURL(const String&);
+  bool isIconExpiredForPageURL(const String&);
+
   // TODO - The following 3 methods were considered private in WebKit - analyze
   // the impact of making them
   // public here in WebCore - I don't see any real badness with doing that...
@@ -119,6 +124,8 @@ class IconDatabase {
   void setIconURLForPageURL(const String& iconURL, const String& pageURL);
 
   static const int currentDatabaseVersion;
+  static const int iconExpirationTime;
+  static const int missingIconExpirationTime;
 
  private:
   IconDatabase();
@@ -186,6 +193,13 @@ class IconDatabase {
   Vector<unsigned char> imageDataForIconID(int);
   Vector<unsigned char> imageDataForIconURL(const String&);
   Vector<unsigned char> imageDataForPageURL(const String&);
+
+  // FIXME: This method is currently implemented in WebCoreIconDatabaseBridge so
+  // we can be in ObjC++ and fire off a loader in Webkit
+  // Once all of the loader logic is sufficiently moved into WebCore we need to
+  // move this implementation to IconDatabase.cpp
+  // using WebCore-style loaders
+  void loadIconFromURL(const String&);
 
   static IconDatabase* m_sharedInstance;
   static const int DefaultCachedPageCount;
