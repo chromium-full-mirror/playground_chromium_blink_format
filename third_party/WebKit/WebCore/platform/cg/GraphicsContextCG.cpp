@@ -516,7 +516,7 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   CGContextEOClip(context);
 }
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 KRenderingDeviceContext* GraphicsContext::createRenderingDeviceContext() {
   return new KRenderingDeviceContextQuartz(platformContext());
 }

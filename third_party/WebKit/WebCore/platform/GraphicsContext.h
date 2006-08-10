@@ -60,7 +60,7 @@ class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class Path;
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 class KRenderingDeviceContext;
 #endif
 
@@ -184,7 +184,7 @@ class GraphicsContext : Noncopyable {
   void rotate(float angleInRadians);
   void translate(const FloatSize&);
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   KRenderingDeviceContext* createRenderingDeviceContext();
 #endif
 

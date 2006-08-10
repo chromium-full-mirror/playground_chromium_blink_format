@@ -84,7 +84,7 @@
 #include "XMLTokenizer.h"
 #include "xmlhttprequest.h"
 
-#if XPATH_SUPPORT
+#ifdef XPATH_SUPPORT
 #include "XPathEvaluator.h"
 #include "XPathExpression.h"
 #include "XPathNSResolver.h"
@@ -100,7 +100,7 @@
 using XBL::XBLBindingManager;
 #endif
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 #include "SVGDocumentExtensions.h"
 #include "SVGElementFactory.h"
 #include "SVGZoomEvent.h"
@@ -240,7 +240,7 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       m_secureForms(0),
       m_designMode(inherit),
       m_selfOnlyRefCount(0)
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
       ,
       m_svgExtensions(0)
 #endif
@@ -336,7 +336,7 @@ Document::~Document() {
   assert(!m_inPageCache);
   assert(m_savedRenderer == 0);
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   delete m_svgExtensions;
 #endif
 
@@ -615,7 +615,7 @@ PassRefPtr<Element> Document::createElementNS(const String& _namespaceURI,
         return 0;
     }
   }
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   else if (_namespaceURI == SVGNames::svgNamespaceURI)
     e = SVGElementFactory::createSVGElement(qName, this, false);
 #endif
@@ -1266,7 +1266,7 @@ void Document::implicitClose() {
     axObjectCache()->postNotification(renderer(), "AXLoadComplete");
 #endif
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   // FIXME: Officially, time 0 is when the outermost <svg> receives its
   // SVGLoad event, but we don't implement those yet.  This is close enough
   // for now.  In some cases we should have fired earlier.
@@ -1908,7 +1908,7 @@ void Document::recalcStyleSelector() {
           sheet = 0;
       }
     }
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
     else if (n->isSVGElement() && n->hasTagName(SVGNames::styleTag)) {
       DeprecatedString title;
       // <STYLE> element
@@ -2235,7 +2235,7 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
   if (eventType == "HTMLEvents" || eventType == "Event" ||
       eventType == "Events")
     return new Event();
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   if (eventType == "SVGEvents")
     return new Event();
   if (eventType == "SVGZoomEvents")
@@ -3185,7 +3185,7 @@ PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
                                String("").impl()));
 }
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 const SVGDocumentExtensions* Document::svgExtensions() {
   return m_svgExtensions;
 }
@@ -3329,7 +3329,7 @@ Vector<String> Document::formElementsState() const {
   return stateVector;
 }
 
-#if XPATH_SUPPORT
+#ifdef XPATH_SUPPORT
 
 PassRefPtr<XPathExpression> Document::createExpression(
     const String& expression,

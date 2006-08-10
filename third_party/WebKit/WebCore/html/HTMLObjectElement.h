@@ -41,7 +41,7 @@ namespace WebCore {
 
 class HTMLFormElement;
 class HTMLImageLoader;
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 class SVGDocument;
 #endif
 
@@ -123,7 +123,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
   bool isDocNamedItem() const { return m_docNamedItem; }
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   SVGDocument* getSVGDocument(ExceptionCode&) const;
 #endif
 

@@ -44,7 +44,7 @@
 #include "Shared.h"
 #include "DeprecatedValueList.h"
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 #include "SVGRenderStyle.h"
 #endif
 
@@ -1162,7 +1162,7 @@ class RenderStyle {
   bool m_unique : 1;
   int m_ref;
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   DataRef<SVGRenderStyle> m_svgStyle;
 #endif
 
@@ -2018,7 +2018,7 @@ class RenderStyle {
     SET_VAR(css3InheritedData, textSizeAdjust, b);
   }
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   const SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
   SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
 #endif

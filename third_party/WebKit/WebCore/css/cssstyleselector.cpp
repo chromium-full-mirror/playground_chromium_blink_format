@@ -214,7 +214,7 @@ RenderStyle* CSSStyleSelector::styleNotYetAvailable = 0;
 CSSStyleSheet* CSSStyleSelector::quirksSheet = 0;
 CSSStyleSheet* CSSStyleSelector::viewSourceSheet = 0;
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 CSSStyleSheet* CSSStyleSelector::svgSheet = 0;
 #endif
 
@@ -373,7 +373,7 @@ void CSSStyleSelector::loadDefaultStyle() {
   defaultStyle->addRulesFromSheet(defaultSheet, &screenEval);
   defaultPrintStyle->addRulesFromSheet(defaultSheet, &printEval);
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   // SVG rules.
   svgSheet = parseUASheet(svgUserAgentStyleSheet);
   defaultStyle->addRulesFromSheet(svgSheet, &screenEval);
@@ -4298,7 +4298,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       break;
 
     default:
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
       // Try the SVG properties
       applySVGProperty(id, value);
 #endif

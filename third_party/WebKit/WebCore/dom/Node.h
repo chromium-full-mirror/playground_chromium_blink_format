@@ -139,7 +139,7 @@ class Node : public TreeShared<Node> {
 
   virtual bool isElementNode() const { return false; }
   virtual bool isHTMLElement() const { return false; }
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   virtual bool isSVGElement() const { return false; }
 #endif
   virtual bool isStyledElement() const { return false; }
@@ -403,7 +403,7 @@ class Node : public TreeShared<Node> {
   void createRendererIfNeeded();
   virtual RenderStyle* styleForRenderer(RenderObject* parent);
   virtual bool rendererIsNeeded(RenderStyle*);
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   virtual bool childShouldCreateRenderer(Node*) const { return true; }
 #endif
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

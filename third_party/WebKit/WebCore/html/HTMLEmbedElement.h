@@ -71,7 +71,7 @@ class HTMLEmbedElement : public HTMLPlugInElement {
   String type() const;
   void setType(const String&);
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   Document* contentDocument() const;
   SVGDocument* getSVGDocument(ExceptionCode&) const;
 #endif

@@ -294,7 +294,7 @@ static const char* const rangeExceptionNames[] = {0, "BAD_BOUNDARYPOINTS_ERR",
 
 static const char* const eventExceptionNames[] = {"UNSPECIFIED_EVENT_TYPE_ERR"};
 
-#if XPATH_SUPPORT
+#ifdef XPATH_SUPPORT
 static const char* const xpathExceptionNames[] = {"INVALID_EXPRESSION_ERR",
                                                   "TYPE_ERR"};
 #endif
@@ -324,7 +324,7 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
     nameTable = eventExceptionNames;
     nameTableSize =
         sizeof(eventExceptionNames) / sizeof(eventExceptionNames[0]);
-#if XPATH_SUPPORT
+#ifdef XPATH_SUPPORT
   } else if (code >= XPathExceptionOffset && code <= XPathExceptionMax) {
     type = "DOM XPath";
     // XPath exception codes start with 51 and we don't want 51 empty elements

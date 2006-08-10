@@ -181,7 +181,7 @@ class CSSStyleSelector : public StyleSelector {
   static CSSStyleSheet* defaultSheet;
   static CSSStyleSheet* quirksSheet;
   static CSSStyleSheet* viewSourceSheet;
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   static CSSStyleSheet* svgSheet;
 #endif
 
@@ -256,7 +256,7 @@ class CSSStyleSelector : public StyleSelector {
   HashSet<AtomicStringImpl*> m_selectorAttrs;
 
   void applyProperty(int id, CSSValue* value);
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   void applySVGProperty(int id, CSSValue* value);
 #endif
 };

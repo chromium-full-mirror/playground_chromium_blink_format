@@ -63,7 +63,7 @@
 #include "SelectionController.h"
 #include "PlatformScrollBar.h"
 
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
 #include "SVGNames.h"
 #endif
 
@@ -362,7 +362,7 @@ RenderLayer* RenderLayer::enclosingPositionedAncestor() const {
 }
 
 bool RenderLayer::isTransparent() const {
-#if SVG_SUPPORT
+#ifdef SVG_SUPPORT
   if (m_object->node()->namespaceURI() == SVGNames::svgNamespaceURI)
     return false;
 #endif
