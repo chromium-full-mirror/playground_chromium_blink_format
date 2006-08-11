@@ -43,7 +43,7 @@
 #include "MouseEvent.h"
 #include "RenderButton.h"
 #include "RenderFileButton.h"
-#include "RenderImageButton.h"
+#include "RenderImage.h"
 #include "RenderLineEdit.h"
 #include "RenderText.h"
 #include "RenderTextControl.h"
@@ -815,7 +815,7 @@ RenderObject* HTMLInputElement::createRenderer(RenderArena* arena,
     case HIDDEN:
       break;
     case IMAGE:
-      return new (arena) RenderImageButton(this);
+      return new (arena) RenderImage(this);
     case ISINDEX:
     case PASSWORD:
     case SEARCH:
