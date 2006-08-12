@@ -42,8 +42,6 @@
 // multiple strings and numbers should be handled differently than with String +
 // String + String + etc.
 
-const char* DefaultIconDatabaseFilename = "/icon.db";
-
 namespace WebCore {
 
 IconDatabase* IconDatabase::m_sharedInstance = 0;
@@ -53,6 +51,11 @@ const int IconDatabase::currentDatabaseVersion = 3;
 const int IconDatabase::iconExpirationTime = 60 * 60 * 24;
 // Absent icons are rechecked once a week
 const int IconDatabase::missingIconExpirationTime = 60 * 60 * 24 * 7;
+
+const String& IconDatabase::defaultDatabaseFilename() {
+  static String defaultDatabaseFilename = "icon.db";
+  return defaultDatabaseFilename;
+}
 
 IconDatabase* IconDatabase::sharedIconDatabase() {
   if (!m_sharedInstance) {
@@ -69,7 +72,13 @@ IconDatabase::IconDatabase()
 
 bool IconDatabase::open(const String& databasePath) {
   close();
-  String dbFilename = databasePath + DefaultIconDatabaseFilename;
+  String dbFilename;
+
+  if (databasePath[databasePath.length()] == '/')
+    dbFilename = databasePath + defaultDatabaseFilename();
+  else
+    dbFilename = databasePath + "/" + defaultDatabaseFilename();
+
   if (!m_db.open(dbFilename)) {
     LOG(IconDatabase, "Unable to open icon database at path %s",
         dbFilename.ascii().data());
@@ -108,6 +117,11 @@ bool IconDatabase::open(const String& databasePath) {
 void IconDatabase::close() {
   // TODO - sync any cached info before m_db.close();
   m_db.close();
+}
+
+bool IconDatabase::isEmpty() {
+  return !(SQLStatement(m_db, "SELECT iconID FROM PageURL LIMIT 1;")
+               .getColumnInt(0));
 }
 
 bool IconDatabase::isValidDatabase() {
@@ -627,9 +641,6 @@ void IconDatabase::retainIconForURL(const String& _url) {
                            String::number(retainCount + 1) + ");"))
     LOG_ERROR("Failed to increment retain count for url %s",
               _url.ascii().data());
-
-  LOG(IconDatabase, "URL %s now has a retain count of %i", _url.ascii().data(),
-      retainCount + 1);
 }
 
 void IconDatabase::releaseIconForURL(const String& _url) {
@@ -670,9 +681,6 @@ void IconDatabase::releaseIconForURL(const String& _url) {
                            String::number(retainCount) + ");"))
     LOG_ERROR("Failed to decrement retain count for url %s",
               _url.ascii().data());
-
-  LOG(IconDatabase, "URL %s now has a retain count of %i", _url.ascii().data(),
-      retainCount);
 
   // If we still have a positve retain count, we're done - lets bail
   if (retainCount)

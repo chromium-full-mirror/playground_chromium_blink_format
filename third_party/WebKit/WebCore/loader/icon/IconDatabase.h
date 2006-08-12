@@ -98,6 +98,8 @@ class IconDatabase {
   bool isOpen() { return m_db.isOpen(); }
   void close();
 
+  bool isEmpty();
+
   Image* iconForPageURL(const String&, const IntSize&, bool cache = true);
   Image* iconForIconURL(const String&, const IntSize&, bool cache = true);
   String iconURLForPageURL(const String&);
@@ -122,6 +124,8 @@ class IconDatabase {
   void setIconDataForIconURL(const void* data, int size, const String&);
   void setHaveNoIconForIconURL(const String&);
   void setIconURLForPageURL(const String& iconURL, const String& pageURL);
+
+  static const String& defaultDatabaseFilename();
 
   static const int currentDatabaseVersion;
   static const int iconExpirationTime;
