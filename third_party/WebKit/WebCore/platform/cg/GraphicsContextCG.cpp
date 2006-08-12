@@ -27,6 +27,7 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
+#include "AffineTransform.h"
 #include "KRenderingDeviceQuartz.h"
 #include "Path.h"
 
@@ -653,6 +654,12 @@ void GraphicsContext::translate(const FloatSize& size) {
   if (paintingDisabled())
     return;
   CGContextTranslateCTM(platformContext(), size.width(), size.height());
+}
+
+void GraphicsContext::concatCTM(const AffineTransform& transform) {
+  if (paintingDisabled())
+    return;
+  CGContextConcatCTM(platformContext(), transform);
 }
 
 FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {

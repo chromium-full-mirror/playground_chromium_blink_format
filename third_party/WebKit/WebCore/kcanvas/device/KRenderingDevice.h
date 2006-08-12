@@ -39,9 +39,6 @@ class KRenderingDeviceContext {
   virtual KCanvasMatrix concatCTM(const KCanvasMatrix& worldMatrix) = 0;
   virtual KCanvasMatrix ctm() const = 0;
 
-  virtual IntRect mapFromVisual(const IntRect& rect) = 0;
-  virtual IntRect mapToVisual(const IntRect& rect) = 0;
-
   virtual void clearPath() = 0;
   virtual void addPath(const KCanvasPath*) = 0;
 
