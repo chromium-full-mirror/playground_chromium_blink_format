@@ -952,7 +952,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           UChar curchar = *src;
           // If we encounter a "/" when scanning an attribute name, treat it as
           // a delimiter.  However, we only do
-          // this if we have actual attribute contents.  This allows the
+          // this if we have a non-empty attribute name.  This allows the
           // degenerate case of <input type=checkbox checked/>
           // to work (despite it being utterly invalid).
           if (curchar <= '>' && (curchar >= '=' || curchar <= ' ' ||
