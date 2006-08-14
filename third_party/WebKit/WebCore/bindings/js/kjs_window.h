@@ -247,8 +247,6 @@ class Window : public DOMObject {
     AddEventListener,
     RemoveEventListener,
     XMLHttpRequest,
-    XMLSerializer,
-    DOMParser_,
     XSLTProcessor_,
     Onabort,
     Onblur,

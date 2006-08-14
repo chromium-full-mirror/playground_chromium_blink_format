@@ -1,7 +1,6 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,33 +17,26 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef JSXMLSerializer_H
-#define JSXMLSerializer_H
+#include "config.h"
+#include "DOMParser.h"
 
-#include "kjs_binding.h"
-
-namespace KJS {
-class JSEventListener;
-}
+#include "DOMImplementation.h"
+#include "String.h"
 
 namespace WebCore {
 
-class JSXMLSerializerConstructorImp : public KJS::DOMObject {
- public:
-  JSXMLSerializerConstructorImp(KJS::ExecState*);
-  virtual bool implementsConstruct() const;
-  virtual KJS::JSObject* construct(KJS::ExecState*, const KJS::List& args);
-};
+PassRefPtr<Document> DOMParser::parseFromString(const String& str,
+                                                const String& contentType) {
+  if (!DOMImplementation::isXMLMIMEType(contentType))
+    return 0;
 
-class JSXMLSerializer : public KJS::DOMObject {
- public:
-  JSXMLSerializer(KJS::ExecState*);
-  virtual bool toBoolean(KJS::ExecState*) const { return true; }
-  virtual const KJS::ClassInfo* classInfo() const { return &info; }
-  static const KJS::ClassInfo info;
-  enum { SerializeToString };
-};
+  RefPtr<Document> doc = DOMImplementation::instance()->createDocument();
 
-}  // namespace
+  doc->open();
+  doc->write(str);
+  doc->finishParsing();
+  doc->close();
 
-#endif
+  return doc.release();
+}
+}
