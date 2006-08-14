@@ -119,10 +119,10 @@ class RegExpObjectImp : public InternalFunctionImp {
   JSValue* getRightContext() const;
 
   // Global search cache / settings
-  bool multiline;
   UString lastInput;
   OwnArrayPtr<int> lastOvector;
-  unsigned lastNumSubPatterns;
+  unsigned lastNumSubPatterns : 31;
+  bool multiline : 1;
 
   static const ClassInfo info;
 };

@@ -65,6 +65,11 @@ FunctionImp::FunctionImp(ExecState* exec,
           n),
       body(b) {}
 
+void FunctionImp::mark() {
+  InternalFunctionImp::mark();
+  _scope.mark();
+}
+
 FunctionImp::~FunctionImp() {}
 
 JSValue* FunctionImp::callAsFunction(ExecState* exec,

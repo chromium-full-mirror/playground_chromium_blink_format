@@ -24,10 +24,11 @@
 #define NUMBER_OBJECT_H_
 
 #include "function_object.h"
+#include "JSWrapperObject.h"
 
 namespace KJS {
 
-class NumberInstance : public JSObject {
+class NumberInstance : public JSWrapperObject {
  public:
   NumberInstance(JSObject* proto);
 

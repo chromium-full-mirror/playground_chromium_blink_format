@@ -416,9 +416,7 @@ const ClassInfo ArrayPrototype::info = {"Array", &ArrayInstance::info,
 
 // ECMA 15.4.4
 ArrayPrototype::ArrayPrototype(ExecState*, ObjectPrototype* objProto)
-    : ArrayInstance(objProto, 0) {
-  setInternalValue(jsNull());
-}
+    : ArrayInstance(objProto, 0) {}
 
 bool ArrayPrototype::getOwnPropertySlot(ExecState* exec,
                                         const Identifier& propertyName,

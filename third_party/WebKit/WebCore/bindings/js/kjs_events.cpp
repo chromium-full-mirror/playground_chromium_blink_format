@@ -272,6 +272,8 @@ void JSLazyEventListener::parseCode() const {
     listener = constr->construct(exec, args, m_functionName, sourceURL,
                                  lineNumber);  // ### is globalExec ok ?
 
+    FunctionImp* listenerAsFunction = static_cast<FunctionImp*>(listener.get());
+
     if (exec->hadException()) {
       exec->clearException();
 
@@ -280,13 +282,13 @@ void JSLazyEventListener::parseCode() const {
     } else if (originalNode) {
       // Add the event's home element to the scope
       // (and the document, and the form - see JSHTMLElement::eventHandlerScope)
-      ScopeChain scope = listener->scope();
+      ScopeChain scope = listenerAsFunction->scope();
 
       JSValue* thisObj = toJS(exec, originalNode);
       if (thisObj->isObject()) {
         static_cast<DOMEventTargetNode*>(thisObj)->pushEventHandlerScope(exec,
                                                                          scope);
-        listener->setScope(scope);
+        listenerAsFunction->setScope(scope);
       }
     }
   }

@@ -119,11 +119,6 @@ void JSObject::mark() {
     proto->mark();
 
   _prop.mark();
-
-  if (_internalValue && !_internalValue->marked())
-    _internalValue->mark();
-
-  _scope.mark();
 }
 
 JSType JSObject::type() const {

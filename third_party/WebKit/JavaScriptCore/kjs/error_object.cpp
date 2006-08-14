@@ -45,7 +45,6 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
                                ObjectPrototype* objectProto,
                                FunctionPrototype* funcProto)
     : JSObject(objectProto) {
-  setInternalValue(jsUndefined());
   // The constructor will be added later in ErrorObjectImp's constructor
 
   put(exec, namePropertyName, jsString("Error"), DontEnum);

@@ -25,6 +25,7 @@
 #include "string_object.h"
 #include "string_object.lut.h"
 
+#include "JSWrapperObject.h"
 #include "error_object.h"
 #include "operations.h"
 #include "PropertyNameArray.h"
@@ -37,12 +38,12 @@ using namespace KJS;
 
 const ClassInfo StringInstance::info = {"String", 0, 0, 0};
 
-StringInstance::StringInstance(JSObject* proto) : JSObject(proto) {
+StringInstance::StringInstance(JSObject* proto) : JSWrapperObject(proto) {
   setInternalValue(jsString(""));
 }
 
 StringInstance::StringInstance(JSObject* proto, const UString& string)
-    : JSObject(proto) {
+    : JSWrapperObject(proto) {
   setInternalValue(jsString(string));
 }
 
@@ -435,7 +436,8 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
     if (!thisObj || !thisObj->inherits(&StringInstance::info))
       return throwError(exec, TypeError);
 
-    return jsString(thisObj->internalValue()->toString(exec));
+    return jsString(
+        static_cast<StringInstance*>(thisObj)->internalValue()->toString(exec));
   }
 
   UString u, u2, u3;
