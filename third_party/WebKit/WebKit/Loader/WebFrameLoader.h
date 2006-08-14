@@ -143,5 +143,8 @@
 - (void)deliverArchivedResourcesAfterDelay;
 - (void)cancelPendingArchiveLoadForLoader:(WebLoader*)loader;
 - (void)clearArchivedResources;
+- (void)_addExtraFieldsToRequest:(NSMutableURLRequest*)request
+                    mainResource:(BOOL)mainResource
+               alwaysFromRequest:(BOOL)f;
 
 @end
