@@ -23,7 +23,6 @@
 #include "config.h"
 #ifdef SVG_SUPPORT
 #include "PlatformString.h"
-//#include <kdom/ecma/Ecma.h>
 #include "Attr.h"
 #include "StringImpl.h"
 
@@ -31,7 +30,7 @@
 #include "SVGNames.h"
 #include "SVGScriptElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGScriptElement::SVGScriptElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc),
@@ -73,14 +72,12 @@ void SVGScriptElement::executeScript(Document* document, StringImpl* jsCode) {
 
     // Run script
     KJS::Completion comp = ecmaEngine->evaluate(jsCode.deprecatedString(), ecmaEngine->globalObject());
-    if(comp.complType() == KJS::Throw)
-    {
+    if (comp.complType() == KJS::Throw) {
         KJS::ExecState *exec = ecmaEngine->globalExec();
         KJS::JSValue *exVal = comp.value();
 
         int lineno = -1;
-        if(exVal->isObject())
-        {
+        if (exVal->isObject()) {
             KJS::JSValue *lineVal = static_cast<KJS::JSObject *>(exVal)->get(exec, "line");
             if(lineVal->type() == KJS::NumberType)
                 lineno = int(lineVal->toNumber(exec));
@@ -88,8 +85,7 @@ void SVGScriptElement::executeScript(Document* document, StringImpl* jsCode) {
 
         // Fire ERROR_EVENT upon errors...
         SVGDocument *svgDocument = static_cast<SVGDocument *>(document);
-        if(svgDocument && document->hasListenerType(ERROR_EVENT))
-        {
+        if (svgDocument && document->hasListenerType(ERROR_EVENT)) {
             RefPtr<Event> event = svgDocument->createEvent("SVGEvents");
             event->initEvent(EventNames::errorEvent, false, false);
             svgDocument->dispatchRecursiveEvent(event.get(), svgDocument->lastChild());
@@ -108,6 +104,7 @@ void SVGScriptElement::executeScript(Document* document, StringImpl* jsCode) {
     // Hack to close memory leak due to #if 0
     String(jsCode);
 #endif
+}
 }
 
 // vim:ts=4:noet

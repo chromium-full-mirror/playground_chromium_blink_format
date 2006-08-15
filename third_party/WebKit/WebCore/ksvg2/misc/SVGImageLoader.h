@@ -35,6 +35,7 @@ class SVGImageLoader : public HTMLImageLoader {
   virtual ~SVGImageLoader();
 
   virtual void updateFromElement();
+  virtual void dispatchLoadEvent();
 };
 
 }  // namespace WebCore

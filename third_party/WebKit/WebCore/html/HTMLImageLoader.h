@@ -38,7 +38,7 @@ class HTMLImageLoader : public CachedResourceClient {
 
   virtual void updateFromElement();
 
-  void dispatchLoadEvent();
+  virtual void dispatchLoadEvent();
 
   Element* element() const { return m_element; }
   bool imageComplete() const { return m_imageComplete; }
@@ -51,6 +51,9 @@ class HTMLImageLoader : public CachedResourceClient {
 
  protected:
   void setLoadingImage(CachedImage*);
+
+  bool haveFiredLoadEvent() { return m_firedLoad; }
+  void setHaveFiredLoadEvent(bool firedLoad) { m_firedLoad = firedLoad; }
 
  private:
   Element* m_element;

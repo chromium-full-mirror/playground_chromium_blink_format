@@ -22,21 +22,19 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "DeprecatedStringList.h"
 
 #include "Attr.h"
-#include "StringImpl.h"
-
-#include "SVGNames.h"
-#include "svgpathparser.h"
-#include "SVGRect.h"
-#include "SVGSVGElement.h"
+#include "SVGAnimatedPreserveAspectRatio.h"
 #include "SVGAnimatedRect.h"
 #include "SVGFitToViewBox.h"
+#include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
-#include "SVGAnimatedPreserveAspectRatio.h"
+#include "SVGRect.h"
+#include "SVGSVGElement.h"
+#include "StringImpl.h"
+#include "svgpathparser.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGFitToViewBox::SVGFitToViewBox() {}
 
@@ -114,9 +112,9 @@ void SVGFitToViewBox::parseViewBox(StringImpl* str) {
   viewBox()->baseVal()->setHeight(h);
   return;
 
-bail_out:
-  fprintf(stderr, "WARNING: Malformed viewbox string: %s (l: %i)",
-          viewbox.ascii(), viewbox.length());
+bail_out:;
+  // FIXME: Per the spec we are supposed to set the document into an "error
+  // state" here.
 }
 
 SVGMatrix* SVGFitToViewBox::viewBoxToViewTransform(float viewWidth,
@@ -141,6 +139,7 @@ bool SVGFitToViewBox::parseMappedAttribute(MappedAttribute* attr) {
   }
 
   return false;
+}
 }
 
 // vim:ts=4:noet
