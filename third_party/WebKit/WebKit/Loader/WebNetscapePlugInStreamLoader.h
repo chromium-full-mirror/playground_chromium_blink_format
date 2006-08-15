@@ -29,13 +29,11 @@
 #import <WebKit/WebLoader.h>
 
 @class WebNetscapePluginStream;
-@class WebBaseNetscapePluginView;
 
 @interface WebNetscapePlugInStreamLoader : WebLoader {
   WebNetscapePluginStream* stream;
-  WebBaseNetscapePluginView* view;
 }
-- initWithStream:(WebNetscapePluginStream*)theStream
-              view:(WebBaseNetscapePluginView*)theView;
+- (id)initWithStream:(WebNetscapePluginStream*)theStream
+         frameLoader:(WebFrameLoader*)fl;
 - (BOOL)isDone;
 @end
