@@ -113,8 +113,6 @@ DOMNode::DOMNode(ExecState* exec, Node* n) : m_impl(n) {
   setPrototype(DOMNodeProto::self(exec));
 }
 
-DOMNode::DOMNode(Node* n) : m_impl(n) {}
-
 DOMNode::~DOMNode() {
   ScriptInterpreter::forgetDOMNodeForDocument(m_impl->document(), m_impl.get());
 }
