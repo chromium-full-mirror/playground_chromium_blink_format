@@ -58,7 +58,12 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
   void init(const UChar*, unsigned len);
 
  protected:
-  StringImpl() : m_length(0), m_data(0), m_hash(0), m_inTable(false) {}
+  StringImpl()
+      : m_length(0),
+        m_data(0),
+        m_hash(0),
+        m_inTable(false),
+        m_hasTerminatingNullCharacter(false) {}
 
  public:
   StringImpl(const UChar*, unsigned len);
@@ -70,6 +75,8 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
 
   const UChar* characters() const { return m_data; }
   unsigned length() const { return m_length; }
+
+  UChar* charactersWithNullTermination();
 
   unsigned hash() const {
     if (m_hash == 0)
@@ -148,6 +155,7 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
 
   mutable unsigned m_hash;
   bool m_inTable;
+  bool m_hasTerminatingNullCharacter;
 };
 
 bool equal(const StringImpl*, const StringImpl*);

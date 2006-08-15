@@ -59,6 +59,7 @@ class String {
 
   unsigned length() const;
   const UChar* characters() const;
+  const UChar* charactersWithNullTermination();
 
   UChar operator[](unsigned i) const;  // if i >= length(), returns 0
 
