@@ -76,6 +76,7 @@ class HTMLParser {
 
  private:
   void setCurrent(Node* newCurrent);
+  void derefCurrent();
   void setSkipMode(const QualifiedName& qName) {
     discard_until = qName.localName();
   }
@@ -113,11 +114,12 @@ class HTMLParser {
                    const AtomicString& localName,
                    int tagPriority);
 
-  // The currently active element (the one new elements will be added to).  Can
-  // be a DocumentFragment, a Document or an Element.
+  // The currently active element (the one new elements will be added to). Can
+  // be a document fragment, a document or an element.
   Node* current;
-
-  bool currentIsReferenced;
+  // We can't ref a document, but we don't want to constantly check if a node is
+  // a document just to decide whether to deref.
+  bool didRefCurrent;
 
   HTMLStackElem* blockStack;
 
@@ -126,7 +128,9 @@ class HTMLParser {
   void popBlock(const QualifiedName& qName) {
     return popBlock(qName.localName());
   }  // Convenience function for readability.
-  void popOneBlock(bool delBlock = true);
+  void popOneBlock();
+  void moveOneBlockToStack(HTMLStackElem*& head);
+  inline HTMLStackElem* popOneBlockCommon();
   void popInlineBlocks();
 
   void freeBlock();
@@ -135,8 +139,8 @@ class HTMLParser {
 
   bool isResidualStyleTag(const AtomicString& tagName);
   bool isAffectedByResidualStyle(const AtomicString& tagName);
-  void handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem);
-  void reopenResidualStyleTags(HTMLStackElem* elem, Node* malformedTableParent);
+  void handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem*);
+  void reopenResidualStyleTags(HTMLStackElem*, Node* malformedTableParent);
 
   bool allowNestedRedundantTag(const AtomicString& tagName);
 
