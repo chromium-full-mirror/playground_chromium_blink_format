@@ -842,3 +842,5 @@ void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
                                          Element*) const {
   notImplemented();
 }
+void RenderThemeWin::systemFont(int propId,
+                                FontDescription& fontDescription) const {}

@@ -54,6 +54,9 @@ class RenderThemeWin : public RenderTheme {
   virtual Color platformActiveSelectionForegroundColor() const;
   virtual Color platformInactiveSelectionForegroundColor() const;
 
+  // System fonts.
+  virtual void systemFont(int propId, FontDescription&) const;
+
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
