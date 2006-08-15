@@ -28,7 +28,7 @@
 #include <kcanvas/RenderSVGContainer.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGGElement::SVGGElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledTransformableElement(tagName, doc),
@@ -61,6 +61,7 @@ SVGDummyElement::~SVGDummyElement() {}
 
 const AtomicString& SVGDummyElement::localName() const {
   return m_localName;
+}
 }
 
 // vim:ts=4:noet

@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGDefsElementImpl_H
-#define KSVG_SVGDefsElementImpl_H
+#ifndef SVGDefsElementImpl_H
+#define SVGDefsElementImpl_H
 #ifdef SVG_SUPPORT
 
 #include "SVGStyledTransformableElement.h"
@@ -38,7 +38,10 @@ class SVGDefsElement : public SVGStyledTransformableElement,
   SVGDefsElement(const QualifiedName&, Document*);
   virtual ~SVGDefsElement();
 
-  virtual bool isValid() const { return SVGTests::isValid(); }
+  virtual bool isValid() const;
+
+  virtual bool rendererIsNeeded(RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 };
 
 }  // namespace WebCore
