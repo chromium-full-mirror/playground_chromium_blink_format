@@ -62,7 +62,18 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
   NPP_SetValueProcPtr NPP_SetValue;
   NPP_ShutdownProcPtr NPP_Shutdown;
   NPP_GetJavaClassProcPtr NPP_GetJavaClass;
+
+  BOOL isLoaded;
+  BOOL needsUnload;
+  unsigned int instanceCount;
 }
+
+// Netscape plug-in packages must be explicitly opened and closed by each
+// plug-in instance.
+// This is to protect Netscape plug-ins from being unloaded while they are in
+// use.
+- (void)open;
+- (void)close;
 
 - (WebExecutableType)executableType;
 
