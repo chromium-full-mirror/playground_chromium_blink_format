@@ -147,5 +147,12 @@
 - (void)_addExtraFieldsToRequest:(NSMutableURLRequest*)request
                     mainResource:(BOOL)mainResource
                alwaysFromRequest:(BOOL)f;
+- (void)cannotShowMIMETypeForURL:(NSURL*)URL;
+- (NSError*)interruptForPolicyChangeErrorWithRequest:(NSURLRequest*)request;
+- (BOOL)isHostedByObjectElement;
+- (BOOL)isLoadingMainFrame;
++ (BOOL)_canShowMIMEType:(NSString*)MIMEType;
++ (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
++ (NSString*)_generatedMIMETypeForURLScheme:(NSString*)URLScheme;
 
 @end
