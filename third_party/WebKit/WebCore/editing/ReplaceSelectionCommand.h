@@ -38,14 +38,12 @@ enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
 
 class RenderingInfo : public Shared<RenderingInfo> {
  public:
-  RenderingInfo(PassRefPtr<CSSMutableStyleDeclaration>, bool);
+  RenderingInfo(PassRefPtr<CSSMutableStyleDeclaration>);
 
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
-  bool wasBlock() const { return m_wasBlock; }
 
  private:
   RefPtr<CSSMutableStyleDeclaration> m_style;
-  bool m_wasBlock;
 };
 
 typedef Vector<RefPtr<Node>> NodeVector;
@@ -70,15 +68,12 @@ class ReplacementFragment : Noncopyable {
 
   bool isEmpty() const;
 
-  bool hasMoreThanOneBlock() const { return m_hasMoreThanOneBlock; }
   bool hasInterchangeNewlineAtStart() const {
     return m_hasInterchangeNewlineAtStart;
   }
   bool hasInterchangeNewlineAtEnd() const {
     return m_hasInterchangeNewlineAtEnd;
   }
-
-  bool wasBlock(Node*) const;
 
   void removeNode(PassRefPtr<Node>);
 
@@ -91,7 +86,6 @@ class ReplacementFragment : Noncopyable {
   void computeStylesUsingTestRendering(Node*);
   void removeUnrenderedNodes(Node*);
   void restoreTestRenderingNodesToFragment(Node*);
-  int renderedBlocks(Node*);
   void removeStyleNodes();
 
   void removeNodePreservingChildren(Node*);
@@ -104,19 +98,17 @@ class ReplacementFragment : Noncopyable {
   bool m_matchStyle;
   bool m_hasInterchangeNewlineAtStart;
   bool m_hasInterchangeNewlineAtEnd;
-  bool m_hasMoreThanOneBlock;
 };
 
 class ReplaceSelectionCommand : public CompositeEditCommand {
  public:
-  ReplaceSelectionCommand(Document* document,
-                          DocumentFragment* fragment,
+  ReplaceSelectionCommand(Document*,
+                          DocumentFragment*,
                           bool selectReplacement = true,
                           bool smartReplace = false,
                           bool matchStyle = false,
-                          bool forceMergeStart = false,
+                          bool preventNesting = true,
                           EditAction action = EditActionPaste);
-  virtual ~ReplaceSelectionCommand();
 
   virtual void doApply();
   virtual EditAction editingAction() const;
@@ -135,19 +127,18 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void fixupNodeStyles(const NodeVector&, const RenderingInfoMap&);
   bool shouldRemoveEndBR(Node*);
 
-  bool shouldMergeStart(const ReplacementFragment&, const Selection&);
-  bool shouldMergeEnd(const VisiblePosition&,
-                      bool selectionEndWasEndOfParagraph);
+  bool shouldMergeStart(bool, bool);
+  bool shouldMergeEnd(bool);
+  bool shouldMerge(const VisiblePosition&, const VisiblePosition&);
 
   RefPtr<Node> m_firstNodeInserted;
   RefPtr<Node> m_lastNodeInserted;
-  RefPtr<Node> m_lastTopNodeInserted;
   RefPtr<CSSMutableStyleDeclaration> m_insertionStyle;
   bool m_selectReplacement;
   bool m_smartReplace;
   bool m_matchStyle;
   RefPtr<DocumentFragment> m_documentFragment;
-  bool m_forceMergeStart;
+  bool m_preventNesting;
   EditAction m_editAction;
 };
 
