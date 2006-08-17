@@ -277,6 +277,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isTextField() const { return false; }
   virtual bool isFrameSet() const { return false; }
   virtual bool isApplet() const { return false; }
+  virtual bool isMenuList() const { return false; }
 
 #ifdef SVG_SUPPORT
   virtual bool isKCanvasContainer() const { return false; }

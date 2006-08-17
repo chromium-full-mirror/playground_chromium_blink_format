@@ -493,8 +493,10 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
   HTMLGenericFormElement::defaultEventHandler(evt);
 }
 
-void HTMLSelectElement::accessKeyAction(bool) {
-  focus();
+void HTMLSelectElement::accessKeyAction(bool sendToAnyElement) {
+  // send the mouse button events iff the
+  // caller specified sendToAnyElement
+  click(sendToAnyElement);
 }
 
 void HTMLSelectElement::setMultiple(bool multiple) {
