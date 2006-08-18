@@ -63,13 +63,11 @@
 
 /* Operating environments */
 
-/* I made the BUILDING_KDE__ macro up for the KDE build system to define */
-
-/* PLATFORM(KDE) */
+/* PLATFORM(QT) */
 /* PLATFORM(MAC) */
 /* PLATFORM(WIN) */
-#if defined(BUILDING_KDE__)
-#define KXMLCORE_PLATFORM_KDE 1
+#if defined(BUILDING_QT__)
+#define KXMLCORE_PLATFORM_QT 1
 #elif PLATFORM(DARWIN)
 #define KXMLCORE_PLATFORM_MAC 1
 #elif PLATFORM(WIN_OS)
