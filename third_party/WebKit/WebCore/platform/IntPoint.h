@@ -43,6 +43,8 @@ typedef struct _NSPoint NSPoint;
 
 #if PLATFORM(WIN)
 typedef struct tagPOINT POINT;
+#elif PLATFORM(QT)
+class QPoint;
 #endif
 
 namespace WebCore {
@@ -80,6 +82,9 @@ class IntPoint {
 #if PLATFORM(WIN)
   IntPoint(const POINT&);
   operator POINT() const;
+#elif PLATFORM(QT)
+  IntPoint(const QPoint&);
+  operator QPoint() const;
 #endif
 
  private:

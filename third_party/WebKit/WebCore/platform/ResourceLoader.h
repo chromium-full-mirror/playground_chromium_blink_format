@@ -99,7 +99,7 @@ class ResourceLoader {
                                                  LPARAM);
 #endif
 
-#if PLATFORM(GDK)
+#if PLATFORM(GDK) || PLATFORM(QT)
   ResourceLoaderInternal* getInternal() { return d; }
 #endif
 

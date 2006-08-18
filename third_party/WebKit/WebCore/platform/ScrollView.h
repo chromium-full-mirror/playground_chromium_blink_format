@@ -30,6 +30,10 @@
 #include "Widget.h"
 #include <wtf/Platform.h>
 
+#if PLATFORM(QT)
+class QScrollArea;
+#endif
+
 namespace WebCore {
 class FloatRect;
 
@@ -103,6 +107,16 @@ class ScrollView : public Widget {
   int updateScrollInfo(short type, int current, int max, int pageSize);
   class ScrollViewPrivate;
   ScrollViewPrivate* m_data;
+#endif
+
+#if PLATFORM(QT)
+  ScrollView();
+  ~ScrollView();
+
+  virtual void setParentWidget(QWidget*);
+
+ private:
+  QScrollArea* m_area;
 #endif
 };
 

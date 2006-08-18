@@ -45,6 +45,10 @@ typedef struct HINSTANCE__* HINSTANCE;
 typedef struct _GdkDrawable GdkDrawable;
 #endif
 
+#if PLATFORM(QT)
+class QWidget;
+#endif
+
 namespace WebCore {
 
 class Cursor;
@@ -139,6 +143,14 @@ class Widget {
   Widget(GdkDrawable* drawable);
   virtual void setDrawable(GdkDrawable* drawable);
   GdkDrawable* drawable() const;
+#endif
+
+#if PLATFORM(QT)
+  QWidget* parentWidget() const;
+  virtual void setParentWidget(QWidget*);
+
+  QWidget* qwidget();
+  void setQWidget(QWidget*);
 #endif
 
 #if __APPLE__
