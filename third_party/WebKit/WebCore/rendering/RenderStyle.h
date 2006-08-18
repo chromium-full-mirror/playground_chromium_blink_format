@@ -1931,7 +1931,7 @@ class RenderStyle {
 #ifndef KHTML_NO_XBL
   void deleteBindingURIs() {
     delete css3NonInheritedData->bindingURI;
-    SET_VAR(css3NonInheritedData, bindingURI, 0);
+    SET_VAR(css3NonInheritedData, bindingURI, (BindingURI*)0);
   }
   void inheritBindingURIs(BindingURI* other) {
     SET_VAR(css3NonInheritedData, bindingURI, other->copy());
