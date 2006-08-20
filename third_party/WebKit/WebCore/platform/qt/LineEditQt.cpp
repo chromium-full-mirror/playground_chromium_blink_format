@@ -36,7 +36,11 @@
 #include "PlatformLineEdit.h"
 #include "Color.h"
 #include "IntSize.h"
-#include "HelperQt.h"
+
+#define notImplemented()                                                  \
+  do {                                                                    \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, __LINE__); \
+  } while (0)
 
 namespace WebCore {
 
@@ -103,7 +107,7 @@ bool PlatformLineEdit::edited() const {
 }
 
 void PlatformLineEdit::setFont(const Font& font) {
-  m_lineEdit->setFont(toQFont(font));
+  m_lineEdit->setFont(font);
 }
 
 void PlatformLineEdit::setMaxLength(int length) {
@@ -123,11 +127,11 @@ bool PlatformLineEdit::isReadOnly() const {
 }
 
 void PlatformLineEdit::setText(const String& str) {
-  m_lineEdit->setText(toQString(str));
+  m_lineEdit->setText(str);
 }
 
 String PlatformLineEdit::text() const {
-  return fromQString(m_lineEdit->text());
+  return m_lineEdit->text();
 }
 
 void PlatformLineEdit::setWritingDirection(TextDirection dir) {
@@ -158,7 +162,7 @@ int PlatformLineEdit::selectionStart() const {
 }
 
 String PlatformLineEdit::selectedText() const {
-  return fromQString(m_lineEdit->selectedText());
+  return m_lineEdit->selectedText();
 }
 
 void PlatformLineEdit::setSelection(int start, int length) {

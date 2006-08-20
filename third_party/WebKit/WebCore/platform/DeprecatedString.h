@@ -41,6 +41,10 @@ class NSString;
 #endif
 #endif
 
+#if PLATFORM(QT)
+class QString;
+#endif
+
 namespace KJS {
 class Identifier;
 class UString;
@@ -227,6 +231,10 @@ class DeprecatedString {
 
   operator KJS::Identifier() const;
   operator KJS::UString() const;
+
+#if PLATFORM(QT)
+  operator QString() const;
+#endif
 
   static DeprecatedString fromLatin1(const char*);
   static DeprecatedString fromLatin1(const char*, int len);

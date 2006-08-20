@@ -32,6 +32,10 @@
 #include "TextDirection.h"
 #include "GlyphBuffer.h"
 
+#if PLATFORM(QT)
+class QFont;
+#endif
+
 namespace WebCore {
 
 class FontFallbackList;
@@ -199,6 +203,10 @@ class Font {
 
 #if __APPLE__
   NSFont* getNSFont() const { return primaryFont()->getNSFont(); }
+#endif
+
+#if PLATFORM(QT)
+  operator QFont() const;
 #endif
 
   // Metrics that we query the FontFallbackList for.
