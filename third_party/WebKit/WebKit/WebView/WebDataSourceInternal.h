@@ -111,7 +111,6 @@
 - (DOMElement*)_imageElementWithImageResource:(WebResource*)resource;
 - (void)_finishedLoadingResource;
 - (void)_mainReceivedBytesSoFar:(unsigned)bytesSoFar complete:(BOOL)isComplete;
-- (void)_receivedError:(NSError*)error;
 - (void)_mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (BOOL)_defersCallbacks;
 - (id)_identifierForInitialRequest:(NSURLRequest*)clientRequest;
@@ -135,10 +134,6 @@
                               response:(NSURLResponse*)r
                                  proxy:(WKNSURLConnectionDelegateProxyPtr)proxy;
 - (BOOL)_privateBrowsingEnabled;
-+ (NSString*)_generatedMIMETypeForURLScheme:(NSString*)URLScheme;
-+ (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
-+ (BOOL)_canShowMIMEType:(NSString*)MIMEType;
-- (void)_handleFallbackContent;
 - (void)_decidePolicyForMIMEType:(NSString*)MIMEType
                 decisionListener:(WebPolicyDecisionListener*)listener;
 
