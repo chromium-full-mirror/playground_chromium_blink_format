@@ -35,6 +35,7 @@
 #include "Timer.h"
 
 #include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 
 namespace WTF {
 
@@ -118,7 +119,7 @@ class IconDatabase {
   void setPrivateBrowsingEnabled(bool flag);
   bool getPrivateBrowsingEnabled() { return m_privateBrowsingEnabled; }
 
-  bool hasIconForIconURL(const String&);
+  bool hasEntryForIconURL(const String&);
 
   bool isIconExpiredForIconURL(const String&);
 
@@ -148,6 +149,9 @@ class IconDatabase {
                                     const String&,
                                     bool createIfNecessary = true);
 
+  // Remove traces of the given pageURL
+  void forgetPageURL(const String& pageURL);
+
   // Remove the current database entry for this IconURL
   void forgetIconForIconURLFromDatabase(const String&);
 
@@ -158,10 +162,15 @@ class IconDatabase {
   // If numberToPrune is negative, ALL dangling icons will be pruned
   void pruneUnreferencedIcons(int numberToPrune);
 
-  // Removes ALL icons that are unretained
-  // Meant to be called just once on startup, after initial retains are complete
-  // via a timer fire
-  void pruneUnretainedIcons(Timer<IconDatabase>*);
+  // Called by the startup timer, this method removes all icons that are
+  // unretained
+  // after initial retains are complete
+  void pruneUnretainedIconsOnStartup(Timer<IconDatabase>*);
+
+  // Called by the prune timer, this method periodically removes all the icons
+  // in the pending-deletion
+  // queue
+  void pruneIconsPendingDeletion(Timer<IconDatabase>*);
 
   // Determine if an IconURL is still retained by anyone
   bool isIconURLRetained(const String&);
@@ -180,6 +189,14 @@ class IconDatabase {
   // necessary
   Vector<unsigned char> imageDataForIconURL(const String&);
 
+  // Retains an iconURL, bringing it back from the brink if it was pending
+  // deletion
+  void retainIconURL(const String& iconURL);
+
+  // Releases an iconURL, putting it on the pending delete queue if it's totally
+  // released
+  void releaseIconURL(const String& iconURL);
+
   // FIXME: This method is currently implemented in WebCoreIconDatabaseBridge so
   // we can be in ObjC++ and fire off a loader in Webkit
   // Once all of the loader logic is sufficiently moved into WebCore we need to
@@ -197,12 +214,21 @@ class IconDatabase {
   bool m_privateBrowsingEnabled;
 
   Timer<IconDatabase> m_startupTimer;
+  Timer<IconDatabase> m_pruneTimer;
 
   typedef HashMap<String, SiteIcon*> SiteIconMap;
-  SiteIconMap m_pageURLToSiteIcons;
   SiteIconMap m_iconURLToSiteIcons;
 
   HashMap<String, String> m_pageURLToIconURLMap;
+
+  // This will keep track of the retaincount for each pageURL
+  HashMap<String, int> m_pageURLToRetainCount;
+  // This will keep track of the retaincount for each iconURL (ie - the number
+  // of pageURLs retaining this icon)
+  HashMap<String, int> m_iconURLToRetainCount;
+
+  HashSet<String> m_pageURLsPendingDeletion;
+  HashSet<String> m_iconURLsPendingDeletion;
 };
 
 }  // namespace WebCore
