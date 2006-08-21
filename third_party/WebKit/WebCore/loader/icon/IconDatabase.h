@@ -137,6 +137,7 @@ class IconDatabase {
   static const int currentDatabaseVersion;
   static const int iconExpirationTime;
   static const int missingIconExpirationTime;
+  static const int updateTimerDelay;
 
  private:
   IconDatabase();
@@ -155,6 +156,8 @@ class IconDatabase {
   // Remove the current database entry for this IconURL
   void forgetIconForIconURLFromDatabase(const String&);
 
+  void setIconURLForPageURLInDatabase(const String&, const String&);
+
   // Wipe all icons from the DB
   void removeAllIcons();
 
@@ -170,7 +173,11 @@ class IconDatabase {
   // Called by the prune timer, this method periodically removes all the icons
   // in the pending-deletion
   // queue
-  void pruneIconsPendingDeletion(Timer<IconDatabase>*);
+  void updateDatabase(Timer<IconDatabase>*);
+
+  // This is called by updateDatabase and when private browsing shifts, and when
+  // the DB is closed down
+  void syncDatabase();
 
   // Determine if an IconURL is still retained by anyone
   bool isIconURLRetained(const String&);
@@ -214,12 +221,13 @@ class IconDatabase {
   bool m_privateBrowsingEnabled;
 
   Timer<IconDatabase> m_startupTimer;
-  Timer<IconDatabase> m_pruneTimer;
+  Timer<IconDatabase> m_updateTimer;
 
   typedef HashMap<String, SiteIcon*> SiteIconMap;
   SiteIconMap m_iconURLToSiteIcons;
 
   HashMap<String, String> m_pageURLToIconURLMap;
+  HashMap<String, String> m_pageURLsPendingAddition;
 
   // This will keep track of the retaincount for each pageURL
   HashMap<String, int> m_pageURLToRetainCount;

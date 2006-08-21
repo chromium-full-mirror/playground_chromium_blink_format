@@ -34,9 +34,6 @@
 #include <sys/types.h>
 #include <time.h>
 
-// FIXME - Make sure we put a private browsing consideration in that uses the
-// temporary tables anytime private browsing would be an issue.
-
 // FIXME - One optimization to be made when this is no longer in flux is to make
 // query construction smarter - that is queries that are created from
 // multiple strings and numbers should be handled differently than with String +
@@ -60,6 +57,8 @@ const int IconDatabase::currentDatabaseVersion = 4;
 const int IconDatabase::iconExpirationTime = 60 * 60 * 24;
 // Absent icons are rechecked once a week
 const int IconDatabase::missingIconExpirationTime = 60 * 60 * 24 * 7;
+
+const int IconDatabase::updateTimerDelay = 5;
 
 const String& IconDatabase::defaultDatabaseFilename() {
   static String defaultDatabaseFilename = "icon.db";
@@ -98,7 +97,7 @@ IconDatabase::IconDatabase()
     : m_currentDB(&m_mainDB),
       m_privateBrowsingEnabled(false),
       m_startupTimer(this, &IconDatabase::pruneUnretainedIconsOnStartup),
-      m_pruneTimer(this, &IconDatabase::pruneIconsPendingDeletion) {}
+      m_updateTimer(this, &IconDatabase::updateDatabase) {}
 
 bool IconDatabase::open(const String& databasePath) {
   if (isOpen()) {
@@ -156,15 +155,14 @@ bool IconDatabase::open(const String& databasePath) {
   // will become "deferredTimer" or something along those lines, and will be set
   // only when
   // a deferred read/write is queued
-  if (isOpen()) {
+  if (isOpen())
     m_startupTimer.startOneShot(0);
-    m_pruneTimer.startRepeating(10);
-  }
 
   return isOpen();
 }
 
 void IconDatabase::close() {
+  syncDatabase();
   m_mainDB.close();
   m_privateBrowsingDB.close();
 }
@@ -273,6 +271,9 @@ Vector<unsigned char> IconDatabase::imageDataForIconURL(const String& iconURL) {
 void IconDatabase::setPrivateBrowsingEnabled(bool flag) {
   if (m_privateBrowsingEnabled == flag)
     return;
+
+  // Sync any deferred DB changes before we change the active DB
+  syncDatabase();
 
   m_privateBrowsingEnabled = flag;
 
@@ -567,12 +568,39 @@ void IconDatabase::setIconURLForPageURL(const String& iconURL,
     if (!oldIconURL.isEmpty())
       releaseIconURL(oldIconURL);
     retainIconURL(iconURL);
+  } else {
+    // If this pageURL is *not* retained, then we may be marking it for
+    // deletion, as well!
+    // As counterintuitive as it seems to mark it for addition and for deletion
+    // at the same time,
+    // it's valid because when we do a new pageURL->iconURL mapping we *have* to
+    // mark it for addition,
+    // no matter what, as there is no efficient was to determine if the mapping
+    // is in the DB already.
+    // But, if the iconURL is marked for deletion, we'll also mark this pageURL
+    // for deletion - if a
+    // client comes along and retains it before the timer fires, the
+    // "pendingDeletion" lists will
+    // be manipulated appopriately and new pageURL will be brought back from the
+    // brink
+    if (m_iconURLsPendingDeletion.contains(iconURL))
+      m_pageURLsPendingDeletion.add(pageURL);
   }
 
   // Cache the pageURL->iconURL map
   m_pageURLToIconURLMap.set(pageURL, iconURL);
 
-  // Store it in the database
+  // And mark this mapping to be added to the database
+  m_pageURLsPendingAddition.set(pageURL, iconURL);
+
+  // Then start the timer to commit this change - or further delay the timer if
+  // it
+  // was already started
+  m_updateTimer.startOneShot(updateTimerDelay);
+}
+
+void IconDatabase::setIconURLForPageURLInDatabase(const String& iconURL,
+                                                  const String& pageURL) {
   int64_t iconID = establishIconIDForIconURL(*m_currentDB, iconURL);
   if (!iconID) {
     LOG_ERROR("Failed to establish an ID for iconURL %s",
@@ -624,8 +652,6 @@ void IconDatabase::pruneUnretainedIconsOnStartup(Timer<IconDatabase>*) {
   if (!isOpen())
     return;
 
-// FIXME - The PageURL delete and the pruneunreferenced icons need to be in an
-// atomic transaction
 #ifndef NDEBUG
   CFTimeInterval start = CFAbsoluteTimeGetCurrent();
 #endif
@@ -644,11 +670,27 @@ void IconDatabase::pruneUnretainedIconsOnStartup(Timer<IconDatabase>*) {
 #endif
 }
 
-void IconDatabase::pruneIconsPendingDeletion(Timer<IconDatabase>*) {
+void IconDatabase::updateDatabase(Timer<IconDatabase>*) {
+  syncDatabase();
+}
+
+void IconDatabase::syncDatabase() {
 #ifndef NDEBUG
   CFTimeInterval start = CFAbsoluteTimeGetCurrent();
 #endif
 
+  // First we'll do the pending additions
+  for (HashMap<String, String>::iterator i = m_pageURLsPendingAddition.begin();
+       i != m_pageURLsPendingAddition.end(); ++i) {
+    // The HashMap maps PageURL->IconURL, but the method takes IconURL then
+    // PageURL - so this ordering is correct
+    setIconURLForPageURLInDatabase(i->second, i->first);
+    LOG(IconDatabase, "Commited IconURL %s for PageURL %s to database",
+        (i->second).ascii().data(), (i->first).ascii().data());
+  }
+  m_pageURLsPendingAddition.clear();
+
+  // Then we'll do the pending deletions
   // First lets wipe all the pageURLs
   HashSet<String>::iterator i = m_pageURLsPendingDeletion.begin();
   for (; i != m_pageURLsPendingDeletion.end(); ++i) {
@@ -672,14 +714,16 @@ void IconDatabase::pruneIconsPendingDeletion(Timer<IconDatabase>*) {
   }
   m_iconURLsPendingDeletion.clear();
 
+  // If the timer was running to cause this update, we can kill the timer as its
+  // firing would be redundant
+  m_updateTimer.stop();
+
 #ifndef NDEBUG
   CFTimeInterval duration = CFAbsoluteTimeGetCurrent() - start;
-  LOG(IconDatabase, "Wiping the items pending-deletion took %.4f seconds",
-      duration);
+  LOG(IconDatabase, "Updating the database took %.4f seconds", duration);
   if (duration > 1.0)
     LOG_ERROR(
-        "Wiping the items pending-deletion took %.4f seconds - this is much "
-        "too long!",
+        "Updating the database took %.4f seconds - this is much too long!",
         duration);
 #endif
 }
