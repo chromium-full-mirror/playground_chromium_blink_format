@@ -62,7 +62,8 @@ class ArrayProtoFunc : public InternalFunctionImp {
     Some,
     IndexOf,
     Filter,
-    Map
+    Map,
+    LastIndexOf
   };
 
  private:
