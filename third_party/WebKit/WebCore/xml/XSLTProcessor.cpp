@@ -341,6 +341,11 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
   bool shouldFreeSourceDoc = false;
   if (xmlDocPtr sourceDoc =
           xmlDocPtrFromNode(sourceNode, shouldFreeSourceDoc)) {
+    // The XML declaration would prevent parsing the result as a fragment, and
+    // it's not needed even for documents,
+    // as the result of this function is always immediately parsed.
+    sheet->omitXmlDeclaration = true;
+
     xsltTransformContextPtr transformContext =
         xsltNewTransformContext(sheet, sourceDoc);
 
