@@ -107,12 +107,8 @@
 - (void)_didFailLoadingWithError:(NSError*)error forResource:(id)identifier;
 - (BOOL)_privateBrowsingEnabled;
 - (void)_didFailLoadingWithError:(NSError*)error forResource:(id)identifier;
-- (void)_addPlugInStreamLoader:(WebLoader*)loader;
-- (void)_removePlugInStreamLoader:(WebLoader*)loader;
 - (void)_finishedLoadingResource;
 - (void)_receivedError:(NSError*)error;
-- (void)_addSubresourceLoader:(WebLoader*)loader;
-- (void)_removeSubresourceLoader:(WebLoader*)loader;
 - (NSURLRequest*)_originalRequest;
 - (WebFrame*)webFrame;
 - (void)_receivedMainResourceError:(NSError*)error complete:(BOOL)isComplete;
@@ -131,7 +127,6 @@
 - (void)_setResponse:(NSURLResponse*)response;
 - (void)_mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (void)_finishedLoading;
-- (void)_mainReceivedBytesSoFar:(unsigned)bytesSoFar complete:(BOOL)isComplete;
 - (void)_iconLoaderReceivedPageIcon:(WebIconLoader*)iconLoader;
 - (NSURL*)_URL;
 
