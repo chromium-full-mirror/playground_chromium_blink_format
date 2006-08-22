@@ -64,7 +64,7 @@ JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  Field* aField = aClass->fieldNamed(propertyName.ascii(), instance);
+  Field* aField = aClass->fieldNamed(propertyName, instance);
   JSValue* result = instance->getValueOfField(exec, aField);
 
   instance->end();
@@ -99,7 +99,7 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
 
   if (aClass) {
     // See if the instance has a field with the specified name.
-    Field* aField = aClass->fieldNamed(propertyName.ascii(), instance.get());
+    Field* aField = aClass->fieldNamed(propertyName, instance.get());
     if (aField) {
       slot.setCustom(this, fieldGetter);
       instance->end();
@@ -141,7 +141,7 @@ void RuntimeObjectImp::put(ExecState* exec,
 
   // Set the value of the property.
   Field* aField =
-      instance->getClass()->fieldNamed(propertyName.ascii(), instance.get());
+      instance->getClass()->fieldNamed(propertyName, instance.get());
   if (aField) {
     getInternalInstance()->setValueOfField(exec, aField, value);
   } else {
@@ -161,7 +161,7 @@ bool RuntimeObjectImp::canPut(ExecState*,
   instance->begin();
 
   Field* aField =
-      instance->getClass()->fieldNamed(propertyName.ascii(), instance.get());
+      instance->getClass()->fieldNamed(propertyName, instance.get());
 
   instance->end();
 

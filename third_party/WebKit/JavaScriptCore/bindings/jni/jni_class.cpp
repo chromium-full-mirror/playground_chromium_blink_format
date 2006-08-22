@@ -25,6 +25,7 @@
 #include "config.h"
 #include <jni_class.h>
 
+#include "identifier.h"
 #include <jni_utility.h>
 #include <jni_runtime.h>
 
@@ -53,17 +54,11 @@ JavaClass::JavaClass(jobject anInstance) {
   jarray fields = (jarray)callJNIObjectMethod(aClass, "getFields",
                                               "()[Ljava/lang/reflect/Field;");
   int numFields = env->GetArrayLength(fields);
-  _fields =
-      CFDictionaryCreateMutable(NULL, numFields, &kCFTypeDictionaryKeyCallBacks,
-                                &FieldDictionaryValueCallBacks);
   for (i = 0; i < numFields; i++) {
     jobject aJField = env->GetObjectArrayElement((jobjectArray)fields, i);
-    Field* aField = new JavaField(
-        env, aJField);  // deleted when the dictionary is destroyed
-    CFStringRef fieldName =
-        CFStringCreateWithCString(NULL, aField->name(), kCFStringEncodingASCII);
-    CFDictionaryAddValue((CFMutableDictionaryRef)_fields, fieldName, aField);
-    CFRelease(fieldName);
+    Field* aField =
+        new JavaField(env, aJField);  // deleted in the JavaClass destructor
+    _fields.set(Identifier(aField->name()).ustring().rep(), aField);
     env->DeleteLocalRef(aJField);
   }
 
@@ -71,24 +66,17 @@ JavaClass::JavaClass(jobject anInstance) {
   jarray methods = (jarray)callJNIObjectMethod(aClass, "getMethods",
                                                "()[Ljava/lang/reflect/Method;");
   int numMethods = env->GetArrayLength(methods);
-  _methods = CFDictionaryCreateMutable(NULL, numMethods,
-                                       &kCFTypeDictionaryKeyCallBacks,
-                                       &MethodListDictionaryValueCallBacks);
   for (i = 0; i < numMethods; i++) {
     jobject aJMethod = env->GetObjectArrayElement((jobjectArray)methods, i);
-    Method* aMethod = new JavaMethod(
-        env, aJMethod);  // deleted when the dictionary is destroyed
-    CFStringRef methodName = CFStringCreateWithCString(NULL, aMethod->name(),
-                                                       kCFStringEncodingASCII);
-    MethodList* methodList = (MethodList*)CFDictionaryGetValue(
-        (CFMutableDictionaryRef)_methods, methodName);
+    Method* aMethod =
+        new JavaMethod(env, aJMethod);  // deleted in the JavaClass destructor
+    MethodList* methodList =
+        _methods.get(Identifier(aMethod->name()).ustring().rep());
     if (!methodList) {
       methodList = new MethodList();
-      CFDictionaryAddValue((CFMutableDictionaryRef)_methods, methodName,
-                           methodList);
+      _methods.set(Identifier(aMethod->name()).ustring().rep(), methodList);
     }
     methodList->addMethod(aMethod);
-    CFRelease(methodName);
     env->DeleteLocalRef(aJMethod);
   }
 
@@ -107,28 +95,30 @@ JavaClass::JavaClass(jobject anInstance) {
 
 JavaClass::~JavaClass() {
   free((void*)_name);
-  CFRelease(_fields);
-  CFRelease(_methods);
+  deleteAllValues(_fields);
+
+  MethodListMap::const_iterator end = _methods.end();
+  for (MethodListMap::const_iterator it = _methods.begin(); it != end; ++it) {
+    const MethodList* methodList = it->second;
+    int length = methodList->length();
+    for (int i = 0; i < length; i++)
+      delete methodList->methodAt(i);
+    delete methodList;
+  }
   delete[] _constructors;
 }
 
-MethodList JavaClass::methodsNamed(const char* name, Instance*) const {
-  CFStringRef methodName =
-      CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
-  MethodList* methodList =
-      (MethodList*)CFDictionaryGetValue(_methods, methodName);
-  CFRelease(methodName);
+MethodList JavaClass::methodsNamed(const Identifier& identifier,
+                                   Instance*) const {
+  MethodList* methodList = _methods.get(identifier.ustring().rep());
+
   if (methodList)
     return *methodList;
   return MethodList();
 }
 
-Field* JavaClass::fieldNamed(const char* name, Instance*) const {
-  CFStringRef fieldName =
-      CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
-  Field* aField = (Field*)CFDictionaryGetValue(_fields, fieldName);
-  CFRelease(fieldName);
-  return aField;
+Field* JavaClass::fieldNamed(const Identifier& identifier, Instance*) const {
+  return _fields.get(identifier.ustring().rep());
 }
 
 bool JavaClass::isNumberClass() const {
