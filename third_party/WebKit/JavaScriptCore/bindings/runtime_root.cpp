@@ -26,6 +26,7 @@
 #include "jni_jsobject.h"
 #include "object.h"
 #include "runtime_root.h"
+#include <wtf/HashCountedSet.h>
 
 using namespace KJS;
 using namespace KJS::Bindings;
@@ -40,7 +41,7 @@ using namespace KJS::Bindings;
 // the last JavaJSObject that refers to it is finalized, or when the applet is
 // shutdown.
 //
-// To do this we keep a dictionary that maps each applet instance
+// To do this we keep a map that maps each applet instance
 // to the JavaScript objects it is referencing.  For each JavaScript instance
 // we also maintain a secondary reference count.  When that reference count
 // reaches
@@ -48,28 +49,28 @@ using namespace KJS::Bindings;
 // instances
 // are represented by a jlong.
 
-static CFMutableDictionaryRef referencesByRootDictionary = 0;
+typedef HashMap<const Bindings::RootObject*, ReferencesSet*>
+    ReferencesByRootMap;
 
-static CFMutableDictionaryRef getReferencesByRootDictionary() {
-  if (!referencesByRootDictionary)
-    referencesByRootDictionary = CFDictionaryCreateMutable(
-        NULL, 0, NULL, &kCFTypeDictionaryValueCallBacks);
-  return referencesByRootDictionary;
+static ReferencesByRootMap* getReferencesByRootMap() {
+  static ReferencesByRootMap* referencesByRootMap = 0;
+
+  if (!referencesByRootMap)
+    referencesByRootMap = new ReferencesByRootMap;
+
+  return referencesByRootMap;
 }
 
-static CFMutableDictionaryRef getReferencesDictionary(
-    const Bindings::RootObject* root) {
-  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
-  CFMutableDictionaryRef referencesDictionary = 0;
+static ReferencesSet* getReferencesSet(const Bindings::RootObject* root) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+  ReferencesSet* referencesSet = 0;
 
-  referencesDictionary = (CFMutableDictionaryRef)CFDictionaryGetValue(
-      refsByRoot, (const void*)root);
-  if (!referencesDictionary) {
-    referencesDictionary = CFDictionaryCreateMutable(NULL, 0, NULL, NULL);
-    CFDictionaryAddValue(refsByRoot, root, referencesDictionary);
-    CFRelease(referencesDictionary);
+  referencesSet = refsByRoot->get(root);
+  if (!referencesSet) {
+    referencesSet = new ReferencesSet;
+    refsByRoot->add(root, referencesSet);
   }
-  return referencesDictionary;
+  return referencesSet;
 }
 
 // Scan all the dictionary for all the roots to see if any have a
@@ -78,105 +79,73 @@ static CFMutableDictionaryRef getReferencesDictionary(
 // FIXME:  This is a potential performance bottleneck with many applets.  We
 // could fix be adding a
 // imp to root dictionary.
-CFMutableDictionaryRef KJS::Bindings::findReferenceDictionary(JSObject* imp) {
-  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
-  CFMutableDictionaryRef foundDictionary = 0;
-
+ReferencesSet* KJS::Bindings::findReferenceSet(JSObject* imp) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
   if (refsByRoot) {
-    const void** allValues = 0;
-    CFIndex count, i;
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
+      ReferencesSet* set = it->second;
 
-    count = CFDictionaryGetCount(refsByRoot);
-    allValues = (const void**)malloc(sizeof(void*) * count);
-    CFDictionaryGetKeysAndValues(refsByRoot, NULL, allValues);
-    for (i = 0; i < count; i++) {
-      CFMutableDictionaryRef referencesDictionary =
-          (CFMutableDictionaryRef)allValues[i];
-      if (CFDictionaryGetValue(referencesDictionary, imp) != 0) {
-        foundDictionary = referencesDictionary;
-        break;
-      }
+      if (set->contains(imp))
+        return set;
     }
-
-    free((void*)allValues);
   }
-  return foundDictionary;
+
+  return 0;
 }
 
 // FIXME:  This is a potential performance bottleneck with many applets.  We
 // could fix be adding a
 // imp to root dictionary.
 const Bindings::RootObject* KJS::Bindings::rootForImp(JSObject* imp) {
-  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
   const Bindings::RootObject* rootObject = 0;
 
   if (refsByRoot) {
-    const void** allValues = 0;
-    const void** allKeys = 0;
-    CFIndex count, i;
-
-    count = CFDictionaryGetCount(refsByRoot);
-    allKeys = (const void**)malloc(sizeof(void*) * count);
-    allValues = (const void**)malloc(sizeof(void*) * count);
-    CFDictionaryGetKeysAndValues(refsByRoot, allKeys, allValues);
-    for (i = 0; i < count; i++) {
-      CFMutableDictionaryRef referencesDictionary =
-          (CFMutableDictionaryRef)allValues[i];
-      if (CFDictionaryGetValue(referencesDictionary, imp) != 0) {
-        rootObject = (const Bindings::RootObject*)allKeys[i];
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
+      ReferencesSet* set = it->second;
+      if (set->contains(imp)) {
+        rootObject = it->first;
         break;
       }
     }
-
-    free((void*)allKeys);
-    free((void*)allValues);
   }
+
   return rootObject;
 }
 
 const Bindings::RootObject* KJS::Bindings::rootForInterpreter(
     KJS::Interpreter* interpreter) {
-  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
-  const Bindings::RootObject *aRootObject = 0, *result = 0;
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
 
   if (refsByRoot) {
-    const void** allValues = 0;
-    const void** allKeys = 0;
-    CFIndex count, i;
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
+      const Bindings::RootObject* aRootObject = it->first;
 
-    count = CFDictionaryGetCount(refsByRoot);
-    allKeys = (const void**)malloc(sizeof(void*) * count);
-    allValues = (const void**)malloc(sizeof(void*) * count);
-    CFDictionaryGetKeysAndValues(refsByRoot, allKeys, allValues);
-    for (i = 0; i < count; i++) {
-      aRootObject = (const Bindings::RootObject*)allKeys[i];
-      if (aRootObject->interpreter() == interpreter) {
-        result = aRootObject;
-        break;
-      }
+      if (aRootObject->interpreter() == interpreter)
+        return aRootObject;
     }
-
-    free((void*)allKeys);
-    free((void*)allValues);
   }
-  return result;
+
+  return 0;
 }
 
 void KJS::Bindings::addNativeReference(const Bindings::RootObject* root,
                                        JSObject* imp) {
   if (root) {
-    CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(root);
+    ReferencesSet* referenceMap = getReferencesSet(root);
 
-    unsigned long numReferences =
-        (unsigned long)CFDictionaryGetValue(referencesDictionary, imp);
+    unsigned numReferences = referenceMap->count(imp);
     if (numReferences == 0) {
       JSLock lock;
       gcProtect(imp);
-      CFDictionaryAddValue(referencesDictionary, imp, (const void*)1);
-    } else {
-      CFDictionaryReplaceValue(referencesDictionary, imp,
-                               (const void*)(numReferences + 1));
     }
+    referenceMap->add(imp);
   }
 }
 
@@ -184,19 +153,15 @@ void KJS::Bindings::removeNativeReference(JSObject* imp) {
   if (!imp)
     return;
 
-  CFMutableDictionaryRef referencesDictionary = findReferenceDictionary(imp);
+  ReferencesSet* referencesSet = findReferenceSet(imp);
+  if (referencesSet) {
+    unsigned numReferences = referencesSet->count(imp);
 
-  if (referencesDictionary) {
-    unsigned long numReferences =
-        (unsigned long)CFDictionaryGetValue(referencesDictionary, imp);
     if (numReferences == 1) {
       JSLock lock;
       gcUnprotect(imp);
-      CFDictionaryRemoveValue(referencesDictionary, imp);
-    } else {
-      CFDictionaryReplaceValue(referencesDictionary, imp,
-                               (const void*)(numReferences - 1));
     }
+    referencesSet->remove(imp);
   }
 }
 
@@ -327,26 +292,18 @@ void RootObject::setFindRootObjectForNativeHandleFunction(
 
 // Must be called when the applet is shutdown.
 void RootObject::removeAllNativeReferences() {
-  CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(this);
+  ReferencesSet* referencesSet = getReferencesSet(this);
 
-  if (referencesDictionary) {
-    void** allImps = 0;
-    CFIndex count, i;
-
-    count = CFDictionaryGetCount(referencesDictionary);
-    allImps = (void**)malloc(sizeof(void*) * count);
-    CFDictionaryGetKeysAndValues(referencesDictionary, (const void**)allImps,
-                                 NULL);
-    for (i = 0; i < count; i++) {
+  if (referencesSet) {
+    ReferencesSet::iterator end = referencesSet->end();
+    for (ReferencesSet::iterator it = referencesSet->begin(); it != end; ++it) {
       JSLock lock;
-      JSObject* anImp = static_cast<JSObject*>(allImps[i]);
-      gcUnprotect(anImp);
+      gcUnprotect(it->first);
     }
-    free((void*)allImps);
-    CFDictionaryRemoveAllValues(referencesDictionary);
-
-    CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
-    CFDictionaryRemoveValue(refsByRoot, (const void*)this);
+    referencesSet->clear();
+    ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+    refsByRoot->remove(this);
+    delete referencesSet;
     delete this;
   }
 }
