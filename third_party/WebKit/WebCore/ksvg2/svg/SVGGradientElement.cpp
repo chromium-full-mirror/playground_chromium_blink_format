@@ -101,7 +101,7 @@ void SVGGradientElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGGradientElement::notifyAttributeChange() const {
-  if (ownerDocument()->parsing() || !attached())
+  if (ownerDocument()->parsing() || !attached() || !m_resource)
     return;
 
   // Update clients of this gradient resource...
@@ -133,7 +133,7 @@ KRenderingPaintServerGradient* SVGGradientElement::canvasResource() {
 
 void SVGGradientElement::resourceNotification() const {
   // We're referenced by a "client", build the gradient now...
-  buildGradient(m_resource);
+  buildGradient(const_cast<SVGGradientElement*>(this)->canvasResource());
 }
 
 void SVGGradientElement::rebuildStops() const {
