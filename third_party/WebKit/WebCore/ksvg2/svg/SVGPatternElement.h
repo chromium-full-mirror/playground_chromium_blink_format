@@ -99,10 +99,10 @@ class SVGPatternElement : public SVGStyledLocatableElement,
   // notifyAttributeChange helpers:
   void fillAttributesFromReferencePattern(
       const SVGPatternElement* target,
-      KCanvasMatrix& patternTransformMatrix) const;
+      AffineTransform& patternTransformMatrix) const;
   void drawPatternContentIntoTile(const SVGPatternElement* target,
                                   const IntSize& newSize,
-                                  KCanvasMatrix patternTransformMatrix) const;
+                                  AffineTransform patternTransformMatrix) const;
   void notifyClientsToRepaint() const;
 };
 

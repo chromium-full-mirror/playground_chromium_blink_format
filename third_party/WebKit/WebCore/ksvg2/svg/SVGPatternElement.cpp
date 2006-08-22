@@ -30,7 +30,6 @@
 #include "RenderSVGContainer.h"
 #include "KCanvasCreator.h"
 #include "KCanvasImage.h"
-#include "KCanvasMatrix.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "KRenderingPaintServerPattern.h"
@@ -168,7 +167,7 @@ void SVGPatternElement::resourceNotification() const {
 
 void SVGPatternElement::fillAttributesFromReferencePattern(
     const SVGPatternElement* target,
-    KCanvasMatrix& patternTransformMatrix) const {
+    AffineTransform& patternTransformMatrix) const {
   DeprecatedString ref = String(href()->baseVal()).deprecatedString();
   KRenderingPaintServer* refServer = getPaintServerById(document(), ref.mid(1));
 
@@ -203,7 +202,7 @@ void SVGPatternElement::fillAttributesFromReferencePattern(
 void SVGPatternElement::drawPatternContentIntoTile(
     const SVGPatternElement* target,
     const IntSize& newSize,
-    KCanvasMatrix patternTransformMatrix) const {
+    AffineTransform patternTransformMatrix) const {
   KRenderingDevice* device = renderingDevice();
 
   SVGStyledElement* activeElement =
@@ -351,10 +350,10 @@ void SVGPatternElement::notifyAttributeChange() const {
   unsigned short savedPatternUnits = patternUnits()->baseVal();
   unsigned short savedPatternContentUnits = patternContentUnits()->baseVal();
 
-  KCanvasMatrix patternTransformMatrix;
+  AffineTransform patternTransformMatrix;
   if (patternTransform()->baseVal()->numberOfItems() > 0)
-    patternTransformMatrix = KCanvasMatrix(
-        patternTransform()->baseVal()->consolidate()->matrix()->matrix());
+    patternTransformMatrix =
+        patternTransform()->baseVal()->consolidate()->matrix()->matrix();
 
   fillAttributesFromReferencePattern(target, patternTransformMatrix);
 

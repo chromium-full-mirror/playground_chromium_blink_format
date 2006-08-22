@@ -38,7 +38,6 @@
 #include "SVGRadialGradientElement.h"
 #include "SVGAnimatedTransformList.h"
 
-#include <kcanvas/KCanvasMatrix.h>
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingPaintServerGradient.h>
 
@@ -129,10 +128,9 @@ void SVGRadialGradientElement::buildGradient(
 
   KRenderingPaintServerRadialGradient* grad =
       static_cast<KRenderingPaintServerRadialGradient*>(_grad);
-  KCanvasMatrix mat;
+  AffineTransform mat;
   if (gradientTransform()->baseVal()->numberOfItems() > 0)
-    mat = KCanvasMatrix(
-        gradientTransform()->baseVal()->consolidate()->matrix()->matrix());
+    mat = gradientTransform()->baseVal()->consolidate()->matrix()->matrix();
 
   DeprecatedString ref = String(href()->baseVal()).deprecatedString();
   KRenderingPaintServer* pserver = getPaintServerById(document(), ref.mid(1));

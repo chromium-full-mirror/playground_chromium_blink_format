@@ -25,8 +25,8 @@
 #include "IntPoint.h"
 
 #include "KRenderingPaintServerGradient.h"
-#include "KCanvasMatrix.h"
 
+#include "AffineTransform.h"
 #include "TextStream.h"
 #include "KCanvasTreeDebug.h"
 
@@ -73,7 +73,7 @@ class KRenderingPaintServerGradient::Private {
   Vector<KCGradientStop> stops;
   KCGradientSpreadMethod spreadMethod;
   bool boundingBoxMode;
-  KCanvasMatrix gradientTransform;
+  AffineTransform gradientTransform;
   KCanvasResourceListener* listener;
 };
 
@@ -122,12 +122,12 @@ void KRenderingPaintServerGradient::setBoundingBoxMode(bool mode) {
   d->boundingBoxMode = mode;
 }
 
-KCanvasMatrix KRenderingPaintServerGradient::gradientTransform() const {
+AffineTransform KRenderingPaintServerGradient::gradientTransform() const {
   return d->gradientTransform;
 }
 
 void KRenderingPaintServerGradient::setGradientTransform(
-    const KCanvasMatrix& mat) {
+    const AffineTransform& mat) {
   d->gradientTransform = mat;
 }
 
@@ -139,8 +139,8 @@ TextStream& KRenderingPaintServerGradient::externalRepresentation(
     ts << "[method=" << spreadMethod() << "]";
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";
-  if (!gradientTransform().matrix().isIdentity())
-    ts << " [transform=" << gradientTransform().matrix() << "]";
+  if (!gradientTransform().isIdentity())
+    ts << " [transform=" << gradientTransform() << "]";
 
   return ts;
 }

@@ -240,7 +240,7 @@ AffineTransform RenderSVGContainer::viewportTransform() const {
     if (!parent()->isKCanvasContainer())
       viewportRect =
           FloatRect(viewport().x(), viewport().y(), width(), height());
-    return getAspectRatio(viewBox(), viewportRect).matrix();
+    return getAspectRatio(viewBox(), viewportRect);
   }
   return AffineTransform();
 }
@@ -322,10 +322,10 @@ bool RenderSVGContainer::slice() const {
   return d->slice;
 }
 
-KCanvasMatrix RenderSVGContainer::getAspectRatio(
+AffineTransform RenderSVGContainer::getAspectRatio(
     const FloatRect& logical,
     const FloatRect& physical) const {
-  KCanvasMatrix temp;
+  AffineTransform temp;
 
   float logicX = logical.x();
   float logicY = logical.y();

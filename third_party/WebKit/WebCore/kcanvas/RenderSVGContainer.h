@@ -94,8 +94,8 @@ class RenderSVGContainer : public RenderContainer {
   bool slice() const;
 
  private:
-  KCanvasMatrix getAspectRatio(const FloatRect& logical,
-                               const FloatRect& physical) const;
+  AffineTransform getAspectRatio(const FloatRect& logical,
+                                 const FloatRect& physical) const;
   AffineTransform viewportTransform() const;
 
   class Private;

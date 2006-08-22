@@ -42,7 +42,6 @@ typedef enum {
   RS_MASKER = 4
 } KCResourceType;
 
-class KCanvasMatrix;
 class KRenderingPaintServer;
 
 class KCanvasResource {
