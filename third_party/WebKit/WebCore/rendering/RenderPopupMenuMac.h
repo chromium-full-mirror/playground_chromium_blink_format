@@ -36,6 +36,7 @@ class RenderPopupMenuMac : public RenderPopupMenu {
 
   virtual void clear();
   virtual void showPopup(const IntRect&, FrameView*, int index);
+  virtual void hidePopup(){};
   virtual void populate();
 
  protected:

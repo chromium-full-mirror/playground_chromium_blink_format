@@ -45,7 +45,15 @@ RenderMenuList::RenderMenuList(HTMLSelectElement* element)
       m_buttonText(0),
       m_innerBlock(0),
       m_optionsChanged(true),
-      m_optionsWidth(0) {}
+      m_optionsWidth(0),
+      m_popup(0),
+      m_popupIsVisible(false) {}
+
+RenderMenuList::~RenderMenuList() {
+  if (m_popup)
+    m_popup->destroy();
+  m_popup = 0;
+}
 
 void RenderMenuList::createInnerBlock() {
   if (m_innerBlock) {
@@ -197,19 +205,28 @@ void RenderMenuList::calcMinMaxWidth() {
 }
 
 void RenderMenuList::showPopup() {
+  if (m_popupIsVisible)
+    return;
+
   // Create m_innerBlock here so it ends up as the first child.
   // This is important because otherwise we might try to create m_innerBlock
   // inside the showPopup call and it would fail.
   createInnerBlock();
-  RenderPopupMenu* menu =
-      theme()->createPopupMenu(renderArena(), document(), this);
+  if (!m_popup)
+    m_popup = theme()->createPopupMenu(renderArena(), document(), this);
   RenderStyle* newStyle = new (renderArena()) RenderStyle;
   newStyle->inheritFrom(style());
-  menu->setStyle(newStyle);
+  m_popup->setStyle(newStyle);
   HTMLSelectElement* select = static_cast<HTMLSelectElement*>(node());
-  menu->showPopup(absoluteBoundingBoxRect(), document()->view(),
-                  select->optionToListIndex(select->selectedIndex()));
-  menu->destroy();
+  m_popupIsVisible = true;
+  m_popup->showPopup(absoluteBoundingBoxRect(), document()->view(),
+                     select->optionToListIndex(select->selectedIndex()));
+}
+
+void RenderMenuList::hidePopup() {
+  if (m_popup)
+    m_popup->hidePopup();
+  m_popupIsVisible = false;
 }
 
 void RenderMenuList::valueChanged(unsigned listIndex) {
