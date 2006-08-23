@@ -55,6 +55,7 @@ class NSImage;
 class NSMenu;
 class NSString;
 class NSView;
+class NSURLConnection;
 #endif
 
 #ifdef __cplusplus
@@ -129,6 +130,8 @@ extern CFReadStreamRef (*wkCreateCustomCFReadStream)(
     void (*formSchedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void (*formUnschedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void* context);
+extern void (*wkSetNSURLConnectionDefersCallbacks)(NSURLConnection*, BOOL);
+extern id (*wkCreateNSURLConnectionDelegateProxy)(void);
 
 #ifdef __cplusplus
 }
