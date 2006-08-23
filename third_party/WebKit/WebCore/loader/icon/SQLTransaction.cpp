@@ -23,9 +23,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+#include "SQLTransaction.h"
+
 #include "SQLDatabase.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SQLTransaction::SQLTransaction(SQLDatabase& db, bool start)
     : m_db(db), m_began(false) {
@@ -54,3 +57,5 @@ void SQLTransaction::rollback() {
   if (m_began)
     m_db.executeCommand("ROLLBACK;");
 }
+
+}  // namespace WebCore

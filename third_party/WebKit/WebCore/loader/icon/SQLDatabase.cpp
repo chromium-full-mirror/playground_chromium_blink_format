@@ -23,10 +23,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
 #include "SQLDatabase.h"
+
+#include "SQLStatement.h"
+
 #include "Logging.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SQLDatabase::SQLDatabase() : m_db(0) {}
 
@@ -109,3 +113,5 @@ int64_t SQLDatabase::lastInsertRowID() {
     return 0;
   return sqlite3_last_insert_rowid(m_db);
 }
+
+}  // namespace WebCore
