@@ -90,11 +90,6 @@ class VisiblePosition {
   void init(const Position&, EAffinity);
   Position canonicalPosition(const Position&);
 
-  static int maxOffset(const Node*);
-
-  static Position previousVisiblePosition(const Position&);
-  static Position nextVisiblePosition(const Position&);
-
   Position m_deepPosition;
   EAffinity m_affinity;
 };
