@@ -78,6 +78,12 @@ class SQLDatabase : public Noncopyable {
 
 };  // class SQLDatabase
 
+inline String escapeSQLString(const String& s) {
+  String es = s;
+  es.replace('\'', "''");
+  return es;
+}
+
 }  // namespace WebCore
 
 #endif
