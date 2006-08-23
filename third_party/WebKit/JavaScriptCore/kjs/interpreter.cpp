@@ -46,9 +46,7 @@
 #include "types.h"
 #include "value.h"
 
-#if PLATFORM(MAC)
 #include "runtime.h"
-#endif
 
 #if HAVE(SYS_TIME_H)
 #include <sys/time.h>
@@ -730,8 +728,6 @@ void Interpreter::setShouldPrintExceptions(bool print) {
   printExceptions = print;
 }
 
-// bindings are OS X WebKit-only for now
-#if PLATFORM(MAC)
 void* Interpreter::createLanguageInstanceForValue(
     ExecState* exec,
     int language,
@@ -742,7 +738,6 @@ void* Interpreter::createLanguageInstanceForValue(
       exec, (Bindings::Instance::BindingLanguage)language, value, origin,
       current);
 }
-#endif
 
 void Interpreter::saveBuiltins(SavedBuiltins& builtins) const {
   if (!builtins._internal)
