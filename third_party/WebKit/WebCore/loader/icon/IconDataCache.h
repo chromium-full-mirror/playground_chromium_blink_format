@@ -53,6 +53,8 @@ class IconDataCache {
 
   void setImageData(unsigned char* data, int size);
 
+  void loadImageFromResource(const char*);
+
   void writeToDatabase(SQLDatabase& db);
 
   ImageDataStatus imageDataStatus();
