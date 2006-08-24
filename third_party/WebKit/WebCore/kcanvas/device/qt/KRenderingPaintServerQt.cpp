@@ -46,22 +46,22 @@ void KRenderingPaintServerQt::setPenProperties(
   if (strokePainter.strokeJoinStyle() == JOIN_MITER) {
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setMiterLimit((qreal)strokePainter.strokeMiterLimit());
-    else if (strokePainter.strokeJoinStyle() == JOIN_ROUND)
-        pen.setJoinStyle(Qt::RoundJoin);
+  } else if (strokePainter.strokeJoinStyle() == JOIN_ROUND)
+    pen.setJoinStyle(Qt::RoundJoin);
 
-    KCDashArray dashes = strokePainter.dashArray();
-    unsigned int dashLength = !dashes.isEmpty() ? dashes.count() : 0;
-    if (dashLength) {
-      QVector<qreal> pattern;
-      unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
+  KCDashArray dashes = strokePainter.dashArray();
+  unsigned int dashLength = !dashes.isEmpty() ? dashes.count() : 0;
+  if (dashLength) {
+    QVector<qreal> pattern;
+    unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
 
-      for (unsigned int i = 0; i < count; i++)
-        pattern.append(dashes[i % dashLength] / (float)pen.widthF());
+    for (unsigned int i = 0; i < count; i++)
+      pattern.append(dashes[i % dashLength] / (float)pen.widthF());
 
-      pen.setDashPattern(pattern);
-      // TODO: dash-offset, does/will qt4 API allow it? (Rob)
-    }
+    pen.setDashPattern(pattern);
+    // TODO: dash-offset, does/will qt4 API allow it? (Rob)
   }
+}
 }
 
 // vim:ts=4:noet
