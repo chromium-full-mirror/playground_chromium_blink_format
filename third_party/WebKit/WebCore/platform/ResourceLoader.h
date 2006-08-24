@@ -44,7 +44,7 @@ typedef _W64 long LONG_PTR;
 typedef LONG_PTR LRESULT;
 #endif
 
-#if __APPLE__
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 @class WebCoreResourceLoaderImp;
 #else
@@ -83,7 +83,7 @@ class ResourceLoader {
   String method() const;
   FormData postData() const;
 
-#if __APPLE__
+#if PLATFORM(MAC)
   void setLoader(WebCoreResourceLoaderImp*);
 #endif
 #if PLATFORM(WIN)

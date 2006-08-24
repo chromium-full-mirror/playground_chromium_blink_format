@@ -77,7 +77,7 @@ class FontData : Noncopyable {
     m_characterToGlyphMap.setGlyphDataForCharacter(c, glyph, fontData);
   }
 
-#if __APPLE__
+#if PLATFORM(MAC)
   NSFont* getNSFont() const { return m_font.font; }
 #endif
 
@@ -112,7 +112,7 @@ class FontData : Noncopyable {
 
   mutable FontData* m_smallCapsFontData;
 
-#if __APPLE__
+#if PLATFORM(MAC)
   void* m_styleGroup;
   float m_syntheticBoldOffset;
   mutable ATSUStyle m_ATSUStyle;

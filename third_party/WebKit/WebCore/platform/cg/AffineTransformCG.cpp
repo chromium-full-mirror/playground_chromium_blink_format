@@ -26,6 +26,8 @@
 #include "config.h"
 #include "AffineTransform.h"
 
+#if PLATFORM(CG)
+
 #include "FloatRect.h"
 #include "IntRect.h"
 
@@ -154,3 +156,5 @@ AffineTransform AffineTransform::operator*(const AffineTransform& m2) {
   return CGAffineTransformConcat(m_transform, CGAffineTransform(m2));
 }
 }
+
+#endif  // PLATFORM(CG)

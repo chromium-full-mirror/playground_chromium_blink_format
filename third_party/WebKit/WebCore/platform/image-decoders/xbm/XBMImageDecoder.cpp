@@ -26,6 +26,8 @@
 #include "config.h"
 #include "XBMImageDecoder.h"
 
+#if PLATFORM(CAIRO)
+
 namespace WebCore {
 
 bool XBMImageDecoder::isSizeAvailable() const {
@@ -36,3 +38,5 @@ RGBA32Buffer* XBMImageDecoder::frameBufferAtIndex(size_t index) {
   return 0;
 }
 }
+
+#endif  // PLATFORM(CAIRO)

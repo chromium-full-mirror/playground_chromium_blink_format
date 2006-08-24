@@ -27,16 +27,16 @@
 #ifndef FloatSize_h
 #define FloatSize_h
 
-#if __APPLE__
-
+#if PLATFORM(CG)
 typedef struct CGSize CGSize;
+#endif
 
+#if PLATFORM(MAC)
 #ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGSize NSSize;
 #else
 typedef struct _NSSize NSSize;
 #endif
-
 #endif
 
 namespace WebCore {
@@ -62,18 +62,16 @@ class FloatSize {
                      m_height > other.m_height ? m_height : other.m_height);
   }
 
-#if __APPLE__
-
+#if PLATFORM(CG)
   explicit FloatSize(
       const CGSize&);  // don't do this implicitly since it's lossy
   operator CGSize() const;
+#endif
 
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#if PLATFORM(MAC) && !defined(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES)
   explicit FloatSize(
       const NSSize&);  // don't do this implicitly since it's lossy
   operator NSSize() const;
-#endif
-
 #endif
 
  private:

@@ -26,6 +26,8 @@
 #include "config.h"
 #include "ImageSource.h"
 
+#if PLATFORM(CAIRO)
+
 #include "GIFImageDecoder.h"
 #include "JPEGImageDecoder.h"
 #include "PNGImageDecoder.h"
@@ -161,3 +163,5 @@ bool ImageSource::frameHasAlphaAtIndex(size_t index) {
   return buffer->hasAlpha();
 }
 }
+
+#endif  // PLATFORM(CAIRO)

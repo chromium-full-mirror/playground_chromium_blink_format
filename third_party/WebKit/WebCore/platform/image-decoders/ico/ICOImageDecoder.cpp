@@ -26,6 +26,8 @@
 #include "config.h"
 #include "ICOImageDecoder.h"
 
+#if PLATFORM(CAIRO)
+
 namespace WebCore {
 
 bool ICOImageDecoder::isSizeAvailable() const {
@@ -36,3 +38,5 @@ RGBA32Buffer* ICOImageDecoder::frameBufferAtIndex(size_t index) {
   return 0;
 }
 }
+
+#endif  // PLATFORM(CAIRO)

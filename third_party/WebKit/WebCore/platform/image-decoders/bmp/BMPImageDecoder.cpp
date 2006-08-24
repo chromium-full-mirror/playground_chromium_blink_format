@@ -26,6 +26,8 @@
 #include "config.h"
 #include "BMPImageDecoder.h"
 
+#if PLATFORM(CAIRO)
+
 namespace WebCore {
 
 bool BMPImageDecoder::isSizeAvailable() const {
@@ -36,3 +38,5 @@ RGBA32Buffer* BMPImageDecoder::frameBufferAtIndex(size_t index) {
   return 0;
 }
 }
+
+#endif  // PLATFORM(CAIRO)

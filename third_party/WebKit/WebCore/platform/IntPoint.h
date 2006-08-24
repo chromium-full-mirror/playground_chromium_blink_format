@@ -29,17 +29,17 @@
 #include "IntSize.h"
 #include <wtf/Platform.h>
 
-#if __APPLE__
-
+#if PLATFORM(CG)
 typedef struct CGPoint CGPoint;
+#endif
 
+#if PLATFORM(MAC)
 #ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
 typedef struct CGPoint NSPoint;
 #else
 typedef struct _NSPoint NSPoint;
 #endif
-
-#endif  // __APPLE__
+#endif
 
 #if PLATFORM(WIN)
 typedef struct tagPOINT POINT;
@@ -65,18 +65,16 @@ class IntPoint {
     m_y += dy;
   }
 
-#if __APPLE__
-
+#if PLATFORM(CG)
   explicit IntPoint(
       const CGPoint&);  // don't do this implicitly since it's lossy
   operator CGPoint() const;
+#endif
 
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+#if PLATFORM(MAC) && !defined(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES)
   explicit IntPoint(
       const NSPoint&);  // don't do this implicitly since it's lossy
   operator NSPoint() const;
-#endif
-
 #endif
 
 #if PLATFORM(WIN)

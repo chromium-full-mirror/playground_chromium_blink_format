@@ -39,6 +39,8 @@
 #include "JPEGImageDecoder.h"
 #include <assert.h>
 
+#if PLATFORM(CAIRO)
+
 extern "C" {
 #include "jpeglib.h"
 }
@@ -480,3 +482,5 @@ void JPEGImageDecoder::jpegComplete() {
   buffer.setStatus(RGBA32Buffer::FrameComplete);
 }
 }
+
+#endif  // PLATFORM(CAIRO)

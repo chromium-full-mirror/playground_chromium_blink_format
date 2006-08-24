@@ -28,7 +28,7 @@
 
 #include <wtf/Platform.h>
 
-#if __APPLE__
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSView;
 #else
@@ -153,7 +153,7 @@ class Widget {
   void setQWidget(QWidget*);
 #endif
 
-#if __APPLE__
+#if PLATFORM(MAC)
   Widget(NSView* view);
 
   NSView* getView() const;

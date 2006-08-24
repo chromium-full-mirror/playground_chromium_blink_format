@@ -23,35 +23,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "FloatRect.h"
-#include "GraphicsTypes.h"
+#include "config.h"
+#include "IntPoint.h"
+
+#if PLATFORM(CG)
 
 #include <ApplicationServices/ApplicationServices.h>
 
 namespace WebCore {
 
-class GraphicsContext;
+IntPoint::IntPoint(const CGPoint& p)
+    : m_x(static_cast<int>(p.x)), m_y(static_cast<int>(p.y)) {}
 
-class PDFDocumentImage {
- public:
-  PDFDocumentImage(CFDataRef);
-  ~PDFDocumentImage();
-
-  FloatSize size() const { return m_mediaBox.size(); }
-  void draw(GraphicsContext*,
-            const FloatRect& fromRect,
-            const FloatRect& toRect,
-            CompositeOperator) const;
-
- private:
-  void setCurrentPage(int page);
-  int pageCount() const;
-  void adjustCTM(GraphicsContext*) const;
-
-  CGPDFDocumentRef m_document;
-  FloatRect m_mediaBox;
-  FloatRect m_cropBox;
-  float m_rotation;
-  int m_currentPage;
-};
+IntPoint::operator CGPoint() const {
+  return CGPointMake(m_x, m_y);
 }
+}
+
+#endif  // PLATFORM(CG)
