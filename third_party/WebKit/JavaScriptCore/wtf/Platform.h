@@ -77,6 +77,16 @@
 #define KXMLCORE_PLATFORM_GDK 1
 #endif
 
+/* Graphics engines */
+
+/* PLATFORM(CG) */
+/* PLATFORM(CAIRO) */
+#if PLATFORM(MAC)
+#define KXMLCORE_PLATFORM_CG 1
+#else
+#define KXMLCORE_PLATFORM_CAIRO 1
+#endif
+
 /* CPU */
 
 /* PLATFORM(PPC) */
