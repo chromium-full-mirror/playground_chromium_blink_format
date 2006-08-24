@@ -64,18 +64,16 @@ void TypingCommand::deleteKeyPressed(Document* document,
   Frame* frame = document->frame();
   ASSERT(frame);
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())
-        ->deleteKeyPressed(granularity);
+    static_cast<TypingCommand*>(lastEditCommand)->deleteKeyPressed(granularity);
     return;
   }
 
-  TypingCommand* typingCommand =
+  RefPtr<TypingCommand> typingCommand =
       new TypingCommand(document, DeleteKey, "", false, granularity);
   typingCommand->setSmartDelete(smartDelete);
-  EditCommandPtr cmd(typingCommand);
-  cmd.apply();
+  typingCommand->apply();
 }
 
 void TypingCommand::forwardDeleteKeyPressed(Document* document,
@@ -86,18 +84,17 @@ void TypingCommand::forwardDeleteKeyPressed(Document* document,
   Frame* frame = document->frame();
   ASSERT(frame);
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())
+    static_cast<TypingCommand*>(lastEditCommand)
         ->forwardDeleteKeyPressed(granularity);
     return;
   }
 
-  TypingCommand* typingCommand =
+  RefPtr<TypingCommand> typingCommand =
       new TypingCommand(document, ForwardDeleteKey, "", false, granularity);
   typingCommand->setSmartDelete(smartDelete);
-  EditCommandPtr cmd(typingCommand);
-  cmd.apply();
+  typingCommand->apply();
 }
 
 void TypingCommand::insertText(Document* document,
@@ -123,16 +120,15 @@ void TypingCommand::insertText(Document* document,
   if (newText.isEmpty())
     return;
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())
+    static_cast<TypingCommand*>(lastEditCommand)
         ->insertText(newText, selectInsertedText);
     return;
   }
 
-  EditCommandPtr cmd(
+  applyCommand(
       new TypingCommand(document, InsertText, newText, selectInsertedText));
-  cmd.apply();
 }
 
 void TypingCommand::insertLineBreak(Document* document) {
@@ -141,14 +137,13 @@ void TypingCommand::insertLineBreak(Document* document) {
   Frame* frame = document->frame();
   ASSERT(frame);
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())->insertLineBreak();
+    static_cast<TypingCommand*>(lastEditCommand)->insertLineBreak();
     return;
   }
 
-  EditCommandPtr cmd(new TypingCommand(document, InsertLineBreak));
-  cmd.apply();
+  applyCommand(new TypingCommand(document, InsertLineBreak));
 }
 
 void TypingCommand::insertParagraphSeparatorInQuotedContent(
@@ -158,16 +153,15 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent(
   Frame* frame = document->frame();
   ASSERT(frame);
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())
+    static_cast<TypingCommand*>(lastEditCommand)
         ->insertParagraphSeparatorInQuotedContent();
     return;
   }
 
-  EditCommandPtr cmd(
+  applyCommand(
       new TypingCommand(document, InsertParagraphSeparatorInQuotedContent));
-  cmd.apply();
 }
 
 void TypingCommand::insertParagraphSeparator(Document* document) {
@@ -176,25 +170,23 @@ void TypingCommand::insertParagraphSeparator(Document* document) {
   Frame* frame = document->frame();
   ASSERT(frame);
 
-  EditCommandPtr lastEditCommand = frame->lastEditCommand();
+  EditCommand* lastEditCommand = frame->lastEditCommand();
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
-    static_cast<TypingCommand*>(lastEditCommand.get())
-        ->insertParagraphSeparator();
+    static_cast<TypingCommand*>(lastEditCommand)->insertParagraphSeparator();
     return;
   }
 
-  EditCommandPtr cmd(new TypingCommand(document, InsertParagraphSeparator));
-  cmd.apply();
+  applyCommand(new TypingCommand(document, InsertParagraphSeparator));
 }
 
-bool TypingCommand::isOpenForMoreTypingCommand(const EditCommandPtr& cmd) {
-  return cmd.isTypingCommand() &&
-         static_cast<const TypingCommand*>(cmd.get())->openForMoreTyping();
+bool TypingCommand::isOpenForMoreTypingCommand(const EditCommand* cmd) {
+  return cmd && cmd->isTypingCommand() &&
+         static_cast<const TypingCommand*>(cmd)->isOpenForMoreTyping();
 }
 
-void TypingCommand::closeTyping(const EditCommandPtr& cmd) {
+void TypingCommand::closeTyping(EditCommand* cmd) {
   if (isOpenForMoreTypingCommand(cmd))
-    static_cast<TypingCommand*>(cmd.get())->closeTyping();
+    static_cast<TypingCommand*>(cmd)->closeTyping();
 }
 
 void TypingCommand::doApply() {
@@ -254,10 +246,8 @@ void TypingCommand::typingAddedToOpenCommand() {
   // The frame will get told in the same way as all other commands.
   // But since this command stays open and is used for additional typing,
   // we need to tell the frame here as other commands are added.
-  if (m_applyEditing) {
-    EditCommandPtr cmd(this);
-    document()->frame()->appliedEditing(cmd);
-  }
+  if (m_applyEditing)
+    document()->frame()->appliedEditing(this);
   m_applyEditing = true;
 }
 
@@ -294,45 +284,32 @@ void TypingCommand::insertText(const String& text, bool selectInsertedText) {
 
 void TypingCommand::insertTextRunWithoutNewlines(const String& text,
                                                  bool selectInsertedText) {
-  // FIXME: Improve typing style.
-  // See this bug: <rdar://problem/3769899> Implementation of typing style needs
-  // improvement
-  if (document()->frame()->typingStyle() || m_cmds.count() == 0) {
-    InsertTextCommand* impl = new InsertTextCommand(document());
-    EditCommandPtr cmd(impl);
-    applyCommandToComposite(cmd);
-    impl->input(text, selectInsertedText);
-  } else {
-    EditCommandPtr lastCommand = m_cmds.last();
-    if (lastCommand.isInsertTextCommand()) {
-      InsertTextCommand* impl =
-          static_cast<InsertTextCommand*>(lastCommand.get());
-      impl->input(text, selectInsertedText);
-    } else {
-      InsertTextCommand* impl = new InsertTextCommand(document());
-      EditCommandPtr cmd(impl);
-      applyCommandToComposite(cmd);
-      impl->input(text, selectInsertedText);
-    }
+  RefPtr<InsertTextCommand> command;
+  if (!document()->frame()->typingStyle() && !m_commands.isEmpty()) {
+    EditCommand* lastCommand = m_commands.last().get();
+    if (lastCommand->isInsertTextCommand())
+      command = static_cast<InsertTextCommand*>(lastCommand);
   }
+  if (!command) {
+    command = new InsertTextCommand(document());
+    applyCommandToComposite(command);
+  }
+  command->input(text, selectInsertedText);
   typingAddedToOpenCommand();
 }
 
 void TypingCommand::insertLineBreak() {
-  EditCommandPtr cmd(new InsertLineBreakCommand(document()));
-  applyCommandToComposite(cmd);
+  applyCommandToComposite(new InsertLineBreakCommand(document()));
   typingAddedToOpenCommand();
 }
 
 void TypingCommand::insertParagraphSeparator() {
-  EditCommandPtr cmd(new InsertParagraphSeparatorCommand(document()));
-  applyCommandToComposite(cmd);
+  applyCommandToComposite(new InsertParagraphSeparatorCommand(document()));
   typingAddedToOpenCommand();
 }
 
 void TypingCommand::insertParagraphSeparatorInQuotedContent() {
-  EditCommandPtr cmd(new BreakBlockquoteCommand(document()));
-  applyCommandToComposite(cmd);
+  applyCommandToComposite(new BreakBlockquoteCommand(document()));
   typingAddedToOpenCommand();
 }
 

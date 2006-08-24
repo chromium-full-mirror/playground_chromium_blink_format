@@ -46,8 +46,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
                     const Position& end,
                     EditAction = EditActionChangeAttributes,
                     EPropertyLevel = PropertyDefault);
-  ApplyStyleCommand(Document*,
-                    Element*,
+  ApplyStyleCommand(Element*,
                     bool = false,
                     EditAction = EditActionChangeAttributes);
 

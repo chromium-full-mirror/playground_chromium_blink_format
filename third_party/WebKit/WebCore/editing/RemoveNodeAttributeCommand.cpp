@@ -32,10 +32,11 @@
 namespace WebCore {
 
 RemoveNodeAttributeCommand::RemoveNodeAttributeCommand(
-    Document* document,
     Element* element,
     const QualifiedName& attribute)
-    : EditCommand(document), m_element(element), m_attribute(attribute) {
+    : EditCommand(element->document()),
+      m_element(element),
+      m_attribute(attribute) {
   ASSERT(m_element);
 }
 

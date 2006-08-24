@@ -33,9 +33,10 @@
 
 namespace WebCore {
 
-RebalanceWhitespaceCommand::RebalanceWhitespaceCommand(Document* document,
-                                                       const Position& pos)
-    : EditCommand(document), m_position(pos), m_upstreamOffset(InvalidOffset) {}
+RebalanceWhitespaceCommand::RebalanceWhitespaceCommand(const Position& pos)
+    : EditCommand(pos.node()->document()),
+      m_position(pos),
+      m_upstreamOffset(InvalidOffset) {}
 
 static inline bool isWhitespace(UChar c) {
   return c == 0xa0 || isCollapsibleWhitespace(c);
@@ -44,7 +45,7 @@ static inline bool isWhitespace(UChar c) {
 // FIXME: This doesn't go into adjacent text in siblings, cousins, etc.
 // FIXME: This turns preserved newlines into nbsps.
 void RebalanceWhitespaceCommand::doApply() {
-  if (m_position.isNull() || !m_position.node()->isTextNode())
+  if (!m_position.node()->isTextNode())
     return;
 
   Text* textNode = static_cast<Text*>(m_position.node());

@@ -77,12 +77,12 @@ class ReplacementFragment : Noncopyable {
 class ReplaceSelectionCommand : public CompositeEditCommand {
  public:
   ReplaceSelectionCommand(Document*,
-                          DocumentFragment*,
+                          PassRefPtr<DocumentFragment>,
                           bool selectReplacement = true,
                           bool smartReplace = false,
                           bool matchStyle = false,
                           bool preventNesting = true,
-                          EditAction action = EditActionPaste);
+                          EditAction = EditActionPaste);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
@@ -119,4 +119,4 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
 }  // namespace WebCore
 
-#endif  // __replace_selection_command_h__
+#endif  // replace_selection_command_h__

@@ -113,8 +113,8 @@ class FrameWin : public Frame {
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*);
 
-  virtual void registerCommandForUndo(const EditCommandPtr&);
-  virtual void registerCommandForRedo(const EditCommandPtr&);
+  virtual void registerCommandForUndo(PassRefPtr<EditCommand>);
+  virtual void registerCommandForRedo(PassRefPtr<EditCommand>);
   virtual void clearUndoRedoOperations();
   virtual void issueUndoCommand();
   virtual void issueRedoCommand();

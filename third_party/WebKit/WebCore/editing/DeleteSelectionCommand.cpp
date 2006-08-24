@@ -58,12 +58,11 @@ DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
       m_typingStyle(0),
       m_deleteIntoBlockquoteStyle(0) {}
 
-DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
-                                               const Selection& selection,
+DeleteSelectionCommand::DeleteSelectionCommand(const Selection& selection,
                                                bool smartDelete,
                                                bool mergeBlocksAfterDelete,
                                                bool replace)
-    : CompositeEditCommand(document),
+    : CompositeEditCommand(selection.start().node()->document()),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),

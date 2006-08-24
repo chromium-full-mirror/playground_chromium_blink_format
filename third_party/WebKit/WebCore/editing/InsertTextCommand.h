@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __insert_text_command_h__
-#define __insert_text_command_h__
+#ifndef insert_text_command_h__
+#define insert_text_command_h__
 
 #include "CompositeEditCommand.h"
 
@@ -32,7 +32,7 @@ namespace WebCore {
 
 class InsertTextCommand : public CompositeEditCommand {
  public:
-  InsertTextCommand(Document* document);
+  InsertTextCommand(Document*);
 
   virtual void doApply();
 
@@ -44,12 +44,12 @@ class InsertTextCommand : public CompositeEditCommand {
  private:
   virtual bool isInsertTextCommand() const;
 
-  Position prepareForTextInsertion(const Position& pos);
-  Position insertTab(Position pos);
+  Position prepareForTextInsertion(const Position&);
+  Position insertTab(const Position&);
 
   unsigned m_charactersAdded;
 };
 
 }  // namespace WebCore
 
-#endif  // __insert_text_command_h__
+#endif  // insert_text_command_h__

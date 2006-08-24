@@ -31,8 +31,8 @@
 
 namespace WebCore {
 
-RemoveNodeCommand::RemoveNodeCommand(Document* document, Node* removeChild)
-    : EditCommand(document),
+RemoveNodeCommand::RemoveNodeCommand(Node* removeChild)
+    : EditCommand(removeChild->document()),
       m_removeChild(removeChild),
       m_parent(m_removeChild->parentNode()),
       m_refChild(m_removeChild->nextSibling()) {

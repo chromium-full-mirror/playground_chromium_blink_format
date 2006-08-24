@@ -268,8 +268,8 @@ class FrameMac : public Frame {
   void addPluginRootObject(KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
-  virtual void registerCommandForUndo(const EditCommandPtr&);
-  virtual void registerCommandForRedo(const EditCommandPtr&);
+  virtual void registerCommandForUndo(PassRefPtr<EditCommand>);
+  virtual void registerCommandForRedo(PassRefPtr<EditCommand>);
   virtual void clearUndoRedoOperations();
   virtual void issueUndoCommand();
   virtual void issueRedoCommand();
@@ -370,7 +370,7 @@ class FrameMac : public Frame {
 
   void freeClipboard();
 
-  void registerCommandForUndoOrRedo(const EditCommandPtr& cmd, bool isRedo);
+  void registerCommandForUndoOrRedo(PassRefPtr<EditCommand>, bool isRedo);
 
   WebCoreFrameBridge* _bridge;
 

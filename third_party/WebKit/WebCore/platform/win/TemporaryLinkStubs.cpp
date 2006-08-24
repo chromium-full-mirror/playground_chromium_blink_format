@@ -405,7 +405,7 @@ bool FrameWin::canUndo() const {
   notImplemented();
   return 0;
 }
-void FrameWin::registerCommandForRedo(WebCore::EditCommandPtr const&) {
+void FrameWin::registerCommandForRedo(PassRefPtr<WebCore::EditCommand>) {
   notImplemented();
 }
 bool FrameWin::runJavaScriptPrompt(String const&, String const&, String&) {
@@ -639,7 +639,7 @@ Frame* FrameWin::createFrame(KURL const&,
   return 0;
 }
 void FrameWin::saveDocumentState() {}
-void FrameWin::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
+void FrameWin::registerCommandForUndo(PassRefPtr<WebCore::EditCommand>) {}
 void FrameWin::clearUndoRedoOperations(void) {}
 String FrameWin::incomingReferrer() const {
   return String();

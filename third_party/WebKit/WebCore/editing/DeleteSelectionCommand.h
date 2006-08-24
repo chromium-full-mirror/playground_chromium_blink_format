@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __delete_selection_command_h__
-#define __delete_selection_command_h__
+#ifndef delete_selection_command_h__
+#define delete_selection_command_h__
 
 #include "CompositeEditCommand.h"
 
@@ -32,12 +32,11 @@ namespace WebCore {
 
 class DeleteSelectionCommand : public CompositeEditCommand {
  public:
-  DeleteSelectionCommand(Document* document,
+  DeleteSelectionCommand(Document*,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
                          bool replace = false);
-  DeleteSelectionCommand(Document* document,
-                         const Selection& selection,
+  DeleteSelectionCommand(const Selection&,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
                          bool replace = false);
@@ -86,4 +85,4 @@ class DeleteSelectionCommand : public CompositeEditCommand {
 
 }  // namespace WebCore
 
-#endif  // __delete_selection_command_h__
+#endif  // delete_selection_command_h__

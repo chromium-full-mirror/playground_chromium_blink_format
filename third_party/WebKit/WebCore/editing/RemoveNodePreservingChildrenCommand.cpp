@@ -32,9 +32,8 @@
 namespace WebCore {
 
 RemoveNodePreservingChildrenCommand::RemoveNodePreservingChildrenCommand(
-    Document* document,
     Node* node)
-    : CompositeEditCommand(document), m_node(node) {
+    : CompositeEditCommand(node->document()), m_node(node) {
   ASSERT(m_node);
 }
 

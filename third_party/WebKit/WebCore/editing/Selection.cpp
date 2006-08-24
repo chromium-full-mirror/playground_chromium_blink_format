@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,9 +46,7 @@ Selection::Selection(const Position& pos, EAffinity affinity)
     : m_base(pos),
       m_extent(pos),
       m_affinity(affinity),
-      m_granularity(CharacterGranularity),
-      m_state(NONE),
-      m_baseIsFirst(true) {
+      m_granularity(CharacterGranularity) {
   validate();
 }
 
@@ -58,9 +56,23 @@ Selection::Selection(const Position& base,
     : m_base(base),
       m_extent(extent),
       m_affinity(affinity),
-      m_granularity(CharacterGranularity),
-      m_state(NONE),
-      m_baseIsFirst(true) {
+      m_granularity(CharacterGranularity) {
+  validate();
+}
+
+Selection::Selection(const VisiblePosition& pos)
+    : m_base(pos.deepEquivalent()),
+      m_extent(pos.deepEquivalent()),
+      m_affinity(pos.affinity()),
+      m_granularity(CharacterGranularity) {
+  validate();
+}
+
+Selection::Selection(const VisiblePosition& base, const VisiblePosition& extent)
+    : m_base(base.deepEquivalent()),
+      m_extent(extent.deepEquivalent()),
+      m_affinity(base.affinity()),
+      m_granularity(CharacterGranularity) {
   validate();
 }
 
@@ -68,9 +80,7 @@ Selection::Selection(const Range* range, EAffinity affinity)
     : m_base(range->startPosition()),
       m_extent(range->endPosition()),
       m_affinity(affinity),
-      m_granularity(CharacterGranularity),
-      m_state(NONE),
-      m_baseIsFirst(true) {
+      m_granularity(CharacterGranularity) {
   validate();
 }
 

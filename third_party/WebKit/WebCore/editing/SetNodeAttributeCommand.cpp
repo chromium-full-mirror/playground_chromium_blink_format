@@ -31,11 +31,10 @@
 
 namespace WebCore {
 
-SetNodeAttributeCommand::SetNodeAttributeCommand(Document* document,
-                                                 Element* element,
+SetNodeAttributeCommand::SetNodeAttributeCommand(Element* element,
                                                  const QualifiedName& attribute,
                                                  const String& value)
-    : EditCommand(document),
+    : EditCommand(element->document()),
       m_element(element),
       m_attribute(attribute),
       m_value(value) {

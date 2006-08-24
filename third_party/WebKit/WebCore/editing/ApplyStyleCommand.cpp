@@ -297,11 +297,10 @@ ApplyStyleCommand::ApplyStyleCommand(Document* document,
       m_styledInlineElement(0),
       m_removeOnly(false) {}
 
-ApplyStyleCommand::ApplyStyleCommand(Document* document,
-                                     Element* element,
+ApplyStyleCommand::ApplyStyleCommand(Element* element,
                                      bool removeOnly,
                                      EditAction editingAction)
-    : CompositeEditCommand(document),
+    : CompositeEditCommand(element->document()),
       m_style(new CSSMutableStyleDeclaration()),
       m_editingAction(editingAction),
       m_propertyLevel(PropertyDefault),

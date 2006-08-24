@@ -254,13 +254,14 @@ void ReplacementFragment::removeUnrenderedNodes(Node* holder) {
     removeNode(it.current());
 }
 
-ReplaceSelectionCommand::ReplaceSelectionCommand(Document* document,
-                                                 DocumentFragment* fragment,
-                                                 bool selectReplacement,
-                                                 bool smartReplace,
-                                                 bool matchStyle,
-                                                 bool preventNesting,
-                                                 EditAction editAction)
+ReplaceSelectionCommand::ReplaceSelectionCommand(
+    Document* document,
+    PassRefPtr<DocumentFragment> fragment,
+    bool selectReplacement,
+    bool smartReplace,
+    bool matchStyle,
+    bool preventNesting,
+    EditAction editAction)
     : CompositeEditCommand(document),
       m_selectReplacement(selectReplacement),
       m_smartReplace(smartReplace),
@@ -790,7 +791,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
   if (m_selectReplacement)
     setEndingSelection(Selection(start, end, SEL_DEFAULT_AFFINITY));
   else
-    setEndingSelection(end, SEL_DEFAULT_AFFINITY);
+    setEndingSelection(Selection(end, SEL_DEFAULT_AFFINITY));
 }
 
 EditAction ReplaceSelectionCommand::editingAction() const {

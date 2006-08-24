@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,8 +32,7 @@ namespace WebCore {
 
 class RebalanceWhitespaceCommand : public EditCommand {
  public:
-  RebalanceWhitespaceCommand(Document*, const Position&);
-  virtual ~RebalanceWhitespaceCommand() {}
+  RebalanceWhitespaceCommand(const Position&);
 
   virtual void doApply();
   virtual void doUnapply();
@@ -52,4 +51,4 @@ class RebalanceWhitespaceCommand : public EditCommand {
 
 }  // namespace WebCore
 
-#endif  // __rebalance_whitespace_command_h__
+#endif  // rebalance_whitespace_command_h__

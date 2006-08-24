@@ -46,8 +46,8 @@ bool ModifySelectionListLevelCommand::preservesTypingStyle() const {
 // This needs to be static so it can be called by canIncreaseSelectionListLevel
 // and canDecreaseSelectionListLevel
 static bool getStartEndListChildren(const Selection& selection,
-                                    Node** start,
-                                    Node** end) {
+                                    Node*& start,
+                                    Node*& end) {
   if (selection.isNone())
     return false;
 
@@ -89,8 +89,8 @@ static bool getStartEndListChildren(const Selection& selection,
       endListChild = r->element();
   }
 
-  *start = startListChild;
-  *end = endListChild;
+  start = startListChild;
+  end = endListChild;
   return true;
 }
 
@@ -147,26 +147,19 @@ void ModifySelectionListLevelCommand::appendSiblingNodeRange(Node* startNode,
 
 IncreaseSelectionListLevelCommand::IncreaseSelectionListLevelCommand(
     Document* document,
-    EListType listType)
-    : ModifySelectionListLevelCommand(document) {
-  m_listType = listType;
-  m_listElement = 0;
-}
-
-Node* IncreaseSelectionListLevelCommand::listElement() {
-  return m_listElement;
-}
+    Type listType)
+    : ModifySelectionListLevelCommand(document), m_listType(listType) {}
 
 // This needs to be static so it can be called by canIncreaseSelectionListLevel
 static bool canIncreaseListLevel(const Selection& selection,
-                                 Node** start,
-                                 Node** end) {
+                                 Node*& start,
+                                 Node*& end) {
   if (!getStartEndListChildren(selection, start, end))
     return false;
 
   // start must not be the first child (because you need a prior one
   // to increase relative to)
-  if (!(*start)->renderer()->previousSibling())
+  if (!start->renderer()->previousSibling())
     return false;
 
   return true;
@@ -189,7 +182,7 @@ static bool canIncreaseListLevel(const Selection& selection,
 void IncreaseSelectionListLevelCommand::doApply() {
   Node* startListChild;
   Node* endListChild;
-  if (!canIncreaseListLevel(endingSelection(), &startListChild, &endListChild))
+  if (!canIncreaseListLevel(endingSelection(), startListChild, endListChild))
     return;
 
   Node* previousItem = startListChild->renderer()->previousSibling()->element();
@@ -221,20 +214,19 @@ bool IncreaseSelectionListLevelCommand::canIncreaseSelectionListLevel(
     Document* document) {
   Node* startListChild;
   Node* endListChild;
-
   return canIncreaseListLevel(document->frame()->selection().selection(),
-                              &startListChild, &endListChild);
+                              startListChild, endListChild);
 }
 
-static Node* increaseSelectionListLevelWithType(Document* document,
-                                                EListType listType) {
+Node* IncreaseSelectionListLevelCommand::increaseSelectionListLevelWithType(
+    Document* document,
+    Type listType) {
   ASSERT(document);
   ASSERT(document->frame());
-  IncreaseSelectionListLevelCommand* modCommand =
+  RefPtr<IncreaseSelectionListLevelCommand> modCommand =
       new IncreaseSelectionListLevelCommand(document, listType);
-  EditCommandPtr cmd(modCommand);
-  cmd.apply();
-  return modCommand->listElement();
+  modCommand->apply();
+  return modCommand->m_listElement.get();
 }
 
 Node* IncreaseSelectionListLevelCommand::increaseSelectionListLevel(
@@ -258,13 +250,13 @@ DecreaseSelectionListLevelCommand::DecreaseSelectionListLevelCommand(
 
 // This needs to be static so it can be called by canDecreaseSelectionListLevel
 static bool canDecreaseListLevel(const Selection& selection,
-                                 Node** start,
-                                 Node** end) {
+                                 Node*& start,
+                                 Node*& end) {
   if (!getStartEndListChildren(selection, start, end))
     return false;
 
   // there must be a destination list to move the items to
-  if (!isListElement((*start)->parentNode()->parentNode()))
+  if (!isListElement(start->parentNode()->parentNode()))
     return false;
 
   return true;
@@ -273,7 +265,7 @@ static bool canDecreaseListLevel(const Selection& selection,
 void DecreaseSelectionListLevelCommand::doApply() {
   Node* startListChild;
   Node* endListChild;
-  if (!canDecreaseListLevel(endingSelection(), &startListChild, &endListChild))
+  if (!canDecreaseListLevel(endingSelection(), startListChild, endListChild))
     return;
 
   Node* previousItem =
@@ -305,18 +297,14 @@ bool DecreaseSelectionListLevelCommand::canDecreaseSelectionListLevel(
     Document* document) {
   Node* startListChild;
   Node* endListChild;
-
   return canDecreaseListLevel(document->frame()->selection().selection(),
-                              &startListChild, &endListChild);
+                              startListChild, endListChild);
 }
 
 void DecreaseSelectionListLevelCommand::decreaseSelectionListLevel(
     Document* document) {
   ASSERT(document);
   ASSERT(document->frame());
-  DecreaseSelectionListLevelCommand* modCommand =
-      new DecreaseSelectionListLevelCommand(document);
-  EditCommandPtr cmd(modCommand);
-  cmd.apply();
+  applyCommand(new DecreaseSelectionListLevelCommand(document));
 }
 }

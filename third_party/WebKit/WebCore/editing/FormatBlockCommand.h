@@ -32,7 +32,7 @@ namespace WebCore {
 
 class FormatBlockCommand : public CompositeEditCommand {
  public:
-  FormatBlockCommand(Document*, const String&);
+  FormatBlockCommand(Document*, const String& tagName);
   virtual void doApply();
   virtual EditAction editingAction() const { return EditActionFormatBlock; }
 

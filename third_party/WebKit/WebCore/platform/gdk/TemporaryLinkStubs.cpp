@@ -403,7 +403,7 @@ bool FrameGdk::canUndo() const {
   notImplemented();
   return 0;
 }
-void FrameGdk::registerCommandForRedo(WebCore::EditCommandPtr const&) {
+void FrameGdk::registerCommandForRedo(PassRefPtr<WebCore::EditCommand>) {
   notImplemented();
 }
 bool FrameGdk::runJavaScriptPrompt(String const&, String const&, String&) {
@@ -612,7 +612,7 @@ Frame* FrameGdk::createFrame(const KURL& url,
 }
 
 void FrameGdk::saveDocumentState() {}
-void FrameGdk::registerCommandForUndo(WebCore::EditCommandPtr const&) {}
+void FrameGdk::registerCommandForUndo(PassRefPtr<WebCore::EditCommand>) {}
 void FrameGdk::clearUndoRedoOperations(void) {}
 String FrameGdk::incomingReferrer() const {
   return String();
