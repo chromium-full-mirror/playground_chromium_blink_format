@@ -24,10 +24,10 @@
 
 #include "IntRect.h"
 #include "RenderPathQt.h"
-#include "KCanvasMatrix.h"
 #include "KCanvasPathQt.h"
-#include "KCanvasClipperQt.h"
+#include "AffineTransform.h"
 #include "GraphicsContext.h"
+#include "KCanvasClipperQt.h"
 #include "KRenderingDeviceQt.h"
 #include "KRenderingPaintServerSolidQt.h"
 #include "KRenderingPaintServerGradientQt.h"
@@ -42,15 +42,15 @@ KRenderingDeviceContextQt::KRenderingDeviceContextQt(QPainter* painter)
 
 KRenderingDeviceContextQt::~KRenderingDeviceContextQt() {}
 
-KCanvasMatrix KRenderingDeviceContextQt::concatCTM(
-    const KCanvasMatrix& worldMatrix) {
-  KCanvasMatrix ret = ctm();
-  m_painter->setMatrix(worldMatrix.matrix(), true);
+AffineTransform KRenderingDeviceContextQt::concatCTM(
+    const AffineTransform& worldMatrix) {
+  AffineTransform ret = ctm();
+  m_painter->setMatrix(worldMatrix, true);
   return ret;
 }
 
-KCanvasMatrix KRenderingDeviceContextQt::ctm() const {
-  return KCanvasMatrix(m_painter->matrix());
+AffineTransform KRenderingDeviceContextQt::ctm() const {
+  return AffineTransform(m_painter->matrix());
 }
 
 IntRect KRenderingDeviceContextQt::mapFromVisual(const IntRect& rect) {
