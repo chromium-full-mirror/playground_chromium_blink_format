@@ -33,6 +33,7 @@
 namespace WebCore {
 
 class AtomicString;
+class Color;
 class CSSProperty;
 class CSSStyleSelector;
 class Clipboard;
@@ -154,6 +155,9 @@ class FrameView : public ScrollView {
 
   bool isTransparent() const;
   void setTransparent(bool isTransparent);
+
+  Color baseBackgroundColor() const;
+  void setBaseBackgroundColor(Color);
 
   void scheduleRelayout();
   void scheduleRelayoutOfSubtree(Node*);

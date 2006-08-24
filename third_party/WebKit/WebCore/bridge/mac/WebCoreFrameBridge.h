@@ -424,6 +424,7 @@ typedef enum {
 - (BOOL)doneProcessingData;
 - (BOOL)shouldClose;
 
+- (void)setBaseBackgroundColor:(NSColor*)backgroundColor;
 - (void)setDrawsBackground:(BOOL)drawsBackround;
 
 - (NSColor*)bodyBackgroundColor;

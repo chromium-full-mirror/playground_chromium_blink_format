@@ -36,7 +36,7 @@
 
 @interface WebFrame (WebInternal)
 
-- (void)_updateDrawsBackground;
+- (void)_updateBackground;
 - (void)_setInternalLoadDelegate:(id)internalLoadDelegate;
 - (id)_internalLoadDelegate;
 - (void)_unmarkAllMisspellings;
