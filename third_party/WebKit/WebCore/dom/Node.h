@@ -290,6 +290,7 @@ class Node : public TreeShared<Node> {
   // of a DocumentType node that is not used with any Document yet. A Document
   // node returns itself.
   Document* document() const {
+    ASSERT(this);
     ASSERT(m_document || nodeType() == DOCUMENT_TYPE_NODE && !inDocument());
     return m_document.get();
   }
