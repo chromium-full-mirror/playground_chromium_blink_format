@@ -32,6 +32,7 @@
 #include "Document.h"
 #include "Element.h"
 #include "Frame.h"
+#include "Screen.h"
 
 namespace WebCore {
 
@@ -82,7 +83,7 @@ PassRefPtr<CSSRuleList> DOMWindow::getMatchedCSSRules(Element* elt,
 }
 
 double DOMWindow::devicePixelRatio() const {
-  return m_frame->view() ? m_frame->view()->scaleFactor() : 1.0;
+  return scaleFactor(m_frame->page());
 }
 
 }  // namespace WebCore

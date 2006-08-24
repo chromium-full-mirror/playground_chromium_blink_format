@@ -257,8 +257,8 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
 
   if (m_rootDefaultStyle && view) {
     delete m_medium;
-    m_medium =
-        new MediaQueryEvaluator(view->mediaType(), view, m_rootDefaultStyle);
+    m_medium = new MediaQueryEvaluator(view->mediaType(), view->frame()->page(),
+                                       m_rootDefaultStyle);
   }
 
   // FIXME: This sucks! The user sheet is reparsed every time!
@@ -298,8 +298,8 @@ CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
 
   if (m_rootDefaultStyle && view) {
     delete m_medium;
-    m_medium =
-        new MediaQueryEvaluator(view->mediaType(), view, m_rootDefaultStyle);
+    m_medium = new MediaQueryEvaluator(view->mediaType(), view->frame()->page(),
+                                       m_rootDefaultStyle);
   }
 
   m_authorStyle = new CSSRuleSet();
