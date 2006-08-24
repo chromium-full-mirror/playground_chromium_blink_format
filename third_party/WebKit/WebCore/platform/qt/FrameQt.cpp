@@ -138,9 +138,10 @@ bool FrameQt::openURL(const KURL& url) {
   qDebug("openURL(%s)", url.url().latin1());
   didOpenURL(url);
 
-  ResourceRequest request(resourceRequest());
-  request.m_responseMIMEType = "image/svg+xml";
-  setResourceRequest(request);
+  // FIXME: Use mimetype logic from KIO!
+  // ResourceRequest request(resourceRequest());
+  // request.m_responseMIMEType = "image/svg+xml";
+  // setResourceRequest(request);
 
   begin(url);
   ResourceLoader* job = new ResourceLoader(this, "GET", url);
@@ -158,7 +159,7 @@ void FrameQt::submitForm(const ResourceRequest& request) {
 
   d->m_submittedFormURL = request.url();
 
-  /* TODO: Once we have a KPart - named "FramePartQt" - we can let that inherit
+  /* FIXME: Once we have a KPart - named "FramePartQt" - we can let that inherit
   from FrameQtClient and implement the functions...)
   if(m_client)
       m_client->submitForm(request.doPost() ? "POST" : "GET", request.url(),
@@ -178,7 +179,6 @@ void FrameQt::urlSelected(const ResourceRequest& request) {
   // need to potentially updateLocationBar(str.ascii()); or notify sys of new
   // url mybe event or callback
   const KURL url = request.url();
-  printf("------------------> LOADING NEW URL %s \n", url.url().ascii());
   didOpenURL(url);
   begin(url);
   ResourceLoader* job = new ResourceLoader(this, "GET", url);

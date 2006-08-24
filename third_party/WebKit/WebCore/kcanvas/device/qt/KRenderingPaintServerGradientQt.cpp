@@ -159,7 +159,7 @@ void KRenderingPaintServerLinearGradientQt::draw(
 
 // KRenderingPaintServerRadialGradientQt
 KRenderingPaintServerRadialGradientQt::KRenderingPaintServerRadialGradientQt()
-    : KRenderingPaintServerRadialGradient() {}
+    : KRenderingPaintServerRadialGradient(), KRenderingPaintServerQt() {}
 
 bool KRenderingPaintServerRadialGradientQt::setup(
     KRenderingDeviceContext* context,

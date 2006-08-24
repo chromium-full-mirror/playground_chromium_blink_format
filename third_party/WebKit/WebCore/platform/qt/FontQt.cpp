@@ -40,7 +40,6 @@
 namespace WebCore {
 
 Font::operator QFont() const {
-  Q_ASSERT(primaryFont() != 0);
   return primaryFont()->platformData().font();
 }
 
@@ -66,7 +65,7 @@ void Font::drawComplexText(GraphicsContext* ctx,
                            const TextRun& run,
                            const TextStyle&,
                            const FloatPoint& point) const {
-  // ### style, run.from()/length() cut-off
+  // FIXME: style, run.from()/length() cut-off
   ctx->platformContext()->drawText(
       point.x(), point.y(),
       QString::fromRawData(
@@ -76,7 +75,7 @@ void Font::drawComplexText(GraphicsContext* ctx,
 
 float Font::floatWidthForComplexText(const TextRun& run,
                                      const TextStyle&) const {
-  // ### style
+  // FIXME: style
   QFontMetricsF metrics(primaryFont()->m_font.font());
   return metrics.width(QString::fromRawData(
       reinterpret_cast<const QChar*>(run.characters() + run.from()),

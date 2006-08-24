@@ -39,16 +39,11 @@
 
 namespace WebCore {
 
-PlatformComboBox::PlatformComboBox() : Widget(), m_comboBox(0) {
-  qDebug("PlatformComboBox::PlatformComboBox(), this=%p", this);
-}
+PlatformComboBox::PlatformComboBox() : Widget(), m_comboBox(0) {}
 
-PlatformComboBox::~PlatformComboBox() {
-  qDebug("PlatformComboBox::~PlatformComboBox(), this=%p", this);
-}
+PlatformComboBox::~PlatformComboBox() {}
 
 void PlatformComboBox::setParentWidget(QWidget* parent) {
-  qDebug("PlatformComboBox::setParentWidget(), parent=%p", parent);
   Widget::setParentWidget(parent);
 
   Q_ASSERT(m_comboBox == 0);
@@ -66,7 +61,7 @@ void PlatformComboBox::appendItem(const DeprecatedString& text, bool enabled) {
 }
 
 void PlatformComboBox::appendGroupLabel(const DeprecatedString& text) {
-  // TODO: Group label?
+  // FIXME: Group label?
   m_comboBox->addItem(text);
 }
 

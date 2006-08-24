@@ -48,7 +48,7 @@ const FontData* FontCache::getFontDataForCharacters(const Font& font,
 }
 
 FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
-  return new FontPlatformData(font.fontDescription(), font.family().family());
+  return 0;
 }
 
 FontPlatformData* FontCache::getLastResortFallbackFont(const Font& font) {
@@ -62,7 +62,7 @@ FontPlatformData* FontCache::getLastResortFallbackFont(const Font& font) {
 FontPlatformData* FontCache::createFontPlatformData(
     const FontDescription& fontDescription,
     const AtomicString& family) {
-  return 0;
+  return new FontPlatformData(fontDescription, family);
 }
 }
 

@@ -40,16 +40,11 @@ ListBox::ListBox()
       m_listWidget(0),
       m_selectionMode(Single),
       _width(0.0),
-      _widthGood(false) {
-  qDebug("ListBox::ListBox(), this=%p", this);
-}
+      _widthGood(false) {}
 
-ListBox::~ListBox() {
-  qDebug("ListBox::~ListBox(), this=%p", this);
-}
+ListBox::~ListBox() {}
 
 void ListBox::setParentWidget(QWidget* parent) {
-  qDebug("ListBox::setParentWidget(), parent=%p", parent);
   ScrollView::setParentWidget(parent);
 
   Q_ASSERT(m_listWidget == 0);

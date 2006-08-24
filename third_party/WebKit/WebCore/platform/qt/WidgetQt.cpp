@@ -29,15 +29,14 @@
  */
 
 #include "config.h"
-#include "Widget.h"
 
-#include "Cursor.h"
 #include "Font.h"
-#include "GraphicsContext.h"
+#include "Widget.h"
+#include "Cursor.h"
 #include "IntRect.h"
 #include "RenderObject.h"
+#include "GraphicsContext.h"
 
-#include <QDebug>
 #include <QWidget>
 
 #define notImplemented()                                                  \

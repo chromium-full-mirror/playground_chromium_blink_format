@@ -105,11 +105,10 @@ void KCanvasClipperQt::applyClip(const FloatRect& boundingBox) const {
     // we would have to detect such, draw to a mask, and then clip
     // to that mask
     // if (!CGContextIsPathEmpty(cgContext)) {
-    if (clipRule == RULE_EVENODD) {
+    if (clipRule == RULE_EVENODD)
       newPath.setFillRule(Qt::OddEvenFill);
-    } else {
+    else
       newPath.setFillRule(Qt::WindingFill);
-    }
     // }
   }
 

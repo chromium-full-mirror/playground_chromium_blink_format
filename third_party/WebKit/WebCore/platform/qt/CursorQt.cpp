@@ -99,9 +99,8 @@ class Cursors {
 Cursors* Cursors::s_self = 0;
 
 Cursors* Cursors::self() {
-  if (!s_self) {
-    s_self = new Cursors;
-  }
+  if (!s_self)
+    s_self = new Cursors();
 
   return s_self;
 }

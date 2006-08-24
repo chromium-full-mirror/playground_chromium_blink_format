@@ -26,7 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QDebug>
 #include <QLineEdit>
 
 #include <config.h>
@@ -45,16 +44,11 @@
 namespace WebCore {
 
 PlatformLineEdit::PlatformLineEdit(PlatformLineEdit::Type type)
-    : m_lineEdit(0), m_type(type) {
-  qDebug("PlatformLineEdit::PlatformLineEdit(), this=%p", this);
-}
+    : m_lineEdit(0), m_type(type) {}
 
-PlatformLineEdit::~PlatformLineEdit() {
-  qDebug("PlatformLineEdit::~PlatformLineEdit()");
-}
+PlatformLineEdit::~PlatformLineEdit() {}
 
 void PlatformLineEdit::setParentWidget(QWidget* parent) {
-  qDebug("PlatformLineEdit::setParentWidget(), parent=%p", parent);
   Widget::setParentWidget(parent);
 
   Q_ASSERT(m_lineEdit == 0);

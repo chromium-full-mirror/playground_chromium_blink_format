@@ -177,7 +177,7 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(QPainter* p)
   painter = p;
   redirect = 0;
 
-  // TODO: Maybe only enable in SVG mode?
+  // FIXME: Maybe only enable in SVG mode?
   painter->setRenderHint(QPainter::Antialiasing);
 }
 
@@ -219,7 +219,7 @@ const TextStyle& style)
     if (m_data->shadow.isNull())
         return;
 
-    TextShadow *shadow = &m_data->shadow;
+    TextShadow* shadow = &m_data->shadow;
 
     if (shadow->blur <= 0) {
         Pen p = pen();
@@ -229,7 +229,7 @@ point.y() + shadow->y));
         setPen(p);
     } else {
         const int thickness = shadow->blur;
-        // ### OPTIMIZE: limit the area to only the actually painted area +
+        // FIXME: OPTIMIZE: limit the area to only the actually painted area +
 2*thickness
         const int w = m_data->p().device()->width();
         const int h = m_data->p().device()->height();
@@ -404,7 +404,8 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   if (paintingDisabled())
     return;
 
-  m_data->p().drawConvexPolygon((QPoint*)points, npoints);
+  m_data->p().drawConvexPolygon(reinterpret_cast<const QPoint*>(points),
+                                npoints);
 }
 
 void GraphicsContext::fillRect(const IntRect& rect, const Color& c) {

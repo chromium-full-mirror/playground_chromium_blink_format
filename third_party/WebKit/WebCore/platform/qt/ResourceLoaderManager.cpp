@@ -210,7 +210,7 @@ void ResourceLoaderManager::add(ResourceLoader* job) {
     strncpy(postDataString, postData.ascii(), postData.length());
     postDataString[postData.length()] = '\0';
 
-    // TODO: Do it properly after we got rid of libcurl! (also leaks the
+    // FIXME: Do it properly after we got rid of libcurl! (also leaks the
     // headerlist. hmpf.)
     curl_easy_setopt(d->m_handle, CURLOPT_POSTFIELDS, postDataString);
   }
