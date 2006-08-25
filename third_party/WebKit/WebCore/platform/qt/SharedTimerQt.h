@@ -38,10 +38,9 @@ namespace WebCore {
 class SharedTimerQt : public QTimer {
   Q_OBJECT
  protected:
-  SharedTimerQt() : QTimer() {
+  SharedTimerQt() : QTimer(), m_timerFunction(0) {
     connect(this, SIGNAL(timeout()), this, SLOT(fire()));
     setSingleShot(true);
-    _timerFunction = 0;
   }
 
   ~SharedTimerQt() {}
@@ -54,12 +53,12 @@ class SharedTimerQt : public QTimer {
     return s_self;
   }
 
-  void (*_timerFunction)();
+  void (*m_timerFunction)();
 
  public Q_SLOTS:
   void fire() {
-    if (_timerFunction)
-      (_timerFunction)();
+    if (m_timerFunction)
+      (m_timerFunction)();
   }
 
  private:

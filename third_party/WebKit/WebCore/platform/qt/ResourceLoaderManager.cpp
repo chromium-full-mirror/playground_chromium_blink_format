@@ -69,9 +69,8 @@ static size_t headerCallback(char* ptr, size_t size, size_t nmemb, void* obj) {
   ResourceLoader* job = static_cast<ResourceLoader*>(obj);
   ResourceLoaderInternal* d = job->getInternal();
 
-  if (job->method() == "POST") {
+  if (job->method() == "POST")
     job->receivedResponse(ptr);
-  }
 
   int totalSize = size * nmemb;
   return totalSize;

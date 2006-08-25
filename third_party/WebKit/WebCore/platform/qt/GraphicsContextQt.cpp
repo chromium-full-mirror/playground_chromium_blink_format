@@ -30,6 +30,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
 #include "GraphicsContext.h"
 #include "Path.h"
 
@@ -150,7 +152,7 @@ class GraphicsContextPlatformPrivate {
   GraphicsContextPlatformPrivate(QPainter* painter);
   ~GraphicsContextPlatformPrivate();
 
-  inline QPainter& p() {
+  QPainter& p() {
     if (layers.isEmpty()) {
       if (redirect)
         return *redirect;

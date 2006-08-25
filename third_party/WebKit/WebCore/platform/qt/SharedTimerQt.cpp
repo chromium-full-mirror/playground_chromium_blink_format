@@ -33,7 +33,7 @@ namespace WebCore {
 SharedTimerQt* SharedTimerQt::s_self = 0;  // FIXME: staticdeleter
 
 void setSharedTimerFiredFunction(void (*f)()) {
-  SharedTimerQt::inst()->_timerFunction = f;
+  SharedTimerQt::inst()->m_timerFunction = f;
 }
 
 void setSharedTimerFireTime(double fireTime) {

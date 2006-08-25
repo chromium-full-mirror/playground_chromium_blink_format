@@ -40,7 +40,6 @@ Path::Path() : m_path(new QPainterPath()) {}
 
 Path::~Path() {
   delete m_path;
-  m_path = 0;
 }
 
 Path::Path(const Path& other)

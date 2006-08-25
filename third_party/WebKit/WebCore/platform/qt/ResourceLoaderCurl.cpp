@@ -27,7 +27,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QDebug>
 #include "config.h"
 #include "ResourceLoader.h"
 
@@ -65,19 +64,17 @@ void ResourceLoader::assembleResponseHeaders() const {
 
     // FIXME: Move the client activation to receivedResponse(), once
     // we use KIO, and receivedResponse() is called only once.
-    if (d->client) {
+    if (d->client)
       d->client->receivedResponse(const_cast<ResourceLoader*>(this),
-                                  (char*)d->response.data());
-    }
+                                  d->response);
 
     d->response = QString();  // Reset
   }
 }
 
 void ResourceLoader::retrieveCharset() const {
-  if (!d->retrievedCharset) {
+  if (!d->retrievedCharset)
     d->retrievedCharset = true;
-  }
 
   // FIXME: We can just parse the headers here, but once we use KIO
   // we can set the response parameter to sth. else than a "char*".
@@ -85,7 +82,7 @@ void ResourceLoader::retrieveCharset() const {
   notImplemented();
 }
 
-void ResourceLoader::receivedResponse(char* response) {
+void ResourceLoader::receivedResponse(QString response) {
   Q_ASSERT(method() == "POST");
 
   d->assembledResponseHeaders = false;
@@ -99,7 +96,7 @@ void ResourceLoader::receivedResponse(char* response) {
   //
   // Anyway, let's collect the response data here, as the ResourceLoaderManager
   // calls us for every line of the header it receives.
-  d->response += QString::fromLatin1(response);
+  d->response += response;
 }
 
 }  // namespace WebCore

@@ -93,7 +93,6 @@ bool FrameView::isFrameView() const {
 }
 
 FrameQt::FrameQt() : Frame(new Page, 0) {
-  qDebug("FrameQt::FrameQt");
   init();
 
   page()->setMainFrame(this);
@@ -135,7 +134,6 @@ FrameQt::~FrameQt() {
 }
 
 bool FrameQt::openURL(const KURL& url) {
-  qDebug("openURL(%s)", url.url().latin1());
   didOpenURL(url);
 
   // FIXME: Use mimetype logic from KIO!
@@ -150,8 +148,6 @@ bool FrameQt::openURL(const KURL& url) {
 }
 
 void FrameQt::submitForm(const ResourceRequest& request) {
-  qDebug("FrameQt::submitForm()");
-
   // FIXME: this is a hack inherited from FrameMac, and should be pushed into
   // Frame
   if (d->m_submittedFormURL == request.url())
@@ -161,7 +157,7 @@ void FrameQt::submitForm(const ResourceRequest& request) {
 
   /* FIXME: Once we have a KPart - named "FramePartQt" - we can let that inherit
   from FrameQtClient and implement the functions...)
-  if(m_client)
+  if (m_client)
       m_client->submitForm(request.doPost() ? "POST" : "GET", request.url(),
   &request.postData);
   */
@@ -358,11 +354,11 @@ KJS::Bindings::Instance* FrameQt::getAppletInstanceForWidget(Widget*) {
   return 0;
 }
 
-void FrameQt::registerCommandForUndo(const EditCommandPtr&) {
+void FrameQt::registerCommandForUndo(PassRefPtr<EditCommand>) {
   notImplemented();
 }
 
-void FrameQt::registerCommandForRedo(const EditCommandPtr&) {
+void FrameQt::registerCommandForRedo(PassRefPtr<EditCommand>) {
   notImplemented();
 }
 
@@ -495,7 +491,7 @@ void FrameQt::receivedAllData(ResourceLoader* job, PlatformData data) {
 }
 
 void FrameQt::setFrameGeometry(const IntRect& r) {
-  setFrameGeometry((QRect)r);
+  setFrameGeometry(QRect(r));
 }
 }
 

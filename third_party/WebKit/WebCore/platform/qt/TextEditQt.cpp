@@ -107,6 +107,7 @@ void PlatformTextEdit::setText(const String&) {
 
 String PlatformTextEdit::text() const {
   notImplemented();
+  return String();
 }
 
 String PlatformTextEdit::textWithHardLineBreaks() const {
@@ -163,6 +164,7 @@ void PlatformTextEdit::setSelectionRange(int, int) {
 IntSize PlatformTextEdit::sizeWithColumnsAndRows(int numColumns,
                                                  int numRows) const {
   notImplemented();
+  return IntSize();
 }
 
 bool PlatformTextEdit::checksDescendantsForFocus() const {
