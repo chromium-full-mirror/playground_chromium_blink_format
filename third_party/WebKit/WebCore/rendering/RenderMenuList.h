@@ -61,6 +61,9 @@ class RenderMenuList : public RenderFlexibleBox {
 
   String text();
 
+ protected:
+  virtual bool hasLineIfEmpty() const { return true; }
+
  private:
   void createInnerBlock();
   void setText(const String&);

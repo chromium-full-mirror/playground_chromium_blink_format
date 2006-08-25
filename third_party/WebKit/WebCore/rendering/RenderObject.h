@@ -851,6 +851,7 @@ class RenderObject : public CachedResourceClient {
                      int angleSpan,
                      BorderSide,
                      Color,
+                     const Color& textcolor,
                      EBorderStyle,
                      bool firstCorner);
   void drawBorder(GraphicsContext*,
@@ -863,8 +864,7 @@ class RenderObject : public CachedResourceClient {
                   const Color& textcolor,
                   EBorderStyle,
                   int adjbw1,
-                  int adjbw2,
-                  bool invalidisInvert = false);
+                  int adjbw2);
 
   virtual void setTable(RenderTable*){};
 

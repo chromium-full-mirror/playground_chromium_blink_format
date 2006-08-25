@@ -376,6 +376,8 @@ void RenderBox::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
         document()->documentElement()->renderer()->style()->hasBackground())
       paintBackgrounds(i.p, style()->backgroundColor(),
                        style()->backgroundLayers(), my, mh, _tx, _ty, w, h);
+    if (style()->hasAppearance())
+      theme()->paintDecorations(this, i, IntRect(_tx, _ty, w, h));
   }
 
   // The theme will tell us whether or not we should also paint the CSS border.

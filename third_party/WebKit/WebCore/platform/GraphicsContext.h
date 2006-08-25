@@ -93,7 +93,9 @@ class GraphicsContext : Noncopyable {
   void drawLine(const IntPoint&, const IntPoint&);
   void drawEllipse(const IntRect&);
   void drawArc(const IntRect&, float thickness, int startAngle, int angleSpan);
-  void drawConvexPolygon(size_t numPoints, const IntPoint*);
+  void drawConvexPolygon(size_t numPoints,
+                         const FloatPoint*,
+                         bool shouldAntialias = false);
 
   void fillRect(const IntRect&, const Color&);
   void fillRect(const FloatRect&, const Color&);

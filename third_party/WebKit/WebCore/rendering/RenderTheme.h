@@ -54,7 +54,13 @@ class RenderTheme {
   // selection of control size based off the font, the disabling of appearance
   // when certain other properties like
   // "border" are set, or if the appearance is not supported by the theme.
-  void adjustStyle(CSSStyleSelector* selector, RenderStyle* style, Element* e);
+  void adjustStyle(CSSStyleSelector*,
+                   RenderStyle*,
+                   Element*,
+                   bool UAHasAppearance,
+                   const BorderData&,
+                   const BackgroundLayer&,
+                   const Color& backgroundColor);
 
   // This method is called to paint the widget as a background of the
   // RenderObject.  A widget's foreground, e.g., the
@@ -67,6 +73,9 @@ class RenderTheme {
   bool paintBorderOnly(RenderObject* o,
                        const RenderObject::PaintInfo& i,
                        const IntRect& r);
+  bool paintDecorations(RenderObject* o,
+                        const RenderObject::PaintInfo& i,
+                        const IntRect& r);
 
   // The remaining methods should be implemented by the platform-specific
   // portion of the theme, e.g.,
@@ -206,6 +215,15 @@ class RenderTheme {
   virtual bool paintMenuList(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const IntRect& r) {
+    return true;
+  }
+
+  virtual void adjustMenuListButtonStyle(CSSStyleSelector* selector,
+                                         RenderStyle* style,
+                                         Element* e) const;
+  virtual bool paintMenuListButton(RenderObject* o,
+                                   const RenderObject::PaintInfo& i,
+                                   const IntRect& r) {
     return true;
   }
 };

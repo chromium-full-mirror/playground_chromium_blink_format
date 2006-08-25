@@ -321,7 +321,8 @@ void GraphicsContext::drawArc(const IntRect& rect,
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
-                                        const IntPoint* points) {
+                                        const IntPoint* points,
+                                        bool shouldAntialias) {
   if (paintingDisabled())
     return;
 
@@ -331,7 +332,8 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   cairo_t* context = m_data->context;
 
   cairo_save(context);
-  cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+  cairo_set_antialias(context, shouldAntialias ? CAIRO_ANTIALIAS_DEFAULT
+                                               : CAIRO_ANTIALIAS_NONE);
   cairo_move_to(context, points[0].x(), points[0].y());
   for (size_t i = 1; i < npoints; i++)
     cairo_line_to(context, points[i].x(), points[i].y());

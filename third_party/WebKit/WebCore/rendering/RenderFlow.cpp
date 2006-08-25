@@ -795,8 +795,7 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
              (nextline.isEmpty() || thisline.x() <= nextline.x() ||
                       (nextline.right() - 1) <= thisline.x()
                   ? ow
-                  : -ow),
-             true);
+                  : -ow));
 
   // right edge
   drawBorder(
@@ -816,23 +815,20 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
       (nextline.isEmpty() || nextline.right() <= thisline.right() ||
                (thisline.right() - 1) <= nextline.x()
            ? ow
-           : -ow),
-      true);
+           : -ow));
   // upper edge
   if (thisline.x() < lastline.x())
     drawBorder(
         p, l - ow, t - ow,
         min(r + ow, (lastline.isEmpty() ? 1000000 : tx + lastline.x())), t,
         BSTop, oc, style()->color(), os, ow,
-        (!lastline.isEmpty() && tx + lastline.x() + 1 < r + ow) ? -ow : ow,
-        true);
+        (!lastline.isEmpty() && tx + lastline.x() + 1 < r + ow) ? -ow : ow);
 
   if (lastline.right() < thisline.right())
     drawBorder(
         p, max(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
         t - ow, r + ow, t, BSTop, oc, style()->color(), os,
-        (!lastline.isEmpty() && l - ow < tx + lastline.right()) ? -ow : ow, ow,
-        true);
+        (!lastline.isEmpty() && l - ow < tx + lastline.right()) ? -ow : ow, ow);
 
   // lower edge
   if (thisline.x() < nextline.x())
@@ -840,14 +836,12 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
         p, l - ow, b,
         min(r + ow, !nextline.isEmpty() ? tx + nextline.x() + 1 : 1000000),
         b + ow, BSBottom, oc, style()->color(), os, ow,
-        (!nextline.isEmpty() && tx + nextline.x() + 1 < r + ow) ? -ow : ow,
-        true);
+        (!nextline.isEmpty() && tx + nextline.x() + 1 < r + ow) ? -ow : ow);
 
   if (nextline.right() < thisline.right())
     drawBorder(
         p, max(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow),
         b, r + ow, b + ow, BSBottom, oc, style()->color(), os,
-        (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow,
-        true);
+        (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow);
 }
 }

@@ -390,7 +390,8 @@ void GraphicsContext::drawArc(const IntRect& rect,
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
-                                        const IntPoint* points) {
+                                        const FloatPoint* points,
+                                        bool shouldAntialias) {
   if (paintingDisabled())
     return;
 
@@ -401,7 +402,7 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
 
   CGContextSaveGState(context);
 
-  CGContextSetShouldAntialias(context, false);
+  CGContextSetShouldAntialias(context, shouldAntialias);
 
   CGContextBeginPath(context);
   CGContextMoveToPoint(context, points[0].x(), points[0].y());

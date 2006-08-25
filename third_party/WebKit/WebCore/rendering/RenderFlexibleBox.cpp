@@ -433,6 +433,10 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
 
       child = iterator.next();
     }
+
+    if (!iterator.first() && hasLineIfEmpty())
+      m_height += lineHeight(true, true);
+
     m_height += toAdd;
 
     // Always make sure our overflowheight is at least our height.
@@ -938,6 +942,10 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
     }
 
     yPos = m_height;
+
+    if (!iterator.first() && hasLineIfEmpty())
+      m_height += lineHeight(true, true);
+
     m_height += toAdd;
 
     // Negative margins can cause our height to shrink below our minimal height

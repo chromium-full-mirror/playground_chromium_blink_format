@@ -112,6 +112,13 @@ class RenderThemeMac : public RenderTheme {
                                    RenderStyle*,
                                    Element*) const;
 
+  virtual bool paintMenuListButton(RenderObject*,
+                                   const RenderObject::PaintInfo&,
+                                   const IntRect&);
+  virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const;
+
  private:
   IntRect inflateRect(const IntRect&, const IntSize&, const int* margins) const;
 
@@ -151,6 +158,9 @@ class RenderThemeMac : public RenderTheme {
   const IntSize* popupButtonSizes() const;
   const int* popupButtonMargins() const;
   const int* popupButtonPadding(NSControlSize) const;
+  void paintMenuListButtonGradients(RenderObject*,
+                                    const RenderObject::PaintInfo&,
+                                    const IntRect&);
 
  private:
   NSButtonCell* checkbox;
