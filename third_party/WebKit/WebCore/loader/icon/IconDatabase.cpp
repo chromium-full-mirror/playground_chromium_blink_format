@@ -30,12 +30,9 @@
 #include "Image.h"
 #include "Logging.h"
 #include "PlatformString.h"
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
 #include "SQLStatement.h"
 #include "SQLTransaction.h"
+#include "SystemTime.h"
 
 // FIXME - One optimization to be made when this is no longer in flux is to make
 // query construction smarter - that is queries that are created from
@@ -705,7 +702,7 @@ void IconDatabase::pruneUnretainedIconsOnStartup(Timer<IconDatabase>*) {
   ASSERT(!m_initialPruningComplete);
 
 #ifndef NDEBUG
-  CFTimeInterval start = CFAbsoluteTimeGetCurrent();
+  double timestamp = currentTime();
 #endif
 
   // rdar://4690949 - Need to prune unretained iconURLs here, then prune out all
@@ -760,13 +757,13 @@ void IconDatabase::pruneUnretainedIconsOnStartup(Timer<IconDatabase>*) {
   m_initialPruningComplete = true;
 
 #ifndef NDEBUG
-  CFTimeInterval duration = CFAbsoluteTimeGetCurrent() - start;
-  if (duration <= 1.0)
-    LOG(IconDatabase, "Pruning unretained icons took %.4f seconds", duration);
+  timestamp = currentTime() - timestamp;
+  if (timestamp <= 1.0)
+    LOG(IconDatabase, "Pruning unretained icons took %.4f seconds", timestamp);
   else
     LOG(IconDatabase,
         "Pruning unretained icons took %.4f seconds - this is much too long!",
-        duration);
+        timestamp);
 #endif
 }
 
@@ -776,7 +773,7 @@ void IconDatabase::updateDatabase(Timer<IconDatabase>*) {
 
 void IconDatabase::syncDatabase() {
 #ifndef NDEBUG
-  CFTimeInterval start = CFAbsoluteTimeGetCurrent();
+  double timestamp = currentTime();
 #endif
 
   // First we'll do the pending additions
@@ -833,13 +830,13 @@ void IconDatabase::syncDatabase() {
   m_updateTimer.stop();
 
 #ifndef NDEBUG
-  CFTimeInterval duration = CFAbsoluteTimeGetCurrent() - start;
-  if (duration <= 1.0)
-    LOG(IconDatabase, "Updating the database took %.4f seconds", duration);
+  timestamp = currentTime() - timestamp;
+  if (timestamp <= 1.0)
+    LOG(IconDatabase, "Updating the database took %.4f seconds", timestamp);
   else
     LOG(IconDatabase,
         "Updating the database took %.4f seconds - this is much too long!",
-        duration);
+        timestamp);
 #endif
 }
 
