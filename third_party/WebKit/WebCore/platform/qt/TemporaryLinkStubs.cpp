@@ -353,11 +353,11 @@ void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
 
-int WebCore::screenDepthPerComponent(Widget*) {
+int WebCore::screenDepthPerComponent(const Page*) {
   notImplemented();
   return 0;
 }
-bool WebCore::screenIsMonochrome(Widget*) {
+bool WebCore::screenIsMonochrome(const Page*) {
   notImplemented();
   return false;
 }
