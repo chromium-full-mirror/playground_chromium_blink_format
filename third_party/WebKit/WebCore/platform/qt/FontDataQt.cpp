@@ -39,6 +39,7 @@
 #include "GlyphBuffer.h"
 #include "FontDescription.h"
 
+#include <QFont>
 #include <QFontMetrics>
 
 namespace WebCore {
@@ -53,7 +54,9 @@ void FontData::platformInit() {
   m_lineSpacing = m_ascent + m_descent + m_lineGap;
 }
 
-void FontData::platformDestroy() {}
+void FontData::platformDestroy() {
+  delete m_font.fontPtr();
+}
 
 FontData* FontData::smallCapsFontData(
     const FontDescription& fontDescription) const {
