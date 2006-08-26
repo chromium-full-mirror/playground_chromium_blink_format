@@ -697,6 +697,9 @@ struct BindingURI {
 #endif
 
 //------------------------------------------------
+
+enum ETextSecurity { TSNONE, TSDISC, TSCIRCLE, TSSQUARE };
+
 // CSS3 User Modify Properties
 
 enum EUserModify { READ_ONLY, READ_WRITE, READ_WRITE_PLAINTEXT_ONLY };
@@ -818,6 +821,7 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
       textShadow;  // Our text shadow information for shadowed text drawing.
   AtomicString
       highlight;  // Apple-specific extension for custom highlight rendering.
+  unsigned textSecurity : 2;    // ETextSecurity
   unsigned userModify : 2;      // EUserModify  (editing)
   unsigned wordWrap : 1;        // EWordWrap
   unsigned nbspMode : 1;        // ENBSPMode
@@ -1643,6 +1647,9 @@ class RenderStyle {
   // Apple-specific property getter methods
   int lineClamp() const { return css3NonInheritedData->lineClamp; }
   bool textSizeAdjust() const { return css3InheritedData->textSizeAdjust; }
+  ETextSecurity textSecurity() const {
+    return static_cast<ETextSecurity>(css3InheritedData->textSecurity);
+  }
 
   // attribute setter methods
 
@@ -2017,6 +2024,9 @@ class RenderStyle {
   void setTextSizeAdjust(bool b) {
     SET_VAR(css3InheritedData, textSizeAdjust, b);
   }
+  void setTextSecurity(ETextSecurity aTextSecurity) {
+    SET_VAR(css3InheritedData, textSecurity, aTextSecurity);
+  }
 
 #ifdef SVG_SUPPORT
   const SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
@@ -2159,6 +2169,7 @@ class RenderStyle {
   // Keep these at the end.
   static int initialLineClamp() { return -1; }
   static bool initialTextSizeAdjust() { return true; }
+  static ETextSecurity initialTextSecurity() { return TSNONE; }
   static const DeprecatedValueList<StyleDashboardRegion>&
   initialDashboardRegions();
   static const DeprecatedValueList<StyleDashboardRegion>&

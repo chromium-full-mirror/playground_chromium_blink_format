@@ -28,6 +28,10 @@
 
 #include "HTMLGenericFormElement.h"
 
+// FIXME: Remove these when converting the password field
+#include "RenderStyle.h"
+#include "RenderObject.h"
+
 namespace WebCore {
 
 class HTMLImageLoader;
@@ -87,7 +91,14 @@ class HTMLInputElement : public HTMLGenericFormElement {
   // FIXME: When other text fields switch to the non-NSView implementation, we
   // should add them here.
   // Once all text fields switch over, we should merge this with isTextField.
-  bool isNonWidgetTextField() const { return m_type == TEXT; }
+  bool isNonWidgetTextField() const {
+    return m_type == TEXT ||
+           (m_type ==
+                PASSWORD /* FIXME: Remove this style check when converting
+                            password */
+            && renderer() &&
+            renderer()->style()->appearance() == TextFieldAppearance);
+  }
 
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);
