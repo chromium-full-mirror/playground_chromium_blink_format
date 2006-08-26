@@ -402,11 +402,13 @@ void GraphicsContext::drawArc(const IntRect& rect,
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
-                                        const IntPoint* points) {
+                                        const FloatPoint* points,
+                                        bool shouldAntialias) {
   if (paintingDisabled())
     return;
 
-  m_data->p().drawConvexPolygon(reinterpret_cast<const QPoint*>(points),
+  // FIXME: Take 'shouldAntialias' into account...
+  m_data->p().drawConvexPolygon(reinterpret_cast<const QPointF*>(points),
                                 npoints);
 }
 
