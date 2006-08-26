@@ -321,7 +321,7 @@ void GraphicsContext::drawArc(const IntRect& rect,
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
-                                        const IntPoint* points,
+                                        const FloatPoint* points,
                                         bool shouldAntialias) {
   if (paintingDisabled())
     return;
