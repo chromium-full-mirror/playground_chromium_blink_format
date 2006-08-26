@@ -35,7 +35,7 @@
 #include "Timer.h"
 #include <wtf/Vector.h>
 
-#if __APPLE__
+#if PLATFORM(CG)
 // FIXME: Will go away when we make PDF a subclass.
 #include "PDFDocumentImage.h"
 #endif
@@ -58,7 +58,11 @@ Image::Image()
       m_animationFinished(false),
       m_haveSize(false),
       m_sizeAvailable(false) {
-  initNativeData();
+#if PLATFORM(CG)
+  m_isPDF = false;  // FIXME: Will go away when we make PDF a subclass.
+  m_PDFDoc = 0;
+#endif
+  initPlatformData();
 }
 
 Image::Image(ImageAnimationObserver* observer, bool isPDF)
@@ -73,10 +77,10 @@ Image::Image(ImageAnimationObserver* observer, bool isPDF)
       m_animationFinished(false),
       m_haveSize(false),
       m_sizeAvailable(false) {
-  initNativeData();
-#if __APPLE__
-  if (isPDF)
-    setIsPDF();  // FIXME: Will go away when we make PDF a subclass.
+  initPlatformData();
+#if PLATFORM(CG)
+  m_isPDF = isPDF;  // FIXME: Will go away when we make PDF a subclass.
+  m_PDFDoc = 0;
 #endif
   m_animationObserver = observer;
 }
@@ -84,7 +88,9 @@ Image::Image(ImageAnimationObserver* observer, bool isPDF)
 Image::~Image() {
   invalidateData();
   stopAnimation();
-  destroyNativeData();
+#if PLATFORM(CG)
+  delete m_PDFDoc;  // FIXME: Will go away when we make a PDF image subclass.
+#endif
 }
 
 void Image::invalidateData() {
@@ -92,7 +98,7 @@ void Image::invalidateData() {
   if (m_frames.size()) {
     m_frames.last().clear();
     m_isSolidColor = false;
-    invalidateNativeData();
+    invalidatePlatformData();
   }
 }
 
@@ -122,7 +128,7 @@ bool Image::isNull() const {
 }
 
 IntSize Image::size() const {
-#if __APPLE__
+#if PLATFORM(CG)
   // FIXME: Will go away when we make PDF a subclass.
   if (m_isPDF) {
     if (m_PDFDoc) {
@@ -155,7 +161,7 @@ bool Image::setData(bool allDataReceived) {
   }
 #endif
 
-#if __APPLE__
+#if PLATFORM(CG)
   // Avoid the extra copy of bytes by just handing the byte array directly to a
   // CFDataRef.
   CFDataRef data = CFDataCreateWithBytesNoCopy(
@@ -171,7 +177,7 @@ bool Image::setData(bool allDataReceived) {
 }
 
 bool Image::setNativeData(NativeBytePtr data, bool allDataReceived) {
-#if __APPLE__
+#if PLATFORM(CG)
   // FIXME: Will go away when we make PDF a subclass.
   if (m_isPDF) {
     if (allDataReceived && !m_PDFDoc)
