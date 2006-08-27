@@ -299,11 +299,11 @@ bool FrameQt::lastEventIsMouseUp() const {
 }
 
 void FrameQt::saveDocumentState() {
-  notImplemented();
+  // FIXME: Implement this as soon a KPart is created...
 }
 
 void FrameQt::restoreDocumentState() {
-  notImplemented();
+  // FIXME: Implement this as soon a KPart is created...
 }
 
 void FrameQt::openURLRequest(const ResourceRequest&) {
@@ -363,7 +363,7 @@ void FrameQt::registerCommandForRedo(PassRefPtr<EditCommand>) {
 }
 
 void FrameQt::clearUndoRedoOperations() {
-  notImplemented();
+  // FIXME: Implement this as soon a KPart is created...
 }
 
 void FrameQt::issueUndoCommand() {
@@ -412,7 +412,9 @@ bool FrameQt::shouldChangeSelection(const SelectionController& oldSelection,
 }
 
 void FrameQt::partClearedInBegin() {
-  notImplemented();
+  // FIXME: This is only related to the js debugger.
+  // See WebCoreSupport/WebFrameBridge.m "windowObjectCleared",
+  // which is called by FrameMac::partClearedInBegin() ...
 }
 
 bool FrameQt::canGoBackOrForward(int distance) const {

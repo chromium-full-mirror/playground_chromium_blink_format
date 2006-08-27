@@ -294,11 +294,8 @@ PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
   notImplemented();
 }
 
-void CheckCacheObjectStatus(DocLoader*, CachedResource*) {
-  notImplemented();
-}
+void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
 bool CheckIfReloading(WebCore::DocLoader*) {
-  notImplemented();
   return false;
 }
 Vector<char> ServeSynchronousRequest(Loader*,
@@ -312,7 +309,6 @@ Vector<char> ServeSynchronousRequest(Loader*,
 }
 
 bool WebCore::historyContains(DeprecatedString const&) {
-  notImplemented();
   return false;
 }
 String WebCore::submitButtonDefaultLabel() {
@@ -378,7 +374,6 @@ void FrameView::updateBorder() {
 bool AXObjectCache::gAccessibilityEnabled = false;
 
 Vector<char> loadResourceIntoArray(const char*) {
-  notImplemented();
   return Vector<char>();
 }
 
@@ -391,7 +386,6 @@ unsigned PlugInInfoStore::pluginCount() const {
   return 0;
 }
 bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
-  notImplemented();
   return false;
 }
 
