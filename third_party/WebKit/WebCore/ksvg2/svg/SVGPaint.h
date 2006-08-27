@@ -24,6 +24,7 @@
 #define KSVG_SVGPaintImpl_H
 #ifdef SVG_SUPPORT
 
+#include "ksvg.h"
 #include <SVGColor.h>
 
 namespace WebCore {
@@ -32,19 +33,19 @@ class SVGPaint : public SVGColor {
  public:
   SVGPaint();
   SVGPaint(StringImpl* uri);
-  SVGPaint(unsigned short paintType);
-  SVGPaint(unsigned short paintType,
+  SVGPaint(SVGPaintType);
+  SVGPaint(SVGPaintType,
            StringImpl* uri,
            StringImpl* rgbPaint = 0,
            StringImpl* iccPaint = 0);
   virtual ~SVGPaint();
 
   // 'SVGPaint' functions
-  unsigned short paintType() const;
+  SVGPaintType paintType() const;
   StringImpl* uri() const;
 
-  void setUri(StringImpl* uri);
-  void setPaint(unsigned short paintType,
+  void setUri(StringImpl*);
+  void setPaint(SVGPaintType,
                 StringImpl* uri,
                 StringImpl* rgbPaint,
                 StringImpl* iccPaint);
@@ -52,7 +53,7 @@ class SVGPaint : public SVGColor {
   virtual String cssText() const;
 
  private:
-  unsigned short m_paintType;
+  SVGPaintType m_paintType;
   String m_uri;
 };
 
