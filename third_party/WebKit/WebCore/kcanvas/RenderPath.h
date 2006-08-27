@@ -36,7 +36,7 @@ namespace WebCore {
 class FloatPoint;
 class SVGStyledElement;
 
-class KCanvasPath;
+class Path;
 class RenderSVGContainer;
 
 class RenderPath : public RenderObject {
@@ -46,14 +46,14 @@ class RenderPath : public RenderObject {
 
   // Hit-detection seperated for the fill and the stroke
   virtual bool fillContains(const FloatPoint& p) const;
-  virtual bool strokeContains(const FloatPoint& p) const;
+  virtual bool strokeContains(const FloatPoint& p) const = 0;
 
   // Returns an unscaled bounding box (not even including localTransform()) for
   // this vector path
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
 
-  void setPath(KCanvasPath* newPath);
-  KCanvasPath* path() const;
+  void setPath(const Path& newPath);
+  const Path& path() const;
 
   virtual bool isRenderPath() const { return true; }
   virtual const char* renderName() const { return "KCanvasItem"; }
@@ -99,10 +99,10 @@ class RenderPath : public RenderObject {
  protected:
   virtual void drawMarkersIfNeeded(GraphicsContext*,
                                    const FloatRect&,
-                                   const KCanvasPath*) const = 0;
+                                   const Path&) const = 0;
+  virtual FloatRect strokeBBox() const = 0;
 
  private:
-  FloatRect strokeBBox() const;
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
 
   PointerEventsHitRules pointerEventsHitRules();
@@ -110,9 +110,6 @@ class RenderPath : public RenderObject {
   class Private;
   Private* d;
 };
-
-// Helper data structure
-typedef DeprecatedValueList<const RenderPath*> KCanvasItemList;
 }
 
 #endif  // SVG_SUPPORT

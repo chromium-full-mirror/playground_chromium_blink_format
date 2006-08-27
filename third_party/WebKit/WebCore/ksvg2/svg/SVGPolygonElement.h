@@ -32,7 +32,7 @@ class SVGPolygonElement : public SVGPolyElement {
   SVGPolygonElement(const QualifiedName&, Document*);
   virtual ~SVGPolygonElement();
 
-  virtual KCanvasPath* toPathData() const;
+  virtual Path toPathData() const;
 };
 
 }  // namespace WebCore

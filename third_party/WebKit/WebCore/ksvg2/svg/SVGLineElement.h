@@ -52,7 +52,7 @@ class SVGLineElement : public SVGStyledTransformableElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual KCanvasPath* toPathData() const;
+  virtual Path toPathData() const;
 
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);

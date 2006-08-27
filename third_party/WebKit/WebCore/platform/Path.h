@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ *                     2006 Rob Buis <buis@kde.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,9 +38,12 @@ typedef void PlatformPath;
 
 namespace WebCore {
 
+enum WindRule { RULE_NONZERO = 0, RULE_EVENODD = 1 };
+
 class FloatPoint;
 class FloatSize;
 class FloatRect;
+class String;
 
 class Path {
  public:
@@ -49,10 +53,11 @@ class Path {
   Path(const Path&);
   Path& operator=(const Path&);
 
-  bool contains(const FloatPoint&) const;
+  bool contains(const FloatPoint&, WindRule rule = RULE_NONZERO) const;
   FloatRect boundingRect() const;
 
   void clear();
+  bool isEmpty() const;
 
   void moveTo(const FloatPoint&);
   void addLineTo(const FloatPoint&);
@@ -73,10 +78,16 @@ class Path {
 
   void translate(const FloatSize&);
 
+  void setWindingRule(WindRule rule) { m_rule = rule; }
+  WindRule windingRule() const { return m_rule; }
+
+  String debugString() const;
+
   PlatformPath* platformPath() const { return m_path; }
 
  private:
   PlatformPath* m_path;
+  WindRule m_rule;
 };
 }
 

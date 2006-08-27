@@ -33,7 +33,6 @@
 #include "SVGRenderStyle.h"
 #include "cssstyleselector.h"
 #include "ksvg.h"
-#include <kcanvas/KCanvasPath.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
 using namespace WebCore;
@@ -97,9 +96,10 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
       SVGStyledElement* styled = static_cast<SVGStyledElement*>(e);
       RenderStyle* pathStyle =
           document()->styleSelector()->styleForElement(styled, clipPathStyle);
-      if (KCanvasPath* pathData = styled->toPathData())
-        m_clipper->addClipData(
-            pathData, (KCWindRule)pathStyle->svgStyle()->clipRule(), bbox);
+      Path pathData = styled->toPathData();
+      if (!pathData.isEmpty())
+        m_clipper->addClipData(pathData, pathStyle->svgStyle()->clipRule(),
+                               bbox);
       pathStyle->deref(view()->renderArena());
     }
   }

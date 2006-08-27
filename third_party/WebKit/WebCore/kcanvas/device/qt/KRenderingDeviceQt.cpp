@@ -24,7 +24,6 @@
 
 #include "IntRect.h"
 #include "RenderPathQt.h"
-#include "KCanvasPathQt.h"
 #include "AffineTransform.h"
 #include "GraphicsContext.h"
 #include "KCanvasClipperQt.h"
@@ -65,8 +64,8 @@ void KRenderingDeviceContextQt::clearPath() {
   m_path = QPainterPath();
 }
 
-void KRenderingDeviceContextQt::addPath(const KCanvasPath* path) {
-  m_path.addPath(static_cast<const KCanvasPathQt*>(path)->qtPath());
+void KRenderingDeviceContextQt::addPath(const Path& path) {
+  m_path.addPath(*(path.platformPath()));
 }
 
 GraphicsContext* KRenderingDeviceContextQt::createGraphicsContext() {
@@ -81,7 +80,7 @@ QRectF KRenderingDeviceContextQt::pathBBox() const {
   return m_path.boundingRect();
 }
 
-void KRenderingDeviceContextQt::setFillRule(KCWindRule rule) {
+void KRenderingDeviceContextQt::setFillRule(WindRule rule) {
   m_path.setFillRule(rule == RULE_EVENODD ? Qt::OddEvenFill : Qt::WindingFill);
 }
 
@@ -116,11 +115,6 @@ KRenderingDeviceContextQt* KRenderingDeviceQt::qtContext() const {
 KRenderingDeviceContext* KRenderingDeviceQt::contextForImage(
     KCanvasImage* image) const {
   qDebug("KRenderingDeviceQt::contextForImage() TODO!");
-  return 0;
-}
-
-DeprecatedString KRenderingDeviceQt::stringForPath(const KCanvasPath* path) {
-  qDebug("KRenderingDeviceQt::stringForPath() TODO!");
   return 0;
 }
 
@@ -165,15 +159,11 @@ KCanvasFilterEffect* KRenderingDeviceQt::createFilterEffect(
   return 0;
 }
 
-KCanvasPath* KRenderingDeviceQt::createPath() const {
-  return new KCanvasPathQt();
-}
-
 // item creation
 RenderPath* KRenderingDeviceQt::createItem(RenderArena* arena,
                                            RenderStyle* style,
                                            SVGStyledElement* node,
-                                           KCanvasPath* path) const {
+                                           const Path& path) const {
   RenderPath* item = new (arena) RenderPathQt(style, node);
   item->setPath(path);
   return item;

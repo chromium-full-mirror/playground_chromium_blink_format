@@ -37,7 +37,7 @@ namespace WebCore {
 
 class RenderPath::Private {
  public:
-  RefPtr<KCanvasPath> path;
+  Path path;
 
   FloatRect fillBBox;
   FloatRect strokeBbox;
@@ -73,39 +73,19 @@ FloatPoint RenderPath::mapAbsolutePointToLocal(const FloatPoint& point) const {
 }
 
 bool RenderPath::fillContains(const FloatPoint& point) const {
-  if (!d->path)
+  if (d->path.isEmpty())
     return false;
 
   if (!KSVGPainterFactory::fillPaintServer(style(), this))
     return false;
 
-  return path()->containsPoint(
+  return path().contains(
       mapAbsolutePointToLocal(point),
       KSVGPainterFactory::fillPainter(style(), this).fillRule());
 }
 
-bool RenderPath::strokeContains(const FloatPoint& point) const {
-  if (!d->path)
-    return false;
-
-  if (!KSVGPainterFactory::strokePaintServer(style(), this))
-    return false;
-
-  return path()->strokeContainsPoint(mapAbsolutePointToLocal(point));
-}
-
-FloatRect RenderPath::strokeBBox() const {
-  if (KSVGPainterFactory::isStroked(style())) {
-    KRenderingStrokePainter strokePainter =
-        KSVGPainterFactory::strokePainter(style(), this);
-    return path()->strokeBoundingBox(strokePainter);
-  }
-
-  return path()->boundingBox();
-}
-
 FloatRect RenderPath::relativeBBox(bool includeStroke) const {
-  if (!d->path)
+  if (d->path.isEmpty())
     return FloatRect();
 
   if (includeStroke) {
@@ -115,18 +95,18 @@ FloatRect RenderPath::relativeBBox(bool includeStroke) const {
   }
 
   if (d->fillBBox.isEmpty())
-    d->fillBBox = path()->boundingBox();
+    d->fillBBox = path().boundingRect();
   return d->fillBBox;
 }
 
-void RenderPath::setPath(KCanvasPath* newPath) {
+void RenderPath::setPath(const Path& newPath) {
   d->path = newPath;
   d->strokeBbox = FloatRect();
   d->fillBBox = FloatRect();
 }
 
-KCanvasPath* RenderPath::path() const {
-  return d->path.get();
+const Path& RenderPath::path() const {
+  return d->path;
 }
 
 void RenderPath::layout() {
@@ -186,7 +166,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   if (paintInfo.p->paintingDisabled() ||
       (paintInfo.phase != PaintPhaseForeground) ||
-      style()->visibility() == HIDDEN || !path())
+      style()->visibility() == HIDDEN || path().isEmpty())
     return;
 
   KRenderingDevice* device = renderingDevice();
@@ -313,7 +293,6 @@ bool RenderPath::nodeAtPoint(NodeInfo& info,
   // We only draw in the forground phase, so we only hit-test then.
   if (hitTestAction != HitTestForeground)
     return false;
-
   PointerEventsHitRules hitRules = pointerEventsHitRules();
 
   bool isVisible = (style()->visibility() == VISIBLE);

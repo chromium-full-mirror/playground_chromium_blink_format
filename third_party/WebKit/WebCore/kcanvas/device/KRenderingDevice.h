@@ -39,7 +39,7 @@ class KRenderingDeviceContext {
   virtual AffineTransform ctm() const = 0;
 
   virtual void clearPath() = 0;
-  virtual void addPath(const KCanvasPath*) = 0;
+  virtual void addPath(const Path&) = 0;
 
   virtual GraphicsContext* createGraphicsContext() = 0;
 };
@@ -64,8 +64,6 @@ class KRenderingDevice {
   virtual KRenderingDeviceContext* contextForImage(
       KCanvasImage* image) const = 0;
 
-  virtual DeprecatedString stringForPath(const KCanvasPath* path) = 0;
-
   // Creation tools
   virtual KCanvasResource* createResource(const KCResourceType& type) const = 0;
   virtual KCanvasFilterEffect* createFilterEffect(
@@ -76,8 +74,7 @@ class KRenderingDevice {
   virtual RenderPath* createItem(RenderArena* arena,
                                  RenderStyle* style,
                                  SVGStyledElement* node,
-                                 KCanvasPath* path) const = 0;
-  virtual KCanvasPath* createPath() const = 0;
+                                 const Path& path) const = 0;
 
  private:
   Vector<KRenderingDeviceContext*> m_contextStack;

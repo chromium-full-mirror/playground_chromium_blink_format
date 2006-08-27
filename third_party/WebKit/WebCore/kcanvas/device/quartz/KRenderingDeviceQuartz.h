@@ -50,7 +50,7 @@ class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
   virtual AffineTransform ctm() const;
 
   virtual void clearPath();
-  virtual void addPath(const KCanvasPath*);
+  virtual void addPath(const Path&);
 
   virtual GraphicsContext* createGraphicsContext();
 
@@ -77,21 +77,18 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   CGContextRef currentCGContext() const;
   virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
-  virtual DeprecatedString stringForPath(const KCanvasPath* path);
-
   // Resource creation
   virtual KCanvasResource* createResource(const KCResourceType& type) const;
   virtual KRenderingPaintServer* createPaintServer(
       const KCPaintServerType& type) const;
   virtual KCanvasFilterEffect* createFilterEffect(
       const KCFilterEffectType& type) const;
-  virtual KCanvasPath* createPath() const;
 
   // item creation
   virtual RenderPath* createItem(RenderArena* arena,
                                  RenderStyle* style,
                                  SVGStyledElement* node,
-                                 KCanvasPath* path) const;
+                                 const Path& path) const;
 
   // filters (mostly debugging)
   static bool filtersEnabled();

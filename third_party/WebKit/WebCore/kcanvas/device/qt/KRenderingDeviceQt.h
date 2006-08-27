@@ -42,7 +42,7 @@ class KRenderingDeviceContextQt : public KRenderingDeviceContext {
   virtual IntRect mapToVisual(const IntRect&);
 
   virtual void clearPath();
-  virtual void addPath(const KCanvasPath*);
+  virtual void addPath(const Path&);
 
   virtual GraphicsContext* createGraphicsContext();
 
@@ -50,7 +50,7 @@ class KRenderingDeviceContextQt : public KRenderingDeviceContext {
   QPainter& painter();
   QRectF pathBBox() const;
 
-  void setFillRule(KCWindRule);
+  void setFillRule(WindRule);
 
   void fillPath();
   void strokePath();
@@ -74,21 +74,18 @@ class KRenderingDeviceQt : public KRenderingDevice {
   KRenderingDeviceContextQt* qtContext() const;
   virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
-  virtual DeprecatedString stringForPath(const KCanvasPath*);
-
   // Resource creation
   virtual KCanvasResource* createResource(const KCResourceType&) const;
   virtual KRenderingPaintServer* createPaintServer(
       const KCPaintServerType&) const;
   virtual KCanvasFilterEffect* createFilterEffect(
       const KCFilterEffectType&) const;
-  virtual KCanvasPath* createPath() const;
 
   // item creation
   virtual RenderPath* createItem(RenderArena*,
                                  RenderStyle*,
                                  SVGStyledElement*,
-                                 KCanvasPath*) const;
+                                 const Path&) const;
 };
 }
 
