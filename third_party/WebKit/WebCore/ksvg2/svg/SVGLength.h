@@ -55,7 +55,7 @@ class SVGLength : public Shared<SVGLength> {
   };
 
   // 'SVGLength' functions
-  unsigned short unitType() const;
+  SVGLengthType unitType() const;
 
   float value() const;
   void setValue(float value);
@@ -86,9 +86,9 @@ class SVGLength : public Shared<SVGLength> {
   float m_value;
   float m_valueInSpecifiedUnits;
 
-  unsigned m_mode : 2;  // LengthMode
+  LengthMode m_mode : 2;
   bool m_bboxRelative : 1;
-  unsigned m_unitType : 4;
+  SVGLengthType m_unitType : 4;
   bool m_requiresLayout : 1;
 
   const SVGStyledElement* m_context;
