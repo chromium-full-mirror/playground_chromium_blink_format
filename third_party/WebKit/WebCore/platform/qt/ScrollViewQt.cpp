@@ -171,10 +171,13 @@ void ScrollView::setHScrollBarMode(ScrollBarMode newMode) {
   switch (newMode) {
     case ScrollBarAuto:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+      break;
     case ScrollBarAlwaysOff:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+      break;
     case ScrollBarAlwaysOn:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+      break;
   }
 }
 
@@ -182,10 +185,13 @@ void ScrollView::setVScrollBarMode(ScrollBarMode newMode) {
   switch (newMode) {
     case ScrollBarAuto:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+      break;
     case ScrollBarAlwaysOff:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+      break;
     case ScrollBarAlwaysOn:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+      break;
   }
 }
 
