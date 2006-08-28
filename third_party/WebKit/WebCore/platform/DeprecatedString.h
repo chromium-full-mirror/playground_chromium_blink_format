@@ -233,6 +233,7 @@ class DeprecatedString {
   operator KJS::UString() const;
 
 #if PLATFORM(QT)
+  DeprecatedString(const QString&);
   operator QString() const;
 #endif
 

@@ -32,6 +32,7 @@
 
 namespace WebCore {
 
+// String conversions
 String::String(const QString& qstr) {
   unsigned int len = qstr.length();
   const UChar* str = reinterpret_cast<const UChar*>(qstr.constData());
@@ -47,6 +48,16 @@ String::String(const QString& qstr) {
 
 String::operator QString() const {
   return QString(reinterpret_cast<const QChar*>(characters()), length());
+}
+
+// DeprecatedString conversions
+DeprecatedString::DeprecatedString(const QString& qstr) {
+  if (qstr.isNull()) {
+    (*this) = DeprecatedString::null;
+  } else {
+    QByteArray utf8Data = qstr.toUtf8();
+    (*this) = DeprecatedString::fromUtf8(utf8Data.data(), utf8Data.length());
+  }
 }
 
 DeprecatedString::operator QString() const {
