@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.
+ * Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -61,6 +62,6 @@ class DOMImplementationFront {
 
 DOMImplementationFront* implementationFront(Document*);
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // DOMImplementationFront_h

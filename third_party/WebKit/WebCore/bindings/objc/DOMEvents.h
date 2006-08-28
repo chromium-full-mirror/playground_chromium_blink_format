@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,6 +24,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <WebCore/DOMDocument.h>
+#import <WebCore/DOMNode.h>
+#import <WebCore/DOMObject.h>
 #import <WebCore/DOMViews.h>
 
 @class DOMEvent;
@@ -63,10 +67,6 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
 - (void)initEvent:(NSString*)
      eventTypeArg:(BOOL)
      canBubbleArg:(BOOL)cancelableArg;
-@end
-
-@interface DOMDocument (DOMDocumentEvent)
-- (DOMEvent*)createEvent:(NSString*)eventType;
 @end
 
 @interface DOMUIEvent : DOMEvent
