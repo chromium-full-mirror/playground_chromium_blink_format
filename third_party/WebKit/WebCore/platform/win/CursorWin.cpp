@@ -26,6 +26,8 @@
 #include "config.h"
 #include "Cursor.h"
 
+#include <windows.h>
+
 namespace WebCore {
 
 Cursor::Cursor(const Cursor& other) : m_impl(other.m_impl) {}

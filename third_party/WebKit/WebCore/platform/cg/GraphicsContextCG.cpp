@@ -32,7 +32,7 @@
 
 #include "AffineTransform.h"
 #include "Path.h"
-#include "wtf/mathextras.h"
+#include <wtf/MathExtras.h>
 
 #ifdef SVG_SUPPORT
 #include "KRenderingDeviceQuartz.h"

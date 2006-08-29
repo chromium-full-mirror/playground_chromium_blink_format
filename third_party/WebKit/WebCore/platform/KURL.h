@@ -23,12 +23,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KURL_H_
-#define KURL_H_
+#ifndef KURL_h
+#define KURL_h
 
+#include <wtf/Platform.h>
 #include "TextEncoding.h"
 
-#if __APPLE__
+#if USE(CFNETWORK)
+#include <CoreFoundation/CFURL.h>
+#endif
+
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSData;
 @class NSURL;
@@ -54,7 +59,7 @@ class KURL {
        const DeprecatedString&,
        const TextEncoding& encoding = TextEncoding(UTF8Encoding));
   KURL(const DeprecatedString&);
-#if __APPLE__
+#if PLATFORM(MAC)
   KURL(NSURL*);
 #endif
 
@@ -88,8 +93,10 @@ class KURL {
 
   DeprecatedString prettyURL() const;
 
-#if __APPLE__
+#if PLATFORM(CF)
   CFURLRef createCFURL() const;
+#endif
+#if PLATFORM(MAC)
   NSURL* getNSURL() const;
 #endif
 
@@ -122,4 +129,4 @@ class KURL {
 };
 }
 
-#endif
+#endif  // KURL_h
