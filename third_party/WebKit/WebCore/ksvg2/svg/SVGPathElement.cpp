@@ -476,17 +476,17 @@ Path SVGPathElement::toPathData() const {
   for (int i = 0; i < len; ++i) {
     SVGPathSeg* p = pathSegList()->getItem(i);
     switch (p->pathSegType()) {
-      case PATHSEG_MOVETO_ABS: {
+      case SVGPathSeg::PATHSEG_MOVETO_ABS: {
         SVGPathSegMovetoAbs* moveTo = static_cast<SVGPathSegMovetoAbs*>(p);
         pathData.moveTo(FloatPoint(moveTo->x(), moveTo->y()));
         break;
       }
-      case PATHSEG_LINETO_ABS: {
+      case SVGPathSeg::PATHSEG_LINETO_ABS: {
         SVGPathSegLinetoAbs* lineTo = static_cast<SVGPathSegLinetoAbs*>(p);
         pathData.addLineTo(FloatPoint(lineTo->x(), lineTo->y()));
         break;
       }
-      case PATHSEG_CURVETO_CUBIC_ABS: {
+      case SVGPathSeg::PATHSEG_CURVETO_CUBIC_ABS: {
         SVGPathSegCurvetoCubicAbs* curveTo =
             static_cast<SVGPathSegCurvetoCubicAbs*>(p);
         pathData.addBezierCurveTo(FloatPoint(curveTo->x1(), curveTo->y1()),
@@ -494,7 +494,7 @@ Path SVGPathElement::toPathData() const {
                                   FloatPoint(curveTo->x(), curveTo->y()));
         break;
       }
-      case PATHSEG_CLOSEPATH:
+      case SVGPathSeg::PATHSEG_CLOSEPATH:
         pathData.closeSubpath();
       default:
         break;

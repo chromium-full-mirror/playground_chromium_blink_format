@@ -24,12 +24,13 @@
 #ifdef SVG_SUPPORT
 #include "SVGPathSeg.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPathSeg::SVGPathSeg(const SVGStyledElement* context)
     : Shared<SVGPathSeg>(), m_context(context) {}
 
 SVGPathSeg::~SVGPathSeg() {}
+}
 
 // vim:ts=4:noet
 #endif  // SVG_SUPPORT
