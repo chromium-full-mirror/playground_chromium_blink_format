@@ -58,7 +58,6 @@ class FontPlatformData {
 
  private:
   QFont* m_font;
-  FontDescription m_fontDescription;
 };
 }
 
