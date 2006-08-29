@@ -46,7 +46,6 @@ typedef void CURL;
 
 #if PLATFORM(QT)
 #include <QString>
-typedef void CURL;
 #endif
 
 // The allocations and releases in ResourceLoaderInternal are
@@ -88,7 +87,7 @@ class ResourceLoaderInternal {
         m_formDataLength(0),
         m_bytesRemainingToWrite(0)
 #endif
-#if PLATFORM(GDK) || PLATFORM(QT)
+#if PLATFORM(GDK)
         ,
         m_handle(0)
 #endif
@@ -128,7 +127,7 @@ class ResourceLoaderInternal {
         m_formDataLength(0),
         m_bytesRemainingToWrite(0)
 #endif
-#if PLATFORM(GDK) || PLATFORM(QT)
+#if PLATFORM(GDK)
         ,
         m_handle(0)
 #endif
@@ -172,8 +171,8 @@ class ResourceLoaderInternal {
   CURL* m_handle;
 #endif
 #if PLATFORM(QT)
-  CURL* m_handle;
-  QString response;
+  QString m_mimetype;
+  QString m_response;
 #endif
 };
 

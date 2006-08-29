@@ -165,6 +165,7 @@ class FrameQt : public Frame, public ResourceLoaderClient {
   virtual bool passMouseDownEventToWidget(Widget*);
 
   FrameQtClient* m_client;
+  bool m_beginCalled : 1;
 };
 }
 

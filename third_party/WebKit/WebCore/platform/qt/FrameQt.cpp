@@ -42,6 +42,7 @@
 #include "DOMWindow.h"
 #include "DOMImplementation.h"
 #include "BrowserExtensionQt.h"
+#include "ResourceLoaderInternal.h"
 #include "Document.h"
 #include "Settings.h"
 #include "Plugin.h"
@@ -135,15 +136,10 @@ FrameQt::~FrameQt() {
 
 bool FrameQt::openURL(const KURL& url) {
   didOpenURL(url);
+  m_beginCalled = false;
 
-  // FIXME: Use mimetype logic from KIO!
-  // ResourceRequest request(resourceRequest());
-  // request.m_responseMIMEType = "image/svg+xml";
-  // setResourceRequest(request);
-
-  begin(url);
   ResourceLoader* job = new ResourceLoader(this, "GET", url);
-  job->start(document()->docLoader());
+  job->start(0);
   return true;
 }
 
@@ -162,11 +158,11 @@ void FrameQt::submitForm(const ResourceRequest& request) {
   &request.postData);
   */
 
-  begin(request.url());
+  m_beginCalled = false;
 
   ResourceLoader* job = new ResourceLoader(
       this, request.doPost() ? "POST" : "GET", request.url(), request.postData);
-  job->start(document()->docLoader());
+  job->start(0);
 
   clearRecordedFormValues();
 }
@@ -175,10 +171,12 @@ void FrameQt::urlSelected(const ResourceRequest& request) {
   // need to potentially updateLocationBar(str.ascii()); or notify sys of new
   // url mybe event or callback
   const KURL url = request.url();
+
   didOpenURL(url);
-  begin(url);
+  m_beginCalled = false;
+
   ResourceLoader* job = new ResourceLoader(this, "GET", url);
-  job->start(document()->docLoader());
+  job->start(0);
 }
 
 String FrameQt::userAgent() const {
@@ -267,7 +265,11 @@ bool FrameQt::toolbarVisible() {
 }
 
 void FrameQt::createEmptyDocument() {
-  notImplemented();
+  // FIXME: Implement like described in this comment from FrameMac:
+  //
+  // Although it's not completely clear from the name of this function,
+  // it does nothing if we already have a document, and just creates an
+  // empty one if we have no document at all.
 }
 
 Range* FrameQt::markedTextRange() const {
@@ -485,11 +487,26 @@ void FrameQt::receivedResponse(ResourceLoader*, PlatformResponse) {
 }
 
 void FrameQt::receivedData(ResourceLoader* job, const char* data, int length) {
+  if (!m_beginCalled) {
+    m_beginCalled = true;
+
+    // Assign correct mimetype _before_ calling begin()!
+    ResourceLoaderInternal* d = job->getInternal();
+    if (d) {
+      ResourceRequest request(resourceRequest());
+      request.m_responseMIMEType = d->m_mimetype;
+      setResourceRequest(request);
+    }
+
+    begin(job->url());
+  }
+
   write(data, length);
 }
 
 void FrameQt::receivedAllData(ResourceLoader* job, PlatformData data) {
   end();
+  m_beginCalled = false;
 }
 
 void FrameQt::setFrameGeometry(const IntRect& r) {
