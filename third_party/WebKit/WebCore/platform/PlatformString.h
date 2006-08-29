@@ -29,7 +29,7 @@
 
 #include "StringImpl.h"
 
-#if __APPLE__
+#if PLATFORM(CF)
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
@@ -157,7 +157,7 @@ class String {
 
   StringImpl* impl() const { return m_impl.get(); }
 
-#if __APPLE__
+#if PLATFORM(CF)
   String(CFStringRef);
   CFStringRef createCFString() const {
     return m_impl ? m_impl->createCFString() : CFSTR("");
