@@ -28,14 +28,16 @@
 #include "config.h"
 #include "SystemTime.h"
 
-#include <time.h>
+#include <sys/time.h>
 
 namespace WebCore {
 
 double currentTime() {
-  time_t ttime;
-  time(&ttime);
-  return (double)ttime;
+  struct timeval tv;
+  struct timezone tz;
+
+  gettimeofday(&tv, &tz);
+  return (double)tv.tv_sec + (double)(tv.tv_usec / 1000000.0);
 }
 }
 
