@@ -69,6 +69,7 @@ class IconDatabase {
 
  public:
   static IconDatabase* sharedIconDatabase();
+  ~IconDatabase();
 
   bool open(const String& path);
   bool isOpen() { return m_mainDB.isOpen() && m_privateBrowsingDB.isOpen(); }
@@ -109,7 +110,6 @@ class IconDatabase {
 
  private:
   IconDatabase();
-  ~IconDatabase();
 
   // This tries to get the iconID for the IconURL and, if it doesn't exist and
   // createIfNecessary is true,
