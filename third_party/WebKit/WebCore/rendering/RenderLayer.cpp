@@ -1365,6 +1365,15 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                              bool haveTransparency,
                              PaintRestriction paintRestriction,
                              RenderObject* paintingRoot) {
+  // Avoid painting layers when stylesheets haven't loaded.  This eliminates
+  // FOUC.
+  // It's ok not to draw, because later on, when all the stylesheets do load,
+  // updateStyleSelector on the Document
+  // will do a full repaint().
+  if (!renderer()->document()->haveStylesheetsLoaded(false) &&
+      !renderer()->isRenderView() && !renderer()->isRoot())
+    return;
+
   // Calculate the clip rects we should use.
   IntRect layerBounds, damageRect, clipRectToApply, outlineRect;
   calculateRects(rootLayer, paintDirtyRect, layerBounds, damageRect,
@@ -1378,8 +1387,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   updateZOrderLists();
   updateOverflowList();
 
-  // If this layer is totally invisible, then return as there is nothing to
-  // paint
+  // If this layer is totally invisible then there is nothing to paint.
   if (!m_object->opacity())
     return;
 
@@ -1496,7 +1504,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   }
 }
 
-static inline bool isSubframeCanvas(RenderObject* renderer) {
+static inline bool isSubframe(RenderObject* renderer) {
   return renderer->isRenderView() &&
          renderer->node()->document()->frame()->tree()->parent();
 }
@@ -1512,7 +1520,7 @@ bool RenderLayer::hitTest(RenderObject::NodeInfo& info, const IntPoint& point) {
   renderer()->document()->updateLayout();
 
   IntRect boundsRect(m_x, m_y, width(), height());
-  if (isSubframeCanvas(renderer()))
+  if (isSubframe(renderer()))
     boundsRect.intersect(frameVisibleRect(renderer()));
 
   RenderLayer* insideLayer = hitTestLayer(this, info, point, boundsRect);

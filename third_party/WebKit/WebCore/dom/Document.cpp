@@ -285,6 +285,7 @@ Document::Document(DOMImplementation* impl, FrameView* v)
                                          !inCompatMode());
   m_pendingStylesheets = 0;
   m_ignorePendingStylesheets = false;
+  m_didLayoutWithPendingStylesheets = false;
 
   m_cssTarget = 0;
 
@@ -938,6 +939,7 @@ void Document::updateLayoutIgnorePendingStylesheets() {
 
   if (!haveStylesheetsLoaded()) {
     m_ignorePendingStylesheets = true;
+    m_didLayoutWithPendingStylesheets = true;
     updateStyleSelector();
   }
 
@@ -1792,6 +1794,12 @@ void Document::updateStyleSelector() {
   // Don't bother updating, since we haven't loaded all our style info yet.
   if (!haveStylesheetsLoaded())
     return;
+
+  if (m_didLayoutWithPendingStylesheets) {
+    m_didLayoutWithPendingStylesheets = false;
+    if (renderer())
+      renderer()->repaint();
+  }
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
