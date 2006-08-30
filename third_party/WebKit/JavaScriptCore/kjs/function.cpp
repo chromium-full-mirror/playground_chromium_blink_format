@@ -83,6 +83,7 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
   ExecState newExec(exec->dynamicInterpreter(), &ctx);
   if (exec->hadException())
     newExec.setException(exec->exception());
+  ctx.setExecState(&newExec);
 
   // assign user supplied arguments to parameters
   processParameters(&newExec, args);
@@ -833,10 +834,10 @@ JSValue* GlobalFuncImp::callAsFunction(ExecState* exec,
         Context ctx(exec->dynamicInterpreter()->globalObject(),
                     exec->dynamicInterpreter(), thisVal, progNode.get(),
                     EvalCode, exec->context());
-
         ExecState newExec(exec->dynamicInterpreter(), &ctx);
         if (exec->hadException())
           newExec.setException(exec->exception());
+        ctx.setExecState(&newExec);
 
         // execute the code
         progNode->processVarDecls(&newExec);
