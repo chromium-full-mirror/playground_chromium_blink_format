@@ -45,8 +45,9 @@ class RenderPath : public RenderObject {
   virtual ~RenderPath();
 
   // Hit-detection seperated for the fill and the stroke
-  virtual bool fillContains(const FloatPoint& p, bool = true) const;
-  virtual bool strokeContains(const FloatPoint& p, bool = true) const = 0;
+  virtual bool fillContains(const FloatPoint&, bool requiresFill = true) const;
+  virtual bool strokeContains(const FloatPoint&,
+                              bool requiresStroke = true) const = 0;
 
   // Returns an unscaled bounding box (not even including localTransform()) for
   // this vector path

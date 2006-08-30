@@ -40,11 +40,12 @@ void RenderPathQt::drawMarkersIfNeeded(GraphicsContext*,
   qDebug("RenderPathQt::drawMarkersIfNeeded() TODO!");
 }
 
-bool RenderPathQt::strokeContains(const FloatPoint& point) const {
+bool RenderPathQt::strokeContains(const FloatPoint& point,
+                                  bool requiresStroke) const {
   if (path().isEmpty())
     return false;
 
-  if (!KSVGPainterFactory::strokePaintServer(style(), this))
+  if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
     return false;
 
   return false;
