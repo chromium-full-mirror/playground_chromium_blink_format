@@ -39,6 +39,10 @@
 #include <windows.h>
 #endif
 
+#if PLATFORM(QT)
+#include <QString>
+#endif
+
 using namespace std;
 using namespace KJS;
 
@@ -2507,6 +2511,21 @@ DeprecatedString::DeprecatedString(const UString& str) {
                             str.size());
   }
 }
+
+#if PLATFORM(QT)
+DeprecatedString::DeprecatedString(const QString& str) {
+  if (str.isNull()) {
+    internalData.deref();
+    dataHandle = makeSharedNullHandle();
+    dataHandle[0]->ref();
+  } else {
+    dataHandle = allocateHandle();
+    *dataHandle = &internalData;
+    internalData.initialize(reinterpret_cast<const DeprecatedChar*>(str.data()),
+                            str.length());
+  }
+}
+#endif
 
 DeprecatedString::operator Identifier() const {
   if (isNull())
