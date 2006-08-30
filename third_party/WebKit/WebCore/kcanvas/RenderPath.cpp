@@ -72,11 +72,12 @@ FloatPoint RenderPath::mapAbsolutePointToLocal(const FloatPoint& point) const {
   return FloatPoint(localX, localY);
 }
 
-bool RenderPath::fillContains(const FloatPoint& point) const {
+bool RenderPath::fillContains(const FloatPoint& point,
+                              bool requiresFill) const {
   if (d->path.isEmpty())
     return false;
 
-  if (!KSVGPainterFactory::fillPaintServer(style(), this))
+  if (requiresFill && !KSVGPainterFactory::fillPaintServer(style(), this))
     return false;
 
   return path().contains(
@@ -305,9 +306,9 @@ bool RenderPath::nodeAtPoint(NodeInfo& info,
          style()->svgStyle()->strokePaint()->paintType() != SVG_PAINTTYPE_NONE);
     FloatPoint hitPoint(_x, _y);
     if ((hitRules.canHitStroke && (hasStroke || !hitRules.requireStroke) &&
-         strokeContains(hitPoint)) ||
+         strokeContains(hitPoint, hitRules.requireStroke)) ||
         (hitRules.canHitFill && (hasFill || !hitRules.requireFill) &&
-         fillContains(hitPoint))) {
+         fillContains(hitPoint, hitRules.requireFill))) {
       setInnerNode(info);
       return true;
     }
