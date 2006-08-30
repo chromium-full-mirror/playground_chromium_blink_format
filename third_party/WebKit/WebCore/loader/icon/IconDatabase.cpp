@@ -613,7 +613,7 @@ void IconDatabase::setHaveNoIconForIconURL(const String& iconURL) {
   setIconDataForIconURL(0, 0, iconURL);
 }
 
-void IconDatabase::setIconURLForPageURL(const String& iconURL,
+bool IconDatabase::setIconURLForPageURL(const String& iconURL,
                                         const String& pageURL) {
   ASSERT(!iconURL.isEmpty());
   ASSERT(!pageURL.isEmpty());
@@ -621,7 +621,7 @@ void IconDatabase::setIconURLForPageURL(const String& iconURL,
   // If the urls already map to each other, bail.
   // This happens surprisingly often, and seems to cream iBench performance
   if (m_pageURLToIconURLMap.get(pageURL) == iconURL)
-    return;
+    return false;
 
   // If this pageURL is retained, we have some work to do on the IconURL retain
   // counts
@@ -659,6 +659,8 @@ void IconDatabase::setIconURLForPageURL(const String& iconURL,
   // it
   // was already started
   m_updateTimer.startOneShot(updateTimerDelay);
+
+  return true;
 }
 
 void IconDatabase::setIconURLForPageURLInDatabase(const String& iconURL,
