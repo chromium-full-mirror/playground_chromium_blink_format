@@ -836,7 +836,7 @@ void IconDatabase::syncDatabase() {
        i != end; ++i) {
     (*i)->writeToDatabase(*m_currentDB);
     LOG(IconDatabase,
-        "Wrote IconDataCache for IconURL %s with timestamp of %lli to the DB",
+        "Wrote IconDataCache for IconURL %s with timestamp of %li to the DB",
         (*i)->getIconURL().ascii().data(), (*i)->getTimestamp());
   }
   m_iconDataCachesPendingUpdate.clear();
@@ -845,7 +845,7 @@ void IconDatabase::syncDatabase() {
                             end = m_pageURLsPendingAddition.end();
   for (; i != end; ++i) {
     setIconURLForPageURLInDatabase(m_pageURLToIconURLMap.get(*i), *i);
-    LOG(IconDatabase, "Commited IconURL for PageURL %s to database",
+    LOG(IconDatabase, "Committed IconURL for PageURL %s to database",
         (*i).ascii().data());
   }
   m_pageURLsPendingAddition.clear();
