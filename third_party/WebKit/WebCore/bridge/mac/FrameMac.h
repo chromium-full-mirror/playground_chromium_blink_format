@@ -303,6 +303,9 @@ class FrameMac : public Frame {
 
   virtual bool inputManagerHasMarkedText() const;
 
+  virtual void setSecureKeyboardEntry(bool);
+  virtual bool secureKeyboardEntry();
+
   KJS::Bindings::RootObject* executionContextForDOM();
   KJS::Bindings::RootObject* bindingRootObject();
 

@@ -431,6 +431,9 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   virtual bool inputManagerHasMarkedText() const { return false; }
 
+  virtual void setSecureKeyboardEntry(bool){};
+  virtual bool secureKeyboardEntry() { return false; }
+
   /**
    * Returns the most recent edit command applied.
    */

@@ -3328,7 +3328,7 @@ void Frame::setIsActive(bool flag) {
     }
   }
 
-  // 4, Changing the tint of controls from clear to aqua/graphite and vice
+  // 4. Changing the tint of controls from clear to aqua/graphite and vice
   // versa.  We
   // do a "fake" paint.  When the theme gets a paint call, it can then do an
   // invalidate.  This is only
@@ -3340,6 +3340,14 @@ void Frame::setIsActive(bool flag) {
     context.setUpdatingControlTints(true);
     paint(&context, visibleRect);
   }
+
+  // 5. Enable or disable secure keyboard entry
+  if ((flag && !secureKeyboardEntry() && doc &&
+       doc->focusNode()->hasTagName(inputTag) &&
+       static_cast<HTMLInputElement*>(doc->focusNode())->inputType() ==
+           HTMLInputElement::PASSWORD) ||
+      (!flag && secureKeyboardEntry()))
+    setSecureKeyboardEntry(flag);
 }
 
 void Frame::setWindowHasFocus(bool flag) {
