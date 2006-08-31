@@ -146,7 +146,7 @@ class IconDatabase {
 
   // Called to eliminate database inconsistency where pages point to
   // non-existent iconIDs
-  void pruneDanglingPageURLs();
+  void checkForDanglingPageURLs(bool prune);
 
   // Determine if an IconURL is still retained by anyone
   bool isIconURLRetained(const String&);
