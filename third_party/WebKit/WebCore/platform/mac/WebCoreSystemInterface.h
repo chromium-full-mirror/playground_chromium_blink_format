@@ -107,11 +107,9 @@ extern void (*wkPopupMenu)(NSMenu*,
                            int selectedItem,
                            NSFont*);
 extern void (*wkReleaseStyleGroup)(void* group);
-extern BOOL (*wkSecureEventInput)(void);
 extern void (*wkSetCGFontRenderingMode)(CGContextRef, NSFont*);
 extern void (*wkSetDragImage)(NSImage*, NSPoint offset);
 extern void (*wkSetPatternPhaseInUserSpace)(CGContextRef, CGPoint point);
-extern void (*wkSetSecureEventInput)(BOOL);
 extern void (*wkSetUpFontCache)(size_t);
 extern void (*wkSignalCFReadStreamEnd)(CFReadStreamRef stream);
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
