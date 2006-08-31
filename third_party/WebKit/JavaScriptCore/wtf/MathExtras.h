@@ -62,6 +62,13 @@ inline float nextafterf(float x, float y) {
   return x > y ? x - FLT_EPSILON : x + FLT_EPSILON;
 }
 
+inline double copysign(double x, double y) {
+  return _copysign(x, y);
+}
+inline int isfinite(double x) {
+  return _finite(x);
+}
+
 #if COMPILER(MSVC)
 
 // Work around a bug in the Microsoft CRT, where fmod(x, +-infinity) yields NaN
