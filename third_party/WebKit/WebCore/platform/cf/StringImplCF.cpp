@@ -21,9 +21,11 @@
 #include "config.h"
 #include "StringImpl.h"
 
+#include <CoreFoundation/CoreFoundation.h>
+
 namespace WebCore {
 
 CFStringRef StringImpl::createCFString() const {
-  return CFStringCreateWithCharacters(NULL, m_data, m_length);
+  return CFStringCreateWithCharacters(NULL, (const UniChar*)m_data, m_length);
 }
 }

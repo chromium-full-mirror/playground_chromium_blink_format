@@ -29,8 +29,8 @@
 #include <wtf/Platform.h>
 #include "TextEncoding.h"
 
-#if USE(CFNETWORK)
-#include <CoreFoundation/CFURL.h>
+#if PLATFORM(CF)
+typedef const struct __CFURL* CFURLRef;
 #endif
 
 #if PLATFORM(MAC)
@@ -62,7 +62,9 @@ class KURL {
 #if PLATFORM(MAC)
   KURL(NSURL*);
 #endif
-
+#if PLATFORM(CF)
+  KURL(CFURLRef);
+#endif
   bool isEmpty() const { return urlString.isEmpty(); }
   bool isMalformed() const { return !m_isValid; }
   bool isValid() const { return m_isValid; }
