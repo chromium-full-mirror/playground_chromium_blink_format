@@ -26,17 +26,13 @@
 #ifdef __cplusplus
 namespace WebCore {
 class IconDatabase;
-class Image;
-class String;
 }
 typedef WebCore::IconDatabase WebCoreIconDatabase;
 #else
 @class WebCoreIconDatabase;
 #endif
-@class WebCoreIconDatabaseBridge;
 
 @interface WebCoreIconDatabaseBridge : NSObject {
-  WebCoreIconDatabaseBridge* _sharedInstance;
   WebCoreIconDatabase* _iconDB;
 }
 - (BOOL)openSharedDatabaseWithPath:(NSString*)path;
@@ -69,7 +65,7 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 // WebCore side of the bridge.
 
 @protocol WebCoreIconDatabaseBridge
-+ (WebCoreIconDatabaseBridge*)sharedBridgeInstance;
++ (WebCoreIconDatabaseBridge*)sharedInstance;
 - (void)loadIconFromURL:(NSString*)iconURL;
 @end
 
