@@ -45,7 +45,8 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
                                          const String& url,
                                          CachePolicy cachePolicy,
                                          time_t _expireDate)
-    : CachedResource(url, XSLStyleSheet, cachePolicy, _expireDate) {
+    : CachedResource(url, XSLStyleSheet, cachePolicy, _expireDate),
+      m_decoder(new Decoder("text/xsl")) {
   // It's XML we want.
   // FIXME: This should accept more general xml formats */*+xml, image/svg+xml
   // for example.
@@ -56,7 +57,6 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
-  m_decoder = new Decoder;
 }
 
 void CachedXSLStyleSheet::ref(CachedResourceClient* c) {
@@ -84,6 +84,7 @@ void CachedXSLStyleSheet::data(Vector<char>& data, bool allDataReceived) {
 
   setSize(data.size());
   m_sheet = String(m_decoder->decode(data.data(), size()));
+  m_sheet += m_decoder->flush();
   m_loading = false;
   checkNotify();
 }

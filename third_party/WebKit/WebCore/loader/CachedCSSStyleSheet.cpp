@@ -33,6 +33,7 @@
 #include "Cache.h"
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
+#include "Decoder.h"
 #include "LoaderFunctions.h"
 #include "loader.h"
 #include <wtf/Vector.h>
@@ -45,14 +46,12 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          time_t _expireDate,
                                          const DeprecatedString& charset)
     : CachedResource(url, CSSStyleSheet, cachePolicy, _expireDate),
-      m_encoding(charset.latin1()) {
+      m_decoder(new Decoder("text/css")) {
   // It's css we want.
   setAccept("text/css");
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
-  if (!m_encoding.isValid())
-    m_encoding = TextEncoding(Latin1Encoding);
 }
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(
@@ -62,8 +61,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(
                      CSSStyleSheet,
                      CachePolicyVerify,
                      0,
-                     stylesheet_data.length()),
-      m_encoding(InvalidEncoding) {
+                     stylesheet_data.length()) {
   m_loading = false;
   m_status = Persistent;
   m_sheet = String(stylesheet_data);
@@ -86,11 +84,8 @@ void CachedCSSStyleSheet::deref(CachedResourceClient* c) {
 }
 
 void CachedCSSStyleSheet::setCharset(const DeprecatedString& chs) {
-  if (!chs.isEmpty()) {
-    TextEncoding encoding = TextEncoding(chs.latin1());
-    if (encoding.isValid())
-      m_encoding = encoding;
-  }
+  if (!chs.isEmpty())
+    m_decoder->setEncodingName(chs.latin1(), Decoder::EncodingFromHTTPHeader);
 }
 
 void CachedCSSStyleSheet::data(Vector<char>& data, bool allDataReceived) {
@@ -98,7 +93,8 @@ void CachedCSSStyleSheet::data(Vector<char>& data, bool allDataReceived) {
     return;
 
   setSize(data.size());
-  m_sheet = String(m_encoding.toUnicode(data.data(), size()));
+  m_sheet = m_decoder->decode(data.data(), size());
+  m_sheet += m_decoder->flush();
   m_loading = false;
   checkNotify();
 }

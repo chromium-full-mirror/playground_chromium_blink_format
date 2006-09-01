@@ -229,7 +229,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
   result->determineParseMode(
       documentSource);  // Make sure we parse in the correct mode.
 
-  RefPtr<Decoder> decoder = new Decoder;
+  RefPtr<Decoder> decoder = new Decoder(sourceMIMEType);
   decoder->setEncodingName(
       sourceEncoding.isEmpty() ? "UTF-8" : sourceEncoding.latin1(),
       Decoder::EncodingFromXMLHeader);
