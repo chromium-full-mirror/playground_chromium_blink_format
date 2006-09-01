@@ -401,7 +401,8 @@ void FrameQt::respondToChangedSelection(const SelectionController& oldSelection,
   notImplemented();
 }
 
-void FrameQt::respondToChangedContents() {
+void FrameQt::respondToChangedContents(
+    const SelectionController& endingSelection) {
   notImplemented();
 }
 
