@@ -2025,6 +2025,15 @@ void Frame::textWillBeDeletedInTextField(Element* input) {}
 
 void Frame::textDidChangeInTextArea(Element* input) {}
 
+bool Frame::isSelectionInPasswordField() {
+  Node* startNode = selection().start().node();
+  if (startNode)
+    startNode = startNode->shadowAncestorNode();
+  return startNode && startNode->hasTagName(inputTag) &&
+         static_cast<HTMLInputElement*>(startNode)->inputType() ==
+             HTMLInputElement::PASSWORD;
+}
+
 EditCommand* Frame::lastEditCommand() {
   return d->m_lastEditCommand.get();
 }

@@ -101,6 +101,7 @@
 - (BOOL)_hasSelectionOrInsertionPoint;
 - (BOOL)_isEditable;
 
+- (BOOL)_isSelectionInPasswordField;
 - (BOOL)_isSelectionMisspelled;
 - (NSArray*)_guessesForMisspelledSelection;
 
