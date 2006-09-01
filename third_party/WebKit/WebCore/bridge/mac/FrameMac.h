@@ -281,7 +281,7 @@ class FrameMac : public Frame {
   virtual void respondToChangedSelection(
       const SelectionController& oldSelection,
       bool closeTyping);
-  virtual void respondToChangedContents();
+  virtual void respondToChangedContents(const SelectionController&);
   virtual bool isContentEditable() const;
   virtual bool shouldChangeSelection(const SelectionController& oldSelection,
                                      const SelectionController& newSelection,

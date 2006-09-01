@@ -596,7 +596,8 @@ class Frame : public Shared<Frame>, Noncopyable {
   virtual void respondToChangedSelection(
       const SelectionController& oldSelection,
       bool closeTyping) = 0;
-  virtual void respondToChangedContents() = 0;
+  virtual void respondToChangedContents(
+      const SelectionController& endingSelection) = 0;
   virtual bool shouldChangeSelection(const SelectionController& oldSelection,
                                      const SelectionController& newSelection,
                                      EAffinity affinity,

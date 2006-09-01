@@ -63,7 +63,7 @@ class AXObjectCache {
 
   void childrenChanged(RenderObject*);
   void postNotification(RenderObject*, const String& message);
-  void postNotificationToTopWebArea(RenderObject*, const String& message);
+  void postNotificationToElement(RenderObject*, const String& message);
   void handleFocusedUIElementChanged();
 
   static void enableAccessibility() { gAccessibilityEnabled = true; }
@@ -87,8 +87,8 @@ inline void AXObjectCache::remove(RenderObject*) {}
 inline void AXObjectCache::removeAXID(WebCoreAXObject*) {}
 inline void AXObjectCache::childrenChanged(RenderObject*) {}
 inline void AXObjectCache::postNotification(RenderObject*, const String&) {}
-inline void AXObjectCache::postNotificationToTopWebArea(RenderObject*,
-                                                        const String&) {}
+inline void AXObjectCache::postNotificationToElement(RenderObject*,
+                                                     const String&) {}
 inline void AXObjectCache::handleFocusedUIElementChanged() {}
 #endif
 }

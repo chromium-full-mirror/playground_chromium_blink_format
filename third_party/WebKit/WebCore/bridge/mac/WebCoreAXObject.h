@@ -56,6 +56,8 @@ class RenderObject;
 - (WebCoreAXObject*)nextSibling;
 - (WebCoreAXObject*)parentObject;
 
+- (WebCoreAXObject*)observableObject;
+
 - (void)childrenChanged;
 - (void)clearChildren;
 

@@ -2078,7 +2078,7 @@ void Frame::appliedEditing(PassRefPtr<EditCommand> cmd) {
     d->m_lastEditCommand = cmd.get();
     registerCommandForUndo(cmd);
   }
-  respondToChangedContents();
+  respondToChangedContents(sel);
 }
 
 void Frame::unappliedEditing(PassRefPtr<EditCommand> cmd) {
@@ -2090,7 +2090,7 @@ void Frame::unappliedEditing(PassRefPtr<EditCommand> cmd) {
 
   d->m_lastEditCommand = 0;
   registerCommandForRedo(cmd);
-  respondToChangedContents();
+  respondToChangedContents(sel);
 }
 
 void Frame::reappliedEditing(PassRefPtr<EditCommand> cmd) {
@@ -2102,7 +2102,7 @@ void Frame::reappliedEditing(PassRefPtr<EditCommand> cmd) {
 
   d->m_lastEditCommand = 0;
   registerCommandForUndo(cmd);
-  respondToChangedContents();
+  respondToChangedContents(sel);
 }
 
 CSSMutableStyleDeclaration* Frame::typingStyle() const {
