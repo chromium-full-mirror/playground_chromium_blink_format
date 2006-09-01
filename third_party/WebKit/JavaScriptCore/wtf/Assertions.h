@@ -1,4 +1,4 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
+/* -*- mode: c++; c-basic-offset: 4 -*- */
 /*
  * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
  *
@@ -27,13 +27,15 @@
 #ifndef KXMLCORE_ASSERTIONS_H
 #define KXMLCORE_ASSERTIONS_H
 
-// no namespaces because this file has to be includable from C and Objective-C
+/*
+   no namespaces because this file has to be includable from C and Objective-C
 
-// Note, this file uses many GCC extensions, but it should be compatible with
-// C, Objective C, C++, and Objective C++.
+   Note, this file uses many GCC extensions, but it should be compatible with
+   C, Objective C, C++, and Objective C++.
 
-// For non-debug builds, everything is disabled by default.
-// Defining any of the symbols explicitly prevents this from having any effect.
+   For non-debug builds, everything is disabled by default.
+   Defining any of the symbols explicitly prevents this from having any effect.
+*/
 
 #include "Platform.h"
 
@@ -69,8 +71,8 @@
 #define KXMLCORE_PRETTY_FUNCTION __FUNCTION__
 #endif
 
-// These helper functions are always declared, but not necessarily always
-// defined if the corresponding function is disabled.
+/* These helper functions are always declared, but not necessarily always
+ * defined if the corresponding function is disabled. */
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,16 +122,16 @@ void WTFLog(const char* file,
 }
 #endif
 
-// CRASH -- gets us into the debugger or the crash reporter -- signals are
-// ignored by the crash reporter so we must do better
+/* CRASH -- gets us into the debugger or the crash reporter -- signals are
+ * ignored by the crash reporter so we must do better */
 
 #define CRASH() *(int*)(uintptr_t)0xbbadbeef = 0
 
-// ASSERT, ASSERT_WITH_MESSAGE, ASSERT_NOT_REACHED
+/* ASSERT, ASSERT_WITH_MESSAGE, ASSERT_NOT_REACHED */
 
 #if PLATFORM(WIN_OS)
-// FIXME: Change to use something other than ASSERT to avoid this conflict with
-// win32.
+/* FIXME: Change to use something other than ASSERT to avoid this conflict with
+ * win32. */
 #undef ASSERT
 #endif
 
@@ -167,7 +169,7 @@ void WTFLog(const char* file,
 
 #endif
 
-// ASSERT_ARG
+/* ASSERT_ARG */
 
 #if ASSERT_ARG_DISABLED
 
@@ -186,7 +188,7 @@ void WTFLog(const char* file,
 
 #endif
 
-// FATAL
+/* FATAL */
 
 #if FATAL_DISABLED
 #define FATAL(...) ((void)0)
@@ -199,7 +201,7 @@ void WTFLog(const char* file,
   } while (0)
 #endif
 
-// LOG_ERROR
+/* LOG_ERROR */
 
 #if ERROR_DISABLED
 #define LOG_ERROR(...) ((void)0)
@@ -208,7 +210,7 @@ void WTFLog(const char* file,
   WTFReportError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, __VA_ARGS__)
 #endif
 
-// LOG
+/* LOG */
 
 #if LOG_DISABLED
 #define LOG(channel, ...) ((void)0)
