@@ -258,9 +258,8 @@ class Document : public ContainerNode {
    * (including
    * any @imports that they may be loading).
    */
-  bool haveStylesheetsLoaded(bool checkIgnoreFlag = true) const {
-    return m_pendingStylesheets <= 0 ||
-           (checkIgnoreFlag && m_ignorePendingStylesheets);
+  bool haveStylesheetsLoaded() const {
+    return m_pendingStylesheets <= 0 || m_ignorePendingStylesheets;
   }
 
   /**
@@ -693,6 +692,16 @@ class Document : public ContainerNode {
                                    ExceptionCode& ec);
 #endif  // XPATH_SUPPORT
 
+  enum PendingSheetLayout {
+    NoLayoutWithPendingSheets,
+    DidLayoutWithPendingSheets,
+    IgnoreLayoutWithPendingSheets
+  };
+
+  bool didLayoutWithPendingStylesheets() const {
+    return m_pendingSheetLayout == DidLayoutWithPendingSheets;
+  }
+
  protected:
   CSSStyleSelector* m_styleSelector;
   FrameView* m_view;
@@ -725,7 +734,7 @@ class Document : public ContainerNode {
   // to track that this happened so that we can do a full repaint when the
   // stylesheets
   // do eventually load.
-  bool m_didLayoutWithPendingStylesheets;
+  PendingSheetLayout m_pendingSheetLayout;
 
   RefPtr<CSSStyleSheet> m_elemSheet;
 

@@ -1406,7 +1406,7 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
   // It's ok not to draw, because later on, when all the stylesheets do load,
   // updateStyleSelector on the Document
   // will do a full repaint().
-  if (!document()->haveStylesheetsLoaded(false))
+  if (document()->didLayoutWithPendingStylesheets())
     return;
 
   PaintPhase newPhase =

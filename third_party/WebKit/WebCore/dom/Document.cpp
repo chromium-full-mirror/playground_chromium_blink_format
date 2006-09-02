@@ -285,7 +285,7 @@ Document::Document(DOMImplementation* impl, FrameView* v)
                                          !inCompatMode());
   m_pendingStylesheets = 0;
   m_ignorePendingStylesheets = false;
-  m_didLayoutWithPendingStylesheets = false;
+  m_pendingSheetLayout = NoLayoutWithPendingSheets;
 
   m_cssTarget = 0;
 
@@ -939,7 +939,19 @@ void Document::updateLayoutIgnorePendingStylesheets() {
 
   if (!haveStylesheetsLoaded()) {
     m_ignorePendingStylesheets = true;
-    m_didLayoutWithPendingStylesheets = true;
+    // FIXME: We are willing to attempt to suppress painting with outdated style
+    // info only once.  Our assumption is that it would be
+    // dangerous to try to stop it a second time, after page content has already
+    // been loaded and displayed
+    // with accurate style information.  (Our suppression involves blanking the
+    // whole page at the
+    // moment.  If it were more refined, we might be able to do something
+    // better.)
+    // It's worth noting though that this entire method is a hack, since what we
+    // really want to do is
+    // suspend JS instead of doing a layout with inaccurate information.
+    if (m_pendingSheetLayout == NoLayoutWithPendingSheets)
+      m_pendingSheetLayout = DidLayoutWithPendingSheets;
     updateStyleSelector();
   }
 
@@ -1795,8 +1807,8 @@ void Document::updateStyleSelector() {
   if (!haveStylesheetsLoaded())
     return;
 
-  if (m_didLayoutWithPendingStylesheets) {
-    m_didLayoutWithPendingStylesheets = false;
+  if (didLayoutWithPendingStylesheets() && m_pendingStylesheets <= 0) {
+    m_pendingSheetLayout = IgnoreLayoutWithPendingSheets;
     if (renderer())
       renderer()->repaint();
   }
