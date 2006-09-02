@@ -66,9 +66,9 @@ const String& IconDatabase::defaultDatabaseFilename() {
 }
 
 IconDatabase* IconDatabase::sharedIconDatabase() {
-  if (!m_sharedInstance) {
+  if (!m_sharedInstance)
     m_sharedInstance = new IconDatabase();
-  }
+
   return m_sharedInstance;
 }
 
@@ -447,7 +447,7 @@ void IconDatabase::retainIconForPageURL(const String& pageURL) {
       }
       m_preparedPageRetainInsertStatement->reset();
       m_preparedPageRetainInsertStatement->bindText16(1, pageURL);
-      if (m_preparedPageRetainInsertStatement->step() != SQLITE_DONE)
+      if (m_preparedPageRetainInsertStatement->step() != SQLResultDone)
         LOG_ERROR(
             "Failed to record icon retention in temporary table for IconURL %s",
             pageURL.ascii().data());
@@ -790,14 +790,14 @@ void IconDatabase::pruneUnretainedIconsOnStartup(Timer<IconDatabase>*) {
                    "ON PageURL.iconID=Icon.iconID");
   sql.prepare();
   int result;
-  while ((result = sql.step()) == SQLITE_ROW) {
+  while ((result = sql.step()) == SQLResultRow) {
     String iconURL = sql.getColumnText16(1);
     m_pageURLToIconURLMap.set(sql.getColumnText16(0), iconURL);
     retainIconURL(iconURL);
     LOG(IconDatabase, "Found a PageURL that mapped to %s",
         iconURL.ascii().data());
   }
-  if (result != SQLITE_DONE)
+  if (result != SQLResultDone)
     LOG_ERROR("Error reading PageURL->IconURL mappings from on-disk DB");
   sql.finalize();
 
@@ -1060,7 +1060,7 @@ int64_t IconDatabase::addIconForIconURLQuery(SQLDatabase& db,
                     "INSERT INTO Icon (url) VALUES ((?));");
   m_addIconForIconURLStatement->bindText16(1, iconURL, false);
   int64_t result = 0;
-  if (m_addIconForIconURLStatement->step() == SQLITE_OK)
+  if (m_addIconForIconURLStatement->step() == SQLResultOk)
     result = db.lastInsertRowID();
   m_addIconForIconURLStatement->reset();
   return result;
@@ -1071,7 +1071,7 @@ bool IconDatabase::hasIconForIconURLQuery(SQLDatabase& db,
   readySQLStatement(m_hasIconForIconURLStatement, db,
                     "SELECT Icon.iconID FROM Icon WHERE Icon.url = (?);");
   m_hasIconForIconURLStatement->bindText16(1, iconURL, false);
-  bool result = m_hasIconForIconURLStatement->step() == SQLITE_ROW;
+  bool result = m_hasIconForIconURLStatement->step() == SQLResultRow;
   m_hasIconForIconURLStatement->reset();
   return result;
 }
