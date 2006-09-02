@@ -27,13 +27,14 @@
 
 #define WIN32_COMPILE_HACK
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "CString.h"
 #include "Node.h"
 #include "TextField.h"
 #include "Font.h"
 #include "FileButton.h"
-#include "TextBox.h"
 #include "PopUpButton.h"
 #include "IntPoint.h"
 #include "Widget.h"
@@ -62,13 +63,17 @@
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
 #include "RenderPopupMenuWin.h"
+#include "EditCommand.h"
 
 using namespace WebCore;
 
-static void notImplemented() {
-  puts("Not yet implemented");
-  _CrtDbgBreak();
-}
+#define notImplemented()                                                   \
+  do {                                                                     \
+    char buf[256] = {0};                                                   \
+    _snprintf(buf, sizeof(buf), "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, \
+              __LINE__);                                                   \
+    OutputDebugStringA(buf);                                               \
+  } while (0)
 
 void FrameView::updateBorder() {
   notImplemented();
@@ -76,89 +81,6 @@ void FrameView::updateBorder() {
 bool FrameView::isFrameView() const {
   notImplemented();
   return 0;
-}
-
-TextBox::TextBox(Widget*) {
-  notImplemented();
-}
-TextBox::~TextBox() {
-  notImplemented();
-}
-String TextBox::textWithHardLineBreaks() const {
-  notImplemented();
-  return String();
-}
-IntSize TextBox::sizeWithColumnsAndRows(int, int) const {
-  notImplemented();
-  return IntSize();
-}
-void TextBox::setText(String const&) {
-  notImplemented();
-}
-void TextBox::setColors(Color const&, Color const&) {
-  notImplemented();
-}
-void TextBox::setFont(WebCore::Font const&) {
-  notImplemented();
-}
-void TextBox::setWritingDirection(enum WebCore::TextDirection) {
-  notImplemented();
-}
-bool TextBox::checksDescendantsForFocus() const {
-  notImplemented();
-  return false;
-}
-int TextBox::selectionStart() {
-  notImplemented();
-  return 0;
-}
-bool TextBox::hasSelectedText() const {
-  notImplemented();
-  return 0;
-}
-int TextBox::selectionEnd() {
-  notImplemented();
-  return 0;
-}
-void TextBox::setScrollBarModes(ScrollBarMode, ScrollBarMode) {
-  notImplemented();
-}
-void TextBox::setReadOnly(bool) {
-  notImplemented();
-}
-void TextBox::selectAll() {
-  notImplemented();
-}
-void TextBox::setDisabled(bool) {
-  notImplemented();
-}
-void TextBox::setLineHeight(int) {
-  notImplemented();
-}
-void TextBox::setSelectionStart(int) {
-  notImplemented();
-}
-void TextBox::setCursorPosition(int, int) {
-  notImplemented();
-}
-String TextBox::text() const {
-  notImplemented();
-  return String();
-}
-void TextBox::setWordWrap(TextBox::WrapStyle) {
-  notImplemented();
-}
-void TextBox::setAlignment(HorizontalAlignment) {
-  notImplemented();
-}
-void TextBox::setSelectionEnd(int) {
-  notImplemented();
-}
-void TextBox::getCursorPosition(int*, int*) const {
-  notImplemented();
-}
-void TextBox::setSelectionRange(int, int) {
-  notImplemented();
 }
 
 Widget::FocusPolicy PopUpButton::focusPolicy() const {
@@ -323,10 +245,6 @@ void FileButton::setDisabled(bool) {
   notImplemented();
 }
 
-Widget::FocusPolicy TextBox::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
 Widget::FocusPolicy Slider::focusPolicy() const {
   notImplemented();
   return NoFocus;
@@ -404,6 +322,9 @@ bool FrameWin::canRedo() const {
 bool FrameWin::canUndo() const {
   notImplemented();
   return 0;
+}
+void FrameWin::registerCommandForUndo(PassRefPtr<WebCore::EditCommand>) {
+  notImplemented();
 }
 void FrameWin::registerCommandForRedo(PassRefPtr<WebCore::EditCommand>) {
   notImplemented();
@@ -483,25 +404,12 @@ bool FrameWin::canPaste() const {
   notImplemented();
   return 0;
 }
-enum WebCore::ObjectContentType FrameWin::objectContentType(KURL const&,
-                                                            String const&) {
-  notImplemented();
-  return (ObjectContentType)0;
-}
 bool FrameWin::canGoBackOrForward(int) const {
   notImplemented();
   return 0;
 }
 void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
-}
-Plugin* FrameWin::createPlugin(Element*,
-                               KURL const&,
-                               const Vector<String>&,
-                               const Vector<String>&,
-                               String const&) {
-  notImplemented();
-  return 0;
 }
 
 bool BrowserExtensionWin::canRunModal() {
@@ -545,11 +453,11 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   notImplemented();
 }
 
-int WebCore::screenDepthPerComponent(Widget*) {
+int WebCore::screenDepthPerComponent(const Page*) {
   notImplemented();
-  return 0;
+  return 8;
 }
-bool WebCore::screenIsMonochrome(Widget*) {
+bool WebCore::screenIsMonochrome(const Page*) {
   notImplemented();
   return false;
 }
@@ -609,7 +517,6 @@ void FrameWin::createEmptyDocument() {}
 String FrameWin::overrideMediaType() const {
   return String();
 }
-void FrameWin::handledOnloadEvents() {}
 Range* FrameWin::markedTextRange() const {
   return 0;
 }
@@ -639,14 +546,25 @@ Frame* FrameWin::createFrame(KURL const&,
   return 0;
 }
 void FrameWin::saveDocumentState() {}
-void FrameWin::registerCommandForUndo(PassRefPtr<WebCore::EditCommand>) {}
 void FrameWin::clearUndoRedoOperations(void) {}
 String FrameWin::incomingReferrer() const {
   return String();
 }
 void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
-void FrameWin::respondToChangedContents() {}
+void FrameWin::respondToChangedContents(
+    const SelectionController& endingSelection) {}
+void FrameWin::handledOnloadEvents() {}
+Plugin* FrameWin::createPlugin(Element*,
+                               const KURL&,
+                               const Vector<String>&,
+                               const Vector<String>&,
+                               const String&) {
+  return 0;
+}
+ObjectContentType FrameWin::objectContentType(const KURL&, const String&) {
+  return ObjectContentNone;
+}
 
 BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
 void BrowserExtensionWin::setTypedIconURL(KURL const&, const String&) {}
@@ -691,12 +609,10 @@ void GraphicsContext::translate(const FloatSize&) {}
 void GraphicsContext::rotate(float) {}
 void GraphicsContext::scale(const FloatSize&) {}
 
-Page::Page(HWND) {}
-
 Path::Path() {}
 Path::~Path() {}
 Path::Path(const Path&) {}
-bool Path::contains(const FloatPoint&) const {
+bool Path::contains(const FloatPoint&, WindRule rule) const {
   return false;
 }
 void Path::translate(const FloatSize&) {}
@@ -719,7 +635,10 @@ void Path::addArc(const FloatPoint&, float, float, float, bool) {}
 void Path::addRect(const FloatRect&) {}
 void Path::addEllipse(const FloatRect&) {}
 
-TextField::TextField(TextField::Type) {}
+TextField::TextField(TextField::Type type) {
+  m_type = type;
+}
+
 TextField::~TextField() {}
 void TextField::setFont(WebCore::Font const&) {}
 void TextField::setAlignment(HorizontalAlignment) {}
@@ -823,6 +742,9 @@ void RenderPopupMenuWin::populate() {
 void RenderPopupMenuWin::showPopup(const IntRect&, FrameView*, int index) {
   notImplemented();
 }
+void RenderPopupMenuWin::hidePopup() {
+  notImplemented();
+}
 void RenderPopupMenuWin::addSeparator() {
   notImplemented();
 }
@@ -833,16 +755,18 @@ void RenderPopupMenuWin::addOption(HTMLOptionElement*) {
   notImplemented();
 }
 
+void RenderThemeWin::systemFont(int propId,
+                                FontDescription& fontDescription) const {}
 bool RenderThemeWin::paintMenuList(RenderObject*,
                                    const RenderObject::PaintInfo&,
                                    const IntRect&) {
-  notImplemented();
   return false;
 }
 void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
                                          RenderStyle*,
-                                         Element*) const {
-  notImplemented();
+                                         Element*) const {}
+
+CString::CString(const DeprecatedCString&) {}
+const char* CString::data() const {
+  return 0;
 }
-void RenderThemeWin::systemFont(int propId,
-                                FontDescription& fontDescription) const {}

@@ -32,7 +32,7 @@
 
 namespace WebCore {
 
-Page::Page() : m_frameCount(0), m_widget(0) {
+Page::Page(HWND hwnd) : m_windowHandle(hwnd), m_frameCount(0), m_widget(0) {
   init();
 }
 
@@ -46,15 +46,6 @@ static HWND rootWindowForFrame(const Frame* frame) {
   if (!frameWnd)
     return 0;
   return GetAncestor(frameWnd, GA_ROOT);
-}
-
-Widget* Page::widget() const {
-  if (!m_widget) {
-    HWND windowHandle = rootWindowForFrame(mainFrame());
-    if (windowHandle)
-      m_widget = new Widget(windowHandle);
-  }
-  return m_widget;
 }
 
 FloatRect Page::windowRect() const {

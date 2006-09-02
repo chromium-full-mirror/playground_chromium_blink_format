@@ -126,7 +126,8 @@ class FrameWin : public Frame {
   virtual void respondToChangedSelection(
       const SelectionController& oldSelection,
       bool closeTyping);
-  virtual void respondToChangedContents();
+  void FrameWin::respondToChangedContents(
+      const SelectionController& endingSelection);
   virtual bool shouldChangeSelection(const SelectionController& oldSelection,
                                      const SelectionController& newSelection,
                                      EAffinity affinity,
