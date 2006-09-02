@@ -43,6 +43,7 @@ extern WTFLogChannel LogEvents;
 extern WTFLogChannel LogEditing;
 extern WTFLogChannel LogTextConversion;
 extern WTFLogChannel LogIconDatabase;
+extern WTFLogChannel LogSQLDatabase;
 }
 
 #endif

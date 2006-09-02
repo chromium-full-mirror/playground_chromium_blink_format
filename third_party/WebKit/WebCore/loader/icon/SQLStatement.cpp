@@ -43,9 +43,10 @@ SQLStatement::~SQLStatement() {
 
 int SQLStatement::prepare() {
   const void* tail;
+  LOG(SQLDatabase, "SQL - prepare - %s", m_query.ascii().data());
   if (sqlite3_prepare16(m_database.m_db, m_query.characters(), -1, &m_statement,
                         &tail) != SQLITE_OK) {
-    LOG(IconDatabase, "sqlite3_prepare16 failed (%i)\n%s\n%s", lastError(),
+    LOG(SQLDatabase, "sqlite3_prepare16 failed (%i)\n%s\n%s", lastError(),
         m_query.ascii().data(), sqlite3_errmsg(m_database.m_db));
     m_statement = 0;
   }
@@ -55,10 +56,10 @@ int SQLStatement::prepare() {
 int SQLStatement::step() {
   if (!isPrepared())
     return SQLITE_ERROR;
-
+  LOG(SQLDatabase, "SQL - step - %s", m_query.ascii().data());
   int error = sqlite3_step(m_statement);
   if (error != SQLITE_DONE && error != SQLITE_ROW) {
-    LOG(IconDatabase, "sqlite3_step failed (%i)\nQuery - %s\nError - %s", error,
+    LOG(SQLDatabase, "sqlite3_step failed (%i)\nQuery - %s\nError - %s", error,
         m_query.ascii().data(), sqlite3_errmsg(m_database.m_db));
   }
   return error;
@@ -66,6 +67,7 @@ int SQLStatement::step() {
 
 int SQLStatement::finalize() {
   if (m_statement) {
+    LOG(SQLDatabase, "SQL - finalize - %s", m_query.ascii().data());
     int result = sqlite3_finalize(m_statement);
     m_statement = 0;
     return result;
@@ -75,6 +77,7 @@ int SQLStatement::finalize() {
 
 int SQLStatement::reset() {
   if (m_statement) {
+    LOG(SQLDatabase, "SQL - reset - %s", m_query.ascii().data());
     return sqlite3_reset(m_statement);
   }
   return SQLITE_ERROR;
@@ -233,11 +236,11 @@ void SQLStatement::getColumnBlobAsVector(int col,
 
 const void* SQLStatement::getColumnBlob(int col, int& size) {
   if (finalize() != SQLITE_OK)
-    LOG(IconDatabase, "Finalize failed");
+    LOG(SQLDatabase, "Finalize failed");
   if (prepare() != SQLITE_OK)
-    LOG(IconDatabase, "Prepare failed");
+    LOG(SQLDatabase, "Prepare failed");
   if (step() != SQLITE_ROW) {
-    LOG(IconDatabase, "Step wasn't a row");
+    LOG(SQLDatabase, "Step wasn't a row");
     size = 0;
     return 0;
   }
@@ -268,7 +271,7 @@ bool SQLStatement::returnTextResults(int col, Vector<String>& v) {
   }
   if (lastError() != SQLITE_DONE) {
     result = false;
-    LOG(IconDatabase, "Error reading results from database query %s",
+    LOG(SQLDatabase, "Error reading results from database query %s",
         m_query.ascii().data());
   }
   finalize();
@@ -287,7 +290,7 @@ bool SQLStatement::returnTextResults16(int col, Vector<String>& v) {
   }
   if (lastError() != SQLITE_DONE) {
     result = false;
-    LOG(IconDatabase, "Error reading results from database query %s",
+    LOG(SQLDatabase, "Error reading results from database query %s",
         m_query.ascii().data());
   }
   finalize();
@@ -306,7 +309,7 @@ bool SQLStatement::returnIntResults(int col, Vector<int>& v) {
   }
   if (lastError() != SQLITE_DONE) {
     result = false;
-    LOG(IconDatabase, "Error reading results from database query %s",
+    LOG(SQLDatabase, "Error reading results from database query %s",
         m_query.ascii().data());
   }
   finalize();
@@ -325,7 +328,7 @@ bool SQLStatement::returnInt64Results(int col, Vector<int64_t>& v) {
   }
   if (lastError() != SQLITE_DONE) {
     result = false;
-    LOG(IconDatabase, "Error reading results from database query %s",
+    LOG(SQLDatabase, "Error reading results from database query %s",
         m_query.ascii().data());
   }
   finalize();
@@ -344,7 +347,7 @@ bool SQLStatement::returnDoubleResults(int col, Vector<double>& v) {
   }
   if (lastError() != SQLITE_DONE) {
     result = false;
-    LOG(IconDatabase, "Error reading results from database query %s",
+    LOG(SQLDatabase, "Error reading results from database query %s",
         m_query.ascii().data());
   }
   finalize();
