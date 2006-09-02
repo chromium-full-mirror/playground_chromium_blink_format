@@ -150,7 +150,10 @@ void RenderThemeGdk::adjustButtonStyle(CSSStyleSelector* selector,
 }
 
 RenderPopupMenu* RenderThemeGdk::createPopupMenu(RenderArena* arena,
-                                                 Document* doc) {
-  return new (arena) RenderPopupMenuGdk(doc);
+                                                 Document* doc,
+                                                 RenderMenuList* list) {
+  return new (arena) RenderPopupMenuGdk(doc, list);
 }
+
+void RenderThemeGdk::systemFont(int propId, FontDescription&) const {}
 }

@@ -73,7 +73,12 @@ class RenderThemeGdk : public RenderTheme {
                               const RenderObject::PaintInfo&,
                               const IntRect&);
 
-  virtual RenderPopupMenu* createPopupMenu(RenderArena*, Document*);
+  // System fonts.
+  virtual void systemFont(int propId, FontDescription&) const;
+
+  virtual RenderPopupMenu* createPopupMenu(RenderArena*,
+                                           Document*,
+                                           RenderMenuList*);
 
  private:
   void addIntrinsicMargins(RenderStyle*) const;
