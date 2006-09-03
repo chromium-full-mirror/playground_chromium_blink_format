@@ -29,11 +29,14 @@
 namespace WebCore {
 
 class KCanvasClipperQt : public KCanvasClipper {
- public:
-  KCanvasClipperQt() {}
-
-  virtual void applyClip(const FloatRect& boundingBox) const;
+public:
+    KCanvasClipperQt()
+    {
+    }
+    
+    virtual void applyClip(const FloatRect& boundingBox) const;
 };
+
 }
 
 #endif

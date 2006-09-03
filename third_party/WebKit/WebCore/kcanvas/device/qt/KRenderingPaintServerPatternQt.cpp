@@ -41,94 +41,89 @@ namespace WebCore {
 
 // KRenderingPaintServerPatternQt
 KRenderingPaintServerPatternQt::KRenderingPaintServerPatternQt()
-    : KRenderingPaintServerPattern(), KRenderingPaintServerQt() {}
-
-KRenderingPaintServerPatternQt::~KRenderingPaintServerPatternQt() {}
-
-void KRenderingPaintServerPatternQt::renderPath(
-    KRenderingDeviceContext* context,
-    const RenderPath* path,
-    KCPaintTargetType type) const {
-  RenderStyle* renderStyle = path->style();
-  KRenderingDeviceContextQt* qtContext =
-      static_cast<KRenderingDeviceContextQt*>(context);
-
-  if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle))
-    qtContext->fillPath();
-
-  if ((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle))
-    qtContext->strokePath();
+    : KRenderingPaintServerPattern()
+    , KRenderingPaintServerQt()
+{
 }
 
-bool KRenderingPaintServerPatternQt::setup(KRenderingDeviceContext* context,
-                                           const RenderObject* object,
-                                           KCPaintTargetType type) const {
-  /*
-      KRenderingDeviceContextQt* qtContext =
-     static_cast<KRenderingDeviceContextQt*>(context);
-      Q_ASSERT(qtContext != 0);
-
-      QPainterPath* _path = static_cast<QPainterPath*>(qtContext->path());
-      Q_ASSERT(_path != 0);
-
-      if (listener()) {
-          listener()->resourceNotification();
-      }
-
-      RenderStyle* renderStyle = object->style();
-
-      qtContext->painter().setPen(Qt::NoPen);
-      qtContext->painter().setBrush(Qt::NoBrush);
-      QImage* patternimage = new QImage(tile()->bits(), tile()->width(),
-     tile()->height(), QImage::Format_ARGB32_Premultiplied);
-      patternimage->setAlphaBuffer(true);
-      if (type & APPLY_TO_FILL) {
-          //QColor c = color();
-          //c.setAlphaF(style->fillPainter()->opacity() * style->opacity() *
-     opacity());
-          KRenderingFillPainter fillPainter =
-     KSVGPainterFactory::fillPainter(renderStyle, object);
-          QBrush brush(QPixmap::fromImage(*patternimage));
-          _path->setFillRule(fillPainter.fillRule() == RULE_EVENODD ?
-     Qt::OddEvenFill : Qt::WindingFill);
-          qtContext->painter().setBrush(brush);
-      }
-      if (type & APPLY_TO_STROKE) {
-          //QColor c = color();
-          //c.setAlphaF(style->strokePainter()->opacity() * style->opacity() *
-     opacity());
-          KRenderingStrokePainter strokePainter =
-     KSVGPainterFactory::strokePainter(renderStyle, object);
-
-          QPen pen;
-          QBrush brush(QPixmap::fromImage(*patternimage));
-
-          setPenProperties(strokePainter, pen);
-          pen.setBrush(brush);
-          qtContext->painter().setPen(pen);
-      }
-
-      qtContext->painter().drawPath(*_path);
-
-      delete patternimage;
-  */
-
-  return true;
+KRenderingPaintServerPatternQt::~KRenderingPaintServerPatternQt()
+{
 }
 
-void KRenderingPaintServerPatternQt::teardown(KRenderingDeviceContext*,
-                                              const RenderObject*,
-                                              KCPaintTargetType) const {}
+void KRenderingPaintServerPatternQt::renderPath(KRenderingDeviceContext* context, const RenderPath* path, KCPaintTargetType type) const
+{
+    RenderStyle* renderStyle = path->style();
+    KRenderingDeviceContextQt* qtContext = static_cast<KRenderingDeviceContextQt*>(context);
 
-void KRenderingPaintServerPatternQt::draw(KRenderingDeviceContext* context,
-                                          const RenderPath* path,
-                                          KCPaintTargetType type) const {
-  if (!setup(context, path, type))
-    return;
+    if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle))
+        qtContext->fillPath();
 
-  renderPath(context, path, type);
-  teardown(context, path, type);
+    if ((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle))
+        qtContext->strokePath();
 }
+
+bool KRenderingPaintServerPatternQt::setup(KRenderingDeviceContext* context, const RenderObject* object, KCPaintTargetType type) const
+{
+/*
+    KRenderingDeviceContextQt* qtContext = static_cast<KRenderingDeviceContextQt*>(context);
+    Q_ASSERT(qtContext != 0);
+
+    QPainterPath* _path = static_cast<QPainterPath*>(qtContext->path());
+    Q_ASSERT(_path != 0);
+ 
+    if (listener()) {
+        listener()->resourceNotification();
+    }
+
+    RenderStyle* renderStyle = object->style();
+
+    qtContext->painter().setPen(Qt::NoPen);
+    qtContext->painter().setBrush(Qt::NoBrush);
+    QImage* patternimage = new QImage(tile()->bits(), tile()->width(), tile()->height(), QImage::Format_ARGB32_Premultiplied);
+    patternimage->setAlphaBuffer(true);
+    if (type & APPLY_TO_FILL) {
+        //QColor c = color();
+        //c.setAlphaF(style->fillPainter()->opacity() * style->opacity() * opacity());
+        KRenderingFillPainter fillPainter = KSVGPainterFactory::fillPainter(renderStyle, object);
+        QBrush brush(QPixmap::fromImage(*patternimage));
+        _path->setFillRule(fillPainter.fillRule() == RULE_EVENODD ? Qt::OddEvenFill : Qt::WindingFill);
+        qtContext->painter().setBrush(brush);
+    }
+    if (type & APPLY_TO_STROKE) {
+        //QColor c = color();
+        //c.setAlphaF(style->strokePainter()->opacity() * style->opacity() * opacity());
+        KRenderingStrokePainter strokePainter = KSVGPainterFactory::strokePainter(renderStyle, object);
+
+        QPen pen;
+        QBrush brush(QPixmap::fromImage(*patternimage));
+
+        setPenProperties(strokePainter, pen);
+        pen.setBrush(brush);
+        qtContext->painter().setPen(pen);
+    }
+
+    qtContext->painter().drawPath(*_path);
+
+    delete patternimage;
+*/
+
+    return true;
+}
+
+void KRenderingPaintServerPatternQt::teardown(KRenderingDeviceContext*, const RenderObject*, KCPaintTargetType) const
+{
+}
+
+void KRenderingPaintServerPatternQt::draw(KRenderingDeviceContext* context, const RenderPath* path, KCPaintTargetType type) const
+{
+    if (!setup(context, path, type))
+        return;
+
+    renderPath(context, path, type);
+    teardown(context, path, type);
+}
+
 }
 
 // vim:ts=4:noet
+

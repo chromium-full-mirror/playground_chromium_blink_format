@@ -22,7 +22,7 @@
 */
 
 #include "config.h"
-#include "RenderPathQt.h"
+#include "RenderPath.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingStrokePainter.h"
 
@@ -30,65 +30,56 @@
 #include <QPainterPathStroker>
 
 namespace WebCore {
+    
+bool RenderPath::strokeContains(const FloatPoint& point, bool requiresStroke) const
+{
+    if (path().isEmpty())
+        return false;
 
-RenderPathQt::RenderPathQt(RenderStyle* style, SVGStyledElement* node)
-    : RenderPath(style, node) {}
+    if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
+        return false;
 
-void RenderPathQt::drawMarkersIfNeeded(GraphicsContext*,
-                                       const FloatRect&,
-                                       const Path&) const {
-  qDebug("RenderPathQt::drawMarkersIfNeeded() TODO!");
-}
-
-bool RenderPathQt::strokeContains(const FloatPoint& point,
-                                  bool requiresStroke) const {
-  if (path().isEmpty())
     return false;
-
-  if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
-    return false;
-
-  return false;
 }
 
-static QPainterPath getPathStroke(
-    const QPainterPath& path,
-    const KRenderingStrokePainter& strokePainter) {
-  QPainterPathStroker s;
-  s.setWidth(strokePainter.strokeWidth());
-  if (strokePainter.strokeCapStyle() == CAP_BUTT)
-    s.setCapStyle(Qt::FlatCap);
-  else if (strokePainter.strokeCapStyle() == CAP_ROUND)
-    s.setCapStyle(Qt::RoundCap);
+static QPainterPath getPathStroke(const QPainterPath &path, const KRenderingStrokePainter &strokePainter)
+{
+    QPainterPathStroker s;
+    s.setWidth(strokePainter.strokeWidth());
+    if(strokePainter.strokeCapStyle() == CAP_BUTT)
+        s.setCapStyle(Qt::FlatCap);
+    else if(strokePainter.strokeCapStyle() == CAP_ROUND)
+        s.setCapStyle(Qt::RoundCap);
 
-  if (strokePainter.strokeJoinStyle() == JOIN_MITER) {
-    s.setJoinStyle(Qt::MiterJoin);
-    s.setMiterLimit((qreal)strokePainter.strokeMiterLimit());
-  } else if (strokePainter.strokeJoinStyle() == JOIN_ROUND)
-    s.setJoinStyle(Qt::RoundJoin);
+    if(strokePainter.strokeJoinStyle() == JOIN_MITER) {
+        s.setJoinStyle(Qt::MiterJoin);
+        s.setMiterLimit((qreal)strokePainter.strokeMiterLimit());
+    } else if(strokePainter.strokeJoinStyle() == JOIN_ROUND)
+        s.setJoinStyle(Qt::RoundJoin);
 
-  KCDashArray dashes = strokePainter.dashArray();
-  unsigned int dashLength = !dashes.isEmpty() ? dashes.count() : 0;
-  if (dashLength) {
-    QVector<qreal> pattern;
-    unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
+    KCDashArray dashes = strokePainter.dashArray();
+    unsigned int dashLength = !dashes.isEmpty() ? dashes.count() : 0;
+    if(dashLength) {
+        QVector<qreal> pattern;
+        unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
 
-    for (unsigned int i = 0; i < count; i++)
-      pattern.append(dashes[i % dashLength] / (float)s.width());
+        for(unsigned int i = 0; i < count; i++)
+            pattern.append(dashes[i % dashLength] / (float)s.width());
 
-    s.setDashPattern(pattern);
-    // TODO: dash-offset, does/will qt4 API allow it? (Rob)
-  }
+        s.setDashPattern(pattern);
+        // TODO: dash-offset, does/will qt4 API allow it? (Rob)
+    }
 
-  return s.createStroke(path);
+    return s.createStroke(path);
 }
 
-FloatRect RenderPathQt::strokeBBox() const {
-  KRenderingStrokePainter strokePainter =
-      KSVGPainterFactory::strokePainter(style(), this);
-  QPainterPath outline = getPathStroke(*(path().platformPath()), strokePainter);
-  return outline.boundingRect();
+FloatRect RenderPath::strokeBBox() const
+{
+    KRenderingStrokePainter strokePainter = KSVGPainterFactory::strokePainter(style(), this);
+    QPainterPath outline = getPathStroke(*(path().platformPath()), strokePainter);
+    return outline.boundingRect();
 }
+
 }
 
 // vim:ts=4:noet

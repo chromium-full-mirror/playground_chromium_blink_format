@@ -36,76 +36,75 @@
 namespace WebCore {
 
 KRenderingPaintServerSolidQt::KRenderingPaintServerSolidQt()
-    : KRenderingPaintServerSolid(), KRenderingPaintServerQt() {}
+    : KRenderingPaintServerSolid()
+    , KRenderingPaintServerQt()
+{
+}
 
-KRenderingPaintServerSolidQt::~KRenderingPaintServerSolidQt() {}
+KRenderingPaintServerSolidQt::~KRenderingPaintServerSolidQt()
+{
+}
 
 // 'Solid' interface
-void KRenderingPaintServerSolidQt::draw(KRenderingDeviceContext* context,
-                                        const RenderPath* path,
-                                        KCPaintTargetType type) const {
-  if (!setup(context, path, type))
-    return;
+void KRenderingPaintServerSolidQt::draw(KRenderingDeviceContext* context, const RenderPath* path, KCPaintTargetType type) const
+{
+    if (!setup(context, path, type))
+        return;
 
-  renderPath(context, path, type);
-  teardown(context, path, type);
+    renderPath(context, path, type);
+    teardown(context, path, type);
 }
 
-bool KRenderingPaintServerSolidQt::setup(KRenderingDeviceContext* context,
-                                         const RenderObject* object,
-                                         KCPaintTargetType type) const {
-  KRenderingDeviceContextQt* qtContext =
-      static_cast<KRenderingDeviceContextQt*>(context);
+bool KRenderingPaintServerSolidQt::setup(KRenderingDeviceContext* context, const RenderObject* object, KCPaintTargetType type) const
+{
+    KRenderingDeviceContextQt* qtContext = static_cast<KRenderingDeviceContextQt*>(context);
 
-  RenderStyle* renderStyle = object->style();
-  // TODO? qtContext->painter().setOpacity(renderStyle->opacity());
+    RenderStyle* renderStyle = object->style();
+    // TODO? qtContext->painter().setOpacity(renderStyle->opacity());
 
-  QColor c = color();
+    QColor c = color();
 
-  if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle)) {
-    KRenderingFillPainter fillPainter =
-        KSVGPainterFactory::fillPainter(renderStyle, object);
-    c.setAlphaF(fillPainter.opacity());
+    if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle)) {
+        KRenderingFillPainter fillPainter = KSVGPainterFactory::fillPainter(renderStyle, object);
+        c.setAlphaF(fillPainter.opacity());
 
-    QBrush brush(c);
-    qtContext->painter().setBrush(brush);
-    qtContext->setFillRule(fillPainter.fillRule());
+        QBrush brush(c);
+        qtContext->painter().setBrush(brush);
+        qtContext->setFillRule(fillPainter.fillRule());
 
-    /* if(isPaintingText()) ... */
-  }
+        /* if(isPaintingText()) ... */
+    }
 
-  if ((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle)) {
-    KRenderingStrokePainter strokePainter =
-        KSVGPainterFactory::strokePainter(renderStyle, object);
-    c.setAlphaF(strokePainter.opacity());
+    if((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle)) {
+        KRenderingStrokePainter strokePainter = KSVGPainterFactory::strokePainter(renderStyle, object);
+        c.setAlphaF(strokePainter.opacity());
 
-    QPen pen(c);
-    setPenProperties(strokePainter, pen);
-    qtContext->painter().setPen(pen);
+        QPen pen(c);
+        setPenProperties(strokePainter, pen);
+        qtContext->painter().setPen(pen);
 
-    /* if(isPaintingText()) ... */
-  }
+        /* if(isPaintingText()) ... */
+    }
 
-  return true;
+    return true;
 }
 
-void KRenderingPaintServerSolidQt::teardown(KRenderingDeviceContext*,
-                                            const RenderObject*,
-                                            KCPaintTargetType) const {}
-
-void KRenderingPaintServerSolidQt::renderPath(KRenderingDeviceContext* context,
-                                              const RenderPath* path,
-                                              KCPaintTargetType type) const {
-  RenderStyle* renderStyle = path->style();
-  KRenderingDeviceContextQt* qtContext =
-      static_cast<KRenderingDeviceContextQt*>(context);
-
-  if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle))
-    qtContext->fillPath();
-
-  if ((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle))
-    qtContext->strokePath();
+void KRenderingPaintServerSolidQt::teardown(KRenderingDeviceContext*, const RenderObject*, KCPaintTargetType) const
+{
 }
+
+void KRenderingPaintServerSolidQt::renderPath(KRenderingDeviceContext* context, const RenderPath* path, KCPaintTargetType type) const
+{
+    RenderStyle* renderStyle = path->style();
+    KRenderingDeviceContextQt* qtContext = static_cast<KRenderingDeviceContextQt*>(context);
+
+    if ((type & APPLY_TO_FILL) && KSVGPainterFactory::isFilled(renderStyle))
+        qtContext->fillPath();
+
+    if ((type & APPLY_TO_STROKE) && KSVGPainterFactory::isStroked(renderStyle))
+        qtContext->strokePath();
+}
+
 }
 
 // vim:ts=4:noet

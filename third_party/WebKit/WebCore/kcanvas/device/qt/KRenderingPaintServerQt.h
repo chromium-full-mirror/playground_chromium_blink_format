@@ -33,13 +33,15 @@ class KRenderingStrokePainter;
 
 // This class is designed as an extension to
 // KRenderingPaintServer, it won't inherit from it.
-class KRenderingPaintServerQt {
- public:
-  KRenderingPaintServerQt();
-  ~KRenderingPaintServerQt();
+class KRenderingPaintServerQt
+{
+public:
+    KRenderingPaintServerQt();
+    ~KRenderingPaintServerQt();
 
-  void setPenProperties(const KRenderingStrokePainter&, QPen&) const;
+    void setPenProperties(const KRenderingStrokePainter&, QPen&) const;
 };
+
 }
 
 #endif
