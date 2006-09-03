@@ -54,6 +54,7 @@ class ArrayInstance : public JSObject {
   static const ClassInfo info;
 
   unsigned getLength() const { return length; }
+  JSValue* getItem(unsigned) const;
 
   void sort(ExecState* exec);
   void sort(ExecState* exec, JSObject* compareFunction);
