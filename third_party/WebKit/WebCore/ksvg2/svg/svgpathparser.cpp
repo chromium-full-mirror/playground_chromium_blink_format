@@ -49,15 +49,13 @@ const char* parseCoord(const char* ptr, double& number) {
   while (*ptr != '\0' && *ptr >= '0' && *ptr <= '9')
     integer = (integer * 10) + *(ptr++) - '0';
 
-  if (*ptr == '.')  // read the decimals
-  {
+  if (*ptr == '.') {  // read the decimals
     ptr++;
     while (*ptr != '\0' && *ptr >= '0' && *ptr <= '9')
       decimal += (*(ptr++) - '0') * (frac *= 0.1);
   }
 
-  if (*ptr == 'e' || *ptr == 'E')  // read the exponent part
-  {
+  if (*ptr == 'e' || *ptr == 'E') {  // read the exponent part
     ptr++;
 
     // read the sign of the exponent
@@ -139,7 +137,6 @@ void SVGPathParser::parseSVG(const DeprecatedString& s, bool process) {
 
       relative = false;
 
-      // std::cout << "Command : " << command << std::endl;
       switch (command) {
         case 'm':
           relative = true;
@@ -500,38 +497,36 @@ void SVGPathParser::calculateArc(bool relative,
   n_segs = (int)(int)ceil(fabs(th_arc / (M_PI * 0.5 + 0.001)));
 
   for (i = 0; i < n_segs; i++) {
-    {
-      double sin_th, cos_th;
-      double a00, a01, a10, a11;
-      double x1, y1, x2, y2, x3, y3;
-      double t;
-      double th_half;
+    double sin_th, cos_th;
+    double a00, a01, a10, a11;
+    double x1, y1, x2, y2, x3, y3;
+    double t;
+    double th_half;
 
-      double _th0 = th0 + i * th_arc / n_segs;
-      double _th1 = th0 + (i + 1) * th_arc / n_segs;
+    double _th0 = th0 + i * th_arc / n_segs;
+    double _th1 = th0 + (i + 1) * th_arc / n_segs;
 
-      sin_th = sin(angle * (M_PI / 180.0));
-      cos_th = cos(angle * (M_PI / 180.0));
+    sin_th = sin(angle * (M_PI / 180.0));
+    cos_th = cos(angle * (M_PI / 180.0));
 
-      /* inverse transform compared with rsvg_path_arc */
-      a00 = cos_th * r1;
-      a01 = -sin_th * r2;
-      a10 = sin_th * r1;
-      a11 = cos_th * r2;
+    /* inverse transform compared with rsvg_path_arc */
+    a00 = cos_th * r1;
+    a01 = -sin_th * r2;
+    a10 = sin_th * r1;
+    a11 = cos_th * r2;
 
-      th_half = 0.5 * (_th1 - _th0);
-      t = (8.0 / 3.0) * sin(th_half * 0.5) * sin(th_half * 0.5) / sin(th_half);
-      x1 = xc + cos(_th0) - t * sin(_th0);
-      y1 = yc + sin(_th0) + t * cos(_th0);
-      x3 = xc + cos(_th1);
-      y3 = yc + sin(_th1);
-      x2 = x3 + t * sin(_th1);
-      y2 = y3 - t * cos(_th1);
+    th_half = 0.5 * (_th1 - _th0);
+    t = (8.0 / 3.0) * sin(th_half * 0.5) * sin(th_half * 0.5) / sin(th_half);
+    x1 = xc + cos(_th0) - t * sin(_th0);
+    y1 = yc + sin(_th0) + t * cos(_th0);
+    x3 = xc + cos(_th1);
+    y3 = yc + sin(_th1);
+    x2 = x3 + t * sin(_th1);
+    y2 = y3 - t * cos(_th1);
 
-      svgCurveToCubic(a00 * x1 + a01 * y1, a10 * x1 + a11 * y1,
-                      a00 * x2 + a01 * y2, a10 * x2 + a11 * y2,
-                      a00 * x3 + a01 * y3, a10 * x3 + a11 * y3);
-    }
+    svgCurveToCubic(a00 * x1 + a01 * y1, a10 * x1 + a11 * y1,
+                    a00 * x2 + a01 * y2, a10 * x2 + a11 * y2,
+                    a00 * x3 + a01 * y3, a10 * x3 + a11 * y3);
   }
 
   if (!relative)
