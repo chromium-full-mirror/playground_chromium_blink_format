@@ -53,7 +53,7 @@ class StyleBase : public Shared<StyleBase> {
   virtual bool isRuleList() { return false; }
   virtual bool isRule() { return false; }
   virtual bool isStyleRule() { return false; }
-  virtual bool isCharetRule() { return false; }
+  virtual bool isCharsetRule() { return false; }
   virtual bool isImportRule() { return false; }
   virtual bool isMediaRule() { return false; }
   virtual bool isFontFaceRule() { return false; }
