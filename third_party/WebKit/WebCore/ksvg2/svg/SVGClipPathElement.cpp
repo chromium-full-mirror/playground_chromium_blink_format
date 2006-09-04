@@ -30,6 +30,7 @@
 #include "SVGAnimatedEnumeration.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
+#include "SVGMatrix.h"
 #include "SVGRenderStyle.h"
 #include "cssstyleselector.h"
 #include "ksvg.h"
@@ -97,6 +98,10 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
       RenderStyle* pathStyle =
           document()->styleSelector()->styleForElement(styled, clipPathStyle);
       Path pathData = styled->toPathData();
+      if (e->isStyledTransformable())
+        pathData.transform(static_cast<SVGStyledTransformableElement*>(e)
+                               ->localMatrix()
+                               ->matrix());
       if (!pathData.isEmpty())
         m_clipper->addClipData(pathData, pathStyle->svgStyle()->clipRule(),
                                bbox);
