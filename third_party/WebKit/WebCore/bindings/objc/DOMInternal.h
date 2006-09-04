@@ -37,11 +37,14 @@
 #import "DOMDocumentType.h"
 #import "DOMElement.h"
 #import "DOMEntityReference.h"
+#import "DOMMediaList.h"
 #import "DOMNamedNodeMap.h"
 #import "DOMNode.h"
 #import "DOMNodeList.h"
 #import "DOMObject.h"
 #import "DOMProcessingInstruction.h"
+#import "DOMStyleSheet.h"
+#import "DOMStyleSheetList.h"
 #import "DOMText.h"
 
 namespace WebCore {
@@ -54,6 +57,7 @@ class DocumentFragment;
 class DocumentType;
 class Element;
 class EntityReference;
+class MediaList;
 class NamedNodeMap;
 class Node;
 class NodeFilter;
@@ -61,6 +65,7 @@ class NodeIterator;
 class NodeList;
 class ProcessingInstruction;
 class Range;
+class StyleSheet;
 class StyleSheetList;
 class Text;
 class TreeWalker;
@@ -153,8 +158,16 @@ typedef int ExceptionCode;
                            filter:(id<DOMNodeFilter>)filter;
 @end
 
+@interface DOMStyleSheet (WebCoreInternal)
++ (DOMStyleSheet*)_styleSheetWith:(WebCore::StyleSheet*)impl;
+@end
+
 @interface DOMStyleSheetList (WebCoreInternal)
 + (DOMStyleSheetList*)_styleSheetListWith:(WebCore::StyleSheetList*)impl;
+@end
+
+@interface DOMMediaList (WebCoreInternal)
++ (DOMMediaList*)_mediaListWith:(WebCore::MediaList*)impl;
 @end
 
 @interface DOMNodeFilter : DOMObject<DOMNodeFilter>
