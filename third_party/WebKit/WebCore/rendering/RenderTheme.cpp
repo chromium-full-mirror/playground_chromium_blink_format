@@ -251,7 +251,8 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
 bool RenderTheme::supportsFocusRing(const RenderStyle* style) const {
   return (style->hasAppearance() &&
           style->appearance() != TextFieldAppearance &&
-          style->appearance() != TextAreaAppearance);
+          style->appearance() != TextAreaAppearance &&
+          style->appearance() != MenulistButtonAppearance);
 }
 
 bool RenderTheme::stateChanged(RenderObject* o, ControlState state) const {
