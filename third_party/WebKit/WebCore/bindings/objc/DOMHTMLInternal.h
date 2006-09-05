@@ -47,6 +47,7 @@ class HTMLFormElement;
 class HTMLImageElement;
 class HTMLInputElement;
 class HTMLObjectElement;
+class HTMLOptionElement;
 class HTMLOptionsCollection;
 class HTMLTableCaptionElement;
 class HTMLTableCellElement;
@@ -105,6 +106,10 @@ class HTMLTableSectionElement;
 
 @interface DOMHTMLObjectElement (WebCoreInternal)
 - (WebCore::HTMLObjectElement*)_HTMLObjectElement;
+@end
+
+@interface DOMHTMLOptionElement (WebCoreInternal)
+- (WebCore::HTMLOptionElement*)_optionElement;
 @end
 
 @interface DOMHTMLInputElement (WebCoreInternal)
