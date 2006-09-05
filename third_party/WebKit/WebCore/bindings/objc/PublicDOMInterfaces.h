@@ -28,7 +28,9 @@
 // Anything not in the file will be generated into the appropriate private
 // header file.
 
+#ifndef OBJC_CODE_GENERATION
 #error Do not include this header, instead include the appropriate DOM header.
+#endif
 
 @interface DOMAttr : DOMNode
 @property(readonly) NSString* name;
@@ -116,6 +118,7 @@
 //- (DOMCSSStyleDeclaration *)getOverrideStyle:(DOMElement *)element
 //pseudoElement:(NSString *)pseudoElement;
 - (DOMNode*)adoptNode:(DOMNode*)source;
+#ifdef XPATH_SUPPORT
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
 //- (DOMXPathExpression *)createExpression:(NSString *)expression resolver:(id
@@ -129,6 +132,7 @@
 //- (DOMXPathResult *)evaluate:(NSString *)expression contextNode:(DOMNode
 //*)contextNode resolver:(id <DOMXPathNSResolver>)resolver type:(unsigned
 //short)type inResult:(DOMXPathResult *)inResult;
+#endif
 @end
 
 @interface DOMDocumentFragment : DOMNode
