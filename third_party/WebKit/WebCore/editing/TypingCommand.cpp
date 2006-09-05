@@ -106,7 +106,7 @@ void TypingCommand::insertText(Document* document,
   ASSERT(frame);
 
   String newText = text;
-  Node* startNode = frame->selection().start().node();
+  Node* startNode = frame->selectionController()->start().node();
 
   if (startNode && startNode->rootEditableElement()) {
     // Send khtmlBeforeTextInsertedEvent.  The event handler will update text if
@@ -324,11 +324,10 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
-      SelectionController sc =
-          SelectionController(endingSelection().start(),
-                              endingSelection().end(), SEL_DEFAULT_AFFINITY);
-      sc.modify(SelectionController::EXTEND, SelectionController::BACKWARD,
-                granularity);
+      SelectionController selectionController;
+      selectionController.setSelection(endingSelection());
+      selectionController.modify(SelectionController::EXTEND,
+                                 SelectionController::BACKWARD, granularity);
 
       // When the caret is at the start of the editable area in an empty list
       // item, break out of the list item.
@@ -354,7 +353,7 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
         return;
       }
 
-      selectionToDelete = sc.selection();
+      selectionToDelete = selectionController.selection();
 
       // setStartingSelection so that undo selects what was deleted
       if (selectionToDelete.isCaretOrRange() &&
@@ -368,8 +367,7 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
   }
 
   if (selectionToDelete.isCaretOrRange() &&
-      document()->frame()->shouldDeleteSelection(
-          SelectionController(selectionToDelete))) {
+      document()->frame()->shouldDeleteSelection(selectionToDelete)) {
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
@@ -387,11 +385,10 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
-      SelectionController sc =
-          SelectionController(endingSelection().start(),
-                              endingSelection().end(), SEL_DEFAULT_AFFINITY);
-      sc.modify(SelectionController::EXTEND, SelectionController::FORWARD,
-                granularity);
+      SelectionController selectionController;
+      selectionController.setSelection(endingSelection());
+      selectionController.modify(SelectionController::EXTEND,
+                                 SelectionController::FORWARD, granularity);
       Position downstreamEnd = endingSelection().end().downstream();
       VisiblePosition visibleEnd = endingSelection().visibleEnd();
       if (visibleEnd == endOfParagraph(visibleEnd))
@@ -407,7 +404,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
         typingAddedToOpenCommand();
         return;
       }
-      selectionToDelete = sc.selection();
+      selectionToDelete = selectionController.selection();
 
       // setStartingSelection so that undo selects what was deleted
       if (selectionToDelete.isCaretOrRange() &&
@@ -421,8 +418,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
   }
 
   if (selectionToDelete.isCaretOrRange() &&
-      document()->frame()->shouldDeleteSelection(
-          SelectionController(selectionToDelete))) {
+      document()->frame()->shouldDeleteSelection(selectionToDelete)) {
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();

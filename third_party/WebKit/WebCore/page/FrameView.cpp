@@ -218,8 +218,7 @@ void FrameView::init() {
 void FrameView::clear() {
   setStaticBackground(false);
 
-  // FIXME: 6498 Should just be able to call m_frame->selection().clear()
-  m_frame->setSelection(SelectionController());
+  m_frame->selectionController()->clear();
 
   d->reset();
 

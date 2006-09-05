@@ -207,7 +207,7 @@ class FrameMac : public Frame {
   NSWritingDirection baseWritingDirectionForSelectionStart() const;
 
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&);
-  virtual void markMisspellings(const SelectionController&);
+  virtual void markMisspellings(const Selection&);
 
   NSFileWrapper* fileWrapperForElement(Element*);
   NSAttributedString* attributedString(Node* startNode,
@@ -278,16 +278,15 @@ class FrameMac : public Frame {
   virtual void issuePasteCommand();
   virtual void issuePasteAndMatchStyleCommand();
   virtual void issueTransposeCommand();
-  virtual void respondToChangedSelection(
-      const SelectionController& oldSelection,
-      bool closeTyping);
-  virtual void respondToChangedContents(const SelectionController&);
+  virtual void respondToChangedSelection(const Selection& oldSelection,
+                                         bool closeTyping);
+  virtual void respondToChangedContents(const Selection&);
   virtual bool isContentEditable() const;
-  virtual bool shouldChangeSelection(const SelectionController& oldSelection,
-                                     const SelectionController& newSelection,
+  virtual bool shouldChangeSelection(const Selection& oldSelection,
+                                     const Selection& newSelection,
                                      EAffinity affinity,
                                      bool stillSelecting) const;
-  virtual bool shouldDeleteSelection(const SelectionController&) const;
+  virtual bool shouldDeleteSelection(const Selection&) const;
   virtual bool shouldBeginEditing(const Range*) const;
   virtual bool shouldEndEditing(const Range*) const;
   virtual void didBeginEditing() const;

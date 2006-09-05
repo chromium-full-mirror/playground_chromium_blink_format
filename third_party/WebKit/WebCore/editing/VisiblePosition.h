@@ -81,6 +81,8 @@ class VisiblePosition {
                : 0;
   }
 
+  IntRect caretRect() const;
+
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
   void showTreeForThis() const;
