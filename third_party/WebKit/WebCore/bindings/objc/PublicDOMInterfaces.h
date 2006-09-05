@@ -250,6 +250,7 @@
 @property int tabIndex;
 @property NSString* target;
 @property NSString* type;
+@property(readonly) NSURL* absoluteLinkURL;
 - (void)blur;
 - (void)focus;
 @end
@@ -263,6 +264,7 @@
 @property NSString* shape;
 @property int tabIndex;
 @property NSString* target;
+@property(readonly) NSURL* absoluteLinkURL;
 @end
 
 @interface DOMHTMLBRElement : DOMHTMLElement
@@ -419,6 +421,8 @@
 @property NSString* useMap;
 @property int vspace;
 @property int width;
+@property(readonly) NSString* altDisplayString;
+@property(readonly) NSURL* absoluteImageURL;
 @end
 
 @interface DOMHTMLInputElement : DOMHTMLElement
@@ -440,6 +444,7 @@
 @property NSString* type;
 @property NSString* useMap;
 @property NSString* value;
+@property(readonly) NSString* altDisplayString;
 - (void)blur;
 - (void)focus;
 - (void)select;
@@ -478,6 +483,7 @@
 @property NSString* rev;
 @property NSString* target;
 @property NSString* type;
+@property(readonly) NSURL* absoluteLinkURL;
 @end
 
 @interface DOMHTMLMapElement : DOMHTMLElement
