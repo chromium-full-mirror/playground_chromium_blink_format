@@ -30,8 +30,7 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGAnimatedLength;
-class SVGAnimatedEnumeration;
+class SVGLength;
 
 class SVGTextContentElement : public SVGStyledElement,
                               public SVGTests,
@@ -44,9 +43,6 @@ class SVGTextContentElement : public SVGStyledElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGTextContentElement' functions
-  SVGAnimatedLength* textLength() const;
-  SVGAnimatedEnumeration* lengthAdjust() const;
-
   long getNumberOfChars() const;
   float getComputedTextLength() const;
   float getSubStringLength(unsigned long charnum, unsigned long nchars) const;
@@ -60,8 +56,11 @@ class SVGTextContentElement : public SVGStyledElement,
   virtual void parseMappedAttribute(MappedAttribute*);
 
  private:
-  mutable RefPtr<SVGAnimatedLength> m_textLength;
-  mutable RefPtr<SVGAnimatedEnumeration> m_lengthAdjust;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 TextLength,
+                                 textLength)
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, LengthAdjust, lengthAdjust)
 };
 
 }  // namespace WebCore

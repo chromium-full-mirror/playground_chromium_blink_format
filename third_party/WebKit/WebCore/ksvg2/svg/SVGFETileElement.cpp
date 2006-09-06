@@ -32,7 +32,6 @@
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
 #include "SVGFETileElement.h"
-#include "SVGAnimatedString.h"
 
 using namespace WebCore;
 
@@ -45,15 +44,19 @@ SVGFETileElement::~SVGFETileElement() {
   delete m_filterEffect;
 }
 
-SVGAnimatedString* SVGFETileElement::in1() const {
-  SVGStyledElement* dummy = 0;
-  return lazy_create<SVGAnimatedString>(m_in1, dummy);
-}
+ANIMATED_PROPERTY_DEFINITIONS(SVGFETileElement,
+                              String,
+                              String,
+                              string,
+                              In,
+                              in,
+                              SVGNames::inAttr.localName(),
+                              m_in)
 
 void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    in1()->setBaseVal(value.impl());
+    setInBaseValue(value.impl());
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -64,7 +67,7 @@ KCanvasFETile* SVGFETileElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_TILE));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(String(in1()->baseVal()).deprecatedString());
+  m_filterEffect->setIn(String(inBaseValue()).deprecatedString());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
 }

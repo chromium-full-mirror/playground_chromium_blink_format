@@ -46,6 +46,9 @@ class SVGGElement : public SVGStyledTransformableElement,
     return StyledElement::rendererIsNeeded(style);
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
 };
 
 class SVGDummyElement : public SVGGElement {

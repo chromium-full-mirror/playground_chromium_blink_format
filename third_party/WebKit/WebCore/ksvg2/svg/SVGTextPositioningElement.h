@@ -27,8 +27,8 @@
 #include "SVGTextContentElement.h"
 
 namespace WebCore {
-class SVGAnimatedLengthList;
-class SVGAnimatedNumberList;
+class SVGLengthList;
+class SVGNumberList;
 
 class SVGTextPositioningElement : public SVGTextContentElement {
  public:
@@ -36,20 +36,17 @@ class SVGTextPositioningElement : public SVGTextContentElement {
   virtual ~SVGTextPositioningElement();
 
   // 'SVGTextPositioningElement' functions
-  SVGAnimatedLengthList* x() const;
-  SVGAnimatedLengthList* y() const;
-  SVGAnimatedLengthList* dx() const;
-  SVGAnimatedLengthList* dy() const;
-  SVGAnimatedNumberList* rotate() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
  private:
-  mutable RefPtr<SVGAnimatedLengthList> m_x;
-  mutable RefPtr<SVGAnimatedLengthList> m_y;
-  mutable RefPtr<SVGAnimatedLengthList> m_dx;
-  mutable RefPtr<SVGAnimatedLengthList> m_dy;
-  mutable RefPtr<SVGAnimatedNumberList> m_rotate;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLengthList*, RefPtr<SVGLengthList>, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLengthList*, RefPtr<SVGLengthList>, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLengthList*, RefPtr<SVGLengthList>, Dx, dx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLengthList*, RefPtr<SVGLengthList>, Dy, dy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGNumberList*,
+                                 RefPtr<SVGNumberList>,
+                                 Rotate,
+                                 rotate)
 };
 
 }  // namespace WebCore

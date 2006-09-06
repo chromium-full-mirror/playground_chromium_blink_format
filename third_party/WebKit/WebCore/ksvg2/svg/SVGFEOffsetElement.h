@@ -28,8 +28,6 @@
 #include "KCanvasFilters.h"
 
 namespace WebCore {
-class SVGAnimatedString;
-class SVGAnimatedNumber;
 
 class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -37,19 +35,18 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEOffsetElement();
 
   // 'SVGFEOffsetElement' functions
-  SVGAnimatedString* in1() const;
-  SVGAnimatedNumber* dx() const;
-  SVGAnimatedNumber* dy() const;
-
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual KCanvasFEOffset* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedString> m_in1;
-  mutable RefPtr<SVGAnimatedNumber> m_dx;
-  mutable RefPtr<SVGAnimatedNumber> m_dy;
+  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, Dx, dx)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, Dy, dy)
   mutable KCanvasFEOffset* m_filterEffect;
 };
 

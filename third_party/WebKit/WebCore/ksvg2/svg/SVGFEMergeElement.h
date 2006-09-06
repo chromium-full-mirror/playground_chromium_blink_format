@@ -35,6 +35,9 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
 
   virtual KCanvasFEMerge* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   mutable KCanvasFEMerge* m_filterEffect;
 };

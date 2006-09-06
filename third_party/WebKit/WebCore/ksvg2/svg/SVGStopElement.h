@@ -27,7 +27,6 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
-class SVGAnimatedNumber;
 class SVGStopElement : public SVGStyledElement {
  public:
   SVGStopElement(const QualifiedName&, Document*);
@@ -36,12 +35,10 @@ class SVGStopElement : public SVGStyledElement {
   virtual bool isGradientStop() const { return true; }
 
   // 'SVGStoplement' functions
-  SVGAnimatedNumber* offset() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
  private:
-  mutable RefPtr<SVGAnimatedNumber> m_offset;
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, Offset, offset)
 };
 
 }  // namespace WebCore

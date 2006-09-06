@@ -31,7 +31,7 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGAnimatedLength;
+class SVGLength;
 class SVGUseElement : public SVGStyledTransformableElement,
                       public SVGTests,
                       public SVGLangSpace,
@@ -49,12 +49,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void closeRenderer();
 
   // 'SVGUseElement' functions
-  SVGAnimatedLength* x() const;
-  SVGAnimatedLength* y() const;
-
-  SVGAnimatedLength* width() const;
-  SVGAnimatedLength* height() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
@@ -62,11 +56,14 @@ class SVGUseElement : public SVGStyledTransformableElement,
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedLength> m_x;
-  mutable RefPtr<SVGAnimatedLength> m_y;
-  mutable RefPtr<SVGAnimatedLength> m_width;
-  mutable RefPtr<SVGAnimatedLength> m_height;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Width, width)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Height, height)
 };
 
 }  // namespace WebCore

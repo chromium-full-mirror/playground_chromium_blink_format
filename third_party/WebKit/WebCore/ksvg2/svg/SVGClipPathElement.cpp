@@ -27,7 +27,6 @@
 #include "Attr.h"
 #include "Document.h"
 #include "RenderView.h"
-#include "SVGAnimatedEnumeration.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGMatrix.h"
@@ -43,7 +42,8 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
     : SVGStyledTransformableElement(tagName, doc),
       SVGTests(),
       SVGLangSpace(),
-      SVGExternalResourcesRequired() {
+      SVGExternalResourcesRequired(),
+      m_clipPathUnits(SVG_UNIT_TYPE_USERSPACEONUSE) {
   m_clipper = 0;
 }
 
@@ -51,22 +51,22 @@ SVGClipPathElement::~SVGClipPathElement() {
   delete m_clipper;
 }
 
-SVGAnimatedEnumeration* SVGClipPathElement::clipPathUnits() const {
-  if (!m_clipPathUnits) {
-    lazy_create<SVGAnimatedEnumeration>(m_clipPathUnits, this);
-    m_clipPathUnits->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
-  }
-
-  return m_clipPathUnits.get();
-}
+ANIMATED_PROPERTY_DEFINITIONS(SVGClipPathElement,
+                              int,
+                              Enumeration,
+                              enumeration,
+                              ClipPathUnits,
+                              clipPathUnits,
+                              SVGNames::clipPathUnitsAttr.localName(),
+                              m_clipPathUnits)
 
 void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::clipPathUnitsAttr) {
     if (value == "userSpaceOnUse")
-      clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
+      setClipPathUnitsBaseValue(SVG_UNIT_TYPE_USERSPACEONUSE);
     else if (value == "objectBoundingBox")
-      clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+      setClipPathUnitsBaseValue(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else {
     if (SVGTests::parseMappedAttribute(attr))
       return;
@@ -87,7 +87,7 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
   else
     m_clipper->resetClipData();
 
-  bool bbox = clipPathUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
+  bool bbox = clipPathUnitsBaseValue() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
   RenderStyle* clipPathStyle = styleForRenderer(
       parent()->renderer());  // FIXME: Manual style resolution is a hack

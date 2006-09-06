@@ -28,9 +28,7 @@
 #include "KCanvasFilters.h"
 
 namespace WebCore {
-class SVGAnimatedString;
-class SVGAnimatedNumberList;
-class SVGAnimatedEnumeration;
+class SVGNumberList;
 
 class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -38,19 +36,21 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEColorMatrixElement();
 
   // 'SVGFEColorMatrixElement' functions
-  SVGAnimatedString* in1() const;
-  SVGAnimatedEnumeration* type() const;
-  SVGAnimatedNumberList* values() const;
-
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual KCanvasFEColorMatrix* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedString> m_in1;
-  mutable RefPtr<SVGAnimatedEnumeration> m_type;
-  mutable RefPtr<SVGAnimatedNumberList> m_values;
+  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, Type, type)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGNumberList*,
+                                 RefPtr<SVGNumberList>,
+                                 Values,
+                                 values)
   mutable KCanvasFEColorMatrix* m_filterEffect;
 };
 

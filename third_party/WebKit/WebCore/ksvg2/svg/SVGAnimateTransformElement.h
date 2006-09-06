@@ -50,6 +50,9 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
   SVGMatrix* initialMatrix() const;
   SVGMatrix* transformMatrix() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   int m_currentItem;
   SVGTransformType m_type;

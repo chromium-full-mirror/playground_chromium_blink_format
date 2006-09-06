@@ -21,8 +21,6 @@
 #ifdef SVG_SUPPORT
 #include "SVGFEPointLightElement.h"
 
-#include "SVGAnimatedNumber.h"
-
 namespace WebCore {
 
 SVGFEPointLightElement::SVGFEPointLightElement(const QualifiedName& tagName,
@@ -32,7 +30,7 @@ SVGFEPointLightElement::SVGFEPointLightElement(const QualifiedName& tagName,
 SVGFEPointLightElement::~SVGFEPointLightElement() {}
 
 KCLightSource* SVGFEPointLightElement::lightSource() const {
-  KCanvasPoint3F pos(x()->baseVal(), y()->baseVal(), z()->baseVal());
+  KCanvasPoint3F pos(xBaseValue(), yBaseValue(), zBaseValue());
   return new KCPointLightSource(pos);
 }
 }

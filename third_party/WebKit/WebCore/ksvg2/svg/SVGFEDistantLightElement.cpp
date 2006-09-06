@@ -21,8 +21,6 @@
 #ifdef SVG_SUPPORT
 #include "SVGFEDistantLightElement.h"
 
-#include "SVGAnimatedNumber.h"
-
 namespace WebCore {
 
 SVGFEDistantLightElement::SVGFEDistantLightElement(const QualifiedName& tagName,
@@ -32,7 +30,7 @@ SVGFEDistantLightElement::SVGFEDistantLightElement(const QualifiedName& tagName,
 SVGFEDistantLightElement::~SVGFEDistantLightElement() {}
 
 KCLightSource* SVGFEDistantLightElement::lightSource() const {
-  return new KCDistantLightSource(azimuth()->baseVal(), elevation()->baseVal());
+  return new KCDistantLightSource(azimuthBaseValue(), elevationBaseValue());
 }
 }
 #endif  // SVG_SUPPORT

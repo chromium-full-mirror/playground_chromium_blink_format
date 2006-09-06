@@ -31,7 +31,6 @@
 #include "Frame.h"
 #include "MouseEvent.h"
 #include "MouseEvent.h"
-#include "SVGAnimatedString.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "csshelper.h"
@@ -49,14 +48,19 @@ SVGAElement::SVGAElement(const QualifiedName& tagName, Document* doc)
 
 SVGAElement::~SVGAElement() {}
 
-SVGAnimatedString* SVGAElement::target() const {
-  return lazy_create<SVGAnimatedString>(m_target, this);
-}
+ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
+                              String,
+                              String,
+                              string,
+                              Target,
+                              target,
+                              SVGNames::targetAttr.localName(),
+                              m_target)
 
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value(attr->value());
   if (attr->name() == SVGNames::targetAttr) {
-    target()->setBaseVal(value.impl());
+    setTargetBaseValue(value.impl());
   } else {
     if (SVGURIReference::parseMappedAttribute(attr)) {
       m_isLink = attr->value() != 0;
@@ -88,7 +92,7 @@ void SVGAElement::defaultEventHandler(Event* evt) {
       SVGStyledTransformableElement::defaultEventHandler(evt);
       return;
     }
-    url = parseURL(href()->baseVal()).deprecatedString();
+    url = parseURL(hrefBaseValue()).deprecatedString();
     utarget = getAttribute(SVGNames::targetAttr).deprecatedString();
 
     if (e && e->button() == 1)

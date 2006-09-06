@@ -32,8 +32,8 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGAnimatedPreserveAspectRatio;
-class SVGAnimatedLength;
+class SVGPreserveAspectRatio;
+class SVGLength;
 class SVGDocument;
 
 class SVGImageElement : public SVGStyledTransformableElement,
@@ -48,14 +48,6 @@ class SVGImageElement : public SVGStyledTransformableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGImageElement' functions
-  SVGAnimatedLength* x() const;
-  SVGAnimatedLength* y() const;
-
-  SVGAnimatedLength* width() const;
-  SVGAnimatedLength* height() const;
-
-  SVGAnimatedPreserveAspectRatio* preserveAspectRatio() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
   virtual void attach();
 
@@ -67,13 +59,18 @@ class SVGImageElement : public SVGStyledTransformableElement,
  protected:
   virtual bool haveLoadedRequiredResources();
 
- private:
-  mutable RefPtr<SVGAnimatedLength> m_x;
-  mutable RefPtr<SVGAnimatedLength> m_y;
-  mutable RefPtr<SVGAnimatedLength> m_width;
-  mutable RefPtr<SVGAnimatedLength> m_height;
-  mutable RefPtr<SVGAnimatedPreserveAspectRatio> m_preserveAspectRatio;
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
 
+ private:
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Width, width)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Height, height)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPreserveAspectRatio*,
+                                 RefPtr<SVGPreserveAspectRatio>,
+                                 PreserveAspectRatio,
+                                 preserveAspectRatio)
   SVGImageLoader m_imageLoader;
 };
 

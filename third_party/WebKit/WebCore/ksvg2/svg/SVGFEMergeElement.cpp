@@ -34,8 +34,6 @@
 #include "SVGRenderStyle.h"
 #include "SVGFEMergeElement.h"
 #include "SVGFEMergeNodeElement.h"
-#include "SVGAnimatedEnumeration.h"
-#include "SVGAnimatedString.h"
 
 using namespace WebCore;
 
@@ -60,8 +58,7 @@ KCanvasFEMerge* SVGFEMergeElement::filterEffect() const {
   DeprecatedStringList mergeInputs;
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feMergeNodeTag)) {
-      String mergeInput =
-          static_cast<SVGFEMergeNodeElement*>(n)->in1()->baseVal();
+      String mergeInput = static_cast<SVGFEMergeNodeElement*>(n)->inBaseValue();
       mergeInputs.append(mergeInput.deprecatedString());
     }
   }

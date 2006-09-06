@@ -44,6 +44,9 @@ class SVGViewElement : public SVGStyledElement,
   // 'SVGViewElement' functions
   SVGStringList* viewTarget() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   mutable RefPtr<SVGStringList> m_viewTarget;
 };

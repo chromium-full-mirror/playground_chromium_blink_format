@@ -28,7 +28,6 @@
 #include "KCanvasFilters.h"
 
 namespace WebCore {
-class SVGAnimatedString;
 
 class SVGFEComponentTransferElement
     : public SVGFilterPrimitiveStandardAttributes {
@@ -37,15 +36,16 @@ class SVGFEComponentTransferElement
   virtual ~SVGFEComponentTransferElement();
 
   // 'SVGFEComponentTransferElement' functions
-  SVGAnimatedString* in1() const;
-
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual KCanvasFEComponentTransfer* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedString> m_in1;
+  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
   mutable KCanvasFEComponentTransfer* m_filterEffect;
 };
 

@@ -34,20 +34,27 @@
 #include "SVGDocument.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGStyledElement.h"
-#include "SVGAnimatedTransformList.h"
+#include "SVGTransformList.h"
 
 using namespace WebCore;
 
 SVGStyledTransformableElement::SVGStyledTransformableElement(
     const QualifiedName& tagName,
     Document* doc)
-    : SVGStyledLocatableElement(tagName, doc), SVGTransformable() {}
+    : SVGStyledLocatableElement(tagName, doc),
+      SVGTransformable(),
+      m_transform(new SVGTransformList(this)) {}
 
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 
-SVGAnimatedTransformList* SVGStyledTransformableElement::transform() const {
-  return lazy_create<SVGAnimatedTransformList>(m_transform, this);
-}
+ANIMATED_PROPERTY_DEFINITIONS(SVGStyledTransformableElement,
+                              SVGTransformList*,
+                              TransformList,
+                              transformList,
+                              Transform,
+                              transform,
+                              SVGNames::transformAttr.localName(),
+                              m_transform.get())
 
 SVGMatrix* SVGStyledTransformableElement::localMatrix() const {
   return lazy_create<SVGMatrix>(m_localMatrix);
@@ -87,7 +94,7 @@ void SVGStyledTransformableElement::updateLocalTransform(
 void SVGStyledTransformableElement::parseMappedAttribute(
     MappedAttribute* attr) {
   if (attr->name() == SVGNames::transformAttr) {
-    SVGTransformList* localTransforms = transform()->baseVal();
+    SVGTransformList* localTransforms = transformBaseValue();
     localTransforms->clear();
 
     SVGTransformable::parseTransformAttribute(localTransforms, attr->value());

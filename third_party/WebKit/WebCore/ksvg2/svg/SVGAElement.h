@@ -32,8 +32,6 @@
 
 namespace WebCore {
 
-class SVGAnimatedString;
-
 class SVGAElement : public SVGStyledTransformableElement,
                     public SVGURIReference,
                     public SVGTests,
@@ -44,8 +42,6 @@ class SVGAElement : public SVGStyledTransformableElement,
   virtual ~SVGAElement();
 
   // 'SVGAElement' functions
-  SVGAnimatedString* target() const;
-
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
@@ -58,8 +54,11 @@ class SVGAElement : public SVGStyledTransformableElement,
 
   virtual void defaultEventHandler(Event* evt);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedString> m_target;
+  ANIMATED_PROPERTY_DECLARATIONS(String, String, Target, target)
 };
 
 }  // namespace WebCore

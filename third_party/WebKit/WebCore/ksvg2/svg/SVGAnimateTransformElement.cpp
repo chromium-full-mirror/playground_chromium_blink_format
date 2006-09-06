@@ -31,7 +31,7 @@
 #include "SVGTransform.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTransformList.h"
-#include "SVGAnimatedTransformList.h"
+#include "SVGTransformList.h"
 #include "SVGAnimateTransformElement.h"
 #include "KSVGTimeScheduler.h"
 #include "Document.h"
@@ -82,8 +82,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
     if (targetElement()->isStyledTransformable()) {
       SVGStyledTransformableElement* transform =
           static_cast<SVGStyledTransformableElement*>(targetElement());
-      RefPtr<SVGTransformList> transformList =
-          transform->transform()->baseVal();
+      RefPtr<SVGTransformList> transformList = transform->transformBaseValue();
       if (transformList) {
         for (unsigned long i = 0; i < transformList->numberOfItems(); i++) {
           SVGTransform* value = transformList->getItem(i);
@@ -449,7 +448,7 @@ SVGMatrix* SVGAnimateTransformElement::initialMatrix() const {
   SVGStyledTransformableElement* transform =
       static_cast<SVGStyledTransformableElement*>(targetElement());
   SVGTransformList* transformList =
-      (transform ? transform->transform()->baseVal() : 0);
+      (transform ? transform->transformBaseValue() : 0);
   if (!transformList)
     return 0;
 

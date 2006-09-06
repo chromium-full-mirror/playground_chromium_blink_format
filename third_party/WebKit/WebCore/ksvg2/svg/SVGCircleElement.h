@@ -30,7 +30,7 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGAnimatedLength;
+class SVGLength;
 class SVGCircleElement : public SVGStyledTransformableElement,
                          public SVGTests,
                          public SVGLangSpace,
@@ -42,10 +42,6 @@ class SVGCircleElement : public SVGStyledTransformableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGCircleElement' functions
-  SVGAnimatedLength* cx() const;
-  SVGAnimatedLength* cy() const;
-  SVGAnimatedLength* r() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
@@ -56,10 +52,13 @@ class SVGCircleElement : public SVGStyledTransformableElement,
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedLength> m_cx;
-  mutable RefPtr<SVGAnimatedLength> m_cy;
-  mutable RefPtr<SVGAnimatedLength> m_r;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Cx, cx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Cy, cy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, R, r)
 };
 
 }  // namespace WebCore

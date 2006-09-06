@@ -30,7 +30,7 @@
 #include "SVGExternalResourcesRequired.h"
 
 namespace WebCore {
-class SVGAnimatedLength;
+class SVGLength;
 class SVGRectElement : public SVGStyledTransformableElement,
                        public SVGTests,
                        public SVGLangSpace,
@@ -42,15 +42,6 @@ class SVGRectElement : public SVGStyledTransformableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGRectElement' functions
-  SVGAnimatedLength* x() const;
-  SVGAnimatedLength* y() const;
-
-  SVGAnimatedLength* width() const;
-  SVGAnimatedLength* height() const;
-
-  SVGAnimatedLength* rx() const;
-  SVGAnimatedLength* ry() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
@@ -61,13 +52,16 @@ class SVGRectElement : public SVGStyledTransformableElement,
   virtual const SVGStyledElement* pushAttributeContext(
       const SVGStyledElement* context);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedLength> m_x;
-  mutable RefPtr<SVGAnimatedLength> m_y;
-  mutable RefPtr<SVGAnimatedLength> m_width;
-  mutable RefPtr<SVGAnimatedLength> m_height;
-  mutable RefPtr<SVGAnimatedLength> m_rx;
-  mutable RefPtr<SVGAnimatedLength> m_ry;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Y, y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Width, width)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Height, height)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Rx, rx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Ry, ry)
 };
 
 }  // namespace WebCore

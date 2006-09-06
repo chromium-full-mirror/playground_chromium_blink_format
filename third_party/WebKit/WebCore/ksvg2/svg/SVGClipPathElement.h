@@ -32,7 +32,6 @@
 #include "KCanvasResources.h"
 
 namespace WebCore {
-class SVGAnimatedEnumeration;
 class SVGClipPathElement : public SVGStyledTransformableElement,
                            public SVGTests,
                            public SVGLangSpace,
@@ -46,12 +45,13 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
   virtual KCanvasClipper* canvasResource();
 
   // 'SVGClipPathElement' functions
-  SVGAnimatedEnumeration* clipPathUnits() const;
-
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedEnumeration> m_clipPathUnits;
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, ClipPathUnits, clipPathUnits)
   KCanvasClipper* m_clipper;
 };
 

@@ -33,7 +33,7 @@ class AffineTransform;
 class Attribute;
 class Node;
 class StringImpl;
-class SVGAnimatedTransformList;
+class SVGTransformList;
 class SVGMatrix;
 class SVGTransformList;
 
@@ -46,7 +46,6 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   virtual bool isStyledTransformable() const { return true; }
 
   // 'SVGTransformable' functions
-  virtual SVGAnimatedTransformList* transform() const;
   virtual SVGMatrix* localMatrix() const;
 
   // Derived from: 'SVGLocatable'
@@ -66,7 +65,10 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
  protected:
   mutable RefPtr<SVGMatrix> m_localMatrix;
-  mutable RefPtr<SVGAnimatedTransformList> m_transform;
+  ANIMATED_PROPERTY_DECLARATIONS(SVGTransformList*,
+                                 RefPtr<SVGTransformList>,
+                                 Transform,
+                                 transform)
 };
 
 }  // namespace WebCore

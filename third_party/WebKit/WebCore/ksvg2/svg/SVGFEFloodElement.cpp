@@ -27,7 +27,6 @@
 #include "Attr.h"
 #include "DeprecatedStringList.h"
 #include "RenderView.h"
-#include "SVGAnimatedString.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
@@ -46,15 +45,19 @@ SVGFEFloodElement::~SVGFEFloodElement() {
   delete m_filterEffect;
 }
 
-SVGAnimatedString* SVGFEFloodElement::in1() const {
-  SVGStyledElement* dummy = 0;
-  return lazy_create<SVGAnimatedString>(m_in1, dummy);
-}
+ANIMATED_PROPERTY_DEFINITIONS(SVGFEFloodElement,
+                              String,
+                              String,
+                              string,
+                              In,
+                              in,
+                              SVGNames::inAttr.localName(),
+                              m_in)
 
 void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    in1()->setBaseVal(value.impl());
+    setInBaseValue(value.impl());
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -65,7 +68,7 @@ KCanvasFEFlood* SVGFEFloodElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_FLOOD));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(String(in1()->baseVal()).deprecatedString());
+  m_filterEffect->setIn(String(inBaseValue()).deprecatedString());
   setStandardAttributes(m_filterEffect);
   RenderStyle* filterStyle =
       const_cast<SVGFEFloodElement*>(this)->styleForRenderer(

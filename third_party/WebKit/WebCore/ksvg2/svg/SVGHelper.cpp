@@ -27,8 +27,8 @@
 #include "Document.h"
 #include "FrameView.h"
 #include "RenderView.h"
-#include "SVGAnimatedLength.h"
-#include "SVGAnimatedRect.h"
+#include "SVGLength.h"
+#include "SVGRect.h"
 #include "SVGSVGElement.h"
 #include "SVGStringList.h"
 #include "ksvg.h"
@@ -49,11 +49,11 @@ float SVGHelper::PercentageOfViewport(float value,
     const SVGSVGElement* svg =
         static_cast<const SVGSVGElement*>(viewportElement);
     if (svg->hasAttribute(SVGNames::viewBoxAttr)) {
-      width = svg->viewBox()->baseVal()->width();
-      height = svg->viewBox()->baseVal()->height();
-    } else if (svg->width()->baseVal()->unitType() ==
+      width = svg->viewBoxBaseValue()->width();
+      height = svg->viewBoxBaseValue()->height();
+    } else if (svg->widthBaseValue()->unitType() ==
                    SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
-               svg->height()->baseVal()->unitType() ==
+               svg->heightBaseValue()->unitType() ==
                    SVGLength::SVG_LENGTHTYPE_PERCENTAGE) {
       // TODO: Shouldn't w/h be multiplied with the percentage values?!
       // AFAIK, this assumes width & height == 100%, Rob??
@@ -67,8 +67,8 @@ float SVGHelper::PercentageOfViewport(float value,
         }
       }
     } else {
-      width = svg->width()->baseVal()->value();
-      height = svg->height()->baseVal()->value();
+      width = svg->widthBaseValue()->value();
+      height = svg->heightBaseValue()->value();
     }
   }
 

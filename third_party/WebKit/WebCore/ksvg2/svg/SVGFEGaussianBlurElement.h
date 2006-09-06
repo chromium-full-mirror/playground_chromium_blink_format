@@ -28,8 +28,6 @@
 #include "KCanvasFilters.h"
 
 namespace WebCore {
-class SVGAnimatedString;
-class SVGAnimatedNumber;
 
 class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -37,10 +35,6 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFEGaussianBlurElement();
 
   // 'SVGFEGaussianBlurElement' functions
-  SVGAnimatedString* in1() const;
-  SVGAnimatedNumber* stdDeviationX() const;
-  SVGAnimatedNumber* stdDeviationY() const;
-
   void setStdDeviation(float stdDeviationX, float stdDeviationY);
 
   // Derived from: 'Element'
@@ -48,10 +42,13 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
 
   virtual KCanvasFEGaussianBlur* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedString> m_in1;
-  mutable RefPtr<SVGAnimatedNumber> m_stdDeviationX;
-  mutable RefPtr<SVGAnimatedNumber> m_stdDeviationY;
+  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, StdDeviationX, stdDeviationX)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, StdDeviationY, stdDeviationY)
   mutable KCanvasFEGaussianBlur* m_filterEffect;
 };
 

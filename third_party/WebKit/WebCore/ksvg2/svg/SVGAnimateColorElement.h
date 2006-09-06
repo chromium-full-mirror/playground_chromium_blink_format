@@ -42,6 +42,9 @@ class SVGAnimateColorElement : public SVGAnimationElement {
   Color color() const;
   Color initialColor() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   Color m_lastColor;
   Color m_currentColor;

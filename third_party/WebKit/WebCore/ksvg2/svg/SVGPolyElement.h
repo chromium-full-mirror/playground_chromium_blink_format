@@ -56,6 +56,9 @@ class SVGPolyElement : public SVGStyledTransformableElement,
 
   virtual void notifyAttributeChange() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   mutable RefPtr<SVGPointList> m_points;
 

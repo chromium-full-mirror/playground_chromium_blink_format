@@ -35,6 +35,9 @@ class SVGAnimateElement : public SVGAnimationElement {
 
   virtual void handleTimerEvent(double timePercentage);
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
   int m_currentItem;
 

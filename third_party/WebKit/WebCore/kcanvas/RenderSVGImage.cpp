@@ -28,8 +28,8 @@
 #include "GraphicsContext.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
-#include "SVGAnimatedLength.h"
-#include "SVGAnimatedPreserveAspectRatio.h"
+#include "SVGLength.h"
+#include "SVGPreserveAspectRatio.h"
 #include "SVGImageElement.h"
 #include "SVGImageElement.h"
 #include "ksvg.h"
@@ -173,14 +173,14 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   SVGImageElement* imageElt = static_cast<SVGImageElement*>(node());
 
-  if (imageElt->preserveAspectRatio()->baseVal()->align() ==
+  if (imageElt->preserveAspectRatioBaseValue()->align() ==
       SVG_PRESERVEASPECTRATIO_NONE)
     RenderImage::paint(pi, 0, 0);
   else {
     FloatRect destRect(m_x, m_y, contentWidth(), contentHeight());
     FloatRect srcRect(0, 0, image()->width(), image()->height());
     adjustRectsForAspectRatio(destRect, srcRect,
-                              imageElt->preserveAspectRatio()->baseVal());
+                              imageElt->preserveAspectRatioBaseValue());
     c->drawImage(image(), destRect, srcRect);
   }
 
@@ -249,9 +249,8 @@ void RenderSVGImage::layout() {
 
 FloatRect RenderSVGImage::relativeBBox(bool includeStroke) const {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
-  float xOffset = image->x()->baseVal() ? image->x()->baseVal()->value() : 0;
-  float yOffset = image->y()->baseVal() ? image->y()->baseVal()->value() : 0;
-  return FloatRect(xOffset, yOffset, width(), height());
+  return FloatRect(image->xBaseValue()->value(), image->yBaseValue()->value(),
+                   width(), height());
 }
 
 void RenderSVGImage::imageChanged(CachedImage* image) {
@@ -263,10 +262,9 @@ void RenderSVGImage::imageChanged(CachedImage* image) {
 
 IntRect RenderSVGImage::getAbsoluteRepaintRect() {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
-  float xOffset = image->x()->baseVal() ? image->x()->baseVal()->value() : 0;
-  float yOffset = image->y()->baseVal() ? image->y()->baseVal()->value() : 0;
   FloatRect repaintRect = absoluteTransform().mapRect(
-      FloatRect(xOffset, yOffset, width(), height()));
+      FloatRect(image->xBaseValue()->value(), image->yBaseValue()->value(),
+                width(), height()));
 
   // Filters can expand the bounding box
   KCanvasFilter* filter =
@@ -285,9 +283,8 @@ void RenderSVGImage::absoluteRects(DeprecatedValueList<IntRect>& rects,
 
 AffineTransform RenderSVGImage::translationForAttributes() {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
-  float xOffset = image->x()->baseVal() ? image->x()->baseVal()->value() : 0;
-  float yOffset = image->y()->baseVal() ? image->y()->baseVal()->value() : 0;
-  return AffineTransform().translate(xOffset, yOffset);
+  return AffineTransform().translate(image->xBaseValue()->value(),
+                                     image->yBaseValue()->value());
 }
 
 void RenderSVGImage::translateForAttributes() {

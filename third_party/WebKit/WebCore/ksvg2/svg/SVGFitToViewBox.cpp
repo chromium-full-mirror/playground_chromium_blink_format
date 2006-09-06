@@ -24,8 +24,8 @@
 #ifdef SVG_SUPPORT
 
 #include "Attr.h"
-#include "SVGAnimatedPreserveAspectRatio.h"
-#include "SVGAnimatedRect.h"
+#include "SVGPreserveAspectRatio.h"
+#include "SVGRect.h"
 #include "SVGFitToViewBox.h"
 #include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
@@ -36,30 +36,29 @@
 
 namespace WebCore {
 
-SVGFitToViewBox::SVGFitToViewBox() {}
+SVGFitToViewBox::SVGFitToViewBox()
+    : m_viewBox(new SVGRect(0)),
+      m_preserveAspectRatio(new SVGPreserveAspectRatio(0)) {}
 
 SVGFitToViewBox::~SVGFitToViewBox() {}
 
-SVGAnimatedRect* SVGFitToViewBox::viewBox() const {
-  if (!m_viewBox) {
-    // const SVGStyledElement *context = dynamic_cast<const SVGStyledElement
-    // *>(this);
-    m_viewBox = new SVGAnimatedRect(0);  // FIXME: 0 is a hack
-  }
-
-  return m_viewBox.get();
-}
-
-SVGAnimatedPreserveAspectRatio* SVGFitToViewBox::preserveAspectRatio() const {
-  if (!m_preserveAspectRatio) {
-    // const SVGStyledElement *context = dynamic_cast<const SVGStyledElement
-    // *>(this);
-    m_preserveAspectRatio =
-        new SVGAnimatedPreserveAspectRatio(0);  // FIXME: 0 is a hack
-  }
-
-  return m_preserveAspectRatio.get();
-}
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(SVGFitToViewBox,
+                                           SVGRect*,
+                                           Rect,
+                                           rect,
+                                           ViewBox,
+                                           viewBox,
+                                           SVGNames::viewBoxAttr.localName(),
+                                           m_viewBox.get())
+ANIMATED_PROPERTY_DEFINITIONS_WITH_CONTEXT(
+    SVGFitToViewBox,
+    SVGPreserveAspectRatio*,
+    PreserveAspectRatio,
+    preserveAspectRatio,
+    PreserveAspectRatio,
+    preserveAspectRatio,
+    SVGNames::preserveAspectRatioAttr.localName(),
+    m_preserveAspectRatio.get())
 
 void SVGFitToViewBox::parseViewBox(StringImpl* str) {
   double x = 0, y = 0, w = 0, h = 0;
@@ -89,10 +88,10 @@ void SVGFitToViewBox::parseViewBox(StringImpl* str) {
   if (p < end)  // nothing should come after the last, fourth number
     goto bail_out;
 
-  viewBox()->baseVal()->setX(x);
-  viewBox()->baseVal()->setY(y);
-  viewBox()->baseVal()->setWidth(w);
-  viewBox()->baseVal()->setHeight(h);
+  viewBoxBaseValue()->setX(x);
+  viewBoxBaseValue()->setY(y);
+  viewBoxBaseValue()->setWidth(w);
+  viewBoxBaseValue()->setHeight(h);
   return;
 
 bail_out:;
@@ -102,11 +101,11 @@ bail_out:;
 
 SVGMatrix* SVGFitToViewBox::viewBoxToViewTransform(float viewWidth,
                                                    float viewHeight) const {
-  SVGRect* viewBoxRect = viewBox()->baseVal();
+  SVGRect* viewBoxRect = viewBoxBaseValue();
   if (viewBoxRect->width() == 0 || viewBoxRect->height() == 0)
     return SVGSVGElement::createSVGMatrix();
 
-  return preserveAspectRatio()->baseVal()->getCTM(
+  return preserveAspectRatioBaseValue()->getCTM(
       viewBoxRect->x(), viewBoxRect->y(), viewBoxRect->width(),
       viewBoxRect->height(), 0, 0, viewWidth, viewHeight);
 }
@@ -116,7 +115,7 @@ bool SVGFitToViewBox::parseMappedAttribute(MappedAttribute* attr) {
     parseViewBox(attr->value().impl());
     return true;
   } else if (attr->name() == SVGNames::preserveAspectRatioAttr) {
-    preserveAspectRatio()->baseVal()->parsePreserveAspectRatio(
+    preserveAspectRatioBaseValue()->parsePreserveAspectRatio(
         attr->value().impl());
     return true;
   }

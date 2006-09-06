@@ -28,9 +28,6 @@
 #include "KCanvasFilters.h"
 
 namespace WebCore {
-class SVGAnimatedInteger;
-class SVGAnimatedNumber;
-class SVGAnimatedEnumeration;
 
 class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
  public:
@@ -38,25 +35,21 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFETurbulenceElement();
 
   // 'SVGFETurbulenceElement' functions
-  SVGAnimatedNumber* baseFrequencyX() const;
-  SVGAnimatedNumber* baseFrequencyY() const;
-  SVGAnimatedInteger* numOctaves() const;
-  SVGAnimatedNumber* seed() const;
-  SVGAnimatedEnumeration* stitchTiles() const;
-  SVGAnimatedEnumeration* type() const;
-
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   virtual KCanvasFETurbulence* filterEffect() const;
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
  private:
-  mutable RefPtr<SVGAnimatedNumber> m_baseFrequencyX;
-  mutable RefPtr<SVGAnimatedNumber> m_baseFrequencyY;
-  mutable RefPtr<SVGAnimatedInteger> m_numOctaves;
-  mutable RefPtr<SVGAnimatedNumber> m_seed;
-  mutable RefPtr<SVGAnimatedEnumeration> m_stitchTiles;
-  mutable RefPtr<SVGAnimatedEnumeration> m_type;
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, BaseFrequencyX, baseFrequencyX)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, BaseFrequencyY, baseFrequencyY)
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, NumOctaves, numOctaves)
+  ANIMATED_PROPERTY_DECLARATIONS(double, double, Seed, seed)
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, StitchTiles, stitchTiles)
+  ANIMATED_PROPERTY_DECLARATIONS(int, int, Type, type)
   mutable KCanvasFETurbulence* m_filterEffect;
 };
 
