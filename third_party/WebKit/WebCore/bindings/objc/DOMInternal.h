@@ -229,24 +229,24 @@ typedef DOMWindow AbstractView;
 @interface DOMHTMLTableCaptionElement (WebCoreInternal)
 + (DOMHTMLTableCaptionElement*)_HTMLTableCaptionElementWith:
     (WebCore::HTMLTableCaptionElement*)impl;
-- (WebCore::HTMLTableCaptionElement*)_tableCaptionElement;
+- (WebCore::HTMLTableCaptionElement*)_HTMLTableCaptionElement;
 @end
 
 @interface DOMHTMLTableSectionElement (WebCoreInternal)
 + (DOMHTMLTableSectionElement*)_HTMLTableSectionElementWith:
     (WebCore::HTMLTableSectionElement*)impl;
-- (WebCore::HTMLTableSectionElement*)_tableSectionElement;
+- (WebCore::HTMLTableSectionElement*)_HTMLTableSectionElement;
 @end
 
 @interface DOMHTMLTableElement (WebCoreInternal)
 + (DOMHTMLTableElement*)_HTMLTableElementWith:(WebCore::HTMLTableElement*)impl;
-- (WebCore::HTMLTableElement*)_tableElement;
+- (WebCore::HTMLTableElement*)_HTMLTableElement;
 @end
 
 @interface DOMHTMLTableCellElement (WebCoreInternal)
 + (DOMHTMLTableCellElement*)_HTMLTableCellElementWith:
     (WebCore::HTMLTableCellElement*)impl;
-- (WebCore::HTMLTableCellElement*)_tableCellElement;
+- (WebCore::HTMLTableCellElement*)_HTMLTableCellElement;
 @end
 
 @interface DOMHTMLImageElement (WebCoreInternal)
@@ -258,7 +258,7 @@ typedef DOMWindow AbstractView;
 @end
 
 @interface DOMHTMLOptionElement (WebCoreInternal)
-- (WebCore::HTMLOptionElement*)_optionElement;
+- (WebCore::HTMLOptionElement*)_HTMLOptionElement;
 @end
 
 @interface DOMHTMLInputElement (WebCoreInternal)
@@ -298,7 +298,7 @@ typedef DOMWindow AbstractView;
 @interface DOMCSSStyleDeclaration (WebCoreInternal)
 + (DOMCSSStyleDeclaration*)_CSSStyleDeclarationWith:
     (WebCore::CSSStyleDeclaration*)impl;
-- (WebCore::CSSStyleDeclaration*)_styleDeclaration;
+- (WebCore::CSSStyleDeclaration*)_CSSStyleDeclaration;
 @end
 
 @interface DOMCSSStyleSheet (WebCoreInternal)
