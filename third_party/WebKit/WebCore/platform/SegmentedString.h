@@ -22,7 +22,6 @@
 #ifndef SegmentedString_h
 #define SegmentedString_h
 
-#include "DeprecatedString.h"
 #include "DeprecatedValueList.h"
 #include "PlatformString.h"
 #include <assert.h>
@@ -36,11 +35,9 @@ class SegmentedSubstring {
   friend class SegmentedString;
 
   SegmentedSubstring() : m_length(0), m_current(0) {}
-  SegmentedSubstring(const DeprecatedString& str)
+  SegmentedSubstring(const String& str)
       : m_string(str), m_length(str.length()) {
-    m_current = m_length == 0
-                    ? 0
-                    : reinterpret_cast<const UChar*>(m_string.stableUnicode());
+    m_current = m_length == 0 ? 0 : m_string.characters();
   }
 
   SegmentedSubstring(const UChar* str, int length)
@@ -51,19 +48,18 @@ class SegmentedSubstring {
     m_current = 0;
   }
 
-  void appendTo(DeprecatedString& str) const {
-    if (reinterpret_cast<const UChar*>(m_string.unicode()) == m_current) {
+  void appendTo(String& str) const {
+    if (m_string.characters() == m_current) {
       if (str.isEmpty())
         str = m_string;
       else
         str.append(m_string);
     } else {
-      str.insert(str.length(),
-                 reinterpret_cast<const DeprecatedChar*>(m_current), m_length);
+      str.append(String(m_current, m_length));
     }
   }
 
-  DeprecatedString m_string;
+  String m_string;
   int m_length;
   const UChar* m_current;
 };
@@ -83,7 +79,7 @@ class SegmentedString {
         m_currentChar(m_currentString.m_current),
         m_lines(0),
         m_composite(false) {}
-  SegmentedString(const DeprecatedString& str)
+  SegmentedString(const String& str)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str),
@@ -130,7 +126,7 @@ class SegmentedString {
   int lineCount() const { return m_lines; }
   void resetLineCount() { m_lines = 0; }
 
-  DeprecatedString toString() const;
+  String toString() const;
 
   void operator++() { advance(); }
   const UChar& operator*() const { return *current(); }

@@ -34,6 +34,7 @@
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
 #include "Decoder.h"
+#include "DeprecatedString.h"
 #include "LoaderFunctions.h"
 #include "loader.h"
 #include <wtf/Vector.h>
@@ -44,9 +45,9 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          const String& url,
                                          CachePolicy cachePolicy,
                                          time_t _expireDate,
-                                         const DeprecatedString& charset)
+                                         const String& charset)
     : CachedResource(url, CSSStyleSheet, cachePolicy, _expireDate),
-      m_decoder(new Decoder("text/css")) {
+      m_decoder(new Decoder("text/css", charset)) {
   // It's css we want.
   setAccept("text/css");
   // load the file
@@ -54,9 +55,8 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
   m_loading = true;
 }
 
-CachedCSSStyleSheet::CachedCSSStyleSheet(
-    const String& url,
-    const DeprecatedString& stylesheet_data)
+CachedCSSStyleSheet::CachedCSSStyleSheet(const String& url,
+                                         const String& stylesheet_data)
     : CachedResource(url,
                      CSSStyleSheet,
                      CachePolicyVerify,
@@ -64,7 +64,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(
                      stylesheet_data.length()) {
   m_loading = false;
   m_status = Persistent;
-  m_sheet = String(stylesheet_data);
+  m_sheet = stylesheet_data;
 }
 
 CachedCSSStyleSheet::~CachedCSSStyleSheet() {}
@@ -83,9 +83,8 @@ void CachedCSSStyleSheet::deref(CachedResourceClient* c) {
     delete this;
 }
 
-void CachedCSSStyleSheet::setCharset(const DeprecatedString& chs) {
-  if (!chs.isEmpty())
-    m_decoder->setEncodingName(chs.latin1(), Decoder::EncodingFromHTTPHeader);
+void CachedCSSStyleSheet::setCharset(const String& chs) {
+  m_decoder->setEncoding(chs, Decoder::EncodingFromHTTPHeader);
 }
 
 void CachedCSSStyleSheet::data(Vector<char>& data, bool allDataReceived) {

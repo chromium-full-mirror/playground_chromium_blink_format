@@ -326,7 +326,7 @@ class FrameMac : public Frame {
   NSMutableDictionary* dashboardRegionsDictionary();
   void dashboardRegionsChanged();
 
-  virtual bool isCharacterSmartReplaceExempt(const DeprecatedChar&, bool);
+  virtual bool isCharacterSmartReplaceExempt(UChar, bool);
 
   virtual bool mouseDownMayStartSelect() const {
     return _mouseDownMayStartSelect;

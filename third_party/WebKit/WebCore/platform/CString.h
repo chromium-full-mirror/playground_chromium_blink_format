@@ -26,10 +26,11 @@
 #ifndef CString_h
 #define CString_h
 
-#include <wtf/Vector.h>
 #include "Shared.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
+
 class DeprecatedCString;
 
 class CStringBuffer : public Shared<CStringBuffer> {
@@ -46,8 +47,9 @@ class CStringBuffer : public Shared<CStringBuffer> {
 class CString {
  public:
   CString() {}
-  CString(const char* str);
-  CString(const char* str, unsigned length);
+  CString(const char*);
+  CString(const char*, unsigned length);
+  static CString newUninitialized(size_t length, char*& characterBuffer);
 
   const char* data() const;
   unsigned length() const;
@@ -56,11 +58,11 @@ class CString {
 
   bool isNull() const { return !m_buffer; }
 
-  CString(const DeprecatedCString& str);
+  CString(const DeprecatedCString&);
   DeprecatedCString deprecatedCString() const;
 
  private:
-  void init(const char* str, unsigned length);
+  void init(const char*, unsigned length);
   RefPtr<CStringBuffer> m_buffer;
 };
 }

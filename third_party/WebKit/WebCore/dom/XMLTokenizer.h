@@ -72,7 +72,7 @@ class Tokenizer {
 Tokenizer* newXMLTokenizer(Document*, FrameView* = 0);
 #if KHTML_XSLT
 void* xmlDocPtrForString(DocLoader*,
-                         const DeprecatedString& source,
+                         const String& source,
                          const DeprecatedString& URL);
 void setLoaderForLibXMLCallbacks(DocLoader*);
 #endif

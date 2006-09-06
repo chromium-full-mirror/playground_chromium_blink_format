@@ -27,7 +27,6 @@
 #include "config.h"
 #include "GraphicsContext.h"
 
-#include "DeprecatedString.h"
 #include "Font.h"
 
 using namespace std;

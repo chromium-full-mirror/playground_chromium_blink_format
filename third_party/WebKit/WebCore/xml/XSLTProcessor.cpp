@@ -138,8 +138,7 @@ static bool saveResultToString(xmlDocPtr resultDoc,
   return (retval >= 0);
 }
 
-static inline void transformTextStringToXHTMLDocumentString(
-    DeprecatedString& text) {
+static inline void transformTextStringToXHTMLDocumentString(String& text) {
   // Modify the output so that it is a well-formed XHTML document with a <pre>
   // tag enclosing the text.
   text.replace('&', "&amp;");
@@ -201,7 +200,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     FrameView* view) {
   RefPtr<Document> ownerDocument = sourceNode->document();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
-  DeprecatedString documentSource = sourceString;
+  String documentSource = sourceString;
 
   RefPtr<Document> result;
   if (sourceMIMEType == "text/html")
@@ -230,8 +229,8 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
       documentSource);  // Make sure we parse in the correct mode.
 
   RefPtr<Decoder> decoder = new Decoder(sourceMIMEType);
-  decoder->setEncodingName(
-      sourceEncoding.isEmpty() ? "UTF-8" : sourceEncoding.latin1(),
+  decoder->setEncoding(
+      sourceEncoding.isEmpty() ? UTF8Encoding() : TextEncoding(sourceEncoding),
       Decoder::EncodingFromXMLHeader);
   result->setDecoder(decoder.get());
 

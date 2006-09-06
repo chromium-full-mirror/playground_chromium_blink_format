@@ -665,7 +665,7 @@ String Document::readyState() const {
 
 String Document::inputEncoding() const {
   if (Decoder* d = decoder())
-    return d->encodingName();
+    return d->encoding().name();
   return String();
 }
 
@@ -678,8 +678,7 @@ String Document::defaultCharset() const {
 void Document::setCharset(const String& charset) {
   if (!decoder())
     return;
-  decoder()->setEncodingName(charset.deprecatedString().ascii(),
-                             Decoder::UserChosenEncoding);
+  decoder()->setEncoding(charset, Decoder::UserChosenEncoding);
 }
 
 Element* Document::elementFromPoint(int x, int y) const {
@@ -1327,11 +1326,11 @@ int Document::elapsedTime() const {
   return static_cast<int>((currentTime() - m_startTime) * 1000);
 }
 
-void Document::write(const String& text) {
-  write(text.deprecatedString());
+void Document::write(const DeprecatedString& text) {
+  write(String(text));
 }
 
-void Document::write(const DeprecatedString& text) {
+void Document::write(const String& text) {
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
     printf("Beginning a document.write at %d\n", elapsedTime());
@@ -1414,10 +1413,9 @@ CSSStyleSheet* Document::elementSheet() {
   return m_elemSheet.get();
 }
 
-void Document::determineParseMode(const DeprecatedString& /*str*/) {
-  // For XML documents use strict parse mode.  HTML docs will override this
-  // method to
-  // determine their parse mode.
+void Document::determineParseMode(const String&) {
+  // For XML documents use strict parse mode.
+  // HTML overrides this method to determine the parse mode.
   pMode = Strict;
   hMode = XHtml;
 }

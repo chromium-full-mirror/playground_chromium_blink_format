@@ -111,7 +111,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
   String m_responseHeaders;
   String m_mimeTypeOverride;
 
-  DeprecatedString m_response;
+  String m_response;
   mutable bool m_createdDocument;
   mutable RefPtr<Document> m_responseXML;
 

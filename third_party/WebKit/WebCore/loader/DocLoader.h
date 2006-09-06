@@ -56,9 +56,8 @@ class DocLoader {
 
   CachedImage* requestImage(const String& url);
   CachedCSSStyleSheet* requestStyleSheet(const String& url,
-                                         const DeprecatedString& charset);
-  CachedScript* requestScript(const String& url,
-                              const DeprecatedString& charset);
+                                         const String& charset);
+  CachedScript* requestScript(const String& url, const String& charset);
 
 #ifdef KHTML_XSLT
   CachedXSLStyleSheet* requestXSLStyleSheet(const String& url);

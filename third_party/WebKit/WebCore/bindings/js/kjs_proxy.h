@@ -30,7 +30,6 @@ class ScriptInterpreter;
 
 namespace WebCore {
 
-class DeprecatedString;
 class Event;
 class EventListener;
 class Frame;

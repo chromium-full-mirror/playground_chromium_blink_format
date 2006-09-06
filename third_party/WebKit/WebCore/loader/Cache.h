@@ -71,17 +71,16 @@ class Cache {
                                    const KURL& URL,
                                    bool reload,
                                    time_t expireDate);
-  static CachedCSSStyleSheet* requestStyleSheet(
-      DocLoader*,
-      const String& URL,
-      bool reload,
-      time_t expireDate,
-      const DeprecatedString& charset);
+  static CachedCSSStyleSheet* requestStyleSheet(DocLoader*,
+                                                const String& URL,
+                                                bool reload,
+                                                time_t expireDate,
+                                                const String& charset);
   static CachedScript* requestScript(DocLoader*,
                                      const String& URL,
                                      bool reload,
                                      time_t expireDate,
-                                     const DeprecatedString& charset);
+                                     const String& charset);
 
 #ifdef KHTML_XSLT
   static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader*,

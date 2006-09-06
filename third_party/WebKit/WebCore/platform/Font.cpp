@@ -361,7 +361,7 @@ UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
         HIRAGANA_KATAKANA_VOICING_MARKS) {
       // Normalize into composed form using 3.2 rules.
       UChar normalizedCharacters[2] = {0, 0};
-      UErrorCode uStatus = (UErrorCode)0;
+      UErrorCode uStatus = U_ZERO_ERROR;
       int32_t resultLength = unorm_normalize(
           m_run.data(currentCharacter), 2, UNORM_NFC, UNORM_UNICODE_3_2,
           &normalizedCharacters[0], 2, &uStatus);

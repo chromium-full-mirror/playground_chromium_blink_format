@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,21 +23,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ExtraCFEncodings_H
-#define ExtraCFEncodings_H
+#ifndef TextCodecLatin1_h
+#define TextCodecLatin1_h
 
-// Until there's a CFString constant for these encodings, this works.
-// Since they are macros, they won't cause a compile failure even if the
-// CFString constant is added.
-#define kCFStringEncodingBig5_DOSVariant \
-  (kTextEncodingBig5 | (kBig5_DOSVariant << 16))
-#define kCFStringEncodingEUC_CN_DOSVariant \
-  (kTextEncodingEUC_CN | (kEUC_CN_DOSVariant << 16))
-#define kCFStringEncodingEUC_KR_DOSVariant \
-  (kTextEncodingEUC_KR | (kEUC_KR_DOSVariant << 16))
-#define kCFStringEncodingISOLatin10 kTextEncodingISOLatin10
-#define kCFStringEncodingKOI8_U kTextEncodingKOI8_U
-#define kCFStringEncodingShiftJIS_DOSVariant \
-  (kTextEncodingShiftJIS | (kShiftJIS_DOSVariant << 16))
+#include "StreamingTextDecoder.h"
 
-#endif  // ExtraCFEncodings_H
+namespace WebCore {
+
+class TextCodecLatin1 : public TextCodec {
+ public:
+  static void registerEncodingNames(EncodingNameRegistrar);
+  static void registerCodecs(TextCodecRegistrar);
+
+  virtual String decode(const char*, size_t length, bool flush = false);
+  virtual CString encode(const UChar*,
+                         size_t length,
+                         bool allowEntities = false);
+};
+
+}  // namespace WebCore
+
+#endif  // TextCodecLatin1_h

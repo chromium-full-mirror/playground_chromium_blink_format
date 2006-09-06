@@ -42,9 +42,9 @@ CachedScript::CachedScript(DocLoader* dl,
                            const String& url,
                            CachePolicy cachePolicy,
                            time_t _expireDate,
-                           const DeprecatedString& charset)
+                           const String& charset)
     : CachedResource(url, Script, cachePolicy, _expireDate),
-      m_encoding(charset.latin1()) {
+      m_encoding(charset) {
   // It's javascript we want.
   // But some websites think their scripts are <some wrong mimetype here>
   // and refuse to serve them if we only accept application/x-javascript.
@@ -54,24 +54,21 @@ CachedScript::CachedScript(DocLoader* dl,
   Cache::loader()->load(dl, this, false);
   m_loading = true;
   if (!m_encoding.isValid())
-    m_encoding = TextEncoding(Latin1Encoding);
+    m_encoding = Latin1Encoding();
 }
 
-CachedScript::CachedScript(const String& url,
-                           const DeprecatedString& script_data)
-    : CachedResource(url, Script, CachePolicyVerify, 0, script_data.length()),
-      m_encoding(InvalidEncoding) {
+CachedScript::CachedScript(const String& url, const String& scriptData)
+    : CachedResource(url, Script, CachePolicyVerify, 0, scriptData.length()) {
   m_errorOccurred = false;
   m_loading = false;
   m_status = Persistent;
-  m_script = String(script_data);
+  m_script = scriptData;
 }
 
 CachedScript::~CachedScript() {}
 
 void CachedScript::ref(CachedResourceClient* c) {
   CachedResource::ref(c);
-
   if (!m_loading)
     c->notifyFinished(this);
 }
@@ -83,8 +80,8 @@ void CachedScript::deref(CachedResourceClient* c) {
     delete this;
 }
 
-void CachedScript::setCharset(const DeprecatedString& chs) {
-  TextEncoding encoding = TextEncoding(chs.latin1());
+void CachedScript::setCharset(const String& chs) {
+  TextEncoding encoding(chs);
   if (encoding.isValid())
     m_encoding = encoding;
 }
@@ -94,7 +91,7 @@ void CachedScript::data(Vector<char>& data, bool allDataReceived) {
     return;
 
   setSize(data.size());
-  m_script = String(m_encoding.toUnicode(data.data(), size()));
+  m_script = m_encoding.decode(data.data(), size());
   m_loading = false;
   checkNotify();
 }

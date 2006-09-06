@@ -29,7 +29,6 @@
 #ifndef CachedResource_h
 #define CachedResource_h
 
-#include "DeprecatedString.h"
 #include "CachePolicy.h"
 #include "PlatformString.h"
 #include <wtf/HashSet.h>
@@ -109,7 +108,7 @@ class CachedResource {
   }
   virtual ~CachedResource();
 
-  virtual void setCharset(const DeprecatedString&) {}
+  virtual void setCharset(const String&) {}
   virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
   virtual void data(Vector<char>&, bool allDataReceived) = 0;
   virtual void error() = 0;
@@ -168,8 +167,8 @@ class CachedResource {
 
   // List of acceptable MIME types seperated by ",".
   // A MIME type may contain a wildcard, e.g. "text/*".
-  DeprecatedString accept() const { return m_accept; }
-  void setAccept(const DeprecatedString& accept) { m_accept = accept; }
+  String accept() const { return m_accept; }
+  void setAccept(const String& accept) { m_accept = accept; }
 
  protected:
   void setSize(int size);
@@ -177,12 +176,14 @@ class CachedResource {
   HashSet<CachedResourceClient*> m_clients;
 
   String m_url;
-  DeprecatedString m_accept;
+  String m_accept;
   Request* m_request;
+
 #if __APPLE__
   NSURLResponse* m_response;
   NSData* m_allData;
 #endif
+
   Type m_type;
   Status m_status;
 

@@ -99,9 +99,8 @@ CachedImage* DocLoader::requestImage(const String& url) {
   return cachedObject;
 }
 
-CachedCSSStyleSheet* DocLoader::requestStyleSheet(
-    const String& url,
-    const DeprecatedString& charset) {
+CachedCSSStyleSheet* DocLoader::requestStyleSheet(const String& url,
+                                                  const String& charset) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))
@@ -116,7 +115,7 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(
 }
 
 CachedScript* DocLoader::requestScript(const String& url,
-                                       const DeprecatedString& charset) {
+                                       const String& charset) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   if (CheckIfReloading(this))

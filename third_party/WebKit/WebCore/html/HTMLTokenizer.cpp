@@ -1167,7 +1167,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           Attribute* a = 0;
           bool foundTypeAttribute = false;
           scriptSrc = DeprecatedString::null;
-          scriptSrcCharset = DeprecatedString::null;
+          scriptSrcCharset = String();
           if (currToken.attrs && /* potentially have a ATTR_SRC ? */
               m_doc->frame() &&
               m_doc->frame()->jScriptEnabled() && /* jscript allowed at all? */
@@ -1608,21 +1608,18 @@ void HTMLTokenizer::finish() {
     scriptCode[scriptCodeSize] = 0;
     scriptCode[scriptCodeSize + 1] = 0;
     int pos;
-    DeprecatedString food;
+    String food;
     if (m_state.inScript() || m_state.inStyle())
-      food.setUnicode(reinterpret_cast<DeprecatedChar*>(scriptCode),
-                      scriptCodeSize);
+      food = String(scriptCode, scriptCodeSize);
     else if (m_state.inServer()) {
       food = "<";
-      food += DeprecatedString(reinterpret_cast<DeprecatedChar*>(scriptCode),
-                               scriptCodeSize);
+      food.append(String(scriptCode, scriptCodeSize));
     } else {
       pos = DeprecatedConstString(reinterpret_cast<DeprecatedChar*>(scriptCode),
                                   scriptCodeSize)
                 .string()
                 .find('>');
-      food.setUnicode(reinterpret_cast<DeprecatedChar*>(scriptCode) + pos + 1,
-                      scriptCodeSize - pos - 1);  // deep copy
+      food = String(scriptCode + pos + 1, scriptCodeSize - pos - 1);
     }
     fastFree(scriptCode);
     scriptCode = 0;
@@ -1817,7 +1814,7 @@ void parseHTMLDocumentFragment(const String& source,
                                DocumentFragment* fragment) {
   HTMLTokenizer tok(fragment);
   tok.setForceSynchronous(true);
-  tok.write(source.deprecatedString(), true);
+  tok.write(source, true);
   tok.finish();
   ASSERT(!tok.processingData());  // make sure we're done (see 3963151)
 }

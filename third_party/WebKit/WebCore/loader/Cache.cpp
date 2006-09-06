@@ -191,7 +191,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
                                               const String& url,
                                               bool reload,
                                               time_t expireDate,
-                                              const DeprecatedString& charset) {
+                                              const String& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
   CachePolicy cachePolicy;
@@ -244,7 +244,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
                                    const String& url,
                                    bool reload,
                                    time_t expireDate,
-                                   const DeprecatedString& charset) {
+                                   const String& charset) {
   // this brings the _url to a standard form...
   KURL kurl;
   CachePolicy cachePolicy;

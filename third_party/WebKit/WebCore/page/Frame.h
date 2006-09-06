@@ -142,7 +142,7 @@ class Frame : public Shared<Frame>, Noncopyable {
    * Execute the specified snippet of JavaScript code.
    */
   KJS::JSValue* executeScript(Node*,
-                              const DeprecatedString& script,
+                              const String& script,
                               bool forceUserGesture = false);
 
   /**
@@ -180,11 +180,11 @@ class Frame : public Shared<Frame>, Noncopyable {
    * These are used for JavaScript-triggered location changes.
    */
   void changeLocation(const DeprecatedString& URL,
-                      const DeprecatedString& referrer,
+                      const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
   void scheduleLocationChange(const DeprecatedString& url,
-                              const DeprecatedString& referrer,
+                              const String& referrer,
                               bool lockHistory = true,
                               bool userGesture = false);
   void scheduleRefresh(bool userGesture = false);
@@ -221,7 +221,7 @@ class Frame : public Shared<Frame>, Noncopyable {
    * this function many times in sequence. But remember: The fewer calls
    * you make, the faster the widget will be.
    *
-   * The HTML code is send through a decoder which decodes the stream to
+   * The HTML code is sent through a decoder which decodes the stream to
    * Unicode.
    *
    * The @p len parameter is needed for streams encoded in utf-16,
@@ -230,7 +230,7 @@ class Frame : public Shared<Frame>, Noncopyable {
    * parameter.
    *
    * Attention: Don't mix calls to @ref write(const char*) with calls
-   * to @ref write(const DeprecatedString&  ).
+   * to @ref write(const String&).
    *
    * The result might not be what you want.
    */
@@ -243,7 +243,7 @@ class Frame : public Shared<Frame>, Noncopyable {
    * this function many times in sequence. But remember: The fewer calls
    * you make, the faster the widget will be.
    */
-  virtual void write(const DeprecatedString& str);
+  virtual void write(const String&);
 
   /**
    * Call this after your last call to @ref write().
@@ -259,14 +259,8 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   void paint(GraphicsContext*, const IntRect&);
 
-  void setEncoding(const DeprecatedString& encoding, bool userChosen);
-
-  /**
-   * Returns the encoding the page currently uses.
-   *
-   * Note that the encoding might be different from the charset.
-   */
-  DeprecatedString encoding() const;
+  void setEncoding(const String& encoding, bool userChosen);
+  String encoding() const;
 
   /**
    * Sets a user defined style sheet to be used on top of the HTML4,
@@ -483,7 +477,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   /**
    * Referrer used for links in this page.
    */
-  DeprecatedString referrer() const;
+  String referrer() const;
 
   /**
    * Last-modified date (in raw string format), if received in the [HTTP]
@@ -524,7 +518,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void applyEditingStyleToElement(Element*) const;
   void removeEditingStyleFromElement(Element*) const;
   virtual void print() = 0;
-  virtual bool isCharacterSmartReplaceExempt(const DeprecatedChar&, bool);
+  virtual bool isCharacterSmartReplaceExempt(UChar, bool);
 
   // Used to keep the part alive when running a script that might destroy it.
   void keepAlive();
@@ -706,7 +700,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   KJS::JSValue* executeScript(const String& filename,
                               int baseLine,
                               Node*,
-                              const DeprecatedString& script);
+                              const String& script);
   KJSProxy* jScript();
   Frame* opener();
   void setOpener(Frame* _opener);

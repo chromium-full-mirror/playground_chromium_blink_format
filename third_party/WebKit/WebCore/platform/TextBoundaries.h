@@ -26,9 +26,7 @@
 #ifndef TextBoundaries_h
 #define TextBoundaries_h
 
-#include <unicode/umachine.h>
-
-// FIXME: Change clients to use ICU and remove these functions.
+#include "UChar.h"
 
 namespace WebCore {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,17 +23,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CharsetNames_H
-#define CharsetNames_H
+#ifndef TextEncodingRegistry_h
+#define TextEncodingRegistry_h
 
-#include "TextEncoding.h"
+#include "UChar.h"
+#include <memory>
 
 namespace WebCore {
 
-TextEncodingID textEncodingIDFromCharsetName(const char*,
-                                             TextEncodingFlags* flags = 0);
-const char* charsetNameFromTextEncodingID(TextEncodingID);
+class TextCodec;
+class TextEncoding;
 
-}  // namespace WebCore
+// Only TextEncoding and TextDecoder should use this function directly.
+// - Use TextDecoder::decode to decode, since it handles BOMs.
+// - Use TextEncoding::decode to decode if you have all the data at once.
+//   It's implemented by calling TextDecoder::decode so works just as well.
+// - Use TextEncoding::encode to encode, since it takes care of normalization.
+std::auto_ptr<TextCodec> newTextCodec(const TextEncoding&);
 
-#endif  // ChaserNames_H
+// Only TextEncoding should use this function directly.
+const char* atomicCanonicalTextEncodingName(const char* alias);
+const char* atomicCanonicalTextEncodingName(const UChar* aliasCharacters,
+                                            size_t aliasLength);
+}
+
+#endif  // TextEncodingRegistry_h

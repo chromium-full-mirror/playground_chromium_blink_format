@@ -123,7 +123,7 @@ class UserStyleSheetLoader : public CachedResourceClient {
 
  private:
   virtual void setStyleSheet(const String& /*URL*/, const String& sheet) {
-    m_frame->setUserStyleSheet(sheet.deprecatedString());
+    m_frame->setUserStyleSheet(sheet);
   }
   Frame* m_frame;
   CachedCSSStyleSheet* m_cachedSheet;
@@ -352,7 +352,7 @@ KJSProxy* Frame::jScript() {
   return d->m_jscript;
 }
 
-static bool getString(JSValue* result, DeprecatedString& string) {
+static bool getString(JSValue* result, String& string) {
   if (!result)
     return false;
   JSLock lock;
@@ -366,7 +366,7 @@ static bool getString(JSValue* result, DeprecatedString& string) {
 void Frame::replaceContentsWithScriptResult(const KURL& url) {
   JSValue* ret = executeScript(
       0, KURL::decode_string(url.url().mid(strlen("javascript:"))));
-  DeprecatedString scriptResult;
+  String scriptResult;
   if (getString(ret, scriptResult)) {
     begin();
     write(scriptResult);
@@ -375,7 +375,7 @@ void Frame::replaceContentsWithScriptResult(const KURL& url) {
 }
 
 JSValue* Frame::executeScript(Node* n,
-                              const DeprecatedString& script,
+                              const String& script,
                               bool forceUserGesture) {
   KJSProxy* proxy = jScript();
 
@@ -450,7 +450,7 @@ void Frame::clear(bool clearWindowProperties) {
   d->m_scheduledRedirection = noRedirectionScheduled;
   d->m_delayRedirect = 0;
   d->m_redirectURL = DeprecatedString::null;
-  d->m_redirectReferrer = DeprecatedString::null;
+  d->m_redirectReferrer = String();
   d->m_redirectLockHistory = true;
   d->m_redirectUserGesture = false;
   d->m_bHTTPRefresh = false;
@@ -459,7 +459,7 @@ void Frame::clear(bool clearWindowProperties) {
   d->m_bMousePressed = false;
 
   if (!d->m_haveEncoding)
-    d->m_encoding = DeprecatedString::null;
+    d->m_encoding = String();
 }
 
 Document* Frame::document() const {
@@ -640,30 +640,25 @@ void Frame::write(const char* str, int len) {
   }
 
   if (!d->m_decoder) {
-    d->m_decoder = new Decoder(d->m_request.m_responseMIMEType,
-                               settings()->encoding().latin1());
+    d->m_decoder =
+        new Decoder(d->m_request.m_responseMIMEType, settings()->encoding());
     if (!d->m_encoding.isNull())
-      d->m_decoder->setEncodingName(d->m_encoding.latin1(),
-                                    d->m_haveEncoding
-                                        ? Decoder::UserChosenEncoding
-                                        : Decoder::EncodingFromHTTPHeader);
-
+      d->m_decoder->setEncoding(
+          d->m_encoding, d->m_haveEncoding ? Decoder::UserChosenEncoding
+                                           : Decoder::EncodingFromHTTPHeader);
     if (d->m_doc)
       d->m_doc->setDecoder(d->m_decoder.get());
   }
-  DeprecatedString decoded = d->m_decoder->decode(str, len);
+
+  String decoded = d->m_decoder->decode(str, len);
 
   if (decoded.isEmpty())
     return;
 
   if (d->m_bFirstData) {
-    // determine the parse mode
-    d->m_doc->determineParseMode(decoded);
     d->m_bFirstData = false;
-
-    // ### this is still quite hacky, but should work a lot better than the old
-    // solution
-    if (d->m_decoder->visuallyOrdered())
+    d->m_doc->determineParseMode(decoded);
+    if (d->m_decoder->encoding().usesVisualOrdering())
       d->m_doc->setVisuallyOrdered();
     d->m_doc->recalcStyle(Node::Force);
   }
@@ -674,7 +669,7 @@ void Frame::write(const char* str, int len) {
   }
 }
 
-void Frame::write(const DeprecatedString& str) {
+void Frame::write(const String& str) {
   if (str.isNull())
     return;
 
@@ -700,10 +695,10 @@ void Frame::endIfNotLoading() {
   // make sure nothing's left in there...
   if (d->m_doc) {
     if (d->m_decoder) {
-      DeprecatedString decoded = d->m_decoder->flush();
+      String decoded = d->m_decoder->flush();
       if (d->m_bFirstData) {
-        d->m_doc->determineParseMode(decoded);
         d->m_bFirstData = false;
+        d->m_doc->determineParseMode(decoded);
       }
       write(decoded);
     }
@@ -850,7 +845,7 @@ KURL Frame::baseURL() const {
 
 String Frame::baseTarget() const {
   if (!d->m_doc)
-    return DeprecatedString();
+    return String();
   return d->m_doc->baseTarget();
 }
 
@@ -871,7 +866,7 @@ void Frame::scheduleRedirection(double delay,
     d->m_scheduledRedirection = redirectionScheduled;
     d->m_delayRedirect = delay;
     d->m_redirectURL = url;
-    d->m_redirectReferrer = DeprecatedString::null;
+    d->m_redirectReferrer = String();
     d->m_redirectLockHistory = doLockHistory;
     d->m_redirectUserGesture = false;
 
@@ -882,7 +877,7 @@ void Frame::scheduleRedirection(double delay,
 }
 
 void Frame::scheduleLocationChange(const DeprecatedString& url,
-                                   const DeprecatedString& referrer,
+                                   const String& referrer,
                                    bool lockHistory,
                                    bool userGesture) {
   KURL u(url);
@@ -976,7 +971,7 @@ void Frame::scheduleHistoryNavigation(int steps) {
   d->m_scheduledRedirection = historyNavigationScheduled;
   d->m_delayRedirect = 0;
   d->m_redirectURL = DeprecatedString::null;
-  d->m_redirectReferrer = DeprecatedString::null;
+  d->m_redirectReferrer = String();
   d->m_scheduledHistoryNavigationSteps = steps;
   stopRedirectionTimer();
   if (d->m_bComplete)
@@ -992,13 +987,13 @@ void Frame::cancelRedirection(bool cancelWithLoadInProgress) {
 }
 
 void Frame::changeLocation(const DeprecatedString& URL,
-                           const DeprecatedString& referrer,
+                           const String& referrer,
                            bool lockHistory,
                            bool userGesture) {
   if (URL.find("javascript:", 0, false) == 0) {
-    DeprecatedString script = KURL::decode_string(URL.mid(11));
+    String script = KURL::decode_string(URL.mid(11));
     JSValue* result = executeScript(0, script, userGesture);
-    DeprecatedString scriptResult;
+    String scriptResult;
     if (getString(result, scriptResult)) {
       begin(url());
       write(scriptResult);
@@ -1038,25 +1033,23 @@ void Frame::redirectionTimerFired(Timer<Frame>*) {
   }
 
   DeprecatedString URL = d->m_redirectURL;
-  DeprecatedString referrer = d->m_redirectReferrer;
+  String referrer = d->m_redirectReferrer;
   bool lockHistory = d->m_redirectLockHistory;
   bool userGesture = d->m_redirectUserGesture;
 
   d->m_scheduledRedirection = noRedirectionScheduled;
   d->m_delayRedirect = 0;
   d->m_redirectURL = DeprecatedString::null;
-  d->m_redirectReferrer = DeprecatedString::null;
+  d->m_redirectReferrer = String();
 
   changeLocation(URL, referrer, lockHistory, userGesture);
 }
 
-DeprecatedString Frame::encoding() const {
+String Frame::encoding() const {
   if (d->m_haveEncoding && !d->m_encoding.isEmpty())
     return d->m_encoding;
-
   if (d->m_decoder && d->m_decoder->encoding().isValid())
-    return d->m_decoder->encodingName();
-
+    return d->m_decoder->encoding().name();
   return settings()->encoding();
 }
 
@@ -1548,16 +1541,18 @@ void Frame::submitForm(const char* action,
     DeprecatedString bodyEnc;
     if (contentType.lower() == "multipart/form-data")
       // FIXME: is this correct?  I suspect not
-      bodyEnc = KURL::encode_string(formData.flattenToString());
+      bodyEnc =
+          KURL::encode_string(formData.flattenToString().deprecatedString());
     else if (contentType.lower() == "text/plain") {
       // Convention seems to be to decode, and s/&/\n/
-      DeprecatedString tmpbody = formData.flattenToString();
+      DeprecatedString tmpbody = formData.flattenToString().deprecatedString();
       tmpbody.replace('&', '\n');
       tmpbody.replace('+', ' ');
       tmpbody = KURL::decode_string(tmpbody);  // Decode the rest of it
       bodyEnc = KURL::encode_string(tmpbody);  // Recode for the URL
     } else
-      bodyEnc = KURL::encode_string(formData.flattenToString());
+      bodyEnc =
+          KURL::encode_string(formData.flattenToString().deprecatedString());
 
     nvps.append(
         String::sprintf("body=%s", bodyEnc.latin1()).deprecatedString());
@@ -1567,7 +1562,7 @@ void Frame::submitForm(const char* action,
 
   if (strcmp(action, "get") == 0) {
     if (u.protocol() != "mailto")
-      u.setQuery(formData.flattenToString());
+      u.setQuery(formData.flattenToString().deprecatedString());
     request.setDoPost(false);
   } else {
     request.postData = formData;
@@ -1649,7 +1644,7 @@ String Frame::jsDefaultStatusBarText() const {
   return d->m_kjsDefaultStatusBarText;
 }
 
-DeprecatedString Frame::referrer() const {
+String Frame::referrer() const {
   return d->m_referrer;
 }
 
@@ -2080,7 +2075,7 @@ void Frame::clearTypingStyle() {
 JSValue* Frame::executeScript(const String& filename,
                               int baseLine,
                               Node* n,
-                              const DeprecatedString& script) {
+                              const String& script) {
   // FIXME: This is missing stuff that the other executeScript has.
   // --> d->m_runningScripts and submitFormAgain.
   // Why is that OK?
@@ -2430,7 +2425,7 @@ void Frame::applyEditingStyleToElement(Element* element) const {
 
 void Frame::removeEditingStyleFromElement(Element*) const {}
 
-bool Frame::isCharacterSmartReplaceExempt(const DeprecatedChar&, bool) {
+bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
   // no smart replace
   return true;
 }
@@ -2655,7 +2650,7 @@ HTMLFormElement* Frame::currentForm() const {
   return start ? scanForForm(start) : 0;
 }
 
-void Frame::setEncoding(const DeprecatedString& name, bool userChosen) {
+void Frame::setEncoding(const String& name, bool userChosen) {
   if (!d->m_workingURL.isEmpty())
     receivedFirstData();
   d->m_encoding = name;

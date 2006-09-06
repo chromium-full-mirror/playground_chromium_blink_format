@@ -113,7 +113,7 @@ DocLoader* XSLStyleSheet::docLoader() {
 
 bool XSLStyleSheet::parseString(const String& string, bool strict) {
   // Parse in a single chunk into an xmlDocPtr
-  const UChar BOM(0xFEFF);
+  const UChar BOM = 0xFEFF;
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
   setLoaderForLibXMLCallbacks(docLoader());
