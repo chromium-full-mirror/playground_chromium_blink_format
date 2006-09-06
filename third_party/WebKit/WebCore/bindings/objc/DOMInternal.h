@@ -85,7 +85,7 @@ class CSSStyleSheet;
 class CSSValue;
 class Comment;
 class Counter;
-class DOMImplementationFront;
+class DOMImplementation;
 class DOMWindow;
 class Document;
 class DocumentFragment;
@@ -186,9 +186,8 @@ typedef DOMWindow AbstractView;
 @end
 
 @interface DOMImplementation (WebCoreInternal)
-+ (DOMImplementation*)_DOMImplementationWith:
-    (WebCore::DOMImplementationFront*)impl;
-- (WebCore::DOMImplementationFront*)_DOMImplementation;
++ (DOMImplementation*)_DOMImplementationWith:(WebCore::DOMImplementation*)impl;
+- (WebCore::DOMImplementation*)_DOMImplementation;
 @end
 
 @interface DOMDocument (WebCoreInternal)
@@ -433,7 +432,7 @@ ALLOW_DOM_CAST(CSSRuleList)
 ALLOW_DOM_CAST(CSSStyleDeclaration)
 ALLOW_DOM_CAST(CSSStyleSheet)
 ALLOW_DOM_CAST(CSSValue)
-ALLOW_DOM_CAST(DOMImplementationFront)
+ALLOW_DOM_CAST(DOMImplementation)
 ALLOW_DOM_CAST(HTMLCollection)
 ALLOW_DOM_CAST(HTMLOptionsCollection)
 ALLOW_DOM_CAST(MediaList)
