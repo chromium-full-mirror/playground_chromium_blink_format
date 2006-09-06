@@ -99,7 +99,7 @@ class FrameWin : public Frame {
   virtual String mimeTypeForFileName(const String&) const;
 
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&);
-  virtual void markMisspellings(const SelectionController&);
+  virtual void markMisspellings(const Selection&);
 
   virtual bool lastEventIsMouseUp() const;
 
@@ -123,13 +123,11 @@ class FrameWin : public Frame {
   virtual void issuePasteCommand();
   virtual void issuePasteAndMatchStyleCommand();
   virtual void issueTransposeCommand();
-  virtual void respondToChangedSelection(
-      const SelectionController& oldSelection,
-      bool closeTyping);
-  void FrameWin::respondToChangedContents(
-      const SelectionController& endingSelection);
-  virtual bool shouldChangeSelection(const SelectionController& oldSelection,
-                                     const SelectionController& newSelection,
+  virtual void respondToChangedSelection(const Selection& oldSelection,
+                                         bool closeTyping);
+  void FrameWin::respondToChangedContents(const Selection& endingSelection);
+  virtual bool shouldChangeSelection(const Selection& oldSelection,
+                                     const Selection& newSelection,
                                      EAffinity affinity,
                                      bool stillSelecting) const;
   virtual void partClearedInBegin();

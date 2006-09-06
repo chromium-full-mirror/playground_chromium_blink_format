@@ -378,7 +378,7 @@ void FrameWin::issuePasteCommand() {
 void FrameWin::scheduleClose() {
   notImplemented();
 }
-void FrameWin::markMisspellings(WebCore::SelectionController const&) {
+void FrameWin::markMisspellings(const WebCore::Selection&) {
   notImplemented();
 }
 bool FrameWin::menubarVisible() {
@@ -530,14 +530,13 @@ bool FrameWin::lastEventIsMouseUp() const {
 }
 void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
 }
-bool FrameWin::shouldChangeSelection(SelectionController const&,
-                                     SelectionController const&,
+bool FrameWin::shouldChangeSelection(const WebCore::Selection&,
+                                     const WebCore::Selection&,
                                      WebCore::EAffinity,
                                      bool) const {
   return true;
 }
-void FrameWin::respondToChangedSelection(WebCore::SelectionController const&,
-                                         bool) {}
+void FrameWin::respondToChangedSelection(const WebCore::Selection&, bool) {}
 static int frameNumber = 0;
 Frame* FrameWin::createFrame(KURL const&,
                              String const&,
@@ -552,8 +551,7 @@ String FrameWin::incomingReferrer() const {
 }
 void FrameWin::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
-void FrameWin::respondToChangedContents(
-    const SelectionController& endingSelection) {}
+void FrameWin::respondToChangedContents(const Selection&) {}
 void FrameWin::handledOnloadEvents() {}
 Plugin* FrameWin::createPlugin(Element*,
                                const KURL&,
@@ -765,8 +763,3 @@ bool RenderThemeWin::paintMenuList(RenderObject*,
 void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const {}
-
-CString::CString(const DeprecatedCString&) {}
-const char* CString::data() const {
-  return 0;
-}
