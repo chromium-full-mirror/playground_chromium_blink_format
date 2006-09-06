@@ -29,11 +29,6 @@
 #ifndef GLYPH_BUFFER_H
 #define GLYPH_BUFFER_H
 
-// MAX_GLYPH_EXPANSION is the maximum numbers of glyphs that may be
-// use to represent a single Unicode code point.
-#define MAX_GLYPH_EXPANSION 4
-#define GLYPH_BUFFER_SIZE 2048
-
 #if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>
 #elif PLATFORM(CAIRO)
@@ -46,6 +41,7 @@
 #include <wtf/Vector.h>
 
 namespace WebCore {
+
 typedef unsigned short Glyph;
 class FontData;
 
@@ -62,8 +58,6 @@ typedef FloatSize GlyphBufferAdvance;
 
 class GlyphBuffer {
  public:
-  GlyphBuffer(){};
-
   bool isEmpty() const { return m_fontData.isEmpty(); }
   int size() const { return m_fontData.size(); }
 
@@ -73,11 +67,13 @@ class GlyphBuffer {
     m_advances.clear();
   }
 
-  GlyphBufferGlyph* glyphs(int from) const {
-    return ((GlyphBufferGlyph*)m_glyphs.data()) + from;
+  GlyphBufferGlyph* glyphs(int from) { return m_glyphs.data() + from; }
+  GlyphBufferAdvance* advances(int from) { return m_advances.data() + from; }
+  const GlyphBufferGlyph* glyphs(int from) const {
+    return m_glyphs.data() + from;
   }
-  GlyphBufferAdvance* advances(int from) const {
-    return ((GlyphBufferAdvance*)m_advances.data()) + from;
+  const GlyphBufferAdvance* advances(int from) const {
+    return m_advances.data() + from;
   }
 
   const FontData* fontDataAt(int index) const { return m_fontData[index]; }
@@ -133,9 +129,9 @@ class GlyphBuffer {
   }
 
  private:
-  Vector<const FontData*, GLYPH_BUFFER_SIZE> m_fontData;
-  Vector<GlyphBufferGlyph, GLYPH_BUFFER_SIZE> m_glyphs;
-  Vector<GlyphBufferAdvance, GLYPH_BUFFER_SIZE> m_advances;
+  Vector<const FontData*, 2048> m_fontData;
+  Vector<GlyphBufferGlyph, 2048> m_glyphs;
+  Vector<GlyphBufferAdvance, 2048> m_advances;
 };
 }
 #endif

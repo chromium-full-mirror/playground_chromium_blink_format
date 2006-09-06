@@ -27,6 +27,7 @@
 #define RenderObject_h
 
 #include "CachedResourceClient.h"
+#include "DeprecatedValueList.h"
 #include "RenderStyle.h"
 #include "ScrollBar.h"
 #include "VisiblePosition.h"
@@ -567,23 +568,13 @@ class RenderObject : public CachedResourceClient {
 
   virtual void updateWidgetPosition();
 
-  DeprecatedValueList<DashboardRegionValue> computeDashboardRegions();
-  void addDashboardRegions(DeprecatedValueList<DashboardRegionValue>& regions);
-  void collectDashboardRegions(
-      DeprecatedValueList<DashboardRegionValue>& regions);
+  void addDashboardRegions(Vector<DashboardRegionValue>&);
+  void collectDashboardRegions(Vector<DashboardRegionValue>&);
 
   // does a query on the rendertree and finds the innernode
   // and overURL for the given position
   // if readonly == false, it will recalc hover styles accordingly
   class NodeInfo {
-    friend class RenderLayer;
-    friend class RenderImage;
-    friend class RenderText;
-    friend class RenderInline;
-    friend class RenderObject;
-    friend class RenderFrameSet;
-    friend class HTMLAreaElement;
-
    public:
     NodeInfo(bool readonly, bool active, bool mouseMove = false)
         : m_innerNode(0),
@@ -814,11 +805,9 @@ class RenderObject : public CachedResourceClient {
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
-  virtual DeprecatedValueList<IntRect> lineBoxRects();
+  virtual void lineBoxRects(Vector<IntRect>&);
 
-  virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
-                             int tx,
-                             int ty);
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   IntRect absoluteBoundingBoxRect();
 
   // the rect that will be painted if this object is passed as the paintingRoot
@@ -869,8 +858,7 @@ class RenderObject : public CachedResourceClient {
   virtual void setTable(RenderTable*){};
 
   // Used by collapsed border tables.
-  virtual void collectBorders(
-      DeprecatedValueList<CollapsedBorderValue>& borderStyles);
+  virtual void collectBorders(DeprecatedValueList<CollapsedBorderValue>&);
 
   // Repaint the entire object.  Called when, e.g., the color of a border
   // changes, or when a border

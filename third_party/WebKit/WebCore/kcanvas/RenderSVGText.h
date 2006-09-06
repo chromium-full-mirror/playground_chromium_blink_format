@@ -44,15 +44,13 @@ class RenderSVGText : public RenderBlock {
   }
 
   virtual bool nodeAtPoint(NodeInfo&,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
                            HitTestAction);
 
-  virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
-                             int tx,
-                             int ty);
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
 
   virtual void computeAbsoluteRepaintRect(IntRect& r, bool f);
   virtual bool requiresLayer();

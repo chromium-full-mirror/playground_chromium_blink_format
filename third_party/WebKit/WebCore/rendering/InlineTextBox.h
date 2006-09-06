@@ -147,7 +147,7 @@ class InlineTextBox : public InlineRunBox {
   void paintMarkedTextUnderline(GraphicsContext*,
                                 int tx,
                                 int ty,
-                                MarkedTextUnderline&);
+                                const MarkedTextUnderline&);
 #if PLATFORM(MAC)
   void paintCustomHighlight(int tx, int ty, const AtomicString& type);
 #endif

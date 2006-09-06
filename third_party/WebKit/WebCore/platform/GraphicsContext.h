@@ -27,7 +27,6 @@
 #define GraphicsContext_h
 
 #include "FloatRect.h"
-#include "Font.h"
 #include "Image.h"
 #include "IntRect.h"
 #include "Pen.h"
@@ -62,6 +61,8 @@ class Font;
 class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class Path;
+class TextRun;
+class TextStyle;
 
 #ifdef SVG_SUPPORT
 class KRenderingDeviceContext;
@@ -143,9 +144,8 @@ class GraphicsContext : Noncopyable {
   void setFocusRingClip(const IntRect&);
   void clearFocusRingClip();
 
-  void drawText(const TextRun&,
-                const IntPoint&,
-                const TextStyle& = TextStyle());
+  void drawText(const TextRun&, const IntPoint&);
+  void drawText(const TextRun&, const IntPoint&, const TextStyle&);
   void drawHighlightForText(const TextRun&,
                             const IntPoint&,
                             int h,

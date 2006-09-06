@@ -1154,15 +1154,13 @@ bool ShadowData::operator==(const ShadowData& o) const {
   return x == o.x && y == o.y && blur == o.blur && color == o.color;
 }
 
-const DeprecatedValueList<StyleDashboardRegion>&
-RenderStyle::initialDashboardRegions() {
-  static DeprecatedValueList<StyleDashboardRegion> emptyList;
+const Vector<StyleDashboardRegion>& RenderStyle::initialDashboardRegions() {
+  static Vector<StyleDashboardRegion> emptyList;
   return emptyList;
 }
 
-const DeprecatedValueList<StyleDashboardRegion>&
-RenderStyle::noneDashboardRegions() {
-  static DeprecatedValueList<StyleDashboardRegion> noneList;
+const Vector<StyleDashboardRegion>& RenderStyle::noneDashboardRegions() {
+  static Vector<StyleDashboardRegion> noneList;
   static bool noneListInitialized = false;
 
   if (!noneListInitialized) {

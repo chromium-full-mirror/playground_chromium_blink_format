@@ -28,10 +28,11 @@
 #include "Document.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
-#include "RenderBlock.h"
-#include "break_lines.h"
 #include "Range.h"
 #include "RenderArena.h"
+#include "RenderBlock.h"
+#include "TextStyle.h"
+#include "break_lines.h"
 #include <wtf/AlwaysInline.h>
 
 #if PLATFORM(MAC)
@@ -307,12 +308,12 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   if (m_len <= 0)
     return;
 
-  DeprecatedValueList<MarkedTextUnderline> underlines;
+  const Vector<MarkedTextUnderline>* underlines = 0;
+  size_t numUnderlines = 0;
   if (haveMarkedText && markedTextUsesUnderlines) {
-    underlines = object()->document()->frame()->markedTextUnderlines();
+    underlines = &object()->document()->frame()->markedTextUnderlines();
+    numUnderlines = underlines->size();
   }
-  DeprecatedValueListIterator<MarkedTextUnderline> underlineIt =
-      underlines.begin();
 
   Color textColor;
 
@@ -422,8 +423,8 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     paintAllMarkersOfType(i.p, tx, ty, DocumentMarker::Spelling, styleToUse,
                           font);
 
-    for (; underlineIt != underlines.end(); underlineIt++) {
-      MarkedTextUnderline underline = *underlineIt;
+    for (size_t index = 0; index < numUnderlines; ++index) {
+      const MarkedTextUnderline& underline = (*underlines)[index];
 
       if (underline.endOffset <= start())
         // underline is completely before this run.  This might be an underline
@@ -739,10 +740,11 @@ void InlineTextBox::paintAllMarkersOfType(GraphicsContext* pt,
   }
 }
 
-void InlineTextBox::paintMarkedTextUnderline(GraphicsContext* pt,
-                                             int _tx,
-                                             int _ty,
-                                             MarkedTextUnderline& underline) {
+void InlineTextBox::paintMarkedTextUnderline(
+    GraphicsContext* pt,
+    int _tx,
+    int _ty,
+    const MarkedTextUnderline& underline) {
   _tx += m_x;
   _ty += m_y;
 

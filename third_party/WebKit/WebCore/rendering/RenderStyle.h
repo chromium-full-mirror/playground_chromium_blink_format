@@ -42,7 +42,8 @@
 #include "IntRect.h"
 #include "Length.h"
 #include "Shared.h"
-#include "DeprecatedValueList.h"
+#include "TextDirection.h"
+#include <wtf/Vector.h>
 
 #ifdef SVG_SUPPORT
 #include "SVGRenderStyle.h"
@@ -781,7 +782,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
 
   int lineClamp;  // An Apple extension.  Not really CSS3 but not worth making a
                   // new struct over.
-  DeprecatedValueList<StyleDashboardRegion> m_dashboardRegions;
+  Vector<StyleDashboardRegion> m_dashboardRegions;
   float opacity;  // Whether or not we're transparent.
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
@@ -1673,10 +1674,10 @@ class RenderStyle {
   void setMinHeight(Length v) { SET_VAR(box, min_height, v) }
   void setMaxHeight(Length v) { SET_VAR(box, max_height, v) }
 
-  DeprecatedValueList<StyleDashboardRegion> dashboardRegions() const {
+  Vector<StyleDashboardRegion> dashboardRegions() const {
     return css3NonInheritedData->m_dashboardRegions;
   }
-  void setDashboardRegions(DeprecatedValueList<StyleDashboardRegion> regions) {
+  void setDashboardRegions(Vector<StyleDashboardRegion> regions) {
     SET_VAR(css3NonInheritedData, m_dashboardRegions, regions);
   }
   void setDashboardRegion(int type,
@@ -2170,10 +2171,8 @@ class RenderStyle {
   static int initialLineClamp() { return -1; }
   static bool initialTextSizeAdjust() { return true; }
   static ETextSecurity initialTextSecurity() { return TSNONE; }
-  static const DeprecatedValueList<StyleDashboardRegion>&
-  initialDashboardRegions();
-  static const DeprecatedValueList<StyleDashboardRegion>&
-  noneDashboardRegions();
+  static const Vector<StyleDashboardRegion>& initialDashboardRegions();
+  static const Vector<StyleDashboardRegion>& noneDashboardRegions();
 };
 
 }  // namespace WebCore

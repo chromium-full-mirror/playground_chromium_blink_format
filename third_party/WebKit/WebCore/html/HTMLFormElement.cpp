@@ -200,29 +200,30 @@ bool HTMLFormElement::formData(FormData& result) const {
     FormDataList lst(encoding);
 
     if (!current->disabled() && current->appendFormData(lst, m_multipart)) {
-      for (DeprecatedValueListConstIterator<FormDataListItem> it = lst.begin();
-           it != lst.end(); ++it) {
+      size_t ln = lst.list().size();
+      for (size_t j = 0; j < ln; ++j) {
+        const FormDataListItem& item = lst.list()[j];
         if (!m_multipart) {
           // handle ISINDEX / <input name=isindex> special
           // but only if its the first entry
-          if (enc_string.isEmpty() && (*it).m_data == "isindex") {
-            ++it;
-            enc_string += encodeCString((*it).m_data);
+          if (enc_string.isEmpty() && item.m_data == "isindex") {
+            enc_string += encodeCString(lst.list()[j + 1].m_data);
+            ++j;
           } else {
             if (!enc_string.isEmpty())
               enc_string += '&';
 
-            enc_string += encodeCString((*it).m_data);
+            enc_string += encodeCString(item.m_data);
             enc_string += "=";
-            ++it;
-            enc_string += encodeCString((*it).m_data);
+            enc_string += encodeCString(lst.list()[j + 1].m_data);
+            ++j;
           }
         } else {
           DeprecatedCString hstr("--");
           hstr += m_boundary.deprecatedString().latin1();
           hstr += "\r\n";
           hstr += "Content-Disposition: form-data; name=\"";
-          hstr += (*it).m_data.data();
+          hstr += item.m_data.data();
           hstr += "\"";
 
           // if the current type is FILE, then we also need to
@@ -258,16 +259,17 @@ bool HTMLFormElement::formData(FormData& result) const {
           }
 
           hstr += "\r\n\r\n";
-          ++it;
 
           // append body
           result.appendData(hstr.data(), hstr.length());
-          const FormDataListItem& item = *it;
+          const FormDataListItem& item = lst.list()[j + 1];
           if (size_t dataSize = item.m_data.length())
             result.appendData(item.m_data, dataSize);
           else if (!item.m_path.isEmpty())
             result.appendFile(item.m_path);
           result.appendData("\r\n", 2);
+
+          ++j;
         }
       }
     }

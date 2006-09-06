@@ -76,6 +76,7 @@ template <typename T>
 class Timer;
 
 struct MarkedTextUnderline {
+  MarkedTextUnderline() : startOffset(0), endOffset(0), thick(false) {}
   MarkedTextUnderline(unsigned s, unsigned e, const Color& c, bool t)
       : startOffset(s), endOffset(e), color(c), thick(t) {}
   unsigned startOffset;
@@ -787,7 +788,7 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   UChar backslashAsCurrencySymbol() const;
 
-  DeprecatedValueList<MarkedTextUnderline> markedTextUnderlines() const;
+  const Vector<MarkedTextUnderline>& markedTextUnderlines() const;
   bool markedTextUsesUnderlines() const;
 
   unsigned markAllMatchesForText(const String&, bool caseFlag);

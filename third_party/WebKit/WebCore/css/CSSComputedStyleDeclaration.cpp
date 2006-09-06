@@ -1346,9 +1346,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       break;
 #if __APPLE__
     case CSS_PROP__WEBKIT_DASHBOARD_REGION: {
-      DeprecatedValueList<StyleDashboardRegion> regions =
-          style->dashboardRegions();
-      unsigned count = regions.count();
+      const Vector<StyleDashboardRegion>& regions = style->dashboardRegions();
+      unsigned count = regions.size();
       if (count == 1 && regions[0].type == StyleDashboardRegion::None)
         return new CSSPrimitiveValue(CSS_VAL_NONE);
 

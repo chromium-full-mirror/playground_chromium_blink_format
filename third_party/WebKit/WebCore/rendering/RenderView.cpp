@@ -255,10 +255,8 @@ void RenderView::computeAbsoluteRepaintRect(IntRect& r, bool f) {
     r.move(m_frameView->contentsX(), m_frameView->contentsY());
 }
 
-void RenderView::absoluteRects(DeprecatedValueList<IntRect>& rects,
-                               int _tx,
-                               int _ty) {
-  rects.append(IntRect(_tx, _ty, m_layer->width(), m_layer->height()));
+void RenderView::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
+  rects.append(IntRect(tx, ty, m_layer->width(), m_layer->height()));
 }
 
 RenderObject* rendererAfterPosition(RenderObject* object, unsigned offset) {

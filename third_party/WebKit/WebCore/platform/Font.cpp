@@ -25,24 +25,22 @@
 
 #include "config.h"
 #include "Font.h"
-#include "FontData.h"
 
+#include "FloatRect.h"
 #include "FontFallbackList.h"
-#include "GraphicsContext.h"
-#include "Settings.h"
-
+#include "IntPoint.h"
 #include "GlyphBuffer.h"
-
+#include "TextStyle.h"
+#include <unicode/uchar.h>
 #include <unicode/umachine.h>
 #include <unicode/unorm.h>
-
 #include <wtf/MathExtras.h>
 
 namespace WebCore {
 
 // According to
 // http://www.unicode.org/Public/UNIDATA/UCD.html#Canonical_Combining_Class_Values
-#define HIRAGANA_KATAKANA_VOICING_MARKS 8
+const uint8_t hiraganaKatakanaVoicingMarksCombiningClass = 8;
 
 const uint8_t Font::gRoundingHackCharacterTable[256] = {
     0,       0, 0,        0,        0,           0, 0,
@@ -358,7 +356,7 @@ bool WidthIterator::advanceOneCharacter(float& width,
 UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
   if (currentCharacter + 1 < m_end) {
     if (u_getCombiningClass(m_run[currentCharacter + 1]) ==
-        HIRAGANA_KATAKANA_VOICING_MARKS) {
+        hiraganaKatakanaVoicingMarksCombiningClass) {
       // Normalize into composed form using 3.2 rules.
       UChar normalizedCharacters[2] = {0, 0};
       UErrorCode uStatus = U_ZERO_ERROR;
@@ -431,6 +429,10 @@ void Font::update() const {
   if (!m_fontList)
     m_fontList = new FontFallbackList();
   m_fontList->invalidate();
+}
+
+int Font::width(const TextRun& run) const {
+  return width(run, TextStyle());
 }
 
 int Font::width(const TextRun& run, const TextStyle& style) const {

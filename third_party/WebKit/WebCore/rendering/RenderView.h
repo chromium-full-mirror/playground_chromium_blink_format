@@ -86,9 +86,7 @@ class RenderView : public RenderBlock {
  public:
   int truncatedAt() const { return m_truncatedAt; }
 
-  virtual void absoluteRects(DeprecatedValueList<IntRect>& rects,
-                             int _tx,
-                             int _ty);
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
 
   IntRect selectionRect() const;
 

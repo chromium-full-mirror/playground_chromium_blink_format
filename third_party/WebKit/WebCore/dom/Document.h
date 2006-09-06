@@ -856,9 +856,8 @@ class Document : public ContainerNode {
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
   void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
-  const DeprecatedValueList<DashboardRegionValue>& dashboardRegions() const;
-  void setDashboardRegions(
-      const DeprecatedValueList<DashboardRegionValue>& regions);
+  const Vector<DashboardRegionValue>& dashboardRegions() const;
+  void setDashboardRegions(const Vector<DashboardRegionValue>&);
 #endif
 
   void removeAllEventListenersFromAllNodes();
@@ -924,7 +923,7 @@ class Document : public ContainerNode {
 #endif
 
 #if __APPLE__
-  DeprecatedValueList<DashboardRegionValue> m_dashboardRegions;
+  Vector<DashboardRegionValue> m_dashboardRegions;
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
 #endif

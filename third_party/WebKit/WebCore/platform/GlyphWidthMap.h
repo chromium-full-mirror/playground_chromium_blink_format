@@ -30,17 +30,14 @@
 #define GLYPH_WIDTH_MAP_H
 
 #include <unicode/umachine.h>
-#include "GlyphBuffer.h"
 #include <wtf/Noncopyable.h>
 #include <wtf/HashMap.h>
 
 namespace WebCore {
 
-// Covers Latin-1.
-const unsigned cGlyphWidthPageSize = 256;
-const float cGlyphWidthUnknown = -1;
+typedef unsigned short Glyph;
 
-class FontData;
+const float cGlyphWidthUnknown = -1;
 
 class GlyphWidthMap : Noncopyable {
  public:
@@ -52,21 +49,17 @@ class GlyphWidthMap : Noncopyable {
     }
   }
 
-  float widthForGlyph(Glyph g);
-  void setWidthForGlyph(Glyph g, float f);
+  float widthForGlyph(Glyph);
+  void setWidthForGlyph(Glyph, float);
 
  private:
   struct GlyphWidthPage {
-    float m_widths[cGlyphWidthPageSize];
+    static const size_t size = 256;  // Usually covers Latin-1 in a single page.
+    float m_widths[size];
 
-    float widthForGlyph(Glyph g) const {
-      return m_widths[g % cGlyphWidthPageSize];
-    }
-    void setWidthForGlyph(Glyph g, float f) {
-      setWidthForIndex(g % cGlyphWidthPageSize, f);
-    }
-
-    void setWidthForIndex(unsigned index, float f) { m_widths[index] = f; }
+    float widthForGlyph(Glyph g) const { return m_widths[g % size]; }
+    void setWidthForGlyph(Glyph g, float w) { setWidthForIndex(g % size, w); }
+    void setWidthForIndex(unsigned index, float w) { m_widths[index] = w; }
   };
 
   GlyphWidthPage* locatePage(unsigned page);

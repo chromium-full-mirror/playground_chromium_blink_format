@@ -31,6 +31,7 @@
 
 #include "FontData.h"
 #include "WebCoreSystemInterface.h"
+#include <ApplicationServices/ApplicationServices.h>
 
 namespace WebCore {
 
@@ -41,7 +42,7 @@ bool GlyphMap::fillPage(GlyphPage* page,
   // Use an array of long so we get good enough alignment.
   long glyphVector[(GLYPH_VECTOR_SIZE + sizeof(long) - 1) / sizeof(long)];
 
-  OSStatus status = wkInitializeGlyphVector(cGlyphPageSize, &glyphVector);
+  OSStatus status = wkInitializeGlyphVector(GlyphPage::size, &glyphVector);
   if (status != noErr)
     // This should never happen, perhaps indicates a bad font!  If it does the
     // font substitution code will find an alternate font.
@@ -51,7 +52,7 @@ bool GlyphMap::fillPage(GlyphPage* page,
                         &glyphVector);
 
   unsigned numGlyphs = wkGetGlyphVectorNumGlyphs(&glyphVector);
-  if (numGlyphs != cGlyphPageSize) {
+  if (numGlyphs != GlyphPage::size) {
     // This should never happen, perhaps indicates a bad font?
     // If it does happen, the font substitution code will find an alternate
     // font.
@@ -61,7 +62,7 @@ bool GlyphMap::fillPage(GlyphPage* page,
 
   ATSLayoutRecord* glyphRecord =
       (ATSLayoutRecord*)wkGetGlyphVectorFirstRecord(glyphVector);
-  for (unsigned i = 0; i < cGlyphPageSize; i++) {
+  for (unsigned i = 0; i < GlyphPage::size; i++) {
     page->setGlyphDataForIndex(i, glyphRecord->glyphID, fontData);
     glyphRecord = (ATSLayoutRecord*)((char*)glyphRecord +
                                      wkGetGlyphVectorRecordSize(glyphVector));

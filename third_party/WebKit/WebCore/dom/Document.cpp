@@ -2050,13 +2050,12 @@ void Document::didEndEditing() {
 }
 
 #if __APPLE__
-const DeprecatedValueList<DashboardRegionValue>& Document::dashboardRegions()
-    const {
+const Vector<DashboardRegionValue>& Document::dashboardRegions() const {
   return m_dashboardRegions;
 }
 
 void Document::setDashboardRegions(
-    const DeprecatedValueList<DashboardRegionValue>& regions) {
+    const Vector<DashboardRegionValue>& regions) {
   m_dashboardRegions = regions;
   setDashboardRegionsDirty(false);
 }

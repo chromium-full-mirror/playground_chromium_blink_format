@@ -188,9 +188,7 @@ bool RenderSVGText::nodeAtPoint(NodeInfo& info,
                                   hitTestAction);
 }
 
-void RenderSVGText::absoluteRects(DeprecatedValueList<IntRect>& rects,
-                                  int _tx,
-                                  int _ty) {
+void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
   AffineTransform mat = translationForAttributes();
   mat *= translationTopToBaseline();
   mat *= absoluteTransform();
