@@ -28,6 +28,7 @@
 #include "ResourceLoaderInternal.h"
 #include "ResourceLoaderWin.h"
 
+#include "CString.h"
 #include "DocLoader.h"
 #include "Frame.h"
 #include "Document.h"
@@ -107,7 +108,7 @@ LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
             urlStr = urlStr.left(fragmentIndex);
           static LPCSTR accept[2] = {"*/*", NULL};
           HINTERNET urlHandle = HttpOpenRequestA(
-              job->d->m_resourceHandle, "POST", urlStr.ascii(), 0, 0, accept,
+              job->d->m_resourceHandle, "POST", urlStr.latin1(), 0, 0, accept,
               INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_FORMS_SUBMIT |
                   INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE,
               (DWORD_PTR)job->d->m_jobId);
@@ -129,14 +130,14 @@ LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
         INTERNET_BUFFERSA buffers;
         memset(&buffers, 0, sizeof(buffers));
         buffers.dwStructSize = sizeof(INTERNET_BUFFERSA);
-        buffers.lpcszHeader = headers.ascii();
+        buffers.lpcszHeader = headers.latin1();
         buffers.dwHeadersLength = headers.length();
         buffers.dwBufferTotal = formData.length();
 
         job->d->m_bytesRemainingToWrite = formData.length();
         job->d->m_formDataString = (char*)malloc(formData.length());
         job->d->m_formDataLength = formData.length();
-        strncpy(job->d->m_formDataString, formData.ascii(), formData.length());
+        strncpy(job->d->m_formDataString, formData.latin1(), formData.length());
         job->d->m_writing = true;
         HttpSendRequestExA(job->d->m_secondaryHandle, &buffers, 0, 0,
                            (DWORD_PTR)job->d->m_jobId);
@@ -325,7 +326,7 @@ bool ResourceLoader::start(DocLoader* docLoader) {
         headers += String("Referer: ") + referrer + "\r\n";
 
       urlHandle = InternetOpenUrlA(
-          internetHandle, urlStr.ascii(), headers.ascii(), headers.length(),
+          internetHandle, urlStr.ascii(), headers.latin1(), headers.length(),
           INTERNET_FLAG_KEEP_CONNECTION, (DWORD_PTR)d->m_jobId);
     }
 
