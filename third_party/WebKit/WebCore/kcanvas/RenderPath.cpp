@@ -456,6 +456,10 @@ void RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
   data.previousMarkerData.type = End;
   drawMarkerWithData(context, data.previousMarkerData);
 }
+
+bool RenderPath::hasPercentageValues() const {
+  return static_cast<SVGStyledElement*>(element())->hasPercentageValues();
+}
 }
 
 #endif  // SVG_SUPPORT
