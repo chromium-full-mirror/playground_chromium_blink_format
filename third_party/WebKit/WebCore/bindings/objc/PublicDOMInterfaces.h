@@ -929,3 +929,28 @@
                metaKey:(unsigned short)
                 button:(id<DOMEventTarget>)relatedTarget;
 @end
+
+@interface DOMNodeIterator : DOMObject
+@property(readonly) DOMNode* root;
+@property(readonly) unsigned whatToShow;
+@property(readonly) id<DOMNodeFilter> filter;
+@property(readonly) BOOL expandEntityReferences;
+- (DOMNode*)nextNode;
+- (DOMNode*)previousNode;
+- (void)detach;
+@end
+
+@interface DOMTreeWalker : DOMObject
+@property(readonly) DOMNode* root;
+@property(readonly) unsigned whatToShow;
+@property(readonly) id<DOMNodeFilter> filter;
+@property(readonly) BOOL expandEntityReferences;
+@property DOMNode* currentNode;
+- (DOMNode*)parentNode;
+- (DOMNode*)firstChild;
+- (DOMNode*)lastChild;
+- (DOMNode*)previousSibling;
+- (DOMNode*)nextSibling;
+- (DOMNode*)previousNode;
+- (DOMNode*)nextNode;
+@end
