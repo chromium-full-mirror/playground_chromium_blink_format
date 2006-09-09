@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004-2006 Apple Computer, Inc.  All rights reserved.
  * Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@class DOMEvent;
+#import <WebCore/DOMHTMLElement.h>
 
-@protocol DOMEventListener<NSObject>
-- (void)handleEvent:(DOMEvent*)event;
+@interface DOMHTMLEmbedElement : DOMHTMLElement
+- (NSString*)align;
+- (void)setAlign:(NSString*)newAlign;
+- (int)height;
+- (void)setHeight:(int)newHeight;
+- (NSString*)name;
+- (void)setName:(NSString*)newName;
+- (NSString*)src;
+- (void)setSrc:(NSString*)newSrc;
+- (NSString*)type;
+- (void)setType:(NSString*)newType;
+- (int)width;
+- (void)setWidth:(int)newWidth;
 @end

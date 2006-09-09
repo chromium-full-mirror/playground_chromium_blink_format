@@ -67,7 +67,7 @@ class KeyboardEvent : public UIEventWithKeyState {
                          bool altKey,
                          bool shiftKey,
                          bool metaKey,
-                         bool altGraphKey);
+                         bool altGraphKey = false);
 
   String keyIdentifier() const { return m_keyIdentifier.get(); }
   unsigned keyLocation() const { return m_keyLocation; }
