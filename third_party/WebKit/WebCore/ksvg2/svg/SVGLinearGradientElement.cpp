@@ -90,13 +90,13 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGLinearGradientElement,
 void SVGLinearGradientElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::x1Attr)
-    x1BaseValue()->setValueAsString(value.impl());
+    x1BaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::y1Attr)
-    y1BaseValue()->setValueAsString(value.impl());
+    y1BaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::x2Attr)
-    x2BaseValue()->setValueAsString(value.impl());
+    x2BaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::y2Attr)
-    y2BaseValue()->setValueAsString(value.impl());
+    y2BaseValue()->setValueAsString(value);
   else
     SVGGradientElement::parseMappedAttribute(attr);
 }
@@ -106,23 +106,23 @@ void SVGLinearGradientElement::buildGradient(
   rebuildStops();  // rebuild stops before possibly importing them from any
                    // referenced gradient.
 
-  bool bbox = (gradientUnitsBaseValue() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+  bool bbox = (gradientUnits() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
 
-  x1BaseValue()->setBboxRelative(bbox);
-  y1BaseValue()->setBboxRelative(bbox);
-  x2BaseValue()->setBboxRelative(bbox);
-  y2BaseValue()->setBboxRelative(bbox);
+  x1()->setBboxRelative(bbox);
+  y1()->setBboxRelative(bbox);
+  x2()->setBboxRelative(bbox);
+  y2()->setBboxRelative(bbox);
 
-  float _x1 = x1BaseValue()->value(), _y1 = y1BaseValue()->value();
-  float _x2 = x2BaseValue()->value(), _y2 = y2BaseValue()->value();
+  float _x1 = x1()->value(), _y1 = y1()->value();
+  float _x2 = x2()->value(), _y2 = y2()->value();
 
   KRenderingPaintServerLinearGradient* grad =
       static_cast<KRenderingPaintServerLinearGradient*>(_grad);
   AffineTransform mat;
-  if (gradientTransformBaseValue()->numberOfItems() > 0)
-    mat = gradientTransformBaseValue()->consolidate()->matrix()->matrix();
+  if (gradientTransform()->numberOfItems() > 0)
+    mat = gradientTransform()->consolidate()->matrix()->matrix();
 
-  DeprecatedString ref = String(hrefBaseValue()).deprecatedString();
+  DeprecatedString ref = String(href()).deprecatedString();
   KRenderingPaintServer* pserver = getPaintServerById(document(), ref.mid(1));
 
   if (pserver && (pserver->type() == PS_RADIAL_GRADIENT ||
@@ -173,9 +173,9 @@ void SVGLinearGradientElement::buildGradient(
     if (!hasAttribute(SVGNames::spreadMethodAttr))
       grad->setGradientSpreadMethod(gradient->spreadMethod());
   } else {
-    if (spreadMethodBaseValue() == SVG_SPREADMETHOD_REFLECT)
+    if (spreadMethod() == SVG_SPREADMETHOD_REFLECT)
       grad->setGradientSpreadMethod(SPREADMETHOD_REFLECT);
-    else if (spreadMethodBaseValue() == SVG_SPREADMETHOD_REPEAT)
+    else if (spreadMethod() == SVG_SPREADMETHOD_REPEAT)
       grad->setGradientSpreadMethod(SPREADMETHOD_REPEAT);
     else
       grad->setGradientSpreadMethod(SPREADMETHOD_PAD);

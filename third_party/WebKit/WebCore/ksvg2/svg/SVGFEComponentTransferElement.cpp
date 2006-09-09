@@ -65,7 +65,7 @@ void SVGFEComponentTransferElement::parseMappedAttribute(
     MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value.impl());
+    setInBaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -78,7 +78,7 @@ KCanvasFEComponentTransfer* SVGFEComponentTransferElement::filterEffect()
   if (!m_filterEffect)
     return 0;
 
-  m_filterEffect->setIn(String(inBaseValue()).deprecatedString());
+  m_filterEffect->setIn(in().deprecatedString());
   setStandardAttributes(m_filterEffect);
 
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {

@@ -38,7 +38,7 @@
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/device/KRenderingFillPainter.h>
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
                                      Document* doc)
@@ -46,10 +46,9 @@ SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
       SVGURIReference(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_preserveAspectRatio(new SVGPreserveAspectRatio(this)) {
-  m_filterEffect = 0;
-  m_cachedImage = 0;
-}
+      m_preserveAspectRatio(new SVGPreserveAspectRatio(this)),
+      m_cachedImage(0),
+      m_filterEffect(0) {}
 
 SVGFEImageElement::~SVGFEImageElement() {
   delete m_filterEffect;
@@ -74,8 +73,7 @@ void SVGFEImageElement::parseMappedAttribute(MappedAttribute* attr) {
     if (SVGURIReference::parseMappedAttribute(attr)) {
       if (m_cachedImage)
         m_cachedImage->deref(this);
-      m_cachedImage =
-          ownerDocument()->docLoader()->requestImage(hrefBaseValue());
+      m_cachedImage = ownerDocument()->docLoader()->requestImage(href());
       if (m_cachedImage)
         m_cachedImage->ref(this);
       return;
@@ -102,6 +100,7 @@ KCanvasFEImage* SVGFEImageElement::filterEffect() const {
     return 0;
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
+}
 }
 
 // vim:ts=4:noet

@@ -82,13 +82,13 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGEllipseElement,
 void SVGEllipseElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::cxAttr)
-    cxBaseValue()->setValueAsString(value.impl());
+    cxBaseValue()->setValueAsString(value);
   if (attr->name() == SVGNames::cyAttr)
-    cyBaseValue()->setValueAsString(value.impl());
+    cyBaseValue()->setValueAsString(value);
   if (attr->name() == SVGNames::rxAttr)
-    rxBaseValue()->setValueAsString(value.impl());
+    rxBaseValue()->setValueAsString(value);
   if (attr->name() == SVGNames::ryAttr)
-    ryBaseValue()->setValueAsString(value.impl());
+    ryBaseValue()->setValueAsString(value);
   else {
     if (SVGTests::parseMappedAttribute(attr))
       return;
@@ -101,8 +101,8 @@ void SVGEllipseElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 Path SVGEllipseElement::toPathData() const {
-  float _cx = cxBaseValue()->value(), _cy = cyBaseValue()->value();
-  float _rx = rxBaseValue()->value(), _ry = ryBaseValue()->value();
+  float _cx = cx()->value(), _cy = cy()->value();
+  float _rx = rx()->value(), _ry = ry()->value();
 
   return Path::createEllipse(FloatPoint(_cx, _cy), _rx, _ry);
 }
@@ -110,22 +110,22 @@ Path SVGEllipseElement::toPathData() const {
 const SVGStyledElement* SVGEllipseElement::pushAttributeContext(
     const SVGStyledElement* context) {
   // All attribute's contexts are equal (so just take the one from 'cx').
-  const SVGStyledElement* restore = cxBaseValue()->context();
+  const SVGStyledElement* restore = cx()->context();
 
-  cxBaseValue()->setContext(context);
-  cyBaseValue()->setContext(context);
-  rxBaseValue()->setContext(context);
-  ryBaseValue()->setContext(context);
+  cx()->setContext(context);
+  cy()->setContext(context);
+  rx()->setContext(context);
+  ry()->setContext(context);
 
   SVGStyledElement::pushAttributeContext(context);
   return restore;
 }
 
 bool SVGEllipseElement::hasPercentageValues() const {
-  if (cxBaseValue()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
-      cyBaseValue()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
-      rxBaseValue()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
-      ryBaseValue()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE)
+  if (cx()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
+      cy()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
+      rx()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
+      ry()->unitType() == SVGLength::SVG_LENGTHTYPE_PERCENTAGE)
     return true;
 
   return false;

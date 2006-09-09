@@ -30,7 +30,7 @@ SVGFEPointLightElement::SVGFEPointLightElement(const QualifiedName& tagName,
 SVGFEPointLightElement::~SVGFEPointLightElement() {}
 
 KCLightSource* SVGFEPointLightElement::lightSource() const {
-  KCanvasPoint3F pos(xBaseValue(), yBaseValue(), zBaseValue());
+  KCanvasPoint3F pos(x(), y(), z());
   return new KCPointLightSource(pos);
 }
 }

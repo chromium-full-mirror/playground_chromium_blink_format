@@ -87,7 +87,7 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
   else
     m_clipper->resetClipData();
 
-  bool bbox = clipPathUnitsBaseValue() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
+  bool bbox = clipPathUnits() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
   RenderStyle* clipPathStyle = styleForRenderer(
       parent()->renderer());  // FIXME: Manual style resolution is a hack

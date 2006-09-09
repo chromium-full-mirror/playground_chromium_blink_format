@@ -49,11 +49,11 @@ float SVGHelper::PercentageOfViewport(float value,
     const SVGSVGElement* svg =
         static_cast<const SVGSVGElement*>(viewportElement);
     if (svg->hasAttribute(SVGNames::viewBoxAttr)) {
-      width = svg->viewBoxBaseValue()->width();
-      height = svg->viewBoxBaseValue()->height();
-    } else if (svg->widthBaseValue()->unitType() ==
+      width = svg->viewBox()->width();
+      height = svg->viewBox()->height();
+    } else if (svg->width()->unitType() ==
                    SVGLength::SVG_LENGTHTYPE_PERCENTAGE ||
-               svg->heightBaseValue()->unitType() ==
+               svg->height()->unitType() ==
                    SVGLength::SVG_LENGTHTYPE_PERCENTAGE) {
       // TODO: Shouldn't w/h be multiplied with the percentage values?!
       // AFAIK, this assumes width & height == 100%, Rob??
@@ -67,8 +67,8 @@ float SVGHelper::PercentageOfViewport(float value,
         }
       }
     } else {
-      width = svg->widthBaseValue()->value();
-      height = svg->heightBaseValue()->value();
+      width = svg->width()->value();
+      height = svg->height()->value();
     }
   }
 

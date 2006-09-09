@@ -127,9 +127,9 @@ void SVGFECompositeElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (value == "arithmetic")
       set_operatorBaseValue(SVG_FECOMPOSITE_OPERATOR_ARITHMETIC);
   } else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value.impl());
+    setInBaseValue(value);
   else if (attr->name() == SVGNames::in2Attr)
-    setIn2BaseValue(value.impl());
+    setIn2BaseValue(value);
   else if (attr->name() == SVGNames::k1Attr)
     setK1BaseValue(value.deprecatedString().toDouble());
   else if (attr->name() == SVGNames::k2Attr)
@@ -148,15 +148,14 @@ KCanvasFEComposite* SVGFECompositeElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_COMPOSITE));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setOperation(
-      (KCCompositeOperationType)(_operatorBaseValue() - 1));
-  m_filterEffect->setIn(String(inBaseValue()).deprecatedString());
-  m_filterEffect->setIn2(String(in2BaseValue()).deprecatedString());
+  m_filterEffect->setOperation((KCCompositeOperationType)(_operator() - 1));
+  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn2(String(in2()).deprecatedString());
   setStandardAttributes(m_filterEffect);
-  m_filterEffect->setK1(k1BaseValue());
-  m_filterEffect->setK2(k2BaseValue());
-  m_filterEffect->setK3(k3BaseValue());
-  m_filterEffect->setK4(k4BaseValue());
+  m_filterEffect->setK1(k1());
+  m_filterEffect->setK2(k2());
+  m_filterEffect->setK3(k3());
+  m_filterEffect->setK4(k4());
   return m_filterEffect;
 }
 

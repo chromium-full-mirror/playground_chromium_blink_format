@@ -91,13 +91,13 @@ void SVGUseElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value = attr->value();
 
   if (attr->name() == SVGNames::xAttr)
-    xBaseValue()->setValueAsString(value.impl());
+    xBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::yAttr)
-    yBaseValue()->setValueAsString(value.impl());
+    yBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::widthAttr)
-    widthBaseValue()->setValueAsString(value.impl());
+    widthBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::heightAttr)
-    heightBaseValue()->setValueAsString(value.impl());
+    heightBaseValue()->setValueAsString(value);
   else {
     if (SVGTests::parseMappedAttribute(attr))
       return;
@@ -112,17 +112,16 @@ void SVGUseElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGUseElement::closeRenderer() {
-  DeprecatedString ref = String(hrefBaseValue()).deprecatedString();
-  String targetId = SVGURIReference::getTarget(ref);
-  Element* targetElement = ownerDocument()->getElementById(targetId.impl());
+  String targetId = SVGURIReference::getTarget(href().deprecatedString());
+  Element* targetElement = ownerDocument()->getElementById(targetId);
   SVGElement* target = svg_dynamic_cast(targetElement);
   if (!target) {
     // document()->addForwardReference(this);
     return;
   }
 
-  float _x = xBaseValue()->value(), _y = yBaseValue()->value();
-  float _w = widthBaseValue()->value(), _h = heightBaseValue()->value();
+  float _x = x()->value(), _y = y()->value();
+  float _w = width()->value(), _h = height()->value();
 
   String wString = String::number(_w);
   String hString = String::number(_h);

@@ -47,7 +47,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEMergeNodeElement,
 void SVGFEMergeNodeElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value.impl());
+    setInBaseValue(value);
   else
     SVGElement::parseMappedAttribute(attr);
 }

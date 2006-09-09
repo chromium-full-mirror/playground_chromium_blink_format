@@ -76,8 +76,8 @@ SVGAnimationElement::~SVGAnimationElement() {}
 SVGElement* SVGAnimationElement::targetElement() const {
   if (!m_targetElement) {
     if (!m_href.isEmpty()) {
-      String targetId = SVGURIReference::getTarget(m_href);
-      Element* element = ownerDocument()->getElementById(targetId.impl());
+      Element* element =
+          ownerDocument()->getElementById(SVGURIReference::getTarget(m_href));
       m_targetElement = svg_dynamic_cast(element);
     } else if (parentNode()) {
       Node* target = parentNode();

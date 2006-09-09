@@ -60,7 +60,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value(attr->value());
   if (attr->name() == SVGNames::targetAttr) {
-    setTargetBaseValue(value.impl());
+    setTargetBaseValue(value);
   } else {
     if (SVGURIReference::parseMappedAttribute(attr)) {
       m_isLink = attr->value() != 0;
@@ -92,7 +92,7 @@ void SVGAElement::defaultEventHandler(Event* evt) {
       SVGStyledTransformableElement::defaultEventHandler(evt);
       return;
     }
-    url = parseURL(hrefBaseValue()).deprecatedString();
+    url = parseURL(href()).deprecatedString();
     utarget = getAttribute(SVGNames::targetAttr).deprecatedString();
 
     if (e && e->button() == 1)

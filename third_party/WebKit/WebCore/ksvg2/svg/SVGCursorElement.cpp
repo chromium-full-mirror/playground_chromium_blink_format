@@ -70,9 +70,9 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGCursorElement,
 void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
   const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
-    xBaseValue()->setValueAsString(value.impl());
+    xBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::yAttr)
-    yBaseValue()->setValueAsString(value.impl());
+    yBaseValue()->setValueAsString(value);
   else {
     if (SVGTests::parseMappedAttribute(attr))
       return;
@@ -81,8 +81,7 @@ void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
     if (SVGURIReference::parseMappedAttribute(attr)) {
       if (m_cachedImage)
         m_cachedImage->deref(this);
-      m_cachedImage =
-          ownerDocument()->docLoader()->requestImage(hrefBaseValue());
+      m_cachedImage = ownerDocument()->docLoader()->requestImage(href());
       if (m_cachedImage)
         m_cachedImage->ref(this);
       return;

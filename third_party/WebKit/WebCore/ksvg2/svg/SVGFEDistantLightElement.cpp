@@ -30,7 +30,7 @@ SVGFEDistantLightElement::SVGFEDistantLightElement(const QualifiedName& tagName,
 SVGFEDistantLightElement::~SVGFEDistantLightElement() {}
 
 KCLightSource* SVGFEDistantLightElement::lightSource() const {
-  return new KCDistantLightSource(azimuthBaseValue(), elevationBaseValue());
+  return new KCDistantLightSource(azimuth(), elevation());
 }
 }
 #endif  // SVG_SUPPORT

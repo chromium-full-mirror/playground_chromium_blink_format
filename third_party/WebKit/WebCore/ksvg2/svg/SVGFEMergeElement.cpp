@@ -39,9 +39,7 @@ using namespace WebCore;
 
 SVGFEMergeElement::SVGFEMergeElement(const QualifiedName& tagName,
                                      Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc) {
-  m_filterEffect = 0;
-}
+    : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
 
 SVGFEMergeElement::~SVGFEMergeElement() {
   delete m_filterEffect;
@@ -57,10 +55,9 @@ KCanvasFEMerge* SVGFEMergeElement::filterEffect() const {
 
   DeprecatedStringList mergeInputs;
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
-    if (n->hasTagName(SVGNames::feMergeNodeTag)) {
-      String mergeInput = static_cast<SVGFEMergeNodeElement*>(n)->inBaseValue();
-      mergeInputs.append(mergeInput.deprecatedString());
-    }
+    if (n->hasTagName(SVGNames::feMergeNodeTag))
+      mergeInputs.append(
+          static_cast<SVGFEMergeNodeElement*>(n)->in().deprecatedString());
   }
 
   m_filterEffect->setMergeInputs(mergeInputs);

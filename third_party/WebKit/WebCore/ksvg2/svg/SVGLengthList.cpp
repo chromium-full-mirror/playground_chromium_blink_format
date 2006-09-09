@@ -28,7 +28,7 @@
 #include "SVGSVGElement.h"
 #include "SVGLengthList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGLengthList::SVGLengthList(const SVGStyledElement* context)
     : SVGList<SVGLength>(context) {}
@@ -42,9 +42,10 @@ void SVGLengthList::parse(const DeprecatedString& value,
   for (unsigned int i = 0; i < lengths.count(); i++) {
     SVGLength* length = new SVGLength(context, mode);
     String str(lengths[i]);
-    length->setValueAsString(str.impl());
+    length->setValueAsString(str);
     appendItem(length);
   }
+}
 }
 
 // vim:ts=4:noet
