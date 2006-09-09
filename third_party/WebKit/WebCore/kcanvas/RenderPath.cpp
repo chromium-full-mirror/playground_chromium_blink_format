@@ -141,7 +141,7 @@ IntRect RenderPath::getAbsoluteRepaintRect() {
 
   // Filters can expand the bounding box
   KCanvasFilter* filter =
-      getFilterById(document(), style()->svgStyle()->filter().mid(1));
+      getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter)
     repaintRect.unite(filter->filterBBoxForItemBBox(repaintRect));
 
@@ -188,18 +188,18 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   // setup to apply filters
   KCanvasFilter* filter =
-      getFilterById(document(), style()->svgStyle()->filter().mid(1));
+      getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter) {
     filter->prepareFilter(relativeBBox(true));
     context = device->currentContext();
   }
 
-  if (KCanvasClipper* clipper =
-          getClipperById(document(), style()->svgStyle()->clipPath().mid(1)))
+  if (KCanvasClipper* clipper = getClipperById(
+          document(), style()->svgStyle()->clipPath().substring(1)))
     clipper->applyClip(relativeBBox(true));
 
-  if (KCanvasMasker* masker =
-          getMaskerById(document(), style()->svgStyle()->maskElement().mid(1)))
+  if (KCanvasMasker* masker = getMaskerById(
+          document(), style()->svgStyle()->maskElement().substring(1)))
     masker->applyMask(relativeBBox(true));
 
   context->clearPath();
@@ -438,9 +438,11 @@ void RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
   const SVGRenderStyle* svgStyle = style()->svgStyle();
 
   KCanvasMarker* startMarker =
-      getMarkerById(doc, svgStyle->startMarker().mid(1));
-  KCanvasMarker* midMarker = getMarkerById(doc, svgStyle->midMarker().mid(1));
-  KCanvasMarker* endMarker = getMarkerById(doc, svgStyle->endMarker().mid(1));
+      getMarkerById(doc, svgStyle->startMarker().substring(1));
+  KCanvasMarker* midMarker =
+      getMarkerById(doc, svgStyle->midMarker().substring(1));
+  KCanvasMarker* endMarker =
+      getMarkerById(doc, svgStyle->endMarker().substring(1));
 
   if (!startMarker && !midMarker && !endMarker)
     return;

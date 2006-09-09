@@ -28,7 +28,7 @@
 #include "SVGStyledElement.h"
 #include "IntPoint.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPoint::SVGPoint(const SVGStyledElement* context) {
   m_x = 0.0;
@@ -75,6 +75,7 @@ void SVGPoint::setY(float y) {
 SVGPoint* SVGPoint::matrixTransform(SVGMatrix* /* matrix */) {
   // TODO: implement me!
   return 0;
+}
 }
 
 // vim:ts=4:noet

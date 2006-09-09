@@ -26,11 +26,10 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGRenderStyleDefs_H
-#define KSVG_SVGRenderStyleDefs_H
+#ifndef SVGRenderStyleDefs_H
+#define SVGRenderStyleDefs_H
 #ifdef SVG_SUPPORT
 
-#include "DeprecatedString.h"
 #include "Path.h"
 
 // Helper macros for 'SVGRenderStyle'
@@ -188,7 +187,7 @@ class StyleClipData : public Shared<StyleClipData> {
     return !(*this == other);
   }
 
-  DeprecatedString clipPath;
+  String clipPath;
 
  private:
   StyleClipData& operator=(const StyleClipData&);
@@ -204,7 +203,7 @@ class StyleMaskData : public Shared<StyleMaskData> {
     return !(*this == other);
   }
 
-  DeprecatedString maskElement;
+  String maskElement;
 
  private:
   StyleMaskData& operator=(const StyleMaskData&);
@@ -220,9 +219,9 @@ class StyleMarkerData : public Shared<StyleMarkerData> {
     return !(*this == other);
   }
 
-  DeprecatedString startMarker;
-  DeprecatedString midMarker;
-  DeprecatedString endMarker;
+  String startMarker;
+  String midMarker;
+  String endMarker;
 
  private:
   StyleMarkerData& operator=(const StyleMarkerData&);
@@ -239,7 +238,7 @@ class StyleMiscData : public Shared<StyleMiscData> {
     return !(*this == other);
   }
 
-  DeprecatedString filter;
+  String filter;
   Color floodColor;
   float floodOpacity;
 

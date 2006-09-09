@@ -57,8 +57,8 @@ class KCanvasResource {
 
   const RenderPathList& clients() const;
 
-  DeprecatedString idInRegistry() const;
-  void setIdInRegistry(const DeprecatedString& newId);
+  String idInRegistry() const;
+  void setIdInRegistry(const String&);
 
   virtual bool isPaintServer() const { return false; }
   virtual bool isFilter() const { return false; }
@@ -70,7 +70,7 @@ class KCanvasResource {
 
  private:
   RenderPathList m_clients;
-  DeprecatedString registryId;
+  String m_registryId;
 };
 
 // Clipping paths

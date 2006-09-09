@@ -44,9 +44,8 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
       m_surfaceScale(0.0),
       m_lightingColor(new SVGColor()),
       m_kernelUnitLengthX(0.0),
-      m_kernelUnitLengthY(0.0) {
-  m_filterEffect = 0;
-}
+      m_kernelUnitLengthY(0.0),
+      m_filterEffect(0) {}
 
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {
   delete m_filterEffect;
@@ -127,7 +126,7 @@ KCanvasFEDiffuseLighting* SVGFEDiffuseLightingElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEDiffuseLighting*>(
         renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
-  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn(in());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setDiffuseConstant((diffuseConstant()));
   m_filterEffect->setSurfaceScale((surfaceScale()));

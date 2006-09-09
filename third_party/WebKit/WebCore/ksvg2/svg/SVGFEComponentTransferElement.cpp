@@ -22,13 +22,11 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "DeprecatedStringList.h"
-
 #include "Attr.h"
 
-#include <kcanvas/KCanvasResources.h>
-#include <kcanvas/KCanvasFilters.h>
-#include <kcanvas/device/KRenderingDevice.h>
+#include "KCanvasResources.h"
+#include "KCanvasFilters.h"
+#include "KRenderingDevice.h"
 
 #include "SVGNames.h"
 #include "SVGHelper.h"
@@ -39,14 +37,12 @@
 #include "SVGFEFuncBElement.h"
 #include "SVGFEFuncAElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGFEComponentTransferElement::SVGFEComponentTransferElement(
     const QualifiedName& tagName,
     Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc) {
-  m_filterEffect = 0;
-}
+    : SVGFilterPrimitiveStandardAttributes(tagName, doc), m_filterEffect(0) {}
 
 SVGFEComponentTransferElement::~SVGFEComponentTransferElement() {
   delete m_filterEffect;
@@ -78,7 +74,7 @@ KCanvasFEComponentTransfer* SVGFEComponentTransferElement::filterEffect()
   if (!m_filterEffect)
     return 0;
 
-  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn(in());
   setStandardAttributes(m_filterEffect);
 
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
@@ -97,6 +93,7 @@ KCanvasFEComponentTransfer* SVGFEComponentTransferElement::filterEffect()
   }
 
   return m_filterEffect;
+}
 }
 
 // vim:ts=4:noet

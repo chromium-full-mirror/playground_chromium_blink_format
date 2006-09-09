@@ -25,7 +25,6 @@
 #define KCanvasFilters_H
 #ifdef SVG_SUPPORT
 
-#include "DeprecatedStringList.h"
 #include "KCanvasResources.h"
 
 #ifdef __OBJC__
@@ -133,11 +132,11 @@ class KCanvasFilterEffect {
   FloatRect subRegion() const;
   void setSubRegion(const FloatRect& subregion);
 
-  DeprecatedString in() const;
-  void setIn(const DeprecatedString& in);
+  String in() const;
+  void setIn(const String& in);
 
-  DeprecatedString result() const;
-  void setResult(const DeprecatedString& result);
+  String result() const;
+  void setResult(const String& result);
 
 #if __APPLE__
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz*) const = 0;
@@ -147,8 +146,8 @@ class KCanvasFilterEffect {
 
  private:
   FloatRect m_subregion;
-  DeprecatedString m_in;
-  DeprecatedString m_result;
+  String m_in;
+  String m_result;
 };
 
 TextStream& operator<<(TextStream&, const KCanvasFilterEffect&);
@@ -163,8 +162,8 @@ typedef enum {
 
 class KCanvasFEBlend : public KCanvasFilterEffect {
  public:
-  DeprecatedString in2() const { return m_in2; }
-  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
+  String in2() const { return m_in2; }
+  void setIn2(const String& in2) { m_in2 = in2; }
 
   KCBlendModeType blendMode() const { return m_mode; }
   void setBlendMode(KCBlendModeType mode) { m_mode = mode; }
@@ -173,7 +172,7 @@ class KCanvasFEBlend : public KCanvasFilterEffect {
 
  private:
   KCBlendModeType m_mode;
-  DeprecatedString m_in2;
+  String m_in2;
 };
 
 typedef enum {
@@ -262,8 +261,8 @@ typedef enum {
 
 class KCanvasFEComposite : public KCanvasFilterEffect {
  public:
-  DeprecatedString in2() const { return m_in2; }
-  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
+  String in2() const { return m_in2; }
+  void setIn2(const String& in2) { m_in2 = in2; }
 
   KCCompositeOperationType operation() const { return m_operation; }
   void setOperation(KCCompositeOperationType oper) { m_operation = oper; }
@@ -280,7 +279,7 @@ class KCanvasFEComposite : public KCanvasFilterEffect {
   TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  DeprecatedString m_in2;
+  String m_in2;
   KCCompositeOperationType m_operation;
   float m_k1;
   float m_k2;
@@ -460,8 +459,8 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
   KCanvasFEDisplacementMap()
       : m_xChannelSelector(CS_RED), m_yChannelSelector(CS_RED), m_scale(0) {}
 
-  DeprecatedString in2() const { return m_in2; }
-  void setIn2(const DeprecatedString& in2) { m_in2 = in2; }
+  String in2() const { return m_in2; }
+  void setIn2(const String& in2) { m_in2 = in2; }
 
   KCChannelSelectorType xChannelSelector() const { return m_xChannelSelector; }
   void setXChannelSelector(const KCChannelSelectorType xChannelSelector) {
@@ -479,7 +478,7 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
   TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  DeprecatedString m_in2;
+  String m_in2;
   KCChannelSelectorType m_xChannelSelector;
   KCChannelSelectorType m_yChannelSelector;
   float m_scale;
@@ -535,15 +534,15 @@ class KCanvasFEImage : public KCanvasFilterEffect, public CachedResourceClient {
 
 class KCanvasFEMerge : public KCanvasFilterEffect {
  public:
-  DeprecatedStringList mergeInputs() const { return m_mergeInputs; }
-  void setMergeInputs(const DeprecatedStringList& mergeInputs) {
+  const Vector<String>& mergeInputs() const { return m_mergeInputs; }
+  void setMergeInputs(const Vector<String>& mergeInputs) {
     m_mergeInputs = mergeInputs;
   }
 
   TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  DeprecatedStringList m_mergeInputs;
+  Vector<String> m_mergeInputs;
 };
 
 typedef enum { MO_ERODE = 0, MO_DIALATE = 1 } KCMorphologyOperatorType;

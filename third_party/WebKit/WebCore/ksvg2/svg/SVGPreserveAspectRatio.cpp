@@ -22,24 +22,20 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "DeprecatedString.h"
 #include "DeprecatedStringList.h"
-
-#include "StringImpl.h"
 
 #include "ksvg.h"
 #include "SVGMatrix.h"
 #include "SVGSVGElement.h"
 #include "SVGPreserveAspectRatio.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPreserveAspectRatio::SVGPreserveAspectRatio(const SVGStyledElement* context)
-    : Shared<SVGPreserveAspectRatio>() {
-  m_context = context;
-  m_meetOrSlice = SVG_MEETORSLICE_MEET;
-  m_align = SVG_PRESERVEASPECTRATIO_XMIDYMID;
-}
+    : Shared<SVGPreserveAspectRatio>(),
+      m_align(SVG_PRESERVEASPECTRATIO_XMIDYMID),
+      m_meetOrSlice(SVG_MEETORSLICE_MEET),
+      m_context(context) {}
 
 SVGPreserveAspectRatio::~SVGPreserveAspectRatio() {}
 
@@ -59,15 +55,13 @@ unsigned short SVGPreserveAspectRatio::meetOrSlice() const {
   return m_meetOrSlice;
 }
 
-void SVGPreserveAspectRatio::parsePreserveAspectRatio(StringImpl* strImpl) {
+void SVGPreserveAspectRatio::parsePreserveAspectRatio(const String& string) {
   // Spec: set the defaults
   setAlign(SVG_PRESERVEASPECTRATIO_NONE);
   setMeetOrSlice(SVG_MEETORSLICE_MEET);
 
-  String s(strImpl);
-  DeprecatedString str = s.deprecatedString();
-  DeprecatedStringList params =
-      DeprecatedStringList::split(' ', str.simplifyWhiteSpace());
+  DeprecatedStringList params = DeprecatedStringList::split(
+      ' ', string.deprecatedString().simplifyWhiteSpace());
 
   if (params[0] == "none")
     m_align = SVG_PRESERVEASPECTRATIO_NONE;
@@ -157,6 +151,7 @@ SVGMatrix* SVGPreserveAspectRatio::getCTM(float logicX,
   }
 
   return temp;
+}
 }
 
 // vim:ts=4:noet

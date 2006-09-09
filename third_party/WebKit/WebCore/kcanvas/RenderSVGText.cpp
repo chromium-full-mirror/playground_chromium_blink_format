@@ -75,14 +75,15 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   const SVGRenderStyle* svgStyle = style()->svgStyle();
 
   if (KCanvasClipper* clipper =
-          getClipperById(document(), svgStyle->clipPath().mid(1)))
+          getClipperById(document(), svgStyle->clipPath().substring(1)))
     clipper->applyClip(boundingBox);
 
   if (KCanvasMasker* masker =
-          getMaskerById(document(), svgStyle->maskElement().mid(1)))
+          getMaskerById(document(), svgStyle->maskElement().substring(1)))
     masker->applyMask(boundingBox);
 
-  KCanvasFilter* filter = getFilterById(document(), svgStyle->filter().mid(1));
+  KCanvasFilter* filter =
+      getFilterById(document(), svgStyle->filter().substring(1));
   if (filter)
     filter->prepareFilter(boundingBox);
 

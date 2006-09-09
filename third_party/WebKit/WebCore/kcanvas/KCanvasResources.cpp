@@ -87,12 +87,12 @@ void KCanvasResource::invalidate() {
     const_cast<RenderPath*>(*it)->repaint();
 }
 
-DeprecatedString KCanvasResource::idInRegistry() const {
-  return registryId;
+String KCanvasResource::idInRegistry() const {
+  return m_registryId;
 }
 
-void KCanvasResource::setIdInRegistry(const DeprecatedString& newId) {
-  registryId = newId;
+void KCanvasResource::setIdInRegistry(const String& newId) {
+  m_registryId = newId;
 }
 
 TextStream& KCanvasResource::externalRepresentation(TextStream& ts) const {
@@ -253,9 +253,6 @@ KCanvasResource* getResourceById(Document* document, const AtomicString& id) {
   SVGElement* svgElement = svg_dynamic_cast(element);
   if (svgElement && svgElement->isStyled())
     return static_cast<SVGStyledElement*>(svgElement)->canvasResource();
-  else
-    fprintf(stderr, "Failed to find resource with id: %s\n",
-            id.deprecatedString().ascii());
   return 0;
 }
 

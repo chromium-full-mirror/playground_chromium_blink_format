@@ -32,7 +32,7 @@
 #include "SVGStringList.h"
 #include "SVGZoomAndPan.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGViewElement::SVGViewElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc),
@@ -48,9 +48,9 @@ SVGStringList* SVGViewElement::viewTarget() const {
 
 void SVGViewElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
-  if (attr->name() == SVGNames::viewTargetAttr) {
+  if (attr->name() == SVGNames::viewTargetAttr)
     viewTarget()->reset(value.deprecatedString());
-  } else {
+  else {
     if (SVGExternalResourcesRequired::parseMappedAttribute(attr) ||
         SVGFitToViewBox::parseMappedAttribute(attr) ||
         SVGZoomAndPan::parseMappedAttribute(attr))
@@ -58,6 +58,7 @@ void SVGViewElement::parseMappedAttribute(MappedAttribute* attr) {
 
     SVGStyledElement::parseMappedAttribute(attr);
   }
+}
 }
 
 #endif  // SVG_SUPPORT

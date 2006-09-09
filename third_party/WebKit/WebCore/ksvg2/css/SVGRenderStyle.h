@@ -190,43 +190,43 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            stopColor,
                                            Color(0, 0, 0))
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            clip,
                                            clipPath,
                                            ClipPath,
                                            clipPath,
-                                           DeprecatedString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+                                           String())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            mask,
                                            maskElement,
                                            MaskElement,
                                            maskElement,
-                                           DeprecatedString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+                                           String())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            markers,
                                            startMarker,
                                            StartMarker,
                                            startMarker,
-                                           DeprecatedString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+                                           String())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            markers,
                                            midMarker,
                                            MidMarker,
                                            midMarker,
-                                           DeprecatedString())
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+                                           String())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            markers,
                                            endMarker,
                                            EndMarker,
                                            endMarker,
-                                           DeprecatedString())
+                                           String())
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(DeprecatedString,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
                                            misc,
                                            filter,
                                            Filter,
                                            filter,
-                                           DeprecatedString())
+                                           String())
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
                                            misc,
                                            floodOpacity,

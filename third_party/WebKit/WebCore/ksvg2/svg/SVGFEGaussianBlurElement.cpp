@@ -42,9 +42,8 @@ SVGFEGaussianBlurElement::SVGFEGaussianBlurElement(const QualifiedName& tagName,
                                                    Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_stdDeviationX(0.0),
-      m_stdDeviationY(0.0) {
-  m_filterEffect = 0;
-}
+      m_stdDeviationY(0.0),
+      m_filterEffect(0) {}
 
 SVGFEGaussianBlurElement::~SVGFEGaussianBlurElement() {
   delete m_filterEffect;
@@ -100,7 +99,7 @@ KCanvasFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn(in());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setStdDeviationX(stdDeviationX());
   m_filterEffect->setStdDeviationY(stdDeviationY());

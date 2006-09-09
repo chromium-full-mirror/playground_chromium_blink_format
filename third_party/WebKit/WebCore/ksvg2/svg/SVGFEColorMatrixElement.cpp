@@ -44,9 +44,8 @@ SVGFEColorMatrixElement::SVGFEColorMatrixElement(const QualifiedName& tagName,
                                                  Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_type(0),
-      m_values(new SVGNumberList(0)) {
-  m_filterEffect = 0;
-}
+      m_values(new SVGNumberList(0)),
+      m_filterEffect(0) {}
 
 SVGFEColorMatrixElement::~SVGFEColorMatrixElement() {
   delete m_filterEffect;
@@ -103,7 +102,7 @@ KCanvasFEColorMatrix* SVGFEColorMatrixElement::filterEffect() const {
   if (!m_filterEffect)
     return 0;
 
-  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn(in());
   setStandardAttributes(m_filterEffect);
   DeprecatedValueList<float> _values;
   SVGNumberList* numbers = values();

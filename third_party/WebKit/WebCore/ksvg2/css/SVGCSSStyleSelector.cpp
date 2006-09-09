@@ -447,10 +447,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
 
@@ -462,10 +462,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
 
@@ -477,10 +477,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
 
@@ -527,10 +527,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
       svgstyle->setFilter(s);
@@ -541,10 +541,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
 
@@ -556,10 +556,10 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       if (!primitiveValue)
         return;
 
-      DeprecatedString s;
+      String s;
       int type = primitiveValue->primitiveType();
       if (type == CSSPrimitiveValue::CSS_URI)
-        s = primitiveValue->getStringValue().deprecatedString();
+        s = primitiveValue->getStringValue();
       else
         return;
 

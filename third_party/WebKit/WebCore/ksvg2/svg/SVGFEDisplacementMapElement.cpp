@@ -39,9 +39,8 @@ SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       m_xChannelSelector(0),
       m_yChannelSelector(0),
-      m_scale(0.0) {
-  m_filterEffect = 0;
-}
+      m_scale(0.0),
+      m_filterEffect(0) {}
 
 SVGFEDisplacementMapElement::~SVGFEDisplacementMapElement() {
   delete m_filterEffect;
@@ -128,8 +127,8 @@ KCanvasFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
       (KCChannelSelectorType)(xChannelSelector()));
   m_filterEffect->setYChannelSelector(
       (KCChannelSelectorType)(yChannelSelector()));
-  m_filterEffect->setIn(in().deprecatedString());
-  m_filterEffect->setIn2(String(in2()).deprecatedString());
+  m_filterEffect->setIn(in());
+  m_filterEffect->setIn2(in2());
   m_filterEffect->setScale(scale());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;

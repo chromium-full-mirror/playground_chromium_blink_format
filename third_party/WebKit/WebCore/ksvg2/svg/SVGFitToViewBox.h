@@ -39,7 +39,7 @@ class SVGFitToViewBox {
   virtual ~SVGFitToViewBox();
 
   // 'SVGFitToViewBox' functions
-  void parseViewBox(StringImpl* str);
+  void parseViewBox(const String&);
   SVGMatrix* viewBoxToViewTransform(float viewWidth, float viewHeight) const;
 
   bool parseMappedAttribute(MappedAttribute* attr);

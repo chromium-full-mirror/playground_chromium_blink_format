@@ -46,9 +46,8 @@ SVGFETurbulenceElement::SVGFETurbulenceElement(const QualifiedName& tagName,
       m_numOctaves(0),
       m_seed(0.0),
       m_stitchTiles(0),
-      m_type(0) {
-  m_filterEffect = 0;
-}
+      m_type(0),
+      m_filterEffect(0) {}
 
 SVGFETurbulenceElement::~SVGFETurbulenceElement() {
   delete m_filterEffect;

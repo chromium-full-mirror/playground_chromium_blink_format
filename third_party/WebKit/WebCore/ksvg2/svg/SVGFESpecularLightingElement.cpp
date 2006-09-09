@@ -46,9 +46,8 @@ SVGFESpecularLightingElement::SVGFESpecularLightingElement(
       m_surfaceScale(0.0),
       m_lightingColor(new SVGColor()),
       m_kernelUnitLengthX(0.0),
-      m_kernelUnitLengthY(0.0) {
-  m_filterEffect = 0;
-}
+      m_kernelUnitLengthY(0.0),
+      m_filterEffect(0) {}
 
 SVGFESpecularLightingElement::~SVGFESpecularLightingElement() {
   delete m_filterEffect;
@@ -139,7 +138,7 @@ KCanvasFESpecularLighting* SVGFESpecularLightingElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFESpecularLighting*>(
         renderingDevice()->createFilterEffect(FE_SPECULAR_LIGHTING));
-  m_filterEffect->setIn(in().deprecatedString());
+  m_filterEffect->setIn(in());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setSpecularConstant((specularConstant()));
   m_filterEffect->setSpecularExponent((specularExponent()));

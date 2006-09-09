@@ -57,9 +57,6 @@ GlobalObject::~GlobalObject() {}
 
 KJS::JSValue* GlobalObject::get(KJS::ExecState* exec,
                                 const KJS::Identifier& p) const {
-  kdDebug(26004) << "WebCore::GlobalObject (" << this << ")::get "
-                 << p.deprecatedString() << endl;
-
   KJS::JSValue* ret = GlobalObject::get(exec, p);
   if (ret->type() != KJS::UndefinedType)
     return ret;
@@ -95,8 +92,6 @@ KJS::JSValue* GlobalObject::get(KJS::ExecState* exec,
 
   // This isn't necessarily a bug. Some code uses if(!window.blah) window.blah=1
   // But it can also mean something isn't loaded or implemented...
-  kdDebug(26004) << "GlobalObject::get property not found: "
-                 << p.deprecatedString() << endl;
   return KJS::jsUndefined();
 }
 
