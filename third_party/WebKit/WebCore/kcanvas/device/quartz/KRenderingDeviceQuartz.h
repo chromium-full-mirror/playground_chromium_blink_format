@@ -33,12 +33,6 @@
 typedef struct CGRect CGRect;
 typedef struct CGContext* CGContextRef;
 
-#ifdef __OBJC__
-@class NSGraphicsContext;
-#else
-class NSGraphicsContext;
-#endif
-
 namespace WebCore {
 
 class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
@@ -55,11 +49,9 @@ class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
   virtual GraphicsContext* createGraphicsContext();
 
   CGContextRef cgContext() const { return m_cgContext; };
-  NSGraphicsContext* nsGraphicsContext();
 
  private:
   CGContextRef m_cgContext;
-  NSGraphicsContext* m_nsGraphicsContext;
 };
 
 class KRenderingDeviceQuartz : public KRenderingDevice {
@@ -68,9 +60,6 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   virtual ~KRenderingDeviceQuartz() {}
 
   virtual bool isBuffered() const { return false; }
-
-  virtual KRenderingDeviceContext* popContext();
-  virtual void pushContext(KRenderingDeviceContext* context);
 
   // context management.
   KRenderingDeviceContextQuartz* quartzContext() const;

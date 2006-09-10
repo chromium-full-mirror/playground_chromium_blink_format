@@ -184,7 +184,8 @@ class Font {
                   const GlyphBuffer&,
                   int from,
                   int to,
-                  const FloatPoint&) const;
+                  const FloatPoint&,
+                  bool usePrinterFont) const;
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
                        const TextStyle&,

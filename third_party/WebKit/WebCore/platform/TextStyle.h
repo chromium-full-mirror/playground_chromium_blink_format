@@ -32,7 +32,8 @@ class TextStyle {
             bool directionalOverride = false,
             bool applyRunRounding = true,
             bool applyWordRounding = true,
-            bool attemptFontSubstitution = true)
+            bool attemptFontSubstitution = true,
+            bool usePrinterFonts = false)
       : m_tabWidth(tabWidth),
         m_xpos(xpos),
         m_padding(padding),
@@ -40,7 +41,8 @@ class TextStyle {
         m_directionalOverride(directionalOverride),
         m_applyRunRounding(applyRunRounding),
         m_applyWordRounding(applyWordRounding),
-        m_attemptFontSubstitution(attemptFontSubstitution) {}
+        m_attemptFontSubstitution(attemptFontSubstitution),
+        m_usePrinterFonts(usePrinterFonts) {}
 
   int tabWidth() const { return m_tabWidth; }
   int xPos() const { return m_xpos; }
@@ -51,11 +53,13 @@ class TextStyle {
   bool applyRunRounding() const { return m_applyRunRounding; }
   bool applyWordRounding() const { return m_applyWordRounding; }
   bool attemptFontSubstitution() const { return m_attemptFontSubstitution; }
+  bool usePrinterFonts() const { return m_usePrinterFonts; }
 
   void disableRoundingHacks() {
     m_applyRunRounding = m_applyWordRounding = false;
   }
   void setRTL(bool b) { m_rtl = b; }
+  void setUsePrinterFonts(bool b) { m_usePrinterFonts = b; }
 
  private:
   int m_tabWidth;
@@ -66,6 +70,7 @@ class TextStyle {
   bool m_applyRunRounding;
   bool m_applyWordRounding;
   bool m_attemptFontSubstitution;
+  bool m_usePrinterFonts;
 };
 }
 
