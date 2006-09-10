@@ -85,6 +85,8 @@ class Element : public ContainerNode {
   int offsetWidth();
   int offsetHeight();
   Element* offsetParent();
+  int clientLeft();
+  int clientTop();
   int clientWidth();
   int clientHeight();
   int scrollLeft();
