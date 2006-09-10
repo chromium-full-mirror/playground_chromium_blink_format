@@ -21,6 +21,8 @@
 #include "config.h"
 #include "StringImpl.h"
 
+#if PLATFORM(CF)
+
 #include <CoreFoundation/CoreFoundation.h>
 
 namespace WebCore {
@@ -29,3 +31,5 @@ CFStringRef StringImpl::createCFString() const {
   return CFStringCreateWithCharacters(NULL, (const UniChar*)m_data, m_length);
 }
 }
+
+#endif  // PLATFORM(CF)
