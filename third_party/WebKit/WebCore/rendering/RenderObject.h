@@ -734,15 +734,27 @@ class RenderObject : public CachedResourceClient {
 
   // More IE extensions.  clientWidth and clientHeight represent the interior of
   // an object
-  // excluding border and scrollbar.
+  // excluding border and scrollbar.  clientLeft/Top are just the
+  // borderLeftWidth and borderTopWidth.
+  int clientLeft() const { return borderLeft(); }
+  int clientTop() const { return borderTop(); }
   int clientWidth() const;
   int clientHeight() const;
 
   // scrollWidth/scrollHeight will be the same as clientWidth/clientHeight
   // unless the
   // object has overflow:hidden/scroll/auto specified and also has overflow.
-  int scrollWidth() const;
-  int scrollHeight() const;
+  // scrollLeft/Top return the current scroll position.  These methods are
+  // virtual so that objects like
+  // textareas can scroll shadow content (but pretend that they are the objects
+  // that are
+  // scrolling).
+  virtual int scrollLeft() const;
+  virtual int scrollTop() const;
+  virtual int scrollWidth() const;
+  virtual int scrollHeight() const;
+  virtual void setScrollLeft(int);
+  virtual void setScrollTop(int);
 
   virtual bool scroll(ScrollDirection direction,
                       ScrollGranularity granularity,

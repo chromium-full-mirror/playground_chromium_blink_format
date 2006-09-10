@@ -615,6 +615,24 @@ int RenderObject::scrollHeight() const {
   return hasOverflowClip() ? layer()->scrollHeight() : overflowHeight();
 }
 
+int RenderObject::scrollLeft() const {
+  return hasOverflowClip() ? layer()->scrollXOffset() : 0;
+}
+
+int RenderObject::scrollTop() const {
+  return hasOverflowClip() ? layer()->scrollYOffset() : 0;
+}
+
+void RenderObject::setScrollLeft(int newLeft) {
+  if (hasOverflowClip())
+    layer()->scrollToXOffset(newLeft);
+}
+
+void RenderObject::setScrollTop(int newTop) {
+  if (hasOverflowClip())
+    layer()->scrollToYOffset(newTop);
+}
+
 bool RenderObject::scroll(ScrollDirection direction,
                           ScrollGranularity granularity,
                           float multiplier) {
