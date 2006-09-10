@@ -1008,6 +1008,28 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
   return style;
 }
 
+static void addIntrinsicMargins(RenderStyle* style) {
+  // Intrinsic margin value.
+  const int intrinsicMargin = 2;
+
+  // FIXME: Using width/height alone and not also dealing with
+  // min-width/max-width is flawed.
+  // FIXME: Using "quirk" to decide the margin wasn't set is kind of lame.
+  if (style->width().isIntrinsicOrAuto()) {
+    if (style->marginLeft().quirk())
+      style->setMarginLeft(Length(intrinsicMargin, Fixed));
+    if (style->marginRight().quirk())
+      style->setMarginRight(Length(intrinsicMargin, Fixed));
+  }
+
+  if (style->height().isAuto()) {
+    if (style->marginTop().quirk())
+      style->setMarginTop(Length(intrinsicMargin, Fixed));
+    if (style->marginBottom().quirk())
+      style->setMarginBottom(Length(intrinsicMargin, Fixed));
+  }
+}
+
 void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
   // Cache our original display.
   style->setOriginalDisplay(style->display());
@@ -1143,6 +1165,20 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
   // Cull out any useless layers and also repeat patterns into additional
   // layers.
   style->adjustBackgroundLayers();
+
+  // Important: Intrinsic margins get added to controls before the theme has
+  // adjusted the style, since the theme will
+  // alter fonts and heights/widths.
+  if (e && e->isControl() && style->fontSize() >= 11) {
+    // Don't apply intrinsic margins to image buttons.  The designer knows how
+    // big the images are,
+    // so we have to treat all image buttons as though they were explicitly
+    // sized.
+    if (!e->hasTagName(inputTag) ||
+        static_cast<HTMLInputElement*>(e)->inputType() !=
+            HTMLInputElement::IMAGE)
+      addIntrinsicMargins(style);
+  }
 
   // Let the theme also have a crack at adjusting the style.
   if (style->hasAppearance())

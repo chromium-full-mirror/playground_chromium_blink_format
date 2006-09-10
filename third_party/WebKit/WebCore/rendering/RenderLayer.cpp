@@ -56,7 +56,6 @@
 #include "OverflowEvent.h"
 #include "PlatformMouseEvent.h"
 #include "RenderArena.h"
-#include "RenderFormElement.h"
 #include "RenderInline.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
@@ -887,10 +886,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
                     m_object->style()->resize() == RESIZE_BOTH)) {
     CSSStyleDeclaration* style =
         static_cast<Element*>(m_object->node()->shadowAncestorNode())->style();
-    if (renderer->style()->hasAppearance() ||
-        renderer->isFormElement() &&
-            static_cast<RenderFormElement*>(renderer)
-                ->canHaveIntrinsicMargins()) {
+    if (renderer->element() && renderer->element()->isControl()) {
       style->setProperty(CSS_PROP_MARGIN_LEFT,
                          String::number(renderer->marginLeft()) + "px", false,
                          ec);
@@ -912,10 +908,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
                      m_object->style()->resize() == RESIZE_BOTH)) {
     CSSStyleDeclaration* style =
         static_cast<Element*>(m_object->node()->shadowAncestorNode())->style();
-    if (renderer->style()->hasAppearance() ||
-        renderer->isFormElement() &&
-            static_cast<RenderFormElement*>(renderer)
-                ->canHaveIntrinsicMargins()) {
+    if (renderer->element() && renderer->element()->isControl()) {
       style->setProperty(CSS_PROP_MARGIN_TOP,
                          String::number(renderer->marginTop()) + "px", false,
                          ec);

@@ -132,8 +132,6 @@ class RenderThemeMac : public RenderTheme {
                               RenderStyle*,
                               NSControlSize) const;
 
-  void addIntrinsicMargins(RenderStyle*, NSControlSize) const;
-
   void updateCheckedState(NSCell*, const RenderObject*);
   void updateEnabledState(NSCell*, const RenderObject*);
   void updateFocusedState(NSCell*, const RenderObject*);

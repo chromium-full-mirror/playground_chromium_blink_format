@@ -45,7 +45,6 @@ class DeprecatedRenderSelect : public RenderFormElement {
       return intrinsicHeight();
     return RenderFormElement::calcReplacedHeight();
   }
-  virtual bool canHaveIntrinsicMargins() const { return true; }
 
   virtual void calcMinMaxWidth();
   virtual void layout();
