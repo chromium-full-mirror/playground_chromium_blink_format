@@ -368,7 +368,6 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 
   TextStyle textStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
                       m_dirOverride || styleToUse->visuallyOrdered());
-  textStyle.setUsePrinterFonts(isPrinting);
 
   if (!paintSelectedTextOnly && !paintSelectedTextSeparately) {
     // paint all the text

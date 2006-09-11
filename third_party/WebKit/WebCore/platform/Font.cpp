@@ -562,7 +562,7 @@ void Font::drawSimpleText(GraphicsContext* context,
     const FontData* nextFontData = glyphBuffer.fontDataAt(nextGlyph);
     if (nextFontData != fontData) {
       drawGlyphs(context, fontData, glyphBuffer, lastFrom, nextGlyph - lastFrom,
-                 startPoint, style.usePrinterFonts());
+                 startPoint);
       lastFrom = nextGlyph;
       fontData = nextFontData;
       startPoint.setX(nextX);
@@ -571,7 +571,7 @@ void Font::drawSimpleText(GraphicsContext* context,
     nextGlyph++;
   }
   drawGlyphs(context, fontData, glyphBuffer, lastFrom, nextGlyph - lastFrom,
-             startPoint, style.usePrinterFonts());
+             startPoint);
 }
 
 void Font::drawText(GraphicsContext* context,

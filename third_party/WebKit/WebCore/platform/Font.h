@@ -94,9 +94,10 @@ class Font {
   Font();
   Font(const FontDescription&, short letterSpacing, short wordSpacing);
 #if PLATFORM(MAC)
-  Font(const FontPlatformData&);  // This constructor is only used by
-                                  // Mac-specific code that already has a native
-                                  // font.
+  Font(const FontPlatformData&, bool isPrinting);  // This constructor is only
+                                                   // used by Mac-specific code
+                                                   // that already has a native
+                                                   // font.
 #endif
   ~Font();
 
@@ -184,8 +185,7 @@ class Font {
                   const GlyphBuffer&,
                   int from,
                   int to,
-                  const FloatPoint&,
-                  bool usePrinterFont) const;
+                  const FloatPoint&) const;
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
                        const TextStyle&,
