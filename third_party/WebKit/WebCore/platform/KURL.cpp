@@ -329,15 +329,16 @@ void KURL::init(const KURL& base,
   bool absolute = false;
 
   // for compatibility with Win IE, we must treat backslashes as if they were
-  // slashes
+  // slashes, as long as we're not dealing with the javascript: schema
   DeprecatedString substitutedRelative;
-  bool containsBackslash = relative.contains('\\');
-  if (containsBackslash) {
+  bool shouldSubstituteBackslashes =
+      relative.contains('\\') && !relative.startsWith("javascript:", false);
+  if (shouldSubstituteBackslashes) {
     substitutedRelative = substituteBackslashes(relative);
   }
 
   const DeprecatedString& rel =
-      containsBackslash ? substitutedRelative : relative;
+      shouldSubstituteBackslashes ? substitutedRelative : relative;
 
   bool allASCII = rel.isAllASCII();
   char* strBuffer;
