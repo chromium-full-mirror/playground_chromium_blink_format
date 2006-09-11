@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+#ifndef INTSIZEHASH_H_
+#define INTSIZEHASH_H_
 
 #include "IntSize.h"
 #include <wtf/HashMap.h>
@@ -39,3 +41,5 @@ struct DefaultHash<WebCore::IntSize> {
 };
 
 }  // namespace WTF
+
+#endif
