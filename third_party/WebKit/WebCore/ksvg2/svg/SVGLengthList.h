@@ -20,17 +20,18 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGLengthListImpl_H
-#define KSVG_SVGLengthListImpl_H
+#ifndef KSVG_SVGLengthList_H
+#define KSVG_SVGLengthList_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGList.h"
 #include "SVGLength.h"
 
 namespace WebCore {
-class SVGLengthList : public SVGList<SVGLength> {
+class SVGLengthList : public SVGList<SVGLength*> {
  public:
-  SVGLengthList(const SVGStyledElement* context = 0);
+  SVGLengthList();
   virtual ~SVGLengthList();
 
   void parse(const DeprecatedString& value,

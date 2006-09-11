@@ -44,9 +44,9 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
-  ANIMATED_PROPERTY_DECLARATIONS(double, double, Dx, dx)
-  ANIMATED_PROPERTY_DECLARATIONS(double, double, Dy, dy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, double, double, Dx, dx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, double, double, Dy, dy)
   mutable KCanvasFEOffset* m_filterEffect;
 };
 

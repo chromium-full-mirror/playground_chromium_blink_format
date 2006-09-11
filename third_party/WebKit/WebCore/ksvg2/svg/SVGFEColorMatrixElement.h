@@ -45,9 +45,14 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
-  ANIMATED_PROPERTY_DECLARATIONS(int, int, Type, type)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGNumberList*,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
+                                 String,
+                                 String,
+                                 In,
+                                 in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement, int, int, Type, type)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
+                                 SVGNumberList*,
                                  RefPtr<SVGNumberList>,
                                  Values,
                                  values)

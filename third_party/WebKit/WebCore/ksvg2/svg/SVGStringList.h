@@ -20,17 +20,19 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGStringListImpl_H
-#define KSVG_SVGStringListImpl_H
+#ifndef KSVG_SVGStringList_H
+#define KSVG_SVGStringList_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGList.h"
+#include "PlatformString.h"
 
 namespace WebCore {
 
-class SVGStringList : public SVGList<StringImpl> {
+class SVGStringList : public SVGList<String> {
  public:
-  SVGStringList(const SVGStyledElement* context = 0);
+  SVGStringList();
   virtual ~SVGStringList();
 
   // Internal
@@ -40,6 +42,6 @@ class SVGStringList : public SVGList<StringImpl> {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGStringListImpl_H
+#endif  // KSVG_SVGStringList_H
 
 // vim:ts=4:noet

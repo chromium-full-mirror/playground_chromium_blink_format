@@ -21,15 +21,19 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+
 #include "SVGElementInstanceList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
-SVGElementInstanceList::SVGElementInstanceList(const SVGStyledElement* context)
-    : SVGList<SVGElementInstance>(context) {}
+SVGElementInstanceList::SVGElementInstanceList()
+    : SVGList<SVGElementInstance*>() {}
 
 SVGElementInstanceList::~SVGElementInstanceList() {}
+}
+
+#endif  // SVG_SUPPORT
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT

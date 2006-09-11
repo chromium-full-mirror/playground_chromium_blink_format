@@ -65,7 +65,8 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
  protected:
   mutable RefPtr<SVGMatrix> m_localMatrix;
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTransformList*,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGStyledTransformableElement,
+                                 SVGTransformList*,
                                  RefPtr<SVGTransformList>,
                                  Transform,
                                  transform)

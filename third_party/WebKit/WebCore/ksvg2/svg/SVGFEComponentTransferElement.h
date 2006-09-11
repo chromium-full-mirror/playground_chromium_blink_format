@@ -45,7 +45,11 @@ class SVGFEComponentTransferElement
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEComponentTransferElement,
+                                 String,
+                                 String,
+                                 In,
+                                 in)
   mutable KCanvasFEComponentTransfer* m_filterEffect;
 };
 

@@ -46,7 +46,11 @@ class SVGURIReference {
   virtual const SVGElement* contextElement() const = 0;
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, Href, href)
+  ANIMATED_PROPERTY_DECLARATIONS_WITH_CONTEXT(SVGURIReference,
+                                              String,
+                                              String,
+                                              Href,
+                                              href)
 };
 
 }  // namespace WebCore

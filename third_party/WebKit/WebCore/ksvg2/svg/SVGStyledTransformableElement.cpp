@@ -41,7 +41,7 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
     Document* doc)
     : SVGStyledLocatableElement(tagName, doc),
       SVGTransformable(),
-      m_transform(new SVGTransformList(this)) {}
+      m_transform(new SVGTransformList) {}
 
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 

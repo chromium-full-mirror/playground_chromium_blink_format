@@ -116,6 +116,11 @@ class SVGAnimationElement : public SVGElement,
  protected:
   mutable SVGElement* m_targetElement;
 
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+                                         bool,
+                                         ExternalResourcesRequired,
+                                         externalResourcesRequired)
+
   bool m_connected : 1;
 
   double m_currentTime;

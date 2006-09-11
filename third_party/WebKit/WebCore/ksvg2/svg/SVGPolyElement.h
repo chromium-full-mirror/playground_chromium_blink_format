@@ -62,6 +62,11 @@ class SVGPolyElement : public SVGStyledTransformableElement,
  private:
   mutable RefPtr<SVGPointList> m_points;
 
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+                                         bool,
+                                         ExternalResourcesRequired,
+                                         externalResourcesRequired)
+
   virtual void svgPolyTo(double x1, double y1, int nr) const;
 };
 

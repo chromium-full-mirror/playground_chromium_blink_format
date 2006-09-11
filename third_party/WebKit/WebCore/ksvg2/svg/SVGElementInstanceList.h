@@ -20,17 +20,18 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGElementInstanceListImpl_H
-#define KSVG_SVGElementInstanceListImpl_H
+#ifndef KSVG_SVGElementInstanceList_H
+#define KSVG_SVGElementInstanceList_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGList.h"
 #include "SVGElementInstance.h"
 
 namespace WebCore {
-class SVGElementInstanceList : public SVGList<SVGElementInstance> {
+class SVGElementInstanceList : public SVGList<SVGElementInstance*> {
  public:
-  SVGElementInstanceList(const SVGStyledElement* context = 0);
+  SVGElementInstanceList();
   virtual ~SVGElementInstanceList();
 };
 

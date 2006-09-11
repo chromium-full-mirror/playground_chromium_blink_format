@@ -47,6 +47,8 @@ class SVGTRefElement : public SVGTextPositioningElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
+
   void updateReferencedText();
 };
 

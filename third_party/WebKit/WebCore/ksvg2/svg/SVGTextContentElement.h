@@ -56,11 +56,21 @@ class SVGTextContentElement : public SVGStyledElement,
   virtual void parseMappedAttribute(MappedAttribute*);
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*,
+  ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
+                                         bool,
+                                         ExternalResourcesRequired,
+                                         externalResourcesRequired)
+
+  ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
+                                 SVGLength*,
                                  RefPtr<SVGLength>,
                                  TextLength,
                                  textLength)
-  ANIMATED_PROPERTY_DECLARATIONS(int, int, LengthAdjust, lengthAdjust)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
+                                 int,
+                                 int,
+                                 LengthAdjust,
+                                 lengthAdjust)
 };
 
 }  // namespace WebCore

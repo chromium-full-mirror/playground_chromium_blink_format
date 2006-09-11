@@ -21,7 +21,9 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+
 #include "SVGMatrix.h"
 #include "SVGTransform.h"
 #include "SVGSVGElement.h"
@@ -29,8 +31,7 @@
 
 using namespace WebCore;
 
-SVGTransformList::SVGTransformList(const SVGStyledElement* context)
-    : SVGList<SVGTransform>(context) {}
+SVGTransformList::SVGTransformList() : SVGList<SVGTransform*>() {}
 
 SVGTransformList::~SVGTransformList() {}
 
@@ -44,14 +45,7 @@ SVGTransform* SVGTransformList::consolidate() {
   if (!obj)
     return 0;
 
-  // Disable notifications here...
-  const SVGStyledElement* savedContext = m_context;
-
-  m_context = 0;
-  SVGTransform* ret = initialize(obj);
-  m_context = savedContext;
-
-  return ret;
+  return initialize(obj);
 }
 
 SVGTransform* SVGTransformList::concatenate() const {
@@ -69,5 +63,6 @@ SVGTransform* SVGTransformList::concatenate() const {
   return obj;
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -62,7 +62,8 @@ class SVGTextElement : public SVGTextPositioningElement,
 
  private:
   mutable RefPtr<SVGMatrix> m_localMatrix;
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTransformList*,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGTextElement,
+                                 SVGTransformList*,
                                  RefPtr<SVGTransformList>,
                                  Transform,
                                  transform)

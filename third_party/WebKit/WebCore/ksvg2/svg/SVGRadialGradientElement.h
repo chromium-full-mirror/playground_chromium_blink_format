@@ -44,11 +44,31 @@ class SVGRadialGradientElement : public SVGGradientElement {
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Cx, cx)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Cy, cy)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, R, r)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Fx, fx)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGLength*, RefPtr<SVGLength>, Fy, fy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
+                                 SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 Cx,
+                                 cx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
+                                 SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 Cy,
+                                 cy)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
+                                 SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 R,
+                                 r)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
+                                 SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 Fx,
+                                 fx)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
+                                 SVGLength*,
+                                 RefPtr<SVGLength>,
+                                 Fy,
+                                 fy)
 };
 
 }  // namespace WebCore

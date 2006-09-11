@@ -78,11 +78,14 @@ class SVGStyledElement : public SVGElement {
 
  private:
   mutable RefPtr<CSSStyleDeclaration> m_pa;
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, ClassName, className)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement,
+                                 String,
+                                 String,
+                                 ClassName,
+                                 className)
   // Optimized updating logic
   bool m_updateVectorial : 1;
 };
-
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT

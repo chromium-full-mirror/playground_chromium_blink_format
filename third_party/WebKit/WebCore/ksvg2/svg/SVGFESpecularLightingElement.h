@@ -45,25 +45,38 @@ class SVGFESpecularLightingElement
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(String, String, In, in)
-  ANIMATED_PROPERTY_DECLARATIONS(double,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 String,
+                                 String,
+                                 In,
+                                 in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 double,
                                  double,
                                  SpecularConstant,
                                  specularConstant)
-  ANIMATED_PROPERTY_DECLARATIONS(double,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 double,
                                  double,
                                  SpecularExponent,
                                  specularExponent)
-  ANIMATED_PROPERTY_DECLARATIONS(double, double, SurfaceScale, surfaceScale)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGColor*,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 double,
+                                 double,
+                                 SurfaceScale,
+                                 surfaceScale)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 SVGColor*,
                                  RefPtr<SVGColor>,
                                  LightingColor,
                                  lightingColor)
-  ANIMATED_PROPERTY_DECLARATIONS(double,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 double,
                                  double,
                                  KernelUnitLengthX,
                                  kernelUnitLengthX)
-  ANIMATED_PROPERTY_DECLARATIONS(double,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
+                                 double,
                                  double,
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
