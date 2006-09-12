@@ -42,6 +42,10 @@ class RenderFieldset : public RenderBlock {
 
   virtual void setStyle(RenderStyle*);
 
+  virtual bool expandsToEncloseOverhangingFloats() const {
+    return style()->height().isAuto();
+  }
+
  private:
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   void paintBorderMinusLegend(GraphicsContext*,
