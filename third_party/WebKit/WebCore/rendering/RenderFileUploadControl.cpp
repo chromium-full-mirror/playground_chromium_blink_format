@@ -111,6 +111,13 @@ void RenderFileUploadControl::setStyle(RenderStyle* s) {
   setReplaced(isInline());
 }
 
+void RenderFileUploadControl::valueChanged() {
+  static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
+      m_fileChooser->filename());
+  static_cast<HTMLInputElement*>(node())->onChange();
+  updateIconAndFilename();
+}
+
 void RenderFileUploadControl::updateIconAndFilename() {
   if (m_fileChooser->icon())
     m_fileBox->setHasIcon();
@@ -132,6 +139,8 @@ void RenderFileUploadControl::updateFromElement() {
     RenderStyle* buttonStyle = createButtonStyle(style());
     m_button->setRenderer(m_button->createRenderer(renderArena(), buttonStyle));
     m_button->renderer()->setStyle(buttonStyle);
+    static_cast<RenderButton*>(m_button->renderer())
+        ->setText(fileButtonChooseFileLabel());
     m_button->setAttached();
     m_button->setInDocument(true);
 
@@ -146,11 +155,6 @@ void RenderFileUploadControl::updateFromElement() {
     m_fileBox->setStyle(fileBoxStyle);
     addChild(m_fileBox);
   }
-
-  HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
-  RenderButton* buttonRenderer =
-      static_cast<RenderButton*>(m_button->renderer());
-  buttonRenderer->setText(input->valueWithDefault());
 
   updateIconAndFilename();
 }

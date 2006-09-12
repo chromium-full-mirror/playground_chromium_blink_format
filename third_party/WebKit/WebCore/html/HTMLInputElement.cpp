@@ -1041,6 +1041,7 @@ String HTMLInputElement::valueWithDefault() const {
     switch (inputType()) {
       case BUTTON:
       case CHECKBOX:
+      case FILE:
       case HIDDEN:
       case IMAGE:
       case ISINDEX:
@@ -1049,9 +1050,6 @@ String HTMLInputElement::valueWithDefault() const {
       case RANGE:
       case SEARCH:
       case TEXT:
-        break;
-      case FILE:
-        v = fileButtonChooseFileLabel();
         break;
       case RESET:
         v = resetButtonDefaultLabel();
