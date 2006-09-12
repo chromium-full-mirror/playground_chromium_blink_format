@@ -41,7 +41,11 @@ class SVGFEMergeNodeElement : public SVGElement {
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEMergeNodeElement, String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEMergeNodeElement,
+                                 String,
+                                 String,
+                                 In1,
+                                 in1)
 };
 
 }  // namespace WebCore

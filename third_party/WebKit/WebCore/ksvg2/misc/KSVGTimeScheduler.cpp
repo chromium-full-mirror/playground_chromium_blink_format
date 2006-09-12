@@ -121,6 +121,8 @@ void SVGTimer::notifyAll() {
   typedef HashMap<SVGElement*, Vector<SVGAnimationElement*>> TargetAnimationMap;
   TargetAnimationMap targetMap;
 
+  ExceptionCode ec = 0;
+
   SVGNotifySet::const_iterator end = m_notifySet.end();
   for (SVGNotifySet::const_iterator it = m_notifySet.begin(); it != end; ++it) {
     SVGAnimationElement* animation = *it;
@@ -131,7 +133,7 @@ void SVGTimer::notifyAll() {
       if (!animation->isFrozen())
         continue;
       if (elapsed <=
-          (animation->getStartTime() + animation->getSimpleDuration()))
+          (animation->getStartTime() + animation->getSimpleDuration(ec)))
         continue;
     }
 
@@ -159,7 +161,7 @@ void SVGTimer::notifyAll() {
 
       double end = animation->getEndTime();
       double start = animation->getStartTime();
-      double duration = animation->getSimpleDuration();
+      double duration = animation->getSimpleDuration(ec);
       double repetitions = animation->repeations();
 
       // Validate animation timing settings:

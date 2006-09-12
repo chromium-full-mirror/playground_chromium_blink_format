@@ -46,15 +46,15 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEFloodElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 
 void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -65,7 +65,7 @@ KCanvasFEFlood* SVGFEFloodElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_FLOOD));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   RenderStyle* filterStyle =
       const_cast<SVGFEFloodElement*>(this)->styleForRenderer(

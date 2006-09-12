@@ -53,7 +53,7 @@ static KRenderingPaintServerSolid* sharedSolidPaintServer() {
 
 bool KSVGPainterFactory::isFilled(const RenderStyle* style) {
   SVGPaint* fill = style->svgStyle()->fillPaint();
-  if (fill && fill->paintType() == SVG_PAINTTYPE_NONE)
+  if (fill && fill->paintType() == SVGPaint::SVG_PAINTTYPE_NONE)
     return false;
   return true;
 }
@@ -72,7 +72,7 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
     fillPaintServer = sharedSolidPaintServer();
     static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
         ->setColor(Color::black);
-  } else if (fill->paintType() == SVG_PAINTTYPE_URI) {
+  } else if (fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
     String id(fill->uri());
     fillPaintServer =
         getPaintServerById(item->document(), AtomicString(id.substring(1)));
@@ -82,7 +82,7 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
     fillPaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
-    if (fill->paintType() == SVG_PAINTTYPE_CURRENTCOLOR)
+    if (fill->paintType() == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
       fillPaintServerSolid->setColor(style->color());
     else
       fillPaintServerSolid->setColor(fill->color());
@@ -93,7 +93,7 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
 
 bool KSVGPainterFactory::isStroked(const RenderStyle* style) {
   SVGPaint* stroke = style->svgStyle()->strokePaint();
-  if (!stroke || stroke->paintType() == SVG_PAINTTYPE_NONE)
+  if (!stroke || stroke->paintType() == SVGPaint::SVG_PAINTTYPE_NONE)
     return false;
   return true;
 }
@@ -107,7 +107,7 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
   SVGPaint* stroke = style->svgStyle()->strokePaint();
 
   KRenderingPaintServer* strokePaintServer;
-  if (stroke && stroke->paintType() == SVG_PAINTTYPE_URI) {
+  if (stroke && stroke->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
     String id(stroke->uri());
     strokePaintServer =
         getPaintServerById(item->document(), AtomicString(id.substring(1)));
@@ -117,7 +117,7 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
     strokePaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* strokePaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(strokePaintServer);
-    if (stroke->paintType() == SVG_PAINTTYPE_CURRENTCOLOR)
+    if (stroke->paintType() == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
       strokePaintServerSolid->setColor(style->color());
     else
       strokePaintServerSolid->setColor(stroke->color());

@@ -46,7 +46,7 @@ class SVGStyledLocatableElement : public SVGStyledElement, public SVGLocatable {
   virtual FloatRect getBBox() const;
   virtual SVGMatrix* getCTM() const;
   virtual SVGMatrix* getScreenCTM() const;
-  virtual SVGMatrix* getTransformToElement(SVGElement*) const;
+  virtual SVGMatrix* getTransformToElement(SVGElement*, ExceptionCode&) const;
 };
 
 }  // namespace WebCore

@@ -52,10 +52,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEOffsetElement,
                               double,
                               Number,
@@ -80,7 +80,7 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == SVGNames::dyAttr)
     setDyBaseValue(value.deprecatedString().toDouble());
   else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -91,7 +91,7 @@ KCanvasFEOffset* SVGFEOffsetElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_OFFSET));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setDx(dx());
   m_filterEffect->setDy(dy());

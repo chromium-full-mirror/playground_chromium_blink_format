@@ -55,10 +55,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEColorMatrixElement,
                               int,
                               Enumeration,
@@ -88,7 +88,7 @@ void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (value == "luminanceToAlpha")
       setTypeBaseValue(SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA);
   } else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else if (attr->name() == SVGNames::valuesAttr)
     valuesBaseValue()->parse(value.deprecatedString());
   else
@@ -102,13 +102,15 @@ KCanvasFEColorMatrix* SVGFEColorMatrixElement::filterEffect() const {
   if (!m_filterEffect)
     return 0;
 
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   DeprecatedValueList<float> _values;
   SVGNumberList* numbers = values();
+
+  ExceptionCode ec = 0;
   unsigned int nr = numbers->numberOfItems();
   for (unsigned int i = 0; i < nr; i++)
-    _values.append(numbers->getItem(i));
+    _values.append(numbers->getItem(i, ec));
   m_filterEffect->setValues(_values);
   m_filterEffect->setType((KCColorMatrixType)(type() - 1));
 

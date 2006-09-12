@@ -55,10 +55,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFECompositeElement,
                               String,
                               String,
@@ -124,7 +124,7 @@ void SVGFECompositeElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (value == "arithmetic")
       set_operatorBaseValue(SVG_FECOMPOSITE_OPERATOR_ARITHMETIC);
   } else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else if (attr->name() == SVGNames::in2Attr)
     setIn2BaseValue(value);
   else if (attr->name() == SVGNames::k1Attr)
@@ -146,7 +146,7 @@ KCanvasFEComposite* SVGFECompositeElement::filterEffect() const {
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setOperation((KCCompositeOperationType)(_operator() - 1));
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   m_filterEffect->setIn2(in2());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setK1(k1());

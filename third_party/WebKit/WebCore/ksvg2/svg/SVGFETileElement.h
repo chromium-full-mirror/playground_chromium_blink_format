@@ -44,7 +44,7 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement, String, String, In, in)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement, String, String, In1, in1)
   mutable KCanvasFETile* m_filterEffect;
 };
 

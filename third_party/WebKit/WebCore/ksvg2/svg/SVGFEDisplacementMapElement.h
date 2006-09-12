@@ -29,6 +29,14 @@ namespace WebCore {
 class SVGFEDisplacementMapElement
     : public SVGFilterPrimitiveStandardAttributes {
  public:
+  enum SVGChannelSelectors {
+    SVG_CHANNEL_UNKNOWN = 0,
+    SVG_CHANNEL_R = 1,
+    SVG_CHANNEL_G = 2,
+    SVG_CHANNEL_B = 3,
+    SVG_CHANNEL_A = 4
+  };
+
   SVGFEDisplacementMapElement(const QualifiedName& tagName, Document*);
   virtual ~SVGFEDisplacementMapElement();
 
@@ -47,8 +55,8 @@ class SVGFEDisplacementMapElement
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDisplacementMapElement,
                                  String,
                                  String,

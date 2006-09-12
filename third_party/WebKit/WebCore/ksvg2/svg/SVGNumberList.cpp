@@ -36,9 +36,11 @@ SVGNumberList::SVGNumberList() : SVGList<float>() {}
 SVGNumberList::~SVGNumberList() {}
 
 void SVGNumberList::parse(const DeprecatedString& value) {
+  ExceptionCode ec = 0;
+
   DeprecatedStringList numbers = DeprecatedStringList::split(' ', value);
   for (unsigned int i = 0; i < numbers.count(); i++)
-    appendItem(numbers[i].toDouble());
+    appendItem(numbers[i].toDouble(), ec);
 }
 
 // vim:ts=4:noet

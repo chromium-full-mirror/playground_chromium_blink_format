@@ -52,7 +52,8 @@ SVGPointList* SVGPolyElement::animatedPoints() const {
 
 void SVGPolyElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::pointsAttr) {
-    points()->clear();
+    ExceptionCode ec = 0;
+    points()->clear(ec);
     parsePoints(attr->value().deprecatedString());
   } else {
     if (SVGTests::parseMappedAttribute(attr))
@@ -66,7 +67,8 @@ void SVGPolyElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void SVGPolyElement::svgPolyTo(double x1, double y1, int) const {
-  points()->appendItem(FloatPoint(x1, y1));
+  ExceptionCode ec = 0;
+  points()->appendItem(FloatPoint(x1, y1), ec);
 }
 
 void SVGPolyElement::notifyAttributeChange() const {
@@ -76,13 +78,15 @@ void SVGPolyElement::notifyAttributeChange() const {
 
   SVGStyledElement::notifyAttributeChange();
 
+  ExceptionCode ec = 0;
+
   // Spec: Additionally, the 'points' attribute on the original element
   // accessed via the XML DOM (e.g., using the getAttribute() method call)
   // will reflect any changes made to points.
   String _points;
   int len = points()->numberOfItems();
   for (int i = 0; i < len; ++i) {
-    FloatPoint p = points()->getItem(i);
+    FloatPoint p = points()->getItem(i, ec);
     _points += String::sprintf("%.6lg %.6lg ", p.x(), p.y());
   }
 
@@ -90,7 +94,7 @@ void SVGPolyElement::notifyAttributeChange() const {
   RefPtr<Attr> attr =
       const_cast<SVGPolyElement*>(this)->getAttributeNode(p.impl());
   if (attr) {
-    ExceptionCode ec;
+    ExceptionCode ec = 0;
     ignoreNotifications = true;  // prevent recursion.
     attr->setValue(_points, ec);
     ignoreNotifications = false;

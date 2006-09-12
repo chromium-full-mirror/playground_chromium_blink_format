@@ -29,11 +29,10 @@
 
 #include "Shared.h"
 #include "FloatPoint.h"
+#include "ExceptionCode.h"
 #include "PlatformString.h"
 
 namespace WebCore {
-
-// TODO: We will probably need to pass ExceptionCodes around here...
 
 template <class Item>
 class SVGListBase : public Shared<SVGListBase<Item>> {
@@ -44,11 +43,11 @@ class SVGListBase : public Shared<SVGListBase<Item>> {
   virtual Item nullItem() const = 0;
 
   unsigned int numberOfItems() const { return m_vector.size(); }
-  void clear() { m_vector.clear(); }
+  void clear(ExceptionCode&) { m_vector.clear(); }
 
-  Item initialize(Item newItem) {
-    clear();
-    return appendItem(newItem);
+  Item initialize(Item newItem, ExceptionCode& ec) {
+    clear(ec);
+    return appendItem(newItem, ec);
   }
 
   Item getFirst() const {
@@ -65,45 +64,53 @@ class SVGListBase : public Shared<SVGListBase<Item>> {
     return m_vector.last();
   }
 
-  Item getItem(unsigned int index) {
-    if (m_vector.size() < index)
+  Item getItem(unsigned int index, ExceptionCode& ec) {
+    if (m_vector.size() < index) {
+      ec = INDEX_SIZE_ERR;
       return nullItem();
+    }
 
     return m_vector.at(index);
   }
 
-  const Item getItem(unsigned int index) const {
-    if (m_vector.size() < index)
+  const Item getItem(unsigned int index, ExceptionCode& ec) const {
+    if (m_vector.size() < index) {
+      ec = INDEX_SIZE_ERR;
       return nullItem();
+    }
 
     return m_vector.at(index);
   }
 
-  Item insertItemBefore(Item newItem, unsigned int index) {
+  Item insertItemBefore(Item newItem, unsigned int index, ExceptionCode&) {
     m_vector.insert(index, newItem);
     return newItem;
   }
 
-  Item replaceItem(Item newItem, unsigned int index) {
-    if (m_vector.size() < index)
+  Item replaceItem(Item newItem, unsigned int index, ExceptionCode& ec) {
+    if (m_vector.size() < index) {
+      ec = INDEX_SIZE_ERR;
       return nullItem();
+    }
 
     m_vector.at(index) = newItem;
     return newItem;
   }
 
-  Item removeItem(unsigned int index) {
-    if (m_vector.size() < index)
+  Item removeItem(unsigned int index, ExceptionCode& ec) {
+    if (m_vector.size() < index) {
+      ec = INDEX_SIZE_ERR;
       return nullItem();
+    }
 
     Item item = m_vector.at(index);
-    remove(index);
+    removeItem(index, ec);
     return item;
   }
 
   void removeItem(const Item item) { m_vector.remove(item); }
 
-  Item appendItem(Item newItem) {
+  Item appendItem(Item newItem, ExceptionCode&) {
     m_vector.append(newItem);
     return newItem;
   }

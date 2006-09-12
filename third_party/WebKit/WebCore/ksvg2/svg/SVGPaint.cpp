@@ -29,7 +29,7 @@ namespace WebCore {
 
 SVGPaint::SVGPaint() : SVGColor(), m_paintType(SVG_PAINTTYPE_UNKNOWN) {}
 
-SVGPaint::SVGPaint(StringImpl* uri)
+SVGPaint::SVGPaint(const String& uri)
     : SVGColor(), m_paintType(SVG_PAINTTYPE_URI) {
   setUri(uri);
 }
@@ -38,27 +38,28 @@ SVGPaint::SVGPaint(SVGPaintType paintType)
     : SVGColor(), m_paintType(paintType) {}
 
 SVGPaint::SVGPaint(SVGPaintType paintType,
-                   StringImpl* uri,
-                   StringImpl* rgbPaint,
-                   StringImpl*)
+                   const String& uri,
+                   const String& rgbPaint,
+                   const String&)
     : SVGColor(rgbPaint), m_paintType(paintType) {
   setUri(uri);
 }
 
 SVGPaint::~SVGPaint() {}
 
-StringImpl* SVGPaint::uri() const {
-  return m_uri.impl();
+String SVGPaint::uri() const {
+  return m_uri;
 }
 
-void SVGPaint::setUri(StringImpl* uri) {
+void SVGPaint::setUri(const String& uri) {
   m_uri = uri;
 }
 
 void SVGPaint::setPaint(SVGPaintType paintType,
-                        StringImpl* uri,
-                        StringImpl* rgbPaint,
-                        StringImpl*) {
+                        const String& uri,
+                        const String& rgbPaint,
+                        const String&,
+                        ExceptionCode&) {
   m_paintType = paintType;
 
   if (m_paintType == SVG_PAINTTYPE_URI)

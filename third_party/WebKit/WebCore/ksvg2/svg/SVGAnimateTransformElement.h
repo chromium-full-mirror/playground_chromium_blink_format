@@ -24,12 +24,11 @@
 #define KSVG_SVGAnimateTransformElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "ksvg.h"
+#include "SVGTransform.h"
 #include "SVGAnimationElement.h"
 
 namespace WebCore {
 
-class SVGTransform;
 class AffineTransform;
 
 class SVGAnimateTransformElement : public SVGAnimationElement {
@@ -56,7 +55,7 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
 
  private:
   int m_currentItem;
-  SVGTransformType m_type;
+  SVGTransform::SVGTransformType m_type;
 
   RefPtr<SVGTransform> m_toTransform;
   RefPtr<SVGTransform> m_fromTransform;

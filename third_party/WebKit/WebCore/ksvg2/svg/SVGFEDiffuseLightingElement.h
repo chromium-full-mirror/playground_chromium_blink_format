@@ -39,7 +39,7 @@ class SVGFEDiffuseLightingElement
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFEDiffuseLighting* filterEffect() const;
+  virtual KCanvasFilterEffect* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -48,8 +48,8 @@ class SVGFEDiffuseLightingElement
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEDiffuseLightingElement,
                                  double,
                                  double,

@@ -25,7 +25,7 @@
 #include "Attr.h"
 #include <wtf/Assertions.h>
 
-#include "ksvg.h"
+#include "SVGUnitTypes.h"
 #include "SVGNames.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 #include "SVGLength.h"
@@ -118,7 +118,7 @@ void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
   bool bbox = false;
   if (parentNode() && parentNode()->hasTagName(SVGNames::filterTag))
     bbox = static_cast<SVGFilterElement*>(parentNode())->primitiveUnits() ==
-           SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
+           SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
   x()->setBboxRelative(bbox);
   y()->setBboxRelative(bbox);

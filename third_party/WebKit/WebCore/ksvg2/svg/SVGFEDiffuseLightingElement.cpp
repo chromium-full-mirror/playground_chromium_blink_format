@@ -55,10 +55,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
                               double,
                               Number,
@@ -103,7 +103,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDiffuseLightingElement,
 void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else if (attr->name() == SVGNames::surfaceScaleAttr)
     setSurfaceScaleBaseValue(value.deprecatedString().toDouble());
   else if (attr->name() == SVGNames::diffuseConstantAttr)
@@ -122,11 +122,11 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-KCanvasFEDiffuseLighting* SVGFEDiffuseLightingElement::filterEffect() const {
+KCanvasFilterEffect* SVGFEDiffuseLightingElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEDiffuseLighting*>(
         renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setDiffuseConstant((diffuseConstant()));
   m_filterEffect->setSurfaceScale((surfaceScale()));

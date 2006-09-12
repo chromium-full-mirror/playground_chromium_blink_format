@@ -50,10 +50,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEDisplacementMapElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEDisplacementMapElement,
                               String,
                               String,
@@ -108,7 +108,7 @@ void SVGFEDisplacementMapElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == SVGNames::yChannelSelectorAttr)
     setYChannelSelectorBaseValue(stringToChannel(value));
   else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else if (attr->name() == SVGNames::in2Attr)
     setIn2BaseValue(value);
   else if (attr->name() == SVGNames::scaleAttr)
@@ -127,7 +127,7 @@ KCanvasFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
       (KCChannelSelectorType)(xChannelSelector()));
   m_filterEffect->setYChannelSelector(
       (KCChannelSelectorType)(yChannelSelector()));
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   m_filterEffect->setIn2(in2());
   m_filterEffect->setScale(scale());
   setStandardAttributes(m_filterEffect);

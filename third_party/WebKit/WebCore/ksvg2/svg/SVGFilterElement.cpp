@@ -27,7 +27,7 @@
 #include <kcanvas/KCanvasResources.h>
 #include <kcanvas/device/KRenderingDevice.h>
 #include <kcanvas/KCanvasFilters.h>
-#include "ksvg.h"
+#include "SVGUnitTypes.h"
 #include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGFilterElement.h"
@@ -42,8 +42,8 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
       SVGURIReference(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_filterUnits(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
-      m_primitiveUnits(SVG_UNIT_TYPE_USERSPACEONUSE),
+      m_filterUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
+      m_primitiveUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
       m_x(new SVGLength(this, LM_WIDTH, viewportElement())),
       m_y(new SVGLength(this, LM_HEIGHT, viewportElement())),
       m_width(new SVGLength(this, LM_WIDTH, viewportElement())),
@@ -140,14 +140,14 @@ void SVGFilterElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::filterUnitsAttr) {
     if (value == "userSpaceOnUse")
-      setFilterUnitsBaseValue(SVG_UNIT_TYPE_USERSPACEONUSE);
+      setFilterUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE);
     else if (value == "objectBoundingBox")
-      setFilterUnitsBaseValue(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+      setFilterUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else if (attr->name() == SVGNames::primitiveUnitsAttr) {
     if (value == "userSpaceOnUse")
-      setPrimitiveUnitsBaseValue(SVG_UNIT_TYPE_USERSPACEONUSE);
+      setPrimitiveUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE);
     else if (value == "objectBoundingBox")
-      setPrimitiveUnitsBaseValue(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+      setPrimitiveUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else if (attr->name() == SVGNames::xAttr)
     xBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::yAttr)
@@ -176,7 +176,8 @@ KCanvasFilter* SVGFilterElement::canvasResource() {
     m_filter = static_cast<KCanvasFilter*>(
         renderingDevice()->createResource(RS_FILTER));
 
-  bool filterBBoxMode = filterUnits() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
+  bool filterBBoxMode =
+      filterUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
   m_filter->setFilterBoundingBoxMode(filterBBoxMode);
 
   x()->setBboxRelative(filterBBoxMode);
@@ -186,7 +187,8 @@ KCanvasFilter* SVGFilterElement::canvasResource() {
   m_filter->setFilterRect(FloatRect(x()->value(), y()->value(),
                                     width()->value(), height()->value()));
 
-  bool primitiveBBoxMode = primitiveUnits() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
+  bool primitiveBBoxMode =
+      primitiveUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
   m_filter->setEffectBoundingBoxMode(primitiveBBoxMode);
   // FIXME: When does this info get passed to the filters elements?
 

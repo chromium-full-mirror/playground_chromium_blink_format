@@ -32,6 +32,14 @@ class SVGNumberList;
 
 class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
  public:
+  enum SVGColorMatrixType {
+    SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0,
+    SVG_FECOLORMATRIX_TYPE_MATRIX = 1,
+    SVG_FECOLORMATRIX_TYPE_SATURATE = 2,
+    SVG_FECOLORMATRIX_TYPE_HUEROTATE = 3,
+    SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4
+  };
+
   SVGFEColorMatrixElement(const QualifiedName&, Document*);
   virtual ~SVGFEColorMatrixElement();
 
@@ -48,8 +56,8 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement, int, int, Type, type)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEColorMatrixElement,
                                  SVGNumberList*,

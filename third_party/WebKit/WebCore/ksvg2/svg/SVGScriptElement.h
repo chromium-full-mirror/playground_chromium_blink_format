@@ -37,8 +37,8 @@ class SVGScriptElement : public SVGElement,
   virtual ~SVGScriptElement();
 
   // 'SVGScriptElement' functions
-  StringImpl* type() const;
-  void setType(StringImpl* type);
+  String type() const;
+  void setType(const String&);
 
   // Internal
   virtual void parseMappedAttribute(MappedAttribute* attr);

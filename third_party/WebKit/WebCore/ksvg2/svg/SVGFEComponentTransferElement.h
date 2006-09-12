@@ -48,8 +48,8 @@ class SVGFEComponentTransferElement
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEComponentTransferElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   mutable KCanvasFEComponentTransfer* m_filterEffect;
 };
 

@@ -53,10 +53,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEGaussianBlurElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEGaussianBlurElement,
                               double,
                               Number,
@@ -88,7 +88,7 @@ void SVGFEGaussianBlurElement::parseMappedAttribute(MappedAttribute* attr) {
     else
       setStdDeviationYBaseValue(numbers[1].toDouble());
   } else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -99,7 +99,7 @@ KCanvasFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   m_filterEffect->setStdDeviationX(stdDeviationX());
   m_filterEffect->setStdDeviationY(stdDeviationY());

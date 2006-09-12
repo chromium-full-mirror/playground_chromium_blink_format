@@ -44,15 +44,15 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFETileElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 
 void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
@@ -63,7 +63,7 @@ KCanvasFETile* SVGFETileElement::filterEffect() const {
         renderingDevice()->createFilterEffect(FE_TILE));
   if (!m_filterEffect)
     return 0;
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
 }

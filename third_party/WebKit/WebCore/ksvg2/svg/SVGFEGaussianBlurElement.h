@@ -49,8 +49,8 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEGaussianBlurElement,
                                  double,
                                  double,

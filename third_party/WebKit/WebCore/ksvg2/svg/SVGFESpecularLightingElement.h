@@ -48,8 +48,8 @@ class SVGFESpecularLightingElement
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
                                  String,
                                  String,
-                                 In,
-                                 in)
+                                 In1,
+                                 in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFESpecularLightingElement,
                                  double,
                                  double,

@@ -48,10 +48,10 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
                               String,
                               string,
-                              In,
-                              in,
+                              In1,
+                              in1,
                               SVGNames::inAttr.localName(),
-                              m_in)
+                              m_in1)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFEBlendElement,
                               String,
                               String,
@@ -83,7 +83,7 @@ void SVGFEBlendElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (value == "lighten")
       setModeBaseValue(SVG_FEBLEND_MODE_LIGHTEN);
   } else if (attr->name() == SVGNames::inAttr)
-    setInBaseValue(value);
+    setIn1BaseValue(value);
   else if (attr->name() == SVGNames::in2Attr)
     setIn2BaseValue(value);
   else
@@ -97,7 +97,7 @@ KCanvasFEBlend* SVGFEBlendElement::filterEffect() const {
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setBlendMode((KCBlendModeType)(mode() - 1));
-  m_filterEffect->setIn(in());
+  m_filterEffect->setIn(in1());
   m_filterEffect->setIn2(in2());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;

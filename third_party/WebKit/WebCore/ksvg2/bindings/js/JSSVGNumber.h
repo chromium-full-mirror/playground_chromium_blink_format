@@ -32,7 +32,7 @@ namespace WebCore {
 
 class JSSVGNumber : public KJS::DOMObject {
  public:
-  JSSVGNumber(KJS::ExecState*, float v) : m_value(v) {}
+  JSSVGNumber(KJS::ExecState*, double v) : m_value(v) {}
   ~JSSVGNumber();
 
   virtual bool getOwnPropertySlot(KJS::ExecState*,
@@ -48,10 +48,10 @@ class JSSVGNumber : public KJS::DOMObject {
   static const KJS::ClassInfo info;
 
  private:
-  float m_value;
+  double m_value;
 };
 
-KJS::JSValue* getJSSVGNumber(KJS::ExecState*, float);
+KJS::JSValue* getJSSVGNumber(KJS::ExecState*, double);
 }
 
 #endif

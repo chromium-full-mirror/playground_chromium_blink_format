@@ -58,7 +58,9 @@ SVGMatrix* SVGStyledLocatableElement::getScreenCTM() const {
   return SVGLocatable::getScreenCTM(this);
 }
 
-SVGMatrix* SVGStyledLocatableElement::getTransformToElement(SVGElement*) const {
+SVGMatrix* SVGStyledLocatableElement::getTransformToElement(
+    SVGElement*,
+    ExceptionCode&) const {
   // TODO!
   return 0;
 }
