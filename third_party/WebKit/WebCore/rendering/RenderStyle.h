@@ -1022,7 +1022,8 @@ class RenderStyle {
     BEFORE,
     AFTER,
     SELECTION,
-    FIRST_LINE_INHERITED
+    FIRST_LINE_INHERITED,
+    FILE_UPLOAD_BUTTON
   };
 
   void ref() { m_ref++; }
@@ -1140,7 +1141,7 @@ class RenderStyle {
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
     bool _affectedByDrag : 1;
-    unsigned _pseudoBits : 6;
+    unsigned _pseudoBits : 7;
     unsigned _unicodeBidi : 2;  // EUnicodeBidi
   } noninherited_flags;
 

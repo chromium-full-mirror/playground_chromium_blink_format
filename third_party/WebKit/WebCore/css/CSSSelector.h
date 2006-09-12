@@ -140,7 +140,8 @@ class CSSSelector {
     PseudoLang,
     PseudoNot,
     PseudoRoot,
-    PseudoSelection
+    PseudoSelection,
+    PseudoFileUploadButton
   };
 
   PseudoType pseudoType() const {

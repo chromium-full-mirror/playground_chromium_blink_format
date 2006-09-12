@@ -48,6 +48,8 @@ class RenderButton : public RenderFlexibleBox {
 
   virtual void paintObject(PaintInfo&, int tx, int ty);
 
+  void setText(const String&);
+
   virtual const char* renderName() const { return "RenderButton"; }
 
  protected:

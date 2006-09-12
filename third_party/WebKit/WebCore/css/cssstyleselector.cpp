@@ -1719,6 +1719,9 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
       case CSSSelector::PseudoAfter:
         dynamicPseudo = RenderStyle::AFTER;
         return true;
+      case CSSSelector::PseudoFileUploadButton:
+        dynamicPseudo = RenderStyle::FILE_UPLOAD_BUTTON;
+        return true;
 
       case CSSSelector::PseudoNotParsed:
         assert(false);
