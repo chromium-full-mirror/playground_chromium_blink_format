@@ -266,7 +266,6 @@ class FrameMac : public Frame {
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*);
   void addPluginRootObject(KJS::Bindings::RootObject* root);
-  void cleanupPluginRootObjects();
 
   virtual void registerCommandForUndo(PassRefPtr<EditCommand>);
   virtual void registerCommandForRedo(PassRefPtr<EditCommand>);
@@ -352,6 +351,7 @@ class FrameMac : public Frame {
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
+  virtual void cleanupPluginObjects();
 
  private:
   virtual void handleMousePressEvent(const MouseEventWithHitTestResults&);
