@@ -82,6 +82,7 @@ class Range : public Shared<Range> {
                                      int offsetB);
   static short compareBoundaryPoints(const Position&, const Position&);
   bool boundaryPointsValid() const;
+  bool intersectsNode(Node* refNode, ExceptionCode&);
   void deleteContents(ExceptionCode&);
   PassRefPtr<DocumentFragment> extractContents(ExceptionCode&);
   PassRefPtr<DocumentFragment> cloneContents(ExceptionCode&);
