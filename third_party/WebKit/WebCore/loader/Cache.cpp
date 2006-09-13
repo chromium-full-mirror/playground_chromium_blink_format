@@ -293,7 +293,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
   return static_cast<CachedScript*>(o);
 }
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
 CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
                                                  const String& url,
                                                  bool reload,
@@ -347,7 +347,7 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
 }
 #endif
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
 CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
                                              const String& url,
                                              bool reload,
@@ -583,13 +583,13 @@ Cache::Statistics Cache::getStatistics() {
         stats.scripts.count++;
         stats.scripts.size += o->size();
         break;
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
       case CachedResource::XSLStyleSheet:
         stats.xslStyleSheets.count++;
         stats.xslStyleSheets.size += o->size();
         break;
 #endif
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
       case CachedResource::XBL:
         stats.xblDocs.count++;
         stats.xblDocs.size += o->size();

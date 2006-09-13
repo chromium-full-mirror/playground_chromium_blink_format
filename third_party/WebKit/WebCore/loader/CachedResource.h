@@ -61,11 +61,11 @@ class CachedResource {
     ImageResource,
     CSSStyleSheet,
     Script
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
     ,
     XSLStyleSheet
 #endif
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
     ,
     XBL
 #endif

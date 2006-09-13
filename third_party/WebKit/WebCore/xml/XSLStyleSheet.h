@@ -23,7 +23,7 @@
 #ifndef XSLStyleSheet_H
 #define XSLStyleSheet_H
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
 
 #include "StyleSheet.h"
 #include <libxml/parser.h>
@@ -82,6 +82,6 @@ class XSLStyleSheet : public StyleSheet {
 
 }  // namespace WebCore
 
-#endif  // KHTML_XSLT
+#endif  // XSLT_SUPPORT
 
 #endif  // XSLStyleSheet_H

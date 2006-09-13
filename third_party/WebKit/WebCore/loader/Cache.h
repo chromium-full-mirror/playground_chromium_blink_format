@@ -82,14 +82,14 @@ class Cache {
                                      time_t expireDate,
                                      const String& charset);
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
   static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader*,
                                                    const String& URL,
                                                    bool reload,
                                                    time_t expireDate);
 #endif
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   static CachedXBLDocument* requestXBLDocument(DocLoader*,
                                                const String& URL,
                                                bool reload,
@@ -144,10 +144,10 @@ class Cache {
     TypeStatistic movies;
     TypeStatistic styleSheets;
     TypeStatistic scripts;
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
     TypeStatistic xslStyleSheets;
 #endif
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
     TypeStatistic xblDocs;
 #endif
     TypeStatistic other;

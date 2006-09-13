@@ -374,7 +374,7 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
       marginTopCollapse(MCOLLAPSE),
       marginBottomCollapse(MCOLLAPSE),
       m_appearance(RenderStyle::initialAppearance())
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
       ,
       bindingURI(0)
 #endif
@@ -394,7 +394,7 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
       marginTopCollapse(o.marginTopCollapse),
       marginBottomCollapse(o.marginBottomCollapse),
       m_appearance(o.m_appearance)
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
       ,
       bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
 #endif
@@ -402,12 +402,12 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
 }
 
 StyleCSS3NonInheritedData::~StyleCSS3NonInheritedData() {
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   delete bindingURI;
 #endif
 }
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
 bool StyleCSS3NonInheritedData::bindingsEquivalent(
     const StyleCSS3NonInheritedData& o) const {
   if (this == &o)
@@ -428,7 +428,7 @@ bool StyleCSS3NonInheritedData::operator==(
          marginTopCollapse == o.marginTopCollapse &&
          marginBottomCollapse == o.marginBottomCollapse &&
          m_appearance == o.m_appearance
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
          && bindingsEquivalent(o)
 #endif
          && lineClamp == o.lineClamp &&
@@ -1082,7 +1082,7 @@ void ContentData::clearContent() {
   }
 }
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
 BindingURI::BindingURI(StringImpl* uri) : m_next(0) {
   m_uri = uri;
   if (uri)

@@ -39,7 +39,7 @@ class DocLoader;
 class Decoder;
 class CachedResourceClient;
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
 class CachedXBLDocument : public CachedResource {
  public:
   CachedXBLDocument(DocLoader*,

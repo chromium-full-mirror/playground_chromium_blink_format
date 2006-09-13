@@ -677,7 +677,7 @@ struct ShadowData {
   ShadowData* next;
 };
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
 struct BindingURI {
   BindingURI(StringImpl*);
   ~BindingURI();
@@ -771,7 +771,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   ~StyleCSS3NonInheritedData();
   StyleCSS3NonInheritedData(const StyleCSS3NonInheritedData& o);
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   bool bindingsEquivalent(const StyleCSS3NonInheritedData& o) const;
 #endif
 
@@ -797,7 +797,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
 
   unsigned m_appearance : 6;  // EAppearance
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   BindingURI* bindingURI;  // The XBL binding URI list.
 #endif
 };
@@ -1557,7 +1557,7 @@ class RenderStyle {
   }
 
 // CSS3 Getter Methods
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   BindingURI* bindingURIs() const { return css3NonInheritedData->bindingURI; }
 #endif
   int outlineOffset() const {
@@ -1937,7 +1937,7 @@ class RenderStyle {
   }
 
 // CSS3 Setters
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   void deleteBindingURIs() {
     delete css3NonInheritedData->bindingURI;
     SET_VAR(css3NonInheritedData, bindingURI, (BindingURI*)0);

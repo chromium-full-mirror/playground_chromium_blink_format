@@ -91,13 +91,12 @@
 #include "XPathResult.h"
 #endif
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
 #include "XSLTProcessor.h"
 #endif
 
-#ifndef KHTML_NO_XBL
-#include "xbl_binding_manager.h"
-using XBL::XBLBindingManager;
+#ifdef XBL_SUPPORT
+#include "XBLBindingManager.h"
 #endif
 
 #ifdef SVG_SUPPORT
@@ -226,11 +225,11 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       m_title(""),
       m_titleSetExplicitly(false),
       m_imageLoadEventTimer(this, &Document::imageLoadEventTimerFired)
-#if !KHTML_NO_XBL
+#ifdef XBL_SUPPORT
       ,
       m_bindingManager(new XBLBindingManager(this))
 #endif
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
       ,
       m_transformSource(0)
 #endif
@@ -356,11 +355,11 @@ Document::~Document() {
     m_renderArena = 0;
   }
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
   xmlFreeDoc((xmlDocPtr)m_transformSource);
 #endif
 
-#ifndef KHTML_NO_XBL
+#ifdef XBL_SUPPORT
   delete m_bindingManager;
 #endif
 
@@ -1850,7 +1849,7 @@ void Document::recalcStyleSelector() {
       // Processing instruction (XML documents only)
       ProcessingInstruction* pi = static_cast<ProcessingInstruction*>(n);
       sheet = pi->sheet();
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
       // Don't apply XSL transforms to already transformed documents --
       // <rdar://problem/4132806>
       if (pi->isXSL() && !transformSourceDocument()) {
@@ -3116,7 +3115,7 @@ void Document::shiftMarkers(Node* node,
     node->renderer()->repaint();
 }
 
-#ifdef KHTML_XSLT
+#ifdef XSLT_SUPPORT
 
 void Document::applyXSLTransform(ProcessingInstruction* pi) {
   RefPtr<XSLTProcessor> processor = new XSLTProcessor;
