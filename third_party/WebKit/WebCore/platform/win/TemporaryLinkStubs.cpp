@@ -33,8 +33,8 @@
 #include "CString.h"
 #include "Node.h"
 #include "TextField.h"
+#include "FileChooser.h"
 #include "Font.h"
-#include "FileButton.h"
 #include "PopUpButton.h"
 #include "IntPoint.h"
 #include "Widget.h"
@@ -64,6 +64,7 @@
 #include "AXObjectCache.h"
 #include "RenderPopupMenuWin.h"
 #include "EditCommand.h"
+#include "Icon.h"
 
 using namespace WebCore;
 
@@ -213,35 +214,23 @@ bool ListBox::checksDescendantsForFocus() const {
   return 0;
 }
 
-FileButton::FileButton(Frame*) {
+FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
   notImplemented();
 }
-void FileButton::click(bool) {
+FileChooser::~FileChooser() {
   notImplemented();
 }
-IntSize FileButton::sizeForCharacterWidth(int) const {
-  notImplemented();
-  return IntSize();
-}
-Widget::FocusPolicy FileButton::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
-WebCore::IntRect FileButton::frameGeometry() const {
-  notImplemented();
-  return IntRect();
-}
-void FileButton::setFilename(DeprecatedString const&) {
+void FileChooser::openFileChooser() {
   notImplemented();
 }
-int FileButton::baselinePosition(int) const {
+String FileChooser::basenameForWidth(int width) const {
   notImplemented();
-  return 0;
+  return String();
 }
-void FileButton::setFrameGeometry(WebCore::IntRect const&) {
+void FileChooser::uploadControlDetaching() {
   notImplemented();
 }
-void FileButton::setDisabled(bool) {
+void FileChooser::chooseFile(const String& filename) {
   notImplemented();
 }
 
@@ -484,6 +473,13 @@ String WebCore::inputElementAltText() {
 String WebCore::resetButtonDefaultLabel() {
   return "Reset";
 }
+String WebCore::fileButtonChooseFileLabel() {
+  return "Browse...";
+}
+String WebCore::fileButtonNoFileSelectedLabel() {
+  return String();
+}
+
 String WebCore::defaultLanguage() {
   return "en";
 }
@@ -763,3 +759,17 @@ bool RenderThemeWin::paintMenuList(RenderObject*,
 void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const {}
+
+Icon::Icon() {
+  notImplemented();
+}
+Icon::~Icon() {
+  notImplemented();
+}
+PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
+  notImplemented();
+  return PassRefPtr<Icon>(new Icon());
+}
+void Icon::paint(GraphicsContext*, const IntRect&) {
+  notImplemented();
+}
