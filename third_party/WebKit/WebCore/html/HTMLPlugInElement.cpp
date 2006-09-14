@@ -32,8 +32,7 @@
 #include "kjs_dom.h"
 #include "kjs_proxy.h"
 
-#if PLATFORM(MAC)
-#include "FrameMac.h"
+#if USE(NPOBJECT)
 #include <JavaScriptCore/npruntime_impl.h>
 #include <JavaScriptCore/NP_jsobject.h>
 #endif
@@ -50,7 +49,7 @@ using namespace HTMLNames;
 HTMLPlugInElement::HTMLPlugInElement(const QualifiedName& tagName,
                                      Document* doc)
     : HTMLElement(tagName, doc)
-#if PLATFORM(MAC)
+#if USE(NPOBJECT)
       ,
       m_NPObject(0)
 #endif
@@ -58,7 +57,7 @@ HTMLPlugInElement::HTMLPlugInElement(const QualifiedName& tagName,
 }
 
 HTMLPlugInElement::~HTMLPlugInElement() {
-#if PLATFORM(MAC)
+#if USE(NPOBJECT)
   if (m_NPObject) {
     _NPN_ReleaseObject(m_NPObject);
     m_NPObject = 0;
@@ -146,7 +145,7 @@ void HTMLPlugInElement::detach() {
   HTMLElement::detach();
 }
 
-#if PLATFORM(MAC)
+#if USE(NPOBJECT)
 
 NPObject* HTMLPlugInElement::createNPObject() {
   // This shouldn't ever happen, but might as well check anyway
@@ -166,7 +165,7 @@ NPObject* HTMLPlugInElement::createNPObject() {
     return _NPN_CreateNoScriptObject();
 
   // Wrap the JSObject in an NPObject
-  const RootObject* executionContext = Mac(frame)->bindingRootObject();
+  const RootObject* executionContext = frame->bindingRootObject();
   return _NPN_CreateScriptObject(0, jsElementValue->getObject(),
                                  executionContext, executionContext);
 }
@@ -177,5 +176,5 @@ NPObject* HTMLPlugInElement::getNPObject() {
   return m_NPObject;
 }
 
-#endif /* PLATFORM(MAC) */
+#endif /* USE(NPOBJECT) */
 }

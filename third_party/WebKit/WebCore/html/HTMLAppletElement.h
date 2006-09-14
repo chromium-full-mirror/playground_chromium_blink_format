@@ -27,7 +27,7 @@
 
 #include "HTMLPlugInElement.h"
 
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
 #include <JavaScriptCore/runtime.h>
 #else
 namespace KJS {
@@ -56,7 +56,7 @@ class HTMLAppletElement : public HTMLPlugInElement {
   virtual void closeRenderer();
   virtual void detach();
 
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
   virtual KJS::Bindings::Instance* getInstance() const;
 #endif
 

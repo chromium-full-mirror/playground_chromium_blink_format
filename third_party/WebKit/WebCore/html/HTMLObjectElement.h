@@ -27,7 +27,7 @@
 
 #include "HTMLPlugInElement.h"
 
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
 #include <JavaScriptCore/runtime.h>
 #else
 namespace KJS {
@@ -71,7 +71,7 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
   void renderFallbackContent();
 
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
   virtual KJS::Bindings::Instance* getInstance() const;
 #endif
 

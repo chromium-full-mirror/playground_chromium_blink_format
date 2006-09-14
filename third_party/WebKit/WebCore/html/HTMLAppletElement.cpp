@@ -38,7 +38,7 @@ HTMLAppletElement::HTMLAppletElement(Document* doc)
     : HTMLPlugInElement(appletTag, doc), m_allParamsAvailable(false) {}
 
 HTMLAppletElement::~HTMLAppletElement() {
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
   // m_instance should have been cleaned up in detach().
   assert(!m_instance);
 #endif
@@ -128,7 +128,7 @@ RenderObject* HTMLAppletElement::createRenderer(RenderArena* arena,
   return new (document()->renderArena()) RenderInline(this);
 }
 
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
 KJS::Bindings::Instance* HTMLAppletElement::getInstance() const {
   Frame* frame = document()->frame();
   if (!frame || !frame->javaEnabled())
@@ -160,7 +160,7 @@ void HTMLAppletElement::closeRenderer() {
 }
 
 void HTMLAppletElement::detach() {
-#if PLATFORM(MAC)
+#if USE(JAVASCRIPTCORE_BINDINGS)
   m_instance = 0;
 #endif
   HTMLPlugInElement::detach();
