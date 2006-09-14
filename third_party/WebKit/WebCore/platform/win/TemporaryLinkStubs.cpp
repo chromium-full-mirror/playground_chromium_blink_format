@@ -65,6 +65,8 @@
 #include "RenderPopupMenuWin.h"
 #include "EditCommand.h"
 #include "Icon.h"
+#include "IconLoader.h"
+#include "IconDatabase.h"
 
 using namespace WebCore;
 
@@ -776,4 +778,24 @@ PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
 }
 void Icon::paint(GraphicsContext*, const IntRect&) {
   notImplemented();
+}
+
+void IconLoader::stopLoading() {
+  notImplemented();
+}
+void IconLoader::startLoading() {
+  notImplemented();
+}
+IconLoader* IconLoader::createForFrame(Frame* frame) {
+  return 0;
+}
+
+bool IconDatabase::isIconExpiredForIconURL(const String& url) {
+  return false;
+}
+bool IconDatabase::hasEntryForIconURL(const String& url) {
+  return false;
+}
+IconDatabase* IconDatabase::sharedIconDatabase() {
+  return 0;
 }
