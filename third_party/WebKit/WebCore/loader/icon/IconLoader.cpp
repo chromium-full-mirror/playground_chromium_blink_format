@@ -27,10 +27,13 @@
 #include "IconLoader.h"
 
 #include "dom/Document.h"
-#include "FrameMac.h"
 #include "loader/icon/IconDatabase.h"
 #include "Logging.h"
 #include "page/Frame.h"
+
+#if PLATFORM(MAC)
+#include "FrameMac.h"
+#endif
 
 using namespace WebCore;
 
@@ -111,9 +114,13 @@ void IconLoader::receivedAllData(ResourceLoader* resourceLoader) {
   // different parts
   // of the app tend to want to retain both
   iconDatabase->setIconURLForPageURL(iconURL.url(), m_frame->url().url());
+
+// FIXME - Need to be able to do the following platform independently
+#if PLATFORM(MAC)
   FrameMac* frameMac = Mac(m_frame);
   iconDatabase->setIconURLForPageURL(iconURL.url(),
                                      frameMac->originalRequestURL().url());
+#endif
 
   notifyIconChanged(iconURL);
 
