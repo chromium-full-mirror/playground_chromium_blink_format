@@ -37,7 +37,7 @@
 #endif
 
 #if USE(WININET)
-typedef void* HANDLE;
+#include <windows.h>
 #endif
 
 #if PLATFORM(GDK)
@@ -76,7 +76,7 @@ class ResourceLoaderInternal {
 #endif
 #if USE(WININET)
         ,
-        m_fileHandle(0),
+        m_fileHandle(INVALID_HANDLE_VALUE),
         m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
@@ -116,7 +116,7 @@ class ResourceLoaderInternal {
 #endif
 #if USE(WININET)
         ,
-        m_fileHandle(0),
+        m_fileHandle(INVALID_HANDLE_VALUE),
         m_fileLoadTimer(job, &ResourceLoader::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
