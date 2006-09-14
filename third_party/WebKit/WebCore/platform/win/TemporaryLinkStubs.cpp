@@ -304,6 +304,10 @@ KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
+KJS::Bindings::RootObject* FrameWin::bindingRootObject() {
+  notImplemented();
+  return 0;
+}
 bool FrameWin::canRedo() const {
   notImplemented();
   return 0;
