@@ -347,6 +347,7 @@ class FrameMac : public Frame {
                             bool line);
 
   NSEvent* currentEvent() { return _currentEvent; }
+  KURL originalRequestURL() const;
 
  protected:
   virtual void startRedirectionTimer();

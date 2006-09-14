@@ -105,6 +105,9 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   void didExplicitOpen();
 
+  KURL iconURL();
+  void setIconURL(const String& url, const String& type);
+
   Page* page() const;
   void pageDestroyed();
 
@@ -873,6 +876,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   void updateBaseURLForEmptyDocument();
 
   KURL url() const;
+
   void setResourceRequest(const ResourceRequest& request);
   const ResourceRequest& resourceRequest() const;
 
