@@ -393,6 +393,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
                                      int x) {
   Position p = visiblePosition.deepEquivalent();
   Node* node = p.node();
+  Node* highestRoot = highestEditableRoot(p);
   if (!node)
     return VisiblePosition();
 
@@ -421,7 +422,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->previousEditable();
     while (n) {
-      if (!n->inSameRootEditableElement(node))
+      if (highestEditableRoot(Position(n, 0)) != highestRoot)
         break;
       Position pos(n, n->caretMinOffset());
       if (pos.inRenderedContent()) {
@@ -463,6 +464,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
                                  int x) {
   Position p = visiblePosition.deepEquivalent();
   Node* node = p.node();
+  Node* highestRoot = highestEditableRoot(p);
   if (!node)
     return VisiblePosition();
 
@@ -491,7 +493,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->nextEditable();
     while (n) {
-      if (!n->inSameRootEditableElement(node))
+      if (highestEditableRoot(Position(n, 0)) != highestRoot)
         break;
       Position pos(n, n->caretMinOffset());
       if (pos.inRenderedContent()) {
@@ -816,50 +818,19 @@ bool isEndOfDocument(const VisiblePosition& p) {
 
 // ---------
 
-VisiblePosition startOfEditableContent(const VisiblePosition& c) {
-  Position p = c.deepEquivalent();
-  Node* node = p.node();
-  if (!node)
+VisiblePosition startOfEditableContent(const VisiblePosition& visiblePosition) {
+  Node* highestRoot = highestEditableRoot(visiblePosition.deepEquivalent());
+  if (!highestRoot)
     return VisiblePosition();
 
-  return VisiblePosition(node->rootEditableElement(), 0, DOWNSTREAM);
+  return VisiblePosition(highestRoot, 0, DOWNSTREAM);
 }
 
-VisiblePosition endOfEditableContent(const VisiblePosition& c) {
-  Position p = c.deepEquivalent();
-  Node* node = p.node();
-  if (!node)
+VisiblePosition endOfEditableContent(const VisiblePosition& visiblePosition) {
+  Node* highestRoot = highestEditableRoot(visiblePosition.deepEquivalent());
+  if (!highestRoot)
     return VisiblePosition();
 
-  node = node->rootEditableElement();
-  if (!node)
-    return VisiblePosition();
-
-  return VisiblePosition(node, node->childNodeCount(), DOWNSTREAM);
-}
-
-bool inSameEditableContent(const VisiblePosition& a, const VisiblePosition& b) {
-  Position ap = a.deepEquivalent();
-  Node* an = ap.node();
-  if (!an)
-    return false;
-
-  Position bp = b.deepEquivalent();
-  Node* bn = bp.node();
-  if (!bn)
-    return false;
-
-  if (!an->isContentEditable() || !bn->isContentEditable())
-    return false;
-
-  return an->rootEditableElement() == bn->rootEditableElement();
-}
-
-bool isStartOfEditableContent(const VisiblePosition& p) {
-  return !inSameEditableContent(p, p.previous());
-}
-
-bool isEndOfEditableContent(const VisiblePosition& p) {
-  return !inSameEditableContent(p, p.next());
+  return VisiblePosition(highestRoot, maxDeepOffset(highestRoot), DOWNSTREAM);
 }
 }

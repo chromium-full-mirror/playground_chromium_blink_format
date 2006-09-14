@@ -194,7 +194,6 @@ class Node : public TreeShared<Node> {
   Element* enclosingInlineElement() const;
   Element* rootEditableElement() const;
 
-  bool inSameRootEditableElement(Node*);
   bool inSameContainingBlockFlowElement(Node*);
 
   // Used by the parser. Checks against the DTD, unlike DOM operations like
