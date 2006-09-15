@@ -60,6 +60,8 @@
 #include "RenderTheme.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
+#include "IconDatabase.h"
+#include "IconLoader.h"
 
 using namespace WebCore;
 
@@ -291,6 +293,26 @@ void PlatformScrollBar::setRect(const IntRect&) {
 
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
   notImplemented();
+}
+
+void IconLoader::stopLoading() {
+  notImplemented();
+}
+void IconLoader::startLoading() {
+  notImplemented();
+}
+IconLoader* IconLoader::createForFrame(Frame* frame) {
+  return 0;
+}
+
+bool IconDatabase::isIconExpiredForIconURL(const String& url) {
+  return false;
+}
+bool IconDatabase::hasEntryForIconURL(const String& url) {
+  return false;
+}
+IconDatabase* IconDatabase::sharedIconDatabase() {
+  return 0;
 }
 
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
