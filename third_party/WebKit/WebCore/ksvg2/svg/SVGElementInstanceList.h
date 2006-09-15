@@ -29,7 +29,7 @@
 #include "SVGElementInstance.h"
 
 namespace WebCore {
-class SVGElementInstanceList : public SVGList<SVGElementInstance*> {
+class SVGElementInstanceList : public SVGList<RefPtr<SVGElementInstance>> {
  public:
   SVGElementInstanceList();
   virtual ~SVGElementInstanceList();

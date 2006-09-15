@@ -29,7 +29,7 @@
 #include "SVGLength.h"
 
 namespace WebCore {
-class SVGLengthList : public SVGList<SVGLength*> {
+class SVGLengthList : public SVGList<RefPtr<SVGLength>> {
  public:
   SVGLengthList();
   virtual ~SVGLengthList();

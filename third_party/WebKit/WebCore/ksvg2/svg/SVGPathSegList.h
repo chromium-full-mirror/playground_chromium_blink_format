@@ -29,7 +29,7 @@
 #include "SVGPathSeg.h"
 
 namespace WebCore {
-class SVGPathSegList : public SVGList<SVGPathSeg*> {
+class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
  public:
   SVGPathSegList();
   virtual ~SVGPathSegList();

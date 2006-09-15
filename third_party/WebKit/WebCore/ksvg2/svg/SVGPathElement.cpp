@@ -497,7 +497,8 @@ Path SVGPathElement::toPathData() const {
 
   ExceptionCode ec = 0;
   for (int i = 0; i < len; ++i) {
-    SVGPathSeg* p = pathSegList()->getItem(i, ec);
+    SVGPathSeg* p = pathSegList()->getItem(i, ec).get();
+    ;
     switch (p->pathSegType()) {
       case SVGPathSeg::PATHSEG_MOVETO_ABS: {
         SVGPathSegMovetoAbs* moveTo = static_cast<SVGPathSegMovetoAbs*>(p);

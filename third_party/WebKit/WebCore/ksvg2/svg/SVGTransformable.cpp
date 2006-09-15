@@ -78,7 +78,7 @@ void SVGTransformable::parseTransformAttribute(SVGTransformList* list,
     if (subtransform[0].startsWith(";") || subtransform[0].startsWith(","))
       subtransform[0] = subtransform[0].mid(1).stripWhiteSpace();
 
-    RefPtr<SVGTransform> t(new SVGTransform());
+    SVGTransform* t = new SVGTransform();
 
     if (subtransform[0] == "rotate") {
       if (params.count() == 3)
@@ -113,7 +113,7 @@ void SVGTransformable::parseTransformAttribute(SVGTransformList* list,
       break;  // failed to parse a valid transform, abort.
 
     ExceptionCode ec = 0;
-    list->appendItem(t.release().release(), ec);
+    list->appendItem(t, ec);
   }
 }
 
