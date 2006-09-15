@@ -826,6 +826,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
   virtual void cleanupPluginObjects() {}
+  void cancelAndClear();
 
   void handleAutoscroll(RenderLayer*);
   void startAutoscrollTimer();

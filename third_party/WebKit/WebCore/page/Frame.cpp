@@ -189,12 +189,7 @@ Frame::~Frame() {
   --FrameCounter::count;
 #endif
 
-  cancelRedirection();
-
-  if (!d->m_bComplete)
-    closeURL();
-
-  clear(false);
+  cancelAndClear();
 
   if (d->m_jscript && d->m_jscript->haveInterpreter())
     if (Window* w = Window::retrieveWindow(this)) {
@@ -452,6 +447,15 @@ bool Frame::autoloadImages() const {
     return d->m_doc->docLoader()->autoloadImages();
 
   return true;
+}
+
+void Frame::cancelAndClear() {
+  cancelRedirection();
+
+  if (!d->m_bComplete)
+    closeURL();
+
+  clear(false);
 }
 
 void Frame::clear(bool clearWindowProperties) {
