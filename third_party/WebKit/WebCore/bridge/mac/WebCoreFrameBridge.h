@@ -450,8 +450,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)alterCurrentSelection:(WebSelectionAlteration)alteration
                     direction:(WebBridgeSelectionDirection)direction
                   granularity:(WebBridgeSelectionGranularity)granularity;
-- (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
-                            verticalDistance:(float)distance;
 - (void)alterCurrentSelection:(WebSelectionAlteration)alteration
              verticalDistance:(float)distance;
 - (WebBridgeSelectionGranularity)selectionGranularity;
@@ -533,8 +531,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)removeEditingStyleFromBodyElement;
 - (void)applyEditingStyleToElement:(DOMElement*)element;
 - (void)removeEditingStyleFromElement:(DOMElement*)element;
-
-- (void)ensureSelectionVisible;
 
 - (WebScriptObject*)windowScriptObject;
 - (NPObject*)windowScriptNPObject;
