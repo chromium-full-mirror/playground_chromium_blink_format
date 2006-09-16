@@ -58,8 +58,11 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer {
   TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  class Private;
-  Private* d;
+  KCanvasImage* m_tile;
+  AffineTransform m_patternTransform;
+  FloatRect m_bbox;
+  bool m_useBoundingBoxMode;
+  KCanvasResourceListener* m_listener;
 };
 }
 

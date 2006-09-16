@@ -26,6 +26,7 @@
 #define RenderPath_H
 #ifdef SVG_SUPPORT
 
+#include "AffineTransform.h"
 #include "DeprecatedValueList.h"
 #include "FloatRect.h"
 
@@ -107,8 +108,12 @@ class RenderPath : public RenderObject {
 
   PointerEventsHitRules pointerEventsHitRules();
 
-  class Private;
-  Private* d;
+  Path m_path;
+
+  mutable FloatRect m_fillBBox;
+  mutable FloatRect m_strokeBbox;
+  AffineTransform m_matrix;
+  IntRect m_absoluteBounds;
 };
 }
 

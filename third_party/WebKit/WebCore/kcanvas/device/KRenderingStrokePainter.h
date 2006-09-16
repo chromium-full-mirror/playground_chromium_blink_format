@@ -62,8 +62,17 @@ class KRenderingStrokePainter {
   void setDirty(bool dirty = true);
 
  private:
-  class Private;
-  Private* d;
+  bool m_dirty;
+  float m_opacity;
+
+  float m_strokeWidth;
+  unsigned int m_miterLimit;
+
+  KCCapStyle m_capStyle;
+  KCJoinStyle m_joinStyle;
+
+  float m_dashOffset;
+  mutable KCDashArray m_dashArray;
 };
 }
 

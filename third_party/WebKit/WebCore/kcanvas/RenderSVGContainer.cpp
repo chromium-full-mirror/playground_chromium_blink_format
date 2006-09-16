@@ -31,44 +31,27 @@
 
 namespace WebCore {
 
-class RenderSVGContainer::Private {
- public:
-  Private() : drawsContents(true), slice(false) {}
-  ~Private() {}
-
-  bool drawsContents : 1;
-  bool slice : 1;
-  AffineTransform matrix;
-
-  FloatRect viewport;
-  FloatRect viewBox;
-  KCAlign align;
-  IntRect absoluteBounds;
-};
-
 RenderSVGContainer::RenderSVGContainer(SVGStyledElement* node)
-    : RenderContainer(node), d(new Private()) {
+    : RenderContainer(node), m_drawsContents(true), m_slice(false) {
   setReplaced(true);
 }
 
-RenderSVGContainer::~RenderSVGContainer() {
-  delete d;
-}
+RenderSVGContainer::~RenderSVGContainer() {}
 
 bool RenderSVGContainer::drawsContents() const {
-  return d->drawsContents;
+  return m_drawsContents;
 }
 
 void RenderSVGContainer::setDrawsContents(bool drawsContents) {
-  d->drawsContents = drawsContents;
+  m_drawsContents = drawsContents;
 }
 
 AffineTransform RenderSVGContainer::localTransform() const {
-  return d->matrix;
+  return m_matrix;
 }
 
 void RenderSVGContainer::setLocalTransform(const AffineTransform& matrix) {
-  d->matrix = matrix;
+  m_matrix = matrix;
 }
 
 bool RenderSVGContainer::canHaveChildren() const {
@@ -104,7 +87,7 @@ void RenderSVGContainer::layout() {
   IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (selfNeedsLayout() && checkForRepaint)
-    oldBounds = d->absoluteBounds;
+    oldBounds = m_absoluteBounds;
 
   RenderObject* child = firstChild();
   while (child) {
@@ -117,7 +100,7 @@ void RenderSVGContainer::layout() {
   calcWidth();
   calcHeight();
 
-  d->absoluteBounds = getAbsoluteRepaintRect();
+  m_absoluteBounds = getAbsoluteRepaintRect();
 
   if (selfNeedsLayout() && checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
@@ -128,8 +111,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     return;
 
   // No one should be transforming us via these.
-  // ASSERT(d->x == 0);
-  // ASSERT(d->y == 0);
+  // ASSERT(m_x == 0);
+  // ASSERT(m_y == 0);
 
   if (shouldPaintBackgroundOrBorder() &&
       (paintInfo.phase == PaintPhaseForeground ||
@@ -217,27 +200,27 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 }
 
 void RenderSVGContainer::setViewport(const FloatRect& viewport) {
-  d->viewport = viewport;
+  m_viewport = viewport;
 }
 
 FloatRect RenderSVGContainer::viewport() const {
-  return d->viewport;
+  return m_viewport;
 }
 
 void RenderSVGContainer::setViewBox(const FloatRect& viewBox) {
-  d->viewBox = viewBox;
+  m_viewBox = viewBox;
 }
 
 FloatRect RenderSVGContainer::viewBox() const {
-  return d->viewBox;
+  return m_viewBox;
 }
 
 void RenderSVGContainer::setAlign(KCAlign align) {
-  d->align = align;
+  m_align = align;
 }
 
 KCAlign RenderSVGContainer::align() const {
-  return d->align;
+  return m_align;
 }
 
 AffineTransform RenderSVGContainer::viewportTransform() const {
@@ -321,11 +304,11 @@ FloatRect RenderSVGContainer::relativeBBox(bool includeStroke) const {
 }
 
 void RenderSVGContainer::setSlice(bool slice) {
-  d->slice = slice;
+  m_slice = slice;
 }
 
 bool RenderSVGContainer::slice() const {
-  return d->slice;
+  return m_slice;
 }
 
 AffineTransform RenderSVGContainer::getAspectRatio(
