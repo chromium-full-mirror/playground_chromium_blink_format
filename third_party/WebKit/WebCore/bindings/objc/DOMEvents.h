@@ -46,3 +46,6 @@ enum DOMEventExceptionCode { DOM_UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 @interface DOMKeyboardEvent (NonStandardAdditions)
 - (BOOL)getModifierState:(NSString*)keyIdentifierArg;
 @end
+
+@interface DOMNode (DOMEventTarget)<DOMEventTarget>
+@end
