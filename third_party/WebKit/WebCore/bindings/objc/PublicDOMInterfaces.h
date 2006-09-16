@@ -48,15 +48,16 @@
 @property NSString* data;
 @property(readonly) unsigned length;
 - (NSString*)substringData:(unsigned)offset:(unsigned)length;
-//- (NSString *)substringData:(unsigned)offset length:(unsigned)length;
+- (NSString*)substringData:(unsigned)offset length:(unsigned)length;
 - (void)appendData:(NSString*)data;
 - (void)insertData:(unsigned)offset:(NSString*)data;
 - (void)deleteData:(unsigned)offset:(unsigned)length;
 - (void)replaceData:(unsigned)offset:(unsigned)length:(NSString*)data;
-//- (void)insertData:(unsigned)offset data:(NSString *)data;
-//- (void)deleteData:(unsigned)offset length:(unsigned)length;
-//- (void)replaceData:(unsigned)offset length:(unsigned)length data:(NSString
-//*)data;
+- (void)insertData:(unsigned)offset data:(NSString*)data;
+- (void)deleteData:(unsigned)offset length:(unsigned)length;
+- (void)replaceData:(unsigned)offset
+             length:(unsigned)length
+               data:(NSString*)data;
 @end
 
 @interface DOMComment : DOMCharacterData
@@ -71,13 +72,15 @@
                   namespaceURI:(NSString*)
                  qualifiedName:(DOMDocumentType*)doctype;
 - (DOMCSSStyleSheet*)createCSSStyleSheet:(NSString*)title:(NSString*)media;
-//- (BOOL)hasFeature:(NSString *)feature version:(NSString *)version;
-//- (DOMDocumentType *)createDocumentType:(NSString *)qualifiedName
-//publicId:(NSString *)publicId systemId:(NSString *)systemId;
-//- (DOMDocument *)createDocument:(NSString *)namespaceURI
-//qualifiedName:(NSString *)qualifiedName doctype:(DOMDocumentType *)doctype;
-//- (DOMCSSStyleSheet *)createCSSStyleSheet:(NSString *)title media:(NSString
-//*)media;
+- (BOOL)hasFeature:(NSString*)feature version:(NSString*)version;
+- (DOMDocumentType*)createDocumentType:(NSString*)qualifiedName
+                              publicId:(NSString*)publicId
+                              systemId:(NSString*)systemId;
+- (DOMDocument*)createDocument:(NSString*)namespaceURI
+                 qualifiedName:(NSString*)qualifiedName
+                       doctype:(DOMDocumentType*)doctype;
+- (DOMCSSStyleSheet*)createCSSStyleSheet:(NSString*)title
+                                   media:(NSString*)media;
 - (DOMHTMLDocument*)createHTMLDocument:(NSString*)title;
 @end
 
@@ -94,8 +97,8 @@
 - (DOMCDATASection*)createCDATASection:(NSString*)data;
 - (DOMProcessingInstruction*)createProcessingInstruction:(NSString*)
                                                   target:(NSString*)data;
-//- (DOMProcessingInstruction *)createProcessingInstruction:(NSString *)target
-//data:(NSString *)data;
+- (DOMProcessingInstruction*)createProcessingInstruction:(NSString*)target
+                                                    data:(NSString*)data;
 - (DOMAttr*)createAttribute:(NSString*)name;
 - (DOMEntityReference*)createEntityReference:(NSString*)name;
 - (DOMNodeList*)getElementsByTagName:(NSString*)tagname;
@@ -104,36 +107,38 @@
 - (DOMAttr*)createAttributeNS:(NSString*)namespaceURI:(NSString*)qualifiedName;
 - (DOMNodeList*)getElementsByTagNameNS:(NSString*)
                           namespaceURI:(NSString*)localName;
-//- (DOMNode *)importNode:(DOMNode *)importedNode deep:(BOOL)deep;
-//- (DOMElement *)createElementNS:(NSString *)namespaceURI
-//qualifiedName:(NSString *)qualifiedName;
-//- (DOMAttr *)createAttributeNS:(NSString *)namespaceURI
-//qualifiedName:(NSString *)qualifiedName;
-//- (DOMNodeList *)getElementsByTagNameNS:(NSString *)namespaceURI
-//localName:(NSString *)localName;
+- (DOMNode*)importNode:(DOMNode*)importedNode deep:(BOOL)deep;
+- (DOMElement*)createElementNS:(NSString*)namespaceURI
+                 qualifiedName:(NSString*)qualifiedName;
+- (DOMAttr*)createAttributeNS:(NSString*)namespaceURI
+                qualifiedName:(NSString*)qualifiedName;
+- (DOMNodeList*)getElementsByTagNameNS:(NSString*)namespaceURI
+                             localName:(NSString*)localName;
 - (DOMElement*)getElementById:(NSString*)elementId;
 - (DOMEvent*)createEvent:(NSString*)eventType;
 - (DOMRange*)createRange;
 - (DOMCSSStyleDeclaration*)getOverrideStyle:(DOMElement*)
                                     element:(NSString*)pseudoElement;
-//- (DOMCSSStyleDeclaration *)getOverrideStyle:(DOMElement *)element
-//pseudoElement:(NSString *)pseudoElement;
+- (DOMCSSStyleDeclaration*)getOverrideStyle:(DOMElement*)element
+                              pseudoElement:(NSString*)pseudoElement;
 - (DOMCSSStyleDeclaration*)createCSSStyleDeclaration;
 - (DOMNode*)adoptNode:(DOMNode*)source;
 #ifdef XPATH_SUPPORT
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
-//- (DOMXPathExpression *)createExpression:(NSString *)expression resolver:(id
-//<DOMXPathNSResolver>)resolver;
+- (DOMXPathExpression*)createExpression:(NSString*)expression
+                               resolver:(id<DOMXPathNSResolver>)resolver;
 - (id<DOMXPathNSResolver>)createNSResolver:(DOMNode*)nodeResolver;
 - (DOMXPathResult*)evaluate:(NSString*)
                  expression:(DOMNode*)
                 contextNode:(id<DOMXPathNSResolver>)
                    resolver:(unsigned short)
                        type:(DOMXPathResult*)inResult;
-//- (DOMXPathResult *)evaluate:(NSString *)expression contextNode:(DOMNode
-//*)contextNode resolver:(id <DOMXPathNSResolver>)resolver type:(unsigned
-//short)type inResult:(DOMXPathResult *)inResult;
+- (DOMXPathResult*)evaluate:(NSString*)expression
+                contextNode:(DOMNode*)contextNode
+                   resolver:(id<DOMXPathNSResolver>)resolver
+                       type:(unsigned short)type
+                   inResult:(DOMXPathResult*)inResult;
 #endif
 @end
 
@@ -165,7 +170,7 @@
 @property(readonly) int scrollHeight;
 - (NSString*)getAttribute:(NSString*)name;
 - (void)setAttribute:(NSString*)name:(NSString*)value;
-//- (void)setAttribute:(NSString *)name value:(NSString *)value;
+- (void)setAttribute:(NSString*)name value:(NSString*)value;
 - (void)removeAttribute:(NSString*)name;
 - (DOMAttr*)getAttributeNode:(NSString*)name;
 - (DOMAttr*)setAttributeNode:(DOMAttr*)newAttr;
@@ -179,21 +184,21 @@
 - (DOMNodeList*)getElementsByTagNameNS:(NSString*)
                           namespaceURI:(NSString*)localName;
 - (DOMAttr*)getAttributeNodeNS:(NSString*)namespaceURI:(NSString*)localName;
-//- (NSString *)getAttributeNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
-//- (void)setAttributeNS:(NSString *)namespaceURI qualifiedName:(NSString
-//*)qualifiedName value:(NSString *)value;
-//- (void)removeAttributeNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
-//- (DOMNodeList *)getElementsByTagNameNS:(NSString *)namespaceURI
-//localName:(NSString *)localName;
-//- (DOMAttr *)getAttributeNodeNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
+- (NSString*)getAttributeNS:(NSString*)namespaceURI
+                  localName:(NSString*)localName;
+- (void)setAttributeNS:(NSString*)namespaceURI
+         qualifiedName:(NSString*)qualifiedName
+                 value:(NSString*)value;
+- (void)removeAttributeNS:(NSString*)namespaceURI
+                localName:(NSString*)localName;
+- (DOMNodeList*)getElementsByTagNameNS:(NSString*)namespaceURI
+                             localName:(NSString*)localName;
+- (DOMAttr*)getAttributeNodeNS:(NSString*)namespaceURI
+                     localName:(NSString*)localName;
 - (DOMAttr*)setAttributeNodeNS:(DOMAttr*)newAttr;
 - (BOOL)hasAttribute:(NSString*)name;
 - (BOOL)hasAttributeNS:(NSString*)namespaceURI:(NSString*)localName;
-//- (BOOL)hasAttributeNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
+- (BOOL)hasAttributeNS:(NSString*)namespaceURI localName:(NSString*)localName;
 - (void)focus;
 - (void)blur;
 - (void)scrollIntoView:(BOOL)alignWithTop;
@@ -216,12 +221,12 @@
 - (DOMNode*)removeNamedItem:(NSString*)name;
 - (DOMNode*)item:(unsigned)index;
 - (DOMNode*)getNamedItemNS:(NSString*)namespaceURI:(NSString*)localName;
-//- (DOMNode *)getNamedItemNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
+- (DOMNode*)getNamedItemNS:(NSString*)namespaceURI
+                 localName:(NSString*)localName;
 - (DOMNode*)setNamedItemNS:(DOMNode*)node;
 - (DOMNode*)removeNamedItemNS:(NSString*)namespaceURI:(NSString*)localName;
-//- (DOMNode *)removeNamedItemNS:(NSString *)namespaceURI localName:(NSString
-//*)localName;
+- (DOMNode*)removeNamedItemNS:(NSString*)namespaceURI
+                    localName:(NSString*)localName;
 @end
 
 @interface DOMNode : DOMObject
@@ -241,16 +246,16 @@
 @property(readonly) NSString* localName;
 @property NSString* textContent;
 - (DOMNode*)insertBefore:(DOMNode*)newChild:(DOMNode*)refChild;
-//- (DOMNode *)insertBefore:(DOMNode *)newChild refChild:(DOMNode *)refChild;
+- (DOMNode*)insertBefore:(DOMNode*)newChild refChild:(DOMNode*)refChild;
 - (DOMNode*)replaceChild:(DOMNode*)newChild:(DOMNode*)oldChild;
-//- (DOMNode *)replaceChild:(DOMNode *)newChild oldChild:(DOMNode *)oldChild;
+- (DOMNode*)replaceChild:(DOMNode*)newChild oldChild:(DOMNode*)oldChild;
 - (DOMNode*)removeChild:(DOMNode*)oldChild;
 - (DOMNode*)appendChild:(DOMNode*)newChild;
 - (BOOL)hasChildNodes;
 - (DOMNode*)cloneNode:(BOOL)deep;
 - (void)normalize;
 - (BOOL)isSupported:(NSString*)feature:(NSString*)version;
-//- (BOOL)isSupported:(NSString *)feature version:(NSString *)version;
+- (BOOL)isSupported:(NSString*)feature version:(NSString*)version;
 - (BOOL)hasAttributes;
 - (BOOL)isSameNode:(DOMNode*)other;
 - (BOOL)isEqualNode:(DOMNode*)other;
@@ -626,7 +631,7 @@
 @property int size;
 @property int tabIndex;
 - (void)add:(DOMHTMLElement*)element:(DOMHTMLElement*)before;
-//- (void)add:(DOMHTMLElement *)element before:(DOMHTMLElement *)before;
+- (void)add:(DOMHTMLElement*)element before:(DOMHTMLElement*)before;
 - (void)remove:(int)index;
 - (void)blur;
 - (void)focus;
@@ -761,7 +766,7 @@
 @property(readonly) DOMMediaList* media;
 @property(readonly) DOMCSSRuleList* cssRules;
 - (unsigned)insertRule:(NSString*)rule:(unsigned)index;
-//- (unsigned)insertRule:(NSString *)rule index:(unsigned)index;
+- (unsigned)insertRule:(NSString*)rule index:(unsigned)index;
 - (void)deleteRule:(unsigned)index;
 @end
 
@@ -773,11 +778,11 @@
 @interface DOMCSSPrimitiveValue : DOMCSSValue
 @property(readonly) unsigned short primitiveType;
 - (void)setFloatValue:(unsigned short)unitType:(float)floatValue;
-//- (void)setFloatValue:(unsigned short)unitType floatValue:(float)floatValue;
+- (void)setFloatValue:(unsigned short)unitType floatValue:(float)floatValue;
 - (float)getFloatValue:(unsigned short)unitType;
 - (void)setStringValue:(unsigned short)stringType:(NSString*)stringValue;
-//- (void)setStringValue:(unsigned short)stringType stringValue:(NSString
-//*)stringValue;
+- (void)setStringValue:(unsigned short)stringType
+           stringValue:(NSString*)stringValue;
 - (NSString*)getStringValue;
 - (DOMCounter*)getCounterValue;
 - (DOMRect*)getRectValue;
@@ -807,8 +812,9 @@
 - (void)setProperty:(NSString*)
        propertyName:(NSString*)
               value:(NSString*)priority;
-//- (void)setProperty:(NSString *)propertyName value:(NSString *)value
-//priority:(NSString *)priority;
+- (void)setProperty:(NSString*)propertyName
+              value:(NSString*)value
+           priority:(NSString*)priority;
 - (NSString*)item:(unsigned)index;
 - (NSString*)getPropertyShorthand:(NSString*)propertyName;
 - (BOOL)isPropertyImplicit:(NSString*)propertyName;
@@ -823,7 +829,7 @@
 @property(readonly) DOMCSSRule* ownerRule;
 @property(readonly) DOMCSSRuleList* cssRules;
 - (unsigned)insertRule:(NSString*)rule:(unsigned)index;
-//- (unsigned)insertRule:(NSString *)rule index:(unsigned)index;
+- (unsigned)insertRule:(NSString*)rule index:(unsigned)index;
 - (void)deleteRule:(unsigned)index;
 @end
 
@@ -863,8 +869,9 @@
 @property(readonly) DOMTimeStamp timeStamp;
 - (void)stopPropagation;
 - (void)preventDefault;
-//- (void)initEvent:(NSString *)eventTypeArg canBubbleArg:(BOOL)canBubbleArg
-//cancelableArg:(BOOL)cancelableArg;
+- (void)initEvent:(NSString*)eventTypeArg
+     canBubbleArg:(BOOL)canBubbleArg
+    cancelableArg:(BOOL)cancelableArg;
 - (void)initEvent:(NSString*)
      eventTypeArg:(BOOL)
      canBubbleArg:(BOOL)cancelableArg;
@@ -873,8 +880,11 @@
 @interface DOMUIEvent : DOMEvent
 @property(readonly) DOMAbstractView* view;
 @property(readonly) int detail;
-//- (void)initUIEvent:(DOMAtomicString *)type canBubble:(BOOL)canBubble
-//cancelable:(BOOL)cancelable view:(DOMAbstractView *)view detail:(int)detail;
+- (void)initUIEvent:(NSString*)type
+          canBubble:(BOOL)canBubble
+         cancelable:(BOOL)cancelable
+               view:(DOMAbstractView*)view
+             detail:(int)detail;
 - (void)initUIEvent:(NSString*)
                type:(BOOL)
           canBubble:(BOOL)
@@ -888,10 +898,14 @@
 @property(readonly) NSString* newValue;
 @property(readonly) NSString* attrName;
 @property(readonly) unsigned short attrChange;
-//- (void)initMutationEvent:(NSString *)type canBubble:(BOOL)canBubble
-//cancelable:(BOOL)cancelable relatedNode:(DOMNode *)relatedNode
-//prevValue:(NSString *)prevValue newValue:(NSString *)newValue
-//attrName:(NSString *)attrName attrChange:(unsigned short)attrChange;
+- (void)initMutationEvent:(NSString*)type
+                canBubble:(BOOL)canBubble
+               cancelable:(BOOL)cancelable
+              relatedNode:(DOMNode*)relatedNode
+                prevValue:(NSString*)prevValue
+                 newValue:(NSString*)newValue
+                 attrName:(NSString*)attrName
+               attrChange:(unsigned short)attrChange;
 - (void)initMutationEvent:(NSString*)
                      type:(BOOL)
                 canBubble:(BOOL)
@@ -943,12 +957,21 @@
 @property(readonly) BOOL metaKey;
 @property(readonly) unsigned short button;
 @property(readonly) id<DOMEventTarget> relatedTarget;
-//- (void)initMouseEvent:(NSString *)type canBubble:(BOOL)canBubble
-//cancelable:(BOOL)cancelable view:(DOMAbstractView *)view detail:(int)detail
-//screenX:(int)screenX screenY:(int)screenY clientX:(int)clientX
-//clientY:(int)clientY ctrlKey:(BOOL)ctrlKey altKey:(BOOL)altKey
-//shiftKey:(BOOL)shiftKey metaKey:(BOOL)metaKey button:(unsigned short)button
-//relatedTarget:(id <DOMEventTarget>)relatedTarget;
+- (void)initMouseEvent:(NSString*)type
+             canBubble:(BOOL)canBubble
+            cancelable:(BOOL)cancelable
+                  view:(DOMAbstractView*)view
+                detail:(int)detail
+               screenX:(int)screenX
+               screenY:(int)screenY
+               clientX:(int)clientX
+               clientY:(int)clientY
+               ctrlKey:(BOOL)ctrlKey
+                altKey:(BOOL)altKey
+              shiftKey:(BOOL)shiftKey
+               metaKey:(BOOL)metaKey
+                button:(unsigned short)button
+         relatedTarget:(id<DOMEventTarget>)relatedTarget;
 - (void)initMouseEvent:(NSString*)
                   type:(BOOL)
              canBubble:(BOOL)
@@ -1007,8 +1030,9 @@
 // We should be able to remove the old style version of this method
 // once we can verify that all the internal Apple usages have switched
 // to the new style, because this has never been in a public release.
-//- (DOMXPathResult *)evaluate:(DOMNode *)contextNode type:(unsigned short)type
-//inResult:(DOMXPathResult *)inResult;
+- (DOMXPathResult*)evaluate:(DOMNode*)contextNode
+                       type:(unsigned short)type
+                   inResult:(DOMXPathResult*)inResult;
 - (DOMXPathResult*)evaluate:(DOMNode*)
                 contextNode:(unsigned short)
                        type:(DOMXPathResult*)inResult;
