@@ -31,10 +31,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "CString.h"
 #include "Node.h"
 #include "TextField.h"
+#include "FileChooser.h"
 #include "Font.h"
-#include "FileButton.h"
 #include "PopUpButton.h"
 #include "IntPoint.h"
 #include "Widget.h"
@@ -44,6 +45,7 @@
 #include "loader.h"
 #include "FrameView.h"
 #include "KURL.h"
+#include "PlatformScrollBar.h"
 #include "ScrollBar.h"
 #include "JavaAppletWidget.h"
 #include "Path.h"
@@ -61,9 +63,11 @@
 #include "RenderThemeGdk.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
-#include "DeprecatedString.h"
-#include "DeprecatedStringList.h"
-#include "SSLKeyGenerator.h"
+#include "RenderPopupMenuGdk.h"
+#include "EditCommand.h"
+#include "Icon.h"
+#include "IconLoader.h"
+#include "IconDatabase.h"
 
 using namespace WebCore;
 
@@ -205,38 +209,6 @@ bool ListBox::checksDescendantsForFocus() const {
   return 0;
 }
 
-FileButton::FileButton(Frame*) {
-  notImplemented();
-}
-void FileButton::click(bool) {
-  notImplemented();
-}
-IntSize FileButton::sizeForCharacterWidth(int) const {
-  notImplemented();
-  return IntSize();
-}
-Widget::FocusPolicy FileButton::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
-WebCore::IntRect FileButton::frameGeometry() const {
-  notImplemented();
-  return IntRect();
-}
-void FileButton::setFilename(DeprecatedString const&) {
-  notImplemented();
-}
-int FileButton::baselinePosition(int) const {
-  notImplemented();
-  return 0;
-}
-void FileButton::setFrameGeometry(WebCore::IntRect const&) {
-  notImplemented();
-}
-void FileButton::setDisabled(bool) {
-  notImplemented();
-}
-
 Widget::FocusPolicy Slider::focusPolicy() const {
   notImplemented();
   return NoFocus;
@@ -307,6 +279,10 @@ KJS::Bindings::Instance* FrameGdk::getEmbedInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
 }
+KJS::Bindings::RootObject* FrameGdk::bindingRootObject() {
+  notImplemented();
+  return 0;
+}
 bool FrameGdk::canRedo() const {
   notImplemented();
   return 0;
@@ -359,7 +335,7 @@ void FrameGdk::issuePasteCommand() {
 void FrameGdk::scheduleClose() {
   notImplemented();
 }
-void FrameGdk::markMisspellings(WebCore::SelectionController const&) {
+void FrameGdk::markMisspellings(WebCore::Selection const&) {
   notImplemented();
 }
 bool FrameGdk::menubarVisible() {
@@ -435,11 +411,11 @@ void BrowserExtensionGdk::createNewWindow(
   notImplemented();
 }
 
-int WebCore::screenDepthPerComponent(Widget*) {
+int WebCore::screenDepthPerComponent(const Page*) {
   notImplemented();
   return 0;
 }
-bool WebCore::screenIsMonochrome(Widget*) {
+bool WebCore::screenIsMonochrome(const Page*) {
   notImplemented();
   return false;
 }
@@ -466,6 +442,13 @@ String WebCore::inputElementAltText() {
 String WebCore::resetButtonDefaultLabel() {
   return "Reset";
 }
+String WebCore::fileButtonChooseFileLabel() {
+  return "Browse...";
+}
+String WebCore::fileButtonNoFileSelectedLabel() {
+  return String();
+}
+
 String WebCore::defaultLanguage() {
   return "en";
 }
@@ -508,14 +491,16 @@ bool FrameGdk::lastEventIsMouseUp() const {
 }
 void FrameGdk::addMessageToConsole(String const&, unsigned int, String const&) {
 }
-bool FrameGdk::shouldChangeSelection(SelectionController const&,
-                                     SelectionController const&,
+bool FrameGdk::shouldChangeSelection(const Selection&,
+                                     const Selection&,
                                      WebCore::EAffinity,
                                      bool) const {
   return true;
 }
-void FrameGdk::respondToChangedSelection(WebCore::SelectionController const&,
-                                         bool) {}
+bool FrameGdk::shouldChangeSelection(const Selection&) const {
+  return true;
+}
+void FrameGdk::respondToChangedSelection(WebCore::Selection const&, bool) {}
 Frame* FrameGdk::createFrame(const KURL& url,
                              const String& name,
                              Element* ownerElement,
@@ -531,7 +516,7 @@ String FrameGdk::incomingReferrer() const {
 }
 void FrameGdk::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
-void FrameGdk::respondToChangedContents() {}
+void FrameGdk::respondToChangedContents(const Selection&) {}
 
 BrowserExtensionGdk::BrowserExtensionGdk(WebCore::Frame*) {}
 void BrowserExtensionGdk::setTypedIconURL(KURL const&, const String&) {}
@@ -597,7 +582,7 @@ void GraphicsContext::scale(const FloatSize&) {}
 Path::Path() {}
 Path::~Path() {}
 Path::Path(const Path&) {}
-bool Path::contains(const FloatPoint&) const {
+bool Path::contains(const FloatPoint&, WindRule rule) const {
   return false;
 }
 void Path::translate(const FloatSize&) {}
@@ -667,6 +652,23 @@ IntRect PopUpButton::frameGeometry() const {
 }
 void PopUpButton::setFrameGeometry(IntRect const&) {}
 
+PlatformScrollBar::PlatformScrollBar(ScrollBarClient* client,
+                                     ScrollBarOrientation orientation)
+    : ScrollBar(client, orientation) {}
+PlatformScrollBar::~PlatformScrollBar() {}
+int PlatformScrollBar::width() const {
+  return 0;
+}
+int PlatformScrollBar::height() const {
+  return 0;
+}
+void PlatformScrollBar::setEnabled(bool) {}
+void PlatformScrollBar::paint(GraphicsContext*, const IntRect& damageRect) {}
+void PlatformScrollBar::setScrollBarValue(int v) {}
+void PlatformScrollBar::setKnobProportion(int visibleSize, int totalSize) {}
+void PlatformScrollBar::setRect(const IntRect&) {}
+
+ScrollBar::ScrollBar(ScrollBarClient*, ScrollBarOrientation) {}
 void ScrollBar::setSteps(int, int) {}
 bool ScrollBar::scroll(ScrollDirection, ScrollGranularity, float) {
   return 0;
@@ -680,6 +682,26 @@ ListBox::ListBox() {}
 ListBox::~ListBox() {}
 void ListBox::setSelectionMode(ListBox::SelectionMode) {}
 void ListBox::setFont(WebCore::Font const&) {}
+
+FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
+  notImplemented();
+}
+FileChooser::~FileChooser() {
+  notImplemented();
+}
+void FileChooser::openFileChooser() {
+  notImplemented();
+}
+String FileChooser::basenameForWidth(int width) const {
+  notImplemented();
+  return String();
+}
+void FileChooser::uploadControlDetaching() {
+  notImplemented();
+}
+void FileChooser::chooseFile(const String& filename) {
+  notImplemented();
+}
 
 Color WebCore::focusRingColor() {
   return 0xFF0000FF;
@@ -709,6 +731,40 @@ bool RenderThemeGdk::paintTextField(RenderObject*,
                                     const RenderObject::PaintInfo&,
                                     const IntRect&) {
   return false;
+}
+
+Icon::Icon() {
+  notImplemented();
+}
+Icon::~Icon() {
+  notImplemented();
+}
+PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
+  notImplemented();
+  return PassRefPtr<Icon>(new Icon());
+}
+void Icon::paint(GraphicsContext*, const IntRect&) {
+  notImplemented();
+}
+
+void IconLoader::stopLoading() {
+  notImplemented();
+}
+void IconLoader::startLoading() {
+  notImplemented();
+}
+IconLoader* IconLoader::createForFrame(Frame* frame) {
+  return 0;
+}
+
+bool IconDatabase::isIconExpiredForIconURL(const String& url) {
+  return false;
+}
+bool IconDatabase::hasEntryForIconURL(const String& url) {
+  return false;
+}
+IconDatabase* IconDatabase::sharedIconDatabase() {
+  return 0;
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,

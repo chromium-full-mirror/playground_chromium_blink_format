@@ -38,6 +38,8 @@ void RenderPopupMenuGdk::populate() {}
 
 void RenderPopupMenuGdk::showPopup(const IntRect&, FrameView*, int) {}
 
+void RenderPopupMenuGdk::hidePopup() {}
+
 void RenderPopupMenuGdk::addSeparator() {}
 
 void RenderPopupMenuGdk::addGroupLabel(HTMLOptGroupElement*) {}

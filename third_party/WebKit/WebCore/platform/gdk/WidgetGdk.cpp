@@ -146,8 +146,4 @@ IntPoint Widget::mapFromGlobal(const IntPoint& p) const {
   gdk_window_get_origin(window, &x, &y);
   return IntPoint(p.x() - x, p.y() - y);
 }
-
-float Widget::scaleFactor() const {
-  return 1.0f;
-}
 }

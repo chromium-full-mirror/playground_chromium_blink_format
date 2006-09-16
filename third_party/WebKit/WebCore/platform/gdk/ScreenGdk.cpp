@@ -28,14 +28,27 @@
 #include "config.h"
 #include "Screen.h"
 
-#include "FloatRect.h"
+#include "Page.h"
+#include "Frame.h"
 #include "Widget.h"
+#include "FloatRect.h"
+
 #include <gdk/gdk.h>
 
 namespace WebCore {
 
-FloatRect screenRect(Widget* widget) {
-  GdkDrawable* drawable = widget->drawable();
+static GdkDrawable* drawableForPage(const Page* page) {
+  Frame* frame = (page ? page->mainFrame() : 0);
+  FrameView* frameView = (frame ? frame->view() : 0);
+
+  if (!frameView)
+    return 0;
+
+  return frameView->drawable();
+}
+
+FloatRect screenRect(const Page* page) {
+  GdkDrawable* drawable = drawableForPage(page);
   if (!drawable)
     return FloatRect();
   GdkScreen* screen = gdk_drawable_get_screen(drawable);
@@ -43,14 +56,18 @@ FloatRect screenRect(Widget* widget) {
                    gdk_screen_get_height(screen));
 }
 
-int screenDepth(Widget* widget) {
-  GdkDrawable* drawable = widget->drawable();
+int screenDepth(const Page* page) {
+  GdkDrawable* drawable = drawableForPage(page);
   if (!drawable)
     return 32;
   return gdk_drawable_get_depth(drawable);
 }
 
-FloatRect usableScreenRect(Widget* widget) {
-  return screenRect(widget);
+FloatRect usableScreenRect(const Page* page) {
+  return screenRect(page);
+}
+
+float scaleFactor(const Page*) {
+  return 1.0f;
 }
 }
