@@ -52,6 +52,7 @@ class CString {
   static CString newUninitialized(size_t length, char*& characterBuffer);
 
   const char* data() const;
+  char* mutableData();
   unsigned length() const;
 
   operator const char*() const { return data(); }
@@ -62,6 +63,7 @@ class CString {
   DeprecatedCString deprecatedCString() const;
 
  private:
+  void copyBufferIfNeeded();
   void init(const char*, unsigned length);
   RefPtr<CStringBuffer> m_buffer;
 };
