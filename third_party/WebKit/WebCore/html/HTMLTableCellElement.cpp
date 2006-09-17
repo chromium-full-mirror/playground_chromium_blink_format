@@ -113,13 +113,7 @@ HTMLTableCellElement::additionalAttributeStyleDecl() {
   Node* p = parentNode();
   while (p && !p->hasTagName(tableTag))
     p = p->parentNode();
-
-  if (p) {
-    HTMLTableElement* table = static_cast<HTMLTableElement*>(p);
-    return table->getSharedCellDecl();
-  }
-
-  return 0;
+  return p ? static_cast<HTMLTableElement*>(p)->getSharedCellDecl() : 0;
 }
 
 bool HTMLTableCellElement::isURLAttribute(Attribute* attr) const {

@@ -41,11 +41,11 @@ class HTMLTableColElement : public HTMLTablePartElement {
   virtual HTMLTagStatus endTagRequirement() const;
   virtual int tagPriority() const;
   virtual bool checkDTD(const Node*);
-  void setTable(HTMLTableElement* t) { table = t; }
 
   // overrides
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual CSSMutableStyleDeclaration* additionalAttributeStyleDecl();
 
   int span() const { return _span; }
 
@@ -68,7 +68,6 @@ class HTMLTableColElement : public HTMLTablePartElement {
 
  protected:
   int _span;
-  HTMLTableElement* table;
 };
 
 }  // namespace
