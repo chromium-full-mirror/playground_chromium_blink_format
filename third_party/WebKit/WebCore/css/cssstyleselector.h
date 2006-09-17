@@ -127,7 +127,7 @@ class CSSStyleSelector : public StyleSelector {
   // Given a CSS keyword in the range (xx-small to -webkit-xxx-large), this
   // function will return
   // the correct font size scaled relative to the user's default (medium).
-  float fontSizeForKeyword(int keyword, bool quirksMode) const;
+  float fontSizeForKeyword(int keyword, bool quirksMode, bool monospace) const;
 
   // When the CSS keyword "larger" is used, this function will attempt to match
   // within the keyword

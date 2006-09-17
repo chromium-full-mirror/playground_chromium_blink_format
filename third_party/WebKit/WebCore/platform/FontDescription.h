@@ -51,7 +51,8 @@ class FontDescription {
         m_isAbsoluteSize(false),
         m_weight(cNormalWeight),
         m_genericFamily(NoFamily),
-        m_usePrinterFont(false) {}
+        m_usePrinterFont(false),
+        m_keywordSize(0) {}
 
   bool operator==(const FontDescription&) const;
   bool operator!=(const FontDescription& other) const {
@@ -72,6 +73,7 @@ class FontDescription {
     return static_cast<GenericFamilyType>(m_genericFamily);
   }
   bool usePrinterFont() const { return m_usePrinterFont; }
+  int keywordSize() const { return m_keywordSize; }
 
   void setFamily(const FontFamily& family) { m_familyList = family; }
   void setComputedSize(float s) { m_computedSize = s; }
@@ -85,6 +87,7 @@ class FontDescription {
     m_genericFamily = genericFamily;
   }
   void setUsePrinterFont(bool p) { m_usePrinterFont = p; }
+  void setKeywordSize(int s) { m_keywordSize = s; }
 
  private:
   FontFamily m_familyList;  // The list of font families to be used.
@@ -102,6 +105,14 @@ class FontDescription {
   unsigned m_weight : 8;
   unsigned m_genericFamily : 3;  // GenericFamilyType
   bool m_usePrinterFont : 1;
+
+  int m_keywordSize : 4;  // We cache whether or not a font is currently
+                          // represented by a CSS keyword (e.g., medium).  If
+                          // so,
+  // then we can accurately translate across different generic families to
+  // adjust for different preference settings
+  // (e.g., 13px monospace vs. 16px everything else).  Sizes are 1-8 (like the
+  // HTML size values for <font>).
 };
 
 inline bool FontDescription::operator==(const FontDescription& other) const {
@@ -112,7 +123,8 @@ inline bool FontDescription::operator==(const FontDescription& other) const {
          m_isAbsoluteSize == other.m_isAbsoluteSize &&
          m_weight == other.m_weight &&
          m_genericFamily == other.m_genericFamily &&
-         m_usePrinterFont == other.m_usePrinterFont;
+         m_usePrinterFont == other.m_usePrinterFont &&
+         m_keywordSize == other.m_keywordSize;
 }
 }
 
