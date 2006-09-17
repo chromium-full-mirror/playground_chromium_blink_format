@@ -33,7 +33,6 @@
 @class WebArchive;
 @class WebDataSource;
 @class WebMainResourceLoader;
-@class WebIconLoader;
 @class WebLoader;
 @class WebResource;
 @class WebFrame;
@@ -61,7 +60,6 @@ typedef enum {
 
   NSMutableArray* subresourceLoaders;
   NSMutableArray* plugInStreamLoaders;
-  WebIconLoader* iconLoader;
 
   WebFrame* webFrame;
   WebDataSource* dataSource;
@@ -74,10 +72,6 @@ typedef enum {
 }
 
 - (id)initWithWebFrame:(WebFrame*)wf;
-// FIXME: should really split isLoadingIcon from hasLoadedIcon, no?
-- (BOOL)hasIconLoader;
-- (void)loadIconWithRequest:(NSURLRequest*)request;
-- (void)stopLoadingIcon;
 - (void)addPlugInStreamLoader:(WebLoader*)loader;
 - (void)removePlugInStreamLoader:(WebLoader*)loader;
 - (void)setDefersCallbacks:(BOOL)defers;
@@ -146,7 +140,6 @@ typedef enum {
 - (void)_setResponse:(NSURLResponse*)response;
 - (void)_mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (void)_finishedLoading;
-- (void)_iconLoaderReceivedPageIcon:(NSURL*)iconURL;
 - (NSURL*)_URL;
 
 - (NSError*)cancelledErrorWithRequest:(NSURLRequest*)request;
@@ -168,7 +161,6 @@ typedef enum {
 + (BOOL)_canShowMIMEType:(NSString*)MIMEType;
 + (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
 + (NSString*)_generatedMIMETypeForURLScheme:(NSString*)URLScheme;
-- (void)_updateIconDatabaseWithURL:(NSURL*)iconURL;
 - (void)_notifyIconChanged:(NSURL*)iconURL;
 - (void)_checkNavigationPolicyForRequest:(NSURLRequest*)newRequest
                                  andCall:(id)obj

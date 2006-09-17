@@ -196,7 +196,7 @@ class IconDatabase {
   // Once all of the loader logic is sufficiently moved into WebCore we need to
   // move this implementation to IconDatabase.cpp
   // using WebCore-style loaders
-  void loadIconFromURL(const String&);
+  // void loadIconFromURL(const String&);
 
   static IconDatabase* m_sharedInstance;
 
