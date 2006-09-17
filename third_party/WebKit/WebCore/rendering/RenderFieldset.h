@@ -42,6 +42,7 @@ class RenderFieldset : public RenderBlock {
 
   virtual void setStyle(RenderStyle*);
 
+  virtual bool avoidsFloats() const { return true; }
   virtual bool expandsToEncloseOverhangingFloats() const {
     return style()->height().isAuto();
   }

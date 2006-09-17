@@ -928,7 +928,7 @@ class RenderObject : public CachedResourceClient {
 
   virtual void removePositionedObjects(RenderBlock*) {}
 
-  bool avoidsFloats() const;
+  virtual bool avoidsFloats() const;
   bool usesLineWidth() const;
 
   // positioning of inline children (bidi)
