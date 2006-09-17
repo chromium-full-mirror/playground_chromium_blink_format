@@ -32,7 +32,7 @@ SVGDescElement::SVGDescElement(const QualifiedName& tagName, Document* doc)
 SVGDescElement::~SVGDescElement() {}
 
 String SVGDescElement::description() const {
-  return textContent().deprecatedString().simplifyWhiteSpace();
+  return textContent().simplifyWhiteSpace();
 }
 }
 

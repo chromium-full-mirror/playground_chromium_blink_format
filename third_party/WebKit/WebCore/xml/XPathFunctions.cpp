@@ -436,11 +436,11 @@ Value FunStringLength::doEvaluate() const {
 Value FunNormalizeSpace::doEvaluate() const {
   if (argCount() == 0) {
     String s = Value(Expression::evaluationContext().node).toString();
-    return Value(s.deprecatedString().simplifyWhiteSpace());
+    return Value(s.simplifyWhiteSpace());
   }
 
   String s = arg(0)->evaluate().toString();
-  return Value(s.deprecatedString().simplifyWhiteSpace());
+  return Value(s.simplifyWhiteSpace());
 }
 
 Value FunTranslate::doEvaluate() const {

@@ -482,7 +482,6 @@ String XMLHttpRequest::getStatusText() const {
     return String();
 
   return firstLine.substring(codeEnd + 1, endOfLine - (codeEnd + 1))
-      .deprecatedString()
       .stripWhiteSpace();
 }
 

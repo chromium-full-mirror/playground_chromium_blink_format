@@ -60,12 +60,12 @@ class XSLTProcessor : public Shared<XSLTProcessor> {
                                                Document* ouputDoc);
   RefPtr<Document> transformToDocument(Node* source);
 
-  void setParameter(StringImpl* namespaceURI,
-                    StringImpl* localName,
-                    StringImpl* value);
-  RefPtr<StringImpl> getParameter(StringImpl* namespaceURI,
-                                  StringImpl* localName) const;
-  void removeParameter(StringImpl* namespaceURI, StringImpl* localName);
+  void setParameter(const String& namespaceURI,
+                    const String& localName,
+                    const String& value);
+  String getParameter(const String& namespaceURI,
+                      const String& localName) const;
+  void removeParameter(const String& namespaceURI, const String& localName);
   void clearParameters() { m_parameters.clear(); }
 
   void reset() {
@@ -78,7 +78,7 @@ class XSLTProcessor : public Shared<XSLTProcessor> {
   // Only for libXSLT callbacks
   XSLStyleSheet* xslStylesheet() const { return m_stylesheet.get(); }
 
-  typedef HashMap<RefPtr<StringImpl>, RefPtr<StringImpl>> ParameterMap;
+  typedef HashMap<String, String> ParameterMap;
 
  private:
   // Convert a libxml doc ptr to a KHTML DOM Document

@@ -1178,8 +1178,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
               scriptSrc =
                   m_doc->completeURL(parseURL(a->value()).deprecatedString());
             if ((a = currToken.attrs->getAttributeItem(charsetAttr)))
-              scriptSrcCharset =
-                  a->value().deprecatedString().stripWhiteSpace();
+              scriptSrcCharset = a->value().domString().stripWhiteSpace();
             if (scriptSrcCharset.isEmpty())
               scriptSrcCharset = m_doc->frame()->encoding();
             /* Check type before language, since language is deprecated */
@@ -1210,8 +1209,11 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                 We want to accept all the values that either of these browsers
                accept, but not other values.
              */
-            DeprecatedString type =
-                a->value().deprecatedString().stripWhiteSpace().lower();
+            DeprecatedString type = a->value()
+                                        .domString()
+                                        .stripWhiteSpace()
+                                        .lower()
+                                        .deprecatedString();
             if (type.compare("application/x-javascript") != 0 &&
                 type.compare("text/javascript") != 0 &&
                 type.compare("text/javascript1.0") != 0 &&
