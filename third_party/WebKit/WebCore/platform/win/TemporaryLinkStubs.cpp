@@ -406,6 +406,9 @@ bool FrameWin::canGoBackOrForward(int) const {
 void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
+KURL FrameWin::originalRequestURL() const {
+  return KURL();
+}
 
 bool BrowserExtensionWin::canRunModal() {
   notImplemented();

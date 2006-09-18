@@ -236,7 +236,9 @@ KURL Frame::iconURL() {
   if (d->m_url.protocol() != "http" && d->m_url.protocol() != "https")
     return "";
 
-  KURL url = d->m_url;
+  KURL url;
+  url.setProtocol(d->m_url.protocol());
+  url.setHost(d->m_url.host());
   url.setPath("/favicon.ico");
   return url;
 }
@@ -779,13 +781,26 @@ void Frame::endIfNotLoading() {
     return;
 
   IconDatabase* sharedIconDatabase = IconDatabase::sharedIconDatabase();
+  // If we already have an unexpired icon, we won't kick off a load but we
+  // *will* map the appropriate URLs to it
   if (sharedIconDatabase->hasEntryForIconURL(url) &&
-      !sharedIconDatabase->isIconExpiredForIconURL(url))
+      !sharedIconDatabase->isIconExpiredForIconURL(url)) {
+    commitIconURLToIconDatabase();
     return;
+  }
 
   if (!d->m_iconLoader)
     d->m_iconLoader = IconLoader::createForFrame(this);
   d->m_iconLoader->startLoading();
+}
+
+void Frame::commitIconURLToIconDatabase() {
+  KURL icon = iconURL();
+
+  IconDatabase* iconDatabase = IconDatabase::sharedIconDatabase();
+  ASSERT(iconDatabase);
+  iconDatabase->setIconURLForPageURL(icon.url(), this->url().url());
+  iconDatabase->setIconURLForPageURL(icon.url(), originalRequestURL().url());
 }
 
 void Frame::stop() {

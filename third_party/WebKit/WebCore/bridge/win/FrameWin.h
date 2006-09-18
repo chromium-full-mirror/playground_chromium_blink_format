@@ -142,6 +142,7 @@ class FrameWin : public Frame {
   virtual void print();
 
   bool keyPress(const PlatformKeyboardEvent&);
+  virtual KURL originalRequestURL() const;
 
  private:
   virtual bool passMouseDownEventToWidget(Widget*);
