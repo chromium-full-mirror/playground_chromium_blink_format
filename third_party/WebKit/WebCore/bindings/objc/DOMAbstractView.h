@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,60 +21,13 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "DOMViews.h"
+#import <WebCore/DOMObject.h>
 
-#import "DOMInternal.h"
-#import "Document.h"
-#import "DOMWindow.h"
+@class DOMDocument;
 
-namespace WebCore {
-    typedef DOMWindow AbstractView;
-}
-
-ALLOW_DOM_CAST(DOMWindow)
-
-@implementation DOMAbstractView
-
-- (DOMDocument *)document
-{
-    return [DOMDocument _documentWith:[self _abstractView]->document()];
-}
-
-@end
-
-@implementation DOMAbstractView (WebCoreInternal)
-
-- (WebCore::AbstractView *)_abstractView
-{
-    return DOM_cast<WebCore::AbstractView *>(_internal);
-}
-
-- (id)_initWithAbstractView:(WebCore::AbstractView *)impl
-{
-    ASSERT(impl);
-
-    [super _init];
-    _internal = DOM_cast<DOMObjectInternal *>(impl);
-    impl->ref();
-    addDOMWrapper(self, impl);
-    return self;
-}
-
-+ (DOMAbstractView *)_abstractViewWith:(WebCore::AbstractView *)impl
-{
-    if (!impl)
-        return nil;
-    
-    id cachedInstance;
-    cachedInstance = getDOMWrapper(impl);
-    if (cachedInstance)
-        return [[cachedInstance retain] autorelease];
-    
-    return [[[DOMAbstractView alloc] _initWithAbstractView:impl] autorelease];
-}
-
+@interface DOMAbstractView : DOMObject
+- (DOMDocument*)document;
 @end
