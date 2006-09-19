@@ -937,14 +937,16 @@ void RenderBlock::clearFloatsIfNeeded(RenderObject* child,
     child->setPos(child->xPos(), child->yPos() + heightIncrease);
 
     // Increase our height by the amount we had to clear.
-    if (!child->isSelfCollapsingBlock())
-      m_height += heightIncrease;
-    else {
-      // For self-collapsing blocks that clear, they may end up collapsing
-      // into the bottom of the parent block.  We simulate this behavior by
-      // setting our positive margin value to compensate for the clear.
-      marginInfo.setPosMargin(max(0, child->yPos() - m_height));
-      marginInfo.setNegMargin(0);
+    m_height += heightIncrease;
+    if (child->isSelfCollapsingBlock()) {
+      // For self-collapsing blocks that clear, they can still collapse their
+      // margins with following siblings.  Reset the current margins to
+      // represent
+      // the self-collapsing block's margins only.
+      marginInfo.setPosMargin(
+          max(child->maxTopMargin(true), child->maxBottomMargin(true)));
+      marginInfo.setNegMargin(
+          max(child->maxTopMargin(false), child->maxBottomMargin(false)));
       marginInfo.setSelfCollapsingBlockClearedFloat(true);
     }
 
