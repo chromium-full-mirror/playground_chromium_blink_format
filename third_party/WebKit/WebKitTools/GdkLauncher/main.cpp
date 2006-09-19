@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 #include "config.h"
 #include "FrameGdk.h"
 #include "Page.h"
@@ -26,21 +27,23 @@
 #include "GraphicsContext.h"
 
 using namespace WebCore;
-// using namespace HTMLNames;
 
 static FrameGdk* frame;
 static GdkWindow* win;
 
 static void handle_event(GdkEvent* event) {
+  if (GDK_DELETE == event->type) {
+    gtk_main_quit();
+    return;
+  }
   frame->handleGdkEvent(event);
 }
 
 int main(int argc, char* argv[]) {
   GdkWindowAttr attr;
-  GMainLoop* loop;
+  char* url;
   gdk_init(&argc, &argv);
   gdk_event_handler_set((GdkEventFunc)handle_event, NULL, NULL);
-  loop = g_main_loop_new(NULL, TRUE);
 
   attr.width = 800;
   attr.height = 600;
@@ -55,9 +58,13 @@ int main(int argc, char* argv[]) {
       " <html><head><title>Google</title> <body bgcolor=#ffffff text=#000000> "
       "<p><font size=-2/>2006 Google Hello bigworld from "
       "mike</p></body></html> ";
-  if (argc >= 2) {
-    printf("OPENING URL == %s \n", argv[1]);
-    frame->openURL(argv[1]);
+  url = "http://www.google.com";
+  if (argc >= 2)
+    url = argv[1];
+
+  if (url) {
+    printf("OPENING URL == %s \n", url);
+    frame->openURL(url);
   } else {
     /*
         frame->createEmptyDocument();
@@ -65,11 +72,9 @@ int main(int argc, char* argv[]) {
         frame->write(pg,strlen(pg));
         frame->document()->close();
     */
-    frame->openURL("http://www.google.com");
   }
 
-  while (1) {
-    g_main_loop_run(loop);
-  }
+  gtk_main();
+  delete frame;
   return 0;
 }
