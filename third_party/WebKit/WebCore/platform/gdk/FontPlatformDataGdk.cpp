@@ -115,7 +115,8 @@ bool FontPlatformData::init() {
 }
 
 FontPlatformData::~FontPlatformData() {
-  FcPatternDestroy(m_pattern);
+  if (m_pattern && ((FcPattern*)-1 != m_pattern))
+    FcPatternDestroy(m_pattern);
   cairo_font_face_destroy(m_fontFace);
   cairo_scaled_font_destroy(m_scaledFont);
   cairo_font_options_destroy(m_options);

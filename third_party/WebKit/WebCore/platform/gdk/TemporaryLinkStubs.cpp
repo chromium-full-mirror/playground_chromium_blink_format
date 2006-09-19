@@ -373,6 +373,13 @@ bool FrameGdk::canGoBackOrForward(int) const {
 void FrameGdk::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
+bool FrameGdk::isLoadTypeReload() {
+  notImplemented();
+  return false;
+}
+KURL FrameGdk::originalRequestURL() const {
+  return KURL();
+}
 Plugin* FrameGdk::createPlugin(Element*,
                                KURL const&,
                                const Vector<String>&,
@@ -765,6 +772,10 @@ bool IconDatabase::hasEntryForIconURL(const String& url) {
 }
 IconDatabase* IconDatabase::sharedIconDatabase() {
   return 0;
+}
+bool IconDatabase::setIconURLForPageURL(const String& iconURL,
+                                        const String& pageURL) {
+  return false;
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,
