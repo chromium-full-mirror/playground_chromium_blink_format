@@ -155,6 +155,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   CachedScript* m_pendingScript;
   RefPtr<Element> m_scriptElement;
+  int m_scriptStartLine;
 
   bool m_parsingFragment;
   String m_defaultNamespaceURI;
@@ -522,6 +523,7 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
       m_lastErrorLine(0),
       m_lastErrorColumn(0),
       m_pendingScript(0),
+      m_scriptStartLine(0),
       m_parsingFragment(false),
       m_pendingCallbacks(new PendingCallbacks) {}
 
@@ -542,6 +544,7 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
       m_lastErrorLine(0),
       m_lastErrorColumn(0),
       m_pendingScript(0),
+      m_scriptStartLine(0),
       m_parsingFragment(true),
       m_pendingCallbacks(new PendingCallbacks) {
   if (fragment)
@@ -772,6 +775,10 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   if (newElement->hasTagName(scriptTag))
     static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
 
+  if (newElement->hasTagName(HTMLNames::scriptTag) ||
+      newElement->hasTagName(SVGNames::scriptTag))
+    m_scriptStartLine = lineNumber();
+
   if (!m_currentNode->addChild(newElement.get())) {
     stopParsing();
     return;
@@ -844,7 +851,8 @@ void XMLTokenizer::endElementNs() {
             child->nodeType() == Node::CDATA_SECTION_NODE)
           scriptCode += static_cast<CharacterData*>(child)->data();
       }
-      m_view->frame()->executeScript(0, scriptCode);
+      m_view->frame()->executeScript(m_doc->URL(), m_scriptStartLine - 1, 0,
+                                     scriptCode);
     }
 
     m_requestingScript = false;
