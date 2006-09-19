@@ -409,6 +409,10 @@ void FrameWin::issuePasteAndMatchStyleCommand() {
 KURL FrameWin::originalRequestURL() const {
   return KURL();
 }
+bool FrameWin::isLoadTypeReload() {
+  notImplemented();
+  return false;
+}
 
 bool BrowserExtensionWin::canRunModal() {
   notImplemented();

@@ -353,6 +353,7 @@ class FrameMac : public Frame {
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
   virtual void cleanupPluginObjects();
+  virtual bool isLoadTypeReload();
 
  private:
   virtual void handleMousePressEvent(const MouseEventWithHitTestResults&);

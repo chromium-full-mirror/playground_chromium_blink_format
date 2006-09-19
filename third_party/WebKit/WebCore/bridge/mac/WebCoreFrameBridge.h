@@ -819,6 +819,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (void)notifyIconChanged:(NSURL*)iconURL;
 - (NSURL*)originalRequestURL;
+- (BOOL)isLoadTypeReload;
 @end
 
 // This interface definition allows those who hold a WebCoreFrameBridge * to

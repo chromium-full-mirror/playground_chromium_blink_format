@@ -144,6 +144,9 @@ class FrameWin : public Frame {
   bool keyPress(const PlatformKeyboardEvent&);
   virtual KURL originalRequestURL() const;
 
+ protected:
+  virtual bool isLoadTypeReload();
+
  private:
   virtual bool passMouseDownEventToWidget(Widget*);
   FrameWinClient* m_client;

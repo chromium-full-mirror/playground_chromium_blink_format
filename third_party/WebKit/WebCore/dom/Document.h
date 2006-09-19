@@ -699,6 +699,9 @@ class Document : public ContainerNode {
     return m_pendingSheetLayout == DidLayoutWithPendingSheets;
   }
 
+  String iconURL();
+  void setIconURL(const String& iconURL, const String& type);
+
  protected:
   CSSStyleSelector* m_styleSelector;
   FrameView* m_view;
@@ -928,6 +931,7 @@ class Document : public ContainerNode {
   mutable bool m_accessKeyMapValid;
   bool m_createRenderers;
   bool m_inPageCache;
+  String m_iconURL;
 };
 
 }  // namespace

@@ -3491,4 +3491,17 @@ unsigned FormElementKeyHash::hash(const FormElementKey& k) {
 FormElementKey FormElementKeyHashTraits::deletedValue() {
   return HashTraits<AtomicStringImpl*>::deletedValue();
 }
+
+String Document::iconURL() {
+  return m_iconURL;
+}
+
+void Document::setIconURL(const String& iconURL, const String& type) {
+  // FIXME - <rdar://problem/4727645> - At some point in the future, we might
+  // actually honor the "type"
+  if (m_iconURL.isEmpty())
+    m_iconURL = iconURL;
+  else if (!type.isEmpty())
+    m_iconURL = iconURL;
+}
 }

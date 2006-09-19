@@ -107,7 +107,6 @@ class Frame : public Shared<Frame>, Noncopyable {
   void didExplicitOpen();
 
   KURL iconURL();
-  void setIconURL(const String& url, const String& type);
   void commitIconURLToIconDatabase();
 
   Page* page() const;
@@ -628,6 +627,8 @@ class Frame : public Shared<Frame>, Noncopyable {
                                               const String& mimeType) = 0;
 
   virtual void redirectionTimerFired(Timer<Frame>*);
+
+  virtual bool isLoadTypeReload() = 0;
 
  public:
   void loadDone();
