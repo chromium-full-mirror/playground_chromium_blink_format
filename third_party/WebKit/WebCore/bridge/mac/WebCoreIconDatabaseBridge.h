@@ -33,7 +33,6 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 #endif
 
 @interface WebCoreIconDatabaseBridge : NSObject {
-  WebCoreIconDatabase* _iconDB;
 }
 - (BOOL)openSharedDatabaseWithPath:(NSString*)path;
 - (void)closeSharedDatabase;
