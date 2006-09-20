@@ -67,7 +67,7 @@ class KRenderingPaintServer : public KCanvasResource {
 
   // Actual rendering function
   virtual void draw(KRenderingDeviceContext*,
-                    const RenderPath* renderPath,
+                    const RenderPath*,
                     KCPaintTargetType) const = 0;
 
   virtual bool setup(KRenderingDeviceContext*,

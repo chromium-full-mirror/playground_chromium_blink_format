@@ -24,7 +24,7 @@
 #define KRenderingPaintServerGradient_H
 #ifdef SVG_SUPPORT
 
-#include <kcanvas/device/KRenderingPaintServer.h>
+#include "KRenderingPaintServer.h"
 
 namespace WebCore {
 
@@ -52,7 +52,7 @@ class KRenderingPaintServerGradient : public KRenderingPaintServer {
   void setGradientStops(KRenderingPaintServerGradient*);
 
   KCGradientSpreadMethod spreadMethod() const;
-  void setGradientSpreadMethod(const KCGradientSpreadMethod& method);
+  void setGradientSpreadMethod(const KCGradientSpreadMethod&);
 
   // Gradient start and end points are percentages when used in boundingBox
   // mode.
@@ -67,7 +67,7 @@ class KRenderingPaintServerGradient : public KRenderingPaintServer {
   void setGradientTransform(const AffineTransform&);
 
   KCanvasResourceListener* listener() const;
-  void setListener(KCanvasResourceListener* listener);
+  void setListener(KCanvasResourceListener*);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -89,10 +89,10 @@ class KRenderingPaintServerLinearGradient
 
   // 'Linear Gradient' interface
   FloatPoint gradientStart() const;
-  void setGradientStart(const FloatPoint& start);
+  void setGradientStart(const FloatPoint&);
 
   FloatPoint gradientEnd() const;
-  void setGradientEnd(const FloatPoint& end);
+  void setGradientEnd(const FloatPoint&);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -111,13 +111,13 @@ class KRenderingPaintServerRadialGradient
 
   // 'Radial Gradient' interface
   FloatPoint gradientCenter() const;
-  void setGradientCenter(const FloatPoint& center);
+  void setGradientCenter(const FloatPoint&);
 
   FloatPoint gradientFocal() const;
-  void setGradientFocal(const FloatPoint& focal);
+  void setGradientFocal(const FloatPoint&);
 
   float gradientRadius() const;
-  void setGradientRadius(float radius);
+  void setGradientRadius(float);
 
   TextStream& externalRepresentation(TextStream&) const;
 

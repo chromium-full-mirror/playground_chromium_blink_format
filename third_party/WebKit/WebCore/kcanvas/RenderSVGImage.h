@@ -34,7 +34,7 @@ class SVGPreserveAspectRatio;
 
 class RenderSVGImage : public RenderImage {
  public:
-  RenderSVGImage(SVGImageElement* impl);
+  RenderSVGImage(SVGImageElement*);
   virtual ~RenderSVGImage();
 
   virtual AffineTransform localTransform() const { return m_transform; }
@@ -50,20 +50,20 @@ class RenderSVGImage : public RenderImage {
   virtual void imageChanged(CachedImage*);
   void adjustRectsForAspectRatio(FloatRect& destRect,
                                  FloatRect& srcRect,
-                                 SVGPreserveAspectRatio* aspectRatio);
-  virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
+                                 SVGPreserveAspectRatio*);
+  virtual void paint(PaintInfo&, int parentX, int parentY);
   virtual void layout();
 
   bool requiresLayer();
 
-  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f);
+  virtual void computeAbsoluteRepaintRect(IntRect&, bool f);
 
-  virtual bool nodeAtPoint(NodeInfo& info,
+  virtual bool nodeAtPoint(NodeInfo&,
                            int _x,
                            int _y,
                            int _tx,
                            int _ty,
-                           HitTestAction hitTestAction);
+                           HitTestAction);
 
  private:
   void translateForAttributes();

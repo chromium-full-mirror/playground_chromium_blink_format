@@ -36,10 +36,10 @@ class KRenderingFillPainter {
   virtual ~KRenderingFillPainter();
 
   WindRule fillRule() const;
-  void setFillRule(WindRule rule);
+  void setFillRule(WindRule);
 
   float opacity() const;
-  void setOpacity(float opacity);
+  void setOpacity(float);
 
  private:
   float m_opacity;

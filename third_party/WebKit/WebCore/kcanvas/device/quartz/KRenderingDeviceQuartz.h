@@ -28,7 +28,7 @@
 #define KRenderingDeviceQuartz_H
 #ifdef SVG_SUPPORT
 
-#import <kcanvas/device/KRenderingDevice.h>
+#import "KRenderingDevice.h"
 
 typedef struct CGRect CGRect;
 typedef struct CGContext* CGContextRef;
@@ -37,7 +37,7 @@ namespace WebCore {
 
 class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
  public:
-  KRenderingDeviceContextQuartz(CGContextRef context);
+  KRenderingDeviceContextQuartz(CGContextRef);
   virtual ~KRenderingDeviceContextQuartz();
 
   virtual AffineTransform concatCTM(const AffineTransform&);
@@ -67,17 +67,17 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
   // Resource creation
-  virtual KCanvasResource* createResource(const KCResourceType& type) const;
+  virtual KCanvasResource* createResource(const KCResourceType&) const;
   virtual KRenderingPaintServer* createPaintServer(
-      const KCPaintServerType& type) const;
+      const KCPaintServerType&) const;
   virtual KCanvasFilterEffect* createFilterEffect(
-      const KCFilterEffectType& type) const;
+      const KCFilterEffectType&) const;
 
   // filters (mostly debugging)
   static bool filtersEnabled();
-  static void setFiltersEnabled(bool enabled);
+  static void setFiltersEnabled(bool);
   static bool hardwareRenderingEnabled();
-  static void setHardwareRenderingEnabled(bool enabled);
+  static void setHardwareRenderingEnabled(bool);
 };
 
 }  // namespace WebCore

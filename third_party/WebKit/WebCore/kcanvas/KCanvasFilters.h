@@ -105,7 +105,7 @@ class KCanvasFilter : public KCanvasResource {
   FloatRect filterBBoxForItemBBox(FloatRect itemBBox) const;
 
   void clearEffects();
-  void addFilterEffect(KCanvasFilterEffect* effect);
+  void addFilterEffect(KCanvasFilterEffect*);
 
   virtual void prepareFilter(const FloatRect& bbox) = 0;
   virtual void applyFilter(const FloatRect& bbox) = 0;
@@ -119,7 +119,7 @@ class KCanvasFilter : public KCanvasResource {
   bool m_effectBBoxMode;
 };
 
-KCanvasFilter* getFilterById(Document* document, const AtomicString& id);
+KCanvasFilter* getFilterById(Document*, const AtomicString&);
 
 class KCanvasFilterEffect {
  public:
@@ -130,13 +130,13 @@ class KCanvasFilterEffect {
   virtual KCFilterEffectType effectType() const { return FE_TURBULENCE; }
 
   FloatRect subRegion() const;
-  void setSubRegion(const FloatRect& subregion);
+  void setSubRegion(const FloatRect&);
 
   String in() const;
-  void setIn(const String& in);
+  void setIn(const String&);
 
   String result() const;
-  void setResult(const String& result);
+  void setResult(const String&);
 
 #if __APPLE__
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz*) const = 0;
@@ -434,7 +434,7 @@ class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
   }
 
   const KCLightSource* lightSource() const { return m_lightSource; }
-  void setLightSource(KCLightSource* lightSource);
+  void setLightSource(KCLightSource*);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -502,10 +502,10 @@ class KCanvasFEFlood : public KCanvasFilterEffect {
 class KCanvasFEGaussianBlur : public KCanvasFilterEffect {
  public:
   float stdDeviationX() const;
-  void setStdDeviationX(float x);
+  void setStdDeviationX(float);
 
   float stdDeviationY() const;
-  void setStdDeviationY(float y);
+  void setStdDeviationY(float);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -520,11 +520,11 @@ class KCanvasFEImage : public KCanvasFilterEffect, public CachedResourceClient {
 
   virtual ~KCanvasFEImage();
 
-  // FIXME: Eventually we need to support <svg> (RenderObject *) as well as
-  // image data.
+  // FIXME: Eventually we need to support <svg> (RenderObject*) as well as image
+  // data.
 
   CachedImage* cachedImage() const { return m_cachedImage; }
-  void setCachedImage(CachedImage* image);
+  void setCachedImage(CachedImage*);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -617,7 +617,7 @@ class KCanvasFESpecularLighting : public KCanvasFilterEffect {
   }
 
   const KCLightSource* lightSource() const { return m_lightSource; }
-  void setLightSource(KCLightSource* lightSource);
+  void setLightSource(KCLightSource*);
 
   TextStream& externalRepresentation(TextStream&) const;
 

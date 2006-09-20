@@ -24,7 +24,7 @@
 #define KRenderingPaintServerPattern_H
 #ifdef SVG_SUPPORT
 
-#include <kcanvas/device/KRenderingPaintServer.h>
+#include "KRenderingPaintServer.h"
 
 namespace WebCore {
 
@@ -38,7 +38,7 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer {
   virtual KCPaintServerType type() const;
 
   // Pattern bbox
-  void setBbox(const FloatRect& rect);
+  void setBbox(const FloatRect&);
   FloatRect bbox() const;
 
   // Pattern x,y phase points are relative when in boundingBoxMode
@@ -48,13 +48,13 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer {
 
   // 'Pattern' interface
   KCanvasImage* tile() const;
-  void setTile(KCanvasImage* tile);
+  void setTile(KCanvasImage*);
 
   AffineTransform patternTransform() const;
   void setPatternTransform(const AffineTransform&);
 
   KCanvasResourceListener* listener() const;
-  void setListener(KCanvasResourceListener* listener);
+  void setListener(KCanvasResourceListener*);
   TextStream& externalRepresentation(TextStream&) const;
 
  private:

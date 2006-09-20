@@ -467,7 +467,7 @@ TextStream& KCanvasFESpecularLighting::externalRepresentation(
 
 #if 0
 ///FIXME: KCanvasFETile doesn't have any properties
-TextStream &KCanvasFETile::externalRepresentation(TextStream &ts) const
+TextStream& KCanvasFETile::externalRepresentation(TextStream& ts) const
 {
    KCanvasFilterEffect::externalRepresentation(ts);
    return ts;

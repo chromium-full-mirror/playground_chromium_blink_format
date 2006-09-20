@@ -395,7 +395,7 @@ static inline void updateMarkerDataForElement(MarkerData& previousMarkerData,
 }
 
 static void drawStartAndMidMarkers(void* info, const PathElement* element) {
-  DrawMarkersData& data = *(DrawMarkersData*)info;
+  DrawMarkersData& data = *reinterpret_cast<DrawMarkersData*>(info);
 
   int elementIndex = data.elementIndex;
   MarkerData& previousMarkerData = data.previousMarkerData;
