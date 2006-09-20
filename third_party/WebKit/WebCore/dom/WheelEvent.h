@@ -66,6 +66,9 @@ class WheelEvent : public MouseRelatedEvent {
   int wheelDeltaX() const { return m_wheelDeltaX; }
   int wheelDeltaY() const { return m_wheelDeltaY; }
 
+  // Needed for Objective-C legacy support
+  bool isHorizontal() const { return m_wheelDeltaX; }
+
  private:
   virtual bool isWheelEvent() const;
 
