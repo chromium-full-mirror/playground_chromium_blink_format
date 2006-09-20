@@ -27,14 +27,16 @@
 
 #include "EventNames.h"
 
+#include <wtf/MathExtras.h>
+
 namespace WebCore {
 
 using namespace EventNames;
 
-WheelEvent::WheelEvent() : m_horizontal(false), m_wheelDelta(0) {}
+WheelEvent::WheelEvent() : m_wheelDeltaX(0), m_wheelDeltaY(0) {}
 
-WheelEvent::WheelEvent(bool horizontal,
-                       int wheelDelta,
+WheelEvent::WheelEvent(float wheelDeltaX,
+                       float wheelDeltaY,
                        AbstractView* view,
                        int screenX,
                        int screenY,
@@ -44,25 +46,26 @@ WheelEvent::WheelEvent(bool horizontal,
                        bool altKey,
                        bool shiftKey,
                        bool metaKey)
-    : MouseRelatedEvent(
-          horizontal ? khtmlHorizontalmousewheelEvent : mousewheelEvent,
-          true,
-          true,
-          view,
-          0,
-          screenX,
-          screenY,
-          pageX,
-          pageY,
-          ctrlKey,
-          altKey,
-          shiftKey,
-          metaKey),
-      m_horizontal(horizontal),
-      m_wheelDelta(wheelDelta) {}
+    : MouseRelatedEvent(mousewheelEvent,
+                        true,
+                        true,
+                        view,
+                        0,
+                        screenX,
+                        screenY,
+                        pageX,
+                        pageY,
+                        ctrlKey,
+                        altKey,
+                        shiftKey,
+                        metaKey),
+      m_wheelDeltaX(lrint(wheelDeltaX) * 120),
+      m_wheelDeltaY(lrint(wheelDeltaY) *
+                    120)  // Normalize to the Windows 120 multiple
+{}
 
-void WheelEvent::initWheelEvent(bool horizontal,
-                                int wheelDelta,
+void WheelEvent::initWheelEvent(int wheelDeltaX,
+                                int wheelDeltaY,
                                 AbstractView* view,
                                 int screenX,
                                 int screenY,
@@ -75,8 +78,7 @@ void WheelEvent::initWheelEvent(bool horizontal,
   if (dispatched())
     return;
 
-  initUIEvent(horizontal ? khtmlHorizontalmousewheelEvent : mousewheelEvent,
-              true, true, view, 0);
+  initUIEvent(mousewheelEvent, true, true, view, 0);
 
   m_screenX = screenX;
   m_screenY = screenY;
@@ -84,8 +86,8 @@ void WheelEvent::initWheelEvent(bool horizontal,
   m_altKey = altKey;
   m_shiftKey = shiftKey;
   m_metaKey = metaKey;
-  m_horizontal = horizontal;
-  m_wheelDelta = wheelDelta;
+  m_wheelDeltaX = wheelDeltaX;
+  m_wheelDeltaY = wheelDeltaY;
 
   initCoordinates(pageX, pageY);
 }

@@ -46,14 +46,9 @@ class PlatformWheelEvent {
  public:
   const IntPoint& pos() const { return m_position; }
   const IntPoint& globalPos() const { return m_globalPosition; }
-  float platformDelta() const {
-    return m_platformDelta;
-  }  // This is the original delta amount on the native platform and can vary.
-  int delta() const {
-    return m_delta;
-  }  // This delta is a multiple of 120 and is designed to match the Windows
-     // standard for wheel deltas.
-  bool isHorizontal() const { return m_isHorizontal; }
+  float deltaX() const { return m_deltaX; }
+  float deltaY() const { return m_deltaY; }
+
   bool isAccepted() const { return m_isAccepted; }
   bool shiftKey() const { return m_shiftKey; }
   bool ctrlKey() const { return m_ctrlKey; }
@@ -79,9 +74,8 @@ class PlatformWheelEvent {
  private:
   IntPoint m_position;
   IntPoint m_globalPosition;
-  float m_platformDelta;
-  int m_delta;
-  bool m_isHorizontal;
+  float m_deltaX;
+  float m_deltaY;
   bool m_isAccepted;
   bool m_shiftKey;
   bool m_ctrlKey;
