@@ -84,7 +84,7 @@ IconDatabase::IconDatabase()
       m_imageDataForIconURLStatement(0),
       m_currentDB(&m_mainDB),
       m_defaultIconDataCache(0),
-      m_isEnabled(true),
+      m_isEnabled(false),
       m_privateBrowsingEnabled(false),
       m_startupTimer(this, &IconDatabase::pruneUnretainedIconsOnStartup),
       m_updateTimer(this, &IconDatabase::updateDatabase),
@@ -211,7 +211,7 @@ void IconDatabase::close() {
 }
 
 void IconDatabase::removeAllIcons() {
-  if (!m_isEnabled || !isOpen())
+  if (!isOpen())
     return;
 
   // We don't need to sync anything anymore since we're wiping everything.
@@ -365,7 +365,7 @@ void IconDatabase::imageDataForIconURL(const String& iconURL,
 }
 
 void IconDatabase::setPrivateBrowsingEnabled(bool flag) {
-  if (!m_isEnabled || !isOpen())
+  if (!isOpen())
     return;
   if (m_privateBrowsingEnabled == flag)
     return;
@@ -387,7 +387,7 @@ void IconDatabase::setPrivateBrowsingEnabled(bool flag) {
 Image* IconDatabase::iconForPageURL(const String& pageURL,
                                     const IntSize& size,
                                     bool cache) {
-  if (!m_isEnabled || !isOpen())
+  if (!isOpen())
     return defaultIcon(size);
 
   // See if we even have an IconURL for this PageURL...
@@ -414,12 +414,12 @@ Image* IconDatabase::iconForPageURL(const String& pageURL,
 // iconExpirationTime to present icons, and missingIconExpirationTime for
 // missing icons
 bool IconDatabase::isIconExpiredForIconURL(const String& iconURL) {
-  // If we're disabled and someone is making this call, it is likely a return
+  // If we're closed and someone is making this call, it is likely a return
   // value of
   // false will discourage them to take any further action, which is our goal in
   // this case
   // Same notion for an empty iconURL - which is now defined as "never expires"
-  if (!m_isEnabled || !isOpen() || iconURL.isEmpty())
+  if (!isOpen() || iconURL.isEmpty())
     return false;
 
   // If we have a IconDataCache, then it definitely has the Timestamp in it
@@ -443,7 +443,7 @@ bool IconDatabase::isIconExpiredForIconURL(const String& iconURL) {
 }
 
 String IconDatabase::iconURLForPageURL(const String& pageURL) {
-  if (!m_isEnabled || !isOpen() || pageURL.isEmpty())
+  if (!isOpen() || pageURL.isEmpty())
     return String();
 
   if (m_pageURLToIconURLMap.contains(pageURL))
@@ -476,7 +476,7 @@ Image* IconDatabase::defaultIcon(const IntSize& size) {
 }
 
 void IconDatabase::retainIconForPageURL(const String& pageURL) {
-  if (!m_isEnabled || !isOpen() || pageURL.isEmpty())
+  if (!isOpen() || pageURL.isEmpty())
     return;
 
   // If we don't have the retain count for this page, we need to setup records
@@ -525,7 +525,7 @@ void IconDatabase::retainIconForPageURL(const String& pageURL) {
 }
 
 void IconDatabase::releaseIconForPageURL(const String& pageURL) {
-  if (!m_isEnabled || !isOpen() || pageURL.isEmpty())
+  if (!isOpen() || pageURL.isEmpty())
     return;
 
   // Check if this pageURL is actually retained
@@ -696,7 +696,7 @@ void IconDatabase::setIconDataForIconURL(const void* data,
                                          int size,
                                          const String& iconURL) {
   ASSERT(size > -1);
-  if (!m_isEnabled || !isOpen() || iconURL.isEmpty())
+  if (!isOpen() || iconURL.isEmpty())
     return;
 
   if (size)
@@ -725,7 +725,7 @@ void IconDatabase::setHaveNoIconForIconURL(const String& iconURL) {
 bool IconDatabase::setIconURLForPageURL(const String& iconURL,
                                         const String& pageURL) {
   ASSERT(!iconURL.isEmpty());
-  if (!m_isEnabled || !isOpen() || pageURL.isEmpty())
+  if (!isOpen() || pageURL.isEmpty())
     return false;
 
   // If the urls already map to each other, bail.
@@ -984,7 +984,7 @@ void IconDatabase::checkForDanglingPageURLs(bool pruneIfFound) {
 }
 
 bool IconDatabase::hasEntryForIconURL(const String& iconURL) {
-  if (!m_isEnabled || !isOpen() || iconURL.isEmpty())
+  if (!isOpen() || iconURL.isEmpty())
     return false;
 
   // First check the in memory mapped icons...
@@ -1005,7 +1005,7 @@ bool IconDatabase::hasEntryForIconURL(const String& iconURL) {
 }
 
 void IconDatabase::setEnabled(bool enabled) {
-  if (isOpen())
+  if (!enabled && isOpen())
     close();
   m_isEnabled = enabled;
 }
