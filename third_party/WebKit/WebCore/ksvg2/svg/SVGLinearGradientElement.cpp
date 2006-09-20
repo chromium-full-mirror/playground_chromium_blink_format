@@ -34,11 +34,10 @@
 #include "SVGLinearGradientElement.h"
 #include "SVGTransformList.h"
 
-#include <kcanvas/KCanvasResources.h>
-#include <kcanvas/device/KRenderingDevice.h>
-#include <kcanvas/device/KRenderingPaintServerGradient.h>
+#include "KRenderingDevice.h"
+#include "KRenderingPaintServerGradient.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGLinearGradientElement::SVGLinearGradientElement(const QualifiedName& tagName,
                                                    Document* doc)
@@ -193,6 +192,7 @@ void SVGLinearGradientElement::buildGradient(
   grad->setBoundingBoxMode(bbox);
   grad->setGradientStart(FloatPoint(_x1, _y1));
   grad->setGradientEnd(FloatPoint(_x2, _y2));
+}
 }
 
 // vim:ts=4:noet
