@@ -124,10 +124,6 @@ class String {
   String left(unsigned len) const { return substring(0, len); }
   String right(unsigned len) const { return substring(length() - len, len); }
 
-  // Splits the string into two. The original string gets truncated to pos, and
-  // the rest is returned.
-  String split(unsigned pos);
-
   // Returns a lowercase/uppercase version of the string
   String lower() const;
   String upper() const;
@@ -151,6 +147,10 @@ class String {
       __attribute__((format(printf, 1, 2)))
 #endif
       ;
+
+  Vector<String> split(const String& separator,
+                       bool allowEmptyEntries = false) const;
+  Vector<String> split(UChar separator, bool allowEmptyEntries = false) const;
 
   int toInt(bool* ok = 0) const;
   Length* toLengthArray(int& len) const;
