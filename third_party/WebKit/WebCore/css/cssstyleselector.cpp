@@ -1158,7 +1158,8 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
   }
 
   // Links should be user selectable when content editable
-  if (e && e->isLink() && (style->userModify() == READ_WRITE ||
+  if (e && e->isLink() && (e->document()->frame()->isContentEditable() ||
+                           style->userModify() == READ_WRITE ||
                            style->userModify() == READ_WRITE_PLAINTEXT_ONLY))
     style->setUserSelect(SELECT_AUTO);
 
