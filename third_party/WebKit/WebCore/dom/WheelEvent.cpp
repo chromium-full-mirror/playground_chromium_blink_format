@@ -59,8 +59,8 @@ WheelEvent::WheelEvent(float wheelDeltaX,
                         altKey,
                         shiftKey,
                         metaKey),
-      m_wheelDeltaX(lround(wheelDeltaX) * 120),
-      m_wheelDeltaY(lround(wheelDeltaY) *
+      m_wheelDeltaX(lroundf(wheelDeltaX) * 120),
+      m_wheelDeltaY(lroundf(wheelDeltaY) *
                     120)  // Normalize to the Windows 120 multiple
 {}
 

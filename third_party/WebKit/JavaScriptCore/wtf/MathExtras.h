@@ -45,9 +45,6 @@ inline long lround(double num) {
 inline long lroundf(float num) {
   return num > 0 ? num + 0.5f : ceilf(num - 0.5f);
 }
-inline int lrint(float num) {
-  return int(lroundf(num));
-}
 inline double round(double num) {
   return num > 0 ? floor(num + 0.5) : ceil(num - 0.5);
 }
