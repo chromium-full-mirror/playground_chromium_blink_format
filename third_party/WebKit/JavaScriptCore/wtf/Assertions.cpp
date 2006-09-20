@@ -34,6 +34,12 @@
 #include <CoreFoundation/CFString.h>
 #endif
 
+#if PLATFORM(WIN)
+#define WINVER 0x0500
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+#endif
+
 extern "C" {
 
 // This is to work around the "you should use a printf format attribute" warning
@@ -61,8 +67,35 @@ static void vprintf_stderr_common(const char* format, va_list args) {
     CFRelease(str);
     CFRelease(cfFormat);
   } else
+#elif PLATFORM(WIN)
+  if (IsDebuggerPresent()) {
+    size_t size = 1024;
+
+    do {
+      char* buffer = (char*)malloc(size);
+
+      if (buffer == NULL)
+        break;
+
+      if (_vsnprintf(buffer, size, format, args) != -1) {
+        OutputDebugStringA(buffer);
+        free(buffer);
+        break;
+      }
+
+      free(buffer);
+      size *= 2;
+    } while (size > 1024);
+  } else
 #endif
     vfprintf_no_warning(stderr, format, args);
+}
+
+static void printf_stderr_common(const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+  vprintf_stderr_common(format, args);
+  va_end(args);
 }
 
 void WTFReportAssertionFailure(const char* file,
@@ -70,15 +103,15 @@ void WTFReportAssertionFailure(const char* file,
                                const char* function,
                                const char* assertion) {
   if (assertion)
-    fprintf(stderr,
-            "=================\nASSERTION FAILED: %s (%s:%d "
-            "%s)\n=================\n",
-            assertion, file, line, function);
+    printf_stderr_common(
+        "=================\nASSERTION FAILED: %s (%s:%d "
+        "%s)\n=================\n",
+        assertion, file, line, function);
   else
-    fprintf(stderr,
-            "=================\nSHOULD NEVER BE REACHED (%s:%d "
-            "%s)\n=================\n",
-            file, line, function);
+    printf_stderr_common(
+        "=================\nSHOULD NEVER BE REACHED (%s:%d "
+        "%s)\n=================\n",
+        file, line, function);
 }
 
 void WTFReportAssertionFailureWithMessage(const char* file,
@@ -87,13 +120,13 @@ void WTFReportAssertionFailureWithMessage(const char* file,
                                           const char* assertion,
                                           const char* format,
                                           ...) {
-  fprintf(stderr, "=================\nASSERTION FAILED: ");
+  printf_stderr_common("=================\nASSERTION FAILED: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  fprintf(stderr, "\n%s (%s:%d %s)\n=================\n", assertion, file, line,
-          function);
+  printf_stderr_common("\n%s (%s:%d %s)\n=================\n", assertion, file,
+                       line, function);
 }
 
 void WTFReportArgumentAssertionFailure(const char* file,
@@ -101,8 +134,7 @@ void WTFReportArgumentAssertionFailure(const char* file,
                                        const char* function,
                                        const char* argName,
                                        const char* assertion) {
-  fprintf(
-      stderr,
+  printf_stderr_common(
       "=================\nARGUMENT BAD: %s, %s (%s:%d %s)\n=================\n",
       argName, assertion, file, line, function);
 }
@@ -112,12 +144,13 @@ void WTFReportFatalError(const char* file,
                          const char* function,
                          const char* format,
                          ...) {
-  fprintf(stderr, "=================\nFATAL ERROR: ");
+  printf_stderr_common("=================\nFATAL ERROR: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  fprintf(stderr, "\n(%s:%d %s)\n=================\n", file, line, function);
+  printf_stderr_common("\n(%s:%d %s)\n=================\n", file, line,
+                       function);
 }
 
 void WTFReportError(const char* file,
@@ -125,12 +158,13 @@ void WTFReportError(const char* file,
                     const char* function,
                     const char* format,
                     ...) {
-  fprintf(stderr, "=================\nERROR: ");
+  printf_stderr_common("=================\nERROR: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  fprintf(stderr, "\n(%s:%d %s)\n=================\n", file, line, function);
+  printf_stderr_common("\n(%s:%d %s)\n=================\n", file, line,
+                       function);
 }
 
 void WTFLog(const char*,
@@ -147,7 +181,7 @@ void WTFLog(const char*,
   vprintf_stderr_common(format, args);
   va_end(args);
   if (format[strlen(format) - 1] != '\n')
-    putc('\n', stderr);
+    printf_stderr_common("\n");
 }
 
 }  // extern "C"
