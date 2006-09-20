@@ -59,6 +59,8 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 - (BOOL)_hasEntryForIconURL:(NSString*)iconURL;
 
 - (BOOL)_isEmpty;
+- (void)_setEnabled:(BOOL)enabled;
+- (BOOL)_isEnabled;
 @end
 
 // The WebCoreIconDatabaseBridge protocol contains methods for use by the
