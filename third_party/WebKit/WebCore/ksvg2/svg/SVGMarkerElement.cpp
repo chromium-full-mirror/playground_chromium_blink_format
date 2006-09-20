@@ -25,18 +25,18 @@
 #include "SVGMarkerElement.h"
 
 #include "Attr.h"
+#include "KRenderingDevice.h"
 #include "PlatformString.h"
+#include "RenderSVGContainer.h"
 #include "SVGAngle.h"
-#include "SVGAngle.h"
-#include "SVGLength.h"
 #include "SVGFitToViewBox.h"
 #include "SVGHelper.h"
+#include "SVGLength.h"
 #include "SVGMatrix.h"
 #include "SVGNames.h"
+#include "SVGPreserveAspectRatio.h"
 #include "SVGSVGElement.h"
 #include "ksvg.h"
-#include <kcanvas/RenderSVGContainer.h>
-#include <kcanvas/device/KRenderingDevice.h>
 
 namespace WebCore {
 
@@ -51,9 +51,8 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
       m_markerHeight(new SVGLength(this, LM_HEIGHT, viewportElement())),
       m_markerUnits(SVG_MARKERUNITS_STROKEWIDTH),
       m_orientType(0),
-      m_orientAngle(new SVGAngle(this)) {
-  m_marker = 0;
-}
+      m_orientAngle(new SVGAngle(this)),
+      m_marker(0) {}
 
 SVGMarkerElement::~SVGMarkerElement() {
   delete m_marker;
@@ -76,7 +75,7 @@ void SVGMarkerElement::parseMappedAttribute(MappedAttribute* attr) {
     if (value == "auto")
       setOrientToAuto();
     else {
-      SVGAngle* angle = SVGSVGElement::createSVGAngle();
+      SVGAngle* angle = new SVGAngle(0);
       angle->setValueAsString(value);
       setOrientToAngle(angle);
     }
@@ -163,7 +162,7 @@ KCanvasMarker* SVGMarkerElement::canvasResource() {
     m_marker = static_cast<KCanvasMarker*>(
         renderingDevice()->createResource(RS_MARKER));
 
-  m_marker->setMarker(renderer());
+  m_marker->setMarker(static_cast<RenderSVGContainer*>(renderer()));
 
   // Spec: If the attribute is not specified, the effect is as if a
   // value of "0" were specified.
@@ -176,12 +175,7 @@ KCanvasMarker* SVGMarkerElement::canvasResource() {
     m_marker->setAutoAngle();
 
   m_marker->setRef(refX()->value(), refY()->value());
-
   m_marker->setUseStrokeWidth(markerUnits() == SVG_MARKERUNITS_STROKEWIDTH);
-  double w = markerWidth()->value();
-  double h = markerHeight()->value();
-  RefPtr<SVGMatrix> viewBox = viewBoxToViewTransform(w, h);
-  m_marker->setScale(viewBox->matrix().m11(), viewBox->matrix().m22());
 
   return m_marker;
 }
@@ -189,6 +183,12 @@ KCanvasMarker* SVGMarkerElement::canvasResource() {
 RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
                                                RenderStyle* style) {
   RenderSVGContainer* markerContainer = new (arena) RenderSVGContainer(this);
+  markerContainer->setViewport(
+      FloatRect(0, 0, markerWidth()->value(), markerHeight()->value()));
+  markerContainer->setViewBox(viewBox());
+  markerContainer->setAlign(KCAlign(preserveAspectRatio()->align() - 1));
+  markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
+                            SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
   markerContainer->setDrawsContents(
       false);  // Marker contents will be explicitly drawn.
   return markerContainer;

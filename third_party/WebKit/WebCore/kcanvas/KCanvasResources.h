@@ -27,7 +27,7 @@
 #include "DeprecatedValueList.h"
 #include "Path.h"
 #include "RenderPath.h"
-#include <kcanvas/KCanvasResourceListener.h>
+#include "KCanvasResourceListener.h"
 
 namespace WebCore {
 
@@ -53,7 +53,7 @@ class KCanvasResource {
   virtual ~KCanvasResource();
 
   virtual void invalidate();
-  void addClient(const RenderPath* item);
+  void addClient(const RenderPath*);
 
   const RenderPathList& clients() const;
 
@@ -102,7 +102,7 @@ class KCanvasClipper : public KCanvasResource {
   virtual bool isClipper() const { return true; }
 
   void resetClipData();
-  void addClipData(const Path& path, WindRule rule, bool bboxUnits);
+  void addClipData(const Path&, WindRule, bool bboxUnits);
 
   virtual void applyClip(const FloatRect& boundingBox) const = 0;
 
@@ -122,7 +122,7 @@ class KCanvasMasker : public KCanvasResource {
   virtual ~KCanvasMasker();
 
   virtual bool isMasker() const { return true; }
-  void setMask(KCanvasImage* mask);
+  void setMask(KCanvasImage*);
   KCanvasImage* mask() const { return m_mask; }
 
   virtual void applyMask(const FloatRect& boundingBox) const = 0;
@@ -135,12 +135,12 @@ class KCanvasMasker : public KCanvasResource {
 
 class KCanvasMarker : public KCanvasResource {
  public:
-  KCanvasMarker(RenderObject* marker = 0);
+  KCanvasMarker(RenderSVGContainer* = 0);
   virtual ~KCanvasMarker();
 
   virtual bool isMarker() const { return true; }
 
-  void setMarker(RenderObject* marker);
+  void setMarker(RenderSVGContainer*);
 
   void setRef(double refX, double refY);
   double refX() const;
@@ -153,10 +153,6 @@ class KCanvasMarker : public KCanvasResource {
   void setUseStrokeWidth(bool useStrokeWidth = true);
   bool useStrokeWidth() const;
 
-  void setScale(float scaleX, float scaleY);
-  float scaleX() const;
-  float scaleY() const;
-
   void draw(GraphicsContext*,
             const FloatRect&,
             double x,
@@ -168,8 +164,8 @@ class KCanvasMarker : public KCanvasResource {
 
  private:
   double m_refX, m_refY;
-  float m_angle, m_scaleX, m_scaleY;
-  RenderObject* m_marker;
+  float m_angle;
+  RenderSVGContainer* m_marker;
   bool m_useStrokeWidth;
 };
 
