@@ -114,9 +114,12 @@ class FontData : Noncopyable {
 
   mutable FontData* m_smallCapsFontData;
 
+#if PLATFORM(CG)
+  float m_syntheticBoldOffset;
+#endif
+
 #if PLATFORM(MAC)
   void* m_styleGroup;
-  float m_syntheticBoldOffset;
   mutable ATSUStyle m_ATSUStyle;
   mutable bool m_ATSUStyleInitialized;
   mutable bool m_ATSUMirrors;
