@@ -228,6 +228,10 @@ void ScrollView::scrollPointRecursively(int x, int y) {
 bool ScrollView::inWindow() const {
   return true;
 }
+
+void ScrollView::wheelEvent(PlatformWheelEvent&) {
+  notImplemented();
+}
 }
 
 // vim: ts=4 sw=4 et

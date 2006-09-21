@@ -314,6 +314,10 @@ bool IconDatabase::hasEntryForIconURL(const String& url) {
 IconDatabase* IconDatabase::sharedIconDatabase() {
   return 0;
 }
+bool IconDatabase::setIconURLForPageURL(const String& iconURL,
+                                        const String& pageURL) {
+  return false;
+}
 
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
 bool CheckIfReloading(WebCore::DocLoader*) {

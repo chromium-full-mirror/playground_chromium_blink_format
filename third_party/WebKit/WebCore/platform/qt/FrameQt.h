@@ -140,6 +140,7 @@ class FrameQt : public Frame {
   virtual bool canUndo() const;
   virtual void print();
   virtual bool shouldInterruptJavaScript();
+  virtual KURL originalRequestURL() const;
 
   bool keyEvent(const PlatformKeyboardEvent& keyEvent);
 
@@ -147,6 +148,8 @@ class FrameQt : public Frame {
 
  private:
   void init();
+
+  virtual bool isLoadTypeReload();
   virtual bool passMouseDownEventToWidget(Widget*);
 
   FrameQtClient* m_client;
