@@ -35,7 +35,7 @@ MoveSelectionCommand::MoveSelectionCommand(
     PassRefPtr<DocumentFragment> fragment,
     const Position& position,
     bool smartMove)
-    : CompositeEditCommand(fragment->document()),
+    : CompositeEditCommand(position.node()->document()),
       m_fragment(fragment),
       m_position(position),
       m_smartMove(smartMove) {
