@@ -128,6 +128,9 @@ bool TextEncoding::isJapanese() const {
 }
 
 UChar TextEncoding::backslashAsCurrencySymbol() const {
+  // The text encodings below treat backslash as a currency symbol.
+  // See http://blogs.msdn.com/michkap/archive/2005/09/17/469941.aspx for more
+  // information.
   static const char* const a =
       atomicCanonicalTextEncodingName("Shift_JIS_X0213-2000");
   static const char* const b = atomicCanonicalTextEncodingName("EUC-JP");
