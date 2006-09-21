@@ -311,6 +311,7 @@ enum MarkerType { Start, Mid, End };
 
 struct MarkerData {
   FloatPoint origin;
+  FloatPoint subpathStart;
   double strokeWidth;
   FloatPoint inslopePoints[2];
   FloatPoint outslopePoints[2];
@@ -335,6 +336,7 @@ DrawMarkersData::DrawMarkersData(GraphicsContext* c,
                                  double strokeWidth)
     : context(c), elementIndex(0), midMarker(mid) {
   previousMarkerData.origin = FloatPoint();
+  previousMarkerData.subpathStart = FloatPoint();
   previousMarkerData.strokeWidth = strokeWidth;
   previousMarkerData.marker = start;
   previousMarkerData.type = Start;
@@ -386,11 +388,17 @@ static inline void updateMarkerDataForElement(MarkerData& previousMarkerData,
       previousMarkerData.origin = points[2];
       break;
     case PathElementMoveToPoint:
+      previousMarkerData.subpathStart = points[0];
     case PathElementAddLineToPoint:
-    case PathElementCloseSubpath:
       previousMarkerData.inslopePoints[0] = previousMarkerData.origin;
       previousMarkerData.inslopePoints[1] = points[0];
       previousMarkerData.origin = points[0];
+      break;
+    case PathElementCloseSubpath:
+      previousMarkerData.inslopePoints[0] = previousMarkerData.origin;
+      previousMarkerData.inslopePoints[1] = points[0];
+      previousMarkerData.origin = previousMarkerData.subpathStart;
+      previousMarkerData.subpathStart = FloatPoint();
   }
 }
 
