@@ -84,7 +84,7 @@ class ScrollView : public Widget {
   // On Mac the underlying NSScrollView just does the scrolling, but on other
   // platforms
   // (like Windows), we need this method in order to do the scroll ourselves.
-  void wheelEvent(PlatformWheelEvent&){};
+  void wheelEvent(PlatformWheelEvent&);
 
 #if __APPLE__
   NSView* getDocumentView() const;
