@@ -683,7 +683,7 @@ void GraphicsContext::rotate(float angle) {
   CGContextRotateCTM(platformContext(), angle);
 }
 
-void GraphicsContext::translate(int x, int y) {
+void GraphicsContext::translate(float x, float y) {
   if (paintingDisabled())
     return;
   CGContextTranslateCTM(platformContext(), x, y);
