@@ -143,13 +143,6 @@ void Widget::setFrameGeometry(const IntRect& r) {
   data->m_widget->setGeometry(r);
 }
 
-IntPoint Widget::mapFromGlobal(const IntPoint& p) const {
-  if (!data->m_widget)
-    return IntPoint();
-
-  return data->m_widget->mapFromGlobal(p);
-}
-
 GraphicsContext* Widget::lockDrawingFocus() {
   notImplemented();
   return 0;
@@ -205,6 +198,14 @@ Widget::FocusPolicy Widget::focusPolicy() const {
   }
 
   return NoFocus;
+}
+
+void Widget::invalidate() {
+  notImplemented();
+}
+
+void Widget::invalidateRect(const IntRect& r) {
+  notImplemented();
 }
 }
 
