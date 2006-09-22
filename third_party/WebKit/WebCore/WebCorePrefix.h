@@ -90,6 +90,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+#define BUILDING_ON_TIGER 1
+#endif
+
 #endif
 
 #ifdef __cplusplus

@@ -28,11 +28,11 @@
 @protocol DOMEventListener;
 
 @protocol DOMEventTarget<NSObject, NSCopying>
-- (void)addEventListener:(NSString*)
-                    type:(id<DOMEventListener>)
-                listener:(BOOL)useCapture;
-- (void)removeEventListener:(NSString*)
-                       type:(id<DOMEventListener>)
-                   listener:(BOOL)useCapture;
+- (void)addEventListener:(NSString*)type
+                listener:(id<DOMEventListener>)listener
+              useCapture:(BOOL)useCapture;
+- (void)removeEventListener:(NSString*)type
+                   listener:(id<DOMEventListener>)listener
+                 useCapture:(BOOL)useCapture;
 - (BOOL)dispatchEvent:(DOMEvent*)event;
 @end
