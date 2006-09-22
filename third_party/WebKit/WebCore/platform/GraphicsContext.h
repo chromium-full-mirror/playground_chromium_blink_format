@@ -187,7 +187,8 @@ class GraphicsContext : Noncopyable {
 
   void scale(const FloatSize&);
   void rotate(float angleInRadians);
-  void translate(const FloatSize&);
+  void translate(int x, int y);
+  IntPoint origin();
 
   void concatCTM(const AffineTransform&);
 

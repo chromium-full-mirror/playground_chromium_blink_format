@@ -38,7 +38,6 @@ class NSView;
 
 #if PLATFORM(WIN)
 typedef struct HWND__* HWND;
-typedef struct HINSTANCE__* HINSTANCE;
 #endif
 
 #if PLATFORM(GDK)
@@ -91,17 +90,15 @@ class Widget {
 
   virtual void paint(GraphicsContext*, const IntRect&);
 
-  virtual IntRect frameGeometry() const;
   virtual void setFrameGeometry(const IntRect&);
+  virtual IntRect frameGeometry() const;
 
   virtual int baselinePosition(
       int height) const;  // relative to the top of the widget
 
-  virtual IntPoint mapFromGlobal(const IntPoint&) const;
-
   bool hasFocus() const;
-  void setFocus();
-  void clearFocus();
+  virtual void setFocus();
+  virtual void clearFocus();
   virtual bool checksDescendantsForFocus() const;
 
   virtual FocusPolicy focusPolicy() const;
@@ -112,8 +109,8 @@ class Widget {
   void setCursor(const Cursor&);
   Cursor cursor();
 
-  void show();
-  void hide();
+  virtual void show();
+  virtual void hide();
 
   virtual void populate() {}
 
@@ -130,11 +127,15 @@ class Widget {
   virtual bool isFrameView() const;
 
 #if PLATFORM(WIN)
-  Widget(HWND);
-  HWND windowHandle() const;
-  void setWindowHandle(HWND);
-  // The global DLL or application instance used for all WebCore windows.
-  static HINSTANCE instanceHandle;
+  IntRect convertToContainingWindow(const IntRect&) const;
+  IntPoint convertToContainingWindow(const IntPoint&) const;
+  IntPoint convertFromContainingWindow(const IntPoint&) const;
+
+  void setContainingWindow(HWND);
+  HWND containingWindow() const;
+
+  void setParent(Widget*);
+  Widget* parent() const;
 #endif
 
 #if PLATFORM(GDK)

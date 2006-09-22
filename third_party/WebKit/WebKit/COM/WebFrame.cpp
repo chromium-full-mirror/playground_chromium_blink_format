@@ -127,7 +127,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::initWithName(
   if (FAILED(hr))
     return hr;
 
-  Page* page = new Page(windowHandle);
+  Page* page = new Page();
   Frame* frame = new FrameWin(page, 0, this);
 
   // FIXME: This is one-time initialization, but it gets the value of the
@@ -148,7 +148,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::initWithName(
   frameView->deref();  // FrameViews are created with a refcount of 1.  Release
                        // this ref, since we've assigned it to a RefPtr
   d->frame->setView(frameView);
-  d->frameView->setWindowHandle(windowHandle);
+  d->frameView->setContainingWindow(windowHandle);
 
   return S_OK;
 }
