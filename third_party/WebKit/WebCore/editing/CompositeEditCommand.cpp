@@ -218,7 +218,7 @@ void CompositeEditCommand::splitElement(Element* element, Node* atChild) {
 
 void CompositeEditCommand::mergeIdenticalElements(Element* first,
                                                   Element* second) {
-  ASSERT(!first->isAncestor(second) && second != first);
+  ASSERT(!first->isDescendantOf(second) && second != first);
   if (first->nextSibling() != second) {
     removeNode(second);
     insertNodeAfter(second, first);
@@ -522,7 +522,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   // Perform some checks to see if we need to perform work in this function.
   if (isBlock(paragraphStart.node())) {
     if (isBlock(end.node())) {
-      if (!end.node()->isAncestor(paragraphStart.node())) {
+      if (!end.node()->isDescendantOf(paragraphStart.node())) {
         // If the paragraph end is a descendant of paragraph start, then we need
         // to run
         // the rest of this function. If not, we can bail here.
@@ -531,7 +531,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
     } else if (enclosingBlock(end.node()) != paragraphStart.node()) {
       // The visibleEnd.  It must be an ancestor of the paragraph start.
       // We can bail as we have a full block to work with.
-      ASSERT(paragraphStart.node()->isAncestor(enclosingBlock(end.node())));
+      ASSERT(paragraphStart.node()->isDescendantOf(enclosingBlock(end.node())));
       return;
     } else if (isEndOfDocument(visibleEnd)) {
       // At the end of the document. We can bail here as well.

@@ -114,11 +114,12 @@ void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
   // the root.
   // or if removed node is not the reference node, or the ancestor of the
   // reference node.
-  if (!removedNode || removedNode == root() || !removedNode->isAncestor(root()))
+  if (!removedNode || removedNode == root() ||
+      !removedNode->isDescendantOf(root()))
     return;
   bool willRemoveReferenceNode = removedNode == referenceNode();
   bool willRemoveReferenceNodeAncestor =
-      referenceNode() && referenceNode()->isAncestor(removedNode);
+      referenceNode() && referenceNode()->isDescendantOf(removedNode);
   if (!willRemoveReferenceNode && !willRemoveReferenceNodeAncestor)
     return;
 
@@ -128,7 +129,7 @@ void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
       // Move out from under the node being removed if the reference node is
       // a descendant of the node being removed.
       if (willRemoveReferenceNodeAncestor) {
-        while (node && node->isAncestor(removedNode))
+        while (node && node->isDescendantOf(removedNode))
           node = findNextNode(node);
       }
       if (node)
@@ -139,7 +140,7 @@ void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
         // Move out from under the node being removed if the reference node is
         // a descendant of the node being removed.
         if (willRemoveReferenceNodeAncestor) {
-          while (node && node->isAncestor(removedNode))
+          while (node && node->isDescendantOf(removedNode))
             node = findPreviousNode(node);
         }
         if (node) {
@@ -157,7 +158,7 @@ void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
       // Move out from under the node being removed if the reference node is
       // a descendant of the node being removed.
       if (willRemoveReferenceNodeAncestor) {
-        while (node && node->isAncestor(removedNode))
+        while (node && node->isDescendantOf(removedNode))
           node = findPreviousNode(node);
       }
       if (node)
@@ -167,7 +168,7 @@ void NodeIterator::notifyBeforeNodeRemoval(Node* removedNode) {
       // Move out from under the node being removed if the reference node is
       // a descendant of the node being removed.
       if (willRemoveReferenceNodeAncestor) {
-        while (node && node->isAncestor(removedNode))
+        while (node && node->isDescendantOf(removedNode))
           node = findPreviousNode(node);
       }
       if (node)

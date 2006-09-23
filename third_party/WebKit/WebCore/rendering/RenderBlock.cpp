@@ -589,7 +589,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   // we overflow or not.
   RenderObject* flexbox = view()->flexBoxInFirstLayout();
   if (hasOverflowClip() &&
-      !(flexbox && flexbox != this && hasAncestor(flexbox)))
+      !(flexbox && flexbox != this && isDescendantOf(flexbox)))
     m_layer->updateScrollInfoAfterLayout();
 
   // Repaint with our new bounds if they are different from our old bounds.
@@ -1378,7 +1378,8 @@ void RenderBlock::repaintOverhangingFloats(bool paintAllDescendants) {
       // paintAllDescendants is true, the latter
       // condition is replaced with being a descendant of us.
       if (r->endY > m_height &&
-          (paintAllDescendants && r->node->hasAncestor(this) || !r->noPaint) &&
+          (paintAllDescendants && r->node->isDescendantOf(this) ||
+           !r->noPaint) &&
           !r->node->layer()) {
         r->node->repaint();
         r->node->repaintOverhangingFloats();
@@ -2060,7 +2061,7 @@ void RenderBlock::removePositionedObjects(RenderBlock* o) {
 
   DeprecatedPtrListIterator<RenderObject> it(*m_positionedObjects);
   while (it.current()) {
-    if (!o || it.current()->hasAncestor(o)) {
+    if (!o || it.current()->isDescendantOf(o)) {
       if (o)
         it.current()->setChildNeedsLayout(true, false);
       m_positionedObjects->removeRef(it.current());

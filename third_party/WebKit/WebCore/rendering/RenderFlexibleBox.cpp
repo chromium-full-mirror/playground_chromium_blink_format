@@ -331,7 +331,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
   // we overflow or not.
   RenderObject* flexbox = view()->flexBoxInFirstLayout();
   if (hasOverflowClip() &&
-      !(flexbox && flexbox != this && hasAncestor(flexbox)))
+      !(flexbox && flexbox != this && isDescendantOf(flexbox)))
     m_layer->updateScrollInfoAfterLayout();
 
   // Repaint with our new bounds if they are different from our old bounds.

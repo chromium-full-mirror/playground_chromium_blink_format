@@ -244,7 +244,7 @@ static void updatePositionForNodeRemoval(Node* node, Position& position) {
   if (node->parent() == position.node() &&
       node->nodeIndex() < (unsigned)position.offset())
     position = Position(position.node(), position.offset() - 1);
-  if (position.node() == node || position.node()->isAncestor(node))
+  if (position.node() == node || position.node()->isDescendantOf(node))
     position = positionBeforeNode(node);
 }
 
@@ -377,7 +377,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
           0) {
         // traverseNextSibling just blew past the end position, so stop deleting
         node = 0;
-      } else if (!m_downstreamEnd.node()->isAncestor(node)) {
+      } else if (!m_downstreamEnd.node()->isDescendantOf(node)) {
         Node* nextNode = node->traverseNextSibling();
         // if we just removed a node from the end container, update end position
         // so the
@@ -401,7 +401,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     }
 
     if (m_downstreamEnd.node() != startNode &&
-        !m_upstreamStart.node()->isAncestor(m_downstreamEnd.node()) &&
+        !m_upstreamStart.node()->isDescendantOf(m_downstreamEnd.node()) &&
         m_downstreamEnd.node()->inDocument() &&
         m_downstreamEnd.offset() >= m_downstreamEnd.node()->caretMinOffset()) {
       if (m_downstreamEnd.offset() >= maxDeepOffset(m_downstreamEnd.node())) {
@@ -411,7 +411,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         // m_downstreamEnd.node() itself
         if (!m_upstreamStart.node()->inDocument() ||
             m_upstreamStart.node() == m_downstreamEnd.node() ||
-            m_upstreamStart.node()->isAncestor(m_downstreamEnd.node())) {
+            m_upstreamStart.node()->isDescendantOf(m_downstreamEnd.node())) {
           m_upstreamStart = Position(m_downstreamEnd.node()->parentNode(),
                                      m_downstreamEnd.node()->nodeIndex());
         }
@@ -427,7 +427,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
           }
         } else {
           int offset = 0;
-          if (m_upstreamStart.node()->isAncestor(m_downstreamEnd.node())) {
+          if (m_upstreamStart.node()->isDescendantOf(m_downstreamEnd.node())) {
             Node* n = m_upstreamStart.node();
             while (n && n->parentNode() != m_downstreamEnd.node())
               n = n->parentNode();
@@ -494,7 +494,7 @@ void DeleteSelectionCommand::mergeParagraphs() {
 
   // We need to merge into m_upstreamStart's block, but it's been emptied out
   // and collapsed by deletion.
-  if (!mergeDestination.deepEquivalent().node()->isAncestor(
+  if (!mergeDestination.deepEquivalent().node()->isDescendantOf(
           m_upstreamStart.node()->enclosingBlockFlowElement())) {
     insertNodeAt(createBreakElement(document()).get(), m_upstreamStart.node(),
                  m_upstreamStart.offset());

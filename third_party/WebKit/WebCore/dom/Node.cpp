@@ -405,13 +405,13 @@ Node* Node::childNode(unsigned /*index*/) const {
 
 Node* Node::traverseNextNode(const Node* stayWithin) const {
   if (firstChild()) {
-    assert(!stayWithin || firstChild()->isAncestor(stayWithin));
+    assert(!stayWithin || firstChild()->isDescendantOf(stayWithin));
     return firstChild();
   }
   if (this == stayWithin)
     return 0;
   if (nextSibling()) {
-    assert(!stayWithin || nextSibling()->isAncestor(stayWithin));
+    assert(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
     return nextSibling();
   }
   const Node* n = this;
@@ -420,7 +420,7 @@ Node* Node::traverseNextNode(const Node* stayWithin) const {
     n = n->parentNode();
   if (n) {
     assert(!stayWithin || !n->nextSibling() ||
-           n->nextSibling()->isAncestor(stayWithin));
+           n->nextSibling()->isDescendantOf(stayWithin));
     return n->nextSibling();
   }
   return 0;
@@ -430,7 +430,7 @@ Node* Node::traverseNextSibling(const Node* stayWithin) const {
   if (this == stayWithin)
     return 0;
   if (nextSibling()) {
-    assert(!stayWithin || nextSibling()->isAncestor(stayWithin));
+    assert(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
     return nextSibling();
   }
   const Node* n = this;
@@ -439,7 +439,7 @@ Node* Node::traverseNextSibling(const Node* stayWithin) const {
     n = n->parentNode();
   if (n) {
     assert(!stayWithin || !n->nextSibling() ||
-           n->nextSibling()->isAncestor(stayWithin));
+           n->nextSibling()->isDescendantOf(stayWithin));
     return n->nextSibling();
   }
   return 0;
@@ -459,13 +459,13 @@ Node* Node::traversePreviousNode(const Node* stayWithin) const {
 
 Node* Node::traversePreviousNodePostOrder(const Node* stayWithin) const {
   if (lastChild()) {
-    assert(!stayWithin || lastChild()->isAncestor(stayWithin));
+    assert(!stayWithin || lastChild()->isDescendantOf(stayWithin));
     return lastChild();
   }
   if (this == stayWithin)
     return 0;
   if (previousSibling()) {
-    assert(!stayWithin || previousSibling()->isAncestor(stayWithin));
+    assert(!stayWithin || previousSibling()->isDescendantOf(stayWithin));
     return previousSibling();
   }
   const Node* n = this;
@@ -474,7 +474,7 @@ Node* Node::traversePreviousNodePostOrder(const Node* stayWithin) const {
     n = n->parentNode();
   if (n) {
     assert(!stayWithin || !n->previousSibling() ||
-           n->previousSibling()->isAncestor(stayWithin));
+           n->previousSibling()->isDescendantOf(stayWithin));
     return n->previousSibling();
   }
   return 0;
@@ -559,7 +559,7 @@ void Node::checkAddChild(Node* newChild, ExceptionCode& ec) {
   // newChild node, or if the node to append is one of this node's ancestors.
 
   // check for ancestor/same node
-  if (newChild == this || isAncestor(newChild)) {
+  if (newChild == this || isDescendantOf(newChild)) {
     ec = HIERARCHY_REQUEST_ERR;
     return;
   }
@@ -589,7 +589,7 @@ void Node::checkAddChild(Node* newChild, ExceptionCode& ec) {
   }
 }
 
-bool Node::isAncestor(const Node* other) const {
+bool Node::isDescendantOf(const Node* other) const {
   // Return true if other is an ancestor of this, otherwise false
   if (!other)
     return false;

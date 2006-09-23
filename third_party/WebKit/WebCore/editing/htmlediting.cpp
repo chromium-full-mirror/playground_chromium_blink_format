@@ -235,7 +235,7 @@ VisiblePosition firstEditablePositionAfterPositionInRoot(
 
   Position p = nextVisuallyDistinctCandidate(position);
   while (p.isNotNull() && !isEditablePosition(p) &&
-         p.node()->isAncestor(highestRoot))
+         p.node()->isDescendantOf(highestRoot))
     p = isAtomicNode(p.node()) ? positionAfterNode(p.node())
                                : nextVisuallyDistinctCandidate(p);
 
@@ -251,7 +251,7 @@ VisiblePosition lastEditablePositionBeforePositionInRoot(
 
   Position p = previousVisuallyDistinctCandidate(position);
   while (p.isNotNull() && !isEditablePosition(p) &&
-         p.node()->isAncestor(highestRoot))
+         p.node()->isDescendantOf(highestRoot))
     p = isAtomicNode(p.node()) ? positionBeforeNode(p.node())
                                : previousVisuallyDistinctCandidate(p);
 
@@ -537,8 +537,8 @@ Node* enclosingNodeWithTag(Node* node, const QualifiedName& tagName) {
   Node* root = (node->inDocument()) ? node->rootEditableElement()
                                     : highestAncestor(node);
   ASSERT(root);
-  for (Node* n = node->parentNode(); n && (n == root || n->isAncestor(root));
-       n = n->parentNode())
+  for (Node* n = node->parentNode();
+       n && (n == root || n->isDescendantOf(root)); n = n->parentNode())
     if (n->hasTagName(tagName))
       return n;
 
@@ -562,8 +562,8 @@ Node* enclosingList(Node* node) {
   Node* root = (node->inDocument()) ? node->rootEditableElement()
                                     : highestAncestor(node);
   ASSERT(root);
-  for (Node* n = node->parentNode(); n && (n == root || n->isAncestor(root));
-       n = n->parentNode())
+  for (Node* n = node->parentNode();
+       n && (n == root || n->isDescendantOf(root)); n = n->parentNode())
     if (n->hasTagName(ulTag) || n->hasTagName(olTag))
       return n;
 
@@ -580,7 +580,7 @@ Node* enclosingListChild(Node* node) {
                                     : highestAncestor(node);
   ASSERT(root);
   for (Node* n = node;
-       n && n->parentNode() && (n == root || n->isAncestor(root));
+       n && n->parentNode() && (n == root || n->isDescendantOf(root));
        n = n->parentNode()) {
     if (n->hasTagName(liTag) || isListElement(n->parentNode()))
       return n;

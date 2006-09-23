@@ -408,7 +408,7 @@ DeprecatedString createMarkup(const Range* range,
           // Close up the ancestors.
           do {
             Node* ancestor = ancestorsToClose.last();
-            if (next != pastEnd && next->isAncestor(ancestor))
+            if (next != pastEnd && next->isDescendantOf(ancestor))
               break;
             // Not at the end of the range, close ancestors up to sibling of
             // next node.
@@ -423,7 +423,7 @@ DeprecatedString createMarkup(const Range* range,
         Node* nextParent = next ? next->parentNode() : 0;
         if (next != pastEnd && n != nextParent) {
           Node* lastAncestorClosedOrSelf =
-              n->isAncestor(lastClosed) ? lastClosed : n;
+              n->isDescendantOf(lastClosed) ? lastClosed : n;
           for (Node* parent = lastAncestorClosedOrSelf->parent();
                parent != 0 && parent != nextParent;
                parent = parent->parentNode()) {
@@ -433,7 +433,7 @@ DeprecatedString createMarkup(const Range* range,
               continue;
             // or b) ancestors that we never encountered during a pre-order
             // traversal starting at startNode:
-            ASSERT(startNode->isAncestor(parent));
+            ASSERT(startNode->isDescendantOf(parent));
             markups.prepend(
                 startMarkup(parent, range, annotate, defaultStyle.get()));
             markups.append(endMarkup(parent));

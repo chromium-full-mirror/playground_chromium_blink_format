@@ -67,7 +67,7 @@ VisiblePosition VisiblePosition::next(bool stayInEditableContent) const {
 
   Node* highestRoot = highestEditableRoot(deepEquivalent());
 
-  if (!next.deepEquivalent().node()->isAncestor(highestRoot))
+  if (!next.deepEquivalent().node()->isDescendantOf(highestRoot))
     return VisiblePosition();
 
   if (highestEditableRoot(next.deepEquivalent()) == highestRoot)
@@ -105,7 +105,7 @@ VisiblePosition VisiblePosition::previous(bool stayInEditableContent) const {
 
   Node* highestRoot = highestEditableRoot(deepEquivalent());
 
-  if (!prev.deepEquivalent().node()->isAncestor(highestRoot))
+  if (!prev.deepEquivalent().node()->isDescendantOf(highestRoot))
     return VisiblePosition();
 
   if (highestEditableRoot(prev.deepEquivalent()) == highestRoot)
@@ -176,9 +176,9 @@ Position VisiblePosition::canonicalPosition(const Position& position) {
   // The new position should be in the same block flow element. Favor that.
   Node* originalBlock = node->enclosingBlockFlowElement();
   bool nextIsOutsideOriginalBlock =
-      !nextNode->isAncestor(originalBlock) && nextNode != originalBlock;
+      !nextNode->isDescendantOf(originalBlock) && nextNode != originalBlock;
   bool prevIsOutsideOriginalBlock =
-      !prevNode->isAncestor(originalBlock) && prevNode != originalBlock;
+      !prevNode->isDescendantOf(originalBlock) && prevNode != originalBlock;
   if (nextIsOutsideOriginalBlock && !prevIsOutsideOriginalBlock)
     return prev;
 
@@ -280,12 +280,12 @@ bool isFirstVisiblePositionInNode(const VisiblePosition& visiblePosition,
   if (visiblePosition.isNull())
     return false;
 
-  if (!visiblePosition.deepEquivalent().node()->isAncestor(node))
+  if (!visiblePosition.deepEquivalent().node()->isDescendantOf(node))
     return false;
 
   VisiblePosition previous = visiblePosition.previous();
   return previous.isNull() ||
-         !previous.deepEquivalent().node()->isAncestor(node);
+         !previous.deepEquivalent().node()->isDescendantOf(node);
 }
 
 bool isLastVisiblePositionInNode(const VisiblePosition& visiblePosition,
@@ -293,11 +293,11 @@ bool isLastVisiblePositionInNode(const VisiblePosition& visiblePosition,
   if (visiblePosition.isNull())
     return false;
 
-  if (!visiblePosition.deepEquivalent().node()->isAncestor(node))
+  if (!visiblePosition.deepEquivalent().node()->isDescendantOf(node))
     return false;
 
   VisiblePosition next = visiblePosition.next();
-  return next.isNull() || !next.deepEquivalent().node()->isAncestor(node);
+  return next.isNull() || !next.deepEquivalent().node()->isDescendantOf(node);
 }
 
 }  // namespace WebCore
