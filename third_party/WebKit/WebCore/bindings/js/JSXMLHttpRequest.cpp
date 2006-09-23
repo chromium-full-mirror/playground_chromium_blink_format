@@ -93,6 +93,8 @@ bool JSXMLHttpRequest::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* JSXMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
+  ExceptionCode ec = 0;
+
   switch (token) {
     case ReadyState:
       return jsNumber(m_impl->getReadyState());
@@ -103,11 +105,15 @@ JSValue* JSXMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
         return toJS(exec, responseXML);
       return jsNull();
     case Status: {
-      int status = m_impl->getStatus();
-      return status > 0 ? jsNumber(status) : jsUndefined();
+      JSValue* result = jsNumber(m_impl->getStatus(ec));
+      setDOMException(exec, ec);
+      return result;
     }
-    case StatusText:
-      return jsStringOrUndefined(m_impl->getStatusText());
+    case StatusText: {
+      JSValue* result = jsString(m_impl->getStatusText(ec));
+      setDOMException(exec, ec);
+      return result;
+    }
     case Onreadystatechange:
       if (JSUnprotectedEventListener* listener =
               static_cast<JSUnprotectedEventListener*>(
@@ -189,6 +195,8 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
 
   JSXMLHttpRequest* request = static_cast<JSXMLHttpRequest*>(thisObj);
 
+  ExceptionCode ec = 0;
+
   switch (id) {
     case JSXMLHttpRequest::Abort:
       request->m_impl->abort();
@@ -196,13 +204,13 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
     case JSXMLHttpRequest::GetAllResponseHeaders:
       return jsStringOrUndefined(request->m_impl->getAllResponseHeaders());
     case JSXMLHttpRequest::GetResponseHeader:
-      if (args.size() != 1)
-        return jsUndefined();
+      if (args.size() < 1)
+        return throwError(exec, SyntaxError, "Not enough arguments");
       return jsStringOrUndefined(
           request->m_impl->getResponseHeader(args[0]->toString(exec)));
     case JSXMLHttpRequest::Open: {
-      if (args.size() < 2 || args.size() > 5)
-        return jsUndefined();
+      if (args.size() < 2)
+        return throwError(exec, SyntaxError, "Not enough arguments");
 
       String method = args[0]->toString(exec);
       KURL url =
@@ -221,14 +229,12 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
       if (args.size() >= 5)
         password = args[4]->toString(exec);
 
-      request->m_impl->open(method, url, async, user, password);
+      request->m_impl->open(method, url, async, user, password, ec);
+      setDOMException(exec, ec);
 
       return jsUndefined();
     }
     case JSXMLHttpRequest::Send: {
-      if (args.size() > 1)
-        return jsUndefined();
-
       String body;
 
       if (args.size() >= 1) {
@@ -246,19 +252,21 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
         }
       }
 
-      request->m_impl->send(body);
+      request->m_impl->send(body, ec);
+      setDOMException(exec, ec);
 
       return jsUndefined();
     }
     case JSXMLHttpRequest::SetRequestHeader:
-      if (args.size() != 2)
-        return jsUndefined();
+      if (args.size() < 2)
+        return throwError(exec, SyntaxError, "Not enough arguments");
       request->m_impl->setRequestHeader(args[0]->toString(exec),
-                                        args[1]->toString(exec));
+                                        args[1]->toString(exec), ec);
+      setDOMException(exec, ec);
       return jsUndefined();
     case JSXMLHttpRequest::OverrideMIMEType:
-      if (args.size() != 1)
-        return jsUndefined();
+      if (args.size() < 1)
+        return throwError(exec, SyntaxError, "Not enough arguments");
       request->m_impl->overrideMIMEType(args[0]->toString(exec));
       return jsUndefined();
   }

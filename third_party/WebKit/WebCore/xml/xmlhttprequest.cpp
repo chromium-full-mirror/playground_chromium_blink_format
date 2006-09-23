@@ -28,6 +28,7 @@
 #include "Event.h"
 #include "EventListener.h"
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "FormData.h"
 #include "HTMLDocument.h"
 #include "LoaderFunctions.h"
@@ -151,7 +152,7 @@ String XMLHttpRequest::getResponseText() const {
 }
 
 Document* XMLHttpRequest::getResponseXML() const {
-  if (m_state != Completed)
+  if (m_state != Loaded)
     return 0;
 
   if (!m_createdDocument) {
@@ -214,7 +215,7 @@ void XMLHttpRequest::callReadyStateChangeListener() {
     m_onReadyStateChangeListener->handleEvent(
         new Event(readystatechangeEvent, true, true), true);
 
-  if (m_doc && m_doc->frame() && m_state == Completed && m_onLoadListener)
+  if (m_doc && m_doc->frame() && m_state == Loaded && m_onLoadListener)
     m_onLoadListener->handleEvent(new Event(loadEvent, true, true), true);
 }
 
@@ -238,7 +239,8 @@ void XMLHttpRequest::open(const String& method,
                           const KURL& url,
                           bool async,
                           const String& user,
-                          const String& password) {
+                          const String& password,
+                          ExceptionCode& ec) {
   abort();
   m_aborted = false;
 
@@ -251,11 +253,10 @@ void XMLHttpRequest::open(const String& method,
 
   changeState(Uninitialized);
 
-  if (m_aborted)
+  if (!urlMatchesDocumentDomain(url)) {
+    ec = PERMISSION_DENIED;
     return;
-
-  if (!urlMatchesDocumentDomain(url))
-    return;
+  }
 
   m_url = url;
 
@@ -282,17 +283,20 @@ void XMLHttpRequest::open(const String& method,
 
   m_async = async;
 
-  changeState(Loading);
+  changeState(Open);
 }
 
-void XMLHttpRequest::send(const String& body) {
+void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
   if (!m_doc)
     return;
 
-  if (m_state != Loading)
+  if (m_state != Open) {
+    ec = INVALID_STATE_ERR;
     return;
+  }
 
-  // FIXME: Should this abort instead if we already have a m_job going?
+  // FIXME: Should this abort or raise an exception instead if we already have a
+  // m_job going?
   if (m_job)
     return;
 
@@ -303,9 +307,11 @@ void XMLHttpRequest::send(const String& body) {
        m_url.protocol().lower() == "https")) {
     String contentType = getRequestHeader("Content-Type");
     String charset;
-    if (contentType.isEmpty())
-      setRequestHeader("Content-Type", "application/xml");
-    else
+    if (contentType.isEmpty()) {
+      ExceptionCode ec = 0;
+      setRequestHeader("Content-Type", "application/xml", ec);
+      ASSERT(ec == 0);
+    } else
       charset = getCharset(contentType);
 
     if (charset.isEmpty())
@@ -386,7 +392,14 @@ void XMLHttpRequest::overrideMIMEType(const String& override) {
   m_mimeTypeOverride = override;
 }
 
-void XMLHttpRequest::setRequestHeader(const String& name, const String& value) {
+void XMLHttpRequest::setRequestHeader(const String& name,
+                                      const String& value,
+                                      ExceptionCode& ec) {
+  if (m_state != Open) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
   if (m_requestHeaders.length() > 0)
     m_requestHeaders += "\r\n";
   m_requestHeaders += name.deprecatedString();
@@ -450,9 +463,17 @@ bool XMLHttpRequest::responseIsXML() const {
   return DOMImplementation::isXMLMIMEType(mimeType);
 }
 
-int XMLHttpRequest::getStatus() const {
-  if (m_responseHeaders.isEmpty())
-    return -1;
+int XMLHttpRequest::getStatus(ExceptionCode& ec) const {
+  if (m_state == Uninitialized)
+    return 0;
+
+  if (m_responseHeaders.isEmpty()) {
+    if (m_state != Receiving && m_state != Loaded)
+      // status MUST be available in these states, but we don't get any headers
+      // from non-HTTP requests
+      ec = INVALID_STATE_ERR;
+    return 0;
+  }
 
   int endOfLine = m_responseHeaders.find("\n");
   String firstLine = endOfLine == -1
@@ -460,20 +481,28 @@ int XMLHttpRequest::getStatus() const {
                          : m_responseHeaders.substring(0, endOfLine);
   int codeStart = firstLine.find(" ");
   int codeEnd = firstLine.find(" ", codeStart + 1);
-  if (codeStart == -1 || codeEnd == -1)
-    return -1;
+  ASSERT(codeStart != -1);
+  ASSERT(codeEnd != -1);
 
   String number = firstLine.substring(codeStart + 1, codeEnd - (codeStart + 1));
   bool ok = false;
   int code = number.toInt(&ok);
-  if (!ok)
-    return -1;
+  ASSERT(ok);
+
   return code;
 }
 
-String XMLHttpRequest::getStatusText() const {
-  if (m_responseHeaders.isEmpty())
+String XMLHttpRequest::getStatusText(ExceptionCode& ec) const {
+  if (m_state == Uninitialized)
+    return "";
+
+  if (m_responseHeaders.isEmpty()) {
+    if (m_state != Receiving && m_state != Loaded)
+      // statusText MUST be available in these states, but we don't get any
+      // headers from non-HTTP requests
+      ec = INVALID_STATE_ERR;
     return String();
+  }
 
   int endOfLine = m_responseHeaders.find("\n");
   String firstLine = endOfLine == -1
@@ -481,8 +510,8 @@ String XMLHttpRequest::getStatusText() const {
                          : m_responseHeaders.substring(0, endOfLine);
   int codeStart = firstLine.find(" ");
   int codeEnd = firstLine.find(" ", codeStart + 1);
-  if (codeStart == -1 || codeEnd == -1)
-    return String();
+  ASSERT(codeStart != -1);
+  ASSERT(codeEnd != -1);
 
   return firstLine.substring(codeEnd + 1, endOfLine - (codeEnd + 1))
       .stripWhiteSpace();
@@ -497,7 +526,7 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
   }
 
   m_responseHeaders = headers;
-  changeState(Loaded);
+  changeState(Sent);
   if (m_aborted)
     return;
 
@@ -515,8 +544,8 @@ void XMLHttpRequest::receivedAllData(ResourceLoader*) {
   if (m_responseHeaders.isEmpty() && m_job)
     m_responseHeaders = m_job->queryMetaData("HTTP-Headers");
 
-  if (m_state < Loaded)
-    changeState(Loaded);
+  if (m_state < Sent)
+    changeState(Sent);
 
   if (m_decoder)
     m_response += m_decoder->flush();
@@ -524,7 +553,7 @@ void XMLHttpRequest::receivedAllData(ResourceLoader*) {
   bool hadJob = m_job;
   m_job = 0;
 
-  changeState(Completed);
+  changeState(Loaded);
   m_decoder = 0;
 
   if (hadJob) {
@@ -545,8 +574,8 @@ void XMLHttpRequest::receivedData(ResourceLoader*, const char* data, int len) {
   if (m_responseHeaders.isEmpty() && m_job)
     m_responseHeaders = m_job->queryMetaData("HTTP-Headers");
 
-  if (m_state < Loaded)
-    changeState(Loaded);
+  if (m_state < Sent)
+    changeState(Sent);
 
   if (!m_decoder) {
     m_encoding = getCharset(m_mimeTypeOverride);
@@ -574,8 +603,8 @@ void XMLHttpRequest::receivedData(ResourceLoader*, const char* data, int len) {
   m_response += decoded;
 
   if (!m_aborted) {
-    if (m_state != Interactive)
-      changeState(Interactive);
+    if (m_state != Receiving)
+      changeState(Receiving);
     else
       // Firefox calls readyStateChanged every time it receives data, 4449442
       callReadyStateChangeListener();
