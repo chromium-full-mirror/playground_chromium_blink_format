@@ -165,7 +165,7 @@ void didFail(CFURLConnectionRef conn,
 }
 
 CFURLCachedResponseRef willCacheResponse(CFURLConnectionRef conn,
-                                         CFURLCachedResponseRef cachedResponse,
+                                         CFCachedURLResponseRef cachedResponse,
                                          const void* clientInfo) {
   ResourceLoader* job = (ResourceLoader*)clientInfo;
   return cachedResponse;
