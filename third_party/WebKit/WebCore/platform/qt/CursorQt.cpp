@@ -48,7 +48,7 @@ Cursor::Cursor(const Cursor& other) : m_impl(other.m_impl) {}
 
 Cursor::~Cursor() {}
 
-Cursor::Cursor(Image*) {
+Cursor::Cursor(Image*, const IntPoint&) {
   notImplemented();
 }
 

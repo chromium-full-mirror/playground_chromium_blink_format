@@ -32,7 +32,7 @@
 #include "SVGHelper.h"
 #include "SVGLength.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGCursorElement::SVGCursorElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc),
@@ -89,6 +89,7 @@ void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
 
     SVGElement::parseMappedAttribute(attr);
   }
+}
 }
 
 // vim:ts=4:noet
