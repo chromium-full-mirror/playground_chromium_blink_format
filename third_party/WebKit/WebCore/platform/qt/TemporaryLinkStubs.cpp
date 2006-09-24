@@ -255,7 +255,7 @@ bool ScrollBar::setValue(int) {
   notImplemented();
   return 0;
 }
-void ScrollBar::setKnobProportion(int, int) {
+void ScrollBar::setProportion(int, int) {
   notImplemented();
 }
 
@@ -281,10 +281,10 @@ void PlatformScrollBar::setEnabled(bool) {
 void PlatformScrollBar::paint(GraphicsContext*, const IntRect& damageRect) {
   notImplemented();
 }
-void PlatformScrollBar::setScrollBarValue(int v) {
+void PlatformScrollBar::updateThumbPosition() {
   notImplemented();
 }
-void PlatformScrollBar::setKnobProportion(int visibleSize, int totalSize) {
+void PlatformScrollBar::updateThumbProportion() {
   notImplemented();
 }
 void PlatformScrollBar::setRect(const IntRect&) {
