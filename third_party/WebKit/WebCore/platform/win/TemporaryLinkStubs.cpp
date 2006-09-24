@@ -705,8 +705,8 @@ int PlatformScrollBar::height() const {
 }
 void PlatformScrollBar::setEnabled(bool) {}
 void PlatformScrollBar::paint(GraphicsContext*, const IntRect& damageRect) {}
-void PlatformScrollBar::setScrollBarValue(int v) {}
-void PlatformScrollBar::setKnobProportion(int visibleSize, int totalSize) {}
+void PlatformScrollBar::updateThumbPosition() {}
+void PlatformScrollBar::updateThumbProportion() {}
 void PlatformScrollBar::setRect(const IntRect&) {}
 
 ScrollBar::ScrollBar(ScrollBarClient*, ScrollBarOrientation) {}

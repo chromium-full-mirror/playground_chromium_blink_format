@@ -45,9 +45,6 @@ class PlatformScrollBar : public Widget, public ScrollBar {
 
   virtual bool isWidget() const { return true; }
 
-  virtual void setScrollBarValue(int v);
-  virtual void setKnobProportion(int visibleSize, int totalSize);
-
   virtual int width() const;
   virtual int height() const;
   virtual void setRect(const IntRect&);
@@ -55,6 +52,10 @@ class PlatformScrollBar : public Widget, public ScrollBar {
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
   bool scrollbarHit(NSScrollerPart);
+
+ protected:
+  virtual void updateThumbPosition();
+  virtual void updateThumbProportion();
 };
 }
 

@@ -1238,7 +1238,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     if (pageStep < 0)
       pageStep = clientWidth;
     m_hBar->setSteps(LINE_STEP, pageStep);
-    m_hBar->setKnobProportion(clientWidth, m_scrollWidth);
+    m_hBar->setProportion(clientWidth, m_scrollWidth);
     m_hBar->setValue(scrollXOffset());
   }
   if (m_vBar) {
@@ -1247,7 +1247,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     if (pageStep < 0)
       pageStep = clientHeight;
     m_vBar->setSteps(LINE_STEP, pageStep);
-    m_vBar->setKnobProportion(clientHeight, m_scrollHeight);
+    m_vBar->setProportion(clientHeight, m_scrollHeight);
     m_object->repaintRectangle(IntRect(
         m_object->borderLeft() + m_object->clientWidth(), m_object->borderTop(),
         verticalScrollbarWidth(),
