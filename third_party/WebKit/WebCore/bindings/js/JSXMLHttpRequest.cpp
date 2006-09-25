@@ -201,13 +201,17 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
     case JSXMLHttpRequest::Abort:
       request->m_impl->abort();
       return jsUndefined();
+
     case JSXMLHttpRequest::GetAllResponseHeaders:
       return jsStringOrUndefined(request->m_impl->getAllResponseHeaders());
+
     case JSXMLHttpRequest::GetResponseHeader:
       if (args.size() < 1)
         return throwError(exec, SyntaxError, "Not enough arguments");
+
       return jsStringOrUndefined(
           request->m_impl->getResponseHeader(args[0]->toString(exec)));
+
     case JSXMLHttpRequest::Open: {
       if (args.size() < 2)
         return throwError(exec, SyntaxError, "Not enough arguments");
@@ -260,13 +264,16 @@ JSValue* JSXMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
     case JSXMLHttpRequest::SetRequestHeader:
       if (args.size() < 2)
         return throwError(exec, SyntaxError, "Not enough arguments");
+
       request->m_impl->setRequestHeader(args[0]->toString(exec),
                                         args[1]->toString(exec), ec);
       setDOMException(exec, ec);
       return jsUndefined();
+
     case JSXMLHttpRequest::OverrideMIMEType:
       if (args.size() < 1)
         return throwError(exec, SyntaxError, "Not enough arguments");
+
       request->m_impl->overrideMIMEType(args[0]->toString(exec));
       return jsUndefined();
   }

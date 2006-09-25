@@ -189,7 +189,7 @@ void XMLHttpRequest::setOnLoadListener(EventListener* eventListener) {
 XMLHttpRequest::XMLHttpRequest(Document* d)
     : m_doc(d),
       m_async(true),
-      m_job(0),
+      m_loader(0),
       m_state(Uninitialized),
       m_response("", 0),
       m_createdDocument(false),
@@ -296,8 +296,8 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
   }
 
   // FIXME: Should this abort or raise an exception instead if we already have a
-  // m_job going?
-  if (m_job)
+  // m_loader going?
+  if (m_loader)
     return;
 
   m_aborted = false;
@@ -321,7 +321,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     if (!m_encoding.isValid())  // FIXME: report an error?
       m_encoding = UTF8Encoding();
 
-    m_job =
+    m_loader =
         new ResourceLoader(m_async ? this : 0, m_method, m_url,
                            m_encoding.encode(body.characters(), body.length()));
   } else {
@@ -329,11 +329,11 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     // out tests in http/tests/xmlhttprequest/methods.html.
     if (m_method == "HEAD")
       m_method = "GET";
-    m_job = new ResourceLoader(m_async ? this : 0, m_method, m_url);
+    m_loader = new ResourceLoader(m_async ? this : 0, m_method, m_url);
   }
 
   if (m_requestHeaders.length())
-    m_job->addMetaData("customHTTPHeader", m_requestHeaders);
+    m_loader->addMetaData("customHTTPHeader", m_requestHeaders);
 
   if (!m_async) {
     Vector<char> data;
@@ -344,11 +344,11 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
       // avoid deadlock in case the loader wants to use JS on a background
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
-      data = ServeSynchronousRequest(Cache::loader(), m_doc->docLoader(), m_job,
-                                     finalURL, headers);
+      data = ServeSynchronousRequest(Cache::loader(), m_doc->docLoader(),
+                                     m_loader, finalURL, headers);
     }
 
-    m_job = 0;
+    m_loader = 0;
     processSyncLoadResults(data, finalURL, headers);
 
     return;
@@ -363,23 +363,23 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     gcProtectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
   }
 
-  if (!m_job->start(m_doc->docLoader())) {
+  if (!m_loader->start(m_doc->docLoader())) {
     LOG_ERROR("Failed to send an XMLHttpRequest for %s", m_url.url().ascii());
-    m_job = 0;
+    m_loader = 0;
   }
 }
 
 void XMLHttpRequest::abort() {
-  bool hadJob = m_job;
+  bool hadLoader = m_loader;
 
-  if (hadJob) {
-    m_job->kill();
-    m_job = 0;
+  if (hadLoader) {
+    m_loader->kill();
+    m_loader = 0;
   }
   m_decoder = 0;
   m_aborted = true;
 
-  if (hadJob) {
+  if (hadLoader) {
     {
       KJS::JSLock lock;
       gcUnprotectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
@@ -541,8 +541,8 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
 }
 
 void XMLHttpRequest::receivedAllData(ResourceLoader*) {
-  if (m_responseHeaders.isEmpty() && m_job)
-    m_responseHeaders = m_job->queryMetaData("HTTP-Headers");
+  if (m_responseHeaders.isEmpty() && m_loader)
+    m_responseHeaders = m_loader->queryMetaData("HTTP-Headers");
 
   if (m_state < Sent)
     changeState(Sent);
@@ -550,13 +550,13 @@ void XMLHttpRequest::receivedAllData(ResourceLoader*) {
   if (m_decoder)
     m_response += m_decoder->flush();
 
-  bool hadJob = m_job;
-  m_job = 0;
+  bool hadLoader = m_loader;
+  m_loader = 0;
 
   changeState(Loaded);
   m_decoder = 0;
 
-  if (hadJob) {
+  if (hadLoader) {
     {
       KJS::JSLock lock;
       gcUnprotectNullTolerant(KJS::ScriptInterpreter::getDOMObject(this));
@@ -571,8 +571,8 @@ void XMLHttpRequest::receivedRedirect(ResourceLoader*, const KURL& m_url) {
 }
 
 void XMLHttpRequest::receivedData(ResourceLoader*, const char* data, int len) {
-  if (m_responseHeaders.isEmpty() && m_job)
-    m_responseHeaders = m_job->queryMetaData("HTTP-Headers");
+  if (m_responseHeaders.isEmpty() && m_loader)
+    m_responseHeaders = m_loader->queryMetaData("HTTP-Headers");
 
   if (m_state < Sent)
     changeState(Sent);
@@ -581,8 +581,8 @@ void XMLHttpRequest::receivedData(ResourceLoader*, const char* data, int len) {
     m_encoding = getCharset(m_mimeTypeOverride);
     if (m_encoding.isEmpty())
       m_encoding = getCharset(getResponseHeader("Content-Type"));
-    if (m_encoding.isEmpty() && m_job)
-      m_encoding = m_job->queryMetaData("charset");
+    if (m_encoding.isEmpty() && m_loader)
+      m_encoding = m_loader->queryMetaData("charset");
 
     if (!m_encoding.isEmpty())
       m_decoder = new Decoder("text/plain", m_encoding);

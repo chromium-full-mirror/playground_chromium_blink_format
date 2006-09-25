@@ -25,6 +25,7 @@
 #include "kjs_binding.h"
 
 namespace WebCore {
+
 class XMLHttpRequest;
 class Document;
 }
@@ -33,9 +34,9 @@ namespace KJS {
 
 class JSXMLHttpRequestConstructorImp : public DOMObject {
  public:
-  JSXMLHttpRequestConstructorImp(ExecState* exec, WebCore::Document* d);
+  JSXMLHttpRequestConstructorImp(ExecState*, WebCore::Document*);
   virtual bool implementsConstruct() const;
-  virtual JSObject* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState*, const List&);
 
  private:
   RefPtr<WebCore::Document> doc;
@@ -43,7 +44,7 @@ class JSXMLHttpRequestConstructorImp : public DOMObject {
 
 class JSXMLHttpRequest : public DOMObject {
  public:
-  JSXMLHttpRequest(ExecState*, WebCore::Document* d);
+  JSXMLHttpRequest(ExecState*, WebCore::Document*);
   ~JSXMLHttpRequest();
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -65,15 +66,12 @@ class JSXMLHttpRequest : public DOMObject {
   };
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  void putValueProperty(ExecState* exec,
-                        int token,
-                        JSValue* value,
-                        int /*attr*/);
+  void putValueProperty(ExecState*, int token, JSValue* value, int /*attr*/);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual void mark();
 
