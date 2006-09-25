@@ -164,7 +164,7 @@ void didFail(CFURLConnectionRef conn,
   job->client()->receivedAllData(job);
 }
 
-CFURLCachedResponseRef willCacheResponse(CFURLConnectionRef conn,
+CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
                                          CFCachedURLResponseRef cachedResponse,
                                          const void* clientInfo) {
   ResourceLoader* job = (ResourceLoader*)clientInfo;
