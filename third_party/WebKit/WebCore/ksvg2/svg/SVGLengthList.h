@@ -34,7 +34,7 @@ class SVGLengthList : public SVGList<RefPtr<SVGLength>> {
   SVGLengthList();
   virtual ~SVGLengthList();
 
-  void parse(const DeprecatedString& value,
+  void parse(const String& value,
              const SVGStyledElement* context,
              LengthMode mode);
 };

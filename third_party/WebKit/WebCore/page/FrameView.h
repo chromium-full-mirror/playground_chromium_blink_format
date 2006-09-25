@@ -230,9 +230,6 @@ class FrameView : public ScrollView {
 
   void restoreScrollBar();
 
-  DeprecatedStringList formCompletionItems(const String& name) const;
-  void addFormCompletionItem(const String& name, const String& value);
-
   MouseEventWithHitTestResults prepareMouseEvent(bool readonly,
                                                  bool active,
                                                  bool mouseMove,

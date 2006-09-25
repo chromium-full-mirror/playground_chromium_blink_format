@@ -29,10 +29,10 @@
 #define DocLoader_h
 
 #include "CachePolicy.h"
-#include "DeprecatedStringList.h"
 #include "Settings.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 class CachedCSSStyleSheet;
@@ -93,7 +93,7 @@ class DocLoader {
   friend class Document;
   friend class HTMLImageLoader;
 
-  DeprecatedStringList m_reloadedURLs;
+  HashSet<String> m_reloadedURLs;
   mutable HashMap<String, CachedResource*> m_docObjects;
   time_t m_expireDate;
   CachePolicy m_cachePolicy;

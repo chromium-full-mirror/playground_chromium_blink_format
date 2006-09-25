@@ -24,7 +24,7 @@
 #define KSVG_SVGHelper_H
 #ifdef SVG_SUPPORT
 
-#include "DeprecatedString.h"
+#include "PlatformString.h"
 
 namespace WebCore {
 
@@ -40,9 +40,9 @@ class SVGHelper {
                                     const SVGElement* viewportElement,
                                     LengthMode mode);
 
-  static void ParseSeperatedList(SVGStringList* list,
-                                 const DeprecatedString& data,
-                                 const DeprecatedChar& delimiter = ',');
+  static void parseSeparatedList(SVGStringList* list,
+                                 const String& data,
+                                 UChar delimiter = ',');
 };
 
 // Lazy creation, template-based

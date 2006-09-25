@@ -129,7 +129,7 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
     RefPtr<SVGStringList> temp = new SVGStringList();
 
     // Feed data into list
-    SVGHelper::ParseSeperatedList(temp.get(), value.deprecatedString(), ';');
+    SVGHelper::parseSeparatedList(temp.get(), value, ';');
 
     ExceptionCode ec = 0;
 
@@ -230,16 +230,13 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
       m_calcMode = CALCMODE_PACED;
   } else if (attr->name() == SVGNames::valuesAttr) {
     m_values = new SVGStringList();
-    SVGHelper::ParseSeperatedList(m_values.get(), value.deprecatedString(),
-                                  ';');
+    SVGHelper::parseSeparatedList(m_values.get(), value, ';');
   } else if (attr->name() == SVGNames::keyTimesAttr) {
     m_keyTimes = new SVGStringList();
-    SVGHelper::ParseSeperatedList(m_keyTimes.get(), value.deprecatedString(),
-                                  ';');
+    SVGHelper::parseSeparatedList(m_keyTimes.get(), value, ';');
   } else if (attr->name() == SVGNames::keySplinesAttr) {
     m_keySplines = new SVGStringList();
-    SVGHelper::ParseSeperatedList(m_keySplines.get(), value.deprecatedString(),
-                                  ';');
+    SVGHelper::parseSeparatedList(m_keySplines.get(), value, ';');
   } else if (attr->name() == SVGNames::fromAttr)
     m_from = value.deprecatedString();
   else if (attr->name() == SVGNames::toAttr)

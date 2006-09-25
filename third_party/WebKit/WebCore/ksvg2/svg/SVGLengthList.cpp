@@ -36,16 +36,16 @@ SVGLengthList::SVGLengthList() : SVGList<RefPtr<SVGLength>>() {}
 
 SVGLengthList::~SVGLengthList() {}
 
-void SVGLengthList::parse(const DeprecatedString& value,
+void SVGLengthList::parse(const String& value,
                           const SVGStyledElement* context,
                           LengthMode mode) {
   ExceptionCode ec = 0;
 
-  DeprecatedStringList lengths = DeprecatedStringList::split(' ', value);
-  for (unsigned int i = 0; i < lengths.count(); i++) {
+  Vector<String> lengths = value.split(' ');
+  Vector<String>::const_iterator end = lengths.end();
+  for (Vector<String>::const_iterator it = lengths.begin(); it != end; ++it) {
     SVGLength* length = new SVGLength(context, mode);
-    String str(lengths[i]);
-    length->setValueAsString(str);
+    length->setValueAsString(*it);
     appendItem(length, ec);
   }
 }
