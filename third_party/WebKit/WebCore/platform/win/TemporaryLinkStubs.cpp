@@ -246,7 +246,7 @@ Widget::FocusPolicy TextField::focusPolicy() const {
   return NoFocus;
 }
 
-Cursor::Cursor(Image*) {
+Cursor::Cursor(Image*, const IntPoint&) {
   notImplemented();
 }
 
