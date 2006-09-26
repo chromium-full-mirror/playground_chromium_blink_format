@@ -193,9 +193,9 @@ class SVGElement : public StyledElement {
   virtual bool isSupported(StringImpl* feature, StringImpl* version) const;
 
   String id() const;
-  void setId(const String&);
+  void setId(const String&, ExceptionCode&);
   String xmlbase() const;
-  void setXmlbase(const String&);
+  void setXmlbase(const String&, ExceptionCode&);
 
   SVGSVGElement* ownerSVGElement() const;
   SVGElement* viewportElement() const;

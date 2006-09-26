@@ -34,11 +34,18 @@
 #include "Range.h"
 #include "RangeException.h"
 #include "xmlhttprequest.h"
-#include "XPathEvaluator.h"
 #include "kjs_dom.h"
 #include "kjs_window.h"
 #include <kjs/collector.h>
 #include <wtf/HashMap.h>
+
+#ifdef SVG_SUPPORT
+#include "SVGException.h"
+#endif
+
+#ifdef XPATH_SUPPORT
+#include "XPathEvaluator.h"
+#endif
 
 using namespace WebCore;
 using namespace EventNames;
@@ -304,6 +311,11 @@ static const char* const xpathExceptionNames[] = {"INVALID_EXPRESSION_ERR",
                                                   "TYPE_ERR"};
 #endif
 
+#ifdef SVG_SUPPORT
+static const char* const svgExceptionNames[] = {
+    "SVG_WRONG_TYPE_ERR", "SVG_INVALID_VALUE_ERR", "SVG_MATRIX_NOT_INVERTABLE"};
+#endif
+
 void setDOMException(ExecState* exec, ExceptionCode ec) {
   if (ec == 0 || exec->hadException())
     return;
@@ -352,6 +364,14 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
     nameTable = xpathExceptionNames;
     nameTableSize =
         sizeof(xpathExceptionNames) / sizeof(xpathExceptionNames[0]);
+#endif
+#ifdef SVG_SUPPORT
+  } else if (code >= SVGExceptionOffset && code <= SVGExceptionMax) {
+    type = "DOM SVG";
+    code -= SVGExceptionOffset;
+    nameIndex = code;
+    nameTable = svgExceptionNames;
+    nameTableSize = sizeof(svgExceptionNames) / sizeof(svgExceptionNames[0]);
 #endif
   } else {
     nameIndex = code;
