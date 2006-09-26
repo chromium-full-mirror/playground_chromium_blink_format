@@ -75,10 +75,10 @@ class RenderTextControl : public RenderFlexibleBox {
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
 
- private:
   VisiblePosition visiblePositionForIndex(int index);
   int indexForVisiblePosition(const VisiblePosition&);
 
+ private:
   RefPtr<HTMLTextFieldInnerElement> m_div;
   bool m_dirty;
   bool m_multiLine;
