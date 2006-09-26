@@ -115,11 +115,11 @@ void SVGFESpecularLightingElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::inAttr)
     setIn1BaseValue(value);
   else if (attr->name() == SVGNames::surfaceScaleAttr)
-    setSurfaceScaleBaseValue(value.deprecatedString().toDouble());
+    setSurfaceScaleBaseValue(value.toDouble());
   else if (attr->name() == SVGNames::specularConstantAttr)
-    setSpecularConstantBaseValue(value.deprecatedString().toDouble());
+    setSpecularConstantBaseValue(value.toDouble());
   else if (attr->name() == SVGNames::specularExponentAttr)
-    setSpecularExponentBaseValue(value.deprecatedString().toDouble());
+    setSpecularExponentBaseValue(value.toDouble());
   else if (attr->name() == SVGNames::kernelUnitLengthAttr) {
     DeprecatedStringList numbers =
         DeprecatedStringList::split(' ', value.deprecatedString());
