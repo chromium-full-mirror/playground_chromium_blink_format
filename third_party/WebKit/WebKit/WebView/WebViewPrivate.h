@@ -112,7 +112,8 @@ typedef enum {
 // These methods are still in flux; don't rely on them yet.
 - (unsigned)markAllMatchesForText:(NSString*)string
                     caseSensitive:(BOOL)caseFlag
-                        highlight:(BOOL)highlight;
+                        highlight:(BOOL)highlight
+                            limit:(unsigned)limit;
 - (void)unmarkAllTextMatches;
 - (NSArray*)rectsForTextMatches;
 

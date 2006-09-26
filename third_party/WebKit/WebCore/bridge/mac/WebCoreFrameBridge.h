@@ -331,7 +331,8 @@ typedef enum {
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
 - (unsigned)markAllMatchesForText:(NSString*)string
-                    caseSensitive:(BOOL)caseFlag;
+                    caseSensitive:(BOOL)caseFlag
+                            limit:(unsigned)limit;
 - (BOOL)markedTextMatchesAreHighlighted;
 - (void)setMarkedTextMatchesAreHighlighted:(BOOL)doHighlight;
 - (void)unmarkAllTextMatches;

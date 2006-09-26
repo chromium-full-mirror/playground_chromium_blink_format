@@ -3479,7 +3479,9 @@ bool Frame::findString(const String& target,
   return true;
 }
 
-unsigned Frame::markAllMatchesForText(const String& target, bool caseFlag) {
+unsigned Frame::markAllMatchesForText(const String& target,
+                                      bool caseFlag,
+                                      unsigned limit) {
   if (target.isEmpty())
     return 0;
 
@@ -3502,7 +3504,12 @@ unsigned Frame::markAllMatchesForText(const String& target, bool caseFlag) {
       break;
 
     ++matchCount;
+
     document()->addMarker(resultRange.get(), DocumentMarker::TextMatch);
+
+    // Stop looking if we hit the specified limit. A limit of 0 means no limit.
+    if (limit > 0 && matchCount >= limit)
+      break;
 
     setStart(searchRange.get(), newStart);
   } while (true);
