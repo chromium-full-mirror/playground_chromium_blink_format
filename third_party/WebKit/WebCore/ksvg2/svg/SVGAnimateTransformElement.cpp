@@ -193,10 +193,10 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
           useTimePercentage = 1.0;
         }
 
-        m_toTransform = parseTransformValue(value2.deprecatedString());
+        m_toTransform = parseTransformValue(value2);
         m_toRotateSpecialCase = m_rotateSpecialCase;
 
-        m_fromTransform = parseTransformValue(value1.deprecatedString());
+        m_fromTransform = parseTransformValue(value1);
         m_fromRotateSpecialCase = m_rotateSpecialCase;
 
         m_currentItem = itemByPercentage;
@@ -326,8 +326,8 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
 }
 
 RefPtr<SVGTransform> SVGAnimateTransformElement::parseTransformValue(
-    const DeprecatedString& data) const {
-  DeprecatedString parse = data.stripWhiteSpace();
+    const String& data) const {
+  DeprecatedString parse = data.deprecatedString().stripWhiteSpace();
   if (parse.isEmpty())
     return 0;
 

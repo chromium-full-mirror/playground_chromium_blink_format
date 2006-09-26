@@ -368,18 +368,24 @@ RenderObject* SVGSVGElement::createRenderer(RenderArena* arena, RenderStyle*) {
   RenderSVGContainer* rootContainer = new (arena) RenderSVGContainer(this);
 
   // FIXME: all this setup should be done after attributesChanged, not here.
-  float _x = x()->value();
-  float _y = y()->value();
-  float _width = width()->value();
-  float _height = height()->value();
-
-  rootContainer->setViewport(FloatRect(_x, _y, _width, _height));
+  rootContainer->setViewport(FloatRect(x()->value(), y()->value(),
+                                       width()->value(), height()->value()));
   rootContainer->setViewBox(viewBox());
   rootContainer->setAlign(KCAlign(preserveAspectRatio()->align() - 1));
   rootContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
                           SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
 
   return rootContainer;
+}
+
+void SVGSVGElement::insertedIntoDocument() {
+  document()->accessSVGExtensions()->addTimeContainer(this);
+  SVGStyledLocatableElement::insertedIntoDocument();
+}
+
+void SVGSVGElement::removedFromDocument() {
+  document()->accessSVGExtensions()->removeTimeContainer(this);
+  SVGStyledLocatableElement::removedFromDocument();
 }
 
 void SVGSVGElement::setZoomAndPan(unsigned short zoomAndPan) {

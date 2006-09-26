@@ -272,11 +272,9 @@ void SVGTimer::notifyAll() {
     HashMap<String, Color>::iterator cend = targetColor.end();
     for (HashMap<String, Color>::iterator cit = targetColor.begin();
          cit != cend; ++cit) {
-      if (cit->second.isValid()) {
-        SVGAnimationElement::setTargetAttribute(
-            targetIterator->first, cit->first.impl(),
-            String(cit->second.name()).impl());
-      }
+      if (cit->second.isValid())
+        SVGAnimationElement::setTargetAttribute(targetIterator->first,
+                                                cit->first, cit->second.name());
     }
   }
 

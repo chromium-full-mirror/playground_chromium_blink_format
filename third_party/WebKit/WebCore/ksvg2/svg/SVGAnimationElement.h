@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGAnimationElementImpl_H
-#define KSVG_SVGAnimationElementImpl_H
+#ifndef SVGAnimationElement_H
+#define SVGAnimationElement_H
 #ifdef SVG_SUPPORT
 
 #include "SVGExternalResourcesRequired.h"
@@ -86,17 +86,17 @@ class SVGAnimationElement : public SVGElement,
   // Helpers
   virtual void handleTimerEvent(double timePercentage) = 0;
 
-  double parseClockValue(const DeprecatedString& data) const;
+  double parseClockValue(const String&) const;
 
   String targetAttribute() const;
-  void setTargetAttribute(StringImpl* value);
+  void setTargetAttribute(const String&);
 
   static void setTargetAttribute(SVGElement* target,
-                                 StringImpl* name,
-                                 StringImpl* value,
-                                 EAttributeType type = ATTRIBUTETYPE_AUTO);
+                                 const String& name,
+                                 const String& value,
+                                 EAttributeType = ATTRIBUTETYPE_AUTO);
 
-  DeprecatedString attributeName() const;
+  String attributeName() const;
 
   bool connected() const;
 
@@ -134,12 +134,12 @@ class SVGAnimationElement : public SVGElement,
   unsigned m_accumulate : 1;     // EAccumulateMode
   unsigned m_attributeType : 2;  // EAttributeType
 
-  DeprecatedString m_to;
-  DeprecatedString m_by;
-  DeprecatedString m_from;
-  DeprecatedString m_href;
-  DeprecatedString m_repeatDur;
-  DeprecatedString m_attributeName;
+  String m_to;
+  String m_by;
+  String m_from;
+  String m_href;
+  String m_repeatDur;
+  String m_attributeName;
 
   double m_max;
   double m_min;
@@ -157,6 +157,6 @@ class SVGAnimationElement : public SVGElement,
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGAnimationElementImpl_H
+#endif  // SVGAnimationElement_H
 
 // vim:ts=4:noet

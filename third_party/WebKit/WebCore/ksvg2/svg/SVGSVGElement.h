@@ -123,6 +123,9 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
   // 'virtual SVGZoomAndPan functions
   virtual void setZoomAndPan(unsigned short zoomAndPan);
 
