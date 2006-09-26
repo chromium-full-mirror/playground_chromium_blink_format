@@ -95,6 +95,7 @@ class ScrollView : public Widget {
   ~ScrollView();
 
   virtual void paint(GraphicsContext*, const IntRect&);
+  virtual void themeChanged();
 
  private:
   void updateScrollBars();
