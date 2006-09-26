@@ -86,7 +86,8 @@ class ResourceLoaderInternal {
         m_writing(false),
         m_formDataString(0),
         m_formDataLength(0),
-        m_bytesRemainingToWrite(0)
+        m_bytesRemainingToWrite(0),
+        m_hasReceivedResponse(false)
 #endif
 #if PLATFORM(GDK)
         ,
@@ -126,7 +127,8 @@ class ResourceLoaderInternal {
         m_writing(false),
         m_formDataString(0),
         m_formDataLength(0),
-        m_bytesRemainingToWrite(0)
+        m_bytesRemainingToWrite(0),
+        m_hasReceivedResponse(false)
 #endif
 #if PLATFORM(GDK)
         ,
@@ -167,6 +169,7 @@ class ResourceLoaderInternal {
   int m_formDataLength;
   int m_bytesRemainingToWrite;
   String m_postReferrer;
+  bool m_hasReceivedResponse;
 #endif
 #if PLATFORM(GDK)
   CURL* m_handle;

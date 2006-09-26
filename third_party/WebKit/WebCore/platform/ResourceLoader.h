@@ -88,6 +88,8 @@ class ResourceLoader {
 #endif
 
 #if USE(WININET)
+  void setHasReceivedResponse(bool b = true);
+  bool hasReceivedResponse() const;
   void fileLoadTimer(Timer<ResourceLoader>* timer);
   void onHandleCreated(LPARAM);
   void onRequestRedirected(LPARAM);

@@ -717,7 +717,7 @@ bool ScrollBar::scroll(ScrollDirection, ScrollGranularity, float) {
 bool ScrollBar::setValue(int) {
   return false;
 }
-void ScrollBar::setKnobProportion(int, int) {}
+void ScrollBar::setProportion(int, int) {}
 
 ListBox::ListBox() {}
 ListBox::~ListBox() {}
