@@ -33,10 +33,7 @@
 #include "PDFDocumentImage.h"
 #include "PlatformString.h"
 #include <ApplicationServices/ApplicationServices.h>
-
-#if PLATFORM(MAC)
 #include "WebCoreSystemInterface.h"
-#endif
 
 namespace WebCore {
 
@@ -279,11 +276,9 @@ void Image::drawTiled(GraphicsContext* ctxt,
 
     ctxt->save();
 
-#if PLATFORM(MAC)
     // FIXME: Really want a public API for this.
     wkSetPatternPhaseInUserSpace(
         context, CGPointMake(oneTileRect.origin.x, oneTileRect.origin.y));
-#endif
 
     CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(NULL);
     CGContextSetFillColorSpace(context, patternSpace);
@@ -385,11 +380,9 @@ void Image::drawTiled(GraphicsContext* ctxt,
     if (vRule == Image::RepeatTile)
       vPhase -= fmodf(ir.size.height, scaleY * tileSize.height) / 2.0f;
 
-#if PLATFORM(MAC)
     // FIXME: Really want a public API for this.
     wkSetPatternPhaseInUserSpace(
         context, CGPointMake(ir.origin.x - hPhase, ir.origin.y - vPhase));
-#endif
 
     CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(NULL);
     CGContextSetFillColorSpace(context, patternSpace);
