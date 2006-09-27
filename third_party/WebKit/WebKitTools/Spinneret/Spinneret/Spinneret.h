@@ -41,7 +41,7 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
   virtual HRESULT STDMETHODCALLTYPE didStartProvisionalLoadForFrame(
       /* [in] */ IWebView* webView,
       /* [in] */ IWebFrame* /*frame*/) {
-    return updateAddressBar(webView);
+    return S_OK;
   }
 
   virtual HRESULT STDMETHODCALLTYPE
@@ -61,7 +61,7 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
   virtual HRESULT STDMETHODCALLTYPE didCommitLoadForFrame(
       /* [in] */ IWebView* webView,
       /* [in] */ IWebFrame* frame) {
-    return S_OK;
+    return updateAddressBar(webView);
   }
 
   virtual HRESULT STDMETHODCALLTYPE didReceiveTitle(
@@ -81,7 +81,7 @@ class SpinneretWebHost : public IWebFrameLoadDelegate {
   virtual HRESULT STDMETHODCALLTYPE didFinishLoadForFrame(
       /* [in] */ IWebView* webView,
       /* [in] */ IWebFrame* /*frame*/) {
-    return updateAddressBar(webView);
+    return S_OK;
   }
 
   virtual HRESULT STDMETHODCALLTYPE didFailLoadWithError(
