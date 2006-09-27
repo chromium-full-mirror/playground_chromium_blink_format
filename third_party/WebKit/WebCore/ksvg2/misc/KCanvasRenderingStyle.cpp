@@ -66,19 +66,13 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
 
   SVGPaint* fill = style->svgStyle()->fillPaint();
 
-  KRenderingPaintServer* fillPaintServer;
-  if (!fill) {
-    // initial value (black)
-    fillPaintServer = sharedSolidPaintServer();
-    static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
-        ->setColor(Color::black);
-  } else if (fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
-    String id(fill->uri());
-    fillPaintServer =
-        getPaintServerById(item->document(), AtomicString(id.substring(1)));
+  KRenderingPaintServer* fillPaintServer = 0;
+  if (fill && fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
+    fillPaintServer = getPaintServerById(
+        item->document(), AtomicString(fill->uri().substring(1)));
     if (item && fillPaintServer && item->isRenderPath())
       fillPaintServer->addClient(static_cast<const RenderPath*>(item));
-  } else {
+  } else if (fill) {
     fillPaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
@@ -86,6 +80,13 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
       fillPaintServerSolid->setColor(style->color());
     else
       fillPaintServerSolid->setColor(fill->color());
+  }
+
+  if (!fillPaintServer) {
+    // default value (black), see bug 11017
+    fillPaintServer = sharedSolidPaintServer();
+    static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
+        ->setColor(Color::black);
   }
 
   return fillPaintServer;
@@ -106,11 +107,10 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
 
   SVGPaint* stroke = style->svgStyle()->strokePaint();
 
-  KRenderingPaintServer* strokePaintServer;
+  KRenderingPaintServer* strokePaintServer = 0;
   if (stroke && stroke->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
-    String id(stroke->uri());
-    strokePaintServer =
-        getPaintServerById(item->document(), AtomicString(id.substring(1)));
+    strokePaintServer = getPaintServerById(
+        item->document(), AtomicString(stroke->uri().substring(1)));
     if (item && strokePaintServer && item->isRenderPath())
       strokePaintServer->addClient(static_cast<const RenderPath*>(item));
   } else {
