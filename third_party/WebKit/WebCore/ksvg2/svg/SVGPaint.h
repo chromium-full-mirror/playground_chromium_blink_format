@@ -66,6 +66,9 @@ class SVGPaint : public SVGColor {
 
   virtual String cssText() const;
 
+  static SVGPaint* defaultFill();
+  static SVGPaint* defaultStroke();
+
  private:
   SVGPaintType m_paintType;
   String m_uri;

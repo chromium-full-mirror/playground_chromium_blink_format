@@ -29,17 +29,14 @@
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "KRenderingFillPainter.h"
-#include "KRenderingPaintServer.h"
 #include "KRenderingPaintServerGradient.h"
 #include "KRenderingPaintServerSolid.h"
 #include "KRenderingStrokePainter.h"
-#include "PlatformString.h"
 #include "RenderObject.h"
 #include "SVGLength.h"
 #include "SVGRenderStyle.h"
 #include "SVGStyledElement.h"
 #include "ksvg.h"
-#include "RenderStyle.h"
 
 namespace WebCore {
 
@@ -52,8 +49,8 @@ static KRenderingPaintServerSolid* sharedSolidPaintServer() {
 }
 
 bool KSVGPainterFactory::isFilled(const RenderStyle* style) {
-  SVGPaint* fill = style->svgStyle()->fillPaint();
-  if (fill && fill->paintType() == SVGPaint::SVG_PAINTTYPE_NONE)
+  if (style->svgStyle()->fillPaint()->paintType() ==
+      SVGPaint::SVG_PAINTTYPE_NONE)
     return false;
   return true;
 }
@@ -67,12 +64,18 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
   SVGPaint* fill = style->svgStyle()->fillPaint();
 
   KRenderingPaintServer* fillPaintServer = 0;
-  if (fill && fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
+  if (fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
     fillPaintServer = getPaintServerById(
         item->document(), AtomicString(fill->uri().substring(1)));
-    if (item && fillPaintServer && item->isRenderPath())
+    if (fillPaintServer && item->isRenderPath())
       fillPaintServer->addClient(static_cast<const RenderPath*>(item));
-  } else if (fill) {
+    if (!fillPaintServer) {
+      // default value (black), see bug 11017
+      fillPaintServer = sharedSolidPaintServer();
+      static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
+          ->setColor(Color::black);
+    }
+  } else {
     fillPaintServer = sharedSolidPaintServer();
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
@@ -81,20 +84,12 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
     else
       fillPaintServerSolid->setColor(fill->color());
   }
-
-  if (!fillPaintServer) {
-    // default value (black), see bug 11017
-    fillPaintServer = sharedSolidPaintServer();
-    static_cast<KRenderingPaintServerSolid*>(fillPaintServer)
-        ->setColor(Color::black);
-  }
-
   return fillPaintServer;
 }
 
 bool KSVGPainterFactory::isStroked(const RenderStyle* style) {
-  SVGPaint* stroke = style->svgStyle()->strokePaint();
-  if (!stroke || stroke->paintType() == SVGPaint::SVG_PAINTTYPE_NONE)
+  if (style->svgStyle()->strokePaint()->paintType() ==
+      SVGPaint::SVG_PAINTTYPE_NONE)
     return false;
   return true;
 }
@@ -108,7 +103,7 @@ KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
   SVGPaint* stroke = style->svgStyle()->strokePaint();
 
   KRenderingPaintServer* strokePaintServer = 0;
-  if (stroke && stroke->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
+  if (stroke->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
     strokePaintServer = getPaintServerById(
         item->document(), AtomicString(stroke->uri().substring(1)));
     if (item && strokePaintServer && item->isRenderPath())

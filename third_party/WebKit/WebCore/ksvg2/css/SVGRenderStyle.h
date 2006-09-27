@@ -21,13 +21,13 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGRenderStyle_H
-#define KSVG_SVGRenderStyle_H
+#ifndef SVGRenderStyle_H
+#define SVGRenderStyle_H
 #ifdef SVG_SUPPORT
 
 #include "DataRef.h"
-#include <ksvg2/svg/SVGPaint.h>
-#include <ksvg2/css/SVGRenderStyleDefs.h>
+#include "SVGPaint.h"
+#include "SVGRenderStyleDefs.h"
 #include <wtf/Platform.h>
 
 #if PLATFORM(WIN_OS)
@@ -64,14 +64,14 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
  public:
   SVGRenderStyle();
   SVGRenderStyle(bool);  // Used to create the default style.
-  SVGRenderStyle(const SVGRenderStyle& other);
+  SVGRenderStyle(const SVGRenderStyle&);
   ~SVGRenderStyle();
 
-  bool inheritedNotEqual(const SVGRenderStyle* other) const;
+  bool inheritedNotEqual(const SVGRenderStyle*) const;
 
-  void inheritFrom(const SVGRenderStyle* inheritParent);
+  void inheritFrom(const SVGRenderStyle*);
 
-  bool operator==(const SVGRenderStyle& o) const;
+  bool operator==(const SVGRenderStyle&) const;
   bool operator!=(const SVGRenderStyle& o) const { return !(*this == o); }
 
   // SVG CSS Properties
@@ -137,7 +137,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            paint,
                                            FillPaint,
                                            fillPaint,
-                                           0)
+                                           SVGPaint::defaultFill())
 
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
                                            stroke,
@@ -150,7 +150,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            paint,
                                            StrokePaint,
                                            strokePaint,
-                                           0)
+                                           SVGPaint::defaultStroke())
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueList*,
                                            stroke,
                                            dashArray,
@@ -334,6 +334,6 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGRenderStyle_H
+#endif  // SVGRenderStyle_H
 
 // vim:ts=4:noet
