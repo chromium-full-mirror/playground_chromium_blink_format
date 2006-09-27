@@ -189,9 +189,13 @@ void SVGLength::updateValue(bool notify) {
       m_value = (m_valueInSpecifiedUnits / 6.0) * dpi();
       break;
     case SVG_LENGTHTYPE_EMS:
-    case SVG_LENGTHTYPE_EXS:
-      if (m_context && m_context->renderer()) {
-        RenderStyle* style = m_context->renderer()->style();
+    case SVG_LENGTHTYPE_EXS: {
+      RenderStyle* style = 0;
+      if (m_context && m_context->renderer())
+        style = m_context->renderer()->style();
+      else if (m_viewportElement && m_viewportElement->renderer())
+        style = m_viewportElement->renderer()->style();
+      if (style) {
         float useSize = style->fontSize();
         ASSERT(useSize > 0);
         if (m_unitType == SVG_LENGTHTYPE_EMS)
@@ -209,6 +213,7 @@ void SVGLength::updateValue(bool notify) {
         m_requiresLayout = true;
       }
       break;
+    }
     case SVG_LENGTHTYPE_UNKNOWN:
     case SVG_LENGTHTYPE_NUMBER:
     case SVG_LENGTHTYPE_PERCENTAGE:

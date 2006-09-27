@@ -30,6 +30,9 @@
 #include "KRenderingDevice.h"
 #include "SVGStyledElement.h"
 #include "GraphicsContext.h"
+#include "SVGLength.h"
+#include "SVGMarkerElement.h"
+#include "SVGSVGElement.h"
 #include "SVGStyledTransformableElement.h"
 
 namespace WebCore {
@@ -86,6 +89,9 @@ void RenderSVGContainer::calcMinMaxWidth() {
 void RenderSVGContainer::layout() {
   ASSERT(needsLayout());
   ASSERT(minMaxKnown());
+
+  if (selfNeedsLayout())
+    calcViewport();
 
   IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
@@ -202,12 +208,25 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     paintInfo.p->restore();
 }
 
-void RenderSVGContainer::setViewport(const FloatRect& viewport) {
-  m_viewport = viewport;
-}
-
 FloatRect RenderSVGContainer::viewport() const {
   return m_viewport;
+}
+
+void RenderSVGContainer::calcViewport() {
+  SVGElement* svgelem = static_cast<SVGElement*>(element());
+  if (svgelem->hasTagName(SVGNames::svgTag)) {
+    SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
+    double x = svg->x()->value();
+    double y = svg->y()->value();
+    double w = svg->width()->value();
+    double h = svg->height()->value();
+    m_viewport = FloatRect(x, y, w, h);
+  } else if (svgelem->hasTagName(SVGNames::markerTag)) {
+    SVGMarkerElement* svg = static_cast<SVGMarkerElement*>(element());
+    double w = svg->markerWidth()->value();
+    double h = svg->markerHeight()->value();
+    m_viewport = FloatRect(0, 0, w, h);
+  }
 }
 
 void RenderSVGContainer::setViewBox(const FloatRect& viewBox) {
