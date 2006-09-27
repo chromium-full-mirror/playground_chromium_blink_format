@@ -215,10 +215,11 @@ class Font {
 
   friend struct WidthIterator;
 
-  // Useful for debugging the complex font rendering code path.
+  // Useful for debugging the different font rendering code paths.
  public:
-  static void setAlwaysUseComplexPath(bool);
-  static bool gAlwaysUseComplexPath;
+  enum CodePath { Auto, Simple, Complex };
+  static void setCodePath(CodePath);
+  static CodePath codePath;
 
   static const uint8_t gRoundingHackCharacterTable[256];
   static bool treatAsSpace(UChar c) {
