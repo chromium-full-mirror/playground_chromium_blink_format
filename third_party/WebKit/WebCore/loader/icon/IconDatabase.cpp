@@ -1036,7 +1036,8 @@ inline void readySQLStatement(SQLStatement*& statement,
   }
   if (!statement) {
     statement = new SQLStatement(db, str);
-    int result = statement->prepare();
+    int result;
+    result = statement->prepare();
     ASSERT(result == SQLResultOk);
   }
 }
