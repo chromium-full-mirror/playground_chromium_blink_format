@@ -1027,13 +1027,17 @@ IconDatabase::~IconDatabase() {
 inline void readySQLStatement(SQLStatement*& statement,
                               SQLDatabase& db,
                               const String& str) {
-  if (statement && statement->database() != &db) {
+  if (statement && (statement->database() != &db || statement->isExpired())) {
+    if (statement->isExpired())
+      LOG(IconDatabase, "SQLStatement associated with %s is expired",
+          str.ascii().data());
     delete statement;
     statement = 0;
   }
   if (!statement) {
     statement = new SQLStatement(db, str);
-    statement->prepare();
+    int result = statement->prepare();
+    ASSERT(result == SQLResultOk);
   }
 }
 
@@ -1057,12 +1061,18 @@ bool IconDatabase::pageURLTableIsEmptyQuery(SQLDatabase& db) {
 
 void IconDatabase::imageDataForIconURLQuery(SQLDatabase& db,
                                             const String& iconURL,
-                                            Vector<unsigned char>& result) {
+                                            Vector<unsigned char>& imageData) {
   readySQLStatement(m_imageDataForIconURLStatement, db,
                     "SELECT Icon.data FROM Icon WHERE Icon.url = (?);");
   m_imageDataForIconURLStatement->bindText16(1, iconURL, false);
-  m_imageDataForIconURLStatement->step();
-  m_imageDataForIconURLStatement->getColumnBlobAsVector(0, result);
+
+  int result = m_imageDataForIconURLStatement->step();
+  imageData.clear();
+  if (result == SQLResultRow)
+    m_imageDataForIconURLStatement->getColumnBlobAsVector(0, imageData);
+  else if (result != SQLResultDone)
+    LOG_ERROR("imageDataForIconURLQuery failed");
+
   m_imageDataForIconURLStatement->reset();
 }
 
@@ -1071,8 +1081,16 @@ int IconDatabase::timeStampForIconURLQuery(SQLDatabase& db,
   readySQLStatement(m_timeStampForIconURLStatement, db,
                     "SELECT Icon.stamp FROM Icon WHERE Icon.url = (?);");
   m_timeStampForIconURLStatement->bindText16(1, iconURL, false);
-  m_timeStampForIconURLStatement->step();
-  int result = m_timeStampForIconURLStatement->getColumnInt(0);
+
+  int result = m_timeStampForIconURLStatement->step();
+  if (result == SQLResultRow)
+    result = m_timeStampForIconURLStatement->getColumnInt(0);
+  else {
+    if (result != SQLResultDone)
+      LOG_ERROR("timeStampForIconURLQuery failed");
+    result = 0;
+  }
+
   m_timeStampForIconURLStatement->reset();
   return result;
 }
@@ -1083,17 +1101,26 @@ String IconDatabase::iconURLForPageURLQuery(SQLDatabase& db,
                     "SELECT Icon.url FROM Icon, PageURL WHERE PageURL.url = "
                     "(?) AND Icon.iconID = PageURL.iconID;");
   m_iconURLForPageURLStatement->bindText16(1, pageURL, false);
-  m_iconURLForPageURLStatement->step();
-  String result = m_iconURLForPageURLStatement->getColumnText16(0);
+
+  int result = m_iconURLForPageURLStatement->step();
+  String iconURL;
+  if (result == SQLResultRow)
+    iconURL = m_iconURLForPageURLStatement->getColumnText16(0);
+  else if (result != SQLResultDone)
+    LOG_ERROR("iconURLForPageURLQuery failed");
+
   m_iconURLForPageURLStatement->reset();
-  return result;
+  return iconURL;
 }
 
 void IconDatabase::forgetPageURLQuery(SQLDatabase& db, const String& pageURL) {
   readySQLStatement(m_forgetPageURLStatement, db,
                     "DELETE FROM PageURL WHERE url = (?);");
   m_forgetPageURLStatement->bindText16(1, pageURL, false);
-  m_forgetPageURLStatement->step();
+
+  if (m_forgetPageURLStatement->step() != SQLResultOk)
+    LOG_ERROR("forgetPageURLQuery failed");
+
   m_forgetPageURLStatement->reset();
 }
 
@@ -1104,7 +1131,10 @@ void IconDatabase::setIconIDForPageURLQuery(SQLDatabase& db,
                     "INSERT INTO PageURL (url, iconID) VALUES ((?), ?);");
   m_setIconIDForPageURLStatement->bindText16(1, pageURL, false);
   m_setIconIDForPageURLStatement->bindInt64(2, iconID);
-  m_setIconIDForPageURLStatement->step();
+
+  if (m_setIconIDForPageURLStatement->step() != SQLResultOk)
+    LOG_ERROR("setIconIDForPageURLQuery failed");
+
   m_setIconIDForPageURLStatement->reset();
 }
 
@@ -1113,8 +1143,16 @@ int64_t IconDatabase::getIconIDForIconURLQuery(SQLDatabase& db,
   readySQLStatement(m_getIconIDForIconURLStatement, db,
                     "SELECT Icon.iconID FROM Icon WHERE Icon.url = (?);");
   m_getIconIDForIconURLStatement->bindText16(1, iconURL, false);
-  m_getIconIDForIconURLStatement->step();
-  int64_t result = m_getIconIDForIconURLStatement->getColumnInt64(0);
+
+  int64_t result = m_getIconIDForIconURLStatement->step();
+  if (result == SQLResultRow)
+    result = m_getIconIDForIconURLStatement->getColumnInt64(0);
+  else {
+    if (result != SQLResultDone)
+      LOG_ERROR("getIconIDForIconURLQuery failed");
+    result = 0;
+  }
+
   m_getIconIDForIconURLStatement->reset();
   return result;
 }
@@ -1124,9 +1162,15 @@ int64_t IconDatabase::addIconForIconURLQuery(SQLDatabase& db,
   readySQLStatement(m_addIconForIconURLStatement, db,
                     "INSERT INTO Icon (url) VALUES ((?));");
   m_addIconForIconURLStatement->bindText16(1, iconURL, false);
-  int64_t result = 0;
-  if (m_addIconForIconURLStatement->step() == SQLResultOk)
+
+  int64_t result = m_addIconForIconURLStatement->step();
+  if (result == SQLResultOk)
     result = db.lastInsertRowID();
+  else {
+    LOG_ERROR("addIconForIconURLQuery failed");
+    result = 0;
+  }
+
   m_addIconForIconURLStatement->reset();
   return result;
 }
@@ -1136,9 +1180,14 @@ bool IconDatabase::hasIconForIconURLQuery(SQLDatabase& db,
   readySQLStatement(m_hasIconForIconURLStatement, db,
                     "SELECT Icon.iconID FROM Icon WHERE Icon.url = (?);");
   m_hasIconForIconURLStatement->bindText16(1, iconURL, false);
-  bool result = m_hasIconForIconURLStatement->step() == SQLResultRow;
+
+  int result = m_hasIconForIconURLStatement->step();
+
+  if (result != SQLResultRow && result != SQLResultDone)
+    LOG_ERROR("hasIconForIconURLQuery failed");
+
   m_hasIconForIconURLStatement->reset();
-  return result;
+  return result == SQLResultRow;
 }
 
 }  // namespace WebCore

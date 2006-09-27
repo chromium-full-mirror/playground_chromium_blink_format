@@ -67,6 +67,8 @@ class SQLStatement : public Noncopyable {
   // returns false otherwise
   bool returnsAtLeastOneResult();
 
+  bool isExpired();
+
   // Returns -1 on last-step failing.  Otherwise, returns number of rows
   // returned in the last step()
   int columnCount();

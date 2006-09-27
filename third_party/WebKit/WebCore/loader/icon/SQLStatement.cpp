@@ -354,4 +354,8 @@ bool SQLStatement::returnDoubleResults(int col, Vector<double>& v) {
   return result;
 }
 
+bool SQLStatement::isExpired() {
+  return m_statement ? sqlite3_expired(m_statement) : true;
+}
+
 }  // namespace WebCore
