@@ -123,18 +123,12 @@ int ScrollView::contentsHeight() const {
   return m_data->contentsSize.height();
 }
 
-IntPoint ScrollView::viewportToContents(const IntPoint& contentsPoint) {
-  POINT point = contentsPoint;
-  MapWindowPoints(GetAncestor(containingWindow(), GA_ROOT), containingWindow(),
-                  &point, 1);
-  return IntPoint(point) + scrollOffset();
+IntPoint ScrollView::viewportToContents(const IntPoint& viewportPoint) {
+  return IntPoint(viewportPoint) + scrollOffset();
 }
 
-IntPoint ScrollView::contentsToViewport(const IntPoint& viewportPoint) {
-  POINT point = viewportPoint - scrollOffset();
-  MapWindowPoints(containingWindow(), GetAncestor(containingWindow(), GA_ROOT),
-                  &point, 1);
-  return point;
+IntPoint ScrollView::contentsToViewport(const IntPoint& contentsPoint) {
+  return contentsPoint - scrollOffset();
 }
 
 IntSize ScrollView::scrollOffset() const {
