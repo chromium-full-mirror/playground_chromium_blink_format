@@ -970,6 +970,7 @@ void RenderLayer::valueChanged(ScrollBar*) {
 ScrollBar* RenderLayer::createScrollbar(ScrollBarOrientation orientation) {
   if (ScrollBar::hasPlatformScrollBars()) {
     PlatformScrollBar* widget = new PlatformScrollBar(this, orientation);
+    widget->ref();
     m_object->element()->document()->view()->addChild(widget);
     return widget;
   }
@@ -983,7 +984,7 @@ void RenderLayer::destroyScrollbar(ScrollBarOrientation orientation) {
     if (m_hBar->isWidget()) {
       m_object->element()->document()->view()->removeChild(
           horizontalScrollbarWidget());
-      delete m_hBar;
+      m_hBar->deref();
       m_hBar = 0;
     }
 
@@ -992,7 +993,7 @@ void RenderLayer::destroyScrollbar(ScrollBarOrientation orientation) {
     if (m_vBar->isWidget()) {
       m_object->element()->document()->view()->removeChild(
           verticalScrollbarWidget());
-      delete m_vBar;
+      m_vBar->deref();
       m_vBar = 0;
     }
 
