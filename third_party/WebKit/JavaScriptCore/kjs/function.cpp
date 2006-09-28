@@ -271,7 +271,6 @@ bool FunctionImp::deleteProperty(ExecState* exec,
  * function f2(x, x): getParameterName(0) --> null
  */
 Identifier FunctionImp::getParameterName(int index) {
-  ASSERT(static_cast<size_t>(index) == index);
   if (static_cast<size_t>(index) > parameters.size())
     return Identifier::null();
 
