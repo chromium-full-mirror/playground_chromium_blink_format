@@ -29,6 +29,7 @@
 
 #include "CSSMutableStyleDeclaration.h"
 #include "CachePolicy.h"
+#include "CommandByName.h"
 #include "DOMWindow.h"
 #include "Decoder.h"
 #include "EditCommand.h"
@@ -88,6 +89,7 @@ class FramePrivate {
         m_bMousePressed(false),
         m_selectionController(thisFrame),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
+        m_command(thisFrame),
         m_caretVisible(false),
         m_caretBlinks(true),
         m_caretPaint(true),
@@ -193,6 +195,8 @@ class FramePrivate {
   SelectionController m_selectionController;
   Selection m_mark;
   Timer<Frame> m_caretBlinkTimer;
+
+  CommandByName m_command;
 
   bool m_caretVisible : 1;
   bool m_caretBlinks : 1;

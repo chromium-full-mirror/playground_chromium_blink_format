@@ -55,6 +55,7 @@ class RootObject;
 
 namespace WebCore {
 
+class CommandByName;
 class CSSComputedStyleDeclaration;
 class CSSMutableStyleDeclaration;
 class CSSStyleDeclaration;
@@ -895,6 +896,8 @@ class Frame : public Shared<Frame>, Noncopyable {
   SelectionController* selectionController() const;
   SelectionController* dragCaretController() const;
   DOMWindow* domWindow() const;
+
+  CommandByName* command() const;
 
  private:
   friend class FramePrivate;

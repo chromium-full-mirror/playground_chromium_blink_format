@@ -32,6 +32,8 @@
 #include <wtf/Vector.h>
 #include <limits.h>
 
+typedef void UBreakIterator;
+
 #if PLATFORM(CF)
 typedef const struct __CFString* CFStringRef;
 #endif
@@ -176,6 +178,8 @@ bool equalIgnoringCase(const StringImpl*, const char*);
 inline bool equalIgnoringCase(const char* a, const StringImpl* b) {
   return equalIgnoringCase(b, a);
 }
+
+UBreakIterator* getWordBreakIterator(const UChar* string, int length);
 }
 
 namespace WTF {

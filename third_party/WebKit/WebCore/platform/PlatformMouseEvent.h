@@ -104,7 +104,7 @@ class PlatformMouseEvent {
   PlatformMouseEvent(NSEvent*);
 #endif
 #if PLATFORM(WIN)
-  PlatformMouseEvent(HWND, WPARAM, LPARAM, int clickCount);
+  PlatformMouseEvent(HWND, WPARAM, LPARAM);
 #endif
 #if PLATFORM(GDK)
   PlatformMouseEvent(GdkEvent*);

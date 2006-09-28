@@ -1234,6 +1234,10 @@ SelectionController* Frame::selectionController() const {
   return &(d->m_selectionController);
 }
 
+CommandByName* Frame::command() const {
+  return &(d->m_command);
+}
+
 TextGranularity Frame::selectionGranularity() const {
   return d->m_selectionGranularity;
 }
