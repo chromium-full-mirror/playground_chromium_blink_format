@@ -1119,7 +1119,7 @@ void IconDatabase::forgetPageURLQuery(SQLDatabase& db, const String& pageURL) {
                     "DELETE FROM PageURL WHERE url = (?);");
   m_forgetPageURLStatement->bindText16(1, pageURL, false);
 
-  if (m_forgetPageURLStatement->step() != SQLResultOk)
+  if (m_forgetPageURLStatement->step() != SQLResultDone)
     LOG_ERROR("forgetPageURLQuery failed");
 
   m_forgetPageURLStatement->reset();
@@ -1133,7 +1133,7 @@ void IconDatabase::setIconIDForPageURLQuery(SQLDatabase& db,
   m_setIconIDForPageURLStatement->bindText16(1, pageURL, false);
   m_setIconIDForPageURLStatement->bindInt64(2, iconID);
 
-  if (m_setIconIDForPageURLStatement->step() != SQLResultOk)
+  if (m_setIconIDForPageURLStatement->step() != SQLResultDone)
     LOG_ERROR("setIconIDForPageURLQuery failed");
 
   m_setIconIDForPageURLStatement->reset();
@@ -1165,7 +1165,7 @@ int64_t IconDatabase::addIconForIconURLQuery(SQLDatabase& db,
   m_addIconForIconURLStatement->bindText16(1, iconURL, false);
 
   int64_t result = m_addIconForIconURLStatement->step();
-  if (result == SQLResultOk)
+  if (result == SQLResultDone)
     result = db.lastInsertRowID();
   else {
     LOG_ERROR("addIconForIconURLQuery failed");
