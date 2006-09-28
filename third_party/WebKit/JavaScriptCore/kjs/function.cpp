@@ -150,18 +150,22 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
 }
 
 void FunctionImp::addParameter(const Identifier& n) {
-  parameters.append(Parameter(n));
+  if (!parameters)
+    parameters.set(new Vector<Parameter>);
+
+  parameters->append(Parameter(n));
 }
 
 UString FunctionImp::parameterString() const {
   UString s;
 
-  Vector<Parameter>::const_iterator end = parameters.end();
-  for (Vector<Parameter>::const_iterator it = parameters.begin(); it < end;
-       it++) {
+  if (!parameters)
+    return s;
+
+  for (size_t i = 0; i < parameters->size(); ++i) {
     if (!s.isEmpty())
       s += ", ";
-    s += it->name.ustring();
+    s += parameters->at(i).name.ustring();
   }
 
   return s;
@@ -169,6 +173,9 @@ UString FunctionImp::parameterString() const {
 
 // ECMA 10.1.3q
 void FunctionImp::processParameters(ExecState* exec, const List& args) {
+  if (!parameters)
+    return;
+
   JSObject* variable = exec->context()->variableObject();
 
 #ifdef KJS_VERBOSE
@@ -181,21 +188,20 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
   ListIterator it = args.begin();
 
   JSValue* v = *it;
-  Vector<Parameter>::const_iterator end = parameters.end();
-  for (Vector<Parameter>::iterator pit = parameters.begin(); pit < end; pit++) {
+  for (size_t i = 0; i < parameters->size(); ++i) {
     if (it != args.end()) {
 #ifdef KJS_VERBOSE
-      fprintf(stderr, "setting parameter %s ", p->name.ascii());
+      fprintf(stderr, "setting parameter %s ", parameters->at(i).name.ascii());
       printInfo(exec, "to", *it);
 #endif
-      variable->put(exec, pit->name, v);
+      variable->put(exec, parameters->at(i).name, v);
       v = ++it;
     } else
-      variable->put(exec, pit->name, jsUndefined());
+      variable->put(exec, parameters->at(i).name, jsUndefined());
   }
 #ifdef KJS_VERBOSE
   else {
-    for (int i = 0; i < args.size(); i++)
+    for (int i = 0; i < args.size(); ++i)
       printInfo(exec, "setting argument", args[i]);
   }
 #endif
@@ -224,7 +230,7 @@ JSValue* FunctionImp::lengthGetter(ExecState*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
-  return jsNumber(thisObj->parameters.size());
+  return jsNumber(thisObj->parameters ? thisObj->parameters->size() : 0);
 }
 
 bool FunctionImp::getOwnPropertySlot(ExecState* exec,
@@ -271,16 +277,17 @@ bool FunctionImp::deleteProperty(ExecState* exec,
  * function f2(x, x): getParameterName(0) --> null
  */
 Identifier FunctionImp::getParameterName(int index) {
-  if (static_cast<size_t>(index) > parameters.size())
+  if (!parameters)
     return Identifier::null();
 
-  Identifier name = parameters[index].name;
+  if (static_cast<size_t>(index) >= parameters->size())
+    return Identifier::null();
+
+  Identifier name = parameters->at(index).name;
 
   // Are there any subsequent parameters with the same name?
-  Vector<Parameter>::const_iterator end = parameters.end();
-  for (Vector<Parameter>::iterator it = &(parameters[index + 1]); it < end;
-       it++)
-    if (it->name == name)
+  for (size_t i = index + 1; i < parameters->size(); ++i)
+    if (parameters->at(i).name == name)
       return Identifier::null();
 
   return name;

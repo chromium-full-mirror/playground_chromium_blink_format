@@ -100,7 +100,7 @@ class FunctionImp : public InternalFunctionImp {
   virtual void mark();
 
  protected:
-  Vector<Parameter> parameters;
+  OwnPtr<Vector<Parameter>> parameters;
 
  private:
   ScopeChain _scope;
