@@ -30,6 +30,7 @@
 #include "UChar.h"
 #include <memory>
 #include <wtf/Noncopyable.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -47,7 +48,7 @@ class TextCodec : Noncopyable {
                          bool allowEntities = false) = 0;
 
  protected:
-  static void appendOmittingBOM(String&, const UChar*, size_t length);
+  static void appendOmittingBOM(Vector<UChar>&, const UChar*, size_t length);
 };
 
 typedef void (*EncodingNameRegistrar)(const char* alias, const char* name);

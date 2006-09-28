@@ -201,36 +201,51 @@ class VectorBuffer;
 template <typename T>
 class VectorBuffer<T, 0> {
  public:
-  VectorBuffer() : m_capacity(0), m_buffer(0) {}
+  VectorBuffer() : m_buffer(0), m_capacity(0) {}
 
-  VectorBuffer(size_t capacity) : m_capacity(0) { allocateBuffer(capacity); }
+  VectorBuffer(size_t capacity)
+#if !ASSERT_DISABLED
+      : m_capacity(0)
+#endif
+  {
+    allocateBuffer(capacity);
+  }
 
   ~VectorBuffer() { deallocateBuffer(m_buffer); }
 
-  void deallocateBuffer(T* buffer) { fastFree(buffer); }
+  static void deallocateBuffer(T* buffer) { fastFree(buffer); }
 
   void allocateBuffer(size_t newCapacity) {
     ASSERT(newCapacity >= m_capacity);
     m_capacity = newCapacity;
     if (newCapacity > std::numeric_limits<size_t>::max() / sizeof(T))
       abort();
-    m_buffer = reinterpret_cast<T*>(fastMalloc(newCapacity * sizeof(T)));
+    m_buffer = static_cast<T*>(fastMalloc(newCapacity * sizeof(T)));
   }
 
   T* buffer() { return m_buffer; }
   const T* buffer() const { return m_buffer; }
   size_t capacity() const { return m_capacity; }
 
+  T* releaseBuffer() {
+    T* buffer = m_buffer;
+    m_buffer = 0;
+    m_capacity = 0;
+    return buffer;
+  }
+
  protected:
   VectorBuffer(T* buffer, size_t capacity)
-      : m_capacity(capacity), m_buffer(buffer) {}
+      : m_buffer(buffer), m_capacity(capacity) {}
 
-  size_t m_capacity;
   T* m_buffer;
+
+ private:
+  size_t m_capacity;
 };
 
 template <typename T, size_t inlineCapacity>
-class VectorBuffer : public VectorBuffer<T, 0> {
+class VectorBuffer : private VectorBuffer<T, 0> {
  private:
   typedef VectorBuffer<T, 0> BaseBuffer;
 
@@ -239,11 +254,11 @@ class VectorBuffer : public VectorBuffer<T, 0> {
 
   VectorBuffer(size_t capacity) : BaseBuffer(inlineBuffer(), inlineCapacity) {
     if (capacity > inlineCapacity)
-      BaseBuffer::allocateBuffer(capacity);
+      allocateBuffer(capacity);
   }
 
   ~VectorBuffer() {
-    if (BaseBuffer::buffer() == inlineBuffer())
+    if (buffer() == inlineBuffer())
       BaseBuffer::m_buffer = 0;
   }
 
@@ -252,9 +267,21 @@ class VectorBuffer : public VectorBuffer<T, 0> {
       BaseBuffer::deallocateBuffer(buffer);
   }
 
+  using BaseBuffer::allocateBuffer;
+
+  using BaseBuffer::buffer;
+  using BaseBuffer::capacity;
+
+  T* releaseBuffer() {
+    if (buffer() == inlineBuffer())
+      return 0;
+    return BaseBuffer::releaseBuffer();
+  }
+
  private:
   static const size_t m_inlineBufferSize = inlineCapacity * sizeof(T);
   T* inlineBuffer() { return reinterpret_cast<T*>(&m_inlineBuffer); }
+
   char m_inlineBuffer[m_inlineBufferSize];
 };
 
@@ -351,6 +378,8 @@ class Vector {
 
   void fill(const T& val, size_t size);
   void fill(const T& val) { fill(val, size()); }
+
+  T* releaseBuffer();
 
  private:
   void expandCapacity(size_t newMinCapacity);
@@ -533,6 +562,21 @@ inline void Vector<T, inlineCapacity>::remove(size_t position) {
   spot->~T();
   TypeOperations::moveOverlapping(spot + 1, end(), spot);
   --m_size;
+}
+
+template <typename T, size_t inlineCapacity>
+T* Vector<T, inlineCapacity>::releaseBuffer() {
+  T* buffer = m_impl.releaseBuffer();
+  if (!buffer && m_size) {
+    // If the vector had some data, but no buffer to release,
+    // that means it was using the inline buffer. In that case,
+    // we create a brand new buffer so the caller always gets one.
+    size_t bytes = m_size * sizeof(T);
+    buffer = static_cast<T*>(fastMalloc(bytes));
+    memcpy(buffer, data(), bytes);
+  }
+  m_size = 0;
+  return buffer;
 }
 
 template <typename T, size_t inlineCapacity>

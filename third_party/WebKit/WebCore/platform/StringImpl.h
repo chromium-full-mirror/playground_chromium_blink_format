@@ -74,6 +74,7 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
   ~StringImpl();
 
   static StringImpl* newUninitialized(size_t length, UChar*& characterBuffer);
+  static StringImpl* adopt(Vector<UChar>&);
 
   const UChar* characters() const { return m_data; }
   unsigned length() const { return m_length; }

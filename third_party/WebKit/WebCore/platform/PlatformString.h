@@ -61,6 +61,7 @@ class String {
   String(StringImpl* i) : m_impl(i) {}
 
   static String newUninitialized(size_t length, UChar*& characterBuffer);
+  static String adopt(Vector<UChar>&);
 
   operator KJS::Identifier() const;
   operator KJS::UString() const;
