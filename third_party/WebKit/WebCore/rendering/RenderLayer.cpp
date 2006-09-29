@@ -835,13 +835,6 @@ void RenderLayer::autoscroll() {
   scrollToOffset(xOffset + diffX, yOffset + diffY);
 }
 
-bool RenderLayer::shouldAutoscroll() {
-  if (renderer()->hasOverflowClip() &&
-      (m_object->scrollsOverflow() || renderer()->node()->isContentEditable()))
-    return true;
-  return false;
-}
-
 void RenderLayer::resize(const PlatformMouseEvent& evt,
                          const IntSize& offsetFromResizeCorner) {
   if (!inResizeMode() || !renderer()->hasOverflowClip() ||
@@ -969,7 +962,8 @@ void RenderLayer::valueChanged(ScrollBar*) {
 
 ScrollBar* RenderLayer::createScrollbar(ScrollBarOrientation orientation) {
   if (ScrollBar::hasPlatformScrollBars()) {
-    PlatformScrollBar* widget = new PlatformScrollBar(this, orientation);
+    PlatformScrollBar* widget =
+        new PlatformScrollBar(this, orientation, RegularScrollBar);
     widget->ref();
     m_object->element()->document()->view()->addChild(widget);
     return widget;

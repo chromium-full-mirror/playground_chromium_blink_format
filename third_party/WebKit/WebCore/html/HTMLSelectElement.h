@@ -58,7 +58,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   virtual void recalcStyle(StyleChange);
 
   int selectedIndex() const;
-  void setSelectedIndex(int index, bool = true);
+  void setSelectedIndex(int index, bool deselect = true);
+  void notifyOptionSelected(HTMLOptionElement* selectedOption, bool selected);
 
   virtual bool isEnumeratable() const { return true; }
 
@@ -111,7 +112,6 @@ class HTMLSelectElement : public HTMLGenericFormElement {
     return m_listItems;
   }
   virtual void reset();
-  void notifyOptionSelected(HTMLOptionElement* selectedOption, bool selected);
 
   virtual void defaultEventHandler(Event*);
   virtual void accessKeyAction(bool sendToAnyElement);
@@ -129,7 +129,13 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
  private:
   void recalcListItems() const;
-  bool shouldUseMenuList() const { return !m_multiple && m_size <= 1; }
+  void deselectItems(HTMLOptionElement* excludeElement);
+  bool usesMenuList() const { return !m_multiple && m_size <= 1; }
+  int lastSelectedListIndex() const;
+  int nextSelectableListIndex(int startIndex);
+  int previousSelectableListIndex(int startIndex);
+  void menuListDefaultEventHandler(Event*);
+  void listBoxDefaultEventHandler(Event*);
 
   mutable Vector<HTMLElement*> m_listItems;
   int m_minwidth;

@@ -79,6 +79,8 @@ class HTMLOptionElement : public HTMLGenericFormElement {
 
   String optionText();
 
+  virtual bool disabled() const;
+
  private:
   String m_value;
   bool m_selected;

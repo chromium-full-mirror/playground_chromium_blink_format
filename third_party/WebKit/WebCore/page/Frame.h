@@ -833,7 +833,7 @@ class Frame : public Shared<Frame>, Noncopyable {
   virtual void cleanupPluginObjects() {}
   void cancelAndClear();
 
-  void handleAutoscroll(RenderLayer*);
+  void handleAutoscroll(RenderObject*);
   void startAutoscrollTimer();
   void stopAutoscrollTimer();
 

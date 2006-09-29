@@ -50,6 +50,8 @@ enum ScrollGranularity {
 
 enum ScrollBarOrientation { HorizontalScrollBar, VerticalScrollBar };
 
+enum ScrollBarControlSize { RegularScrollBar, SmallScrollBar, MiniScrollBar };
+
 class ScrollBarClient {
  public:
   virtual ~ScrollBarClient() {}
@@ -58,7 +60,7 @@ class ScrollBarClient {
 
 class ScrollBar : public Shared<ScrollBar> {
  protected:
-  ScrollBar(ScrollBarClient*, ScrollBarOrientation);
+  ScrollBar(ScrollBarClient*, ScrollBarOrientation, ScrollBarControlSize);
 
  public:
   virtual ~ScrollBar() {}
@@ -67,6 +69,8 @@ class ScrollBar : public Shared<ScrollBar> {
 
   ScrollBarOrientation orientation() const { return m_orientation; }
   int value() const { return m_currentPos; }
+
+  ScrollBarControlSize controlSize() const { return m_controlSize; }
 
   void setSteps(int lineStep, int pageStep);
 
@@ -107,6 +111,7 @@ class ScrollBar : public Shared<ScrollBar> {
 
   ScrollBarClient* m_client;
   ScrollBarOrientation m_orientation;
+  ScrollBarControlSize m_controlSize;
   int m_visibleSize;
   int m_totalSize;
   int m_currentPos;

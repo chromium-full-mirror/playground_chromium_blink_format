@@ -122,6 +122,7 @@ class FrameViewPrivate {
       repaintRects->clear();
     resizingFrameSet = 0;
     m_resizeLayer = 0;
+    m_currentMousePosition = IntPoint();
   }
 
   RefPtr<Node> underMouse;
@@ -181,6 +182,8 @@ class FrameViewPrivate {
   bool horizontalOverflow;
   bool m_verticalOverflow;
   RenderObject* m_viewportRenderer;
+
+  IntPoint m_currentMousePosition;
 };
 
 FrameView::FrameView(Frame* frame)
@@ -570,6 +573,10 @@ static Frame* subframeForEvent(const MouseEventWithHitTestResults& mev) {
   return static_cast<FrameView*>(widget)->frame();
 }
 
+IntPoint FrameView::currentMousePosition() const {
+  return d->m_currentMousePosition;
+}
+
 void FrameView::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   if (!m_frame->document())
     return;
@@ -577,6 +584,7 @@ void FrameView::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(this);
 
   d->mousePressed = true;
+  d->m_currentMousePosition = convertFromContainingWindow(mouseEvent.pos());
 
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(false, true, false, mouseEvent);
@@ -638,6 +646,7 @@ void FrameView::handleMouseDoubleClickEvent(
 
   // We get this instead of a second mouse-up
   d->mousePressed = false;
+  d->m_currentMousePosition = convertFromContainingWindow(mouseEvent.pos());
 
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(false, true, false, mouseEvent);
@@ -781,6 +790,7 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
     return;
 
   RefPtr<FrameView> protector(this);
+  d->m_currentMousePosition = convertFromContainingWindow(mouseEvent.pos());
 
   if (d->hoverTimer.isActive())
     d->hoverTimer.stop();
@@ -847,6 +857,7 @@ void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(this);
 
   d->mousePressed = false;
+  d->m_currentMousePosition = convertFromContainingWindow(mouseEvent.pos());
 
   if (d->resizingFrameSet) {
     dispatchMouseEvent(mouseupEvent, d->resizingFrameSet.get(), true,

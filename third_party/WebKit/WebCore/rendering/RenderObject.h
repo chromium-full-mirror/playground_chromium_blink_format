@@ -279,6 +279,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isFrameSet() const { return false; }
   virtual bool isApplet() const { return false; }
   virtual bool isMenuList() const { return false; }
+  virtual bool isListBox() const { return false; }
 
 #ifdef SVG_SUPPORT
   virtual bool isKCanvasContainer() const { return false; }
@@ -759,6 +760,8 @@ class RenderObject : public CachedResourceClient {
   virtual bool scroll(ScrollDirection direction,
                       ScrollGranularity granularity,
                       float multiplier = 1.0);
+  virtual bool shouldAutoscroll() const;
+  virtual void autoscroll();
 
   // The following seven functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The

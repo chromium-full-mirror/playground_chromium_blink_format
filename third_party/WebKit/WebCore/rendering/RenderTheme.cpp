@@ -119,6 +119,7 @@ bool RenderTheme::paint(RenderObject* o,
     case MenulistButtonAppearance:
     case TextFieldAppearance:
     case TextAreaAppearance:
+    case ListboxAppearance:
       return true;
     default:
       break;
@@ -138,6 +139,7 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
   switch (o->style()->appearance()) {
     case TextFieldAppearance:
       return paintTextField(o, i, r);
+    case ListboxAppearance:
     case TextAreaAppearance:
       return paintTextArea(o, i, r);
     case MenulistButtonAppearance:
@@ -167,6 +169,7 @@ bool RenderTheme::paintDecorations(RenderObject* o,
       return paintMenuListButton(o, i, r);
     case TextFieldAppearance:
     case TextAreaAppearance:
+    case ListboxAppearance:
     case CheckboxAppearance:
     case RadioAppearance:
     case PushButtonAppearance:
@@ -214,6 +217,22 @@ Color RenderTheme::platformInactiveSelectionForegroundColor() const {
   return Color();
 }
 
+Color RenderTheme::activeListBoxSelectionBackgroundColor() const {
+  return Color(56, 117, 215);
+}
+
+Color RenderTheme::activeListBoxSelectionForegroundColor() const {
+  return Color(255, 255, 255);
+}
+
+Color RenderTheme::inactiveListBoxSelectionBackgroundColor() const {
+  return Color(212, 212, 212);
+}
+
+Color RenderTheme::inactiveListBoxSelectionForegroundColor() const {
+  return Color(0, 0, 0);
+}
+
 short RenderTheme::baselinePosition(const RenderObject* o) const {
   return o->height() + o->marginTop();
 }
@@ -233,6 +252,7 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
     case PushButtonAppearance:
     case SquareButtonAppearance:
     case ButtonAppearance:
+    case ListboxAppearance:
     case MenulistAppearance:
     case TextFieldAppearance:
     case TextAreaAppearance: {
@@ -252,7 +272,8 @@ bool RenderTheme::supportsFocusRing(const RenderStyle* style) const {
   return (style->hasAppearance() &&
           style->appearance() != TextFieldAppearance &&
           style->appearance() != TextAreaAppearance &&
-          style->appearance() != MenulistButtonAppearance);
+          style->appearance() != MenulistButtonAppearance &&
+          style->appearance() != ListboxAppearance);
 }
 
 bool RenderTheme::stateChanged(RenderObject* o, ControlState state) const {

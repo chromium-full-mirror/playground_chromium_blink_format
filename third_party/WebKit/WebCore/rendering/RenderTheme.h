@@ -142,6 +142,12 @@ class RenderTheme {
   virtual Color platformActiveSelectionForegroundColor() const;
   virtual Color platformInactiveSelectionForegroundColor() const;
 
+  // List Box selection color
+  virtual Color activeListBoxSelectionBackgroundColor() const;
+  virtual Color activeListBoxSelectionForegroundColor() const;
+  virtual Color inactiveListBoxSelectionBackgroundColor() const;
+  virtual Color inactiveListBoxSelectionForegroundColor() const;
+
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const = 0;
 
