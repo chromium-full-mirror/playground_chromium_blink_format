@@ -40,8 +40,6 @@ using namespace HTMLNames;
 HTMLIFrameElement::HTMLIFrameElement(Document* doc)
     : HTMLFrameElement(iframeTag, doc), needWidgetUpdate(false) {
   m_frameBorder = false;
-  m_marginWidth = -1;
-  m_marginHeight = -1;
 }
 
 HTMLIFrameElement::~HTMLIFrameElement() {}
@@ -160,17 +158,6 @@ void HTMLIFrameElement::recalcStyle(StyleChange ch) {
   HTMLElement::recalcStyle(ch);
 }
 
-void HTMLIFrameElement::openURL() {
-  if (!isURLAllowed(m_URL))
-    return;
-  if (m_URL.isEmpty())
-    m_URL = "about:blank";
-
-  document()->frame()->requestFrame(this, m_URL, m_name);
-  if (contentFrame())
-    contentFrame()->setInViewSourceMode(viewSourceMode());
-}
-
 bool HTMLIFrameElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == srcAttr;
 }
@@ -189,10 +176,6 @@ String HTMLIFrameElement::height() const {
 
 void HTMLIFrameElement::setHeight(const String& value) {
   setAttribute(heightAttr, value);
-}
-
-String HTMLIFrameElement::src() const {
-  return document()->completeURL(getAttribute(srcAttr));
 }
 
 String HTMLIFrameElement::width() const {

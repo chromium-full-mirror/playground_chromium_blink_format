@@ -62,11 +62,7 @@ class HTMLIFrameElement : public HTMLFrameElement {
   String width() const;
   void setWidth(const String&);
 
-  virtual String src() const;
-
  protected:
-  virtual void openURL();
-
   bool needWidgetUpdate;
 
  private:
