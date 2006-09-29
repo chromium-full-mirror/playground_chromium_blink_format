@@ -859,7 +859,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   // the cursor in view.
 
   IntPoint currentPoint =
-      m_object->document()->view()->viewportToContents(evt.pos());
+      m_object->document()->view()->convertFromContainingWindow(evt.pos());
   currentPoint += offsetFromResizeCorner;
 
   int x;

@@ -123,12 +123,12 @@ int ScrollView::contentsHeight() const {
   return m_data->contentsSize.height();
 }
 
-IntPoint ScrollView::viewportToContents(const IntPoint& viewportPoint) {
-  return IntPoint(viewportPoint) + scrollOffset();
+IntPoint ScrollView::convertToContainingWindow(const IntPoint& point) const {
+  return contentsPoint - scrollOffset();
 }
 
-IntPoint ScrollView::contentsToViewport(const IntPoint& contentsPoint) {
-  return contentsPoint - scrollOffset();
+IntPoint ScrollView::convertFromContainingWindow(const IntPoint& point) const {
+  return IntPoint(point) + scrollOffset();
 }
 
 IntSize ScrollView::scrollOffset() const {
