@@ -105,6 +105,7 @@ class PlatformMouseEvent {
 #endif
 #if PLATFORM(WIN)
   PlatformMouseEvent(HWND, WPARAM, LPARAM);
+  void setClickCount(int count) { m_clickCount = count; }
 #endif
 #if PLATFORM(GDK)
   PlatformMouseEvent(GdkEvent*);
