@@ -64,6 +64,8 @@ class MediaQueryEvaluator {
    */
   MediaQueryEvaluator(const String& acceptedMediaType,
                       bool mediaFeatureResult = false);
+  MediaQueryEvaluator(const char* acceptedMediaType,
+                      bool mediaFeatureResult = false);
 
   /** Creates evaluator which evaluates full media queries
    */
