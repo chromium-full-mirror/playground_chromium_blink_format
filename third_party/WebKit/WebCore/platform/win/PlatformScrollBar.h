@@ -46,6 +46,9 @@ class PlatformScrollBar : public Widget, public ScrollBar {
   virtual void setEnabled(bool);
   virtual void paint(GraphicsContext*, const IntRect& damageRect);
 
+  virtual void handleMouseMoveEvent(const PlatformMouseEvent&){};
+  virtual void handleMouseOutEvent(const PlatformMouseEvent&){};
+
  protected:
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
