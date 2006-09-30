@@ -1388,8 +1388,10 @@ void Document::setURL(const DeprecatedString& url) {
     m_styleSelector->setEncodedURL(m_url);
 }
 
-void Document::setStyleSheet(const String& url, const String& sheet) {
-  m_sheet = new CSSStyleSheet(this, url);
+void Document::setCSSStyleSheet(const String& url,
+                                const String& charset,
+                                const String& sheet) {
+  m_sheet = new CSSStyleSheet(this, url, charset);
   m_sheet->parseString(sheet);
   m_loadingSheet = false;
 
@@ -1874,7 +1876,7 @@ void Document::recalcStyleSelector() {
 
           CSSStyleSheet* cssSheet = new CSSStyleSheet(this);
           cssSheet->parseString(sheetText);
-          pi->setStyleSheet(cssSheet);
+          pi->setCSSStyleSheet(cssSheet);
           sheet = cssSheet;
         }
       }

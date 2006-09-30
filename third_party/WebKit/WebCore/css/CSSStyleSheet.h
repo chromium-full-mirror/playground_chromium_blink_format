@@ -39,10 +39,14 @@ typedef int ExceptionCode;
 class CSSStyleSheet : public StyleSheet {
  public:
   CSSStyleSheet(Node* parentNode,
-                String href = String(),
-                bool _implicit = false);
-  CSSStyleSheet(CSSStyleSheet* parentSheet, String href = String());
-  CSSStyleSheet(CSSRule* ownerRule, String href = String());
+                const String& href = String(),
+                const String& charset = String());
+  CSSStyleSheet(CSSStyleSheet* parentSheet,
+                const String& href = String(),
+                const String& charset = String());
+  CSSStyleSheet(CSSRule* ownerRule,
+                const String& href = String(),
+                const String& charset = String());
 
   ~CSSStyleSheet();
 
@@ -74,12 +78,12 @@ class CSSStyleSheet : public StyleSheet {
   virtual void checkLoaded();
   DocLoader* docLoader();
   Document* doc() { return m_doc; }
-  bool implicit() { return m_implicit; }
+  const String& charset() const { return m_charset; }
 
  protected:
   Document* m_doc;
-  bool m_implicit;
   CSSNamespace* m_namespaces;
+  String m_charset;
 };
 
 }  // namespace

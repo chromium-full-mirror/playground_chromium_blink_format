@@ -45,7 +45,7 @@ class XSLImportRule : public CachedResourceClient, public StyleBase {
   XSLStyleSheet* parentStyleSheet() const;
 
   // from CachedResourceClient
-  virtual void setStyleSheet(const String& url, const String& sheet);
+  virtual void setXSLStyleSheet(const String& url, const String& sheet);
 
   bool isLoading();
   void loadSheet();

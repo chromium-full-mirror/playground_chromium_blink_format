@@ -26,19 +26,19 @@
 
 namespace WebCore {
 
-StyleSheet::StyleSheet(StyleSheet* parentSheet, String href)
+StyleSheet::StyleSheet(StyleSheet* parentSheet, const String& href)
     : StyleList(parentSheet),
       m_parentNode(0),
       m_strHref(href),
       m_disabled(false) {}
 
-StyleSheet::StyleSheet(Node* parentNode, String href)
+StyleSheet::StyleSheet(Node* parentNode, const String& href)
     : StyleList(0),
       m_parentNode(parentNode),
       m_strHref(href),
       m_disabled(false) {}
 
-StyleSheet::StyleSheet(StyleBase* owner, String href)
+StyleSheet::StyleSheet(StyleBase* owner, const String& href)
     : StyleList(owner), m_parentNode(0), m_strHref(href), m_disabled(false) {}
 
 StyleSheet::~StyleSheet() {

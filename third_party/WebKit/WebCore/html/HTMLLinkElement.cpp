@@ -179,7 +179,10 @@ void HTMLLinkElement::process() {
       if (!isAlternate())
         document()->addPendingSheet();
 
-      DeprecatedString chset = getAttribute(charsetAttr).deprecatedString();
+      String chset = getAttribute(charsetAttr);
+      if (chset.isEmpty() && document()->frame())
+        chset = document()->frame()->encoding();
+
       if (m_cachedSheet) {
         if (m_loading) {
           document()->stylesheetLoaded();
@@ -187,7 +190,8 @@ void HTMLLinkElement::process() {
         m_cachedSheet->deref(this);
       }
       m_loading = true;
-      m_cachedSheet = document()->docLoader()->requestStyleSheet(m_url, chset);
+      m_cachedSheet =
+          document()->docLoader()->requestCSSStyleSheet(m_url, chset);
       if (m_cachedSheet)
         m_cachedSheet->ref(this);
     }
@@ -208,8 +212,10 @@ void HTMLLinkElement::removedFromDocument() {
   process();
 }
 
-void HTMLLinkElement::setStyleSheet(const String& url, const String& sheetStr) {
-  m_sheet = new CSSStyleSheet(this, url);
+void HTMLLinkElement::setCSSStyleSheet(const String& url,
+                                       const String& charset,
+                                       const String& sheetStr) {
+  m_sheet = new CSSStyleSheet(this, url, charset);
   m_sheet->parseString(sheetStr, !document()->inCompatMode());
 
   RefPtr<MediaList> media = new MediaList((CSSStyleSheet*)0, m_media, true);

@@ -71,11 +71,11 @@ class Cache {
                                    const KURL& URL,
                                    bool reload,
                                    time_t expireDate);
-  static CachedCSSStyleSheet* requestStyleSheet(DocLoader*,
-                                                const String& URL,
-                                                bool reload,
-                                                time_t expireDate,
-                                                const String& charset);
+  static CachedCSSStyleSheet* requestCSSStyleSheet(DocLoader*,
+                                                   const String& URL,
+                                                   bool reload,
+                                                   time_t expireDate,
+                                                   const String& charset);
   static CachedScript* requestScript(DocLoader*,
                                      const String& URL,
                                      bool reload,

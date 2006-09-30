@@ -45,7 +45,6 @@ class CachedCSSStyleSheet : public CachedResource {
                       CachePolicy,
                       time_t expireDate,
                       const String& charset);
-  CachedCSSStyleSheet(const String& URL, const String& stylesheetData);
   virtual ~CachedCSSStyleSheet();
 
   const String& sheet() const { return m_sheet; }

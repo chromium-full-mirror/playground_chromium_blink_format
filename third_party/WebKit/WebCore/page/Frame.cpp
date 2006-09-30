@@ -123,13 +123,15 @@ class UserStyleSheetLoader : public CachedResourceClient {
  public:
   UserStyleSheetLoader(Frame* frame, const String& url, DocLoader* dl)
       : m_frame(frame),
-        m_cachedSheet(Cache::requestStyleSheet(dl, url, false, 0, "")) {
+        m_cachedSheet(Cache::requestCSSStyleSheet(dl, url, false, 0, "")) {
     m_cachedSheet->ref(this);
   }
   ~UserStyleSheetLoader() { m_cachedSheet->deref(this); }
 
  private:
-  virtual void setStyleSheet(const String& /*URL*/, const String& sheet) {
+  virtual void setCSSStyleSheet(const String& /*URL*/,
+                                const String& /*charset*/,
+                                const String& sheet) {
     m_frame->setUserStyleSheet(sheet);
   }
   Frame* m_frame;
