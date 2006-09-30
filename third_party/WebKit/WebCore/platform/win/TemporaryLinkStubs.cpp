@@ -82,6 +82,23 @@ using namespace WebCore;
 void FrameView::updateBorder() {
   notImplemented();
 }
+bool FrameView::passMousePressEventToSubframe(MouseEventWithHitTestResults& mev,
+                                              Frame* subframe) {
+  return true;
+}
+bool FrameView::passMouseMoveEventToSubframe(MouseEventWithHitTestResults& mev,
+                                             Frame* subframe) {
+  return true;
+}
+bool FrameView::passMouseReleaseEventToSubframe(
+    MouseEventWithHitTestResults& mev,
+    Frame* subframe) {
+  return true;
+}
+bool FrameView::passWheelEventToSubframe(PlatformWheelEvent& e,
+                                         Frame* subframe) {
+  return false;
+}
 
 void Widget::enableFlushDrawing() {
   notImplemented();
@@ -104,7 +121,18 @@ GraphicsContext* Widget::lockDrawingFocus() {
 void Widget::unlockDrawingFocus(GraphicsContext*) {
   notImplemented();
 }
-
+bool Widget::capturingMouse() const {
+  return false;
+}
+void Widget::setCapturingMouse(bool capturingMouse) {}
+Widget* Widget::capturingTarget() {
+  return this;
+}
+Widget* Widget::capturingChild() {
+  return 0;
+}
+void Widget::setCapturingChild(Widget* w) {}
+}
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
                                    Element*,
                                    WTF::HashMap<String, String> const&) {
