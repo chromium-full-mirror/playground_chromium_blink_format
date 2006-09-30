@@ -3241,12 +3241,7 @@ bool Frame::passWidgetMouseDownEventToWidget(
   if (!target)
     return false;
 
-  Widget* widget;
-  if (target->isListBox())
-    widget = static_cast<RenderListBox*>(target)->scrollBarTarget();
-  else
-    widget = RenderLayer::gScrollBar;
-
+  Widget* widget = event.scrollbar();
   if (!widget) {
     if (!target->isWidget())
       return false;

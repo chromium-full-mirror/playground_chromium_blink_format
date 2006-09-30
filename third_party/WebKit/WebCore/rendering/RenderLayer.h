@@ -184,8 +184,6 @@ class RenderLayer : public ScrollBarClient {
     return s.m_rectHidden;
   }
 
-  static PlatformScrollBar* gScrollBar;
-
   RenderLayer(RenderObject*);
   ~RenderLayer();
 

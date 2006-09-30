@@ -55,7 +55,6 @@ RenderListBox::RenderListBox(HTMLSelectElement* element)
       m_optionsWidth(0),
       m_indexOffset(0),
       m_selectionChanged(true),
-      m_scrollBarHit(false),
       m_vBar(0) {}
 
 RenderListBox::~RenderListBox() {
@@ -63,7 +62,6 @@ RenderListBox::~RenderListBox() {
     element()->document()->view()->removeChild(
         static_cast<PlatformScrollBar*>(m_vBar));
     m_vBar->deref();
-    delete m_vBar;
   }
 }
 
@@ -335,11 +333,11 @@ void RenderListBox::paintItemBackground(PaintInfo& i,
     i.p->fillRect(itemBoundingBoxRect(tx, ty, listIndex), backColor);
 }
 
-PlatformScrollBar* RenderListBox::scrollBarTarget() {
-  return m_scrollBarHit ? static_cast<PlatformScrollBar*>(m_vBar) : 0;
-}
-
-bool RenderListBox::isPointInScrollbar(int _x, int _y, int _tx, int _ty) {
+bool RenderListBox::isPointInScrollbar(NodeInfo& info,
+                                       int _x,
+                                       int _y,
+                                       int _tx,
+                                       int _ty) {
   if (!m_vBar)
     return false;
 
@@ -348,8 +346,12 @@ bool RenderListBox::isPointInScrollbar(int _x, int _y, int _tx, int _ty) {
                    height() + borderTopExtra() + borderBottomExtra() -
                        borderTop() - borderBottom());
 
-  m_scrollBarHit = vertRect.contains(_x, _y);
-  return m_scrollBarHit;
+  if (vertRect.contains(_x, _y)) {
+    info.setScrollbar(
+        m_vBar->isWidget() ? static_cast<PlatformScrollBar*>(m_vBar) : 0);
+    return true;
+  }
+  return false;
 }
 
 HTMLOptionElement* RenderListBox::optionAtPoint(int x, int y) {

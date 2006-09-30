@@ -46,7 +46,7 @@ class RenderListBox : public RenderBlock, public ScrollBarClient {
   virtual bool canHaveChildren() const { return false; }
   virtual const char* renderName() const { return "RenderListBox"; }
   virtual void paintObject(PaintInfo&, int tx, int ty);
-  virtual bool isPointInScrollbar(int x, int y, int tx, int ty);
+  virtual bool isPointInScrollbar(NodeInfo&, int x, int y, int tx, int ty);
 
   virtual bool scroll(ScrollDirection direction,
                       ScrollGranularity granularity,
@@ -61,8 +61,6 @@ class RenderListBox : public RenderBlock, public ScrollBarClient {
 
   HTMLOptionElement* optionAtPoint(int x, int y);
 
-  PlatformScrollBar* scrollBarTarget();
-
   bool scrollToRevealElementAtListIndex(int index);
 
   virtual bool shouldAutoscroll() const { return numItems() > size(); }
@@ -75,7 +73,6 @@ class RenderListBox : public RenderBlock, public ScrollBarClient {
   int m_optionsTotalHeight;
   int m_indexOffset;
   bool m_selectionChanged;
-  bool m_scrollBarHit;
 
   int size() const;
   int numItems() const;

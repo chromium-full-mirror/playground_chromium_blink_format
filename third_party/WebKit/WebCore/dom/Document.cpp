@@ -1711,7 +1711,7 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
     const IntPoint& point,
     const PlatformMouseEvent& event) {
   if (!renderer())
-    return MouseEventWithHitTestResults(event, 0, false);
+    return MouseEventWithHitTestResults(event, 0, 0, false);
 
   assert(renderer()->isRenderView());
   RenderObject::NodeInfo renderInfo(readonly, active, mouseMove);
@@ -1723,7 +1723,7 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
   bool isOverLink = renderInfo.URLElement() &&
                     !renderInfo.URLElement()->getAttribute(hrefAttr).isNull();
   return MouseEventWithHitTestResults(event, renderInfo.innerNode(),
-                                      isOverLink);
+                                      renderInfo.scrollbar(), isOverLink);
 }
 
 // DOM Section 1.1.1
