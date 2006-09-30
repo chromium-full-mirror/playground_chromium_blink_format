@@ -669,8 +669,9 @@ int TextField::baselinePosition(int) const {
 void TextField::setLiveSearch(bool) {}
 
 PlatformScrollBar::PlatformScrollBar(ScrollBarClient* client,
-                                     ScrollBarOrientation orientation)
-    : ScrollBar(client, orientation) {}
+                                     ScrollBarOrientation orientation,
+                                     ScrollBarControlSize controlSize)
+    : ScrollBar(client, orientation, controlSize) {}
 PlatformScrollBar::~PlatformScrollBar() {}
 int PlatformScrollBar::width() const {
   return 0;
