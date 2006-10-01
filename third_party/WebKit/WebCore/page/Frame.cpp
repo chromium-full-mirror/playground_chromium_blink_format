@@ -1683,7 +1683,7 @@ void Frame::submitForm(const char* action,
                              boundary);
   }
 
-  if (d->m_doc->parsing() || d->m_runningScripts > 0) {
+  if (d->m_runningScripts > 0) {
     if (d->m_submitForm)
       return;
     d->m_submitForm = new FramePrivate::SubmitForm;
