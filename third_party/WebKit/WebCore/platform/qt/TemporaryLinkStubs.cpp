@@ -241,7 +241,9 @@ Widget::FocusPolicy Slider::focusPolicy() const {
   return NoFocus;
 }
 
-ScrollBar::ScrollBar(ScrollBarClient*, ScrollBarOrientation) {
+ScrollBar::ScrollBar(ScrollBarClient*,
+                     ScrollBarOrientation,
+                     ScrollBarControlSize) {
   notImplemented();
 }
 void ScrollBar::setSteps(int, int) {
@@ -260,8 +262,9 @@ void ScrollBar::setProportion(int, int) {
 }
 
 PlatformScrollBar::PlatformScrollBar(ScrollBarClient* client,
-                                     ScrollBarOrientation orientation)
-    : ScrollBar(client, orientation) {
+                                     ScrollBarOrientation orientation,
+                                     ScrollBarControlSize controlSize)
+    : ScrollBar(client, orientation, controlSize) {
   notImplemented();
 }
 PlatformScrollBar::~PlatformScrollBar() {
@@ -398,6 +401,27 @@ void WebCore::setFocusRingColorChangeFunction(void (*)()) {
 
 void FrameView::updateBorder() {
   notImplemented();
+}
+bool FrameView::passMousePressEventToSubframe(MouseEventWithHitTestResults& mev,
+                                              Frame* subframe) {
+  return true;
+}
+bool FrameView::passMouseMoveEventToSubframe(MouseEventWithHitTestResults& mev,
+                                             Frame* subframe) {
+  return true;
+}
+bool FrameView::passMouseReleaseEventToSubframe(
+    MouseEventWithHitTestResults& mev,
+    Frame* subframe) {
+  return true;
+}
+bool FrameView::passWheelEventToSubframe(PlatformWheelEvent& e,
+                                         Frame* subframe) {
+  return false;
+}
+bool FrameView::passMousePressEventToScrollbar(
+    MouseEventWithHitTestResults& mev) {
+  return false;
 }
 
 bool AXObjectCache::gAccessibilityEnabled = false;
