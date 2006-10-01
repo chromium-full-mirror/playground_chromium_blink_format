@@ -23,10 +23,6 @@
 #include "config.h"
 
 #ifdef SVG_SUPPORT
-
-#include "DeprecatedString.h"
-#include "DeprecatedStringList.h"
-
 #include "SVGMatrix.h"
 #include "SVGSVGElement.h"
 #include "SVGNumberList.h"
@@ -37,11 +33,11 @@ SVGNumberList::SVGNumberList() : SVGList<double>() {}
 
 SVGNumberList::~SVGNumberList() {}
 
-void SVGNumberList::parse(const DeprecatedString& value) {
+void SVGNumberList::parse(const String& value) {
   ExceptionCode ec = 0;
 
-  DeprecatedStringList numbers = DeprecatedStringList::split(' ', value);
-  for (unsigned int i = 0; i < numbers.count(); i++)
+  Vector<String> numbers = value.split(' ');
+  for (unsigned int i = 0; i < numbers.size(); i++)
     appendItem(numbers[i].toDouble(), ec);
 }
 
