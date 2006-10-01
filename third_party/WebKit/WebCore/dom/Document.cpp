@@ -1829,17 +1829,12 @@ void Document::updateStyleSelector() {
   }
 }
 
-DeprecatedStringList Document::availableStyleSheets() const {
-  return m_availableSheets;
-}
-
 void Document::recalcStyleSelector() {
   if (!renderer() || !attached())
     return;
 
   DeprecatedPtrList<StyleSheet> oldStyleSheets = m_styleSheets->styleSheets;
   m_styleSheets->styleSheets.clear();
-  m_availableSheets.clear();
   Node* n;
   for (n = this; n; n = n->traverseNextNode()) {
     StyleSheet* sheet = 0;
@@ -1919,9 +1914,6 @@ void Document::recalcStyleSelector() {
             m_preferredStylesheetSet = m_selectedStylesheetSet = title;
         }
 
-        if (!m_availableSheets.contains(title))
-          m_availableSheets.append(title);
-
         if (title != m_preferredStylesheetSet)
           sheet = 0;
       }
@@ -1945,9 +1937,6 @@ void Document::recalcStyleSelector() {
           sheet = 0;  // don't use it
 
         title = title.replace('&', "&&");
-
-        if (!m_availableSheets.contains(title))
-          m_availableSheets.append(title);
       }
     }
 #endif

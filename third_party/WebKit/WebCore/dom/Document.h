@@ -29,7 +29,7 @@
 #include "Attr.h"
 #include "Color.h"
 #include "DeprecatedPtrList.h"
-#include "DeprecatedStringList.h"
+#include "DeprecatedValueList.h"
 #include "DocumentMarker.h"
 #include "HTMLCollection.h"
 #include "StringHash.h"
@@ -442,8 +442,6 @@ class Document : public ContainerNode {
   String selectedStylesheetSet() const;
   void setSelectedStylesheetSet(const String&);
 
-  DeprecatedStringList availableStyleSheets() const;
-
   Node* focusNode() const { return m_focusNode.get(); }
   bool setFocusNode(PassRefPtr<Node>);
   void clearSelectionIfNeeded(Node*);
@@ -720,7 +718,6 @@ class Document : public ContainerNode {
   RefPtr<StyleSheet> m_sheet;
   String m_usersheet;
   String m_printSheet;
-  DeprecatedStringList m_availableSheets;
 
   // Track the number of currently loading top-level stylesheets.  Sheets
   // loaded using the @import directive are not included in this count.
