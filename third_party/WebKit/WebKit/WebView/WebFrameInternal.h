@@ -31,6 +31,7 @@
 
 #import <WebKit/WebFramePrivate.h>
 
+@class WebDocumentLoadState;
 @class WebInspector;
 @class WebFrameLoader;
 
@@ -82,6 +83,10 @@
 - (void)_prepareForDataSourceReplacement;
 - (void)_frameLoadCompleted;
 - (BOOL)_shouldReloadToHandleUnreachableURLFromRequest:(NSURLRequest*)request;
+- (WebDataSource*)_dataSourceForDocumentLoadState:
+    (WebDocumentLoadState*)loadState;
+- (WebDocumentLoadState*)_createDocumentLoadStateWithRequest:
+    (NSURLRequest*)request;
 
 @end
 
