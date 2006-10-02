@@ -45,6 +45,7 @@
 
 - (id)initWithRequest:(NSURLRequest*)request;
 - (void)setFrameLoader:(WebFrameLoader*)fl;
+- (WebFrameLoader*)frameLoader;
 - (void)setMainResourceData:(NSData*)data;
 - (NSData*)mainResourceData;
 - (NSURLRequest*)originalRequest;
