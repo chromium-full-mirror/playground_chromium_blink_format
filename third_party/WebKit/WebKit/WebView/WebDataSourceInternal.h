@@ -47,6 +47,7 @@
 @class WebUnarchivingState;
 @class WebView;
 @class WebDocumentLoadState;
+@class WebDocumentLoadStateMac;
 
 @protocol WebDocumentRepresentation;
 
@@ -131,5 +132,5 @@
 - (void)_setLoading:(BOOL)loading;
 - (void)_updateLoading;
 - (WebDocumentLoadState*)_documentLoadState;
-- (id)_initWithDocumentLoadState:(WebDocumentLoadState*)loadState;
+- (id)_initWithDocumentLoadState:(WebDocumentLoadStateMac*)loadState;
 @end
