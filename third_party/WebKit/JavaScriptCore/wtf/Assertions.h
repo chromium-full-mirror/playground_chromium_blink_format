@@ -38,6 +38,7 @@
 */
 
 #include "Platform.h"
+#include <inttypes.h>
 
 #ifdef NDEBUG
 #define ASSERTIONS_DISABLED_DEFAULT 1
@@ -224,4 +225,4 @@ void WTFLog(const char* file,
 #define JOIN_LOG_CHANNEL_WITH_PREFIX_LEVEL_2(prefix, channel) prefix##channel
 #endif
 
-#endif  // KXMLCORE_ASSERTIONS_H
+#endif

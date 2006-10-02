@@ -108,18 +108,15 @@ class Lookup {
    * Find an entry in the table, and return its value (i.e. the value field of
    * HashEntry)
    */
-  static int find(const struct HashTable* table, const Identifier& s);
-  static int find(const struct HashTable* table,
-                  const UChar* c,
-                  unsigned int len);
+  static int find(const struct HashTable*, const Identifier&);
+  static int find(const struct HashTable*, const UChar*, unsigned int len);
 
   /**
    * Find an entry in the table, and return the entry
    * This variant gives access to the other attributes of the entry,
    * especially the attr field.
    */
-  static const HashEntry* findEntry(const struct HashTable* table,
-                                    const Identifier& s);
+  static const HashEntry* findEntry(const struct HashTable*, const Identifier&);
 };
 
 class ExecState;
@@ -297,16 +294,6 @@ inline void lookupPut(ExecState* exec,
                             attr);  // not found: forward to parent
 }
 
-}  // namespace
-
-/*
- * The template method below can't be in the KJS namespace because it's used in
- * KJS_DEFINE_PROPERTY which can be used outside of the KJS namespace. It can be
- * moved back
- * when a gcc with http://gcc.gnu.org/bugzilla/show_bug.cgi?id=8355 is
- * mainstream enough.
- */
-
 /**
  * This template method retrieves or create an object that is unique
  * (for a given interpreter) The first time this is called (for a given
@@ -316,20 +303,21 @@ inline void lookupPut(ExecState* exec,
  * exec.
  */
 template <class ClassCtor>
-inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
-                                        const KJS::Identifier& propertyName) {
-  KJS::JSObject* globalObject =
-      static_cast<KJS::JSObject*>(exec->lexicalInterpreter()->globalObject());
-  KJS::JSValue* obj = globalObject->getDirect(propertyName);
+inline JSObject* cacheGlobalObject(ExecState* exec,
+                                   const Identifier& propertyName) {
+  JSObject* globalObject =
+      static_cast<JSObject*>(exec->lexicalInterpreter()->globalObject());
+  JSValue* obj = globalObject->getDirect(propertyName);
   if (obj) {
     assert(obj->isObject());
-    return static_cast<KJS::JSObject*>(obj);
+    return static_cast<JSObject*>(obj);
   }
-  KJS::JSObject* newObject = new ClassCtor(exec);
-  globalObject->put(exec, propertyName, newObject,
-                    KJS::Internal | KJS::DontEnum);
+  JSObject* newObject = new ClassCtor(exec);
+  globalObject->put(exec, propertyName, newObject, Internal | DontEnum);
   return newObject;
 }
+
+}  // namespace
 
 /**
  * Helpers to define prototype objects (each of which simply implements
@@ -354,40 +342,23 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
  * DOMNodeProto as the second argument.
  */
 
-// Work around a bug in GCC 4.1
-#if !COMPILER(GCC)
-#define KJS_GCC_ROOT_NS_HACK ::
-#else
-#define KJS_GCC_ROOT_NS_HACK
-#endif
-
 // These macros assume that a prototype's only properties are functions
-#define KJS_DEFINE_PROTOTYPE(ClassProto)                                \
-  class ClassProto : public KJS::JSObject {                             \
-    friend KJS::JSObject* KJS_GCC_ROOT_NS_HACK                          \
-    cacheGlobalObject<ClassProto>(KJS::ExecState * exec,                \
-                                  const KJS::Identifier& propertyName); \
-                                                                        \
-   public:                                                              \
-    static KJS::JSObject* self(KJS::ExecState* exec);                   \
-    virtual const KJS::ClassInfo* classInfo() const { return &info; }   \
-    static const KJS::ClassInfo info;                                   \
-    bool getOwnPropertySlot(KJS::ExecState*,                            \
-                            const KJS::Identifier&,                     \
-                            KJS::PropertySlot&);                        \
-                                                                        \
-   protected:                                                           \
-    ClassProto(KJS::ExecState* exec)                                    \
-        : KJS::JSObject(                                                \
-              exec->lexicalInterpreter()->builtinObjectPrototype()) {}  \
+#define KJS_DEFINE_PROTOTYPE(ClassProto)                               \
+  class ClassProto : public KJS::JSObject {                            \
+   public:                                                             \
+    static KJS::JSObject* self(KJS::ExecState* exec);                  \
+    virtual const KJS::ClassInfo* classInfo() const { return &info; }  \
+    static const KJS::ClassInfo info;                                  \
+    bool getOwnPropertySlot(KJS::ExecState*,                           \
+                            const KJS::Identifier&,                    \
+                            KJS::PropertySlot&);                       \
+    ClassProto(KJS::ExecState* exec)                                   \
+        : KJS::JSObject(                                               \
+              exec->lexicalInterpreter()->builtinObjectPrototype()) {} \
   };
 
 #define KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(ClassProto, ClassProtoProto) \
   class ClassProto : public KJS::JSObject {                              \
-    friend KJS::JSObject* KJS_GCC_ROOT_NS_HACK                           \
-    cacheGlobalObject<ClassProto>(KJS::ExecState * exec,                 \
-                                  const KJS::Identifier& propertyName);  \
-                                                                         \
    public:                                                               \
     static KJS::JSObject* self(KJS::ExecState* exec);                    \
     virtual const KJS::ClassInfo* classInfo() const { return &info; }    \
@@ -395,22 +366,20 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
     bool getOwnPropertySlot(KJS::ExecState*,                             \
                             const KJS::Identifier&,                      \
                             KJS::PropertySlot&);                         \
-                                                                         \
-   protected:                                                            \
     ClassProto(KJS::ExecState* exec)                                     \
         : KJS::JSObject(ClassProtoProto::self(exec)) {}                  \
   };
 
-#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassProto, ClassFunc)            \
-  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};  \
-  JSObject* ClassProto::self(ExecState* exec) {                              \
-    return ::cacheGlobalObject<ClassProto>(exec,                             \
-                                           "[[" ClassName ".prototype]]");   \
-  }                                                                          \
-  bool ClassProto::getOwnPropertySlot(                                       \
-      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) { \
-    return getStaticFunctionSlot<ClassFunc, JSObject>(                       \
-        exec, &ClassProto##Table, this, propertyName, slot);                 \
+#define KJS_IMPLEMENT_PROTOTYPE(ClassName, ClassProto, ClassFunc)             \
+  const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};   \
+  JSObject* ClassProto::self(ExecState* exec) {                               \
+    return KJS::cacheGlobalObject<ClassProto>(exec,                           \
+                                              "[[" ClassName ".prototype]]"); \
+  }                                                                           \
+  bool ClassProto::getOwnPropertySlot(                                        \
+      ExecState* exec, const Identifier& propertyName, PropertySlot& slot) {  \
+    return getStaticFunctionSlot<ClassFunc, JSObject>(                        \
+        exec, &ClassProto##Table, this, propertyName, slot);                  \
   }
 
 #define KJS_IMPLEMENT_PROTOFUNC(ClassFunc)                                 \
@@ -433,20 +402,5 @@ inline KJS::JSObject* cacheGlobalObject(KJS::ExecState* exec,
    private:                                                                \
     int id;                                                                \
   };
-
-/*
- * List of things to do when porting an objectimp to the 'static hashtable'
- * mechanism:
- * - write the hashtable source, between @begin and @end
- * - add a rule to build the .lut.h
- * - include the .lut.h
- * - mention the table in the classinfo (add a classinfo if necessary)
- * - write/update the class enum (for the tokens)
- * - turn get() into getValueProperty(), put() into putValueProperty(), using a
- * switch and removing funcs
- * - write get() and/or put() using a template method
- * - cleanup old stuff (e.g. hasProperty)
- * - compile, test, commit ;)
- */
 
 #endif
