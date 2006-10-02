@@ -57,30 +57,24 @@
 - (void)_setOverrideEncoding:(NSString*)overrideEncoding;
 - (void)_addToUnarchiveState:(WebArchive*)archive;
 - (NSURL*)_URLForHistory;
-- (NSURLRequest*)_originalRequest;
 - (BOOL)_isClientRedirect;
 - (void)_makeRepresentation;
 - (BOOL)_loadingFromPageCache;
 - (NSArray*)_responses;
 - (void)_setPrimaryLoadComplete:(BOOL)flag;
-- (void)_stopLoading;
 - (BOOL)_isDocumentHTML;
-- (void)__adoptRequest:(NSMutableURLRequest*)request;
 - (void)_setTriggeringAction:(NSDictionary*)action;
 - (NSDictionary*)_triggeringAction;
 - (WebView*)_webView;
 - (WebFrameBridge*)_bridge;
 - (void)_stopLoadingWithError:(NSError*)error;
 - (NSURLRequest*)_lastCheckedRequest;
-- (void)_defersCallbacksChanged;
 - (void)_setLastCheckedRequest:(NSURLRequest*)request;
-- (void)_setURL:(NSURL*)URL;
 - (void)_setIsClientRedirect:(BOOL)flag;
 - (WebArchive*)_popSubframeArchiveWithName:(NSString*)frameName;
 - (void)_loadFromPageCache:(NSDictionary*)pageCache;
 - (NSURL*)_URL;
 - (void)_setWebFrame:(WebFrame*)frame;
-- (BOOL)_isStopping;
 - (NSString*)_title;
 - (DOMElement*)_imageElementWithImageResource:(WebResource*)resource;
 - (DOMDocumentFragment*)_documentFragmentWithImageResource:
@@ -98,7 +92,6 @@
 - (void)_stopRecordingResponses;
 - (void)_startLoading;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
-- (void)_defersCallbacksChanged;
 - (id)_identifierForInitialRequest:(NSURLRequest*)clientRequest;
 - (NSURLRequest*)_willSendRequest:(NSMutableURLRequest*)clientRequest
                       forResource:(id)identifier
@@ -119,18 +112,15 @@
                                request:(NSURLRequest*)request
                               response:(NSURLResponse*)r
                                  proxy:(WKNSURLConnectionDelegateProxyPtr)proxy;
-- (BOOL)_defersCallbacks;
 - (void)_receivedMainResourceError:(NSError*)error complete:(BOOL)isComplete;
-- (void)_receivedData:(NSData*)data;
-- (void)_setRequest:(NSURLRequest*)request;
-- (void)_setResponse:(NSURLResponse*)response;
-- (void)_finishedLoading;
-- (void)_setupForReplaceByMIMEType:(NSString*)mimeType;
-- (void)_mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (void)_decidePolicyForMIMEType:(NSString*)MIMEType
                 decisionListener:(WebPolicyDecisionListener*)listener;
-- (void)_setLoading:(BOOL)loading;
-- (void)_updateLoading;
 - (WebDocumentLoadState*)_documentLoadState;
 - (id)_initWithDocumentLoadState:(WebDocumentLoadStateMac*)loadState;
+- (void)_finishedLoading;
+- (void)_receivedData:(NSData*)data;
+- (void)_revertToProvisionalState;
+- (void)_setMainDocumentError:(NSError*)error;
+- (void)_clearUnarchivingState;
+
 @end
