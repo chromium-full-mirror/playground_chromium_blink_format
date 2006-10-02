@@ -444,9 +444,9 @@ bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
 
 namespace WebCore {
 
-DeprecatedStringList supportedKeySizes() {
+Vector<String> supportedKeySizes() {
   notImplemented();
-  return DeprecatedStringList();
+  return Vector<String>();
 }
 String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const String& challengeString,
