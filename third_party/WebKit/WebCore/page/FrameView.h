@@ -131,6 +131,8 @@ class FrameView : public ScrollView {
 
   void clear();
 
+  bool didFirstLayout() const;
+
  public:
   void clearPart();
 
