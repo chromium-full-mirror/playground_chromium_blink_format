@@ -95,6 +95,7 @@ class StringImpl : public Shared<StringImpl>, Noncopyable {
   void append(char);
   void append(UChar);
   void insert(const StringImpl*, unsigned pos);
+  void insert(const UChar* str, unsigned length, unsigned pos);
   void truncate(int len);
   void remove(unsigned pos, int len = 1);
 

@@ -123,7 +123,7 @@ class CSSParser {
 
   Document* document() const;
 
-  void addProperty(int propId, CSSValue*, bool important);
+  void addProperty(int propId, PassRefPtr<CSSValue>, bool important);
   void rollbackLastProperties(int num);
   bool hasProperties() const { return numParsedProperties > 0; }
 
@@ -156,11 +156,13 @@ class CSSParser {
 
   bool parseShape(int propId, bool important);
   bool parseFont(bool important);
+  bool parseCounter(int propId, int defaultValue, bool important);
   CSSValueList* parseFontFamily();
   bool parseColorParameters(Value*, int* colorValues, bool parseAlpha);
   bool parseHSLParameters(Value*, double* colorValues, bool parseAlpha);
   CSSPrimitiveValue* parseColor();
   CSSPrimitiveValue* parseColorFromValue(Value*);
+  PassRefPtr<CSSValue> parseCounterContent(ValueList* args, bool counters);
 
 #ifdef SVG_SUPPORT
   bool parseSVGValue(int propId, bool important);

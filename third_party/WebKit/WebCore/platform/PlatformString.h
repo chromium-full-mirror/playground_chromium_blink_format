@@ -101,6 +101,7 @@ class String {
   void append(char);
   void append(UChar);
   void insert(const String&, unsigned pos);
+  void insert(const UChar*, unsigned length, unsigned pos);
 
   String& replace(UChar a, UChar b) {
     if (m_impl)

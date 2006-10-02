@@ -4,6 +4,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
+ *           (C) 2004 Allan Sandfeld Jensen (kde@carewolf.com)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  * Copyright (C) 2006 Andrew Wellington (proton@wiretapped.net)
  *
@@ -28,6 +29,7 @@
 #include "RenderContainer.h"
 
 #include "htmlediting.h"
+#include "RenderCounter.h"
 #include "RenderListItem.h"
 #include "RenderTable.h"
 #include "RenderTextFragment.h"
@@ -364,6 +366,14 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
       img->setStyle(style);
       img->setContentObject(contentData->contentObject());
       pseudoContainer->addChild(img);
+    } else if (contentData->_contentType == CONTENT_COUNTER) {
+      RenderCounter* c = new (renderArena())
+          RenderCounter(element(), contentData->contentCounter());
+      RenderStyle* style = new (renderArena()) RenderStyle();
+      style->inheritFrom(pseudo);
+      c->setIsAnonymous(true);
+      c->setStyle(style);
+      pseudoContainer->addChild(c);
     }
   }
 

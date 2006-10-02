@@ -4,6 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
+ *           (C) 2004 Allan Sandfeld Jensen (kde@carewolf.com)
  * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -31,6 +32,7 @@
 #include "RenderStyle.h"
 #include "ScrollBar.h"
 #include "VisiblePosition.h"
+#include <wtf/HashMap.h>
 
 /*
  *  The painting of a layer occurs in three distinct phases.  Each phase
@@ -51,6 +53,7 @@ namespace WebCore {
 class AffineTransform;
 class CollapsedBorderValue;
 class Color;
+class CounterNode;
 class Document;
 class Element;
 class Event;
@@ -201,6 +204,12 @@ class RenderObject : public CachedResourceClient {
   virtual int staticX() const { return 0; }
   virtual int staticY() const { return 0; }
 
+  CounterNode* findCounter(const String& counterName,
+                           bool willNeedLayout = false,
+                           bool usesSeparator = false,
+                           bool createIfNotFound = true);
+
+ public:
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual bool canHaveChildren() const;
@@ -262,6 +271,7 @@ class RenderObject : public CachedResourceClient {
 
   virtual bool isListItem() const { return false; }
   virtual bool isListMarker() const { return false; }
+  virtual bool isCounter() const { return false; }
   virtual bool isRenderView() const { return false; }
   bool isRoot() const;
   bool isBody() const;
@@ -1147,7 +1157,8 @@ class RenderObject : public CachedResourceClient {
 
   bool m_hasOverflowClip : 1;
 
-  // note: do not add unnecessary bitflags, we have 32 bit already!
+  bool m_hasCounterNodeMap : 1;
+
   friend class RenderListItem;
   friend class RenderContainer;
   friend class RenderView;
