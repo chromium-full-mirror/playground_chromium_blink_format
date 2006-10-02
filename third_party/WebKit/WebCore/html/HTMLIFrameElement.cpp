@@ -38,7 +38,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLIFrameElement::HTMLIFrameElement(Document* doc)
-    : HTMLFrameElement(iframeTag, doc), needWidgetUpdate(false) {
+    : HTMLFrameElement(iframeTag, doc) {
   m_frameBorder = false;
 }
 
@@ -57,7 +57,7 @@ bool HTMLIFrameElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLElement::mapToEntry(attrName, result);
+  return HTMLFrameElement::mapToEntry(attrName, result);
 }
 
 void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -80,23 +80,14 @@ void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void HTMLIFrameElement::insertedIntoDocument() {
+  HTMLFrameElement::insertedIntoDocument();
+
   if (document()->isHTMLDocument()) {
     HTMLDocument* doc = static_cast<HTMLDocument*>(document());
     doc->addDocExtraNamedItem(oldNameAttr);
   }
 
-  HTMLElement::insertedIntoDocument();
-
-  // Load the frame
-  m_name = getAttribute(nameAttr);
-  if (m_name.isNull())
-    m_name = getAttribute(idAttr);
-
-  if (Frame* parentFrame = document()->frame()) {
-    m_name = parentFrame->tree()->uniqueChildName(m_name);
-
-    openURL();
-  }
+  openURL();
 }
 
 void HTMLIFrameElement::willRemove() {
@@ -115,7 +106,7 @@ void HTMLIFrameElement::removedFromDocument() {
     doc->removeDocExtraNamedItem(oldNameAttr);
   }
 
-  HTMLElement::removedFromDocument();
+  HTMLFrameElement::removedFromDocument();
 }
 
 bool HTMLIFrameElement::rendererIsNeeded(RenderStyle* style) {
@@ -129,33 +120,19 @@ RenderObject* HTMLIFrameElement::createRenderer(RenderArena* arena,
 }
 
 void HTMLIFrameElement::attach() {
-  HTMLElement::attach();
+  HTMLFrameElement::attach();
 
-  RenderPartObject* renderPart = static_cast<RenderPartObject*>(renderer());
-
-  if (renderPart) {
-    if (!contentFrame())
-      openURL();
-
+  if (RenderPartObject* renderPart =
+          static_cast<RenderPartObject*>(renderer())) {
     if (contentFrame()) {
       renderPart->setWidget(contentFrame()->view());
       renderPart->updateWidget();
-      needWidgetUpdate = false;
     }
   }
 }
 
 void HTMLIFrameElement::detach() {
   HTMLElement::detach();
-}
-
-void HTMLIFrameElement::recalcStyle(StyleChange ch) {
-  if (needWidgetUpdate) {
-    if (renderer())
-      static_cast<RenderPartObject*>(renderer())->updateWidget();
-    needWidgetUpdate = false;
-  }
-  HTMLElement::recalcStyle(ch);
 }
 
 bool HTMLIFrameElement::isURLAttribute(Attribute* attr) const {
