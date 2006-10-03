@@ -523,7 +523,8 @@ short Range::compareBoundaryPoints(const Position& a, const Position& b) {
 }
 
 bool Range::boundaryPointsValid() const {
-  return compareBoundaryPoints(m_startContainer.get(), m_startOffset,
+  return m_startContainer && m_endContainer &&
+         compareBoundaryPoints(m_startContainer.get(), m_startOffset,
                                m_endContainer.get(), m_endOffset) <= 0;
 }
 
