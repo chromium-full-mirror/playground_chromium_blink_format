@@ -153,6 +153,8 @@ class FrameView : public ScrollView {
 
   void doAutoScroll();
 
+  bool advanceFocus(bool forward);
+
   bool updateDragAndDrop(const PlatformMouseEvent&, Clipboard*);
   void cancelDragAndDrop(const PlatformMouseEvent&, Clipboard*);
   bool performDragAndDrop(const PlatformMouseEvent&, Clipboard*);
@@ -225,8 +227,6 @@ class FrameView : public ScrollView {
   String mediaType() const;
 
   bool scrollTo(const IntRect&);
-
-  void focusNextPrevNode(bool next);
 
   bool useSlowRepaints() const;
   void setUseSlowRepaints();
