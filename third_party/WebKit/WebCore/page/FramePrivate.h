@@ -91,7 +91,6 @@ class FramePrivate {
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
         m_command(thisFrame),
         m_caretVisible(false),
-        m_caretBlinks(true),
         m_caretPaint(true),
         m_bFirstData(true),
         m_bCleared(true),
@@ -199,7 +198,6 @@ class FramePrivate {
   CommandByName m_command;
 
   bool m_caretVisible : 1;
-  bool m_caretBlinks : 1;
   bool m_caretPaint : 1;
   bool m_bFirstData : 1;
   bool m_bCleared : 1;

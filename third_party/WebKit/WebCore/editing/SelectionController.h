@@ -29,6 +29,7 @@
 #include "IntRect.h"
 #include "Selection.h"
 #include "Range.h"
+#include <wtf/Noncopyable.h>
 
 namespace WebCore {
 
@@ -37,13 +38,12 @@ class GraphicsContext;
 class RenderObject;
 class VisiblePosition;
 
-class SelectionController {
+class SelectionController : Noncopyable {
  public:
   enum EAlter { MOVE, EXTEND };
   enum EDirection { FORWARD, BACKWARD, RIGHT, LEFT };
-#define SEL_DEFAULT_AFFINITY DOWNSTREAM
 
-  SelectionController(Frame* frame = 0, bool isDragCaretController = false);
+  SelectionController(Frame* = 0, bool isDragCaretController = false);
 
   Element* rootEditableElement() const {
     return selection().rootEditableElement();
@@ -162,8 +162,9 @@ class SelectionController {
   // void clear();
   // TextRange *createRange();
 
-  void needsCaretRepaint();
-  void paintCaret(GraphicsContext*, const IntRect& rect);
+  bool recomputeCaretRect();  // returns true if caret rect moved
+  void invalidateCaretRect();
+  void paintCaret(GraphicsContext*, const IntRect&);
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
@@ -171,9 +172,6 @@ class SelectionController {
 #endif
 
  private:
-  SelectionController(const SelectionController&);
-  SelectionController& operator=(const SelectionController&);
-
   enum EPositionType { START, END, BASE, EXTENT };
 
   VisiblePosition modifyExtendingRightForward(TextGranularity);
