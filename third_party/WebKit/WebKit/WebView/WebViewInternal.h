@@ -43,7 +43,6 @@
                        stillSelecting:(BOOL)flag;
 - (BOOL)_shouldBeginEditingInDOMRange:(DOMRange*)range;
 - (BOOL)_shouldEndEditingInDOMRange:(DOMRange*)range;
-- (BOOL)_canPaste;
 @end
 
 @interface WebView (AllWebViews)
