@@ -1028,10 +1028,10 @@ int TextIterator::rangeLength(const Range* r) {
   return length;
 }
 
-PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
+PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Element* scope,
                                                            int rangeLocation,
                                                            int rangeLength) {
-  RefPtr<Range> resultRange = doc->createRange();
+  RefPtr<Range> resultRange = scope->document()->createRange();
 
   int docTextPosition = 0;
   int rangeEnd = rangeLocation + rangeLength;
@@ -1039,7 +1039,7 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Document* doc,
 
   RefPtr<Range> textRunRange;
 
-  TextIterator it(rangeOfContents(doc).get());
+  TextIterator it(rangeOfContents(scope).get());
 
   // FIXME: the atEnd() check shouldn't be necessary, workaround for
   // <http://bugzilla.opendarwin.org/show_bug.cgi?id=6289>.
