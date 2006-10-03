@@ -88,5 +88,6 @@
 - (NSError*)mainDocumentError;
 - (void)mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (void)setResponse:(NSURLResponse*)resp;
+- (void)detachFromFrameLoader;
 
 @end
