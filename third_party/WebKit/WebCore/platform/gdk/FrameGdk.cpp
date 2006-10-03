@@ -115,7 +115,9 @@ FrameGdk::FrameGdk(Page* page, Element* element) : Frame(page, element) {
   setSettings(settings);
 }
 
-FrameGdk::~FrameGdk() {}
+FrameGdk::~FrameGdk() {
+  cancelAndClear();
+}
 
 bool FrameGdk::openURL(const KURL& url) {
   didOpenURL(url);
