@@ -63,7 +63,6 @@ class SelectionController : Noncopyable {
               const Position&,
               EAffinity,
               bool userTriggered = false);
-  void moveTo(const SelectionController&, bool userTriggered = false);
 
   const Selection& selection() const { return m_sel; }
   void setSelection(const Selection&,

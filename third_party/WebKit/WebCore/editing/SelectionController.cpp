@@ -64,11 +64,6 @@ void SelectionController::moveTo(const VisiblePosition& base,
                true, true, userTriggered);
 }
 
-void SelectionController::moveTo(const SelectionController& o,
-                                 bool userTriggered) {
-  setSelection(o.m_sel, true, true, userTriggered);
-}
-
 void SelectionController::moveTo(const Position& pos,
                                  EAffinity affinity,
                                  bool userTriggered) {
@@ -784,7 +779,7 @@ void SelectionController::collapseToStart() {
 }
 
 void SelectionController::empty() {
-  moveTo(SelectionController());
+  moveTo(VisiblePosition());
 }
 
 void SelectionController::extend(Node* node, int offset) {
