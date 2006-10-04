@@ -577,6 +577,10 @@ IntPoint ScrollView::windowToContents(const IntPoint& point) const {
 IntPoint ScrollView::contentsToWindow(const IntPoint& point) const {
   return point;
 }
+PlatformScrollBar* ScrollView::scrollbarUnderMouse(
+    const PlatformMouseEvent& mouseEvent) {
+  return 0;
+}
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
                                          const IntSize& topLeft,
