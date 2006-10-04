@@ -136,6 +136,12 @@ Widget* Widget::capturingChild() {
   return 0;
 }
 void Widget::setCapturingChild(Widget* w) {}
+IntPoint Widget::convertChildToSelf(const Widget*, const IntPoint& p) const {
+  return p;
+}
+IntPoint Widget::convertSelfToChild(const Widget*, const IntPoint& p) const {
+  return p;
+}
 
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
                                    Element*,
@@ -633,6 +639,7 @@ IntPoint ScrollView::convertSelfToChild(const Widget*,
                                         const IntPoint& p) const {
   return p;
 }
+void ScrollView::scrolled() const {};
 
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
