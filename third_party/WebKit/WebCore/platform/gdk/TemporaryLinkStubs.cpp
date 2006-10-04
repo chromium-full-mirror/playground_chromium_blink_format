@@ -570,10 +570,10 @@ int ScrollView::updateScrollInfo(short type,
                                  int pageSize) {
   return 0;
 }
-IntPoint ScrollView::convertToContainingWindow(const IntPoint& point) const {
+IntPoint ScrollView::windowToContents(const IntPoint& point) const {
   return point;
 }
-IntPoint ScrollView::convertFromContainingWindow(const IntPoint& point) const {
+IntPoint ScrollView::contentsToWindow(const IntPoint& point) const {
   return point;
 }
 
