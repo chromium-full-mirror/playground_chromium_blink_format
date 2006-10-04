@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ *           (C) 2006 Graham Dennis (graham.dennis@gmail.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,6 +34,13 @@ namespace WebCore {
 
 class Settings {
  public:
+  enum EditableLinkBehavior {
+    EditableLinkDefaultBehavior = 0,
+    EditableLinkAlwaysLive,
+    EditableLinkOnlyLiveWithShiftKey,
+    EditableLinkLiveWhenNotFocused
+  };
+
   Settings()
       : m_minimumFontSize(0),
         m_minimumLogicalFontSize(0),
@@ -45,7 +53,8 @@ class Settings {
         m_javaScriptEnabled(0),
         m_javaScriptCanOpenWindowsAutomatically(0),
         m_shouldPrintBackgrounds(0),
-        m_textAreasAreResizable(0) {}
+        m_textAreasAreResizable(0),
+        m_editableLinkBehavior(EditableLinkDefaultBehavior) {}
 
   const AtomicString& stdFontName() const { return m_stdFontName; }
   const AtomicString& fixedFontName() const { return m_fixedFontName; }
@@ -74,6 +83,9 @@ class Settings {
   KURL userStyleSheetLocation() const { return m_userStyleSheetLocation; }
   bool shouldPrintBackgrounds() const { return m_shouldPrintBackgrounds; }
   bool textAreasAreResizable() const { return m_textAreasAreResizable; }
+  EditableLinkBehavior editableLinkBehavior() const {
+    return m_editableLinkBehavior;
+  }
 
   void setStdFontName(const AtomicString& s) { m_stdFontName = s; }
   void setFixedFontName(const AtomicString& s) { m_fixedFontName = s; }
@@ -103,6 +115,9 @@ class Settings {
   }
   void setShouldPrintBackgrounds(bool f) { m_shouldPrintBackgrounds = f; }
   void setTextAreasAreResizable(bool f) { m_textAreasAreResizable = f; }
+  void setEditableLinkBehavior(EditableLinkBehavior e) {
+    m_editableLinkBehavior = e;
+  }
 
  private:
   AtomicString m_stdFontName;
@@ -126,6 +141,7 @@ class Settings {
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;
+  EditableLinkBehavior m_editableLinkBehavior;
 };
 }
 

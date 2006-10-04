@@ -117,6 +117,9 @@ typedef WebCore::Settings WebCoreSettingsImpl;
 - (void)setDefaultTextEncoding:(NSString*)encoding;
 - (NSString*)defaultTextEncoding;
 
+- (void)setEditableLinkBehavior:(int)behavior;
+- (int)editableLinkBehavior;
+
 - (WebCoreSettingsImpl*)settings;
 
 @end
