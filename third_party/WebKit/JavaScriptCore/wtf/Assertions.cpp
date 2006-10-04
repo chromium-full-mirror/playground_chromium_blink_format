@@ -38,6 +38,7 @@
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
 #include <windows.h>
+#include <crtdbg.h>
 #endif
 
 extern "C" {
@@ -98,20 +99,23 @@ static void printf_stderr_common(const char* format, ...) {
   va_end(args);
 }
 
+static void printCallSite(const char* file, int line, const char* function) {
+#if PLATFORM(WIN)
+  _CrtDbgReport(_CRT_WARN, file, line, NULL, "%s\n", function);
+#else
+  printf_stderr_common("(%s:%d %s)\n", file, line, function);
+#endif
+}
+
 void WTFReportAssertionFailure(const char* file,
                                int line,
                                const char* function,
                                const char* assertion) {
   if (assertion)
-    printf_stderr_common(
-        "=================\nASSERTION FAILED: %s (%s:%d "
-        "%s)\n=================\n",
-        assertion, file, line, function);
+    printf_stderr_common("ASSERTION FAILED: %s\n", assertion);
   else
-    printf_stderr_common(
-        "=================\nSHOULD NEVER BE REACHED (%s:%d "
-        "%s)\n=================\n",
-        file, line, function);
+    printf_stderr_common("SHOULD NEVER BE REACHED\n");
+  printCallSite(file, line, function);
 }
 
 void WTFReportAssertionFailureWithMessage(const char* file,
@@ -120,13 +124,13 @@ void WTFReportAssertionFailureWithMessage(const char* file,
                                           const char* assertion,
                                           const char* format,
                                           ...) {
-  printf_stderr_common("=================\nASSERTION FAILED: ");
+  printf_stderr_common("ASSERTION FAILED: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  printf_stderr_common("\n%s (%s:%d %s)\n=================\n", assertion, file,
-                       line, function);
+  printf_stderr_common("\n%s\n", assertion);
+  printCallSite(file, line, function);
 }
 
 void WTFReportArgumentAssertionFailure(const char* file,
@@ -134,9 +138,8 @@ void WTFReportArgumentAssertionFailure(const char* file,
                                        const char* function,
                                        const char* argName,
                                        const char* assertion) {
-  printf_stderr_common(
-      "=================\nARGUMENT BAD: %s, %s (%s:%d %s)\n=================\n",
-      argName, assertion, file, line, function);
+  printf_stderr_common("ARGUMENT BAD: %s, %s\n", argName, assertion);
+  printCallSite(file, line, function);
 }
 
 void WTFReportFatalError(const char* file,
@@ -144,13 +147,13 @@ void WTFReportFatalError(const char* file,
                          const char* function,
                          const char* format,
                          ...) {
-  printf_stderr_common("=================\nFATAL ERROR: ");
+  printf_stderr_common("FATAL ERROR: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  printf_stderr_common("\n(%s:%d %s)\n=================\n", file, line,
-                       function);
+  printf_stderr_common("\n");
+  printCallSite(file, line, function);
 }
 
 void WTFReportError(const char* file,
@@ -158,13 +161,13 @@ void WTFReportError(const char* file,
                     const char* function,
                     const char* format,
                     ...) {
-  printf_stderr_common("=================\nERROR: ");
+  printf_stderr_common("ERROR: ");
   va_list args;
   va_start(args, format);
   vprintf_stderr_common(format, args);
   va_end(args);
-  printf_stderr_common("\n(%s:%d %s)\n=================\n", file, line,
-                       function);
+  printf_stderr_common("\n");
+  printCallSite(file, line, function);
 }
 
 void WTFLog(const char*,
