@@ -625,6 +625,14 @@ bool ScrollView::inWindow() const {
 void ScrollView::paint(GraphicsContext*, const IntRect&) {}
 void ScrollView::wheelEvent(PlatformWheelEvent&) {}
 void ScrollView::themeChanged() {}
+IntPoint ScrollView::convertChildToSelf(const Widget*,
+                                        const IntPoint& p) const {
+  return p;
+}
+IntPoint ScrollView::convertSelfToChild(const Widget*,
+                                        const IntPoint& p) const {
+  return p;
+}
 
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
