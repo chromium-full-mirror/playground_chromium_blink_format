@@ -21,6 +21,8 @@
 #ifndef STDINT_WIN32_H
 #define STDINT_WIN32_H
 
+#include <wtf/Platform.h>
+
 /* This file emulates enough of stdint.h on Windows to make JavaScriptCore and
  * WebCore compile. */
 
