@@ -385,6 +385,7 @@ typedef enum {
                    offset:(int)offset
                  affinity:(NSSelectionAffinity)affinity;
 - (NSRect)firstRectForDOMRange:(DOMRange*)range;
+- (void)scrollDOMRangeToVisible:(DOMRange*)range;
 
 - (void)setSelectedDOMRange:(DOMRange*)range
                    affinity:(NSSelectionAffinity)selectionAffinity
