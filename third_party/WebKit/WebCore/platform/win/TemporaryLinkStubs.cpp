@@ -99,8 +99,8 @@ bool FrameView::passWheelEventToSubframe(PlatformWheelEvent& e,
                                          Frame* subframe) {
   return false;
 }
-bool FrameView::passMousePressEventToScrollbar(
-    MouseEventWithHitTestResults& mev) {
+bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
+                                               PlatformScrollBar*) {
   return false;
 }
 

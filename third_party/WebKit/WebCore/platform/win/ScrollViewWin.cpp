@@ -103,7 +103,7 @@ void ScrollView::resizeContents(int w, int h) {
   IntSize newSize(w, h);
   if (m_data->contentsSize != newSize) {
     m_data->contentsSize = newSize;
-    updateScrollBars();
+    updateScrollBars(m_data->scrollOffset);
   }
 }
 
@@ -149,7 +149,7 @@ void ScrollView::scrollBy(int dx, int dy) {
 
   if (newScrollOffset != scrollOffset) {
     m_data->scrollOffset = newScrollOffset;
-    updateScrollBars();
+    updateScrollBars(m_data->scrollOffset);
     // ScrollBar updates can fail, so we check the final delta before scrolling
     IntSize scrollDelta = m_data->scrollOffset - scrollOffset;
     if (scrollDelta == IntSize())
@@ -175,36 +175,37 @@ WebCore::ScrollBarMode ScrollView::vScrollBarMode() const {
 void ScrollView::suppressScrollBars(bool suppressed, bool repaintOnSuppress) {
   m_data->suppressScrollBars = suppressed;
   if (repaintOnSuppress)
-    updateScrollBars();
+    updateScrollBars(m_data->scrollOffset);
 }
 
 void ScrollView::setHScrollBarMode(ScrollBarMode newMode) {
   if (m_data->hScrollBarMode != newMode) {
     m_data->hScrollBarMode = newMode;
-    updateScrollBars();
+    updateScrollBars(m_data->scrollOffset);
   }
 }
 
 void ScrollView::setVScrollBarMode(ScrollBarMode newMode) {
   if (m_data->vScrollBarMode != newMode) {
     m_data->vScrollBarMode = newMode;
-    updateScrollBars();
+    updateScrollBars(m_data->scrollOffset);
   }
 }
 
 void ScrollView::setScrollBarsMode(ScrollBarMode newMode) {
   m_data->hScrollBarMode = m_data->vScrollBarMode = newMode;
-  updateScrollBars();
+  updateScrollBars(m_data->scrollOffset);
 }
 
 void ScrollView::setStaticBackground(bool flag) {
   m_data->hasStaticBackground = flag;
 }
 
-int ScrollView::updateScrollInfo(short type,
-                                 int current,
-                                 int max,
-                                 int pageSize) {
+static int updateScrollInfo(ScrollView* view,
+                            short type,
+                            int current,
+                            int max,
+                            int pageSize) {
   SCROLLINFO si;
   si.cbSize = sizeof(si);
   si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
@@ -212,20 +213,21 @@ int ScrollView::updateScrollInfo(short type,
   si.nMax = max;
   si.nPage = pageSize;
   si.nPos = current;
-  SetScrollInfo(containingWindow(), type, &si, TRUE);
-  GetScrollInfo(containingWindow(), type, &si);
+  SetScrollInfo(view->containingWindow(), type, &si, TRUE);
+  GetScrollInfo(view->containingWindow(), type, &si);
   return si.nPos;
 }
 
-void ScrollView::updateScrollBars() {
+void ScrollView::updateScrollBars(const IntPoint&) {
   IntSize maxScrollPosition(contentsWidth(), contentsHeight());
   IntSize scroll = scrollOffset().shrunkTo(maxScrollPosition);
   scroll.clampNegativeToZero();
 
-  m_data->scrollOffset = IntSize(
-      updateScrollInfo(SB_HORZ, scroll.width(), contentsWidth() - 1, width()),
-      updateScrollInfo(SB_VERT, scroll.height(), contentsHeight() - 1,
-                       height()));
+  m_data->scrollOffset =
+      IntSize(updateScrollInfo(this, SB_HORZ, scroll.width(),
+                               contentsWidth() - 1, width()),
+              updateScrollInfo(this, SB_VERT, scroll.height(),
+                               contentsHeight() - 1, height()));
 
   if (m_data->hScrollBarMode != ScrollBarAuto || m_data->suppressScrollBars)
     ShowScrollBar(containingWindow(), SB_HORZ,
