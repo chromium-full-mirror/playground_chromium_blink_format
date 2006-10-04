@@ -850,7 +850,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
   // the cursor in view.
 
   IntPoint currentPoint =
-      m_object->document()->view()->convertFromContainingWindow(evt.pos());
+      m_object->document()->view()->windowToContents(evt.pos());
   currentPoint += offsetFromResizeCorner;
 
   int x;
@@ -1069,22 +1069,22 @@ void RenderLayer::positionResizeControl() {
 }
 
 void RenderLayer::positionScrollbars(const IntRect& absBounds) {
-  int resizeControlSize = max(resizeControlRect().height() - 1, 0);
+  int resizeControlSize = max(resizeControlRect().height(), 0);
   if (m_vBar)
     m_vBar->setRect(
         IntRect(absBounds.right() - m_object->borderRight() - m_vBar->width(),
                 absBounds.y() + m_object->borderTop(), m_vBar->width(),
                 absBounds.height() -
                     (m_object->borderTop() + m_object->borderBottom()) -
-                    (m_hBar ? m_hBar->height() - 1 : resizeControlSize)));
+                    (m_hBar ? m_hBar->height() : resizeControlSize)));
 
-  resizeControlSize = max(resizeControlRect().width() - 1, 0);
+  resizeControlSize = max(resizeControlRect().width(), 0);
   if (m_hBar)
     m_hBar->setRect(IntRect(
         absBounds.x() + m_object->borderLeft(),
         absBounds.bottom() - m_object->borderBottom() - m_hBar->height(),
         absBounds.width() - (m_object->borderLeft() + m_object->borderRight()) -
-            (m_vBar ? m_vBar->width() - 1 : resizeControlSize),
+            (m_vBar ? m_vBar->width() : resizeControlSize),
         m_hBar->height()));
 }
 

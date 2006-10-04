@@ -388,7 +388,7 @@ bool EventTargetNode::dispatchMouseEvent(const PlatformMouseEvent& _mouse,
 
   IntPoint contentsPos;
   if (FrameView* view = document()->view())
-    contentsPos = view->convertFromContainingWindow(_mouse.pos());
+    contentsPos = view->windowToContents(_mouse.pos());
 
   return dispatchMouseEvent(
       eventType, _mouse.button(), detail, contentsPos.x(), contentsPos.y(),
@@ -490,7 +490,7 @@ void EventTargetNode::dispatchWheelEvent(PlatformWheelEvent& e) {
   if (!view)
     return;
 
-  IntPoint pos = view->convertFromContainingWindow(e.pos());
+  IntPoint pos = view->windowToContents(e.pos());
 
   RefPtr<WheelEvent> we =
       new WheelEvent(e.deltaX(), e.deltaY(), document()->defaultView(),

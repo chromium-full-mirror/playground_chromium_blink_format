@@ -123,15 +123,13 @@ void RenderWidget::setWidget(Widget* widget) {
                                    paddingLeft() - paddingRight(),
                      m_height - borderTop() - borderBottom() - paddingTop() -
                          paddingBottom());
-      else
-        setPos(xPos(), -500000);
       if (style()) {
         if (style()->visibility() != VISIBLE)
           m_widget->hide();
         else
           m_widget->show();
       }
-      m_view->addChild(m_widget, -500000, 0);
+      m_view->addChild(m_widget);
     }
   }
 }

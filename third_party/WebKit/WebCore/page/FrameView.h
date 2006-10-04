@@ -146,7 +146,8 @@ class FrameView : public ScrollView {
   bool passMouseMoveEventToSubframe(MouseEventWithHitTestResults&, Frame*);
   bool passMouseReleaseEventToSubframe(MouseEventWithHitTestResults&, Frame*);
   bool passWheelEventToSubframe(PlatformWheelEvent&, Frame*);
-  bool passMousePressEventToScrollbar(MouseEventWithHitTestResults&);
+  bool passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
+                                      PlatformScrollBar*);
 
   bool mousePressed();
   void setMousePressed(bool);

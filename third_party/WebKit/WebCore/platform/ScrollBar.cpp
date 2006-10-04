@@ -42,10 +42,10 @@ ScrollBar::ScrollBar(ScrollBarClient* client,
 
 bool ScrollBar::setValue(int v) {
   int maxPos = m_totalSize - m_visibleSize;
-  if (v < 0)
-    v = 0;
   if (v > maxPos)
     v = maxPos;
+  if (v < 0)
+    v = 0;
   if (m_currentPos == v)
     return false;  // Our value stayed the same.
   m_currentPos = v;

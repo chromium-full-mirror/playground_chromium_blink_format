@@ -1824,7 +1824,7 @@ void Frame::selectClosestWordFromMouseEvent(const PlatformMouseEvent& mouse,
 
   if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
       innerNode->renderer()->shouldSelect()) {
-    IntPoint vPoint = view()->convertFromContainingWindow(mouse.pos());
+    IntPoint vPoint = view()->windowToContents(mouse.pos());
     VisiblePosition pos(innerNode->renderer()->positionForPoint(vPoint));
     if (pos.isNotNull()) {
       newSelection = Selection(pos);
@@ -1864,7 +1864,7 @@ void Frame::handleMousePressEventTripleClick(
       innerNode->renderer() && mouseDownMayStartSelect() &&
       innerNode->renderer()->shouldSelect()) {
     Selection newSelection;
-    IntPoint vPoint = view()->convertFromContainingWindow(event.event().pos());
+    IntPoint vPoint = view()->windowToContents(event.event().pos());
     VisiblePosition pos(innerNode->renderer()->positionForPoint(vPoint));
     if (pos.isNotNull()) {
       newSelection = Selection(pos);
@@ -1893,8 +1893,7 @@ void Frame::handleMousePressEventSingleClick(
 
       // Don't restart the selection when the mouse is pressed on an
       // existing selection so we can allow for text dragging.
-      IntPoint vPoint =
-          view()->convertFromContainingWindow(event.event().pos());
+      IntPoint vPoint = view()->windowToContents(event.event().pos());
       if (!extendSelection && isPointInsideSelection(vPoint))
         return;
 
@@ -1971,7 +1970,7 @@ void Frame::handleMouseMoveEvent(const MouseEventWithHitTestResults& event) {
 
   // handle making selection
 
-  IntPoint vPoint = view()->convertFromContainingWindow(event.event().pos());
+  IntPoint vPoint = view()->windowToContents(event.event().pos());
   VisiblePosition pos(innerNode->renderer()->positionForPoint(vPoint));
 
   // Don't modify the selection if we're not on a node.
@@ -2013,8 +2012,7 @@ void Frame::handleMouseReleaseEvent(const MouseEventWithHitTestResults& event) {
     Selection newSelection;
     Node* node = event.targetNode();
     if (node && node->isContentEditable() && node->renderer()) {
-      IntPoint vPoint =
-          view()->convertFromContainingWindow(event.event().pos());
+      IntPoint vPoint = view()->windowToContents(event.event().pos());
       VisiblePosition pos = node->renderer()->positionForPoint(vPoint);
       newSelection = Selection(pos);
     }
