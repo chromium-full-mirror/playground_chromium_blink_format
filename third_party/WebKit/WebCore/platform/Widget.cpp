@@ -85,11 +85,4 @@ bool Widget::checksDescendantsForFocus() const {
 bool Widget::isFrameView() const {
   return false;
 }
-
-IntRect Widget::convertToContainingWindow(const IntRect& rect) const {
-  IntRect convertedRect = rect;
-  convertedRect.setLocation(
-      convertToContainingWindow(convertedRect.location()));
-  return convertedRect;
-}
 }
