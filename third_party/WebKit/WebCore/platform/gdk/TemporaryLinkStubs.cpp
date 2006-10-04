@@ -78,7 +78,8 @@ static void notImplemented() {
 void FrameView::updateBorder() {
   notImplemented();
 }
-bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&) {
+bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
+                                               PlatformScrollBar*) {
   return false;
 }
 bool FrameView::passMousePressEventToSubframe(MouseEventWithHitTestResults&,
