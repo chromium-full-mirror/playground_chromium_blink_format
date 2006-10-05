@@ -36,7 +36,7 @@ static inline Element* targetElement(Node* node) {
 MouseEventWithHitTestResults::MouseEventWithHitTestResults(
     const PlatformMouseEvent& event,
     PassRefPtr<Node> node,
-    PlatformScrollBar* scrollbar,
+    PlatformScrollbar* scrollbar,
     bool isOverLink)
     : m_event(event),
       m_targetNode(node),

@@ -86,8 +86,8 @@ class FrameViewPrivate {
     repaintRects = 0;
     isTransparent = false;
     baseBackgroundColor = Color::white;
-    vmode = hmode = ScrollBarAuto;
-    needToInitScrollBars = true;
+    vmode = hmode = ScrollbarAuto;
+    needToInitScrollbars = true;
     reset();
   }
   ~FrameViewPrivate() {
@@ -98,13 +98,13 @@ class FrameViewPrivate {
     underMouse = 0;
     oldUnder = 0;
     oldSubframe = 0;
-    oldScrollBar = 0;
+    oldScrollbar = 0;
     linkPressed = false;
     useSlowRepaints = false;
     slowRepaintObjectCount = 0;
     dragTarget = 0;
     borderTouched = false;
-    scrollBarMoved = false;
+    scrollbarMoved = false;
     ignoreWheelEvents = false;
     borderX = 30;
     borderY = 30;
@@ -130,16 +130,16 @@ class FrameViewPrivate {
   RefPtr<Node> underMouse;
   RefPtr<Node> oldUnder;
   RefPtr<Frame> oldSubframe;
-  RefPtr<PlatformScrollBar> oldScrollBar;
+  RefPtr<PlatformScrollbar> oldScrollbar;
 
   bool borderTouched : 1;
   bool borderStart : 1;
-  bool scrollBarMoved : 1;
+  bool scrollbarMoved : 1;
   bool doFullRepaint : 1;
   bool m_hasBorder : 1;
 
-  ScrollBarMode vmode;
-  ScrollBarMode hmode;
+  ScrollbarMode vmode;
+  ScrollbarMode hmode;
   bool linkPressed;
   bool useSlowRepaints;
   unsigned slowRepaintObjectCount;
@@ -158,7 +158,7 @@ class FrameViewPrivate {
   int layoutCount;
 
   bool firstLayout;
-  bool needToInitScrollBars;
+  bool needToInitScrollbars;
   bool mousePressed;
   bool isTransparent;
   Color baseBackgroundColor;
@@ -196,7 +196,7 @@ FrameView::FrameView(Frame* frame)
 }
 
 FrameView::~FrameView() {
-  resetScrollBars();
+  resetScrollbars();
 
   ASSERT(m_refCount == 0);
 
@@ -222,14 +222,14 @@ void FrameView::clearPart() {
   m_frame = 0;
 }
 
-void FrameView::resetScrollBars() {
+void FrameView::resetScrollbars() {
   // Reset the document's scrollbars back to our defaults before we yield the
   // floor.
   d->firstLayout = true;
-  suppressScrollBars(true);
-  ScrollView::setVScrollBarMode(d->vmode);
-  ScrollView::setHScrollBarMode(d->hmode);
-  suppressScrollBars(false);
+  suppressScrollbars(true);
+  ScrollView::setVScrollbarMode(d->vmode);
+  ScrollView::setHScrollbarMode(d->hmode);
+  suppressScrollbars(false);
 }
 
 void FrameView::init() {
@@ -254,18 +254,18 @@ void FrameView::clear() {
 
   cleared();
 
-  suppressScrollBars(true);
+  suppressScrollbars(true);
 }
 
 bool FrameView::didFirstLayout() const {
   return !d->firstLayout;
 }
 
-void FrameView::initScrollBars() {
-  if (!d->needToInitScrollBars)
+void FrameView::initScrollbars() {
+  if (!d->needToInitScrollbars)
     return;
-  d->needToInitScrollBars = false;
-  setScrollBarsMode(hScrollBarMode());
+  d->needToInitScrollbars = false;
+  setScrollbarsMode(hScrollbarMode());
 }
 
 void FrameView::setMarginWidth(int w) {
@@ -294,8 +294,8 @@ void FrameView::adjustViewSize() {
 }
 
 void FrameView::applyOverflowToViewport(RenderObject* o,
-                                        ScrollBarMode& hMode,
-                                        ScrollBarMode& vMode) {
+                                        ScrollbarMode& hMode,
+                                        ScrollbarMode& vMode) {
   // Handle the overflow:hidden/scroll case for the body/html elements.  WinIE
   // treats
   // overflow:hidden and overflow:scroll on <body> as applying to the document's
@@ -304,13 +304,13 @@ void FrameView::applyOverflowToViewport(RenderObject* o,
   // use the root element.
   switch (o->style()->overflowX()) {
     case OHIDDEN:
-      hMode = ScrollBarAlwaysOff;
+      hMode = ScrollbarAlwaysOff;
       break;
     case OSCROLL:
-      hMode = ScrollBarAlwaysOn;
+      hMode = ScrollbarAlwaysOn;
       break;
     case OAUTO:
-      hMode = ScrollBarAuto;
+      hMode = ScrollbarAuto;
       break;
     default:
         // Don't set it at all.
@@ -319,13 +319,13 @@ void FrameView::applyOverflowToViewport(RenderObject* o,
 
   switch (o->style()->overflowY()) {
     case OHIDDEN:
-      vMode = ScrollBarAlwaysOff;
+      vMode = ScrollbarAlwaysOff;
       break;
     case OSCROLL:
-      vMode = ScrollBarAlwaysOn;
+      vMode = ScrollbarAlwaysOn;
       break;
     case OAUTO:
-      vMode = ScrollBarAuto;
+      vMode = ScrollbarAuto;
       break;
     default:
         // Don't set it at all.
@@ -406,8 +406,8 @@ void FrameView::layout(bool allowSubtree) {
     return;
   }
 
-  ScrollBarMode hMode = d->hmode;
-  ScrollBarMode vMode = d->vmode;
+  ScrollbarMode hMode = d->hmode;
+  ScrollbarMode vMode = d->vmode;
 
   if (!subtree) {
     Document* document = static_cast<Document*>(rootNode);
@@ -419,8 +419,8 @@ void FrameView::layout(bool allowSubtree) {
       if (body && body->renderer()) {
         if (body->hasTagName(framesetTag)) {
           body->renderer()->setNeedsLayout(true);
-          vMode = ScrollBarAlwaysOff;
-          hMode = ScrollBarAlwaysOff;
+          vMode = ScrollbarAlwaysOff;
+          hMode = ScrollbarAlwaysOff;
         } else if (body->hasTagName(bodyTag)) {
           if (!d->firstLayout && m_size.height() != visibleHeight() &&
               static_cast<RenderBox*>(body->renderer())
@@ -454,37 +454,37 @@ void FrameView::layout(bool allowSubtree) {
   bool didFirstLayout = false;
   if (!subtree) {
     // Now set our scrollbar state for the layout.
-    ScrollBarMode currentHMode = hScrollBarMode();
-    ScrollBarMode currentVMode = vScrollBarMode();
+    ScrollbarMode currentHMode = hScrollbarMode();
+    ScrollbarMode currentVMode = vScrollbarMode();
 
     if (d->firstLayout || (hMode != currentHMode || vMode != currentVMode)) {
-      suppressScrollBars(true);
+      suppressScrollbars(true);
       if (d->firstLayout) {
         d->firstLayout = false;
         didFirstLayout = true;
 
         // Set the initial vMode to AlwaysOn if we're auto.
-        if (vMode == ScrollBarAuto)
-          ScrollView::setVScrollBarMode(ScrollBarAlwaysOn);  // This causes a
+        if (vMode == ScrollbarAuto)
+          ScrollView::setVScrollbarMode(ScrollbarAlwaysOn);  // This causes a
                                                              // vertical
                                                              // scrollbar to
                                                              // appear.
         // Set the initial hMode to AlwaysOff if we're auto.
-        if (hMode == ScrollBarAuto)
-          ScrollView::setHScrollBarMode(ScrollBarAlwaysOff);  // This causes a
+        if (hMode == ScrollbarAuto)
+          ScrollView::setHScrollbarMode(ScrollbarAlwaysOff);  // This causes a
                                                               // horizontal
                                                               // scrollbar to
                                                               // disappear.
       }
 
       if (hMode == vMode)
-        ScrollView::setScrollBarsMode(hMode);
+        ScrollView::setScrollbarsMode(hMode);
       else {
-        ScrollView::setHScrollBarMode(hMode);
-        ScrollView::setVScrollBarMode(vMode);
+        ScrollView::setHScrollbarMode(hMode);
+        ScrollView::setVScrollbarMode(vMode);
       }
 
-      suppressScrollBars(false, true);
+      suppressScrollbars(false, true);
     }
 
     IntSize oldSize = m_size;
@@ -630,7 +630,7 @@ void FrameView::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
         mev.targetNode()->shadowParentNode()->hasTagName(inputTag))
       mev = prepareMouseEvent(true, true, false, mouseEvent);
 
-    PlatformScrollBar* scrollbar = scrollbarUnderMouse(mouseEvent);
+    PlatformScrollbar* scrollbar = scrollbarUnderMouse(mouseEvent);
     if (!scrollbar)
       scrollbar = mev.scrollbar();
     if (!scrollbar || !passMousePressEventToScrollbar(mev, scrollbar))
@@ -696,7 +696,7 @@ static bool nodeIsNotBeingEdited(Node* node, Frame* frame) {
 static Cursor selectCursor(const MouseEventWithHitTestResults& event,
                            Frame* frame,
                            bool mousePressed,
-                           PlatformScrollBar* scrollbar) {
+                           PlatformScrollbar* scrollbar) {
   // During selection, use an I-beam no matter what we're over.
   if (mousePressed && frame->hasSelection())
     return iBeamCursor();
@@ -858,15 +858,15 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.targetNode(),
                                          false, 0, mouseEvent, true);
 
-  PlatformScrollBar* scrollbar = scrollbarUnderMouse(mouseEvent);
+  PlatformScrollbar* scrollbar = scrollbarUnderMouse(mouseEvent);
   if (!scrollbar)
     scrollbar = mev.scrollbar();
 
-  if (d->oldScrollBar != scrollbar) {
+  if (d->oldScrollbar != scrollbar) {
     // Send mouse exited to the old scrollbar.
-    if (d->oldScrollBar)
-      d->oldScrollBar->handleMouseOutEvent(mouseEvent);
-    d->oldScrollBar = scrollbar;
+    if (d->oldScrollbar)
+      d->oldScrollbar->handleMouseOutEvent(mouseEvent);
+    d->oldScrollbar = scrollbar;
   }
 
   if (d->m_resizeLayer && d->m_resizeLayer->inResizeMode())
@@ -1135,25 +1135,25 @@ void FrameView::removeSlowRepaintObject() {
     setStaticBackground(d->useSlowRepaints);
 }
 
-void FrameView::setScrollBarsMode(ScrollBarMode mode) {
+void FrameView::setScrollbarsMode(ScrollbarMode mode) {
   d->vmode = mode;
   d->hmode = mode;
 
-  ScrollView::setScrollBarsMode(mode);
+  ScrollView::setScrollbarsMode(mode);
 }
 
-void FrameView::setVScrollBarMode(ScrollBarMode mode) {
+void FrameView::setVScrollbarMode(ScrollbarMode mode) {
   d->vmode = mode;
-  ScrollView::setVScrollBarMode(mode);
+  ScrollView::setVScrollbarMode(mode);
 }
 
-void FrameView::setHScrollBarMode(ScrollBarMode mode) {
+void FrameView::setHScrollbarMode(ScrollbarMode mode) {
   d->hmode = mode;
-  ScrollView::setHScrollBarMode(mode);
+  ScrollView::setHScrollbarMode(mode);
 }
 
-void FrameView::restoreScrollBar() {
-  suppressScrollBars(false);
+void FrameView::restoreScrollbar() {
+  suppressScrollbars(false);
 }
 
 void FrameView::setResizingFrameSet(HTMLFrameSetElement* frameSet) {
@@ -1205,7 +1205,7 @@ bool FrameView::dispatchMouseEvent(const AtomicString& eventType,
   if (setUnder) {
     if (d->oldUnder && d->oldUnder->document() != frame()->document()) {
       d->oldUnder = 0;
-      d->oldScrollBar = 0;
+      d->oldScrollbar = 0;
     }
 
     if (d->oldUnder != targetNode) {
@@ -1315,10 +1315,10 @@ void FrameView::handleWheelEvent(PlatformWheelEvent& e) {
   }
 }
 
-void FrameView::scrollBarMoved() {
+void FrameView::scrollbarMoved() {
   // FIXME: Need to arrange for this to be called when the view is scrolled!
   if (!d->scrollingSelf)
-    d->scrollBarMoved = true;
+    d->scrollbarMoved = true;
 }
 
 void FrameView::repaintRectangle(const IntRect& r, bool immediate) {

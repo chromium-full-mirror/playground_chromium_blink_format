@@ -28,9 +28,9 @@
 
 namespace WebCore {
 
-ScrollBar::ScrollBar(ScrollBarClient* client,
-                     ScrollBarOrientation orientation,
-                     ScrollBarControlSize controlSize)
+Scrollbar::Scrollbar(ScrollbarClient* client,
+                     ScrollbarOrientation orientation,
+                     ScrollbarControlSize controlSize)
     : m_client(client),
       m_orientation(orientation),
       m_controlSize(controlSize),
@@ -40,7 +40,7 @@ ScrollBar::ScrollBar(ScrollBarClient* client,
       m_lineStep(0),
       m_pageStep(0) {}
 
-bool ScrollBar::setValue(int v) {
+bool Scrollbar::setValue(int v) {
   int maxPos = m_totalSize - m_visibleSize;
   if (v > maxPos)
     v = maxPos;
@@ -58,24 +58,24 @@ bool ScrollBar::setValue(int v) {
   return true;
 }
 
-void ScrollBar::setProportion(int visibleSize, int totalSize) {
+void Scrollbar::setProportion(int visibleSize, int totalSize) {
   m_visibleSize = visibleSize;
   m_totalSize = totalSize;
 
   updateThumbProportion();
 }
 
-void ScrollBar::setSteps(int lineStep, int pageStep) {
+void Scrollbar::setSteps(int lineStep, int pageStep) {
   m_lineStep = lineStep;
   m_pageStep = pageStep;
 }
 
-bool ScrollBar::scroll(ScrollDirection direction,
+bool Scrollbar::scroll(ScrollDirection direction,
                        ScrollGranularity granularity,
                        float multiplier) {
   float delta = 0.0;
-  if ((direction == ScrollUp && m_orientation == VerticalScrollBar) ||
-      (direction == ScrollLeft && m_orientation == HorizontalScrollBar)) {
+  if ((direction == ScrollUp && m_orientation == VerticalScrollbar) ||
+      (direction == ScrollLeft && m_orientation == HorizontalScrollbar)) {
     if (granularity == ScrollByLine) {
       delta = -m_lineStep;
     } else if (granularity == ScrollByPage) {
@@ -85,9 +85,9 @@ bool ScrollBar::scroll(ScrollDirection direction,
     } else if (granularity == ScrollByWheel) {
       delta = -m_lineStep;
     }
-  } else if ((direction == ScrollDown && m_orientation == VerticalScrollBar) ||
+  } else if ((direction == ScrollDown && m_orientation == VerticalScrollbar) ||
              (direction == ScrollRight &&
-              m_orientation == HorizontalScrollBar)) {
+              m_orientation == HorizontalScrollbar)) {
     if (granularity == ScrollByLine) {
       delta = m_lineStep;
     } else if (granularity == ScrollByPage) {

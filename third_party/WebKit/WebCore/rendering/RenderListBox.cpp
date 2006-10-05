@@ -60,7 +60,7 @@ RenderListBox::RenderListBox(HTMLSelectElement* element)
 RenderListBox::~RenderListBox() {
   if (m_vBar && m_vBar->isWidget()) {
     element()->document()->view()->removeChild(
-        static_cast<PlatformScrollBar*>(m_vBar));
+        static_cast<PlatformScrollbar*>(m_vBar));
     m_vBar->deref();
   }
 }
@@ -103,9 +103,9 @@ void RenderListBox::updateFromElement() {
 
 void RenderListBox::calcMinMaxWidth() {
   if (!m_vBar) {
-    if (ScrollBar::hasPlatformScrollBars()) {
-      PlatformScrollBar* widget =
-          new PlatformScrollBar(this, VerticalScrollBar, SmallScrollBar);
+    if (Scrollbar::hasPlatformScrollbars()) {
+      PlatformScrollbar* widget =
+          new PlatformScrollbar(this, VerticalScrollbar, SmallScrollbar);
       widget->ref();
       node()->document()->view()->addChild(widget);
       m_vBar = widget;
@@ -348,7 +348,7 @@ bool RenderListBox::isPointInScrollbar(NodeInfo& info,
 
   if (vertRect.contains(_x, _y)) {
     info.setScrollbar(
-        m_vBar->isWidget() ? static_cast<PlatformScrollBar*>(m_vBar) : 0);
+        m_vBar->isWidget() ? static_cast<PlatformScrollbar*>(m_vBar) : 0);
     return true;
   }
   return false;
@@ -362,10 +362,10 @@ HTMLOptionElement* RenderListBox::optionAtPoint(int x, int y) {
       max(0, yOffset / (style()->font().height() + optionsSpacingMiddle)) +
       m_indexOffset;
   newOffset = max(0, min((int)listItems.size() - 1, newOffset));
-  int scrollBarWidth = m_vBar ? m_vBar->width() : 0;
+  int scrollbarWidth = m_vBar ? m_vBar->width() : 0;
   if (x >= absoluteBoundingBoxRect().x() + borderLeft() + paddingLeft() &&
       x < absoluteBoundingBoxRect().right() - borderRight() - paddingRight() -
-              scrollBarWidth)
+              scrollbarWidth)
     return static_cast<HTMLOptionElement*>(listItems[newOffset]);
   return 0;
 }
@@ -433,7 +433,7 @@ void RenderListBox::valueChanged(unsigned listIndex) {
   select->onChange();
 }
 
-void RenderListBox::valueChanged(ScrollBar*) {
+void RenderListBox::valueChanged(Scrollbar*) {
   if (m_vBar) {
     int newOffset = max(
         0, m_vBar->value() / (style()->font().height() + optionsSpacingMiddle));

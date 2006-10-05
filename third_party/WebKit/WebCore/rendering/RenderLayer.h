@@ -57,8 +57,7 @@ class RenderObject;
 class RenderStyle;
 class RenderTable;
 class RenderText;
-class ScrollBar;
-class PlatformScrollBar;
+class PlatformScrollbar;
 
 class ClipRects {
  public:
@@ -150,7 +149,7 @@ class Marquee {
   EMarqueeDirection m_direction : 4;
 };
 
-class RenderLayer : public ScrollBarClient {
+class RenderLayer : public ScrollbarClient {
  public:
   enum ScrollBehavior {
     noScroll,
@@ -258,16 +257,16 @@ class RenderLayer : public ScrollBarClient {
                           const IntRect& exposeRect,
                           const ScrollAlignment& alignX,
                           const ScrollAlignment& alignY);
-  void setHasHorizontalScrollbar(bool hasScrollbar);
-  void setHasVerticalScrollbar(bool hasScrollbar);
-  ScrollBar* createScrollbar(ScrollBarOrientation orientation);
-  void destroyScrollbar(ScrollBarOrientation orientation);
-  ScrollBar* horizontalScrollbar() { return m_hBar; }
-  ScrollBar* verticalScrollbar() { return m_vBar; }
-  PlatformScrollBar* horizontalScrollbarWidget() const;
-  PlatformScrollBar* verticalScrollbarWidget() const;
-  int verticalScrollbarWidth();
-  int horizontalScrollbarHeight();
+  void setHasHorizontalScrollbar(bool);
+  void setHasVerticalScrollbar(bool);
+  PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
+  void destroyScrollbar(ScrollbarOrientation);
+  Scrollbar* horizontalScrollbar() { return m_hBar.get(); }
+  Scrollbar* verticalScrollbar() { return m_vBar.get(); }
+  PlatformScrollbar* horizontaScrollbarWidget() const;
+  PlatformScrollbar* verticalScrollbarWidget() const;
+  int verticalScrollbarWidth() const;
+  int horizontalScrollbarHeight() const;
   void positionScrollbars(const IntRect& absBounds);
   void positionResizeControl();
   bool isPointInResizeControl(const IntPoint&);
@@ -393,7 +392,7 @@ class RenderLayer : public ScrollBarClient {
 
   bool shouldBeOverflowOnly() const;
 
-  virtual void valueChanged(ScrollBar*);
+  virtual void valueChanged(Scrollbar*);
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
@@ -435,8 +434,8 @@ class RenderLayer : public ScrollBarClient {
   int m_scrollHeight;
 
   // For layers with overflow, we have a pair of scrollbars.
-  ScrollBar* m_hBar;
-  ScrollBar* m_vBar;
+  RefPtr<Scrollbar> m_hBar;
+  RefPtr<Scrollbar> m_vBar;
 
   // The rectangle for the control to resize layers that have overflow.
   IntRect m_resizeControlRect;

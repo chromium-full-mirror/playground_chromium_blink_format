@@ -55,7 +55,7 @@ void HTMLFrameElement::init() {
   m_frameBorderSet = false;
   m_marginWidth = -1;
   m_marginHeight = -1;
-  m_scrolling = ScrollBarAuto;
+  m_scrolling = ScrollbarAuto;
   m_noResize = false;
   m_viewSource = false;
 }
@@ -143,9 +143,9 @@ void HTMLFrameElement::parseMappedAttribute(MappedAttribute* attr) {
     // scrolling."
     if (equalIgnoringCase(attr->value(), "auto") ||
         equalIgnoringCase(attr->value(), "yes"))
-      m_scrolling = ScrollBarAuto;
+      m_scrolling = ScrollbarAuto;
     else if (equalIgnoringCase(attr->value(), "no"))
-      m_scrolling = ScrollBarAlwaysOff;
+      m_scrolling = ScrollbarAlwaysOff;
     // FIXME: If we are already attached, this has no effect.
   } else if (attr->name() == viewsourceAttr) {
     m_viewSource = !attr->isNull();

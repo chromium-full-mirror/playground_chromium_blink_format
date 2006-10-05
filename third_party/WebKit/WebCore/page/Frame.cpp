@@ -864,7 +864,7 @@ void Frame::finishedParsing() {
   // check if the scrollbars are really needed for the content
   // if not, remove them, relayout, and repaint
 
-  d->m_view->restoreScrollBar();
+  d->m_view->restoreScrollbar();
   gotoAnchor();
 }
 
@@ -3176,8 +3176,8 @@ bool Frame::scrollbarsVisible() {
   if (!view())
     return false;
 
-  if (view()->hScrollBarMode() == ScrollBarAlwaysOff ||
-      view()->vScrollBarMode() == ScrollBarAlwaysOff)
+  if (view()->hScrollbarMode() == ScrollbarAlwaysOff ||
+      view()->vScrollbarMode() == ScrollbarAlwaysOff)
     return false;
 
   return true;

@@ -30,7 +30,7 @@ namespace WebCore {
 class HTMLSelectElement;
 class HTMLOptionElement;
 
-class RenderListBox : public RenderBlock, public ScrollBarClient {
+class RenderListBox : public RenderBlock, public ScrollbarClient {
  public:
   RenderListBox(HTMLSelectElement*);
   ~RenderListBox();
@@ -57,7 +57,7 @@ class RenderListBox : public RenderBlock, public ScrollBarClient {
   virtual void calcHeight();
   void setOptionsChanged(bool c) { m_optionsChanged = c; }
   void valueChanged(unsigned listIndex);
-  virtual void valueChanged(ScrollBar*);
+  virtual void valueChanged(Scrollbar*);
 
   HTMLOptionElement* optionAtPoint(int x, int y);
 
@@ -81,7 +81,7 @@ class RenderListBox : public RenderBlock, public ScrollBarClient {
   void paintItemForeground(PaintInfo&, int tx, int ty, int listIndex);
   void paintItemBackground(PaintInfo&, int tx, int ty, int listIndex);
 
-  ScrollBar* m_vBar;
+  Scrollbar* m_vBar;
 };
 }
 
