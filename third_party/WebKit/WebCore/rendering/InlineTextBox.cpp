@@ -497,7 +497,7 @@ void InlineTextBox::paintSelection(GraphicsContext* p,
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
-  p->addClip(IntRect(m_x + tx, y + ty, m_width, h));
+  p->clip(IntRect(m_x + tx, y + ty, m_width, h));
   p->drawHighlightForText(
       TextRun(textObject()->string(), m_start, m_len, sPos, ePos),
       IntPoint(m_x + tx, y + ty), h,
@@ -684,7 +684,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
     Color yellow = Color(255, 255, 0);
     pt->save();
     pt->setPen(yellow);  // Don't draw text at all!
-    pt->addClip(IntRect(_tx + m_x, _ty + y, m_width, h));
+    pt->clip(IntRect(_tx + m_x, _ty + y, m_width, h));
     pt->drawHighlightForText(run, startPoint, h, renderStyle, yellow);
     pt->restore();
   }

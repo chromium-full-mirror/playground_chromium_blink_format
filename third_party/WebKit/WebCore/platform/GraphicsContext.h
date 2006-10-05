@@ -132,7 +132,7 @@ class GraphicsContext : Noncopyable {
                       Image::TileRule vRule = Image::StretchTile,
                       CompositeOperator = CompositeSourceOver);
 
-  void addClip(const IntRect&);
+  void clip(const IntRect&);
   void addRoundedRectClip(const IntRect&,
                           const IntSize& topLeft,
                           const IntSize& topRight,

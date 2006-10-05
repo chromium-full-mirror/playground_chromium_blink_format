@@ -661,7 +661,7 @@ void InlineFlowBox::paintBackground(GraphicsContext* p,
     for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
       totalWidth += curr->width();
     p->save();
-    p->addClip(IntRect(_tx, _ty, width(), height()));
+    p->clip(IntRect(_tx, _ty, width(), height()));
     object()->paintBackgroundExtended(
         p, c, bgLayer, my, mh, startX, _ty, totalWidth, h, borderLeft(),
         borderRight(), paddingLeft(), paddingRight());
@@ -740,7 +740,7 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
         for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
           totalWidth += curr->width();
         p->save();
-        p->addClip(IntRect(_tx, _ty, width(), height()));
+        p->clip(IntRect(_tx, _ty, width(), height()));
         object()->paintBorder(p, startX, _ty, totalWidth, h, object()->style());
         p->restore();
       }

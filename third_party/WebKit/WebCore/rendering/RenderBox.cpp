@@ -502,7 +502,7 @@ void RenderBox::paintBackgroundExtended(GraphicsContext* p,
     int height = h - borderTop() - borderBottom() -
                  (includePadding ? paddingTop() + paddingBottom() : 0);
     p->save();
-    p->addClip(IntRect(x, y, width, height));
+    p->clip(IntRect(x, y, width, height));
   }
 
   CachedImage* bg = bgLayer->backgroundImage();

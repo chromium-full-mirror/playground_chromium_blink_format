@@ -406,7 +406,7 @@ void RenderLayer::beginTransparencyLayers(GraphicsContext* p,
     IntRect clipRect = transparencyClipBox(this);
     clipRect.intersect(paintDirtyRect);
     p->save();
-    p->addClip(clipRect);
+    p->clip(clipRect);
     p->beginTransparencyLayer(renderer()->opacity());
   }
 }
@@ -1324,7 +1324,7 @@ static void setClip(GraphicsContext* p,
   if (paintDirtyRect == clipRect)
     return;
   p->save();
-  p->addClip(clipRect);
+  p->clip(clipRect);
 }
 
 static void restoreClip(GraphicsContext* p,

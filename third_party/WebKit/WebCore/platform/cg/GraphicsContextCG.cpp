@@ -84,11 +84,19 @@ static void setCGStrokeColor(CGContextRef context, const Color& color) {
 }
 
 void GraphicsContext::savePlatformState() {
+  // Note: Do not use this function within this class implementation, since we
+  // want to avoid the extra
+  // save of the secondary context (in GraphicsContextPlatformPrivate.h).
   CGContextSaveGState(platformContext());
+  m_data->save();
 }
 
 void GraphicsContext::restorePlatformState() {
+  // Note: Do not use this function within this class implementation, since we
+  // want to avoid the extra
+  // restore of the secondary context (in GraphicsContextPlatformPrivate.h).
   CGContextRestoreGState(platformContext());
+  m_data->restore();
 }
 
 // Draws a filled rectangle with a stroked border.
@@ -444,10 +452,11 @@ void GraphicsContext::fillRect(const FloatRect& rect, const Color& color) {
   }
 }
 
-void GraphicsContext::addClip(const IntRect& rect) {
+void GraphicsContext::clip(const IntRect& rect) {
   if (paintingDisabled())
     return;
   CGContextClipToRect(platformContext(), rect);
+  m_data->clip(rect);
 }
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
@@ -471,7 +480,7 @@ void GraphicsContext::addRoundedRectClip(const IntRect& rect,
     return;
 
   // Clip to our rect.
-  addClip(rect);
+  clip(rect);
 
   // OK, the curves can fit.
   CGContextRef context = platformContext();
@@ -535,7 +544,7 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   if (paintingDisabled())
     return;
 
-  addClip(rect);
+  clip(rect);
   CGContextRef context = platformContext();
 
   // Add outer ellipse
@@ -669,30 +678,35 @@ void GraphicsContext::clip(const Path& path) {
   CGContextBeginPath(context);
   CGContextAddPath(context, path.platformPath());
   CGContextClip(context);
+  m_data->clip(path);
 }
 
 void GraphicsContext::scale(const FloatSize& size) {
   if (paintingDisabled())
     return;
   CGContextScaleCTM(platformContext(), size.width(), size.height());
+  m_data->scale(size);
 }
 
 void GraphicsContext::rotate(float angle) {
   if (paintingDisabled())
     return;
   CGContextRotateCTM(platformContext(), angle);
+  m_data->rotate(angle);
 }
 
 void GraphicsContext::translate(float x, float y) {
   if (paintingDisabled())
     return;
   CGContextTranslateCTM(platformContext(), x, y);
+  m_data->translate(x, y);
 }
 
 void GraphicsContext::concatCTM(const AffineTransform& transform) {
   if (paintingDisabled())
     return;
   CGContextConcatCTM(platformContext(), transform);
+  m_data->concatCTM(transform);
 }
 
 FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
