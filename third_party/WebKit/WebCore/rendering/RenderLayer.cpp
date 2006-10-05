@@ -120,6 +120,8 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_next(0),
       m_first(0),
       m_last(0),
+      m_repaintX(0),
+      m_repaintY(0),
       m_relX(0),
       m_relY(0),
       m_x(0),
