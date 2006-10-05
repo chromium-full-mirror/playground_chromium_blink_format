@@ -51,8 +51,8 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   m_frame->didOpenURL(url);
   m_beginCalled = false;
 
-  ResourceLoader* job = new ResourceLoader(this, "GET", url);
-  job->start(0);
+  RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
+  loader->start(0);
 }
 
 void FrameQtClientDefault::submitForm(const String& method,
@@ -60,8 +60,9 @@ void FrameQtClientDefault::submitForm(const String& method,
                                       const FormData* postData) {
   m_beginCalled = false;
 
-  ResourceLoader* job = new ResourceLoader(this, method, url, *postData);
-  job->start(0);
+  RefPtr<ResourceLoader> loader =
+      ResourceLoader::create(this, method, url, *postData);
+  loader->start(0);
 }
 
 void FrameQtClientDefault::receivedResponse(ResourceLoader*, PlatformResponse) {
