@@ -49,7 +49,7 @@ class IconLoader : public ResourceLoaderClient {
 
   void notifyIconChanged(const KURL& iconURL);
 
-  ResourceLoader* m_resourceLoader;
+  RefPtr<ResourceLoader> m_resourceLoader;
   Frame* m_frame;
 
   static const int IconLoaderDefaultBuffer = 4096;

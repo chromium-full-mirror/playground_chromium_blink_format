@@ -115,7 +115,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
   bool m_async;
   DeprecatedString m_requestHeaders;
 
-  ResourceLoader* m_loader;
+  RefPtr<ResourceLoader> m_loader;
 
   XMLHttpRequestState m_state;
 

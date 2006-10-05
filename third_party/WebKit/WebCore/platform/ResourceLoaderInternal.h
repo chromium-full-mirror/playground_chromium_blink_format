@@ -66,7 +66,9 @@ class ResourceLoaderInternal {
         URL(u),
         method(method),
         assembledResponseHeaders(true),
-        retrievedCharset(true)
+        retrievedCharset(true),
+        m_loading(false),
+        m_cancelled(false)
 #if USE(CFNETWORK)
         ,
         m_connection(0)
@@ -107,7 +109,9 @@ class ResourceLoaderInternal {
         method(method),
         postData(p),
         assembledResponseHeaders(true),
-        retrievedCharset(true)
+        retrievedCharset(true),
+        m_loading(false),
+        m_cancelled(false)
 #if USE(CFNETWORK)
         ,
         m_connection(0)
@@ -150,6 +154,9 @@ class ResourceLoaderInternal {
   bool assembledResponseHeaders;
   bool retrievedCharset;
   DeprecatedString responseHeaders;
+
+  bool m_loading;
+  bool m_cancelled;
 
 #if USE(CFNETWORK)
   CFURLConnectionRef m_connection;

@@ -43,6 +43,19 @@ ResourceLoader::ResourceLoader(ResourceLoaderClient* client,
                                const FormData& postData)
     : d(new ResourceLoaderInternal(this, client, method, url, postData)) {}
 
+PassRefPtr<ResourceLoader> ResourceLoader::create(ResourceLoaderClient* client,
+                                                  const String& method,
+                                                  const KURL& url) {
+  return new ResourceLoader(client, method, url);
+}
+
+PassRefPtr<ResourceLoader> ResourceLoader::create(ResourceLoaderClient* client,
+                                                  const String& method,
+                                                  const KURL& url,
+                                                  const FormData& postData) {
+  return new ResourceLoader(client, method, url, postData);
+}
+
 bool ResourceLoader::isErrorPage() const {
   return d->status != 0;
 }
@@ -80,7 +93,12 @@ void ResourceLoader::addMetaData(const HashMap<String, String>& keysAndValues) {
 }
 
 void ResourceLoader::kill() {
-  delete this;
+  if (d->m_loading) {
+    ASSERT(!d->m_cancelled);
+    d->m_loading = false;
+    d->m_cancelled = true;
+    deref();
+  }
 }
 
 KURL ResourceLoader::url() const {

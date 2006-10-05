@@ -321,15 +321,15 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
     if (!m_encoding.isValid())  // FIXME: report an error?
       m_encoding = UTF8Encoding();
 
-    m_loader =
-        new ResourceLoader(m_async ? this : 0, m_method, m_url,
-                           m_encoding.encode(body.characters(), body.length()));
+    m_loader = ResourceLoader::create(
+        m_async ? this : 0, m_method, m_url,
+        m_encoding.encode(body.characters(), body.length()));
   } else {
     // FIXME: HEAD requests just crash; see <rdar://4460899> and the commented
     // out tests in http/tests/xmlhttprequest/methods.html.
     if (m_method == "HEAD")
       m_method = "GET";
-    m_loader = new ResourceLoader(m_async ? this : 0, m_method, m_url);
+    m_loader = ResourceLoader::create(m_async ? this : 0, m_method, m_url);
   }
 
   if (m_requestHeaders.length())
@@ -345,7 +345,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
       data = ServeSynchronousRequest(Cache::loader(), m_doc->docLoader(),
-                                     m_loader, finalURL, headers);
+                                     m_loader.get(), finalURL, headers);
     }
 
     m_loader = 0;

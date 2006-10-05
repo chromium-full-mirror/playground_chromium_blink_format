@@ -37,8 +37,7 @@
 
 using namespace WebCore;
 
-IconLoader::IconLoader(Frame* frame)
-    : m_resourceLoader(0), m_frame(frame), m_httpStatusCode(0) {}
+IconLoader::IconLoader(Frame* frame) : m_frame(frame), m_httpStatusCode(0) {}
 
 IconLoader* IconLoader::createForFrame(Frame* frame) {
   if (frame)
@@ -47,7 +46,8 @@ IconLoader* IconLoader::createForFrame(Frame* frame) {
 }
 
 IconLoader::~IconLoader() {
-  delete m_resourceLoader;
+  if (m_resourceLoader)
+    m_resourceLoader->kill();
 }
 
 void IconLoader::startLoading() {
@@ -55,7 +55,7 @@ void IconLoader::startLoading() {
     return;
 
   m_httpStatusCode = 0;
-  m_resourceLoader = new ResourceLoader(this, "GET", m_frame->iconURL());
+  m_resourceLoader = ResourceLoader::create(this, "GET", m_frame->iconURL());
 
   // A frame may be documentless - one example is viewing a PDF directly
   if (!m_frame->document()) {
@@ -66,12 +66,15 @@ void IconLoader::startLoading() {
   } else if (!m_resourceLoader->start(m_frame->document()->docLoader())) {
     LOG_ERROR("Failed to start load for icon at url %s",
               m_frame->iconURL().url().ascii());
+    if (m_resourceLoader)
+      m_resourceLoader->kill();
     m_resourceLoader = 0;
   }
 }
 
 void IconLoader::stopLoading() {
-  delete m_resourceLoader;
+  if (m_resourceLoader)
+    m_resourceLoader->kill();
   m_resourceLoader = 0;
   m_data.clear();
 }
@@ -79,7 +82,7 @@ void IconLoader::stopLoading() {
 void IconLoader::receivedData(ResourceLoader* resourceLoader,
                               const char* data,
                               int size) {
-  ASSERT(resourceLoader = m_resourceLoader);
+  ASSERT(resourceLoader == m_resourceLoader);
   ASSERT(data);
   ASSERT(size > -1);
 
