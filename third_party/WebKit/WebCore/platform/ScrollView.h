@@ -27,6 +27,7 @@
 #define ScrollView_H
 
 #include "ScrollBarMode.h"
+#include "ScrollBar.h"
 #include "Widget.h"
 #include <wtf/Platform.h>
 
@@ -96,6 +97,8 @@ class ScrollView : public Widget {
   // platforms
   // (like Windows), we need this method in order to do the scroll ourselves.
   void wheelEvent(PlatformWheelEvent&);
+
+  void scroll(ScrollDirection, ScrollGranularity);
 
 #if PLATFORM(MAC)
   NSView* getDocumentView() const;
