@@ -67,6 +67,8 @@ void RenderForeignObject::paint(PaintInfo& paintInfo,
 
   float opacity = style()->opacity();
   if (opacity < 1.0f)
+    // FIXME: Possible optimization by clipping to bbox here, once relativeBBox
+    // is implemented & clip, mask and filter support added.
     paintInfo.p->beginTransparencyLayer(opacity);
 
   PaintInfo pi(paintInfo);
