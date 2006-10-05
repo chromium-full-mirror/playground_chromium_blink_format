@@ -58,7 +58,6 @@
 #include "PlugInInfoStore.h"
 #include "RenderTheme.h"
 #include "FrameWin.h"
-#include "BrowserExtensionWin.h"
 #include "ResourceLoader.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
@@ -441,35 +440,6 @@ bool FrameWin::isLoadTypeReload() {
   return false;
 }
 
-bool BrowserExtensionWin::canRunModal() {
-  notImplemented();
-  return 0;
-}
-void BrowserExtensionWin::createNewWindow(
-    struct WebCore::ResourceRequest const&,
-    struct WebCore::WindowArgs const&,
-    Frame*&) {
-  notImplemented();
-}
-bool BrowserExtensionWin::canRunModalNow() {
-  notImplemented();
-  return 0;
-}
-void BrowserExtensionWin::runModal() {
-  notImplemented();
-}
-void BrowserExtensionWin::goBackOrForward(int) {
-  notImplemented();
-}
-KURL BrowserExtensionWin::historyURL(int distance) {
-  notImplemented();
-  return KURL();
-}
-void BrowserExtensionWin::createNewWindow(
-    struct WebCore::ResourceRequest const&) {
-  notImplemented();
-}
-
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
                                          const IntSize& topLeft,
                                          const IntSize& topRight,
@@ -598,13 +568,6 @@ Plugin* FrameWin::createPlugin(Element*,
 }
 ObjectContentType FrameWin::objectContentType(const KURL&, const String&) {
   return ObjectContentNone;
-}
-
-BrowserExtensionWin::BrowserExtensionWin(WebCore::Frame*) {}
-void BrowserExtensionWin::setTypedIconURL(KURL const&, const String&) {}
-void BrowserExtensionWin::setIconURL(KURL const&) {}
-int BrowserExtensionWin::getHistoryLength() {
-  return 0;
 }
 
 namespace WebCore {
