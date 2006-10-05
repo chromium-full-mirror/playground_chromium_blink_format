@@ -240,6 +240,14 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            floodColor,
                                            Color(0, 0, 0))
 
+  // convenience
+  bool hasStroke() const {
+    return (strokePaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE);
+  }
+  bool hasFill() const {
+    return (fillPaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE);
+  }
+
  protected:
   // inherit
   struct InheritedFlags {

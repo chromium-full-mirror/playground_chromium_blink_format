@@ -21,11 +21,11 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_KCanvasRenderingStyle_H
-#define KSVG_KCanvasRenderingStyle_H
+#ifndef KCanvasRenderingStyle_H
+#define KCanvasRenderingStyle_H
 #ifdef SVG_SUPPORT
 
-#include "DeprecatedValueList.h"
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -35,7 +35,11 @@ enum KCCapStyle { CAP_BUTT = 1, CAP_ROUND = 2, CAP_SQUARE = 3 };
 enum KCJoinStyle { JOIN_MITER = 1, JOIN_ROUND = 2, JOIN_BEVEL = 3 };
 
 // Special types
-typedef DeprecatedValueList<float> KCDashArray;
+#if PLATFORM(CG)
+typedef Vector<CGFloat> KCDashArray;
+#else
+typedef Vector<float> KCDashArray;
+#endif
 
 class CSSValue;
 class KRenderingFillPainter;
@@ -51,11 +55,8 @@ class KSVGPainterFactory {
   static KRenderingStrokePainter strokePainter(const RenderStyle*,
                                                const RenderObject*);
 
-  static bool isStroked(const RenderStyle*);
   static KRenderingPaintServer* strokePaintServer(const RenderStyle*,
                                                   const RenderObject*);
-
-  static bool isFilled(const RenderStyle*);
   static KRenderingPaintServer* fillPaintServer(const RenderStyle*,
                                                 const RenderObject*);
 
@@ -67,6 +68,6 @@ class KSVGPainterFactory {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_KCanvasRenderingStyle_H
+#endif  // KCanvasRenderingStyle_H
 
 // vim:ts=4:noet

@@ -27,7 +27,6 @@
 
 #include "Attr.h"
 #include "CSSPropertyNames.h"
-#include "KCanvasRenderingStyle.h"
 #include "RenderSVGImage.h"
 #include "SVGLength.h"
 #include "SVGPreserveAspectRatio.h"
@@ -36,11 +35,11 @@
 #include "SVGNames.h"
 #include "SVGSVGElement.h"
 #include "XLinkNames.h"
-#include <kcanvas/RenderSVGContainer.h>
-#include <kcanvas/KCanvasImage.h>
+#include "RenderSVGContainer.h"
+#include "KCanvasImage.h"
 #include <wtf/Assertions.h>
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGImageElement::SVGImageElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledTransformableElement(tagName, doc),
@@ -142,6 +141,7 @@ void SVGImageElement::attach() {
   SVGStyledTransformableElement::attach();
   if (RenderSVGImage* imageObj = static_cast<RenderSVGImage*>(renderer()))
     imageObj->setCachedImage(m_imageLoader.image());
+}
 }
 
 // vim:ts=4:noet

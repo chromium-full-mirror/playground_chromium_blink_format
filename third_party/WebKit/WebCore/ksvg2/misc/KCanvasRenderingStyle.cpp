@@ -48,17 +48,10 @@ static KRenderingPaintServerSolid* sharedSolidPaintServer() {
   return _sharedSolidPaintServer;
 }
 
-bool KSVGPainterFactory::isFilled(const RenderStyle* style) {
-  if (style->svgStyle()->fillPaint()->paintType() ==
-      SVGPaint::SVG_PAINTTYPE_NONE)
-    return false;
-  return true;
-}
-
 KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
     const RenderStyle* style,
     const RenderObject* item) {
-  if (!isFilled(style))
+  if (!style->svgStyle()->hasFill())
     return 0;
 
   SVGPaint* fill = style->svgStyle()->fillPaint();
@@ -87,17 +80,10 @@ KRenderingPaintServer* KSVGPainterFactory::fillPaintServer(
   return fillPaintServer;
 }
 
-bool KSVGPainterFactory::isStroked(const RenderStyle* style) {
-  if (style->svgStyle()->strokePaint()->paintType() ==
-      SVGPaint::SVG_PAINTTYPE_NONE)
-    return false;
-  return true;
-}
-
 KRenderingPaintServer* KSVGPainterFactory::strokePaintServer(
     const RenderStyle* style,
     const RenderObject* item) {
-  if (!isStroked(style))
+  if (!style->svgStyle()->hasStroke())
     return 0;
 
   SVGPaint* stroke = style->svgStyle()->strokePaint();

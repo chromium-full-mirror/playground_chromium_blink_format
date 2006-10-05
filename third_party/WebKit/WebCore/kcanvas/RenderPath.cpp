@@ -291,10 +291,10 @@ bool RenderPath::nodeAtPoint(NodeInfo& info,
   if (isVisible || !hitRules.requireVisible) {
     FloatPoint hitPoint(_x, _y);
     if ((hitRules.canHitStroke &&
-         (KSVGPainterFactory::isStroked(style()) || !hitRules.requireStroke) &&
+         (style()->svgStyle()->hasStroke() || !hitRules.requireStroke) &&
          strokeContains(hitPoint, hitRules.requireStroke)) ||
         (hitRules.canHitFill &&
-         (KSVGPainterFactory::isFilled(style()) || !hitRules.requireFill) &&
+         (style()->svgStyle()->hasFill() || !hitRules.requireFill) &&
          fillContains(hitPoint, hitRules.requireFill))) {
       setInnerNode(info);
       return true;
