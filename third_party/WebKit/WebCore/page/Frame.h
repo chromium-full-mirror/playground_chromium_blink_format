@@ -869,6 +869,8 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   virtual void frameDetached();
 
+  void detachChildren();
+
   void updateBaseURLForEmptyDocument();
 
   KURL url() const;
