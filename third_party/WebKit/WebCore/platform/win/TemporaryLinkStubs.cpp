@@ -623,6 +623,9 @@ PlatformScrollbar* ScrollView::scrollbarUnderMouse(
     const PlatformMouseEvent& mouseEvent) {
   return 0;
 }
+void ScrollView::setFrameGeometry(const IntRect& r) {
+  Widget::setFrameGeometry(r);
+}
 
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
