@@ -115,6 +115,7 @@ class ScrollView : public Widget {
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 
   virtual void scrolled() const;
+  virtual void setFrameGeometry(const IntRect&);
 
  private:
   void updateScrollbars(const IntSize& desiredOffset);
