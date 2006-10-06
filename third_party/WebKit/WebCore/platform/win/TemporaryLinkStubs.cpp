@@ -102,6 +102,9 @@ bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
                                                PlatformScrollbar*) {
   return false;
 }
+IntRect FrameView::windowResizerRect() const {
+  return IntRect();
+}
 
 void Widget::enableFlushDrawing() {
   notImplemented();
@@ -143,6 +146,10 @@ IntPoint Widget::convertChildToSelf(const Widget*, const IntPoint& p) const {
 }
 IntPoint Widget::convertSelfToChild(const Widget*, const IntPoint& p) const {
   return p;
+}
+void Widget::setParent(ScrollView*) {}
+ScrollView* Widget::parent() const {
+  return 0;
 }
 
 JavaAppletWidget::JavaAppletWidget(IntSize const&,
@@ -441,6 +448,9 @@ KURL FrameWin::originalRequestURL() const {
 bool FrameWin::isLoadTypeReload() {
   notImplemented();
   return false;
+}
+IntRect FrameWin::windowResizerRect() const {
+  return IntRect();
 }
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,

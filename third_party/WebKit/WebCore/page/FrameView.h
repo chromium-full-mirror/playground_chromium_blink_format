@@ -115,6 +115,7 @@ class FrameView : public ScrollView {
   virtual void setVScrollbarMode(ScrollbarMode);
   virtual void setHScrollbarMode(ScrollbarMode);
   virtual void setScrollbarsMode(ScrollbarMode);
+  virtual IntRect windowResizerRect() const;
 
   void print();
 

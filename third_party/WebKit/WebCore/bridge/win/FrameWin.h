@@ -151,6 +151,7 @@ class FrameWin : public Frame {
 
   bool keyPress(const PlatformKeyboardEvent&);
   virtual KURL originalRequestURL() const;
+  virtual IntRect windowResizerRect() const;
 
  protected:
   virtual bool isLoadTypeReload();

@@ -136,6 +136,9 @@ class Widget {
   void setContainingWindow(HWND);
   HWND containingWindow() const;
 
+  void setParent(ScrollView*);
+  ScrollView* parent() const;
+
   virtual void scrolled() const {};
 
   bool capturingMouse() const;
