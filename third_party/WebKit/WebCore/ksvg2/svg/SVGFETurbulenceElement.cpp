@@ -75,7 +75,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
                               SVGNames::seedAttr.localName(),
                               m_seed)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFETurbulenceElement,
-                              int,
+                              long,
                               Integer,
                               integer,
                               NumOctaves,

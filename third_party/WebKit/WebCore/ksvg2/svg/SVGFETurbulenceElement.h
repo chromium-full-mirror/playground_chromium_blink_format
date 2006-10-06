@@ -67,8 +67,8 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  BaseFrequencyY,
                                  baseFrequencyY)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
-                                 int,
-                                 int,
+                                 long,
+                                 long,
                                  NumOctaves,
                                  numOctaves)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement,
