@@ -45,7 +45,7 @@
 #include "FrameView.h"
 #include "KURL.h"
 #include "PlatformScrollBar.h"
-#include "ScrollBar.h"
+#include "Scrollbar.h"
 #include "JavaAppletWidget.h"
 #include "Page.h"
 #include "Path.h"
@@ -99,7 +99,7 @@ bool FrameView::passWheelEventToSubframe(PlatformWheelEvent& e,
   return false;
 }
 bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
-                                               PlatformScrollBar*) {
+                                               PlatformScrollbar*) {
   return false;
 }
 
@@ -115,6 +115,9 @@ Widget::FocusPolicy Widget::focusPolicy() const {
   return NoFocus;
 }
 void Widget::disableFlushDrawing() {
+  notImplemented();
+}
+void Widget::removeFromParent() {
   notImplemented();
 }
 GraphicsContext* Widget::lockDrawingFocus() {
@@ -603,7 +606,7 @@ IntPoint ScrollView::convertSelfToChild(const Widget*,
   return p;
 }
 void ScrollView::scrolled() const {};
-PlatformScrollBar* ScrollView::scrollbarUnderMouse(
+PlatformScrollbar* ScrollView::scrollbarUnderMouse(
     const PlatformMouseEvent& mouseEvent) {
   return 0;
 }
@@ -682,34 +685,34 @@ int TextField::baselinePosition(int) const {
 }
 void TextField::setLiveSearch(bool) {}
 
-PlatformScrollBar::PlatformScrollBar(ScrollBarClient* client,
-                                     ScrollBarOrientation orientation,
-                                     ScrollBarControlSize controlSize)
-    : ScrollBar(client, orientation, controlSize) {}
-PlatformScrollBar::~PlatformScrollBar() {}
-int PlatformScrollBar::width() const {
+PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
+                                     ScrollbarOrientation orientation,
+                                     ScrollbarControlSize controlSize)
+    : Scrollbar(client, orientation, controlSize) {}
+PlatformScrollbar::~PlatformScrollbar() {}
+int PlatformScrollbar::width() const {
   return 0;
 }
-int PlatformScrollBar::height() const {
+int PlatformScrollbar::height() const {
   return 0;
 }
-void PlatformScrollBar::setEnabled(bool) {}
-void PlatformScrollBar::paint(GraphicsContext*, const IntRect& damageRect) {}
-void PlatformScrollBar::updateThumbPosition() {}
-void PlatformScrollBar::updateThumbProportion() {}
-void PlatformScrollBar::setRect(const IntRect&) {}
+void PlatformScrollbar::setEnabled(bool) {}
+void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {}
+void PlatformScrollbar::updateThumbPosition() {}
+void PlatformScrollbar::updateThumbProportion() {}
+void PlatformScrollbar::setRect(const IntRect&) {}
 
-ScrollBar::ScrollBar(ScrollBarClient*,
-                     ScrollBarOrientation,
-                     ScrollBarControlSize) {}
-void ScrollBar::setSteps(int, int) {}
-bool ScrollBar::scroll(ScrollDirection, ScrollGranularity, float) {
+Scrollbar::Scrollbar(ScrollbarClient*,
+                     ScrollbarOrientation,
+                     ScrollbarControlSize) {}
+void Scrollbar::setSteps(int, int) {}
+bool Scrollbar::scroll(ScrollDirection, ScrollGranularity, float) {
   return false;
 }
-bool ScrollBar::setValue(int) {
+bool Scrollbar::setValue(int) {
   return false;
 }
-void ScrollBar::setProportion(int, int) {}
+void Scrollbar::setProportion(int, int) {}
 
 ListBox::ListBox() {}
 ListBox::~ListBox() {}
