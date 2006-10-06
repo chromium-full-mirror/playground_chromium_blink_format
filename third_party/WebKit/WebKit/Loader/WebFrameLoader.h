@@ -207,6 +207,8 @@ typedef enum {
     (WebDocumentLoadState*)loadState;
 - (void)prepareForLoadStart;
 - (BOOL)subframeIsLoading;
+- (void)willChangeTitleForDocumentLoadState:(WebDocumentLoadState*)loadState;
+- (void)didChangeTitleForDocumentLoadState:(WebDocumentLoadState*)loadState;
 
 - (WebFrameLoadType)loadType;
 - (void)setLoadType:(WebFrameLoadType)type;

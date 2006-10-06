@@ -52,26 +52,17 @@
 @protocol WebDocumentRepresentation;
 
 @interface WebDataSource (WebInternal)
-- (void)_setTitle:(NSString*)title;
-- (NSString*)_overrideEncoding;
-- (void)_setOverrideEncoding:(NSString*)overrideEncoding;
 - (void)_addToUnarchiveState:(WebArchive*)archive;
 - (NSURL*)_URLForHistory;
 - (void)_makeRepresentation;
 - (BOOL)_loadingFromPageCache;
-- (NSArray*)_responses;
 - (BOOL)_isDocumentHTML;
-- (void)_setTriggeringAction:(NSDictionary*)action;
-- (NSDictionary*)_triggeringAction;
 - (WebView*)_webView;
 - (WebFrameBridge*)_bridge;
 - (void)_stopLoadingWithError:(NSError*)error;
-- (NSURLRequest*)_lastCheckedRequest;
-- (void)_setLastCheckedRequest:(NSURLRequest*)request;
 - (WebArchive*)_popSubframeArchiveWithName:(NSString*)frameName;
 - (void)_loadFromPageCache:(NSDictionary*)pageCache;
 - (NSURL*)_URL;
-- (NSString*)_title;
 - (DOMElement*)_imageElementWithImageResource:(WebResource*)resource;
 - (DOMDocumentFragment*)_documentFragmentWithImageResource:
     (WebResource*)resource;
@@ -80,10 +71,8 @@
     (BOOL)allowImageTypeOmission;
 - (void)_replaceSelectionWithArchive:(WebArchive*)archive
                    selectReplacement:(BOOL)selectReplacement;
-- (void)_stopRecordingResponses;
 - (void)_startLoading;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
-- (void)_stopRecordingResponses;
 - (void)_startLoading;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
 - (id)_identifierForInitialRequest:(NSURLRequest*)clientRequest;
