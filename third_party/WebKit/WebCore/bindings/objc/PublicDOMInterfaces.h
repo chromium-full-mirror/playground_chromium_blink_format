@@ -298,6 +298,20 @@
 - (void)focus;
 @end
 
+@interface DOMHTMLAppletElement : DOMHTMLElement
+@property NSString* align;
+@property NSString* alt;
+@property NSString* archive;
+@property NSString* code;
+@property NSString* codeBase;
+@property NSString* height;
+@property int hspace;
+@property NSString* name;
+@property NSString* object;
+@property int vspace;
+@property NSString* width;
+@end
+
 @interface DOMHTMLAreaElement : DOMHTMLElement
 @property NSString* accessKey;
 @property NSString* alt;
@@ -396,6 +410,15 @@
 @property NSString* contentEditable;
 @property(readonly) BOOL isContentEditable;
 @property(readonly) NSString* titleDisplayString;
+@end
+
+@interface DOMHTMLEmbedElement : DOMHTMLElement
+@property NSString* align;
+@property int height;
+@property NSString* name;
+@property NSString* src;
+@property NSString* type;
+@property int width;
 @end
 
 @interface DOMHTMLFieldSetElement : DOMHTMLElement
@@ -601,6 +624,17 @@
 @interface DOMHTMLOptGroupElement : DOMHTMLElement
 @property BOOL disabled;
 @property NSString* label;
+@end
+
+@interface DOMHTMLOptionElement : DOMHTMLElement
+@property(readonly) DOMHTMLFormElement* form;
+@property BOOL defaultSelected;
+@property(readonly) NSString* text;
+@property(readonly) int index;
+@property BOOL disabled;
+@property NSString* label;
+@property BOOL selected;
+@property NSString* value;
 @end
 
 @interface DOMHTMLOptionsCollection : DOMObject
@@ -1062,6 +1096,20 @@
 
 @protocol DOMEventListener<NSObject>
 - (void)handleEvent:(DOMEvent*)evt;
+@end
+
+@protocol DOMEventTarget<NSObject, NSCopying>
+- (void)addEventListener:(NSString*)type
+                listener:(id<DOMEventListener>)listener
+              useCapture:(BOOL)useCapture;
+- (void)removeEventListener:(NSString*)type
+                   listener:(id<DOMEventListener>)listener
+                 useCapture:(BOOL)useCapture;
+- (BOOL)dispatchEvent:(DOMEvent*)event;
+@end
+
+@protocol DOMNodeFilter<NSObject>
+- (short)acceptNode:(DOMNode*)n;
 @end
 
 @protocol DOMXPathNSResolver<NSObject>
