@@ -32,8 +32,8 @@
 // and it is no longer completely appropriate for use outside of WebKit.
 
 @interface WebDynamicScrollBarsView : NSScrollView<WebCoreFrameView> {
-  WebCoreScrollBarMode hScroll;
-  WebCoreScrollBarMode vScroll;
+  WebCoreScrollbarMode hScroll;
+  WebCoreScrollbarMode vScroll;
   BOOL hScrollModeLocked;
   BOOL vScrollModeLocked;
   BOOL suppressLayout;
