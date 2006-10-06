@@ -118,7 +118,8 @@ class ScrollView : public Widget {
   virtual void scrolled() const;
   virtual void setFrameGeometry(const IntRect&);
 
-  virtual IntRect windowResizerRect();
+  IntRect windowResizerRect();
+  bool resizerOverlapsContent() const;
 
  private:
   void updateScrollbars(const IntSize& desiredOffset);

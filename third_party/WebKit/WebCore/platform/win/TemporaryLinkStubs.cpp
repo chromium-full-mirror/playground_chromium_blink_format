@@ -626,6 +626,9 @@ void ScrollView::setFrameGeometry(const IntRect& r) {
 IntRect ScrollView::windowResizerRect() {
   return IntRect();
 }
+bool ScrollView::resizerOverlapsContent() const {
+  return false;
+}
 
 void GraphicsContext::setShadow(IntSize const&, int, Color const&) {}
 void GraphicsContext::clearShadow() {}
