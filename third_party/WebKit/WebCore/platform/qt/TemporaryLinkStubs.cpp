@@ -241,56 +241,56 @@ Widget::FocusPolicy Slider::focusPolicy() const {
   return NoFocus;
 }
 
-ScrollBar::ScrollBar(ScrollBarClient*,
-                     ScrollBarOrientation,
-                     ScrollBarControlSize) {
+Scrollbar::Scrollbar(ScrollbarClient*,
+                     ScrollbarOrientation,
+                     ScrollbarControlSize) {
   notImplemented();
 }
-void ScrollBar::setSteps(int, int) {
+void Scrollbar::setSteps(int, int) {
   notImplemented();
 }
-bool ScrollBar::scroll(ScrollDirection, ScrollGranularity, float) {
-  notImplemented();
-  return 0;
-}
-bool ScrollBar::setValue(int) {
+bool Scrollbar::scroll(ScrollDirection, ScrollGranularity, float) {
   notImplemented();
   return 0;
 }
-void ScrollBar::setProportion(int, int) {
+bool Scrollbar::setValue(int) {
+  notImplemented();
+  return 0;
+}
+void Scrollbar::setProportion(int, int) {
   notImplemented();
 }
 
-PlatformScrollBar::PlatformScrollBar(ScrollBarClient* client,
-                                     ScrollBarOrientation orientation,
-                                     ScrollBarControlSize controlSize)
-    : ScrollBar(client, orientation, controlSize) {
+PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
+                                     ScrollbarOrientation orientation,
+                                     ScrollbarControlSize controlSize)
+    : Scrollbar(client, orientation, controlSize) {
   notImplemented();
 }
-PlatformScrollBar::~PlatformScrollBar() {
+PlatformScrollbar::~PlatformScrollbar() {
   notImplemented();
 }
-int PlatformScrollBar::width() const {
-  notImplemented();
-  return 0;
-}
-int PlatformScrollBar::height() const {
+int PlatformScrollbar::width() const {
   notImplemented();
   return 0;
 }
-void PlatformScrollBar::setEnabled(bool) {
+int PlatformScrollbar::height() const {
+  notImplemented();
+  return 0;
+}
+void PlatformScrollbar::setEnabled(bool) {
   notImplemented();
 }
-void PlatformScrollBar::paint(GraphicsContext*, const IntRect& damageRect) {
+void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {
   notImplemented();
 }
-void PlatformScrollBar::updateThumbPosition() {
+void PlatformScrollbar::updateThumbPosition() {
   notImplemented();
 }
-void PlatformScrollBar::updateThumbProportion() {
+void PlatformScrollbar::updateThumbProportion() {
   notImplemented();
 }
-void PlatformScrollBar::setRect(const IntRect&) {
+void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
 }
 
@@ -421,7 +421,7 @@ bool FrameView::passWheelEventToSubframe(PlatformWheelEvent& e,
 }
 bool FrameView::passMousePressEventToScrollbar(
     MouseEventWithHitTestResults& mev,
-    PlatformScrollBar*) {
+    PlatformScrollbar*) {
   return false;
 }
 

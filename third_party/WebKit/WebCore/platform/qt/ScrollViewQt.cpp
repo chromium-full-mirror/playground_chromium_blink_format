@@ -136,68 +136,68 @@ void ScrollView::scrollBy(int dx, int dy) {
                                         dy);
 }
 
-ScrollBarMode ScrollView::hScrollBarMode() const {
+ScrollbarMode ScrollView::hScrollbarMode() const {
   switch (m_area->horizontalScrollBarPolicy()) {
     case Qt::ScrollBarAsNeeded:
-      return ScrollBarAuto;
+      return ScrollbarAuto;
     case Qt::ScrollBarAlwaysOff:
-      return ScrollBarAlwaysOff;
+      return ScrollbarAlwaysOff;
     case Qt::ScrollBarAlwaysOn:
-      return ScrollBarAlwaysOn;
+      return ScrollbarAlwaysOn;
   }
 
-  return ScrollBarAuto;
+  return ScrollbarAuto;
 }
 
-ScrollBarMode ScrollView::vScrollBarMode() const {
+ScrollbarMode ScrollView::vScrollbarMode() const {
   switch (m_area->verticalScrollBarPolicy()) {
     case Qt::ScrollBarAsNeeded:
-      return ScrollBarAuto;
+      return ScrollbarAuto;
     case Qt::ScrollBarAlwaysOff:
-      return ScrollBarAlwaysOff;
+      return ScrollbarAlwaysOff;
     case Qt::ScrollBarAlwaysOn:
-      return ScrollBarAlwaysOn;
+      return ScrollbarAlwaysOn;
   }
 
-  return ScrollBarAuto;
+  return ScrollbarAuto;
 }
 
-void ScrollView::suppressScrollBars(bool suppressed,
+void ScrollView::suppressScrollbars(bool suppressed,
                                     bool /* repaintOnSuppress */) {
-  setScrollBarsMode(suppressed ? ScrollBarAlwaysOff : ScrollBarAuto);
+  setScrollbarsMode(suppressed ? ScrollbarAlwaysOff : ScrollbarAuto);
 }
 
-void ScrollView::setHScrollBarMode(ScrollBarMode newMode) {
+void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
   switch (newMode) {
-    case ScrollBarAuto:
+    case ScrollbarAuto:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
       break;
-    case ScrollBarAlwaysOff:
+    case ScrollbarAlwaysOff:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
       break;
-    case ScrollBarAlwaysOn:
+    case ScrollbarAlwaysOn:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
       break;
   }
 }
 
-void ScrollView::setVScrollBarMode(ScrollBarMode newMode) {
+void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
   switch (newMode) {
-    case ScrollBarAuto:
+    case ScrollbarAuto:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
       break;
-    case ScrollBarAlwaysOff:
+    case ScrollbarAlwaysOff:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
       break;
-    case ScrollBarAlwaysOn:
+    case ScrollbarAlwaysOn:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
       break;
   }
 }
 
-void ScrollView::setScrollBarsMode(ScrollBarMode newMode) {
-  setHScrollBarMode(newMode);
-  setVScrollBarMode(newMode);
+void ScrollView::setScrollbarsMode(ScrollbarMode newMode) {
+  setHScrollbarMode(newMode);
+  setVScrollbarMode(newMode);
 }
 
 void ScrollView::setStaticBackground(bool flag) {
@@ -231,7 +231,7 @@ void ScrollView::wheelEvent(PlatformWheelEvent&) {
   notImplemented();
 }
 
-PlatformScrollBar* ScrollView::scrollbarUnderMouse(
+PlatformScrollbar* ScrollView::scrollbarUnderMouse(
     const PlatformMouseEvent& mouseEvent) {
   // Probably don't care about this.
   return 0;
