@@ -203,5 +203,7 @@ typedef enum {
     mainReceivedCompleteError:(NSError*)error;
 - (void)finalSetupForReplaceWithDocumentLoadState:
     (WebDocumentLoadState*)loadState;
+- (void)prepareForLoadStart;
+- (BOOL)subframeIsLoading;
 
 @end
