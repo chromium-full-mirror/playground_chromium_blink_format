@@ -57,6 +57,7 @@ class IntPoint;
 class IntRect;
 class IntSize;
 class PlatformMouseEvent;
+class ScrollView;
 class WidgetClient;
 class WidgetPrivate;
 
@@ -129,12 +130,14 @@ class Widget {
 
   virtual bool isFrameView() const;
 
+  virtual void removeFromParent();
+
 #if PLATFORM(WIN)
   void setContainingWindow(HWND);
   HWND containingWindow() const;
 
-  void setParent(Widget*);
-  Widget* parent() const;
+  void setParent(ScrollView*);
+  ScrollView* parent() const;
 
   virtual void scrolled() const {};
 
