@@ -62,8 +62,6 @@ class ScrollView : public Widget {
   // Set the mode for both scrollbars at once.
   virtual void setScrollbarsMode(ScrollbarMode);
 
-  virtual IntRect windowResizerRect() const { return IntRect(); }
-
   // This gives us a means of blocking painting on our scrollbars until the
   // first layout has occurred.
   void suppressScrollbars(bool suppressed, bool repaintOnUnsuppress = false);
@@ -119,6 +117,8 @@ class ScrollView : public Widget {
 
   virtual void scrolled() const;
   virtual void setFrameGeometry(const IntRect&);
+
+  virtual IntRect windowResizerRect();
 
  private:
   void updateScrollbars(const IntSize& desiredOffset);
