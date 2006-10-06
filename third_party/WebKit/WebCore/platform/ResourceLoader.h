@@ -79,6 +79,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
   ~ResourceLoader();
 
   bool start(DocLoader*);
+  bool startHTTPRequest(const String& referrer);
 
   int error() const;
   void setError(int);
