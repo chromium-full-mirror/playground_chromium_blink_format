@@ -817,9 +817,6 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   void setNeedsReapplyStyles();
 
-  void stopAutoscrollTimer();
-  RenderObject* autoscrollRenderer() const;
-
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
@@ -828,7 +825,7 @@ class Frame : public Shared<Frame>, Noncopyable {
 
   void handleAutoscroll(RenderObject*);
   void startAutoscrollTimer();
-  void setAutoscrollRenderer(RenderObject*);
+  void stopAutoscrollTimer();
 
  private:
   void emitLoadEvent();
