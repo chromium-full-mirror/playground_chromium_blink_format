@@ -102,9 +102,6 @@ bool FrameView::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
                                                PlatformScrollbar*) {
   return false;
 }
-IntRect FrameView::windowResizerRect() const {
-  return IntRect();
-}
 
 void Widget::enableFlushDrawing() {
   notImplemented();
