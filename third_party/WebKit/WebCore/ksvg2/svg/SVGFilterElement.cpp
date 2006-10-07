@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
 
     This file is part of the KDE project
 
@@ -116,7 +117,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               SVGNames::heightAttr.localName(),
                               m_height.get())
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              int,
+                              long,
                               Integer,
                               integer,
                               FilterResX,
@@ -124,7 +125,7 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               "filterResX",
                               m_filterResX)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              int,
+                              long,
                               Integer,
                               integer,
                               FilterResY,

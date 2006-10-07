@@ -73,7 +73,3 @@
 @interface DOMHTMLObjectElement (DOMHTMLObjectElementExtensions)
 - (NSURL*)absoluteImageURL;
 @end
-
-@interface DOMRange (DOMRangeExtensions)
-- (NSString*)text;
-@end

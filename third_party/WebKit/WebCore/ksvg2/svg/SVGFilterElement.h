@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
 
     This file is part of the KDE project
 
@@ -90,13 +91,13 @@ class SVGFilterElement : public SVGStyledElement,
                                  Height,
                                  height)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterElement,
-                                 int,
-                                 int,
+                                 long,
+                                 long,
                                  FilterResX,
                                  filterResX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterElement,
-                                 int,
-                                 int,
+                                 long,
+                                 long,
                                  FilterResY,
                                  filterResY)
 
