@@ -60,7 +60,6 @@
 - (void)_setInternalLoadDelegate:(id)internalLoadDelegate;
 - (id)_internalLoadDelegate;
 - (void)_unmarkAllMisspellings;
-- (void)_didFirstLayout;
 // Note that callers should not perform any ops on these views that could change
 // the set of frames
 - (NSArray*)_documentViews;
@@ -106,6 +105,8 @@
 - (WebDocumentLoadState*)_createDocumentLoadStateWithRequest:
     (NSURLRequest*)request;
 - (void)_didReceiveServerRedirectForProvisionalLoadForFrame;
+
+- (void)_restoreScrollPositionAndViewState;
 
 @end
 

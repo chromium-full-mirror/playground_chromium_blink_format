@@ -88,6 +88,8 @@ typedef enum {
   BOOL delegateIsHandlingProvisionalLoadError;
   BOOL delegateIsDecidingNavigationPolicy;
   BOOL delegateIsHandlingUnimplementablePolicy;
+
+  BOOL firstLayoutDone;
 }
 
 - (id)initWithClient:(WebFrame<WebFrameLoaderClient>*)wf;
@@ -125,6 +127,8 @@ typedef enum {
 - (void)clearDataSource;
 - (void)setupForReplace;
 + (CFAbsoluteTime)timeOfLastCompletedLoad;
+- (void)provisionalLoadStarted;
+- (void)frameLoadCompleted;
 
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
 - (BOOL)defersCallbacks;
@@ -247,5 +251,8 @@ typedef enum {
           withLoadType:(WebFrameLoadType)loadType
              formState:(WebFormState*)formState;
 - (void)handleUnimplementablePolicyWithErrorCode:(int)code forURL:(NSURL*)URL;
+
+- (void)didFirstLayout;
+- (BOOL)firstLayoutDone;
 
 @end
