@@ -465,7 +465,7 @@ void WebFrame::receivedRedirect(ResourceLoader*, const KURL& url) {
   }
 }
 
-void WebFrame::receivedResponse(ResourceLoader*, PlatformResponse) {
+void WebFrame::receivedResponse(ResourceLoader* job, PlatformResponse) {
   // Commit the provisional data source
 
   if (m_provisionalDataSource) {
@@ -493,6 +493,24 @@ void WebFrame::receivedResponse(ResourceLoader*, PlatformResponse) {
 
   d->frame->begin(kurl);
 
+  if (m_loadType != WebFrameLoadTypeBack &&
+      m_loadType != WebFrameLoadTypeForward &&
+      m_loadType != WebFrameLoadTypeIndexedBackForward &&
+      !m_quickRedirectComing) {
+    DeprecatedString urlStr = job->url().url();
+    BSTR urlBStr =
+        SysAllocStringLen((LPCOLESTR)urlStr.unicode(), urlStr.length());
+    WebHistoryItem* historyItem = WebHistoryItem::createInstance();
+    if (SUCCEEDED(historyItem->initWithURLString(urlBStr, 0 /*FIXME*/))) {
+      IWebBackForwardList* backForwardList;
+      if (SUCCEEDED(d->webView->backForwardList(&backForwardList))) {
+        backForwardList->addItem(historyItem);
+        backForwardList->Release();
+      }
+      historyItem->Release();
+    }
+  }
+
   IWebFrameLoadDelegate* frameLoadDelegate;
   if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate))) {
     frameLoadDelegate->didCommitLoadForFrame(d->webView, this);
@@ -512,29 +530,11 @@ void WebFrame::receivedAllData(ResourceLoader* /*job*/) {
   m_loadType = WebFrameLoadTypeStandard;
 }
 
-void WebFrame::receivedAllData(ResourceLoader* job, PlatformData data) {
+void WebFrame::receivedAllData(ResourceLoader*, PlatformData data) {
   IWebFrameLoadDelegate* frameLoadDelegate;
   if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate))) {
     if (data->loaded) {
       frameLoadDelegate->didFinishLoadForFrame(d->webView, this);
-
-      if (m_loadType != WebFrameLoadTypeBack &&
-          m_loadType != WebFrameLoadTypeForward &&
-          m_loadType != WebFrameLoadTypeIndexedBackForward &&
-          !m_quickRedirectComing) {
-        DeprecatedString urlStr = job->url().url();
-        BSTR urlBStr =
-            SysAllocStringLen((LPCOLESTR)urlStr.unicode(), urlStr.length());
-        WebHistoryItem* historyItem = WebHistoryItem::createInstance();
-        if (SUCCEEDED(historyItem->initWithURLString(urlBStr, 0 /*FIXME*/))) {
-          IWebBackForwardList* backForwardList;
-          if (SUCCEEDED(d->webView->backForwardList(&backForwardList))) {
-            backForwardList->addItem(historyItem);
-            backForwardList->Release();
-          }
-          historyItem->Release();
-        }
-      }
     } else {
       frameLoadDelegate->didFailLoadWithError(d->webView, 0 /*FIXME*/, this);
       m_quickRedirectComing = false;
