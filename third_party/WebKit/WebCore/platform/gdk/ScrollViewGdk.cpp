@@ -49,16 +49,16 @@ class ScrollView::ScrollViewPrivate {
  public:
   ScrollViewPrivate()
       : hasStaticBackground(false),
-        suppressScrollBars(false),
-        vScrollBarMode(ScrollBarAuto),
-        hScrollBarMode(ScrollBarAuto) {}
+        suppressScrollbars(false),
+        vScrollbarMode(ScrollbarAuto),
+        hScrollbarMode(ScrollbarAuto) {}
 
   IntSize scrollOffset;
   IntSize contentsSize;
   bool hasStaticBackground;
-  bool suppressScrollBars;
-  ScrollBarMode vScrollBarMode;
-  ScrollBarMode hScrollBarMode;
+  bool suppressScrollbars;
+  ScrollbarMode vScrollbarMode;
+  ScrollbarMode hScrollbarMode;
   IntRect visibleContentArea;
   IntRect viewportArea;
   IntRect scrollViewArea;
@@ -114,7 +114,7 @@ void ScrollView::resizeContents(int w, int h) {
   IntSize newSize(w, h);
   if (m_data->contentsSize != newSize) {
     m_data->contentsSize = newSize;
-    updateScrollBars();
+    updateScrollbars();
   }
 }
 
@@ -152,8 +152,8 @@ void ScrollView::scrollBy(int dx, int dy) {
 
   if (newScrollOffset != scrollOffset) {
     m_data->scrollOffset = newScrollOffset;
-    updateScrollBars();
-    // ScrollBar updates can fail, so we check the final delta before scrolling
+    updateScrollbars();
+    // Scrollbar updates can fail, so we check the final delta before scrolling
     IntSize scrollDelta = m_data->scrollOffset - scrollOffset;
     if (scrollDelta == IntSize())
       return;
@@ -168,37 +168,37 @@ void ScrollView::scrollBy(int dx, int dy) {
   }
 }
 
-ScrollBarMode ScrollView::hScrollBarMode() const {
-  return m_data->hScrollBarMode;
+ScrollbarMode ScrollView::hScrollbarMode() const {
+  return m_data->hScrollbarMode;
 }
 
-ScrollBarMode ScrollView::vScrollBarMode() const {
-  return m_data->vScrollBarMode;
+ScrollbarMode ScrollView::vScrollbarMode() const {
+  return m_data->vScrollbarMode;
 }
 
-void ScrollView::suppressScrollBars(bool suppressed, bool repaintOnSuppress) {
-  m_data->suppressScrollBars = suppressed;
+void ScrollView::suppressScrollbars(bool suppressed, bool repaintOnSuppress) {
+  m_data->suppressScrollbars = suppressed;
   if (repaintOnSuppress)
-    updateScrollBars();
+    updateScrollbars();
 }
 
-void ScrollView::setHScrollBarMode(ScrollBarMode newMode) {
-  if (m_data->hScrollBarMode != newMode) {
-    m_data->hScrollBarMode = newMode;
-    updateScrollBars();
+void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
+  if (m_data->hScrollbarMode != newMode) {
+    m_data->hScrollbarMode = newMode;
+    updateScrollbars();
   }
 }
 
-void ScrollView::setVScrollBarMode(ScrollBarMode newMode) {
-  if (m_data->vScrollBarMode != newMode) {
-    m_data->vScrollBarMode = newMode;
-    updateScrollBars();
+void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
+  if (m_data->vScrollbarMode != newMode) {
+    m_data->vScrollbarMode = newMode;
+    updateScrollbars();
   }
 }
 
-void ScrollView::setScrollBarsMode(ScrollBarMode newMode) {
-  m_data->hScrollBarMode = m_data->vScrollBarMode = newMode;
-  updateScrollBars();
+void ScrollView::setScrollbarsMode(ScrollbarMode newMode) {
+  m_data->hScrollbarMode = m_data->vScrollbarMode = newMode;
+  updateScrollbars();
 }
 
 void ScrollView::setStaticBackground(bool flag) {
