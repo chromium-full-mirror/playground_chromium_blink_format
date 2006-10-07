@@ -771,8 +771,6 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
            (renderer && renderer->isText() && renderer->canSelect())) &&
           !inResizer && !scrollbar)
         return iBeamCursor();
-      // FIXME: If the point is in a layer's overflow scrollbars, we should use
-      // the pointer cursor
       return pointerCursor();
     }
     case CURSOR_CROSS:
@@ -885,7 +883,8 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
                                                     // platforms that support
                                                     // visual feedback on
                                                     // scrollbar hovering.
-    setCursor(selectCursor(mev, m_frame.get(), d->mousePressed, scrollbar));
+    if (!d->m_resizeLayer || !d->m_resizeLayer->inResizeMode())
+      setCursor(selectCursor(mev, m_frame.get(), d->mousePressed, scrollbar));
   }
 
   d->oldSubframe = newSubframe;
