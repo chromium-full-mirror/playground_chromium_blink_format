@@ -615,7 +615,7 @@ IntPoint ScrollView::convertSelfToChild(const Widget*,
                                         const IntPoint& p) const {
   return p;
 }
-void ScrollView::scrolled() const {};
+void ScrollView::geometryChanged() const {};
 PlatformScrollbar* ScrollView::scrollbarUnderMouse(
     const PlatformMouseEvent& mouseEvent) {
   return 0;

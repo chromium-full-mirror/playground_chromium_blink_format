@@ -69,7 +69,7 @@ class ScrollView : public Widget {
   ScrollbarMode vScrollbarMode() const;
   ScrollbarMode hScrollbarMode() const;
 
-  void addChild(Widget*, int x = 0, int y = 0);
+  void addChild(Widget*);
   void removeChild(Widget*);
 
   virtual void resizeContents(int w, int h);
@@ -115,7 +115,7 @@ class ScrollView : public Widget {
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 
-  virtual void scrolled() const;
+  virtual void geometryChanged() const;
   virtual void setFrameGeometry(const IntRect&);
 
   IntRect windowResizerRect();

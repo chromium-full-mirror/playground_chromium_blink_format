@@ -85,4 +85,8 @@ bool Widget::checksDescendantsForFocus() const {
 bool Widget::isFrameView() const {
   return false;
 }
+
+IntRect Widget::windowClipRect() const {
+  return IntRect();
+}
 }

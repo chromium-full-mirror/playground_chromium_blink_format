@@ -1732,6 +1732,14 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
   }
 }
 
+IntRect RenderLayer::documentClipRect() {
+  RenderLayer* rootLayer = renderer()->document()->renderer()->layer();
+  IntRect layerBounds, damageRect, clipRectToApply, outlineRect;
+  calculateRects(rootLayer, rootLayer->absoluteBoundingBox(), layerBounds,
+                 damageRect, clipRectToApply, outlineRect);
+  return clipRectToApply;
+}
+
 bool RenderLayer::intersectsDamageRect(const IntRect& layerBounds,
                                        const IntRect& damageRect) const {
   // Always examine the canvas and the root.
