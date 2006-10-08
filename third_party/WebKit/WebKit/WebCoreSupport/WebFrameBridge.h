@@ -32,6 +32,7 @@
 @class WebCoreRenderPart;
 @class WebFrame;
 @class WebFrameView;
+@class WebFrameLoader;
 
 @protocol WebOpenPanelResultListener;
 
@@ -57,5 +58,6 @@
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;
+- (WebFrameLoader*)frameLoader;
 
 @end
