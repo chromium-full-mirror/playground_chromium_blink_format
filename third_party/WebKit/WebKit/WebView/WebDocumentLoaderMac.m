@@ -26,13 +26,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebDocumentLoadStateMac.h"
+#import "WebDocumentLoaderMac.h"
 
 #import <JavaScriptCore/Assertions.h>
 
 #import <WebKitSystemInterface.h>
 
-@implementation WebDocumentLoadStateMac
+@implementation WebDocumentLoaderMac
 
 
 - (id)initWithRequest:(NSURLRequest *)req

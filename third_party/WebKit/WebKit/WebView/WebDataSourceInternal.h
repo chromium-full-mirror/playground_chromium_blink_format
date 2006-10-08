@@ -46,8 +46,8 @@
 @class WebResource;
 @class WebUnarchivingState;
 @class WebView;
-@class WebDocumentLoadState;
-@class WebDocumentLoadStateMac;
+@class WebDocumentLoader;
+@class WebDocumentLoaderMac;
 
 @protocol WebDocumentRepresentation;
 
@@ -73,12 +73,12 @@
                    selectReplacement:(BOOL)selectReplacement;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
-- (id)_initWithDocumentLoadState:(WebDocumentLoadStateMac*)loadState;
+- (id)_initWithDocumentLoader:(WebDocumentLoaderMac*)loader;
 - (void)_finishedLoading;
 - (void)_receivedData:(NSData*)data;
 - (void)_revertToProvisionalState;
 - (void)_setMainDocumentError:(NSError*)error;
 - (void)_clearUnarchivingState;
-- (WebDocumentLoadState*)_documentLoadState;
+- (WebDocumentLoader*)_documentLoader;
 
 @end

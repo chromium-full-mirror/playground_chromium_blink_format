@@ -27,11 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebKit/WebDocumentLoadState.h>
+#import <WebKit/WebDocumentLoader.h>
 
 @class WebDataSource;
 
-@interface WebDocumentLoadStateMac : WebDocumentLoadState {
+@interface WebDocumentLoaderMac : WebDocumentLoader {
  @public
   WebDataSource* dataSource;
 }
