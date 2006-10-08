@@ -1647,7 +1647,7 @@ void Frame::submitForm(const char* action,
     DeprecatedString query = u.query();
     if (!query.isEmpty())
       query += '&';
-    query += String::sprintf("&body=%s", bodyEnc.latin1()).deprecatedString();
+    query += "body=" + bodyEnc;
 
     u.setQuery(query);
   }
