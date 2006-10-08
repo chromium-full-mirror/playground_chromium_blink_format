@@ -49,8 +49,8 @@ ProcessingInstruction::ProcessingInstruction(Document* doc,
                                              const String& target,
                                              const String& data)
     : ContainerNode(doc),
-      m_target(target.impl()),
-      m_data(data.impl()),
+      m_target(target),
+      m_data(data),
       m_cachedSheet(0),
       m_loading(false)
 #if XSLT_SUPPORT
@@ -71,11 +71,11 @@ void ProcessingInstruction::setData(const String& data, ExceptionCode& ec) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
-  m_data = data.impl();
+  m_data = data;
 }
 
 String ProcessingInstruction::nodeName() const {
-  return m_target.get();
+  return m_target;
 }
 
 Node::NodeType ProcessingInstruction::nodeType() const {
@@ -83,7 +83,7 @@ Node::NodeType ProcessingInstruction::nodeType() const {
 }
 
 String ProcessingInstruction::nodeValue() const {
-  return m_data.get();
+  return m_data;
 }
 
 void ProcessingInstruction::setNodeValue(const String& nodeValue,
@@ -94,7 +94,7 @@ void ProcessingInstruction::setNodeValue(const String& nodeValue,
 
 PassRefPtr<Node> ProcessingInstruction::cloneNode(bool /*deep*/) {
   // ### copy m_localHref
-  return new ProcessingInstruction(document(), m_target.get(), m_data.get());
+  return new ProcessingInstruction(document(), m_target, m_data);
 }
 
 // DOM Section 1.1.1
@@ -103,14 +103,13 @@ bool ProcessingInstruction::childTypeAllowed(NodeType) {
 }
 
 bool ProcessingInstruction::checkStyleSheet() {
-  if (String(m_target.get()) == "xml-stylesheet") {
+  if (m_target == "xml-stylesheet") {
     // see http://www.w3.org/TR/xml-stylesheet/
     // ### support stylesheet included in a fragment of this (or another)
     // document
     // ### make sure this gets called when adding from javascript
     bool attrsOk;
-    const HashMap<String, String> attrs =
-        parseAttributes(m_data.get(), attrsOk);
+    const HashMap<String, String> attrs = parseAttributes(m_data, attrsOk);
     if (!attrsOk)
       return true;
     HashMap<String, String>::const_iterator i = attrs.find("type");
@@ -139,7 +138,7 @@ bool ProcessingInstruction::checkStyleSheet() {
         // to be able
         // to kick off import/include loads that can hang off some parent sheet.
         if (m_isXSL) {
-          m_sheet = new XSLStyleSheet(this, m_localHref.get(), true);
+          m_sheet = new XSLStyleSheet(this, m_localHref, true);
           m_loading = false;
         }
         return !m_isXSL;
@@ -223,9 +222,9 @@ void ProcessingInstruction::parseStyleSheet(const String& sheet) {
 
 String ProcessingInstruction::toString() const {
   String result = "<?";
-  result += m_target.get();
+  result += m_target;
   result += " ";
-  result += m_data.get();
+  result += m_data;
   result += "?>";
   return result;
 }

@@ -50,7 +50,7 @@ KeyboardEvent::KeyboardEvent(const PlatformKeyboardEvent& key,
                           key.shiftKey(),
                           key.metaKey()),
       m_keyEvent(new PlatformKeyboardEvent(key)),
-      m_keyIdentifier(String(key.keyIdentifier()).impl()),
+      m_keyIdentifier(key.keyIdentifier()),
       m_keyLocation(key.isKeypad() ? DOM_KEY_LOCATION_NUMPAD
                                    : DOM_KEY_LOCATION_STANDARD),
       m_altGraphKey(false) {}
@@ -76,7 +76,7 @@ KeyboardEvent::KeyboardEvent(const AtomicString& eventType,
                           shiftKey,
                           metaKey),
       m_keyEvent(0),
-      m_keyIdentifier(keyIdentifier.impl()),
+      m_keyIdentifier(keyIdentifier),
       m_keyLocation(keyLocation),
       m_altGraphKey(altGraphKey) {}
 
@@ -100,7 +100,7 @@ void KeyboardEvent::initKeyboardEvent(const AtomicString& type,
 
   initUIEvent(type, canBubble, cancelable, view, 0);
 
-  m_keyIdentifier = keyIdentifier.impl();
+  m_keyIdentifier = keyIdentifier;
   m_keyLocation = keyLocation;
   m_ctrlKey = ctrlKey;
   m_shiftKey = shiftKey;

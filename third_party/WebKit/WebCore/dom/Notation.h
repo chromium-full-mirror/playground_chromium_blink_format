@@ -38,8 +38,8 @@ class Notation : public ContainerNode {
            const String& systemId);
 
   // DOM methods & attributes for Notation
-  String publicId() const { return m_publicId.get(); }
-  String systemId() const { return m_systemId.get(); }
+  String publicId() const { return m_publicId; }
+  String systemId() const { return m_systemId; }
 
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
@@ -47,9 +47,9 @@ class Notation : public ContainerNode {
   virtual bool childTypeAllowed(NodeType);
 
  private:
-  RefPtr<StringImpl> m_name;
-  RefPtr<StringImpl> m_publicId;
-  RefPtr<StringImpl> m_systemId;
+  String m_name;
+  String m_publicId;
+  String m_systemId;
 };
 
 }  // namespace

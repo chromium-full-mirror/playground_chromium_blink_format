@@ -396,7 +396,7 @@ class FrameMac : public Frame {
 
   bool _haveUndoRedoOperations;
 
-  HashSet<RefPtr<StringImpl>> urlsBridgeKnowsAbout;
+  HashSet<String> urlsBridgeKnowsAbout;
 
   friend class Frame;
 

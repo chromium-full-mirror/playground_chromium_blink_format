@@ -39,9 +39,9 @@ MutationEvent::MutationEvent(const AtomicString& type,
                              unsigned short attrChange)
     : Event(type, canBubble, cancelable),
       m_relatedNode(relatedNode),
-      m_prevValue(prevValue.impl()),
-      m_newValue(newValue.impl()),
-      m_attrName(attrName.impl()),
+      m_prevValue(prevValue),
+      m_newValue(newValue),
+      m_attrName(attrName),
       m_attrChange(attrChange) {}
 
 void MutationEvent::initMutationEvent(const AtomicString& type,
@@ -58,9 +58,9 @@ void MutationEvent::initMutationEvent(const AtomicString& type,
   initEvent(type, canBubble, cancelable);
 
   m_relatedNode = relatedNode;
-  m_prevValue = prevValue.impl();
-  m_newValue = newValue.impl();
-  m_attrName = attrName.impl();
+  m_prevValue = prevValue;
+  m_newValue = newValue;
+  m_attrName = attrName;
   m_attrChange = attrChange;
 }
 

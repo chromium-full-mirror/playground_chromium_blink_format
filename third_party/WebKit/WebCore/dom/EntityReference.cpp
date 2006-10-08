@@ -26,11 +26,11 @@ namespace WebCore {
 
 EntityReference::EntityReference(Document* doc) : ContainerNode(doc) {}
 
-EntityReference::EntityReference(Document* doc, StringImpl* entityName)
+EntityReference::EntityReference(Document* doc, const String& entityName)
     : ContainerNode(doc), m_entityName(entityName) {}
 
 String EntityReference::nodeName() const {
-  return m_entityName.get();
+  return m_entityName;
 }
 
 Node::NodeType EntityReference::nodeType() const {
@@ -38,8 +38,7 @@ Node::NodeType EntityReference::nodeType() const {
 }
 
 PassRefPtr<Node> EntityReference::cloneNode(bool deep) {
-  RefPtr<EntityReference> clone =
-      new EntityReference(document(), m_entityName.get());
+  RefPtr<EntityReference> clone = new EntityReference(document(), m_entityName);
   // ### make sure children are readonly
   // ### since we are a reference, should we clone children anyway (even if not
   // deep?)
@@ -66,7 +65,7 @@ bool EntityReference::childTypeAllowed(NodeType type) {
 
 String EntityReference::toString() const {
   String result = "&";
-  result += m_entityName.get();
+  result += m_entityName;
   result += ";";
 
   return result;
