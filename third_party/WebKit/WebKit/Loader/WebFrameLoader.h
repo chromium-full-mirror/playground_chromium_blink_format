@@ -28,20 +28,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "WebDocumentLoader.h"
-#import "WebFrameLoaderClient.h"
-#import "WebFramePrivate.h"
-
+@class DOMElement;
 @class WebArchive;
 @class WebDataSource;
+@class WebDocumentLoader;
 @class WebFormState;
-@class WebFrameBridge;
-@class WebMainResourceLoader;
-@class WebLoader;
-@class WebResource;
 @class WebFrame;
+@class WebFrame;
+@class WebFrameBridge;
+@class WebLoader;
+@class WebMainResourceLoader;
 @class WebPolicyDecisionListener;
-@class DOMElement;
+@class WebResource;
+@protocol WebFrameLoaderClient;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -58,6 +57,18 @@ typedef enum {
   WebPolicyDownload,
   WebPolicyIgnore,
 } WebPolicyAction;
+
+typedef enum {
+  FrameLoadTypeStandard,
+  FrameLoadTypeBack,
+  FrameLoadTypeForward,
+  FrameLoadTypeIndexedBackForward,  // a multi-item hop in the backforward list
+  FrameLoadTypeReload,
+  FrameLoadTypeReloadAllowingStaleData,
+  FrameLoadTypeSame,  // user loads same URL again (but not reload button)
+  FrameLoadTypeInternal,
+  FrameLoadTypeReplace
+} FrameLoadType;
 
 @interface WebFrameLoader : NSObject {
  @public
@@ -77,7 +88,7 @@ typedef enum {
 
   NSMutableDictionary* pendingArchivedResources;
 
-  WebFrameLoadType loadType;
+  FrameLoadType loadType;
 
   // state we'll need to continue after waiting for the policy delegate's
   // decision
@@ -86,7 +97,7 @@ typedef enum {
   id policyTarget;
   SEL policySelector;
   WebFormState* policyFormState;
-  WebFrameLoadType policyLoadType;
+  FrameLoadType policyLoadType;
 
   BOOL delegateIsHandlingProvisionalLoadError;
   BOOL delegateIsDecidingNavigationPolicy;
@@ -209,7 +220,7 @@ typedef enum {
 - (void)_reloadAllowingStaleDataWithOverrideEncoding:(NSString*)encoding;
 - (void)_loadRequest:(NSURLRequest*)request
     triggeringAction:(NSDictionary*)action
-            loadType:(WebFrameLoadType)loadType
+            loadType:(FrameLoadType)loadType
            formState:(WebFormState*)formState;
 
 - (void)didReceiveServerRedirectForProvisionalLoadForFrame;
@@ -230,8 +241,8 @@ typedef enum {
 - (void)willChangeTitleForDocument:(WebDocumentLoader*)loader;
 - (void)didChangeTitleForDocument:(WebDocumentLoader*)loader;
 
-- (WebFrameLoadType)loadType;
-- (void)setLoadType:(WebFrameLoadType)type;
+- (FrameLoadType)loadType;
+- (void)setLoadType:(FrameLoadType)type;
 - (BOOL)delegateIsHandlingProvisionalLoadError;
 - (void)setDelegateIsHandlingProvisionalLoadError:(BOOL)is;
 
@@ -251,7 +262,7 @@ typedef enum {
 - (void)continueLoadRequestAfterNavigationPolicy:(NSURLRequest*)request
                                        formState:(WebFormState*)formState;
 - (void)loadDataSource:(WebDataSource*)newDataSource
-          withLoadType:(WebFrameLoadType)loadType
+          withLoadType:(FrameLoadType)loadType
              formState:(WebFormState*)formState;
 - (void)handleUnimplementablePolicyWithErrorCode:(int)code forURL:(NSURL*)URL;
 
@@ -266,7 +277,7 @@ typedef enum {
     isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
-           loadType:(WebFrameLoadType)loadType
+           loadType:(FrameLoadType)loadType
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
                form:(DOMElement*)form
