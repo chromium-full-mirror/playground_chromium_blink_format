@@ -68,8 +68,6 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
                               response:(NSURLResponse*)response
                                  proxy:(id)proxy;
 
-- (void)_dispatchDidHandleOnloadEventsForFrame;
-- (void)_dispatchDidReceiveServerRedirectForProvisionalLoadForFrame;
 - (id)_dispatchIdentifierForInitialRequest:(NSURLRequest*)request
                         fromDocumentLoader:(WebDocumentLoader*)loader;
 - (NSURLRequest*)_dispatchResource:(id)identifier
@@ -95,5 +93,21 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 - (void)_dispatchResource:(id)identifier
     didFailLoadingWithError:error
          fromDocumentLoader:(WebDocumentLoader*)loader;
+
+- (void)_dispatchDidHandleOnloadEventsForFrame;
+- (void)_dispatchDidReceiveServerRedirectForProvisionalLoadForFrame;
+- (void)_dispatchDidCancelClientRedirectForFrame;
+- (void)_dispatchWillPerformClientRedirectToURL:(NSURL*)URL
+                                          delay:(NSTimeInterval)seconds
+                                       fireDate:(NSDate*)date;
+- (void)_dispatchDidChangeLocationWithinPageForFrame;
+- (void)_dispatchWillCloseFrame;
+- (void)_dispatchDidReceiveIcon:(NSImage*)icon;
+- (void)_dispatchDidStartProvisionalLoadForFrame;
+- (void)_dispatchDidReceiveTitle:(NSString*)title;
+- (void)_dispatchDidCommitLoadForFrame;
+- (void)_dispatchDidFailProvisionalLoadWithError:(NSError*)error;
+- (void)_dispatchDidFailLoadWithError:(NSError*)error;
+- (void)_dispatchDidFinishLoadForFrame;
 
 @end
