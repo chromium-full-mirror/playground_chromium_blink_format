@@ -63,6 +63,11 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 
 - (void)_loadedFromPageCache;
 
+- (void)_downloadWithLoadingConnection:(NSURLConnection*)connection
+                               request:(NSURLRequest*)request
+                              response:(NSURLResponse*)response
+                                 proxy:(id)proxy;
+
 - (void)_dispatchDidHandleOnloadEventsForFrame;
 - (void)_dispatchDidReceiveServerRedirectForProvisionalLoadForFrame;
 - (id)_dispatchIdentifierForInitialRequest:(NSURLRequest*)request
