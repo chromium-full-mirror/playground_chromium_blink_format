@@ -26,28 +26,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebKit/WebDataSourcePrivate.h>
-#import <WebKitSystemInterface.h>
-
-@class NSURL;
+#import "WebDataSourcePrivate.h"
 
 @class DOMDocumentFragment;
 @class DOMElement;
-@class DOMRange;
 @class NSError;
-@class NSURLRequest;
-@class NSURLResponse;
+@class NSURL;
 @class WebArchive;
-@class WebLoader;
-@class WebFrameBridge;
-@class WebHistoryItem;
-@class WebMainResourceLoader;
-@class WebPolicyDecisionListener;
-@class WebResource;
-@class WebUnarchivingState;
-@class WebView;
 @class WebDocumentLoader;
 @class WebDocumentLoaderMac;
+@class WebFrameBridge;
+@class WebResource;
+@class WebView;
 
 @protocol WebDocumentRepresentation;
 
@@ -72,7 +62,6 @@
 - (void)_replaceSelectionWithArchive:(WebArchive*)archive
                    selectReplacement:(BOOL)selectReplacement;
 - (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
-- (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
 - (id)_initWithDocumentLoader:(WebDocumentLoaderMac*)loader;
 - (void)_finishedLoading;
 - (void)_receivedData:(NSData*)data;
@@ -80,5 +69,4 @@
 - (void)_setMainDocumentError:(NSError*)error;
 - (void)_clearUnarchivingState;
 - (WebDocumentLoader*)_documentLoader;
-
 @end

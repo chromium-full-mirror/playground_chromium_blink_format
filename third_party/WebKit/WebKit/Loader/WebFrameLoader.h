@@ -70,6 +70,15 @@ typedef enum {
   FrameLoadTypeReplace
 } FrameLoadType;
 
+typedef enum {
+  NavigationTypeLinkClicked,
+  NavigationTypeFormSubmitted,
+  NavigationTypeBackForward,
+  NavigationTypeReload,
+  NavigationTypeFormResubmitted,
+  NavigationTypeOther
+} NavigationType;
+
 BOOL isBackForwardLoadType(FrameLoadType type);
 
 @interface WebFrameLoader : NSObject {
@@ -142,13 +151,11 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 - (WebDocumentLoader*)documentLoader;
 - (WebDocumentLoader*)provisionalDocumentLoader;
 - (WebFrameState)state;
-- (void)clearDataSource;
 - (void)setupForReplace;
 + (CFAbsoluteTime)timeOfLastCompletedLoad;
 - (void)provisionalLoadStarted;
 - (void)frameLoadCompleted;
 
-- (WebResource*)_archivedSubresourceForURL:(NSURL*)URL;
 - (BOOL)defersCallbacks;
 - (void)defersCallbacksChanged;
 - (id)_identifierForInitialRequest:(NSURLRequest*)clientRequest;
@@ -198,9 +205,6 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 - (void)deliverArchivedResourcesAfterDelay;
 - (void)cancelPendingArchiveLoadForLoader:(WebLoader*)loader;
 - (void)clearArchivedResources;
-- (void)_addExtraFieldsToRequest:(NSMutableURLRequest*)request
-                    mainResource:(BOOL)mainResource
-               alwaysFromRequest:(BOOL)f;
 - (void)cannotShowMIMETypeForURL:(NSURL*)URL;
 - (NSError*)interruptForPolicyChangeErrorWithRequest:(NSURLRequest*)request;
 - (BOOL)isHostedByObjectElement;
@@ -307,5 +311,22 @@ BOOL isBackForwardLoadType(FrameLoadType type);
     triggeringEvent:(NSEvent*)event
                form:(DOMElement*)form
          formValues:(NSDictionary*)values;
+
+- (void)checkLoadComplete;
+- (void)detachFromParent;
+- (void)safeLoadURL:(NSURL*)URL;
+- (void)defersCallbacksChanged;
+- (void)detachChildren;
+- (void)addExtraFieldsToRequest:(NSMutableURLRequest*)request
+                   mainResource:(BOOL)mainResource
+              alwaysFromRequest:(BOOL)alwaysFromRequest;
+- (NSDictionary*)actionInformationForNavigationType:
+                     (NavigationType)navigationType
+                                              event:(NSEvent*)event
+                                        originalURL:(NSURL*)URL;
+- (NSDictionary*)actionInformationForLoadType:(FrameLoadType)loadType
+                             isFormSubmission:(BOOL)isFormSubmission
+                                        event:(NSEvent*)event
+                                  originalURL:(NSURL*)URL;
 
 @end
