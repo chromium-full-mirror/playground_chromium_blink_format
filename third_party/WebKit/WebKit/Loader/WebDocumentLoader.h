@@ -138,5 +138,6 @@
 - (NSURLRequest*)lastCheckedRequest;
 - (void)stopRecordingResponses;
 - (NSString*)title;
+- (NSURL*)URLForHistory;
 
 @end
