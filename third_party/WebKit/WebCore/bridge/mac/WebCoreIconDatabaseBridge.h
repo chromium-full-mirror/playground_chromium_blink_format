@@ -34,6 +34,8 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 
 @interface WebCoreIconDatabaseBridge : NSObject {
 }
++ (WebCoreIconDatabaseBridge*)sharedInstance;
+
 - (BOOL)openSharedDatabaseWithPath:(NSString*)path;
 - (void)closeSharedDatabase;
 - (BOOL)isOpen;
@@ -66,7 +68,7 @@ typedef WebCore::IconDatabase WebCoreIconDatabase;
 // WebCore side of the bridge.
 
 @protocol WebCoreIconDatabaseBridge
-+ (WebCoreIconDatabaseBridge*)sharedInstance;
++ (WebCoreIconDatabaseBridge*)createInstance;
 @end
 
 // This interface definition allows those who hold a WebCoreIconDatabaseBridge *
