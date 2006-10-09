@@ -531,6 +531,7 @@
 @property NSString* useMap;
 @property NSString* value;
 @property(readonly) NSString* altDisplayString;
+@property(readonly) NSURL* absoluteImageURL;
 - (void)blur;
 - (void)focus;
 - (void)select;
@@ -619,6 +620,7 @@
 @property int vspace;
 @property NSString* width;
 @property(readonly) DOMDocument* contentDocument;
+@property(readonly) NSURL* absoluteImageURL;
 @end
 
 @interface DOMHTMLOptGroupElement : DOMHTMLElement

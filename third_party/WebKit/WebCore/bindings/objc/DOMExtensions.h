@@ -43,7 +43,9 @@
 #import <WebCore/DOMRGBColor.h>
 #import <WebCore/DOMRange.h>
 
+@class NSArray;
 @class NSImage;
+@class NSURL;
 
 @interface DOMNode (DOMNodeExtensions)
 - (NSRect)boundingBox;
@@ -64,12 +66,4 @@
                             (NSString*)markupString
                                                        baseURL:(NSURL*)baseURL;
 - (DOMDocumentFragment*)createDocumentFragmentWithText:(NSString*)text;
-@end
-
-@interface DOMHTMLInputElement (DOMHTMLInputElementExtensions)
-- (NSURL*)absoluteImageURL;
-@end
-
-@interface DOMHTMLObjectElement (DOMHTMLObjectElementExtensions)
-- (NSURL*)absoluteImageURL;
 @end
