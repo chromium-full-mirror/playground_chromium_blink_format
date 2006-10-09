@@ -22,11 +22,11 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-
 #include "SVGPathSegLineto.h"
+
 #include "SVGStyledElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPathSegLinetoAbs::SVGPathSegLinetoAbs(const SVGStyledElement* context)
     : SVGPathSeg(context) {
@@ -84,6 +84,7 @@ void SVGPathSegLinetoRel::setY(double y) {
 
 double SVGPathSegLinetoRel::y() const {
   return m_y;
+}
 }
 
 // vim:ts=4:noet

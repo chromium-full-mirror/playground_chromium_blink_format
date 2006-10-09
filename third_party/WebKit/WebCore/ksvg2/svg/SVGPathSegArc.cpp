@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -23,9 +23,10 @@
 #include "config.h"
 #ifdef SVG_SUPPORT
 #include "SVGPathSegArc.h"
+
 #include "SVGStyledElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPathSegArcAbs::SVGPathSegArcAbs(const SVGStyledElement* context)
     : SVGPathSeg(context) {
@@ -195,6 +196,7 @@ void SVGPathSegArcRel::setSweepFlag(bool sweepFlag) {
 
 bool SVGPathSegArcRel::sweepFlag() const {
   return m_sweepFlag;
+}
 }
 
 // vim:ts=4:noet

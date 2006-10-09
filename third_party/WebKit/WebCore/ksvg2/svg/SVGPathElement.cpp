@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,26 +22,22 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include "ksvg.h"
-#include "SVGNames.h"
-#include "SVGHelper.h"
-#include "SVGSVGElement.h"
-#include "SVGPathSegArc.h"
-#include "SVGPathSegList.h"
 #include "SVGPathElement.h"
-#include "SVGPathSegLineto.h"
-#include "SVGPathSegMoveto.h"
+
+#include "SVGHelper.h"
+#include "SVGNames.h"
+#include "SVGPathSegArc.h"
 #include "SVGPathSegClosePath.h"
 #include "SVGPathSegCurvetoCubic.h"
-#include "SVGPathSegLinetoVertical.h"
-#include "SVGPathSegLinetoHorizontal.h"
-#include "SVGPathSegCurvetoQuadratic.h"
 #include "SVGPathSegCurvetoCubicSmooth.h"
+#include "SVGPathSegCurvetoQuadratic.h"
 #include "SVGPathSegCurvetoQuadraticSmooth.h"
-
-#include <kcanvas/device/KRenderingDevice.h>
+#include "SVGPathSegLineto.h"
+#include "SVGPathSegLinetoHorizontal.h"
+#include "SVGPathSegLinetoVertical.h"
+#include "SVGPathSegList.h"
+#include "SVGPathSegMoveto.h"
+#include "SVGSVGElement.h"
 
 namespace WebCore {
 
@@ -71,14 +67,14 @@ double SVGPathElement::getTotalLength() {
 FloatPoint SVGPathElement::getPointAtLength(double /*distance*/) {
   /*
   double totalDistance = getTotalLength();
-  T2P::BezierPath *path = ownerDoc()->view()->toBezierPath(m_item);
+  T2P::BezierPath* path = ownerDoc()->view()->toBezierPath(m_item);
   if (path) {
       T2P::Point p;
       path->pointTangentNormalAt(distance / totalDistance, &p);
       ret->setX(p.x());
       ret->setY(p.y());
   }
-  */
+ */
 
   return FloatPoint();
 }

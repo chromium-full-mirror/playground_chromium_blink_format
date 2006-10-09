@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -23,9 +23,10 @@
 #include "config.h"
 #ifdef SVG_SUPPORT
 #include "SVGPathSegCurvetoQuadratic.h"
+
 #include "SVGStyledElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPathSegCurvetoQuadraticAbs::SVGPathSegCurvetoQuadraticAbs(
     const SVGStyledElement* context)
@@ -129,6 +130,7 @@ void SVGPathSegCurvetoQuadraticRel::setY1(double y1) {
 
 double SVGPathSegCurvetoQuadraticRel::y1() const {
   return m_y1;
+}
 }
 
 // vim:ts=4:noet
