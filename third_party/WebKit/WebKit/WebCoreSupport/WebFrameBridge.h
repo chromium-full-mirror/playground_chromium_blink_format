@@ -39,7 +39,7 @@
 
 @interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
   WebFrame* _frame;
-  WebFrameLoader* _loader;
+  WebFrameLoader* _frameLoader;
 
   WebCoreKeyboardUIMode _keyboardUIMode;
   BOOL _keyboardUIModeAccessed;
@@ -60,6 +60,6 @@
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;
-- (WebFrameLoader*)loader;
+- (WebFrameLoader*)frameLoader;
 
 @end
