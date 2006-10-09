@@ -110,6 +110,7 @@ void Image::draw(GraphicsContext* ctxt,
   cairo_rectangle(context, 0, 0, dstRect.width(), dstRect.height());
   cairo_fill(context);
 
+  cairo_pattern_destroy(pattern);
   cairo_restore(context);
 
   startAnimation();
