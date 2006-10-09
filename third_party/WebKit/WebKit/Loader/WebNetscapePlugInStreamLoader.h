@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebKit/WebLoader.h>
-#import <WebKit/WebPlugInStreamLoaderDelegate.h>
+#import "WebLoader.h"
+#import "WebPlugInStreamLoaderDelegate.h"
 
 @class WebNetscapePluginStream;
 
