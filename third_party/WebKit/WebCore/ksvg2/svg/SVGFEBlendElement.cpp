@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,15 +22,10 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include <kcanvas/KCanvasFilters.h>
-#include <kcanvas/device/KRenderingDevice.h>
-
-#include "ksvg.h"
-#include "SVGHelper.h"
-#include "SVGRenderStyle.h"
 #include "SVGFEBlendElement.h"
+
+#include "KRenderingDevice.h"
+#include "SVGHelper.h"
 
 namespace WebCore {
 

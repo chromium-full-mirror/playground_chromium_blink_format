@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-    Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2004, 2005, 2006 Rob Buis <buis@kde.org>
     Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
 
     This file is part of the KDE project
@@ -25,12 +25,11 @@
 #define KSVG_SVGFilterElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGLangSpace.h"
-#include "SVGURIReference.h"
-#include "SVGStyledElement.h"
-#include "SVGExternalResourcesRequired.h"
-
 #include "KCanvasFilters.h"
+#include "SVGExternalResourcesRequired.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledElement.h"
+#include "SVGURIReference.h"
 
 namespace WebCore {
 class SVGLength;

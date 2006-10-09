@@ -19,17 +19,12 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include <kcanvas/KCanvasFilters.h>
-#include <kcanvas/device/KRenderingDevice.h>
-
-#include "ksvg.h"
-#include "SVGHelper.h"
-#include "SVGRenderStyle.h"
 #include "SVGFEDisplacementMapElement.h"
 
-using namespace WebCore;
+#include "KRenderingDevice.h"
+#include "SVGHelper.h"
+
+namespace WebCore {
 
 SVGFEDisplacementMapElement::SVGFEDisplacementMapElement(
     const QualifiedName& tagName,
@@ -130,5 +125,6 @@ KCanvasFEDisplacementMap* SVGFEDisplacementMapElement::filterEffect() const {
   m_filterEffect->setScale(scale());
   setStandardAttributes(m_filterEffect);
   return m_filterEffect;
+}
 }
 #endif  // SVG_SUPPORT

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,18 +22,13 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include <kcanvas/KCanvasFilters.h>
-#include <kcanvas/device/KRenderingDevice.h>
-
-#include "ksvg.h"
-#include "SVGHelper.h"
-#include "SVGRenderStyle.h"
 #include "SVGFEMergeElement.h"
-#include "SVGFEMergeNodeElement.h"
 
-using namespace WebCore;
+#include "KRenderingDevice.h"
+#include "SVGFEMergeNodeElement.h"
+#include "SVGHelper.h"
+
+namespace WebCore {
 
 SVGFEMergeElement::SVGFEMergeElement(const QualifiedName& tagName,
                                      Document* doc)
@@ -60,6 +55,7 @@ KCanvasFEMerge* SVGFEMergeElement::filterEffect() const {
   m_filterEffect->setMergeInputs(mergeInputs);
 
   return m_filterEffect;
+}
 }
 
 // vim:ts=4:noet

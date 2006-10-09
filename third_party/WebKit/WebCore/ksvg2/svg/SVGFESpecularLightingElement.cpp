@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
                   2005 Oliver Hunt <ojh16@student.canterbury.ac.nz>
 
     This library is free software; you can redistribute it and/or
@@ -17,23 +17,19 @@
     along with this library; see the file COPYING.LIB.  If not, write to
     the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.
- */
+*/
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include <kcanvas/KCanvasFilters.h>
-#include <kcanvas/device/KRenderingDevice.h>
-
-#include "SVGNames.h"
-#include "SVGHelper.h"
-#include "SVGRenderStyle.h"
-#include "SVGColor.h"
-#include "SVGFELightElement.h"
 #include "SVGFESpecularLightingElement.h"
 
-using namespace WebCore;
+#include "KRenderingDevice.h"
+#include "SVGColor.h"
+#include "SVGHelper.h"
+#include "SVGNames.h"
+#include "SVGFELightElement.h"
+
+namespace WebCore {
 
 SVGFESpecularLightingElement::SVGFESpecularLightingElement(
     const QualifiedName& tagName,
@@ -163,4 +159,6 @@ void SVGFESpecularLightingElement::updateLights() const {
   }
   m_filterEffect->setLightSource(light);
 }
+}
+
 #endif  // SVG_SUPPORT

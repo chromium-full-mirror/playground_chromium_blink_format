@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-    Copyright (C) 2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2004, 2005, 2006 Rob Buis <buis@kde.org>
     Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
 
     This file is part of the KDE project
@@ -23,16 +23,16 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
+#include "SVGFilterElement.h"
 
+#include "Attr.h"
 #include "KRenderingDevice.h"
 #include "KCanvasFilters.h"
-#include "SVGUnitTypes.h"
-#include "SVGNames.h"
-#include "SVGHelper.h"
-#include "SVGFilterElement.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
+#include "SVGHelper.h"
 #include "SVGLength.h"
+#include "SVGNames.h"
+#include "SVGUnitTypes.h"
 
 namespace WebCore {
 

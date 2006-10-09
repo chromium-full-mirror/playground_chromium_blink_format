@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
                   2005 Oliver Hunt <ojh16@student.canterbury.ac.nz>
 
     This library is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
 #define KSVG_SVGFESpecularLightingElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGFilterPrimitiveStandardAttributes.h"
 #include "KCanvasFilters.h"
+#include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
 class SVGColor;

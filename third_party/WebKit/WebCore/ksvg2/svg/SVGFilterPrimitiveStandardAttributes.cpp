@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,19 +22,15 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-#include <wtf/Assertions.h>
-
-#include "SVGUnitTypes.h"
-#include "SVGNames.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
-#include "SVGLength.h"
-#include "SVGStyledElement.h"
+
 #include "SVGFilterElement.h"
+#include "SVGLength.h"
+#include "SVGNames.h"
+#include "SVGStyledElement.h"
+#include "SVGUnitTypes.h"
 
-#include <kcanvas/KCanvasFilters.h>
-
-using namespace WebCore;
+namespace WebCore {
 
 SVGFilterPrimitiveStandardAttributes::SVGFilterPrimitiveStandardAttributes(
     const QualifiedName& tagName,
@@ -133,6 +129,7 @@ void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
     filterEffect->setSubRegion(FloatRect(_x, _y, _width, _height));
 
   filterEffect->setResult(result());
+}
 }
 
 // vim:ts=4:noet
