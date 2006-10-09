@@ -148,12 +148,6 @@ ScrollView* Widget::parent() const {
   return 0;
 }
 
-JavaAppletWidget::JavaAppletWidget(IntSize const&,
-                                   Element*,
-                                   WTF::HashMap<String, String> const&) {
-  notImplemented();
-}
-
 void TextField::selectAll() {
   notImplemented();
 }
