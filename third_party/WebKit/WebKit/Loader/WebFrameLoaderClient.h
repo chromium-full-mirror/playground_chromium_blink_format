@@ -32,6 +32,7 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 
 @class WebDocumentLoader;
 @class WebPolicyDecisionListener;
+@class WebResource;
 
 @protocol WebFrameLoaderClient
 
@@ -44,8 +45,13 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 - (BOOL)_privateBrowsingEnabled;
 
 - (void)_makeDocumentView;
+- (void)_makeRepresentationForDocumentLoader:(WebDocumentLoader*)loader;
 - (void)_setDocumentViewFromPageCache:(NSDictionary*)dictionary;
 - (void)_forceLayout;
+- (void)_forceLayoutForNonHTML;
+
+- (WebResource*)_archivedSubresourceForURL:(NSURL*)URL
+                        fromDocumentLoader:(WebDocumentLoader*)loader;
 
 - (void)_updateHistoryForCommit;
 
@@ -137,5 +143,8 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 
 - (void)_dispatchDidLoadMainResourceForDocumentLoader:
     (WebDocumentLoader*)loader;
+- (void)_clearLoadingFromPageCacheForDocumentLoader:(WebDocumentLoader*)loader;
+- (BOOL)_isDocumentLoaderLoadingFromPageCache:
+    (WebDocumentLoader*)documentLoader;
 
 @end

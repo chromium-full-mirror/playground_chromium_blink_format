@@ -97,6 +97,9 @@
 - (NSMutableURLRequest*)request;
 - (void)setRequest:(NSURLRequest*)request;
 - (NSMutableURLRequest*)actualRequest;
+- (NSURLRequest*)initialRequest;
+- (NSURL*)URL;
+- (NSURL*)unreachableURL;
 - (void)replaceRequestURLForAnchorScrollWithURL:(NSURL*)URL;
 - (BOOL)isStopping;
 - (void)stopLoading;
