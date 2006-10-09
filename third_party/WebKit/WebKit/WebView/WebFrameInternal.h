@@ -128,6 +128,10 @@
 - (void)_addHistoryItemForFragmentScroll;
 - (void)_didFinishLoad;
 
+- (void)_addDocumentLoader:(WebDocumentLoader*)loader
+          toUnarchiveState:(WebArchive*)archive;
+- (id<WebFormDelegate>)_formDelegate;
+
 @end
 
 @interface NSObject (WebInternalFrameLoadDelegate)

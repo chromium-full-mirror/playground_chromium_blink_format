@@ -202,7 +202,7 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 - (void)deliverArchivedResourcesAfterDelay;
 - (void)cancelPendingArchiveLoadForLoader:(WebLoader*)loader;
 - (void)clearArchivedResources;
-- (void)cannotShowMIMETypeForURL:(NSURL*)URL;
+- (void)cannotShowMIMETypeWithResponse:(NSURLResponse*)response;
 - (NSError*)interruptForPolicyChangeErrorWithRequest:(NSURLRequest*)request;
 - (BOOL)isHostedByObjectElement;
 - (BOOL)isLoadingMainFrame;
@@ -264,7 +264,6 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 - (void)loadDocumentLoader:(WebDocumentLoader*)loader
               withLoadType:(FrameLoadType)loadType
                  formState:(WebFormState*)formState;
-- (void)handleUnimplementablePolicyWithErrorCode:(int)code forURL:(NSURL*)URL;
 
 - (void)didFirstLayout;
 - (BOOL)firstLayoutDone;
