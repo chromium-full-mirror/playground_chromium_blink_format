@@ -95,7 +95,6 @@
 - (void)_frameLoadCompleted;
 - (WebDataSource*)_dataSourceForDocumentLoader:(WebDocumentLoader*)loader;
 - (WebDocumentLoader*)_createDocumentLoaderWithRequest:(NSURLRequest*)request;
-- (void)_didReceiveServerRedirectForProvisionalLoadForFrame;
 
 - (NSURLRequest*)_webDataRequestForData:(NSData*)data
                                MIMEType:(NSString*)MIMEType
@@ -103,7 +102,6 @@
                                 baseURL:(NSURL*)URL
                          unreachableURL:(NSURL*)unreachableURL;
 
-- (void)_handledOnloadEvents;
 - (WebFrameBridge*)_bridge;
 
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(FrameLoadType)type;
