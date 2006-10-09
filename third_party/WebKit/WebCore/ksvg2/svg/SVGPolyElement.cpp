@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,13 +24,12 @@
 #ifdef SVG_SUPPORT
 #include "SVGPolyElement.h"
 
-#include "Attr.h"
 #include "Document.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGPointList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPolyElement::SVGPolyElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledTransformableElement(tagName, doc),
@@ -99,6 +98,7 @@ void SVGPolyElement::notifyAttributeChange() const {
     attr->setValue(_points, ec);
     ignoreNotifications = false;
   }
+}
 }
 
 // vim:ts=4:noet

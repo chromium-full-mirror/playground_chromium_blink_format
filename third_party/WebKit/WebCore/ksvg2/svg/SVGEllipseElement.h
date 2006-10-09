@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,10 +24,10 @@
 #define KSVG_SVGEllipseElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
+#include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
-#include "SVGExternalResourcesRequired.h"
+#include "SVGTests.h"
 
 namespace WebCore {
 class SVGLength;

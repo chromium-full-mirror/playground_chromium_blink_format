@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,10 +24,6 @@
 #ifdef SVG_SUPPORT
 #include "SVGRectElement.h"
 
-#include "Attr.h"
-#include "KRenderingDevice.h"
-#include "KRenderingFillPainter.h"
-#include "KRenderingPaintServerSolid.h"
 #include "SVGHelper.h"
 #include "SVGLength.h"
 #include "SVGNames.h"

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,16 +22,14 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
+#include "SVGLineElement.h"
 
 #include "FloatPoint.h"
-
-#include "SVGNames.h"
 #include "SVGHelper.h"
-#include "SVGLineElement.h"
 #include "SVGLength.h"
+#include "SVGNames.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGLineElement::SVGLineElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledTransformableElement(tagName, doc),
@@ -128,6 +126,7 @@ bool SVGLineElement::hasPercentageValues() const {
     return true;
 
   return false;
+}
 }
 
 // vim:ts=4:noet

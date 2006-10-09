@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,12 +24,12 @@
 #define KSVG_SVGPolyElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "svgpathparser.h"
-#include "SVGLangSpace.h"
-#include "SVGStyledTransformableElement.h"
 #include "SVGAnimatedPoints.h"
 #include "SVGExternalResourcesRequired.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledTransformableElement.h"
+#include "SVGTests.h"
+#include "svgpathparser.h"
 
 namespace WebCore {
 class SVGPolyElement : public SVGStyledTransformableElement,

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,12 +22,11 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "SVGPointList.h"
 #include "SVGPolygonElement.h"
 
-#include <kcanvas/device/KRenderingDevice.h>
+#include "SVGPointList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGPolygonElement::SVGPolygonElement(const QualifiedName& tagName,
                                      Document* doc)
@@ -48,6 +47,7 @@ Path SVGPolygonElement::toPathData() const {
 
   polyData.closeSubpath();
   return polyData;
+}
 }
 
 // vim:ts=4:noet
