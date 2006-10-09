@@ -72,6 +72,9 @@ class FrameWin : public Frame {
                              const String& name,
                              Element* ownerElement,
                              const String& referrer);
+  virtual Widget* createJavaAppletWidget(const IntSize&,
+                                         Element*,
+                                         const HashMap<String, String>& args);
 
   virtual void scheduleClose();
 
