@@ -46,7 +46,6 @@
 #include "KURL.h"
 #include "PlatformScrollBar.h"
 #include "ScrollBar.h"
-#include "JavaAppletWidget.h"
 #include "Page.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
@@ -340,6 +339,12 @@ KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(Widget*) {
   return 0;
 }
 KJS::Bindings::RootObject* FrameWin::bindingRootObject() {
+  notImplemented();
+  return 0;
+}
+Widget* FrameWin::createJavaAppletWidget(const IntSize&,
+                                         Element*,
+                                         const HashMap<String, String>&) {
   notImplemented();
   return 0;
 }
