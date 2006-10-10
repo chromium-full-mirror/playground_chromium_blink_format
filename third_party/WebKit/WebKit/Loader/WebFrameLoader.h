@@ -31,7 +31,6 @@
 @class DOMElement;
 @class WebDocumentLoader;
 @class WebFormState;
-@class WebFrame;
 @class WebCoreFrameBridge;
 @class WebLoader;
 @class WebMainResourceLoader;
@@ -85,7 +84,7 @@ BOOL isBackForwardLoadType(FrameLoadType type);
   NSMutableArray* subresourceLoaders;
   NSMutableArray* plugInStreamLoaders;
 
-  WebFrame<WebFrameLoaderClient>* client;
+  id<WebFrameLoaderClient> client;
   WebDocumentLoader* documentLoader;
   WebDocumentLoader* provisionalDocumentLoader;
   WebDocumentLoader* policyDocumentLoader;
@@ -116,7 +115,7 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 }
 
 - (id)initWithFrame:(WebCoreFrameBridge*)bridge
-             client:(WebFrame<WebFrameLoaderClient>*)client;
+             client:(id<WebFrameLoaderClient>)client;
 - (void)addPlugInStreamLoader:(WebLoader*)loader;
 - (void)removePlugInStreamLoader:(WebLoader*)loader;
 - (void)setDefersCallbacks:(BOOL)defers;
@@ -319,6 +318,6 @@ BOOL isBackForwardLoadType(FrameLoadType type);
                                         event:(NSEvent*)event
                                   originalURL:(NSURL*)URL;
 
-- (NSObject<WebFrameLoaderClient>*)client;
+- (id<WebFrameLoaderClient>)client;
 
 @end
