@@ -858,7 +858,7 @@ void Frame::finishedParsing() {
   // protect ourselves
   // because doing so will cause us to re-enter our destructor when protector
   // goes out of scope.
-  RefPtr<Frame> protector = refCount() > 0 ? this : 0;
+  RefPtr<Frame> protector = this;
   checkCompleted();
 
   if (!d->m_view)

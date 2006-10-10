@@ -29,7 +29,6 @@
 
 #include "FontData.h"
 #include "Shared.h"
-#include <wtf/Noncopyable.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -42,7 +41,7 @@ class FontPlatformData;
 
 const int cAllFamiliesScanned = -1;
 
-class FontFallbackList : public Shared<FontFallbackList>, Noncopyable {
+class FontFallbackList : public Shared<FontFallbackList> {
  public:
   FontFallbackList();
 
