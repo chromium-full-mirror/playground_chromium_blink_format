@@ -31,10 +31,9 @@
 
 #import "WebFramePrivate.h"
 
-#import "WebFrameLoaderClient.h"
+#import <WebCore/WebFrameLoaderClient.h>
+#import <WebCore/WebFrameLoader.h>
 #import "WebPolicyDelegatePrivate.h"
-
-#import "WebFrameLoader.h"
 
 @class WebDocumentLoader;
 @class WebInspector;

@@ -28,7 +28,7 @@
 
 #import "WebLoader.h"
 
-#import <WebCore/WebCoreResourceLoader.h>
+#import "WebCoreResourceLoader.h"
 
 @class WebFrameLoader;
 

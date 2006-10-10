@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebPolicyDecider.h"
+#import <WebCore/WebPolicyDecider.h>
 
 @class WebPolicyDecisionListener;
 
