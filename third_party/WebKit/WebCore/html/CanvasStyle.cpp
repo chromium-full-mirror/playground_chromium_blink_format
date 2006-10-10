@@ -70,7 +70,7 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
     case ColorString: {
       RGBA32 color = CSSParser::parseColor(m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBStrokeColor(
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0,
           ((color >> 8) & 0xFF) / 255.0, (color & 0xFF) / 255.0,
@@ -81,7 +81,7 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
     case ColorStringWithAlpha: {
       RGBA32 color = CSSParser::parseColor(m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBStrokeColor(
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0,
           ((color >> 8) & 0xFF) / 255.0, (color & 0xFF) / 255.0, m_alpha);
@@ -90,21 +90,21 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
     }
     case GrayLevel:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetGrayStrokeColor(context->platformContext(), m_grayLevel,
                                   m_alpha);
 #endif
       break;
     case RGBA:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBStrokeColor(context->platformContext(), m_red, m_green,
                                  m_blue, m_alpha);
 #endif
       break;
     case CMYKA:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetCMYKStrokeColor(context->platformContext(), m_cyan, m_magenta,
                                   m_yellow, m_black, m_alpha);
 #endif
@@ -122,7 +122,7 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
     case ColorString: {
       RGBA32 color = CSSParser::parseColor(m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBFillColor(
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0,
           ((color >> 8) & 0xFF) / 255.0, (color & 0xFF) / 255.0,
@@ -133,7 +133,7 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
     case ColorStringWithAlpha: {
       RGBA32 color = CSSParser::parseColor(m_color);
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBFillColor(
           context->platformContext(), ((color >> 16) & 0xFF) / 255.0,
           ((color >> 8) & 0xFF) / 255.0, (color & 0xFF) / 255.0, m_alpha);
@@ -142,21 +142,21 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
     }
     case GrayLevel:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetGrayFillColor(context->platformContext(), m_grayLevel,
                                 m_alpha);
 #endif
       break;
     case RGBA:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetRGBFillColor(context->platformContext(), m_red, m_green,
                                m_blue, m_alpha);
 #endif
       break;
     case CMYKA:
 // FIXME: Do this through platform-independent GraphicsContext API.
-#if __APPLE__
+#if PLATFORM(CG)
       CGContextSetCMYKFillColor(context->platformContext(), m_cyan, m_magenta,
                                 m_yellow, m_black, m_alpha);
 #endif

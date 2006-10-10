@@ -28,7 +28,7 @@
 
 #include "cssparser.h"
 
-#if __APPLE__
+#if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -40,7 +40,7 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0, const FloatPoint& p1)
       m_p1(p1),
       m_stopsSorted(false),
       m_lastStop(0)
-#if __APPLE__
+#if PLATFORM(CG)
       ,
       m_shading(0)
 #endif
@@ -58,7 +58,7 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0,
       m_r1(r1),
       m_stopsSorted(false),
       m_lastStop(0)
-#if __APPLE__
+#if PLATFORM(CG)
       ,
       m_shading(0)
 #endif
@@ -66,7 +66,7 @@ CanvasGradient::CanvasGradient(const FloatPoint& p0,
 }
 
 CanvasGradient::~CanvasGradient() {
-#if __APPLE__
+#if PLATFORM(CG)
   CGShadingRelease(m_shading);
 #endif
 }
@@ -79,13 +79,13 @@ void CanvasGradient::addColorStop(float value, const String& color) {
 
   m_stopsSorted = false;
 
-#if __APPLE__
+#if PLATFORM(CG)
   CGShadingRelease(m_shading);
   m_shading = 0;
 #endif
 }
 
-#if __APPLE__
+#if PLATFORM(CG)
 
 static void gradientCallback(void* info, const CGFloat* in, CGFloat* out) {
   float r, g, b, a;

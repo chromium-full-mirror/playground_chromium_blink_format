@@ -32,7 +32,7 @@
 #include "PlatformString.h"
 #include <wtf/Vector.h>
 
-#if __APPLE__
+#if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -259,7 +259,7 @@ class CanvasRenderingContext2D : public Shared<CanvasRenderingContext2D> {
     CompositeOperator m_globalComposite;
     bool m_appliedStrokePattern;
     bool m_appliedFillPattern;
-#if __APPLE__
+#if PLATFORM(CG)
     CGAffineTransform m_strokeStylePatternTransform;
     CGAffineTransform m_fillStylePatternTransform;
 #endif
