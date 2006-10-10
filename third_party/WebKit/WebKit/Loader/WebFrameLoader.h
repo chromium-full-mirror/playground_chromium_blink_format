@@ -35,9 +35,8 @@
 @class WebCoreFrameBridge;
 @class WebLoader;
 @class WebMainResourceLoader;
+@class WebPolicyDecider;
 @protocol WebFrameLoaderClient;
-
-@class WebPolicyDecisionListener;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -93,12 +92,12 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 
   WebFrameState state;
 
-  WebPolicyDecisionListener* listener;
-
   FrameLoadType loadType;
 
   // state we'll need to continue after waiting for the policy delegate's
   // decision
+  WebPolicyDecider* policyDecider;
+
   NSURLRequest* policyRequest;
   NSString* policyFrameName;
   id policyTarget;
