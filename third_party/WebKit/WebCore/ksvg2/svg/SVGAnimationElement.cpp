@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,19 +24,16 @@
 #ifdef SVG_SUPPORT
 #include "SVGAnimationElement.h"
 
-#include "Attr.h"
 #include "CSSPropertyNames.h"
 #include "Document.h"
-#include "DOMImplementation.h"
-#include "ksvgcssproperties.h"
 #include "KSVGTimeScheduler.h"
 #include "PlatformString.h"
-#include "SVGDocumentExtensions.h"
 #include "SVGHelper.h"
-#include "SVGStyledElement.h"
 #include "SVGSVGElement.h"
+#include "SVGStyledElement.h"
 #include "SVGURIReference.h"
 #include "XLinkNames.h"
+#include "ksvgcssproperties.h"
 #include <float.h>
 #include <math.h>
 #include <wtf/Vector.h>
@@ -77,7 +74,7 @@ SVGElement* SVGAnimationElement::targetElement() const {
       m_targetElement = svg_dynamic_cast(element);
     } else if (parentNode()) {
       Node* target = parentNode();
-      while (target != 0) {
+      while (target) {
         if (target->nodeType() != ELEMENT_NODE)
           target = target->parentNode();
         else
@@ -357,7 +354,7 @@ String SVGAnimationElement::targetAttribute() const {
     return String();
 
   SVGElement* target = targetElement();
-  SVGStyledElement* styled = NULL;
+  SVGStyledElement* styled = 0;
   if (target && target->isStyled())
     styled = static_cast<SVGStyledElement*>(target);
 

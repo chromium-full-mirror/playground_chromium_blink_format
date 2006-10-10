@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,22 +22,15 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
+#include "SVGAnimateTransformElement.h"
 
-#include <kcanvas/RenderPath.h>
-
+#include "KSVGTimeScheduler.h"
 #include "SVGAngle.h"
 #include "SVGMatrix.h"
-#include "SVGTransform.h"
 #include "SVGStyledTransformableElement.h"
-#include "SVGTransformList.h"
-#include "SVGTransformList.h"
-#include "SVGAnimateTransformElement.h"
-#include "KSVGTimeScheduler.h"
-#include "Document.h"
-#include "SVGDocumentExtensions.h"
 #include "SVGSVGElement.h"
-
+#include "SVGTransform.h"
+#include "SVGTransformList.h"
 #include <math.h>
 
 using namespace std;
