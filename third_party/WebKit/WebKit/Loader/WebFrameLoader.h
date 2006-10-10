@@ -292,6 +292,7 @@ BOOL isBackForwardLoadType(FrameLoadType type);
 - (NSURLRequest*)requestFromDelegateForRequest:(NSURLRequest*)request
                                     identifier:(id*)identifier
                                          error:(NSError**)error;
+- (void)loadRequest:(NSURLRequest*)request;
 - (void)loadRequest:(NSURLRequest*)request inFrameNamed:(NSString*)frameName;
 - (void)postWithURL:(NSURL*)URL
            referrer:(NSString*)referrer
