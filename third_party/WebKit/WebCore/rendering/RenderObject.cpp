@@ -660,8 +660,9 @@ bool RenderObject::scroll(ScrollDirection direction,
 }
 
 bool RenderObject::shouldAutoscroll() const {
-  return (hasOverflowClip() &&
-          (scrollsOverflow() || (node() && node()->isContentEditable())));
+  return ((isRoot()) ||
+          (hasOverflowClip() &&
+           (scrollsOverflow() || (node() && node()->isContentEditable()))));
 }
 
 void RenderObject::autoscroll() {
@@ -2577,6 +2578,11 @@ bool RenderObject::documentBeingDestroyed() const {
 }
 
 void RenderObject::destroy() {
+  // If this renderer is being autoscrolled, stop the autoscroll timer
+  if (document() && document()->frame() &&
+      document()->frame()->autoscrollRenderer() == this)
+    document()->frame()->stopAutoscrollTimer();
+
   if (m_hasCounterNodeMap) {
     RenderObjectsToCounterNodeMaps* objectsMap =
         getRenderObjectsToCounterNodeMaps();

@@ -591,7 +591,7 @@ void FrameView::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(this);
 
   d->mousePressed = true;
-  d->m_currentMousePosition = windowToContents(mouseEvent.pos());
+  d->m_currentMousePosition = mouseEvent.pos();
 
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(false, true, false, mouseEvent);
@@ -660,7 +660,7 @@ void FrameView::handleMouseDoubleClickEvent(
 
   // We get this instead of a second mouse-up
   d->mousePressed = false;
-  d->m_currentMousePosition = windowToContents(mouseEvent.pos());
+  d->m_currentMousePosition = mouseEvent.pos();
 
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(false, true, false, mouseEvent);
@@ -829,7 +829,7 @@ void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
     return;
 
   RefPtr<FrameView> protector(this);
-  d->m_currentMousePosition = windowToContents(mouseEvent.pos());
+  d->m_currentMousePosition = mouseEvent.pos();
 
   if (d->hoverTimer.isActive())
     d->hoverTimer.stop();
@@ -910,7 +910,7 @@ void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(this);
 
   d->mousePressed = false;
-  d->m_currentMousePosition = windowToContents(mouseEvent.pos());
+  d->m_currentMousePosition = mouseEvent.pos();
 
   if (d->resizingFrameSet) {
     dispatchMouseEvent(mouseupEvent, d->resizingFrameSet.get(), true,

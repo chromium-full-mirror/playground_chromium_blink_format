@@ -541,6 +541,8 @@ class Frame : public Shared<Frame> {
   virtual void handleMouseMoveEvent(const MouseEventWithHitTestResults&);
   virtual void handleMouseReleaseEvent(const MouseEventWithHitTestResults&);
 
+  void updateSelectionForMouseDragOverPosition(const VisiblePosition&);
+
   void selectClosestWordFromMouseEvent(const PlatformMouseEvent&,
                                        Node* innerNode);
 
@@ -700,6 +702,11 @@ class Frame : public Shared<Frame> {
   void selectFrameElementInParentIfFullySelected();
 
   virtual bool mouseDownMayStartSelect() const { return true; }
+  bool mouseDownMayStartAutoscroll() const;
+  void setMouseDownMayStartAutoscroll(bool b);
+
+  bool mouseDownMayStartDrag() const;
+  void setMouseDownMayStartDrag(bool b);
 
   void handleFallbackContent();
 
@@ -823,6 +830,9 @@ class Frame : public Shared<Frame> {
 
   virtual IntRect windowResizerRect() const { return IntRect(); }
 
+  void stopAutoscrollTimer();
+  RenderObject* autoscrollRenderer() const;
+
  protected:
   virtual void startRedirectionTimer();
   virtual void stopRedirectionTimer();
@@ -831,7 +841,7 @@ class Frame : public Shared<Frame> {
 
   void handleAutoscroll(RenderObject*);
   void startAutoscrollTimer();
-  void stopAutoscrollTimer();
+  void setAutoscrollRenderer(RenderObject*);
 
  private:
   void emitLoadEvent();

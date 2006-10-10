@@ -748,7 +748,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                      event:(NSEvent*)event
              sourceIsDHTML:(BOOL)flag
             DHTMLWroteData:(BOOL)dhtmlWroteData;
-- (void)handleAutoscrollForMouseDragged:(NSEvent*)event;
 - (BOOL)mayStartDragAtEventLocation:(NSPoint)location;
 
 - (BOOL)selectWordBeforeMenuEvent;

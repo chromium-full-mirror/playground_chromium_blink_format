@@ -795,34 +795,22 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
 }
 
 void RenderLayer::autoscroll() {
-  int xOffset = scrollXOffset();
-  int yOffset = scrollYOffset();
+  if (!renderer() || !renderer()->document() ||
+      !renderer()->document()->frame() ||
+      !renderer()->document()->frame()->view())
+    return;
 
-  // Get the rectangle for the extent of the selection
-  Selection selection(
-      renderer()->document()->frame()->selectionController()->selection());
-  IntRect extentRect = VisiblePosition(selection.extent()).caretRect();
-  extentRect.move(xOffset, yOffset);
+  Frame* currentFrame = renderer()->document()->frame();
+  IntPoint currentPos = currentFrame->view()->windowToContents(
+      currentFrame->view()->currentMousePosition());
 
-  IntRect bounds = IntRect(xPos() + xOffset, yPos() + yOffset,
-                           width() - verticalScrollbarWidth(),
-                           height() - horizontalScrollbarHeight());
+  if (currentFrame->mouseDownMayStartSelect()) {
+    VisiblePosition pos(renderer()->positionForPoint(currentPos));
+    currentFrame->updateSelectionForMouseDragOverPosition(pos);
+  }
 
-  // Calculate how much the layer should scroll horizontally.
-  int diffX = 0;
-  if (extentRect.right() > bounds.right())
-    diffX = extentRect.right() - bounds.right();
-  else if (extentRect.x() < bounds.x())
-    diffX = extentRect.x() - bounds.x();
-
-  // Calculate how much the layer should scroll vertically.
-  int diffY = 0;
-  if (extentRect.bottom() > bounds.bottom())
-    diffY = extentRect.bottom() - bounds.bottom();
-  else if (extentRect.y() < bounds.y())
-    diffY = extentRect.y() - bounds.y();
-
-  scrollToOffset(xOffset + diffX, yOffset + diffY);
+  scrollRectToVisible(IntRect(currentPos, IntSize(1, 1)), gAlignToEdgeIfNeeded,
+                      gAlignToEdgeIfNeeded);
 }
 
 void RenderLayer::resize(const PlatformMouseEvent& evt,
