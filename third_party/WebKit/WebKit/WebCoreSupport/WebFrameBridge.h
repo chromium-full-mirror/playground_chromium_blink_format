@@ -33,13 +33,11 @@
 @class WebFrame;
 @class WebFrameLoader;
 @class WebFrameView;
-@class WebFrameLoader;
 
 @protocol WebOpenPanelResultListener;
 
 @interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
   WebFrame* _frame;
-  WebFrameLoader* _frameLoader;
 
   WebCoreKeyboardUIMode _keyboardUIMode;
   BOOL _keyboardUIModeAccessed;
@@ -60,6 +58,5 @@
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;
-- (WebFrameLoader*)frameLoader;
 
 @end

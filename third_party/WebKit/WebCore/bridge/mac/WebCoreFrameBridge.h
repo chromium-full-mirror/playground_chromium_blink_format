@@ -55,12 +55,15 @@ typedef WebCore::Element WebCoreElement;
 @class DOMRange;
 @class WebCorePageBridge;
 @class WebCoreSettings;
+@class WebFrame;
+@class WebFrameLoader;
 @class WebScriptObject;
 @class WebView;
 
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
+@protocol WebFrameLoaderClient;
 
 extern NSString* WebCorePageCacheStateKey;
 
@@ -174,6 +177,8 @@ typedef enum {
 
 @interface WebCoreFrameBridge : NSObject {
   WebCoreMacFrame* m_frame;
+  WebFrameLoader* _frameLoader;
+
   BOOL _shouldCreateRenderers;
   BOOL _closed;
 }
@@ -576,6 +581,9 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (void)setProhibitsScrolling:(BOOL)prohibits;
 
+- (void)setFrameLoaderClient:(id<WebFrameLoaderClient>)client;
+- (WebFrameLoader*)frameLoader;
+
 @end
 
 // The WebCoreFrameBridge protocol contains methods for use by the WebCore side
@@ -588,8 +596,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 @class WebFrameLoader;
 
 @protocol WebCoreFrameBridge
-
-- (WebFrameLoader*)frameLoader;
 
 - (void)frameDetached;
 - (NSView*)documentView;
