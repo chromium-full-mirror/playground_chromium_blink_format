@@ -178,8 +178,21 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   oldChild->deleteLineBoxWrapper();
 
   if (!documentBeingDestroyed()) {
+    // if we remove visible child from an invisible parent, we don't know the
+    // layer visibility any more
+    RenderLayer* layer = 0;
+    if (m_style->visibility() != VISIBLE &&
+        oldChild->style()->visibility() == VISIBLE && !oldChild->layer()) {
+      layer = enclosingLayer();
+      layer->dirtyVisibleContentStatus();
+    }
+
     // Keep our layer hierarchy updated.
-    oldChild->removeLayers(enclosingLayer());
+    if (oldChild->firstChild() || oldChild->layer()) {
+      if (!layer)
+        layer = enclosingLayer();
+      oldChild->removeLayers(layer);
+    }
 
     // If oldChild is the start or end of the selection, then clear the
     // selection to
@@ -405,9 +418,20 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
   // Keep our layer hierarchy updated.  Optimize for the common case where we
   // don't have any children
   // and don't have a layer attached to ourselves.
+  RenderLayer* layer = 0;
   if (newChild->firstChild() || newChild->layer()) {
-    RenderLayer* layer = enclosingLayer();
+    layer = enclosingLayer();
     newChild->addLayers(layer, newChild);
+  }
+
+  // if the new child is visible but this object was not, tell the layer it has
+  // some visible content
+  // that needs to be drawn and layer visibility optimization can't be used
+  if (style()->visibility() != VISIBLE &&
+      newChild->style()->visibility() == VISIBLE && !newChild->layer()) {
+    if (!layer)
+      layer = enclosingLayer();
+    layer->setHasVisibleContent(true);
   }
 
   newChild->setNeedsLayoutAndMinMaxRecalc();  // Goes up the containing block
@@ -451,9 +475,24 @@ void RenderContainer::insertChildNode(RenderObject* child,
 
   child->setParent(this);
 
-  // Keep our layer hierarchy updated.
-  RenderLayer* layer = enclosingLayer();
-  child->addLayers(layer, child);
+  // Keep our layer hierarchy updated.  Optimize for the common case where we
+  // don't have any children
+  // and don't have a layer attached to ourselves.
+  RenderLayer* layer = 0;
+  if (child->firstChild() || child->layer()) {
+    layer = enclosingLayer();
+    child->addLayers(layer, child);
+  }
+
+  // if the new child is visible but this object was not, tell the layer it has
+  // some visible content
+  // that needs to be drawn and layer visibility optimization can't be used
+  if (style()->visibility() != VISIBLE &&
+      child->style()->visibility() == VISIBLE && !child->layer()) {
+    if (!layer)
+      layer = enclosingLayer();
+    layer->setHasVisibleContent(true);
+  }
 
   child->setNeedsLayoutAndMinMaxRecalc();
   if (!normalChildNeedsLayout())

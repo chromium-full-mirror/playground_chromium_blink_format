@@ -312,6 +312,10 @@ class RenderLayer : public ScrollbarClient {
   void updateOverflowList();
   Vector<RenderLayer*>* overflowList() const { return m_overflowList; }
 
+  bool hasVisibleContent() const { return m_hasVisibleContent; }
+  void setHasVisibleContent(bool b);
+  void dirtyVisibleContentStatus();
+
   // Gets the nearest enclosing positioned ancestor layer (also includes
   // the <html> layer and the root layer).
   RenderLayer* enclosingPositionedAncestor() const;
@@ -397,6 +401,10 @@ class RenderLayer : public ScrollbarClient {
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 
+  void childVisibilityChanged(bool newVisibility);
+  void dirtyVisibleDescendantStatus();
+  void updateVisibilityStatus();
+
  protected:
   RenderObject* m_object;
 
@@ -473,6 +481,10 @@ class RenderLayer : public ScrollbarClient {
   bool m_overflowStatusDirty : 1;
   bool m_horizontalOverflow : 1;
   bool m_verticalOverflow : 1;
+  bool m_visibleContentStatusDirty : 1;
+  bool m_hasVisibleContent : 1;
+  bool m_visibleDescendantStatusDirty : 1;
+  bool m_hasVisibleDescendant : 1;
 
   Marquee* m_marquee;  // Used by layers with overflow:marquee
 };
