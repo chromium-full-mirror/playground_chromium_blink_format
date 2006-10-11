@@ -72,6 +72,8 @@ class QualifiedName {
 
   String toString() const;
 
+  QualifiedNameImpl* impl() const { return m_impl; }
+
   // Init routine for globals
   static void init();
 
