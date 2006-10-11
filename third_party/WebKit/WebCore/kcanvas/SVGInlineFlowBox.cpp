@@ -290,7 +290,7 @@ static void placeBoxesVerticallyWithAbsBaseline(InlineFlowBox* flow,
       baseline +=
           (int)(text->dy()->getFirst() ? text->dy()->getFirst()->value() : 0);
       if (text->y()->getFirst()) {
-        baseline = text->y()->getFirst()->value() - yPos;
+        baseline = (int)(text->y()->getFirst()->value() - yPos);
       }
       placeBoxesVerticallyWithAbsBaseline(static_cast<InlineFlowBox*>(curr),
                                           heightOfBlock, min_y, max_y, baseline,
