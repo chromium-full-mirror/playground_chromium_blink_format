@@ -248,6 +248,10 @@ FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
 FileChooser::~FileChooser() {
   notImplemented();
 }
+PassRefPtr<FileChooser> FileChooser::create(Document*,
+                                            RenderFileUploadControl*) {
+  notImplemented();
+}
 void FileChooser::openFileChooser() {
   notImplemented();
 }
