@@ -25,6 +25,7 @@
 
 #include "FileChooser.h"
 #include "HTMLInputElement.h"
+#include "Shared.h"
 
 namespace WebCore {
 
@@ -58,7 +59,7 @@ class RenderFileUploadControl : public RenderBlock {
   RenderStyle* createButtonStyle(RenderStyle* parentStyle = 0);
 
   RefPtr<HTMLFileUploadInnerButtonElement> m_button;
-  FileChooser* m_fileChooser;
+  RefPtr<FileChooser> m_fileChooser;
 };
 }
 

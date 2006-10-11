@@ -64,14 +64,13 @@ class HTMLFileUploadInnerButtonElement : public HTMLInputElement {
 RenderFileUploadControl::RenderFileUploadControl(Node* node)
     : RenderBlock(node),
       m_button(0),
-      m_fileChooser(new FileChooser(document(), this)) {}
+      m_fileChooser(FileChooser::create(document(), this)) {}
 
 RenderFileUploadControl::~RenderFileUploadControl() {
   if (m_button)
     m_button->detach();
   if (m_fileChooser) {
     m_fileChooser->uploadControlDetaching();
-    delete m_fileChooser;
   }
 }
 
