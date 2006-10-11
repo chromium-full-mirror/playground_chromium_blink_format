@@ -36,29 +36,28 @@ class RenderSVGText : public RenderBlock {
   RenderSVGText(SVGTextElement* node);
 
   virtual const char* renderName() const { return "RenderSVGText"; }
-  virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual AffineTransform localTransform() const { return m_transform; }
   virtual void setLocalTransform(const AffineTransform& transform) {
     m_transform = transform;
   }
-
+  virtual void paint(PaintInfo& i, int _tx, int _ty);
   virtual bool nodeAtPoint(NodeInfo&,
                            int x,
                            int y,
                            int tx,
                            int ty,
                            HitTestAction);
-
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
-
   virtual void computeAbsoluteRepaintRect(IntRect& r, bool f);
   virtual bool requiresLayer();
   virtual void layout();
+  virtual FloatRect relativeBBox(bool includeStroke = true) const;
+  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
+                                     bool isRootLineBox,
+                                     bool isOnlyRun = false);
 
  private:
-  AffineTransform translationTopToBaseline();
-  AffineTransform translationForAttributes();
   AffineTransform m_transform;
   IntRect m_absoluteBounds;
 };
