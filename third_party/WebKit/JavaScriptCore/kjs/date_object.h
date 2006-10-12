@@ -27,6 +27,8 @@
 
 namespace KJS {
 
+struct tm;
+
 class FunctionPrototype;
 class ObjectPrototype;
 

@@ -67,12 +67,7 @@ static double parseDate(const UString&);
 static double timeClip(double);
 
 inline int gmtoffset(const tm& t) {
-#if PLATFORM(WIN_OS)
-  // Time is supposed to be in the current timezone.
-  return -(_timezone / 60 - (t.tm_isdst != 0 ? 60 : 0)) * 60;
-#else
   return t.tm_gmtoff;
-#endif
 }
 
 /**
@@ -201,12 +196,10 @@ static UString formatTime(const tm& t, bool utc) {
              t.tm_sec);
   } else {
     int offset = abs(gmtoffset(t));
-#if PLATFORM(WIN_OS)
     char tzname[70];
-    strftime(tzname, sizeof(tzname), "%Z", &t);
-#else
-    const char* tzname = t.tm_zone;
-#endif
+    struct ::tm gtm = KJStmToTm(t);
+    strftime(tzname, sizeof(tzname), "%Z", &gtm);
+
     if (tzname) {
       snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d (%s)",
                t.tm_hour, t.tm_min, t.tm_sec, gmtoffset(t) < 0 ? '-' : '+',
@@ -517,18 +510,24 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
       return jsString(formatLocaleDate(exec, secs, false, true, args));
       break;
 #else
-    case ToLocaleString:
-      strftime(timebuffer, bufsize, "%c", &t);
+    case ToLocaleString: {
+      struct ::tm gtm = KJStmToTm(t);
+      strftime(timebuffer, bufsize, "%c", &gtm);
       return jsString(timebuffer);
       break;
-    case ToLocaleDateString:
-      strftime(timebuffer, bufsize, "%x", &t);
+    }
+    case ToLocaleDateString: {
+      struct ::tm gtm = KJStmToTm(t);
+      strftime(timebuffer, bufsize, "%x", &gtm);
       return jsString(timebuffer);
       break;
-    case ToLocaleTimeString:
-      strftime(timebuffer, bufsize, "%X", &t);
+    }
+    case ToLocaleTimeString: {
+      struct ::tm gtm = KJStmToTm(t);
+      strftime(timebuffer, bufsize, "%X", &gtm);
       return jsString(timebuffer);
       break;
+    }
 #endif
     case ValueOf:
     case GetTime:
@@ -592,7 +591,7 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
   if (id == SetYear || id == SetMilliSeconds || id == SetSeconds ||
       id == SetMinutes || id == SetHours || id == SetDate || id == SetMonth ||
       id == SetFullYear) {
-    result = jsNumber(dateToMseconds(&t, ms, utc));
+    result = jsNumber(dateToMS(t, ms, utc));
     thisDateObj->setInternalValue(result);
   }
 
@@ -682,7 +681,7 @@ JSObject* DateObjectImp::construct(ExecState* exec, const List& args) {
       t.tm_sec = (numArgs >= 6) ? args[5]->toInt32(exec) : 0;
       t.tm_isdst = -1;
       double ms = (numArgs >= 7) ? roundValue(exec, args[6]) : 0;
-      value = dateToMseconds(&t, ms, false);
+      value = dateToMS(t, ms, false);
     }
   }
 
@@ -697,7 +696,7 @@ JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
                                        JSObject* /*thisObj*/,
                                        const List& /*args*/) {
   time_t t = time(0);
-  tm ts = *localtime(&t);
+  tm ts = tmToKJStm(*localtime(&t));
   return jsString(formatDate(ts) + " " + formatTime(ts, false));
 }
 
@@ -739,7 +738,7 @@ JSValue* DateObjectFuncImp::callAsFunction(ExecState* exec,
     t.tm_min = (n >= 5) ? args[4]->toInt32(exec) : 0;
     t.tm_sec = (n >= 6) ? args[5]->toInt32(exec) : 0;
     double ms = (n >= 7) ? roundValue(exec, args[6]) : 0;
-    return jsNumber(dateToMseconds(&t, ms, true));
+    return jsNumber(dateToMS(t, ms, true));
   }
 }
 
@@ -1102,9 +1101,9 @@ static double parseDate(const UString& date) {
     t.tm_min = minute;
     t.tm_hour = hour;
 
-    // Use our dateToMseconds() rather than mktime() as the latter can't handle
-    // the full year range.
-    return dateToMseconds(&t, 0, false);
+    // Use our dateToMS() rather than mktime() as the latter can't handle the
+    // full year range.
+    return dateToMS(t, 0, false);
   }
 
   return (ymdhmsToSeconds(year, month + 1, day, hour, minute, second) -
