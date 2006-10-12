@@ -47,7 +47,6 @@
 #include "KURL.h"
 #include "PlatformScrollBar.h"
 #include "ScrollBar.h"
-#include "JavaAppletWidget.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
 #include "CookieJar.h"
@@ -120,12 +119,6 @@ void Widget::unlockDrawingFocus(GraphicsContext*) {
   notImplemented();
 }
 void Widget::removeFromParent() {}
-
-JavaAppletWidget::JavaAppletWidget(IntSize const&,
-                                   Element*,
-                                   WTF::HashMap<String, String> const&) {
-  notImplemented();
-}
 
 void TextField::selectAll() {
   notImplemented();
@@ -292,6 +285,12 @@ KJS::Bindings::Instance* FrameGdk::getEmbedInstanceForWidget(Widget*) {
   return 0;
 }
 KJS::Bindings::RootObject* FrameGdk::bindingRootObject() {
+  notImplemented();
+  return 0;
+}
+Widget* FrameGdk::createJavaAppletWidget(const IntSize&,
+                                         Element*,
+                                         const HashMap<String, String>&) {
   notImplemented();
   return 0;
 }
@@ -704,6 +703,11 @@ FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
 }
 FileChooser::~FileChooser() {
   notImplemented();
+}
+PassRefPtr<FileChooser> FileChooser::create(Document*,
+                                            RenderFileUploadControl*) {
+  notImplemented();
+  return 0;
 }
 void FileChooser::openFileChooser() {
   notImplemented();

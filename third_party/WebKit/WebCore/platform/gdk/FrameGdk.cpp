@@ -43,6 +43,7 @@
 #include "GraphicsContext.h"
 #include "HTMLDocument.h"
 #include "ResourceLoader.h"
+#include "ResourceLoaderInternal.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformWheelEvent.h"
@@ -66,6 +67,66 @@ Vector<char> loadResourceIntoArray(const char* resourceName) {
 }
 
 namespace WebCore {
+
+FrameGdkClientDefault::FrameGdkClientDefault()
+    : ResourceLoaderClient(), m_frame(0), m_beginCalled(false) {}
+
+FrameGdkClientDefault::~FrameGdkClientDefault() {}
+
+void FrameGdkClientDefault::setFrame(const FrameGdk* frame) {
+  m_frame = const_cast<FrameGdk*>(frame);
+}
+
+void FrameGdkClientDefault::openURL(const KURL& url) {
+  m_frame->didOpenURL(url);
+  m_beginCalled = false;
+
+  RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
+  loader->start(0);
+}
+
+void FrameGdkClientDefault::submitForm(const String& method,
+                                       const KURL& url,
+                                       const FormData* postData) {
+  m_beginCalled = false;
+
+  RefPtr<ResourceLoader> loader =
+      ResourceLoader::create(this, method, url, *postData);
+  loader->start(0);
+}
+
+void FrameGdkClientDefault::receivedResponse(ResourceLoader*,
+                                             PlatformResponse) {
+  // no-op
+}
+
+void FrameGdkClientDefault::receivedData(ResourceLoader* job,
+                                         const char* data,
+                                         int length) {
+  if (!m_beginCalled) {
+    m_beginCalled = true;
+
+#if 0  // FIXME: This is from Qt version, need to be removed or Gdk equivalent
+       // written
+        // Assign correct mimetype _before_ calling begin()!
+        ResourceLoaderInternal* d = job->getInternal();
+        if (d) {
+            ResourceRequest request(m_frame->resourceRequest());
+            request.m_responseMIMEType = d->m_mimetype;
+            m_frame->setResourceRequest(request);
+        }
+#endif
+    m_frame->begin(job->url());
+  }
+
+  m_frame->write(data, length);
+}
+
+void FrameGdkClientDefault::receivedAllData(ResourceLoader* job,
+                                            PlatformData data) {
+  m_frame->end();
+  m_beginCalled = false;
+}
 
 static void doScroll(const RenderObject* r, float deltaX, float deltaY) {
   // FIXME: The scrolling done here should be done in the default handlers
@@ -106,6 +167,9 @@ FrameGdk::FrameGdk(GdkDrawable* gdkdrawable)
   IntRect geom = frameGeometry();
   view->resize(geom.width(), geom.height());
   view->ScrollView::setDrawable(gdkdrawable);
+
+  m_client = new FrameGdkClientDefault();
+  m_client->setFrame(this);
 }
 
 FrameGdk::FrameGdk(Page* page, Element* element) : Frame(page, element) {
@@ -113,6 +177,8 @@ FrameGdk::FrameGdk(Page* page, Element* element) : Frame(page, element) {
   Settings* settings = new Settings;
   settings->setAutoLoadImages(true);
   setSettings(settings);
+  m_client = new FrameGdkClientDefault();
+  m_client->setFrame(this);
 }
 
 FrameGdk::~FrameGdk() {
@@ -120,24 +186,32 @@ FrameGdk::~FrameGdk() {
 }
 
 bool FrameGdk::openURL(const KURL& url) {
-  didOpenURL(url);
-  begin(url);
-  RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
-  loader->start(document()->docLoader());
+  if (!m_client)
+    return false;
+
+  m_client->openURL(url);
   return true;
 }
 
-void FrameGdk::submitForm(const ResourceRequest&) {}
+void FrameGdk::submitForm(const ResourceRequest& request) {
+  // FIXME: this is a hack inherited from FrameMac, and should be pushed into
+  // Frame
+  if (d->m_submittedFormURL == request.url())
+    return;
+
+  d->m_submittedFormURL = request.url();
+
+  if (m_client)
+    m_client->submitForm(request.doPost() ? "POST" : "GET", request.url(),
+                         &request.postData);
+  clearRecordedFormValues();
+}
 
 void FrameGdk::urlSelected(const ResourceRequest& request) {
-  // need to potentially updateLocationBar(str.ascii()); or notify sys of new
-  // url mybe event or callback
-  const KURL url = request.url();
-  printf("------------------> LOADING NEW URL %s \n", url.url().ascii());
-  didOpenURL(url);
-  begin(url);
-  RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
-  loader->start(document()->docLoader());
+  if (!m_client)
+    return;
+
+  m_client->openURL(request.url());
 }
 
 String FrameGdk::userAgent() const {
@@ -286,14 +360,6 @@ void FrameGdk::handleGdkEvent(GdkEvent* event) {
     default:
       break;
   }
-}
-
-void FrameGdk::receivedData(ResourceLoader* job, const char* data, int length) {
-  write(data, length);
-}
-
-void FrameGdk::receivedAllData(ResourceLoader* job, PlatformData data) {
-  end();
 }
 
 void FrameGdk::setFrameGeometry(const IntRect& r) {
