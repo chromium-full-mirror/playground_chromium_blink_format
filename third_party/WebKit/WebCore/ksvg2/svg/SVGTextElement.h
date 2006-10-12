@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -34,7 +34,7 @@ class SVGTextElement : public SVGTextPositioningElement,
   SVGTextElement(const QualifiedName&, Document*);
   virtual ~SVGTextElement();
 
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   // 'SVGTextElement' functions
   virtual SVGElement* nearestViewportElement() const;
@@ -50,12 +50,12 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;
   virtual void attach();
   virtual SVGMatrix* localMatrix() const;
 
-  virtual void updateLocalTransform(SVGTransformList* localTransforms);
+  virtual void updateLocalTransform(SVGTransformList*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

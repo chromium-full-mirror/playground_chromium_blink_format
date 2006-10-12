@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,15 +22,14 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include "SVGNames.h"
-#include "SVGHelper.h"
 #include "SVGTextPositioningElement.h"
+
+#include "SVGHelper.h"
 #include "SVGLengthList.h"
+#include "SVGNames.h"
 #include "SVGNumberList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGTextPositioningElement::SVGTextPositioningElement(
     const QualifiedName& tagName,
@@ -100,6 +99,7 @@ void SVGTextPositioningElement::parseMappedAttribute(MappedAttribute* attr) {
     rotateBaseValue()->parse(value.deprecatedString());
   else
     SVGTextContentElement::parseMappedAttribute(attr);
+}
 }
 
 // vim:ts=4:noet

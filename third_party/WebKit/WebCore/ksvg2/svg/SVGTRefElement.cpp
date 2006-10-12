@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,14 +22,15 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Text.h"
 #include "SVGTRefElement.h"
-#include "SVGNames.h"
-#include "XLinkNames.h"
-#include "SVGDocument.h"
-#include "RenderSVGInline.h"
 
-using namespace WebCore;
+#include "RenderSVGInline.h"
+#include "SVGDocument.h"
+#include "SVGNames.h"
+#include "Text.h"
+#include "XLinkNames.h"
+
+namespace WebCore {
 
 SVGTRefElement::SVGTRefElement(const QualifiedName& tagName, Document* doc)
     : SVGTextPositioningElement(tagName, doc), SVGURIReference() {}
@@ -71,6 +72,7 @@ bool SVGTRefElement::childShouldCreateRenderer(Node* child) const {
 
 RenderObject* SVGTRefElement::createRenderer(RenderArena* arena, RenderStyle*) {
   return new (arena) RenderSVGInline(this);
+}
 }
 
 // vim:ts=4:noet
