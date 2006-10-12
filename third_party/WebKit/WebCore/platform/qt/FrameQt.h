@@ -149,6 +149,8 @@ class FrameQt : public Frame {
 
   void setFrameGeometry(const IntRect&);
 
+  virtual void tokenizerProcessedData();
+
  private:
   void init();
 

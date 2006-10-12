@@ -123,11 +123,14 @@ void ResourceLoaderManager::remove(ResourceLoader* job) {
   if (!kioJob)
     return;
 
-  if (job->method() == "POST") {
+  QString headers = kioJob->queryMetaData("HTTP-Headers");
+  if (job->method() == "GET")
+    d->m_charset = job->extractCharsetFromHeaders(headers);
+  else if (job->method() == "POST") {
     // Will take care of informing our client...
     // This must be called before receivedAllData(),
     // otherwhise assembleResponseHeaders() is called too early...
-    job->receivedResponse(kioJob->queryMetaData("HTTP-Headers"));
+    job->receivedResponse(headers);
   }
 
   d->client->receivedAllData(job, 0);

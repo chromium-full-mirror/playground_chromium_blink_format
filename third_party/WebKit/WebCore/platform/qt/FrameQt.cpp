@@ -478,6 +478,11 @@ bool FrameQt::keyEvent(const PlatformKeyboardEvent& keyEvent) {
 void FrameQt::setFrameGeometry(const IntRect& r) {
   setFrameGeometry(QRect(r));
 }
+
+void FrameQt::tokenizerProcessedData() {
+  if (d->m_doc)
+    checkCompleted();
+}
 }
 
 // vim: ts=4 sw=4 et
