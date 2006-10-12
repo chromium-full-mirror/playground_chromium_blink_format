@@ -828,8 +828,6 @@ class Frame : public Shared<Frame> {
 
   void setNeedsReapplyStyles();
 
-  virtual IntRect windowResizerRect() const { return IntRect(); }
-
   void stopAutoscrollTimer();
   RenderObject* autoscrollRenderer() const;
 

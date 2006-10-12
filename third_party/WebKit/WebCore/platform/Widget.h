@@ -168,6 +168,7 @@ class Widget {
   virtual IntPoint convertChildToSelf(const Widget*, const IntPoint&) const;
   virtual IntPoint convertSelfToChild(const Widget*, const IntPoint&) const;
 
+  bool suppressInvalidation() const;
   void setSuppressInvalidation(bool);
 
   // These methods will be called on a widget while it is capturing the mouse.

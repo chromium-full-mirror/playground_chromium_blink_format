@@ -36,6 +36,7 @@
 #include "RenderBR.h"
 #include "RenderText.h"
 #include "RenderTheme.h"
+#include "RenderView.h"
 #include "TextStyle.h"
 #include <math.h>
 
@@ -445,5 +446,9 @@ void RenderListBox::valueChanged(Scrollbar*) {
       EventTargetNodeCast(node())->dispatchHTMLEvent(scrollEvent, true, false);
     }
   }
+}
+
+IntRect RenderListBox::windowClipRect() const {
+  return view()->frameView()->windowClipRectForLayer(enclosingLayer(), true);
 }
 }

@@ -345,11 +345,14 @@ class RenderLayer : public ScrollbarClient {
                       IntRect& layerBounds,
                       IntRect& backgroundRect,
                       IntRect& foregroundRect,
-                      IntRect& outlineRect);
+                      IntRect& outlineRect) const;
   void calculateClipRects(const RenderLayer* rootLayer);
   ClipRects* clipRects() const { return m_clipRects; }
-  IntRect documentClipRect();  // Returns the foreground clip rect of the layer
-                               // in the document's coordinate space.
+  IntRect childrenClipRect() const;  // Returns the foreground clip rect of the
+                                     // layer in the document's coordinate
+                                     // space.
+  IntRect selfClipRect() const;      // Returns the background clip rect of the
+                                 // layer in the document's coordinate space.
 
   bool intersectsDamageRect(const IntRect& layerBounds,
                             const IntRect& damageRect) const;
@@ -398,6 +401,7 @@ class RenderLayer : public ScrollbarClient {
   bool shouldBeOverflowOnly() const;
 
   virtual void valueChanged(Scrollbar*);
+  virtual IntRect windowClipRect() const;
 
   void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 

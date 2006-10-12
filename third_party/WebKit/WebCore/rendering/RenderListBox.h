@@ -57,7 +57,10 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
   virtual void calcHeight();
   void setOptionsChanged(bool c) { m_optionsChanged = c; }
   void valueChanged(unsigned listIndex);
+
+  // ScrollbarClient interface.
   virtual void valueChanged(Scrollbar*);
+  virtual IntRect windowClipRect() const;
 
   HTMLOptionElement* optionAtPoint(int x, int y);
 

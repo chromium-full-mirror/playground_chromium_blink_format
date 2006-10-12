@@ -154,7 +154,7 @@ class RenderObject : public CachedResourceClient {
   RenderObject* lastLeafChild() const;
 
   virtual RenderLayer* layer() const { return 0; }
-  RenderLayer* enclosingLayer();
+  RenderLayer* enclosingLayer() const;
   void addLayers(RenderLayer* parentLayer, RenderObject* newObject);
   void removeLayers(RenderLayer* parentLayer);
   void moveLayers(RenderLayer* oldParent, RenderLayer* newParent);

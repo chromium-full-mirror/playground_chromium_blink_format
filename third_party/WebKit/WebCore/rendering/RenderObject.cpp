@@ -526,8 +526,8 @@ RenderLayer* RenderObject::findNextLayer(RenderLayer* parentLayer,
   return 0;
 }
 
-RenderLayer* RenderObject::enclosingLayer() {
-  RenderObject* curr = this;
+RenderLayer* RenderObject::enclosingLayer() const {
+  const RenderObject* curr = this;
   while (curr) {
     RenderLayer* layer = curr->layer();
     if (layer)
