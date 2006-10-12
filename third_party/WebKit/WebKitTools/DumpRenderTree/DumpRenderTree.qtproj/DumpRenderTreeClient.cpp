@@ -30,11 +30,17 @@
 
 #include "DumpRenderTree.h"
 
+#include <QDebug>
+
 namespace WebCore {
 
 DumpRenderTreeClient::DumpRenderTreeClient() : FrameQtClientDefault() {}
 
 DumpRenderTreeClient::~DumpRenderTreeClient() {}
+
+void DumpRenderTreeClient::runJavaScriptAlert(String const& message) {
+  qDebug() << "ALERT: " << message << "\n";
+}
 }
 
 // vim: ts=4 sw=4 et

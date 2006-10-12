@@ -36,6 +36,8 @@ class DumpRenderTreeClient : public FrameQtClientDefault {
  public:
   DumpRenderTreeClient();
   virtual ~DumpRenderTreeClient();
+
+  virtual void runJavaScriptAlert(String const& message);
 };
 }
 

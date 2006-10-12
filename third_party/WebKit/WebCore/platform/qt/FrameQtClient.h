@@ -46,6 +46,9 @@ class FrameQtClient {
   virtual void submitForm(const String& method,
                           const KURL&,
                           const FormData*) = 0;
+
+  // WebKitPart / DumpRenderTree want to handle this differently.
+  virtual void runJavaScriptAlert(String const& message) = 0;
 };
 
 class FrameQtClientDefault : public FrameQtClient, public ResourceLoaderClient {
@@ -58,6 +61,8 @@ class FrameQtClientDefault : public FrameQtClient, public ResourceLoaderClient {
 
   virtual void openURL(const KURL&);
   virtual void submitForm(const String& method, const KURL&, const FormData*);
+
+  virtual void runJavaScriptAlert(String const& message);
 
   // ResourceLoaderClient
   virtual void receivedResponse(ResourceLoader*, PlatformResponse);
