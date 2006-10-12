@@ -61,7 +61,7 @@
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
-#include "RenderPopupMenuWin.h"
+#include "PopupMenu.h"
 #include "EditCommand.h"
 #include "Icon.h"
 #include "IconLoader.h"
@@ -756,28 +756,31 @@ void Image::drawTiled(GraphicsContext*,
                       TileRule,
                       CompositeOperator) {}
 
-RenderPopupMenuWin::~RenderPopupMenuWin() {
+PopupMenu::PopupMenu(RenderMenuList*) {
   notImplemented();
 }
-void RenderPopupMenuWin::clear() {
+PopupMenu::~PopupMenu() {
   notImplemented();
 }
-void RenderPopupMenuWin::populate() {
+void PopupMenu::clear() {
   notImplemented();
 }
-void RenderPopupMenuWin::showPopup(const IntRect&, FrameView*, int index) {
+void PopupMenu::populate() {
   notImplemented();
 }
-void RenderPopupMenuWin::hidePopup() {
+void PopupMenu::show(const IntRect&, FrameView*, int index) {
   notImplemented();
 }
-void RenderPopupMenuWin::addSeparator() {
+void PopupMenu::hide() {
   notImplemented();
 }
-void RenderPopupMenuWin::addGroupLabel(HTMLOptGroupElement*) {
+void PopupMenu::addSeparator() {
   notImplemented();
 }
-void RenderPopupMenuWin::addOption(HTMLOptionElement*) {
+void PopupMenu::addGroupLabel(HTMLOptGroupElement*) {
+  notImplemented();
+}
+void PopupMenu::addOption(HTMLOptionElement*) {
   notImplemented();
 }
 

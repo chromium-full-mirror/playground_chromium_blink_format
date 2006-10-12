@@ -26,7 +26,6 @@
 #include <cairo-win32.h>
 #include "Document.h"
 #include "GraphicsContext.h"
-#include "RenderPopupMenuWin.h"
 
 /*
  * The following constants are used to determine how a widget is drawn using
@@ -331,11 +330,5 @@ bool RenderThemeWin::paintTextArea(RenderObject* o,
                                    const RenderObject::PaintInfo& i,
                                    const IntRect& r) {
   return paintTextField(o, i, r);
-}
-
-RenderPopupMenu* RenderThemeWin::createPopupMenu(RenderArena* arena,
-                                                 Document* doc,
-                                                 RenderMenuList* menuList) {
-  return new (arena) RenderPopupMenuWin(doc, menuList);
 }
 }

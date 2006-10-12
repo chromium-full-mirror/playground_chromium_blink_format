@@ -152,9 +152,6 @@ class RenderTheme {
   virtual void systemFont(int propId, FontDescription&) const = 0;
 
   virtual int minimumMenuListSize(RenderStyle*) const { return 0; }
-  virtual RenderPopupMenu* createPopupMenu(RenderArena*,
-                                           Document*,
-                                           RenderMenuList*) = 0;
 
  protected:
   // Methods for state querying

@@ -98,9 +98,6 @@ class RenderThemeWin : public RenderTheme {
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual RenderPopupMenu* createPopupMenu(RenderArena*,
-                                           Document*,
-                                           RenderMenuList*);
 
  private:
   void addIntrinsicMargins(RenderStyle*) const;
