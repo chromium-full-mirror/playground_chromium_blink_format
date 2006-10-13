@@ -66,8 +66,8 @@ namespace KJS {
 static double parseDate(const UString&);
 static double timeClip(double);
 
-inline int gmtoffset(const tm& t) {
-  return static_cast<int>(t.tm_gmtoff);
+inline int gmtoffset(const GregorianDateTime& t) {
+  return t.utcOffset;
 }
 
 /**
@@ -173,40 +173,40 @@ static UString formatLocaleDate(ExecState* exec,
 
 #endif  // PLATFORM(MAC)
 
-static UString formatDate(const tm& t) {
+static UString formatDate(const GregorianDateTime& t) {
   char buffer[100];
   snprintf(buffer, sizeof(buffer), "%s %s %02d %04d",
-           weekdayName[(t.tm_wday + 6) % 7], monthName[t.tm_mon], t.tm_mday,
-           t.tm_year + 1900);
+           weekdayName[(t.weekDay + 6) % 7], monthName[t.month], t.monthDay,
+           t.year + 1900);
   return buffer;
 }
 
-static UString formatDateUTCVariant(const tm& t) {
+static UString formatDateUTCVariant(const GregorianDateTime& t) {
   char buffer[100];
   snprintf(buffer, sizeof(buffer), "%s, %02d %s %04d",
-           weekdayName[(t.tm_wday + 6) % 7], t.tm_mday, monthName[t.tm_mon],
-           t.tm_year + 1900);
+           weekdayName[(t.weekDay + 6) % 7], t.monthDay, monthName[t.month],
+           t.year + 1900);
   return buffer;
 }
 
-static UString formatTime(const tm& t, bool utc) {
+static UString formatTime(const GregorianDateTime& t, bool utc) {
   char buffer[100];
   if (utc) {
-    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT", t.tm_hour, t.tm_min,
-             t.tm_sec);
+    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT", t.hour, t.minute,
+             t.second);
   } else {
     int offset = abs(gmtoffset(t));
     char tzname[70];
-    struct ::tm gtm = KJStmToTm(t);
+    struct ::tm gtm = t.toTM();
     strftime(tzname, sizeof(tzname), "%Z", &gtm);
 
     if (tzname) {
       snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d (%s)",
-               t.tm_hour, t.tm_min, t.tm_sec, gmtoffset(t) < 0 ? '-' : '+',
+               t.hour, t.minute, t.second, gmtoffset(t) < 0 ? '-' : '+',
                offset / (60 * 60), (offset / 60) % 60, tzname);
     } else {
-      snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d",
-               t.tm_hour, t.tm_min, t.tm_sec, gmtoffset(t) < 0 ? '-' : '+',
+      snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d", t.hour,
+               t.minute, t.second, gmtoffset(t) < 0 ? '-' : '+',
                offset / (60 * 60), (offset / 60) % 60);
     }
   }
@@ -223,7 +223,7 @@ static void fillStructuresUsingTimeArgs(ExecState* exec,
                                         const List& args,
                                         int maxArgs,
                                         double* ms,
-                                        tm* t) {
+                                        GregorianDateTime* t) {
   double milliseconds = 0;
   int idx = 0;
   int numArgs = args.size();
@@ -234,19 +234,19 @@ static void fillStructuresUsingTimeArgs(ExecState* exec,
 
   // hours
   if (maxArgs >= 4 && idx < numArgs) {
-    t->tm_hour = 0;
+    t->hour = 0;
     milliseconds += args[idx++]->toInt32(exec) * msPerHour;
   }
 
   // minutes
   if (maxArgs >= 3 && idx < numArgs) {
-    t->tm_min = 0;
+    t->minute = 0;
     milliseconds += args[idx++]->toInt32(exec) * msPerMinute;
   }
 
   // seconds
   if (maxArgs >= 2 && idx < numArgs) {
-    t->tm_sec = 0;
+    t->second = 0;
     milliseconds += args[idx++]->toInt32(exec) * msPerSecond;
   }
 
@@ -270,7 +270,7 @@ static void fillStructuresUsingDateArgs(ExecState* exec,
                                         const List& args,
                                         int maxArgs,
                                         double* ms,
-                                        tm* t) {
+                                        GregorianDateTime* t) {
   int idx = 0;
   int numArgs = args.size();
 
@@ -280,15 +280,15 @@ static void fillStructuresUsingDateArgs(ExecState* exec,
 
   // years
   if (maxArgs >= 3 && idx < numArgs)
-    t->tm_year = args[idx++]->toInt32(exec) - 1900;
+    t->year = args[idx++]->toInt32(exec) - 1900;
 
   // months
   if (maxArgs >= 2 && idx < numArgs)
-    t->tm_mon = args[idx++]->toInt32(exec);
+    t->month = args[idx++]->toInt32(exec);
 
   // days
   if (idx < numArgs) {
-    t->tm_mday = 0;
+    t->monthDay = 0;
     *ms += args[idx]->toInt32(exec) * msPerDay;
   }
 }
@@ -299,22 +299,22 @@ const ClassInfo DateInstance::info = {"Date", 0, 0, 0};
 
 DateInstance::DateInstance(JSObject* proto) : JSWrapperObject(proto) {}
 
-bool DateInstance::getTime(tm& t, int& offset) const {
+bool DateInstance::getTime(GregorianDateTime& t, int& offset) const {
   double milli = internalValue()->getNumber();
   if (isNaN(milli))
     return false;
 
-  msToTM(milli, false, t);
+  msToGregorianDateTime(milli, false, t);
   offset = gmtoffset(t);
   return true;
 }
 
-bool DateInstance::getUTCTime(tm& t) const {
+bool DateInstance::getUTCTime(GregorianDateTime& t) const {
   double milli = internalValue()->getNumber();
   if (isNaN(milli))
     return false;
 
-  msToTM(milli, true, t);
+  msToGregorianDateTime(milli, true, t);
   return true;
 }
 
@@ -323,8 +323,8 @@ bool DateInstance::getTime(double& milli, int& offset) const {
   if (isNaN(milli))
     return false;
 
-  tm t;
-  msToTM(milli, false, t);
+  GregorianDateTime t;
+  msToGregorianDateTime(milli, false, t);
   offset = gmtoffset(t);
   return true;
 }
@@ -483,8 +483,8 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
   double secs = floor(milli / msPerSecond);
   double ms = milli - secs * msPerSecond;
 
-  tm t;
-  msToTM(milli, utc, t);
+  GregorianDateTime t;
+  msToGregorianDateTime(milli, utc, t);
 
   switch (id) {
     case ToString:
@@ -535,22 +535,22 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
     case GetYear:
       // IE returns the full year even in getYear.
       if (exec->dynamicInterpreter()->compatMode() == Interpreter::IECompat)
-        return jsNumber(1900 + t.tm_year);
-      return jsNumber(t.tm_year);
+        return jsNumber(1900 + t.year);
+      return jsNumber(t.year);
     case GetFullYear:
-      return jsNumber(1900 + t.tm_year);
+      return jsNumber(1900 + t.year);
     case GetMonth:
-      return jsNumber(t.tm_mon);
+      return jsNumber(t.month);
     case GetDate:
-      return jsNumber(t.tm_mday);
+      return jsNumber(t.monthDay);
     case GetDay:
-      return jsNumber(t.tm_wday);
+      return jsNumber(t.weekDay);
     case GetHours:
-      return jsNumber(t.tm_hour);
+      return jsNumber(t.hour);
     case GetMinutes:
-      return jsNumber(t.tm_min);
+      return jsNumber(t.minute);
     case GetSeconds:
-      return jsNumber(t.tm_sec);
+      return jsNumber(t.second);
     case GetMilliSeconds:
       return jsNumber(ms);
     case GetTimezoneOffset:
@@ -582,16 +582,16 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
       fillStructuresUsingDateArgs(exec, args, 3, &ms, &t);
       break;
     case SetYear:
-      t.tm_year = (args[0]->toInt32(exec) > 99 || args[0]->toInt32(exec) < 0)
-                      ? args[0]->toInt32(exec) - 1900
-                      : args[0]->toInt32(exec);
+      t.year = (args[0]->toInt32(exec) > 99 || args[0]->toInt32(exec) < 0)
+                   ? args[0]->toInt32(exec) - 1900
+                   : args[0]->toInt32(exec);
       break;
   }
 
   if (id == SetYear || id == SetMilliSeconds || id == SetSeconds ||
       id == SetMinutes || id == SetHours || id == SetDate || id == SetMonth ||
       id == SetFullYear) {
-    result = jsNumber(dateToMS(t, ms, utc));
+    result = jsNumber(gregorianDateTimeToMS(t, ms, utc));
     thisDateObj->setInternalValue(result);
   }
 
@@ -670,18 +670,18 @@ JSObject* DateObjectImp::construct(ExecState* exec, const List& args) {
         (numArgs >= 7 && isNaN(args[6]->toNumber(exec)))) {
       value = NaN;
     } else {
-      tm t;
+      GregorianDateTime t;
       memset(&t, 0, sizeof(t));
       int year = args[0]->toInt32(exec);
-      t.tm_year = (year >= 0 && year <= 99) ? year : year - 1900;
-      t.tm_mon = args[1]->toInt32(exec);
-      t.tm_mday = (numArgs >= 3) ? args[2]->toInt32(exec) : 1;
-      t.tm_hour = (numArgs >= 4) ? args[3]->toInt32(exec) : 0;
-      t.tm_min = (numArgs >= 5) ? args[4]->toInt32(exec) : 0;
-      t.tm_sec = (numArgs >= 6) ? args[5]->toInt32(exec) : 0;
-      t.tm_isdst = -1;
+      t.year = (year >= 0 && year <= 99) ? year : year - 1900;
+      t.month = args[1]->toInt32(exec);
+      t.monthDay = (numArgs >= 3) ? args[2]->toInt32(exec) : 1;
+      t.hour = (numArgs >= 4) ? args[3]->toInt32(exec) : 0;
+      t.minute = (numArgs >= 5) ? args[4]->toInt32(exec) : 0;
+      t.second = (numArgs >= 6) ? args[5]->toInt32(exec) : 0;
+      t.isDST = -1;
       double ms = (numArgs >= 7) ? roundValue(exec, args[6]) : 0;
-      value = dateToMS(t, ms, false);
+      value = gregorianDateTimeToMS(t, ms, false);
     }
   }
 
@@ -696,7 +696,7 @@ JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
                                        JSObject* /*thisObj*/,
                                        const List& /*args*/) {
   time_t t = time(0);
-  tm ts = tmToKJStm(*localtime(&t));
+  GregorianDateTime ts(*localtime(&t));
   return jsString(formatDate(ts) + " " + formatTime(ts, false));
 }
 
@@ -728,17 +728,17 @@ JSValue* DateObjectFuncImp::callAsFunction(ExecState* exec,
       return jsNaN();
     }
 
-    tm t;
+    GregorianDateTime t;
     memset(&t, 0, sizeof(t));
     int year = args[0]->toInt32(exec);
-    t.tm_year = (year >= 0 && year <= 99) ? year : year - 1900;
-    t.tm_mon = args[1]->toInt32(exec);
-    t.tm_mday = (n >= 3) ? args[2]->toInt32(exec) : 1;
-    t.tm_hour = (n >= 4) ? args[3]->toInt32(exec) : 0;
-    t.tm_min = (n >= 5) ? args[4]->toInt32(exec) : 0;
-    t.tm_sec = (n >= 6) ? args[5]->toInt32(exec) : 0;
+    t.year = (year >= 0 && year <= 99) ? year : year - 1900;
+    t.month = args[1]->toInt32(exec);
+    t.monthDay = (n >= 3) ? args[2]->toInt32(exec) : 1;
+    t.hour = (n >= 4) ? args[3]->toInt32(exec) : 0;
+    t.minute = (n >= 5) ? args[4]->toInt32(exec) : 0;
+    t.second = (n >= 6) ? args[5]->toInt32(exec) : 0;
     double ms = (n >= 7) ? roundValue(exec, args[6]) : 0;
-    return jsNumber(dateToMS(t, ms, true));
+    return jsNumber(gregorianDateTimeToMS(t, ms, true));
   }
 }
 
@@ -1091,19 +1091,19 @@ static double parseDate(const UString& date) {
 
   // fall back to local timezone
   if (!haveTZ) {
-    tm t;
+    GregorianDateTime t;
     memset(&t, 0, sizeof(tm));
-    t.tm_mday = day;
-    t.tm_mon = month;
-    t.tm_year = year - 1900;
-    t.tm_isdst = -1;
-    t.tm_sec = second;
-    t.tm_min = minute;
-    t.tm_hour = hour;
+    t.monthDay = day;
+    t.month = month;
+    t.year = year - 1900;
+    t.isDST = -1;
+    t.second = second;
+    t.minute = minute;
+    t.hour = hour;
 
-    // Use our dateToMS() rather than mktime() as the latter can't handle the
-    // full year range.
-    return dateToMS(t, 0, false);
+    // Use our gregorianDateTimeToMS() rather than mktime() as the latter can't
+    // handle the full year range.
+    return gregorianDateTimeToMS(t, 0, false);
   }
 
   return (ymdhmsToSeconds(year, month + 1, day, hour, minute, second) -

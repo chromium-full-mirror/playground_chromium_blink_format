@@ -27,7 +27,7 @@
 
 namespace KJS {
 
-struct tm;
+struct GregorianDateTime;
 
 class FunctionPrototype;
 class ObjectPrototype;
@@ -36,10 +36,10 @@ class DateInstance : public JSWrapperObject {
  public:
   DateInstance(JSObject* proto);
 
-  bool getTime(tm& t, int& gmtoffset) const;
-  bool getUTCTime(tm& t) const;
-  bool getTime(double& ms, int& gmtoffset) const;
-  bool getUTCTime(double& ms) const;
+  bool getTime(GregorianDateTime&, int& offset) const;
+  bool getUTCTime(GregorianDateTime&) const;
+  bool getTime(double& milli, int& offset) const;
+  bool getUTCTime(double& milli) const;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
