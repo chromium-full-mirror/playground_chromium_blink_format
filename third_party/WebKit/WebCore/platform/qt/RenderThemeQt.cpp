@@ -33,7 +33,6 @@
 #include "Document.h"
 #include "RenderTheme.h"
 #include "GraphicsContext.h"
-#include "RenderPopupMenuQt.h"
 
 #define notImplemented()                                                  \
   do {                                                                    \
@@ -88,9 +87,6 @@ class RenderThemeQt : public RenderTheme {
   virtual bool controlSupportsTints(const RenderObject*) const;
 
   virtual void systemFont(int propId, FontDescription&) const;
-  virtual RenderPopupMenu* createPopupMenu(RenderArena*,
-                                           Document*,
-                                           RenderMenuList*);
 
  private:
   void addIntrinsicMargins(RenderStyle*) const;
@@ -137,12 +133,6 @@ bool RenderThemeQt::controlSupportsTints(const RenderObject* o) const {
 void RenderThemeQt::systemFont(int propId,
                                FontDescription& fontDescription) const {
   // no-op
-}
-
-RenderPopupMenu* RenderThemeQt::createPopupMenu(RenderArena* arena,
-                                                Document* doc,
-                                                RenderMenuList* menuList) {
-  return new (arena) RenderPopupMenuQt(doc, menuList);
 }
 
 void RenderThemeQt::addIntrinsicMargins(RenderStyle* style) const {
