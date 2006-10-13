@@ -283,15 +283,9 @@ void RenderListBox::paintItemForeground(PaintInfo& i,
       static_cast<HTMLOptionElement*>(element)->selected()) {
     if (document()->frame()->isActive() && document()->focusNode() == node())
       textColor = theme()->activeListBoxSelectionForegroundColor();
-    /*
-       FIXME: Decide what the desired behavior is for inactive foreground color.
-       For example, disabled items have a dark grey foreground color defined in
-       CSS.
-       If we don't honor that, the selected disabled items will have a weird
-       black-on-grey look.
-           else
-               textColor = theme()->inactiveListBoxSelectionForegroundColor();
-    */
+    // Honor the foreground color for disabled items
+    else if (!element->disabled())
+      textColor = theme()->inactiveListBoxSelectionForegroundColor();
   }
 
   i.p->setPen(textColor);
