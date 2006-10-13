@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,12 +22,12 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "SVGElement.h"
-#include "SVGUseElement.h"
 #include "SVGElementInstance.h"
-#include "SVGElementInstanceList.h"
 
-using namespace WebCore;
+#include "SVGElementInstanceList.h"
+#include "SVGUseElement.h"
+
+namespace WebCore {
 
 SVGElementInstance::SVGElementInstance() : EventTarget() {}
 
@@ -63,6 +63,7 @@ SVGElementInstance* SVGElementInstance::firstChild() const {
 
 SVGElementInstance* SVGElementInstance::lastChild() const {
   return 0;
+}
 }
 
 // vim:ts=4:noet

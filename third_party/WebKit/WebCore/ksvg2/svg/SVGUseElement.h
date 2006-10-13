@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,11 +24,11 @@
 #define KSVG_SVGUseElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "SVGLangSpace.h"
-#include "SVGURIReference.h"
-#include "SVGStyledTransformableElement.h"
 #include "SVGExternalResourcesRequired.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledTransformableElement.h"
+#include "SVGTests.h"
+#include "SVGURIReference.h"
 
 namespace WebCore {
 class SVGLength;
@@ -49,12 +49,12 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void closeRenderer();
 
   // 'SVGUseElement' functions
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

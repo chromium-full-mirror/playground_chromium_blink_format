@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,8 +24,7 @@
 #ifdef SVG_SUPPORT
 #include "SVGGElement.h"
 
-#include <kcanvas/RenderSVGContainer.h>
-#include <kcanvas/device/KRenderingDevice.h>
+#include "RenderSVGContainer.h"
 
 namespace WebCore {
 

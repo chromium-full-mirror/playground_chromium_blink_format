@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,13 +22,13 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "PlatformString.h"
-
-#include "SVGHelper.h"
 #include "SVGSymbolElement.h"
-#include "SVGFitToViewBox.h"
 
-using namespace WebCore;
+#include "PlatformString.h"
+#include "SVGFitToViewBox.h"
+#include "SVGHelper.h"
+
+namespace WebCore {
 
 SVGSymbolElement::SVGSymbolElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc),
@@ -47,6 +47,7 @@ void SVGSymbolElement::parseMappedAttribute(MappedAttribute* attr) {
     return;
 
   SVGStyledElement::parseMappedAttribute(attr);
+}
 }
 
 // vim:ts=4:noet

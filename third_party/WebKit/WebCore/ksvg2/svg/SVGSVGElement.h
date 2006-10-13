@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,15 +24,14 @@
 #define SVGSVGElement_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "SVGLangSpace.h"
-#include "SVGFitToViewBox.h"
-#include "SVGZoomAndPan.h"
-#include "SVGStyledLocatableElement.h"
 #include "SVGExternalResourcesRequired.h"
+#include "SVGFitToViewBox.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledLocatableElement.h"
+#include "SVGTests.h"
+#include "SVGZoomAndPan.h"
 
 namespace WebCore {
-class DocumentPtr;
 class SVGAngle;
 class SVGLength;
 class SVGMatrix;
@@ -76,7 +75,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   bool useCurrentView() const;
   void setUseCurrentView(bool currentView);
 
-  // SVGViewSpec *currentView() const;
+  // SVGViewSpec* currentView() const;
 
   float currentScale() const;
   void setCurrentScale(float scale);
@@ -112,7 +111,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   static SVGTransform* createSVGTransform();
   static SVGTransform* createSVGTransformFromMatrix(SVGMatrix*);
 
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   // 'virtual SVGLocatable' functions
   virtual SVGMatrix* getCTM() const;
@@ -121,7 +120,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
