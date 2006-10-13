@@ -54,7 +54,6 @@
 
 - (void)close;
 
-- (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;

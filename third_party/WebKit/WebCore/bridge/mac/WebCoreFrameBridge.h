@@ -587,22 +587,42 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)setFrameLoaderClient:(id<WebFrameLoaderClient>)client;
 - (WebFrameLoader*)frameLoader;
 
-@end
-
-// The WebCoreFrameBridge protocol contains methods for use by the WebCore side
-// of the bridge.
-
-// In NSArray objects for post data, NSData objects represent literal data, and
-// NSString objects represent encoded files.
-// The encoding is the standard form encoding for uploading files.
-
-@class WebFrameLoader;
-
-@protocol WebCoreFrameBridge
-
+- (void)setTitle:(NSString*)title;
+- (void)didFirstLayout;
+- (void)notifyIconChanged:(NSURL*)iconURL;
+- (NSURL*)originalRequestURL;
+- (BOOL)isLoadTypeReload;
 - (void)frameDetached;
-- (NSView*)documentView;
-
+- (void)tokenizerProcessedData;
+- (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
+- (id<WebCoreResourceHandle>)startLoadingResource:
+                                 (id<WebCoreResourceLoader>)loader
+                                       withMethod:(NSString*)method
+                                              URL:(NSURL*)URL
+                                    customHeaders:(NSDictionary*)customHeaders;
+- (id<WebCoreResourceHandle>)startLoadingResource:
+                                 (id<WebCoreResourceLoader>)loader
+                                       withMethod:(NSString*)method
+                                              URL:(NSURL*)URL
+                                    customHeaders:(NSDictionary*)customHeaders
+                                         postData:(NSArray*)data;
+- (void)objectLoadedFromCacheWithURL:(NSURL*)URL
+                            response:(NSURLResponse*)response
+                                data:(NSData*)data;
+- (NSData*)syncLoadResourceWithMethod:(NSString*)method
+                                  URL:(NSURL*)URL
+                        customHeaders:(NSDictionary*)requestHeaders
+                             postData:(NSArray*)postData
+                             finalURL:(NSURL**)finalNSURL
+                      responseHeaders:(NSDictionary**)responseHeaderDict
+                           statusCode:(int*)statusCode;
+- (BOOL)isReloading;
+- (void)reportClientRedirectToURL:(NSURL*)URL
+                            delay:(NSTimeInterval)seconds
+                         fireDate:(NSDate*)date
+                      lockHistory:(BOOL)lockHistory
+           isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
+- (void)reportClientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
              reload:(BOOL)reload
@@ -619,6 +639,25 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
     triggeringEvent:(NSEvent*)event
                form:(DOMElement*)form
          formValues:(NSDictionary*)values;
+- (NSString*)incomingReferrer;
+- (NSURLResponse*)mainResourceURLResponse;
+- (void)loadEmptyDocumentSynchronously;
+- (void)handledOnloadEvents;
+
+@end
+
+// The WebCoreFrameBridge protocol contains methods for use by the WebCore side
+// of the bridge.
+
+// In NSArray objects for post data, NSData objects represent literal data, and
+// NSString objects represent encoded files.
+// The encoding is the standard form encoding for uploading files.
+
+@class WebFrameLoader;
+
+@protocol WebCoreFrameBridge
+
+- (NSView*)documentView;
 
 - (WebCorePageBridge*)createWindowWithURL:(NSURL*)URL;
 - (void)showWindow;
@@ -630,7 +669,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (NSString*)userAgentForURL:(NSURL*)URL;
 
-- (void)setTitle:(NSString*)title;
 - (void)setStatusText:(NSString*)status;
 
 - (WebCoreFrameBridge*)createChildFrameNamed:(NSString*)frameName
@@ -672,38 +710,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
 
-- (id<WebCoreResourceHandle>)startLoadingResource:
-                                 (id<WebCoreResourceLoader>)loader
-                                       withMethod:(NSString*)method
-                                              URL:(NSURL*)URL
-                                    customHeaders:(NSDictionary*)customHeaders;
-- (id<WebCoreResourceHandle>)startLoadingResource:
-                                 (id<WebCoreResourceLoader>)loader
-                                       withMethod:(NSString*)method
-                                              URL:(NSURL*)URL
-                                    customHeaders:(NSDictionary*)customHeaders
-                                         postData:(NSArray*)data;
-- (void)objectLoadedFromCacheWithURL:(NSURL*)URL
-                            response:(NSURLResponse*)response
-                                data:(NSData*)data;
-
-- (NSData*)syncLoadResourceWithMethod:(NSString*)method
-                                  URL:(NSURL*)URL
-                        customHeaders:(NSDictionary*)requestHeaders
-                             postData:(NSArray*)postData
-                             finalURL:(NSURL**)finalNSURL
-                      responseHeaders:(NSDictionary**)responseHeaderDict
-                           statusCode:(int*)statusCode;
-
-- (BOOL)isReloading;
 - (time_t)expiresTimeForResponse:(NSURLResponse*)response;
-
-- (void)reportClientRedirectToURL:(NSURL*)URL
-                            delay:(NSTimeInterval)seconds
-                         fireDate:(NSDate*)date
-                      lockHistory:(BOOL)lockHistory
-           isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
-- (void)reportClientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 
 - (void)activateWindow;
 - (void)deactivateWindow;
@@ -721,10 +728,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (NSArray*)documentState;
 
 - (void)setNeedsReapplyStyles;
-
-- (void)tokenizerProcessedData;
-
-- (NSString*)incomingReferrer;
 
 - (NSView*)viewForPluginWithURL:(NSURL*)URL
                  attributeNames:(NSArray*)attributeNames
@@ -745,8 +748,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (ObjectElementType)determineObjectFromMIMEType:(NSString*)MIMEType
                                              URL:(NSURL*)URL;
-
-- (void)loadEmptyDocumentSynchronously;
 
 - (NSString*)MIMETypeForPath:(NSString*)path;
 
@@ -816,8 +817,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (int)spellCheckerDocumentTag;
 - (BOOL)isContinuousSpellCheckingEnabled;
 
-- (void)didFirstLayout;
-
 - (void)dashboardRegionsChanged:(NSMutableDictionary*)regions;
 - (void)willPopupMenu:(NSMenu*)menu;
 
@@ -828,16 +827,10 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                   behindText:(BOOL)text
                   entireLine:(BOOL)line;
 
-- (void)handledOnloadEvents;
-
 - (WebCoreKeyboardUIMode)keyboardUIMode;
 
-- (NSURLResponse*)mainResourceURLResponse;
 - (NSString*)imageTitleForFilename:(NSString*)filename size:(NSSize)size;
 
-- (void)notifyIconChanged:(NSURL*)iconURL;
-- (NSURL*)originalRequestURL;
-- (BOOL)isLoadTypeReload;
 @end
 
 // This interface definition allows those who hold a WebCoreFrameBridge * to
