@@ -23,12 +23,14 @@
  *
  */
 
-#ifndef DOM_ContainerNodeImpl_h
-#define DOM_ContainerNodeImpl_h
+#ifndef ContainerNode_h
+#define ContainerNode_h
 
 #include "EventTargetNode.h"
 
 namespace WebCore {
+
+typedef void (*NodeCallback)(Node*);
 
 class ContainerNode : public EventTargetNode {
  public:
@@ -71,6 +73,9 @@ class ContainerNode : public EventTargetNode {
   void removeChildren();
   void cloneChildNodes(Node* clone);
 
+ protected:
+  static void queuePostAttachCallback(NodeCallback, Node*);
+
  private:
   Node* m_firstChild;
   Node* m_lastChild;
@@ -79,6 +84,6 @@ class ContainerNode : public EventTargetNode {
   bool getLowerRightCorner(int& x, int& y) const;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // ContainerNode_h

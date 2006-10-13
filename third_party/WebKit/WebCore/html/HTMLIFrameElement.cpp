@@ -79,15 +79,22 @@ void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
     HTMLFrameElement::parseMappedAttribute(attr);
 }
 
-void HTMLIFrameElement::insertedIntoDocument() {
-  HTMLFrameElement::insertedIntoDocument();
+bool HTMLIFrameElement::rendererIsNeeded(RenderStyle* style) {
+  return isURLAllowed(m_URL) && style->display() != NONE;
+}
 
+RenderObject* HTMLIFrameElement::createRenderer(RenderArena* arena,
+                                                RenderStyle*) {
+  return new (arena) RenderPartObject(this);
+}
+
+void HTMLIFrameElement::insertedIntoDocument() {
   if (document()->isHTMLDocument()) {
     HTMLDocument* doc = static_cast<HTMLDocument*>(document());
     doc->addDocExtraNamedItem(oldNameAttr);
   }
 
-  openURL();
+  HTMLFrameElement::insertedIntoDocument();
 }
 
 void HTMLIFrameElement::removedFromDocument() {
@@ -99,26 +106,12 @@ void HTMLIFrameElement::removedFromDocument() {
   HTMLFrameElement::removedFromDocument();
 }
 
-bool HTMLIFrameElement::rendererIsNeeded(RenderStyle* style) {
-  // Don't ignore display: none the way frame does.
-  return isURLAllowed(m_URL) && style->display() != NONE;
-}
-
-RenderObject* HTMLIFrameElement::createRenderer(RenderArena* arena,
-                                                RenderStyle* style) {
-  return new (arena) RenderPartObject(this);
-}
-
 void HTMLIFrameElement::attach() {
   HTMLFrameElement::attach();
 
   if (RenderPartObject* renderPartObject =
-          static_cast<RenderPartObject*>(renderer())) {
-    if (contentFrame()) {
-      renderPartObject->setWidget(contentFrame()->view());
-      renderPartObject->updateWidget();
-    }
-  }
+          static_cast<RenderPartObject*>(renderer()))
+    renderPartObject->updateWidget();
 }
 
 bool HTMLIFrameElement::isURLAttribute(Attribute* attr) const {
