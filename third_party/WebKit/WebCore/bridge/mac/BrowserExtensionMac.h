@@ -34,8 +34,8 @@ class BrowserExtensionMac : public BrowserExtension {
  public:
   BrowserExtensionMac(Frame*);
 
-  virtual void createNewWindow(const ResourceRequest&);
-  virtual void createNewWindow(const ResourceRequest&,
+  virtual void createNewWindow(const FrameLoadRequest&);
+  virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowArgs&,
                                Frame*& part);
 
@@ -48,7 +48,9 @@ class BrowserExtensionMac : public BrowserExtension {
   virtual void runModal();
 
  private:
-  void createNewWindow(const ResourceRequest&, const WindowArgs&, Frame** part);
+  void createNewWindow(const FrameLoadRequest&,
+                       const WindowArgs&,
+                       Frame** part);
 
   FrameMac* m_frame;
 };

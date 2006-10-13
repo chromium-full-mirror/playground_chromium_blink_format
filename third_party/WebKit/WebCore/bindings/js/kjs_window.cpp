@@ -30,6 +30,7 @@
 #include "EventNames.h"
 #include "FloatRect.h"
 #include "Frame.h"
+#include "FrameLoadRequest.h"
 #include "FrameTree.h"
 #include "HTMLDocument.h"
 #include "JSCSSRule.h"
@@ -545,10 +546,11 @@ static Frame* createNewWindow(ExecState* exec,
   Frame* openerPart = openerWindow->frame();
   Frame* activePart = Window::retrieveActive(exec)->frame();
 
-  ResourceRequest request(KURL(""));
-  request.frameName = frameName;
+  FrameLoadRequest frameRequest;
+  frameRequest.m_request = ResourceRequest(KURL(""));
+  frameRequest.m_frameName = frameName;
   if (activePart)
-    request.setReferrer(activePart->referrer());
+    frameRequest.m_request.setReferrer(activePart->referrer());
 
   // FIXME: It's much better for client API if a new window starts with a URL,
   // here where we
@@ -563,7 +565,7 @@ static Frame* createNewWindow(ExecState* exec,
   // We'd have to resolve all those issues to pass the URL instead of "".
 
   Frame* newFrame = 0;
-  openerPart->browserExtension()->createNewWindow(request, windowArgs,
+  openerPart->browserExtension()->createNewWindow(frameRequest, windowArgs,
                                                   newFrame);
 
   if (!newFrame)
@@ -1630,10 +1632,10 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!str.isEmpty() && activePart)
         url = activePart->document()->completeURL(str.deprecatedString());
 
-      ResourceRequest request;
-      request.setURL(url);
-      request.frameName = frameName.deprecatedString();
-      if (request.frameName == "_top") {
+      FrameLoadRequest frameRequest;
+      frameRequest.m_request.setURL(url);
+      frameRequest.m_frameName = frameName.deprecatedString();
+      if (frameRequest.m_frameName == "_top") {
         while (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1649,7 +1651,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         }
         return Window::retrieve(frame);
       }
-      if (request.frameName == "_parent") {
+      if (frameRequest.m_frameName == "_parent") {
         if (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1668,8 +1670,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 
       // request window (new or existing if framename is set)
       Frame* newFrame = 0;
-      request.setReferrer(activePart->referrer());
-      frame->browserExtension()->createNewWindow(request, windowArgs, newFrame);
+      frameRequest.m_request.setReferrer(activePart->referrer());
+      frame->browserExtension()->createNewWindow(frameRequest, windowArgs,
+                                                 newFrame);
       if (!newFrame)
         return jsUndefined();
       newFrame->setOpener(frame);

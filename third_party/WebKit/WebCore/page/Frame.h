@@ -62,6 +62,7 @@ class DrawContentsEvent;
 class DOMWindow;
 class EditCommand;
 class FramePrivate;
+class FrameLoadRequest;
 class FrameTree;
 class KJSProxy;
 class Page;
@@ -547,7 +548,9 @@ class Frame : public Shared<Frame> {
                                        Node* innerNode);
 
   virtual void urlSelected(const DeprecatedString& url, const String& target);
-  virtual void urlSelected(const ResourceRequest&, const String& target);
+  virtual void urlSelected(const ResourceRequest&,
+                           const String& target,
+                           bool lockHistory = false);
 
   // Methods with platform-specific overrides (and no base class
   // implementation).
@@ -607,9 +610,9 @@ class Frame : public Shared<Frame> {
   virtual void saveDocumentState() = 0;
   virtual void restoreDocumentState() = 0;
   virtual bool canGoBackOrForward(int distance) const = 0;
-  virtual void openURLRequest(const ResourceRequest&) = 0;
-  virtual void submitForm(const ResourceRequest&) = 0;
-  virtual void urlSelected(const ResourceRequest&) = 0;
+  virtual void openURLRequest(const FrameLoadRequest&) = 0;
+  virtual void submitForm(const FrameLoadRequest&) = 0;
+  virtual void urlSelected(const FrameLoadRequest&) = 0;
   virtual bool lastEventIsMouseUp() const = 0;
   virtual String overrideMediaType() const = 0;
   virtual void redirectDataToPlugin(Widget* pluginWidget) {}

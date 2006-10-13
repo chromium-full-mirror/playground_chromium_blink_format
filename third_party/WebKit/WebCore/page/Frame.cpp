@@ -45,6 +45,7 @@
 #include "EventNames.h"
 #include "FloatRect.h"
 #include "Frame.h"
+#include "FrameLoadRequest.h"
 #include "GraphicsContext.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElement.h"
@@ -1120,14 +1121,13 @@ void Frame::changeLocation(const DeprecatedString& URL,
   }
 
   ResourceRequest request(completeURL(URL));
-  request.setLockHistory(lockHistory);
   if (!referrer.isEmpty())
     request.setReferrer(referrer);
 
   request.reload = (d->m_cachePolicy == CachePolicyReload) ||
                    (d->m_cachePolicy == CachePolicyRefresh);
 
-  urlSelected(request, "_self");
+  urlSelected(request, "_self", lockHistory);
 }
 
 void Frame::redirectionTimerFired(Timer<Frame>*) {
@@ -1416,7 +1416,9 @@ void Frame::urlSelected(const DeprecatedString& url, const String& target) {
   urlSelected(ResourceRequest(completeURL(url)), target);
 }
 
-void Frame::urlSelected(const ResourceRequest& request, const String& _target) {
+void Frame::urlSelected(const ResourceRequest& request,
+                        const String& _target,
+                        bool lockHistory) {
   String target = _target;
   if (target.isEmpty() && d->m_doc)
     target = d->m_doc->baseTarget();
@@ -1432,16 +1434,17 @@ void Frame::urlSelected(const ResourceRequest& request, const String& _target) {
     // ### ERROR HANDLING
     return;
 
-  ResourceRequest requestCopy = request;
-  requestCopy.frameName = target;
+  FrameLoadRequest frameRequest;
+  frameRequest.m_request = request;
+  frameRequest.m_frameName = target;
 
   if (d->m_bHTTPRefresh)
     d->m_bHTTPRefresh = false;
 
   if (!d->m_referrer.isEmpty())
-    requestCopy.setReferrer(d->m_referrer);
+    frameRequest.m_request.setReferrer(d->m_referrer);
 
-  urlSelected(requestCopy);
+  urlSelected(frameRequest);
 }
 
 bool Frame::requestFrame(Element* ownerElement,
@@ -1463,7 +1466,9 @@ bool Frame::requestFrame(Element* ownerElement,
     request.setReferrer(d->m_referrer);
     request.reload = (d->m_cachePolicy == CachePolicyReload) ||
                      (d->m_cachePolicy == CachePolicyRefresh);
-    frame->openURLRequest(request);
+    FrameLoadRequest frameRequest;
+    frameRequest.m_request = request;
+    frame->openURLRequest(frameRequest);
   } else
     frame = loadSubframe(ownerElement, url, frameName, d->m_referrer);
 
@@ -1629,12 +1634,13 @@ void Frame::submitForm(const char* action,
     return;
   }
 
-  ResourceRequest request;
+  FrameLoadRequest frameRequest;
 
   if (!d->m_referrer.isEmpty())
-    request.setReferrer(d->m_referrer);
+    frameRequest.m_request.setReferrer(d->m_referrer);
 
-  request.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
+  frameRequest.m_frameName =
+      _target.isEmpty() ? d->m_doc->baseTarget() : _target;
 
   // Handle mailto: forms
   if (u.protocol() == "mailto") {
@@ -1666,18 +1672,19 @@ void Frame::submitForm(const char* action,
   if (strcmp(action, "get") == 0) {
     if (u.protocol() != "mailto")
       u.setQuery(formData.flattenToString().deprecatedString());
-    request.setDoPost(false);
+    frameRequest.m_request.setDoPost(false);
   } else {
-    request.postData = formData;
-    request.setDoPost(true);
+    frameRequest.m_request.postData = formData;
+    frameRequest.m_request.setDoPost(true);
 
     // construct some user headers if necessary
     if (contentType.isNull() ||
         contentType == "application/x-www-form-urlencoded")
-      request.setContentType("Content-Type: application/x-www-form-urlencoded");
+      frameRequest.m_request.setContentType(
+          "Content-Type: application/x-www-form-urlencoded");
     else  // contentType must be "multipart/form-data"
-      request.setContentType("Content-Type: " + contentType + "; boundary=" +
-                             boundary);
+      frameRequest.m_request.setContentType("Content-Type: " + contentType +
+                                            "; boundary=" + boundary);
   }
 
   if (d->m_runningScripts > 0) {
@@ -1691,8 +1698,8 @@ void Frame::submitForm(const char* action,
     d->m_submitForm->submitContentType = contentType;
     d->m_submitForm->submitBoundary = boundary;
   } else {
-    request.setURL(u);
-    submitForm(request);
+    frameRequest.m_request.setURL(u);
+    submitForm(frameRequest);
   }
 }
 
