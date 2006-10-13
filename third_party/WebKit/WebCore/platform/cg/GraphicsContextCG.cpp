@@ -572,6 +572,7 @@ void GraphicsContext::beginTransparencyLayer(float opacity) {
   CGContextSaveGState(context);
   CGContextSetAlpha(context, opacity);
   CGContextBeginTransparencyLayer(context, 0);
+  m_data->beginTransparencyLayer();
 }
 
 void GraphicsContext::endTransparencyLayer() {
@@ -580,6 +581,7 @@ void GraphicsContext::endTransparencyLayer() {
   CGContextRef context = platformContext();
   CGContextEndTransparencyLayer(context);
   CGContextRestoreGState(context);
+  m_data->endTransparencyLayer();
 }
 
 void GraphicsContext::setShadow(const IntSize& size,
