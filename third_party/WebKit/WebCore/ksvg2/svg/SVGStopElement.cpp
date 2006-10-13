@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,17 +22,13 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-#include "Document.h"
-
-#include <kcanvas/device/KRenderingPaintServerGradient.h>
-
-#include "SVGNames.h"
-#include "SVGHelper.h"
-#include "SVGRenderStyle.h"
 #include "SVGStopElement.h"
 
-using namespace WebCore;
+#include "Document.h"
+#include "SVGHelper.h"
+#include "SVGNames.h"
+
+namespace WebCore {
 
 SVGStopElement::SVGStopElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc), m_offset(0.0) {}
@@ -67,6 +63,7 @@ void SVGStopElement::parseMappedAttribute(MappedAttribute* attr) {
     if (parentStyled)
       parentStyled->notifyAttributeChange();
   }
+}
 }
 
 // vim:ts=4:noet

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,22 +24,17 @@
 #ifdef SVG_SUPPORT
 #include "SVGGradientElement.h"
 
-#include "Attr.h"
-#include "Document.h"
+#include "KRenderingDevice.h"
 #include "RenderView.h"
-#include "SVGTransformList.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
-#include "SVGRenderStyle.h"
 #include "SVGStopElement.h"
 #include "SVGTransformList.h"
 #include "SVGTransformable.h"
-#include "cssstyleselector.h"
 #include "SVGUnitTypes.h"
-#include <kcanvas/device/KRenderingDevice.h>
-#include <kcanvas/device/KRenderingPaintServerGradient.h>
+#include "cssstyleselector.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
                                        Document* doc)
@@ -172,6 +167,7 @@ void SVGGradientElement::rebuildStops() const {
     gradientStyle->deref(view()->renderArena());
     m_resource->setGradientStops(stops);
   }
+}
 }
 
 // vim:ts=4:noet

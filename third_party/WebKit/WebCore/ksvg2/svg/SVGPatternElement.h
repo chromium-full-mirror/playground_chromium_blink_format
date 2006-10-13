@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,14 +24,13 @@
 #define KSVG_SVGPatternElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "SVGLangSpace.h"
-#include "SVGURIReference.h"
-#include "SVGFitToViewBox.h"
-#include "SVGStyledLocatableElement.h"
+#include "KRenderingPaintServerPattern.h"
 #include "SVGExternalResourcesRequired.h"
-
-#include <kcanvas/device/KRenderingPaintServerPattern.h>
+#include "SVGFitToViewBox.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledLocatableElement.h"
+#include "SVGTests.h"
+#include "SVGURIReference.h"
 
 class KCanvasImage;
 
@@ -53,9 +52,9 @@ class SVGPatternElement : public SVGStyledLocatableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGPatternElement' functions
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
-  const SVGStyledElement* pushAttributeContext(const SVGStyledElement* context);
+  const SVGStyledElement* pushAttributeContext(const SVGStyledElement*);
 
   virtual void resourceNotification() const;
   virtual void notifyAttributeChange() const;
@@ -63,7 +62,7 @@ class SVGPatternElement : public SVGStyledLocatableElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual KRenderingPaintServerPattern* canvasResource();
 
   // 'virtual SVGLocatable' functions

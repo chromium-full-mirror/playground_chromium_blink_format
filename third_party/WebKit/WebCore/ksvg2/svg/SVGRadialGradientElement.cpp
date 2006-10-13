@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,21 +22,17 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Attr.h"
-
-#include "SVGUnitTypes.h"
-#include "SVGNames.h"
-#include "SVGHelper.h"
-#include "SVGMatrix.h"
-#include "SVGTransform.h"
-#include "SVGStopElement.h"
-#include "SVGTransformList.h"
-#include "SVGLength.h"
 #include "SVGRadialGradientElement.h"
-#include "SVGTransformList.h"
 
-#include <kcanvas/device/KRenderingDevice.h>
-#include <kcanvas/device/KRenderingPaintServerGradient.h>
+#include "KRenderingPaintServerGradient.h"
+#include "SVGHelper.h"
+#include "SVGLength.h"
+#include "SVGMatrix.h"
+#include "SVGNames.h"
+#include "SVGStopElement.h"
+#include "SVGTransform.h"
+#include "SVGTransformList.h"
+#include "SVGUnitTypes.h"
 
 namespace WebCore {
 

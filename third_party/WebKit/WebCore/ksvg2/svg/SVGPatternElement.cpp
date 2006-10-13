@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,24 +24,22 @@
 #ifdef SVG_SUPPORT
 #include "SVGPatternElement.h"
 
-#include "Attr.h"
 #include "Document.h"
 #include "GraphicsContext.h"
-#include "RenderSVGContainer.h"
 #include "KCanvasImage.h"
 #include "KRenderingDevice.h"
 #include "KRenderingPaintServerPattern.h"
-#include "SVGLength.h"
-#include "SVGTransformList.h"
+#include "RenderSVGContainer.h"
 #include "SVGHelper.h"
+#include "SVGLength.h"
 #include "SVGMatrix.h"
 #include "SVGNames.h"
 #include "SVGSVGElement.h"
 #include "SVGTransformList.h"
 #include "SVGTransformable.h"
 #include "SVGUnitTypes.h"
-#include <wtf/OwnPtr.h>
 #include <math.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -260,7 +258,7 @@ void SVGPatternElement::drawPatternContentIntoTile(
 
   OwnPtr<GraphicsContext> context(patternContext->createGraphicsContext());
 
-  for (Node* n = target->firstChild(); n != 0; n = n->nextSibling()) {
+  for (Node* n = target->firstChild(); n; n = n->nextSibling()) {
     SVGElement* elem = svg_dynamic_cast(n);
     if (!elem || !elem->isStyled())
       continue;
@@ -287,7 +285,7 @@ void SVGPatternElement::drawPatternContentIntoTile(
         // Take into account viewportElement's viewBox, if existant...
         if (viewportElement() && viewportElement()->hasTagName(SVGNames::svgTag))
         {
-            SVGSVGElement* svgElement = static_cast<SVGSVGElement* >(viewportElement());
+            SVGSVGElement* svgElement = static_cast<SVGSVGElement*>(viewportElement());
 
             RefPtr<SVGMatrix> svgCTM = svgElement->getCTM();
             RefPtr<SVGMatrix> ctm = getCTM();

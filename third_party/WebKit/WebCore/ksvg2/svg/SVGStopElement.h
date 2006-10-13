@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,7 +35,7 @@ class SVGStopElement : public SVGStyledElement {
   virtual bool isGradientStop() const { return true; }
 
   // 'SVGStoplement' functions
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGStopElement, double, double, Offset, offset)
