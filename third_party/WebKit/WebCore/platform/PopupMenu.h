@@ -47,7 +47,7 @@ class PopupMenu : public Shared<PopupMenu> {
   static PassRefPtr<PopupMenu> create(RenderMenuList* menuList);
   ~PopupMenu();
 
-  void menuListIsDetaching() { m_menuList = 0; }
+  void disconnectMenuList() { m_menuList = 0; }
 
   void clear();
   void populate();

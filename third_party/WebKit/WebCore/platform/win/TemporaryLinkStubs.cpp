@@ -260,7 +260,7 @@ String FileChooser::basenameForWidth(int width) const {
   notImplemented();
   return String();
 }
-void FileChooser::uploadControlDetaching() {
+void FileChooser::disconnectUploadControl() {
   notImplemented();
 }
 void FileChooser::chooseFile(const String& filename) {

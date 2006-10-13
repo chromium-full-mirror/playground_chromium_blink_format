@@ -53,7 +53,7 @@ class FileChooser : public Shared<FileChooser> {
   RenderFileUploadControl* uploadControl() const { return m_uploadControl; }
   Document* document() { return m_document; }
 
-  void uploadControlDetaching();
+  void disconnectUploadControl();
 
   void chooseFile(const String& filename);
 
