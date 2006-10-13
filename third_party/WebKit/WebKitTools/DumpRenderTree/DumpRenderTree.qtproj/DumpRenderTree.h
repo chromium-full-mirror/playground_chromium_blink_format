@@ -29,6 +29,7 @@
 #ifndef DUMPRENDERTREE_H
 #define DUMPRENDERTREE_H
 
+#include <QList>
 #include <QObject>
 #include <QTextStream>
 #include <QSocketNotifier>
@@ -60,11 +61,16 @@ class DumpRenderTree : public QObject {
   FrameQt* frame() const;
 
  private:
+  void readSkipFile();
+
   FrameQt* m_frame;
   DumpRenderTreeClient* m_client;
 
   QTextStream* m_stdin;
   QSocketNotifier* m_notifier;
+
+  // To be skipped tests
+  QList<QString> m_skipped;
 };
 }
 
