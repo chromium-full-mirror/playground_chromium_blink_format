@@ -53,5 +53,6 @@
 - (void)webView:(WebView*)sender
     didScrollDocumentInFrameView:(WebFrameView*)frameView;
 - (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
+- (void)webView:(WebView*)sender willPopupMenu:(NSMenu*)menu;
 
 @end
