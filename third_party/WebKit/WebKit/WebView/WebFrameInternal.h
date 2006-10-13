@@ -30,16 +30,14 @@
 // WebKit, but are neither SPI nor API.
 
 #import "WebFramePrivate.h"
-
-#import <WebCore/WebFrameLoaderClient.h>
-#import <WebCore/WebFrameLoader.h>
 #import "WebPolicyDelegatePrivate.h"
+#import <WebCore/FrameLoaderTypes.h>
 
 @class WebDocumentLoader;
 @class WebInspector;
+@class WebFrameLoader;
 @class WebFrameView;
 @class WebFrameBridge;
-@class WebFormState;
 
 @interface WebFrame (WebInternal)
 
@@ -129,7 +127,4 @@
 - (WebFrame*)_previousSiblingFrame;
 - (WebFrame*)_nextSiblingFrame;
 - (WebFrame*)_traverseNextFrameStayWithin:(WebFrame*)stayWithin;
-@end
-
-@interface WebFrame (WebFrameLoaderClient)<WebFrameLoaderClient>
 @end
