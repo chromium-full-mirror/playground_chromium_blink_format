@@ -60,6 +60,7 @@ class AffineTransform;
 class Font;
 class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
+class KURL;
 class Path;
 class TextRun;
 class TextStyle;
@@ -173,6 +174,7 @@ class GraphicsContext : Noncopyable {
   void addFocusRingRect(const IntRect&);
   void drawFocusRing(const Color&);
   void clearFocusRing();
+  IntRect focusRingBoundingRect();
 
   void setLineWidth(float);
   void setLineCap(LineCap);
@@ -189,6 +191,8 @@ class GraphicsContext : Noncopyable {
   void rotate(float angleInRadians);
   void translate(float x, float y);
   IntPoint origin();
+
+  void setURLForRect(const KURL&, const IntRect&);
 
   void concatCTM(const AffineTransform&);
 

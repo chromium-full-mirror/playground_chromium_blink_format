@@ -99,14 +99,13 @@ class RenderFlow : public RenderContainer {
                             int* extraWidthToEndOfLine = 0);
 
   virtual void addFocusRingRects(GraphicsContext*, int _tx, int _ty);
-  void paintFocusRing(GraphicsContext*, int tx, int ty);
   void paintOutlineForLine(GraphicsContext*,
                            int tx,
                            int ty,
                            const IntRect& prevLine,
                            const IntRect& thisLine,
                            const IntRect& nextLine);
-  void paintOutlines(GraphicsContext*, int tx, int ty);
+  void paintOutline(GraphicsContext*, int tx, int ty);
 
  protected:
   // An inline can be split with blocks occurring in between the inline content.
