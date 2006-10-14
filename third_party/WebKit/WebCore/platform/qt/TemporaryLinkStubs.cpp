@@ -47,6 +47,7 @@
 #include "KURL.h"
 #include "ScrollBar.h"
 #include "PlatformScrollBar.h"
+#include "CachedResource.h"
 #include "ScrollBar.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
@@ -327,10 +328,10 @@ Vector<char> ServeSynchronousRequest(Loader*,
   notImplemented();
   return Vector<char>();
 }
-time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse*) {
+time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
   return 0;
 }
-bool ResponseIsMultipart(PlatformResponse*) {
+bool ResponseIsMultipart(PlatformResponse) {
   return false;
 }
 DeprecatedString ResponseMIMEType(PlatformResponse) {
@@ -342,10 +343,10 @@ bool IsResponseURLEqualToURL(PlatformResponse, const String& URL) {
 DeprecatedString ResponseURL(PlatformResponse) {
   return DeprecatedString();
 }
-CachedResource::setResponse(PlatformResponse) {
+void CachedResource::setResponse(PlatformResponse) {
   notImplemented();
 }
-CachedResource::setAllData(PlatformData) {
+void CachedResource::setAllData(PlatformData) {
   notImplemented();
 }
 }

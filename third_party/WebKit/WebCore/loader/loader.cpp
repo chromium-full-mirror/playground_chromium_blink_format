@@ -105,9 +105,7 @@ void Loader::receivedAllData(ResourceLoader* job, PlatformData allData) {
   } else {
     docLoader->setLoadInProgress(true);
     object->data(req->buffer(), true);
-#if PLATFORM(MAC)
     object->setAllData(allData);
-#endif
     docLoader->setLoadInProgress(false);
     object->finish();
   }
@@ -120,7 +118,12 @@ void Loader::receivedAllData(ResourceLoader* job, PlatformData allData) {
 void Loader::receivedResponse(ResourceLoader* job, PlatformResponse response) {
   Request* req = m_requestsLoading.get(job);
   ASSERT(req);
+#if !PLATFORM(QT)
   ASSERT(response);
+#else
+  ASSERT(!response.isEmpty());
+#endif
+
   req->cachedObject()->setResponse(response);
   req->cachedObject()->setExpireDate(
       CacheObjectExpiresTime(req->docLoader(), response), false);

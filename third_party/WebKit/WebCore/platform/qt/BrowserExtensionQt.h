@@ -38,8 +38,8 @@ class BrowserExtensionQt : public BrowserExtension {
  public:
   BrowserExtensionQt(Frame*);
 
-  virtual void createNewWindow(const ResourceRequest&);
-  virtual void createNewWindow(const ResourceRequest&,
+  virtual void createNewWindow(const FrameLoadRequest&);
+  virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowArgs&,
                                Frame*&);
 
