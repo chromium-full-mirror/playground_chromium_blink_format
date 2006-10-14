@@ -593,6 +593,27 @@ bool CheckIfReloading(WebCore::DocLoader*) {
   return false;
 }
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
+time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse*) {
+  return 0;
+}
+bool ResponseIsMultipart(PlatformResponse*) {
+  return false;
+}
+DeprecatedString ResponseMIMEType(PlatformResponse) {
+  return DeprecatedString();
+}
+bool IsResponseURLEqualToURL(PlatformResponse, const String& URL) {
+  return false;
+}
+DeprecatedString ResponseURL(PlatformResponse) {
+  return DeprecatedString();
+}
+CachedResource::setResponse(PlatformResponse) {
+  notImplemented();
+}
+CachedResource::setAllData(PlatformData) {
+  notImplemented();
+}
 }
 
 HINSTANCE Page::s_instanceHandle = 0;

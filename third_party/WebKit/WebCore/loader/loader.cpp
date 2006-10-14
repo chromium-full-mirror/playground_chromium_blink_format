@@ -118,7 +118,6 @@ void Loader::receivedAllData(ResourceLoader* job, PlatformData allData) {
 }
 
 void Loader::receivedResponse(ResourceLoader* job, PlatformResponse response) {
-#ifdef __APPLE__
   Request* req = m_requestsLoading.get(job);
   ASSERT(req);
   ASSERT(response);
@@ -140,7 +139,6 @@ void Loader::receivedResponse(ResourceLoader* job, PlatformResponse response) {
     if (!req->cachedObject()->isImage())
       job->cancel();
   }
-#endif
 }
 
 void Loader::receivedData(ResourceLoader* job, const char* data, int size) {
