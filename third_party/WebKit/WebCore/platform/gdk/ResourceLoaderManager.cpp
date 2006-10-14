@@ -119,7 +119,6 @@ void ResourceLoaderManager::downloadTimerCallback(
 
     // check the curl messages indicating completed transfers
     // and free their resources
-    ResourceLoader* job;
     int nmsgs;
     while (CURLMsg* msg = curl_multi_info_read(curlMultiHandle, &nmsgs)) {
       if (msg->msg == CURLMSG_DONE) {

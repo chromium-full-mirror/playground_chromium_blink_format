@@ -170,4 +170,8 @@
 #define KXMLCORE_USE_WININET 1
 #endif
 
+#if PLATFORM(GDK)
+#define KXMLCORE_USE_CURL 1
+#endif
+
 #endif /* KXMLCORE_PLATFORM_H */

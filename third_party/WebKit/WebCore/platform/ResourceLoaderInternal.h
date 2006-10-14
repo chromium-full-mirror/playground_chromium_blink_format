@@ -41,7 +41,7 @@
 #include <windows.h>
 #endif
 
-#if PLATFORM(GDK)
+#if USE(CURL)
 typedef void CURL;
 #endif
 
@@ -92,7 +92,7 @@ class ResourceLoaderInternal {
         m_hasReceivedResponse(false),
         m_resend(false)
 #endif
-#if PLATFORM(GDK)
+#if USE(CURL)
         ,
         m_handle(0)
 #endif
@@ -136,7 +136,7 @@ class ResourceLoaderInternal {
         m_hasReceivedResponse(false),
         m_resend(false)
 #endif
-#if PLATFORM(GDK)
+#if USE(CURL)
         ,
         m_handle(0)
 #endif
@@ -181,7 +181,7 @@ class ResourceLoaderInternal {
   bool m_hasReceivedResponse;
   bool m_resend;
 #endif
-#if PLATFORM(GDK)
+#if USE(CURL)
   CURL* m_handle;
 #endif
 #if PLATFORM(QT)

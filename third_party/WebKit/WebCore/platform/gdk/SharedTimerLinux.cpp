@@ -68,10 +68,11 @@ void setSharedTimerFireTime(double fireTime) {
 }
 
 void stopSharedTimer() {
+  gboolean s = FALSE;
   if (sharedTimer == 0)
     return;
 
-  gboolean s = g_source_remove(sharedTimer);
+  s = g_source_remove(sharedTimer);
   ASSERT(s);
   sharedTimer = 0;
 }
