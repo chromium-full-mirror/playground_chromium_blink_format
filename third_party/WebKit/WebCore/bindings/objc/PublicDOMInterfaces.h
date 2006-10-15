@@ -1000,6 +1000,7 @@
 @property(readonly) BOOL metaKey;
 @property(readonly) int keyCode;
 @property(readonly) int charCode;
+- (BOOL)getModifierState:(NSString*)keyIdentifierArg;
 @end
 
 @interface DOMMouseEvent : DOMUIEvent
