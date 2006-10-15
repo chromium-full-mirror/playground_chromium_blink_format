@@ -118,11 +118,7 @@ void Loader::receivedAllData(ResourceLoader* job, PlatformData allData) {
 void Loader::receivedResponse(ResourceLoader* job, PlatformResponse response) {
   Request* req = m_requestsLoading.get(job);
   ASSERT(req);
-#if !PLATFORM(QT)
   ASSERT(response);
-#else
-  ASSERT(!response.isEmpty());
-#endif
 
   req->cachedObject()->setResponse(response);
   req->cachedObject()->setExpireDate(

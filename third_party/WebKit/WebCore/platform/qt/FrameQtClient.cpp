@@ -47,11 +47,13 @@ FrameQtClientDefault::FrameQtClientDefault()
 FrameQtClientDefault::~FrameQtClientDefault() {}
 
 void FrameQtClientDefault::setFrame(const FrameQt* frame) {
-  Q_ASSERT(frame != 0);
+  ASSERT(frame != 0);
   m_frame = const_cast<FrameQt*>(frame);
 }
 
 void FrameQtClientDefault::openURL(const KURL& url) {
+  ASSERT(m_frame);
+
   m_frame->didOpenURL(url);
   m_assignedMimetype = false;
 
@@ -109,6 +111,10 @@ bool FrameQtClientDefault::locationbarVisible() const {
   return false;
 }
 
+void FrameQtClientDefault::loadFinished() const {
+  // no-op
+}
+
 void FrameQtClientDefault::receivedResponse(ResourceLoader*, PlatformResponse) {
   // no-op
 }
@@ -138,5 +144,7 @@ void FrameQtClientDefault::receivedAllData(ResourceLoader* job,
                                            PlatformData data) {
   m_frame->end();
   m_assignedMimetype = false;
+
+  loadFinished();
 }
 }

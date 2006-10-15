@@ -54,6 +54,8 @@ class FrameQtClient {
   virtual bool personalbarVisible() const = 0;
   virtual bool locationbarVisible() const = 0;
 
+  virtual void loadFinished() const = 0;
+
   virtual void runJavaScriptAlert(String const& message) = 0;
   virtual bool runJavaScriptConfirm(const String& message) = 0;
   virtual bool runJavaScriptPrompt(const String& message,
@@ -83,6 +85,8 @@ class FrameQtClientDefault : public FrameQtClient, public ResourceLoaderClient {
   virtual bool statusbarVisible() const;
   virtual bool personalbarVisible() const;
   virtual bool locationbarVisible() const;
+
+  virtual void loadFinished() const;
 
   // ResourceLoaderClient
   virtual void receivedResponse(ResourceLoader*, PlatformResponse);

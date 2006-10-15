@@ -187,7 +187,7 @@ class ResourceLoaderInternal {
 #if PLATFORM(QT)
   QString m_charset;
   QString m_mimetype;
-  QString m_response;
+  PlatformResponse m_response;
 #endif
 };
 
