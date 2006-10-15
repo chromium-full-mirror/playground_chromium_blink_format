@@ -57,6 +57,9 @@
 #include "MouseEventWithHitTestResults.h"
 #include "SelectionController.h"
 #include "TypingCommand.h"
+#include "JSLock.h"
+#include "kjs_window.h"
+#include "runtime_root.h"
 
 #include <QScrollArea>
 
@@ -90,7 +93,7 @@ static void doScroll(const RenderObject* r, bool isHorizontal, int multiplier) {
 }
 
 FrameQt::FrameQt(Page* page, Element* ownerElement, FrameQtClient* client)
-    : Frame(page, ownerElement) {
+    : Frame(page, ownerElement), m_bindingRoot(0) {
   d->m_extension = new BrowserExtensionQt(this);
   Settings* settings = new Settings;
   settings->setAutoLoadImages(true);
@@ -163,13 +166,11 @@ void FrameQt::runJavaScriptAlert(String const& message) {
 }
 
 bool FrameQt::runJavaScriptConfirm(String const& message) {
-  notImplemented();
-  return true;
+  return m_client->runJavaScriptConfirm(message);
 }
 
 bool FrameQt::locationbarVisible() {
-  notImplemented();
-  return true;
+  return m_client->locationbarVisible();
 }
 
 void FrameQt::setTitle(const String& title) {
@@ -177,9 +178,9 @@ void FrameQt::setTitle(const String& title) {
     view()->parentWidget()->setWindowTitle(title);
 }
 
-Frame* FrameQt::createFrame(const KURL&,
+Frame* FrameQt::createFrame(const KURL& url,
                             const String& name,
-                            Element*,
+                            Element* ownerElement,
                             const String& referrer) {
   notImplemented();
   return 0;
@@ -192,9 +193,7 @@ bool FrameQt::passWheelEventToChildWidget(Node*) {
 
 bool FrameQt::passSubframeEventToSubframe(MouseEventWithHitTestResults& mev,
                                           Frame*) {
-  if (mev.targetNode() == 0)
-    return true;
-
+  notImplemented();
   return false;
 }
 
@@ -224,23 +223,19 @@ bool FrameQt::isLoadTypeReload() {
 }
 
 bool FrameQt::menubarVisible() {
-  notImplemented();
-  return true;
+  return m_client->menubarVisible();
 }
 
 bool FrameQt::personalbarVisible() {
-  notImplemented();
-  return true;
+  return m_client->personalbarVisible();
 }
 
 bool FrameQt::statusbarVisible() {
-  notImplemented();
-  return true;
+  return m_client->statusbarVisible();
 }
 
 bool FrameQt::toolbarVisible() {
-  notImplemented();
-  return true;
+  return m_client->toolbarVisible();
 }
 
 void FrameQt::createEmptyDocument() {
@@ -252,7 +247,7 @@ void FrameQt::createEmptyDocument() {
 }
 
 Range* FrameQt::markedTextRange() const {
-  // notImplemented();
+  // FIXME: Handle selections.
   return 0;
 }
 
@@ -275,7 +270,7 @@ void FrameQt::markMisspellings(const Selection&) {
 }
 
 bool FrameQt::lastEventIsMouseUp() const {
-  notImplemented();
+  // no-op
   return false;
 }
 
@@ -287,23 +282,32 @@ void FrameQt::restoreDocumentState() {
   // FIXME: Implement this as soon a KPart is created...
 }
 
-void FrameQt::openURLRequest(const FrameLoadRequest&) {
-  notImplemented();
+void FrameQt::openURLRequest(const FrameLoadRequest& request) {
+  urlSelected(request);
 }
 
 void FrameQt::scheduleClose() {
-  notImplemented();
+  // no-op
 }
 
 void FrameQt::unfocusWindow() {
-  notImplemented();
+  if (!view())
+    return;
+
+  if (!tree()->parent())
+    view()->qwidget()->clearFocus();
 }
 
 void FrameQt::focusWindow() {
-  notImplemented();
+  if (!view())
+    return;
+
+  if (!tree()->parent())
+    view()->qwidget()->setFocus();
 }
 
 String FrameQt::overrideMediaType() const {
+  // no-op
   return String();
 }
 
@@ -318,8 +322,7 @@ void FrameQt::addMessageToConsole(const String& message,
 bool FrameQt::runJavaScriptPrompt(const String& message,
                                   const String& defaultValue,
                                   String& result) {
-  notImplemented();
-  return false;
+  return m_client->runJavaScriptPrompt(message, defaultValue, result);
 }
 
 KJS::Bindings::Instance* FrameQt::getEmbedInstanceForWidget(Widget*) {
@@ -338,8 +341,24 @@ KJS::Bindings::Instance* FrameQt::getAppletInstanceForWidget(Widget*) {
 }
 
 KJS::Bindings::RootObject* FrameQt::bindingRootObject() {
-  notImplemented();
-  return 0;
+  ASSERT(jScriptEnabled());
+
+  if (!m_bindingRoot) {
+    KJS::JSLock lock;
+    m_bindingRoot = new KJS::Bindings::RootObject(
+        0);  // The root gets deleted by JavaScriptCore.
+
+    KJS::JSObject* win = KJS::Window::retrieveWindow(this);
+    m_bindingRoot->setRootObjectImp(win);
+    m_bindingRoot->setInterpreter(jScript()->interpreter());
+    addPluginRootObject(m_bindingRoot);
+  }
+
+  return m_bindingRoot;
+}
+
+void FrameQt::addPluginRootObject(KJS::Bindings::RootObject* root) {
+  m_rootObjects.append(root);
 }
 
 Widget* FrameQt::createJavaAppletWidget(const IntSize&,
@@ -350,15 +369,15 @@ Widget* FrameQt::createJavaAppletWidget(const IntSize&,
 }
 
 void FrameQt::registerCommandForUndo(PassRefPtr<EditCommand>) {
-  notImplemented();
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
 }
 
 void FrameQt::registerCommandForRedo(PassRefPtr<EditCommand>) {
-  notImplemented();
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
 }
 
 void FrameQt::clearUndoRedoOperations() {
-  // FIXME: Implement this as soon a KPart is created...
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
 }
 
 void FrameQt::issueUndoCommand() {
@@ -391,18 +410,18 @@ void FrameQt::issueTransposeCommand() {
 
 void FrameQt::respondToChangedSelection(const Selection& oldSelection,
                                         bool closeTyping) {
-  notImplemented();
+  // TODO: If we want continous spell checking, we need to implement this.
 }
 
 void FrameQt::respondToChangedContents(const Selection& endingSelection) {
-  notImplemented();
+  // TODO: If we want accessibility, we need to implement this.
 }
 
 bool FrameQt::shouldChangeSelection(const Selection& oldSelection,
                                     const Selection& newSelection,
                                     EAffinity affinity,
                                     bool stillSelecting) const {
-  notImplemented();
+  // no-op
   return true;
 }
 
@@ -413,6 +432,7 @@ void FrameQt::partClearedInBegin() {
 }
 
 bool FrameQt::canGoBackOrForward(int distance) const {
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
   notImplemented();
   return false;
 }
@@ -428,16 +448,19 @@ void FrameQt::handledOnloadEvents() {
 }
 
 bool FrameQt::canPaste() const {
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
   notImplemented();
   return false;
 }
 
 bool FrameQt::canRedo() const {
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
   notImplemented();
   return false;
 }
 
 bool FrameQt::canUndo() const {
+  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
   notImplemented();
   return false;
 }

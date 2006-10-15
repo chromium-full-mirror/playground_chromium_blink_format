@@ -112,6 +112,8 @@ class FrameQt : public Frame {
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getAppletInstanceForWidget(Widget*);
   virtual KJS::Bindings::RootObject* bindingRootObject();
+  void addPluginRootObject(KJS::Bindings::RootObject*);
+
   virtual Widget* createJavaAppletWidget(const IntSize&,
                                          Element*,
                                          const HashMap<String, String>& args);
@@ -159,9 +161,13 @@ class FrameQt : public Frame {
 
   FrameQtClient* m_client;
   bool m_beginCalled : 1;
+
+  KJS::Bindings::RootObject* m_bindingRoot;  // The root object used for objects
+  // bound outside the context of a plugin.
+
+  Vector<KJS::Bindings::RootObject*> m_rootObjects;
 };
 }
 
 #endif
-
 // vim: ts=4 sw=4 et

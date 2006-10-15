@@ -343,12 +343,8 @@ bool IsResponseURLEqualToURL(PlatformResponse, const String& URL) {
 DeprecatedString ResponseURL(PlatformResponse) {
   return DeprecatedString();
 }
-void CachedResource::setResponse(PlatformResponse) {
-  notImplemented();
-}
-void CachedResource::setAllData(PlatformData) {
-  notImplemented();
-}
+void CachedResource::setResponse(PlatformResponse) {}
+void CachedResource::setAllData(PlatformData) {}
 }
 
 bool WebCore::historyContains(DeprecatedString const&) {
