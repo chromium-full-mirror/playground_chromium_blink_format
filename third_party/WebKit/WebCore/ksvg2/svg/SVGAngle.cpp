@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,15 +22,11 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
+#include "SVGAngle.h"
+
 #include <math.h>
 
-#include <ksvg2/ksvg.h>
-
-#include "DeprecatedString.h"
-#include "SVGAngle.h"
-#include "SVGHelper.h"
-
-using namespace WebCore;
+namespace WebCore {
 
 const double deg2rad = 0.017453292519943295769;  // pi/180
 const double deg2grad = 400.0 / 360.0;
@@ -169,6 +165,7 @@ const SVGStyledElement* SVGAngle::context() const {
 
 void SVGAngle::setContext(const SVGStyledElement* context) {
   m_context = context;
+}
 }
 
 // vim:ts=4:noet

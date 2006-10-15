@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,13 +24,10 @@
 #ifdef SVG_SUPPORT
 #include "SVGLangSpace.h"
 
-#include "Attr.h"
 #include "SVGElement.h"
 #include "SVGNames.h"
-#include "StringImpl.h"
-#include "ksvg.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGLangSpace::SVGLangSpace() {}
 
@@ -62,6 +59,7 @@ bool SVGLangSpace::parseMappedAttribute(MappedAttribute* attr) {
   }
 
   return false;
+}
 }
 
 // vim:ts=4:noet

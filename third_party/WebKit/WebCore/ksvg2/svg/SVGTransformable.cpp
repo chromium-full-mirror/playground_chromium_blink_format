@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,22 +22,16 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
+#include "SVGTransformable.h"
+
 #include "RegularExpression.h"
-#include <wtf/RefPtr.h>
-
-#include "Attr.h"
-
-#include <kcanvas/RenderPath.h>
-
-#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGMatrix.h"
-#include "SVGTransformable.h"
+#include "SVGNames.h"
 #include "SVGStyledElement.h"
 #include "SVGTransformList.h"
-#include "ksvg.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGTransformable::SVGTransformable() : SVGLocatable() {}
 
@@ -116,6 +110,7 @@ void SVGTransformable::parseTransformAttribute(SVGTransformList* list,
     ExceptionCode ec = 0;
     list->appendItem(t, ec);
   }
+}
 }
 
 // vim:ts=4:noet

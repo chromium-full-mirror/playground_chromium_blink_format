@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -22,14 +22,12 @@
 
 #include "config.h"
 #ifdef SVG_SUPPORT
-#include "Node.h"
-#include "Attr.h"
-
-#include "SVGNames.h"
-#include "XLinkNames.h"
-#include "SVGHelper.h"
 #include "SVGURIReference.h"
+
+#include "SVGHelper.h"
+#include "SVGNames.h"
 #include "SVGStyledElement.h"
+#include "XLinkNames.h"
 
 namespace WebCore {
 

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob, 2006 Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,13 +24,12 @@
 #ifdef SVG_SUPPORT
 #include "SVGTests.h"
 
+#include "DOMImplementation.h"
 #include "Language.h"
 #include "SVGElement.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGStringList.h"
-#include "Attr.h"
-#include "DOMImplementation.h"
 
 namespace WebCore {
 
@@ -59,7 +58,7 @@ bool SVGTests::isValid() const {
 
   SVGStringList* list = requiredFeatures();
   for (unsigned long i = 0; i < list->numberOfItems(); i++) {
-    String value = String(list->getItem(i, ec));
+    String value = list->getItem(i, ec);
     if (value.isEmpty() ||
         !DOMImplementation::instance()->hasFeature(value, String()))
       return false;

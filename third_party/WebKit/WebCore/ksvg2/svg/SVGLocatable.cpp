@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,12 +24,11 @@
 #ifdef SVG_SUPPORT
 #include "SVGLocatable.h"
 
-#include "SVGElement.h"
+#include "RenderPath.h"
 #include "SVGMatrix.h"
 #include "SVGSVGElement.h"
-#include <kcanvas/RenderPath.h>
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGLocatable::SVGLocatable() {}
 
@@ -118,6 +117,7 @@ SVGMatrix* SVGLocatable::getScreenCTM(const SVGElement* element) {
   }
 
   return ctm;
+}
 }
 
 #endif  // SVG_SUPPORT

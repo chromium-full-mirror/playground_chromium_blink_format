@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -29,9 +29,7 @@
 #include "SVGElement.h"
 #include "SVGLength.h"
 #include "SVGSVGElement.h"
-#include "ksvg.h"
 #include "svgpathparser.h"
-
 #include <math.h>
 
 using namespace std;
@@ -152,13 +150,12 @@ void SVGLength::convertToSpecifiedUnits(unsigned short unitType) {
 
 double SVGLength::dpi() const {
   /* FIXME: DPI detection
-  if(context && context->ownerDoc())
-  {
-      if(mode == LM_WIDTH)
+  if (context && context->ownerDoc()) {
+      if (mode == LM_WIDTH)
           return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterX();
-      else if(mode == LM_HEIGHT)
+      else if (mode == LM_HEIGHT)
           return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterY();
-      else if(mode == LM_OTHER)
+      else if (mode == LM_OTHER)
           return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterX();
   }
   */
