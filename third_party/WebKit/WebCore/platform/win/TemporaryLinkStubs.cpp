@@ -43,6 +43,7 @@
 #include "Cursor.h"
 #include "loader.h"
 #include "FrameView.h"
+#include "FrameLoadRequest.h"
 #include "KURL.h"
 #include "PlatformScrollBar.h"
 #include "ScrollBar.h"
@@ -58,6 +59,7 @@
 #include "RenderTheme.h"
 #include "FrameWin.h"
 #include "ResourceLoader.h"
+#include "ResourceLoaderClient.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
@@ -66,6 +68,7 @@
 #include "Icon.h"
 #include "IconLoader.h"
 #include "IconDatabase.h"
+#include "CachedResource.h"
 
 using namespace WebCore;
 
@@ -304,18 +307,6 @@ int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
   return 0;
 }
 
-namespace WebCore {
-
-Vector<char> ServeSynchronousRequest(Loader*,
-                                     DocLoader*,
-                                     ResourceLoader*,
-                                     KURL&,
-                                     DeprecatedString&) {
-  notImplemented();
-  return Vector<char>();
-}
-}
-
 void FrameWin::focusWindow() {
   notImplemented();
 }
@@ -390,7 +381,7 @@ void FrameWin::issueCutCommand() {
 void FrameWin::issueCopyCommand() {
   notImplemented();
 }
-void FrameWin::openURLRequest(struct WebCore::ResourceRequest const&) {
+void FrameWin::openURLRequest(const FrameLoadRequest&) {
   notImplemented();
 }
 bool FrameWin::passWheelEventToChildWidget(Node*) {
@@ -589,31 +580,41 @@ ObjectContentType FrameWin::objectContentType(const KURL&, const String&) {
 
 namespace WebCore {
 
-bool CheckIfReloading(WebCore::DocLoader*) {
-  return false;
+Vector<char> ServeSynchronousRequest(Loader*,
+                                     DocLoader*,
+                                     ResourceLoader*,
+                                     KURL&,
+                                     DeprecatedString&) {
+  notImplemented();
+  return Vector<char>();
 }
+
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
-time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse*) {
-  return 0;
-}
-bool ResponseIsMultipart(PlatformResponse*) {
+bool CheckIfReloading(DocLoader*) {
   return false;
 }
-DeprecatedString ResponseMIMEType(PlatformResponse) {
-  return DeprecatedString();
-}
-bool IsResponseURLEqualToURL(PlatformResponse, const String& URL) {
+bool IsResponseURLEqualToURL(PlatformResponse, const String&) {
   return false;
 }
 DeprecatedString ResponseURL(PlatformResponse) {
   return DeprecatedString();
 }
-CachedResource::setResponse(PlatformResponse) {
+DeprecatedString ResponseMIMEType(PlatformResponse) {
+  return DeprecatedString();
+}
+bool ResponseIsMultipart(PlatformResponse) {
+  return false;
+}
+time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
+  return 0;
+}
+}
+
+void CachedResource::setResponse(PlatformResponse) {
   notImplemented();
 }
-CachedResource::setAllData(PlatformData) {
+void CachedResource::setAllData(PlatformData) {
   notImplemented();
-}
 }
 
 HINSTANCE Page::s_instanceHandle = 0;

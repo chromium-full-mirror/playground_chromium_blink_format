@@ -233,8 +233,8 @@ static HDC prepareForDrawing(GraphicsContext* g) {
   return g->getWindowsContext();
 }
 
-static void doneDrawing(GraphicsContext* g) {
-  g->releaseWindowsContext();
+static void doneDrawing(GraphicsContext* g, HDC hdc) {
+  g->releaseWindowsContext(hdc);
 }
 
 bool RenderThemeWin::paintButton(RenderObject* o,
@@ -261,7 +261,7 @@ bool RenderThemeWin::paintButton(RenderObject* o,
   RECT widgetRect = r;
   drawThemeBG(m_buttonTheme, hdc, themeData.m_part, themeData.m_state,
               &widgetRect, NULL);
-  doneDrawing(i.p);
+  doneDrawing(i.p, hdc);
 
   return false;
 }
@@ -317,7 +317,7 @@ bool RenderThemeWin::paintTextField(RenderObject* o,
   RECT widgetRect = r;
   drawThemeBG(m_textFieldTheme, hdc, themeData.m_part, themeData.m_state,
               &widgetRect, NULL);
-  doneDrawing(i.p);
+  doneDrawing(i.p, hdc);
 
   return false;
 }
