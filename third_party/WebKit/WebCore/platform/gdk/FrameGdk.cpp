@@ -52,6 +52,7 @@
 #include "TypingCommand.h"
 #include "SSLKeyGenerator.h"
 #include "KeyboardCodes.h"
+#include "FrameLoadRequest.h"
 #include <gdk/gdk.h>
 
 // This function loads resources from WebKit
@@ -193,7 +194,9 @@ bool FrameGdk::openURL(const KURL& url) {
   return true;
 }
 
-void FrameGdk::submitForm(const ResourceRequest& request) {
+void FrameGdk::submitForm(const FrameLoadRequest& frameLoadRequest) {
+  ResourceRequest request = frameLoadRequest.m_request;
+
   // FIXME: this is a hack inherited from FrameMac, and should be pushed into
   // Frame
   if (d->m_submittedFormURL == request.url())
@@ -207,7 +210,9 @@ void FrameGdk::submitForm(const ResourceRequest& request) {
   clearRecordedFormValues();
 }
 
-void FrameGdk::urlSelected(const ResourceRequest& request) {
+void FrameGdk::urlSelected(const FrameLoadRequest& frameLoadRequest) {
+  ResourceRequest request = frameLoadRequest.m_request;
+
   if (!m_client)
     return;
 

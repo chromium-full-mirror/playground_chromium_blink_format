@@ -27,8 +27,6 @@
 
 #include "config.h"
 
-#define WIN32_COMPILE_HACK
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "CString.h"
@@ -58,21 +56,29 @@
 #include "RenderTheme.h"
 #include "FrameGdk.h"
 #include "BrowserExtensionGdk.h"
-#include "ResourceLoader.h"
+#include "FrameLoadRequest.h"
 #include "RenderThemeGdk.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
-#include "RenderPopupMenuGdk.h"
 #include "EditCommand.h"
 #include "Icon.h"
 #include "IconLoader.h"
 #include "IconDatabase.h"
+#include "CachedResource.h"
 
 using namespace WebCore;
 
-static void notImplemented() {
-  puts("Not yet implemented");
+namespace WebCore {
+struct PlatformDataStruct {};
+
+struct PlatformResponseStruct {};
 }
+
+#define notImplemented()                                                 \
+  do {                                                                   \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED: %s in %s:%d\n", __FUNCTION__, \
+            __FILE__, __LINE__);                                         \
+  } while (0)
 
 void FrameView::updateBorder() {
   notImplemented();
@@ -330,7 +336,7 @@ void FrameGdk::issueCutCommand() {
 void FrameGdk::issueCopyCommand() {
   notImplemented();
 }
-void FrameGdk::openURLRequest(struct WebCore::ResourceRequest const&) {
+void FrameGdk::openURLRequest(struct WebCore::FrameLoadRequest const&) {
   notImplemented();
 }
 void FrameGdk::issueUndoCommand() {
@@ -405,9 +411,13 @@ bool BrowserExtensionGdk::canRunModal() {
   return 0;
 }
 void BrowserExtensionGdk::createNewWindow(
-    struct WebCore::ResourceRequest const&,
+    struct WebCore::FrameLoadRequest const&,
     struct WebCore::WindowArgs const&,
     Frame*&) {
+  notImplemented();
+}
+void BrowserExtensionGdk::createNewWindow(
+    struct WebCore::FrameLoadRequest const&) {
   notImplemented();
 }
 bool BrowserExtensionGdk::canRunModalNow() {
@@ -424,9 +434,11 @@ KURL BrowserExtensionGdk::historyURL(int distance) {
   notImplemented();
   return KURL();
 }
-void BrowserExtensionGdk::createNewWindow(
-    struct WebCore::ResourceRequest const&) {
-  notImplemented();
+BrowserExtensionGdk::BrowserExtensionGdk(WebCore::Frame*) {}
+void BrowserExtensionGdk::setTypedIconURL(KURL const&, const String&) {}
+void BrowserExtensionGdk::setIconURL(KURL const&) {}
+int BrowserExtensionGdk::getHistoryLength() {
+  return 0;
 }
 
 int WebCore::screenDepthPerComponent(const Page*) {
@@ -536,19 +548,33 @@ void FrameGdk::markMisspellingsInAdjacentWords(
     WebCore::VisiblePosition const&) {}
 void FrameGdk::respondToChangedContents(const Selection&) {}
 
-BrowserExtensionGdk::BrowserExtensionGdk(WebCore::Frame*) {}
-void BrowserExtensionGdk::setTypedIconURL(KURL const&, const String&) {}
-void BrowserExtensionGdk::setIconURL(KURL const&) {}
-int BrowserExtensionGdk::getHistoryLength() {
-  return 0;
-}
-
 namespace WebCore {
 
-bool CheckIfReloading(WebCore::DocLoader*) {
+bool CheckIfReloading(DocLoader*) {
   return false;
 }
+time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
+  return 0;
+}
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {}
+DeprecatedString ResponseURL(PlatformResponse) {
+  return DeprecatedString();
+}
+bool IsResponseURLEqualToURL(PlatformResponse, const String& URL) {
+  return false;
+}
+bool ResponseIsMultipart(PlatformResponse) {
+  return false;
+}
+DeprecatedString ResponseMIMEType(PlatformResponse) {
+  return DeprecatedString();
+}
+void CachedResource::setResponse(PlatformResponse) {
+  notImplemented();
+}
+void CachedResource::setAllData(PlatformData) {
+  notImplemented();
+}
 }
 
 void Widget::setEnabled(bool) {}
@@ -681,18 +707,6 @@ void PlatformScrollbar::updateThumbPosition() {}
 void PlatformScrollbar::updateThumbProportion() {}
 void PlatformScrollbar::setRect(const IntRect&) {}
 
-Scrollbar::Scrollbar(ScrollbarClient*,
-                     ScrollbarOrientation,
-                     ScrollbarControlSize controlSize) {}
-void Scrollbar::setSteps(int, int) {}
-bool Scrollbar::scroll(ScrollDirection, ScrollGranularity, float) {
-  return false;
-}
-bool Scrollbar::setValue(int) {
-  return false;
-}
-void Scrollbar::setProportion(int, int) {}
-
 ListBox::ListBox() {}
 ListBox::~ListBox() {}
 void ListBox::setSelectionMode(ListBox::SelectionMode) {}
@@ -716,7 +730,7 @@ String FileChooser::basenameForWidth(int width) const {
   notImplemented();
   return String();
 }
-void FileChooser::uploadControlDetaching() {
+void FileChooser::disconnectUploadControl() {
   notImplemented();
 }
 void FileChooser::chooseFile(const String& filename) {

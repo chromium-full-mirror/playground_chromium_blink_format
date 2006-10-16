@@ -1908,7 +1908,7 @@ static ALWAYS_INLINE void do_free(void* ptr) {
 #if WTF_CHANGES
   if (ptr == NULL)
     return;
-#else WTF_CHANGES
+#else
   if (ptr == NULL || tcmalloc_is_destroyed)
     return;
 #endif

@@ -56,10 +56,6 @@ RenderTheme* theme() {
   return &gdkTheme;
 }
 
-RenderThemeGdk::RenderThemeGdk() {}
-
-RenderThemeGdk::~RenderThemeGdk() {}
-
 void RenderThemeGdk::close() {}
 
 void RenderThemeGdk::addIntrinsicMargins(RenderStyle* style) const {
@@ -147,12 +143,6 @@ void RenderThemeGdk::adjustButtonStyle(CSSStyleSelector* selector,
                                        RenderStyle* style,
                                        WebCore::Element* e) const {
   addIntrinsicMargins(style);
-}
-
-RenderPopupMenu* RenderThemeGdk::createPopupMenu(RenderArena* arena,
-                                                 Document* doc,
-                                                 RenderMenuList* list) {
-  return new (arena) RenderPopupMenuGdk(doc, list);
 }
 
 void RenderThemeGdk::systemFont(int propId, FontDescription&) const {}
