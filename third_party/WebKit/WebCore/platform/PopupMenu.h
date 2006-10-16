@@ -32,6 +32,7 @@ class NSPopUpButtonCell;
 #endif
 #elif PLATFORM(WIN)
 typedef struct HWND__* HWND;
+typedef struct tagDRAWITEMSTRUCT* LPDRAWITEMSTRUCT;
 #endif
 
 namespace WebCore {
@@ -58,7 +59,7 @@ class PopupMenu : public Shared<PopupMenu> {
   bool down();
 
   bool wasClicked() const { return m_wasClicked; }
-  void setWasClicked(bool b) { m_wasClicked = b; }
+  void setWasClicked(bool b = true) { m_wasClicked = b; }
 
   int focusedIndex() const;
 
@@ -66,6 +67,7 @@ class PopupMenu : public Shared<PopupMenu> {
 
 #if PLATFORM(WIN)
   HWND popupHandle() const { return m_popup; }
+  void drawItem(LPDRAWITEMSTRUCT);
 #endif
 
  protected:
