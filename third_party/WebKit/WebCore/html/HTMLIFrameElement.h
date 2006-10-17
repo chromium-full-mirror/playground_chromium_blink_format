@@ -23,17 +23,16 @@
  *
  */
 
-#ifndef HTMLIFrameElement_H
-#define HTMLIFrameElement_H
+#ifndef HTMLIFrameElement_h
+#define HTMLIFrameElement_h
 
-#include "HTMLFrameElement.h"
+#include "HTMLFrameElementBase.h"
 
 namespace WebCore {
 
-class HTMLIFrameElement : public HTMLFrameElement {
+class HTMLIFrameElement : public HTMLFrameElementBase {
  public:
   HTMLIFrameElement(Document* doc);
-  ~HTMLIFrameElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 1; }
@@ -64,6 +63,6 @@ class HTMLIFrameElement : public HTMLFrameElement {
   String oldNameAttr;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // HTMLIFrameElement_h

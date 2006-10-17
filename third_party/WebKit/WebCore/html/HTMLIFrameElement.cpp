@@ -27,10 +27,8 @@
 
 #include "CSSPropertyNames.h"
 #include "Frame.h"
-#include "FrameTree.h"
 #include "HTMLDocument.h"
 #include "HTMLNames.h"
-#include "Page.h"
 #include "RenderPartObject.h"
 
 namespace WebCore {
@@ -38,11 +36,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLIFrameElement::HTMLIFrameElement(Document* doc)
-    : HTMLFrameElement(iframeTag, doc) {
+    : HTMLFrameElementBase(iframeTag, doc) {
   m_frameBorder = false;
 }
-
-HTMLIFrameElement::~HTMLIFrameElement() {}
 
 bool HTMLIFrameElement::mapToEntry(const QualifiedName& attrName,
                                    MappedAttributeEntry& result) const {
@@ -57,7 +53,7 @@ bool HTMLIFrameElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLFrameElement::mapToEntry(attrName, result);
+  return HTMLFrameElementBase::mapToEntry(attrName, result);
 }
 
 void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -76,7 +72,7 @@ void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
     }
     oldNameAttr = newNameAttr;
   } else
-    HTMLFrameElement::parseMappedAttribute(attr);
+    HTMLFrameElementBase::parseMappedAttribute(attr);
 }
 
 bool HTMLIFrameElement::rendererIsNeeded(RenderStyle* style) {
@@ -94,7 +90,7 @@ void HTMLIFrameElement::insertedIntoDocument() {
     doc->addDocExtraNamedItem(oldNameAttr);
   }
 
-  HTMLFrameElement::insertedIntoDocument();
+  HTMLFrameElementBase::insertedIntoDocument();
 }
 
 void HTMLIFrameElement::removedFromDocument() {
@@ -103,11 +99,11 @@ void HTMLIFrameElement::removedFromDocument() {
     doc->removeDocExtraNamedItem(oldNameAttr);
   }
 
-  HTMLFrameElement::removedFromDocument();
+  HTMLFrameElementBase::removedFromDocument();
 }
 
 void HTMLIFrameElement::attach() {
-  HTMLFrameElement::attach();
+  HTMLFrameElementBase::attach();
 
   if (RenderPartObject* renderPartObject =
           static_cast<RenderPartObject*>(renderer()))
