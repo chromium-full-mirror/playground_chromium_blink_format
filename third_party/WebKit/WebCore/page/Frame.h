@@ -516,6 +516,8 @@ class Frame : public Shared<Frame> {
                   EditAction editingAction = EditActionUnspecified);
   void applyParagraphStyle(CSSStyleDeclaration*,
                            EditAction editingAction = EditActionUnspecified);
+  void indent();
+  void outdent();
   TriState selectionHasStyle(CSSStyleDeclaration*) const;
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
   TriState selectionListState() const;

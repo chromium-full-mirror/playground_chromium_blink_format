@@ -55,6 +55,7 @@
 #include "HTMLObjectElement.h"
 #include "HTMLViewSourceDocument.h"
 #include "ImageDocument.h"
+#include "IndentOutdentCommand.h"
 #include "loader/icon/IconDatabase.h"
 #include "loader/icon/IconLoader.h"
 #include "MediaFeatureNames.h"
@@ -2343,6 +2344,16 @@ void Frame::applyParagraphStyle(CSSStyleDeclaration* style,
                                   ApplyStyleCommand::ForceBlockProperties));
       break;
   }
+}
+
+void Frame::indent() {
+  applyCommand(
+      new IndentOutdentCommand(document(), IndentOutdentCommand::Indent));
+}
+
+void Frame::outdent() {
+  applyCommand(
+      new IndentOutdentCommand(document(), IndentOutdentCommand::Outdent));
 }
 
 static void updateState(CSSMutableStyleDeclaration* desiredStyle,
