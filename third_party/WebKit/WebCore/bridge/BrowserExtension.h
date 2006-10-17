@@ -58,10 +58,9 @@ class BrowserExtension {
  public:
   virtual ~BrowserExtension() {}
 
-  virtual void createNewWindow(const FrameLoadRequest&) = 0;
   virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowArgs&,
-                               Frame*&) = 0;
+                               Frame*& newFrame) = 0;
 
   virtual int getHistoryLength() = 0;
   virtual void goBackOrForward(int distance) = 0;
