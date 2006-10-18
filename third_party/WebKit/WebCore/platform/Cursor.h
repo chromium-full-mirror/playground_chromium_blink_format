@@ -83,9 +83,7 @@ class Cursor {
   PlatformCursor m_impl;
 };
 
-inline Cursor pointerCursor() {
-  return Cursor();
-}
+const Cursor& pointerCursor();
 const Cursor& crossCursor();
 const Cursor& handCursor();
 const Cursor& moveCursor();
