@@ -49,12 +49,10 @@ namespace KJS {
 
 /* Constants */
 
-static const double secondsPerHour = 60.0 * 60.0;
 static const double minutesPerDay = 24.0 * 60.0;
 static const double secondsPerDay = 24.0 * 60.0 * 60.0;
 static const double secondsPerYear = 24.0 * 60.0 * 60.0 * 365.0;
 
-static const double usecPerMsec = 1000.0;
 static const double usecPerSec = 1000000.0;
 
 static const double maxUnixTime = 2145859200.0; /*equivalent to 12/31/2037 */
@@ -324,7 +322,7 @@ static double getDSTOffsetSimple(double localTimeSeconds) {
            0)  // Go ahead a day to make localtime work (does not work with 0)
     localTimeSeconds += secondsPerDay;
 
-  double offsetTime = (localTimeSeconds * usecPerMsec) + getUTCOffset();
+  double offsetTime = (localTimeSeconds * msPerSecond) + getUTCOffset();
 
   // Offset from UTC but doesn't include DST obviously
   int offsetHour = msToHours(offsetTime);
@@ -346,7 +344,7 @@ static double getDSTOffsetSimple(double localTimeSeconds) {
   if (diff < 0)
     diff += secondsPerDay;
 
-  return (diff * usecPerMsec);
+  return (diff * msPerSecond);
 }
 
 // Get the DST offset the time passed in
@@ -365,7 +363,7 @@ static double getDSTOffset(double ms) {
     ms = (day * msPerDay) + msToMilliseconds(ms);
   }
 
-  return getDSTOffsetSimple(ms / usecPerMsec);
+  return getDSTOffsetSimple(ms / msPerSecond);
 }
 
 double gregorianDateTimeToMS(const GregorianDateTime& t,
@@ -404,7 +402,7 @@ void msToGregorianDateTime(double ms,
   tm.year = msToYear(ms) - 1900;
   tm.isDST = dstOff != 0.0;
 
-  tm.utcOffset = static_cast<long>((dstOff + getUTCOffset()) / usecPerMsec);
+  tm.utcOffset = static_cast<long>((dstOff + getUTCOffset()) / msPerSecond);
   tm.timeZone = NULL;
 }
 
