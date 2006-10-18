@@ -35,7 +35,7 @@ class BrowserExtensionMac : public BrowserExtension {
   BrowserExtensionMac(Frame*);
 
   virtual void createNewWindow(const FrameLoadRequest&,
-                               const WindowArgs&,
+                               const WindowFeatures&,
                                Frame*& newFrame);
 
   virtual int getHistoryLength();
