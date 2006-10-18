@@ -1407,6 +1407,9 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
   _ty += m_y;
 
   // Check if we need to do anything at all.
+  // FIXME: Could eliminate the isRoot() check if we fix background painting so
+  // that the RenderView
+  // paints the root's background.
   if (!isInlineFlow() && !isRoot()) {
     IntRect overflowBox = overflowRect(false);
     overflowBox.inflate(maximalOutlineSize(i.phase));
@@ -1433,7 +1436,7 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
   // It's ok not to draw, because later on, when all the stylesheets do load,
   // updateStyleSelector on the Document
   // will do a full repaint().
-  if (document()->didLayoutWithPendingStylesheets())
+  if (document()->didLayoutWithPendingStylesheets() && !isRenderView())
     return;
 
   PaintPhase newPhase =
@@ -2819,7 +2822,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
   int tx = _tx + m_x;
   int ty = _ty + m_y + borderTopExtra();
 
-  if (!inlineFlow && !isRoot()) {
+  if (!inlineFlow && !isRenderView()) {
     // Check if we need to do anything at all.
     IntRect overflowBox = overflowRect(false);
     overflowBox.move(tx, ty);
@@ -2900,8 +2903,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
     int topExtra = borderTopExtra();
     IntRect boundsRect(tx, ty - topExtra, m_width,
                        m_height + topExtra + borderBottomExtra());
-    if (isRoot() ||
-        (style()->visibility() == VISIBLE && boundsRect.contains(_x, _y))) {
+    if (style()->visibility() == VISIBLE && boundsRect.contains(_x, _y)) {
       setInnerNode(info);
       return true;
     }

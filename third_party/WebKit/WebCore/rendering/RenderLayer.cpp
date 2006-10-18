@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2006 Apple Computer, Inc.
  *
  * Portions are Copyright (C) 1998 Netscape Communications Corporation.
  *
@@ -1582,22 +1582,16 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   }
 }
 
-static inline bool isSubframe(RenderObject* renderer) {
-  return renderer->isRenderView() &&
-         renderer->node()->document()->frame()->tree()->parent();
-}
-
 static inline IntRect frameVisibleRect(RenderObject* renderer) {
   return enclosingIntRect(
-      renderer->node()->document()->frame()->view()->visibleContentRect());
+      renderer->document()->frame()->view()->visibleContentRect());
 }
 
 bool RenderLayer::hitTest(RenderObject::NodeInfo& info, const IntPoint& point) {
   renderer()->document()->updateLayout();
 
   IntRect boundsRect(m_x, m_y, width(), height());
-  if (isSubframe(renderer()))
-    boundsRect.intersect(frameVisibleRect(renderer()));
+  boundsRect.intersect(frameVisibleRect(renderer()));
 
   RenderLayer* insideLayer = hitTestLayer(this, info, point, boundsRect);
 
@@ -1618,11 +1612,6 @@ bool RenderLayer::hitTest(RenderObject::NodeInfo& info, const IntPoint& point) {
   // the root
   // layer).
   return insideLayer;
-}
-
-static inline bool shouldApplyImplicitCapture(RenderObject* renderer,
-                                              bool mouseDown) {
-  return mouseDown && renderer->isRoot();
 }
 
 RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
@@ -1717,8 +1706,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // contain the point so mouse move events keep getting delivered when dragging
   // outside the
   // window.
-  if ((bgRect.contains(mousePos) ||
-       shouldApplyImplicitCapture(renderer(), info.active())) &&
+  if (bgRect.contains(mousePos) &&
       renderer()->hitTest(
           info, mousePos.x(), mousePos.y(),
           layerBounds.x() - renderer()->xPos(),
@@ -1726,7 +1714,14 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
           HitTestSelf))
     return this;
 
-  // No luck.
+  // We didn't hit any layer.  However if the mouse is down, we must always at
+  // least be inside
+  // the render view.
+  if (info.active() && renderer()->isRenderView()) {
+    renderer()->setInnerNode(info);
+    return this;
+  }
+
   return 0;
 }
 
@@ -1858,6 +1853,9 @@ IntRect RenderLayer::selfClipRect() const {
 bool RenderLayer::intersectsDamageRect(const IntRect& layerBounds,
                                        const IntRect& damageRect) const {
   // Always examine the canvas and the root.
+  // FIXME: Could eliminate the isRoot() check if we fix background painting so
+  // that the RenderView
+  // paints the root's background.
   if (renderer()->isRenderView() || renderer()->isRoot())
     return true;
 
