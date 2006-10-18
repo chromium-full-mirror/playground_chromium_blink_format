@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2006 Samuel Weinig (sam.weinig@gmail.com)
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -281,10 +282,6 @@ Widget::FocusPolicy ListBox::focusPolicy() const {
 Widget::FocusPolicy TextField::focusPolicy() const {
   notImplemented();
   return NoFocus;
-}
-
-Cursor::Cursor(Image*, const IntPoint&) {
-  notImplemented();
 }
 
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
@@ -777,6 +774,9 @@ void Image::drawTiled(GraphicsContext*,
                       TileRule,
                       TileRule,
                       CompositeOperator) {}
+bool Image::getHBITMAP(HBITMAP) {
+  return false;
+}
 
 PopupMenu::PopupMenu(RenderMenuList*) {
   notImplemented();

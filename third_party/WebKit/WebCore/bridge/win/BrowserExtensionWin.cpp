@@ -41,12 +41,7 @@ namespace WebCore {
     OutputDebugStringA(buf);                                               \
   } while (0)
 
-BrowserExtensionWin::BrowserExtensionWin(WebCore::FrameWin* frame)
-    : m_frame(frame) {}
-
-void BrowserExtensionWin::setTypedIconURL(KURL const&, const String&) {}
-
-void BrowserExtensionWin::setIconURL(KURL const&) {}
+BrowserExtensionWin::BrowserExtensionWin(FrameWin* frame) : m_frame(frame) {}
 
 int BrowserExtensionWin::getHistoryLength() {
   return 0;
@@ -57,14 +52,10 @@ bool BrowserExtensionWin::canRunModal() {
   return 0;
 }
 
-void BrowserExtensionWin::createNewWindow(const FrameLoadRequest& request) {
-  m_frame->createNewWindow(request);
-}
-
 void BrowserExtensionWin::createNewWindow(const FrameLoadRequest& request,
-                                          const WindowFeatures& args,
-                                          Frame*& frame) {
-  m_frame->createNewWindow(request, args, frame);
+                                          const WindowFeatures& features,
+                                          Frame*& newFrame) {
+  m_frame->createNewWindow(request, features, newFrame);
 }
 
 bool BrowserExtensionWin::canRunModalNow() {
