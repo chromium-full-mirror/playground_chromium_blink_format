@@ -82,22 +82,6 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
   return request;
 }
 
-void didReceiveChallenge(CFURLConnectionRef conn,
-                         CFURLAuthChallengeRef challenge,
-                         const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
-
-  // Do nothing right now
-}
-
-void didCancelChallenge(CFURLConnectionRef conn,
-                        CFURLAuthChallengeRef challenge,
-                        const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
-
-  // Do nothing right now
-}
-
 void didReceiveResponse(CFURLConnectionRef conn,
                         CFURLResponseRef response,
                         const void* clientInfo) {
@@ -144,6 +128,7 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
 
   job->client()->receivedAllData(job, 0);
   job->client()->receivedAllData(job);
+  job->kill();
 }
 
 void didFail(CFURLConnectionRef conn,
@@ -162,6 +147,7 @@ void didFail(CFURLConnectionRef conn,
   job->setError(1);
   job->client()->receivedAllData(job, 0);
   job->client()->receivedAllData(job);
+  job->kill();
 }
 
 CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
@@ -169,6 +155,14 @@ CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
                                          const void* clientInfo) {
   ResourceLoader* job = (ResourceLoader*)clientInfo;
   return cachedResponse;
+}
+
+void didReceiveChallenge(CFURLConnectionRef conn,
+                         CFURLAuthChallengeRef challenge,
+                         const void* clientInfo) {
+  ResourceLoader* job = (ResourceLoader*)clientInfo;
+
+  // Do nothing right now
 }
 
 const unsigned BUF_LENGTH = 500;
@@ -254,7 +248,6 @@ CFArrayRef arrayFromFormData(const FormData& d) {
 
 void emptyPerform(void* unused) {}
 
-#if defined(LOADER_THREAD)
 static CFRunLoopRef loaderRL = 0;
 void runLoaderThread(void* unused) {
   loaderRL = CFRunLoopGetCurrent();
@@ -267,7 +260,6 @@ void runLoaderThread(void* unused) {
 
   CFRunLoopRun();
 }
-#endif
 
 bool ResourceLoader::start(DocLoader* docLoader) {
   CFURLRef url = d->URL.createCFURL();
@@ -280,6 +272,8 @@ bool ResourceLoader::start(DocLoader* docLoader) {
       CFHTTPMessageCreateRequest(0, requestMethod, url, kCFHTTPVersion1_1);
   CFRelease(requestMethod);
 
+  ref();
+  d->m_loading = true;
   str = queryMetaData("customHTTPHeader");
   CFStringRef headerString = CFStringCreateWithCharacters(
       0, (const UniChar*)str.characters(), str.length());
@@ -362,32 +356,26 @@ bool ResourceLoader::start(DocLoader* docLoader) {
                                   0,
                                   0,
                                   willSendRequest,
-                                  didReceiveChallenge,
-                                  didCancelChallenge,
                                   didReceiveResponse,
                                   didReceiveData,
+                                  NULL,
                                   didFinishLoading,
-                                  didFail};
+                                  didFail,
+                                  willCacheResponse,
+                                  didReceiveChallenge};
   d->m_connection = CFURLConnectionCreate(0, request, &client);
   CFRelease(request);
-  CFURLConnectionSetMaximumBufferSize(d->m_connection,
-                                      32 * 1024);  // Buffer up to 32K at a time
 
-#if defined(LOADER_THREAD)
   if (!loaderRL) {
     _beginthread(runLoaderThread, 0, 0);
     while (loaderRL == 0) {
       Sleep(10);
     }
   }
-#endif
 
-  CFURLConnectionScheduleWithRunLoop(d->m_connection, CFRunLoopGetCurrent(),
-                                     kCFRunLoopCommonModes);
-#if defined(LOADER_THREAD)
+  CFURLConnectionScheduleWithCurrentMessageQueue(d->m_connection);
   CFURLConnectionScheduleDownloadWithRunLoop(d->m_connection, loaderRL,
                                              kCFRunLoopDefaultMode);
-#endif
   CFURLConnectionStart(d->m_connection);
 
 #if defined(LOG_RESOURCELOADER_EVENTS)
@@ -407,6 +395,11 @@ void ResourceLoader::cancel() {
     CFRelease(d->m_connection);
     d->m_connection = 0;
   }
+
+  // Copied directly from ResourceLoaderWin.cpp
+  setError(1);
+  d->client->receivedAllData(this, 0);
+  d->client->receivedAllData(this);
 }
 
 }  // namespace WebCore
