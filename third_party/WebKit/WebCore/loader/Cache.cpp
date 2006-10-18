@@ -73,7 +73,9 @@ int Cache::flushCount = 0;
 Image* Cache::nullImage = 0;
 Image* Cache::brokenImage = 0;
 
+CachedResource* Cache::m_headOfUncacheableList = 0;
 int Cache::m_totalSizeOfLRULists = 0;
+int Cache::m_countOfLRUAndUncacheableLists;
 LRUList* Cache::m_LRULists = 0;
 
 void Cache::init() {
@@ -399,9 +401,17 @@ CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
 }
 #endif
 
-void Cache::flush() {
-  if (m_totalSizeOfLRULists <= maxSize)
+void Cache::flush(bool force) {
+  if (force)
+    flushCount = 0;
+  // Don't flush for every image.
+  if (m_countOfLRUAndUncacheableLists < flushCount)
     return;
+
+  init();
+
+  while (m_headOfUncacheableList)
+    remove(m_headOfUncacheableList);
 
   for (int i = maxLRULists - 1; i >= 0; i--) {
     if (m_totalSizeOfLRULists <= maxSize)
@@ -410,14 +420,18 @@ void Cache::flush() {
     while (m_totalSizeOfLRULists > maxSize && m_LRULists[i].m_tail)
       remove(m_LRULists[i].m_tail);
   }
+
+  flushCount = m_countOfLRUAndUncacheableLists +
+               10;  // Flush again when the cache has grown.
 }
 
 void Cache::setSize(int bytes) {
   maxSize = bytes;
   maxCacheable = max(maxSize / 128, minMaxCacheableObjectSize);
 
-  // Flush in case the new size is smaller.
-  flush();
+  // may be we need to clear parts of the cache
+  flushCount = 0;
+  flush(true);
 }
 
 void Cache::remove(CachedResource* object) {
@@ -474,32 +488,34 @@ LRUList* Cache::getLRUListFor(CachedResource* o) {
 }
 
 void Cache::removeFromLRUList(CachedResource* object) {
-  if (object->status() == CachedResource::Uncacheable ||
-      object->status() == CachedResource::Persistent)
-    return;
-
   CachedResource* next = object->m_nextInLRUList;
   CachedResource* prev = object->m_prevInLRUList;
+  bool uncacheable = object->status() == CachedResource::Uncacheable;
 
-  LRUList* list = getLRUListFor(object);
+  LRUList* list = uncacheable ? 0 : getLRUListFor(object);
+  CachedResource*& head = uncacheable ? m_headOfUncacheableList : list->m_head;
 
-  if (next == 0 && prev == 0 && list->m_head != object)
+  if (next == 0 && prev == 0 && head != object) {
     return;
+  }
 
   object->m_nextInLRUList = 0;
   object->m_prevInLRUList = 0;
 
   if (next)
     next->m_prevInLRUList = prev;
-  else if (list->m_tail == object)
+  else if (!uncacheable && list->m_tail == object)
     list->m_tail = prev;
 
   if (prev)
     prev->m_nextInLRUList = next;
-  else if (list->m_head == object)
-    list->m_head = next;
+  else if (head == object)
+    head = next;
 
-  m_totalSizeOfLRULists -= object->size();
+  --m_countOfLRUAndUncacheableLists;
+
+  if (!uncacheable)
+    m_totalSizeOfLRULists -= object->size();
 }
 
 void Cache::moveToHeadOfLRUList(CachedResource* object) {
@@ -513,15 +529,22 @@ void Cache::insertInLRUList(CachedResource* object) {
     return;
 
   LRUList* list = getLRUListFor(object);
-  object->m_nextInLRUList = list->m_head;
-  if (list->m_head)
-    list->m_head->m_prevInLRUList = object;
-  list->m_head = object;
 
-  if (object->m_nextInLRUList == 0)
+  bool uncacheable = object->status() == CachedResource::Uncacheable;
+  CachedResource*& head = uncacheable ? m_headOfUncacheableList : list->m_head;
+
+  object->m_nextInLRUList = head;
+  if (head)
+    head->m_prevInLRUList = object;
+  head = object;
+
+  if (object->m_nextInLRUList == 0 && !uncacheable)
     list->m_tail = object;
 
-  m_totalSizeOfLRULists += object->size();
+  ++m_countOfLRUAndUncacheableLists;
+
+  if (!uncacheable)
+    m_totalSizeOfLRULists += object->size();
 }
 
 bool Cache::adjustSize(CachedResource* object, int delta) {

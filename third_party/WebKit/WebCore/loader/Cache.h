@@ -119,7 +119,7 @@ class Cache {
   /**
    * clean up cache
    */
-  static void flush();
+  static void flush(bool force = false);
 
   /**
    * clears the cache
@@ -179,6 +179,10 @@ class Cache {
 
   static LRUList* m_LRULists;
   static int m_totalSizeOfLRULists;
+
+  static CachedResource* m_headOfUncacheableList;
+
+  static int m_countOfLRUAndUncacheableLists;
 };
 }
 
