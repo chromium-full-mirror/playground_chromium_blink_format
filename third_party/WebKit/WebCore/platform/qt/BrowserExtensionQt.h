@@ -40,7 +40,7 @@ class BrowserExtensionQt : public BrowserExtension {
 
   virtual void createNewWindow(const FrameLoadRequest&);
   virtual void createNewWindow(const FrameLoadRequest&,
-                               const WindowArgs&,
+                               const WindowFeatures&,
                                Frame*&);
 
   virtual void setIconURL(const KURL&);

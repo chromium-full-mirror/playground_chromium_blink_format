@@ -36,7 +36,7 @@ class FrameWinClient {
  public:
   virtual void createNewWindow(const ResourceRequest&) = 0;
   virtual void createNewWindow(const ResourceRequest&,
-                               const WindowArgs&,
+                               const WindowFeatures&,
                                Frame*& part) = 0;
   virtual void openURL(const DeprecatedString&, bool lockHistory) = 0;
   virtual void submitForm(const String& method,
@@ -53,7 +53,7 @@ class FrameWin : public Frame {
 
   virtual void createNewWindow(const FrameLoadRequest&);
   virtual void createNewWindow(const FrameLoadRequest&,
-                               const WindowArgs&,
+                               const WindowFeatures&,
                                Frame*& part);
   virtual bool openURL(const KURL&);
   virtual void openURLRequest(const FrameLoadRequest&);

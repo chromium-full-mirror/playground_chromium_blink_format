@@ -412,7 +412,7 @@ bool BrowserExtensionGdk::canRunModal() {
 }
 void BrowserExtensionGdk::createNewWindow(
     struct WebCore::FrameLoadRequest const&,
-    struct WebCore::WindowArgs const&,
+    struct WebCore::WindowFeatures const&,
     Frame*&) {
   notImplemented();
 }
