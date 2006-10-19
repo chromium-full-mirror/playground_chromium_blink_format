@@ -90,7 +90,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
       void* oldErrorContext = xmlGenericErrorContext;
 
       Vector<char> data = ServeSynchronousRequest(
-          Cache::loader(), globalDocLoader, loader.get(), finalURL, headers);
+          cache()->loader(), globalDocLoader, loader.get(), finalURL, headers);
 
       xmlSetGenericErrorFunc(0, parseErrorFunc);
       // We don't specify an encoding here. Neither Gecko nor WinIE respects

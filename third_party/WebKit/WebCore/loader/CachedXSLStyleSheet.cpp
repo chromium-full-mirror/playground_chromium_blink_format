@@ -55,7 +55,7 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
       "application/rss+xml, application/atom+xml");
 
   // load the file
-  Cache::loader()->load(dl, this, false);
+  cache()->loader()->load(dl, this, false);
   m_loading = true;
 }
 
@@ -64,13 +64,6 @@ void CachedXSLStyleSheet::ref(CachedResourceClient* c) {
 
   if (!m_loading)
     c->setXSLStyleSheet(m_url, m_sheet);
-}
-
-void CachedXSLStyleSheet::deref(CachedResourceClient* c) {
-  Cache::flush();
-  CachedResource::deref(c);
-  if (canDelete() && m_free)
-    delete this;
 }
 
 void CachedXSLStyleSheet::setCharset(const String& chs) {

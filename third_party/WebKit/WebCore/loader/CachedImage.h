@@ -56,7 +56,6 @@ class CachedImage : public CachedResource, public ImageAnimationObserver {
   IntRect imageRect() const;  // The size of the image.
 
   virtual void ref(CachedResourceClient*);
-  virtual void deref(CachedResourceClient*);
 
   virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
   virtual void data(Vector<char>&, bool allDataReceived);
@@ -74,6 +73,11 @@ class CachedImage : public CachedResource, public ImageAnimationObserver {
 
   virtual bool shouldStopAnimation(const Image* image);
   virtual void animationAdvanced(const Image* image);
+
+  bool stillNeedsLoad() const {
+    return !m_errorOccurred && m_status == Unknown && m_loading == false;
+  }
+  void load();
 
  private:
   void createImage();
