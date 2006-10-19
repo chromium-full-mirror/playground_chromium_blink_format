@@ -79,6 +79,7 @@
 #define WebKitShowsURLsInToolTipsPreferenceKey @"WebKitShowsURLsInToolTips"
 #define WebKitPDFDisplayModePreferenceKey @"WebKitPDFDisplayMode"
 #define WebKitPDFScaleFactorPreferenceKey @"WebKitPDFScaleFactor"
+#define WebKitUsePDFPreviewViewPreferenceKey @"WebKitUsePDFPreviewView"
 #define WebKitEditableLinkBehaviorPreferenceKey @"WebKitEditableLinkBehavior"
 
 // Window display is throttled to 60 frames per second if
