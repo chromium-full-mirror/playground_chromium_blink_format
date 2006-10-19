@@ -79,7 +79,7 @@ class CachedResource {
                  unsigned size = 0);
   virtual ~CachedResource();
 
-  virtual void setCharset(const String&) {}
+  virtual void setEncoding(const String&) {}
   virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
   virtual void data(Vector<char>&, bool allDataReceived) = 0;
   virtual void error() = 0;

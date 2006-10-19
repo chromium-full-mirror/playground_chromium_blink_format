@@ -85,6 +85,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
   void setError(int);
   String errorText() const;
   bool isErrorPage() const;
+  String responseEncoding() const;
   String queryMetaData(const String&) const;
   void addMetaData(const String& key, const String& value);
   void addMetaData(const HashMap<String, String>&);
@@ -133,7 +134,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
 
  private:
   void assembleResponseHeaders() const;
-  void retrieveCharset() const;
+  void retrieveResponseEncoding() const;
 
   ResourceLoaderInternal* d;
 };
