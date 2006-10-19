@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef KXMLCORE_HASH_SET_H
-#define KXMLCORE_HASH_SET_H
+#ifndef WTF_HashSet_h
+#define WTF_HashSet_h
 
 #include "HashTable.h"
 
@@ -348,4 +348,4 @@ inline void deleteAllValues(const HashSet<T, U, V>& collection) {
 
 using WTF::HashSet;
 
-#endif /* KXMLCORE_HASH_SET_H */
+#endif /* WTF_HashSet_h */

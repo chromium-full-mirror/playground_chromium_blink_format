@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KXMLCORE_VECTOR_H
-#define KXMLCORE_VECTOR_H
+#ifndef WTF_Vector_h
+#define WTF_Vector_h
 
 #include "Assertions.h"
 #include "FastMalloc.h"
@@ -591,4 +591,4 @@ void deleteAllValues(const Vector<T, inlineCapacity>& collection) {
 
 using WTF::Vector;
 
-#endif  // KXMLCORE_VECTOR_H
+#endif  // WTF_Vector_h

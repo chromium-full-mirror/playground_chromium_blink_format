@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef KXMLCORE_HASH_MAP_H
-#define KXMLCORE_HASH_MAP_H
+#ifndef WTF_HashMap_h
+#define WTF_HashMap_h
 
 #include "HashTable.h"
 
@@ -339,4 +339,4 @@ inline void deleteAllValues(const HashMap<T, U, V, W, X>& collection) {
 
 using WTF::HashMap;
 
-#endif /* KXMLCORE_HASH_MAP_H */
+#endif /* WTF_HashMap_h */

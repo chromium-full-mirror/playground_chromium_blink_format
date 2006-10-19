@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KXMLCORE_VECTOR_TRAITS_H
-#define KXMLCORE_VECTOR_TRAITS_H
+#ifndef WTF_VectorTraits_h
+#define WTF_VectorTraits_h
 
 #include "RefPtr.h"
 #include <utility>
@@ -163,4 +163,4 @@ struct VectorTraits<pair<First, Second>> {
 using WTF::VectorTraits;
 using WTF::SimpleClassVectorTraits;
 
-#endif  // KXMLCORE_VECTOR_TRAITS_H
+#endif  // WTF_VectorTraits_h

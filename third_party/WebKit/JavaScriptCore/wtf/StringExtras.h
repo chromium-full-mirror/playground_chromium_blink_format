@@ -23,6 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef WTF_StringExtras_h
+#define WTF_StringExtras_h
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -39,3 +42,5 @@ inline int strncasecmp(const char* s1, const char* s2, int len) {
 }
 
 #endif
+
+#endif  // WTF_StringExtras_h

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef KXMLCORE_LIST_REF_PTR_H
-#define KXMLCORE_LIST_REF_PTR_H
+#ifndef WTF_ListRefPtr_h
+#define WTF_ListRefPtr_h
 
 #include <wtf/RefPtr.h>
 
@@ -79,4 +79,4 @@ inline T* getPtr(const ListRefPtr<T>& p) {
 
 using WTF::ListRefPtr;
 
-#endif  // KXMLCORE_LIST_REF_PTR_H
+#endif  // WTF_ListRefPtr_h

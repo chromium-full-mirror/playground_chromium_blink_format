@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef KXMLCORE_OWN_PTR_H
-#define KXMLCORE_OWN_PTR_H
+#ifndef WTF_OwnPtr_h
+#define WTF_OwnPtr_h
 
 #include <algorithm>
 #include <wtf/Assertions.h>
@@ -93,4 +93,4 @@ inline T* getPtr(const OwnPtr<T>& p) {
 
 using WTF::OwnPtr;
 
-#endif  // KXMLCORE_OWN_PTR_H
+#endif  // WTF_OwnPtr_h
