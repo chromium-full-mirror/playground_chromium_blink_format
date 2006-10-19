@@ -52,7 +52,6 @@ class FrameWin : public Frame {
   FrameWin(Page*, Element*, FrameWinClient*);
   ~FrameWin();
 
-  virtual void createNewWindow(const FrameLoadRequest&);
   virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowFeatures&,
                                Frame*& part);
