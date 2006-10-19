@@ -75,7 +75,7 @@ Vector<char> ServeSynchronousRequest(Loader*,
 }
 
 int NumberOfPendingOrLoadingRequests(DocLoader* docLoader) {
-  return Cache::loader()->numRequests(docLoader);
+  return cache()->loader()->numRequests(docLoader);
 }
 
 bool CheckIfReloading(WebCore::DocLoader* docLoader) {
@@ -90,9 +90,7 @@ void CheckCacheObjectStatus(DocLoader* docLoader,
     return;
 
   switch (cachedObject->status()) {
-    case CachedResource::Persistent:
     case CachedResource::Cached:
-    case CachedResource::Uncacheable:
       break;
     case CachedResource::NotCached:
     case CachedResource::Unknown:

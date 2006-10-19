@@ -65,6 +65,7 @@ class Cursors {
   Cursors()
       : CrossCursor(QCursor(Qt::CrossCursor)),
         MoveCursor(QCursor(Qt::SizeAllCursor)),
+        PointerCursor(QCursor(Qt::ArrowCursor)),
         PointingHandCursor(QCursor(Qt::PointingHandCursor)),
         IBeamCursor(QCursor(Qt::IBeamCursor)),
         WaitCursor(QCursor(Qt::WaitCursor)),
@@ -84,6 +85,7 @@ class Cursors {
 
   Cursor CrossCursor;
   Cursor MoveCursor;
+  Cursor PointerCursor;
   Cursor PointingHandCursor;
   Cursor IBeamCursor;
   Cursor WaitCursor;
@@ -104,6 +106,10 @@ Cursors* Cursors::self() {
 
   return s_self;
 }
+}
+
+const Cursor& pointerCursor() {
+  return Cursors::self()->PointerCursor;
 }
 
 const Cursor& moveCursor() {

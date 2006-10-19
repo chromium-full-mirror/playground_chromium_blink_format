@@ -26,8 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <wtf/Platform.h>
 
+#include "KURL.h"
 #include "BrowserExtensionQt.h"
 
 #define notImplemented()                                                  \
@@ -43,8 +45,6 @@ bool BrowserExtensionQt::canRunModal() {
   notImplemented();
   return false;
 }
-
-void BrowserExtensionQt::createNewWindow(const FrameLoadRequest& request) {}
 
 void BrowserExtensionQt::createNewWindow(const FrameLoadRequest& request,
                                          const WindowFeatures& args,
@@ -68,14 +68,6 @@ void BrowserExtensionQt::goBackOrForward(int) {
 KURL BrowserExtensionQt::historyURL(int distance) {
   notImplemented();
   return KURL();
-}
-
-void BrowserExtensionQt::setTypedIconURL(KURL const&, const String&) {
-  notImplemented();
-}
-
-void BrowserExtensionQt::setIconURL(KURL const&) {
-  notImplemented();
 }
 
 int BrowserExtensionQt::getHistoryLength() {
