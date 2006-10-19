@@ -112,6 +112,7 @@ Position positionOutsideContainingSpecialElement(
     Node** containingSpecialElement = 0);
 
 Node* enclosingNodeWithTag(Node*, const QualifiedName&);
+Node* enclosingNodeOfType(Node*, bool (*nodeIsOfType)(Node*));
 Node* enclosingTableCell(Node*);
 Node* enclosingEmptyListItem(const VisiblePosition&);
 bool isListElement(Node*);
