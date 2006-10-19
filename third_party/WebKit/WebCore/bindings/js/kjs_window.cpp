@@ -2140,7 +2140,7 @@ UString FrameArray::toString(ExecState*) const {
 
 ////////////////////// Location Object ////////////////////////
 
-const ClassInfo Location::info = {"Location", 0, 0, 0};
+const ClassInfo Location::info = {"Location", 0, &LocationTable, 0};
 /*
 @begin LocationTable 12
   assign        Location::Assign        DontDelete|Function 1
@@ -2152,7 +2152,6 @@ const ClassInfo Location::info = {"Location", 0, 0, 0};
   port          Location::Port          DontDelete
   protocol      Location::Protocol      DontDelete
   search        Location::Search        DontDelete
-  [[==]]        Location::EqualEqual    DontDelete|ReadOnly
   toString      Location::ToString      DontDelete|Function 0
   replace       Location::Replace       DontDelete|Function 1
   reload        Location::Reload        DontDelete|Function 0
@@ -2361,7 +2360,7 @@ JSValue* LocationFunc::callAsFunction(ExecState* exec,
 
 ////////////////////// Selection Object ////////////////////////
 
-const ClassInfo Selection::info = {"Selection", 0, 0, 0};
+const ClassInfo Selection::info = {"Selection", 0, &SelectionTable, 0};
 /*
 @begin SelectionTable 19
   anchorNode                Selection::AnchorNode DontDelete|ReadOnly
@@ -2374,7 +2373,6 @@ const ClassInfo Selection::info = {"Selection", 0, 0, 0};
   extentOffset              Selection::ExtentOffset DontDelete|ReadOnly
   isCollapsed               Selection::IsCollapsed DontDelete|ReadOnly
   type                      Selection::_Type DontDelete|ReadOnly
-  [[==]]                    Selection::EqualEqual DontDelete|ReadOnly
   toString                  Selection::ToString DontDelete|Function 0
   collapse                  Selection::Collapse DontDelete|Function 2
   collapseToEnd             Selection::CollapseToEnd DontDelete|Function 0
@@ -2486,7 +2484,7 @@ JSValue* SelectionFunc::callAsFunction(ExecState* exec,
 
 ////////////////////// BarInfo Object ////////////////////////
 
-const ClassInfo BarInfo::info = {"BarInfo", 0, 0, 0};
+const ClassInfo BarInfo::info = {"BarInfo", 0, &BarInfoTable, 0};
 /*
 @begin BarInfoTable 1
   visible                BarInfo::Visible DontDelete|ReadOnly
@@ -2529,7 +2527,7 @@ bool BarInfo::getOwnPropertySlot(ExecState* exec,
 
 ////////////////////// History Object ////////////////////////
 
-const ClassInfo History::info = {"History", 0, 0, 0};
+const ClassInfo History::info = {"History", 0, &HistoryTable, 0};
 /*
 @begin HistoryTable 4
   length        History::Length         DontDelete|ReadOnly
@@ -2548,17 +2546,12 @@ bool History::getOwnPropertySlot(ExecState* exec,
 }
 
 JSValue* History::getValueProperty(ExecState*, int token) const {
-  switch (token) {
-    case Length: {
-      BrowserExtension* ext = m_frame->browserExtension();
-      if (!ext)
-        return jsNumber(0);
+  ASSERT(token == Length);
+  BrowserExtension* ext = m_frame->browserExtension();
+  if (!ext)
+    return jsNumber(0);
 
-      return jsNumber(ext->getHistoryLength());
-    }
-    default:
-      return jsUndefined();
-  }
+  return jsNumber(ext->getHistoryLength());
 }
 
 UString History::toString(ExecState* exec) const {
