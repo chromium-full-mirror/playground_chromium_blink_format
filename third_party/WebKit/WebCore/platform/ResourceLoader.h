@@ -85,6 +85,10 @@ class ResourceLoader : public Shared<ResourceLoader> {
   void setError(int);
   String errorText() const;
   bool isErrorPage() const;
+
+  void setRequestHeaders(const HashMap<String, String>& requestHeaders);
+  const HashMap<String, String>& requestHeaders() const;
+
   String responseEncoding() const;
   String queryMetaData(const String&) const;
   void addMetaData(const String& key, const String& value);

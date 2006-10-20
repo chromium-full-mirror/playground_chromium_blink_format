@@ -22,10 +22,12 @@
 #ifndef XMLHTTPREQUEST_H_
 #define XMLHTTPREQUEST_H_
 
-#include "KURL.h"
-#include "PlatformString.h"
-#include "ResourceLoaderClient.h"
+#include <wtf/HashMap.h>
 #include <wtf/Vector.h>
+#include "KURL.h"
+#include "ResourceLoaderClient.h"
+#include "PlatformString.h"
+#include "StringHash.h"
 
 namespace WebCore {
 
@@ -99,7 +101,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
 
   bool responseIsXML() const;
 
-  DeprecatedString getRequestHeader(const DeprecatedString& name) const;
+  String getRequestHeader(const String& name) const;
   static DeprecatedString getSpecificHeader(const DeprecatedString& headers,
                                             const DeprecatedString& name);
 
@@ -113,7 +115,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
   KURL m_url;
   DeprecatedString m_method;
   bool m_async;
-  DeprecatedString m_requestHeaders;
+  HashMap<String, String> m_requestHeaders;
 
   RefPtr<ResourceLoader> m_loader;
 
