@@ -35,4 +35,11 @@ IntPoint::operator POINT() const {
   POINT p = {m_x, m_y};
   return p;
 }
+
+IntPoint::IntPoint(const POINTS& p) : m_x(p.x), m_y(p.y) {}
+
+IntPoint::operator POINTS() const {
+  POINTS p = {m_x, m_y};
+  return p;
+}
 }
