@@ -29,31 +29,28 @@
 #import "FrameLoaderTypes.h"
 #import <Cocoa/Cocoa.h>
 #import <wtf/Forward.h>
-#import <wtf/HashSet.h>
-#import <wtf/RefPtr.h>
-#import <wtf/Vector.h>
 
 namespace WebCore {
 class FormState;
-class MainResourceLoader;
-class WebResourceLoader;
 }
 
 @class DOMElement;
 @class WebDocumentLoader;
 @class WebCoreFrameBridge;
+@class WebLoader;
+@class WebMainResourceLoader;
 @class WebPolicyDecider;
 @protocol WebFrameLoaderClient;
 
-bool isBackForwardLoadType(FrameLoadType);
+BOOL isBackForwardLoadType(FrameLoadType type);
 
 @interface WebFrameLoader : NSObject {
   WebCoreFrameBridge* frameBridge;
 
-  WebCore::MainResourceLoader* m_mainResourceLoader;
+  WebMainResourceLoader* mainResourceLoader;
 
-  HashSet<RefPtr<WebCore::WebResourceLoader>>* m_subresourceLoaders;
-  HashSet<RefPtr<WebCore::WebResourceLoader>>* m_plugInStreamLoaders;
+  NSMutableArray* subresourceLoaders;
+  NSMutableArray* plugInStreamLoaders;
 
   id<WebFrameLoaderClient> client;
   WebDocumentLoader* documentLoader;
@@ -86,16 +83,16 @@ bool isBackForwardLoadType(FrameLoadType);
 }
 
 - (id)initWithFrameBridge:(WebCoreFrameBridge*)bridge;
-- (void)addPlugInStreamLoader:(WebCore::WebResourceLoader*)loader;
-- (void)removePlugInStreamLoader:(WebCore::WebResourceLoader*)loader;
+- (void)addPlugInStreamLoader:(WebLoader*)loader;
+- (void)removePlugInStreamLoader:(WebLoader*)loader;
 - (void)setDefersCallbacks:(BOOL)defers;
 - (void)stopLoadingPlugIns;
 - (BOOL)isLoadingMainResource;
 - (BOOL)isLoadingSubresources;
 - (BOOL)isLoading;
 - (void)stopLoadingSubresources;
-- (void)addSubresourceLoader:(WebCore::WebResourceLoader*)loader;
-- (void)removeSubresourceLoader:(WebCore::WebResourceLoader*)loader;
+- (void)addSubresourceLoader:(WebLoader*)loader;
+- (void)removeSubresourceLoader:(WebLoader*)loader;
 - (NSData*)mainResourceData;
 - (void)releaseMainResourceLoader;
 - (void)cancelMainResourceLoad;
@@ -161,9 +158,9 @@ bool isBackForwardLoadType(FrameLoadType);
 - (NSError*)fileDoesNotExistErrorWithResponse:(NSURLResponse*)response;
 - (BOOL)willUseArchiveForRequest:(NSURLRequest*)request
                      originalURL:(NSURL*)originalURL
-                          loader:(WebCore::WebResourceLoader*)loader;
-- (BOOL)archiveLoadPendingForLoader:(WebCore::WebResourceLoader*)loader;
-- (void)cancelPendingArchiveLoadForLoader:(WebCore::WebResourceLoader*)loader;
+                          loader:(WebLoader*)loader;
+- (BOOL)archiveLoadPendingForLoader:(WebLoader*)loader;
+- (void)cancelPendingArchiveLoadForLoader:(WebLoader*)loader;
 - (void)cannotShowMIMETypeWithResponse:(NSURLResponse*)response;
 - (NSError*)interruptForPolicyChangeErrorWithRequest:(NSURLRequest*)request;
 - (BOOL)isHostedByObjectElement;
