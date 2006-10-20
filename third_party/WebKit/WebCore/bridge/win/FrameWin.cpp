@@ -63,7 +63,8 @@ FrameWin::~FrameWin() {
   clearRecordedFormValues();
 }
 
-void FrameWin::urlSelected(const FrameLoadRequest& request) {
+void FrameWin::urlSelected(const FrameLoadRequest& request,
+                           const Event* /*triggeringEvent*/) {
   if (m_client)
     m_client->openURL(request.m_request.url().url(), request.lockHistory());
 }

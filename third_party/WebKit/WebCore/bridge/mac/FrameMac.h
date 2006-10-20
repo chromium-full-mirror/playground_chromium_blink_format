@@ -129,7 +129,8 @@ class FrameMac : public Frame {
 
   virtual void submitForm(const FrameLoadRequest&);
   virtual void openURLRequest(const FrameLoadRequest&);
-  virtual void urlSelected(const FrameLoadRequest&);
+  virtual void urlSelected(const FrameLoadRequest&,
+                           const Event* triggeringEvent);
 
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const String& mimeType);
