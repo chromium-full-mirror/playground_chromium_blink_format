@@ -39,6 +39,7 @@ class FrameView;
 }
 
 class WebKitPartClient;
+class WebKitPartBrowserExtension;
 
 class WebKitPart : public KParts::ReadOnlyPart {
   Q_OBJECT
@@ -95,6 +96,7 @@ class WebKitPart : public KParts::ReadOnlyPart {
   WTF::RefPtr<WebCore::FrameView> m_frameView;
 
   WebKitPartClient* m_client;
+  WebKitPartBrowserExtension* m_extension;
 };
 
 #endif

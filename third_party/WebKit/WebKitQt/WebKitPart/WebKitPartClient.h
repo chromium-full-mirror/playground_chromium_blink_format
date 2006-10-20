@@ -30,10 +30,16 @@
 
 #include "FrameQt.h"
 
+class WebKitPart;
 class WebKitPartClient : public WebCore::FrameQtClientDefault {
  public:
-  WebKitPartClient();
+  WebKitPartClient(WebKitPart*);
   virtual ~WebKitPartClient();
+
+  virtual void loadFinished() const;
+
+ private:
+  WebKitPart* m_part;
 };
 
 #endif
