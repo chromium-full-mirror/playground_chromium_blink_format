@@ -2044,8 +2044,10 @@ void Window::clearTimeout(int timeoutId, bool delAction) {
 void Window::timerFired(DOMWindowTimer* timer) {
   // Simple case for non-one-shot timers.
   if (timer->isActive()) {
+    int timeoutId = timer->timeoutId();
+
     timer->action()->execute(this);
-    if (timer->repeatInterval() &&
+    if (m_timeouts.contains(timeoutId) && timer->repeatInterval() &&
         timer->repeatInterval() < cMinimumTimerInterval) {
       timer->setNestingLevel(timer->nestingLevel() + 1);
       if (timer->nestingLevel() >= cMaxTimerNestingLevel)
