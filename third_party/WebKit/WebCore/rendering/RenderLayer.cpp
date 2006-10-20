@@ -905,8 +905,12 @@ void RenderLayer::autoscroll() {
       currentFrame->view()->currentMousePosition());
 
   if (currentFrame->mouseDownMayStartSelect()) {
-    VisiblePosition pos(renderer()->positionForPoint(currentPos));
-    currentFrame->updateSelectionForMouseDragOverPosition(pos);
+    RenderObject::NodeInfo renderInfo(true, false, true);
+    if (hitTest(renderInfo, currentPos)) {
+      VisiblePosition pos(
+          renderInfo.innerNode()->renderer()->positionForPoint(currentPos));
+      currentFrame->updateSelectionForMouseDragOverPosition(pos);
+    }
   }
 
   scrollRectToVisible(IntRect(currentPos, IntSize(1, 1)), gAlignToEdgeIfNeeded,
