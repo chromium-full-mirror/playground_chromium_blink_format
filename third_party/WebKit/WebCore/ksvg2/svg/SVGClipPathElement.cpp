@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -24,18 +24,16 @@
 #ifdef SVG_SUPPORT
 #include "SVGClipPathElement.h"
 
-#include "Attr.h"
 #include "Document.h"
+#include "KRenderingDevice.h"
 #include "RenderView.h"
 #include "SVGHelper.h"
-#include "SVGNames.h"
 #include "SVGMatrix.h"
-#include "SVGRenderStyle.h"
-#include "cssstyleselector.h"
+#include "SVGNames.h"
 #include "SVGUnitTypes.h"
-#include <kcanvas/device/KRenderingDevice.h>
+#include "cssstyleselector.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
                                        Document* doc)
@@ -91,7 +89,7 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
 
   RenderStyle* clipPathStyle = styleForRenderer(
       parent()->renderer());  // FIXME: Manual style resolution is a hack
-  for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
+  for (Node* n = firstChild(); n; n = n->nextSibling()) {
     SVGElement* e = svg_dynamic_cast(n);
     if (e && e->isStyled()) {
       SVGStyledElement* styled = static_cast<SVGStyledElement*>(e);
@@ -110,6 +108,7 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
   }
   clipPathStyle->deref(view()->renderArena());
   return m_clipper;
+}
 }
 
 // vim:ts=4:noet

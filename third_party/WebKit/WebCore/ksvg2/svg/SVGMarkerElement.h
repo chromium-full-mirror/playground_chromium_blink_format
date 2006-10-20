@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -57,14 +57,14 @@ class SVGMarkerElement : public SVGStyledElement,
 
   // 'SVGMarkerElement' functions
   void setOrientToAuto();
-  void setOrientToAngle(SVGAngle* angle);
+  void setOrientToAngle(SVGAngle*);
 
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual KCanvasMarker* canvasResource();
 
  protected:

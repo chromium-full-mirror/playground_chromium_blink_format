@@ -23,13 +23,12 @@
 #define SVGMaskElement_H
 #ifdef SVG_SUPPORT
 
-#include "SVGTests.h"
-#include "SVGLangSpace.h"
-#include "SVGURIReference.h"
-#include "SVGStyledLocatableElement.h"
-#include "SVGExternalResourcesRequired.h"
-
 #include "KCanvasMasker.h"
+#include "SVGExternalResourcesRequired.h"
+#include "SVGLangSpace.h"
+#include "SVGStyledLocatableElement.h"
+#include "SVGTests.h"
+#include "SVGURIReference.h"
 
 namespace WebCore {
 class Attribute;
@@ -46,13 +45,13 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
   // 'SVGMaskElement' functions
   virtual void childrenChanged();
-  virtual void attributeChanged(Attribute* attr, bool preserveDecls);
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void attributeChanged(Attribute*, bool preserveDecls);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual KCanvasMasker* canvasResource();
 
  protected:

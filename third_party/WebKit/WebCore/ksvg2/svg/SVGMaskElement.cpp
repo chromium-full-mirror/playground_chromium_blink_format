@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
                   2005 Alexander Kellett <lypanov@kde.org>
 
     This file is part of the KDE project
@@ -26,16 +26,13 @@
 #include "SVGMaskElement.h"
 
 #include "GraphicsContext.h"
-#include "RenderSVGContainer.h"
 #include "KCanvasImage.h"
 #include "KRenderingDevice.h"
-#include "SVGLength.h"
+#include "RenderSVGContainer.h"
 #include "SVGHelper.h"
+#include "SVGLength.h"
 #include "SVGNames.h"
-#include "SVGRenderStyle.h"
 #include "cssstyleselector.h"
-#include "ksvg.h"
-#include "Attr.h"
 #include <wtf/OwnPtr.h>
 #include <math.h>
 
