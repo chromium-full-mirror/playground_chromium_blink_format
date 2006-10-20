@@ -552,7 +552,7 @@ static Frame* createNewWindow(ExecState* exec,
   frameRequest.m_request = ResourceRequest(KURL(""));
   frameRequest.m_frameName = frameName;
   if (activePart)
-    frameRequest.m_request.setReferrer(activePart->referrer());
+    frameRequest.m_request.setHTTPReferrer(activePart->referrer());
 
   // FIXME: It's much better for client API if a new window starts with a URL,
   // here where we
@@ -1673,7 +1673,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 
       // request window (new or existing if framename is set)
       Frame* newFrame = 0;
-      frameRequest.m_request.setReferrer(activePart->referrer());
+      frameRequest.m_request.setHTTPReferrer(activePart->referrer());
       frame->browserExtension()->createNewWindow(frameRequest, windowFeatures,
                                                  newFrame);
       if (!newFrame)

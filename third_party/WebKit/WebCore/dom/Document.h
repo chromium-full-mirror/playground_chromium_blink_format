@@ -897,7 +897,7 @@ class Document : public ContainerNode {
   mutable HashMap<AtomicStringImpl*, Element*> m_elementsById;
   mutable HashCountedSet<AtomicStringImpl*> m_duplicateIds;
 
-  mutable HashMap<StringImpl*, Element*, CaseInsensitiveHash>
+  mutable HashMap<StringImpl*, Element*, CaseInsensitiveHash<StringImpl*>>
       m_elementsByAccessKey;
 
   InheritedBool m_designMode;

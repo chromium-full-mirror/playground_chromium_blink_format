@@ -589,14 +589,6 @@ void Frame::childBegin() {
   d->m_bComplete = false;
 }
 
-void Frame::setResourceRequest(const ResourceRequest& request) {
-  d->m_request = request;
-}
-
-const ResourceRequest& Frame::resourceRequest() const {
-  return d->m_request;
-}
-
 void Frame::setResponseMIMEType(const String& contentType) {
   d->m_responseMIMEType = contentType;
 }
@@ -1120,12 +1112,12 @@ void Frame::changeLocation(const DeprecatedString& URL,
     return;
   }
 
-  ResourceRequest request(completeURL(URL));
-  if (!referrer.isEmpty())
-    request.setReferrer(referrer);
-
-  request.reload = (d->m_cachePolicy == CachePolicyReload) ||
-                   (d->m_cachePolicy == CachePolicyRefresh);
+  ResourceRequestCachePolicy policy =
+      (d->m_cachePolicy == CachePolicyReload) ||
+              (d->m_cachePolicy == CachePolicyRefresh)
+          ? ReloadIgnoringCacheData
+          : UseProtocolCachePolicy;
+  ResourceRequest request(completeURL(URL), referrer, policy);
 
   urlSelected(request, "_self", lockHistory);
 }
@@ -1441,8 +1433,8 @@ void Frame::urlSelected(const ResourceRequest& request,
   if (d->m_bHTTPRefresh)
     d->m_bHTTPRefresh = false;
 
-  if (!d->m_referrer.isEmpty())
-    frameRequest.m_request.setReferrer(d->m_referrer);
+  if (frameRequest.m_request.httpReferrer().isEmpty())
+    frameRequest.m_request.setHTTPReferrer(d->m_referrer);
 
   urlSelected(frameRequest);
 }
@@ -1462,10 +1454,12 @@ bool Frame::requestFrame(Element* ownerElement,
 
   Frame* frame = tree()->child(frameName);
   if (frame) {
-    ResourceRequest request(url);
-    request.setReferrer(d->m_referrer);
-    request.reload = (d->m_cachePolicy == CachePolicyReload) ||
-                     (d->m_cachePolicy == CachePolicyRefresh);
+    ResourceRequestCachePolicy policy =
+        (d->m_cachePolicy == CachePolicyReload) ||
+                (d->m_cachePolicy == CachePolicyRefresh)
+            ? ReloadIgnoringCacheData
+            : UseProtocolCachePolicy;
+    ResourceRequest request(url, d->m_referrer, policy);
     FrameLoadRequest frameRequest;
     frameRequest.m_request = request;
     frame->openURLRequest(frameRequest);
@@ -1637,7 +1631,7 @@ void Frame::submitForm(const char* action,
   FrameLoadRequest frameRequest;
 
   if (!d->m_referrer.isEmpty())
-    frameRequest.m_request.setReferrer(d->m_referrer);
+    frameRequest.m_request.setHTTPReferrer(d->m_referrer);
 
   frameRequest.m_frameName =
       _target.isEmpty() ? d->m_doc->baseTarget() : _target;
@@ -1672,19 +1666,17 @@ void Frame::submitForm(const char* action,
   if (strcmp(action, "get") == 0) {
     if (u.protocol() != "mailto")
       u.setQuery(formData.flattenToString().deprecatedString());
-    frameRequest.m_request.setDoPost(false);
   } else {
-    frameRequest.m_request.postData = formData;
-    frameRequest.m_request.setDoPost(true);
+    frameRequest.m_request.setHTTPBody(formData);
+    frameRequest.m_request.setHTTPMethod("POST");
 
     // construct some user headers if necessary
     if (contentType.isNull() ||
         contentType == "application/x-www-form-urlencoded")
-      frameRequest.m_request.setContentType(
-          "Content-Type: application/x-www-form-urlencoded");
+      frameRequest.m_request.setHTTPContentType(contentType);
     else  // contentType must be "multipart/form-data"
-      frameRequest.m_request.setContentType("Content-Type: " + contentType +
-                                            "; boundary=" + boundary);
+      frameRequest.m_request.setHTTPContentType(contentType + "; boundary=" +
+                                                boundary);
   }
 
   if (d->m_runningScripts > 0) {
