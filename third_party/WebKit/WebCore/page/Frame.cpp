@@ -158,11 +158,12 @@ static inline Frame* parentFromOwnerElement(Element* ownerElement) {
   return ownerElement->document()->frame();
 }
 
-Frame::Frame(Page* page, Element* ownerElement)
+Frame::Frame(Page* page, Element* ownerElement, EditorClient* client)
     : d(new FramePrivate(page,
                          parentFromOwnerElement(ownerElement),
                          this,
-                         ownerElement)) {
+                         ownerElement,
+                         client)) {
   AtomicString::init();
   EventNames::init();
   HTMLNames::init();
@@ -1242,6 +1243,10 @@ bool Frame::hasSelection() const {
 
 SelectionController* Frame::selectionController() const {
   return &(d->m_selectionController);
+}
+
+Editor* Frame::editor() const {
+  return &(d->m_editor);
 }
 
 CommandByName* Frame::command() const {

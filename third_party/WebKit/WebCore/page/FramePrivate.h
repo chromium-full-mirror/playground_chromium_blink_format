@@ -34,6 +34,7 @@
 #include "DOMWindow.h"
 #include "Decoder.h"
 #include "EditCommand.h"
+#include "Editor.h"
 #include "FormData.h"
 #include "Frame.h"
 #include "FrameTree.h"
@@ -63,7 +64,8 @@ class FramePrivate {
   FramePrivate(Page* page,
                Frame* parent,
                Frame* thisFrame,
-               Element* ownerElement)
+               Element* ownerElement,
+               EditorClient* client)
       : m_page(page),
         m_treeNode(thisFrame, parent),
         m_ownerElement(ownerElement),
@@ -91,6 +93,7 @@ class FramePrivate {
         m_bMousePressed(false),
         m_selectionController(thisFrame),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
+        m_editor(thisFrame, client),
         m_command(thisFrame),
         m_caretVisible(false),
         m_caretPaint(true),
@@ -199,7 +202,7 @@ class FramePrivate {
   SelectionController m_selectionController;
   Selection m_mark;
   Timer<Frame> m_caretBlinkTimer;
-
+  Editor m_editor;
   CommandByName m_command;
 
   bool m_caretVisible : 1;
