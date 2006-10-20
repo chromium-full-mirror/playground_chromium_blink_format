@@ -71,8 +71,6 @@
 #include "IconDatabase.h"
 #include "CachedResource.h"
 
-using namespace WebCore;
-
 #define notImplemented()                                                   \
   do {                                                                     \
     char buf[256] = {0};                                                   \
@@ -80,6 +78,8 @@ using namespace WebCore;
               __LINE__);                                                   \
     OutputDebugStringA(buf);                                               \
   } while (0)
+
+namespace WebCore {
 
 void FrameView::updateBorder() {
   notImplemented();
@@ -191,6 +191,9 @@ bool TextField::edited() const {
 Slider::Slider() {
   notImplemented();
 }
+Slider::~Slider() {
+  notImplemented();
+}
 IntSize Slider::sizeHint() const {
   notImplemented();
   return IntSize();
@@ -202,9 +205,6 @@ void Slider::setMaxValue(double) {
   notImplemented();
 }
 void Slider::setMinValue(double) {
-  notImplemented();
-}
-Slider::~Slider() {
   notImplemented();
 }
 void Slider::setFont(WebCore::Font const&) {
@@ -287,19 +287,19 @@ Widget::FocusPolicy TextField::focusPolicy() const {
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
   notImplemented();
 }
-String WebCore::searchableIndexIntroduction() {
+String searchableIndexIntroduction() {
   notImplemented();
   return String();
 }
 
-int WebCore::findNextSentenceFromIndex(UChar const*, int, int, bool) {
+int findNextSentenceFromIndex(UChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
-void WebCore::findSentenceBoundary(UChar const*, int, int, int*, int*) {
+void findSentenceBoundary(UChar const*, int, int, int*, int*) {
   notImplemented();
 }
-int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
+int findNextWordFromIndex(UChar const*, int, int, bool) {
   notImplemented();
   return 0;
 }
@@ -441,6 +441,56 @@ bool FrameWin::isLoadTypeReload() {
 IntRect FrameWin::windowResizerRect() const {
   return IntRect();
 }
+void FrameWin::restoreDocumentState() {}
+void FrameWin::partClearedInBegin() {}
+void FrameWin::createEmptyDocument() {}
+String FrameWin::overrideMediaType() const {
+  return String();
+}
+Range* FrameWin::markedTextRange() const {
+  return 0;
+}
+bool FrameWin::passSubframeEventToSubframe(MouseEventWithHitTestResults&,
+                                           Frame*) {
+  return false;
+}
+bool FrameWin::lastEventIsMouseUp() const {
+  return false;
+}
+void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
+}
+bool FrameWin::shouldChangeSelection(const Selection&,
+                                     const Selection&,
+                                     EAffinity,
+                                     bool) const {
+  return true;
+}
+void FrameWin::respondToChangedSelection(const Selection&, bool) {}
+static int frameNumber = 0;
+Frame* FrameWin::createFrame(KURL const&,
+                             String const&,
+                             Element*,
+                             String const&) {
+  return 0;
+}
+void FrameWin::saveDocumentState() {}
+void FrameWin::clearUndoRedoOperations(void) {}
+String FrameWin::incomingReferrer() const {
+  return String();
+}
+void FrameWin::markMisspellingsInAdjacentWords(VisiblePosition const&) {}
+void FrameWin::respondToChangedContents(const Selection&) {}
+void FrameWin::handledOnloadEvents() {}
+Plugin* FrameWin::createPlugin(Element*,
+                               const KURL&,
+                               const Vector<String>&,
+                               const Vector<String>&,
+                               const String&) {
+  return 0;
+}
+ObjectContentType FrameWin::objectContentType(const KURL&, const String&) {
+  return ObjectContentNone;
+}
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
                                          const IntSize& topLeft,
@@ -454,11 +504,11 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   notImplemented();
 }
 
-int WebCore::screenDepthPerComponent(const Page*) {
+int screenDepthPerComponent(const Page*) {
   notImplemented();
   return 8;
 }
-bool WebCore::screenIsMonochrome(const Page*) {
+bool screenIsMonochrome(const Page*) {
   notImplemented();
   return false;
 }
@@ -473,34 +523,34 @@ const Cursor& WebCore::moveCursor() {
 
 bool AXObjectCache::gAccessibilityEnabled = false;
 
-bool WebCore::historyContains(DeprecatedString const&) {
+bool historyContains(DeprecatedString const&) {
   return false;
 }
-String WebCore::submitButtonDefaultLabel() {
+String submitButtonDefaultLabel() {
   return "Submit";
 }
-String WebCore::inputElementAltText() {
+String inputElementAltText() {
   return DeprecatedString();
 }
-String WebCore::resetButtonDefaultLabel() {
+String resetButtonDefaultLabel() {
   return "Reset";
 }
-String WebCore::fileButtonChooseFileLabel() {
+String fileButtonChooseFileLabel() {
   return "Browse...";
 }
-String WebCore::fileButtonNoFileSelectedLabel() {
+String fileButtonNoFileSelectedLabel() {
   return String();
 }
 
-String WebCore::defaultLanguage() {
+String defaultLanguage() {
   return "en";
 }
 
-void WebCore::findWordBoundary(UChar const* str,
-                               int len,
-                               int position,
-                               int* start,
-                               int* end) {
+void findWordBoundary(UChar const* str,
+                      int len,
+                      int position,
+                      int* start,
+                      int* end) {
   *start = position;
   *end = position;
 }
@@ -511,71 +561,16 @@ PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
 unsigned PlugInInfoStore::pluginCount() const {
   return 0;
 }
-bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
+bool PlugInInfoStore::supportsMIMEType(const String&) {
   return false;
 }
-void WebCore::refreshPlugins(bool) {}
+void refreshPlugins(bool) {}
 
-void WebCore::ResourceLoader::assembleResponseHeaders() const {}
-void WebCore::ResourceLoader::retrieveResponseEncoding() const {}
-bool WebCore::ResourceLoader::startHTTPRequest(const String& referrer) {
+void ResourceLoader::assembleResponseHeaders() const {}
+void ResourceLoader::retrieveResponseEncoding() const {}
+bool ResourceLoader::startHTTPRequest(const String& referrer) {
   return false;
 }
-
-void FrameWin::restoreDocumentState() {}
-void FrameWin::partClearedInBegin() {}
-void FrameWin::createEmptyDocument() {}
-String FrameWin::overrideMediaType() const {
-  return String();
-}
-Range* FrameWin::markedTextRange() const {
-  return 0;
-}
-bool FrameWin::passSubframeEventToSubframe(
-    WebCore::MouseEventWithHitTestResults&,
-    Frame*) {
-  return false;
-}
-bool FrameWin::lastEventIsMouseUp() const {
-  return false;
-}
-void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
-}
-bool FrameWin::shouldChangeSelection(const WebCore::Selection&,
-                                     const WebCore::Selection&,
-                                     WebCore::EAffinity,
-                                     bool) const {
-  return true;
-}
-void FrameWin::respondToChangedSelection(const WebCore::Selection&, bool) {}
-static int frameNumber = 0;
-Frame* FrameWin::createFrame(KURL const&,
-                             String const&,
-                             Element*,
-                             String const&) {
-  return 0;
-}
-void FrameWin::saveDocumentState() {}
-void FrameWin::clearUndoRedoOperations(void) {}
-String FrameWin::incomingReferrer() const {
-  return String();
-}
-void FrameWin::markMisspellingsInAdjacentWords(
-    WebCore::VisiblePosition const&) {}
-void FrameWin::respondToChangedContents(const Selection&) {}
-void FrameWin::handledOnloadEvents() {}
-Plugin* FrameWin::createPlugin(Element*,
-                               const KURL&,
-                               const Vector<String>&,
-                               const Vector<String>&,
-                               const String&) {
-  return 0;
-}
-ObjectContentType FrameWin::objectContentType(const KURL&, const String&) {
-  return ObjectContentNone;
-}
-
-namespace WebCore {
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
@@ -604,7 +599,6 @@ bool ResponseIsMultipart(PlatformResponse) {
 }
 time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
   return 0;
-}
 }
 
 void CachedResource::setResponse(PlatformResponse) {
@@ -698,7 +692,6 @@ void Path::addEllipse(const FloatRect&) {}
 TextField::TextField(TextField::Type type) {
   m_type = type;
 }
-
 TextField::~TextField() {}
 void TextField::setFont(WebCore::Font const&) {}
 void TextField::setAlignment(HorizontalAlignment) {}
@@ -761,10 +754,10 @@ ListBox::~ListBox() {}
 void ListBox::setSelectionMode(ListBox::SelectionMode) {}
 void ListBox::setFont(WebCore::Font const&) {}
 
-Color WebCore::focusRingColor() {
+Color focusRingColor() {
   return 0xFF0000FF;
 }
-void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
+void setFocusRingColorChangeFunction(void (*)()) {}
 
 void Frame::setNeedsReapplyStyles() {}
 
@@ -784,25 +777,10 @@ PopupMenu::PopupMenu(RenderMenuList*) {
 PopupMenu::~PopupMenu() {
   notImplemented();
 }
-void PopupMenu::clear() {
-  notImplemented();
-}
-void PopupMenu::populate() {
-  notImplemented();
-}
 void PopupMenu::show(const IntRect&, FrameView*, int index) {
   notImplemented();
 }
 void PopupMenu::hide() {
-  notImplemented();
-}
-void PopupMenu::addSeparator() {
-  notImplemented();
-}
-void PopupMenu::addGroupLabel(HTMLOptGroupElement*) {
-  notImplemented();
-}
-void PopupMenu::addOption(HTMLOptionElement*) {
   notImplemented();
 }
 
@@ -854,3 +832,5 @@ bool IconDatabase::setIconURLForPageURL(const String& iconURL,
                                         const String& pageURL) {
   return false;
 }
+
+}  // namespace WebCore
