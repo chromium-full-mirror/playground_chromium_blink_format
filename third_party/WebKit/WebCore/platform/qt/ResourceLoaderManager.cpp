@@ -154,9 +154,7 @@ void ResourceLoaderManager::add(ResourceLoader* job,
 
   KIO::Job* kioJob = 0;
 
-  if (job->method() == "GET")
-    kioJob = KIO::get(KUrl(url), false, false);
-  else if (job->method() == "POST") {
+  if (job->method() == "POST") {
     DeprecatedString postData =
         job->postData().flattenToString().deprecatedString();
     QByteArray postDataArray(postData.ascii(), postData.length());
@@ -165,7 +163,8 @@ void ResourceLoaderManager::add(ResourceLoader* job,
     kioJob->addMetaData("PropagateHttpHeader", "true");
     kioJob->addMetaData("content-type",
                         "Content-Type: application/x-www-form-urlencoded");
-  }
+  } else
+    kioJob = KIO::get(KUrl(url), false, false);
 
   Q_ASSERT(kioJob != 0);
 
