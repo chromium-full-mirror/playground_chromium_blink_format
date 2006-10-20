@@ -29,7 +29,10 @@
 #include "FrameQtClient.h"
 
 #include "FrameQt.h"
+#include "Document.h"
+#include "FrameTree.h"
 #include "ResourceLoader.h"
+#include "LoaderFunctions.h"
 #include "ResourceLoaderInternal.h"
 
 #include <kstdguiitem.h>
@@ -47,7 +50,7 @@ FrameQtClientDefault::FrameQtClientDefault()
 FrameQtClientDefault::~FrameQtClientDefault() {}
 
 void FrameQtClientDefault::setFrame(const FrameQt* frame) {
-  ASSERT(frame != 0);
+  ASSERT(frame);
   m_frame = const_cast<FrameQt*>(frame);
 }
 
@@ -58,17 +61,28 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   m_assignedMimetype = false;
 
   RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
-  loader->start(0);
+  loader->start(m_frame->document() ? m_frame->document()->docLoader() : 0);
 }
 
 void FrameQtClientDefault::submitForm(const String& method,
                                       const KURL& url,
                                       const FormData* postData) {
+  ASSERT(m_frame);
+
   m_assignedMimetype = false;
 
   RefPtr<ResourceLoader> loader =
       ResourceLoader::create(this, method, url, *postData);
-  loader->start(0);
+  loader->start(m_frame->document() ? m_frame->document()->docLoader() : 0);
+}
+
+void FrameQtClientDefault::checkLoaded() {
+  ASSERT(m_frame && m_frame->document() && m_frame->document()->docLoader());
+
+  // Recursively check the frame tree for open requests...
+  int num = numPendingOrLoadingRequests(true);
+  if (!num)
+    loadFinished();
 }
 
 void FrameQtClientDefault::runJavaScriptAlert(String const& message) {
@@ -140,11 +154,28 @@ void FrameQtClientDefault::receivedData(ResourceLoader* job,
   m_frame->write(data, length);
 }
 
+FrameQt* FrameQtClientDefault::traverseNextFrameStayWithin(
+    FrameQt* frame) const {
+  return QtFrame(m_frame->tree()->traverseNext(frame));
+}
+
+int FrameQtClientDefault::numPendingOrLoadingRequests(bool recurse) const {
+  if (!recurse)
+    return NumberOfPendingOrLoadingRequests(m_frame->document()->docLoader());
+
+  int num = 0;
+  for (FrameQt* frame = m_frame; frame != 0;
+       frame = traverseNextFrameStayWithin(frame))
+    num += NumberOfPendingOrLoadingRequests(frame->document()->docLoader());
+
+  return num;
+}
+
 void FrameQtClientDefault::receivedAllData(ResourceLoader* job,
                                            PlatformData data) {
+  ASSERT(m_frame);
+
   m_frame->end();
   m_assignedMimetype = false;
-
-  loadFinished();
 }
 }
