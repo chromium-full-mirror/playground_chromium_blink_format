@@ -1242,15 +1242,15 @@ bool Frame::hasSelection() const {
 }
 
 SelectionController* Frame::selectionController() const {
-  return &(d->m_selectionController);
+  return &d->m_selectionController;
 }
 
 Editor* Frame::editor() const {
-  return &(d->m_editor);
+  return &d->m_editor;
 }
 
 CommandByName* Frame::command() const {
-  return &(d->m_command);
+  return &d->m_command;
 }
 
 TextGranularity Frame::selectionGranularity() const {
@@ -2171,6 +2171,7 @@ void Frame::appliedEditing(PassRefPtr<EditCommand> cmd) {
     registerCommandForUndo(cmd);
   }
   respondToChangedContents(newSelection);
+  editor()->deleteButtonController()->respondToChangedContents(newSelection);
 }
 
 void Frame::unappliedEditing(PassRefPtr<EditCommand> cmd) {
@@ -2183,6 +2184,7 @@ void Frame::unappliedEditing(PassRefPtr<EditCommand> cmd) {
   d->m_lastEditCommand = 0;
   registerCommandForRedo(cmd);
   respondToChangedContents(newSelection);
+  editor()->deleteButtonController()->respondToChangedContents(newSelection);
 }
 
 void Frame::reappliedEditing(PassRefPtr<EditCommand> cmd) {
@@ -2195,6 +2197,7 @@ void Frame::reappliedEditing(PassRefPtr<EditCommand> cmd) {
   d->m_lastEditCommand = 0;
   registerCommandForUndo(cmd);
   respondToChangedContents(newSelection);
+  editor()->deleteButtonController()->respondToChangedContents(newSelection);
 }
 
 CSSMutableStyleDeclaration* Frame::typingStyle() const {
