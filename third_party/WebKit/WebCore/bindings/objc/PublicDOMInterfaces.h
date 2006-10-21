@@ -108,6 +108,7 @@
 - (DOMNodeList*)getElementsByTagNameNS:(NSString*)
                           namespaceURI:(NSString*)localName;
 - (DOMNode*)importNode:(DOMNode*)importedNode deep:(BOOL)deep;
+- (DOMNode*)adoptNode:(DOMNode*)source;
 - (DOMElement*)createElementNS:(NSString*)namespaceURI
                  qualifiedName:(NSString*)qualifiedName;
 - (DOMAttr*)createAttributeNS:(NSString*)namespaceURI
@@ -117,12 +118,18 @@
 - (DOMElement*)getElementById:(NSString*)elementId;
 - (DOMEvent*)createEvent:(NSString*)eventType;
 - (DOMRange*)createRange;
+- (DOMCSSStyleDeclaration*)createCSSStyleDeclaration;
 - (DOMCSSStyleDeclaration*)getOverrideStyle:(DOMElement*)
                                     element:(NSString*)pseudoElement;
 - (DOMCSSStyleDeclaration*)getOverrideStyle:(DOMElement*)element
                               pseudoElement:(NSString*)pseudoElement;
-- (DOMCSSStyleDeclaration*)createCSSStyleDeclaration;
-- (DOMNode*)adoptNode:(DOMNode*)source;
+- (DOMCSSStyleDeclaration*)getComputedStyle:(DOMElement*)element
+                              pseudoElement:(NSString*)pseudoElement;
+- (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)element
+                        pseudoElement:(NSString*)pseudoElement;
+- (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)element
+                        pseudoElement:(NSString*)pseudoElement
+                           authorOnly:(BOOL)authorOnly;
 #ifdef XPATH_SUPPORT
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
