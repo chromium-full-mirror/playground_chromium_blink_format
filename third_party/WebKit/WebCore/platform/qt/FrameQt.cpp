@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include "FrameQt.h"
+
 #include "Element.h"
 #include "RenderObject.h"
 #include "RenderWidget.h"
@@ -71,27 +72,32 @@
 
 namespace WebCore {
 
-static void doScroll(const RenderObject* r, bool isHorizontal, int multiplier) {
-  // FIXME: The scrolling done here should be done in the default handlers
-  // of the elements rather than here in the part.
-  if (!r)
-    return;
+// FIXME: Turned this off to fix buildbot. This function be either deleted or
+// used.
+#if 0
+static void doScroll(const RenderObject* r, bool isHorizontal, int multiplier)
+{
+    // FIXME: The scrolling done here should be done in the default handlers
+    // of the elements rather than here in the part.
+    if (!r)
+        return;
 
-  // broken since it calls scroll on scrollbars
-  // and we have none now
-  // r->scroll(direction, KWQScrollWheel, multiplier);
-  if (!r->layer())
-    return;
+    //broken since it calls scroll on scrollbars
+    //and we have none now
+    //r->scroll(direction, KWQScrollWheel, multiplier);
+    if (!r->layer())
+        return;
 
-  int x = r->layer()->scrollXOffset();
-  int y = r->layer()->scrollYOffset();
-  if (isHorizontal)
-    x += multiplier;
-  else
-    y += multiplier;
+    int x = r->layer()->scrollXOffset();
+    int y = r->layer()->scrollYOffset();
+    if (isHorizontal)
+        x += multiplier;
+    else
+        y += multiplier;
 
-  r->layer()->scrollToOffset(x, y, true, true);
+    r->layer()->scrollToOffset(x, y, true, true);
 }
+#endif
 
 FrameQt::FrameQt(Page* page,
                  Element* ownerElement,
