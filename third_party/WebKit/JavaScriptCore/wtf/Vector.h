@@ -227,6 +227,11 @@ class VectorBuffer<T, 0> {
   const T* buffer() const { return m_buffer; }
   size_t capacity() const { return m_capacity; }
 
+  void swap(VectorBuffer<T, 0>& other) {
+    std::swap(m_capacity, other.m_capacity);
+    std::swap(m_buffer, other.m_buffer);
+  }
+
   T* releaseBuffer() {
     T* buffer = m_buffer;
     m_buffer = 0;
@@ -278,10 +283,14 @@ class VectorBuffer : private VectorBuffer<T, 0> {
     return BaseBuffer::releaseBuffer();
   }
 
+  void swap(VectorBuffer<T, inlineCapacity>&);
+
  private:
   static const size_t m_inlineBufferSize = inlineCapacity * sizeof(T);
   T* inlineBuffer() { return reinterpret_cast<T*>(&m_inlineBuffer); }
 
+  // FIXME: Nothing guarantees this buffer is appropriately aligned to hold
+  // objects of type T.
   char m_inlineBuffer[m_inlineBufferSize];
 };
 
@@ -376,10 +385,15 @@ class Vector {
     TypeOperations::uninitializedFill(begin(), end(), val);
   }
 
-  void fill(const T& val, size_t size);
+  void fill(const T&, size_t);
   void fill(const T& val) { fill(val, size()); }
 
   T* releaseBuffer();
+
+  void swap(Vector<T, inlineCapacity>& other) {
+    std::swap(m_size, other.m_size);
+    m_impl.swap(other.m_impl);
+  }
 
  private:
   void expandCapacity(size_t newMinCapacity);
@@ -585,6 +599,11 @@ void deleteAllValues(const Vector<T, inlineCapacity>& collection) {
   iterator end = collection.end();
   for (iterator it = collection.begin(); it != end; ++it)
     delete *it;
+}
+
+template <typename T, size_t inlineCapacity>
+inline void swap(Vector<T, inlineCapacity>& a, Vector<T, inlineCapacity>& b) {
+  a.swap(b);
 }
 
 }  // namespace WTF
