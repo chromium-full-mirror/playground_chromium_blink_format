@@ -26,6 +26,7 @@
 #include "config.h"
 #include "Editor.h"
 
+#include "DeleteButtonController.h"
 #include "EditorClient.h"
 #include "Frame.h"
 #include "HTMLElement.h"
@@ -35,7 +36,7 @@
 namespace WebCore {
 
 // implement as platform-specific
-Pasteboard generalPasteboard() {
+static Pasteboard generalPasteboard() {
   return 0;
 }
 
@@ -96,7 +97,7 @@ void Editor::pasteAsPlainTextWithPasteboard(Pasteboard pasteboard) {}
 void Editor::pasteWithPasteboard(Pasteboard pasteboard, bool allowPlainText) {}
 
 Range* Editor::selectedRange() {
-  return NULL;
+  return 0;
 }
 
 bool Editor::shouldDeleteRange(Range* range) {
@@ -131,14 +132,24 @@ bool Editor::shouldShowDeleteInterface(HTMLElement* element) {
   return m_client->shouldShowDeleteInterface(element);
 }
 
+void Editor::respondToChangedSelection(const Selection& oldSelection) {
+  m_deleteButtonController->respondToChangedSelection(oldSelection);
+}
+
+void Editor::respondToChangedContents() {
+  m_deleteButtonController->respondToChangedContents();
+}
+
 // =============================================================================
 //
 // public editing commands
 //
 // =============================================================================
 
-Editor::Editor(Frame* frame, EditorClient* client)
-    : m_frame(frame), m_client(client), m_deleteButtonController(this) {}
+Editor::Editor(Frame* frame, PassRefPtr<EditorClient> client)
+    : m_frame(frame),
+      m_client(client),
+      m_deleteButtonController(new DeleteButtonController(frame)) {}
 
 Editor::~Editor() {}
 

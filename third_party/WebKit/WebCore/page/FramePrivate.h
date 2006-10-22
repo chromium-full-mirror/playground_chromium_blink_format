@@ -35,6 +35,7 @@
 #include "Decoder.h"
 #include "EditCommand.h"
 #include "Editor.h"
+#include "EditorClient.h"
 #include "FormData.h"
 #include "Frame.h"
 #include "FrameTree.h"
@@ -65,7 +66,7 @@ class FramePrivate {
                Frame* parent,
                Frame* thisFrame,
                Element* ownerElement,
-               EditorClient* client)
+               PassRefPtr<EditorClient> client)
       : m_page(page),
         m_treeNode(thisFrame, parent),
         m_ownerElement(ownerElement),
