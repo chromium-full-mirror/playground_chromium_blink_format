@@ -92,8 +92,8 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
   bool urlMatchesDocumentDomain(const KURL&) const;
 
   virtual void receivedRedirect(ResourceLoader*, const KURL&);
-  virtual void receivedData(ResourceLoader*, const char* data, int size);
-  virtual void receivedAllData(ResourceLoader*);
+  virtual void didReceiveData(ResourceLoader*, const char* data, int size);
+  virtual void didFinishLoading(ResourceLoader*);
 
   void processSyncLoadResults(const Vector<char>& data,
                               const KURL& finalURL,

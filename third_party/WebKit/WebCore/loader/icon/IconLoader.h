@@ -41,8 +41,8 @@ class IconLoader : public ResourceLoaderClient {
 
   // ResourceLoaderClient delegate methods
   virtual void receivedResponse(ResourceLoader*, PlatformResponse);
-  virtual void receivedData(ResourceLoader*, const char*, int);
-  virtual void receivedAllData(ResourceLoader*);
+  virtual void didReceiveData(ResourceLoader*, const char*, int);
+  virtual void didFinishLoading(ResourceLoader*);
 
  private:
   IconLoader(Frame* frame);

@@ -101,9 +101,9 @@ void FrameGdkClientDefault::receivedResponse(ResourceLoader*,
   // no-op
 }
 
-void FrameGdkClientDefault::receivedData(ResourceLoader* job,
-                                         const char* data,
-                                         int length) {
+void FrameGdkClientDefault::didReceiveData(ResourceLoader* job,
+                                           const char* data,
+                                           int length) {
   if (!m_beginCalled) {
     m_beginCalled = true;
 

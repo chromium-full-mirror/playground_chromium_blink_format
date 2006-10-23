@@ -115,7 +115,7 @@ void didReceiveData(CFURLConnectionRef conn,
   CFRelease(str);
 #endif
 
-  job->client()->receivedData(job, (const char*)bytes, length);
+  job->client()->didReceiveData(job, (const char*)bytes, length);
 }
 
 void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
@@ -129,7 +129,7 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
 #endif
 
   job->client()->receivedAllData(job, 0);
-  job->client()->receivedAllData(job);
+  job->client()->didFinishLoading(job);
   job->kill();
 }
 
@@ -148,7 +148,7 @@ void didFail(CFURLConnectionRef conn,
 
   job->setError(1);
   job->client()->receivedAllData(job, 0);
-  job->client()->receivedAllData(job);
+  job->client()->didFinishLoading(job);
   job->kill();
 }
 
@@ -383,7 +383,7 @@ void ResourceLoader::cancel() {
   // Copied directly from ResourceLoaderWin.cpp
   setError(1);
   d->client->receivedAllData(this, 0);
-  d->client->receivedAllData(this);
+  d->client->didFinishLoading(this);
 }
 
 }  // namespace WebCore
