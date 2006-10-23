@@ -126,7 +126,7 @@ class FrameMac : public Frame {
   virtual void setTitle(const String&);
   virtual void setStatusBarText(const String&);
 
-  bool loadRequest(const FrameLoadRequest& request,
+  void loadRequest(const FrameLoadRequest& request,
                    bool userGesture,
                    NSEvent* triggeringEvent = 0,
                    ObjCDOMElement* submitForm = 0,
