@@ -30,6 +30,7 @@
 #include "CreateLinkCommand.h"
 #include "Document.h"
 #include "DocumentFragment.h"
+#include "Editor.h"
 #include "FormatBlockCommand.h"
 #include "Frame.h"
 #include "HTMLNames.h"
@@ -540,8 +541,12 @@ Frame::TriState stateItalic(Frame* frame) {
   return stateStyle(frame, CSS_PROP_FONT_STYLE, "italic");
 }
 
-Frame::TriState stateList(Frame* frame) {
-  return frame->selectionListState();
+Frame::TriState stateUnorderedList(Frame* frame) {
+  return frame->editor()->selectionUnorderedListState();
+}
+
+Frame::TriState stateOrderedList(Frame* frame) {
+  return frame->editor()->selectionOrderedListState();
 }
 
 Frame::TriState stateStrikethrough(Frame* frame) {
@@ -643,8 +648,8 @@ CommandMap* createCommandDictionary() {
        {execInsertLineBreak, enabledAnyEditableSelection, stateNone,
         valueNull}},
       {"InsertOrderedList",
-       {execInsertOrderedList, enabledAnyRichlyEditableSelection, stateList,
-        valueNull}},
+       {execInsertOrderedList, enabledAnyRichlyEditableSelection,
+        stateOrderedList, valueNull}},
       {"InsertParagraph",
        {execInsertParagraph, enabledAnyEditableSelection, stateNone,
         valueNull}},
@@ -654,8 +659,8 @@ CommandMap* createCommandDictionary() {
       {"InsertText",
        {execInsertText, enabledAnyEditableSelection, stateNone, valueNull}},
       {"InsertUnorderedList",
-       {execInsertUnorderedList, enabledAnyRichlyEditableSelection, stateList,
-        valueNull}},
+       {execInsertUnorderedList, enabledAnyRichlyEditableSelection,
+        stateUnorderedList, valueNull}},
       {"Italic",
        {execItalic, enabledAnyRichlyEditableSelection, stateItalic, valueNull}},
       {"JustifyCenter",
