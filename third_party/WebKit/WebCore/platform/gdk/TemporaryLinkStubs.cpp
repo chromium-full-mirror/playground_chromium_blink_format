@@ -336,9 +336,6 @@ void FrameGdk::issueCutCommand() {
 void FrameGdk::issueCopyCommand() {
   notImplemented();
 }
-void FrameGdk::openURLRequest(struct WebCore::FrameLoadRequest const&) {
-  notImplemented();
-}
 void FrameGdk::issueUndoCommand() {
   notImplemented();
 }
