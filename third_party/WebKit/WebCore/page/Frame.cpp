@@ -1071,10 +1071,10 @@ void Frame::scheduleHistoryNavigation(int steps) {
   // except for the
   // fragment part, we don't need to schedule the navigation.
   if (d->m_extension) {
-    KURL u = d->m_extension->historyURL(steps);
+    KURL u = historyURL(steps);
 
     if (equalIgnoringRef(d->m_url, u)) {
-      d->m_extension->goBackOrForward(steps);
+      goBackOrForward(steps);
       return;
     }
   }
@@ -1136,7 +1136,7 @@ void Frame::redirectionTimerFired(Timer<Frame>*) {
       openURL(url());  /// ## need args.reload=true?
     else {
       if (d->m_extension) {
-        d->m_extension->goBackOrForward(d->m_scheduledHistoryNavigationSteps);
+        goBackOrForward(d->m_scheduledHistoryNavigationSteps);
       }
     }
     return;

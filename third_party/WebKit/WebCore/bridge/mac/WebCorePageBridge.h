@@ -70,6 +70,12 @@ class WebCoreFrameBridge;
 - (void)setWindowFrame:(NSRect)frame;
 - (NSRect)windowFrame;
 
+- (WebCorePageBridge*)createModalDialogWithURL:(NSURL*)URL
+                                      referrer:(NSString*)referrer;
+
+- (BOOL)canRunModal;
+- (BOOL)canRunModalNow;
+- (void)runModal;
 @end
 
 // This interface definition allows those who hold a WebCorePageBridge * to call

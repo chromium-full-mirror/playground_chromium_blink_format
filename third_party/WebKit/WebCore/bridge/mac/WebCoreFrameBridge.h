@@ -669,11 +669,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (WebCorePageBridge*)createWindowWithURL:(NSURL*)URL;
 - (void)showWindow;
 
-- (BOOL)canRunModal;
-- (BOOL)canRunModalNow;
-- (WebCorePageBridge*)createModalDialogWithURL:(NSURL*)URL;
-- (void)runModal;
-
 - (NSString*)userAgentForURL:(NSURL*)URL;
 
 - (void)setStatusText:(NSString*)status;

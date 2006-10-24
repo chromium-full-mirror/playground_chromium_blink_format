@@ -33,18 +33,9 @@ class FrameMac;
 class BrowserExtensionMac : public BrowserExtension {
  public:
   BrowserExtensionMac(Frame*);
-
   virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowFeatures&,
                                Frame*& newFrame);
-
-  virtual int getHistoryLength();
-  virtual void goBackOrForward(int distance);
-  virtual KURL historyURL(int distance);
-
-  virtual bool canRunModal();
-  virtual bool canRunModalNow();
-  virtual void runModal();
 
  private:
   FrameMac* m_frame;

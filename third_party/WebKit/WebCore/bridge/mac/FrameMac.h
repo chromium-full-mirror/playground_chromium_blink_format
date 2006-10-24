@@ -332,8 +332,6 @@ class FrameMac : public Frame {
   void setMarkedTextRange(const Range*, NSArray* attributes, NSArray* ranges);
   virtual Range* markedTextRange() const { return m_markedTextRange.get(); }
 
-  virtual bool canGoBackOrForward(int distance) const;
-
   virtual void didFirstLayout();
 
   NSMutableDictionary* dashboardRegionsDictionary();
@@ -364,6 +362,11 @@ class FrameMac : public Frame {
 
   NSEvent* currentEvent() { return _currentEvent; }
   virtual KURL originalRequestURL() const;
+
+  virtual bool canGoBackOrForward(int distance) const;
+  virtual void goBackOrForward(int distance);
+  virtual int getHistoryLength();
+  virtual KURL historyURL(int distance);
 
  protected:
   virtual void startRedirectionTimer();
