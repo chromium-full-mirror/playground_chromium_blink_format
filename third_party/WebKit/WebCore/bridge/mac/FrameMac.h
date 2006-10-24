@@ -115,6 +115,8 @@ class FrameMac : public Frame {
   ~FrameMac();
 
   // FIXME: Merge these and move them into WebFrameLoader.
+  virtual bool openURL(const KURL&);
+  virtual void openURLRequest(const FrameLoadRequest&);
   void loadRequest(const FrameLoadRequest&,
                    bool userGesture,
                    NSEvent* triggeringEvent = 0,

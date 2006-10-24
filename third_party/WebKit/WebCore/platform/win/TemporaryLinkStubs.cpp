@@ -357,6 +357,10 @@ bool FrameWin::shouldInterruptJavaScript() {
   notImplemented();
   return false;
 }
+bool FrameWin::openURL(KURL const&) {
+  notImplemented();
+  return 0;
+}
 void FrameWin::print() {
   notImplemented();
 }
@@ -372,6 +376,9 @@ void FrameWin::issueCutCommand() {
   notImplemented();
 }
 void FrameWin::issueCopyCommand() {
+  notImplemented();
+}
+void FrameWin::openURLRequest(const FrameLoadRequest&) {
   notImplemented();
 }
 bool FrameWin::passWheelEventToChildWidget(Node*) {
