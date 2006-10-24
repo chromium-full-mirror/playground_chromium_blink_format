@@ -37,6 +37,11 @@
 #include "Frame.h"
 #include "FrameView.h"
 
+#define notImplemented()                                                  \
+  do {                                                                    \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, __LINE__); \
+  } while (0)
+
 namespace WebCore {
 
 static QWidget* rootWindowForFrame(const Frame* frame) {
@@ -60,6 +65,20 @@ void Page::setWindowRect(const FloatRect& r) {
   if (widget)
     widget->setGeometry(QRect(qRound(r.x()), qRound(r.y()), qRound(r.width()),
                               qRound(r.height())));
+}
+
+bool Page::canRunModal() {
+  notImplemented();
+  return false;
+}
+
+bool Page::canRunModalNow() {
+  notImplemented();
+  return false;
+}
+
+void Page::runModal() {
+  notImplemented();
 }
 }
 
