@@ -36,12 +36,12 @@
 @class DOMElement;
 @class WebCoreFrameBridge;
 @class WebCoreFrameLoaderAsDelegate;
-@class WebDocumentLoader;
 @class WebPolicyDecider;
 @protocol WebFrameLoaderClient;
 
 namespace WebCore {
 
+class DocumentLoader;
 class FormState;
 class Frame;
 class MainResourceLoader;
@@ -60,7 +60,7 @@ class FrameLoader : Noncopyable {
   void prepareForLoadStart();
   void setupForReplace();
   void setupForReplaceByMIMEType(NSString* newMIMEType);
-  void finalSetupForReplace(WebDocumentLoader*);
+  void finalSetupForReplace(DocumentLoader*);
   void safeLoad(NSURL*);
   void load(NSURLRequest*);
   void load(NSURLRequest*, NSString* frameName);
@@ -68,11 +68,11 @@ class FrameLoader : Noncopyable {
             NSDictionary* triggeringAaction,
             FrameLoadType,
             PassRefPtr<FormState>);
-  void load(WebDocumentLoader*);
-  void load(WebDocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
+  void load(DocumentLoader*);
+  void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
   void load(NSURL*,
             NSString* referrer,
-            FrameLoadType loadType,
+            FrameLoadType,
             NSString* target,
             NSEvent* event,
             DOMElement* form,
@@ -96,9 +96,9 @@ class FrameLoader : Noncopyable {
   NSData* mainResourceData() const;
   void releaseMainResourceLoader();
 
-  WebDocumentLoader* activeDocumentLoader() const;
-  WebDocumentLoader* documentLoader() const;
-  WebDocumentLoader* provisionalDocumentLoader();
+  DocumentLoader* activeDocumentLoader() const;
+  DocumentLoader* documentLoader() const;
+  DocumentLoader* provisionalDocumentLoader();
   WebFrameState state() const;
   static double timeOfLastCompletedLoad();
 
@@ -156,16 +156,16 @@ class FrameLoader : Noncopyable {
   void reloadAllowingStaleData(NSString* overrideEncoding);
 
   void didReceiveServerRedirectForProvisionalLoadForFrame();
-  void finishedLoadingDocument(WebDocumentLoader*);
-  void committedLoad(WebDocumentLoader*, NSData* data);
+  void finishedLoadingDocument(DocumentLoader*);
+  void committedLoad(DocumentLoader*, NSData* data);
   bool isReplacing() const;
   void setReplacing();
-  void revertToProvisional(WebDocumentLoader*);
-  void setMainDocumentError(WebDocumentLoader*, NSError*);
-  void mainReceivedCompleteError(WebDocumentLoader*, NSError*);
+  void revertToProvisional(DocumentLoader*);
+  void setMainDocumentError(DocumentLoader*, NSError*);
+  void mainReceivedCompleteError(DocumentLoader*, NSError*);
   bool subframeIsLoading() const;
-  void willChangeTitle(WebDocumentLoader*);
-  void didChangeTitle(WebDocumentLoader*);
+  void willChangeTitle(DocumentLoader*);
+  void didChangeTitle(DocumentLoader*);
 
   FrameLoadType loadType() const;
 
@@ -245,7 +245,7 @@ class FrameLoader : Noncopyable {
                             NSString* frameName,
                             PassRefPtr<FormState>);
   void checkNavigationPolicy(NSURLRequest*,
-                             WebDocumentLoader*,
+                             DocumentLoader*,
                              PassRefPtr<FormState>,
                              id continuationObject,
                              SEL continuationSelector);
@@ -253,9 +253,9 @@ class FrameLoader : Noncopyable {
   void transitionToCommitted(NSDictionary* pageCache);
   void checkLoadCompleteForThisFrame();
 
-  void setDocumentLoader(WebDocumentLoader*);
-  void setPolicyDocumentLoader(WebDocumentLoader*);
-  void setProvisionalDocumentLoader(WebDocumentLoader*);
+  void setDocumentLoader(DocumentLoader*);
+  void setPolicyDocumentLoader(DocumentLoader*);
+  void setProvisionalDocumentLoader(DocumentLoader*);
 
   bool isLoadingPlugIns() const;
 
@@ -280,9 +280,9 @@ class FrameLoader : Noncopyable {
 
   id<WebFrameLoaderClient> m_client;
 
-  RetainPtr<WebDocumentLoader> m_documentLoader;
-  RetainPtr<WebDocumentLoader> m_provisionalDocumentLoader;
-  RetainPtr<WebDocumentLoader> m_policyDocumentLoader;
+  RefPtr<DocumentLoader> m_documentLoader;
+  RefPtr<DocumentLoader> m_provisionalDocumentLoader;
+  RefPtr<DocumentLoader> m_policyDocumentLoader;
 
   WebFrameState m_state;
   FrameLoadType m_loadType;

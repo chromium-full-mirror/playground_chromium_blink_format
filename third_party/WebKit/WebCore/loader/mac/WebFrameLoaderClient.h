@@ -29,6 +29,7 @@
 #import <Cocoa/Cocoa.h>
 
 namespace WebCore {
+class DocumentLoader;
 class WebResourceLoader;
 }
 
@@ -36,7 +37,6 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 
 @class DOMElement;
 @class WebCoreFrameBridge;
-@class WebDocumentLoader;
 @class WebPolicyDecider;
 @class WebResource;
 
@@ -55,7 +55,7 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 - (BOOL)_privateBrowsingEnabled;
 
 - (void)_makeDocumentView;
-- (void)_makeRepresentationForDocumentLoader:(WebDocumentLoader*)loader;
+- (void)_makeRepresentationForDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (void)_setDocumentViewFromPageCache:(NSDictionary*)dictionary;
 - (void)_forceLayout;
 - (void)_forceLayoutForNonHTML;
@@ -88,30 +88,32 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
                                  proxy:(id)proxy;
 
 - (id)_dispatchIdentifierForInitialRequest:(NSURLRequest*)request
-                        fromDocumentLoader:(WebDocumentLoader*)loader;
+                        fromDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (NSURLRequest*)_dispatchResource:(id)identifier
                    willSendRequest:(NSURLRequest*)clientRequest
                   redirectResponse:(NSURLResponse*)redirectResponse
-                fromDocumentLoader:(WebDocumentLoader*)loader;
+                fromDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (void)_dispatchDidReceiveAuthenticationChallenge:
             (NSURLAuthenticationChallenge*)currentWebChallenge
                                        forResource:(id)identifier
-                                fromDocumentLoader:(WebDocumentLoader*)loader;
+                                fromDocumentLoader:
+                                    (WebCore::DocumentLoader*)loader;
 - (void)_dispatchDidCancelAuthenticationChallenge:
             (NSURLAuthenticationChallenge*)currentWebChallenge
                                       forResource:(id)identifier
-                               fromDocumentLoader:(WebDocumentLoader*)loader;
+                               fromDocumentLoader:
+                                   (WebCore::DocumentLoader*)loader;
 - (void)_dispatchResource:(id)identifier
        didReceiveResponse:(NSURLResponse*)r
-       fromDocumentLoader:(WebDocumentLoader*)loader;
+       fromDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (void)_dispatchResource:(id)identifier
     didReceiveContentLength:(int)lengthReceived
-         fromDocumentLoader:(WebDocumentLoader*)loader;
+         fromDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (void)_dispatchResource:(id)identifier
-    didFinishLoadingFromDocumentLoader:(WebDocumentLoader*)loader;
+    didFinishLoadingFromDocumentLoader:(WebCore::DocumentLoader*)loader;
 - (void)_dispatchResource:(id)identifier
     didFailLoadingWithError:error
-         fromDocumentLoader:(WebDocumentLoader*)loader;
+         fromDocumentLoader:(WebCore::DocumentLoader*)loader;
 
 - (void)_dispatchDidHandleOnloadEventsForFrame;
 - (void)_dispatchDidReceiveServerRedirectForProvisionalLoadForFrame;
@@ -151,13 +153,15 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
            submissionDecider:(WebPolicyDecider*)decider;
 
 - (void)_dispatchDidLoadMainResourceForDocumentLoader:
-    (WebDocumentLoader*)loader;
-- (void)_clearLoadingFromPageCacheForDocumentLoader:(WebDocumentLoader*)loader;
-- (BOOL)_isDocumentLoaderLoadingFromPageCache:(WebDocumentLoader*)loader;
-- (void)_revertToProvisionalStateForDocumentLoader:(WebDocumentLoader*)loader;
+    (WebCore::DocumentLoader*)loader;
+- (void)_clearLoadingFromPageCacheForDocumentLoader:
+    (WebCore::DocumentLoader*)loader;
+- (BOOL)_isDocumentLoaderLoadingFromPageCache:(WebCore::DocumentLoader*)loader;
+- (void)_revertToProvisionalStateForDocumentLoader:
+    (WebCore::DocumentLoader*)loader;
 - (void)_setMainDocumentError:(NSError*)error
-            forDocumentLoader:(WebDocumentLoader*)loader;
-- (void)_clearUnarchivingStateForLoader:(WebDocumentLoader*)loader;
+            forDocumentLoader:(WebCore::DocumentLoader*)loader;
+- (void)_clearUnarchivingStateForLoader:(WebCore::DocumentLoader*)loader;
 
 - (void)_progressStarted;
 - (void)_progressCompleted;
@@ -171,15 +175,16 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 
 - (void)_startDownloadWithRequest:(NSURLRequest*)request;
 
-- (void)_willChangeTitleForDocument:(WebDocumentLoader*)loader;
-- (void)_didChangeTitleForDocument:(WebDocumentLoader*)loader;
+- (void)_willChangeTitleForDocument:(WebCore::DocumentLoader*)loader;
+- (void)_didChangeTitleForDocument:(WebCore::DocumentLoader*)loader;
 
-- (void)_committedLoadWithDocumentLoader:(WebDocumentLoader*)loader
+- (void)_committedLoadWithDocumentLoader:(WebCore::DocumentLoader*)loader
                                     data:(NSData*)data;
-- (void)_finishedLoadingDocument:(WebDocumentLoader*)loader;
-- (void)_documentLoader:(WebDocumentLoader*)loader
+- (void)_finishedLoadingDocument:(WebCore::DocumentLoader*)loader;
+- (void)_documentLoader:(WebCore::DocumentLoader*)loader
     setMainDocumentError:(NSError*)error;
-- (void)_finalSetupForReplaceWithDocumentLoader:(WebDocumentLoader*)loader;
+- (void)_finalSetupForReplaceWithDocumentLoader:
+    (WebCore::DocumentLoader*)loader;
 
 - (NSError*)_cancelledErrorWithRequest:(NSURLRequest*)request;
 - (NSError*)_cannotShowURLErrorWithRequest:(NSURLRequest*)request;
@@ -219,7 +224,8 @@ typedef struct LoadErrorResetToken LoadErrorResetToken;
 - (void)_addHistoryItemForFragmentScroll;
 - (void)_didFinishLoad;
 - (void)_prepareForDataSourceReplacement;
-- (WebDocumentLoader*)_createDocumentLoaderWithRequest:(NSURLRequest*)request;
+- (PassRefPtr<WebCore::DocumentLoader>)_createDocumentLoaderWithRequest:
+    (NSURLRequest*)request;
 - (void)_setTitle:(NSString*)title forURL:(NSURL*)URL;
 
 @end

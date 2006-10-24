@@ -28,13 +28,22 @@
 
 #import "WebDataSourcePrivate.h"
 
+#ifdef __cplusplus
+namespace WebCore {
+class DocumentLoader;
+}
+typedef WebCore::DocumentLoader WebCoreDocumentLoader;
+class WebDocumentLoaderMac;
+#else
+@class WebCoreDocumentLoader;
+@class WebDocumentLoaderMac;
+#endif
+
 @class DOMDocumentFragment;
 @class DOMElement;
 @class NSError;
 @class NSURL;
 @class WebArchive;
-@class WebDocumentLoader;
-@class WebDocumentLoaderMac;
 @class WebFrameBridge;
 @class WebResource;
 @class WebView;
@@ -68,5 +77,5 @@
 - (void)_revertToProvisionalState;
 - (void)_setMainDocumentError:(NSError*)error;
 - (void)_clearUnarchivingState;
-- (WebDocumentLoader*)_documentLoader;
+- (WebCoreDocumentLoader*)_documentLoader;
 @end

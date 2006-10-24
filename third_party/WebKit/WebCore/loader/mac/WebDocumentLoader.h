@@ -26,122 +26,132 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#include "RetainPtr.h"
+#include "Shared.h"
+#include <wtf/Vector.h>
+
+@class WebCoreFrameBridge;
 
 namespace WebCore {
+
 class Frame;
 class FrameLoader;
-}
 
-@interface WebDocumentLoader : NSObject {
- @public
-  WebCore::Frame* m_frame;
+typedef Vector<RetainPtr<NSURLResponse>> ResponseVector;
 
-  NSData* mainResourceData;
+class DocumentLoader : public Shared<DocumentLoader> {
+ public:
+  DocumentLoader(NSURLRequest*);
+  virtual ~DocumentLoader();
+
+  void setFrame(Frame*);
+  virtual void attachToFrame();
+  virtual void detachFromFrame();
+
+  FrameLoader* frameLoader() const;
+  NSData* mainResourceData() const;
+  NSURLRequest* originalRequest() const;
+  NSURLRequest* originalRequestCopy() const;
+  NSMutableURLRequest* request();
+  void setRequest(NSURLRequest*);
+  NSMutableURLRequest* actualRequest();
+  NSURLRequest* initialRequest() const;
+  NSURL* URL() const;
+  NSURL* unreachableURL() const;
+  void replaceRequestURLForAnchorScroll(NSURL*);
+  bool isStopping() const;
+  void stopLoading();
+  void setCommitted(bool);
+  bool isCommitted() const;
+  bool isLoading() const;
+  void setLoading(bool);
+  void updateLoading();
+  void receivedData(NSData*);
+  void setupForReplaceByMIMEType(NSString* newMIMEType);
+  void finishedLoading();
+  NSURLResponse* response() const;
+  NSError* mainDocumentError() const;
+  void mainReceivedError(NSError*, bool isComplete);
+  void setResponse(NSURLResponse*);
+  void prepareForLoadStart();
+  bool isClientRedirect() const;
+  void setIsClientRedirect(bool);
+  bool isLoadingInAPISense() const;
+  void setPrimaryLoadComplete(bool);
+  void setTitle(NSString*);
+  NSString* overrideEncoding() const;
+  void addResponse(NSURLResponse*);
+  const ResponseVector& responses() const;
+  NSDictionary* triggeringAction() const;
+  void setTriggeringAction(NSDictionary*);
+  void setOverrideEncoding(NSString*);
+  void setLastCheckedRequest(NSURLRequest* request);
+  NSURLRequest* lastCheckedRequest() const;
+  void stopRecordingResponses();
+  NSString* title() const;
+  NSURL* URLForHistory() const;
+
+ private:
+  void setMainResourceData(NSData*);
+  void setupForReplace();
+  void commitIfReady();
+  void clearErrors();
+  double loadingStartedTime() const;
+  WebCoreFrameBridge* bridge() const;
+  void setMainDocumentError(NSError*);
+  void commitLoad(NSData*);
+  bool doesProgressiveLoad(NSString* MIMEType) const;
+
+  Frame* m_frame;
+
+  RetainPtr<NSData> m_mainResourceData;
 
   // A reference to actual request used to create the data source.
   // This should only be used by the resourceLoadDelegate's
-  // identifierForInitialRequest:fromDatasource: method.  It is
+  // identifierForInitialRequest:fromDatasource: method. It is
   // not guaranteed to remain unchanged, as requests are mutable.
-  NSURLRequest* originalRequest;
+  RetainPtr<NSURLRequest> m_originalRequest;
 
   // A copy of the original request used to create the data source.
   // We have to copy the request because requests are mutable.
-  NSURLRequest* originalRequestCopy;
+  RetainPtr<NSURLRequest> m_originalRequestCopy;
 
-  // The 'working' request for this datasource.  It may be mutated
+  // The 'working' request. It may be mutated
   // several times from the original request to include additional
   // headers, cookie information, canonicalization and redirects.
-  NSMutableURLRequest* request;
+  RetainPtr<NSMutableURLRequest> m_request;
 
-  NSURLResponse* response;
+  RetainPtr<NSURLResponse> m_response;
 
-  NSError* mainDocumentError;
+  RetainPtr<NSError> m_mainDocumentError;
 
   // The time when the data source was told to start loading.
-  double loadingStartedTime;
+  double m_loadingStartedTime;
 
-  BOOL committed;
-  BOOL stopping;
-  BOOL loading;
-  BOOL gotFirstByte;
-  BOOL primaryLoadComplete;
-  BOOL isClientRedirect;
+  bool m_committed;
+  bool m_stopping;
+  bool m_loading;
+  bool m_gotFirstByte;
+  bool m_primaryLoadComplete;
+  bool m_isClientRedirect;
 
-  NSString* pageTitle;
+  RetainPtr<NSString> m_pageTitle;
 
-  NSString* encoding;
-  NSString* overrideEncoding;
+  RetainPtr<NSString> m_encoding;
+  RetainPtr<NSString> m_overrideEncoding;
 
-  // The action that triggered loading of this data source -
-  // we keep this around for the benefit of the various policy
-  // handlers.
-  NSDictionary* triggeringAction;
+  // The action that triggered loading - we keep this around for the
+  // benefit of the various policy handlers.
+  RetainPtr<NSDictionary> m_triggeringAction;
 
   // The last request that we checked click policy for - kept around
   // so we can avoid asking again needlessly.
-  NSURLRequest* lastCheckedRequest;
+  RetainPtr<NSURLRequest> m_lastCheckedRequest;
 
   // We retain all the received responses so we can play back the
   // WebResourceLoadDelegate messages if the item is loaded from the
   // page cache.
-  NSMutableArray* responses;
-  BOOL stopRecordingResponses;
+  ResponseVector m_responses;
+  bool m_stopRecordingResponses;
+};
 }
-
-- (id)initWithRequest:(NSURLRequest*)request;
-- (void)setFrame:(WebCore::Frame*)frame;
-- (WebCore::FrameLoader*)frameLoader;
-- (void)setMainResourceData:(NSData*)data;
-- (NSData*)mainResourceData;
-- (NSURLRequest*)originalRequest;
-- (NSURLRequest*)originalRequestCopy;
-- (NSMutableURLRequest*)request;
-- (void)setRequest:(NSURLRequest*)request;
-- (NSMutableURLRequest*)actualRequest;
-- (NSURLRequest*)initialRequest;
-- (NSURL*)URL;
-- (NSURL*)unreachableURL;
-- (void)replaceRequestURLForAnchorScrollWithURL:(NSURL*)URL;
-- (BOOL)isStopping;
-- (void)stopLoading;
-- (void)setupForReplace;
-- (void)commitIfReady;
-- (void)setCommitted:(BOOL)f;
-- (BOOL)isCommitted;
-- (BOOL)isLoading;
-- (void)setLoading:(BOOL)f;
-- (void)updateLoading;
-- (void)receivedData:(NSData*)data;
-- (void)setupForReplaceByMIMEType:(NSString*)newMIMEType;
-- (void)finishedLoading;
-- (NSURLResponse*)response;
-- (void)clearErrors;
-- (NSError*)mainDocumentError;
-- (void)mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
-- (void)setResponse:(NSURLResponse*)resp;
-- (void)attachToFrame;
-- (void)detachFromFrame;
-- (void)prepareForLoadStart;
-- (double)loadingStartedTime;
-- (BOOL)isClientRedirect;
-- (void)setIsClientRedirect:(BOOL)flag;
-- (BOOL)isLoadingInAPISense;
-- (void)setPrimaryLoadComplete:(BOOL)flag;
-- (void)setTitle:(NSString*)title;
-- (NSString*)overrideEncoding;
-- (void)addResponse:(NSURLResponse*)r;
-- (NSArray*)responses;
-- (NSDictionary*)triggeringAction;
-- (void)setTriggeringAction:(NSDictionary*)action;
-- (void)setOverrideEncoding:(NSString*)overrideEncoding;
-- (NSString*)overrideEncoding;
-- (NSDictionary*)triggeringAction;
-- (void)setTriggeringAction:(NSDictionary*)action;
-- (void)setLastCheckedRequest:(NSURLRequest*)request;
-- (NSURLRequest*)lastCheckedRequest;
-- (void)stopRecordingResponses;
-- (NSString*)title;
-- (NSURL*)URLForHistory;
-
-@end

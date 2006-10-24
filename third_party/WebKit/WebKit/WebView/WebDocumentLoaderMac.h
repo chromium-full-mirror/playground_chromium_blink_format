@@ -30,10 +30,17 @@
 
 @class WebDataSource;
 
-@interface WebDocumentLoaderMac : WebDocumentLoader {
-  WebDataSource* dataSource;
-  WebDataSource* detachedDataSource;  // not retained
-}
-- (void)setDataSource:(WebDataSource*)dataSource;
-- (WebDataSource*)dataSource;
-@end
+class WebDocumentLoaderMac : public WebCore::DocumentLoader {
+ public:
+  WebDocumentLoaderMac(NSURLRequest*);
+
+  void setDataSource(WebDataSource*);
+  WebDataSource* dataSource() const;
+
+  virtual void attachToFrame();
+  virtual void detachFromFrame();
+
+ private:
+  WebCore::RetainPtr<WebDataSource> m_dataSource;
+  WebDataSource* m_detachedDataSource;  // not retained
+};
