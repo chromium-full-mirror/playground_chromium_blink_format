@@ -127,7 +127,7 @@ class StyleFillData : public Shared<StyleFillData> {
   }
 
   float opacity;
-  SVGPaint* paint;
+  RefPtr<SVGPaint> paint;
 
  private:
   StyleFillData& operator=(const StyleFillData&);
@@ -146,11 +146,11 @@ class StyleStrokeData : public Shared<StyleStrokeData> {
   float opacity;
   unsigned int miterLimit;
 
-  CSSValue* width;
-  CSSValue* dashOffset;
+  RefPtr<CSSValue> width;
+  RefPtr<CSSValue> dashOffset;
 
-  SVGPaint* paint;
-  CSSValueList* dashArray;
+  RefPtr<SVGPaint> paint;
+  RefPtr<CSSValueList> dashArray;
 
  private:
   StyleStrokeData& operator=(const StyleStrokeData&);
