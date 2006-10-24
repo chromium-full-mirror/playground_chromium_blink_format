@@ -332,6 +332,20 @@ backforward list.
 - (void)_drawHeaderAndFooter;
 @end
 
+#if !BUILDING_ON_TIGER
+@interface WebView (WebViewGrammarChecking)
+
+// FIXME: These two methods should be merged into WebViewEditing when we're not
+// in API freeze
+- (BOOL)isGrammarCheckingEnabled;
+- (void)setGrammarCheckingEnabled:(BOOL)flag;
+
+// FIXME: This method should be merged into WebIBActions when we're not in API
+// freeze
+- (void)toggleGrammarChecking:(id)sender;
+@end
+#endif
+
 @interface WebView (WebViewEditingInMail)
 - (void)_insertNewlineInQuotedContent;
 - (BOOL)_selectWordBeforeMenuEvent;
