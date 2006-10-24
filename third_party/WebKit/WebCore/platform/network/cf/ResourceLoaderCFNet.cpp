@@ -167,16 +167,18 @@ void didReceiveChallenge(CFURLConnectionRef conn,
   // Do nothing right now
 }
 
-void addHeadersFromHashMap(CFHTTPMessageRef request,
-                           const HashMap<String, String>& requestHeaders) {
+void addHeadersFromHashMap(
+    CFHTTPMessageRef request,
+    const ResourceRequest::HTTPHeaderMap& requestHeaders) {
   if (!requestHeaders.size())
     return;
 
   CFMutableDictionaryRef allHeaders = CFDictionaryCreateMutable(
       0, requestHeaders.size(), &kCFTypeDictionaryKeyCallBacks,
       &kCFTypeDictionaryValueCallBacks);
-  HashMap<String, String>::const_iterator end = requestHeaders.end();
-  for (HashMap<String, String>::const_iterator it = requestHeaders.begin();
+  ResourceRequest::HTTPHeaderMap::const_iterator end = requestHeaders.end();
+  for (ResourceRequest::HTTPHeaderMap::const_iterator it =
+           requestHeaders.begin();
        it != end; ++it) {
     CFStringRef key = it->first.createCFString();
     CFStringRef value = it->second.createCFString();
@@ -249,8 +251,8 @@ void runLoaderThread(void* unused) {
 }
 
 bool ResourceLoader::start(DocLoader* docLoader) {
-  CFURLRef url = d->URL.createCFURL();
-  CFStringRef requestMethod = d->method.createCFString();
+  CFURLRef url = d->m_request.url().createCFURL();
+  CFStringRef requestMethod = d->m_request.httpMethod().createCFString();
   Boolean isPost =
       CFStringCompare(requestMethod, CFSTR("POST"), kCFCompareCaseInsensitive);
   CFHTTPMessageRef httpRequest =
@@ -264,7 +266,7 @@ bool ResourceLoader::start(DocLoader* docLoader) {
 
   ref();
   d->m_loading = true;
-  addHeadersFromHashMap(httpRequest, d->m_requestHeaders);
+  addHeadersFromHashMap(httpRequest, d->m_request.httpHeaderFields());
 
   String referrer = docLoader->frame()->referrer();
   if (!referrer.isEmpty()) {
@@ -382,8 +384,8 @@ void ResourceLoader::cancel() {
 
   // Copied directly from ResourceLoaderWin.cpp
   setError(1);
-  d->client->receivedAllData(this, 0);
-  d->client->didFinishLoading(this);
+  d->m_client->receivedAllData(this, 0);
+  d->m_client->didFinishLoading(this);
 }
 
 }  // namespace WebCore
