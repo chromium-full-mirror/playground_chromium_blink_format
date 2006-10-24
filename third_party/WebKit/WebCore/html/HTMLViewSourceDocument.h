@@ -46,7 +46,7 @@ class HTMLViewSourceDocument : public HTMLDocument {
   Element* addSpanWithClassName(const String&);
 
  private:
-  RefPtr<Node> m_current;
+  Node* m_current;
 };
 }
 
