@@ -35,7 +35,7 @@ namespace WebCore {
 class NetscapePlugInStreamLoader : public WebResourceLoader {
  public:
   static PassRefPtr<NetscapePlugInStreamLoader> create(
-      WebFrameLoader*,
+      Frame*,
       id<WebPlugInStreamLoaderDelegate>);
   virtual ~NetscapePlugInStreamLoader();
 
@@ -47,13 +47,13 @@ class NetscapePlugInStreamLoader : public WebResourceLoader {
                               bool allAtOnce);
   virtual void didFinishLoading();
   virtual void didFail(NSError*);
-  virtual void cancel(NSError*);
 
   virtual void releaseResources();
 
  private:
-  NetscapePlugInStreamLoader(WebFrameLoader*,
-                             id<WebPlugInStreamLoaderDelegate>);
+  NetscapePlugInStreamLoader(Frame*, id<WebPlugInStreamLoaderDelegate>);
+
+  virtual void didCancel(NSError*);
 
   RetainPtr<id<WebPlugInStreamLoaderDelegate>> m_stream;
 };

@@ -28,11 +28,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class WebFrameLoader;
+namespace WebCore {
+class Frame;
+class FrameLoader;
+}
 
 @interface WebDocumentLoader : NSObject {
  @public
-  WebFrameLoader* frameLoader;
+  WebCore::Frame* m_frame;
 
   NSData* mainResourceData;
 
@@ -87,8 +90,8 @@
 }
 
 - (id)initWithRequest:(NSURLRequest*)request;
-- (void)setFrameLoader:(WebFrameLoader*)fl;
-- (WebFrameLoader*)frameLoader;
+- (void)setFrame:(WebCore::Frame*)frame;
+- (WebCore::FrameLoader*)frameLoader;
 - (void)setMainResourceData:(NSData*)data;
 - (NSData*)mainResourceData;
 - (NSURLRequest*)originalRequest;
@@ -117,7 +120,8 @@
 - (NSError*)mainDocumentError;
 - (void)mainReceivedError:(NSError*)error complete:(BOOL)isComplete;
 - (void)setResponse:(NSURLResponse*)resp;
-- (void)detachFromFrameLoader;
+- (void)attachToFrame;
+- (void)detachFromFrame;
 - (void)prepareForLoadStart;
 - (double)loadingStartedTime;
 - (BOOL)isClientRedirect;

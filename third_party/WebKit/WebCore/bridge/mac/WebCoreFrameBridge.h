@@ -31,21 +31,24 @@
 #ifdef __cplusplus
 
 namespace WebCore {
-class FrameMac;
-class Element;
 class EditorClient;
+class Element;
+class FrameLoader;
+class FrameMac;
 }
 
-typedef WebCore::FrameMac WebCoreMacFrame;
-typedef WebCore::Element WebCoreElement;
 typedef WebCore::EditorClient WebCoreEditorClient;
+typedef WebCore::Element WebCoreElement;
+typedef WebCore::FrameLoader WebCoreFrameLoader;
+typedef WebCore::FrameMac WebCoreFrameMac;
 
 #else
 
 @class NSMenu;
-@class WebCoreMacFrame;
-@class WebCoreElement;
 @class WebCoreEditorClient;
+@class WebCoreElement;
+@class WebCoreFrameLoader;
+@class WebCoreFrameMac;
 
 #endif
 
@@ -62,7 +65,6 @@ typedef WebCore::EditorClient WebCoreEditorClient;
 @class WebCorePageBridge;
 @class WebCoreSettings;
 @class WebFrame;
-@class WebFrameLoader;
 @class WebScriptObject;
 @class WebView;
 
@@ -182,8 +184,8 @@ typedef enum {
 // side of the bridge.
 
 @interface WebCoreFrameBridge : NSObject {
-  WebCoreMacFrame* m_frame;
-  WebFrameLoader* _frameLoader;
+  WebCoreFrameMac* m_frame;
+  WebCoreFrameLoader* m_frameLoader;
 
   BOOL _shouldCreateRenderers;
   BOOL _closed;
@@ -592,7 +594,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)setProhibitsScrolling:(BOOL)prohibits;
 
 - (void)setFrameLoaderClient:(id<WebFrameLoaderClient>)client;
-- (WebFrameLoader*)frameLoader;
+- (WebCoreFrameLoader*)frameLoader;
 
 - (void)setTitle:(NSString*)title;
 - (void)didFirstLayout;
@@ -659,8 +661,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 // In NSArray objects for post data, NSData objects represent literal data, and
 // NSString objects represent encoded files.
 // The encoding is the standard form encoding for uploading files.
-
-@class WebFrameLoader;
 
 @protocol WebCoreFrameBridge
 
@@ -849,7 +849,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 // header just for that.
 
 @interface WebCoreFrameBridge (WebCoreInternalUse)
-- (WebCoreMacFrame*)impl;
+- (WebCoreFrameMac*)impl;
 @end
 
 // Protocols that make up part of the interaces above.
