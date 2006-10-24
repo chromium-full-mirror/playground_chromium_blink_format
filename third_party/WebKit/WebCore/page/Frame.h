@@ -115,9 +115,6 @@ class Frame : public Shared<Frame> {
                       const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
-  virtual void urlSelected(const DeprecatedString& url,
-                           const String& target,
-                           const Event* triggeringEvent);
   virtual void urlSelected(const ResourceRequest&,
                            const String& target,
                            const Event* triggeringEvent,

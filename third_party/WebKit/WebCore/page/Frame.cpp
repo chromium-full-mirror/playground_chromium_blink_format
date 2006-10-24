@@ -272,12 +272,6 @@ void Frame::changeLocation(const DeprecatedString& URL,
   urlSelected(request, "_self", 0, lockHistory);
 }
 
-void Frame::urlSelected(const DeprecatedString& url,
-                        const String& target,
-                        const Event* triggeringEvent) {
-  urlSelected(ResourceRequest(completeURL(url)), target, triggeringEvent);
-}
-
 void Frame::urlSelected(const ResourceRequest& request,
                         const String& _target,
                         const Event* triggeringEvent,
