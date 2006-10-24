@@ -60,8 +60,10 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   m_frame->didOpenURL(url);
   m_assignedMimetype = false;
 
-  RefPtr<ResourceLoader> loader = ResourceLoader::create(this, "GET", url);
-  loader->start(m_frame->document() ? m_frame->document()->docLoader() : 0);
+  RequestRequest request(url);
+  RefPtr<ResourceLoader> loader = ResourceLoader::create(
+      request, this,
+      m_frame->document() ? m_frame->document()->docLoader() : 0);
 }
 
 void FrameQtClientDefault::submitForm(const String& method,
@@ -71,9 +73,13 @@ void FrameQtClientDefault::submitForm(const String& method,
 
   m_assignedMimetype = false;
 
-  RefPtr<ResourceLoader> loader =
-      ResourceLoader::create(this, method, url, *postData);
-  loader->start(m_frame->document() ? m_frame->document()->docLoader() : 0);
+  ResourceRequest request(url);
+  request.setHTTPMethod(method);
+  request.setHTTPBody(*postData);
+
+  RefPtr<ResourceLoader> loader = ResourceLoader::create(
+      request, this,
+      m_frame->document() ? m_frame->document()->docLoader() : 0);
 }
 
 void FrameQtClientDefault::checkLoaded() {

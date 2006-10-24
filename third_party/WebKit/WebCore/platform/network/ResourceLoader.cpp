@@ -32,28 +32,20 @@
 
 namespace WebCore {
 
-ResourceLoader::ResourceLoader(ResourceLoaderClient* client,
-                               const String& method,
-                               const KURL& url)
-    : d(new ResourceLoaderInternal(this, client, method, url)) {}
+ResourceLoader::ResourceLoader(const ResourceRequest& request,
+                               ResourceLoaderClient* client)
+    : d(new ResourceLoaderInternal(this, request, client)) {}
 
-ResourceLoader::ResourceLoader(ResourceLoaderClient* client,
-                               const String& method,
-                               const KURL& url,
-                               const FormData& postData)
-    : d(new ResourceLoaderInternal(this, client, method, url, postData)) {}
+PassRefPtr<ResourceLoader> ResourceLoader::create(
+    const ResourceRequest& request,
+    ResourceLoaderClient* client,
+    DocLoader* dl) {
+  RefPtr<ResourceLoader> newLoader(new ResourceLoader(request, client));
 
-PassRefPtr<ResourceLoader> ResourceLoader::create(ResourceLoaderClient* client,
-                                                  const String& method,
-                                                  const KURL& url) {
-  return new ResourceLoader(client, method, url);
-}
+  if (newLoader->start(dl))
+    return newLoader.release();
 
-PassRefPtr<ResourceLoader> ResourceLoader::create(ResourceLoaderClient* client,
-                                                  const String& method,
-                                                  const KURL& url,
-                                                  const FormData& postData) {
-  return new ResourceLoader(client, method, url, postData);
+  return 0;
 }
 
 bool ResourceLoader::isErrorPage() const {
@@ -74,33 +66,9 @@ String ResourceLoader::responseEncoding() const {
   return d->m_responseEncoding;
 }
 
-void ResourceLoader::setRequestHeaders(
-    const HashMap<String, String>& requestHeaders) {
-  d->m_requestHeaders = requestHeaders;
-}
-
-const HashMap<String, String>& ResourceLoader::requestHeaders() const {
-  return d->m_requestHeaders;
-}
-
-String ResourceLoader::queryMetaData(const String& key) const {
-  if (key == "HTTP-Headers") {
-    assembleResponseHeaders();
-    return d->responseHeaders;
-  }
-
-  return d->metaData.get(key);
-}
-
-void ResourceLoader::addMetaData(const String& key, const String& value) {
-  d->metaData.set(key, value);
-}
-
-void ResourceLoader::addMetaData(const HashMap<String, String>& keysAndValues) {
-  HashMap<String, String>::const_iterator end = keysAndValues.end();
-  for (HashMap<String, String>::const_iterator it = keysAndValues.begin();
-       it != end; ++it)
-    d->metaData.set(it->first, it->second);
+String ResourceLoader::responseHTTPHeadersAsString() const {
+  assembleResponseHeaders();
+  return d->responseHeaders;
 }
 
 void ResourceLoader::kill() {
@@ -112,20 +80,24 @@ void ResourceLoader::kill() {
   }
 }
 
-KURL ResourceLoader::url() const {
-  return d->URL;
+const ResourceRequest::HTTPHeaderMap& ResourceLoader::requestHeaders() const {
+  return d->m_request.httpHeaderFields();
 }
 
-FormData ResourceLoader::postData() const {
-  return d->postData;
+const KURL& ResourceLoader::url() const {
+  return d->m_request.url();
 }
 
-String ResourceLoader::method() const {
-  return d->method;
+const FormData& ResourceLoader::postData() const {
+  return d->m_request.httpBody();
+}
+
+const String& ResourceLoader::method() const {
+  return d->m_request.httpMethod();
 }
 
 ResourceLoaderClient* ResourceLoader::client() const {
-  return d->client;
+  return d->m_client;
 }
 
 }  // namespace WebCore

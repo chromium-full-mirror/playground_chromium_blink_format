@@ -49,6 +49,7 @@ class IconLoader : public ResourceLoaderClient {
 
   void notifyIconChanged(const KURL& iconURL);
 
+  KURL m_url;
   RefPtr<ResourceLoader> m_resourceLoader;
   Frame* m_frame;
 

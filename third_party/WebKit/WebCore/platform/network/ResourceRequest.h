@@ -56,6 +56,7 @@ struct ResourceRequest {
       : m_url(url),
         m_cachePolicy(UseProtocolCachePolicy),
         m_timeoutInterval(defaultTimeoutInterval),
+        m_httpMethod("GET"),
         m_allowHTTPCookies(true) {}
 
   ResourceRequest(const KURL& url,
@@ -64,6 +65,7 @@ struct ResourceRequest {
       : m_url(url),
         m_cachePolicy(policy),
         m_timeoutInterval(defaultTimeoutInterval),
+        m_httpMethod("GET"),
         m_allowHTTPCookies(true) {
     setHTTPReferrer(referrer);
   }
@@ -104,6 +106,7 @@ struct ResourceRequest {
     m_httpHeaderFields.set(name, value);
   }
   void addHTTPHeaderField(const String& name, const String& value);
+  void addHTTPHeaderFields(const HTTPHeaderMap& headerFields);
 
   String httpContentType() const { return httpHeaderField("Content-Type"); }
   void setHTTPContentType(const String& httpContentType) {
@@ -118,6 +121,11 @@ struct ResourceRequest {
   String httpUserAgent() const { return httpHeaderField("User-Agent"); }
   void setHTTPUserAgent(const String& httpUserAgent) {
     setHTTPHeaderField("User-Agent", httpUserAgent);
+  }
+
+  String httpAccept() const { return httpHeaderField("Accept"); }
+  void setHTTPAccept(const String& httpUserAgent) {
+    setHTTPHeaderField("Accept", httpUserAgent);
   }
 
   const FormData& httpBody() const { return m_httpBody; }
@@ -147,6 +155,14 @@ inline void ResourceRequest::addHTTPHeaderField(const String& name,
       m_httpHeaderFields.add(name, value);
   if (!result.second)
     result.first->second += "," + value;
+}
+
+// FIXME: probably shouldn't inline this
+inline void ResourceRequest::addHTTPHeaderFields(
+    const HTTPHeaderMap& headerFields) {
+  HTTPHeaderMap::const_iterator end = headerFields.end();
+  for (HTTPHeaderMap::const_iterator it = headerFields.begin(); it != end; ++it)
+    addHTTPHeaderField(it->first, it->second);
 }
 
 }  // namespace WebCore
