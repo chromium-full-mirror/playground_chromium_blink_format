@@ -56,26 +56,50 @@ class FrameLoader : Noncopyable {
 
   Frame* frame() const { return m_frame; }
 
+  // FIXME: This is not cool, people.
+  void prepareForLoadStart();
+  void setupForReplace();
+  void setupForReplaceByMIMEType(NSString* newMIMEType);
+  void finalSetupForReplace(WebDocumentLoader*);
+  void safeLoad(NSURL*);
+  void load(NSURLRequest*);
+  void load(NSURLRequest*, NSString* frameName);
+  void load(NSURLRequest*,
+            NSDictionary* triggeringAaction,
+            FrameLoadType,
+            PassRefPtr<FormState>);
+  void load(WebDocumentLoader*);
+  void load(WebDocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
+  void load(NSURL*,
+            NSString* referrer,
+            FrameLoadType loadType,
+            NSString* target,
+            NSEvent* event,
+            DOMElement* form,
+            NSDictionary* formValues);
+
+  // Also not cool.
+  void stopLoadingPlugIns();
+  void stopLoadingSubresources();
+  void stopLoading(NSError*);
+  void stopLoading();
+  void cancelMainResourceLoad();
+  void cancelPendingArchiveLoad(WebResourceLoader*);
+
   void addPlugInStreamLoader(WebResourceLoader*);
   void removePlugInStreamLoader(WebResourceLoader*);
-  void stopLoadingPlugIns();
   bool isLoadingMainResource() const;
   bool isLoadingSubresources() const;
   bool isLoading() const;
-  void stopLoadingSubresources();
   void addSubresourceLoader(WebResourceLoader*);
   void removeSubresourceLoader(WebResourceLoader*);
   NSData* mainResourceData() const;
   void releaseMainResourceLoader();
-  void cancelMainResourceLoad();
-  void stopLoading(NSError*);
-  void stopLoading();
 
   WebDocumentLoader* activeDocumentLoader() const;
   WebDocumentLoader* documentLoader() const;
   WebDocumentLoader* provisionalDocumentLoader();
   WebFrameState state() const;
-  void setupForReplace();
   static double timeOfLastCompletedLoad();
 
   bool defersCallbacks() const;
@@ -104,7 +128,6 @@ class FrameLoader : Noncopyable {
                 id proxy);
   void handleFallbackContent();
   bool isStopping() const;
-  void setupForReplaceByMIMEType(NSString* newMIMEType);
   void setResponse(NSURLResponse*);
 
   void finishedLoading();
@@ -114,7 +137,6 @@ class FrameLoader : Noncopyable {
   NSError* fileDoesNotExistError(NSURLResponse*) const;
   bool willUseArchive(WebResourceLoader*, NSURLRequest*, NSURL*) const;
   bool isArchiveLoadPending(WebResourceLoader*) const;
-  void cancelPendingArchiveLoad(WebResourceLoader*);
   void cannotShowMIMEType(NSURLResponse*);
   NSError* interruptionForPolicyChangeError(NSURLRequest*);
   bool isHostedByObjectElement() const;
@@ -132,10 +154,6 @@ class FrameLoader : Noncopyable {
   void cancelContentPolicyCheck();
   void reload();
   void reloadAllowingStaleData(NSString* overrideEncoding);
-  void load(NSURLRequest*,
-            NSDictionary* triggeringAaction,
-            FrameLoadType,
-            PassRefPtr<FormState>);
 
   void didReceiveServerRedirectForProvisionalLoadForFrame();
   void finishedLoadingDocument(WebDocumentLoader*);
@@ -145,16 +163,11 @@ class FrameLoader : Noncopyable {
   void revertToProvisional(WebDocumentLoader*);
   void setMainDocumentError(WebDocumentLoader*, NSError*);
   void mainReceivedCompleteError(WebDocumentLoader*, NSError*);
-  void finalSetupForReplace(WebDocumentLoader*);
-  void prepareForLoadStart();
   bool subframeIsLoading() const;
   void willChangeTitle(WebDocumentLoader*);
   void didChangeTitle(WebDocumentLoader*);
 
   FrameLoadType loadType() const;
-
-  void load(WebDocumentLoader*);
-  void load(WebDocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
 
   void didFirstLayout();
   bool firstLayoutDone() const;
@@ -165,13 +178,6 @@ class FrameLoader : Noncopyable {
                         NSDate* fireDate,
                         bool lockHistory,
                         bool isJavaScriptFormAction);
-  void load(NSURL*,
-            NSString* referrer,
-            FrameLoadType loadType,
-            NSString* target,
-            NSEvent* event,
-            DOMElement* form,
-            NSDictionary* formValues);
   void commitProvisionalLoad(NSDictionary* pageCache);
   bool isQuickRedirectComing() const;
   bool shouldReload(NSURL* currentURL, NSURL* destinationURL);
@@ -183,8 +189,6 @@ class FrameLoader : Noncopyable {
   NSURLRequest* requestFromDelegate(NSURLRequest*,
                                     id& identifier,
                                     NSError*& error);
-  void load(NSURLRequest*);
-  void load(NSURLRequest*, NSString* frameName);
   void post(NSURL*,
             NSString* referrer,
             NSString* target,
@@ -196,7 +200,6 @@ class FrameLoader : Noncopyable {
 
   void checkLoadComplete();
   void detachFromParent();
-  void safeLoad(NSURL*);
   void detachChildren();
   void addExtraFieldsToRequest(NSMutableURLRequest*,
                                bool isMainResource,
@@ -220,13 +223,15 @@ class FrameLoader : Noncopyable {
                                                FormState*);
 
  private:
-  void setDefersCallbacks(bool);
+  // Also not cool.
+  void startLoading();
   bool startLoadingMainResource(NSMutableURLRequest*, id identifier);
-  void clearProvisionalLoad();
   void stopLoadingSubframes();
+
+  void setDefersCallbacks(bool);
+  void clearProvisionalLoad();
   void markLoadComplete();
   void commitProvisionalLoad();
-  void startLoading();
   void provisionalLoadStarted();
   void frameLoadCompleted();
 
