@@ -310,6 +310,10 @@ void Frame::urlSelected(const ResourceRequest& request,
   urlSelected(frameRequest, triggeringEvent);
 }
 
+FrameLoader* Frame::frameLoader() {
+  return d->m_frameLoader;
+}
+
 bool Frame::requestFrame(Element* ownerElement,
                          const String& urlParam,
                          const AtomicString& frameName) {

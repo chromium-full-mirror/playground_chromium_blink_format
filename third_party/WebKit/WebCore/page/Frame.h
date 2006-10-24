@@ -67,6 +67,7 @@ class EditorClient;
 class FormData;
 class FramePrivate;
 class FrameLoadRequest;
+class FrameLoader;
 class FrameTree;
 class KJSProxy;
 class Page;
@@ -123,6 +124,8 @@ class Frame : public Shared<Frame> {
                            bool lockHistory = false);
   virtual void urlSelected(const FrameLoadRequest&,
                            const Event* triggeringEvent) = 0;
+
+  FrameLoader* frameLoader();
 
   bool requestFrame(Element* ownerElement,
                     const String& url,
