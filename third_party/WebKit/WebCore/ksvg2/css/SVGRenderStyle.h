@@ -26,6 +26,7 @@
 #ifdef SVG_SUPPORT
 
 #include "DataRef.h"
+#include "GraphicsTypes.h"
 #include "SVGPaint.h"
 #include "SVGRenderStyleDefs.h"
 #include <wtf/Platform.h>
@@ -84,7 +85,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                           dominantBaseline,
                           DB_AUTO)
 
-  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(ECapStyle, CapStyle, capStyle, CS_BUTT)
+  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(LineCap, CapStyle, capStyle, ButtCap)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(WindRule, ClipRule, clipRule, RULE_NONZERO)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EColorInterpolation,
                                     ColorInterpolation,
@@ -103,7 +104,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                     ImageRendering,
                                     imageRendering,
                                     IR_AUTO)
-  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EJoinStyle, JoinStyle, joinStyle, JS_MITER)
+  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(LineJoin, JoinStyle, joinStyle, MiterJoin)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EPointerEvents,
                                     PointerEvents,
                                     pointerEvents,
@@ -267,8 +268,8 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
         unsigned _textRendering : 2;              // ETextRendering
         unsigned _clipRule : 1;                   // WindRule
         unsigned _fillRule : 1;                   // WindRule
-        unsigned _capStyle : 2;                   // ECapStyle
-        unsigned _joinStyle : 2;                  // EJoinStyle
+        unsigned _capStyle : 2;                   // LineCap
+        unsigned _joinStyle : 2;                  // LineJoin
         unsigned _textAnchor : 2;                 // ETextAnchor
         unsigned _colorInterpolation : 2;         // EColorInterpolation
         unsigned _colorInterpolationFilters : 2;  // EColorInterpolation

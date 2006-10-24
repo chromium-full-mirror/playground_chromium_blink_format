@@ -45,10 +45,6 @@
 
 namespace WebCore {
 
-enum ECapStyle { CS_BUTT = 1, CS_ROUND = 2, CS_SQUARE = 3 };
-
-enum EJoinStyle { JS_MITER = 1, JS_ROUND = 2, JS_BEVEL = 3 };
-
 enum ETextAnchor { TA_START, TA_MIDDLE, TA_END };
 
 enum EColorInterpolation { CI_AUTO, CI_SRGB, CI_LINEARRGB };
