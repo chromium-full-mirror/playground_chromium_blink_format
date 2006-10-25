@@ -119,7 +119,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
 
   void receivedResponse(PlatformResponse);
 
-  const ResourceRequest::HTTPHeaderMap& requestHeaders() const;
+  const HTTPHeaderMap& requestHeaders() const;
   const KURL& url() const;
   const String& method() const;
   const FormData& postData() const;
