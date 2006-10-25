@@ -33,13 +33,11 @@
 namespace WebCore {
 class EditorClient;
 class Element;
-class FrameLoader;
 class FrameMac;
 }
 
 typedef WebCore::EditorClient WebCoreEditorClient;
 typedef WebCore::Element WebCoreElement;
-typedef WebCore::FrameLoader WebCoreFrameLoader;
 typedef WebCore::FrameMac WebCoreFrameMac;
 
 #else
@@ -47,7 +45,6 @@ typedef WebCore::FrameMac WebCoreFrameMac;
 @class NSMenu;
 @class WebCoreEditorClient;
 @class WebCoreElement;
-@class WebCoreFrameLoader;
 @class WebCoreFrameMac;
 
 #endif
@@ -71,7 +68,6 @@ typedef WebCore::FrameMac WebCoreFrameMac;
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
-@protocol WebFrameLoaderClient;
 
 extern NSString* WebCorePageCacheStateKey;
 
@@ -190,6 +186,9 @@ typedef enum {
   BOOL _closed;
 }
 
+- (WebCoreFrameMac*)
+    _frame;  // underscore to prevent conflict with -[NSView frame]
+
 + (WebCoreFrameBridge*)bridgeForDOMDocument:(DOMDocument*)document;
 
 - (id)initMainFrameWithPage:(WebCorePageBridge*)page
@@ -209,8 +208,6 @@ typedef enum {
 - (NSString*)name;
 
 - (WebCorePageBridge*)page;
-
-- (WebCoreFrameBridge*)parent;
 
 - (WebCoreFrameBridge*)firstChild;
 - (WebCoreFrameBridge*)lastChild;
@@ -233,20 +230,15 @@ typedef enum {
 - (WebCoreFrameBridge*)childFrameNamed:(NSString*)name;
 - (WebCoreFrameBridge*)findFrameNamed:(NSString*)name;
 
-- (void)provisionalLoadStarted;
-
 - (void)openURL:(NSURL*)URL
           reload:(BOOL)reload
      contentType:(NSString*)contentType
          refresh:(NSString*)refresh
     lastModified:(NSDate*)lastModified
        pageCache:(NSDictionary*)pageCache;
-- (void)setEncoding:(NSString*)encoding userChosen:(BOOL)userChosen;
 - (void)addData:(NSData*)data;
 - (void)closeURL;
-- (void)stopLoading;
 
-- (void)didNotOpenURL:(NSURL*)URL;
 - (void)invalidatePageCache:(NSDictionary*)pageCache;
 
 - (BOOL)canLoadURL:(NSURL*)URL
@@ -260,9 +252,6 @@ typedef enum {
 - (BOOL)canCachePage;
 - (BOOL)saveDocumentToPageCache;
 
-- (void)end;
-- (void)stop;
-
 - (void)clearFrame;
 - (void)handleFallbackContent;
 
@@ -274,8 +263,6 @@ typedef enum {
 
 - (void)installInFrame:(NSView*)view;
 - (void)removeFromFrame;
-
-- (void)scrollToAnchorWithURL:(NSURL*)URL;
 
 - (BOOL)scrollOverflowInDirection:(WebScrollDirection)direction
                       granularity:(WebScrollGranularity)granularity;
@@ -311,7 +298,6 @@ typedef enum {
 - (void)mouseDragged:(NSEvent*)event;
 
 // these return YES if event is eaten by WebCore
-- (BOOL)sendScrollWheelEvent:(NSEvent*)event;
 - (BOOL)sendContextMenuEvent:(NSEvent*)event;
 
 - (NSView*)nextKeyView;
@@ -427,7 +413,6 @@ typedef enum {
                                   endOffset:(int)endOffset;
 
 - (NSFont*)fontForSelection:(BOOL*)hasMultipleFonts;
-- (NSDictionary*)fontAttributesForSelectionStart;
 - (NSWritingDirection)baseWritingDirectionForSelectionStart;
 
 - (NSString*)stringWithData:
@@ -544,36 +529,18 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
     withUndoAction:(WebUndoAction)undoAction;
 - (void)applyParagraphStyle:(DOMCSSStyleDeclaration*)style
              withUndoAction:(WebUndoAction)undoAction;
-- (void)indent;
-- (void)outdent;
 - (BOOL)selectionStartHasStyle:(DOMCSSStyleDeclaration*)style;
 - (NSCellStateValue)selectionHasStyle:(DOMCSSStyleDeclaration*)style;
-- (void)applyEditingStyleToBodyElement;
-- (void)removeEditingStyleFromBodyElement;
-- (void)applyEditingStyleToElement:(DOMElement*)element;
-- (void)removeEditingStyleFromElement:(DOMElement*)element;
 
 - (WebScriptObject*)windowScriptObject;
 - (NPObject*)windowScriptNPObject;
 
-- (BOOL)eventMayStartDrag:(NSEvent*)event;
 - (NSDragOperation)dragOperationForDraggingInfo:(id<NSDraggingInfo>)info;
 - (void)dragExitedWithDraggingInfo:(id<NSDraggingInfo>)info;
 - (BOOL)concludeDragForDraggingInfo:(id<NSDraggingInfo>)info;
 - (void)dragSourceMovedTo:(NSPoint)windowLoc;
 - (void)dragSourceEndedAt:(NSPoint)windowLoc
                 operation:(NSDragOperation)operation;
-
-- (BOOL)mayDHTMLCut;
-- (BOOL)mayDHTMLCopy;
-- (BOOL)mayDHTMLPaste;
-- (BOOL)tryDHTMLCut;
-- (BOOL)tryDHTMLCopy;
-- (BOOL)tryDHTMLPaste;
-
-- (NSMutableDictionary*)dashboardRegions;
-
-- (void)clear;
 
 - (BOOL)isCharacterSmartReplaceExempt:(unichar)c
                   isPreviousCharacter:(BOOL)isPreviousCharacter;
@@ -585,19 +552,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (BOOL)canProvideDocumentSource;
 - (BOOL)canSaveAsWebArchive;
-- (BOOL)containsPlugins;
-
-- (void)setInViewSourceMode:(BOOL)flag;
-- (BOOL)inViewSourceMode;
-
-- (void)setProhibitsScrolling:(BOOL)prohibits;
-
-- (void)setFrameLoaderClient:(id<WebFrameLoaderClient>)client;
-- (WebCoreFrameLoader*)frameLoader;
 
 - (void)setTitle:(NSString*)title;
-- (void)didFirstLayout;
-- (void)notifyIconChanged:(NSURL*)iconURL;
 - (NSURL*)originalRequestURL;
 - (BOOL)isLoadTypeReload;
 - (void)frameDetached;
@@ -825,14 +781,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 // This idiom is appropriate because WebCoreFrameBridge is an abstract class.
 
 @interface WebCoreFrameBridge (SubclassResponsibility)<WebCoreFrameBridge>
-@end
-
-// One method for internal use within WebCore itself.
-// Could move this to another header, but would be a pity to create an entire
-// header just for that.
-
-@interface WebCoreFrameBridge (WebCoreInternalUse)
-- (WebCoreFrameMac*)impl;
 @end
 
 // Protocols that make up part of the interaces above.

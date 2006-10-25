@@ -120,8 +120,6 @@ class Frame : public Shared<Frame> {
   virtual void urlSelected(const FrameLoadRequest&,
                            const Event* triggeringEvent) = 0;
 
-  FrameLoader* frameLoader();
-
   bool requestFrame(Element* ownerElement,
                     const String& url,
                     const AtomicString& frameName);
@@ -912,6 +910,7 @@ class Frame : public Shared<Frame> {
   DOMWindow* domWindow() const;
   Editor* editor() const;
   CommandByName* command() const;
+  FrameLoader* loader() const;
 
  private:
   friend class FramePrivate;
