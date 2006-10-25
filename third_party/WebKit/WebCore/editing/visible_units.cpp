@@ -91,9 +91,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == 0) {
-    RefPtr<Range> range(it.range());
-    pos = Position(range->startContainer(exception),
-                   range->startOffset(exception));
+    pos = it.range()->startPosition();
   } else if (!it.atEnd() && it.length() == 0) {
     // Got a zero-length chunk.
     // This means we have hit a replaced element.
@@ -181,10 +179,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == string.length()) {
-    RefPtr<Range> range(it.range());
-    int exception = 0;
-    pos = Position(range->startContainer(exception),
-                   range->startOffset(exception));
+    pos = it.range()->startPosition();
   } else if (!it.atEnd() && it.length() == 0) {
     // Got a zero-length chunk.
     // This means we have hit a replaced element.
@@ -212,8 +207,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     // position.
     CharacterIterator charIt(searchRange.get());
     charIt.advance(next - 1);
-    pos = Position(charIt.range()->endContainer(ec),
-                   charIt.range()->endOffset(ec));
+    pos = charIt.range()->endPosition();
   }
 
   // generate VisiblePosition, use UPSTREAM affinity if possible
