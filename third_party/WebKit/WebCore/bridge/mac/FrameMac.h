@@ -135,7 +135,7 @@ class FrameMac : public Frame {
                                const Vector<String>& paramValues,
                                const String& mimeType);
 
-  void clear();
+  void clear(bool clearWindowProperties = true);
 
   void setBridge(WebCoreFrameBridge* p);
   WebCoreFrameBridge* bridge() const { return _bridge; }
