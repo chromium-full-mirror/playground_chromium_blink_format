@@ -62,7 +62,6 @@ class SubresourceLoader : public WebResourceLoader {
   static id<WebCoreResourceHandle> create(Frame*,
                                           id<WebCoreResourceLoader>,
                                           NSMutableURLRequest*,
-                                          NSString* method,
                                           NSDictionary* customHeaders,
                                           NSString* referrer);
 
