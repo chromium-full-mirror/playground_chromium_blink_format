@@ -132,6 +132,11 @@ class StringImpl : public Shared<StringImpl> {
   int find(UChar, int index = 0) const;
   int find(const StringImpl*, int index, bool caseSensitive = true) const;
 
+  int reverseFind(UChar, int index) const;
+  int reverseFind(const StringImpl*,
+                  int index,
+                  bool caseSensitive = true) const;
+
   bool startsWith(const StringImpl* m_data, bool caseSensitive = true) const {
     return find(m_data, 0, caseSensitive) == 0;
   }
