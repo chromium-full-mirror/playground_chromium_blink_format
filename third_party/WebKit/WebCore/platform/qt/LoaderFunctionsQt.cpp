@@ -43,7 +43,7 @@ namespace WebCore {
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader* docLoader,
-                                     ResourceLoader*,
+                                     const ResourceRequest&,
                                      KURL& url,
                                      DeprecatedString&) {
   // FIXME: Handle last paremeter: "responseHeaders"

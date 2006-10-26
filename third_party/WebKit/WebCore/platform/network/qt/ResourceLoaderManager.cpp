@@ -62,10 +62,10 @@ void ResourceLoaderManager::slotData(KIO::Job* kioJob, const QByteArray& data) {
     return;
 
   ResourceLoaderInternal* d = job->getInternal();
-  if (!d || !d->client)
+  if (!d || !d->m_client)
     return;
 
-  d->client->didReceiveData(job, data.data(), data.size());
+  d->m_client->didReceiveData(job, data.data(), data.size());
 }
 
 void ResourceLoaderManager::slotMimetype(KIO::Job* kioJob,
@@ -82,7 +82,7 @@ void ResourceLoaderManager::slotMimetype(KIO::Job* kioJob,
     return;
 
   ResourceLoaderInternal* d = job->getInternal();
-  if (!d || !d->client)
+  if (!d || !d->m_client)
     return;
 
   d->m_mimetype = type;
@@ -113,7 +113,7 @@ void ResourceLoaderManager::slotResult(KJob* kjob) {
 
 void ResourceLoaderManager::remove(ResourceLoader* job) {
   ResourceLoaderInternal* d = job->getInternal();
-  if (!d || !d->client)
+  if (!d || !d->m_client)
     return;
 
   KIO::Job* kioJob = 0;
@@ -140,8 +140,8 @@ void ResourceLoaderManager::remove(ResourceLoader* job) {
     job->receivedResponse(response);
   }
 
-  d->client->receivedAllData(job, 0);
-  d->client->didFinishLoading(job);
+  d->m_client->receivedAllData(job, 0);
+  d->m_client->didFinishLoading(job);
 
   m_jobToKioMap.remove(job);
   m_kioToJobMap.remove(kioJob);
@@ -150,7 +150,7 @@ void ResourceLoaderManager::remove(ResourceLoader* job) {
 void ResourceLoaderManager::add(ResourceLoader* job,
                                 FrameQtClient* frameClient) {
   ResourceLoaderInternal* d = job->getInternal();
-  DeprecatedString url = d->URL.url();
+  DeprecatedString url = d->m_request.url().url();
 
   KIO::Job* kioJob = 0;
 
