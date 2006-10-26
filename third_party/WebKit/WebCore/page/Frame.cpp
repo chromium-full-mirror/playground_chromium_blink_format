@@ -3013,7 +3013,7 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     LOG_ERROR("called Frame::paint with nil renderer");
 }
 
-#if __APPLE__
+#if PLATFORM(CG)
 
 void Frame::adjustPageHeight(float* newBottom,
                              float oldTop,
@@ -3022,7 +3022,7 @@ void Frame::adjustPageHeight(float* newBottom,
   RenderView* root = static_cast<RenderView*>(document()->renderer());
   if (root) {
     // Use a context with painting disabled.
-    GraphicsContext context(0);
+    GraphicsContext context((PlatformGraphicsContext*)0);
     root->setTruncatedAt((int)floorf(oldBottom));
     IntRect dirtyRect(0, (int)floorf(oldTop), root->docWidth(),
                       (int)ceilf(oldBottom - oldTop));

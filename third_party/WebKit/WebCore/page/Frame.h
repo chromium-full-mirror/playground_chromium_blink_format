@@ -643,6 +643,11 @@ class Frame : public Shared<Frame> {
   virtual bool lastEventIsMouseUp() const = 0;
   virtual String overrideMediaType() const = 0;
   virtual void redirectDataToPlugin(Widget* pluginWidget) {}
+  virtual void setupRootForPrinting(bool onOrOff) {}
+  virtual Vector<IntRect> computePageRects(const IntRect& printRect,
+                                           float userScaleFactor) {
+    return Vector<IntRect>();
+  }
 
  protected:
   virtual Plugin* createPlugin(Element* node,
