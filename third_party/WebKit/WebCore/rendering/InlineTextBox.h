@@ -137,7 +137,11 @@ class InlineTextBox : public InlineRunBox {
                              DocumentMarker::MarkerType,
                              RenderStyle*,
                              const Font*);
-  void paintSpellingMarker(GraphicsContext*, int tx, int ty, DocumentMarker);
+  void paintSpellingOrGrammarMarker(GraphicsContext*,
+                                    int tx,
+                                    int ty,
+                                    DocumentMarker,
+                                    bool grammar);
   void paintTextMatchMarker(GraphicsContext*,
                             int tx,
                             int ty,

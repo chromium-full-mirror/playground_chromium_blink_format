@@ -591,10 +591,11 @@ void InlineTextBox::paintDecoration(GraphicsContext* pt,
   }
 }
 
-void InlineTextBox::paintSpellingMarker(GraphicsContext* pt,
-                                        int _tx,
-                                        int _ty,
-                                        DocumentMarker marker) {
+void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
+                                                 int _tx,
+                                                 int _ty,
+                                                 DocumentMarker marker,
+                                                 bool grammar) {
   _tx += m_x;
   _ty += m_y;
 
@@ -648,8 +649,8 @@ void InlineTextBox::paintSpellingMarker(GraphicsContext* pt,
     // big gap
     underlineOffset = m_baseline + 2;
   }
-  pt->drawLineForMisspelling(IntPoint(_tx + start, _ty + underlineOffset),
-                             width);
+  pt->drawLineForMisspellingOrBadGrammar(
+      IntPoint(_tx + start, _ty + underlineOffset), width, grammar);
 }
 
 void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
@@ -724,7 +725,7 @@ void InlineTextBox::paintAllMarkersOfType(GraphicsContext* pt,
     // marker intersects this run.  Paint it.
     switch (markerType) {
       case DocumentMarker::Spelling:
-        paintSpellingMarker(pt, _tx, _ty, marker);
+        paintSpellingOrGrammarMarker(pt, _tx, _ty, marker, false);
         break;
       case DocumentMarker::TextMatch:
         paintTextMatchMarker(pt, _tx, _ty, marker, style, f);

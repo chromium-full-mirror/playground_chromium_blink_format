@@ -28,9 +28,9 @@ namespace WebCore {
 // A range of a node within a document that is "marked", such as being
 // misspelled
 struct DocumentMarker {
-  enum MarkerType { AllMarkers = -1, Spelling = 0, TextMatch = 1 };
+  enum MarkerType { AllMarkers = -1, Spelling, Grammar, TextMatch };
 
-  enum MarkerType type;
+  MarkerType type;
   unsigned startOffset;
   unsigned endOffset;
 
