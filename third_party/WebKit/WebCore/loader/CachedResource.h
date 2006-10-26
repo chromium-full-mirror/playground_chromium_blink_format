@@ -36,6 +36,10 @@
 #include <wtf/Vector.h>
 #include <time.h>
 
+#if PLATFORM(MAC)
+#include "RetainPtr.h"
+#endif
+
 namespace WebCore {
 
 class Cache;
@@ -137,6 +141,10 @@ class CachedResource {
   String accept() const { return m_accept; }
   void setAccept(const String& accept) { m_accept = accept; }
 
+#if PLATFORM(MAC)
+  CFURLRef getCFURL();
+#endif
+
  protected:
   void setSize(unsigned size);
 
@@ -145,6 +153,10 @@ class CachedResource {
   String m_url;
   String m_accept;
   Request* m_request;
+
+#if PLATFORM(MAC)
+  RetainPtr<CFURLRef> m_cfURL;
+#endif
 
   PlatformResponse m_response;
   PlatformData m_allData;
