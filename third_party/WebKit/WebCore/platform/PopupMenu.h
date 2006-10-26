@@ -58,6 +58,8 @@ class PopupMenu : public Shared<PopupMenu> {
   void show(const IntRect&, FrameView*, int index);
   void hide();
 
+  void updateFromElement();
+
   RenderMenuList* menuList() const { return m_menuList; }
 
 #if PLATFORM(WIN)
@@ -75,7 +77,7 @@ class PopupMenu : public Shared<PopupMenu> {
   bool setFocusedIndex(int index,
                        bool setControlText = true,
                        bool fireOnChange = false);
-  int focusedIndex() const { return m_focusedIndex; }
+  int focusedIndex() const;
   void focusFirst();
   void focusLast();
 
@@ -118,7 +120,6 @@ class PopupMenu : public Shared<PopupMenu> {
   bool m_wasClicked;
   IntRect m_windowRect;
   int m_itemHeight;
-  int m_focusedIndex;
   int m_scrollOffset;
   int m_wheelDelta;
 #endif
