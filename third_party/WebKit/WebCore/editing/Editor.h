@@ -62,6 +62,8 @@ class Editor {
   Frame::TriState selectionUnorderedListState() const;
   Frame::TriState selectionOrderedListState() const;
 
+  void removeFormattingAndStyle();
+
   Frame* frame() const { return m_frame; }
   DeleteButtonController* deleteButtonController() const {
     return m_deleteButtonController.get();
