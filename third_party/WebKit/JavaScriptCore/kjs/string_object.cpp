@@ -109,7 +109,7 @@ void StringInstance::getPropertyNames(ExecState* exec,
                                       PropertyNameArray& propertyNames) {
   int size = internalValue()->getString().size();
   for (int i = 0; i < size; i++)
-    propertyNames.add(Identifier(UString(i)));
+    propertyNames.add(Identifier(UString::from(i)));
   return JSObject::getPropertyNames(exec, propertyNames);
 }
 
