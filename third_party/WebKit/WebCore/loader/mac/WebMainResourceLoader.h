@@ -56,7 +56,7 @@ class MainResourceLoader : public WebResourceLoader {
   virtual void didFail(NSError*);
 
   void continueAfterNavigationPolicy(NSURLRequest*);
-  void continueAfterContentPolicy(WebPolicyAction);
+  void continueAfterContentPolicy(PolicyAction);
 
  private:
   virtual void didCancel(NSError*);
@@ -76,7 +76,7 @@ class MainResourceLoader : public WebResourceLoader {
   bool isPostOrRedirectAfterPost(NSURLRequest* newRequest,
                                  NSURLResponse* redirectResponse);
 
-  void continueAfterContentPolicy(WebPolicyAction, NSURLResponse*);
+  void continueAfterContentPolicy(PolicyAction, NSURLResponse*);
 
   int m_contentLength;  // for logging only
   int m_bytesReceived;  // for logging only

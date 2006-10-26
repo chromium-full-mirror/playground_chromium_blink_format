@@ -202,34 +202,6 @@ typedef enum {
 + (NSArray*)supportedImageMIMETypes;
 + (NSArray*)supportedImageResourceMIMETypes;  // includes types like PDF
 
-- (void)initializeSettings:(WebCoreSettings*)settings;
-
-- (void)setName:(NSString*)name;
-- (NSString*)name;
-
-- (WebCorePageBridge*)page;
-
-- (WebCoreFrameBridge*)firstChild;
-- (WebCoreFrameBridge*)lastChild;
-- (WebCoreFrameBridge*)previousSibling;
-- (WebCoreFrameBridge*)nextSibling;
-
-- (BOOL)isMainFrame;
-
-- (void)appendChild:(WebCoreFrameBridge*)child;
-- (void)removeChild:(WebCoreFrameBridge*)child;
-
-- (unsigned)childCount;
-- (BOOL)isDescendantOfFrame:(WebCoreFrameBridge*)ancestor;
-- (WebCoreFrameBridge*)traverseNextFrameStayWithin:
-    (WebCoreFrameBridge*)stayWithin;
-
-- (WebCoreFrameBridge*)nextFrameWithWrap:(BOOL)wrap;
-- (WebCoreFrameBridge*)previousFrameWithWrap:(BOOL)wrap;
-
-- (WebCoreFrameBridge*)childFrameNamed:(NSString*)name;
-- (WebCoreFrameBridge*)findFrameNamed:(NSString*)name;
-
 - (void)openURL:(NSURL*)URL
           reload:(BOOL)reload
      contentType:(NSString*)contentType
@@ -249,17 +221,11 @@ typedef enum {
 - (void)saveDocumentState;
 - (void)restoreDocumentState;
 
-- (BOOL)canCachePage;
 - (BOOL)saveDocumentToPageCache;
 
 - (void)clearFrame;
-- (void)handleFallbackContent;
 
-- (NSURL*)URL;
 - (NSURL*)baseURL;
-- (NSString*)referrer;
-- (WebCoreFrameBridge*)opener;
-- (void)setOpener:(WebCoreFrameBridge*)bridge;
 
 - (void)installInFrame:(NSView*)view;
 - (void)removeFromFrame;
@@ -290,15 +256,6 @@ typedef enum {
 - (NSArray*)computePageRectsWithPrintWidthScaleFactor:
                 (float)printWidthScaleFactor
                                           printHeight:(float)printHeight;
-
-- (void)setActivationEventNumber:(int)num;
-- (void)mouseDown:(NSEvent*)event;
-- (void)mouseUp:(NSEvent*)event;
-- (void)mouseMoved:(NSEvent*)event;
-- (void)mouseDragged:(NSEvent*)event;
-
-// these return YES if event is eaten by WebCore
-- (BOOL)sendContextMenuEvent:(NSEvent*)event;
 
 - (NSView*)nextKeyView;
 - (NSView*)previousKeyView;
@@ -353,23 +310,10 @@ typedef enum {
 - (NSAppleEventDescriptor*)aeDescByEvaluatingJavaScriptFromString:
     (NSString*)string;
 
-- (DOMDocument*)DOMDocument;
-- (DOMHTMLElement*)frameElement;
-
-- (BOOL)isSelectionInPasswordField;
-- (BOOL)isSelectionEditable;
-- (BOOL)isSelectionRichlyEditable;
-- (WebSelectionState)selectionState;
-
 - (BOOL)mayCopy;
 
 - (NSAttributedString*)selectedAttributedString;
 - (NSString*)selectedString;
-
-- (void)setSelectionFromNone;
-- (void)setIsActive:(BOOL)flag;
-
-- (void)setWindowHasFocus:(BOOL)flag;
 
 - (NSString*)stringForRange:(DOMRange*)range;
 
@@ -380,10 +324,6 @@ typedef enum {
 - (void)deselectAll;
 - (void)deselectText;
 
-- (NSRect)selectionRect;
-- (NSRect)visibleSelectionRect;
-- (void)centerSelectionInVisibleArea;
-- (NSImage*)selectionImageForcingWhiteText:(BOOL)forceWhiteText;
 - (NSRect)caretRectAtNode:(DOMNode*)node
                    offset:(int)offset
                  affinity:(NSSelectionAffinity)affinity;
@@ -393,7 +333,6 @@ typedef enum {
 - (void)setSelectedDOMRange:(DOMRange*)range
                    affinity:(NSSelectionAffinity)selectionAffinity
                 closeTyping:(BOOL)closeTyping;
-- (DOMRange*)selectedDOMRange;
 - (NSSelectionAffinity)selectionAffinity;
 
 // Emacs-style-editing "mark"
@@ -422,22 +361,16 @@ typedef enum {
                (NSString*)
                    textEncodingName;  // nil for textEncodingName means Latin-1
 
-- (BOOL)interceptKeyEvent:(NSEvent*)event toView:(NSView*)view;
-
 - (void)setShouldCreateRenderers:(BOOL)f;
 - (BOOL)shouldCreateRenderers;
 
 - (int)numPendingOrLoadingRequests;
 - (BOOL)doneProcessingData;
-- (BOOL)shouldClose;
 
 - (void)setBaseBackgroundColor:(NSColor*)backgroundColor;
 - (void)setDrawsBackground:(BOOL)drawsBackround;
 
-- (NSColor*)bodyBackgroundColor;
 - (NSColor*)selectionColor;
-
-- (void)adjustViewSize;
 
 - (id)accessibilityTree;
 
@@ -508,7 +441,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment
                        smartMove:(BOOL)smartMove;
 - (void)moveDragCaretToPoint:(NSPoint)point;
-- (void)removeDragCaret;
 - (DOMRange*)dragCaretDOMRange;
 - (BOOL)isDragCaretRichlyEditable;
 - (DOMRange*)editableDOMRangeForPoint:(NSPoint)point;
@@ -532,9 +464,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (BOOL)selectionStartHasStyle:(DOMCSSStyleDeclaration*)style;
 - (NSCellStateValue)selectionHasStyle:(DOMCSSStyleDeclaration*)style;
 
-- (WebScriptObject*)windowScriptObject;
-- (NPObject*)windowScriptNPObject;
-
 - (NSDragOperation)dragOperationForDraggingInfo:(id<NSDraggingInfo>)info;
 - (void)dragExitedWithDraggingInfo:(id<NSDraggingInfo>)info;
 - (BOOL)concludeDragForDraggingInfo:(id<NSDraggingInfo>)info;
@@ -555,7 +484,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (void)setTitle:(NSString*)title;
 - (NSURL*)originalRequestURL;
-- (BOOL)isLoadTypeReload;
 - (void)frameDetached;
 - (void)tokenizerProcessedData;
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
@@ -581,16 +509,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                       responseHeaders:(NSDictionary**)responseHeaderDict
                            statusCode:(int*)statusCode;
 - (BOOL)isReloading;
-- (void)reportClientRedirectToURL:(NSURL*)URL
-                            delay:(NSTimeInterval)seconds
-                         fireDate:(NSDate*)date
-                      lockHistory:(BOOL)lockHistory
-           isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
-- (void)reportClientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 - (NSString*)incomingReferrer;
-- (NSURLResponse*)mainResourceURLResponse;
 - (void)loadEmptyDocumentSynchronously;
-- (void)handledOnloadEvents;
 
 @end
 

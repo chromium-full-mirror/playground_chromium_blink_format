@@ -26,23 +26,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-typedef enum {
-  WebFrameStateProvisional,
+namespace WebCore {
 
+enum FrameState {
+  FrameStateProvisional,
   // This state indicates we are ready to commit to a page,
   // which means the view will transition to use the new data source.
-  WebFrameStateCommittedPage,
+  FrameStateCommittedPage,
+  FrameStateComplete
+};
 
-  WebFrameStateComplete
-} WebFrameState;
+enum PolicyAction {
+  PolicyUse,
+  PolicyDownload,
+  PolicyIgnore,
+};
 
-typedef enum {
-  WebPolicyUse,
-  WebPolicyDownload,
-  WebPolicyIgnore,
-} WebPolicyAction;
-
-typedef enum {
+enum FrameLoadType {
   FrameLoadTypeStandard,
   FrameLoadTypeBack,
   FrameLoadTypeForward,
@@ -52,13 +52,14 @@ typedef enum {
   FrameLoadTypeSame,  // user loads same URL again (but not reload button)
   FrameLoadTypeInternal,
   FrameLoadTypeReplace
-} FrameLoadType;
+};
 
-typedef enum {
+enum NavigationType {
   NavigationTypeLinkClicked,
   NavigationTypeFormSubmitted,
   NavigationTypeBackForward,
   NavigationTypeReload,
   NavigationTypeFormResubmitted,
   NavigationTypeOther
-} NavigationType;
+};
+}

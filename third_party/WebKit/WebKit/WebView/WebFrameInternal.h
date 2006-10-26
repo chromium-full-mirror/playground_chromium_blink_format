@@ -31,14 +31,13 @@
 
 #import "WebFramePrivate.h"
 #import "WebPolicyDelegatePrivate.h"
-#import <WebCore/FrameLoaderTypes.h>
 
 #ifdef __cplusplus
+#import <WebCore/FrameLoaderTypes.h>
 #import <wtf/Forward.h>
 #endif
 
-@class WebCoreFrameBridge;
-@class WebDocumentLoader;
+@class DOMRange;
 @class WebInspector;
 @class WebFrameView;
 @class WebFrameBridge;
@@ -47,11 +46,32 @@
 #ifdef __cplusplus
 
 namespace WebCore {
+class Document;
 class DocumentLoader;
+class Element;
+class Frame;
+class FrameMac;
 class FrameLoader;
+class HTMLElement;
+class Range;
 class WebResourceLoader;
 struct LoadErrorResetToken;
 }
+
+WebCore::FrameMac* core(WebFrame*);
+WebFrame* kit(WebCore::Frame*);
+
+WebCore::Element* core(DOMElement*);
+DOMElement* kit(WebCore::Element*);
+
+WebCore::Document* core(DOMDocument*);
+DOMDocument* kit(WebCore::Document*);
+
+WebCore::HTMLElement* core(DOMHTMLElement*);
+DOMHTMLElement* kit(WebCore::HTMLElement*);
+
+WebCore::Range* core(DOMRange*);
+DOMRange* kit(WebCore::Range*);
 
 #endif
 
@@ -72,9 +92,11 @@ struct LoadErrorResetToken;
 - (void)_clearSelection;
 - (WebFrame*)_findFrameWithSelection;
 - (void)_clearSelectionInOtherFrames;
+#ifdef __cplusplus
 - (id)_initWithWebFrameView:(WebFrameView*)fv
                     webView:(WebView*)v
-                     bridge:(WebFrameBridge*)bridge;
+                  coreFrame:(WebCore::Frame*)coreFrame;
+#endif
 
 - (void)_addPlugInView:(NSView*)plugInView;
 - (void)_removeAllPlugInViews;
@@ -105,7 +127,10 @@ struct LoadErrorResetToken;
 
 - (WebFrameBridge*)_bridge;
 
-- (void)_goToItem:(WebHistoryItem*)item withLoadType:(FrameLoadType)type;
+#ifdef __cplusplus
+- (void)_goToItem:(WebHistoryItem*)item
+     withLoadType:(WebCore::FrameLoadType)type;
+#endif
 - (void)_loadURL:(NSURL*)URL
         referrer:(NSString*)referrer
        intoChild:(WebFrame*)childFrame;
@@ -123,9 +148,6 @@ struct LoadErrorResetToken;
 + (CFAbsoluteTime)_timeOfLastCompletedLoad;
 - (BOOL)_canCachePage;
 - (void)_purgePageCache;
-
-- (WebFrame*)_nextFrameWithWrap:(BOOL)wrapFlag;
-- (WebFrame*)_previousFrameWithWrap:(BOOL)wrapFlag;
 
 - (int)_numPendingOrLoadingRequests:(BOOL)recurse;
 
@@ -202,7 +224,7 @@ struct LoadErrorResetToken;
 - (void)_dispatchDidFailLoadWithError:(NSError*)error;
 - (void)_dispatchDidFinishLoadForFrame;
 - (void)_dispatchDidFirstLayoutInFrame;
-- (WebCoreFrameBridge*)_dispatchCreateWebViewWithRequest:(NSURLRequest*)request;
+- (WebCore::Frame*)_dispatchCreateWebViewWithRequest:(NSURLRequest*)request;
 - (void)_dispatchShow;
 - (WebPolicyDecider*)_createPolicyDeciderWithTarget:(id)target
                                              action:(SEL)action;
@@ -217,8 +239,8 @@ struct LoadErrorResetToken;
                                          request:(NSURLRequest*)request
                                          decider:(WebPolicyDecider*)decider;
 - (void)_dispatchUnableToImplementPolicyWithError:(NSError*)error;
-- (void)_dispatchSourceFrame:(WebCoreFrameBridge*)sourceFrame
-              willSubmitForm:(DOMElement*)form
+- (void)_dispatchSourceFrame:(WebCore::Frame*)sourceFrame
+              willSubmitForm:(WebCore::Element*)form
                   withValues:(NSDictionary*)values
            submissionDecider:(WebPolicyDecider*)decider;
 - (void)_detachedFromParent1;
@@ -304,13 +326,4 @@ struct LoadErrorResetToken;
 
 @interface NSObject (WebInternalFrameLoadDelegate)
 - (void)webFrame:(WebFrame*)webFrame didFinishLoadWithError:(NSError*)error;
-@end
-
-@interface WebFrame (FrameTraversal)
-- (WebFrame*)_firstChildFrame;
-- (WebFrame*)_lastChildFrame;
-- (unsigned)_childFrameCount;
-- (WebFrame*)_previousSiblingFrame;
-- (WebFrame*)_nextSiblingFrame;
-- (WebFrame*)_traverseNextFrameStayWithin:(WebFrame*)stayWithin;
 @end

@@ -48,10 +48,6 @@ class RootObject;
 
 #ifdef __OBJC__
 
-// Avoid clashes with KJS::DOMElement in KHTML code.
-@class DOMElement;
-typedef DOMElement ObjCDOMElement;
-
 @class WebCorePageState;
 @class NSArray;
 @class NSAttributedString;
@@ -70,9 +66,6 @@ typedef DOMElement ObjCDOMElement;
 @class WebScriptObject;
 
 #else
-
-// Avoid clashes with KJS::DOMElement in KHTML code.
-class ObjCDOMElement;
 
 class WebCorePageState;
 class NSArray;
@@ -114,11 +107,11 @@ class FrameMac : public Frame {
   FrameMac(Page*, Element*, PassRefPtr<EditorClient>);
   ~FrameMac();
 
-  // FIXME: Merge these and move them into WebFrameLoader.
+  // FIXME: Merge these and move them into FrameLoader.
   void loadRequest(const FrameLoadRequest&,
                    bool userGesture,
                    NSEvent* triggeringEvent = 0,
-                   ObjCDOMElement* submitForm = 0,
+                   Element* submitForm = 0,
                    NSMutableDictionary* formValues = 0);
   virtual void urlSelected(const FrameLoadRequest&,
                            const Event* triggeringEvent);

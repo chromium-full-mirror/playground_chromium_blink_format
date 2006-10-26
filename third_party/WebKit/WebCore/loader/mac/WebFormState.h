@@ -30,7 +30,6 @@
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 
-@class DOMElement;
 @class NSDictionary;
 @class WebCoreFrameBridge;
 
@@ -49,7 +48,7 @@ class FormState : public Shared<FormState> {
   const HashMap<String, String>& values() const { return m_values; }
   Frame* sourceFrame() const { return m_sourceFrame.get(); }
 
-  static PassRefPtr<FormState> create(DOMElement* form,
+  static PassRefPtr<FormState> create(PassRefPtr<Element> form,
                                       NSDictionary* values,
                                       WebCoreFrameBridge* sourceFrame);
   NSDictionary* valuesAsNSDictionary() const;
@@ -58,7 +57,7 @@ class FormState : public Shared<FormState> {
   FormState(PassRefPtr<Element> form,
             const HashMap<String, String>& values,
             PassRefPtr<Frame> sourceFrame);
-  FormState(DOMElement* form,
+  FormState(PassRefPtr<Element> form,
             NSDictionary* values,
             WebCoreFrameBridge* sourceFrame);
 
