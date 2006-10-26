@@ -43,13 +43,16 @@ class AutoTableLayout : public TableLayout {
  protected:
   void fullRecalc();
   void recalcColumn(int effCol);
+
+  void calcPercentages() const;
   int totalPercent() const {
     if (m_percentagesDirty)
       calcPercentages();
     return m_totalPercent;
   }
-  void calcPercentages() const;
+
   int calcEffectiveWidth();
+
   void insertSpanCell(RenderTableCell*);
 
   struct Layout {
@@ -75,6 +78,7 @@ class AutoTableLayout : public TableLayout {
   mutable bool m_effWidthDirty : 1;
   mutable unsigned short m_totalPercent;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // AutoTableLayout_H

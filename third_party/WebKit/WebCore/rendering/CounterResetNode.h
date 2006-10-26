@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  *
 */
-#ifndef Counter_Reset_Node_h_
-#define Counter_Reset_Node_h_
+#ifndef CounterResetNode_h
+#define CounterResetNode_h
 
 #include "CounterNode.h"
 

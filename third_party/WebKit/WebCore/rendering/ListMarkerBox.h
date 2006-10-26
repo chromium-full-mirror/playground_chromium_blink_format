@@ -36,6 +36,6 @@ class ListMarkerBox : public InlineBox {
   virtual bool isText() const;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // ListMarkerBox_H

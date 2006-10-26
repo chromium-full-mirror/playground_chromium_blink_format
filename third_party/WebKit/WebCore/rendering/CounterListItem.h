@@ -36,6 +36,6 @@ class CounterListItem : public CounterNode {
   virtual void setSelfDirty();
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CounterListItem_H

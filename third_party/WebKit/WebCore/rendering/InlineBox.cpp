@@ -18,12 +18,13 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "InlineBox.h"
 
 #include "InlineFlowBox.h"
-#include "RootInlineBox.h"
 #include "RenderArena.h"
+#include "RootInlineBox.h"
 
 using namespace std;
 
@@ -227,7 +228,8 @@ int InlineBox::placeEllipsisBox(bool ltr,
   // Use -1 to mean "we didn't set the position."
   return -1;
 }
-}
+
+}  // namespace WebCore
 
 #ifndef NDEBUG
 

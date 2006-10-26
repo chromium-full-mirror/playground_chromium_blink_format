@@ -98,4 +98,4 @@ void CounterNode::setParentDirty() {
     m_renderer->setNeedsLayoutAndMinMaxRecalc();
 }
 
-}  // namespace
+}  // namespace WebCore

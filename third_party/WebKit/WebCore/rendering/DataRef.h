@@ -90,6 +90,7 @@ class DataRef {
  private:
   T* m_data;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // DataRef_h

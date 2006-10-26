@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  *
 */
-#ifndef Counter_Node_h_
-#define Counter_Node_h_
+#ifndef CounterNode_h
+#define CounterNode_h
 
 #include "RenderObject.h"
 
@@ -47,7 +47,7 @@ class CounterNode {
   virtual CounterNode* firstChild() const { return 0; }
   virtual CounterNode* lastChild() const { return 0; }
   virtual void insertAfter(CounterNode* newChild, CounterNode* refChild);
-  virtual void removeChild(CounterNode* oldChild);
+  virtual void removeChild(CounterNode*);
   void remove();
 
   int value() const { return m_value; }

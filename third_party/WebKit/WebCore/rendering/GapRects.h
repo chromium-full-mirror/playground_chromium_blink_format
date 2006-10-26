@@ -61,6 +61,7 @@ struct GapRects {
   IntRect m_center;
   IntRect m_right;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // GapRects_h

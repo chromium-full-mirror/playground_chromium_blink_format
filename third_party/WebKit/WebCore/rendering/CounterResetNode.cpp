@@ -143,4 +143,4 @@ void CounterResetNode::updateTotal(int value) {
     m_total = value;
 }
 
-}  // namespace
+}  // namespace WebCore

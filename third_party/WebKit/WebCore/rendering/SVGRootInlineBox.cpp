@@ -21,10 +21,12 @@
  *
  */
 
+#include "config.h"
+
 #ifdef SVG_SUPPORT
 
-#include "config.h"
 #include "SVGRootInlineBox.h"
+
 #include "SVGInlineFlowBox.h"
 
 namespace WebCore {
@@ -46,5 +48,7 @@ int SVGRootInlineBox::placeBoxesHorizontally(int x,
 void SVGRootInlineBox::verticallyAlignBoxes(int& heightOfBlock) {
   placeSVGFlowVertically(this, heightOfBlock);
 }
-}
+
+}  // namespace WebCore
+
 #endif  // SVG_SUPPORT

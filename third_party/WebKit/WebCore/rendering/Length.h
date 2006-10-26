@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef LENGTH_H
-#define LENGTH_H
+#ifndef Length_H
+#define Length_H
 
 namespace WebCore {
 
@@ -39,10 +39,13 @@ enum LengthType {
 
 struct Length {
   Length() : m_value(0) {}
+
   Length(LengthType t) : m_value(t) {}
+
   Length(int v, LengthType t, bool q = false)
-      : m_value((v * 16) | (q << 3) | t) {}
-  // FIXME: Doesn't work if the passed-in value is very large!
+      : m_value((v * 16) | (q << 3) |
+                t)  // FIXME: Doesn't work if the passed-in value is very large!
+  {}
 
   bool operator==(const Length& o) const { return m_value == o.m_value; }
   bool operator!=(const Length& o) const { return m_value != o.m_value; }
@@ -94,6 +97,7 @@ struct Length {
  private:
   int m_value;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // Length_H

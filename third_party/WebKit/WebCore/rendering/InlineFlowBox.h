@@ -29,13 +29,14 @@ namespace WebCore {
 
 class InlineFlowBox : public InlineRunBox {
  public:
-  InlineFlowBox(RenderObject* obj) : InlineRunBox(obj) {
-    m_firstChild = 0;
-    m_lastChild = 0;
-    m_includeLeftEdge = m_includeRightEdge = false;
-    m_hasTextChildren = false;
-    m_maxHorizontalShadow = 0;
-  }
+  InlineFlowBox(RenderObject* obj)
+      : InlineRunBox(obj),
+        m_firstChild(0),
+        m_lastChild(0),
+        m_maxHorizontalShadow(0),
+        m_includeLeftEdge(false),
+        m_includeRightEdge(false),
+        m_hasTextChildren(false) {}
 
   RenderFlow* flowObject();
 
@@ -61,42 +62,42 @@ class InlineFlowBox : public InlineRunBox {
     if (m_firstChild)
       m_firstChild->setConstructed();
   }
-  void addToLine(InlineBox* child);
 
-  virtual void deleteLine(RenderArena* arena);
+  void addToLine(InlineBox* child);
+  virtual void deleteLine(RenderArena*);
   virtual void extractLine();
   virtual void attachLine();
   virtual void adjustPosition(int dx, int dy);
 
   virtual void clearTruncation();
 
-  virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
-                                        int _tx,
-                                        int _ty);
-  void paintBackgrounds(GraphicsContext* p,
-                        const Color& c,
-                        const BackgroundLayer* bgLayer,
+  virtual void paintBackgroundAndBorder(RenderObject::PaintInfo&,
+                                        int tx,
+                                        int ty);
+  void paintBackgrounds(GraphicsContext*,
+                        const Color&,
+                        const BackgroundLayer*,
                         int my,
                         int mh,
-                        int _tx,
-                        int _ty,
+                        int tx,
+                        int ty,
                         int w,
                         int h);
-  void paintBackground(GraphicsContext* p,
-                       const Color& c,
-                       const BackgroundLayer* bgLayer,
+  void paintBackground(GraphicsContext*,
+                       const Color&,
+                       const BackgroundLayer*,
                        int my,
                        int mh,
-                       int _tx,
-                       int _ty,
+                       int tx,
+                       int ty,
                        int w,
                        int h);
-  virtual void paintDecorations(RenderObject::PaintInfo& i,
-                                int _tx,
-                                int _ty,
+  virtual void paintDecorations(RenderObject::PaintInfo&,
+                                int tx,
+                                int ty,
                                 bool paintedChildren = false);
-  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo&,
                            int x,
                            int y,
                            int tx,
@@ -133,6 +134,7 @@ class InlineFlowBox : public InlineRunBox {
     m_includeLeftEdge = includeLeft;
     m_includeRightEdge = includeRight;
   }
+
   virtual bool hasTextChildren() { return m_hasTextChildren; }
 
   // Helper functions used during line construction and placement.
@@ -188,11 +190,11 @@ class InlineFlowBox : public InlineRunBox {
   bool m_hasTextChildren : 1;
 };
 
-}  // namespace
+}  // namespace WebCore
 
 #ifndef NDEBUG
 // Outside the WebCore namespace for ease of invocation from gdb.
 void showTree(const WebCore::InlineBox*);
 #endif
 
-#endif
+#endif  // InlineFlowBox_H

@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef break_lines_h
+#define break_lines_h
+
 #include "UChar.h"
 
 namespace WebCore {
@@ -38,4 +41,7 @@ inline bool isBreakable(const UChar* str,
     nextBreakable = nextBreakablePosition(str, pos, len, breakNBSP);
   return pos == nextBreakable;
 }
-}
+
+}  // namespace WebCore
+
+#endif  // break_lines_h

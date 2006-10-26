@@ -40,6 +40,7 @@ class RenderPartObject : public RenderPart {
 
   virtual void viewCleared();
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderPartObject_H

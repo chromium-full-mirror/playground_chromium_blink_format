@@ -109,27 +109,27 @@ class RootInlineBox : public InlineFlowBox {
                                bool&);
 
   EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
-  void paintEllipsisBox(RenderObject::PaintInfo& i, int _tx, int _ty) const;
-  bool hitTestEllipsisBox(RenderObject::NodeInfo& info,
-                          int _x,
-                          int _y,
-                          int _tx,
-                          int _ty,
-                          HitTestAction hitTestAction,
+  void paintEllipsisBox(RenderObject::PaintInfo&, int tx, int ty) const;
+  bool hitTestEllipsisBox(RenderObject::NodeInfo&,
+                          int x,
+                          int y,
+                          int tx,
+                          int ty,
+                          HitTestAction,
                           bool inBox);
 
   virtual void clearTruncation();
 
 #if PLATFORM(MAC)
   void addHighlightOverflow();
-  void paintCustomHighlight(RenderObject::PaintInfo& i,
+  void paintCustomHighlight(RenderObject::PaintInfo&,
                             int tx,
                             int ty,
                             const AtomicString& highlightType);
 #endif
 
-  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo&,
                            int x,
                            int y,
                            int tx,
@@ -149,7 +149,7 @@ class RootInlineBox : public InlineFlowBox {
                                 int blockY,
                                 int tx,
                                 int ty,
-                                const RenderObject::PaintInfo* i);
+                                const RenderObject::PaintInfo*);
 
   RenderBlock* block() const;
 
@@ -157,7 +157,7 @@ class RootInlineBox : public InlineFlowBox {
   int selectionBottom() { return m_selectionBottom; }
   int selectionHeight() { return max(0, selectionBottom() - selectionTop()); }
 
-  InlineBox* closestLeafChildForXPos(int _x, int _tx);
+  InlineBox* closestLeafChildForXPos(int x, int tx);
 
  protected:
   // Normally we are only as tall as the style on our block dictates, but we
@@ -198,6 +198,6 @@ class RootInlineBox : public InlineFlowBox {
   EllipsisBox* m_ellipsisBox;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RootInlineBox_H

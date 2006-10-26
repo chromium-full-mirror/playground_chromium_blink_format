@@ -863,4 +863,5 @@ bool InlineTextBox::containsCaretOffset(int offset) const {
   // affinity).
   return true;
 }
-}
+
+}  // namespace WebCore

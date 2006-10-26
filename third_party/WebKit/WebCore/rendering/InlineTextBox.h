@@ -22,12 +22,12 @@
  *
  */
 
-#ifndef KHTML_InlineTextBox_H
-#define KHTML_InlineTextBox_H
+#ifndef InlineTextBox_H
+#define InlineTextBox_H
 
 #include "DocumentMarker.h"
-#include "RenderText.h"
 #include "InlineRunBox.h"
+#include "RenderText.h"
 
 namespace WebCore {
 
@@ -41,14 +41,14 @@ class Position;
 
 class InlineTextBox : public InlineRunBox {
  public:
-  InlineTextBox(RenderObject* obj) : InlineRunBox(obj) {
-    m_start = 0;
-    m_len = 0;
-    m_reversed = false;
-    m_treatAsText = true;
-    m_toAdd = 0;
-    m_truncation = cNoTruncation;
-  }
+  InlineTextBox(RenderObject* obj)
+      : InlineRunBox(obj),
+        m_start(0),
+        m_len(0),
+        m_truncation(cNoTruncation),
+        m_reversed(false),
+        m_treatAsText(true),
+        m_toAdd(0) {}
 
   InlineTextBox* nextTextBox() const {
     return static_cast<InlineTextBox*>(nextLineBox());
@@ -66,14 +66,14 @@ class InlineTextBox : public InlineRunBox {
 
   void offsetRun(int d) { m_start += d; }
 
-  void destroy(RenderArena* arena);
+  void destroy(RenderArena*);
 
   IntRect selectionRect(int absx, int absy, int startPos, int endPos);
   bool isSelected(int startPos, int endPos) const;
   void selectionStartEnd(int& sPos, int& ePos);
 
-  virtual void paint(RenderObject::PaintInfo& i, int tx, int ty);
-  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo&,
                            int x,
                            int y,
                            int tx,
@@ -81,7 +81,7 @@ class InlineTextBox : public InlineRunBox {
 
   RenderText* textObject() const;
 
-  virtual void deleteLine(RenderArena* arena);
+  virtual void deleteLine(RenderArena*);
   virtual void extractLine();
   virtual void attachLine();
 
@@ -97,14 +97,14 @@ class InlineTextBox : public InlineRunBox {
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
-  void* operator new(size_t sz, RenderArena* renderArena) throw();
+  void* operator new(size_t, RenderArena*) throw();
 
   // Overridden to prevent the normal delete from being called.
-  void operator delete(void* ptr, size_t sz);
+  void operator delete(void*, size_t);
 
  private:
   // The normal operator new is disallowed.
-  void* operator new(size_t sz) throw();
+  void* operator new(size_t) throw();
 
  public:
   void setSpaceAdd(int add) {
@@ -156,7 +156,7 @@ class InlineTextBox : public InlineRunBox {
   virtual unsigned caretMaxRenderedOffset() const;
 
   int textPos() const;
-  int offsetForPosition(int _x, bool includePartialGlyphs = true) const;
+  int offsetForPosition(int x, bool includePartialGlyphs = true) const;
   int positionForOffset(int offset) const;
 
   bool containsCaretOffset(
@@ -183,6 +183,7 @@ class InlineTextBox : public InlineRunBox {
 inline RenderText* InlineTextBox::textObject() const {
   return static_cast<RenderText*>(m_object);
 }
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // InlineTextBox_H

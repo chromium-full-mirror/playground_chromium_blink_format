@@ -44,6 +44,7 @@ class FixedTableLayout : public TableLayout {
 
   Vector<Length> m_width;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // FixedTableLayout_H

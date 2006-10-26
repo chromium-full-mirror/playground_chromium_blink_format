@@ -29,8 +29,8 @@ class RenderTable;
 
 class TableLayout {
  public:
-  TableLayout(RenderTable* t) : m_table(t) {}
-  virtual ~TableLayout(){};
+  TableLayout(RenderTable* table) : m_table(table) {}
+  virtual ~TableLayout() {}
 
   virtual void calcMinMaxWidth() = 0;
   virtual void layout() = 0;
@@ -38,6 +38,7 @@ class TableLayout {
  protected:
   RenderTable* m_table;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // TableLayout_H
