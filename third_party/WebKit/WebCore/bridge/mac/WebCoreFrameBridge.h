@@ -300,7 +300,6 @@ typedef enum {
 
 - (NSString*)advanceToNextMisspelling;
 - (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
-- (void)unmarkAllMisspellings;
 
 - (void)setTextSizeMultiplier:(float)multiplier;
 
