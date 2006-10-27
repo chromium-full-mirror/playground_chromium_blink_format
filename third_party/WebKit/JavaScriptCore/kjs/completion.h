@@ -55,7 +55,7 @@ class Completion {
   ComplType complType() const { return comp; }
   JSValue* value() const { return val; }
   Identifier target() const { return tar; }
-  bool isValueCompletion() const { return val; }
+  bool isValueCompletion() const { return !!val; }
 
  private:
   ComplType comp;

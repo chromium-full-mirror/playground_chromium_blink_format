@@ -1013,7 +1013,7 @@ JSObject* ArrayObjectImp::construct(ExecState* exec, const List& args) {
 
 // ECMA 15.6.1
 JSValue* ArrayObjectImp::callAsFunction(ExecState* exec,
-                                        JSObject* /*thisObj*/,
+                                        JSObject*,
                                         const List& args) {
   // equivalent to 'new Array(....)'
   return construct(exec, args);

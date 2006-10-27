@@ -90,7 +90,7 @@ class PropertyMap {
   void restore(const SavedProperties& p);
 
   bool hasGetterSetterProperties() const {
-    return _singleEntry.globalGetterSetterFlag;
+    return !!_singleEntry.globalGetterSetterFlag;
   }
   void setHasGetterSetterProperties(bool f) {
     _singleEntry.globalGetterSetterFlag = f;

@@ -2,6 +2,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
+ *  Copyright (C) 2006 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -30,7 +31,7 @@
 #include "nodes.h"
 #include <wtf/unicode/Unicode.h>
 
-static bool isDecimalDigit(unsigned short c);
+static bool isDecimalDigit(int);
 
 // we can't specify the namespace in yacc's C output, so do it here
 using namespace KJS;
@@ -215,7 +216,7 @@ int Lexer::lex() {
           }
         } else if (current == '"' || current == '\'') {
           state = InString;
-          stringType = current;
+          stringType = static_cast<unsigned short>(current);
         } else if (isIdentStart(current)) {
           record16(current);
           state = InIdentifierOrKeyword;
@@ -289,7 +290,7 @@ int Lexer::lex() {
           nextLine();
           state = InString;
         } else {
-          record16(singleEscape(current));
+          record16(singleEscape(static_cast<unsigned short>(current)));
           state = InString;
         }
         break;
@@ -591,7 +592,7 @@ bool Lexer::isLineTerminator() {
   return cr || lf || current == 0x2028 || current == 0x2029;
 }
 
-bool Lexer::isIdentStart(unsigned short c) {
+bool Lexer::isIdentStart(int c) {
   return (WTF::Unicode::category(c) &
           (WTF::Unicode::Letter_Uppercase | WTF::Unicode::Letter_Lowercase |
            WTF::Unicode::Letter_Titlecase | WTF::Unicode::Letter_Modifier |
@@ -599,7 +600,7 @@ bool Lexer::isIdentStart(unsigned short c) {
          c == '$' || c == '_';
 }
 
-bool Lexer::isIdentPart(unsigned short c) {
+bool Lexer::isIdentPart(int c) {
   return (WTF::Unicode::category(c) &
           (WTF::Unicode::Letter_Uppercase | WTF::Unicode::Letter_Lowercase |
            WTF::Unicode::Letter_Titlecase | WTF::Unicode::Letter_Modifier |
@@ -610,22 +611,19 @@ bool Lexer::isIdentPart(unsigned short c) {
          c == '$' || c == '_';
 }
 
-static bool isDecimalDigit(unsigned short c) {
+static bool isDecimalDigit(int c) {
   return (c >= '0' && c <= '9');
 }
 
-bool Lexer::isHexDigit(unsigned short c) {
+bool Lexer::isHexDigit(int c) {
   return (c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F');
 }
 
-bool Lexer::isOctalDigit(unsigned short c) const {
+bool Lexer::isOctalDigit(int c) {
   return (c >= '0' && c <= '7');
 }
 
-int Lexer::matchPunctuator(unsigned short c1,
-                           unsigned short c2,
-                           unsigned short c3,
-                           unsigned short c4) {
+int Lexer::matchPunctuator(int c1, int c2, int c3, int c4) {
   if (c1 == '>' && c2 == '>' && c3 == '>' && c4 == '=') {
     shift(4);
     return URSHIFTEQUAL;
@@ -738,7 +736,7 @@ int Lexer::matchPunctuator(unsigned short c1,
   }
 }
 
-unsigned short Lexer::singleEscape(unsigned short c) const {
+unsigned short Lexer::singleEscape(unsigned short c) {
   switch (c) {
     case 'b':
       return 0x08;
@@ -763,35 +761,31 @@ unsigned short Lexer::singleEscape(unsigned short c) const {
   }
 }
 
-unsigned short Lexer::convertOctal(unsigned short c1,
-                                   unsigned short c2,
-                                   unsigned short c3) const {
-  return ((c1 - '0') * 64 + (c2 - '0') * 8 + c3 - '0');
+unsigned short Lexer::convertOctal(int c1, int c2, int c3) {
+  return static_cast<unsigned short>((c1 - '0') * 64 + (c2 - '0') * 8 + c3 -
+                                     '0');
 }
 
-unsigned char Lexer::convertHex(unsigned short c) {
+unsigned char Lexer::convertHex(int c) {
   if (c >= '0' && c <= '9')
-    return (c - '0');
-  else if (c >= 'a' && c <= 'f')
-    return (c - 'a' + 10);
-  else
-    return (c - 'A' + 10);
+    return static_cast<unsigned char>(c - '0');
+  if (c >= 'a' && c <= 'f')
+    return static_cast<unsigned char>(c - 'a' + 10);
+  return static_cast<unsigned char>(c - 'A' + 10);
 }
 
-unsigned char Lexer::convertHex(unsigned short c1, unsigned short c2) {
+unsigned char Lexer::convertHex(int c1, int c2) {
   return ((convertHex(c1) << 4) + convertHex(c2));
 }
 
-KJS::UChar Lexer::convertUnicode(unsigned short c1,
-                                 unsigned short c2,
-                                 unsigned short c3,
-                                 unsigned short c4) {
+KJS::UChar Lexer::convertUnicode(int c1, int c2, int c3, int c4) {
   return KJS::UChar((convertHex(c1) << 4) + convertHex(c2),
                     (convertHex(c3) << 4) + convertHex(c4));
 }
 
-void Lexer::record8(unsigned short c) {
-  assert(c <= 0xff);
+void Lexer::record8(int c) {
+  ASSERT(c >= 0);
+  ASSERT(c <= 0xff);
 
   // enlarge buffer if full
   if (pos8 >= size8 - 1) {

@@ -207,7 +207,7 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
 #endif
 }
 
-void FunctionImp::processVarDecls(ExecState* /*exec*/) {}
+void FunctionImp::processVarDecls(ExecState*) {}
 
 JSValue* FunctionImp::argumentsGetter(ExecState* exec,
                                       JSObject*,

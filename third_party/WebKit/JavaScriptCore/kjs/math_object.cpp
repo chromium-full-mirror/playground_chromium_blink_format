@@ -206,7 +206,7 @@ JSValue* MathFuncImp::callAsFunction(ExecState* exec,
       break;
     case MathObjectImp::Random:
       if (!randomSeeded) {
-        srand(time(0));
+        srand(static_cast<unsigned>(time(0)));
         randomSeeded = true;
       }
       result = (double)rand() / RAND_MAX;

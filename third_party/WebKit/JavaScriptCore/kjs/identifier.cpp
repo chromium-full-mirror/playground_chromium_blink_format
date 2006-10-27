@@ -49,9 +49,9 @@
 namespace WTF {
 
 template <typename T>
-class DefaultHash;
+struct DefaultHash;
 template <typename T>
-class StrHash;
+struct StrHash;
 
 template <>
 struct StrHash<KJS::UString::Rep*> {
@@ -117,12 +117,13 @@ struct CStringTranslator {
   }
 
   static void translate(UString::Rep*& location, const char* c, unsigned hash) {
-    int length = strlen(c);
+    size_t length = strlen(c);
     UChar* d = static_cast<UChar*>(fastMalloc(sizeof(UChar) * length));
-    for (int i = 0; i != length; i++)
+    for (size_t i = 0; i != length; i++)
       d[i] = c[i];
 
-    UString::Rep* r = UString::Rep::create(d, length).release();
+    UString::Rep* r =
+        UString::Rep::create(d, static_cast<int>(length)).release();
     r->isIdentifier = 1;
     r->rc = 0;
     r->_hash = hash;
@@ -134,7 +135,7 @@ struct CStringTranslator {
 PassRefPtr<UString::Rep> Identifier::add(const char* c) {
   if (!c)
     return &UString::Rep::null;
-  int length = strlen(c);
+  size_t length = strlen(c);
   if (length == 0)
     return &UString::Rep::empty;
 

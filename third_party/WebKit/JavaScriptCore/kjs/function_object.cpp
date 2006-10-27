@@ -58,7 +58,7 @@ FunctionPrototype::FunctionPrototype(ExecState* exec) {
 FunctionPrototype::~FunctionPrototype() {}
 
 // ECMA 15.3.4
-JSValue* FunctionPrototype::callAsFunction(ExecState* /*exec*/,
+JSValue* FunctionPrototype::callAsFunction(ExecState*,
                                            JSObject* /*thisObj*/,
                                            const List& /*args*/) {
   return jsUndefined();

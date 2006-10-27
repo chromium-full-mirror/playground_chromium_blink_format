@@ -55,7 +55,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
   assert(UTF16Chars);
 
   if (UTF8Length == -1)
-    UTF8Length = strlen(UTF8Chars);
+    UTF8Length = static_cast<int>(strlen(UTF8Chars));
 
   // UTF16Length maximum length is the length of the UTF8 string, plus one to
   // include terminator
@@ -98,7 +98,8 @@ void coerceValueToNPVariantStringType(ExecState* exec,
                                       NPVariant* result) {
   UString ustring = value->toString(exec);
   CString cstring = ustring.UTF8String();
-  NPString string = {(const NPUTF8*)cstring.c_str(), cstring.size()};
+  NPString string = {(const NPUTF8*)cstring.c_str(),
+                     static_cast<uint32_t>(cstring.size())};
   NPN_InitializeVariantWithStringCopy(result, &string);
 }
 
@@ -111,7 +112,8 @@ void convertValueToNPVariant(ExecState* exec,
   if (type == StringType) {
     UString ustring = value->toString(exec);
     CString cstring = ustring.UTF8String();
-    NPString string = {(const NPUTF8*)cstring.c_str(), cstring.size()};
+    NPString string = {(const NPUTF8*)cstring.c_str(),
+                       static_cast<uint32_t>(cstring.size())};
     NPN_InitializeVariantWithStringCopy(result, &string);
   } else if (type == NumberType) {
     DOUBLE_TO_NPVARIANT(value->toNumber(exec), *result);

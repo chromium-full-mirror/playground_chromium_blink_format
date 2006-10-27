@@ -76,7 +76,7 @@ inline unsigned intHash(uint64_t key) {
   key ^= (key >> 15);
   key += ~(key << 27);
   key ^= (key >> 31);
-  return key;
+  return static_cast<unsigned>(key);
 }
 
 template <typename T>
@@ -93,7 +93,15 @@ struct IntHash {
 template <typename T>
 struct PtrHash {
   static unsigned hash(T key) {
+#if COMPILER(MSVC)
+#pragma warning(push)
+#pragma warning(disable : 4244)  // work around what seems to be a bug in MSVC's
+                                 // conversion warnings
+#endif
     return IntHash<uintptr_t>::hash(reinterpret_cast<uintptr_t>(key));
+#if COMPILER(MSVC)
+#pragma warning(pop)
+#endif
   }
   static bool equal(T a, T b) { return a == b; }
 };

@@ -124,7 +124,7 @@ class LabelStack : Noncopyable {
 
 enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
 
-class AttachedInterpreter;
+struct AttachedInterpreter;
 class DebuggerImp {
  public:
   DebuggerImp() {

@@ -504,7 +504,7 @@ void JSObject::getPropertyNames(ExecState* exec,
     static_cast<JSObject*>(_proto)->getPropertyNames(exec, propertyNames);
 }
 
-bool JSObject::toBoolean(ExecState* /*exec*/) const {
+bool JSObject::toBoolean(ExecState*) const {
   return true;
 }
 
@@ -522,7 +522,7 @@ UString JSObject::toString(ExecState* exec) const {
   return prim->toString(exec);
 }
 
-JSObject* JSObject::toObject(ExecState* /*exec*/) const {
+JSObject* JSObject::toObject(ExecState*) const {
   return const_cast<JSObject*>(this);
 }
 

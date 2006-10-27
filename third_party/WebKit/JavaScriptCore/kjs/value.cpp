@@ -102,7 +102,7 @@ uint32_t JSValue::toUInt32(ExecState* exec) const {
 uint16_t JSValue::toUInt16(ExecState* exec) const {
   uint32_t i;
   if (getUInt32(i))
-    return i;
+    return static_cast<uint16_t>(i);
 
   double d = roundValue(exec, const_cast<JSValue*>(this));
   if (isNaN(d) || isInf(d))

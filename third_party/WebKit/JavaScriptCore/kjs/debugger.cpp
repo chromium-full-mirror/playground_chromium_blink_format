@@ -93,7 +93,7 @@ bool Debugger::hasHandledException(ExecState* exec, JSValue* exception) {
   return false;
 }
 
-bool Debugger::sourceParsed(ExecState* /*exec*/,
+bool Debugger::sourceParsed(ExecState*,
                             int /*sourceId*/,
                             const UString& /*sourceURL*/,
                             const UString& /*source*/,
@@ -103,25 +103,25 @@ bool Debugger::sourceParsed(ExecState* /*exec*/,
   return true;
 }
 
-bool Debugger::sourceUnused(ExecState* /*exec*/, int /*sourceId*/) {
+bool Debugger::sourceUnused(ExecState*, int /*sourceId*/) {
   return true;
 }
 
-bool Debugger::exception(ExecState* /*exec*/,
+bool Debugger::exception(ExecState*,
                          int /*sourceId*/,
                          int /*lineno*/,
-                         JSValue* /*exception*/) {
+                         JSValue* /*exception */) {
   return true;
 }
 
-bool Debugger::atStatement(ExecState* /*exec*/,
+bool Debugger::atStatement(ExecState*,
                            int /*sourceId*/,
                            int /*firstLine*/,
                            int /*lastLine*/) {
   return true;
 }
 
-bool Debugger::callEvent(ExecState* /*exec*/,
+bool Debugger::callEvent(ExecState*,
                          int /*sourceId*/,
                          int /*lineno*/,
                          JSObject* /*function*/,
@@ -129,7 +129,7 @@ bool Debugger::callEvent(ExecState* /*exec*/,
   return true;
 }
 
-bool Debugger::returnEvent(ExecState* /*exec*/,
+bool Debugger::returnEvent(ExecState*,
                            int /*sourceId*/,
                            int /*lineno*/,
                            JSObject* /*function*/) {
