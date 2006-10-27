@@ -131,12 +131,12 @@ class InlineTextBox : public InlineRunBox {
                                  const Font*,
                                  int startPos,
                                  int endPos);
-  void paintAllMarkersOfType(GraphicsContext*,
-                             int tx,
-                             int ty,
-                             DocumentMarker::MarkerType,
-                             RenderStyle*,
-                             const Font*);
+  void paintDocumentMarkers(GraphicsContext*,
+                            int tx,
+                            int ty,
+                            RenderStyle*,
+                            const Font*,
+                            bool background);
   void paintSpellingOrGrammarMarker(GraphicsContext*,
                                     int tx,
                                     int ty,
