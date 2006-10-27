@@ -185,7 +185,7 @@ class String {
   String(NSString*);
   operator NSString*() const {
     if (!m_impl)
-      return @"";
+      return nil;
     return *m_impl;
   }
 #endif
