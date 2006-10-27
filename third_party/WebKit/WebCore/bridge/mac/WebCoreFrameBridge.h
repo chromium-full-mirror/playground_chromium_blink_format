@@ -296,9 +296,6 @@ typedef enum {
 - (void)unmarkAllTextMatches;
 - (NSArray*)rectsForTextMatches;
 
-- (NSString*)advanceToNextMisspelling;
-- (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
-
 - (void)setTextSizeMultiplier:(float)multiplier;
 
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string;
