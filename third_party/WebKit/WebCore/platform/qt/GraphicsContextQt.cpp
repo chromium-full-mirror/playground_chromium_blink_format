@@ -479,7 +479,9 @@ void GraphicsContext::drawLineForText(const IntPoint& point,
   drawLine(origin, endPoint);
 }
 
-void GraphicsContext::drawLineForMisspelling(const IntPoint& point, int width) {
+void GraphicsContext::drawLineForMisspellingOrBadGrammar(const IntPoint&,
+                                                         int width,
+                                                         bool grammar) {
   if (paintingDisabled())
     return;
 
