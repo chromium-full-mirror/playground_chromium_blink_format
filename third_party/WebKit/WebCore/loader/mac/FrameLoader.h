@@ -27,6 +27,7 @@
  */
 
 #import "FrameLoaderTypes.h"
+#import <WebCore/PlatformString.h>
 #import <wtf/Forward.h>
 #import <wtf/HashSet.h>
 #import <wtf/Noncopyable.h>
@@ -50,6 +51,7 @@ class FormState;
 class Frame;
 class FrameLoaderClient;
 class MainResourceLoader;
+class String;
 class WebResourceLoader;
 
 bool isBackForwardLoadType(FrameLoadType);
@@ -65,11 +67,11 @@ class FrameLoader : Noncopyable {
   // FIXME: This is not cool, people.
   void prepareForLoadStart();
   void setupForReplace();
-  void setupForReplaceByMIMEType(NSString* newMIMEType);
+  void setupForReplaceByMIMEType(const String& newMIMEType);
   void finalSetupForReplace(DocumentLoader*);
   void safeLoad(NSURL*);
   void load(NSURLRequest*);
-  void load(NSURLRequest*, NSString* frameName);
+  void load(NSURLRequest*, const String& frameName);
   void load(NSURLRequest*,
             NSDictionary* triggeringAaction,
             FrameLoadType,
@@ -77,12 +79,14 @@ class FrameLoader : Noncopyable {
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
   void load(NSURL*,
-            NSString* referrer,
+            const String& referrer,
             FrameLoadType,
-            NSString* target,
+            const String& target,
             NSEvent* event,
             Element* form,
             NSDictionary* formValues);
+
+  bool canLoad(NSURL*, const String& referrer, bool& hideReferrer);
 
   // Also not cool.
   void stopLoadingPlugIns();
@@ -147,19 +151,19 @@ class FrameLoader : Noncopyable {
   NSError* interruptionForPolicyChangeError(NSURLRequest*);
   bool isHostedByObjectElement() const;
   bool isLoadingMainFrame() const;
-  bool canShowMIMEType(NSString* MIMEType) const;
-  bool representationExistsForURLScheme(NSString* URLScheme);
-  NSString* generatedMIMETypeForURLScheme(NSString* URLScheme);
+  bool canShowMIMEType(const String& MIMEType) const;
+  bool representationExistsForURLScheme(const String& URLScheme);
+  String generatedMIMETypeForURLScheme(const String& URLScheme);
   void notifyIconChanged(NSURL* iconURL);
   void checkNavigationPolicy(NSURLRequest* newRequest,
                              id continuationObject,
                              SEL continuationSelector);
-  void checkContentPolicy(NSString* MIMEType,
+  void checkContentPolicy(const String& MIMEType,
                           id continuationObject,
                           SEL continuationSelector);
   void cancelContentPolicyCheck();
   void reload();
-  void reloadAllowingStaleData(NSString* overrideEncoding);
+  void reloadAllowingStaleData(const String& overrideEncoding);
 
   void didReceiveServerRedirectForProvisionalLoadForFrame();
   void finishedLoadingDocument(DocumentLoader*);
@@ -196,10 +200,10 @@ class FrameLoader : Noncopyable {
                                     id& identifier,
                                     NSError*& error);
   void post(NSURL*,
-            NSString* referrer,
-            NSString* target,
+            const String& referrer,
+            const String& target,
             NSArray* postData,
-            NSString* contentType,
+            const String& contentType,
             NSEvent*,
             Element* form,
             NSDictionary* formValues);
@@ -225,7 +229,7 @@ class FrameLoader : Noncopyable {
   void continueLoadRequestAfterNavigationPolicy(NSURLRequest*, FormState*);
   void continueFragmentScrollAfterNavigationPolicy(NSURLRequest*);
   void continueLoadRequestAfterNewWindowPolicy(NSURLRequest*,
-                                               NSString* frameName,
+                                               const String& frameName,
                                                FormState*);
 #endif
 
@@ -250,7 +254,7 @@ class FrameLoader : Noncopyable {
   void invalidatePendingPolicyDecision(bool callDefaultAction);
   void checkNewWindowPolicy(NSURLRequest*,
                             NSDictionary*,
-                            NSString* frameName,
+                            const String& frameName,
                             PassRefPtr<FormState>);
   void checkNavigationPolicy(NSURLRequest*,
                              DocumentLoader*,
@@ -302,7 +306,7 @@ class FrameLoader : Noncopyable {
   RetainPtr<WebPolicyDecider> m_policyDecider;
 
   RetainPtr<NSURLRequest> m_policyRequest;
-  RetainPtr<NSString> m_policyFrameName;
+  String m_policyFrameName;
   RetainPtr<id> m_policyTarget;
   SEL m_policySelector;
   RefPtr<FormState> m_policyFormState;

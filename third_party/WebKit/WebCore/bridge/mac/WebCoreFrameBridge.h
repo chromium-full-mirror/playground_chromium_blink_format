@@ -34,6 +34,7 @@ namespace WebCore {
 class EditorClient;
 class Element;
 class FrameMac;
+class String;
 }
 
 typedef WebCore::EditorClient WebCoreEditorClient;
@@ -213,9 +214,6 @@ typedef enum {
 
 - (void)invalidatePageCache:(NSDictionary*)pageCache;
 
-- (BOOL)canLoadURL:(NSURL*)URL
-      fromReferrer:(NSString*)referrer
-      hideReferrer:(BOOL*)hideReferrer;
 - (BOOL)canTargetLoadInFrame:(WebCoreFrameBridge*)targetFrame;
 
 - (void)saveDocumentState;
@@ -481,7 +479,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (BOOL)canProvideDocumentSource;
 - (BOOL)canSaveAsWebArchive;
 
-- (void)setTitle:(NSString*)title;
 - (NSURL*)originalRequestURL;
 - (void)frameDetached;
 - (void)tokenizerProcessedData;
@@ -533,7 +530,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (WebCoreFrameBridge*)createChildFrameNamed:(NSString*)frameName
                                      withURL:(NSURL*)URL
-                                    referrer:(NSString*)referrer
+                                    referrer:(const WebCore::String&)referrer
                                 ownerElement:(WebCoreElement*)ownerElement
                              allowsScrolling:(BOOL)allowsScrolling
                                  marginWidth:(int)width
