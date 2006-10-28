@@ -42,6 +42,7 @@
 #include "HTMLNames.h"
 #include "HTMLOListElement.h"
 #include "KURL.h"
+#include "HitTestResult.h"
 #include "Position.h"
 #include "RenderArena.h"
 #include "RenderFlexibleBox.h"
@@ -2687,7 +2688,7 @@ void RenderObject::updateDragState(bool dragOn) {
     continuation()->updateDragState(dragOn);
 }
 
-bool RenderObject::hitTest(NodeInfo& info,
+bool RenderObject::hitTest(HitTestResult& info,
                            int x,
                            int y,
                            int tx,
@@ -2715,7 +2716,7 @@ bool RenderObject::hitTest(NodeInfo& info,
   return inside;
 }
 
-void RenderObject::setInnerNode(NodeInfo& info) {
+void RenderObject::setInnerNode(HitTestResult& info) {
   if (info.innerNode())
     return;
 
@@ -2737,7 +2738,7 @@ void RenderObject::setInnerNode(NodeInfo& info) {
   }
 }
 
-bool RenderObject::nodeAtPoint(NodeInfo& info,
+bool RenderObject::nodeAtPoint(HitTestResult& info,
                                int _x,
                                int _y,
                                int _tx,

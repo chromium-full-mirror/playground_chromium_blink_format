@@ -58,7 +58,7 @@ class RenderSVGImage : public RenderImage {
 
   virtual void computeAbsoluteRepaintRect(IntRect&, bool f);
 
-  virtual bool nodeAtPoint(NodeInfo&,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int _x,
                            int _y,
                            int _tx,

@@ -70,7 +70,7 @@ class RenderText : public RenderObject {
   virtual void paint(PaintInfo& i, int tx, int ty) { assert(false); }
   virtual void layout() { assert(false); }
 
-  virtual bool nodeAtPoint(NodeInfo&, int, int, int, int, HitTestAction) {
+  virtual bool nodeAtPoint(HitTestResult&, int, int, int, int, HitTestAction) {
     assert(false);
     return false;
   }

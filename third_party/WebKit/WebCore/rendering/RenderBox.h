@@ -42,7 +42,7 @@ class RenderBox : public RenderObject {
 
   virtual void setStyle(RenderStyle*);
   virtual void paint(PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(NodeInfo& i,
+  virtual bool nodeAtPoint(HitTestResult& i,
                            int _x,
                            int _y,
                            int _tx,

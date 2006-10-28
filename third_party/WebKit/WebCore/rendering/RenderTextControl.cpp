@@ -30,6 +30,7 @@
 #include "HTMLNames.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLTextFieldInnerElement.h"
+#include "HitTestResult.h"
 #include "RenderTheme.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
@@ -351,7 +352,7 @@ short RenderTextControl::baselinePosition(bool b, bool isRootLineBox) const {
   return RenderFlexibleBox::baselinePosition(b, isRootLineBox);
 }
 
-bool RenderTextControl::nodeAtPoint(NodeInfo& info,
+bool RenderTextControl::nodeAtPoint(HitTestResult& info,
                                     int x,
                                     int y,
                                     int tx,

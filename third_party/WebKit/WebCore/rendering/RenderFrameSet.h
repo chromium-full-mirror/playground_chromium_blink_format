@@ -53,7 +53,7 @@ class RenderFrameSet : public RenderContainer {
   bool canResize(int x, int y);
   void setResizing(bool);
 
-  virtual bool nodeAtPoint(NodeInfo&,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int x,
                            int y,
                            int tx,

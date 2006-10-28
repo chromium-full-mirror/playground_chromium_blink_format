@@ -30,6 +30,7 @@
 #if PLATFORM(MAC)
 #include "FrameMac.h"
 #endif
+#include "HitTestResult.h"
 
 using namespace std;
 
@@ -160,7 +161,7 @@ void RootInlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 #endif
 }
 
-bool RootInlineBox::nodeAtPoint(RenderObject::NodeInfo& i,
+bool RootInlineBox::nodeAtPoint(HitTestResult& i,
                                 int x,
                                 int y,
                                 int tx,

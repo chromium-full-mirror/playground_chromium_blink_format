@@ -111,7 +111,7 @@ class RenderTableSection : public RenderContainer {
 
   virtual RenderObject* removeChildNode(RenderObject* child);
 
-  virtual bool nodeAtPoint(NodeInfo& info,
+  virtual bool nodeAtPoint(HitTestResult& info,
                            int x,
                            int y,
                            int tx,

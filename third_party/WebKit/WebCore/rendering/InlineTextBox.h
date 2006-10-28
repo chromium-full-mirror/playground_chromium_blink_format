@@ -37,6 +37,7 @@ const int cFullTruncation = -2;
 class String;
 class StringImpl;
 class MarkedTextUnderline;
+class HitTestResult;
 class Position;
 
 class InlineTextBox : public InlineRunBox {
@@ -72,12 +73,8 @@ class InlineTextBox : public InlineRunBox {
   bool isSelected(int startPos, int endPos) const;
   void selectionStartEnd(int& sPos, int& ePos);
 
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
-  virtual bool nodeAtPoint(RenderObject::NodeInfo&,
-                           int x,
-                           int y,
-                           int tx,
-                           int ty);
+  virtual void paint(RenderObject::PaintInfo& i, int tx, int ty);
+  virtual bool nodeAtPoint(HitTestResult&, int, int, int, int);
 
   RenderText* textObject() const;
 

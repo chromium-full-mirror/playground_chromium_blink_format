@@ -28,6 +28,7 @@
 #include "Document.h"
 #include "Frame.h"
 #include "GraphicsContext.h"
+#include "HitTestResult.h"
 #include "Range.h"
 #include "RenderArena.h"
 #include "RenderBlock.h"
@@ -225,7 +226,7 @@ bool InlineTextBox::isLineBreak() const {
           (*textObject()->string())[start()] == '\n');
 }
 
-bool InlineTextBox::nodeAtPoint(RenderObject::NodeInfo& i,
+bool InlineTextBox::nodeAtPoint(HitTestResult& i,
                                 int x,
                                 int y,
                                 int tx,

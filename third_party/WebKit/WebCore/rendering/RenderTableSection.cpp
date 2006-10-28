@@ -1007,7 +1007,7 @@ RenderObject* RenderTableSection::removeChildNode(RenderObject* child) {
 }
 
 // Hit Testing
-bool RenderTableSection::nodeAtPoint(NodeInfo& info,
+bool RenderTableSection::nodeAtPoint(HitTestResult& info,
                                      int x,
                                      int y,
                                      int tx,

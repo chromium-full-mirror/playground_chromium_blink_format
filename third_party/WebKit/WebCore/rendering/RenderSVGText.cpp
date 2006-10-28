@@ -92,7 +92,7 @@ InlineBox* RenderSVGText::createInlineBox(bool makePlaceHolderBox,
   return flowBox;
 }
 
-bool RenderSVGText::nodeAtPoint(NodeInfo& info,
+bool RenderSVGText::nodeAtPoint(HitTestResult& info,
                                 int _x,
                                 int _y,
                                 int _tx,

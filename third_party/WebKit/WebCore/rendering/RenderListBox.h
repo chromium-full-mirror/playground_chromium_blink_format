@@ -46,7 +46,7 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
   virtual bool canHaveChildren() const { return false; }
   virtual const char* renderName() const { return "RenderListBox"; }
   virtual void paintObject(PaintInfo&, int tx, int ty);
-  virtual bool isPointInScrollbar(NodeInfo&, int x, int y, int tx, int ty);
+  virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
 
   virtual bool scroll(ScrollDirection direction,
                       ScrollGranularity granularity,

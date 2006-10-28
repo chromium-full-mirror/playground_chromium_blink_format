@@ -32,6 +32,7 @@
 #include "HTMLOptionElement.h"
 #include "HTMLOptGroupElement.h"
 #include "HTMLSelectElement.h"
+#include "HitTestResult.h"
 #include "PlatformScrollBar.h"
 #include "RenderBR.h"
 #include "RenderText.h"
@@ -334,7 +335,7 @@ void RenderListBox::paintItemBackground(PaintInfo& i,
     i.p->fillRect(itemBoundingBoxRect(tx, ty, listIndex), backColor);
 }
 
-bool RenderListBox::isPointInScrollbar(NodeInfo& info,
+bool RenderListBox::isPointInScrollbar(HitTestResult& info,
                                        int _x,
                                        int _y,
                                        int _tx,

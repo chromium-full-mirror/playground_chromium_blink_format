@@ -274,7 +274,7 @@ RenderPath::PointerEventsHitRules RenderPath::pointerEventsHitRules() {
   return hitRules;
 }
 
-bool RenderPath::nodeAtPoint(NodeInfo& info,
+bool RenderPath::nodeAtPoint(HitTestResult& info,
                              int _x,
                              int _y,
                              int _tx,

@@ -242,7 +242,7 @@ int RenderBox::calcContentBoxHeight(int h) const {
 }
 
 // Hit Testing
-bool RenderBox::nodeAtPoint(NodeInfo& info,
+bool RenderBox::nodeAtPoint(HitTestResult& info,
                             int x,
                             int y,
                             int tx,

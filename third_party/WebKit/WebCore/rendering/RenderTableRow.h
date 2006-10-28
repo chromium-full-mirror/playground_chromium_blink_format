@@ -44,7 +44,7 @@ class RenderTableRow : public RenderContainer {
   virtual void position(InlineBox*) {}
   virtual void layout();
   virtual IntRect getAbsoluteRepaintRect();
-  virtual bool nodeAtPoint(NodeInfo& info,
+  virtual bool nodeAtPoint(HitTestResult& info,
                            int x,
                            int y,
                            int tx,

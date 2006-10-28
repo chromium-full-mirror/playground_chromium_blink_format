@@ -34,6 +34,7 @@
 #include "HTMLInputElement.h"
 #include "HTMLMapElement.h"
 #include "HTMLNames.h"
+#include "HitTestResult.h"
 #include "RenderView.h"
 #include "TextStyle.h"
 
@@ -320,7 +321,7 @@ HTMLMapElement* RenderImage::imageMap() {
   return i ? i->document()->getImageMap(i->imageMap()) : 0;
 }
 
-bool RenderImage::nodeAtPoint(NodeInfo& info,
+bool RenderImage::nodeAtPoint(HitTestResult& info,
                               int _x,
                               int _y,
                               int _tx,

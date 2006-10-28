@@ -36,6 +36,7 @@
 #endif
 
 @class DOMElement;
+@class DOMNode;
 @class DOMRange;
 @class WebInspector;
 @class WebFrameView;
@@ -53,6 +54,7 @@ class Frame;
 class FrameMac;
 class FrameLoader;
 class HTMLElement;
+class Node;
 class Range;
 }
 
@@ -61,6 +63,9 @@ WebFrame* kit(WebCore::Frame*);
 
 WebCore::Element* core(DOMElement*);
 DOMElement* kit(WebCore::Element*);
+
+WebCore::Node* core(DOMNode*);
+DOMNode* kit(WebCore::Node*);
 
 WebCore::Document* core(DOMDocument*);
 DOMDocument* kit(WebCore::Document*);

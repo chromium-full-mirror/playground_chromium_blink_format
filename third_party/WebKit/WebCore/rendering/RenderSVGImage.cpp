@@ -211,7 +211,7 @@ void RenderSVGImage::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   RenderImage::computeAbsoluteRepaintRect(r, f);
 }
 
-bool RenderSVGImage::nodeAtPoint(NodeInfo& info,
+bool RenderSVGImage::nodeAtPoint(HitTestResult& info,
                                  int _x,
                                  int _y,
                                  int _tx,

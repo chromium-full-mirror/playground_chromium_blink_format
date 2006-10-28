@@ -137,7 +137,7 @@ IntRect RenderTableRow::getAbsoluteRepaintRect() {
 }
 
 // Hit Testing
-bool RenderTableRow::nodeAtPoint(NodeInfo& info,
+bool RenderTableRow::nodeAtPoint(HitTestResult& info,
                                  int x,
                                  int y,
                                  int tx,

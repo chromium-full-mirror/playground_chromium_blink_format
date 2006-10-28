@@ -430,7 +430,7 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
   }
 }
 
-bool RenderFlow::hitTestLines(NodeInfo& i,
+bool RenderFlow::hitTestLines(HitTestResult& i,
                               int x,
                               int y,
                               int tx,

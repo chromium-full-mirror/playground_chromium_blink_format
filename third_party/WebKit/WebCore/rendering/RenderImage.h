@@ -70,7 +70,7 @@ class RenderImage : public RenderReplaced {
     return m_cachedImage ? m_cachedImage->image() : nullImage();
   }
 
-  virtual bool nodeAtPoint(NodeInfo&,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int x,
                            int y,
                            int tx,

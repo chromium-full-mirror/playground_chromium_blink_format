@@ -40,7 +40,7 @@ class RenderTextControl : public RenderFlexibleBox {
   virtual void updateFromElement();
   virtual bool canHaveChildren() const { return false; }
   virtual short baselinePosition(bool, bool) const;
-  virtual bool nodeAtPoint(NodeInfo&,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int x,
                            int y,
                            int tx,

@@ -29,6 +29,7 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
+#include "HitTestResult.h"
 #include "RenderTableCell.h"
 #include "RenderTextFragment.h"
 #include "SelectionController.h"
@@ -2775,7 +2776,7 @@ int RenderBlock::getClearDelta(RenderObject* child) {
   return result;
 }
 
-bool RenderBlock::isPointInScrollbar(NodeInfo& info,
+bool RenderBlock::isPointInScrollbar(HitTestResult& info,
                                      int _x,
                                      int _y,
                                      int _tx,
@@ -2811,7 +2812,7 @@ bool RenderBlock::isPointInScrollbar(NodeInfo& info,
   return false;
 }
 
-bool RenderBlock::nodeAtPoint(NodeInfo& info,
+bool RenderBlock::nodeAtPoint(HitTestResult& info,
                               int _x,
                               int _y,
                               int _tx,

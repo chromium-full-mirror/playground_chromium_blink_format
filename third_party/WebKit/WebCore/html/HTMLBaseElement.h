@@ -37,7 +37,7 @@ class HTMLBaseElement : public HTMLElement {
   virtual int tagPriority() const { return 0; }
 
   String href() const { return m_href; }
-  String target() const { return m_target; }
+  virtual String target() const { return m_target; }
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void insertedIntoDocument();

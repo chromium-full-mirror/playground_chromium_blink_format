@@ -178,6 +178,7 @@ class Element : public ContainerNode {
   virtual String toString() const;
 
   virtual bool isURLAttribute(Attribute* attr) const;
+  virtual String target() const { return String(); }
 
   virtual void focus();
   virtual void updateFocusAppearance();

@@ -79,7 +79,7 @@ class HTMLAnchorElement : public HTMLElement {
   int tabIndex() const;
   void setTabIndex(int);
 
-  String target() const;
+  virtual String target() const;
   void setTarget(const String&);
 
   String type() const;

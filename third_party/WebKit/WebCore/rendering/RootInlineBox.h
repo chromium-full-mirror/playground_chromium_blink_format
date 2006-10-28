@@ -29,6 +29,8 @@
 namespace WebCore {
 
 class EllipsisBox;
+class HitTestResult;
+
 struct GapRects;
 
 class RootInlineBox : public InlineFlowBox {
@@ -109,13 +111,14 @@ class RootInlineBox : public InlineFlowBox {
                                bool&);
 
   EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
-  void paintEllipsisBox(RenderObject::PaintInfo&, int tx, int ty) const;
-  bool hitTestEllipsisBox(RenderObject::NodeInfo&,
-                          int x,
-                          int y,
-                          int tx,
-                          int ty,
-                          HitTestAction,
+
+  void paintEllipsisBox(RenderObject::PaintInfo& i, int _tx, int _ty) const;
+  bool hitTestEllipsisBox(HitTestResult& info,
+                          int _x,
+                          int _y,
+                          int _tx,
+                          int _ty,
+                          HitTestAction hitTestAction,
                           bool inBox);
 
   virtual void clearTruncation();
@@ -128,12 +131,8 @@ class RootInlineBox : public InlineFlowBox {
                             const AtomicString& highlightType);
 #endif
 
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
-  virtual bool nodeAtPoint(RenderObject::NodeInfo&,
-                           int x,
-                           int y,
-                           int tx,
-                           int ty);
+  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(HitTestResult&, int, int, int, int);
 
   bool hasSelectedChildren() const { return m_hasSelectedChildren; }
   void setHasSelectedChildren(bool b);

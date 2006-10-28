@@ -27,6 +27,8 @@
 #include "EllipsisBox.h"
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
+#include "HitTestResult.h"
+#include "RootInlineBox.h"
 #include "RenderBlock.h"
 #include "RenderFlow.h"
 #include "RenderListMarker.h"
@@ -545,7 +547,7 @@ void InlineFlowBox::shrinkBoxesWithNoTextChildren(int topPos, int bottomPos) {
   }
 }
 
-bool InlineFlowBox::nodeAtPoint(RenderObject::NodeInfo& i,
+bool InlineFlowBox::nodeAtPoint(HitTestResult& i,
                                 int x,
                                 int y,
                                 int tx,

@@ -116,7 +116,7 @@ void RenderForeignObject::layout() {
   setNeedsLayout(false);
 }
 
-bool RenderForeignObject::nodeAtPoint(NodeInfo& info,
+bool RenderForeignObject::nodeAtPoint(HitTestResult& info,
                                       int x,
                                       int y,
                                       int tx,

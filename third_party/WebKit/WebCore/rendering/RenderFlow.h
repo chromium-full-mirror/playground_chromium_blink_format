@@ -78,7 +78,7 @@ class RenderFlow : public RenderContainer {
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   void paintLines(PaintInfo& i, int _tx, int _ty);
-  bool hitTestLines(NodeInfo& i,
+  bool hitTestLines(HitTestResult& i,
                     int x,
                     int y,
                     int tx,
