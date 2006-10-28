@@ -906,8 +906,8 @@ void RenderLayer::autoscroll() {
       currentFrame->view()->currentMousePosition());
 
   if (currentFrame->mouseDownMayStartSelect()) {
-    HitTestResult renderInfo(true, false, true);
-    if (hitTest(renderInfo, currentPos)) {
+    HitTestResult renderInfo(currentPos, true, false, true);
+    if (hitTest(renderInfo)) {
       VisiblePosition pos(
           renderInfo.innerNode()->renderer()->positionForPoint(currentPos));
       currentFrame->updateSelectionForMouseDragOverPosition(pos);
@@ -1592,13 +1592,13 @@ static inline IntRect frameVisibleRect(RenderObject* renderer) {
       renderer->document()->frame()->view()->visibleContentRect());
 }
 
-bool RenderLayer::hitTest(HitTestResult& info, const IntPoint& point) {
+bool RenderLayer::hitTest(HitTestResult& info) {
   renderer()->document()->updateLayout();
 
   IntRect boundsRect(m_x, m_y, width(), height());
   boundsRect.intersect(frameVisibleRect(renderer()));
 
-  RenderLayer* insideLayer = hitTestLayer(this, info, point, boundsRect);
+  RenderLayer* insideLayer = hitTestLayer(this, info, boundsRect);
 
   // Now determine if the result is inside an anchor; make sure an image map
   // wins if
@@ -1621,7 +1621,6 @@ bool RenderLayer::hitTest(HitTestResult& info, const IntPoint& point) {
 
 RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
                                        HitTestResult& info,
-                                       const IntPoint& mousePos,
                                        const IntRect& hitTestRect) {
   // Calculate the clip rects we should use.
   IntRect layerBounds;
@@ -1645,8 +1644,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // z-index.
   if (m_posZOrderList) {
     for (int i = m_posZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer = m_posZOrderList->at(i)->hitTestLayer(rootLayer, info,
-                                                         mousePos, hitTestRect);
+      insideLayer =
+          m_posZOrderList->at(i)->hitTestLayer(rootLayer, info, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1655,8 +1654,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our overflow objects.
   if (m_overflowList) {
     for (int i = m_overflowList->size() - 1; i >= 0; --i) {
-      insideLayer = m_overflowList->at(i)->hitTestLayer(rootLayer, info,
-                                                        mousePos, hitTestRect);
+      insideLayer =
+          m_overflowList->at(i)->hitTestLayer(rootLayer, info, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1664,9 +1663,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
 
   // Next we want to see if the mouse pos is inside the child RenderObjects of
   // the layer.
-  if (fgRect.contains(mousePos) &&
+  if (fgRect.contains(info.point()) &&
       renderer()->hitTest(
-          info, mousePos.x(), mousePos.y(),
+          info, info.point().x(), info.point().y(),
           layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestDescendants)) {
@@ -1697,8 +1696,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our negative z-index children.
   if (m_negZOrderList) {
     for (int i = m_negZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer = m_negZOrderList->at(i)->hitTestLayer(rootLayer, info,
-                                                         mousePos, hitTestRect);
+      insideLayer =
+          m_negZOrderList->at(i)->hitTestLayer(rootLayer, info, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1711,9 +1710,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // contain the point so mouse move events keep getting delivered when dragging
   // outside the
   // window.
-  if (bgRect.contains(mousePos) &&
+  if (bgRect.contains(info.point()) &&
       renderer()->hitTest(
-          info, mousePos.x(), mousePos.y(),
+          info, info.point().x(), info.point().y(),
           layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestSelf))

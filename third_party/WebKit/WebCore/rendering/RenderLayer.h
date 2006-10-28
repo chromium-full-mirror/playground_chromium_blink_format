@@ -336,7 +336,7 @@ class RenderLayer : public ScrollbarClient {
              const IntRect& damageRect,
              PaintRestriction = PaintRestrictionNone,
              RenderObject* paintingRoot = 0);
-  bool hitTest(HitTestResult&, const IntPoint&);
+  bool hitTest(HitTestResult&);
 
   // This method figures out our layerBounds in coordinates relative to
   // |rootLayer}.  It also computes our background and foreground clip rects
@@ -395,7 +395,6 @@ class RenderLayer : public ScrollbarClient {
                   RenderObject* paintingRoot);
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
                             HitTestResult&,
-                            const IntPoint&,
                             const IntRect& hitTestRect);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);
 
