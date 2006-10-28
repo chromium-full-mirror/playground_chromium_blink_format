@@ -181,6 +181,7 @@ typedef enum {
 // side of the bridge.
 
 @interface WebCoreFrameBridge : NSObject {
+ @public
   WebCoreFrameMac* m_frame;
 
   BOOL _shouldCreateRenderers;
@@ -478,9 +479,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (NSURL*)originalRequestURL;
 - (void)frameDetached;
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
-- (void)objectLoadedFromCacheWithURL:(NSURL*)URL
-                            response:(NSURLResponse*)response
-                                data:(NSData*)data;
 - (NSData*)syncLoadResourceWithMethod:(NSString*)method
                                   URL:(NSURL*)URL
                         customHeaders:(NSDictionary*)requestHeaders

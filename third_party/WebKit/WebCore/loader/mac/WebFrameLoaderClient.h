@@ -115,6 +115,10 @@ class FrameLoaderClient : Noncopyable {
   virtual void dispatchDidFailLoading(DocumentLoader*,
                                       id identifier,
                                       NSError*) = 0;
+  virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
+                                                      NSURLRequest*,
+                                                      NSURLResponse*,
+                                                      int length) = 0;
 
   virtual void dispatchDidHandleOnloadEvents() = 0;
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() = 0;

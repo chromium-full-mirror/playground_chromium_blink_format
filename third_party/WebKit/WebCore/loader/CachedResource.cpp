@@ -163,15 +163,4 @@ void CachedResource::setSize(unsigned size) {
     cache()->adjustSize(referenced(), oldSize, size);
   }
 }
-
-#if PLATFORM(MAC)
-CFURLRef CachedResource::getCFURL() {
-  if (!m_cfURL) {
-    m_cfURL = KURL(url().deprecatedString()).createCFURL();
-    CFRelease(m_cfURL.get());
-  }
-
-  return m_cfURL.get();
-}
-#endif
 }

@@ -265,6 +265,9 @@ class FrameLoader : Noncopyable {
             NSEvent*,
             Element* form,
             NSDictionary* formValues);
+  void loadedResourceFromMemoryCache(NSURLRequest* request,
+                                     NSURLResponse* response,
+                                     int length);
 
   void checkLoadComplete();
   void detachFromParent();
