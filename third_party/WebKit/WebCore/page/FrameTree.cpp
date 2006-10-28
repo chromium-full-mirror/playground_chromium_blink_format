@@ -219,14 +219,14 @@ Frame* FrameTree::find(const AtomicString& name) const {
   return 0;
 }
 
-bool FrameTree::isDescendantOf(Frame* ancestor) const {
+bool FrameTree::isDescendantOf(const Frame* ancestor) const {
   for (Frame* frame = m_thisFrame; frame; frame = frame->tree()->parent())
     if (frame == ancestor)
       return true;
   return false;
 }
 
-Frame* FrameTree::traverseNext(Frame* stayWithin) const {
+Frame* FrameTree::traverseNext(const Frame* stayWithin) const {
   Frame* child = firstChild();
   if (child) {
     ASSERT(!stayWithin || child->tree()->isDescendantOf(stayWithin));

@@ -358,7 +358,6 @@ typedef enum {
 - (void)setShouldCreateRenderers:(BOOL)f;
 - (BOOL)shouldCreateRenderers;
 
-- (int)numPendingOrLoadingRequests;
 - (BOOL)doneProcessingData;
 
 - (void)setBaseBackgroundColor:(NSColor*)backgroundColor;
@@ -478,19 +477,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (NSURL*)originalRequestURL;
 - (void)frameDetached;
-- (void)tokenizerProcessedData;
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
-- (id<WebCoreResourceHandle>)startLoadingResource:
-                                 (id<WebCoreResourceLoader>)loader
-                                       withMethod:(NSString*)method
-                                              URL:(NSURL*)URL
-                                    customHeaders:(NSDictionary*)customHeaders;
-- (id<WebCoreResourceHandle>)startLoadingResource:
-                                 (id<WebCoreResourceLoader>)loader
-                                       withMethod:(NSString*)method
-                                              URL:(NSURL*)URL
-                                    customHeaders:(NSDictionary*)customHeaders
-                                         postData:(NSArray*)data;
 - (void)objectLoadedFromCacheWithURL:(NSURL*)URL
                             response:(NSURLResponse*)response
                                 data:(NSData*)data;
@@ -501,9 +488,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                              finalURL:(NSURL**)finalNSURL
                       responseHeaders:(NSDictionary**)responseHeaderDict
                            statusCode:(int*)statusCode;
-- (BOOL)isReloading;
-- (NSString*)incomingReferrer;
-- (void)loadEmptyDocumentSynchronously;
 
 @end
 
