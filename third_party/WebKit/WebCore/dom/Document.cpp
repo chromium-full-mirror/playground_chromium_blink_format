@@ -42,7 +42,9 @@
 #include "EventNames.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
+#if PLATFORM(MAC)
 #include "FrameLoader.h"
+#endif
 #include "FrameTree.h"
 #include "HTMLBodyElement.h"
 #include "HTMLDocument.h"
@@ -2405,9 +2407,10 @@ Element* Document::ownerElement() const {
 }
 
 String Document::referrer() const {
+#if PLATFORM(MAC)
   if (frame())
     return frame()->loader()->referrer();
-
+#endif
   return String();
 }
 
