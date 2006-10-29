@@ -150,7 +150,7 @@ class CSSParser {
 
   void addBackgroundValue(CSSValue*& lval, CSSValue* rval);
 
-#if __APPLE__
+#if PLATFORM(MAC)
   bool parseDashboardRegions(int propId, bool important);
 #endif
 

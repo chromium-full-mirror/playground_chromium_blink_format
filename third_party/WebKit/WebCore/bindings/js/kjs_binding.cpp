@@ -73,7 +73,7 @@ static NodePerDocMap* domNodesPerDocument() {
 ScriptInterpreter::ScriptInterpreter(JSObject* global, Frame* frame)
     : Interpreter(global),
       m_frame(frame),
-      m_evt(0L),
+      m_currentEvent(0),
       m_inlineCode(false),
       m_timerCallback(false) {
   // Time in milliseconds before the script timeout handler kicks in
@@ -190,8 +190,8 @@ void ScriptInterpreter::updateDOMNodeDocument(Node* node,
 }
 
 bool ScriptInterpreter::wasRunByUserGesture() const {
-  if (m_evt) {
-    const AtomicString& type = m_evt->type();
+  if (m_currentEvent) {
+    const AtomicString& type = m_currentEvent->type();
     bool eventOk = (  // mouse events
         type == clickEvent || type == mousedownEvent || type == mouseupEvent ||
         type == dblclickEvent ||

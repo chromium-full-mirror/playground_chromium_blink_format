@@ -30,7 +30,7 @@ class RefPtr;
 template <typename T>
 class PassRefPtr;
 template <typename T>
-PassRefPtr<T> adoptRef(T* p);
+PassRefPtr<T> adoptRef(T*);
 
 template <typename T>
 class PassRefPtr {
@@ -45,9 +45,9 @@ class PassRefPtr {
   // PassRefPtr
   // temporaries, and we don't really have a need to use real const PassRefPtrs
   // anyway.
-  PassRefPtr(const PassRefPtr& o) : m_ptr(o.release()) {}
+  PassRefPtr(const PassRefPtr& o) : m_ptr(o.releaseRef()) {}
   template <typename U>
-  PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.release()) {}
+  PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.releaseRef()) {}
 
   ~PassRefPtr() {
     if (T* ptr = m_ptr)
@@ -62,7 +62,7 @@ class PassRefPtr {
 
   T* get() const { return m_ptr; }
 
-  T* release() const {
+  T* releaseRef() const {
     T* tmp = m_ptr;
     m_ptr = 0;
     return tmp;
@@ -120,7 +120,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
 template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<T>& ref) {
   T* ptr = m_ptr;
-  m_ptr = ref.release();
+  m_ptr = ref.releaseRef();
   if (ptr)
     ptr->deref();
   return *this;
@@ -130,7 +130,7 @@ template <typename T>
 template <typename U>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<U>& ref) {
   T* ptr = m_ptr;
-  m_ptr = ref.release();
+  m_ptr = ref.releaseRef();
   if (ptr)
     ptr->deref();
   return *this;
@@ -193,12 +193,12 @@ inline PassRefPtr<T> adoptRef(T* p) {
 
 template <typename T, typename U>
 inline PassRefPtr<T> static_pointer_cast(const PassRefPtr<U>& p) {
-  return adoptRef(static_cast<T*>(p.release()));
+  return adoptRef(static_cast<T*>(p.releaseRef()));
 }
 
 template <typename T, typename U>
 inline PassRefPtr<T> const_pointer_cast(const PassRefPtr<U>& p) {
-  return adoptRef(const_cast<T*>(p.release()));
+  return adoptRef(const_cast<T*>(p.releaseRef()));
 }
 
 template <typename T>

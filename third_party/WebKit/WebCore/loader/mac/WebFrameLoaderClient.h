@@ -28,18 +28,21 @@
 
 #include <wtf/Noncopyable.h>
 #include <wtf/Forward.h>
-
-@class WebPolicyDecider;
+#include "FrameLoaderTypes.h"
 
 namespace WebCore {
 
 class DocumentLoader;
 class Element;
+class FormState;
 class Frame;
+class FrameLoader;
 class String;
 class WebResourceLoader;
 
 struct LoadErrorResetToken;
+
+typedef void (FrameLoader::*FramePolicyFunction)(PolicyAction);
 
 class FrameLoaderClient : Noncopyable {
  public:
@@ -77,6 +80,8 @@ class FrameLoaderClient : Noncopyable {
   virtual LoadErrorResetToken* tokenForLoadErrorReset() = 0;
   virtual void resetAfterLoadError(LoadErrorResetToken*) = 0;
   virtual void doNotResetAfterLoadError(LoadErrorResetToken*) = 0;
+
+  virtual void willCloseDocument() = 0;
 
   virtual void detachedFromParent1() = 0;
   virtual void detachedFromParent2() = 0;
@@ -140,23 +145,23 @@ class FrameLoaderClient : Noncopyable {
   virtual Frame* dispatchCreatePage(NSURLRequest*) = 0;
   virtual void dispatchShow() = 0;
 
-  virtual void dispatchDecidePolicyForMIMEType(WebPolicyDecider*,
+  virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,
                                                const String& MIMEType,
                                                NSURLRequest*) = 0;
   virtual void dispatchDecidePolicyForNewWindowAction(
-      WebPolicyDecider*,
+      FramePolicyFunction,
       NSDictionary* action,
       NSURLRequest*,
       const String& frameName) = 0;
-  virtual void dispatchDecidePolicyForNavigationAction(WebPolicyDecider*,
+  virtual void dispatchDecidePolicyForNavigationAction(FramePolicyFunction,
                                                        NSDictionary* action,
                                                        NSURLRequest*) = 0;
+  virtual void cancelPolicyCheck() = 0;
+
   virtual void dispatchUnableToImplementPolicy(NSError*) = 0;
 
-  virtual void dispatchWillSubmitForm(WebPolicyDecider*,
-                                      Frame* sourceFrame,
-                                      Element* form,
-                                      NSDictionary* values) = 0;
+  virtual void dispatchWillSubmitForm(FramePolicyFunction,
+                                      PassRefPtr<FormState>) = 0;
 
   virtual void dispatchDidLoadMainResource(DocumentLoader*) = 0;
   virtual void clearLoadingFromPageCache(DocumentLoader*) = 0;
@@ -192,9 +197,7 @@ class FrameLoaderClient : Noncopyable {
 
   virtual bool shouldFallBack(NSError*) = 0;
 
-  virtual NSURL* mainFrameURL() = 0;
-
-  virtual void setDefersCallbacks(bool) = 0;
+  virtual void setDefersLoading(bool) = 0;
 
   virtual bool willUseArchive(WebResourceLoader*,
                               NSURLRequest*,
@@ -212,8 +215,6 @@ class FrameLoaderClient : Noncopyable {
 
   virtual NSDictionary* elementForEvent(NSEvent*) const = 0;
 
-  virtual WebPolicyDecider* createPolicyDecider(id object, SEL selector) = 0;
-
   virtual void frameLoadCompleted() = 0;
   virtual void restoreScrollPositionAndViewState() = 0;
   virtual void provisionalLoadStarted() = 0;
@@ -222,7 +223,9 @@ class FrameLoaderClient : Noncopyable {
   virtual void didFinishLoad() = 0;
   virtual void prepareForDataSourceReplacement() = 0;
   virtual PassRefPtr<DocumentLoader> createDocumentLoader(NSURLRequest*) = 0;
-  virtual void setTitle(NSString* title, NSURL* URL) = 0;
+  virtual void setTitle(const String& title, NSURL*) = 0;
+
+  virtual String userAgent(NSURL*) = 0;
 
  protected:
   virtual ~FrameLoaderClient();

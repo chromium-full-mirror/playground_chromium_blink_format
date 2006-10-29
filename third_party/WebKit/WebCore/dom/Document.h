@@ -93,9 +93,7 @@ class XPathNSResolver;
 class XPathResult;
 #endif
 
-#if __APPLE__
 struct DashboardRegionValue;
-#endif
 
 #ifdef SVG_SUPPORT
 class SVGDocumentExtensions;
@@ -850,7 +848,7 @@ class Document : public ContainerNode {
 
   UChar backslashAsCurrencySymbol() const;
 
-#if __APPLE__
+#if PLATFORM(MAC)
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
@@ -921,7 +919,7 @@ class Document : public ContainerNode {
   SVGDocumentExtensions* m_svgExtensions;
 #endif
 
-#if __APPLE__
+#if PLATFORM(MAC)
   Vector<DashboardRegionValue> m_dashboardRegions;
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;

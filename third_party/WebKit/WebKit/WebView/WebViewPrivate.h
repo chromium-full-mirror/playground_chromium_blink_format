@@ -370,6 +370,9 @@ backforward list.
  */
 - (void)_detachScriptDebuggerFromAllFrames;
 
+- (BOOL)defersCallbacks;                 // called by QuickTime plug-in
+- (void)setDefersCallbacks:(BOOL)defer;  // called by QuickTime plug-in
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

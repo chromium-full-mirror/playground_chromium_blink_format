@@ -80,7 +80,7 @@ static const int computedProperties[] = {
     CSS_PROP_CLEAR,
     CSS_PROP_COLOR,
     CSS_PROP_CURSOR,
-#if __APPLE__
+#if PLATFORM(MAC)
     CSS_PROP__WEBKIT_DASHBOARD_REGION,
 #endif
     CSS_PROP_DIRECTION,
@@ -1374,7 +1374,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_PADDING:
       // FIXME: unimplemented
       break;
-#if __APPLE__
+#if PLATFORM(MAC)
     case CSS_PROP__WEBKIT_DASHBOARD_REGION: {
       const Vector<StyleDashboardRegion>& regions = style->dashboardRegions();
       unsigned count = regions.size();

@@ -60,8 +60,6 @@ WebResourceDelegateImplementationCache
 WebViewGetResourceLoadDelegateImplementations(WebView* webView);
 
 @interface WebView (WebViewMiscInternal)
-- (BOOL)defersCallbacks;
-- (void)setDefersCallbacks:(BOOL)defers;
 - (NSMenu*)_menuForElement:(NSDictionary*)element defaultItems:(NSArray*)items;
 - (void)_setInitiatedDrag:(BOOL)initiatedDrag;
 - (id)_UIDelegateForwarder;

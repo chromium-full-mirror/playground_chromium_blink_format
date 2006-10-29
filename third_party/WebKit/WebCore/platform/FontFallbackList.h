@@ -61,9 +61,7 @@ class FontFallbackList : public Shared<FontFallbackList> {
                                         const UChar*,
                                         int length) const;
 
-#if __APPLE__
   void setPlatformFont(const FontPlatformData&);
-#endif
 
   mutable Vector<const FontData*, 1> m_fontList;
   mutable int m_familyIndex;

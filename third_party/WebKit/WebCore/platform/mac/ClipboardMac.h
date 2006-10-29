@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +29,6 @@
 #ifndef ClipboardMac_h
 #define ClipboardMac_h
 
-#include "Image.h"
 #include "IntPoint.h"
 #include "Clipboard.h"
 #include "ClipboardAccessPolicy.h"
@@ -41,7 +40,7 @@
 #else
 class NSImage;
 class NSPasteboard;
-typedef unsigned int NSDragOperation;
+typedef unsigned NSDragOperation;
 #endif
 
 namespace WebCore {
@@ -51,17 +50,17 @@ class FrameMac;
 class ClipboardMac : public Clipboard, public CachedResourceClient {
  public:
   ClipboardMac(bool forDragging,
-               NSPasteboard* pasteboard,
-               ClipboardAccessPolicy policy,
-               FrameMac* frame = 0);
+               NSPasteboard*,
+               ClipboardAccessPolicy,
+               FrameMac* = 0);
   virtual ~ClipboardMac();
 
   bool isForDragging() const;
 
   String dropEffect() const;
-  void setDropEffect(const String& s);
+  void setDropEffect(const String&);
   String effectAllowed() const;
-  void setEffectAllowed(const String& s);
+  void setEffectAllowed(const String&);
 
   void clearData(const String& type);
   void clearAllData();
@@ -77,21 +76,19 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   Node* dragImageElement();
   void setDragImageElement(Node*, const IntPoint&);
 
-#if __APPLE__
   // Methods for getting info in Cocoa's type system
   NSImage* dragNSImage(
-      NSPoint* loc);  // loc converted from dragLoc, based on whole image size
-  bool sourceOperation(NSDragOperation* op) const;
-  bool destinationOperation(NSDragOperation* op) const;
-  void setSourceOperation(NSDragOperation op);
-  void setDestinationOperation(NSDragOperation op);
-#endif
+      NSPoint&);  // loc converted from dragLoc, based on whole image size
+  bool sourceOperation(NSDragOperation&) const;
+  bool destinationOperation(NSDragOperation&) const;
+  void setSourceOperation(NSDragOperation);
+  void setDestinationOperation(NSDragOperation);
 
   void setAccessPolicy(ClipboardAccessPolicy);
   void setDragHasStarted() { m_dragStarted = true; }
 
  private:
-  void setDragImage(CachedImage* cachedImage, Node*, const IntPoint& loc);
+  void setDragImage(CachedImage*, Node*, const IntPoint&);
 
   NSPasteboard* m_pasteboard;
   bool m_forDragging;

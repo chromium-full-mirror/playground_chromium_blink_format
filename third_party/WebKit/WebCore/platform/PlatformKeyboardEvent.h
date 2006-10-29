@@ -29,10 +29,12 @@
 #include "PlatformString.h"
 #include <wtf/Platform.h>
 
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSEvent;
 #else
 class NSEvent;
+#endif
 #endif
 
 #if PLATFORM(WIN)
@@ -65,7 +67,7 @@ class PlatformKeyboardEvent {
   bool altKey() const { return m_altKey; }
   bool metaKey() const { return m_metaKey; }
 
-#ifdef __APPLE__
+#if PLATFORM(MAC)
   PlatformKeyboardEvent(NSEvent*, bool forceAutoRepeat = false);
 #endif
 

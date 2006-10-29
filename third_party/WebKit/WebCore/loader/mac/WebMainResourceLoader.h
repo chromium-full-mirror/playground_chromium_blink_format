@@ -30,9 +30,9 @@
 #import "WebLoader.h"
 #import <wtf/Forward.h>
 
-@class WebCoreMainResourceLoaderAsPolicyDelegate;
-
 namespace WebCore {
+
+class FormState;
 
 class MainResourceLoader : public WebResourceLoader {
  public:
@@ -42,7 +42,7 @@ class MainResourceLoader : public WebResourceLoader {
 
   virtual bool load(NSURLRequest*);
 
-  virtual void setDefersCallbacks(bool);
+  virtual void setDefersLoading(bool);
 
   virtual void addData(NSData*, bool allAtOnce);
 
@@ -55,18 +55,12 @@ class MainResourceLoader : public WebResourceLoader {
   virtual void didFinishLoading();
   virtual void didFail(NSError*);
 
-  void continueAfterNavigationPolicy(NSURLRequest*);
-  void continueAfterContentPolicy(PolicyAction);
-
  private:
   virtual void didCancel(NSError*);
 
   MainResourceLoader(Frame*);
 
   virtual void releaseDelegate();
-
-  WebCoreMainResourceLoaderAsPolicyDelegate* policyDelegate();
-  void releasePolicyDelegate();
 
   NSURLRequest* loadNow(NSURLRequest*);
 
@@ -76,6 +70,13 @@ class MainResourceLoader : public WebResourceLoader {
   bool isPostOrRedirectAfterPost(NSURLRequest* newRequest,
                                  NSURLResponse* redirectResponse);
 
+  static void callContinueAfterNavigationPolicy(void*,
+                                                NSURLRequest*,
+                                                PassRefPtr<FormState>);
+  void continueAfterNavigationPolicy(NSURLRequest*);
+
+  static void callContinueAfterContentPolicy(void*, PolicyAction);
+  void continueAfterContentPolicy(PolicyAction);
   void continueAfterContentPolicy(PolicyAction, NSURLResponse*);
 
   int m_contentLength;  // for logging only
@@ -83,7 +84,8 @@ class MainResourceLoader : public WebResourceLoader {
   RetainPtr<NSURLResponse> m_response;
   RetainPtr<id> m_proxy;
   RetainPtr<NSURLRequest> m_initialRequest;
-  RetainPtr<WebCoreMainResourceLoaderAsPolicyDelegate> m_policyDelegate;
   bool m_loadingMultipartContent;
+
+  bool m_waitingForContentPolicy;
 };
 }

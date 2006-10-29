@@ -75,6 +75,9 @@ class Page : Noncopyable {
   bool canRunModalNow();
   void runModal();
 
+  void setDefersLoading(bool);
+  bool defersLoading() const { return m_defersLoading; }
+
 #if PLATFORM(MAC)
   Page(WebCorePageBridge*);
   WebCorePageBridge* bridge() const { return m_bridge; }
@@ -96,6 +99,7 @@ class Page : Noncopyable {
   int m_frameCount;
   String m_groupName;
   mutable SelectionController m_dragCaretController;
+  bool m_defersLoading;
 
 #if PLATFORM(MAC)
   WebCorePageBridge* m_bridge;

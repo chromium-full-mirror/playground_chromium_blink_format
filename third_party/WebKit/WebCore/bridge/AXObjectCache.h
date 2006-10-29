@@ -78,7 +78,7 @@ class AXObjectCache {
   HashSet<AXID, IntHash<AXID>, AXIDHashTraits> m_idsInUse;
 };
 
-#ifndef __APPLE__
+#if !PLATFORM(MAC)
 inline AXObjectCache::~AXObjectCache() {}
 inline WebCoreAXObject* AXObjectCache::get(RenderObject*) {
   return 0;
