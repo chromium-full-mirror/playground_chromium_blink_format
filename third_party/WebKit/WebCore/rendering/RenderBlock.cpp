@@ -2776,7 +2776,7 @@ int RenderBlock::getClearDelta(RenderObject* child) {
   return result;
 }
 
-bool RenderBlock::isPointInScrollbar(HitTestResult& info,
+bool RenderBlock::isPointInScrollbar(HitTestResult& result,
                                      int _x,
                                      int _y,
                                      int _tx,
@@ -2791,7 +2791,7 @@ bool RenderBlock::isPointInScrollbar(HitTestResult& info,
         height() + borderTopExtra() + borderBottomExtra() - borderTop() -
             borderBottom() - m_layer->horizontalScrollbarHeight());
     if (vertRect.contains(_x, _y)) {
-      info.setScrollbar(m_layer->verticalScrollbarWidget());
+      result.setScrollbar(m_layer->verticalScrollbarWidget());
       return true;
     }
   }
@@ -2804,7 +2804,7 @@ bool RenderBlock::isPointInScrollbar(HitTestResult& info,
                           m_layer->verticalScrollbarWidth(),
                       m_layer->horizontalScrollbarHeight());
     if (horizRect.contains(_x, _y)) {
-      info.setScrollbar(m_layer->horizontaScrollbarWidget());
+      result.setScrollbar(m_layer->horizontaScrollbarWidget());
       return true;
     }
   }
@@ -2812,7 +2812,7 @@ bool RenderBlock::isPointInScrollbar(HitTestResult& info,
   return false;
 }
 
-bool RenderBlock::nodeAtPoint(HitTestResult& info,
+bool RenderBlock::nodeAtPoint(HitTestResult& result,
                               int _x,
                               int _y,
                               int _tx,
@@ -2839,9 +2839,9 @@ bool RenderBlock::nodeAtPoint(HitTestResult& info,
     }
   }
 
-  if (isPointInScrollbar(info, _x, _y, tx, ty)) {
+  if (isPointInScrollbar(result, _x, _y, tx, ty)) {
     if (hitTestAction == HitTestBlockBackground) {
-      setInnerNode(info);
+      setInnerNode(result);
       return true;
     }
     return false;
@@ -2854,8 +2854,8 @@ bool RenderBlock::nodeAtPoint(HitTestResult& info,
     m_layer->subtractScrollOffset(scrolledX, scrolledY);
   if (childrenInline() && !isTable()) {
     // We have to hit-test our line boxes.
-    if (hitTestLines(info, _x, _y, scrolledX, scrolledY, hitTestAction)) {
-      setInnerNode(info);
+    if (hitTestLines(result, _x, _y, scrolledX, scrolledY, hitTestAction)) {
+      setInnerNode(result);
       return true;
     }
   } else {
@@ -2871,9 +2871,9 @@ bool RenderBlock::nodeAtPoint(HitTestResult& info,
       // table-specific hit-test method (which we should do for performance
       // reasons anyway), then we can remove this check.
       if (!child->layer() && !child->isFloating() && !child->isInlineFlow() &&
-          child->nodeAtPoint(info, _x, _y, scrolledX, scrolledY,
+          child->nodeAtPoint(result, _x, _y, scrolledX, scrolledY,
                              childHitTest)) {
-        setInnerNode(info);
+        setInnerNode(result);
         return true;
       }
   }
@@ -2890,10 +2890,10 @@ bool RenderBlock::nodeAtPoint(HitTestResult& info,
     for (it.toLast(); (o = it.current()); --it)
       if (!o->noPaint && !o->node->layer() &&
           o->node->hitTest(
-              info, _x, _y,
+              result, _x, _y,
               scrolledX + o->left + o->node->marginLeft() - o->node->xPos(),
               scrolledY + o->startY + o->node->marginTop() - o->node->yPos())) {
-        setInnerNode(info);
+        setInnerNode(result);
         return true;
       }
   }
@@ -2905,7 +2905,7 @@ bool RenderBlock::nodeAtPoint(HitTestResult& info,
     IntRect boundsRect(tx, ty - topExtra, m_width,
                        m_height + topExtra + borderBottomExtra());
     if (style()->visibility() == VISIBLE && boundsRect.contains(_x, _y)) {
-      setInnerNode(info);
+      setInnerNode(result);
       return true;
     }
   }

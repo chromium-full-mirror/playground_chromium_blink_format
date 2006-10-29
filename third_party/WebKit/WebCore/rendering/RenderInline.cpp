@@ -346,13 +346,13 @@ const char* RenderInline::renderName() const {
   return "RenderInline";
 }
 
-bool RenderInline::nodeAtPoint(HitTestResult& info,
+bool RenderInline::nodeAtPoint(HitTestResult& result,
                                int _x,
                                int _y,
                                int _tx,
                                int _ty,
                                HitTestAction hitTestAction) {
-  return hitTestLines(info, _x, _y, _tx, _ty, hitTestAction);
+  return hitTestLines(result, _x, _y, _tx, _ty, hitTestAction);
 }
 
 VisiblePosition RenderInline::positionForCoordinates(int x, int y) {

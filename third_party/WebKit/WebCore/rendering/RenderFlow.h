@@ -77,13 +77,13 @@ class RenderFlow : public RenderContainer {
                                      bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
-  void paintLines(PaintInfo& i, int _tx, int _ty);
-  bool hitTestLines(HitTestResult& i,
+  void paintLines(PaintInfo&, int _tx, int _ty);
+  bool hitTestLines(HitTestResult&,
                     int x,
                     int y,
                     int tx,
                     int ty,
-                    HitTestAction hitTestAction);
+                    HitTestAction);
 
   virtual IntRect getAbsoluteRepaintRect();
 

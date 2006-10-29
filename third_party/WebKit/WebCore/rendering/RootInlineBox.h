@@ -112,14 +112,14 @@ class RootInlineBox : public InlineFlowBox {
 
   EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
 
-  void paintEllipsisBox(RenderObject::PaintInfo& i, int _tx, int _ty) const;
-  bool hitTestEllipsisBox(HitTestResult& info,
+  void paintEllipsisBox(RenderObject::PaintInfo&, int _tx, int _ty) const;
+  bool hitTestEllipsisBox(HitTestResult&,
                           int _x,
                           int _y,
                           int _tx,
                           int _ty,
-                          HitTestAction hitTestAction,
-                          bool inBox);
+                          HitTestAction,
+                          bool);
 
   virtual void clearTruncation();
 

@@ -116,7 +116,7 @@ void RenderForeignObject::layout() {
   setNeedsLayout(false);
 }
 
-bool RenderForeignObject::nodeAtPoint(HitTestResult& info,
+bool RenderForeignObject::nodeAtPoint(HitTestResult& result,
                                       int x,
                                       int y,
                                       int tx,
@@ -126,7 +126,7 @@ bool RenderForeignObject::nodeAtPoint(HitTestResult& info,
   totalTransform *= translationForAttributes();
   double localX, localY;
   totalTransform.invert().map(x, y, &localX, &localY);
-  return RenderBlock::nodeAtPoint(info, (int)localX, (int)localY, tx, ty,
+  return RenderBlock::nodeAtPoint(result, (int)localX, (int)localY, tx, ty,
                                   hitTestAction);
 }
 }

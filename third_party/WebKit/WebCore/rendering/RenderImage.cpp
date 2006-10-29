@@ -321,14 +321,14 @@ HTMLMapElement* RenderImage::imageMap() {
   return i ? i->document()->getImageMap(i->imageMap()) : 0;
 }
 
-bool RenderImage::nodeAtPoint(HitTestResult& info,
+bool RenderImage::nodeAtPoint(HitTestResult& result,
                               int _x,
                               int _y,
                               int _tx,
                               int _ty,
                               HitTestAction hitTestAction) {
   bool inside =
-      RenderReplaced::nodeAtPoint(info, _x, _y, _tx, _ty, hitTestAction);
+      RenderReplaced::nodeAtPoint(result, _x, _y, _tx, _ty, hitTestAction);
 
   if (inside && element()) {
     int tx = _tx + m_x;
@@ -338,8 +338,8 @@ bool RenderImage::nodeAtPoint(HitTestResult& info,
     if (map) {
       // we're a client side image map
       inside = map->mapMouseEvent(
-          _x - tx, _y - ty, IntSize(contentWidth(), contentHeight()), info);
-      info.setInnerNonSharedNode(element());
+          _x - tx, _y - ty, IntSize(contentWidth(), contentHeight()), result);
+      result.setInnerNonSharedNode(element());
     }
   }
 

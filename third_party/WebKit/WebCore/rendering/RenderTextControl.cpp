@@ -352,7 +352,7 @@ short RenderTextControl::baselinePosition(bool b, bool isRootLineBox) const {
   return RenderFlexibleBox::baselinePosition(b, isRootLineBox);
 }
 
-bool RenderTextControl::nodeAtPoint(HitTestResult& info,
+bool RenderTextControl::nodeAtPoint(HitTestResult& result,
                                     int x,
                                     int y,
                                     int tx,
@@ -361,8 +361,8 @@ bool RenderTextControl::nodeAtPoint(HitTestResult& info,
   // If we're within the text control, we want to act as if we've hit the inner
   // div, incase the point
   // was on the control but not on the div (see Radar 4617841).
-  if (RenderFlexibleBox::nodeAtPoint(info, x, y, tx, ty, hitTestAction)) {
-    info.setInnerNode(m_div.get());
+  if (RenderFlexibleBox::nodeAtPoint(result, x, y, tx, ty, hitTestAction)) {
+    result.setInnerNode(m_div.get());
     return true;
   }
   return false;

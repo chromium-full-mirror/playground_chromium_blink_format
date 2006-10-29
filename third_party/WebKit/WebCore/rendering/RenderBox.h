@@ -41,13 +41,13 @@ class RenderBox : public RenderObject {
   virtual const char* renderName() const { return "RenderBox"; }
 
   virtual void setStyle(RenderStyle*);
-  virtual void paint(PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(HitTestResult& i,
+  virtual void paint(PaintInfo&, int _tx, int _ty);
+  virtual bool nodeAtPoint(HitTestResult&,
                            int _x,
                            int _y,
                            int _tx,
                            int _ty,
-                           HitTestAction hitTestAction);
+                           HitTestAction);
 
   virtual void destroy();
 

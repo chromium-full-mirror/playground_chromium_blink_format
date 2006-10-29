@@ -92,7 +92,7 @@ InlineBox* RenderSVGText::createInlineBox(bool makePlaceHolderBox,
   return flowBox;
 }
 
-bool RenderSVGText::nodeAtPoint(HitTestResult& info,
+bool RenderSVGText::nodeAtPoint(HitTestResult& result,
                                 int _x,
                                 int _y,
                                 int _tx,
@@ -101,7 +101,7 @@ bool RenderSVGText::nodeAtPoint(HitTestResult& info,
   AffineTransform totalTransform = absoluteTransform();
   double localX, localY;
   totalTransform.invert().map(_x, _y, &localX, &localY);
-  return RenderBlock::nodeAtPoint(info, (int)localX, (int)localY, _tx, _ty,
+  return RenderBlock::nodeAtPoint(result, (int)localX, (int)localY, _tx, _ty,
                                   hitTestAction);
 }
 

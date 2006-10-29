@@ -62,14 +62,14 @@ class RenderInline : public RenderFlow {
 
   virtual void layout() {}  // Do nothing for layout()
 
-  virtual void paint(PaintInfo& i, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
 
-  virtual bool nodeAtPoint(HitTestResult& info,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int _x,
                            int _y,
                            int _tx,
                            int _ty,
-                           HitTestAction hitTestAction);
+                           HitTestAction);
 
   virtual void calcMinMaxWidth();
 

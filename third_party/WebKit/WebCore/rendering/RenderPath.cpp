@@ -274,7 +274,7 @@ RenderPath::PointerEventsHitRules RenderPath::pointerEventsHitRules() {
   return hitRules;
 }
 
-bool RenderPath::nodeAtPoint(HitTestResult& info,
+bool RenderPath::nodeAtPoint(HitTestResult& result,
                              int _x,
                              int _y,
                              int _tx,
@@ -294,7 +294,7 @@ bool RenderPath::nodeAtPoint(HitTestResult& info,
         (hitRules.canHitFill &&
          (style()->svgStyle()->hasFill() || !hitRules.requireFill) &&
          fillContains(hitPoint, hitRules.requireFill))) {
-      setInnerNode(info);
+      setInnerNode(result);
       return true;
     }
   }

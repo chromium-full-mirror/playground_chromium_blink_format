@@ -226,7 +226,7 @@ bool InlineTextBox::isLineBreak() const {
           (*textObject()->string())[start()] == '\n');
 }
 
-bool InlineTextBox::nodeAtPoint(HitTestResult& i,
+bool InlineTextBox::nodeAtPoint(HitTestResult& result,
                                 int x,
                                 int y,
                                 int tx,
@@ -237,7 +237,7 @@ bool InlineTextBox::nodeAtPoint(HitTestResult& i,
   IntRect rect(tx + m_x, ty + m_y, m_width, m_height);
   if (m_truncation != cFullTruncation &&
       object()->style()->visibility() == VISIBLE && rect.contains(x, y)) {
-    object()->setInnerNode(i);
+    object()->setInnerNode(result);
     return true;
   }
   return false;

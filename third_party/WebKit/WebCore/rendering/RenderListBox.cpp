@@ -335,7 +335,7 @@ void RenderListBox::paintItemBackground(PaintInfo& i,
     i.p->fillRect(itemBoundingBoxRect(tx, ty, listIndex), backColor);
 }
 
-bool RenderListBox::isPointInScrollbar(HitTestResult& info,
+bool RenderListBox::isPointInScrollbar(HitTestResult& result,
                                        int _x,
                                        int _y,
                                        int _tx,
@@ -349,7 +349,7 @@ bool RenderListBox::isPointInScrollbar(HitTestResult& info,
                        borderTop() - borderBottom());
 
   if (vertRect.contains(_x, _y)) {
-    info.setScrollbar(
+    result.setScrollbar(
         m_vBar->isWidget() ? static_cast<PlatformScrollbar*>(m_vBar) : 0);
     return true;
   }

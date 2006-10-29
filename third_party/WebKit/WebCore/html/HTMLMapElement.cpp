@@ -51,7 +51,7 @@ bool HTMLMapElement::checkDTD(const Node* newChild) {
 bool HTMLMapElement::mapMouseEvent(int x,
                                    int y,
                                    const IntSize& size,
-                                   HitTestResult& info) {
+                                   HitTestResult& result) {
   HTMLAreaElement* defaultArea = 0;
   Node* node = this;
   while ((node = node->traverseNextNode(this))) {
@@ -60,14 +60,14 @@ bool HTMLMapElement::mapMouseEvent(int x,
       if (areaElt->isDefault()) {
         if (!defaultArea)
           defaultArea = areaElt;
-      } else if (areaElt->mapMouseEvent(x, y, size, info))
+      } else if (areaElt->mapMouseEvent(x, y, size, result))
         return true;
     }
   }
 
   if (defaultArea) {
-    info.setInnerNode(defaultArea);
-    info.setURLElement(defaultArea);
+    result.setInnerNode(defaultArea);
+    result.setURLElement(defaultArea);
   }
   return defaultArea;
 }

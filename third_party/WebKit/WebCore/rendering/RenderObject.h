@@ -600,19 +600,19 @@ class RenderObject : public CachedResourceClient {
         : m_object(o), m_repaintRect(r) {}
   };
 
-  bool hitTest(HitTestResult& info,
+  bool hitTest(HitTestResult&,
                int x,
                int y,
                int tx,
                int ty,
                HitTestFilter hitTestFilter = HitTestAll);
-  virtual bool nodeAtPoint(HitTestResult& info,
+  virtual bool nodeAtPoint(HitTestResult&,
                            int x,
                            int y,
                            int tx,
                            int ty,
-                           HitTestAction hitTestAction);
-  void setInnerNode(HitTestResult& info);
+                           HitTestAction);
+  void setInnerNode(HitTestResult&);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
   VisiblePosition positionForPoint(const IntPoint& point) {

@@ -242,7 +242,7 @@ int RenderBox::calcContentBoxHeight(int h) const {
 }
 
 // Hit Testing
-bool RenderBox::nodeAtPoint(HitTestResult& info,
+bool RenderBox::nodeAtPoint(HitTestResult& result,
                             int x,
                             int y,
                             int tx,
@@ -262,8 +262,8 @@ bool RenderBox::nodeAtPoint(HitTestResult& info,
     // reasons anyway),
     // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
-        child->nodeAtPoint(info, x, y, tx, ty, action)) {
-      setInnerNode(info);
+        child->nodeAtPoint(result, x, y, tx, ty, action)) {
+      setInnerNode(result);
       return true;
     }
   }
@@ -273,7 +273,7 @@ bool RenderBox::nodeAtPoint(HitTestResult& info,
   // foreground phase (which is true for replaced elements like images).
   if (action == HitTestForeground &&
       IntRect(tx, ty, m_width, m_height).contains(x, y)) {
-    setInnerNode(info);
+    setInnerNode(result);
     return true;
   }
 
