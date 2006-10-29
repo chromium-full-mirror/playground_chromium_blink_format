@@ -73,7 +73,7 @@ class SubresourceLoader : public WebResourceLoader {
 
   virtual void didCancel(NSError*);
 
-  RefPtr<ResourceHandle> m_loader;
+  RefPtr<ResourceHandle> m_handle;
   bool m_loadingMultipartContent;
 };
 }
