@@ -188,7 +188,7 @@ class String {
   // need this mapping because AppKit crashes when passed nil NSStrings.
   operator NSString*() const {
     if (!m_impl)
-      return "";
+      return @"";
     return *m_impl;
   }
 #endif
