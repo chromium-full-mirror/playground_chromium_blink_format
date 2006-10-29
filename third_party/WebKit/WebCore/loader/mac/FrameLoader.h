@@ -41,42 +41,38 @@
 
 #ifdef __OBJC__
 
-@class WebCoreFrameBridge;
 @class WebCorePageState;
 
-@class NSArray;
+@class NSData;
 @class NSDate;
+@class NSDictionary;
+@class NSError;
+@class NSEvent;
+@class NSMutableURLRequest;
 @class NSURL;
+@class NSURLAuthenticationChallenge;
 @class NSURLConnection;
 @class NSURLRequest;
 @class NSURLResponse;
-@class NSDictionary;
-@class NSEvent;
-@class NSError;
-@class NSData;
-@class NSMutableURLRequest;
-@class NSURLAuthenticationChallenge;
 
 @protocol WebCoreResourceLoader;
 @protocol WebCoreResourceHandle;
 
 #else
 
-class WebCoreFrameBridge;
 class WebCorePageState;
 
-class NSArray;
+class NSData;
 class NSDate;
+class NSDictionary;
+class NSError;
+class NSEvent;
+class NSMutableURLRequest;
 class NSURL;
+class NSURLAuthenticationChallenge;
 class NSURLConnection;
 class NSURLRequest;
 class NSURLResponse;
-class NSDictionary;
-class NSEvent;
-class NSError;
-class NSData;
-class NSMutableURLRequest;
-class NSURLAuthenticationChallenge;
 
 #endif  // __OBJC__
 
@@ -86,11 +82,14 @@ namespace WebCore {
 
 class DocumentLoader;
 class Element;
+class FormData;
 class FormState;
 class Frame;
 class FrameLoadRequest;
 class FrameLoaderClient;
+class KURL;
 class MainResourceLoader;
+class ResourceRequest;
 class String;
 class SubresourceLoader;
 class WebResourceLoader;
@@ -168,7 +167,7 @@ class FrameLoader : Noncopyable {
   void post(NSURL*,
             const String& referrer,
             const String& target,
-            NSArray* postData,
+            const FormData&,
             const String& contentType,
             NSEvent*,
             Element* form,
@@ -183,6 +182,12 @@ class FrameLoader : Noncopyable {
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
 
   bool canLoad(NSURL*, const String& referrer, bool& hideReferrer);
+
+  void loadResourceSynchronously(const ResourceRequest&,
+                                 KURL& finalURL,
+                                 NSDictionary*& responseHeaders,
+                                 int& statusCode,
+                                 Vector<char>& data);
 
   // Also not cool.
   void stopLoadingPlugIns();

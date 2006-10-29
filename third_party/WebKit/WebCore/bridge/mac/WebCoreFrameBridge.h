@@ -461,13 +461,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (NSURL*)originalRequestURL;
 - (void)frameDetached;
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
-- (NSData*)syncLoadResourceWithMethod:(NSString*)method
-                                  URL:(NSURL*)URL
-                        customHeaders:(NSDictionary*)requestHeaders
-                             postData:(NSArray*)postData
-                             finalURL:(NSURL**)finalNSURL
-                      responseHeaders:(NSDictionary**)responseHeaderDict
-                           statusCode:(int*)statusCode;
 
 @end
 

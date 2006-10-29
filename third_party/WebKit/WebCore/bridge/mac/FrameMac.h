@@ -124,10 +124,11 @@ class FrameMac : public Frame {
                                const Vector<String>& paramValues,
                                const String& mimeType);
 
-  void clear(bool clearWindowProperties = true);
+  virtual void clear(bool clearWindowProperties = true);
 
   void setBridge(WebCoreFrameBridge* p);
   WebCoreFrameBridge* bridge() const { return _bridge; }
+
   virtual void setView(FrameView*);
   virtual void frameDetached();
 
@@ -241,8 +242,7 @@ class FrameMac : public Frame {
                                    Frame* subframePart);
   bool passWheelEventToWidget(Widget*);
 
-  NSString* searchForLabelsAboveCell(RegularExpression* regExp,
-                                     HTMLTableCellElement* cell);
+  NSString* searchForLabelsAboveCell(RegularExpression*, HTMLTableCellElement*);
   NSString* searchForLabelsBeforeElement(NSArray* labels, Element* element);
   NSString* matchLabelsAgainstElement(NSArray* labels, Element* element);
 
