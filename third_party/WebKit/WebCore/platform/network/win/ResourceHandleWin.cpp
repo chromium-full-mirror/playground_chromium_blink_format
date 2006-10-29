@@ -24,9 +24,9 @@
  */
 
 #include "config.h"
-#include "ResourceLoader.h"
-#include "ResourceLoaderInternal.h"
-#include "ResourceLoaderWin.h"
+#include "ResourceHandle.h"
+#include "ResourceHandleInternal.h"
+#include "ResourceHandleWin.h"
 
 #include "CString.h"
 #include "DocLoader.h"
@@ -39,10 +39,10 @@
 namespace WebCore {
 
 static unsigned transferJobId = 0;
-static HashMap<int, ResourceLoader*>* jobIdMap = 0;
+static HashMap<int, ResourceHandle*>* jobIdMap = 0;
 
 static HWND transferJobWindowHandle = 0;
-const LPCWSTR kResourceLoaderWindowClassName = L"ResourceLoaderWindowClass";
+const LPCWSTR kResourceHandleWindowClassName = L"ResourceHandleWindowClass";
 
 // Message types for internal use (keep in sync with kMessageHandlers)
 enum {
@@ -51,14 +51,14 @@ enum {
   requestCompleteMessage
 };
 
-typedef void (ResourceLoader::*ResourceLoaderEventHandler)(LPARAM);
-static const ResourceLoaderEventHandler messageHandlers[] = {
-    &ResourceLoader::onHandleCreated, &ResourceLoader::onRequestRedirected,
-    &ResourceLoader::onRequestComplete};
+typedef void (ResourceHandle::*ResourceHandleEventHandler)(LPARAM);
+static const ResourceHandleEventHandler messageHandlers[] = {
+    &ResourceHandle::onHandleCreated, &ResourceHandle::onRequestRedirected,
+    &ResourceHandle::onRequestComplete};
 
-static int addToOutstandingJobs(ResourceLoader* job) {
+static int addToOutstandingJobs(ResourceHandle* job) {
   if (!jobIdMap)
-    jobIdMap = new HashMap<int, ResourceLoader*>;
+    jobIdMap = new HashMap<int, ResourceHandle*>;
   transferJobId++;
   jobIdMap->set(transferJobId, job);
   return transferJobId;
@@ -70,13 +70,13 @@ static void removeFromOutstandingJobs(int jobId) {
   jobIdMap->remove(jobId);
 }
 
-static ResourceLoader* lookupResourceLoader(int jobId) {
+static ResourceHandle* lookupResourceHandle(int jobId) {
   if (!jobIdMap)
     return 0;
   return jobIdMap->get(jobId);
 }
 
-static LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
+static LRESULT CALLBACK ResourceHandleWndProc(HWND hWnd,
                                               UINT message,
                                               WPARAM wParam,
                                               LPARAM lParam) {
@@ -84,7 +84,7 @@ static LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
     UINT index = message - handleCreatedMessage;
     if (index < _countof(messageHandlers)) {
       unsigned jobId = (unsigned)wParam;
-      ResourceLoader* job = lookupResourceLoader(jobId);
+      ResourceHandle* job = lookupResourceHandle(jobId);
       if (job) {
         ASSERT(job->d->m_jobId == jobId);
         ASSERT(job->d->m_threadId == GetCurrentThreadId());
@@ -96,34 +96,34 @@ static LRESULT CALLBACK ResourceLoaderWndProc(HWND hWnd,
   return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-static void initializeOffScreenResourceLoaderWindow() {
+static void initializeOffScreenResourceHandleWindow() {
   if (transferJobWindowHandle)
     return;
 
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));
   wcex.cbSize = sizeof(WNDCLASSEX);
-  wcex.lpfnWndProc = ResourceLoaderWndProc;
+  wcex.lpfnWndProc = ResourceHandleWndProc;
   wcex.hInstance = Page::instanceHandle();
-  wcex.lpszClassName = kResourceLoaderWindowClassName;
+  wcex.lpszClassName = kResourceHandleWindowClassName;
   RegisterClassEx(&wcex);
 
   transferJobWindowHandle = CreateWindow(
-      kResourceLoaderWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
+      kResourceHandleWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
       HWND_MESSAGE, 0, Page::instanceHandle(), 0);
 }
 
-ResourceLoaderInternal::~ResourceLoaderInternal() {
+ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_fileHandle != INVALID_HANDLE_VALUE)
     CloseHandle(m_fileHandle);
 }
 
-ResourceLoader::~ResourceLoader() {
+ResourceHandle::~ResourceHandle() {
   if (d->m_jobId)
     removeFromOutstandingJobs(d->m_jobId);
 }
 
-void ResourceLoader::onHandleCreated(LPARAM lParam) {
+void ResourceHandle::onHandleCreated(LPARAM lParam) {
   if (!d->m_resourceHandle) {
     d->m_resourceHandle = HINTERNET(lParam);
     if (d->status != 0) {
@@ -180,7 +180,7 @@ void ResourceLoader::onHandleCreated(LPARAM lParam) {
   }
 }
 
-void ResourceLoader::onRequestRedirected(LPARAM lParam) {
+void ResourceHandle::onRequestRedirected(LPARAM lParam) {
   // If already canceled, then ignore this event.
   if (d->status != 0)
     return;
@@ -189,7 +189,7 @@ void ResourceLoader::onRequestRedirected(LPARAM lParam) {
   client()->receivedRedirect(this, url);
 }
 
-void ResourceLoader::onRequestComplete(LPARAM lParam) {
+void ResourceHandle::onRequestComplete(LPARAM lParam) {
   if (d->m_writing) {
     DWORD bytesWritten;
     InternetWriteFile(d->m_secondaryHandle,
@@ -299,7 +299,7 @@ static void __stdcall transferJobStatusCallback(HINTERNET internetHandle,
   PostMessage(transferJobWindowHandle, msg, (WPARAM)jobId, lParam);
 }
 
-bool ResourceLoader::start(DocLoader* docLoader) {
+bool ResourceHandle::start(DocLoader* docLoader) {
   ref();
   if (d->URL.isLocalFile()) {
     DeprecatedString path = d->URL.path();
@@ -335,7 +335,7 @@ bool ResourceLoader::start(DocLoader* docLoader) {
     static INTERNET_STATUS_CALLBACK callbackHandle =
         InternetSetStatusCallback(internetHandle, transferJobStatusCallback);
 
-    initializeOffScreenResourceLoaderWindow();
+    initializeOffScreenResourceHandleWindow();
     d->m_jobId = addToOutstandingJobs(this);
 
     // For form posting, we can't use InternetOpenURL.  We have to use
@@ -374,7 +374,7 @@ bool ResourceLoader::start(DocLoader* docLoader) {
   }
 }
 
-void ResourceLoader::fileLoadTimer(Timer<ResourceLoader>* timer) {
+void ResourceHandle::fileLoadTimer(Timer<ResourceHandle>* timer) {
   d->client->receivedResponse(this, 0);
 
   bool result = false;
@@ -403,7 +403,7 @@ void ResourceLoader::fileLoadTimer(Timer<ResourceLoader>* timer) {
   d->client->didFinishLoading(this);
 }
 
-void ResourceLoader::cancel() {
+void ResourceHandle::cancel() {
   if (d->m_resourceHandle)
     InternetCloseHandle(d->m_resourceHandle);
   else
@@ -423,11 +423,11 @@ void ResourceLoader::cancel() {
     setError(1);
 }
 
-void ResourceLoader::setHasReceivedResponse(bool b) {
+void ResourceHandle::setHasReceivedResponse(bool b) {
   d->m_hasReceivedResponse = b;
 }
 
-bool ResourceLoader::hasReceivedResponse() const {
+bool ResourceHandle::hasReceivedResponse() const {
   return d->m_hasReceivedResponse;
 }
 

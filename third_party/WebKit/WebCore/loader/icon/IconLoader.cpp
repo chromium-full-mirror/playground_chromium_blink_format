@@ -67,7 +67,7 @@ void IconLoader::startLoading() {
   m_url = m_frame->iconURL();
   ResourceRequest request(m_url);
   m_resourceLoader =
-      ResourceLoader::create(request, this, m_frame->document()->docLoader());
+      ResourceHandle::create(request, this, m_frame->document()->docLoader());
 
   if (!m_resourceLoader)
     LOG_ERROR("Failed to start load for icon at url %s",
@@ -81,7 +81,7 @@ void IconLoader::stopLoading() {
   m_data.clear();
 }
 
-void IconLoader::didReceiveData(ResourceLoader* resourceLoader,
+void IconLoader::didReceiveData(ResourceHandle* resourceLoader,
                                 const char* data,
                                 int size) {
   ASSERT(resourceLoader == m_resourceLoader);
@@ -92,7 +92,7 @@ void IconLoader::didReceiveData(ResourceLoader* resourceLoader,
     m_data.append(data[i]);
 }
 
-void IconLoader::didFinishLoading(ResourceLoader* resourceLoader) {
+void IconLoader::didFinishLoading(ResourceHandle* resourceLoader) {
   ASSERT(resourceLoader == m_resourceLoader);
 
   const char* data;

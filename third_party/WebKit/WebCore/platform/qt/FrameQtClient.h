@@ -28,7 +28,7 @@
 #ifndef FrameQtClient_H
 #define FrameQtClient_H
 
-#include "ResourceLoaderClient.h"
+#include "ResourceHandleClient.h"
 
 namespace WebCore {
 
@@ -47,7 +47,7 @@ class FrameQtClient {
                           const KURL&,
                           const FormData*) = 0;
 
-  // This is invoked after any ResourceLoader is done,
+  // This is invoked after any ResourceHandle is done,
   // to check wheter all items to be loaded are finished.
   virtual void checkLoaded() = 0;
 
@@ -67,7 +67,7 @@ class FrameQtClient {
                                    String& result) = 0;
 };
 
-class FrameQtClientDefault : public FrameQtClient, public ResourceLoaderClient {
+class FrameQtClientDefault : public FrameQtClient, public ResourceHandleClient {
  public:
   FrameQtClientDefault();
   virtual ~FrameQtClientDefault();
@@ -94,10 +94,10 @@ class FrameQtClientDefault : public FrameQtClient, public ResourceLoaderClient {
 
   virtual void loadFinished() const;
 
-  // ResourceLoaderClient
-  virtual void receivedResponse(ResourceLoader*, PlatformResponse);
-  virtual void didReceiveData(ResourceLoader*, const char*, int);
-  virtual void receivedAllData(ResourceLoader*, PlatformData);
+  // ResourceHandleClient
+  virtual void receivedResponse(ResourceHandle*, PlatformResponse);
+  virtual void didReceiveData(ResourceHandle*, const char*, int);
+  virtual void receivedAllData(ResourceHandle*, PlatformData);
 
  private:
   // Internal helpers

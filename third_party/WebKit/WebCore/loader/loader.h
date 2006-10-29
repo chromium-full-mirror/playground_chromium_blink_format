@@ -28,7 +28,7 @@
 #ifndef loader_h
 #define loader_h
 
-#include "ResourceLoaderClient.h"
+#include "ResourceHandleClient.h"
 #include <wtf/HashMap.h>
 #include "DeprecatedPtrList.h"
 
@@ -47,7 +47,7 @@ class DocLoader;
 class Request;
 class String;
 
-class Loader : ResourceLoaderClient {
+class Loader : ResourceHandleClient {
  public:
   Loader();
   ~Loader();
@@ -60,17 +60,17 @@ class Loader : ResourceLoaderClient {
   void removeBackgroundDecodingRequest(Request*);
 
   // may return 0
-  ResourceLoader* jobForRequest(const String& URL) const;
+  ResourceHandle* jobForRequest(const String& URL) const;
 
  private:
-  virtual void receivedResponse(ResourceLoader*, PlatformResponse);
-  virtual void didReceiveData(ResourceLoader*, const char*, int);
-  virtual void receivedAllData(ResourceLoader*, PlatformData);
+  virtual void receivedResponse(ResourceHandle*, PlatformResponse);
+  virtual void didReceiveData(ResourceHandle*, const char*, int);
+  virtual void receivedAllData(ResourceHandle*, PlatformData);
 
   void servePendingRequests();
 
   DeprecatedPtrList<Request> m_requestsPending;
-  typedef HashMap<ResourceLoader*, Request*> RequestMap;
+  typedef HashMap<ResourceHandle*, Request*> RequestMap;
   RequestMap m_requestsLoading;
 
   DeprecatedPtrList<Request> m_requestsBackgroundDecoding;

@@ -25,25 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ResourceLoaderManager_H
-#define ResourceLoaderManager_H
+#ifndef ResourceHandleManager_H
+#define ResourceHandleManager_H
 
 #include <QMap>
 #include <QObject>
 
-#include "ResourceLoader.h"
+#include "ResourceHandle.h"
 
 namespace WebCore {
 
 class FrameQtClient;
 
-class ResourceLoaderManager : public QObject {
+class ResourceHandleManager : public QObject {
   Q_OBJECT
  public:
-  static ResourceLoaderManager* self();
+  static ResourceHandleManager* self();
 
-  void add(ResourceLoader*, FrameQtClient*);
-  void cancel(ResourceLoader*);
+  void add(ResourceHandle*, FrameQtClient*);
+  void cancel(ResourceHandle*);
 
  public Q_SLOTS:
   void slotData(KIO::Job*, const QByteArray& data);
@@ -51,14 +51,14 @@ class ResourceLoaderManager : public QObject {
   void slotResult(KJob*);
 
  private:
-  ResourceLoaderManager();
-  ~ResourceLoaderManager();
+  ResourceHandleManager();
+  ~ResourceHandleManager();
 
-  void remove(ResourceLoader*);
+  void remove(ResourceHandle*);
 
   // KIO Job <-> WebKit Job mapping
-  QMap<ResourceLoader*, KIO::Job*> m_jobToKioMap;
-  QMap<KIO::Job*, ResourceLoader*> m_kioToJobMap;
+  QMap<ResourceHandle*, KIO::Job*> m_jobToKioMap;
+  QMap<KIO::Job*, ResourceHandle*> m_kioToJobMap;
 
   FrameQtClient* m_frameClient;
 };

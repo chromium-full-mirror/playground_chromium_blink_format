@@ -42,13 +42,13 @@ namespace WebCore {
 
 class FormData;
 class String;
-class ResourceLoader;
+class ResourceHandle;
 class ResourceRequest;
 
 class SubresourceLoader : public WebResourceLoader {
  public:
   static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              ResourceLoader*,
+                                              ResourceHandle*,
                                               ResourceRequest&);
 
   virtual ~SubresourceLoader();
@@ -64,16 +64,16 @@ class SubresourceLoader : public WebResourceLoader {
 
  private:
   static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              ResourceLoader*,
+                                              ResourceHandle*,
                                               NSMutableURLRequest*,
                                               NSDictionary* customHeaders,
                                               const String& referrer);
 
-  SubresourceLoader(Frame*, ResourceLoader*);
+  SubresourceLoader(Frame*, ResourceHandle*);
 
   virtual void didCancel(NSError*);
 
-  RefPtr<ResourceLoader> m_loader;
+  RefPtr<ResourceHandle> m_loader;
   bool m_loadingMultipartContent;
 };
 }

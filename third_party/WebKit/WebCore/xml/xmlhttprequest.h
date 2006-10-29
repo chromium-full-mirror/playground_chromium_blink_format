@@ -25,7 +25,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/Vector.h>
 #include "KURL.h"
-#include "ResourceLoaderClient.h"
+#include "ResourceHandleClient.h"
 #include "PlatformString.h"
 #include "HTTPHeaderMap.h"
 #include "StringHash.h"
@@ -56,7 +56,7 @@ enum XMLHttpRequestState {
   Loaded = 4      // The data transfer has been completed.
 };
 
-class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
+class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceHandleClient {
  public:
   XMLHttpRequest(Document*);
   ~XMLHttpRequest();
@@ -92,9 +92,9 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
  private:
   bool urlMatchesDocumentDomain(const KURL&) const;
 
-  virtual void receivedRedirect(ResourceLoader*, const KURL&);
-  virtual void didReceiveData(ResourceLoader*, const char* data, int size);
-  virtual void didFinishLoading(ResourceLoader*);
+  virtual void receivedRedirect(ResourceHandle*, const KURL&);
+  virtual void didReceiveData(ResourceHandle*, const char* data, int size);
+  virtual void didFinishLoading(ResourceHandle*);
 
   void processSyncLoadResults(const Vector<char>& data,
                               const KURL& finalURL,
@@ -118,7 +118,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceLoaderClient {
   bool m_async;
   HTTPHeaderMap m_requestHeaders;
 
-  RefPtr<ResourceLoader> m_loader;
+  RefPtr<ResourceHandle> m_loader;
 
   XMLHttpRequestState m_state;
 

@@ -23,10 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ResourceLoader_h
-#define ResourceLoader_h
+#ifndef ResourceHandle_h
+#define ResourceHandle_h
 
-#include "ResourceLoaderClient.h"  // for PlatformResponse
+#include "ResourceHandleClient.h"  // for PlatformResponse
 #include "ResourceRequest.h"
 #include "StringHash.h"
 #include "Timer.h"
@@ -58,19 +58,19 @@ namespace WebCore {
 class DocLoader;
 class FormData;
 class KURL;
-class ResourceLoaderInternal;
+class ResourceHandleInternal;
 
-class ResourceLoader : public Shared<ResourceLoader> {
+class ResourceHandle : public Shared<ResourceHandle> {
  private:
-  ResourceLoader(const ResourceRequest&, ResourceLoaderClient*);
+  ResourceHandle(const ResourceRequest&, ResourceHandleClient*);
 
  public:
   // FIXME: should not need the DocLoader
-  static PassRefPtr<ResourceLoader> create(const ResourceRequest&,
-                                           ResourceLoaderClient*,
+  static PassRefPtr<ResourceHandle> create(const ResourceRequest&,
+                                           ResourceHandleClient*,
                                            DocLoader*);
 
-  ~ResourceLoader();
+  ~ResourceHandle();
 
   int error() const;
   void setError(int);
@@ -92,7 +92,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
 #if USE(WININET)
   void setHasReceivedResponse(bool b = true);
   bool hasReceivedResponse() const;
-  void fileLoadTimer(Timer<ResourceLoader>* timer);
+  void fileLoadTimer(Timer<ResourceHandle>* timer);
   void onHandleCreated(LPARAM);
   void onRequestRedirected(LPARAM);
   void onRequestComplete(LPARAM);
@@ -101,14 +101,14 @@ class ResourceLoader : public Shared<ResourceLoader> {
                                                   DWORD,
                                                   LPVOID,
                                                   DWORD);
-  friend LRESULT __stdcall ResourceLoaderWndProc(HWND,
+  friend LRESULT __stdcall ResourceHandleWndProc(HWND,
                                                  unsigned message,
                                                  WPARAM,
                                                  LPARAM);
 #endif
 
 #if PLATFORM(GDK) || PLATFORM(QT)
-  ResourceLoaderInternal* getInternal() { return d; }
+  ResourceHandleInternal* getInternal() { return d; }
 #endif
 
 #if PLATFORM(QT)
@@ -118,7 +118,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
 
   void cancel();
 
-  ResourceLoaderClient* client() const;
+  ResourceHandleClient* client() const;
 
   void receivedResponse(PlatformResponse);
 
@@ -133,8 +133,8 @@ class ResourceLoader : public Shared<ResourceLoader> {
   void assembleResponseHeaders() const;
   void retrieveResponseEncoding() const;
 
-  ResourceLoaderInternal* d;
+  ResourceHandleInternal* d;
 };
 }
 
-#endif  // ResourceLoader_h
+#endif  // ResourceHandle_h

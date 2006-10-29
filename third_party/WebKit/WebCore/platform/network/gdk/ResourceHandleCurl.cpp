@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2004, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2006 Michael Emmel mike.emmel@gmail.com
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,20 +25,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ResourceLoaderWin_H
-#define ResourceLoaderWin_H
+#include "config.h"
+#include "ResourceHandle.h"
 
-#include <windows.h>
+#include "DocLoader.h"
+#include "ResourceHandleInternal.h"
+#include "ResourceHandleManager.h"
 
 namespace WebCore {
 
-struct PlatformDataStruct {
-  DWORD error;
-  BOOL loaded;
-  LPTSTR errorString;
-};
+ResourceHandleInternal::~ResourceHandleInternal() {}
 
-struct PlatformResponseStruct {};
+ResourceHandle::~ResourceHandle() {
+  cancel();
 }
 
-#endif
+bool ResourceHandle::start(DocLoader* docLoader) {
+  ref();
+  ResourceHandleManager::get()->add(this);
+  return true;
+}
+
+void ResourceHandle::cancel() {
+  ResourceHandleManager::get()->cancel(this);
+}
+
+}  // namespace WebCore

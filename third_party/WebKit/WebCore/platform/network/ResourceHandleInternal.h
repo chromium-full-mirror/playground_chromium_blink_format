@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ResourceLoaderInternal_h
-#define ResourceLoaderInternal_h
+#ifndef ResourceHandleInternal_h
+#define ResourceHandleInternal_h
 
 #include "FormData.h"
 #include "KURL.h"
@@ -53,17 +53,17 @@ typedef void CURL;
 #include "WebSubresourceLoader.h"
 #endif
 
-// The allocations and releases in ResourceLoaderInternal are
+// The allocations and releases in ResourceHandleInternal are
 // Cocoa-exception-free (either simple Foundation classes or
 // WebCoreResourceLoaderImp which avoids doing work in dealloc).
 
 namespace WebCore {
 
-class ResourceLoaderInternal {
+class ResourceHandleInternal {
  public:
-  ResourceLoaderInternal(ResourceLoader* loader,
+  ResourceHandleInternal(ResourceHandle* loader,
                          const ResourceRequest& request,
-                         ResourceLoaderClient* c)
+                         ResourceHandleClient* c)
       : m_client(c),
         m_request(request),
         status(0),
@@ -82,7 +82,7 @@ class ResourceLoaderInternal {
 #if USE(WININET)
         ,
         m_fileHandle(INVALID_HANDLE_VALUE),
-        m_fileLoadTimer(loader, &ResourceLoader::fileLoadTimer),
+        m_fileLoadTimer(loader, &ResourceHandle::fileLoadTimer),
         m_resourceHandle(0),
         m_secondaryHandle(0),
         m_jobId(0),
@@ -101,9 +101,9 @@ class ResourceLoaderInternal {
   {
   }
 
-  ~ResourceLoaderInternal();
+  ~ResourceHandleInternal();
 
-  ResourceLoaderClient* m_client;
+  ResourceHandleClient* m_client;
 
   ResourceRequest m_request;
 
@@ -126,7 +126,7 @@ class ResourceLoaderInternal {
 #endif
 #if USE(WININET)
   HANDLE m_fileHandle;
-  Timer<ResourceLoader> m_fileLoadTimer;
+  Timer<ResourceHandle> m_fileLoadTimer;
   HINTERNET m_resourceHandle;
   HINTERNET m_secondaryHandle;
   unsigned m_jobId;
@@ -151,4 +151,4 @@ class ResourceLoaderInternal {
 
 }  // namespace WebCore
 
-#endif  // ResourceLoaderInternal_h
+#endif  // ResourceHandleInternal_h

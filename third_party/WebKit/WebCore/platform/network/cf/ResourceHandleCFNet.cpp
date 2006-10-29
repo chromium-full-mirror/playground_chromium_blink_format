@@ -27,8 +27,8 @@
 
 #if USE(CFNETWORK)
 
-#include "ResourceLoader.h"
-#include "ResourceLoaderInternal.h"
+#include "ResourceHandle.h"
+#include "ResourceHandleInternal.h"
 #include "DocLoader.h"
 #include "Frame.h"
 
@@ -49,7 +49,7 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
                                 CFURLRequestRef request,
                                 CFURLResponseRef redirectionResponse,
                                 const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
   CFURLRef url = CFURLRequestGetURL(request);
   CFStringRef urlString = CFURLGetString(url);
   const char* bytes = CFStringGetCStringPtr(urlString, kCFStringEncodingUTF8);
@@ -87,7 +87,7 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
 void didReceiveResponse(CFURLConnectionRef conn,
                         CFURLResponseRef response,
                         const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
 
 #if defined(LOG_RESOURCELOADER_EVENTS)
   CFStringRef str = CFStringCreateWithFormat(
@@ -103,7 +103,7 @@ void didReceiveData(CFURLConnectionRef conn,
                     CFDataRef data,
                     CFIndex originalLength,
                     const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
   const UInt8* bytes = CFDataGetBytePtr(data);
   CFIndex length = CFDataGetLength(data);
 
@@ -119,7 +119,7 @@ void didReceiveData(CFURLConnectionRef conn,
 }
 
 void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
 
 #if defined(LOG_RESOURCELOADER_EVENTS)
   CFStringRef str = CFStringCreateWithFormat(
@@ -136,7 +136,7 @@ void didFinishLoading(CFURLConnectionRef conn, const void* clientInfo) {
 void didFail(CFURLConnectionRef conn,
              CFStreamError error,
              const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
 
 #if defined(LOG_RESOURCELOADER_EVENTS)
   CFStringRef str = CFStringCreateWithFormat(
@@ -155,14 +155,14 @@ void didFail(CFURLConnectionRef conn,
 CFCachedURLResponseRef willCacheResponse(CFURLConnectionRef conn,
                                          CFCachedURLResponseRef cachedResponse,
                                          const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
   return cachedResponse;
 }
 
 void didReceiveChallenge(CFURLConnectionRef conn,
                          CFURLAuthChallengeRef challenge,
                          const void* clientInfo) {
-  ResourceLoader* job = (ResourceLoader*)clientInfo;
+  ResourceHandle* job = (ResourceHandle*)clientInfo;
 
   // Do nothing right now
 }
@@ -188,7 +188,7 @@ void addHeadersFromHashMap(CFHTTPMessageRef request,
   CFRelease(allHeaders);
 }
 
-ResourceLoaderInternal::~ResourceLoaderInternal() {
+ResourceHandleInternal::~ResourceHandleInternal() {
   if (m_connection) {
 #if defined(LOG_RESOURCELOADER_EVENTS)
     CFStringRef str = CFStringCreateWithFormat(
@@ -202,7 +202,7 @@ ResourceLoaderInternal::~ResourceLoaderInternal() {
   }
 }
 
-ResourceLoader::~ResourceLoader() {
+ResourceHandle::~ResourceHandle() {
 #if defined(LOG_RESOURCELOADER_EVENTS)
   CFStringRef str =
       CFStringCreateWithFormat(0, 0, CFSTR("Destroying job %p\n"), this);
@@ -248,7 +248,7 @@ void runLoaderThread(void* unused) {
   CFRunLoopRun();
 }
 
-bool ResourceLoader::start(DocLoader* docLoader) {
+bool ResourceHandle::start(DocLoader* docLoader) {
   CFURLRef url = d->m_request.url().createCFURL();
   CFStringRef requestMethod = d->m_request.httpMethod().createCFString();
   Boolean isPost =
@@ -373,14 +373,14 @@ bool ResourceLoader::start(DocLoader* docLoader) {
   return true;
 }
 
-void ResourceLoader::cancel() {
+void ResourceHandle::cancel() {
   if (d->m_connection) {
     CFURLConnectionCancel(d->m_connection);
     CFRelease(d->m_connection);
     d->m_connection = 0;
   }
 
-  // Copied directly from ResourceLoaderWin.cpp
+  // Copied directly from ResourceHandleWin.cpp
   setError(1);
   d->m_client->receivedAllData(this, 0);
   d->m_client->didFinishLoading(this);

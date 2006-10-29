@@ -261,7 +261,7 @@ namespace WebCore {
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
-                                     ResourceLoader*,
+                                     ResourceHandle*,
                                      KURL&,
                                      DeprecatedString&) {
   notImplemented();
@@ -500,8 +500,8 @@ bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
 }
 void WebCore::refreshPlugins(bool) {}
 
-void WebCore::ResourceLoader::assembleResponseHeaders() const {}
-void WebCore::ResourceLoader::retrieveCharset() const {}
+void WebCore::ResourceHandle::assembleResponseHeaders() const {}
+void WebCore::ResourceHandle::retrieveCharset() const {}
 
 void FrameGdk::restoreDocumentState() {}
 void FrameGdk::partClearedInBegin() {}

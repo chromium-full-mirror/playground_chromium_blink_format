@@ -25,13 +25,13 @@
 #ifndef ICONLOADER_H_
 #define ICONLOADER_H_
 
-#include "ResourceLoader.h"
+#include "ResourceHandle.h"
 
 namespace WebCore {
 
 class Frame;
 
-class IconLoader : public ResourceLoaderClient {
+class IconLoader : public ResourceHandleClient {
  public:
   static IconLoader* createForFrame(Frame* frame);
   ~IconLoader();
@@ -39,10 +39,10 @@ class IconLoader : public ResourceLoaderClient {
   void startLoading();
   void stopLoading();
 
-  // ResourceLoaderClient delegate methods
-  virtual void receivedResponse(ResourceLoader*, PlatformResponse);
-  virtual void didReceiveData(ResourceLoader*, const char*, int);
-  virtual void didFinishLoading(ResourceLoader*);
+  // ResourceHandleClient delegate methods
+  virtual void receivedResponse(ResourceHandle*, PlatformResponse);
+  virtual void didReceiveData(ResourceHandle*, const char*, int);
+  virtual void didFinishLoading(ResourceHandle*);
 
  private:
   IconLoader(Frame* frame);
@@ -50,7 +50,7 @@ class IconLoader : public ResourceLoaderClient {
   void notifyIconChanged(const KURL& iconURL);
 
   KURL m_url;
-  RefPtr<ResourceLoader> m_resourceLoader;
+  RefPtr<ResourceHandle> m_resourceLoader;
   Frame* m_frame;
 
   static const int IconLoaderDefaultBuffer = 4096;

@@ -31,21 +31,21 @@
 
 #include "FrameQt.h"
 #include "DocLoader.h"
-#include "ResourceLoader.h"
+#include "ResourceHandle.h"
 #include "DeprecatedString.h"
-#include "ResourceLoaderManager.h"
-#include "ResourceLoaderInternal.h"
+#include "ResourceHandleManager.h"
+#include "ResourceHandleInternal.h"
 
 namespace WebCore {
 
-ResourceLoaderInternal::~ResourceLoaderInternal() {}
+ResourceHandleInternal::~ResourceHandleInternal() {}
 
-ResourceLoader::~ResourceLoader() {
+ResourceHandle::~ResourceHandle() {
   cancel();
   delete d;
 }
 
-bool ResourceLoader::start(DocLoader* docLoader) {
+bool ResourceHandle::start(DocLoader* docLoader) {
   ref();
   d->m_loading = true;
 
@@ -55,15 +55,15 @@ bool ResourceLoader::start(DocLoader* docLoader) {
     ASSERT(frame);
   }
 
-  ResourceLoaderManager::self()->add(this, frame ? frame->client() : 0);
+  ResourceHandleManager::self()->add(this, frame ? frame->client() : 0);
   return true;
 }
 
-void ResourceLoader::cancel() {
-  ResourceLoaderManager::self()->cancel(this);
+void ResourceHandle::cancel() {
+  ResourceHandleManager::self()->cancel(this);
 }
 
-void ResourceLoader::assembleResponseHeaders() const {
+void ResourceHandle::assembleResponseHeaders() const {
   if (!d->assembledResponseHeaders) {
     ASSERT(d->m_response);
 
@@ -72,14 +72,14 @@ void ResourceLoader::assembleResponseHeaders() const {
   }
 }
 
-void ResourceLoader::retrieveResponseEncoding() const {
+void ResourceHandle::retrieveResponseEncoding() const {
   if (!d->m_retrievedResponseEncoding) {
     d->m_responseEncoding = extractCharsetFromHeaders(d->responseHeaders);
     d->m_retrievedResponseEncoding = true;
   }
 }
 
-void ResourceLoader::receivedResponse(PlatformResponse response) {
+void ResourceHandle::receivedResponse(PlatformResponse response) {
   Q_ASSERT(method() == "POST");
 
   d->assembledResponseHeaders = false;
@@ -87,10 +87,10 @@ void ResourceLoader::receivedResponse(PlatformResponse response) {
   d->m_response = response;
 
   if (d->m_client)
-    d->m_client->receivedResponse(const_cast<ResourceLoader*>(this), response);
+    d->m_client->receivedResponse(const_cast<ResourceHandle*>(this), response);
 }
 
-QString ResourceLoader::extractCharsetFromHeaders(QString headers) const {
+QString ResourceHandle::extractCharsetFromHeaders(QString headers) const {
   int pos = headers.find("content-type:", 0, false);
 
   if (pos > -1) {

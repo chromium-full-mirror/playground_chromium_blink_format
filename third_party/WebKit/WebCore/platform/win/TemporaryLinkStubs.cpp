@@ -59,8 +59,8 @@
 #include "PlugInInfoStore.h"
 #include "RenderTheme.h"
 #include "FrameWin.h"
-#include "ResourceLoader.h"
-#include "ResourceLoaderClient.h"
+#include "ResourceHandle.h"
+#include "ResourceHandleClient.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
@@ -559,12 +559,12 @@ bool PlugInInfoStore::supportsMIMEType(const String&) {
 }
 void refreshPlugins(bool) {}
 
-void ResourceLoader::assembleResponseHeaders() const {}
-void ResourceLoader::retrieveResponseEncoding() const {}
+void ResourceHandle::assembleResponseHeaders() const {}
+void ResourceHandle::retrieveResponseEncoding() const {}
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
-                                     ResourceLoader*,
+                                     ResourceHandle*,
                                      KURL&,
                                      DeprecatedString&) {
   notImplemented();

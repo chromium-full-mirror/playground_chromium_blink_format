@@ -29,7 +29,7 @@
 #define FrameGdk_H_
 
 #include "Frame.h"
-#include "ResourceLoaderClient.h"
+#include "ResourceHandleClient.h"
 #include <gdk/gdk.h>
 
 namespace WebCore {
@@ -50,7 +50,7 @@ class FrameGdkClient {
 };
 
 class FrameGdkClientDefault : public FrameGdkClient,
-                              public ResourceLoaderClient {
+                              public ResourceHandleClient {
  public:
   FrameGdkClientDefault();
   virtual ~FrameGdkClientDefault();
@@ -60,10 +60,10 @@ class FrameGdkClientDefault : public FrameGdkClient,
   virtual void openURL(const KURL&);
   virtual void submitForm(const String& method, const KURL&, const FormData*);
 
-  // ResourceLoaderClient
-  virtual void receivedResponse(ResourceLoader*, PlatformResponse);
-  virtual void didReceiveData(ResourceLoader*, const char*, int);
-  virtual void receivedAllData(ResourceLoader*, PlatformData);
+  // ResourceHandleClient
+  virtual void receivedResponse(ResourceHandle*, PlatformResponse);
+  virtual void didReceiveData(ResourceHandle*, const char*, int);
+  virtual void receivedAllData(ResourceHandle*, PlatformData);
 
  private:
   FrameGdk* m_frame;

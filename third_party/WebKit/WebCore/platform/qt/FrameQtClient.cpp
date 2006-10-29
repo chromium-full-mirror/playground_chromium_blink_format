@@ -32,9 +32,9 @@
 #include "FrameQt.h"
 #include "Document.h"
 #include "FrameTree.h"
-#include "ResourceLoader.h"
+#include "ResourceHandle.h"
 #include "LoaderFunctions.h"
-#include "ResourceLoaderInternal.h"
+#include "ResourceHandleInternal.h"
 
 #include <kstdguiitem.h>
 #include <kmessagebox.h>
@@ -62,7 +62,7 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   m_assignedMimetype = false;
 
   ResourceRequest request(url);
-  RefPtr<ResourceLoader> loader = ResourceLoader::create(
+  RefPtr<ResourceHandle> loader = ResourceHandle::create(
       request, this,
       m_frame->document() ? m_frame->document()->docLoader() : 0);
 }
@@ -78,7 +78,7 @@ void FrameQtClientDefault::submitForm(const String& method,
   request.setHTTPMethod(method);
   request.setHTTPBody(*postData);
 
-  RefPtr<ResourceLoader> loader = ResourceLoader::create(
+  RefPtr<ResourceHandle> loader = ResourceHandle::create(
       request, this,
       m_frame->document() ? m_frame->document()->docLoader() : 0);
 }
@@ -136,14 +136,14 @@ void FrameQtClientDefault::loadFinished() const {
   // no-op
 }
 
-void FrameQtClientDefault::receivedResponse(ResourceLoader*, PlatformResponse) {
+void FrameQtClientDefault::receivedResponse(ResourceHandle*, PlatformResponse) {
   // no-op
 }
 
-void FrameQtClientDefault::didReceiveData(ResourceLoader* job,
+void FrameQtClientDefault::didReceiveData(ResourceHandle* job,
                                           const char* data,
                                           int length) {
-  ResourceLoaderInternal* d = job->getInternal();
+  ResourceHandleInternal* d = job->getInternal();
   ASSERT(d);
 
   if (!m_assignedMimetype) {
@@ -185,7 +185,7 @@ int FrameQtClientDefault::numPendingOrLoadingRequests(bool recurse) const {
   return num;
 }
 
-void FrameQtClientDefault::receivedAllData(ResourceLoader* job,
+void FrameQtClientDefault::receivedAllData(ResourceHandle* job,
                                            PlatformData data) {
   ASSERT(m_frame);
 
