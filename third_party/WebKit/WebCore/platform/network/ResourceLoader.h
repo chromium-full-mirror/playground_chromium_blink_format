@@ -83,7 +83,10 @@ class ResourceLoader : public Shared<ResourceLoader> {
   void kill();
 
 #if PLATFORM(MAC)
-  void setLoader(WebCoreResourceLoaderImp*);
+  void redirectedToURL(NSURL* url);
+  void addData(NSData* data);
+  void finishJobAndHandle(NSData* data);
+  void reportError();
 #endif
 
 #if USE(WININET)

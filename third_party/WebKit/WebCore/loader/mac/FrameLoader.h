@@ -207,18 +207,6 @@ class FrameLoader : Noncopyable {
   String referrer() const;
   void loadEmptyDocumentSynchronously();
 
-#ifdef __OBJC__
-  id<WebCoreResourceHandle> startLoadingResource(id<WebCoreResourceLoader>,
-                                                 const String& method,
-                                                 NSURL*,
-                                                 NSDictionary* customHeaders);
-  id<WebCoreResourceHandle> startLoadingResource(id<WebCoreResourceLoader>,
-                                                 const String& method,
-                                                 NSURL*,
-                                                 NSDictionary* customHeaders,
-                                                 NSArray* postData);
-#endif
-
   DocumentLoader* activeDocumentLoader() const;
   DocumentLoader* documentLoader() const;
   DocumentLoader* provisionalDocumentLoader();
