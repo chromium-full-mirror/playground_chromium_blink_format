@@ -42,22 +42,13 @@ namespace WebCore {
 
 class String;
 class ResourceLoader;
+class ResourceRequest;
 
 class SubresourceLoader : public WebResourceLoader {
  public:
   static PassRefPtr<SubresourceLoader> create(Frame*,
                                               ResourceLoader*,
-                                              const String& method,
-                                              NSURL* URL,
-                                              NSDictionary* customHeaders,
-                                              const String& referrer);
-  static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              ResourceLoader*,
-                                              const String& method,
-                                              NSURL* URL,
-                                              NSDictionary* customHeaders,
-                                              NSArray* postData,
-                                              const String& referrer);
+                                              ResourceRequest&);
 
   virtual ~SubresourceLoader();
 
