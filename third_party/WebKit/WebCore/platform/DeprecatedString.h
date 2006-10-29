@@ -31,10 +31,10 @@
 #include "DeprecatedCString.h"
 
 #if PLATFORM(CF)
-#include <CoreFoundation/CoreFoundation.h>
+typedef const struct __CFString* CFStringRef;
 #endif
 
-#if __APPLE__
+#if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSString;
 #else
@@ -242,8 +242,10 @@ class DeprecatedString {
   static DeprecatedString fromLatin1(const char*, int len);
   static DeprecatedString fromUtf8(const char*);
   static DeprecatedString fromUtf8(const char*, int len);
-#if __APPLE__
+#if PLATFORM(CF)
   static DeprecatedString fromCFString(CFStringRef);
+#endif
+#if PLATFORM(MAC)
   static DeprecatedString fromNSString(NSString*);
 #endif
   DeprecatedString& operator=(char);
@@ -381,10 +383,13 @@ class DeprecatedString {
   DeprecatedString& operator+=(DeprecatedChar c) { return append(c); }
   DeprecatedString& operator+=(char c) { return append(c); }
 
-#if __APPLE__
+#if PLATFORM(CF)
   CFStringRef getCFString() const;
-  NSString* getNSString() const;
   void setBufferFromCFString(CFStringRef);
+#endif
+
+#if PLATFORM(MAC)
+  NSString* getNSString() const;
 
 #ifdef __OBJC__
   operator NSString*() const { return getNSString(); }
@@ -451,10 +456,12 @@ inline const DeprecatedChar* DeprecatedString::unicode() const {
   return dataHandle[0]->unicode();
 }
 
-#if __APPLE__
+#if PLATFORM(MAC)
+#if PLATFORM(CF)
 inline CFStringRef DeprecatedString::getCFString() const {
   return (CFStringRef)getNSString();
 }
+#endif
 #endif
 
 inline DeprecatedString DeprecatedString::fromLatin1(const char* chs) {
