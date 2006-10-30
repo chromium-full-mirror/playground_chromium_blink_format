@@ -35,8 +35,11 @@ class RenderApplet : public RenderWidget {
  public:
   RenderApplet(HTMLAppletElement*, const HashMap<String, String>& args);
   virtual ~RenderApplet();
+
   virtual const char* renderName() const { return "RenderApplet"; }
+
   virtual bool isApplet() const { return true; }
+
   virtual void layout();
   virtual int intrinsicWidth() const;
   virtual int intrinsicHeight() const;
@@ -46,6 +49,7 @@ class RenderApplet : public RenderWidget {
  private:
   HashMap<String, String> m_args;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderApplet_h

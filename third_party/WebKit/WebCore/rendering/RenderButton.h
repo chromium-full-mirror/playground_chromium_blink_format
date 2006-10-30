@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RenderButton_H
-#define RenderButton_H
+#ifndef RenderButton_h
+#define RenderButton_h
 
 #include "RenderFlexibleBox.h"
 
@@ -36,8 +36,10 @@ class RenderButton : public RenderFlexibleBox {
  public:
   RenderButton(Node*);
 
+  virtual const char* renderName() const { return "RenderButton"; }
+
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
-  virtual void removeChild(RenderObject* oldChild);
+  virtual void removeChild(RenderObject*);
   virtual void removeLeftoverAnonymousBoxes() {}
   virtual bool createsAnonymousWrapper() const { return true; }
 
@@ -50,14 +52,13 @@ class RenderButton : public RenderFlexibleBox {
 
   void setText(const String&);
 
-  virtual const char* renderName() const { return "RenderButton"; }
-
  protected:
   virtual bool hasLineIfEmpty() const { return true; }
 
   RenderText* m_buttonText;
   RenderBlock* m_inner;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderButton_h

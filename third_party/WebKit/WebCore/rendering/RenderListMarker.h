@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef RenderListMarker_H
-#define RenderListMarker_H
+#ifndef RenderListMarker_h
+#define RenderListMarker_h
 
 #include "DeprecatedString.h"
 #include "RenderBox.h"
@@ -40,13 +40,16 @@ class RenderListMarker : public RenderBox {
   RenderListMarker(Document*);
   ~RenderListMarker();
 
+  virtual const char* renderName() const { return "RenderListMarker"; }
+
+  virtual bool isListMarker() const { return true; }
+
   virtual void setStyle(RenderStyle*);
 
-  virtual const char* renderName() const { return "RenderListMarker"; }
+  virtual void paint(PaintInfo&, int xoff, int yoff);
+
   // so the marker gets to layout itself. Only needed for
   // list-style-position: inside
-
-  virtual void paint(PaintInfo&, int xoff, int yoff);
   virtual void layout();
   virtual void calcMinMaxWidth();
 
@@ -56,10 +59,9 @@ class RenderListMarker : public RenderBox {
 
   virtual InlineBox* createInlineBox(bool, bool, bool);
 
-  virtual short lineHeight(bool b, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool b, bool isRootLineBox = false) const;
-
-  virtual bool isListMarker() const { return true; }
+  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual short baselinePosition(bool firstLine,
+                                 bool isRootLineBox = false) const;
 
   CachedImage* listImage() const { return m_listImage; }
 
@@ -84,6 +86,6 @@ class RenderListMarker : public RenderBox {
   SelectionState m_selectionState;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderListMarker_h

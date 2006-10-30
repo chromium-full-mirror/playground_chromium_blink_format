@@ -46,8 +46,8 @@ RenderListItem::RenderListItem(Node* node)
   setInline(false);  // our object is not Inline
 }
 
-void RenderListItem::setStyle(RenderStyle* _style) {
-  RenderBlock::setStyle(_style);
+void RenderListItem::setStyle(RenderStyle* newStyle) {
+  RenderBlock::setStyle(newStyle);
 
   if (style()->listStyleType() != LNONE ||
       (style()->listStyleImage() &&
@@ -250,14 +250,15 @@ void RenderListItem::positionListMarker() {
   }
 }
 
-void RenderListItem::paint(PaintInfo& i, int _tx, int _ty) {
+void RenderListItem::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (!m_height)
     return;
 
-  RenderBlock::paint(i, _tx, _ty);
+  RenderBlock::paint(paintInfo, tx, ty);
 }
 
 DeprecatedString RenderListItem::markerStringValue() {
   return m_marker ? m_marker->text() : "";
 }
-}
+
+}  // namespace WebCore

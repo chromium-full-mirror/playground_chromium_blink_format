@@ -41,24 +41,24 @@
  * version of this file under any of the LGPL, the MPL or the GPL.
  */
 
-#ifndef render_layer_h
-#define render_layer_h
+#ifndef RenderLayer_h
+#define RenderLayer_h
 
 #include "RenderObject.h"
-#include "Timer.h"
 #include "ScrollBar.h"
+#include "Timer.h"
 
 namespace WebCore {
 
 class CachedResource;
 class HitTestResult;
-class RenderView;
+class PlatformScrollbar;
 class RenderFrameSet;
 class RenderObject;
 class RenderStyle;
 class RenderTable;
 class RenderText;
-class PlatformScrollbar;
+class RenderView;
 
 class ClipRects {
  public:
@@ -67,6 +67,7 @@ class ClipRects {
         m_fixedClipRect(r),
         m_posClipRect(r),
         m_refCnt(0) {}
+
   ClipRects(const IntRect& o, const IntRect& f, const IntRect& p)
       : m_overflowClipRect(o),
         m_fixedClipRect(f),
@@ -83,17 +84,17 @@ class ClipRects {
       destroy(renderArena);
   }
 
-  void destroy(RenderArena* renderArena);
+  void destroy(RenderArena*);
 
   // Overloaded new operator.
-  void* operator new(size_t sz, RenderArena* renderArena) throw();
+  void* operator new(size_t, RenderArena*) throw();
 
   // Overridden to prevent the normal delete from being called.
-  void operator delete(void* ptr, size_t sz);
+  void operator delete(void*, size_t);
 
  private:
   // The normal operator new is disallowed on all render objects.
-  void* operator new(size_t sz) throw();
+  void* operator new(size_t) throw();
 
  private:
   IntRect m_overflowClipRect;
@@ -102,6 +103,7 @@ class ClipRects {
   unsigned m_refCnt;
 };
 
+// FIXME: move this to its own file
 // This class handles the auto-scrolling of layers with overflow: marquee.
 class Marquee {
  public:
@@ -109,6 +111,7 @@ class Marquee {
 
   int speed() const { return m_speed; }
   int marqueeSpeed() const;
+
   EMarqueeDirection reverseDirection() const {
     return static_cast<EMarqueeDirection>(-direction());
   }
@@ -120,7 +123,7 @@ class Marquee {
 
   EWhiteSpace whiteSpace() { return static_cast<EWhiteSpace>(m_whiteSpace); }
 
-  int computePosition(EMarqueeDirection dir, bool stopAtClientEdge);
+  int computePosition(EMarqueeDirection, bool stopAtClientEdge);
 
   void setEnd(int end) { m_end = end; }
 
@@ -191,7 +194,6 @@ class RenderLayer : public ScrollbarClient {
   RenderLayer* parent() const { return m_parent; }
   RenderLayer* previousSibling() const { return m_previous; }
   RenderLayer* nextSibling() const { return m_next; }
-
   RenderLayer* firstChild() const { return m_first; }
   RenderLayer* lastChild() const { return m_last; }
 
@@ -223,19 +225,18 @@ class RenderLayer : public ScrollbarClient {
 
   int xPos() const { return m_x; }
   int yPos() const { return m_y; }
+  void setPos(int xPos, int yPos) {
+    m_x = xPos;
+    m_y = yPos;
+  }
+
   int width() const { return m_width; }
   int height() const { return m_height; }
-
   void setWidth(int w) { m_width = w; }
   void setHeight(int h) { m_height = h; }
 
   int scrollWidth();
   int scrollHeight();
-
-  void setPos(int xPos, int yPos) {
-    m_x = xPos;
-    m_y = yPos;
-  }
 
   // Scrolling methods for layers that can scroll their overflow.
   void scrollOffset(int& x, int& y);
@@ -251,35 +252,44 @@ class RenderLayer : public ScrollbarClient {
     scrollToOffset(m_scrollX + m_scrollOriginX, y);
   }
   void scrollRectToVisible(
-      const IntRect& r,
+      const IntRect&,
       const ScrollAlignment& alignX = gAlignCenterIfNeeded,
       const ScrollAlignment& alignY = gAlignCenterIfNeeded);
+
   IntRect getRectToExpose(const IntRect& visibleRect,
                           const IntRect& exposeRect,
                           const ScrollAlignment& alignX,
                           const ScrollAlignment& alignY);
+
   void setHasHorizontalScrollbar(bool);
   void setHasVerticalScrollbar(bool);
+
   PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
   void destroyScrollbar(ScrollbarOrientation);
+
   Scrollbar* horizontalScrollbar() { return m_hBar.get(); }
   Scrollbar* verticalScrollbar() { return m_vBar.get(); }
+
   PlatformScrollbar* horizontaScrollbarWidget() const;
   PlatformScrollbar* verticalScrollbarWidget() const;
+
   int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
+
   void positionOverflowControls();
   bool isPointInResizeControl(const IntPoint&);
   IntSize offsetFromResizeCorner(const IntPoint&) const;
+
   void paintOverflowControls(GraphicsContext*,
                              int tx,
                              int ty,
                              const IntRect& damageRect);
+
   void updateScrollInfoAfterLayout();
-  bool scroll(ScrollDirection direction,
-              ScrollGranularity granularity,
-              float multiplier = 1.0);
+
+  bool scroll(ScrollDirection, ScrollGranularity, float multiplier = 1.0f);
   void autoscroll();
+
   void resize(const PlatformMouseEvent&, const IntSize&);
   bool inResizeMode() const { return m_inResizeMode; }
   void setInResizeMode(bool b) { m_inResizeMode = b; }
@@ -288,6 +298,7 @@ class RenderLayer : public ScrollbarClient {
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
   void checkForRepaintOnResize();
+
   void relativePositionOffset(int& relX, int& relY) {
     relX += m_relX;
     relY += m_relY;
@@ -314,7 +325,7 @@ class RenderLayer : public ScrollbarClient {
   Vector<RenderLayer*>* overflowList() const { return m_overflowList; }
 
   bool hasVisibleContent() const { return m_hasVisibleContent; }
-  void setHasVisibleContent(bool b);
+  void setHasVisibleContent(bool);
   void dirtyVisibleContentStatus();
 
   // Gets the nearest enclosing positioned ancestor layer (also includes
@@ -365,18 +376,18 @@ class RenderLayer : public ScrollbarClient {
 
   IntRect repaintRect() const { return m_repaintRect; }
 
-  void destroy(RenderArena* renderArena);
+  void destroy(RenderArena*);
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
-  void* operator new(size_t sz, RenderArena* renderArena) throw();
+  void* operator new(size_t, RenderArena*) throw();
 
   // Overridden to prevent the normal delete from being called.
-  void operator delete(void* ptr, size_t sz);
+  void operator delete(void*, size_t);
 
  private:
   // The normal operator new is disallowed on all render objects.
-  void* operator new(size_t sz) throw();
+  void* operator new(size_t) throw();
 
  private:
   void setNextSibling(RenderLayer* next) { m_next = next; }
@@ -415,7 +426,6 @@ class RenderLayer : public ScrollbarClient {
   RenderLayer* m_parent;
   RenderLayer* m_previous;
   RenderLayer* m_next;
-
   RenderLayer* m_first;
   RenderLayer* m_last;
 
@@ -493,6 +503,6 @@ class RenderLayer : public ScrollbarClient {
   Marquee* m_marquee;  // Used by layers with overflow:marquee
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderLayer_h

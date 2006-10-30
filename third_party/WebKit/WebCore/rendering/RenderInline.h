@@ -22,16 +22,14 @@
  *
  */
 
-#ifndef RENDER_INLINE_H
-#define RENDER_INLINE_H
+#ifndef RenderInline_h
+#define RenderInline_h
 
 #include "RenderFlow.h"
 
 namespace WebCore {
-class Position;
-}
 
-namespace WebCore {
+class Position;
 
 class RenderInline : public RenderFlow {
  public:
@@ -65,10 +63,10 @@ class RenderInline : public RenderFlow {
   virtual void paint(PaintInfo&, int tx, int ty);
 
   virtual bool nodeAtPoint(HitTestResult&,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
                            HitTestAction);
 
   virtual void calcMinMaxWidth();
@@ -97,6 +95,6 @@ class RenderInline : public RenderFlow {
                               // inline.
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderInline_h

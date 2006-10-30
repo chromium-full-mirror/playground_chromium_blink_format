@@ -22,11 +22,11 @@
  *
  */
 
-#ifndef RenderFrameSet_H
-#define RenderFrameSet_H
+#ifndef RenderFrameSet_h
+#define RenderFrameSet_h
 
-#include "RenderContainer.h"
 #include "HTMLFrameSetElement.h"
+#include "RenderContainer.h"
 
 namespace WebCore {
 
@@ -85,6 +85,7 @@ class RenderFrameSet : public RenderContainer {
   bool m_resizing;
   bool m_clientResizing;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderFrameSet_h

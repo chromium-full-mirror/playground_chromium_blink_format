@@ -79,8 +79,8 @@ short RenderBR::lineHeight(bool firstLine, bool isRootLineBox) const {
   return m_lineHeight;
 }
 
-void RenderBR::setStyle(RenderStyle* _style) {
-  RenderText::setStyle(_style);
+void RenderBR::setStyle(RenderStyle* newStyle) {
+  RenderText::setStyle(newStyle);
   m_lineHeight = -1;
 }
 
@@ -96,11 +96,12 @@ unsigned RenderBR::caretMaxRenderedOffset() const {
   return 1;
 }
 
-VisiblePosition RenderBR::positionForCoordinates(int _x, int _y) {
+VisiblePosition RenderBR::positionForCoordinates(int /*x*/, int /*y*/) {
   return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
-InlineBox* RenderBR::inlineBox(int offset, EAffinity affinity) {
+InlineBox* RenderBR::inlineBox(int /*offset*/, EAffinity /*affinity*/) {
   return firstTextBox();
 }
-}
+
+}  // namespace WebCore

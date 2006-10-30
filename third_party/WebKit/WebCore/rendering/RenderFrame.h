@@ -22,11 +22,11 @@
  *
  */
 
-#ifndef RenderFrame_H
-#define RenderFrame_H
+#ifndef RenderFrame_h
+#define RenderFrame_h
 
-#include "RenderPart.h"
 #include "HTMLFrameElement.h"
+#include "RenderPart.h"
 
 namespace WebCore {
 
@@ -42,6 +42,7 @@ class RenderFrame : public RenderPart {
 
   virtual void viewCleared();
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderFrame_h

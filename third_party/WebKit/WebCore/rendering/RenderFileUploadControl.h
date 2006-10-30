@@ -18,13 +18,12 @@
  *
  */
 
-#ifndef RenderFileUploadControl_H
-#define RenderFileUploadControl_H
-
-#include "RenderBlock.h"
+#ifndef RenderFileUploadControl_h
+#define RenderFileUploadControl_h
 
 #include "FileChooser.h"
 #include "HTMLInputElement.h"
+#include "RenderBlock.h"
 #include "Shared.h"
 
 namespace WebCore {
@@ -43,6 +42,8 @@ class RenderFileUploadControl : public RenderBlock {
   RenderFileUploadControl(Node*);
   ~RenderFileUploadControl();
 
+  virtual const char* renderName() const { return "RenderFileUploadControl"; }
+
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
   virtual void calcMinMaxWidth();
@@ -52,8 +53,6 @@ class RenderFileUploadControl : public RenderBlock {
 
   void valueChanged();
 
-  virtual const char* renderName() const { return "RenderFileUploadControl"; }
-
  protected:
   int maxFilenameWidth();
   RenderStyle* createButtonStyle(RenderStyle* parentStyle = 0);
@@ -61,6 +60,7 @@ class RenderFileUploadControl : public RenderBlock {
   RefPtr<HTMLFileUploadInnerButtonElement> m_button;
   RefPtr<FileChooser> m_fileChooser;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderFileUploadControl_h

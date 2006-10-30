@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef RenderBlock_H
-#define RenderBlock_H
+#ifndef RenderBlock_h
+#define RenderBlock_h
 
 #include "GapRects.h"
 #include "RenderFlow.h"
@@ -43,8 +43,9 @@ class RenderBlock : public RenderFlow {
   virtual const char* renderName() const;
 
   // These two functions are overridden for inline-block.
-  virtual short lineHeight(bool b, bool isRootLineBox = false) const;
-  virtual short baselinePosition(bool b, bool isRootLineBox = false) const;
+  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual short baselinePosition(bool firstLine,
+                                 bool isRootLineBox = false) const;
 
   virtual bool isRenderBlock() const { return true; }
   virtual bool isBlockFlow() const {
@@ -77,16 +78,10 @@ class RenderBlock : public RenderFlow {
   virtual bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
 
   virtual int maxTopMargin(bool positive) const {
-    if (positive)
-      return m_maxTopPosMargin;
-    else
-      return m_maxTopNegMargin;
+    return positive ? m_maxTopPosMargin : m_maxTopNegMargin;
   }
   virtual int maxBottomMargin(bool positive) const {
-    if (positive)
-      return m_maxBottomPosMargin;
-    else
-      return m_maxBottomNegMargin;
+    return positive ? m_maxBottomPosMargin : m_maxBottomNegMargin;
   }
 
   void initMaxMarginValues() {
@@ -168,16 +163,16 @@ class RenderBlock : public RenderFlow {
   void checkLinesForTextOverflow();
   // end bidi.cpp functions
 
-  virtual void paint(PaintInfo& i, int tx, int ty);
-  virtual void paintObject(PaintInfo& i, int tx, int ty);
-  void paintFloats(PaintInfo& i, int _tx, int _ty, bool paintSelection = false);
-  void paintChildren(PaintInfo& i, int _tx, int _ty);
-  void paintEllipsisBoxes(PaintInfo& i, int _tx, int _ty);
-  void paintSelection(PaintInfo& i, int _tx, int _ty);
-  void paintCaret(PaintInfo& i, CaretType);
+  virtual void paint(PaintInfo&, int tx, int ty);
+  virtual void paintObject(PaintInfo&, int tx, int ty);
+  void paintFloats(PaintInfo&, int tx, int ty, bool paintSelection = false);
+  void paintChildren(PaintInfo&, int tx, int ty);
+  void paintEllipsisBoxes(PaintInfo&, int tx, int ty);
+  void paintSelection(PaintInfo&, int tx, int ty);
+  void paintCaret(PaintInfo&, CaretType);
 
-  void insertFloatingObject(RenderObject* o);
-  void removeFloatingObject(RenderObject* o);
+  void insertFloatingObject(RenderObject*);
+  void removeFloatingObject(RenderObject*);
   void setPaintsFloatingObject(RenderObject*, bool);
 
   // called from lineWidth, to position the floats added in the last line.
@@ -191,8 +186,8 @@ class RenderBlock : public RenderFlow {
   // FIXME: containsFloats() should not return true if the floating objects list
   // is empty. However, layoutInlineChildren() relies on the current behavior.
   // http://bugzilla.opendarwin.org/show_bug.cgi?id=7395#c3
-  virtual bool containsFloats() { return m_floatingObjects != 0; }
-  virtual bool containsFloat(RenderObject* o);
+  virtual bool containsFloats() { return m_floatingObjects; }
+  virtual bool containsFloat(RenderObject*);
 
   virtual bool hasOverhangingFloats() { return floatBottom() > m_height; }
   void addIntrudingFloats(RenderBlock* prev, int xoffset, int yoffset);
@@ -233,7 +228,7 @@ class RenderBlock : public RenderFlow {
                            int y,
                            int tx,
                            int ty,
-                           HitTestAction hitTestAction);
+                           HitTestAction);
 
   virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
 
@@ -277,19 +272,16 @@ class RenderBlock : public RenderFlow {
     GapRects m_rects;
     SelectionState m_state;
 
-    BlockSelectionInfo() {
-      m_block = 0;
-      m_state = SelectionNone;
-    }
-    BlockSelectionInfo(RenderBlock* b) {
-      m_block = b;
-      m_state = m_block->selectionState();
-      m_rects = m_block->selectionGapRects();
-    }
+    BlockSelectionInfo() : m_block(0), m_state(SelectionNone) {}
 
+    BlockSelectionInfo(RenderBlock* b)
+        : m_block(b),
+          m_rects(b->selectionGapRects()),
+          m_state(b->selectionState()) {}
+
+    RenderBlock* block() const { return m_block; }
     GapRects rects() const { return m_rects; }
     SelectionState state() const { return m_state; }
-    RenderBlock* block() const { return m_block; }
   };
 
   virtual IntRect selectionRect() { return selectionGapRects(); }
@@ -304,7 +296,7 @@ class RenderBlock : public RenderFlow {
                              int& lastTop,
                              int& lastLeft,
                              int& lastRight,
-                             const PaintInfo* i = 0);
+                             const PaintInfo* = 0);
   GapRects fillInlineSelectionGaps(RenderBlock* rootBlock,
                                    int blockX,
                                    int blockY,
@@ -313,7 +305,7 @@ class RenderBlock : public RenderFlow {
                                    int& lastTop,
                                    int& lastLeft,
                                    int& lastRight,
-                                   const PaintInfo* i);
+                                   const PaintInfo*);
   GapRects fillBlockSelectionGaps(RenderBlock* rootBlock,
                                   int blockX,
                                   int blockY,
@@ -322,7 +314,7 @@ class RenderBlock : public RenderFlow {
                                   int& lastTop,
                                   int& lastLeft,
                                   int& lastRight,
-                                  const PaintInfo* i);
+                                  const PaintInfo*);
   IntRect fillVerticalSelectionGap(int lastTop,
                                    int lastLeft,
                                    int lastRight,
@@ -330,7 +322,7 @@ class RenderBlock : public RenderFlow {
                                    RenderBlock* rootBlock,
                                    int blockX,
                                    int blockY,
-                                   const PaintInfo* i);
+                                   const PaintInfo*);
   IntRect fillLeftSelectionGap(RenderObject* selObj,
                                int xPos,
                                int yPos,
@@ -340,7 +332,7 @@ class RenderBlock : public RenderFlow {
                                int blockY,
                                int tx,
                                int ty,
-                               const PaintInfo* i);
+                               const PaintInfo*);
   IntRect fillRightSelectionGap(RenderObject* selObj,
                                 int xPos,
                                 int yPos,
@@ -350,28 +342,28 @@ class RenderBlock : public RenderFlow {
                                 int blockY,
                                 int tx,
                                 int ty,
-                                const PaintInfo* i);
+                                const PaintInfo*);
   IntRect fillHorizontalSelectionGap(RenderObject* selObj,
                                      int xPos,
                                      int yPos,
                                      int width,
                                      int height,
-                                     const PaintInfo* i);
+                                     const PaintInfo*);
 
-  void getHorizontalSelectionGapInfo(SelectionState state,
+  void getHorizontalSelectionGapInfo(SelectionState,
                                      bool& leftGap,
                                      bool& rightGap);
   int leftSelectionOffset(RenderBlock* rootBlock, int y);
   int rightSelectionOffset(RenderBlock* rootBlock, int y);
 
 #ifndef NDEBUG
-  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream*, DeprecatedString ind = "") const;
 #endif
 
   // Helper methods for computing line counts and heights for line counts.
-  RootInlineBox* lineAtIndex(int i);
+  RootInlineBox* lineAtIndex(int);
   int lineCount();
-  int heightForLineCount(int l);
+  int heightForLineCount(int);
   void clearTruncation();
 
  protected:
@@ -379,22 +371,21 @@ class RenderBlock : public RenderFlow {
   virtual bool hasLineIfEmpty() const;
 
  private:
-  Position positionForBox(InlineBox* box, bool start = true) const;
-  Position positionForRenderer(RenderObject* renderer, bool start = true) const;
+  Position positionForBox(InlineBox*, bool start = true) const;
+  Position positionForRenderer(RenderObject*, bool start = true) const;
 
  protected:
   struct FloatingObject {
     enum Type { FloatLeft, FloatRight };
 
-    FloatingObject(Type type) {
-      node = 0;
-      startY = 0;
-      endY = 0;
-      m_type = type;
-      left = 0;
-      width = 0;
-      noPaint = false;
-    }
+    FloatingObject(Type type)
+        : node(0),
+          startY(0),
+          endY(0),
+          left(0),
+          width(0),
+          m_type(type),
+          noPaint(false) {}
 
     Type type() { return static_cast<Type>(m_type); }
 
@@ -530,34 +521,32 @@ class RenderBlock : public RenderFlow {
     int margin() const { return m_posMargin - m_negMargin; }
   };
 
-  void adjustPositionedBlock(RenderObject* child, const MarginInfo& marginInfo);
-  void adjustFloatingBlock(const MarginInfo& marginInfo);
+  void adjustPositionedBlock(RenderObject* child, const MarginInfo&);
+  void adjustFloatingBlock(const MarginInfo&);
   RenderObject* handleSpecialChild(RenderObject* child,
-                                   const MarginInfo& marginInfo,
-                                   CompactInfo& compactInfo,
+                                   const MarginInfo&,
+                                   CompactInfo&,
                                    bool& handled);
   RenderObject* handleFloatingChild(RenderObject* child,
-                                    const MarginInfo& marginInfo,
+                                    const MarginInfo&,
                                     bool& handled);
   RenderObject* handlePositionedChild(RenderObject* child,
-                                      const MarginInfo& marginInfo,
+                                      const MarginInfo&,
                                       bool& handled);
   RenderObject* handleCompactChild(RenderObject* child,
-                                   CompactInfo& compactInfo,
+                                   CompactInfo&,
                                    bool& handled);
   RenderObject* handleRunInChild(RenderObject* child, bool& handled);
-  void collapseMargins(RenderObject* child,
-                       MarginInfo& marginInfo,
-                       int yPosEstimate);
+  void collapseMargins(RenderObject* child, MarginInfo&, int yPosEstimate);
   void clearFloatsIfNeeded(RenderObject* child,
-                           MarginInfo& marginInfo,
+                           MarginInfo&,
                            int oldTopPosMargin,
                            int oldTopNegMargin);
-  void insertCompactIfNeeded(RenderObject* child, CompactInfo& compactInfo);
-  int estimateVerticalPosition(RenderObject* child, const MarginInfo& info);
+  void insertCompactIfNeeded(RenderObject* child, CompactInfo&);
+  int estimateVerticalPosition(RenderObject* child, const MarginInfo&);
   void determineHorizontalPosition(RenderObject* child);
-  void handleBottomOfBlock(int top, int bottom, MarginInfo& marginInfo);
-  void setCollapsedBottomMargin(const MarginInfo& marginInfo);
+  void handleBottomOfBlock(int top, int bottom, MarginInfo&);
+  void setCollapsedBottomMargin(const MarginInfo&);
   // End helper functions and structs used by layoutBlockChildren.
 
  protected:
@@ -581,7 +570,7 @@ class RenderBlock : public RenderFlow {
   // we support
   // for now is spillage out of the bottom and the right, which are the common
   // cases).
-  // XXX Generalize to work with top and left as well.
+  // FIXME: Generalize to work with top and left as well.
   int m_overflowHeight;
   int m_overflowWidth;
 
@@ -597,4 +586,4 @@ class RenderBlock : public RenderFlow {
 
 }  // namespace WebCore
 
-#endif  // RenderBlock_H
+#endif  // RenderBlock_h

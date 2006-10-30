@@ -106,8 +106,8 @@ void RenderLineEdit::calcMinMaxWidth() {
   RenderFormElement::calcMinMaxWidth();
 }
 
-void RenderLineEdit::setStyle(RenderStyle* s) {
-  RenderFormElement::setStyle(s);
+void RenderLineEdit::setStyle(RenderStyle* newStyle) {
+  RenderFormElement::setStyle(newStyle);
 
   TextField* w = static_cast<TextField*>(widget());
   w->setAlignment(textAlignment());
@@ -190,7 +190,7 @@ int RenderLineEdit::selectionEnd() {
   int start = lineEdit->selectionStart();
   if (start == -1)
     return lineEdit->cursorPosition();
-  return start + (int)lineEdit->selectedText().length();
+  return start + static_cast<int>(lineEdit->selectedText().length());
 }
 
 void RenderLineEdit::setSelectionStart(int start) {

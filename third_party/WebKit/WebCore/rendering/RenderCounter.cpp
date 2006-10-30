@@ -53,9 +53,10 @@ static String toRoman(int number, bool upper) {
   int d = 0;
   do {
     int num = number % 10;
-    if (num % 5 < 4)
+    if (num % 5 < 4) {
       for (int i = num % 5; i > 0; i--)
         roman.insert(&digits[d], 1, 0);
+    }
     if (num >= 4 && num <= 8)
       roman.insert(&digits[d + 1], 1, 0);
     if (num == 9)

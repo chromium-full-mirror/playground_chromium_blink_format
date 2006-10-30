@@ -36,8 +36,8 @@
 #include "RenderArena.h"
 
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ROUNDUP(x, y) ((((x) + ((y)-1)) / (y)) * (y))
 
@@ -56,7 +56,7 @@ typedef struct {
 
 #endif
 
-RenderArena::RenderArena(unsigned int arenaSize) {
+RenderArena::RenderArena(unsigned arenaSize) {
   // Initialize the arena pool
   INIT_ARENA_POOL(&m_pool, "RenderArena", arenaSize);
 
@@ -128,4 +128,5 @@ void RenderArena::free(size_t size, void* ptr) {
   }
 #endif
 }
-}
+
+}  // namespace WebCore

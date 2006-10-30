@@ -46,8 +46,8 @@ short RenderFormElement::baselinePosition(bool f, bool isRootLineBox) const {
   return marginTop() + widget()->baselinePosition(m_height);
 }
 
-void RenderFormElement::setStyle(RenderStyle* s) {
-  RenderWidget::setStyle(s);
+void RenderFormElement::setStyle(RenderStyle* newStyle) {
+  RenderWidget::setStyle(newStyle);
 
   // Do not paint a background or border for Aqua form elements
   setShouldPaintBackgroundOrBorder(false);
@@ -98,7 +98,7 @@ HorizontalAlignment RenderFormElement::textAlignment() const {
     case TAAUTO:
       return style()->direction() == RTL ? AlignRight : AlignLeft;
   }
-  ASSERT(false);  // Should never be reached.
+  ASSERT_NOT_REACHED();
   return AlignLeft;
 }
 

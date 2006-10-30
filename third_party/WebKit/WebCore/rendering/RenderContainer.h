@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef RenderContainer_H
-#define RenderContainer_H
+#ifndef RenderContainer_h
+#define RenderContainer_h
 
 #include "RenderBox.h"
 
@@ -42,13 +42,13 @@ class RenderContainer : public RenderBox {
 
   virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
-  virtual void removeChild(RenderObject* oldChild);
+  virtual void removeChild(RenderObject*);
 
   virtual void destroy();
   void destroyLeftoverChildren();
 
-  virtual RenderObject* removeChildNode(RenderObject* child);
-  virtual void appendChildNode(RenderObject* child);
+  virtual RenderObject* removeChildNode(RenderObject*);
+  virtual void appendChildNode(RenderObject*);
   virtual void insertChildNode(RenderObject* child, RenderObject* before);
 
   virtual void layout();
@@ -68,9 +68,10 @@ class RenderContainer : public RenderBox {
   void setFirstChild(RenderObject* first) { m_first = first; }
   void setLastChild(RenderObject* last) { m_last = last; }
 
- protected:
   RenderObject* m_first;
   RenderObject* m_last;
 };
-}
-#endif
+
+}  // namespace WebCore
+
+#endif  // RenderContainer_h

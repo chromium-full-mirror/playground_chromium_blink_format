@@ -76,12 +76,14 @@ void RenderApplet::createWidgetIfNecessary() {
                    ? style()->height().value()
                    : m_height - borderTop() - borderBottom() - paddingTop() -
                          paddingBottom();
-  for (Node* child = node()->firstChild(); child; child = child->nextSibling())
+  for (Node* child = node()->firstChild(); child;
+       child = child->nextSibling()) {
     if (child->hasTagName(paramTag)) {
       HTMLParamElement* p = static_cast<HTMLParamElement*>(child);
       if (!p->name().isEmpty())
         m_args.set(p->name(), p->value());
     }
+  }
 
   Frame* frame = document()->frame();
   ASSERT(frame);
@@ -100,4 +102,5 @@ void RenderApplet::layout() {
   createWidgetIfNecessary();
   setNeedsLayout(false);
 }
-}
+
+}  // namespace WebCore

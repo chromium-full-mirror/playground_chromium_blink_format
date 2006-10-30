@@ -37,8 +37,8 @@ RenderInline::RenderInline(Node* node)
 
 RenderInline::~RenderInline() {}
 
-void RenderInline::setStyle(RenderStyle* _style) {
-  RenderFlow::setStyle(_style);
+void RenderInline::setStyle(RenderStyle* newStyle) {
+  RenderFlow::setStyle(newStyle);
   setInline(true);
 
   // Ensure that all of the split inlines pick up the new style. We
@@ -263,8 +263,8 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
   post->setNeedsLayoutAndMinMaxRecalc();
 }
 
-void RenderInline::paint(PaintInfo& i, int _tx, int _ty) {
-  paintLines(i, _tx, _ty);
+void RenderInline::paint(PaintInfo& paintInfo, int tx, int ty) {
+  paintLines(paintInfo, tx, ty);
 }
 
 void RenderInline::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
@@ -272,9 +272,10 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
     rects.append(IntRect(tx + curr->xPos(), ty + curr->yPos(), curr->width(),
                          curr->height()));
 
-  for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
+  for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
     if (!curr->isText())
       curr->absoluteRects(rects, tx + curr->xPos(), ty + curr->yPos());
+  }
 
   if (continuation())
     continuation()->absoluteRects(
@@ -284,11 +285,6 @@ void RenderInline::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
 
 void RenderInline::calcMinMaxWidth() {
   ASSERT(!minMaxKnown());
-
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName()
-                << "(RenderInline)::calcMinMaxWidth() this=" << this << endl;
-#endif
 
   // Irrelevant, since some enclosing block will actually measure us and our
   // children.
@@ -317,11 +313,10 @@ int RenderInline::width() const {
 }
 
 int RenderInline::height() const {
-  int h = 0;
   if (firstLineBox())
-    h = lastLineBox()->yPos() + lastLineBox()->height() -
-        firstLineBox()->yPos();
-  return h;
+    return lastLineBox()->yPos() + lastLineBox()->height() -
+           firstLineBox()->yPos();
+  return 0;
 }
 
 int RenderInline::offsetLeft() const {
@@ -347,12 +342,12 @@ const char* RenderInline::renderName() const {
 }
 
 bool RenderInline::nodeAtPoint(HitTestResult& result,
-                               int _x,
-                               int _y,
-                               int _tx,
-                               int _ty,
+                               int x,
+                               int y,
+                               int tx,
+                               int ty,
                                HitTestAction hitTestAction) {
-  return hitTestLines(result, _x, _y, _tx, _ty, hitTestAction);
+  return hitTestLines(result, x, y, tx, ty, hitTestAction);
 }
 
 VisiblePosition RenderInline::positionForCoordinates(int x, int y) {
@@ -363,4 +358,5 @@ VisiblePosition RenderInline::positionForCoordinates(int x, int y) {
 
   return RenderFlow::positionForCoordinates(x, y);
 }
-}
+
+}  // namespace WebCore

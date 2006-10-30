@@ -56,12 +56,12 @@
 #include "HitTestResult.h"
 #include "OverflowEvent.h"
 #include "PlatformMouseEvent.h"
+#include "PlatformScrollBar.h"
 #include "RenderArena.h"
 #include "RenderInline.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "SelectionController.h"
-#include "PlatformScrollBar.h"
 
 #ifdef SVG_SUPPORT
 #include "SVGNames.h"
@@ -2493,4 +2493,5 @@ void Marquee::timerFired(Timer<Marquee>*) {
       m_layer->scrollToYOffset(newPos);
   }
 }
-}
+
+}  // namespace WebCore

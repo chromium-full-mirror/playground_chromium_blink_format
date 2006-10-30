@@ -69,21 +69,20 @@ RenderFileUploadControl::RenderFileUploadControl(Node* node)
 RenderFileUploadControl::~RenderFileUploadControl() {
   if (m_button)
     m_button->detach();
-  if (m_fileChooser) {
+  if (m_fileChooser)
     m_fileChooser->disconnectUploadControl();
-  }
 }
 
-void RenderFileUploadControl::setStyle(RenderStyle* s) {
+void RenderFileUploadControl::setStyle(RenderStyle* newStyle) {
   // Force text-align to match the direction
-  if (s->direction() == LTR)
-    s->setTextAlign(LEFT);
+  if (newStyle->direction() == LTR)
+    newStyle->setTextAlign(LEFT);
   else
-    s->setTextAlign(RIGHT);
+    newStyle->setTextAlign(RIGHT);
 
-  RenderBlock::setStyle(s);
+  RenderBlock::setStyle(newStyle);
   if (m_button)
-    m_button->renderer()->setStyle(createButtonStyle(s));
+    m_button->renderer()->setStyle(createButtonStyle(newStyle));
 
   setReplaced(isInline());
 }
@@ -137,20 +136,22 @@ RenderStyle* RenderFileUploadControl::createButtonStyle(
   return style;
 }
 
-void RenderFileUploadControl::paintObject(PaintInfo& i, int tx, int ty) {
+void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
+                                          int tx,
+                                          int ty) {
   // Push a clip.
-  if (i.phase == PaintPhaseForeground ||
-      i.phase == PaintPhaseChildBlockBackgrounds) {
+  if (paintInfo.phase == PaintPhaseForeground ||
+      paintInfo.phase == PaintPhaseChildBlockBackgrounds) {
     IntRect clipRect(tx + borderLeft(), ty + borderTop(),
                      width() - borderLeft() - borderRight(),
                      height() - borderBottom() - borderTop());
     if (clipRect.width() == 0 || clipRect.height() == 0)
       return;
-    i.p->save();
-    i.p->clip(clipRect);
+    paintInfo.p->save();
+    paintInfo.p->clip(clipRect);
   }
 
-  if (i.phase == PaintPhaseForeground) {
+  if (paintInfo.phase == PaintPhaseForeground) {
     const String& displayedFilename =
         m_fileChooser->basenameForWidth(maxFilenameWidth());
     TextRun textRun(displayedFilename.characters(), displayedFilename.length());
@@ -174,11 +175,11 @@ void RenderFileUploadControl::paintObject(PaintInfo& i, int tx, int ty) {
                 buttonRenderer->paddingTop() +
                 buttonRenderer->baselinePosition(true, false);
 
-    i.p->setFont(style()->font());
-    i.p->setPen(style()->color());
+    paintInfo.p->setFont(style()->font());
+    paintInfo.p->setPen(style()->color());
 
     // Draw the filename
-    i.p->drawText(textRun, IntPoint(textX, textY));
+    paintInfo.p->drawText(textRun, IntPoint(textX, textY));
 
     if (m_fileChooser->icon()) {
       // Determine where the icon should be placed
@@ -194,17 +195,17 @@ void RenderFileUploadControl::paintObject(PaintInfo& i, int tx, int ty) {
 
       // Draw the file icon
       m_fileChooser->icon()->paint(
-          i.p, IntRect(iconX, iconY, iconWidth, iconHeight));
+          paintInfo.p, IntRect(iconX, iconY, iconWidth, iconHeight));
     }
   }
 
   // Paint the children.
-  RenderBlock::paintObject(i, tx, ty);
+  RenderBlock::paintObject(paintInfo, tx, ty);
 
   // Pop the clip.
-  if (i.phase == PaintPhaseForeground ||
-      i.phase == PaintPhaseChildBlockBackgrounds)
-    i.p->restore();
+  if (paintInfo.phase == PaintPhaseForeground ||
+      paintInfo.phase == PaintPhaseChildBlockBackgrounds)
+    paintInfo.p->restore();
 }
 
 void RenderFileUploadControl::calcMinMaxWidth() {
@@ -261,4 +262,5 @@ RenderObject* HTMLFileUploadInnerButtonElement::createRenderer(
     RenderStyle* style) {
   return HTMLInputElement::createRenderer(arena, style);
 }
-}
+
+}  // namespace WebCore

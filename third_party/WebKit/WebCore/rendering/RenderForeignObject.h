@@ -20,12 +20,12 @@
  *
  */
 
-#ifndef RenderForeignObject_H
-#define RenderForeignObject_H
+#ifndef RenderForeignObject_h
+#define RenderForeignObject_h
 #ifdef SVG_SUPPORT
 
-#include "RenderBlock.h"
 #include "AffineTransform.h"
+#include "RenderBlock.h"
 
 namespace WebCore {
 
@@ -33,17 +33,18 @@ class SVGForeignObjectElement;
 
 class RenderForeignObject : public RenderBlock {
  public:
-  RenderForeignObject(SVGForeignObjectElement* node);
+  RenderForeignObject(SVGForeignObjectElement*);
 
   virtual const char* renderName() const { return "RenderForeignObject"; }
-  virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
+
+  virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual AffineTransform localTransform() const { return m_transform; }
   virtual void setLocalTransform(const AffineTransform& transform) {
     m_transform = transform;
   }
 
-  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f);
+  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed);
   virtual bool requiresLayer();
   virtual void layout();
 
@@ -56,10 +57,12 @@ class RenderForeignObject : public RenderBlock {
 
  private:
   AffineTransform translationForAttributes();
+
   AffineTransform m_transform;
   IntRect m_absoluteBounds;
 };
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif
+#endif  // RenderForeignObject_h

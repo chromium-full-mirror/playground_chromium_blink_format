@@ -21,13 +21,15 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+
 #include "RenderForeignObject.h"
 
 #include "GraphicsContext.h"
 #include "KRenderingDevice.h"
-#include "SVGLength.h"
 #include "SVGForeignObjectElement.h"
+#include "SVGLength.h"
 
 namespace WebCore {
 
@@ -126,9 +128,11 @@ bool RenderForeignObject::nodeAtPoint(HitTestResult& result,
   totalTransform *= translationForAttributes();
   double localX, localY;
   totalTransform.invert().map(x, y, &localX, &localY);
-  return RenderBlock::nodeAtPoint(result, (int)localX, (int)localY, tx, ty,
+  return RenderBlock::nodeAtPoint(result, static_cast<int>(localX),
+                                  static_cast<int>(localY), tx, ty,
                                   hitTestAction);
 }
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT

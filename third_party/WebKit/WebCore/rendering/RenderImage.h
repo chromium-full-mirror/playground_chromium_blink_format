@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef RENDER_IMAGE_H
-#define RENDER_IMAGE_H
+#ifndef RenderImage_h
+#define RenderImage_h
 
 #include "CachedImage.h"
 #include "HTMLElement.h"
@@ -57,7 +57,7 @@ class RenderImage : public RenderReplaced {
   }
 
   // hook to keep RendeObject::m_inline() up to date
-  virtual void setStyle(RenderStyle* style);
+  virtual void setStyle(RenderStyle*);
   void updateAltText();
 
   void setIsAnonymousImage(bool anon) { m_isAnonymousImage = anon; }
@@ -113,6 +113,6 @@ class RenderImage : public RenderReplaced {
   static Image* nullImage();
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderImage_h

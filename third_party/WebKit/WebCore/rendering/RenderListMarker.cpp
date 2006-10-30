@@ -512,4 +512,5 @@ IntRect RenderListMarker::selectionRect() {
   return IntRect(absx + xPos(), absy + root->selectionTop(), width(),
                  root->selectionHeight());
 }
-}
+
+}  // namespace WebCore
