@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef FrameLoaderTypes_h
+#define FrameLoaderTypes_h
+
 namespace WebCore {
 
 enum FrameState {
@@ -63,3 +66,5 @@ enum NavigationType {
   NavigationTypeOther
 };
 }
+
+#endif

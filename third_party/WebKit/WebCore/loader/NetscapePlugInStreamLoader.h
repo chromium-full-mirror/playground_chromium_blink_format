@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ResourceLoader.h"
-#import <wtf/Forward.h>
+#include "ResourceLoader.h"
+#include <wtf/Forward.h>
 
 #ifdef __OBJC__
 #import "WebPlugInStreamLoaderDelegate.h"
@@ -51,6 +51,7 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
 
   bool isDone() const;
 
+#if PLATFORM(MAC)
   virtual void didReceiveResponse(NSURLResponse*);
   virtual void didReceiveData(NSData*,
                               long long lengthReceived,
@@ -59,12 +60,15 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
   virtual void didFail(NSError*);
 
   virtual void releaseResources();
+#endif
 
  private:
   NetscapePlugInStreamLoader(Frame*, PlugInStreamLoaderDelegate);
 
+#if PLATFORM(MAC)
   virtual void didCancel(NSError*);
 
   RetainPtr<PlugInStreamLoaderDelegate> m_stream;
+#endif
 };
 }

@@ -559,7 +559,7 @@ void Frame::cancelRedirection(bool cancelWithLoadInProgress) {
 #pragma mark END LOADING FUNCTIONS
 
 FrameLoader* Frame::loader() const {
-  return d->m_frameLoader;
+  return d->m_loader;
 }
 
 KURL Frame::iconURL() {

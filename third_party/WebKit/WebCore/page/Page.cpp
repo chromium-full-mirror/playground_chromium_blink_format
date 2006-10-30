@@ -22,16 +22,13 @@
 #include "Page.h"
 
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "FrameTree.h"
 #include "StringHash.h"
 #include "Widget.h"
 #include <kjs/collector.h>
 #include <kjs/JSLock.h>
 #include <wtf/HashMap.h>
-
-#if PLATFORM(MAC)
-#include "FrameLoader.h"
-#endif
 
 using namespace KJS;
 
@@ -133,7 +130,6 @@ SelectionController* Page::dragCaretController() const {
   return &m_dragCaretController;
 }
 
-#if PLATFORM(MAC)
 void Page::setDefersLoading(bool defers) {
   if (defers == m_defersLoading)
     return;
@@ -142,5 +138,4 @@ void Page::setDefersLoading(bool defers) {
   for (Frame* frame = mainFrame(); frame; frame = frame->tree()->traverseNext())
     frame->loader()->setDefersLoading(defers);
 }
-#endif
 }
