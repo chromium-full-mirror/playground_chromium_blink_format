@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef ResourceLoader_h
+#define ResourceLoader_h
+
 #include "Shared.h"
 #include <wtf/RefPtr.h>
 
@@ -159,3 +162,5 @@ class ResourceLoader : public Shared<ResourceLoader> {
   bool m_defersLoading;
 };
 }
+
+#endif
