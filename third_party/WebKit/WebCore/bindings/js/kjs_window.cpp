@@ -374,13 +374,13 @@ DOMWindow* Window::impl() const {
 }
 
 ScriptInterpreter* Window::interpreter() const {
-  return m_frame->jScript()->interpreter();
+  return m_frame->scriptProxy()->interpreter();
 }
 
 Window* Window::retrieveWindow(Frame* f) {
   JSObject* o = retrieve(f)->getObject();
 
-  ASSERT(o || !f->jScriptEnabled());
+  ASSERT(o || !f->javaScriptEnabled());
   return static_cast<Window*>(o);
 }
 
@@ -392,7 +392,7 @@ Window* Window::retrieveActive(ExecState* exec) {
 
 JSValue* Window::retrieve(Frame* p) {
   ASSERT(p);
-  if (KJSProxy* proxy = p->jScript())
+  if (KJSProxy* proxy = p->scriptProxy())
     return proxy->interpreter()
         ->globalObject();  // the Global object is the "window"
 
@@ -1915,10 +1915,11 @@ void Window::updateLayout() const {
 ////////////////////// ScheduledAction ////////////////////////
 
 void ScheduledAction::execute(Window* window) {
-  if (!window->m_frame || !window->m_frame->jScript())
+  if (!window->m_frame || !window->m_frame->scriptProxy())
     return;
 
-  ScriptInterpreter* interpreter = window->m_frame->jScript()->interpreter();
+  ScriptInterpreter* interpreter =
+      window->m_frame->scriptProxy()->interpreter();
 
   interpreter->setProcessingTimerCallback(true);
 

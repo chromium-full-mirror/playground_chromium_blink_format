@@ -26,13 +26,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "WebLoader.h"
+#import "ResourceLoader.h"
 #import "WebPlugInStreamLoaderDelegate.h"
 #import <wtf/Forward.h>
 
 namespace WebCore {
 
-class NetscapePlugInStreamLoader : public WebResourceLoader {
+class NetscapePlugInStreamLoader : public ResourceLoader {
  public:
   static PassRefPtr<NetscapePlugInStreamLoader> create(
       Frame*,

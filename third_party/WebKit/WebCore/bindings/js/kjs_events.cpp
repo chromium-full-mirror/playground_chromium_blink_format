@@ -71,7 +71,7 @@ void JSAbstractEventListener::handleEvent(Event* ele, bool isWindowEvent) {
   Frame* frame = window->frame();
   if (!frame)
     return;
-  KJSProxy* proxy = frame->jScript();
+  KJSProxy* proxy = frame->scriptProxy();
   if (!proxy)
     return;
 
@@ -256,7 +256,7 @@ void JSLazyEventListener::parseCode() const {
   Frame* frame = windowObj()->frame();
   KJSProxy* proxy = 0;
   if (frame)
-    proxy = frame->jScript();
+    proxy = frame->scriptProxy();
 
   if (proxy) {
     ScriptInterpreter* interpreter = proxy->interpreter();

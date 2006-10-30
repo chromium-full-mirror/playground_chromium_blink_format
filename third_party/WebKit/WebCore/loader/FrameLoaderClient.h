@@ -44,7 +44,7 @@ class FormState;
 class Frame;
 class FrameLoader;
 class String;
-class WebResourceLoader;
+class ResourceLoader;
 
 struct LoadErrorResetToken;
 
@@ -208,11 +208,11 @@ class FrameLoaderClient : Noncopyable {
   virtual void setDefersLoading(bool) = 0;
 
 #if PLATFORM(MAC)
-  virtual bool willUseArchive(WebResourceLoader*,
+  virtual bool willUseArchive(ResourceLoader*,
                               NSURLRequest*,
                               NSURL* originalURL) const = 0;
-  virtual bool isArchiveLoadPending(WebResourceLoader*) const = 0;
-  virtual void cancelPendingArchiveLoad(WebResourceLoader*) = 0;
+  virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;
+  virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
   virtual void clearArchivedResources() = 0;
 
   virtual bool canHandleRequest(NSURLRequest*) const = 0;

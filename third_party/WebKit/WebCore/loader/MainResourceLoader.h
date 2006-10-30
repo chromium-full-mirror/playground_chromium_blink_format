@@ -26,33 +26,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SubresourceLoader_H_
-#define SubresourceLoader_H_
-
-#import "WebLoader.h"
-#include <wtf/PassRefPtr.h>
-
-#ifndef __OBJC__
-class NSArray;
-class NSDictionary;
-class NSMutableURLRequest;
-#endif
+#import "FrameLoaderTypes.h"
+#import "ResourceLoader.h"
+#import <wtf/Forward.h>
 
 namespace WebCore {
 
-class FormData;
-class String;
-class ResourceHandle;
-class ResourceRequest;
+class FormState;
 
-class SubresourceLoader : public WebResourceLoader {
+class MainResourceLoader : public ResourceLoader {
  public:
-  static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              ResourceHandle*,
-                                              ResourceRequest&);
+  static PassRefPtr<MainResourceLoader> create(Frame*);
+  virtual ~MainResourceLoader();
 
-  virtual ~SubresourceLoader();
+#if PLATFORM(MAC)
+  virtual bool load(NSURLRequest*);
+  virtual void addData(NSData*, bool allAtOnce);
+#endif
 
+  virtual void setDefersLoading(bool);
+
+#if PLATFORM(MAC)
   virtual NSURLRequest* willSendRequest(NSURLRequest*,
                                         NSURLResponse* redirectResponse);
   virtual void didReceiveResponse(NSURLResponse*);
@@ -61,21 +55,39 @@ class SubresourceLoader : public WebResourceLoader {
                               bool allAtOnce);
   virtual void didFinishLoading();
   virtual void didFail(NSError*);
+#endif
 
  private:
-  static PassRefPtr<SubresourceLoader> create(Frame*,
-                                              ResourceHandle*,
-                                              NSMutableURLRequest*,
-                                              NSDictionary* customHeaders,
-                                              const String& referrer);
+  MainResourceLoader(Frame*);
 
-  SubresourceLoader(Frame*, ResourceHandle*);
-
+#if PLATFORM(MAC)
   virtual void didCancel(NSError*);
 
-  RefPtr<ResourceHandle> m_handle;
+  virtual void releaseDelegate();
+
+  NSURLRequest* loadNow(NSURLRequest*);
+
+  void receivedError(NSError*);
+  NSError* interruptionForPolicyChangeError() const;
+  void stopLoadingForPolicyChange();
+  bool isPostOrRedirectAfterPost(NSURLRequest* newRequest,
+                                 NSURLResponse* redirectResponse);
+
+  static void callContinueAfterNavigationPolicy(void*,
+                                                NSURLRequest*,
+                                                PassRefPtr<FormState>);
+  void continueAfterNavigationPolicy(NSURLRequest*);
+
+  static void callContinueAfterContentPolicy(void*, PolicyAction);
+  void continueAfterContentPolicy(PolicyAction);
+  void continueAfterContentPolicy(PolicyAction, NSURLResponse*);
+
+  RetainPtr<NSURLResponse> m_response;
+  RetainPtr<id> m_proxy;
+  RetainPtr<NSURLRequest> m_initialRequest;
+#endif
+
   bool m_loadingMultipartContent;
+  bool m_waitingForContentPolicy;
 };
 }
-
-#endif  // SubresourceLoader_H_

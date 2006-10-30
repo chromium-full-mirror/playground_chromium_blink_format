@@ -32,7 +32,7 @@
 
 namespace WebCore {
 
-class Decoder;
+class TextResourceDecoder;
 class Document;
 class EventListener;
 class String;
@@ -122,7 +122,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceHandleClient {
 
   XMLHttpRequestState m_state;
 
-  RefPtr<Decoder> m_decoder;
+  RefPtr<TextResourceDecoder> m_decoder;
   String m_encoding;
   String m_responseHeaders;
   String m_mimeTypeOverride;

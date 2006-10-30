@@ -1187,7 +1187,8 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           scriptSrcCharset = String();
           if (currToken.attrs && /* potentially have a ATTR_SRC ? */
               m_doc->frame() &&
-              m_doc->frame()->jScriptEnabled() && /* jscript allowed at all? */
+              m_doc->frame()
+                  ->javaScriptEnabled() && /* jscript allowed at all? */
               !m_fragment /* are we a regular tokenizer or just for innerHTML ?
                              */
               ) {
@@ -1659,7 +1660,7 @@ void HTMLTokenizer::finish() {
 
 PassRefPtr<Node> HTMLTokenizer::processToken() {
   KJSProxy* jsProxy =
-      (!m_fragment && m_doc->frame()) ? m_doc->frame()->jScript() : 0;
+      (!m_fragment && m_doc->frame()) ? m_doc->frame()->scriptProxy() : 0;
   if (jsProxy)
     jsProxy->setEventHandlerLineno(tagStartLineno);
   if (dest > buffer) {

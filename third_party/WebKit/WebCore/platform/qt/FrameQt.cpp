@@ -345,7 +345,7 @@ KJS::Bindings::Instance* FrameQt::getAppletInstanceForWidget(Widget*) {
 }
 
 KJS::Bindings::RootObject* FrameQt::bindingRootObject() {
-  ASSERT(jScriptEnabled());
+  ASSERT(javaScriptEnabled());
 
   if (!m_bindingRoot) {
     KJS::JSLock lock;
@@ -354,7 +354,7 @@ KJS::Bindings::RootObject* FrameQt::bindingRootObject() {
 
     KJS::JSObject* win = KJS::Window::retrieveWindow(this);
     m_bindingRoot->setRootObjectImp(win);
-    m_bindingRoot->setInterpreter(jScript()->interpreter());
+    m_bindingRoot->setInterpreter(scriptProxy()->interpreter());
     addPluginRootObject(m_bindingRoot);
   }
 

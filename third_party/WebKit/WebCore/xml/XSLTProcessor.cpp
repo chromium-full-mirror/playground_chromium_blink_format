@@ -28,7 +28,7 @@
 #include "Cache.h"
 #include "CString.h"
 #include "DOMImplementation.h"
-#include "Decoder.h"
+#include "TextResourceDecoder.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
 #include "Frame.h"
@@ -227,10 +227,10 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
   result->determineParseMode(
       documentSource);  // Make sure we parse in the correct mode.
 
-  RefPtr<Decoder> decoder = new Decoder(sourceMIMEType);
+  RefPtr<TextResourceDecoder> decoder = new TextResourceDecoder(sourceMIMEType);
   decoder->setEncoding(
       sourceEncoding.isEmpty() ? UTF8Encoding() : TextEncoding(sourceEncoding),
-      Decoder::EncodingFromXMLHeader);
+      TextResourceDecoder::EncodingFromXMLHeader);
   result->setDecoder(decoder.get());
 
   result->write(documentSource);

@@ -173,7 +173,7 @@ class Frame : public Shared<Frame> {
   /**
    * Returns @p true if Javascript is enabled, @p false otherwise.
    */
-  bool jScriptEnabled() const;
+  bool javaScriptEnabled() const;
 
   /**
    * Returns true if Java is enabled, false otherwise.
@@ -729,7 +729,7 @@ class Frame : public Shared<Frame> {
                               int baseLine,
                               Node*,
                               const String& script);
-  KJSProxy* jScript();
+  KJSProxy* scriptProxy();
   Frame* opener();
   void setOpener(Frame* _opener);
   bool openedByJS();

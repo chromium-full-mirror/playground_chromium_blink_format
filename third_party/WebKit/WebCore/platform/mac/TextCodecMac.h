@@ -24,32 +24,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "StreamingTextDecoder.h"
+#ifndef TextCodecMac_h
+#define TextCodecMac_h
 
-#include "PlatformString.h"
+#include "TextCodec.h"
+#include <CoreServices/CoreServices.h>
 
 namespace WebCore {
 
-const UChar BOM = 0xFEFF;
+typedef ::TextEncoding TECTextEncodingID;
+const TECTextEncodingID invalidEncoding = kCFStringEncodingInvalidId;
 
-TextCodec::~TextCodec() {}
+class TextCodecMac : public TextCodec {
+ public:
+  static void registerEncodingNames(EncodingNameRegistrar);
+  static void registerCodecs(TextCodecRegistrar);
 
-// We strip BOM characters because they can show up both at the start of content
-// and inside content, and we never want them to end up in the decoded text.
-void TextCodec::appendOmittingBOM(Vector<UChar>& v,
-                                  const UChar* characters,
-                                  size_t length) {
-  size_t start = 0;
-  for (size_t i = 0; i != length; ++i) {
-    if (BOM == characters[i]) {
-      if (start != i)
-        v.append(&characters[start], i - start);
-      start = i + 1;
-    }
-  }
-  if (start != length)
-    v.append(&characters[start], length - start);
-}
+  explicit TextCodecMac(TECTextEncodingID);
+  virtual ~TextCodecMac();
+
+  virtual String decode(const char*, size_t length, bool flush = false);
+  virtual CString encode(const UChar*,
+                         size_t length,
+                         bool allowEntities = false);
+
+ private:
+  OSStatus decode(const unsigned char* inputBuffer,
+                  int inputBufferLength,
+                  int& inputLength,
+                  void* outputBuffer,
+                  int outputBufferLength,
+                  int& outputLength);
+
+  OSStatus createTECConverter() const;
+  void releaseTECConverter() const;
+
+  TECTextEncodingID m_encoding;
+  UChar m_backslashAsCurrencySymbol;
+  bool m_error;
+  unsigned m_numBufferedBytes;
+  unsigned char
+      m_bufferedBytes[16];  // bigger than any single multi-byte character
+  mutable TECObjectRef m_converterTEC;
+};
 
 }  // namespace WebCore
+
+#endif  // TextCodecMac_h

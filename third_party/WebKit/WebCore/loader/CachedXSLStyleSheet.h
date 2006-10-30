@@ -35,7 +35,7 @@
 namespace WebCore {
 
 class DocLoader;
-class Decoder;
+class TextResourceDecoder;
 
 #ifdef XSLT_SUPPORT
 class CachedXSLStyleSheet : public CachedResource {
@@ -59,7 +59,7 @@ class CachedXSLStyleSheet : public CachedResource {
 
  protected:
   String m_sheet;
-  RefPtr<Decoder> m_decoder;
+  RefPtr<TextResourceDecoder> m_decoder;
 };
 
 #endif

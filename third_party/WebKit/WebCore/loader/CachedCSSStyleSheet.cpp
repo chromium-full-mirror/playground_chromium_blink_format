@@ -33,7 +33,7 @@
 #include "Cache.h"
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
-#include "Decoder.h"
+#include "TextResourceDecoder.h"
 #include "DeprecatedString.h"
 #include "LoaderFunctions.h"
 #include "loader.h"
@@ -47,7 +47,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          time_t _expireDate,
                                          const String& charset)
     : CachedResource(url, CSSStyleSheet, cachePolicy, _expireDate),
-      m_decoder(new Decoder("text/css", charset)) {
+      m_decoder(new TextResourceDecoder("text/css", charset)) {
   // It's css we want.
   setAccept("text/css");
   // load the file
@@ -65,7 +65,7 @@ void CachedCSSStyleSheet::ref(CachedResourceClient* c) {
 }
 
 void CachedCSSStyleSheet::setEncoding(const String& chs) {
-  m_decoder->setEncoding(chs, Decoder::EncodingFromHTTPHeader);
+  m_decoder->setEncoding(chs, TextResourceDecoder::EncodingFromHTTPHeader);
 }
 
 void CachedCSSStyleSheet::data(Vector<char>& data, bool allDataReceived) {

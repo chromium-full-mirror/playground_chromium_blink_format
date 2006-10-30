@@ -48,7 +48,7 @@ class CSSStyleSheet;
 class Comment;
 class DOMImplementation;
 class DOMWindow;
-class Decoder;
+class TextResourceDecoder;
 class DocLoader;
 class DocumentFragment;
 class DocumentType;
@@ -843,8 +843,8 @@ class Document : public ContainerNode {
   void setShouldCreateRenderers(bool);
   bool shouldCreateRenderers();
 
-  void setDecoder(Decoder*);
-  Decoder* decoder() const { return m_decoder.get(); }
+  void setDecoder(TextResourceDecoder*);
+  TextResourceDecoder* decoder() const { return m_decoder.get(); }
 
   UChar backslashAsCurrencySymbol() const;
 
@@ -890,7 +890,7 @@ class Document : public ContainerNode {
   int m_passwordFields;
   int m_secureForms;
 
-  RefPtr<Decoder> m_decoder;
+  RefPtr<TextResourceDecoder> m_decoder;
 
   mutable HashMap<AtomicStringImpl*, Element*> m_elementsById;
   mutable HashCountedSet<AtomicStringImpl*> m_duplicateIds;

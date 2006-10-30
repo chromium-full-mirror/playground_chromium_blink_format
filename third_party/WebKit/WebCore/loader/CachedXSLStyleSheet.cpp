@@ -33,7 +33,7 @@
 #include "Cache.h"
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
-#include "Decoder.h"
+#include "TextResourceDecoder.h"
 #include "loader.h"
 #include <wtf/Vector.h>
 
@@ -46,7 +46,7 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
                                          CachePolicy cachePolicy,
                                          time_t _expireDate)
     : CachedResource(url, XSLStyleSheet, cachePolicy, _expireDate),
-      m_decoder(new Decoder("text/xsl")) {
+      m_decoder(new TextResourceDecoder("text/xsl")) {
   // It's XML we want.
   // FIXME: This should accept more general xml formats */*+xml, image/svg+xml
   // for example.
@@ -67,7 +67,7 @@ void CachedXSLStyleSheet::ref(CachedResourceClient* c) {
 }
 
 void CachedXSLStyleSheet::setEncoding(const String& chs) {
-  m_decoder->setEncoding(chs, Decoder::EncodingFromHTTPHeader);
+  m_decoder->setEncoding(chs, TextResourceDecoder::EncodingFromHTTPHeader);
 }
 
 void CachedXSLStyleSheet::data(Vector<char>& data, bool allDataReceived) {

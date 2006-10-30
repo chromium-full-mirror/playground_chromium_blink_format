@@ -31,7 +31,7 @@
 #include "CSSValueKeywords.h"
 #include "Comment.h"
 #include "DOMImplementation.h"
-#include "Decoder.h"
+#include "TextResourceDecoder.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
 #include "DocumentType.h"
@@ -667,7 +667,7 @@ String Document::readyState() const {
 }
 
 String Document::inputEncoding() const {
-  if (Decoder* d = decoder())
+  if (TextResourceDecoder* d = decoder())
     return d->encoding().name();
   return String();
 }
@@ -681,7 +681,7 @@ String Document::defaultCharset() const {
 void Document::setCharset(const String& charset) {
   if (!decoder())
     return;
-  decoder()->setEncoding(charset, Decoder::UserChosenEncoding);
+  decoder()->setEncoding(charset, TextResourceDecoder::UserChosenEncoding);
 }
 
 Element* Document::elementFromPoint(int x, int y) const {
@@ -2339,7 +2339,7 @@ PassRefPtr<EventListener> Document::createHTMLEventListener(
     const String& code,
     Node* node) {
   if (Frame* frm = frame())
-    if (KJSProxy* proxy = frm->jScript())
+    if (KJSProxy* proxy = frm->scriptProxy())
       return proxy->createHTMLEventHandler(functionName, code, node);
   return 0;
 }
@@ -2543,7 +2543,7 @@ HTMLMapElement* Document::getImageMap(const String& URL) const {
   return m_imageMapsByName.get(name.impl());
 }
 
-void Document::setDecoder(Decoder* decoder) {
+void Document::setDecoder(TextResourceDecoder* decoder) {
   m_decoder = decoder;
 }
 
