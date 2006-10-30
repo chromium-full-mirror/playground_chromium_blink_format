@@ -61,10 +61,14 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   m_frame->didOpenURL(url);
   m_assignedMimetype = false;
 
+  if (!m_frame->document())
+    m_frame->createEmptyDocument();
+
+  ASSERT(m_frame->document());
+
   ResourceRequest request(url);
-  RefPtr<ResourceHandle> loader = ResourceHandle::create(
-      request, this,
-      m_frame->document() ? m_frame->document()->docLoader() : 0);
+  RefPtr<ResourceHandle> loader =
+      ResourceHandle::create(request, this, m_frame->document()->docLoader());
 }
 
 void FrameQtClientDefault::submitForm(const String& method,
