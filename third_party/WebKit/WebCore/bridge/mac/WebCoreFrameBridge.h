@@ -204,12 +204,8 @@ typedef enum {
 
 - (void)addData:(NSData*)data;
 
-- (void)invalidatePageCache:(NSDictionary*)pageCache;
-
 - (void)saveDocumentState;
 - (void)restoreDocumentState;
-
-- (BOOL)saveDocumentToPageCache;
 
 - (void)clearFrame;
 
@@ -544,8 +540,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                               baseURL:(NSURL*)baseURL
                            DOMElement:(DOMElement*)element;
 - (void)redirectDataToPlugin:(NSView*)pluginView;
-
-- (BOOL)saveDocumentToPageCache:(id)documentInfo;
 
 - (int)getObjectCacheSize;
 

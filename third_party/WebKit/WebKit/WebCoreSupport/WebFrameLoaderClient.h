@@ -133,8 +133,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
   virtual void dispatchDidCancelClientRedirect();
   virtual void dispatchWillPerformClientRedirect(NSURL* URL,
-                                                 NSTimeInterval,
-                                                 NSDate*);
+                                                 double interval,
+                                                 double fireDate);
   virtual void dispatchDidChangeLocationWithinPage();
   virtual void dispatchWillClose();
   virtual void dispatchDidReceiveIcon(NSImage*);
