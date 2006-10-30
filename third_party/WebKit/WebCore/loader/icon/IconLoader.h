@@ -40,7 +40,7 @@ class IconLoader : public ResourceHandleClient {
   void stopLoading();
 
   // ResourceHandleClient delegate methods
-  virtual void receivedResponse(ResourceHandle*, PlatformResponse);
+  virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*, const char*, int);
   virtual void didFinishLoading(ResourceHandle*);
 

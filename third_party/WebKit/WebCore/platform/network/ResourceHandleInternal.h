@@ -67,17 +67,11 @@ class ResourceHandleInternal {
       : m_client(c),
         m_request(request),
         status(0),
-        assembledResponseHeaders(true),
-        m_retrievedResponseEncoding(true),
         m_loading(false),
         m_cancelled(false)
 #if USE(CFNETWORK)
         ,
         m_connection(0)
-#elif PLATFORM(MAC)
-        ,
-        loader(nil),
-        response(nil)
 #endif
 #if USE(WININET)
         ,
@@ -108,11 +102,6 @@ class ResourceHandleInternal {
   ResourceRequest m_request;
 
   int status;
-  String m_responseEncoding;
-  DeprecatedString responseHeaders;
-
-  bool assembledResponseHeaders;
-  bool m_retrievedResponseEncoding;
 
   bool m_loading;
   bool m_cancelled;
@@ -120,9 +109,7 @@ class ResourceHandleInternal {
 #if USE(CFNETWORK)
   CFURLConnectionRef m_connection;
 #elif PLATFORM(MAC)
-  WebCoreResourceLoaderImp* loader;
   RefPtr<WebCore::SubresourceLoader> m_subresourceLoader;
-  NSURLResponse* response;
 #endif
 #if USE(WININET)
   HANDLE m_fileHandle;

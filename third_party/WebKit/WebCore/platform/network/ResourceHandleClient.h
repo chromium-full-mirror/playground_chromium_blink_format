@@ -74,6 +74,7 @@ typedef struct PlatformResponseStruct* PlatformResponse;
 
 class KURL;
 class ResourceHandle;
+class ResourceResponse;
 
 class ResourceHandleClient {
  public:
@@ -88,7 +89,7 @@ class ResourceHandleClient {
   // void didCancelAuthenticationChallenge(ResourceHandle*, const
   // AuthenticationChallenge&) { }
 
-  // void didReceiveResponse(ResourceHandle*, const ResourceResponse&) { }
+  virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&) {}
   virtual void didReceiveData(ResourceHandle*, const char*, int) {}
   virtual void didFinishLoading(ResourceHandle*) {}
   // void didFailWithError(ResourceError*) { }

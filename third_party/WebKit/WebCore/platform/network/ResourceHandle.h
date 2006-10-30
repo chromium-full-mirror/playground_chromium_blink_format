@@ -77,9 +77,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
   String errorText() const;
   bool isErrorPage() const;
 
-  String responseEncoding() const;
-
-  String responseHTTPHeadersAsString() const;
   void kill();
 
 #if PLATFORM(MAC)
@@ -129,9 +126,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
 
  private:
   bool start(DocLoader*);
-
-  void assembleResponseHeaders() const;
-  void retrieveResponseEncoding() const;
 
   ResourceHandleInternal* d;
 };

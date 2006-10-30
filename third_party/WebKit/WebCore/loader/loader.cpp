@@ -39,6 +39,7 @@
 #include "LoaderFunctions.h"
 #include "Request.h"
 #include "ResourceHandle.h"
+#include "ResourceResponse.h"
 #include <wtf/Assertions.h>
 #include <wtf/Vector.h>
 
@@ -117,18 +118,24 @@ void Loader::receivedAllData(ResourceHandle* job, PlatformData allData) {
   servePendingRequests();
 }
 
-void Loader::receivedResponse(ResourceHandle* job, PlatformResponse response) {
-  Request* req = m_requestsLoading.get(job);
+void Loader::receivedResponse(ResourceHandle* handle,
+                              PlatformResponse response) {
+  Request* req = m_requestsLoading.get(handle);
   ASSERT(req);
 #if !PLATFORM(WIN)
   // FIXME: the win32 platform does not have PlatformResponse yet.
   ASSERT(response);
 #endif
   req->cachedResource()->setResponse(response);
-  req->cachedResource()->setExpireDate(
-      CacheObjectExpiresTime(req->docLoader(), response), false);
+}
 
-  String encoding = job->responseEncoding();
+void Loader::didReceivedResponse(ResourceHandle* handle,
+                                 const ResourceResponse& response) {
+  Request* req = m_requestsLoading.get(handle);
+  ASSERT(req);
+  req->cachedResource()->setExpireDate(response.expirationDate(), false);
+
+  String encoding = response.textEncodingName();
   if (!encoding.isNull())
     req->cachedResource()->setEncoding(encoding);
 
@@ -137,10 +144,10 @@ void Loader::receivedResponse(ResourceHandle* job, PlatformResponse response) {
     static_cast<CachedImage*>(req->cachedResource())->clear();
     if (req->docLoader()->frame())
       req->docLoader()->frame()->checkCompleted();
-  } else if (ResponseIsMultipart(response)) {
+  } else if (response.isMultipart()) {
     req->setIsMultipart(true);
     if (!req->cachedResource()->isImage())
-      job->cancel();
+      handle->cancel();
   }
 }
 

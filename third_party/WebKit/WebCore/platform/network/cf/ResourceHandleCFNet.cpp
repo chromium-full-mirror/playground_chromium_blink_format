@@ -27,10 +27,12 @@
 
 #if USE(CFNETWORK)
 
-#include "ResourceHandle.h"
-#include "ResourceHandleInternal.h"
 #include "DocLoader.h"
 #include "Frame.h"
+#include "ResourceHandle.h"
+#include "ResourceHandleInternal.h"
+#include "ResourceResponse.h"
+#include "ResourceResponseCFNet.h"
 
 #include <WTF/HashMap.h>
 
@@ -85,18 +87,23 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
 }
 
 void didReceiveResponse(CFURLConnectionRef conn,
-                        CFURLResponseRef response,
+                        CFURLResponseRef cfResponse,
                         const void* clientInfo) {
-  ResourceHandle* job = (ResourceHandle*)clientInfo;
+  ResourceHandle* handle = (ResourceHandle*)clientInfo;
 
 #if defined(LOG_RESOURCELOADER_EVENTS)
   CFStringRef str = CFStringCreateWithFormat(
-      0, 0, CFSTR("didReceiveResponse(conn=%p, job = %p)\n"), conn, job);
+      0, 0, CFSTR("didReceiveResponse(conn=%p, job = %p)\n"), conn, handle);
   CFShow(str);
   CFRelease(str);
 #endif
 
-  job->client()->receivedResponse(job, response);
+  if (ResourceHandleClient* client = handle->client()) {
+    client->receivedResponse(handle, cfResponse);
+    ResourceResponse response;
+    getResourceResponse(response, cfResponse);
+    client->didReceiveResponse(handle, response);
+  }
 }
 
 void didReceiveData(CFURLConnectionRef conn,

@@ -517,8 +517,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
 
-- (time_t)expiresTimeForResponse:(NSURLResponse*)response;
-
 - (void)activateWindow;
 - (void)deactivateWindow;
 

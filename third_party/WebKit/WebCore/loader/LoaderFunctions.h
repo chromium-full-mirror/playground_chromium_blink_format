@@ -54,8 +54,7 @@ class ResourceRequest;
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
                                      const ResourceRequest&,
-                                     KURL& finalURL,
-                                     DeprecatedString& headers);
+                                     ResourceResponse&);
 
 void CheckCacheObjectStatus(DocLoader*, CachedResource*);
 bool CheckIfReloading(DocLoader*);
@@ -63,6 +62,5 @@ bool IsResponseURLEqualToURL(PlatformResponse, const String& URL);
 DeprecatedString ResponseURL(PlatformResponse);
 DeprecatedString ResponseMIMEType(PlatformResponse);
 bool ResponseIsMultipart(PlatformResponse);
-time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse);
 NSString* HeaderStringFromDictionary(NSDictionary* headers, int statusCode);
 }

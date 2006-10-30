@@ -91,6 +91,7 @@ class FrameLoaderClient;
 class KURL;
 class MainResourceLoader;
 class ResourceRequest;
+class ResourceResponse;
 class String;
 class SubresourceLoader;
 class ResourceLoader;
@@ -191,11 +192,9 @@ class FrameLoader : Noncopyable {
   bool canLoad(NSURL*, const String& referrer, bool& hideReferrer);
 #endif
 
-  void loadResourceSynchronously(const ResourceRequest&,
-                                 KURL& finalURL,
-                                 NSDictionary*& responseHeaders,
-                                 int& statusCode,
-                                 Vector<char>& data);
+  void loadResourceSynchronously(const ResourceRequest& request,
+                                 Vector<char>& data,
+                                 ResourceResponse& r);
 
   // Also not cool.
   void stopLoadingPlugIns();
