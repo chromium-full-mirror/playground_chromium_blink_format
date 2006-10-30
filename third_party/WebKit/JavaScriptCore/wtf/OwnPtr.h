@@ -42,7 +42,7 @@ class OwnPtr : Noncopyable {
   }
 
   void set(T* ptr) {
-    ASSERT(m_ptr != ptr);
+    ASSERT(!ptr || m_ptr != ptr);
     safeDelete();
     m_ptr = ptr;
   }
