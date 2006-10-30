@@ -30,6 +30,12 @@
 #include <wtf/Forward.h>
 #include "FrameLoaderTypes.h"
 
+#if PLATFORM(MAC)
+#ifndef __OBJC__
+class NSImage;
+#endif
+#endif
+
 namespace WebCore {
 
 class DocumentLoader;
@@ -48,6 +54,7 @@ class FrameLoaderClient : Noncopyable {
  public:
   virtual void detachFrameLoader() = 0;
 
+#if PLATFORM(MAC)
   virtual bool hasWebView() const = 0;    // mainly for assertions
   virtual bool hasFrameView() const = 0;  // ditto
 
@@ -129,7 +136,7 @@ class FrameLoaderClient : Noncopyable {
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() = 0;
   virtual void dispatchDidCancelClientRedirect() = 0;
   virtual void dispatchWillPerformClientRedirect(NSURL* URL,
-                                                 NSTimeInterval,
+                                                 double,
                                                  NSDate*) = 0;
   virtual void dispatchDidChangeLocationWithinPage() = 0;
   virtual void dispatchWillClose() = 0;
@@ -196,9 +203,11 @@ class FrameLoaderClient : Noncopyable {
   virtual NSError* fileDoesNotExistError(NSURLResponse*) = 0;
 
   virtual bool shouldFallBack(NSError*) = 0;
+#endif
 
   virtual void setDefersLoading(bool) = 0;
 
+#if PLATFORM(MAC)
   virtual bool willUseArchive(WebResourceLoader*,
                               NSURLRequest*,
                               NSURL* originalURL) const = 0;
@@ -226,6 +235,7 @@ class FrameLoaderClient : Noncopyable {
   virtual void setTitle(const String& title, NSURL*) = 0;
 
   virtual String userAgent(NSURL*) = 0;
+#endif
 
  protected:
   virtual ~FrameLoaderClient();
