@@ -27,16 +27,26 @@
  */
 
 #import "ResourceLoader.h"
-#import "WebPlugInStreamLoaderDelegate.h"
 #import <wtf/Forward.h>
+
+#ifdef __OBJC__
+#import "WebPlugInStreamLoaderDelegate.h"
+#endif
 
 namespace WebCore {
 
 class NetscapePlugInStreamLoader : public ResourceLoader {
  public:
+#ifdef __OBJC__
+  typedef id<WebPlugInStreamLoaderDelegate> PlugInStreamLoaderDelegate;
+#else
+  class PlugInStreamLoaderClient;
+  typedef PlugInStreamLoaderClient* PlugInStreamLoaderDelegate;
+#endif
+
   static PassRefPtr<NetscapePlugInStreamLoader> create(
       Frame*,
-      id<WebPlugInStreamLoaderDelegate>);
+      PlugInStreamLoaderDelegate);
   virtual ~NetscapePlugInStreamLoader();
 
   bool isDone() const;
@@ -51,10 +61,10 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
   virtual void releaseResources();
 
  private:
-  NetscapePlugInStreamLoader(Frame*, id<WebPlugInStreamLoaderDelegate>);
+  NetscapePlugInStreamLoader(Frame*, PlugInStreamLoaderDelegate);
 
   virtual void didCancel(NSError*);
 
-  RetainPtr<id<WebPlugInStreamLoaderDelegate>> m_stream;
+  RetainPtr<PlugInStreamLoaderDelegate> m_stream;
 };
 }
