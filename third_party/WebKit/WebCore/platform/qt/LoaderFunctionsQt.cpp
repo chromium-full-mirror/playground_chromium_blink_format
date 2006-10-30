@@ -35,6 +35,9 @@
 #include "Cache.h"
 #include "loader.h"
 #include "FrameQt.h"
+#include "Request.h"
+#include "ResourceHandle.h"
+#include "ResourceRequest.h"
 #include "DocLoader.h"
 #include "CachedResource.h"
 #include "DeprecatedString.h"
@@ -43,9 +46,8 @@ namespace WebCore {
 
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader* docLoader,
-                                     const ResourceRequest&,
-                                     KURL& url,
-                                     DeprecatedString&) {
+                                     const ResourceRequest& request,
+                                     ResourceResponse&) {
   // FIXME: Handle last paremeter: "responseHeaders"
   FrameQt* frame = QtFrame(docLoader->frame());
 
@@ -54,7 +56,7 @@ Vector<char> ServeSynchronousRequest(Loader*,
 
   // FIXME: We shouldn't use temporary files for sync jobs!
   QString tempFile;
-  if (!KIO::NetAccess::download(KUrl(url.url()), tempFile, 0))
+  if (!KIO::NetAccess::download(KUrl(request.url().url()), tempFile, 0))
     return Vector<char>();
 
   QFile file(tempFile);

@@ -63,27 +63,9 @@ void ResourceHandle::cancel() {
   ResourceHandleManager::self()->cancel(this);
 }
 
-void ResourceHandle::assembleResponseHeaders() const {
-  if (!d->assembledResponseHeaders) {
-    ASSERT(d->m_response);
-
-    d->responseHeaders = d->m_response->data;
-    d->assembledResponseHeaders = true;
-  }
-}
-
-void ResourceHandle::retrieveResponseEncoding() const {
-  if (!d->m_retrievedResponseEncoding) {
-    d->m_responseEncoding = extractCharsetFromHeaders(d->responseHeaders);
-    d->m_retrievedResponseEncoding = true;
-  }
-}
-
 void ResourceHandle::receivedResponse(PlatformResponse response) {
   Q_ASSERT(method() == "POST");
 
-  d->assembledResponseHeaders = false;
-  d->m_retrievedResponseEncoding = false;
   d->m_response = response;
 
   if (d->m_client)
