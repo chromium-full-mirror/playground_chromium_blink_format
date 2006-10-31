@@ -23,11 +23,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef KRenderingPaintServerQuartz_H
+#define KRenderingPaintServerQuartz_H
 
-#import "KRenderingDevice.h"
-#import "KRenderingPaintServerSolid.h"
-#import "KRenderingPaintServerPattern.h"
-#import "KRenderingPaintServerGradient.h"
+#include "KRenderingDevice.h"
+#include "KRenderingPaintServerSolid.h"
+#include "KRenderingPaintServerPattern.h"
+#include "KRenderingPaintServerGradient.h"
 
 namespace WebCore {
 
@@ -188,3 +190,5 @@ class KRenderingPaintServerRadialGradientQuartz
   }
 };
 }
+
+#endif  // !KRenderingPaintServerQuartz_H
