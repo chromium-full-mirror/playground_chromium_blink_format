@@ -56,6 +56,7 @@ class HitTestResult {
   Frame* targetFrame() const;
   IntRect boundingBox() const;
   bool isSelected() const;
+  String spellingToolTip() const;
   String title() const;
 
  private:

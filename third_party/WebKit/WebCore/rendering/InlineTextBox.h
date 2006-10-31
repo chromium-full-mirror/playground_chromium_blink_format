@@ -143,6 +143,8 @@ class InlineTextBox : public InlineRunBox {
                                     int tx,
                                     int ty,
                                     DocumentMarker,
+                                    RenderStyle*,
+                                    const Font*,
                                     bool grammar);
   void paintTextMatchMarker(GraphicsContext*,
                             int tx,
