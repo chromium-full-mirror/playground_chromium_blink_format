@@ -72,12 +72,6 @@ extern NSString* WebCorePageCacheStateKey;
 
 typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
-typedef enum {
-  WebSelectionStateNone,
-  WebSelectionStateCaret,
-  WebSelectionStateRange
-} WebSelectionState;
-
 typedef enum { WebSelectByMoving, WebSelectByExtending } WebSelectionAlteration;
 
 typedef enum {
@@ -281,8 +275,6 @@ typedef enum {
 - (NSAppleEventDescriptor*)aeDescByEvaluatingJavaScriptFromString:
     (NSString*)string;
 
-- (BOOL)mayCopy;
-
 - (NSString*)selectedString;
 
 - (NSString*)stringForRange:(DOMRange*)range;
@@ -346,7 +338,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
               replacingRange:(DOMRange*)charRangeToReplace
                 beforeString:(NSString**)beforeString
                  afterString:(NSString**)afterString;
-- (BOOL)canDeleteRange:(DOMRange*)range;
 - (void)selectNSRange:(NSRange)range;
 - (NSRange)selectedNSRange;
 - (NSRange)markedTextNSRange;
@@ -585,7 +576,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (BOOL)shouldEndEditing:(DOMRange*)range;
 - (void)didBeginEditing;
 - (void)didEndEditing;
-- (BOOL)canPaste;
 
 - (NSString*)overrideMediaType;
 

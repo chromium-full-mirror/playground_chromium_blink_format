@@ -50,13 +50,27 @@ class Editor {
   ~Editor();
 
   EditorClient* client() const;
+  Frame* frame() const { return m_frame; }
+  DeleteButtonController* deleteButtonController() const {
+    return m_deleteButtonController.get();
+  }
+  EditCommand* lastEditCommand() { return m_lastEditCommand.get(); }
+
+  bool canEdit() const;
+  bool canEditRichly() const;
+
+  bool canCut() const;
+  bool canCopy() const;
+  bool canPaste() const;
+  bool canDelete() const;
 
   void cut();
   void copy();
   void paste();
   void performDelete();
 
-  bool shouldShowDeleteInterface(HTMLElement*);
+  bool shouldShowDeleteInterface(HTMLElement*) const;
+  bool shouldDeleteRange(Range*) const;
 
   void respondToChangedSelection(const Selection& oldSelection);
   void respondToChangedContents();
@@ -65,12 +79,6 @@ class Editor {
   Frame::TriState selectionOrderedListState() const;
 
   void removeFormattingAndStyle();
-
-  Frame* frame() const { return m_frame; }
-  DeleteButtonController* deleteButtonController() const {
-    return m_deleteButtonController.get();
-  }
-  EditCommand* lastEditCommand() { return m_lastEditCommand.get(); }
 
   // FIXME: Once the Editor implements all editing commands, it should track
   // the lastEditCommand on its own, and we should remove this function.
@@ -84,15 +92,9 @@ class Editor {
   OwnPtr<DeleteButtonController> m_deleteButtonController;
   RefPtr<EditCommand> m_lastEditCommand;
 
-  bool canCopy();
-  bool canCut();
-  bool canDelete();
-  bool canDeleteRange(Range*);
-  bool canPaste();
+  bool canDeleteRange(Range*) const;
   bool canSmartCopyOrDelete();
-  bool isSelectionRichlyEditable();
   Range* selectedRange();
-  bool shouldDeleteRange(Range*);
   bool tryDHTMLCopy();
   bool tryDHTMLCut();
   bool tryDHTMLPaste();

@@ -400,16 +400,6 @@ class Frame : public Shared<Frame> {
   int xPosForVerticalArrowNavigation() const;
 
   /**
-   * Has the user selected anything?
-   *
-   *  Call @ref selectedText() to
-   * retrieve the selected text.
-   *
-   * @return @p true if there is text selected.
-   */
-  bool hasSelection() const;
-
-  /**
    * Returns whether editing should end in the given range
    */
   virtual bool shouldBeginEditing(const Range*) const;
@@ -446,8 +436,6 @@ class Frame : public Shared<Frame> {
 
   virtual void setSecureKeyboardEntry(bool){};
   virtual bool isSecureKeyboardEntry() { return false; }
-
-  bool isSelectionInPasswordField();
 
   /**
    * Called when editing has been applied.
@@ -511,8 +499,6 @@ class Frame : public Shared<Frame> {
   void cutToPasteboard();
   void pasteFromPasteboard();
   void pasteAndMatchStyle();
-  bool mayCopy();
-  virtual bool canPaste() const = 0;
   void redo();
   void undo();
   virtual bool canRedo() const = 0;
@@ -848,7 +834,6 @@ class Frame : public Shared<Frame> {
   friend class FrameWin;
 
   HitTestResult hitTestResultAtPoint(const IntPoint&, bool allowShadowContent);
-  bool hasSelection();
   String documentTypeString() const;
 
   void checkEmitLoadEvent();

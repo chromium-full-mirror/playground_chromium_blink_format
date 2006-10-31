@@ -478,11 +478,11 @@ bool enabledAnyRichlyEditableSelection(Frame* frame) {
 }
 
 bool enabledPaste(Frame* frame) {
-  return supportsPasteCommand && frame->canPaste();
+  return supportsPasteCommand && frame->editor()->canPaste();
 }
 
 bool enabledPasteAndMatchStyle(Frame* frame) {
-  return supportsPasteCommand && frame->canPaste();
+  return supportsPasteCommand && frame->editor()->canPaste();
 }
 
 bool enabledAnyRangeSelection(Frame* frame) {
