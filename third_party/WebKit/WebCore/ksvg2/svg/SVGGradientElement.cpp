@@ -25,6 +25,7 @@
 #include "SVGGradientElement.h"
 
 #include "KRenderingDevice.h"
+#include "RenderPath.h"
 #include "RenderView.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
@@ -43,13 +44,9 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
       SVGExternalResourcesRequired(),
       m_spreadMethod(0),
       m_gradientUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
-      m_gradientTransform(new SVGTransformList) {
-  m_resource = 0;
-}
+      m_gradientTransform(new SVGTransformList) {}
 
-SVGGradientElement::~SVGGradientElement() {
-  delete m_resource;
-}
+SVGGradientElement::~SVGGradientElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGGradientElement,
                               int,
@@ -124,20 +121,20 @@ void SVGGradientElement::notifyAttributeChange() const {
   }
 }
 
-KRenderingPaintServerGradient* SVGGradientElement::canvasResource() {
+SVGResource* SVGGradientElement::canvasResource() {
   if (!m_resource) {
-    KRenderingPaintServer* temp =
-        renderingDevice()->createPaintServer(gradientType());
-    m_resource = static_cast<KRenderingPaintServerGradient*>(temp);
+    m_resource = WTF::static_pointer_cast<KRenderingPaintServerGradient>(
+        renderingDevice()->createPaintServer(gradientType()));
     m_resource->setListener(this);
     buildGradient(m_resource);
   }
-  return m_resource;
+  return m_resource.get();
 }
 
 void SVGGradientElement::resourceNotification() const {
   // We're referenced by a "client", build the gradient now...
-  buildGradient(const_cast<SVGGradientElement*>(this)->canvasResource());
+  buildGradient(static_cast<KRenderingPaintServerGradient*>(
+      const_cast<SVGGradientElement*>(this)->canvasResource()));
 }
 
 void SVGGradientElement::rebuildStops() const {
