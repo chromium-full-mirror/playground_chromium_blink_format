@@ -46,6 +46,21 @@ bool EditorClientQt::shouldDeleteRange(Range*) {
 bool EditorClientQt::shouldShowDeleteInterface(HTMLElement*) {
   return false;
 }
+
+bool EditorClientQt::isContinuousSpellCheckingEnabled() {
+  notImplemented();
+  return false;
+}
+
+bool EditorClientQt::isGrammarCheckingEnabled() {
+  notImplemented();
+  return false;
+}
+
+int EditorClientQt::spellCheckerDocumentTag() {
+  notImplemented();
+  return 0;
+}
 }
 
 // vim: ts=4 sw=4 et

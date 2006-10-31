@@ -37,6 +37,10 @@ class EditorClientQt : public EditorClient {
  public:
   virtual bool shouldDeleteRange(Range*);
   virtual bool shouldShowDeleteInterface(HTMLElement*);
+
+  virtual bool isContinuousSpellCheckingEnabled();
+  virtual bool isGrammarCheckingEnabled();
+  virtual int spellCheckerDocumentTag();
 };
 }
 

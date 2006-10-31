@@ -27,6 +27,7 @@
 namespace WebCore {
 
 // FIXME: For now we only stub this methods!
+SVGResourceImage::SVGResourceImage() {}
 
 void SVGResourceImage::init(const Image&) {}
 
