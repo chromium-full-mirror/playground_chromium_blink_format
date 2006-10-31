@@ -420,17 +420,6 @@ class Frame : public Shared<Frame> {
   bool hasSelection() const;
 
   /**
-   * Marks all text in the document as selected.
-   */
-  void selectAll();
-
-  /**
-   * Marks contents of node as selected.
-   * Returns whether the selection changed.
-   */
-  bool selectContentsOfNode(Node*);
-
-  /**
    * Returns whether editing should end in the given range
    */
   virtual bool shouldBeginEditing(const Range*) const;
@@ -469,11 +458,6 @@ class Frame : public Shared<Frame> {
   virtual bool isSecureKeyboardEntry() { return false; }
 
   bool isSelectionInPasswordField();
-
-  /**
-   * Returns the most recent edit command applied.
-   */
-  EditCommand* lastEditCommand();
 
   /**
    * Called when editing has been applied.
@@ -527,8 +511,6 @@ class Frame : public Shared<Frame> {
    * headers.
    */
   String lastModified() const;
-
-  bool isPointInsideSelection(const IntPoint&);
 
   virtual bool tabsToLinks() const;
   virtual bool tabsToAllControls() const;
@@ -709,11 +691,6 @@ class Frame : public Shared<Frame> {
                      const Vector<String>& paramValues);
   Document* document() const;
   void setDocument(Document* newDoc);
-
-  // Workaround for the fact that it's hard to delete a frame.
-  // Call this after doing user-triggered selections to make it easy to delete
-  // the frame you entirely selected.
-  void selectFrameElementInParentIfFullySelected();
 
   virtual bool mouseDownMayStartSelect() const { return true; }
   bool mouseDownMayStartAutoscroll() const;

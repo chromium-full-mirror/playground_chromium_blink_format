@@ -69,6 +69,15 @@ class SelectionController : Noncopyable {
                     bool closeTyping = true,
                     bool clearTypingStyle = true,
                     bool userTriggered = false);
+  void setSelectedRange(Range*, EAffinity, bool closeTyping, ExceptionCode&);
+  void selectAll();
+  void clear();
+
+  // Call this after doing user-triggered selections to make it easy to delete
+  // the frame you entirely selected.
+  void selectFrameElementInParentIfFullySelected();
+
+  bool contains(const IntPoint&);
 
   Selection::EState state() const { return m_sel.state(); }
 
@@ -77,8 +86,6 @@ class SelectionController : Noncopyable {
   bool modify(EAlter, EDirection, TextGranularity, bool userTriggered = false);
   bool modify(EAlter, int verticalDistance, bool userTriggered = false);
   bool expandUsingGranularity(TextGranularity);
-
-  void clear();
 
   void setBase(const VisiblePosition&, bool userTriggered = false);
   void setBase(const Position&, EAffinity, bool userTriggered = false);
