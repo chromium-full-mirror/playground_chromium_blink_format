@@ -80,6 +80,7 @@ struct FrameLoadRequest;
 class FrameLoaderClient;
 class KURL;
 class MainResourceLoader;
+class NavigationAction;
 class PageState;
 class ResourceLoader;
 class ResourceRequest;
@@ -173,7 +174,7 @@ class FrameLoader : Noncopyable {
   void load(NSURLRequest*);
   void load(NSURLRequest*, const String& frameName);
   void load(NSURLRequest*,
-            NSDictionary* triggeringAaction,
+            const NavigationAction&,
             FrameLoadType,
             PassRefPtr<FormState>);
 #endif
@@ -345,11 +346,6 @@ class FrameLoader : Noncopyable {
   void addExtraFieldsToRequest(NSMutableURLRequest*,
                                bool isMainResource,
                                bool alwaysFromRequest);
-  NSDictionary* actionInformation(NavigationType, NSEvent*, NSURL*);
-  NSDictionary* actionInformation(FrameLoadType loadType,
-                                  bool isFormSubmission,
-                                  NSEvent*,
-                                  NSURL*);
 #endif
 
   void setClient(FrameLoaderClient*);
@@ -383,7 +379,7 @@ class FrameLoader : Noncopyable {
                              PassRefPtr<FormState>,
                              NavigationPolicyDecisionFunction,
                              void* argument);
-  void checkNewWindowPolicy(NSDictionary*,
+  void checkNewWindowPolicy(const NavigationAction&,
                             NSURLRequest*,
                             PassRefPtr<FormState>,
                             const String& frameName);

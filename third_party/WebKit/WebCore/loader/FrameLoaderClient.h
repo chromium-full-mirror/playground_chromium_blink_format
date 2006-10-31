@@ -43,6 +43,7 @@ class Element;
 class FormState;
 class Frame;
 class FrameLoader;
+class NavigationAction;
 class String;
 class ResourceLoader;
 
@@ -157,11 +158,11 @@ class FrameLoaderClient : Noncopyable {
                                                NSURLRequest*) = 0;
   virtual void dispatchDecidePolicyForNewWindowAction(
       FramePolicyFunction,
-      NSDictionary* action,
+      const NavigationAction&,
       NSURLRequest*,
       const String& frameName) = 0;
   virtual void dispatchDecidePolicyForNavigationAction(FramePolicyFunction,
-                                                       NSDictionary* action,
+                                                       const NavigationAction&,
                                                        NSURLRequest*) = 0;
   virtual void cancelPolicyCheck() = 0;
 
@@ -221,8 +222,6 @@ class FrameLoaderClient : Noncopyable {
       const String& URLScheme) const = 0;
   virtual String generatedMIMETypeForURLScheme(
       const String& URLScheme) const = 0;
-
-  virtual NSDictionary* elementForEvent(NSEvent*) const = 0;
 
   virtual void frameLoadCompleted() = 0;
   virtual void restoreScrollPositionAndViewState() = 0;

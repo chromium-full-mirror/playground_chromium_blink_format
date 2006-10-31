@@ -154,12 +154,12 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                                NSURLRequest*);
   virtual void dispatchDecidePolicyForNewWindowAction(
       WebCore::FramePolicyFunction,
-      NSDictionary* action,
+      const WebCore::NavigationAction&,
       NSURLRequest*,
       const WebCore::String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
-      NSDictionary* action,
+      const WebCore::NavigationAction&,
       NSURLRequest*);
   virtual void cancelPolicyCheck();
 
@@ -224,8 +224,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual WebCore::String generatedMIMETypeForURLScheme(
       const WebCore::String& URLScheme) const;
 
-  virtual NSDictionary* elementForEvent(NSEvent*) const;
-
   virtual void frameLoadCompleted();
   virtual void restoreScrollPositionAndViewState();
   virtual void provisionalLoadStarted();
@@ -243,6 +241,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   void deliverArchivedResources(WebCore::Timer<WebFrameLoaderClient>*);
 
   WebFramePolicyListener* setUpPolicyListener(WebCore::FramePolicyFunction);
+
+  NSDictionary* actionDictionary(const WebCore::NavigationAction&) const;
+  NSDictionary* elementForEvent(NSEvent*) const;
 
   bool createPageCache(WebHistoryItem*);
 
