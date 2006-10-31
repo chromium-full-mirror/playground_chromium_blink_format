@@ -27,6 +27,7 @@
 
 namespace WebCore {
 
+class HTMLElement;
 class HTMLSelectElement;
 class HTMLOptionElement;
 
@@ -64,12 +65,13 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
   virtual void valueChanged(Scrollbar*);
   virtual IntRect windowClipRect() const;
 
-  HTMLOptionElement* optionAtPoint(int x, int y);
+  int listIndexAtOffset(int x, int y);
 
   bool scrollToRevealElementAtListIndex(int index);
 
-  virtual bool shouldAutoscroll() const { return numItems() > size(); }
+  virtual bool shouldAutoscroll() const { return true; }
   virtual void autoscroll();
+  virtual void stopAutoscroll();
 
  private:
   int size() const;
@@ -78,6 +80,7 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
   void paintScrollbar(PaintInfo&);
   void paintItemForeground(PaintInfo&, int tx, int ty, int listIndex);
   void paintItemBackground(PaintInfo&, int tx, int ty, int listIndex);
+  bool listIndexIsVisible(int index);
 
   bool m_optionsChanged;
   int m_optionsWidth;

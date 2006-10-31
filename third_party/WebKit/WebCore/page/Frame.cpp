@@ -2836,7 +2836,9 @@ void Frame::startAutoscrollTimer() {
   d->m_autoscrollTimer.startRepeating(autoscrollInterval);
 }
 
-void Frame::stopAutoscrollTimer() {
+void Frame::stopAutoscrollTimer(bool rendererIsBeingDestroyed) {
+  if (!rendererIsBeingDestroyed && autoscrollRenderer())
+    autoscrollRenderer()->stopAutoscroll();
   setAutoscrollRenderer(0);
   d->m_autoscrollTimer.stop();
 }
