@@ -780,6 +780,8 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
       return handCursor();
     case CURSOR_MOVE:
       return moveCursor();
+    case CURSOR_ALL_SCROLL:
+      return moveCursor();
     case CURSOR_E_RESIZE:
       return eastResizeCursor();
     case CURSOR_W_RESIZE:

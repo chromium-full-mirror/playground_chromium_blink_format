@@ -955,7 +955,8 @@ enum ECursor {
   CURSOR_ROW_RESIZE,
   CURSOR_TEXT,
   CURSOR_WAIT,
-  CURSOR_HELP
+  CURSOR_HELP,
+  CURSOR_ALL_SCROLL
 };
 
 struct CursorData {
