@@ -260,7 +260,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::provisionalDataSource(
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::stopLoading(void) {
-  //    DebugBreak();
+  d->frame->stopLoading(false);
   return E_NOTIMPL;
 }
 
