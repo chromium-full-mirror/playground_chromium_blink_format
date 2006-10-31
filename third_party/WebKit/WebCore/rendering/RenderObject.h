@@ -62,7 +62,6 @@ class FrameView;
 class HTMLAreaElement;
 class InlineBox;
 class InlineFlowBox;
-class HitTestRequest;
 class HitTestResult;
 class PlatformScrollbar;
 class Position;
@@ -77,6 +76,8 @@ class RenderView;
 class String;
 class TextStream;
 class VisiblePosition;
+
+struct HitTestRequest;
 
 enum PaintPhase {
   PaintPhaseBlockBackground,
