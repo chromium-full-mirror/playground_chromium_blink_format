@@ -38,6 +38,10 @@ class WebEditorClient : public WebCore::EditorClient {
 
   void setWebView(WebView* webView);
 
+  bool isGrammarCheckingEnabled();
+  bool isContinuousSpellCheckingEnabled();
+  int spellCheckerDocumentTag();
+
   bool shouldDeleteRange(WebCore::Range*);
   bool shouldShowDeleteInterface(WebCore::HTMLElement*);
 

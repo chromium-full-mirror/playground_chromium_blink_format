@@ -49,6 +49,8 @@ class Editor {
   Editor(Frame*, PassRefPtr<EditorClient>);
   ~Editor();
 
+  EditorClient* client() const;
+
   void cut();
   void copy();
   void paste();

@@ -591,9 +591,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (void)windowObjectCleared;
 
-- (int)spellCheckerDocumentTag;
-- (BOOL)isContinuousSpellCheckingEnabled;
-
 - (void)dashboardRegionsChanged:(NSMutableDictionary*)regions;
 - (void)willPopupMenu:(NSMenu*)menu;
 
