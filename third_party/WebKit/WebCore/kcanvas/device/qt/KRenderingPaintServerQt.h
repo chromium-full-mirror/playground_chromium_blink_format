@@ -34,15 +34,13 @@ class RenderObject;
 
 // This class is designed as an extension to
 // KRenderingPaintServer, it won't inherit from it.
-class KRenderingPaintServerQt
-{
-public:
-    KRenderingPaintServerQt();
-    ~KRenderingPaintServerQt();
+class KRenderingPaintServerQt {
+ public:
+  KRenderingPaintServerQt();
+  ~KRenderingPaintServerQt();
 
-    void setPenProperties(const RenderObject*, const RenderStyle*, QPen&) const;
+  void setPenProperties(const RenderObject*, const RenderStyle*, QPen&) const;
 };
-
 }
 
 #endif

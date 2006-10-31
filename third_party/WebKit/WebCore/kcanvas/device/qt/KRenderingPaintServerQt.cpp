@@ -25,52 +25,52 @@
 #include <QPen>
 #include <QVector>
 
+#include "RenderStyle.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingPaintServerQt.h"
 
 namespace WebCore {
 
-KRenderingPaintServerQt::KRenderingPaintServerQt()
-{
+KRenderingPaintServerQt::KRenderingPaintServerQt() {}
+
+KRenderingPaintServerQt::~KRenderingPaintServerQt() {}
+
+void KRenderingPaintServerQt::setPenProperties(const RenderObject* item,
+                                               const RenderStyle* style,
+                                               QPen& pen) const {
+  pen.setWidthF(KSVGPainterFactory::cssPrimitiveToLength(
+      item, style->svgStyle()->strokeWidth(), 1.0));
+
+  if (style->svgStyle()->capStyle() == ButtCap)
+    pen.setCapStyle(Qt::FlatCap);
+  else if (style->svgStyle()->capStyle() == RoundCap)
+    pen.setCapStyle(Qt::RoundCap);
+
+  if (style->svgStyle()->joinStyle() == MiterJoin) {
+    pen.setJoinStyle(Qt::MiterJoin);
+    pen.setMiterLimit((qreal)style->svgStyle()->strokeMiterLimit());
+  } else if (style->svgStyle()->joinStyle() == RoundJoin)
+    pen.setJoinStyle(Qt::RoundJoin);
+
+  const KCDashArray& dashes =
+      KSVGPainterFactory::dashArrayFromRenderingStyle(style);
+  double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(
+      item, style->svgStyle()->strokeDashOffset(), 0.0);
+
+  unsigned int dashLength = !dashes.isEmpty() ? dashes.size() : 0;
+  if (dashLength) {
+    QVector<qreal> pattern;
+    unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
+
+    for (unsigned int i = 0; i < count; i++)
+      pattern.append(dashes[i % dashLength] / (float)pen.widthF());
+
+    pen.setDashPattern(pattern);
+
+    Q_UNUSED(dashOffset);
+    // TODO: dash-offset, does/will qt4 API allow it? (Rob)
+  }
 }
-
-KRenderingPaintServerQt::~KRenderingPaintServerQt()
-{
-}
-
-void KRenderingPaintServerQt::setPenProperties(const RenderObject* item, const RenderStyle* style, QPen& pen) const
-{
-    pen.setWidthF(KSVGPainterFactory::cssPrimitiveToLength(item, style->svgStyle()->strokeWidth(), 1.0));
-
-    if (style->svgStyle()->capStyle() == ButtCap)
-        pen.setCapStyle(Qt::FlatCap);
-    else if (style->svgStyle()->capStyle() == RoundCap)
-        pen.setCapStyle(Qt::RoundCap);
-
-    if (style->svgStyle()->joinStyle() == MiterJoin) {
-        pen.setJoinStyle(Qt::MiterJoin);
-        pen.setMiterLimit((qreal) style->svgStyle()->strokeMiterLimit());
-    } else if(style->svgStyle()->joinStyle() == RoundJoin)
-        pen.setJoinStyle(Qt::RoundJoin);
-
-    const KCDashArray& dashes = KSVGPainterFactory::dashArrayFromRenderingStyle(style);
-    double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(item, style->svgStyle()->strokeDashOffset(), 0.0);
-
-    unsigned int dashLength = !dashes.isEmpty() ? dashes.size() : 0;
-    if(dashLength) {
-        QVector<qreal> pattern;
-        unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
-
-        for(unsigned int i = 0; i < count; i++)
-            pattern.append(dashes[i % dashLength] / (float)pen.widthF());
-
-        pen.setDashPattern(pattern);
-    
-        Q_UNUSED(dashOffset);
-        // TODO: dash-offset, does/will qt4 API allow it? (Rob)
-    }
-}
-
 }
 
 // vim:ts=4:noet

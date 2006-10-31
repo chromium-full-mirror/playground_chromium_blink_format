@@ -30,58 +30,57 @@
 
 namespace WebCore {
 
-class KRenderingDeviceContextQt : public KRenderingDeviceContext
-{
-public:
-    KRenderingDeviceContextQt(QPainter*);
-    virtual ~KRenderingDeviceContextQt();
+class KRenderingDeviceContextQt : public KRenderingDeviceContext {
+ public:
+  KRenderingDeviceContextQt(QPainter*);
+  virtual ~KRenderingDeviceContextQt();
 
-    virtual AffineTransform concatCTM(const AffineTransform&);
-    virtual AffineTransform ctm() const;
+  virtual AffineTransform concatCTM(const AffineTransform&);
+  virtual AffineTransform ctm() const;
 
-    virtual IntRect mapFromVisual(const IntRect&);
-    virtual IntRect mapToVisual(const IntRect&);
+  virtual IntRect mapFromVisual(const IntRect&);
+  virtual IntRect mapToVisual(const IntRect&);
 
-    virtual void clearPath();
-    virtual void addPath(const Path&);
+  virtual void clearPath();
+  virtual void addPath(const Path&);
 
-    virtual GraphicsContext* createGraphicsContext();
-    
-    // Qt specific stuff
-    QPainter& painter();
-    QRectF pathBBox() const;
+  virtual GraphicsContext* createGraphicsContext();
 
-    void setFillRule(WindRule);
+  // Qt specific stuff
+  QPainter& painter();
+  QRectF pathBBox() const;
 
-    void fillPath();
-    void strokePath();
+  void setFillRule(WindRule);
 
-private:
-    QPainter* m_painter;
-    QPainterPath m_path;
+  void fillPath();
+  void strokePath();
+
+ private:
+  QPainter* m_painter;
+  QPainterPath m_path;
 };
 
-class KRenderingDeviceQt : public KRenderingDevice
-{
-public:
-    KRenderingDeviceQt();
-    virtual ~KRenderingDeviceQt();
+class KRenderingDeviceQt : public KRenderingDevice {
+ public:
+  KRenderingDeviceQt();
+  virtual ~KRenderingDeviceQt();
 
-    virtual bool isBuffered() const { return false; }
+  virtual bool isBuffered() const { return false; }
 
-    virtual KRenderingDeviceContext* popContext();
-    virtual void pushContext(KRenderingDeviceContext*);
+  virtual KRenderingDeviceContext* popContext();
+  virtual void pushContext(KRenderingDeviceContext*);
 
-    // context management.
-    KRenderingDeviceContextQt* qtContext() const;
-    virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
+  // context management.
+  KRenderingDeviceContextQt* qtContext() const;
+  virtual KRenderingDeviceContext* contextForImage(SVGResourceImage*) const;
 
-    // Resource creation
-    virtual KCanvasResource* createResource(const KCResourceType&) const;
-    virtual KRenderingPaintServer* createPaintServer(const KCPaintServerType&) const;
-    virtual KCanvasFilterEffect* createFilterEffect(const KCFilterEffectType&) const;
+  // Resource creation
+  virtual PassRefPtr<SVGResource> createResource(const SVGResourceType&) const;
+  virtual PassRefPtr<KRenderingPaintServer> createPaintServer(
+      const KCPaintServerType&) const;
+  virtual KCanvasFilterEffect* createFilterEffect(
+      const KCFilterEffectType&) const;
 };
-
 }
 
 #endif

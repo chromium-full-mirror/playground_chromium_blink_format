@@ -29,6 +29,10 @@
 
 namespace WebCore {
 
+class AffineTransform;
+class GraphicsContext;
+class Path;
+
 // aka where to draw
 class KRenderingDeviceContext {
  public:
@@ -44,7 +48,7 @@ class KRenderingDeviceContext {
   virtual GraphicsContext* createGraphicsContext() = 0;
 };
 
-class KCanvasImage;
+class SVGResourceImage;
 class KCanvasFilterEffect;
 class KRenderingDevice {
  public:
@@ -61,13 +65,14 @@ class KRenderingDevice {
   virtual KRenderingDeviceContext* popContext();
   virtual void pushContext(KRenderingDeviceContext*);
 
-  virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const = 0;
+  virtual KRenderingDeviceContext* contextForImage(SVGResourceImage*) const = 0;
 
   // Creation tools
-  virtual KCanvasResource* createResource(const KCResourceType&) const = 0;
+  virtual PassRefPtr<SVGResource> createResource(
+      const SVGResourceType&) const = 0;
   virtual KCanvasFilterEffect* createFilterEffect(
       const KCFilterEffectType&) const = 0;
-  virtual KRenderingPaintServer* createPaintServer(
+  virtual PassRefPtr<KRenderingPaintServer> createPaintServer(
       const KCPaintServerType&) const = 0;
 
  private:

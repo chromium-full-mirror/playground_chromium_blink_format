@@ -41,13 +41,9 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {
-  m_clipper = 0;
-}
+      m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
 
-SVGClipPathElement::~SVGClipPathElement() {
-  delete m_clipper;
-}
+SVGClipPathElement::~SVGClipPathElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGClipPathElement,
                               int,
@@ -76,12 +72,12 @@ void SVGClipPathElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-KCanvasClipper* SVGClipPathElement::canvasResource() {
+SVGResource* SVGClipPathElement::canvasResource() {
   if (!view())
     return 0;
+
   if (!m_clipper)
-    m_clipper = static_cast<KCanvasClipper*>(
-        renderingDevice()->createResource(RS_CLIPPER));
+    m_clipper = new SVGResourceClipper();
   else
     m_clipper->resetClipData();
 
@@ -107,7 +103,7 @@ KCanvasClipper* SVGClipPathElement::canvasResource() {
     }
   }
   clipPathStyle->deref(view()->renderArena());
-  return m_clipper;
+  return m_clipper.get();
 }
 }
 

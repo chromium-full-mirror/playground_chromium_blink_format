@@ -26,8 +26,8 @@
 
 #include "Attr.h"
 #include "GraphicsContext.h"
-#include "KCanvasClipper.h"
-#include "KCanvasMasker.h"
+#include "SVGResourceClipper.h"
+#include "SVGResourceMasker.h"
 #include "KRenderingDevice.h"
 #include "SVGLength.h"
 #include "SVGPreserveAspectRatio.h"
@@ -148,11 +148,11 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   FloatRect boundingBox = FloatRect(0, 0, width(), height());
   const SVGRenderStyle* svgStyle = style()->svgStyle();
 
-  if (KCanvasClipper* clipper =
+  if (SVGResourceClipper* clipper =
           getClipperById(document(), svgStyle->clipPath().substring(1)))
     clipper->applyClip(boundingBox);
 
-  if (KCanvasMasker* masker =
+  if (SVGResourceMasker* masker =
           getMaskerById(document(), svgStyle->maskElement().substring(1)))
     masker->applyMask(boundingBox);
 

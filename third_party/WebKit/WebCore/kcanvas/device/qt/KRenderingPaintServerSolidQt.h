@@ -27,22 +27,28 @@
 #include "KRenderingPaintServerSolid.h"
 
 namespace WebCore {
-    
+
 class KRenderingPaintServerSolidQt : public KRenderingPaintServerSolid,
-                                     public KRenderingPaintServerQt
-{
-public:
-    KRenderingPaintServerSolidQt();
-    virtual ~KRenderingPaintServerSolidQt();
+                                     public KRenderingPaintServerQt {
+ public:
+  KRenderingPaintServerSolidQt();
+  virtual ~KRenderingPaintServerSolidQt();
 
-    virtual void draw(KRenderingDeviceContext*, const RenderPath*, KCPaintTargetType) const;
-    virtual bool setup(KRenderingDeviceContext*, const RenderObject*, KCPaintTargetType) const;
-    virtual void teardown(KRenderingDeviceContext*, const RenderObject*, KCPaintTargetType) const;
+  virtual void draw(KRenderingDeviceContext*,
+                    const RenderPath*,
+                    KCPaintTargetType) const;
+  virtual bool setup(KRenderingDeviceContext*,
+                     const RenderObject*,
+                     KCPaintTargetType) const;
+  virtual void teardown(KRenderingDeviceContext*,
+                        const RenderObject*,
+                        KCPaintTargetType) const;
 
-protected:
-    virtual void renderPath(KRenderingDeviceContext*, const RenderPath*, KCPaintTargetType) const;
+ protected:
+  virtual void renderPath(KRenderingDeviceContext*,
+                          const RenderPath*,
+                          KCPaintTargetType) const;
 };
-
 }
 
 #endif

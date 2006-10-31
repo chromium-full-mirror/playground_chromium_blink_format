@@ -29,11 +29,11 @@
 #ifdef SVG_SUPPORT
 #include "KCanvasTreeDebug.h"
 
+#include "SVGResourceClipper.h"
 #include "GraphicsTypes.h"
 #include "HTMLNames.h"
 #include "RenderTreeAsText.h"
 #include "RenderSVGContainer.h"
-#include "KCanvasClipper.h"
 #include "KRenderingDevice.h"
 #include "KRenderingPaintServerGradient.h"
 #include "KRenderingPaintServerPattern.h"
@@ -360,16 +360,18 @@ void writeRenderResources(TextStream& ts, Node* parent) {
       continue;
 
     SVGStyledElement* styled = static_cast<SVGStyledElement*>(svgElement);
-    KCanvasResource* resource = styled->canvasResource();
+    RefPtr<SVGResource> resource(styled->canvasResource());
     if (!resource)
       continue;
 
     DeprecatedString elementId =
         svgElement->getAttribute(HTMLNames::idAttr).deprecatedString();
-    if (resource->isPaintServer())
-      ts << "KRenderingPaintServer {id=\"" << elementId << "\" "
-         << *static_cast<KRenderingPaintServer*>(resource) << "}" << endl;
-    else
+    if (resource->isPaintServer()) {
+      RefPtr<KRenderingPaintServer> paintServer =
+          WTF::static_pointer_cast<KRenderingPaintServer>(resource);
+      ts << "KRenderingPaintServer {id=\"" << elementId << "\" " << *paintServer
+         << "}" << endl;
+    } else
       ts << "KCanvasResource {id=\"" << elementId << "\" " << *resource << "}"
          << endl;
   } while ((node = node->traverseNextNode(parent)));

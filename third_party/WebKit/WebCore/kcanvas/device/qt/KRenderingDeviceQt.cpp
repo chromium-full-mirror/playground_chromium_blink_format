@@ -26,8 +26,8 @@
 #include "RenderPathQt.h"
 #include "AffineTransform.h"
 #include "GraphicsContext.h"
-#include "KCanvasClipperQt.h"
-#include "KCanvasMarker.h"
+#include "SVGResourceClipper.h"
+#include "SVGResourceMarker.h"
 #include "KRenderingDeviceQt.h"
 #include "KRenderingPaintServerSolidQt.h"
 #include "KRenderingPaintServerGradientQt.h"
@@ -36,160 +36,134 @@
 namespace WebCore {
 
 KRenderingDeviceContextQt::KRenderingDeviceContextQt(QPainter* painter)
-    : m_painter(painter)
-    , m_path()
-{
-    Q_ASSERT(m_painter != 0);
+    : m_painter(painter), m_path() {
+  Q_ASSERT(m_painter != 0);
 }
 
-KRenderingDeviceContextQt::~KRenderingDeviceContextQt()
-{
+KRenderingDeviceContextQt::~KRenderingDeviceContextQt() {}
+
+AffineTransform KRenderingDeviceContextQt::concatCTM(
+    const AffineTransform& worldMatrix) {
+  AffineTransform ret = ctm();
+  m_painter->setMatrix(worldMatrix, true);
+  return ret;
 }
 
-AffineTransform KRenderingDeviceContextQt::concatCTM(const AffineTransform& worldMatrix)
-{
-    AffineTransform ret = ctm();
-    m_painter->setMatrix(worldMatrix, true);
-    return ret;
+AffineTransform KRenderingDeviceContextQt::ctm() const {
+  return AffineTransform(m_painter->matrix());
 }
 
-AffineTransform KRenderingDeviceContextQt::ctm() const
-{
-    return AffineTransform(m_painter->matrix());
+IntRect KRenderingDeviceContextQt::mapFromVisual(const IntRect& rect) {
+  return IntRect();
 }
 
-IntRect KRenderingDeviceContextQt::mapFromVisual(const IntRect& rect)
-{
-    return IntRect();
+IntRect KRenderingDeviceContextQt::mapToVisual(const IntRect& rect) {
+  return IntRect();
 }
 
-IntRect KRenderingDeviceContextQt::mapToVisual(const IntRect& rect)
-{
-    return IntRect();
+void KRenderingDeviceContextQt::clearPath() {
+  m_path = QPainterPath();
 }
 
-void KRenderingDeviceContextQt::clearPath()
-{
-    m_path = QPainterPath();
+void KRenderingDeviceContextQt::addPath(const Path& path) {
+  m_path.addPath(*(path.platformPath()));
 }
 
-void KRenderingDeviceContextQt::addPath(const Path& path)
-{
-    m_path.addPath(*(path.platformPath()));
+GraphicsContext* KRenderingDeviceContextQt::createGraphicsContext() {
+  return new GraphicsContext(m_painter);
 }
 
-GraphicsContext* KRenderingDeviceContextQt::createGraphicsContext()
-{
-    return new GraphicsContext(m_painter);
+QPainter& KRenderingDeviceContextQt::painter() {
+  return *m_painter;
 }
 
-QPainter& KRenderingDeviceContextQt::painter()
-{
-    return *m_painter;
+QRectF KRenderingDeviceContextQt::pathBBox() const {
+  return m_path.boundingRect();
 }
 
-QRectF KRenderingDeviceContextQt::pathBBox() const
-{
-    return m_path.boundingRect();
+void KRenderingDeviceContextQt::setFillRule(WindRule rule) {
+  m_path.setFillRule(rule == RULE_EVENODD ? Qt::OddEvenFill : Qt::WindingFill);
 }
 
-void KRenderingDeviceContextQt::setFillRule(WindRule rule)
-{
-    m_path.setFillRule(rule == RULE_EVENODD ? Qt::OddEvenFill : Qt::WindingFill);
+void KRenderingDeviceContextQt::fillPath() {
+  m_painter->fillPath(m_path, m_painter->brush());
 }
 
-void KRenderingDeviceContextQt::fillPath()
-{
-    m_painter->fillPath(m_path, m_painter->brush());
-}
-
-void KRenderingDeviceContextQt::strokePath()
-{
-    m_painter->strokePath(m_path, m_painter->pen());
+void KRenderingDeviceContextQt::strokePath() {
+  m_painter->strokePath(m_path, m_painter->pen());
 }
 
 // KRenderingDeviceQt
-KRenderingDeviceQt::KRenderingDeviceQt() : KRenderingDevice()
-{
+KRenderingDeviceQt::KRenderingDeviceQt() : KRenderingDevice() {}
+
+KRenderingDeviceQt::~KRenderingDeviceQt() {}
+
+KRenderingDeviceContext* KRenderingDeviceQt::popContext() {
+  // Any special things needed?
+  return KRenderingDevice::popContext();
 }
 
-KRenderingDeviceQt::~KRenderingDeviceQt()
-{
-}
-
-KRenderingDeviceContext* KRenderingDeviceQt::popContext()
-{
-    // Any special things needed?
-    return KRenderingDevice::popContext();
-}
-
-void KRenderingDeviceQt::pushContext(KRenderingDeviceContext* context)
-{
-    // Any special things needed?
-    KRenderingDevice::pushContext(context);
+void KRenderingDeviceQt::pushContext(KRenderingDeviceContext* context) {
+  // Any special things needed?
+  KRenderingDevice::pushContext(context);
 }
 
 // context management.
-KRenderingDeviceContextQt* KRenderingDeviceQt::qtContext() const
-{
-    return static_cast<KRenderingDeviceContextQt*>(currentContext());
+KRenderingDeviceContextQt* KRenderingDeviceQt::qtContext() const {
+  return static_cast<KRenderingDeviceContextQt*>(currentContext());
 }
 
-KRenderingDeviceContext* KRenderingDeviceQt::contextForImage(KCanvasImage* image) const
-{
-    qDebug("KRenderingDeviceQt::contextForImage() TODO!");
-    return 0;
+KRenderingDeviceContext* KRenderingDeviceQt::contextForImage(
+    SVGResourceImage* image) const {
+  qDebug("KRenderingDeviceQt::contextForImage() TODO!");
+  return 0;
 }
 
 // Resource creation
-KCanvasResource* KRenderingDeviceQt::createResource(const KCResourceType& type) const
-{
-    switch (type)
-    {
-        case RS_CLIPPER:
-            return new KCanvasClipperQt();
-        case RS_MARKER:
-            return new KCanvasMarker(); // Use default implementation...
-        case RS_IMAGE:
-            // return new KCanvasImageQt();
-        case RS_FILTER:
-            // return new KCanvasFilterQt();
-        case RS_MASKER:
-            // return new KCanvasMaskerQt();
-        default:
-            return 0;
-    }
+PassRefPtr<SVGResource> KRenderingDeviceQt::createResource(
+    const SVGResourceType& type) const {
+  switch (type) {
+    case RS_CLIPPER:
+      return new SVGResourceClipper();
+    case RS_MARKER:
+      return new SVGResourceMarker();  // Use default implementation...
+    case RS_IMAGE:
+    // return new SVGResourceImageQt();
+    case RS_FILTER:
+    // return new KCanvasFilterQt();
+    case RS_MASKER:
+    // return new KCanvasMaskerQt();
+    default:
+      return 0;
+  }
 }
 
-KRenderingPaintServer* KRenderingDeviceQt::createPaintServer(const KCPaintServerType& type) const
-{
-    switch (type)
-    {
-        case PS_SOLID:
-            return new KRenderingPaintServerSolidQt();
-        case PS_PATTERN:
-            return new KRenderingPaintServerPatternQt();
-        case PS_LINEAR_GRADIENT:
-            return new KRenderingPaintServerLinearGradientQt();
-        case PS_RADIAL_GRADIENT:
-            return new KRenderingPaintServerRadialGradientQt();
-        default:
-            return 0;
-    }
+PassRefPtr<KRenderingPaintServer> KRenderingDeviceQt::createPaintServer(
+    const KCPaintServerType& type) const {
+  switch (type) {
+    case PS_SOLID:
+      return new KRenderingPaintServerSolidQt();
+    case PS_PATTERN:
+      return new KRenderingPaintServerPatternQt();
+    case PS_LINEAR_GRADIENT:
+      return new KRenderingPaintServerLinearGradientQt();
+    case PS_RADIAL_GRADIENT:
+      return new KRenderingPaintServerRadialGradientQt();
+    default:
+      return 0;
+  }
 }
 
-KCanvasFilterEffect* KRenderingDeviceQt::createFilterEffect(const KCFilterEffectType& type) const
-{
-    qDebug("KRenderingDeviceQt::createFilterEffect() TODO!");
-    return 0;
+KCanvasFilterEffect* KRenderingDeviceQt::createFilterEffect(
+    const KCFilterEffectType& type) const {
+  qDebug("KRenderingDeviceQt::createFilterEffect() TODO!");
+  return 0;
 }
 
-KRenderingDevice* renderingDevice()
-{
-    static KRenderingDevice *sharedRenderingDevice = new KRenderingDeviceQt();
-    return sharedRenderingDevice;
+KRenderingDevice* renderingDevice() {
+  static KRenderingDevice* sharedRenderingDevice = new KRenderingDeviceQt();
+  return sharedRenderingDevice;
 }
-
 }
 
 // vim:ts=4:noet

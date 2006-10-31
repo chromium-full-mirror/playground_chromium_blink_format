@@ -29,60 +29,62 @@
 #include <QPainterPathStroker>
 
 namespace WebCore {
-    
-bool RenderPath::strokeContains(const FloatPoint& point, bool requiresStroke) const
-{
-    if (path().isEmpty())
-        return false;
 
-    if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
-        return false;
-
+bool RenderPath::strokeContains(const FloatPoint& point,
+                                bool requiresStroke) const {
+  if (path().isEmpty())
     return false;
+
+  if (requiresStroke && !KSVGPainterFactory::strokePaintServer(style(), this))
+    return false;
+
+  return false;
 }
 
-static QPainterPath getPathStroke(const QPainterPath &path, const RenderObject* object, const RenderStyle* style)
-{ 
-    QPainterPathStroker s;
-    s.setWidth(KSVGPainterFactory::cssPrimitiveToLength(object, style->svgStyle()->strokeWidth(), 1.0));
+static QPainterPath getPathStroke(const QPainterPath& path,
+                                  const RenderObject* object,
+                                  const RenderStyle* style) {
+  QPainterPathStroker s;
+  s.setWidth(KSVGPainterFactory::cssPrimitiveToLength(
+      object, style->svgStyle()->strokeWidth(), 1.0));
 
-    if (style->svgStyle()->capStyle() == ButtCap)
-        s.setCapStyle(Qt::FlatCap);
-    else if (style->svgStyle()->capStyle() == RoundCap)
-        s.setCapStyle(Qt::RoundCap);
+  if (style->svgStyle()->capStyle() == ButtCap)
+    s.setCapStyle(Qt::FlatCap);
+  else if (style->svgStyle()->capStyle() == RoundCap)
+    s.setCapStyle(Qt::RoundCap);
 
-    if (style->svgStyle()->joinStyle() == MiterJoin) {
-        s.setJoinStyle(Qt::MiterJoin);
-        s.setMiterLimit((qreal) style->svgStyle()->strokeMiterLimit());
-    } else if(style->svgStyle()->joinStyle() == RoundJoin)
-        s.setJoinStyle(Qt::RoundJoin);
+  if (style->svgStyle()->joinStyle() == MiterJoin) {
+    s.setJoinStyle(Qt::MiterJoin);
+    s.setMiterLimit((qreal)style->svgStyle()->strokeMiterLimit());
+  } else if (style->svgStyle()->joinStyle() == RoundJoin)
+    s.setJoinStyle(Qt::RoundJoin);
 
-    const KCDashArray& dashes = KSVGPainterFactory::dashArrayFromRenderingStyle(style);
-    double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(object, style->svgStyle()->strokeDashOffset(), 0.0);
+  const KCDashArray& dashes =
+      KSVGPainterFactory::dashArrayFromRenderingStyle(style);
+  double dashOffset = KSVGPainterFactory::cssPrimitiveToLength(
+      object, style->svgStyle()->strokeDashOffset(), 0.0);
 
-    unsigned int dashLength = !dashes.isEmpty() ? dashes.size() : 0;
-    if(dashLength) {
-        QVector<qreal> pattern;
-        unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
+  unsigned int dashLength = !dashes.isEmpty() ? dashes.size() : 0;
+  if (dashLength) {
+    QVector<qreal> pattern;
+    unsigned int count = (dashLength % 2) == 0 ? dashLength : dashLength * 2;
 
-        for(unsigned int i = 0; i < count; i++)
-            pattern.append(dashes[i % dashLength] / (float)s.width());
+    for (unsigned int i = 0; i < count; i++)
+      pattern.append(dashes[i % dashLength] / (float)s.width());
 
-        s.setDashPattern(pattern);
-    
-        Q_UNUSED(dashOffset);
-        // TODO: dash-offset, does/will qt4 API allow it? (Rob)
-    }
+    s.setDashPattern(pattern);
 
-    return s.createStroke(path);
+    Q_UNUSED(dashOffset);
+    // TODO: dash-offset, does/will qt4 API allow it? (Rob)
+  }
+
+  return s.createStroke(path);
 }
 
-FloatRect RenderPath::strokeBBox() const
-{
-    QPainterPath outline = getPathStroke(*(path().platformPath()), this, style());
-    return outline.boundingRect();
+FloatRect RenderPath::strokeBBox() const {
+  QPainterPath outline = getPathStroke(*(path().platformPath()), this, style());
+  return outline.boundingRect();
 }
-
 }
 
 // vim:ts=4:noet

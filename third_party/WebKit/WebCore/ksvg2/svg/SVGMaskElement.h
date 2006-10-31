@@ -23,7 +23,7 @@
 #define SVGMaskElement_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasMasker.h"
+#include "SVGResourceMasker.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledLocatableElement.h"
@@ -52,10 +52,10 @@ class SVGMaskElement : public SVGStyledLocatableElement,
     return StyledElement::rendererIsNeeded(style);
   }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual KCanvasMasker* canvasResource();
+  virtual SVGResource* canvasResource();
 
  protected:
-  KCanvasImage* drawMaskerContent();
+  SVGResourceImage* drawMaskerContent();
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
@@ -87,7 +87,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  KCanvasMasker* m_masker;
+  RefPtr<SVGResourceMasker> m_masker;
   bool m_dirty;
 };
 
