@@ -1646,7 +1646,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!str.isEmpty() && activeFrame)
         url = activeFrame->document()->completeURL(str.deprecatedString());
 
-      FrameLoadRequest frameRequest(ResourceRequest(url), frameName);
+      ResourceRequest resRequest(url);
+      FrameLoadRequest frameRequest(resRequest, frameName);
       if (frameRequest.frameName() == "_top") {
         while (frame->tree()->parent())
           frame = frame->tree()->parent();
