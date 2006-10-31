@@ -225,6 +225,23 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
   return jsNull();
 }
 
+JSValue* FunctionImp::callerGetter(ExecState* exec,
+                                   JSObject*,
+                                   const Identifier&,
+                                   const PropertySlot& slot) {
+  FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
+  Context* context = exec->m_context;
+  while (context) {
+    if (context->function() == thisObj)
+      return (context->callingContext()->function())
+                 ? context->callingContext()->function()
+                 : jsNull();
+
+    context = context->callingContext();
+  }
+  return jsNull();
+}
+
 JSValue* FunctionImp::lengthGetter(ExecState*,
                                    JSObject*,
                                    const Identifier&,
@@ -245,6 +262,11 @@ bool FunctionImp::getOwnPropertySlot(ExecState* exec,
   // Compute length of parameters.
   if (propertyName == lengthPropertyName) {
     slot.setCustom(this, lengthGetter);
+    return true;
+  }
+
+  if (propertyName == callerPropertyName) {
+    slot.setCustom(this, callerGetter);
     return true;
   }
 

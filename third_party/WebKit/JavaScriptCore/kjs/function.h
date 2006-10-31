@@ -41,17 +41,17 @@ class FunctionImp : public InternalFunctionImp {
   friend class ActivationImp;
 
  public:
-  FunctionImp(ExecState* exec, const Identifier& n, FunctionBodyNode* b);
+  FunctionImp(ExecState*, const Identifier& n, FunctionBodyNode* b);
   virtual ~FunctionImp();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState* exec,
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
-  virtual JSValue* callAsFunction(ExecState* exec,
+  virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
 
@@ -61,7 +61,7 @@ class FunctionImp : public InternalFunctionImp {
   UString parameterString() const;
   virtual CodeType codeType() const = 0;
 
-  virtual Completion execute(ExecState* exec) = 0;
+  virtual Completion execute(ExecState*) = 0;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -109,33 +109,37 @@ class FunctionImp : public InternalFunctionImp {
                                   JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
+  static JSValue* callerGetter(ExecState*,
+                               JSObject*,
+                               const Identifier&,
+                               const PropertySlot&);
   static JSValue* lengthGetter(ExecState*,
                                JSObject*,
                                const Identifier&,
                                const PropertySlot&);
 
-  void processParameters(ExecState* exec, const List&);
-  virtual void processVarDecls(ExecState* exec);
+  void processParameters(ExecState*, const List&);
+  virtual void processVarDecls(ExecState*);
 };
 
 class DeclaredFunctionImp : public FunctionImp {
  public:
-  DeclaredFunctionImp(ExecState* exec,
+  DeclaredFunctionImp(ExecState*,
                       const Identifier& n,
                       FunctionBodyNode* b,
                       const ScopeChain& sc);
 
   bool implementsConstruct() const;
-  JSObject* construct(ExecState* exec, const List& args);
+  JSObject* construct(ExecState*, const List& args);
 
-  virtual Completion execute(ExecState* exec);
+  virtual Completion execute(ExecState*);
   CodeType codeType() const { return FunctionCode; }
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
-  virtual void processVarDecls(ExecState* exec);
+  virtual void processVarDecls(ExecState*);
 };
 
 class IndexToNameMap {
@@ -156,22 +160,22 @@ class IndexToNameMap {
 
 class Arguments : public JSObject {
  public:
-  Arguments(ExecState* exec,
+  Arguments(ExecState*,
             FunctionImp* func,
             const List& args,
             ActivationImp* act);
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual void put(ExecState* exec,
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
-  static JSValue* mappedIndexGetter(ExecState* exec,
+  static JSValue* mappedIndexGetter(ExecState*,
                                     JSObject*,
                                     const Identifier&,
                                     const PropertySlot& slot);
@@ -184,14 +188,12 @@ class ActivationImp : public JSObject {
  public:
   ActivationImp(FunctionImp* function, const List& arguments);
 
-  virtual bool getOwnPropertySlot(ExecState* exec,
-                                  const Identifier&,
-                                  PropertySlot&);
-  virtual void put(ExecState* exec,
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+  virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -202,11 +204,11 @@ class ActivationImp : public JSObject {
 
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
-  static JSValue* argumentsGetter(ExecState* exec,
+  static JSValue* argumentsGetter(ExecState*,
                                   JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot);
-  void createArgumentsObject(ExecState* exec) const;
+  void createArgumentsObject(ExecState*) const;
 
   FunctionImp* _function;
   List _arguments;
@@ -220,7 +222,7 @@ class GlobalFuncImp : public InternalFunctionImp {
                 int i,
                 int len,
                 const Identifier&);
-  virtual JSValue* callAsFunction(ExecState* exec,
+  virtual JSValue* callAsFunction(ExecState*,
                                   JSObject* thisObj,
                                   const List& args);
   virtual CodeType codeType() const;
