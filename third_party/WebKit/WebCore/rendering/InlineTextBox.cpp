@@ -226,7 +226,8 @@ bool InlineTextBox::isLineBreak() const {
           (*textObject()->string())[start()] == '\n');
 }
 
-bool InlineTextBox::nodeAtPoint(HitTestResult& result,
+bool InlineTextBox::nodeAtPoint(const HitTestRequest& request,
+                                HitTestResult& result,
                                 int x,
                                 int y,
                                 int tx,

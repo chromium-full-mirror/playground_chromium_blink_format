@@ -62,6 +62,7 @@ class FrameView;
 class HTMLAreaElement;
 class InlineBox;
 class InlineFlowBox;
+class HitTestRequest;
 class HitTestResult;
 class PlatformScrollbar;
 class Position;
@@ -600,13 +601,15 @@ class RenderObject : public CachedResourceClient {
         : m_object(o), m_repaintRect(r) {}
   };
 
-  bool hitTest(HitTestResult&,
+  bool hitTest(const HitTestRequest&,
+               HitTestResult&,
                int x,
                int y,
                int tx,
                int ty,
                HitTestFilter hitTestFilter = HitTestAll);
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

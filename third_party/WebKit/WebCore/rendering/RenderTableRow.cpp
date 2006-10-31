@@ -137,7 +137,8 @@ IntRect RenderTableRow::getAbsoluteRepaintRect() {
 }
 
 // Hit Testing
-bool RenderTableRow::nodeAtPoint(HitTestResult& result,
+bool RenderTableRow::nodeAtPoint(const HitTestRequest& request,
+                                 HitTestResult& result,
                                  int x,
                                  int y,
                                  int tx,
@@ -155,7 +156,7 @@ bool RenderTableRow::nodeAtPoint(HitTestResult& result,
     // reasons anyway),
     // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
-        child->nodeAtPoint(result, x, y, tx, ty, action)) {
+        child->nodeAtPoint(request, result, x, y, tx, ty, action)) {
       setInnerNode(result);
       return true;
     }

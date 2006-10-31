@@ -1007,7 +1007,8 @@ RenderObject* RenderTableSection::removeChildNode(RenderObject* child) {
 }
 
 // Hit Testing
-bool RenderTableSection::nodeAtPoint(HitTestResult& result,
+bool RenderTableSection::nodeAtPoint(const HitTestRequest& request,
+                                     HitTestResult& result,
                                      int x,
                                      int y,
                                      int tx,
@@ -1028,7 +1029,7 @@ bool RenderTableSection::nodeAtPoint(HitTestResult& result,
     // reasons anyway),
     // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
-        child->nodeAtPoint(result, x, y, tx, ty, action)) {
+        child->nodeAtPoint(request, result, x, y, tx, ty, action)) {
       setInnerNode(result);
       return true;
     }

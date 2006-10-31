@@ -429,7 +429,8 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
   }
 }
 
-bool RenderFlow::hitTestLines(HitTestResult& result,
+bool RenderFlow::hitTestLines(const HitTestRequest& request,
+                              HitTestResult& result,
                               int x,
                               int y,
                               int tx,
@@ -464,7 +465,7 @@ bool RenderFlow::hitTestLines(HitTestResult& result,
   for (InlineFlowBox* curr = lastLineBox(); curr; curr = curr->prevFlowBox()) {
     if (y >= ty + curr->root()->topOverflow() &&
         y < ty + curr->root()->bottomOverflow()) {
-      bool inside = curr->nodeAtPoint(result, x, y, tx, ty);
+      bool inside = curr->nodeAtPoint(request, result, x, y, tx, ty);
       if (inside) {
         setInnerNode(result);
         return true;

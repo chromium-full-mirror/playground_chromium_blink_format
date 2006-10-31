@@ -48,7 +48,8 @@ class RenderForeignObject : public RenderBlock {
   virtual bool requiresLayer();
   virtual void layout();
 
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

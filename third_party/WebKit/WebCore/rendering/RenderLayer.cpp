@@ -53,6 +53,7 @@
 #include "GraphicsContext.h"
 #include "HTMLMarqueeElement.h"
 #include "HTMLNames.h"
+#include "HitTestRequest.h"
 #include "HitTestResult.h"
 #include "OverflowEvent.h"
 #include "PlatformMouseEvent.h"
@@ -906,8 +907,9 @@ void RenderLayer::autoscroll() {
       currentFrame->view()->currentMousePosition());
 
   if (currentFrame->mouseDownMayStartSelect()) {
-    HitTestResult result(currentPos, true, false, true);
-    if (hitTest(result)) {
+    HitTestRequest request(true, false, true);
+    HitTestResult result(currentPos);
+    if (hitTest(request, result)) {
       VisiblePosition pos(
           result.innerNode()->renderer()->positionForPoint(currentPos));
       currentFrame->updateSelectionForMouseDragOverPosition(pos);
@@ -1592,13 +1594,14 @@ static inline IntRect frameVisibleRect(RenderObject* renderer) {
       renderer->document()->frame()->view()->visibleContentRect());
 }
 
-bool RenderLayer::hitTest(HitTestResult& result) {
+bool RenderLayer::hitTest(const HitTestRequest& request,
+                          HitTestResult& result) {
   renderer()->document()->updateLayout();
 
   IntRect boundsRect(m_x, m_y, width(), height());
   boundsRect.intersect(frameVisibleRect(renderer()));
 
-  RenderLayer* insideLayer = hitTestLayer(this, result, boundsRect);
+  RenderLayer* insideLayer = hitTestLayer(this, request, result, boundsRect);
 
   // Now determine if the result is inside an anchor; make sure an image map
   // wins if
@@ -1611,7 +1614,7 @@ bool RenderLayer::hitTest(HitTestResult& result) {
   }
 
   // Next set up the correct :hover/:active state along the new chain.
-  updateHoverActiveState(result);
+  updateHoverActiveState(request, result);
 
   // Now return whether we were inside this layer (this will always be true for
   // the root
@@ -1620,6 +1623,7 @@ bool RenderLayer::hitTest(HitTestResult& result) {
 }
 
 RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
+                                       const HitTestRequest& request,
                                        HitTestResult& result,
                                        const IntRect& hitTestRect) {
   // Calculate the clip rects we should use.
@@ -1644,8 +1648,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // z-index.
   if (m_posZOrderList) {
     for (int i = m_posZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer =
-          m_posZOrderList->at(i)->hitTestLayer(rootLayer, result, hitTestRect);
+      insideLayer = m_posZOrderList->at(i)->hitTestLayer(rootLayer, request,
+                                                         result, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1654,8 +1658,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our overflow objects.
   if (m_overflowList) {
     for (int i = m_overflowList->size() - 1; i >= 0; --i) {
-      insideLayer =
-          m_overflowList->at(i)->hitTestLayer(rootLayer, result, hitTestRect);
+      insideLayer = m_overflowList->at(i)->hitTestLayer(rootLayer, request,
+                                                        result, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1665,7 +1669,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // the layer.
   if (fgRect.contains(result.point()) &&
       renderer()->hitTest(
-          result, result.point().x(), result.point().y(),
+          request, result, result.point().x(), result.point().y(),
           layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestDescendants)) {
@@ -1696,8 +1700,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // Now check our negative z-index children.
   if (m_negZOrderList) {
     for (int i = m_negZOrderList->size() - 1; i >= 0; --i) {
-      insideLayer =
-          m_negZOrderList->at(i)->hitTestLayer(rootLayer, result, hitTestRect);
+      insideLayer = m_negZOrderList->at(i)->hitTestLayer(rootLayer, request,
+                                                         result, hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1712,7 +1716,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // window.
   if (bgRect.contains(result.point()) &&
       renderer()->hitTest(
-          result, result.point().x(), result.point().y(),
+          request, result, result.point().x(), result.point().y(),
           layerBounds.x() - renderer()->xPos(),
           layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestSelf))
@@ -1721,7 +1725,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // We didn't hit any layer.  However if the mouse is down, we must always at
   // least be inside
   // the render view.
-  if (result.active() && renderer()->isRenderView()) {
+  if (request.active && renderer()->isRenderView()) {
     renderer()->setInnerNode(result);
     return this;
   }
@@ -1991,9 +1995,10 @@ static RenderObject* commonAncestor(RenderObject* obj1, RenderObject* obj2) {
   return 0;
 }
 
-void RenderLayer::updateHoverActiveState(HitTestResult& result) {
+void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
+                                         HitTestResult& result) {
   // We don't update :hover/:active state when the result is marked as readonly.
-  if (result.readonly())
+  if (request.readonly)
     return;
 
   Document* doc = renderer()->document();
@@ -2001,7 +2006,7 @@ void RenderLayer::updateHoverActiveState(HitTestResult& result) {
     return;
 
   Node* activeNode = doc->activeNode();
-  if (activeNode && !result.active()) {
+  if (activeNode && !request.active) {
     // We are clearing the :active chain because the mouse has been released.
     for (RenderObject* curr = activeNode->renderer(); curr;
          curr = curr->parent()) {
@@ -2011,7 +2016,7 @@ void RenderLayer::updateHoverActiveState(HitTestResult& result) {
     doc->setActiveNode(0);
   } else {
     Node* newActiveNode = result.innerNode();
-    if (!activeNode && newActiveNode && result.active()) {
+    if (!activeNode && newActiveNode && request.active) {
       // We are setting the :active chain and freezing it. If future moves
       // happen, they
       // will need to reference this chain.
@@ -2030,7 +2035,7 @@ void RenderLayer::updateHoverActiveState(HitTestResult& result) {
   // :hover/:active to only apply to elements that are in the :active chain that
   // we froze
   // at the time the mouse went down.
-  bool mustBeInActiveChain = result.active() && result.mouseMove();
+  bool mustBeInActiveChain = request.active && request.mouseMove;
 
   // Check to see if the hovered node has changed.  If not, then we don't need
   // to
@@ -2065,7 +2070,7 @@ void RenderLayer::updateHoverActiveState(HitTestResult& result) {
   for (RenderObject* curr = newHoverObj; curr; curr = curr->hoverAncestor()) {
     if (curr->element() && !curr->isText() &&
         (!mustBeInActiveChain || curr->element()->inActiveChain())) {
-      curr->element()->setActive(result.active());
+      curr->element()->setActive(request.active);
       curr->element()->setHovered(true);
     }
   }

@@ -56,6 +56,8 @@
 #include "HTMLNameCollection.h"
 #include "HTMLNames.h"
 #include "HTMLStyleElement.h"
+#include "HitTestRequest.h"
+#include "HitTestResult.h"
 #include "JSEditor.h"
 #include "KeyboardEvent.h"
 #include "Logging.h"
@@ -64,7 +66,6 @@
 #include "MutationEvent.h"
 #include "NameNodeList.h"
 #include "NodeFilter.h"
-#include "HitTestResult.h"
 #include "NodeIterator.h"
 #include "PlatformKeyboardEvent.h"
 #include "ProcessingInstruction.h"
@@ -688,8 +689,9 @@ Element* Document::elementFromPoint(int x, int y) const {
   if (!renderer())
     return 0;
 
-  HitTestResult result(IntPoint(x, y), true, true);
-  renderer()->layer()->hitTest(result);
+  HitTestRequest request(true, true);
+  HitTestResult result(IntPoint(x, y));
+  renderer()->layer()->hitTest(request, result);
 
   Node* n = result.innerNode();
   while (n && !n->isElementNode())
@@ -1705,8 +1707,9 @@ MouseEventWithHitTestResults Document::prepareMouseEvent(
     return MouseEventWithHitTestResults(event, 0, 0, false);
 
   assert(renderer()->isRenderView());
-  HitTestResult result(point, readonly, active, mouseMove);
-  renderer()->layer()->hitTest(result);
+  HitTestRequest request(readonly, active, mouseMove);
+  HitTestResult result(point);
+  renderer()->layer()->hitTest(request, result);
 
   if (!readonly)
     updateRendering();

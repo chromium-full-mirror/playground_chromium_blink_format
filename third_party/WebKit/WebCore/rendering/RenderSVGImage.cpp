@@ -211,7 +211,8 @@ void RenderSVGImage::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   RenderImage::computeAbsoluteRepaintRect(r, f);
 }
 
-bool RenderSVGImage::nodeAtPoint(HitTestResult& result,
+bool RenderSVGImage::nodeAtPoint(const HitTestRequest& request,
+                                 HitTestResult& result,
                                  int _x,
                                  int _y,
                                  int _tx,
@@ -221,8 +222,8 @@ bool RenderSVGImage::nodeAtPoint(HitTestResult& result,
   totalTransform *= translationForAttributes();
   double localX, localY;
   totalTransform.invert().map(_x + _tx, _y + _ty, &localX, &localY);
-  return RenderImage::nodeAtPoint(result, (int)localX, (int)localY, 0, 0,
-                                  hitTestAction);
+  return RenderImage::nodeAtPoint(request, result, (int)localX, (int)localY, 0,
+                                  0, hitTestAction);
 }
 
 bool RenderSVGImage::requiresLayer() {

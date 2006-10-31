@@ -27,6 +27,7 @@
 
 namespace WebCore {
 
+class HitTestRequest;
 class HitTestResult;
 
 class InlineFlowBox : public InlineRunBox {
@@ -99,7 +100,12 @@ class InlineFlowBox : public InlineRunBox {
                                 int _ty,
                                 bool paintedChildren = false);
   virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(HitTestResult&, int, int, int, int);
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
+                           int,
+                           int,
+                           int,
+                           int);
 
   int marginBorderPaddingLeft();
   int marginBorderPaddingRight();

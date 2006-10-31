@@ -42,7 +42,8 @@ class RenderSVGText : public RenderBlock {
     m_transform = transform;
   }
   virtual void paint(PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

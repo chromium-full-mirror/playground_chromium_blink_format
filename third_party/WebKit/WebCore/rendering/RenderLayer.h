@@ -51,6 +51,7 @@
 namespace WebCore {
 
 class CachedResource;
+class HitTestRequest;
 class HitTestResult;
 class PlatformScrollbar;
 class RenderFrameSet;
@@ -347,7 +348,7 @@ class RenderLayer : public ScrollbarClient {
              const IntRect& damageRect,
              PaintRestriction = PaintRestrictionNone,
              RenderObject* paintingRoot = 0);
-  bool hitTest(HitTestResult&);
+  bool hitTest(const HitTestRequest&, HitTestResult&);
 
   // This method figures out our layerBounds in coordinates relative to
   // |rootLayer}.  It also computes our background and foreground clip rects
@@ -372,7 +373,7 @@ class RenderLayer : public ScrollbarClient {
   // Returns a bounding box for this layer only.
   IntRect absoluteBoundingBox() const;
 
-  void updateHoverActiveState(HitTestResult&);
+  void updateHoverActiveState(const HitTestRequest&, HitTestResult&);
 
   IntRect repaintRect() const { return m_repaintRect; }
 
@@ -405,6 +406,7 @@ class RenderLayer : public ScrollbarClient {
                   PaintRestriction,
                   RenderObject* paintingRoot);
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
+                            const HitTestRequest&,
                             HitTestResult&,
                             const IntRect& hitTestRect);
   void computeScrollDimensions(bool* needHBar = 0, bool* needVBar = 0);

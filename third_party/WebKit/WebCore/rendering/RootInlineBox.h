@@ -132,7 +132,12 @@ class RootInlineBox : public InlineFlowBox {
 #endif
 
   virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
-  virtual bool nodeAtPoint(HitTestResult&, int, int, int, int);
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
+                           int,
+                           int,
+                           int,
+                           int);
 
   bool hasSelectedChildren() const { return m_hasSelectedChildren; }
   void setHasSelectedChildren(bool b);

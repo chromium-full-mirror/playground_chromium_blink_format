@@ -72,7 +72,8 @@ class RenderPath : public RenderObject {
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
 
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

@@ -341,13 +341,14 @@ const char* RenderInline::renderName() const {
   return "RenderInline";
 }
 
-bool RenderInline::nodeAtPoint(HitTestResult& result,
+bool RenderInline::nodeAtPoint(const HitTestRequest& request,
+                               HitTestResult& result,
                                int x,
                                int y,
                                int tx,
                                int ty,
                                HitTestAction hitTestAction) {
-  return hitTestLines(result, x, y, tx, ty, hitTestAction);
+  return hitTestLines(request, result, x, y, tx, ty, hitTestAction);
 }
 
 VisiblePosition RenderInline::positionForCoordinates(int x, int y) {

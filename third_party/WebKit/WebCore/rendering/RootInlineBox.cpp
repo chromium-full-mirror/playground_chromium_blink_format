@@ -161,18 +161,19 @@ void RootInlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 #endif
 }
 
-bool RootInlineBox::nodeAtPoint(HitTestResult& result,
+bool RootInlineBox::nodeAtPoint(const HitTestRequest& request,
+                                HitTestResult& result,
                                 int x,
                                 int y,
                                 int tx,
                                 int ty) {
   if (m_ellipsisBox && object()->style()->visibility() == VISIBLE) {
-    if (m_ellipsisBox->nodeAtPoint(result, x, y, tx, ty)) {
+    if (m_ellipsisBox->nodeAtPoint(request, result, x, y, tx, ty)) {
       object()->setInnerNode(result);
       return true;
     }
   }
-  return InlineFlowBox::nodeAtPoint(result, x, y, tx, ty);
+  return InlineFlowBox::nodeAtPoint(request, result, x, y, tx, ty);
 }
 
 void RootInlineBox::adjustPosition(int dx, int dy) {

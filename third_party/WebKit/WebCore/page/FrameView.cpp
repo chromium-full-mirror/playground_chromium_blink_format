@@ -37,10 +37,11 @@
 #include "HTMLFrameSetElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "HitTestRequest.h"
+#include "HitTestResult.h"
 #include "Image.h"
 #include "MouseEvent.h"
 #include "MouseEventWithHitTestResults.h"
-#include "HitTestResult.h"
 #include "OverflowEvent.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformScrollBar.h"
@@ -1281,8 +1282,9 @@ void FrameView::handleWheelEvent(PlatformWheelEvent& e) {
     if (docRenderer) {
       IntPoint vPoint = windowToContents(e.pos());
 
-      HitTestResult hitTestResult(vPoint, true, false);
-      doc->renderer()->layer()->hitTest(hitTestResult);
+      HitTestRequest hitTestRequest(true, false);
+      HitTestResult hitTestResult(vPoint);
+      doc->renderer()->layer()->hitTest(hitTestRequest, hitTestResult);
       Node* node = hitTestResult.innerNode();
       Frame* subframe = subframeForTargetNode(node);
       if (subframe && passWheelEventToSubframe(e, subframe)) {

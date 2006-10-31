@@ -26,6 +26,7 @@
 
 namespace WebCore {
 
+class HitTestRequest;
 class HitTestResult;
 
 class EllipsisBox : public InlineBox {
@@ -56,7 +57,12 @@ class EllipsisBox : public InlineBox {
         m_markupBox(markupBox) {}
 
   virtual void paint(RenderObject::PaintInfo&, int _tx, int _ty);
-  virtual bool nodeAtPoint(HitTestResult&, int _x, int _y, int _tx, int _ty);
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
+                           int _x,
+                           int _y,
+                           int _tx,
+                           int _ty);
 
  private:
   AtomicString m_str;

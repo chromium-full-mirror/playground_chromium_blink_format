@@ -223,7 +223,8 @@ class RenderBlock : public RenderFlow {
                     int* heightRemaining = 0) const;
   int leftOffset(int y) const { return leftRelOffset(y, leftOffset(), true); }
 
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

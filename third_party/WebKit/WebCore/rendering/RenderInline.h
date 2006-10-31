@@ -62,7 +62,8 @@ class RenderInline : public RenderFlow {
 
   virtual void paint(PaintInfo&, int tx, int ty);
 
-  virtual bool nodeAtPoint(HitTestResult&,
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
                            int x,
                            int y,
                            int tx,

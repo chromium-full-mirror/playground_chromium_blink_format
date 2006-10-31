@@ -62,7 +62,8 @@ void EllipsisBox::paint(RenderObject::PaintInfo& i, int _tx, int _ty) {
   }
 }
 
-bool EllipsisBox::nodeAtPoint(HitTestResult& result,
+bool EllipsisBox::nodeAtPoint(const HitTestRequest& request,
+                              HitTestResult& result,
                               int x,
                               int y,
                               int tx,
@@ -74,7 +75,7 @@ bool EllipsisBox::nodeAtPoint(HitTestResult& result,
   if (m_markupBox) {
     int mtx = tx + m_width - m_markupBox->xPos();
     int mty = ty + m_baseline - (m_markupBox->yPos() + m_markupBox->baseline());
-    if (m_markupBox->nodeAtPoint(result, x, y, mtx, mty)) {
+    if (m_markupBox->nodeAtPoint(request, result, x, y, mtx, mty)) {
       object()->setInnerNode(result);
       return true;
     }

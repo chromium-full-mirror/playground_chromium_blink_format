@@ -2812,7 +2812,8 @@ bool RenderBlock::isPointInScrollbar(HitTestResult& result,
   return false;
 }
 
-bool RenderBlock::nodeAtPoint(HitTestResult& result,
+bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
+                              HitTestResult& result,
                               int _x,
                               int _y,
                               int _tx,
@@ -2854,7 +2855,8 @@ bool RenderBlock::nodeAtPoint(HitTestResult& result,
     m_layer->subtractScrollOffset(scrolledX, scrolledY);
   if (childrenInline() && !isTable()) {
     // We have to hit-test our line boxes.
-    if (hitTestLines(result, _x, _y, scrolledX, scrolledY, hitTestAction)) {
+    if (hitTestLines(request, result, _x, _y, scrolledX, scrolledY,
+                     hitTestAction)) {
       setInnerNode(result);
       return true;
     }
@@ -2871,7 +2873,7 @@ bool RenderBlock::nodeAtPoint(HitTestResult& result,
       // table-specific hit-test method (which we should do for performance
       // reasons anyway), then we can remove this check.
       if (!child->layer() && !child->isFloating() && !child->isInlineFlow() &&
-          child->nodeAtPoint(result, _x, _y, scrolledX, scrolledY,
+          child->nodeAtPoint(request, result, _x, _y, scrolledX, scrolledY,
                              childHitTest)) {
         setInnerNode(result);
         return true;
@@ -2890,7 +2892,7 @@ bool RenderBlock::nodeAtPoint(HitTestResult& result,
     for (it.toLast(); (o = it.current()); --it)
       if (!o->noPaint && !o->node->layer() &&
           o->node->hitTest(
-              result, _x, _y,
+              request, result, _x, _y,
               scrolledX + o->left + o->node->marginLeft() - o->node->xPos(),
               scrolledY + o->startY + o->node->marginTop() - o->node->yPos())) {
         setInnerNode(result);

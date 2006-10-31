@@ -32,6 +32,7 @@
 #include "GraphicsContext.h"
 #include "HTMLFrameSetElement.h"
 #include "HTMLNames.h"
+#include "HitTestRequest.h"
 #include "HitTestResult.h"
 #include "MouseEvent.h"
 #include "RenderFrame.h"
@@ -74,7 +75,8 @@ RenderFrameSet::~RenderFrameSet() {
     delete[] m_vSplitVar;
 }
 
-bool RenderFrameSet::nodeAtPoint(HitTestResult& result,
+bool RenderFrameSet::nodeAtPoint(const HitTestRequest& request,
+                                 HitTestResult& result,
                                  int _x,
                                  int _y,
                                  int _tx,
@@ -83,10 +85,10 @@ bool RenderFrameSet::nodeAtPoint(HitTestResult& result,
   if (hitTestAction != HitTestForeground)
     return false;
 
-  bool inside =
-      RenderContainer::nodeAtPoint(result, _x, _y, _tx, _ty, hitTestAction) ||
-      m_resizing || canResize(_x, _y);
-  if (inside && element() && !element()->noResize() && !result.readonly() &&
+  bool inside = RenderContainer::nodeAtPoint(request, result, _x, _y, _tx, _ty,
+                                             hitTestAction) ||
+                m_resizing || canResize(_x, _y);
+  if (inside && element() && !element()->noResize() && !request.readonly &&
       !result.innerNode()) {
     result.setInnerNode(element());
     result.setInnerNonSharedNode(element());
