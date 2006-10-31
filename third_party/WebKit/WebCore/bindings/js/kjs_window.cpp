@@ -23,7 +23,6 @@
 #include "config.h"
 #include "kjs_window.h"
 
-#include "BrowserExtension.h"
 #include "CString.h"
 #include "DOMWindow.h"
 #include "Element.h"
@@ -32,6 +31,7 @@
 #include "FloatRect.h"
 #include "Frame.h"
 #include "FrameLoadRequest.h"
+#include "FrameLoader.h"
 #include "FrameTree.h"
 #include "HTMLDocument.h"
 #include "JSCSSRule.h"
@@ -555,17 +555,16 @@ static float floatFeature(const HashMap<String, String>& features,
 static Frame* createNewWindow(ExecState* exec,
                               Window* openerWindow,
                               const DeprecatedString& URL,
-                              const DeprecatedString& frameName,
+                              const String& frameName,
                               const WindowFeatures& windowFeatures,
                               JSValue* dialogArgs) {
-  Frame* openerPart = openerWindow->frame();
-  Frame* activePart = Window::retrieveActive(exec)->frame();
+  Frame* openerFrame = openerWindow->frame();
+  Frame* activeFrame = Window::retrieveActive(exec)->frame();
 
-  FrameLoadRequest frameRequest;
-  frameRequest.m_request = ResourceRequest(KURL(""));
-  frameRequest.m_frameName = frameName;
-  if (activePart)
-    frameRequest.m_request.setHTTPReferrer(activePart->referrer());
+  ResourceRequest request = ResourceRequest(KURL(""));
+  if (activeFrame)
+    request.setHTTPReferrer(activeFrame->referrer());
+  FrameLoadRequest frameRequest(request, frameName);
 
   // FIXME: It's much better for client API if a new window starts with a URL,
   // here where we
@@ -579,21 +578,19 @@ static Frame* createNewWindow(ExecState* exec,
   // before creating it.
   // We'd have to resolve all those issues to pass the URL instead of "".
 
-  Frame* newFrame = 0;
-  openerPart->browserExtension()->createNewWindow(frameRequest, windowFeatures,
-                                                  newFrame);
-
+  Frame* newFrame =
+      openerFrame->loader()->createWindow(frameRequest, windowFeatures);
   if (!newFrame)
     return 0;
 
   Window* newWindow = Window::retrieveWindow(newFrame);
 
-  newFrame->setOpener(openerPart);
+  newFrame->setOpener(openerFrame);
   newFrame->setOpenedByJS(true);
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
 
-  Document* activeDoc = activePart ? activePart->document() : 0;
+  Document* activeDoc = activeFrame ? activeFrame->document() : 0;
   if (!URL.isEmpty() && activeDoc) {
     DeprecatedString completedURL = activeDoc->completeURL(URL);
     if (!completedURL.startsWith("javascript:", false) ||
@@ -601,7 +598,7 @@ static Frame* createNewWindow(ExecState* exec,
       bool userGesture =
           static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
               ->wasRunByUserGesture();
-      newFrame->changeLocation(completedURL, activePart->referrer(), false,
+      newFrame->changeLocation(completedURL, activeFrame->referrer(), false,
                                userGesture);
     }
   }
@@ -1645,14 +1642,12 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
 
       // prepare arguments
       KURL url;
-      Frame* activePart = Window::retrieveActive(exec)->m_frame;
-      if (!str.isEmpty() && activePart)
-        url = activePart->document()->completeURL(str.deprecatedString());
+      Frame* activeFrame = Window::retrieveActive(exec)->m_frame;
+      if (!str.isEmpty() && activeFrame)
+        url = activeFrame->document()->completeURL(str.deprecatedString());
 
-      FrameLoadRequest frameRequest;
-      frameRequest.m_request.setURL(url);
-      frameRequest.m_frameName = frameName.deprecatedString();
-      if (frameRequest.m_frameName == "_top") {
+      FrameLoadRequest frameRequest(ResourceRequest(url), frameName);
+      if (frameRequest.frameName() == "_top") {
         while (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1662,13 +1657,13 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          frame->scheduleLocationChange(url.url(), activePart->referrer(),
+          frame->scheduleLocationChange(url.url(), activeFrame->referrer(),
                                         false /*don't lock history*/,
                                         userGesture);
         }
         return Window::retrieve(frame);
       }
-      if (frameRequest.m_frameName == "_parent") {
+      if (frameRequest.frameName() == "_parent") {
         if (frame->tree()->parent())
           frame = frame->tree()->parent();
 
@@ -1678,7 +1673,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          frame->scheduleLocationChange(url.url(), activePart->referrer(),
+          frame->scheduleLocationChange(url.url(), activeFrame->referrer(),
                                         false /*don't lock history*/,
                                         userGesture);
         }
@@ -1686,10 +1681,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       }
 
       // request window (new or existing if framename is set)
-      Frame* newFrame = 0;
-      frameRequest.m_request.setHTTPReferrer(activePart->referrer());
-      frame->browserExtension()->createNewWindow(frameRequest, windowFeatures,
-                                                 newFrame);
+      frameRequest.resourceRequest().setHTTPReferrer(activeFrame->referrer());
+      Frame* newFrame =
+          frame->loader()->createWindow(frameRequest, windowFeatures);
       if (!newFrame)
         return jsUndefined();
       newFrame->setOpener(frame);
@@ -1715,7 +1709,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          newFrame->scheduleLocationChange(url.url(), activePart->referrer(),
+          newFrame->scheduleLocationChange(url.url(), activeFrame->referrer(),
                                            false, userGesture);
         }
       }

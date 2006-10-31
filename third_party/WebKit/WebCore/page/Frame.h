@@ -53,7 +53,6 @@ class RootObject;
 
 namespace WebCore {
 
-class BrowserExtension;
 class CommandByName;
 class CSSComputedStyleDeclaration;
 class CSSMutableStyleDeclaration;
@@ -158,16 +157,7 @@ class Frame : public Shared<Frame> {
   Page* page() const;
   void pageDestroyed();
 
-  /**
-   * Returns a pointer to the @ref BrowserExtension.
-   */
-  BrowserExtension* browserExtension() const;
-
-  /**
-   * Returns a pointer to the HTML document's view.
-   */
   FrameView* view() const;
-
   virtual void setView(FrameView*);
 
   /**

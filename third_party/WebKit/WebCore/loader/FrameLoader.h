@@ -78,14 +78,15 @@ class FormState;
 class Frame;
 class FrameLoadRequest;
 class FrameLoaderClient;
-class PageState;
 class KURL;
 class MainResourceLoader;
+class PageState;
+class ResourceLoader;
 class ResourceRequest;
 class ResourceResponse;
 class String;
 class SubresourceLoader;
-class ResourceLoader;
+class WindowFeatures;
 
 typedef HashSet<RefPtr<ResourceLoader>> ResourceLoaderSet;
 
@@ -182,6 +183,8 @@ class FrameLoader : Noncopyable {
 #if PLATFORM(MAC)
   bool canLoad(NSURL*, const String& referrer, bool& hideReferrer);
 #endif
+
+  Frame* createWindow(const FrameLoadRequest&, const WindowFeatures&);
 
   void loadResourceSynchronously(const ResourceRequest& request,
                                  Vector<char>& data,

@@ -27,7 +27,6 @@
 #ifndef FramePrivate_h
 #define FramePrivate_h
 
-#include "BrowserExtension.h"
 #include "CSSMutableStyleDeclaration.h"
 #include "CachePolicy.h"
 #include "CommandByName.h"
@@ -70,7 +69,6 @@ class FramePrivate {
       : m_page(page),
         m_treeNode(thisFrame, parent),
         m_ownerElement(ownerElement),
-        m_extension(0),
         m_jscript(0),
         m_runningScripts(0),
         m_bJScriptEnabled(true),
@@ -123,7 +121,6 @@ class FramePrivate {
         m_prohibitsScrolling(false) {}
 
   ~FramePrivate() {
-    delete m_extension;
     delete m_jscript;
     delete m_loader;
     delete m_iconLoader;
@@ -137,7 +134,6 @@ class FramePrivate {
 
   Element* m_ownerElement;
   RefPtr<FrameView> m_view;
-  BrowserExtension* m_extension;
   RefPtr<Document> m_doc;
   RefPtr<TextResourceDecoder> m_decoder;
   String m_encoding;
