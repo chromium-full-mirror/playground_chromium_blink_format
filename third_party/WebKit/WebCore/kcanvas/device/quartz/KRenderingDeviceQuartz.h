@@ -64,11 +64,11 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   // context management.
   KRenderingDeviceContextQuartz* quartzContext() const;
   CGContextRef currentCGContext() const;
-  virtual KRenderingDeviceContext* contextForImage(SVGResourceImage*) const;
+  virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
   // Resource creation
-  virtual PassRefPtr<SVGResource> createResource(const SVGResourceType&) const;
-  virtual PassRefPtr<KRenderingPaintServer> createPaintServer(
+  virtual KCanvasResource* createResource(const KCResourceType&) const;
+  virtual KRenderingPaintServer* createPaintServer(
       const KCPaintServerType&) const;
   virtual KCanvasFilterEffect* createFilterEffect(
       const KCFilterEffectType&) const;

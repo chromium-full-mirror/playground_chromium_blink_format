@@ -42,7 +42,7 @@ class SVGFilterElement : public SVGStyledElement,
   SVGFilterElement(const QualifiedName&, Document*);
   virtual ~SVGFilterElement();
 
-  virtual SVGResource* canvasResource();
+  virtual KCanvasFilter* canvasResource();
 
   // 'SVGFilterElement' functions
   void setFilterRes(unsigned long filterResX, unsigned long filterResY) const;
@@ -100,7 +100,7 @@ class SVGFilterElement : public SVGStyledElement,
                                  FilterResY,
                                  filterResY)
 
-  RefPtr<KCanvasFilter> m_filter;
+  KCanvasFilter* m_filter;
 };
 
 }  // namespace WebCore

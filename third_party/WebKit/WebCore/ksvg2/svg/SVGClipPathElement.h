@@ -24,7 +24,7 @@
 #define KSVG_SVGClipPathElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "SVGResourceClipper.h"
+#include "KCanvasClipper.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -41,7 +41,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
-  virtual SVGResource* canvasResource();
+  virtual KCanvasClipper* canvasResource();
 
   // 'SVGClipPathElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
@@ -61,7 +61,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                                  ClipPathUnits,
                                  clipPathUnits)
 
-  RefPtr<SVGResourceClipper> m_clipper;
+  KCanvasClipper* m_clipper;
 };
 
 }  // namespace WebCore

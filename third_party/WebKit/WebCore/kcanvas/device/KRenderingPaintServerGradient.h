@@ -24,9 +24,6 @@
 #define KRenderingPaintServerGradient_H
 #ifdef SVG_SUPPORT
 
-#include "AffineTransform.h"
-#include "Color.h"
-#include "FloatPoint.h"
 #include "KRenderingPaintServer.h"
 
 namespace WebCore {
@@ -69,8 +66,8 @@ class KRenderingPaintServerGradient : public KRenderingPaintServer {
   AffineTransform gradientTransform() const;
   void setGradientTransform(const AffineTransform&);
 
-  SVGResourceListener* listener() const;
-  void setListener(SVGResourceListener*);
+  KCanvasResourceListener* listener() const;
+  void setListener(KCanvasResourceListener*);
 
   TextStream& externalRepresentation(TextStream&) const;
 
@@ -79,7 +76,7 @@ class KRenderingPaintServerGradient : public KRenderingPaintServer {
   KCGradientSpreadMethod m_spreadMethod;
   bool m_boundingBoxMode;
   AffineTransform m_gradientTransform;
-  SVGResourceListener* m_listener;
+  KCanvasResourceListener* m_listener;
 };
 
 class KRenderingPaintServerLinearGradient

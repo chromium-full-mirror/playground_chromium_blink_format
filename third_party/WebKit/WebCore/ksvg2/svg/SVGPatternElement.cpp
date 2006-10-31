@@ -26,7 +26,7 @@
 
 #include "Document.h"
 #include "GraphicsContext.h"
-#include "SVGResourceImage.h"
+#include "KCanvasImage.h"
 #include "KRenderingDevice.h"
 #include "KRenderingPaintServerPattern.h"
 #include "RenderSVGContainer.h"
@@ -51,7 +51,7 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
-      SVGResourceListener(),
+      KCanvasResourceListener(),
       m_x(new SVGLength(this, LM_WIDTH, viewportElement())),
       m_y(new SVGLength(this, LM_HEIGHT, viewportElement())),
       m_width(new SVGLength(this, LM_WIDTH, viewportElement())),
@@ -59,10 +59,14 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
       m_patternUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
       m_patternContentUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
       m_patternTransform(new SVGTransformList) {
+  m_tile = 0;
+  m_paintServer = 0;
   m_ignoreAttributeChanges = false;
 }
 
-SVGPatternElement::~SVGPatternElement() {}
+SVGPatternElement::~SVGPatternElement() {
+  delete m_paintServer;
+}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGPatternElement,
                               int,
@@ -184,14 +188,13 @@ void SVGPatternElement::fillAttributesFromReferencePattern(
     const SVGPatternElement* target,
     AffineTransform& patternTransformMatrix) {
   DeprecatedString ref = href().deprecatedString();
-  RefPtr<KRenderingPaintServer> refServer =
-      getPaintServerById(document(), ref.mid(1));
+  KRenderingPaintServer* refServer = getPaintServerById(document(), ref.mid(1));
 
   if (!refServer || refServer->type() != PS_PATTERN)
     return;
 
-  RefPtr<KRenderingPaintServerPattern> refPattern =
-      WTF::static_pointer_cast<KRenderingPaintServerPattern>(refServer);
+  KRenderingPaintServerPattern* refPattern =
+      static_cast<KRenderingPaintServerPattern*>(refServer);
 
   if (!hasAttribute(SVGNames::patternUnitsAttr)) {
     const AtomicString& value =
@@ -241,17 +244,17 @@ void SVGPatternElement::drawPatternContentIntoTile(
           activeElement);
   }
 
-  m_tile = new SVGResourceImage();
+  delete m_tile;
+  m_tile = static_cast<KCanvasImage*>(device->createResource(RS_IMAGE));
   m_tile->init(newSize);
 
-  KRenderingDeviceContext* patternContext =
-      device->contextForImage(m_tile.get());
+  KRenderingDeviceContext* patternContext = device->contextForImage(m_tile);
   device->pushContext(patternContext);
   FloatRect rect(x()->value(), y()->value(), width()->value(),
                  height()->value());
   m_paintServer->setBbox(rect);
   m_paintServer->setPatternTransform(patternTransformMatrix);
-  m_paintServer->setTile(m_tile.get());
+  m_paintServer->setTile(m_tile);
 
   OwnPtr<GraphicsContext> context(patternContext->createGraphicsContext());
 
@@ -392,13 +395,14 @@ RenderObject* SVGPatternElement::createRenderer(RenderArena* arena,
   return patternContainer;
 }
 
-SVGResource* SVGPatternElement::canvasResource() {
+KRenderingPaintServerPattern* SVGPatternElement::canvasResource() {
   if (!m_paintServer) {
-    m_paintServer = WTF::static_pointer_cast<KRenderingPaintServerPattern>(
-        renderingDevice()->createPaintServer(KCPaintServerType(PS_PATTERN)));
+    KRenderingPaintServer* pserver =
+        renderingDevice()->createPaintServer(KCPaintServerType(PS_PATTERN));
+    m_paintServer = static_cast<KRenderingPaintServerPattern*>(pserver);
     m_paintServer->setListener(const_cast<SVGPatternElement*>(this));
   }
-  return m_paintServer.get();
+  return m_paintServer;
 }
 
 SVGMatrix* SVGPatternElement::getCTM() const {

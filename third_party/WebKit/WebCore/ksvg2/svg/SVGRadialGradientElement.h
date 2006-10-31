@@ -37,7 +37,7 @@ class SVGRadialGradientElement : public SVGGradientElement {
   virtual void parseMappedAttribute(MappedAttribute*);
 
  protected:
-  virtual void buildGradient(PassRefPtr<KRenderingPaintServerGradient>) const;
+  virtual void buildGradient(KRenderingPaintServerGradient*) const;
   virtual KCPaintServerType gradientType() const { return PS_RADIAL_GRADIENT; }
 
  protected:

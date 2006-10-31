@@ -29,9 +29,9 @@
 
 #include "GraphicsContext.h"
 #include "RenderSVGContainer.h"
-#include "SVGResourceClipper.h"
-#include "SVGResourceMasker.h"
-#include "SVGResourceMarker.h"
+#include "KCanvasClipper.h"
+#include "KCanvasMasker.h"
+#include "KCanvasMarker.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "SVGStyledElement.h"
@@ -183,11 +183,11 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     context = device->currentContext();
   }
 
-  if (SVGResourceClipper* clipper = getClipperById(
+  if (KCanvasClipper* clipper = getClipperById(
           document(), style()->svgStyle()->clipPath().substring(1)))
     clipper->applyClip(relativeBBox(true));
 
-  if (SVGResourceMasker* masker = getMaskerById(
+  if (KCanvasMasker* masker = getMaskerById(
           document(), style()->svgStyle()->maskElement().substring(1)))
     masker->applyMask(relativeBBox(true));
 
@@ -310,23 +310,23 @@ struct MarkerData {
   FloatPoint inslopePoints[2];
   FloatPoint outslopePoints[2];
   MarkerType type;
-  SVGResourceMarker* marker;
+  KCanvasMarker* marker;
 };
 
 struct DrawMarkersData {
   DrawMarkersData(GraphicsContext*,
-                  SVGResourceMarker* startMarker,
-                  SVGResourceMarker* midMarker,
+                  KCanvasMarker* startMarker,
+                  KCanvasMarker* midMarker,
                   double strokeWidth);
   GraphicsContext* context;
   int elementIndex;
   MarkerData previousMarkerData;
-  SVGResourceMarker* midMarker;
+  KCanvasMarker* midMarker;
 };
 
 DrawMarkersData::DrawMarkersData(GraphicsContext* c,
-                                 SVGResourceMarker* start,
-                                 SVGResourceMarker* mid,
+                                 KCanvasMarker* start,
+                                 KCanvasMarker* mid,
                                  double strokeWidth)
     : context(c), elementIndex(0), midMarker(mid) {
   previousMarkerData.origin = FloatPoint();
@@ -430,11 +430,11 @@ void RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
   Document* doc = document();
   const SVGRenderStyle* svgStyle = style()->svgStyle();
 
-  SVGResourceMarker* startMarker =
+  KCanvasMarker* startMarker =
       getMarkerById(doc, svgStyle->startMarker().substring(1));
-  SVGResourceMarker* midMarker =
+  KCanvasMarker* midMarker =
       getMarkerById(doc, svgStyle->midMarker().substring(1));
-  SVGResourceMarker* endMarker =
+  KCanvasMarker* endMarker =
       getMarkerById(doc, svgStyle->endMarker().substring(1));
 
   if (!startMarker && !midMarker && !endMarker)

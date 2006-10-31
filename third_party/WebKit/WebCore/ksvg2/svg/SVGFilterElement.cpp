@@ -60,9 +60,13 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
   // "120%" were specified.
   m_width->setValueAsString("120%");
   m_height->setValueAsString("120%");
+
+  m_filter = 0;
 }
 
-SVGFilterElement::~SVGFilterElement() {}
+SVGFilterElement::~SVGFilterElement() {
+  delete m_filter;
+}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               int,
@@ -163,12 +167,12 @@ void SVGFilterElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
-SVGResource* SVGFilterElement::canvasResource() {
+KCanvasFilter* SVGFilterElement::canvasResource() {
   if (!attached())
     return 0;
 
   if (!m_filter)
-    m_filter = WTF::static_pointer_cast<KCanvasFilter>(
+    m_filter = static_cast<KCanvasFilter*>(
         renderingDevice()->createResource(RS_FILTER));
 
   bool filterBBoxMode =
@@ -198,7 +202,7 @@ SVGResource* SVGFilterElement::canvasResource() {
         m_filter->addFilterEffect(fe->filterEffect());
     }
   }
-  return m_filter.get();
+  return m_filter;
 }
 }
 

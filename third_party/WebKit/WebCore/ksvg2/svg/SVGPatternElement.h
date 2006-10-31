@@ -32,7 +32,7 @@
 #include "SVGTests.h"
 #include "SVGURIReference.h"
 
-class SVGResourceImage;
+class KCanvasImage;
 
 namespace WebCore {
 class SVGLength;
@@ -44,7 +44,7 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                           public SVGLangSpace,
                           public SVGExternalResourcesRequired,
                           public SVGFitToViewBox,
-                          public SVGResourceListener {
+                          public KCanvasResourceListener {
  public:
   SVGPatternElement(const QualifiedName&, Document*);
   virtual ~SVGPatternElement();
@@ -63,7 +63,7 @@ class SVGPatternElement : public SVGStyledLocatableElement,
     return StyledElement::rendererIsNeeded(style);
   }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource();
+  virtual KRenderingPaintServerPattern* canvasResource();
 
   // 'virtual SVGLocatable' functions
   virtual SVGMatrix* getCTM() const;
@@ -119,9 +119,9 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                                  PatternTransform,
                                  patternTransform)
 
-  mutable RefPtr<SVGResourceImage> m_tile;
+  mutable KCanvasImage* m_tile;
   mutable bool m_ignoreAttributeChanges;
-  mutable RefPtr<KRenderingPaintServerPattern> m_paintServer;
+  mutable KRenderingPaintServerPattern* m_paintServer;
 
   virtual const SVGElement* contextElement() const { return this; }
 
