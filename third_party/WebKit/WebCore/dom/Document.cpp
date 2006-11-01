@@ -2680,7 +2680,9 @@ static IntRect placeholderRectForMarker(void) {
   return IntRect(-1, -1, -1, -1);
 }
 
-void Document::addMarker(Range* range, DocumentMarker::MarkerType type) {
+void Document::addMarker(Range* range,
+                         DocumentMarker::MarkerType type,
+                         String description) {
   // Use a TextIterator to visit the potentially multiple nodes the range
   // covers.
   for (TextIterator markedText(range); !markedText.atEnd();
@@ -2688,7 +2690,7 @@ void Document::addMarker(Range* range, DocumentMarker::MarkerType type) {
     RefPtr<Range> textPiece = markedText.range();
     int exception = 0;
     DocumentMarker marker = {type, textPiece->startOffset(exception),
-                             textPiece->endOffset(exception)};
+                             textPiece->endOffset(exception), description};
     addMarker(textPiece->startContainer(exception), marker);
   }
 }
@@ -2889,6 +2891,40 @@ void Document::removeMarkers(Node* node,
   // repaint the affected node
   if (docDirty && node->renderer())
     node->renderer()->repaint();
+}
+
+DocumentMarker* Document::markerContainingPoint(
+    const IntPoint& point,
+    DocumentMarker::MarkerType markerType) {
+  // outer loop: process each node that contains any markers
+  MarkerMap::iterator end = m_markers.end();
+  for (MarkerMap::iterator nodeIterator = m_markers.begin();
+       nodeIterator != end; ++nodeIterator) {
+    // inner loop; process each marker in this node
+    MarkerMapVectorPair* vectorPair = nodeIterator->second;
+    Vector<DocumentMarker>& markers = vectorPair->first;
+    Vector<IntRect>& rects = vectorPair->second;
+    ASSERT(markers.size() == rects.size());
+    unsigned markerCount = markers.size();
+    for (unsigned markerIndex = 0; markerIndex < markerCount; ++markerIndex) {
+      DocumentMarker& marker = markers[markerIndex];
+
+      // skip marker that is wrong type
+      if (marker.type != markerType && markerType != DocumentMarker::AllMarkers)
+        continue;
+
+      IntRect& r = rects[markerIndex];
+
+      // skip placeholder rects
+      if (r == placeholderRectForMarker())
+        continue;
+
+      if (r.contains(point))
+        return &marker;
+    }
+  }
+
+  return 0;
 }
 
 Vector<DocumentMarker> Document::markersForNode(Node* node) {

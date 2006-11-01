@@ -610,7 +610,9 @@ class Document : public ContainerNode {
   bool queryCommandSupported(const String& command);
   String queryCommandValue(const String& command);
 
-  void addMarker(Range*, DocumentMarker::MarkerType);
+  void addMarker(Range*,
+                 DocumentMarker::MarkerType,
+                 String description = String());
   void addMarker(Node*, DocumentMarker);
   void copyMarkers(Node* srcNode,
                    unsigned startOffset,
@@ -634,6 +636,9 @@ class Document : public ContainerNode {
                     int delta,
                     DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
 
+  DocumentMarker* markerContainingPoint(
+      const IntPoint&,
+      DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
   Vector<DocumentMarker> markersForNode(Node*);
   Vector<IntRect> renderedRectsForMarkers(
       DocumentMarker::MarkerType = DocumentMarker::AllMarkers);
