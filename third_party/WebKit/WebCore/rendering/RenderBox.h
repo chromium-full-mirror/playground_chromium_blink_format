@@ -179,8 +179,8 @@ class RenderBox : public RenderObject {
   virtual int staticY() const { return m_staticY; }
 
  protected:
-  virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
-  void paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty);
+  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
 
   void paintBackgrounds(GraphicsContext*,
                         const Color&,

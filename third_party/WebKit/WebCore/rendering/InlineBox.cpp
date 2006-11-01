@@ -113,9 +113,10 @@ void InlineBox::adjustPosition(int dx, int dy) {
     m_object->setPos(m_object->xPos() + dx, m_object->yPos() + dy);
 }
 
-void InlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
-  if (!object()->shouldPaintWithinRoot(i) ||
-      (i.phase != PaintPhaseForeground && i.phase != PaintPhaseSelection))
+void InlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
+  if (!object()->shouldPaintWithinRoot(paintInfo) ||
+      (paintInfo.phase != PaintPhaseForeground &&
+       paintInfo.phase != PaintPhaseSelection))
     return;
 
   // Paint all phases of replaced elements atomically, as though the replaced
@@ -123,9 +124,9 @@ void InlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   // own stacking context.  (See Appendix E.2, section 6.4 on inline block/table
   // elements in the CSS2.1
   // specification.)
-  bool paintSelectionOnly = i.phase == PaintPhaseSelection;
-  RenderObject::PaintInfo info(i);
-  info.phase = paintSelectionOnly ? i.phase : PaintPhaseBlockBackground;
+  bool paintSelectionOnly = paintInfo.phase == PaintPhaseSelection;
+  RenderObject::PaintInfo info(paintInfo);
+  info.phase = paintSelectionOnly ? paintInfo.phase : PaintPhaseBlockBackground;
   object()->paint(info, tx, ty);
   if (!paintSelectionOnly) {
     info.phase = PaintPhaseChildBlockBackgrounds;

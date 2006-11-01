@@ -75,38 +75,38 @@ class InlineFlowBox : public InlineRunBox {
 
   virtual void clearTruncation();
 
-  virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
-                                        int _tx,
-                                        int _ty);
-  void paintBackgrounds(GraphicsContext* p,
-                        const Color& c,
-                        const BackgroundLayer* bgLayer,
+  virtual void paintBackgroundAndBorder(RenderObject::PaintInfo&,
+                                        int tx,
+                                        int ty);
+  void paintBackgrounds(GraphicsContext*,
+                        const Color&,
+                        const BackgroundLayer*,
                         int my,
                         int mh,
-                        int _tx,
-                        int _ty,
+                        int tx,
+                        int ty,
                         int w,
                         int h);
-  void paintBackground(GraphicsContext* p,
-                       const Color& c,
-                       const BackgroundLayer* bgLayer,
+  void paintBackground(GraphicsContext*,
+                       const Color&,
+                       const BackgroundLayer*,
                        int my,
                        int mh,
-                       int _tx,
-                       int _ty,
+                       int tx,
+                       int ty,
                        int w,
                        int h);
-  virtual void paintDecorations(RenderObject::PaintInfo& i,
-                                int _tx,
-                                int _ty,
+  virtual void paintDecorations(RenderObject::PaintInfo&,
+                                int tx,
+                                int ty,
                                 bool paintedChildren = false);
-  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
-                           int,
-                           int,
-                           int,
-                           int);
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
   int marginBorderPaddingLeft();
   int marginBorderPaddingRight();

@@ -1845,7 +1845,7 @@ void RenderObject::paintOutline(GraphicsContext* p,
              Color(oc), style->color(), os, ow, ow);
 }
 
-void RenderObject::paint(PaintInfo& i, int tx, int ty) {}
+void RenderObject::paint(PaintInfo& /*paintInfo*/, int /*tx*/, int /*ty*/) {}
 
 void RenderObject::repaint(bool immediate) {
   // Can't use view(), since we might be unrooted.

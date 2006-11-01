@@ -107,14 +107,6 @@ void RenderFlow::addChildWithContinuation(RenderObject* newChild,
 }
 
 void RenderFlow::addChild(RenderObject* newChild, RenderObject* beforeChild) {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderFlow)::addChild( "
-                << newChild->renderName() << ", "
-                << (beforeChild ? beforeChild->renderName() : "0") << " )"
-                << endl;
-  kdDebug(6040) << "current height = " << m_height << endl;
-#endif
-
   if (continuation())
     return addChildWithContinuation(newChild, beforeChild);
   return addChildToFlow(newChild, beforeChild);
@@ -346,11 +338,13 @@ InlineBox* RenderFlow::createInlineBox(bool makePlaceHolderBox,
   return flowBox;
 }
 
-void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
+void RenderFlow::paintLines(PaintInfo& paintInfo, int tx, int ty) {
   // Only paint during the foreground/selection phases.
-  if (i.phase != PaintPhaseForeground && i.phase != PaintPhaseSelection &&
-      i.phase != PaintPhaseOutline && i.phase != PaintPhaseSelfOutline &&
-      i.phase != PaintPhaseChildOutlines)
+  if (paintInfo.phase != PaintPhaseForeground &&
+      paintInfo.phase != PaintPhaseSelection &&
+      paintInfo.phase != PaintPhaseOutline &&
+      paintInfo.phase != PaintPhaseSelfOutline &&
+      paintInfo.phase != PaintPhaseChildOutlines)
     return;
 
   bool inlineFlow = isInlineFlow();
@@ -368,15 +362,15 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
   // FIXME: This check is flawed in the following extremely obscure way:
   // if some line in the middle has a huge overflow, it might actually extend
   // below the last line.
-  int yPos =
-      firstLineBox()->root()->topOverflow() - maximalOutlineSize(i.phase);
-  int h = maximalOutlineSize(i.phase) +
+  int yPos = firstLineBox()->root()->topOverflow() -
+             maximalOutlineSize(paintInfo.phase);
+  int h = maximalOutlineSize(paintInfo.phase) +
           lastLineBox()->root()->bottomOverflow() - yPos;
-  yPos += _ty;
-  if (yPos >= i.r.bottom() || yPos + h <= i.r.y())
+  yPos += ty;
+  if (yPos >= paintInfo.rect.bottom() || yPos + h <= paintInfo.rect.y())
     return;
 
-  PaintInfo info(i);
+  PaintInfo info(paintInfo);
   RenderFlowSequencedSet outlineObjects;
   info.outlineObjects = &outlineObjects;
 
@@ -397,11 +391,11 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
       // of the entire page.
       if (curr->root()->bottomOverflow() - curr->root()->topOverflow() <=
           c->printRect().height()) {
-        if (_ty + curr->root()->bottomOverflow() > c->printRect().bottom()) {
-          if (_ty + curr->root()->topOverflow() < c->truncatedAt())
-            c->setBestTruncatedAt(_ty + curr->root()->topOverflow(), this);
+        if (ty + curr->root()->bottomOverflow() > c->printRect().bottom()) {
+          if (ty + curr->root()->topOverflow() < c->truncatedAt())
+            c->setBestTruncatedAt(ty + curr->root()->topOverflow(), this);
           // If we were able to truncate, don't paint.
-          if (_ty + curr->root()->topOverflow() >= c->truncatedAt())
+          if (ty + curr->root()->topOverflow() >= c->truncatedAt())
             break;
         }
       }
@@ -412,9 +406,9 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
     int bottom =
         curr->root()->bottomOverflow() + maximalOutlineSize(info.phase);
     h = bottom - top;
-    yPos = _ty + top;
-    if (yPos < info.r.bottom() && yPos + h > info.r.y())
-      curr->paint(info, _tx, _ty);
+    yPos = ty + top;
+    if (yPos < info.rect.bottom() && yPos + h > info.rect.y())
+      curr->paint(info, tx, ty);
   }
 
   if (info.phase == PaintPhaseOutline || info.phase == PaintPhaseSelfOutline ||
@@ -423,7 +417,7 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
     for (RenderFlowSequencedSet::iterator it = info.outlineObjects->begin();
          it != end; ++it) {
       RenderFlow* flow = *it;
-      flow->paintOutline(info.p, _tx, _ty);
+      flow->paintOutline(info.context, tx, ty);
     }
     info.outlineObjects->clear();
   }
@@ -481,9 +475,11 @@ IntRect RenderFlow::getAbsoluteRepaintRect() {
     // Find our leftmost position.
     int left = 0;
     int top = firstLineBox() ? firstLineBox()->yPos() : 0;
-    for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
+    for (InlineRunBox* curr = firstLineBox(); curr;
+         curr = curr->nextLineBox()) {
       if (curr == firstLineBox() || curr->xPos() < left)
         left = curr->xPos();
+    }
 
     // Now invalidate a rectangle.
     int ow = style() ? style()->outlineSize() : 0;
@@ -536,13 +532,14 @@ IntRect RenderFlow::getAbsoluteRepaintRect() {
     }
 
     return r;
-  } else
-    return RenderContainer::getAbsoluteRepaintRect();
+  }
+
+  return RenderContainer::getAbsoluteRepaintRect();
 }
 
 int RenderFlow::lowestPosition(bool includeOverflowInterior,
                                bool includeSelf) const {
-  assert(!isInlineFlow());
+  ASSERT(!isInlineFlow());
   int bottom = includeSelf && m_width > 0 ? m_height : 0;
   if (!includeOverflowInterior && hasOverflowClip())
     return bottom;
@@ -555,10 +552,8 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
   // have to get to
   // the abs div.
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
-      int lp = c->yPos() + c->lowestPosition(false);
-      bottom = max(bottom, lp);
-    }
+    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
+      bottom = max(bottom, c->yPos() + c->lowestPosition(false));
   }
 
   if (isRelPositioned())
@@ -569,7 +564,7 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
 
 int RenderFlow::rightmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
-  assert(!isInlineFlow());
+  ASSERT(!isInlineFlow());
   int right = includeSelf && m_height > 0 ? m_width : 0;
   if (!includeOverflowInterior && hasOverflowClip())
     return right;
@@ -582,10 +577,8 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
   // have to get to
   // the abs div.
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
-      int rp = c->xPos() + c->rightmostPosition(false);
-      right = max(right, rp);
-    }
+    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
+      right = max(right, c->xPos() + c->rightmostPosition(false));
   }
 
   if (isRelPositioned())
@@ -596,7 +589,7 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
 
 int RenderFlow::leftmostPosition(bool includeOverflowInterior,
                                  bool includeSelf) const {
-  assert(!isInlineFlow());
+  ASSERT(!isInlineFlow());
   int left = includeSelf && m_height > 0 ? 0 : m_width;
   if (!includeOverflowInterior && hasOverflowClip())
     return left;
@@ -609,10 +602,8 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
   // have to get to
   // the abs div.
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
-    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow()) {
-      int lp = c->xPos() + c->leftmostPosition(false);
-      left = min(left, lp);
-    }
+    if (!c->isFloatingOrPositioned() && !c->isText() && !c->isInlineFlow())
+      left = min(left, c->xPos() + c->leftmostPosition(false));
   }
 
   if (isRelPositioned())
@@ -704,27 +695,33 @@ IntRect RenderFlow::caretRect(int offset,
   return IntRect(x, y, caretWidth, height);
 }
 
-void RenderFlow::addFocusRingRects(GraphicsContext* p, int _tx, int _ty) {
+void RenderFlow::addFocusRingRects(GraphicsContext* graphicsContext,
+                                   int tx,
+                                   int ty) {
   if (isRenderBlock())
-    p->addFocusRingRect(IntRect(_tx, _ty, width(), height()));
+    graphicsContext->addFocusRingRect(IntRect(tx, ty, width(), height()));
 
   if (!hasOverflowClip()) {
     for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
-      p->addFocusRingRect(IntRect(_tx + curr->xPos(), _ty + curr->yPos(),
-                                  curr->width(), curr->height()));
+      graphicsContext->addFocusRingRect(IntRect(
+          tx + curr->xPos(), ty + curr->yPos(), curr->width(), curr->height()));
 
     for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
       if (!curr->isText() && !curr->isListMarker())
-        curr->addFocusRingRects(p, _tx + curr->xPos(), _ty + curr->yPos());
+        curr->addFocusRingRects(graphicsContext, tx + curr->xPos(),
+                                ty + curr->yPos());
   }
 
   if (continuation())
     continuation()->addFocusRingRects(
-        p, _tx - containingBlock()->xPos() + continuation()->xPos(),
-        _ty - containingBlock()->yPos() + continuation()->yPos());
+        graphicsContext,
+        tx - containingBlock()->xPos() + continuation()->xPos(),
+        ty - containingBlock()->yPos() + continuation()->yPos());
 }
 
-void RenderFlow::paintOutline(GraphicsContext* p, int _tx, int _ty) {
+void RenderFlow::paintOutline(GraphicsContext* graphicsContext,
+                              int tx,
+                              int ty) {
   if (!hasOutline())
     return;
 
@@ -734,13 +731,13 @@ void RenderFlow::paintOutline(GraphicsContext* p, int _tx, int _ty) {
     if (!oc.isValid())
       oc = style()->color();
 
-    p->initFocusRing(ow, style()->outlineOffset());
-    addFocusRingRects(p, _tx, _ty);
+    graphicsContext->initFocusRing(ow, style()->outlineOffset());
+    addFocusRingRects(graphicsContext, tx, ty);
     if (style()->outlineStyleIsAuto())
-      p->drawFocusRing(oc);
+      graphicsContext->drawFocusRing(oc);
     else
-      addPDFURLRect(p, p->focusRingBoundingRect());
-    p->clearFocusRing();
+      addPDFURLRect(graphicsContext, graphicsContext->focusRingBoundingRect());
+    graphicsContext->clearFocusRing();
   }
 
   if (style()->outlineStyleIsAuto() || style()->outlineStyle() <= BHIDDEN)
@@ -757,11 +754,11 @@ void RenderFlow::paintOutline(GraphicsContext* p, int _tx, int _ty) {
   rects.append(new IntRect);
 
   for (unsigned int i = 1; i < rects.count() - 1; i++)
-    paintOutlineForLine(p, _tx, _ty, *rects.at(i - 1), *rects.at(i),
+    paintOutlineForLine(graphicsContext, tx, ty, *rects.at(i - 1), *rects.at(i),
                         *rects.at(i + 1));
 }
 
-void RenderFlow::paintOutlineForLine(GraphicsContext* p,
+void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
                                      int tx,
                                      int ty,
                                      const IntRect& lastline,
@@ -781,7 +778,7 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
   int r = tx + thisline.right() + offset;
 
   // left edge
-  drawBorder(p, l - ow,
+  drawBorder(graphicsContext, l - ow,
              t - (lastline.isEmpty() || thisline.x() < lastline.x() ||
                           (lastline.right() - 1) <= thisline.x()
                       ? ow
@@ -801,50 +798,53 @@ void RenderFlow::paintOutlineForLine(GraphicsContext* p,
                   : -ow));
 
   // right edge
-  drawBorder(
-      p, r, t - (lastline.isEmpty() || lastline.right() < thisline.right() ||
-                         (thisline.right() - 1) <= lastline.x()
-                     ? ow
-                     : 0),
-      r + ow, b + (nextline.isEmpty() || nextline.right() <= thisline.right() ||
-                           (thisline.right() - 1) <= nextline.x()
-                       ? ow
-                       : 0),
-      BSRight, oc, style()->color(), os,
-      (lastline.isEmpty() || lastline.right() < thisline.right() ||
-               (thisline.right() - 1) <= lastline.x()
-           ? ow
-           : -ow),
-      (nextline.isEmpty() || nextline.right() <= thisline.right() ||
-               (thisline.right() - 1) <= nextline.x()
-           ? ow
-           : -ow));
+  drawBorder(graphicsContext, r,
+             t - (lastline.isEmpty() || lastline.right() < thisline.right() ||
+                          (thisline.right() - 1) <= lastline.x()
+                      ? ow
+                      : 0),
+             r + ow,
+             b + (nextline.isEmpty() || nextline.right() <= thisline.right() ||
+                          (thisline.right() - 1) <= nextline.x()
+                      ? ow
+                      : 0),
+             BSRight, oc, style()->color(), os,
+             (lastline.isEmpty() || lastline.right() < thisline.right() ||
+                      (thisline.right() - 1) <= lastline.x()
+                  ? ow
+                  : -ow),
+             (nextline.isEmpty() || nextline.right() <= thisline.right() ||
+                      (thisline.right() - 1) <= nextline.x()
+                  ? ow
+                  : -ow));
   // upper edge
   if (thisline.x() < lastline.x())
     drawBorder(
-        p, l - ow, t - ow,
+        graphicsContext, l - ow, t - ow,
         min(r + ow, (lastline.isEmpty() ? 1000000 : tx + lastline.x())), t,
         BSTop, oc, style()->color(), os, ow,
         (!lastline.isEmpty() && tx + lastline.x() + 1 < r + ow) ? -ow : ow);
 
   if (lastline.right() < thisline.right())
     drawBorder(
-        p, max(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
+        graphicsContext,
+        max(lastline.isEmpty() ? -1000000 : tx + lastline.right(), l - ow),
         t - ow, r + ow, t, BSTop, oc, style()->color(), os,
         (!lastline.isEmpty() && l - ow < tx + lastline.right()) ? -ow : ow, ow);
 
   // lower edge
   if (thisline.x() < nextline.x())
     drawBorder(
-        p, l - ow, b,
+        graphicsContext, l - ow, b,
         min(r + ow, !nextline.isEmpty() ? tx + nextline.x() + 1 : 1000000),
         b + ow, BSBottom, oc, style()->color(), os, ow,
         (!nextline.isEmpty() && tx + nextline.x() + 1 < r + ow) ? -ow : ow);
 
   if (nextline.right() < thisline.right())
     drawBorder(
-        p, max(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow),
-        b, r + ow, b + ow, BSBottom, oc, style()->color(), os,
+        graphicsContext,
+        max(!nextline.isEmpty() ? tx + nextline.right() : -1000000, l - ow), b,
+        r + ow, b + ow, BSBottom, oc, style()->color(), os,
         (!nextline.isEmpty() && l - ow < tx + nextline.right()) ? -ow : ow, ow);
 }
 

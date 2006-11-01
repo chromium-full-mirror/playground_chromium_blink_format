@@ -65,17 +65,17 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
                         RenderObject::PaintInfo& paintInfo,
                         int tx,
                         int ty) {
-  if (paintInfo.p->paintingDisabled())
+  if (paintInfo.context->paintingDisabled())
     return;
 
   KRenderingDevice* device = renderingDevice();
   KRenderingDeviceContext* context = device->currentContext();
   bool shouldPopContext = false;
   if (context)
-    paintInfo.p->save();
+    paintInfo.context->save();
   else {
     // Need to set up KCanvas rendering if it hasn't already been done.
-    context = paintInfo.p->createRenderingDeviceContext();
+    context = paintInfo.context->createRenderingDeviceContext();
     device->pushContext(context);
     shouldPopContext = true;
   }
@@ -101,9 +101,9 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
 
   RenderObject::PaintInfo pi = paintInfo;
   OwnPtr<GraphicsContext> c(device->currentContext()->createGraphicsContext());
-  pi.p = c.get();
+  pi.context = c.get();
   if (!flow->isRootInlineBox())
-    pi.r = (object->localTransform()).invert().mapRect(paintInfo.r);
+    pi.rect = (object->localTransform()).invert().mapRect(paintInfo.rect);
 
   float opacity = object->style()->opacity();
   if (opacity < 1.0f) {
@@ -140,7 +140,7 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
 
   // restore drawing state
   if (!shouldPopContext)
-    paintInfo.p->restore();
+    paintInfo.context->restore();
   else {
     device->popContext();
     delete context;

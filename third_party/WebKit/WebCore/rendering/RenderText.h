@@ -53,11 +53,11 @@ class RenderText : public RenderObject {
 
   virtual const char* renderName() const { return "RenderText"; }
 
-  virtual void setStyle(RenderStyle* style);
+  virtual void setStyle(RenderStyle*);
 
-  void extractTextBox(InlineTextBox* textBox);
-  void attachTextBox(InlineTextBox* textBox);
-  void removeTextBox(InlineTextBox* textBox);
+  void extractTextBox(InlineTextBox*);
+  void attachTextBox(InlineTextBox*);
+  void removeTextBox(InlineTextBox*);
   void deleteTextBoxes();
   virtual void destroy();
 
@@ -67,7 +67,7 @@ class RenderText : public RenderObject {
   virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootInlineBox = false);
 
-  virtual void paint(PaintInfo& i, int tx, int ty) { assert(false); }
+  virtual void paint(PaintInfo&, int tx, int ty) { assert(false); }
   virtual void layout() { assert(false); }
 
   virtual bool nodeAtPoint(const HitTestRequest&,
@@ -149,7 +149,7 @@ class RenderText : public RenderObject {
   virtual void setSelectionState(SelectionState s);
   virtual IntRect selectionRect();
   virtual IntRect caretRect(int offset,
-                            EAffinity affinity,
+                            EAffinity,
                             int* extraWidthToEndOfLine = 0);
   void posOfChar(int ch, int& x, int& y);
 
@@ -169,7 +169,7 @@ class RenderText : public RenderObject {
   InlineTextBox* firstTextBox() const { return m_firstTextBox; }
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }
 
-  virtual InlineBox* inlineBox(int offset, EAffinity affinity = UPSTREAM);
+  virtual InlineBox* inlineBox(int offset, EAffinity = UPSTREAM);
 
   int widthFromCache(const Font*,
                      int start,
@@ -189,10 +189,10 @@ class RenderText : public RenderObject {
 
   bool containsReversedText() const { return m_containsReversedText; }
 
- public:
   InlineTextBox* findNextInlineTextBox(int offset, int& pos) const;
 
- protected:  // members
+ protected:
+  // members
   RefPtr<StringImpl> str;
 
   InlineTextBox* m_firstTextBox;
@@ -230,6 +230,7 @@ class RenderText : public RenderObject {
 };
 
 UBreakIterator* characterBreakIterator(const StringImpl*);
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderText_h

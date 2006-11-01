@@ -66,7 +66,7 @@ class RenderSVGContainer : public RenderContainer {
 
   virtual void calcMinMaxWidth();
   virtual void layout();
-  virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
+  virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual IntRect getAbsoluteRepaintRect();
 

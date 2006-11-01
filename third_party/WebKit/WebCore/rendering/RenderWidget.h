@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef RenderWidget_H
-#define RenderWidget_H
+#ifndef RenderWidget_h
+#define RenderWidget_h
 
 #include "RenderReplaced.h"
 #include "WidgetClient.h"
@@ -34,11 +34,11 @@ class RenderWidget : public RenderReplaced, public WidgetClient {
   RenderWidget(Node*);
   virtual ~RenderWidget();
 
+  virtual bool isWidget() const { return true; }
+
   virtual void setStyle(RenderStyle*);
 
   virtual void paint(PaintInfo&, int tx, int ty);
-
-  virtual bool isWidget() const { return true; };
 
   virtual void destroy();
   virtual void layout();
@@ -78,6 +78,7 @@ class RenderWidget : public RenderReplaced, public WidgetClient {
  private:
   int m_refCount;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderWidget_h

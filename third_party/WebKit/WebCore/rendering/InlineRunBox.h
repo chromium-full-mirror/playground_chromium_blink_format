@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef InlineRunBox_H
-#define InlineRunBox_H
+#ifndef InlineRunBox_h
+#define InlineRunBox_h
 
 #include "InlineBox.h"
 
@@ -52,4 +52,4 @@ class InlineRunBox : public InlineBox {
 
 }  // namespace WebCore
 
-#endif  // InlineRunBox_H
+#endif  // InlineRunBox_h

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef InlineTextBox_H
-#define InlineTextBox_H
+#ifndef InlineTextBox_h
+#define InlineTextBox_h
 
 #include "DocumentMarker.h"
 #include "InlineRunBox.h"
@@ -73,13 +73,13 @@ class InlineTextBox : public InlineRunBox {
   bool isSelected(int startPos, int endPos) const;
   void selectionStartEnd(int& sPos, int& ePos);
 
-  virtual void paint(RenderObject::PaintInfo& i, int tx, int ty);
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
-                           int,
-                           int,
-                           int,
-                           int);
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
   RenderText* textObject() const;
 
@@ -194,4 +194,4 @@ inline RenderText* InlineTextBox::textObject() const {
 
 }  // namespace WebCore
 
-#endif  // InlineTextBox_H
+#endif  // InlineTextBox_h

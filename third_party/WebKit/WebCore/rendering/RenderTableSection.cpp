@@ -840,7 +840,7 @@ void RenderTableSection::recalcOuterBorder() {
   m_outerBorderRight = calcOuterBorderRight(rtl);
 }
 
-void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
+void RenderTableSection::paint(PaintInfo& paintInfo, int tx, int ty) {
   unsigned int totalRows = gridRows;
   unsigned int totalCols = table()->columns.size();
 
@@ -852,25 +852,27 @@ void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
 
   // check which rows and cols are visible and only paint these
   // ### fixme: could use a binary search here
-  PaintPhase paintPhase = i.phase;
-  int x = i.r.x();
-  int y = i.r.y();
-  int w = i.r.width();
-  int h = i.r.height();
+  PaintPhase paintPhase = paintInfo.phase;
+  int x = paintInfo.rect.x();
+  int y = paintInfo.rect.y();
+  int w = paintInfo.rect.width();
+  int h = paintInfo.rect.height();
 
   int os = 2 * maximalOutlineSize(paintPhase);
   unsigned int startrow = 0;
   unsigned int endrow = totalRows;
-  for (; startrow < totalRows; startrow++)
+  for (; startrow < totalRows; startrow++) {
     if (ty + rowPos[startrow + 1] >= y - os)
       break;
+  }
   if (startrow == totalRows &&
       ty + rowPos[totalRows] + table()->outerBorderBottom() >= y - os)
     startrow--;
 
-  for (; endrow > 0; endrow--)
+  for (; endrow > 0; endrow--) {
     if (ty + rowPos[endrow - 1] <= y + h + os)
       break;
+  }
   if (endrow == 0 && ty + rowPos[0] - table()->outerBorderTop() <= y + h + os)
     endrow++;
 
@@ -937,22 +939,22 @@ void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
           // Note that we deliberately ignore whether or not the cell has a
           // layer, since these backgrounds paint "behind" the
           // cell.
-          cell->paintBackgroundsBehindCell(i, tx, ty, colGroup);
-          cell->paintBackgroundsBehindCell(i, tx, ty, col);
+          cell->paintBackgroundsBehindCell(paintInfo, tx, ty, colGroup);
+          cell->paintBackgroundsBehindCell(paintInfo, tx, ty, col);
 
           // Paint the row group next.
-          cell->paintBackgroundsBehindCell(i, tx, ty, this);
+          cell->paintBackgroundsBehindCell(paintInfo, tx, ty, this);
 
           // Paint the row next, but only if it doesn't have a layer.  If a row
           // has a layer, it will be responsible for
           // painting the row background for the cell.
           if (!row->layer())
-            cell->paintBackgroundsBehindCell(i, tx, ty, row);
+            cell->paintBackgroundsBehindCell(paintInfo, tx, ty, row);
         }
 
         if ((!cell->layer() && !cell->parent()->layer()) ||
-            i.phase == PaintPhaseCollapsedTableBorders)
-          cell->paint(i, tx, ty);
+            paintInfo.phase == PaintPhaseCollapsedTableBorders)
+          cell->paint(paintInfo, tx, ty);
       }
     }
   }

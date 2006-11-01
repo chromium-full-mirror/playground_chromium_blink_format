@@ -185,12 +185,12 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
       paintInfo.phase != PaintPhaseSelfOutline)
     paintBoxDecorations(paintInfo, tx, ty);
 
-  GraphicsContext* p = paintInfo.p;
+  GraphicsContext* context = paintInfo.context;
 
   if ((paintInfo.phase == PaintPhaseOutline ||
        paintInfo.phase == PaintPhaseSelfOutline) &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(p, tx, ty, width(), height(), style());
+    paintOutline(context, tx, ty, width(), height(), style());
 
   if (paintInfo.phase != PaintPhaseForeground &&
       paintInfo.phase != PaintPhaseSelection)
@@ -223,10 +223,10 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
 
     if (cWidth > 2 && cHeight > 2) {
       if (!errorOccurred()) {
-        p->setPen(Color::lightGray);
-        p->setFillColor(Color::transparent);
-        p->drawRect(IntRect(tx + leftBorder + leftPad, ty + topBorder + topPad,
-                            cWidth, cHeight));
+        context->setPen(Color::lightGray);
+        context->setFillColor(Color::transparent);
+        context->drawRect(IntRect(tx + leftBorder + leftPad,
+                                  ty + topBorder + topPad, cWidth, cHeight));
       }
 
       bool errorPictureDrawn = false;
@@ -247,15 +247,15 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
           centerY = 0;
         imageX = leftBorder + leftPad + centerX;
         imageY = topBorder + topPad + centerY;
-        p->drawImage(image(), IntPoint(tx + imageX, ty + imageY));
+        context->drawImage(image(), IntPoint(tx + imageX, ty + imageY));
         errorPictureDrawn = true;
       }
 
       if (!m_altText.isEmpty()) {
         DeprecatedString text = m_altText.deprecatedString();
         text.replace('\\', backslashAsCurrencySymbol());
-        p->setFont(style()->font());
-        p->setPen(style()->color());
+        context->setFont(style()->font());
+        context->setPen(style()->color());
         int ax = tx + leftBorder + leftPad;
         int ay = ty + topBorder + topPad;
         const Font& font = style()->font();
@@ -268,14 +268,15 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
         int textWidth = font.width(textRun);
         if (errorPictureDrawn) {
           if (usableWidth >= textWidth && font.height() <= imageY)
-            p->drawText(textRun, IntPoint(ax, ay + ascent));
+            context->drawText(textRun, IntPoint(ax, ay + ascent));
         } else if (usableWidth >= textWidth && cHeight >= font.height())
-          p->drawText(textRun, IntPoint(ax, ay + ascent));
+          context->drawText(textRun, IntPoint(ax, ay + ascent));
       }
     }
   } else if (m_cachedImage) {
 #if PLATFORM(MAC)
-    if (style()->highlight() != nullAtom && !paintInfo.p->paintingDisabled())
+    if (style()->highlight() != nullAtom &&
+        !paintInfo.context->paintingDisabled())
       paintCustomHighlight(tx - m_x, ty - m_y, style()->highlight(), true);
 #endif
 
@@ -287,10 +288,10 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
                                      : 0;
     CompositeOperator compositeOperator =
         imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
-    p->drawImage(image(), rect, compositeOperator);
+    context->drawImage(image(), rect, compositeOperator);
 
     if (drawSelectionTint)
-      p->fillRect(selectionRect(), selectionBackgroundColor());
+      context->fillRect(selectionRect(), selectionBackgroundColor());
   }
 }
 

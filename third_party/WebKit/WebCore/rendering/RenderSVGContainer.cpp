@@ -115,7 +115,7 @@ void RenderSVGContainer::layout() {
 }
 
 void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
-  if (paintInfo.p->paintingDisabled())
+  if (paintInfo.context->paintingDisabled())
     return;
 
   // No one should be transforming us via these.
@@ -130,7 +130,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if ((paintInfo.phase == PaintPhaseOutline ||
        paintInfo.phase == PaintPhaseSelfOutline) &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(paintInfo.p, parentX, parentY, width(), height(), style());
+    paintOutline(paintInfo.context, parentX, parentY, width(), height(),
+                 style());
 
   if (paintInfo.phase != PaintPhaseForeground || !drawsContents() ||
       style()->visibility() == HIDDEN)
@@ -147,11 +148,11 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (!deviceContext) {
     // I only need to setup for KCanvas rendering if it hasn't already been
     // done.
-    deviceContext = paintInfo.p->createRenderingDeviceContext();
+    deviceContext = paintInfo.context->createRenderingDeviceContext();
     device->pushContext(deviceContext);
     shouldPopContext = true;
   } else
-    paintInfo.p->save();
+    paintInfo.context->save();
 
   if (parentX != 0 || parentY != 0) {
     // Translate from parent offsets (html renderers) to a relative transform
@@ -162,10 +163,11 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   if (!viewport().isEmpty()) {
     if (style()->overflowX() != OVISIBLE)
-      paintInfo.p->clip(enclosingIntRect(viewport()));  // FIXME: Eventually
-                                                        // we'll want
-                                                        // float-precision
-                                                        // clipping
+      paintInfo.context->clip(enclosingIntRect(viewport()));  // FIXME:
+                                                              // Eventually
+                                                              // we'll want
+                                                              // float-precision
+                                                              // clipping
     deviceContext->concatCTM(
         AffineTransform().translate(viewport().x(), viewport().y()));
   }
@@ -185,8 +187,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   float opacity = style()->opacity();
   if (opacity < 1.0f) {
-    paintInfo.p->clip(enclosingIntRect(strokeBBox));
-    paintInfo.p->beginTransparencyLayer(opacity);
+    paintInfo.context->clip(enclosingIntRect(strokeBBox));
+    paintInfo.context->beginTransparencyLayer(opacity);
   }
 
   if (filter)
@@ -201,14 +203,14 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     filter->applyFilter(strokeBBox);
 
   if (opacity < 1.0f)
-    paintInfo.p->endTransparencyLayer();
+    paintInfo.context->endTransparencyLayer();
 
   // restore drawing state
   if (shouldPopContext) {
     device->popContext();
     delete deviceContext;
   } else
-    paintInfo.p->restore();
+    paintInfo.context->restore();
 }
 
 FloatRect RenderSVGContainer::viewport() const {

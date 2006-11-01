@@ -112,12 +112,12 @@ class RootInlineBox : public InlineFlowBox {
 
   EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
 
-  void paintEllipsisBox(RenderObject::PaintInfo&, int _tx, int _ty) const;
+  void paintEllipsisBox(RenderObject::PaintInfo&, int tx, int ty) const;
   bool hitTestEllipsisBox(HitTestResult&,
-                          int _x,
-                          int _y,
-                          int _tx,
-                          int _ty,
+                          int x,
+                          int y,
+                          int tx,
+                          int ty,
                           HitTestAction,
                           bool);
 
@@ -131,7 +131,7 @@ class RootInlineBox : public InlineFlowBox {
                             const AtomicString& highlightType);
 #endif
 
-  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int,

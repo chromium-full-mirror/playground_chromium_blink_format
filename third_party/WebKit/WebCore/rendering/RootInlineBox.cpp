@@ -108,13 +108,13 @@ int RootInlineBox::placeEllipsisBox(bool ltr,
   return result;
 }
 
-void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& i,
-                                     int _tx,
-                                     int _ty) const {
-  if (m_ellipsisBox && object()->shouldPaintWithinRoot(i) &&
+void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& paintInfo,
+                                     int tx,
+                                     int ty) const {
+  if (m_ellipsisBox && object()->shouldPaintWithinRoot(paintInfo) &&
       object()->style()->visibility() == VISIBLE &&
-      i.phase == PaintPhaseForeground)
-    m_ellipsisBox->paint(i, _tx, _ty);
+      paintInfo.phase == PaintPhaseForeground)
+    m_ellipsisBox->paint(paintInfo, tx, ty);
 }
 
 #if PLATFORM(MAC)
@@ -130,13 +130,13 @@ void RootInlineBox::addHighlightOverflow() {
   m_bottomOverflow = max(m_bottomOverflow, inflatedRect.bottom());
 }
 
-void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& i,
+void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
                                          int tx,
                                          int ty,
                                          const AtomicString& highlightType) {
-  if (!object()->shouldPaintWithinRoot(i) ||
+  if (!object()->shouldPaintWithinRoot(paintInfo) ||
       object()->style()->visibility() != VISIBLE ||
-      i.phase != PaintPhaseForeground)
+      paintInfo.phase != PaintPhaseForeground)
     return;
 
   // Get the inflated rect so that we can properly hit test.
@@ -145,19 +145,20 @@ void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& i,
   FloatRect inflatedRect =
       Mac(object()->document()->frame())
           ->customHighlightLineRect(highlightType, rootRect);
-  if (inflatedRect.intersects(i.r))
+  if (inflatedRect.intersects(paintInfo.rect))
     Mac(object()->document()->frame())
         ->paintCustomHighlight(highlightType, rootRect, rootRect, false, true);
 }
 #endif
 
-void RootInlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
-  InlineFlowBox::paint(i, tx, ty);
-  paintEllipsisBox(i, tx, ty);
+void RootInlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
+  InlineFlowBox::paint(paintInfo, tx, ty);
+  paintEllipsisBox(paintInfo, tx, ty);
 #if PLATFORM(MAC)
   RenderStyle* styleToUse = object()->style(m_firstLine);
-  if (styleToUse->highlight() != nullAtom && !i.p->paintingDisabled())
-    paintCustomHighlight(i, tx, ty, styleToUse->highlight());
+  if (styleToUse->highlight() != nullAtom &&
+      !paintInfo.context->paintingDisabled())
+    paintCustomHighlight(paintInfo, tx, ty, styleToUse->highlight());
 #endif
 }
 
@@ -196,14 +197,15 @@ void RootInlineBox::childRemoved(InlineBox* box) {
   }
 }
 
-GapRects RootInlineBox::fillLineSelectionGap(int selTop,
-                                             int selHeight,
-                                             RenderBlock* rootBlock,
-                                             int blockX,
-                                             int blockY,
-                                             int tx,
-                                             int ty,
-                                             const RenderObject::PaintInfo* i) {
+GapRects RootInlineBox::fillLineSelectionGap(
+    int selTop,
+    int selHeight,
+    RenderBlock* rootBlock,
+    int blockX,
+    int blockY,
+    int tx,
+    int ty,
+    const RenderObject::PaintInfo* paintInfo) {
   GapRects result;
   RenderObject::SelectionState lineState = selectionState();
 
@@ -215,11 +217,11 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
   if (leftGap)
     result.uniteLeft(block()->fillLeftSelectionGap(
         firstBox->parent()->object(), firstBox->xPos(), selTop, selHeight,
-        rootBlock, blockX, blockY, tx, ty, i));
+        rootBlock, blockX, blockY, tx, ty, paintInfo));
   if (rightGap)
     result.uniteRight(block()->fillRightSelectionGap(
         lastBox->parent()->object(), lastBox->xPos() + lastBox->width(), selTop,
-        selHeight, rootBlock, blockX, blockY, tx, ty, i));
+        selHeight, rootBlock, blockX, blockY, tx, ty, paintInfo));
 
   if (firstBox && firstBox != lastBox) {
     // Now fill in any gaps on the line that occurred between two selected
@@ -230,7 +232,7 @@ GapRects RootInlineBox::fillLineSelectionGap(int selTop,
       if (box->selectionState() != RenderObject::SelectionNone) {
         result.uniteCenter(block()->fillHorizontalSelectionGap(
             box->parent()->object(), lastX + tx, selTop + ty,
-            box->xPos() - lastX, selHeight, i));
+            box->xPos() - lastX, selHeight, paintInfo));
         lastX = box->xPos() + box->width();
       }
       if (box == lastBox)

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RENDER_THEME_H
-#define RENDER_THEME_H
+#ifndef RenderTheme_h
+#define RenderTheme_h
 
 #include "RenderObject.h"
 
@@ -67,15 +67,13 @@ class RenderTheme {
   // text of a button, is always rendered by the engine itself.  The boolean
   // return value indicates
   // whether the CSS border/background should also be painted.
-  bool paint(RenderObject* o,
-             const RenderObject::PaintInfo& i,
-             const IntRect& r);
-  bool paintBorderOnly(RenderObject* o,
-                       const RenderObject::PaintInfo& i,
-                       const IntRect& r);
-  bool paintDecorations(RenderObject* o,
-                        const RenderObject::PaintInfo& i,
-                        const IntRect& r);
+  bool paint(RenderObject*, const RenderObject::PaintInfo&, const IntRect&);
+  bool paintBorderOnly(RenderObject*,
+                       const RenderObject::PaintInfo&,
+                       const IntRect&);
+  bool paintDecorations(RenderObject*,
+                        const RenderObject::PaintInfo&,
+                        const IntRect&);
 
   // The remaining methods should be implemented by the platform-specific
   // portion of the theme, e.g.,
@@ -86,24 +84,22 @@ class RenderTheme {
   // position cannot be determined by examining child content. Checkboxes and
   // radio buttons are examples of
   // controls that need to do this.
-  virtual short baselinePosition(const RenderObject* o) const;
+  virtual short baselinePosition(const RenderObject*) const;
 
   // A method for asking if a control is a container or not.  Leaf controls have
   // to have some special behavior (like
   // the baseline position API above).
-  virtual bool isControlContainer(EAppearance appearance) const;
+  virtual bool isControlContainer(EAppearance) const;
 
   // A method asking if the control changes its tint when the window has focus
   // or not.
-  virtual bool controlSupportsTints(const RenderObject* o) const {
-    return false;
-  }
+  virtual bool controlSupportsTints(const RenderObject*) const { return false; }
 
   // Whether or not the control has been styled enough by the author to disable
   // the native appearance.
-  virtual bool isControlStyled(const RenderStyle* style,
-                               const BorderData& border,
-                               const BackgroundLayer& background,
+  virtual bool isControlStyled(const RenderStyle*,
+                               const BorderData&,
+                               const BackgroundLayer&,
                                const Color& backgroundColor) const;
 
   // A general method asking if any control tinting is supported at all.
@@ -113,24 +109,24 @@ class RenderTheme {
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
   // can invalidate the whole control.
-  virtual void adjustRepaintRect(const RenderObject* o, IntRect& r) {}
+  virtual void adjustRepaintRect(const RenderObject*, IntRect&) {}
 
   // This method is called whenever a relevant state changes on a particular
   // themed object, e.g., the mouse becomes pressed
   // or a control becomes disabled.
-  virtual bool stateChanged(RenderObject* o, ControlState state) const;
+  virtual bool stateChanged(RenderObject*, ControlState) const;
 
   // This method is called whenever the theme changes on the system in order to
   // flush cached resources from the
   // old theme.
-  virtual void themeChanged(){};
+  virtual void themeChanged() {}
 
   // A method asking if the theme is able to draw the focus ring.
-  virtual bool supportsFocusRing(const RenderStyle* style) const;
+  virtual bool supportsFocusRing(const RenderStyle*) const;
 
   // A method asking if the theme's controls actually care about redrawing when
   // hovered.
-  virtual bool supportsHover(const RenderStyle* style) const { return false; }
+  virtual bool supportsHover(const RenderStyle*) const { return false; }
 
   // The selection color.
   Color activeSelectionBackgroundColor() const;
@@ -155,78 +151,78 @@ class RenderTheme {
 
  protected:
   // Methods for state querying
-  bool isChecked(const RenderObject* o) const;
-  bool isIndeterminate(const RenderObject* o) const;
-  bool isEnabled(const RenderObject* o) const;
-  bool isFocused(const RenderObject* o) const;
-  bool isPressed(const RenderObject* o) const;
-  bool isHovered(const RenderObject* o) const;
-  bool isReadOnlyControl(const RenderObject* o) const;
+  bool isChecked(const RenderObject*) const;
+  bool isIndeterminate(const RenderObject*) const;
+  bool isEnabled(const RenderObject*) const;
+  bool isFocused(const RenderObject*) const;
+  bool isPressed(const RenderObject*) const;
+  bool isHovered(const RenderObject*) const;
+  bool isReadOnlyControl(const RenderObject*) const;
 
   // Methods for each appearance value.
-  virtual void adjustCheckboxStyle(CSSStyleSelector* selector,
-                                   RenderStyle* style,
-                                   Element* e) const;
-  virtual bool paintCheckbox(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
-                             const IntRect& r) {
+  virtual void adjustCheckboxStyle(CSSStyleSelector*,
+                                   RenderStyle*,
+                                   Element*) const;
+  virtual bool paintCheckbox(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&) {
     return true;
   }
-  virtual void setCheckboxSize(RenderStyle* style) const {};
+  virtual void setCheckboxSize(RenderStyle*) const {}
 
-  virtual void adjustRadioStyle(CSSStyleSelector* selector,
-                                RenderStyle* style,
-                                Element* e) const;
-  virtual bool paintRadio(RenderObject* o,
-                          const RenderObject::PaintInfo& i,
-                          const IntRect& r) {
+  virtual void adjustRadioStyle(CSSStyleSelector*,
+                                RenderStyle*,
+                                Element*) const;
+  virtual bool paintRadio(RenderObject*,
+                          const RenderObject::PaintInfo&,
+                          const IntRect&) {
     return true;
   }
-  virtual void setRadioSize(RenderStyle* style) const {};
+  virtual void setRadioSize(RenderStyle*) const {}
 
-  virtual void adjustButtonStyle(CSSStyleSelector* selector,
-                                 RenderStyle* style,
-                                 Element* e) const;
-  virtual bool paintButton(RenderObject* o,
-                           const RenderObject::PaintInfo& i,
-                           const IntRect& r) {
+  virtual void adjustButtonStyle(CSSStyleSelector*,
+                                 RenderStyle*,
+                                 Element*) const;
+  virtual bool paintButton(RenderObject*,
+                           const RenderObject::PaintInfo&,
+                           const IntRect&) {
     return true;
   }
-  virtual void setButtonSize(RenderStyle* style) const {};
+  virtual void setButtonSize(RenderStyle*) const {}
 
-  virtual void adjustTextFieldStyle(CSSStyleSelector* selector,
-                                    RenderStyle* style,
-                                    Element* e) const;
-  virtual bool paintTextField(RenderObject* o,
-                              const RenderObject::PaintInfo& i,
-                              const IntRect& r) {
-    return true;
-  }
-
-  virtual void adjustTextAreaStyle(CSSStyleSelector* selector,
-                                   RenderStyle* style,
-                                   Element* e) const;
-  virtual bool paintTextArea(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
-                             const IntRect& r) {
+  virtual void adjustTextFieldStyle(CSSStyleSelector*,
+                                    RenderStyle*,
+                                    Element*) const;
+  virtual bool paintTextField(RenderObject*,
+                              const RenderObject::PaintInfo&,
+                              const IntRect&) {
     return true;
   }
 
-  virtual void adjustMenuListStyle(CSSStyleSelector* selector,
-                                   RenderStyle* style,
-                                   Element* e) const;
-  virtual bool paintMenuList(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
-                             const IntRect& r) {
+  virtual void adjustTextAreaStyle(CSSStyleSelector*,
+                                   RenderStyle*,
+                                   Element*) const;
+  virtual bool paintTextArea(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&) {
     return true;
   }
 
-  virtual void adjustMenuListButtonStyle(CSSStyleSelector* selector,
-                                         RenderStyle* style,
-                                         Element* e) const;
-  virtual bool paintMenuListButton(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
-                                   const IntRect& r) {
+  virtual void adjustMenuListStyle(CSSStyleSelector*,
+                                   RenderStyle*,
+                                   Element*) const;
+  virtual bool paintMenuList(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&) {
+    return true;
+  }
+
+  virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
+                                         RenderStyle*,
+                                         Element*) const;
+  virtual bool paintMenuListButton(RenderObject*,
+                                   const RenderObject::PaintInfo&,
+                                   const IntRect&) {
     return true;
   }
 };
@@ -235,6 +231,7 @@ class RenderTheme {
 // theme implementation to hand
 // back the appropriate platform theme.
 RenderTheme* theme();
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderTheme_h

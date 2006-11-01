@@ -158,23 +158,24 @@ void RenderWidget::setStyle(RenderStyle* _style) {
   }
 }
 
-void RenderWidget::paint(PaintInfo& i, int tx, int ty) {
-  if (!shouldPaint(i, tx, ty))
+void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
+  if (!shouldPaint(paintInfo, tx, ty))
     return;
 
   tx += m_x;
   ty += m_y;
 
-  if (shouldPaintBackgroundOrBorder() && i.phase != PaintPhaseOutline &&
-      i.phase != PaintPhaseSelfOutline)
-    paintBoxDecorations(i, tx, ty);
+  if (shouldPaintBackgroundOrBorder() && paintInfo.phase != PaintPhaseOutline &&
+      paintInfo.phase != PaintPhaseSelfOutline)
+    paintBoxDecorations(paintInfo, tx, ty);
 
-  if (!m_view || i.phase != PaintPhaseForeground ||
+  if (!m_view || paintInfo.phase != PaintPhaseForeground ||
       style()->visibility() != VISIBLE)
     return;
 
 #if PLATFORM(MAC)
-  if (style()->highlight() != nullAtom && !i.p->paintingDisabled())
+  if (style()->highlight() != nullAtom &&
+      !paintInfo.context->paintingDisabled())
     paintCustomHighlight(tx - m_x, ty - m_y, style()->highlight(), true);
 #endif
 
@@ -191,12 +192,12 @@ void RenderWidget::paint(PaintInfo& i, int tx, int ty) {
     // allowed
     // to paint itself.  That way it will composite properly with z-indexed
     // layers.
-    m_widget->paint(i.p, i.r);
+    m_widget->paint(paintInfo.context, paintInfo.rect);
   }
 
   // Paint a partially transparent wash over selected widgets.
   if (isSelected() && !document()->printing())
-    i.p->fillRect(selectionRect(), selectionBackgroundColor());
+    paintInfo.context->fillRect(selectionRect(), selectionBackgroundColor());
 }
 
 void RenderWidget::focusIn(Widget*) {

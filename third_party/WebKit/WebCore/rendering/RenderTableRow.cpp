@@ -165,7 +165,7 @@ bool RenderTableRow::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-void RenderTableRow::paint(PaintInfo& i, int tx, int ty) {
+void RenderTableRow::paint(PaintInfo& paintInfo, int tx, int ty) {
   assert(m_layer);
   if (!m_layer)
     return;
@@ -174,14 +174,15 @@ void RenderTableRow::paint(PaintInfo& i, int tx, int ty) {
        child = child->nextSibling()) {
     if (child->isTableCell()) {
       // Paint the row background behind the cell.
-      if (i.phase == PaintPhaseBlockBackground ||
-          i.phase == PaintPhaseChildBlockBackground) {
+      if (paintInfo.phase == PaintPhaseBlockBackground ||
+          paintInfo.phase == PaintPhaseChildBlockBackground) {
         RenderTableCell* cell = static_cast<RenderTableCell*>(child);
-        cell->paintBackgroundsBehindCell(i, tx, ty, this);
+        cell->paintBackgroundsBehindCell(paintInfo, tx, ty, this);
       }
       if (!child->layer())
-        child->paint(i, tx, ty);
+        child->paint(paintInfo, tx, ty);
     }
   }
 }
-}
+
+}  // namespace WebCore

@@ -1403,9 +1403,9 @@ void RenderBlock::repaintObjectsBeforeLayout() {
   }
 }
 
-void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
-  _tx += m_x;
-  _ty += m_y;
+void RenderBlock::paint(PaintInfo& paintInfo, int tx, int ty) {
+  tx += m_x;
+  ty += m_y;
 
   // Check if we need to do anything at all.
   // FIXME: Could eliminate the isRoot() check if we fix background painting so
@@ -1413,25 +1413,26 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
   // paints the root's background.
   if (!isInlineFlow() && !isRoot()) {
     IntRect overflowBox = overflowRect(false);
-    overflowBox.inflate(maximalOutlineSize(i.phase));
-    overflowBox.move(_tx, _ty);
-    bool intersectsOverflowBox = overflowBox.intersects(i.r);
+    overflowBox.inflate(maximalOutlineSize(paintInfo.phase));
+    overflowBox.move(tx, ty);
+    bool intersectsOverflowBox = overflowBox.intersects(paintInfo.rect);
     if (!intersectsOverflowBox) {
       // Check floats next.
-      if (i.phase != PaintPhaseFloat && i.phase != PaintPhaseSelection)
+      if (paintInfo.phase != PaintPhaseFloat &&
+          paintInfo.phase != PaintPhaseSelection)
         return;
       IntRect floatBox = floatRect();
-      floatBox.inflate(maximalOutlineSize(i.phase));
-      floatBox.move(_tx, _ty);
-      if (!floatBox.intersects(i.r))
+      floatBox.inflate(maximalOutlineSize(paintInfo.phase));
+      floatBox.move(tx, ty);
+      if (!floatBox.intersects(paintInfo.rect))
         return;
     }
   }
 
-  return paintObject(i, _tx, _ty);
+  return paintObject(paintInfo, tx, ty);
 }
 
-void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
+void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   // Avoid painting descendants of the root element when stylesheets haven't
   // loaded.  This eliminates FOUC.
   // It's ok not to draw, because later on, when all the stylesheets do load,
@@ -1440,16 +1441,17 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
   if (document()->didLayoutWithPendingStylesheets() && !isRenderView())
     return;
 
-  PaintPhase newPhase =
-      (i.phase == PaintPhaseChildOutlines) ? PaintPhaseOutline : i.phase;
+  PaintPhase newPhase = (paintInfo.phase == PaintPhaseChildOutlines)
+                            ? PaintPhaseOutline
+                            : paintInfo.phase;
   newPhase = (newPhase == PaintPhaseChildBlockBackgrounds)
                  ? PaintPhaseChildBlockBackground
                  : newPhase;
 
   // We don't paint our own background, but we do let the kids paint their
   // backgrounds.
-  PaintInfo paintInfo(i);
-  paintInfo.phase = newPhase;
+  PaintInfo info(paintInfo);
+  info.phase = newPhase;
   bool isPrinting = document()->printing();
 
   for (RenderObject* child = firstChild(); child;
@@ -1457,29 +1459,29 @@ void RenderBlock::paintChildren(PaintInfo& i, int _tx, int _ty) {
     // Check for page-break-before: always, and if it's set, break and bail.
     if (isPrinting && !childrenInline() &&
         child->style()->pageBreakBefore() == PBALWAYS && inRootBlockContext() &&
-        (_ty + child->yPos()) > i.r.y() &&
-        (_ty + child->yPos()) < i.r.bottom()) {
-      view()->setBestTruncatedAt(_ty + child->yPos(), this, true);
+        (ty + child->yPos()) > paintInfo.rect.y() &&
+        (ty + child->yPos()) < paintInfo.rect.bottom()) {
+      view()->setBestTruncatedAt(ty + child->yPos(), this, true);
       return;
     }
 
     if (!child->layer() && !child->isFloating())
-      child->paint(paintInfo, _tx, _ty);
+      child->paint(info, tx, ty);
 
     // Check for page-break-after: always, and if it's set, break and bail.
     if (isPrinting && !childrenInline() &&
         child->style()->pageBreakAfter() == PBALWAYS && inRootBlockContext() &&
-        (_ty + child->yPos() + child->height()) > i.r.y() &&
-        (_ty + child->yPos() + child->height()) < i.r.bottom()) {
-      view()->setBestTruncatedAt(_ty + child->yPos() + child->height() +
-                                     child->collapsedMarginBottom(),
-                                 this, true);
+        (ty + child->yPos() + child->height()) > paintInfo.rect.y() &&
+        (ty + child->yPos() + child->height()) < paintInfo.rect.bottom()) {
+      view()->setBestTruncatedAt(
+          ty + child->yPos() + child->height() + child->collapsedMarginBottom(),
+          this, true);
       return;
     }
   }
 }
 
-void RenderBlock::paintCaret(PaintInfo& i, CaretType type) {
+void RenderBlock::paintCaret(PaintInfo& paintInfo, CaretType type) {
   SelectionController* selectionController =
       type == CursorCaret ? document()->frame()->selectionController()
                           : document()->frame()->dragCaretController();
@@ -1487,16 +1489,15 @@ void RenderBlock::paintCaret(PaintInfo& i, CaretType type) {
   RenderObject* renderer = caretNode ? caretNode->renderer() : 0;
   if (renderer && (renderer == this || renderer->containingBlock() == this) &&
       caretNode && caretNode->isContentEditable()) {
-    if (type == CursorCaret) {
-      document()->frame()->paintCaret(i.p, i.r);
-    } else {
-      document()->frame()->paintDragCaret(i.p, i.r);
-    }
+    if (type == CursorCaret)
+      document()->frame()->paintCaret(paintInfo.context, paintInfo.rect);
+    else
+      document()->frame()->paintDragCaret(paintInfo.context, paintInfo.rect);
   }
 }
 
-void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
-  PaintPhase paintPhase = i.phase;
+void RenderBlock::paintObject(PaintInfo& paintInfo, int tx, int ty) {
+  PaintPhase paintPhase = paintInfo.phase;
 
   // If we're a repositioned run-in or a compact, don't paint
   // background/borders.
@@ -1506,7 +1507,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   if (!inlineFlow && (paintPhase == PaintPhaseBlockBackground ||
                       paintPhase == PaintPhaseChildBlockBackground) &&
       shouldPaintBackgroundOrBorder() && style()->visibility() == VISIBLE) {
-    paintBoxDecorations(i, _tx, _ty);
+    paintBoxDecorations(paintInfo, tx, ty);
   }
 
   // We're done.  We don't bother painting any children.
@@ -1515,61 +1516,63 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
 
   // Adjust our painting position if we're inside a scrolled layer (e.g., an
   // overflow:auto div).s
-  int scrolledX = _tx;
-  int scrolledY = _ty;
+  int scrolledX = tx;
+  int scrolledY = ty;
   if (hasOverflowClip())
     m_layer->subtractScrollOffset(scrolledX, scrolledY);
 
   // 2. paint contents
   if (paintPhase != PaintPhaseSelfOutline) {
     if (childrenInline())
-      paintLines(i, scrolledX, scrolledY);
+      paintLines(paintInfo, scrolledX, scrolledY);
     else
-      paintChildren(i, scrolledX, scrolledY);
+      paintChildren(paintInfo, scrolledX, scrolledY);
   }
 
   // 3. paint selection
   bool isPrinting = document()->printing();
   if (!inlineFlow && !isPrinting)
     paintSelection(
-        i, scrolledX,
+        paintInfo, scrolledX,
         scrolledY);  // Fill in gaps in selection on lines and between blocks.
 
   // 4. paint floats.
   if (!inlineFlow &&
       (paintPhase == PaintPhaseFloat || paintPhase == PaintPhaseSelection))
-    paintFloats(i, scrolledX, scrolledY, paintPhase == PaintPhaseSelection);
+    paintFloats(paintInfo, scrolledX, scrolledY,
+                paintPhase == PaintPhaseSelection);
 
   // 5. paint outline.
   if (!inlineFlow && (paintPhase == PaintPhaseOutline ||
                       paintPhase == PaintPhaseSelfOutline) &&
       hasOutline() && style()->visibility() == VISIBLE)
-    RenderObject::paintOutline(i.p, _tx, _ty, width(), height(), style());
+    RenderObject::paintOutline(paintInfo.context, tx, ty, width(), height(),
+                               style());
 
   // 6. paint caret.
   // If the caret's node's render object's containing block is this block, and
   // the paint action is PaintPhaseForeground,
   // then paint the caret.
   if (!inlineFlow && paintPhase == PaintPhaseForeground) {
-    paintCaret(i, CursorCaret);
-    paintCaret(i, DragCaret);
+    paintCaret(paintInfo, CursorCaret);
+    paintCaret(paintInfo, DragCaret);
   }
 
 #ifdef BOX_DEBUG
   if (style() && style()->visibility() == VISIBLE) {
     if (isAnonymous())
-      outlineBox(i.p, _tx, _ty, "green");
+      outlineBox(paintInfo.context, tx, ty, "green");
     if (isFloating())
-      outlineBox(i.p, _tx, _ty, "yellow");
+      outlineBox(paintInfo.context, tx, ty, "yellow");
     else
-      outlineBox(i.p, _tx, _ty);
+      outlineBox(paintInfo.context, tx, ty);
   }
 #endif
 }
 
-void RenderBlock::paintFloats(PaintInfo& i,
-                              int _tx,
-                              int _ty,
+void RenderBlock::paintFloats(PaintInfo& paintInfo,
+                              int tx,
+                              int ty,
                               bool paintSelection) {
   if (!m_floatingObjects)
     return;
@@ -1579,38 +1582,39 @@ void RenderBlock::paintFloats(PaintInfo& i,
   for (; (r = it.current()); ++it) {
     // Only paint the object if our noPaint flag isn't set.
     if (!r->noPaint && !r->node->layer()) {
-      PaintInfo info(i);
-      info.phase =
+      PaintInfo currentPaintInfo(paintInfo);
+      currentPaintInfo.phase =
           paintSelection ? PaintPhaseSelection : PaintPhaseBlockBackground;
-      int tx = _tx + r->left - r->node->xPos() + r->node->marginLeft();
-      int ty = _ty + r->startY - r->node->yPos() + r->node->marginTop();
-      r->node->paint(info, tx, ty);
+      int currentTX = tx + r->left - r->node->xPos() + r->node->marginLeft();
+      int currentTY = ty + r->startY - r->node->yPos() + r->node->marginTop();
+      r->node->paint(currentPaintInfo, currentTX, currentTY);
       if (!paintSelection) {
-        info.phase = PaintPhaseChildBlockBackgrounds;
-        r->node->paint(info, tx, ty);
-        info.phase = PaintPhaseFloat;
-        r->node->paint(info, tx, ty);
-        info.phase = PaintPhaseForeground;
-        r->node->paint(info, tx, ty);
-        info.phase = PaintPhaseOutline;
-        r->node->paint(info, tx, ty);
+        currentPaintInfo.phase = PaintPhaseChildBlockBackgrounds;
+        r->node->paint(currentPaintInfo, currentTX, currentTY);
+        currentPaintInfo.phase = PaintPhaseFloat;
+        r->node->paint(currentPaintInfo, currentTX, currentTY);
+        currentPaintInfo.phase = PaintPhaseForeground;
+        r->node->paint(currentPaintInfo, currentTX, currentTY);
+        currentPaintInfo.phase = PaintPhaseOutline;
+        r->node->paint(currentPaintInfo, currentTX, currentTY);
       }
     }
   }
 }
 
-void RenderBlock::paintEllipsisBoxes(PaintInfo& i, int _tx, int _ty) {
-  if (!shouldPaintWithinRoot(i) || !firstLineBox())
+void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
+  if (!shouldPaintWithinRoot(paintInfo) || !firstLineBox())
     return;
 
-  if (style()->visibility() == VISIBLE && i.phase == PaintPhaseForeground) {
+  if (style()->visibility() == VISIBLE &&
+      paintInfo.phase == PaintPhaseForeground) {
     // We can check the first box and last box and avoid painting if we don't
     // intersect.
-    int yPos = _ty + firstLineBox()->yPos();
+    int yPos = ty + firstLineBox()->yPos();
     ;
     int h = lastLineBox()->yPos() + lastLineBox()->height() -
             firstLineBox()->yPos();
-    if (yPos >= i.r.bottom() || yPos + h <= i.r.y())
+    if (yPos >= paintInfo.rect.bottom() || yPos + h <= paintInfo.rect.y())
       return;
 
     // See if our boxes intersect with the dirty rect.  If so, then we paint
@@ -1619,10 +1623,11 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& i, int _tx, int _ty) {
     // based off positions of our first line box or our last line box.
     for (RootInlineBox* curr = firstRootBox(); curr;
          curr = curr->nextRootBox()) {
-      yPos = _ty + curr->yPos();
+      yPos = ty + curr->yPos();
       h = curr->height();
-      if (curr->ellipsisBox() && yPos < i.r.bottom() && yPos + h > i.r.y())
-        curr->paintEllipsisBox(i, _tx, _ty);
+      if (curr->ellipsisBox() && yPos < paintInfo.rect.bottom() &&
+          yPos + h > paintInfo.rect.y())
+        curr->paintEllipsisBox(paintInfo, tx, ty);
     }
   }
 }
@@ -1686,12 +1691,13 @@ GapRects RenderBlock::selectionGapRects() {
   return fillSelectionGaps(this, tx, ty, tx, ty, lastTop, lastLeft, lastRight);
 }
 
-void RenderBlock::paintSelection(PaintInfo& i, int tx, int ty) {
-  if (shouldPaintSelectionGaps() && i.phase == PaintPhaseForeground) {
+void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
+  if (shouldPaintSelectionGaps() && paintInfo.phase == PaintPhaseForeground) {
     int lastTop = -borderTopExtra();
     int lastLeft = leftSelectionOffset(this, lastTop);
     int lastRight = rightSelectionOffset(this, lastTop);
-    fillSelectionGaps(this, tx, ty, tx, ty, lastTop, lastLeft, lastRight, &i);
+    fillSelectionGaps(this, tx, ty, tx, ty, lastTop, lastLeft, lastRight,
+                      &paintInfo);
   }
 }
 
@@ -1703,7 +1709,7 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
                                         int& lastTop,
                                         int& lastLeft,
                                         int& lastRight,
-                                        const PaintInfo* i) {
+                                        const PaintInfo* paintInfo) {
   // FIXME: overflow: auto/scroll regions need more math here, since painting in
   // the border box is different from painting in the padding box (one is
   // scrolled, the other is
@@ -1714,10 +1720,10 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
 
   if (childrenInline())
     result = fillInlineSelectionGaps(rootBlock, blockX, blockY, tx, ty, lastTop,
-                                     lastLeft, lastRight, i);
+                                     lastLeft, lastRight, paintInfo);
   else
     result = fillBlockSelectionGaps(rootBlock, blockX, blockY, tx, ty, lastTop,
-                                    lastLeft, lastRight, i);
+                                    lastLeft, lastRight, paintInfo);
 
   // Go ahead and fill the vertical gap all the way to the bottom of our block
   // if the selection extends past our block.
@@ -1725,7 +1731,7 @@ GapRects RenderBlock::fillSelectionGaps(RenderBlock* rootBlock,
       (m_selectionState != SelectionBoth && m_selectionState != SelectionEnd))
     result.uniteCenter(fillVerticalSelectionGap(
         lastTop, lastLeft, lastRight, ty + height() + borderBottomExtra(),
-        rootBlock, blockX, blockY, i));
+        rootBlock, blockX, blockY, paintInfo));
   return result;
 }
 
@@ -1737,7 +1743,7 @@ GapRects RenderBlock::fillInlineSelectionGaps(RenderBlock* rootBlock,
                                               int& lastTop,
                                               int& lastLeft,
                                               int& lastRight,
-                                              const PaintInfo* i) {
+                                              const PaintInfo* paintInfo) {
   GapRects result;
 
   RenderObject* selStart = view()->selectionStart();
@@ -1774,11 +1780,13 @@ GapRects RenderBlock::fillInlineSelectionGaps(RenderBlock* rootBlock,
         selectionState() != SelectionStart && selectionState() != SelectionBoth)
       result.uniteCenter(fillVerticalSelectionGap(lastTop, lastLeft, lastRight,
                                                   ty + selTop, rootBlock,
-                                                  blockX, blockY, i));
+                                                  blockX, blockY, paintInfo));
 
-    if (!i || ty + selTop < i->r.bottom() && ty + selTop + selHeight > i->r.y())
-      result.unite(curr->fillLineSelectionGap(selTop, selHeight, rootBlock,
-                                              blockX, blockY, tx, ty, i));
+    if (!paintInfo ||
+        ty + selTop < paintInfo->rect.bottom() &&
+            ty + selTop + selHeight > paintInfo->rect.y())
+      result.unite(curr->fillLineSelectionGap(
+          selTop, selHeight, rootBlock, blockX, blockY, tx, ty, paintInfo));
 
     lastSelectedLine = curr;
   }
@@ -1807,7 +1815,7 @@ GapRects RenderBlock::fillBlockSelectionGaps(RenderBlock* rootBlock,
                                              int& lastTop,
                                              int& lastLeft,
                                              int& lastRight,
-                                             const PaintInfo* i) {
+                                             const PaintInfo* paintInfo) {
   GapRects result;
 
   // Go ahead and jump right to the first block child that contains some
@@ -1849,7 +1857,7 @@ GapRects RenderBlock::fillBlockSelectionGaps(RenderBlock* rootBlock,
         // Fill the gap above the object.
         result.uniteCenter(fillVerticalSelectionGap(
             lastTop, lastLeft, lastRight, ty + curr->yPos(), rootBlock, blockX,
-            blockY, i));
+            blockY, paintInfo));
 
       // Only fill side gaps for objects that paint their own selection if we
       // know for sure the selection is going to extend all the way *past*
@@ -1866,11 +1874,11 @@ GapRects RenderBlock::fillBlockSelectionGaps(RenderBlock* rootBlock,
       if (leftGap)
         result.uniteLeft(fillLeftSelectionGap(this, curr->xPos(), curr->yPos(),
                                               curr->height(), rootBlock, blockX,
-                                              blockY, tx, ty, i));
+                                              blockY, tx, ty, paintInfo));
       if (rightGap)
         result.uniteRight(fillRightSelectionGap(
             this, curr->xPos() + curr->width(), curr->yPos(), curr->height(),
-            rootBlock, blockX, blockY, tx, ty, i));
+            rootBlock, blockX, blockY, tx, ty, paintInfo));
 
       // Update lastTop to be just underneath the object.  lastLeft and
       // lastRight extend as far as
@@ -1886,7 +1894,7 @@ GapRects RenderBlock::fillBlockSelectionGaps(RenderBlock* rootBlock,
       // and recur.
       result.unite(static_cast<RenderBlock*>(curr)->fillSelectionGaps(
           rootBlock, blockX, blockY, tx + curr->xPos(), ty + curr->yPos(),
-          lastTop, lastLeft, lastRight, i));
+          lastTop, lastLeft, lastRight, paintInfo));
   }
   return result;
 }
@@ -1896,12 +1904,12 @@ IntRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
                                                 int yPos,
                                                 int width,
                                                 int height,
-                                                const PaintInfo* i) {
+                                                const PaintInfo* paintInfo) {
   if (width <= 0 || height <= 0)
     return IntRect();
   IntRect gapRect(xPos, yPos, width, height);
-  if (i)
-    i->p->fillRect(gapRect, selObj->selectionBackgroundColor());
+  if (paintInfo)
+    paintInfo->context->fillRect(gapRect, selObj->selectionBackgroundColor());
   return gapRect;
 }
 
@@ -1912,7 +1920,7 @@ IntRect RenderBlock::fillVerticalSelectionGap(int lastTop,
                                               RenderBlock* rootBlock,
                                               int blockX,
                                               int blockY,
-                                              const PaintInfo* i) {
+                                              const PaintInfo* paintInfo) {
   int top = blockY + lastTop;
   int height = bottomY - top;
   if (height <= 0)
@@ -1926,8 +1934,8 @@ IntRect RenderBlock::fillVerticalSelectionGap(int lastTop,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i)
-    i->p->fillRect(gapRect, selectionBackgroundColor());
+  if (paintInfo)
+    paintInfo->context->fillRect(gapRect, selectionBackgroundColor());
   return gapRect;
 }
 
@@ -1940,7 +1948,7 @@ IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
                                           int blockY,
                                           int tx,
                                           int ty,
-                                          const PaintInfo* i) {
+                                          const PaintInfo* paintInfo) {
   int top = yPos + ty;
   int left = blockX + max(leftSelectionOffset(rootBlock, yPos),
                           leftSelectionOffset(rootBlock, yPos + height));
@@ -1949,8 +1957,8 @@ IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i)
-    i->p->fillRect(gapRect, selObj->selectionBackgroundColor());
+  if (paintInfo)
+    paintInfo->context->fillRect(gapRect, selObj->selectionBackgroundColor());
   return gapRect;
 }
 
@@ -1963,7 +1971,7 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
                                            int blockY,
                                            int tx,
                                            int ty,
-                                           const PaintInfo* i) {
+                                           const PaintInfo* paintInfo) {
   int left = xPos + tx;
   int top = yPos + ty;
   int right = blockX + min(rightSelectionOffset(rootBlock, yPos),
@@ -1973,8 +1981,8 @@ IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
     return IntRect();
 
   IntRect gapRect(left, top, width, height);
-  if (i)
-    i->p->fillRect(gapRect, selObj->selectionBackgroundColor());
+  if (paintInfo)
+    paintInfo->context->fillRect(gapRect, selObj->selectionBackgroundColor());
   return gapRect;
 }
 

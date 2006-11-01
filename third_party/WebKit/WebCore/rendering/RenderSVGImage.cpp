@@ -124,7 +124,7 @@ void RenderSVGImage::adjustRectsForAspectRatio(
 }
 
 void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
-  if (paintInfo.p->paintingDisabled() ||
+  if (paintInfo.context->paintingDisabled() ||
       (paintInfo.phase != PaintPhaseForeground) ||
       style()->visibility() == HIDDEN)
     return;
@@ -133,10 +133,10 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   KRenderingDeviceContext* context = device->currentContext();
   bool shouldPopContext = false;
   if (context)
-    paintInfo.p->save();
+    paintInfo.context->save();
   else {
     // Need to push a device context on the stack if empty.
-    context = paintInfo.p->createRenderingDeviceContext();
+    context = paintInfo.context->createRenderingDeviceContext();
     device->pushContext(context);
     shouldPopContext = true;
   }
@@ -170,8 +170,8 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   }
 
   PaintInfo pi(paintInfo);
-  pi.p = c.get();
-  pi.r = absoluteTransform().invert().mapRect(paintInfo.r);
+  pi.context = c.get();
+  pi.rect = absoluteTransform().invert().mapRect(paintInfo.rect);
 
   int x = 0, y = 0;
   if (shouldPaint(pi, x, y)) {
@@ -197,7 +197,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   // restore drawing state
   if (!shouldPopContext)
-    paintInfo.p->restore();
+    paintInfo.context->restore();
   else {
     device->popContext();
     delete context;

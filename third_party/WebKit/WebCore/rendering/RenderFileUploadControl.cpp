@@ -147,8 +147,8 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                      height() - borderBottom() - borderTop());
     if (clipRect.width() == 0 || clipRect.height() == 0)
       return;
-    paintInfo.p->save();
-    paintInfo.p->clip(clipRect);
+    paintInfo.context->save();
+    paintInfo.context->clip(clipRect);
   }
 
   if (paintInfo.phase == PaintPhaseForeground) {
@@ -175,11 +175,11 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                 buttonRenderer->paddingTop() +
                 buttonRenderer->baselinePosition(true, false);
 
-    paintInfo.p->setFont(style()->font());
-    paintInfo.p->setPen(style()->color());
+    paintInfo.context->setFont(style()->font());
+    paintInfo.context->setPen(style()->color());
 
     // Draw the filename
-    paintInfo.p->drawText(textRun, IntPoint(textX, textY));
+    paintInfo.context->drawText(textRun, IntPoint(textX, textY));
 
     if (m_fileChooser->icon()) {
       // Determine where the icon should be placed
@@ -195,7 +195,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
 
       // Draw the file icon
       m_fileChooser->icon()->paint(
-          paintInfo.p, IntRect(iconX, iconY, iconWidth, iconHeight));
+          paintInfo.context, IntRect(iconX, iconY, iconWidth, iconHeight));
     }
   }
 
@@ -205,7 +205,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
   // Pop the clip.
   if (paintInfo.phase == PaintPhaseForeground ||
       paintInfo.phase == PaintPhaseChildBlockBackgrounds)
-    paintInfo.p->restore();
+    paintInfo.context->restore();
 }
 
 void RenderFileUploadControl::calcMinMaxWidth() {

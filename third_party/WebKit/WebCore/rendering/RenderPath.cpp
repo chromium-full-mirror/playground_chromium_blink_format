@@ -156,7 +156,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   // ASSERT(parentX == 0);
   // ASSERT(parentY == 0);
 
-  if (paintInfo.p->paintingDisabled() ||
+  if (paintInfo.context->paintingDisabled() ||
       (paintInfo.phase != PaintPhaseForeground) ||
       style()->visibility() == HIDDEN || path().isEmpty())
     return;
@@ -165,10 +165,10 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   KRenderingDeviceContext* context = device->currentContext();
   bool shouldPopContext = false;
   if (context)
-    paintInfo.p->save();
+    paintInfo.context->save();
   else {
     // Need to set up KCanvas rendering if it hasn't already been done.
-    context = paintInfo.p->createRenderingDeviceContext();
+    context = paintInfo.context->createRenderingDeviceContext();
     device->pushContext(context);
     shouldPopContext = true;
   }
@@ -208,7 +208,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     strokePaintServer->draw(context, this, APPLY_TO_STROKE);
   }
 
-  drawMarkersIfNeeded(paintInfo.p, paintInfo.r, path());
+  drawMarkersIfNeeded(paintInfo.context, paintInfo.rect, path());
 
   // actually apply the filter
   if (filter)
@@ -216,7 +216,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   // restore drawing state
   if (!shouldPopContext)
-    paintInfo.p->restore();
+    paintInfo.context->restore();
   else {
     device->popContext();
     delete context;

@@ -396,22 +396,24 @@ void RenderTable::setCellWidths() {
       static_cast<RenderTableSection*>(child)->setCellWidths();
 }
 
-void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
-  _tx += xPos();
-  _ty += yPos();
+void RenderTable::paint(PaintInfo& paintInfo, int tx, int ty) {
+  tx += xPos();
+  ty += yPos();
 
-  PaintPhase paintPhase = i.phase;
+  PaintPhase paintPhase = paintInfo.phase;
 
   int os = 2 * maximalOutlineSize(paintPhase);
-  if (_ty >= i.r.bottom() + os || _ty + height() <= i.r.y() - os)
+  if (ty >= paintInfo.rect.bottom() + os ||
+      ty + height() <= paintInfo.rect.y() - os)
     return;
-  if (_tx >= i.r.right() + os || _tx + width() <= i.r.x() - os)
+  if (tx >= paintInfo.rect.right() + os ||
+      tx + width() <= paintInfo.rect.x() - os)
     return;
 
   if ((paintPhase == PaintPhaseBlockBackground ||
        paintPhase == PaintPhaseChildBlockBackground) &&
       shouldPaintBackgroundOrBorder() && style()->visibility() == VISIBLE)
-    paintBoxDecorations(i, _tx, _ty);
+    paintBoxDecorations(paintInfo, tx, ty);
 
   // We're done.  We don't bother painting any children.
   if (paintPhase == PaintPhaseBlockBackground)
@@ -421,12 +423,14 @@ void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
   // backgrounds.
   if (paintPhase == PaintPhaseChildBlockBackgrounds)
     paintPhase = PaintPhaseChildBlockBackground;
-  PaintInfo paintInfo(i);
-  paintInfo.phase = paintPhase;
+  PaintInfo info(paintInfo);
+  info.phase = paintPhase;
 
-  for (RenderObject* child = firstChild(); child; child = child->nextSibling())
+  for (RenderObject* child = firstChild(); child;
+       child = child->nextSibling()) {
     if (!child->layer() && (child->isTableSection() || child == tCaption))
-      child->paint(paintInfo, _tx, _ty);
+      child->paint(info, tx, ty);
+  }
 
   if (collapseBorders() && paintPhase == PaintPhaseChildBlockBackground &&
       style()->visibility() == VISIBLE) {
@@ -443,18 +447,19 @@ void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
     for (; it != end; ++it) {
       m_currentBorder = &(*it);
       for (RenderObject* child = firstChild(); child;
-           child = child->nextSibling())
+           child = child->nextSibling()) {
         if (child->isTableSection())
-          child->paint(paintInfo, _tx, _ty);
+          child->paint(info, tx, ty);
+      }
     }
   }
 
 #ifdef BOX_DEBUG
-  outlineBox(i.p, _tx, _ty, "blue");
+  outlineBox(paintInfo.context, tx, ty, "blue");
 #endif
 }
 
-void RenderTable::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
+void RenderTable::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   int w = width();
   int h = height();
 
@@ -464,21 +469,21 @@ void RenderTable::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
         (tCaption->height() + tCaption->marginBottom() + tCaption->marginTop());
     h -= captionHeight;
     if (tCaption->style()->captionSide() != CAPBOTTOM)
-      _ty += captionHeight;
+      ty += captionHeight;
   }
 
-  int my = max(_ty, i.r.y());
+  int my = max(ty, paintInfo.rect.y());
   int mh;
-  if (_ty < i.r.y())
-    mh = max(0, h - (i.r.y() - _ty));
+  if (ty < paintInfo.rect.y())
+    mh = max(0, h - (paintInfo.rect.y() - ty));
   else
-    mh = min(i.r.height(), h);
+    mh = min(paintInfo.rect.height(), h);
 
-  paintBackground(i.p, style()->backgroundColor(), style()->backgroundLayers(),
-                  my, mh, _tx, _ty, w, h);
+  paintBackground(paintInfo.context, style()->backgroundColor(),
+                  style()->backgroundLayers(), my, mh, tx, ty, w, h);
 
   if (style()->hasBorder() && !collapseBorders())
-    paintBorder(i.p, _tx, _ty, w, h, style());
+    paintBorder(paintInfo.context, tx, ty, w, h, style());
 }
 
 void RenderTable::calcMinMaxWidth() {

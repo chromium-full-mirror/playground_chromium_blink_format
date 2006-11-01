@@ -103,7 +103,7 @@ class RenderTable : public RenderBlock {
   }
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual void paint(PaintInfo&, int tx, int ty);
-  virtual void paintBoxDecorations(PaintInfo&, int _tx, int _ty);
+  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void layout();
   virtual void calcMinMaxWidth();
 

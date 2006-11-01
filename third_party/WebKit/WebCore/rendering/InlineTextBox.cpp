@@ -244,18 +244,18 @@ bool InlineTextBox::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
-  if (isLineBreak() || !object()->shouldPaintWithinRoot(i) ||
+void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
+  if (isLineBreak() || !object()->shouldPaintWithinRoot(paintInfo) ||
       object()->style()->visibility() != VISIBLE ||
-      m_truncation == cFullTruncation || i.phase == PaintPhaseOutline)
+      m_truncation == cFullTruncation || paintInfo.phase == PaintPhaseOutline)
     return;
 
-  assert(i.phase != PaintPhaseSelfOutline &&
-         i.phase != PaintPhaseChildOutlines);
+  ASSERT(paintInfo.phase != PaintPhaseSelfOutline &&
+         paintInfo.phase != PaintPhaseChildOutlines);
 
   int xPos = tx + m_x - parent()->maxHorizontalShadow();
   int w = width() + 2 * parent()->maxHorizontalShadow();
-  if (xPos >= i.r.right() || xPos + w <= i.r.x())
+  if (xPos >= paintInfo.rect.right() || xPos + w <= paintInfo.rect.x())
     return;
 
   bool isPrinting = textObject()->document()->printing();
@@ -263,7 +263,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   // Determine whether or not we're selected.
   bool haveSelection =
       !isPrinting && selectionState() != RenderObject::SelectionNone;
-  if (!haveSelection && i.phase == PaintPhaseSelection)
+  if (!haveSelection && paintInfo.phase == PaintPhaseSelection)
     // When only painting the selection, don't bother to paint if there is none.
     return;
 
@@ -280,28 +280,29 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   RenderStyle* styleToUse = object()->style(m_firstLine);
   int d = styleToUse->textDecorationsInEffect();
   const Font* font = &styleToUse->font();
-  if (*font != i.p->font())
-    i.p->setFont(*font);
+  if (*font != paintInfo.context->font())
+    paintInfo.context->setFont(*font);
 
   // 1. Paint backgrounds behind text if needed.  Examples of such backgrounds
   // include selection
   // and marked text.
-  if (i.phase != PaintPhaseSelection && !isPrinting) {
+  if (paintInfo.phase != PaintPhaseSelection && !isPrinting) {
 #if PLATFORM(MAC)
     // Custom highlighters go behind everything else.
-    if (styleToUse->highlight() != nullAtom && !i.p->paintingDisabled())
+    if (styleToUse->highlight() != nullAtom &&
+        !paintInfo.context->paintingDisabled())
       paintCustomHighlight(tx, ty, styleToUse->highlight());
 #endif
 
     if (haveMarkedText && !markedTextUsesUnderlines)
-      paintMarkedTextBackground(i.p, tx, ty, styleToUse, font,
+      paintMarkedTextBackground(paintInfo.context, tx, ty, styleToUse, font,
                                 markedTextRange->startOffset(exception),
                                 markedTextRange->endOffset(exception));
 
-    paintDocumentMarkers(i.p, tx, ty, styleToUse, font, true);
+    paintDocumentMarkers(paintInfo.context, tx, ty, styleToUse, font, true);
 
     if (haveSelection)
-      paintSelection(i.p, tx, ty, styleToUse, font);
+      paintSelection(paintInfo.context, tx, ty, styleToUse, font);
   }
 
   // 2. Now paint the foreground, including text and decorations like
@@ -318,7 +319,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 
   Color textColor;
 
-  if (i.forceWhiteText)
+  if (paintInfo.forceWhiteText)
     textColor = Color::white;
   else {
     textColor = styleToUse->color();
@@ -328,25 +329,25 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       textColor = correctedTextColor(textColor, Color::white);
   }
 
-  if (textColor != i.p->pen().color())
-    i.p->setPen(textColor);
+  if (textColor != paintInfo.context->pen().color())
+    paintInfo.context->setPen(textColor);
 
   // Set a text shadow if we have one.
   // FIXME: Support multiple shadow effects.  Need more from the CG API before
   // we can do this.
   bool setShadow = false;
   if (styleToUse->textShadow()) {
-    i.p->setShadow(
+    paintInfo.context->setShadow(
         IntSize(styleToUse->textShadow()->x, styleToUse->textShadow()->y),
         styleToUse->textShadow()->blur, styleToUse->textShadow()->color);
     setShadow = true;
   }
 
-  bool paintSelectedTextOnly = (i.phase == PaintPhaseSelection);
+  bool paintSelectedTextOnly = (paintInfo.phase == PaintPhaseSelection);
   bool paintSelectedTextSeparately =
       false;  // Whether or not we have to do multiple paints.  Only
   // necessary when a custom ::selection foreground color is applied.
-  Color selectionColor = i.p->pen().color();
+  Color selectionColor = paintInfo.context->pen().color();
   ShadowData* selectionTextShadow = 0;
   if (haveSelection) {
     // Check foreground color first.
@@ -378,50 +379,56 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     int endPoint = m_len;
     if (m_truncation != cNoTruncation)
       endPoint = m_truncation - m_start;
-    i.p->drawText(TextRun(textStr, m_start, endPoint),
-                  IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
+    paintInfo.context->drawText(TextRun(textStr, m_start, endPoint),
+                                IntPoint(m_x + tx, m_y + ty + m_baseline),
+                                textStyle);
   } else {
     int sPos, ePos;
     selectionStartEnd(sPos, ePos);
     if (paintSelectedTextSeparately) {
       // paint only the text that is not selected
       if (sPos >= ePos)
-        i.p->drawText(TextRun(textStr, m_start, m_len),
-                      IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
+        paintInfo.context->drawText(TextRun(textStr, m_start, m_len),
+                                    IntPoint(m_x + tx, m_y + ty + m_baseline),
+                                    textStyle);
       else {
         if (sPos - 1 >= 0)
-          i.p->drawText(TextRun(textStr, m_start, m_len, 0, sPos),
-                        IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
+          paintInfo.context->drawText(TextRun(textStr, m_start, m_len, 0, sPos),
+                                      IntPoint(m_x + tx, m_y + ty + m_baseline),
+                                      textStyle);
         if (ePos < m_start + m_len)
-          i.p->drawText(TextRun(textStr, m_start, m_len, ePos),
-                        IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
+          paintInfo.context->drawText(TextRun(textStr, m_start, m_len, ePos),
+                                      IntPoint(m_x + tx, m_y + ty + m_baseline),
+                                      textStyle);
       }
     }
 
     if (sPos < ePos) {
       // paint only the text that is selected
-      if (selectionColor != i.p->pen().color())
-        i.p->setPen(selectionColor);
+      if (selectionColor != paintInfo.context->pen().color())
+        paintInfo.context->setPen(selectionColor);
 
       if (selectionTextShadow)
-        i.p->setShadow(IntSize(selectionTextShadow->x, selectionTextShadow->y),
-                       selectionTextShadow->blur, selectionTextShadow->color);
-      i.p->drawText(TextRun(textStr, m_start, m_len, sPos, ePos),
-                    IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
+        paintInfo.context->setShadow(
+            IntSize(selectionTextShadow->x, selectionTextShadow->y),
+            selectionTextShadow->blur, selectionTextShadow->color);
+      paintInfo.context->drawText(TextRun(textStr, m_start, m_len, sPos, ePos),
+                                  IntPoint(m_x + tx, m_y + ty + m_baseline),
+                                  textStyle);
       if (selectionTextShadow)
-        i.p->clearShadow();
+        paintInfo.context->clearShadow();
     }
   }
 
   // Paint decorations
-  if (d != TDNONE && i.phase != PaintPhaseSelection &&
+  if (d != TDNONE && paintInfo.phase != PaintPhaseSelection &&
       styleToUse->htmlHacks()) {
-    i.p->setPen(styleToUse->color());
-    paintDecoration(i.p, tx, ty, d);
+    paintInfo.context->setPen(styleToUse->color());
+    paintDecoration(paintInfo.context, tx, ty, d);
   }
 
-  if (i.phase != PaintPhaseSelection) {
-    paintDocumentMarkers(i.p, tx, ty, styleToUse, font, false);
+  if (paintInfo.phase != PaintPhaseSelection) {
+    paintDocumentMarkers(paintInfo.context, tx, ty, styleToUse, font, false);
 
     for (size_t index = 0; index < numUnderlines; ++index) {
       const MarkedTextUnderline& underline = (*underlines)[index];
@@ -436,7 +443,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 
       if (underline.startOffset <= end()) {
         // underline intersects this run.  Paint it.
-        paintMarkedTextUnderline(i.p, tx, ty, underline);
+        paintMarkedTextUnderline(paintInfo.context, tx, ty, underline);
         if (underline.endOffset > end() + 1)
           // underline also runs into the next run. Bail now, no more marker
           // advancement.
@@ -449,7 +456,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
   }
 
   if (setShadow)
-    i.p->clearShadow();
+    paintInfo.context->clearShadow();
 }
 
 void InlineTextBox::selectionStartEnd(int& sPos, int& ePos) {

@@ -19,8 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef EllipsisBox_H
-#define EllipsisBox_H
+#ifndef EllipsisBox_h
+#define EllipsisBox_h
 
 #include "InlineBox.h"
 
@@ -57,13 +57,13 @@ class EllipsisBox : public InlineBox {
         m_str(ellipsisStr),
         m_markupBox(markupBox) {}
 
-  virtual void paint(RenderObject::PaintInfo&, int _tx, int _ty);
+  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty);
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
  private:
   AtomicString m_str;
@@ -72,4 +72,4 @@ class EllipsisBox : public InlineBox {
 
 }  // namespace WebCore
 
-#endif  // EllipsisBox_H
+#endif  // EllipsisBox_h
