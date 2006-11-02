@@ -51,6 +51,7 @@ bool isAtomicNode(const Node* node) {
   return node && (!node->hasChildNodes() || editingIgnoresContent(node));
 }
 
+// FIXME: This function needs a comment.
 bool editingIgnoresContent(const Node* node) {
   if (!node || !node->isHTMLElement())
     return false;
@@ -76,6 +77,7 @@ bool editingIgnoresContent(const Node* node) {
 bool canHaveChildrenForEditing(const Node* node) {
   return !node->hasTagName(hrTag) && !node->hasTagName(brTag) &&
          !node->hasTagName(imgTag) && !node->hasTagName(buttonTag) &&
+         !node->hasTagName(inputTag) && !node->hasTagName(textareaTag) &&
          !node->hasTagName(objectTag) && !node->hasTagName(iframeTag) &&
          !node->isTextNode();
 }
@@ -539,13 +541,15 @@ bool isListElement(Node* n) {
 Node* enclosingNodeWithTag(Node* node, const QualifiedName& tagName) {
   if (!node)
     return 0;
-  Node* root = (node->inDocument()) ? node->rootEditableElement()
-                                    : highestAncestor(node);
-  ASSERT(root);
-  for (Node* n = node->parentNode();
-       n && (n == root || n->isDescendantOf(root)); n = n->parentNode())
+
+  Node* root = highestEditableRoot(Position(node, 0));
+
+  for (Node* n = node->parentNode(); n; n = n->parentNode()) {
     if (n->hasTagName(tagName))
       return n;
+    if (n == root)
+      return 0;
+  }
 
   return 0;
 }
@@ -555,13 +559,13 @@ Node* enclosingNodeOfType(Node* node, bool (*nodeIsOfType)(Node*)) {
     return 0;
 
   Node* root = highestEditableRoot(Position(node, 0));
-  if (!root)
-    root = highestAncestor(node);
 
-  for (Node* n = node->parentNode();
-       n && (n == root || n->isDescendantOf(root)); n = n->parentNode())
+  for (Node* n = node->parentNode(); n; n = n->parentNode()) {
     if ((*nodeIsOfType)(n))
       return n;
+    if (n == root)
+      return 0;
+  }
 
   return 0;
 }
@@ -580,13 +584,15 @@ Node* enclosingTableCell(Node* node) {
 Node* enclosingList(Node* node) {
   if (!node)
     return 0;
-  Node* root = (node->inDocument()) ? node->rootEditableElement()
-                                    : highestAncestor(node);
-  ASSERT(root);
-  for (Node* n = node->parentNode();
-       n && (n == root || n->isDescendantOf(root)); n = n->parentNode())
+
+  Node* root = highestEditableRoot(Position(node, 0));
+
+  for (Node* n = node->parentNode(); n; n = n->parentNode()) {
     if (n->hasTagName(ulTag) || n->hasTagName(olTag))
       return n;
+    if (n == root)
+      return 0;
+  }
 
   return 0;
 }
@@ -597,14 +603,15 @@ Node* enclosingListChild(Node* node) {
   // Check for a list item element, or for a node whose parent is a list
   // element.  Such a node
   // will appear visually as a list item (but without a list marker)
-  Node* root = (node->inDocument()) ? node->rootEditableElement()
-                                    : highestAncestor(node);
-  ASSERT(root);
-  for (Node* n = node;
-       n && n->parentNode() && (n == root || n->isDescendantOf(root));
-       n = n->parentNode()) {
+  Node* root = highestEditableRoot(Position(node, 0));
+
+  // FIXME: This function is inappropriately named if it starts with node
+  // instead of node->parentNode()
+  for (Node* n = node; n && n->parentNode(); n = n->parentNode()) {
     if (n->hasTagName(liTag) || isListElement(n->parentNode()))
       return n;
+    if (n == root)
+      return 0;
   }
 
   return 0;
