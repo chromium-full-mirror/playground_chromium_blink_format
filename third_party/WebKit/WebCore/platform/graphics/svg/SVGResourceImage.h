@@ -29,7 +29,7 @@
 #include "IntSize.h"
 #include "SVGResource.h"
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
 typedef struct CGContext* CGContextRef;
 typedef struct CGLayer* CGLayerRef;
 #endif
@@ -43,7 +43,7 @@ class SVGResourceImage : public SVGResource {
  public:
   SVGResourceImage();
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
   virtual ~SVGResourceImage();
 #endif
 
@@ -53,7 +53,7 @@ class SVGResourceImage : public SVGResource {
 
   IntSize size() const;
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
   CGLayerRef cgLayer();
   void setCGLayer(CGLayerRef layer);
 
