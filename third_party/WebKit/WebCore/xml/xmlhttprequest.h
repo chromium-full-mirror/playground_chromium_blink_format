@@ -93,9 +93,7 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>, ResourceHandleClient {
  private:
   bool urlMatchesDocumentDomain(const KURL&) const;
 
-  virtual void willSendRequest(ResourceHandle*,
-                               ResourceRequest& request,
-                               const ResourceResponse& redirectResponse);
+  virtual void receivedRedirect(ResourceHandle*, const KURL&);
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*, const char* data, int size);
   virtual void didFinishLoading(ResourceHandle*);

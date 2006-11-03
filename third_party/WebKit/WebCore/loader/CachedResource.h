@@ -32,7 +32,6 @@
 #include "CachePolicy.h"
 #include "PlatformString.h"
 #include "ResourceHandleClient.h"  // defines PlatformResponse and PlatformData
-#include "ResourceResponse.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 #include <time.h>
@@ -87,6 +86,7 @@ class CachedResource {
   CachedResource(const String& URL,
                  Type type,
                  CachePolicy cachePolicy,
+                 time_t expireDate,
                  unsigned size = 0);
   virtual ~CachedResource();
 
@@ -130,14 +130,14 @@ class CachedResource {
 
   void setRequest(Request*);
 
-  PlatformResponse platformResponse() const { return m_platformResponse; }
-  void setPlatformResponse(PlatformResponse);
+  PlatformResponse response() const { return m_response; }
+  void setResponse(PlatformResponse);
   PlatformData allData() const { return m_allData; }
   void setAllData(PlatformData);
 
-  void setResponse(const ResourceResponse& response) { m_response = response; }
-
   bool canDelete() const { return !referenced() && !m_request; }
+
+  void setExpireDate(time_t expireDate, bool changeHttpCache);
 
   bool isExpired() const;
 
@@ -165,8 +165,7 @@ class CachedResource {
   RetainPtr<NSURLRequest> m_nsURLRequest;
 #endif
 
-  ResourceResponse m_response;
-  PlatformResponse m_platformResponse;
+  PlatformResponse m_response;
   PlatformData m_allData;
 
   Type m_type;
@@ -177,6 +176,7 @@ class CachedResource {
   unsigned m_accessCount;
 
  protected:
+  time_t m_expireDate;
   CachePolicy m_cachePolicy;
   bool m_inCache;
   bool m_loading;

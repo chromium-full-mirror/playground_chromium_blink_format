@@ -48,12 +48,8 @@ typedef LONG_PTR LRESULT;
 #if PLATFORM(MAC)
 #ifdef __OBJC__
 @class WebCoreResourceLoaderImp;
-@class NSURLRequest;
-@class NSURLResponse;
 #else
 class WebCoreResourceLoaderImp;
-class NSURLRequest;
-class NSURLResponse;
 #endif
 #endif
 
@@ -84,7 +80,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
   void kill();
 
 #if PLATFORM(MAC)
-  NSURLRequest* willSendRequest(NSURLRequest*, NSURLResponse*);
+  void redirectedToURL(NSURL* url);
   void addData(NSData* data);
   void finishJobAndHandle(NSData* data);
   void reportError();

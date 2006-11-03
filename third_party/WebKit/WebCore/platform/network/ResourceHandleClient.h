@@ -74,7 +74,6 @@ typedef struct PlatformResponseStruct* PlatformResponse;
 
 class KURL;
 class ResourceHandle;
-class ResourceRequest;
 class ResourceResponse;
 
 class ResourceHandleClient {
@@ -82,9 +81,8 @@ class ResourceHandleClient {
   virtual ~ResourceHandleClient() {}
 
   // request may be modified
-  virtual void willSendRequest(ResourceHandle*,
-                               ResourceRequest&,
-                               const ResourceResponse& redirectResponse) {}
+  // void willSendRequest(ResourceHandle*, Request&, const ResourceResonse&
+  // redirectResponse) { }
 
   // void didReceiveAuthenticationChallenge(ResourceHandle*, const
   // AuthenticationChallenge&) { }
@@ -100,6 +98,7 @@ class ResourceHandleClient {
   // void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }
 
   // old-style methods
+  virtual void receivedRedirect(ResourceHandle*, const KURL&) {}
   virtual void receivedResponse(ResourceHandle*, PlatformResponse) {}
   virtual void receivedAllData(ResourceHandle*, PlatformData) {}
 };

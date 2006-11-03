@@ -127,7 +127,8 @@ void CachedImage::clear() {
 inline void CachedImage::createImage() {
   // Create the image if it doesn't yet exist.
   if (!m_image)
-    m_image = new Image(this, m_response.mimeType() == "application/pdf");
+    m_image =
+        new Image(this, ResponseMIMEType(m_response) == "application/pdf");
 }
 
 Vector<char>& CachedImage::bufferData(const char* bytes,
