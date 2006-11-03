@@ -174,25 +174,20 @@ void didReceiveChallenge(CFURLConnectionRef conn,
   // Do nothing right now
 }
 
-void addHeadersFromHashMap(CFHTTPMessageRef request,
+void addHeadersFromHashMap(CFMutableURLRequestRef request,
                            const HTTPHeaderMap& requestHeaders) {
   if (!requestHeaders.size())
     return;
 
-  CFMutableDictionaryRef allHeaders = CFDictionaryCreateMutable(
-      0, requestHeaders.size(), &kCFTypeDictionaryKeyCallBacks,
-      &kCFTypeDictionaryValueCallBacks);
   HTTPHeaderMap::const_iterator end = requestHeaders.end();
   for (HTTPHeaderMap::const_iterator it = requestHeaders.begin(); it != end;
        ++it) {
     CFStringRef key = it->first.createCFString();
     CFStringRef value = it->second.createCFString();
-    CFDictionaryAddValue(allHeaders, key, value);
+    CFURLRequestSetHTTPHeaderFieldValue(request, key, value);
     CFRelease(key);
     CFRelease(value);
   }
-  _CFHTTPMessageSetMultipleHeaderFields(request, allHeaders);
-  CFRelease(allHeaders);
 }
 
 ResourceHandleInternal::~ResourceHandleInternal() {
@@ -257,26 +252,28 @@ void runLoaderThread(void* unused) {
 
 bool ResourceHandle::start(DocLoader* docLoader) {
   CFURLRef url = d->m_request.url().createCFURL();
+
   CFStringRef requestMethod = d->m_request.httpMethod().createCFString();
+  CFMutableURLRequestRef request = CFURLRequestCreateMutable(
+      0, url, kCFURLRequestCachePolicyProtocolDefault, 30.0, 0);
   Boolean isPost =
       CFStringCompare(requestMethod, CFSTR("POST"), kCFCompareCaseInsensitive);
-  CFHTTPMessageRef httpRequest =
-      CFHTTPMessageCreateRequest(0, requestMethod, url, kCFHTTPVersion1_1);
+  CFRelease(requestMethod);
+
   CFStringRef userAgentString =
       docLoader->frame()->userAgent().createCFString();
-  CFHTTPMessageSetHeaderFieldValue(httpRequest, CFSTR("User-Agent"),
-                                   userAgentString);
-  CFRelease(requestMethod);
+  CFURLRequestSetHTTPHeaderFieldValue(request, CFSTR("User-Agent"),
+                                      userAgentString);
   CFRelease(userAgentString);
 
   ref();
   d->m_loading = true;
-  addHeadersFromHashMap(httpRequest, d->m_request.httpHeaderFields());
+  addHeadersFromHashMap(request, d->m_request.httpHeaderFields());
 
   String referrer = docLoader->frame()->referrer();
-  if (!referrer.isEmpty()) {
+  if (!referrer.isEmpty() && referrer.find("file:", 0, false) != 0) {
     CFStringRef str = referrer.createCFString();
-    CFHTTPMessageSetHeaderFieldValue(httpRequest, CFSTR("Referer"), str);
+    CFURLRequestSetHTTPHeaderFieldValue(request, CFSTR("Referer"), str);
     CFRelease(str);
   }
 
@@ -291,7 +288,7 @@ bool ResourceHandle::start(DocLoader* docLoader) {
       // files.
       CFTypeRef d = CFArrayGetValueAtIndex(formArray, 0);
       if (CFGetTypeID(d) == CFDataGetTypeID()) {
-        CFHTTPMessageSetBody(httpRequest, (CFDataRef)d);
+        CFURLRequestSetHTTPRequestBody(request, (CFDataRef)d);
         done = true;
       }
     }
@@ -329,8 +326,8 @@ bool ResourceHandle::start(DocLoader* docLoader) {
       if (success) {
         CFStringRef lengthStr =
             CFStringCreateWithFormat(0, 0, CFSTR("%lld"), length);
-        CFHTTPMessageSetHeaderFieldValue(httpRequest, CFSTR("Content-Length"),
-                                         lengthStr);
+        CFURLRequestSetHTTPHeaderFieldValue(request, CFSTR("Content-Length"),
+                                            lengthStr);
         CFRelease(lengthStr);
       }
       bodyStream = CFReadStreamCreateWithFormArray(0, formArray);
@@ -338,9 +335,8 @@ bool ResourceHandle::start(DocLoader* docLoader) {
     CFRelease(formArray);
   }
 
-  CFURLRequestRef request = CFURLRequestCreateHTTPRequest(
-      0, httpRequest, bodyStream, kCFURLRequestCachePolicyProtocolDefault, 30.0,
-      0);
+  if (bodyStream)
+    CFURLRequestSetHTTPRequestBodyStream(request, bodyStream);
   CFURLConnectionClient client = {0,
                                   this,
                                   0,
