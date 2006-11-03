@@ -513,8 +513,10 @@ void XMLHttpRequest::didFinishLoading(ResourceHandle* loader) {
   }
 }
 
-void XMLHttpRequest::receivedRedirect(ResourceHandle*, const KURL& m_url) {
-  if (!urlMatchesDocumentDomain(m_url))
+void XMLHttpRequest::willSendRequest(ResourceHandle*,
+                                     ResourceRequest& request,
+                                     const ResourceResponse& redirectResponse) {
+  if (!urlMatchesDocumentDomain(request.url()))
     abort();
 }
 

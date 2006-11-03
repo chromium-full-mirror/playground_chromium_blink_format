@@ -218,6 +218,9 @@ class GraphicsContext : Noncopyable {
  private:
   void savePlatformState();
   void restorePlatformState();
+  void setPlatformPen(const Pen& pen);
+  void setPlatformFillColor(const Color& fill);
+  void setPlatformFont(const Font& font);
 
   int focusRingWidth() const;
   int focusRingOffset() const;

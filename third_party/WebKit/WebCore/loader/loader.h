@@ -64,8 +64,8 @@ class Loader : ResourceHandleClient {
 
  private:
   virtual void receivedResponse(ResourceHandle*, PlatformResponse);
-  virtual void didReceivedResponse(ResourceHandle* handle,
-                                   const ResourceResponse& response);
+  virtual void didReceiveResponse(ResourceHandle* handle,
+                                  const ResourceResponse& response);
   virtual void didReceiveData(ResourceHandle*, const char*, int);
   virtual void receivedAllData(ResourceHandle*, PlatformData);
 

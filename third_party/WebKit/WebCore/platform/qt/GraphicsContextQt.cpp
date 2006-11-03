@@ -36,6 +36,8 @@
 #include "Path.h"
 #include "Color.h"
 #include "GraphicsContext.h"
+#include "Font.h"
+#include "Pen.h"
 
 #include <QStack>
 #include <QPainter>
@@ -58,7 +60,8 @@
 
 namespace WebCore {
 
-static QPainter::CompositionMode toQtCompositionMode(CompositeOperator op) {
+static inline QPainter::CompositionMode toQtCompositionMode(
+    CompositeOperator op) {
   switch (op) {
     case CompositeClear:
       return QPainter::CompositionMode_Clear;
@@ -93,7 +96,7 @@ static QPainter::CompositionMode toQtCompositionMode(CompositeOperator op) {
   return QPainter::CompositionMode_SourceOver;
 }
 
-static Qt::PenCapStyle toQtLineCap(LineCap lc) {
+static inline Qt::PenCapStyle toQtLineCap(LineCap lc) {
   switch (lc) {
     case ButtCap:
       return Qt::FlatCap;
@@ -106,7 +109,7 @@ static Qt::PenCapStyle toQtLineCap(LineCap lc) {
   return Qt::FlatCap;
 }
 
-static Qt::PenJoinStyle toQtLineJoin(LineJoin lj) {
+static inline Qt::PenJoinStyle toQtLineJoin(LineJoin lj) {
   switch (lj) {
     case MiterJoin:
       return Qt::SvgMiterJoin;
@@ -119,6 +122,29 @@ static Qt::PenJoinStyle toQtLineJoin(LineJoin lj) {
   return Qt::MiterJoin;
 }
 
+static Qt::PenStyle toQPenStyle(Pen::PenStyle style) {
+  switch (style) {
+    case Pen::NoPen:
+      return Qt::NoPen;
+      break;
+    case Pen::SolidLine:
+      return Qt::SolidLine;
+      break;
+    case Pen::DotLine:
+      return Qt::DotLine;
+      break;
+    case Pen::DashLine:
+      return Qt::DashLine;
+      break;
+  }
+  qWarning("couldn't recognize the pen style");
+  return Qt::NoPen;
+}
+
+static inline QPen penToQPen(const Pen& pen) {
+  return QPen(QColor(pen.color()), pen.width(), toQPenStyle(pen.style()));
+}
+
 struct TransparencyLayer {
   TransparencyLayer(const QPainter& p, int width, int height) {
     pixmap = QPixmap(width, height);
@@ -127,6 +153,10 @@ struct TransparencyLayer {
     painter->setPen(p.pen());
     painter->setBrush(p.brush());
     painter->setMatrix(p.matrix());
+    painter->setOpacity(p.opacity());
+    painter->setFont(p.font());
+    painter->setCompositionMode(p.compositionMode());
+    painter->setClipPath(p.clipPath());
   }
 
   TransparencyLayer() : painter(0) {}
@@ -753,6 +783,18 @@ void GraphicsContext::concatCTM(const AffineTransform& transform) {
 
 void GraphicsContext::setURLForRect(const KURL& link, const IntRect& destRect) {
   notImplemented();
+}
+
+void GraphicsContext::setPlatformFont(const Font& aFont) {
+  m_data->p().setFont(aFont);
+}
+
+void GraphicsContext::setPlatformPen(const Pen& pen) {
+  m_data->p().setPen(penToQPen(pen));
+}
+
+void GraphicsContext::setPlatformFillColor(const Color& color) {
+  m_data->p().setBrush(QBrush(color));
 }
 
 #ifdef SVG_SUPPORT

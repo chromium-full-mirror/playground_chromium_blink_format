@@ -44,7 +44,6 @@ namespace WebCore {
 CachedResource::CachedResource(const String& URL,
                                Type type,
                                CachePolicy cachePolicy,
-                               time_t expireDate,
                                unsigned size) {
   m_url = URL;
   m_type = type;
@@ -53,9 +52,8 @@ CachedResource::CachedResource(const String& URL,
   m_inCache = false;
   m_cachePolicy = cachePolicy;
   m_request = 0;
-  m_response = 0;
+  m_platformResponse = 0;
   m_allData = 0;
-  m_expireDate = expireDate;
   m_expireDateChanged = false;
   m_accessCount = 0;
   m_nextInLRUList = 0;
@@ -72,7 +70,7 @@ CachedResource::~CachedResource() {
 #ifndef NDEBUG
   m_deleted = true;
 #endif
-  setResponse(0);
+  setPlatformResponse(0);
   setAllData(0);
 }
 
@@ -96,23 +94,11 @@ void CachedResource::finish() {
     m_expireDateChanged = false;
 }
 
-void CachedResource::setExpireDate(time_t expireDate, bool changeHttpCache) {
-  if (expireDate == m_expireDate)
-    return;
-
-  if (m_status == Cached)
-    finish();
-
-  m_expireDate = expireDate;
-  if (changeHttpCache && m_expireDate)
-    m_expireDateChanged = true;
-}
-
 bool CachedResource::isExpired() const {
-  if (!m_expireDate)
+  if (!m_response.expirationDate())
     return false;
   time_t now = time(0);
-  return (difftime(now, m_expireDate) >= 0);
+  return (difftime(now, m_response.expirationDate()) >= 0);
 }
 
 void CachedResource::setRequest(Request* request) {
