@@ -118,7 +118,8 @@ class FramePrivate {
         m_windowHasFocus(false),
         m_inViewSourceMode(false),
         frameCount(0),
-        m_prohibitsScrolling(false) {}
+        m_prohibitsScrolling(false),
+        m_beganSelectingText(false) {}
 
   ~FramePrivate() {
     delete m_jscript;
