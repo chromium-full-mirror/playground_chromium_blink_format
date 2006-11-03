@@ -443,7 +443,7 @@ void RenderTextControl::forwardEvent(Event* evt) {
     RenderObject* innerRenderer = m_div->renderer();
     if (innerRenderer) {
       RenderLayer* innerLayer = innerRenderer->layer();
-      if (innerLayer)
+      if (innerLayer && !m_multiLine)
         innerLayer->scrollToOffset(
             style()->direction() == RTL ? innerLayer->scrollWidth() : 0, 0);
     }
