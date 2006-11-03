@@ -21,9 +21,11 @@
 #include "config.h"
 #include "Page.h"
 
+#include "Chrome.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameTree.h"
+#include "SelectionController.h"
 #include "StringHash.h"
 #include "Widget.h"
 #include <kjs/collector.h>
@@ -37,11 +39,16 @@ namespace WebCore {
 static HashSet<Page*>* allPages;
 static HashMap<String, HashSet<Page*>*>* frameNamespaces;
 
-void Page::init() {
+Page::Page(PassRefPtr<ChromeClient> chromeClient)
+    : m_dragCaretController(new SelectionController(0, true)),
+      m_chrome(new Chrome(this, chromeClient)),
+      m_frameCount(0),
+      m_defersLoading(false) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
   }
+
   ASSERT(!allPages->contains(this));
   allPages->add(this);
 }
@@ -62,10 +69,13 @@ Page::~Page() {
     Collector::collect();
 #endif
   }
+
+  delete m_dragCaretController;
+  delete m_chrome;
 }
 
 void Page::setMainFrame(PassRefPtr<Frame> mainFrame) {
-  ASSERT(!m_mainFrame);
+  ASSERT(!m_mainFrame);  // Should only be called during initialization
   m_mainFrame = mainFrame;
 }
 
@@ -124,10 +134,6 @@ void Page::setNeedsReapplyStylesForSettingsChange(Settings* settings) {
          frame = frame->tree()->traverseNext())
       if (frame->settings() == settings)
         frame->setNeedsReapplyStyles();
-}
-
-SelectionController* Page::dragCaretController() const {
-  return &m_dragCaretController;
 }
 
 void Page::setDefersLoading(bool defers) {

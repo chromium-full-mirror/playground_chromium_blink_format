@@ -113,10 +113,11 @@ class ResourceLoader : public Shared<ResourceLoader> {
       NSURLAuthenticationChallenge*);
   void receivedCancellation(NSURLAuthenticationChallenge*);
 
-  // Used to work around the fact that you don't get any more NSURLConnection
-  // callbacks until you return from the first one.
-  static bool inConnectionCallback();
 #endif
+
+  // Used to work around the fact that you don't get any more NSURLConnection
+  // callbacks until you return from the one you're in.
+  static bool loadsBlocked();
 
  protected:
   ResourceLoader(Frame*);
