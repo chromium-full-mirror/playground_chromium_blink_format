@@ -42,13 +42,6 @@ namespace WebCore {
 
 static ResourceHandleManager* s_self = 0;
 
-#if PLATFORM(KDE)
-
-ResourceHandleManager::ResourceHandleManager()
-    : m_jobToKioMap(), m_kioToJobMap(), m_frameClient(0) {}
-
-ResourceHandleManager::~ResourceHandleManager() {}
-
 ResourceHandleManager* ResourceHandleManager::self() {
   if (!s_self)
     s_self = new ResourceHandleManager();
@@ -56,6 +49,32 @@ ResourceHandleManager* ResourceHandleManager::self() {
   return s_self;
 }
 
+QtJob::QtJob(const QString& path) : m_path(path) {
+  startTimer(0);
+}
+
+void QtJob::timerEvent(QTimerEvent* e) {
+  killTimer(e->timerId());
+
+  QFile f(m_path);
+  QByteArray data;
+  if (f.open(QIODevice::ReadOnly)) {
+    data = f.readAll();
+    f.close();
+  };
+
+  emit finished(this, data);
+
+  deleteLater();
+}
+#if PLATFORM(KDE)
+
+ResourceHandleManager::ResourceHandleManager()
+    : m_jobToKioMap(), m_kioToJobMap(), m_frameClient(0) {}
+
+ResourceHandleManager::~ResourceHandleManager() {}
+
+void ResourceHandleManager::deliverJobData(QtJob*, const QByteArray&) {}
 void ResourceHandleManager::slotData(KIO::Job* kioJob, const QByteArray& data) {
   ResourceHandle* job = 0;
 
@@ -196,38 +215,11 @@ void ResourceHandleManager::cancel(ResourceHandle* job) {
   job->setError(1);
 }
 
-#else
 // Qt Resource Handle Manager
-
-QtJob::QtJob(const QString& path) : m_path(path) {
-  startTimer(0);
-}
-
-void QtJob::timerEvent(QTimerEvent* e) {
-  killTimer(e->timerId());
-
-  QFile f(m_path);
-  QByteArray data;
-  if (f.open(QIODevice::ReadOnly)) {
-    data = f.readAll();
-    f.close();
-  };
-
-  emit finished(this, data);
-
-  deleteLater();
-}
-
+#else
 ResourceHandleManager::ResourceHandleManager() : m_frameClient(0) {}
 
 ResourceHandleManager::~ResourceHandleManager() {}
-
-ResourceHandleManager* ResourceHandleManager::self() {
-  if (!s_self)
-    s_self = new ResourceHandleManager();
-
-  return s_self;
-}
 
 void ResourceHandleManager::remove(ResourceHandle* job) {
   ResourceHandleInternal* d = job->getInternal();

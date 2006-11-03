@@ -37,34 +37,6 @@ namespace WebCore {
 
 class FrameQtClient;
 
-#if PLATFORM(KDE)
-class ResourceHandleManager : public QObject {
-  Q_OBJECT
- public:
-  static ResourceHandleManager* self();
-
-  void add(ResourceHandle*, FrameQtClient*);
-  void cancel(ResourceHandle*);
-
- public Q_SLOTS:
-  void slotData(KIO::Job*, const QByteArray& data);
-  void slotMimetype(KIO::Job*, const QString& type);
-  void slotResult(KJob*);
-
- private:
-  ResourceHandleManager();
-  ~ResourceHandleManager();
-
-  void remove(ResourceHandle*);
-
-  // KIO Job <-> WebKit Job mapping
-  QMap<ResourceHandle*, KIO::Job*> m_jobToKioMap;
-  QMap<KIO::Job*, ResourceHandle*> m_kioToJobMap;
-
-  FrameQtClient* m_frameClient;
-};
-#else
-
 class QtJob : public QObject {
   Q_OBJECT
  public:
@@ -89,7 +61,10 @@ class ResourceHandleManager : public QObject {
   void cancel(ResourceHandle*);
 
  public Q_SLOTS:
-  void deliverJobData(QtJob* job, const QByteArray& data);
+  void slotData(KIO::Job*, const QByteArray& data);
+  void slotMimetype(KIO::Job*, const QString& type);
+  void slotResult(KJob*);
+  void deliverJobData(QtJob*, const QByteArray&);
 
  private:
   ResourceHandleManager();
@@ -97,13 +72,18 @@ class ResourceHandleManager : public QObject {
 
   void remove(ResourceHandle*);
 
+#if PLATFORM(KDE)
+  // KIO Job <-> WebKit Job mapping
+  QMap<ResourceHandle*, KIO::Job*> m_jobToKioMap;
+  QMap<KIO::Job*, ResourceHandle*> m_kioToJobMap;
+#else
+
   QMap<ResourceHandle*, QtJob*> m_resourceToJob;
   QMap<QtJob*, ResourceHandle*> m_jobToResource;
+#endif
 
   FrameQtClient* m_frameClient;
 };
-
-#endif
 }
 
 #endif
