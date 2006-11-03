@@ -79,8 +79,6 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
   }
   ASSERT(bytes);
   KURL newURL(bytes);
-  if (!(newURL == job->url()))
-    job->client()->receivedRedirect(job, newURL);
   if (freeBytes)
     free((void*)bytes);
   return request;
