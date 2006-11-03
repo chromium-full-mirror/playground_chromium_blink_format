@@ -342,27 +342,6 @@ String WebCore::fileButtonNoFileSelectedLabel() {
   return "No file selected";
 }
 
-int WebCore::findNextSentenceFromIndex(UChar const*, int, int, bool) {
-  notImplemented();
-  return 0;
-}
-void WebCore::findSentenceBoundary(UChar const*, int, int, int*, int*) {
-  notImplemented();
-}
-int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
-  notImplemented();
-  return 0;
-}
-void WebCore::findWordBoundary(UChar const* str,
-                               int len,
-                               int position,
-                               int* start,
-                               int* end) {
-  *start = position;
-  *end = position;
-  notImplemented();
-}
-
 void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
