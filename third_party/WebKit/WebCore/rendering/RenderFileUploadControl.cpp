@@ -139,6 +139,8 @@ RenderStyle* RenderFileUploadControl::createButtonStyle(
 void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                                           int tx,
                                           int ty) {
+  const int buttonShadowHeight = 2;
+
   // Push a clip.
   if (paintInfo.phase == PaintPhaseForeground ||
       paintInfo.phase == PaintPhaseChildBlockBackgrounds) {
