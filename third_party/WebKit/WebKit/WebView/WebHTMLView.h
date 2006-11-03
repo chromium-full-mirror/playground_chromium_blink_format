@@ -60,4 +60,6 @@
 */
 - (void)reapplyStyles;
 
+- (void)outdent:(id)sender;
+
 @end
