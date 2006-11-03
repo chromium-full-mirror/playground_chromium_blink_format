@@ -144,9 +144,13 @@ typedef enum {
 - (void)setWebView:(WebView*)newWebView;
 @end
 
-@interface WebView (WebPendingPublic)
+@interface WebView (WebViewEditingActionsPendingPublic)
 
 - (void)outdent:(id)sender;
+
+@end
+
+@interface WebView (WebPendingPublic)
 
 - (void)setMainFrameDocumentReady:(BOOL)mainFrameDocumentReady;
 
