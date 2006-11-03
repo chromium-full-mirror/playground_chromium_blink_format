@@ -43,6 +43,28 @@ class JSObject;
 class JSValue;
 class UString;
 
+template <bool for32bit, bool for64bit>
+struct NanAsBitsValue {};
+template <>
+struct NanAsBitsValue<true, false> {
+  enum { value = 0x7fc00000 };
+};
+template <>
+struct NanAsBitsValue<false, true> {
+  enum { value = 0x7ff80000ULL << 32 };
+};
+
+template <bool for32bit, bool for64bit>
+struct oneAsBitsValue {};
+template <>
+struct oneAsBitsValue<true, false> {
+  enum { value = 0x3f800000 };
+};
+template <>
+struct oneAsBitsValue<false, true> {
+  enum { value = 0x3ff00000ULL << 32 };
+};
+
 /*
  * A JSValue * is either a pointer to a cell (a heap-allocated object) or an
  * immediate (a type-tagged
@@ -88,7 +110,7 @@ class JSImmediate {
   }
 
   static JSValue* fromDouble(double d) {
-    if (is32bit()) {
+    if (is32bit) {
       FloatUnion floatUnion;
       floatUnion.asFloat = d;
 
@@ -104,7 +126,7 @@ class JSImmediate {
         return 0;
 
       return tag(floatUnion.asBits, NumberType);
-    } else if (is64bit()) {
+    } else if (is64bit) {
       DoubleUnion doubleUnion;
       doubleUnion.asDouble = d;
 
@@ -124,11 +146,11 @@ class JSImmediate {
   static double toDouble(const JSValue* v) {
     ASSERT(isImmediate(v));
 
-    if (is32bit()) {
+    if (is32bit) {
       FloatUnion floatUnion;
       floatUnion.asBits = unTag(v);
       return floatUnion.asFloat;
-    } else if (is64bit()) {
+    } else if (is64bit) {
       DoubleUnion doubleUnion;
       doubleUnion.asBits = unTag(v);
       return doubleUnion.asDouble;
@@ -192,47 +214,23 @@ class JSImmediate {
   };
 
   // we support 32-bit platforms with sizes like this
-  static bool is32bit() {
-    return sizeof(float) == sizeof(uint32_t) &&
-           sizeof(double) == sizeof(uint64_t) &&
-           sizeof(uintptr_t) == sizeof(uint32_t);
-  }
+  static const bool is32bit = sizeof(float) == sizeof(uint32_t) &&
+                              sizeof(double) == sizeof(uint64_t) &&
+                              sizeof(uintptr_t) == sizeof(uint32_t);
 
   // we support 64-bit platforms with sizes like this
-  static bool is64bit() {
-    return sizeof(float) == sizeof(uint32_t) &&
-           sizeof(double) == sizeof(uint64_t) &&
-           sizeof(uintptr_t) == sizeof(uint64_t);
-  }
+  static const bool is64bit = sizeof(float) == sizeof(uint32_t) &&
+                              sizeof(double) == sizeof(uint64_t) &&
+                              sizeof(uintptr_t) == sizeof(uint64_t);
 
   static uintptr_t NanAsBits() {
-    const uint32_t NaN32AsBits = 0x7fc00000;
-    const uint64_t NaN64AsBits = 0x7ff80000ULL << 32;
-
-    if (is32bit())
-      return NaN32AsBits;
-    else if (is64bit())
-      return NaN64AsBits;
-    else {
-      abort();
-      return 0;
-    }
+    return NanAsBitsValue<is32bit, is64bit>::value;
   }
 
   static uintptr_t zeroAsBits() { return 0x0; }
 
   static uintptr_t oneAsBits() {
-    const uint32_t One32AsBits = 0x3f800000;
-    const uint64_t One64AsBits = 0x3ff00000ULL << 32;
-
-    if (is32bit())
-      return One32AsBits;
-    else if (is64bit())
-      return One64AsBits;
-    else {
-      abort();
-      return 0;
-    }
+    return oneAsBitsValue<is32bit, is64bit>::value;
   }
 };
 
