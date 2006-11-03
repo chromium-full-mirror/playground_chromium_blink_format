@@ -90,6 +90,7 @@ class FramePrivate {
         m_zoomFactor(parent ? parent->d->m_zoomFactor : 100),
         m_submitForm(0),
         m_bMousePressed(false),
+        m_beganSelectingText(false),
         m_selectionController(thisFrame),
         m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
         m_editor(thisFrame, client),
@@ -118,8 +119,7 @@ class FramePrivate {
         m_windowHasFocus(false),
         m_inViewSourceMode(false),
         frameCount(0),
-        m_prohibitsScrolling(false),
-        m_beganSelectingText(false) {}
+        m_prohibitsScrolling(false) {}
 
   ~FramePrivate() {
     delete m_jscript;
