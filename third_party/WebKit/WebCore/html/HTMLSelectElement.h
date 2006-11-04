@@ -34,14 +34,11 @@
 
 namespace WebCore {
 
-class DeprecatedRenderSelect;
 class HTMLOptionElement;
 class HTMLOptionsCollection;
 class KeyboardEvent;
 
 class HTMLSelectElement : public HTMLGenericFormElement {
-  friend class DeprecatedRenderSelect;
-
  public:
   HTMLSelectElement(Document*, HTMLFormElement* = 0);
   HTMLSelectElement(const QualifiedName& tagName,

@@ -36,7 +36,6 @@
 #include "TextField.h"
 #include "FileChooser.h"
 #include "Font.h"
-#include "ListBox.h"
 #include "IntPoint.h"
 #include "Widget.h"
 #include "GraphicsContext.h"
@@ -215,37 +214,6 @@ double Slider::value() const {
   return 0;
 }
 
-void ListBox::setSelected(int, bool) {
-  notImplemented();
-}
-IntSize ListBox::sizeForNumberOfLines(int) const {
-  notImplemented();
-  return IntSize();
-}
-bool ListBox::isSelected(int) const {
-  notImplemented();
-  return 0;
-}
-void ListBox::appendItem(DeprecatedString const&, ListBoxItemType, bool) {
-  notImplemented();
-}
-void ListBox::doneAppendingItems() {
-  notImplemented();
-}
-void ListBox::setWritingDirection(TextDirection) {
-  notImplemented();
-}
-void ListBox::setEnabled(bool) {
-  notImplemented();
-}
-void ListBox::clear() {
-  notImplemented();
-}
-bool ListBox::checksDescendantsForFocus() const {
-  notImplemented();
-  return 0;
-}
-
 FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
   notImplemented();
 }
@@ -272,10 +240,6 @@ void FileChooser::chooseFile(const String& filename) {
 }
 
 Widget::FocusPolicy Slider::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
-Widget::FocusPolicy ListBox::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
@@ -738,11 +702,6 @@ bool Scrollbar::setValue(int) {
   return false;
 }
 void Scrollbar::setProportion(int, int) {}
-
-ListBox::ListBox() {}
-ListBox::~ListBox() {}
-void ListBox::setSelectionMode(ListBox::SelectionMode) {}
-void ListBox::setFont(WebCore::Font const&) {}
 
 Color focusRingColor() {
   return 0xFF0000FF;
