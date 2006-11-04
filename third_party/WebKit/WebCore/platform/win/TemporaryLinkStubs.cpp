@@ -60,11 +60,14 @@
 #include "FrameWin.h"
 #include "ResourceHandle.h"
 #include "ResourceHandleClient.h"
+#include "ResourceLoader.h"
 #include "RenderThemeWin.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
 #include "PopupMenu.h"
+#include "ChromeClientWin.h"
 #include "EditCommand.h"
+#include "EditorClientWin.h"
 #include "Icon.h"
 #include "IconLoader.h"
 #include "IconDatabase.h"
@@ -385,6 +388,17 @@ bool FrameWin::canGoBackOrForward(int) const {
   notImplemented();
   return 0;
 }
+void FrameWin::goBackOrForward(int distance) {
+  notImplemented();
+}
+int FrameWin::getHistoryLength() {
+  notImplemented();
+  return 0;
+}
+KURL FrameWin::historyURL(int distance) {
+  notImplemented();
+  return KURL();
+}
 void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
 }
@@ -523,14 +537,10 @@ bool PlugInInfoStore::supportsMIMEType(const String&) {
 }
 void refreshPlugins(bool) {}
 
-void ResourceHandle::assembleResponseHeaders() const {}
-void ResourceHandle::retrieveResponseEncoding() const {}
-
 Vector<char> ServeSynchronousRequest(Loader*,
                                      DocLoader*,
-                                     ResourceHandle*,
-                                     KURL&,
-                                     DeprecatedString&) {
+                                     const ResourceRequest&,
+                                     ResourceResponse&) {
   notImplemented();
   return Vector<char>();
 }
@@ -563,6 +573,31 @@ void CachedResource::setAllData(PlatformData) {
 }
 
 HINSTANCE Page::s_instanceHandle = 0;
+bool ChromeClientWin::canRunModal() {
+  notImplemented();
+  return false;
+}
+void ChromeClientWin::runModal() {}
+
+bool EditorClientWin::shouldDeleteRange(Range*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldShowDeleteInterface(HTMLElement*) {
+  return false;
+}
+bool EditorClientWin::isContinuousSpellCheckingEnabled() {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::isGrammarCheckingEnabled() {
+  notImplemented();
+  return false;
+}
+int EditorClientWin::spellCheckerDocumentTag() {
+  notImplemented();
+  return 0;
+}
 
 void Widget::setEnabled(bool) {}
 void Widget::paint(GraphicsContext*, IntRect const&) {}
@@ -642,6 +677,7 @@ void Path::closeSubpath() {}
 void Path::addArc(const FloatPoint&, float, float, float, bool) {}
 void Path::addRect(const FloatRect&) {}
 void Path::addEllipse(const FloatRect&) {}
+void Path::transform(const AffineTransform&) {}
 
 TextField::TextField(TextField::Type type) {
   m_type = type;
@@ -732,6 +768,9 @@ void PopupMenu::show(const IntRect&, FrameView*, int index) {
 void PopupMenu::hide() {
   notImplemented();
 }
+void PopupMenu::updateFromElement() {
+  notImplemented();
+}
 
 void RenderThemeWin::systemFont(int propId,
                                 FontDescription& fontDescription) const {}
@@ -743,6 +782,11 @@ bool RenderThemeWin::paintMenuList(RenderObject*,
 void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const {}
+
+bool ResourceLoader::loadsBlocked() {
+  notImplemented();
+  return false;
+}
 
 Icon::Icon() {
   notImplemented();
@@ -782,4 +826,5 @@ bool IconDatabase::setIconURLForPageURL(const String& iconURL,
   return false;
 }
 
+void systemBeep() {}
 }  // namespace WebCore
