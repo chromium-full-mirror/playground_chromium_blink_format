@@ -27,10 +27,7 @@
 #ifndef ResourceHandleInternal_h
 #define ResourceHandleInternal_h
 
-#include "FormData.h"
-#include "KURL.h"
-#include <wtf/HashMap.h>
-#include <wtf/Platform.h>
+#include "ResourceRequest.h"
 
 #if USE(CFNETWORK)
 #include <CFNetwork/CFURLConnectionPriv.h>

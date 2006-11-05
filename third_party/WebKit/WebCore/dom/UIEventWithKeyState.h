@@ -26,13 +26,9 @@
 #ifndef UIEventWithKeyState_h
 #define UIEventWithKeyState_h
 
-#include "AtomicString.h"
-#include "DOMWindow.h"
 #include "UIEvent.h"
 
 namespace WebCore {
-
-typedef DOMWindow AbstractView;
 
 class UIEventWithKeyState : public UIEvent {
  public:

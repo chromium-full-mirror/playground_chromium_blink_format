@@ -1239,7 +1239,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         form()->reset();
       else {
         m_activeSubmit = true;
-        if (!form()->prepareSubmit()) {
+        if (!form()->prepareSubmit(evt)) {
           xPos = 0;
           yPos = 0;
         }
@@ -1371,7 +1371,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         blur();
         // Make sure the form hasn't been destroyed during the blur.
         if (form())
-          form()->submitClick();
+          form()->submitClick(evt);
       }
       evt->setDefaultHandled();
     }

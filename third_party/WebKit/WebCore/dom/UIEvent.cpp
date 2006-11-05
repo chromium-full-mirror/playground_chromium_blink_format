@@ -21,10 +21,11 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "UIEvent.h"
 
-#include "AtomicString.h"
+#include "DOMWindow.h"
 
 namespace WebCore {
 
@@ -38,6 +39,8 @@ UIEvent::UIEvent(const AtomicString& eventType,
     : Event(eventType, canBubbleArg, cancelableArg),
       m_view(viewArg),
       m_detail(detailArg) {}
+
+UIEvent::~UIEvent() {}
 
 void UIEvent::initUIEvent(const AtomicString& typeArg,
                           bool canBubbleArg,

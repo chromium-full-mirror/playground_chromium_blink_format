@@ -39,6 +39,7 @@
 #include "LoaderFunctions.h"
 #include "Request.h"
 #include "ResourceHandle.h"
+#include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include <wtf/Assertions.h>
 #include <wtf/Vector.h>

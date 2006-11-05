@@ -132,7 +132,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
   virtual void dispatchDidCancelClientRedirect();
-  virtual void dispatchWillPerformClientRedirect(NSURL* URL,
+  virtual void dispatchWillPerformClientRedirect(const WebCore::KURL&,
                                                  double interval,
                                                  double fireDate);
   virtual void dispatchDidChangeLocationWithinPage();
@@ -208,7 +208,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void setDefersLoading(bool);
 
-  virtual WebCore::String userAgent(NSURL*);
+  virtual WebCore::String userAgent();
 
   virtual bool willUseArchive(WebCore::ResourceLoader*,
                               NSURLRequest*,
@@ -227,13 +227,13 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void frameLoadCompleted();
   virtual void restoreScrollPositionAndViewState();
   virtual void provisionalLoadStarted();
-  virtual bool shouldTreatURLAsSameAsCurrent(NSURL*) const;
+  virtual bool shouldTreatURLAsSameAsCurrent(const WebCore::KURL&) const;
   virtual void addHistoryItemForFragmentScroll();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
   virtual PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
       NSURLRequest*);
-  virtual void setTitle(const WebCore::String& title, NSURL*);
+  virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
 
   void deliverArchivedResourcesAfterDelay() const;
   bool canUseArchivedResource(NSURLRequest*) const;
@@ -243,7 +243,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   WebFramePolicyListener* setUpPolicyListener(WebCore::FramePolicyFunction);
 
   NSDictionary* actionDictionary(const WebCore::NavigationAction&) const;
-  NSDictionary* elementForEvent(NSEvent*) const;
 
   bool createPageCache(WebHistoryItem*);
 

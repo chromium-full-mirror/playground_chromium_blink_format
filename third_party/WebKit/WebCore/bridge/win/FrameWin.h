@@ -55,9 +55,8 @@ class FrameWin : public Frame {
   virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowFeatures&,
                                Frame*& part);
-  virtual void submitForm(const FrameLoadRequest&);
-  virtual void urlSelected(const FrameLoadRequest&,
-                           const Event* triggeringEvent);
+  virtual void submitForm(const FrameLoadRequest&, Event*);
+  virtual void urlSelected(const FrameLoadRequest&, Event*);
 
   virtual void setTitle(const String&);
   virtual void setStatusBarText(const String&);

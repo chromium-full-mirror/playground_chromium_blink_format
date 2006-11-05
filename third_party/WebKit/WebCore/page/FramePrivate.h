@@ -189,6 +189,7 @@ class FramePrivate {
     String target;
     String submitContentType;
     String submitBoundary;
+    RefPtr<Event> event;
   };
   SubmitForm* m_submitForm;
 

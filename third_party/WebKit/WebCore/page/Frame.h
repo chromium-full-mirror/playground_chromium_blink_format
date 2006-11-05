@@ -64,7 +64,6 @@ class Editor;
 class EditorClient;
 class FormData;
 class FramePrivate;
-struct FrameLoadRequest;
 class FrameLoader;
 class FrameTree;
 class KJSProxy;
@@ -80,6 +79,8 @@ class Selection;
 class SelectionController;
 class Settings;
 class VisiblePosition;
+
+struct FrameLoadRequest;
 
 template <typename T>
 class Timer;
@@ -113,12 +114,11 @@ class Frame : public Shared<Frame> {
                       const String& referrer,
                       bool lockHistory = true,
                       bool userGesture = false);
-  virtual void urlSelected(const ResourceRequest&,
-                           const String& target,
-                           const Event* triggeringEvent,
-                           bool lockHistory = false);
-  virtual void urlSelected(const FrameLoadRequest&,
-                           const Event* triggeringEvent) = 0;
+  void urlSelected(const ResourceRequest&,
+                   const String& target,
+                   Event*,
+                   bool lockHistory = false);
+  virtual void urlSelected(const FrameLoadRequest&, Event*) = 0;
 
   bool requestFrame(Element* ownerElement,
                     const String& url,
@@ -132,14 +132,15 @@ class Frame : public Shared<Frame> {
                       const String& name,
                       const String& referrer);
 
-  virtual void submitForm(const FrameLoadRequest&) = 0;
   void submitForm(const char* action,
-                  const String& url,
-                  const FormData& formData,
+                  const String& URL,
+                  const FormData&,
                   const String& target,
-                  const String& contentType = String(),
-                  const String& boundary = String());
+                  const String& contentType,
+                  const String& boundary,
+                  Event*);
   void submitFormAgain();
+  virtual void submitForm(const FrameLoadRequest&, Event*) = 0;
 
   void stop();
   void stopLoading(bool sendUnload = false);

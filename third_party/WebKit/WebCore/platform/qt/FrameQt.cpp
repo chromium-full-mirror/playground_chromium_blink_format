@@ -133,7 +133,7 @@ FrameQt::~FrameQt() {
   cancelAndClear();
 }
 
-void FrameQt::submitForm(const FrameLoadRequest& frameLoadRequest) {
+void FrameQt::submitForm(const FrameLoadRequest& frameLoadRequest, Event*) {
   const ResourceRequest& request = frameLoadRequest.resourceRequest();
 
   // FIXME: this is a hack inherited from FrameMac, and should be pushed into
@@ -150,8 +150,7 @@ void FrameQt::submitForm(const FrameLoadRequest& frameLoadRequest) {
   clearRecordedFormValues();
 }
 
-void FrameQt::urlSelected(const FrameLoadRequest& frameLoadRequest,
-                          const Event*) {
+void FrameQt::urlSelected(const FrameLoadRequest& frameLoadRequest, Event*) {
   const ResourceRequest& request = frameLoadRequest.resourceRequest();
 
   if (!m_client)
