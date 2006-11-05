@@ -109,13 +109,11 @@ class FrameViewPrivate {
     slowRepaintObjectCount = 0;
     dragTarget = 0;
     borderTouched = false;
-    scrollbarMoved = false;
     ignoreWheelEvents = false;
     borderX = 30;
     borderY = 30;
     clickCount = 0;
     clickNode = 0;
-    scrollingSelf = false;
     layoutTimer.stop();
     layoutRoot = 0;
     delayedLayout = false;
@@ -139,7 +137,6 @@ class FrameViewPrivate {
 
   bool borderTouched : 1;
   bool borderStart : 1;
-  bool scrollbarMoved : 1;
   bool doFullRepaint : 1;
   bool m_hasBorder : 1;
 
@@ -154,7 +151,6 @@ class FrameViewPrivate {
   int clickCount;
   RefPtr<Node> clickNode;
 
-  bool scrollingSelf;
   Timer<FrameView> layoutTimer;
   bool delayedLayout;
   RefPtr<Node> layoutRoot;
@@ -257,7 +253,9 @@ void FrameView::clear() {
 #endif
   d->layoutTimer.stop();
 
-  cleared();
+  if (m_frame)
+    if (RenderPart* renderer = m_frame->ownerRenderer())
+      renderer->viewCleared();
 
   suppressScrollbars(true);
 }
@@ -1055,8 +1053,6 @@ Node* FrameView::nodeUnderMouse() const {
 }
 
 bool FrameView::scrollTo(const IntRect& bounds) {
-  d->scrollingSelf = true;  // so scroll events get ignored
-
   int x, y, xe, ye;
   x = bounds.x();
   y = bounds.y();
@@ -1120,8 +1116,6 @@ bool FrameView::scrollTo(const IntRect& bounds) {
     scrollX = -scrollX;
   if (scrollY < 0)
     scrollY = -scrollY;
-
-  d->scrollingSelf = false;
 
   return scrollX != maxx && scrollY != maxy;
 }
@@ -1360,12 +1354,6 @@ void FrameView::handleWheelEvent(PlatformWheelEvent& e) {
   }
 }
 
-void FrameView::scrollbarMoved() {
-  // FIXME: Need to arrange for this to be called when the view is scrolled!
-  if (!d->scrollingSelf)
-    d->scrollbarMoved = true;
-}
-
 void FrameView::repaintRectangle(const IntRect& r, bool immediate) {
   updateContents(r, immediate);
 }
@@ -1490,12 +1478,6 @@ void FrameView::setHasBorder(bool b) {
 
 bool FrameView::hasBorder() const {
   return d->m_hasBorder;
-}
-
-void FrameView::cleared() {
-  if (m_frame)
-    if (RenderPart* renderer = m_frame->ownerRenderer())
-      renderer->viewCleared();
 }
 
 void FrameView::scheduleEvent(PassRefPtr<Event> event,

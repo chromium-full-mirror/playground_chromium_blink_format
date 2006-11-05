@@ -432,10 +432,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 // The WebCoreFrameBridge protocol contains methods for use by the WebCore side
 // of the bridge.
 
-// In NSArray objects for post data, NSData objects represent literal data, and
-// NSString objects represent encoded files.
-// The encoding is the standard form encoding for uploading files.
-
 @protocol WebCoreFrameBridge
 
 - (NSView*)documentView;
@@ -453,16 +449,15 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                  marginWidth:(int)width
                                 marginHeight:(int)height;
 
-- (BOOL)areToolbarsVisible;
-- (void)setToolbarsVisible:(BOOL)visible;
-- (BOOL)isStatusbarVisible;
-- (void)setStatusbarVisible:(BOOL)visible;
-- (BOOL)areScrollbarsVisible;
-- (void)setScrollbarsVisible:(BOOL)visible;
 - (NSWindow*)window;
 
+- (void)setToolbarsVisible:(BOOL)visible;
+- (void)setStatusbarVisible:(BOOL)visible;
+- (void)setScrollbarsVisible:(BOOL)visible;
 - (void)setWindowIsResizable:(BOOL)resizable;
-- (BOOL)windowIsResizable;
+
+- (BOOL)areToolbarsVisible;
+- (BOOL)isStatusbarVisible;
 
 - (NSResponder*)firstResponder;
 - (void)makeFirstResponder:(NSResponder*)responder;
@@ -491,7 +486,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)formControlIsResigningFirstResponder:(NSView*)formControl;
 
 - (NSView*)nextKeyViewOutsideWebFrameViews;
-- (NSView*)nextValidKeyViewOutsideWebFrameViews;
 - (NSView*)previousKeyViewOutsideWebFrameViews;
 
 - (void)saveDocumentState:(NSArray*)documentState;
@@ -546,8 +540,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
     shouldHandleEvent:(NSEvent*)event;
 
 - (void)setHasBorder:(BOOL)hasBorder;
-
-- (NSFileWrapper*)fileWrapperForURL:(NSURL*)URL;
 
 - (void)print;
 
@@ -606,7 +598,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 @interface WebCoreFrameBridge (SubclassResponsibility)<WebCoreFrameBridge>
 @end
 
-// Protocols that make up part of the interaces above.
+// Protocols that make up part of the interfaces above.
 
 @protocol WebCoreRenderTreeCopier<NSObject>
 - (NSObject*)nodeWithName:(NSString*)name
