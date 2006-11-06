@@ -500,35 +500,17 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
           JSValue* conversionFunction =
               o->get(exec, toLocaleStringPropertyName);
           if (conversionFunction->isObject() &&
-              static_cast<JSObject*>(conversionFunction)->implementsCall()) {
+              static_cast<JSObject*>(conversionFunction)->implementsCall())
             str += static_cast<JSObject*>(conversionFunction)
                        ->call(exec, o, List())
                        ->toString(exec);
-          } else {
+          else
             // try toString() fallback
             fallback = true;
-          }
         }
 
-        if (id == ToString || id == Join || fallback) {
-          if (element->isObject()) {
-            JSObject* o = static_cast<JSObject*>(element);
-            JSValue* conversionFunction = o->get(exec, toStringPropertyName);
-            if (conversionFunction->isObject() &&
-                static_cast<JSObject*>(conversionFunction)->implementsCall()) {
-              str += static_cast<JSObject*>(conversionFunction)
-                         ->call(exec, o, List())
-                         ->toString(exec);
-            } else {
-              visitedElems.remove(thisObj);
-              return throwError(
-                  exec, RangeError,
-                  "Can't convert " + o->className() + " object to string");
-            }
-          } else {
-            str += element->toString(exec);
-          }
-        }
+        if (id == ToString || id == Join || fallback)
+          str += element->toString(exec);
 
         if (exec->hadException())
           break;
