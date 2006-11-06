@@ -130,6 +130,10 @@ extern NSString* WebElementSpellingToolTipKey;  // NSString of a tooltip
                                                 // representing misspelling or
                                                 // bad grammar (used internally)
 
+// other WebElementDictionary keys
+extern NSString* WebElementLinkIsLiveKey;  // NSNumber of BOOL indictating
+                                           // whether the link is live or not
+
 typedef enum {
   WebDashboardBehaviorAlwaysSendMouseEventsToAllWindows,
   WebDashboardBehaviorAlwaysSendActiveNullEventsToPlugIns,

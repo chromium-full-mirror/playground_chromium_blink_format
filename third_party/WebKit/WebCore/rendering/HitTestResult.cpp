@@ -27,6 +27,7 @@
 #include "Document.h"
 #include "Frame.h"
 #include "FrameTree.h"
+#include "HTMLAnchorElement.h"
 #include "HTMLElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
@@ -219,6 +220,16 @@ KURL HitTestResult::absoluteLinkURL() const {
       parseURL(
           static_cast<Element*>(m_innerURLElement.get())->getAttribute("href"))
           .deprecatedString()));
+}
+
+bool HitTestResult::isLiveLink() const {
+  if (!(m_innerURLElement && m_innerURLElement->document()))
+    return false;
+
+  if (!m_innerURLElement->hasTagName(aTag))
+    return false;
+
+  return static_cast<HTMLAnchorElement*>(m_innerURLElement.get())->isLiveLink();
 }
 
 String HitTestResult::titleDisplayString() const {
