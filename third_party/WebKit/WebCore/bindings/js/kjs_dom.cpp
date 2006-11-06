@@ -281,9 +281,7 @@ JSValue* DOMNode::toPrimitive(ExecState* exec, JSType) const {
 UString DOMNode::toString(ExecState*) const {
   if (!m_impl)
     return "null";
-  return "[object " +
-         (m_impl->isElementNode() ? UString(m_impl->nodeName()) : className()) +
-         "]";
+  return "[object " + className() + "]";
 }
 
 JSValue* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
