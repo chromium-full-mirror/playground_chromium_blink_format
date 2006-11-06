@@ -26,6 +26,8 @@
 #ifndef SVGResourceImage_H
 #define SVGResourceImage_H
 
+#ifdef SVG_SUPPORT
+
 #include "IntSize.h"
 #include "SVGResource.h"
 
@@ -64,5 +66,7 @@ class SVGResourceImage : public SVGResource {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // SVGResourceImage_H

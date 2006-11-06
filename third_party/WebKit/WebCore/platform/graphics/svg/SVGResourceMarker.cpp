@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SVGResourceMarker.h"
 
+#ifdef SVG_SUPPORT
+
 #include "AffineTransform.h"
 #include "GraphicsContext.h"
 #include "RenderSVGContainer.h"
@@ -118,3 +120,5 @@ SVGResourceMarker* getMarkerById(Document* document, const AtomicString& id) {
 }
 
 }  // namespace WebCore
+
+#endif

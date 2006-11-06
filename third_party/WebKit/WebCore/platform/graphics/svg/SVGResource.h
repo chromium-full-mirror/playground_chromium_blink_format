@@ -26,6 +26,8 @@
 #ifndef SVGResource_H
 #define SVGResource_H
 
+#ifdef SVG_SUPPORT
+
 #include "Shared.h"
 #include "PlatformString.h"
 #include "DeprecatedValueList.h"
@@ -98,5 +100,7 @@ KRenderingPaintServer* getPaintServerById(Document*, const AtomicString&);
 TextStream& operator<<(TextStream&, const SVGResource&);
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // SVGResource_H

@@ -26,6 +26,8 @@
 #ifndef SVGResourceClipper_H
 #define SVGResourceClipper_H
 
+#ifdef SVG_SUPPORT
+
 #include "SVGResource.h"
 #include "Path.h"
 
@@ -77,5 +79,7 @@ TextStream& operator<<(TextStream&, const ClipData&);
 SVGResourceClipper* getClipperById(Document*, const AtomicString&);
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // SVGResourceClipper_H

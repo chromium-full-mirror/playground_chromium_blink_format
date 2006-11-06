@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SVGResource.h"
 
+#ifdef SVG_SUPPORT
+
 #include "KRenderingPaintServer.h"
 #include "RenderPath.h"
 #include "SVGElement.h"
@@ -95,3 +97,5 @@ TextStream& operator<<(TextStream& ts, const SVGResource& r) {
 }
 
 }  // namespace WebCore
+
+#endif

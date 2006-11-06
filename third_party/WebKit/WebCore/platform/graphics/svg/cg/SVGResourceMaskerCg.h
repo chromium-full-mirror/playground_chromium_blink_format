@@ -24,6 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef SVG_SUPPORT
+
 #include "KCanvasMasker.h"
 #include "KCanvasImage.h"
 
@@ -36,3 +38,5 @@ class KCanvasMaskerQuartz : public KCanvasMasker {
   virtual void applyMask(const FloatRect& boundingBox) const;
 };
 }
+
+#endif
