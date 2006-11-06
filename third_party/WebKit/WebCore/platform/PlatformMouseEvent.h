@@ -32,8 +32,12 @@
 #if PLATFORM(MAC)
 #ifdef __OBJC__
 @class NSEvent;
+@class NSScreen;
+@class NSWindow;
 #else
 class NSEvent;
+class NSScreen;
+class NSWindow;
 #endif
 #endif
 
@@ -125,6 +129,12 @@ class PlatformMouseEvent {
   bool m_altKey;
   bool m_metaKey;
 };
+
+#if PLATFORM(MAC)
+IntPoint globalPoint(const NSPoint& windowPoint, NSWindow* window);
+IntPoint pointForEvent(NSEvent* event);
+IntPoint globalPointForEvent(NSEvent* event);
+#endif
 
 }  // namespace WebCore
 

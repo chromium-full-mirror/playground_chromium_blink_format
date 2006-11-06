@@ -21,29 +21,68 @@
 #include "config.h"
 #include "Chrome.h"
 
+#include "ChromeClient.h"
+#include "FloatRect.h"
 #include "Page.h"
 #include "ResourceLoader.h"
-#include "ChromeClient.h"
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
 
-bool Chrome::canRunModal() {
-  if (!m_client)
-    return false;
+Chrome::Chrome(Page* page, PassRefPtr<ChromeClient> client)
+    : m_page(page), m_client(client) {
+  ASSERT(m_client);
+}
+
+void Chrome::setWindowRect(const FloatRect& rect) const {
+  m_client->setWindowRect(rect);
+}
+
+FloatRect Chrome::windowRect() const {
+  return m_client->windowRect();
+}
+
+FloatRect Chrome::pageRect() const {
+  return m_client->pageRect();
+}
+
+float Chrome::scaleFactor() {
+  return m_client->scaleFactor();
+}
+
+void Chrome::focus() const {
+  m_client->focus();
+}
+
+void Chrome::unfocus() const {
+  m_client->unfocus();
+}
+
+Page* Chrome::createWindow(const FrameLoadRequest& request) const {
+  return m_client->createWindow(request);
+}
+
+Page* Chrome::createModalDialog(const FrameLoadRequest& request) const {
+  return m_client->createModalDialog(request);
+}
+
+void Chrome::show() const {
+  m_client->show();
+}
+
+bool Chrome::canRunModal() const {
   return m_client->canRunModal();
 }
 
-bool Chrome::canRunModalNow() {
+bool Chrome::canRunModalNow() const {
   // If loads are blocked, we can't run modal because the contents
   // of the modal dialog will never show up!
   return canRunModal() && !ResourceLoader::loadsBlocked();
 }
 
-void Chrome::runModal() {
-  if (!canRunModal())
-    return;
-
+void Chrome::runModal() const {
   if (m_page->defersLoading()) {
     LOG_ERROR(
         "Tried to run modal in a page when it was deferring loading -- should "
@@ -73,6 +112,42 @@ void Chrome::runModal() {
   // Restore loading for any views that we shut down.
   for (size_t i = 0; i < count; ++i)
     pagesToDefer[i]->setDefersLoading(false);
+}
+
+void Chrome::setToolbarsVisible(bool b) const {
+  m_client->setToolbarsVisible(b);
+}
+
+bool Chrome::toolbarsVisible() const {
+  return m_client->toolbarsVisible();
+}
+
+void Chrome::setStatusbarVisible(bool b) const {
+  m_client->setStatusbarVisible(b);
+}
+
+bool Chrome::statusbarVisible() const {
+  return m_client->statusbarVisible();
+}
+
+void Chrome::setScrollbarsVisible(bool b) const {
+  m_client->setScrollbarsVisible(b);
+}
+
+bool Chrome::scrollbarsVisible() const {
+  return m_client->scrollbarsVisible();
+}
+
+void Chrome::setMenubarVisible(bool b) const {
+  m_client->setMenubarVisible(b);
+}
+
+bool Chrome::menubarVisible() const {
+  return m_client->menubarVisible();
+}
+
+void Chrome::setResizable(bool b) const {
+  m_client->setResizable(b);
 }
 
 }  // namespace WebCore

@@ -213,7 +213,6 @@ class Frame : public Shared<Frame> {
 
   void sendResizeEvent();
   void sendScrollEvent();
-  bool scrollbarsVisible();
   bool canMouseDownStartSelect(Node*);
 
   void clearTimers();
@@ -249,11 +248,6 @@ class Frame : public Shared<Frame> {
                                    const String& defaultValue,
                                    String& result) = 0;
   virtual bool shouldInterruptJavaScript() = 0;
-  virtual bool locationbarVisible() = 0;
-  virtual bool menubarVisible() = 0;
-  virtual bool personalbarVisible() = 0;
-  virtual bool statusbarVisible() = 0;
-  virtual bool toolbarVisible() = 0;
   virtual void scheduleClose() = 0;
   virtual void focusWindow() = 0;
   virtual void unfocusWindow() = 0;

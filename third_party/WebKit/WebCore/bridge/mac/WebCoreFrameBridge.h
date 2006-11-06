@@ -34,6 +34,7 @@ namespace WebCore {
 class EditorClient;
 class Element;
 class FrameMac;
+class Page;
 class String;
 }
 
@@ -60,7 +61,6 @@ typedef WebCore::FrameMac WebCoreFrameMac;
 @class DOMNode;
 @class DOMRange;
 @class NSMenu;
-@class WebCorePageBridge;
 @class WebCoreSettings;
 @class WebFrame;
 @class WebScriptObject;
@@ -185,7 +185,7 @@ typedef enum {
 
 + (WebCoreFrameBridge*)bridgeForDOMDocument:(DOMDocument*)document;
 
-- (id)initMainFrameWithPage:(WebCorePageBridge*)page
+- (id)initMainFrameWithPage:(WebCore::Page*)page
            withEditorClient:(WebCoreEditorClient*)client;
 - (id)initSubframeWithOwnerElement:(WebCoreElement*)ownerElement
                   withEditorClient:(WebCoreEditorClient*)client;
@@ -436,9 +436,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (NSView*)documentView;
 
-- (WebCorePageBridge*)createWindowWithURL:(NSURL*)URL;
-- (void)showWindow;
-
 - (void)setStatusText:(NSString*)status;
 
 - (WebCoreFrameBridge*)createChildFrameNamed:(NSString*)frameName
@@ -450,14 +447,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                 marginHeight:(int)height;
 
 - (NSWindow*)window;
-
-- (void)setToolbarsVisible:(BOOL)visible;
-- (void)setStatusbarVisible:(BOOL)visible;
-- (void)setScrollbarsVisible:(BOOL)visible;
-- (void)setWindowIsResizable:(BOOL)resizable;
-
-- (BOOL)areToolbarsVisible;
-- (BOOL)isStatusbarVisible;
 
 - (NSResponder*)firstResponder;
 - (void)makeFirstResponder:(NSResponder*)responder;
@@ -478,9 +467,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)addMessageToConsole:(NSDictionary*)message;
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
-
-- (void)activateWindow;
-- (void)deactivateWindow;
 
 - (void)formControlIsBecomingFirstResponder:(NSView*)formControl;
 - (void)formControlIsResigningFirstResponder:(NSView*)formControl;

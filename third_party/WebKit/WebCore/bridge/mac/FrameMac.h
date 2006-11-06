@@ -150,11 +150,6 @@ class FrameMac : public Frame {
                                    const String& defaultValue,
                                    String& result);
   virtual bool shouldInterruptJavaScript();
-  virtual bool locationbarVisible();
-  virtual bool menubarVisible();
-  virtual bool personalbarVisible();
-  virtual bool statusbarVisible();
-  virtual bool toolbarVisible();
 
   FloatRect customHighlightLineRect(const AtomicString& type,
                                     const FloatRect& lineRect);

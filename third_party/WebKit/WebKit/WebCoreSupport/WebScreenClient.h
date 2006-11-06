@@ -23,28 +23,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SCREEN_H
-#define SCREEN_H
+#import <WebCore/ScreenClient.h>
 
-namespace WebCore {
+#import <wtf/Forward.h>
 
-class FloatRect;
-class Page;
+@class WebView;
 
-int screenDepth(const Page*);
-int screenDepthPerComponent(const Page*);
-bool screenIsMonochrome(const Page*);
-FloatRect screenRect(const Page*);
-FloatRect usableScreenRect(const Page*);
+class WebScreenClient : public WebCore::ScreenClient {
+ public:
+  static PassRefPtr<WebScreenClient> create(WebView*);
 
-FloatRect scaleScreenRectToPageCoordinates(const FloatRect&, const Page*);
-FloatRect scalePageRectToScreenCoordinates(const FloatRect&, const Page*);
-float scaleFactor(const Page*);
+  int depth();
+  int depthPerComponent();
 
-#if PLATFORM(MAC)
-NSRect flipScreenRect(NSRect);
-NSPoint flipScreenPoint(NSPoint);
-#endif
-}
+  bool isMonochrome();
 
-#endif
+  WebCore::FloatRect rect();
+  WebCore::FloatRect usableRect();
+
+ private:
+  WebScreenClient(WebView*);
+
+  WebView* m_webView;
+};
