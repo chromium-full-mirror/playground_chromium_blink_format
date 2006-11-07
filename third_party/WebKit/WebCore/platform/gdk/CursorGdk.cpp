@@ -57,6 +57,11 @@ Cursor::Cursor(GdkCursor* c) : m_impl(c) {
   gdk_cursor_ref(c);
 }
 
+const Cursor& pointerCursor() {
+  static Cursor c = gdk_cursor_new(GDK_LEFT_PTR);
+  return c;
+}
+
 const Cursor& crossCursor() {
   static Cursor c = gdk_cursor_new(GDK_CROSS);
   return c;
