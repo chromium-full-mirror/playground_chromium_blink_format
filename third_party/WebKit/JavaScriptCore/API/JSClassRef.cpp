@@ -54,7 +54,8 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
       callAsFunction(definition->callAsFunction),
       callAsConstructor(definition->callAsConstructor),
       hasInstance(definition->hasInstance),
-      convertToType(definition->convertToType) {
+      convertToType(definition->convertToType),
+      cachedPrototype(0) {
   if (JSStaticValue* staticValue = definition->staticValues) {
     staticValues = new StaticValuesTable();
     while (staticValue->name) {
