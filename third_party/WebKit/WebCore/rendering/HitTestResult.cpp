@@ -115,16 +115,13 @@ String HitTestResult::spellingToolTip() const {
   // associated with bad grammar
   // currently supply strings, but maybe someday markers associated with
   // misspelled words will also.
-  if (!m_innerNonSharedNode)
-    return String();
-
   DocumentMarker* marker =
       m_innerNonSharedNode->document()->markerContainingPoint(
           m_point, DocumentMarker::Grammar);
-  if (!marker)
-    return String();
+  if (marker)
+    return marker->description;
 
-  return marker->description;
+  return String();
 }
 
 String HitTestResult::title() const {
