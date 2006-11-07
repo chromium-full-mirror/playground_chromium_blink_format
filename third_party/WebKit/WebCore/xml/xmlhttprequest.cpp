@@ -491,7 +491,7 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
 }
 
 void XMLHttpRequest::didFinishLoading(ResourceHandle* loader) {
-  ASSERT(loader == m_loader);
+  ASSERT(m_aborted || loader == m_loader);
 
   if (m_state < Sent)
     changeState(Sent);
