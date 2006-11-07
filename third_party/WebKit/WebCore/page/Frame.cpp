@@ -1070,7 +1070,7 @@ void Frame::endIfNotLoading() {
     // *will* map the appropriate URLs to it
     if (sharedIconDatabase->hasEntryForIconURL(url) && !isLoadTypeReload() &&
         !sharedIconDatabase->isIconExpiredForIconURL(url)) {
-      commitIconURLToIconDatabase();
+      commitIconURLToIconDatabase(iconURL());
       return;
     }
 
@@ -1080,9 +1080,7 @@ void Frame::endIfNotLoading() {
   }
 }
 
-void Frame::commitIconURLToIconDatabase() {
-  KURL icon = iconURL();
-
+void Frame::commitIconURLToIconDatabase(const KURL& icon) {
   IconDatabase* iconDatabase = IconDatabase::sharedIconDatabase();
   ASSERT(iconDatabase);
   iconDatabase->setIconURLForPageURL(icon.url(), this->url().url());
