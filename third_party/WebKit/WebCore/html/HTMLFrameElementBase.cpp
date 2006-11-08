@@ -25,17 +25,18 @@
 #include "config.h"
 #include "HTMLFrameElementBase.h"
 
-#include "csshelper.h"
 #include "Document.h"
 #include "EventNames.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
-#include "HTMLNames.h"
 #include "HTMLFrameSetElement.h"
+#include "HTMLNames.h"
 #include "KURL.h"
 #include "Page.h"
 #include "RenderFrame.h"
+#include "csshelper.h"
 
 namespace WebCore {
 
@@ -77,7 +78,7 @@ bool HTMLFrameElementBase::isURLAllowed(const AtomicString& URLString) const {
   bool foundSelfReference = false;
   for (Frame* frame = document()->frame(); frame;
        frame = frame->tree()->parent()) {
-    KURL frameURL = frame->url();
+    KURL frameURL = frame->loader()->url();
     frameURL.setRef(DeprecatedString::null);
     if (frameURL == completeURL) {
       if (foundSelfReference)
@@ -96,7 +97,7 @@ void HTMLFrameElementBase::openURL() {
   if (m_URL.isEmpty())
     m_URL = "about:blank";
 
-  document()->frame()->requestFrame(this, m_URL, m_name);
+  document()->frame()->loader()->requestFrame(this, m_URL, m_name);
 
   if (contentFrame())
     contentFrame()->setInViewSourceMode(viewSourceMode());
@@ -184,7 +185,7 @@ void HTMLFrameElementBase::attach() {
 void HTMLFrameElementBase::willRemove() {
   if (Frame* frame = contentFrame()) {
     frame->disconnectOwnerElement();
-    frame->frameDetached();
+    frame->loader()->frameDetached();
   }
 
   HTMLElement::willRemove();

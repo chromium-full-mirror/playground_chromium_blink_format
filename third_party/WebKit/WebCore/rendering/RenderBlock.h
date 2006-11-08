@@ -185,7 +185,7 @@ class RenderBlock : public RenderFlow {
 
   // FIXME: containsFloats() should not return true if the floating objects list
   // is empty. However, layoutInlineChildren() relies on the current behavior.
-  // http://bugzilla.opendarwin.org/show_bug.cgi?id=7395#c3
+  // http://bugs.webkit.org/show_bug.cgi?id=7395#c3
   virtual bool containsFloats() { return m_floatingObjects; }
   virtual bool containsFloat(RenderObject*);
 

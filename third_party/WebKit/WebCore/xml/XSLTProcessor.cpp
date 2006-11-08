@@ -32,6 +32,7 @@
 #include "DocLoader.h"
 #include "DocumentFragment.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "FrameView.h"
 #include "HTMLDocument.h"
 #include "HTMLTokenizer.h"
@@ -237,7 +238,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
   result->write(documentSource);
   result->finishParsing();
   if (view)
-    view->frame()->checkCompleted();
+    view->frame()->loader()->checkCompleted();
   else
     result->close();  // FIXME: Even viewless docs can load subresources. onload
                       // will fire too early.

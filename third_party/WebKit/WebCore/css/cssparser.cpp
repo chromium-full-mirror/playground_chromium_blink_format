@@ -1702,7 +1702,7 @@ bool CSSParser::parseContent(int propId, bool important) {
       // no-open-quote
       // no-close-quote
       // FIXME: These are not yet implemented
-      // (http://bugzilla.opendarwin.org/show_bug.cgi?id=6503).
+      // (http://bugs.webkit.org/show_bug.cgi?id=6503).
     } else if (val->unit == CSSPrimitiveValue::CSS_STRING) {
       parsedValue = new CSSPrimitiveValue(domString(val->string),
                                           CSSPrimitiveValue::CSS_STRING);

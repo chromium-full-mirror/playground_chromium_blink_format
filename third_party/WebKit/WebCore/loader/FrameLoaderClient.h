@@ -59,7 +59,6 @@ class FrameLoaderClient : Noncopyable {
  public:
   virtual void detachFrameLoader() = 0;
 
-#if PLATFORM(MAC)
   virtual bool hasWebView() const = 0;    // mainly for assertions
   virtual bool hasFrameView() const = 0;  // ditto
 
@@ -74,7 +73,9 @@ class FrameLoaderClient : Noncopyable {
 
   virtual void makeDocumentView() = 0;
   virtual void makeRepresentation(DocumentLoader*) = 0;
+#if PLATFORM(MAC)
   virtual void setDocumentViewFromPageCache(NSDictionary*) = 0;
+#endif
   virtual void forceLayout() = 0;
   virtual void forceLayoutForNonHTML() = 0;
 
@@ -102,6 +103,7 @@ class FrameLoaderClient : Noncopyable {
 
   virtual void loadedFromPageCache() = 0;
 
+#if PLATFORM(MAC)
   virtual void download(NSURLConnection*,
                         NSURLRequest*,
                         NSURLResponse*,
@@ -136,6 +138,7 @@ class FrameLoaderClient : Noncopyable {
                                                       NSURLRequest*,
                                                       NSURLResponse*,
                                                       int length) = 0;
+#endif
 
   virtual void dispatchDidHandleOnloadEvents() = 0;
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() = 0;
@@ -145,18 +148,25 @@ class FrameLoaderClient : Noncopyable {
                                                  double fireDate) = 0;
   virtual void dispatchDidChangeLocationWithinPage() = 0;
   virtual void dispatchWillClose() = 0;
+#if PLATFORM(MAC)
   virtual void dispatchDidReceiveIcon(NSImage*) = 0;
+#endif
   virtual void dispatchDidStartProvisionalLoad() = 0;
   virtual void dispatchDidReceiveTitle(const String& title) = 0;
   virtual void dispatchDidCommitLoad() = 0;
+#if PLATFORM(MAC)
   virtual void dispatchDidFailProvisionalLoad(NSError*) = 0;
   virtual void dispatchDidFailLoad(NSError*) = 0;
+#endif
   virtual void dispatchDidFinishLoad() = 0;
   virtual void dispatchDidFirstLayout() = 0;
 
+#if PLATFORM(MAC)
   virtual Frame* dispatchCreatePage(NSURLRequest*) = 0;
+#endif
   virtual void dispatchShow() = 0;
 
+#if PLATFORM(MAC)
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,
                                                const String& MIMEType,
                                                NSURLRequest*) = 0;
@@ -168,9 +178,12 @@ class FrameLoaderClient : Noncopyable {
   virtual void dispatchDecidePolicyForNavigationAction(FramePolicyFunction,
                                                        const NavigationAction&,
                                                        NSURLRequest*) = 0;
+#endif
   virtual void cancelPolicyCheck() = 0;
 
+#if PLATFORM(MAC)
   virtual void dispatchUnableToImplementPolicy(NSError*) = 0;
+#endif
 
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>) = 0;
@@ -179,27 +192,36 @@ class FrameLoaderClient : Noncopyable {
   virtual void clearLoadingFromPageCache(DocumentLoader*) = 0;
   virtual bool isLoadingFromPageCache(DocumentLoader*) = 0;
   virtual void revertToProvisionalState(DocumentLoader*) = 0;
+#if PLATFORM(MAC)
   virtual void setMainDocumentError(DocumentLoader*, NSError*) = 0;
+#endif
   virtual void clearUnarchivingState(DocumentLoader*) = 0;
 
   virtual void progressStarted() = 0;
   virtual void progressCompleted() = 0;
 
+#if PLATFORM(MAC)
   virtual void incrementProgress(id identifier, NSURLResponse*) = 0;
   virtual void incrementProgress(id identifier, NSData*) = 0;
   virtual void completeProgress(id identifier) = 0;
+#endif
 
   virtual void setMainFrameDocumentReady(bool) = 0;
 
+#if PLATFORM(MAC)
   virtual void startDownload(NSURLRequest*) = 0;
+#endif
 
   virtual void willChangeTitle(DocumentLoader*) = 0;
   virtual void didChangeTitle(DocumentLoader*) = 0;
 
+#if PLATFORM(MAC)
   virtual void committedLoad(DocumentLoader*, NSData*) = 0;
+#endif
   virtual void finishedLoading(DocumentLoader*) = 0;
   virtual void finalSetupForReplace(DocumentLoader*) = 0;
 
+#if PLATFORM(MAC)
   virtual NSError* cancelledError(NSURLRequest*) = 0;
   virtual NSError* cannotShowURLError(NSURLRequest*) = 0;
   virtual NSError* interruptForPolicyChangeError(NSURLRequest*) = 0;
@@ -216,11 +238,14 @@ class FrameLoaderClient : Noncopyable {
   virtual bool willUseArchive(ResourceLoader*,
                               NSURLRequest*,
                               NSURL* originalURL) const = 0;
+#endif
   virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;
   virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
   virtual void clearArchivedResources() = 0;
 
+#if PLATFORM(MAC)
   virtual bool canHandleRequest(NSURLRequest*) const = 0;
+#endif
   virtual bool canShowMIMEType(const String& MIMEType) const = 0;
   virtual bool representationExistsForURLScheme(
       const String& URLScheme) const = 0;
@@ -234,11 +259,12 @@ class FrameLoaderClient : Noncopyable {
   virtual void addHistoryItemForFragmentScroll() = 0;
   virtual void didFinishLoad() = 0;
   virtual void prepareForDataSourceReplacement() = 0;
+#if PLATFORM(MAC)
   virtual PassRefPtr<DocumentLoader> createDocumentLoader(NSURLRequest*) = 0;
+#endif
   virtual void setTitle(const String& title, const KURL&) = 0;
 
   virtual String userAgent() = 0;
-#endif
 
  protected:
   virtual ~FrameLoaderClient();

@@ -27,11 +27,12 @@
 
 #include "Document.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
-#include "HTMLNames.h"
 #include "HTMLEmbedElement.h"
 #include "HTMLIFrameElement.h"
+#include "HTMLNames.h"
 #include "HTMLObjectElement.h"
 #include "HTMLParamElement.h"
 #include "KURL.h"
@@ -59,7 +60,7 @@ static bool isURLAllowed(Document* doc, const String& url) {
   // But we don't allow more than one.
   bool foundSelfReference = false;
   for (Frame* frame = doc->frame(); frame; frame = frame->tree()->parent()) {
-    KURL frameURL = frame->url();
+    KURL frameURL = frame->loader()->url();
     frameURL.setRef(DeprecatedString::null);
     if (frameURL == newURL) {
       if (foundSelfReference)
@@ -222,8 +223,9 @@ void RenderPartObject::updateWidget() {
            !static_cast<Text*>(child)->containsOnlyWhitespace()))
         m_hasFallbackContent = true;
     }
-    bool success = frame->requestObject(this, url, AtomicString(o->name()),
-                                        serviceType, paramNames, paramValues);
+    bool success =
+        frame->loader()->requestObject(this, url, AtomicString(o->name()),
+                                       serviceType, paramNames, paramValues);
     if (!success && m_hasFallbackContent)
       o->renderFallbackContent();
   } else if (element()->hasTagName(embedTag)) {
@@ -245,8 +247,8 @@ void RenderPartObject::updateWidget() {
         paramValues.append(it->value().domString());
       }
     }
-    frame->requestObject(this, url, o->getAttribute(nameAttr), serviceType,
-                         paramNames, paramValues);
+    frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
+                                   serviceType, paramNames, paramValues);
   }
 }
 

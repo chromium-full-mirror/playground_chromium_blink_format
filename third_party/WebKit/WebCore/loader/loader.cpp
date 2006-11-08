@@ -35,6 +35,7 @@
 #include "CachedResource.h"
 #include "DocLoader.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "HTMLDocument.h"
 #include "LoaderFunctions.h"
 #include "Request.h"
@@ -144,7 +145,7 @@ void Loader::didReceiveResponse(ResourceHandle* handle,
     ASSERT(req->cachedResource()->isImage());
     static_cast<CachedImage*>(req->cachedResource())->clear();
     if (req->docLoader()->frame())
-      req->docLoader()->frame()->checkCompleted();
+      req->docLoader()->frame()->loader()->checkCompleted();
   } else if (response.isMultipart()) {
     req->setIsMultipart(true);
     if (!req->cachedResource()->isImage())

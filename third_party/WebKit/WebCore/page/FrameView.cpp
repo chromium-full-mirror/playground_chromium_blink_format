@@ -33,6 +33,7 @@
 #include "EventNames.h"
 #include "FloatRect.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "FrameTree.h"
 #include "HTMLDocument.h"
 #include "HTMLFrameElementBase.h"
@@ -546,7 +547,7 @@ void FrameView::layout(bool allowSubtree) {
 #endif
 
   if (didFirstLayout)
-    m_frame->didFirstLayout();
+    m_frame->loader()->didFirstLayout();
 
   if (root->needsLayout()) {
     scheduleRelayout();
@@ -1146,7 +1147,7 @@ void FrameView::setMediaType(const String& mediaType) {
 
 String FrameView::mediaType() const {
   // See if we have an override type.
-  String overrideType = m_frame->overrideMediaType();
+  String overrideType = m_frame->loader()->overrideMediaType();
   if (!overrideType.isNull())
     return overrideType;
   return d->m_mediaType;

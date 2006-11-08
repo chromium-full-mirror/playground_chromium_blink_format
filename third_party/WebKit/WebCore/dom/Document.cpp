@@ -31,9 +31,9 @@
 #include "CSSValueKeywords.h"
 #include "Comment.h"
 #include "DOMImplementation.h"
-#include "TextResourceDecoder.h"
 #include "DocLoader.h"
 #include "DocumentFragment.h"
+#include "DocumentLoader.h"
 #include "DocumentType.h"
 #include "EditingText.h"
 #include "EntityReference.h"
@@ -79,13 +79,14 @@
 #include "StyleSheetList.h"
 #include "SystemTime.h"
 #include "TextIterator.h"
+#include "TextResourceDecoder.h"
 #include "TreeWalker.h"
 #include "UIEvent.h"
+#include "XMLTokenizer.h"
 #include "csshelper.h"
 #include "cssstyleselector.h"
 #include "kjs_binding.h"
 #include "kjs_proxy.h"
-#include "XMLTokenizer.h"
 #include "xmlhttprequest.h"
 
 #ifdef XPATH_SUPPORT
@@ -655,7 +656,7 @@ Element* Document::getElementById(const AtomicString& elementId) const {
 
 String Document::readyState() const {
   if (Frame* f = frame()) {
-    if (f->isComplete())
+    if (f->loader()->isComplete())
       return "complete";
     if (parsing())
       return "loading";
@@ -734,7 +735,7 @@ Element* Document::getElementByAccessKey(const String& key) const {
 
 void Document::updateTitle() {
   if (Frame* f = frame())
-    f->setTitle(m_title);
+    f->loader()->setTitle(m_title);
 }
 
 void Document::setTitle(const String& title, Node* titleElement) {
@@ -1147,14 +1148,14 @@ void Document::open() {
   } else
     setURL(DeprecatedString());
 
-  if ((frame() && frame()->isLoadingMainResource()) ||
+  if ((frame() && frame()->loader()->isLoadingMainResource()) ||
       (tokenizer() && tokenizer()->executingScript()))
     return;
 
   implicitOpen();
 
   if (frame())
-    frame()->didExplicitOpen();
+    frame()->loader()->didExplicitOpen();
 }
 
 void Document::cancelParsing() {
@@ -1196,7 +1197,7 @@ HTMLElement* Document::body() {
 
 void Document::close() {
   if (frame())
-    frame()->endIfNotLoading();
+    frame()->loader()->endIfNotLoading();
   implicitClose();
 }
 
@@ -1209,7 +1210,7 @@ void Document::implicitClose() {
   }
 
   bool wasLocationChangePending =
-      frame() && frame()->isScheduledLocationChangePending();
+      frame() && frame()->loader()->isScheduledLocationChangePending();
   bool doload = !parsing() && m_tokenizer && !m_processingLoadEvent &&
                 !wasLocationChangePending;
 
@@ -1241,8 +1242,8 @@ void Document::implicitClose() {
 
   dispatchImageLoadEventsNow();
   this->dispatchWindowEvent(loadEvent, false, false);
-  if (Frame* p = frame())
-    p->handledOnloadEvents();
+  if (Frame* f = frame())
+    f->loader()->handledOnloadEvents();
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
     printf("onload fired at %d\n", elapsedTime());
@@ -1254,7 +1255,7 @@ void Document::implicitClose() {
   // fires. This will improve onload scores, and other browsers do it.
   // If they wanna cheat, we can too. -dwh
 
-  if (frame() && frame()->isScheduledLocationChangePending() &&
+  if (frame() && frame()->loader()->isScheduledLocationChangePending() &&
       elapsedTime() < cLayoutScheduleThreshold) {
     // Just bail out. Before or during the onload we were shifted to another
     // page.
@@ -1265,7 +1266,7 @@ void Document::implicitClose() {
   }
 
   if (frame())
-    frame()->checkEmitLoadEvent();
+    frame()->loader()->checkEmitLoadEvent();
 
   // Now do our painting/layout, but only if we aren't in a subframe or if we're
   // in a subframe
@@ -1659,7 +1660,8 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
       delay = str.toInt(&ok);
       // We want a new history item if the refresh timeout > 1 second
       if (ok && frame)
-        frame->scheduleRedirection(delay, frame->url().url(), delay <= 1);
+        frame->loader()->scheduleRedirection(
+            delay, frame->loader()->url().url(), delay <= 1);
     } else {
       double delay = 0;
       bool ok = false;
@@ -1677,19 +1679,15 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
       str = parseURL(String(str)).deprecatedString();
       if (ok && frame)
         // We want a new history item if the refresh timeout > 1 second
-        frame->scheduleRedirection(delay, completeURL(str), delay <= 1);
+        frame->loader()->scheduleRedirection(delay, completeURL(str),
+                                             delay <= 1);
     }
   } else if (equalIgnoringCase(equiv, "expires")) {
     String str = content.stripWhiteSpace();
     time_t expire_date = str.toInt();
     m_docLoader->setExpireDate(expire_date);
-  } else if ((equalIgnoringCase(equiv, "pragma") ||
-              equalIgnoringCase(equiv, "cache-control")) &&
-             frame) {
-    DeprecatedString str = content.deprecatedString().lower().stripWhiteSpace();
-    KURL url = frame->url();
   } else if (equalIgnoringCase(equiv, "set-cookie")) {
-    // ### FIXME: make setCookie work on XML documents too; e.g. in case of
+    // FIXME: make setCookie work on XML documents too; e.g. in case of
     // <html:meta .....>
     if (isHTMLDocument())
       static_cast<HTMLDocument*>(this)->setCookie(content);
@@ -2409,10 +2407,8 @@ Element* Document::ownerElement() const {
 }
 
 String Document::referrer() const {
-#if PLATFORM(MAC)
   if (frame())
     return frame()->loader()->referrer();
-#endif
   return String();
 }
 
@@ -3345,7 +3341,7 @@ PassRefPtr<NameNodeList> Document::getElementsByName(
 void Document::finishedParsing() {
   setParsing(false);
   if (Frame* f = frame())
-    f->finishedParsing();
+    f->loader()->finishedParsing();
 }
 
 Vector<String> Document::formElementsState() const {

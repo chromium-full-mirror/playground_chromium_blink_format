@@ -72,10 +72,10 @@ void IconLoader::startLoading() {
   m_buffer.reserveCapacity(defaultBufferSize);
 
   RefPtr<ResourceHandle> loader = ResourceHandle::create(
-      m_frame->iconURL(), this, m_frame->document()->docLoader());
+      m_frame->loader()->iconURL(), this, m_frame->document()->docLoader());
   if (!loader)
     LOG_ERROR("Failed to start load for icon at url %s",
-              m_frame->iconURL().url().ascii());
+              m_frame->loader()->iconURL().url().ascii());
 
   // Store the handle so we can cancel the load if stopLoading is called later.
   // But only do it if the load hasn't already completed.
@@ -116,7 +116,7 @@ void IconLoader::finishLoading(const KURL& iconURL) {
       m_buffer.data(), m_buffer.size(), iconURL.url());
 
   // Tell the frame to map its URL(s) to its iconURL in the database.
-  m_frame->commitIconURLToIconDatabase(iconURL);
+  m_frame->loader()->commitIconURLToIconDatabase(iconURL);
 
 // Send the notification to the app that this icon is finished loading.
 #if PLATFORM(MAC)  // turn this on for other platforms when FrameLoader is
