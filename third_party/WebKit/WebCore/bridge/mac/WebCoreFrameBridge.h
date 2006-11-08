@@ -343,11 +343,6 @@ alterCurrentSelection:(WebCore::SelectionController::EAlteration)alteration
 - (DOMCSSStyleDeclaration*)typingStyle;
 - (void)setTypingStyle:(DOMCSSStyleDeclaration*)style
         withUndoAction:(WebCore::EditAction)undoAction;
-- (void)applyStyle:(DOMCSSStyleDeclaration*)style
-    withUndoAction:(WebCore::EditAction)undoAction;
-- (void)applyParagraphStyle:(DOMCSSStyleDeclaration*)style
-             withUndoAction:(WebCore::EditAction)undoAction;
-- (BOOL)selectionStartHasStyle:(DOMCSSStyleDeclaration*)style;
 - (NSCellStateValue)selectionHasStyle:(DOMCSSStyleDeclaration*)style;
 
 - (NSDragOperation)dragOperationForDraggingInfo:(id<NSDraggingInfo>)info;

@@ -86,6 +86,17 @@ class Editor {
 
   void deleteSelectionWithSmartDelete(bool smartDelete);
 
+  void applyStyle(CSSStyleDeclaration*, EditAction = EditActionUnspecified);
+  void applyParagraphStyle(CSSStyleDeclaration*,
+                           EditAction = EditActionUnspecified);
+  void applyStyleToSelection(CSSStyleDeclaration*, EditAction);
+  void applyParagraphStyleToSelection(CSSStyleDeclaration*, EditAction);
+
+  void toggleBold();
+  void toggleItalic();
+
+  bool selectionStartHasStyle(CSSStyleDeclaration*) const;
+
  private:
   Frame* m_frame;
   RefPtr<EditorClient> m_client;

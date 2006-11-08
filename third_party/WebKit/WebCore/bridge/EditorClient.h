@@ -30,6 +30,7 @@
 
 namespace WebCore {
 
+class CSSStyleDeclaration;
 class Range;
 class HTMLElement;
 
@@ -53,8 +54,7 @@ class EditorClient : public Shared<EditorClient> {
   //    virtual bool shouldChangeSelectedRange(Range *currentRange, Range
   //    *toProposedRange, NSSelectionAffinity selectionAffinity, bool
   //    stillSelecting) = 0;
-  //    virtual bool shouldApplyStyle(CSSStyleDeclaration *style, Range
-  //    *toElementsInDOMRange) = 0;
+  virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*) = 0;
   //    virtual bool shouldChangeTypingStyle(CSSStyleDeclaration *currentStyle,
   //    CSSStyleDeclaration *toProposedStyle) = 0;
   //    virtual bool doCommandBySelector(SEL selector) = 0;

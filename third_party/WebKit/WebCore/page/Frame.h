@@ -279,14 +279,10 @@ class Frame : public Shared<Frame> {
   virtual bool canUndo() const = 0;
   void computeAndSetTypingStyle(CSSStyleDeclaration*,
                                 EditAction = EditActionUnspecified);
-  void applyStyle(CSSStyleDeclaration*, EditAction = EditActionUnspecified);
-  void applyParagraphStyle(CSSStyleDeclaration*,
-                           EditAction = EditActionUnspecified);
   void indent();
   void outdent();
   enum TriState { falseTriState, trueTriState, mixedTriState };
   TriState selectionHasStyle(CSSStyleDeclaration*) const;
-  bool selectionStartHasStyle(CSSStyleDeclaration*) const;
   String selectionStartStylePropertyValue(int stylePropertyID) const;
   void applyEditingStyleToBodyElement() const;
   void removeEditingStyleFromBodyElement() const;
