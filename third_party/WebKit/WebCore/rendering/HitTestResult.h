@@ -67,6 +67,7 @@ class HitTestResult {
   String titleDisplayString() const;
   String textContent() const;
   bool isLiveLink() const;
+  bool isContentEditable() const;
 
  private:
   RefPtr<Node> m_innerNode;
