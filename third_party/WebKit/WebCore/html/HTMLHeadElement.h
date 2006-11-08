@@ -37,6 +37,7 @@ class HTMLHeadElement : public HTMLElement {
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 10; }
+  virtual bool childAllowed(Node* newChild);
   virtual bool checkDTD(const Node* newChild);
 
   String profile() const;
