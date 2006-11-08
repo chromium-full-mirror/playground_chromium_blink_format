@@ -23,26 +23,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebCore/ScreenClient.h>
+#ifndef Screen_h
+#define Screen_h
 
-#import <wtf/Forward.h>
+#include "FloatRect.h"
+#include <wtf/Forward.h>
+#include <wtf/RefPtr.h>
 
-@class WebView;
+#ifdef __OBJC__
+@class NSScreen;
+@class NSWindow;
+#else
+class NSScreen;
+class NSWindow;
+#endif
 
-class WebScreenClient : public WebCore::ScreenClient {
+namespace WebCore {
+
+class FloatRect;
+class Page;
+
+class Screen {
  public:
-  static PassRefPtr<WebScreenClient> create(WebView*);
+  Screen(Page* page) : m_page(page) {}
 
-  int depth();
-  int depthPerComponent();
+  int depth() const;
+  int depthPerComponent() const;
+  bool isMonochrome() const;
 
-  bool isMonochrome();
-
-  WebCore::FloatRect rect();
-  WebCore::FloatRect usableRect();
+  FloatRect rect() const;
+  FloatRect usableRect() const;
 
  private:
-  WebScreenClient(WebView*);
-
-  WebView* m_webView;
+  Page* m_page;
 };
+
+#if PLATFORM(MAC)
+FloatRect toUserSpace(const NSRect&, NSWindow* destination);
+NSRect toDeviceSpace(const FloatRect&, NSWindow* source);
+
+NSPoint flipScreenPoint(const NSPoint& screenPoint, NSScreen* screen);
+#endif
+
+}  // namespace WebCore
+
+#endif  // Screen_h

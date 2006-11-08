@@ -37,14 +37,13 @@ class Frame;
 class FrameNamespace;
 class FloatRect;
 class Screen;
-class ScreenClient;
 class Settings;
 class SelectionController;
 class Widget;
 
 class Page : Noncopyable {
  public:
-  Page(PassRefPtr<ChromeClient>, PassRefPtr<ScreenClient>);
+  Page(PassRefPtr<ChromeClient>);
   ~Page();
 
   void setMainFrame(PassRefPtr<Frame>);
