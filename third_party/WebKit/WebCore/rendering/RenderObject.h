@@ -811,7 +811,9 @@ class RenderObject : public CachedResourceClient {
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
-  virtual void lineBoxRects(Vector<IntRect>&);
+  virtual void addLineBoxRects(Vector<IntRect>&,
+                               unsigned startOffset = 0,
+                               unsigned endOffset = UINT_MAX);
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   IntRect absoluteBoundingBoxRect();

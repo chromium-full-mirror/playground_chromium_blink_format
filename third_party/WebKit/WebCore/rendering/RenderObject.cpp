@@ -1704,7 +1704,9 @@ void RenderObject::paintBorder(GraphicsContext* p,
     p->restore();  // Undo the clip.
 }
 
-void RenderObject::lineBoxRects(Vector<IntRect>&) {}
+void RenderObject::addLineBoxRects(Vector<IntRect>&,
+                                   unsigned startOffset,
+                                   unsigned endOffset) {}
 
 void RenderObject::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
   // For blocks inside inlines, we go ahead and include margins so that we run

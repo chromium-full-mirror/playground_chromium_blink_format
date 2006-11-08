@@ -30,6 +30,7 @@
 #include "Shared.h"
 #include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -37,6 +38,7 @@ typedef int ExceptionCode;
 
 class DocumentFragment;
 class Document;
+class IntRect;
 class Node;
 class Position;
 class String;
@@ -118,6 +120,9 @@ class Range : public Shared<Range> {
   Node* pastEndNode() const;
 
   Position editingStartPosition() const;
+
+  IntRect boundingBox();
+  void addLineBoxRects(Vector<IntRect>&);
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;

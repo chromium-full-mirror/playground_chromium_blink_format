@@ -654,7 +654,9 @@ VisiblePosition RenderContainer::positionForCoordinates(int x, int y) {
   return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
-void RenderContainer::lineBoxRects(Vector<IntRect>& rects) {
+void RenderContainer::addLineBoxRects(Vector<IntRect>& rects,
+                                      unsigned start,
+                                      unsigned end) {
   if (!firstChild() && (isInline() || isAnonymousBlock())) {
     int x, y;
     absolutePositionForContent(x, y);
@@ -665,8 +667,9 @@ void RenderContainer::lineBoxRects(Vector<IntRect>& rects) {
   if (!firstChild())
     return;
 
-  for (RenderObject* child = firstChild(); child;
-       child = child->nextSibling()) {
+  unsigned offset = start;
+  for (RenderObject *child = childAt(start); child && offset < end;
+       child = child->nextSibling(), ++offset) {
     if (child->isText() || child->isInline() || child->isAnonymousBlock()) {
       int x, y;
       child->absolutePositionForContent(x, y);
