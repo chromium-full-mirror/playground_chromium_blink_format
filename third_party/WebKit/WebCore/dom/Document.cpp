@@ -2552,19 +2552,23 @@ UChar Document::backslashAsCurrencySymbol() const {
 }
 
 DeprecatedString Document::completeURL(const DeprecatedString& URL) {
+  // FIXME: This treats null URLs the same as empty URLs, unlike the String
+  // function below.
+
   // If both the URL and base URL are empty, like they are for documents
   // created using DOMImplementation::createDocument, just return the passed in
   // URL.
   // (We do this because URL() returns "about:blank" for empty URLs.
   if (m_url.isEmpty() && m_baseURL.isEmpty())
     return URL;
-
   if (!m_decoder)
     return KURL(baseURL(), URL).url();
   return KURL(baseURL(), URL, m_decoder->encoding()).url();
 }
 
 String Document::completeURL(const String& URL) {
+  // FIXME: This always returns null when passed a null URL, unlike the String
+  // function above.
   if (URL.isNull())
     return URL;
   return completeURL(URL.deprecatedString());

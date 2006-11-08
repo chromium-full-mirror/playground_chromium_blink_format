@@ -446,7 +446,7 @@ void FrameLoader::submitForm(const char* action,
                              const String& contentType,
                              const String& boundary,
                              Event* event) {
-  KURL u = completeURL(url);
+  KURL u = completeURL(url.isNull() ? "" : url);
   if (!u.isValid())
     return;
 
