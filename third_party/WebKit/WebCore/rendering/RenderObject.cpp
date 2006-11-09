@@ -33,7 +33,6 @@
 #include "Chrome.h"
 #include "CounterNode.h"
 #include "CounterResetNode.h"
-#include "TextResourceDecoder.h"
 #include "Document.h"
 #include "Element.h"
 #include "EventNames.h"
@@ -43,9 +42,9 @@
 #include "GraphicsContext.h"
 #include "HTMLNames.h"
 #include "HTMLOListElement.h"
-#include "KURL.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
+#include "KURL.h"
 #include "Page.h"
 #include "Position.h"
 #include "RenderArena.h"
@@ -60,6 +59,7 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "Screen.h"
+#include "TextResourceDecoder.h"
 #include "TextStream.h"
 #include "cssstyleselector.h"
 #include <algorithm>
@@ -183,16 +183,13 @@ RenderObject::RenderObject(Node* node)
       m_posChildNeedsLayout(false),
       m_minMaxKnown(false),
       m_floating(false),
-
       m_positioned(false),
       m_relPositioned(false),
       m_paintBackground(false),
-
       m_isAnonymous(node == node->document()),
       m_recalcMinMax(false),
       m_isText(false),
       m_inline(true),
-
       m_replaced(false),
       m_isDragging(false),
       m_hasOverflowClip(false),
@@ -209,9 +206,10 @@ RenderObject::~RenderObject() {
 }
 
 bool RenderObject::isDescendantOf(const RenderObject* obj) const {
-  for (const RenderObject* r = this; r; r = r->m_parent)
+  for (const RenderObject* r = this; r; r = r->m_parent) {
     if (r == obj)
       return true;
+  }
   return false;
 }
 
@@ -247,24 +245,24 @@ bool RenderObject::isInlineContinuation() const {
 }
 
 void RenderObject::addChild(RenderObject*, RenderObject*) {
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
 }
 
 RenderObject* RenderObject::removeChildNode(RenderObject*) {
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
   return 0;
 }
 
 void RenderObject::removeChild(RenderObject*) {
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
 }
 
 void RenderObject::appendChildNode(RenderObject*) {
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
 }
 
 void RenderObject::insertChildNode(RenderObject*, RenderObject*) {
-  ASSERT(0);
+  ASSERT_NOT_REACHED();
 }
 
 RenderObject* RenderObject::nextInPreOrder() const {
@@ -283,6 +281,7 @@ RenderObject* RenderObject::nextInPreOrderAfterChildren() const {
     if (o)
       o = o->nextSibling();
   }
+
   return o;
 }
 
@@ -305,9 +304,8 @@ RenderObject* RenderObject::childAt(unsigned index) const {
 
 bool RenderObject::isEditable() const {
   RenderText* textRenderer = 0;
-  if (isText()) {
+  if (isText())
     textRenderer = static_cast<RenderText*>(const_cast<RenderObject*>(this));
-  }
 
   return style()->visibility() == VISIBLE && element() &&
          element()->isContentEditable() &&
@@ -358,6 +356,7 @@ RenderObject* RenderObject::nextEditable() const {
     }
     n = r->parent();
   }
+
   return 0;
 }
 
@@ -404,6 +403,7 @@ RenderObject* RenderObject::previousEditable() const {
     }
     n = r->parent();
   }
+
   return 0;
 }
 
@@ -594,6 +594,7 @@ RenderObject* RenderObject::offsetParent() const {
   // blocks.
   if (isBody())
     return 0;
+
   bool skipTables = isPositioned() || isRelPositioned();
   RenderObject* curr = parent();
   while (curr && (!curr->element() ||
@@ -783,12 +784,12 @@ RenderBlock* RenderObject::containingBlock() const {
 }
 
 int RenderObject::containingBlockWidth() const {
-  // ###
+  // FIXME ?
   return containingBlock()->contentWidth();
 }
 
 int RenderObject::containingBlockHeight() const {
-  // ###
+  // FIXME ?
   return containingBlock()->contentHeight();
 }
 
@@ -799,9 +800,11 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
 
   // Ok, let's check the background first.
   const BackgroundLayer* bgLayer = style()->backgroundLayers();
+
+  // Nobody will use multiple background layers without wanting fancy
+  // positioning.
   if (bgLayer->next())
-    return true;  // Nobody will use multiple background layers without wanting
-                  // fancy positioning.
+    return true;
 
   // Make sure we have a valid background image.
   CachedImage* bg = bgLayer->backgroundImage();
@@ -813,23 +816,24 @@ bool RenderObject::mustRepaintBackgroundOrBorder() const {
        bgLayer->backgroundYPosition().value() != 0 ||
        bgLayer->backgroundSize().width.isPercent() ||
        bgLayer->backgroundSize().height.isPercent()))
-    return true;  // The background image will shift unpredictably if the size
-                  // changes.
+    // The background image will shift unpredictably if the size changes.
+    return true;
 
   // Background is ok.  Let's check border.
   if (style()->hasBorder()) {
     // Border images are not ok.
     CachedImage* borderImage = style()->borderImage().image();
     bool shouldPaintBorderImage = borderImage && borderImage->canRender();
+
+    // If the image hasn't loaded, we're still using the normal border style.
     if (shouldPaintBorderImage && borderImage->isLoaded())
-      return true;  // If the image hasn't loaded, we're still using the normal
-                    // border style.
+      return true;
   }
 
   return false;
 }
 
-void RenderObject::drawBorderArc(GraphicsContext* p,
+void RenderObject::drawBorderArc(GraphicsContext* graphicsContext,
                                  int x,
                                  int y,
                                  float thickness,
@@ -841,8 +845,8 @@ void RenderObject::drawBorderArc(GraphicsContext* p,
                                  const Color& textColor,
                                  EBorderStyle style,
                                  bool firstCorner) {
-  if ((style == DOUBLE && ((thickness / 2) < 3)) ||
-      ((style == RIDGE || style == GROOVE) && ((thickness / 2) < 2)))
+  if ((style == DOUBLE && thickness / 2 < 3) ||
+      ((style == RIDGE || style == GROOVE) && thickness / 2 < 2))
     style = SOLID;
 
   if (!c.isValid()) {
@@ -857,26 +861,25 @@ void RenderObject::drawBorderArc(GraphicsContext* p,
     case BHIDDEN:
       return;
     case DOTTED:
-      p->setPen(Pen(c, thickness == 1 ? 0 : (int)thickness, Pen::DotLine));
+      graphicsContext->setPen(Pen(
+          c, thickness == 1 ? 0 : static_cast<int>(thickness), Pen::DotLine));
     case DASHED:
       if (style == DASHED)
-        p->setPen(Pen(c, thickness == 1 ? 0 : (int)thickness, Pen::DashLine));
+        graphicsContext->setPen(
+            Pen(c, thickness == 1 ? 0 : static_cast<int>(thickness),
+                Pen::DashLine));
 
-      if (thickness > 0) {
-        if (s == BSBottom || s == BSTop)
-          p->drawArc(IntRect(x, y, radius.width() * 2, radius.height() * 2),
-                     thickness, angleStart, angleSpan);
-        else  // We are drawing a left or right border
-          p->drawArc(IntRect(x, y, radius.width() * 2, radius.height() * 2),
-                     thickness, angleStart, angleSpan);
-      }
+      if (thickness > 0)
+        graphicsContext->drawArc(
+            IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
+            angleStart, angleSpan);
 
       break;
     case DOUBLE: {
-      float third = thickness / 3;
-      float innerThird = (thickness + 1) / 6;
-      int shiftForInner = (int)(innerThird * 2.5);
-      p->setPen(Pen::NoPen);
+      float third = thickness / 3.0f;
+      float innerThird = (thickness + 1.0f) / 6.0f;
+      int shiftForInner = static_cast<int>(innerThird * 2.5f);
+      graphicsContext->setPen(Pen::NoPen);
 
       int outerY = y;
       int outerHeight = radius.height() * 2;
@@ -890,11 +893,12 @@ void RenderObject::drawBorderArc(GraphicsContext* p,
         innerHeight += 2;
       }
 
-      p->drawArc(IntRect(x, outerY, radius.width() * 2, outerHeight), third,
-                 angleStart, angleSpan);
-      p->drawArc(IntRect(innerX, innerY, innerWidth, innerHeight),
-                 (innerThird > 2) ? innerThird - 1 : innerThird, angleStart,
-                 angleSpan);
+      graphicsContext->drawArc(
+          IntRect(x, outerY, radius.width() * 2, outerHeight), third,
+          angleStart, angleSpan);
+      graphicsContext->drawArc(IntRect(innerX, innerY, innerWidth, innerHeight),
+                               (innerThird > 2) ? innerThird - 1 : innerThird,
+                               angleStart, angleSpan);
       break;
     }
     case GROOVE:
@@ -908,19 +912,21 @@ void RenderObject::drawBorderArc(GraphicsContext* p,
         c = c.dark();
       }
 
-      p->setPen(Pen::NoPen);
-      p->setFillColor(c.rgb());
-      p->drawArc(IntRect(x, y, radius.width() * 2, radius.height() * 2),
-                 thickness, angleStart, angleSpan);
+      graphicsContext->setPen(Pen::NoPen);
+      graphicsContext->setFillColor(c);
+      graphicsContext->drawArc(
+          IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
+          angleStart, angleSpan);
 
-      float halfThickness = (thickness + 1) / 4;
-      int shiftForInner = (int)(halfThickness * 1.5);
-      p->setFillColor(c2.rgb());
-      p->drawArc(IntRect(x + shiftForInner, y + shiftForInner,
-                         (radius.width() - shiftForInner) * 2,
-                         (radius.height() - shiftForInner) * 2),
-                 (halfThickness > 2) ? halfThickness - 1 : halfThickness,
-                 angleStart, angleSpan);
+      float halfThickness = (thickness + 1.0f) / 4.0f;
+      int shiftForInner = static_cast<int>(halfThickness * 1.5f);
+      graphicsContext->setFillColor(c2);
+      graphicsContext->drawArc(
+          IntRect(x + shiftForInner, y + shiftForInner,
+                  (radius.width() - shiftForInner) * 2,
+                  (radius.height() - shiftForInner) * 2),
+          (halfThickness > 2) ? halfThickness - 1 : halfThickness, angleStart,
+          angleSpan);
       break;
     }
     case INSET:
@@ -930,15 +936,16 @@ void RenderObject::drawBorderArc(GraphicsContext* p,
       if (style == OUTSET && (s == BSBottom || s == BSRight))
         c = c.dark();
     case SOLID:
-      p->setPen(Pen::NoPen);
-      p->setFillColor(c.rgb());
-      p->drawArc(IntRect(x, y, radius.width() * 2, radius.height() * 2),
-                 thickness, angleStart, angleSpan);
+      graphicsContext->setPen(Pen::NoPen);
+      graphicsContext->setFillColor(c);
+      graphicsContext->drawArc(
+          IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
+          angleStart, angleSpan);
       break;
   }
 }
 
-void RenderObject::drawBorder(GraphicsContext* p,
+void RenderObject::drawBorder(GraphicsContext* graphicsContext,
                               int x1,
                               int y1,
                               int x2,
@@ -966,94 +973,84 @@ void RenderObject::drawBorder(GraphicsContext* p,
     case BHIDDEN:
       return;
     case DOTTED:
-      p->setPen(Pen(c, width == 1 ? 0 : width, Pen::DotLine));
-    /* nobreak; */
     case DASHED:
-      if (style == DASHED)
-        p->setPen(Pen(c, width == 1 ? 0 : width, Pen::DashLine));
+      graphicsContext->setPen(
+          Pen(c, width == 1 ? 0 : width,
+              style == DASHED ? Pen::DashLine : Pen::DotLine));
 
       if (width > 0)
         switch (s) {
           case BSBottom:
           case BSTop:
-            p->drawLine(IntPoint(x1, (y1 + y2) / 2),
-                        IntPoint(x2, (y1 + y2) / 2));
+            graphicsContext->drawLine(IntPoint(x1, (y1 + y2) / 2),
+                                      IntPoint(x2, (y1 + y2) / 2));
             break;
           case BSRight:
           case BSLeft:
-            p->drawLine(IntPoint((x1 + x2) / 2, y1),
-                        IntPoint((x1 + x2) / 2, y2));
+            graphicsContext->drawLine(IntPoint((x1 + x2) / 2, y1),
+                                      IntPoint((x1 + x2) / 2, y2));
             break;
         }
-
       break;
-
     case DOUBLE: {
       int third = (width + 1) / 3;
 
       if (adjbw1 == 0 && adjbw2 == 0) {
-        p->setPen(Pen::NoPen);
-        p->setFillColor(c.rgb());
+        graphicsContext->setPen(Pen::NoPen);
+        graphicsContext->setFillColor(c);
         switch (s) {
           case BSTop:
           case BSBottom:
-            p->drawRect(IntRect(x1, y1, x2 - x1, third));
-            p->drawRect(IntRect(x1, y2 - third, x2 - x1, third));
+            graphicsContext->drawRect(IntRect(x1, y1, x2 - x1, third));
+            graphicsContext->drawRect(IntRect(x1, y2 - third, x2 - x1, third));
             break;
           case BSLeft:
-            p->drawRect(IntRect(x1, y1 + 1, third, y2 - y1 - 1));
-            p->drawRect(IntRect(x2 - third, y1 + 1, third, y2 - y1 - 1));
+            graphicsContext->drawRect(IntRect(x1, y1 + 1, third, y2 - y1 - 1));
+            graphicsContext->drawRect(
+                IntRect(x2 - third, y1 + 1, third, y2 - y1 - 1));
             break;
           case BSRight:
-            p->drawRect(IntRect(x1, y1 + 1, third, y2 - y1 - 1));
-            p->drawRect(IntRect(x2 - third, y1 + 1, third, y2 - y1 - 1));
+            graphicsContext->drawRect(IntRect(x1, y1 + 1, third, y2 - y1 - 1));
+            graphicsContext->drawRect(
+                IntRect(x2 - third, y1 + 1, third, y2 - y1 - 1));
             break;
         }
       } else {
-        int adjbw1bigthird;
-        if (adjbw1 > 0)
-          adjbw1bigthird = adjbw1 + 1;
-        else
-          adjbw1bigthird = adjbw1 - 1;
-        adjbw1bigthird /= 3;
-
-        int adjbw2bigthird;
-        if (adjbw2 > 0)
-          adjbw2bigthird = adjbw2 + 1;
-        else
-          adjbw2bigthird = adjbw2 - 1;
-        adjbw2bigthird /= 3;
+        int adjbw1bigthird = ((adjbw1 > 0) ? adjbw1 + 1 : adjbw1 - 1) / 3;
+        int adjbw2bigthird = ((adjbw2 > 0) ? adjbw2 + 1 : adjbw2 - 1) / 3;
 
         switch (s) {
           case BSTop:
-            drawBorder(p, x1 + max((-adjbw1 * 2 + 1) / 3, 0), y1,
+            drawBorder(graphicsContext, x1 + max((-adjbw1 * 2 + 1) / 3, 0), y1,
                        x2 - max((-adjbw2 * 2 + 1) / 3, 0), y1 + third, s, c,
                        textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
-            drawBorder(p, x1 + max((adjbw1 * 2 + 1) / 3, 0), y2 - third,
-                       x2 - max((adjbw2 * 2 + 1) / 3, 0), y2, s, c, textcolor,
-                       SOLID, adjbw1bigthird, adjbw2bigthird);
+            drawBorder(graphicsContext, x1 + max((adjbw1 * 2 + 1) / 3, 0),
+                       y2 - third, x2 - max((adjbw2 * 2 + 1) / 3, 0), y2, s, c,
+                       textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
             break;
           case BSLeft:
-            drawBorder(p, x1, y1 + max((-adjbw1 * 2 + 1) / 3, 0), x1 + third,
-                       y2 - max((-adjbw2 * 2 + 1) / 3, 0), s, c, textcolor,
-                       SOLID, adjbw1bigthird, adjbw2bigthird);
-            drawBorder(p, x2 - third, y1 + max((adjbw1 * 2 + 1) / 3, 0), x2,
+            drawBorder(graphicsContext, x1, y1 + max((-adjbw1 * 2 + 1) / 3, 0),
+                       x1 + third, y2 - max((-adjbw2 * 2 + 1) / 3, 0), s, c,
+                       textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
+            drawBorder(graphicsContext, x2 - third,
+                       y1 + max((adjbw1 * 2 + 1) / 3, 0), x2,
                        y2 - max((adjbw2 * 2 + 1) / 3, 0), s, c, textcolor,
                        SOLID, adjbw1bigthird, adjbw2bigthird);
             break;
           case BSBottom:
-            drawBorder(p, x1 + max((adjbw1 * 2 + 1) / 3, 0), y1,
+            drawBorder(graphicsContext, x1 + max((adjbw1 * 2 + 1) / 3, 0), y1,
                        x2 - max((adjbw2 * 2 + 1) / 3, 0), y1 + third, s, c,
                        textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
-            drawBorder(p, x1 + max((-adjbw1 * 2 + 1) / 3, 0), y2 - third,
-                       x2 - max((-adjbw2 * 2 + 1) / 3, 0), y2, s, c, textcolor,
-                       SOLID, adjbw1bigthird, adjbw2bigthird);
+            drawBorder(graphicsContext, x1 + max((-adjbw1 * 2 + 1) / 3, 0),
+                       y2 - third, x2 - max((-adjbw2 * 2 + 1) / 3, 0), y2, s, c,
+                       textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
             break;
           case BSRight:
-            drawBorder(p, x1, y1 + max((adjbw1 * 2 + 1) / 3, 0), x1 + third,
-                       y2 - max((adjbw2 * 2 + 1) / 3, 0), s, c, textcolor,
-                       SOLID, adjbw1bigthird, adjbw2bigthird);
-            drawBorder(p, x2 - third, y1 + max((-adjbw1 * 2 + 1) / 3, 0), x2,
+            drawBorder(graphicsContext, x1, y1 + max((adjbw1 * 2 + 1) / 3, 0),
+                       x1 + third, y2 - max((adjbw2 * 2 + 1) / 3, 0), s, c,
+                       textcolor, SOLID, adjbw1bigthird, adjbw2bigthird);
+            drawBorder(graphicsContext, x2 - third,
+                       y1 + max((-adjbw1 * 2 + 1) / 3, 0), x2,
                        y2 - max((-adjbw2 * 2 + 1) / 3, 0), s, c, textcolor,
                        SOLID, adjbw1bigthird, adjbw2bigthird);
             break;
@@ -1075,50 +1072,41 @@ void RenderObject::drawBorder(GraphicsContext* p,
         s2 = INSET;
       }
 
-      int adjbw1bighalf;
-      int adjbw2bighalf;
-      if (adjbw1 > 0)
-        adjbw1bighalf = adjbw1 + 1;
-      else
-        adjbw1bighalf = adjbw1 - 1;
-      adjbw1bighalf /= 2;
-
-      if (adjbw2 > 0)
-        adjbw2bighalf = adjbw2 + 1;
-      else
-        adjbw2bighalf = adjbw2 - 1;
-      adjbw2bighalf /= 2;
+      int adjbw1bighalf = ((adjbw1 > 0) ? adjbw1 + 1 : adjbw1 - 1) / 2;
+      int adjbw2bighalf = ((adjbw2 > 0) ? adjbw2 + 1 : adjbw2 - 1) / 2;
 
       switch (s) {
         case BSTop:
-          drawBorder(p, x1 + max(-adjbw1, 0) / 2, y1, x2 - max(-adjbw2, 0) / 2,
-                     (y1 + y2 + 1) / 2, s, c, textcolor, s1, adjbw1bighalf,
-                     adjbw2bighalf);
-          drawBorder(p, x1 + max(adjbw1 + 1, 0) / 2, (y1 + y2 + 1) / 2,
-                     x2 - max(adjbw2 + 1, 0) / 2, y2, s, c, textcolor, s2,
-                     adjbw1 / 2, adjbw2 / 2);
+          drawBorder(graphicsContext, x1 + max(-adjbw1, 0) / 2, y1,
+                     x2 - max(-adjbw2, 0) / 2, (y1 + y2 + 1) / 2, s, c,
+                     textcolor, s1, adjbw1bighalf, adjbw2bighalf);
+          drawBorder(graphicsContext, x1 + max(adjbw1 + 1, 0) / 2,
+                     (y1 + y2 + 1) / 2, x2 - max(adjbw2 + 1, 0) / 2, y2, s, c,
+                     textcolor, s2, adjbw1 / 2, adjbw2 / 2);
           break;
         case BSLeft:
-          drawBorder(p, x1, y1 + max(-adjbw1, 0) / 2, (x1 + x2 + 1) / 2,
-                     y2 - max(-adjbw2, 0) / 2, s, c, textcolor, s1,
-                     adjbw1bighalf, adjbw2bighalf);
-          drawBorder(p, (x1 + x2 + 1) / 2, y1 + max(adjbw1 + 1, 0) / 2, x2,
+          drawBorder(graphicsContext, x1, y1 + max(-adjbw1, 0) / 2,
+                     (x1 + x2 + 1) / 2, y2 - max(-adjbw2, 0) / 2, s, c,
+                     textcolor, s1, adjbw1bighalf, adjbw2bighalf);
+          drawBorder(graphicsContext, (x1 + x2 + 1) / 2,
+                     y1 + max(adjbw1 + 1, 0) / 2, x2,
                      y2 - max(adjbw2 + 1, 0) / 2, s, c, textcolor, s2,
                      adjbw1 / 2, adjbw2 / 2);
           break;
         case BSBottom:
-          drawBorder(p, x1 + max(adjbw1, 0) / 2, y1, x2 - max(adjbw2, 0) / 2,
-                     (y1 + y2 + 1) / 2, s, c, textcolor, s2, adjbw1bighalf,
-                     adjbw2bighalf);
-          drawBorder(p, x1 + max(-adjbw1 + 1, 0) / 2, (y1 + y2 + 1) / 2,
-                     x2 - max(-adjbw2 + 1, 0) / 2, y2, s, c, textcolor, s1,
-                     adjbw1 / 2, adjbw2 / 2);
+          drawBorder(graphicsContext, x1 + max(adjbw1, 0) / 2, y1,
+                     x2 - max(adjbw2, 0) / 2, (y1 + y2 + 1) / 2, s, c,
+                     textcolor, s2, adjbw1bighalf, adjbw2bighalf);
+          drawBorder(graphicsContext, x1 + max(-adjbw1 + 1, 0) / 2,
+                     (y1 + y2 + 1) / 2, x2 - max(-adjbw2 + 1, 0) / 2, y2, s, c,
+                     textcolor, s1, adjbw1 / 2, adjbw2 / 2);
           break;
         case BSRight:
-          drawBorder(p, x1, y1 + max(adjbw1, 0) / 2, (x1 + x2 + 1) / 2,
-                     y2 - max(adjbw2, 0) / 2, s, c, textcolor, s2,
-                     adjbw1bighalf, adjbw2bighalf);
-          drawBorder(p, (x1 + x2 + 1) / 2, y1 + max(-adjbw1 + 1, 0) / 2, x2,
+          drawBorder(graphicsContext, x1, y1 + max(adjbw1, 0) / 2,
+                     (x1 + x2 + 1) / 2, y2 - max(adjbw2, 0) / 2, s, c,
+                     textcolor, s2, adjbw1bighalf, adjbw2bighalf);
+          drawBorder(graphicsContext, (x1 + x2 + 1) / 2,
+                     y1 + max(-adjbw1 + 1, 0) / 2, x2,
                      y2 - max(-adjbw2 + 1, 0) / 2, s, c, textcolor, s1,
                      adjbw1 / 2, adjbw2 / 2);
           break;
@@ -1128,18 +1116,18 @@ void RenderObject::drawBorder(GraphicsContext* p,
     case INSET:
       if (s == BSTop || s == BSLeft)
         c = c.dark();
-    /* nobreak; */
+    // fall through
     case OUTSET:
       if (style == OUTSET && (s == BSBottom || s == BSRight))
         c = c.dark();
-    /* nobreak; */
+    // fall through
     case SOLID: {
-      p->setPen(Pen::NoPen);
-      p->setFillColor(c);
+      graphicsContext->setPen(Pen::NoPen);
+      graphicsContext->setFillColor(c);
       ASSERT(x2 >= x1);
       ASSERT(y2 >= y1);
       if (!adjbw1 && !adjbw2) {
-        p->drawRect(IntRect(x1, y1, x2 - x1, y2 - y1));
+        graphicsContext->drawRect(IntRect(x1, y1, x2 - x1, y2 - y1));
         return;
       }
       FloatPoint quad[4];
@@ -1169,15 +1157,15 @@ void RenderObject::drawBorder(GraphicsContext* p,
           quad[3] = FloatPoint(x2, y1 + max(-adjbw1, 0));
           break;
       }
-      p->drawConvexPolygon(4, quad);
+      graphicsContext->drawConvexPolygon(4, quad);
       break;
     }
   }
 }
 
-bool RenderObject::paintBorderImage(GraphicsContext* p,
-                                    int _tx,
-                                    int _ty,
+bool RenderObject::paintBorderImage(GraphicsContext* graphicsContext,
+                                    int tx,
+                                    int ty,
                                     int w,
                                     int h,
                                     const RenderStyle* style) {
@@ -1190,9 +1178,9 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
   // rect.
   bool clipped = false;
   if (style->hasBorderRadius()) {
-    IntRect clipRect(_tx, _ty, w, h);
-    p->save();
-    p->addRoundedRectClip(
+    IntRect clipRect(tx, ty, w, h);
+    graphicsContext->save();
+    graphicsContext->addRoundedRectClip(
         clipRect, style->borderTopLeftRadius(), style->borderTopRightRadius(),
         style->borderBottomLeftRadius(), style->borderBottomRightRadius());
     clipped = true;
@@ -1228,31 +1216,31 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
   if (drawLeft) {
     // Paint the top and bottom left corners.
 
-    // The top left corner rect is (_tx, _ty, leftWidth, topWidth)
+    // The top left corner rect is (tx, ty, leftWidth, topWidth)
     // The rect to use from within the image is obtained from our slice, and is
     // (0, 0, leftSlice, topSlice)
     if (drawTop)
-      p->drawImage(
+      graphicsContext->drawImage(
           borderImage->image(),
-          IntRect(_tx, _ty, style->borderLeftWidth(), style->borderTopWidth()),
+          IntRect(tx, ty, style->borderLeftWidth(), style->borderTopWidth()),
           IntRect(0, 0, leftSlice, topSlice));
 
-    // The bottom left corner rect is (_tx, _ty + h - bottomWidth, leftWidth,
+    // The bottom left corner rect is (tx, ty + h - bottomWidth, leftWidth,
     // bottomWidth)
     // The rect to use from within the image is (0, imageHeight - bottomSlice,
     // leftSlice, botomSlice)
     if (drawBottom)
-      p->drawImage(
+      graphicsContext->drawImage(
           borderImage->image(),
-          IntRect(_tx, _ty + h - style->borderBottomWidth(),
+          IntRect(tx, ty + h - style->borderBottomWidth(),
                   style->borderLeftWidth(), style->borderBottomWidth()),
           IntRect(0, imageHeight - bottomSlice, leftSlice, bottomSlice));
 
     // Paint the left edge.
     // Have to scale and tile into the border rect.
-    p->drawTiledImage(
+    graphicsContext->drawTiledImage(
         borderImage->image(),
-        IntRect(_tx, _ty + style->borderTopWidth(), style->borderLeftWidth(),
+        IntRect(tx, ty + style->borderTopWidth(), style->borderLeftWidth(),
                 h - style->borderTopWidth() - style->borderBottomWidth()),
         IntRect(0, topSlice, leftSlice, imageHeight - topSlice - bottomSlice),
         Image::StretchTile, (Image::TileRule)vRule);
@@ -1260,34 +1248,35 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
 
   if (drawRight) {
     // Paint the top and bottom right corners
-    // The top right corner rect is (_tx + w - rightWidth, _ty, rightWidth,
+    // The top right corner rect is (tx + w - rightWidth, ty, rightWidth,
     // topWidth)
     // The rect to use from within the image is obtained from our slice, and is
     // (imageWidth - rightSlice, 0, rightSlice, topSlice)
     if (drawTop)
-      p->drawImage(borderImage->image(),
-                   IntRect(_tx + w - style->borderRightWidth(), _ty,
-                           style->borderRightWidth(), style->borderTopWidth()),
-                   IntRect(imageWidth - rightSlice, 0, rightSlice, topSlice));
+      graphicsContext->drawImage(
+          borderImage->image(),
+          IntRect(tx + w - style->borderRightWidth(), ty,
+                  style->borderRightWidth(), style->borderTopWidth()),
+          IntRect(imageWidth - rightSlice, 0, rightSlice, topSlice));
 
-    // The bottom right corner rect is (_tx + w - rightWidth, _ty + h -
+    // The bottom right corner rect is (tx + w - rightWidth, ty + h -
     // bottomWidth, rightWidth, bottomWidth)
     // The rect to use from within the image is (imageWidth - rightSlice,
     // imageHeight - bottomSlice, rightSlice, botomSlice)
     if (drawBottom)
-      p->drawImage(
+      graphicsContext->drawImage(
           borderImage->image(),
-          IntRect(_tx + w - style->borderRightWidth(),
-                  _ty + h - style->borderBottomWidth(),
+          IntRect(tx + w - style->borderRightWidth(),
+                  ty + h - style->borderBottomWidth(),
                   style->borderRightWidth(), style->borderBottomWidth()),
           IntRect(imageWidth - rightSlice, imageHeight - bottomSlice,
                   rightSlice, bottomSlice));
 
     // Paint the right edge.
-    p->drawTiledImage(
+    graphicsContext->drawTiledImage(
         borderImage->image(),
-        IntRect(_tx + w - style->borderRightWidth(),
-                _ty + style->borderTopWidth(), style->borderRightWidth(),
+        IntRect(tx + w - style->borderRightWidth(),
+                ty + style->borderTopWidth(), style->borderRightWidth(),
                 h - style->borderTopWidth() - style->borderBottomWidth()),
         IntRect(imageWidth - rightSlice, topSlice, rightSlice,
                 imageHeight - topSlice - bottomSlice),
@@ -1296,9 +1285,9 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
 
   // Paint the top edge.
   if (drawTop)
-    p->drawTiledImage(
+    graphicsContext->drawTiledImage(
         borderImage->image(),
-        IntRect(_tx + style->borderLeftWidth(), _ty,
+        IntRect(tx + style->borderLeftWidth(), ty,
                 w - style->borderLeftWidth() - style->borderRightWidth(),
                 style->borderTopWidth()),
         IntRect(leftSlice, 0, imageWidth - rightSlice - leftSlice, topSlice),
@@ -1306,10 +1295,10 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
 
   // Paint the bottom edge.
   if (drawBottom)
-    p->drawTiledImage(
+    graphicsContext->drawTiledImage(
         borderImage->image(),
-        IntRect(_tx + style->borderLeftWidth(),
-                _ty + h - style->borderBottomWidth(),
+        IntRect(tx + style->borderLeftWidth(),
+                ty + h - style->borderBottomWidth(),
                 w - style->borderLeftWidth() - style->borderRightWidth(),
                 style->borderBottomWidth()),
         IntRect(leftSlice, imageHeight - bottomSlice,
@@ -1318,9 +1307,9 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
 
   // Paint the middle.
   if (drawMiddle)
-    p->drawTiledImage(
+    graphicsContext->drawTiledImage(
         borderImage->image(),
-        IntRect(_tx + style->borderLeftWidth(), _ty + style->borderTopWidth(),
+        IntRect(tx + style->borderLeftWidth(), ty + style->borderTopWidth(),
                 w - style->borderLeftWidth() - style->borderRightWidth(),
                 h - style->borderTopWidth() - style->borderBottomWidth()),
         IntRect(leftSlice, topSlice, imageWidth - rightSlice - leftSlice,
@@ -1329,14 +1318,14 @@ bool RenderObject::paintBorderImage(GraphicsContext* p,
 
   // Clear the clip for the border radius.
   if (clipped)
-    p->restore();
+    graphicsContext->restore();
 
   return true;
 }
 
-void RenderObject::paintBorder(GraphicsContext* p,
-                               int _tx,
-                               int _ty,
+void RenderObject::paintBorder(GraphicsContext* graphicsContext,
+                               int tx,
+                               int ty,
                                int w,
                                int h,
                                const RenderStyle* style,
@@ -1345,7 +1334,8 @@ void RenderObject::paintBorder(GraphicsContext* p,
   CachedImage* borderImage = style->borderImage().image();
   bool shouldPaintBackgroundImage = borderImage && borderImage->canRender();
   if (shouldPaintBackgroundImage)
-    shouldPaintBackgroundImage = paintBorderImage(p, _tx, _ty, w, h, style);
+    shouldPaintBackgroundImage =
+        paintBorderImage(graphicsContext, tx, ty, w, h, style);
 
   if (shouldPaintBackgroundImage)
     return;
@@ -1391,9 +1381,9 @@ void RenderObject::paintBorder(GraphicsContext* p,
 
   // Clip to the rounded rectangle.
   if (renderRadii) {
-    p->save();
-    p->addRoundedRectClip(IntRect(_tx, _ty, w, h), topLeft, topRight,
-                          bottomLeft, bottomRight);
+    graphicsContext->save();
+    graphicsContext->addRoundedRectClip(IntRect(tx, ty, w, h), topLeft,
+                                        topRight, bottomLeft, bottomRight);
   }
 
   int firstAngleStart, secondAngleStart, firstAngleSpan, secondAngleSpan;
@@ -1410,29 +1400,30 @@ void RenderObject::paintBorder(GraphicsContext* p,
   if (renderTop) {
     bool ignore_left =
         (renderRadii && topLeft.width() > 0) ||
-        ((tc == lc) && (tt == lt) && (ts >= OUTSET) &&
+        (tc == lc && tt == lt && ts >= OUTSET &&
          (ls == DOTTED || ls == DASHED || ls == SOLID || ls == OUTSET));
 
     bool ignore_right =
         (renderRadii && topRight.width() > 0) ||
-        ((tc == rc) && (tt == rt) && (ts >= OUTSET) &&
+        (tc == rc && tt == rt && ts >= OUTSET &&
          (rs == DOTTED || rs == DASHED || rs == SOLID || rs == INSET));
 
-    int x = _tx;
-    int x2 = _tx + w;
+    int x = tx;
+    int x2 = tx + w;
     if (renderRadii) {
       x += topLeft.width();
       x2 -= topRight.width();
     }
 
-    drawBorder(p, x, _ty, x2, _ty + style->borderTopWidth(), BSTop, tc,
-               style->color(), ts, ignore_left ? 0 : style->borderLeftWidth(),
+    drawBorder(graphicsContext, x, ty, x2, ty + style->borderTopWidth(), BSTop,
+               tc, style->color(), ts,
+               ignore_left ? 0 : style->borderLeftWidth(),
                ignore_right ? 0 : style->borderRightWidth());
 
     if (renderRadii) {
-      int leftX = _tx;
-      int leftY = _ty;
-      int rightX = _tx + w - topRight.width() * 2;
+      int leftX = tx;
+      int leftY = ty;
+      int rightX = tx + w - topRight.width() * 2;
       firstAngleStart = 90;
       firstAngleSpan = upperLeftBorderStylesMatch ? 90 : 45;
 
@@ -1457,64 +1448,66 @@ void RenderObject::paintBorder(GraphicsContext* p,
                                 (style->borderTopWidth() < topLeft.height()) &&
                                 (ts != DOUBLE || style->borderTopWidth() > 6);
       if (applyLeftInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(leftX, leftY, topLeft.width() * 2, topLeft.height() * 2),
             style->borderTopWidth());
       }
 
       // Draw upper left arc
-      drawBorderArc(p, leftX, leftY, thickness, topLeft, firstAngleStart,
-                    firstAngleSpan, BSTop, tc, style->color(), ts, true);
+      drawBorderArc(graphicsContext, leftX, leftY, thickness, topLeft,
+                    firstAngleStart, firstAngleSpan, BSTop, tc, style->color(),
+                    ts, true);
       if (applyLeftInnerClip)
-        p->restore();
+        graphicsContext->restore();
 
       bool applyRightInnerClip =
           (style->borderRightWidth() < topRight.width()) &&
           (style->borderTopWidth() < topRight.height()) &&
           (ts != DOUBLE || style->borderTopWidth() > 6);
       if (applyRightInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(rightX, leftY, topRight.width() * 2, topRight.height() * 2),
             style->borderTopWidth());
       }
 
       // Draw upper right arc
-      drawBorderArc(p, rightX, leftY, thickness, topRight, secondAngleStart,
-                    secondAngleSpan, BSTop, tc, style->color(), ts, false);
+      drawBorderArc(graphicsContext, rightX, leftY, thickness, topRight,
+                    secondAngleStart, secondAngleSpan, BSTop, tc,
+                    style->color(), ts, false);
       if (applyRightInnerClip)
-        p->restore();
+        graphicsContext->restore();
     }
   }
 
   if (renderBottom) {
     bool ignore_left =
         (renderRadii && bottomLeft.width() > 0) ||
-        ((bc == lc) && (bt == lt) && (bs >= OUTSET) &&
+        (bc == lc && bt == lt && bs >= OUTSET &&
          (ls == DOTTED || ls == DASHED || ls == SOLID || ls == OUTSET));
 
     bool ignore_right =
         (renderRadii && bottomRight.width() > 0) ||
-        ((bc == rc) && (bt == rt) && (bs >= OUTSET) &&
+        (bc == rc && bt == rt && bs >= OUTSET &&
          (rs == DOTTED || rs == DASHED || rs == SOLID || rs == INSET));
 
-    int x = _tx;
-    int x2 = _tx + w;
+    int x = tx;
+    int x2 = tx + w;
     if (renderRadii) {
       x += bottomLeft.width();
       x2 -= bottomRight.width();
     }
 
-    drawBorder(p, x, _ty + h - style->borderBottomWidth(), x2, _ty + h,
-               BSBottom, bc, style->color(), bs,
+    drawBorder(graphicsContext, x, ty + h - style->borderBottomWidth(), x2,
+               ty + h, BSBottom, bc, style->color(), bs,
                ignore_left ? 0 : style->borderLeftWidth(),
                ignore_right ? 0 : style->borderRightWidth());
 
     if (renderRadii) {
-      int leftX = _tx;
-      int leftY = _ty + h - bottomLeft.height() * 2;
-      int rightX = _tx + w - bottomRight.width() * 2;
+      int leftX = tx;
+      int leftY = ty + h - bottomLeft.height() * 2;
+      int rightX = tx + w - bottomRight.width() * 2;
       secondAngleStart = 270;
       secondAngleSpan = upperRightBorderStylesMatch ? 90 : 45;
       thickness = style->borderBottomWidth() * 2;
@@ -1532,65 +1525,69 @@ void RenderObject::paintBorder(GraphicsContext* p,
           (style->borderBottomWidth() < bottomLeft.height()) &&
           (bs != DOUBLE || style->borderBottomWidth() > 6);
       if (applyLeftInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(IntRect(leftX, leftY, bottomLeft.width() * 2,
-                                           bottomLeft.height() * 2),
-                                   style->borderBottomWidth());
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
+            IntRect(leftX, leftY, bottomLeft.width() * 2,
+                    bottomLeft.height() * 2),
+            style->borderBottomWidth());
       }
 
       // Draw lower left arc
-      drawBorderArc(p, leftX, leftY, thickness, bottomLeft, firstAngleStart,
-                    firstAngleSpan, BSBottom, bc, style->color(), bs, true);
+      drawBorderArc(graphicsContext, leftX, leftY, thickness, bottomLeft,
+                    firstAngleStart, firstAngleSpan, BSBottom, bc,
+                    style->color(), bs, true);
       if (applyLeftInnerClip)
-        p->restore();
+        graphicsContext->restore();
 
       bool applyRightInnerClip =
           (style->borderRightWidth() < bottomRight.width()) &&
           (style->borderBottomWidth() < bottomRight.height()) &&
           (bs != DOUBLE || style->borderBottomWidth() > 6);
       if (applyRightInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(rightX, leftY, bottomRight.width() * 2,
                     bottomRight.height() * 2),
             style->borderBottomWidth());
       }
 
       // Draw lower right arc
-      drawBorderArc(p, rightX, leftY, thickness, bottomRight, secondAngleStart,
-                    secondAngleSpan, BSBottom, bc, style->color(), bs, false);
+      drawBorderArc(graphicsContext, rightX, leftY, thickness, bottomRight,
+                    secondAngleStart, secondAngleSpan, BSBottom, bc,
+                    style->color(), bs, false);
       if (applyRightInnerClip)
-        p->restore();
+        graphicsContext->restore();
     }
   }
 
   if (renderLeft) {
     bool ignore_top =
         (renderRadii && topLeft.height() > 0) ||
-        ((tc == lc) && (tt == lt) && (ls >= OUTSET) &&
+        (tc == lc && tt == lt && ls >= OUTSET &&
          (ts == DOTTED || ts == DASHED || ts == SOLID || ts == OUTSET));
 
     bool ignore_bottom =
         (renderRadii && bottomLeft.height() > 0) ||
-        ((bc == lc) && (bt == lt) && (ls >= OUTSET) &&
+        (bc == lc && bt == lt && ls >= OUTSET &&
          (bs == DOTTED || bs == DASHED || bs == SOLID || bs == INSET));
 
-    int y = _ty;
-    int y2 = _ty + h;
+    int y = ty;
+    int y2 = ty + h;
     if (renderRadii) {
       y += topLeft.height();
       y2 -= bottomLeft.height();
     }
 
-    drawBorder(p, _tx, y, _tx + style->borderLeftWidth(), y2, BSLeft, lc,
-               style->color(), ls, ignore_top ? 0 : style->borderTopWidth(),
+    drawBorder(graphicsContext, tx, y, tx + style->borderLeftWidth(), y2,
+               BSLeft, lc, style->color(), ls,
+               ignore_top ? 0 : style->borderTopWidth(),
                ignore_bottom ? 0 : style->borderBottomWidth());
 
     if (renderRadii &&
         (!upperLeftBorderStylesMatch || !lowerLeftBorderStylesMatch)) {
-      int topX = _tx;
-      int topY = _ty;
-      int bottomY = _ty + h - bottomLeft.height() * 2;
+      int topX = tx;
+      int topY = ty;
+      int bottomY = ty + h - bottomLeft.height() * 2;
       firstAngleStart = 135;
       secondAngleStart = 180;
       firstAngleSpan = secondAngleSpan = 45;
@@ -1600,35 +1597,37 @@ void RenderObject::paintBorder(GraphicsContext* p,
                                (style->borderTopWidth() < topLeft.height()) &&
                                (ls != DOUBLE || style->borderLeftWidth() > 6);
       if (applyTopInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(topX, topY, topLeft.width() * 2, topLeft.height() * 2),
             style->borderLeftWidth());
       }
 
       // Draw top left arc
-      drawBorderArc(p, topX, topY, thickness, topLeft, firstAngleStart,
-                    firstAngleSpan, BSLeft, lc, style->color(), ls, true);
+      drawBorderArc(graphicsContext, topX, topY, thickness, topLeft,
+                    firstAngleStart, firstAngleSpan, BSLeft, lc, style->color(),
+                    ls, true);
       if (applyTopInnerClip)
-        p->restore();
+        graphicsContext->restore();
 
       bool applyBottomInnerClip =
           (style->borderLeftWidth() < bottomLeft.width()) &&
           (style->borderBottomWidth() < bottomLeft.height()) &&
           (ls != DOUBLE || style->borderLeftWidth() > 6);
       if (applyBottomInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(topX, bottomY, bottomLeft.width() * 2,
                     bottomLeft.height() * 2),
             style->borderLeftWidth());
       }
 
       // Draw bottom left arc
-      drawBorderArc(p, topX, bottomY, thickness, bottomLeft, secondAngleStart,
-                    secondAngleSpan, BSLeft, lc, style->color(), ls, false);
+      drawBorderArc(graphicsContext, topX, bottomY, thickness, bottomLeft,
+                    secondAngleStart, secondAngleSpan, BSLeft, lc,
+                    style->color(), ls, false);
       if (applyBottomInnerClip)
-        p->restore();
+        graphicsContext->restore();
     }
   }
 
@@ -1643,22 +1642,23 @@ void RenderObject::paintBorder(GraphicsContext* p,
         ((bc == rc) && (bt == rt) && (rs >= DOTTED || rs == INSET) &&
          (bs == DOTTED || bs == DASHED || bs == SOLID || bs == INSET));
 
-    int y = _ty;
-    int y2 = _ty + h;
+    int y = ty;
+    int y2 = ty + h;
     if (renderRadii) {
       y += topRight.height();
       y2 -= bottomRight.height();
     }
 
-    drawBorder(p, _tx + w - style->borderRightWidth(), y, _tx + w, y2, BSRight,
-               rc, style->color(), rs, ignore_top ? 0 : style->borderTopWidth(),
+    drawBorder(graphicsContext, tx + w - style->borderRightWidth(), y, tx + w,
+               y2, BSRight, rc, style->color(), rs,
+               ignore_top ? 0 : style->borderTopWidth(),
                ignore_bottom ? 0 : style->borderBottomWidth());
 
     if (renderRadii &&
         (!upperRightBorderStylesMatch || !lowerRightBorderStylesMatch)) {
-      int topX = _tx + w - topRight.width() * 2;
-      int topY = _ty;
-      int bottomY = _ty + h - bottomRight.height() * 2;
+      int topX = tx + w - topRight.width() * 2;
+      int topY = ty;
+      int bottomY = ty + h - bottomRight.height() * 2;
       firstAngleStart = 0;
       secondAngleStart = 315;
       firstAngleSpan = secondAngleSpan = 45;
@@ -1668,40 +1668,42 @@ void RenderObject::paintBorder(GraphicsContext* p,
                                (style->borderTopWidth() < topRight.height()) &&
                                (rs != DOUBLE || style->borderRightWidth() > 6);
       if (applyTopInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(topX, topY, topRight.width() * 2, topRight.height() * 2),
             style->borderRightWidth());
       }
 
       // Draw top right arc
-      drawBorderArc(p, topX, topY, thickness, topRight, firstAngleStart,
-                    firstAngleSpan, BSRight, rc, style->color(), rs, true);
+      drawBorderArc(graphicsContext, topX, topY, thickness, topRight,
+                    firstAngleStart, firstAngleSpan, BSRight, rc,
+                    style->color(), rs, true);
       if (applyTopInnerClip)
-        p->restore();
+        graphicsContext->restore();
 
       bool applyBottomInnerClip =
           (style->borderRightWidth() < bottomRight.width()) &&
           (style->borderBottomWidth() < bottomRight.height()) &&
           (rs != DOUBLE || style->borderRightWidth() > 6);
       if (applyBottomInnerClip) {
-        p->save();
-        p->addInnerRoundedRectClip(
+        graphicsContext->save();
+        graphicsContext->addInnerRoundedRectClip(
             IntRect(topX, bottomY, bottomRight.width() * 2,
                     bottomRight.height() * 2),
             style->borderRightWidth());
       }
 
       // Draw bottom right arc
-      drawBorderArc(p, topX, bottomY, thickness, bottomRight, secondAngleStart,
-                    secondAngleSpan, BSRight, rc, style->color(), rs, false);
+      drawBorderArc(graphicsContext, topX, bottomY, thickness, bottomRight,
+                    secondAngleStart, secondAngleSpan, BSRight, rc,
+                    style->color(), rs, false);
       if (applyBottomInnerClip)
-        p->restore();
+        graphicsContext->restore();
     }
   }
 
   if (renderRadii)
-    p->restore();  // Undo the clip.
+    graphicsContext->restore();
 }
 
 void RenderObject::addLineBoxRects(Vector<IntRect>&,
@@ -1759,10 +1761,11 @@ IntRect RenderObject::paintingRootRect(IntRect& topLevelRect) {
   return result;
 }
 
-void RenderObject::addPDFURLRect(GraphicsContext* p, IntRect rect) {
+void RenderObject::addPDFURLRect(GraphicsContext* graphicsContext,
+                                 IntRect rect) {
   Node* node = element();
   if (node) {
-    if (p) {
+    if (graphicsContext) {
       if (rect.width() > 0 && rect.height() > 0) {
         Element* element = static_cast<Element*>(node);
         String href;
@@ -1772,33 +1775,36 @@ void RenderObject::addPDFURLRect(GraphicsContext* p, IntRect rect) {
         if (!href.isNull()) {
           KURL link = element->document()->completeURL(href.deprecatedString());
           if (link.isValid())
-            p->setURLForRect(link, rect);
+            graphicsContext->setURLForRect(link, rect);
         }
       }
     }
   }
 }
 
-void RenderObject::addFocusRingRects(GraphicsContext* p, int _tx, int _ty) {
+void RenderObject::addFocusRingRects(GraphicsContext* graphicsContext,
+                                     int tx,
+                                     int ty) {
   // For blocks inside inlines, we go ahead and include margins so that we run
   // right up to the
   // inline boxes above and below us (thus getting merged with them to form a
   // single irregular
   // shape).
   if (continuation()) {
-    p->addFocusRingRect(
-        IntRect(_tx, _ty - collapsedMarginTop(), width(),
+    graphicsContext->addFocusRingRect(
+        IntRect(tx, ty - collapsedMarginTop(), width(),
                 height() + collapsedMarginTop() + collapsedMarginBottom()));
     continuation()->addFocusRingRects(
-        p, _tx - xPos() + continuation()->containingBlock()->xPos(),
-        _ty - yPos() + continuation()->containingBlock()->yPos());
+        graphicsContext,
+        tx - xPos() + continuation()->containingBlock()->xPos(),
+        ty - yPos() + continuation()->containingBlock()->yPos());
   } else
-    p->addFocusRingRect(IntRect(_tx, _ty, width(), height()));
+    graphicsContext->addFocusRingRect(IntRect(tx, ty, width(), height()));
 }
 
-void RenderObject::paintOutline(GraphicsContext* p,
-                                int _tx,
-                                int _ty,
+void RenderObject::paintOutline(GraphicsContext* graphicsContext,
+                                int tx,
+                                int ty,
                                 int w,
                                 int h,
                                 const RenderStyle* style) {
@@ -1819,35 +1825,36 @@ void RenderObject::paintOutline(GraphicsContext* p,
     if (!theme()->supportsFocusRing(style)) {
       // Only paint the focus ring by hand if the theme isn't able to draw the
       // focus ring.
-      p->initFocusRing(ow, offset);
+      graphicsContext->initFocusRing(ow, offset);
       if (style->outlineStyleIsAuto())
-        addFocusRingRects(p, _tx, _ty);
+        addFocusRingRects(graphicsContext, tx, ty);
       else
-        addPDFURLRect(p, p->focusRingBoundingRect());
-      p->drawFocusRing(oc);
-      p->clearFocusRing();
+        addPDFURLRect(graphicsContext,
+                      graphicsContext->focusRingBoundingRect());
+      graphicsContext->drawFocusRing(oc);
+      graphicsContext->clearFocusRing();
     }
   }
 
   if (style->outlineStyleIsAuto() || style->outlineStyle() <= BHIDDEN)
     return;
 
-  _tx -= offset;
-  _ty -= offset;
+  tx -= offset;
+  ty -= offset;
   w += 2 * offset;
   h += 2 * offset;
 
-  drawBorder(p, _tx - ow, _ty - ow, _tx, _ty + h + ow, BSLeft, Color(oc),
-             style->color(), os, ow, ow);
-
-  drawBorder(p, _tx - ow, _ty - ow, _tx + w + ow, _ty, BSTop, Color(oc),
-             style->color(), os, ow, ow);
-
-  drawBorder(p, _tx + w, _ty - ow, _tx + w + ow, _ty + h + ow, BSRight,
+  drawBorder(graphicsContext, tx - ow, ty - ow, tx, ty + h + ow, BSLeft,
              Color(oc), style->color(), os, ow, ow);
 
-  drawBorder(p, _tx - ow, _ty + h, _tx + w + ow, _ty + h + ow, BSBottom,
+  drawBorder(graphicsContext, tx - ow, ty - ow, tx + w + ow, ty, BSTop,
              Color(oc), style->color(), os, ow, ow);
+
+  drawBorder(graphicsContext, tx + w, ty - ow, tx + w + ow, ty + h + ow,
+             BSRight, Color(oc), style->color(), os, ow, ow);
+
+  drawBorder(graphicsContext, tx - ow, ty + h, tx + w + ow, ty + h + ow,
+             BSBottom, Color(oc), style->color(), os, ow, ow);
 }
 
 void RenderObject::paint(PaintInfo& /*paintInfo*/, int /*tx*/, int /*ty*/) {}
@@ -1859,10 +1866,10 @@ void RenderObject::repaint(bool immediate) {
     o = o->parent();
   if (!o->isRenderView())
     return;
-  RenderView* c = static_cast<RenderView*>(o);
-  if (c->printingMode())
+  RenderView* view = static_cast<RenderView*>(o);
+  if (view->printingMode())
     return;  // Don't repaint if we're printing.
-  c->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
+  view->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
 }
 
 void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
@@ -1872,18 +1879,18 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
     o = o->parent();
   if (!o->isRenderView())
     return;
-  RenderView* c = static_cast<RenderView*>(o);
-  if (c->printingMode())
+  RenderView* view = static_cast<RenderView*>(o);
+  if (view->printingMode())
     return;  // Don't repaint if we're printing.
   IntRect absRect(r);
   computeAbsoluteRepaintRect(absRect);
-  c->repaintViewRectangle(absRect, immediate);
+  view->repaintViewRectangle(absRect, immediate);
 }
 
 bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
                                               const IntRect& oldFullBounds) {
-  RenderView* c = view();
-  if (c->printingMode())
+  RenderView* v = view();
+  if (v->printingMode())
     return false;  // Don't repaint if we're printing.
 
   IntRect newBounds, newFullBounds;
@@ -1895,9 +1902,9 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
                      newBounds.location() != oldBounds.location() ||
                      mustRepaintBackgroundOrBorder();
   if (fullRepaint) {
-    c->repaintViewRectangle(oldFullBounds);
+    v->repaintViewRectangle(oldFullBounds);
     if (newBounds != oldBounds)
-      c->repaintViewRectangle(newFullBounds);
+      v->repaintViewRectangle(newFullBounds);
     return true;
   }
 
@@ -1907,7 +1914,7 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   int ow = style() ? style()->outlineSize() : 0;
   int width = abs(newBounds.width() - oldBounds.width());
   if (width)
-    c->repaintViewRectangle(
+    v->repaintViewRectangle(
         IntRect(min(newBounds.x() + newBounds.width(),
                     oldBounds.x() + oldBounds.width()) -
                     borderRight() - ow,
@@ -1915,7 +1922,7 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
                 max(newBounds.height(), oldBounds.height())));
   int height = abs(newBounds.height() - oldBounds.height());
   if (height)
-    c->repaintViewRectangle(IntRect(
+    v->repaintViewRectangle(IntRect(
         newBounds.x(),
         min(newBounds.bottom(), oldBounds.bottom()) - borderBottom() - ow,
         max(newBounds.width(), oldBounds.width()),
@@ -1958,10 +1965,12 @@ IntRect RenderObject::getAbsoluteRepaintRectWithOutline(int ow) {
   if (continuation() && !isInline())
     r.inflateY(collapsedMarginTop());
 
-  if (isInlineFlow())
-    for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
+  if (isInlineFlow()) {
+    for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
       if (!curr->isText())
         r.unite(curr->getAbsoluteRepaintRectWithOutline(ow));
+    }
+  }
 
   return r;
 }
@@ -2029,40 +2038,30 @@ DeprecatedString RenderObject::information() const {
 }
 
 void RenderObject::dump(TextStream* stream, DeprecatedString ind) const {
-  if (isAnonymous()) {
+  if (isAnonymous())
     *stream << " anonymous";
-  }
-  if (isFloating()) {
+  if (isFloating())
     *stream << " floating";
-  }
-  if (isPositioned()) {
+  if (isPositioned())
     *stream << " positioned";
-  }
-  if (isRelPositioned()) {
+  if (isRelPositioned())
     *stream << " relPositioned";
-  }
-  if (isText()) {
+  if (isText())
     *stream << " text";
-  }
-  if (isInline()) {
+  if (isInline())
     *stream << " inline";
-  }
-  if (isReplaced()) {
+  if (isReplaced())
     *stream << " replaced";
-  }
-  if (shouldPaintBackgroundOrBorder()) {
+  if (shouldPaintBackgroundOrBorder())
     *stream << " paintBackground";
-  }
-  if (needsLayout()) {
+  if (needsLayout())
     *stream << " needsLayout";
-  }
-  if (minMaxKnown()) {
+  if (minMaxKnown())
     *stream << " minMaxKnown";
-  }
   *stream << endl;
 
   RenderObject* child = firstChild();
-  while (child != 0) {
+  while (child) {
     *stream << ind << child->renderName() << ": ";
     child->dump(stream, ind + "  ");
     child = child->nextSibling();
@@ -2074,7 +2073,7 @@ void RenderObject::showTreeForThis() const {
     element()->showTreeForThis();
 }
 
-#endif
+#endif  // NDEBUG
 
 static Node* selectStartNode(const RenderObject* object) {
   Node* node = 0;
@@ -2158,14 +2157,13 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
                                                            IntPoint(x, y))) {
         dhtmlWillDrag = false;
         return curr->node();
-      } else if (curr->shouldSelect()) {
+      } else if (curr->shouldSelect())
         // In this case we have a click in the unselected portion of text.  If
         // this text is
         // selectable, we want to start the selection process instead of looking
         // for a parent
         // to try to drag.
         return 0;
-      }
     } else {
       EUserDrag dragMode = curr->style()->userDrag();
       if (dhtmlOK && dragMode == DRAG_ELEMENT) {
@@ -2313,13 +2311,13 @@ void RenderObject::setStyle(RenderStyle* style) {
       if (m_style->position() == StaticPosition)
         repaint();
       if (isRenderBlock()) {
-        if (style->position() == StaticPosition) {
+        if (style->position() == StaticPosition)
           // Clear our positioned objects list. Our absolutely positioned
           // descendants will be
           // inserted into our containing block's positioned objects list during
           // layout.
           removePositionedObjects(0);
-        } else if (m_style->position() == StaticPosition) {
+        else if (m_style->position() == StaticPosition) {
           // Remove our absolutely positioned descendants from their current
           // containing block.
           // They will be inserted into our positioned objects list during
@@ -2411,12 +2409,12 @@ void RenderObject::setStyle(RenderStyle* style) {
     repaint();
 }
 
-void RenderObject::setStyleInternal(RenderStyle* st) {
-  if (m_style == st)
+void RenderObject::setStyleInternal(RenderStyle* style) {
+  if (m_style == style)
     return;
   if (m_style)
     m_style->deref(renderArena());
-  m_style = st;
+  m_style = style;
   if (m_style)
     m_style->ref();
 }
@@ -2552,7 +2550,7 @@ RenderObject* RenderObject::container() const {
   // calcAbsoluteHorizontal and
   // calcAbsoluteVertical have to use container().
   EPosition pos = m_style->position();
-  RenderObject* o = 0;
+  RenderObject* o = parent();
   if (!isText() && pos == FixedPosition) {
     // container() can be called on an object that is not in the
     // tree yet.  We don't call view() since it will assert if it
@@ -2560,18 +2558,16 @@ RenderObject* RenderObject::container() const {
     // as we can.  If we're in the tree, we'll get the root.  If we
     // aren't we'll get the root of our little subtree (most likely
     // we'll just return 0).
-    o = parent();
     while (o && o->parent())
       o = o->parent();
   } else if (!isText() && pos == AbsolutePosition) {
     // Same goes here.  We technically just want our containing block, but
     // we may not have one if we're part of an uninstalled subtree.  We'll
     // climb as high as we can though.
-    o = parent();
     while (o && o->style()->position() == StaticPosition && !o->isRenderView())
       o = o->parent();
-  } else
-    o = parent();
+  }
+
   return o;
 }
 
@@ -2679,10 +2675,6 @@ VisiblePosition RenderObject::positionForCoordinates(int x, int y) {
   return VisiblePosition(element(), caretMinOffset(), DOWNSTREAM);
 }
 
-bool RenderObject::isDragging() const {
-  return m_isDragging;
-}
-
 void RenderObject::updateDragState(bool dragOn) {
   bool valueChanged = (dragOn != m_isDragging);
   m_isDragging = dragOn;
@@ -2746,13 +2738,13 @@ void RenderObject::setInnerNode(HitTestResult& result) {
   }
 }
 
-bool RenderObject::nodeAtPoint(const HitTestRequest& request,
-                               HitTestResult& result,
-                               int _x,
-                               int _y,
-                               int _tx,
-                               int _ty,
-                               HitTestAction hitTestAction) {
+bool RenderObject::nodeAtPoint(const HitTestRequest&,
+                               HitTestResult&,
+                               int /*x*/,
+                               int /*y*/,
+                               int /*tx*/,
+                               int /*ty*/,
+                               HitTestAction) {
   return false;
 }
 
@@ -2763,6 +2755,7 @@ short RenderObject::verticalPositionHint(bool firstLine) const {
     if (!firstLine)
       m_verticalPosition = vpos;
   }
+
   return vpos;
 }
 
@@ -2773,13 +2766,13 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
   // This method determines the vertical position for inline elements.
   int vpos = 0;
   EVerticalAlign va = style()->verticalAlign();
-  if (va == TOP) {
+  if (va == TOP)
     vpos = PositionTop;
-  } else if (va == BOTTOM) {
+  else if (va == BOTTOM)
     vpos = PositionBottom;
-  } else if (va == LENGTH) {
+  else if (va == LENGTH)
     vpos = -style()->verticalAlignLength().calcValue(lineHeight(firstLine));
-  } else {
+  else {
     bool checkParent = parent()->isInline() &&
                        !parent()->isInlineBlockOrInlineTable() &&
                        parent()->style()->verticalAlign() != TOP &&
@@ -2800,7 +2793,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
     else if (va == TEXT_TOP)
       vpos += baselinePosition(firstLine) - f.ascent();
     else if (va == MIDDLE)
-      vpos += -(int)(f.xHeight() / 2) - lineHeight(firstLine) / 2 +
+      vpos += -static_cast<int>(f.xHeight() / 2) - lineHeight(firstLine) / 2 +
               baselinePosition(firstLine);
     else if (va == TEXT_BOTTOM) {
       vpos += f.descent();
@@ -2813,7 +2806,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
   return vpos;
 }
 
-short RenderObject::lineHeight(bool firstLine, bool) const {
+short RenderObject::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
   RenderStyle* s = style(firstLine);
 
   Length lh = s->lineHeight();
@@ -2845,11 +2838,6 @@ void RenderObject::invalidateVerticalPositions() {
 
 void RenderObject::recalcMinMaxWidths() {
   ASSERT(m_recalcMinMax);
-
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << " recalcMinMaxWidths() this=" << this
-                << endl;
-#endif
 
   if (m_recalcMinMax)
     updateFirstLetter();
@@ -2912,7 +2900,7 @@ InlineBox* RenderObject::inlineBoxWrapper() const {
   return 0;
 }
 
-void RenderObject::setInlineBoxWrapper(InlineBox* b) {}
+void RenderObject::setInlineBoxWrapper(InlineBox*) {}
 
 void RenderObject::deleteLineBoxWrapper() {}
 
@@ -3100,9 +3088,10 @@ CounterNode* RenderObject::findCounter(const String& counterName,
   RenderObjectsToCounterNodeMaps* objectsMap =
       getRenderObjectsToCounterNodeMaps();
   CounterNode* newNode = 0;
-  if (CounterNodeMap* counterNodesMap = objectsMap->get(this))
+  if (CounterNodeMap* counterNodesMap = objectsMap->get(this)) {
     if (counterNodesMap)
       newNode = counterNodesMap->get(counterName);
+  }
 
   if (newNode)
     return newNode;
@@ -3221,9 +3210,10 @@ CounterNode* RenderObject::findCounter(const String& counterName,
 }
 
 UChar RenderObject::backslashAsCurrencySymbol() const {
-  if (Node* node = element())
+  if (Node* node = element()) {
     if (TextResourceDecoder* decoder = node->document()->decoder())
       return decoder->encoding().backslashAsCurrencySymbol();
+  }
   return '\\';
 }
 
@@ -3238,11 +3228,11 @@ void RenderObject::imageChanged(CachedImage* image) {
   if (image && image->canRender() && parent()) {
     if (view() && element() &&
         (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
-      view()->repaint();  // repaint the entire canvas since the background gets
-                          // propagated up
+      // repaint the entire canvas since the background gets propagated up
+      view()->repaint();
     else
-      repaint();  // repaint object, which is a box or a container with boxes
-                  // inside it
+      // repaint object, which is a box or a container with boxes inside it
+      repaint();
   }
 }
 
@@ -3311,8 +3301,9 @@ AffineTransform RenderObject::absoluteTransform() const {
   return localTransform();
 }
 
-#endif
-}
+#endif  // SVG_SUPPORT
+
+}  // namespace WebCore
 
 #ifndef NDEBUG
 

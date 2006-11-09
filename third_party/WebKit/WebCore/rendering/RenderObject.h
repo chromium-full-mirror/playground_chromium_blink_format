@@ -32,6 +32,7 @@
 #include "RenderStyle.h"
 #include "ScrollBar.h"
 #include "VisiblePosition.h"
+#include <algorithm>
 #include <wtf/HashMap.h>
 
 /*
@@ -60,9 +61,9 @@ class Event;
 class FloatRect;
 class FrameView;
 class HTMLAreaElement;
+class HitTestResult;
 class InlineBox;
 class InlineFlowBox;
-class HitTestResult;
 class PlatformScrollbar;
 class Position;
 class RenderArena;
@@ -76,7 +77,6 @@ class RenderView;
 class String;
 class TextStream;
 class VisiblePosition;
-
 struct HitTestRequest;
 
 enum PaintPhase {
@@ -108,15 +108,21 @@ enum HitTestAction {
   HitTestForeground
 };
 
+enum VerticalPositionHint {
+  PositionTop = -0x4000,
+  PositionBottom = 0x4000,
+  PositionUndefined = 0x3fff
+};
+
 struct DashboardRegionValue {
+  bool operator==(const DashboardRegionValue& o) const {
+    return type == o.type && bounds == o.bounds && label == o.label;
+  }
+
   String label;
   IntRect bounds;
   IntRect clip;
   int type;
-
-  bool operator==(const DashboardRegionValue& o) const {
-    return type == o.type && bounds == o.bounds && label == o.label;
-  }
 };
 
 // FIXME: This should be a HashSequencedSet, but we don't have that data
@@ -129,15 +135,21 @@ typedef HashSet<RenderFlow*> RenderFlowSequencedSet;
  * Base Class for all rendering tree objects.
  */
 class RenderObject : public CachedResourceClient {
+  friend class RenderListItem;
+  friend class RenderContainer;
+  friend class RenderView;
+
  public:
   // Anonymous objects should pass the document as their node, and they will
   // then automatically be
   // marked as anonymous in the constructor.
-  RenderObject(Node* node);
+  RenderObject(Node*);
   virtual ~RenderObject();
 
+  virtual const char* renderName() const { return "RenderObject"; }
+
   RenderObject* parent() const { return m_parent; }
-  bool isDescendantOf(const RenderObject* obj) const;
+  bool isDescendantOf(const RenderObject*) const;
 
   RenderObject* previousSibling() const { return m_previous; }
   RenderObject* nextSibling() const { return m_next; }
@@ -167,18 +179,21 @@ class RenderObject : public CachedResourceClient {
   virtual void positionChildLayers() {}
   virtual bool requiresLayer();
 
-  virtual IntRect getOverflowClipRect(int tx, int ty) {
+  virtual IntRect getOverflowClipRect(int /*tx*/, int /*ty*/) {
     return IntRect(0, 0, 0, 0);
   }
-  virtual IntRect getClipRect(int tx, int ty) { return IntRect(0, 0, 0, 0); }
+  virtual IntRect getClipRect(int /*tx*/, int /*ty*/) {
+    return IntRect(0, 0, 0, 0);
+  }
   bool hasClip() { return isPositioned() && style()->hasClip(); }
 
   virtual int getBaselineOfFirstLineBox() const { return -1; }
   virtual int getBaselineOfLastLineBox() const { return -1; }
+
   virtual bool isEmpty() const { return firstChild() == 0; }
 
   virtual bool isEdited() const { return false; }
-  virtual void setEdited(bool) { return; };
+  virtual void setEdited(bool) {}
 
   // Obtains the nearest enclosing block (including this block) that contributes
   // a first-line style to our inline
@@ -202,8 +217,8 @@ class RenderObject : public CachedResourceClient {
   // to determine its position.
   bool hasStaticX() const;
   bool hasStaticY() const;
-  virtual void setStaticX(int staticX){};
-  virtual void setStaticY(int staticY){};
+  virtual void setStaticX(int /*staticX*/) {}
+  virtual void setStaticY(int /*staticY*/) {}
   virtual int staticX() const { return 0; }
   virtual int staticY() const { return 0; }
 
@@ -212,17 +227,16 @@ class RenderObject : public CachedResourceClient {
                            bool usesSeparator = false,
                            bool createIfNotFound = true);
 
- public:
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
-  virtual void removeChild(RenderObject* oldChild);
+  virtual void removeChild(RenderObject*);
   virtual bool createsAnonymousWrapper() const { return false; }
 
   // raw tree manipulation
-  virtual RenderObject* removeChildNode(RenderObject* child);
-  virtual void appendChildNode(RenderObject* child);
+  virtual RenderObject* removeChildNode(RenderObject*);
+  virtual void appendChildNode(RenderObject*);
   virtual void insertChildNode(RenderObject* child, RenderObject* before);
   //////////////////////////////////////////
 
@@ -237,25 +251,24 @@ class RenderObject : public CachedResourceClient {
   void addAbsoluteRectForLayer(IntRect& result);
 
  public:
-  virtual const char* renderName() const { return "RenderObject"; }
 #ifndef NDEBUG
   DeprecatedString information() const;
-  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream*, DeprecatedString ind = "") const;
   void showTreeForThis() const;
 #endif
 
-  static RenderObject* createObject(Node* node, RenderStyle* style);
+  static RenderObject* createObject(Node*, RenderStyle*);
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
-  void* operator new(size_t sz, RenderArena* renderArena) throw();
+  void* operator new(size_t, RenderArena*) throw();
 
   // Overridden to prevent the normal delete from being called.
-  void operator delete(void* ptr, size_t sz);
+  void operator delete(void*, size_t);
 
  private:
   // The normal operator new is disallowed on all render objects.
-  void* operator new(size_t sz) throw();
+  void* operator new(size_t) throw();
 
  public:
   RenderArena* renderArena() const;
@@ -266,19 +279,11 @@ class RenderObject : public CachedResourceClient {
   virtual bool isInlineFlow() const { return false; }
   virtual bool isBlockFlow() const { return false; }
   virtual bool isInlineBlockOrInlineTable() const { return false; }
-  virtual bool childrenInline() const { return false; }
-  virtual void setChildrenInline(bool b){};
-
-  virtual RenderFlow* continuation() const;
   virtual bool isInlineContinuation() const;
-
   virtual bool isListItem() const { return false; }
   virtual bool isListMarker() const { return false; }
   virtual bool isCounter() const { return false; }
   virtual bool isRenderView() const { return false; }
-  bool isRoot() const;
-  bool isBody() const;
-  bool isHR() const;
   virtual bool isBR() const { return false; }
   virtual bool isTableCell() const { return false; }
   virtual bool isTableRow() const { return false; }
@@ -295,6 +300,17 @@ class RenderObject : public CachedResourceClient {
   virtual bool isMenuList() const { return false; }
   virtual bool isListBox() const { return false; }
 
+  bool isRoot() const;
+  bool isBody() const;
+  bool isHR() const;
+
+  bool isHTMLMarquee() const;
+
+  virtual bool childrenInline() const { return false; }
+  virtual void setChildrenInline(bool) {}
+
+  virtual RenderFlow* continuation() const;
+
 #ifdef SVG_SUPPORT
   virtual bool isKCanvasContainer() const { return false; }
   virtual bool isRenderPath() const { return false; }
@@ -306,8 +322,6 @@ class RenderObject : public CachedResourceClient {
 #endif
 
   virtual bool isEditable() const;
-
-  bool isHTMLMarquee() const;
 
   bool isAnonymous() const { return m_isAnonymous; }
   void setIsAnonymous(bool b) { m_isAnonymous = b; }
@@ -331,20 +345,24 @@ class RenderObject : public CachedResourceClient {
   bool isRunIn() const {
     return style()->display() == RUN_IN;
   }  // run-in object
-  bool isDragging() const;
+  bool isDragging() const { return m_isDragging; }
   bool isReplaced() const {
     return m_replaced;
   }  // a "replaced" element (see CSS)
+
   bool shouldPaintBackgroundOrBorder() const { return m_paintBackground; }
   bool mustRepaintBackgroundOrBorder() const;
+
   bool needsLayout() const {
     return m_needsLayout || m_normalChildNeedsLayout || m_posChildNeedsLayout;
   }
   bool selfNeedsLayout() const { return m_needsLayout; }
   bool posChildNeedsLayout() const { return m_posChildNeedsLayout; }
   bool normalChildNeedsLayout() const { return m_normalChildNeedsLayout; }
+
   bool minMaxKnown() const { return m_minMaxKnown; }
   bool recalcMinMax() const { return m_recalcMinMax; }
+
   bool isSelectionBorder() const;
 
   bool hasOverflowClip() const { return m_hasOverflowClip; }
@@ -379,7 +397,7 @@ class RenderObject : public CachedResourceClient {
            (style()->overflowX() == OSCROLL || style()->overflowX() == OAUTO);
   }
 
-  RenderStyle* getPseudoStyle(RenderStyle::PseudoId pseudo,
+  RenderStyle* getPseudoStyle(RenderStyle::PseudoId,
                               RenderStyle* parentStyle = 0) const;
 
   void updateDragState(bool dragOn);
@@ -409,12 +427,13 @@ class RenderObject : public CachedResourceClient {
   void markContainingBlocksForLayout(bool scheduleRelayout = true);
   void setNeedsLayout(bool b, bool markParents = true);
   void setChildNeedsLayout(bool b, bool markParents = true);
+
   void setMinMaxKnown(bool b = true) {
     m_minMaxKnown = b;
     if (!b) {
       RenderObject* o = this;
       RenderObject* root = this;
-      while (o) {  // ### && !o->m_recalcMinMax ) {
+      while (o) {  // FIXME: && !o->m_recalcMinMax ) {
         o->m_recalcMinMax = true;
         root = o;
         o = o->m_parent;
@@ -453,10 +472,10 @@ class RenderObject : public CachedResourceClient {
   // and to easily
   // iterate over structures on the line.
   virtual InlineBox* inlineBoxWrapper() const;
-  virtual void setInlineBoxWrapper(InlineBox* b);
+  virtual void setInlineBoxWrapper(InlineBox*);
   virtual void deleteLineBoxWrapper();
 
-  virtual InlineBox* inlineBox(int offset = 0, EAffinity affinity = UPSTREAM);
+  virtual InlineBox* inlineBox(int offset = 0, EAffinity = UPSTREAM);
 
   // for discussion of lineHeight see CSS2 spec
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
@@ -513,13 +532,13 @@ class RenderObject : public CachedResourceClient {
                         int ty,
                         int w,
                         int h,
-                        const RenderStyle* style);
+                        const RenderStyle*);
   void paintOutline(GraphicsContext*,
                     int tx,
                     int ty,
                     int w,
                     int h,
-                    const RenderStyle* style);
+                    const RenderStyle*);
 
   // RenderBox implements this.
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty) {}
@@ -531,7 +550,7 @@ class RenderObject : public CachedResourceClient {
                                        int cliph,
                                        int tx,
                                        int ty,
-                                       int w,
+                                       int width,
                                        int height,
                                        int bleft,
                                        int bright,
@@ -584,7 +603,7 @@ class RenderObject : public CachedResourceClient {
 
   // used for element state updates that can not be fixed with a
   // repaint and do not need a relayout
-  virtual void updateFromElement(){};
+  virtual void updateFromElement() {}
 
   virtual int availableHeight() const { return 0; }
 
@@ -597,11 +616,11 @@ class RenderObject : public CachedResourceClient {
   // after
   // layout is complete.
   struct RepaintInfo {
+    RepaintInfo(RenderObject* object, const IntRect& repaintRect)
+        : m_object(object), m_repaintRect(repaintRect) {}
+
     RenderObject* m_object;
     IntRect m_repaintRect;
-
-    RepaintInfo(RenderObject* o, const IntRect& r)
-        : m_object(o), m_repaintRect(r) {}
   };
 
   bool hitTest(const HitTestRequest&,
@@ -610,7 +629,7 @@ class RenderObject : public CachedResourceClient {
                int y,
                int tx,
                int ty,
-               HitTestFilter hitTestFilter = HitTestAll);
+               HitTestFilter = HitTestAll);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,
@@ -625,16 +644,16 @@ class RenderObject : public CachedResourceClient {
     return positionForCoordinates(point.x(), point.y());
   }
 
-  virtual void dirtyLinesFromChangedChild(RenderObject* child);
+  virtual void dirtyLinesFromChangedChild(RenderObject*);
 
   // Set the style of the object and update the state of the object accordingly.
-  virtual void setStyle(RenderStyle* style);
+  virtual void setStyle(RenderStyle*);
 
   // Updates only the local style ptr of the object.  Does not update the state
   // of the object,
   // and so only should be called when the style is known not to have changed
   // (or from setStyle).
-  void setStyleInternal(RenderStyle* style);
+  void setStyleInternal(RenderStyle*);
 
   // returns the containing block level element for this element.
   RenderBlock* containingBlock() const;
@@ -656,7 +675,7 @@ class RenderObject : public CachedResourceClient {
   virtual int overrideSize() const { return 0; }
   virtual int overrideWidth() const { return 0; }
   virtual int overrideHeight() const { return 0; }
-  virtual void setOverrideSize(int s) {}
+  virtual void setOverrideSize(int /*overrideSize*/) {}
 
   // relative to parent node
   virtual void setPos(int /*xPos*/, int /*yPos*/) {}
@@ -669,7 +688,7 @@ class RenderObject : public CachedResourceClient {
   // calculate client position of box
   virtual bool absolutePosition(int& /*xPos*/,
                                 int& /*yPos*/,
-                                bool fixed = false);
+                                bool /*fixed*/ = false);
 
   // This function is used to deal with the extra top space that can occur in
   // table cells (called borderTopExtra).
@@ -693,17 +712,17 @@ class RenderObject : public CachedResourceClient {
   // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
   // inside
   // it would have an overflow height of borderTop() + paddingTop() + 100px.
-  virtual int overflowHeight(bool includeInterior = true) const {
+  virtual int overflowHeight(bool /*includeInterior*/ = true) const {
     return height();
   }
-  virtual int overflowWidth(bool includeInterior = true) const {
+  virtual int overflowWidth(bool /*includeInterior*/ = true) const {
     return width();
   }
   virtual void setOverflowHeight(int) {}
   virtual void setOverflowWidth(int) {}
-  virtual int overflowLeft(bool includeInterior = true) const { return 0; }
-  virtual int overflowTop(bool includeInterior = true) const { return 0; }
-  virtual IntRect overflowRect(bool includeInterior = true) const {
+  virtual int overflowLeft(bool /*includeInterior*/ = true) const { return 0; }
+  virtual int overflowTop(bool /*includeInterior*/ = true) const { return 0; }
+  virtual IntRect overflowRect(bool /*includeInterior*/ = true) const {
     return borderBox();
   }
 
@@ -716,8 +735,8 @@ class RenderObject : public CachedResourceClient {
     return height() + borderTopExtra() + borderBottomExtra();
   }
 
-  // IE exxtensions.  Also supported by Gecko.  We override in render flow to
-  // get the
+  // IE extensions.  Also supported by Gecko.  We override in render flow to get
+  // the
   // left and top correct. -dwh
   virtual int offsetLeft() const;
   virtual int offsetTop() const;
@@ -747,12 +766,12 @@ class RenderObject : public CachedResourceClient {
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
 
-  virtual bool scroll(ScrollDirection direction,
-                      ScrollGranularity granularity,
-                      float multiplier = 1.0);
+  virtual bool scroll(ScrollDirection,
+                      ScrollGranularity,
+                      float multiplier = 1.0f);
   virtual bool shouldAutoscroll() const;
   virtual void autoscroll();
-  virtual void stopAutoscroll(){};
+  virtual void stopAutoscroll() {}
 
   // The following seven functions are used to implement collapsing margins.
   // All objects know their maximal positive and negative margins.  The
@@ -770,27 +789,13 @@ class RenderObject : public CachedResourceClient {
   }
   virtual bool isTopMarginQuirk() const { return false; }
   virtual bool isBottomMarginQuirk() const { return false; }
+
   virtual int maxTopMargin(bool positive) const {
-    if (positive)
-      if (marginTop() > 0)
-        return marginTop();
-      else
-        return 0;
-    else if (marginTop() < 0)
-      return 0 - marginTop();
-    else
-      return 0;
+    return positive ? std::max(0, marginTop()) : -std::min(0, marginTop());
   }
   virtual int maxBottomMargin(bool positive) const {
-    if (positive)
-      if (marginBottom() > 0)
-        return marginBottom();
-      else
-        return 0;
-    else if (marginBottom() < 0)
-      return 0 - marginBottom();
-    else
-      return 0;
+    return positive ? std::max(0, marginBottom())
+                    : -std::min(0, marginBottom());
   }
 
   virtual int marginTop() const { return 0; }
@@ -821,7 +826,7 @@ class RenderObject : public CachedResourceClient {
   // the rect that will be painted if this object is passed as the paintingRoot
   IntRect paintingRootRect(IntRect& topLevelRect);
 
-  void addPDFURLRect(GraphicsContext* p, IntRect rect);
+  void addPDFURLRect(GraphicsContext*, IntRect);
 
   virtual void addFocusRingRects(GraphicsContext*, int tx, int ty);
 
@@ -841,6 +846,7 @@ class RenderObject : public CachedResourceClient {
                                bool quirksMode = false);
 
   enum BorderSide { BSTop, BSBottom, BSLeft, BSRight };
+
   void drawBorderArc(GraphicsContext*,
                      int x,
                      int y,
@@ -865,7 +871,7 @@ class RenderObject : public CachedResourceClient {
                   int adjbw1,
                   int adjbw2);
 
-  virtual void setTable(RenderTable*){};
+  virtual void setTable(RenderTable*) {}
 
   // Used by collapsed border tables.
   virtual void collectBorders(DeprecatedValueList<CollapsedBorderValue>&);
@@ -877,7 +883,7 @@ class RenderObject : public CachedResourceClient {
 
   // Repaint a specific subrectangle within a given object.  The rect |r| is in
   // the object's coordinate space.
-  void repaintRectangle(const IntRect& r, bool immediate = false);
+  void repaintRectangle(const IntRect&, bool immediate = false);
 
   // Repaint only if our old bounds and new bounds are different.
   bool repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
@@ -909,15 +915,15 @@ class RenderObject : public CachedResourceClient {
   // Given a rect in the object's coordinate space, this method converts the
   // rectangle to the view's
   // coordinate space.
-  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f = false);
+  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);
 
   virtual unsigned int length() const { return 1; }
 
   bool isFloatingOrPositioned() const {
     return (isFloating() || isPositioned());
-  };
+  }
   virtual bool containsFloats() { return false; }
-  virtual bool containsFloat(RenderObject* o) { return false; }
+  virtual bool containsFloat(RenderObject*) { return false; }
   virtual bool hasOverhangingFloats() { return false; }
   virtual bool expandsToEncloseOverhangingFloats() const {
     return isFloating() && style()->height().isAuto();
@@ -937,7 +943,7 @@ class RenderObject : public CachedResourceClient {
 
   // Applied as a "slop" to dirty rect checks during the outline painting
   // phase's dirty-rect checks.
-  int maximalOutlineSize(PaintPhase p) const;
+  int maximalOutlineSize(PaintPhase) const;
 
   enum SelectionState {
     SelectionNone,    // The object is not selected.
@@ -956,9 +962,9 @@ class RenderObject : public CachedResourceClient {
   virtual SelectionState selectionState() const { return SelectionNone; }
 
   // Sets the selection state for an object.
-  virtual void setSelectionState(SelectionState s) {
+  virtual void setSelectionState(SelectionState state) {
     if (parent())
-      parent()->setSelectionState(s);
+      parent()->setSelectionState(state);
   }
 
   // A single rectangle that encompasses all of the selected objects within this
@@ -990,22 +996,20 @@ class RenderObject : public CachedResourceClient {
   // This struct is used when the selection changes to cache the old and new
   // state of the selection for each RenderObject.
   struct SelectionInfo {
-    RenderObject* m_object;
-    IntRect m_rect;
-    RenderObject::SelectionState m_state;
+    SelectionInfo() : m_object(0), m_state(SelectionNone) {}
+
+    SelectionInfo(RenderObject* o)
+        : m_object(o),
+          m_rect(o->selectionRect()),
+          m_state(o->selectionState()) {}
 
     RenderObject* object() const { return m_object; }
     IntRect rect() const { return m_rect; }
     SelectionState state() const { return m_state; }
 
-    SelectionInfo() {
-      m_object = 0;
-      m_state = SelectionNone;
-    }
-    SelectionInfo(RenderObject* o)
-        : m_object(o),
-          m_rect(o->selectionRect()),
-          m_state(o->selectionState()) {}
+    RenderObject* m_object;
+    IntRect m_rect;
+    SelectionState m_state;
   };
 
   Node* draggableNode(bool dhtmlOK,
@@ -1025,19 +1029,19 @@ class RenderObject : public CachedResourceClient {
    * useful for character range rect computations
    */
   virtual IntRect caretRect(int offset,
-                            EAffinity affinity = UPSTREAM,
+                            EAffinity = UPSTREAM,
                             int* extraWidthToEndOfLine = 0);
 
-  virtual int lowestPosition(bool includeOverflowInterior = true,
-                             bool includeSelf = true) const {
+  virtual int lowestPosition(bool /*includeOverflowInterior*/ = true,
+                             bool /*includeSelf*/ = true) const {
     return 0;
   }
-  virtual int rightmostPosition(bool includeOverflowInterior = true,
-                                bool includeSelf = true) const {
+  virtual int rightmostPosition(bool /*includeOverflowInterior*/ = true,
+                                bool /*includeSelf*/ = true) const {
     return 0;
   }
-  virtual int leftmostPosition(bool includeOverflowInterior = true,
-                               bool includeSelf = true) const {
+  virtual int leftmostPosition(bool /*includeOverflowInterior*/ = true,
+                               bool /*includeSelf*/ = true) const {
     return 0;
   }
 
@@ -1140,23 +1144,13 @@ class RenderObject : public CachedResourceClient {
   bool m_hasOverflowClip : 1;
 
   bool m_hasCounterNodeMap : 1;
-
-  friend class RenderListItem;
-  friend class RenderContainer;
-  friend class RenderView;
 };
 
-enum VerticalPositionHint {
-  PositionTop = -0x4000,
-  PositionBottom = 0x4000,
-  PositionUndefined = 0x3fff
-};
-
-}  // namespace
+}  // namespace WebCore
 
 #ifndef NDEBUG
 // Outside the WebCore namespace for ease of invocation from gdb.
 void showTree(const WebCore::RenderObject*);
 #endif
 
-#endif
+#endif  // RenderObject_h
