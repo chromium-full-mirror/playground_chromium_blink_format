@@ -240,7 +240,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   bool canUseArchivedResource(NSURLResponse*) const;
   void deliverArchivedResources(WebCore::Timer<WebFrameLoaderClient>*);
 
-  WebFramePolicyListener* setUpPolicyListener(WebCore::FramePolicyFunction);
+  WebCore::RetainPtr<WebFramePolicyListener> setUpPolicyListener(
+      WebCore::FramePolicyFunction);
 
   NSDictionary* actionDictionary(const WebCore::NavigationAction&) const;
 
