@@ -94,6 +94,8 @@ class ResourceHandleInternal {
 
   ~ResourceHandleInternal();
 
+  ResourceHandleClient* client() const { return m_client; }
+
   ResourceHandleClient* m_client;
 
   ResourceRequest m_request;

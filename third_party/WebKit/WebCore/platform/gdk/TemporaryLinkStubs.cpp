@@ -50,7 +50,6 @@
 #include "loader.h"
 #include "LocalizedStrings.h"
 #include "Node.h"
-#include "Page.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
@@ -76,6 +75,9 @@ using namespace WebCore;
   } while (0)
 
 namespace WebCore {
+
+class Page;
+
 struct PlatformDataStruct {};
 
 struct PlatformResponseStruct {};
@@ -197,10 +199,6 @@ Widget::FocusPolicy Slider::focusPolicy() const {
 Widget::FocusPolicy TextField::focusPolicy() const {
   notImplemented();
   return NoFocus;
-}
-
-Cursor::Cursor(Image*, const IntPoint&) {
-  notImplemented();
 }
 
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
@@ -378,31 +376,81 @@ KURL FrameGdk::historyURL(int distance) {
   notImplemented();
   return KURL();
 }
-bool ChromeClientGdk::canRunModal() {
+
+FloatRect ChromeClientGdk::windowRect() {
+  notImplemented();
+  return FloatRect();
+}
+void ChromeClientGdk::setWindowRect(const FloatRect& r) {
+  notImplemented();
+}
+FloatRect ChromeClientGdk::pageRect() {
+  notImplemented();
+  return FloatRect();
+}
+float ChromeClientGdk::scaleFactor() {
+  notImplemented();
+  return 1.0;
+}
+void ChromeClientGdk::focus() {
+  notImplemented();
+}
+void ChromeClientGdk::unfocus() {
+  notImplemented();
+}
+WebCore::Page* ChromeClientGdk::createWindow(const FrameLoadRequest&) {
   notImplemented();
   return 0;
+}
+WebCore::Page* ChromeClientGdk::createModalDialog(const FrameLoadRequest&) {
+  notImplemented();
+  return 0;
+}
+void ChromeClientGdk::show() {
+  notImplemented();
+}
+bool ChromeClientGdk::canRunModal() {
+  notImplemented();
+  return false;
 }
 void ChromeClientGdk::runModal() {
   notImplemented();
 }
-
-int WebCore::screenDepthPerComponent(const Page*) {
+void ChromeClientGdk::setToolbarsVisible(bool) {
   notImplemented();
-  return 0;
 }
-bool WebCore::screenIsMonochrome(const Page*) {
+bool ChromeClientGdk::toolbarsVisible() {
   notImplemented();
   return false;
+}
+void ChromeClientGdk::setStatusbarVisible(bool) {
+  notImplemented();
+}
+bool ChromeClientGdk::statusbarVisible() {
+  notImplemented();
+  return false;
+}
+void ChromeClientGdk::setScrollbarsVisible(bool) {
+  notImplemented();
+}
+bool ChromeClientGdk::scrollbarsVisible() {
+  notImplemented();
+  return false;
+}
+void ChromeClientGdk::setMenubarVisible(bool) {
+  notImplemented();
+}
+bool ChromeClientGdk::menubarVisible() {
+  notImplemented();
+  return false;
+}
+void ChromeClientGdk::setResizable(bool) {
+  notImplemented();
 }
 
 /********************************************************/
 /* Completely empty stubs (mostly to allow DRT to run): */
 /********************************************************/
-static Cursor localCursor;
-const Cursor& WebCore::moveCursor() {
-  return localCursor;
-}
-
 bool AXObjectCache::gAccessibilityEnabled = false;
 
 bool WebCore::historyContains(DeprecatedString const&) {
