@@ -209,7 +209,7 @@ static bool colorMediaFeatureEval(CSSValue* value,
                                   RenderStyle* style,
                                   Page* page,
                                   MediaFeaturePrefix op) {
-  int bitsPerComponent = page->screen()->depthPerComponent();
+  int bitsPerComponent = screenDepthPerComponent(page->mainFrame()->view());
   float number;
   if (value)
     return numberValue(value, number) &&
@@ -222,7 +222,7 @@ static bool monochromeMediaFeatureEval(CSSValue* value,
                                        RenderStyle* style,
                                        Page* page,
                                        MediaFeaturePrefix op) {
-  if (!page->screen()->isMonochrome())
+  if (!screenIsMonochrome(page->mainFrame()->view()))
     return false;
 
   return colorMediaFeatureEval(value, style, page, op);
@@ -233,7 +233,7 @@ static bool device_aspect_ratioMediaFeatureEval(CSSValue* value,
                                                 Page* page,
                                                 MediaFeaturePrefix op) {
   if (value) {
-    FloatRect sg = page->screen()->rect();
+    FloatRect sg = screenRect(page->mainFrame()->view());
     int a = 0;
     int b = 0;
     if (parseAspectRatio(value, a, b))
@@ -276,7 +276,7 @@ static bool device_heightMediaFeatureEval(CSSValue* value,
                                           Page* page,
                                           MediaFeaturePrefix op) {
   if (value) {
-    FloatRect sg = page->screen()->rect();
+    FloatRect sg = screenRect(page->mainFrame()->view());
     return value->isPrimitiveValue() &&
            cmpvalue(
                (int)sg.height(),
@@ -293,7 +293,7 @@ static bool device_widthMediaFeatureEval(CSSValue* value,
                                          Page* page,
                                          MediaFeaturePrefix op) {
   if (value) {
-    FloatRect sg = page->screen()->rect();
+    FloatRect sg = screenRect(page->mainFrame()->view());
     return value->isPrimitiveValue() &&
            cmpvalue(
                (int)sg.width(),
