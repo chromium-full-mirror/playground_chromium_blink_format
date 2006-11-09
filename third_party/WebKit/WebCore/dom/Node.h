@@ -42,6 +42,7 @@ class Element;
 class Event;
 class EventListener;
 class IntRect;
+class KeyboardEvent;
 class NamedAttrMap;
 class NodeList;
 class PlatformKeyboardEvent;
@@ -256,7 +257,7 @@ class Node : public TreeShared<Node> {
    */
   virtual bool supportsFocus() const { return isFocusable(); }
   virtual bool isFocusable() const;
-  virtual bool isKeyboardFocusable() const;
+  virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
 
   virtual bool isControl() const {

@@ -42,6 +42,7 @@ class FrameViewPrivate;
 class HTMLFrameSetElement;
 class IntPoint;
 class IntRect;
+class KeyboardEvent;
 class PlatformMouseEvent;
 class MouseEventWithHitTestResults;
 class Node;
@@ -180,7 +181,7 @@ class FrameView : public ScrollView {
 
   void doAutoScroll();
 
-  bool advanceFocus(bool forward);
+  bool advanceFocus(KeyboardEvent*);
 
   bool updateDragAndDrop(const PlatformMouseEvent&, Clipboard*);
   void cancelDragAndDrop(const PlatformMouseEvent&, Clipboard*);

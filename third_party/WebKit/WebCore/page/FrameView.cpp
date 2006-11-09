@@ -43,6 +43,7 @@
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
 #include "Image.h"
+#include "KeyboardEvent.h"
 #include "MouseEvent.h"
 #include "MouseEventWithHitTestResults.h"
 #include "OverflowEvent.h"
@@ -1126,13 +1127,14 @@ bool FrameView::scrollTo(const IntRect& bounds) {
   return scrollX != maxx && scrollY != maxy;
 }
 
-bool FrameView::advanceFocus(bool forward) {
+bool FrameView::advanceFocus(KeyboardEvent* event) {
   Document* document = m_frame->document();
   if (!document)
     return false;
 
-  Node* node = forward ? document->nextFocusNode(document->focusNode())
-                       : document->previousFocusNode(document->focusNode());
+  Node* node = event->shiftKey()
+                   ? document->previousFocusNode(document->focusNode(), event)
+                   : document->nextFocusNode(document->focusNode(), event);
 
   if (!node)
     // FIXME: Need to support tabbing out of the document to the UI.

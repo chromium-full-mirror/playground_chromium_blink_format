@@ -49,12 +49,11 @@
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLFormElement.h"
-#include "HTMLFrameElement.h"
+#include "HTMLFrameElementBase.h"
 #include "HTMLGenericFormElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
-#include "HTMLViewSourceDocument.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
 #include "IconDatabase.h"
@@ -66,9 +65,6 @@
 #include "NodeList.h"
 #include "Page.h"
 #include "PlatformScrollBar.h"
-#include "PlugInInfoStore.h"
-#include "Plugin.h"
-#include "PluginDocument.h"
 #include "RenderListBox.h"
 #include "RenderObject.h"
 #include "RenderPart.h"
@@ -76,7 +72,6 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "SegmentedString.h"
-#include "TextDocument.h"
 #include "TextIterator.h"
 #include "TextResourceDecoder.h"
 #include "TypingCommand.h"
@@ -806,8 +801,7 @@ void Frame::textFieldDidEndEditing(Element* input) {}
 
 void Frame::textDidChangeInTextField(Element* input) {}
 
-bool Frame::doTextFieldCommandFromEvent(Element* input,
-                                        const PlatformKeyboardEvent* evt) {
+bool Frame::doTextFieldCommandFromEvent(Element*, KeyboardEvent*) {
   return false;
 }
 
@@ -897,11 +891,11 @@ void Frame::clearTypingStyle() {
   d->m_typingStyle = 0;
 }
 
-bool Frame::tabsToLinks() const {
+bool Frame::tabsToLinks(KeyboardEvent*) const {
   return true;
 }
 
-bool Frame::tabsToAllControls() const {
+bool Frame::tabsToAllControls(KeyboardEvent*) const {
   return true;
 }
 
@@ -1249,7 +1243,7 @@ static HTMLFormElement* scanForForm(Node* start) {
              static_cast<HTMLElement*>(n)->isGenericFormElement())
       return static_cast<HTMLGenericFormElement*>(n)->form();
     else if (n->hasTagName(frameTag) || n->hasTagName(iframeTag)) {
-      Node* childDoc = static_cast<HTMLFrameElement*>(n)->contentDocument();
+      Node* childDoc = static_cast<HTMLFrameElementBase*>(n)->contentDocument();
       if (HTMLFormElement* frameResult = scanForForm(childDoc))
         return frameResult;
     }
@@ -1386,7 +1380,7 @@ HitTestResult Frame::hitTestResultAtPoint(const IntPoint& point,
     Widget* widget = static_cast<RenderWidget*>(n->renderer())->widget();
     if (!widget || !widget->isFrameView())
       break;
-    Frame* frame = static_cast<HTMLFrameElement*>(n)->contentFrame();
+    Frame* frame = static_cast<HTMLFrameElementBase*>(n)->contentFrame();
     if (!frame || !frame->renderer())
       break;
     int absX, absY;
@@ -1875,13 +1869,6 @@ void Frame::setMarkedTextMatchesAreHighlighted(bool flag) {
 
   d->m_highlightTextMatches = flag;
   document()->repaintMarkers(DocumentMarker::TextMatch);
-}
-
-void Frame::prepareForUserAction() {
-  // Reset the multiple form submission protection code.
-  // We'll let you submit the same form twice if you do two separate user
-  // actions.
-  loader()->resetMultipleFormSubmissionProtection();
 }
 
 Node* Frame::mousePressNode() {

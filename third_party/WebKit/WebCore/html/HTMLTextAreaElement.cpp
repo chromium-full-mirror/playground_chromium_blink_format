@@ -172,7 +172,7 @@ void HTMLTextAreaElement::reset() {
   setValue(defaultValue());
 }
 
-bool HTMLTextAreaElement::isKeyboardFocusable() const {
+bool HTMLTextAreaElement::isKeyboardFocusable(KeyboardEvent*) const {
   // If text areas can be focused, then they should always be keyboard focusable
   return HTMLGenericFormElement::isFocusable();
 }

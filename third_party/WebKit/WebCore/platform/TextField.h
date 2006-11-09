@@ -41,12 +41,11 @@ namespace WebCore {
 
 class Color;
 
+// Always search (obsolete other than for search).
 class TextField : public Widget {
  public:
-  enum Type { Normal, Password, Search };
-
-  TextField(Type);
-  ~TextField();
+  TextField();
+  virtual ~TextField();
 
   void setColors(const Color& background, const Color& foreground);
 
@@ -84,8 +83,6 @@ class TextField : public Widget {
   virtual FocusPolicy focusPolicy() const;
   virtual bool checksDescendantsForFocus() const;
 
-  Type type() const { return m_type; }
-
   void setLiveSearch(bool liveSearch);
   void setAutoSaveName(const String& name);
   void setMaxResults(int maxResults);
@@ -93,7 +90,6 @@ class TextField : public Widget {
   void addSearchResult();
 
  private:
-  Type m_type;
   WebCoreTextFieldController* m_controller;
 };
 

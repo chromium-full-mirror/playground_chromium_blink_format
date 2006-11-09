@@ -1427,7 +1427,7 @@ void Document::determineParseMode(const String&) {
   hMode = XHtml;
 }
 
-Node* Document::nextFocusNode(Node* fromNode) {
+Node* Document::nextFocusNode(Node* fromNode, KeyboardEvent* event) {
   unsigned short fromTabIndex;
 
   if (!fromNode) {
@@ -1435,7 +1435,7 @@ Node* Document::nextFocusNode(Node* fromNode) {
 
     int lowestTabIndex = 65535;
     for (Node* n = this; n; n = n->traverseNextNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() > 0 &&
+      if (n->isKeyboardFocusable(event) && n->tabIndex() > 0 &&
           n->tabIndex() < lowestTabIndex)
         lowestTabIndex = n->tabIndex();
 
@@ -1444,7 +1444,7 @@ Node* Document::nextFocusNode(Node* fromNode) {
 
     // Go to the first node in the document that has the desired tab index
     for (Node* n = this; n; n = n->traverseNextNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == lowestTabIndex)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == lowestTabIndex)
         return n;
 
     return 0;
@@ -1457,7 +1457,7 @@ Node* Document::nextFocusNode(Node* fromNode) {
     // order) that has a tab index of 0
     Node* n;
     for (n = fromNode->traverseNextNode(); n; n = n->traverseNextNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == 0)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == 0)
         break;
 
     return n;
@@ -1476,7 +1476,7 @@ Node* Document::nextFocusNode(Node* fromNode) {
   for (Node* n = this; n; n = n->traverseNextNode()) {
     if (n == fromNode)
       reachedFromNode = true;
-    else if (n->isKeyboardFocusable() &&
+    else if (n->isKeyboardFocusable(event) &&
              ((reachedFromNode && n->tabIndex() >= fromTabIndex) ||
               (!reachedFromNode && n->tabIndex() > fromTabIndex)))
       // We found a selectable node with a tab index at least as high as
@@ -1490,7 +1490,7 @@ Node* Document::nextFocusNode(Node* fromNode) {
     // No next node with a tab index -> just take first node with tab index of 0
     Node* n;
     for (n = this; n; n = n->traverseNextNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == 0)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == 0)
         break;
 
     return n;
@@ -1498,20 +1498,22 @@ Node* Document::nextFocusNode(Node* fromNode) {
 
   // Search forwards from fromNode
   for (Node* n = fromNode->traverseNextNode(); n; n = n->traverseNextNode())
-    if (n->isKeyboardFocusable() && n->tabIndex() == lowestSuitableTabIndex)
+    if (n->isKeyboardFocusable(event) &&
+        n->tabIndex() == lowestSuitableTabIndex)
       return n;
 
   // The next node isn't after fromNode, start from the beginning of the
   // document
   for (Node* n = this; n != fromNode; n = n->traverseNextNode())
-    if (n->isKeyboardFocusable() && n->tabIndex() == lowestSuitableTabIndex)
+    if (n->isKeyboardFocusable(event) &&
+        n->tabIndex() == lowestSuitableTabIndex)
       return n;
 
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-Node* Document::previousFocusNode(Node* fromNode) {
+Node* Document::previousFocusNode(Node* fromNode, KeyboardEvent* event) {
   Node* lastNode;
   for (lastNode = this; lastNode->lastChild(); lastNode = lastNode->lastChild())
     ;
@@ -1521,7 +1523,7 @@ Node* Document::previousFocusNode(Node* fromNode) {
 
     int highestTabIndex = 0;
     for (Node* n = lastNode; n; n = n->traversePreviousNode()) {
-      if (n->isKeyboardFocusable()) {
+      if (n->isKeyboardFocusable(event)) {
         if (n->tabIndex() == 0)
           return n;
         else if (n->tabIndex() > highestTabIndex)
@@ -1532,7 +1534,7 @@ Node* Document::previousFocusNode(Node* fromNode) {
     // No node with a tab index of 0; just go to the last node with the highest
     // tab index
     for (Node* n = lastNode; n; n = n->traversePreviousNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == highestTabIndex)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == highestTabIndex)
         return n;
 
     return 0;
@@ -1545,7 +1547,7 @@ Node* Document::previousFocusNode(Node* fromNode) {
     // that has a tab index of 0
     Node* n;
     for (n = fromNode->traversePreviousNode(); n; n = n->traversePreviousNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == 0)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == 0)
         break;
 
     if (n)
@@ -1555,14 +1557,14 @@ Node* Document::previousFocusNode(Node* fromNode) {
     // that has the highest tab index
     int highestTabIndex = 0;
     for (n = this; n; n = n->traverseNextNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() > highestTabIndex)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() > highestTabIndex)
         highestTabIndex = n->tabIndex();
 
     if (!highestTabIndex)
       return 0;
 
     for (n = lastNode; n; n = n->traversePreviousNode())
-      if (n->isKeyboardFocusable() && n->tabIndex() == highestTabIndex)
+      if (n->isKeyboardFocusable(event) && n->tabIndex() == highestTabIndex)
         return n;
 
     ASSERT_NOT_REACHED();
@@ -1580,7 +1582,7 @@ Node* Document::previousFocusNode(Node* fromNode) {
 
   bool reachedFromNode = false;
   for (Node* n = this; n; n = n->traverseNextNode()) {
-    if (n->isKeyboardFocusable() &&
+    if (n->isKeyboardFocusable(event) &&
         ((!reachedFromNode && (n->tabIndex() <= fromTabIndex)) ||
          (reachedFromNode && (n->tabIndex() < fromTabIndex))) &&
         (n->tabIndex() > highestSuitableTabIndex) && (n != fromNode)) {
@@ -1604,12 +1606,14 @@ Node* Document::previousFocusNode(Node* fromNode) {
   // Search backwards from fromNode
   for (Node* n = fromNode->traversePreviousNode(); n;
        n = n->traversePreviousNode())
-    if (n->isKeyboardFocusable() && (n->tabIndex() == highestSuitableTabIndex))
+    if (n->isKeyboardFocusable(event) &&
+        (n->tabIndex() == highestSuitableTabIndex))
       return n;
 
   // The previous node isn't before fromNode, start from the end of the document
   for (Node* n = lastNode; n != fromNode; n = n->traversePreviousNode())
-    if (n->isKeyboardFocusable() && (n->tabIndex() == highestSuitableTabIndex))
+    if (n->isKeyboardFocusable(event) &&
+        (n->tabIndex() == highestSuitableTabIndex))
       return n;
 
   ASSERT_NOT_REACHED();
