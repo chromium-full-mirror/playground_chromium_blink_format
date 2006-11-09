@@ -488,10 +488,6 @@ alterCurrentSelection:(WebCore::SelectionController::EAlteration)alteration
                             affinity:(WebCore::EAffinity)selectionAffinity
                       stillSelecting:(BOOL)flag;
 - (BOOL)shouldDeleteSelectedDOMRange:(DOMRange*)currentRange;
-- (BOOL)shouldBeginEditing:(DOMRange*)range;
-- (BOOL)shouldEndEditing:(DOMRange*)range;
-- (void)didBeginEditing;
-- (void)didEndEditing;
 
 - (NSString*)overrideMediaType;
 

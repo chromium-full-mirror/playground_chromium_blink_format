@@ -794,14 +794,6 @@ bool Frame::shouldDeleteSelection(const Selection& newSelection) const {
   return true;
 }
 
-bool Frame::shouldBeginEditing(const Range* range) const {
-  return true;
-}
-
-bool Frame::shouldEndEditing(const Range* range) const {
-  return true;
-}
-
 bool Frame::isContentEditable() const {
   if (!d->m_doc)
     return false;
@@ -970,16 +962,6 @@ void Frame::computeAndSetTypingStyle(CSSStyleDeclaration* style,
 
   // Set the remaining style as the typing style.
   d->m_typingStyle = mutableStyle.release();
-}
-
-void Frame::indent() {
-  applyCommand(
-      new IndentOutdentCommand(document(), IndentOutdentCommand::Indent));
-}
-
-void Frame::outdent() {
-  applyCommand(
-      new IndentOutdentCommand(document(), IndentOutdentCommand::Outdent));
 }
 
 static void updateState(CSSMutableStyleDeclaration* desiredStyle,

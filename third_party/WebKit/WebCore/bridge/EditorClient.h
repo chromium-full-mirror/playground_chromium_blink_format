@@ -45,8 +45,8 @@ class EditorClient : public Shared<EditorClient> {
   virtual bool isGrammarCheckingEnabled() = 0;
   virtual int spellCheckerDocumentTag() = 0;
 
-  //    virtual bool shouldBeginEditingInRange(Range *range) = 0;
-  //    virtual bool shouldEndEditingInRange(Range *range) = 0;
+  virtual bool shouldBeginEditing(Range*) = 0;
+  virtual bool shouldEndEditing(Range*) = 0;
   //    virtual bool shouldInsertNode(Node *node, Range* replacingRange,
   //    WebViewInsertAction givenAction) = 0;
   //    virtual bool shouldInsertText(NSString *text, Range *replacingRange,
@@ -59,9 +59,9 @@ class EditorClient : public Shared<EditorClient> {
   //    CSSStyleDeclaration *toProposedStyle) = 0;
   //    virtual bool doCommandBySelector(SEL selector) = 0;
   //
-  //    virtual void webViewDidBeginEditing:(NSNotification *)notification = 0;
+  virtual void didBeginEditing() = 0;
   //    virtual void webViewDidChange:(NSNotification *)notification = 0;
-  //    virtual void webViewDidEndEditing:(NSNotification *)notification = 0;
+  virtual void didEndEditing() = 0;
   //    virtual void webViewDidChangeTypingStyle:(NSNotification *)notification
   //    = 0;
   //    virtual void webViewDidChangeSelection:(NSNotification *)notification =

@@ -40,6 +40,7 @@
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "HitTestResult.h"
+#include "IndentOutdentCommand.h"
 #include "Range.h"
 #include "ReplaceSelectionCommand.h"
 #include "SelectionController.h"
@@ -355,6 +356,16 @@ bool Editor::selectionStartHasStyle(CSSStyleDeclaration* style) const {
   }
 
   return match;
+}
+
+void Editor::indent() {
+  applyCommand(new IndentOutdentCommand(m_frame->document(),
+                                        IndentOutdentCommand::Indent));
+}
+
+void Editor::outdent() {
+  applyCommand(new IndentOutdentCommand(m_frame->document(),
+                                        IndentOutdentCommand::Outdent));
 }
 
 // =============================================================================
