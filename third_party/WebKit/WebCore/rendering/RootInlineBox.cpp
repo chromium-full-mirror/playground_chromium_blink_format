@@ -190,8 +190,9 @@ void RootInlineBox::childRemoved(InlineBox* box) {
   if (box->object() == m_lineBreakObj)
     setLineBreakInfo(0, 0, 0, 0);
 
-  RootInlineBox* prev = prevRootBox();
-  if (prev && prev->lineBreakObj() == box->object()) {
+  for (RootInlineBox* prev = prevRootBox();
+       prev && prev->lineBreakObj() == box->object();
+       prev = prev->prevRootBox()) {
     prev->setLineBreakInfo(0, 0, 0, 0);
     prev->markDirty();
   }
