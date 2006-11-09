@@ -76,7 +76,7 @@ class Editor {
   bool shouldDeleteRange(Range*) const;
 
   void respondToChangedSelection(const Selection& oldSelection);
-  void respondToChangedContents();
+  void respondToChangedContents(const Selection& endingSelection);
 
   Frame::TriState selectionUnorderedListState() const;
   Frame::TriState selectionOrderedListState() const;
@@ -94,6 +94,10 @@ class Editor {
                            EditAction = EditActionUnspecified);
   void applyStyleToSelection(CSSStyleDeclaration*, EditAction);
   void applyParagraphStyleToSelection(CSSStyleDeclaration*, EditAction);
+
+  void appliedEditing(PassRefPtr<EditCommand>);
+  void unappliedEditing(PassRefPtr<EditCommand>);
+  void reappliedEditing(PassRefPtr<EditCommand>);
 
   void toggleBold();
   void toggleItalic();

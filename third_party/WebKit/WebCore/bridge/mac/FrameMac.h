@@ -199,7 +199,6 @@ class FrameMac : public Frame {
   virtual void issueTransposeCommand();
   virtual void respondToChangedSelection(const Selection& oldSelection,
                                          bool closeTyping);
-  virtual void respondToChangedContents(const Selection&);
   virtual bool isContentEditable() const;
   virtual bool shouldChangeSelection(const Selection& oldSelection,
                                      const Selection& newSelection,

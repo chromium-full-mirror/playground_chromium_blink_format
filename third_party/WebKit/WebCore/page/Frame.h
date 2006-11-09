@@ -289,7 +289,6 @@ class Frame : public Shared<Frame> {
   virtual void issueTransposeCommand() = 0;
   virtual void respondToChangedSelection(const Selection& oldSelection,
                                          bool closeTyping) = 0;
-  virtual void respondToChangedContents(const Selection& endingSelection) = 0;
   virtual bool shouldChangeSelection(const Selection& oldSelection,
                                      const Selection& newSelection,
                                      EAffinity,
@@ -394,10 +393,6 @@ class Frame : public Shared<Frame> {
 
   virtual void setSecureKeyboardEntry(bool) {}
   virtual bool isSecureKeyboardEntry() { return false; }
-
-  void appliedEditing(PassRefPtr<EditCommand>);
-  void unappliedEditing(PassRefPtr<EditCommand>);
-  void reappliedEditing(PassRefPtr<EditCommand>);
 
   CSSMutableStyleDeclaration* typingStyle() const;
   void setTypingStyle(CSSMutableStyleDeclaration*);

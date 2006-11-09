@@ -480,7 +480,6 @@ alterCurrentSelection:(WebCore::SelectionController::EAlteration)alteration
 - (void)issuePasteAndMatchStyleCommand;
 - (void)issueTransposeCommand;
 - (void)respondToChangedSelection;
-- (void)respondToChangedContents;
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 - (BOOL)isEditable;
 - (BOOL)shouldChangeSelectedDOMRange:(DOMRange*)currentRange

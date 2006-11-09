@@ -28,15 +28,15 @@
 
 #import <WebCore/EditorClient.h>
 
-@class WebView;
+@class WebFrame;
 
 class WebEditorClient : public WebCore::EditorClient {
  public:
   WebEditorClient();
-  WebEditorClient(WebView* webView);
+  WebEditorClient(WebFrame* webFrame);
   ~WebEditorClient();
 
-  void setWebView(WebView* webView);
+  void setWebFrame(WebFrame* webFrame);
 
   bool isGrammarCheckingEnabled();
   bool isContinuousSpellCheckingEnabled();
@@ -60,12 +60,12 @@ class WebEditorClient : public WebCore::EditorClient {
   //    bool doCommandBySelector(SEL selector);
 
   void didBeginEditing();
-  //    void webViewDidChange:(NSNotification *)notification;
+  void respondToChangedContents();
   void didEndEditing();
   //    void webViewDidChangeTypingStyle:(NSNotification *)notification;
   //    void webViewDidChangeSelection:(NSNotification *)notification;
   //    NSUndoManager* undoManagerForWebView:(WebView *)webView;
 
  private:
-  WebView* m_webView;
+  WebFrame* m_webFrame;
 };
