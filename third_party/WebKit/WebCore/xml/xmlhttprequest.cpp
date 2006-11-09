@@ -490,11 +490,16 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
   didFinishLoading(0);
 }
 
-void XMLHttpRequest::didFinishLoading(ResourceHandle* loader) {
+void XMLHttpRequest::didFailWithError(ResourceHandle* handle,
+                                      const ResourceError&) {
+  didFinishLoading(handle);
+}
+
+void XMLHttpRequest::didFinishLoading(ResourceHandle* handle) {
   if (m_aborted)
     return;
 
-  ASSERT(loader == m_loader);
+  ASSERT(handle == m_loader);
 
   if (m_state < Sent)
     changeState(Sent);

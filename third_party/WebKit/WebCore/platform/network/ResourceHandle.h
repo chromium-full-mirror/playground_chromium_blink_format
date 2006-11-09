@@ -45,9 +45,11 @@ typedef LONG_PTR LRESULT;
 #ifdef __OBJC__
 @class NSURLRequest;
 @class NSURLResponse;
+@class NSError;
 #else
 class NSURLRequest;
 class NSURLResponse;
+class NSError;
 #endif
 #endif
 
@@ -75,18 +77,13 @@ class ResourceHandle : public Shared<ResourceHandle> {
 
   ~ResourceHandle();
 
-  int error() const;
-  void setError(int);
-  String errorText() const;
-  bool isErrorPage() const;
-
   void kill();
 
 #if PLATFORM(MAC)
   NSURLRequest* willSendRequest(NSURLRequest*, NSURLResponse*);
   void addData(NSData*);
   void finishJobAndHandle(NSData*);
-  void reportError();
+  void reportError(NSError* error);
 #endif
 
 #if USE(WININET)

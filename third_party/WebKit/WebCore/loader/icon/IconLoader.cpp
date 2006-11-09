@@ -107,7 +107,13 @@ void IconLoader::didReceiveData(ResourceHandle*, const char* data, int size) {
   m_buffer.append(data, size);
 }
 
+void IconLoader::didFailWithError(ResourceHandle* handle,
+                                  const ResourceError&) {
+  finishLoading(handle->url());
+}
+
 void IconLoader::didFinishLoading(ResourceHandle* handle) {
+  ASSERT(handle == m_handle);
   finishLoading(handle->url());
 }
 

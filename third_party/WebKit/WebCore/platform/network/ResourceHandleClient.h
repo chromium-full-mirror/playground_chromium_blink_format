@@ -74,6 +74,7 @@ typedef struct PlatformResponseStruct* PlatformResponse;
 
 class KURL;
 class ResourceHandle;
+class ResourceError;
 class ResourceRequest;
 class ResourceResponse;
 
@@ -94,7 +95,7 @@ class ResourceHandleClient {
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&) {}
   virtual void didReceiveData(ResourceHandle*, const char*, int) {}
   virtual void didFinishLoading(ResourceHandle*) {}
-  // void didFailWithError(ResourceError*) { }
+  virtual void didFailWithError(ResourceHandle*, const ResourceError&) {}
 
   // cached response may be modified
   // void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }

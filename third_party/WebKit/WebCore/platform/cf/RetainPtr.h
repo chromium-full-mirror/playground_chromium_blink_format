@@ -42,6 +42,18 @@ struct RemovePointer<T*> {
 // type or the pointed-to type,
 // so both RetainPtr<NSDictionary> and RetainPtr<CFDictionaryRef> will work.
 
+enum AdoptTag { Adopt };
+
+template <typename T>
+inline void adoptCFReference(T* ptr) {}
+
+#ifdef __OBJC__
+inline void adoptCFReference(id ptr) {
+  CFRetain(ptr);
+  [ptr release];
+}
+#endif
+
 template <typename T>
 class RetainPtr {
  public:
@@ -54,6 +66,9 @@ class RetainPtr {
     if (ptr)
       CFRetain(ptr);
   }
+
+  RetainPtr(AdoptTag, PtrType ptr) : m_ptr(ptr) { adoptCFReference(ptr); }
+
   RetainPtr(const RetainPtr& o) : m_ptr(o.m_ptr) {
     if (PtrType ptr = m_ptr)
       CFRetain(ptr);
@@ -88,6 +103,8 @@ class RetainPtr {
   RetainPtr& operator=(PtrType);
   template <typename U>
   RetainPtr& operator=(U*);
+
+  void adopt(PtrType);
 
   void swap(RetainPtr&);
 
@@ -129,6 +146,16 @@ inline RetainPtr<T>& RetainPtr<T>::operator=(PtrType optr) {
   if (ptr)
     CFRelease(ptr);
   return *this;
+}
+
+template <typename T>
+inline void RetainPtr<T>::adopt(PtrType optr) {
+  if (optr)
+    adoptCFReference(optr);
+  PtrType ptr = m_ptr;
+  m_ptr = optr;
+  if (ptr)
+    CFRelease(ptr);
 }
 
 template <typename T>
