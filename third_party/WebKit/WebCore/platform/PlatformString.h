@@ -153,7 +153,7 @@ class String {
   static String number(unsigned long long);
   static String number(double);
 
-  static String sprintf(const char*, ...)
+  static String format(const char*, ...)
 #if __GNUC__
       __attribute__((format(printf, 1, 2)))
 #endif

@@ -37,7 +37,7 @@ class SVGPathSegCurvetoQuadraticSmoothAbs : public SVGPathSeg {
   }
   virtual String pathSegTypeAsLetter() const { return "T"; }
   virtual String toString() const {
-    return String::sprintf("T %.6lg %.6lg", m_x, m_y);
+    return String::format("T %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);
@@ -61,7 +61,7 @@ class SVGPathSegCurvetoQuadraticSmoothRel : public SVGPathSeg {
   }
   virtual String pathSegTypeAsLetter() const { return "t"; }
   virtual String toString() const {
-    return String::sprintf("t %.6lg %.6lg", m_x, m_y);
+    return String::format("t %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);

@@ -333,7 +333,7 @@ class DeprecatedString {
   DeprecatedString& setNum(unsigned long);
   DeprecatedString& setNum(double);
 
-  DeprecatedString& sprintf(const char*, ...)
+  DeprecatedString& format(const char*, ...)
 #if __GNUC__
       __attribute__((format(printf, 2, 3)))
 #endif

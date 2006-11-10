@@ -37,7 +37,7 @@ class SVGPathSegCurvetoCubicSmoothAbs : public SVGPathSeg {
   }
   virtual String pathSegTypeAsLetter() const { return "S"; }
   virtual String toString() const {
-    return String::sprintf("S %.6lg %.6lg %.6lg %.6lg", m_x2, m_y2, m_x, m_y);
+    return String::format("S %.6lg %.6lg %.6lg %.6lg", m_x2, m_y2, m_x, m_y);
   }
 
   void setX(double);
@@ -69,7 +69,7 @@ class SVGPathSegCurvetoCubicSmoothRel : public SVGPathSeg {
   }
   virtual String pathSegTypeAsLetter() const { return "s"; }
   virtual String toString() const {
-    return String::sprintf("s %.6lg %.6lg %.6lg %.6lg", m_x2, m_y2, m_x, m_y);
+    return String::format("s %.6lg %.6lg %.6lg %.6lg", m_x2, m_y2, m_x, m_y);
   }
 
   void setX(double);

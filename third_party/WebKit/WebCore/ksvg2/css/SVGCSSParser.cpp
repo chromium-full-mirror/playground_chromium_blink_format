@@ -365,7 +365,7 @@ CSSValue* CSSParser::parseSVGPaint() {
   Value* value = valueList->current();
   if (!strict && value->unit == CSSPrimitiveValue::CSS_NUMBER &&
       value->fValue >= 0. && value->fValue < 1000000.) {
-    String str = String::sprintf("%06d", (int)(value->fValue + .5));
+    String str = String::format("%06d", (int)(value->fValue + .5));
     return new SVGPaint(SVGPaint::SVG_PAINTTYPE_RGBCOLOR, String(), str);
   } else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR) {
     String str = "#" + domString(value->string);
@@ -406,7 +406,7 @@ CSSValue* CSSParser::parseSVGPaint() {
     b = max(0, min(255, b));
 
     return new SVGPaint(SVGPaint::SVG_PAINTTYPE_RGBCOLOR, String(),
-                        String::sprintf("rgb(%d, %d, %d)", r, g, b).impl());
+                        String::format("rgb(%d, %d, %d)", r, g, b).impl());
   } else
     return 0;
 
@@ -418,7 +418,7 @@ CSSValue* CSSParser::parseSVGColor() {
   if (!strict && value->unit == CSSPrimitiveValue::CSS_NUMBER &&
       value->fValue >= 0. && value->fValue < 1000000.)
     return new SVGColor(
-        String::sprintf("%06d", (int)(value->fValue + .5)).impl());
+        String::format("%06d", (int)(value->fValue + .5)).impl());
   else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR) {
     String str = "#" + domString(value->string);
     return new SVGColor(str.impl());
@@ -456,7 +456,7 @@ CSSValue* CSSParser::parseSVGColor() {
     g = max(0, min(255, g));
     b = max(0, min(255, b));
 
-    return new SVGColor(String::sprintf("rgb(%d, %d, %d)", r, g, b).impl());
+    return new SVGColor(String::format("rgb(%d, %d, %d)", r, g, b).impl());
   } else
     return 0;
 

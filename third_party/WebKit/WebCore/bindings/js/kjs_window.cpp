@@ -1267,7 +1267,7 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
         "URL %s. Domains must match.\n",
         targetDocument->URL().latin1(), originDocument->URL().latin1());
   }
-  String message = String::sprintf(
+  String message = String::format(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       targetDocument->URL().latin1(), originDocument->URL().latin1());
@@ -1335,7 +1335,7 @@ bool Window::isSafeScript(ExecState* exec) const {
         "URL %s. Domains must match.\n",
         thisDocument->URL().latin1(), actDocument->URL().latin1());
   }
-  String message = String::sprintf(
+  String message = String::format(
       "Unsafe JavaScript attempt to access frame with URL %s from frame with "
       "URL %s. Domains must match.\n",
       thisDocument->URL().latin1(), actDocument->URL().latin1());

@@ -35,7 +35,7 @@ class SVGPathSegMovetoAbs : public SVGPathSeg {
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_ABS; }
   virtual String pathSegTypeAsLetter() const { return "M"; }
   virtual String toString() const {
-    return String::sprintf("M %.6lg %.6lg", m_x, m_y);
+    return String::format("M %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);
@@ -57,7 +57,7 @@ class SVGPathSegMovetoRel : public SVGPathSeg {
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_REL; }
   virtual String pathSegTypeAsLetter() const { return "m"; }
   virtual String toString() const {
-    return String::sprintf("m %.6lg %.6lg", m_x, m_y);
+    return String::format("m %.6lg %.6lg", m_x, m_y);
   }
 
   void setX(double);
