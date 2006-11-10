@@ -137,7 +137,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                                  double fireDate);
   virtual void dispatchDidChangeLocationWithinPage();
   virtual void dispatchWillClose();
-  virtual void dispatchDidReceiveIcon(NSImage*);
+  virtual void dispatchDidReceiveIcon();
   virtual void dispatchDidStartProvisionalLoad();
   virtual void dispatchDidReceiveTitle(const WebCore::String& title);
   virtual void dispatchDidCommitLoad();

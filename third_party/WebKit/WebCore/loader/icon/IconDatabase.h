@@ -26,26 +26,23 @@
 #ifndef ICONDATABASE_H
 #define ICONDATABASE_H
 
-#include "config.h"
-
-#include "IntSize.h"
-#include "IntSizeHash.h"
-#include "PlatformString.h"
 #include "SQLDatabase.h"
 #include "StringHash.h"
 #include "Timer.h"
+#include <wtf/Noncopyable.h>
+#include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 
 class Image;
+class IntSize;
 class IconDataCache;
 class SQLTransaction;
-class SQLStatement;
 
-class IconDatabase {
+class IconDatabase : Noncopyable {
  public:
   static IconDatabase* sharedIconDatabase();
-  ~IconDatabase();
 
   bool open(const String& path);
   bool isOpen() { return m_mainDB.isOpen() && m_privateBrowsingDB.isOpen(); }
@@ -64,7 +61,7 @@ class IconDatabase {
   void releaseIconForPageURL(const String&);
 
   void setPrivateBrowsingEnabled(bool flag);
-  bool getPrivateBrowsingEnabled() { return m_privateBrowsingEnabled; }
+  bool isPrivateBrowsingEnabled() const { return m_privateBrowsingEnabled; }
 
   bool hasEntryForIconURL(const String&);
 
@@ -78,17 +75,13 @@ class IconDatabase {
   bool setIconURLForPageURL(const String& iconURL, const String& pageURL);
 
   void setEnabled(bool enabled);
-  bool enabled() { return m_isEnabled; }
+  bool enabled() const { return m_isEnabled; }
 
   static const String& defaultDatabaseFilename();
 
-  static const int currentDatabaseVersion;
-  static const int iconExpirationTime;
-  static const int missingIconExpirationTime;
-  static const int updateTimerDelay;
-
  private:
   IconDatabase();
+  ~IconDatabase();
 
   // This tries to get the iconID for the IconURL and, if it doesn't exist and
   // createIfNecessary is true,
@@ -189,15 +182,6 @@ class IconDatabase {
   SQLStatement* m_imageDataForIconURLStatement;
 
   void deleteAllPreparedStatements(bool withSync);
-
-  // FIXME: This method is currently implemented in WebCoreIconDatabaseBridge so
-  // we can be in ObjC++ and fire off a loader in Webkit
-  // Once all of the loader logic is sufficiently moved into WebCore we need to
-  // move this implementation to IconDatabase.cpp
-  // using WebCore-style loaders
-  // void loadIconFromURL(const String&);
-
-  static IconDatabase* m_sharedInstance;
 
   SQLDatabase m_mainDB;
   SQLDatabase m_privateBrowsingDB;
