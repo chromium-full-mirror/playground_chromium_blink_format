@@ -99,9 +99,6 @@ class Editor {
   void unappliedEditing(PassRefPtr<EditCommand>);
   void reappliedEditing(PassRefPtr<EditCommand>);
 
-  void toggleBold();
-  void toggleItalic();
-
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
 
   bool execCommand(const String&);

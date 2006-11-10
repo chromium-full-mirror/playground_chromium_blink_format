@@ -48,6 +48,7 @@
 #include "ReplaceSelectionCommand.h"
 #include "SelectionController.h"
 #include "Sound.h"
+#include "TypingCommand.h"
 #include "htmlediting.h"
 #include "markup.h"
 
@@ -317,28 +318,6 @@ void Editor::applyParagraphStyleToSelection(CSSStyleDeclaration* style,
     applyParagraphStyle(style, editingAction);
 }
 
-void Editor::toggleBold() {
-  ExceptionCode ec;
-
-  RefPtr<CSSStyleDeclaration> style =
-      m_frame->document()->createCSSStyleDeclaration();
-  style->setProperty(CSS_PROP_FONT_WEIGHT, "bold", false, ec);
-  if (selectionStartHasStyle(style.get()))
-    style->setProperty(CSS_PROP_FONT_WEIGHT, "normal", false, ec);
-  applyStyleToSelection(style.get(), EditActionSetFont);
-}
-
-void Editor::toggleItalic() {
-  ExceptionCode ec;
-
-  RefPtr<CSSStyleDeclaration> style =
-      m_frame->document()->createCSSStyleDeclaration();
-  style->setProperty(CSS_PROP_FONT_STYLE, "italic", false, ec);
-  if (selectionStartHasStyle(style.get()))
-    style->setProperty(CSS_PROP_FONT_STYLE, "normal", false, ec);
-  applyStyleToSelection(style.get(), EditActionSetFont);
-}
-
 bool Editor::selectionStartHasStyle(CSSStyleDeclaration* style) const {
   Node* nodeToRemove;
   RefPtr<CSSStyleDeclaration> selectionStyle =
@@ -448,6 +427,27 @@ void Editor::reappliedEditing(PassRefPtr<EditCommand> cmd) {
 }
 
 // Execute command functions
+
+bool execCopy(Frame* frame) {
+  frame->copyToPasteboard();
+  return true;
+}
+
+bool execCut(Frame* frame) {
+  frame->cutToPasteboard();
+  return true;
+}
+
+static bool execDelete(Frame* frame) {
+  TypingCommand::deleteKeyPressed(
+      frame->document(), frame->selectionGranularity() == WordGranularity);
+  return true;
+}
+
+static bool execForwardDelete(Frame* frame) {
+  TypingCommand::forwardDeleteKeyPressed(frame->document());
+  return true;
+}
 
 static bool execMoveBackward(Frame* frame) {
   frame->selectionController()->modify(SelectionController::MOVE,
@@ -715,11 +715,67 @@ static bool execMoveWordRightAndModifySelection(Frame* frame) {
   return true;
 }
 
+static bool execPaste(Frame* frame) {
+  frame->pasteFromPasteboard();
+  return true;
+}
+
+static bool execSelectAll(Frame* frame) {
+  frame->selectionController()->selectAll();
+  return true;
+}
+
+static bool execToggleBold(Frame* frame) {
+  ExceptionCode ec;
+
+  RefPtr<CSSStyleDeclaration> style =
+      frame->document()->createCSSStyleDeclaration();
+  style->setProperty(CSS_PROP_FONT_WEIGHT, "bold", false, ec);
+  if (frame->editor()->selectionStartHasStyle(style.get()))
+    style->setProperty(CSS_PROP_FONT_WEIGHT, "normal", false, ec);
+  frame->editor()->applyStyleToSelection(style.get(), EditActionSetFont);
+  return true;
+}
+
+static bool execToggleItalic(Frame* frame) {
+  ExceptionCode ec;
+
+  RefPtr<CSSStyleDeclaration> style =
+      frame->document()->createCSSStyleDeclaration();
+  style->setProperty(CSS_PROP_FONT_STYLE, "italic", false, ec);
+  if (frame->editor()->selectionStartHasStyle(style.get()))
+    style->setProperty(CSS_PROP_FONT_STYLE, "normal", false, ec);
+  frame->editor()->applyStyleToSelection(style.get(), EditActionSetFont);
+  return true;
+}
+
 // Enabled functions
 
-bool canAlterCurrentSelection(Frame* frame) {
+static bool enabled(Frame*) {
+  return true;
+}
+
+static bool canPaste(Frame* frame) {
+  return frame->editor()->canPaste();
+}
+
+static bool hasEditableSelection(Frame* frame) {
   return frame->selectionController()->isCaretOrRange() &&
          frame->selectionController()->isContentEditable();
+}
+
+static bool hasEditableRangeSelection(Frame* frame) {
+  return frame->selectionController()->isRange() &&
+         frame->selectionController()->isContentEditable();
+}
+
+static bool hasRangeSelection(Frame* frame) {
+  return frame->selectionController()->isRange();
+}
+
+static bool hasRichlyEditableSelection(Frame* frame) {
+  return frame->selectionController()->isCaretOrRange() &&
+         frame->selectionController()->isContentRichlyEditable();
 }
 
 struct Command {
@@ -736,75 +792,78 @@ static CommandMap* createCommandMap() {
   };
 
   static const CommandEntry commands[] = {
-      {"MoveBackward", {canAlterCurrentSelection, execMoveBackward}},
+      {"Copy", {hasRangeSelection, execCopy}},
+      {"Cut", {hasEditableRangeSelection, execCut}},
+      {"Delete", {hasEditableSelection, execDelete}},
+      {"ForwardDelete", {hasEditableSelection, execForwardDelete}},
+      {"MoveBackward", {hasEditableSelection, execMoveBackward}},
       {"MoveBackwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveBackwardAndModifySelection}},
-      {"MoveDown", {canAlterCurrentSelection, execMoveDown}},
+       {hasEditableSelection, execMoveBackwardAndModifySelection}},
+      {"MoveDown", {hasEditableSelection, execMoveDown}},
       {"MoveDownAndModifySelection",
-       {canAlterCurrentSelection, execMoveDownAndModifySelection}},
-      {"MoveForward", {canAlterCurrentSelection, execMoveForward}},
+       {hasEditableSelection, execMoveDownAndModifySelection}},
+      {"MoveForward", {hasEditableSelection, execMoveForward}},
       {"MoveForwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveForwardAndModifySelection}},
-      {"MoveLeft", {canAlterCurrentSelection, execMoveLeft}},
+       {hasEditableSelection, execMoveForwardAndModifySelection}},
+      {"MoveLeft", {hasEditableSelection, execMoveLeft}},
       {"MoveLeftAndModifySelection",
-       {canAlterCurrentSelection, execMoveLeftAndModifySelection}},
-      {"MoveRight", {canAlterCurrentSelection, execMoveRight}},
+       {hasEditableSelection, execMoveLeftAndModifySelection}},
+      {"MoveRight", {hasEditableSelection, execMoveRight}},
       {"MoveRightAndModifySelection",
-       {canAlterCurrentSelection, execMoveRightAndModifySelection}},
+       {hasEditableSelection, execMoveRightAndModifySelection}},
       {"MoveToBeginningOfDocument",
-       {canAlterCurrentSelection, execMoveToBeginningOfDocument}},
+       {hasEditableSelection, execMoveToBeginningOfDocument}},
       {"MoveToBeginningOfDocumentAndModifySelection",
-       {canAlterCurrentSelection,
-        execMoveToBeginningOfDocumentAndModifySelection}},
+       {hasEditableSelection, execMoveToBeginningOfDocumentAndModifySelection}},
       {"MoveToBeginningOfSentence",
-       {canAlterCurrentSelection, execMoveToBeginningOfSentence}},
+       {hasEditableSelection, execMoveToBeginningOfSentence}},
       {"MoveToBeginningOfSentenceAndModifySelection",
-       {canAlterCurrentSelection,
-        execMoveToBeginningOfSentenceAndModifySelection}},
+       {hasEditableSelection, execMoveToBeginningOfSentenceAndModifySelection}},
       {"MoveToBeginningOfLine",
-       {canAlterCurrentSelection, execMoveToBeginningOfLine}},
+       {hasEditableSelection, execMoveToBeginningOfLine}},
       {"MoveToBeginningOfLineAndModifySelection",
-       {canAlterCurrentSelection, execMoveToBeginningOfLineAndModifySelection}},
+       {hasEditableSelection, execMoveToBeginningOfLineAndModifySelection}},
       {"MoveToBeginningOfParagraph",
-       {canAlterCurrentSelection, execMoveToBeginningOfParagraph}},
+       {hasEditableSelection, execMoveToBeginningOfParagraph}},
       {"MoveToBeginningOfLineAndModifySelection",
-       {canAlterCurrentSelection,
+       {hasEditableSelection,
         execMoveToBeginningOfParagraphAndModifySelection}},
-      {"MoveToEndOfDocument",
-       {canAlterCurrentSelection, execMoveToEndOfDocument}},
+      {"MoveToEndOfDocument", {hasEditableSelection, execMoveToEndOfDocument}},
       {"MoveToEndOfDocumentAndModifySelection",
-       {canAlterCurrentSelection, execMoveToEndOfDocumentAndModifySelection}},
-      {"MoveToEndOfSentence",
-       {canAlterCurrentSelection, execMoveToEndOfSentence}},
+       {hasEditableSelection, execMoveToEndOfDocumentAndModifySelection}},
+      {"MoveToEndOfSentence", {hasEditableSelection, execMoveToEndOfSentence}},
       {"MoveToEndOfSentenceAndModifySelection",
-       {canAlterCurrentSelection, execMoveToEndOfSentenceAndModifySelection}},
-      {"MoveToEndOfLine", {canAlterCurrentSelection, execMoveToEndOfLine}},
+       {hasEditableSelection, execMoveToEndOfSentenceAndModifySelection}},
+      {"MoveToEndOfLine", {hasEditableSelection, execMoveToEndOfLine}},
       {"MoveToEndOfLineAndModifySelection",
-       {canAlterCurrentSelection, execMoveToEndOfLineAndModifySelection}},
+       {hasEditableSelection, execMoveToEndOfLineAndModifySelection}},
       {"MoveToEndOfParagraph",
-       {canAlterCurrentSelection, execMoveToEndOfParagraph}},
+       {hasEditableSelection, execMoveToEndOfParagraph}},
       {"MoveToEndOfLineAndModifySelection",
-       {canAlterCurrentSelection, execMoveToEndOfParagraphAndModifySelection}},
+       {hasEditableSelection, execMoveToEndOfParagraphAndModifySelection}},
       {"MoveParagraphBackwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveParagraphBackwardAndModifySelection}},
+       {hasEditableSelection, execMoveParagraphBackwardAndModifySelection}},
       {"MoveParagraphForwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveParagraphForwardAndModifySelection}},
-      {"MoveUp", {canAlterCurrentSelection, execMoveUp}},
+       {hasEditableSelection, execMoveParagraphForwardAndModifySelection}},
+      {"MoveUp", {hasEditableSelection, execMoveUp}},
       {"MoveUpAndModifySelection",
-       {canAlterCurrentSelection, execMoveUpAndModifySelection}},
-      {"MoveWordBackward", {canAlterCurrentSelection, execMoveWordBackward}},
+       {hasEditableSelection, execMoveUpAndModifySelection}},
+      {"MoveWordBackward", {hasEditableSelection, execMoveWordBackward}},
       {"MoveWordBackwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveWordBackwardAndModifySelection}},
-      {"MoveWordForward", {canAlterCurrentSelection, execMoveWordForward}},
+       {hasEditableSelection, execMoveWordBackwardAndModifySelection}},
+      {"MoveWordForward", {hasEditableSelection, execMoveWordForward}},
       {"MoveWordForwardAndModifySelection",
-       {canAlterCurrentSelection, execMoveWordForwardAndModifySelection}},
-      {"MoveWordLeft", {canAlterCurrentSelection, execMoveWordLeft}},
+       {hasEditableSelection, execMoveWordForwardAndModifySelection}},
+      {"MoveWordLeft", {hasEditableSelection, execMoveWordLeft}},
       {"MoveWordLeftAndModifySelection",
-       {canAlterCurrentSelection, execMoveWordLeftAndModifySelection}},
-      {"MoveWordRight", {canAlterCurrentSelection, execMoveWordRight}},
+       {hasEditableSelection, execMoveWordLeftAndModifySelection}},
+      {"MoveWordRight", {hasEditableSelection, execMoveWordRight}},
       {"MoveWordRightAndModifySelection",
-       {canAlterCurrentSelection, execMoveWordRightAndModifySelection}},
-  };
+       {hasEditableSelection, execMoveWordRightAndModifySelection}},
+      {"Paste", {canPaste, execPaste}},
+      {"SelectAll", {enabled, execSelectAll}},
+      {"ToggleBold", {hasRichlyEditableSelection, execToggleBold}},
+      {"ToggleItalic", {hasRichlyEditableSelection, execToggleItalic}}};
 
   CommandMap* commandMap = new CommandMap;
 
