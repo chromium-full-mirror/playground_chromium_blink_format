@@ -34,6 +34,7 @@
 #include "PlatformString.h"
 #include "Timer.h"
 #include <wtf/Vector.h>
+#include "MimeTypeRegistry.h"
 
 #if PLATFORM(CG)
 // FIXME: Will go away when we make PDF a subclass.
@@ -121,6 +122,10 @@ void Image::cacheFrame(size_t index) {
   if (shouldAnimate())
     m_frames[index].m_duration = m_source.frameDurationAtIndex(index);
   m_frames[index].m_hasAlpha = m_source.frameHasAlphaAtIndex(index);
+}
+
+bool Image::supportsType(const String& type) {
+  return MimeTypeRegistry::isSupportedImageResourceMIMEType(type);
 }
 
 bool Image::isNull() const {
