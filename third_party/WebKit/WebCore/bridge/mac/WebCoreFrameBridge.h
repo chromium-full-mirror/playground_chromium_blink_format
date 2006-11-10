@@ -267,10 +267,6 @@ rangeByAlteringCurrentSelection:
                       direction:
                           (WebCore::SelectionController::EDirection)direction
                     granularity:(WebCore::TextGranularity)granularity;
-- (void)
-alterCurrentSelection:(WebCore::SelectionController::EAlteration)alteration
-            direction:(WebCore::SelectionController::EDirection)direction
-          granularity:(WebCore::TextGranularity)granularity;
 - (void)alterCurrentSelection:
             (WebCore::SelectionController::EAlteration)alteration
              verticalDistance:(float)distance;

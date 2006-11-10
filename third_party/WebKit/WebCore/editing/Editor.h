@@ -104,6 +104,8 @@ class Editor {
 
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
 
+  bool execCommand(const String&);
+
  private:
   Frame* m_frame;
   RefPtr<EditorClient> m_client;

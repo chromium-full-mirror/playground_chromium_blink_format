@@ -77,10 +77,10 @@ class TypingCommand : public CompositeEditCommand {
   void deleteKeyPressed(TextGranularity);
   void forwardDeleteKeyPressed(TextGranularity);
 
+ private:
   bool smartDelete() { return m_smartDelete; }
   void setSmartDelete(bool smartDelete) { m_smartDelete = smartDelete; }
 
- private:
   virtual bool isTypingCommand() const;
   virtual bool preservesTypingStyle() const;
 
