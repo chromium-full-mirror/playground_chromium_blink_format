@@ -325,7 +325,7 @@ static void formEventCallback(CFReadStreamRef stream,
 void setHTTPBody(CFMutableURLRequestRef request, const FormData& formData) {
   size_t count = formData.elements().size();
 
-  if (!count == 0)
+  if (count == 0)
     return;
 
   // Handle the common special case of one piece of form data, with no files.
