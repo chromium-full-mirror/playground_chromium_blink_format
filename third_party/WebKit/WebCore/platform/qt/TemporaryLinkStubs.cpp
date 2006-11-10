@@ -60,7 +60,6 @@
 #include "RenderTheme.h"
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
-#include "IconDatabase.h"
 #include "IconLoader.h"
 
 using namespace WebCore;
@@ -144,7 +143,7 @@ Widget::FocusPolicy TextField::focusPolicy() const {
   notImplemented();
   return NoFocus;
 }
-TextField::TextField(TextField::Type) {
+TextField::TextField() {
   notImplemented();
 }
 TextField::~TextField() {
@@ -291,30 +290,6 @@ void PlatformScrollbar::setRect(const IntRect&) {
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
   notImplemented();
 }
-
-void IconLoader::stopLoading() {
-  notImplemented();
-}
-void IconLoader::startLoading() {
-  notImplemented();
-}
-IconLoader* IconLoader::createForFrame(Frame* frame) {
-  return 0;
-}
-
-bool IconDatabase::isIconExpiredForIconURL(const String& url) {
-  return false;
-}
-bool IconDatabase::hasEntryForIconURL(const String& url) {
-  return false;
-}
-IconDatabase* IconDatabase::sharedIconDatabase() {
-  return 0;
-}
-bool IconDatabase::setIconURLForPageURL(const String& iconURL,
-                                        const String& pageURL) {
-  return false;
-}
 }
 
 bool WebCore::historyContains(DeprecatedString const&) {
@@ -346,13 +321,25 @@ void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
 
-int WebCore::screenDepthPerComponent(const Page*) {
+int WebCore::screenDepth(Widget*) {
   notImplemented();
   return 0;
 }
-bool WebCore::screenIsMonochrome(const Page*) {
+int WebCore::screenDepthPerComponent(Widget*) {
+  notImplemented();
+  return 0;
+}
+bool WebCore::screenIsMonochrome(Widget*) {
   notImplemented();
   return false;
+}
+FloatRect WebCore::screenRect(Widget*) {
+  notImplemented();
+  return FloatRect();
+}
+FloatRect WebCore::screenAvailableRect(Widget*) {
+  notImplemented();
+  return FloatRect();
 }
 
 void WebCore::setFocusRingColorChangeFunction(void (*)()) {

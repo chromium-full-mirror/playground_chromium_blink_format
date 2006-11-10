@@ -43,20 +43,24 @@
 #include "DOMWindow.h"
 #include "EditorClientQt.h"
 #include "FrameLoadRequest.h"
+#include "FrameLoaderClientQt.h"
 #include "DOMImplementation.h"
 #include "ResourceHandleInternal.h"
 #include "Document.h"
 #include "Settings.h"
 #include "Plugin.h"
+#include "FrameView.h"
 #include "FramePrivate.h"
 #include "GraphicsContext.h"
 #include "HTMLDocument.h"
 #include "ResourceHandle.h"
+#include "FrameLoader.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformWheelEvent.h"
 #include "MouseEventWithHitTestResults.h"
 #include "SelectionController.h"
+#include "kjs_proxy.h"
 #include "TypingCommand.h"
 #include "JSLock.h"
 #include "kjs_window.h"
@@ -124,18 +128,15 @@ FrameQt::FrameQt(Page* page,
 
   m_client = frameClient;
   m_client->setFrame(this);
+  // FIXME: rework once frameloaderclientqt is even close to working
+  loader()->setClient(new FrameLoaderClientQt());
 }
 
 FrameQt::~FrameQt() {
   setView(0);
-  clearRecordedFormValues();
+  loader()->clearRecordedFormValues();
 
-  cancelAndClear();
-}
-
-String FrameQt::userAgent() const {
-  return "Mozilla/5.0 (PC; U; Intel; Linux; en) AppleWebKit/420+ (KHTML, like "
-         "Gecko)";
+  loader()->cancelAndClear();
 }
 
 void FrameQt::runJavaScriptAlert(String const& message) {
@@ -148,19 +149,6 @@ bool FrameQt::runJavaScriptConfirm(String const& message) {
 
 bool FrameQt::locationbarVisible() {
   return m_client->locationbarVisible();
-}
-
-void FrameQt::setTitle(const String& title) {
-  if (view() && view()->parentWidget())
-    view()->parentWidget()->setWindowTitle(title);
-}
-
-Frame* FrameQt::createFrame(const KURL& url,
-                            const String& name,
-                            Element* ownerElement,
-                            const String& referrer) {
-  notImplemented();
-  return 0;
 }
 
 bool FrameQt::passWheelEventToChildWidget(Node*) {
@@ -200,26 +188,9 @@ bool FrameQt::toolbarVisible() {
   return m_client->toolbarVisible();
 }
 
-void FrameQt::createEmptyDocument() {
-  // Although it's not completely clear from the name of this function,
-  // it does nothing if we already have a document, and just creates an
-  // empty one if we have no document at all.
-
-  // Force creation.
-  if (!d->m_doc) {
-    begin();
-    end();
-  }
-}
-
 Range* FrameQt::markedTextRange() const {
   // FIXME: Handle selections.
   return 0;
-}
-
-String FrameQt::incomingReferrer() const {
-  notImplemented();
-  return String();
 }
 
 String FrameQt::mimeTypeForFileName(const String&) const {
@@ -266,11 +237,6 @@ void FrameQt::focusWindow() {
 
   if (!tree()->parent())
     view()->qwidget()->setFocus();
-}
-
-String FrameQt::overrideMediaType() const {
-  // no-op
-  return String();
 }
 
 void FrameQt::addMessageToConsole(const String& message,
@@ -321,13 +287,6 @@ KJS::Bindings::RootObject* FrameQt::bindingRootObject() {
 
 void FrameQt::addPluginRootObject(KJS::Bindings::RootObject* root) {
   m_rootObjects.append(root);
-}
-
-Widget* FrameQt::createJavaAppletWidget(const IntSize&,
-                                        Element*,
-                                        const HashMap<String, String>&) {
-  notImplemented();
-  return 0;
 }
 
 void FrameQt::registerCommandForUndo(PassRefPtr<EditCommand>) {
@@ -387,28 +346,6 @@ bool FrameQt::shouldChangeSelection(const Selection& oldSelection,
   return true;
 }
 
-void FrameQt::partClearedInBegin() {
-  // FIXME: This is only related to the js debugger.
-  // See WebCoreSupport/WebFrameBridge.m "windowObjectCleared",
-  // which is called by FrameMac::partClearedInBegin() ...
-}
-
-bool FrameQt::canGoBackOrForward(int distance) const {
-  // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
-  notImplemented();
-  return false;
-}
-
-void FrameQt::handledOnloadEvents() {
-  // TODO: FrameMac doesn't need that - it seems.
-  // It must be handled differently, can't figure it out.
-  // If we won't call this here doc->parsing() remains 'true'
-  // all the time. Calling document.open(); document.write(...)
-  // from JavaScript leaves the parsing state 'true', and DRT will
-  // hang on these tests (fast/dom/Document/document-reopen.html for instance)
-  endIfNotLoading();
-}
-
 bool FrameQt::canPaste() const {
   // FIXME: Implement this in the FrameQtClient, to be used within WebKitPart.
   notImplemented();
@@ -458,7 +395,7 @@ bool FrameQt::keyEvent(const PlatformKeyboardEvent& keyEvent) {
   }
 
   if (!keyEvent.isKeyUp())
-    prepareForUserAction();
+    loader()->resetMultipleFormSubmissionProtection();
 
   result = !EventTargetNodeCast(node)->dispatchKeyEvent(keyEvent);
 
@@ -468,11 +405,6 @@ bool FrameQt::keyEvent(const PlatformKeyboardEvent& keyEvent) {
 
 void FrameQt::setFrameGeometry(const IntRect& r) {
   setFrameGeometry(QRect(r));
-}
-
-void FrameQt::tokenizerProcessedData() {
-  if (d->m_doc)
-    checkCompleted();
 }
 
 FrameQtClient* FrameQt::client() const {
@@ -492,11 +424,6 @@ void FrameQt::goBackOrForward(int) {
 KURL FrameQt::historyURL(int distance) {
   notImplemented();
   return KURL();
-}
-
-int FrameQt::getHistoryLength() {
-  notImplemented();
-  return 0;
 }
 }
 

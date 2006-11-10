@@ -62,6 +62,8 @@ class DocumentLoader : public Shared<DocumentLoader> {
  public:
 #if PLATFORM(MAC)
   DocumentLoader(NSURLRequest*);
+#elif PLATFORM(QT)
+  DocumentLoader();
 #endif
   virtual ~DocumentLoader();
 
