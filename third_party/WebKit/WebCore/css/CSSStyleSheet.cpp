@@ -38,7 +38,8 @@ CSSStyleSheet::CSSStyleSheet(CSSStyleSheet* parentSheet,
     : StyleSheet(parentSheet, href),
       m_doc(parentSheet ? parentSheet->doc() : 0),
       m_namespaces(0),
-      m_charset(charset) {}
+      m_charset(charset),
+      m_loadCompleted(false) {}
 
 CSSStyleSheet::CSSStyleSheet(Node* parentNode,
                              const String& href,
@@ -46,7 +47,8 @@ CSSStyleSheet::CSSStyleSheet(Node* parentNode,
     : StyleSheet(parentNode, href),
       m_doc(parentNode->document()),
       m_namespaces(0),
-      m_charset(charset) {}
+      m_charset(charset),
+      m_loadCompleted(false) {}
 
 CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule,
                              const String& href,
@@ -54,7 +56,8 @@ CSSStyleSheet::CSSStyleSheet(CSSRule* ownerRule,
     : StyleSheet(ownerRule, href),
       m_doc(0),
       m_namespaces(0),
-      m_charset(charset) {}
+      m_charset(charset),
+      m_loadCompleted(false) {}
 
 CSSStyleSheet::~CSSStyleSheet() {
   delete m_namespaces;
@@ -169,6 +172,7 @@ void CSSStyleSheet::checkLoaded() {
     parent()->checkLoaded();
   if (m_parentNode)
     m_parentNode->sheetLoaded();
+  m_loadCompleted = true;
 }
 
 DocLoader* CSSStyleSheet::docLoader() {
