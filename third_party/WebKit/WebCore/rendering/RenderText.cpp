@@ -618,7 +618,7 @@ void RenderText::calcMinMaxWidth() {
   calcMinMaxWidth(0);
 }
 
-inline bool isSpace(UChar c, RenderStyle* style) {
+inline bool isSpaceAccordingToStyle(UChar c, RenderStyle* style) {
   return c == ' ' || (c == 0xa0 && style->nbspMode() == SPACE);
 }
 
@@ -690,7 +690,8 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
 
     bool hasBreak = isBreakable(txt, i, len, nextBreakable, breakNBSP);
     int j = i;
-    while (c != '\n' && !isSpace(c, style()) && c != '\t' && c != SOFT_HYPHEN) {
+    while (c != '\n' && !isSpaceAccordingToStyle(c, style()) && c != '\t' &&
+           c != SOFT_HYPHEN) {
       j++;
       if (j == len)
         break;
@@ -706,7 +707,7 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
       currMinWidth += w;
       currMaxWidth += w;
 
-      bool isSpace = (j < len) && isSpace(c, style());
+      bool isSpace = (j < len) && isSpaceAccordingToStyle(c, style());
       bool isCollapsibleWhiteSpace =
           (j < len) && style()->isCollapsibleWhiteSpace(c);
       if (j < len && style()->autoWrap())
