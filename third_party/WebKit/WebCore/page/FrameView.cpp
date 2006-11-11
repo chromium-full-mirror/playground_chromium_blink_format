@@ -824,6 +824,12 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
       return waitCursor();
     case CURSOR_HELP:
       return helpCursor();
+    case CURSOR_VERTICAL_TEXT:
+      return verticalTextCursor();
+    case CURSOR_CELL:
+      return cellCursor();
+    case CURSOR_CONTEXT_MENU:
+      return contextMenuCursor();
     case CURSOR_DEFAULT:
       return pointerCursor();
   }
