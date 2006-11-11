@@ -72,6 +72,7 @@ struct ResourceRequest {
   ResourceRequest()
       : m_cachePolicy(UseProtocolCachePolicy),
         m_timeoutInterval(defaultTimeoutInterval),
+        m_httpMethod("GET"),
         m_allowHTTPCookies(true) {}
 
   bool isEmpty() const { return m_url.isEmpty(); }
