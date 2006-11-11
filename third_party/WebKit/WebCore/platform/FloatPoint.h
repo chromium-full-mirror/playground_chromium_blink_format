@@ -46,6 +46,10 @@ typedef struct _NSPoint NSPoint;
 class QPointF;
 #endif
 
+#if PLATFORM(SYMBIAN)
+class TPoint;
+#endif
+
 namespace WebCore {
 
 class IntPoint;
@@ -79,6 +83,11 @@ class FloatPoint {
 #if PLATFORM(QT)
   FloatPoint(const QPointF&);
   operator QPointF() const;
+#endif
+
+#if PLATFORM(SYMBIAN)
+  operator TPoint() const;
+  FloatPoint(const TPoint&);
 #endif
 
  private:

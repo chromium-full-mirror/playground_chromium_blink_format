@@ -198,6 +198,16 @@ class String {
   operator QString() const;
 #endif
 
+#if PLATFORM(SYMBIAN)
+  String(const TDesC&);
+  operator TPtrC() const { return des(); }
+  TPtrC des() const {
+    if (!m_impl)
+      return KNullDesC();
+    return m_impl->des();
+  }
+#endif
+
 #ifndef NDEBUG
   // For debugging only, leaks memory.
   Vector<char> ascii() const;

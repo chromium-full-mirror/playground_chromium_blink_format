@@ -127,6 +127,11 @@ class FloatRect {
   FloatRect(const QRectF&);
   operator QRectF() const;
 #endif
+#if PLATFORM(SYMBIAN)
+  FloatRect(const TRect&);
+  operator TRect() const;
+  TRect rect() const;
+#endif
 
  private:
   FloatPoint m_location;
