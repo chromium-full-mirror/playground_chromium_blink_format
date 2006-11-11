@@ -191,6 +191,18 @@ const Cursor& columnResizeCursor() {
 const Cursor& rowResizeCursor() {
   return Cursors::self()->SplitVCursor;
 }
+
+const Cursor& verticalTextCursor() {
+  return Cursors::self()->PointerCursor;
+}
+
+const Cursor& cellCursor() {
+  return Cursors::self()->PointerCursor;
+}
+
+const Cursor& contextMenuCursor() {
+  return Cursors::self()->PointerCursor;
+}
 }
 
 // vim: ts=4 sw=4 et
