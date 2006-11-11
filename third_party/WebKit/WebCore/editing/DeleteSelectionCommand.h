@@ -50,6 +50,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void initializeStartEnd();
   void initializePositionData();
   void saveTypingStyleState();
+  void saveFullySelectedAnchor();
   void insertPlaceholderForAncestorBlockContent();
   bool handleSpecialCaseBRDelete();
   void handleGeneralDelete();

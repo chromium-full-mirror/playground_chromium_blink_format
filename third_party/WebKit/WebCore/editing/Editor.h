@@ -89,6 +89,9 @@ class Editor {
 
   void deleteSelectionWithSmartDelete(bool smartDelete);
 
+  Node* removedAnchor() const { return m_removedAnchor.get(); }
+  void setRemovedAnchor(Node* n) { m_removedAnchor = n; }
+
   void applyStyle(CSSStyleDeclaration*, EditAction = EditActionUnspecified);
   void applyParagraphStyle(CSSStyleDeclaration*,
                            EditAction = EditActionUnspecified);
@@ -108,6 +111,7 @@ class Editor {
   RefPtr<EditorClient> m_client;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
   RefPtr<EditCommand> m_lastEditCommand;
+  RefPtr<Node> m_removedAnchor;
 
   bool canDeleteRange(Range*) const;
   bool canSmartCopyOrDelete();
