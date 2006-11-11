@@ -346,4 +346,8 @@ String FrameLoaderClientQt::userAgent() {
   notImplemented();
   return String();
 }
+
+void FrameLoaderClientQt::dispatchDidReceiveIcon() {
+  notImplemented();
+}
 }
