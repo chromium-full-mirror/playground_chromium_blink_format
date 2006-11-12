@@ -48,6 +48,14 @@ void FrameLoaderClientQt::detachFrameLoader() {
   notImplemented();
 }
 
+void FrameLoaderClientQt::ref() {
+  Shared<FrameLoaderClientQt>::ref();
+}
+
+void FrameLoaderClientQt::deref() {
+  Shared<FrameLoaderClientQt>::deref();
+}
+
 bool FrameLoaderClientQt::hasWebView() const {
   notImplemented();
   return false;

@@ -53,6 +53,14 @@ ChromeClientQt::ChromeClientQt() {}
 
 ChromeClientQt::~ChromeClientQt() {}
 
+void ChromeClientQt::ref() {
+  Shared<ChromeClientQt>::ref();
+}
+
+void ChromeClientQt::deref() {
+  Shared<ChromeClientQt>::deref();
+}
+
 void ChromeClientQt::setWindowRect(const FloatRect&) {
   notImplemented();
 #if 0
