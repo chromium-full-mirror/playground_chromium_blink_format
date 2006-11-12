@@ -47,9 +47,4 @@ Image* Image::loadPlatformResource(const char* name) {
   img->setNativeData(&arr, true);
   return img;
 }
-
-bool Image::supportsType(const String& type) {
-  // FIXME: Implement.
-  return false;
-}
 }
