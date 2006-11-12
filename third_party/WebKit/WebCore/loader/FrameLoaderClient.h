@@ -28,9 +28,9 @@
 #ifndef FrameLoaderClient_h
 #define FrameLoaderClient_h
 
+#include "AbstractShared.h"
 #include "FrameLoaderTypes.h"
 #include <wtf/Forward.h>
-#include <wtf/Noncopyable.h>
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
@@ -57,10 +57,8 @@ struct LoadErrorResetToken;
 
 typedef void (FrameLoader::*FramePolicyFunction)(PolicyAction);
 
-class FrameLoaderClient : Noncopyable {
+class FrameLoaderClient : public AbstractShared {
  public:
-  virtual void detachFrameLoader() = 0;
-
   virtual bool hasWebView() const = 0;    // mainly for assertions
   virtual bool hasFrameView() const = 0;  // ditto
 
@@ -265,10 +263,8 @@ class FrameLoaderClient : Noncopyable {
   virtual void setTitle(const String& title, const KURL&) = 0;
 
   virtual String userAgent() = 0;
-
- protected:
-  virtual ~FrameLoaderClient();
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // FrameLoaderClient_h
