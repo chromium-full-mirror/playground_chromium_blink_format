@@ -44,6 +44,8 @@ extern WTFLogChannel LogTextConversion;
 extern WTFLogChannel LogIconDatabase;
 extern WTFLogChannel LogSQLDatabase;
 extern WTFLogChannel LogSpellingAndGrammar;
+extern WTFLogChannel LogBackForward;
+extern WTFLogChannel LogHistory;
 
 void InitializeLoggingChannelsIfNecessary();
 
