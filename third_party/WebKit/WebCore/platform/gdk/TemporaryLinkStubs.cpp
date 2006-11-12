@@ -337,11 +337,6 @@ bool FrameGdk::canPaste() const {
   notImplemented();
   return 0;
 }
-enum WebCore::ObjectContentType FrameGdk::objectContentType(KURL const&,
-                                                            String const&) {
-  notImplemented();
-  return (ObjectContentType)0;
-}
 bool FrameGdk::canGoBackOrForward(int) const {
   notImplemented();
   return 0;
@@ -355,14 +350,6 @@ bool FrameGdk::isLoadTypeReload() {
 }
 KURL FrameGdk::originalRequestURL() const {
   return KURL();
-}
-Plugin* FrameGdk::createPlugin(Element*,
-                               KURL const&,
-                               const Vector<String>&,
-                               const Vector<String>&,
-                               String const&) {
-  notImplemented();
-  return 0;
 }
 
 void FrameGdk::goBackOrForward(int distance) {
@@ -656,7 +643,7 @@ void Path::addRect(const FloatRect&) {}
 void Path::addEllipse(const FloatRect&) {}
 void Path::transform(const AffineTransform& transform) {}
 
-TextField::TextField(TextField::Type) {}
+TextField::TextField() {}
 TextField::~TextField() {}
 void TextField::setFont(WebCore::Font const&) {}
 void TextField::setAlignment(HorizontalAlignment) {}
@@ -773,10 +760,6 @@ PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
   return PassRefPtr<Icon>(new Icon());
 }
 void Icon::paint(GraphicsContext*, const IntRect&) {
-  notImplemented();
-}
-
-void IconLoader::notifyIconChanged(const KURL&) {
   notImplemented();
 }
 
