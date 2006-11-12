@@ -1257,6 +1257,7 @@ class RenderStyle {
 
     noninherited_flags._effectiveDisplay = noninherited_flags._originalDisplay =
         initialDisplay();
+    noninherited_flags._bg_repeat = initialBackgroundRepeat();
     noninherited_flags._overflowX = initialOverflowX();
     noninherited_flags._overflowY = initialOverflowY();
     noninherited_flags._vertical_align = initialVerticalAlign();
