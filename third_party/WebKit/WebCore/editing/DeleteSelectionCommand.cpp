@@ -620,7 +620,7 @@ void DeleteSelectionCommand::saveFullySelectedAnchor() {
   if (startAnchor && startAnchor == endAnchor &&
       startAnchor != beforeStartAnchor && endAnchor != afterEndAnchor)
     document()->frame()->editor()->setRemovedAnchor(
-        startAnchor->cloneNode(false).get());
+        startAnchor->cloneNode(false));
 }
 
 void DeleteSelectionCommand::doApply() {

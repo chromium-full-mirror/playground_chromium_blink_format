@@ -90,7 +90,7 @@ class Editor {
   void deleteSelectionWithSmartDelete(bool smartDelete);
 
   Node* removedAnchor() const { return m_removedAnchor.get(); }
-  void setRemovedAnchor(Node* n) { m_removedAnchor = n; }
+  void setRemovedAnchor(PassRefPtr<Node> n) { m_removedAnchor = n; }
 
   void applyStyle(CSSStyleDeclaration*, EditAction = EditActionUnspecified);
   void applyParagraphStyle(CSSStyleDeclaration*,
