@@ -182,8 +182,9 @@ void ResourceHandleManager::add(ResourceHandle* job,
   KIO::Job* kioJob = 0;
 
   if (job->method() == "POST") {
+    ASSERT(job->postData());
     DeprecatedString postData =
-        job->postData().flattenToString().deprecatedString();
+        job->postData()->flattenToString().deprecatedString();
     QByteArray postDataArray(postData.ascii(), postData.length());
 
     kioJob = KIO::http_post(KUrl(url), postDataArray, false);

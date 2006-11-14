@@ -80,14 +80,14 @@ void FrameQtClientDefault::openURL(const KURL& url) {
 
 void FrameQtClientDefault::submitForm(const String& method,
                                       const KURL& url,
-                                      const FormData* postData) {
+                                      PassRefPtr<FormData> postData) {
   ASSERT(m_frame);
 
   m_assignedMimetype = false;
 
   ResourceRequest request(url);
   request.setHTTPMethod(method);
-  request.setHTTPBody(*postData);
+  request.setHTTPBody(postData);
 
   RefPtr<ResourceHandle> loader = ResourceHandle::create(
       request, this,
