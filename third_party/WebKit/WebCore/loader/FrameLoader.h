@@ -198,7 +198,7 @@ class FrameLoader : Noncopyable {
   void post(const KURL&,
             const String& referrer,
             const String& target,
-            const FormData&,
+            PassRefPtr<FormData>,
             const String& contentType,
             Event*,
             Element* form,
@@ -408,7 +408,7 @@ class FrameLoader : Noncopyable {
 
   void submitForm(const char* action,
                   const String& URL,
-                  const FormData&,
+                  PassRefPtr<FormData>,
                   const String& target,
                   const String& contentType,
                   const String& boundary,

@@ -65,7 +65,7 @@ const KURL& ResourceHandle::url() const {
   return d->m_request.url();
 }
 
-const FormData& ResourceHandle::postData() const {
+const PassRefPtr<FormData> ResourceHandle::postData() const {
   return d->m_request.httpBody();
 }
 

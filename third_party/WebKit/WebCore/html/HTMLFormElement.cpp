@@ -178,7 +178,7 @@ static DeprecatedCString encodeCString(const CString& cstr) {
   return encoded;
 }
 
-bool HTMLFormElement::formData(FormData& result) const {
+PassRefPtr<FormData> HTMLFormElement::formData() const {
   DeprecatedCString enc_string = "";  // used for non-multipart data
 
   String str = m_acceptcharset;
@@ -196,6 +196,8 @@ bool HTMLFormElement::formData(FormData& result) const {
     else
       encoding = Latin1Encoding();
   }
+
+  RefPtr<FormData> result = new FormData();
 
   for (unsigned i = 0; i < formElements.size(); ++i) {
     HTMLGenericFormElement* current = formElements[i];
@@ -261,13 +263,13 @@ bool HTMLFormElement::formData(FormData& result) const {
           hstr += "\r\n\r\n";
 
           // append body
-          result.appendData(hstr.data(), hstr.length());
+          result->appendData(hstr.data(), hstr.length());
           const FormDataListItem& item = lst.list()[j + 1];
           if (size_t dataSize = item.m_data.length())
-            result.appendData(item.m_data, dataSize);
+            result->appendData(item.m_data, dataSize);
           else if (!item.m_path.isEmpty())
-            result.appendFile(item.m_path);
-          result.appendData("\r\n", 2);
+            result->appendFile(item.m_path);
+          result->appendData("\r\n", 2);
 
           ++j;
         }
@@ -278,8 +280,8 @@ bool HTMLFormElement::formData(FormData& result) const {
   if (m_multipart)
     enc_string = ("--" + m_boundary.deprecatedString() + "--\r\n").ascii();
 
-  result.appendData(enc_string.data(), enc_string.length());
-  return true;
+  result->appendData(enc_string.data(), enc_string.length());
+  return result;
 }
 
 void HTMLFormElement::parseEnctype(const String& type) {
@@ -365,15 +367,13 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
   if (!m_post)
     m_multipart = false;
 
-  FormData postData;
-  if (formData(postData)) {
-    if (m_post)
-      frame->loader()->submitForm("POST", m_url, postData, m_target, enctype(),
-                                  boundary(), event);
-    else
-      frame->loader()->submitForm("GET", m_url, postData, m_target, String(),
-                                  String(), event);
-  }
+  RefPtr<FormData> postData = formData();
+  if (m_post)
+    frame->loader()->submitForm("POST", m_url, postData, m_target, enctype(),
+                                boundary(), event);
+  else
+    frame->loader()->submitForm("GET", m_url, postData, m_target, String(),
+                                String(), event);
 
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(false);

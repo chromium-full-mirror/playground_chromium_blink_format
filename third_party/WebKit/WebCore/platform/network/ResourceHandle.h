@@ -121,7 +121,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
   const HTTPHeaderMap& requestHeaders() const;
   const KURL& url() const;
   const String& method() const;
-  const FormData& postData() const;
+  const PassRefPtr<FormData> postData() const;
 
  private:
   bool start(DocLoader*);
