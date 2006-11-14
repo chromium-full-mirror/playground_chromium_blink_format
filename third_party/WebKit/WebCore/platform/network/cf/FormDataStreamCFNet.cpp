@@ -320,6 +320,8 @@ static void formEventCallback(CFReadStreamRef stream,
 
 void setHTTPBody(CFMutableURLRequestRef request,
                  PassRefPtr<FormData> formData) {
+  if (!formData)
+    return;
   size_t count = formData->elements().size();
 
   if (count == 0)
