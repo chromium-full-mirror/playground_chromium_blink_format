@@ -260,10 +260,6 @@ class Frame : public Shared<Frame> {
   void cutToPasteboard();
   void pasteFromPasteboard();
   void pasteAndMatchStyle();
-  void redo();
-  void undo();
-  virtual bool canRedo() const = 0;
-  virtual bool canUndo() const = 0;
   void computeAndSetTypingStyle(CSSStyleDeclaration*,
                                 EditAction = EditActionUnspecified);
   enum TriState { falseTriState, trueTriState, mixedTriState };
@@ -277,11 +273,6 @@ class Frame : public Shared<Frame> {
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&) = 0;
   virtual void markMisspellings(const Selection&) = 0;
   virtual Range* markedTextRange() const = 0;
-  virtual void registerCommandForUndo(PassRefPtr<EditCommand>) = 0;
-  virtual void registerCommandForRedo(PassRefPtr<EditCommand>) = 0;
-  virtual void clearUndoRedoOperations() = 0;
-  virtual void issueUndoCommand() = 0;
-  virtual void issueRedoCommand() = 0;
   virtual void issueCutCommand() = 0;
   virtual void issueCopyCommand() = 0;
   virtual void issuePasteCommand() = 0;

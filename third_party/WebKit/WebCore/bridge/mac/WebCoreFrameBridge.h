@@ -257,9 +257,6 @@ typedef enum {
 
 - (id)accessibilityTree;
 
-- (void)undoEditing:(id)arg;
-- (void)redoEditing:(id)arg;
-
 - (DOMRange*)rangeOfCharactersAroundCaret;
 - (DOMRange*)
 rangeByAlteringCurrentSelection:
@@ -464,8 +461,6 @@ rangeByAlteringCurrentSelection:
 // Deprecated, use getAppletInView: instead.
 - (jobject)pollForAppletInView:(NSView*)view;
 
-- (NSUndoManager*)undoManager;
-- (NSString*)undoNameForEditAction:(WebCore::EditAction)editAction;
 - (void)issueCutCommand;
 - (void)issueCopyCommand;
 - (void)issuePasteCommand;

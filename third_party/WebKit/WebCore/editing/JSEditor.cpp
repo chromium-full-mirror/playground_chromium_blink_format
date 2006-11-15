@@ -31,6 +31,7 @@
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "Editor.h"
+#include "EditorClient.h"
 #include "FormatBlockCommand.h"
 #include "Frame.h"
 #include "HTMLNames.h"
@@ -388,7 +389,7 @@ bool execPrint(Frame* frame, bool, const String&) {
 }
 
 bool execRedo(Frame* frame, bool, const String&) {
-  frame->redo();
+  frame->editor()->client()->redo();
   return true;
 }
 
@@ -430,7 +431,7 @@ bool execUnderline(Frame* frame, bool, const String&) {
 }
 
 bool execUndo(Frame* frame, bool, const String&) {
-  frame->undo();
+  frame->editor()->client()->undo();
   return true;
 }
 
@@ -500,11 +501,11 @@ bool enabledAnyRichlyEditableRangeSelection(Frame* frame) {
 }
 
 bool enabledRedo(Frame* frame) {
-  return frame->canRedo();
+  return frame->editor()->client()->canRedo();
 }
 
 bool enabledUndo(Frame* frame) {
-  return frame->canUndo();
+  return frame->editor()->client()->canUndo();
 }
 
 // =============================================================================================
