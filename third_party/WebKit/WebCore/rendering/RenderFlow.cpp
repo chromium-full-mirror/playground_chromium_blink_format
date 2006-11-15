@@ -743,8 +743,7 @@ void RenderFlow::paintOutline(GraphicsContext* graphicsContext,
   if (style()->outlineStyleIsAuto() || style()->outlineStyle() <= BHIDDEN)
     return;
 
-  DeprecatedPtrList<IntRect> rects;
-  rects.setAutoDelete(true);
+  Vector<IntRect*> rects;
 
   rects.append(new IntRect);
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
@@ -753,9 +752,10 @@ void RenderFlow::paintOutline(GraphicsContext* graphicsContext,
 
   rects.append(new IntRect);
 
-  for (unsigned int i = 1; i < rects.count() - 1; i++)
+  for (unsigned i = 1; i < rects.size() - 1; i++)
     paintOutlineForLine(graphicsContext, tx, ty, *rects.at(i - 1), *rects.at(i),
                         *rects.at(i + 1));
+  deleteAllValues(rects);
 }
 
 void RenderFlow::paintOutlineForLine(GraphicsContext* graphicsContext,
