@@ -57,5 +57,6 @@
 - (WebHistoryItem*)targetItem;
 - (NSString*)target;
 - (NSArray*)children;
+- (BOOL)isTargetItem;
 
 @end

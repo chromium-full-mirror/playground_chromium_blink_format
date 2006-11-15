@@ -50,7 +50,6 @@
 
 - (NSPoint)scrollPoint;
 - (NSArray*)documentState;
-- (BOOL)isTargetItem;
 - (NSData*)formData;
 - (NSString*)formContentType;
 - (NSString*)formReferrer;
