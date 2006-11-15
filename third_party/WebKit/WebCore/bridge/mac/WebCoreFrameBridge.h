@@ -435,8 +435,6 @@ rangeByAlteringCurrentSelection:
             DHTMLWroteData:(BOOL)dhtmlWroteData;
 - (BOOL)mayStartDragAtEventLocation:(NSPoint)location;
 
-- (BOOL)selectWordBeforeMenuEvent;
-
 - (int)historyLength;
 - (void)goBackOrForward:(int)distance;
 - (BOOL)canGoBackOrForward:(int)distance;

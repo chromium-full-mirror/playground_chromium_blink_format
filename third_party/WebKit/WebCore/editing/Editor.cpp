@@ -318,6 +318,14 @@ void Editor::applyParagraphStyleToSelection(CSSStyleDeclaration* style,
     applyParagraphStyle(style, editingAction);
 }
 
+bool Editor::selectWordBeforeMenuEvent() const {
+  return m_client->selectWordBeforeMenuEvent();
+}
+
+bool Editor::clientIsEditable() const {
+  return m_client->isEditable();
+}
+
 bool Editor::selectionStartHasStyle(CSSStyleDeclaration* style) const {
   Node* nodeToRemove;
   RefPtr<CSSStyleDeclaration> selectionStyle =

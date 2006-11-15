@@ -104,6 +104,9 @@ class Editor {
 
   bool selectionStartHasStyle(CSSStyleDeclaration*) const;
 
+  bool selectWordBeforeMenuEvent() const;
+  bool clientIsEditable() const;
+
   bool execCommand(const String&);
 
  private:

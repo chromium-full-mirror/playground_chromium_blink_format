@@ -49,6 +49,9 @@ class WebEditorClient : public WebCore::EditorClient,
   bool isContinuousSpellCheckingEnabled();
   int spellCheckerDocumentTag();
 
+  bool selectWordBeforeMenuEvent();
+  bool isEditable();
+
   bool shouldDeleteRange(WebCore::Range*);
   bool shouldShowDeleteInterface(WebCore::HTMLElement*);
 
