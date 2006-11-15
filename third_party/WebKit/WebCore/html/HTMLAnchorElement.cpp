@@ -149,6 +149,10 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
         case Settings::EditableLinkAlwaysLive:
           break;
 
+        case Settings::EditableLinkNeverLive:
+          HTMLElement::defaultEventHandler(evt);
+          return;
+
         // If the selection prior to clicking on this link resided in the same
         // editable block as this link,
         // and the shift key isn't pressed, we don't want to follow the link
@@ -252,6 +256,9 @@ void HTMLAnchorElement::setActive(bool down, bool pause) {
       case Settings::EditableLinkDefaultBehavior:
       case Settings::EditableLinkAlwaysLive:
         break;
+
+      case Settings::EditableLinkNeverLive:
+        return;
 
       // Don't set the link to be active if the current selection is in the same
       // editable block as
@@ -448,6 +455,9 @@ bool HTMLAnchorElement::isLiveLink() const {
     case Settings::EditableLinkDefaultBehavior:
     case Settings::EditableLinkAlwaysLive:
       return true;
+
+    case Settings::EditableLinkNeverLive:
+      return false;
 
     // Don't set the link to be live if the current selection is in the same
     // editable block as

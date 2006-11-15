@@ -38,7 +38,8 @@ class Settings {
     EditableLinkDefaultBehavior = 0,
     EditableLinkAlwaysLive,
     EditableLinkOnlyLiveWithShiftKey,
-    EditableLinkLiveWhenNotFocused
+    EditableLinkLiveWhenNotFocused,
+    EditableLinkNeverLive
   };
 
   Settings()
