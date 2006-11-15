@@ -27,6 +27,7 @@
 #include "config.h"
 #include "HTMLGenericFormElement.h"
 
+#include "EventHandler.h"
 #include "EventNames.h"
 #include "Frame.h"
 #include "HTMLFormElement.h"
@@ -206,7 +207,7 @@ bool HTMLGenericFormElement::isKeyboardFocusable(KeyboardEvent* event) const {
               Widget::TabFocus);
     }
     if (document()->frame())
-      return document()->frame()->tabsToAllControls(event);
+      return document()->frame()->eventHandler()->tabsToAllControls(event);
   }
   return false;
 }

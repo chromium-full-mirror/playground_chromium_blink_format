@@ -30,7 +30,7 @@
 #include "CachedResourceClient.h"
 #include "DeprecatedValueList.h"
 #include "RenderStyle.h"
-#include "ScrollBar.h"
+#include "ScrollTypes.h"
 #include "VisiblePosition.h"
 #include <algorithm>
 #include <wtf/HashMap.h>
@@ -616,7 +616,8 @@ class RenderObject : public CachedResourceClient {
   // after
   // layout is complete.
   struct RepaintInfo {
-    RepaintInfo(RenderObject* object, const IntRect& repaintRect)
+    RepaintInfo(RenderObject* object = 0,
+                const IntRect& repaintRect = IntRect())
         : m_object(object), m_repaintRect(repaintRect) {}
 
     RenderObject* m_object;

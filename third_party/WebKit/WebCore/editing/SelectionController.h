@@ -174,6 +174,12 @@ class SelectionController : Noncopyable {
   void invalidateCaretRect();
   void paintCaret(GraphicsContext*, const IntRect&);
 
+  // Used to suspend caret blinking while the mouse is down.
+  void setCaretBlinkingSuspended(bool suspended) {
+    m_isCaretBlinkingSuspended = suspended;
+  }
+  bool isCaretBlinkingSuspended() const { return m_isCaretBlinkingSuspended; }
+
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
   void showTreeForThis() const;
@@ -209,6 +215,8 @@ class SelectionController : Noncopyable {
                              // modified with EAlteration::EXTEND
   Frame* m_frame;
   bool m_isDragCaretController;
+
+  bool m_isCaretBlinkingSuspended;
 };
 
 inline bool operator==(const SelectionController& a,

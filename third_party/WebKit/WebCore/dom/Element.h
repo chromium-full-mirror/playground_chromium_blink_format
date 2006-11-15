@@ -28,7 +28,7 @@
 #define Element_h
 
 #include "Attr.h"
-#include "ScrollBar.h"
+#include "ScrollTypes.h"
 #include "Timer.h"
 
 namespace WebCore {
@@ -76,7 +76,7 @@ class Element : public ContainerNode {
   void scrollIntoView(bool alignToTop = true);
   void scrollIntoViewIfNeeded(bool centerIfNeeded = true);
 
-  void scrollByUnits(int units, ScrollGranularity granularity);
+  void scrollByUnits(int units, ScrollGranularity);
   void scrollByLines(int lines);
   void scrollByPages(int pages);
 

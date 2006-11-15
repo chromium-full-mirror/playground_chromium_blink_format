@@ -59,7 +59,8 @@ SelectionController::SelectionController(Frame* frame,
     : m_needsLayout(true),
       m_modifyBiasSet(false),
       m_frame(frame),
-      m_isDragCaretController(isDragCaretController) {}
+      m_isDragCaretController(isDragCaretController),
+      m_isCaretBlinkingSuspended(false) {}
 
 void SelectionController::moveTo(const VisiblePosition& pos,
                                  bool userTriggered) {

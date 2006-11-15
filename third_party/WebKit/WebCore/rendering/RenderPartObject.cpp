@@ -26,6 +26,7 @@
 #include "RenderPartObject.h"
 
 #include "Document.h"
+#include "EventHandler.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameTree.h"
@@ -278,7 +279,8 @@ void RenderPartObject::viewCleared() {
     }
 
     view->setHasBorder(hasBorder);
-    view->setIgnoreWheelEvents(element()->hasTagName(iframeTag));
+    view->frame()->eventHandler()->setIgnoreWheelEvents(
+        element()->hasTagName(iframeTag));
     if (marginw != -1)
       view->setMarginWidth(marginw);
     if (marginh != -1)
