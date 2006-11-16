@@ -1331,9 +1331,13 @@ bool FrameLoader::requestObject(RenderPart* renderer,
 
   bool useFallback;
   if (shouldUsePlugin(renderer->element(), completedURL, mimeType,
-                      renderer->hasFallbackContent(), useFallback))
+                      renderer->hasFallbackContent(), useFallback)) {
+    if (!m_frame->pluginsEnabled())
+      return false;
+
     return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
+  }
 
   ASSERT(renderer->node()->hasTagName(objectTag) ||
          renderer->node()->hasTagName(embedTag));
