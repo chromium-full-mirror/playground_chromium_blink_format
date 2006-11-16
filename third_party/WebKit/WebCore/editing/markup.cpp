@@ -614,11 +614,13 @@ DeprecatedString createMarkup(const Node* node,
                                                     // path
   // disable the delete button so it's elements are not serialized into the
   // markup
-  node->document()->frame()->editor()->deleteButtonController()->disable();
+  if (node->document()->frame())
+    node->document()->frame()->editor()->deleteButtonController()->disable();
   node->document()->updateLayoutIgnorePendingStylesheets();
   DeprecatedString result(
       markup(const_cast<Node*>(node), includeChildren, false, nodes));
-  node->document()->frame()->editor()->deleteButtonController()->enable();
+  if (node->document()->frame())
+    node->document()->frame()->editor()->deleteButtonController()->enable();
   return result;
 }
 
