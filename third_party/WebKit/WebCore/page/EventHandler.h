@@ -86,6 +86,8 @@ class EventHandler : Noncopyable {
   bool mousePressed() const { return m_mousePressed; }
   void setMousePressed(bool pressed) { m_mousePressed = pressed; }
 
+  void setCapturingMouseEventsNode(PassRefPtr<Node>);
+
   bool advanceFocus(KeyboardEvent*);
 
   bool updateDragAndDrop(const PlatformMouseEvent&, Clipboard*);
@@ -252,6 +254,8 @@ class EventHandler : Noncopyable {
   bool m_mouseDownMayStartDrag;
 
   RenderLayer* m_resizeLayer;
+
+  RefPtr<Node> m_capturingMouseEventsNode;
 
   RefPtr<Node> m_nodeUnderMouse;
   RefPtr<Node> m_lastNodeUnderMouse;

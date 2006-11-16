@@ -1083,7 +1083,8 @@ class RenderStyle {
     AFTER,
     SELECTION,
     FIRST_LINE_INHERITED,
-    FILE_UPLOAD_BUTTON
+    FILE_UPLOAD_BUTTON,
+    SLIDER_THUMB
   };
 
   void ref() { m_ref++; }
@@ -1197,11 +1198,11 @@ class RenderStyle {
     unsigned _page_break_before : 2;  // EPageBreak
     unsigned _page_break_after : 2;   // EPageBreak
 
-    unsigned _styleType : 3;  // PseudoId
+    unsigned _styleType : 4;  // PseudoId
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
     bool _affectedByDrag : 1;
-    unsigned _pseudoBits : 7;
+    unsigned _pseudoBits : 8;
     unsigned _unicodeBidi : 2;  // EUnicodeBidi
   } noninherited_flags;
 

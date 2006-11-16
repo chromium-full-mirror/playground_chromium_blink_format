@@ -141,7 +141,8 @@ class CSSSelector {
     PseudoNot,
     PseudoRoot,
     PseudoSelection,
-    PseudoFileUploadButton
+    PseudoFileUploadButton,
+    PseudoSliderThumb
   };
 
   PseudoType pseudoType() const {

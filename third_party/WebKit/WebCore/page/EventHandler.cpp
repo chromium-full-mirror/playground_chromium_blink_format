@@ -77,6 +77,7 @@ EventHandler::EventHandler(Frame* frame)
       m_mouseDownMayStartAutoscroll(false),
       m_mouseDownMayStartDrag(false),
       m_resizeLayer(0),
+      m_capturingMouseEventsNode(0),
       m_ignoreWheelEvents(false),
       m_clickCount(0),
       m_mouseDownWasInSubframe(false),
@@ -975,6 +976,10 @@ Node* EventHandler::nodeUnderMouse() const {
   return m_nodeUnderMouse.get();
 }
 
+void EventHandler::setCapturingMouseEventsNode(PassRefPtr<Node> n) {
+  m_capturingMouseEventsNode = n;
+}
+
 bool EventHandler::advanceFocus(KeyboardEvent* event) {
   Document* document = m_frame->document();
   if (!document)
@@ -1021,6 +1026,10 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
     targetNode = targetNode->parentNode();
   if (targetNode)
     targetNode = targetNode->shadowAncestorNode();
+
+  if (m_capturingMouseEventsNode)
+    targetNode = m_capturingMouseEventsNode.get();
+
   m_nodeUnderMouse = targetNode;
 
   // mouseout/mouseover

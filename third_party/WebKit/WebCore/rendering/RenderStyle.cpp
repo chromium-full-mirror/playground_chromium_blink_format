@@ -660,7 +660,8 @@ enum EPseudoBit {
   FIRST_LETTER_BIT = 0x8,
   SELECTION_BIT = 0x10,
   FIRST_LINE_INHERITED_BIT = 0x20,
-  FILE_UPLOAD_BUTTON_BIT = 0x40
+  FILE_UPLOAD_BUTTON_BIT = 0x40,
+  SLIDER_THUMB_BIT = 0x80
 };
 
 static inline int pseudoBit(RenderStyle::PseudoId pseudo) {
@@ -679,6 +680,10 @@ static inline int pseudoBit(RenderStyle::PseudoId pseudo) {
       return FIRST_LINE_INHERITED_BIT;
     case RenderStyle::FILE_UPLOAD_BUTTON:
       return FILE_UPLOAD_BUTTON_BIT;
+    /*     case RenderStyle::SLIDER_TRACK:
+             return SLIDER_TRACK_BIT; */
+    case RenderStyle::SLIDER_THUMB:
+      return SLIDER_THUMB_BIT;
     default:
       return NO_BIT;
   }

@@ -39,7 +39,6 @@
 #include "IntPoint.h"
 #include "Widget.h"
 #include "GraphicsContext.h"
-#include "Slider.h"
 #include "Cursor.h"
 #include "loader.h"
 #include "FrameView.h"
@@ -190,33 +189,6 @@ bool TextField::edited() const {
   return 0;
 }
 
-Slider::Slider() {
-  notImplemented();
-}
-Slider::~Slider() {
-  notImplemented();
-}
-IntSize Slider::sizeHint() const {
-  notImplemented();
-  return IntSize();
-}
-void Slider::setValue(double) {
-  notImplemented();
-}
-void Slider::setMaxValue(double) {
-  notImplemented();
-}
-void Slider::setMinValue(double) {
-  notImplemented();
-}
-void Slider::setFont(WebCore::Font const&) {
-  notImplemented();
-}
-double Slider::value() const {
-  notImplemented();
-  return 0;
-}
-
 FileChooser::FileChooser(Document*, RenderFileUploadControl*) {
   notImplemented();
 }
@@ -242,10 +214,6 @@ void FileChooser::chooseFile(const String& filename) {
   notImplemented();
 }
 
-Widget::FocusPolicy Slider::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
 Widget::FocusPolicy TextField::focusPolicy() const {
   notImplemented();
   return NoFocus;

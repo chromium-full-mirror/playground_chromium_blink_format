@@ -225,6 +225,24 @@ class RenderTheme {
                                    const IntRect&) {
     return true;
   }
+
+  virtual void adjustSliderTrackStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintSliderTrack(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&) {
+    return true;
+  }
+
+  virtual void adjustSliderThumbStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintSliderThumb(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&) {
+    return true;
+  }
 };
 
 // Function to obtain the theme.  This is implemented in your platform-specific

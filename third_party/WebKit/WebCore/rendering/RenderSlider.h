@@ -1,10 +1,6 @@
-/*
- * This file is part of the DOM implementation for KDE.
+/**
  *
- * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
- *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2006 Apple Computer, Inc.
+ * Copyright (C) 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,28 +19,52 @@
  *
  */
 
-#ifndef DeprecatedSlider_h
-#define DeprecatedSlider_h
+#ifndef RenderSlider_h
+#define RenderSlider_h
 
-#include "RenderFormElement.h"
+#include "RenderBlock.h"
 
 namespace WebCore {
 
+class HTMLDivElement;
 class HTMLInputElement;
+class HTMLSliderThumbElement;
+class MouseEvent;
 
-class DeprecatedSlider : public RenderFormElement {
+class RenderSlider : public RenderBlock {
  public:
-  DeprecatedSlider(HTMLInputElement*);
+  RenderSlider(HTMLInputElement*);
+  ~RenderSlider();
 
-  virtual const char* renderName() const { return "DeprecatedSlider"; }
+  virtual const char* renderName() const { return "RenderSlider"; }
 
+  virtual short baselinePosition(bool, bool) const;
   virtual void calcMinMaxWidth();
+  virtual void setStyle(RenderStyle*);
+  virtual void layout();
   virtual void updateFromElement();
 
+  bool mouseEventIsInThumb(MouseEvent*);
+
+  void setValueForPosition(int position);
+  double setPositionFromValue(bool inLayout = false);
+  int positionForOffset(const IntPoint&);
+
+  void valueChanged();
+
+  int currentPosition();
+  void setCurrentPosition(int pos);
+
+  void forwardEvent(Event*);
+  bool inDragMode() const;
+
  private:
-  virtual void valueChanged(Widget*);
+  RenderStyle* createThumbStyle(RenderStyle* parentStyle);
+  int trackSize();
+
+  RefPtr<HTMLSliderThumbElement> m_thumb;
 };
 
 }  // namespace WebCore
 
-#endif  // DeprecatedSlider_h
+#endif  // RenderSlider_h

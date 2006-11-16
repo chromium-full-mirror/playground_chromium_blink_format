@@ -116,6 +116,20 @@ class RenderThemeMac : public RenderTheme {
                                          RenderStyle*,
                                          Element*) const;
 
+  virtual void adjustSliderTrackStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintSliderTrack(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+
+  virtual void adjustSliderThumbStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintSliderThumb(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+
  private:
   IntRect inflateRect(const IntRect&, const IntSize&, const int* margins) const;
 
@@ -161,6 +175,10 @@ class RenderThemeMac : public RenderTheme {
   NSButtonCell* checkbox;
   NSButtonCell* radio;
   NSButtonCell* button;
+  NSSliderCell* sliderThumbHorizontalCell;
+  NSSliderCell* sliderThumbVerticalCell;
+  bool sliderHorizontalCellIsPressed;
+  bool sliderVerticalCellIsPressed;
   NSPopUpButtonCell* popupButton;
   Image* resizeCornerImage;
 };
