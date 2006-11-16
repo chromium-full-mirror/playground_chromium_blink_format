@@ -37,9 +37,6 @@ class AtomicStringImpl;
 class Node;
 class String;
 
-template <typename T>
-class DeprecatedValueList;
-
 class HTMLCollection : public Shared<HTMLCollection> {
  public:
   enum Type {
@@ -85,7 +82,7 @@ class HTMLCollection : public Shared<HTMLCollection> {
   // In case of multiple items named the same way
   virtual Node* nextNamedItem(const String& name) const;
 
-  DeprecatedValueList<RefPtr<Node>> namedItems(const AtomicString& name) const;
+  void namedItems(const AtomicString& name, Vector<RefPtr<Node>>&) const;
 
   Node* base() { return m_base.get(); }
 

@@ -25,7 +25,6 @@
 
 #include "DeprecatedString.h"
 #include "TextStream.h"
-#include "DeprecatedValueList.h"
 
 namespace WebCore {
 
@@ -62,34 +61,30 @@ TextStream& operator<<(TextStream&, const FloatPoint&);
 // signatures unintentionally.
 
 template <typename Item>
-TextStream& operator<<(TextStream& ts, const DeprecatedValueList<Item*>& l) {
+TextStream& operator<<(TextStream& ts, const Vector<Item*>& v) {
   ts << "[";
-  typename DeprecatedValueList<Item*>::ConstIterator it = l.begin();
-  typename DeprecatedValueList<Item*>::ConstIterator it_e = l.end();
-  while (it != it_e) {
-    ts << *(*it);
-    ++it;
-    if (it != it_e)
+
+  for (unsigned i = 0; i < v.size(); i++) {
+    ts << *v[i];
+    if (i < v.size() - 1)
       ts << ", ";
   }
-  ts << "]";
 
+  ts << "]";
   return ts;
 }
 
 template <typename Item>
-TextStream& operator<<(TextStream& ts, const DeprecatedValueList<Item>& l) {
+TextStream& operator<<(TextStream& ts, const Vector<Item>& v) {
   ts << "[";
-  typename DeprecatedValueList<Item>::ConstIterator it = l.begin();
-  typename DeprecatedValueList<Item>::ConstIterator it_e = l.end();
-  while (it != it_e) {
-    ts << *it;
-    ++it;
-    if (it != it_e)
+
+  for (unsigned i = 0; i < v.size(); i++) {
+    ts << v[i];
+    if (i < v.size() - 1)
       ts << ", ";
   }
-  ts << "]";
 
+  ts << "]";
   return ts;
 }
 }

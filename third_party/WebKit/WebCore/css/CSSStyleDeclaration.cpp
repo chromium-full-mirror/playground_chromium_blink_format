@@ -146,7 +146,7 @@ void CSSStyleDeclaration::diff(CSSMutableStyleDeclaration* style) const {
   if (!style)
     return;
 
-  DeprecatedValueList<int> properties;
+  Vector<int> properties;
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it(
            style->valuesIterator());
@@ -157,9 +157,8 @@ void CSSStyleDeclaration::diff(CSSMutableStyleDeclaration* style) const {
       properties.append(property.id());
   }
 
-  for (DeprecatedValueListIterator<int> it(properties.begin());
-       it != properties.end(); ++it)
-    style->removeProperty(*it);
+  for (unsigned i = 0; i < properties.size(); i++)
+    style->removeProperty(properties[i]);
 }
 
 PassRefPtr<CSSMutableStyleDeclaration> CSSStyleDeclaration::copyPropertiesInSet(

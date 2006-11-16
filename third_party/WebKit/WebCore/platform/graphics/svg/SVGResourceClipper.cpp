@@ -53,7 +53,7 @@ const ClipDataList& SVGResourceClipper::clipData() const {
 
 TextStream& SVGResourceClipper::externalRepresentation(TextStream& ts) const {
   ts << "[type=CLIPPER]";
-  ts << " [clip data=" << clipData() << "]";
+  ts << " [clip data=" << clipData().clipData() << "]";
   return ts;
 }
 
