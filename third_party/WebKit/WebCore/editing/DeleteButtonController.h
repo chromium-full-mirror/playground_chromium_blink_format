@@ -52,10 +52,7 @@ class DeleteButtonController {
   void show(HTMLElement*);
   void hide();
 
-  bool enabled() {
-    ASSERT(m_disableStack && !m_target);
-    return m_disableStack == 0;
-  }
+  bool enabled() { return m_disableStack == 0; }
   void enable();
   void disable();
 
