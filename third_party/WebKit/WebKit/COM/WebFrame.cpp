@@ -37,7 +37,9 @@
 #pragma warning(push, 0)
 #include "Cache.h"
 #include "ChromeClientWin.h"
+#include "ContextMenuClientWin.h"
 #include "Document.h"
+#include "FrameLoader.h"
 #include "FrameView.h"
 #include "FrameWin.h"
 #include "GraphicsContext.h"
@@ -47,6 +49,7 @@
 #include "cairo-win32.h"
 #include "ResourceHandle.h"
 #include "ResourceHandleWin.h"
+#include "ResourceRequest.h"
 #include "EditorClient.h"
 #pragma warning(pop)
 
@@ -130,7 +133,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::initWithName(
   if (FAILED(hr))
     return hr;
 
-  Page* page = new Page(new ChromeClientWin());
+  Page* page = new Page(new ChromeClientWin(), new ContextMenuClientWin());
   Frame* frame = new FrameWin(page, 0, 0, this);
 
   // FIXME: This is one-time initialization, but it gets the value of the
@@ -216,11 +219,11 @@ HRESULT STDMETHODCALLTYPE WebFrame::loadHTMLString(
   if (baseURL) {
     DeprecatedString baseURLString((DeprecatedChar*)baseURL,
                                    SysStringLen(baseURL));
-    d->frame->begin(KURL(baseURLString));
+    d->frame->loader()->begin(KURL(baseURLString));
   } else
-    d->frame->begin();
-  d->frame->write(htmlString);
-  d->frame->end();
+    d->frame->loader()->begin();
+  d->frame->loader()->write(htmlString);
+  d->frame->loader()->end();
 
   return S_OK;
 }
@@ -258,15 +261,15 @@ HRESULT STDMETHODCALLTYPE WebFrame::provisionalDataSource(
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::stopLoading(void) {
-  d->frame->stopLoading(false);
+  d->frame->loader()->stopLoading(false);
   return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE WebFrame::reload(void) {
-  if (!d->frame->url().url().startsWith("javascript:", false))
-    d->frame->scheduleLocationChange(
-        d->frame->url().url(), d->frame->referrer(), true /*lock history*/,
-        true /*userGesture*/);
+  if (!d->frame->loader()->url().url().startsWith("javascript:", false))
+    d->frame->loader()->scheduleLocationChange(
+        d->frame->loader()->url().url(), d->frame->loader()->outgoingReferrer(),
+        true /*lock history*/, true /*userGesture*/);
   return S_OK;
 }
 
@@ -351,7 +354,7 @@ HRESULT WebFrame::loadDataSource(WebDataSource* dataSource) {
       hr = request->HTTPMethod(&method);
       if (SUCCEEDED(hr)) {
         KURL kurl(DeprecatedString((DeprecatedChar*)url, SysStringLen(url)));
-        d->frame->didOpenURL(kurl);
+        d->frame->loader()->didOpenURL(kurl);
         String methodString(method, SysStringLen(method));
         const FormData* formData = 0;
         if (wcscmp(method, TEXT("GET"))) {
@@ -440,29 +443,13 @@ int WebFrame::getObjectCacheSize() {
 
 // ResourceHandleClient
 
-void WebFrame::receivedRedirect(ResourceHandle*, const KURL& url) {
-  DeprecatedString urlStr(url.url());
-  urlStr.append('\0');
+void WebFrame::didReceiveData(WebCore::ResourceHandle*,
+                              const char* data,
+                              int length) {
+  // Ensure that WebFrame::receivedResponse was called.
+  _ASSERT(m_dataSource && !m_provisionalDataSource);
 
-  // FIXME: is this the correct way to handle a redirect?
-
-  IWebMutableURLRequest* request = WebMutableURLRequest::createInstance();
-  BSTR urlBStr = SysAllocString((LPCTSTR)urlStr.unicode());
-  if (SUCCEEDED(request->initWithURL(urlBStr,
-                                     WebURLRequestUseProtocolCachePolicy, 0))) {
-    _ASSERT(m_provisionalDataSource);
-    static_cast<WebDataSource*>(m_provisionalDataSource)
-        ->replaceRequest(request);
-  }
-  SysFreeString(urlBStr);
-  request->Release();
-
-  IWebFrameLoadDelegate* frameLoadDelegate;
-  if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate))) {
-    frameLoadDelegate->didReceiveServerRedirectForProvisionalLoadForFrame(
-        d->webView, this);
-    frameLoadDelegate->Release();
-  }
+  d->frame->loader()->write(data, length);
 }
 
 void WebFrame::receivedResponse(ResourceHandle* job, PlatformResponse) {
@@ -487,9 +474,9 @@ void WebFrame::receivedResponse(ResourceHandle* job, PlatformResponse) {
   SysFreeString(url);
 
   // Update MIME info (FIXME: get from PlatformResponse)
-  d->frame->setResponseMIMEType(String(L"text/html"));
+  d->frame->loader()->setResponseMIMEType(String(L"text/html"));
 
-  d->frame->begin(kurl);
+  d->frame->loader()->begin(kurl);
 
   if (m_loadType != WebFrameLoadTypeBack &&
       m_loadType != WebFrameLoadTypeForward &&
@@ -516,20 +503,6 @@ void WebFrame::receivedResponse(ResourceHandle* job, PlatformResponse) {
   }
 }
 
-void WebFrame::didReceiveData(WebCore::ResourceHandle*,
-                              const char* data,
-                              int length) {
-  // Ensure that WebFrame::receivedResponse was called.
-  _ASSERT(m_dataSource && !m_provisionalDataSource);
-
-  d->frame->write(data, length);
-}
-
-void WebFrame::receivedAllData(ResourceHandle* /*job*/) {
-  m_quickRedirectComing = false;
-  m_loadType = WebFrameLoadTypeStandard;
-}
-
 void WebFrame::receivedAllData(ResourceHandle*, PlatformData data) {
   IWebFrameLoadDelegate* frameLoadDelegate;
   if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate))) {
@@ -544,7 +517,7 @@ void WebFrame::receivedAllData(ResourceHandle*, PlatformData data) {
     frameLoadDelegate->Release();
   }
 
-  d->frame->end();
+  d->frame->loader()->end();
 }
 
 // FrameWinClient

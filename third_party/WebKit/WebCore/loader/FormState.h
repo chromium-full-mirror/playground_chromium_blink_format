@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef FormState_h
+#define FormState_h
+
 #include "Shared.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
@@ -55,3 +58,5 @@ class FormState : public Shared<FormState> {
   RefPtr<Frame> m_sourceFrame;
 };
 }
+
+#endif  // FormState_h

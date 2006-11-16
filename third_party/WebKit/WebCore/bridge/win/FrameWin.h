@@ -31,7 +31,9 @@
 
 namespace WebCore {
 
+class FormData;
 class FrameLoadRequest;
+class ResourceRequest;
 struct WindowFeatures;
 
 class FrameWinClient {
@@ -50,39 +52,16 @@ class FrameWinClient {
 class FrameWin : public Frame {
  public:
   FrameWin(Page*, Element*, PassRefPtr<EditorClient>, FrameWinClient*);
-  ~FrameWin();
+  virtual ~FrameWin();
 
   virtual void createNewWindow(const FrameLoadRequest&,
                                const WindowFeatures&,
                                Frame*& part);
-  virtual void submitForm(const FrameLoadRequest&, Event*);
-  virtual void urlSelected(const FrameLoadRequest&, Event*);
-
-  virtual void setTitle(const String&);
-  virtual void setStatusBarText(const String&);
-
-  virtual ObjectContentType objectContentType(const KURL& url,
-                                              const String& mimeType);
-  virtual Plugin* createPlugin(Element*,
-                               const KURL&,
-                               const Vector<String>& paramNames,
-                               const Vector<String>& paramValues,
-                               const String& mimeType);
-  virtual Frame* createFrame(const KURL&,
-                             const String& name,
-                             Element* ownerElement,
-                             const String& referrer);
-  virtual Widget* createJavaAppletWidget(const IntSize&,
-                                         Element*,
-                                         const HashMap<String, String>& args);
 
   virtual void scheduleClose();
 
   virtual void focusWindow();
   virtual void unfocusWindow();
-
-  virtual void saveDocumentState();
-  virtual void restoreDocumentState();
 
   virtual void addMessageToConsole(const String& message,
                                    unsigned int lineNumber,
@@ -101,11 +80,7 @@ class FrameWin : public Frame {
   virtual bool statusbarVisible();
   virtual bool toolbarVisible();
 
-  virtual void createEmptyDocument();
   virtual Range* markedTextRange() const;
-
-  virtual String incomingReferrer() const;
-  virtual String userAgent() const;
 
   virtual String mimeTypeForFileName(const String&) const;
 
@@ -117,8 +92,6 @@ class FrameWin : public Frame {
   virtual bool passSubframeEventToSubframe(MouseEventWithHitTestResults&,
                                            Frame* subframePart = 0);
   virtual bool passWheelEventToChildWidget(Node*);
-
-  virtual String overrideMediaType() const;
 
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*);
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*);
@@ -137,27 +110,18 @@ class FrameWin : public Frame {
   virtual void issueTransposeCommand();
   virtual void respondToChangedSelection(const Selection& oldSelection,
                                          bool closeTyping);
-  void FrameWin::respondToChangedContents(const Selection& endingSelection);
+  virtual void respondToChangedContents(const Selection& endingSelection);
   virtual bool shouldChangeSelection(const Selection& oldSelection,
                                      const Selection& newSelection,
                                      EAffinity affinity,
                                      bool stillSelecting) const;
-  virtual void partClearedInBegin();
-
-  virtual bool canGoBackOrForward(int distance) const;
-  virtual void goBackOrForward(int distance);
-  virtual int getHistoryLength();
-  virtual KURL historyURL(int distance);
-  virtual void handledOnloadEvents();
 
   virtual bool canPaste() const;
   virtual bool canRedo() const;
   virtual bool canUndo() const;
   virtual void print();
 
-  bool keyPress(const PlatformKeyboardEvent&);
-  virtual KURL originalRequestURL() const;
-  virtual IntRect windowResizerRect() const;
+  virtual bool keyPress(const PlatformKeyboardEvent&);
 
  protected:
   virtual bool isLoadTypeReload();

@@ -135,11 +135,9 @@ class WebFrame : public IWebFrame,
       /* [retval][out] */ IWebFrame*** frames);
 
   // ResourceHandleClient
-  virtual void receivedRedirect(WebCore::ResourceHandle*, const WebCore::KURL&);
+  virtual void didReceiveData(WebCore::ResourceHandle*, const char*, int);
   virtual void receivedResponse(WebCore::ResourceHandle*,
                                 WebCore::PlatformResponse);
-  virtual void didReceiveData(WebCore::ResourceHandle*, const char*, int);
-  virtual void receivedAllData(WebCore::ResourceHandle*);
   virtual void receivedAllData(WebCore::ResourceHandle*, WebCore::PlatformData);
 
   // FrameWinClient
