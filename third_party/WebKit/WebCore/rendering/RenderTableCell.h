@@ -123,7 +123,6 @@ class RenderTableCell : public RenderBlock {
   int rSpan;
   int cSpan;
   int _topExtra : 31;
-  bool nWrap : 1;
   int _bottomExtra : 31;
   bool m_widthChanged : 1;
 
