@@ -110,8 +110,9 @@ class ContextMenu : Noncopyable {
 
   void populate();
 
-  void show();
-  void hide();
+  // FIXME: Implement these
+  void show() {}
+  void hide() {}
 
   void insertItem(unsigned position, ContextMenuItem);
   void appendItem(ContextMenuItem item);
