@@ -73,6 +73,8 @@ class WebChromeClient : public WebCore::ChromeClient,
 
   virtual void setResizable(bool);
 
+  virtual void addCustomContextMenuItems(WebCore::ContextMenu*);
+
  private:
   WebChromeClient(WebView* webView);
 

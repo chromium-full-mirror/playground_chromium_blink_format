@@ -25,8 +25,10 @@
 
 namespace WebCore {
 
+class ContextMenu;
 class FloatRect;
 class Page;
+
 struct FrameLoadRequest;
 
 class ChromeClient : public AbstractShared {
@@ -61,6 +63,8 @@ class ChromeClient : public AbstractShared {
   virtual bool menubarVisible() = 0;
 
   virtual void setResizable(bool) = 0;
+
+  virtual void addCustomContextMenuItems(ContextMenu*) = 0;
 };
 }
 
