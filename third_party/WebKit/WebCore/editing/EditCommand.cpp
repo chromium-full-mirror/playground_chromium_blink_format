@@ -82,11 +82,7 @@ void EditCommand::apply() {
     }
   }
 
-  frame->editor()->deleteButtonController()->disable();
-
   doApply();
-
-  frame->editor()->deleteButtonController()->enable();
 
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
@@ -109,8 +105,6 @@ void EditCommand::unapply() {
 
   Frame* frame = m_document->frame();
 
-  frame->editor()->deleteButtonController()->disable();
-
   doUnapply();
 
   frame->editor()->deleteButtonController()->enable();
@@ -127,11 +121,7 @@ void EditCommand::reapply() {
 
   Frame* frame = m_document->frame();
 
-  frame->editor()->deleteButtonController()->disable();
-
   doReapply();
-
-  frame->editor()->deleteButtonController()->enable();
 
   if (!m_parent) {
     updateLayout();
@@ -222,7 +212,11 @@ void EditCommand::setParent(CompositeEditCommand* parent) {
 }
 
 void applyCommand(PassRefPtr<EditCommand> command) {
+  DeleteButtonController* deleteButtonController =
+      command->document()->frame()->editor()->deleteButtonController();
+  deleteButtonController->disable();
   command->apply();
+  deleteButtonController->enable();
 }
 
 }  // namespace WebCore

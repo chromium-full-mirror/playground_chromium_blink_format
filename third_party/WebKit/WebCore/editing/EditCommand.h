@@ -89,6 +89,8 @@ class EditCommand : public Shared<EditCommand> {
   RefPtr<Element> m_endingRootEditableElement;
   RefPtr<CSSMutableStyleDeclaration> m_typingStyle;
   CompositeEditCommand* m_parent;
+
+  friend void applyCommand(PassRefPtr<EditCommand>);
 };
 
 void applyCommand(PassRefPtr<EditCommand>);
