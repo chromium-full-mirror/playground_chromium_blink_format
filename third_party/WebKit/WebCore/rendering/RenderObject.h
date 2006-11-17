@@ -886,7 +886,7 @@ class RenderObject : public CachedResourceClient {
                                   const IntRect& oldFullBounds);
 
   // Repaint only if the object moved.
-  virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
+  virtual void repaintDuringLayoutIfMoved(const IntRect& rect);
 
   // Called to repaint a block's floats.
   virtual void repaintOverhangingFloats(bool paintAllDescendants = false);

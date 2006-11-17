@@ -1142,8 +1142,8 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
 }
 
 void RenderFlexibleBox::placeChild(RenderObject* child, int x, int y) {
-  int oldChildX = child->xPos();
-  int oldChildY = child->yPos();
+  IntRect oldRect(child->xPos(), child->yPos(), child->width(),
+                  child->height());
 
   // Place the child.
   child->setPos(x, y);
@@ -1154,7 +1154,7 @@ void RenderFlexibleBox::placeChild(RenderObject* child, int x, int y) {
   // we're going to
   // repaint ourselves (and the child) anyway.
   if (!selfNeedsLayout() && child->checkForRepaintDuringLayout())
-    child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
+    child->repaintDuringLayoutIfMoved(oldRect);
 }
 
 int RenderFlexibleBox::allowedChildFlex(RenderObject* child,

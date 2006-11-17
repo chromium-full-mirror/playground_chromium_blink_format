@@ -1225,15 +1225,15 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
         child->setChildNeedsLayout(true);
     }
 
-    // Cache our old position so that we can dirty the proper repaint rects if
-    // the child moves.
-    int oldChildX = child->xPos();
-    int oldChildY = child->yPos();
+    // Cache our old rect so that we can dirty the proper repaint rects if the
+    // child moves.
+    IntRect oldRect(child->xPos(), child->yPos(), child->width(),
+                    child->height());
 
     // Go ahead and position the child as though it didn't collapse with the
     // top.
     child->setPos(child->xPos(), yPosEstimate);
-    if (yPosEstimate != oldChildY && !child->avoidsFloats() &&
+    if (yPosEstimate != oldRect.y() && !child->avoidsFloats() &&
         child->containsFloats())
       child->markAllDescendantsWithFloatsForLayout();
     child->layoutIfNeeded();
@@ -1295,8 +1295,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (!selfNeedsLayout() && child->checkForRepaintDuringLayout()) {
       int finalChildX = child->xPos();
       int finalChildY = child->yPos();
-      if (finalChildX != oldChildX || finalChildY != oldChildY)
-        child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
+      if (finalChildX != oldRect.x() || finalChildY != oldRect.y())
+        child->repaintDuringLayoutIfMoved(oldRect);
       else if (finalChildY != yPosEstimate ||
                finalChildY != postCollapseChildY) {
         // The child's repaints during layout were done before it reached its
@@ -2205,8 +2205,7 @@ void RenderBlock::positionNewFloats() {
     if (ro - lo < fwidth)
       fwidth = ro - lo;  // Never look for more than what will be available.
 
-    int oldChildX = o->xPos();
-    int oldChildY = o->yPos();
+    IntRect oldRect(o->xPos(), o->yPos(), o->width(), o->height());
 
     if (o->style()->clear() & CLEFT)
       y = max(leftBottom(), y);
@@ -2244,7 +2243,7 @@ void RenderBlock::positionNewFloats() {
 
     // If the child moved, we have to repaint it.
     if (o->checkForRepaintDuringLayout())
-      o->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
+      o->repaintDuringLayoutIfMoved(oldRect);
 
     f = m_floatingObjects->next();
   }
