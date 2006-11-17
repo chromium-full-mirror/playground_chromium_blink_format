@@ -149,6 +149,8 @@ class RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const { return 0; }
 
+  virtual void adjustSliderThumbSize(RenderObject*) const;
+
  protected:
   // Methods for state querying
   bool isChecked(const RenderObject*) const;

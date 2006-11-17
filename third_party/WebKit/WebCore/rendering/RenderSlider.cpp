@@ -31,6 +31,7 @@
 #include "HTMLDivElement.h"
 #include "HTMLNames.h"
 #include "MouseEvent.h"
+#include "RenderTheme.h"
 #include <wtf/MathExtras.h>
 
 using std::min;
@@ -163,13 +164,9 @@ void RenderSlider::setStyle(RenderStyle* newStyle) {
   RenderBlock::setStyle(newStyle);
 
   RenderStyle* thumbStyle = createThumbStyle(newStyle);
+
   if (m_thumb)
     m_thumb->renderer()->setStyle(thumbStyle);
-
-  if (newStyle->appearance() == SliderVerticalAppearance)
-    thumbStyle->setAppearance(SliderThumbVerticalAppearance);
-  else
-    thumbStyle->setAppearance(SliderThumbHorizontalAppearance);
 
   setReplaced(isInline());
 }
@@ -185,6 +182,11 @@ RenderStyle* RenderSlider::createThumbStyle(RenderStyle* parentStyle) {
   style->setDisplay(BLOCK);
   style->setPosition(RelativePosition);
 
+  if (parentStyle->appearance() == SliderVerticalAppearance)
+    style->setAppearance(SliderThumbVerticalAppearance);
+  else if (parentStyle->appearance() == SliderHorizontalAppearance)
+    style->setAppearance(SliderThumbHorizontalAppearance);
+
   return style;
 }
 
@@ -199,6 +201,10 @@ void RenderSlider::layout() {
 
     if (oldWidth != m_width || oldHeight != m_height)
       relayoutChildren = true;
+
+    // Allow the theme to set the size of the thumb
+    if (m_thumb->renderer()->style()->hasAppearance())
+      theme()->adjustSliderThumbSize(m_thumb->renderer());
 
     if (style()->appearance() == SliderVerticalAppearance)
       m_thumb->renderer()->style()->setLeft(Length(

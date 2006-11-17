@@ -68,6 +68,8 @@ class RenderThemeMac : public RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
+  virtual void adjustSliderThumbSize(RenderObject*) const;
+
  protected:
   // Methods for each appearance value.
   virtual bool paintCheckbox(RenderObject*,
@@ -116,16 +118,9 @@ class RenderThemeMac : public RenderTheme {
                                          RenderStyle*,
                                          Element*) const;
 
-  virtual void adjustSliderTrackStyle(CSSStyleSelector*,
-                                      RenderStyle*,
-                                      Element*) const;
   virtual bool paintSliderTrack(RenderObject*,
                                 const RenderObject::PaintInfo&,
                                 const IntRect&);
-
-  virtual void adjustSliderThumbStyle(CSSStyleSelector*,
-                                      RenderStyle*,
-                                      Element*) const;
   virtual bool paintSliderThumb(RenderObject*,
                                 const RenderObject::PaintInfo&,
                                 const IntRect&);
