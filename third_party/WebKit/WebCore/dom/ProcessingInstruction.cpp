@@ -186,9 +186,12 @@ bool ProcessingInstruction::isLoading() const {
   return m_sheet->isLoading();
 }
 
-void ProcessingInstruction::sheetLoaded() {
-  if (!isLoading())
+bool ProcessingInstruction::sheetLoaded() {
+  if (!isLoading()) {
     document()->stylesheetLoaded();
+    return true;
+  }
+  return false;
 }
 
 void ProcessingInstruction::setCSSStyleSheet(const String& url,

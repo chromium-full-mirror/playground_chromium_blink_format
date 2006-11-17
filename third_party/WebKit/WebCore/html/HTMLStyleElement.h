@@ -46,7 +46,7 @@ class HTMLStyleElement : public HTMLElement {
   virtual void childrenChanged();
 
   bool isLoading() const;
-  void sheetLoaded();
+  virtual bool sheetLoaded();
 
   bool disabled() const;
   void setDisabled(bool);

@@ -103,9 +103,12 @@ bool HTMLStyleElement::isLoading() const {
   return static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading();
 }
 
-void HTMLStyleElement::sheetLoaded() {
-  if (!isLoading())
+bool HTMLStyleElement::sheetLoaded() {
+  if (!isLoading()) {
     document()->stylesheetLoaded();
+    return true;
+  }
+  return false;
 }
 
 bool HTMLStyleElement::disabled() const {

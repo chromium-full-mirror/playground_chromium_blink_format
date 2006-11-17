@@ -237,9 +237,12 @@ bool HTMLLinkElement::isLoading() const {
   return static_cast<CSSStyleSheet*>(m_sheet.get())->isLoading();
 }
 
-void HTMLLinkElement::sheetLoaded() {
-  if (!isLoading() && !isDisabled() && !isAlternate())
+bool HTMLLinkElement::sheetLoaded() {
+  if (!isLoading() && !isDisabled() && !isAlternate()) {
     document()->stylesheetLoaded();
+    return true;
+  }
+  return false;
 }
 
 bool HTMLLinkElement::isURLAttribute(Attribute* attr) const {
