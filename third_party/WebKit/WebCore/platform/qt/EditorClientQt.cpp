@@ -30,11 +30,14 @@
 #include "config.h"
 #include "EditorClientQt.h"
 
+#include "EditCommand.h"
+
 #include <stdio.h>
 
-#define notImplemented()                                                  \
-  do {                                                                    \
-    fprintf(stderr, "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, __LINE__); \
+#define notImplemented()                                                     \
+  do {                                                                       \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED: %s:%d(%s)\n", __FILE__, __LINE__, \
+            __FUNCTION__);                                                   \
   } while (0)
 
 namespace WebCore {
@@ -96,6 +99,48 @@ void EditorClientQt::respondToChangedContents() {
 }
 
 void EditorClientQt::didEndEditing() {
+  notImplemented();
+}
+
+bool EditorClientQt::selectWordBeforeMenuEvent() {
+  notImplemented();
+  return false;
+}
+
+bool EditorClientQt::isEditable() {
+  notImplemented();
+  return false;
+}
+
+void EditorClientQt::registerCommandForUndo(
+    WTF::PassRefPtr<WebCore::EditCommand>) {
+  notImplemented();
+}
+
+void EditorClientQt::registerCommandForRedo(
+    WTF::PassRefPtr<WebCore::EditCommand>) {
+  notImplemented();
+}
+
+void EditorClientQt::clearUndoRedoOperations() {
+  notImplemented();
+}
+
+bool EditorClientQt::canUndo() const {
+  notImplemented();
+  return false;
+}
+
+bool EditorClientQt::canRedo() const {
+  notImplemented();
+  return false;
+}
+
+void EditorClientQt::undo() {
+  notImplemented();
+}
+
+void EditorClientQt::redo() {
   notImplemented();
 }
 }
