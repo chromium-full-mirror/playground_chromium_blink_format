@@ -321,6 +321,23 @@ bool ReplaceSelectionCommand::shouldMergeEnd(
          shouldMerge(endOfInsertedContent, next);
 }
 
+static bool isMailPasteAsQuotationNode(Node* node) {
+  return node && node->hasTagName(blockquoteTag) && node->isElementNode() &&
+         static_cast<Element*>(node)->getAttribute(classAttr) ==
+             ApplePasteAsQuotation;
+}
+
+// Virtual method used so that ReplaceSelectionCommand can update the node's it
+// tracks.
+void ReplaceSelectionCommand::removeNodePreservingChildren(Node* node) {
+  if (m_firstNodeInserted == node)
+    m_firstNodeInserted = node->traverseNextNode();
+  if (m_lastNodeInserted == node)
+    m_lastNodeInserted =
+        node->lastChild() ? node->lastChild() : node->traverseNextSibling();
+  CompositeEditCommand::removeNodePreservingChildren(node);
+}
+
 bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
                                           const VisiblePosition& to) {
   if (from.isNull() || to.isNull())
@@ -329,8 +346,9 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
   Node* fromNode = from.deepEquivalent().node();
   Node* toNode = to.deepEquivalent().node();
 
-  return nearestMailBlockquote(fromNode) == nearestMailBlockquote(toNode) &&
-         !enclosingBlock(fromNode)->hasTagName(blockquoteTag) &&
+  return !enclosingNodeOfType(fromNode, &isMailPasteAsQuotationNode) &&
+         (!enclosingBlock(fromNode)->hasTagName(blockquoteTag) ||
+          isMailBlockquote(enclosingBlock(fromNode))) &&
          enclosingListChild(fromNode) == enclosingListChild(toNode) &&
          enclosingTableCell(fromNode) == enclosingTableCell(toNode) &&
          !(fromNode->renderer() && fromNode->renderer()->isTable()) &&
@@ -338,11 +356,21 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
          !fromNode->hasTagName(hrTag) && !toNode->hasTagName(hrTag);
 }
 
-void ReplaceSelectionCommand::removeRedundantStyles() {
+void ReplaceSelectionCommand::removeRedundantStyles(
+    Node* mailBlockquoteEnclosingSelectionStart) {
   // There's usually a top level style span that holds the document's default
   // style, push it down.
   Node* node = m_firstNodeInserted.get();
-  if (isStyleSpan(node)) {
+  if (isStyleSpan(node) && mailBlockquoteEnclosingSelectionStart) {
+    // Calculate the document default style.
+    RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
+        Position(mailBlockquoteEnclosingSelectionStart, 0)
+            .computedStyle()
+            ->copyInheritableProperties();
+    RefPtr<CSSMutableStyleDeclaration> spanStyle =
+        static_cast<HTMLElement*>(node)->inlineStyleDecl();
+    spanStyle->merge(blockquoteStyle.get());
+  } else if (isStyleSpan(node)) {
     RefPtr<CSSMutableStyleDeclaration> parentStyle =
         Position(node, 0).computedStyle()->copyInheritableProperties();
 
@@ -371,10 +399,6 @@ void ReplaceSelectionCommand::removeRedundantStyles() {
       child = next;
     }
 
-    if (m_firstNodeInserted == node)
-      m_firstNodeInserted = node->firstChild();
-    if (m_lastNodeInserted == node)
-      m_lastNodeInserted = node->lastChild();
     removeNodePreservingChildren(node);
   }
 
@@ -424,10 +448,6 @@ void ReplaceSelectionCommand::removeRedundantStyles() {
         (isStyleSpan(element) || element->hasTagName(bTag) ||
          element->hasTagName(fontTag) || element->hasTagName(iTag) ||
          element->hasTagName(uTag))) {
-      if (element == m_firstNodeInserted)
-        m_firstNodeInserted = element->traverseNextNode();
-      if (element == m_lastNodeInserted)
-        m_lastNodeInserted = element->traverseNextNode();
       removeNodePreservingChildren(element);
       continue;
     }
@@ -440,6 +460,12 @@ void ReplaceSelectionCommand::removeRedundantStyles() {
       setNodeAttribute(element, styleAttr, inlineStyleDecl->cssText());
     }
   }
+}
+
+void ReplaceSelectionCommand::handlePasteAsQuotationNode() {
+  Node* node = m_firstNodeInserted.get();
+  if (isMailPasteAsQuotationNode(node))
+    static_cast<Element*>(node)->setAttribute(classAttr, "");
 }
 
 void ReplaceSelectionCommand::doApply() {
@@ -467,6 +493,8 @@ void ReplaceSelectionCommand::doApply() {
 
   bool selectionEndWasEndOfParagraph = isEndOfParagraph(visibleEnd);
   bool selectionStartWasStartOfParagraph = isStartOfParagraph(visibleStart);
+  Node* mailBlockquoteEnclosingSelectionStart =
+      nearestMailBlockquote(visibleStart.deepEquivalent().node());
 
   Node* startBlock = enclosingBlock(visibleStart.deepEquivalent().node());
 
@@ -604,7 +632,7 @@ void ReplaceSelectionCommand::doApply() {
     node = next;
   }
 
-  removeRedundantStyles();
+  removeRedundantStyles(mailBlockquoteEnclosingSelectionStart);
 
   endOfInsertedContent = VisiblePosition(Position(
       m_lastNodeInserted.get(), maxDeepOffset(m_lastNodeInserted.get())));
@@ -719,6 +747,8 @@ void ReplaceSelectionCommand::doApply() {
             endingSelection().visibleStart().deepEquivalent().node();
     }
   }
+
+  handlePasteAsQuotationNode();
 
   endOfInsertedContent = VisiblePosition(Position(
       m_lastNodeInserted.get(), maxDeepOffset(m_lastNodeInserted.get())));
