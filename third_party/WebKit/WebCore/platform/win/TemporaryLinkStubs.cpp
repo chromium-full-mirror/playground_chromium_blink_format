@@ -46,6 +46,7 @@
 #include "FileChooser.h"
 #include "Font.h"
 #include "FrameLoader.h"
+#include "FrameLoaderClientWin.h"
 #include "FrameLoadRequest.h"
 #include "FrameView.h"
 #include "FrameWin.h"
@@ -241,11 +242,11 @@ void ChromeClientWin::unfocus() {
 }
 Page* ChromeClientWin::createWindow(const FrameLoadRequest&) {
   notImplemented();
-  return NULL;
+  return 0;
 }
 Page* ChromeClientWin::createModalDialog(const FrameLoadRequest&) {
   notImplemented();
-  return NULL;
+  return 0;
 }
 void ChromeClientWin::show() {
   notImplemented();
@@ -351,6 +352,58 @@ bool EditorClientWin::isGrammarCheckingEnabled() {
 int EditorClientWin::spellCheckerDocumentTag() {
   notImplemented();
   return 0;
+}
+bool EditorClientWin::selectWordBeforeMenuEvent() {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::isEditable() {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldBeginEditing(Range*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldEndEditing(Range*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldApplyStyle(CSSStyleDeclaration*, Range*) {
+  notImplemented();
+  return false;
+}
+void EditorClientWin::didBeginEditing() {
+  notImplemented();
+}
+void EditorClientWin::respondToChangedContents() {
+  notImplemented();
+}
+void EditorClientWin::didEndEditing() {
+  notImplemented();
+}
+void EditorClientWin::registerCommandForUndo(PassRefPtr<EditCommand>) {
+  notImplemented();
+}
+void EditorClientWin::registerCommandForRedo(PassRefPtr<EditCommand>) {
+  notImplemented();
+}
+void EditorClientWin::clearUndoRedoOperations() {
+  notImplemented();
+}
+bool EditorClientWin::canUndo() const {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::canRedo() const {
+  notImplemented();
+  return false;
+}
+void EditorClientWin::undo() {
+  notImplemented();
+}
+void EditorClientWin::redo() {
+  notImplemented();
 }
 
 void EventHandler::focusDocumentView() {
@@ -491,7 +544,7 @@ Frame* FrameLoader::createFrame(KURL const&,
                                 Element*,
                                 String const&) {
   notImplemented();
-  return NULL;
+  return 0;
 }
 void FrameLoader::submitForm(const FrameLoadRequest&, Event*) {
   notImplemented();
@@ -517,13 +570,247 @@ Widget* FrameLoader::createPlugin(Element*,
                                   const Vector<String>&,
                                   const String&) {
   notImplemented();
-  return NULL;
+  return 0;
 }
 void FrameLoader::detachFromParent() {
   notImplemented();
 }
 void FrameLoader::checkLoadCompleteForThisFrame() {
   notImplemented();
+}
+
+bool FrameLoaderClientWin::hasWebView() const {
+  notImplemented();
+  return false;
+}
+bool FrameLoaderClientWin::hasFrameView() const {
+  notImplemented();
+  return false;
+}
+bool FrameLoaderClientWin::hasBackForwardList() const {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::resetBackForwardList() {
+  notImplemented();
+}
+bool FrameLoaderClientWin::provisionalItemIsTarget() const {
+  notImplemented();
+  return false;
+}
+bool FrameLoaderClientWin::loadProvisionalItemFromPageCache() {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::invalidateCurrentItemPageCache() {
+  notImplemented();
+}
+bool FrameLoaderClientWin::privateBrowsingEnabled() const {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::makeDocumentView() {
+  notImplemented();
+}
+void FrameLoaderClientWin::makeRepresentation(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::forceLayout() {
+  notImplemented();
+}
+void FrameLoaderClientWin::forceLayoutForNonHTML() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryForCommit() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryForBackForwardNavigation() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryForReload() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryForStandardLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryForInternalLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::updateHistoryAfterClientRedirect() {
+  notImplemented();
+}
+void FrameLoaderClientWin::setCopiesOnScroll() {
+  notImplemented();
+}
+LoadErrorResetToken* FrameLoaderClientWin::tokenForLoadErrorReset() {
+  notImplemented();
+  return 0;
+}
+void FrameLoaderClientWin::resetAfterLoadError(LoadErrorResetToken*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::doNotResetAfterLoadError(LoadErrorResetToken*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::willCloseDocument() {
+  notImplemented();
+}
+void FrameLoaderClientWin::detachedFromParent1() {
+  notImplemented();
+}
+void FrameLoaderClientWin::detachedFromParent2() {
+  notImplemented();
+}
+void FrameLoaderClientWin::detachedFromParent3() {
+  notImplemented();
+}
+void FrameLoaderClientWin::detachedFromParent4() {
+  notImplemented();
+}
+void FrameLoaderClientWin::loadedFromPageCache() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidHandleOnloadEvents() {
+  notImplemented();
+}
+void FrameLoaderClientWin::
+    dispatchDidReceiveServerRedirectForProvisionalLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidCancelClientRedirect() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchWillPerformClientRedirect(const KURL&,
+                                                             double,
+                                                             double) {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidChangeLocationWithinPage() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchWillClose() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidReceiveIcon() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidStartProvisionalLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidReceiveTitle(const String&) {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidCommitLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidFinishLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidFirstLayout() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchShow() {
+  notImplemented();
+}
+void FrameLoaderClientWin::cancelPolicyCheck() {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchWillSubmitForm(FramePolicyFunction,
+                                                  PassRefPtr<FormState>) {
+  notImplemented();
+}
+void FrameLoaderClientWin::dispatchDidLoadMainResource(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::clearLoadingFromPageCache(DocumentLoader*) {
+  notImplemented();
+}
+bool FrameLoaderClientWin::isLoadingFromPageCache(DocumentLoader*) {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::revertToProvisionalState(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::clearUnarchivingState(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::progressStarted() {
+  notImplemented();
+}
+void FrameLoaderClientWin::progressCompleted() {
+  notImplemented();
+}
+void FrameLoaderClientWin::setMainFrameDocumentReady(bool) {
+  notImplemented();
+}
+void FrameLoaderClientWin::willChangeTitle(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::didChangeTitle(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::finishedLoading(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::finalSetupForReplace(DocumentLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::setDefersLoading(bool) {
+  notImplemented();
+}
+bool FrameLoaderClientWin::isArchiveLoadPending(ResourceLoader*) const {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::cancelPendingArchiveLoad(ResourceLoader*) {
+  notImplemented();
+}
+void FrameLoaderClientWin::clearArchivedResources() {
+  notImplemented();
+}
+bool FrameLoaderClientWin::canShowMIMEType(const String&) const {
+  notImplemented();
+  return false;
+}
+bool FrameLoaderClientWin::representationExistsForURLScheme(
+    const String&) const {
+  notImplemented();
+  return false;
+}
+String FrameLoaderClientWin::generatedMIMETypeForURLScheme(
+    const String&) const {
+  notImplemented();
+  return String();
+}
+void FrameLoaderClientWin::frameLoadCompleted() {
+  notImplemented();
+}
+void FrameLoaderClientWin::restoreScrollPositionAndViewState() {
+  notImplemented();
+}
+void FrameLoaderClientWin::provisionalLoadStarted() {
+  notImplemented();
+}
+bool FrameLoaderClientWin::shouldTreatURLAsSameAsCurrent(const KURL&) const {
+  notImplemented();
+  return false;
+}
+void FrameLoaderClientWin::addHistoryItemForFragmentScroll() {
+  notImplemented();
+}
+void FrameLoaderClientWin::didFinishLoad() {
+  notImplemented();
+}
+void FrameLoaderClientWin::prepareForDataSourceReplacement() {
+  notImplemented();
+}
+void FrameLoaderClientWin::setTitle(const String&, const KURL&) {
+  notImplemented();
+}
+String FrameLoaderClientWin::userAgent() {
+  notImplemented();
+  return String();
 }
 
 void FrameView::updateBorder() {
