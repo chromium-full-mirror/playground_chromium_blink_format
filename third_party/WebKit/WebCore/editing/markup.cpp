@@ -777,6 +777,11 @@ PassRefPtr<DocumentFragment> createFragmentFromNodes(
   if (!document)
     return 0;
 
+  // disable the delete button so it's elements are not serialized into the
+  // markup
+  if (document->frame())
+    document->frame()->editor()->deleteButtonController()->disable();
+
   RefPtr<DocumentFragment> fragment = document->createDocumentFragment();
 
   ExceptionCode ec = 0;
@@ -788,6 +793,9 @@ PassRefPtr<DocumentFragment> createFragmentFromNodes(
     fragment->appendChild(element.release(), ec);
     ASSERT(ec == 0);
   }
+
+  if (document->frame())
+    document->frame()->editor()->deleteButtonController()->enable();
 
   return fragment.release();
 }
