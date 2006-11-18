@@ -754,7 +754,7 @@ class Document : public ContainerNode {
 
   unsigned m_domtree_version;
 
-  DeprecatedPtrList<NodeIterator> m_nodeIterators;
+  HashSet<NodeIterator*> m_nodeIterators;
 
   unsigned short m_listenerTypes;
   RefPtr<StyleSheetList> m_styleSheets;
