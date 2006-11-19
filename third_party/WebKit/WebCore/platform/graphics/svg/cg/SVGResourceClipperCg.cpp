@@ -30,7 +30,6 @@
 #include "SVGResourceClipper.h"
 
 #include "GraphicsContext.h"
-#include "KCanvasFilterQuartz.h"
 #include "KRenderingDeviceQuartz.h"
 #include "QuartzSupport.h"
 

@@ -85,9 +85,9 @@ void SVGFEGaussianBlurElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-KCanvasFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
+SVGFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<KCanvasFEGaussianBlur*>(
+    m_filterEffect = static_cast<SVGFEGaussianBlur*>(
         renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
   if (!m_filterEffect)
     return 0;

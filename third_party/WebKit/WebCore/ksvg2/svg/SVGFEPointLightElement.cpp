@@ -20,6 +20,7 @@
 #include "config.h"
 #ifdef SVG_SUPPORT
 #include "SVGFEPointLightElement.h"
+#include "SVGPointLightSource.h"
 
 namespace WebCore {
 
@@ -29,9 +30,9 @@ SVGFEPointLightElement::SVGFEPointLightElement(const QualifiedName& tagName,
 
 SVGFEPointLightElement::~SVGFEPointLightElement() {}
 
-KCLightSource* SVGFEPointLightElement::lightSource() const {
-  KCanvasPoint3F pos(x(), y(), z());
-  return new KCPointLightSource(pos);
+SVGLightSource* SVGFEPointLightElement::lightSource() const {
+  FloatPoint3D pos(x(), y(), z());
+  return new SVGPointLightSource(pos);
 }
 }
 #endif  // SVG_SUPPORT

@@ -23,7 +23,7 @@
 #define KSVG_SVGFESpecularLightingElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGFESpecularLighting.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
@@ -39,7 +39,7 @@ class SVGFESpecularLightingElement
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFESpecularLighting* filterEffect() const;
+  virtual SVGFESpecularLighting* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -81,7 +81,7 @@ class SVGFESpecularLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
   // need other properties here...
-  mutable KCanvasFESpecularLighting* m_filterEffect;
+  mutable SVGFESpecularLighting* m_filterEffect;
 
   // light management
   void updateLights() const;

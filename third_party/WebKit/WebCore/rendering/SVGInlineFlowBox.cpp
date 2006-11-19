@@ -30,6 +30,7 @@
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
 #include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
 #include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
@@ -94,7 +95,7 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
           object->document(), svgStyle->maskElement().substring(1)))
     masker->applyMask(boundingBox);
 
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(object->document(), svgStyle->filter().substring(1));
   if (filter)
     filter->prepareFilter(boundingBox);

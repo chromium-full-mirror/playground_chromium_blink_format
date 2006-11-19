@@ -132,10 +132,10 @@ void SVGComponentTransferFunctionElement::parseMappedAttribute(
     SVGElement::parseMappedAttribute(attr);
 }
 
-KCComponentTransferFunction
+SVGComponentTransferFunction
 SVGComponentTransferFunctionElement::transferFunction() const {
-  KCComponentTransferFunction func;
-  func.type = (KCComponentTransferType)(type() - 1);
+  SVGComponentTransferFunction func;
+  func.type = (SVGComponentTransferType)type();
   func.slope = slope();
   func.intercept = intercept();
   func.amplitude = amplitude();

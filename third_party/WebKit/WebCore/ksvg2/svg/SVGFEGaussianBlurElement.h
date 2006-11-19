@@ -24,7 +24,7 @@
 #define KSVG_SVGFEGaussianBlurElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGFEGaussianBlur.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
@@ -40,7 +40,7 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFEGaussianBlur* filterEffect() const;
+  virtual SVGFEGaussianBlur* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -61,7 +61,7 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
                                  double,
                                  StdDeviationY,
                                  stdDeviationY)
-  mutable KCanvasFEGaussianBlur* m_filterEffect;
+  mutable SVGFEGaussianBlur* m_filterEffect;
 };
 
 }  // namespace WebCore

@@ -89,9 +89,9 @@ void SVGFEImageElement::notifyFinished(CachedResource* finishedObj) {
     filterEffect()->setCachedImage(m_cachedImage);
 }
 
-KCanvasFEImage* SVGFEImageElement::filterEffect() const {
+SVGFEImage* SVGFEImageElement::filterEffect() const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<KCanvasFEImage*>(
+    m_filterEffect = static_cast<SVGFEImage*>(
         renderingDevice()->createFilterEffect(FE_IMAGE));
   if (!m_filterEffect)
     return 0;

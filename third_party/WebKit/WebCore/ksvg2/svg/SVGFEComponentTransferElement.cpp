@@ -24,7 +24,6 @@
 #ifdef SVG_SUPPORT
 #include "Attr.h"
 
-#include "KCanvasFilters.h"
 #include "KRenderingDevice.h"
 
 #include "SVGNames.h"
@@ -65,10 +64,9 @@ void SVGFEComponentTransferElement::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-KCanvasFEComponentTransfer* SVGFEComponentTransferElement::filterEffect()
-    const {
+SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect() const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<KCanvasFEComponentTransfer*>(
+    m_filterEffect = static_cast<SVGFEComponentTransfer*>(
         renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
   if (!m_filterEffect)
     return 0;

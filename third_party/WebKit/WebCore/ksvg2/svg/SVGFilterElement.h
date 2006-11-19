@@ -25,7 +25,7 @@
 #define KSVG_SVGFilterElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGResourceFilter.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
@@ -100,7 +100,7 @@ class SVGFilterElement : public SVGStyledElement,
                                  FilterResY,
                                  filterResY)
 
-  RefPtr<KCanvasFilter> m_filter;
+  RefPtr<SVGResourceFilter> m_filter;
 };
 
 }  // namespace WebCore

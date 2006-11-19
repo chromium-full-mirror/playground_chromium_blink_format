@@ -24,25 +24,18 @@
 #define KSVG_SVGFETurbulenceElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGFETurbulence.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
+enum SVGStitchOptions {
+  SVG_STITCHTYPE_UNKNOWN = 0,
+  SVG_STITCHTYPE_STITCH = 1,
+  SVG_STITCHTYPE_NOSTITCH = 2
+};
 
 class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  enum SVGTurbulenceType {
-    SVG_TURBULENCE_TYPE_UNKNOWN = 0,
-    SVG_TURBULENCE_TYPE_FRACTALNOISE = 1,
-    SVG_TURBULENCE_TYPE_TURBULENCE = 2
-  };
-
-  enum SVGStitchOptions {
-    SVG_STITCHTYPE_UNKNOWN = 0,
-    SVG_STITCHTYPE_STITCH = 1,
-    SVG_STITCHTYPE_NOSTITCH = 2
-  };
-
   SVGFETurbulenceElement(const QualifiedName&, Document*);
   virtual ~SVGFETurbulenceElement();
 
@@ -50,7 +43,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFETurbulence* filterEffect() const;
+  virtual SVGFETurbulence* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -82,7 +75,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
                                  StitchTiles,
                                  stitchTiles)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETurbulenceElement, int, int, Type, type)
-  mutable KCanvasFETurbulence* m_filterEffect;
+  mutable SVGFETurbulence* m_filterEffect;
 };
 
 }  // namespace WebCore

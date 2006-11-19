@@ -25,7 +25,7 @@
 #ifdef SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributes.h"
-#include "KCanvasFilters.h"
+#include "SVGFEOffset.h"
 
 namespace WebCore {
 
@@ -38,7 +38,7 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFEOffset* filterEffect() const;
+  virtual SVGFEOffset* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -47,7 +47,7 @@ class SVGFEOffsetElement : public SVGFilterPrimitiveStandardAttributes {
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, String, String, In1, in1)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, double, double, Dx, dx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEOffsetElement, double, double, Dy, dy)
-  mutable KCanvasFEOffset* m_filterEffect;
+  mutable SVGFEOffset* m_filterEffect;
 };
 
 }  // namespace WebCore

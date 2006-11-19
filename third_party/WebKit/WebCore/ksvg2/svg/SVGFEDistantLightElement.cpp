@@ -20,6 +20,7 @@
 #include "config.h"
 #ifdef SVG_SUPPORT
 #include "SVGFEDistantLightElement.h"
+#include "SVGDistantLightSource.h"
 
 namespace WebCore {
 
@@ -29,8 +30,8 @@ SVGFEDistantLightElement::SVGFEDistantLightElement(const QualifiedName& tagName,
 
 SVGFEDistantLightElement::~SVGFEDistantLightElement() {}
 
-KCLightSource* SVGFEDistantLightElement::lightSource() const {
-  return new KCDistantLightSource(azimuth(), elevation());
+SVGLightSource* SVGFEDistantLightElement::lightSource() const {
+  return new SVGDistantLightSource(azimuth(), elevation());
 }
 }
 #endif  // SVG_SUPPORT

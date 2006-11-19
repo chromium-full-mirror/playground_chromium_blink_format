@@ -24,7 +24,6 @@
 #ifdef SVG_SUPPORT
 #include "Attr.h"
 
-#include "KCanvasFilters.h"
 #include "KRenderingDevice.h"
 #include "KRenderingPaintServerGradient.h"
 
@@ -82,9 +81,9 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-KCanvasFEOffset* SVGFEOffsetElement::filterEffect() const {
+SVGFEOffset* SVGFEOffsetElement::filterEffect() const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<KCanvasFEOffset*>(
+    m_filterEffect = static_cast<SVGFEOffset*>(
         renderingDevice()->createFilterEffect(FE_OFFSET));
   if (!m_filterEffect)
     return 0;

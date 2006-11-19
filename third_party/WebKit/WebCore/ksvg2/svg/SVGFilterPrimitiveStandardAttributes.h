@@ -27,7 +27,7 @@
 #include "SVGStyledElement.h"
 
 namespace WebCore {
-class KCanvasFilterEffect;
+class SVGFilterEffect;
 class SVGLength;
 
 class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
@@ -40,10 +40,10 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
   // 'SVGFilterPrimitiveStandardAttributes' functions
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFilterEffect* filterEffect() const = 0;
+  virtual SVGFilterEffect* filterEffect() const = 0;
 
  protected:
-  void setStandardAttributes(KCanvasFilterEffect* filterEffect) const;
+  void setStandardAttributes(SVGFilterEffect* filterEffect) const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

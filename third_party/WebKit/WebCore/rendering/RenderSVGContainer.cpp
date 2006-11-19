@@ -25,6 +25,7 @@
 #include "RenderSVGContainer.h"
 
 #include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
 #include "KRenderingDevice.h"
 #include "SVGStyledElement.h"
@@ -137,7 +138,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
       style()->visibility() == HIDDEN)
     return;
 
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (!firstChild() && !filter)
     return;  // Spec: groups w/o children still may render filter content.
@@ -269,7 +270,7 @@ IntRect RenderSVGContainer::getAbsoluteRepaintRect() {
     repaintRect.unite(current->getAbsoluteRepaintRect());
 
   // Filters can expand the bounding box
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter)
     repaintRect.unite(

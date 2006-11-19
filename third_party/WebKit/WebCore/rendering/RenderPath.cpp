@@ -30,6 +30,7 @@
 #include "GraphicsContext.h"
 #include "RenderSVGContainer.h"
 #include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
 #include "SVGResourceMarker.h"
 #include "KCanvasRenderingStyle.h"
@@ -130,7 +131,7 @@ IntRect RenderPath::getAbsoluteRepaintRect() {
   FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
 
   // Filters can expand the bounding box
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter)
     repaintRect.unite(filter->filterBBoxForItemBBox(repaintRect));
@@ -177,7 +178,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   context->concatCTM(localTransform());
 
   // setup to apply filters
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter) {
     filter->prepareFilter(relativeBBox(true));

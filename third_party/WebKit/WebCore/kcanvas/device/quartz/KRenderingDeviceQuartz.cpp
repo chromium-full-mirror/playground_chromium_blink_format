@@ -28,12 +28,24 @@
 
 #ifdef SVG_SUPPORT
 #include "KRenderingDeviceQuartz.h"
-
 #include "GraphicsContext.h"
+#include "SVGFEBlend.h"
+#include "SVGFEColorMatrix.h"
+#include "SVGFEComponentTransfer.h"
+#include "SVGFEComposite.h"
+#include "SVGFEDiffuseLighting.h"
+#include "SVGFEDisplacementMap.h"
+#include "SVGFEFlood.h"
+#include "SVGFEGaussianBlur.h"
+#include "SVGFEImage.h"
+#include "SVGFEMerge.h"
+#include "SVGFEOffset.h"
+#include "SVGFESpecularLighting.h"
+#include "SVGFETile.h"
 #include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
 #include "SVGResourceImage.h"
 #include "SVGResourceMarker.h"
-#include "KCanvasFilterQuartz.h"
 #include "SVGResourceMasker.h"
 #include "KRenderingPaintServerQuartz.h"
 #include "Logging.h"
@@ -157,7 +169,7 @@ PassRefPtr<SVGResource> KRenderingDeviceQuartz::createResource(
     case RS_IMAGE:
       return new SVGResourceImage();
     case RS_FILTER:
-      return new KCanvasFilterQuartz();
+      return new SVGResourceFilter();
     case RS_MASKER:
       return new SVGResourceMasker();
   }
@@ -165,8 +177,8 @@ PassRefPtr<SVGResource> KRenderingDeviceQuartz::createResource(
   return 0;
 }
 
-KCanvasFilterEffect* KRenderingDeviceQuartz::createFilterEffect(
-    const KCFilterEffectType& type) const {
+SVGFilterEffect* KRenderingDeviceQuartz::createFilterEffect(
+    const SVGFilterEffectType& type) const {
   switch (type) {
     /* Light sources are contained by the diffuse/specular light blocks
     case FE_DISTANT_LIGHT:
@@ -174,33 +186,33 @@ KCanvasFilterEffect* KRenderingDeviceQuartz::createFilterEffect(
     case FE_SPOT_LIGHT:
     */
     case FE_BLEND:
-      return new KCanvasFEBlendQuartz();
+      return new SVGFEBlend();
     case FE_COLOR_MATRIX:
-      return new KCanvasFEColorMatrixQuartz();
+      return new SVGFEColorMatrix();
     case FE_COMPONENT_TRANSFER:
-      return new KCanvasFEComponentTransferQuartz();
+      return new SVGFEComponentTransfer();
     case FE_COMPOSITE:
-      return new KCanvasFECompositeQuartz();
+      return new SVGFEComposite();
     //  case FE_CONVOLVE_MATRIX:
     case FE_DIFFUSE_LIGHTING:
-      return new KCanvasFEDiffuseLightingQuartz();
+      return new SVGFEDiffuseLighting();
     case FE_DISPLACEMENT_MAP:
-      return new KCanvasFEDisplacementMapQuartz();
+      return new SVGFEDisplacementMap();
     case FE_FLOOD:
-      return new KCanvasFEFloodQuartz();
+      return new SVGFEFlood();
     case FE_GAUSSIAN_BLUR:
-      return new KCanvasFEGaussianBlurQuartz();
+      return new SVGFEGaussianBlur();
     case FE_IMAGE:
-      return new KCanvasFEImageQuartz();
+      return new SVGFEImage();
     case FE_MERGE:
-      return new KCanvasFEMergeQuartz();
+      return new SVGFEMerge();
     //  case FE_MORPHOLOGY:
     case FE_OFFSET:
-      return new KCanvasFEOffsetQuartz();
+      return new SVGFEOffset();
     case FE_SPECULAR_LIGHTING:
-      return new KCanvasFESpecularLightingQuartz();
+      return new SVGFESpecularLighting();
     case FE_TILE:
-      return new KCanvasFETileQuartz();
+      return new SVGFETile();
     //  case FE_TURBULENCE:
     default:
       return 0;

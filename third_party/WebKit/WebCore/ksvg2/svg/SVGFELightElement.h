@@ -23,8 +23,8 @@
 #define KSVG_SVGFELightElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
 #include "SVGElement.h"
+#include "SVGLightSource.h"
 
 namespace WebCore {
 class SVGNumberList;
@@ -35,7 +35,7 @@ class SVGFELightElement : public SVGElement {
   virtual ~SVGFELightElement();
 
   // 'SVGComponentTransferFunctionElement' functions
-  virtual KCLightSource* lightSource() const = 0;
+  virtual SVGLightSource* lightSource() const = 0;
 
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);

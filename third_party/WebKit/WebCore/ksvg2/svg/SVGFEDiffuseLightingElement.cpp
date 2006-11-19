@@ -24,13 +24,13 @@
 #include "SVGFEDiffuseLightingElement.h"
 
 #include "Attr.h"
-#include "KCanvasFilters.h"
 #include "KRenderingDevice.h"
 #include "SVGColor.h"
 #include "SVGFELightElement.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
+#include "SVGFEDiffuseLighting.h"
 
 namespace WebCore {
 
@@ -119,9 +119,9 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
 }
 
-KCanvasFilterEffect* SVGFEDiffuseLightingElement::filterEffect() const {
+SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect() const {
   if (!m_filterEffect)
-    m_filterEffect = static_cast<KCanvasFEDiffuseLighting*>(
+    m_filterEffect = static_cast<SVGFEDiffuseLighting*>(
         renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
   m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
@@ -138,7 +138,7 @@ void SVGFEDiffuseLightingElement::updateLights() const {
   if (!m_filterEffect)
     return;
 
-  KCLightSource* light = 0;
+  SVGLightSource* light = 0;
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feDistantLightTag) ||
         n->hasTagName(SVGNames::fePointLightTag) ||

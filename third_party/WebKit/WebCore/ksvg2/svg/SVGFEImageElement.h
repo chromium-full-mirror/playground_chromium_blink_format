@@ -28,7 +28,7 @@
 #include "SVGURIReference.h"
 #include "SVGLangSpace.h"
 #include "SVGExternalResourcesRequired.h"
-#include "KCanvasFilters.h"
+#include "SVGFEImage.h"
 
 namespace WebCore {
 class SVGPreserveAspectRatio;
@@ -47,7 +47,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void notifyFinished(CachedResource* finishedObj);
 
  protected:
-  virtual KCanvasFEImage* filterEffect() const;
+  virtual SVGFEImage* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -66,7 +66,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  preserveAspectRatio)
 
   CachedImage* m_cachedImage;
-  mutable KCanvasFEImage* m_filterEffect;
+  mutable SVGFEImage* m_filterEffect;
 };
 
 }  // namespace WebCore

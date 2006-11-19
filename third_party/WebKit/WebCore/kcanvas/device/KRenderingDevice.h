@@ -22,9 +22,10 @@
 
 #ifndef KRenderingDevice_H
 #define KRenderingDevice_H
+
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGFilterEffect.h"
 #include "KRenderingPaintServer.h"
 
 namespace WebCore {
@@ -49,7 +50,7 @@ class KRenderingDeviceContext {
 };
 
 class SVGResourceImage;
-class KCanvasFilterEffect;
+class SVGResourceFilterEffect;
 class KRenderingDevice {
  public:
   KRenderingDevice();
@@ -70,8 +71,8 @@ class KRenderingDevice {
   // Creation tools
   virtual PassRefPtr<SVGResource> createResource(
       const SVGResourceType&) const = 0;
-  virtual KCanvasFilterEffect* createFilterEffect(
-      const KCFilterEffectType&) const = 0;
+  virtual SVGFilterEffect* createFilterEffect(
+      const SVGFilterEffectType&) const = 0;
   virtual PassRefPtr<KRenderingPaintServer> createPaintServer(
       const KCPaintServerType&) const = 0;
 

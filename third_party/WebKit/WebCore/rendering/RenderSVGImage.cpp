@@ -27,6 +27,7 @@
 #include "Attr.h"
 #include "GraphicsContext.h"
 #include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
 #include "SVGResourceMasker.h"
 #include "KRenderingDevice.h"
 #include "SVGLength.h"
@@ -155,7 +156,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
           getMaskerById(document(), svgStyle->maskElement().substring(1)))
     masker->applyMask(boundingBox);
 
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), svgStyle->filter().substring(1));
   if (filter)
     filter->prepareFilter(boundingBox);
@@ -270,7 +271,7 @@ IntRect RenderSVGImage::getAbsoluteRepaintRect() {
       FloatRect(image->x()->value(), image->y()->value(), width(), height()));
 
   // Filters can expand the bounding box
-  KCanvasFilter* filter =
+  SVGResourceFilter* filter =
       getFilterById(document(), style()->svgStyle()->filter().substring(1));
   if (filter)
     repaintRect.unite(filter->filterBBoxForItemBBox(repaintRect));

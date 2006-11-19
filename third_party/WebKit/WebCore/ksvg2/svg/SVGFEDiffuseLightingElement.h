@@ -26,7 +26,7 @@
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
-class KCanvasFEDiffuseLighting;
+class SVGFEDiffuseLighting;
 class SVGColor;
 
 class SVGFEDiffuseLightingElement
@@ -39,7 +39,7 @@ class SVGFEDiffuseLightingElement
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFilterEffect* filterEffect() const;
+  virtual SVGFilterEffect* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -76,7 +76,7 @@ class SVGFEDiffuseLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
   // need other properties here...
-  mutable KCanvasFEDiffuseLighting* m_filterEffect;
+  mutable SVGFEDiffuseLighting* m_filterEffect;
 
   // light management
   void updateLights() const;

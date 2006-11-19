@@ -24,7 +24,7 @@
 #define KSVG_SVGFEColorMatrixElementImpl_H
 #ifdef SVG_SUPPORT
 
-#include "KCanvasFilters.h"
+#include "SVGFEColorMatrix.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 namespace WebCore {
@@ -32,14 +32,6 @@ class SVGNumberList;
 
 class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
  public:
-  enum SVGColorMatrixType {
-    SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0,
-    SVG_FECOLORMATRIX_TYPE_MATRIX = 1,
-    SVG_FECOLORMATRIX_TYPE_SATURATE = 2,
-    SVG_FECOLORMATRIX_TYPE_HUEROTATE = 3,
-    SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4
-  };
-
   SVGFEColorMatrixElement(const QualifiedName&, Document*);
   virtual ~SVGFEColorMatrixElement();
 
@@ -47,7 +39,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFEColorMatrix* filterEffect() const;
+  virtual SVGFEColorMatrix* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
@@ -64,7 +56,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
                                  RefPtr<SVGNumberList>,
                                  Values,
                                  values)
-  mutable KCanvasFEColorMatrix* m_filterEffect;
+  mutable SVGFEColorMatrix* m_filterEffect;
 };
 
 }  // namespace WebCore

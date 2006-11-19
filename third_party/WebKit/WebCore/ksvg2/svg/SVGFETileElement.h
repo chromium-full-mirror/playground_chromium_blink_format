@@ -25,7 +25,7 @@
 #ifdef SVG_SUPPORT
 
 #include "SVGFilterPrimitiveStandardAttributes.h"
-#include "KCanvasFilters.h"
+#include "SVGFETile.h"
 
 namespace WebCore {
 
@@ -38,14 +38,14 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
   // Derived from: 'Element'
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
-  virtual KCanvasFETile* filterEffect() const;
+  virtual SVGFETile* filterEffect() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement, String, String, In1, in1)
-  mutable KCanvasFETile* m_filterEffect;
+  mutable SVGFETile* m_filterEffect;
 };
 
 }  // namespace WebCore
