@@ -264,7 +264,20 @@ void ResourceHandleManager::add(ResourceHandle* resource,
 
 void ResourceHandleManager::cancel(ResourceHandle* job) {
   remove(job);
-  job->setError(1);
+  // FIXME set an error state
+  // job->setError(1);
+}
+
+void ResourceHandleManager::slotData(KIO::Job*, const QByteArray& data) {
+  // dummy, never called in a Qt-only build
+}
+
+void ResourceHandleManager::slotMimetype(KIO::Job*, const QString& type) {
+  // dummy, never called in a Qt-only build
+}
+
+void ResourceHandleManager::slotResult(KJob*) {
+  // dummy, never called in a Qt-only build
 }
 
 void ResourceHandleManager::deliverJobData(QtJob* job, const QByteArray& data) {
@@ -278,7 +291,8 @@ void ResourceHandleManager::deliverJobData(QtJob* job, const QByteArray& data) {
 
   d->m_client->didReceiveData(handle, data.data(), data.size());
 
-  handle->setError(0);
+  // FIXME: should report an error
+  // handle->setError(0);
   remove(handle);
 
   ASSERT(m_frameClient);
