@@ -150,7 +150,7 @@ class Lexer {
 
   // current and following unicode characters (int to allow for -1 for
   // end-of-file marker)
-  int current, next1, next2, next3, next4;
+  int current, next1, next2, next3;
 
   UString** strings;
   unsigned int numStrings;
