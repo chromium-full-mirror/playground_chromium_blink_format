@@ -42,6 +42,12 @@ class WebContextMenuClient : public WebCore::ContextMenuClient,
 
   virtual void addCustomContextMenuItems(WebCore::ContextMenu* menu);
 
+  virtual void copyLinkToClipboard(WebCore::HitTestResult);
+  virtual void downloadURL(WebCore::KURL url);
+  virtual void copyImageToClipboard(WebCore::HitTestResult);
+  virtual void searchWithSpotlight();
+  virtual void lookUpInDictionary(WebCore::Frame*);
+
   WebView* webView() { return m_webView; }
 
  private:

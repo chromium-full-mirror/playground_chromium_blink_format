@@ -41,6 +41,14 @@ namespace WebCore {
   static ContextMenuItem action##Item(ActionType, ContextMenuItemTag##action, \
                                       String(title))
 
+ContextMenuController* ContextMenu::controller() const {
+  if (Node* node = m_hitTestResult.innerNonSharedNode())
+    if (Frame* frame = node->document()->frame())
+      if (Page* page = frame->page())
+        return page->contextMenuController();
+  return 0;
+}
+
 void ContextMenu::populate() {
   MENU_ACTION_ITEM(OpenLinkInNewWindow, "Open Link in New Window");
   MENU_ACTION_ITEM(DownloadLinkToDisk, "Download Linked File");

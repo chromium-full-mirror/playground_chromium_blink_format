@@ -43,6 +43,8 @@ class QMenu;
 
 namespace WebCore {
 
+class ContextMenuController;
+
 // This enum needs to be in sync with WebMenuItemTag, which is defined in
 // WebUIDelegate.h
 enum ContextMenuAction {
@@ -117,9 +119,8 @@ class ContextMenu : Noncopyable {
 
   void populate();
 
-  // FIXME: Implement these
-  void show() {}
-  void hide() {}
+  void show();
+  void hide();
 
   void insertItem(unsigned position, ContextMenuItem);
   void appendItem(ContextMenuItem item);
@@ -127,6 +128,7 @@ class ContextMenu : Noncopyable {
   unsigned itemCount();
 
   HitTestResult hitTestResult() const { return m_hitTestResult; }
+  ContextMenuController* controller() const;
 
   PlatformMenuDescription platformMenuDescription() { return m_menu; }
   void setPlatformMenuDescription(PlatformMenuDescription menu);
