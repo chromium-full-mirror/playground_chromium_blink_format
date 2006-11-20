@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2000 Peter Kelly (pmk@post.com)
  * Copyright (C) 2005, 2006 Apple Computer, Inc.
- * Copyright (C) 2006 Alexey Proskuryakov
+ * Copyright (C) 2006 Alexey Proskuryakov (ap@webkit.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -113,6 +113,9 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   void processingInstruction(const xmlChar* target, const xmlChar* data);
   void cdataBlock(const xmlChar* s, int len);
   void comment(const xmlChar* s);
+  void startDocument(const xmlChar* version,
+                     const xmlChar* encoding,
+                     int standalone);
   void internalSubset(const xmlChar* name,
                       const xmlChar* externalID,
                       const xmlChar* systemID);
@@ -1031,6 +1034,19 @@ void XMLTokenizer::comment(const xmlChar* s) {
     newNode->attach();
 }
 
+void XMLTokenizer::startDocument(const xmlChar* version,
+                                 const xmlChar* encoding,
+                                 int standalone) {
+  ExceptionCode ec = 0;
+
+  if (version)
+    m_doc->setXMLVersion(toString(version), ec);
+  m_doc->setXMLStandalone(standalone == 1,
+                          ec);  // possible values are 0, 1, and -1
+  if (encoding)
+    m_doc->setXMLEncoding(toString(encoding));
+}
+
 void XMLTokenizer::internalSubset(const xmlChar* name,
                                   const xmlChar* externalID,
                                   const xmlChar* systemID) {
@@ -1193,6 +1209,13 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
   return ent;
 }
 
+static void startDocumentHandler(void* closure) {
+  xmlParserCtxt* ctxt = static_cast<xmlParserCtxt*>(closure);
+  getTokenizer(closure)->startDocument(ctxt->version, ctxt->encoding,
+                                       ctxt->standalone);
+  xmlSAX2StartDocument(closure);
+}
+
 static void internalSubsetHandler(void* closure,
                                   const xmlChar* name,
                                   const xmlChar* externalID,
@@ -1237,7 +1260,7 @@ void XMLTokenizer::initializeParserContext() {
   sax.startElementNs = startElementNsHandler;
   sax.endElementNs = endElementNsHandler;
   sax.getEntity = getEntityHandler;
-  sax.startDocument = xmlSAX2StartDocument;
+  sax.startDocument = startDocumentHandler;
   sax.internalSubset = internalSubsetHandler;
   sax.externalSubset = externalSubsetHandler;
   sax.ignorableWhitespace = ignorableWhitespaceHandler;
