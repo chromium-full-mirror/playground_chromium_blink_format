@@ -25,8 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EditorClientWin_H
-#define EditorClientWin_H
+#ifndef EditorClientWin_h
+#define EditorClientWin_h
 
 #include "EditorClient.h"
 
@@ -51,6 +51,7 @@ class EditorClientWin : public EditorClient, public Shared<EditorClientWin> {
 
   virtual bool shouldBeginEditing(Range*);
   virtual bool shouldEndEditing(Range*);
+  virtual bool shouldInsertText(String, Range*, EditorInsertAction);
   virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
 
   virtual void didBeginEditing();
@@ -67,6 +68,7 @@ class EditorClientWin : public EditorClient, public Shared<EditorClientWin> {
   virtual void undo();
   virtual void redo();
 };
-}
 
-#endif  // EditorClientWin_H
+}  // namespace WebCore
+
+#endif  // EditorClientWin_h

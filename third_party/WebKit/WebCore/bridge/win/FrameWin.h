@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FrameWin_H
-#define FrameWin_H
+#ifndef FrameWin_h
+#define FrameWin_h
 
 #include "Frame.h"
 
@@ -84,6 +84,8 @@ class FrameWin : public Frame {
 
   virtual String mimeTypeForFileName(const String&) const;
 
+  virtual void ignoreSpelling();
+  virtual void learnSpelling();
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&);
   virtual void markMisspellings(const Selection&);
 
@@ -128,6 +130,7 @@ class FrameWin : public Frame {
 
  private:
   virtual bool passMouseDownEventToWidget(Widget*);
+
   FrameWinClient* m_client;
 };
 
@@ -140,4 +143,4 @@ inline const FrameWin* Win(const Frame* frame) {
 
 }  // namespace WebCore
 
-#endif
+#endif  // FrameWin_h

@@ -305,8 +305,23 @@ void ChromeClientWin::setResizable(bool) {
 void ContextMenu::appendItem(ContextMenuItem item) {
   notImplemented();
 }
+void ContextMenu::show() {
+  notImplemented();
+}
 
 void ContextMenuClientWin::addCustomContextMenuItems(ContextMenu*) {
+  notImplemented();
+}
+void ContextMenuClientWin::copyLinkToClipboard(HitTestResult) {
+  notImplemented();
+}
+void ContextMenuClientWin::downloadURL(KURL) {
+  notImplemented();
+}
+void ContextMenuClientWin::copyImageToClipboard(HitTestResult) {
+  notImplemented();
+}
+void ContextMenuClientWin::lookUpInDictionary(Frame*) {
   notImplemented();
 }
 
@@ -378,6 +393,10 @@ bool EditorClientWin::shouldBeginEditing(Range*) {
   return false;
 }
 bool EditorClientWin::shouldEndEditing(Range*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldInsertText(String, Range*, EditorInsertAction) {
   notImplemented();
   return false;
 }
@@ -588,6 +607,9 @@ void FrameLoader::detachFromParent() {
   notImplemented();
 }
 void FrameLoader::checkLoadCompleteForThisFrame() {
+  notImplemented();
+}
+void FrameLoader::reload() {
   notImplemented();
 }
 
@@ -976,6 +998,12 @@ void FrameWin::markMisspellingsInAdjacentWords(VisiblePosition const&) {
   notImplemented();
 }
 void FrameWin::respondToChangedContents(const Selection&) {
+  notImplemented();
+}
+void FrameWin::ignoreSpelling() {
+  notImplemented();
+}
+void FrameWin::learnSpelling() {
   notImplemented();
 }
 
