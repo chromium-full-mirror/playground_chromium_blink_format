@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include "Node.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "Font.h"
 #include "IntPoint.h"
 #include "Widget.h"
@@ -316,6 +317,10 @@ void WebCore::setFocusRingColorChangeFunction(void (*)()) {
 }
 
 void FrameView::updateBorder() {
+  notImplemented();
+}
+
+void FrameLoader::reload() {
   notImplemented();
 }
 

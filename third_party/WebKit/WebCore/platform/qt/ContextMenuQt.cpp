@@ -26,16 +26,23 @@
 #include "config.h"
 #include "ContextMenu.h"
 
+#include <wtf/Assertions.h>
+
 #include <QMenu>
 #include <QAction>
 
 namespace WebCore {
 
 void ContextMenu::appendItem(ContextMenuItem item) {
-  if (!m_menu) {
+  if (!m_menu)
     m_menu = new QMenu();
-  }
+
   QAction* action = m_menu->addAction(item.title);
+}
+
+void ContextMenu::show() {
+  ASSERT(m_menu);
+  m_menu->exec();
 }
 
 unsigned ContextMenu::itemCount() {

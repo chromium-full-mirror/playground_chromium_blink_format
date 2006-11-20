@@ -22,9 +22,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
 #include "ContextMenuClientQt.h"
 
+#include "HitTestResult.h"
+#include "KURL.h"
 #include "Shared.h"
 
 #include <stdio.h>
@@ -37,15 +40,31 @@
 
 namespace WebCore {
 
-void ContextMenuClientQt::addCustomContextMenuItems(ContextMenu*) {
-  notImplemented();
-}
-
 void ContextMenuClientQt::ref() {
   Shared<ContextMenuClientQt>::ref();
 }
 
 void ContextMenuClientQt::deref() {
   Shared<ContextMenuClientQt>::deref();
+}
+
+void ContextMenuClientQt::addCustomContextMenuItems(ContextMenu*) {
+  notImplemented();
+}
+
+void ContextMenuClientQt::copyLinkToClipboard(HitTestResult) {
+  notImplemented();
+}
+
+void ContextMenuClientQt::downloadURL(KURL) {
+  notImplemented();
+}
+
+void ContextMenuClientQt::copyImageToClipboard(HitTestResult) {
+  notImplemented();
+}
+
+void ContextMenuClientQt::lookUpInDictionary(Frame*) {
+  notImplemented();
 }
 }

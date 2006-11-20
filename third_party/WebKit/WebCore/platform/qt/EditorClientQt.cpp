@@ -84,6 +84,11 @@ bool EditorClientQt::shouldEndEditing(WebCore::Range*) {
   return false;
 }
 
+bool EditorClientQt::shouldInsertText(String, Range*, EditorInsertAction) {
+  notImplemented();
+  return false;
+}
+
 bool EditorClientQt::shouldApplyStyle(WebCore::CSSStyleDeclaration*,
                                       WebCore::Range*) {
   notImplemented();
