@@ -125,6 +125,8 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
                    int lineNumber,
                    int columnNumber);
 
+  virtual bool wellFormed() const { return !m_sawError; }
+
  private:
   void initializeParserContext();
   void setCurrentNode(Node*);

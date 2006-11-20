@@ -366,6 +366,8 @@ class Document : public ContainerNode {
   void finishParsing();
   void clear();
 
+  bool wellFormed() const { return m_wellFormed; }
+
   DeprecatedString URL() const {
     return m_url.isEmpty() ? "about:blank" : m_url;
   }
@@ -722,6 +724,7 @@ class Document : public ContainerNode {
 
   DocLoader* m_docLoader;
   Tokenizer* m_tokenizer;
+  bool m_wellFormed;
   DeprecatedString m_url;
   DeprecatedString m_baseURL;
   String m_baseTarget;
