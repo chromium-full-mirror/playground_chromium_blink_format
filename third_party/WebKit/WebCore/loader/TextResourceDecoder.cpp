@@ -292,7 +292,7 @@ void TextResourceDecoder::setEncoding(const TextEncoding& encoding,
 }
 
 // Returns the position of the encoding string.
-static int findXMLEncoding(const DeprecatedCString& str, int& encodingLength) {
+static int findXMLEncoding(const CString& str, int& encodingLength) {
   int len = str.length();
 
   int pos = str.find("encoding");
