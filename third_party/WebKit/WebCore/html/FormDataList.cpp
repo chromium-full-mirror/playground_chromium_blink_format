@@ -27,8 +27,6 @@
 #include "config.h"
 #include "FormDataList.h"
 
-#include "DeprecatedCString.h"
-
 namespace WebCore {
 
 FormDataList::FormDataList(const TextEncoding& c) : m_encoding(c) {}
@@ -38,7 +36,7 @@ void FormDataList::appendString(const CString& s) {
 }
 
 // Change plain CR and plain LF to CRLF pairs.
-static DeprecatedCString fixLineBreaks(const DeprecatedCString& s) {
+static CString fixLineBreaks(const CString& s) {
   // Compute the length.
   unsigned newLen = 0;
   const char* p = s.data();
@@ -63,8 +61,8 @@ static DeprecatedCString fixLineBreaks(const DeprecatedCString& s) {
 
   // Make a copy of the string.
   p = s.data();
-  DeprecatedCString result(newLen + 1);
-  char* q = result.data();
+  char* q;
+  CString result = CString::newUninitialized(newLen, q);
   while (char c = *p++) {
     if (c == '\r') {
       // Safe to look ahead because of trailing '\0'.
@@ -86,10 +84,9 @@ static DeprecatedCString fixLineBreaks(const DeprecatedCString& s) {
 }
 
 void FormDataList::appendString(const String& s) {
-  DeprecatedCString cstr = fixLineBreaks(
-      m_encoding.encode(s.characters(), s.length(), true).deprecatedCString());
-  cstr.truncate(cstr.length());
-  m_list.append(CString(cstr));
+  CString cstr =
+      fixLineBreaks(m_encoding.encode(s.characters(), s.length(), true));
+  m_list.append(cstr);
 }
 
 void FormDataList::appendFile(const String& key, const String& filename) {
