@@ -148,6 +148,10 @@ bool IsResponseURLEqualToURL(PlatformResponse, const String&) {
   notImplemented();
   return false;
 }
+const Cursor& aliasCursor() {
+  notImplemented();
+  return localCursor;
+}
 const Cursor& cellCursor() {
   notImplemented();
   return localCursor;
@@ -157,6 +161,14 @@ const Cursor& contextMenuCursor() {
   return localCursor;
 }
 const Cursor& moveCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& noDropCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& progressCursor() {
   notImplemented();
   return localCursor;
 }
