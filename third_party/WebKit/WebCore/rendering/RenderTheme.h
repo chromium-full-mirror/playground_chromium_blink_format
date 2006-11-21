@@ -151,7 +151,6 @@ class RenderTheme {
 
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
- protected:
   // Methods for state querying
   bool isChecked(const RenderObject*) const;
   bool isIndeterminate(const RenderObject*) const;
@@ -161,6 +160,7 @@ class RenderTheme {
   bool isHovered(const RenderObject*) const;
   bool isReadOnlyControl(const RenderObject*) const;
 
+ protected:
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(CSSStyleSelector*,
                                    RenderStyle*,
