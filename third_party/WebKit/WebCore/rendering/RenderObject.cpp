@@ -1508,6 +1508,7 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
     if (renderRadii) {
       int leftX = tx;
       int leftY = ty + h - bottomLeft.height() * 2;
+      int rightY = ty + h - bottomRight.height() * 2;
       int rightX = tx + w - bottomRight.width() * 2;
       secondAngleStart = 270;
       secondAngleSpan = upperRightBorderStylesMatch ? 90 : 45;
@@ -1547,13 +1548,13 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
       if (applyRightInnerClip) {
         graphicsContext->save();
         graphicsContext->addInnerRoundedRectClip(
-            IntRect(rightX, leftY, bottomRight.width() * 2,
+            IntRect(rightX, rightY, bottomRight.width() * 2,
                     bottomRight.height() * 2),
             style->borderBottomWidth());
       }
 
       // Draw lower right arc
-      drawBorderArc(graphicsContext, rightX, leftY, thickness, bottomRight,
+      drawBorderArc(graphicsContext, rightX, rightY, thickness, bottomRight,
                     secondAngleStart, secondAngleSpan, BSBottom, bc,
                     style->color(), bs, false);
       if (applyRightInnerClip)
@@ -1659,6 +1660,7 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
         (!upperRightBorderStylesMatch || !lowerRightBorderStylesMatch)) {
       int topX = tx + w - topRight.width() * 2;
       int topY = ty;
+      int bottomX = tx + w - bottomRight.width() * 2;
       int bottomY = ty + h - bottomRight.height() * 2;
       firstAngleStart = 0;
       secondAngleStart = 315;
@@ -1689,13 +1691,13 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
       if (applyBottomInnerClip) {
         graphicsContext->save();
         graphicsContext->addInnerRoundedRectClip(
-            IntRect(topX, bottomY, bottomRight.width() * 2,
+            IntRect(bottomX, bottomY, bottomRight.width() * 2,
                     bottomRight.height() * 2),
             style->borderRightWidth());
       }
 
       // Draw bottom right arc
-      drawBorderArc(graphicsContext, topX, bottomY, thickness, bottomRight,
+      drawBorderArc(graphicsContext, bottomX, bottomY, thickness, bottomRight,
                     secondAngleStart, secondAngleSpan, BSRight, rc,
                     style->color(), rs, false);
       if (applyBottomInnerClip)
