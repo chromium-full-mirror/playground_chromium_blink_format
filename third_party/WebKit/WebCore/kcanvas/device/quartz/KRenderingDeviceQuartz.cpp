@@ -47,7 +47,10 @@
 #include "SVGResourceImage.h"
 #include "SVGResourceMarker.h"
 #include "SVGResourceMasker.h"
-#include "KRenderingPaintServerQuartz.h"
+#include "SVGPaintServerSolid.h"
+#include "SVGPaintServerLinearGradient.h"
+#include "SVGPaintServerRadialGradient.h"
+#include "SVGPaintServerPattern.h"
 #include "Logging.h"
 #include "QuartzSupport.h"
 #include "RenderView.h"
@@ -139,21 +142,21 @@ KRenderingDeviceContext* KRenderingDeviceQuartz::contextForImage(
 #pragma mark -
 #pragma mark Resource Creation
 
-PassRefPtr<KRenderingPaintServer> KRenderingDeviceQuartz::createPaintServer(
-    const KCPaintServerType& type) const {
-  KRenderingPaintServer* newServer = NULL;
+PassRefPtr<SVGPaintServer> KRenderingDeviceQuartz::createPaintServer(
+    const SVGPaintServerType& type) const {
+  SVGPaintServer* newServer = NULL;
   switch (type) {
     case PS_SOLID:
-      newServer = new KRenderingPaintServerSolidQuartz();
+      newServer = new SVGPaintServerSolid();
       break;
     case PS_PATTERN:
-      newServer = new KRenderingPaintServerPatternQuartz();
+      newServer = new SVGPaintServerPattern();
       break;
     case PS_LINEAR_GRADIENT:
-      newServer = new KRenderingPaintServerLinearGradientQuartz();
+      newServer = new SVGPaintServerLinearGradient();
       break;
     case PS_RADIAL_GRADIENT:
-      newServer = new KRenderingPaintServerRadialGradientQuartz();
+      newServer = new SVGPaintServerRadialGradient();
       break;
   }
   return newServer;

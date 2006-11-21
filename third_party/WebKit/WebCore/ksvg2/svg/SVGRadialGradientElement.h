@@ -37,8 +37,8 @@ class SVGRadialGradientElement : public SVGGradientElement {
   virtual void parseMappedAttribute(MappedAttribute*);
 
  protected:
-  virtual void buildGradient(PassRefPtr<KRenderingPaintServerGradient>) const;
-  virtual KCPaintServerType gradientType() const { return PS_RADIAL_GRADIENT; }
+  virtual void buildGradient(PassRefPtr<SVGPaintServerGradient>) const;
+  virtual SVGPaintServerType gradientType() const { return PS_RADIAL_GRADIENT; }
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

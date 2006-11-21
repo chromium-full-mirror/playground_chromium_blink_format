@@ -68,8 +68,8 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
 
   // Resource creation
   virtual PassRefPtr<SVGResource> createResource(const SVGResourceType&) const;
-  virtual PassRefPtr<KRenderingPaintServer> createPaintServer(
-      const KCPaintServerType&) const;
+  virtual PassRefPtr<SVGPaintServer> createPaintServer(
+      const SVGPaintServerType&) const;
   virtual SVGFilterEffect* createFilterEffect(const SVGFilterEffectType&) const;
 
   // filters (mostly debugging)

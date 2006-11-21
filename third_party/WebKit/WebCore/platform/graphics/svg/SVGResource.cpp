@@ -24,11 +24,10 @@
  */
 
 #include "config.h"
-#include "SVGResource.h"
 
 #ifdef SVG_SUPPORT
+#include "SVGResource.h"
 
-#include "KRenderingPaintServer.h"
 #include "RenderPath.h"
 #include "SVGElement.h"
 #include "SVGStyledElement.h"
@@ -81,15 +80,6 @@ SVGResource* getResourceById(Document* document, const AtomicString& id) {
 
   if (svgElement && svgElement->isStyled())
     return static_cast<SVGStyledElement*>(svgElement)->canvasResource();
-
-  return 0;
-}
-
-KRenderingPaintServer* getPaintServerById(Document* document,
-                                          const AtomicString& id) {
-  SVGResource* resource = getResourceById(document, id);
-  if (resource && resource->isPaintServer())
-    return static_cast<KRenderingPaintServer*>(resource);
 
   return 0;
 }
