@@ -187,7 +187,7 @@ void SVGPatternElement::fillAttributesFromReferencePattern(
   DeprecatedString ref = href().deprecatedString();
   RefPtr<SVGPaintServer> refServer = getPaintServerById(document(), ref.mid(1));
 
-  if (!refServer || refServer->type() != PS_PATTERN)
+  if (!refServer || refServer->type() != PatternPaintServer)
     return;
 
   RefPtr<SVGPaintServerPattern> refPattern =
@@ -393,7 +393,8 @@ RenderObject* SVGPatternElement::createRenderer(RenderArena* arena,
 SVGResource* SVGPatternElement::canvasResource() {
   if (!m_paintServer) {
     m_paintServer = WTF::static_pointer_cast<SVGPaintServerPattern>(
-        renderingDevice()->createPaintServer(SVGPaintServerType(PS_PATTERN)));
+        renderingDevice()->createPaintServer(
+            SVGPaintServerType(PatternPaintServer)));
     m_paintServer->setListener(const_cast<SVGPatternElement*>(this));
   }
   return m_paintServer.get();

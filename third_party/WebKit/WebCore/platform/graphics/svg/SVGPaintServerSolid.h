@@ -38,14 +38,14 @@ class SVGPaintServerSolid : public SVGPaintServer {
   SVGPaintServerSolid();
   virtual ~SVGPaintServerSolid();
 
-  virtual SVGPaintServerType type() const { return PS_SOLID; }
+  virtual SVGPaintServerType type() const { return SolidPaintServer; }
 
   Color color() const;
   void setColor(const Color&);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
-#if PLATFORM(MAC) || PLATFORM(QT)
+#if PLATFORM(CG) || PLATFORM(QT)
   virtual bool setup(KRenderingDeviceContext*,
                      const RenderObject*,
                      SVGPaintTargetType) const;

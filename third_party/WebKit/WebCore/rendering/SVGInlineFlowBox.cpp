@@ -116,9 +116,9 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
       KSVGPainterFactory::fillPaintServer(object->style(), object);
   if (fillPaintServer) {
     fillPaintServer->setPaintingText(true);
-    if (fillPaintServer->setup(context, object, APPLY_TO_FILL)) {
+    if (fillPaintServer->setup(context, object, ApplyToFillTargetType)) {
       flow->InlineFlowBox::paint(pi, tx, ty);
-      fillPaintServer->teardown(context, object, APPLY_TO_FILL);
+      fillPaintServer->teardown(context, object, ApplyToFillTargetType);
     }
     fillPaintServer->setPaintingText(false);
   }
@@ -126,9 +126,9 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
       KSVGPainterFactory::strokePaintServer(object->style(), object);
   if (strokePaintServer) {
     strokePaintServer->setPaintingText(true);
-    if (strokePaintServer->setup(context, object, APPLY_TO_STROKE)) {
+    if (strokePaintServer->setup(context, object, ApplyToStrokeTargetType)) {
       flow->InlineFlowBox::paint(pi, tx, ty);
-      strokePaintServer->teardown(context, object, APPLY_TO_STROKE);
+      strokePaintServer->teardown(context, object, ApplyToStrokeTargetType);
     }
     strokePaintServer->setPaintingText(false);
   }

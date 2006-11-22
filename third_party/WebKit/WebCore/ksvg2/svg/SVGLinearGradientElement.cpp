@@ -122,9 +122,9 @@ void SVGLinearGradientElement::buildGradient(
   DeprecatedString ref = href().deprecatedString();
   RefPtr<SVGPaintServer> pserver = getPaintServerById(document(), ref.mid(1));
 
-  if (pserver && (pserver->type() == PS_RADIAL_GRADIENT ||
-                  pserver->type() == PS_LINEAR_GRADIENT)) {
-    bool isLinear = pserver->type() == PS_LINEAR_GRADIENT;
+  if (pserver && (pserver->type() == RadialGradientPaintServer ||
+                  pserver->type() == LinearGradientPaintServer)) {
+    bool isLinear = pserver->type() == LinearGradientPaintServer;
     SVGPaintServerGradient* gradient =
         static_cast<SVGPaintServerGradient*>(pserver.get());
 

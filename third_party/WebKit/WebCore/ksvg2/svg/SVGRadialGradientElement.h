@@ -38,7 +38,9 @@ class SVGRadialGradientElement : public SVGGradientElement {
 
  protected:
   virtual void buildGradient(PassRefPtr<SVGPaintServerGradient>) const;
-  virtual SVGPaintServerType gradientType() const { return PS_RADIAL_GRADIENT; }
+  virtual SVGPaintServerType gradientType() const {
+    return RadialGradientPaintServer;
+  }
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

@@ -32,7 +32,7 @@
 #include "Color.h"
 #include "SVGPaintServer.h"
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
 #include "SVGResourceImage.h"
 #endif
 
@@ -77,7 +77,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
   virtual void teardown(KRenderingDeviceContext*,
                         const RenderObject*,
                         SVGPaintTargetType) const;
@@ -111,7 +111,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
   AffineTransform m_gradientTransform;
   SVGResourceListener* m_listener;
 
-#if PLATFORM(MAC)
+#if PLATFORM(CG)
  public:
   typedef struct {
     CGFloat colorArray[4];

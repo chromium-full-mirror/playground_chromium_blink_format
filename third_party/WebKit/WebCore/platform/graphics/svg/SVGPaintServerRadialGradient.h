@@ -38,7 +38,7 @@ class SVGPaintServerRadialGradient : public SVGPaintServerGradient {
   SVGPaintServerRadialGradient();
   virtual ~SVGPaintServerRadialGradient();
 
-  virtual SVGPaintServerType type() const { return PS_RADIAL_GRADIENT; }
+  virtual SVGPaintServerType type() const { return RadialGradientPaintServer; }
 
   FloatPoint gradientCenter() const;
   void setGradientCenter(const FloatPoint&);

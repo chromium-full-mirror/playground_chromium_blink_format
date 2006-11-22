@@ -45,7 +45,7 @@ bool SVGPaintServerSolid::setup(KRenderingDeviceContext* context,
                                       // GraphicsContext, or some other central
                                       // location
 
-  if ((type & APPLY_TO_FILL) && style->svgStyle()->hasFill()) {
+  if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     CGFloat colorComponents[4];
     color().getRGBA(colorComponents[0], colorComponents[1], colorComponents[2],
                     colorComponents[3]);
@@ -61,7 +61,7 @@ bool SVGPaintServerSolid::setup(KRenderingDeviceContext* context,
     }
   }
 
-  if ((type & APPLY_TO_STROKE) && style->svgStyle()->hasStroke()) {
+  if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
     CGFloat colorComponents[4];
     color().getRGBA(colorComponents[0], colorComponents[1], colorComponents[2],
                     colorComponents[3]);

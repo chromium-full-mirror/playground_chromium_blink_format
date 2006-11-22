@@ -169,7 +169,7 @@ SVGResource* SVGFilterElement::canvasResource() {
 
   if (!m_filter)
     m_filter = WTF::static_pointer_cast<SVGResourceFilter>(
-        renderingDevice()->createResource(RS_FILTER));
+        renderingDevice()->createResource(FilterResourceType));
 
   bool filterBBoxMode =
       filterUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
