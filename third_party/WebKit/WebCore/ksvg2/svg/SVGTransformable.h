@@ -44,6 +44,8 @@ class SVGTransformable : public SVGLocatable {
 
   static void parseTransformAttribute(SVGTransformList*,
                                       const AtomicString& transform);
+  SVGMatrix* getCTM(const SVGElement*) const;
+  SVGMatrix* getScreenCTM(const SVGElement*) const;
 };
 
 }  // namespace WebCore
