@@ -111,7 +111,7 @@ bool SVGPaintServerRadialGradient::setup(KRenderingDeviceContext* context,
   // gradientTrans.map(cx, cy, &cx, &cy);
   // qtContext->painter().setMatrix(mat);
 
-  if ((type & APPLY_TO_FILL) && renderStyle->svgStyle()->hasFill()) {
+  if ((type & ApplyToFillTargetType) && renderStyle->svgStyle()->hasFill()) {
     fillColorArray(gradient, gradientStops(), opacity);
 
     QBrush brush(gradient);
@@ -120,7 +120,8 @@ bool SVGPaintServerRadialGradient::setup(KRenderingDeviceContext* context,
     qtContext->setFillRule(renderStyle->svgStyle()->fillRule());
   }
 
-  if ((type & APPLY_TO_STROKE) && renderStyle->svgStyle()->hasStroke()) {
+  if ((type & ApplyToStrokeTargetType) &&
+      renderStyle->svgStyle()->hasStroke()) {
     fillColorArray(gradient, gradientStops(), opacity);
 
     QPen pen;

@@ -93,10 +93,10 @@ void SVGPaintServer::renderPath(KRenderingDeviceContext* context,
   KRenderingDeviceContextQt* qtContext =
       static_cast<KRenderingDeviceContextQt*>(context);
 
-  if ((type & APPLY_TO_FILL) && renderStyle->svgStyle()->hasFill())
+  if ((type & ApplyToFillTargetType) && renderStyle->svgStyle()->hasFill())
     qtContext->fillPath();
 
-  if ((type & APPLY_TO_STROKE) && renderStyle->svgStyle()->hasStroke())
+  if ((type & ApplyToStrokeTargetType) && renderStyle->svgStyle()->hasStroke())
     qtContext->strokePath();
 }
 
