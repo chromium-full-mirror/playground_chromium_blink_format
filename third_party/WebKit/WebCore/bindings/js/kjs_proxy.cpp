@@ -21,11 +21,13 @@
 #include "config.h"
 #include "kjs_proxy.h"
 
+#include "Chrome.h"
 #include "kjs_events.h"
 #include "kjs_window.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "JSDOMWindow.h"
+#include "Page.h"
 
 #ifdef SVG_SUPPORT
 #include "JSSVGLazyEventListener.h"
@@ -85,7 +87,8 @@ JSValue* KJSProxy::evaluate(const String& filename,
                             ->toObject(m_script->globalExec())
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
-    m_frame->addMessageToConsole(errorMessage, lineNumber, sourceURL);
+    m_frame->page()->chrome()->addMessageToConsole(errorMessage, lineNumber,
+                                                   sourceURL);
   }
 
   return 0;

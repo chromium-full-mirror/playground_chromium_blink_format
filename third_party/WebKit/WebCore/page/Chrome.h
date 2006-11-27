@@ -30,6 +30,7 @@ class ChromeClient;
 class ContextMenu;
 class FloatRect;
 class Page;
+class String;
 struct FrameLoadRequest;
 
 class Chrome {
@@ -69,6 +70,10 @@ class Chrome {
   bool menubarVisible() const;
 
   void setResizable(bool) const;
+
+  void addMessageToConsole(const String& message,
+                           unsigned int lineNumber,
+                           const String& sourceID);
 
  private:
   Page* m_page;
