@@ -177,6 +177,8 @@ class FrameMac : public Frame {
 
   virtual void ignoreSpelling();
   virtual void learnSpelling();
+  virtual bool isSelectionMisspelled();
+  virtual Vector<String> guessesForMisspelledSelection();
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&);
   virtual void markMisspellings(const Selection&);
 

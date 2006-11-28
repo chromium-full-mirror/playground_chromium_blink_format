@@ -310,6 +310,10 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
   return frame;
 }
 
+bool FrameLoader::canHandleRequest(const ResourceRequest& request) {
+  return m_client->canHandleRequest(request);
+}
+
 void FrameLoader::changeLocation(const String& URL,
                                  const String& referrer,
                                  bool lockHistory,

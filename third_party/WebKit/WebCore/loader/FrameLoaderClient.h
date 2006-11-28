@@ -52,6 +52,7 @@ class KURL;
 class NavigationAction;
 class String;
 class ResourceLoader;
+class ResourceRequest;
 
 struct LoadErrorResetToken;
 
@@ -241,9 +242,7 @@ class FrameLoaderClient : public AbstractShared {
   virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
   virtual void clearArchivedResources() = 0;
 
-#if PLATFORM(MAC)
-  virtual bool canHandleRequest(NSURLRequest*) const = 0;
-#endif
+  virtual bool canHandleRequest(const ResourceRequest&) const = 0;
   virtual bool canShowMIMEType(const String& MIMEType) const = 0;
   virtual bool representationExistsForURLScheme(
       const String& URLScheme) const = 0;

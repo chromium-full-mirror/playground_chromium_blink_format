@@ -224,6 +224,8 @@ class FrameLoader : Noncopyable {
                                  Vector<char>& data,
                                  ResourceResponse& r);
 
+  bool canHandleRequest(const ResourceRequest&);
+
   // Also not cool.
   void stopLoadingPlugIns();
   void stopLoadingSubresources();
