@@ -34,8 +34,6 @@
 }
 
 + (NSArray*)statistics;
-+ (void)emptyCache;
-+ (void)setCacheDisabled:(BOOL)disabled;
 
 + (size_t)javaScriptObjectsCount;
 + (size_t)javaScriptInterpretersCount;
