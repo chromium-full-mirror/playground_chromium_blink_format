@@ -36,7 +36,7 @@
 
 namespace WebCore {
 
-RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderBlock(node) {}
+RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
 
 void RenderSVGText::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   AffineTransform transform = localTransform();

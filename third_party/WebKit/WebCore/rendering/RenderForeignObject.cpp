@@ -34,7 +34,7 @@
 namespace WebCore {
 
 RenderForeignObject::RenderForeignObject(SVGForeignObjectElement* node)
-    : RenderBlock(node) {}
+    : RenderSVGBlock(node) {}
 
 AffineTransform RenderForeignObject::translationForAttributes() {
   SVGForeignObjectElement* foreign =
