@@ -56,6 +56,7 @@ class CharacterData : public EventTargetNode {
 
   virtual String nodeValue() const;
   virtual void setNodeValue(const String&, ExceptionCode&);
+  virtual bool isCharacterDataNode() const { return true; }
 
   // Other methods (not part of DOM)
 

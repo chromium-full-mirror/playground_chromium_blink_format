@@ -183,13 +183,6 @@ class FrameMac : public Frame {
   virtual void markMisspellingsInAdjacentWords(const VisiblePosition&);
   virtual void markMisspellings(const Selection&);
 
-  bool canDHTMLCut();
-  bool canDHTMLCopy();
-  bool canDHTMLPaste();
-  bool tryDHTMLCut();
-  bool tryDHTMLCopy();
-  bool tryDHTMLPaste();
-
   virtual void issueCutCommand();
   virtual void issueCopyCommand();
   virtual void issuePasteCommand();
@@ -218,8 +211,6 @@ class FrameMac : public Frame {
   virtual void textDidChangeInTextArea(Element*);
 
  private:
-  bool dispatchCPPEvent(const AtomicString& eventType, ClipboardAccessPolicy);
-
   RefPtr<Range> m_markedTextRange;
 
   // === to be moved into the Platform directory

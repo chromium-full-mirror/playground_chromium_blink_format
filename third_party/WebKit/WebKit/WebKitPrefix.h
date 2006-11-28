@@ -74,3 +74,8 @@
  * support is disabled. */
 #undef try
 #undef catch
+
+#define USING_WEBCORE_CUT 1
+#define USING_WEBCORE_COPY 1
+//#define USING_WEBCORE_PASTE 1
+//#define USING_WEBCORE_DELETE 1
