@@ -35,8 +35,9 @@ using std::min;
 namespace WebCore {
 
 IntRect::IntRect(const FloatRect& r)
-    : m_location(IntPoint(r.x(), r.y())),
-      m_size(IntSize(r.width(), r.height())) {}
+    : m_location(IntPoint(static_cast<int>(r.x()), static_cast<int>(r.y()))),
+      m_size(
+          IntSize(static_cast<int>(r.width()), static_cast<int>(r.height()))) {}
 
 bool IntRect::intersects(const IntRect& other) const {
   // Checking emptiness handles negative widths as well as zero.
