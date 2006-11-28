@@ -234,6 +234,8 @@ FrameLoader::~FrameLoader() {
   HashSet<Frame*>::iterator end = m_openedFrames.end();
   for (HashSet<Frame*>::iterator it = m_openedFrames.begin(); it != end; ++it)
     (*it)->loader()->m_opener = 0;
+
+  m_client->frameLoaderDestroyed();
 }
 
 static void setAllDefersLoading(const ResourceLoaderSet& loaders, bool defers) {
@@ -2158,14 +2160,14 @@ int FrameLoader::numPendingOrLoadingRequests(bool recurse) const {
   return count;
 }
 
-void FrameLoader::setClient(PassRefPtr<FrameLoaderClient> client) {
+void FrameLoader::setClient(FrameLoaderClient* client) {
   ASSERT(client);
   ASSERT(!m_client);
   m_client = client;
 }
 
 FrameLoaderClient* FrameLoader::client() const {
-  return m_client.get();
+  return m_client;
 }
 
 #if PLATFORM(MAC)

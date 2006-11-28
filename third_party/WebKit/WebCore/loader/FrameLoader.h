@@ -381,7 +381,7 @@ class FrameLoader : Noncopyable {
                                bool alwaysFromRequest);
 #endif
 
-  void setClient(PassRefPtr<FrameLoaderClient>);
+  void setClient(FrameLoaderClient*);
   FrameLoaderClient* client() const;
 
   void setDefersLoading(bool);
@@ -684,7 +684,7 @@ class FrameLoader : Noncopyable {
   void startIconLoader();
 
   Frame* m_frame;
-  RefPtr<FrameLoaderClient> m_client;
+  FrameLoaderClient* m_client;
 
   FrameState m_state;
   FrameLoadType m_loadType;

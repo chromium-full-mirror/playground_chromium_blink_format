@@ -27,20 +27,16 @@
  */
 
 #import <WebCore/ChromeClient.h>
-#import <WebCore/Shared.h>
 #import <wtf/Forward.h>
 
 @class WebView;
 
-class WebChromeClient : public WebCore::ChromeClient,
-                        public WebCore::Shared<WebChromeClient> {
+class WebChromeClient : public WebCore::ChromeClient {
  public:
-  static PassRefPtr<WebChromeClient> create(WebView* webView);
-
-  virtual void ref();
-  virtual void deref();
-
+  WebChromeClient(WebView* webView);
   WebView* webView() { return m_webView; }
+
+  virtual void chromeDestroyed();
 
   virtual void setWindowRect(const WebCore::FloatRect&);
   virtual WebCore::FloatRect windowRect();
@@ -78,7 +74,5 @@ class WebChromeClient : public WebCore::ChromeClient,
                                    const WebCore::String& sourceID);
 
  private:
-  WebChromeClient(WebView* webView);
-
   WebView* m_webView;
 };

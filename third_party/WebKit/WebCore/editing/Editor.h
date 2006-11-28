@@ -47,7 +47,7 @@ typedef int Pasteboard;
 
 class Editor {
  public:
-  Editor(Frame*, PassRefPtr<EditorClient>);
+  Editor(Frame*);
   ~Editor();
 
   EditorClient* client() const;
@@ -113,7 +113,6 @@ class Editor {
 
  private:
   Frame* m_frame;
-  RefPtr<EditorClient> m_client;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
   RefPtr<EditCommand> m_lastEditCommand;
   RefPtr<Node> m_removedAnchor;

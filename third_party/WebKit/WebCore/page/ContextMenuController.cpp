@@ -54,12 +54,13 @@ namespace WebCore {
 
 using namespace EventNames;
 
-ContextMenuController::ContextMenuController(
-    Page* page,
-    PassRefPtr<ContextMenuClient> client)
+ContextMenuController::ContextMenuController(Page* page,
+                                             ContextMenuClient* client)
     : m_page(page), m_client(client), m_contextMenu(0) {}
 
-ContextMenuController::~ContextMenuController() {}
+ContextMenuController::~ContextMenuController() {
+  m_client->contextMenuDestroyed();
+}
 
 void ContextMenuController::handleContextMenuEvent(Event* event) {
   ASSERT(event->type() == contextmenuEvent);

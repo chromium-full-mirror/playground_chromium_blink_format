@@ -39,7 +39,6 @@
 #include "DocLoader.h"
 #include "DocumentType.h"
 #include "EditingText.h"
-#include "EditorClient.h"
 #include "Event.h"
 #include "EventNames.h"
 #include "FloatRect.h"
@@ -158,12 +157,11 @@ static inline Frame* parentFromOwnerElement(Element* ownerElement) {
   return ownerElement->document()->frame();
 }
 
-Frame::Frame(Page* page, Element* ownerElement, PassRefPtr<EditorClient> client)
+Frame::Frame(Page* page, Element* ownerElement)
     : d(new FramePrivate(page,
                          parentFromOwnerElement(ownerElement),
                          this,
-                         ownerElement,
-                         client)) {
+                         ownerElement)) {
   AtomicString::init();
   EventNames::init();
   HTMLNames::init();
@@ -1451,8 +1449,7 @@ void Frame::setProhibitsScrolling(bool prohibit) {
 FramePrivate::FramePrivate(Page* page,
                            Frame* parent,
                            Frame* thisFrame,
-                           Element* ownerElement,
-                           PassRefPtr<EditorClient> client)
+                           Element* ownerElement)
     : m_page(page),
       m_treeNode(thisFrame, parent),
       m_ownerElement(ownerElement),
@@ -1464,7 +1461,7 @@ FramePrivate::FramePrivate(Page* page,
       m_zoomFactor(parent ? parent->d->m_zoomFactor : 100),
       m_selectionController(thisFrame),
       m_caretBlinkTimer(thisFrame, &Frame::caretBlinkTimerFired),
-      m_editor(thisFrame, client),
+      m_editor(thisFrame),
       m_command(thisFrame),
       m_eventHandler(thisFrame),
       m_caretVisible(false),
