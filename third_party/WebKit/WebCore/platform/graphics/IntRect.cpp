@@ -26,12 +26,17 @@
 #include "config.h"
 #include "IntRect.h"
 
+#include "FloatRect.h"
 #include <algorithm>
 
 using std::max;
 using std::min;
 
 namespace WebCore {
+
+IntRect::IntRect(const FloatRect& r)
+    : m_location(IntPoint(r.x(), r.y())),
+      m_size(IntSize(r.width(), r.height())) {}
 
 bool IntRect::intersects(const IntRect& other) const {
   // Checking emptiness handles negative widths as well as zero.
