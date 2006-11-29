@@ -51,6 +51,9 @@ ContextMenuController* ContextMenu::controller() const {
 }
 
 void ContextMenu::populate() {
+  static ContextMenuItem SeparatorItem(SeparatorType,
+                                       ContextMenuItemTagNoAction, String());
+
   MENU_ACTION_ITEM(OpenLinkInNewWindow, "Open Link in New Window");
   MENU_ACTION_ITEM(DownloadLinkToDisk, "Download Linked File");
   MENU_ACTION_ITEM(CopyLinkToClipboard, "Copy Link");
@@ -76,8 +79,6 @@ void ContextMenu::populate() {
   MENU_ACTION_ITEM(LookUpInDictionary, "Look Up in Dictionary");
   // FIXME: Add PDF action items
 
-  ContextMenuItem SeparatorItem(SeparatorType, ContextMenuItemTagNoAction,
-                                String());
   HitTestResult result = hitTestResult();
 
   Node* node = m_hitTestResult.innerNonSharedNode();
@@ -148,9 +149,11 @@ void ContextMenu::populate() {
       else {
         for (unsigned i = 0; i < size; i++) {
           String guess = guesses[i];
-          if (!guess.isNull())
-            appendItem(ContextMenuItem(ActionType,
-                                       ContextMenuItemTagSpellingGuess, guess));
+          if (!guess.isNull()) {
+            ContextMenuItem item(ActionType, ContextMenuItemTagSpellingGuess,
+                                 guess);
+            appendItem(item);
+          }
         }
       }
 
@@ -174,10 +177,9 @@ void ContextMenu::populate() {
     appendItem(CutItem);
     appendItem(CopyItem);
     appendItem(PasteItem);
-    appendItem(SeparatorItem);
 
-    // FIXME: Add "Spelling [and Grammar, on Leopard]", "Font", "Speech",
-    // "Writing Direction" submenus here.
+    // FIXME: Add a separator, then "Spelling [and Grammar, on Leopard]",
+    // "Font", "Speech", "Writing Direction" submenus here.
   }
 }
 }

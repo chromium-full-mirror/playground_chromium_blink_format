@@ -93,8 +93,8 @@ class Scrollbar : public Shared<Scrollbar> {
   // when the mouse went down in a scrollbar, since it is assumed the scrollbar
   // will start
   // grabbing all events in that case anyway.
-  virtual void handleMouseMoveEvent(const PlatformMouseEvent&){};
-  virtual void handleMouseOutEvent(const PlatformMouseEvent&){};
+  virtual bool handleMouseMoveEvent(const PlatformMouseEvent&) { return false; }
+  virtual bool handleMouseOutEvent(const PlatformMouseEvent&) { return false; }
 
  protected:
   virtual void updateThumbPosition() = 0;

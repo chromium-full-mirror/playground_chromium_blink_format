@@ -58,5 +58,8 @@ enum { WebMenuItemTagOpenLink = 1000 };
     didScrollDocumentInFrameView:(WebFrameView*)frameView;
 - (BOOL)webViewShouldInterruptJavaScript:(WebView*)sender;
 - (void)webView:(WebView*)sender willPopupMenu:(NSMenu*)menu;
+- (void)webView:(WebView*)sender
+    contextMenuItemSelected:(NSMenuItem*)item
+                 forElement:(NSDictionary*)element;
 
 @end

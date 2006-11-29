@@ -26,6 +26,7 @@
 #include "config.h"
 #include "ContextMenuController.h"
 
+#include "Chrome.h"
 #include "ContextMenu.h"
 #include "ContextMenuClient.h"
 #include "Document.h"
@@ -48,6 +49,7 @@
 #include "RenderObject.h"
 #include "ReplaceSelectionCommand.h"
 #include "ResourceRequest.h"
+#include "SelectionController.h"
 #include "markup.h"
 
 namespace WebCore {
@@ -65,10 +67,10 @@ ContextMenuController::~ContextMenuController() {
 void ContextMenuController::handleContextMenuEvent(Event* event) {
   ASSERT(event->type() == contextmenuEvent);
   MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
-  HitTestResult result(IntPoint(mouseEvent->x(), mouseEvent->y()));
+  HitTestResult result(IntPoint(mouseEvent->pageX(), mouseEvent->pageY()));
 
   if (RenderObject* renderer = event->target()->renderer())
-    if (RenderLayer* layer = renderer->layer())
+    if (RenderLayer* layer = renderer->enclosingLayer())
       layer->hitTest(HitTestRequest(false, true), result);
 
   if (!result.innerNonSharedNode())
@@ -78,6 +80,8 @@ void ContextMenuController::handleContextMenuEvent(Event* event) {
   m_contextMenu->populate();
   m_client->addCustomContextMenuItems(m_contextMenu.get());
   m_contextMenu->show();
+
+  event->setDefaultHandled();
 }
 
 static String makeGoogleSearchURL(String searchString) {
@@ -92,15 +96,22 @@ static String makeGoogleSearchURL(String searchString) {
   return url;
 }
 
-void ContextMenuController::contextMenuActionSelected(ContextMenuAction action,
-                                                      String title) {
+void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
+  ASSERT(item->menu() == contextMenu());
+  ASSERT(item->type() == ActionType);
+
+  if (item->action() >= ContextMenuItemBaseApplicationTag) {
+    m_client->contextMenuItemSelected(item);
+    return;
+  }
+
   Frame* frame =
       m_contextMenu->hitTestResult().innerNonSharedNode()->document()->frame();
   if (!frame)
     return;
   ASSERT(m_page == frame->page());
 
-  switch (action) {
+  switch (item->action()) {
     case ContextMenuItemTagOpenLinkInNewWindow: {
       ResourceRequest request =
           ResourceRequest(m_contextMenu->hitTestResult().absoluteLinkURL());
@@ -171,14 +182,14 @@ void ContextMenuController::contextMenuActionSelected(ContextMenuAction action,
       frame->editor()->paste();
       break;
     case ContextMenuItemTagSpellingGuess:
-      ASSERT(frame->selectedText().length() != 0);
+      ASSERT(frame->selectedText().length());
       if (frame->editor()->shouldInsertText(
-              title, frame->selectionController()->toRange().get(),
+              item->title(), frame->selectionController()->toRange().get(),
               EditorInsertActionPasted)) {
         Document* document = frame->document();
         applyCommand(new ReplaceSelectionCommand(
-            document, createFragmentFromMarkup(document, title, ""), true,
-            false, true));
+            document, createFragmentFromMarkup(document, item->title(), ""),
+            true, false, true));
         frame->revealSelection(RenderLayer::gAlignToEdgeIfNeeded);
       }
       break;

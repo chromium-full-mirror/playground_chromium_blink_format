@@ -21,12 +21,15 @@
 #include "config.h"
 #include "Page.h"
 
+#include "Chrome.h"
 #include "ChromeClient.h"
 #include "ContextMenuClient.h"
+#include "ContextMenuController.h"
 #include "EditorClient.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameTree.h"
+#include "SelectionController.h"
 #include "StringHash.h"
 #include "Widget.h"
 #include <kjs/collector.h>
@@ -43,9 +46,10 @@ static HashMap<String, HashSet<Page*>*>* frameNamespaces;
 Page::Page(ChromeClient* chromeClient,
            ContextMenuClient* contextMenuClient,
            EditorClient* editorClient)
-    : m_dragCaretController(0, true),
-      m_chrome(this, chromeClient),
-      m_contextMenuController(this, contextMenuClient),
+    : m_dragCaretController(new SelectionController(0, true)),
+      m_chrome(new Chrome(this, chromeClient)),
+      m_contextMenuController(
+          new ContextMenuController(this, contextMenuClient)),
       m_editorClient(editorClient),
       m_frameCount(0),
       m_defersLoading(false) {

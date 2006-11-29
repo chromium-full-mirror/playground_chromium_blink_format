@@ -828,11 +828,11 @@ IntRect FrameView::windowClipRectForLayer(const RenderLayer* layer,
   return intersection(clipRect, windowClipRect());
 }
 
-void FrameView::handleMouseMoveEvent(const PlatformMouseEvent& event) {
-  m_frame->eventHandler()->handleMouseMoveEvent(event);
+bool FrameView::handleMouseMoveEvent(const PlatformMouseEvent& event) {
+  return m_frame->eventHandler()->handleMouseMoveEvent(event);
 }
 
-void FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& event) {
-  m_frame->eventHandler()->handleMouseReleaseEvent(event);
+bool FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& event) {
+  return m_frame->eventHandler()->handleMouseReleaseEvent(event);
 }
 }

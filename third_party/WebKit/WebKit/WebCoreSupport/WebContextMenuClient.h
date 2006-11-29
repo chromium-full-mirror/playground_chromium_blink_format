@@ -38,7 +38,8 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
 
   virtual void contextMenuDestroyed();
 
-  virtual void addCustomContextMenuItems(WebCore::ContextMenu* menu);
+  virtual void addCustomContextMenuItems(WebCore::ContextMenu*);
+  virtual void contextMenuItemSelected(WebCore::ContextMenuItem*);
 
   virtual void copyLinkToClipboard(WebCore::HitTestResult);
   virtual void downloadURL(WebCore::KURL url);
