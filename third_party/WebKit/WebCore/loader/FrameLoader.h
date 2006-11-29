@@ -172,7 +172,7 @@ class PolicyCheck {
 
 class FrameLoader : Noncopyable {
  public:
-  FrameLoader(Frame*);
+  FrameLoader(Frame*, FrameLoaderClient*);
   ~FrameLoader();
 
   Frame* frame() const { return m_frame; }
@@ -381,7 +381,6 @@ class FrameLoader : Noncopyable {
                                bool alwaysFromRequest);
 #endif
 
-  void setClient(FrameLoaderClient*);
   FrameLoaderClient* client() const;
 
   void setDefersLoading(bool);

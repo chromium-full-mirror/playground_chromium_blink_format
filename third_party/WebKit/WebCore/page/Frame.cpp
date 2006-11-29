@@ -157,11 +157,14 @@ static inline Frame* parentFromOwnerElement(Element* ownerElement) {
   return ownerElement->document()->frame();
 }
 
-Frame::Frame(Page* page, Element* ownerElement)
+Frame::Frame(Page* page,
+             Element* ownerElement,
+             FrameLoaderClient* frameLoaderClient)
     : d(new FramePrivate(page,
                          parentFromOwnerElement(ownerElement),
                          this,
-                         ownerElement)) {
+                         ownerElement,
+                         frameLoaderClient)) {
   AtomicString::init();
   EventNames::init();
   HTMLNames::init();
@@ -1449,7 +1452,8 @@ void Frame::setProhibitsScrolling(bool prohibit) {
 FramePrivate::FramePrivate(Page* page,
                            Frame* parent,
                            Frame* thisFrame,
-                           Element* ownerElement)
+                           Element* ownerElement,
+                           FrameLoaderClient* frameLoaderClient)
     : m_page(page),
       m_treeNode(thisFrame, parent),
       m_ownerElement(ownerElement),
@@ -1468,7 +1472,7 @@ FramePrivate::FramePrivate(Page* page,
       m_caretPaint(true),
       m_isActive(false),
       m_lifeSupportTimer(thisFrame, &Frame::lifeSupportTimerFired),
-      m_loader(new FrameLoader(thisFrame)),
+      m_loader(new FrameLoader(thisFrame, frameLoaderClient)),
       m_userStyleSheetLoader(0),
       m_paintRestriction(PaintRestrictionNone),
       m_markedTextUsesUnderlines(false),

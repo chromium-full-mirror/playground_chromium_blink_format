@@ -40,7 +40,11 @@ class UserStyleSheetLoader;
 
 class FramePrivate {
  public:
-  FramePrivate(Page*, Frame* parent, Frame* thisFrame, Element* ownerElement);
+  FramePrivate(Page*,
+               Frame* parent,
+               Frame* thisFrame,
+               Element* ownerElement,
+               FrameLoaderClient*);
   ~FramePrivate();
 
   Page* m_page;

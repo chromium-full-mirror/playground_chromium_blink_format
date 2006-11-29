@@ -53,8 +53,7 @@ class Page;
 
 - (id)initMainFrameWithPage:(WebCore::Page*)page
                   frameName:(NSString*)name
-                       view:(WebFrameView*)view
-                    webView:(WebView*)webView;
+                  frameView:(WebFrameView*)frameView;
 - (void)close;
 
 - (WebFrame*)webFrame;

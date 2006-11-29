@@ -128,7 +128,7 @@ WebView* getWebView(WebFrame* webFrame);
 #ifdef __cplusplus
 - (id)_initWithWebFrameView:(WebFrameView*)fv
                     webView:(WebView*)v
-                  coreFrame:(WebCore::Frame*)coreFrame;
+                     bridge:(WebFrameBridge*)bridge;
 #endif
 
 - (void)_addPlugInView:(NSView*)plugInView;

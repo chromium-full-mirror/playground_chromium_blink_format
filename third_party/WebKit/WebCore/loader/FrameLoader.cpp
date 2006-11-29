@@ -199,9 +199,9 @@ static int numRequests(Document* document) {
   return 0;
 }
 
-FrameLoader::FrameLoader(Frame* frame)
+FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
     : m_frame(frame),
-      m_client(0),
+      m_client(client),
       m_state(FrameStateCommittedPage),
       m_loadType(FrameLoadTypeStandard),
       m_policyLoadType(FrameLoadTypeStandard),
@@ -2158,12 +2158,6 @@ int FrameLoader::numPendingOrLoadingRequests(bool recurse) const {
        frame = frame->tree()->traverseNext(m_frame))
     count += numRequests(frame->document());
   return count;
-}
-
-void FrameLoader::setClient(FrameLoaderClient* client) {
-  ASSERT(client);
-  ASSERT(!m_client);
-  m_client = client;
 }
 
 FrameLoaderClient* FrameLoader::client() const {
