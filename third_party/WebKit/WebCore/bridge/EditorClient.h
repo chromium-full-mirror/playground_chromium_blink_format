@@ -91,7 +91,9 @@ class EditorClient {
   virtual void redo() = 0;
 
 #if PLATFORM(MAC)
+  // FIXME: This should become SelectionController::toWebArchive()
   virtual NSData* dataForArchivedSelection(Frame*) = 0;
+
   virtual NSString* _web_userVisibleString(NSURL*) = 0;
 #endif
 };

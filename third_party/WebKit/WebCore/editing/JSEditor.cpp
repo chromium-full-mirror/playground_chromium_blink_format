@@ -389,7 +389,7 @@ bool execPrint(Frame* frame, bool, const String&) {
 }
 
 bool execRedo(Frame* frame, bool, const String&) {
-  frame->editor()->client()->redo();
+  frame->editor()->redo();
   return true;
 }
 
@@ -431,7 +431,7 @@ bool execUnderline(Frame* frame, bool, const String&) {
 }
 
 bool execUndo(Frame* frame, bool, const String&) {
-  frame->editor()->client()->undo();
+  frame->editor()->undo();
   return true;
 }
 
@@ -501,11 +501,11 @@ bool enabledAnyRichlyEditableRangeSelection(Frame* frame) {
 }
 
 bool enabledRedo(Frame* frame) {
-  return frame->editor()->client()->canRedo();
+  return frame->editor()->canRedo();
 }
 
 bool enabledUndo(Frame* frame) {
-  return frame->editor()->client()->canUndo();
+  return frame->editor()->canUndo();
 }
 
 // =============================================================================================

@@ -119,6 +119,25 @@ class Editor {
 
   bool execCommand(const String&);
 
+  bool isContinuousSpellCheckingEnabled();
+  int spellCheckerDocumentTag();
+
+  bool shouldBeginEditing(Range* range);
+  bool shouldEndEditing(Range* range);
+
+  void clearUndoRedoOperations();
+  bool canUndo();
+  void undo();
+  bool canRedo();
+  void redo();
+
+  void didBeginEditing();
+  void didEndEditing();
+
+#if PLATFORM(MAC)
+  NSString* _web_userVisibleString(NSURL* nsURL);
+#endif
+
  private:
   Frame* m_frame;
   OwnPtr<DeleteButtonController> m_deleteButtonController;
