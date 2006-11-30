@@ -42,11 +42,6 @@ KJSProxy::KJSProxy(Frame* frame) {
   m_handlerLineno = 0;
 }
 
-KJSProxy::~KJSProxy() {
-  JSLock lock;
-  Collector::collect();
-}
-
 JSValue* KJSProxy::evaluate(const String& filename,
                             int baseLine,
                             const String& str,

@@ -39,7 +39,6 @@ class String;
 class KJSProxy {
  public:
   KJSProxy(Frame*);
-  ~KJSProxy();
   KJS::JSValue* evaluate(const String& filename,
                          int baseLine,
                          const String& code,

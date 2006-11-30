@@ -230,6 +230,7 @@ class FrameLoader : Noncopyable {
   void stopLoadingPlugIns();
   void stopLoadingSubresources();
 #if PLATFORM(MAC)
+  void closeBridge();
   void cancelMainResourceLoad(NSError*);
 #endif
   void stopAllLoaders();
