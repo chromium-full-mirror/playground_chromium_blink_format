@@ -31,6 +31,7 @@
 #include "ContextMenuItem.h"
 #include "HitTestResult.h"
 #include "PlatformString.h"
+#include "RetainPtr.h"
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
@@ -76,14 +77,18 @@ class ContextMenu : Noncopyable {
   HitTestResult hitTestResult() const { return m_hitTestResult; }
   ContextMenuController* controller() const;
 
-  PlatformMenuDescription platformDescription() const {
-    return m_platformDescription;
-  }
+  PlatformMenuDescription platformDescription() const;
   void setPlatformDescription(PlatformMenuDescription);
 
  private:
   HitTestResult m_hitTestResult;
+
+#if PLATFORM(MAC)
+  // Keep this in sync with the PlatformMenuDescription typedef
+  RetainPtr<NSMutableArray> m_platformDescription;
+#else
   PlatformMenuDescription m_platformDescription;
+#endif
 };
 }
 
