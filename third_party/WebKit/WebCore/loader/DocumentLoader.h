@@ -25,6 +25,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef DocumentLoader_H_
+#define DocumentLoader_H_
 
 #include "NavigationAction.h"
 #include "Shared.h"
@@ -194,3 +196,5 @@ class DocumentLoader : public Shared<DocumentLoader> {
 #endif
 };
 }
+
+#endif  // DocumentLoader_H_
