@@ -21,14 +21,14 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+#include "SVGFEOffsetElement.h"
+
 #include "Attr.h"
-
-#include "KRenderingDevice.h"
-
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
-#include "SVGFEOffsetElement.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -83,7 +83,7 @@ void SVGFEOffsetElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEOffset* SVGFEOffsetElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEOffset*>(
-        renderingDevice()->createFilterEffect(FE_OFFSET));
+        SVGResourceFilter::createFilterEffect(FE_OFFSET));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(in1());
@@ -94,5 +94,6 @@ SVGFEOffset* SVGFEOffsetElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

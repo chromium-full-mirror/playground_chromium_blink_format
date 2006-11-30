@@ -24,12 +24,12 @@
 #ifdef SVG_SUPPORT
 #include "SVGPaintServer.h"
 
-#include "KRenderingDeviceQuartz.h"
+#include "GraphicsContext.h"
 #include "RenderPath.h"
 
 namespace WebCore {
 
-void SVGPaintServer::draw(KRenderingDeviceContext* context,
+void SVGPaintServer::draw(GraphicsContext*& context,
                           const RenderPath* path,
                           SVGPaintTargetType type) const {
   if (!setup(context, path, type))
@@ -39,20 +39,17 @@ void SVGPaintServer::draw(KRenderingDeviceContext* context,
   teardown(context, path, type);
 }
 
-void SVGPaintServer::teardown(KRenderingDeviceContext*,
+void SVGPaintServer::teardown(GraphicsContext*&,
                               const RenderObject*,
                               SVGPaintTargetType) const {
   // no-op
 }
 
-void SVGPaintServer::renderPath(KRenderingDeviceContext* context,
+void SVGPaintServer::renderPath(GraphicsContext*& context,
                                 const RenderPath* path,
                                 SVGPaintTargetType type) const {
   RenderStyle* style = path->style();
-
-  KRenderingDeviceContextQuartz* quartzContext =
-      static_cast<KRenderingDeviceContextQuartz*>(context);
-  CGContextRef contextRef = quartzContext->cgContext();
+  CGContextRef contextRef = context->platformContext();
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill())
     fillPath(contextRef, path);

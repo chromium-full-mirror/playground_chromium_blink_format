@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEFuncGElement.h"
 
@@ -33,5 +34,6 @@ SVGFEFuncGElement::SVGFEFuncGElement(const QualifiedName& tagName,
 SVGFEFuncGElement::~SVGFEFuncGElement() {}
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -20,17 +20,16 @@
 #include "config.h"
 
 #ifdef SVG_SUPPORT
-
 #include "SVGFEDiffuseLightingElement.h"
 
 #include "Attr.h"
-#include "KRenderingDevice.h"
 #include "SVGColor.h"
 #include "SVGFELightElement.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGFEDiffuseLighting.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -122,13 +121,16 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFilterEffect* SVGFEDiffuseLightingElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEDiffuseLighting*>(
-        renderingDevice()->createFilterEffect(FE_DIFFUSE_LIGHTING));
+        SVGResourceFilter::createFilterEffect(FE_DIFFUSE_LIGHTING));
+  if (!m_filterEffect)
+    return 0;
+
   m_filterEffect->setIn(in1());
   setStandardAttributes(m_filterEffect);
-  m_filterEffect->setDiffuseConstant((diffuseConstant()));
-  m_filterEffect->setSurfaceScale((surfaceScale()));
-  m_filterEffect->setKernelUnitLengthX((kernelUnitLengthX()));
-  m_filterEffect->setKernelUnitLengthY((kernelUnitLengthY()));
+  m_filterEffect->setDiffuseConstant(diffuseConstant());
+  m_filterEffect->setSurfaceScale(surfaceScale());
+  m_filterEffect->setKernelUnitLengthX(kernelUnitLengthX());
+  m_filterEffect->setKernelUnitLengthY(kernelUnitLengthY());
   m_filterEffect->setLightingColor(lightingColor()->color());
   updateLights();
   return m_filterEffect;
@@ -148,8 +150,11 @@ void SVGFEDiffuseLightingElement::updateLights() const {
       break;
     }
   }
+
   m_filterEffect->setLightSource(light);
 }
 }
 
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -30,22 +30,20 @@
 #include "SVGResourceClipper.h"
 
 #include "GraphicsContext.h"
-#include "KRenderingDeviceQuartz.h"
-#include "QuartzSupport.h"
+#include "CgSupport.h"
 
 namespace WebCore {
 
-void SVGResourceClipper::applyClip(const FloatRect& boundingBox) const {
-  KRenderingDeviceContext* context = renderingDevice()->currentContext();
-  CGContextRef cgContext =
-      static_cast<KRenderingDeviceContextQuartz*>(context)->cgContext();
+void SVGResourceClipper::applyClip(GraphicsContext* context,
+                                   const FloatRect& boundingBox) const {
+  CGContextRef cgContext = context->platformContext();
   if (m_clipData.clipData().size() < 1)
     return;
 
   bool heterogenousClipRules = false;
   WindRule clipRule = m_clipData.clipData()[0].windRule;
 
-  context->clearPath();
+  context->beginPath();
 
   CGAffineTransform bboxTransform = CGAffineTransformMakeMapBetweenRects(
       CGRectMake(0, 0, 1, 1), CGRect(boundingBox));

@@ -28,7 +28,6 @@
 
 #include "GraphicsContext.h"
 #include "KCanvasRenderingStyle.h"
-#include "KRenderingDevice.h"
 #include "AffineTransform.h"
 
 namespace WebCore {

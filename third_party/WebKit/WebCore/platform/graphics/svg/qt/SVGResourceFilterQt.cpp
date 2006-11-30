@@ -20,9 +20,9 @@
 */
 
 #include "config.h"
-#include "SVGResourceFilter.h"
 
 #ifdef SVG_SUPPORT
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -30,11 +30,17 @@ SVGResourceFilter::SVGResourceFilter() {}
 
 SVGResourceFilter::~SVGResourceFilter() {}
 
-void SVGResourceFilter::prepareFilter(const FloatRect& bbox) {
+SVGFilterEffect* SVGResourceFilter::createFilterEffect(
+    const SVGFilterEffectType&) {
+  // FIXME: implement me :-)
+  return 0;
+}
+
+void SVGResourceFilter::prepareFilter(GraphicsContext*&, const FloatRect&) {
   // FIXME: implement me :-)
 }
 
-void SVGResourceFilter::applyFilter(const FloatRect& bbox) {
+void SVGResourceFilter::applyFilter(GraphicsContext*&, const FloatRect&) {
   // FIXME: implement me :-)
 }
 

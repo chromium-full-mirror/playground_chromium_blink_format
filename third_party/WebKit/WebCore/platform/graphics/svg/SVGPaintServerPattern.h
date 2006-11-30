@@ -64,16 +64,16 @@ class SVGPaintServerPattern : public SVGPaintServer {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
 #if PLATFORM(CG)
-  virtual bool setup(KRenderingDeviceContext*,
+  virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType) const;
-  virtual void teardown(KRenderingDeviceContext*,
+  virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
                         SVGPaintTargetType) const;
 #endif
 
 #if PLATFORM(QT)
-  virtual bool setup(KRenderingDeviceContext*,
+  virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType) const;
 #endif

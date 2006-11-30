@@ -21,13 +21,14 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEColorMatrixElement.h"
 
-#include "KRenderingDevice.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGNumberList.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -89,7 +90,7 @@ void SVGFEColorMatrixElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEColorMatrix* SVGFEColorMatrixElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEColorMatrix*>(
-        renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));
+        SVGResourceFilter::createFilterEffect(FE_COLOR_MATRIX));
   if (!m_filterEffect)
     return 0;
 
@@ -109,5 +110,6 @@ SVGFEColorMatrix* SVGFEColorMatrixElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

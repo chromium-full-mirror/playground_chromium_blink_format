@@ -24,11 +24,11 @@
 #ifdef SVG_SUPPORT
 #include "SVGPaintServer.h"
 
+#include "GraphicsContext.h"
 #include "KCanvasRenderingStyle.h"
-#include "KRenderingDeviceQt.h"
 #include "RenderPath.h"
 
-#include <QPen>
+#include <QPainter>
 #include <QVector>
 
 namespace WebCore {
@@ -70,7 +70,7 @@ void SVGPaintServer::setPenProperties(const RenderObject* object,
   }
 }
 
-void SVGPaintServer::draw(KRenderingDeviceContext* context,
+void SVGPaintServer::draw(GraphicsContext*& context,
                           const RenderPath* path,
                           SVGPaintTargetType type) const {
   if (!setup(context, path, type))
@@ -80,24 +80,28 @@ void SVGPaintServer::draw(KRenderingDeviceContext* context,
   teardown(context, path, type);
 }
 
-void SVGPaintServer::teardown(KRenderingDeviceContext*,
+void SVGPaintServer::teardown(GraphicsContext*&,
                               const RenderObject*,
                               SVGPaintTargetType) const {
   // no-op
 }
 
-void SVGPaintServer::renderPath(KRenderingDeviceContext* context,
+void SVGPaintServer::renderPath(GraphicsContext*& context,
                                 const RenderPath* path,
                                 SVGPaintTargetType type) const {
   RenderStyle* renderStyle = path->style();
-  KRenderingDeviceContextQt* qtContext =
-      static_cast<KRenderingDeviceContextQt*>(context);
+
+  QPainter* painter(context ? context->platformContext() : 0);
+  Q_ASSERT(painter);
+
+  QPainterPath* painterPath(context ? context->currentPath() : 0);
+  Q_ASSERT(painterPath);
 
   if ((type & ApplyToFillTargetType) && renderStyle->svgStyle()->hasFill())
-    qtContext->fillPath();
+    painter->fillPath(*painterPath, painter->brush());
 
   if ((type & ApplyToStrokeTargetType) && renderStyle->svgStyle()->hasStroke())
-    qtContext->strokePath();
+    painter->strokePath(*painterPath, painter->pen());
 }
 
 }  // namespace WebCore

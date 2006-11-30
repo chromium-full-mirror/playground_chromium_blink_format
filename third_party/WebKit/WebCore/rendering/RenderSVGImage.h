@@ -67,7 +67,6 @@ class RenderSVGImage : public RenderImage {
                            HitTestAction);
 
  private:
-  void translateForAttributes();
   AffineTransform translationForAttributes();
   AffineTransform m_transform;
   IntRect m_absoluteBounds;

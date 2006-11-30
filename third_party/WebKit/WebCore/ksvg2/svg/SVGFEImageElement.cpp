@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEImageElement.h"
 
@@ -29,11 +30,11 @@
 #include "DocLoader.h"
 #include "Document.h"
 #include "SVGResourceImage.h"
-#include "KRenderingDevice.h"
 #include "SVGHelper.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -92,7 +93,7 @@ void SVGFEImageElement::notifyFinished(CachedResource* finishedObj) {
 SVGFEImage* SVGFEImageElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEImage*>(
-        renderingDevice()->createFilterEffect(FE_IMAGE));
+        SVGResourceFilter::createFilterEffect(FE_IMAGE));
   if (!m_filterEffect)
     return 0;
   setStandardAttributes(m_filterEffect);
@@ -100,5 +101,6 @@ SVGFEImage* SVGFEImageElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -24,11 +24,11 @@
 #ifdef SVG_SUPPORT
 #include "SVGPaintServerGradient.h"
 
-#include "KRenderingDeviceQuartz.h"
+#include "GraphicsContext.h"
 #include "SVGPaintServerLinearGradient.h"
 #include "SVGPaintServerRadialGradient.h"
 #include "RenderPath.h"
-#include "QuartzSupport.h"
+#include "CgSupport.h"
 
 namespace WebCore {
 
@@ -181,13 +181,11 @@ void SVGPaintServerGradient::updateQuartzGradientCache(
   }
 }
 
-void SVGPaintServerGradient::teardown(KRenderingDeviceContext* context,
+void SVGPaintServerGradient::teardown(GraphicsContext*& context,
                                       const RenderObject* object,
                                       SVGPaintTargetType type) const {
   CGShadingRef shading = m_shadingCache;
-  KRenderingDeviceQuartz* quartzDevice =
-      static_cast<KRenderingDeviceQuartz*>(renderingDevice());
-  CGContextRef contextRef = quartzDevice->currentCGContext();
+  CGContextRef contextRef = context->platformContext();
   RenderStyle* style = object->style();
   ASSERT(contextRef != NULL);
 
@@ -203,8 +201,12 @@ void SVGPaintServerGradient::teardown(KRenderingDeviceContext* context,
     if (isPaintingText()) {
       int width = 2048;
       int height = 2048;  // FIXME??? SEE ABOVE
-      delete quartzDevice->popContext();
-      contextRef = quartzDevice->currentCGContext();
+
+      delete context;
+      context = m_savedContext;
+      contextRef = context->platformContext();
+      m_savedContext = 0;
+
       void* imageBuffer = fastMalloc(width * height);
       CGColorSpaceRef grayColorSpace = CGColorSpaceCreateDeviceGray();
       CGContextRef grayscaleContext =
@@ -226,12 +228,10 @@ void SVGPaintServerGradient::teardown(KRenderingDeviceContext* context,
   CGContextRestoreGState(contextRef);
 }
 
-void SVGPaintServerGradient::renderPath(KRenderingDeviceContext* context,
+void SVGPaintServerGradient::renderPath(GraphicsContext*& context,
                                         const RenderPath* path,
                                         SVGPaintTargetType type) const {
-  KRenderingDeviceQuartz* quartzDevice =
-      static_cast<KRenderingDeviceQuartz*>(renderingDevice());
-  CGContextRef contextRef = quartzDevice->currentCGContext();
+  CGContextRef contextRef = context->platformContext();
   RenderStyle* style = path->style();
   ASSERT(contextRef != NULL);
 
@@ -258,7 +258,7 @@ void SVGPaintServerGradient::renderPath(KRenderingDeviceContext* context,
   CGContextConcatCTM(contextRef, transform);
 }
 
-bool SVGPaintServerGradient::setup(KRenderingDeviceContext* context,
+bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                                    const RenderObject* object,
                                    SVGPaintTargetType type) const {
   if (listener())  // this seems like bad design to me, should be in a common
@@ -270,9 +270,7 @@ bool SVGPaintServerGradient::setup(KRenderingDeviceContext* context,
   if (!m_shadingCache)
     const_cast<SVGPaintServerGradient*>(this)->updateQuartzGradientCache(this);
 
-  KRenderingDeviceQuartz* quartzDevice =
-      static_cast<KRenderingDeviceQuartz*>(renderingDevice());
-  CGContextRef contextRef = quartzDevice->currentCGContext();
+  CGContextRef contextRef = context->platformContext();
   RenderStyle* style = object->style();
   ASSERT(contextRef != NULL);
 
@@ -296,15 +294,15 @@ bool SVGPaintServerGradient::setup(KRenderingDeviceContext* context,
       int height = 2048;  // FIXME???
       IntSize size = IntSize(width, height);
       m_maskImage->init(size);
-      KRenderingDeviceContext* maskImageContext =
-          quartzDevice->contextForImage(m_maskImage.get());
-      quartzDevice->pushContext(maskImageContext);
-      CGContextRef maskContext =
-          static_cast<KRenderingDeviceContextQuartz*>(maskImageContext)
-              ->cgContext();
+
+      GraphicsContext* maskImageContext = contextForImage(m_maskImage.get());
+      CGContextRef maskContext = maskImageContext->platformContext();
       const_cast<RenderObject*>(object)->style()->setColor(
           Color(255, 255, 255));
       CGContextSetTextDrawingMode(maskContext, kCGTextStroke);
+
+      m_savedContext = context;
+      context = maskImageContext;
     }
   }
 

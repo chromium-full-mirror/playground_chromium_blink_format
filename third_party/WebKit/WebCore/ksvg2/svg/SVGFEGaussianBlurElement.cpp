@@ -21,12 +21,13 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEGaussianBlurElement.h"
 
-#include "KRenderingDevice.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -87,7 +88,7 @@ void SVGFEGaussianBlurElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEGaussianBlur*>(
-        renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
+        SVGResourceFilter::createFilterEffect(FE_GAUSSIAN_BLUR));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(in1());
@@ -98,5 +99,6 @@ SVGFEGaussianBlur* SVGFEGaussianBlurElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

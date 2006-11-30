@@ -58,6 +58,8 @@ class ClipDataList {
   Vector<ClipData> m_clipData;
 };
 
+class GraphicsContext;
+
 class SVGResourceClipper : public SVGResource {
  public:
   SVGResourceClipper();
@@ -72,7 +74,7 @@ class SVGResourceClipper : public SVGResource {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
   // To be implemented by the specific rendering devices
-  void applyClip(const FloatRect& boundingBox) const;
+  void applyClip(GraphicsContext*, const FloatRect& boundingBox) const;
 
  private:
   ClipDataList m_clipData;

@@ -22,11 +22,11 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "RenderSVGTSpan.h"
 #include "GraphicsContext.h"
 #include "KCanvasRenderingStyle.h"
-#include "KRenderingDevice.h"
 #include "SVGRootInlineBox.h"
 #include "SVGInlineFlowBox.h"
 #include "AffineTransform.h"

@@ -21,12 +21,13 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEMergeElement.h"
 
-#include "KRenderingDevice.h"
 #include "SVGFEMergeNodeElement.h"
 #include "SVGHelper.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -41,7 +42,7 @@ SVGFEMergeElement::~SVGFEMergeElement() {
 SVGFEMerge* SVGFEMergeElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEMerge*>(
-        renderingDevice()->createFilterEffect(FE_MERGE));
+        SVGResourceFilter::createFilterEffect(FE_MERGE));
   if (!m_filterEffect)
     return 0;
   setStandardAttributes(m_filterEffect);
@@ -53,10 +54,10 @@ SVGFEMerge* SVGFEMergeElement::filterEffect() const {
   }
 
   m_filterEffect->setMergeInputs(mergeInputs);
-
   return m_filterEffect;
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

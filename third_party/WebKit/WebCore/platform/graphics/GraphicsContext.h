@@ -29,6 +29,7 @@
 #include "FloatRect.h"
 #include "Image.h"
 #include "IntRect.h"
+#include "Path.h"
 #include "Pen.h"
 #include "TextDirection.h"
 #include "UChar.h"
@@ -62,12 +63,9 @@ class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class KURL;
 class Path;
+class SVGResourceImage;
 class TextRun;
 class TextStyle;
-
-#ifdef SVG_SUPPORT
-class KRenderingDeviceContext;
-#endif
 
 class GraphicsContext : Noncopyable {
  public:
@@ -187,6 +185,9 @@ class GraphicsContext : Noncopyable {
 
   void setCompositeOperation(CompositeOperator);
 
+  void beginPath();
+  void addPath(const Path& path);
+
   void clip(const Path&);
 
   void scale(const FloatSize&);
@@ -197,10 +198,6 @@ class GraphicsContext : Noncopyable {
   void setURLForRect(const KURL&, const IntRect&);
 
   void concatCTM(const AffineTransform&);
-
-#ifdef SVG_SUPPORT
-  KRenderingDeviceContext* createRenderingDeviceContext();
-#endif
 
 #if PLATFORM(WIN)
   GraphicsContext(HDC);  // FIXME: To be removed.
@@ -213,6 +210,11 @@ class GraphicsContext : Noncopyable {
                              const IntRect* = 0);  // The passed in HDC should
                                                    // be the one handed back by
                                                    // getWindowsContext.
+#endif
+
+#if PLATFORM(QT)
+  void setFillRule(WindRule);
+  PlatformPath* currentPath();
 #endif
 
  private:
@@ -232,6 +234,10 @@ class GraphicsContext : Noncopyable {
   GraphicsContextPrivate* m_common;
   GraphicsContextPlatformPrivate* m_data;
 };
+
+#ifdef SVG_SUPPORT
+GraphicsContext* contextForImage(SVGResourceImage*);
+#endif
 
 }  // namespace WebCore
 

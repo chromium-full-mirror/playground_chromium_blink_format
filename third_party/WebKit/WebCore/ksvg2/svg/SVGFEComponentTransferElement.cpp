@@ -21,19 +21,19 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+#include "SVGFEComponentTransferElement.h"
+
 #include "Attr.h"
-
-#include "KRenderingDevice.h"
-
 #include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
-#include "SVGFEComponentTransferElement.h"
 #include "SVGFEFuncRElement.h"
 #include "SVGFEFuncGElement.h"
 #include "SVGFEFuncBElement.h"
 #include "SVGFEFuncAElement.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -67,7 +67,7 @@ void SVGFEComponentTransferElement::parseMappedAttribute(
 SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEComponentTransfer*>(
-        renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
+        SVGResourceFilter::createFilterEffect(FE_COMPONENT_TRANSFER));
   if (!m_filterEffect)
     return 0;
 
@@ -93,5 +93,6 @@ SVGFEComponentTransfer* SVGFEComponentTransferElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

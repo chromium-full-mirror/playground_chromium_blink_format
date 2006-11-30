@@ -20,6 +20,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFELightElement.h"
 
@@ -154,3 +155,5 @@ void SVGFELightElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

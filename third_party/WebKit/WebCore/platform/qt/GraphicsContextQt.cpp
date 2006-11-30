@@ -49,10 +49,6 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#ifdef SVG_SUPPORT
-#include "KRenderingDeviceQt.h"
-#endif
-
 #define notImplemented()                                                  \
   do {                                                                    \
     fprintf(stderr, "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, __LINE__); \
@@ -202,6 +198,9 @@ class GraphicsContextPlatformPrivate {
 
   IntRect focusRingClip;
   TextShadow shadow;
+
+  // Only used by SVG for now.
+  QPainterPath currentPath;
 
  private:
   QPainter* painter;
@@ -466,6 +465,23 @@ void GraphicsContext::fillRect(const FloatRect& rect, const Color& c) {
     return;
 
   m_data->p().fillRect(rect, QColor(c));
+}
+
+void GraphicsContext::beginPath() {
+  m_data->currentPath = QPainterPath();
+}
+
+void GraphicsContext::addPath(const Path& path) {
+  m_data->currentPath = *(path.platformPath());
+}
+
+void GraphicsContext::setFillRule(WindRule rule) {
+  m_data->currentPath.setFillRule(rule == RULE_EVENODD ? Qt::OddEvenFill
+                                                       : Qt::WindingFill);
+}
+
+PlatformPath* GraphicsContext::currentPath() {
+  return &m_data->currentPath;
 }
 
 void GraphicsContext::clip(const IntRect& rect) {
@@ -797,11 +813,9 @@ void GraphicsContext::setPlatformFillColor(const Color& color) {
   m_data->p().setBrush(QBrush(color));
 }
 
-#ifdef SVG_SUPPORT
-KRenderingDeviceContext* GraphicsContext::createRenderingDeviceContext() {
-  return new KRenderingDeviceContextQt(platformContext());
-}
-#endif
+GraphicsContext* contextForImage(SVGResourceImage*) {
+  // FIXME!
+  return 0;
 }
 
 // vim: ts=4 sw=4 et

@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEFloodElement.h"
 
@@ -29,7 +30,7 @@
 #include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
-#include "KRenderingDevice.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -61,7 +62,7 @@ void SVGFEFloodElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEFlood* SVGFEFloodElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEFlood*>(
-        renderingDevice()->createFilterEffect(FE_FLOOD));
+        SVGResourceFilter::createFilterEffect(FE_FLOOD));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(in1());
@@ -78,5 +79,6 @@ SVGFEFlood* SVGFEFloodElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

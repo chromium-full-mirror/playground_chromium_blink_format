@@ -27,7 +27,6 @@
 
 #include "CSSValueList.h"
 #include "Document.h"
-#include "KRenderingDevice.h"
 #include "SVGPaintServerGradient.h"
 #include "SVGPaintServerSolid.h"
 #include "RenderObject.h"
@@ -43,8 +42,7 @@ namespace WebCore {
 static SVGPaintServerSolid* sharedSolidPaintServer() {
   static SVGPaintServerSolid* _sharedSolidPaintServer = 0;
   if (!_sharedSolidPaintServer)
-    _sharedSolidPaintServer = static_cast<SVGPaintServerSolid*>(
-        renderingDevice()->createPaintServer(SolidPaintServer).releaseRef());
+    _sharedSolidPaintServer = new SVGPaintServerSolid();
   return _sharedSolidPaintServer;
 }
 

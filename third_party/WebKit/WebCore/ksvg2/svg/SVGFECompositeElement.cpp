@@ -21,12 +21,13 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFECompositeElement.h"
 
-#include "KRenderingDevice.h"
 #include "SVGHelper.h"
 #include "SVGNames.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -135,7 +136,7 @@ void SVGFECompositeElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFEComposite* SVGFECompositeElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<SVGFEComposite*>(
-        renderingDevice()->createFilterEffect(FE_COMPOSITE));
+        SVGResourceFilter::createFilterEffect(FE_COMPOSITE));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setOperation((SVGCompositeOperationType)_operator());
@@ -150,5 +151,6 @@ SVGFEComposite* SVGFECompositeElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

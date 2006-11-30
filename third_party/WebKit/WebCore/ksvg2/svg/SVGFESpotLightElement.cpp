@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFESpotLightElement.h"
 #include "SVGSpotLightSource.h"
@@ -32,6 +33,7 @@ SVGFESpotLightElement::~SVGFESpotLightElement() {}
 
 SVGLightSource* SVGFESpotLightElement::lightSource() const {
   FloatPoint3D pos(x(), y(), z());
+
   // convert lookAt to a direction
   FloatPoint3D direction(pointsAtX() - pos.x(), pointsAtY() - pos.y(),
                          pointsAtZ() - pos.z());
@@ -40,4 +42,7 @@ SVGLightSource* SVGFESpotLightElement::lightSource() const {
                                 limitingConeAngle());
 }
 }
+
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

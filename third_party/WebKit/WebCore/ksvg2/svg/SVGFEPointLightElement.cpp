@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEPointLightElement.h"
 #include "SVGPointLightSource.h"
@@ -35,4 +36,7 @@ SVGLightSource* SVGFEPointLightElement::lightSource() const {
   return new SVGPointLightSource(pos);
 }
 }
+
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -49,7 +49,7 @@ class SVGPaintServerLinearGradient : public SVGPaintServerGradient {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
 #if PLATFORM(QT)
-  virtual bool setup(KRenderingDeviceContext*,
+  virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
                      SVGPaintTargetType) const;
 #endif

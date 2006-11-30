@@ -23,13 +23,12 @@
 #include "config.h"
 
 #ifdef SVG_SUPPORT
-
 #include "SVGFETileElement.h"
 
 #include "Attr.h"
-#include "KRenderingDevice.h"
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -60,7 +59,7 @@ void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
 SVGFETile* SVGFETileElement::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect =
-        static_cast<SVGFETile*>(renderingDevice()->createFilterEffect(FE_TILE));
+        static_cast<SVGFETile*>(SVGResourceFilter::createFilterEffect(FE_TILE));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(in1());
@@ -69,5 +68,6 @@ SVGFETile* SVGFETileElement::filterEffect() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGFEDistantLightElement.h"
 #include "SVGDistantLightSource.h"
