@@ -94,9 +94,13 @@ class ResourceResponse {
 #if PLATFORM(MAC)
   ResourceResponse(NSURLResponse* nsResponse)
       : m_isUpToDate(false), m_nsResponse(nsResponse) {}
+
+  NSURLResponse* nsURLResponse() const { return m_nsResponse.get(); }
 #elif USE(CFNETWORK)
   ResourceResponse(CFURLResponseRef cfResponse)
       : m_isUpToDate(false), m_cfResponse(cfResponse) {}
+
+  CFURLResponseRef cfURLResponse() const { return m_cfResponse.get(); }
 #endif
 
  private:

@@ -81,6 +81,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
 
 #if PLATFORM(MAC)
   NSURLRequest* willSendRequest(NSURLRequest*, NSURLResponse*);
+  void didReceiveResponse(NSURLResponse*);
   void addData(NSData*);
   void finishJobAndHandle(NSData*);
   void reportError(NSError* error);
@@ -115,8 +116,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
   void cancel();
 
   ResourceHandleClient* client() const;
-
-  void receivedResponse(PlatformResponse);
 
   const HTTPHeaderMap& requestHeaders() const;
   const KURL& url() const;
