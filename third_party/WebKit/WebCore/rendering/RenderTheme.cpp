@@ -333,7 +333,7 @@ bool RenderTheme::isEnabled(const RenderObject* o) const {
 bool RenderTheme::isFocused(const RenderObject* o) const {
   if (!o->element())
     return false;
-  return o->element() == o->element()->document()->focusNode();
+  return o->element() == o->element()->document()->focusedNode();
 }
 
 bool RenderTheme::isPressed(const RenderObject* o) const {

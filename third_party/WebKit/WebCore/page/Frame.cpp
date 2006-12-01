@@ -374,7 +374,7 @@ void Frame::setCaretVisible(bool flag) {
     return;
   clearCaretRectIfNeeded();
   if (flag)
-    setFocusNodeIfNeeded();
+    setFocusedNodeIfNeeded();
   d->m_caretVisible = flag;
   selectionLayoutChanged();
 }
@@ -399,7 +399,7 @@ static bool isFrameElement(const Node* n) {
   return widget && widget->isFrameView();
 }
 
-void Frame::setFocusNodeIfNeeded() {
+void Frame::setFocusedNodeIfNeeded() {
   if (!document() || selectionController()->isNone() || !d->m_isActive)
     return;
 
@@ -417,14 +417,14 @@ void Frame::setFocusNodeIfNeeded() {
       // make this
       // work in the long term, but this is the safest fix at this time.
       if (target && target->isMouseFocusable() && !isFrameElement(target)) {
-        document()->setFocusNode(target);
+        document()->setFocusedNode(target);
         return;
       }
       renderer = renderer->parent();
       if (renderer)
         target = renderer->element();
     }
-    document()->setFocusNode(0);
+    document()->setFocusedNode(0);
   }
 }
 
@@ -917,7 +917,7 @@ static HTMLFormElement* scanForForm(Node* start) {
 HTMLFormElement* Frame::currentForm() const {
   // start looking either at the active (first responder) node, or where the
   // selection is
-  Node* start = d->m_doc ? d->m_doc->focusNode() : 0;
+  Node* start = d->m_doc ? d->m_doc->focusedNode() : 0;
   if (!start)
     start = selectionController()->start().node();
 
@@ -1210,7 +1210,7 @@ void Frame::setIsActive(bool flag) {
   // 3. The drawing of a focus ring around links in web pages.
   Document* doc = document();
   if (doc) {
-    Node* node = doc->focusNode();
+    Node* node = doc->focusedNode();
     if (node) {
       node->setChanged();
       if (node->renderer() && node->renderer()->style()->hasAppearance())
@@ -1232,9 +1232,9 @@ void Frame::setIsActive(bool flag) {
   }
 
   // 5. Enable or disable secure keyboard entry
-  if ((flag && !isSecureKeyboardEntry() && doc && doc->focusNode() &&
-       doc->focusNode()->hasTagName(inputTag) &&
-       static_cast<HTMLInputElement*>(doc->focusNode())->inputType() ==
+  if ((flag && !isSecureKeyboardEntry() && doc && doc->focusedNode() &&
+       doc->focusedNode()->hasTagName(inputTag) &&
+       static_cast<HTMLInputElement*>(doc->focusedNode())->inputType() ==
            HTMLInputElement::PASSWORD) ||
       (!flag && isSecureKeyboardEntry()))
     setSecureKeyboardEntry(flag);

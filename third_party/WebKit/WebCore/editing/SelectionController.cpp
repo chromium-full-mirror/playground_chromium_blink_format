@@ -139,7 +139,7 @@ void SelectionController::setSelection(const Selection& s,
   m_needsLayout = true;
 
   if (!s.isNone())
-    m_frame->setFocusNodeIfNeeded();
+    m_frame->setFocusedNodeIfNeeded();
 
   m_frame->selectionLayoutChanged();
   // Always clear the x position used for vertical arrow navigation.

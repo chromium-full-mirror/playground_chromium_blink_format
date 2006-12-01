@@ -148,10 +148,10 @@ bool HTMLInputElement::isKeyboardFocusable(KeyboardEvent* event) const {
 
     // Never allow keyboard tabbing to leave you in the same radio group. Always
     // skip any other elements in the group.
-    Node* currentFocusNode = document()->focusNode();
-    if (currentFocusNode && currentFocusNode->hasTagName(inputTag)) {
+    Node* currentFocusedNode = document()->focusedNode();
+    if (currentFocusedNode && currentFocusedNode->hasTagName(inputTag)) {
       HTMLInputElement* focusedInput =
-          static_cast<HTMLInputElement*>(currentFocusNode);
+          static_cast<HTMLInputElement*>(currentFocusedNode);
       if (focusedInput->inputType() == RADIO &&
           focusedInput->form() == form() && focusedInput->name() == name())
         return false;
@@ -175,12 +175,12 @@ bool HTMLInputElement::isMouseFocusable() const {
 void HTMLInputElement::focus() {
   if (isNonWidgetTextField()) {
     Document* doc = document();
-    if (doc->focusNode() == this)
+    if (doc->focusedNode() == this)
       return;
     doc->updateLayout();
     if (!supportsFocus())
       return;
-    doc->setFocusNode(this);
+    doc->setFocusedNode(this);
     // FIXME: Should isFocusable do the updateLayout?
     if (!isFocusable()) {
       setNeedsFocusAppearanceUpdate(true);
@@ -474,7 +474,7 @@ int HTMLInputElement::selectionStart() const {
     case ISINDEX:
     case PASSWORD:
     case TEXT:
-      if (document()->focusNode() != this && cachedSelStart >= 0)
+      if (document()->focusedNode() != this && cachedSelStart >= 0)
         return cachedSelStart;
       return static_cast<RenderTextControl*>(renderer())->selectionStart();
   }
@@ -501,7 +501,7 @@ int HTMLInputElement::selectionEnd() const {
     case ISINDEX:
     case PASSWORD:
     case TEXT:
-      if (document()->focusNode() != this && cachedSelEnd >= 0)
+      if (document()->focusedNode() != this && cachedSelEnd >= 0)
         return cachedSelEnd;
       return static_cast<RenderTextControl*>(renderer())->selectionEnd();
   }
@@ -1078,7 +1078,7 @@ void HTMLInputElement::setValue(const String& value) {
 
   // Restore a caret at the starting point of the old selection.
   // This matches Safari 2.0 behavior.
-  if (isNonWidgetTextField() && document()->focusNode() == this &&
+  if (isNonWidgetTextField() && document()->focusedNode() == this &&
       cachedSelStart >= 0) {
     ASSERT(cachedSelEnd >= 0);
     setSelectionRange(cachedSelStart, cachedSelStart);
@@ -1354,7 +1354,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
             if (inputElt->inputType() == RADIO && inputElt->name() == name() &&
                 inputElt->isFocusable()) {
               inputElt->setChecked(true);
-              document()->setFocusNode(inputElt);
+              document()->setFocusedNode(inputElt);
               inputElt->click(false, false);
               evt->setDefaultHandled();
               break;

@@ -315,7 +315,7 @@ class Frame : public Shared<Frame> {
   bool shouldChangeSelection(const Selection&) const;
   virtual bool shouldDeleteSelection(const Selection&) const;
   void clearCaretRectIfNeeded();
-  void setFocusNodeIfNeeded();
+  void setFocusedNodeIfNeeded();
   void selectionLayoutChanged();
   void notifyRendererOfSelectionChange(bool userTriggered);
 

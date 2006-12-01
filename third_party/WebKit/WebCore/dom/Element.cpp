@@ -538,7 +538,7 @@ void Element::attach() {
   ContainerNode::attach();
   if (needsFocusAppearanceUpdate() &&
       !m_updateFocusAppearanceTimer.isActive() &&
-      document()->focusNode() == this)
+      document()->focusedNode() == this)
     m_updateFocusAppearanceTimer.startOneShot(0);
 }
 
@@ -843,7 +843,7 @@ void Element::focus() {
   if (!supportsFocus())
     return;
 
-  doc->setFocusNode(this);
+  doc->setFocusedNode(this);
 
   if (!isFocusable()) {
     setNeedsFocusAppearanceUpdate(true);
@@ -883,8 +883,8 @@ void Element::updateFocusAppearanceTimerFired(Timer<Element>*) {
 void Element::blur() {
   stopUpdateFocusAppearanceTimer();
   Document* doc = document();
-  if (doc->focusNode() == this)
-    doc->setFocusNode(0);
+  if (doc->focusedNode() == this)
+    doc->setFocusedNode(0);
 }
 
 void Element::stopUpdateFocusAppearanceTimer() {

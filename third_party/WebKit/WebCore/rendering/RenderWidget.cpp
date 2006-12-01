@@ -204,15 +204,15 @@ void RenderWidget::focusIn(Widget*) {
   RenderArena* arena = ref();
   RefPtr<Node> elem = element();
   if (elem)
-    elem->document()->setFocusNode(elem);
+    elem->document()->setFocusedNode(elem);
   deref(arena);
 }
 
 void RenderWidget::focusOut(Widget*) {
   RenderArena* arena = ref();
   RefPtr<Node> elem = element();
-  if (elem && elem == elem->document()->focusNode())
-    elem->document()->setFocusNode(0);
+  if (elem && elem == elem->document()->focusedNode())
+    elem->document()->setFocusedNode(0);
   deref(arena);
 }
 
