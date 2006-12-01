@@ -78,6 +78,9 @@ class TextIterator {
   static PassRefPtr<Range> rangeFromLocationAndLength(Element* scope,
                                                       int rangeLocation,
                                                       int rangeLength);
+  static PassRefPtr<Range> subrange(Range* entireRange,
+                                    int characterOffset,
+                                    int characterCount);
 
  private:
   void exitNode();

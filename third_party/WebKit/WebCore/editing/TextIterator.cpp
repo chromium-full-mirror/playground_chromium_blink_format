@@ -809,6 +809,11 @@ PassRefPtr<Range> CharacterIterator::range() const {
 }
 
 void CharacterIterator::advance(int count) {
+  if (count <= 0) {
+    ASSERT(count == 0);
+    return;
+  }
+
   m_atBreak = false;
 
   // easy if there is enough left in the current m_textIterator run
@@ -1031,6 +1036,25 @@ int TextIterator::rangeLength(const Range* r) {
     length += it.length();
   }
   return length;
+}
+
+PassRefPtr<Range> TextIterator::subrange(Range* entireRange,
+                                         int characterOffset,
+                                         int characterCount) {
+  ExceptionCode ec = 0;
+
+  PassRefPtr<Range> result(entireRange);
+  CharacterIterator chars(entireRange);
+  chars.advance(characterOffset);
+  result->setStart(chars.range()->startContainer(ec),
+                   chars.range()->startOffset(ec), ec);
+  ASSERT(ec == 0);
+  chars.advance(characterCount);
+  result->setEnd(chars.range()->startContainer(ec),
+                 chars.range()->startOffset(ec), ec);
+  ASSERT(ec == 0);
+
+  return result;
 }
 
 PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Element* scope,
