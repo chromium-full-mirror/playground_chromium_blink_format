@@ -34,13 +34,17 @@
 #include "AXObjectCache.h"
 #include "CachedResource.h"
 #include "ChromeClientWin.h"
+#include "Clipboard.h"
 #include "ContextMenu.h"
 #include "ContextMenuClientWin.h"
+#include "ContextMenuItem.h"
 #include "CookieJar.h"
 #include "CString.h"
 #include "Cursor.h"
+#include "DocumentFragment.h"
 #include "DocumentLoader.h"
 #include "EditCommand.h"
+#include "Editor.h"
 #include "EditorClientWin.h"
 #include "EventHandler.h"
 #include "FileChooser.h"
@@ -62,6 +66,7 @@
 #include "LocalizedStrings.h"
 #include "Node.h"
 #include "Page.h"
+#include "Pasteboard.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
@@ -224,13 +229,13 @@ String submitButtonDefaultLabel() {
 
 bool AXObjectCache::gAccessibilityEnabled = false;
 
-void CachedResource::setPlatformResponse(PlatformResponse) {
-  notImplemented();
-}
 void CachedResource::setAllData(PlatformData) {
   notImplemented();
 }
 
+void ChromeClientWin::chromeDestroyed() {
+  notImplemented();
+}
 void ChromeClientWin::setWindowRect(const FloatRect&) {
   notImplemented();
 }
@@ -301,15 +306,33 @@ bool ChromeClientWin::menubarVisible() {
 void ChromeClientWin::setResizable(bool) {
   notImplemented();
 }
+void ChromeClientWin::addMessageToConsole(const String& message,
+                                          unsigned int lineNumber,
+                                          const String& sourceID) {
+  notImplemented();
+}
 
-void ContextMenu::appendItem(ContextMenuItem item) {
+ContextMenu::ContextMenu(const HitTestResult& result)
+    : m_hitTestResult(result) {
+  notImplemented();
+}
+ContextMenu::~ContextMenu() {
+  notImplemented();
+}
+void ContextMenu::appendItem(const ContextMenuItem& item) {
   notImplemented();
 }
 void ContextMenu::show() {
   notImplemented();
 }
 
+void ContextMenuClientWin::contextMenuDestroyed() {
+  notImplemented();
+}
 void ContextMenuClientWin::addCustomContextMenuItems(ContextMenu*) {
+  notImplemented();
+}
+void ContextMenuClientWin::contextMenuItemSelected(ContextMenuItem*) {
   notImplemented();
 }
 void ContextMenuClientWin::copyLinkToClipboard(HitTestResult) {
@@ -322,6 +345,10 @@ void ContextMenuClientWin::copyImageToClipboard(HitTestResult) {
   notImplemented();
 }
 void ContextMenuClientWin::lookUpInDictionary(Frame*) {
+  notImplemented();
+}
+
+ContextMenuItem::~ContextMenuItem() {
   notImplemented();
 }
 
@@ -360,11 +387,24 @@ void DocumentLoader::stopRecordingResponses() {
   notImplemented();
 }
 
+PassRefPtr<Clipboard> Editor::newGeneralClipboard(
+    ClipboardAccessPolicy policy) {
+  notImplemented();
+  return 0;
+}
+
+void EditorClientWin::pageDestroyed() {
+  notImplemented();
+}
 bool EditorClientWin::shouldDeleteRange(Range*) {
   notImplemented();
   return false;
 }
 bool EditorClientWin::shouldShowDeleteInterface(HTMLElement*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::smartInsertDeleteEnabled() {
   notImplemented();
   return false;
 }
@@ -393,6 +433,10 @@ bool EditorClientWin::shouldBeginEditing(Range*) {
   return false;
 }
 bool EditorClientWin::shouldEndEditing(Range*) {
+  notImplemented();
+  return false;
+}
+bool EditorClientWin::shouldInsertNode(Node*, Range*, EditorInsertAction) {
   notImplemented();
   return false;
 }
@@ -603,9 +647,6 @@ Widget* FrameLoader::createPlugin(Element*,
   notImplemented();
   return 0;
 }
-void FrameLoader::detachFromParent() {
-  notImplemented();
-}
 void FrameLoader::checkLoadCompleteForThisFrame() {
   notImplemented();
 }
@@ -613,9 +654,12 @@ void FrameLoader::reload() {
   notImplemented();
 }
 
+void FrameLoaderClientWin::frameLoaderDestroyed() {
+  notImplemented();
+}
 bool FrameLoaderClientWin::hasWebView() const {
   notImplemented();
-  return false;
+  return true;
 }
 bool FrameLoaderClientWin::hasFrameView() const {
   notImplemented();
@@ -803,6 +847,10 @@ void FrameLoaderClientWin::cancelPendingArchiveLoad(ResourceLoader*) {
 void FrameLoaderClientWin::clearArchivedResources() {
   notImplemented();
 }
+bool FrameLoaderClientWin::canHandleRequest(const ResourceRequest&) const {
+  notImplemented();
+  return false;
+}
 bool FrameLoaderClientWin::canShowMIMEType(const String&) const {
   notImplemented();
   return false;
@@ -857,13 +905,6 @@ void FrameWin::focusWindow() {
 void FrameWin::unfocusWindow() {
   notImplemented();
 }
-bool FrameWin::locationbarVisible() {
-  notImplemented();
-  return 0;
-}
-void FrameWin::issueRedoCommand(void) {
-  notImplemented();
-}
 KJS::Bindings::Instance* FrameWin::getObjectInstanceForWidget(Widget*) {
   notImplemented();
   return 0;
@@ -875,20 +916,6 @@ KJS::Bindings::Instance* FrameWin::getEmbedInstanceForWidget(Widget*) {
 KJS::Bindings::RootObject* FrameWin::bindingRootObject() {
   notImplemented();
   return 0;
-}
-bool FrameWin::canRedo() const {
-  notImplemented();
-  return 0;
-}
-bool FrameWin::canUndo() const {
-  notImplemented();
-  return 0;
-}
-void FrameWin::registerCommandForUndo(PassRefPtr<WebCore::EditCommand>) {
-  notImplemented();
-}
-void FrameWin::registerCommandForRedo(PassRefPtr<WebCore::EditCommand>) {
-  notImplemented();
 }
 bool FrameWin::runJavaScriptPrompt(String const&, String const&, String&) {
   notImplemented();
@@ -915,13 +942,6 @@ void FrameWin::issueCutCommand() {
 void FrameWin::issueCopyCommand() {
   notImplemented();
 }
-bool FrameWin::passWheelEventToChildWidget(Node*) {
-  notImplemented();
-  return 0;
-}
-void FrameWin::issueUndoCommand() {
-  notImplemented();
-}
 String FrameWin::mimeTypeForFileName(String const&) const {
   notImplemented();
   return String();
@@ -935,28 +955,8 @@ void FrameWin::scheduleClose() {
 void FrameWin::markMisspellings(const WebCore::Selection&) {
   notImplemented();
 }
-bool FrameWin::menubarVisible() {
-  notImplemented();
-  return 0;
-}
-bool FrameWin::personalbarVisible() {
-  notImplemented();
-  return 0;
-}
-bool FrameWin::statusbarVisible() {
-  notImplemented();
-  return 0;
-}
-bool FrameWin::toolbarVisible() {
-  notImplemented();
-  return 0;
-}
 void FrameWin::issueTransposeCommand() {
   notImplemented();
-}
-bool FrameWin::canPaste() const {
-  notImplemented();
-  return 0;
 }
 void FrameWin::issuePasteAndMatchStyleCommand() {
   notImplemented();
@@ -969,18 +969,6 @@ Range* FrameWin::markedTextRange() const {
   notImplemented();
   return 0;
 }
-bool FrameWin::passSubframeEventToSubframe(MouseEventWithHitTestResults&,
-                                           Frame*) {
-  notImplemented();
-  return false;
-}
-bool FrameWin::lastEventIsMouseUp() const {
-  notImplemented();
-  return false;
-}
-void FrameWin::addMessageToConsole(String const&, unsigned int, String const&) {
-  notImplemented();
-}
 bool FrameWin::shouldChangeSelection(const Selection&,
                                      const Selection&,
                                      EAffinity,
@@ -991,13 +979,7 @@ bool FrameWin::shouldChangeSelection(const Selection&,
 void FrameWin::respondToChangedSelection(const Selection&, bool) {
   notImplemented();
 }
-void FrameWin::clearUndoRedoOperations(void) {
-  notImplemented();
-}
 void FrameWin::markMisspellingsInAdjacentWords(VisiblePosition const&) {
-  notImplemented();
-}
-void FrameWin::respondToChangedContents(const Selection&) {
   notImplemented();
 }
 void FrameWin::ignoreSpelling() {
@@ -1005,6 +987,14 @@ void FrameWin::ignoreSpelling() {
 }
 void FrameWin::learnSpelling() {
   notImplemented();
+}
+bool FrameWin::isSelectionMisspelled() {
+  notImplemented();
+  return false;
+}
+Vector<String> FrameWin::guessesForMisspelledSelection() {
+  notImplemented();
+  return Vector<String>();
 }
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
@@ -1115,6 +1105,60 @@ bool Image::getHBITMAP(HBITMAP) {
 }
 
 HINSTANCE Page::s_instanceHandle = 0;
+
+Pasteboard* Pasteboard::generalPasteboard() {
+  notImplemented();
+  return 0;
+}
+void Pasteboard::writeSelection(PassRefPtr<Range>,
+                                bool canSmartCopyOrDelete,
+                                Frame*) {
+  notImplemented();
+}
+void Pasteboard::clearTypes() {
+  notImplemented();
+}
+bool Pasteboard::canSmartReplace() {
+  notImplemented();
+  return false;
+}
+PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
+    Frame*,
+    PassRefPtr<Range>,
+    bool allowPlainText,
+    bool& chosePlainText) {
+  notImplemented();
+  return 0;
+}
+String Pasteboard::plainText(Frame* frame) {
+  notImplemented();
+  return String();
+}
+Pasteboard::Pasteboard() {
+  notImplemented();
+}
+Pasteboard::~Pasteboard() {
+  notImplemented();
+}
+HashSet<int> Pasteboard::registerSelectionPasteboardTypes() {
+  notImplemented();
+  return HashSet<int>();
+}
+void Pasteboard::replaceNBSP(String&) {
+  notImplemented();
+}
+HGLOBAL Pasteboard::createHandle(String) {
+  notImplemented();
+  return 0;
+}
+HGLOBAL Pasteboard::createHandle(CString) {
+  notImplemented();
+  return 0;
+}
+DeprecatedCString Pasteboard::createCF_HTMLFromRange(PassRefPtr<Range>) {
+  notImplemented();
+  return DeprecatedCString();
+}
 
 Path::Path() {
   notImplemented();

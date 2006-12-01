@@ -36,6 +36,7 @@ class FrameLoaderClientWin : public FrameLoaderClient,
                              public Shared<FrameLoaderClientWin> {
  public:
   virtual ~FrameLoaderClientWin() {}
+  virtual void frameLoaderDestroyed();
 
   virtual void ref() { Shared<FrameLoaderClientWin>::ref(); }
   virtual void deref() { Shared<FrameLoaderClientWin>::deref(); }
@@ -124,6 +125,7 @@ class FrameLoaderClientWin : public FrameLoaderClient,
   virtual void cancelPendingArchiveLoad(ResourceLoader*);
   virtual void clearArchivedResources();
 
+  virtual bool canHandleRequest(const ResourceRequest&) const;
   virtual bool canShowMIMEType(const String&) const;
   virtual bool representationExistsForURLScheme(const String&) const;
   virtual String generatedMIMETypeForURLScheme(const String&) const;
