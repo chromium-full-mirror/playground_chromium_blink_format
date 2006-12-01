@@ -689,8 +689,14 @@ void CompositeEditCommand::moveParagraphs(
   // treated as though they were rendered.
   Position start = startOfParagraphToMove.deepEquivalent().downstream();
   Position end = endOfParagraphToMove.deepEquivalent().upstream();
-  RefPtr<Range> range = new Range(document(), start.node(), start.offset(),
-                                  end.node(), end.offset());
+
+  // start and end can't be used directly to create a Range; they are "editing
+  // positions"
+  Position startRangeCompliant = rangeCompliantEquivalent(start);
+  Position endRangeCompliant = rangeCompliantEquivalent(end);
+  RefPtr<Range> range = new Range(
+      document(), startRangeCompliant.node(), startRangeCompliant.offset(),
+      endRangeCompliant.node(), endRangeCompliant.offset());
 
   // FIXME: This is an inefficient way to preserve style on nodes in the
   // paragraph to move.  It
@@ -745,8 +751,9 @@ void CompositeEditCommand::moveParagraphs(
                  beforeParagraph.deepEquivalent().node(),
                  beforeParagraph.deepEquivalent().offset());
 
-  RefPtr<Range> startToDestinationRange(new Range(
-      document(), Position(document(), 0), destination.deepEquivalent()));
+  RefPtr<Range> startToDestinationRange(
+      new Range(document(), Position(document(), 0),
+                rangeCompliantEquivalent(destination.deepEquivalent())));
   destinationIndex = TextIterator::rangeLength(startToDestinationRange.get());
 
   setEndingSelection(destination);

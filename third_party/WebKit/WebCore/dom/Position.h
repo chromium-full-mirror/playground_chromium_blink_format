@@ -81,7 +81,6 @@ class Position {
   Position upstream() const;
   Position downstream() const;
 
-  Position equivalentRangeCompliantPosition() const;
   bool inRenderedContent() const;
   bool isRenderedCharacter() const;
   bool rendersInDifferentPosition(const Position& pos) const;
