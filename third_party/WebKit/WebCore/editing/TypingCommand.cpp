@@ -356,10 +356,6 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
 
       selectionToDelete = selectionController.selection();
 
-      // setStartingSelection so that undo selects what was deleted
-      if (selectionToDelete.isCaretOrRange() &&
-          granularity != CharacterGranularity)
-        setStartingSelection(selectionToDelete);
       break;
     }
     case Selection::NONE:
@@ -369,6 +365,10 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
 
   if (selectionToDelete.isCaretOrRange() &&
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
+    // setStartingSelection so that undo selects what was deleted
+    if (granularity != CharacterGranularity)
+      setStartingSelection(selectionToDelete);
+
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
@@ -407,10 +407,6 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
       }
       selectionToDelete = selectionController.selection();
 
-      // setStartingSelection so that undo selects what was deleted
-      if (selectionToDelete.isCaretOrRange() &&
-          granularity != CharacterGranularity)
-        setStartingSelection(selectionToDelete);
       break;
     }
     case Selection::NONE:
@@ -420,6 +416,10 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
 
   if (selectionToDelete.isCaretOrRange() &&
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
+    // setStartingSelection so that undo selects what was deleted
+    if (granularity != CharacterGranularity)
+      setStartingSelection(selectionToDelete);
+
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
