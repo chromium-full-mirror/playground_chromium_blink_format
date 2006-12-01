@@ -44,7 +44,6 @@ class Event : public Shared<Event> {
  public:
   enum PhaseType { CAPTURING_PHASE = 1, AT_TARGET = 2, BUBBLING_PHASE = 3 };
 
-  // Reverse-engineered from Netscape
   enum EventType {
     MOUSEDOWN = 1,
     MOUSEUP = 2,
@@ -65,17 +64,15 @@ class Event : public Shared<Event> {
   };
 
   Event();
-  Event(const AtomicString& typeArg, bool canBubbleArg, bool cancelableArg);
+  Event(const AtomicString& type, bool canBubble, bool cancelable);
   virtual ~Event();
 
-  void initEvent(const AtomicString& eventTypeArg,
-                 bool canBubbleArg,
-                 bool cancelableArg);
+  void initEvent(const AtomicString& type, bool canBubble, bool cancelable);
 
   const AtomicString& type() const { return m_type; }
 
   Node* target() const { return m_target.get(); }
-  void setTarget(Node*);
+  void setTarget(PassRefPtr<Node>);
 
   Node* currentTarget() const { return m_currentTarget; }
   void setCurrentTarget(Node* currentTarget) {
@@ -104,11 +101,8 @@ class Event : public Shared<Event> {
 #endif
 
   bool propagationStopped() const { return m_propagationStopped; }
+
   bool defaultPrevented() const { return m_defaultPrevented; }
-
-  void setDefaultHandled() { m_defaultHandled = true; }
-  bool defaultHandled() const { return m_defaultHandled; }
-
   void preventDefault() {
     if (m_cancelable)
       m_defaultPrevented = true;
@@ -117,8 +111,14 @@ class Event : public Shared<Event> {
     m_defaultPrevented = defaultPrevented;
   }
 
+  bool defaultHandled() const { return m_defaultHandled; }
+  void setDefaultHandled() { m_defaultHandled = true; }
+
+  bool cancelBubble() const { return m_cancelBubble; }
   void setCancelBubble(bool cancel) { m_cancelBubble = cancel; }
-  bool getCancelBubble() const { return m_cancelBubble; }
+
+  Event* underlyingEvent() const { return m_underlyingEvent.get(); }
+  void setUnderlyingEvent(PassRefPtr<Event>);
 
   virtual bool storesResultAsString() const;
   virtual void storeResult(const String&);
@@ -137,10 +137,12 @@ class Event : public Shared<Event> {
   bool m_defaultHandled;
   bool m_cancelBubble;
 
-  Node* m_currentTarget;  // ref > 0 maintained externally
+  Node* m_currentTarget;
   unsigned short m_eventPhase;
   RefPtr<Node> m_target;
   DOMTimeStamp m_createTime;
+
+  RefPtr<Event> m_underlyingEvent;
 };
 
 }  // namespace WebCore

@@ -613,34 +613,6 @@ void HTMLInputElement::setSelectionRange(int start, int end) {
   }
 }
 
-void HTMLInputElement::click(bool sendMouseEvents, bool showPressedLook) {
-  switch (inputType()) {
-    case BUTTON:
-    case CHECKBOX:
-    case IMAGE:
-    case ISINDEX:
-    case PASSWORD:
-    case RADIO:
-    case RANGE:
-    case RESET:
-    case SEARCH:
-    case SUBMIT:
-    case TEXT:
-      break;
-    case FILE:
-      if (renderer()) {
-        static_cast<RenderFileUploadControl*>(renderer())
-            ->click(sendMouseEvents);
-        return;
-      }
-      break;
-    case HIDDEN:
-      // a no-op for this type
-      return;
-  }
-  HTMLGenericFormElement::click(sendMouseEvents, showPressedLook);
-}
-
 void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
   switch (inputType()) {
     case BUTTON:
@@ -654,7 +626,7 @@ void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
       // focus
       focus();
       // send the mouse button events iff the caller specified sendToAnyElement
-      click(sendToAnyElement);
+      dispatchSimulatedClick(0, sendToAnyElement);
       break;
     case HIDDEN:
       // a no-op for this type
@@ -1229,7 +1201,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   // and submit inputs, this means
   // actually submitting the form. For reset inputs, the form is reset. These
   // events are sent when the user clicks
-  // on the element, or presses enter while it is the active element. Javacsript
+  // on the element, or presses enter while it is the active element. JavaScript
   // code wishing to activate the element
   // must dispatch a DOMActivate event - a click event will not do the job.
   if (evt->type() == DOMActivateEvent && !disabled()) {
@@ -1247,7 +1219,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         m_activeSubmit = false;
       }
     } else if (inputType() == FILE && renderer())
-      static_cast<RenderFileUploadControl*>(renderer())->click(false);
+      static_cast<RenderFileUploadControl*>(renderer())->click();
   }
 
   // Use key press event here since sending simulated mouse events
@@ -1355,7 +1327,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
                 inputElt->isFocusable()) {
               inputElt->setChecked(true);
               document()->setFocusedNode(inputElt);
-              inputElt->click(false, false);
+              inputElt->dispatchSimulatedClick(evt, false, false);
               evt->setDefaultHandled();
               break;
             }
@@ -1365,7 +1337,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     }
 
     if (clickElement) {
-      click(false);
+      dispatchSimulatedClick(evt);
       evt->setDefaultHandled();
     } else if (clickDefaultFormButton && (inputType() != SEARCH || form())) {
       if (form()) {

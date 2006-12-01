@@ -64,7 +64,9 @@ class EventTargetNode : public Node {
   void dispatchWindowEvent(const AtomicString& eventType,
                            bool canBubble,
                            bool cancelable);
-  bool dispatchUIEvent(const AtomicString& eventType, int detail = 0);
+  bool dispatchUIEvent(const AtomicString& eventType,
+                       int detail = 0,
+                       PassRefPtr<Event> underlyingEvent = 0);
   bool dispatchKeyEvent(const PlatformKeyboardEvent&);
   void dispatchWheelEvent(PlatformWheelEvent&);
   bool dispatchMouseEvent(const PlatformMouseEvent&,
@@ -83,8 +85,13 @@ class EventTargetNode : public Node {
                           bool shiftKey,
                           bool metaKey,
                           bool isSimulated = false,
-                          Node* relatedTarget = 0);
-  bool dispatchSimulatedMouseEvent(const AtomicString& eventType);
+                          Node* relatedTarget = 0,
+                          PassRefPtr<Event> underlyingEvent = 0);
+  void dispatchSimulatedMouseEvent(const AtomicString& eventType,
+                                   PassRefPtr<Event> underlyingEvent = 0);
+  void dispatchSimulatedClick(PassRefPtr<Event> underlyingEvent,
+                              bool sendMouseEvents = false,
+                              bool showPressedLook = true);
 
   void handleLocalEvents(Event*, bool useCapture);
 

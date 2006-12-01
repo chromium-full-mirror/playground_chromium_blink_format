@@ -122,7 +122,6 @@ class HTMLInputElement : public HTMLGenericFormElement {
   void select();
   void setSelectionRange(int start, int end);
 
-  virtual void click(bool sendMouseEvents = false, bool showPressedLook = true);
   virtual void accessKeyAction(bool sendToAnyElement);
 
   virtual bool mapToEntry(const QualifiedName& attrName,

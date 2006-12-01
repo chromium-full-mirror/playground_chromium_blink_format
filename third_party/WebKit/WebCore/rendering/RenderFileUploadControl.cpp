@@ -94,7 +94,7 @@ void RenderFileUploadControl::valueChanged() {
   repaint();
 }
 
-void RenderFileUploadControl::click(bool sendMouseEvents) {
+void RenderFileUploadControl::click() {
   m_fileChooser->openFileChooser();
 }
 

@@ -118,9 +118,8 @@ bool HTMLButtonElement::appendFormData(FormDataList& encoding,
 }
 
 void HTMLButtonElement::accessKeyAction(bool sendToAnyElement) {
-  // send the mouse button events iff the
-  // caller specified sendToAnyElement
-  click(sendToAnyElement);
+  // send the mouse button events iff the caller specified sendToAnyElement
+  dispatchSimulatedClick(0, sendToAnyElement);
 }
 
 String HTMLButtonElement::accessKey() const {

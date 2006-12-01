@@ -99,7 +99,7 @@ void HTMLLabelElement::defaultEventHandler(Event* evt) {
   static bool processingClick = false;
 
   if (evt->type() == clickEvent && !processingClick) {
-    HTMLElement* element = formElement();
+    RefPtr<HTMLElement> element = formElement();
 
     // If we can't find a control or if the control received the click
     // event, then there's no need for us to do anything.
@@ -109,7 +109,7 @@ void HTMLLabelElement::defaultEventHandler(Event* evt) {
     processingClick = true;
 
     // Click the corresponding control.
-    element->click(false);
+    element->dispatchSimulatedClick(evt);
 
     // If the control can be focused via the mouse, then do that too.
     if (element->isMouseFocusable())
