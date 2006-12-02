@@ -1730,9 +1730,13 @@ DeprecatedString& DeprecatedString::format(const char* format, ...) {
   va_list args;
   va_start(args, format);
 
-  // Do the format once to get the length.
+// Do the format once to get the length.
+#if PLATFORM(WIN_OS)
+  int result = _vscprintf(format, args);
+#else
   char ch;
   int result = vsnprintf(&ch, 1, format, args);
+#endif
 
   // Handle the empty string case to simplify the code below.
   if (result <=
@@ -1764,6 +1768,7 @@ DeprecatedString& DeprecatedString::format(const char* format, ...) {
   // Now do the formatting again, guaranteed to fit.
   vsprintf(const_cast<char*>(ascii()), format, args);
 
+  va_end(args);
   return *this;
 }
 
