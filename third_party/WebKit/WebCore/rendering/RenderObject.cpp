@@ -2328,7 +2328,7 @@ void RenderObject::setStyle(RenderStyle* style) {
           RenderObject* cb = parent();
           while (cb && (cb->style()->position() == StaticPosition ||
                         (cb->isInline() && !cb->isReplaced())) &&
-                 !cb->isRoot() && !cb->isRenderView()) {
+                 !cb->isRenderView()) {
             if (cb->style()->position() == RelativePosition && cb->isInline() &&
                 !cb->isReplaced()) {
               cb = cb->containingBlock();
