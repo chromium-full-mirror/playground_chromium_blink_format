@@ -52,6 +52,7 @@ class TPoint;
 
 namespace WebCore {
 
+class AffineTransform;
 class IntPoint;
 
 class FloatPoint {
@@ -89,6 +90,8 @@ class FloatPoint {
   operator TPoint() const;
   FloatPoint(const TPoint&);
 #endif
+
+  FloatPoint matrixTransform(const AffineTransform&) const;
 
  private:
   float m_x, m_y;

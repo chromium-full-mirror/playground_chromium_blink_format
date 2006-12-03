@@ -40,10 +40,16 @@ class JSSVGRect : public KJS::DOMObject {
                                   const KJS::Identifier&,
                                   KJS::PropertySlot&);
   JSValue* getValueProperty(KJS::ExecState*, int token) const;
-  // no put - all read-only
+
+  virtual void put(KJS::ExecState*,
+                   const KJS::Identifier&,
+                   KJS::JSValue*,
+                   int attr = KJS::None);
+  void putValueProperty(KJS::ExecState*, int, KJS::JSValue*, int attr);
 
   virtual const KJS::ClassInfo* classInfo() const { return &info; }
   static const KJS::ClassInfo info;
+
   enum { RectX, RectY, RectWidth, RectHeight };
 
   FloatRect impl() { return m_rect; }

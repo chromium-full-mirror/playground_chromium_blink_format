@@ -26,32 +26,55 @@
 #include "config.h"
 #include "JSSVGNumber.h"
 
+#include "JSSVGNumberTable.cpp"
+
 using namespace KJS;
 
 namespace WebCore {
 
-const ClassInfo JSSVGNumber::info = {"SVGNumber", 0, 0, 0};
+const ClassInfo JSSVGNumber::info = {"SVGNumber", 0, &JSSVGNumberTable, 0};
+
+/*
+@begin JSSVGNumberTable 4
+  value         WebCore::JSSVGNumber::NumberValue       DontDelete
+@end
+*/
 
 JSSVGNumber::~JSSVGNumber() {}
 
 bool JSSVGNumber::getOwnPropertySlot(ExecState* exec,
                                      const Identifier& propertyName,
                                      PropertySlot& slot) {
-  if (propertyName == "value") {
-    slot.setCustom(this, getValue);
-    return true;
-  }
-  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
+  return getStaticValueSlot<JSSVGNumber, DOMObject>(exec, &JSSVGNumberTable,
+                                                    this, propertyName, slot);
 }
 
-JSValue* JSSVGNumber::getValue(ExecState* exec,
-                               JSObject* originalObject,
-                               const Identifier& propertyName,
-                               const PropertySlot& slot) {
-  JSSVGNumber* thisObj = static_cast<JSSVGNumber*>(slot.slotBase());
-  if (propertyName == "value")
-    return jsNumber(thisObj->m_value);
-  return 0;
+JSValue* JSSVGNumber::getValueProperty(ExecState* exec, int token) const {
+  switch (token) {
+    case NumberValue:
+      return jsNumber(m_value);
+    default:
+      return 0;
+  }
+}
+
+void JSSVGNumber::put(KJS::ExecState* exec,
+                      const KJS::Identifier& propertyName,
+                      KJS::JSValue* value,
+                      int attr) {
+  lookupPut<JSSVGNumber>(exec, propertyName, value, attr, &JSSVGNumberTable,
+                         this);
+}
+
+void JSSVGNumber::putValueProperty(KJS::ExecState* exec,
+                                   int token,
+                                   KJS::JSValue* value,
+                                   int attr) {
+  switch (token) {
+    case NumberValue:
+      m_value = value->toNumber(exec);
+      break;
+  }
 }
 
 JSValue* getJSSVGNumber(ExecState* exec, double v) {
