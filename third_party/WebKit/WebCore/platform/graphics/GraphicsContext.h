@@ -63,7 +63,6 @@ class GraphicsContextPrivate;
 class GraphicsContextPlatformPrivate;
 class KURL;
 class Path;
-class SVGResourceImage;
 class TextRun;
 class TextStyle;
 
@@ -236,6 +235,7 @@ class GraphicsContext : Noncopyable {
 };
 
 #ifdef SVG_SUPPORT
+class SVGResourceImage;
 GraphicsContext* contextForImage(SVGResourceImage*);
 #endif
 
