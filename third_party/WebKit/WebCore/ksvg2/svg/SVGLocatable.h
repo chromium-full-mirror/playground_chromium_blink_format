@@ -46,8 +46,7 @@ class SVGLocatable {
   virtual FloatRect getBBox() const = 0;
   virtual SVGMatrix* getCTM() const = 0;
   virtual SVGMatrix* getScreenCTM() const = 0;
-  virtual SVGMatrix* getTransformToElement(SVGElement*,
-                                           ExceptionCode&) const = 0;
+  SVGMatrix* getTransformToElement(SVGElement*, ExceptionCode&) const;
 
  protected:
   static SVGElement* nearestViewportElement(const SVGStyledElement*);

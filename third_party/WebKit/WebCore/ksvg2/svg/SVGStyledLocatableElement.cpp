@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -31,12 +31,12 @@
 #include "SVGMatrix.h"
 #include "SVGSVGElement.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGStyledLocatableElement::SVGStyledLocatableElement(
     const QualifiedName& tagName,
     Document* doc)
-    : SVGStyledElement(tagName, doc), SVGLocatable() {}
+    : SVGLocatable(), SVGStyledElement(tagName, doc) {}
 
 SVGStyledLocatableElement::~SVGStyledLocatableElement() {}
 
@@ -59,12 +59,6 @@ SVGMatrix* SVGStyledLocatableElement::getCTM() const {
 SVGMatrix* SVGStyledLocatableElement::getScreenCTM() const {
   return SVGLocatable::getScreenCTM(this);
 }
-
-SVGMatrix* SVGStyledLocatableElement::getTransformToElement(
-    SVGElement*,
-    ExceptionCode&) const {
-  // TODO!
-  return 0;
 }
 
 // vim:ts=4:noet

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,7 +35,7 @@
 #include "SVGStyledElement.h"
 #include "SVGTransformList.h"
 
-using namespace WebCore;
+namespace WebCore {
 
 SVGStyledTransformableElement::SVGStyledTransformableElement(
     const QualifiedName& tagName,
@@ -106,17 +106,12 @@ FloatRect SVGStyledTransformableElement::getBBox() const {
   return SVGTransformable::getBBox(this);
 }
 
-SVGMatrix* SVGStyledTransformableElement::getTransformToElement(
-    SVGElement*,
-    ExceptionCode&) const {
-  return 0;
-}
-
 void SVGStyledTransformableElement::attach() {
   SVGStyledElement::attach();
 
   if (renderer() && m_localMatrix)
     renderer()->setLocalTransform(m_localMatrix->matrix());
+}
 }
 
 // vim:ts=4:noet

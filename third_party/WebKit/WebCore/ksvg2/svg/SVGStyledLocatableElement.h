@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -32,7 +32,8 @@ namespace WebCore {
 class SVGMatrix;
 class SVGElement;
 
-class SVGStyledLocatableElement : public SVGStyledElement, public SVGLocatable {
+class SVGStyledLocatableElement : public SVGStyledElement,
+                                  virtual public SVGLocatable {
  public:
   SVGStyledLocatableElement(const QualifiedName&, Document*);
   virtual ~SVGStyledLocatableElement();
@@ -46,7 +47,6 @@ class SVGStyledLocatableElement : public SVGStyledElement, public SVGLocatable {
   virtual FloatRect getBBox() const;
   virtual SVGMatrix* getCTM() const;
   virtual SVGMatrix* getScreenCTM() const;
-  virtual SVGMatrix* getTransformToElement(SVGElement*, ExceptionCode&) const;
 };
 
 }  // namespace WebCore
