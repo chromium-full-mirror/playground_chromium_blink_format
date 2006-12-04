@@ -47,6 +47,9 @@ class HTMLCanvasElement : public HTMLElement {
   HTMLCanvasElement(Document*);
   virtual ~HTMLCanvasElement();
 
+  virtual HTMLTagStatus endTagRequirement() const;
+  virtual int tagPriority() const;
+
   int width() const { return m_size.width(); }
   int height() const { return m_size.height(); }
   void setWidth(int);

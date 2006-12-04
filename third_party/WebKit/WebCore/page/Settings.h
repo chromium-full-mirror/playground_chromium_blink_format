@@ -53,8 +53,9 @@ class Settings {
         m_pluginsEnabled(0),
         m_javaScriptEnabled(0),
         m_javaScriptCanOpenWindowsAutomatically(0),
-        m_shouldPrintBackgrounds(0),
+        m_shouldPrintBackgrounds(false),
         m_textAreasAreResizable(0),
+        m_shouldUseDashboardBackwardCompatibilityMode(false),
         m_editableLinkBehavior(EditableLinkDefaultBehavior) {}
 
   const AtomicString& stdFontName() const { return m_stdFontName; }
@@ -120,6 +121,13 @@ class Settings {
     m_editableLinkBehavior = e;
   }
 
+  void setShouldUseDashboardBackwardCompatibilityMode(bool b) {
+    m_shouldUseDashboardBackwardCompatibilityMode = b;
+  }
+  bool shouldUseDashboardBackwardCompatibilityMode() const {
+    return m_shouldUseDashboardBackwardCompatibilityMode;
+  }
+
  private:
   AtomicString m_stdFontName;
   AtomicString m_fixedFontName;
@@ -142,6 +150,7 @@ class Settings {
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;
+  bool m_shouldUseDashboardBackwardCompatibilityMode : 1;
   EditableLinkBehavior m_editableLinkBehavior;
 };
 }

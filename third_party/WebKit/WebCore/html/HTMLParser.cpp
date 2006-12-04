@@ -48,6 +48,7 @@
 #include "HTMLTableSectionElement.h"
 #include "HTMLTokenizer.h"
 #include "LocalizedStrings.h"
+#include "Settings.h"
 #include "Text.h"
 
 namespace WebCore {
@@ -755,6 +756,12 @@ bool HTMLParser::mapCreateErrorCheck(Token* t, RefPtr<Node>& result) {
 }
 
 bool HTMLParser::canvasCreateErrorCheck(Token* t, RefPtr<Node>& result) {
+  if (document->frame() &&
+      document->frame()
+          ->settings()
+          ->shouldUseDashboardBackwardCompatibilityMode())
+    return true;
+
   if (!m_fragment && document->frame() &&
       document->frame()->javaScriptEnabled())
     setSkipMode(canvasTag);
