@@ -66,6 +66,12 @@ class Widget;
 
 enum SelectionDirection { SelectingNext, SelectingPrevious };
 
+extern const float LinkDragHysteresis;
+extern const float ImageDragHysteresis;
+extern const float TextDragHysteresis;
+extern const float GeneralDragHysteresis;
+extern const double TextDragDelay;
+
 class EventHandler : Noncopyable {
  public:
   EventHandler(Frame*);
@@ -206,6 +212,7 @@ class EventHandler : Noncopyable {
                             const PlatformMouseEvent&);
 
   bool dragHysteresisExceeded(const FloatPoint&) const;
+  bool dragHysteresisExceeded(const IntPoint&) const;
 
   bool passMousePressEventToSubframe(MouseEventWithHitTestResults&,
                                      Frame* subframe);
@@ -274,6 +281,8 @@ class EventHandler : Noncopyable {
   IntSize m_offsetFromResizeCorner;
 
   IntPoint m_currentMousePosition;
+  IntPoint m_mouseDownPos;  // in our view's coords
+  double m_mouseDownTimestamp;
 
   bool m_mouseDownWasInSubframe;
   bool m_mouseDownMayStartSelect;
@@ -282,8 +291,6 @@ class EventHandler : Noncopyable {
   NSView* m_mouseDownView;
   bool m_sendingEventToSubview;
   PlatformMouseEvent m_mouseDown;
-  IntPoint m_mouseDownPos;  // in our view's coords
-  double m_mouseDownTimestamp;
   int m_activationEventNumber;
 #endif
 };

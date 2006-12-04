@@ -61,6 +61,21 @@ namespace WebCore {
 // These button numbers match the one used in the DOM API.
 enum MouseButton { LeftButton, MiddleButton, RightButton };
 
+#if PLATFORM(WIN)
+enum MouseEventType {
+  MouseMoved,
+  LeftMouseDown,
+  LeftMouseUp,
+  LeftMouseDragged,
+  RightMouseDown,
+  RightMouseUp,
+  RightMouseDragged,
+  MiddleMouseDown,
+  MiddleMouseUp,
+  MiddleMouseDragged
+};
+#endif
+
 class PlatformMouseEvent {
  public:
   static const struct CurrentEventTag {
@@ -109,8 +124,11 @@ class PlatformMouseEvent {
   PlatformMouseEvent(NSEvent*);
 #endif
 #if PLATFORM(WIN)
-  PlatformMouseEvent(HWND, UINT, WPARAM, LPARAM);
+  PlatformMouseEvent(HWND, UINT, WPARAM, LPARAM, bool activatedWebView = false);
   void setClickCount(int count) { m_clickCount = count; }
+  double timestamp() const { return m_timestamp; }
+  bool activatedWebView() const { return m_activatedWebView; }
+  MouseEventType type() const { return m_type; }
 #endif
 #if PLATFORM(GDK)
   PlatformMouseEvent(GdkEvent*);
@@ -128,6 +146,12 @@ class PlatformMouseEvent {
   bool m_ctrlKey;
   bool m_altKey;
   bool m_metaKey;
+
+#if PLATFORM(WIN)
+  double m_timestamp;  // unit: seconds
+  bool m_activatedWebView;
+  MouseEventType m_type;
+#endif
 };
 
 #if PLATFORM(MAC)
