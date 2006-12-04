@@ -71,7 +71,7 @@ class Loader : ResourceHandleClient {
   void servePendingRequests();
 
   DeprecatedPtrList<Request> m_requestsPending;
-  typedef HashMap<ResourceHandle*, Request*> RequestMap;
+  typedef HashMap<RefPtr<ResourceHandle>, Request*> RequestMap;
   RequestMap m_requestsLoading;
 
   DeprecatedPtrList<Request> m_requestsBackgroundDecoding;

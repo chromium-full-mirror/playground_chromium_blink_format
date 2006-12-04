@@ -48,15 +48,6 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
   return 0;
 }
 
-void ResourceHandle::kill() {
-  if (d->m_loading) {
-    ASSERT(!d->m_cancelled);
-    d->m_loading = false;
-    d->m_cancelled = true;
-    deref();
-  }
-}
-
 const HTTPHeaderMap& ResourceHandle::requestHeaders() const {
   return d->m_request.httpHeaderFields();
 }

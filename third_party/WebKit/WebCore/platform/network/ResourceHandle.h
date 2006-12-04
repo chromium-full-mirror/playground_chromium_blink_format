@@ -77,8 +77,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
 
   ~ResourceHandle();
 
-  void kill();
-
 #if PLATFORM(MAC)
   NSURLRequest* willSendRequest(NSURLRequest*, NSURLResponse*);
   void didReceiveResponse(NSURLResponse*);
