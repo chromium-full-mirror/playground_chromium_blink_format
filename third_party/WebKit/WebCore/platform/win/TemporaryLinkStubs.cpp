@@ -348,7 +348,46 @@ void ContextMenuClientWin::lookUpInDictionary(Frame*) {
   notImplemented();
 }
 
+ContextMenuItem::ContextMenuItem(PlatformMenuItemDescription, ContextMenu*) {
+  notImplemented();
+}
+ContextMenuItem::ContextMenuItem(ContextMenu* parentMenu,
+                                 ContextMenu* subMenu) {
+  notImplemented();
+}
+ContextMenuItem::ContextMenuItem(ContextMenuItemType type,
+                                 ContextMenuAction action,
+                                 const String& title,
+                                 ContextMenu* parentMenu,
+                                 ContextMenu* subMenu) {
+  notImplemented();
+}
 ContextMenuItem::~ContextMenuItem() {
+  notImplemented();
+}
+PlatformMenuItemDescription ContextMenuItem::platformDescription() const {
+  notImplemented();
+  return m_platformDescription;
+}
+ContextMenuAction ContextMenuItem::action() const {
+  notImplemented();
+  return ContextMenuItemTagNoAction;
+}
+void ContextMenuItem::setAction(ContextMenuAction action) {
+  notImplemented();
+}
+String ContextMenuItem::title() const {
+  notImplemented();
+  return String();
+}
+void ContextMenuItem::setTitle(String title) {
+  notImplemented();
+}
+PlatformMenuDescription ContextMenuItem::platformSubMenu() const {
+  notImplemented();
+  return 0;
+}
+void ContextMenuItem::setSubMenu(ContextMenu* subMenu) {
   notImplemented();
 }
 
