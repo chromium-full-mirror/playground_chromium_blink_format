@@ -94,7 +94,7 @@ class EditorClient {
   // FIXME: This should become SelectionController::toWebArchive()
   virtual NSData* dataForArchivedSelection(Frame*) = 0;
 
-  virtual NSString* _web_userVisibleString(NSURL*) = 0;
+  virtual NSString* userVisibleString(NSURL*) = 0;
 #endif
 };
 }

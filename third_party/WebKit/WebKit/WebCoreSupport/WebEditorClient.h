@@ -65,7 +65,7 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void didEndEditing();
 
   virtual NSData* dataForArchivedSelection(WebCore::Frame*);
-  virtual NSString* _web_userVisibleString(NSURL*);
+  virtual NSString* userVisibleString(NSURL*);
 
   virtual void respondToChangedContents();
 

@@ -26,14 +26,26 @@
 #ifndef PASTEBOARD_H_
 #define PASTEBOARD_H_
 
-#include "AtomicStringImpl.h"
-#include "DeprecatedCString.h"
-#include "PlatformString.h"
-#include "Range.h"
+#include <wtf/Forward.h>
+#include <wtf/HashSet.h>
+#include <wtf/Noncopyable.h>
+
+// FIXME: This class is too high-level to be in the platform directory, since it
+// uses the DOM and makes calls to Editor. It should either be divested of its
+// knowledge of the frame and editor or moved into the editing directory.
 
 #if PLATFORM(MAC)
 class NSPasteboard;
 class NSArray;
+#endif
+
+#if PLATFORM(WIN)
+#include <windows.h>
+typedef struct HWND__* HWND;
+#endif
+
+#if PLATFORM(MAC)
+// FIXME: These should be moved into the WebCore namespace.
 extern NSString* WebArchivePboardType;
 extern NSString* WebSmartPastePboardType;
 extern NSString* WebURLNamePboardType;
@@ -41,18 +53,16 @@ extern NSString* WebURLPboardType;
 extern NSString* WebURLsWithTitlesPboardType;
 #endif
 
-#if PLATFORM(WIN)
-#include <wtf/HashSet.h>
-#include <windows.h>
-typedef struct HWND__* HWND;
-#endif
-
 namespace WebCore {
 
+class CString;
+class DeprecatedCString;
 class DocumentFragment;
 class Frame;
+class Range;
+class String;
 
-class Pasteboard {
+class Pasteboard : Noncopyable {
  public:
   static Pasteboard* generalPasteboard();
   void writeSelection(PassRefPtr<Range>, bool canSmartCopyOrDelete, Frame*);
@@ -62,17 +72,14 @@ class Pasteboard {
                                                 PassRefPtr<Range>,
                                                 bool allowPlainText,
                                                 bool& chosePlainText);
-  String plainText(Frame* frame = 0);
+  String plainText(Frame* = 0);
 
- protected:
+ private:
   Pasteboard();
   ~Pasteboard();
 
- private:
-  static Pasteboard* s_generalPasteboard;
-
 #if PLATFORM(MAC)
-  Pasteboard(NSPasteboard* pboard);
+  Pasteboard(NSPasteboard*);
   NSArray* selectionPasteboardTypes(bool canSmartCopyOrDelete,
                                     bool selectionContainsAttachments);
   NSPasteboard* m_pasteboard;
@@ -84,7 +91,6 @@ class Pasteboard {
   HGLOBAL createHandle(String);
   HGLOBAL createHandle(CString);
   DeprecatedCString createCF_HTMLFromRange(PassRefPtr<Range>);
-
   HWND m_owner;
 #endif
 };

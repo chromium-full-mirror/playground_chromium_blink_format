@@ -61,7 +61,6 @@ namespace WebCore {
 
 using namespace EventNames;
 using namespace HTMLNames;
-using namespace EventNames;
 
 EditorClient* Editor::client() const {
   if (Page* page = m_frame->page())
@@ -197,8 +196,9 @@ bool Editor::shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
   if (client()) {
     Node* child = fragment->firstChild();
     if (fragment->lastChild() == child && child->isCharacterDataNode())
-      return client()->shouldInsertText(((CharacterData*)child)->data(),
-                                        replacingDOMRange.get(), givenAction);
+      return client()->shouldInsertText(
+          static_cast<CharacterData*>(child)->data(), replacingDOMRange.get(),
+          givenAction);
     return client()->shouldInsertNode(fragment.get(), replacingDOMRange.get(),
                                       givenAction);
   }
@@ -1208,13 +1208,5 @@ void Editor::didEndEditing() {
   if (client())
     client()->didEndEditing();
 }
-
-#if PLATFORM(MAC)
-NSString* Editor::_web_userVisibleString(NSURL* nsURL) {
-  if (client())
-    return client()->_web_userVisibleString(nsURL);
-  return nil;
-}
-#endif
 
 }  // namespace WebCore
