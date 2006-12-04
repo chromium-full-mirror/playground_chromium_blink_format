@@ -520,6 +520,14 @@ void EditorClientWin::redo() {
   notImplemented();
 }
 
+bool EventHandler::tabsToLinks(KeyboardEvent* event) const {
+  notImplemented();
+  return false;
+}
+bool EventHandler::tabsToAllControls(KeyboardEvent* event) const {
+  notImplemented();
+  return false;
+}
 void EventHandler::focusDocumentView() {
   notImplemented();
 }
@@ -535,48 +543,20 @@ bool EventHandler::lastEventIsMouseUp() const {
   notImplemented();
   return false;
 }
-bool EventHandler::passMousePressEventToSubframe(
-    MouseEventWithHitTestResults& mev,
-    Frame* subframe) {
-  notImplemented();
-  return true;
-}
-bool EventHandler::passMouseMoveEventToSubframe(
-    MouseEventWithHitTestResults& mev,
-    Frame* subframe) {
-  notImplemented();
-  return true;
-}
-bool EventHandler::passMouseReleaseEventToSubframe(
-    MouseEventWithHitTestResults& mev,
-    Frame* subframe) {
-  notImplemented();
-  return true;
-}
-bool EventHandler::passWheelEventToSubframe(PlatformWheelEvent& e,
-                                            Frame* subframe) {
-  notImplemented();
-  return false;
-}
-bool EventHandler::passWidgetMouseDownEventToWidget(
-    const MouseEventWithHitTestResults&) {
-  notImplemented();
-  return false;
-}
-bool EventHandler::passMousePressEventToScrollbar(MouseEventWithHitTestResults&,
-                                                  PlatformScrollbar*) {
-  notImplemented();
-  return false;
-}
 bool EventHandler::shouldDragAutoNode(Node*, const IntPoint&) const {
   notImplemented();
   return false;
 }
-bool EventHandler::tabsToAllControls(KeyboardEvent*) const {
+bool EventHandler::passSubframeEventToSubframe(MouseEventWithHitTestResults&,
+                                               Frame* subframe) {
   notImplemented();
   return false;
 }
-bool EventHandler::tabsToLinks(KeyboardEvent*) const {
+bool EventHandler::passMouseDownEventToWidget(Widget*) {
+  notImplemented();
+  return false;
+}
+bool EventHandler::passWheelEventToWidget(Widget*) {
   notImplemented();
   return false;
 }
@@ -630,9 +610,6 @@ int FrameLoader::getHistoryLength() {
   notImplemented();
   return 0;
 }
-void FrameLoader::setTitle(const String& title) {
-  notImplemented();
-}
 String FrameLoader::referrer() const {
   notImplemented();
   return String();
@@ -650,18 +627,12 @@ KURL FrameLoader::historyURL(int distance) {
   notImplemented();
   return KURL();
 }
-void FrameLoader::urlSelected(const FrameLoadRequest&, Event*) {
-  notImplemented();
-}
 Frame* FrameLoader::createFrame(KURL const&,
                                 String const&,
                                 Element*,
                                 String const&) {
   notImplemented();
   return 0;
-}
-void FrameLoader::submitForm(const FrameLoadRequest&, Event*) {
-  notImplemented();
 }
 void FrameLoader::partClearedInBegin() {
   notImplemented();
@@ -928,10 +899,6 @@ void FrameLoaderClientWin::prepareForDataSourceReplacement() {
 }
 void FrameLoaderClientWin::setTitle(const String&, const KURL&) {
   notImplemented();
-}
-String FrameLoaderClientWin::userAgent() {
-  notImplemented();
-  return String();
 }
 
 void FrameView::updateBorder() {
