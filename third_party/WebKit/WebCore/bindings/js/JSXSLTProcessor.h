@@ -23,10 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef XSLT_SUPPORT
-
 #ifndef XSLTProcessor_H
 #define XSLTProcessor_H
+
+#ifdef XSLT_SUPPORT
 
 #include "kjs_binding.h"
 
@@ -76,6 +76,6 @@ class XSLTProcessorConstructorImp : public DOMObject {
 
 }  // namespace KJS
 
-#endif  // XSLTProcessor_H
-
 #endif  // XSLT_SUPPORT
+
+#endif  // XSLTProcessor_H

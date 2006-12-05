@@ -24,10 +24,13 @@
  */
 
 #include "config.h"
-#include "JSSVGMatrix.h"
-#include "JSSVGPoint.h"
-#include "SVGMatrix.h"
 
+#ifdef SVG_SUPPORT
+
+#include "JSSVGPoint.h"
+
+#include "JSSVGMatrix.h"
+#include "SVGMatrix.h"
 #include "JSSVGPointTable.cpp"
 
 using namespace KJS;
@@ -125,4 +128,7 @@ FloatPoint toFloatPoint(JSValue* val) {
              ? static_cast<JSSVGPoint*>(val)->impl()
              : FloatPoint();
 }
-}
+
+}  // namespace WebCore
+
+#endif  // SVG_SUPPORT

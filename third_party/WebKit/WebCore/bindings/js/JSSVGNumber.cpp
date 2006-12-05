@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#ifdef SVG_SUPPORT
+
 #include "JSSVGNumber.h"
 
 #include "JSSVGNumberTable.cpp"
@@ -80,4 +83,7 @@ void JSSVGNumber::putValueProperty(KJS::ExecState* exec,
 JSValue* getJSSVGNumber(ExecState* exec, double v) {
   return new JSSVGNumber(exec, v);
 }
-}
+
+}  // namespace WebCore
+
+#endif  // SVG_SUPPORT

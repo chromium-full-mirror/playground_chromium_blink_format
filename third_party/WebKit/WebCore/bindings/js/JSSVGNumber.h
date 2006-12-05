@@ -23,8 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JSSVGNumber_H
-#define JSSVGNumber_H
+#ifndef JSSVGNumber_h
+#define JSSVGNumber_h
+
+#ifdef SVG_SUPPORT
 
 #include "kjs_binding.h"
 
@@ -58,6 +60,9 @@ class JSSVGNumber : public KJS::DOMObject {
 };
 
 KJS::JSValue* getJSSVGNumber(KJS::ExecState*, double);
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // SVG_SUPPORT
+
+#endif  // JSSVGNumber_h

@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+
+#ifdef SVG_SUPPORT
+
 #include "JSSVGRect.h"
 
 #include "JSSVGRectTable.cpp"
@@ -101,4 +104,7 @@ FloatRect toFloatRect(JSValue* val) {
   return val->isObject(&JSSVGRect::info) ? static_cast<JSSVGRect*>(val)->impl()
                                          : FloatRect();
 }
-}
+
+}  // namespace WebCore
+
+#endif  // SVG_SUPPORT
