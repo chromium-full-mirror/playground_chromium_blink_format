@@ -111,6 +111,7 @@ const Cursor& contextMenuCursor();
 const Cursor& noDropCursor();
 const Cursor& progressCursor();
 const Cursor& aliasCursor();
+const Cursor& copyCursor();
 
 }  // namespace WebCore
 
