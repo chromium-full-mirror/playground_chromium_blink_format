@@ -241,9 +241,16 @@ void ContextMenu::populate() {
             misspelling ? frame->guessesForMisspelledSelection()
                         : frame->guessesForUngrammaticalSelection();
         size_t size = guesses.size();
-        if (size == 0)
-          appendItem(NoGuessesFoundItem);
-        else {
+        if (size == 0) {
+          // If there's bad grammar but no suggestions (e.g., repeated word),
+          // just leave off the suggestions
+          // list and trailing separator rather than adding a "No Guesses Found"
+          // item (matches AppKit)
+          if (misspelling) {
+            appendItem(NoGuessesFoundItem);
+            appendItem(SeparatorItem);
+          }
+        } else {
           for (unsigned i = 0; i < size; i++) {
             const String& guess = guesses[i];
             if (!guess.isEmpty()) {
@@ -252,9 +259,9 @@ void ContextMenu::populate() {
               appendItem(item);
             }
           }
+          appendItem(SeparatorItem);
         }
 
-        appendItem(SeparatorItem);
         if (misspelling) {
           appendItem(IgnoreSpellingItem);
           appendItem(LearnSpellingItem);
