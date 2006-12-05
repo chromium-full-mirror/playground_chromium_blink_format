@@ -120,6 +120,7 @@ class Editor {
   bool execCommand(const String&);
 
   bool isContinuousSpellCheckingEnabled();
+  bool isGrammarCheckingEnabled();
   int spellCheckerDocumentTag();
 
   bool shouldBeginEditing(Range* range);

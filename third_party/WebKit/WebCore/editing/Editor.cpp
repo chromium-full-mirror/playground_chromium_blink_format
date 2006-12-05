@@ -1154,6 +1154,12 @@ bool Editor::isContinuousSpellCheckingEnabled() {
   return false;
 }
 
+bool Editor::isGrammarCheckingEnabled() {
+  if (client())
+    return client()->isGrammarCheckingEnabled();
+  return false;
+}
+
 int Editor::spellCheckerDocumentTag() {
   if (client())
     return client()->spellCheckerDocumentTag();

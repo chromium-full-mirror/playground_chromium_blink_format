@@ -233,9 +233,8 @@ void ContextMenu::populate() {
       // is never considered a misspelling and bad grammar at the same time)
       bool misspelling = frame->isSelectionMisspelled();
       bool badGrammar =
-          !misspelling &&
-          (frame->editor()->client()->isGrammarCheckingEnabled() &&
-           frame->isSelectionUngrammatical());
+          !misspelling && (frame->editor()->isGrammarCheckingEnabled() &&
+                           frame->isSelectionUngrammatical());
 
       if (misspelling || badGrammar) {
         Vector<String> guesses =
