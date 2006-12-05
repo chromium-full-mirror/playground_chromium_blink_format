@@ -42,6 +42,7 @@
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include "SubresourceLoader.h"
 #include <wtf/Assertions.h>
 #include <wtf/Vector.h>
 
@@ -84,15 +85,16 @@ void Loader::servePendingRequests() {
                    .deprecatedString();
   }
 
-  RefPtr<ResourceHandle> loader =
-      ResourceHandle::create(request, this, req->docLoader());
+  RefPtr<SubresourceLoader> loader = SubresourceLoader::create(
+      req->docLoader()->doc()->frame(), this, request);
 
   if (loader)
     m_requestsLoading.add(loader.release(), req);
 }
 
-void Loader::receivedAllData(ResourceHandle* job, PlatformData allData) {
-  RequestMap::iterator i = m_requestsLoading.find(job);
+void Loader::receivedAllData(SubresourceLoader* loader, PlatformData allData) {
+  loader->ref();
+  RequestMap::iterator i = m_requestsLoading.find(loader);
   if (i == m_requestsLoading.end())
     return;
 
@@ -113,9 +115,10 @@ void Loader::receivedAllData(ResourceHandle* job, PlatformData allData) {
   servePendingRequests();
 }
 
-void Loader::didFailWithError(ResourceHandle* handle,
+void Loader::didFailWithError(SubresourceLoader* loader,
                               const ResourceError& error) {
-  RequestMap::iterator i = m_requestsLoading.find(handle);
+  ASSERT(loader->handle());
+  RequestMap::iterator i = m_requestsLoading.find(loader);
   if (i == m_requestsLoading.end())
     return;
 
@@ -135,9 +138,10 @@ void Loader::didFailWithError(ResourceHandle* handle,
   servePendingRequests();
 }
 
-void Loader::didReceiveResponse(ResourceHandle* handle,
+void Loader::didReceiveResponse(SubresourceLoader* loader,
                                 const ResourceResponse& response) {
-  Request* req = m_requestsLoading.get(handle);
+  ASSERT(loader->handle());
+  Request* req = m_requestsLoading.get(loader);
   ASSERT(req);
   req->cachedResource()->setResponse(response);
 
@@ -153,12 +157,15 @@ void Loader::didReceiveResponse(ResourceHandle* handle,
   } else if (response.isMultipart()) {
     req->setIsMultipart(true);
     if (!req->cachedResource()->isImage())
-      handle->cancel();
+      loader->handle()->cancel();
   }
 }
 
-void Loader::didReceiveData(ResourceHandle* job, const char* data, int size) {
-  Request* request = m_requestsLoading.get(job);
+void Loader::didReceiveData(SubresourceLoader* loader,
+                            const char* data,
+                            int size) {
+  ASSERT(loader->handle());
+  Request* request = m_requestsLoading.get(loader);
   if (!request)
     return;
 
@@ -214,19 +221,19 @@ void Loader::cancelRequests(DocLoader* dl) {
       ++pIt;
   }
 
-  Vector<ResourceHandle*, 256> jobsToCancel;
+  Vector<SubresourceLoader*, 256> loadersToCancel;
 
   RequestMap::iterator end = m_requestsLoading.end();
   for (RequestMap::iterator i = m_requestsLoading.begin(); i != end; ++i) {
     Request* r = i->second;
     if (r->docLoader() == dl)
-      jobsToCancel.append(i->first.get());
+      loadersToCancel.append(i->first.get());
   }
 
-  for (unsigned i = 0; i < jobsToCancel.size(); ++i) {
-    ResourceHandle* job = jobsToCancel[i];
-    Request* r = m_requestsLoading.get(job);
-    m_requestsLoading.remove(job);
+  for (unsigned i = 0; i < loadersToCancel.size(); ++i) {
+    SubresourceLoader* loader = loadersToCancel[i];
+    Request* r = m_requestsLoading.get(loader);
+    m_requestsLoading.remove(loader);
     cache()->remove(r->cachedResource());
   }
 
@@ -243,17 +250,6 @@ void Loader::cancelRequests(DocLoader* dl) {
 void Loader::removeBackgroundDecodingRequest(Request* r) {
   if (m_requestsBackgroundDecoding.containsRef(r))
     m_requestsBackgroundDecoding.remove(r);
-}
-
-ResourceHandle* Loader::jobForRequest(const String& URL) const {
-  RequestMap::const_iterator end = m_requestsLoading.end();
-  for (RequestMap::const_iterator i = m_requestsLoading.begin(); i != end;
-       ++i) {
-    CachedResource* obj = i->second->cachedResource();
-    if (obj && obj->url() == URL)
-      return i->first.get();
-  }
-  return 0;
 }
 
 }  // namespace WebCore

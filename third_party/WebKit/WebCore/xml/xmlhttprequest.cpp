@@ -38,6 +38,7 @@
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "Settings.h"
+#include "SubresourceLoader.h"
 #include "TextEncoding.h"
 #include "kjs_binding.h"
 #include <kjs/protect.h>
@@ -369,7 +370,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
   // page.
   // this is true while running onunload handlers
   // FIXME: Maybe create can return false for other reasons too?
-  m_loader = ResourceHandle::create(request, this, m_doc->docLoader());
+  m_loader = SubresourceLoader::create(m_doc->frame(), this, request);
 }
 
 void XMLHttpRequest::abort() {
@@ -502,16 +503,16 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
   didFinishLoading(0);
 }
 
-void XMLHttpRequest::didFailWithError(ResourceHandle* handle,
+void XMLHttpRequest::didFailWithError(SubresourceLoader* loader,
                                       const ResourceError&) {
-  didFinishLoading(handle);
+  didFinishLoading(loader);
 }
 
-void XMLHttpRequest::didFinishLoading(ResourceHandle* handle) {
+void XMLHttpRequest::didFinishLoading(SubresourceLoader* loader) {
   if (m_aborted)
     return;
 
-  ASSERT(handle == m_loader.get());
+  ASSERT(loader == m_loader);
 
   if (m_state < Sent)
     changeState(Sent);
@@ -534,14 +535,14 @@ void XMLHttpRequest::didFinishLoading(ResourceHandle* handle) {
   }
 }
 
-void XMLHttpRequest::willSendRequest(ResourceHandle*,
+void XMLHttpRequest::willSendRequest(SubresourceLoader*,
                                      ResourceRequest& request,
                                      const ResourceResponse& redirectResponse) {
   if (!urlMatchesDocumentDomain(request.url()))
     abort();
 }
 
-void XMLHttpRequest::didReceiveResponse(ResourceHandle*,
+void XMLHttpRequest::didReceiveResponse(SubresourceLoader*,
                                         const ResourceResponse& response) {
   m_response = response;
   m_encoding = getCharset(m_mimeTypeOverride);
@@ -549,7 +550,7 @@ void XMLHttpRequest::didReceiveResponse(ResourceHandle*,
     m_encoding = response.textEncodingName();
 }
 
-void XMLHttpRequest::didReceiveData(ResourceHandle*,
+void XMLHttpRequest::didReceiveData(SubresourceLoader*,
                                     const char* data,
                                     int len) {
   if (m_state < Sent)

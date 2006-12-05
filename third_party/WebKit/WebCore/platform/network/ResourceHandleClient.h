@@ -99,10 +99,6 @@ class ResourceHandleClient {
 
   // cached response may be modified
   // void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }
-
-  // old-style methods
-  virtual void receivedResponse(ResourceHandle*, PlatformResponse) {}
-  virtual void receivedAllData(ResourceHandle*, PlatformData) {}
 };
 }
 
