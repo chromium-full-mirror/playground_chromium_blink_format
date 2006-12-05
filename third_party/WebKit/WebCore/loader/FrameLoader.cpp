@@ -1468,6 +1468,7 @@ bool FrameLoader::userGestureHint() {
                 // the navigation
 }
 
+#ifdef MULTIPLE_FORM_SUBMISSION_PROTECTION
 void FrameLoader::didNotOpenURL(const KURL& URL) {
   if (m_submittedFormURL == URL)
     m_submittedFormURL = KURL();
@@ -1476,6 +1477,7 @@ void FrameLoader::didNotOpenURL(const KURL& URL) {
 void FrameLoader::resetMultipleFormSubmissionProtection() {
   m_submittedFormURL = KURL();
 }
+#endif
 
 void FrameLoader::setEncoding(const String& name, bool userChosen) {
   if (!m_workingURL.isEmpty())
@@ -2167,6 +2169,7 @@ FrameLoaderClient* FrameLoader::client() const {
 
 #if PLATFORM(MAC)
 void FrameLoader::submitForm(const FrameLoadRequest& request, Event* event) {
+#ifdef MULTIPLE_FORM_SUBMISSION_PROTECTION
   // FIXME: We'd like to remove this altogether and fix the multiple form
   // submission issue another way.
   // We do not want to submit more than one form from the same page,
@@ -2191,6 +2194,7 @@ void FrameLoader::submitForm(const FrameLoadRequest& request, Event* event) {
       return;
     m_submittedFormURL = request.resourceRequest().url();
   }
+#endif
 
   // FIXME: Why do we always pass true for userGesture?
   load(request, true, event, m_formAboutToBeSubmitted.get(),
