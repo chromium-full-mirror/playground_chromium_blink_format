@@ -99,6 +99,7 @@
 - (BOOL)_isEditable;
 
 - (BOOL)_isSelectionInPasswordField;
+- (BOOL)_isSelectionUngrammatical;
 - (BOOL)_isSelectionMisspelled;
 - (NSArray*)_guessesForMisspelledSelection;
 

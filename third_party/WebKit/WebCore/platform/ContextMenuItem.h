@@ -95,6 +95,7 @@ enum ContextMenuAction {
   ContextMenuItemPDFPreviousPage,
   // These are new tags! Not a part of API!!!!
   ContextMenuItemTagOpenLink = 1000,
+  ContextMenuItemTagIgnoreGrammar,
 #ifndef BUILDING_ON_TIGER
   ContextMenuItemTagSpellingAndGrammarMenu,  // Spelling sub-menu
   ContextMenuItemTagShowSpellingAndGrammar,
