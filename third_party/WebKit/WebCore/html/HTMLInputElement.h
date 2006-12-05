@@ -28,10 +28,6 @@
 
 #include "HTMLGenericFormElement.h"
 
-// FIXME: Remove these when converting the password field
-#include "RenderStyle.h"
-#include "RenderObject.h"
-
 namespace WebCore {
 
 class HTMLImageLoader;
