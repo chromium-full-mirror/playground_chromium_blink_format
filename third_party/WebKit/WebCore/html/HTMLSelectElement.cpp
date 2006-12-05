@@ -497,7 +497,7 @@ void HTMLSelectElement::reset() {
         firstOption = option;
     }
   }
-  if (!optionSelected && firstOption)
+  if (!optionSelected && firstOption && usesMenuList())
     firstOption->setSelected(true);
   setChanged(true);
   m_lastOnChangeIndex = -1;
