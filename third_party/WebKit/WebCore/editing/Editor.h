@@ -121,6 +121,8 @@ class Editor {
 
   bool isContinuousSpellCheckingEnabled();
   bool isGrammarCheckingEnabled();
+  void ignoreSpelling();
+  void learnSpelling();
   int spellCheckerDocumentTag();
 
   bool shouldBeginEditing(Range* range);
