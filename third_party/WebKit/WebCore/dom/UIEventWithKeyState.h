@@ -66,6 +66,8 @@ class UIEventWithKeyState : public UIEvent {
   bool m_metaKey : 1;
 };
 
+UIEventWithKeyState* findEventWithKeyState(Event*);
+
 }  // namespace WebCore
 
 #endif  // UIEventWithKeyState_h
