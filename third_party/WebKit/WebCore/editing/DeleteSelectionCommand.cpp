@@ -713,9 +713,10 @@ void DeleteSelectionCommand::doApply() {
     insertNodeAt(placeholder.get(), m_endingPosition.node(),
                  m_endingPosition.offset());
 
+  rebalanceWhitespaceAt(m_endingPosition);
+
   calculateTypingStyleAfterDelete(placeholder.get());
 
-  rebalanceWhitespaceAt(m_endingPosition);
   setEndingSelection(Selection(m_endingPosition, affinity));
   clearTransientState();
 }

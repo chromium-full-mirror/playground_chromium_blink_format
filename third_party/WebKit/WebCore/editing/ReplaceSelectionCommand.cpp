@@ -551,12 +551,7 @@ void ReplaceSelectionCommand::doApply() {
 
   // Inserting content could cause whitespace to collapse, e.g. inserting
   // <div>foo</div> into hello^ world.
-  // We remove unrendered spaces and rebalance the rendered ones (turn them into
-  // nbsps) around insertionPos to prevent that.
-  Position upstreamInsertionPos = insertionPos.upstream();
-  deleteInsignificantText(insertionPos.upstream(), insertionPos.downstream());
-  insertionPos = upstreamInsertionPos.downstream();
-  rebalanceWhitespaceAt(insertionPos);
+  prepareWhitespaceAtPositionForSplit(insertionPos);
 
   // NOTE: This would be an incorrect usage of downstream() if downstream() were
   // changed to mean the last position after
