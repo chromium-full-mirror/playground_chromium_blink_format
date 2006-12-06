@@ -124,6 +124,13 @@ class Editor {
   void ignoreSpelling();
   void learnSpelling();
   int spellCheckerDocumentTag();
+  bool isSelectionUngrammatical();
+  bool isSelectionMisspelled();
+  Vector<String> guessesForMisspelledSelection();
+  Vector<String> guessesForUngrammaticalSelection();
+  void markMisspellingsInAdjacentWords(const VisiblePosition&);
+  void markMisspellings(const Selection&);
+  void advanceToNextMisspelling(bool startBeforeSelection = false);
 
   bool shouldBeginEditing(Range* range);
   bool shouldEndEditing(Range* range);
