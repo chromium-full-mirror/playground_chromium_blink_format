@@ -107,8 +107,8 @@ void IconLoader::didReceiveData(SubresourceLoader*,
   m_buffer.append(data, size);
 }
 
-void IconLoader::didFailWithError(SubresourceLoader* resourceLoader,
-                                  const ResourceError&) {
+void IconLoader::didFail(SubresourceLoader* resourceLoader,
+                         const ResourceError&) {
   ASSERT(m_loadIsInProgress);
   m_buffer.clear();
   finishLoading(resourceLoader->handle()->url());

@@ -63,7 +63,7 @@ class Loader : private SubresourceLoaderClient {
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
   virtual void didReceiveData(SubresourceLoader*, const char*, int);
   virtual void receivedAllData(SubresourceLoader*, PlatformData);
-  virtual void didFailWithError(SubresourceLoader*, const ResourceError&);
+  virtual void didFail(SubresourceLoader*, const ResourceError&);
 
   void servePendingRequests();
 

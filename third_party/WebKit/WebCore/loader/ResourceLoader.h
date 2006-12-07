@@ -67,8 +67,6 @@ namespace WebCore {
 class Frame;
 class FrameLoader;
 
-// FIXME: Rename to ResourceHandle after resolving conflict with existing class
-// of that name.
 class ResourceLoader : public Shared<ResourceLoader> {
  public:
   virtual ~ResourceLoader();
@@ -94,7 +92,7 @@ class ResourceLoader : public Shared<ResourceLoader> {
   NSURLResponse* response() const;
 
   virtual void addData(NSData*, bool allAtOnce);
-  NSData* resourceData();
+  virtual NSData* resourceData();
   void clearResourceData();
 
   virtual NSURLRequest* willSendRequest(NSURLRequest*,
@@ -151,8 +149,10 @@ class ResourceLoader : public Shared<ResourceLoader> {
   bool m_cancelled;
   bool m_calledDidFinishLoad;
 
+ protected:
+  // FIXME: Once everything is made cross platform, these can be private instead
+  // of protected
   RefPtr<Frame> m_frame;
-
 #if PLATFORM(MAC)
   RetainPtr<id> m_identifier;
   RetainPtr<NSURLResponse> m_response;

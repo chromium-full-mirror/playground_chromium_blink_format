@@ -503,8 +503,7 @@ void XMLHttpRequest::processSyncLoadResults(const Vector<char>& data,
   didFinishLoading(0);
 }
 
-void XMLHttpRequest::didFailWithError(SubresourceLoader* loader,
-                                      const ResourceError&) {
+void XMLHttpRequest::didFail(SubresourceLoader* loader, const ResourceError&) {
   didFinishLoading(loader);
 }
 
