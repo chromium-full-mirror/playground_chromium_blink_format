@@ -138,7 +138,10 @@ void SVGPatternElement::parseMappedAttribute(MappedAttribute* attr) {
           SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else if (attr->name() == SVGNames::patternTransformAttr) {
     SVGTransformList* patternTransforms = patternTransformBaseValue();
-    SVGTransformable::parseTransformAttribute(patternTransforms, value);
+    if (!SVGTransformable::parseTransformAttribute(patternTransforms, value)) {
+      ExceptionCode ec = 0;
+      patternTransforms->clear(ec);
+    }
   } else if (attr->name() == SVGNames::xAttr)
     xBaseValue()->setValueAsString(value);
   else if (attr->name() == SVGNames::yAttr)

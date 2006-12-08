@@ -42,7 +42,7 @@ class SVGTransformable : virtual public SVGLocatable {
 
   virtual void updateLocalTransform(SVGTransformList*) = 0;
 
-  static void parseTransformAttribute(SVGTransformList*,
+  static bool parseTransformAttribute(SVGTransformList*,
                                       const AtomicString& transform);
   SVGMatrix* getCTM(const SVGElement*) const;
   SVGMatrix* getScreenCTM(const SVGElement*) const;
