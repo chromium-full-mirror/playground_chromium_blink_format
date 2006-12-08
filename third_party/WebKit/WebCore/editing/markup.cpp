@@ -26,6 +26,7 @@
 #include "config.h"
 #include "markup.h"
 
+#include "CDATASection.h"
 #include "CSSComputedStyleDeclaration.h"
 #include "CSSPropertyNames.h"
 #include "CSSRule.h"
@@ -285,8 +286,11 @@ static DeprecatedString startMarkup(const Node* node,
 
       return markup;
     }
-    case Node::ATTRIBUTE_NODE:
     case Node::CDATA_SECTION_NODE:
+      return static_cast<const CDATASection*>(node)
+          ->toString()
+          .deprecatedString();
+    case Node::ATTRIBUTE_NODE:
     case Node::ENTITY_NODE:
     case Node::ENTITY_REFERENCE_NODE:
     case Node::NOTATION_NODE:
