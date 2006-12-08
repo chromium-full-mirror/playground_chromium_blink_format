@@ -28,6 +28,7 @@
 
 #include "PlatformMenuDescription.h"
 #include "PlatformString.h"
+#include <wtf/OwnPtr.h>
 
 #if PLATFORM(MAC)
 #include "RetainPtr.h"
@@ -161,6 +162,7 @@ class ContextMenuItem {
 #else
   PlatformMenuItemDescription m_platformDescription;
 #endif
+  OwnPtr<ContextMenu> m_subMenu;
   ContextMenuItemType m_type;
 };
 }
