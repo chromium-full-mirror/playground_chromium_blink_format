@@ -52,14 +52,16 @@ static IntPoint globalPositionForEvent(HWND hWnd, LPARAM lParam) {
 PlatformMouseEvent::PlatformMouseEvent(HWND hWnd,
                                        UINT message,
                                        WPARAM wParam,
-                                       LPARAM lParam)
+                                       LPARAM lParam,
+                                       bool activatedWebView)
     : m_position(positionForEvent(hWnd, lParam)),
       m_globalPosition(globalPositionForEvent(hWnd, lParam)),
       m_shiftKey(wParam & MK_SHIFT),
       m_ctrlKey(wParam & MK_CONTROL),
       m_altKey(GetKeyState(VK_MENU) & HIGH_BIT_MASK_SHORT),
       m_metaKey(m_altKey)  // FIXME: We'll have to test other browsers
-{
+      ,
+      m_activatedWebView(activatedWebView) {
   switch (message) {
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP:

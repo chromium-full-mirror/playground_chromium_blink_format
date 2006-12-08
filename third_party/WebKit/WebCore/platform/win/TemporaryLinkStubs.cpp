@@ -72,6 +72,7 @@
 #include "PlatformScrollBar.h"
 #include "PlugInInfoStore.h"
 #include "PopupMenu.h"
+#include "Range.h"
 #include "RenderTheme.h"
 #include "ResourceLoader.h"
 #include "RenderThemeWin.h"
@@ -94,10 +95,6 @@ namespace WebCore {
 static int frameNumber = 0;
 static Cursor localCursor;
 
-time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
-  notImplemented();
-  return 0;
-}
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {
   notImplemented();
 }
@@ -112,10 +109,6 @@ String defaultLanguage() {
 String fileButtonChooseFileLabel() {
   notImplemented();
   return "Browse...";
-}
-String fileButtonNoFileSelectedLabel() {
-  notImplemented();
-  return String();
 }
 int findNextSentenceFromIndex(UChar const*, int, int, bool) {
   notImplemented();
@@ -149,10 +142,6 @@ String inputElementAltText() {
   notImplemented();
   return DeprecatedString();
 }
-bool IsResponseURLEqualToURL(PlatformResponse, const String&) {
-  notImplemented();
-  return false;
-}
 const Cursor& aliasCursor() {
   notImplemented();
   return localCursor;
@@ -162,6 +151,10 @@ const Cursor& cellCursor() {
   return localCursor;
 }
 const Cursor& contextMenuCursor() {
+  notImplemented();
+  return localCursor;
+}
+const Cursor& copyCursor() {
   notImplemented();
   return localCursor;
 }
@@ -187,18 +180,6 @@ void refreshPlugins(bool) {
 String resetButtonDefaultLabel() {
   notImplemented();
   return "Reset";
-}
-bool ResponseIsMultipart(PlatformResponse) {
-  notImplemented();
-  return false;
-}
-DeprecatedString ResponseMIMEType(PlatformResponse) {
-  notImplemented();
-  return DeprecatedString();
-}
-DeprecatedString ResponseURL(PlatformResponse) {
-  notImplemented();
-  return DeprecatedString();
 }
 int screenDepthPerComponent(Widget*) {
   notImplemented();
@@ -332,16 +313,16 @@ void ContextMenuClientWin::contextMenuDestroyed() {
 void ContextMenuClientWin::addCustomContextMenuItems(ContextMenu*) {
   notImplemented();
 }
-void ContextMenuClientWin::contextMenuItemSelected(ContextMenuItem*) {
+void ContextMenuClientWin::contextMenuItemSelected(const ContextMenuItem*) {
   notImplemented();
 }
-void ContextMenuClientWin::copyLinkToClipboard(HitTestResult) {
+void ContextMenuClientWin::copyLinkToClipboard(const HitTestResult&) {
   notImplemented();
 }
-void ContextMenuClientWin::downloadURL(KURL) {
+void ContextMenuClientWin::downloadURL(const KURL& url) {
   notImplemented();
 }
-void ContextMenuClientWin::copyImageToClipboard(HitTestResult) {
+void ContextMenuClientWin::copyImageToClipboard(const HitTestResult&) {
   notImplemented();
 }
 void ContextMenuClientWin::lookUpInDictionary(Frame*) {
@@ -426,6 +407,31 @@ void DocumentLoader::stopRecordingResponses() {
   notImplemented();
 }
 
+void Editor::ignoreSpelling() {
+  notImplemented();
+}
+void Editor::learnSpelling() {
+  notImplemented();
+}
+bool Editor::isSelectionUngrammatical() {
+  notImplemented();
+  return false;
+}
+bool Editor::isSelectionMisspelled() {
+  notImplemented();
+  return false;
+}
+Vector<String> Editor::guessesForMisspelledSelection() {
+  notImplemented();
+  return Vector<String>();
+}
+Vector<String> Editor::guessesForUngrammaticalSelection() {
+  notImplemented();
+  return Vector<String>();
+}
+void Editor::markMisspellingsInAdjacentWords(const VisiblePosition&) {
+  notImplemented();
+}
 PassRefPtr<Clipboard> Editor::newGeneralClipboard(
     ClipboardAccessPolicy policy) {
   notImplemented();
@@ -590,6 +596,13 @@ void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
 
+void FrameLoader::load(const FrameLoadRequest&,
+                       bool userGesture,
+                       Event*,
+                       Element* form,
+                       const HashMap<String, String>& formValues) {
+  notImplemented();
+}
 void FrameLoader::didFirstLayout() {
   notImplemented();
 }
@@ -958,9 +971,6 @@ void FrameWin::issuePasteCommand() {
 void FrameWin::scheduleClose() {
   notImplemented();
 }
-void FrameWin::markMisspellings(const WebCore::Selection&) {
-  notImplemented();
-}
 void FrameWin::issueTransposeCommand() {
   notImplemented();
 }
@@ -984,23 +994,6 @@ bool FrameWin::shouldChangeSelection(const Selection&,
 }
 void FrameWin::respondToChangedSelection(const Selection&, bool) {
   notImplemented();
-}
-void FrameWin::markMisspellingsInAdjacentWords(VisiblePosition const&) {
-  notImplemented();
-}
-void FrameWin::ignoreSpelling() {
-  notImplemented();
-}
-void FrameWin::learnSpelling() {
-  notImplemented();
-}
-bool FrameWin::isSelectionMisspelled() {
-  notImplemented();
-  return false;
-}
-Vector<String> FrameWin::guessesForMisspelledSelection() {
-  notImplemented();
-  return Vector<String>();
 }
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,
