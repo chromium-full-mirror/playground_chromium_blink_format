@@ -34,6 +34,7 @@
 #include "SVGAngle.h"
 #include "SVGLength.h"
 #include "SVGMatrix.h"
+#include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
 #include "SVGTransform.h"
 #include "SVGZoomEvent.h"
@@ -43,6 +44,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 using namespace EventNames;
+using namespace SVGNames;
 
 SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledLocatableElement(tagName, doc),
@@ -104,16 +106,20 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
                               SVGNames::heightAttr.localName(),
                               m_height.get())
 
-AtomicString SVGSVGElement::contentScriptType() const {
-  return tryGetAttribute("contentScriptType", "text/ecmascript");
+const AtomicString& SVGSVGElement::contentScriptType() const {
+  static const AtomicString defaultValue("text/ecmascript");
+  const AtomicString& n = getAttribute(contentScriptTypeAttr);
+  return n.isNull() ? defaultValue : n;
 }
 
 void SVGSVGElement::setContentScriptType(const AtomicString& type) {
   setAttribute(SVGNames::contentScriptTypeAttr, type);
 }
 
-AtomicString SVGSVGElement::contentStyleType() const {
-  return tryGetAttribute("contentStyleType", "text/css");
+const AtomicString& SVGSVGElement::contentStyleType() const {
+  static const AtomicString defaultValue("text/css");
+  const AtomicString& n = getAttribute(contentStyleTypeAttr);
+  return n.isNull() ? defaultValue : n;
 }
 
 void SVGSVGElement::setContentStyleType(const AtomicString& type) {

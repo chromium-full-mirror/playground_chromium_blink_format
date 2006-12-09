@@ -59,10 +59,10 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   // 'SVGSVGElement' functions
-  AtomicString contentScriptType() const;
+  const AtomicString& contentScriptType() const;
   void setContentScriptType(const AtomicString& type);
 
-  AtomicString contentStyleType() const;
+  const AtomicString& contentStyleType() const;
   void setContentStyleType(const AtomicString& type);
 
   FloatRect viewport() const;

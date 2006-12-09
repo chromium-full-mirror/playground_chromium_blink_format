@@ -199,17 +199,6 @@ class SVGElement : public StyledElement {
   SVGSVGElement* ownerSVGElement() const;
   SVGElement* viewportElement() const;
 
-  // Helper methods that returns the attr value if attr is set, otherwise the
-  // default value.
-  // It throws NO_MODIFICATION_ALLOWED_ERR if the element is read-only.
-  AtomicString tryGetAttribute(
-      const String& name,
-      AtomicString defaultValue = AtomicString()) const;
-  AtomicString tryGetAttributeNS(
-      const String& namespaceURI,
-      const String& localName,
-      AtomicString defaultValue = AtomicString()) const;
-
   // Internal
   virtual void parseMappedAttribute(MappedAttribute*);
 

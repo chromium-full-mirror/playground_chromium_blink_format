@@ -1883,8 +1883,12 @@ void Document::recalcStyleSelector() {
       }
 
     } else if (n->isHTMLElement() &&
-               (n->hasTagName(linkTag) || n->hasTagName(styleTag))) {
-      HTMLElement* e = static_cast<HTMLElement*>(n);
+                   (n->hasTagName(linkTag) || n->hasTagName(styleTag))
+#ifdef SVG_SUPPORT
+               || (n->isSVGElement() && n->hasTagName(SVGNames::styleTag))
+#endif
+                   ) {
+      Element* e = static_cast<Element*>(n);
       DeprecatedString title = e->getAttribute(titleAttr).deprecatedString();
       bool enabledViaScript = false;
       if (e->hasLocalName(linkTag)) {
@@ -1897,9 +1901,14 @@ void Document::recalcStyleSelector() {
         enabledViaScript = l->isEnabledViaScript();
       }
 
-      // Get the current preferred styleset.  This is the
-      // set of sheets that will be enabled.
-      if (e->hasLocalName(linkTag))
+// Get the current preferred styleset.  This is the
+// set of sheets that will be enabled.
+#ifdef SVG_SUPPORT
+      if (n->isSVGElement() && n->hasTagName(SVGNames::styleTag))
+        sheet = static_cast<SVGStyleElement*>(n)->sheet();
+      else
+#endif
+          if (e->hasLocalName(linkTag))
         sheet = static_cast<HTMLLinkElement*>(n)->sheet();
       else
         // <STYLE> element
@@ -1922,30 +1931,13 @@ void Document::recalcStyleSelector() {
 
         if (title != m_preferredStylesheetSet)
           sheet = 0;
-      }
-    }
+
 #ifdef SVG_SUPPORT
-    else if (n->isSVGElement() && n->hasTagName(SVGNames::styleTag)) {
-      DeprecatedString title;
-      // <STYLE> element
-      SVGStyleElement* s = static_cast<SVGStyleElement*>(n);
-      if (!s->isLoading()) {
-        sheet = s->sheet();
-        if (sheet)
-          title = s->getAttribute(SVGNames::titleAttr).deprecatedString();
-      }
-
-      if (!title.isEmpty() && m_preferredStylesheetSet.isEmpty())
-        m_preferredStylesheetSet = m_selectedStylesheetSet = title;
-
-      if (!title.isEmpty()) {
-        if (title != m_preferredStylesheetSet)
-          sheet = 0;  // don't use it
-
-        title = title.replace('&', "&&");
+        if (!n->isHTMLElement())
+          title = title.replace('&', "&&");
+#endif
       }
     }
-#endif
 
     if (sheet) {
       sheet->ref();
