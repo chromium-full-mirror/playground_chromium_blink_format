@@ -78,12 +78,13 @@ bool SVGPaintServerLinearGradient::setup(GraphicsContext*& context,
 
   double opacity = 1.0;
 
-  // TODO: Gradient transform + opacity fixes!
+  // TODO: opacity fixes!
 
   if ((type & ApplyToFillTargetType) && renderStyle->svgStyle()->hasFill()) {
     fillColorArray(gradient, gradientStops(), opacity);
 
     QBrush brush(gradient);
+    brush.setTransform(QTransform(gradientTransform()));
 
     painter->setBrush(brush);
     context->setFillRule(renderStyle->svgStyle()->fillRule());
@@ -95,6 +96,7 @@ bool SVGPaintServerLinearGradient::setup(GraphicsContext*& context,
 
     QPen pen;
     QBrush brush(gradient);
+    brush.setTransform(QTransform(gradientTransform()));
 
     setPenProperties(object, renderStyle, pen);
     pen.setBrush(brush);

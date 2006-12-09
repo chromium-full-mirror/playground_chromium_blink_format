@@ -133,7 +133,6 @@ class ResourceHandleInternal {
 #if PLATFORM(QT)
   QString m_charset;
   QString m_mimetype;
-  PlatformResponse m_response;
 #endif
 };
 

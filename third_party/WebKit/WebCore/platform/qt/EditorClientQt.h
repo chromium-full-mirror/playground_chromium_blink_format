@@ -41,6 +41,7 @@ class EditorClientQt : public EditorClient, public Shared<EditorClientQt> {
  public:
   virtual void ref();
   virtual void deref();
+  virtual void pageDestroyed();
 
   virtual bool shouldDeleteRange(Range*);
   virtual bool shouldShowDeleteInterface(HTMLElement*);
@@ -49,9 +50,11 @@ class EditorClientQt : public EditorClient, public Shared<EditorClientQt> {
   virtual bool isGrammarCheckingEnabled();
   virtual int spellCheckerDocumentTag();
 
+  virtual bool smartInsertDeleteEnabled();
   virtual bool shouldBeginEditing(WebCore::Range*);
   virtual bool shouldEndEditing(WebCore::Range*);
   virtual bool shouldInsertText(String, Range*, EditorInsertAction);
+  virtual bool shouldInsertNode(Node*, Range*, EditorInsertAction);
   virtual bool shouldApplyStyle(WebCore::CSSStyleDeclaration*, WebCore::Range*);
 
   virtual void didBeginEditing();

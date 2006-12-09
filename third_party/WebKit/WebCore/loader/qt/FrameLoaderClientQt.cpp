@@ -358,4 +358,9 @@ String FrameLoaderClientQt::userAgent() {
 void FrameLoaderClientQt::dispatchDidReceiveIcon() {
   notImplemented();
 }
+
+void FrameLoaderClientQt::frameLoaderDestroyed() {}
+
+bool FrameLoaderClientQt::canHandleRequest(
+    const WebCore::ResourceRequest&) const {}
 }

@@ -74,8 +74,8 @@ void FrameQtClientDefault::openURL(const KURL& url) {
   ASSERT(m_frame->document());
 
   ResourceRequest request(url);
-  RefPtr<ResourceHandle> loader =
-      ResourceHandle::create(request, this, m_frame->document()->docLoader());
+  RefPtr<ResourceHandle> loader = ResourceHandle::create(
+      request, this, m_frame->document()->docLoader(), false);
 }
 
 void FrameQtClientDefault::submitForm(const String& method,
@@ -90,8 +90,8 @@ void FrameQtClientDefault::submitForm(const String& method,
   request.setHTTPBody(postData);
 
   RefPtr<ResourceHandle> loader = ResourceHandle::create(
-      request, this,
-      m_frame->document() ? m_frame->document()->docLoader() : 0);
+      request, this, m_frame->document() ? m_frame->document()->docLoader() : 0,
+      false);
 }
 
 void FrameQtClientDefault::checkLoaded() {

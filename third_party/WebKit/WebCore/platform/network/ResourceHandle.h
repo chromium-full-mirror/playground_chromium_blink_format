@@ -115,7 +115,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
 #endif
 
 #if PLATFORM(GDK) || PLATFORM(QT)
-  ResourceHandleInternal* getInternal() { return d; }
+  ResourceHandleInternal* getInternal() { return d.get(); }
 #endif
 
 #if PLATFORM(QT)

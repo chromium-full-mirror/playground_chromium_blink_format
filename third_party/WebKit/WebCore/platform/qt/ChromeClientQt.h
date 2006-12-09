@@ -42,6 +42,7 @@ class ChromeClientQt : public ChromeClient, public Shared<ChromeClientQt> {
  public:
   ChromeClientQt();
   virtual ~ChromeClientQt();
+  virtual void chromeDestroyed();
 
   virtual void ref();
   virtual void deref();
@@ -76,6 +77,10 @@ class ChromeClientQt : public ChromeClient, public Shared<ChromeClientQt> {
   virtual bool menubarVisible();
 
   virtual void setResizable(bool);
+
+  virtual void addMessageToConsole(const String& message,
+                                   unsigned int lineNumber,
+                                   const String& sourceID);
 };
 }
 

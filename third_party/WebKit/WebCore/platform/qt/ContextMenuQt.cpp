@@ -33,11 +33,16 @@
 
 namespace WebCore {
 
-void ContextMenu::appendItem(ContextMenuItem item) {
+ContextMenu::ContextMenu(const HitTestResult& result)
+    : m_hitTestResult(result) {}
+
+ContextMenu::~ContextMenu() {}
+
+void ContextMenu::appendItem(const ContextMenuItem& item) {
   if (!m_menu)
     m_menu = new QMenu();
 
-  QAction* action = m_menu->addAction(item.title);
+  QAction* action = m_menu->addAction(item.title());
 }
 
 void ContextMenu::show() {
@@ -45,17 +50,17 @@ void ContextMenu::show() {
   m_menu->exec();
 }
 
-unsigned ContextMenu::itemCount() {
+unsigned ContextMenu::itemCount() const {
   // FIXME: This method is silly
   return 1;
 }
 
-void ContextMenu::insertItem(unsigned position, ContextMenuItem item) {
+void ContextMenu::insertItem(unsigned position, const ContextMenuItem& item) {
   // FIXME: Another silly method
   appendItem(item);
 }
 
-void ContextMenu::setPlatformMenuDescription(PlatformMenuDescription menu) {
+void ContextMenu::setPlatformDescription(PlatformMenuDescription menu) {
   delete m_menu;
   m_menu = static_cast<QMenu*>(menu);
 }

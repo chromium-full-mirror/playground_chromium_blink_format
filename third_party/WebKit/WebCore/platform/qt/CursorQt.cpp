@@ -208,6 +208,10 @@ const Cursor& noDropCursor() {
   return Cursors::self()->PointerCursor;
 }
 
+const Cursor& copyCursor() {
+  return Cursors::self()->PointerCursor;
+}
+
 const Cursor& progressCursor() {
   return Cursors::self()->PointerCursor;
 }

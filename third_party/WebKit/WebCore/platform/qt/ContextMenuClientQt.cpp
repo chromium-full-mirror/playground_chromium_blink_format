@@ -52,19 +52,23 @@ void ContextMenuClientQt::addCustomContextMenuItems(ContextMenu*) {
   notImplemented();
 }
 
-void ContextMenuClientQt::copyLinkToClipboard(HitTestResult) {
+void ContextMenuClientQt::copyLinkToClipboard(const HitTestResult&) {
   notImplemented();
 }
 
-void ContextMenuClientQt::downloadURL(KURL) {
+void ContextMenuClientQt::downloadURL(const KURL&) {
   notImplemented();
 }
 
-void ContextMenuClientQt::copyImageToClipboard(HitTestResult) {
+void ContextMenuClientQt::copyImageToClipboard(const HitTestResult&) {
   notImplemented();
 }
 
 void ContextMenuClientQt::lookUpInDictionary(Frame*) {
   notImplemented();
 }
+
+void ContextMenuClientQt::contextMenuDestroyed() {}
+
+void ContextMenuClientQt::contextMenuItemSelected(const ContextMenuItem*) {}
 }
