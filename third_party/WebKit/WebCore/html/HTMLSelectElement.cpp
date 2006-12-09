@@ -811,9 +811,9 @@ static String stripLeadingWhiteSpace(const String& string) {
   int i;
   for (i = 0; i < length; ++i)
     if (string[i] != nonBreakingSpace &&
-        (string[i] <= 0x7F
-             ? !isspace(string[i])
-             : (u_charDirection(string[i]) != U_WHITE_SPACE_NEUTRAL)))
+        (string[i] <= 0x7F ? !isspace(string[i])
+                           : (WTF::Unicode::direction(string[i]) !=
+                              WTF::Unicode::WhiteSpaceNeutral)))
       break;
 
   return string.substring(i, length - i);

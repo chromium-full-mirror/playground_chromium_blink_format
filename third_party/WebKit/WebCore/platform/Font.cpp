@@ -31,10 +31,11 @@
 #include "IntPoint.h"
 #include "GlyphBuffer.h"
 #include "TextStyle.h"
-#include <unicode/uchar.h>
-#include <unicode/umachine.h>
-#include <unicode/unorm.h>
+#include <wtf/unicode/Unicode.h>
 #include <wtf/MathExtras.h>
+#if USE(ICU_UNICODE)
+#include <unicode/unorm.h>
+#endif
 
 namespace WebCore {
 
@@ -210,11 +211,11 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
 
     if (needCharTransform) {
       if (rtl)
-        c = u_charMirror(c);
+        c = WTF::Unicode::mirroredChar(c);
 
       // If small-caps, convert lowercase to upper.
-      if (m_font->isSmallCaps() && !u_isUUppercase(c)) {
-        UChar32 upperC = u_toupper(c);
+      if (m_font->isSmallCaps() && !WTF::Unicode::isUpper(c)) {
+        UChar32 upperC = WTF::Unicode::toUpper(c);
         if (upperC != c) {
           c = upperC;
           fontData = fontData->smallCapsFontData(m_font->fontDescription());
@@ -357,8 +358,9 @@ bool WidthIterator::advanceOneCharacter(float& width,
 
 UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
   if (currentCharacter + 1 < m_end) {
-    if (u_getCombiningClass(m_run[currentCharacter + 1]) ==
+    if (WTF::Unicode::combiningClass(m_run[currentCharacter + 1]) ==
         hiraganaKatakanaVoicingMarksCombiningClass) {
+#if USE(ICU_UNICODE)
       // Normalize into composed form using 3.2 rules.
       UChar normalizedCharacters[2] = {0, 0};
       UErrorCode uStatus = U_ZERO_ERROR;
@@ -367,6 +369,14 @@ UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
           &normalizedCharacters[0], 2, &uStatus);
       if (resultLength == 1 && uStatus == 0)
         return normalizedCharacters[0];
+#elif USE(QT4_UNICODE)
+      QString tmp(reinterpret_cast<const QChar*>(m_run.data(currentCharacter)),
+                  2);
+      QString res =
+          tmp.normalized(QString::NormalizationForm_C, QChar::Unicode_3_2);
+      if (res.length() == 1)
+        return res.at(0).unicode();
+#endif
     }
   }
   return 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Lars Knoll <lars@trolltech.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,9 +23,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef UChar_h
-#define UChar_h
+#ifndef TextCodecQt_h
+#define TextCodecQt_h
 
-#include <unicode/umachine.h>
+#include "TextCodec.h"
+#include "TextEncoding.h"
+#include <QTextCodec>
 
-#endif  // UChar_h
+class QTextCodec;
+
+namespace WebCore {
+
+class TextCodecQt : public TextCodec {
+ public:
+  static void registerEncodingNames(EncodingNameRegistrar);
+  static void registerCodecs(TextCodecRegistrar);
+
+  TextCodecQt(const TextEncoding&);
+  virtual ~TextCodecQt();
+
+  virtual String decode(const char*, size_t length, bool flush = false);
+  virtual CString encode(const UChar*,
+                         size_t length,
+                         bool allowEntities = false);
+
+ private:
+  TextEncoding m_encoding;
+  QTextCodec* m_codec;
+  QTextCodec::ConverterState m_state;
+};
+
+}  // namespace WebCore
+
+#endif  // TextCodecICU_h

@@ -3881,7 +3881,7 @@ void RenderBlock::updateFirstLetter() {
       // account for leading spaces and punctuation
       while (length < oldText->length() &&
              (DeprecatedChar((*oldText)[length]).isSpace() ||
-              u_ispunct((*oldText)[length])))
+              WTF::Unicode::isPunct((*oldText)[length])))
         length++;
 
       // account for first letter

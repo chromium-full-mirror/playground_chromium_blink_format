@@ -24,8 +24,7 @@
 #include "AtomicStringImpl.h"
 #include "PlatformString.h"
 #include <wtf/HashTraits.h>
-#include <unicode/uchar.h>
-#include <unicode/ustring.h>
+#include <wtf/unicode/Unicode.h>
 
 namespace WTF {
 
@@ -112,8 +111,8 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
 
     // Main loop
     for (; l > 0; l--) {
-      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
-      tmp = (u_foldCase(s[1], U_FOLD_CASE_DEFAULT) << 11) ^ hash;
+      hash += WTF::Unicode::foldCase(s[0]);
+      tmp = (WTF::Unicode::foldCase(s[1]) << 11) ^ hash;
       hash = (hash << 16) ^ tmp;
       s += 2;
       hash += hash >> 11;
@@ -121,7 +120,7 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
 
     // Handle end case
     if (rem) {
-      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
+      hash += WTF::Unicode::foldCase(s[0]);
       hash ^= hash << 11;
       hash += hash >> 17;
     }
@@ -159,8 +158,8 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
 
     // Main loop
     for (; l > 0; l--) {
-      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
-      tmp = (u_foldCase(s[1], U_FOLD_CASE_DEFAULT) << 11) ^ hash;
+      hash += WTF::Unicode::foldCase(s[0]);
+      tmp = (WTF::Unicode::foldCase(s[1]) << 11) ^ hash;
       hash = (hash << 16) ^ tmp;
       s += 2;
       hash += hash >> 11;
@@ -168,7 +167,7 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
 
     // Handle end case
     if (rem) {
-      hash += u_foldCase(s[0], U_FOLD_CASE_DEFAULT);
+      hash += WTF::Unicode::foldCase(s[0]);
       hash ^= hash << 11;
       hash += hash >> 17;
     }
@@ -198,8 +197,8 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
     unsigned length = a->length();
     if (length != b->length())
       return false;
-    return u_memcasecmp(a->characters(), b->characters(), length,
-                        U_FOLD_CASE_DEFAULT) == 0;
+    return WTF::Unicode::strcasecmp(a->characters(), b->characters(), length) ==
+           0;
   }
 };
 

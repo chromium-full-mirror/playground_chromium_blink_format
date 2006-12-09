@@ -25,13 +25,11 @@
 #define StringImpl_h
 
 #include "Shared.h"
-#include "UChar.h"
+#include <wtf/unicode/Unicode.h>
 #include <kjs/identifier.h>
 #include <wtf/Forward.h>
 #include <wtf/Vector.h>
 #include <limits.h>
-
-typedef void UBreakIterator;
 
 #if PLATFORM(CF)
 typedef const struct __CFString* CFStringRef;
@@ -190,8 +188,6 @@ bool equalIgnoringCase(const StringImpl*, const char*);
 inline bool equalIgnoringCase(const char* a, const StringImpl* b) {
   return equalIgnoringCase(b, a);
 }
-
-UBreakIterator* getWordBreakIterator(const UChar* string, int length);
 }
 
 namespace WTF {
