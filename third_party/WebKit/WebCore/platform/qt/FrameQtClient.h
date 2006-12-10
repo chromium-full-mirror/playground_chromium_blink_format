@@ -43,29 +43,12 @@ class FrameQtClient : public ResourceHandleClient {
   FrameQtClient();
   virtual ~FrameQtClient();
 
+  // local
+  void openURL(const KURL&);
+  void submitForm(const String& method, const KURL&, PassRefPtr<FormData>);
+
   // FrameQtClient
   virtual void setFrame(const FrameQt*);
-
-  virtual void openURL(const KURL&);
-  virtual void submitForm(const String& method,
-                          const KURL&,
-                          PassRefPtr<FormData>);
-
-  virtual void checkLoaded();
-
-  virtual void runJavaScriptAlert(String const& message);
-  virtual bool runJavaScriptConfirm(const String& message);
-  virtual bool runJavaScriptPrompt(const String& message,
-                                   const String& defaultValue,
-                                   String& result);
-
-  virtual bool menubarVisible() const;
-  virtual bool toolbarVisible() const;
-  virtual bool statusbarVisible() const;
-  virtual bool personalbarVisible() const;
-  virtual bool locationbarVisible() const;
-
-  virtual void loadFinished() const;
 
   // ResourceHandleClient
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
@@ -73,8 +56,6 @@ class FrameQtClient : public ResourceHandleClient {
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
   virtual void receivedAllData(ResourceHandle*, PlatformData);
-
-  virtual void setTitle(const String& title);
 
  private:
   // Internal helpers
