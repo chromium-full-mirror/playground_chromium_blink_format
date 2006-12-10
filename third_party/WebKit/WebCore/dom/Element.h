@@ -200,6 +200,9 @@ class Element : public ContainerNode {
                               int& exception);
   bool contains(const Node*) const;
 
+  String innerText() const;
+  String outerText() const;
+
  protected:
   virtual void createAttributeMap() const;
   String openTagStartToString() const;
