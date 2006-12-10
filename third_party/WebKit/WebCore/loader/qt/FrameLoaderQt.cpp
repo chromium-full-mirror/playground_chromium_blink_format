@@ -126,8 +126,7 @@ void FrameLoader::urlSelected(const FrameLoadRequest& frameLoadRequest,
 }
 
 void FrameLoader::setTitle(const String& title) {
-  if (m_frame->view() && m_frame->view()->parentWidget())
-    m_frame->view()->parentWidget()->setWindowTitle(title);
+  client()->setTitle(title, URL());
 }
 
 Frame* FrameLoader::createFrame(const KURL& url,
@@ -190,7 +189,7 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
 
     case FrameStateCommittedPage: {
       DocumentLoader* dl = m_documentLoader.get();
-      if (dl->isLoadingInAPISense())
+      if (!dl || dl->isLoadingInAPISense())
         return;
 
       markLoadComplete();

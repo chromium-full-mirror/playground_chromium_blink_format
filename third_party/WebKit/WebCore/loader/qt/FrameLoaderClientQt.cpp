@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "FrameLoaderClientQt.h"
+#include "DocumentLoader.h"
 
 #define notImplemented()                                                  \
   do {                                                                    \
@@ -58,12 +59,12 @@ void FrameLoaderClientQt::deref() {
 
 bool FrameLoaderClientQt::hasWebView() const {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool FrameLoaderClientQt::hasFrameView() const {
   notImplemented();
-  return false;
+  return true;
 }
 
 bool FrameLoaderClientQt::hasBackForwardList() const {
@@ -271,8 +272,8 @@ void FrameLoaderClientQt::willChangeTitle(DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::didChangeTitle(DocumentLoader*) {
-  notImplemented();
+void FrameLoaderClientQt::didChangeTitle(DocumentLoader* l) {
+  setTitle(l->title(), l->URL());
 }
 
 void FrameLoaderClientQt::finishedLoading(DocumentLoader*) {
