@@ -130,10 +130,6 @@ class ResourceHandleInternal {
 #if USE(CURL)
   CURL* m_handle;
 #endif
-#if PLATFORM(QT)
-  QString m_charset;
-  QString m_mimetype;
-#endif
 };
 
 }  // namespace WebCore

@@ -71,4 +71,8 @@ ResourceHandleClient* ResourceHandle::client() const {
   return d->m_client;
 }
 
+const ResourceRequest& ResourceHandle::request() const {
+  return d->m_request;
+}
+
 }  // namespace WebCore
