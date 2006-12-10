@@ -103,8 +103,7 @@ void* ArenaAllocate(ArenaPool* pool, unsigned int nb);
 #define CLEAR_UNUSED(a)              \
   (assert((a)->avail <= (a)->limit), \
    memset((void*)(a)->avail, FREE_PATTERN, (a)->limit - (a)->avail))
-#define CLEAR_ARENA(a) \
-  memset((void*)(a), FREE_PATTERN, (a)->limit - (PRUword)(a))
+#define CLEAR_ARENA(a) memset((void*)(a), FREE_PATTERN, (a)->limit - (uword)(a))
 #else
 #define CLEAR_UNUSED(a)
 #define CLEAR_ARENA(a)

@@ -63,6 +63,7 @@ namespace {
 class Cursors {
  protected:
   Cursors()
+#ifndef QT_NO_CURSOR
       : CrossCursor(QCursor(Qt::CrossCursor)),
         MoveCursor(QCursor(Qt::SizeAllCursor)),
         PointerCursor(QCursor(Qt::ArrowCursor)),
@@ -75,7 +76,10 @@ class Cursors {
         SizeFDiagCursor(QCursor(Qt::SizeFDiagCursor)),
         SizeBDiagCursor(QCursor(Qt::SizeBDiagCursor)),
         SplitHCursor(QCursor(Qt::SplitHCursor)),
-        SplitVCursor(QCursor(Qt::SplitVCursor)) {}
+        SplitVCursor(QCursor(Qt::SplitVCursor))
+#endif
+  {
+  }
 
   ~Cursors() {}
 

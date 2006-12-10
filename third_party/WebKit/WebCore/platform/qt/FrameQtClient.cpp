@@ -118,8 +118,8 @@ bool FrameQtClientDefault::runJavaScriptConfirm(const String& message) {
                                    KStdGuiItem::cancel()) == KMessageBox::Yes;
 #else
   return QMessageBox::warning(m_frame->view()->qwidget(), "JavaScript", message,
-                              QMessageBox::Yes | QMessageBox::No) ==
-         QMessageBox::Yes;
+                              QMessageBox::Yes | QMessageBox::No, 0,
+                              0) == QMessageBox::Yes;
 #endif
 }
 
@@ -131,8 +131,12 @@ bool FrameQtClientDefault::runJavaScriptPrompt(const String& message,
   result = KInputDialog::getText("JavaScript", message, defaultValue, &ok,
                                  m_frame->view()->qwidget());
 #else
+#ifndef QT_NO_INPUTDIALOG
   result = QInputDialog::getText(m_frame->view()->qwidget(), "JavaScript",
                                  message, QLineEdit::Normal, defaultValue, &ok);
+#else
+  abort();  // FIXME
+#endif
 #endif
 
   return ok;
