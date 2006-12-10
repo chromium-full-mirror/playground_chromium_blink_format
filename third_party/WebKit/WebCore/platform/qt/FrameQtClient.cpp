@@ -94,7 +94,6 @@ void FrameQtClient::submitForm(const String& method,
 
 void FrameQtClient::didReceiveResponse(ResourceHandle* job,
                                        const ResourceResponse& response) {
-  // qDebug() << "----------> FrameQtClient::didReceiveResponse";
   // set mimetype and encoding
 
   // Assign correct mimetype _before_ calling begin()!
@@ -112,10 +111,14 @@ void FrameQtClient::didReceiveResponse(ResourceHandle* job,
 }
 
 void FrameQtClient::didFinishLoading(ResourceHandle* handle) {
+  m_frame->loader()->end();
+  m_frame->loader()->checkCompleted();
   handle->deref();
 }
 
 void FrameQtClient::didFail(ResourceHandle* handle, const ResourceError&) {
+  m_frame->loader()->end();
+  m_frame->loader()->checkCompleted();
   handle->deref();
 }
 
@@ -148,11 +151,5 @@ int FrameQtClient::numPendingOrLoadingRequests(bool recurse) const {
     num += numRequests(frame->document());
 
   return num;
-}
-
-void FrameQtClient::receivedAllData(ResourceHandle* job, PlatformData data) {
-  ASSERT(m_frame);
-
-  m_frame->loader()->end();
 }
 }

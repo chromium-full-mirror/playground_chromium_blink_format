@@ -121,7 +121,7 @@ bool EventHandler::dragHysteresisExceeded(
 }
 
 bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
-  notImplemented();
+  // notImplemented();
   return false;
 }
 

@@ -128,7 +128,7 @@ void EditorClientQt::registerCommandForRedo(
 }
 
 void EditorClientQt::clearUndoRedoOperations() {
-  notImplemented();
+  // notImplemented();
 }
 
 bool EditorClientQt::canUndo() const {
