@@ -30,15 +30,21 @@
 #include "DumpRenderTree.h"
 #include "KURL.h"
 
-#include <kapplication.h>
-#include <kcmdlineargs.h>
+#include <qstringlist.h>
 
 using namespace WebCore;
 
+#if PLATFORM(KDE)
+#include <kapplication.h>
+#include <kcmdlineargs.h>
+
 static KCmdLineOptions options[] = {{"+file", "File to load", 0},
                                     KCmdLineLastOption};
-
+#else
+#include <qapplication.h>
+#endif
 int main(int argc, char* argv[]) {
+#if PLATFORM(KDE)
   KCmdLineArgs::init(argc, argv, "DumpRenderTree", "DumpRenderTree",
                      "testing application", "0.1");
   KCmdLineArgs::addCmdLineOptions(options);
@@ -54,4 +60,19 @@ int main(int argc, char* argv[]) {
     dumper.open(KURL(args->arg(0)));
 
   return app.exec();
+#else
+  QApplication app(argc, argv);
+
+  const QStringList args = app.arguments();
+
+  WebCore::DumpRenderTree dumper;
+
+  if (args.count() == 2 && args[1] == QLatin1String("-"))
+    dumper.open();
+  else if (args.count() == 2)
+    dumper.open(KURL(args[1]));
+
+  return app.exec();
+
+#endif
 }

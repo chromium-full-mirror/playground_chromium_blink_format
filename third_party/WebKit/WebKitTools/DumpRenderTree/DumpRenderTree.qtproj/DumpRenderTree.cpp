@@ -29,6 +29,7 @@
 
 #include "config.h"
 #include "DumpRenderTree.h"
+#include "DumpRenderTreeClient.h"
 
 #include "Page.h"
 #include "markup.h"
@@ -40,6 +41,7 @@
 #include "ChromeClientQt.h"
 #include "ContextMenuClientQt.h"
 #include "EditorClientQt.h"
+#include "FrameLoaderClientQt.h"
 
 #include <QDir>
 #include <QFile>
@@ -64,7 +66,7 @@ DumpRenderTree::DumpRenderTree()
   // Initialize WebCore in Qt platform mode...
   Page* page = new Page(new ChromeClientQt(), new ContextMenuClientQt(),
                         new EditorClientQt());
-  m_frame = new FrameQt(page, 0, m_client);
+  m_frame = new FrameQt(page, 0, m_client, new FrameLoaderClientQt());
 
   FrameView* view = new FrameView(m_frame);
   view->setScrollbarsMode(ScrollbarAlwaysOff);
@@ -94,7 +96,7 @@ DumpRenderTree::~DumpRenderTree() {
 
 void DumpRenderTree::open() {
   if (!m_stdin)
-    m_stdin = new QTextStream(stdin, IO_ReadOnly);
+    m_stdin = new QTextStream(stdin, QFile::ReadOnly);
 
   if (!m_notifier) {
     m_notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
@@ -180,5 +182,3 @@ FrameQt* DumpRenderTree::frame() const {
   return m_frame;
 }
 }
-
-#include "DumpRenderTree.moc"
