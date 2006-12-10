@@ -58,7 +58,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
       reinterpret_cast<const QChar*>(glyphBuffer.glyphs(from));
   QString str = QString::fromRawData(buffer, numGlyphs);
 
-  p.drawText(QPointF(point.x(), point.y()), str);
+  p.drawText(point, str);
 }
 
 void Font::drawComplexText(GraphicsContext* ctx,
@@ -67,10 +67,9 @@ void Font::drawComplexText(GraphicsContext* ctx,
                            const FloatPoint& point) const {
   // FIXME: style, run.from()/length() cut-off
   ctx->platformContext()->drawText(
-      point.x(), point.y(),
-      QString::fromRawData(
-          reinterpret_cast<const QChar*>(run.characters() + run.from()),
-          run.length()));
+      point, QString::fromRawData(
+                 reinterpret_cast<const QChar*>(run.characters() + run.from()),
+                 run.length()));
 }
 
 float Font::floatWidthForComplexText(const TextRun& run,
