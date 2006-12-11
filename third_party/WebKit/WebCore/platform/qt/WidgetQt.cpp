@@ -36,6 +36,7 @@
 #include "IntRect.h"
 #include "RenderObject.h"
 #include "GraphicsContext.h"
+#include "WidgetClient.h"
 
 #include <QWidget>
 
@@ -47,8 +48,10 @@
 namespace WebCore {
 
 struct WidgetPrivate {
-  WidgetPrivate() : m_parent(0), m_widget(0) {}
+  WidgetPrivate() : m_parent(0), m_widget(0), m_client(0) {}
   ~WidgetPrivate() { delete m_widget; }
+
+  WidgetClient* m_client;
 
   QWidget* m_parent;
   QWidget* m_widget;
@@ -64,12 +67,11 @@ Widget::~Widget() {
 }
 
 void Widget::setClient(WidgetClient* c) {
-  notImplemented();
+  data->m_client = c;
 }
 
 WidgetClient* Widget::client() const {
-  notImplemented();
-  return 0;
+  return data->m_client;
 }
 
 IntRect Widget::frameGeometry() const {
@@ -186,6 +188,9 @@ void Widget::setEnabled(bool en) {
 
 Widget::FocusPolicy Widget::focusPolicy() const {
   if (!data->m_widget)
+    return NoFocus;
+
+  if (data->m_client && !data->m_client->isVisible(const_cast<Widget*>(this)))
     return NoFocus;
 
   switch (data->m_widget->focusPolicy()) {
