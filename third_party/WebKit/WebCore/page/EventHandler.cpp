@@ -82,7 +82,6 @@ static Frame* subframeForTargetNode(Node* node);
 
 EventHandler::EventHandler(Frame* frame)
     : m_frame(frame),
-      m_bMousePressed(false),
       m_mousePressed(false),
       m_beganSelectingText(false),
       m_hoverTimer(this, &EventHandler::hoverTimerFired),
@@ -279,7 +278,7 @@ bool EventHandler::handleMousePressEvent(
   if (event.event().button() == LeftButton ||
       event.event().button() == MiddleButton) {
     m_frame->selectionController()->setCaretBlinkingSuspended(true);
-    m_bMousePressed = true;
+    m_mousePressed = true;
     m_beganSelectingText = false;
 
     if (event.event().clickCount() == 2)
@@ -303,7 +302,7 @@ bool EventHandler::handleMouseMoveEvent(
     return true;
 
   // Mouse not pressed. Do nothing.
-  if (!m_bMousePressed)
+  if (!m_mousePressed)
     return false;
 
   Node* innerNode = event.targetNode();
@@ -376,7 +375,7 @@ bool EventHandler::handleMouseReleaseEvent(
   // Used to prevent mouseMoveEvent from initiating a drag before
   // the mouse is pressed again.
   m_frame->selectionController()->setCaretBlinkingSuspended(false);
-  m_bMousePressed = false;
+  m_mousePressed = false;
 
   bool handled = false;
 
@@ -414,7 +413,7 @@ void EventHandler::handleAutoscroll(RenderObject* renderer) {
 }
 
 void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
-  if (!m_bMousePressed) {
+  if (!m_mousePressed) {
     stopAutoscrollTimer();
     return;
   }

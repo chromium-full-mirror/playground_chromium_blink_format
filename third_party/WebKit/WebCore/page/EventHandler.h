@@ -245,7 +245,6 @@ class EventHandler : Noncopyable {
 
   Frame* m_frame;
 
-  bool m_bMousePressed;
   bool m_mousePressed;
   RefPtr<Node> m_mousePressNode;
 
