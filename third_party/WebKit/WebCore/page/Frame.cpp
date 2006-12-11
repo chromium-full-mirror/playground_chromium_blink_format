@@ -43,8 +43,8 @@
 #include "EventNames.h"
 #include "FloatRect.h"
 #include "Frame.h"
-#include "FrameLoader.h"
 #include "FrameLoadRequest.h"
+#include "FrameLoader.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "HTMLFormElement.h"
@@ -151,14 +151,15 @@ int FrameCounter::count = 0;
 static FrameCounter frameCounter;
 #endif
 
-static inline Frame* parentFromOwnerElement(Element* ownerElement) {
+static inline Frame* parentFromOwnerElement(
+    HTMLFrameOwnerElement* ownerElement) {
   if (!ownerElement)
     return 0;
   return ownerElement->document()->frame();
 }
 
 Frame::Frame(Page* page,
-             Element* ownerElement,
+             HTMLFrameOwnerElement* ownerElement,
              FrameLoaderClient* frameLoaderClient)
     : d(new FramePrivate(page,
                          parentFromOwnerElement(ownerElement),
@@ -184,6 +185,7 @@ Frame::Frame(Page* page,
     // Leave this ref call here until we can straighten that out.
     ref();
     page->incrementFrameCount();
+    ownerElement->m_contentFrame = this;
   }
 
 #ifndef NDEBUG
@@ -866,12 +868,12 @@ RenderObject* Frame::renderer() const {
   return doc ? doc->renderer() : 0;
 }
 
-Element* Frame::ownerElement() {
+HTMLFrameOwnerElement* Frame::ownerElement() const {
   return d->m_ownerElement;
 }
 
 RenderPart* Frame::ownerRenderer() {
-  Element* ownerElement = d->m_ownerElement;
+  HTMLFrameOwnerElement* ownerElement = d->m_ownerElement;
   if (!ownerElement)
     return 0;
   return static_cast<RenderPart*>(ownerElement->renderer());
@@ -1434,9 +1436,11 @@ void Frame::pageDestroyed() {
 void Frame::setStatusBarText(const String&) {}
 
 void Frame::disconnectOwnerElement() {
-  if (d->m_ownerElement && d->m_page)
-    d->m_page->decrementFrameCount();
-
+  if (d->m_ownerElement) {
+    d->m_ownerElement->m_contentFrame = 0;
+    if (d->m_page)
+      d->m_page->decrementFrameCount();
+  }
   d->m_ownerElement = 0;
 }
 
@@ -1459,7 +1463,7 @@ void Frame::setProhibitsScrolling(bool prohibit) {
 FramePrivate::FramePrivate(Page* page,
                            Frame* parent,
                            Frame* thisFrame,
-                           Element* ownerElement,
+                           HTMLFrameOwnerElement* ownerElement,
                            FrameLoaderClient* frameLoaderClient)
     : m_page(page),
       m_treeNode(thisFrame, parent),

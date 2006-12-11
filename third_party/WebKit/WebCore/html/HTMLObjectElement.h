@@ -90,8 +90,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   String codeType() const;
   void setCodeType(const String&);
 
-  Document* contentDocument() const;
-
   String data() const;
   void setData(const String&);
 

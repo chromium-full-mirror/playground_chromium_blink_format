@@ -22,6 +22,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "HTMLFrameElement.h"
 
@@ -47,10 +48,17 @@ RenderObject* HTMLFrameElement::createRenderer(RenderArena* arena,
   return new (arena) RenderFrame(this);
 }
 
+static inline HTMLFrameSetElement* containingFrameSetElement(Node* node) {
+  while ((node = node->parentNode()))
+    if (node->hasTagName(framesetTag))
+      return static_cast<HTMLFrameSetElement*>(node);
+  return 0;
+}
+
 void HTMLFrameElement::attach() {
   HTMLFrameElementBase::attach();
 
-  if (HTMLFrameSetElement* frameSetElement = containingFrameSetElement()) {
+  if (HTMLFrameSetElement* frameSetElement = containingFrameSetElement(this)) {
     if (!m_frameBorderSet)
       m_frameBorder = frameSetElement->frameBorder();
     if (!m_noResize)

@@ -44,7 +44,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderPartObject::RenderPartObject(HTMLElement* element) : RenderPart(element) {
+RenderPartObject::RenderPartObject(HTMLFrameOwnerElement* element)
+    : RenderPart(element) {
   // init RenderObject attributes
   setInline(true);
   m_hasFallbackContent = false;
@@ -273,9 +274,9 @@ void RenderPartObject::viewCleared() {
     int marginh = -1;
     if (element()->hasTagName(iframeTag)) {
       HTMLIFrameElement* frame = static_cast<HTMLIFrameElement*>(element());
-      hasBorder = frame->m_frameBorder;
-      marginw = frame->m_marginWidth;
-      marginh = frame->m_marginHeight;
+      hasBorder = frame->hasFrameBorder();
+      marginw = frame->getMarginWidth();
+      marginh = frame->getMarginHeight();
     }
 
     view->setHasBorder(hasBorder);

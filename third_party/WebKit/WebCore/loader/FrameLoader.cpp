@@ -52,7 +52,6 @@
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
-#include "HTMLPlugInElement.h"
 #include "HTTPParsers.h"
 #include "IconDatabase.h"
 #include "IconLoader.h"
@@ -371,7 +370,7 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
   urlSelected(frameRequest, triggeringEvent);
 }
 
-bool FrameLoader::requestFrame(Element* ownerElement,
+bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
                                const String& urlString,
                                const AtomicString& frameName) {
   // Support for <frame src="javascript:string">
@@ -404,7 +403,7 @@ bool FrameLoader::requestFrame(Element* ownerElement,
   return true;
 }
 
-Frame* FrameLoader::loadSubframe(Element* ownerElement,
+Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
                                  const KURL& url,
                                  const String& name,
                                  const String& referrer) {
@@ -1317,28 +1316,28 @@ bool FrameLoader::requestObject(RenderPart* renderer,
     completedURL = completeURL(url);
 
   bool useFallback;
-  if (shouldUsePlugin(renderer->element(), completedURL, mimeType,
-                      renderer->hasFallbackContent(), useFallback)) {
+  if (shouldUsePlugin(completedURL, mimeType, renderer->hasFallbackContent(),
+                      useFallback)) {
     if (!m_frame->pluginsEnabled())
       return false;
-
     return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
   }
 
   ASSERT(renderer->node()->hasTagName(objectTag) ||
          renderer->node()->hasTagName(embedTag));
-  AtomicString uniqueFrameName = m_frame->tree()->uniqueChildName(frameName);
-  static_cast<HTMLPlugInElement*>(renderer->node())
-      ->setFrameName(uniqueFrameName);
+  HTMLPlugInElement* element =
+      static_cast<HTMLPlugInElement*>(renderer->node());
 
-  // FIXME: OK to always make a new one? When does the old frame get removed?
-  return loadSubframe(static_cast<Element*>(renderer->node()), completedURL,
-                      uniqueFrameName, m_outgoingReferrer);
+  AtomicString uniqueFrameName = m_frame->tree()->uniqueChildName(frameName);
+  element->setFrameName(uniqueFrameName);
+
+  // FIXME: OK to always make a new frame? When does the old frame get removed?
+  return loadSubframe(element, completedURL, uniqueFrameName,
+                      m_outgoingReferrer);
 }
 
-bool FrameLoader::shouldUsePlugin(Node* element,
-                                  const KURL& url,
+bool FrameLoader::shouldUsePlugin(const KURL& url,
                                   const String& mimeType,
                                   bool hasFallback,
                                   bool& useFallback) {
@@ -1420,7 +1419,7 @@ void FrameLoader::setOpenedByJavaScript() {
 }
 
 void FrameLoader::handleFallbackContent() {
-  Element* owner = m_frame->ownerElement();
+  HTMLFrameOwnerElement* owner = m_frame->ownerElement();
   if (!owner || !owner->hasTagName(objectTag))
     return;
   static_cast<HTMLObjectElement*>(owner)->renderFallbackContent();
@@ -1574,7 +1573,7 @@ void FrameLoader::stopRedirectionTimer() {
 }
 
 void FrameLoader::updateBaseURLForEmptyDocument() {
-  Element* owner = m_frame->ownerElement();
+  HTMLFrameOwnerElement* owner = m_frame->ownerElement();
   // FIXME: Should embed be included?
   if (owner && (owner->hasTagName(iframeTag) || owner->hasTagName(objectTag) ||
                 owner->hasTagName(embedTag)))
@@ -1990,7 +1989,7 @@ bool FrameLoader::isArchiveLoadPending(ResourceLoader* loader) const {
 }
 
 bool FrameLoader::isHostedByObjectElement() const {
-  Element* owner = m_frame->ownerElement();
+  HTMLFrameOwnerElement* owner = m_frame->ownerElement();
   return owner && owner->hasTagName(objectTag);
 }
 

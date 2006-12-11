@@ -54,6 +54,7 @@
 #include "HTMLBodyElement.h"
 #include "HTMLDocument.h"
 #include "HTMLElementFactory.h"
+#include "HTMLFrameOwnerElement.h"
 #include "HTMLImageLoader.h"
 #include "HTMLInputElement.h"
 #include "HTMLLinkElement.h"

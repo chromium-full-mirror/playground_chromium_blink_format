@@ -85,6 +85,7 @@ class FormData;
 class Frame;
 class FrameLoaderClient;
 class HTMLFormElement;
+class HTMLFrameOwnerElement;
 class IconLoader;
 class IntSize;
 class MainResourceLoader;
@@ -186,14 +187,14 @@ class FrameLoader : Noncopyable {
   void load(const FrameLoadRequest&,
             bool userGesture,
             Event*,
-            Element* form,
+            HTMLFormElement*,
             const HashMap<String, String>& formValues);
   void load(const KURL&,
             const String& referrer,
             FrameLoadType,
             const String& target,
             Event*,
-            Element* form,
+            HTMLFormElement*,
             const HashMap<String, String>& formValues);
   void post(const KURL&,
             const String& referrer,
@@ -201,7 +202,7 @@ class FrameLoader : Noncopyable {
             PassRefPtr<FormData>,
             const String& contentType,
             Event*,
-            Element* form,
+            HTMLFormElement*,
             const HashMap<String, String>& formValues);
 #if PLATFORM(MAC)
   void load(NSURLRequest*);
@@ -396,14 +397,14 @@ class FrameLoader : Noncopyable {
                    bool lockHistory = false);
   void urlSelected(const FrameLoadRequest&, Event*);
 
-  bool requestFrame(Element* ownerElement,
+  bool requestFrame(HTMLFrameOwnerElement*,
                     const String& URL,
                     const AtomicString& frameName);
   Frame* createFrame(const KURL& URL,
                      const String& name,
-                     Element* ownerElement,
+                     HTMLFrameOwnerElement*,
                      const String& referrer);
-  Frame* loadSubframe(Element* ownerElement,
+  Frame* loadSubframe(HTMLFrameOwnerElement*,
                       const KURL& URL,
                       const String& name,
                       const String& referrer);
@@ -572,8 +573,7 @@ class FrameLoader : Noncopyable {
   void completed();
   void parentCompleted();
 
-  bool shouldUsePlugin(Node* element,
-                       const KURL&,
+  bool shouldUsePlugin(const KURL&,
                        const String& mimeType,
                        bool hasFallback,
                        bool& useFallback);
