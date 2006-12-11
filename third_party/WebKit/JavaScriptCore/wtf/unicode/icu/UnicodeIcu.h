@@ -229,10 +229,6 @@ inline bool isDigit(int32_t c) {
   return !!u_isdigit(c);
 }
 
-inline bool isSpace(int32_t c) {
-  return !!u_isspace(c);
-}
-
 inline bool isPunct(int32_t c) {
   return !!u_ispunct(c);
 }
