@@ -66,8 +66,10 @@ void FrameQtClient::openURL(const KURL& url) {
 
   m_frame->loader()->didOpenURL(url);
 
-  if (!m_frame->document())
+  if (!m_frame->document()) {
     m_frame->loader()->createEmptyDocument();
+    m_frame->loader()->didOpenURL(url);
+  }
 
   ASSERT(m_frame->document());
 

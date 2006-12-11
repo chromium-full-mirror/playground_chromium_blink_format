@@ -178,7 +178,7 @@ void ResourceHandleManager::cancel(ResourceHandle* resource) {
   if (!req)
     return;
 
-  DEBUG() << "ResourceHandleManager::cancel";
+  DEBUG() << "ResourceHandleManager::cancel" << resource->url().path();
   client->didFail(resource, ResourceError());
 
   RequestQt* request = pendingRequests.take(resource);
@@ -267,14 +267,14 @@ void ResourceHandleManager::receivedData(RequestQt* request,
   if (!client)
     return;
 
-  DEBUG() << "receivedData" << data;
+  DEBUG() << "receivedData" << request->url.path();
   client->didReceiveData(request->resource, data.constData(), data.length(),
                          data.length() /*FixMe*/);
 }
 
 void ResourceHandleManager::receivedFinished(RequestQt* request,
                                              int errorCode) {
-  DEBUG() << "receivedFinished" << errorCode;
+  DEBUG() << "receivedFinished" << errorCode << request->url.path();
   RequestQt* req = pendingRequests.value(request->resource);
   if (!req)
     return;
@@ -350,7 +350,7 @@ FileLoader::FileLoader() : QObject(0) {
 }
 
 void FileLoader::request(RequestQt* request) {
-  DEBUG() << "FileLoader::request";
+  DEBUG() << "FileLoader::request" << request->url.path();
   KURL url = request->url;
   Q_ASSERT(url.isLocalFile());
   int error = 0;
