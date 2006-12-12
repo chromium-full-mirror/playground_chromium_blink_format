@@ -39,6 +39,7 @@ class EditorClient;
 class Frame;
 class FrameNamespace;
 class FloatRect;
+class Node;
 class SelectionController;
 class Settings;
 class Widget;
@@ -55,6 +56,9 @@ class Page : Noncopyable {
 
   void setGroupName(const String&);
   String groupName() const { return m_groupName; }
+
+  bool setFocusedNode(PassRefPtr<Node>);
+  Node* focusedNode() const { return m_focusedNode.get(); }
 
   const HashSet<Page*>* frameNamespace() const;
   static const HashSet<Page*>* frameNamespace(const String&);
@@ -92,6 +96,7 @@ class Page : Noncopyable {
 
   EditorClient* m_editorClient;
   RefPtr<Frame> m_mainFrame;
+  RefPtr<Node> m_focusedNode;
   int m_frameCount;
   String m_groupName;
 

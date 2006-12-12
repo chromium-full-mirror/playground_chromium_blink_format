@@ -229,6 +229,7 @@ class Node : public TreeShared<Node> {
   bool hasStyle() const { return m_hasStyle; }
   bool active() const { return m_active; }
   bool inActiveChain() const { return m_inActiveChain; }
+  bool inDetach() const { return m_inDetach; }
   bool hovered() const { return m_hovered; }
   bool focused() const { return m_focused; }
   bool attached() const { return m_attached; }
