@@ -23,7 +23,7 @@
 #include "config.h"
 #include "Base64.h"
 
-#include <wtf/platform.h>
+#include <wtf/Platform.h>
 #include <wtf/StringExtras.h>
 
 static const char base64EncMap[64] = {
