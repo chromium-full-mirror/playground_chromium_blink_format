@@ -32,7 +32,7 @@
 #include "RenderSVGContainer.h"
 #include "SVGHelper.h"
 #include "SVGLength.h"
-#include "SVGMatrix.h"
+#include "AffineTransform.h"
 #include "SVGNames.h"
 #include "SVGSVGElement.h"
 #include "SVGTransformList.h"
@@ -361,8 +361,7 @@ void SVGPatternElement::notifyAttributeChange() const {
 
   AffineTransform patternTransformMatrix;
   if (patternTransform()->numberOfItems() > 0)
-    patternTransformMatrix =
-        patternTransform()->consolidate()->matrix()->matrix();
+    patternTransformMatrix = patternTransform()->consolidate()->matrix();
 
   SVGPatternElement* nonConstThis = const_cast<SVGPatternElement*>(this);
 
@@ -393,14 +392,11 @@ SVGResource* SVGPatternElement::canvasResource() {
   return m_paintServer.get();
 }
 
-SVGMatrix* SVGPatternElement::getCTM() const {
-  SVGMatrix* mat = SVGSVGElement::createSVGMatrix();
-  if (mat) {
-    RefPtr<SVGMatrix> viewBox =
-        viewBoxToViewTransform(width()->value(), height()->value());
-    mat->multiply(viewBox.get());
-  }
-
+AffineTransform SVGPatternElement::getCTM() const {
+  AffineTransform mat;
+  AffineTransform viewBox =
+      viewBoxToViewTransform(width()->value(), height()->value());
+  mat *= viewBox;
   return mat;
 }
 }

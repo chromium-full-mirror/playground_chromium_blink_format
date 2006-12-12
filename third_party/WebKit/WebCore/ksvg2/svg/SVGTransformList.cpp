@@ -24,7 +24,7 @@
 
 #ifdef SVG_SUPPORT
 
-#include "SVGMatrix.h"
+#include "AffineTransform.h"
 #include "SVGTransform.h"
 #include "SVGSVGElement.h"
 #include "SVGTransformList.h"
@@ -36,7 +36,7 @@ SVGTransformList::SVGTransformList() : SVGList<RefPtr<SVGTransform>>() {}
 SVGTransformList::~SVGTransformList() {}
 
 RefPtr<SVGTransform> SVGTransformList::createSVGTransformFromMatrix(
-    SVGMatrix* matrix) const {
+    const AffineTransform& matrix) const {
   return SVGSVGElement::createSVGTransformFromMatrix(matrix);
 }
 
@@ -55,11 +55,11 @@ SVGTransform* SVGTransformList::concatenate() const {
     return 0;
 
   SVGTransform* obj = SVGSVGElement::createSVGTransform();
-  SVGMatrix* matrix = SVGSVGElement::createSVGMatrix();
+  AffineTransform matrix;
 
   ExceptionCode ec = 0;
   for (unsigned int i = 0; i < length; i++)
-    matrix->multiply(getItem(i, ec)->matrix());
+    matrix = getItem(i, ec)->matrix() * matrix;
 
   obj->setMatrix(matrix);
   return obj;

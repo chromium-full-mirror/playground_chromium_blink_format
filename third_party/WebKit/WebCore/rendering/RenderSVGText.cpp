@@ -43,7 +43,7 @@ void RenderSVGText::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   AffineTransform transform = localTransform();
   r = transform.mapRect(r);
   RenderContainer::computeAbsoluteRepaintRect(r, f);
-  r = transform.invert().mapRect(r);
+  r = transform.inverse().mapRect(r);
 }
 
 bool RenderSVGText::requiresLayer() {
@@ -102,7 +102,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
                                 HitTestAction hitTestAction) {
   AffineTransform totalTransform = absoluteTransform();
   double localX, localY;
-  totalTransform.invert().map(_x, _y, &localX, &localY);
+  totalTransform.inverse().map(_x, _y, &localX, &localY);
   return RenderBlock::nodeAtPoint(request, result, (int)localX, (int)localY,
                                   _tx, _ty, hitTestAction);
 }
@@ -119,7 +119,7 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
 
 void RenderSVGText::paint(PaintInfo& paintInfo, int tx, int ty) {
   RenderObject::PaintInfo pi(paintInfo);
-  pi.rect = (absoluteTransform()).invert().mapRect(pi.rect);
+  pi.rect = (absoluteTransform()).inverse().mapRect(pi.rect);
   RenderBlock::paint(pi, tx, ty);
 }
 

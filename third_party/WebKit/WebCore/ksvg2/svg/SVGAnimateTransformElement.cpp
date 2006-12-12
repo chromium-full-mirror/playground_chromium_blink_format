@@ -26,7 +26,7 @@
 
 #include "KSVGTimeScheduler.h"
 #include "SVGAngle.h"
-#include "SVGMatrix.h"
+#include "AffineTransform.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGSVGElement.h"
 #include "SVGTransform.h"
@@ -133,10 +133,10 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
         if (!m_fromTransform)
           m_fromTransform = new SVGTransform();
 
-        SVGMatrix* byMatrix = m_toTransform->matrix();
-        SVGMatrix* fromMatrix = m_fromTransform->matrix();
+        AffineTransform byMatrix = m_toTransform->matrix();
+        AffineTransform fromMatrix = m_fromTransform->matrix();
 
-        byMatrix->multiply(fromMatrix);
+        byMatrix *= fromMatrix;
 
         break;
       }
@@ -180,8 +180,8 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       if (!value1.isEmpty() && !value2.isEmpty()) {
         bool apply = false;
         if (m_toTransform && m_fromTransform) {
-          qToMatrix = m_toTransform->matrix()->matrix();
-          qFromMatrix = m_fromTransform->matrix()->matrix();
+          qToMatrix = m_toTransform->matrix();
+          qFromMatrix = m_fromTransform->matrix();
 
           apply = true;
           useTimePercentage = 1.0;
@@ -203,38 +203,40 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
           calculateRelativeTimePercentage(timePercentage, m_currentItem);
   }
 
-  if (m_toTransform && m_toTransform->matrix() && qToMatrix.isIdentity())
-    qToMatrix = m_toTransform->matrix()->matrix();
+  if (m_toTransform && qToMatrix.isIdentity())
+    qToMatrix = m_toTransform->matrix();
 
-  if (m_fromTransform && m_fromTransform->matrix() && qFromMatrix.isIdentity())
-    qFromMatrix = m_fromTransform->matrix()->matrix();
+  if (m_fromTransform && qFromMatrix.isIdentity())
+    qFromMatrix = m_fromTransform->matrix();
 
-  if (!m_transformMatrix)
-    m_transformMatrix = new SVGMatrix();
-  else {
-    m_transformMatrix->reset();
+  /* FIXME: This logic needs fixing, was broken before, is still broken.
+      if (m_transformMatrix)
+          m_transformMatrix = new SVGMatrix();
+      else {
+          m_transformMatrix.reset();
 
-    if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
-      m_transformMatrix->multiply(m_lastMatrix.get());
-  }
+          if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
+              m_transformMatrix->multiply(m_lastMatrix.get());
+      }
+   */
 
   switch (m_type) {
     case SVGTransform::SVG_TRANSFORM_TRANSLATE: {
-      double dx = ((qToMatrix.dx() - qFromMatrix.dx()) * useTimePercentage) +
-                  qFromMatrix.dx();
-      double dy = ((qToMatrix.dy() - qFromMatrix.dy()) * useTimePercentage) +
-                  qFromMatrix.dy();
+      double dx = ((qToMatrix.e() - qFromMatrix.e()) * useTimePercentage) +
+                  qFromMatrix.e();
+      double dy = ((qToMatrix.f() - qFromMatrix.f()) * useTimePercentage) +
+                  qFromMatrix.f();
 
-      m_transformMatrix->translate(dx, dy);
+      m_transformMatrix.translate(dx, dy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SCALE: {
-      double sx = ((qToMatrix.m11() - qFromMatrix.m11()) * useTimePercentage) +
-                  qFromMatrix.m11();
-      double sy = ((qToMatrix.m22() - qFromMatrix.m22()) * useTimePercentage) +
-                  qFromMatrix.m22();
+      double sx = ((qToMatrix.a() - qFromMatrix.a()) * useTimePercentage) +
+                  qFromMatrix.a();
+      double sy = ((qToMatrix.d() - qFromMatrix.d()) * useTimePercentage) +
+                  qFromMatrix.d();
 
-      m_transformMatrix->scaleNonUniform(sx, sy);
+      m_transformMatrix.scale(sx, sy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_ROTATE: {
@@ -260,27 +262,27 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       double cx = (toCx - fromCx) * useTimePercentage + fromCx;
       double cy = (toCy - fromCy) * useTimePercentage + fromCy;
 
-      m_transformMatrix->translate(cx, cy);
-      m_transformMatrix->rotate(angle);
-      m_transformMatrix->translate(-cx, -cy);
+      m_transformMatrix.translate(cx, cy);
+      m_transformMatrix.rotate(angle);
+      m_transformMatrix.translate(-cx, -cy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWX: {
       double sx =
-          (SVGAngle::todeg(atan(qToMatrix.m21()) - atan(qFromMatrix.m21())) *
+          (SVGAngle::todeg(atan(qToMatrix.c()) - atan(qFromMatrix.c())) *
            useTimePercentage) +
-          SVGAngle::todeg(atan(qFromMatrix.m21()));
+          SVGAngle::todeg(atan(qFromMatrix.c()));
 
-      m_transformMatrix->skewX(sx);
+      m_transformMatrix.shear(sx, 1.0);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWY: {
       double sy =
-          (SVGAngle::todeg(atan(qToMatrix.m12()) - atan(qFromMatrix.m12())) *
+          (SVGAngle::todeg(atan(qToMatrix.b()) - atan(qFromMatrix.b())) *
            useTimePercentage) +
-          SVGAngle::todeg(atan(qFromMatrix.m12()));
+          SVGAngle::todeg(atan(qFromMatrix.b()));
 
-      m_transformMatrix->skewY(sy);
+      m_transformMatrix.shear(1.0, sy);
       break;
     }
     default:
@@ -291,10 +293,10 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
   if (timePercentage == 1.0) {
     if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
         isIndefinite(m_repeatCount)) {
-      m_lastMatrix = new SVGMatrix();
+      m_lastMatrix.reset();
 
-      if (m_transformMatrix)
-        m_lastMatrix->copy(m_transformMatrix.get());
+      if (!m_transformMatrix.isIdentity())
+        m_lastMatrix = m_transformMatrix;
 
       m_repeations++;
       return;
@@ -310,11 +312,11 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
     m_initialTransform = 0;
 
     if (!isFrozen()) {
-      SVGMatrix* initial = initialMatrix();
-      if (initial)
+      AffineTransform initial = initialMatrix();
+      if (!initial.isIdentity())
         m_transformMatrix = initial;
       else
-        m_transformMatrix = new SVGMatrix();
+        m_transformMatrix.reset();
     }
   }
 }
@@ -417,8 +419,8 @@ void SVGAnimateTransformElement::calculateRotationFromMatrix(
     double& angle,
     double& cx,
     double& cy) const {
-  double cosa = matrix.m11();
-  double sina = -matrix.m21();
+  double cosa = matrix.a();
+  double sina = -matrix.c();
 
   if (cosa != 1.0) {
     // Calculate the angle via magic ;)
@@ -429,8 +431,8 @@ void SVGAnimateTransformElement::calculateRotationFromMatrix(
 
     double res = (1 - cosa) + ((sina * sina) / (1 - cosa));
 
-    cx = (matrix.dx() - ((sina * matrix.dy()) / (1 - cosa))) / res;
-    cy = (matrix.dy() + ((sina * matrix.dx()) / (1 - cosa))) / res;
+    cx = (matrix.e() - ((sina * matrix.f()) / (1 - cosa))) / res;
+    cy = (matrix.f() + ((sina * matrix.e()) / (1 - cosa))) / res;
 
     return;
   }
@@ -440,28 +442,25 @@ void SVGAnimateTransformElement::calculateRotationFromMatrix(
   angle = 0.0;
 }
 
-SVGMatrix* SVGAnimateTransformElement::initialMatrix() const {
+AffineTransform SVGAnimateTransformElement::initialMatrix() const {
   if (!targetElement()->isStyledTransformable())
-    return 0;
+    return AffineTransform();
   SVGStyledTransformableElement* transform =
       static_cast<SVGStyledTransformableElement*>(targetElement());
   SVGTransformList* transformList =
       (transform ? transform->transformBaseValue() : 0);
   if (!transformList)
-    return 0;
+    return AffineTransform();
 
   RefPtr<SVGTransform> result = transformList->concatenate();
   if (!result)
-    return 0;
+    return AffineTransform();
 
-  SVGMatrix* ret = result->matrix();
-  ret->ref();
-
-  return ret;
+  return result->matrix();
 }
 
-SVGMatrix* SVGAnimateTransformElement::transformMatrix() const {
-  return m_transformMatrix.get();
+AffineTransform SVGAnimateTransformElement::transformMatrix() const {
+  return m_transformMatrix;
 }
 }
 

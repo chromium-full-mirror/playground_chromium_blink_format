@@ -28,7 +28,6 @@
 #include "SVGPaintServerLinearGradient.h"
 #include "SVGHelper.h"
 #include "SVGLength.h"
-#include "SVGMatrix.h"
 #include "SVGNames.h"
 #include "SVGTransform.h"
 #include "SVGTransformList.h"
@@ -117,7 +116,7 @@ void SVGLinearGradientElement::buildGradient(
       WTF::static_pointer_cast<SVGPaintServerLinearGradient>(_grad);
   AffineTransform mat;
   if (gradientTransform()->numberOfItems() > 0)
-    mat = gradientTransform()->consolidate()->matrix()->matrix();
+    mat = gradientTransform()->consolidate()->matrix();
 
   DeprecatedString ref = href().deprecatedString();
   RefPtr<SVGPaintServer> pserver = getPaintServerById(document(), ref.mid(1));

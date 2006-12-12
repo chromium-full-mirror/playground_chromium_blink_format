@@ -41,8 +41,8 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual SVGElement* farthestViewportElement() const;
 
   virtual FloatRect getBBox() const;
-  virtual SVGMatrix* getCTM() const;
-  virtual SVGMatrix* getScreenCTM() const;
+  virtual AffineTransform getCTM() const;
+  virtual AffineTransform getScreenCTM() const;
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
@@ -50,7 +50,7 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;
   virtual void attach();
-  virtual SVGMatrix* localMatrix() const;
+  virtual AffineTransform localMatrix() const;
 
   virtual void updateLocalTransform(SVGTransformList*);
 
@@ -58,7 +58,7 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  mutable RefPtr<SVGMatrix> m_localMatrix;
+  mutable AffineTransform m_localMatrix;
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextElement,
                                  SVGTransformList*,
                                  RefPtr<SVGTransformList>,

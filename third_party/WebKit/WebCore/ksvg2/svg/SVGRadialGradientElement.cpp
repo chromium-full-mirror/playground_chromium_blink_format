@@ -27,7 +27,6 @@
 #include "SVGPaintServerRadialGradient.h"
 #include "SVGHelper.h"
 #include "SVGLength.h"
-#include "SVGMatrix.h"
 #include "SVGNames.h"
 #include "SVGStopElement.h"
 #include "SVGTransform.h"
@@ -133,7 +132,7 @@ void SVGRadialGradientElement::buildGradient(
       WTF::static_pointer_cast<SVGPaintServerRadialGradient>(_grad);
   AffineTransform mat;
   if (gradientTransform()->numberOfItems() > 0)
-    mat = gradientTransform()->consolidate()->matrix()->matrix();
+    mat = gradientTransform()->consolidate()->matrix();
 
   DeprecatedString ref = href().deprecatedString();
   RefPtr<SVGPaintServer> pserver = getPaintServerById(document(), ref.mid(1));

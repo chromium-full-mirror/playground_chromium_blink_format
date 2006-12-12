@@ -92,11 +92,12 @@ bail_out:;
   // state" here.
 }
 
-SVGMatrix* SVGFitToViewBox::viewBoxToViewTransform(float viewWidth,
-                                                   float viewHeight) const {
+AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
+    float viewWidth,
+    float viewHeight) const {
   FloatRect viewBoxRect = viewBox();
   if (!viewBoxRect.width() || !viewBoxRect.height())
-    return SVGSVGElement::createSVGMatrix();
+    return AffineTransform();
 
   return preserveAspectRatio()->getCTM(
       viewBoxRect.x(), viewBoxRect.y(), viewBoxRect.width(),
