@@ -26,7 +26,7 @@
 #import <Cocoa/Cocoa.h>
 #import <JavaScriptCore/npruntime.h>
 #import <JavaVM/jni.h>
-#import <WebCore/WebCoreKeyboardAccess.h>
+#import <WebCore/WebCoreKeyboardUIMode.h>
 #import <WebCore/EditAction.h>
 #import <WebCore/SelectionController.h>
 #import <WebCore/TextAffinity.h>
@@ -43,43 +43,38 @@ class String;
 @class DOMDocument;
 @class DOMDocumentFragment;
 @class DOMElement;
-@class DOMHTMLElement;
 @class DOMHTMLInputElement;
 @class DOMHTMLTextAreaElement;
 @class DOMNode;
 @class DOMRange;
 @class NSMenu;
-@class WebCoreSettings;
-@class WebFrame;
-@class WebScriptObject;
-@class WebView;
 
 @protocol WebCoreRenderTreeCopier;
 
 extern NSString* WebCorePageCacheStateKey;
 
-typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
+enum WebCoreDeviceType { WebCoreDeviceScreen, WebCoreDevicePrinter };
 
-typedef enum {
+enum WebScrollDirection {
   WebScrollUp,
   WebScrollDown,
   WebScrollLeft,
   WebScrollRight
-} WebScrollDirection;
+};
 
-typedef enum {
+enum WebScrollGranularity {
   WebScrollLine,
   WebScrollPage,
   WebScrollDocument,
   WebScrollWheel
-} WebScrollGranularity;
+};
 
-typedef enum {
+typedef enum ObjectElementType {
   ObjectElementNone,
   ObjectElementImage,
   ObjectElementFrame,
   ObjectElementPlugin
-} ObjectElementType;
+};
 
 @protocol WebCoreOpenPanelResultListener<NSObject>
 - (void)chooseFilename:(NSString*)fileName;
@@ -102,7 +97,6 @@ typedef enum {
 @interface WebCoreFrameBridge : NSObject {
  @public
   WebCore::FrameMac* m_frame;
-
   BOOL _shouldCreateRenderers;
   BOOL _closed;
 }
@@ -467,7 +461,7 @@ createChildFrameNamed:(NSString*)frameName
                   behindText:(BOOL)text
                   entireLine:(BOOL)line;
 
-- (WebCoreKeyboardUIMode)keyboardUIMode;
+- (WebCore::KeyboardUIMode)keyboardUIMode;
 
 - (NSString*)imageTitleForFilename:(NSString*)filename size:(NSSize)size;
 

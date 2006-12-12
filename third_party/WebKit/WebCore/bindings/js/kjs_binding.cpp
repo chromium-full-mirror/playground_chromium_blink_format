@@ -20,7 +20,7 @@
 
 // gcc 3.x can't handle including the HashMap pointer specialization in this
 // file
-#ifndef __GLIBCXX__  // less than gcc 3.4
+#if defined __GNUC__ && !defined __GLIBCXX__  // less than gcc 3.4
 #define HASH_MAP_PTR_SPEC_WORKAROUND 1
 #endif
 
@@ -52,13 +52,13 @@ using namespace EventNames;
 
 namespace KJS {
 
-UString DOMObject::toString(ExecState*) const {
-  return "[object " + className() + "]";
-}
-
 typedef HashMap<void*, DOMObject*> DOMObjectMap;
 typedef HashMap<Node*, DOMNode*> NodeMap;
 typedef HashMap<Document*, NodeMap*> NodePerDocMap;
+
+UString DOMObject::toString(ExecState*) const {
+  return "[object " + className() + "]";
+}
 
 static DOMObjectMap* domObjects() {
   static DOMObjectMap* staticDomObjects = new DOMObjectMap();
@@ -76,10 +76,8 @@ ScriptInterpreter::ScriptInterpreter(JSObject* global, Frame* frame)
       m_currentEvent(0),
       m_inlineCode(false),
       m_timerCallback(false) {
-  // Time in milliseconds before the script timeout handler kicks in
-  const unsigned ScriptTimeoutTimeMS = 5000;
-
-  setTimeoutTime(ScriptTimeoutTimeMS);
+  // Time in milliseconds before the script timeout handler kicks in.
+  setTimeoutTime(5000);
 }
 
 DOMObject* ScriptInterpreter::getDOMObject(void* objectHandle) {
@@ -116,18 +114,18 @@ void ScriptInterpreter::forgetDOMNodeForDocument(Document* document,
 }
 
 void ScriptInterpreter::putDOMNodeForDocument(Document* document,
-                                              Node* nodeHandle,
+                                              Node* node,
                                               DOMNode* nodeWrapper) {
   if (!document) {
-    domObjects()->set(nodeHandle, nodeWrapper);
+    domObjects()->set(node, nodeWrapper);
     return;
   }
   NodeMap* documentDict = domNodesPerDocument()->get(document);
   if (!documentDict) {
-    documentDict = new NodeMap();
+    documentDict = new NodeMap;
     domNodesPerDocument()->set(document, documentDict);
   }
-  documentDict->set(nodeHandle, nodeWrapper);
+  documentDict->set(node, nodeWrapper);
 }
 
 void ScriptInterpreter::forgetAllDOMNodesForDocument(Document* document) {

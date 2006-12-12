@@ -35,7 +35,7 @@
 #include <wtf/RefPtr.h>
 
 #if PLATFORM(MAC)
-#include "WebCoreKeyboardAccess.h"
+#include "WebCoreKeyboardUIMode.h"
 #ifndef __OBJC__
 typedef unsigned NSDragOperation;
 class NSView;
@@ -235,7 +235,7 @@ class EventHandler : Noncopyable {
   bool passWheelEventToWidget(Widget*);
 
 #if PLATFORM(MAC)
-  WebCoreKeyboardUIMode keyboardUIMode() const;
+  KeyboardUIMode keyboardUIMode() const;
 
   NSView* mouseDownViewIfStillGood();
   NSView* nextKeyViewInFrame(Node*,
