@@ -99,10 +99,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void loadedFromPageCache();
 
-  virtual void download(NSURLConnection*,
+  virtual void download(WebCore::ResourceHandle*,
                         NSURLRequest*,
-                        NSURLResponse*,
-                        id proxy);
+                        NSURLResponse*);
 
   virtual id dispatchIdentifierForInitialRequest(WebCore::DocumentLoader*,
                                                  NSURLRequest*);

@@ -63,8 +63,6 @@ class MainResourceLoader : public ResourceLoader {
 #if PLATFORM(MAC)
   virtual void didCancel(NSError*);
 
-  virtual void releaseDelegate();
-
   NSURLRequest* loadNow(NSURLRequest*);
 
   void receivedError(NSError*);
@@ -83,7 +81,6 @@ class MainResourceLoader : public ResourceLoader {
   void continueAfterContentPolicy(PolicyAction, NSURLResponse*);
 
   RetainPtr<NSURLResponse> m_response;
-  RetainPtr<id> m_proxy;
   RetainPtr<NSURLRequest> m_initialRequest;
 #endif
 

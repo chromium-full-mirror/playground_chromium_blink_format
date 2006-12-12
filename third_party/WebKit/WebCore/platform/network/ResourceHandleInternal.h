@@ -66,11 +66,13 @@ class ResourceHandleInternal : Noncopyable {
   ResourceHandleInternal(ResourceHandle* loader,
                          const ResourceRequest& request,
                          ResourceHandleClient* c,
-                         bool defersLoading)
+                         bool defersLoading,
+                         bool mightDownloadFromHandle)
       : m_client(c),
         m_request(request),
         status(0),
-        m_defersLoading(defersLoading)
+        m_defersLoading(defersLoading),
+        m_mightDownloadFromHandle(mightDownloadFromHandle)
 #if USE(CFNETWORK)
         ,
         m_connection(0)
@@ -106,11 +108,13 @@ class ResourceHandleInternal : Noncopyable {
   int status;
 
   bool m_defersLoading;
+  bool m_mightDownloadFromHandle;
 #if USE(CFNETWORK)
   CFURLConnectionRef m_connection;
 #elif PLATFORM(MAC)
   RetainPtr<NSURLConnection> m_connection;
   RetainPtr<WebCoreResourceHandleAsDelegate> m_delegate;
+  RetainPtr<id> m_proxy;
 #endif
 #if USE(WININET)
   HANDLE m_fileHandle;
