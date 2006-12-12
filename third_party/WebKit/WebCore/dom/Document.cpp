@@ -601,10 +601,8 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
   }
 
   for (Node* node = source.get(); node;
-       node = node->traverseNextNode(source.get())) {
-    KJS::ScriptInterpreter::updateDOMNodeDocument(node, node->document(), this);
+       node = node->traverseNextNode(source.get()))
     node->setDocument(this);
-  }
 
   return source;
 }

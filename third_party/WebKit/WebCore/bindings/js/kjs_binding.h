@@ -49,9 +49,11 @@ class DOMObject : public JSObject {
   // DOMObject Destruction is not thread-safe because JS DOM objects
   // wrap unsafe WebCore DOM data structures
   DOMObject() : JSObject(false) {}
-
+#ifndef NDEBUG
+  virtual ~DOMObject();
+#endif
  public:
-  virtual UString toString(ExecState* exec) const;
+  virtual UString toString(ExecState*) const;
 };
 
 class DOMNode;
