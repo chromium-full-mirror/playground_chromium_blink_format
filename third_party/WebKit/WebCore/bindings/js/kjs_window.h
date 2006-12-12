@@ -184,6 +184,8 @@ class Window : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
+    AToB,
+    BToA,
     Closed,
     Crypto,
     DefaultStatus,
