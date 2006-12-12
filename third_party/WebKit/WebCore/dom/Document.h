@@ -74,6 +74,7 @@ class NameNodeList;
 class NodeFilter;
 class NodeIterator;
 class NodeList;
+class Page;
 class PlatformMouseEvent;
 class ProcessingInstruction;
 class Range;
@@ -313,8 +314,9 @@ class Document : public ContainerNode {
                                AtomicStringImpl* type,
                                String& state);
 
-  FrameView* view() const { return m_view; }
-  Frame* frame() const;
+  FrameView* view() const;  // can be NULL
+  Frame* frame() const;     // can be NULL
+  Page* page() const;       // can be NULL
 
   PassRefPtr<Range> createRange();
 
@@ -453,16 +455,20 @@ class Document : public ContainerNode {
   String selectedStylesheetSet() const;
   void setSelectedStylesheetSet(const String&);
 
+  // Convenience functions for accessing the page's focused node.
   bool setFocusedNode(PassRefPtr<Node>);
   Node* focusedNode() const;
 
-  Node* hoverNode() const { return m_hoverNode.get(); }
+  // Hover and active are still per-document, not per-page.
   void setHoverNode(PassRefPtr<Node>);
+  Node* hoverNode() const { return m_hoverNode.get(); }
+
+  void setActiveNode(PassRefPtr<Node>);
+  Node* activeNode() const { return m_activeNode.get(); }
+
+  void focusedNodeDetached(Node*);
   void hoveredNodeDetached(Node*);
   void activeChainNodeDetached(Node*);
-
-  Node* activeNode() const { return m_activeNode.get(); }
-  void setActiveNode(PassRefPtr<Node>);
 
   // Updates for :target (CSS3 selector).
   void setCSSTarget(Node*);

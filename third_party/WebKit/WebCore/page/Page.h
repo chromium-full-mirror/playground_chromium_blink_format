@@ -36,6 +36,7 @@ class ChromeClient;
 class ContextMenuClient;
 class ContextMenuController;
 class EditorClient;
+class FocusController;
 class Frame;
 class FrameNamespace;
 class FloatRect;
@@ -57,9 +58,6 @@ class Page : Noncopyable {
   void setGroupName(const String&);
   String groupName() const { return m_groupName; }
 
-  bool setFocusedNode(PassRefPtr<Node>);
-  Node* focusedNode() const { return m_focusedNode.get(); }
-
   const HashSet<Page*>* frameNamespace() const;
   static const HashSet<Page*>* frameNamespace(const String&);
 
@@ -70,10 +68,11 @@ class Page : Noncopyable {
   static void setNeedsReapplyStyles();
   static void setNeedsReapplyStylesForSettingsChange(Settings*);
 
+  Chrome* chrome() { return m_chrome.get(); }
   SelectionController* dragCaretController() {
     return m_dragCaretController.get();
   }
-  Chrome* chrome() { return m_chrome.get(); }
+  FocusController* focusController() { return m_focusController.get(); }
   ContextMenuController* contextMenuController() {
     return m_contextMenuController.get();
   }
@@ -90,8 +89,9 @@ class Page : Noncopyable {
 #endif
 
  private:
-  OwnPtr<SelectionController> m_dragCaretController;
   OwnPtr<Chrome> m_chrome;
+  OwnPtr<SelectionController> m_dragCaretController;
+  OwnPtr<FocusController> m_focusController;
   OwnPtr<ContextMenuController> m_contextMenuController;
 
   EditorClient* m_editorClient;
