@@ -77,6 +77,8 @@ class Editor {
   void paste();
   void performDelete();
 
+  void copyURL(const KURL&, const String&);
+
   void indent();
   void outdent();
 

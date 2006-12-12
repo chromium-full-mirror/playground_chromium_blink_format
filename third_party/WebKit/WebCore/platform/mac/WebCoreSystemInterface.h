@@ -87,6 +87,8 @@ extern OSStatus (*wkConvertCharToGlyphs)(void* styleGroup,
                                          unsigned numCharacters,
                                          void* glyphs);
 extern id (*wkCreateNSURLConnectionDelegateProxy)(void);
+extern NSString* (*wkCreateURLPasteboardFlavorTypeName)(void);
+extern NSString* (*wkCreateURLNPasteboardFlavorTypeName)(void);
 extern void (*wkDrawBezeledTextFieldCell)(NSRect, BOOL enabled);
 extern void (*wkDrawBezeledTextArea)(NSRect, BOOL enabled);
 extern void (*wkDrawFocusRing)(CGContextRef,
