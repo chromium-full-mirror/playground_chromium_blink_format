@@ -161,6 +161,14 @@ bool EditorClientQt::smartInsertDeleteEnabled() {
   notImplemented();
   return false;
 }
+
+void EditorClientQt::toggleContinuousSpellChecking() {
+  notImplemented();
+}
+
+void EditorClientQt::toggleGrammarChecking() {
+  notImplemented();
+}
 }
 
 // vim: ts=4 sw=4 et

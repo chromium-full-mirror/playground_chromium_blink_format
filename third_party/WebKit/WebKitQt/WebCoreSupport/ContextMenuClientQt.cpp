@@ -71,4 +71,12 @@ void ContextMenuClientQt::lookUpInDictionary(Frame*) {
 void ContextMenuClientQt::contextMenuDestroyed() {}
 
 void ContextMenuClientQt::contextMenuItemSelected(const ContextMenuItem*) {}
+
+void ContextMenuClientQt::speak(const String&) {
+  notImplemented();
+}
+
+void ContextMenuClientQt::stopSpeaking() {
+  notImplemented();
+}
 }

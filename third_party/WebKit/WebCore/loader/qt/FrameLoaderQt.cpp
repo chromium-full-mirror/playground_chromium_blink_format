@@ -50,6 +50,7 @@
 #include "GraphicsContext.h"
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
+#include "HTMLFormElement.h"
 #include "JSLock.h"
 #include "MouseEventWithHitTestResults.h"
 #include "Page.h"
@@ -132,7 +133,7 @@ void FrameLoader::setTitle(const String& title) {
 
 Frame* FrameLoader::createFrame(const KURL& url,
                                 const String& name,
-                                Element* ownerElement,
+                                HTMLFrameOwnerElement* ownerElement,
                                 const String& referrer) {
   notImplemented();
   return 0;
@@ -275,7 +276,7 @@ void FrameLoader::redirectDataToPlugin(Widget* pluginWidget) {
 void FrameLoader::load(const FrameLoadRequest& request,
                        bool userGesture,
                        Event* event,
-                       Element* submitForm,
+                       HTMLFormElement* submitForm,
                        const HashMap<String, String>& formValues) {
   notImplemented();
 }
@@ -285,7 +286,7 @@ void FrameLoader::load(const KURL& URL,
                        FrameLoadType newLoadType,
                        const String& frameName,
                        Event* event,
-                       Element* form,
+                       HTMLFormElement* form,
                        const HashMap<String, String>& values) {
   notImplemented();
 }
