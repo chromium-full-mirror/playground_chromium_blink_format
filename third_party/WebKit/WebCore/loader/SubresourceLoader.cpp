@@ -60,8 +60,8 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
   // SubresourceLoader::create cross-platform.
   RefPtr<SubresourceLoader> subloader(new SubresourceLoader(frame, client));
 
-  subloader->m_handle = ResourceHandle::create(
-      request, subloader.get(), frame->document()->docLoader(), false);
+  subloader->m_handle =
+      ResourceHandle::create(request, subloader.get(), frame, false);
 
   return subloader.release();
 }
