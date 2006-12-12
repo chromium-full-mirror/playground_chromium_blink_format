@@ -40,7 +40,9 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void pageDestroyed();
 
   virtual bool isGrammarCheckingEnabled();
+  virtual void toggleGrammarChecking();
   virtual bool isContinuousSpellCheckingEnabled();
+  virtual void toggleContinuousSpellChecking();
   virtual int spellCheckerDocumentTag();
 
   virtual bool smartInsertDeleteEnabled();

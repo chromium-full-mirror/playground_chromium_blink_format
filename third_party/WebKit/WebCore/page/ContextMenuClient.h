@@ -32,6 +32,7 @@ class ContextMenuItem;
 class Frame;
 class HitTestResult;
 class KURL;
+class String;
 
 class ContextMenuClient {
  public:
@@ -44,6 +45,8 @@ class ContextMenuClient {
   virtual void downloadURL(const KURL& url) = 0;
   virtual void copyImageToClipboard(const HitTestResult&) = 0;
   virtual void lookUpInDictionary(Frame*) = 0;
+  virtual void speak(const String&) = 0;
+  virtual void stopSpeaking() = 0;
 
 #if PLATFORM(MAC)
   virtual void searchWithSpotlight() = 0;
