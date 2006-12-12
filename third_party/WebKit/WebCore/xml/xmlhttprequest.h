@@ -35,6 +35,7 @@ namespace WebCore {
 
 class TextResourceDecoder;
 class Document;
+class Event;
 class EventListener;
 class String;
 
@@ -91,6 +92,20 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
   void setOnLoadListener(EventListener*);
   EventListener* onLoadListener() const;
 
+  typedef Vector<RefPtr<EventListener>> ListenerVector;
+  typedef HashMap<AtomicStringImpl*, ListenerVector> EventListenersMap;
+
+  // useCapture is not used, even for add/remove pairing (for Firefox
+  // compatibility).
+  void addEventListener(const AtomicString& eventType,
+                        PassRefPtr<EventListener>,
+                        bool useCapture);
+  void removeEventListener(const AtomicString& eventType,
+                           EventListener*,
+                           bool useCapture);
+  bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
+  EventListenersMap& eventListeners() { return m_eventListeners; }
+
  private:
   bool urlMatchesDocumentDomain(const KURL&) const;
 
@@ -113,8 +128,10 @@ class XMLHttpRequest : public Shared<XMLHttpRequest>,
   void callReadyStateChangeListener();
 
   Document* m_doc;
+
   RefPtr<EventListener> m_onReadyStateChangeListener;
   RefPtr<EventListener> m_onLoadListener;
+  EventListenersMap m_eventListeners;
 
   KURL m_url;
   DeprecatedString m_method;

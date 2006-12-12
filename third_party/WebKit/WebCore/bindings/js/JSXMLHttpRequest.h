@@ -62,7 +62,10 @@ class JSXMLHttpRequest : public DOMObject {
     Open,
     Send,
     SetRequestHeader,
-    OverrideMIMEType
+    OverrideMIMEType,
+    AddEventListener,
+    RemoveEventListener,
+    DispatchEvent
   };
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
