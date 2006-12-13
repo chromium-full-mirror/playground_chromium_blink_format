@@ -49,7 +49,7 @@ Page::Page(ChromeClient* chromeClient,
            EditorClient* editorClient)
     : m_chrome(new Chrome(this, chromeClient)),
       m_dragCaretController(new SelectionController(0, true)),
-      m_focusController(new FocusController),
+      m_focusController(new FocusController(this)),
       m_contextMenuController(
           new ContextMenuController(this, contextMenuClient)),
       m_editorClient(editorClient),

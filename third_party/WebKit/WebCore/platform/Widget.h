@@ -100,7 +100,7 @@ class Widget {
   virtual int baselinePosition(
       int height) const;  // relative to the top of the widget
 
-  bool hasFocus() const;
+  virtual bool hasFocus() const;
   virtual void setFocus();
   virtual void clearFocus();
   virtual bool checksDescendantsForFocus() const;
@@ -154,12 +154,6 @@ class Widget {
   Widget* capturingTarget();
   Widget* capturingChild();
   void setCapturingChild(Widget*);
-
-  void setFocused(bool);
-  Widget* focusedTarget();
-  Widget* focusedChild();
-  void setFocusedChild(Widget*);
-  void clearFocusFromDescendants();
 
   IntRect convertToContainingWindow(const IntRect&) const;
   IntPoint convertToContainingWindow(const IntPoint&) const;

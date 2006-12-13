@@ -31,6 +31,7 @@
 #include "Editor.h"
 #include "Element.h"
 #include "EventNames.h"
+#include "FocusController.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
@@ -39,6 +40,7 @@
 #include "HTMLNames.h"
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
+#include "Page.h"
 #include "RenderView.h"
 #include "TextIterator.h"
 #include "TypingCommand.h"
@@ -1044,8 +1046,8 @@ void SelectionController::selectFrameElementInParentIfFullySelected() {
   Frame* parent = m_frame->tree()->parent();
   if (!parent)
     return;
-  FrameView* parentView = parent->view();
-  if (!parentView)
+  Page* page = m_frame->page();
+  if (!page)
     return;
 
   // Check if the selection contains the entire frame contents; if not, then
@@ -1085,7 +1087,7 @@ void SelectionController::selectFrameElementInParentIfFullySelected() {
   // after.
   Selection newSelection(beforeOwnerElement, afterOwnerElement);
   if (parent->shouldChangeSelection(newSelection)) {
-    parentView->setFocus();
+    page->focusController()->setFocusedFrame(parent);
     parent->selectionController()->setSelection(newSelection);
   }
 }
