@@ -105,6 +105,9 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual id dispatchIdentifierForInitialRequest(WebCore::DocumentLoader*,
                                                  NSURLRequest*);
+  virtual id dispatchIdentifierForInitialRequest(
+      WebCore::DocumentLoader*,
+      const WebCore::ResourceRequest&);
   virtual NSURLRequest* dispatchWillSendRequest(
       WebCore::DocumentLoader*,
       id identifier,
@@ -152,16 +155,16 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void dispatchDecidePolicyForMIMEType(WebCore::FramePolicyFunction,
                                                const WebCore::String& MIMEType,
-                                               NSURLRequest*);
+                                               const WebCore::ResourceRequest&);
   virtual void dispatchDecidePolicyForNewWindowAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
-      NSURLRequest*,
+      const WebCore::ResourceRequest&,
       const WebCore::String& frameName);
   virtual void dispatchDecidePolicyForNavigationAction(
       WebCore::FramePolicyFunction,
       const WebCore::NavigationAction&,
-      NSURLRequest*);
+      const WebCore::ResourceRequest&);
   virtual void cancelPolicyCheck();
 
   virtual void dispatchUnableToImplementPolicy(NSError*);
@@ -189,7 +192,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void setMainFrameDocumentReady(bool);
 
-  virtual void startDownload(NSURLRequest*);
+  virtual void startDownload(const WebCore::ResourceRequest&);
 
   virtual void willChangeTitle(WebCore::DocumentLoader*);
   virtual void didChangeTitle(WebCore::DocumentLoader*);
@@ -199,7 +202,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void finalSetupForReplace(WebCore::DocumentLoader*);
 
   virtual NSError* cancelledError(NSURLRequest*);
-  virtual NSError* cannotShowURLError(NSURLRequest*);
+  virtual NSError* cannotShowURLError(const WebCore::ResourceRequest&);
   virtual NSError* interruptForPolicyChangeError(NSURLRequest*);
 
   virtual NSError* cannotShowMIMETypeError(NSURLResponse*);
@@ -233,7 +236,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
   virtual PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
-      NSURLRequest*);
+      const WebCore::ResourceRequest&);
   virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
 
   void deliverArchivedResourcesAfterDelay() const;

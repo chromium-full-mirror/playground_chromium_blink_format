@@ -31,6 +31,18 @@
 #import <Foundation/NSURLRequest.h>
 #import <Foundation/NSURLProtocol.h>
 
+extern NSString* WebDataRequestPropertyKey;
+
+@interface WebDataRequestParameters : NSObject<NSCopying> {
+ @public
+  NSData* data;
+  NSString* MIMEType;
+  NSString* encoding;
+  NSURL* baseURL;
+  NSURL* unreachableURL;
+}
+@end
+
 @interface WebDataProtocol : NSURLProtocol {
 }
 + (BOOL)_webIsDataProtocolURL:(NSURL*)URL;
@@ -42,6 +54,7 @@
 @end
 
 @interface NSURLRequest (WebDataRequest)
+- (WebDataRequestParameters*)_webDataRequestParametersForReading;
 + (NSString*)_webDataRequestPropertyKey;
 - (NSURL*)_webDataRequestBaseURL;
 - (NSURL*)_webDataRequestUnreachableURL;

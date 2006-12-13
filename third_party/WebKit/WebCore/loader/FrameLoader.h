@@ -40,11 +40,11 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/RefPtr.h>
+#include "ResourceRequest.h"
 
 #if PLATFORM(MAC)
 
-#import "RetainPtr.h"
-#import <objc/objc.h>
+typedef struct objc_object* id;
 
 #ifdef __OBJC__
 
@@ -119,15 +119,15 @@ typedef HashSet<RefPtr<ResourceLoader>> ResourceLoaderSet;
 
 bool isBackForwardLoadType(FrameLoadType);
 
-#if PLATFORM(MAC)
 typedef void (*NavigationPolicyDecisionFunction)(void* argument,
-                                                 NSURLRequest*,
-                                                 PassRefPtr<FormState>);
+                                                 const ResourceRequest&,
+                                                 PassRefPtr<FormState>,
+                                                 bool shouldContinue);
 typedef void (*NewWindowPolicyDecisionFunction)(void* argument,
-                                                NSURLRequest*,
+                                                const ResourceRequest&,
                                                 PassRefPtr<FormState>,
-                                                const String& frameName);
-#endif
+                                                const String& frameName,
+                                                bool shouldContinue);
 typedef void (*ContentPolicyDecisionFunction)(void* argument, PolicyAction);
 
 class PolicyCheck {
@@ -135,38 +135,30 @@ class PolicyCheck {
   PolicyCheck();
 
   void clear();
-#if PLATFORM(MAC)
-  void set(NSURLRequest*,
+  void set(const ResourceRequest&,
            PassRefPtr<FormState>,
            NavigationPolicyDecisionFunction,
            void* argument);
-  void set(NSURLRequest*,
+  void set(const ResourceRequest&,
            PassRefPtr<FormState>,
            const String& frameName,
            NewWindowPolicyDecisionFunction,
            void* argument);
-#endif
   void set(ContentPolicyDecisionFunction, void* argument);
 
-#if PLATFORM(MAC)
-  NSURLRequest* request() const { return m_request.get(); }
-#endif
+  const ResourceRequest& request() const { return m_request; }
   void clearRequest();
 
-  void call();
+  void call(bool shouldContinue);
   void call(PolicyAction);
 
  private:
-#if PLATFORM(MAC)
-  RetainPtr<NSURLRequest> m_request;
-#endif
+  ResourceRequest m_request;
   RefPtr<FormState> m_formState;
   String m_frameName;
 
-#if PLATFORM(MAC)
   NavigationPolicyDecisionFunction m_navigationFunction;
   NewWindowPolicyDecisionFunction m_newWindowFunction;
-#endif
   ContentPolicyDecisionFunction m_contentFunction;
   void* m_argument;
 };
@@ -204,14 +196,12 @@ class FrameLoader : Noncopyable {
             Event*,
             HTMLFormElement*,
             const HashMap<String, String>& formValues);
-#if PLATFORM(MAC)
-  void load(NSURLRequest*);
-  void load(NSURLRequest*, const String& frameName);
-  void load(NSURLRequest*,
+  void load(const ResourceRequest&);
+  void load(const ResourceRequest&, const String& frameName);
+  void load(const ResourceRequest&,
             const NavigationAction&,
             FrameLoadType,
             PassRefPtr<FormState>);
-#endif
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
 
@@ -280,12 +270,12 @@ class FrameLoader : Noncopyable {
   void didFailToLoad(ResourceLoader*, NSError*);
 #endif
   bool privateBrowsingEnabled() const;
+  const ResourceRequest& originalRequest() const;
+  const ResourceRequest& initialRequest() const;
+  void setRequest(const ResourceRequest&);
 #if PLATFORM(MAC)
-  NSURLRequest* originalRequest() const;
   void receivedMainResourceError(NSError*, bool isComplete);
-  NSURLRequest* initialRequest() const;
   void receivedData(NSData*);
-  void setRequest(NSURLRequest*);
 #endif
   void handleFallbackContent();
   bool isStopping() const;
@@ -315,11 +305,9 @@ class FrameLoader : Noncopyable {
 
   void notifyIconChanged();
 
-#if PLATFORM(MAC)
-  void checkNavigationPolicy(NSURLRequest*,
-                             NavigationPolicyDecisionFunction,
+  void checkNavigationPolicy(const ResourceRequest&,
+                             NavigationPolicyDecisionFunction function,
                              void* argument);
-#endif
   void checkContentPolicy(const String& MIMEType,
                           ContentPolicyDecisionFunction,
                           void* argument);
@@ -382,6 +370,9 @@ class FrameLoader : Noncopyable {
                                bool isMainResource,
                                bool alwaysFromRequest);
 #endif
+  void addExtraFieldsToRequest(ResourceRequest&,
+                               bool isMainResource,
+                               bool alwaysFromRequest);
 
   FrameLoaderClient* client() const;
 
@@ -597,9 +588,7 @@ class FrameLoader : Noncopyable {
 
   // Also not cool.
   void startLoading();
-#if PLATFORM(MAC)
-  bool startLoadingMainResource(NSMutableURLRequest*, id identifier);
-#endif
+  bool startLoadingMainResource(ResourceRequest&, id identifier);
   void stopLoadingSubframes();
 
   void clearProvisionalLoad();
@@ -613,41 +602,44 @@ class FrameLoader : Noncopyable {
 
   void setLoadType(FrameLoadType);
 
-#if PLATFORM(MAC)
-  void checkNavigationPolicy(NSURLRequest*,
+  void checkNavigationPolicy(const ResourceRequest&,
                              DocumentLoader*,
                              PassRefPtr<FormState>,
                              NavigationPolicyDecisionFunction,
                              void* argument);
   void checkNewWindowPolicy(const NavigationAction&,
-                            NSURLRequest*,
+                            const ResourceRequest&,
                             PassRefPtr<FormState>,
                             const String& frameName);
-#endif
 
   void continueAfterNavigationPolicy(PolicyAction);
   void continueAfterNewWindowPolicy(PolicyAction);
   void continueAfterContentPolicy(PolicyAction);
   void continueAfterWillSubmitForm(PolicyAction = PolicyUse);
 
-#if PLATFORM(MAC)
   static void callContinueLoadAfterNavigationPolicy(void*,
-                                                    NSURLRequest*,
-                                                    PassRefPtr<FormState>);
-  void continueLoadAfterNavigationPolicy(NSURLRequest*, PassRefPtr<FormState>);
+                                                    const ResourceRequest&,
+                                                    PassRefPtr<FormState>,
+                                                    bool shouldContinue);
+  void continueLoadAfterNavigationPolicy(const ResourceRequest&,
+                                         PassRefPtr<FormState>,
+                                         bool shouldContinue);
   static void callContinueLoadAfterNewWindowPolicy(void*,
-                                                   NSURLRequest*,
+                                                   const ResourceRequest&,
                                                    PassRefPtr<FormState>,
-                                                   const String& frameName);
-  void continueLoadAfterNewWindowPolicy(NSURLRequest*,
+                                                   const String& frameName,
+                                                   bool shouldContinue);
+  void continueLoadAfterNewWindowPolicy(const ResourceRequest&,
                                         PassRefPtr<FormState>,
-                                        const String& frameName);
+                                        const String& frameName,
+                                        bool shouldContinue);
   static void callContinueFragmentScrollAfterNavigationPolicy(
       void*,
-      NSURLRequest*,
-      PassRefPtr<FormState>);
-  void continueFragmentScrollAfterNavigationPolicy(NSURLRequest*);
-#endif
+      const ResourceRequest&,
+      PassRefPtr<FormState>,
+      bool shouldContinue);
+  void continueFragmentScrollAfterNavigationPolicy(const ResourceRequest&,
+                                                   bool shouldContinue);
 
   void stopPolicyCheck();
 
@@ -670,12 +662,13 @@ class FrameLoader : Noncopyable {
   void open(PageState&);
   void opened();
 
+  bool shouldReloadToHandleUnreachableURL(const ResourceRequest&);
 #if PLATFORM(MAC)
   void handleUnimplementablePolicy(NSError*);
-  bool shouldReloadToHandleUnreachableURL(NSURLRequest*);
 
   void applyUserAgent(NSMutableURLRequest*);
 #endif
+  void applyUserAgent(ResourceRequest& request);
 
   bool canTarget(Frame*) const;
 

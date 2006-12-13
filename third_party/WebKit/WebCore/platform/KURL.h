@@ -51,6 +51,10 @@ class String;
 class TextEncoding;
 
 bool operator==(const KURL&, const KURL&);
+inline bool operator!=(const KURL& a, const KURL& b) {
+  return !(a == b);
+}
+
 bool equalIgnoringRef(const KURL&, const KURL&);
 
 class KURL {

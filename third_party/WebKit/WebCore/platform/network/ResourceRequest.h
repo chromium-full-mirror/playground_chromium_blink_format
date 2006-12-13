@@ -124,7 +124,7 @@ struct ResourceRequest {
   }
 
   String httpReferrer() const { return httpHeaderField("Referer"); }
-  void setHTTPReferrer(const String& httpReferrer) {
+  void ResourceRequest::setHTTPReferrer(const String& httpReferrer) {
     setHTTPHeaderField("Referer", httpReferrer);
   }
 
@@ -187,6 +187,8 @@ struct ResourceRequest {
   RetainPtr<CFURLRequestRef> m_cfRequest;
 #endif
 };
+
+bool operator==(const ResourceRequest& a, const ResourceRequest& b);
 
 }  // namespace WebCore
 
