@@ -157,9 +157,9 @@ class SelectionController : Noncopyable {
   void collapseToStart();
   void extend(Node*, int offset);
   PassRefPtr<Range> getRangeAt(int index) const;
+  int rangeCount() const { return !isNone() ? 1 : 0; }
   // void deleteFromDocument();
   // bool containsNode(Node *node, bool entirelyContained);
-  // int rangeCount() const;
   // void addRange(const Range *);
   // void selectAllChildren(const Node *);
   // void removeRange(const Range *);

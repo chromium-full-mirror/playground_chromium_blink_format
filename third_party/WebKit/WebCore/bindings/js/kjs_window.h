@@ -399,6 +399,7 @@ class Selection : public DOMObject {
     ExtentOffset,
     IsCollapsed,
     _Type,
+    RangeCount,
     Collapse,
     CollapseToEnd,
     CollapseToStart,
