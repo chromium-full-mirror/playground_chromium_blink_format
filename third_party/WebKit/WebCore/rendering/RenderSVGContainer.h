@@ -94,6 +94,14 @@ class RenderSVGContainer : public RenderContainer {
 
   AffineTransform viewportTransform() const;
 
+  virtual bool nodeAtPoint(const HitTestRequest&,
+                           HitTestResult&,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
+                           HitTestAction);
+
  private:
   void calcViewport();
   AffineTransform getAspectRatio(const FloatRect& logical,
