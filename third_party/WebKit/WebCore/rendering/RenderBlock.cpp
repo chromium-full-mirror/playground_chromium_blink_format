@@ -1467,6 +1467,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   // backgrounds.
   PaintInfo info(paintInfo);
   info.phase = newPhase;
+  info.paintingRoot = paintingRootForChildren(paintInfo);
   bool isPrinting = document()->printing();
 
   for (RenderObject* child = firstChild(); child;

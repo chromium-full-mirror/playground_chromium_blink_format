@@ -602,6 +602,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
                               : paintInfo.phase;
   RenderObject::PaintInfo childInfo(paintInfo);
   childInfo.phase = paintPhase;
+  childInfo.paintingRoot = object()->paintingRootForChildren(paintInfo);
 
   // 3. Paint our children.
   if (paintPhase != PaintPhaseSelfOutline) {
