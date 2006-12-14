@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,8 +20,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGElementImpl_H
-#define KSVG_SVGElementImpl_H
+#ifndef SVGElement_H
+#define SVGElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "Document.h"
@@ -31,21 +32,23 @@
 #include "SVGDocumentExtensions.h"
 #include "SVGNames.h"
 
-#define ANIMATED_PROPERTY_EMPTY_DECLARATIONS(BareType, NullType,           \
-                                             UpperProperty, LowerProperty) \
- public:                                                                   \
-  virtual BareType LowerProperty() const {                                 \
-    ASSERT(false);                                                         \
-    return NullType;                                                       \
-  }                                                                        \
-  virtual void set##UpperProperty(BareType newValue) { ASSERT(false); }    \
-  virtual BareType LowerProperty##BaseValue() const {                      \
-    ASSERT(false);                                                         \
-    return NullType;                                                       \
-  }                                                                        \
-  virtual void set##UpperProperty##BaseValue(BareType newValue) {          \
-    ASSERT(false);                                                         \
-  }
+#define ANIMATED_PROPERTY_EMPTY_DECLARATIONS(BareType, NullType,               \
+                                             UpperProperty, LowerProperty)     \
+ public:                                                                       \
+  virtual BareType LowerProperty() const {                                     \
+    ASSERT_NOT_REACHED();                                                      \
+    return NullType;                                                           \
+  }                                                                            \
+  virtual void set##UpperProperty(BareType newValue) { ASSERT_NOT_REACHED(); } \
+  virtual BareType LowerProperty##BaseValue() const {                          \
+    ASSERT_NOT_REACHED();                                                      \
+    return NullType;                                                           \
+  }                                                                            \
+  virtual void set##UpperProperty##BaseValue(BareType newValue) {              \
+    ASSERT_NOT_REACHED();                                                      \
+  }                                                                            \
+  virtual void start##UpperProperty() const { ASSERT_NOT_REACHED(); }          \
+  virtual void stop##UpperProperty() { ASSERT_NOT_REACHED(); }
 
 #define ANIMATED_PROPERTY_FORWARD_DECLARATIONS(ForwardClass, BareType,       \
                                                UpperProperty, LowerProperty) \
@@ -61,7 +64,11 @@
   }                                                                          \
   virtual void set##UpperProperty##BaseValue(BareType newValue) {            \
     ForwardClass::set##UpperProperty##BaseValue(newValue);                   \
-  }
+  }                                                                          \
+  virtual void start##UpperProperty() const {                                \
+    ForwardClass::start##UpperProperty();                                    \
+  }                                                                          \
+  virtual void stop##UpperProperty() { ForwardClass::stop##UpperProperty(); }
 
 #define ANIMATED_PROPERTY_DECLARATIONS_INTERNAL(ClassType, ClassStorageType,  \
                                                 BareType, StorageType,        \
@@ -87,53 +94,83 @@
   void set##UpperProperty##BaseValue(BareType newValue);                      \
   PassRefPtr<SVGAnimatedTemplate##UpperProperty> LowerProperty##Animated()    \
       const;                                                                  \
+  void start##UpperProperty() const;                                          \
+  void stop##UpperProperty();                                                 \
                                                                               \
  private:                                                                     \
   StorageType m_##LowerProperty;
 
-#define ANIMATED_PROPERTY_DEFINITIONS_INTERNAL(                              \
-    ClassName, ClassType, BareType, UpperClassName, LowerClassName,          \
-    UpperProperty, LowerProperty, AttrName, StorageGetter, ContextElement)   \
-  ClassName::SVGAnimatedTemplate##UpperProperty::                            \
-      SVGAnimatedTemplate##UpperProperty(const ClassType* element)           \
-      : m_element(const_cast<ClassType*>(element)) {}                        \
-  BareType ClassName::SVGAnimatedTemplate##UpperProperty::baseVal() const {  \
-    return m_element->LowerProperty##BaseValue();                            \
-  }                                                                          \
-  void ClassName::SVGAnimatedTemplate##UpperProperty::setBaseVal(            \
-      BareType newBaseVal) {                                                 \
-    m_element->set##UpperProperty##BaseValue(newBaseVal);                    \
-  }                                                                          \
-  BareType ClassName::SVGAnimatedTemplate##UpperProperty::animVal() const {  \
-    return m_element->LowerProperty();                                       \
-  }                                                                          \
-  void ClassName::SVGAnimatedTemplate##UpperProperty::setAnimVal(            \
-      BareType newAnimVal) {                                                 \
-    m_element->set##UpperProperty(newAnimVal);                               \
-  }                                                                          \
-  BareType ClassName::LowerProperty() const { return StorageGetter; }        \
-  void ClassName::set##UpperProperty(BareType newValue) {                    \
-    m_##LowerProperty = newValue;                                            \
-  }                                                                          \
-  BareType ClassName::LowerProperty##BaseValue() const {                     \
-    const SVGElement* context = ContextElement;                              \
-    ASSERT(context != 0);                                                    \
-    SVGDocumentExtensions* extensions =                                      \
-        (context->document() ? context->document()->accessSVGExtensions()    \
-                             : 0);                                           \
-    if (extensions && extensions->hasBaseValue<BareType>(context, AttrName)) \
-      return extensions->baseValue<BareType>(context, AttrName);             \
-    return LowerProperty();                                                  \
-  }                                                                          \
-  void ClassName::set##UpperProperty##BaseValue(BareType newValue) {         \
-    const SVGElement* context = ContextElement;                              \
-    ASSERT(context != 0);                                                    \
-    SVGDocumentExtensions* extensions =                                      \
-        (context->document() ? context->document()->accessSVGExtensions()    \
-                             : 0);                                           \
-    if (extensions && extensions->hasBaseValue<BareType>(context, AttrName)) \
-      extensions->setBaseValue<BareType>(context, AttrName, newValue);       \
-    set##UpperProperty(newValue);                                            \
+#define ANIMATED_PROPERTY_DEFINITIONS_INTERNAL(                                \
+    ClassName, ClassType, BareType, UpperClassName, LowerClassName,            \
+    UpperProperty, LowerProperty, AttrName, StorageGetter, ContextElement)     \
+  ClassName::SVGAnimatedTemplate##UpperProperty::                              \
+      SVGAnimatedTemplate##UpperProperty(const ClassType* element)             \
+      : m_element(const_cast<ClassType*>(element)) {}                          \
+  BareType ClassName::SVGAnimatedTemplate##UpperProperty::baseVal() const {    \
+    return m_element->LowerProperty##BaseValue();                              \
+  }                                                                            \
+  void ClassName::SVGAnimatedTemplate##UpperProperty::setBaseVal(              \
+      BareType newBaseVal) {                                                   \
+    m_element->set##UpperProperty##BaseValue(newBaseVal);                      \
+  }                                                                            \
+  BareType ClassName::SVGAnimatedTemplate##UpperProperty::animVal() const {    \
+    return m_element->LowerProperty();                                         \
+  }                                                                            \
+  void ClassName::SVGAnimatedTemplate##UpperProperty::setAnimVal(              \
+      BareType newAnimVal) {                                                   \
+    m_element->set##UpperProperty(newAnimVal);                                 \
+  }                                                                            \
+  BareType ClassName::LowerProperty() const { return StorageGetter; }          \
+  void ClassName::set##UpperProperty(BareType newValue) {                      \
+    m_##LowerProperty = newValue;                                              \
+  }                                                                            \
+  BareType ClassName::LowerProperty##BaseValue() const {                       \
+    const SVGElement* context = ContextElement;                                \
+    ASSERT(context);                                                           \
+    SVGDocumentExtensions* extensions =                                        \
+        (context->document() ? context->document()->accessSVGExtensions()      \
+                             : 0);                                             \
+    if (extensions && extensions->hasBaseValue<BareType>(context, AttrName))   \
+      return extensions->baseValue<BareType>(context, AttrName);               \
+    return LowerProperty();                                                    \
+  }                                                                            \
+  void ClassName::set##UpperProperty##BaseValue(BareType newValue) {           \
+    const SVGElement* context = ContextElement;                                \
+    ASSERT(context);                                                           \
+    SVGDocumentExtensions* extensions =                                        \
+        (context->document() ? context->document()->accessSVGExtensions()      \
+                             : 0);                                             \
+    if (extensions && extensions->hasBaseValue<BareType>(context, AttrName)) { \
+      extensions->setBaseValue<BareType>(context, AttrName, newValue);         \
+      return;                                                                  \
+    }                                                                          \
+    /* Only update stored property, if not animating */                        \
+    set##UpperProperty(newValue);                                              \
+  }                                                                            \
+                                                                               \
+  void ClassName::start##UpperProperty() const {                               \
+    const SVGElement* context = ContextElement;                                \
+    ASSERT(context);                                                           \
+    SVGDocumentExtensions* extensions =                                        \
+        (context->document() ? context->document()->accessSVGExtensions()      \
+                             : 0);                                             \
+    if (extensions) {                                                          \
+      ASSERT(!extensions->hasBaseValue<BareType>(context, AttrName));          \
+      extensions->setBaseValue<BareType>(context, AttrName, LowerProperty());  \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  void ClassName::stop##UpperProperty() {                                      \
+    const SVGElement* context = ContextElement;                                \
+    ASSERT(context);                                                           \
+    SVGDocumentExtensions* extensions =                                        \
+        (context->document() ? context->document()->accessSVGExtensions()      \
+                             : 0);                                             \
+    if (extensions) {                                                          \
+      ASSERT(extensions->hasBaseValue<BareType>(context, AttrName));           \
+      set##UpperProperty(extensions->baseValue<BareType>(context, AttrName));  \
+      extensions->removeBaseValue<BareType>(context, AttrName);                \
+    }                                                                          \
   }
 
 // These are the macros which will be used to declare/implement the svg animated
@@ -159,7 +196,7 @@
   PassRefPtr<ClassName::SVGAnimatedTemplate##UpperProperty>                    \
       ClassName::LowerProperty##Animated() const {                             \
     const SVGElement* context = contextElement();                              \
-    ASSERT(context != 0);                                                      \
+    ASSERT(context);                                                           \
     return RefPtr<ClassName::SVGAnimatedTemplate##UpperProperty>(              \
         new ClassName::SVGAnimatedTemplate##UpperProperty(context));           \
   }
@@ -252,6 +289,6 @@ static inline SVGElement* svg_dynamic_cast(Node* node) {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGElementImpl_H
+#endif  // SVGElement_H
 
 // vim:ts=4:noet
