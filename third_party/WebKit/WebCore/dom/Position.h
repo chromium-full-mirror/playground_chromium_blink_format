@@ -81,7 +81,7 @@ class Position {
   Position upstream() const;
   Position downstream() const;
 
-  bool inRenderedContent() const;
+  bool isCandidate() const;
   bool isRenderedCharacter() const;
   bool rendersInDifferentPosition(const Position& pos) const;
 

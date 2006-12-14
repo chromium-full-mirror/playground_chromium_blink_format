@@ -441,7 +441,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
       if (highestEditableRoot(Position(n, 0)) != highestRoot)
         break;
       Position pos(n, n->caretMinOffset());
-      if (pos.inRenderedContent()) {
+      if (pos.isCandidate()) {
         assert(n->renderer());
         box = n->renderer()->inlineBox(n->caretMaxOffset());
         if (box) {
@@ -512,7 +512,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
       if (highestEditableRoot(Position(n, 0)) != highestRoot)
         break;
       Position pos(n, n->caretMinOffset());
-      if (pos.inRenderedContent()) {
+      if (pos.isCandidate()) {
         assert(n->renderer());
         box = n->renderer()->inlineBox(n->caretMinOffset());
         if (box) {
@@ -594,7 +594,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
   // FIXME: Use the leftmost candidate.  Canonicalization should give us the
   // leftmost candidate,
   // but it sometimes doesn't because of 8622.
-  if (p.upstream().inRenderedContent()) {
+  if (p.upstream().isCandidate()) {
     p = p.upstream();
     ASSERT(VisiblePosition(p) == c);
   }
