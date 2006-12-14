@@ -49,7 +49,8 @@ class ResourceError {
         ,
         m_dataIsUpToDate(true)
 #endif
-  {
+        ,
+        m_isNull(true) {
   }
 
   ResourceError(const String& domain,
@@ -64,12 +65,13 @@ class ResourceError {
         ,
         m_dataIsUpToDate(true)
 #endif
-  {
+        ,
+        m_isNull(false) {
   }
 
 #if PLATFORM(MAC)
   ResourceError(NSError* error)
-      : m_dataIsUpToDate(false), m_platformError(error) {}
+      : m_dataIsUpToDate(false), m_platformError(error), m_isNull(!error) {}
 #endif
 
 #if 0
@@ -79,6 +81,8 @@ class ResourceError {
         static const String MachDomain;
         static const String WebKitDomain;
 #endif
+
+  bool isNull() const { return m_isNull; }
 
   const String& domain() {
     unpackPlatformErrorIfNeeded();
@@ -122,6 +126,7 @@ class ResourceError {
   bool m_dataIsUpToDate;
   mutable RetainPtr<NSError> m_platformError;
 #endif
+  bool m_isNull;
 };
 
 }  // namespace WebCore

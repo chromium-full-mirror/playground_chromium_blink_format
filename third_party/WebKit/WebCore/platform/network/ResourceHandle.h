@@ -66,12 +66,13 @@ namespace WebCore {
 class FormData;
 class Frame;
 class KURL;
+class ResourceError;
 class ResourceHandleClient;
 class ResourceHandleInternal;
+class ResourceRequest;
+class ResourceResponse;
 class SubresourceLoader;
 class SubresourceLoaderClient;
-
-struct ResourceRequest;
 
 template <typename T>
 class Timer;
@@ -91,6 +92,11 @@ class ResourceHandle : public Shared<ResourceHandle> {
       Frame*,
       bool defersLoading,
       bool mightDownloadFromHandle = false);
+
+  static void loadResourceSynchronously(const ResourceRequest&,
+                                        ResourceError&,
+                                        ResourceResponse&,
+                                        Vector<char>& data);
 
   ~ResourceHandle();
 

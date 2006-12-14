@@ -215,4 +215,12 @@ bool operator==(const ResourceRequest& a, const ResourceRequest& b) {
 
   return true;
 }
+
+bool ResourceRequest::isConditional() const {
+  return (m_httpHeaderFields.contains("If-Match") ||
+          m_httpHeaderFields.contains("If-Modified-Since") ||
+          m_httpHeaderFields.contains("If-None-Match") ||
+          m_httpHeaderFields.contains("If-Range") ||
+          m_httpHeaderFields.contains("If-Unmodified-Since"));
+}
 }

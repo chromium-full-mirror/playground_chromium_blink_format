@@ -144,6 +144,8 @@ struct ResourceRequest {
   bool allowHTTPCookies() const;
   void setAllowHTTPCookies(bool allowHTTPCookies);
 
+  bool isConditional() const;
+
 #if PLATFORM(MAC)
   ResourceRequest(NSURLRequest* nsRequest)
       : m_resourceRequestUpdated(false),
