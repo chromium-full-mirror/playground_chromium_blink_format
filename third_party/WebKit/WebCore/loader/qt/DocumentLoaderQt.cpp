@@ -116,6 +116,33 @@ DocumentLoader::~DocumentLoader() {
          !frameLoader()->isLoading());
 }
 
+const ResourceRequest& DocumentLoader::originalRequest() const {
+  return m_originalRequest;
+}
+
+const ResourceRequest& DocumentLoader::originalRequestCopy() const {
+  return m_originalRequestCopy;
+}
+
+const ResourceRequest& DocumentLoader::request() const {
+  // FIXME: need a better way to handle data loads
+  return m_request;
+}
+
+ResourceRequest& DocumentLoader::request() {
+  // FIXME: need a better way to handle data loads
+  return m_request;
+}
+
+const ResourceRequest& DocumentLoader::initialRequest() const {
+  // FIXME: need a better way to handle data loads
+  return m_originalRequest;
+}
+
+ResourceRequest& DocumentLoader::actualRequest() {
+  return m_request;
+}
+
 const KURL& DocumentLoader::URL() const {
   return request().url();
 }
