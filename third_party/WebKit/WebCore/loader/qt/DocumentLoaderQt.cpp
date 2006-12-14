@@ -105,16 +105,6 @@ static inline String canonicalizedTitle(const String& title, Frame* frame) {
   return String::adopt(stringBuilder);
 }
 
-DocumentLoader::DocumentLoader()
-    : m_frame(0),
-      m_loadingStartedTime(0),
-      m_committed(false),
-      m_stopping(false),
-      m_loading(false),
-      m_gotFirstByte(false),
-      m_primaryLoadComplete(false),
-      m_isClientRedirect(false) {}
-
 FrameLoader* DocumentLoader::frameLoader() const {
   if (!m_frame)
     return 0;
@@ -126,13 +116,11 @@ DocumentLoader::~DocumentLoader() {
          !frameLoader()->isLoading());
 }
 
-KURL DocumentLoader::URL() const {
-  KURL url;
-  notImplemented();
-  return url;
+const KURL& DocumentLoader::URL() const {
+  return request().url();
 }
 
-KURL DocumentLoader::unreachableURL() const {
+const KURL DocumentLoader::unreachableURL() const {
   KURL url;
   notImplemented();
   return url;

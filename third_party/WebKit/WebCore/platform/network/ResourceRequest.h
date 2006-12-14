@@ -124,7 +124,7 @@ struct ResourceRequest {
   }
 
   String httpReferrer() const { return httpHeaderField("Referer"); }
-  void ResourceRequest::setHTTPReferrer(const String& httpReferrer) {
+  void setHTTPReferrer(const String& httpReferrer) {
     setHTTPHeaderField("Referer", httpReferrer);
   }
 
