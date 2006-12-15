@@ -63,7 +63,9 @@ class MainResourceLoader : public ResourceLoader {
 
   virtual void didCancel(const ResourceError&);
 
+#if PLATFORM(MAC)
   NSURLRequest* loadNow(NSURLRequest*);
+#endif
 
   void receivedError(const ResourceError&);
   ResourceError interruptionForPolicyChangeError() const;
