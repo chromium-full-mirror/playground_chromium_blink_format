@@ -31,7 +31,6 @@
 #include "Document.h"
 #include "EditorClient.h"
 #include "FrameLoader.h"
-#include "FrameLoaderClientWin.h"
 #include "FrameLoadRequest.h"
 #include "FramePrivate.h"
 #include "FrameView.h"
@@ -46,8 +45,9 @@ namespace WebCore {
 
 FrameWin::FrameWin(Page* page,
                    HTMLFrameOwnerElement* ownerElement,
-                   FrameWinClient* client)
-    : Frame(page, ownerElement, new FrameLoaderClientWin()), m_client(client) {
+                   FrameWinClient* client,
+                   FrameLoaderClient* loaderClient)
+    : Frame(page, ownerElement, loaderClient), m_client(client) {
   Settings* settings = new Settings();
   settings->setAutoLoadImages(true);
   settings->setMediumFixedFontSize(13);

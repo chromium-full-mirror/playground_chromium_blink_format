@@ -25,16 +25,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FrameLoaderClientWin_H
-#define FrameLoaderClientWin_H
+#ifndef WebFrameLoaderClient_H
+#define WebFrameLoaderClient_H
 
 #include "FrameLoaderClient.h"
 
-namespace WebCore {
+class WebFrame;
 
-class FrameLoaderClientWin : public FrameLoaderClient {
+class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
  public:
-  virtual ~FrameLoaderClientWin() {}
+  WebFrameLoaderClient(WebFrame* webFrame);
+  virtual ~WebFrameLoaderClient();
+
   virtual void frameLoaderDestroyed();
 
   virtual bool hasWebView() const;
@@ -50,7 +52,7 @@ class FrameLoaderClientWin : public FrameLoaderClient {
   virtual bool privateBrowsingEnabled() const;
 
   virtual void makeDocumentView();
-  virtual void makeRepresentation(DocumentLoader*);
+  virtual void makeRepresentation(WebCore::DocumentLoader*);
   virtual void forceLayout();
   virtual void forceLayoutForNonHTML();
 
@@ -65,9 +67,9 @@ class FrameLoaderClientWin : public FrameLoaderClient {
 
   virtual void setCopiesOnScroll();
 
-  virtual LoadErrorResetToken* tokenForLoadErrorReset();
-  virtual void resetAfterLoadError(LoadErrorResetToken*);
-  virtual void doNotResetAfterLoadError(LoadErrorResetToken*);
+  virtual WebCore::LoadErrorResetToken* tokenForLoadErrorReset();
+  virtual void resetAfterLoadError(WebCore::LoadErrorResetToken*);
+  virtual void doNotResetAfterLoadError(WebCore::LoadErrorResetToken*);
 
   virtual void willCloseDocument();
 
@@ -81,12 +83,14 @@ class FrameLoaderClientWin : public FrameLoaderClient {
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
   virtual void dispatchDidCancelClientRedirect();
-  virtual void dispatchWillPerformClientRedirect(const KURL&, double, double);
+  virtual void dispatchWillPerformClientRedirect(const WebCore::KURL&,
+                                                 double,
+                                                 double);
   virtual void dispatchDidChangeLocationWithinPage();
   virtual void dispatchWillClose();
   virtual void dispatchDidReceiveIcon();
   virtual void dispatchDidStartProvisionalLoad();
-  virtual void dispatchDidReceiveTitle(const String&);
+  virtual void dispatchDidReceiveTitle(const WebCore::String&);
   virtual void dispatchDidCommitLoad();
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
@@ -95,48 +99,53 @@ class FrameLoaderClientWin : public FrameLoaderClient {
 
   virtual void cancelPolicyCheck();
 
-  virtual void dispatchWillSubmitForm(FramePolicyFunction,
-                                      PassRefPtr<FormState>);
+  virtual void dispatchWillSubmitForm(WebCore::FramePolicyFunction,
+                                      PassRefPtr<WebCore::FormState>);
 
-  virtual void dispatchDidLoadMainResource(DocumentLoader*);
-  virtual void clearLoadingFromPageCache(DocumentLoader*);
-  virtual bool isLoadingFromPageCache(DocumentLoader*);
-  virtual void revertToProvisionalState(DocumentLoader*);
-  virtual void clearUnarchivingState(DocumentLoader*);
+  virtual void dispatchDidLoadMainResource(WebCore::DocumentLoader*);
+  virtual void clearLoadingFromPageCache(WebCore::DocumentLoader*);
+  virtual bool isLoadingFromPageCache(WebCore::DocumentLoader*);
+  virtual void revertToProvisionalState(WebCore::DocumentLoader*);
+  virtual void clearUnarchivingState(WebCore::DocumentLoader*);
 
   virtual void progressStarted();
   virtual void progressCompleted();
 
   virtual void setMainFrameDocumentReady(bool);
 
-  virtual void willChangeTitle(DocumentLoader*);
-  virtual void didChangeTitle(DocumentLoader*);
+  virtual void willChangeTitle(WebCore::DocumentLoader*);
+  virtual void didChangeTitle(WebCore::DocumentLoader*);
 
-  virtual void finishedLoading(DocumentLoader*);
-  virtual void finalSetupForReplace(DocumentLoader*);
+  virtual void finishedLoading(WebCore::DocumentLoader*);
+  virtual void finalSetupForReplace(WebCore::DocumentLoader*);
 
   virtual void setDefersLoading(bool);
 
-  virtual bool isArchiveLoadPending(ResourceLoader*) const;
-  virtual void cancelPendingArchiveLoad(ResourceLoader*);
+  virtual bool isArchiveLoadPending(WebCore::ResourceLoader*) const;
+  virtual void cancelPendingArchiveLoad(WebCore::ResourceLoader*);
   virtual void clearArchivedResources();
 
-  virtual bool canHandleRequest(const ResourceRequest&) const;
-  virtual bool canShowMIMEType(const String&) const;
-  virtual bool representationExistsForURLScheme(const String&) const;
-  virtual String generatedMIMETypeForURLScheme(const String&) const;
+  virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
+  virtual bool canShowMIMEType(const WebCore::String&) const;
+  virtual bool representationExistsForURLScheme(const WebCore::String&) const;
+  virtual WebCore::String generatedMIMETypeForURLScheme(
+      const WebCore::String&) const;
 
   virtual void frameLoadCompleted();
   virtual void restoreScrollPositionAndViewState();
   virtual void provisionalLoadStarted();
-  virtual bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
+  virtual bool shouldTreatURLAsSameAsCurrent(const WebCore::KURL&) const;
   virtual void addHistoryItemForFragmentScroll();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
-  virtual void setTitle(const String& title, const KURL&);
+  virtual void setTitle(const WebCore::String& title, const WebCore::KURL&);
 
-  virtual String userAgent();
+  virtual WebCore::String userAgent();
+
+ protected:
+  // The WebFrame that owns this object and manages its lifetime. Therefore,
+  // the web frame object is guaranteed to exist.
+  WebFrame* m_webFrame;
 };
-}
 
 #endif  // FrameLoaderClientWin_H

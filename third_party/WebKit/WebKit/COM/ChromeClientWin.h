@@ -30,25 +30,23 @@
 
 #include "ChromeClient.h"
 
-namespace WebCore {
-
-class ChromeClientWin : public ChromeClient {
+class ChromeClientWin : public WebCore::ChromeClient {
  public:
-  virtual ~ChromeClientWin() {}
+  virtual ~ChromeClientWin();
   virtual void chromeDestroyed();
 
-  virtual void setWindowRect(const FloatRect&);
-  virtual FloatRect windowRect();
+  virtual void setWindowRect(const WebCore::FloatRect&);
+  virtual WebCore::FloatRect windowRect();
 
-  virtual FloatRect pageRect();
+  virtual WebCore::FloatRect pageRect();
 
   virtual float scaleFactor();
 
   virtual void focus();
   virtual void unfocus();
 
-  virtual Page* createWindow(const FrameLoadRequest&);
-  virtual Page* createModalDialog(const FrameLoadRequest&);
+  virtual WebCore::Page* createWindow(const WebCore::FrameLoadRequest&);
+  virtual WebCore::Page* createModalDialog(const WebCore::FrameLoadRequest&);
   virtual void show();
 
   virtual bool canRunModal();
@@ -68,10 +66,9 @@ class ChromeClientWin : public ChromeClient {
 
   virtual void setResizable(bool);
 
-  virtual void addMessageToConsole(const String& message,
+  virtual void addMessageToConsole(const WebCore::String& message,
                                    unsigned int lineNumber,
-                                   const String& sourceID);
+                                   const WebCore::String& sourceID);
 };
-}
 
 #endif  // ChromeClientWin_H

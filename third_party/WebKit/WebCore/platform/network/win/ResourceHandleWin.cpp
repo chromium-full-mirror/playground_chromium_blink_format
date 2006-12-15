@@ -318,7 +318,7 @@ static void __stdcall transferJobStatusCallback(HINTERNET internetHandle,
   PostMessage(transferJobWindowHandle, msg, (WPARAM)jobId, lParam);
 }
 
-bool ResourceHandle::start(DocLoader* docLoader) {
+bool ResourceHandle::start(Frame* frame) {
   ref();
   if (url().isLocalFile()) {
     DeprecatedString path = url().path();
@@ -340,8 +340,7 @@ bool ResourceHandle::start(DocLoader* docLoader) {
   } else {
     static HINTERNET internetHandle = 0;
     if (!internetHandle) {
-      String userAgentStr =
-          docLoader->frame()->loader()->userAgent() + String("", 1);
+      String userAgentStr = frame->loader()->userAgent() + String("", 1);
       LPCWSTR userAgent =
           reinterpret_cast<const WCHAR*>(userAgentStr.characters());
       // leak the Internet for now
@@ -365,7 +364,7 @@ bool ResourceHandle::start(DocLoader* docLoader) {
     // For form posting, we can't use InternetOpenURL.  We have to use
     // InternetConnect followed by HttpSendRequest.
     HINTERNET urlHandle;
-    String referrer = docLoader->frame()->loader()->referrer();
+    String referrer = frame->loader()->referrer();
     if (method() == "POST") {
       d->m_postReferrer = referrer;
       DeprecatedString host = url().host();

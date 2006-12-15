@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Don Gibson <dgibson77@gmail.com>
+ * Copyright (C) 2006 Marvin Decker <marv.decker@gmail.com>
  *
  * All rights reserved.
  *
@@ -25,27 +25,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ContextMenuClientWin_h
-#define ContextMenuClientWin_h
+#include "config.h"
+#include "ContextMenuClientWin.h"
 
-#include "ContextMenuClient.h"
+#define notImplemented() \
+  {}
 
-namespace WebCore {
+ContextMenuClientWin::~ContextMenuClientWin() {}
 
-class ContextMenuClientWin : public ContextMenuClient {
- public:
-  virtual ~ContextMenuClientWin() {}
-  virtual void contextMenuDestroyed();
+void ContextMenuClientWin::contextMenuDestroyed() {
+  notImplemented();
+}
 
-  virtual void addCustomContextMenuItems(ContextMenu*);
-  virtual void contextMenuItemSelected(const ContextMenuItem*);
+void ContextMenuClientWin::addCustomContextMenuItems(WebCore::ContextMenu*) {
+  notImplemented();
+}
 
-  virtual void copyLinkToClipboard(const HitTestResult&);
-  virtual void downloadURL(const KURL&);
-  virtual void copyImageToClipboard(const HitTestResult&);
-  virtual void lookUpInDictionary(Frame*);
-};
+void ContextMenuClientWin::contextMenuItemSelected(
+    const WebCore::ContextMenuItem*) {
+  notImplemented();
+}
 
-}  // namespace WebCore
+void ContextMenuClientWin::copyLinkToClipboard(const WebCore::HitTestResult&) {
+  notImplemented();
+}
 
-#endif  // ContextMenuClientWin_h
+void ContextMenuClientWin::downloadURL(const WebCore::KURL&) {
+  notImplemented();
+}
+
+void ContextMenuClientWin::copyImageToClipboard(const WebCore::HitTestResult&) {
+  notImplemented();
+}
+
+void ContextMenuClientWin::lookUpInDictionary(WebCore::Frame*) {
+  notImplemented();
+}
+
+void ContextMenuClientWin::speak(const WebCore::String&) {
+  notImplemented();
+}
+
+void ContextMenuClientWin::stopSpeaking() {
+  notImplemented();
+}

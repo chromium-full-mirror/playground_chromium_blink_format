@@ -25,49 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EditorClientWin_h
-#define EditorClientWin_h
+#ifndef ContextMenuClientWin_h
+#define ContextMenuClientWin_h
 
-#include "EditorClient.h"
+#include "ContextMenuClient.h"
 
-namespace WebCore {
-
-class EditorClientWin : public EditorClient {
+class ContextMenuClientWin : public WebCore::ContextMenuClient {
  public:
-  virtual ~EditorClientWin() {}
-  virtual void pageDestroyed();
+  virtual ~ContextMenuClientWin();
+  virtual void contextMenuDestroyed();
 
-  virtual bool shouldDeleteRange(Range*);
-  virtual bool shouldShowDeleteInterface(HTMLElement*);
-  virtual bool smartInsertDeleteEnabled();
-  virtual bool isContinuousSpellCheckingEnabled();
-  virtual bool isGrammarCheckingEnabled();
-  virtual int spellCheckerDocumentTag();
+  virtual void addCustomContextMenuItems(WebCore::ContextMenu*);
+  virtual void contextMenuItemSelected(const WebCore::ContextMenuItem*);
 
-  virtual bool selectWordBeforeMenuEvent();
-  virtual bool isEditable();
-
-  virtual bool shouldBeginEditing(Range*);
-  virtual bool shouldEndEditing(Range*);
-  virtual bool shouldInsertNode(Node*, Range*, EditorInsertAction);
-  virtual bool shouldInsertText(String, Range*, EditorInsertAction);
-  virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
-
-  virtual void didBeginEditing();
-  virtual void respondToChangedContents();
-  virtual void didEndEditing();
-
-  virtual void registerCommandForUndo(PassRefPtr<EditCommand>);
-  virtual void registerCommandForRedo(PassRefPtr<EditCommand>);
-  virtual void clearUndoRedoOperations();
-
-  virtual bool canUndo() const;
-  virtual bool canRedo() const;
-
-  virtual void undo();
-  virtual void redo();
+  virtual void copyLinkToClipboard(const WebCore::HitTestResult&);
+  virtual void downloadURL(const WebCore::KURL&);
+  virtual void copyImageToClipboard(const WebCore::HitTestResult&);
+  virtual void lookUpInDictionary(WebCore::Frame*);
+  virtual void speak(const WebCore::String&);
+  virtual void stopSpeaking();
 };
 
-}  // namespace WebCore
-
-#endif  // EditorClientWin_h
+#endif  // ContextMenuClientWin_h

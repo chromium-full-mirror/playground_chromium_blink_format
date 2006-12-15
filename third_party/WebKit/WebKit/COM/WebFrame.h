@@ -34,6 +34,7 @@
 #include "SubresourceLoaderClient.h"
 #include "FrameWin.h"
 #include "PlatformString.h"
+#include "WebFrameLoaderClient.h"
 #pragma warning(pop)
 
 namespace WebCore {
@@ -163,6 +164,7 @@ class WebFrame : public IWebFrame,
   class WebFramePrivate;
   WebFramePrivate* d;
   ULONG m_refCount;
+  WebFrameLoaderClient m_frameLoaderClient;
   IWebDataSource* m_dataSource;
   IWebDataSource* m_provisionalDataSource;
   WebFrameLoadType m_loadType;

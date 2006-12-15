@@ -51,7 +51,7 @@ class FrameWinClient {
 
 class FrameWin : public Frame {
  public:
-  FrameWin(Page*, HTMLFrameOwnerElement*, FrameWinClient*);
+  FrameWin(Page*, HTMLFrameOwnerElement*, FrameWinClient*, FrameLoaderClient*);
   virtual ~FrameWin();
 
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*);
