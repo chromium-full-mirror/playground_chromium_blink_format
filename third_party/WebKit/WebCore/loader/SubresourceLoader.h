@@ -86,7 +86,9 @@ class SubresourceLoader : public ResourceLoader {
  private:
   SubresourceLoader(Frame*, SubresourceLoaderClient*);
 
+#if PLATFORM(MAC)
   virtual void didCancel(const ResourceError&);
+#endif
   SubresourceLoaderClient* m_client;
   bool m_loadingMultipartContent;
 };

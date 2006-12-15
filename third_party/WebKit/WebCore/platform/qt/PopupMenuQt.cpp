@@ -35,7 +35,7 @@
 
 namespace WebCore {
 
-PopupMenu::PopupMenu(RenderMenuList* menuList) {}
+PopupMenu::PopupMenu(PopupMenuClient* menuList) {}
 
 PopupMenu::~PopupMenu() {}
 
