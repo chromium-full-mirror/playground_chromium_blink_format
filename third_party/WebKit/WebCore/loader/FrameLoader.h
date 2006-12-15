@@ -262,7 +262,7 @@ class FrameLoader : Noncopyable {
   void didCancelAuthenticationChallenge(ResourceLoader*,
                                         NSURLAuthenticationChallenge*);
   void didReceiveResponse(ResourceLoader*, NSURLResponse*);
-  void didReceiveData(ResourceLoader*, NSData*, int lengthReceived);
+  void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
 #endif
   void didFinishLoad(ResourceLoader*);
   void didFailToLoad(ResourceLoader*, const ResourceError&);
@@ -271,9 +271,8 @@ class FrameLoader : Noncopyable {
   const ResourceRequest& initialRequest() const;
   void setRequest(const ResourceRequest&);
   void receivedMainResourceError(const ResourceError&, bool isComplete);
-#if PLATFORM(MAC)
-  void receivedData(NSData*);
-#endif
+  void receivedData(const char*, int);
+
   void handleFallbackContent();
   bool isStopping() const;
 #if PLATFORM(MAC)
@@ -315,9 +314,7 @@ class FrameLoader : Noncopyable {
 
   void didReceiveServerRedirectForProvisionalLoadForFrame();
   void finishedLoadingDocument(DocumentLoader*);
-#if PLATFORM(MAC)
-  void committedLoad(DocumentLoader*, NSData*);
-#endif
+  void committedLoad(DocumentLoader*, const char*, int);
   bool isReplacing() const;
   void setReplacing();
   void revertToProvisional(DocumentLoader*);

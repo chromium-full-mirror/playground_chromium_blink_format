@@ -92,7 +92,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual void releaseResources();
   NSURLResponse* response() const;
 
-  virtual void addData(NSData*, bool allAtOnce);
+  virtual void addData(const char*, int, bool allAtOnce);
   virtual NSData* resourceData();
   void clearResourceData();
 
@@ -101,10 +101,11 @@ class ResourceLoader : public Shared<ResourceLoader>,
   void didReceiveAuthenticationChallenge(NSURLAuthenticationChallenge*);
   void didCancelAuthenticationChallenge(NSURLAuthenticationChallenge*);
   virtual void didReceiveResponse(NSURLResponse*);
-  virtual void didReceiveData(NSData*,
+  virtual void didReceiveData(const char*,
+                              int,
                               long long lengthReceived,
                               bool allAtOnce);
-  void willStopBufferingData(NSData* data);
+  void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
   NSCachedURLResponse* willCacheResponse(NSCachedURLResponse*);
@@ -141,8 +142,10 @@ class ResourceLoader : public Shared<ResourceLoader>,
     didCancelAuthenticationChallenge(challenge);
   }
 
-  virtual void willStopBufferingData(ResourceHandle*, NSData* data) {
-    willStopBufferingData(data);
+  virtual void willStopBufferingData(ResourceHandle*,
+                                     const char* data,
+                                     int length) {
+    willStopBufferingData(data, length);
   }
 
   virtual NSCachedURLResponse* willCacheResponse(

@@ -206,7 +206,7 @@ class FrameLoaderClient {
 
 #if PLATFORM(MAC)
   virtual void incrementProgress(id identifier, NSURLResponse*) = 0;
-  virtual void incrementProgress(id identifier, NSData*) = 0;
+  virtual void incrementProgress(id identifier, const char*, int) = 0;
   virtual void completeProgress(id identifier) = 0;
 #endif
 
@@ -220,7 +220,7 @@ class FrameLoaderClient {
   virtual void didChangeTitle(DocumentLoader*) = 0;
 
 #if PLATFORM(MAC)
-  virtual void committedLoad(DocumentLoader*, NSData*) = 0;
+  virtual void committedLoad(DocumentLoader*, const char*, int) = 0;
 #endif
   virtual void finishedLoading(DocumentLoader*) = 0;
   virtual void finalSetupForReplace(DocumentLoader*) = 0;

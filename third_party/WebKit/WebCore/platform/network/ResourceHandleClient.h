@@ -116,7 +116,7 @@ class ResourceHandleClient {
                                                 NSURLAuthenticationChallenge*) {
   }
 
-  virtual void willStopBufferingData(ResourceHandle*, NSData* data) {}
+  virtual void willStopBufferingData(ResourceHandle*, const char*, int) {}
 
   virtual NSCachedURLResponse* willCacheResponse(
       ResourceHandle*,

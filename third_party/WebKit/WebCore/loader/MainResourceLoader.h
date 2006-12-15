@@ -42,7 +42,7 @@ class MainResourceLoader : public ResourceLoader {
 
 #if PLATFORM(MAC)
   virtual bool load(NSURLRequest*);
-  virtual void addData(NSData*, bool allAtOnce);
+  virtual void addData(const char*, int, bool allAtOnce);
 #endif
 
   virtual void setDefersLoading(bool);
@@ -51,7 +51,8 @@ class MainResourceLoader : public ResourceLoader {
   virtual NSURLRequest* willSendRequest(NSURLRequest*,
                                         NSURLResponse* redirectResponse);
   virtual void didReceiveResponse(NSURLResponse*);
-  virtual void didReceiveData(NSData*,
+  virtual void didReceiveData(const char*,
+                              int,
                               long long lengthReceived,
                               bool allAtOnce);
   virtual void didFinishLoading();

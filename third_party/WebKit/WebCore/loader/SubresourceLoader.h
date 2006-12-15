@@ -63,7 +63,8 @@ class SubresourceLoader : public ResourceLoader {
   virtual NSURLRequest* willSendRequest(NSURLRequest*,
                                         NSURLResponse* redirectResponse);
   virtual void didReceiveResponse(NSURLResponse*);
-  virtual void didReceiveData(NSData*,
+  virtual void didReceiveData(const char*,
+                              int,
                               long long lengthReceived,
                               bool allAtOnce);
   virtual void didFinishLoading();
