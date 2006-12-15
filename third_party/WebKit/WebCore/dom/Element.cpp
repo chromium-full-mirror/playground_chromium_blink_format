@@ -913,4 +913,8 @@ String Element::outerText() const {
   // a rule, but it doesn't in WinIE, and we want to match that.
   return innerText();
 }
+
+String Element::title() const {
+  return getAttribute(titleAttr);
+}
 }

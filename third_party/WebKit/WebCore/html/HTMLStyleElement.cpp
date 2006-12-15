@@ -38,6 +38,8 @@ HTMLStyleElement::HTMLStyleElement(Document* doc)
 void HTMLStyleElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == mediaAttr)
     m_media = attr->value().deprecatedString().lower();
+  else if (attr->name() == titleAttr && m_sheet)
+    m_sheet->setTitle(attr->value());
   else
     HTMLElement::parseMappedAttribute(attr);
 }
