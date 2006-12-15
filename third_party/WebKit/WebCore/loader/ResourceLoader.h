@@ -79,8 +79,8 @@ class ResourceLoader : public Shared<ResourceLoader>,
 
   FrameLoader* frameLoader() const;
 
-  virtual void cancel(NSError*);
-  NSError* cancelledError();
+  virtual void cancel(const ResourceError&);
+  ResourceError cancelledError();
 #endif
 
   virtual void setDefersLoading(bool);

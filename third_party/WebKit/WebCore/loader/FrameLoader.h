@@ -50,7 +50,6 @@ typedef struct objc_object* id;
 
 @class NSData;
 @class NSDictionary;
-@class NSError;
 @class NSMutableURLRequest;
 @class NSURL;
 @class NSURLAuthenticationChallenge;
@@ -61,7 +60,6 @@ typedef struct objc_object* id;
 
 class NSData;
 class NSDictionary;
-class NSError;
 class NSMutableURLRequest;
 class NSURL;
 class NSURLAuthenticationChallenge;
@@ -221,7 +219,7 @@ class FrameLoader : Noncopyable {
   void stopLoadingSubresources();
 #if PLATFORM(MAC)
   void closeBridge();
-  void cancelMainResourceLoad(NSError*);
+  void cancelMainResourceLoad(const ResourceError&);
 #endif
   void stopAllLoaders();
   void cancelMainResourceLoad();
@@ -283,8 +281,8 @@ class FrameLoader : Noncopyable {
   KURL URL() const;
 
 #if PLATFORM(MAC)
-  NSError* cancelledError(NSURLRequest*) const;
-  NSError* fileDoesNotExistError(NSURLResponse*) const;
+  ResourceError cancelledError(NSURLRequest*) const;
+  ResourceError fileDoesNotExistError(NSURLResponse*) const;
   bool willUseArchive(ResourceLoader*, NSURLRequest*, NSURL*) const;
 #endif
   bool isArchiveLoadPending(ResourceLoader*) const;
@@ -319,8 +317,8 @@ class FrameLoader : Noncopyable {
   void setReplacing();
   void revertToProvisional(DocumentLoader*);
 #if PLATFORM(MAC)
-  void setMainDocumentError(DocumentLoader*, NSError*);
-  void mainReceivedCompleteError(DocumentLoader*, NSError*);
+  void setMainDocumentError(DocumentLoader*, const ResourceError&);
+  void mainReceivedCompleteError(DocumentLoader*, const ResourceError&);
 #endif
   bool subframeIsLoading() const;
   void willChangeTitle(DocumentLoader*);
@@ -348,10 +346,10 @@ class FrameLoader : Noncopyable {
   void sendRemainingDelegateMessages(id identifier,
                                      NSURLResponse*,
                                      unsigned length,
-                                     NSError*);
+                                     const ResourceError&);
   NSURLRequest* requestFromDelegate(NSURLRequest*,
                                     id& identifier,
-                                    NSError*& error);
+                                    ResourceError&);
   void loadedResourceFromMemoryCache(NSURLRequest*, NSURLResponse*, int length);
 #endif
 
@@ -593,7 +591,7 @@ class FrameLoader : Noncopyable {
   void frameLoadCompleted();
 
 #if PLATFORM(MAC)
-  void mainReceivedError(NSError*, bool isComplete);
+  void mainReceivedError(const ResourceError&, bool isComplete);
 #endif
 
   void setLoadType(FrameLoadType);
@@ -660,7 +658,7 @@ class FrameLoader : Noncopyable {
 
   bool shouldReloadToHandleUnreachableURL(const ResourceRequest&);
 #if PLATFORM(MAC)
-  void handleUnimplementablePolicy(NSError*);
+  void handleUnimplementablePolicy(const ResourceError&);
 
   void applyUserAgent(NSMutableURLRequest*);
 #endif
