@@ -98,10 +98,10 @@ class DocumentLoader : public Shared<DocumentLoader> {
   void setupForReplaceByMIMEType(const String& newMIMEType);
   void finishedLoading();
 #if PLATFORM(MAC)
-  const ResourceResponse& response() const;
+  NSURLResponse* response() const;
   const ResourceError& mainDocumentError() const;
   void mainReceivedError(const ResourceError&, bool isComplete);
-  void setResponse(const ResourceResponse);
+  void setResponse(NSURLResponse*);
 #endif
   void prepareForLoadStart();
   bool isClientRedirect() const;
