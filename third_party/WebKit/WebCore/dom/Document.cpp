@@ -73,7 +73,6 @@
 #include "NameNodeList.h"
 #include "NodeFilter.h"
 #include "NodeIterator.h"
-#include "Page.h"
 #include "PlatformKeyboardEvent.h"
 #include "ProcessingInstruction.h"
 #include "RegisteredEventListener.h"
@@ -233,6 +232,54 @@ static inline bool isValidNamePart(UChar32 c) {
   return true;
 }
 
+static Widget* widgetForNode(Node* focusedNode) {
+  if (!focusedNode)
+    return 0;
+  RenderObject* renderer = focusedNode->renderer();
+  if (!renderer || !renderer->isWidget())
+    return 0;
+  return static_cast<RenderWidget*>(renderer)->widget();
+}
+
+static bool relinquishesEditingFocus(Node* node) {
+  assert(node);
+  assert(node->isContentEditable());
+
+  Node* root = node->rootEditableElement();
+  Frame* frame = node->document()->frame();
+  if (!frame || !root)
+    return false;
+
+  return frame->editor()->shouldEndEditing(rangeOfContents(root).get());
+}
+
+static bool acceptsEditingFocus(Node* node) {
+  assert(node);
+  assert(node->isContentEditable());
+
+  Node* root = node->rootEditableElement();
+  Frame* frame = node->document()->frame();
+  if (!frame || !root)
+    return false;
+
+  return frame->editor()->shouldBeginEditing(rangeOfContents(root).get());
+}
+
+static void clearSelectionIfNeeded(Frame* frame, Node* newFocusedNode) {
+  if (!frame)
+    return;
+
+  // Clear the selection when changing the focus node to null or to a node that
+  // is not
+  // contained by the current selection.
+  Node* startContainer = frame->selectionController()->start().node();
+  if (!newFocusedNode ||
+      (startContainer && startContainer != newFocusedNode &&
+       !(startContainer->isDescendantOf(newFocusedNode)) &&
+       startContainer->shadowAncestorNode() != newFocusedNode))
+    frame->selectionController()->clear();
+}
+
 DeprecatedPtrList<Document>* Document::changedDocuments = 0;
 
 // FrameView might be 0
@@ -337,6 +384,7 @@ void Document::removedLastRef() {
     // we must make sure not to be retaining any of our children through
     // these extra pointers or we will create a reference cycle
     m_docType = 0;
+    m_focusedNode = 0;
     m_hoverNode = 0;
     m_activeNode = 0;
     m_titleElement = 0;
@@ -1051,6 +1099,7 @@ void Document::detach() {
   m_imageLoadEventDispatchingList.clear();
 
   m_hoverNode = 0;
+  m_focusedNode = 0;
   m_activeNode = 0;
 
   ContainerNode::detach();
@@ -1986,10 +2035,7 @@ void Document::setActiveNode(PassRefPtr<Node> newActiveNode) {
 }
 
 void Document::focusedNodeDetached(Node* node) {
-  Page* page = this->page();
-  if (!page)
-    return;
-  page->focusController()->focusedNodeDetached(node);
+  setFocusedNode(0);
 }
 
 void Document::hoveredNodeDetached(Node* node) {
@@ -2027,20 +2073,125 @@ void Document::setDashboardRegions(
 }
 #endif
 
-bool Document::setFocusedNode(PassRefPtr<Node> node) {
-  Page* page = this->page();
-  if (!page)
+bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
+  // Make sure newFocusedNode is actually in this document
+  if (newFocusedNode && (newFocusedNode->document() != this))
+    return true;
+
+  if (m_focusedNode == newFocusedNode)
+    return true;
+
+  if (m_focusedNode &&
+      m_focusedNode.get() == m_focusedNode->rootEditableElement() &&
+      !relinquishesEditingFocus(m_focusedNode.get()))
     return false;
 
-  return page->focusController()->setFocusedNode(node);
-}
+  bool focusChangeBlocked = false;
+  RefPtr<Node> oldFocusedNode = m_focusedNode;
+  m_focusedNode = 0;
+  clearSelectionIfNeeded(frame(), newFocusedNode.get());
 
-Node* Document::focusedNode() const {
-  Page* page = this->page();
-  if (!page)
-    return 0;
+  // Remove focus from the existing focus node (if any)
+  if (oldFocusedNode && !oldFocusedNode->m_inDetach) {
+    if (oldFocusedNode->active())
+      oldFocusedNode->setActive(false);
 
-  return page->focusController()->focusedNode();
+    oldFocusedNode->setFocus(false);
+
+    // Dispatch a change event for text fields or textareas that have been
+    // edited
+    RenderObject* r =
+        static_cast<RenderObject*>(oldFocusedNode.get()->renderer());
+    if (r && (r->isTextArea() || r->isTextField()) && r->isEdited()) {
+      EventTargetNodeCast(oldFocusedNode.get())
+          ->dispatchHTMLEvent(changeEvent, true, false);
+      if ((r = static_cast<RenderObject*>(oldFocusedNode.get()->renderer())))
+        r->setEdited(false);
+    }
+
+    // Dispatch the blur event and let the node do any other blur related
+    // activities (important for text fields)
+    EventTargetNodeCast(oldFocusedNode.get())->dispatchBlurEvent();
+
+    if (m_focusedNode) {
+      // handler shifted focus
+      focusChangeBlocked = true;
+      newFocusedNode = 0;
+    }
+    clearSelectionIfNeeded(frame(), newFocusedNode.get());
+    EventTargetNodeCast(oldFocusedNode.get())
+        ->dispatchUIEvent(DOMFocusOutEvent);
+    if (m_focusedNode) {
+      // handler shifted focus
+      focusChangeBlocked = true;
+      newFocusedNode = 0;
+    }
+    clearSelectionIfNeeded(frame(), newFocusedNode.get());
+    if ((oldFocusedNode.get() == this) && oldFocusedNode->hasOneRef())
+      return true;
+
+    if (oldFocusedNode.get() == oldFocusedNode->rootEditableElement())
+      frame()->editor()->didEndEditing();
+  }
+
+  if (newFocusedNode) {
+    if (newFocusedNode == newFocusedNode->rootEditableElement() &&
+        !acceptsEditingFocus(newFocusedNode.get())) {
+      // delegate blocks focus change
+      focusChangeBlocked = true;
+      goto SetFocusedNodeDone;
+    }
+    // Set focus on the new node
+    m_focusedNode = newFocusedNode.get();
+
+    // Dispatch the focus event and let the node do any other focus related
+    // activities (important for text fields)
+    EventTargetNodeCast(m_focusedNode.get())->dispatchFocusEvent();
+
+    if (m_focusedNode != newFocusedNode) {
+      // handler shifted focus
+      focusChangeBlocked = true;
+      goto SetFocusedNodeDone;
+    }
+    EventTargetNodeCast(m_focusedNode.get())->dispatchUIEvent(DOMFocusInEvent);
+    if (m_focusedNode != newFocusedNode) {
+      // handler shifted focus
+      focusChangeBlocked = true;
+      goto SetFocusedNodeDone;
+    }
+    m_focusedNode->setFocus();
+
+    if (m_focusedNode.get() == m_focusedNode->rootEditableElement())
+      frame()->editor()->didBeginEditing();
+
+    // eww, I suck. set the qt focus correctly
+    // ### find a better place in the code for this
+    if (view()) {
+      Widget* focusWidget = widgetForNode(m_focusedNode.get());
+      if (focusWidget) {
+        // Make sure a widget has the right size before giving it focus.
+        // Otherwise, we are testing edge cases of the Widget code.
+        // Specifically, in WebCore this does not work well for text fields.
+        updateLayout();
+        // Re-get the widget in case updating the layout changed things.
+        focusWidget = widgetForNode(m_focusedNode.get());
+      }
+      if (focusWidget)
+        focusWidget->setFocus();
+      else
+        view()->setFocus();
+    }
+  }
+
+#if PLATFORM(MAC)
+  if (!focusChangeBlocked && m_focusedNode &&
+      AXObjectCache::accessibilityEnabled())
+    axObjectCache()->handleFocusedUIElementChanged();
+#endif
+
+SetFocusedNodeDone:
+  updateRendering();
+  return !focusChangeBlocked;
 }
 
 void Document::setCSSTarget(Node* n) {
