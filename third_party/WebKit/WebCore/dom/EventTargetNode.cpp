@@ -203,7 +203,7 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
 
   for (; it.current() && it.current() != this && !evt->propagationStopped();
        ++it) {
-    evt->setCurrentTarget(it.current());
+    evt->setCurrentTarget(EventTargetNodeCast(it.current()));
     EventTargetNodeCast(it.current())->handleLocalEvents(evt.get(), true);
   }
 
@@ -211,7 +211,7 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
   it.toLast();
   if (!evt->propagationStopped()) {
     evt->setEventPhase(Event::AT_TARGET);
-    evt->setCurrentTarget(it.current());
+    evt->setCurrentTarget(EventTargetNodeCast(it.current()));
 
     // We do want capturing event listeners to be invoked here, even though
     // that violates the specification since Mozilla does it.
@@ -238,7 +238,7 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
     evt->setEventPhase(Event::BUBBLING_PHASE);
     for (; it.current() && !evt->propagationStopped() && !evt->cancelBubble();
          --it) {
-      evt->setCurrentTarget(it.current());
+      evt->setCurrentTarget(EventTargetNodeCast(it.current()));
       EventTargetNodeCast(it.current())->handleLocalEvents(evt.get(), false);
     }
     // Handle window events for bubbling phase, except load events, this quirk
@@ -248,7 +248,7 @@ bool EventTargetNode::dispatchGenericEvent(PassRefPtr<Event> e,
     it.toFirst();
     if (evt->type() != loadEvent && it.current()->isDocumentNode() &&
         !evt->propagationStopped() && !evt->cancelBubble()) {
-      evt->setCurrentTarget(it.current());
+      evt->setCurrentTarget(EventTargetNodeCast(it.current()));
       static_cast<Document*>(it.current())->handleWindowEvent(evt.get(), false);
     }
   }

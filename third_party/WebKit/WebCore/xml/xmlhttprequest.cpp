@@ -230,7 +230,9 @@ void XMLHttpRequest::removeEventListener(const AtomicString& eventType,
     }
 }
 
-bool XMLHttpRequest::dispatchEvent(PassRefPtr<Event> evt, ExceptionCode& ec) {
+bool XMLHttpRequest::dispatchEvent(PassRefPtr<Event> evt,
+                                   ExceptionCode& ec,
+                                   bool /*tempEvent*/) {
   // FIXME: check for other error conditions enumerated in the spec.
   if (evt->type().isEmpty()) {
     ec = UNSPECIFIED_EVENT_TYPE_ERR;
@@ -239,8 +241,11 @@ bool XMLHttpRequest::dispatchEvent(PassRefPtr<Event> evt, ExceptionCode& ec) {
 
   ListenerVector listenersCopy = m_eventListeners.get(evt->type().impl());
   for (ListenerVector::const_iterator listenerIter = listenersCopy.begin();
-       listenerIter != listenersCopy.end(); ++listenerIter)
-    listenerIter->get()->handleEvent(evt.get(), true);
+       listenerIter != listenersCopy.end(); ++listenerIter) {
+    evt->setTarget(this);
+    evt->setCurrentTarget(this);
+    listenerIter->get()->handleEvent(evt.get(), false);
+  }
 
   return !evt->defaultPrevented();
 }
@@ -270,18 +275,29 @@ void XMLHttpRequest::changeState(XMLHttpRequestState newState) {
 }
 
 void XMLHttpRequest::callReadyStateChangeListener() {
-  if (m_doc && m_doc->frame() && m_onReadyStateChangeListener)
-    m_onReadyStateChangeListener->handleEvent(
-        new Event(readystatechangeEvent, true, true), true);
+  if (m_doc && m_doc->frame() && m_onReadyStateChangeListener) {
+    RefPtr<Event> evt = new Event(readystatechangeEvent, true, true);
+    evt->setTarget(this);
+    evt->setCurrentTarget(this);
+    m_onReadyStateChangeListener->handleEvent(evt.get(), false);
+  }
 
   if (m_doc && m_doc->frame() && m_state == Loaded) {
-    if (m_onLoadListener)
-      m_onLoadListener->handleEvent(new Event(loadEvent, true, true), true);
+    if (m_onLoadListener) {
+      RefPtr<Event> evt = new Event(loadEvent, true, true);
+      evt->setTarget(this);
+      evt->setCurrentTarget(this);
+      m_onLoadListener->handleEvent(evt.get(), false);
+    }
 
     ListenerVector listenersCopy = m_eventListeners.get(loadEvent.impl());
     for (ListenerVector::const_iterator listenerIter = listenersCopy.begin();
-         listenerIter != listenersCopy.end(); ++listenerIter)
-      listenerIter->get()->handleEvent(new Event(loadEvent, true, true), true);
+         listenerIter != listenersCopy.end(); ++listenerIter) {
+      RefPtr<Event> evt = new Event(loadEvent, true, true);
+      evt->setTarget(this);
+      evt->setCurrentTarget(this);
+      listenerIter->get()->handleEvent(evt.get(), false);
+    }
   }
 }
 
