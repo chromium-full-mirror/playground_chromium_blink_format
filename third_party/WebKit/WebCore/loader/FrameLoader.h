@@ -283,7 +283,7 @@ class FrameLoader : Noncopyable {
 #if PLATFORM(MAC)
   ResourceError cancelledError(NSURLRequest*) const;
   ResourceError fileDoesNotExistError(NSURLResponse*) const;
-  bool willUseArchive(ResourceLoader*, NSURLRequest*, NSURL*) const;
+  bool willUseArchive(ResourceLoader*, NSURLRequest*, const KURL&) const;
 #endif
   bool isArchiveLoadPending(ResourceLoader*) const;
 #if PLATFORM(MAC)

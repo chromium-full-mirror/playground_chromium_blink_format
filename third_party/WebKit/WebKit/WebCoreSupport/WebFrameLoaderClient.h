@@ -222,7 +222,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual bool willUseArchive(WebCore::ResourceLoader*,
                               NSURLRequest*,
-                              NSURL* originalURL) const;
+                              const WebCore::KURL& originalURL) const;
   virtual bool isArchiveLoadPending(WebCore::ResourceLoader*) const;
   virtual void cancelPendingArchiveLoad(WebCore::ResourceLoader*);
   virtual void clearArchivedResources();

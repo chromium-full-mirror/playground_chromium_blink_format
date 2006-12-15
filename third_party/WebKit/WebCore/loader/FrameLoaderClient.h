@@ -242,7 +242,7 @@ class FrameLoaderClient {
 #if PLATFORM(MAC)
   virtual bool willUseArchive(ResourceLoader*,
                               NSURLRequest*,
-                              NSURL* originalURL) const = 0;
+                              const KURL& originalURL) const = 0;
 #endif
   virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;
   virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
