@@ -131,7 +131,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                         id identifier);
   virtual void dispatchDidFailLoading(WebCore::DocumentLoader*,
                                       id identifier,
-                                      NSError*);
+                                      const WebCore::ResourceError&);
 
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
@@ -145,8 +145,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidStartProvisionalLoad();
   virtual void dispatchDidReceiveTitle(const WebCore::String& title);
   virtual void dispatchDidCommitLoad();
-  virtual void dispatchDidFailProvisionalLoad(NSError*);
-  virtual void dispatchDidFailLoad(NSError*);
+  virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
+  virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
 
@@ -167,7 +167,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::ResourceRequest&);
   virtual void cancelPolicyCheck();
 
-  virtual void dispatchUnableToImplementPolicy(NSError*);
+  virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
 
   virtual void dispatchWillSubmitForm(WebCore::FramePolicyFunction,
                                       PassRefPtr<WebCore::FormState>);
@@ -176,7 +176,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void clearLoadingFromPageCache(WebCore::DocumentLoader*);
   virtual bool isLoadingFromPageCache(WebCore::DocumentLoader*);
   virtual void revertToProvisionalState(WebCore::DocumentLoader*);
-  virtual void setMainDocumentError(WebCore::DocumentLoader*, NSError*);
+  virtual void setMainDocumentError(WebCore::DocumentLoader*,
+                                    const WebCore::ResourceError&);
   virtual void clearUnarchivingState(WebCore::DocumentLoader*);
   virtual bool dispatchDidLoadResourceFromMemoryCache(WebCore::DocumentLoader*,
                                                       NSURLRequest*,
@@ -201,14 +202,19 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void finishedLoading(WebCore::DocumentLoader*);
   virtual void finalSetupForReplace(WebCore::DocumentLoader*);
 
-  virtual NSError* cancelledError(NSURLRequest*);
-  virtual NSError* cannotShowURLError(const WebCore::ResourceRequest&);
-  virtual NSError* interruptForPolicyChangeError(NSURLRequest*);
+  virtual WebCore::ResourceError cancelledError(
+      const WebCore::ResourceRequest&);
+  virtual WebCore::ResourceError cannotShowURLError(
+      const WebCore::ResourceRequest&);
+  virtual WebCore::ResourceError interruptForPolicyChangeError(
+      const WebCore::ResourceRequest&);
 
-  virtual NSError* cannotShowMIMETypeError(NSURLResponse*);
-  virtual NSError* fileDoesNotExistError(NSURLResponse*);
+  virtual WebCore::ResourceError cannotShowMIMETypeError(
+      const WebCore::ResourceResponse&);
+  virtual WebCore::ResourceError fileDoesNotExistError(
+      const WebCore::ResourceResponse&);
 
-  virtual bool shouldFallBack(NSError*);
+  virtual bool shouldFallBack(const WebCore::ResourceError&);
 
   virtual void setDefersLoading(bool);
 

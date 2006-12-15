@@ -84,19 +84,19 @@ class ResourceError {
 
   bool isNull() const { return m_isNull; }
 
-  const String& domain() {
+  const String& domain() const {
     unpackPlatformErrorIfNeeded();
     return m_domain;
   }
-  int errorCode() {
+  int errorCode() const {
     unpackPlatformErrorIfNeeded();
     return m_errorCode;
   }
-  const String& failingURL() {
+  const String& failingURL() const {
     unpackPlatformErrorIfNeeded();
     return m_failingURL;
   }
-  const String& localizedDescription() {
+  const String& localizedDescription() const {
     unpackPlatformErrorIfNeeded();
     return m_localizedDescription;
   }
@@ -106,10 +106,10 @@ class ResourceError {
 #endif
 
  private:
-  void unpackPlatformErrorIfNeeded() {
+  void unpackPlatformErrorIfNeeded() const {
 #if PLATFORM(MAC)
     if (!m_dataIsUpToDate)
-      unpackPlatformError();
+      const_cast<ResourceError*>(this)->unpackPlatformError();
 #endif
   }
 

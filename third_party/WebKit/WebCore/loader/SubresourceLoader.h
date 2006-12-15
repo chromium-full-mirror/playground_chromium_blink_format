@@ -67,7 +67,7 @@ class SubresourceLoader : public ResourceLoader {
                               long long lengthReceived,
                               bool allAtOnce);
   virtual void didFinishLoading();
-  virtual void didFail(NSError*);
+  virtual void didFail(const ResourceError&);
 #else
   virtual void willSendRequest(ResourceHandle*,
                                ResourceRequest&,
@@ -85,9 +85,7 @@ class SubresourceLoader : public ResourceLoader {
  private:
   SubresourceLoader(Frame*, SubresourceLoaderClient*);
 
-#if PLATFORM(MAC)
-  virtual void didCancel(NSError*);
-#endif
+  virtual void didCancel(const ResourceError&);
   SubresourceLoaderClient* m_client;
   bool m_loadingMultipartContent;
 };

@@ -50,9 +50,11 @@ class FrameLoader;
 class KURL;
 class NavigationAction;
 class String;
+class ResourceError;
 class ResourceHandle;
 class ResourceLoader;
 class ResourceRequest;
+class ResourceResponse;
 
 struct LoadErrorResetToken;
 
@@ -136,7 +138,7 @@ class FrameLoaderClient {
   virtual void dispatchDidFinishLoading(DocumentLoader*, id identifier) = 0;
   virtual void dispatchDidFailLoading(DocumentLoader*,
                                       id identifier,
-                                      NSError*) = 0;
+                                      const ResourceError&) = 0;
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
                                                       NSURLRequest*,
                                                       NSURLResponse*,
@@ -156,8 +158,8 @@ class FrameLoaderClient {
   virtual void dispatchDidReceiveTitle(const String& title) = 0;
   virtual void dispatchDidCommitLoad() = 0;
 #if PLATFORM(MAC)
-  virtual void dispatchDidFailProvisionalLoad(NSError*) = 0;
-  virtual void dispatchDidFailLoad(NSError*) = 0;
+  virtual void dispatchDidFailProvisionalLoad(const ResourceError&) = 0;
+  virtual void dispatchDidFailLoad(const ResourceError&) = 0;
 #endif
   virtual void dispatchDidFinishLoad() = 0;
   virtual void dispatchDidFirstLayout() = 0;
@@ -184,7 +186,7 @@ class FrameLoaderClient {
   virtual void cancelPolicyCheck() = 0;
 
 #if PLATFORM(MAC)
-  virtual void dispatchUnableToImplementPolicy(NSError*) = 0;
+  virtual void dispatchUnableToImplementPolicy(const ResourceError&) = 0;
 #endif
 
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
@@ -195,7 +197,7 @@ class FrameLoaderClient {
   virtual bool isLoadingFromPageCache(DocumentLoader*) = 0;
   virtual void revertToProvisionalState(DocumentLoader*) = 0;
 #if PLATFORM(MAC)
-  virtual void setMainDocumentError(DocumentLoader*, NSError*) = 0;
+  virtual void setMainDocumentError(DocumentLoader*, const ResourceError&) = 0;
 #endif
   virtual void clearUnarchivingState(DocumentLoader*) = 0;
 
@@ -224,14 +226,15 @@ class FrameLoaderClient {
   virtual void finalSetupForReplace(DocumentLoader*) = 0;
 
 #if PLATFORM(MAC)
-  virtual NSError* cancelledError(NSURLRequest*) = 0;
-  virtual NSError* cannotShowURLError(const ResourceRequest&) = 0;
-  virtual NSError* interruptForPolicyChangeError(NSURLRequest*) = 0;
+  virtual ResourceError cancelledError(const ResourceRequest&) = 0;
+  virtual ResourceError cannotShowURLError(const ResourceRequest&) = 0;
+  virtual ResourceError interruptForPolicyChangeError(
+      const ResourceRequest&) = 0;
 
-  virtual NSError* cannotShowMIMETypeError(NSURLResponse*) = 0;
-  virtual NSError* fileDoesNotExistError(NSURLResponse*) = 0;
+  virtual ResourceError cannotShowMIMETypeError(const ResourceResponse&) = 0;
+  virtual ResourceError fileDoesNotExistError(const ResourceResponse&) = 0;
 
-  virtual bool shouldFallBack(NSError*) = 0;
+  virtual bool shouldFallBack(const ResourceError&) = 0;
 #endif
 
   virtual void setDefersLoading(bool) = 0;

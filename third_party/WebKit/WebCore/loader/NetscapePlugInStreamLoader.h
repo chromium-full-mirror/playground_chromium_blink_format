@@ -57,7 +57,7 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
                               long long lengthReceived,
                               bool allAtOnce);
   virtual void didFinishLoading();
-  virtual void didFail(NSError*);
+  virtual void didFail(const ResourceError&);
 
   virtual void releaseResources();
 #endif
@@ -66,7 +66,7 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
   NetscapePlugInStreamLoader(Frame*, PlugInStreamLoaderDelegate);
 
 #if PLATFORM(MAC)
-  virtual void didCancel(NSError*);
+  virtual void didCancel(const ResourceError& error);
 
   RetainPtr<PlugInStreamLoaderDelegate> m_stream;
 #endif
