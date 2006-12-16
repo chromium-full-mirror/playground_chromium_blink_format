@@ -308,12 +308,11 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
     // FIXME: Uncomment this when making search fields style-able.
     // case SearchFieldAppearance:
     case TextFieldAppearance:
-    case TextAreaAppearance: {
+    case TextAreaAppearance:
       // Test the style to see if the UA border and background match.
       return (style->border() != border ||
               *style->backgroundLayers() != background ||
               style->backgroundColor() != backgroundColor);
-    }
     default:
       return false;
   }
@@ -481,4 +480,5 @@ void RenderTheme::adjustSearchFieldResultsButtonStyle(
     CSSStyleSelector* selector,
     RenderStyle* style,
     Element* e) const {}
-}
+
+}  // namespace WebCore

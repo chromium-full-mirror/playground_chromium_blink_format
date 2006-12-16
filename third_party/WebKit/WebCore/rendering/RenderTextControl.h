@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef RenderTextField_H
-#define RenderTextField_H
+#ifndef RenderTextControl_h
+#define RenderTextControl_h
 
 #include "PopupMenuClient.h"
 #include "RenderBlock.h"
@@ -37,14 +37,15 @@ class RenderTextControl : public RenderBlock, public PopupMenuClient {
   RenderTextControl(Node*, bool multiLine);
   virtual ~RenderTextControl();
 
+  virtual const char* renderName() const { return "RenderTextField"; }
+
   virtual void calcHeight();
   virtual void calcMinMaxWidth();
-  virtual const char* renderName() const { return "RenderTextField"; }
   virtual void removeLeftoverAnonymousBoxes() {}
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
   virtual bool canHaveChildren() const { return false; }
-  virtual short baselinePosition(bool, bool) const;
+  virtual short baselinePosition(bool firstLine, bool isRootLineBox) const;
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,
@@ -65,7 +66,7 @@ class RenderTextControl : public RenderBlock, public PopupMenuClient {
   void setSelectionStart(int);
   void setSelectionEnd(int);
   void select();
-  void setSelectionRange(int, int);
+  void setSelectionRange(int start, int end);
 
   void subtreeHasChanged();
   String text();
@@ -80,9 +81,9 @@ class RenderTextControl : public RenderBlock, public PopupMenuClient {
   virtual int scrollHeight() const;
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
-  virtual bool scroll(ScrollDirection direction,
-                      ScrollGranularity granularity,
-                      float multiplier = 1.0);
+  virtual bool scroll(ScrollDirection,
+                      ScrollGranularity,
+                      float multiplier = 1.0f);
 
   VisiblePosition visiblePositionForIndex(int index);
   int indexForVisiblePosition(const VisiblePosition&);
@@ -137,6 +138,7 @@ class RenderTextControl : public RenderBlock, public PopupMenuClient {
   bool m_searchPopupIsVisible;
   mutable Vector<String> m_recentSearches;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderTextControl_h

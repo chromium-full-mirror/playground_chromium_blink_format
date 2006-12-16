@@ -23,6 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef SVGRenderTreeAsText_h
+#define SVGRenderTreeAsText_h
+
+#ifdef SVG_SUPPORT
+
 #include "DeprecatedString.h"
 #include "TextStream.h"
 
@@ -35,8 +40,6 @@ class FloatRect;
 class FloatSize;
 class IntPoint;
 class IntRect;
-class KCClipData;
-class KCPathData;
 class Node;
 class RenderPath;
 class RenderSVGContainer;
@@ -87,4 +90,9 @@ TextStream& operator<<(TextStream& ts, const Vector<Item>& v) {
   ts << "]";
   return ts;
 }
-}
+
+}  // namespace WebCore
+
+#endif  // SVG_SUPPORT
+
+#endif  // SVGRenderTreeAsText_h

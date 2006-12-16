@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef TableLayout_H
-#define TableLayout_H
+#ifndef TableLayout_h
+#define TableLayout_h
 
 namespace WebCore {
 
@@ -30,6 +30,7 @@ class RenderTable;
 class TableLayout {
  public:
   TableLayout(RenderTable* table) : m_table(table) {}
+
   virtual ~TableLayout() {}
 
   virtual void calcMinMaxWidth() = 0;
@@ -41,4 +42,4 @@ class TableLayout {
 
 }  // namespace WebCore
 
-#endif  // TableLayout_H
+#endif  // TableLayout_h

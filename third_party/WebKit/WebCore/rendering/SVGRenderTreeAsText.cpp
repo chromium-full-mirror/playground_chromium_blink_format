@@ -26,18 +26,20 @@
  */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
+
 #include "SVGRenderTreeAsText.h"
 
-#include "SVGResourceClipper.h"
 #include "GraphicsTypes.h"
 #include "HTMLNames.h"
-#include "RenderTreeAsText.h"
+#include "KCanvasRenderingStyle.h"
 #include "RenderSVGContainer.h"
+#include "RenderTreeAsText.h"
 #include "SVGPaintServerGradient.h"
 #include "SVGPaintServerPattern.h"
 #include "SVGPaintServerSolid.h"
-#include "KCanvasRenderingStyle.h"
+#include "SVGResourceClipper.h"
 #include "SVGStyledElement.h"
 #include <math.h>
 
@@ -55,9 +57,8 @@ class TextStreamSeparator {
       : m_separator(s), m_needToSeparate(false) {}
 
  private:
-  friend TextStream& operator<<(TextStream& ts, TextStreamSeparator& sep);
+  friend TextStream& operator<<(TextStream&, TextStreamSeparator&);
 
- private:
   DeprecatedString m_separator;
   bool m_needToSeparate;
 };
@@ -81,9 +82,9 @@ TextStream& operator<<(TextStream& ts, const IntRect& r) {
 
 bool hasFractions(double val) {
   double epsilon = 0.0001;
-  int ival = int(val);
-  double dval = double(ival);
-  return (fabs(val - dval) > epsilon);
+  int ival = static_cast<int>(val);
+  double dval = static_cast<double>(ival);
+  return fabs(val - dval) > epsilon;
 }
 
 TextStream& operator<<(TextStream& ts, const FloatRect& r) {
@@ -138,14 +139,13 @@ TextStream& operator<<(TextStream& ts, const FloatSize& s) {
   return ts;
 }
 
-TextStream& operator<<(TextStream& ts, const AffineTransform& m) {
-  if (m.isIdentity())
+TextStream& operator<<(TextStream& ts, const AffineTransform& transform) {
+  if (transform.isIdentity())
     ts << "identity";
-  else {
-    ts << "{m=((" << m.a() << "," << m.b() << ")(" << m.c() << "," << m.d()
-       << "))";
-    ts << " t=(" << m.e() << "," << m.f() << ")}";
-  }
+  else
+    ts << "{m=((" << transform.a() << "," << transform.b() << ")("
+       << transform.c() << "," << transform.d() << ")) t=(" << transform.e()
+       << "," << transform.f() << ")}";
 
   return ts;
 }
@@ -155,12 +155,11 @@ TextStream& operator<<(TextStream& ts, const Color& c) {
 }
 
 static void writeIndent(TextStream& ts, int indent) {
-  for (int i = 0; i != indent; ++i) {
+  for (int i = 0; i != indent; ++i)
     ts << "  ";
-  }
 }
 
-// FIXME: This should be in KRenderingStyle.cpp
+// FIXME: Maybe this should be in KCanvasRenderingStyle.cpp
 static TextStream& operator<<(TextStream& ts, const KCDashArray& a) {
   ts << "{";
   KCDashArray::const_iterator end = a.end();
@@ -173,7 +172,7 @@ static TextStream& operator<<(TextStream& ts, const KCDashArray& a) {
   return ts;
 }
 
-// FIXME: This should be in KRenderingStyle.cpp
+// FIXME: Maybe this should be in GraphicsTypes.cpp
 static TextStream& operator<<(TextStream& ts, LineCap style) {
   switch (style) {
     case ButtCap:
@@ -189,7 +188,7 @@ static TextStream& operator<<(TextStream& ts, LineCap style) {
   return ts;
 }
 
-// FIXME: This should be in KRenderingStyle.cpp
+// FIXME: Maybe this should be in GraphicsTypes.cpp
 static TextStream& operator<<(TextStream& ts, LineJoin style) {
   switch (style) {
     case MiterJoin:
@@ -204,15 +203,6 @@ static TextStream& operator<<(TextStream& ts, LineJoin style) {
   }
   return ts;
 }
-
-#define DIFFERS_FROM_PARENT(path) \
-  (!parentStyle || (parentStyle->path != childStyle->path))
-// avoids testing path if pred is false. This is used with tests that have
-// side-effects
-// for the parent object
-#define DIFFERS_FROM_PARENT_AVOID_TEST_IF_FALSE(pred, path) \
-  (!parentStyle ||                                          \
-   ((!parentStyle->pred) || (parentStyle->path != childStyle->path)))
 
 static void writeStyle(TextStream& ts, const RenderObject& object) {
   const RenderStyle* style = object.style();
@@ -283,23 +273,22 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
   if (!svgStyle->filter().isEmpty())
     ts << " [filter=" << svgStyle->filter() << "]";
 }
-#undef DIFFERS_FROM_PARENT
-#undef DIFFERS_FROM_PARENT_AVOID_TEST_IF_FALSE
 
-static TextStream& operator<<(TextStream& ts, const RenderPath& o) {
-  ts << " " << o.absoluteTransform().mapRect(o.relativeBBox());
+static TextStream& operator<<(TextStream& ts, const RenderPath& path) {
+  ts << " " << path.absoluteTransform().mapRect(path.relativeBBox());
 
-  writeStyle(ts, o);
+  writeStyle(ts, path);
 
-  ts << " [data=\"" << o.path().debugString() << "\"]";
+  ts << " [data=\"" << path.path().debugString() << "\"]";
 
   return ts;
 }
 
-static TextStream& operator<<(TextStream& ts, const RenderSVGContainer& o) {
-  ts << " " << o.absoluteTransform().mapRect(o.relativeBBox());
+static TextStream& operator<<(TextStream& ts,
+                              const RenderSVGContainer& container) {
+  ts << " " << container.absoluteTransform().mapRect(container.relativeBBox());
 
-  writeStyle(ts, o);
+  writeStyle(ts, container);
 
   return ts;
 }
@@ -323,7 +312,7 @@ void write(TextStream& ts, const RenderSVGContainer& container, int indent) {
 
   ts << container << endl;
 
-  for (RenderObject* child = container.firstChild(); child != NULL;
+  for (RenderObject* child = container.firstChild(); child;
        child = child->nextSibling())
     write(ts, *child, indent + 1);
 }
@@ -368,6 +357,7 @@ void writeRenderResources(TextStream& ts, Node* parent) {
          << endl;
   } while ((node = node->traverseNextNode(parent)));
 }
-}
+
+}  // namespace WebCore
 
 #endif  // SVG_SUPPORT

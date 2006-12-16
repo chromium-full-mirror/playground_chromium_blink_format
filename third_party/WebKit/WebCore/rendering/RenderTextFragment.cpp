@@ -25,8 +25,6 @@
 #include "config.h"
 #include "RenderTextFragment.h"
 
-using namespace WebCore;
-
 namespace WebCore {
 
 RenderTextFragment::RenderTextFragment(Node* node,
@@ -46,16 +44,8 @@ RenderTextFragment::RenderTextFragment(Node* node, StringImpl* str)
       m_generatedContentStr(str),
       m_firstLetter(0) {}
 
-bool RenderTextFragment::isTextFragment() const {
-  return true;
-}
-
 PassRefPtr<StringImpl> RenderTextFragment::originalString() const {
-  StringImpl* result = 0;
-  if (element())
-    result = element()->string();
-  else
-    result = contentString();
+  StringImpl* result = (element() ? element()->string() : contentString());
   if (result && (start() > 0 || start() < result->length()))
     result = result->substring(start(), end());
   return result;
@@ -66,4 +56,5 @@ void RenderTextFragment::destroy() {
     firstLetter()->destroy();
   RenderText::destroy();
 }
-}
+
+}  // namespace WebCore

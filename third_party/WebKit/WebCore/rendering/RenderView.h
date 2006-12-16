@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef render_canvas_h
-#define render_canvas_h
+#ifndef RenderView_h
+#define RenderView_h
 
 #include "RenderBlock.h"
 
@@ -43,7 +43,7 @@ class RenderView : public RenderBlock {
   virtual void calcWidth();
   virtual void calcHeight();
   virtual void calcMinMaxWidth();
-  virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
+  virtual bool absolutePosition(int& xPos, int& yPos, bool fixed = false);
 
   int docHeight() const;
   int docWidth() const;
@@ -52,12 +52,15 @@ class RenderView : public RenderBlock {
 
   virtual bool hasOverhangingFloats() { return false; }
 
-  virtual void repaintViewRectangle(const IntRect& r, bool immediate = false);
+  virtual void repaintViewRectangle(const IntRect&, bool immediate = false);
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
 
-  void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
+  void setSelection(RenderObject* start,
+                    int startPos,
+                    RenderObject* end,
+                    int endPos);
   void clearSelection();
   virtual RenderObject* selectionStart() const { return m_selectionStart; }
   virtual RenderObject* selectionEnd() const { return m_selectionEnd; }
@@ -76,12 +79,6 @@ class RenderView : public RenderBlock {
                           bool forcedBreak = false);
   int bestTruncatedAt() const { return m_bestTruncatedAt; }
 
- private:
-  int m_bestTruncatedAt;
-  int m_truncatorWidth;
-  bool m_forcedPageBreak;
-
- public:
   int truncatedAt() const { return m_truncatedAt; }
 
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
@@ -93,7 +90,7 @@ class RenderView : public RenderBlock {
 
   virtual IntRect viewRect() const;
 
-  virtual void selectionStartEnd(int& spos, int& epos);
+  virtual void selectionStartEnd(int& startPos, int& endPos);
 
   IntRect printRect() const { return m_printRect; }
   void setPrintRect(const IntRect& r) { m_printRect = r; }
@@ -127,7 +124,13 @@ class RenderView : public RenderBlock {
   RenderObjectSet m_widgets;
 
   RenderObject* m_flexBoxInFirstLayout;
-};
-}
 
-#endif
+ private:
+  int m_bestTruncatedAt;
+  int m_truncatorWidth;
+  bool m_forcedPageBreak;
+};
+
+}  // namespace WebCore
+
+#endif  // RenderView_h

@@ -21,6 +21,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #include "config.h"
 #include "RenderWidget.h"
 
@@ -60,8 +61,8 @@ void RenderWidget::destroy() {
   // both RenderBox::destroy() and RenderObject::destroy().
   // Fix originally made for <rdar://problem/4228818>.
 
-  if (RenderView* c = view())
-    c->removeWidget(this);
+  if (RenderView* v = view())
+    v->removeWidget(this);
 
   document()->axObjectCache()->remove(this);
 
@@ -143,8 +144,8 @@ void RenderWidget::sendConsumedMouseUp(Widget*) {
   deref(arena);
 }
 
-void RenderWidget::setStyle(RenderStyle* _style) {
-  RenderReplaced::setStyle(_style);
+void RenderWidget::setStyle(RenderStyle* newStyle) {
+  RenderReplaced::setStyle(newStyle);
   if (m_widget) {
     m_widget->setFont(style()->font());
     if (style()->visibility() != VISIBLE)
@@ -235,23 +236,26 @@ void RenderWidget::updateWidgetPosition() {
   if (!m_widget)
     return;
 
-  int x, y, width, height;
+  int x;
+  int y;
   absolutePosition(x, y);
   x += borderLeft() + paddingLeft();
   y += borderTop() + paddingTop();
-  width =
+
+  int width =
       m_width - borderLeft() - borderRight() - paddingLeft() - paddingRight();
-  height =
+  int height =
       m_height - borderTop() - borderBottom() - paddingTop() - paddingBottom();
+
   IntRect newBounds(x, y, width, height);
   IntRect oldBounds(m_widget->frameGeometry());
   if (newBounds != oldBounds) {
     // The widget changed positions.  Update the frame geometry.
     if (checkForRepaintDuringLayout()) {
-      RenderView* c = view();
-      if (!c->printingMode()) {
-        c->repaintViewRectangle(oldBounds);
-        c->repaintViewRectangle(newBounds);
+      RenderView* v = view();
+      if (!v->printingMode()) {
+        v->repaintViewRectangle(oldBounds);
+        v->repaintViewRectangle(newBounds);
       }
     }
 
@@ -263,10 +267,10 @@ void RenderWidget::updateWidgetPosition() {
   }
 }
 
-void RenderWidget::setSelectionState(SelectionState s) {
-  if (selectionState() != s) {
-    RenderReplaced::setSelectionState(s);
-    m_selectionState = s;
+void RenderWidget::setSelectionState(SelectionState state) {
+  if (selectionState() != state) {
+    RenderReplaced::setSelectionState(state);
+    m_selectionState = state;
     if (m_widget)
       m_widget->setIsSelected(isSelected());
   }
@@ -275,4 +279,5 @@ void RenderWidget::setSelectionState(SelectionState s) {
 void RenderWidget::deleteWidget() {
   delete m_widget;
 }
-}
+
+}  // namespace WebCore

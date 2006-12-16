@@ -34,8 +34,8 @@
 #include "InlineTextBox.h"
 #include "JSEditor.h"
 #include "RenderBR.h"
-#include "RenderView.h"
 #include "RenderTableCell.h"
+#include "RenderView.h"
 #include "RenderWidget.h"
 #include "SelectionController.h"
 #include <wtf/Vector.h>
@@ -63,9 +63,8 @@ static TextStream& operator<<(TextStream& ts, const IntRect& r) {
 #endif
 
 static void writeIndent(TextStream& ts, int indent) {
-  for (int i = 0; i != indent; ++i) {
+  for (int i = 0; i != indent; ++i)
     ts << "  ";
-  }
 }
 
 static void printBorderStyle(TextStream& ts,
@@ -133,9 +132,8 @@ static bool isEmptyOrUnstyledAppleStyleSpan(const Node* node) {
 static TextStream& operator<<(TextStream& ts, const RenderObject& o) {
   ts << o.renderName();
 
-  if (o.style() && o.style()->zIndex()) {
+  if (o.style() && o.style()->zIndex())
     ts << " zI: " << o.style()->zIndex();
-  }
 
   if (o.element()) {
     DeprecatedString tagName = getTagName(o.element());
@@ -336,8 +334,7 @@ static void write(TextStream& ts,
                   int indent = 0) {
   writeIndent(ts, indent);
 
-  ts << "layer";
-  ts << " " << layerBounds;
+  ts << "layer " << layerBounds;
 
   if (!layerBounds.isEmpty()) {
     if (!backgroundClipRect.contains(layerBounds))
@@ -415,14 +412,14 @@ static void writeLayers(TextStream& ts,
 static DeprecatedString nodePosition(Node* node) {
   DeprecatedString result;
 
-  Node* p;
-  for (Node* n = node; n; n = p) {
-    p = n->parentNode();
-    if (!p)
-      p = n->shadowParentNode();
+  Node* parent;
+  for (Node* n = node; n; n = parent) {
+    parent = n->parentNode();
+    if (!parent)
+      parent = n->shadowParentNode();
     if (n != node)
       result += " of ";
-    if (p)
+    if (parent)
       result += "child " + DeprecatedString::number(n->nodeIndex()) + " {" +
                 getTagName(n) + "}";
     else
@@ -449,12 +446,11 @@ static void writeSelection(TextStream& ts, const RenderObject* o) {
     if (selection.affinity() == UPSTREAM)
       ts << " (upstream affinity)";
     ts << "\n";
-  } else if (selection.isRange()) {
+  } else if (selection.isRange())
     ts << "selection start: position " << selection.start().offset() << " of "
        << nodePosition(selection.start().node()) << "\n"
        << "selection end:   position " << selection.end().offset() << " of "
        << nodePosition(selection.end().node()) << "\n";
-  }
 }
 
 DeprecatedString externalRepresentation(RenderObject* o) {
@@ -477,4 +473,5 @@ DeprecatedString externalRepresentation(RenderObject* o) {
   }
   return s;
 }
-}
+
+}  // namespace WebCore

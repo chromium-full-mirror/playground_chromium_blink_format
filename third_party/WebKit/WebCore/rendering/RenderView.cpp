@@ -30,9 +30,17 @@
 
 namespace WebCore {
 
-//#define BOX_DEBUG
-
-RenderView::RenderView(Node* node, FrameView* view) : RenderBlock(node) {
+RenderView::RenderView(Node* node, FrameView* view)
+    : RenderBlock(node),
+      m_frameView(view),
+      m_selectionStart(0),
+      m_selectionEnd(0),
+      m_selectionStartPos(-1),
+      m_selectionEndPos(-1),
+      m_printingMode(false),
+      m_printImages(true),
+      m_maximalOutlineSize(0),
+      m_flexBoxInFirstLayout(0) {
   // Clear our anonymous bit, set because RenderObject assumes
   // any renderer with document as the node is anonymous.
   setIsAnonymous(false);
@@ -40,31 +48,16 @@ RenderView::RenderView(Node* node, FrameView* view) : RenderBlock(node) {
   // init RenderObject attributes
   setInline(false);
 
-  m_frameView = view;
   // try to contrain the width to the views width
-
-  m_minWidth = 0;
+  m_width = 0;
   m_height = 0;
-
-  m_width = m_minWidth;
-  m_maxWidth = m_minWidth;
+  m_minWidth = 0;
+  m_maxWidth = 0;
 
   setPositioned(true);  // to 0,0 :)
 
-  m_printingMode = false;
-  m_printImages = true;
-
-  m_maximalOutlineSize = 0;
-
-  m_selectionStart = 0;
-  m_selectionEnd = 0;
-  m_selectionStartPos = -1;
-  m_selectionEndPos = -1;
-
   // Create a new root layer for our layer hierarchy.
   m_layer = new (node->document()->renderArena()) RenderLayer(this);
-
-  m_flexBoxInFirstLayout = 0;
 }
 
 RenderView::~RenderView() {}
@@ -120,7 +113,7 @@ void RenderView::layout() {
     setHeight(m_frameView->visibleHeight());
   }
 
-  // ### we could maybe do the call below better and only pass true if the
+  // FIXME: we could maybe do the call below better and only pass true if the
   // docsize changed.
   layoutPositionedObjects(true);
 
@@ -130,8 +123,8 @@ void RenderView::layout() {
   setNeedsLayout(false);
 }
 
-bool RenderView::absolutePosition(int& xPos, int& yPos, bool f) {
-  if (f && m_frameView) {
+bool RenderView::absolutePosition(int& xPos, int& yPos, bool fixed) {
+  if (fixed && m_frameView) {
     xPos = m_frameView->contentsX();
     yPos = m_frameView->contentsY();
   } else
@@ -218,6 +211,7 @@ void RenderView::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
 RenderObject* rendererAfterPosition(RenderObject* object, unsigned offset) {
   if (!object)
     return 0;
+
   RenderObject* child = object->childAt(offset);
   return child ? child : object->nextInPreOrderAfterChildren();
 }
@@ -260,19 +254,19 @@ IntRect RenderView::selectionRect() const {
   return selRect;
 }
 
-void RenderView::setSelection(RenderObject* s,
-                              int sp,
-                              RenderObject* e,
-                              int ep) {
+void RenderView::setSelection(RenderObject* start,
+                              int startPos,
+                              RenderObject* end,
+                              int endPos) {
   // Make sure both our start and end objects are defined.
   // Check www.msnbc.com and try clicking around to find the case where this
   // happened.
-  if ((s && !e) || (e && !s))
+  if ((start && !end) || (end && !start))
     return;
 
   // Just return if the selection hasn't changed.
-  if (m_selectionStart == s && m_selectionStartPos == sp &&
-      m_selectionEnd == e && m_selectionEndPos == ep)
+  if (m_selectionStart == start && m_selectionStartPos == startPos &&
+      m_selectionEnd == end && m_selectionEndPos == endPos)
     return;
 
   // Record the old selected objects.  These will be used later
@@ -324,27 +318,27 @@ void RenderView::setSelection(RenderObject* s,
     i->first->setSelectionState(SelectionNone);
 
   // set selection start and end
-  m_selectionStart = s;
-  m_selectionStartPos = sp;
-  m_selectionEnd = e;
-  m_selectionEndPos = ep;
+  m_selectionStart = start;
+  m_selectionStartPos = startPos;
+  m_selectionEnd = end;
+  m_selectionEndPos = endPos;
 
   // Update the selection status of all objects between m_selectionStart and
   // m_selectionEnd
-  if (s && s == e)
-    s->setSelectionState(SelectionBoth);
+  if (start && start == end)
+    start->setSelectionState(SelectionBoth);
   else {
-    if (s)
-      s->setSelectionState(SelectionStart);
-    if (e)
-      e->setSelectionState(SelectionEnd);
+    if (start)
+      start->setSelectionState(SelectionStart);
+    if (end)
+      end->setSelectionState(SelectionEnd);
   }
 
-  RenderObject* o = s;
-  stop = rendererAfterPosition(e, ep);
+  RenderObject* o = start;
+  stop = rendererAfterPosition(end, endPos);
 
   while (o && o != stop) {
-    if (o != s && o != e && o->canBeSelectionLeaf())
+    if (o != start && o != end && o->canBeSelectionLeaf())
       o->setSelectionState(SelectionInside);
     o = o->nextInPreOrder();
   }
@@ -352,9 +346,9 @@ void RenderView::setSelection(RenderObject* s,
   // Now that the selection state has been updated for the new objects, walk
   // them again and
   // put them in the new objects list.
-  o = s;
+  o = start;
   while (o && o != stop) {
-    if ((o->canBeSelectionLeaf() || o == s || o == e) &&
+    if ((o->canBeSelectionLeaf() || o == start || o == end) &&
         o->selectionState() != SelectionNone) {
       newSelectedObjects.set(o, new SelectionInfo(o));
       RenderBlock* cb = o->containingBlock();
@@ -444,16 +438,15 @@ void RenderView::clearSelection() {
   setSelection(0, -1, 0, -1);
 }
 
-void RenderView::selectionStartEnd(int& spos, int& epos) {
-  spos = m_selectionStartPos;
-  epos = m_selectionEndPos;
+void RenderView::selectionStartEnd(int& startPos, int& endPos) {
+  startPos = m_selectionStartPos;
+  endPos = m_selectionEndPos;
 }
 
 void RenderView::updateWidgetPositions() {
   RenderObjectSet::iterator end = m_widgets.end();
-  for (RenderObjectSet::iterator it = m_widgets.begin(); it != end; ++it) {
+  for (RenderObjectSet::iterator it = m_widgets.begin(); it != end; ++it)
     (*it)->updateWidgetPosition();
-  }
 }
 
 void RenderView::addWidget(RenderObject* o) {
@@ -488,9 +481,9 @@ int RenderView::docHeight() const {
   // Instead of this dh computation we should keep the result
   // when we call RenderBlock::layout.
   int dh = 0;
-  for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
+  for (RenderObject* c = firstChild(); c; c = c->nextSibling())
     dh += c->height() + c->marginTop() + c->marginBottom();
-  }
+
   if (dh > h)
     h = dh;
 
@@ -513,6 +506,7 @@ int RenderView::docWidth() const {
     if (dw > w)
       w = dw;
   }
+
   return w;
 }
 
@@ -540,4 +534,5 @@ void RenderView::setBestTruncatedAt(int y,
     m_bestTruncatedAt = y;
   }
 }
-}
+
+}  // namespace WebCore

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RENDER_THEME_MAC_H
-#define RENDER_THEME_MAC_H
+#ifndef RenderThemeMac_h
+#define RenderThemeMac_h
 
 #import "RenderTheme.h"
 
@@ -52,9 +52,9 @@ class RenderThemeMac : public RenderTheme {
 
   virtual void adjustRepaintRect(const RenderObject*, IntRect&);
 
-  virtual bool isControlStyled(const RenderStyle* style,
-                               const BorderData& border,
-                               const BackgroundLayer& background,
+  virtual bool isControlStyled(const RenderStyle*,
+                               const BorderData&,
+                               const BackgroundLayer&,
                                const Color& backgroundColor) const;
 
   virtual void paintResizeControl(GraphicsContext*, const IntRect&);
@@ -225,6 +225,7 @@ class RenderThemeMac : public RenderTheme {
 
   Image* resizeCornerImage;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderThemeMac_h

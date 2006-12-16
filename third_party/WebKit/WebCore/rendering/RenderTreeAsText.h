@@ -23,7 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RenderObject.h"
+#ifndef RenderTreeAsText_h
+#define RenderTreeAsText_h
+
 #include "TextStream.h"
 
 namespace WebCore {
@@ -32,4 +34,7 @@ class RenderObject;
 
 DeprecatedString externalRepresentation(RenderObject*);
 void write(TextStream&, const RenderObject&, int indent = 0);
-}
+
+}  // namespace WebCore
+
+#endif  // RenderTreeAsText_h

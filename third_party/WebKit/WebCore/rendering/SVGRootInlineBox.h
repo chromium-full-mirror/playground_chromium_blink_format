@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef SVGRootInlineBox_H
-#define SVGRootInlineBox_H
+#ifndef SVGRootInlineBox_h
+#define SVGRootInlineBox_h
 
 #ifdef SVG_SUPPORT
 
@@ -46,4 +46,4 @@ class SVGRootInlineBox : public RootInlineBox {
 
 #endif  // SVG_SUPPORT
 
-#endif  // SVGRootInlineBox_H
+#endif  // SVGRootInlineBox_h

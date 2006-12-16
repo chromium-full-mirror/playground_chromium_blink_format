@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef KHTML_RenderTextFragment_H
-#define KHTML_RenderTextFragment_H
+#ifndef RenderTextFragment_h
+#define RenderTextFragment_h
 
 #include "RenderText.h"
 
@@ -45,7 +45,7 @@ class RenderTextFragment : public RenderText {
                      RenderObject* firstLetter = 0);
   RenderTextFragment(Node*, StringImpl*);
 
-  virtual bool isTextFragment() const;
+  virtual bool isTextFragment() const { return true; }
 
   virtual void destroy();
 
@@ -62,6 +62,7 @@ class RenderTextFragment : public RenderText {
   RefPtr<StringImpl> m_generatedContentStr;
   RenderObject* m_firstLetter;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderTextFragment_h

@@ -44,11 +44,12 @@
 #include "visible_units.h"
 #include <math.h>
 
+using namespace std;
+
 namespace WebCore {
 
 using namespace EventNames;
 using namespace HTMLNames;
-using namespace std;
 
 RenderTextControl::RenderTextControl(Node* node, bool multiLine)
     : RenderBlock(node),
@@ -84,9 +85,10 @@ void RenderTextControl::setStyle(RenderStyle* style) {
     RenderStyle* textBlockStyle = createInnerTextStyle(style);
     textBlockRenderer->setStyle(textBlockStyle);
     for (Node* n = m_innerText->firstChild(); n;
-         n = n->traverseNextNode(m_innerText.get()))
+         n = n->traverseNextNode(m_innerText.get())) {
       if (n->renderer())
         n->renderer()->setStyle(textBlockStyle);
+    }
   }
   if (m_resultsButton)
     m_resultsButton->renderer()->setStyle(createResultsButtonStyle(style));
@@ -103,8 +105,7 @@ static Color disabledTextColor(const Color& textColor,
   if (differenceSquared(textColor, Color::white) >
       differenceSquared(backgroundColor, Color::white))
     return textColor.light();
-  else
-    return textColor.dark();
+  return textColor.dark();
 }
 
 RenderStyle* RenderTextControl::createInnerBlockStyle(RenderStyle* startStyle) {
@@ -150,7 +151,6 @@ RenderStyle* RenderTextControl::createInnerTextStyle(RenderStyle* startStyle) {
       textBlockStyle->setWhiteSpace(PRE_WRAP);
       textBlockStyle->setWordWrap(BREAK_WORD);
     }
-
   } else {
     textBlockStyle->setWhiteSpace(PRE);
     textBlockStyle->setOverflowX(OHIDDEN);
@@ -181,7 +181,7 @@ RenderStyle* RenderTextControl::createResultsButtonStyle(
   RenderStyle* resultsBlockStyle;
   if (input->maxResults() < 0)
     resultsBlockStyle = getPseudoStyle(RenderStyle::SEARCH_DECORATION);
-  else if (input->maxResults() == 0)
+  else if (!input->maxResults())
     resultsBlockStyle = getPseudoStyle(RenderStyle::SEARCH_RESULTS_DECORATION);
   else
     resultsBlockStyle = getPseudoStyle(RenderStyle::SEARCH_RESULTS_BUTTON);
@@ -536,7 +536,7 @@ String RenderTextControl::textWithHardLineBreaks() {
     }
   }
   s.append(range->toString(true, ec));
-  ASSERT(ec == 0);
+  ASSERT(!ec);
 
   return s.replace('\\', backslashAsCurrencySymbol());
 }
@@ -609,7 +609,7 @@ bool RenderTextControl::nodeAtPoint(const HitTestRequest& request,
                                     int ty,
                                     HitTestAction hitTestAction) {
   // If we're within the text control, we want to act as if we've hit the inner
-  // text block element, incase the point
+  // text block element, in case the point
   // was on the control but not on the inner element (see Radar 4617841).
 
   // In a search field, we want to act as if we've hit the results block if
@@ -707,7 +707,7 @@ void RenderTextControl::calcMinMaxWidth() {
       if (factor <= 0)
         factor = 20;
     }
-    m_maxWidth = (int)ceilf(charWidth * factor) + scrollbarSize;
+    m_maxWidth = static_cast<int>(ceilf(charWidth * factor)) + scrollbarSize;
   }
 
   if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
@@ -841,18 +841,19 @@ void RenderTextControl::addSearchResult() {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
   if (input->maxResults() <= 0)
     return;
+
   String v = input->value();
   if (v.isEmpty() || !document() || !document()->frame() ||
       document()->frame()->settings()->privateBrowsingEnabled())
     return;
 
-  int size = (int)m_recentSearches.size();
+  int size = static_cast<int>(m_recentSearches.size());
   for (int i = size - 1; i >= 0; --i)
     if (m_recentSearches[i] == v)
       m_recentSearches.remove(i);
 
   m_recentSearches.insert(0, v);
-  while ((int)m_recentSearches.size() > input->maxResults())
+  while (static_cast<int>(m_recentSearches.size()) > input->maxResults())
     m_recentSearches.removeLast();
 
   const AtomicString& name = autosaveName();
@@ -880,10 +881,10 @@ void RenderTextControl::showPopup() {
   // Trim the recent searches list if the maximum size has changed since we last
   // saved.
   HTMLInputElement* input = static_cast<HTMLInputElement*>(node());
-  if ((int)m_recentSearches.size() > input->maxResults()) {
+  if (static_cast<int>(m_recentSearches.size()) > input->maxResults()) {
     do
       m_recentSearches.removeLast();
-    while ((int)m_recentSearches.size() > input->maxResults());
+    while (static_cast<int>(m_recentSearches.size()) > input->maxResults());
     m_searchPopup->saveRecentSearches(name, m_recentSearches);
   }
 
@@ -920,10 +921,10 @@ void RenderTextControl::valueChanged(unsigned listIndex, bool fireOnSearch) {
 String RenderTextControl::itemText(unsigned listIndex) const {
   unsigned size = listSize();
   if (size == 1) {
-    ASSERT(listIndex == 0);
+    ASSERT(!listIndex);
     return String("No recent searches");
   }
-  if (listIndex == 0)
+  if (!listIndex)
     return String("Recent Searches");
   if (itemIsSeparator(listIndex))
     return String();
@@ -933,7 +934,7 @@ String RenderTextControl::itemText(unsigned listIndex) const {
 }
 
 bool RenderTextControl::itemIsEnabled(unsigned listIndex) const {
-  if (listIndex == 0 || itemIsSeparator(listIndex))
+  if (!listIndex || itemIsSeparator(listIndex))
     return false;
   return true;
 }
@@ -965,7 +966,7 @@ int RenderTextControl::clientPaddingRight() const {
 unsigned RenderTextControl::listSize() const {
   // If there are no recent searches, then our menu will have 1 "No recent
   // searches" item.
-  if (m_recentSearches.size() == 0)
+  if (!m_recentSearches.size())
     return 1;
   // Otherwise, leave room in the menu for a header, a separator, and the "Clear
   // recent searches" item.
@@ -996,9 +997,10 @@ void RenderTextControl::setTextFromItem(unsigned listIndex) {
 bool RenderTextControl::scroll(ScrollDirection direction,
                                ScrollGranularity granularity,
                                float multiplier) {
-  RenderLayer* l = m_innerText->renderer()->layer();
-  if (l && l->scroll(direction, granularity, multiplier))
+  RenderLayer* layer = m_innerText->renderer()->layer();
+  if (layer && layer->scroll(direction, granularity, multiplier))
     return true;
   return RenderObject::scroll(direction, granularity, multiplier);
 }
-}
+
+}  // namespace WebCore

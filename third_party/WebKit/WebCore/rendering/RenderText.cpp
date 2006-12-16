@@ -33,46 +33,18 @@
 #include "Range.h"
 #include "RenderArena.h"
 #include "RenderBlock.h"
+#include "TextBreakIterator.h"
 #include "TextStyle.h"
 #include "break_lines.h"
-#include "TextBreakIterator.h"
 #include <wtf/AlwaysInline.h>
 
 using namespace std;
 
 namespace WebCore {
 
-int RenderText::previousOffset(int current) const {
-  StringImpl* si = str.get();
-  TextBreakIterator* iterator =
-      characterBreakIterator(si->characters(), si->length());
-  if (!iterator)
-    return current - 1;
-
-  long result = textBreakPreceding(iterator, current);
-  if (result == TextBreakDone)
-    result = current - 1;
-
-  return result;
-}
-
-int RenderText::nextOffset(int current) const {
-  StringImpl* si = str.get();
-  TextBreakIterator* iterator =
-      characterBreakIterator(si->characters(), si->length());
-  if (!iterator)
-    return current + 1;
-
-  long result = textBreakFollowing(iterator, current);
-  if (result == TextBreakDone)
-    result = current + 1;
-
-  return result;
-}
-
-RenderText::RenderText(Node* node, StringImpl* _str)
+RenderText::RenderText(Node* node, StringImpl* str)
     : RenderObject(node),
-      str(_str),
+      m_str(str),
       m_firstTextBox(0),
       m_lastTextBox(0),
       m_minWidth(-1),
@@ -84,29 +56,28 @@ RenderText::RenderText(Node* node, StringImpl* _str)
       m_allAscii(false),
       m_monospaceCharacterWidth(0) {
   setRenderText();
-  if (str)
-    str = str->replace('\\', backslashAsCurrencySymbol());
-  ASSERT(!str || !str->length() || str->characters());
+  if (m_str)
+    m_str = m_str->replace('\\', backslashAsCurrencySymbol());
+  ASSERT(!m_str || !m_str->length() || m_str->characters());
 }
 
-void RenderText::setStyle(RenderStyle* _style) {
-  if (style() != _style) {
+void RenderText::setStyle(RenderStyle* newStyle) {
+  if (style() != newStyle) {
     bool needToTransformText =
-        (!style() && _style->textTransform() != TTNONE) ||
-        (style() && style()->textTransform() != _style->textTransform());
+        (!style() && newStyle->textTransform() != TTNONE) ||
+        (style() && style()->textTransform() != newStyle->textTransform());
 
-    bool needToSecureText = (!style() && _style->textSecurity() != TSNONE);
+    bool needToSecureText = (!style() && newStyle->textSecurity() != TSNONE);
 
-    RenderObject::setStyle(_style);
+    RenderObject::setStyle(newStyle);
 
     if (needToTransformText || needToSecureText) {
       RefPtr<StringImpl> textToTransform = originalString();
       if (textToTransform)
+        // setText also calls cacheWidths(), so there is no need to call it
+        // again in that case.
         setText(textToTransform.get(), true);
-    }
-    // setText also calls cacheWidths(), so there is no need to call it again in
-    // that case.
-    else
+    } else
       cacheWidths();
   }
 }
@@ -177,10 +148,6 @@ void RenderText::deleteTextBoxes() {
   }
 }
 
-bool RenderText::isTextFragment() const {
-  return false;
-}
-
 PassRefPtr<StringImpl> RenderText::originalString() const {
   return element() ? element()->string() : 0;
 }
@@ -215,9 +182,9 @@ void RenderText::addLineBoxRects(Vector<IntRect>& rects,
 }
 
 InlineTextBox* RenderText::findNextInlineTextBox(int offset, int& pos) const {
-  // The text runs point to parts of the rendertext's str string
+  // The text runs point to parts of the RenderText's m_str
   // (they don't include '\n')
-  // Find the text run that includes the character at @p offset
+  // Find the text run that includes the character at offset
   // and return pos, which is the position of the char in the run.
 
   if (!m_firstTextBox)
@@ -364,7 +331,7 @@ static inline bool atLineWrap(InlineTextBox* box, int offset) {
 IntRect RenderText::caretRect(int offset,
                               EAffinity affinity,
                               int* extraWidthToEndOfLine) {
-  if (!firstTextBox() || stringLength() == 0)
+  if (!firstTextBox() || !stringLength())
     return IntRect();
 
   // Find the text box for the given offset
@@ -394,9 +361,8 @@ IntRect RenderText::caretRect(int offset,
     }
   }
 
-  if (!box) {
+  if (!box)
     return IntRect();
-  }
 
   int height = box->root()->bottomOverflow() - box->root()->topOverflow();
   int top = box->root()->topOverflow();
@@ -444,11 +410,12 @@ bool RenderText::allAscii() const {
   m_allAsciiChecked = true;
 
   unsigned i;
-  for (i = 0; i < str->length(); i++)
-    if ((*str)[i] > 0x7f) {
+  for (i = 0; i < m_str->length(); i++) {
+    if ((*m_str)[i] > 0x7f) {
       m_allAscii = false;
       return m_allAscii;
     }
+  }
 
   m_allAscii = true;
 
@@ -469,29 +436,29 @@ void RenderText::cacheWidths() {
   if (shouldUseMonospaceCache(f)) {
     const UChar c = ' ';
     m_monospaceCharacterWidth = f->width(TextRun(&c, 1));
-  } else {
+  } else
     m_monospaceCharacterWidth = 0;
-  }
 }
 
 ALWAYS_INLINE int RenderText::widthFromCache(const Font* f,
                                              int start,
                                              int len,
                                              int tabWidth,
-                                             int xpos) const {
-  if (m_monospaceCharacterWidth != 0) {
-    int i, w = 0;
+                                             int xPos) const {
+  if (m_monospaceCharacterWidth) {
+    int i;
+    int w = 0;
     for (i = start; i < start + len; i++) {
-      UChar c = (*str)[i];
+      UChar c = (*m_str)[i];
       WTF::Unicode::Direction dir = WTF::Unicode::direction(c);
       if (dir != WTF::Unicode::NonSpacingMark &&
           dir != WTF::Unicode::BoundaryNeutral) {
-        if (c == '\t' && tabWidth != 0)
-          w += tabWidth - ((xpos + w) % tabWidth);
+        if (c == '\t' && tabWidth)
+          w += tabWidth - ((xPos + w) % tabWidth);
         else
           w += m_monospaceCharacterWidth;
         if (DeprecatedChar(c).isSpace() && i > start &&
-            !DeprecatedChar((*str)[i - 1]).isSpace())
+            !DeprecatedChar((*m_str)[i - 1]).isSpace())
           w += f->wordSpacing();
       }
     }
@@ -499,7 +466,7 @@ ALWAYS_INLINE int RenderText::widthFromCache(const Font* f,
     return w;
   }
 
-  return f->width(TextRun(string(), start, len, 0), TextStyle(tabWidth, xpos));
+  return f->width(TextRun(string(), start, len, 0), TextStyle(tabWidth, xPos));
 }
 
 void RenderText::trimmedMinMaxWidth(int leadWidth,
@@ -518,14 +485,13 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
   if (!collapseWhiteSpace)
     stripFrontSpaces = false;
 
-  int len = str->length();
-  if (len == 0 || (stripFrontSpaces && str->containsOnlyWhitespace())) {
+  int len = m_str->length();
+  if (!len || (stripFrontSpaces && m_str->containsOnlyWhitespace())) {
     maxW = 0;
     hasBreak = false;
     return;
   }
 
-  // if the text has a variable width tab, we need to call
   if (m_hasTab)
     calcMinMaxWidth(leadWidth);
 
@@ -541,8 +507,9 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
   hasBreak = m_hasBreak;
 
   if (stripFrontSpaces &&
-      ((*str)[0] == ' ' || ((*str)[0] == '\n' && !style()->preserveNewline()) ||
-       (*str)[0] == '\t')) {
+      ((*m_str)[0] == ' ' ||
+       ((*m_str)[0] == '\n' && !style()->preserveNewline()) ||
+       (*m_str)[0] == '\t')) {
     const Font* f =
         font(false);  // FIXME: Why is it ok to ignore first-line here?
     const UChar space = ' ';
@@ -559,10 +526,11 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
   if (hasBreak) {
     const Font* f = font(false);
     bool firstLine = true;
-    beginMaxW = endMaxW = maxW;
+    beginMaxW = maxW;
+    endMaxW = maxW;
     for (int i = 0; i < len; i++) {
       int linelen = 0;
-      while (i + linelen < len && (*str)[i + linelen] != '\n')
+      while (i + linelen < len && (*m_str)[i + linelen] != '\n')
         linelen++;
 
       if (linelen) {
@@ -602,8 +570,10 @@ inline bool isSpaceAccordingToStyle(UChar c, RenderStyle* style) {
 }
 
 void RenderText::calcMinMaxWidth(int leadWidth) {
-  // ### calc Min and Max width...
-  m_minWidth = m_beginMinWidth = m_endMinWidth = 0;
+  // FIXME: calc Min and Max width...
+  m_minWidth = 0;
+  m_beginMinWidth = 0;
+  m_endMinWidth = 0;
   m_maxWidth = 0;
 
   if (isBR())
@@ -611,14 +581,17 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
 
   int currMinWidth = 0;
   int currMaxWidth = 0;
-  m_hasBreakableChar = m_hasBreak = m_hasTab = m_hasBeginWS = m_hasEndWS =
-      false;
+  m_hasBreakableChar = false;
+  m_hasBreak = false;
+  m_hasTab = false;
+  m_hasBeginWS = false;
+  m_hasEndWS = false;
 
   // FIXME: not 100% correct for first-line
   const Font* f = font(false);
   int wordSpacing = style()->wordSpacing();
-  int len = str->length();
-  const UChar* txt = str->characters();
+  int len = m_str->length();
+  const UChar* txt = m_str->characters();
   bool needsWordSpacing = false;
   bool ignoringSpaces = false;
   bool isSpace = false;
@@ -646,11 +619,10 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
         isSpace = false;
       } else
         isSpace = true;
-    } else {
+    } else
       isSpace = c == ' ';
-    }
 
-    if ((isSpace || isNewline) && i == 0)
+    if ((isSpace || isNewline) && !i)
       m_hasBeginWS = true;
     if ((isSpace || isNewline) && i == len - 1)
       m_hasEndWS = true;
@@ -663,9 +635,8 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
       ignoringSpaces = false;
 
     // Ignore spaces and soft hyphens
-    if (ignoringSpaces || c == SOFT_HYPHEN) {
+    if (ignoringSpaces || c == SOFT_HYPHEN)
       continue;
-    }
 
     bool hasBreak = isBreakable(txt, i, len, nextBreakable, breakNBSP);
     int j = i;
@@ -679,10 +650,10 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
         break;
     }
 
-    int wordlen = j - i;
-    if (wordlen) {
+    int wordLen = j - i;
+    if (wordLen) {
       int w =
-          widthFromCache(f, i, wordlen, tabWidth(), leadWidth + currMaxWidth);
+          widthFromCache(f, i, wordLen, tabWidth(), leadWidth + currMaxWidth);
       currMinWidth += w;
       currMaxWidth += w;
 
@@ -717,7 +688,7 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
         m_minWidth = currMinWidth;
       currMinWidth = 0;
 
-      i += wordlen - 1;
+      i += wordLen - 1;
     } else {
       // Nowrap can never be broken, so don't bother setting the
       // breakable character boolean. Pre can only be broken if we encounter a
@@ -768,15 +739,13 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
   }
 
   setMinMaxKnown();
-  // kdDebug( 6040 ) << "Text::calcMinMaxWidth(): min = " << m_minWidth << " max
-  // = " << m_maxWidth << endl;
 }
 
 bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
   unsigned currPos;
   for (currPos = from; currPos < from + len &&
-                       ((*str)[currPos] == '\n' || (*str)[currPos] == ' ' ||
-                        (*str)[currPos] == '\t');
+                       ((*m_str)[currPos] == '\n' || (*m_str)[currPos] == ' ' ||
+                        (*m_str)[currPos] == '\t');
        currPos++)
     ;
   return currPos >= (from + len);
@@ -785,10 +754,13 @@ bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
 int RenderText::minXPos() const {
   if (!m_firstTextBox)
     return 0;
-  int retval = 6666666;
+
+  // FIXME: we should not use an arbitrary value like this.  Perhaps we should
+  // use INT_MAX.
+  int minXPos = 6666666;
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
-    retval = min(retval, (int)box->m_x);
-  return retval;
+    minXPos = min(minXPos, static_cast<int>(box->m_x));
+  return minXPos;
 }
 
 int RenderText::xPos() const {
@@ -803,20 +775,20 @@ const Font& RenderText::font() {
   return style()->font();
 }
 
-void RenderText::setSelectionState(SelectionState s) {
+void RenderText::setSelectionState(SelectionState state) {
   InlineTextBox* box;
 
-  m_selectionState = s;
-  if (s == SelectionStart || s == SelectionEnd || s == SelectionBoth) {
+  m_selectionState = state;
+  if (state == SelectionStart || state == SelectionEnd ||
+      state == SelectionBoth) {
     int startPos, endPos;
     selectionStartEnd(startPos, endPos);
     if (selectionState() == SelectionStart) {
-      endPos = str->length();
+      endPos = m_str->length();
 
       // to handle selection from end of text to end of line
-      if (startPos != 0 && startPos == endPos) {
+      if (startPos != 0 && startPos == endPos)
         startPos = endPos - 1;
-      }
     } else if (selectionState() == SelectionEnd)
       startPos = 0;
 
@@ -831,18 +803,18 @@ void RenderText::setSelectionState(SelectionState s) {
     for (box = firstTextBox(); box; box = box->nextTextBox()) {
       RootInlineBox* line = box->root();
       if (line)
-        line->setHasSelectedChildren(s == SelectionInside);
+        line->setHasSelectedChildren(state == SelectionInside);
     }
   }
 
-  containingBlock()->setSelectionState(s);
+  containingBlock()->setSelectionState(state);
 }
 
 void RenderText::setTextWithOffset(StringImpl* text,
                                    unsigned offset,
                                    unsigned len,
                                    bool force) {
-  unsigned oldLen = str ? str->length() : 0;
+  unsigned oldLen = m_str ? m_str->length() : 0;
   unsigned newLen = text ? text->length() : 0;
   int delta = newLen - oldLen;
   unsigned end = len ? offset + len - 1 : offset;
@@ -865,24 +837,26 @@ void RenderText::setTextWithOffset(StringImpl* text,
       RootInlineBox* root = curr->root();
       if (!firstRootBox) {
         firstRootBox = root;
-        if (!dirtiedLines) {  // The affected area was in between two runs. Go
-                              // ahead and mark the root box of the run after
-                              // the affected area as dirty.
+        if (!dirtiedLines) {
+          // The affected area was in between two runs. Go ahead and mark the
+          // root box of
+          // the run after the affected area as dirty.
           firstRootBox->markDirty();
           dirtiedLines = true;
         }
       }
       lastRootBox = root;
     } else if (curr->end() >= offset && curr->end() <= end) {
-      curr->dirtyLineBoxes();  // Text run overlaps with the left end of the
-                               // affected range.
+      // Text run overlaps with the left end of the affected range.
+      curr->dirtyLineBoxes();
       dirtiedLines = true;
     } else if (curr->start() <= offset && curr->end() >= end) {
-      curr->dirtyLineBoxes();  // Text run subsumes the affected range.
+      // Text run subsumes the affected range.
+      curr->dirtyLineBoxes();
       dirtiedLines = true;
     } else if (curr->start() <= end && curr->end() >= end) {
-      curr->dirtyLineBoxes();  // Text run overlaps with right end of the
-                               // affected range.
+      // Text run overlaps with right end of the affected range.
+      curr->dirtyLineBoxes();
       dirtiedLines = true;
     }
   }
@@ -914,14 +888,14 @@ void RenderText::setTextWithOffset(StringImpl* text,
 void RenderText::setText(StringImpl* text, bool force) {
   if (!text)
     return;
-  if (!force && str == text)
+  if (!force && m_str == text)
     return;
 
   m_allAsciiChecked = false;
 
-  str = text;
-  if (str) {
-    str = str->replace('\\', backslashAsCurrencySymbol());
+  m_str = text;
+  if (m_str) {
+    m_str = m_str->replace('\\', backslashAsCurrencySymbol());
     if (style()) {
       switch (style()->textTransform()) {
         case CAPITALIZE: {
@@ -938,27 +912,28 @@ void RenderText::setText(StringImpl* text, bool force) {
             StringImpl* prevStr = static_cast<RenderText*>(o)->string();
             previous = (*prevStr)[prevStr->length() - 1];
           }
-          str = str->capitalize(previous);
+          m_str = m_str->capitalize(previous);
         } break;
         case UPPERCASE:
-          str = str->upper();
+          m_str = m_str->upper();
           break;
         case LOWERCASE:
-          str = str->lower();
+          m_str = m_str->lower();
           break;
         case NONE:
-        default:;
+        default:
+          break;
       }
 
       switch (style()->textSecurity()) {
         case TSDISC:
-          str = str->secure(BULLET_CHAR);
+          m_str = m_str->secure(BULLET_CHAR);
           break;
         case TSCIRCLE:
-          str = str->secure(CIRCLE_CHAR);
+          m_str = m_str->secure(CIRCLE_CHAR);
           break;
         case TSSQUARE:
-          str = str->secure(SQUARE_CHAR);
+          m_str = m_str->secure(SQUARE_CHAR);
           break;
         case TSNONE:
           break;
@@ -968,10 +943,10 @@ void RenderText::setText(StringImpl* text, bool force) {
 
   cacheWidths();
 
-  // ### what should happen if we change the text of a
+  // FIXME: what should happen if we change the text of a
   // RenderBR object ?
-  ASSERT(!isBR() || (str->length() == 1 && (*str)[0] == '\n'));
-  ASSERT(!str->length() || str->characters());
+  ASSERT(!isBR() || (m_str->length() == 1 && (*m_str)[0] == '\n'));
+  ASSERT(!m_str->length() || m_str->characters());
 
   setNeedsLayoutAndMinMaxRecalc();
 }
@@ -1015,8 +990,8 @@ InlineBox* RenderText::createInlineBox(bool, bool isRootLineBox, bool) {
 void RenderText::position(InlineBox* box) {
   InlineTextBox* s = static_cast<InlineTextBox*>(box);
 
-  // ### should not be needed!!!
-  if (s->m_len == 0) {
+  // FIXME: should not be needed!!!
+  if (!s->m_len) {
     // We want the box to be destroyed.
     s->remove();
     s->destroy(renderArena());
@@ -1029,39 +1004,43 @@ void RenderText::position(InlineBox* box) {
 
 unsigned int RenderText::width(unsigned int from,
                                unsigned int len,
-                               int xpos,
+                               int xPos,
                                bool firstLine) const {
-  if (from >= str->length())
+  if (from >= m_str->length())
     return 0;
-  if (from + len > str->length())
-    len = str->length() - from;
+
+  if (from + len > m_str->length())
+    len = m_str->length() - from;
 
   const Font* f = font(firstLine);
-  return width(from, len, f, xpos);
+  return width(from, len, f, xPos);
 }
 
 unsigned int RenderText::width(unsigned int from,
                                unsigned int len,
                                const Font* f,
-                               int xpos) const {
-  if (!str->characters() || from > str->length())
+                               int xPos) const {
+  if (!m_str->characters() || from > m_str->length())
     return 0;
-  if (from + len > str->length())
-    len = str->length() - from;
+
+  if (from + len > m_str->length())
+    len = m_str->length() - from;
 
   int w;
-  if (!style()->preserveNewline() && f == &style()->font() && from == 0 &&
-      len == str->length())
+  if (!style()->preserveNewline() && f == &style()->font() && !from &&
+      len == m_str->length())
     w = m_maxWidth;
   else if (f == &style()->font())
-    w = widthFromCache(f, from, len, tabWidth(), xpos);
+    w = widthFromCache(f, from, len, tabWidth(), xPos);
   else
-    w = f->width(TextRun(string(), from, len, 0), TextStyle(tabWidth(), xpos));
+    w = f->width(TextRun(string(), from, len, 0), TextStyle(tabWidth(), xPos));
 
   return w;
 }
 
 int RenderText::width() const {
+  // FIXME: we should not use an arbitrary value like this.  Perhaps we should
+  // use INT_MAX.
   int minx = 100000000;
   int maxx = 0;
   // slooow
@@ -1094,11 +1073,11 @@ IntRect RenderText::selectionRect() {
   if (selectionState() == SelectionInside) {
     // We are fully selected.
     startPos = 0;
-    endPos = str->length();
+    endPos = m_str->length();
   } else {
     selectionStartEnd(startPos, endPos);
     if (selectionState() == SelectionStart)
-      endPos = str->length();
+      endPos = m_str->length();
     else if (selectionState() == SelectionEnd)
       startPos = 0;
   }
@@ -1138,7 +1117,7 @@ int RenderText::caretMinOffset() const {
 int RenderText::caretMaxOffset() const {
   InlineTextBox* box = lastTextBox();
   if (!box)
-    return str->length();
+    return m_str->length();
   int maxOffset = box->m_start + box->m_len;
   for (box = box->prevTextBox(); box; box = box->prevTextBox())
     maxOffset = max(maxOffset, box->m_start + box->m_len);
@@ -1150,6 +1129,34 @@ unsigned RenderText::caretMaxRenderedOffset() const {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
     l += box->m_len;
   return l;
+}
+
+int RenderText::previousOffset(int current) const {
+  StringImpl* si = m_str.get();
+  TextBreakIterator* iterator =
+      characterBreakIterator(si->characters(), si->length());
+  if (!iterator)
+    return current - 1;
+
+  long result = textBreakPreceding(iterator, current);
+  if (result == TextBreakDone)
+    result = current - 1;
+
+  return result;
+}
+
+int RenderText::nextOffset(int current) const {
+  StringImpl* si = m_str.get();
+  TextBreakIterator* iterator =
+      characterBreakIterator(si->characters(), si->length());
+  if (!iterator)
+    return current + 1;
+
+  long result = textBreakFollowing(iterator, current);
+  if (result == TextBreakDone)
+    result = current + 1;
+
+  return result;
 }
 
 InlineBox* RenderText::inlineBox(int offset, EAffinity affinity) {
@@ -1168,4 +1175,5 @@ InlineBox* RenderText::inlineBox(int offset, EAffinity affinity) {
 
   return 0;
 }
-}
+
+}  // namespace WebCore

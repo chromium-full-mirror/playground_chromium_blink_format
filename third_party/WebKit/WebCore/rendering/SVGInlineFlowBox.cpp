@@ -24,17 +24,18 @@
 #include "config.h"
 
 #ifdef SVG_SUPPORT
+
 #include "SVGInlineFlowBox.h"
 
 #include "GraphicsContext.h"
 #include "InlineTextBox.h"
-#include "SVGResourceClipper.h"
-#include "SVGResourceFilter.h"
-#include "SVGResourceMasker.h"
-#include "SVGPaintServer.h"
 #include "KCanvasRenderingStyle.h"
 #include "RootInlineBox.h"
 #include "SVGLengthList.h"
+#include "SVGPaintServer.h"
+#include "SVGResourceClipper.h"
+#include "SVGResourceFilter.h"
+#include "SVGResourceMasker.h"
 #include "SVGTextPositioningElement.h"
 
 using namespace std;
@@ -108,6 +109,7 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
     }
     fillPaintServer->setPaintingText(false);
   }
+
   SVGPaintServer* strokePaintServer =
       KSVGPainterFactory::strokePaintServer(object->style(), object);
   if (strokePaintServer) {
@@ -144,9 +146,10 @@ static bool translateBox(InlineBox* box, int x, int y, bool topLevel = true) {
       box->setXPos(box->xPos() + x);
       box->setYPos(box->yPos() + y);
       for (InlineBox* curr = flow->firstChild(); curr;
-           curr = curr->nextOnLine())
+           curr = curr->nextOnLine()) {
         if (!translateBox(curr, x, y, false))
           return false;
+      }
     }
   }
   return true;
@@ -161,7 +164,6 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
                                             bool& needsWordSpacing,
                                             int xPos,
                                             bool positioned) {
-  // int startx = x;
   int mn = INT_MAX;
   int mx = INT_MIN;
   int amn = INT_MAX;
@@ -190,9 +192,11 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
       SVGTextPositioningElement* text =
           static_cast<SVGTextPositioningElement*>(flow->object()->element());
-      x += (int)(text->dx()->getFirst() ? text->dx()->getFirst()->value() : 0);
+      x += text->dx()->getFirst()
+               ? static_cast<int>(text->dx()->getFirst()->value())
+               : 0;
       if (text->x()->getFirst())
-        x = (int)(text->x()->getFirst()->value() - xPos);
+        x = static_cast<int>(text->x()->getFirst()->value() - xPos);
       if (text->x()->getFirst() || text->y()->getFirst() ||
           (text->dx()->getFirst() && text->dx()->getFirst()->value()) ||
           (text->dy()->getFirst() && text->dy()->getFirst()->value())) {
@@ -202,14 +206,15 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
         x = placePositionedBoxesHorizontally(flow, x, mn, mx, ignoreX, ignoreY,
                                              needsWordSpacing, xPos, true);
       } else if (seenPositionedElement) {
-        int _amn, _amx;  // throw away these values
-        x = placePositionedBoxesHorizontally(flow, x, mn, mx, _amn, _amx,
+        int ignoreX, ignoreY;
+        x = placePositionedBoxesHorizontally(flow, x, mn, mx, ignoreX, ignoreY,
                                              needsWordSpacing, xPos, false);
       } else
         x = placePositionedBoxesHorizontally(flow, x, mn, mx, amn, amx,
                                              needsWordSpacing, xPos, false);
     }
   }
+
   if (mn > mx)
     mn = mx = startx;
   if (amn > amx)
@@ -231,12 +236,14 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
       default:
         break;
     }
+
     if (dx) {
       x += dx;
       mn += dx;
       mx += dx;
     }
   }
+
   leftPosition = min(leftPosition, mn);
   rightPosition = max(rightPosition, mx);
   leftAlign = min(leftAlign, amn);
@@ -262,21 +269,21 @@ int placeSVGFlowHorizontally(InlineFlowBox* flow,
 
 static void placeBoxesVerticallyWithAbsBaseline(InlineFlowBox* flow,
                                                 int& heightOfBlock,
-                                                int& min_y,
-                                                int& max_y,
+                                                int& minY,
+                                                int& maxY,
                                                 int& baseline,
                                                 int yPos) {
   for (InlineBox* curr = flow->firstChild(); curr; curr = curr->nextOnLine()) {
     if (curr->isInlineFlowBox()) {
       SVGTextPositioningElement* text =
           static_cast<SVGTextPositioningElement*>(curr->object()->element());
-      baseline +=
-          (int)(text->dy()->getFirst() ? text->dy()->getFirst()->value() : 0);
-      if (text->y()->getFirst()) {
-        baseline = (int)(text->y()->getFirst()->value() - yPos);
-      }
+      baseline += text->dy()->getFirst()
+                      ? static_cast<int>(text->dy()->getFirst()->value())
+                      : 0;
+      if (text->y()->getFirst())
+        baseline = static_cast<int>(text->y()->getFirst()->value() - yPos);
       placeBoxesVerticallyWithAbsBaseline(static_cast<InlineFlowBox*>(curr),
-                                          heightOfBlock, min_y, max_y, baseline,
+                                          heightOfBlock, minY, maxY, baseline,
                                           yPos);
     }
     const Font& font = curr->object()->font(true);
@@ -287,21 +294,24 @@ static void placeBoxesVerticallyWithAbsBaseline(InlineFlowBox* flow,
     curr->setYPos(position);
     curr->setHeight(height);
 
-    if (position < min_y)
-      min_y = position;
-    if (position + height > max_y)
-      max_y = position + height;
+    if (position < minY)
+      minY = position;
+    if (position + height > maxY)
+      maxY = position + height;
   }
+
   if (flow->isRootInlineBox()) {
-    flow->setYPos(min_y);
-    flow->setHeight(max_y - min_y);
-    flow->setBaseline(baseline - min_y);
-    heightOfBlock += max_y - min_y;
+    flow->setYPos(minY);
+    flow->setHeight(maxY - minY);
+    flow->setBaseline(baseline - minY);
+    heightOfBlock += maxY - minY;
   }
 }
 
 void placeSVGFlowVertically(InlineFlowBox* flow, int& heightOfBlock) {
-  int top = INT_MAX, bottom = INT_MIN, baseline = heightOfBlock;
+  int top = INT_MAX;
+  int bottom = INT_MIN;
+  int baseline = heightOfBlock;
   placeBoxesVerticallyWithAbsBaseline(flow, heightOfBlock, top, bottom,
                                       baseline, flow->object()->yPos());
   flow->setVerticalOverflowPositions(top, bottom);
