@@ -29,4 +29,21 @@
 #include "config.h"
 #include "DocumentLoader.h"
 
-namespace WebCore {}
+namespace WebCore {
+
+const ResourceResponse& DocumentLoader::response() const {
+  return m_response;
+}
+
+void DocumentLoader::setResponse(const ResourceResponse& response) {
+  m_response = response;
+}
+
+bool DocumentLoader::isStopping() const {
+  return m_isStopping;
+}
+
+const ResourceError& DocumentLoader::mainDocumentError() const {
+  return m_mainDocumentError;
+}
+}
