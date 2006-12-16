@@ -92,9 +92,7 @@ ReplacementFragment::ReplacementFragment(Document* document,
       // FIXME: Remove these checks once textareas and textfields actually
       // register an event handler.
       !(shadowAncestorNode && shadowAncestorNode->renderer() &&
-        shadowAncestorNode->renderer()->isTextField() &&
-        static_cast<HTMLInputElement*>(shadowAncestorNode)
-            ->isNonWidgetTextField()) &&
+        shadowAncestorNode->renderer()->isTextField()) &&
       !(shadowAncestorNode && shadowAncestorNode->renderer() &&
         shadowAncestorNode->renderer()->isTextArea()) &&
       editableRoot->isContentRichlyEditable()) {
