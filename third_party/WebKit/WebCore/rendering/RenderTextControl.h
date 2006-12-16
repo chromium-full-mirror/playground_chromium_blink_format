@@ -80,6 +80,9 @@ class RenderTextControl : public RenderBlock, public PopupMenuClient {
   virtual int scrollHeight() const;
   virtual void setScrollLeft(int);
   virtual void setScrollTop(int);
+  virtual bool scroll(ScrollDirection direction,
+                      ScrollGranularity granularity,
+                      float multiplier = 1.0);
 
   VisiblePosition visiblePositionForIndex(int index);
   int indexForVisiblePosition(const VisiblePosition&);
