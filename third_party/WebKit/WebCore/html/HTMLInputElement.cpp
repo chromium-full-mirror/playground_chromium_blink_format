@@ -44,7 +44,6 @@
 #include "RenderButton.h"
 #include "RenderFileUploadControl.h"
 #include "RenderImage.h"
-#include "RenderLineEdit.h"
 #include "RenderText.h"
 #include "RenderTextControl.h"
 #include "RenderTheme.h"
@@ -475,10 +474,9 @@ int HTMLInputElement::selectionStart() const {
     case RESET:
     case SUBMIT:
       break;
-    case SEARCH:
-      return static_cast<RenderLineEdit*>(renderer())->selectionStart();
     case ISINDEX:
     case PASSWORD:
+    case SEARCH:
     case TEXT:
       if (document()->focusedNode() != this && cachedSelStart >= 0)
         return cachedSelStart;
@@ -502,11 +500,10 @@ int HTMLInputElement::selectionEnd() const {
     case RESET:
     case SUBMIT:
       break;
-    case SEARCH:
-      return static_cast<RenderLineEdit*>(renderer())->selectionEnd();
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       if (document()->focusedNode() != this && cachedSelEnd >= 0)
         return cachedSelEnd;
       return static_cast<RenderTextControl*>(renderer())->selectionEnd();
@@ -529,12 +526,10 @@ void HTMLInputElement::setSelectionStart(int start) {
     case RESET:
     case SUBMIT:
       break;
-    case SEARCH:
-      static_cast<RenderLineEdit*>(renderer())->setSelectionStart(start);
-      break;
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       static_cast<RenderTextControl*>(renderer())->setSelectionStart(start);
       break;
   }
@@ -555,12 +550,10 @@ void HTMLInputElement::setSelectionEnd(int end) {
     case RESET:
     case SUBMIT:
       break;
-    case SEARCH:
-      static_cast<RenderLineEdit*>(renderer())->setSelectionEnd(end);
-      break;
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       static_cast<RenderTextControl*>(renderer())->setSelectionEnd(end);
       break;
   }
@@ -581,12 +574,10 @@ void HTMLInputElement::select() {
     case SUBMIT:
     case FILE:
       break;
-    case SEARCH:
-      static_cast<RenderLineEdit*>(renderer())->select();
-      break;
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       static_cast<RenderTextControl*>(renderer())->select();
       break;
   }
@@ -607,12 +598,10 @@ void HTMLInputElement::setSelectionRange(int start, int end) {
     case RESET:
     case SUBMIT:
       break;
-    case SEARCH:
-      static_cast<RenderLineEdit*>(renderer())->setSelectionRange(start, end);
-      break;
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       static_cast<RenderTextControl*>(renderer())
           ->setSelectionRange(start, end);
       break;
@@ -752,7 +741,16 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == onsearchAttr) {
     setHTMLEventListener(searchEvent, attr);
   } else if (attr->name() == resultsAttr) {
+    int oldResults = m_maxResults;
     m_maxResults = !attr->isNull() ? attr->value().toInt() : -1;
+    // FIXME: Detaching just for maxResults change is not ideal.  We should
+    // figure out the right
+    // time to relayout for this change.
+    if (m_maxResults != oldResults && (m_maxResults <= 0 || oldResults <= 0) &&
+        attached()) {
+      detach();
+      attach();
+    }
     setChanged();
   } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
              attr->name() == placeholderAttr || attr->name() == minAttr ||
@@ -800,13 +798,12 @@ RenderObject* HTMLInputElement::createRenderer(RenderArena* arena,
       break;
     case IMAGE:
       return new (arena) RenderImage(this);
-    case SEARCH:
-      return new (arena) RenderLineEdit(this);
     case RANGE:
       return new (arena) RenderSlider(this);
     case ISINDEX:
     case PASSWORD:
     case TEXT:
+    case SEARCH:
       return new (arena) RenderTextControl(this, false);
   }
   assert(false);
@@ -1346,6 +1343,8 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
       dispatchSimulatedClick(evt);
       evt->setDefaultHandled();
     } else if (clickDefaultFormButton) {
+      if (isSearchField())
+        addSearchResult();
       blur();
       // Form may never have been present, or may have been destroyed by the
       // blur event.
@@ -1376,7 +1375,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
 
   if (isNonWidgetTextField() &&
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
-       evt->type() == blurEvent) &&
+       evt->type() == blurEvent || evt->type() == focusEvent) &&
       renderer())
     static_cast<RenderTextControl*>(renderer())->forwardEvent(evt);
 
@@ -1498,6 +1497,12 @@ String HTMLInputElement::constrainValue(const String& proposedValue,
       return proposedValue.substring(0, newLen);
   }
   return proposedValue;
+}
+
+void HTMLInputElement::addSearchResult() {
+  ASSERT(isSearchField());
+  if (renderer())
+    static_cast<RenderTextControl*>(renderer())->addSearchResult();
 }
 
 }  // namespace

@@ -444,8 +444,7 @@ bool Editor::dispatchCPPEvent(const AtomicString& eventType,
     target = m_frame->document()->body();
   if (!target)
     return true;
-  if (target->isShadowNode())
-    target = target->shadowParentNode();
+  target = target->shadowAncestorNode();
 
   RefPtr<Clipboard> clipboard = newGeneralClipboard(policy);
 

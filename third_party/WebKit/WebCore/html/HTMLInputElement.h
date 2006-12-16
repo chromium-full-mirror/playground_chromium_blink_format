@@ -88,8 +88,10 @@ class HTMLInputElement : public HTMLGenericFormElement {
   // should add them here.
   // Once all text fields switch over, we should merge this with isTextField.
   bool isNonWidgetTextField() const {
-    return m_type == TEXT || m_type == ISINDEX || m_type == PASSWORD;
+    return m_type == TEXT || m_type == ISINDEX || m_type == PASSWORD ||
+           m_type == SEARCH;
   }
+  bool isSearchField() const { return m_type == SEARCH; }
 
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);
@@ -195,6 +197,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
     cachedSelStart = s;
     cachedSelEnd = e;
   };
+  void addSearchResult();
 
  protected:
   AtomicString m_name;

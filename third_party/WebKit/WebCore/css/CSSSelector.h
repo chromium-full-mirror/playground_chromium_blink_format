@@ -142,7 +142,11 @@ class CSSSelector {
     PseudoRoot,
     PseudoSelection,
     PseudoFileUploadButton,
-    PseudoSliderThumb
+    PseudoSliderThumb,
+    PseudoSearchCancelButton,
+    PseudoSearchDecoration,
+    PseudoSearchResultsDecoration,
+    PseudoSearchResultsButton
   };
 
   PseudoType pseudoType() const {
@@ -167,8 +171,8 @@ class CSSSelector {
 
   unsigned m_relation : 3;     // enum Relation
   mutable unsigned match : 4;  // enum Match
-  unsigned pseudoId : 3;
-  mutable unsigned _pseudoType : 5;  // PseudoType
+  unsigned pseudoId : 4;
+  mutable unsigned _pseudoType : 6;  // PseudoType
 
  private:
   void extractPseudoType() const;

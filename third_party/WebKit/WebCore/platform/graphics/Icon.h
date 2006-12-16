@@ -50,6 +50,10 @@ class Icon : public Shared<Icon> {
 
   void paint(GraphicsContext*, const IntRect&);
 
+#if PLATFORM(WIN)
+  Icon(HICON);
+#endif
+
  private:
 #if PLATFORM(MAC)
   NSImage* m_nsImage;

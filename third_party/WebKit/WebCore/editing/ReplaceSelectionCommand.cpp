@@ -86,17 +86,17 @@ ReplacementFragment::ReplacementFragment(Document* document,
   if (!editableRoot)
     return;
 
-  Node* shadowParentNode = editableRoot->shadowParentNode();
+  Node* shadowAncestorNode = editableRoot->shadowAncestorNode();
 
   if (!editableRoot->getHTMLEventListener(khtmlBeforeTextInsertedEvent) &&
       // FIXME: Remove these checks once textareas and textfields actually
       // register an event handler.
-      !(shadowParentNode && shadowParentNode->renderer() &&
-        shadowParentNode->renderer()->isTextField() &&
-        static_cast<HTMLInputElement*>(shadowParentNode)
+      !(shadowAncestorNode && shadowAncestorNode->renderer() &&
+        shadowAncestorNode->renderer()->isTextField() &&
+        static_cast<HTMLInputElement*>(shadowAncestorNode)
             ->isNonWidgetTextField()) &&
-      !(shadowParentNode && shadowParentNode->renderer() &&
-        shadowParentNode->renderer()->isTextArea()) &&
+      !(shadowAncestorNode && shadowAncestorNode->renderer() &&
+        shadowAncestorNode->renderer()->isTextArea()) &&
       editableRoot->isContentRichlyEditable()) {
     removeInterchangeNodes(m_fragment->firstChild());
     return;
@@ -345,10 +345,10 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
 
   Node* fromNode = from.deepEquivalent().node();
   Node* toNode = to.deepEquivalent().node();
-
+  Node* fromNodeBlock = enclosingBlock(fromNode);
   return !enclosingNodeOfType(fromNode, &isMailPasteAsQuotationNode) &&
-         (!enclosingBlock(fromNode)->hasTagName(blockquoteTag) ||
-          isMailBlockquote(enclosingBlock(fromNode))) &&
+         fromNodeBlock && (!fromNodeBlock->hasTagName(blockquoteTag) ||
+                           isMailBlockquote(fromNodeBlock)) &&
          enclosingListChild(fromNode) == enclosingListChild(toNode) &&
          enclosingTableCell(fromNode) == enclosingTableCell(toNode) &&
          !(fromNode->renderer() && fromNode->renderer()->isTable()) &&
@@ -500,7 +500,8 @@ void ReplaceSelectionCommand::doApply() {
 
   if (selectionStartWasStartOfParagraph && selectionEndWasEndOfParagraph ||
       startBlock == currentRoot ||
-      startBlock->renderer() && startBlock->renderer()->isListItem())
+      startBlock && startBlock->renderer() &&
+          startBlock->renderer()->isListItem())
     m_preventNesting = false;
 
   Position insertionPos = selection.start();
@@ -566,7 +567,7 @@ void ReplaceSelectionCommand::doApply() {
   startBlock = enclosingBlock(insertionPos.node());
 
   // Adjust insertionPos to prevent nesting.
-  if (m_preventNesting) {
+  if (m_preventNesting && startBlock) {
     ASSERT(startBlock != currentRoot);
     VisiblePosition visibleInsertionPos(insertionPos);
     if (isEndOfBlock(visibleInsertionPos) &&
@@ -638,7 +639,7 @@ void ReplaceSelectionCommand::doApply() {
   // before the startBlock wasn't in its own block and
   // didn't have a br after it, so the inserted content ended up in the same
   // paragraph.
-  if (insertionPos.node() == startBlock->parentNode() &&
+  if (startBlock && insertionPos.node() == startBlock->parentNode() &&
       (unsigned)insertionPos.offset() < startBlock->nodeIndex() &&
       !isStartOfParagraph(startOfInsertedContent))
     insertNodeAt(createBreakElement(document()).get(),

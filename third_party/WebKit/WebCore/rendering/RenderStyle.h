@@ -769,8 +769,10 @@ enum EAppearance {
   SliderThumbVerticalAppearance,
   CaretAppearance,
   SearchFieldAppearance,
-  SearchFieldResultsAppearance,
-  SearchFieldCloseAppearance,
+  SearchFieldDecorationAppearance,
+  SearchFieldResultsDecorationAppearance,
+  SearchFieldResultsButtonAppearance,
+  SearchFieldCancelButtonAppearance,
   TextFieldAppearance,
   TextAreaAppearance
 };
@@ -1089,7 +1091,11 @@ class RenderStyle {
     SELECTION,
     FIRST_LINE_INHERITED,
     FILE_UPLOAD_BUTTON,
-    SLIDER_THUMB
+    SLIDER_THUMB,
+    SEARCH_CANCEL_BUTTON,
+    SEARCH_DECORATION,
+    SEARCH_RESULTS_DECORATION,
+    SEARCH_RESULTS_BUTTON
   };
 
   void ref() { m_ref++; }
@@ -1207,7 +1213,7 @@ class RenderStyle {
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
     bool _affectedByDrag : 1;
-    unsigned _pseudoBits : 8;
+    unsigned _pseudoBits : 12;
     unsigned _unicodeBidi : 2;  // EUnicodeBidi
   } noninherited_flags;
 

@@ -88,6 +88,16 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
     case SliderThumbHorizontalAppearance:
     case SliderThumbVerticalAppearance:
       return adjustSliderThumbStyle(selector, style, e);
+    case SearchFieldAppearance:
+      return adjustSearchFieldStyle(selector, style, e);
+    case SearchFieldCancelButtonAppearance:
+      return adjustSearchFieldCancelButtonStyle(selector, style, e);
+    case SearchFieldDecorationAppearance:
+      return adjustSearchFieldDecorationStyle(selector, style, e);
+    case SearchFieldResultsDecorationAppearance:
+      return adjustSearchFieldResultsDecorationStyle(selector, style, e);
+    case SearchFieldResultsButtonAppearance:
+      return adjustSearchFieldResultsButtonStyle(selector, style, e);
     default:
       break;
   }
@@ -132,6 +142,16 @@ bool RenderTheme::paint(RenderObject* o,
     case TextAreaAppearance:
     case ListboxAppearance:
       return true;
+    case SearchFieldAppearance:
+      return paintSearchField(o, paintInfo, r);
+    case SearchFieldCancelButtonAppearance:
+      return paintSearchFieldCancelButton(o, paintInfo, r);
+    case SearchFieldDecorationAppearance:
+      return paintSearchFieldDecoration(o, paintInfo, r);
+    case SearchFieldResultsDecorationAppearance:
+      return paintSearchFieldResultsDecoration(o, paintInfo, r);
+    case SearchFieldResultsButtonAppearance:
+      return paintSearchFieldResultsButton(o, paintInfo, r);
     default:
       break;
   }
@@ -165,6 +185,11 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
     case SliderVerticalAppearance:
     case SliderThumbHorizontalAppearance:
     case SliderThumbVerticalAppearance:
+    case SearchFieldAppearance:
+    case SearchFieldCancelButtonAppearance:
+    case SearchFieldDecorationAppearance:
+    case SearchFieldResultsDecorationAppearance:
+    case SearchFieldResultsButtonAppearance:
     default:
       break;
   }
@@ -195,6 +220,11 @@ bool RenderTheme::paintDecorations(RenderObject* o,
     case SliderVerticalAppearance:
     case SliderThumbHorizontalAppearance:
     case SliderThumbVerticalAppearance:
+    case SearchFieldAppearance:
+    case SearchFieldCancelButtonAppearance:
+    case SearchFieldDecorationAppearance:
+    case SearchFieldResultsDecorationAppearance:
+    case SearchFieldResultsButtonAppearance:
     default:
       break;
   }
@@ -275,6 +305,8 @@ bool RenderTheme::isControlStyled(const RenderStyle* style,
     case ButtonAppearance:
     case ListboxAppearance:
     case MenulistAppearance:
+    // FIXME: Uncomment this when making search fields style-able.
+    // case SearchFieldAppearance:
     case TextFieldAppearance:
     case TextAreaAppearance: {
       // Test the style to see if the UA border and background match.
@@ -427,4 +459,26 @@ void RenderTheme::adjustSliderThumbStyle(CSSStyleSelector* selector,
                                          Element* e) const {}
 
 void RenderTheme::adjustSliderThumbSize(RenderObject*) const {}
+
+void RenderTheme::adjustSearchFieldStyle(CSSStyleSelector* selector,
+                                         RenderStyle* style,
+                                         Element* e) const {}
+
+void RenderTheme::adjustSearchFieldCancelButtonStyle(CSSStyleSelector* selector,
+                                                     RenderStyle* style,
+                                                     Element* e) const {}
+
+void RenderTheme::adjustSearchFieldDecorationStyle(CSSStyleSelector* selector,
+                                                   RenderStyle* style,
+                                                   Element* e) const {}
+
+void RenderTheme::adjustSearchFieldResultsDecorationStyle(
+    CSSStyleSelector* selector,
+    RenderStyle* style,
+    Element* e) const {}
+
+void RenderTheme::adjustSearchFieldResultsButtonStyle(
+    CSSStyleSelector* selector,
+    RenderStyle* style,
+    Element* e) const {}
 }
