@@ -274,7 +274,7 @@ class FrameLoader : Noncopyable {
   void handleFallbackContent();
   bool isStopping() const;
 #if PLATFORM(MAC)
-  void setResponse(NSURLResponse*);
+  void setResponse(const ResourceResponse&);
 #endif
 
   void finishedLoading();

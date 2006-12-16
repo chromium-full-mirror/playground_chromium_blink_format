@@ -103,8 +103,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                         NSURLRequest*,
                         NSURLResponse*);
 
-  virtual id dispatchIdentifierForInitialRequest(WebCore::DocumentLoader*,
-                                                 NSURLRequest*);
   virtual id dispatchIdentifierForInitialRequest(
       WebCore::DocumentLoader*,
       const WebCore::ResourceRequest&);

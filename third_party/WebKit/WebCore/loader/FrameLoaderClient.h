@@ -114,8 +114,6 @@ class FrameLoaderClient {
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
                                                  const ResourceRequest&) = 0;
-  virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
-                                                 NSURLRequest*) = 0;
   virtual NSURLRequest* dispatchWillSendRequest(
       DocumentLoader*,
       id identifier,
