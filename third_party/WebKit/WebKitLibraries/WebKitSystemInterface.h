@@ -114,6 +114,7 @@ void WKDrawFocusRing(CGContextRef context,
 void WKSetDragImage(NSImage* image, NSPoint offset);
 
 void WKDrawBezeledTextFieldCell(NSRect, BOOL enabled);
+void WKDrawTextFieldCellFocusRing(NSTextFieldCell*, NSRect);
 void WKDrawBezeledTextArea(NSRect, BOOL enabled);
 void WKPopupMenu(NSMenu*,
                  NSPoint location,
