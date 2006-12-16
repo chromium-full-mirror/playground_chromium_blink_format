@@ -50,9 +50,7 @@ void HTMLTextFieldInnerTextElement::defaultEventHandler(Event* evt) {
   // this subclass.
   Node* shadowAncestor = shadowAncestorNode();
   if (shadowAncestor && shadowAncestor->renderer()) {
-    ASSERT((shadowAncestor->renderer()->isTextField() &&
-            static_cast<HTMLInputElement*>(shadowAncestor)
-                ->isNonWidgetTextField()) ||
+    ASSERT(shadowAncestor->renderer()->isTextField() ||
            shadowAncestor->renderer()->isTextArea());
     if (evt->isBeforeTextInsertedEvent())
       if (shadowAncestor->renderer()->isTextField())

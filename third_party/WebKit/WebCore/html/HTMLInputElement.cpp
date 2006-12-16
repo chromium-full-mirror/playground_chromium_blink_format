@@ -139,7 +139,7 @@ const AtomicString& HTMLInputElement::name() const {
 bool HTMLInputElement::isKeyboardFocusable(KeyboardEvent* event) const {
   // If text fields can be focused, then they should always be keyboard
   // focusable
-  if (isNonWidgetTextField())
+  if (isTextField())
     return HTMLGenericFormElement::isFocusable();
 
   // If the base class says we can't be focused, then we can stop now.
@@ -172,13 +172,13 @@ bool HTMLInputElement::isKeyboardFocusable(KeyboardEvent* event) const {
 }
 
 bool HTMLInputElement::isMouseFocusable() const {
-  if (isNonWidgetTextField())
+  if (isTextField())
     return HTMLGenericFormElement::isFocusable();
   return HTMLGenericFormElement::isMouseFocusable();
 }
 
 void HTMLInputElement::focus() {
-  if (isNonWidgetTextField()) {
+  if (isTextField()) {
     Document* doc = document();
     if (doc->focusedNode() == this)
       return;
@@ -198,7 +198,7 @@ void HTMLInputElement::focus() {
 }
 
 void HTMLInputElement::updateFocusAppearance() {
-  if (isNonWidgetTextField()) {
+  if (isTextField()) {
     select();
     if (document() && document()->frame())
       document()->frame()->revealSelection();
@@ -207,12 +207,12 @@ void HTMLInputElement::updateFocusAppearance() {
 }
 
 void HTMLInputElement::aboutToUnload() {
-  if (isNonWidgetTextField() && document()->frame())
+  if (isTextField() && document()->frame())
     document()->frame()->textFieldDidEndEditing(this);
 }
 
 void HTMLInputElement::dispatchFocusEvent() {
-  if (isNonWidgetTextField()) {
+  if (isTextField()) {
     setAutofilled(false);
     if (inputType() == PASSWORD && document()->frame())
       document()->frame()->setSecureKeyboardEntry(true);
@@ -221,7 +221,7 @@ void HTMLInputElement::dispatchFocusEvent() {
 }
 
 void HTMLInputElement::dispatchBlurEvent() {
-  if (isNonWidgetTextField() && document()->frame()) {
+  if (isTextField() && document()->frame()) {
     if (inputType() == PASSWORD)
       document()->frame()->setSecureKeyboardEntry(false);
     document()->frame()->textFieldDidEndEditing(static_cast<Element*>(this));
@@ -1053,7 +1053,7 @@ void HTMLInputElement::setValue(const String& value) {
 
   // Restore a caret at the starting point of the old selection.
   // This matches Safari 2.0 behavior.
-  if (isNonWidgetTextField() && document()->focusedNode() == this &&
+  if (isTextField() && document()->focusedNode() == this &&
       cachedSelStart >= 0) {
     ASSERT(cachedSelEnd >= 0);
     setSelectionRange(cachedSelStart, cachedSelStart);
@@ -1231,7 +1231,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     bool clickElement = false;
     bool clickDefaultFormButton = false;
 
-    if (isNonWidgetTextField() && document()->frame() &&
+    if (isTextField() && document()->frame() &&
         document()->frame()->doTextFieldCommandFromEvent(
             this, static_cast<KeyboardEvent*>(evt))) {
       evt->setDefaultHandled();
@@ -1373,10 +1373,9 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     textEvent->setText(constrainValue(textEvent->text(), maxNewLen));
   }
 
-  if (isNonWidgetTextField() &&
+  if (isTextField() && renderer() &&
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
-       evt->type() == blurEvent || evt->type() == focusEvent) &&
-      renderer())
+       evt->type() == blurEvent || evt->type() == focusEvent))
     static_cast<RenderTextControl*>(renderer())->forwardEvent(evt);
 
   if (inputType() == RANGE && renderer()) {
