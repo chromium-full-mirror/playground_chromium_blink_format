@@ -162,7 +162,6 @@ class FrameMac : public Frame {
   // === to be moved into Editor
 
  public:
-  NSFont* fontForSelection(bool* hasMultipleFonts) const;
   NSDictionary* fontAttributesForSelectionStart() const;
 
   NSWritingDirection baseWritingDirectionForSelectionStart() const;

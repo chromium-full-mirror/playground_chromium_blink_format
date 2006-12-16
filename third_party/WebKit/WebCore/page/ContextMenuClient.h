@@ -40,7 +40,8 @@ class ContextMenuClient {
   virtual void contextMenuDestroyed() = 0;
 
   virtual void addCustomContextMenuItems(ContextMenu*) = 0;
-  virtual void contextMenuItemSelected(const ContextMenuItem*) = 0;
+  virtual void contextMenuItemSelected(ContextMenuItem*,
+                                       const ContextMenu*) = 0;
 
   virtual void downloadURL(const KURL& url) = 0;
   virtual void copyImageToClipboard(const HitTestResult&) = 0;

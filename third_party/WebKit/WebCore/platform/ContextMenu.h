@@ -50,14 +50,15 @@ class ContextMenu : Noncopyable {
   ~ContextMenu();
 
   void populate();
+  void checkOrEnableIfNeeded(ContextMenuItem&) const;
 
   void show();
   void hide();
 
-  void insertItem(unsigned position, const ContextMenuItem&);
-  void appendItem(const ContextMenuItem&);
+  void insertItem(unsigned position, ContextMenuItem&);
+  void appendItem(ContextMenuItem&);
 
-  ContextMenuItem at(unsigned index);
+  ContextMenuItem* itemWithAction(unsigned);
 
   unsigned itemCount() const;
 
