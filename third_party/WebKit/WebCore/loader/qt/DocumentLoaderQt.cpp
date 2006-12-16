@@ -157,10 +157,6 @@ void DocumentLoader::replaceRequestURLForAnchorScroll(const KURL& URL) {
   notImplemented();
 }
 
-bool DocumentLoader::isStopping() const {
-  return m_stopping;
-}
-
 void DocumentLoader::clearErrors() {}
 
 // Cancels the data source's pending loads.  Conceptually, a data source only
@@ -182,7 +178,7 @@ void DocumentLoader::stopLoading() {
   RefPtr<Frame> protectFrame(m_frame);
   RefPtr<DocumentLoader> protectLoader(this);
 
-  m_stopping = true;
+  m_isStopping = true;
 
   FrameLoader* frameLoader = DocumentLoader::frameLoader();
 
@@ -205,7 +201,7 @@ void DocumentLoader::stopLoading() {
   frameLoader->stopLoadingSubresources();
   frameLoader->stopLoadingPlugIns();
 
-  m_stopping = false;
+  m_isStopping = false;
 }
 
 void DocumentLoader::setupForReplace() {
@@ -302,21 +298,14 @@ void DocumentLoader::detachFromFrame() {
 }
 
 void DocumentLoader::prepareForLoadStart() {
-  ASSERT(!m_stopping);
+  ASSERT(!m_isStopping);
   setPrimaryLoadComplete(false);
   ASSERT(frameLoader());
   clearErrors();
 
-  // Mark the start loading time.
-  m_loadingStartedTime = QDateTime::currentDateTime().toTime_t();
-
   setLoading(true);
 
   frameLoader()->prepareForLoadStart();
-}
-
-double DocumentLoader::loadingStartedTime() const {
-  return m_loadingStartedTime;
 }
 
 void DocumentLoader::setIsClientRedirect(bool flag) {

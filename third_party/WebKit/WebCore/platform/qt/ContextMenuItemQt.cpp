@@ -30,37 +30,44 @@
 
 namespace WebCore {
 
-ContextMenuItem::ContextMenuItem(ContextMenu* parentMenu, ContextMenu* subMenu)
-    : m_parentMenu(parentMenu), m_subMenu(subMenu), m_type(SeparatorType) {}
+ContextMenuItem::ContextMenuItem(ContextMenu* subMenu) {}
 
 ContextMenuItem::ContextMenuItem(ContextMenuItemType type,
                                  ContextMenuAction action,
                                  const String& title,
-                                 ContextMenu* parentMenu,
-                                 ContextMenu* subMenu)
-    : m_parentMenu(parentMenu), m_subMenu(subMenu), m_type(type) {}
+                                 ContextMenu* subMenu) {}
 
 ContextMenuItem::~ContextMenuItem() {}
 
-PlatformMenuItemDescription ContextMenuItem::platformDescription() const {
+PlatformMenuItemDescription ContextMenuItem::releasePlatformDescription() {
   return PlatformMenuItemDescription();
-  ;
 }
+
+ContextMenuItemType ContextMenuItem::type() {
+  return ActionType;
+}
+
+void ContextMenuItem::setType(ContextMenuItemType) {}
 
 ContextMenuAction ContextMenuItem::action() const {
   return ContextMenuAction();
-  ;
 }
+
+void ContextMenuItem::setAction(ContextMenuAction action) {}
 
 String ContextMenuItem::title() const {
   return String();
 }
 
-void ContextMenuItem::setAction(ContextMenuAction action) {}
+void ContextMenuItem::setTitle(const String& title) const {}
 
-void ContextMenuItem::setTitle(String title) {}
-
-void ContextMenuItem::setSubMenu(ContextMenu* menu) {
-  m_subMenu.set(menu);
+PlatformMenuDescription ContextMenuItem::platformSubMenu() const {
+  return PlatformMenuDescription();
 }
+
+void ContextMenuItem::setSubMenu(ContextMenu* menu) {}
+
+void ContextMenuItem::setChecked(bool) const {}
+
+void ContextMenuItem::setEnabled(bool) const {}
 }

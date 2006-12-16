@@ -38,7 +38,7 @@ ContextMenu::ContextMenu(const HitTestResult& result)
 
 ContextMenu::~ContextMenu() {}
 
-void ContextMenu::appendItem(const ContextMenuItem& item) {
+void ContextMenu::appendItem(ContextMenuItem& item) {
   if (!m_menu)
     m_menu = new QMenu();
 
@@ -55,7 +55,7 @@ unsigned ContextMenu::itemCount() const {
   return 1;
 }
 
-void ContextMenu::insertItem(unsigned position, const ContextMenuItem& item) {
+void ContextMenu::insertItem(unsigned position, ContextMenuItem& item) {
   // FIXME: Another silly method
   appendItem(item);
 }

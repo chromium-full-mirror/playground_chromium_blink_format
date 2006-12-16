@@ -48,15 +48,20 @@ void ContextMenuClientQt::deref() {
   Shared<ContextMenuClientQt>::deref();
 }
 
+void ContextMenuClientQt::contextMenuDestroyed() {
+  notImplemented();
+}
+
 void ContextMenuClientQt::addCustomContextMenuItems(ContextMenu*) {
   notImplemented();
 }
 
-void ContextMenuClientQt::copyLinkToClipboard(const HitTestResult&) {
+void ContextMenuClientQt::contextMenuItemSelected(ContextMenuItem*,
+                                                  const ContextMenu*) {
   notImplemented();
 }
 
-void ContextMenuClientQt::downloadURL(const KURL&) {
+void ContextMenuClientQt::downloadURL(const KURL& url) {
   notImplemented();
 }
 
@@ -67,10 +72,6 @@ void ContextMenuClientQt::copyImageToClipboard(const HitTestResult&) {
 void ContextMenuClientQt::lookUpInDictionary(Frame*) {
   notImplemented();
 }
-
-void ContextMenuClientQt::contextMenuDestroyed() {}
-
-void ContextMenuClientQt::contextMenuItemSelected(const ContextMenuItem*) {}
 
 void ContextMenuClientQt::speak(const String&) {
   notImplemented();
