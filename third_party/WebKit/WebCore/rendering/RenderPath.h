@@ -57,7 +57,7 @@ class RenderPath : public RenderObject {
   const Path& path() const;
 
   virtual bool isRenderPath() const { return true; }
-  virtual const char* renderName() const { return "KCanvasItem"; }
+  virtual const char* renderName() const { return "RenderPath"; }
 
   virtual AffineTransform localTransform() const;
   virtual void setLocalTransform(const AffineTransform& matrix);
