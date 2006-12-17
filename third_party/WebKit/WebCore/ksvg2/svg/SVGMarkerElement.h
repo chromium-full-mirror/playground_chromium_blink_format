@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,6 +22,7 @@
 
 #ifndef SVGMarkerElement_H
 #define SVGMarkerElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGResourceMarker.h"
@@ -33,8 +34,7 @@
 namespace WebCore {
 class Document;
 class SVGAngle;
-class SVGAngle;
-class SVGLength;
+
 class SVGMarkerElement : public SVGStyledElement,
                          public SVGLangSpace,
                          public SVGExternalResourcesRequired,
@@ -85,23 +85,23 @@ class SVGMarkerElement : public SVGStyledElement,
                                          preserveAspectRatio)
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  RefX,
                                  refX)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  RefY,
                                  refY)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  MarkerWidth,
                                  markerWidth)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  MarkerHeight,
                                  markerHeight)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,

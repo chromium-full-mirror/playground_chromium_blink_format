@@ -233,7 +233,7 @@ void RenderSVGImage::layout() {
 
 FloatRect RenderSVGImage::relativeBBox(bool includeStroke) const {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
-  return FloatRect(image->x()->value(), image->y()->value(), width(), height());
+  return FloatRect(image->x().value(), image->y().value(), width(), height());
 }
 
 void RenderSVGImage::imageChanged(CachedImage* image) {
@@ -246,7 +246,7 @@ void RenderSVGImage::imageChanged(CachedImage* image) {
 IntRect RenderSVGImage::getAbsoluteRepaintRect() {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
   FloatRect repaintRect = absoluteTransform().mapRect(
-      FloatRect(image->x()->value(), image->y()->value(), width(), height()));
+      FloatRect(image->x().value(), image->y().value(), width(), height()));
 
   // Filters can expand the bounding box
   SVGResourceFilter* filter =
@@ -263,7 +263,7 @@ void RenderSVGImage::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
 
 AffineTransform RenderSVGImage::translationForAttributes() {
   SVGImageElement* image = static_cast<SVGImageElement*>(node());
-  return AffineTransform().translate(image->x()->value(), image->y()->value());
+  return AffineTransform().translate(image->x().value(), image->y().value());
 }
 }
 

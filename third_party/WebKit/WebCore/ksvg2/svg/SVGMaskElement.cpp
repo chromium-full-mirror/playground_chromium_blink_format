@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
                   2005 Alexander Kellett <lypanov@kde.org>
 
@@ -45,50 +45,50 @@ SVGMaskElement::SVGMaskElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_x(new SVGLength(this, LM_WIDTH, viewportElement())),
-      m_y(new SVGLength(this, LM_HEIGHT, viewportElement())),
-      m_width(new SVGLength(this, LM_WIDTH, viewportElement())),
-      m_height(new SVGLength(this, LM_HEIGHT, viewportElement())),
+      m_x(this, LengthModeWidth),
+      m_y(this, LengthModeHeight),
+      m_width(this, LengthModeWidth),
+      m_height(this, LengthModeHeight),
       m_dirty(true) {}
 
 SVGMaskElement::~SVGMaskElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               X,
                               x,
                               SVGNames::xAttr.localName(),
-                              m_x.get())
+                              m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Y,
                               y,
                               SVGNames::yAttr.localName(),
-                              m_y.get())
+                              m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Width,
                               width,
                               SVGNames::widthAttr.localName(),
-                              m_width.get())
+                              m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGMaskElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Height,
                               height,
                               SVGNames::heightAttr.localName(),
-                              m_height.get())
+                              m_height)
 
 void SVGMaskElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   IntSize newSize =
-      IntSize(lroundf(width()->value()), lroundf(height()->value()));
+      IntSize(lroundf(width().value()), lroundf(height().value()));
   if (!m_masker || !m_masker->mask() || (m_masker->mask()->size() != newSize))
     m_dirty = true;
   SVGStyledLocatableElement::attributeChanged(attr, preserveDecls);
@@ -102,13 +102,13 @@ void SVGMaskElement::childrenChanged() {
 void SVGMaskElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
-    xBaseValue()->setValueAsString(value);
+    setXBaseValue(SVGLength(this, LengthModeWidth, value));
   else if (attr->name() == SVGNames::yAttr)
-    yBaseValue()->setValueAsString(value);
+    setYBaseValue(SVGLength(this, LengthModeHeight, value));
   else if (attr->name() == SVGNames::widthAttr)
-    widthBaseValue()->setValueAsString(value);
+    setWidthBaseValue(SVGLength(this, LengthModeWidth, value));
   else if (attr->name() == SVGNames::heightAttr)
-    heightBaseValue()->setValueAsString(value);
+    setHeightBaseValue(SVGLength(this, LengthModeHeight, value));
   else {
     if (SVGURIReference::parseMappedAttribute(attr))
       return;
@@ -128,7 +128,7 @@ SVGResourceImage* SVGMaskElement::drawMaskerContent() {
   return 0;
   SVGResourceImage* maskImage = new SVGResourceImage();
 
-  IntSize size = IntSize(lroundf(width()->value()), lroundf(height()->value()));
+  IntSize size = IntSize(lroundf(width().value()), lroundf(height().value()));
   maskImage->init(size);
 
   OwnPtr<GraphicsContext> context(contextForImage(maskImage));
@@ -164,5 +164,6 @@ SVGResource* SVGMaskElement::canvasResource() {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -29,14 +29,14 @@
 #include "SVGList.h"
 
 namespace WebCore {
-class SVGLengthList : public SVGList<RefPtr<SVGLength>> {
+class SVGLengthList : public SVGList<SVGLength> {
  public:
   SVGLengthList();
   virtual ~SVGLengthList();
 
   void parse(const String& value,
              const SVGStyledElement* context,
-             LengthMode mode);
+             SVGLengthMode mode);
 };
 
 }  // namespace WebCore

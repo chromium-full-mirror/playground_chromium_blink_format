@@ -38,19 +38,19 @@ SVGTextContentElement::SVGTextContentElement(const QualifiedName& tagName,
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_textLength(new SVGLength(this, LM_WIDTH)),
+      m_textLength(this, LengthModeWidth),
       m_lengthAdjust(0) {}
 
 SVGTextContentElement::~SVGTextContentElement() {}
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               TextLength,
                               textLength,
                               SVGNames::textLengthAttr.localName(),
-                              m_textLength.get())
+                              m_textLength)
 ANIMATED_PROPERTY_DEFINITIONS(SVGTextContentElement,
                               int,
                               Enumeration,
@@ -105,7 +105,7 @@ void SVGTextContentElement::selectSubString(unsigned long charnum,
 
 void SVGTextContentElement::parseMappedAttribute(MappedAttribute* attr) {
   // if (attr->name() == SVGNames::lengthAdjustAttr)
-  //    xBaseValue()->setValueAsString(value);
+  //    setXBaseValue(SVGLength(this, LengthModeWidth, value));
   // else
   {
     if (SVGTests::parseMappedAttribute(attr))

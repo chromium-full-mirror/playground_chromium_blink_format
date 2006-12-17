@@ -21,6 +21,7 @@
 
 #ifndef SVGMaskElement_H
 #define SVGMaskElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGResourceMasker.h"
@@ -63,24 +64,16 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
 
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement, SVGLength, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement, SVGLength, SVGLength, Y, y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 Y,
-                                 y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
 

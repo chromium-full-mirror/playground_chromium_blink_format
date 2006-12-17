@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,15 +20,15 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGFilterPrimitiveStandardAttributesImpl_H
-#define KSVG_SVGFilterPrimitiveStandardAttributesImpl_H
+#ifndef SVGFilterPrimitiveStandardAttributes_H
+#define SVGFilterPrimitiveStandardAttributes_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGStyledElement.h"
 
 namespace WebCore {
 class SVGFilterEffect;
-class SVGLength;
 
 class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
  public:
@@ -50,23 +50,23 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  X,
                                  x)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Y,
                                  y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
   ANIMATED_PROPERTY_DECLARATIONS(SVGFilterPrimitiveStandardAttributes,

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,8 +20,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGUseElementImpl_H
-#define KSVG_SVGUseElementImpl_H
+#ifndef SVGUseElement_H
+#define SVGUseElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGExternalResourcesRequired.h"
@@ -66,24 +67,16 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                          externalResourcesRequired)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
+  ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement, SVGLength, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement, SVGLength, SVGLength, Y, y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 Y,
-                                 y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
 };

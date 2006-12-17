@@ -19,8 +19,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGForeignObjectElementImpl_H
-#define KSVG_SVGForeignObjectElementImpl_H
+#ifndef SVGForeignObjectElement_H
+#define SVGForeignObjectElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGTests.h"
@@ -43,12 +44,12 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   virtual ~SVGForeignObjectElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
-  virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void parseMappedAttribute(MappedAttribute*);
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-  bool childShouldCreateRenderer(Node* child) const;
+  bool childShouldCreateRenderer(Node*) const;
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
  protected:
@@ -62,23 +63,23 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  X,
                                  x)
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Y,
                                  y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
 };

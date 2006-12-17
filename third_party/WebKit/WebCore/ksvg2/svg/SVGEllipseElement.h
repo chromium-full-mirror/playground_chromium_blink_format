@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,8 +20,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGEllipseElementImpl_H
-#define KSVG_SVGEllipseElementImpl_H
+#ifndef SVGEllipseElement_H
+#define SVGEllipseElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGExternalResourcesRequired.h"
@@ -30,7 +31,6 @@
 #include "SVGTests.h"
 
 namespace WebCore {
-class SVGLength;
 class SVGEllipseElement : public SVGStyledTransformableElement,
                           public SVGTests,
                           public SVGLangSpace,
@@ -49,12 +49,8 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
   }
   virtual Path toPathData() const;
 
-  virtual const SVGStyledElement* pushAttributeContext(
-      const SVGStyledElement* context);
-
  protected:
   virtual const SVGElement* contextElement() const { return this; }
-
   virtual bool hasPercentageValues() const;
 
  private:
@@ -64,23 +60,23 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
                                          externalResourcesRequired)
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGEllipseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Cx,
                                  cx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGEllipseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Cy,
                                  cy)
   ANIMATED_PROPERTY_DECLARATIONS(SVGEllipseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Rx,
                                  rx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGEllipseElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Ry,
                                  ry)
 };

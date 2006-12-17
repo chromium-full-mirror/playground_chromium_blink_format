@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGSVGElement.h"
 
@@ -53,20 +54,14 @@ SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document* doc)
       SVGExternalResourcesRequired(),
       SVGFitToViewBox(),
       SVGZoomAndPan(),
+      m_x(this, LengthModeWidth),
+      m_y(this, LengthModeHeight),
+      m_width(this, LengthModeWidth),
+      m_height(this, LengthModeHeight),
       m_useCurrentView(false),
       m_timeScheduler(new TimeScheduler(doc)) {
-  const SVGElement* viewport =
-      ownerDocument()->documentElement() == this ? this : viewportElement();
-  const SVGStyledElement* context =
-      ownerDocument()->documentElement() == this ? 0 : this;
-
-  m_x = new SVGLength(context, LM_WIDTH, viewport);
-  m_y = new SVGLength(context, LM_HEIGHT, viewport);
-  m_width = new SVGLength(context, LM_WIDTH, viewport);
-  m_height = new SVGLength(context, LM_HEIGHT, viewport);
-
-  m_width->setValueAsString("100%");
-  m_height->setValueAsString("100%");
+  setWidthBaseValue(SVGLength(this, LengthModeWidth, "100%"));
+  setHeightBaseValue(SVGLength(this, LengthModeHeight, "100%"));
 }
 
 SVGSVGElement::~SVGSVGElement() {
@@ -74,37 +69,37 @@ SVGSVGElement::~SVGSVGElement() {
 }
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               X,
                               x,
                               SVGNames::xAttr.localName(),
-                              m_x.get())
+                              m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Y,
                               y,
                               SVGNames::yAttr.localName(),
-                              m_y.get())
+                              m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Width,
                               width,
                               SVGNames::widthAttr.localName(),
-                              m_width.get())
+                              m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Height,
                               height,
                               SVGNames::heightAttr.localName(),
-                              m_height.get())
+                              m_height)
 
 const AtomicString& SVGSVGElement::contentScriptType() const {
   static const AtomicString defaultValue("text/ecmascript");
@@ -127,10 +122,10 @@ void SVGSVGElement::setContentStyleType(const AtomicString& type) {
 }
 
 FloatRect SVGSVGElement::viewport() const {
-  double _x = x()->value();
-  double _y = y()->value();
-  double w = width()->value();
-  double h = height()->value();
+  double _x = x().value();
+  double _y = y().value();
+  double w = width().value();
+  double h = height().value();
   AffineTransform viewBox = viewBoxToViewTransform(w, h);
   viewBox.map(_x, _y, &_x, &_y);
   viewBox.map(w, h, &w, &h);
@@ -204,15 +199,15 @@ void SVGSVGElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (attr->name() == SVGNames::onzoomAttr)
       addSVGWindowEventListner(zoomEvent, attr);
   }
-  if (attr->name() == SVGNames::xAttr) {
-    xBaseValue()->setValueAsString(value);
-  } else if (attr->name() == SVGNames::yAttr) {
-    yBaseValue()->setValueAsString(value);
-  } else if (attr->name() == SVGNames::widthAttr) {
-    widthBaseValue()->setValueAsString(value);
+  if (attr->name() == SVGNames::xAttr)
+    setXBaseValue(SVGLength(this, LengthModeWidth, value));
+  else if (attr->name() == SVGNames::yAttr)
+    setYBaseValue(SVGLength(this, LengthModeHeight, value));
+  else if (attr->name() == SVGNames::widthAttr) {
+    setWidthBaseValue(SVGLength(this, LengthModeWidth, value));
     addCSSProperty(attr, CSS_PROP_WIDTH, value);
   } else if (attr->name() == SVGNames::heightAttr) {
-    heightBaseValue()->setValueAsString(value);
+    setHeightBaseValue(SVGLength(this, LengthModeHeight, value));
     addCSSProperty(attr, CSS_PROP_HEIGHT, value);
   } else {
     if (SVGTests::parseMappedAttribute(attr))
@@ -284,8 +279,8 @@ double SVGSVGElement::createSVGNumber() {
   return 0.0;
 }
 
-SVGLength* SVGSVGElement::createSVGLength() {
-  return new SVGLength(0);
+SVGLength SVGSVGElement::createSVGLength() {
+  return SVGLength();
 }
 
 SVGAngle* SVGSVGElement::createSVGAngle() {
@@ -317,11 +312,11 @@ SVGTransform* SVGSVGElement::createSVGTransformFromMatrix(
 
 AffineTransform SVGSVGElement::getCTM() const {
   AffineTransform mat;
-  mat.translate(x()->value(), y()->value());
+  mat.translate(x().value(), y().value());
 
   if (attributes()->getNamedItem(SVGNames::viewBoxAttr)) {
     AffineTransform viewBox =
-        viewBoxToViewTransform(width()->value(), height()->value());
+        viewBoxToViewTransform(width().value(), height().value());
     mat = viewBox * mat;
   }
 
@@ -330,11 +325,11 @@ AffineTransform SVGSVGElement::getCTM() const {
 
 AffineTransform SVGSVGElement::getScreenCTM() const {
   AffineTransform mat = SVGStyledLocatableElement::getScreenCTM();
-  mat.translate(x()->value(), y()->value());
+  mat.translate(x().value(), y().value());
 
   if (attributes()->getNamedItem(SVGNames::viewBoxAttr)) {
     AffineTransform viewBox =
-        viewBoxToViewTransform(width()->value(), height()->value());
+        viewBoxToViewTransform(width().value(), height().value());
     mat = viewBox * mat;
   }
 
@@ -390,6 +385,16 @@ void SVGSVGElement::setCurrentTime(float /* seconds */) {
   // FIXME: Implement me
 }
 
+bool SVGSVGElement::hasPercentageValues() const {
+  if (x().unitType() == LengthTypePercentage ||
+      y().unitType() == LengthTypePercentage ||
+      width().unitType() == LengthTypePercentage ||
+      height().unitType() == LengthTypePercentage)
+    return true;
+
+  return false;
+}
+
 void SVGSVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   if (attr->name() == SVGNames::xAttr || attr->name() == SVGNames::yAttr ||
       attr->name() == SVGNames::widthAttr ||
@@ -401,5 +406,6 @@ void SVGSVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

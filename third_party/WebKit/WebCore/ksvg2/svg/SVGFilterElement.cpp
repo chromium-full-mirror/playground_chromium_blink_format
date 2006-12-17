@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
     Copyright (C) 2004, 2005, 2006 Rob Buis <buis@kde.org>
     Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
 
@@ -43,23 +43,21 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
       SVGExternalResourcesRequired(),
       m_filterUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
       m_primitiveUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
-      m_x(new SVGLength(this, LM_WIDTH, viewportElement())),
-      m_y(new SVGLength(this, LM_HEIGHT, viewportElement())),
-      m_width(new SVGLength(this, LM_WIDTH, viewportElement())),
-      m_height(new SVGLength(this, LM_HEIGHT, viewportElement())),
+      m_x(this, LengthModeWidth),
+      m_y(this, LengthModeHeight),
+      m_width(this, LengthModeWidth),
+      m_height(this, LengthModeHeight),
       m_filterResX(0),
-      m_filterResY(0)
-
-{
+      m_filterResY(0) {
   // Spec: If the attribute is not specified, the effect is as if a value of
   // "-10%" were specified.
-  m_x->setValueAsString("-10%");
-  m_y->setValueAsString("-10%");
+  setXBaseValue(SVGLength(this, LengthModeWidth, "-10%"));
+  setYBaseValue(SVGLength(this, LengthModeHeight, "-10%"));
 
   // Spec: If the attribute is not specified, the effect is as if a value of
   // "120%" were specified.
-  m_width->setValueAsString("120%");
-  m_height->setValueAsString("120%");
+  setWidthBaseValue(SVGLength(this, LengthModeWidth, "120%"));
+  setHeightBaseValue(SVGLength(this, LengthModeHeight, "120%"));
 }
 
 SVGFilterElement::~SVGFilterElement() {}
@@ -81,37 +79,37 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               SVGNames::primitiveUnitsAttr.localName(),
                               m_primitiveUnits)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               X,
                               x,
                               SVGNames::xAttr.localName(),
-                              m_x.get())
+                              m_x)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Y,
                               y,
                               SVGNames::yAttr.localName(),
-                              m_y.get())
+                              m_y)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Width,
                               width,
                               SVGNames::widthAttr.localName(),
-                              m_width.get())
+                              m_width)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
-                              SVGLength*,
+                              SVGLength,
                               Length,
                               length,
                               Height,
                               height,
                               SVGNames::heightAttr.localName(),
-                              m_height.get())
+                              m_height)
 ANIMATED_PROPERTY_DEFINITIONS(SVGFilterElement,
                               long,
                               Integer,
@@ -144,13 +142,13 @@ void SVGFilterElement::parseMappedAttribute(MappedAttribute* attr) {
     else if (value == "objectBoundingBox")
       setPrimitiveUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else if (attr->name() == SVGNames::xAttr)
-    xBaseValue()->setValueAsString(value);
+    setXBaseValue(SVGLength(this, LengthModeWidth, value));
   else if (attr->name() == SVGNames::yAttr)
-    yBaseValue()->setValueAsString(value);
+    setYBaseValue(SVGLength(this, LengthModeHeight, value));
   else if (attr->name() == SVGNames::widthAttr)
-    widthBaseValue()->setValueAsString(value);
+    setWidthBaseValue(SVGLength(this, LengthModeWidth, value));
   else if (attr->name() == SVGNames::heightAttr)
-    heightBaseValue()->setValueAsString(value);
+    setHeightBaseValue(SVGLength(this, LengthModeHeight, value));
   else {
     if (SVGURIReference::parseMappedAttribute(attr))
       return;
@@ -174,12 +172,29 @@ SVGResource* SVGFilterElement::canvasResource() {
       filterUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
   m_filter->setFilterBoundingBoxMode(filterBBoxMode);
 
-  x()->setBboxRelative(filterBBoxMode);
-  y()->setBboxRelative(filterBBoxMode);
-  width()->setBboxRelative(filterBBoxMode);
-  height()->setBboxRelative(filterBBoxMode);
-  m_filter->setFilterRect(FloatRect(x()->value(), y()->value(),
-                                    width()->value(), height()->value()));
+  float _x, _y, w, h;
+
+  if (filterBBoxMode && x().unitType() == LengthTypePercentage)
+    _x = x().valueInSpecifiedUnits() / 100.0;
+  else
+    _x = x().value();
+
+  if (filterBBoxMode && y().unitType() == LengthTypePercentage)
+    _y = y().valueInSpecifiedUnits() / 100.0;
+  else
+    _y = y().value();
+
+  if (filterBBoxMode && width().unitType() == LengthTypePercentage)
+    w = width().valueInSpecifiedUnits() / 100.0;
+  else
+    w = width().value();
+
+  if (filterBBoxMode && height().unitType() == LengthTypePercentage)
+    h = height().valueInSpecifiedUnits() / 100.0;
+  else
+    h = height().value();
+
+  m_filter->setFilterRect(FloatRect(_x, _y, w, h));
 
   bool primitiveBBoxMode =
       primitiveUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
@@ -201,5 +216,6 @@ SVGResource* SVGFilterElement::canvasResource() {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

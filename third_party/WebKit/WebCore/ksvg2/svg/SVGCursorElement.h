@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+                  2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -20,12 +20,14 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGCursorElementImpl_H
-#define KSVG_SVGCursorElementImpl_H
+#ifndef SVGCursorElement_H
+#define SVGCursorElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "Image.h"
 
+#include "SVGLength.h"
 #include "SVGElement.h"
 #include "SVGTests.h"
 #include "SVGURIReference.h"
@@ -33,8 +35,6 @@
 #include "CachedResourceClient.h"
 
 namespace WebCore {
-class SVGLength;
-
 class SVGCursorElement : public SVGElement,
                          public SVGTests,
                          public SVGExternalResourcesRequired,
@@ -61,16 +61,8 @@ class SVGCursorElement : public SVGElement,
                                          externalResourcesRequired)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGCursorElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGCursorElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 Y,
-                                 y)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCursorElement, SVGLength, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCursorElement, SVGLength, SVGLength, Y, y)
 
   CachedImage* m_cachedImage;
 };

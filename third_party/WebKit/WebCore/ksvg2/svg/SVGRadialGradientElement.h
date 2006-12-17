@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,8 +20,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGRadialGradientElementImpl_H
-#define KSVG_SVGRadialGradientElementImpl_H
+#ifndef SVGRadialGradientElement_H
+#define SVGRadialGradientElement_H
+
 #ifdef SVG_SUPPORT
 
 #include <SVGGradientElement.h>
@@ -47,28 +48,28 @@ class SVGRadialGradientElement : public SVGGradientElement {
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Cx,
                                  cx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Cy,
                                  cy)
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  R,
                                  r)
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Fx,
                                  fx)
   ANIMATED_PROPERTY_DECLARATIONS(SVGRadialGradientElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Fy,
                                  fy)
 };

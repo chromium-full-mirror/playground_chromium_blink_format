@@ -73,8 +73,8 @@ class SVGTextContentElement : public SVGStyledElement,
                                          externalResourcesRequired)
 
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  TextLength,
                                  textLength)
   ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,

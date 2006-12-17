@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -20,8 +20,9 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGImageElementImpl_H
-#define KSVG_SVGImageElementImpl_H
+#ifndef SVGImageElement_H
+#define SVGImageElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGExternalResourcesRequired.h"
@@ -69,24 +70,16 @@ class SVGImageElement : public SVGStyledTransformableElement,
                                          externalResourcesRequired)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
 
+  ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement, SVGLength, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement, SVGLength, SVGLength, Y, y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 Y,
-                                 y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
   ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,

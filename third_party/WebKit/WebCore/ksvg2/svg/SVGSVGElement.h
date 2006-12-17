@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -22,6 +22,7 @@
 
 #ifndef SVGSVGElement_H
 #define SVGSVGElement_H
+
 #ifdef SVG_SUPPORT
 
 #include "SVGExternalResourcesRequired.h"
@@ -102,7 +103,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void deselectAll();
 
   static double createSVGNumber();
-  static SVGLength* createSVGLength();
+  static SVGLength createSVGLength();
   static SVGAngle* createSVGAngle();
   static FloatPoint createSVGPoint();
   static AffineTransform createSVGMatrix();
@@ -132,6 +133,9 @@ class SVGSVGElement : public SVGStyledLocatableElement,
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 
+  friend class RenderSVGContainer;
+  virtual bool hasPercentageValues() const;
+
  private:
   void addSVGWindowEventListner(const AtomicString& eventType,
                                 const Attribute* attr);
@@ -149,24 +153,16 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                          PreserveAspectRatio,
                                          preserveAspectRatio)
 
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, SVGLength, X, x)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement, SVGLength, SVGLength, Y, y)
   ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 X,
-                                 x)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
-                                 Y,
-                                 y)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Width,
                                  width)
   ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
-                                 SVGLength*,
-                                 RefPtr<SVGLength>,
+                                 SVGLength,
+                                 SVGLength,
                                  Height,
                                  height)
 
