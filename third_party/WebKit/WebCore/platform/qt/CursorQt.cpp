@@ -76,7 +76,8 @@ class Cursors {
         SizeFDiagCursor(QCursor(Qt::SizeFDiagCursor)),
         SizeBDiagCursor(QCursor(Qt::SizeBDiagCursor)),
         SplitHCursor(QCursor(Qt::SplitHCursor)),
-        SplitVCursor(QCursor(Qt::SplitVCursor))
+        SplitVCursor(QCursor(Qt::SplitVCursor)),
+        BlankCursor(QCursor(Qt::BlankCursor))
 #endif
   {
   }
@@ -100,6 +101,7 @@ class Cursors {
   Cursor SizeBDiagCursor;
   Cursor SplitHCursor;
   Cursor SplitVCursor;
+  Cursor BlankCursor;
 };
 
 Cursors* Cursors::s_self = 0;
@@ -222,6 +224,10 @@ const Cursor& progressCursor() {
 
 const Cursor& aliasCursor() {
   return Cursors::self()->PointerCursor;
+}
+
+const Cursor& noneCursor() {
+  return Cursors::self()->BlankCursor;
 }
 }
 

@@ -173,4 +173,9 @@ const Cursor& rowResizeCursor() {
   static Cursor c = gdk_cursor_new(GDK_DOUBLE_ARROW);
   return c;
 }
+
+const Cursor& noneCursor() {
+  static Cursor c = gdk_cursor_new(GDK_LEFT_PTR);
+  return c;
+}
 }

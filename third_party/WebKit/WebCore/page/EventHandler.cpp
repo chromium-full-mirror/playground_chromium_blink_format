@@ -684,6 +684,8 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
       return aliasCursor();
     case CURSOR_COPY:
       return copyCursor();
+    case CURSOR_NONE:
+      return noneCursor();
     case CURSOR_NOT_ALLOWED:
       return noDropCursor();
     case CURSOR_DEFAULT:
