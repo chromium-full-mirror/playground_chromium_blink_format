@@ -27,7 +27,6 @@
 #include "Attr.h"
 #include "PlatformString.h"
 #include "SVGFitToViewBox.h"
-#include "SVGHelper.h"
 #include "SVGNames.h"
 #include "SVGStringList.h"
 #include "SVGZoomAndPan.h"
@@ -43,7 +42,10 @@ SVGViewElement::SVGViewElement(const QualifiedName& tagName, Document* doc)
 SVGViewElement::~SVGViewElement() {}
 
 SVGStringList* SVGViewElement::viewTarget() const {
-  return lazy_create<SVGStringList>(m_viewTarget);
+  if (!m_viewTarget)
+    m_viewTarget = new SVGStringList();
+
+  return m_viewTarget.get();
 }
 
 void SVGViewElement::parseMappedAttribute(MappedAttribute* attr) {
