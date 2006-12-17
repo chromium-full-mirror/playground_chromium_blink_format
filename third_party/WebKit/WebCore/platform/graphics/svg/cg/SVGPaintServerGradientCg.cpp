@@ -265,6 +265,8 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                    // baseclass. -- ecs 8/6/05
     listener()->resourceNotification();
 
+  m_maskImage = 0;
+
   // FIXME: total const HACK!
   // We need a hook to call this when the gradient gets updated, before drawn.
   if (!m_shadingCache)
