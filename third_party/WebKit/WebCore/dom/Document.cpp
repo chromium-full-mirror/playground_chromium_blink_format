@@ -2287,9 +2287,12 @@ void Document::defaultEventHandler(Event* evt) {
       if (elem) {
         elem->accessKeyAction(false);
         evt->setDefaultHandled();
+        return;
       }
     }
   }
+
+  ContainerNode::defaultEventHandler(evt);
 }
 
 void Document::setHTMLWindowEventListener(const AtomicString& eventType,

@@ -41,6 +41,8 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
+const int defaultTrackLength = 129;
+
 class HTMLSliderThumbElement : public HTMLDivElement {
  public:
   HTMLSliderThumbElement(Document*, Node* shadowParent = 0);
@@ -66,14 +68,15 @@ HTMLSliderThumbElement::HTMLSliderThumbElement(Document* doc,
       m_initialPosition(0),
       m_inDragMode(false) {}
 
-void HTMLSliderThumbElement::defaultEventHandler(Event* evt) {
-  if (evt->type() == mousedownEvent) {
-    MouseEvent* mEvt = static_cast<MouseEvent*>(evt);
-    if (renderer() && renderer()->parent() &&
+void HTMLSliderThumbElement::defaultEventHandler(Event* event) {
+  const AtomicString& eventType = event->type();
+  if (eventType == mousedownEvent && event->isMouseEvent()) {
+    MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
+    if (document()->frame() && renderer() && renderer()->parent() &&
         static_cast<RenderSlider*>(renderer()->parent())
-            ->mouseEventIsInThumb(mEvt)) {
+            ->mouseEventIsInThumb(mouseEvent)) {
       // Cache the initial point where the mouse down occurred.
-      m_initialClickPoint = IntPoint(mEvt->x(), mEvt->y());
+      m_initialClickPoint = IntPoint(mouseEvent->x(), mouseEvent->y());
       // Cache the initial position of the thumb.
       m_initialPosition =
           static_cast<RenderSlider*>(renderer()->parent())->currentPosition();
@@ -81,34 +84,35 @@ void HTMLSliderThumbElement::defaultEventHandler(Event* evt) {
 
       document()->frame()->eventHandler()->setCapturingMouseEventsNode(this);
 
-      evt->setDefaultHandled();
+      event->setDefaultHandled();
+      return;
     }
-  } else if (evt->type() == mouseupEvent) {
-    m_initialClickPoint = IntPoint();
-    m_initialPosition = 0;
-    document()->frame()->eventHandler()->setCapturingMouseEventsNode(0);
-    m_inDragMode = false;
-
-    evt->setDefaultHandled();
-  } else if (evt->type() == mousemoveEvent) {
+  } else if (eventType == mouseupEvent) {
+    if (m_inDragMode) {
+      if (Frame* frame = document()->frame())
+        frame->eventHandler()->setCapturingMouseEventsNode(0);
+      m_inDragMode = false;
+      event->setDefaultHandled();
+      return;
+    }
+  } else if (eventType == mousemoveEvent && event->isMouseEvent()) {
     if (m_inDragMode && renderer() && renderer()->parent()) {
       // Move the slider
-      MouseEvent* mEvt = static_cast<MouseEvent*>(evt);
+      MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
       RenderSlider* slider = static_cast<RenderSlider*>(renderer()->parent());
-
-      int newPosition = slider->positionForOffset(
-          IntPoint(m_initialPosition + mEvt->x() - m_initialClickPoint.x() +
-                       (renderer()->absoluteBoundingBoxRect().width() / 2),
-                   m_initialPosition + mEvt->y() - m_initialClickPoint.y() +
-                       (renderer()->absoluteBoundingBoxRect().height() / 2)));
-      if (slider->currentPosition() != newPosition)
+      int newPosition = slider->positionForOffset(IntPoint(
+          m_initialPosition + mouseEvent->x() - m_initialClickPoint.x() +
+              (renderer()->absoluteBoundingBoxRect().width() / 2),
+          m_initialPosition + mouseEvent->y() - m_initialClickPoint.y() +
+              (renderer()->absoluteBoundingBoxRect().height() / 2)));
+      if (slider->currentPosition() != newPosition) {
         slider->setCurrentPosition(newPosition);
-
-      slider->valueChanged();
-
-      evt->setDefaultHandled();
+        slider->valueChanged();
+      }
     }
   }
+
+  HTMLDivElement::defaultEventHandler(event);
 }
 
 RenderSlider::RenderSlider(HTMLInputElement* element)
@@ -122,8 +126,6 @@ RenderSlider::~RenderSlider() {
 short RenderSlider::baselinePosition(bool b, bool isRootLineBox) const {
   return height() + marginTop();
 }
-
-const int defaultTrackLength = 129;
 
 void RenderSlider::calcMinMaxWidth() {
   m_minWidth = 0;
@@ -274,7 +276,7 @@ void RenderSlider::setValueForPosition(int position) {
 
   // Force integer value if not float.
   if (!equalIgnoringCase(precision, "float"))
-    val = (int)roundf(val);
+    val = lroundf(val);
 
   static_cast<HTMLInputElement*>(node())->setValueFromRenderer(
       String::number(val));
@@ -308,7 +310,7 @@ double RenderSlider::setPositionFromValue(bool inLayout) {
 
   // Force integer value if not float.
   if (!equalIgnoringCase(precision, "float"))
-    val = (int)roundf(val);
+    val = lroundf(val);
 
   // Calculate the new position based on the value
   double factor = (val - minVal) / (maxVal - minVal);
