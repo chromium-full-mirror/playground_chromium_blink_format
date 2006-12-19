@@ -72,7 +72,7 @@ class SVGList : public Shared<SVGList<Item>> {
   }
 
   Item getItem(unsigned int index, ExceptionCode& ec) {
-    if (m_vector.size() < index) {
+    if (index >= m_vector.size()) {
       ec = INDEX_SIZE_ERR;
       return TypeOperations::nullItem();
     }
@@ -81,7 +81,7 @@ class SVGList : public Shared<SVGList<Item>> {
   }
 
   const Item getItem(unsigned int index, ExceptionCode& ec) const {
-    if (m_vector.size() < index) {
+    if (index >= m_vector.size()) {
       ec = INDEX_SIZE_ERR;
       return TypeOperations::nullItem();
     }
@@ -95,7 +95,7 @@ class SVGList : public Shared<SVGList<Item>> {
   }
 
   Item replaceItem(Item newItem, unsigned int index, ExceptionCode& ec) {
-    if (m_vector.size() < index) {
+    if (index >= m_vector.size()) {
       ec = INDEX_SIZE_ERR;
       return TypeOperations::nullItem();
     }
@@ -105,7 +105,7 @@ class SVGList : public Shared<SVGList<Item>> {
   }
 
   Item removeItem(unsigned int index, ExceptionCode& ec) {
-    if (m_vector.size() < index) {
+    if (index >= m_vector.size()) {
       ec = INDEX_SIZE_ERR;
       return TypeOperations::nullItem();
     }
