@@ -184,9 +184,8 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
       break;
   }
 
-  save();
-
   CGContextRef context = platformContext();
+  CGContextSaveGState(context);
 
   CGContextSetShouldAntialias(context, false);
 
@@ -252,7 +251,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
 
   CGContextStrokePath(context);
 
-  restore();
+  CGContextRestoreGState(context);
 }
 
 // This method is only used to draw the little circles used in lists.
