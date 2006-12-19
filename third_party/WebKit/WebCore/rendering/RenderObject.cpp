@@ -864,14 +864,11 @@ void RenderObject::drawBorderArc(GraphicsContext* graphicsContext,
     case DOTTED:
     case DASHED:
       graphicsContext->setStrokeColor(c);
-      graphicsContext->setStrokeThickness(
-          thickness == 1 ? 0 : static_cast<int>(thickness));
       graphicsContext->setStrokeStyle(style == DOTTED ? DottedStroke
                                                       : DashedStroke);
-      if (thickness > 0)
-        graphicsContext->drawArc(
-            IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
-            angleStart, angleSpan);
+      graphicsContext->strokeArc(
+          IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
+          angleStart, angleSpan);
       break;
     case DOUBLE: {
       float third = thickness / 3.0f;
@@ -890,13 +887,14 @@ void RenderObject::drawBorderArc(GraphicsContext* graphicsContext,
         innerHeight += 2;
       }
 
-      graphicsContext->setStrokeStyle(NoStroke);
-      graphicsContext->drawArc(
+      graphicsContext->setStrokeStyle(SolidStroke);
+      graphicsContext->strokeArc(
           IntRect(x, outerY, radius.width() * 2, outerHeight), third,
           angleStart, angleSpan);
-      graphicsContext->drawArc(IntRect(innerX, innerY, innerWidth, innerHeight),
-                               (innerThird > 2) ? innerThird - 1 : innerThird,
-                               angleStart, angleSpan);
+      graphicsContext->strokeArc(
+          IntRect(innerX, innerY, innerWidth, innerHeight),
+          (innerThird > 2) ? innerThird - 1 : innerThird, angleStart,
+          angleSpan);
       break;
     }
     case GROOVE:
@@ -910,16 +908,16 @@ void RenderObject::drawBorderArc(GraphicsContext* graphicsContext,
         c = c.dark();
       }
 
-      graphicsContext->setStrokeStyle(NoStroke);
-      graphicsContext->setFillColor(c);
-      graphicsContext->drawArc(
+      graphicsContext->setStrokeStyle(SolidStroke);
+      graphicsContext->setStrokeColor(c);
+      graphicsContext->strokeArc(
           IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
           angleStart, angleSpan);
 
       float halfThickness = (thickness + 1.0f) / 4.0f;
       int shiftForInner = static_cast<int>(halfThickness * 1.5f);
-      graphicsContext->setFillColor(c2);
-      graphicsContext->drawArc(
+      graphicsContext->setStrokeColor(c2);
+      graphicsContext->strokeArc(
           IntRect(x + shiftForInner, y + shiftForInner,
                   (radius.width() - shiftForInner) * 2,
                   (radius.height() - shiftForInner) * 2),
@@ -934,9 +932,9 @@ void RenderObject::drawBorderArc(GraphicsContext* graphicsContext,
       if (style == OUTSET && (s == BSBottom || s == BSRight))
         c = c.dark();
     case SOLID:
-      graphicsContext->setStrokeStyle(NoStroke);
-      graphicsContext->setFillColor(c);
-      graphicsContext->drawArc(
+      graphicsContext->setStrokeStyle(SolidStroke);
+      graphicsContext->setStrokeColor(c);
+      graphicsContext->strokeArc(
           IntRect(x, y, radius.width() * 2, radius.height() * 2), thickness,
           angleStart, angleSpan);
       break;
