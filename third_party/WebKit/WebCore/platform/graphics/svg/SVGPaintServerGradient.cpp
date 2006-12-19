@@ -74,7 +74,8 @@ SVGPaintServerGradient::SVGPaintServerGradient()
       m_stopsCache(0),
       m_stopsCount(0),
       m_shadingCache(0),
-      m_savedContext(0)
+      m_savedContext(0),
+      m_imageBuffer(0)
 #endif
 {
 }
