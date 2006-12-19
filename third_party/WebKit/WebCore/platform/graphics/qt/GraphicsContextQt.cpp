@@ -224,6 +224,11 @@ GraphicsContext::GraphicsContext(PlatformGraphicsContext* context)
     : m_common(createGraphicsContextPrivate()),
       m_data(new GraphicsContextPlatformPrivate(context)) {
   setPaintingDisabled(!context);
+  if (context) {
+    // Make sure the context starts in sync with our state.
+    setPlatformFillColor(fillColor());
+    setPlatformStrokeColor(strokeColor());
+  }
 }
 
 GraphicsContext::~GraphicsContext() {
