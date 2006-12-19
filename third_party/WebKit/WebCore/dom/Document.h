@@ -60,7 +60,6 @@ class Event;
 class EventListener;
 class Frame;
 class FrameView;
-class HitTestRequest;
 class HTMLDocument;
 class HTMLElement;
 class HTMLFormElement;
@@ -97,6 +96,7 @@ class XPathResult;
 #endif
 
 struct DashboardRegionValue;
+struct HitTestRequest;
 
 #ifdef SVG_SUPPORT
 class SVGDocumentExtensions;
