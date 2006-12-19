@@ -235,8 +235,8 @@ void SVGPatternElement::drawPatternContentIntoTile(
     h = height().value();
   }
 
-  ImageBuffer* patternImage(
-      GraphicsContext::createImageBuffer(IntSize(w, h), false));
+  ImageBuffer* patternImage(GraphicsContext::createImageBuffer(
+      IntSize(lroundf(w), lroundf(h)), false));
   if (!patternImage)
     return;
 
