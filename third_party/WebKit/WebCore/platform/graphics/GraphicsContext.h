@@ -65,6 +65,12 @@ class Path;
 class TextRun;
 class TextStyle;
 
+// These bits can be ORed together for a total of 8 possible text drawing modes.
+const int cTextInvisible = 0;
+const int cTextFill = 1;
+const int cTextStroke = 2;
+const int cTextClip = 4;
+
 class GraphicsContext : Noncopyable {
  public:
   GraphicsContext(PlatformGraphicsContext*);
@@ -75,6 +81,8 @@ class GraphicsContext : Noncopyable {
   const Font& font() const;
   void setFont(const Font&);
 
+  // The pen encapsulates the concept of stroking.  It includes a stroke style,
+  // width and color.
   const Pen& pen() const;
   void setPen(const Pen&);
   void setPen(Pen::PenStyle);
@@ -140,6 +148,9 @@ class GraphicsContext : Noncopyable {
   // Functions to work around bugs in focus ring clipping on Mac.
   void setFocusRingClip(const IntRect&);
   void clearFocusRingClip();
+
+  int textDrawingMode();
+  void setTextDrawingMode(int);
 
   void drawText(const TextRun&, const IntPoint&);
   void drawText(const TextRun&, const IntPoint&, const TextStyle&);
@@ -218,6 +229,7 @@ class GraphicsContext : Noncopyable {
  private:
   void savePlatformState();
   void restorePlatformState();
+  void setPlatformTextDrawingMode(int);
   void setPlatformPen(const Pen& pen);
   void setPlatformFillColor(const Color& fill);
   void setPlatformFont(const Font& font);

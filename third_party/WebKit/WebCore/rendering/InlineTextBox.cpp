@@ -220,6 +220,15 @@ static Color correctedTextColor(Color textColor, Color backgroundColor) {
   return textColor.light();
 }
 
+static void updateTextColor(GraphicsContext* context, const Color& textColor) {
+  ASSERT(textColor.isValid());
+  int mode = context->textDrawingMode();
+  if (mode & cTextFill && textColor != context->fillColor())
+    context->setFillColor(textColor);
+  if (mode & cTextStroke && textColor != context->pen().color())
+    context->setPen(textColor);
+}
+
 bool InlineTextBox::isLineBreak() const {
   return object()->isBR() ||
          (object()->style()->preserveNewline() && len() == 1 &&
@@ -329,8 +338,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
       textColor = correctedTextColor(textColor, Color::white);
   }
 
-  if (textColor != paintInfo.context->pen().color())
-    paintInfo.context->setPen(textColor);
+  updateTextColor(paintInfo.context, textColor);
 
   // Set a text shadow if we have one.
   // FIXME: Support multiple shadow effects.  Need more from the CG API before
@@ -347,7 +355,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   bool paintSelectedTextSeparately =
       false;  // Whether or not we have to do multiple paints.  Only
   // necessary when a custom ::selection foreground color is applied.
-  Color selectionColor = paintInfo.context->pen().color();
+  Color selectionColor;
   ShadowData* selectionTextShadow = 0;
   if (haveSelection) {
     // Check foreground color first.
@@ -405,8 +413,8 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
     if (sPos < ePos) {
       // paint only the text that is selected
-      if (selectionColor != paintInfo.context->pen().color())
-        paintInfo.context->setPen(selectionColor);
+      if (selectionColor.isValid())
+        updateTextColor(paintInfo.context, selectionColor);
 
       if (selectionTextShadow)
         paintInfo.context->setShadow(
@@ -500,7 +508,7 @@ void InlineTextBox::paintSelection(GraphicsContext* p,
     c = Color(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
 
   p->save();
-  p->setPen(c);  // Don't draw text at all!
+  updateTextColor(p, c);  // Don't draw text at all!
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
@@ -532,7 +540,7 @@ void InlineTextBox::paintMarkedTextBackground(GraphicsContext* p,
 
   Color c = Color(225, 221, 85);
 
-  p->setPen(c);  // Don't draw text at all!
+  updateTextColor(p, c);  // Don't draw text at all!
 
   RootInlineBox* r = root();
   int y = r->selectionTop();
@@ -712,7 +720,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   if (object()->document()->frame()->markedTextMatchesAreHighlighted()) {
     Color yellow = Color(255, 255, 0);
     pt->save();
-    pt->setPen(yellow);  // Don't draw text at all!
+    updateTextColor(pt, yellow);  // Don't draw text at all!
     pt->clip(IntRect(_tx + m_x, _ty + y, m_width, h));
     pt->drawHighlightForText(run, startPoint, h, renderStyle, yellow);
     pt->restore();

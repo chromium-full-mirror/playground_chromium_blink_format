@@ -51,7 +51,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   if (!cell)
     return false;
 
-  CGContextSaveGState(contextRef);
+  context->save();
 
   CGSize cellSize = CGSize(cell->size());
 
@@ -87,7 +87,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     CGContextSetFillPattern(contextRef, m_pattern, &alpha);
     if (isPaintingText()) {
       const_cast<RenderObject*>(object)->style()->setColor(Color());
-      CGContextSetTextDrawingMode(contextRef, kCGTextFill);
+      context->setTextDrawingMode(cTextFill);
     }
   }
 
@@ -97,7 +97,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     applyStrokeStyleToContext(contextRef, style, object);
     if (isPaintingText()) {
       const_cast<RenderObject*>(object)->style()->setColor(Color());
-      CGContextSetTextDrawingMode(contextRef, kCGTextStroke);
+      context->setTextDrawingMode(cTextStroke);
     }
   }
 
@@ -107,10 +107,9 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
 void SVGPaintServerPattern::teardown(GraphicsContext*& context,
                                      const RenderObject* object,
                                      SVGPaintTargetType type) const {
-  CGContextRef contextRef = context->platformContext();
   CGPatternRelease(m_pattern);
   CGColorSpaceRelease(m_patternSpace);
-  CGContextRestoreGState(contextRef);
+  context->restore();
 }
 
 }  // namespace WebCore

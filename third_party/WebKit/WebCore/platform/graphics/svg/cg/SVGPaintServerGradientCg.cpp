@@ -194,7 +194,7 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
     // that no text was intersected with the clip
     if (!isPaintingText() || (object->width() > 0 && object->height() > 0))
       CGContextDrawShading(contextRef, shading);
-    CGContextRestoreGState(contextRef);
+    context->restore();
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
@@ -222,10 +222,10 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
       CGImageRelease(grayscaleImage);
     }
     CGContextDrawShading(contextRef, shading);
-    CGContextRestoreGState(contextRef);
+    context->restore();
   }
 
-  CGContextRestoreGState(contextRef);
+  context->restore();
 }
 
 void SVGPaintServerGradient::renderPath(GraphicsContext*& context,
@@ -276,17 +276,17 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
   RenderStyle* style = object->style();
   ASSERT(contextRef != NULL);
 
-  CGContextSaveGState(contextRef);
+  context->save();
   CGContextSetAlpha(contextRef, style->opacity());
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
-    CGContextSaveGState(contextRef);
+    context->save();
     if (isPaintingText())
-      CGContextSetTextDrawingMode(contextRef, kCGTextClip);
+      context->setTextDrawingMode(cTextClip);
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
-    CGContextSaveGState(contextRef);
+    context->save();
     applyStrokeStyleToContext(
         contextRef, style,
         object);  // FIXME: this seems like the wrong place for this.
@@ -298,10 +298,9 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
       m_maskImage->init(size);
 
       GraphicsContext* maskImageContext = contextForImage(m_maskImage.get());
-      CGContextRef maskContext = maskImageContext->platformContext();
       const_cast<RenderObject*>(object)->style()->setColor(
           Color(255, 255, 255));
-      CGContextSetTextDrawingMode(maskContext, kCGTextStroke);
+      maskImageContext->setTextDrawingMode(cTextStroke);
 
       m_savedContext = context;
       context = maskImageContext;

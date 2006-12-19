@@ -180,7 +180,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                 buttonRenderer->baselinePosition(true, false);
 
     paintInfo.context->setFont(style()->font());
-    paintInfo.context->setPen(style()->color());
+    paintInfo.context->setFillColor(style()->color());
 
     // Draw the filename
     paintInfo.context->drawText(textRun, IntPoint(textX, textY));
