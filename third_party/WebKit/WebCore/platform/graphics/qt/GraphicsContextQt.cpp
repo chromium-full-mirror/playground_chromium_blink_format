@@ -378,7 +378,7 @@ static void adjustLineToPixelBoundaries(FloatPoint& p1,
   // width gave
   // us a perfect position, but an odd width gave us a position that is off by
   // exactly 0.5.
-  if (penStyle == DottedLine || penStyle == DashedLine) {
+  if (penStyle == DottedStroke || penStyle == DashedStroke) {
     if (p1.x() == p2.x()) {
       p1.setY(p1.y() + strokeWidth);
       p2.setY(p2.y() - strokeWidth);
