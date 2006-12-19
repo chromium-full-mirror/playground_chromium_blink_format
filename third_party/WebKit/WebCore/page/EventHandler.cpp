@@ -836,7 +836,7 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   // was pressed, rather than updating for nodes the mouse moves over as you
   // hold the mouse down.
   HitTestRequest request(m_mousePressed && m_mouseDownMayStartSelect,
-                         m_mousePressed, true, m_mousePressed);
+                         m_mousePressed, true);
   MouseEventWithHitTestResults mev = prepareMouseEvent(request, mouseEvent);
 
   if (m_lastMouseMoveEventSubframe &&
