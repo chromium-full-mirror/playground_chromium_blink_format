@@ -271,24 +271,23 @@ void GraphicsContext::drawEllipse(const IntRect& rect) {
     setCGFillColor(context, fillColor());
     if (strokeStyle() != NoStroke) {
       // stroke and fill
-      unsigned penWidth = max(strokeThickness(), 1U);
-      CGContextSetLineWidth(context, penWidth);
+      unsigned strokeWidth = max(strokeThickness(), 1.0f);
+      CGContextSetLineWidth(context, strokeWidth);
       CGContextDrawPath(context, kCGPathFillStroke);
     } else
       CGContextFillPath(context);
   } else if (strokeStyle() != NoStroke) {
-    unsigned penWidth = max(strokeThickness(), 1U);
-    CGContextSetLineWidth(context, penWidth);
+    unsigned strokeWidth = max(strokeThickness(), 1.0f);
+    CGContextSetLineWidth(context, strokeWidth);
     CGContextStrokePath(context);
   }
 }
 
 void GraphicsContext::strokeArc(const IntRect& rect,
-                                float thickness,
                                 int startAngle,
                                 int angleSpan) {
-  if (paintingDisabled() || strokeStyle() == NoStroke || thickness <= 0.0f ||
-      !strokeColor().alpha())
+  if (paintingDisabled() || strokeStyle() == NoStroke ||
+      strokeThickness() <= 0.0f || !strokeColor().alpha())
     return;
 
   CGContextRef context = platformContext();
@@ -318,7 +317,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
   if (w != h)
     scale(FloatSize(1, reverseScaleFactor));
 
-  float width = max(thickness, 1.0f);
+  float width = max(strokeThickness(), 1.0f);
   int patWidth = 0;
 
   switch (strokeStyle()) {

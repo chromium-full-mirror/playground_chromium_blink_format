@@ -45,7 +45,7 @@ struct GraphicsContextState {
 
   Font font;
   StrokeStyle strokeStyle;
-  unsigned strokeThickness;
+  float strokeThickness;
   Color strokeColor;
   Color fillColor;
   int textDrawingMode;
@@ -110,7 +110,7 @@ void GraphicsContext::setFont(const Font& aFont) {
   setPlatformFont(aFont);
 }
 
-void GraphicsContext::setStrokeThickness(unsigned thickness) {
+void GraphicsContext::setStrokeThickness(float thickness) {
   m_common->state.strokeThickness = thickness;
   setPlatformStrokeThickness(thickness);
 }
@@ -125,7 +125,7 @@ void GraphicsContext::setStrokeColor(const Color& color) {
   setPlatformStrokeColor(color);
 }
 
-unsigned GraphicsContext::strokeThickness() const {
+float GraphicsContext::strokeThickness() const {
   return m_common->state.strokeThickness;
 }
 
@@ -336,7 +336,7 @@ void GraphicsContext::setPlatformStrokeColor(const Color&);
 #if !PLATFORM(QT)
 void GraphicsContext::setPlatformStrokeStyle(const StrokeStyle&) {}
 
-void GraphicsContext::setPlatformStrokeThickness(unsigned) {}
+void GraphicsContext::setPlatformStrokeThickness(float) {}
 
 void GraphicsContext::setPlatformFont(const Font&) {}
 #endif

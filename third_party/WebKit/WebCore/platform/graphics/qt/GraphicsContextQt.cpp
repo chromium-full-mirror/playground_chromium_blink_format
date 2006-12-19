@@ -422,19 +422,13 @@ void GraphicsContext::drawEllipse(const IntRect& rect) {
 }
 
 void GraphicsContext::strokeArc(const IntRect& rect,
-                                float thickness,
                                 int startAngle,
                                 int angleSpan) {
-  if (paintingDisabled() || strokeStyle() == NoStroke || thickness <= 0.0f ||
-      !strokeColor().alpha())
+  if (paintingDisabled() || strokeStyle() == NoStroke ||
+      strokeThickness() <= 0.0f || !strokeColor().alpha())
     return;
 
-  const QPen oldPen = m_data->p().pen();
-  QPen nPen = oldPen;
-  nPen.setWidthF(thickness);
-  m_data->p().setPen(nPen);
   m_data->p().drawArc(rect, startAngle, angleSpan);
-  m_data->p().setPen(oldPen);
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
@@ -821,9 +815,9 @@ void GraphicsContext::setPlatformStrokeStyle(const StrokeStyle& strokeStyle) {
   m_data->p().setPen(toQPenStyle(strokeStyle));
 }
 
-void GraphicsContext::setPlatformStrokeThickness(unsigned thickness) {
+void GraphicsContext::setPlatformStrokeThickness(float thickness) {
   QPen newPen(m_data->p().pen());
-  newPen.setWidth(thickness);
+  newPen.setWidthF(thickness);
   m_data->p().setPen(newPen);
 }
 

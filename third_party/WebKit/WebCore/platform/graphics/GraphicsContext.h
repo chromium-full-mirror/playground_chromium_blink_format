@@ -82,8 +82,8 @@ class GraphicsContext : Noncopyable {
   const Font& font() const;
   void setFont(const Font&);
 
-  unsigned strokeThickness() const;
-  void setStrokeThickness(unsigned);
+  float strokeThickness() const;
+  void setStrokeThickness(float);
   StrokeStyle strokeStyle() const;
   void setStrokeStyle(const StrokeStyle& style);
   Color strokeColor() const;
@@ -104,15 +104,8 @@ class GraphicsContext : Noncopyable {
                          bool shouldAntialias = false);
 
   // Arc drawing (used by border-radius in CSS) just supports stroking at the
-  // moment.  It ignores
-  // the stroke thickness, relying instead on a passed-in argument (because of
-  // float vs. int issues).
-  // FIXME: Reconcile this method with stroke thickness by converting stroke
-  // thickness to a float.
-  void strokeArc(const IntRect&,
-                 float thickness,
-                 int startAngle,
-                 int angleSpan);
+  // moment.
+  void strokeArc(const IntRect&, int startAngle, int angleSpan);
 
   void fillRect(const IntRect&, const Color&);
   void fillRect(const FloatRect&, const Color&);
@@ -244,7 +237,7 @@ class GraphicsContext : Noncopyable {
   void setPlatformTextDrawingMode(int);
   void setPlatformStrokeColor(const Color&);
   void setPlatformStrokeStyle(const StrokeStyle&);
-  void setPlatformStrokeThickness(unsigned);
+  void setPlatformStrokeThickness(float);
   void setPlatformFillColor(const Color&);
   void setPlatformFont(const Font& font);
 
