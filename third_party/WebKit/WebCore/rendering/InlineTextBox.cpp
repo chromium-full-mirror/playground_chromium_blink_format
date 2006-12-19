@@ -225,8 +225,8 @@ static void updateTextColor(GraphicsContext* context, const Color& textColor) {
   int mode = context->textDrawingMode();
   if (mode & cTextFill && textColor != context->fillColor())
     context->setFillColor(textColor);
-  if (mode & cTextStroke && textColor != context->pen().color())
-    context->setPen(textColor);
+  if (mode & cTextStroke && textColor != context->strokeColor())
+    context->setStrokeColor(textColor);
 }
 
 bool InlineTextBox::isLineBreak() const {
@@ -431,7 +431,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   // Paint decorations
   if (d != TDNONE && paintInfo.phase != PaintPhaseSelection &&
       styleToUse->htmlHacks()) {
-    paintInfo.context->setPen(styleToUse->color());
+    paintInfo.context->setStrokeColor(styleToUse->color());
     paintDecoration(paintInfo.context, tx, ty, d);
   }
 
@@ -592,15 +592,15 @@ void InlineTextBox::paintDecoration(GraphicsContext* pt,
   // Use a special function for underlines to get the positioning exactly right.
   bool isPrinting = textObject()->document()->printing();
   if (deco & UNDERLINE) {
-    pt->setPen(underline);
+    pt->setStrokeColor(underline);
     pt->drawLineForText(IntPoint(_tx, _ty), m_baseline, width, isPrinting);
   }
   if (deco & OVERLINE) {
-    pt->setPen(overline);
+    pt->setStrokeColor(overline);
     pt->drawLineForText(IntPoint(_tx, _ty), 0, width, isPrinting);
   }
   if (deco & LINE_THROUGH) {
-    pt->setPen(linethrough);
+    pt->setStrokeColor(linethrough);
     pt->drawLineForText(IntPoint(_tx, _ty), 2 * m_baseline / 3, width,
                         isPrinting);
   }
@@ -835,7 +835,8 @@ void InlineTextBox::paintMarkedTextUnderline(
   if (underline.thick)
     lineThickness = ((m_height - m_baseline) > 2) ? 2 : 1;
   int underlineOffset = m_height - lineThickness;
-  pt->setPen(Pen(underline.color, lineThickness));
+  pt->setStrokeColor(underline.color);
+  pt->setStrokeThickness(lineThickness);
   pt->drawLineForText(IntPoint(_tx + start, _ty), underlineOffset, width,
                       textObject()->document()->printing());
 }

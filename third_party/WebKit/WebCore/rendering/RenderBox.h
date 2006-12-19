@@ -207,11 +207,6 @@ class RenderBox : public RenderObject {
                             bool behindText);
 #endif
 
-  void outlineBox(GraphicsContext*,
-                  int _tx,
-                  int _ty,
-                  const char* color = "red");
-
   int containingBlockWidthForPositioned(
       const RenderObject* containingBlock) const;
   int containingBlockHeightForPositioned(

@@ -30,7 +30,6 @@
 #include "Image.h"
 #include "IntRect.h"
 #include "Path.h"
-#include "Pen.h"
 #include "TextDirection.h"
 #include <wtf/Noncopyable.h>
 #include <wtf/Platform.h>
@@ -71,6 +70,8 @@ const int cTextFill = 1;
 const int cTextStroke = 2;
 const int cTextClip = 4;
 
+enum StrokeStyle { NoStroke, SolidStroke, DottedStroke, DashedStroke };
+
 class GraphicsContext : Noncopyable {
  public:
   GraphicsContext(PlatformGraphicsContext*);
@@ -81,12 +82,12 @@ class GraphicsContext : Noncopyable {
   const Font& font() const;
   void setFont(const Font&);
 
-  // The pen encapsulates the concept of stroking.  It includes a stroke style,
-  // width and color.
-  const Pen& pen() const;
-  void setPen(const Pen&);
-  void setPen(Pen::PenStyle);
-  void setPen(RGBA32);
+  unsigned strokeThickness() const;
+  void setStrokeThickness(unsigned);
+  StrokeStyle strokeStyle() const;
+  void setStrokeStyle(const StrokeStyle& style);
+  Color strokeColor() const;
+  void setStrokeColor(const Color&);
 
   Color fillColor() const;
   void setFillColor(const Color&);
@@ -230,8 +231,10 @@ class GraphicsContext : Noncopyable {
   void savePlatformState();
   void restorePlatformState();
   void setPlatformTextDrawingMode(int);
-  void setPlatformPen(const Pen& pen);
-  void setPlatformFillColor(const Color& fill);
+  void setPlatformStrokeColor(const Color&);
+  void setPlatformStrokeStyle(const StrokeStyle&);
+  void setPlatformStrokeThickness(unsigned);
+  void setPlatformFillColor(const Color&);
   void setPlatformFont(const Font& font);
 
   int focusRingWidth() const;

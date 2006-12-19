@@ -36,11 +36,17 @@ namespace WebCore {
 
 struct GraphicsContextState {
   GraphicsContextState()
-      : fillColor(Color::black),
+      : strokeStyle(SolidStroke),
+        strokeThickness(0),
+        strokeColor(Color::black),
+        fillColor(Color::black),
         textDrawingMode(cTextFill),
         paintingDisabled(false) {}
+
   Font font;
-  Pen pen;
+  StrokeStyle strokeStyle;
+  unsigned strokeThickness;
+  Color strokeColor;
   Color fillColor;
   int textDrawingMode;
   bool paintingDisabled;
@@ -104,27 +110,31 @@ void GraphicsContext::setFont(const Font& aFont) {
   setPlatformFont(aFont);
 }
 
-const Pen& GraphicsContext::pen() const {
-  return m_common->state.pen;
+void GraphicsContext::setStrokeThickness(unsigned thickness) {
+  m_common->state.strokeThickness = thickness;
+  setPlatformStrokeThickness(thickness);
 }
 
-void GraphicsContext::setPen(const Pen& pen) {
-  m_common->state.pen = pen;
-  setPlatformPen(pen);
+void GraphicsContext::setStrokeStyle(const StrokeStyle& style) {
+  m_common->state.strokeStyle = style;
+  setPlatformStrokeStyle(style);
 }
 
-void GraphicsContext::setPen(Pen::PenStyle style) {
-  m_common->state.pen.setStyle(style);
-  m_common->state.pen.setColor(Color::black);
-  m_common->state.pen.setWidth(0);
-  setPlatformPen(m_common->state.pen);
+void GraphicsContext::setStrokeColor(const Color& color) {
+  m_common->state.strokeColor = color;
+  setPlatformStrokeColor(color);
 }
 
-void GraphicsContext::setPen(RGBA32 rgb) {
-  m_common->state.pen.setStyle(Pen::SolidLine);
-  m_common->state.pen.setColor(rgb);
-  m_common->state.pen.setWidth(0);
-  setPlatformPen(m_common->state.pen);
+unsigned GraphicsContext::strokeThickness() const {
+  return m_common->state.strokeThickness;
+}
+
+StrokeStyle GraphicsContext::strokeStyle() const {
+  return m_common->state.strokeStyle;
+}
+
+Color GraphicsContext::strokeColor() const {
+  return m_common->state.strokeColor;
 }
 
 void GraphicsContext::setFillColor(const Color& color) {
@@ -318,10 +328,15 @@ void GraphicsContext::setPlatformTextDrawingMode(int mode) {}
 
 #if !PLATFORM(CG) && !PLATFORM(QT)
 void GraphicsContext::setPlatformFillColor(const Color&) {}
+
+void GraphicsContext::setPlatformStrokeColor(const Color&);
+{}
 #endif
 
 #if !PLATFORM(QT)
-void GraphicsContext::setPlatformPen(const Pen&) {}
+void GraphicsContext::setPlatformStrokeStyle(const StrokeStyle&) {}
+
+void GraphicsContext::setPlatformStrokeThickness(unsigned) {}
 
 void GraphicsContext::setPlatformFont(const Font&) {}
 #endif

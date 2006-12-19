@@ -454,10 +454,6 @@ void RenderTable::paint(PaintInfo& paintInfo, int tx, int ty) {
       }
     }
   }
-
-#ifdef BOX_DEBUG
-  outlineBox(paintInfo.context, tx, ty, "blue");
-#endif
 }
 
 void RenderTable::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {

@@ -528,7 +528,7 @@ bool RenderFrameSet::userResize(MouseEvent* evt) {
             IntRect(m_oldpos + sw / 2 - rBord, r.y(), 2 * rBord, r.height()),
             true);
       if (p >= 0) {
-        context->setPen(Pen::NoPen);
+        context->setStrokeStyle(NoStroke);
         context->setFillColor(greyQuarterOpacity);
         context->drawRect(
             IntRect(p + sw / 2 - rBord, r.y(), 2 * rBord, r.height()));
@@ -539,7 +539,7 @@ bool RenderFrameSet::userResize(MouseEvent* evt) {
             IntRect(r.x(), m_oldpos + sw / 2 - rBord, r.width(), 2 * rBord),
             true);
       if (p >= 0) {
-        context->setPen(Pen::NoPen);
+        context->setStrokeStyle(NoStroke);
         context->setFillColor(greyQuarterOpacity);
         context->drawRect(
             IntRect(r.x(), p + sw / 2 - rBord, r.width(), 2 * rBord));
