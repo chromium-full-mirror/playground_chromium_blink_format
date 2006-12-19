@@ -38,7 +38,6 @@
 #include "GraphicsContext.h"
 #include "Font.h"
 #include "Pen.h"
-#include "SVGResourceImage.h"
 
 #include <QStack>
 #include <QPainter>
@@ -830,11 +829,10 @@ void GraphicsContext::setPlatformFillColor(const Color& color) {
   m_data->p().setBrush(QBrush(color));
 }
 
-#ifdef SVG_SUPPORT
-GraphicsContext* contextForImage(SVGResourceImage*) {
+ImageBuffer* GraphicsContext::createImageBuffer(const IntSize&, bool) {
   // FIXME!
   return 0;
 }
-#endif
 }
+
 // vim: ts=4 sw=4 et

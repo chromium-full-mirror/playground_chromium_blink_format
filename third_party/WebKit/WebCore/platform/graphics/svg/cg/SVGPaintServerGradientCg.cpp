@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
 
     This file is part of the KDE project
 
@@ -187,7 +187,7 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
   CGShadingRef shading = m_shadingCache;
   CGContextRef contextRef = context->platformContext();
   RenderStyle* style = object->style();
-  ASSERT(contextRef != NULL);
+  ASSERT(contextRef);
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     // workaround for filling the entire screen with the shading in the case
@@ -199,28 +199,27 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
     if (isPaintingText()) {
-      int width = 2048;
-      int height = 2048;  // FIXME??? SEE ABOVE
+      IntRect maskRect =
+          const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
+      maskRect = object->absoluteTransform().inverse().mapRect(maskRect);
 
-      delete context;
+      // Translate from 0x0 image origin to actual rendering position
+      m_savedContext->translate(maskRect.x(), maskRect.y());
+
+      // Clip current context to mask image (gradient)
+      CGContextClipToMask(m_savedContext->platformContext(),
+                          CGRectMake(0, 0, maskRect.width(), maskRect.height()),
+                          m_imageBuffer->cgImage());
+      m_savedContext->translate(-maskRect.x(), -maskRect.y());
+
+      // Restore on-screen drawing context, after we got the image of the
+      // gradient
+      delete m_imageBuffer;
       context = m_savedContext;
       contextRef = context->platformContext();
       m_savedContext = 0;
-
-      void* imageBuffer = fastMalloc(width * height);
-      CGColorSpaceRef grayColorSpace = CGColorSpaceCreateDeviceGray();
-      CGContextRef grayscaleContext =
-          CGBitmapContextCreate(imageBuffer, width, height, 8, width,
-                                grayColorSpace, kCGImageAlphaNone);
-      CGColorSpaceRelease(grayColorSpace);
-      CGContextDrawLayerAtPoint(grayscaleContext, CGPointMake(0, 0),
-                                m_maskImage->cgLayer());
-      CGImageRef grayscaleImage = CGBitmapContextCreateImage(grayscaleContext);
-      CGContextClipToMask(contextRef, CGRectMake(0, 0, width, height),
-                          grayscaleImage);
-      CGContextRelease(grayscaleContext);
-      CGImageRelease(grayscaleImage);
     }
+
     CGContextDrawShading(contextRef, shading);
     context->restore();
   }
@@ -233,7 +232,7 @@ void SVGPaintServerGradient::renderPath(GraphicsContext*& context,
                                         SVGPaintTargetType type) const {
   CGContextRef contextRef = context->platformContext();
   RenderStyle* style = path->style();
-  ASSERT(contextRef != NULL);
+  ASSERT(contextRef);
 
   CGRect objectBBox;
   if (boundingBoxMode())
@@ -265,8 +264,6 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                    // baseclass. -- ecs 8/6/05
     listener()->resourceNotification();
 
-  m_maskImage = 0;
-
   // FIXME: total const HACK!
   // We need a hook to call this when the gradient gets updated, before drawn.
   if (!m_shadingCache)
@@ -274,7 +271,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
 
   CGContextRef contextRef = context->platformContext();
   RenderStyle* style = object->style();
-  ASSERT(contextRef != NULL);
+  ASSERT(contextRef);
 
   context->save();
   CGContextSetAlpha(contextRef, style->opacity());
@@ -291,17 +288,22 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
         contextRef, style,
         object);  // FIXME: this seems like the wrong place for this.
     if (isPaintingText()) {
-      m_maskImage = new SVGResourceImage();
-      int width = 2048;
-      int height = 2048;  // FIXME???
-      IntSize size = IntSize(width, height);
-      m_maskImage->init(size);
+      IntRect maskRect =
+          const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
+      maskRect = object->absoluteTransform().inverse().mapRect(maskRect);
 
-      GraphicsContext* maskImageContext = contextForImage(m_maskImage.get());
+      ImageBuffer* maskImage(GraphicsContext::createImageBuffer(
+          IntSize(maskRect.width(), maskRect.height()), false));
+      GraphicsContext* maskImageContext = maskImage->context();
+
+      maskImageContext->save();
+      maskImageContext->translate(-maskRect.x(), -maskRect.y());
+
       const_cast<RenderObject*>(object)->style()->setColor(
           Color(255, 255, 255));
       maskImageContext->setTextDrawingMode(cTextStroke);
 
+      m_imageBuffer = maskImage;
       m_savedContext = context;
       context = maskImageContext;
     }

@@ -28,7 +28,6 @@
 #ifdef SVG_SUPPORT
 #include "SVGPaintServerPattern.h"
 #include "SVGRenderTreeAsText.h"
-#include "SVGResourceImage.h"
 
 namespace WebCore {
 
@@ -53,12 +52,12 @@ void SVGPaintServerPattern::setBoundingBoxMode(bool mode) {
   m_boundingBoxMode = mode;
 }
 
-SVGResourceImage* SVGPaintServerPattern::tile() const {
+ImageBuffer* SVGPaintServerPattern::tile() const {
   return m_tile.get();
 }
 
-void SVGPaintServerPattern::setTile(const PassRefPtr<SVGResourceImage>& tile) {
-  m_tile = tile;
+void SVGPaintServerPattern::setTile(ImageBuffer* tile) {
+  m_tile.set(tile);
 }
 
 AffineTransform SVGPaintServerPattern::patternTransform() const {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,42 +24,36 @@
  */
 
 #include "config.h"
+#include "ImageBuffer.h"
+
+#include "GraphicsContext.h"
 
 #ifdef SVG_SUPPORT
-#include <ApplicationServices/ApplicationServices.h>
-#include "SVGResourceImage.h"
+#include "RenderSVGContainer.h"
+#endif
 
 namespace WebCore {
 
-SVGResourceImage::SVGResourceImage() : m_cgLayer(0) {}
+void ImageBuffer::renderSubtreeToImage(ImageBuffer* image, RenderObject* item) {
+  ASSERT(item && image && image->context());
+  RenderObject::PaintInfo info(image->context(), IntRect(),
+                               PaintPhaseForeground, 0, 0, 0);
 
-SVGResourceImage::~SVGResourceImage() {
-  CGLayerRelease(m_cgLayer);
+#ifdef SVG_SUPPORT
+  RenderSVGContainer* svgContainer = 0;
+  if (item && item->isKCanvasContainer())
+    svgContainer = static_cast<RenderSVGContainer*>(item);
+
+  bool drawsContents = svgContainer ? svgContainer->drawsContents() : false;
+  if (svgContainer && !drawsContents)
+    svgContainer->setDrawsContents(true);
+#endif
+
+  item->paint(info, 0, 0);
+
+#ifdef SVG_SUPPORT
+  if (svgContainer && !drawsContents)
+    svgContainer->setDrawsContents(false);
+#endif
 }
-
-void SVGResourceImage::init(const Image&) {
-  // no-op
 }
-
-void SVGResourceImage::init(IntSize size) {
-  m_size = size;
-}
-
-IntSize SVGResourceImage::size() const {
-  return m_size;
-}
-
-CGLayerRef SVGResourceImage::cgLayer() {
-  return m_cgLayer;
-}
-
-void SVGResourceImage::setCGLayer(CGLayerRef layer) {
-  if (m_cgLayer != layer) {
-    CGLayerRelease(m_cgLayer);
-    m_cgLayer = CGLayerRetain(layer);
-  }
-}
-
-}  // namespace WebCore
-
-#endif  // SVG_SUPPORT

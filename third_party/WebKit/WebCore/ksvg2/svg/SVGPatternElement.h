@@ -33,8 +33,6 @@
 #include "SVGTests.h"
 #include "SVGURIReference.h"
 
-class SVGResourceImage;
-
 namespace WebCore {
 class SVGLength;
 class SVGPatternElement;
@@ -112,7 +110,6 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                                  PatternTransform,
                                  patternTransform)
 
-  mutable RefPtr<SVGResourceImage> m_tile;
   mutable bool m_ignoreAttributeChanges;
   mutable RefPtr<SVGPaintServerPattern> m_paintServer;
 

@@ -26,14 +26,17 @@
 
 #include "GraphicsContext.h"
 #include "RenderObject.h"
-#include "SVGResourceImage.h"
 #include "CgSupport.h"
 
 namespace WebCore {
 
 static void patternCallback(void* info, CGContextRef context) {
-  CGLayerRef layer = reinterpret_cast<SVGResourceImage*>(info)->cgLayer();
-  CGContextDrawLayerAtPoint(context, CGPointZero, layer);
+  ImageBuffer* patternImage = reinterpret_cast<ImageBuffer*>(info);
+
+  IntSize patternContentSize = patternImage->size();
+  CGContextDrawImage(context, CGRectMake(0, 0, patternContentSize.width(),
+                                         patternContentSize.height()),
+                     patternImage->cgImage());
 }
 
 bool SVGPaintServerPattern::setup(GraphicsContext*& context,
@@ -47,14 +50,12 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
 
   CGContextRef contextRef = context->platformContext();
 
-  RefPtr<SVGResourceImage> cell = tile();
-  if (!cell)
+  if (!tile())
     return false;
 
   context->save();
 
-  CGSize cellSize = CGSize(cell->size());
-
+  CGSize cellSize = CGSize(tile()->size());
   CGFloat alpha = 1;  // canvasStyle->opacity(); //which?
 
   // Patterns don't seem to resepect the CTM unless we make them...
@@ -71,8 +72,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   CGPatternCallbacks callbacks = {0, patternCallback, NULL};
   m_pattern = CGPatternCreate(
       tile(), CGRectMake(0, 0, cellSize.width, cellSize.height), transform,
-      bbox().width(),                   // cellSize.width,
-      bbox().height(),                  // cellSize.height,
+      bbox().width(), bbox().height(),
       kCGPatternTilingConstantSpacing,  // FIXME: should ask CG guys.
       true,                             // has color
       &callbacks);
@@ -80,7 +80,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
   CGContextSetAlpha(contextRef,
                     style->opacity());  // or do I set the alpha above?
 
-  m_patternSpace = CGColorSpaceCreatePattern(NULL);
+  m_patternSpace = CGColorSpaceCreatePattern(0);
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     CGContextSetFillColorSpace(contextRef, m_patternSpace);
