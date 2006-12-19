@@ -308,9 +308,6 @@ String FrameGdk::mimeTypeForFileName(String const&) const {
 void FrameGdk::issuePasteCommand() {
   notImplemented();
 }
-void FrameGdk::scheduleClose() {
-  notImplemented();
-}
 void FrameGdk::markMisspellings(WebCore::Selection const&) {
   notImplemented();
 }

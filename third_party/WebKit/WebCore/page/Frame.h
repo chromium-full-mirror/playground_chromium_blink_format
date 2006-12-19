@@ -236,10 +236,11 @@ class Frame : public Shared<Frame> {
                                    const String& defaultValue,
                                    String& result) = 0;
   virtual bool shouldInterruptJavaScript() = 0;
-  virtual void scheduleClose() = 0;
   virtual void focusWindow() = 0;
   virtual void unfocusWindow() = 0;
   virtual void print() = 0;
+  bool shouldClose();
+  void scheduleClose();
 
  private:
   virtual void setStatusBarText(const String&);

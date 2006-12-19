@@ -29,6 +29,7 @@ namespace WebCore {
 class ChromeClient;
 class ContextMenu;
 class FloatRect;
+class Frame;
 class Page;
 class String;
 struct FrameLoadRequest;
@@ -75,6 +76,11 @@ class Chrome {
   void addMessageToConsole(const String& message,
                            unsigned int lineNumber,
                            const String& sourceID);
+
+  bool canRunBeforeUnloadConfirmPanel();
+  bool runBeforeUnloadConfirmPanel(const String& message, Frame* frame);
+
+  void closeWindowSoon();
 
  private:
   Page* m_page;

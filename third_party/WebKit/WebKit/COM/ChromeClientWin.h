@@ -69,6 +69,11 @@ class ChromeClientWin : public WebCore::ChromeClient {
   virtual void addMessageToConsole(const WebCore::String& message,
                                    unsigned int lineNumber,
                                    const WebCore::String& sourceID);
+
+  virtual bool canRunBeforeUnloadConfirmPanel();
+  virtual bool runBeforeUnloadConfirmPanel(const String& message, Frame* frame);
+
+  virtual void closeWindowSoon();
 };
 
 #endif  // ChromeClientWin_H

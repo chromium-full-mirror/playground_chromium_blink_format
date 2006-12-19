@@ -84,8 +84,6 @@ class FrameGdk : public Frame {
 
   virtual void setTitle(const String&);
 
-  virtual void scheduleClose();
-
   virtual void unfocusWindow();
 
   virtual void focusWindow();

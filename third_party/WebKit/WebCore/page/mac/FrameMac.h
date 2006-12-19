@@ -115,7 +115,6 @@ class FrameMac : public Frame {
   void willPopupMenu(NSMenu*);
 
   void cleanupPluginObjects();
-  bool shouldClose();
 
   NSImage* selectionImage(bool forceWhiteText = false) const;
   NSImage* snapshotDragImage(Node*,
@@ -156,8 +155,6 @@ class FrameMac : public Frame {
                             bool line);
 
   virtual void print();
-
-  virtual void scheduleClose();
 
   // === to be moved into Editor
 

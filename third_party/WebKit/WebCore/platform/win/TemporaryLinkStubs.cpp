@@ -546,9 +546,6 @@ String FrameWin::mimeTypeForFileName(String const&) const {
 void FrameWin::issuePasteCommand() {
   notImplemented();
 }
-void FrameWin::scheduleClose() {
-  notImplemented();
-}
 void FrameWin::issueTransposeCommand() {
   notImplemented();
 }
