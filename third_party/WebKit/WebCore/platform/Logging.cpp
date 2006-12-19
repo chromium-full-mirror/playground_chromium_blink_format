@@ -52,4 +52,5 @@ WTFLogChannel LogSpellingAndGrammar = {0x00001000, "WebCoreLogLevel",
 WTFLogChannel LogBackForward = {0x00002000, "WebCoreLogLevel",
                                 WTFLogChannelOff};
 WTFLogChannel LogHistory = {0x00004000, "WebCoreLogLevel", WTFLogChannelOff};
+WTFLogChannel LogNetwork = {0x00100000, "WebCoreLogLevel", WTFLogChannelOn};
 }
