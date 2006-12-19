@@ -81,6 +81,11 @@ class ChromeClientQt : public ChromeClient, public Shared<ChromeClientQt> {
   virtual void addMessageToConsole(const String& message,
                                    unsigned int lineNumber,
                                    const String& sourceID);
+
+  virtual bool canRunBeforeUnloadConfirmPanel();
+  virtual bool runBeforeUnloadConfirmPanel(const String& message, Frame* frame);
+
+  virtual void closeWindowSoon();
 };
 }
 

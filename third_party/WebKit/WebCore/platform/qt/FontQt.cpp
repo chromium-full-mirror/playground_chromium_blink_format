@@ -50,7 +50,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
                       const FloatPoint& point) const {
   QPainter& p = *graphicsContext->platformContext();
 
-  Color color = graphicsContext->pen().color();
+  Color color = graphicsContext->fillColor();
   p.setPen(QColor(color));
   p.setFont(font->platformData().font());
 

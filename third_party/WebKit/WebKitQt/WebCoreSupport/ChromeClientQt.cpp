@@ -168,4 +168,11 @@ void ChromeClientQt::addMessageToConsole(const String& message,
                                          const String& sourceID) {}
 
 void ChromeClientQt::chromeDestroyed() {}
+
+bool ChromeClientQt::canRunBeforeUnloadConfirmPanel() {}
+
+bool ChromeClientQt::runBeforeUnloadConfirmPanel(const String& message,
+                                                 Frame* frame) {}
+
+void ChromeClientQt::closeWindowSoon() {}
 }
