@@ -705,7 +705,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   m_mouseDownWasInSubframe = false;
 
   MouseEventWithHitTestResults mev =
-      prepareMouseEvent(false, true, false, mouseEvent);
+      prepareMouseEvent(HitTestRequest(false, true), mouseEvent);
 
   if (!mev.targetNode()) {
     invalidateClick();
@@ -747,7 +747,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
     // event target node can't still be the shadow node.
     if (mev.targetNode()->isShadowNode() &&
         mev.targetNode()->shadowParentNode()->hasTagName(inputTag))
-      mev = prepareMouseEvent(true, true, false, mouseEvent);
+      mev = prepareMouseEvent(HitTestRequest(true, true), mouseEvent);
 
     PlatformScrollbar* scrollbar =
         m_frame->view()->scrollbarUnderMouse(mouseEvent);
@@ -786,7 +786,7 @@ bool EventHandler::handleMouseDoubleClickEvent(
   m_currentMousePosition = mouseEvent.pos();
 
   MouseEventWithHitTestResults mev =
-      prepareMouseEvent(false, true, false, mouseEvent);
+      prepareMouseEvent(HitTestRequest(false, true), mouseEvent);
   Frame* subframe = subframeForTargetNode(mev.targetNode());
   if (subframe && passMousePressEventToSubframe(mev, subframe))
     return true;
@@ -835,9 +835,9 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   // the mouse
   // was pressed, rather than updating for nodes the mouse moves over as you
   // hold the mouse down.
-  MouseEventWithHitTestResults mev =
-      prepareMouseEvent(m_mousePressed && m_mouseDownMayStartSelect,
-                        m_mousePressed, true, mouseEvent);
+  HitTestRequest request(m_mousePressed && m_mouseDownMayStartSelect,
+                         m_mousePressed, true, m_mousePressed);
+  MouseEventWithHitTestResults mev = prepareMouseEvent(request, mouseEvent);
 
   if (m_lastMouseMoveEventSubframe &&
       m_lastMouseMoveEventSubframe->tree()->isDescendantOf(m_frame))
@@ -904,7 +904,7 @@ bool EventHandler::handleMouseReleaseEvent(
                               m_clickCount, mouseEvent, false);
 
   MouseEventWithHitTestResults mev =
-      prepareMouseEvent(false, false, false, mouseEvent);
+      prepareMouseEvent(HitTestRequest(false, false, false, true), mouseEvent);
   Frame* subframe = subframeForTargetNode(mev.targetNode());
   if (subframe && passMouseReleaseEventToSubframe(mev, subframe))
     return true;
@@ -953,7 +953,7 @@ bool EventHandler::updateDragAndDrop(const PlatformMouseEvent& event,
   bool accept = false;
 
   MouseEventWithHitTestResults mev =
-      prepareMouseEvent(true, false, false, event);
+      prepareMouseEvent(HitTestRequest(true, false), event);
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
@@ -1062,16 +1062,13 @@ bool EventHandler::advanceFocus(KeyboardEvent* event) {
 }
 
 MouseEventWithHitTestResults EventHandler::prepareMouseEvent(
-    bool readonly,
-    bool active,
-    bool mouseMove,
+    const HitTestRequest& request,
     const PlatformMouseEvent& mev) {
   ASSERT(m_frame);
   ASSERT(m_frame->document());
 
-  IntPoint vPoint = m_frame->view()->windowToContents(mev.pos());
-  return m_frame->document()->prepareMouseEvent(readonly, active, mouseMove,
-                                                vPoint, mev);
+  IntPoint documentPoint = m_frame->view()->windowToContents(mev.pos());
+  return m_frame->document()->prepareMouseEvent(request, documentPoint, mev);
 }
 
 bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
@@ -1169,10 +1166,10 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
 
   IntPoint vPoint = m_frame->view()->windowToContents(e.pos());
 
-  HitTestRequest hitTestRequest(true, false);
-  HitTestResult hitTestResult(vPoint);
-  doc->renderer()->layer()->hitTest(hitTestRequest, hitTestResult);
-  Node* node = hitTestResult.innerNode();
+  HitTestRequest request(true, false);
+  HitTestResult result(vPoint);
+  doc->renderer()->layer()->hitTest(request, result);
+  Node* node = result.innerNode();
   Frame* subframe = subframeForTargetNode(node);
   if (subframe && passWheelEventToSubframe(e, subframe)) {
     e.accept();
@@ -1219,7 +1216,7 @@ bool EventHandler::sendContextMenuEvent(PlatformMouseEvent event) {
   bool swallowEvent;
   IntPoint viewportPos = v->windowToContents(event.pos());
   MouseEventWithHitTestResults mev =
-      doc->prepareMouseEvent(false, true, false, viewportPos, event);
+      doc->prepareMouseEvent(HitTestRequest(false, true), viewportPos, event);
 
   swallowEvent = dispatchMouseEvent(contextmenuEvent, mev.targetNode(), true, 0,
                                     event, true);
@@ -1268,7 +1265,7 @@ void EventHandler::setResizingFrameSet(HTMLFrameSetElement* frameSet) {
 
 void EventHandler::hoverTimerFired(Timer<EventHandler>*) {
   m_hoverTimer.stop();
-  prepareMouseEvent(false, false, true,
+  prepareMouseEvent(HitTestRequest(false, false, true),
                     PlatformMouseEvent(PlatformMouseEvent::currentEvent));
 }
 }
