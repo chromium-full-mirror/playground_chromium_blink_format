@@ -32,6 +32,10 @@
 #include "regexp_object.h"
 #include <wtf/unicode/Unicode.h>
 
+#if PLATFORM(CF)
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 using namespace KJS;
 
 // ------------------------------ StringInstance ----------------------------
@@ -136,6 +140,7 @@ const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
   toUpperCase           StringProtoFunc::ToUpperCase    DontEnum|Function 0
   toLocaleLowerCase     StringProtoFunc::ToLocaleLowerCase DontEnum|Function 0
   toLocaleUpperCase     StringProtoFunc::ToLocaleUpperCase DontEnum|Function 0
+  localeCompare         StringProtoFunc::LocaleCompare  DontEnum|Function 1
 #
 # Under here: html extension, should only exist if KJS_PURE_ECMA is not defined
 # I guess we need to generate two hashtables in the .lut.h file, and use #ifdef
@@ -305,6 +310,33 @@ static inline UString substituteBackreferences(const UString& replacement,
 
   return substitutedReplacement;
 }
+
+#if PLATFORM(WIN_OS)
+static inline int localeCompare(const UString& a, const UString& b) {
+  return CompareStringW(LOCALE_USER_DEFAULT, 0, a.data(), a.length(), b.data(),
+                        b.length());
+}
+#elif PLATFORM(CF)
+static inline int localeCompare(const UString& a, const UString& b) {
+  CFStringRef sa = CFStringCreateWithCharactersNoCopy(
+      kCFAllocatorDefault, reinterpret_cast<const UniChar*>(a.data()), a.size(),
+      kCFAllocatorNull);
+  CFStringRef sb = CFStringCreateWithCharactersNoCopy(
+      kCFAllocatorDefault, reinterpret_cast<const UniChar*>(b.data()), b.size(),
+      kCFAllocatorNull);
+
+  int retval = CFStringCompare(sa, sb, kCFCompareLocalized);
+
+  CFRelease(sa);
+  CFRelease(sb);
+
+  return retval;
+}
+#else
+static inline int localeCompare(const UString& a, const UString& b) {
+  return compare(a, b);
+}
+#endif
 
 static JSValue* replace(ExecState* exec,
                         const UString& source,
@@ -739,6 +771,8 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       free(destIfNeeded);
       break;
     }
+    case LocaleCompare:
+      return jsNumber(localeCompare(s, a0->toString(exec)));
 #ifndef KJS_PURE_ECMA
     case Big:
       result = jsString("<big>" + s + "</big>");
