@@ -191,7 +191,6 @@ class GraphicsContext : Noncopyable {
   void clearFocusRing();
   IntRect focusRingBoundingRect();
 
-  void setLineWidth(float);
   void setLineCap(LineCap);
   void setLineJoin(LineJoin);
   void setMiterLimit(float);
