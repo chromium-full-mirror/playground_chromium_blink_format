@@ -124,7 +124,15 @@ typedef void (*KJSDidExecuteFunctionPtr)(ExecState*, JSObject* rootObject);
 
 class Instance {
  public:
-  typedef enum { JavaLanguage, ObjectiveCLanguage, CLanguage } BindingLanguage;
+  typedef enum {
+    JavaLanguage,
+    ObjectiveCLanguage,
+    CLanguage
+#if PLATFORM(QT)
+    ,
+    QtLanguage
+#endif
+  } BindingLanguage;
 
   Instance();
 

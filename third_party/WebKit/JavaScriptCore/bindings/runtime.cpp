@@ -33,6 +33,9 @@
 #include "jni_instance.h"
 #include "objc_instance.h"
 #endif
+#if PLATFORM(QT)
+#include "qt_instance.h"
+#endif
 #include "runtime_object.h"
 
 namespace KJS {
@@ -125,6 +128,12 @@ Instance* Instance::createBindingForLanguageInstance(
       newInstance = new Bindings::CInstance((NPObject*)nativeInstance);
       break;
     }
+#if PLATFORM(QT)
+    case Instance::QtLanguage: {
+      newInstance = new Bindings::QtInstance((QObject*)nativeInstance);
+      break;
+    }
+#endif
     default:
       break;
   }
