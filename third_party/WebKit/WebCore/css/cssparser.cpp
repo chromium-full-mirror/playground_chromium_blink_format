@@ -690,6 +690,8 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSS_PROP_TEXT_LINE_THROUGH_COLOR:  // CSS3 text decoration colors
     case CSS_PROP_TEXT_UNDERLINE_COLOR:
     case CSS_PROP_TEXT_OVERLINE_COLOR:
+    case CSS_PROP__WEBKIT_TEXT_FILL_COLOR:
+    case CSS_PROP__WEBKIT_TEXT_STROKE_COLOR:
       if (id == CSS_VAL__WEBKIT_TEXT)
         valid_primitive =
             true;  // Always allow this, even when strict parsing is on,
@@ -822,6 +824,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       }
       break;
 
+    case CSS_PROP__WEBKIT_TEXT_STROKE_WIDTH:
     case CSS_PROP_OUTLINE_WIDTH:        // <border-width> | inherit
     case CSS_PROP_BORDER_TOP_WIDTH:     //// <border-width> | inherit
     case CSS_PROP_BORDER_RIGHT_WIDTH:   //   Which is defined as
@@ -1408,6 +1411,11 @@ bool CSSParser::parseValue(int propId, bool important) {
                                  CSS_PROP_LIST_STYLE_POSITION,
                                  CSS_PROP_LIST_STYLE_IMAGE};
       return parseShorthand(propId, properties, 3, important);
+    }
+    case CSS_PROP__WEBKIT_TEXT_STROKE: {
+      const int properties[2] = {CSS_PROP__WEBKIT_TEXT_STROKE_WIDTH,
+                                 CSS_PROP__WEBKIT_TEXT_STROKE_COLOR};
+      return parseShorthand(propId, properties, 2, important);
     }
     default:
 #ifdef SVG_SUPPORT

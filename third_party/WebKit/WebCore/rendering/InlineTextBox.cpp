@@ -220,13 +220,28 @@ static Color correctedTextColor(Color textColor, Color backgroundColor) {
   return textColor.light();
 }
 
-static void updateTextColor(GraphicsContext* context, const Color& textColor) {
-  ASSERT(textColor.isValid());
+static void updateGraphicsContext(GraphicsContext* context,
+                                  const Color& fillColor,
+                                  const Color& strokeColor,
+                                  float strokeThickness) {
   int mode = context->textDrawingMode();
-  if (mode & cTextFill && textColor != context->fillColor())
-    context->setFillColor(textColor);
-  if (mode & cTextStroke && textColor != context->strokeColor())
-    context->setStrokeColor(textColor);
+  if (strokeThickness > 0) {
+    int newMode = mode | cTextStroke;
+    if (mode != newMode) {
+      context->setTextDrawingMode(newMode);
+      mode = newMode;
+    }
+  }
+
+  if (mode & cTextFill && fillColor != context->fillColor())
+    context->setFillColor(fillColor);
+
+  if (mode & cTextStroke) {
+    if (strokeColor != context->strokeColor())
+      context->setStrokeColor(strokeColor);
+    if (strokeThickness != context->strokeThickness())
+      context->setStrokeThickness(strokeThickness);
+  }
 }
 
 bool InlineTextBox::isLineBreak() const {
@@ -262,8 +277,8 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   ASSERT(paintInfo.phase != PaintPhaseSelfOutline &&
          paintInfo.phase != PaintPhaseChildOutlines);
 
-  int xPos = tx + m_x - parent()->maxHorizontalShadow();
-  int w = width() + 2 * parent()->maxHorizontalShadow();
+  int xPos = tx + m_x - parent()->maxHorizontalVisualOverflow();
+  int w = width() + 2 * parent()->maxHorizontalVisualOverflow();
   if (xPos >= paintInfo.rect.right() || xPos + w <= paintInfo.rect.x())
     return;
 
@@ -326,19 +341,39 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     numUnderlines = underlines->size();
   }
 
-  Color textColor;
+  Color textFillColor;
+  Color textStrokeColor;
+  float textStrokeWidth = styleToUse->textStrokeWidth();
 
-  if (paintInfo.forceWhiteText)
-    textColor = Color::white;
-  else {
-    textColor = styleToUse->color();
+  if (paintInfo.forceWhiteText) {
+    textFillColor = Color::white;
+    textStrokeColor = Color::white;
+  } else {
+    textFillColor = styleToUse->textFillColor();
+    if (!textFillColor.isValid())
+      textFillColor = styleToUse->color();
 
-    // Make the text color legible against a white background
+    // Make the text fill color legible against a white background
     if (styleToUse->forceBackgroundsToWhite())
-      textColor = correctedTextColor(textColor, Color::white);
+      textFillColor = correctedTextColor(textFillColor, Color::white);
+
+    textStrokeColor = styleToUse->textStrokeColor();
+    if (!textStrokeColor.isValid())
+      textStrokeColor = styleToUse->color();
+
+    // Make the text stroke color legible against a white background
+    if (styleToUse->forceBackgroundsToWhite())
+      textStrokeColor = correctedTextColor(textStrokeColor, Color::white);
   }
 
-  updateTextColor(paintInfo.context, textColor);
+  // For stroked painting, we have to change the text drawing mode.  It's
+  // probably dangerous to leave that mutated as a side
+  // effect, so only when we know we're stroking, do a save/restore.
+  if (textStrokeWidth > 0)
+    paintInfo.context->save();
+
+  updateGraphicsContext(paintInfo.context, textFillColor, textStrokeColor,
+                        textStrokeWidth);
 
   // Set a text shadow if we have one.
   // FIXME: Support multiple shadow effects.  Need more from the CG API before
@@ -355,22 +390,42 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   bool paintSelectedTextSeparately =
       false;  // Whether or not we have to do multiple paints.  Only
   // necessary when a custom ::selection foreground color is applied.
-  Color selectionColor;
+  Color selectionFillColor = textFillColor;
+  Color selectionStrokeColor = textStrokeColor;
+  float selectionStrokeWidth = textStrokeWidth;
   ShadowData* selectionTextShadow = 0;
   if (haveSelection) {
     // Check foreground color first.
     Color foreground = object()->selectionForegroundColor();
-    if (foreground.isValid() && foreground != selectionColor) {
+    if (foreground.isValid() && foreground != selectionFillColor) {
       if (!paintSelectedTextOnly)
         paintSelectedTextSeparately = true;
-      selectionColor = foreground;
+      selectionFillColor = foreground;
     }
     RenderStyle* pseudoStyle = object()->getPseudoStyle(RenderStyle::SELECTION);
-    if (pseudoStyle && pseudoStyle->textShadow()) {
-      if (!paintSelectedTextOnly)
-        paintSelectedTextSeparately = true;
-      if (pseudoStyle->textShadow())
-        selectionTextShadow = pseudoStyle->textShadow();
+    if (pseudoStyle) {
+      if (pseudoStyle->textShadow()) {
+        if (!paintSelectedTextOnly)
+          paintSelectedTextSeparately = true;
+        if (pseudoStyle->textShadow())
+          selectionTextShadow = pseudoStyle->textShadow();
+      }
+
+      short strokeWidth = pseudoStyle->textStrokeWidth();
+      if (strokeWidth != selectionStrokeWidth) {
+        if (!paintSelectedTextOnly)
+          paintSelectedTextSeparately = true;
+        selectionStrokeWidth = strokeWidth;
+      }
+
+      Color stroke = pseudoStyle->textStrokeColor();
+      if (!stroke.isValid())
+        stroke = pseudoStyle->color();
+      if (stroke != selectionStrokeColor) {
+        if (!paintSelectedTextOnly)
+          paintSelectedTextSeparately = true;
+        selectionStrokeColor = stroke;
+      }
     }
   }
 
@@ -413,8 +468,11 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
     if (sPos < ePos) {
       // paint only the text that is selected
-      if (selectionColor.isValid())
-        updateTextColor(paintInfo.context, selectionColor);
+      if (selectionStrokeWidth > 0)
+        paintInfo.context->save();
+
+      updateGraphicsContext(paintInfo.context, selectionFillColor,
+                            selectionStrokeColor, selectionStrokeWidth);
 
       if (selectionTextShadow)
         paintInfo.context->setShadow(
@@ -425,6 +483,9 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
                                   textStyle);
       if (selectionTextShadow)
         paintInfo.context->clearShadow();
+
+      if (selectionStrokeWidth > 0)
+        paintInfo.context->restore();
     }
   }
 
@@ -465,6 +526,9 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
   if (setShadow)
     paintInfo.context->clearShadow();
+
+  if (textStrokeWidth > 0)
+    paintInfo.context->restore();
 }
 
 void InlineTextBox::selectionStartEnd(int& sPos, int& ePos) {
@@ -508,7 +572,7 @@ void InlineTextBox::paintSelection(GraphicsContext* p,
     c = Color(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
 
   p->save();
-  updateTextColor(p, c);  // Don't draw text at all!
+  updateGraphicsContext(p, c, c, 0);  // Don't draw text at all!
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
@@ -540,7 +604,7 @@ void InlineTextBox::paintMarkedTextBackground(GraphicsContext* p,
 
   Color c = Color(225, 221, 85);
 
-  updateTextColor(p, c);  // Don't draw text at all!
+  updateGraphicsContext(p, c, c, 0);  // Don't draw text at all!
 
   RootInlineBox* r = root();
   int y = r->selectionTop();
@@ -720,7 +784,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   if (object()->document()->frame()->markedTextMatchesAreHighlighted()) {
     Color yellow = Color(255, 255, 0);
     pt->save();
-    updateTextColor(pt, yellow);  // Don't draw text at all!
+    updateGraphicsContext(pt, yellow, yellow, 0);  // Don't draw text at all!
     pt->clip(IntRect(_tx + m_x, _ty + y, m_width, h));
     pt->drawHighlightForText(run, startPoint, h, renderStyle, yellow);
     pt->restore();

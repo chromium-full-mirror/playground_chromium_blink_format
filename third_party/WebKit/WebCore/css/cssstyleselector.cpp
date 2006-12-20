@@ -2653,65 +2653,74 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSS_PROP_BORDER_LEFT_COLOR:
     case CSS_PROP_COLOR:
     case CSS_PROP_OUTLINE_COLOR:
-      // this property is an extension used to get HTML4 <font> right.
-      {
-        Color col;
-        if (isInherit) {
-          HANDLE_INHERIT_COND(CSS_PROP_BACKGROUND_COLOR, backgroundColor,
-                              BackgroundColor)
-          HANDLE_INHERIT_COND(CSS_PROP_BORDER_TOP_COLOR, borderTopColor,
-                              BorderTopColor)
-          HANDLE_INHERIT_COND(CSS_PROP_BORDER_BOTTOM_COLOR, borderBottomColor,
-                              BorderBottomColor)
-          HANDLE_INHERIT_COND(CSS_PROP_BORDER_RIGHT_COLOR, borderRightColor,
-                              BorderRightColor)
-          HANDLE_INHERIT_COND(CSS_PROP_BORDER_LEFT_COLOR, borderLeftColor,
-                              BorderLeftColor)
-          HANDLE_INHERIT_COND(CSS_PROP_COLOR, color, Color)
-          HANDLE_INHERIT_COND(CSS_PROP_OUTLINE_COLOR, outlineColor,
-                              OutlineColor)
-          return;
-        }
-        if (isInitial) {
-          // The border/outline colors will just map to the invalid color |col|
-          // above.  This will have the
-          // effect of forcing the use of the currentColor when it comes time to
-          // draw the borders (and of
-          // not painting the background since the color won't be valid).
-          if (id == CSS_PROP_COLOR)
-            col = RenderStyle::initialColor();
-        } else {
-          if (!primitiveValue)
-            return;
-          col = getColorFromPrimitiveValue(primitiveValue);
-        }
-
-        switch (id) {
-          case CSS_PROP_BACKGROUND_COLOR:
-            style->setBackgroundColor(col);
-            break;
-          case CSS_PROP_BORDER_TOP_COLOR:
-            style->setBorderTopColor(col);
-            break;
-          case CSS_PROP_BORDER_RIGHT_COLOR:
-            style->setBorderRightColor(col);
-            break;
-          case CSS_PROP_BORDER_BOTTOM_COLOR:
-            style->setBorderBottomColor(col);
-            break;
-          case CSS_PROP_BORDER_LEFT_COLOR:
-            style->setBorderLeftColor(col);
-            break;
-          case CSS_PROP_COLOR:
-            style->setColor(col);
-            break;
-          case CSS_PROP_OUTLINE_COLOR:
-            style->setOutlineColor(col);
-            break;
-        }
+    case CSS_PROP__WEBKIT_TEXT_STROKE_COLOR:
+    case CSS_PROP__WEBKIT_TEXT_FILL_COLOR: {
+      Color col;
+      if (isInherit) {
+        HANDLE_INHERIT_COND(CSS_PROP_BACKGROUND_COLOR, backgroundColor,
+                            BackgroundColor)
+        HANDLE_INHERIT_COND(CSS_PROP_BORDER_TOP_COLOR, borderTopColor,
+                            BorderTopColor)
+        HANDLE_INHERIT_COND(CSS_PROP_BORDER_BOTTOM_COLOR, borderBottomColor,
+                            BorderBottomColor)
+        HANDLE_INHERIT_COND(CSS_PROP_BORDER_RIGHT_COLOR, borderRightColor,
+                            BorderRightColor)
+        HANDLE_INHERIT_COND(CSS_PROP_BORDER_LEFT_COLOR, borderLeftColor,
+                            BorderLeftColor)
+        HANDLE_INHERIT_COND(CSS_PROP_COLOR, color, Color)
+        HANDLE_INHERIT_COND(CSS_PROP_OUTLINE_COLOR, outlineColor, OutlineColor)
+        HANDLE_INHERIT_COND(CSS_PROP__WEBKIT_TEXT_STROKE_COLOR, textStrokeColor,
+                            TextStrokeColor)
+        HANDLE_INHERIT_COND(CSS_PROP__WEBKIT_TEXT_FILL_COLOR, textFillColor,
+                            TextFillColor)
         return;
       }
-      break;
+      if (isInitial) {
+        // The border/outline colors will just map to the invalid color |col|
+        // above.  This will have the
+        // effect of forcing the use of the currentColor when it comes time to
+        // draw the borders (and of
+        // not painting the background since the color won't be valid).
+        if (id == CSS_PROP_COLOR)
+          col = RenderStyle::initialColor();
+      } else {
+        if (!primitiveValue)
+          return;
+        col = getColorFromPrimitiveValue(primitiveValue);
+      }
+
+      switch (id) {
+        case CSS_PROP_BACKGROUND_COLOR:
+          style->setBackgroundColor(col);
+          break;
+        case CSS_PROP_BORDER_TOP_COLOR:
+          style->setBorderTopColor(col);
+          break;
+        case CSS_PROP_BORDER_RIGHT_COLOR:
+          style->setBorderRightColor(col);
+          break;
+        case CSS_PROP_BORDER_BOTTOM_COLOR:
+          style->setBorderBottomColor(col);
+          break;
+        case CSS_PROP_BORDER_LEFT_COLOR:
+          style->setBorderLeftColor(col);
+          break;
+        case CSS_PROP_COLOR:
+          style->setColor(col);
+          break;
+        case CSS_PROP_OUTLINE_COLOR:
+          style->setOutlineColor(col);
+          break;
+        case CSS_PROP__WEBKIT_TEXT_STROKE_COLOR:
+          style->setTextStrokeColor(col);
+          break;
+        case CSS_PROP__WEBKIT_TEXT_FILL_COLOR:
+          style->setTextFillColor(col);
+          break;
+      }
+
+      return;
+    } break;
 
     // uri || inherit
     case CSS_PROP_BACKGROUND_IMAGE:
@@ -4486,7 +4495,29 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         return;
       style->setVisuallyOrdered(primitiveValue->getIdent() == CSS_VAL_VISUAL);
       break;
-
+    case CSS_PROP__WEBKIT_TEXT_STROKE_WIDTH: {
+      HANDLE_INHERIT_AND_INITIAL(textStrokeWidth, TextStrokeWidth)
+      float width = 0;
+      switch (primitiveValue->getIdent()) {
+        case CSS_VAL_THIN:
+        case CSS_VAL_MEDIUM:
+        case CSS_VAL_THICK: {
+          double result = 1.0 / 48;
+          if (primitiveValue->getIdent() == CSS_VAL_MEDIUM)
+            result *= 3;
+          else if (primitiveValue->getIdent() == CSS_VAL_THICK)
+            result *= 5;
+          CSSPrimitiveValue val(result, CSSPrimitiveValue::CSS_EMS);
+          width = val.computeLengthFloat(style);
+          break;
+        }
+        default:
+          width = primitiveValue->computeLengthFloat(style);
+          break;
+      }
+      style->setTextStrokeWidth(width);
+      break;
+    }
     default:
 #ifdef SVG_SUPPORT
       // Try the SVG properties

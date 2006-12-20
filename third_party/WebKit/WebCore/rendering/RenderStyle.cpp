@@ -436,7 +436,8 @@ bool StyleCSS3NonInheritedData::operator==(
 }
 
 StyleCSS3InheritedData::StyleCSS3InheritedData()
-    : textShadow(0),
+    : textStrokeWidth(RenderStyle::initialTextStrokeWidth()),
+      textShadow(0),
       textSecurity(RenderStyle::initialTextSecurity()),
       userModify(READ_ONLY),
       wordWrap(WBNORMAL),
@@ -447,6 +448,9 @@ StyleCSS3InheritedData::StyleCSS3InheritedData()
 
 StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
     : Shared<StyleCSS3InheritedData>(),
+      textStrokeColor(o.textStrokeColor),
+      textStrokeWidth(o.textStrokeWidth),
+      textFillColor(o.textFillColor),
       textShadow(o.textShadow ? new ShadowData(*o.textShadow) : 0),
       highlight(o.highlight),
       textSecurity(o.textSecurity),
@@ -463,8 +467,11 @@ StyleCSS3InheritedData::~StyleCSS3InheritedData() {
 
 bool StyleCSS3InheritedData::operator==(const StyleCSS3InheritedData& o) const {
   return userModify == o.userModify && shadowDataEquivalent(o) &&
-         highlight == o.highlight && wordWrap == o.wordWrap &&
-         nbspMode == o.nbspMode && khtmlLineBreak == o.khtmlLineBreak &&
+         textStrokeColor == o.textStrokeColor &&
+         textStrokeWidth == o.textStrokeWidth &&
+         textFillColor == o.textFillColor && highlight == o.highlight &&
+         wordWrap == o.wordWrap && nbspMode == o.nbspMode &&
+         khtmlLineBreak == o.khtmlLineBreak &&
          textSizeAdjust == o.textSizeAdjust;
 }
 
@@ -892,7 +899,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(inherited_flags._direction == other->inherited_flags._direction) ||
       !(inherited_flags._white_space == other->inherited_flags._white_space) ||
       !(noninherited_flags._clear == other->noninherited_flags._clear) ||
-      !css3InheritedData->shadowDataEquivalent(*other->css3InheritedData.get()))
+      !css3InheritedData->shadowDataEquivalent(
+          *other->css3InheritedData.get()) ||
+      textStrokeWidth() != other->textStrokeWidth())
     return Layout;
 
   // Overflow returns a layout hint.
@@ -968,7 +977,11 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       css3InheritedData->userModify != other->css3InheritedData->userModify ||
       css3NonInheritedData->userSelect !=
           other->css3NonInheritedData->userSelect ||
-      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag)
+      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag ||
+      css3InheritedData->textFillColor !=
+          other->css3InheritedData->textFillColor ||
+      css3InheritedData->textStrokeColor !=
+          other->css3InheritedData->textStrokeColor)
     return Repaint;
 
   return Equal;
