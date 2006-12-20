@@ -35,6 +35,8 @@
 #include "RenderTableCell.h"
 #include "RootInlineBox.h"
 
+#include <math.h>
+
 using namespace std;
 
 namespace WebCore {
@@ -263,7 +265,8 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       // FIXME: Setting this as layout overflow is bad.  We need to have a
       // separate concept of
       // visual overflow.
-      int strokeOverflow = (rt->style()->textStrokeWidth() + 1) / 2;
+      int strokeOverflow =
+          static_cast<int>(ceilf(rt->style()->textStrokeWidth() / 2.0));
       int visualOverflowLeft = -strokeOverflow;
       int visualOverflowRight = strokeOverflow;
       for (ShadowData* shadow = rt->style()->textShadow(); shadow;
