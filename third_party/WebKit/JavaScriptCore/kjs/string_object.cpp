@@ -34,6 +34,8 @@
 
 #if PLATFORM(CF)
 #include <CoreFoundation/CoreFoundation.h>
+#elif PLATFORM(WIN_OS)
+#include <windows.h>
 #endif
 
 using namespace KJS;
@@ -313,8 +315,8 @@ static inline UString substituteBackreferences(const UString& replacement,
 
 #if PLATFORM(WIN_OS)
 static inline int localeCompare(const UString& a, const UString& b) {
-  return CompareStringW(LOCALE_USER_DEFAULT, 0, a.data(), a.length(), b.data(),
-                        b.length());
+  return CompareStringW(LOCALE_USER_DEFAULT, 0, a.data(), a.size(), b.data(),
+                        b.size());
 }
 #elif PLATFORM(CF)
 static inline int localeCompare(const UString& a, const UString& b) {
