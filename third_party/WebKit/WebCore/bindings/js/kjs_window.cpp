@@ -2427,6 +2427,8 @@ const ClassInfo Selection::info = {"Selection", 0, &SelectionTable, 0};
   setPosition               Selection::SetPosition DontDelete|Function 2
   modify                    Selection::Modify DontDelete|Function 3
   getRangeAt                Selection::GetRangeAt DontDelete|Function 1
+  removeAllRanges           Selection::RemoveAllRanges DontDelete|Function 0
+  addRange                  Selection::AddRange DontDelete|Function 1
 @end
 */
 KJS_IMPLEMENT_PROTOFUNC(SelectionFunc)
@@ -2521,6 +2523,12 @@ JSValue* SelectionFunc::callAsFunction(ExecState* exec,
         break;
       case Selection::GetRangeAt:
         return toJS(exec, s->getRangeAt(args[0]->toInt32(exec)).get());
+      case Selection::RemoveAllRanges:
+        s->removeAllRanges();
+        break;
+      case Selection::AddRange:
+        s->addRange(toRange(args[0]));
+        break;
       case Selection::ToString:
         return jsString(s->toString());
     }

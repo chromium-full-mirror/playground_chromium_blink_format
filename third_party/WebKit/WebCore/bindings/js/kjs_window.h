@@ -408,7 +408,9 @@ class Selection : public DOMObject {
     SetBaseAndExtent,
     SetPosition,
     Modify,
-    GetRangeAt
+    GetRangeAt,
+    RemoveAllRanges,
+    AddRange
   };
   WebCore::Frame* frame() const { return m_frame; }
   virtual const ClassInfo* classInfo() const { return &info; }
