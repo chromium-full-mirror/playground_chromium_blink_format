@@ -52,7 +52,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
 
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
-  virtual bool canSelectAll() const { return !usesMenuList(); }
+  virtual bool canSelectAll() const;
   virtual void selectAll();
 
   virtual void recalcStyle(StyleChange);
