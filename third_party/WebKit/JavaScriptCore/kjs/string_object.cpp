@@ -315,8 +315,9 @@ static inline UString substituteBackreferences(const UString& replacement,
 
 #if PLATFORM(WIN_OS)
 static inline int localeCompare(const UString& a, const UString& b) {
-  return CompareStringW(LOCALE_USER_DEFAULT, 0, a.data(), a.size(), b.data(),
-                        b.size());
+  return CompareStringW(LOCALE_USER_DEFAULT, 0,
+                        reinterpret_cast<LPCWSTR>(a.data()), a.size(),
+                        reinterpret_cast<LPCWSTR>(b.data()), b.size());
 }
 #elif PLATFORM(CF)
 static inline int localeCompare(const UString& a, const UString& b) {
