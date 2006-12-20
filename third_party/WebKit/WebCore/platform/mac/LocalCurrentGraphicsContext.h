@@ -33,6 +33,7 @@ class LocalCurrentGraphicsContext : Noncopyable {
   ~LocalCurrentGraphicsContext();
 
  private:
+  GraphicsContext* m_savedGraphicsContext;
   NSGraphicsContext* m_savedNSGraphicsContext;
 };
 }
