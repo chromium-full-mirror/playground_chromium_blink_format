@@ -2962,6 +2962,23 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   return result;
 }
 
+static Color decorationColor(RenderStyle* style) {
+  Color result;
+  if (style->textStrokeWidth() > 0) {
+    // Prefer stroke color if possible but not if it's fully transparent.
+    result = style->textStrokeColor();
+    if (!result.isValid())
+      result = style->color();
+    if (result.alpha())
+      return result;
+  }
+
+  result = style->textFillColor();
+  if (!result.isValid())
+    result = style->color();
+  return result;
+}
+
 void RenderObject::getTextDecorationColors(int decorations,
                                            Color& underline,
                                            Color& overline,
@@ -2973,15 +2990,15 @@ void RenderObject::getTextDecorationColors(int decorations,
     if (currDecs) {
       if (currDecs & UNDERLINE) {
         decorations &= ~UNDERLINE;
-        underline = curr->style()->color();
+        underline = decorationColor(curr->style());
       }
       if (currDecs & OVERLINE) {
         decorations &= ~OVERLINE;
-        overline = curr->style()->color();
+        overline = decorationColor(curr->style());
       }
       if (currDecs & LINE_THROUGH) {
         decorations &= ~LINE_THROUGH;
-        linethrough = curr->style()->color();
+        linethrough = decorationColor(curr->style());
       }
     }
     curr = curr->parent();
@@ -2995,11 +3012,11 @@ void RenderObject::getTextDecorationColors(int decorations,
   // <a> element).
   if (decorations && curr) {
     if (decorations & UNDERLINE)
-      underline = curr->style()->color();
+      underline = decorationColor(curr->style());
     if (decorations & OVERLINE)
-      overline = curr->style()->color();
+      overline = decorationColor(curr->style());
     if (decorations & LINE_THROUGH)
-      linethrough = curr->style()->color();
+      linethrough = decorationColor(curr->style());
   }
 }
 
