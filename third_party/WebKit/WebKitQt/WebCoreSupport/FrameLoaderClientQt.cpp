@@ -59,12 +59,12 @@ void FrameLoaderClientQt::deref() {
 }
 
 bool FrameLoaderClientQt::hasWebView() const {
-  notImplemented();
+  // notImplemented();
   return true;
 }
 
 bool FrameLoaderClientQt::hasFrameView() const {
-  notImplemented();
+  // notImplemented();
   return true;
 }
 
@@ -178,7 +178,7 @@ void FrameLoaderClientQt::loadedFromPageCache() {
 }
 
 void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
-  notImplemented();
+  // notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
@@ -220,7 +220,7 @@ void FrameLoaderClientQt::dispatchDidFinishLoad() {
 }
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
-  notImplemented();
+  // notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchShow() {
@@ -349,7 +349,7 @@ void FrameLoaderClientQt::prepareForDataSourceReplacement() {
 }
 
 void FrameLoaderClientQt::setTitle(const String& title, const KURL&) {
-  notImplemented();
+  // notImplemented();
 }
 
 String FrameLoaderClientQt::userAgent() {
@@ -365,4 +365,6 @@ void FrameLoaderClientQt::frameLoaderDestroyed() {}
 
 bool FrameLoaderClientQt::canHandleRequest(
     const WebCore::ResourceRequest&) const {}
+
+void FrameLoaderClientQt::partClearedInBegin() {}
 }

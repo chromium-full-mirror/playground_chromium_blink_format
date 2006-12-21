@@ -36,6 +36,7 @@
 class QFile;
 
 #include "DumpRenderTreeClient.h"
+class LayoutTestController;
 
 namespace WebCore {
 
@@ -52,9 +53,13 @@ class DumpRenderTree : public QObject {
   // Initialize in single-file mode.
   void open(const KURL& url);
 
+  void initJSObjects();
+  void resetJSObjects();
+
  public Q_SLOTS:
   void readStdin(int);
   void checkLoaded();
+  void dump();
 
  private:
   friend class DumpRenderTreeClient;
@@ -66,6 +71,7 @@ class DumpRenderTree : public QObject {
 
   FrameQt* m_frame;
   DumpRenderTreeClient* m_client;
+  LayoutTestController* m_controller;
 
   QFile* m_stdin;
   QSocketNotifier* m_notifier;

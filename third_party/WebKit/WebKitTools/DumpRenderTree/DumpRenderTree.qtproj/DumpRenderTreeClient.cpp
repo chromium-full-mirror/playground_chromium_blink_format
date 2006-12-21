@@ -34,12 +34,13 @@
 
 namespace WebCore {
 
-DumpRenderTreeClient::DumpRenderTreeClient() : FrameQtClient() {}
+DumpRenderTreeClient::DumpRenderTreeClient(DumpRenderTree* d)
+    : FrameLoaderClientQt(), dumper(d) {}
 
 DumpRenderTreeClient::~DumpRenderTreeClient() {}
 
-void DumpRenderTreeClient::runJavaScriptAlert(String const& message) {
-  qDebug() << "ALERT: " << message << "\n";
+void DumpRenderTreeClient::partClearedInBegin() {
+  dumper->initJSObjects();
 }
 }
 

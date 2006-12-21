@@ -153,6 +153,10 @@ class FrameLoaderClientQt : public FrameLoaderClient,
   virtual void setTitle(const String& title, const KURL&);
 
   virtual String userAgent();
+
+  // FIXME: This should probably not be here, but it's needed for the tests
+  // currently
+  virtual void partClearedInBegin();
 };
 }
 

@@ -28,16 +28,20 @@
 #ifndef DumpRenderTreeClient_H
 #define DumpRenderTreeClient_H
 
-#include "FrameQt.h"
+#include "FrameLoaderClientQt.h"
 
 namespace WebCore {
+class DumpRenderTree;
 
-class DumpRenderTreeClient : public FrameQtClient {
+class DumpRenderTreeClient : public FrameLoaderClientQt {
  public:
-  DumpRenderTreeClient();
+  DumpRenderTreeClient(DumpRenderTree* d);
   virtual ~DumpRenderTreeClient();
 
-  virtual void runJavaScriptAlert(String const& message);
+  virtual void partClearedInBegin();
+
+ private:
+  DumpRenderTree* dumper;
 };
 }
 
