@@ -116,12 +116,17 @@ void SVGGradientElement::notifyAttributeChange() const {
 
   const RenderPathList& clients = m_resource->clients();
   unsigned size = clients.size();
+
   for (unsigned i = 0; i < size; i++) {
     const RenderPath* current = clients[i];
     SVGStyledElement* styled =
         (current ? static_cast<SVGStyledElement*>(current->element()) : 0);
-    if (styled)
+    if (styled) {
       styled->setChanged(true);
+
+      if (styled->renderer())
+        styled->renderer()->repaint();
+    }
   }
 }
 
