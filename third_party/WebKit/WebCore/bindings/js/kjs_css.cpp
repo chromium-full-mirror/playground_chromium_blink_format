@@ -782,6 +782,12 @@ bool DOMCSSRule::getOwnPropertySlot(ExecState* exec,
   const HashEntry* entry =
       Lookup::findEntry(DOMCSSRule::classInfo()->propHashTable, propertyName);
   if (entry) {
+    // FIXME: for now we single out the media rule functions.
+    // This is a temporary hack since we should try to generate
+    // them. See http://bugs.webkit.org/show_bug.cgi?id=11898
+    if (entry->attr & Function)
+      return getStaticPropertySlot<DOMCSSRuleFunc, DOMCSSRule, DOMObject>(
+          exec, &DOMCSSMediaRuleTable, this, propertyName, slot);
     slot.setStaticEntry(this, entry, staticValueGetter<DOMCSSRule>);
     return true;
   }
