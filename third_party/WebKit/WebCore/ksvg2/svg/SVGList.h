@@ -111,7 +111,7 @@ class SVGList : public Shared<SVGList<Item>> {
     }
 
     Item item = m_vector[index];
-    removeItem(index, ec);
+    m_vector.remove(index);
     return item;
   }
 
