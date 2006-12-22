@@ -134,8 +134,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
     paintOutline(paintInfo.context, parentX, parentY, width(), height(),
                  style());
 
-  if (paintInfo.phase != PaintPhaseForeground || !drawsContents() ||
-      style()->visibility() == HIDDEN)
+  if (paintInfo.phase != PaintPhaseForeground || !drawsContents())
     return;
 
   SVGResourceFilter* filter =
