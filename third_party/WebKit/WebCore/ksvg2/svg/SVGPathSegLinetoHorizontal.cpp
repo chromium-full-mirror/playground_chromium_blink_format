@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGPathSegLinetoHorizontal.h"
 
@@ -28,9 +29,7 @@
 
 namespace WebCore {
 
-SVGPathSegLinetoHorizontalAbs::SVGPathSegLinetoHorizontalAbs(
-    const SVGStyledElement* context)
-    : SVGPathSeg(context) {
+SVGPathSegLinetoHorizontalAbs::SVGPathSegLinetoHorizontalAbs() : SVGPathSeg() {
   m_x = 0.0;
 }
 
@@ -38,18 +37,13 @@ SVGPathSegLinetoHorizontalAbs::~SVGPathSegLinetoHorizontalAbs() {}
 
 void SVGPathSegLinetoHorizontalAbs::setX(double x) {
   m_x = x;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoHorizontalAbs::x() const {
   return m_x;
 }
 
-SVGPathSegLinetoHorizontalRel::SVGPathSegLinetoHorizontalRel(
-    const SVGStyledElement* context)
-    : SVGPathSeg(context) {
+SVGPathSegLinetoHorizontalRel::SVGPathSegLinetoHorizontalRel() : SVGPathSeg() {
   m_x = 0.0;
 }
 
@@ -57,9 +51,6 @@ SVGPathSegLinetoHorizontalRel::~SVGPathSegLinetoHorizontalRel() {}
 
 void SVGPathSegLinetoHorizontalRel::setX(double x) {
   m_x = x;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoHorizontalRel::x() const {
@@ -67,5 +58,6 @@ double SVGPathSegLinetoHorizontalRel::x() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

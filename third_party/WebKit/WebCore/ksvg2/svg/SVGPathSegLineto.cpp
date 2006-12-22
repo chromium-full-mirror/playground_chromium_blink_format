@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "SVGPathSegLineto.h"
 
@@ -28,8 +29,7 @@
 
 namespace WebCore {
 
-SVGPathSegLinetoAbs::SVGPathSegLinetoAbs(const SVGStyledElement* context)
-    : SVGPathSeg(context) {
+SVGPathSegLinetoAbs::SVGPathSegLinetoAbs() : SVGPathSeg() {
   m_x = m_y = 0.0;
 }
 
@@ -37,9 +37,6 @@ SVGPathSegLinetoAbs::~SVGPathSegLinetoAbs() {}
 
 void SVGPathSegLinetoAbs::setX(double x) {
   m_x = x;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoAbs::x() const {
@@ -48,17 +45,13 @@ double SVGPathSegLinetoAbs::x() const {
 
 void SVGPathSegLinetoAbs::setY(double y) {
   m_y = y;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoAbs::y() const {
   return m_y;
 }
 
-SVGPathSegLinetoRel::SVGPathSegLinetoRel(const SVGStyledElement* context)
-    : SVGPathSeg(context) {
+SVGPathSegLinetoRel::SVGPathSegLinetoRel() : SVGPathSeg() {
   m_x = m_y = 0.0;
 }
 
@@ -66,9 +59,6 @@ SVGPathSegLinetoRel::~SVGPathSegLinetoRel() {}
 
 void SVGPathSegLinetoRel::setX(double x) {
   m_x = x;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoRel::x() const {
@@ -77,9 +67,6 @@ double SVGPathSegLinetoRel::x() const {
 
 void SVGPathSegLinetoRel::setY(double y) {
   m_y = y;
-
-  if (m_context)
-    m_context->notifyAttributeChange();
 }
 
 double SVGPathSegLinetoRel::y() const {
@@ -87,5 +74,6 @@ double SVGPathSegLinetoRel::y() const {
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -28,9 +28,14 @@
 
 namespace WebCore {
 
-SVGPathSegList::SVGPathSegList() : SVGList<RefPtr<SVGPathSeg>>() {}
+SVGPathSegList::SVGPathSegList(const SVGStyledElement* context)
+    : SVGList<RefPtr<SVGPathSeg>>(), m_context(context) {}
 
 SVGPathSegList::~SVGPathSegList() {}
+
+const SVGStyledElement* SVGPathSegList::context() const {
+  return m_context;
+}
 }
 
 #endif  // SVG_SUPPORT
