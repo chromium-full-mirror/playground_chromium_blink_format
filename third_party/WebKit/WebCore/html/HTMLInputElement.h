@@ -188,6 +188,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
     cachedSelEnd = e;
   };
   void addSearchResult();
+  void onSearch();
 
  protected:
   AtomicString m_name;
