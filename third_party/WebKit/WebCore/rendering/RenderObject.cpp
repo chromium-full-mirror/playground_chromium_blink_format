@@ -977,7 +977,7 @@ void RenderObject::drawBorder(GraphicsContext* graphicsContext,
     case DOTTED:
     case DASHED:
       graphicsContext->setStrokeColor(c);
-      graphicsContext->setStrokeThickness(width == 1 ? 0 : width);
+      graphicsContext->setStrokeThickness(width);
       graphicsContext->setStrokeStyle(style == DASHED ? DashedStroke
                                                       : DottedStroke);
 
