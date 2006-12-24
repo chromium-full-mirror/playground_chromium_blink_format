@@ -344,7 +344,6 @@ Document::Document(DOMImplementation* impl, FrameView* v)
   m_textColor = Color::black;
   m_listenerTypes = 0;
   m_inDocument = true;
-  m_styleSelectorDirty = false;
   m_inStyleRecalc = false;
   m_closeAfterStyleRecalc = false;
   m_usesDescendantRules = false;
@@ -2021,7 +2020,6 @@ void Document::recalcStyleSelector() {
   m_styleSelector = new CSSStyleSelector(this, usersheet, m_styleSheets.get(),
                                          !inCompatMode());
   m_styleSelector->setEncodedURL(m_url);
-  m_styleSelectorDirty = false;
 }
 
 void Document::setHoverNode(PassRefPtr<Node> newHoverNode) {
