@@ -293,8 +293,9 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
           const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
       maskRect = object->absoluteTransform().inverse().mapRect(maskRect);
 
-      ImageBuffer* maskImage(GraphicsContext::createImageBuffer(
-          IntSize(maskRect.width(), maskRect.height()), false));
+      ImageBuffer* maskImage = GraphicsContext::createImageBuffer(
+          IntSize(maskRect.width(), maskRect.height()), false);
+      // FIXME: maskImage could be NULL
       GraphicsContext* maskImageContext = maskImage->context();
 
       maskImageContext->save();

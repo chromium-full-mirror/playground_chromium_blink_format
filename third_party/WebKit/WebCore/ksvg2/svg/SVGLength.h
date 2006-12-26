@@ -77,6 +77,8 @@ class SVGLength {
   float valueInSpecifiedUnits() const;
   void setValueInSpecifiedUnits(float);
 
+  float valueAsPercentage() const;
+
   String valueAsString() const;
   void setValueAsString(const String&);
 
@@ -84,7 +86,6 @@ class SVGLength {
   void convertToSpecifiedUnits(unsigned short);
 
   // Helper functions
-  static bool isFraction(const SVGLength&);
   static float PercentageOfViewport(float value,
                                     const SVGStyledElement*,
                                     SVGLengthMode);
