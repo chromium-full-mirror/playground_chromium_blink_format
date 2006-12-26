@@ -24,135 +24,129 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebCoreSettings_H
-#define WebCoreSettings_H
+#ifndef Settings_h
+#define Settings_h
 
 #include "AtomicString.h"
 #include "KURL.h"
 
 namespace WebCore {
 
+enum EditableLinkBehavior {
+  EditableLinkDefaultBehavior = 0,
+  EditableLinkAlwaysLive,
+  EditableLinkOnlyLiveWithShiftKey,
+  EditableLinkLiveWhenNotFocused,
+  EditableLinkNeverLive
+};
+
 class Settings {
  public:
-  enum EditableLinkBehavior {
-    EditableLinkDefaultBehavior = 0,
-    EditableLinkAlwaysLive,
-    EditableLinkOnlyLiveWithShiftKey,
-    EditableLinkLiveWhenNotFocused,
-    EditableLinkNeverLive
-  };
+  Settings();
 
-  Settings()
-      : m_minimumFontSize(0),
-        m_minimumLogicalFontSize(0),
-        m_defaultFontSize(0),
-        m_defaultFixedFontSize(0),
-        m_javaEnabled(0),
-        m_willLoadImagesAutomatically(0),
-        m_privateBrowsingEnabled(0),
-        m_pluginsEnabled(0),
-        m_javaScriptEnabled(0),
-        m_javaScriptCanOpenWindowsAutomatically(0),
-        m_shouldPrintBackgrounds(false),
-        m_textAreasAreResizable(0),
-        m_shouldUseDashboardBackwardCompatibilityMode(false),
-        m_editableLinkBehavior(EditableLinkDefaultBehavior) {}
+  void setStandardFontFamily(const AtomicString&);
+  const AtomicString& standardFontFamily() const {
+    return m_standardFontFamily;
+  }
 
-  const AtomicString& stdFontName() const { return m_stdFontName; }
-  const AtomicString& fixedFontName() const { return m_fixedFontName; }
-  const AtomicString& serifFontName() const { return m_serifFontName; }
-  const AtomicString& sansSerifFontName() const { return m_sansSerifFontName; }
-  const AtomicString& cursiveFontName() const { return m_cursiveFontName; }
-  const AtomicString& fantasyFontName() const { return m_fantasyFontName; }
+  void setFixedFontFamily(const AtomicString&);
+  const AtomicString& fixedFontFamily() const { return m_fixedFontFamily; }
 
-  int minFontSize() const { return m_minimumFontSize; }
-  int minLogicalFontSize() const { return m_minimumLogicalFontSize; }
-  int mediumFontSize() const { return m_defaultFontSize; }
-  int mediumFixedFontSize() const { return m_defaultFixedFontSize; }
+  void setSerifFontFamily(const AtomicString&);
+  const AtomicString& serifFontFamily() const { return m_serifFontFamily; }
 
-  bool autoLoadImages() const { return m_willLoadImagesAutomatically; }
+  void setSansSerifFontFamily(const AtomicString&);
+  const AtomicString& sansSerifFontFamily() const {
+    return m_sansSerifFontFamily;
+  }
 
-  bool isJavaScriptEnabled() const { return m_javaScriptEnabled; }
+  void setCursiveFontFamily(const AtomicString&);
+  const AtomicString& cursiveFontFamily() const { return m_cursiveFontFamily; }
+
+  void setFantasyFontFamily(const AtomicString&);
+  const AtomicString& fantasyFontFamily() const { return m_fantasyFontFamily; }
+
+  void setMinimumFontSize(int);
+  int minimumFontSize() const { return m_minimumFontSize; }
+
+  void setMinimumLogicalFontSize(int);
+  int minimumLogicalFontSize() const { return m_minimumLogicalFontSize; }
+
+  void setDefaultFontSize(int);
+  int defaultFontSize() const { return m_defaultFontSize; }
+
+  void setDefaultFixedFontSize(int);
+  int defaultFixedFontSize() const { return m_defaultFixedFontSize; }
+
+  void setLoadsImagesAutomatically(bool);
+  bool loadsImagesAutomatically() const { return m_loadsImagesAutomatically; }
+
+  void setJavaScriptEnabled(bool);
+  bool isJavaScriptEnabled() const { return m_isJavaScriptEnabled; }
+
+  void setJavaScriptCanOpenWindowsAutomatically(bool);
   bool JavaScriptCanOpenWindowsAutomatically() const {
     return m_javaScriptCanOpenWindowsAutomatically;
   }
-  bool isJavaEnabled() const { return m_javaEnabled; }
-  bool isPluginsEnabled() const { return m_pluginsEnabled; }
+
+  void setJavaEnabled(bool);
+  bool isJavaEnabled() const { return m_isJavaEnabled; }
+
+  void setPluginsEnabled(bool);
+  bool arePluginsEnabled() const { return m_arePluginsEnabled; }
+
+  void setPrivateBrowsingEnabled(bool);
   bool privateBrowsingEnabled() const { return m_privateBrowsingEnabled; }
 
-  const String& encoding() const { return m_encoding; }
+  void setDefaultTextEncodingName(const String&);
+  const String& defaultTextEncodingName() const {
+    return m_defaultTextEncodingName;
+  }
 
+  void setUserStyleSheetLocation(const KURL&);
   KURL userStyleSheetLocation() const { return m_userStyleSheetLocation; }
+
+  void setShouldPrintBackgrounds(bool);
   bool shouldPrintBackgrounds() const { return m_shouldPrintBackgrounds; }
+
+  void setTextAreasAreResizable(bool);
   bool textAreasAreResizable() const { return m_textAreasAreResizable; }
+
+  void setEditableLinkBehavior(EditableLinkBehavior);
   EditableLinkBehavior editableLinkBehavior() const {
     return m_editableLinkBehavior;
   }
 
-  void setStdFontName(const AtomicString& s) { m_stdFontName = s; }
-  void setFixedFontName(const AtomicString& s) { m_fixedFontName = s; }
-  void setSerifFontName(const AtomicString& s) { m_serifFontName = s; }
-  void setSansSerifFontName(const AtomicString& s) { m_sansSerifFontName = s; }
-  void setCursiveFontName(const AtomicString& s) { m_cursiveFontName = s; }
-  void setFantasyFontName(const AtomicString& s) { m_fantasyFontName = s; }
-
-  void setMinFontSize(int s) { m_minimumFontSize = s; }
-  void setMinLogicalFontSize(int s) { m_minimumLogicalFontSize = s; }
-  void setMediumFontSize(int s) { m_defaultFontSize = s; }
-  void setMediumFixedFontSize(int s) { m_defaultFixedFontSize = s; }
-
-  void setAutoLoadImages(bool f) { m_willLoadImagesAutomatically = f; }
-  void setIsJavaScriptEnabled(bool f) { m_javaScriptEnabled = f; }
-  void setIsJavaEnabled(bool f) { m_javaEnabled = f; }
-  void setArePluginsEnabled(bool f) { m_pluginsEnabled = f; }
-  void setPrivateBrowsingEnabled(bool f) { m_privateBrowsingEnabled = f; }
-  void setJavaScriptCanOpenWindowsAutomatically(bool f) {
-    m_javaScriptCanOpenWindowsAutomatically = f;
-  }
-
-  void setEncoding(const String& s) { m_encoding = s; }
-
-  void setUserStyleSheetLocation(const KURL& s) {
-    m_userStyleSheetLocation = s;
-  }
-  void setShouldPrintBackgrounds(bool f) { m_shouldPrintBackgrounds = f; }
-  void setTextAreasAreResizable(bool f) { m_textAreasAreResizable = f; }
-  void setEditableLinkBehavior(EditableLinkBehavior e) {
-    m_editableLinkBehavior = e;
-  }
-
-  void setShouldUseDashboardBackwardCompatibilityMode(bool b) {
-    m_shouldUseDashboardBackwardCompatibilityMode = b;
-  }
-  bool shouldUseDashboardBackwardCompatibilityMode() const {
-    return m_shouldUseDashboardBackwardCompatibilityMode;
+  void setUsesDashboardBackwardCompatibilityMode(bool);
+  bool usesDashboardBackwardCompatibilityMode() const {
+    return m_usesDashboardBackwardCompatibilityMode;
   }
 
  private:
-  AtomicString m_stdFontName;
-  AtomicString m_fixedFontName;
-  AtomicString m_serifFontName;
-  AtomicString m_sansSerifFontName;
-  AtomicString m_cursiveFontName;
-  AtomicString m_fantasyFontName;
-  String m_encoding;
+  String m_defaultTextEncodingName;
   KURL m_userStyleSheetLocation;
-
+  EditableLinkBehavior m_editableLinkBehavior;
+  AtomicString m_standardFontFamily;
+  AtomicString m_fixedFontFamily;
+  AtomicString m_serifFontFamily;
+  AtomicString m_sansSerifFontFamily;
+  AtomicString m_cursiveFontFamily;
+  AtomicString m_fantasyFontFamily;
   int m_minimumFontSize;
   int m_minimumLogicalFontSize;
   int m_defaultFontSize;
   int m_defaultFixedFontSize;
-  bool m_javaEnabled : 1;
-  bool m_willLoadImagesAutomatically : 1;
+  bool m_isJavaEnabled : 1;
+  bool m_loadsImagesAutomatically : 1;
   bool m_privateBrowsingEnabled : 1;
-  bool m_pluginsEnabled : 1;
-  bool m_javaScriptEnabled : 1;
+  bool m_arePluginsEnabled : 1;
+  bool m_isJavaScriptEnabled : 1;
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;
-  bool m_shouldUseDashboardBackwardCompatibilityMode : 1;
-  EditableLinkBehavior m_editableLinkBehavior;
+  bool m_usesDashboardBackwardCompatibilityMode : 1;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // Settings_h

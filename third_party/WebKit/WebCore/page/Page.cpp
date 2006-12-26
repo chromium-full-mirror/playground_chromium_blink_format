@@ -31,6 +31,7 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "SelectionController.h"
+#include "Settings.h"
 #include "StringHash.h"
 #include "Widget.h"
 #include <kjs/collector.h>
@@ -52,6 +53,7 @@ Page::Page(ChromeClient* chromeClient,
       m_focusController(new FocusController(this)),
       m_contextMenuController(
           new ContextMenuController(this, contextMenuClient)),
+      m_settings(new Settings),
       m_editorClient(editorClient),
       m_frameCount(0),
       m_defersLoading(false) {

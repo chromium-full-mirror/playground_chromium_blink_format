@@ -471,7 +471,7 @@ void CanvasRenderingContext2D::stroke() {
       m_canvas->document()
           ->frame()
           ->settings()
-          ->shouldUseDashboardBackwardCompatibilityMode())
+          ->usesDashboardBackwardCompatibilityMode())
     state().m_path.clear();
 }
 

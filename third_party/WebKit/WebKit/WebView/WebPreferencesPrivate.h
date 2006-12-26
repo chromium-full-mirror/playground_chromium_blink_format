@@ -45,8 +45,8 @@
 
 #endif
 
-// WebKitEditableLinkBehavior needs to match the Settings::EditableLinkBehavior
-// enum in WebCore
+// WebKitEditableLinkBehavior needs to match the EditableLinkBehavior enum in
+// WebCore
 typedef enum {
   WebKitEditableLinkDefaultBehavior = 0,
   WebKitEditableLinkAlwaysLive,

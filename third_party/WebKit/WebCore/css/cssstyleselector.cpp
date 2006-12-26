@@ -3549,27 +3549,27 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         else if (val->primitiveType() == CSSPrimitiveValue::CSS_IDENT) {
           switch (val->getIdent()) {
             case CSS_VAL__WEBKIT_BODY:
-              face = settings->stdFontName();
+              face = settings->standardFontFamily();
               break;
             case CSS_VAL_SERIF:
-              face = settings->serifFontName();
+              face = settings->serifFontFamily();
               fontDescription.setGenericFamily(FontDescription::SerifFamily);
               break;
             case CSS_VAL_SANS_SERIF:
-              face = settings->sansSerifFontName();
+              face = settings->sansSerifFontFamily();
               fontDescription.setGenericFamily(
                   FontDescription::SansSerifFamily);
               break;
             case CSS_VAL_CURSIVE:
-              face = settings->cursiveFontName();
+              face = settings->cursiveFontFamily();
               fontDescription.setGenericFamily(FontDescription::CursiveFamily);
               break;
             case CSS_VAL_FANTASY:
-              face = settings->fantasyFontName();
+              face = settings->fantasyFontFamily();
               fontDescription.setGenericFamily(FontDescription::FantasyFamily);
               break;
             case CSS_VAL_MONOSPACE:
-              face = settings->fixedFontName();
+              face = settings->fixedFontFamily();
               fontDescription.setGenericFamily(
                   FontDescription::MonospaceFamily);
               break;
@@ -4828,7 +4828,7 @@ void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* style,
         childFont.genericFamily() == FontDescription::MonospaceFamily);
   } else {
     float fixedScaleFactor =
-        ((float)settings->mediumFixedFontSize()) / settings->mediumFontSize();
+        ((float)settings->defaultFixedFontSize()) / settings->defaultFontSize();
     size = (parentFont.genericFamily() == FontDescription::MonospaceFamily)
                ? childFont.specifiedSize() / fixedScaleFactor
                : childFont.specifiedSize() * fixedScaleFactor;
@@ -4864,8 +4864,8 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
   // smaller,
   // since sites will mis-render otherwise (e.g., http://www.gamespot.com with a
   // 9px minimum).
-  int minSize = settings->minFontSize();
-  int minLogicalSize = settings->minLogicalFontSize();
+  int minSize = settings->minimumFontSize();
+  int minLogicalSize = settings->minimumLogicalFontSize();
 
   float zoomPercent = view ? view->frame()->zoomFactor() / 100.0f : 1.0f;
   float zoomedSize = specifiedSize * zoomPercent;
@@ -4932,7 +4932,7 @@ float CSSStyleSelector::fontSizeForKeyword(int keyword,
                                            bool quirksMode,
                                            bool fixed) const {
   int mediumSize =
-      fixed ? settings->mediumFixedFontSize() : settings->mediumFontSize();
+      fixed ? settings->defaultFixedFontSize() : settings->defaultFontSize();
   if (mediumSize >= fontSizeTableMin && mediumSize <= fontSizeTableMax) {
     // Look up the entry in the table.
     int row = mediumSize - fontSizeTableMin;
@@ -4942,7 +4942,7 @@ float CSSStyleSelector::fontSizeForKeyword(int keyword,
   }
 
   // Value is outside the range of the table. Apply the scale factor instead.
-  float minLogicalSize = max(settings->minLogicalFontSize(), 1);
+  float minLogicalSize = max(settings->minimumLogicalFontSize(), 1);
   return max(fontSizeFactors[keyword - CSS_VAL_XX_SMALL] * mediumSize,
              minLogicalSize);
 }

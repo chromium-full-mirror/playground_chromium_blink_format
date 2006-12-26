@@ -76,6 +76,7 @@ class Page : Noncopyable {
   ContextMenuController* contextMenuController() {
     return m_contextMenuController.get();
   }
+  Settings* settings() { return m_settings.get(); }
 
   void setDefersLoading(bool);
   bool defersLoading() const { return m_defersLoading; }
@@ -93,6 +94,7 @@ class Page : Noncopyable {
   OwnPtr<SelectionController> m_dragCaretController;
   OwnPtr<FocusController> m_focusController;
   OwnPtr<ContextMenuController> m_contextMenuController;
+  OwnPtr<Settings> m_settings;
 
   EditorClient* m_editorClient;
   RefPtr<Frame> m_mainFrame;

@@ -30,9 +30,11 @@
 // WebKit, but are neither SPI nor API.
 
 #import "WebFramePrivate.h"
+#import "WebPreferencesPrivate.h"
 
 #ifdef __cplusplus
 #import <WebCore/FrameLoaderTypes.h>
+#import <WebCore/Settings.h>
 #endif
 
 @class DOMCSSStyleDeclaration;
@@ -84,6 +86,9 @@ DOMRange* kit(WebCore::Range*);
 
 WebCore::Page* core(WebView*);
 WebView* kit(WebCore::Page*);
+
+WebCore::EditableLinkBehavior core(WebKitEditableLinkBehavior);
+WebKitEditableLinkBehavior kit(WebCore::EditableLinkBehavior);
 
 WebView* getWebView(WebFrame* webFrame);
 

@@ -123,7 +123,6 @@ class Frame : public Shared<Frame> {
   EventHandler* eventHandler() const;
   FrameLoader* loader() const;
   SelectionController* selectionController() const;
-  const Settings* settings() const;
   FrameTree* tree() const;
 
   RenderObject* renderer()
@@ -146,20 +145,14 @@ class Frame : public Shared<Frame> {
  public:
   static Frame* frameForWidget(const Widget*);
 
-  bool javaScriptEnabled() const;
-  bool javaEnabled() const;
-  bool pluginsEnabled() const;
-
   void setSettings(Settings*);
+  const Settings* settings() const;
   void reparseConfiguration();
 
   void paint(GraphicsContext*, const IntRect&);
 
   void setUserStyleSheetLocation(const KURL&);
   void setUserStyleSheet(const String& styleSheetData);
-
-  void setStandardFont(const String& name);
-  void setFixedFont(const String& name);
 
   void setZoomFactor(int percent);
   int zoomFactor() const;

@@ -593,21 +593,21 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
       if (editable) {
         switch (frame->settings()->editableLinkBehavior()) {
           default:
-          case Settings::EditableLinkDefaultBehavior:
-          case Settings::EditableLinkAlwaysLive:
+          case EditableLinkDefaultBehavior:
+          case EditableLinkAlwaysLive:
             editableLinkEnabled = true;
             break;
 
-          case Settings::EditableLinkNeverLive:
+          case EditableLinkNeverLive:
             editableLinkEnabled = false;
             break;
 
-          case Settings::EditableLinkLiveWhenNotFocused:
+          case EditableLinkLiveWhenNotFocused:
             editableLinkEnabled =
                 nodeIsNotBeingEdited(node, frame) || event.event().shiftKey();
             break;
 
-          case Settings::EditableLinkOnlyLiveWithShiftKey:
+          case EditableLinkOnlyLiveWithShiftKey:
             editableLinkEnabled = event.event().shiftKey();
             break;
         }
