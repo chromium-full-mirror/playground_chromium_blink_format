@@ -90,7 +90,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void resetAfterLoadError(WebCore::LoadErrorResetToken*);
   virtual void doNotResetAfterLoadError(WebCore::LoadErrorResetToken*);
 
-  virtual void willCloseDocument();
+  virtual void didCloseDocument();
 
   virtual void detachedFromParent1();
   virtual void detachedFromParent2();
