@@ -30,7 +30,8 @@ PassRefPtr<Document> DOMParser::parseFromString(const String& str,
   if (!DOMImplementation::isXMLMIMEType(contentType))
     return 0;
 
-  RefPtr<Document> doc = DOMImplementation::instance()->createDocument(0);
+  RefPtr<Document> doc =
+      DOMImplementation::instance()->createDocument(contentType, 0, false);
 
   doc->open();
   doc->write(str);
