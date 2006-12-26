@@ -42,7 +42,6 @@ class Node;
 class SVGElement;
 class String;
 class TimeScheduler;
-class SVGPathSeg;
 class SVGStyledElement;
 class SVGSVGElement;
 
@@ -74,14 +73,14 @@ class SVGDocumentExtensions {
   HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*> baseValueMap()
       const {
     static HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*>
-        s_valueType;
-    return s_valueType;
+        s_baseValueMap;
+    return s_baseValueMap;
   }
 
-  HashMap<const SVGPathSeg*, const SVGStyledElement*> pathSegContextMap()
-      const {
-    static HashMap<const SVGPathSeg*, const SVGStyledElement*> s_valueType;
-    return s_valueType;
+  template <typename KeyType>
+  HashMap<const KeyType*, const SVGStyledElement*> genericContextMap() const {
+    static HashMap<const KeyType*, const SVGStyledElement*> s_genericContextMap;
+    return s_genericContextMap;
   }
 
  public:
@@ -133,22 +132,25 @@ class SVGDocumentExtensions {
     return false;
   }
 
-  // Used by SVGPathSeg* JS wrappers
-  const SVGStyledElement* pathSegContext(const SVGPathSeg* obj) const {
-    return pathSegContextMap().get(obj);
+  // Used by several JS wrappers
+  template <typename KeyType>
+  const SVGStyledElement* genericContext(const KeyType* obj) const {
+    return genericContextMap<KeyType>().get(obj);
   }
 
-  void setPathSegContext(const SVGPathSeg* obj,
-                         const SVGStyledElement* context) {
-    pathSegContextMap().set(obj, context);
+  template <typename KeyType>
+  void setGenericContext(const KeyType* obj, const SVGStyledElement* context) {
+    genericContextMap<KeyType>().set(obj, context);
   }
 
-  void removePathSegContext(const SVGPathSeg* obj) {
-    pathSegContextMap().remove(obj);
+  template <typename KeyType>
+  void removeGenericContext(const KeyType* obj) {
+    genericContextMap<KeyType>().remove(obj);
   }
 
-  bool hasPathSegContext(const SVGPathSeg* obj) {
-    return pathSegContextMap().contains(obj);
+  template <typename KeyType>
+  bool hasGenericContext(const KeyType* obj) {
+    return genericContextMap<KeyType>().contains(obj);
   }
 };
 
