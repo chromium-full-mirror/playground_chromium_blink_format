@@ -183,7 +183,8 @@ void SVGPaintServerGradient::updateQuartzGradientCache(
 
 void SVGPaintServerGradient::teardown(GraphicsContext*& context,
                                       const RenderObject* object,
-                                      SVGPaintTargetType type) const {
+                                      SVGPaintTargetType type,
+                                      bool isPaintingText) const {
   CGShadingRef shading = m_shadingCache;
   CGContextRef contextRef = context->platformContext();
   RenderStyle* style = object->style();
@@ -192,13 +193,13 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     // workaround for filling the entire screen with the shading in the case
     // that no text was intersected with the clip
-    if (!isPaintingText() || (object->width() > 0 && object->height() > 0))
+    if (!isPaintingText || (object->width() > 0 && object->height() > 0))
       CGContextDrawShading(contextRef, shading);
     context->restore();
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
-    if (isPaintingText()) {
+    if (isPaintingText) {
       IntRect maskRect =
           const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
       maskRect = object->absoluteTransform().inverse().mapRect(maskRect);
@@ -260,7 +261,8 @@ void SVGPaintServerGradient::renderPath(GraphicsContext*& context,
 
 bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                                    const RenderObject* object,
-                                   SVGPaintTargetType type) const {
+                                   SVGPaintTargetType type,
+                                   bool isPaintingText) const {
   if (listener())  // this seems like bad design to me, should be in a common
                    // baseclass. -- ecs 8/6/05
     listener()->resourceNotification();
@@ -280,7 +282,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     context->save();
 
-    if (isPaintingText())
+    if (isPaintingText)
       context->setTextDrawingMode(cTextClip);
   }
 
@@ -288,7 +290,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
     context->save();
     applyStrokeStyleToContext(contextRef, style, object);
 
-    if (isPaintingText()) {
+    if (isPaintingText) {
       IntRect maskRect =
           const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
       maskRect = object->absoluteTransform().inverse().mapRect(maskRect);

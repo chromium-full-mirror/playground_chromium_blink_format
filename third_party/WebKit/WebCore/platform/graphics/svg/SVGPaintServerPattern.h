@@ -67,16 +67,19 @@ class SVGPaintServerPattern : public SVGPaintServer {
 #if PLATFORM(CG)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
-                     SVGPaintTargetType) const;
+                     SVGPaintTargetType,
+                     bool isPaintingText) const;
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
-                        SVGPaintTargetType) const;
+                        SVGPaintTargetType,
+                        bool isPaintingText) const;
 #endif
 
 #if PLATFORM(QT)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
-                     SVGPaintTargetType) const;
+                     SVGPaintTargetType,
+                     bool isPaintingText) const;
 #endif
 
  private:

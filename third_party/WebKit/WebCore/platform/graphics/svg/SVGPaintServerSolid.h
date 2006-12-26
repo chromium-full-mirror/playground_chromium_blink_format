@@ -48,7 +48,8 @@ class SVGPaintServerSolid : public SVGPaintServer {
 #if PLATFORM(CG) || PLATFORM(QT)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
-                     SVGPaintTargetType) const;
+                     SVGPaintTargetType,
+                     bool isPaintingText) const;
 #endif
 
  private:

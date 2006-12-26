@@ -30,25 +30,9 @@
 
 namespace WebCore {
 
-SVGPaintServer::SVGPaintServer() : m_activeClient(0), m_paintingText(false) {}
+SVGPaintServer::SVGPaintServer() {}
 
 SVGPaintServer::~SVGPaintServer() {}
-
-const RenderPath* SVGPaintServer::activeClient() const {
-  return m_activeClient;
-}
-
-void SVGPaintServer::setActiveClient(const RenderPath* client) {
-  m_activeClient = client;
-}
-
-bool SVGPaintServer::isPaintingText() const {
-  return m_paintingText;
-}
-
-void SVGPaintServer::setPaintingText(bool paintingText) {
-  m_paintingText = paintingText;
-}
 
 TextStream& operator<<(TextStream& ts, const SVGPaintServer& paintServer) {
   return paintServer.externalRepresentation(ts);

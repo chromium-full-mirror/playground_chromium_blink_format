@@ -41,7 +41,8 @@ static void patternCallback(void* info, CGContextRef context) {
 
 bool SVGPaintServerPattern::setup(GraphicsContext*& context,
                                   const RenderObject* object,
-                                  SVGPaintTargetType type) const {
+                                  SVGPaintTargetType type,
+                                  bool isPaintingText) const {
   if (listener())  // this seems like bad design to me, should be in a common
                    // baseclass. -- ecs 8/6/05
     listener()->resourceNotification();
@@ -86,7 +87,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     CGContextSetFillColorSpace(contextRef, m_patternSpace);
     CGContextSetFillPattern(contextRef, m_pattern, &alpha);
 
-    if (isPaintingText())
+    if (isPaintingText)
       context->setTextDrawingMode(cTextFill);
   }
 
@@ -95,7 +96,7 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
     CGContextSetStrokePattern(contextRef, m_pattern, &alpha);
     applyStrokeStyleToContext(contextRef, style, object);
 
-    if (isPaintingText())
+    if (isPaintingText)
       context->setTextDrawingMode(cTextStroke);
   }
 
@@ -104,7 +105,8 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
 
 void SVGPaintServerPattern::teardown(GraphicsContext*& context,
                                      const RenderObject* object,
-                                     SVGPaintTargetType type) const {
+                                     SVGPaintTargetType type,
+                                     bool isPaintingText) const {
   CGPatternRelease(m_pattern);
   CGColorSpaceRelease(m_patternSpace);
   context->restore();

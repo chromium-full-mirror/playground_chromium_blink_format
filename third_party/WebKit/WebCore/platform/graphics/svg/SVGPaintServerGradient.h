@@ -80,14 +80,16 @@ class SVGPaintServerGradient : public SVGPaintServer {
 #if PLATFORM(CG)
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
-                        SVGPaintTargetType) const;
+                        SVGPaintTargetType,
+                        bool isPaintingText) const;
   virtual void renderPath(GraphicsContext*&,
                           const RenderPath*,
                           SVGPaintTargetType) const;
 
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
-                     SVGPaintTargetType) const;
+                     SVGPaintTargetType,
+                     bool isPaintingText) const;
 
   virtual void invalidate();
 
