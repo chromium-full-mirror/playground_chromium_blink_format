@@ -101,8 +101,6 @@ class FrameLoaderClient {
   virtual void resetAfterLoadError(LoadErrorResetToken*) = 0;
   virtual void doNotResetAfterLoadError(LoadErrorResetToken*) = 0;
 
-  virtual void didCloseDocument() = 0;
-
   virtual void detachedFromParent1() = 0;
   virtual void detachedFromParent2() = 0;
   virtual void detachedFromParent3() = 0;

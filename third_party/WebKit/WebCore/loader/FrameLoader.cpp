@@ -2107,11 +2107,6 @@ bool FrameLoader::isQuickRedirectComing() const {
   return m_quickRedirectComing;
 }
 
-void FrameLoader::closeDocument() {
-  closeURL();
-  m_client->didCloseDocument();
-}
-
 void FrameLoader::detachChildren() {
   // FIXME: Is it really necessary to do this in reverse order?
   Frame* previous;
@@ -2238,7 +2233,7 @@ void FrameLoader::frameDetached() {
 void FrameLoader::detachFromParent() {
   RefPtr<Frame> protect(m_frame);
 
-  closeDocument();
+  closeURL();
   stopAllLoaders();
   m_client->detachedFromParent1();
   detachChildren();

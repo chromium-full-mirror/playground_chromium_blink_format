@@ -106,7 +106,6 @@ WebView* getWebView(WebFrame* webFrame);
   WebScriptDebugger* scriptDebugger;
   id internalLoadDelegate;
 
-  NSMutableSet* plugInViews;
   NSMutableSet* inspectors;
 }
 @end
@@ -135,8 +134,6 @@ WebView* getWebView(WebFrame* webFrame);
                     webView:(WebView*)v
                      bridge:(WebFrameBridge*)bridge;
 #endif
-
-- (void)_addPlugInView:(NSView*)plugInView;
 
 - (BOOL)_isMainFrame;
 
