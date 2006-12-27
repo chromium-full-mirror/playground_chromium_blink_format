@@ -224,8 +224,8 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
       else if (id == SVGCSS_VAL_CURRENTCOLOR)
         parsedValue = new SVGPaint(SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR);
       else if (value->unit == CSSPrimitiveValue::CSS_URI)
-        parsedValue = new SVGPaint(SVGPaint::SVG_PAINTTYPE_URI,
-                                   domString(value->string).impl());
+        parsedValue =
+            new SVGPaint(SVGPaint::SVG_PAINTTYPE_URI, domString(value->string));
       else
         parsedValue = parseSVGPaint();
 
@@ -236,7 +236,7 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
     case CSS_PROP_COLOR:  // <color> | inherit
       if ((id >= CSS_VAL_AQUA && id <= CSS_VAL_WINDOWTEXT) ||
           (id >= SVGCSS_VAL_ALICEBLUE && id <= SVGCSS_VAL_YELLOWGREEN))
-        parsedValue = new SVGColor(domString(value->string).impl());
+        parsedValue = new SVGColor(domString(value->string));
       else
         parsedValue = parseSVGColor();
 
@@ -249,7 +249,7 @@ bool CSSParser::parseSVGValue(int propId, bool important) {
     case SVGCSS_PROP_LIGHTING_COLOR:
       if ((id >= CSS_VAL_AQUA && id <= CSS_VAL_WINDOWTEXT) ||
           (id >= SVGCSS_VAL_ALICEBLUE && id <= SVGCSS_VAL_YELLOWGREEN))
-        parsedValue = new SVGColor(domString(value->string).impl());
+        parsedValue = new SVGColor(domString(value->string));
       else if (id == SVGCSS_VAL_CURRENTCOLOR)
         parsedValue = new SVGColor(SVGColor::SVG_COLORTYPE_CURRENTCOLOR);
       else  // TODO : svgcolor (iccColor)
@@ -406,7 +406,7 @@ CSSValue* CSSParser::parseSVGPaint() {
     b = max(0, min(255, b));
 
     return new SVGPaint(SVGPaint::SVG_PAINTTYPE_RGBCOLOR, String(),
-                        String::format("rgb(%d, %d, %d)", r, g, b).impl());
+                        String::format("rgb(%d, %d, %d)", r, g, b));
   } else
     return 0;
 
@@ -417,14 +417,12 @@ CSSValue* CSSParser::parseSVGColor() {
   Value* value = valueList->current();
   if (!strict && value->unit == CSSPrimitiveValue::CSS_NUMBER &&
       value->fValue >= 0. && value->fValue < 1000000.)
-    return new SVGColor(
-        String::format("%06d", (int)(value->fValue + .5)).impl());
-  else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR) {
-    String str = "#" + domString(value->string);
-    return new SVGColor(str.impl());
-  } else if (value->unit == CSSPrimitiveValue::CSS_IDENT ||
-             (!strict && value->unit == CSSPrimitiveValue::CSS_DIMENSION))
-    return new SVGColor(domString(value->string).impl());
+    return new SVGColor(String::format("%06d", (int)(value->fValue + .5)));
+  else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR)
+    return new SVGColor("#" + domString(value->string));
+  else if (value->unit == CSSPrimitiveValue::CSS_IDENT ||
+           (!strict && value->unit == CSSPrimitiveValue::CSS_DIMENSION))
+    return new SVGColor(domString(value->string));
   else if (value->unit == Value::Function && value->function->args != 0 &&
            domString(value->function->name).lower() == "rgb(") {
     ValueList* args = value->function->args;
@@ -456,7 +454,7 @@ CSSValue* CSSParser::parseSVGColor() {
     g = max(0, min(255, g));
     b = max(0, min(255, b));
 
-    return new SVGColor(String::format("rgb(%d, %d, %d)", r, g, b).impl());
+    return new SVGColor(String::format("rgb(%d, %d, %d)", r, g, b));
   } else
     return 0;
 
