@@ -205,11 +205,8 @@ BidiContext::BidiContext(unsigned char l,
                          bool o)
     : level(l), override(o), m_dir(e) {
   parent = p;
-  if (p) {
+  if (p)
     p->ref();
-    m_basicDir = p->basicDir();
-  } else
-    m_basicDir = e;
   count = 0;
 }
 
@@ -232,7 +229,7 @@ bool operator==(const BidiContext& c1, const BidiContext& c2) {
   if (&c1 == &c2)
     return true;
   if (c1.level != c2.level || c1.override != c2.override ||
-      c1.dir() != c2.dir() || c1.basicDir() != c2.basicDir())
+      c1.dir() != c2.dir())
     return false;
   if (!c1.parent)
     return !c2.parent;
@@ -956,7 +953,7 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
     case TAAUTO:
       numSpaces = 0;
       // for right to left fall through to right aligned
-      if (bidi.context->basicDir() == WTF::Unicode::LeftToRight)
+      if (style()->direction() == LTR)
         break;
     case RIGHT:
     case KHTML_RIGHT:

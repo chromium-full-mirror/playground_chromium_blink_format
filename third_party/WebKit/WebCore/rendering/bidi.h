@@ -58,14 +58,10 @@ class BidiContext {
   WTF::Unicode::Direction dir() const {
     return static_cast<WTF::Unicode::Direction>(m_dir);
   }
-  WTF::Unicode::Direction basicDir() const {
-    return static_cast<WTF::Unicode::Direction>(m_basicDir);
-  }
 
   unsigned char level;
   bool override : 1;
-  unsigned m_dir : 5;       // WTF::Unicode::Direction
-  unsigned m_basicDir : 5;  // WTF::Unicode::Direction
+  unsigned m_dir : 5;  // WTF::Unicode::Direction
 
   BidiContext* parent;
 
