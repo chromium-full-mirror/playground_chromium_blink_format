@@ -32,9 +32,23 @@
 namespace WebCore {
 
 SVGPaintServerPattern::SVGPaintServerPattern()
-    : m_boundingBoxMode(true), m_listener(0) {}
+    : m_boundingBoxMode(true),
+      m_tileIsDirty(false),
+      m_listener(0)
+#if PLATFORM(CG)
+      ,
+      m_patternSpace(0),
+      m_pattern(0)
+#endif
+{
+}
 
-SVGPaintServerPattern::~SVGPaintServerPattern() {}
+SVGPaintServerPattern::~SVGPaintServerPattern() {
+#if PLATFORM(CG)
+  CGPatternRelease(m_pattern);
+  CGColorSpaceRelease(m_patternSpace);
+#endif
+}
 
 FloatRect SVGPaintServerPattern::bbox() const {
   return m_bbox;
@@ -58,6 +72,7 @@ ImageBuffer* SVGPaintServerPattern::tile() const {
 
 void SVGPaintServerPattern::setTile(ImageBuffer* tile) {
   m_tile.set(tile);
+  m_tileIsDirty = true;
 }
 
 AffineTransform SVGPaintServerPattern::patternTransform() const {

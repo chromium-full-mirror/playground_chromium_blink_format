@@ -87,6 +87,7 @@ class SVGPaintServerPattern : public SVGPaintServer {
   AffineTransform m_patternTransform;
   FloatRect m_bbox;
   bool m_boundingBoxMode;
+  mutable bool m_tileChanged;
   SVGResourceListener* m_listener;
 
 #if PLATFORM(CG)
