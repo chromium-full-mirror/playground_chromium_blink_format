@@ -38,8 +38,8 @@ SVGTRefElement::SVGTRefElement(const QualifiedName& tagName, Document* doc)
 SVGTRefElement::~SVGTRefElement() {}
 
 void SVGTRefElement::updateReferencedText() {
-  String targetId = SVGURIReference::getTarget(href().deprecatedString());
-  Element* targetElement = ownerDocument()->getElementById(targetId.impl());
+  Element* targetElement =
+      ownerDocument()->getElementById(SVGURIReference::getTarget(href()));
   SVGElement* target = svg_dynamic_cast(targetElement);
   if (target) {
     ExceptionCode ignore = 0;

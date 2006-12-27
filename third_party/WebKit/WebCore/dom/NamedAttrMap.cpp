@@ -59,8 +59,7 @@ PassRefPtr<Node> NamedAttrMap::getNamedItem(const String& name) const {
 
 PassRefPtr<Node> NamedAttrMap::getNamedItemNS(const String& namespaceURI,
                                               const String& localName) const {
-  return getNamedItem(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()));
+  return getNamedItem(QualifiedName(nullAtom, localName, namespaceURI));
 }
 
 PassRefPtr<Node> NamedAttrMap::removeNamedItem(const String& name,
@@ -78,8 +77,7 @@ PassRefPtr<Node> NamedAttrMap::removeNamedItem(const String& name,
 PassRefPtr<Node> NamedAttrMap::removeNamedItemNS(const String& namespaceURI,
                                                  const String& localName,
                                                  ExceptionCode& ec) {
-  return removeNamedItem(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()), ec);
+  return removeNamedItem(QualifiedName(nullAtom, localName, namespaceURI), ec);
 }
 
 PassRefPtr<Node> NamedAttrMap::getNamedItem(const QualifiedName& name) const {

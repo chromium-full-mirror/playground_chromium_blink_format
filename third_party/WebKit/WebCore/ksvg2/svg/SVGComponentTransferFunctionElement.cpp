@@ -116,7 +116,7 @@ void SVGComponentTransferFunctionElement::parseMappedAttribute(
     else if (value == "gamma")
       setTypeBaseValue(SVG_FECOMPONENTTRANSFER_TYPE_GAMMA);
   } else if (attr->name() == SVGNames::tableValuesAttr)
-    tableValuesBaseValue()->parse(value.deprecatedString());
+    tableValuesBaseValue()->parse(value);
   else if (attr->name() == SVGNames::slopeAttr)
     setSlopeBaseValue(value.toDouble());
   else if (attr->name() == SVGNames::interceptAttr)

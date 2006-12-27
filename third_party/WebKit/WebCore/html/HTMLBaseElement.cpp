@@ -76,7 +76,7 @@ void HTMLBaseElement::process() {
             .url());
 
   if (!m_target.isEmpty())
-    document()->setBaseTarget(m_target.deprecatedString());
+    document()->setBaseTarget(m_target);
 
   // ### should changing a document's base URL dynamically automatically update
   // all images, stylesheets etc?

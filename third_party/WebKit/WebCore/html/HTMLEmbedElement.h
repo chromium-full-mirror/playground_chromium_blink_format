@@ -70,8 +70,8 @@ class HTMLEmbedElement : public HTMLPlugInElement {
 #endif
 
   DeprecatedString url;
-  DeprecatedString pluginPage;
-  DeprecatedString serviceType;
+  String m_pluginPage;
+  String m_serviceType;
 };
 }
 

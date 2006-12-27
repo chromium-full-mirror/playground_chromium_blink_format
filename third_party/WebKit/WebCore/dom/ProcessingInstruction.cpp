@@ -133,7 +133,7 @@ bool ProcessingInstruction::checkStyleSheet() {
 
     if (href.length() > 1) {
       if (href[0] == '#') {
-        m_localHref = href.substring(1).impl();
+        m_localHref = href.substring(1);
 #if XSLT_SUPPORT
         // We need to make a synthetic XSLStyleSheet that is embedded.  It needs
         // to be able

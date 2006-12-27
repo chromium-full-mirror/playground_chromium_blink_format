@@ -313,8 +313,7 @@ const AtomicString& Element::getAttribute(const String& name) const {
 
 const AtomicString& Element::getAttributeNS(const String& namespaceURI,
                                             const String& localName) const {
-  return getAttribute(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()));
+  return getAttribute(QualifiedName(nullAtom, localName, namespaceURI));
 }
 
 void Element::setAttribute(const String& name,
@@ -346,7 +345,7 @@ void Element::setAttribute(const String& name,
     namedAttrMap->removeAttribute(old->name());
   else if (!old && !value.isNull())
     namedAttrMap->addAttribute(createAttribute(
-        QualifiedName(nullAtom, localName.impl(), nullAtom), value.impl()));
+        QualifiedName(nullAtom, localName, nullAtom), value.impl()));
   else if (old && !value.isNull()) {
     old->setValue(value);
     attributeChanged(old);
@@ -777,9 +776,8 @@ void Element::setAttributeNS(const String& namespaceURI,
     ec = INVALID_CHARACTER_ERR;
     return;
   }
-  setAttribute(
-      QualifiedName(prefix.impl(), localName.impl(), namespaceURI.impl()),
-      value.impl(), ec);
+  setAttribute(QualifiedName(prefix, localName, namespaceURI), value.impl(),
+               ec);
 }
 
 void Element::removeAttribute(const String& name, ExceptionCode& ec) {
@@ -795,8 +793,7 @@ void Element::removeAttribute(const String& name, ExceptionCode& ec) {
 void Element::removeAttributeNS(const String& namespaceURI,
                                 const String& localName,
                                 ExceptionCode& ec) {
-  removeAttribute(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()), ec);
+  removeAttribute(QualifiedName(nullAtom, localName, namespaceURI), ec);
 }
 
 PassRefPtr<Attr> Element::getAttributeNode(const String& name) {
@@ -812,8 +809,8 @@ PassRefPtr<Attr> Element::getAttributeNodeNS(const String& namespaceURI,
   NamedAttrMap* attrs = attributes(true);
   if (!attrs)
     return 0;
-  return static_pointer_cast<Attr>(attrs->getNamedItem(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl())));
+  return static_pointer_cast<Attr>(
+      attrs->getNamedItem(QualifiedName(nullAtom, localName, namespaceURI)));
 }
 
 bool Element::hasAttribute(const String& name) const {
@@ -830,7 +827,7 @@ bool Element::hasAttributeNS(const String& namespaceURI,
   if (!attrs)
     return false;
   return attrs->getAttributeItem(
-      QualifiedName(nullAtom, localName.impl(), namespaceURI.impl()));
+      QualifiedName(nullAtom, localName, namespaceURI));
 }
 
 CSSStyleDeclaration* Element::style() {

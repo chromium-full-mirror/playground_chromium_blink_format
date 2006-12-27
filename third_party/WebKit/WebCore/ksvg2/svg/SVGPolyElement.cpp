@@ -95,9 +95,8 @@ void SVGPolyElement::notifyAttributeChange() const {
     _points += String::format("%.6lg %.6lg ", p.x(), p.y());
   }
 
-  String p("points");
-  RefPtr<Attr> attr =
-      const_cast<SVGPolyElement*>(this)->getAttributeNode(p.impl());
+  RefPtr<Attr> attr = const_cast<SVGPolyElement*>(this)->getAttributeNode(
+      SVGNames::pointsAttr.localName());
   if (attr) {
     ExceptionCode ec = 0;
     attr->setValue(_points, ec);

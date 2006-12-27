@@ -48,8 +48,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
       /*            case TO_ANIMATION:
                   case FROM_TO_ANIMATION:
                   {
-                      String toColorString(m_to);
-                      m_toColor->setRGBColor(toColorString.impl());
+                      m_toColor->setRGBColor(m_to);
 
                       String fromColorString;
                       if (!m_from.isEmpty()) // from-to animation
@@ -57,7 +56,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                       else // to animation
                           fromColorString = m_initialColor.name();
 
-                      m_fromColor->setRGBColor(fromColorString.impl());
+                      m_fromColor->setRGBColor(fromColorString);
 
                       // Calculate color differences, once.
                       Color qTo = m_toColor->color();
@@ -72,8 +71,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                   case BY_ANIMATION:
                   case FROM_BY_ANIMATION:
                   {
-                      String byColorString(m_by);
-                      m_toColor->setRGBColor(byColorString.impl());
+                      m_toColor->setRGBColor(m_by);
 
                       String fromColorString;
 
@@ -82,7 +80,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                       else // by animation
                           fromColorString = m_initialColor.name();
 
-                      m_fromColor->setRGBColor(fromColorString.impl());
+                      m_fromColor->setRGBColor(fromColorString);
 
                       Color qBy = m_toColor->color();
                       Color qFrom = m_fromColor->color();
@@ -95,7 +93,7 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                       Color qTo = clampColor(r, g, b);
 
                       String toColorString(qTo.name());
-                      m_toColor->setRGBColor(toColorString.impl());
+                      m_toColor->setRGBColor(toColorString);
 
                       m_redDiff = qTo.red() - qFrom.red();
                       m_greenDiff = qTo.green() - qFrom.green();
@@ -151,11 +149,8 @@ void SVGAnimateElement::handleTimerEvent(double timePercentage) {
                         apply = true;
                     }
 
-                    String toColorString(value2);
-                    m_toColor->setRGBColor(toColorString.impl());
-
-                    String fromColorString(value1);
-                    m_fromColor->setRGBColor(fromColorString.impl());
+                    m_toColor->setRGBColor(value2);
+                    m_fromColor->setRGBColor(value1);
 
                     Color qTo = m_toColor->color();
                     Color qFrom = m_fromColor->color();

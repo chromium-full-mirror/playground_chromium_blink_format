@@ -3229,9 +3229,8 @@ PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
   // namespace-aware.  There's no harm to XML
   // documents if we're wrong.
   return new Attr(0, this, new MappedAttribute(
-                               QualifiedName(prefix.impl(), localName.impl(),
-                                             namespaceURI.impl()),
-                               String("").impl()));
+                               QualifiedName(prefix, localName, namespaceURI),
+                               StringImpl::empty()));
 }
 
 #ifdef SVG_SUPPORT

@@ -51,7 +51,7 @@ SVGStringList* SVGViewElement::viewTarget() const {
 void SVGViewElement::parseMappedAttribute(MappedAttribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::viewTargetAttr)
-    viewTarget()->reset(value.deprecatedString());
+    viewTarget()->reset(value);
   else {
     if (SVGExternalResourcesRequired::parseMappedAttribute(attr) ||
         SVGFitToViewBox::parseMappedAttribute(attr) ||

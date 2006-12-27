@@ -93,20 +93,18 @@ bool HTMLEmbedElement::mapToEntry(const QualifiedName& attrName,
 }
 
 void HTMLEmbedElement::parseMappedAttribute(MappedAttribute* attr) {
-  DeprecatedString val = attr->value().deprecatedString();
+  String val = attr->value();
 
-  int pos;
   if (attr->name() == typeAttr) {
-    serviceType = val.lower();
-    pos = serviceType.find(";");
+    m_serviceType = val.lower();
+    int pos = m_serviceType.find(";");
     if (pos != -1)
-      serviceType = serviceType.left(pos);
-  } else if (attr->name() == codeAttr || attr->name() == srcAttr) {
-    url = parseURL(attr->value()).deprecatedString();
-  } else if (attr->name() == pluginpageAttr ||
-             attr->name() == pluginspageAttr) {
-    pluginPage = val;
-  } else if (attr->name() == hiddenAttr) {
+      m_serviceType = m_serviceType.left(pos);
+  } else if (attr->name() == codeAttr || attr->name() == srcAttr)
+    url = parseURL(val).deprecatedString();
+  else if (attr->name() == pluginpageAttr || attr->name() == pluginspageAttr)
+    m_pluginPage = val;
+  else if (attr->name() == hiddenAttr) {
     if (val.lower() == "yes" || val.lower() == "true") {
       // FIXME: Not dynamic, but it's not really important that such a
       // rarely-used
@@ -115,13 +113,12 @@ void HTMLEmbedElement::parseMappedAttribute(MappedAttribute* attr) {
       addCSSLength(attr, CSS_PROP_HEIGHT, "0");
     }
   } else if (attr->name() == nameAttr) {
-    String newNameAttr = attr->value();
     if (inDocument() && document()->isHTMLDocument()) {
       HTMLDocument* doc = static_cast<HTMLDocument*>(document());
       doc->removeNamedItem(oldNameAttr);
-      doc->addNamedItem(newNameAttr);
+      doc->addNamedItem(val);
     }
-    oldNameAttr = newNameAttr;
+    oldNameAttr = val;
   } else
     HTMLPlugInElement::parseMappedAttribute(attr);
 }
