@@ -23,7 +23,7 @@
 #ifdef SVG_SUPPORT
 #include "SVGParserUtilities.h"
 
-#include "String.h"
+#include "PlatformString.h"
 #include <math.h>
 #include <wtf/MathExtras.h>
 
