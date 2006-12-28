@@ -30,12 +30,14 @@
 #include "config.h"
 #include "CachedImage.h"
 
+#include "BitmapImage.h"
 #include "Cache.h"
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
 #include "DocLoader.h"
 #include "Image.h"
 #include "LoaderFunctions.h"
+#include "PDFDocumentImage.h"
 #include "Request.h"
 #include <wtf/Vector.h>
 
@@ -90,7 +92,7 @@ static Image* brokenImage() {
 }
 
 static Image* nullImage() {
-  static Image nullImage;
+  static BitmapImage nullImage;
   return &nullImage;
 }
 
@@ -126,8 +128,15 @@ void CachedImage::clear() {
 
 inline void CachedImage::createImage() {
   // Create the image if it doesn't yet exist.
-  if (!m_image)
-    m_image = new Image(this, m_response.mimeType() == "application/pdf");
+
+  if (!m_image) {
+#ifdef PLATFORM(CG)
+    if (m_response.mimeType() == "application/pdf")
+      m_image = new PDFDocumentImage;
+    else
+#endif
+      m_image = new BitmapImage(this);
+  }
 }
 
 Vector<char>& CachedImage::bufferData(const char* bytes,

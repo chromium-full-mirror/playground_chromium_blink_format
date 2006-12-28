@@ -28,6 +28,7 @@
 #include "config.h"
 #include "RenderImage.h"
 
+#include "BitmapImage.h"
 #include "Document.h"
 #include "GraphicsContext.h"
 #include "HTMLImageElement.h"
@@ -451,7 +452,7 @@ void RenderImage::calcMinMaxWidth() {
 }
 
 Image* RenderImage::nullImage() {
-  static Image sharedNullImage;
+  static BitmapImage sharedNullImage;
   return &sharedNullImage;
 }
 

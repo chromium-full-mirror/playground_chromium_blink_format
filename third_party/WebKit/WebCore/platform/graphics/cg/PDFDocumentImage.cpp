@@ -35,18 +35,30 @@ using namespace std;
 
 namespace WebCore {
 
-PDFDocumentImage::PDFDocumentImage(CFDataRef data) {
-  if (data) {
-    CGDataProviderRef dataProvider = CGDataProviderCreateWithCFData(data);
-    m_document = CGPDFDocumentCreateWithProvider(dataProvider);
-    CGDataProviderRelease(dataProvider);
-  }
-  m_currentPage = -1;
-  setCurrentPage(0);
-}
+PDFDocumentImage::PDFDocumentImage()
+    : Image(0)  // PDFs don't animate
+      ,
+      m_document(0),
+      m_rotation(0f),
+      m_currentPage(-1) {}
 
 PDFDocumentImage::~PDFDocumentImage() {
   CGPDFDocumentRelease(m_document);
+}
+
+IntSize PDFDocumentImage::size() const {
+  return IntSize((int)m_mediaBox.size().width(),
+                 (int)m_mediaBox.size().height());
+}
+
+bool PDFDocumentImage::setNativeData(NativeBytePtr data, bool allDataReceived) {
+  if (allDataReceived && !m_document && data) {
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithCFData(data);
+    m_document = CGPDFDocumentCreateWithProvider(dataProvider);
+    CGDataProviderRelease(dataProvider);
+    setCurrentPage(0);
+  }
+  return m_document;  // return true if size is available
 }
 
 void PDFDocumentImage::adjustCTM(GraphicsContext* context) const {
@@ -111,9 +123,9 @@ int PDFDocumentImage::pageCount() const {
 }
 
 void PDFDocumentImage::draw(GraphicsContext* context,
-                            const FloatRect& srcRect,
                             const FloatRect& dstRect,
-                            CompositeOperator op) const {
+                            const FloatRect& srcRect,
+                            CompositeOperator op) {
   if (!m_document || m_currentPage == -1)
     return;
 
