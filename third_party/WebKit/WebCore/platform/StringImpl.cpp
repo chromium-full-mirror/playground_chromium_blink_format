@@ -543,7 +543,7 @@ StringImpl* StringImpl::capitalize(UChar previous) const {
     return capitalizedString;
 
   UChar* stringWithPrevious = newUCharVector(m_length + 1);
-  stringWithPrevious[0] = previous;
+  stringWithPrevious[0] = previous == nonBreakingSpace ? ' ' : previous;
   for (unsigned i = 1; i < m_length + 1; i++) {
     // Replace &nbsp with a real space since ICU no longer treats &nbsp as a
     // word separator.
@@ -569,9 +569,11 @@ StringImpl* StringImpl::capitalize(UChar previous) const {
        startOfWord = endOfWord, endOfWord = textBreakNext(boundary)) {
     if (startOfWord != 0)  // Ignore first char of previous string
       capitalizedString->m_data[startOfWord - 1] =
-          WTF::Unicode::toTitleCase(stringWithPrevious[startOfWord]);
+          m_data[startOfWord - 1] == nonBreakingSpace
+              ? nonBreakingSpace
+              : WTF::Unicode::toTitleCase(stringWithPrevious[startOfWord]);
     for (int i = startOfWord + 1; i < endOfWord; i++)
-      capitalizedString->m_data[i - 1] = stringWithPrevious[i];
+      capitalizedString->m_data[i - 1] = m_data[i - 1];
   }
 
   deleteUCharVector(stringWithPrevious);
