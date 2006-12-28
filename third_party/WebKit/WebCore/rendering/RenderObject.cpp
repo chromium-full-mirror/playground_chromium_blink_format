@@ -1918,20 +1918,27 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   // two rectangles (but typically only one).
   int ow = style() ? style()->outlineSize() : 0;
   int width = abs(newBounds.width() - oldBounds.width());
-  if (width)
-    v->repaintViewRectangle(
-        IntRect(min(newBounds.x() + newBounds.width(),
-                    oldBounds.x() + oldBounds.width()) -
-                    borderRight() - ow,
-                newBounds.y(), width + borderRight() + ow,
-                max(newBounds.height(), oldBounds.height())));
+  if (width) {
+    int borderWidth =
+        max(borderRight(), max(style()->borderTopRightRadius().width(),
+                               style()->borderBottomRightRadius().width())) +
+        ow;
+    v->repaintViewRectangle(IntRect(
+        newBounds.x() + min(newBounds.width(), oldBounds.width()) - borderWidth,
+        newBounds.y(), width + borderWidth,
+        max(newBounds.height(), oldBounds.height())));
+  }
   int height = abs(newBounds.height() - oldBounds.height());
-  if (height)
+  if (height) {
+    int borderHeight =
+        max(borderBottom(), max(style()->borderBottomLeftRadius().height(),
+                                style()->borderBottomRightRadius().height())) +
+        ow;
     v->repaintViewRectangle(IntRect(
         newBounds.x(),
-        min(newBounds.bottom(), oldBounds.bottom()) - borderBottom() - ow,
-        max(newBounds.width(), oldBounds.width()),
-        height + borderBottom() + ow));
+        min(newBounds.bottom(), oldBounds.bottom()) - borderHeight,
+        max(newBounds.width(), oldBounds.width()), height + borderHeight));
+  }
   return false;
 }
 
