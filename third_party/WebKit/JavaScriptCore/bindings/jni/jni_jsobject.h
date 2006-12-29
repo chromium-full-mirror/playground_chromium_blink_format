@@ -91,7 +91,7 @@ class JavaJSObject {
   List listFromJArray(jobjectArray) const;
 
  private:
-  const RootObject* _root;
+  const RootObject* _rootObject;
   JSObject* _imp;
 };
 

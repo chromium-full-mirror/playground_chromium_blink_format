@@ -40,15 +40,15 @@ extern NPClass* NPScriptObjectClass;
 struct JavaScriptObject {
   NPObject object;
   KJS::JSObject* imp;
-  const KJS::Bindings::RootObject* originExecutionContext;
-  const KJS::Bindings::RootObject* executionContext;
+  const KJS::Bindings::RootObject* originRootObject;
+  const KJS::Bindings::RootObject* rootObject;
 };
 
 NPObject* _NPN_CreateScriptObject(
     NPP npp,
     KJS::JSObject*,
-    const KJS::Bindings::RootObject* originExecutionContext,
-    const KJS::Bindings::RootObject* executionContext);
+    const KJS::Bindings::RootObject* originRootObject,
+    const KJS::Bindings::RootObject* rootObject);
 NPObject* _NPN_CreateNoScriptObject(void);
 
 #endif

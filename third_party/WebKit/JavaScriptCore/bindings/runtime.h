@@ -142,11 +142,6 @@ class Instance {
   static Instance* createBindingForLanguageInstance(BindingLanguage,
                                                     void* nativeInstance,
                                                     const RootObject* = 0);
-  static void* createLanguageInstanceForValue(ExecState*,
-                                              BindingLanguage,
-                                              JSObject* value,
-                                              const RootObject* origin,
-                                              const RootObject* current);
   static JSObject* createRuntimeObject(BindingLanguage,
                                        void* nativeInstance,
                                        const RootObject* = 0);
@@ -190,13 +185,13 @@ class Instance {
 
   virtual JSValue* valueOf() const { return jsString(getClass()->name()); }
 
-  void setExecutionContext(const RootObject* r) { _executionContext = r; }
-  const RootObject* executionContext() const { return _executionContext; }
+  void setRootObject(const RootObject* r) { _rootObject = r; }
+  const RootObject* rootObject() const { return _rootObject; }
 
   virtual ~Instance() {}
 
  protected:
-  const RootObject* _executionContext;
+  const RootObject* _rootObject;
   unsigned _refCount;
 
  private:

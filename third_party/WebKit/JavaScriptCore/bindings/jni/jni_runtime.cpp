@@ -94,13 +94,13 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
   if (cls != NULL) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
     if (mid != NULL) {
-      const RootObject* execContext = instance->executionContext();
-      if (execContext && execContext->nativeHandle()) {
+      const RootObject* rootObject = instance->rootObject();
+      if (rootObject && rootObject->nativeHandle()) {
         JSValue* exceptionDescription = NULL;
         jvalue args[1];
 
         args[0].l = jinstance;
-        dispatchJNICall(execContext->nativeHandle(), fieldJInstance, false,
+        dispatchJNICall(rootObject->nativeHandle(), fieldJInstance, false,
                         returnType, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
           throwError(exec, GeneralError, exceptionDescription->toString(exec));
@@ -125,11 +125,11 @@ JSValue* JavaField::valueFromInstance(ExecState* exec,
 
       const char* arrayType = type();
       if (arrayType[0] == '[') {
-        jsresult = JavaArray::convertJObjectToArray(
-            exec, anObject, arrayType, instance->executionContext());
+        jsresult = JavaArray::convertJObjectToArray(exec, anObject, arrayType,
+                                                    instance->rootObject());
       } else if (anObject != 0) {
         jsresult = Instance::createRuntimeObject(
-            Instance::JavaLanguage, anObject, instance->executionContext());
+            Instance::JavaLanguage, anObject, instance->rootObject());
       }
     } break;
 
@@ -183,15 +183,15 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
   if (cls != NULL) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
     if (mid != NULL) {
-      const RootObject* execContext = instance->executionContext();
-      if (execContext && execContext->nativeHandle()) {
+      const RootObject* rootObject = instance->rootObject();
+      if (rootObject && rootObject->nativeHandle()) {
         JSValue* exceptionDescription = NULL;
         jvalue args[2];
         jvalue result;
 
         args[0].l = jinstance;
         args[1] = javaValue;
-        dispatchJNICall(execContext->nativeHandle(), fieldJInstance, false,
+        dispatchJNICall(rootObject->nativeHandle(), fieldJInstance, false,
                         void_type, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
           throwError(exec, GeneralError, exceptionDescription->toString(exec));
@@ -387,7 +387,7 @@ JavaArray::JavaArray(jobject a, const char* t, const RootObject* r) {
   JNIEnv* env = getJNIEnv();
   _length = env->GetArrayLength((jarray)_array->_instance);
   _type = strdup(t);
-  _root = r;
+  _rootObject = r;
 }
 
 JavaArray::~JavaArray() {
@@ -486,11 +486,11 @@ JSValue* JavaArray::valueAt(ExecState* exec, unsigned int index) const {
       // Nested array?
       if (_type[1] == '[') {
         return JavaArray::convertJObjectToArray(exec, anObject, _type + 1,
-                                                executionContext());
+                                                rootObject());
       }
       // or array of other object type?
       return Instance::createRuntimeObject(Instance::JavaLanguage, anObject,
-                                           executionContext());
+                                           rootObject());
     }
 
     case boolean_type: {

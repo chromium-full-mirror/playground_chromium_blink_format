@@ -85,7 +85,7 @@ MethodList& MethodList::operator=(const MethodList& other) {
   return *this;
 }
 
-Instance::Instance() : _executionContext(0), _refCount(0) {}
+Instance::Instance() : _rootObject(0), _refCount(0) {}
 
 static KJSDidExecuteFunctionPtr _DidExecuteFunction;
 
@@ -109,14 +109,14 @@ void Instance::setValueOfField(ExecState* exec,
 Instance* Instance::createBindingForLanguageInstance(
     BindingLanguage language,
     void* nativeInstance,
-    const RootObject* executionContext) {
+    const RootObject* rootObject) {
   Instance* newInstance = 0;
 
   switch (language) {
 #if PLATFORM(MAC)
     case Instance::JavaLanguage: {
       newInstance =
-          new Bindings::JavaInstance((jobject)nativeInstance, executionContext);
+          new Bindings::JavaInstance((jobject)nativeInstance, rootObject);
       break;
     }
     case Instance::ObjectiveCLanguage: {
@@ -139,55 +139,19 @@ Instance* Instance::createBindingForLanguageInstance(
   }
 
   if (newInstance)
-    newInstance->setExecutionContext(executionContext);
+    newInstance->setRootObject(rootObject);
 
   return newInstance;
 }
 
 JSObject* Instance::createRuntimeObject(BindingLanguage language,
                                         void* nativeInstance,
-                                        const RootObject* executionContext) {
+                                        const RootObject* rootObject) {
   Instance* interfaceObject = Instance::createBindingForLanguageInstance(
-      language, nativeInstance, executionContext);
+      language, nativeInstance, rootObject);
 
   JSLock lock;
   return new RuntimeObjectImp(interfaceObject);
-}
-
-void* Instance::createLanguageInstanceForValue(ExecState*,
-                                               BindingLanguage language,
-                                               JSObject* value,
-                                               const RootObject* origin,
-                                               const RootObject* current) {
-  void* result = 0;
-
-  if (!value->isObject())
-    return 0;
-
-  JSObject* imp = static_cast<JSObject*>(value);
-
-  switch (language) {
-#if PLATFORM(MAC)
-    case Instance::ObjectiveCLanguage: {
-      result = createObjcInstanceForValue(value, origin, current);
-      break;
-    }
-    case Instance::JavaLanguage: {
-      // FIXME:  factor creation of jni_jsobjects, also remove unnecessary
-      // thread
-      // invocation code.
-      break;
-    }
-#endif
-    case Instance::CLanguage: {
-      result = _NPN_CreateScriptObject(0, imp, origin, current);
-      break;
-    }
-    default:
-      break;
-  }
-
-  return result;
 }
 }
 }  // namespace KJS::Bindings

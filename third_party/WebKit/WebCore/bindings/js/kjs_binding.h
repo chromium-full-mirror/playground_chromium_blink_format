@@ -83,8 +83,6 @@ class ScriptInterpreter : public Interpreter {
 
   WebCore::Frame* frame() const { return m_frame; }
 
-  virtual int rtti() { return 1; }
-
   /**
    * Set the event that is triggering the execution of a script, if any
    */
@@ -107,16 +105,6 @@ class ScriptInterpreter : public Interpreter {
   virtual bool isGlobalObject(JSValue*);
   virtual Interpreter* interpreterForGlobalObject(const JSValue*);
   virtual bool isSafeScript(const Interpreter* target);
-  virtual void* createLanguageInstanceForValue(
-      ExecState*,
-      int language,
-      JSObject* value,
-      const Bindings::RootObject* origin,
-      const Bindings::RootObject* current);
-  void* createObjcInstanceForValue(ExecState*,
-                                   JSObject* value,
-                                   const Bindings::RootObject* origin,
-                                   const Bindings::RootObject* current);
 
   virtual bool shouldInterruptScript() const;
 
