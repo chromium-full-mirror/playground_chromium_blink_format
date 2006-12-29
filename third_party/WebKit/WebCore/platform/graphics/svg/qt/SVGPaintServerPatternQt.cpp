@@ -28,7 +28,8 @@ namespace WebCore {
 
 bool SVGPaintServerPattern::setup(GraphicsContext*& context,
                                   const RenderObject* object,
-                                  SVGPaintTargetType type) const {
+                                  SVGPaintTargetType type,
+                                  bool isPaintingText) const {
   // FIXME: Reactivate old pattern code
 
   /*

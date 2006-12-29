@@ -54,7 +54,8 @@ class SVGPaintServerRadialGradient : public SVGPaintServerGradient {
 #if PLATFORM(QT)
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
-                     SVGPaintTargetType) const;
+                     SVGPaintTargetType,
+                     bool isPaintingText = false) const;
 #endif
 
  private:
