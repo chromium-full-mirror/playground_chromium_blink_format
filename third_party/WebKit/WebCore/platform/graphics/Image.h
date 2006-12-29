@@ -73,7 +73,7 @@ class Image : Noncopyable {
   int width() const;
   int height() const;
 
-  bool setData(bool allDataReceived);
+  virtual bool setData(bool allDataReceived);
   virtual bool setNativeData(NativeBytePtr, bool allDataReceived) {
     return false;
   }

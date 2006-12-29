@@ -54,13 +54,13 @@ class PDFDocumentImage : public Image {
                          const FloatRect& dstRect,
                          const FloatPoint& srcPoint,
                          const FloatSize& tileSize,
-                         CompositeOperator) {}
+                         CompositeOperator);
   virtual void drawTiled(GraphicsContext*,
                          const FloatRect& dstRect,
                          const FloatRect& srcRect,
                          TileRule hRule,
                          TileRule vRule,
-                         CompositeOperator) {}
+                         CompositeOperator);
 
   void setCurrentPage(int);
   int pageCount() const;
