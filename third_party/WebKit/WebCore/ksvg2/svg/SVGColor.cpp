@@ -25,6 +25,7 @@
 #include "SVGColor.h"
 
 #include "SVGException.h"
+#include "SVGParserUtilities.h"
 
 namespace WebCore {
 
@@ -37,6 +38,9 @@ SVGColor::SVGColor(const String& rgbColor)
 
 SVGColor::SVGColor(unsigned short colorType)
     : CSSValue(), m_colorType(colorType) {}
+
+SVGColor::SVGColor(const Color& c)
+    : CSSValue(), m_color(c), m_colorType(SVG_COLORTYPE_RGBCOLOR) {}
 
 SVGColor::~SVGColor() {}
 
@@ -203,46 +207,51 @@ static const Color cmap[] =
 #endif
 
 void SVGColor::setRGBColor(const String& rgbColor, ExceptionCode& ec) {
-  m_rgbColor = rgbColor;
-
-  if (m_rgbColor.isNull()) {
-    ec = SVG_INVALID_VALUE_ERR;
+  ec = SVG_INVALID_VALUE_ERR;
+  if (rgbColor.isNull())
     return;
-  }
 
-  String parse = m_rgbColor.stripWhiteSpace();
+  Color color;
+  String parse = rgbColor.stripWhiteSpace();
   if (parse.startsWith("rgb(")) {
-    Vector<String> colors = parse.split(',');
-    String r = colors[0].right((colors[0].length() - 4));
-    String g = colors[1];
-    String b = colors[2].left((colors[2].length() - 1));
-
-    if (r.contains("%")) {
-      r = r.left(r.length() - 1);
-      r = String::number(int(((255.0 * r.toDouble()) / 100.0)));
+    double r = -1, g = -1, b = -1;
+    const UChar* ptr = parse.characters() + 4;
+    const UChar* end = parse.characters() + parse.length();
+    skipOptionalSpaces(ptr, end);
+    if (!parseNumber(ptr, end, r))
+      return;
+    if (*ptr == '%') {
+      r = int((255.0 * r) / 100.0);
+      ptr++;
+    }
+    if (!parseNumber(ptr, end, g))
+      return;
+    if (*ptr == '%') {
+      g = int((255.0 * g) / 100.0);
+      ptr++;
+    }
+    if (!parseNumber(ptr, end, b))
+      return;
+    if (*ptr == '%') {
+      b = int((255.0 * b) / 100.0);
+      ptr++;
     }
 
-    if (g.contains("%")) {
-      g = g.left(g.length() - 1);
-      g = String::number(int(((255.0 * g.toDouble()) / 100.0)));
-    }
+    if (*ptr != ')')
+      return;
+    ptr++;
+    if (ptr != end)
+      return;
 
-    if (b.contains("%")) {
-      b = b.left(b.length() - 1);
-      b = String::number(int(((255.0 * b.toDouble()) / 100.0)));
-    }
-
-    m_color = Color(r.toInt(), g.toInt(), b.toInt());
+    color = Color(int(r), int(g), int(b));
   } else {
-    String colorName = m_rgbColor.lower();
-    //        int col = WebCore::getValueID(name.ascii(), name.length());
-    //        if (col == 0)
-    m_color = Color(colorName);
-    //        else
-    //            m_color = cmap[col - SVGCSS_VAL_ALICEBLUE];
+    String colorName = parse.lower();
+    color = Color(colorName);
   }
-  if (!m_color.isValid())
-    ec = SVG_INVALID_VALUE_ERR;
+  if (color.isValid()) {
+    ec = 0;
+    m_color = color;
+  }
 }
 
 void SVGColor::setRGBColorICCColor(const String& /* rgbColor */,
@@ -261,7 +270,7 @@ void SVGColor::setColor(unsigned short colorType,
 
 String SVGColor::cssText() const {
   if (m_colorType == SVG_COLORTYPE_RGBCOLOR)
-    return m_rgbColor;
+    return m_color.name();
 
   return String();
 }

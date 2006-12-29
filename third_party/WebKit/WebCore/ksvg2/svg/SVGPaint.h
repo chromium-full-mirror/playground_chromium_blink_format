@@ -51,6 +51,7 @@ class SVGPaint : public SVGColor {
            const String& uri,
            const String& rgbPaint = String(),
            const String& iccPaint = String());
+  SVGPaint(const Color& c);
   virtual ~SVGPaint();
 
   // 'SVGPaint' functions

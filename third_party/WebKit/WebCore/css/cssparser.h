@@ -160,8 +160,8 @@ class CSSParser {
   CSSValueList* parseFontFamily();
   bool parseColorParameters(Value*, int* colorValues, bool parseAlpha);
   bool parseHSLParameters(Value*, double* colorValues, bool parseAlpha);
-  CSSPrimitiveValue* parseColor();
-  CSSPrimitiveValue* parseColorFromValue(Value*);
+  CSSPrimitiveValue* parseColor(Value* = 0);
+  bool parseColorFromValue(Value*, RGBA32&, bool = false);
   PassRefPtr<CSSValue> parseCounterContent(ValueList* args, bool counters);
 
 #ifdef SVG_SUPPORT
@@ -171,7 +171,7 @@ class CSSParser {
   CSSValue* parseSVGStrokeDasharray();
 #endif
 
-  static bool parseColor(const DeprecatedString&, RGBA32& rgb);
+  static bool parseColor(const String&, RGBA32& rgb);
 
   // CSS3 Parsing Routines (for properties specific to CSS3)
   bool parseShadow(int propId, bool important);

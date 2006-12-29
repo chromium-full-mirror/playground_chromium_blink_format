@@ -101,6 +101,8 @@ class Color {
   operator QColor() const;
 #endif
 
+  static bool parseHexColor(const String& name, RGBA32& rgb);
+
   static const RGBA32 black = 0xFF000000;
   static const RGBA32 white = 0xFFFFFFFF;
   static const RGBA32 darkGray = 0xFF808080;

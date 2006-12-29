@@ -36,6 +36,7 @@ class SVGColor : public CSSValue {
  public:
   SVGColor();
   SVGColor(const String& rgbColor);
+  SVGColor(const Color& c);
   SVGColor(unsigned short colorType);
   virtual ~SVGColor();
 
@@ -74,7 +75,6 @@ class SVGColor : public CSSValue {
  private:
   Color m_color;
   unsigned short m_colorType;
-  String m_rgbColor;
 };
 
 }  // namespace WebCore
