@@ -361,10 +361,16 @@ void FrameLoaderClientQt::dispatchDidReceiveIcon() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::frameLoaderDestroyed() {}
+void FrameLoaderClientQt::frameLoaderDestroyed() {
+  notImplemented();
+}
 
 bool FrameLoaderClientQt::canHandleRequest(
-    const WebCore::ResourceRequest&) const {}
+    const WebCore::ResourceRequest&) const {
+  notImplemented();
+}
 
-void FrameLoaderClientQt::partClearedInBegin() {}
+void FrameLoaderClientQt::partClearedInBegin() {
+  notImplemented();
+}
 }
