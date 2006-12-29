@@ -32,14 +32,14 @@ namespace KJS {
 namespace Bindings {
 
 QtInstance::QtInstance(QObject* o) : Instance(), _class(0), _object(o) {
-  setExecutionContext(0);
+  setRootObject(0);
 }
 
 QtInstance::~QtInstance() {}
 
 QtInstance::QtInstance(const QtInstance& other)
     : Instance(), _class(0), _object(other._object) {
-  setExecutionContext(other.executionContext());
+  setRootObject(other.rootObject());
 }
 
 QtInstance& QtInstance::operator=(const QtInstance& other) {
