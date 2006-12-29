@@ -20,6 +20,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSImportRule.h"
 
@@ -40,8 +41,6 @@ CSSImportRule::CSSImportRule(StyleBase* parent,
       m_lstMedia(media),
       m_cachedSheet(0),
       m_loading(false) {
-  m_type = IMPORT_RULE;
-
   if (m_lstMedia)
     m_lstMedia->setParent(this);
   else
@@ -97,9 +96,10 @@ void CSSImportRule::insertedIntoParent() {
   // Check for a cycle in our import chain.  If we encounter a stylesheet
   // in our parent chain with the same URL, then just bail.
   for (parent = static_cast<StyleBase*>(this)->parent(); parent;
-       parent = parent->parent())
+       parent = parent->parent()) {
     if (absHref == parent->baseURL())
       return;
+  }
 
   m_cachedSheet =
       docLoader->requestCSSStyleSheet(absHref, parentSheet->charset());
@@ -127,4 +127,5 @@ String CSSImportRule::cssText() const {
 
   return result;
 }
-}
+
+}  // namespace WebCore

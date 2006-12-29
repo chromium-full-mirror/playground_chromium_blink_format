@@ -22,8 +22,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSMediaRule_H
-#define CSSMediaRule_H
+#ifndef CSSMediaRule_h
+#define CSSMediaRule_h
 
 #include "CSSRule.h"
 #include <wtf/RefPtr.h>
@@ -42,16 +42,20 @@ class CSSMediaRule : public CSSRule {
   CSSMediaRule(StyleBase* parent, MediaList* mediaList, CSSRuleList* ruleList);
   virtual ~CSSMediaRule();
 
+  virtual bool isMediaRule() { return true; }
+
   MediaList* media() const { return m_lstMedia.get(); }
   CSSRuleList* cssRules() { return m_lstCSSRules.get(); }
 
   unsigned insertRule(const String& rule, unsigned index, ExceptionCode&);
   void deleteRule(unsigned index, ExceptionCode&);
 
-  virtual bool isMediaRule() { return true; }
+  // Inherited from CSSRule
+  virtual unsigned short type() const { return MEDIA_RULE; }
+
   virtual String cssText() const;
 
-  /* Not part of the DOM */
+  // Not part of the CSSOM
   unsigned append(CSSRule*);
 
  protected:
@@ -59,6 +63,6 @@ class CSSMediaRule : public CSSRule {
   RefPtr<CSSRuleList> m_lstCSSRules;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSMediaRule_h

@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSFontFaceRule_H
-#define CSSFontFaceRule_H
+#ifndef CSSFontFaceRule_h
+#define CSSFontFaceRule_h
 
 #include "CSSRule.h"
 #include <wtf/RefPtr.h>
@@ -36,14 +36,19 @@ class CSSFontFaceRule : public CSSRule {
   CSSFontFaceRule(StyleBase* parent);
   virtual ~CSSFontFaceRule();
 
+  virtual bool isFontFaceRule() { return true; }
+
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
 
-  virtual bool isFontFaceRule() { return true; }
+  // Inherited from CSSRule
+  virtual unsigned short type() const { return FONT_FACE_RULE; }
+
+  virtual String cssText() const;
 
  protected:
   RefPtr<CSSMutableStyleDeclaration> m_style;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSFontFaceRule_h

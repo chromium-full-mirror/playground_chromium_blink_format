@@ -19,19 +19,19 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSCharsetRule.h"
 
 namespace WebCore {
 
 CSSCharsetRule::CSSCharsetRule(StyleBase* parent, const String& encoding)
-    : CSSRule(parent), m_encoding(encoding) {
-  m_type = CHARSET_RULE;
-}
+    : CSSRule(parent), m_encoding(encoding) {}
 
 CSSCharsetRule::~CSSCharsetRule() {}
 
 String CSSCharsetRule::cssText() const {
   return "@charset \"" + m_encoding + "\";";
 }
-}
+
+}  // namespace WebCore

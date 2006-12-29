@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSUnknownRule_H
-#define CSSUnknownRule_H
+#ifndef CSSUnknownRule_h
+#define CSSUnknownRule_h
 
 #include "CSSRule.h"
 
@@ -33,8 +33,10 @@ class CSSUnknownRule : public CSSRule {
   CSSUnknownRule(StyleBase* parent) : CSSRule(parent) {}
 
   virtual bool isUnknownRule() { return true; }
+
+  virtual unsigned short type() const { return UNKNOWN_RULE; }
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSUnknownRule_h

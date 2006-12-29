@@ -36,25 +36,19 @@ namespace WebCore {
 CSSMediaRule::CSSMediaRule(StyleBase* parent,
                            MediaList* mediaList,
                            CSSRuleList* ruleList)
-    : CSSRule(parent), m_lstMedia(mediaList), m_lstCSSRules(ruleList) {
-  m_type = MEDIA_RULE;
-}
+    : CSSRule(parent), m_lstMedia(mediaList), m_lstCSSRules(ruleList) {}
 
 CSSMediaRule::CSSMediaRule(StyleBase* parent)
     : CSSRule(parent),
       m_lstMedia(0),
       m_lstCSSRules(new CSSRuleList())
 
-{
-  m_type = MEDIA_RULE;
-}
+{}
 
 CSSMediaRule::CSSMediaRule(StyleBase* parent, const String& media)
     : CSSRule(parent),
       m_lstMedia(new MediaList(this, media)),
-      m_lstCSSRules(new CSSRuleList()) {
-  m_type = MEDIA_RULE;
-}
+      m_lstCSSRules(new CSSRuleList()) {}
 
 CSSMediaRule::~CSSMediaRule() {
   if (m_lstMedia)
@@ -151,4 +145,5 @@ String CSSMediaRule::cssText() const {
   result += "}";
   return result;
 }
-}
+
+}  // namespace WebCore

@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSStyleRule_H
-#define CSSStyleRule_H
+#ifndef CSSStyleRule_h
+#define CSSStyleRule_h
 
 #include "CSSRule.h"
 #include <wtf/PassRefPtr.h>
@@ -38,14 +38,19 @@ class CSSStyleRule : public CSSRule {
   CSSStyleRule(StyleBase* parent);
   virtual ~CSSStyleRule();
 
-  CSSMutableStyleDeclaration* style() const { return m_style.get(); }
-
   virtual bool isStyleRule() { return true; }
-  virtual String cssText() const;
 
   String selectorText() const;
   void setSelectorText(String);
 
+  CSSMutableStyleDeclaration* style() const { return m_style.get(); }
+
+  // Inherited from CSSRule
+  virtual unsigned short type() const { return STYLE_RULE; }
+
+  virtual String cssText() const;
+
+  // Not part of the CSSOM
   virtual bool parseString(const String&, bool = false);
 
   void setSelector(CSSSelector* selector) { m_selector = selector; }
@@ -59,6 +64,6 @@ class CSSStyleRule : public CSSRule {
   CSSSelector* m_selector;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSStyleRule_h
