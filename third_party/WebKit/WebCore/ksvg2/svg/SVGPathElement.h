@@ -28,9 +28,9 @@
 #include "SVGAnimatedPathData.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
+#include "SVGParserUtilities.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTests.h"
-#include "svgpathparser.h"
 
 namespace WebCore {
 class SVGPathSeg;
@@ -58,7 +58,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
                        public SVGLangSpace,
                        public SVGExternalResourcesRequired,
                        public SVGAnimatedPathData,
-                       public DeprecatedSVGPathParser {
+                       public SVGPathParser {
  public:
   SVGPathElement(const QualifiedName&, Document*);
   virtual ~SVGPathElement();

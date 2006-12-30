@@ -94,7 +94,7 @@ class SVGPolyParser {
 class SVGPathParser {
  public:
   virtual ~SVGPathParser() {}
-  void parseSVG(const String& d, bool process = false);
+  bool parseSVG(const String& d, bool process = false);
 
  protected:
   virtual void svgMoveTo(double x1,
