@@ -51,17 +51,13 @@ class RootObject {
   friend class JavaJSObject;
 
  public:
-  RootObject(const void* nativeHandle)
-      : _nativeHandle(nativeHandle), _interpreter(0) {}
+  RootObject(const void* nativeHandle, PassRefPtr<Interpreter> interpreter)
+      : m_nativeHandle(nativeHandle), m_interpreter(interpreter) {}
 
-  void setRootObjectImp(JSObject* i) { _imp = i; }
+  const void* nativeHandle() const { return m_nativeHandle; }
+  Interpreter* interpreter() const { return m_interpreter.get(); }
 
-  JSObject* rootObjectImp() const { return _imp.get(); }
-
-  void setInterpreter(Interpreter* i);
-  Interpreter* interpreter() const { return _interpreter; }
-
-  void removeAllNativeReferences();
+  void destroy();
 
 #if PLATFORM(MAC)
   // Must be called from the thread that will be used to access JavaScript.
@@ -79,12 +75,10 @@ class RootObject {
 
   static void dispatchToJavaScriptThread(JSObjectCallContext* context);
 #endif
-  const void* nativeHandle() const { return _nativeHandle; }
 
  private:
-  const void* _nativeHandle;
-  ProtectedPtr<JSObject> _imp;
-  Interpreter* _interpreter;
+  const void* m_nativeHandle;
+  RefPtr<Interpreter> m_interpreter;
 
 #if PLATFORM(MAC)
   static FindRootObjectForNativeHandleFunctionPtr
