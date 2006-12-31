@@ -36,12 +36,6 @@ class SVGViewElement : public SVGStyledElement,
                        public SVGFitToViewBox,
                        public SVGZoomAndPan {
  public:
-  enum SVGZoomAndPanType {
-    SVG_ZOOMANDPAN_UNKNOWN = 0,
-    SVG_ZOOMANDPAN_DISABLE = 1,
-    SVG_ZOOMANDPAN_MAGNIFY = 2
-  };
-
   SVGViewElement(const QualifiedName&, Document*);
   virtual ~SVGViewElement();
 
