@@ -30,7 +30,7 @@
 namespace WebCore {
 class SVGPathSegCurvetoQuadraticAbs : public SVGPathSeg {
  public:
-  SVGPathSegCurvetoQuadraticAbs();
+  SVGPathSegCurvetoQuadraticAbs(double x, double y, double x1, double y1);
   virtual ~SVGPathSegCurvetoQuadraticAbs();
 
   virtual unsigned short pathSegType() const {
@@ -62,7 +62,7 @@ class SVGPathSegCurvetoQuadraticAbs : public SVGPathSeg {
 
 class SVGPathSegCurvetoQuadraticRel : public SVGPathSeg {
  public:
-  SVGPathSegCurvetoQuadraticRel();
+  SVGPathSegCurvetoQuadraticRel(double x, double y, double x1, double y1);
   virtual ~SVGPathSegCurvetoQuadraticRel();
 
   virtual unsigned short pathSegType() const {

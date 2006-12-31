@@ -30,7 +30,7 @@
 namespace WebCore {
 class SVGPathSegLinetoVerticalAbs : public SVGPathSeg {
  public:
-  SVGPathSegLinetoVerticalAbs();
+  SVGPathSegLinetoVerticalAbs(double y);
   virtual ~SVGPathSegLinetoVerticalAbs();
 
   virtual unsigned short pathSegType() const {
@@ -48,7 +48,7 @@ class SVGPathSegLinetoVerticalAbs : public SVGPathSeg {
 
 class SVGPathSegLinetoVerticalRel : public SVGPathSeg {
  public:
-  SVGPathSegLinetoVerticalRel();
+  SVGPathSegLinetoVerticalRel(double y);
   virtual ~SVGPathSegLinetoVerticalRel();
 
   virtual unsigned short pathSegType() const {

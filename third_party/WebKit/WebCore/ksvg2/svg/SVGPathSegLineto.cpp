@@ -29,9 +29,8 @@
 
 namespace WebCore {
 
-SVGPathSegLinetoAbs::SVGPathSegLinetoAbs() : SVGPathSeg() {
-  m_x = m_y = 0.0;
-}
+SVGPathSegLinetoAbs::SVGPathSegLinetoAbs(double x, double y)
+    : SVGPathSeg(), m_x(x), m_y(y) {}
 
 SVGPathSegLinetoAbs::~SVGPathSegLinetoAbs() {}
 
@@ -51,9 +50,8 @@ double SVGPathSegLinetoAbs::y() const {
   return m_y;
 }
 
-SVGPathSegLinetoRel::SVGPathSegLinetoRel() : SVGPathSeg() {
-  m_x = m_y = 0.0;
-}
+SVGPathSegLinetoRel::SVGPathSegLinetoRel(double x, double y)
+    : SVGPathSeg(), m_x(x), m_y(y) {}
 
 SVGPathSegLinetoRel::~SVGPathSegLinetoRel() {}
 

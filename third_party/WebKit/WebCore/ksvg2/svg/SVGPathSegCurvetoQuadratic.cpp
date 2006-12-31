@@ -29,9 +29,11 @@
 
 namespace WebCore {
 
-SVGPathSegCurvetoQuadraticAbs::SVGPathSegCurvetoQuadraticAbs() : SVGPathSeg() {
-  m_x = m_y = m_x1 = m_y1 = 0.0;
-}
+SVGPathSegCurvetoQuadraticAbs::SVGPathSegCurvetoQuadraticAbs(double x,
+                                                             double y,
+                                                             double x1,
+                                                             double y1)
+    : SVGPathSeg(), m_x(x), m_y(y), m_x1(x1), m_y1(y1) {}
 
 SVGPathSegCurvetoQuadraticAbs::~SVGPathSegCurvetoQuadraticAbs() {}
 
@@ -67,9 +69,11 @@ double SVGPathSegCurvetoQuadraticAbs::y1() const {
   return m_y1;
 }
 
-SVGPathSegCurvetoQuadraticRel::SVGPathSegCurvetoQuadraticRel() : SVGPathSeg() {
-  m_x = m_y = m_x1 = m_y1 = 0.0;
-}
+SVGPathSegCurvetoQuadraticRel::SVGPathSegCurvetoQuadraticRel(double x,
+                                                             double y,
+                                                             double x1,
+                                                             double y1)
+    : SVGPathSeg(), m_x(x), m_y(y), m_x1(x1), m_y1(y1) {}
 
 SVGPathSegCurvetoQuadraticRel::~SVGPathSegCurvetoQuadraticRel() {}
 

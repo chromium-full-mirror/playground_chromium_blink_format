@@ -29,10 +29,21 @@
 
 namespace WebCore {
 
-SVGPathSegArcAbs::SVGPathSegArcAbs() : SVGPathSeg() {
-  m_x = m_y = m_r1 = m_r2 = m_angle = 0.0;
-  m_largeArcFlag = m_sweepFlag = false;
-}
+SVGPathSegArcAbs::SVGPathSegArcAbs(double x,
+                                   double y,
+                                   double r1,
+                                   double r2,
+                                   double angle,
+                                   bool largeArcFlag,
+                                   bool sweepFlag)
+    : SVGPathSeg(),
+      m_x(x),
+      m_y(y),
+      m_r1(r1),
+      m_r2(r2),
+      m_angle(angle),
+      m_largeArcFlag(largeArcFlag),
+      m_sweepFlag(sweepFlag) {}
 
 SVGPathSegArcAbs::~SVGPathSegArcAbs() {}
 
@@ -92,10 +103,21 @@ bool SVGPathSegArcAbs::sweepFlag() const {
   return m_sweepFlag;
 }
 
-SVGPathSegArcRel::SVGPathSegArcRel() : SVGPathSeg() {
-  m_x = m_y = m_r1 = m_r2 = m_angle = 0.0;
-  m_largeArcFlag = m_sweepFlag = false;
-}
+SVGPathSegArcRel::SVGPathSegArcRel(double x,
+                                   double y,
+                                   double r1,
+                                   double r2,
+                                   double angle,
+                                   bool largeArcFlag,
+                                   bool sweepFlag)
+    : SVGPathSeg(),
+      m_x(x),
+      m_y(y),
+      m_r1(r1),
+      m_r2(r2),
+      m_angle(angle),
+      m_largeArcFlag(largeArcFlag),
+      m_sweepFlag(sweepFlag) {}
 
 SVGPathSegArcRel::~SVGPathSegArcRel() {}
 
