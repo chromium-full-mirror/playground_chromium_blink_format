@@ -1754,6 +1754,7 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
   IntRect posClipRect(parent()->clipRects()->posClipRect());
   IntRect overflowClipRect(parent()->clipRects()->overflowClipRect());
   IntRect fixedClipRect(parent()->clipRects()->fixedClipRect());
+  bool fixed = parent()->clipRects()->fixed();
 
   // A fixed object is essentially the root of its containing block hierarchy,
   // so when
@@ -1761,6 +1762,7 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
   if (m_object->style()->position() == FixedPosition) {
     posClipRect = fixedClipRect;
     overflowClipRect = fixedClipRect;
+    fixed = true;
   } else if (m_object->style()->position() == RelativePosition)
     posClipRect = overflowClipRect;
   else if (m_object->style()->position() == AbsolutePosition)
@@ -1772,6 +1774,10 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
     int x = 0;
     int y = 0;
     convertToLayerCoords(rootLayer, x, y);
+    if (fixed) {
+      x -= renderer()->view()->frameView()->contentsX();
+      y -= renderer()->view()->frameView()->contentsY();
+    }
 
     if (m_object->hasOverflowClip()) {
       IntRect newOverflowClip = m_object->getOverflowClipRect(x, y);
@@ -1790,13 +1796,14 @@ void RenderLayer::calculateClipRects(const RenderLayer* rootLayer) {
   // If our clip rects match our parent's clip, then we can just share its data
   // structure and
   // ref count.
-  if (posClipRect == parent()->clipRects()->posClipRect() &&
+  if (fixed == parent()->clipRects()->fixed() &&
+      posClipRect == parent()->clipRects()->posClipRect() &&
       overflowClipRect == parent()->clipRects()->overflowClipRect() &&
       fixedClipRect == parent()->clipRects()->fixedClipRect())
     m_clipRects = parent()->clipRects();
   else
     m_clipRects = new (m_object->renderArena())
-        ClipRects(overflowClipRect, fixedClipRect, posClipRect);
+        ClipRects(overflowClipRect, fixedClipRect, posClipRect, fixed);
   m_clipRects->ref();
 }
 
@@ -1808,11 +1815,16 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
                                  IntRect& outlineRect) const {
   if (parent()) {
     parent()->calculateClipRects(rootLayer);
+
     backgroundRect = m_object->style()->position() == FixedPosition
                          ? parent()->clipRects()->fixedClipRect()
                          : (m_object->isPositioned()
                                 ? parent()->clipRects()->posClipRect()
                                 : parent()->clipRects()->overflowClipRect());
+    if (parent()->clipRects()->fixed())
+      backgroundRect.move(renderer()->view()->frameView()->contentsX(),
+                          renderer()->view()->frameView()->contentsY());
+
     backgroundRect.intersect(paintDirtyRect);
   } else
     backgroundRect = paintDirtyRect;
