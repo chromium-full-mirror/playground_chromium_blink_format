@@ -46,14 +46,14 @@ void SVGTimer::start() {
     startRepeating(m_interval);
 }
 
-double SVGTimer::calculateTimePercentage(double elapsed,
+double SVGTimer::calculateTimePercentage(double elapsedSeconds,
                                          double start,
                                          double end,
                                          double duration,
                                          double repetitions) {
   double percentage = 0.0;
 
-  double useElapsed = elapsed - (duration * repetitions);
+  double useElapsed = elapsedSeconds - (duration * repetitions);
 
   if (duration > 0.0 && end == 0.0)
     percentage = 1.0 - (((start + duration) - useElapsed) / duration);
@@ -68,20 +68,10 @@ double SVGTimer::calculateTimePercentage(double elapsed,
   return percentage;
 }
 
-void SVGTimer::notifyAll() {
-  if (m_enabledNotifySet.isEmpty())
-    return;
-
-  double elapsed = m_scheduler->elapsed() * 1000.0;  // Take time now.
-
-  // First build a list of animation elements per target element
-  // This is important to decide about the order & priority of
-  // the animations -> 'additive' support is handled this way.
-  typedef HashMap<SVGElement*, Vector<SVGAnimationElement*>> TargetAnimationMap;
-  TargetAnimationMap targetMap;
-
+SVGTimer::TargetAnimationMap SVGTimer::animationsByElement(
+    double elapsedSeconds) {
   ExceptionCode ec = 0;
-
+  TargetAnimationMap targetMap;
   SVGNotifySet::const_iterator end = m_notifySet.end();
   for (SVGNotifySet::const_iterator it = m_notifySet.begin(); it != end; ++it) {
     SVGAnimationElement* animation = *it;
@@ -91,7 +81,7 @@ void SVGTimer::notifyAll() {
     if (!m_enabledNotifySet.contains(animation)) {
       if (!animation->isFrozen())
         continue;
-      if (elapsed <=
+      if (elapsedSeconds <=
           (animation->getStartTime() + animation->getSimpleDuration(ec)))
         continue;
     }
@@ -106,6 +96,21 @@ void SVGTimer::notifyAll() {
       targetMap.set(target, list);
     }
   }
+  return targetMap;
+}
+
+void SVGTimer::notifyAll() {
+  if (m_enabledNotifySet.isEmpty())
+    return;
+
+  double elapsedSeconds = m_scheduler->elapsed() * 1000.0;  // Take time now.
+
+  // First build a list of animation elements per target element
+  // This is important to decide about the order & priority of
+  // the animations -> 'additive' support is handled this way.
+  TargetAnimationMap targetMap = animationsByElement(elapsedSeconds);
+
+  ExceptionCode ec = 0;
 
   TargetAnimationMap::iterator targetIterator = targetMap.begin();
   TargetAnimationMap::iterator tend = targetMap.end();
@@ -128,12 +133,11 @@ void SVGTimer::notifyAll() {
       // #2 (duration <= 0.0 && end > 0) -> fine
 
       if ((duration <= 0.0 && end <= 0.0) ||
-          (animation->isIndefinite(duration) &&
-           end <= 0.0))  // Ignore dur="0" or dur="-neg"
-        continue;
+          (animation->isIndefinite(duration) && end <= 0.0))
+        continue;  // Ignore dur="0" or dur="-neg"
 
-      float percentage =
-          calculateTimePercentage(elapsed, start, end, duration, repetitions);
+      float percentage = calculateTimePercentage(elapsedSeconds, start, end,
+                                                 duration, repetitions);
 
       if (percentage <= 1.0 || animation->connected())
         animation->handleTimerEvent(percentage);
@@ -142,9 +146,6 @@ void SVGTimer::notifyAll() {
       if (animation->hasTagName(SVGNames::animateTransformTag)) {
         SVGAnimateTransformElement* animTransform =
             static_cast<SVGAnimateTransformElement*>(animation);
-        if (!animTransform)
-          continue;
-
         AffineTransform transformMatrix = animTransform->transformMatrix();
         RefPtr<SVGTransform> targetTransform = new SVGTransform();
 
@@ -170,33 +171,19 @@ void SVGTimer::notifyAll() {
       } else if (animation->hasTagName(SVGNames::animateColorTag)) {
         SVGAnimateColorElement* animColor =
             static_cast<SVGAnimateColorElement*>(animation);
-        if (!animColor)
-          continue;
-
         String name = animColor->attributeName();
-        Color color = animColor->color();
 
-        if (!targetColor.contains(name)) {
-          if (animation->isAdditive()) {
-            int r = animColor->initialColor().red() + color.red();
-            int g = animColor->initialColor().green() + color.green();
-            int b = animColor->initialColor().blue() + color.blue();
-
-            targetColor.set(name, animColor->clampColor(r, g, b));
-          } else
-            targetColor.set(name, color);
-        } else {
-          if (!animation->isAdditive())
-            targetColor.set(name, color);
-          else {
-            Color baseColor = targetColor.get(name);
-            int r = baseColor.red() + color.red();
-            int g = baseColor.green() + color.green();
-            int b = baseColor.blue() + color.blue();
-
-            targetColor.set(name, animColor->clampColor(r, g, b));
-          }
-        }
+        if (animation->isAdditive()) {
+          if (targetColor.contains(name))
+            targetColor.set(name,
+                            animColor->addColorsAndClamp(targetColor.get(name),
+                                                         animColor->color()));
+          else
+            targetColor.set(
+                name, animColor->addColorsAndClamp(animColor->initialColor(),
+                                                   animColor->color()));
+        } else
+          targetColor.set(name, animColor->color());
       }
     }
 
@@ -212,12 +199,13 @@ void SVGTimer::notifyAll() {
     }
 
     // Handle <animateColor>.
-    HashMap<String, Color>::iterator cend = targetColor.end();
-    for (HashMap<String, Color>::iterator cit = targetColor.begin();
-         cit != cend; ++cit) {
-      if (cit->second.isValid())
+    HashMap<String, Color>::iterator colorIteratorEnd = targetColor.end();
+    for (HashMap<String, Color>::iterator colorIterator = targetColor.begin();
+         colorIterator != colorIteratorEnd; ++colorIterator) {
+      if (colorIterator->second.isValid())
         SVGAnimationElement::setTargetAttribute(targetIterator->first,
-                                                cit->first, cit->second.name());
+                                                colorIterator->first,
+                                                colorIterator->second.name());
     }
   }
 
