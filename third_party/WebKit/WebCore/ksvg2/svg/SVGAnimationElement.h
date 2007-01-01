@@ -84,6 +84,7 @@ class SVGAnimationElement : public SVGElement,
   virtual void closeRenderer();
 
   // Helpers
+  bool updateForElapsedSeconds(double);
   virtual void handleTimerEvent(double timePercentage) = 0;
 
   double parseClockValue(const String&) const;
