@@ -25,7 +25,7 @@
 #include "SVGAnimateColorElement.h"
 
 #include "Document.h"
-#include "KSVGTimeScheduler.h"
+#include "TimeScheduler.h"
 #include "PlatformString.h"
 #include "SVGColor.h"
 #include "SVGSVGElement.h"
@@ -141,13 +141,12 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
     if (itemByPercentage == -1)
       return;
 
-    if (m_currentItem != itemByPercentage)  // Item changed...
-    {
+    if (m_currentItem != itemByPercentage) {  // Item changed...
       ExceptionCode ec = 0;
 
       // Extract current 'from' / 'to' values
-      String value1 = String(m_values->getItem(itemByPercentage, ec));
-      String value2 = String(m_values->getItem(itemByPercentage + 1, ec));
+      String value1 = m_values->getItem(itemByPercentage, ec);
+      String value2 = m_values->getItem(itemByPercentage + 1, ec);
 
       // Calculate r/g/b shifting values...
       if (!value1.isEmpty() && !value2.isEmpty()) {
@@ -221,23 +220,16 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
   }
 }
 
+static inline int clampColorValue(int v) {
+  if (v > 255)
+    v = 255;
+  else if (v < 0)
+    v = 0;
+  return v;
+}
+
 Color SVGAnimateColorElement::clampColor(int r, int g, int b) const {
-  if (r > 255)
-    r = 255;
-  else if (r < 0)
-    r = 0;
-
-  if (g > 255)
-    g = 255;
-  else if (g < 0)
-    g = 0;
-
-  if (b > 255)
-    b = 255;
-  else if (b < 0)
-    b = 0;
-
-  return Color(r, g, b);
+  return Color(clampColorValue(r), clampColorValue(g), clampColorValue(b));
 }
 
 void SVGAnimateColorElement::calculateColor(double time,
