@@ -85,7 +85,7 @@ class SVGAnimationElement : public SVGElement,
 
   // Helpers
   bool updateForElapsedSeconds(double);
-  virtual void handleTimerEvent(double timePercentage) = 0;
+  void handleTimerEvent(double timePercentage);
 
   double parseClockValue(const String&) const;
 
@@ -119,6 +119,10 @@ class SVGAnimationElement : public SVGElement,
 
   void connectTimer();
   void disconnectTimer();
+
+  virtual bool updateCurrentValue(double timePercentage) = 0;
+  virtual bool handleStartCondition() = 0;
+  virtual void handleEndCondition() = 0;
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,

@@ -35,28 +35,25 @@ SVGSetElement::SVGSetElement(const QualifiedName& tagName, Document* doc)
 
 SVGSetElement::~SVGSetElement() {}
 
-void SVGSetElement::handleTimerEvent(double timePercentage) {
-  // Start condition.
-  if (!connectedToTimer()) {
-    connectTimer();
-    return;
-  }
-
-  // Commit change now...
+bool SVGSetElement::updateCurrentValue(double timePercentage) {
   if (m_savedTo.isEmpty()) {
     m_savedTo = targetAttribute();
     setTargetAttribute(m_to);
   }
+  return false;
+}
 
-  // End condition.
-  if (timePercentage == 1.0) {
-    disconnectTimer();
+bool SVGSetElement::handleStartCondition() {
+  return true;
+}
 
-    if (!isFrozen())
-      setTargetAttribute(m_savedTo);
+void SVGSetElement::handleEndCondition() {
+  disconnectTimer();
 
-    m_savedTo = String();
-  }
+  if (!isFrozen())
+    setTargetAttribute(m_savedTo);
+
+  m_savedTo = String();
 }
 }
 

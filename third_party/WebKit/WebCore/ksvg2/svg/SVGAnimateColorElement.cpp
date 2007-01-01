@@ -128,53 +128,48 @@ bool SVGAnimateColorElement::updateCurrentValue(double timePercentage) {
   return true;
 }
 
-bool SVGAnimateColorElement::startIfNecessary() {
-  if (!connectedToTimer()) {
-    storeInitialValue();
+bool SVGAnimateColorElement::handleStartCondition() {
+  storeInitialValue();
 
-    switch (detectAnimationMode()) {
-      case TO_ANIMATION:
-      case FROM_TO_ANIMATION: {
-        m_toColor->setRGBColor(m_to);
-        if (!m_from.isEmpty())  // from-to animation
-          m_fromColor->setRGBColor(m_from);
-        else  // to animation
-          m_fromColor->setRGBColor(m_initialColor.name());
+  switch (detectAnimationMode()) {
+    case TO_ANIMATION:
+    case FROM_TO_ANIMATION: {
+      m_toColor->setRGBColor(m_to);
+      if (!m_from.isEmpty())  // from-to animation
+        m_fromColor->setRGBColor(m_from);
+      else  // to animation
+        m_fromColor->setRGBColor(m_initialColor.name());
 
-        calculateColorDifference(m_toColor->color(), m_fromColor->color(),
-                                 m_redDiff, m_greenDiff, m_blueDiff);
-        break;
-      }
-      case BY_ANIMATION:
-      case FROM_BY_ANIMATION: {
-        if (!m_from.isEmpty())  // from-by animation
-          m_fromColor->setRGBColor(m_from);
-        else  // by animation
-          m_fromColor->setRGBColor(m_initialColor.name());
-
-        m_toColor->setRGBColor(
-            addColorsAndClamp(m_fromColor->color(),
-                              SVGColor::colorFromRGBColorString(m_by))
-                .name());
-
-        calculateColorDifference(m_toColor->color(), m_fromColor->color(),
-                                 m_redDiff, m_greenDiff, m_blueDiff);
-        break;
-      }
-      case VALUES_ANIMATION:
-        break;
-      default: {
-        // kdError() << k_funcinfo << " Unable to detect animation mode!
-        // Aborting creation!" << endl;
-        return true;
-      }
+      calculateColorDifference(m_toColor->color(), m_fromColor->color(),
+                               m_redDiff, m_greenDiff, m_blueDiff);
+      break;
     }
+    case BY_ANIMATION:
+    case FROM_BY_ANIMATION: {
+      if (!m_from.isEmpty())  // from-by animation
+        m_fromColor->setRGBColor(m_from);
+      else  // by animation
+        m_fromColor->setRGBColor(m_initialColor.name());
 
-    connectTimer();
-    return true;
+      m_toColor->setRGBColor(
+          addColorsAndClamp(m_fromColor->color(),
+                            SVGColor::colorFromRGBColorString(m_by))
+              .name());
+
+      calculateColorDifference(m_toColor->color(), m_fromColor->color(),
+                               m_redDiff, m_greenDiff, m_blueDiff);
+      break;
+    }
+    case VALUES_ANIMATION:
+      break;
+    default: {
+      // kdError() << k_funcinfo << " Unable to detect animation mode! Aborting
+      // creation!" << endl;
+      return false;
+    }
   }
 
-  return false;
+  return true;
 }
 
 void SVGAnimateColorElement::handleEndCondition() {
@@ -187,19 +182,6 @@ void SVGAnimateColorElement::handleEndCondition() {
 
   disconnectTimer();
   resetValues();
-}
-
-void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
-  // Start condition.
-  if (!startIfNecessary())
-    return;
-
-  if (!updateCurrentValue(timePercentage))
-    return;
-
-  // End condition.
-  if (timePercentage == 1.0)
-    handleEndCondition();
 }
 
 void SVGAnimateColorElement::applyAnimationToValue(Color& currentColor) {

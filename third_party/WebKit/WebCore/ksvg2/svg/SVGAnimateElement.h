@@ -33,10 +33,12 @@ class SVGAnimateElement : public SVGAnimationElement {
   SVGAnimateElement(const QualifiedName&, Document*);
   virtual ~SVGAnimateElement();
 
-  virtual void handleTimerEvent(double timePercentage) {}
-
  protected:
   virtual const SVGElement* contextElement() const { return this; }
+
+  virtual bool updateCurrentValue(double timePercentage) { return false; }
+  virtual bool handleStartCondition() { return false; }
+  virtual void handleEndCondition() {}
 
  private:
   int m_currentItem;

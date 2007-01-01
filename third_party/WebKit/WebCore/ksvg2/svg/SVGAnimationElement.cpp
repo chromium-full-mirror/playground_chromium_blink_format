@@ -546,6 +546,20 @@ static double calculateTimePercentage(double elapsedSeconds,
   return percentage;
 }
 
+void SVGAnimationElement::handleTimerEvent(double timePercentage) {
+  if (!connectedToTimer()) {
+    connectTimer();
+    handleStartCondition();  // Check bool if adding anything after this call
+    return;
+  }
+
+  if (!updateCurrentValue(timePercentage))
+    return;
+
+  if (timePercentage == 1.0)
+    handleEndCondition();
+}
+
 bool SVGAnimationElement::updateForElapsedSeconds(double elapsedSeconds) {
   // Validate animation timing settings:
   // #1 (duration > 0) -> fine
