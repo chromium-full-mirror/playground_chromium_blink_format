@@ -57,10 +57,7 @@ void calculateColorDifference(const Color& first,
 }
 
 void SVGAnimateColorElement::storeInitialValue() {
-  // Save initial color... (needed for fill="remove" or additve="sum")
-  RefPtr<SVGColor> initialColor(new SVGColor());
-  initialColor->setRGBColor(targetAttribute());
-  m_initialColor = initialColor->color();
+  m_initialColor = SVGColor::colorFromRGBColorString(targetAttribute());
 }
 
 void SVGAnimateColorElement::resetValues() {
@@ -155,9 +152,10 @@ bool SVGAnimateColorElement::startIfNecessary() {
         else  // by animation
           m_fromColor->setRGBColor(m_initialColor.name());
 
-        m_toColor->setRGBColor(m_by);
         m_toColor->setRGBColor(
-            addColorsAndClamp(m_fromColor->color(), m_toColor->color()).name());
+            addColorsAndClamp(m_fromColor->color(),
+                              SVGColor::colorFromRGBColorString(m_by))
+                .name());
 
         calculateColorDifference(m_toColor->color(), m_fromColor->color(),
                                  m_redDiff, m_greenDiff, m_blueDiff);
