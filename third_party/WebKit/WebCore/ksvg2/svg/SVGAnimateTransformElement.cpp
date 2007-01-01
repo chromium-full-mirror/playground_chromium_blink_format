@@ -67,91 +67,38 @@ void SVGAnimateTransformElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGAnimationElement::parseMappedAttribute(attr);
 }
 
-void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
-  // Start condition.
-  if (!connectedToTimer()) {
-    m_initialTransform = 0;
+void SVGAnimateTransformElement::storeInitialValue() {
+  m_initialTransform = 0;
 
-    // Save initial transform... (needed for fill="remove" or additve="sum")
-    if (targetElement()->isStyledTransformable()) {
-      SVGStyledTransformableElement* transform =
-          static_cast<SVGStyledTransformableElement*>(targetElement());
-      RefPtr<SVGTransformList> transformList = transform->transformBaseValue();
-      if (transformList) {
-        ExceptionCode ec = 0;
-        for (unsigned long i = 0; i < transformList->numberOfItems(); i++) {
-          SVGTransform* value = transformList->getItem(i, ec).get();
-          if (!value)
-            continue;
+  // Save initial transform... (needed for fill="remove" or additve="sum")
+  if (targetElement()->isStyledTransformable()) {
+    SVGStyledTransformableElement* transform =
+        static_cast<SVGStyledTransformableElement*>(targetElement());
+    RefPtr<SVGTransformList> transformList = transform->transformBaseValue();
+    if (transformList) {
+      ExceptionCode ec = 0;
+      for (unsigned long i = 0; i < transformList->numberOfItems(); i++) {
+        SVGTransform* value = transformList->getItem(i, ec).get();
+        if (!value)
+          continue;
 
-          if (value->type() == m_type) {
-            m_initialTransform = value;
-            break;
-          }
+        if (value->type() == m_type) {
+          m_initialTransform = value;
+          break;
         }
       }
     }
-
-    // Animation mode handling
-    switch (detectAnimationMode()) {
-      case TO_ANIMATION:
-      case FROM_TO_ANIMATION: {
-        m_toTransform = parseTransformValue(m_to);
-        m_toRotateSpecialCase = m_rotateSpecialCase;
-
-        if (!m_from.isEmpty()) {  // from-to animation
-          m_fromTransform = parseTransformValue(m_from);
-          m_fromRotateSpecialCase = m_rotateSpecialCase;
-        } else {  // to animation
-          m_fromTransform = m_initialTransform;
-          m_fromRotateSpecialCase = false;
-        }
-
-        if (!m_fromTransform)
-          m_fromTransform = new SVGTransform();
-
-        break;
-      }
-      case BY_ANIMATION:
-      case FROM_BY_ANIMATION: {
-        m_toTransform = parseTransformValue(m_by);
-        m_toRotateSpecialCase = m_rotateSpecialCase;
-
-        if (!m_from.isEmpty()) {  // from-by animation
-          m_fromTransform = parseTransformValue(m_from);
-          m_fromRotateSpecialCase = m_rotateSpecialCase;
-        } else {  // by animation
-          m_fromTransform = m_initialTransform;
-          m_fromRotateSpecialCase = false;
-        }
-
-        if (!m_fromTransform)
-          m_fromTransform = new SVGTransform();
-
-        AffineTransform byMatrix = m_toTransform->matrix();
-        AffineTransform fromMatrix = m_fromTransform->matrix();
-
-        byMatrix *= fromMatrix;
-
-        break;
-      }
-      case VALUES_ANIMATION:
-        break;
-      default: {
-        // kdError() << k_funcinfo << " Unable to detect animation mode!
-        // Aborting creation!" << endl;
-        return;
-      }
-    }
-
-    connectTimer();
-    return;
   }
+}
 
-  // Calculations...
-  if (timePercentage >= 1.0)
-    timePercentage = 1.0;
+void SVGAnimateTransformElement::resetValues() {
+  m_currentItem = -1;
+  m_toTransform = 0;
+  m_fromTransform = 0;
+  m_initialTransform = 0;
+}
 
+bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
   AffineTransform qToMatrix, qFromMatrix;
   double useTimePercentage = timePercentage;
 
@@ -159,7 +106,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
     int itemByPercentage = calculateCurrentValueItem(timePercentage);
 
     if (itemByPercentage == -1)
-      return;
+      return false;
 
     if (m_currentItem != itemByPercentage) {  // Item changed...
       ExceptionCode ec = 0;
@@ -188,7 +135,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
         m_currentItem = itemByPercentage;
 
         if (!apply)
-          return;
+          return false;
       }
     } else if (m_toTransform && m_fromTransform)
       useTimePercentage =
@@ -203,14 +150,14 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
 
   /* FIXME: This logic needs fixing, was broken before, is still broken.
       if (m_transformMatrix)
-          m_transformMatrix = new SVGMatrix();
-      else {
-          m_transformMatrix.reset();
+      m_transformMatrix = new SVGMatrix();
+  else {
+      m_transformMatrix.reset();
 
-          if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
-              m_transformMatrix->multiply(m_lastMatrix.get());
-      }
-   */
+      if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
+          m_transformMatrix->multiply(m_lastMatrix.get());
+  }
+  */
 
   switch (m_type) {
     case SVGTransform::SVG_TRANSFORM_TRANSLATE: {
@@ -272,36 +219,103 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
     default:
       break;
   }
+  return true;
+}
 
-  // End condition.
-  if (timePercentage == 1.0) {
-    if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
-        isIndefinite(m_repeatCount)) {
-      m_lastMatrix.reset();
+bool SVGAnimateTransformElement::startIfNecessary() {
+  if (!connectedToTimer()) {
+    storeInitialValue();
 
-      if (!m_transformMatrix.isIdentity())
-        m_lastMatrix = m_transformMatrix;
+    switch (detectAnimationMode()) {
+      case TO_ANIMATION:
+      case FROM_TO_ANIMATION: {
+        m_toTransform = parseTransformValue(m_to);
+        m_toRotateSpecialCase = m_rotateSpecialCase;
 
-      m_repeations++;
-      return;
+        if (!m_from.isEmpty()) {  // from-to animation
+          m_fromTransform = parseTransformValue(m_from);
+          m_fromRotateSpecialCase = m_rotateSpecialCase;
+        } else {  // to animation
+          m_fromTransform = m_initialTransform;
+          m_fromRotateSpecialCase = false;
+        }
+
+        if (!m_fromTransform)
+          m_fromTransform = new SVGTransform();
+
+        break;
+      }
+      case BY_ANIMATION:
+      case FROM_BY_ANIMATION: {
+        m_toTransform = parseTransformValue(m_by);
+        m_toRotateSpecialCase = m_rotateSpecialCase;
+
+        if (!m_from.isEmpty()) {  // from-by animation
+          m_fromTransform = parseTransformValue(m_from);
+          m_fromRotateSpecialCase = m_rotateSpecialCase;
+        } else {  // by animation
+          m_fromTransform = m_initialTransform;
+          m_fromRotateSpecialCase = false;
+        }
+
+        if (!m_fromTransform)
+          m_fromTransform = new SVGTransform();
+
+        AffineTransform byMatrix = m_toTransform->matrix();
+        AffineTransform fromMatrix = m_fromTransform->matrix();
+
+        byMatrix *= fromMatrix;
+
+        break;
+      }
+      case VALUES_ANIMATION:
+        break;
+      default: {
+        // kdError() << k_funcinfo << " Unable to detect animation mode!
+        // Aborting creation!" << endl;
+        return true;
+      }
     }
 
-    disconnectTimer();
-
-    // Reset...
-    m_currentItem = -1;
-    m_toTransform = 0;
-    m_fromTransform = 0;
-    m_initialTransform = 0;
-
-    if (!isFrozen()) {
-      AffineTransform initial = initialMatrix();
-      if (!initial.isIdentity())
-        m_transformMatrix = initial;
-      else
-        m_transformMatrix.reset();
-    }
+    connectTimer();
+    return true;
   }
+  return false;
+}
+
+void SVGAnimateTransformElement::handleEndCondition() {
+  if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
+      isIndefinite(m_repeatCount)) {
+    m_lastMatrix.reset();
+
+    if (!m_transformMatrix.isIdentity())
+      m_lastMatrix = m_transformMatrix;
+
+    m_repeations++;
+    return;
+  }
+
+  disconnectTimer();
+  resetValues();
+
+  if (!isFrozen()) {
+    AffineTransform initial = initialMatrix();
+    if (!initial.isIdentity())
+      m_transformMatrix = initial;
+    else
+      m_transformMatrix.reset();
+  }
+}
+
+void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
+  if (startIfNecessary())
+    return;
+
+  if (!updateCurrentValue(timePercentage))
+    return;
+
+  if (timePercentage == 1.0)
+    handleEndCondition();
 }
 
 void SVGAnimateTransformElement::applyAnimationToValue(

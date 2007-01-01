@@ -53,6 +53,11 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
+  void storeInitialValue();
+  bool updateCurrentValue(double timePercentage);
+  void resetValues();
+  bool startIfNecessary();
+  void handleEndCondition();
 
  private:
   int m_currentItem;
