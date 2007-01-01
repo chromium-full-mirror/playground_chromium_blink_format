@@ -99,7 +99,7 @@ class SVGAnimationElement : public SVGElement,
 
   String attributeName() const;
 
-  bool connected() const;
+  bool connectedToTimer() const;
 
   bool isFrozen() const;
   bool isAdditive() const;
@@ -117,12 +117,15 @@ class SVGAnimationElement : public SVGElement,
  protected:
   mutable SVGElement* m_targetElement;
 
+  void connectTimer();
+  void disconnectTimer();
+
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
 
-  bool m_connected : 1;
+  bool m_connectedToTimer : 1;
 
   double m_currentTime;
   double m_simpleDuration;

@@ -69,7 +69,7 @@ void SVGAnimateTransformElement::parseMappedAttribute(MappedAttribute* attr) {
 
 void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
   // Start condition.
-  if (!m_connected) {
+  if (!connectedToTimer()) {
     m_initialTransform = 0;
 
     // Save initial transform... (needed for fill="remove" or additve="sum")
@@ -144,9 +144,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       }
     }
 
-    ownerSVGElement()->timeScheduler()->connectIntervalTimer(this);
-    m_connected = true;
-
+    connectTimer();
     return;
   }
 
@@ -288,8 +286,7 @@ void SVGAnimateTransformElement::handleTimerEvent(double timePercentage) {
       return;
     }
 
-    ownerSVGElement()->timeScheduler()->disconnectIntervalTimer(this);
-    m_connected = false;
+    disconnectTimer();
 
     // Reset...
     m_currentItem = -1;

@@ -58,7 +58,7 @@ void calculateColorDifference(const Color& first,
 
 void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
   // Start condition.
-  if (!m_connected) {
+  if (!connectedToTimer()) {
     // Save initial color... (needed for fill="remove" or additve="sum")
     RefPtr<SVGColor> initialColor = new SVGColor();
     initialColor->setRGBColor(targetAttribute());
@@ -102,9 +102,7 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
       }
     }
 
-    ownerSVGElement()->timeScheduler()->connectIntervalTimer(this);
-    m_connected = true;
-
+    connectTimer();
     return;
   }
 
@@ -180,8 +178,7 @@ void SVGAnimateColorElement::handleTimerEvent(double timePercentage) {
       return;
     }
 
-    ownerSVGElement()->timeScheduler()->disconnectIntervalTimer(this);
-    m_connected = false;
+    disconnectTimer();
 
     // Reset...
     m_currentItem = -1;
