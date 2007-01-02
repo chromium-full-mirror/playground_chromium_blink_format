@@ -125,7 +125,8 @@ class SVGAnimationElement : public SVGElement,
 
   virtual bool updateCurrentValue(double timePercentage) = 0;
   virtual bool handleStartCondition() = 0;
-  virtual void updateLastValueWithCurrent(){};
+  virtual void updateLastValueWithCurrent() {
+  }  // See bug 12075 for explaination of why this is a bad API
   virtual void resetValues() {}
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
