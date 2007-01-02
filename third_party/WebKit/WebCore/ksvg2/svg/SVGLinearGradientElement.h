@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,14 +21,16 @@
 */
 
 #ifndef SVGLinearGradientElement_H
-#define SVGLinearGRadientElement_H
+#define SVGLinearGradientElement_H
 
 #ifdef SVG_SUPPORT
 
-#include <SVGGradientElement.h>
+#include "SVGGradientElement.h"
 
 namespace WebCore {
+struct LinearGradientAttributes;
 class SVGLength;
+
 class SVGLinearGradientElement : public SVGGradientElement {
  public:
   SVGLinearGradientElement(const QualifiedName&, Document*);
@@ -38,10 +40,12 @@ class SVGLinearGradientElement : public SVGGradientElement {
   virtual void parseMappedAttribute(MappedAttribute*);
 
  protected:
-  virtual void buildGradient(PassRefPtr<SVGPaintServerGradient>) const;
+  virtual void buildGradient() const;
   virtual SVGPaintServerType gradientType() const {
     return LinearGradientPaintServer;
   }
+
+  LinearGradientAttributes collectGradientProperties() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

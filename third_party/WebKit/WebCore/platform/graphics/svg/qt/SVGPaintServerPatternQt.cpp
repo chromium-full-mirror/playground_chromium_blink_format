@@ -39,10 +39,6 @@ bool SVGPaintServerPattern::setup(GraphicsContext*& context,
       QPainterPath* _path = static_cast<QPainterPath*>(qtContext->path());
       Q_ASSERT(_path != 0);
 
-      if (listener()) {
-          listener()->resourceNotification();
-      }
-
       RenderStyle* renderStyle = object->style();
 
       painter->setPen(Qt::NoPen);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -34,16 +34,18 @@
 #include "SVGURIReference.h"
 
 namespace WebCore {
+struct PatternAttributes;
+
 class SVGLength;
 class SVGPatternElement;
 class SVGTransformList;
+
 class SVGPatternElement : public SVGStyledLocatableElement,
                           public SVGURIReference,
                           public SVGTests,
                           public SVGLangSpace,
                           public SVGExternalResourcesRequired,
-                          public SVGFitToViewBox,
-                          public SVGResourceListener {
+                          public SVGFitToViewBox {
  public:
   SVGPatternElement(const QualifiedName&, Document*);
   virtual ~SVGPatternElement();
@@ -55,7 +57,6 @@ class SVGPatternElement : public SVGStyledLocatableElement,
 
   const SVGStyledElement* pushAttributeContext(const SVGStyledElement*);
 
-  virtual void resourceNotification() const;
   virtual void notifyAttributeChange() const;
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
@@ -66,6 +67,8 @@ class SVGPatternElement : public SVGStyledLocatableElement,
 
   // 'virtual SVGLocatable' functions
   virtual AffineTransform getCTM() const;
+
+  virtual void insertedIntoDocument();
 
  protected:
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
@@ -110,20 +113,15 @@ class SVGPatternElement : public SVGStyledLocatableElement,
                                  PatternTransform,
                                  patternTransform)
 
-  mutable bool m_ignoreAttributeChanges;
-  mutable RefPtr<SVGPaintServerPattern> m_paintServer;
+  mutable RefPtr<SVGPaintServerPattern> m_resource;
 
   virtual const SVGElement* contextElement() const { return this; }
 
  private:
-  // notifyAttributeChange helpers:
-  void fillAttributesFromReferencePattern(
-      const SVGPatternElement* target,
-      AffineTransform& patternTransformMatrix);
-  void drawPatternContentIntoTile(const SVGPatternElement* target,
-                                  const IntSize& newSize,
-                                  AffineTransform patternTransformMatrix);
-  void notifyClientsToRepaint() const;
+  friend class SVGPaintServerPattern;
+  void buildPattern(const FloatRect& targetRect) const;
+
+  PatternAttributes collectPatternProperties() const;
 };
 
 }  // namespace WebCore

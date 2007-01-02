@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -25,6 +25,7 @@
 #ifdef SVG_SUPPORT
 #include "SVGLinearGradientElement.h"
 
+#include "LinearGradientAttributes.h"
 #include "SVGPaintServerLinearGradient.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
@@ -95,84 +96,94 @@ void SVGLinearGradientElement::parseMappedAttribute(MappedAttribute* attr) {
     SVGGradientElement::parseMappedAttribute(attr);
 }
 
-void SVGLinearGradientElement::buildGradient(
-    PassRefPtr<SVGPaintServerGradient> _grad) const {
-  rebuildStops();  // rebuild stops before possibly importing them from any
-                   // referenced gradient.
+void SVGLinearGradientElement::buildGradient() const {
+  LinearGradientAttributes attributes = collectGradientProperties();
 
-  bool bbox =
-      (gradientUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+  // If we didn't find any gradient containing stop elements, ignore the
+  // request.
+  if (attributes.stops().isEmpty())
+    return;
 
-  float _x1, _y1, _x2, _y2;
+  RefPtr<SVGPaintServerLinearGradient> linearGradient =
+      WTF::static_pointer_cast<SVGPaintServerLinearGradient>(m_resource);
 
-  if (bbox) {
-    _x1 = x1().valueAsPercentage();
-    _y1 = y1().valueAsPercentage();
-    _x2 = x2().valueAsPercentage();
-    _y2 = y2().valueAsPercentage();
-  } else {
-    _x1 = x1().value();
-    _y1 = y1().value();
-    _x2 = x2().value();
-    _y2 = y2().value();
-  }
+  linearGradient->setGradientStops(attributes.stops());
+  linearGradient->setBoundingBoxMode(attributes.boundingBoxMode());
+  linearGradient->setGradientSpreadMethod(attributes.spreadMethod());
+  linearGradient->setGradientTransform(attributes.gradientTransform());
+  linearGradient->setGradientStart(
+      FloatPoint(attributes.x1(), attributes.y1()));
+  linearGradient->setGradientEnd(FloatPoint(attributes.x2(), attributes.y2()));
+}
 
-  RefPtr<SVGPaintServerLinearGradient> grad =
-      WTF::static_pointer_cast<SVGPaintServerLinearGradient>(_grad);
-  AffineTransform mat;
-  if (gradientTransform()->numberOfItems() > 0)
-    mat = gradientTransform()->consolidate()->matrix();
+LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties()
+    const {
+  LinearGradientAttributes attributes;
+  HashSet<const SVGGradientElement*> processedGradients;
 
-  RefPtr<SVGPaintServer> pserver =
-      getPaintServerById(document(), href().substring(1));
+  bool isLinear = true;
+  const SVGGradientElement* current = this;
 
-  if (pserver && (pserver->type() == RadialGradientPaintServer ||
-                  pserver->type() == LinearGradientPaintServer)) {
-    bool isLinear = pserver->type() == LinearGradientPaintServer;
-    SVGPaintServerGradient* gradient =
-        static_cast<SVGPaintServerGradient*>(pserver.get());
+  while (current) {
+    if (!attributes.hasSpreadMethod() &&
+        current->hasAttribute(SVGNames::spreadMethodAttr))
+      attributes.setSpreadMethod(
+          (SVGGradientSpreadMethod)current->spreadMethod());
 
-    if (!hasAttribute(SVGNames::gradientUnitsAttr))
-      bbox = gradient->boundingBoxMode();
+    if (!attributes.hasBoundingBoxMode() &&
+        current->hasAttribute(SVGNames::gradientUnitsAttr))
+      attributes.setBoundingBoxMode(
+          current->getAttribute(SVGNames::gradientUnitsAttr) ==
+          "objectBoundingBox");
 
-    if (isLinear) {
-      SVGPaintServerLinearGradient* linear =
-          static_cast<SVGPaintServerLinearGradient*>(pserver.get());
-      if (!hasAttribute(SVGNames::x1Attr))
-        _x1 = linear->gradientStart().x();
+    if (!attributes.hasGradientTransform() &&
+        current->hasAttribute(SVGNames::gradientTransformAttr))
+      attributes.setGradientTransform(
+          current->gradientTransform()->consolidate()->matrix());
 
-      if (!hasAttribute(SVGNames::y1Attr))
-        _y1 = linear->gradientStart().y();
-
-      if (!hasAttribute(SVGNames::x2Attr))
-        _x2 = linear->gradientEnd().x();
-
-      if (!hasAttribute(SVGNames::y2Attr))
-        _y2 = linear->gradientEnd().y();
+    if (!attributes.hasStops()) {
+      const Vector<SVGGradientStop>& stops(current->buildStops());
+      if (!stops.isEmpty())
+        attributes.setStops(stops);
     }
 
-    if (!hasAttribute(SVGNames::gradientTransformAttr))
-      mat = gradient->gradientTransform();
+    if (isLinear) {
+      const SVGLinearGradientElement* linear =
+          static_cast<const SVGLinearGradientElement*>(current);
 
-    // Inherit color stops if empty
-    if (grad->gradientStops().isEmpty())
-      grad->setGradientStops(gradient);
+      if (!attributes.hasX1() && current->hasAttribute(SVGNames::x1Attr))
+        attributes.setX1(linear->x1().valueAsPercentage());
 
-    if (!hasAttribute(SVGNames::spreadMethodAttr))
-      grad->setGradientSpreadMethod(gradient->spreadMethod());
-  } else {
-    if (spreadMethod() == SVG_SPREADMETHOD_REFLECT)
-      grad->setGradientSpreadMethod(SPREADMETHOD_REFLECT);
-    else if (spreadMethod() == SVG_SPREADMETHOD_REPEAT)
-      grad->setGradientSpreadMethod(SPREADMETHOD_REPEAT);
-    else
-      grad->setGradientSpreadMethod(SPREADMETHOD_PAD);
+      if (!attributes.hasY1() && current->hasAttribute(SVGNames::y1Attr))
+        attributes.setY1(linear->y1().valueAsPercentage());
+
+      if (!attributes.hasX2() && current->hasAttribute(SVGNames::x2Attr))
+        attributes.setX2(linear->x2().valueAsPercentage());
+
+      if (!attributes.hasY2() && current->hasAttribute(SVGNames::y2Attr))
+        attributes.setY2(linear->y2().valueAsPercentage());
+    }
+
+    processedGradients.add(current);
+
+    // Respect xlink:href, take attributes from referenced element
+    Node* refNode = ownerDocument()->getElementById(
+        SVGURIReference::getTarget(current->href()));
+    if (refNode && (refNode->hasTagName(SVGNames::linearGradientTag) ||
+                    refNode->hasTagName(SVGNames::radialGradientTag))) {
+      current = static_cast<const SVGGradientElement*>(
+          const_cast<const Node*>(refNode));
+
+      // Cycle detection
+      if (processedGradients.contains(current))
+        return LinearGradientAttributes();
+
+      isLinear = current->gradientType() == LinearGradientPaintServer;
+    } else
+      current = 0;
   }
 
-  grad->setGradientTransform(mat);
-  grad->setBoundingBoxMode(bbox);
-  grad->setGradientStart(FloatPoint(_x1, _y1));
-  grad->setGradientEnd(FloatPoint(_x2, _y2));
+  return attributes;
 }
 }
 

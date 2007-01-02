@@ -28,15 +28,21 @@
 
 #ifdef SVG_SUPPORT
 
-#include "Shared.h"
 #include "PlatformString.h"
+#include "Shared.h"
+#include "StringHash.h"
+
+#include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 
+class AtomicString;
 class Document;
 class RenderPath;
+class SVGDocumentExtensions;
+class SVGStyledElement;
 class TextStream;
-class AtomicString;
 
 typedef Vector<const RenderPath*> RenderPathList;
 
@@ -69,6 +75,9 @@ class SVGResource : public Shared<SVGResource> {
 
   const RenderPathList& clients() const;
 
+  void repaintClients() const;
+  static void repaintClients(HashSet<SVGStyledElement*>);
+
   virtual bool isPaintServer() const { return false; }
   virtual bool isFilter() const { return false; }
   virtual bool isClipper() const { return false; }
@@ -79,13 +88,6 @@ class SVGResource : public Shared<SVGResource> {
 
  private:
   RenderPathList m_clients;
-};
-
-// Helper class notifying about changes in the resources
-class SVGResourceListener {
- public:
-  virtual ~SVGResourceListener() {}
-  virtual void resourceNotification() const = 0;
 };
 
 SVGResource* getResourceById(Document*, const AtomicString&);

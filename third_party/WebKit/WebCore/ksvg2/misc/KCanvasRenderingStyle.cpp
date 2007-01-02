@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                         2006 Alexander Kellett <lypanov@kde.org>
 
@@ -22,16 +22,18 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "KCanvasRenderingStyle.h"
 
 #include "CSSValueList.h"
 #include "Document.h"
-#include "SVGPaintServerGradient.h"
-#include "SVGPaintServerSolid.h"
 #include "RenderObject.h"
 #include "RenderPath.h"
 #include "SVGLength.h"
+#include "SVGPaintServerGradient.h"
+#include "SVGPaintServerSolid.h"
+#include "SVGURIReference.h"
 #include "SVGRenderStyle.h"
 #include "SVGStyledElement.h"
 
@@ -55,10 +57,17 @@ SVGPaintServer* KSVGPainterFactory::fillPaintServer(const RenderStyle* style,
 
   SVGPaintServer* fillPaintServer = 0;
   if (fill->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
-    fillPaintServer = getPaintServerById(
-        item->document(), AtomicString(fill->uri().substring(1)));
-    if (fillPaintServer && item->isRenderPath())
+    AtomicString id(SVGURIReference::getTarget(fill->uri()));
+    fillPaintServer = getPaintServerById(item->document(), id);
+
+    if (item->isRenderPath() && fillPaintServer)
       fillPaintServer->addClient(static_cast<const RenderPath*>(item));
+    else if (!fillPaintServer) {
+      SVGElement* svgElement = static_cast<SVGElement*>(item->element());
+      ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
+      svgElement->document()->accessSVGExtensions()->addPendingResource(
+          id, static_cast<SVGStyledElement*>(svgElement));
+    }
   } else {
     fillPaintServer = sharedSolidPaintServer();
     SVGPaintServerSolid* fillPaintServerSolid =
@@ -90,10 +99,17 @@ SVGPaintServer* KSVGPainterFactory::strokePaintServer(
 
   SVGPaintServer* strokePaintServer = 0;
   if (stroke->paintType() == SVGPaint::SVG_PAINTTYPE_URI) {
-    strokePaintServer = getPaintServerById(
-        item->document(), AtomicString(stroke->uri().substring(1)));
-    if (item && strokePaintServer && item->isRenderPath())
+    AtomicString id(SVGURIReference::getTarget(stroke->uri()));
+    strokePaintServer = getPaintServerById(item->document(), id);
+
+    if (item->isRenderPath() && strokePaintServer)
       strokePaintServer->addClient(static_cast<const RenderPath*>(item));
+    else if (!strokePaintServer) {
+      SVGElement* svgElement = static_cast<SVGElement*>(item->element());
+      ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
+      svgElement->document()->accessSVGExtensions()->addPendingResource(
+          id, static_cast<SVGStyledElement*>(svgElement));
+    }
   } else {
     strokePaintServer = sharedSolidPaintServer();
     SVGPaintServerSolid* strokePaintServerSolid =
@@ -157,5 +173,6 @@ KCDashArray KSVGPainterFactory::dashArrayFromRenderingStyle(
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

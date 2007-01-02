@@ -43,9 +43,6 @@ bool SVGPaintServerLinearGradient::setup(GraphicsContext*& context,
   QPainterPath* path(context ? context->currentPath() : 0);
   Q_ASSERT(path);
 
-  if (listener())
-    listener()->resourceNotification();
-
   RenderStyle* renderStyle = object->style();
 
   double x1, x2, y1, y2;

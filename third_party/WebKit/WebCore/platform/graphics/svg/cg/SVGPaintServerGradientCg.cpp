@@ -25,6 +25,7 @@
 #include "SVGPaintServerGradient.h"
 
 #include "GraphicsContext.h"
+#include "SVGGradientElement.h"
 #include "SVGPaintServerLinearGradient.h"
 #include "SVGPaintServerRadialGradient.h"
 #include "RenderPath.h"
@@ -35,7 +36,8 @@ namespace WebCore {
 static void cgGradientCallback(void* info,
                                const CGFloat* inValues,
                                CGFloat* outColor) {
-  const SVGPaintServerGradient* server = (const SVGPaintServerGradient*)info;
+  const SVGPaintServerGradient* server =
+      reinterpret_cast<const SVGPaintServerGradient*>(info);
   SVGPaintServerGradient::QuartzGradientStop* stops = server->m_stopsCache;
   int stopsCount = server->m_stopsCount;
 
@@ -62,12 +64,9 @@ static void cgGradientCallback(void* info,
            (stops[nextStopIndex].offset < inValue))
       nextStopIndex++;
 
-    // float nextOffset = stops[nextStopIndex].offset;
     CGFloat* nextColorArray = stops[nextStopIndex].colorArray;
     CGFloat* previousColorArray = stops[nextStopIndex - 1].colorArray;
-    // float totalDelta = nextOffset - previousOffset;
     CGFloat diffFromPrevious = inValue - stops[nextStopIndex - 1].offset;
-    // float percent = diffFromPrevious / totalDelta;
     CGFloat percent =
         diffFromPrevious * stops[nextStopIndex].previousDeltaInverse;
 
@@ -114,10 +113,10 @@ static CGShadingRef CGShadingRefForRadialGradient(
   // Spec: If (fx, fy) lies outside the circle defined by (cx, cy) and r, set
   // (fx, fy)
   // to the point of intersection of the line through (fx, fy) and the circle.
-  if (sqrt(fdx * fdx + fdy * fdy) > radius) {
-    double angle = atan2(focus.y, focus.x);
-    focus.x = int(cos(angle) * radius) - 1;
-    focus.y = int(sin(angle) * radius) - 1;
+  if (sqrtf(fdx * fdx + fdy * fdy) > radius) {
+    double angle = atan2(focus.y * 100.0, focus.x * 100.0);
+    focus.x = cos(angle) * radius;
+    focus.y = sin(angle) * radius;
   }
 
   CGFunctionCallbacks callbacks = {0, cgGradientCallback, NULL};
@@ -132,14 +131,6 @@ static CGShadingRef CGShadingRefForRadialGradient(
   CGColorSpaceRelease(colorSpace);
   CGFunctionRelease(shadingFunction);
   return shading;
-}
-
-void SVGPaintServerGradient::invalidateCaches() {
-  delete m_stopsCache;
-  CGShadingRelease(m_shadingCache);
-
-  m_stopsCache = 0;
-  m_shadingCache = 0;
 }
 
 void SVGPaintServerGradient::updateQuartzGradientStopsCache(
@@ -167,8 +158,7 @@ void SVGPaintServerGradient::updateQuartzGradientCache(
   if (!m_stopsCache)
     updateQuartzGradientStopsCache(gradientStops());
 
-  if (m_shadingCache)
-    CGShadingRelease(m_shadingCache);
+  CGShadingRelease(m_shadingCache);
 
   if (type() == RadialGradientPaintServer) {
     const SVGPaintServerRadialGradient* radial =
@@ -190,16 +180,26 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
   RenderStyle* style = object->style();
   ASSERT(contextRef);
 
+  // As renderPath() is not used when painting text, special logic needed here.
+  if (isPaintingText) {
+    IntRect textBoundary =
+        const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
+    FloatRect targetRect =
+        object->absoluteTransform().inverse().mapRect(textBoundary);
+    handleBoundingBoxModeAndGradientTransformation(context, targetRect);
+  }
+
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill()) {
     // workaround for filling the entire screen with the shading in the case
     // that no text was intersected with the clip
     if (!isPaintingText || (object->width() > 0 && object->height() > 0))
       CGContextDrawShading(contextRef, shading);
+
     context->restore();
   }
 
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke()) {
-    if (isPaintingText) {
+    if (isPaintingText && m_savedContext) {
       IntRect maskRect =
           const_cast<RenderObject*>(object)->absoluteBoundingBoxRect();
       maskRect = object->absoluteTransform().inverse().mapRect(maskRect);
@@ -232,27 +232,36 @@ void SVGPaintServerGradient::teardown(GraphicsContext*& context,
 void SVGPaintServerGradient::renderPath(GraphicsContext*& context,
                                         const RenderPath* path,
                                         SVGPaintTargetType type) const {
-  CGContextRef contextRef = context->platformContext();
   RenderStyle* style = path->style();
+  CGContextRef contextRef = context->platformContext();
   ASSERT(contextRef);
 
   // Compute destination object bounding box
-  CGRect objectBBox;
+  FloatRect objectBBox;
   if (boundingBoxMode())
     objectBBox = CGContextGetPathBoundingBox(contextRef);
 
   if ((type & ApplyToFillTargetType) && style->svgStyle()->hasFill())
     clipToFillPath(contextRef, path);
+
   if ((type & ApplyToStrokeTargetType) && style->svgStyle()->hasStroke())
     clipToStrokePath(contextRef, path);
 
+  handleBoundingBoxModeAndGradientTransformation(context, objectBBox);
+}
+
+void SVGPaintServerGradient::handleBoundingBoxModeAndGradientTransformation(
+    GraphicsContext* context,
+    const FloatRect& targetRect) const {
+  CGContextRef contextRef = context->platformContext();
+
   if (boundingBoxMode()) {
     // Choose default gradient bounding box
-    CGRect gradientBBox = CGRectMake(0, 0, 100, 100);
+    CGRect gradientBBox = CGRectMake(0.0, 0.0, 1.0, 1.0);
 
     // Generate a transform to map between both bounding boxes
     CGAffineTransform gradientIntoObjectBBox =
-        CGAffineTransformMakeMapBetweenRects(gradientBBox, objectBBox);
+        CGAffineTransformMakeMapBetweenRects(gradientBBox, CGRect(targetRect));
     CGContextConcatCTM(contextRef, gradientIntoObjectBBox);
   }
 
@@ -265,11 +274,8 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                                    const RenderObject* object,
                                    SVGPaintTargetType type,
                                    bool isPaintingText) const {
-  if (listener())  // this seems like bad design to me, should be in a common
-                   // baseclass. -- ecs 8/6/05
-    listener()->resourceNotification();
+  m_ownerElement->buildGradient();
 
-  // FIXME: total const HACK!
   // We need a hook to call this when the gradient gets updated, before drawn.
   if (!m_shadingCache)
     const_cast<SVGPaintServerGradient*>(this)->updateQuartzGradientCache(this);
@@ -300,6 +306,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
       ImageBuffer* maskImage = GraphicsContext::createImageBuffer(
           IntSize(maskRect.width(), maskRect.height()), false);
       // FIXME: maskImage could be NULL
+
       GraphicsContext* maskImageContext = maskImage->context();
 
       maskImageContext->save();
@@ -319,7 +326,12 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
 }
 
 void SVGPaintServerGradient::invalidate() {
-  invalidateCaches();
+  // Invalidate caches
+  delete m_stopsCache;
+  CGShadingRelease(m_shadingCache);
+
+  m_stopsCache = 0;
+  m_shadingCache = 0;
 }
 
 }  // namespace WebCore
