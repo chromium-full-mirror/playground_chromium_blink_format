@@ -335,6 +335,13 @@ know we are in UTF-8 mode. */
     ++len;                                 \
   }
 
+#define GETCHARLENEND(c, eptr, end, len)                        \
+  c = eptr[0];                                                  \
+  if (IS_LEADING_SURROGATE(c)) {                                \
+    c = DECODE_SURROGATE_PAIR(c, eptr + 1 < end ? eptr[1] : 0); \
+    ++len;                                                      \
+  }
+
 #define ISMIDCHAR(c) IS_TRAILING_SURROGATE(c)
 
 #else

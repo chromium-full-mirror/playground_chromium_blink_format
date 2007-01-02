@@ -239,10 +239,12 @@ PCRE_DATA_SCOPE int pcre_callout(pcre_callout_block*);
 
 PCRE_DATA_SCOPE pcre* pcre_compile(const pcre_char*,
                                    int,
+                                   int,
                                    const char**,
                                    int*,
                                    const unsigned char*);
 PCRE_DATA_SCOPE pcre* pcre_compile2(const pcre_char*,
+                                    int,
                                     int,
                                     int*,
                                     const char**,
