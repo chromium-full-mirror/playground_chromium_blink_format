@@ -1172,6 +1172,7 @@ void ContentData::clearContent() {
       break;
     default:;
   }
+  _contentType = CONTENT_NONE;
 }
 
 #ifdef XBL_SUPPORT
