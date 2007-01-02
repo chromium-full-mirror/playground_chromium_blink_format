@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
     This file is part of the KDE project
 
@@ -50,6 +51,11 @@ SVGAnimateTransformElement::SVGAnimateTransformElement(
 
 SVGAnimateTransformElement::~SVGAnimateTransformElement() {}
 
+bool SVGAnimateTransformElement::hasValidTarget() const {
+  return (SVGAnimationElement::hasValidTarget() &&
+          targetElement()->isStyledTransformable());
+}
+
 void SVGAnimateTransformElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == SVGNames::typeAttr) {
     const String& value = attr->value();
@@ -82,6 +88,8 @@ void SVGAnimateTransformElement::storeInitialValue() {
         if (!value)
           continue;
 
+        // FIXME: This is wrong if the initial transform list has not been
+        // normalized
         if (value->type() == m_type) {
           m_initialTransform = value;
           break;
@@ -148,16 +156,10 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
   if (m_fromTransform && qFromMatrix.isIdentity())
     qFromMatrix = m_fromTransform->matrix();
 
-  /* FIXME: This logic needs fixing, was broken before, is still broken.
-      if (m_transformMatrix)
-      m_transformMatrix = new SVGMatrix();
-  else {
-      m_transformMatrix.reset();
+  m_currentTransform.reset();
 
-      if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
-          m_transformMatrix->multiply(m_lastMatrix.get());
-  }
-  */
+  if (isAccumulated() && repeations() != 0.0)
+    m_currentTransform.multiply(m_lastTransform);
 
   switch (m_type) {
     case SVGTransform::SVG_TRANSFORM_TRANSLATE: {
@@ -166,7 +168,7 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
       double dy = ((qToMatrix.f() - qFromMatrix.f()) * useTimePercentage) +
                   qFromMatrix.f();
 
-      m_transformMatrix.translate(dx, dy);
+      m_currentTransform.translate(dx, dy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SCALE: {
@@ -175,7 +177,7 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
       double sy = ((qToMatrix.d() - qFromMatrix.d()) * useTimePercentage) +
                   qFromMatrix.d();
 
-      m_transformMatrix.scale(sx, sy);
+      m_currentTransform.scale(sx, sy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_ROTATE: {
@@ -193,9 +195,9 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
       double cx = (toCx - fromCx) * useTimePercentage + fromCx;
       double cy = (toCy - fromCy) * useTimePercentage + fromCy;
 
-      m_transformMatrix.translate(cx, cy);
-      m_transformMatrix.rotate(angle);
-      m_transformMatrix.translate(-cx, -cy);
+      m_currentTransform.translate(cx, cy);
+      m_currentTransform.rotate(angle);
+      m_currentTransform.translate(-cx, -cy);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWX: {
@@ -204,7 +206,7 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
            useTimePercentage) +
           SVGAngle::todeg(atan(qFromMatrix.c()));
 
-      m_transformMatrix.shear(sx, 1.0);
+      m_currentTransform.shear(sx, 1.0);
       break;
     }
     case SVGTransform::SVG_TRANSFORM_SKEWY: {
@@ -213,7 +215,7 @@ bool SVGAnimateTransformElement::updateCurrentValue(double timePercentage) {
            useTimePercentage) +
           SVGAngle::todeg(atan(qFromMatrix.b()));
 
-      m_transformMatrix.shear(1.0, sy);
+      m_currentTransform.shear(1.0, sy);
       break;
     }
     default:
@@ -278,28 +280,8 @@ bool SVGAnimateTransformElement::handleStartCondition() {
   return true;
 }
 
-void SVGAnimateTransformElement::handleEndCondition() {
-  if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
-      isIndefinite(m_repeatCount)) {
-    m_lastMatrix.reset();
-
-    if (!m_transformMatrix.isIdentity())
-      m_lastMatrix = m_transformMatrix;
-
-    m_repeations++;
-    return;
-  }
-
-  disconnectTimer();
-  resetValues();
-
-  if (!isFrozen()) {
-    AffineTransform initial = initialMatrix();
-    if (!initial.isIdentity())
-      m_transformMatrix = initial;
-    else
-      m_transformMatrix.reset();
-  }
+void SVGAnimateTransformElement::updateLastValueWithCurrent() {
+  m_lastTransform = m_currentTransform;
 }
 
 void SVGAnimateTransformElement::applyAnimationToValue(
@@ -309,7 +291,7 @@ void SVGAnimateTransformElement::applyAnimationToValue(
     targetTransforms->clear(ec);
 
   RefPtr<SVGTransform> targetTransform = new SVGTransform();
-  targetTransform->setMatrix(m_transformMatrix);
+  targetTransform->setMatrix(m_currentTransform);
   targetTransforms->appendItem(targetTransform.get(), ec);
 }
 
@@ -435,25 +417,8 @@ void SVGAnimateTransformElement::calculateRotationFromMatrix(
   angle = 0.0;
 }
 
-AffineTransform SVGAnimateTransformElement::initialMatrix() const {
-  if (!targetElement()->isStyledTransformable())
-    return AffineTransform();
-  SVGStyledTransformableElement* transform =
-      static_cast<SVGStyledTransformableElement*>(targetElement());
-  SVGTransformList* transformList =
-      (transform ? transform->transformBaseValue() : 0);
-  if (!transformList)
-    return AffineTransform();
-
-  RefPtr<SVGTransform> result = transformList->concatenate();
-  if (!result)
-    return AffineTransform();
-
-  return result->matrix();
-}
-
-AffineTransform SVGAnimateTransformElement::transformMatrix() const {
-  return m_transformMatrix;
+AffineTransform SVGAnimateTransformElement::currentTransform() const {
+  return m_currentTransform;
 }
 }
 

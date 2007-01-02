@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
     This file is part of the KDE project
 
@@ -36,6 +37,8 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
   SVGAnimateTransformElement(const QualifiedName&, Document*);
   virtual ~SVGAnimateTransformElement();
 
+  virtual bool hasValidTarget() const;
+
   virtual void parseMappedAttribute(MappedAttribute*);
 
   void applyAnimationToValue(SVGTransformList*);
@@ -47,17 +50,16 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
                                    double& cx,
                                    double& cy) const;
 
-  AffineTransform initialMatrix() const;
-  AffineTransform transformMatrix() const;
+  AffineTransform currentTransform() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }
   void storeInitialValue();
-  void resetValues();
+  virtual void resetValues();
 
   virtual bool updateCurrentValue(double timePercentage);
   virtual bool handleStartCondition();
-  virtual void handleEndCondition();
+  virtual void updateLastValueWithCurrent();
 
  private:
   int m_currentItem;
@@ -67,8 +69,8 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
   RefPtr<SVGTransform> m_fromTransform;
   RefPtr<SVGTransform> m_initialTransform;
 
-  AffineTransform m_lastMatrix;
-  AffineTransform m_transformMatrix;
+  AffineTransform m_lastTransform;
+  AffineTransform m_currentTransform;
 
   mutable bool m_rotateSpecialCase : 1;
   bool m_toRotateSpecialCase : 1;

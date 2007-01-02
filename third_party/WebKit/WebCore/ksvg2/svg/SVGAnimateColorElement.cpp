@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
     This file is part of the KDE project
 
@@ -172,16 +173,8 @@ bool SVGAnimateColorElement::handleStartCondition() {
   return true;
 }
 
-void SVGAnimateColorElement::handleEndCondition() {
-  if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
-      isIndefinite(m_repeatCount)) {
-    m_lastColor = m_currentColor;
-    m_repeations++;
-    return;
-  }
-
-  disconnectTimer();
-  resetValues();
+void SVGAnimateColorElement::updateLastValueWithCurrent() {
+  m_lastColor = m_currentColor;
 }
 
 void SVGAnimateColorElement::applyAnimationToValue(Color& currentColor) {

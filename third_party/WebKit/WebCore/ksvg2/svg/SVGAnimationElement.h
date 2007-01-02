@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
     This file is part of the KDE project
 
@@ -71,6 +72,8 @@ class SVGAnimationElement : public SVGElement,
   // 'SVGAnimationElement' functions
   SVGElement* targetElement() const;
 
+  virtual bool hasValidTarget() const;
+
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   double getEndTime() const;
@@ -122,7 +125,8 @@ class SVGAnimationElement : public SVGElement,
 
   virtual bool updateCurrentValue(double timePercentage) = 0;
   virtual bool handleStartCondition() = 0;
-  virtual void handleEndCondition() = 0;
+  virtual void updateLastValueWithCurrent(){};
+  virtual void resetValues() {}
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
@@ -154,7 +158,7 @@ class SVGAnimationElement : public SVGElement,
   double m_end;
   double m_begin;
 
-  double m_repeations;
+  double m_repetitions;
   double m_repeatCount;
 
   RefPtr<SVGStringList> m_values;

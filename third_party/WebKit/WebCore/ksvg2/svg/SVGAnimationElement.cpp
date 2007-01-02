@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+    Copyright (C) 2007 Eric Seidel <eric@webkit.org>
 
     This file is part of the KDE project
 
@@ -59,10 +60,14 @@ SVGAnimationElement::SVGAnimationElement(const QualifiedName& tagName,
       m_min(0.0),
       m_end(0.0),
       m_begin(0.0),
-      m_repeations(0),
+      m_repetitions(0),
       m_repeatCount(0) {}
 
 SVGAnimationElement::~SVGAnimationElement() {}
+
+bool SVGAnimationElement::hasValidTarget() const {
+  return targetElement();
+}
 
 SVGElement* SVGAnimationElement::targetElement() const {
   if (!m_targetElement) {
@@ -116,17 +121,12 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
       m_attributeType = ATTRIBUTETYPE_AUTO;
   } else if (attr->name() == SVGNames::beginAttr ||
              attr->name() == SVGNames::endAttr) {
-    // Create list
-    RefPtr<SVGStringList> temp = new SVGStringList();
-
-    // Feed data into list
-    temp->parse(value, ';');
+    RefPtr<SVGStringList> valueList = new SVGStringList();
+    valueList->parse(value, ';');
 
     ExceptionCode ec = 0;
-
-    // Parse data
-    for (unsigned int i = 0; i < temp->numberOfItems(); i++) {
-      String current = temp->getItem(i, ec);
+    for (unsigned int i = 0; i < valueList->numberOfItems(); i++) {
+      String current = valueList->getItem(i, ec);
 
       if (current.startsWith("accessKey")) {
         // Register keyDownEventListener for the character
@@ -247,7 +247,6 @@ void SVGAnimationElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     if (SVGExternalResourcesRequired::parseMappedAttribute(attr))
       return;
-
     SVGElement::parseMappedAttribute(attr);
   }
 }
@@ -506,7 +505,7 @@ double SVGAnimationElement::calculateRelativeTimePercentage(
 }
 
 double SVGAnimationElement::repeations() const {
-  return m_repeations;
+  return m_repetitions;
 }
 
 bool SVGAnimationElement::isIndefinite(double value) const {
@@ -549,15 +548,25 @@ static double calculateTimePercentage(double elapsedSeconds,
 void SVGAnimationElement::handleTimerEvent(double timePercentage) {
   if (!connectedToTimer()) {
     connectTimer();
-    handleStartCondition();  // Check bool if adding anything after this call
+    handleStartCondition();  // Need to check bool return if adding anything
+                             // after this call
     return;
   }
 
   if (!updateCurrentValue(timePercentage))
     return;
 
-  if (timePercentage == 1.0)
-    handleEndCondition();
+  if (timePercentage == 1.0) {
+    if ((m_repeatCount > 0 && m_repetitions < m_repeatCount - 1) ||
+        isIndefinite(m_repeatCount)) {
+      updateLastValueWithCurrent();
+      m_repetitions++;
+      return;
+    }
+
+    disconnectTimer();
+    resetValues();
+  }
 }
 
 bool SVGAnimationElement::updateForElapsedSeconds(double elapsedSeconds) {
@@ -570,7 +579,7 @@ bool SVGAnimationElement::updateForElapsedSeconds(double elapsedSeconds) {
     return false;  // Ignore dur="0" or dur="-neg"
 
   float percentage = calculateTimePercentage(elapsedSeconds, m_begin, m_end,
-                                             m_simpleDuration, m_repeations);
+                                             m_simpleDuration, m_repetitions);
 
   if (percentage <= 1.0 || connectedToTimer())
     handleTimerEvent(percentage);
