@@ -158,6 +158,7 @@ class RenderTable : public RenderBlock {
 
   RenderTableCol* colElement(int col) const;
 
+  bool needsSectionRecalc() const { return needSectionRecalc; }
   void setNeedSectionRecalc() { needSectionRecalc = true; }
 
   virtual RenderObject* removeChildNode(RenderObject*);
