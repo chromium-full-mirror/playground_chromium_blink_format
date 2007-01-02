@@ -301,11 +301,9 @@ KJS::Bindings::RootObject* FrameQt::bindingRootObject() {
   ASSERT(settings()->isJavaScriptEnabled());
   if (!m_bindingRoot) {
     JSLock lock;
-    m_bindingRoot = new KJS::Bindings::RootObject(
-        0);  // The root gets deleted by JavaScriptCore.
-    KJS::JSObject* win = KJS::Window::retrieveWindow(this);
-    m_bindingRoot->setRootObjectImp(win);
-    m_bindingRoot->setInterpreter(scriptProxy()->interpreter());
+    // The root gets deleted by JavaScriptCore.
+    m_bindingRoot =
+        new KJS::Bindings::RootObject(0, scriptProxy()->interpreter());
     addPluginRootObject(m_bindingRoot);
   }
   return m_bindingRoot;
