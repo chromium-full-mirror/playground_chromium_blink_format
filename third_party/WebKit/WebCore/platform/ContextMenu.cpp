@@ -35,6 +35,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "KURL.h"
+#include "LocalizedStrings.h"
 #include "Node.h"
 #include "Page.h"
 #include "ResourceRequest.h"
@@ -60,17 +61,21 @@ static void createAndAppendFontSubMenu(const HitTestResult& result,
   ContextMenu* fontMenu = new ContextMenu(result);
 #if PLATFORM(MAC)
   ContextMenuItem showFonts(ActionType, ContextMenuItemTagShowFonts,
-                            "Show Fonts");
+                            contextMenuItemTagShowFonts());
 #endif
-  ContextMenuItem bold(ActionType, ContextMenuItemTagBold, "Bold");
-  ContextMenuItem italic(ActionType, ContextMenuItemTagItalic, "Italic");
+  ContextMenuItem bold(ActionType, ContextMenuItemTagBold,
+                       contextMenuItemTagBold());
+  ContextMenuItem italic(ActionType, ContextMenuItemTagItalic,
+                         contextMenuItemTagItalic());
   ContextMenuItem underline(ActionType, ContextMenuItemTagUnderline,
-                            "Underline");
-  ContextMenuItem outline(ActionType, ContextMenuItemTagOutline, "Outline");
+                            contextMenuItemTagUnderline());
+  ContextMenuItem outline(ActionType, ContextMenuItemTagOutline,
+                          contextMenuItemTagOutline());
 #if PLATFORM(MAC)
-  ContextMenuItem styles(ActionType, ContextMenuItemTagStyles, "Styles...");
+  ContextMenuItem styles(ActionType, ContextMenuItemTagStyles,
+                         contextMenuItemTagStyles());
   ContextMenuItem showColors(ActionType, ContextMenuItemTagShowColors,
-                             "Show Colors");
+                             contextMenuItemTagShowColors());
 #endif
 
 #if PLATFORM(MAC)
@@ -96,15 +101,15 @@ static void createAndAppendSpellingAndGrammarSubMenu(
   ContextMenu* spellingAndGrammarMenu = new ContextMenu(result);
   ContextMenuItem showSpellingPanel(ActionType,
                                     ContextMenuItemTagShowSpellingPanel,
-                                    "Show Spelling and Grammar");
+                                    contextMenuItemTagShowSpellingPanel(true));
   ContextMenuItem checkSpelling(ActionType, ContextMenuItemTagCheckSpelling,
-                                "Check Document Now");
+                                contextMenuItemTagCheckSpelling());
   ContextMenuItem checkAsYouType(ActionType,
                                  ContextMenuItemTagCheckSpellingWhileTyping,
-                                 "Check Spelling While Typing");
+                                 contextMenuItemTagCheckSpellingWhileTyping());
   ContextMenuItem grammarWithSpelling(
       ActionType, ContextMenuItemTagCheckGrammarWithSpelling,
-      "Check Grammar With Spelling");
+      contextMenuItemTagCheckGrammarWithSpelling());
 
   spellingAndGrammarMenu->appendItem(showSpellingPanel);
   spellingAndGrammarMenu->appendItem(checkSpelling);
@@ -118,13 +123,14 @@ static void createAndAppendSpellingAndGrammarSubMenu(
 static void createAndAppendSpellingSubMenu(const HitTestResult& result,
                                            ContextMenuItem& spellingMenuItem) {
   ContextMenu* spellingMenu = new ContextMenu(result);
-  ContextMenuItem showSpellingPanel(
-      ActionType, ContextMenuItemTagShowSpellingPanel, "Spelling...");
+  ContextMenuItem showSpellingPanel(ActionType,
+                                    ContextMenuItemTagShowSpellingPanel,
+                                    contextMenuItemTagShowSpellingPanel(true));
   ContextMenuItem checkSpelling(ActionType, ContextMenuItemTagCheckSpelling,
-                                "Check Spelling");
+                                contextMenuItemTagCheckSpelling());
   ContextMenuItem checkAsYouType(ActionType,
                                  ContextMenuItemTagCheckSpellingWhileTyping,
-                                 "Check Spelling as You Type");
+                                 contextMenuItemTagCheckSpellingWhileTyping());
 
   spellingMenu->appendItem(showSpellingPanel);
   spellingMenu->appendItem(checkSpelling);
@@ -138,9 +144,9 @@ static void createAndAppendSpeechSubMenu(const HitTestResult& result,
                                          ContextMenuItem& speechMenuItem) {
   ContextMenu* speechMenu = new ContextMenu(result);
   ContextMenuItem start(ActionType, ContextMenuItemTagStartSpeaking,
-                        "Start Speaking");
+                        contextMenuItemTagStartSpeaking());
   ContextMenuItem stop(ActionType, ContextMenuItemTagStartSpeaking,
-                       "Stop Speaking");
+                       contextMenuItemTagStartSpeaking());
 
   speechMenu->appendItem(start);
   speechMenu->appendItem(stop);
@@ -153,11 +159,11 @@ static void createAndAppendWritingDirectionSubMenu(
     ContextMenuItem& writingDirectionMenuItem) {
   ContextMenu* writingDirectionMenu = new ContextMenu(result);
   ContextMenuItem defaultItem(ActionType, ContextMenuItemTagDefaultDirection,
-                              "Default");
+                              contextMenuItemTagDefaultDirection());
   ContextMenuItem ltr(ActionType, ContextMenuItemTagLeftToRight,
-                      "Left to Right");
+                      contextMenuItemTagLeftToRight());
   ContextMenuItem rtl(ActionType, ContextMenuItemTagRightToLeft,
-                      "Right to Left");
+                      contextMenuItemTagRightToLeft());
 
   writingDirectionMenu->appendItem(defaultItem);
   writingDirectionMenu->appendItem(ltr);
@@ -168,49 +174,61 @@ static void createAndAppendWritingDirectionSubMenu(
 
 void ContextMenu::populate() {
   ContextMenuItem OpenLinkItem(ActionType, ContextMenuItemTagOpenLink,
-                               "Open Link");
-  ContextMenuItem OpenLinkInNewWindowItem(ActionType,
-                                          ContextMenuItemTagOpenLinkInNewWindow,
-                                          "Open Link in New Window");
-  ContextMenuItem DownloadFileItem(
-      ActionType, ContextMenuItemTagDownloadLinkToDisk, "Download Linked File");
-  ContextMenuItem CopyLinkItem(
-      ActionType, ContextMenuItemTagCopyLinkToClipboard, "Copy Link");
+                               contextMenuItemTagOpenLink());
+  ContextMenuItem OpenLinkInNewWindowItem(
+      ActionType, ContextMenuItemTagOpenLinkInNewWindow,
+      contextMenuItemTagOpenLinkInNewWindow());
+  ContextMenuItem DownloadFileItem(ActionType,
+                                   ContextMenuItemTagDownloadLinkToDisk,
+                                   contextMenuItemTagDownloadLinkToDisk());
+  ContextMenuItem CopyLinkItem(ActionType,
+                               ContextMenuItemTagCopyLinkToClipboard,
+                               contextMenuItemTagCopyLinkToClipboard());
   ContextMenuItem OpenImageInNewWindowItem(
       ActionType, ContextMenuItemTagOpenImageInNewWindow,
-      "Open Image in New Window");
-  ContextMenuItem DownloadImageItem(
-      ActionType, ContextMenuItemTagDownloadImageToDisk, "Download Image");
-  ContextMenuItem CopyImageItem(
-      ActionType, ContextMenuItemTagCopyImageToClipboard, "Copy Image");
+      contextMenuItemTagOpenImageInNewWindow());
+  ContextMenuItem DownloadImageItem(ActionType,
+                                    ContextMenuItemTagDownloadImageToDisk,
+                                    contextMenuItemTagDownloadImageToDisk());
+  ContextMenuItem CopyImageItem(ActionType,
+                                ContextMenuItemTagCopyImageToClipboard,
+                                contextMenuItemTagCopyImageToClipboard());
 #if PLATFORM(MAC)
-  ContextMenuItem SearchSpotlightItem(
-      ActionType, ContextMenuItemTagSearchInSpotlight, "Search in Spotlight");
+  ContextMenuItem SearchSpotlightItem(ActionType,
+                                      ContextMenuItemTagSearchInSpotlight,
+                                      contextMenuItemTagSearchInSpotlight());
 #endif
   ContextMenuItem SearchWebItem(ActionType, ContextMenuItemTagSearchWeb,
-                                "Search in Google");
+                                contextMenuItemTagSearchWeb());
   ContextMenuItem LookInDictionaryItem(ActionType,
                                        ContextMenuItemTagLookUpInDictionary,
-                                       "Look Up in Dictionary");
-  ContextMenuItem CopyItem(ActionType, ContextMenuItemTagCopy, "Copy");
-  ContextMenuItem BackItem(ActionType, ContextMenuItemTagGoBack, "Back");
+                                       contextMenuItemTagLookUpInDictionary());
+  ContextMenuItem CopyItem(ActionType, ContextMenuItemTagCopy,
+                           contextMenuItemTagCopy());
+  ContextMenuItem BackItem(ActionType, ContextMenuItemTagGoBack,
+                           contextMenuItemTagGoBack());
   ContextMenuItem ForwardItem(ActionType, ContextMenuItemTagGoForward,
-                              "Forward");
-  ContextMenuItem StopItem(ActionType, ContextMenuItemTagStop, "Stop");
-  ContextMenuItem ReloadItem(ActionType, ContextMenuItemTagReload, "Reload");
+                              contextMenuItemTagGoForward());
+  ContextMenuItem StopItem(ActionType, ContextMenuItemTagStop,
+                           contextMenuItemTagStop());
+  ContextMenuItem ReloadItem(ActionType, ContextMenuItemTagReload,
+                             contextMenuItemTagReload());
   ContextMenuItem OpenFrameItem(ActionType,
                                 ContextMenuItemTagOpenFrameInNewWindow,
-                                "Open Frame in New Window");
+                                contextMenuItemTagOpenFrameInNewWindow());
   ContextMenuItem NowGuessesItem(ActionType, ContextMenuItemTagNoGuessesFound,
-                                 "No Guesses Found");
-  ContextMenuItem IgnoreSpellingItem(
-      ActionType, ContextMenuItemTagIgnoreSpelling, "Ignore Spelling");
+                                 contextMenuItemTagNoGuessesFound());
+  ContextMenuItem IgnoreSpellingItem(ActionType,
+                                     ContextMenuItemTagIgnoreSpelling,
+                                     contextMenuItemTagIgnoreSpelling());
   ContextMenuItem LearnSpellingItem(ActionType, ContextMenuItemTagLearnSpelling,
-                                    "Learn Spelling");
+                                    contextMenuItemTagLearnSpelling());
   ContextMenuItem IgnoreGrammarItem(ActionType, ContextMenuItemTagIgnoreGrammar,
-                                    "Ignore Grammar");
-  ContextMenuItem CutItem(ActionType, ContextMenuItemTagCut, "Cut");
-  ContextMenuItem PasteItem(ActionType, ContextMenuItemTagPaste, "Paste");
+                                    contextMenuItemTagIgnoreGrammar());
+  ContextMenuItem CutItem(ActionType, ContextMenuItemTagCut,
+                          contextMenuItemTagCut());
+  ContextMenuItem PasteItem(ActionType, ContextMenuItemTagPaste,
+                            contextMenuItemTagPaste());
 
   HitTestResult result = hitTestResult();
 
@@ -337,29 +355,31 @@ void ContextMenu::populate() {
       appendItem(*separatorItem());
 #ifndef BUILDING_ON_TIGER
       ContextMenuItem SpellingAndGrammarMenuItem(
-          SubmenuType, ContextMenuItemTagSpellingMenu, "Spelling and Grammar");
+          SubmenuType, ContextMenuItemTagSpellingMenu,
+          contextMenuItemTagSpellingMenu());
       createAndAppendSpellingAndGrammarSubMenu(m_hitTestResult,
                                                SpellingAndGrammarMenuItem);
       appendItem(SpellingAndGrammarMenuItem);
 #else
-      ContextMenuItem SpellingMenuItem(
-          SubmenuType, ContextMenuItemTagSpellingMenu, "Spelling");
+      ContextMenuItem SpellingMenuItem(SubmenuType,
+                                       ContextMenuItemTagSpellingMenu,
+                                       contextMenuItemTagSpellingMenu());
       createAndAppendSpellingSubMenu(m_hitTestResult, SpellingMenuItem);
       appendItem(SpellingMenuItem);
 #endif
       ContextMenuItem FontMenuItem(SubmenuType, ContextMenuItemTagFontMenu,
-                                   "Font");
+                                   contextMenuItemTagFontMenu());
       createAndAppendFontSubMenu(m_hitTestResult, FontMenuItem);
       appendItem(FontMenuItem);
 #if PLATFORM(MAC)
       ContextMenuItem SpeechMenuItem(SubmenuType, ContextMenuItemTagSpeechMenu,
-                                     "Speech");
+                                     contextMenuItemTagSpeechMenu());
       createAndAppendSpeechSubMenu(m_hitTestResult, SpeechMenuItem);
       appendItem(SpeechMenuItem);
 #endif
       ContextMenuItem WritingDirectionMenuItem(
           SubmenuType, ContextMenuItemTagWritingDirectionMenu,
-          "Writing Direction");
+          contextMenuItemTagWritingDirectionMenu());
       createAndAppendWritingDirectionSubMenu(m_hitTestResult,
                                              WritingDirectionMenuItem);
       appendItem(WritingDirectionMenuItem);
@@ -468,17 +488,9 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagShowSpellingPanel:
 #ifndef BUILDING_ON_TIGER
       if (frame->editor()->spellingPanelIsShowing())
-        item.setTitle(String("Hide Spelling and Grammar"));  // With UI_STRING
-                                                             // this also sends
-                                                             // "menu item
-                                                             // title" as a
-                                                             // parameter
+        item.setTitle(contextMenuItemTagWritingDirectionMenu(false));
       else
-        item.setTitle(String("Show Spelling and Grammar"));  // With UI_STRING
-                                                             // this also sends
-                                                             // "menu item
-                                                             // title" as a
-                                                             // parameter
+        item.setTitle(contextMenuItemTagWritingDirectionMenu(true));
 #endif
       shouldEnable = frame->editor()->canEdit();
       break;
