@@ -68,6 +68,12 @@ void ResourceHandle::cancel() {
 
 bool ResourceHandle::loadsBlocked() {
   notImplemented();
+  return false;
+}
+
+bool ResourceHandle::willLoadFromCache(ResourceRequest& request) {
+  notImplemented();
+  return false;
 }
 
 }  // namespace WebCore

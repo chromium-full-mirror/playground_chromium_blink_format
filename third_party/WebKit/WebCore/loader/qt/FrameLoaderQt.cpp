@@ -205,10 +205,10 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
 
       // If the user had a scroll point, scroll to it, overriding the anchor
       // point if any.
-      if ((isBackForwardLoadType(m_loadType) ||
-           m_loadType == FrameLoadTypeReload) &&
-          m_client->hasBackForwardList())
-        m_client->restoreScrollPositionAndViewState();
+      //         if ((isBackForwardLoadType(m_loadType) || m_loadType ==
+      //         FrameLoadTypeReload)
+      //             && m_client->hasBackForwardList())
+      //             m_client->restoreScrollPositionAndViewState();
 
       //         if (error)
       //             m_client->dispatchDidFailLoad(error);
@@ -229,18 +229,15 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
   }
 }
 
-void FrameLoader::goBackOrForward(int distance) {
-  notImplemented();
-}
-
 KURL FrameLoader::historyURL(int distance) {
   notImplemented();
   return KURL();
 }
 
 void FrameLoader::didFirstLayout() {
-  if (isBackForwardLoadType(m_loadType) && m_client->hasBackForwardList())
-    m_client->restoreScrollPositionAndViewState();
+  //     if (isBackForwardLoadType(m_loadType) &&
+  //     m_client->hasBackForwardList())
+  //         m_client->restoreScrollPositionAndViewState();
 
   m_firstLayoutDone = true;
   m_client->dispatchDidFirstLayout();
@@ -254,16 +251,6 @@ bool FrameLoader::canGoBackOrForward(int distance) const {
 void FrameLoader::partClearedInBegin() {
   if (m_frame->settings()->isJavaScriptEnabled())
     static_cast<FrameLoaderClientQt*>(m_client)->partClearedInBegin();
-}
-
-void FrameLoader::saveDocumentState() {
-  // Do not save doc state if the page has a password field and a form that
-  // would be submitted via https.
-  // notImplemented();
-}
-
-void FrameLoader::restoreDocumentState() {
-  // notImplemented();
 }
 
 void FrameLoader::didChangeTitle(DocumentLoader* loader) {
@@ -307,10 +294,41 @@ void FrameLoader::load(DocumentLoader* loader,
   notImplemented();
 }
 
+void FrameLoader::load(const ResourceRequest& request) {
+  notImplemented();
+}
+
+void FrameLoader::load(const ResourceRequest& request,
+                       const String& frameName) {
+  notImplemented();
+}
+
+void FrameLoader::load(const ResourceRequest& request,
+                       const NavigationAction& action,
+                       FrameLoadType type,
+                       PassRefPtr<FormState> formState) {
+  notImplemented();
+}
+
 void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
                                             ResourceResponse& r,
                                             Vector<char>& data) {
   notImplemented();
+}
+
+void FrameLoader::opened() {
+  notImplemented();
+}
+
+KURL FrameLoader::dataURLBaseFromRequest(const ResourceRequest& request) const {
+  notImplemented();
+  return KURL();
+}
+
+void FrameLoader::applyUserAgent(ResourceRequest& request) {
+  String userAgent = client()->userAgent();
+  ASSERT(!userAgent.isNull());
+  request.setHTTPUserAgent(userAgent);
 }
 
 PolicyCheck::PolicyCheck() : m_contentFunction(0) {}
