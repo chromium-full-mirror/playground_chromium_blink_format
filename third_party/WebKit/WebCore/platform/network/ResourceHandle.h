@@ -97,6 +97,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
                                         ResourceError&,
                                         ResourceResponse&,
                                         Vector<char>& data);
+  static bool willLoadFromCache(ResourceRequest&);
 
   ~ResourceHandle();
 

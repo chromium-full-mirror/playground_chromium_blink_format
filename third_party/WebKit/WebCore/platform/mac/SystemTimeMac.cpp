@@ -26,11 +26,17 @@
 #include "config.h"
 #include "SystemTime.h"
 
+#include "WebCoreSystemInterface.h"
+
 #include <CoreFoundation/CFDate.h>
 
 namespace WebCore {
 
 double currentTime() {
   return CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970;
+}
+
+float userIdleTime() {
+  return wkSecondsSinceLastInputEvent();
 }
 }

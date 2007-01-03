@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,54 +20,30 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "WebCorePageState.h"
+#ifndef HistoryItemTimer_H
+#define HistoryItemTimer_H
 
-#import "Document.h"
-#import "Frame.h"
-#import "Page.h"
-#import "PageState.h"
+#include "Timer.h"
 
-using namespace WebCore;
+namespace WebCore {
 
-@implementation WebCorePageState
+extern const double DefaultPageCacheReleaseInterval;
 
-- (id)initWithPage:(Page*)page
-{
-    self = [super init];
-    if (!self)
-        return nil;
+class HistoryItemTimer {
+ public:
+  HistoryItemTimer();
 
-    Document* document = page->mainFrame()->document();
-    if (!document || !document->view()) {
-        [self release];
-        return nil;
-    }
+  bool isActive() const;
+  void schedule(double seconds = DefaultPageCacheReleaseInterval);
+  void invalidate();
 
-    m_impl = WebCore::PageState::create(page).releaseRef();
-    return self;
+ private:
+  void callReleasePageCache(Timer<HistoryItemTimer>*);
+  Timer<HistoryItemTimer> m_timer;
+};
 }
 
-- (void)dealloc
-{
-    if (m_impl)
-        m_impl->deref();
-    [super dealloc];
-}
-
-- (void)finalize
-{
-    if (m_impl)
-        m_impl->deref();
-    [super finalize];
-}
-
-- (WebCore::PageState*)impl
-{
-    return m_impl;
-}
-
-@end
+#endif  // HistoryItemTimer_H

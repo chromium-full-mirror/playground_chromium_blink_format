@@ -57,7 +57,9 @@ namespace WebCore {
 
 class Frame;
 class FrameLoader;
+class HistoryItem;
 class KURL;
+class PageCache;
 
 typedef Vector<ResourceResponse> ResponseVector;
 
@@ -74,6 +76,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
 #if PLATFORM(MAC)
   NSData* mainResourceData() const;
 #endif
+
   const ResourceRequest& originalRequest() const;
   const ResourceRequest& originalRequestCopy() const;
 
@@ -86,6 +89,17 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   const KURL& URL() const;
   const KURL unreachableURL() const;
+
+  KURL originalURL() const;
+  KURL requestURL() const;
+  KURL responseURL() const;
+  String responseMIMEType() const;
+
+  // FIXME: After we have a ResourceResponse in the mix, this method can go away
+  // and we can use it directly
+  bool getResponseRefreshAndModifiedHeaders(String& refresh,
+                                            String& modified) const;
+
   void replaceRequestURLForAnchorScroll(const KURL&);
   bool isStopping() const;
   void stopLoading();
@@ -122,7 +136,11 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   void stopRecordingResponses();
   String title() const;
-  KURL URLForHistory() const;
+  KURL urlForHistory() const;
+
+  void loadFromPageCache(PassRefPtr<PageCache>);
+  void setLoadingFromPageCache(bool);
+  bool isLoadingFromPageCache() const;
 
  private:
 #if PLATFORM(MAC)
@@ -170,6 +188,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
   bool m_gotFirstByte;
   bool m_primaryLoadComplete;
   bool m_isClientRedirect;
+  bool m_loadingFromPageCache;
 
   String m_pageTitle;
 

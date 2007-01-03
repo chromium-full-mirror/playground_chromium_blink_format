@@ -141,7 +141,7 @@ extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
 extern BOOL (*wkSupportsMultipartXMixedReplace)(NSMutableURLRequest*);
 extern Class (*wkNSURLProtocolClassForReqest)(NSURLRequest*);
-
+extern float (*wkSecondsSinceLastInputEvent)(void);
 #ifdef __cplusplus
 }
 #endif

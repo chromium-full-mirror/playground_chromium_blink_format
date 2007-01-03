@@ -1551,4 +1551,10 @@ bool KURL::isHierarchical() const {
   assert(urlString[schemeEndPos] == ':');
   return urlString[schemeEndPos + 1] == '/';
 }
+
+#ifndef NDEBUG
+void KURL::print() const {
+  printf("%s\n", urlString.ascii());
+}
+#endif
 }

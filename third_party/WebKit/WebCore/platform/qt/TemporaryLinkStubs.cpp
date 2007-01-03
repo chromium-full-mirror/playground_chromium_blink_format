@@ -60,6 +60,7 @@
 #include "TextBoundaries.h"
 #include "AXObjectCache.h"
 #include "IconLoader.h"
+#include "SystemTime.h"
 
 using namespace WebCore;
 
@@ -252,6 +253,11 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
                                          const String& challengeString,
                                          const KURL& url) {
   return String();
+}
+
+float userIdleTime() {
+  notImplemented();
+  return 0.0;
 }
 }
 

@@ -89,8 +89,6 @@ class FrameMac : public Frame {
   // === undecided, may or may not belong here
 
  public:
-  virtual void setView(FrameView*);
-
   static WebCoreFrameBridge* bridgeForWidget(const Widget*);
 
   NSString* searchForLabelsAboveCell(RegularExpression*, HTMLTableCellElement*);

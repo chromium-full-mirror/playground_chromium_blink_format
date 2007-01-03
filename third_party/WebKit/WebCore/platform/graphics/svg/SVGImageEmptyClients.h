@@ -135,10 +135,6 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void setCopiesOnScroll() {}
 
-  virtual LoadErrorResetToken* tokenForLoadErrorReset() { return 0; }
-  virtual void resetAfterLoadError(LoadErrorResetToken*) {}
-  virtual void doNotResetAfterLoadError(LoadErrorResetToken*) {}
-
   virtual void detachedFromParent1() {}
   virtual void detachedFromParent2() {}
   virtual void detachedFromParent3() {}
@@ -328,6 +324,14 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void setTitle(const String& title, const KURL&) {}
 
   virtual String userAgent() { return ""; }
+
+  virtual void setDocumentViewFromPageCache(PageCache*) {}
+  virtual void updateGlobalHistoryForStandardLoad(const KURL&) {}
+  virtual void updateGlobalHistoryForReload(const KURL&) {}
+  virtual bool shouldGoToHistoryItem(HistoryItem*) const { return false; }
+  virtual void saveScrollPositionAndViewStateToItem(HistoryItem*) {}
+  virtual void saveDocumentViewToPageCache(PageCache*) {}
+  virtual bool canCachePage() const { return false; }
 };
 
 class SVGEmptyEditorClient : public EditorClient {

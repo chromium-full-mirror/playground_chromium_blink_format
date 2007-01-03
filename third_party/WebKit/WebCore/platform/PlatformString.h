@@ -272,6 +272,15 @@ inline bool operator!=(const String& a, const DeprecatedString& b) {
 inline bool operator!=(const DeprecatedString& b, const String& a) {
   return !(a == b);
 }
+
+#ifdef __OBJC__
+// This is for situations in WebKit where the long standing behavior has been
+// "nil if empty", so we try to maintain longstanding behavior for the sake of
+// entrenched clients
+inline NSString* nsStringNilIfEmpty(const String& str) {
+  return str.isEmpty() ? nil : (NSString*)str;
+}
+#endif
 }
 
 namespace WTF {

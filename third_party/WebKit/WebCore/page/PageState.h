@@ -23,6 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef PageState_H
+#define PageState_H
+
 #include "KURL.h"
 #include "Shared.h"
 #include <wtf/Forward.h>
@@ -65,5 +68,8 @@ class PageState : public Shared<PageState> {
   OwnPtr<KJS::SavedProperties> m_locationProperties;
   OwnPtr<KJS::SavedBuiltins> m_interpreterBuiltins;
   OwnPtr<KJS::PausedTimeouts> m_pausedTimeouts;
-};
-}
+};  // class PageState
+
+}  // namespace WebCore
+
+#endif  // PageState_H
