@@ -72,6 +72,8 @@ class HTMLPlugInElement : public HTMLFrameOwnerElement {
 
   void setFrameName(const AtomicString& frameName) { m_frameName = frameName; }
 
+  virtual void defaultEventHandler(Event*);
+
  private:
 #if USE(NPOBJECT)
   NPObject* createNPObject();

@@ -51,6 +51,7 @@ class QWidget;
 namespace WebCore {
 
 class Cursor;
+class Event;
 class Font;
 class GraphicsContext;
 class IntPoint;
@@ -140,6 +141,7 @@ class Widget {
   // children.
   virtual IntRect windowClipRect() const;
 
+  virtual void handleEvent(Event*) {}
 #if PLATFORM(WIN)
   void setContainingWindow(HWND);
   HWND containingWindow() const;
