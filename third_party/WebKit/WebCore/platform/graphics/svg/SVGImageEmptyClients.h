@@ -144,7 +144,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
 #if PLATFORM(MAC)
   virtual void download(ResourceHandle*,
-                        NSURLRequest*,
+                        const ResourceRequest&,
                         const ResourceResponse&) {}
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
@@ -289,7 +289,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
 #if PLATFORM(MAC)
   virtual bool willUseArchive(ResourceLoader*,
-                              NSURLRequest*,
+                              const ResourceRequest&,
                               const KURL& originalURL) const {
     return false;
   }

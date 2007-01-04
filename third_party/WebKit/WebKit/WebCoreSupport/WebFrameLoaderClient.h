@@ -80,7 +80,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void loadedFromPageCache();
 
   virtual void download(WebCore::ResourceHandle*,
-                        NSURLRequest*,
+                        const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);
 
   virtual id dispatchIdentifierForInitialRequest(
@@ -202,7 +202,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual WebCore::String userAgent();
 
   virtual bool willUseArchive(WebCore::ResourceLoader*,
-                              NSURLRequest*,
+                              const WebCore::ResourceRequest&,
                               const WebCore::KURL& originalURL) const;
   virtual bool isArchiveLoadPending(WebCore::ResourceLoader*) const;
   virtual void cancelPendingArchiveLoad(WebCore::ResourceLoader*);

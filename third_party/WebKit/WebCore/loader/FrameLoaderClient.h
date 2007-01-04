@@ -88,7 +88,7 @@ class FrameLoaderClient {
 
 #if PLATFORM(MAC)
   virtual void download(ResourceHandle*,
-                        NSURLRequest*,
+                        const ResourceRequest&,
                         const ResourceResponse&) = 0;
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
@@ -220,7 +220,7 @@ class FrameLoaderClient {
 
 #if PLATFORM(MAC)
   virtual bool willUseArchive(ResourceLoader*,
-                              NSURLRequest*,
+                              const ResourceRequest&,
                               const KURL& originalURL) const = 0;
 #endif
   virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;

@@ -73,7 +73,7 @@ class MainResourceLoader : public ResourceLoader {
   ResourceError interruptionForPolicyChangeError() const;
   void stopLoadingForPolicyChange();
 #if PLATFORM(MAC)
-  bool isPostOrRedirectAfterPost(NSURLRequest* newRequest,
+  bool isPostOrRedirectAfterPost(const ResourceRequest& newRequest,
                                  const ResourceResponse& redirectResponse);
 
   static void callContinueAfterNavigationPolicy(void*,
