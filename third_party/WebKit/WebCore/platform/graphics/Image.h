@@ -127,10 +127,6 @@ class Image : Noncopyable {
                          TileRule vRule,
                          CompositeOperator) = 0;
 
-  // Handle OS-specific data
-  void initPlatformData();
-  void invalidatePlatformData();
-
   Vector<char> m_data;  // The encoded raw data for the image.
   ImageAnimationObserver* m_animationObserver;
 };

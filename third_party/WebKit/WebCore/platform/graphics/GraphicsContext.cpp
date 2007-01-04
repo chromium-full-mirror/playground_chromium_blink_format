@@ -329,8 +329,7 @@ void GraphicsContext::setPlatformTextDrawingMode(int mode) {}
 #if !PLATFORM(CG) && !PLATFORM(QT)
 void GraphicsContext::setPlatformFillColor(const Color&) {}
 
-void GraphicsContext::setPlatformStrokeColor(const Color&);
-{}
+void GraphicsContext::setPlatformStrokeColor(const Color&) {}
 
 void GraphicsContext::setPlatformStrokeThickness(float) {}
 #endif

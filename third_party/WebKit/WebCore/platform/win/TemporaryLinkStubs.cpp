@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include "AXObjectCache.h"
+#include "BitmapImage.h"
 #include "CachedResource.h"
 #include "Clipboard.h"
 #include "ContextMenu.h"
@@ -63,6 +64,7 @@
 #include "LocalizedStrings.h"
 #include "Node.h"
 #include "Page.h"
+#include "PageCache.h"
 #include "Pasteboard.h"
 #include "Path.h"
 #include "PlatformMouseEvent.h"
@@ -76,8 +78,8 @@
 #include "RenderThemeWin.h"
 #include "Screen.h"
 #include "ScrollBar.h"
+#include "SearchPopupMenu.h"
 #include "TextBoundaries.h"
-#include "TextField.h"
 #include "Widget.h"
 
 #define notImplemented()                                                   \
@@ -205,8 +207,25 @@ String submitButtonDefaultLabel() {
   notImplemented();
   return "Submit";
 }
+float userIdleTime() {
+  notImplemented();
+  return 0;
+}
 
 bool AXObjectCache::gAccessibilityEnabled = false;
+
+void BitmapImage::drawTiled(GraphicsContext*,
+                            const FloatRect&,
+                            const FloatRect&,
+                            TileRule,
+                            TileRule,
+                            CompositeOperator) {
+  notImplemented();
+}
+bool BitmapImage::getHBITMAP(HBITMAP) {
+  notImplemented();
+  return false;
+}
 
 void CachedResource::setAllData(PlatformData) {
   notImplemented();
@@ -219,53 +238,64 @@ ContextMenu::ContextMenu(const HitTestResult& result)
 ContextMenu::~ContextMenu() {
   notImplemented();
 }
-void ContextMenu::appendItem(const ContextMenuItem& item) {
-  notImplemented();
-}
 void ContextMenu::show() {
   notImplemented();
 }
-
-ContextMenuItem::ContextMenuItem(PlatformMenuItemDescription, ContextMenu*) {
+void ContextMenu::appendItem(ContextMenuItem&) {
   notImplemented();
 }
-ContextMenuItem::ContextMenuItem(ContextMenu* parentMenu,
-                                 ContextMenu* subMenu) {
+
+ContextMenuItem::ContextMenuItem(PlatformMenuItemDescription) {
+  notImplemented();
+}
+ContextMenuItem::ContextMenuItem(ContextMenu*) {
   notImplemented();
 }
 ContextMenuItem::ContextMenuItem(ContextMenuItemType type,
                                  ContextMenuAction action,
                                  const String& title,
-                                 ContextMenu* parentMenu,
                                  ContextMenu* subMenu) {
   notImplemented();
 }
 ContextMenuItem::~ContextMenuItem() {
   notImplemented();
 }
-PlatformMenuItemDescription ContextMenuItem::platformDescription() const {
+PlatformMenuItemDescription ContextMenuItem::releasePlatformDescription() {
   notImplemented();
   return m_platformDescription;
+}
+ContextMenuItemType ContextMenuItem::type() const {
+  notImplemented();
+  return ActionType;
+}
+void ContextMenuItem::setType(ContextMenuItemType) {
+  notImplemented();
 }
 ContextMenuAction ContextMenuItem::action() const {
   notImplemented();
   return ContextMenuItemTagNoAction;
 }
-void ContextMenuItem::setAction(ContextMenuAction action) {
+void ContextMenuItem::setAction(ContextMenuAction) {
   notImplemented();
 }
 String ContextMenuItem::title() const {
   notImplemented();
   return String();
 }
-void ContextMenuItem::setTitle(String title) {
+void ContextMenuItem::setTitle(const String&) {
   notImplemented();
 }
 PlatformMenuDescription ContextMenuItem::platformSubMenu() const {
   notImplemented();
   return 0;
 }
-void ContextMenuItem::setSubMenu(ContextMenu* subMenu) {
+void ContextMenuItem::setSubMenu(ContextMenu*) {
+  notImplemented();
+}
+void ContextMenuItem::setChecked(bool) {
+  notImplemented();
+}
+void ContextMenuItem::setEnabled(bool) {
   notImplemented();
 }
 
@@ -276,17 +306,46 @@ FrameLoader* DocumentLoader::frameLoader() const {
   notImplemented();
   return m_frame->loader();
 }
+static ResourceRequest emptyResourceRequestForDocumentLoader;
+const ResourceRequest& DocumentLoader::originalRequest() const {
+  notImplemented();
+  return emptyResourceRequestForDocumentLoader;
+}
+const ResourceRequest& DocumentLoader::request() const {
+  notImplemented();
+  return emptyResourceRequestForDocumentLoader;
+}
+ResourceRequest& DocumentLoader::request() {
+  notImplemented();
+  return emptyResourceRequestForDocumentLoader;
+}
 static KURL emptyKURLForDocumentLoader;
 const KURL& DocumentLoader::URL() const {
   notImplemented();
   return emptyKURLForDocumentLoader;
 }
-bool DocumentLoader::isStopping() const {
+const KURL DocumentLoader::unreachableURL() const {
+  notImplemented();
+  return KURL();
+}
+bool DocumentLoader::getResponseRefreshAndModifiedHeaders(
+    String& refresh,
+    String& modified) const {
   notImplemented();
   return false;
 }
+void DocumentLoader::replaceRequestURLForAnchorScroll(const KURL&) {
+  notImplemented();
+}
 void DocumentLoader::stopLoading() {
   notImplemented();
+}
+void DocumentLoader::setCommitted(bool) {
+  notImplemented();
+}
+bool DocumentLoader::isLoading() const {
+  notImplemented();
+  return false;
 }
 void DocumentLoader::setLoading(bool) {
   notImplemented();
@@ -297,12 +356,27 @@ void DocumentLoader::updateLoading() {
 void DocumentLoader::setupForReplaceByMIMEType(const String& newMIMEType) {
   notImplemented();
 }
+void DocumentLoader::prepareForLoadStart() {
+  notImplemented();
+}
+bool DocumentLoader::isClientRedirect() const {
+  notImplemented();
+  return false;
+}
 bool DocumentLoader::isLoadingInAPISense() const {
   notImplemented();
   return false;
 }
 void DocumentLoader::stopRecordingResponses() {
   notImplemented();
+}
+String DocumentLoader::title() const {
+  notImplemented();
+  return String();
+}
+KURL DocumentLoader::urlForHistory() const {
+  notImplemented();
+  return KURL();
 }
 
 void Editor::ignoreSpelling() {
@@ -327,7 +401,7 @@ Vector<String> Editor::guessesForUngrammaticalSelection() {
   notImplemented();
   return Vector<String>();
 }
-void Editor::markMisspellingsInAdjacentWords(const VisiblePosition&) {
+void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition&) {
   notImplemented();
 }
 PassRefPtr<Clipboard> Editor::newGeneralClipboard(
@@ -413,6 +487,15 @@ void FrameLoader::load(const FrameLoadRequest&,
                        const HashMap<String, String>& formValues) {
   notImplemented();
 }
+void FrameLoader::load(const ResourceRequest&,
+                       const NavigationAction&,
+                       FrameLoadType,
+                       PassRefPtr<FormState>) {
+  notImplemented();
+}
+void FrameLoader::load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>) {
+  notImplemented();
+}
 void FrameLoader::didFirstLayout() {
   notImplemented();
 }
@@ -437,15 +520,6 @@ String FrameLoader::referrer() const {
   notImplemented();
   return String();
 }
-void FrameLoader::saveDocumentState() {
-  notImplemented();
-}
-void FrameLoader::restoreDocumentState() {
-  notImplemented();
-}
-void FrameLoader::goBackOrForward(int distance) {
-  notImplemented();
-}
 KURL FrameLoader::historyURL(int distance) {
   notImplemented();
   return KURL();
@@ -461,6 +535,10 @@ void FrameLoader::partClearedInBegin() {
   notImplemented();
 }
 KURL FrameLoader::originalRequestURL() const {
+  notImplemented();
+  return KURL();
+}
+KURL FrameLoader::dataURLBaseFromRequest(const ResourceRequest& request) const {
   notImplemented();
   return KURL();
 }
@@ -489,6 +567,12 @@ void FrameLoader::reload() {
 void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
                                             ResourceResponse& r,
                                             Vector<char>& data) {
+  notImplemented();
+}
+void FrameLoader::opened() {
+  notImplemented();
+}
+void FrameLoader::applyUserAgent(ResourceRequest& request) {
   notImplemented();
 }
 
@@ -600,9 +684,6 @@ void GraphicsContext::clearRect(const FloatRect&) {
 void GraphicsContext::strokeRect(const FloatRect&, float) {
   notImplemented();
 }
-void GraphicsContext::setLineWidth(float) {
-  notImplemented();
-}
 void GraphicsContext::setLineCap(LineCap) {
   notImplemented();
 }
@@ -642,6 +723,23 @@ void Icon::paint(GraphicsContext*, const IntRect&) {
   notImplemented();
 }
 
+// FIXME: All this IconDatabase stuff could go away if much of
+// WebCore/loader/icon was linked in.  Unfortunately that requires SQLite,
+// which isn't currently part of the build.
+Image* IconDatabase::iconForPageURL(const String&, const IntSize&, bool cache) {
+  notImplemented();
+  return 0;
+}
+Image* IconDatabase::defaultIcon(const IntSize&) {
+  notImplemented();
+  return 0;
+}
+void IconDatabase::retainIconForPageURL(const String&) {
+  notImplemented();
+}
+void IconDatabase::releaseIconForPageURL(const String&) {
+  notImplemented();
+}
 bool IconDatabase::isIconExpiredForIconURL(const String& url) {
   notImplemented();
   return false;
@@ -665,20 +763,11 @@ void IconDatabase::setIconDataForIconURL(const void* data,
   notImplemented();
 }
 
-void Image::drawTiled(GraphicsContext*,
-                      const FloatRect&,
-                      const FloatRect&,
-                      TileRule,
-                      TileRule,
-                      CompositeOperator) {
-  notImplemented();
-}
-bool Image::getHBITMAP(HBITMAP) {
-  notImplemented();
-  return false;
-}
-
 HINSTANCE Page::s_instanceHandle = 0;
+
+void PageCache::close() {
+  notImplemented();
+}
 
 Pasteboard* Pasteboard::generalPasteboard() {
   notImplemented();
@@ -882,10 +971,15 @@ void RenderThemeWin::adjustMenuListStyle(CSSStyleSelector*,
   notImplemented();
 }
 
+bool ResourceHandle::willLoadFromCache(ResourceRequest&) {
+  notImplemented();
+  return false;
+}
 bool ResourceHandle::loadsBlocked() {
   notImplemented();
   return false;
 }
+
 void ResourceLoader::cancel() {
   notImplemented();
 }
@@ -943,102 +1037,15 @@ bool ScrollView::resizerOverlapsContent() const {
   return false;
 }
 
-void TextField::selectAll() {
+void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
+                                         const Vector<String>& searchItems) {
   notImplemented();
 }
-void TextField::addSearchResult() {
+void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
+                                         Vector<String>& searchItems) {
   notImplemented();
 }
-int TextField::selectionStart() const {
-  notImplemented();
-  return 0;
-}
-bool TextField::hasSelectedText() const {
-  notImplemented();
-  return 0;
-}
-String TextField::selectedText() const {
-  notImplemented();
-  return String();
-}
-void TextField::setAutoSaveName(String const&) {
-  notImplemented();
-}
-bool TextField::checksDescendantsForFocus() const {
-  notImplemented();
-  return false;
-}
-void TextField::setSelection(int, int) {
-  notImplemented();
-}
-void TextField::setMaxResults(int) {
-  notImplemented();
-}
-bool TextField::edited() const {
-  notImplemented();
-  return 0;
-}
-Widget::FocusPolicy TextField::focusPolicy() const {
-  notImplemented();
-  return NoFocus;
-}
-TextField::TextField() {
-  notImplemented();
-}
-TextField::~TextField() {
-  notImplemented();
-}
-void TextField::setFont(WebCore::Font const&) {
-  notImplemented();
-}
-void TextField::setAlignment(HorizontalAlignment) {
-  notImplemented();
-}
-void TextField::setWritingDirection(TextDirection) {
-  notImplemented();
-}
-int TextField::maxLength() const {
-  notImplemented();
-  return 0;
-}
-void TextField::setMaxLength(int) {
-  notImplemented();
-}
-String TextField::text() const {
-  notImplemented();
-  return String();
-}
-void TextField::setText(String const&) {
-  notImplemented();
-}
-int TextField::cursorPosition() const {
-  notImplemented();
-  return 0;
-}
-void TextField::setCursorPosition(int) {
-  notImplemented();
-}
-void TextField::setEdited(bool) {
-  notImplemented();
-}
-void TextField::setReadOnly(bool) {
-  notImplemented();
-}
-void TextField::setPlaceholderString(String const&) {
-  notImplemented();
-}
-void TextField::setColors(Color const&, Color const&) {
-  notImplemented();
-}
-IntSize TextField::sizeForCharacterWidth(int) const {
-  notImplemented();
-  return IntSize();
-}
-int TextField::baselinePosition(int) const {
-  notImplemented();
-  return 0;
-}
-void TextField::setLiveSearch(bool) {
+SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
   notImplemented();
 }
 

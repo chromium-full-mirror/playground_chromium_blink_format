@@ -139,7 +139,8 @@ bool ChromeClientWin::canRunBeforeUnloadConfirmPanel() {
   return false;
 }
 
-bool ChromeClientWin::runBeforeUnloadConfirmPanel(const String&, Frame*) {
+bool ChromeClientWin::runBeforeUnloadConfirmPanel(const WebCore::String&,
+                                                  WebCore::Frame*) {
   notImplemented();
   return false;
 }

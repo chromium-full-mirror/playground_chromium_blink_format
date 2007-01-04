@@ -42,11 +42,8 @@ void ContextMenuClientWin::addCustomContextMenuItems(WebCore::ContextMenu*) {
 }
 
 void ContextMenuClientWin::contextMenuItemSelected(
-    const WebCore::ContextMenuItem*) {
-  notImplemented();
-}
-
-void ContextMenuClientWin::copyLinkToClipboard(const WebCore::HitTestResult&) {
+    WebCore::ContextMenuItem*,
+    const WebCore::ContextMenu*) {
   notImplemented();
 }
 
