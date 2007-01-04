@@ -87,7 +87,9 @@ class FrameLoaderClient {
   virtual void loadedFromPageCache() = 0;
 
 #if PLATFORM(MAC)
-  virtual void download(ResourceHandle*, NSURLRequest*, NSURLResponse*) = 0;
+  virtual void download(ResourceHandle*,
+                        NSURLRequest*,
+                        const ResourceResponse&) = 0;
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
                                                  const ResourceRequest&) = 0;
@@ -95,7 +97,7 @@ class FrameLoaderClient {
       DocumentLoader*,
       id identifier,
       NSURLRequest*,
-      NSURLResponse* redirectResponse) = 0;
+      const ResourceResponse& redirectResponse) = 0;
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       id identifier,
@@ -106,7 +108,7 @@ class FrameLoaderClient {
       NSURLAuthenticationChallenge*) = 0;
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           id identifier,
-                                          NSURLResponse*) = 0;
+                                          const ResourceResponse&) = 0;
   virtual void dispatchDidReceiveContentLength(DocumentLoader*,
                                                id identifier,
                                                int lengthReceived) = 0;
@@ -116,7 +118,7 @@ class FrameLoaderClient {
                                       const ResourceError&) = 0;
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
                                                       NSURLRequest*,
-                                                      NSURLResponse*,
+                                                      const ResourceResponse&,
                                                       int length) = 0;
 #endif
 
@@ -178,7 +180,7 @@ class FrameLoaderClient {
   virtual void progressCompleted() = 0;
 
 #if PLATFORM(MAC)
-  virtual void incrementProgress(id identifier, NSURLResponse*) = 0;
+  virtual void incrementProgress(id identifier, const ResourceResponse&) = 0;
   virtual void incrementProgress(id identifier, const char*, int) = 0;
   virtual void completeProgress(id identifier) = 0;
 #endif

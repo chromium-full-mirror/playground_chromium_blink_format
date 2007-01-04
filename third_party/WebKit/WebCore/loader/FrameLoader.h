@@ -54,7 +54,6 @@ typedef struct objc_object* id;
 @class NSURL;
 @class NSURLAuthenticationChallenge;
 @class NSURLRequest;
-@class NSURLResponse;
 
 #else
 
@@ -64,7 +63,6 @@ class NSMutableURLRequest;
 class NSURL;
 class NSURLAuthenticationChallenge;
 class NSURLRequest;
-class NSURLResponse;
 
 #endif  // __OBJC__
 
@@ -258,12 +256,12 @@ class FrameLoader : Noncopyable {
   id identifierForInitialRequest(NSURLRequest*);
   NSURLRequest* willSendRequest(ResourceLoader*,
                                 NSMutableURLRequest*,
-                                NSURLResponse* redirectResponse);
+                                const ResourceResponse& redirectResponse);
   void didReceiveAuthenticationChallenge(ResourceLoader*,
                                          NSURLAuthenticationChallenge*);
   void didCancelAuthenticationChallenge(ResourceLoader*,
                                         NSURLAuthenticationChallenge*);
-  void didReceiveResponse(ResourceLoader*, NSURLResponse*);
+  void didReceiveResponse(ResourceLoader*, const ResourceResponse&);
   void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
 #endif
   void didFinishLoad(ResourceLoader*);
@@ -345,13 +343,15 @@ class FrameLoader : Noncopyable {
 
 #if PLATFORM(MAC)
   void sendRemainingDelegateMessages(id identifier,
-                                     NSURLResponse*,
+                                     const ResourceResponse&,
                                      unsigned length,
                                      const ResourceError&);
   NSURLRequest* requestFromDelegate(NSURLRequest*,
                                     id& identifier,
                                     ResourceError&);
-  void loadedResourceFromMemoryCache(NSURLRequest*, NSURLResponse*, int length);
+  void loadedResourceFromMemoryCache(NSURLRequest*,
+                                     const ResourceResponse&,
+                                     int length);
 #endif
 
   void checkLoadComplete();

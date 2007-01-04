@@ -48,9 +48,10 @@ class MainResourceLoader : public ResourceLoader {
   virtual void setDefersLoading(bool);
 
 #if PLATFORM(MAC)
-  virtual NSURLRequest* willSendRequest(NSURLRequest*,
-                                        NSURLResponse* redirectResponse);
-  virtual void didReceiveResponse(NSURLResponse*);
+  virtual NSURLRequest* willSendRequest(
+      NSURLRequest*,
+      const ResourceResponse& redirectResponse);
+  virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
                               long long lengthReceived,
@@ -73,7 +74,7 @@ class MainResourceLoader : public ResourceLoader {
   void stopLoadingForPolicyChange();
 #if PLATFORM(MAC)
   bool isPostOrRedirectAfterPost(NSURLRequest* newRequest,
-                                 NSURLResponse* redirectResponse);
+                                 const ResourceResponse& redirectResponse);
 
   static void callContinueAfterNavigationPolicy(void*,
                                                 const ResourceRequest&,
@@ -84,9 +85,8 @@ class MainResourceLoader : public ResourceLoader {
 
   static void callContinueAfterContentPolicy(void*, PolicyAction);
   void continueAfterContentPolicy(PolicyAction);
-  void continueAfterContentPolicy(PolicyAction, NSURLResponse*);
+  void continueAfterContentPolicy(PolicyAction, const ResourceResponse&);
 
-  RetainPtr<NSURLResponse> m_response;
   RetainPtr<NSURLRequest> m_initialRequest;
 #endif
 

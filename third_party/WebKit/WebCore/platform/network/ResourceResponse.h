@@ -50,7 +50,8 @@ class ResourceResponse {
       : m_expectedContentLength(0),
         m_httpStatusCode(0),
         m_expirationDate(0),
-        m_isUpToDate(true) {}
+        m_isUpToDate(true),
+        m_isNull(true) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -65,6 +66,9 @@ class ResourceResponse {
         m_httpStatusCode(0),
         m_expirationDate(0),
         m_isUpToDate(true) {}
+
+  bool isNull() const { return m_isNull; }
+  bool isHTTP() const;
 
   const KURL& url() const;
   const String& mimeType() const;
@@ -94,14 +98,14 @@ class ResourceResponse {
 
 #if PLATFORM(MAC)
   ResourceResponse(NSURLResponse* nsResponse)
-      : m_isUpToDate(false), m_nsResponse(nsResponse) {}
+      : m_isUpToDate(false), m_isNull(!nsResponse), m_nsResponse(nsResponse) {}
 
-  NSURLResponse* nsURLResponse() const { return m_nsResponse.get(); }
+  NSURLResponse* nsURLResponse() const;
 #elif USE(CFNETWORK)
   ResourceResponse(CFURLResponseRef cfResponse)
-      : m_isUpToDate(false), m_cfResponse(cfResponse) {}
+      : m_isUpToDate(false), m_isNull(!cfResponse), m_cfResponse(cfResponse) {}
 
-  CFURLResponseRef cfURLResponse() const { return m_cfResponse.get(); }
+  CFURLResponseRef cfURLResponse() const;
 #endif
 
  private:
@@ -122,6 +126,7 @@ class ResourceResponse {
   time_t m_expirationDate;
   time_t m_lastModifiedDate;
   mutable bool m_isUpToDate;
+  bool m_isNull;
 #if PLATFORM(MAC)
   RetainPtr<NSURLResponse> m_nsResponse;
 #elif USE(CFNETWORK)

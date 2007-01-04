@@ -81,7 +81,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void download(WebCore::ResourceHandle*,
                         NSURLRequest*,
-                        NSURLResponse*);
+                        const WebCore::ResourceResponse&);
 
   virtual id dispatchIdentifierForInitialRequest(
       WebCore::DocumentLoader*,
@@ -90,7 +90,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       WebCore::DocumentLoader*,
       id identifier,
       NSURLRequest*,
-      NSURLResponse* redirectResponse);
+      const WebCore::ResourceResponse& redirectResponse);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
       id identifier,
@@ -101,7 +101,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       NSURLAuthenticationChallenge*);
   virtual void dispatchDidReceiveResponse(WebCore::DocumentLoader*,
                                           id identifier,
-                                          NSURLResponse*);
+                                          const WebCore::ResourceResponse&);
   virtual void dispatchDidReceiveContentLength(WebCore::DocumentLoader*,
                                                id identifier,
                                                int lengthReceived);
@@ -155,15 +155,17 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void setMainDocumentError(WebCore::DocumentLoader*,
                                     const WebCore::ResourceError&);
   virtual void clearUnarchivingState(WebCore::DocumentLoader*);
-  virtual bool dispatchDidLoadResourceFromMemoryCache(WebCore::DocumentLoader*,
-                                                      NSURLRequest*,
-                                                      NSURLResponse*,
-                                                      int length);
+  virtual bool dispatchDidLoadResourceFromMemoryCache(
+      WebCore::DocumentLoader*,
+      NSURLRequest*,
+      const WebCore::ResourceResponse&,
+      int length);
 
   virtual void progressStarted();
   virtual void progressCompleted();
 
-  virtual void incrementProgress(id identifier, NSURLResponse*);
+  virtual void incrementProgress(id identifier,
+                                 const WebCore::ResourceResponse&);
   virtual void incrementProgress(id identifier, const char*, int);
   virtual void completeProgress(id identifier);
 

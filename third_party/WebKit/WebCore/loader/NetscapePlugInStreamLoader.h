@@ -52,7 +52,7 @@ class NetscapePlugInStreamLoader : public ResourceLoader {
   bool isDone() const;
 
 #if PLATFORM(MAC)
-  virtual void didReceiveResponse(NSURLResponse*);
+  virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
                               long long lengthReceived,

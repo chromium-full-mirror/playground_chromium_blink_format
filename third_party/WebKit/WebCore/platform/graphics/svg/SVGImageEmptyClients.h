@@ -143,7 +143,9 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void loadedFromPageCache() {}
 
 #if PLATFORM(MAC)
-  virtual void download(ResourceHandle*, NSURLRequest*, NSURLResponse*) {}
+  virtual void download(ResourceHandle*,
+                        NSURLRequest*,
+                        const ResourceResponse&) {}
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
                                                  const ResourceRequest&) {
@@ -153,7 +155,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
       DocumentLoader*,
       id identifier,
       NSURLRequest*,
-      NSURLResponse* redirectResponse) {
+      const ResourceResponse& redirectResponse) {
     return 0;
   }
   virtual void dispatchDidReceiveAuthenticationChallenge(
@@ -166,7 +168,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
       NSURLAuthenticationChallenge*) {}
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           id identifier,
-                                          NSURLResponse*) {}
+                                          const ResourceResponse&) {}
   virtual void dispatchDidReceiveContentLength(DocumentLoader*,
                                                id identifier,
                                                int lengthReceived) {}
@@ -176,7 +178,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                                       const ResourceError&) {}
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
                                                       NSURLRequest*,
-                                                      NSURLResponse*,
+                                                      const ResourceResponse&,
                                                       int length) {
     return false;
   }
@@ -242,7 +244,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void progressCompleted() {}
 
 #if PLATFORM(MAC)
-  virtual void incrementProgress(id identifier, NSURLResponse*) {}
+  virtual void incrementProgress(id identifier, const ResourceResponse&) {}
   virtual void incrementProgress(id identifier, const char*, int) {}
   virtual void completeProgress(id identifier) {}
 #endif
