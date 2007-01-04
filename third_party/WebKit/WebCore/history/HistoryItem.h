@@ -151,6 +151,8 @@ class HistoryItem : public Shared<HistoryItem> {
 #endif
 
   void scheduleRelease();
+  void cancelRelease();
+  void releasePageCache();
 
 #ifndef NDEBUG
   void print() const;
@@ -158,8 +160,7 @@ class HistoryItem : public Shared<HistoryItem> {
 
  private:
   HistoryItem(const HistoryItem&);
-  static void scheduleReleaseTimer();
-  static void releasePageCache();
+  static void releasePageCachesOrReschedule();
 
   String m_urlString;
   String m_originalURLString;
@@ -174,6 +175,7 @@ class HistoryItem : public Shared<HistoryItem> {
   Vector<String> m_documentState;
 
   HistoryItemVector m_subItems;
+  bool m_pageCacheIsPendingRelease;
   RefPtr<PageCache> m_pageCache;
 
   bool m_isTargetItem;
