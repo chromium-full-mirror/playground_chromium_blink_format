@@ -402,7 +402,9 @@ class SVGEmptyContextMenuClient : public ContextMenuClient {
   virtual ~SVGEmptyContextMenuClient() {}
   virtual void contextMenuDestroyed() {}
 
-  virtual void addCustomContextMenuItems(ContextMenu*) {}
+  virtual PlatformMenuDescription getCustomMenuFromDefaultItems(ContextMenu*) {
+    return 0;
+  }
   virtual void contextMenuItemSelected(ContextMenuItem*, const ContextMenu*) {}
 
   virtual void downloadURL(const KURL& url) {}

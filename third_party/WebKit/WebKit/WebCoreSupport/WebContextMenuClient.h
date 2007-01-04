@@ -38,7 +38,7 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
 
   virtual void contextMenuDestroyed();
 
-  virtual void addCustomContextMenuItems(WebCore::ContextMenu*);
+  virtual NSMutableArray* getCustomMenuFromDefaultItems(WebCore::ContextMenu*);
   virtual void contextMenuItemSelected(WebCore::ContextMenuItem*,
                                        const WebCore::ContextMenu*);
 

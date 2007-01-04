@@ -609,14 +609,11 @@ void EventTargetNode::defaultEventHandler(Event* event) {
     int detail =
         event->isUIEvent() ? static_cast<UIEvent*>(event)->detail() : 0;
     dispatchUIEvent(DOMActivateEvent, detail, event);
-  }
-#ifdef WEBCORE_CONTEXT_MENUS
-  else if (eventType == contextmenuEvent) {
+  } else if (eventType == contextmenuEvent) {
     if (Frame* frame = document()->frame())
       if (Page* page = frame->page())
         page->contextMenuController()->handleContextMenuEvent(event);
   }
-#endif
 }
 
 #ifndef NDEBUG
