@@ -796,6 +796,8 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
     return !(*this == o);
   }
 
+  bool shadowDataEquivalent(const StyleCSS3NonInheritedData& o) const;
+
   int lineClamp;  // An Apple extension.  Not really CSS3 but not worth making a
                   // new struct over.
   Vector<StyleDashboardRegion> m_dashboardRegions;
@@ -814,6 +816,8 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
                                                  // first place.
 
   unsigned m_appearance : 6;  // EAppearance
+
+  ShadowData* m_boxShadow;  // For box-shadow decorations.
 
 #ifdef XBL_SUPPORT
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1681,6 +1685,7 @@ class RenderStyle {
   EBoxAlignment boxPack() const {
     return static_cast<EBoxAlignment>(css3NonInheritedData->flexibleBox->pack);
   }
+  ShadowData* boxShadow() const { return css3NonInheritedData->m_boxShadow; }
   EBoxSizing boxSizing() const {
     return static_cast<EBoxSizing>(box->boxSizing);
   }
@@ -2075,6 +2080,7 @@ class RenderStyle {
   void setBoxPack(EBoxAlignment p) {
     SET_VAR(css3NonInheritedData.access()->flexibleBox, pack, p);
   }
+  void setBoxShadow(ShadowData* val, bool add = false);
   void setBoxSizing(EBoxSizing s) { SET_VAR(box, boxSizing, s); }
   void setMarqueeIncrement(const Length& f) {
     SET_VAR(css3NonInheritedData.access()->marquee, increment, f);
