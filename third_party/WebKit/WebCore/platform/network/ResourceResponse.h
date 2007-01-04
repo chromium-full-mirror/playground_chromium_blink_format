@@ -65,7 +65,8 @@ class ResourceResponse {
         m_suggestedFilename(filename),
         m_httpStatusCode(0),
         m_expirationDate(0),
-        m_isUpToDate(true) {}
+        m_isUpToDate(true),
+        m_isNull(false) {}
 
   bool isNull() const { return m_isNull; }
   bool isHTTP() const;
