@@ -114,7 +114,8 @@ struct LengthBox {
   }
 
   bool nonZero() const {
-    return left.value() || right.value() || top.value() || bottom.value();
+    return !(left.isZero() && right.isZero() && top.isZero() &&
+             bottom.isZero());
   }
 };
 
@@ -2252,7 +2253,7 @@ class RenderStyle {
   static EVerticalAlign initialVerticalAlign() { return BASELINE; }
   static int initialWidows() { return 2; }
   static int initialOrphans() { return 2; }
-  static Length initialLineHeight() { return Length(-100, Percent); }
+  static Length initialLineHeight() { return Length(-100.0, Percent); }
   static ETextAlign initialTextAlign() { return TAAUTO; }
   static ETextDecoration initialTextDecoration() { return TDNONE; }
   static int initialOutlineOffset() { return 0; }

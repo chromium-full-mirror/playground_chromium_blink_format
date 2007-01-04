@@ -395,7 +395,7 @@ int RenderImage::calcReplacedWidth() const {
     width = calcAspectRatioWidth();
 
   int minW = calcReplacedWidthUsing(style()->minWidth());
-  int maxW = style()->maxWidth().value() == undefinedLength
+  int maxW = style()->maxWidth().isUndefined()
                  ? width
                  : calcReplacedWidthUsing(style()->maxWidth());
 
@@ -410,7 +410,7 @@ int RenderImage::calcReplacedHeight() const {
     height = calcAspectRatioHeight();
 
   int minH = calcReplacedHeightUsing(style()->minHeight());
-  int maxH = style()->maxHeight().value() == undefinedLength
+  int maxH = style()->maxHeight().isUndefined()
                  ? height
                  : calcReplacedHeightUsing(style()->maxHeight());
 

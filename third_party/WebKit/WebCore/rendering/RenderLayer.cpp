@@ -2253,7 +2253,7 @@ EMarqueeDirection Marquee::direction() const {
   // negative.
   // If so, then we reverse the direction.
   Length increment = m_layer->renderer()->style()->marqueeIncrement();
-  if (increment.value() < 0)
+  if (increment.isNegative())
     result = static_cast<EMarqueeDirection>(-result);
 
   return result;
@@ -2316,7 +2316,7 @@ int Marquee::computePosition(EMarqueeDirection dir, bool stopAtContentEdge) {
 
 void Marquee::start() {
   if (m_timer.isActive() ||
-      m_layer->renderer()->style()->marqueeIncrement().value() == 0)
+      m_layer->renderer()->style()->marqueeIncrement().isZero())
     return;
 
   if (!m_suspended && !m_stopped) {

@@ -1171,7 +1171,7 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
       int w = child->overrideWidth() -
               (child->borderLeft() + child->borderRight() +
                child->paddingLeft() + child->paddingRight());
-      if (child->style()->maxWidth().value() != undefinedLength &&
+      if (!child->style()->maxWidth().isUndefined() &&
           child->style()->maxWidth().isFixed())
         maxW = child->style()->maxWidth().value();
       else if (child->style()->maxWidth().type() == Intrinsic)
@@ -1187,7 +1187,7 @@ int RenderFlexibleBox::allowedChildFlex(RenderObject* child,
       int h = child->overrideHeight() -
               (child->borderTop() + child->borderBottom() +
                child->paddingTop() + child->paddingBottom());
-      if (child->style()->maxHeight().value() != undefinedLength &&
+      if (!child->style()->maxHeight().isUndefined() &&
           child->style()->maxHeight().isFixed())
         maxH = child->style()->maxHeight().value();
       if (maxH == INT_MAX)

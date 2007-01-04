@@ -431,7 +431,7 @@ static void cacluateBackgroundSize(const BackgroundLayer* bgLayer,
     Length bgHeight = bgLayer->backgroundSize().height;
 
     if (bgWidth.isPercent())
-      scaledWidth = scaledWidth * bgWidth.value() / 100;
+      scaledWidth = bgWidth.calcValue(scaledWidth);
     else if (bgWidth.isFixed())
       scaledWidth = bgWidth.value();
     else if (bgWidth.isAuto()) {
@@ -439,7 +439,7 @@ static void cacluateBackgroundSize(const BackgroundLayer* bgLayer,
       // appropriate
       // scale to maintain our aspect ratio.
       if (bgHeight.isPercent()) {
-        int scaledH = scaledHeight * bgHeight.value() / 100;
+        int scaledH = bgHeight.calcValue(scaledHeight);
         scaledWidth =
             bg->imageSize().width() * scaledH / bg->imageSize().height();
       } else if (bgHeight.isFixed())
@@ -448,7 +448,7 @@ static void cacluateBackgroundSize(const BackgroundLayer* bgLayer,
     }
 
     if (bgHeight.isPercent())
-      scaledHeight = scaledHeight * bgHeight.value() / 100;
+      scaledHeight = bgHeight.calcValue(scaledHeight);
     else if (bgHeight.isFixed())
       scaledHeight = bgHeight.value();
     else if (bgHeight.isAuto()) {
@@ -1162,7 +1162,7 @@ void RenderBox::calcWidth() {
     m_width = calcWidthUsing(Width, containerWidth);
 
     // Calculate MaxWidth
-    if (style()->maxWidth().value() != undefinedLength) {
+    if (!style()->maxWidth().isUndefined()) {
       int maxW = calcWidthUsing(MaxWidth, containerWidth);
       if (m_width > maxW) {
         m_width = maxW;
@@ -1355,7 +1355,7 @@ void RenderBox::calcHeight() {
         height = m_height;
       int minH =
           calcHeightUsing(style()->minHeight());  // Leave as -1 if unset.
-      int maxH = style()->maxHeight().value() == undefinedLength
+      int maxH = style()->maxHeight().isUndefined()
                      ? height
                      : calcHeightUsing(style()->maxHeight());
       if (maxH == -1)
@@ -1511,7 +1511,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
 int RenderBox::calcReplacedWidth() const {
   int width = calcReplacedWidthUsing(style()->width());
   int minW = calcReplacedWidthUsing(style()->minWidth());
-  int maxW = style()->maxWidth().value() == undefinedLength
+  int maxW = style()->maxWidth().isUndefined()
                  ? width
                  : calcReplacedWidthUsing(style()->maxWidth());
 
@@ -1536,7 +1536,7 @@ int RenderBox::calcReplacedWidthUsing(Length width) const {
 int RenderBox::calcReplacedHeight() const {
   int height = calcReplacedHeightUsing(style()->height());
   int minH = calcReplacedHeightUsing(style()->minHeight());
-  int maxH = style()->maxHeight().value() == undefinedLength
+  int maxH = style()->maxHeight().isUndefined()
                  ? height
                  : calcReplacedHeightUsing(style()->maxHeight());
 
@@ -1766,7 +1766,7 @@ void RenderBox::calcAbsoluteHorizontal() {
 
   // Calculate constraint equation values for 'max-width'
   // case.calcContentBoxWidth(width.calcValue(containerWidth));
-  if (style()->maxWidth().value() != undefinedLength) {
+  if (!style()->maxWidth().isUndefined()) {
     int maxWidth;
     int maxMarginLeft;
     int maxMarginRight;
@@ -1786,7 +1786,7 @@ void RenderBox::calcAbsoluteHorizontal() {
   }
 
   // Calculate constraint equation values for 'min-width' case.
-  if (style()->minWidth().value()) {
+  if (!style()->minWidth().isZero()) {
     int minWidth;
     int minMarginLeft;
     int minMarginRight;
@@ -2069,7 +2069,7 @@ void RenderBox::calcAbsoluteVertical() {
   // see FIXME 3
 
   // Calculate constraint equation values for 'max-height' case.
-  if (style()->maxHeight().value() != undefinedLength) {
+  if (!style()->maxHeight().isUndefined()) {
     int maxHeight;
     int maxMarginTop;
     int maxMarginBottom;
@@ -2089,7 +2089,7 @@ void RenderBox::calcAbsoluteVertical() {
   }
 
   // Calculate constraint equation values for 'min-height' case.
-  if (style()->minHeight().value()) {
+  if (!style()->minHeight().isZero()) {
     int minHeight;
     int minMarginTop;
     int minMarginBottom;
