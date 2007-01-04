@@ -1264,6 +1264,13 @@ const Vector<MarkedTextUnderline>& Frame::markedTextUnderlines() const {
   return d->m_markedTextUnderlines;
 }
 
+static bool isInShadowTree(Node* node) {
+  for (Node* n = node; n; n = n->parentNode())
+    if (n->isShadowNode())
+      return true;
+  return false;
+}
+
 // Searches from the beginning of the document if nothing is selected.
 bool Frame::findString(const String& target,
                        bool forward,
@@ -1276,7 +1283,16 @@ bool Frame::findString(const String& target,
   // selection, and search to edge of document.
   RefPtr<Range> searchRange(rangeOfContents(document()));
   Selection selection(selectionController()->selection());
-  if (!selection.isNone()) {
+  Node* selectionBaseNode = selection.base().node();
+
+  // FIXME 3099526: We don't search in the shadow trees (e.g. text fields and
+  // textareas), though we'd like to
+  // someday. If we don't explicitly skip them here, we'll miss hits in the
+  // regular content.
+  bool startAtSelection =
+      selectionBaseNode && !isInShadowTree(selectionBaseNode);
+
+  if (startAtSelection) {
     if (forward)
       setStart(searchRange.get(), selection.visibleStart());
     else
@@ -1288,7 +1304,7 @@ bool Frame::findString(const String& target,
   // Build a selection with the found range to remove collapsed whitespace.
   // Compare ranges instead of selection objects to ignore the way that the
   // current selection was made.
-  if (!selection.isNone() &&
+  if (startAtSelection &&
       *Selection(resultRange.get()).toRange() == *selection.toRange()) {
     searchRange = rangeOfContents(document());
     if (forward)
