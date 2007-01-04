@@ -3142,7 +3142,7 @@ void FrameLoader::updateHistoryForCommit() {
 #endif
   FrameLoadType type = loadType();
   if (isBackForwardLoadType(type) ||
-      (type == FrameLoadTypeReload &&
+      (type == FrameLoadTypeReload && documentLoader() &&
        !documentLoader()->unreachableURL().isEmpty())) {
     // Once committed, we want to use current item for saving DocState, and
     // the provisional item for restoring state.
