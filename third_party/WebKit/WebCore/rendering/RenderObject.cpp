@@ -1364,9 +1364,9 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
   bool renderBottom = bs > BHIDDEN && !bt;
 
   // Need sufficient width and height to contain border radius curves.  Sanity
-  // check our top/bottom
-  // values and our width/height values to make sure the curves can all fit. If
-  // not, then we won't paint
+  // check our border radii
+  // and our width/height values to make sure the curves can all fit. If not,
+  // then we won't paint
   // any border radii.
   bool renderRadii = false;
   IntSize topLeft = style->borderTopLeftRadius();
@@ -1374,13 +1374,19 @@ void RenderObject::paintBorder(GraphicsContext* graphicsContext,
   IntSize bottomLeft = style->borderBottomLeftRadius();
   IntSize bottomRight = style->borderBottomRightRadius();
 
-  if (style->hasBorderRadius()) {
-    int requiredWidth = max(topLeft.width() + topRight.width(),
-                            bottomLeft.width() + bottomRight.width());
-    int requiredHeight = max(topLeft.height() + bottomLeft.height(),
-                             topRight.height() + bottomRight.height());
-    renderRadii = (requiredWidth <= w && requiredHeight <= h);
-  }
+  if (style->hasBorderRadius() &&
+      static_cast<unsigned>(w) >= static_cast<unsigned>(topLeft.width()) +
+                                      static_cast<unsigned>(topRight.width()) &&
+      static_cast<unsigned>(w) >=
+          static_cast<unsigned>(bottomLeft.width()) +
+              static_cast<unsigned>(bottomRight.width()) &&
+      static_cast<unsigned>(h) >=
+          static_cast<unsigned>(topLeft.height()) +
+              static_cast<unsigned>(bottomLeft.height()) &&
+      static_cast<unsigned>(h) >=
+          static_cast<unsigned>(topRight.height()) +
+              static_cast<unsigned>(bottomRight.height()))
+    renderRadii = true;
 
   // Clip to the rounded rectangle.
   if (renderRadii) {
