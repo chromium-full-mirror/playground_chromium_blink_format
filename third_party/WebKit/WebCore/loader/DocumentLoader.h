@@ -55,6 +55,7 @@ class FrameLoader;
 class HistoryItem;
 class KURL;
 class PageCache;
+class SharedBuffer;
 
 typedef Vector<ResourceResponse> ResponseVector;
 
@@ -69,7 +70,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   FrameLoader* frameLoader() const;
 #if PLATFORM(MAC)
-  NSData* mainResourceData() const;
+  PassRefPtr<SharedBuffer> mainResourceData() const;
 #endif
 
   const ResourceRequest& originalRequest() const;
@@ -139,7 +140,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
  private:
 #if PLATFORM(MAC)
-  void setMainResourceData(NSData*);
+  void setMainResourceData(PassRefPtr<SharedBuffer>);
 #endif
   void setupForReplace();
   void commitIfReady();
@@ -153,7 +154,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
   Frame* m_frame;
 
 #if PLATFORM(MAC)
-  RetainPtr<NSData> m_mainResourceData;
+  RefPtr<SharedBuffer> m_mainResourceData;
 #endif
 
   // A reference to actual request used to create the data source.

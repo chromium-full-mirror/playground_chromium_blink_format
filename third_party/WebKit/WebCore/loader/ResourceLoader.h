@@ -36,7 +36,7 @@
 #include "Shared.h"
 #include "KURL.h"
 
-#include <wtf/RefPtr.h>
+#include <wtf/Forward.h>
 
 #if PLATFORM(MAC)
 
@@ -48,7 +48,6 @@
 @class NSURLAuthenticationChallenge;
 #else
 class NSCachedURLResponse;
-class NSData;
 class NSMutableData;
 class NSURLAuthenticationChallenge;
 class NSURLCredential;
@@ -61,6 +60,7 @@ namespace WebCore {
 class Frame;
 class FrameLoader;
 class ResourceHandle;
+class SharedBuffer;
 
 class ResourceLoader : public Shared<ResourceLoader>,
                        protected ResourceHandleClient {
@@ -88,7 +88,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   const ResourceResponse& response() const;
 
   virtual void addData(const char*, int, bool allAtOnce);
-  virtual NSData* resourceData();
+  virtual PassRefPtr<SharedBuffer> resourceData();
   void clearResourceData();
 
   virtual void willSendRequest(ResourceRequest&,
@@ -199,7 +199,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   NSURLAuthenticationChallenge* m_currentConnectionChallenge;
   RetainPtr<NSURLAuthenticationChallenge> m_currentWebChallenge;
   KURL m_originalURL;
-  RetainPtr<NSMutableData> m_resourceData;
+  RefPtr<SharedBuffer> m_resourceData;
 #endif
   bool m_defersLoading;
 };

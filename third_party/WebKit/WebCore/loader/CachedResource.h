@@ -31,8 +31,8 @@
 
 #include "CachePolicy.h"
 #include "PlatformString.h"
-#include "ResourceHandleClient.h"  // defines PlatformData
 #include "ResourceResponse.h"
+#include "SharedBuffer.h"
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 #include <time.h>
@@ -130,8 +130,8 @@ class CachedResource {
 
   void setRequest(Request*);
 
-  PlatformData allData() const { return m_allData; }
-  void setAllData(PlatformData);
+  SharedBuffer* allData() const { return m_allData.get(); }
+  void setAllData(PassRefPtr<SharedBuffer>);
 
   void setResponse(const ResourceResponse& response) { m_response = response; }
   const ResourceResponse& response() const { return m_response; }
@@ -165,7 +165,7 @@ class CachedResource {
 #endif
 
   ResourceResponse m_response;
-  PlatformData m_allData;
+  RefPtr<SharedBuffer> m_allData;
 
   Type m_type;
   Status m_status;

@@ -48,12 +48,10 @@ typedef struct objc_object* id;
 
 #ifdef __OBJC__
 
-@class NSData;
 @class NSURLAuthenticationChallenge;
 
 #else
 
-class NSData;
 class NSURLAuthenticationChallenge;
 
 #endif  // __OBJC__
@@ -87,6 +85,7 @@ class ResourceError;
 class ResourceLoader;
 class ResourceRequest;
 class ResourceResponse;
+class SharedBuffer;
 class SubresourceLoader;
 class TextResourceDecoder;
 class Widget;
@@ -228,7 +227,7 @@ class FrameLoader : Noncopyable {
   void addSubresourceLoader(ResourceLoader*);
   void removeSubresourceLoader(ResourceLoader*);
 #if PLATFORM(MAC)
-  NSData* mainResourceData() const;
+  PassRefPtr<SharedBuffer> mainResourceData() const;
 #endif
   void releaseMainResourceLoader();
 

@@ -67,6 +67,7 @@ class ResourceHandleClient;
 class ResourceHandleInternal;
 class ResourceRequest;
 class ResourceResponse;
+class SharedBuffer;
 class SubresourceLoader;
 class SubresourceLoaderClient;
 
@@ -101,7 +102,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
   NSURLConnection* connection() const;
   WebCoreResourceHandleAsDelegate* delegate();
   void releaseDelegate();
-  NSData* bufferedData();
+  PassRefPtr<SharedBuffer> bufferedData();
 
   static bool supportsBufferedData();
 
