@@ -101,6 +101,15 @@ void ChromeClientQt::unfocus() {
   notImplemented();
 }
 
+bool ChromeClientQt::canTakeFocus(FocusDirection) {
+  notImplemented();
+  return true;
+}
+
+void ChromeClientQt::takeFocus(FocusDirection) {
+  notImplemented();
+}
+
 Page* ChromeClientQt::createWindow(const FrameLoadRequest&) {
   notImplemented();
   return 0;

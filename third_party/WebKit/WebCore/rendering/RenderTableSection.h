@@ -82,7 +82,7 @@ class RenderTableSection : public RenderContainer {
   }
 
   void appendColumn(int pos);
-  void RenderTableSection::splitColumn(int pos, int newSize);
+  void splitColumn(int pos, int newSize);
 
   virtual int lowestPosition(bool includeOverflowInterior,
                              bool includeSelf) const;
