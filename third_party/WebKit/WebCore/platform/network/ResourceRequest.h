@@ -95,6 +95,7 @@ struct ResourceRequest {
         m_resourceRequestUpdated(true),
         m_platformRequestUpdated(false) {}
 
+  bool isNull() const;
   bool isEmpty() const;
 
   const KURL& url() const;
@@ -191,6 +192,9 @@ struct ResourceRequest {
 };
 
 bool operator==(const ResourceRequest& a, const ResourceRequest& b);
+inline bool operator!=(ResourceRequest& a, const ResourceRequest& b) {
+  return !(a == b);
+}
 
 }  // namespace WebCore
 

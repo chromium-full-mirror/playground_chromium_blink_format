@@ -48,9 +48,8 @@ class MainResourceLoader : public ResourceLoader {
   virtual void setDefersLoading(bool);
 
 #if PLATFORM(MAC)
-  virtual NSURLRequest* willSendRequest(
-      NSURLRequest*,
-      const ResourceResponse& redirectResponse);
+  virtual void willSendRequest(ResourceRequest&,
+                               const ResourceResponse& redirectResponse);
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
@@ -87,7 +86,7 @@ class MainResourceLoader : public ResourceLoader {
   void continueAfterContentPolicy(PolicyAction);
   void continueAfterContentPolicy(PolicyAction, const ResourceResponse&);
 
-  RetainPtr<NSURLRequest> m_initialRequest;
+  ResourceRequest m_initialRequest;
 #endif
 
   bool m_loadingMultipartContent;

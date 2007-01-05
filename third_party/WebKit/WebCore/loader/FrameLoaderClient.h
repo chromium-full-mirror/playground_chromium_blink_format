@@ -93,10 +93,10 @@ class FrameLoaderClient {
 
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
                                                  const ResourceRequest&) = 0;
-  virtual NSURLRequest* dispatchWillSendRequest(
+  virtual void dispatchWillSendRequest(
       DocumentLoader*,
       id identifier,
-      NSURLRequest*,
+      ResourceRequest&,
       const ResourceResponse& redirectResponse) = 0;
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
@@ -117,7 +117,7 @@ class FrameLoaderClient {
                                       id identifier,
                                       const ResourceError&) = 0;
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
-                                                      NSURLRequest*,
+                                                      const ResourceRequest&,
                                                       const ResourceResponse&,
                                                       int length) = 0;
 #endif

@@ -30,7 +30,9 @@
 #define ResourceLoader_h
 
 #include "ResourceHandleClient.h"
+#include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include "ResourceLoader.h"
 #include "Shared.h"
 #include "KURL.h"
 
@@ -93,9 +95,8 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual NSData* resourceData();
   void clearResourceData();
 
-  virtual NSURLRequest* willSendRequest(
-      NSURLRequest*,
-      const ResourceResponse& redirectResponse);
+  virtual void willSendRequest(ResourceRequest&,
+                               const ResourceResponse& redirectResponse);
   void didReceiveAuthenticationChallenge(NSURLAuthenticationChallenge*);
   void didCancelAuthenticationChallenge(NSURLAuthenticationChallenge*);
   virtual void didReceiveResponse(const ResourceResponse&);
@@ -177,7 +178,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual void didCancel(const ResourceError&);
   void didFinishLoadingOnePart();
 
-  NSURLRequest* request() const { return m_request.get(); }
+  const ResourceRequest& request() const { return m_request; }
 #endif
   bool reachedTerminalState() const { return m_reachedTerminalState; }
   bool cancelled() const { return m_cancelled; }
@@ -186,9 +187,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   RefPtr<ResourceHandle> m_handle;
 
  private:
-#if PLATFORM(MAC)
-  RetainPtr<NSURLRequest> m_request;
-#endif
+  ResourceRequest m_request;
 
   bool m_reachedTerminalState;
   bool m_cancelled;

@@ -86,10 +86,10 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual id dispatchIdentifierForInitialRequest(
       WebCore::DocumentLoader*,
       const WebCore::ResourceRequest&);
-  virtual NSURLRequest* dispatchWillSendRequest(
+  virtual void dispatchWillSendRequest(
       WebCore::DocumentLoader*,
       id identifier,
-      NSURLRequest*,
+      WebCore::ResourceRequest&,
       const WebCore::ResourceResponse& redirectResponse);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
@@ -157,7 +157,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void clearUnarchivingState(WebCore::DocumentLoader*);
   virtual bool dispatchDidLoadResourceFromMemoryCache(
       WebCore::DocumentLoader*,
-      NSURLRequest*,
+      const WebCore::ResourceRequest&,
       const WebCore::ResourceResponse&,
       int length);
 

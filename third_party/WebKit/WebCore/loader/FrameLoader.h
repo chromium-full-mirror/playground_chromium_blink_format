@@ -49,20 +49,12 @@ typedef struct objc_object* id;
 #ifdef __OBJC__
 
 @class NSData;
-@class NSDictionary;
-@class NSMutableURLRequest;
-@class NSURL;
 @class NSURLAuthenticationChallenge;
-@class NSURLRequest;
 
 #else
 
 class NSData;
-class NSDictionary;
-class NSMutableURLRequest;
-class NSURL;
 class NSURLAuthenticationChallenge;
-class NSURLRequest;
 
 #endif  // __OBJC__
 
@@ -254,9 +246,9 @@ class FrameLoader : Noncopyable {
 
 #if PLATFORM(MAC)
   id identifierForInitialRequest(const ResourceRequest&);
-  NSURLRequest* willSendRequest(ResourceLoader*,
-                                NSMutableURLRequest*,
-                                const ResourceResponse& redirectResponse);
+  void willSendRequest(ResourceLoader*,
+                       ResourceRequest&,
+                       const ResourceResponse& redirectResponse);
   void didReceiveAuthenticationChallenge(ResourceLoader*,
                                          NSURLAuthenticationChallenge*);
   void didCancelAuthenticationChallenge(ResourceLoader*,
@@ -348,10 +340,8 @@ class FrameLoader : Noncopyable {
                                      const ResourceResponse&,
                                      unsigned length,
                                      const ResourceError&);
-  NSURLRequest* requestFromDelegate(NSURLRequest*,
-                                    id& identifier,
-                                    ResourceError&);
-  void loadedResourceFromMemoryCache(NSURLRequest*,
+  void requestFromDelegate(ResourceRequest&, id& identifier, ResourceError&);
+  void loadedResourceFromMemoryCache(const ResourceRequest&,
                                      const ResourceResponse&,
                                      int length);
 #endif
@@ -706,7 +696,6 @@ class FrameLoader : Noncopyable {
 #if PLATFORM(MAC)
   void handleUnimplementablePolicy(const ResourceError&);
 
-  void applyUserAgent(NSMutableURLRequest*);
 #endif
   void applyUserAgent(ResourceRequest& request);
 

@@ -151,13 +151,11 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                                                  const ResourceRequest&) {
     return 0;
   }
-  virtual NSURLRequest* dispatchWillSendRequest(
+  virtual void dispatchWillSendRequest(
       DocumentLoader*,
       id identifier,
-      NSURLRequest*,
-      const ResourceResponse& redirectResponse) {
-    return 0;
-  }
+      ResourceRequest&,
+      const ResourceResponse& redirectResponse) {}
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       id identifier,
@@ -177,7 +175,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                                       id identifier,
                                       const ResourceError&) {}
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
-                                                      NSURLRequest*,
+                                                      const ResourceRequest&,
                                                       const ResourceResponse&,
                                                       int length) {
     return false;
