@@ -3038,14 +3038,10 @@ void FrameLoader::updateHistoryForStandardLoad() {
       }
       addBackForwardItemClippedAtTarget(true);
     }
-  } else {
-    if (documentLoader()->unreachableURL().isEmpty()) {
-      m_currentHistoryItem->setURL(documentLoader()->URL());
-
-      // FIXME: After we can get a ResourceRequest& from the DocumentLoader we
-      // instead can call -
-      m_currentHistoryItem->setFormInfoFromRequest(documentLoader()->request());
-    }
+  } else if (documentLoader()->unreachableURL().isEmpty() &&
+             m_currentHistoryItem) {
+    m_currentHistoryItem->setURL(documentLoader()->URL());
+    m_currentHistoryItem->setFormInfoFromRequest(documentLoader()->request());
   }
 }
 
@@ -3060,8 +3056,10 @@ void FrameLoader::updateHistoryForClientRedirect() {
   // Clear out form data so we don't try to restore it into the incoming page.
   // Must happen after
   // webcore has closed the URL and saved away the form state.
-  m_currentHistoryItem->clearDocumentState();
-  m_currentHistoryItem->clearScrollPoint();
+  if (m_currentHistoryItem) {
+    m_currentHistoryItem->clearDocumentState();
+    m_currentHistoryItem->clearScrollPoint();
+  }
 }
 
 void FrameLoader::updateHistoryForBackForwardNavigation() {
