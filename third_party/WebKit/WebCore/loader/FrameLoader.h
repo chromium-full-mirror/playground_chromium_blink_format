@@ -226,9 +226,7 @@ class FrameLoader : Noncopyable {
   bool isLoading() const;
   void addSubresourceLoader(ResourceLoader*);
   void removeSubresourceLoader(ResourceLoader*);
-#if PLATFORM(MAC)
   PassRefPtr<SharedBuffer> mainResourceData() const;
-#endif
   void releaseMainResourceLoader();
 
   int numPendingOrLoadingRequests(bool recurse) const;
@@ -273,13 +271,11 @@ class FrameLoader : Noncopyable {
   void finishedLoading();
   KURL URL() const;
 
-#if PLATFORM(MAC)
   ResourceError cancelledError(const ResourceRequest&) const;
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
   bool willUseArchive(ResourceLoader*,
                       const ResourceRequest&,
                       const KURL&) const;
-#endif
   bool isArchiveLoadPending(ResourceLoader*) const;
 #if PLATFORM(MAC)
   void cannotShowMIMEType(const ResourceResponse&);
@@ -311,10 +307,8 @@ class FrameLoader : Noncopyable {
   bool isReplacing() const;
   void setReplacing();
   void revertToProvisional(DocumentLoader*);
-#if PLATFORM(MAC)
   void setMainDocumentError(DocumentLoader*, const ResourceError&);
   void mainReceivedCompleteError(DocumentLoader*, const ResourceError&);
-#endif
   bool subframeIsLoading() const;
   void willChangeTitle(DocumentLoader*);
   void didChangeTitle(DocumentLoader*);
@@ -626,9 +620,7 @@ class FrameLoader : Noncopyable {
   void transitionToCommitted(PassRefPtr<PageCache>);
   void frameLoadCompleted();
 
-#if PLATFORM(MAC)
   void mainReceivedError(const ResourceError&, bool isComplete);
-#endif
 
   void setLoadType(FrameLoadType);
 

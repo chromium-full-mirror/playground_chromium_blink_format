@@ -1708,11 +1708,9 @@ void FrameLoader::finalSetupForReplace(DocumentLoader* loader) {
   m_client->clearUnarchivingState(loader);
 }
 
-#if PLATFORM(MAC)
 void FrameLoader::load(const KURL& URL, Event* event) {
   load(ResourceRequest(URL), true, event, 0, HashMap<String, String>());
 }
-#endif
 
 bool FrameLoader::canTarget(Frame* target) const {
   // This method prevents this exploit:
@@ -2521,6 +2519,12 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
         "plain;q=0.8,image/png,*/*;q=0.5");
 }
 
+void FrameLoader::committedLoad(DocumentLoader* loader,
+                                const char* data,
+                                int length) {
+  m_client->committedLoad(loader, data, length);
+}
+
 void FrameLoader::addHistoryItemForFragmentScroll() {
   addBackForwardItemClippedAtTarget(false);
 }
@@ -3191,6 +3195,39 @@ void FrameLoader::setPreviousHistoryItem(PassRefPtr<HistoryItem> item) {
 
 void FrameLoader::setProvisionalHistoryItem(PassRefPtr<HistoryItem> item) {
   m_provisionalHistoryItem = item;
+}
+
+void FrameLoader::setMainDocumentError(DocumentLoader* loader,
+                                       const ResourceError& error) {
+  m_client->setMainDocumentError(loader, error);
+}
+
+void FrameLoader::mainReceivedCompleteError(DocumentLoader* loader,
+                                            const ResourceError& error) {
+  loader->setPrimaryLoadComplete(true);
+  m_client->dispatchDidLoadMainResource(activeDocumentLoader());
+  checkLoadComplete();
+}
+
+void FrameLoader::mainReceivedError(const ResourceError& error,
+                                    bool isComplete) {
+  activeDocumentLoader()->mainReceivedError(error, isComplete);
+}
+
+ResourceError FrameLoader::cancelledError(
+    const ResourceRequest& request) const {
+  return m_client->cancelledError(request);
+}
+
+ResourceError FrameLoader::fileDoesNotExistError(
+    const ResourceResponse& response) const {
+  return m_client->fileDoesNotExistError(response);
+}
+
+PassRefPtr<SharedBuffer> FrameLoader::mainResourceData() const {
+  if (!m_mainResourceLoader)
+    return 0;
+  return m_mainResourceLoader->resourceData();
 }
 
 }  // namespace WebCore
