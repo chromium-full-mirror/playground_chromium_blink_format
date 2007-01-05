@@ -84,6 +84,13 @@ class RenderTableSection : public RenderContainer {
   void appendColumn(int pos);
   void splitColumn(int pos, int newSize);
 
+  virtual int overflowWidth(bool includeInterior = true) const {
+    return (!includeInterior && hasOverflowClip()) ? m_width : m_overflowWidth;
+  }
+  virtual int overflowLeft(bool includeInterior = true) const {
+    return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowLeft;
+  }
+
   virtual int lowestPosition(bool includeOverflowInterior,
                              bool includeSelf) const;
   virtual int rightmostPosition(bool includeOverflowInterior,
@@ -151,6 +158,9 @@ class RenderTableSection : public RenderContainer {
   int m_outerBorderRight;
   int m_outerBorderTop;
   int m_outerBorderBottom;
+  int m_overflowLeft;
+  int m_overflowWidth;
+  bool m_hasOverflowingCell;
 };
 
 }  // namespace WebCore
