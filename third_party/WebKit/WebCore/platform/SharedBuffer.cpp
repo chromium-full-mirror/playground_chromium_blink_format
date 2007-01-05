@@ -73,8 +73,7 @@ inline const char* SharedBuffer::platformData() const {
   return 0;
 }
 
-inline unsigned SharedBuffer::platformDataSize() const;
-{
+inline unsigned SharedBuffer::platformDataSize() const {
   ASSERT_NOT_REACHED();
 
   return 0;

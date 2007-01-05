@@ -131,7 +131,7 @@ class CachedResource {
   void setRequest(Request*);
 
   SharedBuffer* allData() const { return m_allData.get(); }
-  void setAllData(PassRefPtr<SharedBuffer>);
+  void setAllData(PassRefPtr<SharedBuffer> allData) { m_allData = allData; }
 
   void setResponse(const ResourceResponse& response) { m_response = response; }
   const ResourceResponse& response() const { return m_response; }
