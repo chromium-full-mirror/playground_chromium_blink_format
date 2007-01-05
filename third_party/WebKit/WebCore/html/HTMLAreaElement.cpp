@@ -198,10 +198,6 @@ void HTMLAreaElement::setShape(const String& value) {
   setAttribute(shapeAttr, value);
 }
 
-int HTMLAreaElement::tabIndex() const {
-  return getAttribute(tabindexAttr).toInt();
-}
-
 void HTMLAreaElement::setTabIndex(int tabIndex) {
   setAttribute(tabindexAttr, String::number(tabIndex));
 }

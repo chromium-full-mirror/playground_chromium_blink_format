@@ -33,6 +33,7 @@
 namespace WebCore {
 
 class Frame;
+class KeyboardEvent;
 class Node;
 class Page;
 
@@ -43,6 +44,8 @@ class FocusController {
   void setFocusedFrame(PassRefPtr<Frame>);
   Frame* focusedFrame() const { return m_focusedFrame.get(); }
   Frame* focusedOrMainFrame();
+
+  bool advanceFocus(KeyboardEvent*);
 
  private:
   Page* m_page;

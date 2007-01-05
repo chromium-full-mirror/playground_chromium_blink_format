@@ -104,7 +104,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   String standby() const;
   void setStandby(const String&);
 
-  int tabIndex() const;
   void setTabIndex(int);
 
   String type() const;
