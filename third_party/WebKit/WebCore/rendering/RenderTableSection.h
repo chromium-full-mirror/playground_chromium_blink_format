@@ -24,8 +24,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef RenderTableSection_H
-#define RenderTableSection_H
+#ifndef RenderTableSection_h
+#define RenderTableSection_h
 
 #include "RenderTable.h"
 #include <wtf/Vector.h>
@@ -38,24 +38,23 @@ class RenderTableSection : public RenderContainer {
  public:
   RenderTableSection(Node*);
   ~RenderTableSection();
+
+  virtual const char* renderName() const { return "RenderTableSection"; }
+
+  virtual bool isTableSection() const { return true; }
+
   virtual void destroy();
 
   virtual void setStyle(RenderStyle*);
 
-  virtual const char* renderName() const { return "RenderTableSection"; }
-
-  // overrides
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual bool isTableSection() const { return true; }
 
-  virtual short lineHeight(bool) const { return 0; }
+  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const {
+    return 0;
+  }
   virtual void position(InlineBox*) {}
 
-#ifndef NDEBUG
-  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
-#endif
-
-  void addCell(RenderTableCell* cell, RenderObject* row);
+  void addCell(RenderTableCell*, RenderObject* row);
 
   void setCellWidths();
   void calcRowHeight();
@@ -67,7 +66,9 @@ class RenderTableSection : public RenderContainer {
     RenderTableCell* cell;
     bool inColSpan;  // true for columns after the first in a colspan
   };
+
   typedef Vector<CellStruct> Row;
+
   struct RowStruct {
     Row* row;
     RenderObject* rowRenderer;
@@ -75,10 +76,13 @@ class RenderTableSection : public RenderContainer {
     Length height;
   };
 
-  CellStruct& cellAt(int row, int col) { return (*grid[row].row)[col]; }
+  CellStruct& cellAt(int row, int col) { return (*m_grid[row].row)[col]; }
   const CellStruct& cellAt(int row, int col) const {
-    return (*grid[row].row)[col];
+    return (*m_grid[row].row)[col];
   }
+
+  void appendColumn(int pos);
+  void RenderTableSection::splitColumn(int pos, int newSize);
 
   virtual int lowestPosition(bool includeOverflowInterior,
                              bool includeSelf) const;
@@ -100,16 +104,23 @@ class RenderTableSection : public RenderContainer {
 
   virtual void paint(PaintInfo&, int tx, int ty);
 
-  int numRows() const { return gridRows; }
+  int numRows() const { return m_gridRows; }
   int numColumns() const;
-  int getBaseline(int row) { return grid[row].baseLine; }
-
-  void setNeedCellRecalc() {
-    needCellRecalc = true;
-    table()->setNeedSectionRecalc();
+  void recalcCells();
+  void recalcCellsIfNeeded() {
+    if (m_needsCellRecalc)
+      recalcCells();
   }
 
-  virtual RenderObject* removeChildNode(RenderObject* child);
+  bool needsCellRecalc() const { return m_needsCellRecalc; }
+  void setNeedsCellRecalc() {
+    m_needsCellRecalc = true;
+    table()->setNeedsSectionRecalc();
+  }
+
+  int getBaseline(int row) { return m_grid[row].baseLine; }
+
+  virtual RenderObject* removeChildNode(RenderObject*);
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -119,26 +130,29 @@ class RenderTableSection : public RenderContainer {
                            int ty,
                            HitTestAction);
 
-  // this gets a cell grid data structure. changing the number of
-  // columns is done by the table
-  Vector<RowStruct> grid;
-  int gridRows;
-  Vector<int> rowPos;
-
-  // the current insertion position
-  int cCol;
-  int cRow;
-  bool needCellRecalc;
-
-  void recalcCells();
+#ifndef NDEBUG
+  virtual void dump(TextStream*, DeprecatedString ind = "") const;
+#endif
 
  protected:
-  bool ensureRows(int numRows);
+  bool ensureRows(int);
   void clearGrid();
+
+  Vector<RowStruct> m_grid;
+  int m_gridRows;
+  Vector<int> m_rowPos;
+
+  // the current insertion position
+  int m_cCol;
+  int m_cRow;
+  bool m_needsCellRecalc;
+
   int m_outerBorderLeft;
   int m_outerBorderRight;
   int m_outerBorderTop;
   int m_outerBorderBottom;
 };
-}
-#endif
+
+}  // namespace WebCore
+
+#endif  // RenderTableSection_h

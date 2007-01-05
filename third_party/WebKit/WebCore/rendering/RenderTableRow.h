@@ -24,8 +24,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef RenderTableRow_H
-#define RenderTableRow_H
+#ifndef RenderTableRow_h
+#define RenderTableRow_h
 
 #include "RenderTableSection.h"
 
@@ -35,12 +35,24 @@ class RenderTableRow : public RenderContainer {
  public:
   RenderTableRow(Node*);
 
-  virtual void destroy();
-  virtual void setStyle(RenderStyle*);
   virtual const char* renderName() const { return "RenderTableRow"; }
+
   virtual bool isTableRow() const { return true; }
+
+  virtual void destroy();
+
+  RenderTableSection* section() const {
+    return static_cast<RenderTableSection*>(parent());
+  }
+  RenderTable* table() const {
+    return static_cast<RenderTable*>(parent()->parent());
+  }
+
+  virtual void setStyle(RenderStyle*);
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual short lineHeight(bool) const { return 0; }
+  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const {
+    return 0;
+  }
   virtual void position(InlineBox*) {}
   virtual void layout();
   virtual IntRect getAbsoluteRepaintRect();
@@ -56,14 +68,8 @@ class RenderTableRow : public RenderContainer {
   virtual bool requiresLayer() { return isTransparent() || hasOverflowClip(); }
 
   virtual void paint(PaintInfo&, int tx, int ty);
-
-  RenderTable* table() const {
-    return static_cast<RenderTable*>(parent()->parent());
-  }
-  RenderTableSection* section() const {
-    return static_cast<RenderTableSection*>(parent());
-  }
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RenderTableRow_h

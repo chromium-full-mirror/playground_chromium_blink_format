@@ -37,8 +37,8 @@ class AutoTableLayout : public TableLayout {
   AutoTableLayout(RenderTable*);
   ~AutoTableLayout();
 
-  void calcMinMaxWidth();
-  void layout();
+  virtual void calcMinMaxWidth(int& minWidth, int& maxWidth);
+  virtual void layout();
 
  protected:
   void fullRecalc();
