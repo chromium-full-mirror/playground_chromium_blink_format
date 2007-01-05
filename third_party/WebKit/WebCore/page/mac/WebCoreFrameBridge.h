@@ -142,12 +142,6 @@ typedef enum ObjectElementType {
                 (float)printWidthScaleFactor
                                           printHeight:(float)printHeight;
 
-- (NSView*)nextKeyView;
-- (NSView*)previousKeyView;
-
-- (NSView*)nextKeyViewInsideWebFrameViews;
-- (NSView*)previousKeyViewInsideWebFrameViews;
-
 - (NSObject*)copyRenderTree:(id<WebCoreRenderTreeCopier>)copier;
 - (NSString*)renderTreeAsExternalRepresentation;
 
@@ -364,9 +358,6 @@ rangeByAlteringCurrentSelection:
 
 - (void)formControlIsBecomingFirstResponder:(NSView*)formControl;
 - (void)formControlIsResigningFirstResponder:(NSView*)formControl;
-
-- (NSView*)nextKeyViewOutsideWebFrameViews;
-- (NSView*)previousKeyViewOutsideWebFrameViews;
 
 - (void)setNeedsReapplyStyles;
 

@@ -26,7 +26,6 @@
 #ifndef EventHandler_h
 #define EventHandler_h
 
-#include "FocusDirection.h"
 #include "PlatformMouseEvent.h"
 #include "ScrollTypes.h"
 #include "Timer.h"
@@ -126,11 +125,6 @@ class EventHandler : Noncopyable {
   bool sendContextMenuEvent(PlatformMouseEvent);
 
 #if PLATFORM(MAC)
-
-  NSView* nextKeyView(Node*, FocusDirection);
-  NSView* nextKeyViewInFrameHierarchy(Node*, FocusDirection);
-  static NSView* nextKeyView(Widget*, FocusDirection);
-
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
   static bool currentEventIsMouseDownInWidget(Widget*);
@@ -236,9 +230,6 @@ class EventHandler : Noncopyable {
   KeyboardUIMode keyboardUIMode() const;
 
   NSView* mouseDownViewIfStillGood();
-  NSView* nextKeyViewInFrame(Node*,
-                             FocusDirection,
-                             bool* focusCallResultedInViewBeingCreated = 0);
 #endif
 
   Frame* m_frame;
