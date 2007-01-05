@@ -2180,36 +2180,19 @@ void RenderBlock::positionNewFloats() {
   // already been positioned.  Then we'll be able to move forward, positioning
   // all of
   // the new floats that need it.
-  FloatingObject* lastFloat = m_floatingObjects->prev();
+  FloatingObject* lastFloat = m_floatingObjects->getPrev();
   while (lastFloat && lastFloat->startY == -1) {
-    f = lastFloat;
-    lastFloat = m_floatingObjects->prev();
+    f = m_floatingObjects->prev();
+    lastFloat = m_floatingObjects->getPrev();
   }
 
-  int leftY = m_height;
-  int rightY = m_height;
+  int y = m_height;
 
-  // The float cannot start above the y position of the last positioned float
-  // with the same
-  // alignment type.  Figure out what these values are.
-  bool leftChecked = false;
-  bool rightChecked = false;
-  for (FloatingObject* currFloat = m_floatingObjects->current(); currFloat;
-       currFloat = m_floatingObjects->prev()) {
-    if (!leftChecked && currFloat->type() == FloatingObject::FloatLeft) {
-      leftY = max(currFloat->startY, leftY);
-      leftChecked = true;
-    } else if (!rightChecked &&
-               currFloat->type() == FloatingObject::FloatRight) {
-      rightY = max(currFloat->startY, rightY);
-      rightChecked = true;
-    }
-    if (leftChecked && rightChecked)
-      break;
-  }
+  // The float cannot start above the y position of the last positioned float.
+  if (lastFloat)
+    y = max(lastFloat->startY, y);
 
   // Now walk through the set of unpositioned floats and place them.
-  m_floatingObjects->findRef(f);
   while (f) {
     // The containing block is responsible for positioning floats, so if we have
     // floats in our
@@ -2218,8 +2201,6 @@ void RenderBlock::positionNewFloats() {
       f = m_floatingObjects->next();
       continue;
     }
-
-    int& y = f->type() == FloatingObject::FloatLeft ? leftY : rightY;
 
     RenderObject* o = f->node;
     int _height = o->height() + o->marginTop() + o->marginBottom();
