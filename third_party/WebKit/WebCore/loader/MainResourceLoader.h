@@ -41,7 +41,7 @@ class MainResourceLoader : public ResourceLoader {
   virtual ~MainResourceLoader();
 
 #if PLATFORM(MAC)
-  virtual bool load(NSURLRequest*);
+  virtual bool load(const ResourceRequest&);
   virtual void addData(const char*, int, bool allAtOnce);
 #endif
 
@@ -65,7 +65,7 @@ class MainResourceLoader : public ResourceLoader {
   virtual void didCancel(const ResourceError&);
 
 #if PLATFORM(MAC)
-  NSURLRequest* loadNow(NSURLRequest*);
+  bool loadNow(ResourceRequest&);
 #endif
 
   void receivedError(const ResourceError&);

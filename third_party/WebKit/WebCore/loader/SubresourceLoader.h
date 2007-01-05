@@ -58,7 +58,7 @@ class SubresourceLoader : public ResourceLoader {
   void stopLoading();
 
 #if PLATFORM(MAC)
-  virtual bool load(NSURLRequest*);
+  virtual bool load(const ResourceRequest&);
 
   virtual void willSendRequest(ResourceRequest&,
                                const ResourceResponse& redirectResponse);

@@ -46,16 +46,12 @@
 #ifdef __OBJC__
 @class NSCachedURLResponse;
 @class NSURLAuthenticationChallenge;
-@class NSURLConnection;
-@class NSURLRequest;
 #else
 class NSCachedURLResponse;
 class NSData;
 class NSMutableData;
 class NSURLAuthenticationChallenge;
-class NSURLConnection;
 class NSURLCredential;
-class NSURLRequest;
 #endif
 
 #endif
@@ -74,7 +70,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   void cancel();
 
 #if PLATFORM(MAC)
-  virtual bool load(NSURLRequest*);
+  virtual bool load(const ResourceRequest&);
 
   FrameLoader* frameLoader() const;
 
