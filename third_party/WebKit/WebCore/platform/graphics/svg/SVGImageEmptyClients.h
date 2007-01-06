@@ -206,7 +206,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchDidFirstLayout() {}
 
 #if PLATFORM(MAC)
-  virtual Frame* dispatchCreatePage(NSURLRequest*) { return 0; }
+  virtual Frame* dispatchCreatePage() { return 0; }
 #endif
   virtual void dispatchShow() {}
 

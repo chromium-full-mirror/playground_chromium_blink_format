@@ -39,6 +39,9 @@
 class NSImage;
 class NSURLConnection;
 #endif
+#else
+// FIXME: Get rid of this once we don't use id in the loader
+typedef void* id;
 #endif
 
 namespace WebCore {
@@ -86,18 +89,20 @@ class FrameLoaderClient {
 
   virtual void loadedFromPageCache() = 0;
 
-#if PLATFORM(MAC)
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
                         const ResourceResponse&) = 0;
 
+#if PLATFORM(MAC)
   virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
                                                  const ResourceRequest&) = 0;
+#endif
   virtual void dispatchWillSendRequest(
       DocumentLoader*,
       id identifier,
       ResourceRequest&,
       const ResourceResponse& redirectResponse) = 0;
+#if PLATFORM(MAC)
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       id identifier,
@@ -106,6 +111,7 @@ class FrameLoaderClient {
       DocumentLoader*,
       id identifier,
       NSURLAuthenticationChallenge*) = 0;
+#endif
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           id identifier,
                                           const ResourceResponse&) = 0;
@@ -120,7 +126,6 @@ class FrameLoaderClient {
                                                       const ResourceRequest&,
                                                       const ResourceResponse&,
                                                       int length) = 0;
-#endif
 
   virtual void dispatchDidHandleOnloadEvents() = 0;
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() = 0;
@@ -134,19 +139,14 @@ class FrameLoaderClient {
   virtual void dispatchDidStartProvisionalLoad() = 0;
   virtual void dispatchDidReceiveTitle(const String& title) = 0;
   virtual void dispatchDidCommitLoad() = 0;
-#if PLATFORM(MAC)
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) = 0;
   virtual void dispatchDidFailLoad(const ResourceError&) = 0;
-#endif
   virtual void dispatchDidFinishLoad() = 0;
   virtual void dispatchDidFirstLayout() = 0;
 
-#if PLATFORM(MAC)
-  virtual Frame* dispatchCreatePage(NSURLRequest*) = 0;
-#endif
+  virtual Frame* dispatchCreatePage() = 0;
   virtual void dispatchShow() = 0;
 
-#if PLATFORM(MAC)
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,
                                                const String& MIMEType,
                                                const ResourceRequest&) = 0;
@@ -159,12 +159,9 @@ class FrameLoaderClient {
       FramePolicyFunction,
       const NavigationAction&,
       const ResourceRequest&) = 0;
-#endif
   virtual void cancelPolicyCheck() = 0;
 
-#if PLATFORM(MAC)
   virtual void dispatchUnableToImplementPolicy(const ResourceError&) = 0;
-#endif
 
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>) = 0;
@@ -177,17 +174,13 @@ class FrameLoaderClient {
   virtual void progressStarted() = 0;
   virtual void progressCompleted() = 0;
 
-#if PLATFORM(MAC)
   virtual void incrementProgress(id identifier, const ResourceResponse&) = 0;
   virtual void incrementProgress(id identifier, const char*, int) = 0;
   virtual void completeProgress(id identifier) = 0;
-#endif
 
   virtual void setMainFrameDocumentReady(bool) = 0;
 
-#if PLATFORM(MAC)
   virtual void startDownload(const ResourceRequest&) = 0;
-#endif
 
   virtual void willChangeTitle(DocumentLoader*) = 0;
   virtual void didChangeTitle(DocumentLoader*) = 0;
@@ -212,11 +205,9 @@ class FrameLoaderClient {
 
   virtual void setDefersLoading(bool) = 0;
 
-#if PLATFORM(MAC)
   virtual bool willUseArchive(ResourceLoader*,
                               const ResourceRequest&,
                               const KURL& originalURL) const = 0;
-#endif
   virtual bool isArchiveLoadPending(ResourceLoader*) const = 0;
   virtual void cancelPendingArchiveLoad(ResourceLoader*) = 0;
   virtual void clearArchivedResources() = 0;
