@@ -46,8 +46,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 RenderImage::RenderImage(Node* node)
-    : RenderReplaced(node), m_cachedImage(0), m_isAnonymousImage(0) {
-  m_selectionState = SelectionNone;
+    : RenderReplaced(node), m_cachedImage(0), m_isAnonymousImage(false) {
   setIntrinsicWidth(0);
   setIntrinsicHeight(0);
   updateAltText();
@@ -63,26 +62,14 @@ void RenderImage::setStyle(RenderStyle* newStyle) {
   setShouldPaintBackgroundOrBorder(true);
 }
 
-void RenderImage::setContentObject(CachedResource* cachedResource) {
-  if (cachedResource && m_cachedImage != cachedResource) {
-    if (m_cachedImage)
-      m_cachedImage->deref(this);
-    m_cachedImage = static_cast<CachedImage*>(cachedResource);
-    if (m_cachedImage)
-      m_cachedImage->ref(this);
-  }
-}
-
 void RenderImage::setCachedImage(CachedImage* newImage) {
-  if (isAnonymousImage())
+  if (m_isAnonymousImage || m_cachedImage == newImage)
     return;
-
-  if (m_cachedImage != newImage) {
-    if (m_cachedImage)
-      m_cachedImage->deref(this);
-    m_cachedImage = newImage;
-    if (m_cachedImage)
-      m_cachedImage->ref(this);
+  if (m_cachedImage)
+    m_cachedImage->deref(this);
+  m_cachedImage = newImage;
+  if (m_cachedImage) {
+    m_cachedImage->ref(this);
     if (m_cachedImage->isErrorImage())
       imageChanged(m_cachedImage);
   }
@@ -218,12 +205,12 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (isPrinting && !view()->printImages())
     return;
 
-  if (!m_cachedImage || image()->isNull() || errorOccurred()) {
+  if (!m_cachedImage || image()->isNull() || isErrorImage()) {
     if (paintInfo.phase == PaintPhaseSelection)
       return;
 
     if (cWidth > 2 && cHeight > 2) {
-      if (!errorOccurred()) {
+      if (!isErrorImage()) {
         context->setStrokeStyle(SolidStroke);
         context->setStrokeColor(Color::lightGray);
         context->setFillColor(Color::transparent);
@@ -237,7 +224,7 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
       int usableWidth = cWidth;
       int usableHeight = cHeight;
 
-      if (errorOccurred() && !image()->isNull() &&
+      if (isErrorImage() && !image()->isNull() &&
           (usableWidth >= image()->width()) &&
           (usableHeight >= image()->height())) {
         // Center the error image, accounting for border and padding.

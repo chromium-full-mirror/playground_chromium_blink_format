@@ -172,7 +172,9 @@ class RenderTable : public RenderBlock {
   RenderTableCell* cellBefore(const RenderTableCell*) const;
   RenderTableCell* cellAfter(const RenderTableCell*) const;
 
-  CollapsedBorderValue* currentBorderStyle() { return m_currentBorder; }
+  const CollapsedBorderValue* currentBorderStyle() const {
+    return m_currentBorder;
+  }
 
   bool hasSections() const { return m_head || m_foot || m_firstBody; }
 
@@ -200,7 +202,7 @@ class RenderTable : public RenderBlock {
 
   TableLayout* m_tableLayout;
 
-  CollapsedBorderValue* m_currentBorder;
+  const CollapsedBorderValue* m_currentBorder;
 
   unsigned m_frame : 4;  // Frame
   unsigned m_rules : 4;  // Rules

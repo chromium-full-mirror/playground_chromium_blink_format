@@ -47,7 +47,6 @@ class HTMLLIElement : public HTMLElement {
   void setValue(int);
 
  private:
-  bool m_isValued;
   int m_requestedValue;
 };
 

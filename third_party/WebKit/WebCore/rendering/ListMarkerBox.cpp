@@ -35,7 +35,7 @@ namespace WebCore {
 ListMarkerBox::ListMarkerBox(RenderObject* obj) : InlineBox(obj) {}
 
 bool ListMarkerBox::isText() const {
-  return !static_cast<RenderListMarker*>(object())->listImage();
+  return static_cast<RenderListMarker*>(object())->isText();
 }
 
 }  // namespace WebCore

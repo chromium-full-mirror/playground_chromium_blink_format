@@ -29,6 +29,7 @@
 #include "FrameView.h"
 #include "InlineTextBox.h"
 #include "RenderArena.h"
+#include "RenderLayer.h"
 #include "RenderView.h"
 #include "break_lines.h"
 #include <wtf/AlwaysInline.h>
@@ -1866,7 +1867,7 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
         curr->deleteLine(arena);
         curr = next;
       }
-      ASSERT(!m_firstLineBox && !m_lastLineBox);
+      ASSERT(!firstLineBox() && !lastLineBox());
     }
   } else {
     for (curr = firstRootBox(); curr && !curr->isDirty();

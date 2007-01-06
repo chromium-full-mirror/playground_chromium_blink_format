@@ -1,6 +1,4 @@
 /*
- * This file is part of the HTML widget for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
@@ -28,10 +26,6 @@
 
 namespace WebCore {
 
-class FrameView;
-class Position;
-class Widget;
-
 class RenderReplaced : public RenderBox {
  public:
   RenderReplaced(Node*);
@@ -44,7 +38,6 @@ class RenderReplaced : public RenderBox {
 
   virtual void calcMinMaxWidth();
 
-  bool shouldPaint(PaintInfo&, int& tx, int& ty);
   virtual void paint(PaintInfo&, int tx, int ty) = 0;
 
   virtual int intrinsicWidth() const { return m_intrinsicWidth; }
@@ -64,9 +57,13 @@ class RenderReplaced : public RenderBox {
   }
   virtual void setSelectionState(SelectionState);
   virtual IntRect selectionRect();
-  bool isSelected();
+
+  bool isSelected() const;
 
  protected:
+  bool shouldPaint(PaintInfo&, int& tx, int& ty);
+
+ private:
   int m_intrinsicWidth;
   int m_intrinsicHeight;
 

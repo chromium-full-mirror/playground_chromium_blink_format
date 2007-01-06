@@ -4,7 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2005, 2006, 2007 Apple Computer, Inc.
  * Copyright (C) 2006 Graham Dennis (graham.dennis@gmail.com)
  *
  * This library is free software; you can redistribute it and/or
@@ -48,6 +48,7 @@
 #include "Pair.h"
 #include "Shared.h"
 #include "TextDirection.h"
+#include <wtf/HashMap.h>
 #include <wtf/Vector.h>
 
 #ifdef SVG_SUPPORT
@@ -67,16 +68,17 @@ namespace WebCore {
 
 using std::max;
 
-class CachedImage;
-class CachedResource;
 class CSSStyleSelector;
 class CSSValueList;
-struct CursorData;
+class CachedImage;
+class CachedResource;
 class CursorList;
 class Pair;
 class RenderArena;
 class ShadowValue;
 class StringImpl;
+
+struct CursorData;
 
 enum PseudoState {
   PseudoUnknown,
@@ -426,7 +428,7 @@ class StyleVisualData : public Shared<StyleVisualData> {
  public:
   StyleVisualData();
   ~StyleVisualData();
-  StyleVisualData(const StyleVisualData& o);
+  StyleVisualData(const StyleVisualData&);
 
   bool operator==(const StyleVisualData& o) const {
     return (clip == o.clip && hasClip == o.hasClip && colspan == o.colspan &&
@@ -778,45 +780,128 @@ enum EAppearance {
   TextAreaAppearance
 };
 
-// This struct is for rarely used non-inherited CSS3 properties.  By grouping
-// them together,
-// we save space, and only allocate this object when someone actually uses
-// a non-inherited CSS3 property.
-class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
+enum EListStyleType {
+  DISC,
+  CIRCLE,
+  SQUARE,
+  LDECIMAL,
+  DECIMAL_LEADING_ZERO,
+  LOWER_ROMAN,
+  UPPER_ROMAN,
+  LOWER_GREEK,
+  LOWER_ALPHA,
+  LOWER_LATIN,
+  UPPER_ALPHA,
+  UPPER_LATIN,
+  HEBREW,
+  ARMENIAN,
+  GEORGIAN,
+  CJK_IDEOGRAPHIC,
+  HIRAGANA,
+  KATAKANA,
+  HIRAGANA_IROHA,
+  KATAKANA_IROHA,
+  LNONE
+};
+
+struct CounterDirectives {
+  CounterDirectives() : m_reset(false), m_increment(false) {}
+
+  bool m_reset;
+  int m_resetValue;
+  bool m_increment;
+  int m_incrementValue;
+};
+
+bool operator==(const CounterDirectives&, const CounterDirectives&);
+inline bool operator!=(const CounterDirectives& a, const CounterDirectives& b) {
+  return !(a == b);
+}
+
+typedef HashMap<RefPtr<AtomicStringImpl>, CounterDirectives>
+    CounterDirectiveMap;
+
+class CounterContent {
  public:
-  StyleCSS3NonInheritedData();
-  ~StyleCSS3NonInheritedData();
-  StyleCSS3NonInheritedData(const StyleCSS3NonInheritedData& o);
+  CounterContent(const AtomicString& identifier,
+                 EListStyleType style,
+                 const AtomicString& separator)
+      : m_identifier(identifier), m_listStyle(style), m_separator(separator) {}
+
+  const AtomicString& identifier() const { return m_identifier; }
+  EListStyleType listStyle() const { return m_listStyle; }
+  const AtomicString& separator() const { return m_separator; }
+
+ private:
+  AtomicString m_identifier;
+  EListStyleType m_listStyle;
+  AtomicString m_separator;
+};
+
+enum ContentType {
+  CONTENT_NONE,
+  CONTENT_OBJECT,
+  CONTENT_TEXT,
+  CONTENT_COUNTER
+};
+
+struct ContentData : Noncopyable {
+  ContentData() : m_type(CONTENT_NONE), m_next(0) {}
+  ~ContentData() { clear(); }
+
+  void clear();
+
+  ContentType m_type;
+  union {
+    CachedResource* m_object;
+    StringImpl* m_text;
+    CounterContent* m_counter;
+  } m_content;
+  ContentData* m_next;
+};
+
+// This struct is for rarely used non-inherited CSS3, CSS2, and WebKit-specific
+// properties.
+// By grouping them together, we save space, and only allocate this object when
+// someone
+// actually uses one of these properties.
+class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
+ public:
+  StyleRareNonInheritedData();
+  ~StyleRareNonInheritedData();
+  StyleRareNonInheritedData(const StyleRareNonInheritedData&);
 
 #ifdef XBL_SUPPORT
-  bool bindingsEquivalent(const StyleCSS3NonInheritedData& o) const;
+  bool bindingsEquivalent(const StyleRareNonInheritedData&) const;
 #endif
 
-  bool operator==(const StyleCSS3NonInheritedData& o) const;
-  bool operator!=(const StyleCSS3NonInheritedData& o) const {
+  bool operator==(const StyleRareNonInheritedData&) const;
+  bool operator!=(const StyleRareNonInheritedData& o) const {
     return !(*this == o);
   }
 
-  bool shadowDataEquivalent(const StyleCSS3NonInheritedData& o) const;
+  bool shadowDataEquivalent(const StyleRareNonInheritedData& o) const;
 
-  int lineClamp;  // An Apple extension.  Not really CSS3 but not worth making a
-                  // new struct over.
+  int lineClamp;  // An Apple extension.
   Vector<StyleDashboardRegion> m_dashboardRegions;
   float opacity;  // Whether or not we're transparent.
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
-  unsigned userDrag : 2;                      // EUserDrag
-  unsigned userSelect : 2;                    // EUserSelect
-  bool textOverflow : 1;  // Whether or not lines that spill out should be
-                          // truncated with "..."
-  unsigned marginTopCollapse : 2;                // EMarginCollapse
-  unsigned marginBottomCollapse : 2;             // EMarginCollapse
-  unsigned matchNearestMailBlockquoteColor : 1;  // FIXME: This property needs
-                                                 // to be eliminated.  It should
-                                                 // never have been added in the
-                                                 // first place.
+  ContentData* m_content;
+  CounterDirectiveMap* m_counterDirectives;
 
-  unsigned m_appearance : 6;  // EAppearance
+  unsigned userDrag : 2;    // EUserDrag
+  unsigned userSelect : 2;  // EUserSelect
+  bool textOverflow : 1;    // Whether or not lines that spill out should be
+                            // truncated with "..."
+  unsigned marginTopCollapse : 2;     // EMarginCollapse
+  unsigned marginBottomCollapse : 2;  // EMarginCollapse
+  unsigned
+      matchNearestMailBlockquoteColor : 1;  // EMatchNearestMailBlockquoteColor,
+                                            // FIXME: This property needs to be
+                                            // eliminated. It should never have
+                                            // been added.
+  unsigned m_appearance : 6;                // EAppearance
 
   ShadowData* m_boxShadow;  // For box-shadow decorations.
 
@@ -825,21 +910,22 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
 #endif
 };
 
-// This struct is for rarely used inherited CSS3 properties.  By grouping them
-// together,
-// we save space, and only allocate this object when someone actually uses
-// an inherited CSS3 property.
-class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
+// This struct is for rarely used inherited CSS3, CSS2, and WebKit-specific
+// properties.
+// By grouping them together, we save space, and only allocate this object when
+// someone
+// actually uses one of these properties.
+class StyleRareInheritedData : public Shared<StyleRareInheritedData> {
  public:
-  StyleCSS3InheritedData();
-  ~StyleCSS3InheritedData();
-  StyleCSS3InheritedData(const StyleCSS3InheritedData& o);
+  StyleRareInheritedData();
+  ~StyleRareInheritedData();
+  StyleRareInheritedData(const StyleRareInheritedData& o);
 
-  bool operator==(const StyleCSS3InheritedData& o) const;
-  bool operator!=(const StyleCSS3InheritedData& o) const {
+  bool operator==(const StyleRareInheritedData& o) const;
+  bool operator!=(const StyleRareInheritedData& o) const {
     return !(*this == o);
   }
-  bool shadowDataEquivalent(const StyleCSS3InheritedData& o) const;
+  bool shadowDataEquivalent(const StyleRareInheritedData&) const;
 
   Color textStrokeColor;
   float textStrokeWidth;
@@ -850,16 +936,12 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
   AtomicString
       highlight;  // Apple-specific extension for custom highlight rendering.
   unsigned textSecurity : 2;    // ETextSecurity
-  unsigned userModify : 2;      // EUserModify  (editing)
+  unsigned userModify : 2;      // EUserModify (editing)
   unsigned wordWrap : 1;        // EWordWrap
   unsigned nbspMode : 1;        // ENBSPMode
   unsigned khtmlLineBreak : 1;  // EKHTMLLineBreak
-  bool textSizeAdjust : 1;      // An Apple extension.  Not really CSS3 but not
-                                // worth making a new struct over.
+  bool textSizeAdjust : 1;      // An Apple extension.
   unsigned resize : 2;          // EResize
-
- private:
-  StyleCSS3InheritedData& operator=(const StyleCSS3InheritedData&);
 };
 
 //------------------------------------------------
@@ -924,30 +1006,6 @@ enum EEmptyCell { SHOW, HIDE };
 
 enum ECaptionSide { CAPTOP, CAPBOTTOM, CAPLEFT, CAPRIGHT };
 
-enum EListStyleType {
-  DISC,
-  CIRCLE,
-  SQUARE,
-  LDECIMAL,
-  DECIMAL_LEADING_ZERO,
-  LOWER_ROMAN,
-  UPPER_ROMAN,
-  LOWER_GREEK,
-  LOWER_ALPHA,
-  LOWER_LATIN,
-  UPPER_ALPHA,
-  UPPER_LATIN,
-  HEBREW,
-  ARMENIAN,
-  GEORGIAN,
-  CJK_IDEOGRAPHIC,
-  HIRAGANA,
-  KATAKANA,
-  HIRAGANA_IROHA,
-  KATAKANA_IROHA,
-  LNONE
-};
-
 enum EListStylePosition { OUTSIDE, INSIDE };
 
 enum EVisibility { VISIBLE, HIDDEN, COLLAPSE };
@@ -1006,63 +1064,6 @@ class CursorList : public Shared<CursorList> {
 
  private:
   Vector<CursorData> m_vector;
-};
-
-enum ContentType {
-  CONTENT_NONE,
-  CONTENT_OBJECT,
-  CONTENT_TEXT,
-  CONTENT_COUNTER
-};
-
-class CounterData {
- public:
-  CounterData() {}
-  CounterData(const String& i, EListStyleType l, const String& s)
-      : m_identifier(i), m_listStyle(l), m_separator(s) {}
-
-  String identifier() { return m_identifier; }
-  EListStyleType listStyle() { return m_listStyle; }
-  String separator() { return m_separator; }
-
- private:
-  String m_identifier;
-  EListStyleType m_listStyle;
-  String m_separator;
-};
-
-struct ContentData {
-  ContentData() : _contentType(CONTENT_NONE), _nextContent(0) {}
-  ~ContentData();
-  void clearContent();
-
-  ContentType contentType() { return _contentType; }
-
-  StringImpl* contentText() {
-    if (contentType() == CONTENT_TEXT)
-      return _content.text;
-    return 0;
-  }
-  CachedResource* contentObject() {
-    if (contentType() == CONTENT_OBJECT)
-      return _content.object;
-    return 0;
-  }
-  CounterData* contentCounter() {
-    if (contentType() == CONTENT_COUNTER)
-      return _content.counter;
-    return 0;
-  }
-
-  ContentType _contentType;
-
-  union {
-    CachedResource* object;
-    StringImpl* text;
-    CounterData* counter;
-  } _content;
-
-  ContentData* _nextContent;
 };
 
 //------------------------------------------------
@@ -1234,20 +1235,14 @@ class RenderStyle {
   DataRef<StyleVisualData> visual;
   DataRef<StyleBackgroundData> background;
   DataRef<StyleSurroundData> surround;
-  DataRef<StyleCSS3NonInheritedData> css3NonInheritedData;
+  DataRef<StyleRareNonInheritedData> rareNonInheritedData;
 
   // inherited attributes
-  DataRef<StyleCSS3InheritedData> css3InheritedData;
+  DataRef<StyleRareInheritedData> rareInheritedData;
   DataRef<StyleInheritedData> inherited;
 
   // list of associated pseudo styles
   RenderStyle* pseudoStyle;
-
-  // added this here, so we can get rid of the vptr in this class.
-  // makes up for the same size.
-  ContentData* content;
-  RefPtr<CSSValueList> counterResetList;
-  RefPtr<CSSValueList> counterIncrementList;
 
   unsigned m_pseudoState : 3;  // PseudoState
   bool m_affectedByAttributeSelectors : 1;
@@ -1648,7 +1643,7 @@ class RenderStyle {
 
 // CSS3 Getter Methods
 #ifdef XBL_SUPPORT
-  BindingURI* bindingURIs() const { return css3NonInheritedData->bindingURI; }
+  BindingURI* bindingURIs() const { return rareNonInheritedData->bindingURI; }
 #endif
   int outlineOffset() const {
     if (background->m_outline.style() == BNONE ||
@@ -1656,95 +1651,95 @@ class RenderStyle {
       return 0;
     return background->m_outline._offset;
   }
-  ShadowData* textShadow() const { return css3InheritedData->textShadow; }
-  Color textStrokeColor() const { return css3InheritedData->textStrokeColor; }
-  float textStrokeWidth() const { return css3InheritedData->textStrokeWidth; }
-  Color textFillColor() const { return css3InheritedData->textFillColor; }
-  float opacity() const { return css3NonInheritedData->opacity; }
+  ShadowData* textShadow() const { return rareInheritedData->textShadow; }
+  Color textStrokeColor() const { return rareInheritedData->textStrokeColor; }
+  float textStrokeWidth() const { return rareInheritedData->textStrokeWidth; }
+  Color textFillColor() const { return rareInheritedData->textFillColor; }
+  float opacity() const { return rareNonInheritedData->opacity; }
   EAppearance appearance() const {
-    return static_cast<EAppearance>(css3NonInheritedData->m_appearance);
+    return static_cast<EAppearance>(rareNonInheritedData->m_appearance);
   }
   EBoxAlignment boxAlign() const {
-    return static_cast<EBoxAlignment>(css3NonInheritedData->flexibleBox->align);
+    return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->align);
   }
   EBoxDirection boxDirection() const {
     return static_cast<EBoxDirection>(inherited_flags._box_direction);
   }
-  float boxFlex() { return css3NonInheritedData->flexibleBox->flex; }
+  float boxFlex() { return rareNonInheritedData->flexibleBox->flex; }
   unsigned int boxFlexGroup() const {
-    return css3NonInheritedData->flexibleBox->flex_group;
+    return rareNonInheritedData->flexibleBox->flex_group;
   }
   EBoxLines boxLines() {
-    return static_cast<EBoxLines>(css3NonInheritedData->flexibleBox->lines);
+    return static_cast<EBoxLines>(rareNonInheritedData->flexibleBox->lines);
   }
   unsigned int boxOrdinalGroup() const {
-    return css3NonInheritedData->flexibleBox->ordinal_group;
+    return rareNonInheritedData->flexibleBox->ordinal_group;
   }
   EBoxOrient boxOrient() const {
-    return static_cast<EBoxOrient>(css3NonInheritedData->flexibleBox->orient);
+    return static_cast<EBoxOrient>(rareNonInheritedData->flexibleBox->orient);
   }
   EBoxAlignment boxPack() const {
-    return static_cast<EBoxAlignment>(css3NonInheritedData->flexibleBox->pack);
+    return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->pack);
   }
-  ShadowData* boxShadow() const { return css3NonInheritedData->m_boxShadow; }
+  ShadowData* boxShadow() const { return rareNonInheritedData->m_boxShadow; }
   EBoxSizing boxSizing() const {
     return static_cast<EBoxSizing>(box->boxSizing);
   }
   Length marqueeIncrement() const {
-    return css3NonInheritedData->marquee->increment;
+    return rareNonInheritedData->marquee->increment;
   }
-  int marqueeSpeed() const { return css3NonInheritedData->marquee->speed; }
-  int marqueeLoopCount() const { return css3NonInheritedData->marquee->loops; }
+  int marqueeSpeed() const { return rareNonInheritedData->marquee->speed; }
+  int marqueeLoopCount() const { return rareNonInheritedData->marquee->loops; }
   EMarqueeBehavior marqueeBehavior() const {
     return static_cast<EMarqueeBehavior>(
-        css3NonInheritedData->marquee->behavior);
+        rareNonInheritedData->marquee->behavior);
   }
   EMarqueeDirection marqueeDirection() const {
     return static_cast<EMarqueeDirection>(
-        css3NonInheritedData->marquee->direction);
+        rareNonInheritedData->marquee->direction);
   }
   EUserModify userModify() const {
-    return static_cast<EUserModify>(css3InheritedData->userModify);
+    return static_cast<EUserModify>(rareInheritedData->userModify);
   }
   EUserDrag userDrag() const {
-    return static_cast<EUserDrag>(css3NonInheritedData->userDrag);
+    return static_cast<EUserDrag>(rareNonInheritedData->userDrag);
   }
   EUserSelect userSelect() const {
-    return static_cast<EUserSelect>(css3NonInheritedData->userSelect);
+    return static_cast<EUserSelect>(rareNonInheritedData->userSelect);
   }
-  bool textOverflow() const { return css3NonInheritedData->textOverflow; }
+  bool textOverflow() const { return rareNonInheritedData->textOverflow; }
   EMarginCollapse marginTopCollapse() const {
     return static_cast<EMarginCollapse>(
-        css3NonInheritedData->marginTopCollapse);
+        rareNonInheritedData->marginTopCollapse);
   }
   EMarginCollapse marginBottomCollapse() const {
     return static_cast<EMarginCollapse>(
-        css3NonInheritedData->marginBottomCollapse);
+        rareNonInheritedData->marginBottomCollapse);
   }
   EWordWrap wordWrap() const {
-    return static_cast<EWordWrap>(css3InheritedData->wordWrap);
+    return static_cast<EWordWrap>(rareInheritedData->wordWrap);
   }
   ENBSPMode nbspMode() const {
-    return static_cast<ENBSPMode>(css3InheritedData->nbspMode);
+    return static_cast<ENBSPMode>(rareInheritedData->nbspMode);
   }
   EKHTMLLineBreak khtmlLineBreak() const {
-    return static_cast<EKHTMLLineBreak>(css3InheritedData->khtmlLineBreak);
+    return static_cast<EKHTMLLineBreak>(rareInheritedData->khtmlLineBreak);
   }
   EMatchNearestMailBlockquoteColor matchNearestMailBlockquoteColor() const {
     return static_cast<EMatchNearestMailBlockquoteColor>(
-        css3NonInheritedData->matchNearestMailBlockquoteColor);
+        rareNonInheritedData->matchNearestMailBlockquoteColor);
   }
-  const AtomicString& highlight() const { return css3InheritedData->highlight; }
+  const AtomicString& highlight() const { return rareInheritedData->highlight; }
   EResize resize() const {
-    return static_cast<EResize>(css3InheritedData->resize);
+    return static_cast<EResize>(rareInheritedData->resize);
   }
   // End CSS3 Getters
 
   // Apple-specific property getter methods
-  int lineClamp() const { return css3NonInheritedData->lineClamp; }
-  bool textSizeAdjust() const { return css3InheritedData->textSizeAdjust; }
+  int lineClamp() const { return rareNonInheritedData->lineClamp; }
+  bool textSizeAdjust() const { return rareInheritedData->textSizeAdjust; }
   ETextSecurity textSecurity() const {
-    return static_cast<ETextSecurity>(css3InheritedData->textSecurity);
+    return static_cast<ETextSecurity>(rareInheritedData->textSecurity);
   }
 
   // attribute setter methods
@@ -1770,10 +1765,10 @@ class RenderStyle {
   void setMaxHeight(Length v) { SET_VAR(box, max_height, v) }
 
   Vector<StyleDashboardRegion> dashboardRegions() const {
-    return css3NonInheritedData->m_dashboardRegions;
+    return rareNonInheritedData->m_dashboardRegions;
   }
   void setDashboardRegions(Vector<StyleDashboardRegion> regions) {
-    SET_VAR(css3NonInheritedData, m_dashboardRegions, regions);
+    SET_VAR(rareNonInheritedData, m_dashboardRegions, regions);
   }
   void setDashboardRegion(int type,
                           const String& label,
@@ -1790,8 +1785,8 @@ class RenderStyle {
     region.offset.left = l;
     region.type = type;
     if (!append)
-      css3NonInheritedData.access()->m_dashboardRegions.clear();
-    css3NonInheritedData.access()->m_dashboardRegions.append(region);
+      rareNonInheritedData.access()->m_dashboardRegions.clear();
+    rareNonInheritedData.access()->m_dashboardRegions.append(region);
   }
 
   void resetBorder() {
@@ -2036,105 +2031,105 @@ class RenderStyle {
 // CSS3 Setters
 #ifdef XBL_SUPPORT
   void deleteBindingURIs() {
-    delete css3NonInheritedData->bindingURI;
-    SET_VAR(css3NonInheritedData, bindingURI, (BindingURI*)0);
+    delete rareNonInheritedData->bindingURI;
+    SET_VAR(rareNonInheritedData, bindingURI, (BindingURI*)0);
   }
   void inheritBindingURIs(BindingURI* other) {
-    SET_VAR(css3NonInheritedData, bindingURI, other->copy());
+    SET_VAR(rareNonInheritedData, bindingURI, other->copy());
   }
   void addBindingURI(StringImpl* uri);
 #endif
   void setOutlineOffset(int v) { SET_VAR(background, m_outline._offset, v) }
   void setTextShadow(ShadowData* val, bool add = false);
   void setTextStrokeColor(const Color& c) {
-    SET_VAR(css3InheritedData, textStrokeColor, c)
+    SET_VAR(rareInheritedData, textStrokeColor, c)
   }
   void setTextStrokeWidth(float w) {
-    SET_VAR(css3InheritedData, textStrokeWidth, w)
+    SET_VAR(rareInheritedData, textStrokeWidth, w)
   }
   void setTextFillColor(const Color& c) {
-    SET_VAR(css3InheritedData, textFillColor, c)
+    SET_VAR(rareInheritedData, textFillColor, c)
   }
-  void setOpacity(float f) { SET_VAR(css3NonInheritedData, opacity, f); }
+  void setOpacity(float f) { SET_VAR(rareNonInheritedData, opacity, f); }
   void setAppearance(EAppearance a) {
-    SET_VAR(css3NonInheritedData, m_appearance, a);
+    SET_VAR(rareNonInheritedData, m_appearance, a);
   }
   void setBoxAlign(EBoxAlignment a) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, align, a);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, align, a);
   }
   void setBoxDirection(EBoxDirection d) { inherited_flags._box_direction = d; }
   void setBoxFlex(float f) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, flex, f);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, flex, f);
   }
   void setBoxFlexGroup(unsigned int fg) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, flex_group, fg);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, flex_group, fg);
   }
   void setBoxLines(EBoxLines l) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, lines, l);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, lines, l);
   }
   void setBoxOrdinalGroup(unsigned int og) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, ordinal_group, og);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, ordinal_group, og);
   }
   void setBoxOrient(EBoxOrient o) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, orient, o);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, orient, o);
   }
   void setBoxPack(EBoxAlignment p) {
-    SET_VAR(css3NonInheritedData.access()->flexibleBox, pack, p);
+    SET_VAR(rareNonInheritedData.access()->flexibleBox, pack, p);
   }
   void setBoxShadow(ShadowData* val, bool add = false);
   void setBoxSizing(EBoxSizing s) { SET_VAR(box, boxSizing, s); }
   void setMarqueeIncrement(const Length& f) {
-    SET_VAR(css3NonInheritedData.access()->marquee, increment, f);
+    SET_VAR(rareNonInheritedData.access()->marquee, increment, f);
   }
   void setMarqueeSpeed(int f) {
-    SET_VAR(css3NonInheritedData.access()->marquee, speed, f);
+    SET_VAR(rareNonInheritedData.access()->marquee, speed, f);
   }
   void setMarqueeDirection(EMarqueeDirection d) {
-    SET_VAR(css3NonInheritedData.access()->marquee, direction, d);
+    SET_VAR(rareNonInheritedData.access()->marquee, direction, d);
   }
   void setMarqueeBehavior(EMarqueeBehavior b) {
-    SET_VAR(css3NonInheritedData.access()->marquee, behavior, b);
+    SET_VAR(rareNonInheritedData.access()->marquee, behavior, b);
   }
   void setMarqueeLoopCount(int i) {
-    SET_VAR(css3NonInheritedData.access()->marquee, loops, i);
+    SET_VAR(rareNonInheritedData.access()->marquee, loops, i);
   }
   void setUserModify(EUserModify u) {
-    SET_VAR(css3InheritedData, userModify, u);
+    SET_VAR(rareInheritedData, userModify, u);
   }
-  void setUserDrag(EUserDrag d) { SET_VAR(css3NonInheritedData, userDrag, d); }
+  void setUserDrag(EUserDrag d) { SET_VAR(rareNonInheritedData, userDrag, d); }
   void setUserSelect(EUserSelect s) {
-    SET_VAR(css3NonInheritedData, userSelect, s);
+    SET_VAR(rareNonInheritedData, userSelect, s);
   }
   void setTextOverflow(bool b) {
-    SET_VAR(css3NonInheritedData, textOverflow, b);
+    SET_VAR(rareNonInheritedData, textOverflow, b);
   }
   void setMarginTopCollapse(EMarginCollapse c) {
-    SET_VAR(css3NonInheritedData, marginTopCollapse, c);
+    SET_VAR(rareNonInheritedData, marginTopCollapse, c);
   }
   void setMarginBottomCollapse(EMarginCollapse c) {
-    SET_VAR(css3NonInheritedData, marginBottomCollapse, c);
+    SET_VAR(rareNonInheritedData, marginBottomCollapse, c);
   }
-  void setWordWrap(EWordWrap b) { SET_VAR(css3InheritedData, wordWrap, b); }
-  void setNBSPMode(ENBSPMode b) { SET_VAR(css3InheritedData, nbspMode, b); }
+  void setWordWrap(EWordWrap b) { SET_VAR(rareInheritedData, wordWrap, b); }
+  void setNBSPMode(ENBSPMode b) { SET_VAR(rareInheritedData, nbspMode, b); }
   void setKHTMLLineBreak(EKHTMLLineBreak b) {
-    SET_VAR(css3InheritedData, khtmlLineBreak, b);
+    SET_VAR(rareInheritedData, khtmlLineBreak, b);
   }
   void setMatchNearestMailBlockquoteColor(EMatchNearestMailBlockquoteColor c) {
-    SET_VAR(css3NonInheritedData, matchNearestMailBlockquoteColor, c);
+    SET_VAR(rareNonInheritedData, matchNearestMailBlockquoteColor, c);
   }
   void setHighlight(const AtomicString& h) {
-    SET_VAR(css3InheritedData, highlight, h);
+    SET_VAR(rareInheritedData, highlight, h);
   }
-  void setResize(EResize r) { SET_VAR(css3InheritedData, resize, r); }
+  void setResize(EResize r) { SET_VAR(rareInheritedData, resize, r); }
   // End CSS3 Setters
 
   // Apple-specific property setters
-  void setLineClamp(int c) { SET_VAR(css3NonInheritedData, lineClamp, c); }
+  void setLineClamp(int c) { SET_VAR(rareNonInheritedData, lineClamp, c); }
   void setTextSizeAdjust(bool b) {
-    SET_VAR(css3InheritedData, textSizeAdjust, b);
+    SET_VAR(rareInheritedData, textSizeAdjust, b);
   }
   void setTextSecurity(ETextSecurity aTextSecurity) {
-    SET_VAR(css3InheritedData, textSecurity, aTextSecurity);
+    SET_VAR(rareInheritedData, textSecurity, aTextSecurity);
   }
 
 #ifdef SVG_SUPPORT
@@ -2142,25 +2137,17 @@ class RenderStyle {
   SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
 #endif
 
-  ContentData* contentData() { return content; }
+  const ContentData* contentData() const {
+    return rareNonInheritedData->m_content;
+  }
   bool contentDataEquivalent(const RenderStyle* otherStyle) const;
-  void setContent(StringImpl* s, bool add = false);
-  void setContent(CachedResource* o, bool add = false);
-  void setContent(CounterData*, bool add = false);
+  void clearContent();
+  void setContent(StringImpl*, bool add = false);
+  void setContent(CachedResource*, bool add = false);
+  void setContent(CounterContent*, bool add = false);
 
-  bool counterDataEquivalent(RenderStyle*);
-  void setCounterResetList(PassRefPtr<CSSValueList> l) { counterResetList = l; }
-  void setCounterIncrementList(PassRefPtr<CSSValueList> l) {
-    counterIncrementList = l;
-  }
-  bool hasCounterReset(const String&) const;
-  bool hasCounterIncrement(const String&) const;
-  int counterReset(const String&) const;
-  int counterIncrement(const String&) const;
-  CSSValueList* counterResetValueList() { return counterResetList.get(); }
-  CSSValueList* counterIncrementValueList() {
-    return counterIncrementList.get();
-  }
+  const CounterDirectiveMap* counterDirectives() const;
+  CounterDirectiveMap& accessCounterDirectives();
 
   bool inheritedNotEqual(RenderStyle* other) const;
 

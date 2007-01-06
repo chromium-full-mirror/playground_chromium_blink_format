@@ -214,8 +214,8 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
           return;
         }
       } else {
-        if (m_last && m_last->isAnonymousBlock()) {
-          m_last->addChild(newChild);
+        if (lastChild() && lastChild()->isAnonymousBlock()) {
+          lastChild()->addChild(newChild);
           return;
         }
       }
@@ -3731,8 +3731,8 @@ int RenderBlock::getBaselineOfFirstLineBox() const {
     return RenderFlow::getBaselineOfFirstLineBox();
 
   if (childrenInline()) {
-    if (m_firstLineBox)
-      return m_firstLineBox->yPos() + m_firstLineBox->baseline();
+    if (firstLineBox())
+      return firstLineBox()->yPos() + firstLineBox()->baseline();
     else
       return -1;
   } else {
@@ -3756,8 +3756,8 @@ int RenderBlock::getBaselineOfLastLineBox() const {
     if (!firstLineBox() && hasLineIfEmpty())
       return RenderFlow::baselinePosition(true, true) + borderTop() +
              paddingTop();
-    if (m_lastLineBox)
-      return m_lastLineBox->yPos() + m_lastLineBox->baseline();
+    if (lastLineBox())
+      return lastLineBox()->yPos() + lastLineBox()->baseline();
     return -1;
   } else {
     bool haveNormalFlowChild = false;

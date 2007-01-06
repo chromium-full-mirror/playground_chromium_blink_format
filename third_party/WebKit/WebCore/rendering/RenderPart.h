@@ -39,12 +39,12 @@ class RenderPart : public RenderWidget {
 
   virtual const char* renderName() const { return "RenderPart"; }
 
-  void setWidget(Widget*);
+  virtual void setWidget(Widget*);
 
   // FIXME: This should not be necessary.
   // Remove this once WebKit knows to properly schedule layouts using WebCore
   // when objects resize.
-  void updateWidgetPosition();
+  virtual void updateWidgetPosition();
 
   bool hasFallbackContent() const { return m_hasFallbackContent; }
 

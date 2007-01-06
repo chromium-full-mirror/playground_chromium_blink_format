@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006, 2007 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -25,10 +25,9 @@
 #ifndef RENDER_BOX_H
 #define RENDER_BOX_H
 
-#include "RenderLayer.h"
+#include "RenderObject.h"
 
 namespace WebCore {
-class CachedResource;
 
 enum WidthType { Width, MinWidth, MaxWidth };
 
@@ -40,13 +39,13 @@ class RenderBox : public RenderObject {
   virtual const char* renderName() const { return "RenderBox"; }
 
   virtual void setStyle(RenderStyle*);
-  virtual void paint(PaintInfo&, int _tx, int _ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
                            HitTestAction);
 
   virtual void destroy();
@@ -64,7 +63,7 @@ class RenderBox : public RenderObject {
 
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
 
-  virtual void setPos(int xPos, int yPos);
+  virtual void setPos(int x, int y);
 
   virtual int xPos() const { return m_x; }
   virtual int yPos() const { return m_y; }
@@ -116,9 +115,9 @@ class RenderBox : public RenderObject {
                                bool includeSelf = true) const;
 
   virtual IntRect getAbsoluteRepaintRect();
-  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f = false);
+  virtual void computeAbsoluteRepaintRect(IntRect&, bool fixed = false);
 
-  virtual void repaintDuringLayoutIfMoved(const IntRect& rect);
+  virtual void repaintDuringLayoutIfMoved(const IntRect&);
 
   virtual int containingBlockWidth() const;
 
@@ -146,7 +145,7 @@ class RenderBox : public RenderObject {
   int calcPercentageHeight(const Length& height);
 
   virtual int availableHeight() const;
-  int availableHeightUsing(const Length& h) const;
+  int availableHeightUsing(const Length&) const;
 
   void calcVerticalMargins();
 
@@ -156,16 +155,16 @@ class RenderBox : public RenderObject {
   virtual RenderLayer* layer() const { return m_layer; }
 
   virtual IntRect caretRect(int offset,
-                            EAffinity affinity = UPSTREAM,
+                            EAffinity = UPSTREAM,
                             int* extraWidthToEndOfLine = 0);
 
   virtual void paintBackgroundExtended(GraphicsContext*,
-                                       const Color& c,
-                                       const BackgroundLayer* bgLayer,
+                                       const Color&,
+                                       const BackgroundLayer*,
                                        int clipy,
                                        int cliph,
-                                       int _tx,
-                                       int _ty,
+                                       int tx,
+                                       int ty,
                                        int w,
                                        int height,
                                        int bleft,
@@ -178,26 +177,19 @@ class RenderBox : public RenderObject {
   virtual int staticX() const { return m_staticX; }
   virtual int staticY() const { return m_staticY; }
 
- protected:
-  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
-  void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
+  virtual IntRect getOverflowClipRect(int tx, int ty);
+  virtual IntRect getClipRect(int tx, int ty);
 
-  void paintBackgrounds(GraphicsContext*,
-                        const Color&,
-                        const BackgroundLayer*,
-                        int clipy,
-                        int cliph,
-                        int _tx,
-                        int _ty,
-                        int w,
-                        int h);
+  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+
+ protected:
   void paintBackground(GraphicsContext*,
                        const Color&,
                        const BackgroundLayer*,
                        int clipy,
                        int cliph,
-                       int _tx,
-                       int _ty,
+                       int tx,
+                       int ty,
                        int w,
                        int h);
 #if PLATFORM(MAC)
@@ -207,34 +199,48 @@ class RenderBox : public RenderObject {
                             bool behindText);
 #endif
 
+  void calcAbsoluteHorizontal();
+
+ private:
+  void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
+
+  void paintBackgrounds(GraphicsContext*,
+                        const Color&,
+                        const BackgroundLayer*,
+                        int clipy,
+                        int cliph,
+                        int tx,
+                        int ty,
+                        int w,
+                        int h);
+
   int containingBlockWidthForPositioned(
       const RenderObject* containingBlock) const;
   int containingBlockHeightForPositioned(
       const RenderObject* containingBlock) const;
 
-  void calcAbsoluteHorizontal();
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(Length width,
                                     const RenderObject* cb,
                                     TextDirection containerDirection,
-                                    const int containerWidth,
-                                    const int bordersPlusPadding,
-                                    const Length left,
-                                    const Length right,
-                                    const Length marginLeft,
-                                    const Length marginRight,
+                                    int containerWidth,
+                                    int bordersPlusPadding,
+                                    Length left,
+                                    Length right,
+                                    Length marginLeft,
+                                    Length marginRight,
                                     int& widthValue,
                                     int& marginLeftValue,
                                     int& marginRightValue,
                                     int& xPos);
   void calcAbsoluteVerticalValues(Length height,
                                   const RenderObject* cb,
-                                  const int containerHeight,
-                                  const int bordersPlusPadding,
-                                  const Length top,
-                                  const Length bottom,
-                                  const Length marginTop,
-                                  const Length marginBottom,
+                                  int containerHeight,
+                                  int bordersPlusPadding,
+                                  Length top,
+                                  Length bottom,
+                                  Length marginTop,
+                                  Length marginBottom,
                                   int& heightValue,
                                   int& marginTopValue,
                                   int& marginBottomValue,
@@ -243,11 +249,8 @@ class RenderBox : public RenderObject {
   void calcAbsoluteVerticalReplaced();
   void calcAbsoluteHorizontalReplaced();
 
-  virtual IntRect getOverflowClipRect(int tx, int ty);
-  virtual IntRect getClipRect(int tx, int ty);
-
-  // the actual height of the contents + borders + padding
-  int m_height;
+ protected:
+  int m_height;  // the actual height of the contents + borders + padding
 
   int m_y;
 
@@ -260,23 +263,12 @@ class RenderBox : public RenderObject {
   int m_marginLeft;
   int m_marginRight;
 
-  /*
-   * the minimum width the element needs, to be able to render
-   * it's content without clipping
-   */
+  // The minimum width the element needs to be able to render
+  // its content without clipping.
   int m_minWidth;
-  /* The maximum width the element can fill horizontally
-   * ( = the width of the element with line breaking disabled)
-   */
+  // The maximum width the element can fill horizontally
+  // (the width of the element with line breaking disabled).
   int m_maxWidth;
-
-  // Used by flexible boxes when flexing this element.
-  int m_overrideSize;
-
-  // Cached normal flow values for absolute positioned elements with static
-  // left/top values.
-  int m_staticX;
-  int m_staticY;
 
   // A pointer to our layer if we have one.  Currently only positioned elements
   // and floaters have layers.
@@ -284,6 +276,15 @@ class RenderBox : public RenderObject {
 
   // For inline replaced elements, the inline box that owns us.
   InlineBox* m_inlineBoxWrapper;
+
+ private:
+  // Used by flexible boxes when flexing this element.
+  int m_overrideSize;
+
+  // Cached normal flow values for absolute positioned elements with static
+  // left/top values.
+  int m_staticX;
+  int m_staticY;
 };
 
 }  // namespace
