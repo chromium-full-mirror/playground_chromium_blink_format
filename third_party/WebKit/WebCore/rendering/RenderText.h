@@ -152,7 +152,6 @@ class RenderText : public RenderObject {
   virtual IntRect caretRect(int offset,
                             EAffinity,
                             int* extraWidthToEndOfLine = 0);
-  void posOfChar(int ch, int& x, int& y);
 
   virtual int marginLeft() const {
     return style()->marginLeft().calcMinValue(0);

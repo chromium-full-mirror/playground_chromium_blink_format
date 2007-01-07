@@ -130,7 +130,7 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
   paintInfo.context->restore();
 }
 
-static bool translateBox(InlineBox* box, int x, int y, bool topLevel = true) {
+static bool translateBox(InlineBox* box, int x, int y, bool topLevel) {
   if (box->object()->isText()) {
     box->setXPos(box->xPos() + x);
     box->setYPos(box->yPos() + y);
@@ -187,7 +187,7 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
       mx = max(mx, x);
       amx = max(amx, x);
     } else {
-      assert(curr->object()->isInlineFlow());
+      ASSERT(curr->object()->isInlineFlow());
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
       SVGTextPositioningElement* text =
           static_cast<SVGTextPositioningElement*>(flow->object()->element());
@@ -218,15 +218,16 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
 
   int width = mx - mn;
   flow->setWidth(width);
+
   int awidth = amx - amn;
   int dx = 0;
   if (positioned) {
     switch (flow->object()->style()->svgStyle()->textAnchor()) {
       case TA_MIDDLE:
-        translateBox(flow, dx = -awidth / 2, 0);
+        translateBox(flow, dx = -awidth / 2, 0, true);
         break;
       case TA_END:
-        translateBox(flow, dx = -awidth, 0);
+        translateBox(flow, dx = -awidth, 0, true);
         break;
       case TA_START:
       default:
@@ -237,6 +238,10 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
       x += dx;
       mn += dx;
       mx += dx;
+
+      // text-anchor changes the x position of our root box
+      if (flow->isRootInlineBox())
+        flow->setXPos(flow->xPos() - (dx + xPos) / 2);
     }
   }
 
@@ -257,8 +262,6 @@ int placeSVGFlowHorizontally(InlineFlowBox* flow,
   x = placePositionedBoxesHorizontally(flow, x, leftPosition, rightPosition,
                                        ignoreX, ignoreY, needsWordSpacing,
                                        flow->object()->xPos(), true);
-  leftPosition = min(leftPosition, x);
-  rightPosition = max(rightPosition, x);
   needsWordSpacing = false;
   return x;
 }
