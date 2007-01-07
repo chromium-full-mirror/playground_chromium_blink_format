@@ -3470,7 +3470,7 @@ void FrameLoader::requestFromDelegate(ResourceRequest& request,
 #endif
   ResourceRequest newRequest(request);
   m_client->dispatchWillSendRequest(m_documentLoader.get(), identifier,
-                                    newRequest, nil);
+                                    newRequest, ResourceResponse());
 
   if (newRequest.isNull())
     error = m_client->cancelledError(request);

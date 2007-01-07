@@ -46,4 +46,20 @@ namespace WebCore {
 void ResourceLoader::cancel() {
   notImplemented();
 }
+
+bool ResourceLoader::load(const WebCore::ResourceRequest&) {
+  notImplemented();
+}
+
+void ResourceLoader::cancel(const WebCore::ResourceError&) {
+  notImplemented();
+}
+
+void ResourceLoader::releaseResources() {
+  notImplemented();
+}
+
+void ResourceLoader::addData(const char*, int, bool) {
+  notImplemented();
+}
 }

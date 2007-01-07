@@ -147,8 +147,4 @@ time_t CacheObjectExpiresTime(DocLoader*, PlatformResponse) {
   return 0;
 }
 
-void CachedResource::setAllData(PlatformData allData) {
-  m_allData = allData;
-}
-
 }  // namespace WebCore
