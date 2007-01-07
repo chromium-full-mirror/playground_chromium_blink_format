@@ -279,7 +279,8 @@ static xsltStylesheetPtr xsltStylesheetPointer(
   if (!cachedStylesheet && stylesheetRootNode) {
     cachedStylesheet = new XSLStyleSheet(stylesheetRootNode->parent()
                                              ? stylesheetRootNode->parent()
-                                             : stylesheetRootNode);
+                                             : stylesheetRootNode,
+                                         stylesheetRootNode->document()->URL());
     cachedStylesheet->parseString(createMarkup(stylesheetRootNode));
   }
 
@@ -330,19 +331,15 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
                                       DeprecatedString& resultString,
                                       DeprecatedString& resultEncoding) {
   RefPtr<Document> ownerDocument = sourceNode->document();
-  RefPtr<XSLStyleSheet> cachedStylesheet = m_stylesheet;
 
   setXSLTLoadCallBack(docLoaderFunc, this, ownerDocument->docLoader());
   xsltStylesheetPtr sheet =
-      xsltStylesheetPointer(cachedStylesheet, m_stylesheetRootNode.get());
+      xsltStylesheetPointer(m_stylesheet, m_stylesheetRootNode.get());
   if (!sheet) {
     setXSLTLoadCallBack(0, 0, 0);
     return false;
   }
-  cachedStylesheet->clearDocuments();
-
-  if (!m_stylesheet)
-    m_stylesheet = cachedStylesheet;
+  m_stylesheet->clearDocuments();
 
   xmlChar* origMethod = sheet->method;
   if (!origMethod && mimeType == "text/html")
