@@ -601,11 +601,11 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
           !isRootInlineBox())
         paintInfo.outlineObjects->add(flowObject());
     } else {
-      // 1. Paint our background and border.
-      paintBackgroundAndBorder(paintInfo, tx, ty);
+      // 1. Paint our background, border and box-shadow.
+      paintBoxDecorations(paintInfo, tx, ty);
 
       // 2. Paint our underline and overline.
-      paintDecorations(paintInfo, tx, ty, false);
+      paintTextDecorations(paintInfo, tx, ty, false);
     }
   }
 
@@ -627,7 +627,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   // 4. Paint our strike-through
   if (intersectsDamageRect && (paintInfo.phase == PaintPhaseForeground ||
                                paintInfo.phase == PaintPhaseSelection))
-    paintDecorations(paintInfo, tx, ty, true);
+    paintTextDecorations(paintInfo, tx, ty, true);
 }
 
 void InlineFlowBox::paintBackgrounds(GraphicsContext* p,
@@ -689,9 +689,27 @@ void InlineFlowBox::paintBackground(GraphicsContext* context,
   }
 }
 
-void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& paintInfo,
-                                             int tx,
-                                             int ty) {
+void InlineFlowBox::paintBoxShadow(GraphicsContext* context,
+                                   RenderStyle* s,
+                                   int tx,
+                                   int ty,
+                                   int w,
+                                   int h) {
+  if ((!prevLineBox() && !nextLineBox()) || !parent())
+    object()->paintBoxShadow(context, tx, ty, w, h, s);
+  else {
+    // FIXME: We can do better here in the multi-line case. We want to push a
+    // clip so that the shadow doesn't
+    // protrude incorrectly at the edges, and we want to possibly include
+    // shadows cast from the previous/following lines
+    object()->paintBoxShadow(context, tx, ty, w, h, s, includeLeftEdge(),
+                             includeRightEdge());
+  }
+}
+
+void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
+                                        int tx,
+                                        int ty) {
   if (!object()->shouldPaintWithinRoot(paintInfo) ||
       object()->style()->visibility() != VISIBLE ||
       paintInfo.phase != PaintPhaseForeground)
@@ -718,7 +736,11 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& paintInfo,
   // a line may actually have to paint a background.
   RenderStyle* styleToUse = object()->style(m_firstLine);
   if ((!parent() && m_firstLine && styleToUse != object()->style()) ||
-      (parent() && object()->shouldPaintBackgroundOrBorder())) {
+      (parent() && object()->hasBoxDecorations())) {
+    // Shadow comes first and is behind the background and border.
+    if (styleToUse->boxShadow())
+      paintBoxShadow(context, styleToUse, tx, ty, w, h);
+
     Color c = styleToUse->backgroundColor();
     paintBackgrounds(context, c, styleToUse->backgroundLayers(), my, mh, tx, ty,
                      w, h);
@@ -769,7 +791,7 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& paintInfo,
   }
 }
 
-static bool shouldDrawDecoration(RenderObject* obj) {
+static bool shouldDrawTextDecoration(RenderObject* obj) {
   for (RenderObject* curr = obj->firstChild(); curr;
        curr = curr->nextSibling()) {
     if (curr->isInlineFlow())
@@ -789,10 +811,10 @@ static bool shouldDrawDecoration(RenderObject* obj) {
   return false;
 }
 
-void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& paintInfo,
-                                     int tx,
-                                     int ty,
-                                     bool paintedChildren) {
+void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
+                                         int tx,
+                                         int ty,
+                                         bool paintedChildren) {
   // Paint text decorations like underlines/overlines. We only do this if we
   // aren't in quirks mode (i.e., in
   // almost-strict mode or strict mode).
@@ -815,7 +837,7 @@ void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& paintInfo,
   if (deco != TDNONE &&
       ((!paintedChildren && ((deco & UNDERLINE) || (deco & OVERLINE))) ||
        (paintedChildren && (deco & LINE_THROUGH))) &&
-      shouldDrawDecoration(object())) {
+      shouldDrawTextDecoration(object())) {
     int x = m_x + borderLeft() + paddingLeft();
     int w = m_width -
             (borderLeft() + paddingLeft() + borderRight() + paddingRight());

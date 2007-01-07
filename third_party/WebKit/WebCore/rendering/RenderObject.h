@@ -338,7 +338,7 @@ class RenderObject : public CachedResourceClient {
     return m_replaced;
   }  // a "replaced" element (see CSS)
 
-  bool shouldPaintBackgroundOrBorder() const { return m_paintBackground; }
+  bool hasBoxDecorations() const { return m_paintBackground; }
   bool mustRepaintBackgroundOrBorder() const;
 
   bool needsLayout() const {
@@ -438,9 +438,7 @@ class RenderObject : public CachedResourceClient {
   void setRelPositioned(bool b = true) { m_relPositioned = b; }
   void setFloating(bool b = true) { m_floating = b; }
   void setInline(bool b = true) { m_inline = b; }
-  void setShouldPaintBackgroundOrBorder(bool b = true) {
-    m_paintBackground = b;
-  }
+  void setHasBoxDecorations(bool b = true) { m_paintBackground = b; }
   void setRenderText() { m_isText = true; }
   void setReplaced(bool b = true) { m_replaced = b; }
   void setHasOverflowClip(bool b = true) { m_hasOverflowClip = b; }
@@ -527,6 +525,14 @@ class RenderObject : public CachedResourceClient {
                     int w,
                     int h,
                     const RenderStyle*);
+  void paintBoxShadow(GraphicsContext*,
+                      int tx,
+                      int ty,
+                      int w,
+                      int h,
+                      const RenderStyle*,
+                      bool begin = true,
+                      bool end = true);
 
   // RenderBox implements this.
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty) {}

@@ -57,11 +57,6 @@ RenderImage::~RenderImage() {
     m_cachedImage->deref(this);
 }
 
-void RenderImage::setStyle(RenderStyle* newStyle) {
-  RenderReplaced::setStyle(newStyle);
-  setShouldPaintBackgroundOrBorder(true);
-}
-
 void RenderImage::setCachedImage(CachedImage* newImage) {
   if (m_isAnonymousImage || m_cachedImage == newImage)
     return;
@@ -169,7 +164,7 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
   tx += m_x;
   ty += m_y;
 
-  if (shouldPaintBackgroundOrBorder() && paintInfo.phase != PaintPhaseOutline &&
+  if (hasBoxDecorations() && paintInfo.phase != PaintPhaseOutline &&
       paintInfo.phase != PaintPhaseSelfOutline)
     paintBoxDecorations(paintInfo, tx, ty);
 
