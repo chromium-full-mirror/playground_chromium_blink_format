@@ -214,7 +214,6 @@
   }
 
 namespace WebCore {
-class DocumentPtr;
 class Ecma;
 class SVGPreserveAspectRatio;
 class SVGMatrix;

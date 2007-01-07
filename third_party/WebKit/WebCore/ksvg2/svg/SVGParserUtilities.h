@@ -72,7 +72,7 @@ static inline bool checkString(const UChar*& ptr,
 class SVGPolyParser {
  public:
   virtual ~SVGPolyParser() {}
-  void parsePoints(const String& points) const;
+  bool parsePoints(const String& points) const;
 
  protected:
   virtual void svgPolyTo(double x1, double y1, int nr) const = 0;
