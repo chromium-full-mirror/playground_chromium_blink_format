@@ -28,7 +28,10 @@
 #ifdef SVG_SUPPORT
 #include "SVGResourceMasker.h"
 
+#include "ImageBuffer.h"
 #include "TextStream.h"
+
+using namespace std;
 
 namespace WebCore {
 
@@ -36,8 +39,8 @@ SVGResourceMasker::SVGResourceMasker() : SVGResource() {}
 
 SVGResourceMasker::~SVGResourceMasker() {}
 
-void SVGResourceMasker::setMask(ImageBuffer* mask) {
-  m_mask.set(mask);
+void SVGResourceMasker::setMask(auto_ptr<ImageBuffer> mask) {
+  m_mask.set(mask.release());
 }
 
 ImageBuffer* SVGResourceMasker::mask() const {

@@ -35,6 +35,10 @@
 
 namespace WebCore {
 
+IntSize ImageBuffer::size() const {
+  return m_size;
+}
+
 void ImageBuffer::renderSubtreeToImage(ImageBuffer* image, RenderObject* item) {
   ASSERT(item && image && image->context());
   RenderObject::PaintInfo info(image->context(), IntRect(),

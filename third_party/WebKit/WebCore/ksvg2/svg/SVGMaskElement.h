@@ -56,7 +56,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual SVGResource* canvasResource();
 
  protected:
-  ImageBuffer* drawMaskerContent();
+  std::auto_ptr<ImageBuffer> drawMaskerContent();
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGURIReference, String, Href, href)
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
