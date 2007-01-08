@@ -3119,7 +3119,7 @@ int RenderBlock::columnGap() const {
                                                             // the normal gap
                                                             // setting. Matches
                                                             // <p> margins.
-  return style()->columnGap();
+  return static_cast<int>(style()->columnGap());
 }
 
 void RenderBlock::calcColumnWidth() {
@@ -3148,7 +3148,7 @@ void RenderBlock::calcColumnWidth() {
           (availWidth - (m_columnCount - 1) * colGap) / m_columnCount;
     }
   } else if (style()->hasAutoColumnCount()) {
-    int colWidth = style()->columnWidth();
+    int colWidth = static_cast<int>(style()->columnWidth());
     if (colWidth < availWidth) {
       m_columnCount = (availWidth + colGap) / (colWidth + colGap);
       m_columnWidth =
@@ -3156,7 +3156,7 @@ void RenderBlock::calcColumnWidth() {
     }
   } else {
     // Both are set.
-    int colWidth = style()->columnWidth();
+    int colWidth = static_cast<int>(style()->columnWidth());
     int colCount = style()->columnCount();
 
     if (colCount * colWidth + (colCount - 1) * colGap <= availWidth) {
