@@ -236,6 +236,12 @@ class RenderBlock : public RenderFlow {
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
+  // Block flows subclass availableWidth to handle multi column layout
+  // (shrinking the width available to children when laying out.)
+  virtual int availableWidth() const;
+
+  virtual void calcWidth();
+
   virtual void calcMinMaxWidth();
   void calcInlineMinMaxWidth();
   void calcBlockMinMaxWidth();

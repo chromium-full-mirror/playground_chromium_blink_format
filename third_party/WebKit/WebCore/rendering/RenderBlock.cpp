@@ -2304,7 +2304,7 @@ int RenderBlock::leftRelOffset(int y,
   if (applyTextIndent && m_firstLine && style()->direction() == LTR) {
     int cw = 0;
     if (style()->textIndent().isPercent())
-      cw = containingBlock()->contentWidth();
+      cw = containingBlock()->availableWidth();
     left += style()->textIndent().calcMinValue(cw);
   }
 
@@ -2345,7 +2345,7 @@ int RenderBlock::rightRelOffset(int y,
   if (applyTextIndent && m_firstLine && style()->direction() == RTL) {
     int cw = 0;
     if (style()->textIndent().isPercent())
-      cw = containingBlock()->contentWidth();
+      cw = containingBlock()->availableWidth();
     right -= style()->textIndent().calcMinValue(cw);
   }
 
@@ -2798,7 +2798,7 @@ int RenderBlock::getClearDelta(RenderObject* child) {
   int result = clearSet ? max(0, bottom - child->yPos()) : 0;
   if (!result && child->avoidsFloats() && child->style()->width().isFixed() &&
       child->minWidth() > lineWidth(child->yPos()) &&
-      child->minWidth() <= contentWidth() && document()->inStrictMode())
+      child->minWidth() <= availableWidth() && document()->inStrictMode())
     result = max(0, floatBottom() - child->yPos());
   return result;
 }
@@ -3100,6 +3100,18 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
   }
 
   return RenderFlow::positionForCoordinates(x, y);
+}
+
+int RenderBlock::availableWidth() const {
+  // If we have multiple columns, then the available width is reduced to our
+  // column width.
+  return RenderBox::availableWidth();
+}
+
+void RenderBlock::calcWidth() {
+  RenderBox::calcWidth();
+
+  // Calculate our column width.
 }
 
 void RenderBlock::calcMinMaxWidth() {

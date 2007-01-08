@@ -810,7 +810,7 @@ RenderBlock* RenderObject::containingBlock() const {
 
 int RenderObject::containingBlockWidth() const {
   // FIXME ?
-  return containingBlock()->contentWidth();
+  return containingBlock()->availableWidth();
 }
 
 int RenderObject::containingBlockHeight() const {
@@ -2585,7 +2585,7 @@ int RenderObject::paddingTop() const {
   int w = 0;
   Length padding = m_style->paddingTop();
   if (padding.isPercent())
-    w = containingBlock()->contentWidth();
+    w = containingBlock()->availableWidth();
   w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
@@ -2596,7 +2596,7 @@ int RenderObject::paddingBottom() const {
   int w = 0;
   Length padding = style()->paddingBottom();
   if (padding.isPercent())
-    w = containingBlock()->contentWidth();
+    w = containingBlock()->availableWidth();
   w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
@@ -2607,7 +2607,7 @@ int RenderObject::paddingLeft() const {
   int w = 0;
   Length padding = style()->paddingLeft();
   if (padding.isPercent())
-    w = containingBlock()->contentWidth();
+    w = containingBlock()->availableWidth();
   w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();
@@ -2618,7 +2618,7 @@ int RenderObject::paddingRight() const {
   int w = 0;
   Length padding = style()->paddingRight();
   if (padding.isPercent())
-    w = containingBlock()->contentWidth();
+    w = containingBlock()->availableWidth();
   w = padding.calcMinValue(w);
   if (isTableCell() && padding.isAuto())
     w = static_cast<const RenderTableCell*>(this)->table()->cellPadding();

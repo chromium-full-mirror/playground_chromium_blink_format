@@ -671,6 +671,7 @@ class StyleMultiColData : public Shared<StyleMultiColData> {
   BorderValue m_rule;
 
   bool m_autoWidth : 1;
+  bool m_autoCount : 1;
   bool m_normalGap : 1;
   unsigned m_breakBefore : 2;  // EPageBreak
   unsigned m_breakAfter : 2;   // EPageBreak
@@ -1773,6 +1774,9 @@ class RenderStyle {
   unsigned short columnCount() const {
     return rareNonInheritedData->m_multiCol->m_count;
   }
+  bool hasAutoColumnCount() const {
+    return rareNonInheritedData->m_multiCol->m_autoCount;
+  }
   float columnGap() const { return rareNonInheritedData->m_multiCol->m_gap; }
   bool hasNormalColumnGap() const {
     return rareNonInheritedData->m_multiCol->m_normalGap;
@@ -2195,7 +2199,12 @@ class RenderStyle {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_width, 0);
   }
   void setColumnCount(unsigned short c) {
+    SET_VAR(rareNonInheritedData.access()->m_multiCol, m_autoCount, false);
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_count, c);
+  }
+  void setHasAutoColumnCount() {
+    SET_VAR(rareNonInheritedData.access()->m_multiCol, m_autoCount, true);
+    SET_VAR(rareNonInheritedData.access()->m_multiCol, m_count, 0);
   }
   void setColumnGap(float f) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_normalGap, false);

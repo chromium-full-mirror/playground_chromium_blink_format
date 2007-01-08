@@ -623,6 +623,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_COLOR:
       return new CSSPrimitiveValue(style->color().rgb());
     case CSS_PROP__WEBKIT_COLUMN_COUNT:
+      if (style->hasAutoColumnCount())
+        return new CSSPrimitiveValue(CSS_VAL_AUTO);
       return new CSSPrimitiveValue(style->columnCount(),
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP__WEBKIT_COLUMN_GAP:
