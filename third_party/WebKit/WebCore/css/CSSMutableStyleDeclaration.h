@@ -123,7 +123,6 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
 
   PassRefPtr<CSSMutableStyleDeclaration> copyBlockProperties() const;
   void removeBlockProperties();
-  void removeInheritableProperties();
   void removePropertiesInSet(const int* set, unsigned length);
 
   void merge(CSSMutableStyleDeclaration*, bool argOverridesOnConflict = true);

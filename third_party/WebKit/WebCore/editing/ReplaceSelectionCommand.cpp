@@ -453,7 +453,8 @@ void ReplaceSelectionCommand::removeRedundantStyles(
     // Clear redundant styles from elements.
     CSSMutableStyleDeclaration* inlineStyleDecl = element->inlineStyleDecl();
     if (inlineStyleDecl) {
-      inlineStyleDecl->removeInheritableProperties();
+      CSSComputedStyleDeclaration::removeComputedInheritablePropertiesFrom(
+          inlineStyleDecl);
       inlineStyleDecl->merge(style, true);
       setNodeAttribute(element, styleAttr, inlineStyleDecl->cssText());
     }

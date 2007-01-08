@@ -1578,9 +1578,6 @@ String CSSComputedStyleDeclaration::item(unsigned i) const {
 // copyInheritableProperties() function.
 // It is the intersection of the list of inherited CSS properties and the
 // properties for which we have a computed implementation in this file.
-// FIXME: This array is duplicated in CSSMutableStyleDeclaration.cpp!  Both must
-// be patched if
-// you add something here!
 const int inheritableProperties[] = {
     CSS_PROP_BORDER_COLLAPSE,
     CSS_PROP__WEBKIT_BORDER_HORIZONTAL_SPACING,
@@ -1609,6 +1606,12 @@ const int inheritableProperties[] = {
 
 const unsigned numInheritableProperties =
     sizeof(inheritableProperties) / sizeof(inheritableProperties[0]);
+
+void CSSComputedStyleDeclaration::removeComputedInheritablePropertiesFrom(
+    CSSMutableStyleDeclaration* declaration) {
+  declaration->removePropertiesInSet(inheritableProperties,
+                                     numInheritableProperties);
+}
 
 PassRefPtr<CSSMutableStyleDeclaration>
 CSSComputedStyleDeclaration::copyInheritableProperties() const {
