@@ -167,10 +167,8 @@ class RenderBox : public RenderObject {
                                        int ty,
                                        int w,
                                        int height,
-                                       int bleft,
-                                       int bright,
-                                       int pleft,
-                                       int pright);
+                                       bool includeLeftEdge = true,
+                                       bool includeRightEdge = true);
 
   virtual void setStaticX(int staticX);
   virtual void setStaticY(int staticY);
