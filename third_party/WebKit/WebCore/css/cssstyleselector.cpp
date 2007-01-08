@@ -3355,28 +3355,19 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     } break;
     case CSS_PROP_Z_INDEX: {
-      HANDLE_INHERIT(zIndex, ZIndex)
-      else if (isInitial) {
+      if (isInherit) {
+        if (parentStyle->hasAutoZIndex())
+          style->setHasAutoZIndex();
+        else
+          style->setZIndex(parentStyle->zIndex());
+        return;
+      } else if (isInitial || primitiveValue->getIdent() == CSS_VAL_AUTO) {
         style->setHasAutoZIndex();
         return;
       }
-
-      if (!primitiveValue)
-        return;
-
-      if (primitiveValue->getIdent() == CSS_VAL_AUTO) {
-        style->setHasAutoZIndex();
-        return;
-      }
-
-      if (primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
-        return;  // Error case.
-
       style->setZIndex((int)primitiveValue->getFloatValue());
-
       return;
     }
-
     case CSS_PROP_WIDOWS: {
       HANDLE_INHERIT_AND_INITIAL(widows, Widows)
       if (!primitiveValue ||
@@ -4267,6 +4258,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           style->setHasNormalColumnGap();
         else
           style->setColumnGap(parentStyle->columnGap());
+        return;
       } else if (isInitial || primitiveValue->getIdent() == CSS_VAL_NORMAL) {
         style->setHasNormalColumnGap();
         return;
@@ -4280,6 +4272,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           style->setHasAutoColumnWidth();
         else
           style->setColumnWidth(parentStyle->columnWidth());
+        return;
       } else if (isInitial || primitiveValue->getIdent() == CSS_VAL_AUTO) {
         style->setHasAutoColumnWidth();
         return;
