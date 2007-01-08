@@ -240,8 +240,6 @@ class RenderBlock : public RenderFlow {
   // (shrinking the width available to children when laying out.)
   virtual int availableWidth() const;
 
-  virtual void calcWidth();
-
   virtual void calcMinMaxWidth();
   void calcInlineMinMaxWidth();
   void calcBlockMinMaxWidth();
@@ -381,6 +379,9 @@ class RenderBlock : public RenderFlow {
  private:
   Position positionForBox(InlineBox*, bool start = true) const;
   Position positionForRenderer(RenderObject*, bool start = true) const;
+
+  int columnGap() const;
+  void calcColumnWidth();
 
  protected:
   struct FloatingObject {
@@ -592,6 +593,10 @@ class RenderBlock : public RenderFlow {
  private:
   // full width of a tab character
   int m_tabWidth;
+
+  // Column information.
+  int m_columnWidth;
+  unsigned m_columnCount;
 };
 
 }  // namespace WebCore

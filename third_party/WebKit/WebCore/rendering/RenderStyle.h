@@ -2191,7 +2191,7 @@ class RenderStyle {
   }
   void setResize(EResize r) { SET_VAR(rareInheritedData, resize, r); }
   void setColumnWidth(float f) {
-    SET_VAR(rareNonInheritedData.access()->m_multiCol, m_width, false);
+    SET_VAR(rareNonInheritedData.access()->m_multiCol, m_autoWidth, false);
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_width, f);
   }
   void setHasAutoColumnWidth() {

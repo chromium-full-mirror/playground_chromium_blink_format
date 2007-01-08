@@ -111,6 +111,8 @@ RenderBlock::RenderBlock(Node* node) : RenderFlow(node) {
   m_overflowHeight = m_overflowWidth = 0;
   m_overflowLeft = m_overflowTop = 0;
   m_tabWidth = -1;
+  m_columnCount = 1;
+  m_columnWidth = 0;
 }
 
 RenderBlock::~RenderBlock() {
@@ -483,11 +485,14 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
 
   int oldWidth = m_width;
+  int oldColumnWidth = m_columnWidth;
 
   calcWidth();
+  calcColumnWidth();
+
   m_overflowWidth = m_width;
 
-  if (oldWidth != m_width)
+  if (oldWidth != m_width || oldColumnWidth != m_columnWidth)
     relayoutChildren = true;
 
   clearFloats();
@@ -2313,10 +2318,7 @@ int RenderBlock::leftRelOffset(int y,
 }
 
 int RenderBlock::rightOffset() const {
-  int right = m_width - borderRight() - paddingRight();
-  if (includeVerticalScrollbarSize())
-    right -= m_layer->verticalScrollbarWidth();
-  return right;
+  return borderLeft() + paddingLeft() + availableWidth();
 }
 
 int RenderBlock::rightRelOffset(int y,
@@ -3105,13 +3107,67 @@ VisiblePosition RenderBlock::positionForCoordinates(int x, int y) {
 int RenderBlock::availableWidth() const {
   // If we have multiple columns, then the available width is reduced to our
   // column width.
-  return RenderBox::availableWidth();
+  if (m_columnCount > 1)
+    return m_columnWidth;
+  return contentWidth();
 }
 
-void RenderBlock::calcWidth() {
-  RenderBox::calcWidth();
+int RenderBlock::columnGap() const {
+  if (style()->hasNormalColumnGap())
+    return style()->fontDescription().computedPixelSize();  // "1em" is
+                                                            // recommended as
+                                                            // the normal gap
+                                                            // setting. Matches
+                                                            // <p> margins.
+  return style()->columnGap();
+}
 
-  // Calculate our column width.
+void RenderBlock::calcColumnWidth() {
+  // Calculate our column width and column count.
+  m_columnCount = 1;
+  m_columnWidth = contentWidth();
+
+  // For now, we don't support multi-column layouts when printing, since we have
+  // to do a lot of work for proper pagination.
+  if (document()->printing() ||
+      (style()->hasAutoColumnCount() && style()->hasAutoColumnWidth()))
+    return;
+
+  int availWidth = m_columnWidth;
+  int colGap = columnGap();
+
+  if (style()->hasAutoColumnWidth()) {
+    int colCount = style()->columnCount();
+    if ((colCount - 1) * colGap < availWidth) {
+      m_columnCount = colCount;
+      m_columnWidth =
+          (availWidth - (m_columnCount - 1) * colGap) / m_columnCount;
+    } else if (colGap < availWidth) {
+      m_columnCount = availWidth / colGap;
+      m_columnWidth =
+          (availWidth - (m_columnCount - 1) * colGap) / m_columnCount;
+    }
+  } else if (style()->hasAutoColumnCount()) {
+    int colWidth = style()->columnWidth();
+    if (colWidth < availWidth) {
+      m_columnCount = (availWidth + colGap) / (colWidth + colGap);
+      m_columnWidth =
+          (availWidth - (m_columnCount - 1) * colGap) / m_columnCount;
+    }
+  } else {
+    // Both are set.
+    int colWidth = style()->columnWidth();
+    int colCount = style()->columnCount();
+
+    if (colCount * colWidth + (colCount - 1) * colGap <= availWidth) {
+      m_columnCount = colCount;
+      m_columnWidth = colWidth;
+    } else if (colWidth < availWidth) {
+      m_columnCount = (availWidth + colGap) / (colWidth + colGap);
+      m_columnWidth =
+          (availWidth - (m_columnCount - 1) * colGap) / m_columnCount;
+    }
+  }
 }
 
 void RenderBlock::calcMinMaxWidth() {
