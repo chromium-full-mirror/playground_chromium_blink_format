@@ -1033,12 +1033,12 @@ void Frame::adjustPageHeight(float* newBottom,
 Frame* Frame::frameForWidget(const Widget* widget) {
   ASSERT_ARG(widget, widget);
 
-  if (WidgetClient* client = widget->client()) {
-    if (Element* element = client->element(const_cast<Widget*>(widget)))
-      return element->document()->frame();
-  }
+  if (RenderWidget* renderer = RenderWidget::find(widget))
+    if (Node* node = renderer->node())
+      return node->document()->frame();
 
-  // Assume all widgets are either form controls, or FrameViews.
+  // Assume all widgets are either a FrameView or owned by a RenderWidget.
+  // FIXME: That assumption is not right for scroll bars!
   ASSERT(widget->isFrameView());
   return static_cast<const FrameView*>(widget)->frame();
 }

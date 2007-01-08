@@ -148,7 +148,6 @@ typedef enum ObjectElementType {
 - (NSURL*)URLWithAttributeString:(NSString*)string;
 
 - (DOMElement*)elementWithName:(NSString*)name inForm:(DOMElement*)form;
-- (DOMElement*)elementForView:(NSView*)view;
 - (BOOL)elementDoesAutoComplete:(DOMElement*)element;
 - (BOOL)elementIsPassword:(DOMElement*)element;
 - (DOMElement*)formForElement:(DOMElement*)element;

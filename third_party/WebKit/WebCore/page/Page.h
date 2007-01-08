@@ -42,12 +42,9 @@ class ContextMenuController;
 class EditorClient;
 class FocusController;
 class Frame;
-class FrameNamespace;
-class FloatRect;
 class Node;
 class SelectionController;
 class Settings;
-class Widget;
 
 class Page : Noncopyable {
  public:
