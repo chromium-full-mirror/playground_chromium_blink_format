@@ -79,23 +79,6 @@ class RenderPath : public RenderObject {
                            int ty,
                            HitTestAction);
 
-  // FIXME: When the other SVG classes get pointer-events support this should be
-  // moved elsewhere
-  struct PointerEventsHitRules {
-    PointerEventsHitRules()
-        : requireVisible(false),
-          requireFill(false),
-          requireStroke(false),
-          canHitStroke(false),
-          canHitFill(false) {}
-
-    bool requireVisible;
-    bool requireFill;
-    bool requireStroke;
-    bool canHitStroke;
-    bool canHitFill;
-  };
-
   virtual void drawMarkersIfNeeded(GraphicsContext*,
                                    const FloatRect&,
                                    const Path&) const;
@@ -105,8 +88,6 @@ class RenderPath : public RenderObject {
 
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
-
-  PointerEventsHitRules pointerEventsHitRules();
 
   Path m_path;
 

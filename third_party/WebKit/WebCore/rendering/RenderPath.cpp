@@ -29,6 +29,7 @@
 
 #include "GraphicsContext.h"
 #include "RenderSVGContainer.h"
+#include "PointerEventsHitRules.h"
 #include "SVGPaintServer.h"
 #include "SVGResourceClipper.h"
 #include "SVGResourceFilter.h"
@@ -206,53 +207,6 @@ void RenderPath::absoluteRects(Vector<IntRect>& rects, int _tx, int _ty) {
   rects.append(getAbsoluteRepaintRect());
 }
 
-RenderPath::PointerEventsHitRules RenderPath::pointerEventsHitRules() {
-  PointerEventsHitRules hitRules;
-
-  switch (style()->svgStyle()->pointerEvents()) {
-    case PE_VISIBLE_PAINTED:
-      hitRules.requireVisible = true;
-      hitRules.requireFill = true;
-      hitRules.requireStroke = true;
-      hitRules.canHitFill = true;
-      hitRules.canHitStroke = true;
-      break;
-    case PE_VISIBLE_FILL:
-      hitRules.requireVisible = true;
-      hitRules.canHitFill = true;
-      break;
-    case PE_VISIBLE_STROKE:
-      hitRules.requireVisible = true;
-      hitRules.canHitStroke = true;
-      break;
-    case PE_VISIBLE:
-      hitRules.requireVisible = true;
-      hitRules.canHitFill = true;
-      hitRules.canHitStroke = true;
-      break;
-    case PE_PAINTED:
-      hitRules.requireFill = true;
-      hitRules.requireStroke = true;
-      hitRules.canHitFill = true;
-      hitRules.canHitStroke = true;
-      break;
-    case PE_FILL:
-      hitRules.canHitFill = true;
-      break;
-    case PE_STROKE:
-      hitRules.canHitStroke = true;
-      break;
-    case PE_ALL:
-      hitRules.canHitFill = true;
-      hitRules.canHitStroke = true;
-      break;
-    case PE_NONE:
-      // nothing to do here, defaults are all false.
-      break;
-  }
-  return hitRules;
-}
-
 bool RenderPath::nodeAtPoint(const HitTestRequest& request,
                              HitTestResult& result,
                              int _x,
@@ -263,7 +217,8 @@ bool RenderPath::nodeAtPoint(const HitTestRequest& request,
   // We only draw in the forground phase, so we only hit-test then.
   if (hitTestAction != HitTestForeground)
     return false;
-  PointerEventsHitRules hitRules = pointerEventsHitRules();
+  PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
+                                 style()->svgStyle()->pointerEvents());
 
   bool isVisible = (style()->visibility() == VISIBLE);
   if (isVisible || !hitRules.requireVisible) {
