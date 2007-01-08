@@ -23,14 +23,14 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef HTMLTOKENIZER_H
-#define HTMLTOKENIZER_H
+#ifndef HTMLTokenizer_h
+#define HTMLTokenizer_h
 
 #include "DeprecatedPtrQueue.h"
 #include "NamedMappedAttrMap.h"
 #include "SegmentedString.h"
 #include "Timer.h"
-#include "XMLTokenizer.h"
+#include "Tokenizer.h"
 #include "CachedResourceClient.h"
 
 namespace WebCore {
@@ -136,6 +136,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
     if ((dest - buffer) > size - len)
       enlargeBuffer(len);
   }
+
   inline void checkScriptBuffer(int len = 10) {
     if (scriptCodeSize + len >= scriptCodeMaxSize)
       enlargeScriptBuffer(len);
@@ -375,6 +376,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 void parseHTMLDocumentFragment(const String&, DocumentFragment*);
 
 UChar decodeNamedEntity(const char*);
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // HTMLTokenizer_h
