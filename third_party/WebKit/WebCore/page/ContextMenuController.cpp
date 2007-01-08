@@ -196,7 +196,8 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
     case ContextMenuItemTagSearchWeb: {
       String url = makeGoogleSearchURL(frame->selectedText());
       ResourceRequest request = ResourceRequest(url);
-      frame->loader()->urlSelected(FrameLoadRequest(request), new Event());
+      frame->page()->mainFrame()->loader()->urlSelected(
+          FrameLoadRequest(request), new Event());
       break;
     }
     case ContextMenuItemTagLookUpInDictionary:
