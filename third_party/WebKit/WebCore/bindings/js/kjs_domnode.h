@@ -63,7 +63,6 @@ class DOMNode : public DOMObject {
     LastChild,
     PreviousSibling,
     NextSibling,
-    Item,
     Attributes,
     NamespaceURI,
     Prefix,

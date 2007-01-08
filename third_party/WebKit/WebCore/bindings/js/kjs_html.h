@@ -190,6 +190,7 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     SelectBlur,
     SelectType,
     SelectOptions,
+    SelectItem,
     SelectDisabled,
     SelectMultiple,
     SelectName,
