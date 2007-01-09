@@ -197,8 +197,8 @@ class CaseInsensitiveHash<WebCore::StringImpl*> {
     unsigned length = a->length();
     if (length != b->length())
       return false;
-    return WTF::Unicode::strcasecmp(a->characters(), b->characters(), length) ==
-           0;
+    return WTF::Unicode::umemcasecmp(a->characters(), b->characters(),
+                                     length) == 0;
   }
 };
 

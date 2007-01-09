@@ -40,6 +40,8 @@
 #include "TextStream.h"
 
 using namespace std;
+using namespace WTF;
+using namespace Unicode;
 
 namespace WebCore {
 
@@ -3958,7 +3960,7 @@ void RenderBlock::updateFirstLetter() {
       // account for leading spaces and punctuation
       while (length < oldText->length() &&
              (DeprecatedChar((*oldText)[length]).isSpace() ||
-              WTF::Unicode::isPunct((*oldText)[length])))
+              Unicode::isPunct((*oldText)[length])))
         length++;
 
       // account for first letter

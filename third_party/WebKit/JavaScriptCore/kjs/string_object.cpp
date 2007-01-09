@@ -38,7 +38,9 @@
 #include <windows.h>
 #endif
 
-using namespace KJS;
+using namespace WTF;
+
+namespace KJS {
 
 // ------------------------------ StringInstance ----------------------------
 
@@ -742,7 +744,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       uint16_t* dataPtr = reinterpret_cast<uint16_t*>(u.rep()->data());
       uint16_t* destIfNeeded;
 
-      int len = WTF::Unicode::toLower(dataPtr, u.size(), destIfNeeded);
+      int len = Unicode::toLower(dataPtr, u.size(), destIfNeeded);
       if (len >= 0)
         result = jsString(UString(
             reinterpret_cast<UChar*>(destIfNeeded ? destIfNeeded : dataPtr),
@@ -763,7 +765,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       uint16_t* dataPtr = reinterpret_cast<uint16_t*>(u.rep()->data());
       uint16_t* destIfNeeded;
 
-      int len = WTF::Unicode::toUpper(dataPtr, u.size(), destIfNeeded);
+      int len = Unicode::toUpper(dataPtr, u.size(), destIfNeeded);
       if (len >= 0)
         result = jsString(UString(
             reinterpret_cast<UChar*>(destIfNeeded ? destIfNeeded : dataPtr),
@@ -894,4 +896,5 @@ JSValue* StringObjectFuncImp::callAsFunction(ExecState* exec,
     s = "";
 
   return jsString(s);
+}
 }

@@ -27,8 +27,8 @@
 #define MimeTypeRegistry_h
 
 #include "PlatformString.h"
-#include "wtf/HashSet.h"
 #include "StringHash.h"
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 

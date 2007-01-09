@@ -27,8 +27,9 @@
 #include "config.h"
 #include "TextCodecMac.h"
 
-#include "CharsetData.h"
 #include "CString.h"
+#include "CharacterNames.h"
+#include "CharsetData.h"
 #include "PlatformString.h"
 #include <wtf/Assertions.h>
 
@@ -283,7 +284,7 @@ String TextCodecMac::decode(const char* bytes, size_t length, bool flush) {
   // To work around, just change all occurences of U+E5E5 to U+3000 (ideographic
   // space).
   if (m_encoding == kCFStringEncodingGB_18030_2000)
-    resultString.replace(0xE5E5, 0x3000);
+    resultString.replace(0xE5E5, ideographicSpace);
 
   return resultString;
 }

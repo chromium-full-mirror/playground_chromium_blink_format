@@ -29,13 +29,11 @@
 #include "config.h"
 #include "GlyphMap.h"
 
+#include "CharacterNames.h"
 #include "FontData.h"
 #include <wtf/unicode/Unicode.h>
 
 namespace WebCore {
-
-const UChar nonBreakingSpace = 0x00A0;
-const UChar zeroWidthSpace = 0x200B;
 
 GlyphData GlyphMap::glyphDataForCharacter(UChar32 c, const FontData* fontData) {
   unsigned pageNumber = (c / GlyphPage::size);
@@ -93,7 +91,7 @@ inline GlyphMap::GlyphPage* GlyphMap::locatePage(unsigned pageNumber,
       // \n, \t, and nonbreaking space must render as a space.
       buffer[(int)'\n'] = ' ';
       buffer[(int)'\t'] = ' ';
-      buffer[nonBreakingSpace] = ' ';
+      buffer[noBreakSpace] = ' ';
     }
   } else {
     bufferLength = GlyphPage::size * 2;
