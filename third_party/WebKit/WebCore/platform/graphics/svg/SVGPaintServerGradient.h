@@ -48,7 +48,11 @@ enum SVGGradientSpreadMethod {
   SPREADMETHOD_REPEAT = 3
 };
 
+#if PLATFORM(CG)
+typedef std::pair<CGFloat, Color> SVGGradientStop;
+#else
 typedef std::pair<float, Color> SVGGradientStop;
+#endif
 
 class SVGPaintServerGradient : public SVGPaintServer {
  public:
