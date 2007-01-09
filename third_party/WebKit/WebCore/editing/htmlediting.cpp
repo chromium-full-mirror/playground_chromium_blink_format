@@ -710,7 +710,7 @@ Position positionAvoidingSpecialElementBoundary(const Position& pos,
   VisiblePosition vPos = VisiblePosition(pos, DOWNSTREAM);
   Node* enclosingAnchor = enclosingNodeWithTag(pos.node(), aTag);
   Position result;
-  if (enclosingAnchor) {
+  if (enclosingAnchor && !isBlock(enclosingAnchor)) {
     // If the caret is after an anchor, do insertion inside the anchor unless
     // it's the last
     // VisiblePosition in the document, to match TextEdit.
