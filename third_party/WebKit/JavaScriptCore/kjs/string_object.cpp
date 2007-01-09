@@ -741,8 +741,9 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
                                // implemented.
       u = s;
       u.copyForWriting();
-      uint16_t* dataPtr = reinterpret_cast<uint16_t*>(u.rep()->data());
-      uint16_t* destIfNeeded;
+      Unicode::UChar* dataPtr =
+          reinterpret_cast<Unicode::UChar*>(u.rep()->data());
+      Unicode::UChar* destIfNeeded;
 
       int len = Unicode::toLower(dataPtr, u.size(), destIfNeeded);
       if (len >= 0)
@@ -762,8 +763,9 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
                                // implemented.
       u = s;
       u.copyForWriting();
-      uint16_t* dataPtr = reinterpret_cast<uint16_t*>(u.rep()->data());
-      uint16_t* destIfNeeded;
+      Unicode::UChar* dataPtr =
+          reinterpret_cast<Unicode::UChar*>(u.rep()->data());
+      Unicode::UChar* destIfNeeded;
 
       int len = Unicode::toUpper(dataPtr, u.size(), destIfNeeded);
       if (len >= 0)
