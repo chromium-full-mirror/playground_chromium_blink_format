@@ -389,10 +389,6 @@ rangeByAlteringCurrentSelection:
             DHTMLWroteData:(BOOL)dhtmlWroteData;
 - (BOOL)mayStartDragAtEventLocation:(NSPoint)location;
 
-- (int)historyLength;
-- (BOOL)canGoBackOrForward:(int)distance;
-- (NSURL*)historyURL:(int)distance;
-
 - (void)textFieldDidBeginEditing:(DOMHTMLInputElement*)element;
 - (void)textFieldDidEndEditing:(DOMHTMLInputElement*)element;
 - (void)textDidChangeInTextField:(DOMHTMLInputElement*)element;
