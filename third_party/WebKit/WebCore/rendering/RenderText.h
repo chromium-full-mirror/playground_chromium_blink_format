@@ -146,7 +146,9 @@ class RenderText : public RenderObject {
                          bool force = false);
 
   virtual bool canBeSelectionLeaf() const { return true; }
-  virtual SelectionState selectionState() const { return m_selectionState; }
+  virtual SelectionState selectionState() const {
+    return static_cast<SelectionState>(m_selectionState);
+  }
   virtual void setSelectionState(SelectionState s);
   virtual IntRect selectionRect();
   virtual IntRect caretRect(int offset,
@@ -206,7 +208,9 @@ class RenderText : public RenderObject {
   int m_beginMinWidth;
   int m_endMinWidth;
 
-  SelectionState m_selectionState : 3;
+  unsigned m_selectionState : 3;  // enums on Windows are signed, so this needs
+                                  // to be unsigned to prevent it turning
+                                  // negative.
   bool m_hasBreakableChar : 1;  // Whether or not we can be broken into multiple
                                 // lines.
   bool m_hasBreak : 1;  // Whether or not we have a hard break (e.g., <pre> with
