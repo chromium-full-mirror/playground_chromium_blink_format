@@ -3711,13 +3711,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSS_PROP_BACKGROUND:
       if (isInitial) {
         style->clearBackgroundLayers();
+        style->setBackgroundColor(Color());
         return;
       } else if (isInherit) {
-        if (parentStyle)
-          style->inheritBackgroundLayers(*parentStyle->backgroundLayers());
-        else
-          style->clearBackgroundLayers();
-        return;
+        style->inheritBackgroundLayers(*parentStyle->backgroundLayers());
+        style->setBackgroundColor(parentStyle->backgroundColor());
       }
       break;
     case CSS_PROP_BORDER:
@@ -4266,7 +4264,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         style->setHasNormalColumnGap();
         return;
       }
-      style->setColumnGap(primitiveValue->getFloatValue());
+      style->setColumnGap(primitiveValue->computeLengthFloat(style));
       break;
     }
     case CSS_PROP__WEBKIT_COLUMN_WIDTH: {
@@ -4280,7 +4278,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         style->setHasAutoColumnWidth();
         return;
       }
-      style->setColumnWidth(primitiveValue->getFloatValue());
+      style->setColumnWidth(primitiveValue->computeLengthFloat(style));
       break;
     }
     case CSS_PROP__WEBKIT_COLUMN_RULE_STYLE:
