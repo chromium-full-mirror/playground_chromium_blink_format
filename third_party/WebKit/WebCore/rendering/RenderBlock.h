@@ -393,7 +393,7 @@ class RenderBlock : public RenderFlow {
   void clearTruncation();
 
   virtual bool hasColumns() const { return m_columnCount > 1; }
-  void adjustRepaintRectForColumns(IntRect&) const;
+  void adjustRectForColumns(IntRect&) const;
 
  protected:
   void newLine();
