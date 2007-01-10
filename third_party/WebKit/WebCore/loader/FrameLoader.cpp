@@ -2672,7 +2672,6 @@ void FrameLoader::continueAfterWillSubmitForm(PolicyAction) {
   startLoading();
 }
 
-#if PLATFORM(MAC)
 void FrameLoader::didFirstLayout() {
   if (isBackForwardLoadType(m_loadType) && m_frame->page() &&
       m_frame->page()->backForwardList())
@@ -2681,7 +2680,6 @@ void FrameLoader::didFirstLayout() {
   m_firstLayoutDone = true;
   m_client->dispatchDidFirstLayout();
 }
-#endif
 
 void FrameLoader::frameLoadCompleted() {
   m_client->frameLoadCompleted();

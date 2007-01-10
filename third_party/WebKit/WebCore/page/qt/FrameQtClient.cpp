@@ -64,20 +64,20 @@ void FrameQtClient::setFrame(const FrameQt* frame) {
 void FrameQtClient::openURL(const KURL& url) {
   ASSERT(m_frame);
 
-  m_frame->loader()->load(url);
-  //     m_frame->loader()->didOpenURL(url);
+  //     m_frame->loader()->load(url);
+  m_frame->loader()->didOpenURL(url);
 
-  //     if (!m_frame->document()) {
-  //         m_frame->loader()->createEmptyDocument();
-  //         m_frame->loader()->didOpenURL(url);
-  //     }
+  if (!m_frame->document()) {
+    m_frame->loader()->createEmptyDocument();
+    m_frame->loader()->didOpenURL(url);
+  }
 
-  //     ASSERT(m_frame->document());
+  ASSERT(m_frame->document());
 
-  //     ResourceRequest request(url);
-  //     RefPtr<ResourceHandle> loader = ResourceHandle::create(request, this,
-  //     m_frame, false);
-  //     loader.get()->ref();
+  ResourceRequest request(url);
+  RefPtr<ResourceHandle> loader =
+      ResourceHandle::create(request, this, m_frame, false);
+  loader.get()->ref();
 }
 
 void FrameQtClient::submitForm(const String& method,

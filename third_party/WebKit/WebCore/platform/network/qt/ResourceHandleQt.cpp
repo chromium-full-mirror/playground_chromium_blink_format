@@ -66,6 +66,11 @@ void ResourceHandle::cancel() {
   ResourceHandleManager::self()->cancel(this);
 }
 
+void ResourceHandle::setDefersLoading(bool defers) {
+  d->m_defersLoading = defers;
+  // FIXME: wkSetNSURLConnectionDefersCallbacks(d->m_connection.get(), defers);
+}
+
 bool ResourceHandle::loadsBlocked() {
   notImplemented();
   return false;
