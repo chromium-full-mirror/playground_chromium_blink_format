@@ -167,6 +167,7 @@ class RenderBlock : public RenderFlow {
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintObject(PaintInfo&, int tx, int ty);
   void paintFloats(PaintInfo&, int tx, int ty, bool paintSelection = false);
+  void paintContents(PaintInfo&, int tx, int ty);
   void paintChildren(PaintInfo&, int tx, int ty);
   void paintEllipsisBoxes(PaintInfo&, int tx, int ty);
   void paintSelection(PaintInfo&, int tx, int ty);
@@ -190,7 +191,11 @@ class RenderBlock : public RenderFlow {
   virtual bool containsFloats() { return m_floatingObjects; }
   virtual bool containsFloat(RenderObject*);
 
-  virtual bool hasOverhangingFloats() { return floatBottom() > m_height; }
+  virtual bool avoidsFloats() const;
+
+  virtual bool hasOverhangingFloats() {
+    return !hasColumns() && floatBottom() > m_height;
+  }
   void addIntrudingFloats(RenderBlock* prev, int xoffset, int yoffset);
   void addOverhangingFloats(RenderBlock* child, int xoffset, int yoffset);
 
@@ -231,6 +236,13 @@ class RenderBlock : public RenderFlow {
                            int tx,
                            int ty,
                            HitTestAction);
+  virtual bool hitTestContents(const HitTestRequest&,
+                               HitTestResult&,
+                               int x,
+                               int y,
+                               int tx,
+                               int ty,
+                               HitTestAction);
 
   virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
 
@@ -372,6 +384,8 @@ class RenderBlock : public RenderFlow {
   int heightForLineCount(int);
   void clearTruncation();
 
+  virtual bool hasColumns() const { return m_columnCount > 1; }
+
  protected:
   void newLine();
   virtual bool hasLineIfEmpty() const;
@@ -382,6 +396,7 @@ class RenderBlock : public RenderFlow {
 
   int columnGap() const;
   void calcColumnWidth();
+  void layoutColumns();
 
  protected:
   struct FloatingObject {
@@ -597,6 +612,7 @@ class RenderBlock : public RenderFlow {
   // Column information.
   int m_columnWidth;
   unsigned m_columnCount;
+  Vector<IntRect>* m_columnRects;
 };
 
 }  // namespace WebCore

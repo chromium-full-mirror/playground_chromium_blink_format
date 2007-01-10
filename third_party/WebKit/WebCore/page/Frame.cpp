@@ -1007,8 +1007,6 @@ void Frame::paint(GraphicsContext* p, const IntRect& rect) {
     LOG_ERROR("called Frame::paint with nil renderer");
 }
 
-#if PLATFORM(CG)
-
 void Frame::adjustPageHeight(float* newBottom,
                              float oldTop,
                              float oldBottom,
@@ -1027,8 +1025,6 @@ void Frame::adjustPageHeight(float* newBottom,
   } else
     *newBottom = oldBottom;
 }
-
-#endif
 
 Frame* Frame::frameForWidget(const Widget* widget) {
   ASSERT_ARG(widget, widget);

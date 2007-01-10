@@ -108,6 +108,8 @@ class RenderFlow : public RenderContainer {
                            const IntRect& nextLine);
   void paintOutline(GraphicsContext*, int tx, int ty);
 
+  virtual bool hasColumns() const { return false; }
+
  private:
   // An inline can be split with blocks occurring in between the inline content.
   // When this occurs we need a pointer to our next object.  We can basically be

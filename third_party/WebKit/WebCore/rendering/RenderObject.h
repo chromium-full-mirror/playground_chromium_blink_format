@@ -917,6 +917,8 @@ class RenderObject : public CachedResourceClient {
   }
   virtual IntRect floatRect() const { return borderBox(); }
 
+  virtual bool expandsToEncloseOverflow() const { return false; }
+
   virtual void removePositionedObjects(RenderBlock*) {}
 
   virtual bool avoidsFloats() const;
