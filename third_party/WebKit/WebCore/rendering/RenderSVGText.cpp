@@ -3,7 +3,8 @@
  *
  * Copyright (C) 2006 Apple Computer, Inc.
  *               2006 Alexander Kellett <lypanov@kde.org>
- *               2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>.
+ *               2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>
+ *               2007 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -41,11 +42,8 @@ namespace WebCore {
 
 RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
 
-void RenderSVGText::computeAbsoluteRepaintRect(IntRect& r, bool f) {
-  AffineTransform transform = localTransform();
-  r = transform.mapRect(r);
-  RenderContainer::computeAbsoluteRepaintRect(r, f);
-  r = transform.inverse().mapRect(r);
+IntRect RenderSVGText::getAbsoluteRepaintRect() {
+  return enclosingIntRect(absoluteTransform().mapRect(relativeBBox(true)));
 }
 
 bool RenderSVGText::requiresLayer() {
@@ -60,11 +58,13 @@ void RenderSVGText::layout() {
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     oldBounds = m_absoluteBounds;
+
+  // FIXME: need to allow floating point positions
   SVGTextElement* text = static_cast<SVGTextElement*>(element());
-  // FIXME:  need to allow floating point positions
   int xOffset = (int)(text->x()->getFirst().value());
   int yOffset = (int)(text->y()->getFirst().value());
   setPos(xOffset, yOffset);
+
   RenderBlock::layout();
 
   m_absoluteBounds = getAbsoluteRepaintRect();
@@ -79,7 +79,7 @@ void RenderSVGText::layout() {
 InlineBox* RenderSVGText::createInlineBox(bool makePlaceHolderBox,
                                           bool isRootLineBox,
                                           bool isOnlyRun) {
-  assert(!isInlineFlow());
+  ASSERT(!isInlineFlow());
   InlineFlowBox* flowBox = new (renderArena()) SVGRootInlineBox(this);
 
   if (!m_firstLineBox)
@@ -119,14 +119,8 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int tx, int ty) {
-  InlineBox* box = firstLineBox();
-  if (box) {
-    AffineTransform boxTransform = box->object()->absoluteTransform();
-    FloatRect boundsRect = FloatRect(xPos() + box->xPos(), yPos() + box->yPos(),
-                                     box->width(), box->height());
-    rects.append(enclosingIntRect(boxTransform.mapRect(boundsRect)));
-  }
+void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
+  rects.append(getAbsoluteRepaintRect());
 }
 
 void RenderSVGText::paint(PaintInfo& paintInfo, int tx, int ty) {
@@ -136,15 +130,23 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
-  FloatRect boundsRect;
-  InlineBox* box = firstLineBox();
-  if (box) {
-    boundsRect = FloatRect(xPos() + box->xPos(), yPos() + box->yPos(),
-                           box->width(), box->height());
-    boundsRect = localTransform().mapRect(boundsRect);
+  FloatRect repaintRect;
+
+  for (InlineRunBox* runBox = firstLineBox(); runBox;
+       runBox = runBox->nextLineBox()) {
+    ASSERT(runBox->isInlineFlow());
+
+    InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
+    for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine())
+      repaintRect.unite(
+          FloatRect(box->xPos(), box->yPos(), box->width(), box->height()));
   }
-  return boundsRect;
+
+  repaintRect.move(xPos(), yPos());
+  return repaintRect;
 }
 }
 
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

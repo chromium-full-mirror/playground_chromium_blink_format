@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -21,6 +21,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "RenderSVGContainer.h"
 
@@ -99,12 +100,12 @@ void RenderSVGContainer::layout() {
   RenderObject* child = firstChild();
   while (child) {
     if (!child->isRenderPath() ||
-        static_cast<RenderPath*>(child)->hasPercentageValues())
+        static_cast<RenderPath*>(child)->hasRelativeValues())
       child->setNeedsLayout(true);
+
+    child->layoutIfNeeded();
     child = child->nextSibling();
   }
-
-  RenderContainer::layout();
 
   calcWidth();
   calcHeight();
@@ -113,15 +114,13 @@ void RenderSVGContainer::layout() {
 
   if (selfNeedsLayout() && checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
+
+  setNeedsLayout(false);
 }
 
 void RenderSVGContainer::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (paintInfo.context->paintingDisabled())
     return;
-
-  // No one should be transforming us via these.
-  // ASSERT(m_x == 0);
-  // ASSERT(m_y == 0);
 
   if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
                               paintInfo.phase == PaintPhaseSelection))
@@ -207,7 +206,7 @@ void RenderSVGContainer::calcViewport() {
   if (svgelem->hasTagName(SVGNames::svgTag)) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(element());
 
-    if (!selfNeedsLayout() && !svg->hasPercentageValues())
+    if (!selfNeedsLayout() && !svg->hasRelativeValues())
       return;
 
     double x = svg->x().value();
@@ -228,6 +227,7 @@ void RenderSVGContainer::calcViewport() {
 
 void RenderSVGContainer::setViewBox(const FloatRect& viewBox) {
   m_viewBox = viewBox;
+
   if (style())
     setNeedsLayout(true);
 }
@@ -238,6 +238,8 @@ FloatRect RenderSVGContainer::viewBox() const {
 
 void RenderSVGContainer::setAlign(KCAlign align) {
   m_align = align;
+  if (style())
+    setNeedsLayout(true);
 }
 
 KCAlign RenderSVGContainer::align() const {
@@ -250,8 +252,10 @@ AffineTransform RenderSVGContainer::viewportTransform() const {
     if (!parent()->isSVGContainer())
       viewportRect =
           FloatRect(viewport().x(), viewport().y(), width(), height());
+
     return getAspectRatio(viewBox(), viewportRect);
   }
+
   return AffineTransform().translate(viewport().x(), viewport().y());
 }
 
@@ -269,18 +273,11 @@ IntRect RenderSVGContainer::getAbsoluteRepaintRect() {
     repaintRect.unite(
         enclosingIntRect(filter->filterBBoxForItemBBox(repaintRect)));
 
-  // FIXME: what about transform?
-
   return repaintRect;
 }
 
-void RenderSVGContainer::computeAbsoluteRepaintRect(IntRect& r, bool f) {
-  AffineTransform transform = localTransform();
-  r = transform.mapRect(r);
-
-  // FIXME: consider filter
-
-  RenderContainer::computeAbsoluteRepaintRect(r, f);
+void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int) {
+  rects.append(getAbsoluteRepaintRect());
 }
 
 AffineTransform RenderSVGContainer::absoluteTransform() const {
@@ -293,6 +290,7 @@ bool RenderSVGContainer::fillContains(const FloatPoint& p) const {
     if (current->isRenderPath() &&
         static_cast<RenderPath*>(current)->fillContains(p))
       return true;
+
     current = current->nextSibling();
   }
 
@@ -305,6 +303,7 @@ bool RenderSVGContainer::strokeContains(const FloatPoint& p) const {
     if (current->isRenderPath() &&
         static_cast<RenderPath*>(current)->strokeContains(p))
       return true;
+
     current = current->nextSibling();
   }
 
@@ -326,6 +325,9 @@ FloatRect RenderSVGContainer::relativeBBox(bool includeStroke) const {
 
 void RenderSVGContainer::setSlice(bool slice) {
   m_slice = slice;
+
+  if (style())
+    setNeedsLayout(true);
 }
 
 bool RenderSVGContainer::slice() const {
@@ -411,5 +413,6 @@ bool RenderSVGContainer::nodeAtPoint(const HitTestRequest& request,
 }
 }
 
-// vim:ts=4:noet
 #endif  // SVG_SUPPORT
+
+// vim:ts=4:noet

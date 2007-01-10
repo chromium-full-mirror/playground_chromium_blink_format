@@ -128,6 +128,11 @@ void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
+void SVGRectElement::notifyAttributeChange() const {
+  if (!ownerDocument()->parsing())
+    rebuildRenderer();
+}
+
 Path SVGRectElement::toPathData() const {
   FloatRect rect(x().value(), y().value(), width().value(), height().value());
 
@@ -142,14 +147,9 @@ Path SVGRectElement::toPathData() const {
   return Path::createRectangle(rect);
 }
 
-bool SVGRectElement::hasPercentageValues() const {
-  if (x().unitType() == LengthTypePercentage ||
-      y().unitType() == LengthTypePercentage ||
-      width().unitType() == LengthTypePercentage ||
-      height().unitType() == LengthTypePercentage)
-    return true;
-
-  return false;
+bool SVGRectElement::hasRelativeValues() const {
+  return (x().isRelative() || width().isRelative() || y().isRelative() ||
+          height().isRelative());
 }
 }
 

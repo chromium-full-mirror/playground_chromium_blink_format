@@ -346,6 +346,11 @@ void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
   }
 }
 
+void SVGPathElement::notifyAttributeChange() const {
+  if (!ownerDocument()->parsing())
+    rebuildRenderer();
+}
+
 SVGPathSegList* SVGPathElement::pathSegList() const {
   if (!m_pathSegList)
     m_pathSegList = new SVGPathSegList(this);

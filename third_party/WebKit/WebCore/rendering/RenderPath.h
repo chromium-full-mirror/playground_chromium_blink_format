@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric.seidel@kdemail.net>
                   2006 Apple Computer, Inc
@@ -24,6 +24,7 @@
 
 #ifndef RenderPath_H
 #define RenderPath_H
+
 #ifdef SVG_SUPPORT
 
 #include "AffineTransform.h"
@@ -34,10 +35,9 @@
 namespace WebCore {
 
 class FloatPoint;
-class SVGStyledElement;
-
 class Path;
 class RenderSVGContainer;
+class SVGStyledElement;
 
 class RenderPath : public RenderObject {
  public:
@@ -53,8 +53,8 @@ class RenderPath : public RenderObject {
   // this vector path
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
 
-  void setPath(const Path& newPath);
   const Path& path() const;
+  void setPath(const Path& newPath);
 
   virtual bool isRenderPath() const { return true; }
   virtual const char* renderName() const { return "RenderPath"; }
@@ -84,13 +84,12 @@ class RenderPath : public RenderObject {
                                    const Path&) const;
   virtual FloatRect strokeBBox() const;
 
-  bool hasPercentageValues() const;
+  bool hasRelativeValues() const;
 
  private:
   FloatPoint mapAbsolutePointToLocal(const FloatPoint&) const;
 
-  Path m_path;
-
+  mutable Path m_path;
   mutable FloatRect m_fillBBox;
   mutable FloatRect m_strokeBbox;
   AffineTransform m_matrix;

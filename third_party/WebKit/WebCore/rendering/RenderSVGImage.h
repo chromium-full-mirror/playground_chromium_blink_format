@@ -23,6 +23,7 @@
 
 #ifndef RenderSVGImage_H
 #define RenderSVGImage_H
+
 #ifdef SVG_SUPPORT
 
 #include "AffineTransform.h"
@@ -53,11 +54,8 @@ class RenderSVGImage : public RenderImage {
                                  FloatRect& srcRect,
                                  SVGPreserveAspectRatio*);
   virtual void paint(PaintInfo&, int parentX, int parentY);
-  virtual void layout();
 
   bool requiresLayer();
-
-  virtual void computeAbsoluteRepaintRect(IntRect&, bool f);
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,

@@ -50,12 +50,11 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual SVGPointList* animatedPoints() const;
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
+  virtual void notifyAttributeChange() const;
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
-
-  virtual void notifyAttributeChange() const;
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

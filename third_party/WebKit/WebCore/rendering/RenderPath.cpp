@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric.seidel@kdemail.net>
 
@@ -22,6 +22,7 @@
 */
 
 #include "config.h"
+
 #ifdef SVG_SUPPORT
 #include "RenderPath.h"
 
@@ -74,7 +75,7 @@ bool RenderPath::fillContains(const FloatPoint& point,
   if (requiresFill && !KSVGPainterFactory::fillPaintServer(style(), this))
     return false;
 
-  return path().contains(point, style()->svgStyle()->fillRule());
+  return m_path.contains(point, style()->svgStyle()->fillRule());
 }
 
 FloatRect RenderPath::relativeBBox(bool includeStroke) const {
@@ -84,11 +85,13 @@ FloatRect RenderPath::relativeBBox(bool includeStroke) const {
   if (includeStroke) {
     if (m_strokeBbox.isEmpty())
       m_strokeBbox = strokeBBox();
+
     return m_strokeBbox;
   }
 
   if (m_fillBBox.isEmpty())
-    m_fillBBox = path().boundingRect();
+    m_fillBBox = m_path.boundingRect();
+
   return m_fillBBox;
 }
 
@@ -103,17 +106,16 @@ const Path& RenderPath::path() const {
 }
 
 void RenderPath::layout() {
-  // FIXME: Currently the DOM does all of the % length calculations, so we
-  // pretend that one of the attributes of the element has changed on the DOM
-  // to force the DOM object to update this render object with new aboslute
-  // position values.
-
   IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (selfNeedsLayout() && checkForRepaint)
     oldBounds = m_absoluteBounds;
 
-  static_cast<SVGStyledElement*>(element())->notifyAttributeChange();
+  // FIXME: Until JSSVGPathSeg* relies on the genericContext<> hack for update
+  // notifications, we can't really disable this. It would break
+  // js-update-path-changes.svg
+  // if (m_path.isEmpty() && m_fillBBox.isEmpty() && m_strokeBbox.isEmpty())
+  static_cast<SVGStyledElement*>(element())->rebuildRenderer();
 
   m_absoluteBounds = getAbsoluteRepaintRect();
 
@@ -137,6 +139,7 @@ IntRect RenderPath::getAbsoluteRepaintRect() {
 
   if (!repaintRect.isEmpty())
     repaintRect.inflate(1);  // inflate 1 pixel for antialiasing
+
   return enclosingIntRect(repaintRect);
 }
 
@@ -152,14 +155,10 @@ short RenderPath::baselinePosition(bool b, bool isRootLineBox) const {
   return static_cast<short>(relativeBBox(true).height());
 }
 
-void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
-  // No one should be transforming us via these.
-  // ASSERT(parentX == 0);
-  // ASSERT(parentY == 0);
-
+void RenderPath::paint(PaintInfo& paintInfo, int, int) {
   if (paintInfo.context->paintingDisabled() ||
       (paintInfo.phase != PaintPhaseForeground) ||
-      style()->visibility() == HIDDEN || path().isEmpty())
+      style()->visibility() == HIDDEN || m_path.isEmpty())
     return;
 
   paintInfo.context->save();
@@ -184,17 +183,18 @@ void RenderPath::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   SVGPaintServer* fillPaintServer =
       KSVGPainterFactory::fillPaintServer(style(), this);
   if (fillPaintServer) {
-    paintInfo.context->addPath(path());
+    paintInfo.context->addPath(m_path);
     fillPaintServer->draw(paintInfo.context, this, ApplyToFillTargetType);
   }
+
   SVGPaintServer* strokePaintServer =
       KSVGPainterFactory::strokePaintServer(style(), this);
   if (strokePaintServer) {
-    paintInfo.context->addPath(path());  // path is cleared when filled.
+    paintInfo.context->addPath(m_path);  // path is cleared when filled.
     strokePaintServer->draw(paintInfo.context, this, ApplyToStrokeTargetType);
   }
 
-  drawMarkersIfNeeded(paintInfo.context, paintInfo.rect, path());
+  drawMarkersIfNeeded(paintInfo.context, paintInfo.rect, m_path);
 
   // actually apply the filter
   if (filter)
@@ -217,6 +217,7 @@ bool RenderPath::nodeAtPoint(const HitTestRequest& request,
   // We only draw in the forground phase, so we only hit-test then.
   if (hitTestAction != HitTestForeground)
     return false;
+
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
                                  style()->svgStyle()->pointerEvents());
 
@@ -233,6 +234,7 @@ bool RenderPath::nodeAtPoint(const HitTestRequest& request,
       return true;
     }
   }
+
   return false;
 }
 
@@ -377,7 +379,6 @@ void RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
 
   double strokeWidth = KSVGPainterFactory::cssPrimitiveToLength(
       this, style()->svgStyle()->strokeWidth(), 1.0);
-
   DrawMarkersData data(context, startMarker, midMarker, strokeWidth);
 
   path.apply(&data, drawStartAndMidMarkers);
@@ -387,8 +388,8 @@ void RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
   drawMarkerWithData(context, data.previousMarkerData);
 }
 
-bool RenderPath::hasPercentageValues() const {
-  return static_cast<SVGStyledElement*>(element())->hasPercentageValues();
+bool RenderPath::hasRelativeValues() const {
+  return static_cast<SVGStyledElement*>(element())->hasRelativeValues();
 }
 }
 

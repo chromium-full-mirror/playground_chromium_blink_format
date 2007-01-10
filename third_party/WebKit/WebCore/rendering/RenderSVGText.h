@@ -2,6 +2,7 @@
  * This file is part of the WebKit project.
  *
  * Copyright (C) 2006 Apple Computer, Inc.
+ *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,6 +23,7 @@
 
 #ifndef RenderSVGText_H
 #define RenderSVGText_H
+
 #ifdef SVG_SUPPORT
 
 #include "AffineTransform.h"
@@ -50,7 +52,7 @@ class RenderSVGText : public RenderSVGBlock {
                            int ty,
                            HitTestAction);
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
-  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f);
+  virtual IntRect getAbsoluteRepaintRect();
   virtual bool requiresLayer();
   virtual void layout();
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
@@ -66,3 +68,5 @@ class RenderSVGText : public RenderSVGBlock {
 
 #endif  // SVG_SUPPORT
 #endif
+
+// vim:ts=4:noet

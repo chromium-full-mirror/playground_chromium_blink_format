@@ -50,6 +50,8 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
   // 'SVGImageElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void notifyAttributeChange() const;
+
   virtual void attach();
 
   virtual bool rendererIsNeeded(RenderStyle* style) {
