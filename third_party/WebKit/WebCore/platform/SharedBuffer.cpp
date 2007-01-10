@@ -28,6 +28,8 @@
 
 namespace WebCore {
 
+SharedBuffer::SharedBuffer() {}
+
 SharedBuffer::SharedBuffer(const char* data, int size) {
   m_buffer.append(data, size);
 }
