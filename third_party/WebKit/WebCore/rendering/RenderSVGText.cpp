@@ -134,7 +134,7 @@ FloatRect RenderSVGText::relativeBBox(bool includeStroke) const {
 
   for (InlineRunBox* runBox = firstLineBox(); runBox;
        runBox = runBox->nextLineBox()) {
-    ASSERT(runBox->isInlineFlow());
+    ASSERT(runBox->isInlineFlowBox());
 
     InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
     for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine())
