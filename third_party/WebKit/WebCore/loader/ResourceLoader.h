@@ -95,11 +95,8 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual PassRefPtr<SharedBuffer> resourceData();
   void clearResourceData();
 
-#if PLATFORM(MAC)
   virtual void willSendRequest(ResourceRequest&,
                                const ResourceResponse& redirectResponse);
-  void didReceiveAuthenticationChallenge(NSURLAuthenticationChallenge*);
-  void didCancelAuthenticationChallenge(NSURLAuthenticationChallenge*);
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char*,
                               int,
@@ -108,20 +105,21 @@ class ResourceLoader : public Shared<ResourceLoader>,
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
+#if PLATFORM(MAC)
+  void didReceiveAuthenticationChallenge(NSURLAuthenticationChallenge*);
+  void didCancelAuthenticationChallenge(NSURLAuthenticationChallenge*);
   NSCachedURLResponse* willCacheResponse(NSCachedURLResponse*);
 
   void receivedCredential(NSURLAuthenticationChallenge*, NSURLCredential*);
   void receivedRequestToContinueWithoutCredential(
       NSURLAuthenticationChallenge*);
   void receivedCancellation(NSURLAuthenticationChallenge*);
-
 #endif
 
   // ResourceHandleClient
   virtual void willSendRequest(ResourceHandle*,
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse);
-
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*,
                               const char*,
@@ -129,6 +127,12 @@ class ResourceLoader : public Shared<ResourceLoader>,
                               int lengthReceived);
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
+
+  virtual void willStopBufferingData(ResourceHandle*,
+                                     const char* data,
+                                     int length) {
+    willStopBufferingData(data, length);
+  }
 
 #if PLATFORM(MAC)
   virtual void didReceiveAuthenticationChallenge(
@@ -140,12 +144,6 @@ class ResourceLoader : public Shared<ResourceLoader>,
       ResourceHandle*,
       NSURLAuthenticationChallenge* challenge) {
     didCancelAuthenticationChallenge(challenge);
-  }
-
-  virtual void willStopBufferingData(ResourceHandle*,
-                                     const char* data,
-                                     int length) {
-    willStopBufferingData(data, length);
   }
 
   virtual NSCachedURLResponse* willCacheResponse(
@@ -175,13 +173,11 @@ class ResourceLoader : public Shared<ResourceLoader>,
  protected:
   ResourceLoader(Frame*);
 
-#if PLATFORM(MAC)
   virtual void didCancel(const ResourceError&);
   void didFinishLoadingOnePart();
 
   const ResourceRequest& request() const { return m_request; }
   void setRequest(const ResourceRequest& request) { m_request = request; }
-#endif
   bool reachedTerminalState() const { return m_reachedTerminalState; }
   bool cancelled() const { return m_cancelled; }
   bool defersLoading() const { return m_defersLoading; }
@@ -199,13 +195,13 @@ class ResourceLoader : public Shared<ResourceLoader>,
   // FIXME: Once everything is made cross platform, these can be private instead
   // of protected
   RefPtr<Frame> m_frame;
+  ResourceResponse m_response;
 #if PLATFORM(MAC)
   RetainPtr<id> m_identifier;
-  ResourceResponse m_response;
   NSURLAuthenticationChallenge* m_currentConnectionChallenge;
   RetainPtr<NSURLAuthenticationChallenge> m_currentWebChallenge;
-  KURL m_originalURL;
 #endif
+  KURL m_originalURL;
   RefPtr<SharedBuffer> m_resourceData;
   bool m_defersLoading;
 };
