@@ -44,6 +44,7 @@ class WebContextMenuClient : public WebCore::ContextMenuClient {
 
   virtual void downloadURL(const WebCore::KURL&);
   virtual void copyImageToClipboard(const WebCore::HitTestResult&);
+  virtual void searchWithGoogle(const WebCore::Frame*);
   virtual void lookUpInDictionary(WebCore::Frame*);
   virtual void speak(const WebCore::String&);
   virtual void stopSpeaking();
