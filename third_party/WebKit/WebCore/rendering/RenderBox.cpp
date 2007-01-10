@@ -1008,6 +1008,18 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& r, bool f) {
 
   RenderObject* o = container();
   if (o) {
+    if (o->isBlockFlow() && style()->position() != AbsolutePosition &&
+        style()->position() != FixedPosition) {
+      RenderBlock* cb = static_cast<RenderBlock*>(o);
+      if (cb->hasColumns()) {
+        IntRect repaintRect(x, y, r.width(), r.height());
+        cb->adjustRepaintRectForColumns(repaintRect);
+        x = repaintRect.x();
+        y = repaintRect.y();
+        r = repaintRect;
+      }
+    }
+
     if (style()->position() == AbsolutePosition && o->isRelPositioned() &&
         o->isInlineFlow()) {
       // When we have an enclosing relpositioned inline, we need to add in the
@@ -1046,6 +1058,7 @@ void RenderBox::computeAbsoluteRepaintRect(IntRect& r, bool f) {
       if (!hasStaticY())
         y += sy;
     }
+
     // <body> may not have overflow, since it might be applying its overflow
     // value to the
     // scrollbars.

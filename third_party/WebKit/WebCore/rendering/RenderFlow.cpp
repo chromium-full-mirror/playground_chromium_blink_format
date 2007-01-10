@@ -500,6 +500,9 @@ IntRect RenderFlow::getAbsoluteRepaintRect() {
     }
 
     IntRect r(-ow + left, -ow + top, width() + ow * 2, height() + ow * 2);
+    if (cb->hasColumns())
+      cb->adjustRepaintRectForColumns(r);
+
     if (cb->hasOverflowClip()) {
       // cb->height() is inaccurate if we're in the middle of a layout of |cb|,
       // so use the
