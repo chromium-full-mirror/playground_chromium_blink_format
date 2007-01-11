@@ -565,8 +565,8 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
 
     if (!keyboardEvent->ctrlKey() && !keyboardEvent->altKey() &&
         !keyboardEvent->metaKey() &&
-        isprint(static_cast<KeyboardEvent*>(evt)->charCode())) {
-      typeAheadFind(static_cast<KeyboardEvent*>(evt));
+        isPrintableChar(keyboardEvent->charCode())) {
+      typeAheadFind(keyboardEvent);
       evt->setDefaultHandled();
       return;
     }
