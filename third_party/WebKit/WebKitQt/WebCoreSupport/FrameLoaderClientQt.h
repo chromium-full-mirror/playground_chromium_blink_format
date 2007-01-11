@@ -33,6 +33,7 @@
 #include "FrameQt.h"
 #include "FrameLoader.h"
 #include "Shared.h"
+#include "ResourceResponse.h"
 
 namespace WebCore {
 
@@ -50,6 +51,7 @@ class FrameLoaderClientQt : public FrameLoaderClient,
  public:
   FrameLoaderClientQt();
   ~FrameLoaderClientQt();
+  void setFrame(FrameQt* frame);
   virtual void detachFrameLoader();
 
   virtual void ref();
@@ -203,17 +205,16 @@ class FrameLoaderClientQt : public FrameLoaderClient,
   virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
   virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
   virtual WebCore::Frame* dispatchCreatePage();
-  virtual void dispatchDecidePolicyForMIMEType(
-      void (WebCore::FrameLoader::*)(WebCore::PolicyAction),
-      const WebCore::String&,
-      const WebCore::ResourceRequest&);
+  virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction function,
+                                               const WebCore::String&,
+                                               const WebCore::ResourceRequest&);
   virtual void dispatchDecidePolicyForNewWindowAction(
-      void (WebCore::FrameLoader::*)(WebCore::PolicyAction),
+      FramePolicyFunction function,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&,
       const WebCore::String&);
   virtual void dispatchDecidePolicyForNavigationAction(
-      void (WebCore::FrameLoader::*)(WebCore::PolicyAction),
+      FramePolicyFunction function,
       const WebCore::NavigationAction&,
       const WebCore::ResourceRequest&);
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
@@ -228,6 +229,11 @@ class FrameLoaderClientQt : public FrameLoaderClient,
   // FIXME: This should probably not be here, but it's needed for the tests
   // currently
   virtual void partClearedInBegin();
+
+ private:
+  Frame* m_frame;
+  ResourceResponse m_response;
+  bool m_firstData;
 };
 }
 

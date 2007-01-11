@@ -52,6 +52,7 @@
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLFormElement.h"
+#include "HistoryItem.h"
 #include "JSLock.h"
 #include "MouseEventWithHitTestResults.h"
 #include "Page.h"
@@ -82,55 +83,8 @@
 
 namespace WebCore {
 
-void FrameLoader::submitForm(const FrameLoadRequest& frameLoadRequest, Event*) {
-#ifdef MULTIPLE_FORM_SUBMISSION_PROTECTION
-  // FIXME: We'd like to remove this altogether and fix the multiple form
-  // submission issue another way.
-  // We do not want to submit more than one form from the same page,
-  // nor do we want to submit a single form more than once.
-  // This flag prevents these from happening; not sure how other browsers
-  // prevent this.
-  // The flag is reset in each time we start handle a new mouse or key down
-  // event, and
-  // also in setView since this part may get reused for a page from the
-  // back/forward cache.
-  // The form multi-submit logic here is only needed when we are submitting a
-  // form that affects this frame.
-  // FIXME: Frame targeting is only one of the ways the submission could end up
-  // doing something other
-  // than replacing this frame's content, so this check is flawed. On the other
-  // hand, the check is hardly
-  // needed any more now that we reset m_submittedFormURL on each mouse or key
-  // down event.
-  Frame* target = m_frame->tree()->find(frameLoadRequest.frameName());
-  if (m_frame->tree()->isDescendantOf(target)) {
-    if (m_submittedFormURL == frameLoadRequest.resourceRequest().url())
-      return;
-    m_submittedFormURL = frameLoadRequest.resourceRequest().url();
-  }
-#endif
-
-  RefPtr<FormData> formData = frameLoadRequest.resourceRequest().httpBody();
-  if (formData && !formData->isEmpty() && QtFrame(m_frame)->client())
-    QtFrame(m_frame)->client()->submitForm(
-        frameLoadRequest.resourceRequest().httpMethod(),
-        frameLoadRequest.resourceRequest().url(), formData);
-
-  clearRecordedFormValues();
-}
-
-void FrameLoader::urlSelected(const FrameLoadRequest& frameLoadRequest,
-                              Event*) {
-  const ResourceRequest& request = frameLoadRequest.resourceRequest();
-
-  if (!QtFrame(m_frame)->client())
-    return;
-
-  QtFrame(m_frame)->client()->openURL(request.url());
-}
-
 void FrameLoader::setTitle(const String& title) {
-  client()->setTitle(title, URL());
+  documentLoader()->setTitle(title);
 }
 
 Frame* FrameLoader::createFrame(const KURL& url,
@@ -164,8 +118,7 @@ Widget* FrameLoader::createJavaAppletWidget(const IntSize&,
 }
 
 KURL FrameLoader::originalRequestURL() const {
-  notImplemented();
-  return KURL();
+  return activeDocumentLoader()->initialRequest().url();
 }
 
 String FrameLoader::overrideMediaType() const {
@@ -174,21 +127,68 @@ String FrameLoader::overrideMediaType() const {
 }
 
 String FrameLoader::referrer() const {
-  notImplemented();
-  return String();
+  return documentLoader()->request().httpReferrer();
 }
 
 void FrameLoader::checkLoadCompleteForThisFrame() {
   ASSERT(m_client->hasWebView());
-  // notImplemented();
 
   switch (m_state) {
     case FrameStateProvisional: {
+      if (m_delegateIsHandlingProvisionalLoadError)
+        return;
+
+      RefPtr<DocumentLoader> pdl = m_provisionalDocumentLoader;
+      if (!pdl)
+        return;
+
+      // If we've received any errors we may be stuck in the provisional state
+      // and actually complete.
+      const ResourceError& error = pdl->mainDocumentError();
+      if (error.isNull())
+        return;
+
+      // Check all children first.
+      RefPtr<HistoryItem> item;
+      if (isBackForwardLoadType(loadType()) &&
+          m_frame == m_frame->page()->mainFrame())
+        item = m_currentHistoryItem;
+
+      bool shouldReset = true;
+      if (!pdl->isLoadingInAPISense()) {
+        m_delegateIsHandlingProvisionalLoadError = true;
+        m_client->dispatchDidFailProvisionalLoad(error);
+        m_delegateIsHandlingProvisionalLoadError = false;
+
+        // FIXME: can stopping loading here possibly have any effect, if
+        // isLoading is false,
+        // which it must be to be in this branch of the if? And is it OK to just
+        // do a full-on
+        // stopAllLoaders instead of stopLoadingSubframes?
+        stopLoadingSubframes();
+        pdl->stopLoading();
+
+        // Finish resetting the load state, but only if another load hasn't been
+        // started by the
+        // delegate callback.
+        if (pdl == m_provisionalDocumentLoader)
+          clearProvisionalLoad();
+        else if (m_documentLoader) {
+          KURL unreachableURL = m_documentLoader->unreachableURL();
+          if (!unreachableURL.isEmpty() &&
+              unreachableURL == pdl->request().url())
+            shouldReset = false;
+        }
+      }
+      if (shouldReset && item && m_frame->page())
+        m_frame->page()->backForwardList()->goToItem(item.get());
+
+      return;
     }
 
     case FrameStateCommittedPage: {
       DocumentLoader* dl = m_documentLoader.get();
-      if (!dl || dl->isLoadingInAPISense())
+      if (dl->isLoadingInAPISense())
         return;
 
       markLoadComplete();
@@ -201,15 +201,16 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
 
       // If the user had a scroll point, scroll to it, overriding the anchor
       // point if any.
-      //         if ((isBackForwardLoadType(m_loadType) || m_loadType ==
-      //         FrameLoadTypeReload)
-      //             && m_client->hasBackForwardList())
-      //             m_client->restoreScrollPositionAndViewState();
+      if ((isBackForwardLoadType(m_loadType) ||
+           m_loadType == FrameLoadTypeReload) &&
+          m_frame->page() && m_frame->page()->backForwardList())
+        restoreScrollPositionAndViewState();
 
-      //         if (error)
-      //             m_client->dispatchDidFailLoad(error);
-      //         else
-      m_client->dispatchDidFinishLoad();
+      const ResourceError& error = dl->mainDocumentError();
+      if (!error.isNull())
+        m_client->dispatchDidFailLoad(error);
+      else
+        m_client->dispatchDidFinishLoad();
 
       m_client->progressCompleted();
       return;
@@ -223,6 +224,8 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
       m_client->frameLoadCompleted();
       return;
   }
+
+  ASSERT_NOT_REACHED();
 }
 
 void FrameLoader::partClearedInBegin() {
