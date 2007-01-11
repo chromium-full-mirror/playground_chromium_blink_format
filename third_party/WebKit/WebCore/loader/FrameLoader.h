@@ -67,6 +67,7 @@ class JSValue;
 
 namespace WebCore {
 
+class AuthenticationChallenge;
 class DocumentLoader;
 class Element;
 class Event;
@@ -244,16 +245,15 @@ class FrameLoader : Noncopyable {
   FrameState state() const;
   static double timeOfLastCompletedLoad();
 
+  void didReceiveAuthenticationChallenge(ResourceLoader*,
+                                         const AuthenticationChallenge&);
+  void didCancelAuthenticationChallenge(ResourceLoader*,
+                                        const AuthenticationChallenge&);
+
   id identifierForInitialRequest(const ResourceRequest&);
   void willSendRequest(ResourceLoader*,
                        ResourceRequest&,
                        const ResourceResponse& redirectResponse);
-#if PLATFORM(MAC)
-  void didReceiveAuthenticationChallenge(ResourceLoader*,
-                                         NSURLAuthenticationChallenge*);
-  void didCancelAuthenticationChallenge(ResourceLoader*,
-                                        NSURLAuthenticationChallenge*);
-#endif
   void didReceiveResponse(ResourceLoader*, const ResourceResponse&);
   void didReceiveData(ResourceLoader*, const char*, int, int lengthReceived);
   void didFinishLoad(ResourceLoader*);

@@ -39,13 +39,9 @@
 #ifdef __OBJC__
 @class NSCachedURLResponse;
 @class NSData;
-@class NSURLAuthenticationChallenge;
-@class NSURLCredential;
 #else
 class NSCachedURLResponse;
 class NSData;
-class NSURLAuthenticationChallenge;
-class NSURLCredential;
 #endif
 #endif
 
@@ -65,6 +61,8 @@ class PlatformResponseQt : public Shared<PlatformResponseQt> {
 typedef RefPtr<PlatformResponseQt> PlatformResponse;
 #endif
 
+class AuthenticationChallenge;
+class Credential;
 class KURL;
 class ResourceHandle;
 class ResourceError;
@@ -80,11 +78,6 @@ class ResourceHandleClient {
                                ResourceRequest&,
                                const ResourceResponse& redirectResponse) {}
 
-  // void didReceiveAuthenticationChallenge(ResourceHandle*, const
-  // AuthenticationChallenge&) { }
-  // void didCancelAuthenticationChallenge(ResourceHandle*, const
-  // AuthenticationChallenge&) { }
-
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&) {}
   virtual void didReceiveData(ResourceHandle*,
                               const char*,
@@ -95,14 +88,21 @@ class ResourceHandleClient {
 
 // cached response may be modified
 // void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }
-
 #if PLATFORM(MAC)
   virtual void didReceiveAuthenticationChallenge(
       ResourceHandle*,
-      NSURLAuthenticationChallenge*) {}
-  virtual void didCancelAuthenticationChallenge(ResourceHandle*,
-                                                NSURLAuthenticationChallenge*) {
-  }
+      const AuthenticationChallenge&) {}
+  virtual void didCancelAuthenticationChallenge(
+      ResourceHandle*,
+      const AuthenticationChallenge&) {}
+  virtual void receivedCredential(ResourceHandle*,
+                                  const AuthenticationChallenge&,
+                                  const Credential&) {}
+  virtual void receivedRequestToContinueWithoutCredential(
+      ResourceHandle*,
+      const AuthenticationChallenge&) {}
+  virtual void receivedCancellation(ResourceHandle*,
+                                    const AuthenticationChallenge&) {}
 
   virtual void willStopBufferingData(ResourceHandle*, const char*, int) {}
 
@@ -111,15 +111,6 @@ class ResourceHandleClient {
       NSCachedURLResponse* cachedResponse) {
     return cachedResponse;
   }
-
-  virtual void receivedCredential(ResourceHandle*,
-                                  NSURLAuthenticationChallenge*,
-                                  NSURLCredential*) {}
-  virtual void receivedRequestToContinueWithoutCredential(
-      ResourceHandle*,
-      NSURLAuthenticationChallenge*) {}
-  virtual void receivedCancellation(ResourceHandle*,
-                                    NSURLAuthenticationChallenge*) {}
 #endif
 };
 }

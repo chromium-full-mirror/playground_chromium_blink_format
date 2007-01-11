@@ -38,6 +38,7 @@
 @class WebResource;
 
 namespace WebCore {
+class AuthenticationChallenge;
 class HistoryItem;
 class PageCache;
 class String;
@@ -94,11 +95,11 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
       id identifier,
-      NSURLAuthenticationChallenge*);
+      const WebCore::AuthenticationChallenge&);
   virtual void dispatchDidCancelAuthenticationChallenge(
       WebCore::DocumentLoader*,
       id identifier,
-      NSURLAuthenticationChallenge*);
+      const WebCore::AuthenticationChallenge&);
   virtual void dispatchDidReceiveResponse(WebCore::DocumentLoader*,
                                           id identifier,
                                           const WebCore::ResourceResponse&);

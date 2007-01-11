@@ -163,11 +163,11 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
       id identifier,
-      NSURLAuthenticationChallenge*) {}
+      const AuthenticationChallenge&) {}
   virtual void dispatchDidCancelAuthenticationChallenge(
       DocumentLoader*,
       id identifier,
-      NSURLAuthenticationChallenge*) {}
+      const AuthenticationChallenge&) {}
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           id identifier,
                                           const ResourceResponse&) {}

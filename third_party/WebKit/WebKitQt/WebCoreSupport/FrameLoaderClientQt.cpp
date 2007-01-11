@@ -600,4 +600,18 @@ bool FrameLoaderClientQt::willUseArchive(WebCore::ResourceLoader*,
   notImplemented();
   return false;
 }
+
+void FrameLoaderClientQt::dispatchDidReceiveAuthenticationChallenge(
+    DocumentLoader*,
+    id,
+    const AuthenticationChallenge&) {
+  notImplemented();
+}
+
+void FrameLoaderClientQt::dispatchDidCancelAuthenticationChallenge(
+    DocumentLoader*,
+    id,
+    const AuthenticationChallenge&) {
+  notImplemented();
+}
 }

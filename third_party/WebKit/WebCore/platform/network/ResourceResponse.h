@@ -135,6 +135,11 @@ class ResourceResponse {
 #endif
 };
 
+bool operator==(const ResourceResponse& a, const ResourceResponse& b);
+inline bool operator!=(const ResourceResponse& a, const ResourceResponse& b) {
+  return !(a == b);
+}
+
 }  // namespace WebCore
 
 #endif  // ResourceResponse_h_
