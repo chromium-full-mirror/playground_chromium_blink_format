@@ -121,8 +121,10 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
                                            const String* charset) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
+#if PLATFORM(MAC) || PLATFORM(QT)
   if (m_frame && m_frame->loader()->isReloading())
     setCachePolicy(CachePolicyReload);
+#endif
 
   checkForReload(fullURL);
 
