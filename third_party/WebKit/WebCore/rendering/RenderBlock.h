@@ -392,7 +392,7 @@ class RenderBlock : public RenderFlow {
   int heightForLineCount(int);
   void clearTruncation();
 
-  virtual bool hasColumns() const { return m_columnCount > 1; }
+  virtual bool hasColumns() const { return m_desiredColumnCount > 1; }
   void adjustRectForColumns(IntRect&) const;
 
  private:
@@ -408,7 +408,7 @@ class RenderBlock : public RenderFlow {
 
   int columnGap() const;
   void calcColumnWidth();
-  void layoutColumns();
+  int layoutColumns(int endOfContent = -1);
 
  protected:
   struct FloatingObject {
@@ -622,8 +622,8 @@ class RenderBlock : public RenderFlow {
   int m_tabWidth;
 
   // Column information.
-  int m_columnWidth;
-  unsigned m_columnCount;
+  int m_desiredColumnWidth;
+  unsigned m_desiredColumnCount;
   Vector<IntRect>* m_columnRects;
 };
 
