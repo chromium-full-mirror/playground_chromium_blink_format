@@ -200,6 +200,16 @@ void InsertListCommand::doApply() {
                                 : createUnorderedListElement(document());
       static_cast<HTMLElement*>(listElement.get())->setId(m_id);
       appendNode(listItemElement.get(), listElement.get());
+
+      if (start == end && isBlock(start.deepEquivalent().node())) {
+        // Inserting the list into an empty paragraph that isn't held open
+        // by a br or a '\n', will invalidate start and end.  Insert
+        // a placeholder and then recompute start and end.
+        Node* placeholder = insertBlockPlaceholder(start.deepEquivalent());
+        start = VisiblePosition(Position(placeholder, 0));
+        end = start;
+      }
+
       insertNodeAt(listElement.get(), start.deepEquivalent().node(),
                    start.deepEquivalent().offset());
     }
