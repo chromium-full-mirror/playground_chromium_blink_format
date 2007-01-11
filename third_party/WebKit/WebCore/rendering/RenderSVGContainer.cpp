@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2007 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -33,7 +33,6 @@
 #include "SVGLength.h"
 #include "SVGMarkerElement.h"
 #include "SVGSVGElement.h"
-#include "SVGStyledTransformableElement.h"
 
 namespace WebCore {
 
@@ -247,6 +246,9 @@ KCAlign RenderSVGContainer::align() const {
 }
 
 AffineTransform RenderSVGContainer::viewportTransform() const {
+  // FIXME: The method name is confusing, since it does not
+  // do viewport translating anymore. Look into this while
+  //  fixing bug 12207.
   if (!viewBox().isEmpty()) {
     FloatRect viewportRect = viewport();
     if (!parent()->isSVGContainer())
@@ -256,7 +258,7 @@ AffineTransform RenderSVGContainer::viewportTransform() const {
     return getAspectRatio(viewBox(), viewportRect);
   }
 
-  return AffineTransform().translate(viewport().x(), viewport().y());
+  return AffineTransform();
 }
 
 IntRect RenderSVGContainer::getAbsoluteRepaintRect() {
@@ -281,7 +283,9 @@ void RenderSVGContainer::absoluteRects(Vector<IntRect>& rects, int, int) {
 }
 
 AffineTransform RenderSVGContainer::absoluteTransform() const {
-  return viewportTransform() * RenderContainer::absoluteTransform();
+  AffineTransform ctm = RenderContainer::absoluteTransform();
+  ctm.translate(viewport().x(), viewport().y());
+  return viewportTransform() * ctm;
 }
 
 bool RenderSVGContainer::fillContains(const FloatPoint& p) const {
