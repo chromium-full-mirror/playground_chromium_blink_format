@@ -47,6 +47,8 @@ class RenderImage : public RenderReplaced {
 
   virtual void imageChanged(CachedImage*);
 
+  bool setImageSizeForAltText(CachedImage* newImage = 0);
+
   void updateAltText();
 
   void setIsAnonymousImage(bool anon) { m_isAnonymousImage = anon; }
