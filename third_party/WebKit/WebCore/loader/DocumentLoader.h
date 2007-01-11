@@ -91,8 +91,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   // FIXME: After we have a ResourceResponse in the mix, this method can go away
   // and we can use it directly
-  bool getResponseRefreshAndModifiedHeaders(String& refresh,
-                                            String& modified) const;
+  bool getResponseModifiedHeader(String& modified) const;
 
   void replaceRequestURLForAnchorScroll(const KURL&);
   bool isStopping() const;
