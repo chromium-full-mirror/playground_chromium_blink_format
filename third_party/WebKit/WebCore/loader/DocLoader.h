@@ -98,6 +98,7 @@ class DocLoader {
                                   const String* charset = 0);
 
   void checkForReload(const KURL&);
+  void checkCacheObjectStatus(CachedResource*);
 
   Cache* m_cache;
   HashSet<String> m_reloadedURLs;
