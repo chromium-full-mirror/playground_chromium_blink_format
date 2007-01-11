@@ -1606,7 +1606,7 @@ IntRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
         // position and size, and so we can use that to make a repaint happen
         // now.
         RenderView* c = view();
-        if (c && !c->printingMode())
+        if (c && !c->printing())
           c->repaintViewRectangle(m_layer->repaintRect());
       }
     }

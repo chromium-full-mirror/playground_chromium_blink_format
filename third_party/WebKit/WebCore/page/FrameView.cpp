@@ -364,9 +364,8 @@ void FrameView::layout(bool allowSubtree) {
 #endif
   }
 
-  d->doFullRepaint =
-      !subtree &&
-      (d->firstLayout || static_cast<RenderView*>(root)->printingMode());
+  d->doFullRepaint = !subtree && (d->firstLayout ||
+                                  static_cast<RenderView*>(root)->printing());
   d->repaintRects.clear();
 
   bool didFirstLayout = false;
@@ -431,7 +430,7 @@ void FrameView::layout(bool allowSubtree) {
 
   d->layoutSchedulingEnabled = true;
 
-  if (!subtree && !static_cast<RenderView*>(root)->printingMode())
+  if (!subtree && !static_cast<RenderView*>(root)->printing())
     resizeContents(layer->width(), layer->height());
 
   // Now update the positions of all layers.

@@ -1963,7 +1963,7 @@ void RenderObject::repaint(bool immediate) {
   if (!o->isRenderView())
     return;
   RenderView* view = static_cast<RenderView*>(o);
-  if (view->printingMode())
+  if (view->printing())
     return;  // Don't repaint if we're printing.
   view->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
 }
@@ -1976,7 +1976,7 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
   if (!o->isRenderView())
     return;
   RenderView* view = static_cast<RenderView*>(o);
-  if (view->printingMode())
+  if (view->printing())
     return;  // Don't repaint if we're printing.
   IntRect absRect(r);
   computeAbsoluteRepaintRect(absRect);
@@ -1986,7 +1986,7 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
 bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
                                               const IntRect& oldFullBounds) {
   RenderView* v = view();
-  if (v->printingMode())
+  if (v->printing())
     return false;  // Don't repaint if we're printing.
 
   IntRect newBounds, newFullBounds;
