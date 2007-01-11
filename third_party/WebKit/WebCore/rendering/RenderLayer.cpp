@@ -912,8 +912,8 @@ void RenderLayer::autoscroll() {
     HitTestRequest request(true, false, true);
     HitTestResult result(currentPos);
     if (hitTest(request, result)) {
-      VisiblePosition pos(
-          result.innerNode()->renderer()->positionForPoint(currentPos));
+      VisiblePosition pos(result.innerNode()->renderer()->positionForPoint(
+          result.localPoint()));
       currentFrame->eventHandler()->updateSelectionForMouseDragOverPosition(
           pos);
     }
@@ -1727,7 +1727,7 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // exited the WebView, and so hit testing over a scrollbar hits the content
   // document.
   if ((request.active || request.mouseUp) && renderer()->isRenderView()) {
-    renderer()->setInnerNode(result);
+    renderer()->updateHitTestResult(result, result.point());
     return this;
   }
 

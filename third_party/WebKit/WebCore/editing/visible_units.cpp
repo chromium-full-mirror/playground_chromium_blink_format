@@ -459,15 +459,16 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
   }
 
   if (root) {
+    // FIXME: Can be wrong for multi-column layout.
     int absx, absy;
     containingBlock->absolutePositionForContent(absx, absy);
     if (containingBlock->hasOverflowClip())
       containingBlock->layer()->subtractScrollOffset(absx, absy);
-    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    RenderObject* renderer = root->closestLeafChildForXPos(x - absx)->object();
     Node* node = renderer->element();
     if (editingIgnoresContent(node))
       return Position(node->parent(), node->nodeIndex());
-    return renderer->positionForCoordinates(x, absy + root->topOverflow());
+    return renderer->positionForCoordinates(x - absx, root->topOverflow());
   }
 
   // Could not find a previous line. This means we must already be on the first
@@ -530,15 +531,16 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
   }
 
   if (root) {
+    // FIXME: Can be wrong for multi-column layout.
     int absx, absy;
     containingBlock->absolutePositionForContent(absx, absy);
     if (containingBlock->hasOverflowClip())
       containingBlock->layer()->subtractScrollOffset(absx, absy);
-    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    RenderObject* renderer = root->closestLeafChildForXPos(x - absx)->object();
     Node* node = renderer->element();
     if (editingIgnoresContent(node))
       return Position(node->parent(), node->nodeIndex());
-    return renderer->positionForCoordinates(x, absy + root->topOverflow());
+    return renderer->positionForCoordinates(x - absx, root->topOverflow());
   }
 
   // Could not find a next line. This means we must already be on the last line.

@@ -230,7 +230,7 @@ bool RenderPath::nodeAtPoint(const HitTestRequest& request,
         (hitRules.canHitFill &&
          (style()->svgStyle()->hasFill() || !hitRules.requireFill) &&
          fillContains(hitPoint, hitRules.requireFill))) {
-      setInnerNode(result);
+      updateHitTestResult(result, IntPoint(_x, _y));
       return true;
     }
   }

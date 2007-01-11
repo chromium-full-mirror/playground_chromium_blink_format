@@ -270,7 +270,7 @@ bool RenderBox::nodeAtPoint(const HitTestRequest& request,
     // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
         child->nodeAtPoint(request, result, x, y, tx, ty, action)) {
-      setInnerNode(result);
+      updateHitTestResult(result, IntPoint(x - tx, y - ty));
       return true;
     }
   }
@@ -280,7 +280,7 @@ bool RenderBox::nodeAtPoint(const HitTestRequest& request,
   // foreground phase (which is true for replaced elements like images).
   if (action == HitTestForeground &&
       IntRect(tx, ty, m_width, m_height).contains(x, y)) {
-    setInnerNode(result);
+    updateHitTestResult(result, IntPoint(x - tx, y - ty));
     return true;
   }
 

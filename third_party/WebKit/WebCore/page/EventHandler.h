@@ -148,8 +148,8 @@ class EventHandler : Noncopyable {
 #endif
 
  private:
-  void selectClosestWordFromMouseEvent(const PlatformMouseEvent&,
-                                       Node* innerNode);
+  void selectClosestWordFromMouseEvent(
+      const MouseEventWithHitTestResults& event);
 
   bool handleMouseDoubleClickEvent(const PlatformMouseEvent&);
 

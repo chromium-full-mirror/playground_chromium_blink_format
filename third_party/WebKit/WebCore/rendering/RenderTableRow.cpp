@@ -156,7 +156,7 @@ bool RenderTableRow::nodeAtPoint(const HitTestRequest& request,
     // then we can remove this check.
     if (!child->layer() && !child->isInlineFlow() &&
         child->nodeAtPoint(request, result, x, y, tx, ty, action)) {
-      setInnerNode(result);
+      updateHitTestResult(result, IntPoint(x - tx, y - ty));
       return true;
     }
   }

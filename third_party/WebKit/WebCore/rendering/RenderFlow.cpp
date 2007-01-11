@@ -462,7 +462,7 @@ bool RenderFlow::hitTestLines(const HitTestRequest& request,
         y < ty + curr->root()->bottomOverflow()) {
       bool inside = curr->nodeAtPoint(request, result, x, y, tx, ty);
       if (inside) {
-        setInnerNode(result);
+        updateHitTestResult(result, IntPoint(x - tx, y - ty));
         return true;
       }
     }

@@ -395,6 +395,9 @@ class RenderBlock : public RenderFlow {
   virtual bool hasColumns() const { return m_columnCount > 1; }
   void adjustRectForColumns(IntRect&) const;
 
+ private:
+  void adjustPointToColumnContents(IntPoint&) const;
+
  protected:
   void newLine();
   virtual bool hasLineIfEmpty() const;
