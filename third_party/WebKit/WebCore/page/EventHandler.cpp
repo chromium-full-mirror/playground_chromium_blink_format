@@ -1199,7 +1199,7 @@ bool EventHandler::sendContextMenuEvent(PlatformMouseEvent event) {
 
   swallowEvent = dispatchMouseEvent(contextmenuEvent, mev.targetNode(), true, 0,
                                     event, true);
-  if (!swallowEvent && !m_frame->selectionController()->contains(viewportPos) &&
+  if (swallowEvent && !m_frame->selectionController()->contains(viewportPos) &&
       (m_frame->editor()->selectWordBeforeMenuEvent() ||
        m_frame->editor()->clientIsEditable() ||
        (mev.targetNode() && mev.targetNode()->isContentEditable()))) {
