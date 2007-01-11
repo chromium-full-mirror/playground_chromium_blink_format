@@ -38,7 +38,7 @@ namespace Bindings {
 
 class RootObject;
 
-typedef RootObject* (*FindRootObjectForNativeHandleFunctionPtr)(void*);
+typedef RootObject* (*CreateRootObjectFunction)(void* nativeHandle);
 typedef HashCountedSet<JSObject*> ReferencesSet;
 
 extern ReferencesSet* findReferenceSet(JSObject* imp);
@@ -61,11 +61,9 @@ class RootObject {
 
 #if PLATFORM(MAC)
   // Must be called from the thread that will be used to access JavaScript.
-  static void setFindRootObjectForNativeHandleFunction(
-      FindRootObjectForNativeHandleFunctionPtr aFunc);
-  static FindRootObjectForNativeHandleFunctionPtr
-  findRootObjectForNativeHandleFunction() {
-    return _findRootObjectForNativeHandleFunctionPtr;
+  static void setCreateRootObject(CreateRootObjectFunction);
+  static CreateRootObjectFunction createRootObject() {
+    return _createRootObject;
   }
 
   static CFRunLoopRef runLoop() { return _runLoop; }
@@ -81,8 +79,7 @@ class RootObject {
   RefPtr<Interpreter> m_interpreter;
 
 #if PLATFORM(MAC)
-  static FindRootObjectForNativeHandleFunctionPtr
-      _findRootObjectForNativeHandleFunctionPtr;
+  static CreateRootObjectFunction _createRootObject;
   static CFRunLoopRef _runLoop;
   static CFRunLoopSourceRef _performJavaScriptSource;
 #endif
