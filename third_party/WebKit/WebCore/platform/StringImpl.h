@@ -143,6 +143,7 @@ class StringImpl : public Shared<StringImpl> {
   // Does not modify the string.
   StringImpl* replace(UChar, UChar);
   StringImpl* replace(UChar, const StringImpl*);
+  StringImpl* replace(const StringImpl*, const StringImpl*);
   StringImpl* replace(unsigned index, unsigned len, const StringImpl*);
 
   static StringImpl* empty();

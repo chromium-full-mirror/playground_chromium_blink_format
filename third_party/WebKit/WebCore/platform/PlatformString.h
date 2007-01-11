@@ -122,6 +122,11 @@ class String {
       m_impl = m_impl->replace(a, b.impl());
     return *this;
   }
+  String& replace(const String& a, const String& b) {
+    if (m_impl)
+      m_impl = m_impl->replace(a.impl(), b.impl());
+    return *this;
+  }
   String& replace(unsigned index, unsigned len, const String& b) {
     if (m_impl)
       m_impl = m_impl->replace(index, len, b.impl());
