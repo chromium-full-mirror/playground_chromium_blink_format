@@ -101,8 +101,8 @@ class JavaJSObject {
 
 extern "C" {
 
-// Functions called from the Java VM when making calls to the JavaJSObject
-// class.
+// The Java VM calls these functions to handle calls to methods in Java's
+// JSObject class.
 jlong KJS_JSCreateNativeJSObject(JNIEnv*,
                                  jclass,
                                  jstring jurl,

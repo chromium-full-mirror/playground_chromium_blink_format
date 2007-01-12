@@ -49,60 +49,80 @@ namespace Bindings {
 // instances
 // are represented by a jlong.
 
-typedef HashMap<const RootObject*, ProtectCountSet*> RootObjectMap;
+typedef HashMap<const RootObject*, ReferencesSet*> ReferencesByRootMap;
 
-static RootObjectMap* getRootObjectMap() {
-  static RootObjectMap staticRootObjectMap;
-  return &staticRootObjectMap;
+static ReferencesByRootMap* getReferencesByRootMap() {
+  static ReferencesByRootMap* referencesByRootMap = 0;
+
+  if (!referencesByRootMap)
+    referencesByRootMap = new ReferencesByRootMap;
+
+  return referencesByRootMap;
 }
 
-static ProtectCountSet* getProtectCountSet(const RootObject* rootObject) {
-  RootObjectMap* rootObjectMap = getRootObjectMap();
-  ProtectCountSet* protectCountSet = rootObjectMap->get(rootObject);
+static ReferencesSet* getReferencesSet(const RootObject* rootObject) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+  ReferencesSet* referencesSet = 0;
 
-  if (!protectCountSet) {
-    protectCountSet = new ProtectCountSet;
-    rootObjectMap->add(rootObject, protectCountSet);
+  referencesSet = refsByRoot->get(rootObject);
+  if (!referencesSet) {
+    referencesSet = new ReferencesSet;
+    refsByRoot->add(rootObject, referencesSet);
   }
-  return protectCountSet;
+  return referencesSet;
 }
 
-static void destroyProtectCountSet(const RootObject* rootObject,
-                                   ProtectCountSet* protectCountSet) {
-  RootObjectMap* rootObjectMap = getRootObjectMap();
-  rootObjectMap->remove(rootObject);
-  delete protectCountSet;
-}
+// Scan all the dictionary for all the roots to see if any have a
+// reference to the imp, and if so, return it's reference count
+// dictionary.
+// FIXME:  This is a potential performance bottleneck with many applets.  We
+// could fix be adding a
+// imp to root dictionary.
+ReferencesSet* findReferenceSet(JSObject* imp) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+  if (refsByRoot) {
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
+      ReferencesSet* set = it->second;
 
-// FIXME:  These two functions are a potential performance problem.  We could
-// fix them by adding a JSObject to RootObject dictionary.
-
-ProtectCountSet* getProtectCountSet(JSObject* jsObject) {
-  const RootObject* rootObject = getRootObject(jsObject);
-  return getProtectCountSet(rootObject);
-}
-
-const RootObject* getRootObject(JSObject* jsObject) {
-  RootObjectMap* rooObjectMap = getRootObjectMap();
-
-  RootObjectMap::const_iterator end = rooObjectMap->end();
-  for (RootObjectMap::const_iterator it = rooObjectMap->begin(); it != end;
-       ++it) {
-    ProtectCountSet* set = it->second;
-    if (set->contains(jsObject))
-      return it->first;
+      if (set->contains(imp))
+        return set;
+    }
   }
 
   return 0;
 }
 
-const RootObject* getRootObject(Interpreter* interpreter) {
-  RootObjectMap* rooObjectMap = getRootObjectMap();
+// FIXME:  This is a potential performance bottleneck with many applets.  We
+// could fix be adding a
+// imp to root dictionary.
+const RootObject* rootObjectForImp(JSObject* imp) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+  const RootObject* rootObject = 0;
 
-  if (rooObjectMap) {
-    RootObjectMap::const_iterator end = rooObjectMap->end();
-    for (RootObjectMap::const_iterator it = rooObjectMap->begin(); it != end;
-         ++it) {
+  if (refsByRoot) {
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
+      ReferencesSet* set = it->second;
+      if (set->contains(imp)) {
+        rootObject = it->first;
+        break;
+      }
+    }
+  }
+
+  return rootObject;
+}
+
+const RootObject* rootObjectForInterpreter(Interpreter* interpreter) {
+  ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+
+  if (refsByRoot) {
+    ReferencesByRootMap::const_iterator end = refsByRoot->end();
+    for (ReferencesByRootMap::const_iterator it = refsByRoot->begin();
+         it != end; ++it) {
       const RootObject* aRootObject = it->first;
 
       if (aRootObject->interpreter() == interpreter)
@@ -113,28 +133,33 @@ const RootObject* getRootObject(Interpreter* interpreter) {
   return 0;
 }
 
-void addNativeReference(const RootObject* rootObject, JSObject* jsObject) {
-  if (!rootObject)
-    return;
+void addNativeReference(const RootObject* rootObject, JSObject* imp) {
+  if (rootObject) {
+    ReferencesSet* referenceMap = getReferencesSet(rootObject);
 
-  ProtectCountSet* protectCountSet = getProtectCountSet(rootObject);
-  if (!protectCountSet->contains(jsObject)) {
-    JSLock lock;
-    gcProtect(jsObject);
+    unsigned numReferences = referenceMap->count(imp);
+    if (numReferences == 0) {
+      JSLock lock;
+      gcProtect(imp);
+    }
+    referenceMap->add(imp);
   }
-  protectCountSet->add(jsObject);
 }
 
-void removeNativeReference(JSObject* jsObject) {
-  if (!jsObject)
+void removeNativeReference(JSObject* imp) {
+  if (!imp)
     return;
 
-  ProtectCountSet* protectCountSet = getProtectCountSet(jsObject);
-  if (protectCountSet->count(jsObject) == 1) {
-    JSLock lock;
-    gcUnprotect(jsObject);
+  ReferencesSet* referencesSet = findReferenceSet(imp);
+  if (referencesSet) {
+    unsigned numReferences = referencesSet->count(imp);
+
+    if (numReferences == 1) {
+      JSLock lock;
+      gcUnprotect(imp);
+    }
+    referencesSet->remove(imp);
   }
-  protectCountSet->remove(jsObject);
 }
 
 #if PLATFORM(MAC)
@@ -264,17 +289,18 @@ void RootObject::setCreateRootObject(
 
 // Destroys the RootObject and unprotects all JSObjects associated with it.
 void RootObject::destroy() {
-  ProtectCountSet* protectCountSet = getProtectCountSet(this);
+  ReferencesSet* referencesSet = getReferencesSet(this);
 
-  if (protectCountSet) {
-    ProtectCountSet::iterator end = protectCountSet->end();
-    for (ProtectCountSet::iterator it = protectCountSet->begin(); it != end;
-         ++it) {
+  if (referencesSet) {
+    ReferencesSet::iterator end = referencesSet->end();
+    for (ReferencesSet::iterator it = referencesSet->begin(); it != end; ++it) {
       JSLock lock;
       gcUnprotect(it->first);
     }
-
-    destroyProtectCountSet(this, protectCountSet);
+    referencesSet->clear();
+    ReferencesByRootMap* refsByRoot = getReferencesByRootMap();
+    refsByRoot->remove(this);
+    delete referencesSet;
   }
 
   delete this;
