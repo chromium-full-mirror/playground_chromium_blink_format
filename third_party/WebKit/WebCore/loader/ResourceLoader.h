@@ -82,7 +82,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual void setDefersLoading(bool);
 
 #if PLATFORM(MAC)
-  void setIdentifier(id);
+  void setIdentifier(id i) { m_identifier = i; }
   id identifier() const { return m_identifier.get(); }
 #else
   void setIdentifier(id) {}
@@ -110,6 +110,10 @@ class ResourceLoader : public Shared<ResourceLoader>,
   NSCachedURLResponse* willCacheResponse(NSCachedURLResponse*);
 #endif
 
+  void didReceiveAuthenticationChallenge(const AuthenticationChallenge&);
+  void didCancelAuthenticationChallenge(const AuthenticationChallenge&);
+  void receivedCancellation(const AuthenticationChallenge&);
+
   // ResourceHandleClient
   virtual void willSendRequest(ResourceHandle*,
                                ResourceRequest&,
@@ -126,23 +130,6 @@ class ResourceLoader : public Shared<ResourceLoader>,
                                      int length) {
     willStopBufferingData(data, length);
   }
-
-#if PLATFORM(MAC)
-  virtual NSCachedURLResponse* willCacheResponse(
-      ResourceHandle*,
-      NSCachedURLResponse* cachedResponse) {
-    return willCacheResponse(cachedResponse);
-  }
-
-  void didReceiveAuthenticationChallenge(
-      const AuthenticationChallenge& challenge);
-  void didCancelAuthenticationChallenge(
-      const AuthenticationChallenge& challenge);
-  void receivedCredential(const AuthenticationChallenge&, const Credential&);
-  void receivedRequestToContinueWithoutCredential(
-      const AuthenticationChallenge&);
-  void receivedCancellation(const AuthenticationChallenge&);
-
   virtual void didReceiveAuthenticationChallenge(
       ResourceHandle*,
       const AuthenticationChallenge& challenge) {
@@ -153,19 +140,16 @@ class ResourceLoader : public Shared<ResourceLoader>,
       const AuthenticationChallenge& challenge) {
     didCancelAuthenticationChallenge(challenge);
   }
-  virtual void receivedCredential(ResourceHandle*,
-                                  const AuthenticationChallenge& challenge,
-                                  const Credential& credential) {
-    receivedCredential(challenge, credential);
-  }
-  virtual void receivedRequestToContinueWithoutCredential(
-      ResourceHandle*,
-      const AuthenticationChallenge& challenge) {
-    receivedRequestToContinueWithoutCredential(challenge);
-  }
   virtual void receivedCancellation(ResourceHandle*,
                                     const AuthenticationChallenge& challenge) {
     receivedCancellation(challenge);
+  }
+
+#if PLATFORM(MAC)
+  virtual NSCachedURLResponse* willCacheResponse(
+      ResourceHandle*,
+      NSCachedURLResponse* cachedResponse) {
+    return willCacheResponse(cachedResponse);
   }
 #endif
 
@@ -199,9 +183,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   ResourceResponse m_response;
 #if PLATFORM(MAC)
   RetainPtr<id> m_identifier;
-  NSURLAuthenticationChallenge* m_currentMacChallenge;
 #endif
-  AuthenticationChallenge m_currentWebChallenge;
 
   KURL m_originalURL;
   RefPtr<SharedBuffer> m_resourceData;

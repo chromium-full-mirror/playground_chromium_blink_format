@@ -86,9 +86,9 @@ class ResourceHandleClient {
   virtual void didFinishLoading(ResourceHandle*) {}
   virtual void didFail(ResourceHandle*, const ResourceError&) {}
 
-// cached response may be modified
-// void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }
-#if PLATFORM(MAC)
+  // cached response may be modified
+  // void willCacheResponse(ResourceHandle*, CachedResourceResponse&) { }
+
   virtual void didReceiveAuthenticationChallenge(
       ResourceHandle*,
       const AuthenticationChallenge&) {}
@@ -104,8 +104,8 @@ class ResourceHandleClient {
   virtual void receivedCancellation(ResourceHandle*,
                                     const AuthenticationChallenge&) {}
 
+#if PLATFORM(MAC)
   virtual void willStopBufferingData(ResourceHandle*, const char*, int) {}
-
   virtual NSCachedURLResponse* willCacheResponse(
       ResourceHandle*,
       NSCachedURLResponse* cachedResponse) {
