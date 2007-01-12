@@ -42,10 +42,12 @@ class RenderFieldset : public RenderBlock {
 
   virtual void setStyle(RenderStyle*);
 
+  virtual void calcMinMaxWidth();
   virtual bool avoidsFloats() const { return true; }
   virtual bool expandsToEncloseOverhangingFloats() const {
     return style()->height().isAuto();
   }
+  virtual bool stretchesToMinIntrinsicWidth() const { return true; }
 
  private:
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
@@ -56,8 +58,9 @@ class RenderFieldset : public RenderBlock {
                               int h,
                               const RenderStyle*,
                               int lx,
-                              int lw);
-  RenderObject* findLegend();
+                              int lw,
+                              int lb);
+  RenderObject* findLegend() const;
 };
 
 }  // namespace WebCore

@@ -131,6 +131,7 @@ class RenderBox : public RenderObject {
   // of a containing block).  HTML4 buttons, <select>s, <input>s, legends, and
   // floating/compact elements do this.
   bool sizesToIntrinsicWidth(WidthType) const;
+  virtual bool stretchesToMinIntrinsicWidth() const { return false; }
 
   int calcWidthUsing(WidthType, int cw);
   int calcHeightUsing(const Length& height);
