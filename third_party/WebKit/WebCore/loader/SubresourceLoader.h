@@ -57,7 +57,6 @@ class SubresourceLoader : public ResourceLoader {
 
   void stopLoading();
 
-#if PLATFORM(MAC)
   virtual bool load(const ResourceRequest&);
 
   virtual void willSendRequest(ResourceRequest&,
@@ -69,26 +68,11 @@ class SubresourceLoader : public ResourceLoader {
                               bool allAtOnce);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
-#else
-  virtual void willSendRequest(ResourceHandle*,
-                               ResourceRequest&,
-                               const ResourceResponse& redirectResponse);
-
-  virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
-  virtual void didReceiveData(ResourceHandle*,
-                              const char*,
-                              int,
-                              int lengthReceived);
-  virtual void didFinishLoading(ResourceHandle*);
-  virtual void didFail(ResourceHandle*, const ResourceError&);
-#endif
 
  private:
   SubresourceLoader(Frame*, SubresourceLoaderClient*);
 
-#if PLATFORM(MAC)
   virtual void didCancel(const ResourceError&);
-#endif
   SubresourceLoaderClient* m_client;
   bool m_loadingMultipartContent;
 };
