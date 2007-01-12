@@ -432,11 +432,11 @@ void Collector::markStackObjectsConservatively() {
 #endif
 }
 
-typedef HashCountedSet<JSCell*> ProtectCounts;
+typedef HashCountedSet<JSCell*> ProtectCountSet;
 
-static ProtectCounts& protectedValues() {
-  static ProtectCounts pv;
-  return pv;
+static ProtectCountSet& protectedValues() {
+  static ProtectCountSet staticProtectCountSet;
+  return staticProtectCountSet;
 }
 
 void Collector::protect(JSValue* k) {
@@ -460,9 +460,10 @@ void Collector::unprotect(JSValue* k) {
 }
 
 void Collector::markProtectedObjects() {
-  ProtectCounts& pv = protectedValues();
-  ProtectCounts::iterator end = pv.end();
-  for (ProtectCounts::iterator it = pv.begin(); it != end; ++it) {
+  ProtectCountSet& protectedValues = KJS::protectedValues();
+  ProtectCountSet::iterator end = protectedValues.end();
+  for (ProtectCountSet::iterator it = protectedValues.begin(); it != end;
+       ++it) {
     JSCell* val = it->first;
     if (!val->marked())
       val->mark();
@@ -686,9 +687,9 @@ static const char* typeName(JSCell* val) {
 HashCountedSet<const char*>* Collector::rootObjectTypeCounts() {
   HashCountedSet<const char*>* counts = new HashCountedSet<const char*>;
 
-  ProtectCounts& pv = protectedValues();
-  ProtectCounts::iterator end = pv.end();
-  for (ProtectCounts::iterator it = pv.begin(); it != end; ++it)
+  ProtectCountSet& protectedValues = KJS::protectedValues();
+  ProtectCountSet::iterator end = protectedValues.end();
+  for (ProtectCountSet::iterator it = protectedValues.begin(); it != end; ++it)
     counts->add(typeName(it->first));
 
   return counts;

@@ -141,7 +141,7 @@ void convertValueToNPVariant(ExecState* exec,
     } else {
       Interpreter* originInterpreter = exec->dynamicInterpreter();
       const Bindings::RootObject* originRootObject =
-          rootObjectForInterpreter(originInterpreter);
+          findRootObject(originInterpreter);
 
       Interpreter* interpreter = 0;
       if (originInterpreter->isGlobalObject(value)) {
@@ -151,7 +151,7 @@ void convertValueToNPVariant(ExecState* exec,
       if (!interpreter)
         interpreter = originInterpreter;
 
-      const RootObject* rootObject = rootObjectForInterpreter(interpreter);
+      const RootObject* rootObject = findRootObject(interpreter);
       if (!rootObject) {
         RootObject* newRootObject = new RootObject(0, interpreter);
         rootObject = newRootObject;
