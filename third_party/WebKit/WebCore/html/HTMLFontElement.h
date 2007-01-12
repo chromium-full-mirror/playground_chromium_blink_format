@@ -49,6 +49,8 @@ class HTMLFontElement : public HTMLElement {
 
   String size() const;
   void setSize(const String&);
+
+  static bool cssValueFromFontSizeNumber(const String&, int&);
 };
 
 }  // namespace
