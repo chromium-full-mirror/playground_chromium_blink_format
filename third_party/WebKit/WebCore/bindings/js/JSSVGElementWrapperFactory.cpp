@@ -199,8 +199,8 @@ typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
                                       path,                                     \
                                       Path) macro(pattern,                      \
                                                   Pattern) macro(polyline,      \
-                                                                 Polygon)       \
-                                      macro(polygon, Polyline) macro(           \
+                                                                 Polyline)      \
+                                      macro(polygon, Polygon) macro(            \
                                           radialGradient,                       \
                                           RadialGradient) macro(rect, Rect)     \
                                           macro(script, Script) macro(          \
