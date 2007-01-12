@@ -711,7 +711,7 @@ void RenderFlow::addFocusRingRects(GraphicsContext* graphicsContext,
   if (isRenderBlock())
     graphicsContext->addFocusRingRect(IntRect(tx, ty, width(), height()));
 
-  if (!hasOverflowClip()) {
+  if (!hasOverflowClip() && !hasControlClip()) {
     for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox())
       graphicsContext->addFocusRingRect(IntRect(
           tx + curr->xPos(), ty + curr->yPos(), curr->width(), curr->height()));

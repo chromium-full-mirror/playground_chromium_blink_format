@@ -47,7 +47,10 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
 
   virtual bool canHaveChildren() const { return false; }
 
+  virtual bool hasControlClip() const { return true; }
   virtual void paintObject(PaintInfo&, int tx, int ty);
+  virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const;
+
   virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
 
   virtual bool scroll(ScrollDirection,
@@ -66,11 +69,21 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
 
   int listIndexAtOffset(int x, int y);
 
+  int itemHeight() const;
+
   bool scrollToRevealElementAtListIndex(int index);
 
   virtual bool shouldAutoscroll() const { return true; }
   virtual void autoscroll();
   virtual void stopAutoscroll();
+
+  virtual int verticalScrollbarWidth() const;
+  virtual int scrollLeft() const;
+  virtual int scrollTop() const;
+  virtual int scrollWidth() const;
+  virtual int scrollHeight() const;
+  virtual void setScrollLeft(int);
+  virtual void setScrollTop(int);
 
  private:
   int size() const;
@@ -83,8 +96,6 @@ class RenderListBox : public RenderBlock, public ScrollbarClient {
 
   bool m_optionsChanged;
   int m_optionsWidth;
-  int m_optionsMaxHeight;
-  int m_optionsTotalHeight;
   int m_indexOffset;
   bool m_selectionChanged;
 

@@ -351,6 +351,10 @@ class RenderObject : public CachedResourceClient {
   bool isSelectionBorder() const;
 
   bool hasOverflowClip() const { return m_hasOverflowClip; }
+  virtual bool hasControlClip() const { return false; }
+  virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const {
+    return IntRect();
+  }
 
   bool hasAutoVerticalScrollbar() const {
     return hasOverflowClip() &&
@@ -373,6 +377,10 @@ class RenderObject : public CachedResourceClient {
            (style()->overflowY() == OSCROLL || hasAutoVerticalScrollbar());
   }
 
+  virtual int verticalScrollbarWidth() const;
+  virtual int horizontalScrollbarHeight() const;
+
+ private:
   bool includeVerticalScrollbarSize() const {
     return hasOverflowClip() &&
            (style()->overflowY() == OSCROLL || style()->overflowY() == OAUTO);
@@ -382,6 +390,7 @@ class RenderObject : public CachedResourceClient {
            (style()->overflowX() == OSCROLL || style()->overflowX() == OAUTO);
   }
 
+ public:
   RenderStyle* getPseudoStyle(RenderStyle::PseudoId,
                               RenderStyle* parentStyle = 0) const;
 
@@ -658,8 +667,12 @@ class RenderObject : public CachedResourceClient {
   virtual int containingBlockHeight() const;
 
   // size of the content area (box size minus padding/border)
-  virtual int contentWidth() const { return 0; }
-  virtual int contentHeight() const { return 0; }
+  int contentWidth() const {
+    return clientWidth() - paddingLeft() - paddingRight();
+  }
+  int contentHeight() const {
+    return clientHeight() - paddingTop() - paddingBottom();
+  }
 
   // intrinsic extend of replaced elements. undefined otherwise
   virtual int intrinsicWidth() const { return 0; }

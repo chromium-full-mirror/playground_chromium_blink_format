@@ -51,9 +51,6 @@ class RenderBox : public RenderObject {
   virtual int minWidth() const { return m_minWidth; }
   virtual int maxWidth() const { return m_maxWidth; }
 
-  virtual int contentWidth() const;
-  virtual int contentHeight() const;
-
   virtual int overrideSize() const { return m_overrideSize; }
   virtual int overrideWidth() const;
   virtual int overrideHeight() const;
