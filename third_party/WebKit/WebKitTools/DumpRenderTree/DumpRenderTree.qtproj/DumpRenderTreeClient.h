@@ -39,6 +39,7 @@ class DumpRenderTreeClient : public FrameLoaderClientQt {
   virtual ~DumpRenderTreeClient();
 
   virtual void partClearedInBegin();
+  void dispatchDidHandleOnloadEvents();
 
  private:
   DumpRenderTree* dumper;

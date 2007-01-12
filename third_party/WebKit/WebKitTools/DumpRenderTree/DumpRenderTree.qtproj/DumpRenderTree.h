@@ -58,8 +58,11 @@ class DumpRenderTree : public QObject {
 
  public Q_SLOTS:
   void readStdin(int);
-  void checkLoaded();
+  void maybeDump();
   void dump();
+
+ Q_SIGNALS:
+  void quit();
 
  private:
   friend class DumpRenderTreeClient;
