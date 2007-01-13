@@ -2508,7 +2508,10 @@ void RenderObject::setStyle(RenderStyle* style) {
 
   // No need to ever schedule repaints from a style change of a text run, since
   // we already did this for the parent of the text run.
-  if (d == RenderStyle::Layout && m_parent && !isText())
+  // We do have to schedule layouts, though, since a style change can force us
+  // to
+  // need to relayout.
+  if (d == RenderStyle::Layout && m_parent)
     setNeedsLayoutAndMinMaxRecalc();
   else if (m_parent && !isText() &&
            (d == RenderStyle::RepaintLayer || d == RenderStyle::Repaint))
