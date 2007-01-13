@@ -63,6 +63,7 @@
 
 #ifdef SVG_SUPPORT
 #include "XLinkNames.h"
+#include "SVGNames.h"
 #endif
 
 using namespace std;
@@ -1211,6 +1212,12 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
       style->setOverflowX(OHIDDEN);
     else if (style->overflowX() == OAUTO)
       style->setOverflowX(OVISIBLE);
+
+    // Only the root <svg> element in an SVG document fragment tree honors css
+    // position
+    if (!(e->hasTagName(SVGNames::svgTag) && e->parentNode() &&
+          !e->parentNode()->isSVGElement()))
+      style->setPosition(RenderStyle::initialPosition());
   }
 #endif
 }
