@@ -482,9 +482,16 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle*,
   notImplemented();
 }
 
+void FrameLoaderClientQt::assignIdentifierToInitialRequest(
+    unsigned long identifier,
+    WebCore::DocumentLoader*,
+    const WebCore::ResourceRequest&) {
+  notImplemented();
+}
+
 void FrameLoaderClientQt::dispatchWillSendRequest(
     WebCore::DocumentLoader*,
-    void*,
+    unsigned long,
     WebCore::ResourceRequest& request,
     const WebCore::ResourceResponse& response) {
   // seems like the Mac code doesn't do anything here by default neither
@@ -492,9 +499,23 @@ void FrameLoaderClientQt::dispatchWillSendRequest(
            << request.url().url();
 }
 
+void FrameLoaderClientQt::dispatchDidReceiveAuthenticationChallenge(
+    DocumentLoader*,
+    unsigned long,
+    const AuthenticationChallenge&) {
+  notImplemented();
+}
+
+void FrameLoaderClientQt::dispatchDidCancelAuthenticationChallenge(
+    DocumentLoader*,
+    unsigned long,
+    const AuthenticationChallenge&) {
+  notImplemented();
+}
+
 void FrameLoaderClientQt::dispatchDidReceiveResponse(
     WebCore::DocumentLoader*,
-    void*,
+    unsigned long,
     const WebCore::ResourceResponse& response) {
   m_response = response;
   m_firstData = true;
@@ -503,19 +524,19 @@ void FrameLoaderClientQt::dispatchDidReceiveResponse(
 
 void FrameLoaderClientQt::dispatchDidReceiveContentLength(
     WebCore::DocumentLoader*,
-    void*,
+    unsigned long,
     int) {
   notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchDidFinishLoading(WebCore::DocumentLoader*,
-                                                   void*) {
+                                                   unsigned long) {
   notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchDidFailLoading(
     WebCore::DocumentLoader*,
-    void*,
+    unsigned long,
     const WebCore::ResourceError&) {
   notImplemented();
 }
@@ -577,16 +598,16 @@ void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
   notImplemented();
 }
 
-void FrameLoaderClientQt::incrementProgress(void*,
+void FrameLoaderClientQt::incrementProgress(unsigned long,
                                             const WebCore::ResourceResponse&) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::incrementProgress(void*, const char*, int) {
+void FrameLoaderClientQt::incrementProgress(unsigned long, const char*, int) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::completeProgress(void*) {
+void FrameLoaderClientQt::completeProgress(unsigned long) {
   notImplemented();
 }
 
@@ -599,19 +620,5 @@ bool FrameLoaderClientQt::willUseArchive(WebCore::ResourceLoader*,
                                          const WebCore::KURL&) const {
   notImplemented();
   return false;
-}
-
-void FrameLoaderClientQt::dispatchDidReceiveAuthenticationChallenge(
-    DocumentLoader*,
-    id,
-    const AuthenticationChallenge&) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::dispatchDidCancelAuthenticationChallenge(
-    DocumentLoader*,
-    id,
-    const AuthenticationChallenge&) {
-  notImplemented();
 }
 }
