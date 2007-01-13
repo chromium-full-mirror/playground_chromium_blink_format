@@ -1797,6 +1797,9 @@ class RenderStyle {
   unsigned short columnRuleWidth() const {
     return rareNonInheritedData->m_multiCol->ruleWidth();
   }
+  bool columnRuleIsTransparent() const {
+    return rareNonInheritedData->m_multiCol->m_rule.isTransparent();
+  }
   EPageBreak columnBreakBefore() const {
     return static_cast<EPageBreak>(
         rareNonInheritedData->m_multiCol->m_breakBefore);
