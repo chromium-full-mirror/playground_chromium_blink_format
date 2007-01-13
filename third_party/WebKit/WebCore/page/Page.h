@@ -95,6 +95,8 @@ class Page : Noncopyable {
   void setDefersLoading(bool);
   bool defersLoading() const { return m_defersLoading; }
 
+  unsigned long createUniqueIdentifier();
+
 #if PLATFORM(WIN)
   // The global DLL or application instance used for all windows.
   static void setInstanceHandle(HINSTANCE instanceHandle) {
@@ -118,6 +120,8 @@ class Page : Noncopyable {
   String m_groupName;
 
   bool m_defersLoading;
+
+  unsigned long m_uniqueIdentifier;
 
 #if PLATFORM(WIN)
   static HINSTANCE s_instanceHandle;

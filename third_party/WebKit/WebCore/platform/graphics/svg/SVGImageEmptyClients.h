@@ -151,32 +151,32 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                         const ResourceRequest&,
                         const ResourceResponse&) {}
 
-  virtual id dispatchIdentifierForInitialRequest(DocumentLoader*,
-                                                 const ResourceRequest&) {
-    return 0;
-  }
+  virtual void assignIdentifierToInitialRequest(unsigned long identifier,
+                                                DocumentLoader*,
+                                                const ResourceRequest&) {}
   virtual void dispatchWillSendRequest(
       DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       ResourceRequest&,
       const ResourceResponse& redirectResponse) {}
   virtual void dispatchDidReceiveAuthenticationChallenge(
       DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       const AuthenticationChallenge&) {}
   virtual void dispatchDidCancelAuthenticationChallenge(
       DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       const AuthenticationChallenge&) {}
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
-                                          id identifier,
+                                          unsigned long identifier,
                                           const ResourceResponse&) {}
   virtual void dispatchDidReceiveContentLength(DocumentLoader*,
-                                               id identifier,
+                                               unsigned long identifier,
                                                int lengthReceived) {}
-  virtual void dispatchDidFinishLoading(DocumentLoader*, id identifier) {}
+  virtual void dispatchDidFinishLoading(DocumentLoader*,
+                                        unsigned long identifier) {}
   virtual void dispatchDidFailLoading(DocumentLoader*,
-                                      id identifier,
+                                      unsigned long identifier,
                                       const ResourceError&) {}
   virtual bool dispatchDidLoadResourceFromMemoryCache(DocumentLoader*,
                                                       const ResourceRequest&,
@@ -246,9 +246,10 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void progressCompleted() {}
 
 #if PLATFORM(MAC)
-  virtual void incrementProgress(id identifier, const ResourceResponse&) {}
-  virtual void incrementProgress(id identifier, const char*, int) {}
-  virtual void completeProgress(id identifier) {}
+  virtual void incrementProgress(unsigned long identifier,
+                                 const ResourceResponse&) {}
+  virtual void incrementProgress(unsigned long identifier, const char*, int) {}
+  virtual void completeProgress(unsigned long identifier) {}
 #endif
 
   virtual void setMainFrameDocumentReady(bool) {}

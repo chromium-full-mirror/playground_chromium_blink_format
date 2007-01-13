@@ -60,7 +60,8 @@ Page::Page(ChromeClient* chromeClient,
       m_settings(new Settings),
       m_editorClient(editorClient),
       m_frameCount(0),
-      m_defersLoading(false) {
+      m_defersLoading(false),
+      m_uniqueIdentifier(0) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
@@ -194,6 +195,10 @@ void Page::setDefersLoading(bool defers) {
   m_defersLoading = defers;
   for (Frame* frame = mainFrame(); frame; frame = frame->tree()->traverseNext())
     frame->loader()->setDefersLoading(defers);
+}
+
+unsigned long Page::createUniqueIdentifier() {
+  return ++m_uniqueIdentifier;
 }
 
 }  // namespace WebCore

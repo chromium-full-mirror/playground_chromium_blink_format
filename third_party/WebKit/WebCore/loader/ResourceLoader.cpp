@@ -53,6 +53,7 @@ ResourceLoader::ResourceLoader(Frame* frame)
       m_cancelled(false),
       m_calledDidFinishLoad(false),
       m_frame(frame),
+      m_identifier(0),
       m_defersLoading(frame->page()->defersLoading()) {}
 
 ResourceLoader::~ResourceLoader() {
@@ -149,10 +150,10 @@ void ResourceLoader::willSendRequest(ResourceRequest& request,
 
   ASSERT(!m_reachedTerminalState);
 
-#if PLATFORM(MAC)
-  if (!m_identifier)
-    m_identifier = frameLoader()->identifierForInitialRequest(request);
-#endif
+  if (!m_identifier) {
+    m_identifier = m_frame->page()->createUniqueIdentifier();
+    frameLoader()->assignIdentifierToInitialRequest(m_identifier, request);
+  }
 
   frameLoader()->willSendRequest(this, request, redirectResponse);
   m_request = request;

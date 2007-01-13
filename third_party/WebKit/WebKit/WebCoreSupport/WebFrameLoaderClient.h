@@ -84,32 +84,34 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                         const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);
 
-  virtual id dispatchIdentifierForInitialRequest(
+  virtual void assignIdentifierToInitialRequest(
+      unsigned long identifier,
       WebCore::DocumentLoader*,
       const WebCore::ResourceRequest&);
+
   virtual void dispatchWillSendRequest(
       WebCore::DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       WebCore::ResourceRequest&,
       const WebCore::ResourceResponse& redirectResponse);
   virtual void dispatchDidReceiveAuthenticationChallenge(
       WebCore::DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
   virtual void dispatchDidCancelAuthenticationChallenge(
       WebCore::DocumentLoader*,
-      id identifier,
+      unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
   virtual void dispatchDidReceiveResponse(WebCore::DocumentLoader*,
-                                          id identifier,
+                                          unsigned long identifier,
                                           const WebCore::ResourceResponse&);
   virtual void dispatchDidReceiveContentLength(WebCore::DocumentLoader*,
-                                               id identifier,
+                                               unsigned long identifier,
                                                int lengthReceived);
   virtual void dispatchDidFinishLoading(WebCore::DocumentLoader*,
-                                        id identifier);
+                                        unsigned long identifier);
   virtual void dispatchDidFailLoading(WebCore::DocumentLoader*,
-                                      id identifier,
+                                      unsigned long identifier,
                                       const WebCore::ResourceError&);
 
   virtual void dispatchDidHandleOnloadEvents();
@@ -165,10 +167,10 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void progressStarted();
   virtual void progressCompleted();
 
-  virtual void incrementProgress(id identifier,
+  virtual void incrementProgress(unsigned long identifier,
                                  const WebCore::ResourceResponse&);
-  virtual void incrementProgress(id identifier, const char*, int);
-  virtual void completeProgress(id identifier);
+  virtual void incrementProgress(unsigned long identifier, const char*, int);
+  virtual void completeProgress(unsigned long identifier);
 
   virtual void setMainFrameDocumentReady(bool);
 

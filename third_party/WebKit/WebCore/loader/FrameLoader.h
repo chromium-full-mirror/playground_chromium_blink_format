@@ -42,25 +42,6 @@
 #include <wtf/RefPtr.h>
 #include "ResourceRequest.h"
 
-#if PLATFORM(MAC)
-
-typedef struct objc_object* id;
-
-#ifdef __OBJC__
-
-@class NSURLAuthenticationChallenge;
-
-#else
-
-class NSURLAuthenticationChallenge;
-
-#endif  // __OBJC__
-
-#else
-// FIXME: Get rid of this once we don't use id in the loader
-typedef void* id;
-#endif  // PLATFORM(MAC)
-
 namespace KJS {
 class JSValue;
 }
@@ -250,7 +231,8 @@ class FrameLoader : Noncopyable {
   void didCancelAuthenticationChallenge(ResourceLoader*,
                                         const AuthenticationChallenge&);
 
-  id identifierForInitialRequest(const ResourceRequest&);
+  void assignIdentifierToInitialRequest(unsigned long identifier,
+                                        const ResourceRequest&);
   void willSendRequest(ResourceLoader*,
                        ResourceRequest&,
                        const ResourceResponse& redirectResponse);
@@ -327,11 +309,13 @@ class FrameLoader : Noncopyable {
 
   bool isQuickRedirectComing() const;
 
-  void sendRemainingDelegateMessages(id identifier,
+  void sendRemainingDelegateMessages(unsigned long identifier,
                                      const ResourceResponse&,
                                      unsigned length,
                                      const ResourceError&);
-  void requestFromDelegate(ResourceRequest&, id& identifier, ResourceError&);
+  void requestFromDelegate(ResourceRequest&,
+                           unsigned long& identifier,
+                           ResourceError&);
   void loadedResourceFromMemoryCache(const ResourceRequest&,
                                      const ResourceResponse&,
                                      int length);
@@ -606,7 +590,7 @@ class FrameLoader : Noncopyable {
 
   // Also not cool.
   void startLoading();
-  bool startLoadingMainResource(ResourceRequest&, id identifier);
+  bool startLoadingMainResource(ResourceRequest&, unsigned long identifier);
   void stopLoadingSubframes();
 
   void clearProvisionalLoad();

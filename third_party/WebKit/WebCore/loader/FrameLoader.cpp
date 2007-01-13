@@ -3046,7 +3046,7 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
   initialRequest.setHTTPUserAgent(client()->userAgent());
 
   ResourceError error;
-  id identifier = nil;
+  unsigned long identifier = 0;
   ResourceRequest newRequest(initialRequest);
   requestFromDelegate(newRequest, identifier, error);
 
@@ -3064,10 +3064,11 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
 }
 
 bool FrameLoader::startLoadingMainResource(ResourceRequest& request,
-                                           id identifier) {
+                                           unsigned long identifier) {
   ASSERT(!m_mainResourceLoader);
   m_mainResourceLoader = MainResourceLoader::create(m_frame);
   m_mainResourceLoader->setIdentifier(identifier);
+
   // FIXME: is there any way the extra fields could have not been added by now?
   addExtraFieldsToRequest(request, true, false);
   if (!m_mainResourceLoader->load(request)) {
@@ -3098,13 +3099,10 @@ void FrameLoader::startLoading() {
 
   m_provisionalDocumentLoader->setLoadingFromPageCache(false);
 
-#if PLATFORM(MAC)
-  id identifier = m_client->dispatchIdentifierForInitialRequest(
-      m_provisionalDocumentLoader.get(),
+  unsigned long identifier = m_frame->page()->createUniqueIdentifier();
+  m_client->assignIdentifierToInitialRequest(
+      identifier, m_provisionalDocumentLoader.get(),
       m_provisionalDocumentLoader->originalRequest());
-#else
-  id identifier = 0;
-#endif
 
   if (!startLoadingMainResource(m_provisionalDocumentLoader->actualRequest(),
                                 identifier))
@@ -3115,14 +3113,11 @@ void FrameLoader::cancelMainResourceLoad(const ResourceError& error) {
   m_mainResourceLoader->cancel(error);
 }
 
-id FrameLoader::identifierForInitialRequest(
+void FrameLoader::assignIdentifierToInitialRequest(
+    unsigned long identifier,
     const ResourceRequest& clientRequest) {
-#if PLATFORM(MAC)
-  return m_client->dispatchIdentifierForInitialRequest(activeDocumentLoader(),
-                                                       clientRequest);
-#else
-  return 0;
-#endif
+  return m_client->assignIdentifierToInitialRequest(
+      identifier, activeDocumentLoader(), clientRequest);
 }
 
 void FrameLoader::willSendRequest(ResourceLoader* loader,
@@ -3281,7 +3276,7 @@ void FrameLoader::opened() {
       // FIXME: If the WebKit client changes or cancels the request, this is not
       // respected.
       ResourceError error;
-      id identifier;
+      unsigned long identifier;
       ResourceRequest request(response.url());
       requestFromDelegate(request, identifier, error);
       sendRemainingDelegateMessages(identifier, response,
@@ -3512,7 +3507,7 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
 }
 
 void FrameLoader::sendRemainingDelegateMessages(
-    id identifier,
+    unsigned long identifier,
     const ResourceResponse& response,
     unsigned length,
     const ResourceError& error) {
@@ -3531,16 +3526,14 @@ void FrameLoader::sendRemainingDelegateMessages(
 }
 
 void FrameLoader::requestFromDelegate(ResourceRequest& request,
-                                      id& identifier,
+                                      unsigned long& identifier,
                                       ResourceError& error) {
   ASSERT(!request.isNull());
 
-#if PLATFORM(MAC)
-  identifier = m_client->dispatchIdentifierForInitialRequest(
-      m_documentLoader.get(), request);
-#else
-  identifier = 0;
-#endif
+  identifier = m_frame->page()->createUniqueIdentifier();
+  m_client->assignIdentifierToInitialRequest(identifier, m_documentLoader.get(),
+                                             request);
+
   ResourceRequest newRequest(request);
   m_client->dispatchWillSendRequest(m_documentLoader.get(), identifier,
                                     newRequest, ResourceResponse());
@@ -3561,7 +3554,7 @@ void FrameLoader::loadedResourceFromMemoryCache(
           m_documentLoader.get(), request, response, length))
     return;
 
-  id identifier;
+  unsigned long identifier;
   ResourceError error;
   ResourceRequest r(request);
   requestFromDelegate(r, identifier, error);

@@ -124,4 +124,8 @@ WebViewGetResourceLoadDelegateImplementations(WebView* webView);
 - (WebBasePluginPackage*)_pluginForMIMEType:(NSString*)MIMEType;
 - (WebBasePluginPackage*)_pluginForExtension:(NSString*)extension;
 - (BOOL)_isMIMETypeRegisteredAsPlugin:(NSString*)MIMEType;
+
+- (void)_addObject:(id)object forIdentifier:(unsigned long)identifier;
+- (id)_objectForIdentifier:(unsigned long)identifier;
+- (void)_removeObjectForIdentifier:(unsigned long)identifier;
 @end
