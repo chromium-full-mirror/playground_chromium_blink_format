@@ -134,7 +134,10 @@ void RenderTableSection::addChild(RenderObject* child,
   ++m_cRow;
   m_cCol = 0;
 
-  ensureRows(m_cRow + 1);
+  // make sure we have enough rows
+  if (!ensureRows(m_cRow + 1))
+    return;
+
   m_grid[m_cRow].rowRenderer = child;
 
   if (!beforeChild) {
@@ -155,8 +158,8 @@ bool RenderTableSection::ensureRows(int numRows) {
   int nRows = m_gridRows;
   if (numRows > nRows) {
     if (numRows > static_cast<int>(m_grid.size())) {
-      if (numRows >
-          static_cast<int>(numeric_limits<size_t>::max() / sizeof(RowStruct)))
+      size_t maxSize = numeric_limits<size_t>::max() / sizeof(RowStruct);
+      if (static_cast<size_t>(numRows) > maxSize)
         return false;
       m_grid.resize(numRows);
     }
@@ -967,7 +970,8 @@ void RenderTableSection::recalcCells() {
     if (row->isTableRow()) {
       m_cRow++;
       m_cCol = 0;
-      ensureRows(m_cRow + 1);
+      if (!ensureRows(m_cRow + 1))
+        break;
       m_grid[m_cRow].rowRenderer = row;
 
       for (RenderObject* cell = row->firstChild(); cell;
