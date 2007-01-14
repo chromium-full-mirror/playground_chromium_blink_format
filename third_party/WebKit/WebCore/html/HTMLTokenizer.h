@@ -324,9 +324,8 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // may be still downloading) and finish
   bool noMoreData;
   // URL to get source code of script from
-  DeprecatedString scriptSrc;
+  String scriptSrc;
   String scriptSrcCharset;
-  bool javascript;
   // the HTML code we will parse after the external script we are waiting for
   // has loaded
   SegmentedString pendingSrc;
