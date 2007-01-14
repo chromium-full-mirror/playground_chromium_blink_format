@@ -1403,14 +1403,6 @@ void RenderBox::calcHeight() {
     m_height = height;
   }
 
-  // Unfurling marquees override with the furled height.
-  if (style()->overflowX() == OMARQUEE && m_layer && m_layer->marquee() &&
-      m_layer->marquee()->isUnfurlMarquee() &&
-      !m_layer->marquee()->isHorizontal()) {
-    m_layer->marquee()->setEnd(m_height);
-    m_height = min(m_height, m_layer->marquee()->unfurlPos());
-  }
-
   // WinIE quirk: The <html> block always fills the entire canvas in quirks
   // mode.  The <body> always fills the
   // <html> block in quirks mode.  Only apply this quirk if the block is normal

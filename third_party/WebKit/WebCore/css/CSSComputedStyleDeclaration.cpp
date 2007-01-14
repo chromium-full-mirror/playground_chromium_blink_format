@@ -1084,8 +1084,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           return new CSSPrimitiveValue(CSS_VAL_SLIDE);
         case MALTERNATE:
           return new CSSPrimitiveValue(CSS_VAL_ALTERNATE);
-        case MUNFURL:
-          return new CSSPrimitiveValue(CSS_VAL_UNFURL);
       }
       ASSERT_NOT_REACHED();
       return 0;

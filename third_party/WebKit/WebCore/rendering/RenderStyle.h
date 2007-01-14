@@ -620,7 +620,7 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
 //------------------------------------------------
 // CSS3 Marquee Properties
 
-enum EMarqueeBehavior { MNONE, MSCROLL, MSLIDE, MALTERNATE, MUNFURL };
+enum EMarqueeBehavior { MNONE, MSCROLL, MSLIDE, MALTERNATE };
 enum EMarqueeDirection {
   MAUTO = 0,
   MLEFT = 1,

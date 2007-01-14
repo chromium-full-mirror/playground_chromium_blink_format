@@ -1179,7 +1179,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
     case CSS_PROP__WEBKIT_MARQUEE_STYLE:
       if (id == CSS_VAL_NONE || id == CSS_VAL_SLIDE || id == CSS_VAL_SCROLL ||
-          id == CSS_VAL_ALTERNATE || id == CSS_VAL_UNFURL)
+          id == CSS_VAL_ALTERNATE)
         valid_primitive = true;
       break;
     case CSS_PROP__WEBKIT_MARQUEE_REPETITION:
