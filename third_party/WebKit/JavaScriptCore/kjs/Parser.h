@@ -53,7 +53,9 @@ class Parser {
                                        int* errLine = 0,
                                        UString* errMsg = 0);
 
-  static UString prettyPrint(const UString&);
+  static UString prettyPrint(const UString&,
+                             int* errLine = 0,
+                             UString* errMsg = 0);
 
   static void accept(PassRefPtr<ProgramNode>);
 
