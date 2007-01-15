@@ -144,7 +144,6 @@ void HTMLParser::reset() {
   inBody = false;
   haveFrameSet = false;
   haveContent = false;
-  inSelect = false;
   inStrayTableContent = 0;
 
   form = 0;
@@ -693,7 +692,6 @@ bool HTMLParser::isindexCreateErrorCheck(Token* t, RefPtr<Node>& result) {
 }
 
 bool HTMLParser::selectCreateErrorCheck(Token* t, RefPtr<Node>& result) {
-  inSelect = true;
   return true;
 }
 
@@ -873,8 +871,6 @@ void HTMLParser::processCloseTag(Token* t) {
     form = 0;
   else if (t->tagName == mapTag)
     map = 0;
-  else if (t->tagName == selectTag)
-    inSelect = false;
 
   HTMLStackElem* oldElem = blockStack;
   popBlock(t->tagName);
