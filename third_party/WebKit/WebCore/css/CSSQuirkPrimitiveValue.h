@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSQuirkPrimitiveValue_H
-#define CSSQuirkPrimitiveValue_H
+#ifndef CSSQuirkPrimitiveValue_h
+#define CSSQuirkPrimitiveValue_h
 
 #include "CSSPrimitiveValue.h"
 
@@ -42,6 +42,6 @@ class CSSQuirkPrimitiveValue : public CSSPrimitiveValue {
   virtual bool isQuirkValue() { return true; }
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSQuirkPrimitiveValue_h

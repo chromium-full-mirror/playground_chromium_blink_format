@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSSelector_H
-#define CSSSelector_H
+#ifndef CSSSelector_h
+#define CSSSelector_h
 
 #include "QualifiedName.h"
 
@@ -32,42 +32,41 @@ namespace WebCore {
 class CSSSelector {
  public:
   CSSSelector()
-      : tagHistory(0),
-        simpleSelector(0),
-        nextSelector(0),
-        argument(nullAtom),
-        attr(anyQName()),
-        tag(anyQName()),
+      : m_tagHistory(0),
+        m_simpleSelector(0),
+        m_nextSelector(0),
+        m_argument(nullAtom),
+        m_attr(anyQName()),
+        m_tag(anyQName()),
         m_relation(Descendant),
-        match(None),
-        pseudoId(0),
-        _pseudoType(PseudoNotParsed) {}
+        m_match(None),
+        m_pseudoType(PseudoNotParsed) {}
 
   CSSSelector(const QualifiedName& qName)
-      : tagHistory(0),
-        simpleSelector(0),
-        nextSelector(0),
-        argument(nullAtom),
-        attr(anyQName()),
-        tag(qName),
+      : m_tagHistory(0),
+        m_simpleSelector(0),
+        m_nextSelector(0),
+        m_argument(nullAtom),
+        m_attr(anyQName()),
+        m_tag(qName),
         m_relation(Descendant),
-        match(None),
-        pseudoId(0),
-        _pseudoType(PseudoNotParsed) {}
+        m_match(None),
+        m_pseudoType(PseudoNotParsed) {}
 
   ~CSSSelector() {
-    delete tagHistory;
-    delete simpleSelector;
-    delete nextSelector;
+    delete m_tagHistory;
+    delete m_simpleSelector;
+    delete m_nextSelector;
   }
 
   void append(CSSSelector* n) {
     CSSSelector* end = this;
-    while (end->nextSelector)
-      end = end->nextSelector;
-    end->nextSelector = n;
+    while (end->m_nextSelector)
+      end = end->m_nextSelector;
+    end->m_nextSelector = n;
   }
-  CSSSelector* next() { return nextSelector; }
+
+  CSSSelector* next() { return m_nextSelector; }
 
   /**
    * Print debug output for this selector
@@ -150,33 +149,33 @@ class CSSSelector {
   };
 
   PseudoType pseudoType() const {
-    if (_pseudoType == PseudoNotParsed)
+    if (m_pseudoType == PseudoNotParsed)
       extractPseudoType();
-    return static_cast<PseudoType>(_pseudoType);
+    return static_cast<PseudoType>(m_pseudoType);
   }
 
-  bool hasTag() const { return tag != anyQName(); }
-  bool hasAttribute() const { return attr != anyQName(); }
-
-  mutable AtomicString value;
-  CSSSelector* tagHistory;
-  CSSSelector* simpleSelector;  // Used for :not.
-  CSSSelector* nextSelector;    // used for ,-chained selectors
-  AtomicString argument;        // Used for :contains, :lang and :nth-*
-
-  QualifiedName attr;
-  QualifiedName tag;
+  bool hasTag() const { return m_tag != anyQName(); }
+  bool hasAttribute() const { return m_attr != anyQName(); }
 
   Relation relation() const { return static_cast<Relation>(m_relation); }
 
-  unsigned m_relation : 3;     // enum Relation
-  mutable unsigned match : 4;  // enum Match
-  unsigned pseudoId : 4;
-  mutable unsigned _pseudoType : 6;  // PseudoType
+  mutable AtomicString m_value;
+  CSSSelector* m_tagHistory;
+  CSSSelector* m_simpleSelector;  // Used for :not.
+  CSSSelector* m_nextSelector;    // used for ,-chained selectors
+  AtomicString m_argument;        // Used for :contains, :lang and :nth-*
+
+  QualifiedName m_attr;
+  QualifiedName m_tag;
+
+  unsigned m_relation : 3;            // enum Relation
+  mutable unsigned m_match : 4;       // enum Match
+  mutable unsigned m_pseudoType : 6;  // PseudoType
 
  private:
   void extractPseudoType() const;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // CSSSelector_h

@@ -1,5 +1,4 @@
 /**
- * CSSComputedStyleDeclaration.h
  *
  * Copyright (C)  2004  Zack Rusin <zack@kde.org>
  * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
@@ -20,8 +19,8 @@
  * 02111-1307  USA
  */
 
-#ifndef CSS_COMPUTEDSTYLE_H
-#define CSS_COMPUTEDSTYLE_H
+#ifndef CSSComputedStyleDeclaration_h
+#define CSSComputedStyleDeclaration_h
 
 #include "CSSStyleDeclaration.h"
 #include "Node.h"
@@ -63,6 +62,7 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
 
  private:
   virtual void setCssText(const String&, ExceptionCode&);
+
   virtual String removeProperty(int propertyID, ExceptionCode&);
   virtual void setProperty(int propertyId,
                            const String& value,
@@ -71,6 +71,7 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
 
   RefPtr<Node> m_node;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // CSSComputedStyleDeclaration_h

@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSStyleDeclaration_H
-#define CSSStyleDeclaration_H
+#ifndef CSSStyleDeclaration_h
+#define CSSStyleDeclaration_h
 
 #include "StyleBase.h"
 #include <wtf/PassRefPtr.h>
@@ -91,6 +91,6 @@ class CSSStyleDeclaration : public StyleBase {
   CSSStyleDeclaration& operator=(const CSSStyleDeclaration&);
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSStyleDeclaration_h

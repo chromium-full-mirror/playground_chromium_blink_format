@@ -20,11 +20,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSMutableStyleDeclaration_H
-#define CSSMutableStyleDeclaration_H
+#ifndef CSSMutableStyleDeclaration_h
+#define CSSMutableStyleDeclaration_h
 
 #include "CSSStyleDeclaration.h"
-#include "CSSPrimitiveValue.h"  // for CSSPrimitiveValue::UnitTypes
+#include "CSSPrimitiveValue.h"
 #include "DeprecatedValueList.h"
 #include "PlatformString.h"
 
@@ -110,7 +110,7 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
                          CSSPrimitiveValue::UnitTypes,
                          bool important = false);  // parsed string value
   void setImageProperty(int propertyId,
-                        const String& URL,
+                        const String& url,
                         bool important = false);
 
   // The following parses an entire new style declaration.
@@ -130,13 +130,13 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
   void merge(CSSMutableStyleDeclaration*, bool argOverridesOnConflict = true);
 
  private:
-  String getShortHandValue(const int* properties, int number) const;
+  String getShorthandValue(const int* properties, int number) const;
   String get4Values(const int* properties) const;
 
   DeprecatedValueList<CSSProperty> m_values;
   Node* m_node;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSMutableStyleDeclaration_h

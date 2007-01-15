@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef Counter_H
-#define Counter_H
+#ifndef Counter_h
+#define Counter_h
 
 #include "CSSPrimitiveValue.h"
 #include "PlatformString.h"
@@ -50,7 +50,7 @@ class Counter : public Shared<Counter> {
   }
 
   int listStyleNumber() const {
-    return m_listStyle ? (int)m_listStyle->getFloatValue() : 0;
+    return m_listStyle ? static_cast<int>(m_listStyle->getFloatValue()) : 0;
   }
 
   void setIdentifier(PassRefPtr<CSSPrimitiveValue> identifier) {
@@ -69,6 +69,6 @@ class Counter : public Shared<Counter> {
   RefPtr<CSSPrimitiveValue> m_separator;   // String
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // Counter_h

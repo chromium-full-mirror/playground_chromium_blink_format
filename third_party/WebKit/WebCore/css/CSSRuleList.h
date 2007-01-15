@@ -21,11 +21,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSRuleList_H
-#define CSSRuleList_H
+#ifndef CSSRuleList_h
+#define CSSRuleList_h
 
-#include "Shared.h"
 #include "DeprecatedPtrList.h"
+#include "Shared.h"
 
 namespace WebCore {
 
@@ -42,14 +42,14 @@ class CSSRuleList : public Shared<CSSRuleList> {
   CSSRule* item(unsigned index) { return m_lstCSSRules.at(index); }
 
   /* not part of the DOM */
-  unsigned insertRule(CSSRule* rule, unsigned index);
+  unsigned insertRule(CSSRule*, unsigned index);
   void deleteRule(unsigned index);
-  void append(CSSRule* rule);
+  void append(CSSRule*);
 
  protected:
   DeprecatedPtrList<CSSRule> m_lstCSSRules;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSRuleList_h

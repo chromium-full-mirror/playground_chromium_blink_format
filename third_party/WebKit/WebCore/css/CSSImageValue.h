@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSImageValue_H
-#define CSSImageValue_H
+#ifndef CSSImageValue_h
+#define CSSImageValue_h
 
 #include "CSSPrimitiveValue.h"
 #include "CachedResourceClient.h"
@@ -43,6 +43,6 @@ class CSSImageValue : public CSSPrimitiveValue, public CachedResourceClient {
   bool m_accessedImage;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSImageValue_h

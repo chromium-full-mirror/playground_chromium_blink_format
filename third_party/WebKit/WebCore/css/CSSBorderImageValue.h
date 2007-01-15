@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSBorderImageValue_H
-#define CSSBorderImageValue_H
+#ifndef CSSBorderImageValue_h
+#define CSSBorderImageValue_h
 
 #include "CSSValue.h"
 #include <wtf/PassRefPtr.h>
@@ -58,6 +58,6 @@ class CSSBorderImageValue : public CSSValue {
                              // left/middle/right
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSBorderImageValue_h

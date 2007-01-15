@@ -18,15 +18,17 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSCursorImageValue.h"
 
 namespace WebCore {
 
 CSSCursorImageValue::CSSCursorImageValue(const String& url,
-                                         const IntPoint& p,
+                                         const IntPoint& hotspot,
                                          StyleBase* style)
-    : CSSImageValue(url, style), m_hotspot(p) {}
+    : CSSImageValue(url, style), m_hotspot(hotspot) {}
 
 CSSCursorImageValue::~CSSCursorImageValue() {}
-}
+
+}  // namespace WebCore

@@ -83,4 +83,5 @@ String parseURL(const String& url) {
 
   return new StringImpl(buffer.data(), nl);
 }
-}
+
+}  // namespace WebCore

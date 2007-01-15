@@ -19,6 +19,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSStyleDeclaration.h"
 
@@ -52,12 +53,12 @@ static int propertyID(const String& s) {
     buffer[i] = c;
   }
 
-  int id = getPropertyID(buffer, len);
+  int propID = getPropertyID(buffer, len);
 #ifdef SVG_SUPPORT
-  if (id == 0)
-    id = SVG::getSVGCSSPropertyID(buffer, len);
+  if (!propID)
+    propID = SVG::getSVGCSSPropertyID(buffer, len);
 #endif
-  return id;
+  return propID;
 }
 
 CSSStyleDeclaration::CSSStyleDeclaration(CSSRule* parent) : StyleBase(parent) {}
@@ -120,7 +121,8 @@ void CSSStyleDeclaration::setProperty(const String& propertyName,
                                       const String& priority,
                                       ExceptionCode& ec) {
   int propID = propertyID(propertyName);
-  if (!propID)  // set exception?
+  if (!propID)
+    // FIXME: set exception?
     return;
   bool important = priority.find("important", 0, false) != -1;
   setProperty(propID, value, important, ec);
@@ -172,4 +174,5 @@ PassRefPtr<CSSMutableStyleDeclaration> CSSStyleDeclaration::copyPropertiesInSet(
   }
   return new CSSMutableStyleDeclaration(0, list);
 }
-}
+
+}  // namespace WebCore

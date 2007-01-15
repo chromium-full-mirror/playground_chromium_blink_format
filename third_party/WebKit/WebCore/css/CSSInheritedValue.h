@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSInheritedValue_H
-#define CSSInheritedValue_H
+#ifndef CSSInheritedValue_h
+#define CSSInheritedValue_h
 
 #include "CSSValue.h"
 
@@ -33,6 +33,6 @@ class CSSInheritedValue : public CSSValue {
   virtual String cssText() const;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSInheritedValue_h

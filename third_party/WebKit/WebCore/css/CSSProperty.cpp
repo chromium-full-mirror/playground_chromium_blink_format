@@ -19,8 +19,10 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSProperty.h"
+
 #include "PlatformString.h"
 
 // Not in any header, so just declare it here for now.
@@ -37,4 +39,5 @@ bool operator==(const CSSProperty& a, const CSSProperty& b) {
   return a.m_id == b.m_id && a.m_important == b.m_important &&
          a.m_value == b.m_value;
 }
-}
+
+}  // namespace WebCore

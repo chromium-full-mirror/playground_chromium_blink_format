@@ -450,7 +450,7 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
   for (CSSRuleData* d = rules->first(); d; d = d->next()) {
     CSSStyleRule* rule = d->rule();
     const AtomicString& localName = element->localName();
-    const AtomicString& selectorLocalName = d->selector()->tag.localName();
+    const AtomicString& selectorLocalName = d->selector()->m_tag.localName();
     if ((localName == selectorLocalName || selectorLocalName == starAtom) &&
         checkSelector(d->selector(), element)) {
       // If the rule has no properties to apply, then ignore it.
@@ -1291,7 +1291,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, Element* e) {
   // the author intended
   // to apply the rules only to links.
   bool onlyHoverActive =
-      (!sel->hasTag() && (sel->match == CSSSelector::PseudoClass &&
+      (!sel->hasTag() && (sel->m_match == CSSSelector::PseudoClass &&
                           (sel->pseudoType() == CSSSelector::PseudoHover ||
                            sel->pseudoType() == CSSSelector::PseudoActive)));
   bool affectedByHover = style ? style->affectedByHoverRules() : false;
@@ -1304,7 +1304,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, Element* e) {
 
   // check the subselectors
   CSSSelector::Relation relation = sel->relation();
-  while ((sel = sel->tagHistory)) {
+  while ((sel = sel->m_tagHistory)) {
     if (!n->isElementNode())
       return false;
     if (relation != CSSSelector::SubSelector) {
@@ -1357,7 +1357,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, Element* e) {
         break;
       case CSSSelector::SubSelector: {
         if (onlyHoverActive)
-          onlyHoverActive = (sel->match == CSSSelector::PseudoClass &&
+          onlyHoverActive = (sel->m_match == CSSSelector::PseudoClass &&
                              (sel->pseudoType() == CSSSelector::PseudoHover ||
                               sel->pseudoType() == CSSSelector::PseudoActive));
 
@@ -1402,8 +1402,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
   if (sel->hasTag()) {
     const AtomicString& localName = e->localName();
     const AtomicString& ns = e->namespaceURI();
-    const AtomicString& selLocalName = sel->tag.localName();
-    const AtomicString& selNS = sel->tag.namespaceURI();
+    const AtomicString& selLocalName = sel->m_tag.localName();
+    const AtomicString& selNS = sel->m_tag.namespaceURI();
 
     if ((selLocalName != starAtom && localName != selLocalName) ||
         (selNS != starAtom && ns != selNS))
@@ -1411,47 +1411,48 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
   }
 
   if (sel->hasAttribute()) {
-    if (sel->match == CSSSelector::Class) {
+    if (sel->m_match == CSSSelector::Class) {
       if (!e->hasClass())
         return false;
       for (const AtomicStringList* c = e->getClassList(); c; c = c->next())
-        if (c->string() == sel->value)
+        if (c->string() == sel->m_value)
           return true;
       return false;
-    } else if (sel->match == CSSSelector::Id)
-      return e->hasID() && e->getIDAttribute() == sel->value;
-    else if (style && (e != element || !styledElement ||
-                       (!styledElement->isMappedAttribute(sel->attr) &&
-                        sel->attr != typeAttr && sel->attr != readonlyAttr))) {
+    } else if (sel->m_match == CSSSelector::Id)
+      return e->hasID() && e->getIDAttribute() == sel->m_value;
+    else if (style &&
+             (e != element || !styledElement ||
+              (!styledElement->isMappedAttribute(sel->m_attr) &&
+               sel->m_attr != typeAttr && sel->m_attr != readonlyAttr))) {
       style->setAffectedByAttributeSelectors();  // Special-case the "type" and
                                                  // "readonly" attributes so
                                                  // input form controls can
                                                  // share style.
-      m_selectorAttrs.add(sel->attr.localName().impl());
+      m_selectorAttrs.add(sel->m_attr.localName().impl());
     }
 
-    const AtomicString& value = e->getAttribute(sel->attr);
+    const AtomicString& value = e->getAttribute(sel->m_attr);
     if (value.isNull())
       return false;  // attribute is not set
 
-    switch (sel->match) {
+    switch (sel->m_match) {
       case CSSSelector::Exact:
-        if ((isXMLDoc && sel->value != value) ||
-            (!isXMLDoc && !equalIgnoringCase(sel->value, value)))
+        if ((isXMLDoc && sel->m_value != value) ||
+            (!isXMLDoc && !equalIgnoringCase(sel->m_value, value)))
           return false;
         break;
       case CSSSelector::List: {
         // The selector's value can't contain a space, or it's totally bogus.
-        if (sel->value.contains(' '))
+        if (sel->m_value.contains(' '))
           return false;
 
         int startSearchAt = 0;
         while (true) {
-          int foundPos = value.find(sel->value, startSearchAt, isXMLDoc);
+          int foundPos = value.find(sel->m_value, startSearchAt, isXMLDoc);
           if (foundPos == -1)
             return false;
           if (foundPos == 0 || value[foundPos - 1] == ' ') {
-            unsigned endStr = foundPos + sel->value.length();
+            unsigned endStr = foundPos + sel->m_value.length();
             if (endStr == value.length() || value[endStr] == ' ')
               break;  // We found a match.
           }
@@ -1462,25 +1463,25 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         break;
       }
       case CSSSelector::Contain:
-        if (!value.contains(sel->value, isXMLDoc))
+        if (!value.contains(sel->m_value, isXMLDoc))
           return false;
         break;
       case CSSSelector::Begin:
-        if (!value.startsWith(sel->value, isXMLDoc))
+        if (!value.startsWith(sel->m_value, isXMLDoc))
           return false;
         break;
       case CSSSelector::End:
-        if (!value.endsWith(sel->value, isXMLDoc))
+        if (!value.endsWith(sel->m_value, isXMLDoc))
           return false;
         break;
       case CSSSelector::Hyphen:
-        if (value.length() < sel->value.length())
+        if (value.length() < sel->m_value.length())
           return false;
-        if (!value.startsWith(sel->value, isXMLDoc))
+        if (!value.startsWith(sel->m_value, isXMLDoc))
           return false;
         // It they start the same, check for exact match or following '-':
-        if (value.length() != sel->value.length() &&
-            value[sel->value.length()] != '-')
+        if (value.length() != sel->m_value.length() &&
+            value[sel->m_value.length()] != '-')
           return false;
         break;
       case CSSSelector::PseudoClass:
@@ -1489,8 +1490,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         break;
     }
   }
-  if (sel->match == CSSSelector::PseudoClass ||
-      sel->match == CSSSelector::PseudoElement) {
+  if (sel->m_match == CSSSelector::PseudoClass ||
+      sel->m_match == CSSSelector::PseudoElement) {
     // Pseudo elements. We need to check first child here. No dynamic pseudo
     // elements for the moment
     switch (sel->pseudoType()) {
@@ -1696,20 +1697,20 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         break;
       case CSSSelector::PseudoLang: {
         const AtomicString& value = e->getAttribute(langAttr);
-        if (value.isEmpty() || !value.startsWith(sel->argument, false))
+        if (value.isEmpty() || !value.startsWith(sel->m_argument, false))
           break;
-        if (value.length() != sel->argument.length() &&
-            value[sel->argument.length()] != '-')
+        if (value.length() != sel->m_argument.length() &&
+            value[sel->m_argument.length()] != '-')
           break;
         return true;
       }
       case CSSSelector::PseudoNot: {
         // check the simple selector
-        for (CSSSelector* subSel = sel->simpleSelector; subSel;
-             subSel = subSel->tagHistory) {
+        for (CSSSelector* subSel = sel->m_simpleSelector; subSel;
+             subSel = subSel->m_tagHistory) {
           // :not cannot nest. I don't really know why this is a
           // restriction in CSS3, but it is, so let's honour it.
-          if (subSel->simpleSelector)
+          if (subSel->m_simpleSelector)
             break;
           if (!checkOneSelector(subSel, e))
             return true;
@@ -1799,16 +1800,16 @@ void CSSRuleSet::addToRuleSet(AtomicStringImpl* key,
 }
 
 void CSSRuleSet::addRule(CSSStyleRule* rule, CSSSelector* sel) {
-  if (sel->match == CSSSelector::Id) {
-    addToRuleSet(sel->value.impl(), m_idRules, rule, sel);
+  if (sel->m_match == CSSSelector::Id) {
+    addToRuleSet(sel->m_value.impl(), m_idRules, rule, sel);
     return;
   }
-  if (sel->match == CSSSelector::Class) {
-    addToRuleSet(sel->value.impl(), m_classRules, rule, sel);
+  if (sel->m_match == CSSSelector::Class) {
+    addToRuleSet(sel->m_value.impl(), m_classRules, rule, sel);
     return;
   }
 
-  const AtomicString& localName = sel->tag.localName();
+  const AtomicString& localName = sel->m_tag.localName();
   if (localName != starAtom) {
     addToRuleSet(localName.impl(), m_tagRules, rule, sel);
     return;

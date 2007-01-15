@@ -21,8 +21,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSNamespace_H
-#define CSSNamespace_H
+#ifndef CSSNamespace_h
+#define CSSNamespace_h
 
 #include "AtomicString.h"
 
@@ -33,10 +33,10 @@ struct CSSNamespace {
   AtomicString m_uri;
   CSSNamespace* m_parent;
 
-  CSSNamespace(const AtomicString& p,
-               const AtomicString& u,
+  CSSNamespace(const AtomicString& prefix,
+               const AtomicString& uri,
                CSSNamespace* parent)
-      : m_prefix(p), m_uri(u), m_parent(parent) {}
+      : m_prefix(prefix), m_uri(uri), m_parent(parent) {}
   ~CSSNamespace() { delete m_parent; }
 
   const AtomicString& uri() { return m_uri; }
@@ -50,6 +50,7 @@ struct CSSNamespace {
     return 0;
   }
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // CSSNamespace_h

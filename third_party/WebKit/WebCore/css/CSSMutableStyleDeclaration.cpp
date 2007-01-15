@@ -19,6 +19,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "CSSMutableStyleDeclaration.h"
 
@@ -60,9 +61,9 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
 }
 
 CSSMutableStyleDeclaration& CSSMutableStyleDeclaration::operator=(
-    const CSSMutableStyleDeclaration& o) {
+    const CSSMutableStyleDeclaration& other) {
   // don't attach it to the same node, just leave the current m_node value
-  m_values = o.m_values;
+  m_values = other.m_values;
   return *this;
 }
 
@@ -74,51 +75,51 @@ String CSSMutableStyleDeclaration::getPropertyValue(int propertyID) const {
   // Shorthand and 4-values properties
   switch (propertyID) {
     case CSS_PROP_BACKGROUND_POSITION: {
-      // ## Is this correct? The code in cssparser.cpp is confusing
+      // FIXME: Is this correct? The code in cssparser.cpp is confusing
       const int properties[2] = {CSS_PROP_BACKGROUND_POSITION_X,
                                  CSS_PROP_BACKGROUND_POSITION_Y};
-      return getShortHandValue(properties, 2);
+      return getShorthandValue(properties, 2);
     }
     case CSS_PROP_BACKGROUND: {
       const int properties[5] = {
           CSS_PROP_BACKGROUND_IMAGE, CSS_PROP_BACKGROUND_REPEAT,
           CSS_PROP_BACKGROUND_ATTACHMENT, CSS_PROP_BACKGROUND_POSITION,
           CSS_PROP_BACKGROUND_COLOR};
-      return getShortHandValue(properties, 5);
+      return getShorthandValue(properties, 5);
     }
     case CSS_PROP_BORDER: {
       const int properties[3] = {CSS_PROP_BORDER_WIDTH, CSS_PROP_BORDER_STYLE,
                                  CSS_PROP_BORDER_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_BORDER_TOP: {
       const int properties[3] = {CSS_PROP_BORDER_TOP_WIDTH,
                                  CSS_PROP_BORDER_TOP_STYLE,
                                  CSS_PROP_BORDER_TOP_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_BORDER_RIGHT: {
       const int properties[3] = {CSS_PROP_BORDER_RIGHT_WIDTH,
                                  CSS_PROP_BORDER_RIGHT_STYLE,
                                  CSS_PROP_BORDER_RIGHT_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_BORDER_BOTTOM: {
       const int properties[3] = {CSS_PROP_BORDER_BOTTOM_WIDTH,
                                  CSS_PROP_BORDER_BOTTOM_STYLE,
                                  CSS_PROP_BORDER_BOTTOM_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_BORDER_LEFT: {
       const int properties[3] = {CSS_PROP_BORDER_LEFT_WIDTH,
                                  CSS_PROP_BORDER_LEFT_STYLE,
                                  CSS_PROP_BORDER_LEFT_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_OUTLINE: {
       const int properties[3] = {CSS_PROP_OUTLINE_WIDTH, CSS_PROP_OUTLINE_STYLE,
                                  CSS_PROP_OUTLINE_COLOR};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
     case CSS_PROP_BORDER_COLOR: {
       const int properties[4] = {
@@ -153,7 +154,7 @@ String CSSMutableStyleDeclaration::getPropertyValue(int propertyID) const {
       const int properties[3] = {CSS_PROP_LIST_STYLE_TYPE,
                                  CSS_PROP_LIST_STYLE_POSITION,
                                  CSS_PROP_LIST_STYLE_IMAGE};
-      return getShortHandValue(properties, 3);
+      return getShorthandValue(properties, 3);
     }
   }
   return String();
@@ -164,8 +165,11 @@ String CSSMutableStyleDeclaration::get4Values(const int* properties) const {
   for (int i = 0; i < 4; ++i) {
     if (!isPropertyImplicit(properties[i])) {
       RefPtr<CSSValue> value = getPropertyCSSValue(properties[i]);
-      if (!value)  // apparently all 4 properties must be specified.
+
+      // apparently all 4 properties must be specified.
+      if (!value)
         return String();
+
       if (!res.isNull())
         res += " ";
       res += value->cssText();
@@ -174,13 +178,14 @@ String CSSMutableStyleDeclaration::get4Values(const int* properties) const {
   return res;
 }
 
-String CSSMutableStyleDeclaration::getShortHandValue(const int* properties,
+String CSSMutableStyleDeclaration::getShorthandValue(const int* properties,
                                                      int number) const {
   String res;
   for (int i = 0; i < number; ++i) {
     if (!isPropertyImplicit(properties[i])) {
       RefPtr<CSSValue> value = getPropertyCSSValue(properties[i]);
-      if (value) {  // TODO provide default value if !value
+      // FIXME: provide default value if !value
+      if (value) {
         if (!res.isNull())
           res += " ";
         res += value->cssText();
@@ -194,9 +199,10 @@ PassRefPtr<CSSValue> CSSMutableStyleDeclaration::getPropertyCSSValue(
     int propertyID) const {
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it = m_values.fromLast();
-       it != end; --it)
+       it != end; --it) {
     if (propertyID == (*it).m_id)
       return (*it).value();
+  }
   return 0;
 }
 
@@ -369,7 +375,7 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
 
   DeprecatedValueListIterator<CSSProperty> end;
   for (DeprecatedValueListIterator<CSSProperty> it = m_values.fromLast();
-       it != end; --it)
+       it != end; --it) {
     if (propertyID == (*it).m_id) {
       value = (*it).value()->cssText();
       m_values.remove(it);
@@ -377,6 +383,7 @@ String CSSMutableStyleDeclaration::removeProperty(int propertyID,
         setChanged();
       break;
     }
+  }
 
   return value;
 }
@@ -398,7 +405,7 @@ void CSSMutableStyleDeclaration::setChanged() {
     return;
   }
 
-  // ### quick&dirty hack for KDE 3.0... make this MUCH better! (Dirk)
+  // FIXME: quick&dirty hack for KDE 3.0... make this MUCH better! (Dirk)
   StyleBase* root = this;
   while (StyleBase* parent = root->parent())
     root = parent;
@@ -409,27 +416,30 @@ void CSSMutableStyleDeclaration::setChanged() {
 bool CSSMutableStyleDeclaration::getPropertyPriority(int propertyID) const {
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it = m_values.begin();
-       it != end; ++it)
+       it != end; ++it) {
     if (propertyID == (*it).id())
       return (*it).isImportant();
+  }
   return false;
 }
 
 int CSSMutableStyleDeclaration::getPropertyShorthand(int propertyID) const {
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it = m_values.begin();
-       it != end; ++it)
+       it != end; ++it) {
     if (propertyID == (*it).id())
       return (*it).shorthandID();
+  }
   return false;
 }
 
 bool CSSMutableStyleDeclaration::isPropertyImplicit(int propertyID) const {
   DeprecatedValueListConstIterator<CSSProperty> end;
   for (DeprecatedValueListConstIterator<CSSProperty> it = m_values.begin();
-       it != end; ++it)
+       it != end; ++it) {
     if (propertyID == (*it).id())
       return (*it).isImplicit();
+  }
   return false;
 }
 
@@ -501,11 +511,11 @@ void CSSMutableStyleDeclaration::setStringProperty(
 }
 
 void CSSMutableStyleDeclaration::setImageProperty(int propertyId,
-                                                  const String& URL,
+                                                  const String& url,
                                                   bool important) {
   removeProperty(propertyId);
   m_values.append(
-      CSSProperty(propertyId, new CSSImageValue(URL, this), important));
+      CSSProperty(propertyId, new CSSImageValue(url, this), important));
   setChanged();
 }
 
@@ -530,13 +540,13 @@ void CSSMutableStyleDeclaration::addParsedProperties(
   // functions in this class.
 }
 
-void CSSMutableStyleDeclaration::setLengthProperty(int id,
+void CSSMutableStyleDeclaration::setLengthProperty(int propertyId,
                                                    const String& value,
                                                    bool important,
-                                                   bool /* multiLength*/) {
+                                                   bool /*multiLength*/) {
   bool parseMode = useStrictParsing();
   setStrictParsing(false);
-  setProperty(id, value, important);
+  setProperty(propertyId, value, important);
   setStrictParsing(parseMode);
 }
 
@@ -651,4 +661,5 @@ PassRefPtr<CSSMutableStyleDeclaration> CSSMutableStyleDeclaration::copy()
     const {
   return new CSSMutableStyleDeclaration(0, m_values);
 }
-}
+
+}  // namespace WebCore

@@ -1,5 +1,4 @@
 /**
- * CSSComputedStyleDeclaration.cpp
  *
  * Copyright (C) 2004 Zack Rusin <zack@kde.org>
  * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
@@ -23,15 +22,15 @@
 #include "config.h"
 #include "CSSComputedStyleDeclaration.h"
 
-#include "CachedImage.h"
-#include "DashboardRegion.h"
-#include "Document.h"
-#include "ExceptionCode.h"
 #include "CSSMutableStyleDeclaration.h"
 #include "CSSPrimitiveValue.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "CSSValueList.h"
+#include "CachedImage.h"
+#include "DashboardRegion.h"
+#include "Document.h"
+#include "ExceptionCode.h"
 #include "Pair.h"
 #include "RenderObject.h"
 #include "ShadowValue.h"
@@ -183,11 +182,10 @@ static CSSValue* valueForLength(const Length& length) {
                                    CSSPrimitiveValue::CSS_PERCENTAGE);
     case Relative:
     case Static:
-      // Should never be reached.
       break;
   }
-  // Should never be reached, but if we do, just return "auto".
-  return new CSSPrimitiveValue(CSS_VAL_AUTO);
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 
 // Handles special value for "none".
@@ -250,6 +248,7 @@ static CSSValue* valueForTextAlign(ETextAlign align) {
 static CSSValue* valueForShadow(const ShadowData* shadow) {
   if (!shadow)
     return new CSSPrimitiveValue(CSS_VAL_NONE);
+
   CSSValueList* list = new CSSValueList;
   for (const ShadowData* s = shadow; s; s = s->next) {
     CSSPrimitiveValue* x =
@@ -321,7 +320,7 @@ String CSSComputedStyleDeclaration::cssText() const {
   String result("");
 
   for (unsigned i = 0; i < numComputedProperties; i++) {
-    if (i != 0)
+    if (i)
       result += " ";
     result += getPropertyName(computedProperties[i]);
     result += ": ";
@@ -351,12 +350,19 @@ CSSPrimitiveValue* primitiveValueFromLength(Length length,
                                             RenderObject* renderer,
                                             RenderStyle* style) {
   String string;
-  if (length.isPercent())
-    string = numberAsString(length.percent()) + "%";
-  else if (length.isFixed())
-    string = numberAsString(length.calcMinValue(0));
-  else if (length.isAuto())
-    string = "auto";
+  switch (length.type()) {
+    case Percent:
+      string = numberAsString(length.percent()) + "%";
+      break;
+    case Fixed:
+      string = numberAsString(length.calcMinValue(0));
+      break;
+    case Auto:
+      string = "auto";
+      break;
+    default:
+      break;
+  }
   return new CSSPrimitiveValue(string, CSSPrimitiveValue::CSS_STRING);
 }
 
@@ -376,6 +382,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
   RenderObject* renderer = node->renderer();
   if (!renderer)
     return 0;
+
   RenderStyle* style = renderer->style();
   if (!style)
     return 0;
@@ -453,11 +460,16 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       EBackgroundBox box = (propertyID == CSS_PROP__WEBKIT_BACKGROUND_CLIP
                                 ? style->backgroundClip()
                                 : style->backgroundOrigin());
-      if (box == BGBORDER)
-        return new CSSPrimitiveValue(CSS_VAL_BORDER);
-      if (box == BGPADDING)
-        return new CSSPrimitiveValue(CSS_VAL_PADDING);
-      return new CSSPrimitiveValue(CSS_VAL_CONTENT);
+      switch (box) {
+        case BGBORDER:
+          return new CSSPrimitiveValue(CSS_VAL_BORDER);
+        case BGPADDING:
+          return new CSSPrimitiveValue(CSS_VAL_PADDING);
+        case BGCONTENT:
+          return new CSSPrimitiveValue(CSS_VAL_CONTENT);
+      }
+      ASSERT_NOT_REACHED();
+      return 0;
     }
     case CSS_PROP_BACKGROUND_POSITION: {
       String string;
@@ -486,8 +498,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_BORDER_COLLAPSE:
       if (style->borderCollapse())
         return new CSSPrimitiveValue(CSS_VAL_COLLAPSE);
-      else
-        return new CSSPrimitiveValue(CSS_VAL_SEPARATE);
+      return new CSSPrimitiveValue(CSS_VAL_SEPARATE);
     case CSS_PROP_BORDER_SPACING: {
       String string(numberAsString(style->horizontalBorderSpacing()) + "px " +
                     numberAsString(style->verticalBorderSpacing()) + "px");
@@ -701,7 +712,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       break;
     case CSS_PROP_CURSOR: {
       CSSValueList* list = 0;
-      CSSValue* value = 0;
       CursorList* cursors = style->cursors();
       if (cursors && cursors->size() > 0) {
         list = new CSSValueList;
@@ -709,6 +719,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           list->append(new CSSPrimitiveValue((*cursors)[i].cursorImage->url(),
                                              CSSPrimitiveValue::CSS_URI));
       }
+      CSSValue* value = 0;
       switch (style->cursor()) {
         case CURSOR_AUTO:
           value = new CSSPrimitiveValue(CSS_VAL_AUTO);
@@ -886,58 +897,43 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       ASSERT_NOT_REACHED();
       return 0;
-    case CSS_PROP_FONT_FAMILY: {
+    case CSS_PROP_FONT_FAMILY:
       // FIXME: This only returns the first family.
-      const FontDescription& desc = style->fontDescription();
-      return new CSSPrimitiveValue(desc.family().family().domString(),
-                                   CSSPrimitiveValue::CSS_STRING);
-    }
-    case CSS_PROP_FONT_SIZE: {
-      FontDescription desc = style->fontDescription();
-      return new CSSPrimitiveValue(desc.computedPixelSize(),
+      return new CSSPrimitiveValue(
+          style->fontDescription().family().family().domString(),
+          CSSPrimitiveValue::CSS_STRING);
+    case CSS_PROP_FONT_SIZE:
+      return new CSSPrimitiveValue(style->fontDescription().computedPixelSize(),
                                    CSSPrimitiveValue::CSS_PX);
-    }
     case CSS_PROP_FONT_STRETCH:
       // FIXME: unimplemented
       break;
-    case CSS_PROP_FONT_STYLE: {
-      // FIXME: handle oblique?
-      const FontDescription& desc = style->fontDescription();
-      if (desc.italic())
+    case CSS_PROP_FONT_STYLE:
+      if (style->fontDescription().italic())
         return new CSSPrimitiveValue(CSS_VAL_ITALIC);
-      else
-        return new CSSPrimitiveValue(CSS_VAL_NORMAL);
-    }
-    case CSS_PROP_FONT_VARIANT: {
-      const FontDescription& desc = style->fontDescription();
-      if (desc.smallCaps())
+      return new CSSPrimitiveValue(CSS_VAL_NORMAL);
+    case CSS_PROP_FONT_VARIANT:
+      if (style->fontDescription().smallCaps())
         return new CSSPrimitiveValue(CSS_VAL_SMALL_CAPS);
-      else
-        return new CSSPrimitiveValue(CSS_VAL_NORMAL);
-    }
-    case CSS_PROP_FONT_WEIGHT: {
+      return new CSSPrimitiveValue(CSS_VAL_NORMAL);
+    case CSS_PROP_FONT_WEIGHT:
       // FIXME: this does not reflect the full range of weights
       // that can be expressed with CSS
-      const FontDescription& desc = style->fontDescription();
-      if (desc.weight() == cBoldWeight)
+      if (style->fontDescription().weight() == cBoldWeight)
         return new CSSPrimitiveValue(CSS_VAL_BOLD);
-      else
-        return new CSSPrimitiveValue(CSS_VAL_NORMAL);
-    }
+      return new CSSPrimitiveValue(CSS_VAL_NORMAL);
     case CSS_PROP_HEIGHT:
       return new CSSPrimitiveValue(renderer->contentHeight(),
                                    CSSPrimitiveValue::CSS_PX);
-    case CSS_PROP__WEBKIT_HIGHLIGHT: {
+    case CSS_PROP__WEBKIT_HIGHLIGHT:
       if (style->highlight() == nullAtom)
         return new CSSPrimitiveValue(CSS_VAL_NONE);
-      else
-        return new CSSPrimitiveValue(style->highlight(),
-                                     CSSPrimitiveValue::CSS_STRING);
-    }
+      return new CSSPrimitiveValue(style->highlight(),
+                                   CSSPrimitiveValue::CSS_STRING);
     case CSS_PROP_LEFT:
       return getPositionOffsetValue(renderer, CSS_PROP_LEFT);
     case CSS_PROP_LETTER_SPACING:
-      if (style->letterSpacing() == 0)
+      if (!style->letterSpacing())
         return new CSSPrimitiveValue(CSS_VAL_NORMAL);
       return new CSSPrimitiveValue(style->letterSpacing(),
                                    CSSPrimitiveValue::CSS_PX);
@@ -947,10 +943,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(style->lineClamp(),
                                    CSSPrimitiveValue::CSS_PERCENTAGE);
     case CSS_PROP_LINE_HEIGHT: {
-      Length length(style->lineHeight());
+      Length length = style->lineHeight();
       if (length.isNegative())
         return new CSSPrimitiveValue(CSS_VAL_NORMAL);
-      if (length.isPercent()) {
+      if (length.isPercent())
         // This is imperfect, because it doesn't include the zoom factor and the
         // real computation
         // for how high to be in pixels does include things like minimum font
@@ -958,12 +954,12 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         // On the other hand, since font-size doesn't include the zoom factor,
         // we really can't do
         // that here either.
-        float fontSize = style->fontDescription().specifiedSize();
-        return new CSSPrimitiveValue((int)(length.percent() * fontSize) / 100,
-                                     CSSPrimitiveValue::CSS_PX);
-      } else {
-        return new CSSPrimitiveValue(length.value(), CSSPrimitiveValue::CSS_PX);
-      }
+        return new CSSPrimitiveValue(
+            static_cast<int>(length.percent() *
+                             style->fontDescription().specifiedSize()) /
+                100,
+            CSSPrimitiveValue::CSS_PX);
+      return new CSSPrimitiveValue(length.value(), CSSPrimitiveValue::CSS_PX);
     }
     case CSS_PROP_LIST_STYLE_IMAGE:
       if (style->listStyleImage())
@@ -1126,7 +1122,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       break;
     case CSS_PROP_OVERFLOW:
     case CSS_PROP_OVERFLOW_X:
-    case CSS_PROP_OVERFLOW_Y:
+    case CSS_PROP_OVERFLOW_Y: {
       EOverflow overflow;
       switch (propertyID) {
         case CSS_PROP_OVERFLOW_X:
@@ -1154,6 +1150,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       ASSERT_NOT_REACHED();
       return 0;
+    }
     case CSS_PROP_PADDING_TOP:
       return new CSSPrimitiveValue(renderer->paddingTop(),
                                    CSSPrimitiveValue::CSS_PX);
@@ -1239,21 +1236,21 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->textDecoration() & UNDERLINE)
         string += "underline";
       if (style->textDecoration() & OVERLINE) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "overline";
       }
       if (style->textDecoration() & LINE_THROUGH) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "line-through";
       }
       if (style->textDecoration() & BLINK) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "blink";
       }
-      if (string.length() == 0)
+      if (!string.length())
         return new CSSPrimitiveValue(CSS_VAL_NONE);
       return new CSSPrimitiveValue(string, CSSPrimitiveValue::CSS_STRING);
     }
@@ -1262,21 +1259,21 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->textDecorationsInEffect() & UNDERLINE)
         string += "underline";
       if (style->textDecorationsInEffect() & OVERLINE) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "overline";
       }
       if (style->textDecorationsInEffect() & LINE_THROUGH) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "line-through";
       }
       if (style->textDecorationsInEffect() & BLINK) {
-        if (string.length() > 0)
+        if (string.length())
           string += " ";
         string += "blink";
       }
-      if (string.length() == 0)
+      if (!string.length())
         return new CSSPrimitiveValue(CSS_VAL_NONE);
       return new CSSPrimitiveValue(string, CSSPrimitiveValue::CSS_STRING);
     }
@@ -1286,7 +1283,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return valueForLength(style->textIndent());
     case CSS_PROP_TEXT_SHADOW:
       return valueForShadow(style->textShadow());
-    case CSS_PROP__WEBKIT_TEXT_SECURITY: {
+    case CSS_PROP__WEBKIT_TEXT_SECURITY:
       switch (style->textSecurity()) {
         case TSNONE:
           return new CSSPrimitiveValue(CSS_VAL_NONE);
@@ -1299,12 +1296,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       ASSERT_NOT_REACHED();
       return 0;
-    }
     case CSS_PROP__WEBKIT_TEXT_SIZE_ADJUST:
       if (style->textSizeAdjust())
         return new CSSPrimitiveValue(CSS_VAL_AUTO);
-      else
-        return new CSSPrimitiveValue(CSS_VAL_NONE);
+      return new CSSPrimitiveValue(CSS_VAL_NONE);
     case CSS_PROP__WEBKIT_TEXT_STROKE_COLOR:
       return currentColorOrValidColor(style, style->textStrokeColor());
     case CSS_PROP__WEBKIT_TEXT_STROKE_WIDTH:
@@ -1443,9 +1438,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         case RESIZE_VERTICAL:
           return new CSSPrimitiveValue(CSS_VAL_VERTICAL);
         case RESIZE_NONE:
-        default:
           return new CSSPrimitiveValue(CSS_VAL_NONE);
       }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_Z_INDEX:
       if (style->hasAutoZIndex())
         return new CSSPrimitiveValue(CSS_VAL_NORMAL);
@@ -1542,19 +1538,21 @@ String CSSComputedStyleDeclaration::getPropertyValue(int propertyID) const {
   return "";
 }
 
-bool CSSComputedStyleDeclaration::getPropertyPriority(int) const {
+bool CSSComputedStyleDeclaration::getPropertyPriority(
+    int /*propertyID*/) const {
   // All computed styles have a priority of false (not "important").
   return false;
 }
 
-String CSSComputedStyleDeclaration::removeProperty(int, ExceptionCode& ec) {
+String CSSComputedStyleDeclaration::removeProperty(int /*propertyID*/,
+                                                   ExceptionCode& ec) {
   ec = NO_MODIFICATION_ALLOWED_ERR;
   return String();
 }
 
-void CSSComputedStyleDeclaration::setProperty(int,
-                                              const String&,
-                                              bool,
+void CSSComputedStyleDeclaration::setProperty(int /*propertyID*/,
+                                              const String& /*value*/,
+                                              bool /*important*/,
                                               ExceptionCode& ec) {
   ec = NO_MODIFICATION_ALLOWED_ERR;
 }
@@ -1563,12 +1561,15 @@ unsigned CSSComputedStyleDeclaration::length() const {
   Node* node = m_node.get();
   if (!node)
     return 0;
+
   RenderObject* renderer = node->renderer();
   if (!renderer)
     return 0;
+
   RenderStyle* style = renderer->style();
   if (!style)
     return 0;
+
   return numComputedProperties;
 }
 

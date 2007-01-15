@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef CSSInitialValue_H
-#define CSSInitialValue_H
+#ifndef CSSInitialValue_h
+#define CSSInitialValue_h
 
 #include "CSSValue.h"
 
@@ -33,6 +33,6 @@ class CSSInitialValue : public CSSValue {
   virtual String cssText() const;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // CSSInitialValue_h

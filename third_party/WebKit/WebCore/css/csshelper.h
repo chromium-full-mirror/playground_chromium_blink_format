@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef css_helper_h
-#define css_helper_h
+#ifndef csshelper_h
+#define csshelper_h
 
 namespace WebCore {
 
@@ -31,6 +31,7 @@ class String;
  * mostly just removes the url("...") brace
  */
 String parseURL(const String& url);
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // csshelper_h
