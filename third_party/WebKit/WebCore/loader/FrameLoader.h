@@ -186,8 +186,9 @@ class FrameLoader : Noncopyable {
 
   Frame* createWindow(const FrameLoadRequest&, const WindowFeatures&);
 
-  void loadResourceSynchronously(const ResourceRequest& request,
-                                 ResourceResponse& r,
+  void loadResourceSynchronously(const ResourceRequest&,
+                                 ResourceError&,
+                                 ResourceResponse&,
                                  Vector<char>& data);
 
   bool canHandleRequest(const ResourceRequest&);

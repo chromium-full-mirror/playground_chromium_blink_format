@@ -3009,6 +3009,7 @@ void FrameLoader::loadEmptyDocumentSynchronously() {
 }
 
 void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
+                                            ResourceError& error,
                                             ResourceResponse& response,
                                             Vector<char>& data) {
   // Since this is a subresource, we can load any URL (we ignore the return
@@ -3040,17 +3041,13 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
                                         .url());
   initialRequest.setHTTPUserAgent(client()->userAgent());
 
-  ResourceError error;
   unsigned long identifier = 0;
   ResourceRequest newRequest(initialRequest);
   requestFromDelegate(newRequest, identifier, error);
 
   if (error.isNull()) {
     ASSERT(!newRequest.isNull());
-    ResourceError error;
-
     didTellBridgeAboutLoad(newRequest.url().url());
-
     ResourceHandle::loadResourceSynchronously(newRequest, error, response,
                                               data);
   }

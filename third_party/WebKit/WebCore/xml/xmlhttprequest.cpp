@@ -1,7 +1,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2004, 2006 Apple Computer, Inc.
- *  Copyright (C) 2005, 2006 Alexey Proskuryakov <ap@nypop.com>
+ *  Copyright (C) 2005-2007 Alexey Proskuryakov <ap@webkit.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "HTMLDocument.h"
+#include "Page.h"
 #include "PlatformString.h"
 #include "RegularExpression.h"
 #include "ResourceHandle.h"
@@ -145,6 +146,28 @@ static String getCharset(const String& contentTypeString) {
   }
 
   return String();
+}
+
+static bool canSetRequestHeader(const String& name) {
+  static HashSet<String, CaseInsensitiveHash<String>> forbiddenHeaders;
+
+  if (forbiddenHeaders.isEmpty()) {
+    forbiddenHeaders.add("accept-charset");
+    forbiddenHeaders.add("accept-encoding");
+    forbiddenHeaders.add("content-length");
+    forbiddenHeaders.add("expect");
+    forbiddenHeaders.add("date");
+    forbiddenHeaders.add("host");
+    forbiddenHeaders.add("keep-alive");
+    forbiddenHeaders.add("referer");
+    forbiddenHeaders.add("te");
+    forbiddenHeaders.add("trailer");
+    forbiddenHeaders.add("transfer-encoding");
+    forbiddenHeaders.add("upgrade");
+    forbiddenHeaders.add("via");
+  }
+
+  return !forbiddenHeaders.contains(name);
 }
 
 XMLHttpRequestState XMLHttpRequest::getReadyState() const {
@@ -416,6 +439,7 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
 
   if (!m_async) {
     Vector<char> data;
+    ResourceError error;
     ResourceResponse response;
 
     {
@@ -423,12 +447,15 @@ void XMLHttpRequest::send(const String& body, ExceptionCode& ec) {
       // thread
       KJS::JSLock::DropAllLocks dropLocks;
       if (m_doc->frame())
-        m_doc->frame()->loader()->loadResourceSynchronously(request, response,
-                                                            data);
+        m_doc->frame()->loader()->loadResourceSynchronously(request, error,
+                                                            response, data);
     }
 
     m_loader = 0;
-    processSyncLoadResults(data, response);
+    if (error.isNull())
+      processSyncLoadResults(data, response);
+    else
+      ec = NETWORK_ERR;
 
     return;
   }
@@ -482,6 +509,13 @@ void XMLHttpRequest::setRequestHeader(const String& name,
       return;
 
     ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  if (!canSetRequestHeader(name)) {
+    if (m_doc && m_doc->frame() && m_doc->frame()->page())
+      m_doc->frame()->page()->chrome()->addMessageToConsole(
+          "Refused to set unsafe header " + name, 1, String());
     return;
   }
 
