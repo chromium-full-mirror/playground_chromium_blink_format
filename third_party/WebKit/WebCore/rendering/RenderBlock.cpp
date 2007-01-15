@@ -1608,9 +1608,9 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
         child->style()->pageBreakAfter() == PBALWAYS && inRootBlockContext() &&
         (ty + child->yPos() + child->height()) > paintInfo.rect.y() &&
         (ty + child->yPos() + child->height()) < paintInfo.rect.bottom()) {
-      view()->setBestTruncatedAt(
-          ty + child->yPos() + child->height() + child->collapsedMarginBottom(),
-          this, true);
+      view()->setBestTruncatedAt(ty + child->yPos() + child->height() +
+                                     max(0, child->collapsedMarginBottom()),
+                                 this, true);
       return;
     }
   }
