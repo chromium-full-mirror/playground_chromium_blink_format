@@ -66,7 +66,6 @@ class SVGStyledElement : public SVGElement {
   virtual bool hasRelativeValues() const { return false; }
 
  private:
-  mutable RefPtr<CSSStyleDeclaration> m_pa;
   ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement,
                                  String,
                                  String,
