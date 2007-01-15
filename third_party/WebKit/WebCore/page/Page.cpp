@@ -32,6 +32,7 @@
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "HistoryItem.h"
+#include "ProgressTracker.h"
 #include "RenderWidget.h"
 #include "SelectionController.h"
 #include "Settings.h"
@@ -58,10 +59,10 @@ Page::Page(ChromeClient* chromeClient,
           new ContextMenuController(this, contextMenuClient)),
       m_backForwardList(new BackForwardList),
       m_settings(new Settings),
+      m_progress(new ProgressTracker),
       m_editorClient(editorClient),
       m_frameCount(0),
-      m_defersLoading(false),
-      m_uniqueIdentifier(0) {
+      m_defersLoading(false) {
   if (!allPages) {
     allPages = new HashSet<Page*>;
     setFocusRingColorChangeFunction(setNeedsReapplyStyles);
@@ -195,10 +196,6 @@ void Page::setDefersLoading(bool defers) {
   m_defersLoading = defers;
   for (Frame* frame = mainFrame(); frame; frame = frame->tree()->traverseNext())
     frame->loader()->setDefersLoading(defers);
-}
-
-unsigned long Page::createUniqueIdentifier() {
-  return ++m_uniqueIdentifier;
 }
 
 }  // namespace WebCore

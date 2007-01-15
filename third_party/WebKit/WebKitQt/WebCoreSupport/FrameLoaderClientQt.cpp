@@ -266,11 +266,15 @@ void FrameLoaderClientQt::clearUnarchivingState(DocumentLoader*) {
   notImplemented();
 }
 
-void FrameLoaderClientQt::progressStarted() {
+void FrameLoaderClientQt::postProgressStartedNotification() {
   // no progress notification for now
 }
 
-void FrameLoaderClientQt::progressCompleted() {
+void FrameLoaderClientQt::postProgressEstimateChangedNotification() {
+  // no progress notification for now
+}
+
+void FrameLoaderClientQt::postProgressFinishedNotification() {
   // no progress notification for now
 }
 
@@ -595,19 +599,6 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
 
 void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
     const WebCore::ResourceError&) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::incrementProgress(unsigned long,
-                                            const WebCore::ResourceResponse&) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::incrementProgress(unsigned long, const char*, int) {
-  notImplemented();
-}
-
-void FrameLoaderClientQt::completeProgress(unsigned long) {
   notImplemented();
 }
 

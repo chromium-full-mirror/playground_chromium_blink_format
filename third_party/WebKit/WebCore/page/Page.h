@@ -43,6 +43,7 @@ class EditorClient;
 class FocusController;
 class Frame;
 class Node;
+class ProgressTracker;
 class SelectionController;
 class Settings;
 
@@ -82,20 +83,19 @@ class Page : Noncopyable {
   static void setNeedsReapplyStyles();
   static void setNeedsReapplyStylesForSettingsChange(Settings*);
 
-  Chrome* chrome() { return m_chrome.get(); }
-  SelectionController* dragCaretController() {
+  Chrome* chrome() const { return m_chrome.get(); }
+  SelectionController* dragCaretController() const {
     return m_dragCaretController.get();
   }
-  FocusController* focusController() { return m_focusController.get(); }
-  ContextMenuController* contextMenuController() {
+  FocusController* focusController() const { return m_focusController.get(); }
+  ContextMenuController* contextMenuController() const {
     return m_contextMenuController.get();
   }
-  Settings* settings() { return m_settings.get(); }
+  Settings* settings() const { return m_settings.get(); }
+  ProgressTracker* progress() const { return m_progress.get(); }
 
   void setDefersLoading(bool);
   bool defersLoading() const { return m_defersLoading; }
-
-  unsigned long createUniqueIdentifier();
 
 #if PLATFORM(WIN)
   // The global DLL or application instance used for all windows.
@@ -112,6 +112,7 @@ class Page : Noncopyable {
   OwnPtr<ContextMenuController> m_contextMenuController;
   RefPtr<BackForwardList> m_backForwardList;
   OwnPtr<Settings> m_settings;
+  OwnPtr<ProgressTracker> m_progress;
 
   EditorClient* m_editorClient;
   RefPtr<Frame> m_mainFrame;
@@ -120,8 +121,6 @@ class Page : Noncopyable {
   String m_groupName;
 
   bool m_defersLoading;
-
-  unsigned long m_uniqueIdentifier;
 
 #if PLATFORM(WIN)
   static HINSTANCE s_instanceHandle;

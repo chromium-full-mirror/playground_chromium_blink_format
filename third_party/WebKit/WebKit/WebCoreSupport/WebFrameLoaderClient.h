@@ -164,13 +164,11 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::ResourceResponse&,
       int length);
 
-  virtual void progressStarted();
-  virtual void progressCompleted();
-
-  virtual void incrementProgress(unsigned long identifier,
-                                 const WebCore::ResourceResponse&);
-  virtual void incrementProgress(unsigned long identifier, const char*, int);
-  virtual void completeProgress(unsigned long identifier);
+  virtual void willChangeEstimatedProgress();
+  virtual void didChangeEstimatedProgress();
+  virtual void postProgressStartedNotification();
+  virtual void postProgressEstimateChangedNotification();
+  virtual void postProgressFinishedNotification();
 
   virtual void setMainFrameDocumentReady(bool);
 

@@ -62,6 +62,7 @@
 #include "Page.h"
 #include "PageCache.h"
 #include "PageState.h"
+#include "ProgressTracker.h"
 #include "RenderPart.h"
 #include "RenderWidget.h"
 #include "ResourceHandle.h"
@@ -82,9 +83,6 @@
 #if PLATFORM(MAC)
 #include "FrameMac.h"
 #import "WebDataProtocol.h"
-#else
-// FIXME: get rid of this once we don't use nil in the loader
-#define nil 0
 #endif
 
 using namespace KJS;
@@ -1678,7 +1676,8 @@ bool FrameLoader::containsPlugins() const {
 }
 
 void FrameLoader::prepareForLoadStart() {
-  m_client->progressStarted();
+  if (m_frame->page())
+    m_frame->page()->progress()->progressStarted(m_frame);
   m_client->dispatchDidStartProvisionalLoad();
 }
 
@@ -2266,7 +2265,8 @@ void FrameLoader::setState(FrameState newState) {
 
 void FrameLoader::clearProvisionalLoad() {
   setProvisionalDocumentLoader(0);
-  m_client->progressCompleted();
+  if (m_frame->page())
+    m_frame->page()->progress()->progressCompleted(m_frame);
   setState(FrameStateComplete);
 }
 
@@ -2726,7 +2726,8 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
       else
         m_client->dispatchDidFinishLoad();
 
-      m_client->progressCompleted();
+      if (m_frame->page())
+        m_frame->page()->progress()->progressCompleted(m_frame);
       return;
     }
 
@@ -3091,7 +3092,8 @@ void FrameLoader::startLoading() {
 
   m_provisionalDocumentLoader->setLoadingFromPageCache(false);
 
-  unsigned long identifier = m_frame->page()->createUniqueIdentifier();
+  unsigned long identifier =
+      m_frame->page()->progress()->createUniqueIdentifier();
   m_client->assignIdentifierToInitialRequest(
       identifier, m_provisionalDocumentLoader.get(),
       m_provisionalDocumentLoader->originalRequest());
@@ -3125,7 +3127,8 @@ void FrameLoader::didReceiveResponse(ResourceLoader* loader,
                                      const ResourceResponse& r) {
   activeDocumentLoader()->addResponse(r);
 
-  m_client->incrementProgress(loader->identifier(), r);
+  if (m_frame->page())
+    m_frame->page()->progress()->incrementProgress(loader->identifier(), r);
   m_client->dispatchDidReceiveResponse(activeDocumentLoader(),
                                        loader->identifier(), r);
 }
@@ -3134,14 +3137,17 @@ void FrameLoader::didReceiveData(ResourceLoader* loader,
                                  const char* data,
                                  int length,
                                  int lengthReceived) {
-  m_client->incrementProgress(loader->identifier(), data, length);
+  if (m_frame->page())
+    m_frame->page()->progress()->incrementProgress(loader->identifier(), data,
+                                                   length);
   m_client->dispatchDidReceiveContentLength(
       activeDocumentLoader(), loader->identifier(), lengthReceived);
 }
 
 void FrameLoader::didFailToLoad(ResourceLoader* loader,
                                 const ResourceError& error) {
-  m_client->completeProgress(loader->identifier());
+  if (m_frame->page())
+    m_frame->page()->progress()->completeProgress(loader->identifier());
   if (!error.isNull())
     m_client->dispatchDidFailLoading(activeDocumentLoader(),
                                      loader->identifier(), error);
@@ -3522,7 +3528,7 @@ void FrameLoader::requestFromDelegate(ResourceRequest& request,
                                       ResourceError& error) {
   ASSERT(!request.isNull());
 
-  identifier = m_frame->page()->createUniqueIdentifier();
+  identifier = m_frame->page()->progress()->createUniqueIdentifier();
   m_client->assignIdentifierToInitialRequest(identifier, m_documentLoader.get(),
                                              request);
 
@@ -4295,7 +4301,8 @@ ResourceError FrameLoader::fileDoesNotExistError(
 }
 
 void FrameLoader::didFinishLoad(ResourceLoader* loader) {
-  m_client->completeProgress(loader->identifier());
+  if (m_frame->page())
+    m_frame->page()->progress()->completeProgress(loader->identifier());
   m_client->dispatchDidFinishLoading(activeDocumentLoader(),
                                      loader->identifier());
 }
