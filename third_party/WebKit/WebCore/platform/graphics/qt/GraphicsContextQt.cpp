@@ -507,9 +507,7 @@ void GraphicsContext::clip(const IntRect& rect) {
   if (paintingDisabled())
     return;
 
-  QPainterPath path;
-  path.addRect(QRectF(rect));
-  m_data->p().setClipPath(path, Qt::UniteClip);
+  m_data->p().setClipRect(rect, Qt::UniteClip);
 }
 
 void GraphicsContext::drawFocusRing(const Color& color) {

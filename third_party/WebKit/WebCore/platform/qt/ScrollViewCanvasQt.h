@@ -31,7 +31,7 @@
 #ifndef SCROLLVIEWCANVASQT_H
 #define SCROLLVIEWCANVASQT_H
 
-#include <QWidget>
+#include <QScrollArea>
 
 class QKeyEvent;
 class QPaintEvent;
@@ -40,13 +40,12 @@ class QMouseEvent;
 namespace WebCore {
 
 class ScrollView;
+class FrameView;
 
 class ScrollViewCanvasQt : public QWidget {
   Q_OBJECT
  public:
   ScrollViewCanvasQt(ScrollView*, QWidget* parent = 0);
-
-  virtual QSize sizeHint() const;
 
  protected:
   virtual void paintEvent(QPaintEvent*);
@@ -58,8 +57,10 @@ class ScrollViewCanvasQt : public QWidget {
 
  private:
   void handleKeyEvent(QKeyEvent*, bool isKeyUp);
+  bool updateFrameView();
 
-  ScrollView* m_frameView;
+  ScrollView* m_scrollView;
+  FrameView* m_frameView;
 };
 }
 

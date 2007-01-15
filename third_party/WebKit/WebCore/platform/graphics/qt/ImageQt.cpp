@@ -80,7 +80,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
   if (!m_source.initialized())
     return;
 
-  QImage* image = frameAtIndex(m_currentFrame);
+  QPixmap* image = frameAtIndex(m_currentFrame);
   if (!image)  // If it's too early we won't have an image yet.
     return;
 
@@ -97,7 +97,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
   // Test using example site at
   // http://www.meyerweb.com/eric/css/edge/complexspiral/demo.html
-  painter->drawImage(dst, *image, src);
+  painter->drawPixmap(dst, *image, src);
 
   ctxt->restore();
 
@@ -112,7 +112,7 @@ void BitmapImage::drawTiled(GraphicsContext* ctxt,
   if (!m_source.initialized())
     return;
 
-  QImage* image = frameAtIndex(m_currentFrame);
+  QPixmap* image = frameAtIndex(m_currentFrame);
   QPixmap pix;
   if (!image)  // If it's too early we won't have an image yet.
     return;
@@ -121,19 +121,17 @@ void BitmapImage::drawTiled(GraphicsContext* ctxt,
 
   if (!qFuzzyCompare(tileSize.width(), intrinsicImageSize.width()) ||
       !qFuzzyCompare(tileSize.height(), intrinsicImageSize.height())) {
-    QImage img((int)tileSize.width(), (int)tileSize.height(),
-               QImage::Format_ARGB32_Premultiplied);
+    QPixmap img((int)tileSize.width(), (int)tileSize.height());
 
     QPainter p(&img);
-    p.drawImage(
+    p.drawPixmap(
         QRectF(0, 0, tileSize.width(), tileSize.height()), *image,
         QRectF(srcPoint.x(), srcPoint.y(), tileSize.width() - srcPoint.x(),
                tileSize.height() - srcPoint.y()));
     p.end();
 
-    pix = QPixmap::fromImage(img);
-  } else
-    pix = QPixmap::fromImage(*image);
+    pix = img;
+  }
 
   ctxt->save();
 

@@ -29,7 +29,7 @@
 
 #include "ImageDecoder.h"
 #include <QtCore/QList>
-#include <QtGui/QImage>
+#include <QtGui/QPixmap>
 
 namespace WebCore {
 
@@ -53,7 +53,7 @@ class ImageDecoderQt : public ImageDecoder {
 
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 
-  const QImage* imageAtIndex(size_t index) const;
+  const QPixmap* imageAtIndex(size_t index) const;
 
   virtual bool supportsAlpha() const;
 
@@ -74,12 +74,14 @@ class ImageDecoderQt : public ImageDecoder {
   };
 
   struct ImageData {
-    ImageData(const QImage& image,
+    ImageData(const QPixmap& image,
+              QImage::Format format,
               ImageState imageState = ImagePartial,
               int duration = 0);
-    QImage m_image;
+    QPixmap m_image;
     ImageState m_imageState;
     int m_duration;
+    QImage::Format m_format;
   };
 
   typedef QList<ImageData> ImageList;

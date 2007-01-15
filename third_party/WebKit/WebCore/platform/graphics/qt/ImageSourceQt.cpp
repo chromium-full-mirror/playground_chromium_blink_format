@@ -152,11 +152,11 @@ NativeImagePtr ImageSource::createFrameAtIndex(size_t index) {
   if (!m_decoder)
     return 0;
 
-  const QImage* source = m_decoder->imageAtIndex(index);
+  const QPixmap* source = m_decoder->imageAtIndex(index);
   if (!source)
     return 0;
 
-  return new QImage(*source);
+  return new QPixmap(*source);
 }
 
 float ImageSource::frameDurationAtIndex(size_t index) {
@@ -170,7 +170,7 @@ bool ImageSource::frameHasAlphaAtIndex(size_t index) {
   if (!m_decoder || !m_decoder->supportsAlpha())
     return false;
 
-  const QImage* source = m_decoder->imageAtIndex(index);
+  const QPixmap* source = m_decoder->imageAtIndex(index);
   if (!source)
     return false;
 
