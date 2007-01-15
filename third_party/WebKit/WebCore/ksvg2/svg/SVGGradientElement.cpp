@@ -161,6 +161,11 @@ void SVGGradientElement::insertedIntoDocument() {
   if (extensions->isPendingResource(resourceId))
     SVGResource::repaintClients(extensions->removePendingResource(resourceId));
 }
+
+void SVGGradientElement::childrenChanged() {
+  notifyAttributeChange();
+  SVGStyledElement::childrenChanged();
+}
 }
 
 #endif  // SVG_SUPPORT
