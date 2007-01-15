@@ -73,7 +73,8 @@ DumpRenderTree::DumpRenderTree()
     : m_frame(0),
       m_client(new DumpRenderTreeClient(this)),
       m_stdin(0),
-      m_notifier() {
+      m_notifier(),
+      m_loading(false) {
   // Initialize WebCore in Qt platform mode...
   Page* page = new Page(new ChromeClientQt(), new ContextMenuClientQt(),
                         new EditorClientQt());
@@ -138,6 +139,9 @@ void DumpRenderTree::open(const KURL& url) {
 }
 
 void DumpRenderTree::readStdin(int /* socket */) {
+  if (m_loading)
+    qDebug() << "=========================== still loading";
+
   // Read incoming data from stdin...
   QByteArray line = m_stdin->readLine();
   if (line.endsWith('\n'))
@@ -224,6 +228,8 @@ void DumpRenderTree::dump() {
     fprintf(stdout, "%s#EOF\n", renderDump.utf8().data());
   }
   fflush(stdout);
+
+  m_loading = false;
 
   if (!m_notifier) {
     // Exit now in single file mode...

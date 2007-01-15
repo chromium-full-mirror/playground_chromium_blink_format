@@ -81,6 +81,7 @@ class DumpRenderTree : public QObject {
 
   // To be skipped tests
   QList<QString> m_skipped;
+  bool m_loading;
 };
 }
 

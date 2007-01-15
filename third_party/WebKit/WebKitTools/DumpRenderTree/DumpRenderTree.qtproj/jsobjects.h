@@ -39,21 +39,24 @@ class LayoutTestController : public QObject {
   bool shouldDumpAsText() const { return textDump; }
   bool shouldWaitUntilDone() const { return waitForDone; }
 
-  void reset() {
-    textDump = false;
-    waitForDone = false;
-  }
+  void reset();
+
+ protected:
+  void timerEvent(QTimerEvent*);
+
  signals:
   void done();
 
  public slots:
   void dumpAsText() { textDump = true; }
-  void waitUntilDone() { waitForDone = true; }
-  void notifyDone() { emit done(); }
+  void waitUntilDone();
+  void notifyDone();
+  void dumpEditingCallbacks();
 
  private:
   bool textDump;
   bool waitForDone;
+  int timeoutTimer;
 };
 
 #endif

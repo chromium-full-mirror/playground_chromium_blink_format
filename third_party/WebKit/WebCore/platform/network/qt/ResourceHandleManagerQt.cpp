@@ -84,11 +84,8 @@ ResourceHandleManager* ResourceHandleManager::self() {
 }
 
 RequestQt::RequestQt(ResourceHandle* res, FrameQtClient* c)
-    : client(c),
-      resource(res),
-      url(res->url()),
-      redirected(false),
-      cancelled(false) {
+    : client(c), resource(res), redirected(false), cancelled(false) {
+  setURL(res->url());
   request = QHttpRequestHeader(resource->method(), url.path() + url.query());
   request.setValue(QLatin1String("User-Agent"),
                    QLatin1String("Mozilla/5.0 (PC; U; Intel; Linux; en) "
@@ -132,6 +129,17 @@ RequestQt::RequestQt(ResourceHandle* res, FrameQtClient* c)
   //     DEBUG() << request.toString();
 }
 
+void RequestQt::setURL(const KURL& u) {
+  url = u;
+  int port = url.port();
+  if (port && port != 80)
+    request.setValue(QLatin1String("Host"),
+                     url.host() + QLatin1Char(':') + QString::number(port));
+  else
+    request.setValue(QLatin1String("Host"), url.host());
+  hostInfo = HostInfo(u);
+}
+
 void ResourceHandleManager::add(ResourceHandle* resource,
                                 FrameQtClient* client) {
   ASSERT(resource);
@@ -151,16 +159,17 @@ void ResourceHandleManager::add(RequestQt* request) {
 
   pendingRequests[request->resource] = request;
 
-  //     DEBUG() << "ResourceHandleManager::add";
+  // DEBUG() << "ResourceHandleManager::add" << request->hostInfo.protocol <<
+  // request->hostInfo.host;
   // check for not implemented protocols
-  if (request->url.isLocalFile()) {
-    //         DEBUG() << "fileRequest";
+  if (request->hostInfo.isLocalFile()) {
+    // DEBUG() << "fileRequest";
     emit fileRequest(request);
     return;
   }
-  String protocol = request->url.protocol();
+  String protocol = request->hostInfo.protocol;
   if (protocol == "http") {
-    //         DEBUG() << "networkRequest";
+    // DEBUG() << "networkRequest";
     emit networkRequest(request);
     return;
   }
@@ -186,11 +195,10 @@ void ResourceHandleManager::cancel(ResourceHandle* resource) {
     return;
   request->cancelled = true;
 
-  KURL url = request->url;
-  if (url.isLocalFile()) {
+  if (request->hostInfo.isLocalFile()) {
     emit fileCancel(request);
   } else {
-    String protocol = request->url.protocol();
+    String protocol = request->hostInfo.protocol;
     if (protocol == "http") {
       emit networkCancel(request);
     } else {
@@ -248,14 +256,7 @@ void ResourceHandleManager::receivedResponse(RequestQt* request) {
       request->request.setRequest(
           request->request.method(),
           newRequest.url().path() + newRequest.url().query());
-      request->url = newRequest.url();
-      int port = request->url.port();
-      if (port && port != 80)
-        request->request.setValue(
-            QLatin1String("Host"),
-            request->url.host() + QLatin1Char(':') + QString::number(port));
-      else
-        request->request.setValue(QLatin1String("Host"), request->url.host());
+      request->setURL(newRequest.url());
       request->redirected = true;
       return;
     }
@@ -358,14 +359,13 @@ FileLoader::FileLoader() : QObject(0) {
 }
 
 void FileLoader::request(RequestQt* request) {
-  DEBUG() << "FileLoader::request" << request->url.path();
-  KURL url = request->url;
-  Q_ASSERT(url.isLocalFile());
+  DEBUG() << "FileLoader::request" << request->request.path();
+  Q_ASSERT(request->hostInfo.isLocalFile());
   int error = 0;
 
   if (request->postData.isEmpty()) {
-    QFile f(QString(url.path()));
-    DEBUG() << "opening" << QString(url.path());
+    QFile f(QString(request->request.path()));
+    DEBUG() << "opening" << QString(request->request.path());
 
     if (f.open(QIODevice::ReadOnly)) {
       request->response = QHttpResponseHeader(100);
@@ -523,7 +523,8 @@ static bool operator==(const HostInfo& i1, const HostInfo& i2) {
   return i1.port == i2.port && i1.host == i2.host;
 }
 
-HostInfo::HostInfo(const KURL& url) : host(url.host()), port(url.port()) {
+HostInfo::HostInfo(const KURL& url)
+    : protocol(url.protocol()), host(url.host()), port(url.port()) {
   if (!port)
     port = 80;
 }
@@ -534,16 +535,16 @@ NetworkLoader::~NetworkLoader() {}
 
 void NetworkLoader::request(RequestQt* request) {
   DEBUG() << "NetworkLoader::request";
-  HostInfo info(request->url);
-  WebCoreHttp* httpConnection = m_hostMapping.value(info);
+  WebCoreHttp* httpConnection = m_hostMapping.value(request->hostInfo);
   if (!httpConnection) {
     // #### fix custom ports
-    DEBUG() << "   new connection to" << info.host << info.port;
-    httpConnection = new WebCoreHttp(this, info);
+    DEBUG() << "   new connection to" << request->hostInfo.host
+            << request->hostInfo.port;
+    httpConnection = new WebCoreHttp(this, request->hostInfo);
     connect(httpConnection, SIGNAL(connectionClosed(const HostInfo&)), this,
             SLOT(connectionClosed(const HostInfo&)));
 
-    m_hostMapping[info] = httpConnection;
+    m_hostMapping[request->hostInfo] = httpConnection;
   }
   httpConnection->request(request);
 }
@@ -555,8 +556,7 @@ void NetworkLoader::connectionClosed(const HostInfo& info) {
 
 void NetworkLoader::cancel(RequestQt* request) {
   DEBUG() << "NetworkLoader::cancel";
-  HostInfo info(request->url);
-  WebCoreHttp* httpConnection = m_hostMapping.value(info);
+  WebCoreHttp* httpConnection = m_hostMapping.value(request->hostInfo);
   if (httpConnection)
     httpConnection->cancel(request);
 }
