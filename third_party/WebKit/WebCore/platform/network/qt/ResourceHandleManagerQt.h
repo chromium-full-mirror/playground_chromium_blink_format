@@ -26,8 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ResourceHandleManagerQt_h
-#define ResourceHandleManagerQt_h
+#ifndef ResourceHandleManagerQt_H
+#define ResourceHandleManagerQt_H
 
 #include <QHash>
 #include <QHttp>
@@ -61,6 +61,7 @@ class RequestQt {
   // not thread safe, don't use in other threads
   KURL url;
 
+  QString qurl;
   FrameQtClient* client;
   ResourceHandle* resource;
 
@@ -94,7 +95,6 @@ class ResourceHandleManager : public QObject {
   void networkRequest(RequestQt*);
   void networkCancel(RequestQt*);
   void fileRequest(RequestQt*);
-  void fileCancel(RequestQt*);
 
  private:
   ResourceHandleManager();
@@ -134,12 +134,15 @@ class FileLoader : public QObject {
 
  public slots:
   void request(RequestQt*);
-  void cancel(RequestQt*);
 
  signals:
   void receivedResponse(RequestQt* resource);
   void receivedData(RequestQt* resource, const QByteArray& data);
   void receivedFinished(RequestQt* resource, int errorCode);
+
+ private:
+  void parseDataUrl(RequestQt* request);
+  void sendData(RequestQt* request, int statusCode, const QByteArray& data);
 };
 
 class WebCoreHttp : public QObject {
