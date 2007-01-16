@@ -94,7 +94,7 @@ class Image : Noncopyable {
     return m_animationObserver;
   }
 
-  enum TileRule { StretchTile, RoundTile, RepeatTile };
+  enum TileRule { StretchTile, RepeatTile };
 
 #if PLATFORM(MAC)
   // Accessors for native image formats.
