@@ -100,6 +100,9 @@ class ResourceHandleInternal : Noncopyable {
 #if PLATFORM(MAC)
         ,
         m_currentMacChallenge(nil)
+#elif USE(CFNETWORK)
+        ,
+        m_currentCFChallenge(0)
 #endif
   {
   }
@@ -141,6 +144,9 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if PLATFORM(MAC)
   NSURLAuthenticationChallenge* m_currentMacChallenge;
+#endif
+#if USE(CFNETWORK)
+  CFURLAuthChallengeRef m_currentCFChallenge;
 #endif
   AuthenticationChallenge m_currentWebChallenge;
 };

@@ -42,7 +42,13 @@ class NSURLAuthenticationChallenge;
 #endif
 #endif
 
+#if USE(CFNETWORK)
+typedef struct _CFURLAuthChallenge* CFURLAuthChallengeRef;
+#endif
+
 namespace WebCore {
+
+class ResourceHandle;
 
 class AuthenticationChallenge {
  public:
@@ -54,6 +60,8 @@ class AuthenticationChallenge {
                           const ResourceError& error);
 #if PLATFORM(MAC)
   AuthenticationChallenge(NSURLAuthenticationChallenge*);
+#elif USE(CFNETWORK)
+  AuthenticationChallenge(CFURLAuthChallengeRef, ResourceHandle* sourceHandle);
 #endif
 
   unsigned previousFailureCount() const;
@@ -70,8 +78,12 @@ class AuthenticationChallenge {
   NSURLAuthenticationChallenge* nsURLAuthenticationChallenge() const {
     return m_macChallenge.get();
   }
+#elif USE(CFNETWORK)
+  ResourceHandle* sourceHandle() const { return m_sourceHandle.get(); }
+  CFURLAuthChallengeRef cfURLAuthChallengeRef() const {
+    return m_cfChallenge.get();
+  }
 #endif
-
  private:
   bool m_isNull;
   ProtectionSpace m_protectionSpace;
@@ -83,6 +95,9 @@ class AuthenticationChallenge {
 #if PLATFORM(MAC)
   RetainPtr<id> m_sender;
   RetainPtr<NSURLAuthenticationChallenge*> m_macChallenge;
+#elif USE(CFNETWORK)
+  RefPtr<ResourceHandle> m_sourceHandle;
+  RetainPtr<CFURLAuthChallengeRef> m_cfChallenge;
 #endif
 };
 
