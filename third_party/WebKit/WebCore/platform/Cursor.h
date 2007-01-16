@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CURSOR_H
-#define CURSOR_H
+#ifndef Cursor_h
+#define Cursor_h
 
 #include <wtf/Platform.h>
 
@@ -116,4 +116,4 @@ const Cursor& noneCursor();
 
 }  // namespace WebCore
 
-#endif  // CURSOR_H
+#endif  // Cursor_h

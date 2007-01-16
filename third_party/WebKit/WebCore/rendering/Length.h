@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef Length_H
-#define Length_H
+#ifndef Length_h
+#define Length_h
 
 #include <wtf/Assertions.h>
 
@@ -149,4 +149,4 @@ struct Length {
 
 }  // namespace WebCore
 
-#endif  // Length_H
+#endif  // Length_h

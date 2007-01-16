@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INTRECT_H_
-#define INTRECT_H_
+#ifndef IntRect_h
+#define IntRect_h
 
 #include "IntPoint.h"
 #include <wtf/Platform.h>
@@ -175,4 +175,4 @@ IntRect enclosingIntRect(const NSRect&);
 
 }  // namespace WebCore
 
-#endif  // INTRECT_H_
+#endif  // IntRect_h

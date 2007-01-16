@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef RenderSVGTSpan_H
-#define RenderSVGTSpan_H
+#ifndef RenderSVGTSpan_h
+#define RenderSVGTSpan_h
 
 #ifdef SVG_SUPPORT
 #include "RenderSVGInline.h"
@@ -37,4 +37,4 @@ class RenderSVGTSpan : public RenderSVGInline {
 }
 
 #endif  // SVG_SUPPORT
-#endif  // !RenderSVGTSpan_H
+#endif  // !RenderSVGTSpan_h

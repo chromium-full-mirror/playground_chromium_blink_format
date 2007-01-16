@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef DOM_CharacterDataImpl_h
-#define DOM_CharacterDataImpl_h
+#ifndef CharacterData_h
+#define CharacterData_h
 
 #include "EventTargetNode.h"
 
@@ -84,4 +84,4 @@ class CharacterData : public EventTargetNode {
 
 }  // namespace WebCore
 
-#endif  // DOM_CharacterDataImpl_h
+#endif  // CharacterData_h

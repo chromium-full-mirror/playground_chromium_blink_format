@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ARRAY_H_
-#define ARRAY_H_
+#ifndef DeprecatedArray_h
+#define DeprecatedArray_h
 
 #include "ArrayImpl.h"
 #include <wtf/Platform.h>
@@ -76,4 +76,4 @@ typedef DeprecatedArray<char> DeprecatedByteArray;
 
 }  // namespace WebCore
 
-#endif  // ARRAY_H_
+#endif  // DeprecatedArray_h

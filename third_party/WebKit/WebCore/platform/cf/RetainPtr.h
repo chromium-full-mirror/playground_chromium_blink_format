@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RETAINPTR_H_
-#define RETAINPTR_H_
+#ifndef RetainPtr_h
+#define RetainPtr_h
 
 #include <algorithm>
 #include <CoreFoundation/CoreFoundation.h>
@@ -232,4 +232,4 @@ inline typename RemovePointer<T>::type getPtr(const RetainPtr<T>& p) {
 }
 }
 
-#endif  // RETAINPTR_H_
+#endif  // RetainPtr_h

@@ -21,8 +21,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGPaintImpl_H
-#define KSVG_SVGPaintImpl_H
+#ifndef SVGPaint_h
+#define SVGPaint_h
 #ifdef SVG_SUPPORT
 
 #include "SVGColor.h"
@@ -80,6 +80,6 @@ class SVGPaint : public SVGColor {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGPaintImpl_H
+#endif  // SVGPaint_h
 
 // vim:ts=4:noet

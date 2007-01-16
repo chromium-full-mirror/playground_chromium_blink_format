@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef InlineFlowBox_H
-#define InlineFlowBox_H
+#ifndef InlineFlowBox_h
+#define InlineFlowBox_h
 
 #include "InlineRunBox.h"
 
@@ -208,4 +208,4 @@ class InlineFlowBox : public InlineRunBox {
 void showTree(const WebCore::InlineBox*);
 #endif
 
-#endif  // InlineFlowBox_H
+#endif  // InlineFlowBox_h

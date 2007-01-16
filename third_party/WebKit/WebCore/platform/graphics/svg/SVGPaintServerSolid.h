@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServerSolid_H
-#define SVGPaintServerSolid_H
+#ifndef SVGPaintServerSolid_h
+#define SVGPaintServerSolid_h
 
 #ifdef SVG_SUPPORT
 
@@ -60,4 +60,4 @@ class SVGPaintServerSolid : public SVGPaintServer {
 
 #endif
 
-#endif  // SVGPaintServerSolid_H
+#endif  // SVGPaintServerSolid_h

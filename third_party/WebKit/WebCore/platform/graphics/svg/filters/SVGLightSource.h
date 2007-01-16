@@ -21,8 +21,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef SVGLightSource_H
-#define SVGLightSource_H
+#ifndef SVGLightSource_h
+#define SVGLightSource_h
 
 #ifdef SVG_SUPPORT
 
@@ -49,4 +49,4 @@ class SVGLightSource {
 
 #endif  // SVG_SUPPORT
 
-#endif  // SVGLightSource_H
+#endif  // SVGLightSource_h

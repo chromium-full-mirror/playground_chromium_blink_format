@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SQLStatement_H
-#define SQLStatement_H
+#ifndef SQLStatement_h
+#define SQLStatement_h
 
 #include "PlatformString.h"
 #include "SQLDatabase.h"
@@ -103,4 +103,4 @@ class SQLStatement : public Noncopyable {
 
 }  // namespace WebCore
 
-#endif  // SQLStatement_H
+#endif  // SQLStatement_h

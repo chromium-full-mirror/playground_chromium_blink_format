@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FrameLoadRequest_H_
-#define FrameLoadRequest_H_
+#ifndef FrameLoadRequest_h
+#define FrameLoadRequest_h
 
 #include "ResourceRequest.h"
 
@@ -62,4 +62,4 @@ struct FrameLoadRequest {
 };
 }
 
-#endif  // FrameLoadRequest_H_
+#endif  // FrameLoadRequest_h

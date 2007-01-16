@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HistoryItemTimer_H
-#define HistoryItemTimer_H
+#ifndef HistoryItemTimer_h
+#define HistoryItemTimer_h
 
 #include "Timer.h"
 
@@ -46,4 +46,4 @@ class HistoryItemTimer {
 };
 }
 
-#endif  // HistoryItemTimer_H
+#endif  // HistoryItemTimer_h

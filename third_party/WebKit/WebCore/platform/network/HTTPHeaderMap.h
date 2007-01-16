@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HTTPHeaderMap_H_
-#define HTTPHeaderMap_H_
+#ifndef HTTPHeaderMap_h
+#define HTTPHeaderMap_h
 
 #include "StringHash.h"
 #include <wtf/HashMap.h>
@@ -36,4 +36,4 @@ typedef HashMap<String, String, CaseInsensitiveHash<String>> HTTPHeaderMap;
 
 }  // namespace WebCore
 
-#endif  // HTTPHeaderMap_H_
+#endif  // HTTPHeaderMap_h

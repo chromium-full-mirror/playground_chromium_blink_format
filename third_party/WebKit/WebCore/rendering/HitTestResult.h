@@ -19,8 +19,8 @@
  * Boston, MA 02111-1307, USA.
  *
 */
-#ifndef HitTestResult_h_
-#define HitTestResult_h_
+#ifndef HitTestResult_h
+#define HitTestResult_h
 
 #include "IntPoint.h"
 #include <wtf/RefPtr.h>
@@ -85,4 +85,4 @@ class HitTestResult {
 
 }  // namespace WebCore
 
-#endif  // HitTestResult_h_
+#endif  // HitTestResult_h

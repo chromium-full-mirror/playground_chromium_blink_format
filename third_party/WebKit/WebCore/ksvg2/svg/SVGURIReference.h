@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KSVG_SVGURIReferenceImpl_H
-#define KSVG_SVGURIReferenceImpl_H
+#ifndef SVGURIReference_h
+#define SVGURIReference_h
 #ifdef SVG_SUPPORT
 
 #include "SVGElement.h"
@@ -55,6 +55,6 @@ class SVGURIReference {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // KSVG_SVGURIReferenceImpl_H
+#endif  // SVGURIReference_h
 
 // vim:ts=4:noet

@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef RenderSVGContainer_H
-#define RenderSVGContainer_H
+#ifndef RenderSVGContainer_h
+#define RenderSVGContainer_h
 
 #ifdef SVG_SUPPORT
 
@@ -120,6 +120,6 @@ class RenderSVGContainer : public RenderContainer {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // RenderSVGContainer_H
+#endif  // RenderSVGContainer_h
 
 // vim:ts=4:noet

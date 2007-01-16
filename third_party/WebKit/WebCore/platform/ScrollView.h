@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ScrollView_H
-#define ScrollView_H
+#ifndef ScrollView_h
+#define ScrollView_h
 
 #include "ScrollTypes.h"
 #include "Widget.h"
@@ -166,4 +166,4 @@ class ScrollView : public Widget {
 
 }  // namespace WebCore
 
-#endif  // ScrollView_H
+#endif  // ScrollView_h

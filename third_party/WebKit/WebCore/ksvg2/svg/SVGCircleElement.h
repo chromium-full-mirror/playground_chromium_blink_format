@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef SVGCircleElement_H
-#define SVGCircleElement_H
+#ifndef SVGCircleElement_h
+#define SVGCircleElement_h
 
 #ifdef SVG_SUPPORT
 
@@ -68,6 +68,6 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // SVGCircleElement_H
+#endif  // SVGCircleElement_h
 
 // vim:ts=4:noet

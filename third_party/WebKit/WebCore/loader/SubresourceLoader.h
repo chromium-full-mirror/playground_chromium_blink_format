@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SubresourceLoader_H_
-#define SubresourceLoader_H_
+#ifndef SubresourceLoader_h
+#define SubresourceLoader_h
 
 #include "ResourceHandleClient.h"
 #include "ResourceLoader.h"
@@ -78,4 +78,4 @@ class SubresourceLoader : public ResourceLoader {
 };
 }
 
-#endif  // SubresourceLoader_H_
+#endif  // SubresourceLoader_h

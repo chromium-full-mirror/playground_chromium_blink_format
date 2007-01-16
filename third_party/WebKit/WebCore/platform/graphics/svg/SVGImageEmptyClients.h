@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGImageEmptyClients_H
-#define SVGImageEmptyClients_H
+#ifndef SVGImageEmptyClients_h
+#define SVGImageEmptyClients_h
 
 #ifdef SVG_SUPPORT
 
@@ -421,4 +421,4 @@ class SVGEmptyContextMenuClient : public ContextMenuClient {
 
 #endif  // SVG_SUPPORT
 
-#endif  // SVGImageEmptyClients_H
+#endif  // SVGImageEmptyClients_h

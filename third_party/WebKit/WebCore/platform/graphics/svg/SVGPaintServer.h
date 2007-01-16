@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServer_H
-#define SVGPaintServer_H
+#ifndef SVGPaintServer_h
+#define SVGPaintServer_h
 
 #ifdef SVG_SUPPORT
 
@@ -107,4 +107,4 @@ SVGPaintServer* getPaintServerById(Document*, const AtomicString&);
 
 #endif
 
-#endif  // SVGPaintServer_H
+#endif  // SVGPaintServer_h

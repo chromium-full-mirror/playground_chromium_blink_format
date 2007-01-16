@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef SVGList_H
-#define SVGList_H
+#ifndef SVGList_h
+#define SVGList_h
 
 #ifdef SVG_SUPPORT
 
@@ -233,6 +233,6 @@ class SVGPODList : public SVGList<RefPtr<SVGPODListItem<Item>>> {
 }  // namespace WebCore
 
 #endif  // SVG_SUPPORT
-#endif  // SVGList_H
+#endif  // SVGList_h
 
 // vim:ts=4:noet

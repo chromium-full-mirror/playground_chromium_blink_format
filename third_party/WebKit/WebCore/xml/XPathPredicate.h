@@ -24,8 +24,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XPathPredicate_H
-#define XPathPredicate_H
+#ifndef XPathPredicate_h
+#define XPathPredicate_h
 
 #ifdef XPATH_SUPPORT
 
@@ -122,4 +122,4 @@ class Predicate : Noncopyable {
 
 #endif  // XPATH_SUPPORT
 
-#endif  // XPathPredicate_H
+#endif  // XPathPredicate_h

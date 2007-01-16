@@ -21,8 +21,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef SVGDistantLightSource_H
-#define SVGDistantLightSource_H
+#ifndef SVGDistantLightSource_h
+#define SVGDistantLightSource_h
 
 #ifdef SVG_SUPPORT
 #include "SVGLightSource.h"
@@ -50,4 +50,4 @@ class SVGDistantLightSource : public SVGLightSource {
 
 #endif  // SVG_SUPPORT
 
-#endif  // SVGDistantLightSource_H
+#endif  // SVGDistantLightSource_h

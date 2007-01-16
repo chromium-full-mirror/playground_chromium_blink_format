@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XSLTProcessor_H
-#define XSLTProcessor_H
+#ifndef JSXSLTProcessor_h
+#define JSXSLTProcessor_h
 
 #ifdef XSLT_SUPPORT
 
@@ -78,4 +78,4 @@ class XSLTProcessorConstructorImp : public DOMObject {
 
 #endif  // XSLT_SUPPORT
 
-#endif  // XSLTProcessor_H
+#endif  // JSXSLTProcessor_h

@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WEBCORE_PLATFORM_WIDGET_H_
-#define WEBCORE_PLATFORM_WIDGET_H_
+#ifndef Widget_h
+#define Widget_h
 
 #include <wtf/Platform.h>
 
@@ -195,4 +195,4 @@ class Widget {
 
 }  // namespace WebCore
 
-#endif  // WEBCORE_PLATFORM_WIDGET_H_
+#endif  // Widget_h

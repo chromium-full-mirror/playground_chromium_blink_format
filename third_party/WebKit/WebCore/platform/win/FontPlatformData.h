@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FontPlatformData_H
-#define FontPlatformData_H
+#ifndef FontPlatformData_h
+#define FontPlatformData_h
 
 #include "StringImpl.h"
 

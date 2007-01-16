@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef BIDI_H
-#define BIDI_H
+#ifndef bidi_h
+#define bidi_h
 
 #include <wtf/unicode/Unicode.h>
 
@@ -133,4 +133,4 @@ struct BidiState;
 
 }  // namespace WebCore
 
-#endif  // BIDI_H
+#endif  // bidi_h

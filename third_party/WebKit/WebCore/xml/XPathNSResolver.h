@@ -24,8 +24,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XPathNSResolver_H
-#define XPathNSResolver_H
+#ifndef XPathNSResolver_h
+#define XPathNSResolver_h
 
 #ifdef XPATH_SUPPORT
 
@@ -52,4 +52,4 @@ class XPathNSResolver : public Shared<XPathNSResolver> {
 
 #endif  // XPATH_SUPPORT
 
-#endif  // XPathNSResolver_H
+#endif  // XPathNSResolver_h

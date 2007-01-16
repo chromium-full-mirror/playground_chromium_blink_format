@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DOM_DocPtr_h
-#define DOM_DocPtr_h
+#ifndef DocPtr_h
+#define DocPtr_h
 
 namespace WebCore {
 
@@ -123,4 +123,4 @@ inline bool operator!=(const T* a, const DocPtr<T>& b) {
 
 }  // namespace WebCore
 
-#endif  // DOM_DocPtr_h
+#endif  // DocPtr_h

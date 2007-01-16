@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef replace_selection_command_h__
-#define replace_selection_command_h__
+#ifndef ReplaceSelectionCommand_h
+#define ReplaceSelectionCommand_h
 
 #include "CompositeEditCommand.h"
 
@@ -122,4 +122,4 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
 }  // namespace WebCore
 
-#endif  // replace_selection_command_h__
+#endif  // ReplaceSelectionCommand_h
