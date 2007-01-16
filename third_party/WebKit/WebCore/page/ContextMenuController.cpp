@@ -83,8 +83,6 @@ void ContextMenuController::handleContextMenuEvent(Event* event) {
   PlatformMenuDescription customMenu =
       m_client->getCustomMenuFromDefaultItems(m_contextMenu.get());
   m_contextMenu->setPlatformDescription(customMenu);
-  m_contextMenu->show();
-
   event->setDefaultHandled();
 }
 
