@@ -32,6 +32,8 @@
 #include "FloatRect.h"
 #include "Shared.h"
 
+class QWebPage;
+
 namespace WebCore {
 
 class FloatRect;
@@ -40,7 +42,7 @@ struct FrameLoadRequest;
 
 class ChromeClientQt : public ChromeClient, public Shared<ChromeClientQt> {
  public:
-  ChromeClientQt();
+  ChromeClientQt(QWebPage* webPage);
   virtual ~ChromeClientQt();
   virtual void chromeDestroyed();
 
@@ -89,6 +91,8 @@ class ChromeClientQt : public ChromeClient, public Shared<ChromeClientQt> {
   virtual bool runBeforeUnloadConfirmPanel(const String& message, Frame* frame);
 
   virtual void closeWindowSoon();
+
+  QWebPage* m_webPage;
 };
 }
 

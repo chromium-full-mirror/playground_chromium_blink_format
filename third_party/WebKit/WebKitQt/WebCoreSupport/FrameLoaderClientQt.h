@@ -34,6 +34,7 @@
 #include "FrameLoader.h"
 #include "Shared.h"
 #include "ResourceResponse.h"
+class QWebFrame;
 
 namespace WebCore {
 
@@ -52,7 +53,7 @@ class FrameLoaderClientQt : public FrameLoaderClient,
  public:
   FrameLoaderClientQt();
   ~FrameLoaderClientQt();
-  void setFrame(FrameQt* frame);
+  void setFrame(QWebFrame* webFrame, FrameQt* frame);
   virtual void detachFrameLoader();
 
   virtual void ref();
@@ -249,6 +250,7 @@ class FrameLoaderClientQt : public FrameLoaderClient,
 
  private:
   Frame* m_frame;
+  QWebFrame* m_webFrame;
   ResourceResponse m_response;
   bool m_firstData;
 };

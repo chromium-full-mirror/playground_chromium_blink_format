@@ -31,6 +31,7 @@
 #include "DocumentLoader.h"
 #include "ResourceResponse.h"
 #include "qdebug.h"
+#include "qwebframe.h"
 
 #define notImplemented()                                                      \
   do {                                                                        \
@@ -44,11 +45,13 @@ FrameLoaderClientQt::FrameLoaderClientQt() : m_frame(0) {}
 
 FrameLoaderClientQt::~FrameLoaderClientQt() {}
 
-void FrameLoaderClientQt::setFrame(FrameQt* frame) {
+void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, FrameQt* frame) {
+  m_webFrame = webFrame;
   m_frame = frame;
 }
 
 void FrameLoaderClientQt::detachFrameLoader() {
+  m_webFrame = 0;
   m_frame = 0;
 }
 
@@ -183,7 +186,7 @@ void FrameLoaderClientQt::loadedFromPageCache() {
 }
 
 void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
-  // notImplemented();
+  emit m_webFrame->loadDone();
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
@@ -387,7 +390,7 @@ bool FrameLoaderClientQt::canHandleRequest(
 }
 
 void FrameLoaderClientQt::partClearedInBegin() {
-  notImplemented();
+  emit m_webFrame->cleared();
 }
 
 void FrameLoaderClientQt::setDocumentViewFromPageCache(WebCore::PageCache*) {

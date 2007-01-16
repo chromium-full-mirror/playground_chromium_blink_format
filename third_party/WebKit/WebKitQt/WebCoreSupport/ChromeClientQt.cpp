@@ -32,7 +32,7 @@
 #include "FrameView.h"
 #include "FrameLoadRequest.h"
 
-#include <QWidget>
+#include "qwebpage.h"
 
 #define notImplemented()                                                  \
   do {                                                                    \
@@ -41,15 +41,7 @@
 
 namespace WebCore {
 
-static QWidget* rootWindowForFrame(const Frame* frame) {
-  FrameView* frameView = (frame ? frame->view() : 0);
-  if (!frameView)
-    return 0;
-
-  return frameView->qwidget();
-}
-
-ChromeClientQt::ChromeClientQt() {}
+ChromeClientQt::ChromeClientQt(QWebPage* webPage) : m_webPage(webPage) {}
 
 ChromeClientQt::~ChromeClientQt() {}
 
@@ -61,31 +53,25 @@ void ChromeClientQt::deref() {
   Shared<ChromeClientQt>::deref();
 }
 
-void ChromeClientQt::setWindowRect(const FloatRect&) {
-  notImplemented();
-#if 0
-    QWidget* widget = rootWindowForFrame(mainFrame());
-    if (widget)
-        widget->setGeometry(QRect(qRound(r.x()), qRound(r.y()),
-                                  qRound(r.width()), qRound(r.height())));
-#endif
+void ChromeClientQt::setWindowRect(const FloatRect& rect) {
+  if (!m_webPage)
+    return;
+  //     m_webPage->emit setWindowRect(QRect(qRound(r.x()), qRound(r.y()),
+  //                                         qRound(r.width()),
+  //                                         qRound(r.height())));
 }
 
 FloatRect ChromeClientQt::windowRect() {
-#if 0
-    QWidget* widget = rootWindowForFrame(mainFrame());
-    if (!widget)
-        return FloatRect();
+  if (!m_webPage)
+    return FloatRect();
 
-    return IntRect(widget->geometry());
-#endif
-  notImplemented();
-  return IntRect(0, 0, 100, 100);
+  return IntRect(m_webPage->topLevelWidget()->geometry());
 }
 
 FloatRect ChromeClientQt::pageRect() {
-  notImplemented();
-  return FloatRect(0, 0, 100, 100);
+  if (!m_webPage)
+    return FloatRect();
+  return FloatRect(QRectF(m_webPage->rect()));
 }
 
 float ChromeClientQt::scaleFactor() {
@@ -94,33 +80,44 @@ float ChromeClientQt::scaleFactor() {
 }
 
 void ChromeClientQt::focus() {
-  notImplemented();
+  if (!m_webPage)
+    return;
+  m_webPage->setFocus();
 }
 
 void ChromeClientQt::unfocus() {
-  notImplemented();
+  if (!m_webPage)
+    return;
+  m_webPage->clearFocus();
 }
 
 bool ChromeClientQt::canTakeFocus(FocusDirection) {
-  notImplemented();
-  return true;
+  if (!m_webPage)
+    return false;
+  return m_webPage->focusPolicy() != Qt::NoFocus;
 }
 
 void ChromeClientQt::takeFocus(FocusDirection) {
-  notImplemented();
+  if (!m_webPage)
+    return;
+  m_webPage->clearFocus();
 }
 
-Page* ChromeClientQt::createWindow(const FrameLoadRequest&) {
+Page* ChromeClientQt::createWindow(const FrameLoadRequest& request) {
+  // QWebPage *newPage = m_webPage->createWindow(...);
   notImplemented();
   return 0;
 }
 
 Page* ChromeClientQt::createModalDialog(const FrameLoadRequest&) {
+  notImplemented();
   return 0;
 }
 
 void ChromeClientQt::show() {
-  notImplemented();
+  if (!m_webPage)
+    return;
+  m_webPage->topLevelWidget()->show();
 }
 
 bool ChromeClientQt::canRunModal() {
@@ -174,14 +171,24 @@ void ChromeClientQt::setResizable(bool) {
 
 void ChromeClientQt::addMessageToConsole(const String& message,
                                          unsigned int lineNumber,
-                                         const String& sourceID) {}
+                                         const String& sourceID) {
+  notImplemented();
+}
 
-void ChromeClientQt::chromeDestroyed() {}
+void ChromeClientQt::chromeDestroyed() {
+  notImplemented();
+}
 
-bool ChromeClientQt::canRunBeforeUnloadConfirmPanel() {}
+bool ChromeClientQt::canRunBeforeUnloadConfirmPanel() {
+  notImplemented();
+}
 
 bool ChromeClientQt::runBeforeUnloadConfirmPanel(const String& message,
-                                                 Frame* frame) {}
+                                                 Frame* frame) {
+  notImplemented();
+}
 
-void ChromeClientQt::closeWindowSoon() {}
+void ChromeClientQt::closeWindowSoon() {
+  notImplemented();
+}
 }
