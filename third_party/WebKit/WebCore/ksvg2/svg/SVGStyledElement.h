@@ -52,6 +52,7 @@ class SVGStyledElement : public SVGElement {
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource() { return 0; }
 
+  virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
 
   RenderView* view() const;
@@ -64,6 +65,8 @@ class SVGStyledElement : public SVGElement {
   void rebuildRenderer() const;
 
   virtual bool hasRelativeValues() const { return false; }
+
+  static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement,
