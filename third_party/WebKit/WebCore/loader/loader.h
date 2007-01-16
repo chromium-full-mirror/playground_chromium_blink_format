@@ -55,8 +55,6 @@ class Loader : private SubresourceLoaderClient {
   int numRequests(DocLoader*) const;
   void cancelRequests(DocLoader*);
 
-  void removeBackgroundDecodingRequest(Request*);
-
  private:
   virtual void didReceiveResponse(SubresourceLoader*, const ResourceResponse&);
   virtual void didReceiveData(SubresourceLoader*, const char*, int);
@@ -68,8 +66,6 @@ class Loader : private SubresourceLoaderClient {
   DeprecatedPtrList<Request> m_requestsPending;
   typedef HashMap<RefPtr<SubresourceLoader>, Request*> RequestMap;
   RequestMap m_requestsLoading;
-
-  DeprecatedPtrList<Request> m_requestsBackgroundDecoding;
 };
 }
 
