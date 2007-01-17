@@ -106,6 +106,9 @@ void DumpRenderTree::readStdin(int /* socket */) {
   if (m_loading)
     fprintf(stderr, "=========================== still loading\n");
 
+  if (m_stdin->atEnd())
+    quit();
+
   // Read incoming data from stdin...
   QByteArray line = m_stdin->readLine();
   if (line.endsWith('\n'))
