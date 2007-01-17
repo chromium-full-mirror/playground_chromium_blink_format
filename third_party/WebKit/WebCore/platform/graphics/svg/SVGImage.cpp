@@ -102,21 +102,17 @@ void SVGImage::draw(GraphicsContext* context,
   context->restore();
 }
 
-void SVGImage::drawTiled(GraphicsContext*,
-                         const FloatRect& dstRect,
-                         const FloatPoint& srcPoint,
-                         const FloatSize& tileSize,
-                         CompositeOperator) {
-  // FIXME: implement to support background images
-}
-
-void SVGImage::drawTiled(GraphicsContext*,
-                         const FloatRect& dstRect,
-                         const FloatRect& srcRect,
-                         TileRule hRule,
-                         TileRule vRule,
-                         CompositeOperator) {
-  // FIXME: implement to support background images
+NativeImagePtr SVGImage::nativeImageForCurrentFrame() {
+  // FIXME: In order to support dynamic SVGs we need to have a way to invalidate
+  // this
+  // frame cache, or better yet, not use a cache for tiled drawing at all,
+  // instead
+  // having a tiled drawing callback (hopefully non-virtual).
+  if (!m_frameCache) {
+    m_frameCache.set(ImageBuffer::create(size(), false).release());
+    ImageBuffer::renderSubtreeToImage(m_frameCache.get(), m_frame->renderer());
+  }
+  return m_frameCache->cgImage();
 }
 
 bool SVGImage::setData(bool allDataReceived) {
