@@ -59,6 +59,13 @@ ProtectionSpaceServerType ProtectionSpace::serverType() const {
   return m_serverType;
 }
 
+bool ProtectionSpace::isProxy() const {
+  return (m_serverType == ProtectionSpaceProxyHTTP ||
+          m_serverType == ProtectionSpaceProxyHTTPS ||
+          m_serverType == ProtectionSpaceProxyFTP ||
+          m_serverType == ProtectionSpaceProxySOCKS);
+}
+
 const String& ProtectionSpace::realm() const {
   return m_realm;
 }
@@ -66,6 +73,14 @@ const String& ProtectionSpace::realm() const {
 ProtectionSpaceAuthenticationScheme ProtectionSpace::authenticationScheme()
     const {
   return m_authenticationScheme;
+}
+
+bool ProtectionSpace::receivesCredentialSecurely() const {
+  return (m_serverType == ProtectionSpaceServerHTTPS ||
+          m_serverType == ProtectionSpaceServerFTPS ||
+          m_serverType == ProtectionSpaceProxyHTTPS ||
+          m_authenticationScheme ==
+              ProtectionSpaceAuthenticationSchemeHTTPDigest);
 }
 
 bool operator==(const ProtectionSpace& a, const ProtectionSpace& b) {
