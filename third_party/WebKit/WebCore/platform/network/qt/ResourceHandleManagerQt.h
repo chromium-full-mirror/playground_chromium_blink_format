@@ -36,6 +36,7 @@
 #include <QThread>
 #include <QString>
 #include <QEvent>
+#include <QUrl>
 
 namespace WebCore {
 
@@ -61,7 +62,7 @@ class RequestQt {
   // not thread safe, don't use in other threads
   KURL url;
 
-  QString qurl;
+  QUrl qurl;
   FrameQtClient* client;
   ResourceHandle* resource;
 

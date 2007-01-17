@@ -185,7 +185,7 @@ void ResourceHandleManager::cancel(ResourceHandle* resource) {
 
   DEBUG() << "ResourceHandleManager::cancel" << resource->url().path();
 
-  RequestQt* request = pendingRequests[resource];
+  RequestQt* request = pendingRequests.take(resource);
   if (!request)
     return;
   request->cancelled = true;
@@ -193,15 +193,12 @@ void ResourceHandleManager::cancel(ResourceHandle* resource) {
   String protocol = request->hostInfo.protocol;
   if (protocol == "http")
     emit networkCancel(request);
-
-  return;
 }
 
 void ResourceHandleManager::receivedResponse(RequestQt* request) {
-  RequestQt* req = pendingRequests.value(request->resource);
-  if (!req || request->cancelled)
+  if (request->cancelled)
     return;
-  Q_ASSERT(req == request);
+  Q_ASSERT(pendingRequests.value(request->resource) == request);
   DEBUG() << "ResourceHandleManager::receivedResponse:";
   DEBUG() << request->response.toString();
 
@@ -255,10 +252,9 @@ void ResourceHandleManager::receivedResponse(RequestQt* request) {
 
 void ResourceHandleManager::receivedData(RequestQt* request,
                                          const QByteArray& data) {
-  RequestQt* req = pendingRequests.value(request->resource);
-  if (!req || request->cancelled || request->redirected)
+  if (request->cancelled)
     return;
-  Q_ASSERT(req == request);
+  Q_ASSERT(pendingRequests.value(request->resource) == request);
 
   ResourceHandleClient* client = request->resource->client();
   if (!client)
@@ -271,11 +267,12 @@ void ResourceHandleManager::receivedData(RequestQt* request,
 
 void ResourceHandleManager::receivedFinished(RequestQt* request,
                                              int errorCode) {
-  DEBUG() << "receivedFinished" << errorCode << request->url.path();
-  RequestQt* req = pendingRequests.value(request->resource);
-  if (!req)
+  if (request->cancelled) {
+    delete request;
     return;
-  Q_ASSERT(req == request);
+  }
+  DEBUG() << "receivedFinished" << errorCode << request->url.path();
+  Q_ASSERT(pendingRequests.value(request->resource) == request);
 
   pendingRequests.remove(request->resource);
 
@@ -289,12 +286,13 @@ void ResourceHandleManager::receivedFinished(RequestQt* request,
   if (!client)
     return;
 
-  if (errorCode || request->cancelled) {
+  if (errorCode) {
     // FIXME: error setting error was removed from ResourceHandle
     client->didFail(request->resource, ResourceError());
   } else {
     client->didFinishLoading(request->resource);
   }
+  DEBUG() << "receivedFinished done" << request->url.path();
   delete request;
 }
 
@@ -357,13 +355,11 @@ void FileLoader::request(RequestQt* request) {
   if (!request->hostInfo.isLocalFile()) {
     statusCode = 404;
   } else if (request->postData.isEmpty()) {
-    QFile f(QString(request->request.path()));
-    DEBUG() << "opening" << QString(request->request.path());
+    QFile f(QString(request->qurl.path()));
+    DEBUG() << "opening" << QString(request->qurl.path());
 
     if (f.open(QIODevice::ReadOnly)) {
       request->response.setStatusLine(200);
-      emit receivedResponse(request);
-
       data = f.readAll();
     } else {
       statusCode = 404;
@@ -388,7 +384,7 @@ void FileLoader::sendData(RequestQt* request,
 }
 
 void FileLoader::parseDataUrl(RequestQt* request) {
-  QByteArray data = request->qurl.toLatin1();
+  QByteArray data = request->qurl.toString().toLatin1();
   // qDebug() << "handling data url:" << data;
 
   ASSERT(data.startsWith("data:"));
@@ -467,10 +463,20 @@ void WebCoreHttp::scheduleNextRequest() {
     if (!connection[c].current)
       break;
   }
-  if (c >= 2 || m_pendingRequests.isEmpty())
+  if (c >= 2)
     return;
 
-  RequestQt* req = m_pendingRequests.takeFirst();
+  RequestQt* req = 0;
+  while (!req && !m_pendingRequests.isEmpty()) {
+    req = m_pendingRequests.takeFirst();
+    if (req->cancelled) {
+      emit m_loader->receivedFinished(req, 1);
+      req = 0;
+    }
+  }
+  if (!req)
+    return;
+
   QHttp* http = connection[c].http;
   if (!req->postData.isEmpty())
     http->request(req->request, req->postData);
