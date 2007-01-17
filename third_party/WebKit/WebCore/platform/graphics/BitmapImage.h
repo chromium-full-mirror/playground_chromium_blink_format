@@ -125,7 +125,14 @@ class BitmapImage : public Image {
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
                     CompositeOperator);
-
+#if PLATFORM(QT)
+  virtual void drawPattern(GraphicsContext*,
+                           const FloatRect& srcRect,
+                           const AffineTransform& patternTransform,
+                           const FloatPoint& phase,
+                           CompositeOperator,
+                           const FloatRect& destRect);
+#endif
   size_t currentFrame() const { return m_currentFrame; }
   size_t frameCount();
   NativeImagePtr frameAtIndex(size_t);

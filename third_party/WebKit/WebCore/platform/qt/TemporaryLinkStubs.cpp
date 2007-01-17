@@ -94,15 +94,6 @@ Color WebCore::focusRingColor() {
   return 0xFF0000FF;
 }
 
-void Image::drawTiled(GraphicsContext*,
-                      const FloatRect&,
-                      const FloatRect&,
-                      TileRule,
-                      TileRule,
-                      CompositeOperator) {
-  notImplemented();
-}
-
 namespace WebCore {
 
 Scrollbar::Scrollbar(ScrollbarClient*,
