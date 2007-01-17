@@ -56,7 +56,7 @@ class RenderBox : public RenderObject {
   virtual int overrideHeight() const;
   virtual void setOverrideSize(int s) { m_overrideSize = s; }
 
-  virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
+  virtual bool absolutePosition(int& x, int& y, bool fixed = false) const;
 
   virtual void setPos(int x, int y);
 

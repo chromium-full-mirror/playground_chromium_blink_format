@@ -666,7 +666,9 @@ class RenderObject : public CachedResourceClient {
   // return just the height of the containing block
   virtual int containingBlockHeight() const;
 
-  // size of the content area (box size minus padding/border)
+  // content area (box minus padding/border)
+  IntRect contentBox() const;
+  IntRect absoluteContentBox() const;
   int contentWidth() const {
     return clientWidth() - paddingLeft() - paddingRight();
   }
@@ -693,9 +695,7 @@ class RenderObject : public CachedResourceClient {
   virtual int yPos() const { return 0; }
 
   // calculate client position of box
-  virtual bool absolutePosition(int& /*xPos*/,
-                                int& /*yPos*/,
-                                bool /*fixed*/ = false);
+  virtual bool absolutePosition(int& x, int& y, bool fixed = false) const;
 
   // This function is used to deal with the extra top space that can occur in
   // table cells (called borderTopExtra).
@@ -703,7 +703,9 @@ class RenderObject : public CachedResourceClient {
   // in.  Any code that wants to
   // accurately deal with the contents of a cell must call this function instad
   // of absolutePosition.
-  void absolutePositionForContent(int& xPos, int& yPos, bool fixed = false) {
+  void absolutePositionForContent(int& xPos,
+                                  int& yPos,
+                                  bool fixed = false) const {
     absolutePosition(xPos, yPos, fixed);
     yPos += borderTopExtra();
   }

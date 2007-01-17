@@ -64,6 +64,7 @@ class HitTestResult {
   String title() const;
   String altDisplayString() const;
   Image* image() const;
+  IntRect imageRect() const;
   KURL absoluteImageURL() const;
   KURL absoluteLinkURL() const;
   String titleDisplayString() const;

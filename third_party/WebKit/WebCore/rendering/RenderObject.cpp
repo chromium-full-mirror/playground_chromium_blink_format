@@ -2563,7 +2563,7 @@ IntRect RenderObject::viewRect() const {
   return view()->viewRect();
 }
 
-bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) {
+bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) const {
   RenderObject* o = parent();
   if (o) {
     o->absolutePosition(xPos, yPos, f);
@@ -3280,6 +3280,19 @@ int RenderObject::maxTopMargin(bool positive) const {
 
 int RenderObject::maxBottomMargin(bool positive) const {
   return positive ? max(0, marginBottom()) : -min(0, marginBottom());
+}
+
+IntRect RenderObject::contentBox() const {
+  return IntRect(borderLeft() + paddingLeft(), borderTop() + paddingTop(),
+                 contentWidth(), contentHeight());
+}
+
+IntRect RenderObject::absoluteContentBox() const {
+  IntRect rect = contentBox();
+  int x, y;
+  absolutePositionForContent(x, y);
+  rect.move(x, y);
+  return rect;
 }
 
 #ifdef SVG_SUPPORT
