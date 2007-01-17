@@ -334,7 +334,7 @@ Window::get
   showModalDialog Window::ShowModalDialog    DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(WindowFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(WindowFunc)
 
 Window::Window(DOMWindow* window)
     : m_frame(window->frame()),
@@ -1417,7 +1417,7 @@ void Window::clear() {
 
   clearAllTimeouts();
   clearProperties();
-  setPrototype(JSDOMWindowProto::self());  // clear the prototype
+  setPrototype(JSDOMWindowPrototype::self());  // clear the prototype
 
   // Now recreate a working global object for the next URL that will use us; but
   // only if we haven't been
@@ -2200,7 +2200,7 @@ const ClassInfo Location::info = {"Location", 0, &LocationTable, 0};
   reload        Location::Reload        DontDelete|Function 0
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(LocationFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(LocationFunc)
 Location::Location(Frame* p) : m_frame(p) {}
 
 JSValue* Location::getValueProperty(ExecState* exec, int token) const {
@@ -2434,7 +2434,7 @@ const ClassInfo Selection::info = {"Selection", 0, &SelectionTable, 0};
   addRange                  Selection::AddRange DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(SelectionFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(SelectionFunc)
 Selection::Selection(Frame* p) : m_frame(p) {}
 
 JSValue* Selection::getValueProperty(ExecState* exec, int token) const {
@@ -2594,7 +2594,7 @@ const ClassInfo History::info = {"History", 0, &HistoryTable, 0};
   go            History::Go             DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(HistoryFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(HistoryFunc)
 
 bool History::getOwnPropertySlot(ExecState* exec,
                                  const Identifier& propertyName,

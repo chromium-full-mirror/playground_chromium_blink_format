@@ -30,7 +30,7 @@ class JSNode;
 
 namespace KJS {
 
-KJS_DEFINE_PROTOTYPE(DOMNodeProto)
+KJS_DEFINE_PROTOTYPE(DOMNodePrototype)
 
 class DOMNode : public DOMObject {
  public:

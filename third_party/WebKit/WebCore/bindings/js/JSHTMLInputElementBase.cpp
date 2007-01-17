@@ -34,7 +34,7 @@ namespace WebCore {
 DontDelete
   selectionEnd          WebCore::JSHTMLInputElementBase::SelectionEnd DontDelete
 @end
-@begin JSHTMLInputElementBaseProtoTable 0
+@begin JSHTMLInputElementBasePrototypeTable 0
 @end
 @begin JSHTMLInputElementBaseFunctionTable 1
   setSelectionRange     WebCore::JSHTMLInputElementBase::SetSelectionRange
@@ -42,14 +42,14 @@ DontDelete|Function 2
 @end
 */
 
-KJS_IMPLEMENT_PROTOFUNC(JSHTMLInputElementBaseProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLInputElementBasePrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("JSHTMLInputElementBase",
-                        JSHTMLInputElementBaseProto,
-                        JSHTMLInputElementBaseProtoFunc)
+                        JSHTMLInputElementBasePrototype,
+                        JSHTMLInputElementBasePrototypeFunction)
 
-JSValue* JSHTMLInputElementBaseProtoFunc::callAsFunction(ExecState*,
-                                                         JSObject*,
-                                                         const List&) {
+JSValue* JSHTMLInputElementBasePrototypeFunction::callAsFunction(ExecState*,
+                                                                 JSObject*,
+                                                                 const List&) {
   return 0;
 }
 
@@ -103,8 +103,8 @@ const ClassInfo JSHTMLInputElementBase::info = {
 JSHTMLInputElementBase::JSHTMLInputElementBase(ExecState* exec,
                                                PassRefPtr<HTMLInputElement> e)
     : KJS::JSHTMLElement(exec, e.get()) {
-  // We don't really need a prototype, just use our parent class's proto
-  setPrototype(KJS::JSHTMLElementProto::self(exec));
+  // We don't really need a prototype, just use our parent class's prototype
+  setPrototype(KJS::JSHTMLElementPrototype::self(exec));
 }
 
 bool JSHTMLInputElementBase::getOwnPropertySlot(ExecState* exec,

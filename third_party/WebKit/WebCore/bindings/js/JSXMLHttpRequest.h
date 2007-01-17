@@ -79,7 +79,7 @@ class JSXMLHttpRequest : public DOMObject {
   virtual void mark();
 
  private:
-  friend class JSXMLHttpRequestProtoFunc;
+  friend class JSXMLHttpRequestPrototypeFunction;
   RefPtr<WebCore::XMLHttpRequest> m_impl;
 };
 

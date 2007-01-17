@@ -82,7 +82,7 @@ class HTMLElementFunction : public InternalFunctionImp {
 };
 
 /*
-@begin JSHTMLDocumentProtoTable 8
+@begin JSHTMLDocumentPrototypeTable 8
 clear                 JSHTMLDocument::Clear             DontDelete|Function 0
 open                  JSHTMLDocument::Open              DontDelete|Function 0
 close                 JSHTMLDocument::Close             DontDelete|Function 0
@@ -93,14 +93,14 @@ captureEvents         JSHTMLDocument::CaptureEvents     DontDelete|Function 0
 releaseEvents         JSHTMLDocument::ReleaseEvents     DontDelete|Function 0
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(JSHTMLDocumentProtoFunc)
-KJS_IMPLEMENT_PROTOTYPE("HTMLDocument",
-                        JSHTMLDocumentProto,
-                        JSHTMLDocumentProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLDocumentPrototypeFunction)
+KJS_IMPLEMENT_PROTOTYPE("DOMHTMLDocument",
+                        JSHTMLDocumentPrototype,
+                        JSHTMLDocumentPrototypeFunction)
 
-JSValue* JSHTMLDocumentProtoFunc::callAsFunction(ExecState* exec,
-                                                 JSObject* thisObj,
-                                                 const List& args) {
+JSValue* JSHTMLDocumentPrototypeFunction::callAsFunction(ExecState* exec,
+                                                         JSObject* thisObj,
+                                                         const List& args) {
   if (!thisObj->inherits(&JSHTMLDocument::info))
     return throwError(exec, TypeError);
   HTMLDocument& doc = *static_cast<HTMLDocument*>(
@@ -156,7 +156,7 @@ JSValue* JSHTMLDocumentProtoFunc::callAsFunction(ExecState* exec,
 }
 
 // FIXME: functions should be in the prototype
-const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &JSDocument::info,
+const ClassInfo JSHTMLDocument::info = {"DOMHTMLDocument", &JSDocument::info,
                                         &HTMLDocumentTable, 0};
 /* Source for HTMLDocumentTable. Use "make hashtables" to regenerate.
 @begin HTMLDocumentTable 30
@@ -197,7 +197,7 @@ const ClassInfo JSHTMLDocument::info = {"HTMLDocument", &JSDocument::info,
 
 JSHTMLDocument::JSHTMLDocument(ExecState* exec, HTMLDocument* d)
     : JSDocument(exec, d) {
-  setPrototype(JSHTMLDocumentProto::self(exec));
+  setPrototype(JSHTMLDocumentPrototype::self(exec));
 }
 
 JSValue* JSHTMLDocument::namedItemGetter(ExecState* exec,
@@ -452,7 +452,7 @@ const ClassInfo JSHTMLElement::frame_info = {
     "HTMLFrameElement", &JSHTMLElement::info, &HTMLFrameElementTable, 0};
 const ClassInfo JSHTMLElement::iFrame_info = {
     "HTMLIFrameElement", &JSHTMLElement::info, &HTMLIFrameElementTable, 0};
-const ClassInfo JSHTMLElement::info = {"HTMLElement", &JSElement::info,
+const ClassInfo JSHTMLElement::info = {"DOMHTMLElement", &JSElement::info,
                                        &HTMLElementTable, 0};
 const ClassInfo JSHTMLElement::marquee_info = {
     "HTMLMarqueeElement", &JSHTMLElement::info, &HTMLMarqueeElementTable, 0};
@@ -555,7 +555,7 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
 
 /*
 
-@begin JSHTMLElementProtoTable 0
+@begin JSHTMLElementPrototypeTable 0
 @end
 
 @begin HTMLElementTable 14
@@ -742,20 +742,20 @@ rows          KJS::JSHTMLElement::FrameSetRows                  DontDelete
 @end
 */
 
-KJS_IMPLEMENT_PROTOFUNC(JSHTMLElementProtoFunc)
-KJS_IMPLEMENT_PROTOTYPE("HTMLElement",
-                        JSHTMLElementProto,
-                        JSHTMLElementProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLElementPrototypeFunction)
+KJS_IMPLEMENT_PROTOTYPE("DOMHTMLElement",
+                        JSHTMLElementPrototype,
+                        JSHTMLElementPrototypeFunction)
 
-JSValue* JSHTMLElementProtoFunc::callAsFunction(ExecState*,
-                                                JSObject*,
-                                                const List&) {
+JSValue* JSHTMLElementPrototypeFunction::callAsFunction(ExecState*,
+                                                        JSObject*,
+                                                        const List&) {
   return 0;
 }
 
 JSHTMLElement::JSHTMLElement(ExecState* exec, HTMLElement* e)
     : WebCore::JSHTMLElement(exec, e) {
-  setPrototype(JSHTMLElementProto::self(exec));
+  setPrototype(JSHTMLElementPrototype::self(exec));
 }
 
 JSValue* JSHTMLElement::selectIndexGetter(ExecState* exec,
@@ -2041,23 +2041,24 @@ HTMLTableSectionElement* toHTMLTableSectionElement(JSValue* val) {
 }
 
 // -------------------------------------------------------------------------
-/* Source for JSHTMLCollectionProtoTable. Use "make hashtables" to regenerate.
-@begin JSHTMLCollectionProtoTable 3
+/* Source for JSHTMLCollectionPrototypeTable. Use "make hashtables" to
+regenerate.
+@begin JSHTMLCollectionPrototypeTable 3
   item          JSHTMLCollection::Item            DontDelete|Function 1
   namedItem     JSHTMLCollection::NamedItem       DontDelete|Function 1
   tags          JSHTMLCollection::Tags            DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(JSHTMLCollectionProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLCollectionPrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("HTMLCollection",
-                        JSHTMLCollectionProto,
-                        JSHTMLCollectionProtoFunc)
+                        JSHTMLCollectionPrototype,
+                        JSHTMLCollectionPrototypeFunction)
 
 const ClassInfo JSHTMLCollection::info = {"Collection", 0, 0, 0};
 
 JSHTMLCollection::JSHTMLCollection(ExecState* exec, HTMLCollection* c)
     : m_impl(c) {
-  setPrototype(JSHTMLCollectionProto::self(exec));
+  setPrototype(JSHTMLCollectionPrototype::self(exec));
 }
 
 JSHTMLCollection::~JSHTMLCollection() {
@@ -2173,9 +2174,9 @@ JSValue* JSHTMLCollection::getNamedItems(ExecState* exec,
   return new DOMNamedNodesCollection(exec, namedItems);
 }
 
-JSValue* JSHTMLCollectionProtoFunc::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List& args) {
+JSValue* JSHTMLCollectionPrototypeFunction::callAsFunction(ExecState* exec,
+                                                           JSObject* thisObj,
+                                                           const List& args) {
   if (!thisObj->inherits(&JSHTMLCollection::info))
     return throwError(exec, TypeError);
   HTMLCollection& coll = *static_cast<JSHTMLCollection*>(thisObj)->impl();

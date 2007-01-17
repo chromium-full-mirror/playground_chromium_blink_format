@@ -45,7 +45,7 @@ class StyleSheetList;
 
 namespace KJS {
 
-KJS_DEFINE_PROTOTYPE(DOMCSSStyleDeclarationProto)
+KJS_DEFINE_PROTOTYPE(DOMCSSStyleDeclarationPrototype)
 
 class DOMCSSStyleDeclaration : public DOMObject {
  public:
@@ -260,7 +260,7 @@ class DOMCSSValue : public DOMObject {
   RefPtr<WebCore::CSSValue> m_impl;
 };
 
-KJS_DEFINE_PROTOTYPE(DOMCSSValueProto)
+KJS_DEFINE_PROTOTYPE(DOMCSSValuePrototype)
 
 JSValue* toJS(ExecState*, WebCore::CSSValue*);
 

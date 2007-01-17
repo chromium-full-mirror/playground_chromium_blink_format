@@ -35,18 +35,18 @@ namespace KJS {
 
 const ClassInfo DOMNodeFilter::info = {"NodeFilter", 0, 0, 0};
 /*
-@begin DOMNodeFilterProtoTable 1
+@begin DOMNodeFilterPrototypeTable 1
   acceptNode    DOMNodeFilter::AcceptNode       DontDelete|Function 0
 @end
 */
-KJS_DEFINE_PROTOTYPE(DOMNodeFilterProto)
-KJS_IMPLEMENT_PROTOFUNC(DOMNodeFilterProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMNodeFilterPrototype)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(DOMNodeFilterPrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("DOMNodeFilter",
-                        DOMNodeFilterProto,
-                        DOMNodeFilterProtoFunc)
+                        DOMNodeFilterPrototype,
+                        DOMNodeFilterPrototypeFunction)
 
 DOMNodeFilter::DOMNodeFilter(ExecState* exec, NodeFilter* nf) : m_impl(nf) {
-  setPrototype(DOMNodeFilterProto::self(exec));
+  setPrototype(DOMNodeFilterPrototype::self(exec));
 }
 
 DOMNodeFilter::~DOMNodeFilter() {
@@ -58,9 +58,9 @@ void DOMNodeFilter::mark() {
   DOMObject::mark();
 }
 
-JSValue* DOMNodeFilterProtoFunc::callAsFunction(ExecState* exec,
-                                                JSObject* thisObj,
-                                                const List& args) {
+JSValue* DOMNodeFilterPrototypeFunction::callAsFunction(ExecState* exec,
+                                                        JSObject* thisObj,
+                                                        const List& args) {
   if (!thisObj->inherits(&KJS::DOMNodeFilter::info))
     return throwError(exec, TypeError);
   NodeFilter& nodeFilter = *static_cast<DOMNodeFilter*>(thisObj)->impl();

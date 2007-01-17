@@ -40,8 +40,8 @@ namespace KJS {
 
 class JSAbstractEventListener;
 
-KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLDocumentProto,
-                                    WebCore::JSDocumentProto)
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLDocumentPrototype,
+                                    WebCore::JSDocumentPrototype)
 
 class JSHTMLDocument : public WebCore::JSDocument {
  public:
@@ -103,8 +103,8 @@ class JSHTMLDocument : public WebCore::JSDocument {
 // depending on the type of element, we inherit JSHTMLElement from
 // WebCore::JSHTMLElement
 // instead of the other way around.
-KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLElementProto,
-                                    WebCore::JSHTMLElementProto)
+KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLElementPrototype,
+                                    WebCore::JSHTMLElementPrototype)
 
 class JSHTMLElement : public WebCore::JSHTMLElement {
  public:
@@ -362,7 +362,7 @@ WebCore::HTMLTableSectionElement* toHTMLTableSectionElement(
     JSValue*);  // returns 0 if passed-in value is not a JSHTMLElement object
                 // for a HTMLTableSectionElement
 
-KJS_DEFINE_PROTOTYPE(JSHTMLCollectionProto)
+KJS_DEFINE_PROTOTYPE(JSHTMLCollectionPrototype)
 
 class JSHTMLCollection : public DOMObject {
  public:

@@ -101,7 +101,7 @@ static bool isCSSPropertyName(const Identifier& JSPropertyName) {
 }
 
 /*
-@begin DOMCSSStyleDeclarationProtoTable 7
+@begin DOMCSSStyleDeclarationPrototypeTable 7
   getPropertyValue      DOMCSSStyleDeclaration::GetPropertyValue
 DontDelete|Function 1
   getPropertyCSSValue   DOMCSSStyleDeclaration::GetPropertyCSSValue
@@ -124,10 +124,10 @@ DontDelete|Function 3
   parentRule            DOMCSSStyleDeclaration::ParentRule DontDelete|ReadOnly
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(DOMCSSStyleDeclarationProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(DOMCSSStyleDeclarationPrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("DOMCSSStyleDeclaration",
-                        DOMCSSStyleDeclarationProto,
-                        DOMCSSStyleDeclarationProtoFunc)
+                        DOMCSSStyleDeclarationPrototype,
+                        DOMCSSStyleDeclarationPrototypeFunction)
 
 const ClassInfo DOMCSSStyleDeclaration::info = {
     "CSSStyleDeclaration", 0, &DOMCSSStyleDeclarationTable, 0};
@@ -135,7 +135,7 @@ const ClassInfo DOMCSSStyleDeclaration::info = {
 DOMCSSStyleDeclaration::DOMCSSStyleDeclaration(ExecState* exec,
                                                CSSStyleDeclaration* s)
     : m_impl(s) {
-  setPrototype(DOMCSSStyleDeclarationProto::self(exec));
+  setPrototype(DOMCSSStyleDeclarationPrototype::self(exec));
 }
 
 DOMCSSStyleDeclaration::~DOMCSSStyleDeclaration() {
@@ -256,9 +256,10 @@ void DOMCSSStyleDeclaration::put(ExecState* exec,
   }
 }
 
-JSValue* DOMCSSStyleDeclarationProtoFunc::callAsFunction(ExecState* exec,
-                                                         JSObject* thisObj,
-                                                         const List& args) {
+JSValue* DOMCSSStyleDeclarationPrototypeFunction::callAsFunction(
+    ExecState* exec,
+    JSObject* thisObj,
+    const List& args) {
   if (!thisObj->inherits(&KJS::DOMCSSStyleDeclaration::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
@@ -387,8 +388,8 @@ const ClassInfo DOMStyleSheetList::info = {"StyleSheetList", 0,
   item          DOMStyleSheetList::Item         DontDelete|Function 1
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(
-    DOMStyleSheetListFunc)  // not really a proto, but doesn't matter
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(
+    DOMStyleSheetListFunc)  // not really a prototype, but doesn't matter
 
 DOMStyleSheetList::DOMStyleSheetList(ExecState* exec,
                                      StyleSheetList* ssl,
@@ -509,20 +510,20 @@ const ClassInfo DOMMediaList::info = {"MediaList", 0, &DOMMediaListTable, 0};
   mediaText     DOMMediaList::MediaText         DontDelete|ReadOnly
   length        DOMMediaList::Length            DontDelete|ReadOnly
 @end
-@begin DOMMediaListProtoTable 3
+@begin DOMMediaListPrototypeTable 3
   item          DOMMediaList::Item              DontDelete|Function 1
   deleteMedium  DOMMediaList::DeleteMedium      DontDelete|Function 1
   appendMedium  DOMMediaList::AppendMedium      DontDelete|Function 1
 @end
 */
-KJS_DEFINE_PROTOTYPE(DOMMediaListProto)
-KJS_IMPLEMENT_PROTOFUNC(DOMMediaListProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMMediaListPrototype)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(DOMMediaListPrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("DOMMediaList",
-                        DOMMediaListProto,
-                        DOMMediaListProtoFunc)
+                        DOMMediaListPrototype,
+                        DOMMediaListPrototypeFunction)
 
 DOMMediaList::DOMMediaList(ExecState* exec, MediaList* ml) : m_impl(ml) {
-  setPrototype(DOMMediaListProto::self(exec));
+  setPrototype(DOMMediaListPrototype::self(exec));
 }
 
 DOMMediaList::~DOMMediaList() {
@@ -584,9 +585,9 @@ JSValue* toJS(ExecState* exec, MediaList* ml) {
   return cacheDOMObject<MediaList, DOMMediaList>(exec, ml);
 }
 
-JSValue* KJS::DOMMediaListProtoFunc::callAsFunction(ExecState* exec,
-                                                    JSObject* thisObj,
-                                                    const List& args) {
+JSValue* KJS::DOMMediaListPrototypeFunction::callAsFunction(ExecState* exec,
+                                                            JSObject* thisObj,
+                                                            const List& args) {
   if (!thisObj->inherits(&KJS::DOMMediaList::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
@@ -617,7 +618,7 @@ const ClassInfo DOMCSSStyleSheet::info = {"CSSStyleSheet", &DOMStyleSheet::info,
 # MSIE extension
   rules         DOMCSSStyleSheet::Rules         DontDelete|ReadOnly
 @end
-@begin DOMCSSStyleSheetProtoTable 6
+@begin DOMCSSStyleSheetPrototypeTable 6
   insertRule    DOMCSSStyleSheet::InsertRule    DontDelete|Function 2
   deleteRule    DOMCSSStyleSheet::DeleteRule    DontDelete|Function 1
 # MSIE extensions
@@ -625,17 +626,18 @@ const ClassInfo DOMCSSStyleSheet::info = {"CSSStyleSheet", &DOMStyleSheet::info,
   removeRule    DOMCSSStyleSheet::RemoveRule    DontDelete|Function 1
 @end
 */
-KJS_DEFINE_PROTOTYPE(DOMCSSStyleSheetProto)
-KJS_IMPLEMENT_PROTOFUNC(DOMCSSStyleSheetProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMCSSStyleSheetPrototype)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(DOMCSSStyleSheetPrototypeFunction)
 KJS_IMPLEMENT_PROTOTYPE("DOMCSSStyleSheet",
-                        DOMCSSStyleSheetProto,
-                        DOMCSSStyleSheetProtoFunc)  // warning, use _WITH_PARENT
-                                                    // if DOMStyleSheet gets a
-                                                    // proto
+                        DOMCSSStyleSheetPrototype,
+                        DOMCSSStyleSheetPrototypeFunction)  // warning, use
+                                                            // _WITH_PARENT if
+                                                            // DOMStyleSheet
+                                                            // gets a prototype
 
 DOMCSSStyleSheet::DOMCSSStyleSheet(ExecState* exec, CSSStyleSheet* ss)
     : DOMStyleSheet(ss) {
-  setPrototype(DOMCSSStyleSheetProto::self(exec));
+  setPrototype(DOMCSSStyleSheetPrototype::self(exec));
 }
 
 DOMCSSStyleSheet::~DOMCSSStyleSheet() {}
@@ -661,9 +663,9 @@ bool DOMCSSStyleSheet::getOwnPropertySlot(ExecState* exec,
       exec, &DOMCSSStyleSheetTable, this, propertyName, slot);
 }
 
-JSValue* DOMCSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
-                                                   JSObject* thisObj,
-                                                   const List& args) {
+JSValue* DOMCSSStyleSheetPrototypeFunction::callAsFunction(ExecState* exec,
+                                                           JSObject* thisObj,
+                                                           const List& args) {
   if (!thisObj->inherits(&KJS::DOMCSSStyleSheet::info))
     return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
@@ -694,7 +696,8 @@ JSValue* DOMCSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
 
 // -------------------------------------------------------------------------
 
-KJS_IMPLEMENT_PROTOFUNC(DOMCSSRuleFunc)  // Not a proto, but doesn't matter
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(
+    DOMCSSRuleFunc)  // Not a prototype, but doesn't matter
 
 DOMCSSRule::DOMCSSRule(ExecState* exec, CSSRule* r) : m_impl(r) {}
 
@@ -932,18 +935,20 @@ JSValue* toJS(ExecState* exec, CSSRule* r) {
 const ClassInfo DOMCSSValue::info = {"CSSValue", 0, &DOMCSSValueTable, 0};
 
 /*
-@begin DOMCSSValueProtoTable 0
+@begin DOMCSSValuePrototypeTable 0
 @end
 @begin DOMCSSValueTable 2
   cssText       DOMCSSValue::CssText            DontDelete|ReadOnly
   cssValueType  DOMCSSValue::CssValueType       DontDelete|ReadOnly
 @end
 */
-KJS_IMPLEMENT_PROTOFUNC(DOMCSSValueProtoFunc)
-KJS_IMPLEMENT_PROTOTYPE("DOMCSSValue", DOMCSSValueProto, DOMCSSValueProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_FUNCTION(DOMCSSValuePrototypeFunction)
+KJS_IMPLEMENT_PROTOTYPE("DOMCSSValue",
+                        DOMCSSValuePrototype,
+                        DOMCSSValuePrototypeFunction)
 
 DOMCSSValue::DOMCSSValue(ExecState* exec, CSSValue* v) : m_impl(v) {
-  setPrototype(DOMCSSValueProto::self(exec));
+  setPrototype(DOMCSSValuePrototype::self(exec));
 }
 
 DOMCSSValue::~DOMCSSValue() {
@@ -981,9 +986,9 @@ void DOMCSSValue::put(ExecState* exec,
     DOMObject::put(exec, propertyName, value, attr);
 }
 
-JSValue* DOMCSSValueProtoFunc::callAsFunction(ExecState*,
-                                              JSObject*,
-                                              const List&) {
+JSValue* DOMCSSValuePrototypeFunction::callAsFunction(ExecState*,
+                                                      JSObject*,
+                                                      const List&) {
   return 0;
 }
 
