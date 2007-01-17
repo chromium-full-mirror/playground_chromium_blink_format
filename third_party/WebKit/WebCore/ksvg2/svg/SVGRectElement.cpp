@@ -100,8 +100,9 @@ void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
     setYBaseValue(SVGLength(this, LengthModeHeight, value));
   else if (attr->name() == SVGNames::rxAttr) {
     setRxBaseValue(SVGLength(this, LengthModeWidth, value));
-    document()->accessSVGExtensions()->reportError(
-        "A negative value for rect <rx> is not allowed");
+    if (rx().value() < 0.0)
+      document()->accessSVGExtensions()->reportError(
+          "A negative value for rect <rx> is not allowed");
   } else if (attr->name() == SVGNames::ryAttr) {
     setRyBaseValue(SVGLength(this, LengthModeHeight, value));
     if (ry().value() < 0.0)
