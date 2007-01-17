@@ -60,6 +60,7 @@ class EditorClientQt : public EditorClient, public Shared<EditorClientQt> {
   virtual void didBeginEditing();
   virtual void respondToChangedContents();
   virtual void didEndEditing();
+  virtual void didWriteSelectionToPasteboard();
 
   virtual bool selectWordBeforeMenuEvent();
   virtual bool isEditable();

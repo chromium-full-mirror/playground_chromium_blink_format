@@ -1266,6 +1266,7 @@ void Editor::copy() {
   }
   Pasteboard::generalPasteboard()->writeSelection(
       selectedRange().get(), canSmartCopyOrDelete(), m_frame);
+  didWriteSelectionToPasteboard();
 }
 
 void Editor::paste() {
@@ -1368,6 +1369,11 @@ void Editor::didBeginEditing() {
 void Editor::didEndEditing() {
   if (client())
     client()->didEndEditing();
+}
+
+void Editor::didWriteSelectionToPasteboard() {
+  if (client())
+    client()->didWriteSelectionToPasteboard();
 }
 
 void Editor::toggleBold() {
