@@ -153,9 +153,6 @@ class RenderObject : public CachedResourceClient {
   RenderObject* previousInPreOrder() const;
   RenderObject* childAt(unsigned) const;
 
-  RenderObject* nextEditable() const;
-  RenderObject* previousEditable() const;
-
   RenderObject* firstLeafChild() const;
   RenderObject* lastLeafChild() const;
 
