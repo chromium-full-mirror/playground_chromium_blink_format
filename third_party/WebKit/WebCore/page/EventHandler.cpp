@@ -281,10 +281,11 @@ bool EventHandler::handleMousePressEvent(
     m_beganSelectingText = false;
 
     if (event.event().clickCount() == 2)
-      return handleMousePressEventDoubleClick(event);
-    if (event.event().clickCount() >= 3)
-      return handleMousePressEventTripleClick(event);
-    swallowEvent = handleMousePressEventSingleClick(event);
+      swallowEvent = handleMousePressEventDoubleClick(event);
+    else if (event.event().clickCount() >= 3)
+      swallowEvent = handleMousePressEventTripleClick(event);
+    else
+      swallowEvent = handleMousePressEventSingleClick(event);
   }
 
   m_mouseDownMayStartAutoscroll =
