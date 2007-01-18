@@ -29,6 +29,7 @@
 #include "EditorInsertAction.h"
 #include <wtf/Forward.h>
 #if PLATFORM(MAC)
+class NSArray;
 class NSData;
 class NSString;
 class NSURL;
@@ -78,6 +79,7 @@ class EditorClient {
   virtual void respondToChangedContents() = 0;
   virtual void didEndEditing() = 0;
   virtual void didWriteSelectionToPasteboard() = 0;
+  virtual void didSetSelectionTypesForPasteboard() = 0;
   //  virtual void webViewDidChangeTypingStyle:(NSNotification *)notification =
   //  0;
   //  virtual void webViewDidChangeSelection:(NSNotification *)notification = 0;
@@ -98,6 +100,9 @@ class EditorClient {
   virtual NSData* dataForArchivedSelection(Frame*) = 0;
 
   virtual NSString* userVisibleString(NSURL*) = 0;
+#ifdef BUILDING_ON_TIGER
+  virtual NSArray* pasteboardTypesForSelection(Frame*) = 0;
+#endif
 #endif
 };
 }

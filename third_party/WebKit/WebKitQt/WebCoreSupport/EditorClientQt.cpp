@@ -100,6 +100,10 @@ void EditorClientQt::didWriteSelectionToPasteboard() {
   notImplemented();
 }
 
+void EditorClientQt::didSetSelectionTypesForPasteboard() {
+  notImplemented();
+}
+
 bool EditorClientQt::selectWordBeforeMenuEvent() {
   notImplemented();
   return false;

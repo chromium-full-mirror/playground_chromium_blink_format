@@ -200,7 +200,6 @@ class Editor {
   PassRefPtr<Clipboard> newGeneralClipboard(ClipboardAccessPolicy policy);
   PassRefPtr<Range> selectedRange();
   void pasteAsPlainTextWithPasteboard(Pasteboard*);
-  Vector<String> pasteboardTypesForSelection();
   void pasteWithPasteboard(Pasteboard*, bool allowPlainText);
   void replaceSelectionWithFragment(PassRefPtr<DocumentFragment> fragment,
                                     bool selectReplacement,

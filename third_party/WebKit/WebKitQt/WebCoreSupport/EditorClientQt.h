@@ -59,6 +59,7 @@ class EditorClientQt : public EditorClient {
   virtual void respondToChangedContents();
   virtual void didEndEditing();
   virtual void didWriteSelectionToPasteboard();
+  virtual void didSetSelectionTypesForPasteboard();
 
   virtual bool selectWordBeforeMenuEvent();
   virtual bool isEditable();
