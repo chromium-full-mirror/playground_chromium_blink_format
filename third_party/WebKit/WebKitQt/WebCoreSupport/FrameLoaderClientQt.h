@@ -58,6 +58,9 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   void slotCallPolicyFunction(int);
  signals:
   void sigCallPolicyFunction(int);
+  void loadStarted(QWebFrame* frame);
+  void loadProgressChanged(double d);
+  void loadFinished(QWebFrame* frame);
 
  public:
   FrameLoaderClientQt();

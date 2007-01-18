@@ -46,6 +46,8 @@ using namespace WebCore;
 
 QWebFrame::QWebFrame(QWebPage* parent)
     : QScrollArea(parent), d(new QWebFramePrivate) {
+  d->page = parent;
+
   d->frameLoaderClient = new FrameLoaderClientQt();
   d->frame = new FrameQt(parent->d->page, 0, new FrameQtClient(),
                          d->frameLoaderClient);
@@ -58,6 +60,7 @@ QWebFrame::QWebFrame(QWebPage* parent)
 
 QWebFrame::QWebFrame(QWebFrame* parent)
     : QScrollArea(parent), d(new QWebFramePrivate) {
+  d->page = parent->d->page;
   //     d->frameLoaderClient = new FrameLoaderClientQt();
   //     d->frame = new FrameQt(page, 0, new FrameQtClient(),
   //     frameLoaderClient);
@@ -100,6 +103,10 @@ QString QWebFrame::innerText() const {
 
 QString QWebFrame::renderTreeDump() const {
   return externalRepresentation(d->frame->renderer());
+}
+
+QWebPage* QWebFrame::page() const {
+  return d->page;
 }
 
 #include "qwebframe.moc"
