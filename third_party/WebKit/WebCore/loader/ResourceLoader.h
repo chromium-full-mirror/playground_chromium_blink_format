@@ -131,14 +131,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
                                     const AuthenticationChallenge& challenge) {
     receivedCancellation(challenge);
   }
-
-#if PLATFORM(MAC)
-  virtual NSCachedURLResponse* willCacheResponse(
-      ResourceHandle*,
-      NSCachedURLResponse* cachedResponse) {
-    return willCacheResponse(cachedResponse);
-  }
-#endif
+  virtual void willCacheResponse(ResourceHandle*, CacheStoragePolicy&);
 
   ResourceHandle* handle() const { return m_handle.get(); }
 
