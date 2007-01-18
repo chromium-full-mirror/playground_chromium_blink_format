@@ -158,9 +158,10 @@ typedef enum ObjectElementType {
 - (NSString*)matchLabels:(NSArray*)labels againstElement:(DOMElement*)element;
 
 - (BOOL)searchFor:(NSString*)string
-        direction:(BOOL)forward
-    caseSensitive:(BOOL)caseFlag
-             wrap:(BOOL)wrapFlag;
+           direction:(BOOL)forward
+       caseSensitive:(BOOL)caseFlag
+                wrap:(BOOL)wrapFlag
+    startInSelection:(BOOL)startInSelection;
 - (unsigned)markAllMatchesForText:(NSString*)string
                     caseSensitive:(BOOL)caseFlag
                             limit:(unsigned)limit;

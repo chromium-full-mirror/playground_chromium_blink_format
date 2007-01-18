@@ -35,6 +35,14 @@
    A version of -1 is returned if the main executable did not link against
    WebKit (should never happen). */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 BOOL WebKitLinkedOnOrAfter(int version);
 int WebKitLinkTimeVersion(void);
 int WebKitRunTimeVersion(void);
+
+#ifdef __cplusplus
+}
+#endif

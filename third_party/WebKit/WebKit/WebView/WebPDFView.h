@@ -35,6 +35,7 @@
 
 @interface WebPDFView : NSView<WebDocumentView,
                                WebDocumentSearching,
+                               WebDocumentIncrementalSearching,
                                WebDocumentSelection,
                                WebDocumentElement,
                                _WebDocumentViewState,
