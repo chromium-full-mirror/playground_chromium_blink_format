@@ -20,6 +20,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
 #include "HTMLImageElement.h"
 
@@ -197,11 +198,10 @@ int HTMLImageElement::width(bool ignorePendingStylesheets) const {
       return m_imageLoader.image()->imageSize().width();
   }
 
-  Document* doc = document();
   if (ignorePendingStylesheets)
-    doc->updateLayoutIgnorePendingStylesheets();
+    document()->updateLayoutIgnorePendingStylesheets();
   else
-    doc->updateLayout();
+    document()->updateLayout();
 
   return renderer() ? renderer()->contentWidth() : 0;
 }
@@ -219,17 +219,16 @@ int HTMLImageElement::height(bool ignorePendingStylesheets) const {
       return m_imageLoader.image()->imageSize().height();
   }
 
-  Document* doc = document();
   if (ignorePendingStylesheets)
-    doc->updateLayoutIgnorePendingStylesheets();
+    document()->updateLayoutIgnorePendingStylesheets();
   else
-    doc->updateLayout();
+    document()->updateLayout();
 
   return renderer() ? renderer()->contentHeight() : 0;
 }
 
 bool HTMLImageElement::isURLAttribute(Attribute* attr) const {
-  return attr->name() == srcAttr ||
+  return attr->name() == srcAttr || attr->name() == lowsrcAttr ||
          (attr->name() == usemapAttr && attr->value().domString()[0] != '#');
 }
 
@@ -292,6 +291,14 @@ String HTMLImageElement::longDesc() const {
 
 void HTMLImageElement::setLongDesc(const String& value) {
   setAttribute(longdescAttr, value);
+}
+
+String HTMLImageElement::lowsrc() const {
+  return document()->completeURL(getAttribute(lowsrcAttr));
+}
+
+void HTMLImageElement::setLowsrc(const String& value) {
+  setAttribute(lowsrcAttr, value);
 }
 
 String HTMLImageElement::src() const {

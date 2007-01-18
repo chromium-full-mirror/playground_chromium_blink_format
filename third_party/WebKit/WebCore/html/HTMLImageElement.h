@@ -95,6 +95,9 @@ class HTMLImageElement : public HTMLElement {
   String longDesc() const;
   void setLongDesc(const String&);
 
+  String lowsrc() const;
+  void setLowsrc(const String&);
+
   String src() const;
   void setSrc(const String&);
 
