@@ -474,7 +474,8 @@ void ReplaceSelectionCommand::doApply() {
   if (selection.isNone() || !selection.start().node())
     return;
 
-  if (!selection.isContentRichlyEditable())
+  bool selectionIsPlainText = !selection.isContentRichlyEditable();
+  if (selectionIsPlainText)
     m_matchStyle = true;
 
   Element* currentRoot = selection.rootEditableElement();
@@ -500,7 +501,8 @@ void ReplaceSelectionCommand::doApply() {
   if (selectionStartWasStartOfParagraph && selectionEndWasEndOfParagraph ||
       startBlock == currentRoot ||
       startBlock && startBlock->renderer() &&
-          startBlock->renderer()->isListItem())
+          startBlock->renderer()->isListItem() ||
+      selectionIsPlainText)
     m_preventNesting = false;
 
   Position insertionPos = selection.start();
