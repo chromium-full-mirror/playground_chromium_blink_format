@@ -869,7 +869,7 @@ WordAwareIterator::WordAwareIterator()
     : m_previousText(0), m_didLookAhead(false) {}
 
 WordAwareIterator::WordAwareIterator(const Range* r)
-    : m_previousText(0), m_didLookAhead(false), m_textIterator(r) {
+    : m_previousText(0), m_didLookAhead(false), m_textIterator(r, RUNFINDER) {
   m_didLookAhead =
       true;   // so we consider the first chunk from the text iterator
   advance();  // get in position over the first chunk of text
