@@ -70,4 +70,8 @@ void ContextMenuItem::setSubMenu(ContextMenu* menu) {}
 void ContextMenuItem::setChecked(bool) {}
 
 void ContextMenuItem::setEnabled(bool) {}
+
+bool ContextMenuItem::enabled() const {
+  return true;
+}
 }

@@ -145,7 +145,9 @@ class ContextMenuItem {
   void setSubMenu(ContextMenu*);
 
   void setChecked(bool = true);
+
   void setEnabled(bool = true);
+  bool enabled() const;
 
   // FIXME: Do we need a keyboard accelerator here?
 
