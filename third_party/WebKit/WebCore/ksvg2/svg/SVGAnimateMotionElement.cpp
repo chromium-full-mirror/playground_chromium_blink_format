@@ -23,6 +23,7 @@
 #ifdef SVG_SUPPORT
 #include "SVGAnimateMotionElement.h"
 
+#include "SVGMPathElement.h"
 #include "SVGPathElement.h"
 #include "SVGTransformList.h"
 
@@ -68,12 +69,16 @@ void SVGAnimateMotionElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 Path SVGAnimateMotionElement::animationPath() {
-#if 0  // disabled until SVGMPathElement is added
-    for (Node* child = firstChild(); child; child->nextSibling()) {
-        if (child->hasName(SVGNames::mPathTag))
-            return static_cast<SVGMPathElement*>(child)->toPathData();
+  for (Node* child = firstChild(); child; child->nextSibling()) {
+    if (child->hasTagName(SVGNames::mpathTag)) {
+      SVGMPathElement* mPath = static_cast<SVGMPathElement*>(child);
+      SVGPathElement* pathElement = mPath->pathElement();
+      if (pathElement)
+        return pathElement->toPathData();
+      // The spec would probably have us throw up an error here, but instead we
+      // try to fall back to the d value
     }
-#endif
+  }
   if (hasAttribute(SVGNames::dAttr))
     return m_path;
   return Path();
