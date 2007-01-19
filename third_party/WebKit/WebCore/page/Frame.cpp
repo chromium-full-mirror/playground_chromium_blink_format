@@ -495,12 +495,14 @@ void Frame::setZoomFactor(int percent) {
 
 void Frame::setJSStatusBarText(const String& text) {
   d->m_kjsStatusBarText = text;
-  setStatusBarText(d->m_kjsStatusBarText);
+  if (d->m_page)
+    d->m_page->chrome()->setStatusbarText(this, d->m_kjsStatusBarText);
 }
 
 void Frame::setJSDefaultStatusBarText(const String& text) {
   d->m_kjsDefaultStatusBarText = text;
-  setStatusBarText(d->m_kjsDefaultStatusBarText);
+  if (d->m_page)
+    d->m_page->chrome()->setStatusbarText(this, d->m_kjsDefaultStatusBarText);
 }
 
 String Frame::jsStatusBarText() const {
@@ -1429,8 +1431,6 @@ void Frame::pageDestroyed() {
     if (Window* w = Window::retrieveWindow(this))
       w->disconnectFrame();
 }
-
-void Frame::setStatusBarText(const String&) {}
 
 void Frame::disconnectOwnerElement() {
   if (d->m_ownerElement) {

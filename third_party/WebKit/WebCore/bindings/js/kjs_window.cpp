@@ -1612,7 +1612,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (frame && frame->document())
         frame->document()->updateRendering();
       exec->dynamicInterpreter()->pauseTimeoutCheck();
-      frame->runJavaScriptAlert(str);
+      if (page)
+        page->chrome()->runJavaScriptAlert(frame, str);
       exec->dynamicInterpreter()->resumeTimeoutCheck();
       return jsUndefined();
     case Window::AToB:
@@ -1643,7 +1644,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (frame && frame->document())
         frame->document()->updateRendering();
       exec->dynamicInterpreter()->pauseTimeoutCheck();
-      bool result = frame->runJavaScriptConfirm(str);
+      bool result = false;
+      if (page)
+        result = page->chrome()->runJavaScriptConfirm(frame, str);
       exec->dynamicInterpreter()->resumeTimeoutCheck();
       return jsBoolean(result);
     }
@@ -1651,11 +1654,11 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (frame && frame->document())
         frame->document()->updateRendering();
       String message = args.size() >= 2 ? args[1]->toString(exec) : UString();
-      bool ok = frame->runJavaScriptPrompt(str, message, str2);
-      if (ok)
+      if (page &&
+          page->chrome()->runJavaScriptPrompt(frame, str, message, str2))
         return jsString(str2);
-      else
-        return jsNull();
+
+      return jsNull();
     }
     case Window::Open: {
       AtomicString frameName = args[1]->isUndefinedOrNull()

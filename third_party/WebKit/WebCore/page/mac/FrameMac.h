@@ -127,16 +127,9 @@ class FrameMac : public Frame {
   // === to be moved into Chrome
 
  public:
-  virtual void setStatusBarText(const String&);
-
   virtual void focusWindow();
   virtual void unfocusWindow();
 
-  virtual void runJavaScriptAlert(const String&);
-  virtual bool runJavaScriptConfirm(const String&);
-  virtual bool runJavaScriptPrompt(const String& message,
-                                   const String& defaultValue,
-                                   String& result);
   virtual bool shouldInterruptJavaScript();
 
   FloatRect customHighlightLineRect(const AtomicString& type,

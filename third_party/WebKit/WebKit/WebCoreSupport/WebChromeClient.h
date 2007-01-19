@@ -83,6 +83,14 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void closeWindowSoon();
 
+  virtual void runJavaScriptAlert(WebCore::Frame*, const WebCore::String&);
+  virtual bool runJavaScriptConfirm(WebCore::Frame*, const WebCore::String&);
+  virtual bool runJavaScriptPrompt(WebCore::Frame*,
+                                   const WebCore::String& message,
+                                   const WebCore::String& defaultValue,
+                                   WebCore::String& result);
+  virtual void setStatusBarText(const WebCore::String&);
+
  private:
   WebView* m_webView;
 };
