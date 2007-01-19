@@ -133,6 +133,8 @@ void SVGImageElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGImageElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 RenderObject* SVGImageElement::createRenderer(RenderArena* arena,

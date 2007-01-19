@@ -132,6 +132,8 @@ void SVGRectElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGRectElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 Path SVGRectElement::toPathData() const {

@@ -100,6 +100,8 @@ void SVGLineElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGLineElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 Path SVGLineElement::toPathData() const {

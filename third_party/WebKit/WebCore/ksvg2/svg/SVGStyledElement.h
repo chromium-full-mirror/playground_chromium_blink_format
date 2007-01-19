@@ -58,6 +58,8 @@ class SVGStyledElement : public SVGElement {
   RenderView* view() const;
 
   virtual void notifyAttributeChange() const;
+  void updateElementInstance(SVGDocumentExtensions*) const;
+
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
  protected:

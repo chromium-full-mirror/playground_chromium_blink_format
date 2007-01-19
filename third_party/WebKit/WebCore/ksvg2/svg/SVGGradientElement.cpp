@@ -153,15 +153,6 @@ Vector<SVGGradientStop> SVGGradientElement::buildStops() const {
   return stops;
 }
 
-void SVGGradientElement::insertedIntoDocument() {
-  SVGElement::insertedIntoDocument();
-  SVGDocumentExtensions* extensions = document()->accessSVGExtensions();
-
-  String resourceId = SVGURIReference::getTarget(id());
-  if (extensions->isPendingResource(resourceId))
-    SVGResource::repaintClients(extensions->removePendingResource(resourceId));
-}
-
 void SVGGradientElement::childrenChanged() {
   notifyAttributeChange();
   SVGStyledElement::childrenChanged();

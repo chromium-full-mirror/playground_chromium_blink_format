@@ -107,6 +107,8 @@ void SVGEllipseElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGEllipseElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 Path SVGEllipseElement::toPathData() const {

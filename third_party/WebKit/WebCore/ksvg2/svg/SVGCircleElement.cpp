@@ -91,6 +91,8 @@ void SVGCircleElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGCircleElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 Path SVGCircleElement::toPathData() const {

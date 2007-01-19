@@ -349,6 +349,8 @@ void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGPathElement::notifyAttributeChange() const {
   if (!ownerDocument()->parsing())
     rebuildRenderer();
+
+  SVGStyledElement::notifyAttributeChange();
 }
 
 SVGPathSegList* SVGPathElement::pathSegList() const {
