@@ -124,6 +124,10 @@ class EventHandler : Noncopyable {
 
   bool sendContextMenuEvent(PlatformMouseEvent);
 
+  void setMouseDownMayStartAutoscroll() {
+    m_mouseDownMayStartAutoscroll = true;
+  }
+
 #if PLATFORM(MAC)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
@@ -144,7 +148,6 @@ class EventHandler : Noncopyable {
   void dragSourceEndedAt(const PlatformMouseEvent&, NSDragOperation);
 
   NSEvent* currentNSEvent();
-
 #endif
 
  private:
