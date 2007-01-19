@@ -27,49 +27,28 @@
  */
 
 #include "config.h"
-#include "GlyphMap.h"
+#include "GlyphPageTreeNode.h"
 
 #include "FontData.h"
-#include "WebCoreSystemInterface.h"
-#include <ApplicationServices/ApplicationServices.h>
+#include <windows.h>
 
 namespace WebCore {
 
-bool GlyphMap::fillPage(GlyphPage* page,
-                        UChar* buffer,
-                        unsigned bufferLength,
-                        const FontData* fontData) {
-  // Use an array of long so we get good enough alignment.
-  long glyphVector[(GLYPH_VECTOR_SIZE + sizeof(long) - 1) / sizeof(long)];
+bool GlyphPage::fill(UChar* buffer,
+                     unsigned bufferLength,
+                     const FontData* fontData) {
+  HDC dc = GetDC((HWND)0);
+  SaveDC(dc);
+  SelectObject(dc, fontData->m_font.hfont());
 
-  OSStatus status = wkInitializeGlyphVector(GlyphPage::size, &glyphVector);
-  if (status != noErr)
-    // This should never happen, perhaps indicates a bad font!  If it does the
-    // font substitution code will find an alternate font.
-    return false;
-
-  wkConvertCharToGlyphs(fontData->m_styleGroup, buffer, bufferLength,
-                        &glyphVector);
-
-  unsigned numGlyphs = wkGetGlyphVectorNumGlyphs(&glyphVector);
-  if (numGlyphs != GlyphPage::size) {
-    // This should never happen, perhaps indicates a bad font?
-    // If it does happen, the font substitution code will find an alternate
-    // font.
-    wkClearGlyphVector(&glyphVector);
-    return false;
-  }
-
-  ATSLayoutRecord* glyphRecord =
-      (ATSLayoutRecord*)wkGetGlyphVectorFirstRecord(glyphVector);
-  for (unsigned i = 0; i < GlyphPage::size; i++) {
-    page->setGlyphDataForIndex(i, glyphRecord->glyphID, fontData);
-    glyphRecord = (ATSLayoutRecord*)((char*)glyphRecord +
-                                     wkGetGlyphVectorRecordSize(glyphVector));
-  }
-  wkClearGlyphVector(&glyphVector);
-
+  TEXTMETRIC tm;
+  GetTextMetrics(dc, &tm);
+  WORD localGlyphBuffer[GlyphPage::size];
+  GetGlyphIndices(dc, buffer, bufferLength, localGlyphBuffer, 0);
+  for (unsigned i = 0; i < GlyphPage::size; i++)
+    setGlyphDataForIndex(i, localGlyphBuffer[i], fontData);
+  RestoreDC(dc, -1);
+  ReleaseDC(0, dc);
   return true;
 }
-
-}  // namespace WebCore
+}

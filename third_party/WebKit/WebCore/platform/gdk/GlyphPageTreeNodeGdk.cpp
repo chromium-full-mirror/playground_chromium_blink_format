@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,28 +29,17 @@
  */
 
 #include "config.h"
-#include "GlyphMap.h"
+#include "GlyphPageTreeNode.h"
+
 #include "FontData.h"
-#include <windows.h>
 
 namespace WebCore {
 
-bool GlyphMap::fillPage(GlyphPage* page,
-                        UChar* buffer,
-                        unsigned bufferLength,
-                        const FontData* fontData) {
-  HDC dc = GetDC((HWND)0);
-  SaveDC(dc);
-  SelectObject(dc, fontData->m_font.hfont());
-
-  TEXTMETRIC tm;
-  GetTextMetrics(dc, &tm);
-  WORD localGlyphBuffer[GlyphPage::size];
-  GetGlyphIndices(dc, buffer, bufferLength, localGlyphBuffer, 0);
-  for (unsigned i = 0; i < GlyphPage::size; i++)
-    page->setGlyphDataForIndex(i, localGlyphBuffer[i], fontData);
-  RestoreDC(dc, -1);
-  ReleaseDC(0, dc);
+bool GlyphPage::fill(UChar* buffer,
+                     unsigned bufferLength,
+                     const FontData* fontData) {
+  for (unsigned i = 0; i < bufferLength; i++)
+    setGlyphDataForIndex(i, fontData->getGlyphIndex(buffer[i]), fontData);
   return true;
 }
 }

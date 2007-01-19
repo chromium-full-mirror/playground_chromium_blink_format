@@ -28,7 +28,7 @@
  */
 
 #include "config.h"
-#include "GlyphMap.h"
+#include "GlyphPageTreeNode.h"
 
 #include "FontData.h"
 #include <wtf/unicode/Unicode.h>
@@ -36,10 +36,9 @@
 
 namespace WebCore {
 
-bool GlyphMap::fillPage(GlyphPage* page,
-                        UChar* buffer,
-                        unsigned bufferLength,
-                        const FontData* fontData) {
+bool GlyphPage::fill(UChar* buffer,
+                     unsigned bufferLength,
+                     const FontData* fontData) {
   bool isUtf16 = bufferLength != GlyphPage::size;
 
   for (unsigned i = 0; i < GlyphPage::size; i++) {
@@ -53,7 +52,7 @@ bool GlyphMap::fillPage(GlyphPage* page,
       character = buffer[i];
     }
 
-    page->setGlyphDataForIndex(i, character, fontData);
+    setGlyphDataForIndex(i, character, fontData);
   }
 
   return true;
