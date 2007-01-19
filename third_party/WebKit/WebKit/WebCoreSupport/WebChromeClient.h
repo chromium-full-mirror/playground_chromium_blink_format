@@ -89,7 +89,7 @@ class WebChromeClient : public WebCore::ChromeClient {
                                    const WebCore::String& message,
                                    const WebCore::String& defaultValue,
                                    WebCore::String& result);
-  virtual void setStatusBarText(const WebCore::String&);
+  virtual void setStatusbarText(const WebCore::String&);
 
  private:
   WebView* m_webView;
