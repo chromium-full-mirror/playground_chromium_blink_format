@@ -150,7 +150,6 @@ void SVGUseElement::notifyAttributeChange() const {
   if (!attached() || ownerDocument()->parsing())
     return;
 
-  fprintf(stderr, "NAC NAC NAC NAC HAMMER!!!!!\n");
   const_cast<SVGUseElement*>(this)->buildPendingResource();
 }
 
