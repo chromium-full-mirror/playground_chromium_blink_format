@@ -1253,6 +1253,7 @@ void Editor::cut() {
   if (shouldDeleteRange(selection.get())) {
     Pasteboard::generalPasteboard()->writeSelection(
         selection.get(), canSmartCopyOrDelete(), m_frame);
+    didWriteSelectionToPasteboard();
     deleteSelectionWithSmartDelete();
   }
 }
