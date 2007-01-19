@@ -89,6 +89,14 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void closeWindowSoon();
 
+  virtual void runJavaScriptAlert(Frame*, const String&);
+  virtual bool runJavaScriptConfirm(Frame*, const String&);
+  virtual bool runJavaScriptPrompt(Frame*,
+                                   const String& message,
+                                   const String& defaultValue,
+                                   String& result);
+  virtual void setStatusbarText(const String&);
+
   QWebPage* m_webPage;
 };
 }
