@@ -110,7 +110,7 @@ class SVGEmptyChromeClient : public ChromeClient {
                                    String& result) {
     return false;
   }
-  virtual void setStatusBarText(const String&) {}
+  virtual void setStatusbarText(const String&) {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
