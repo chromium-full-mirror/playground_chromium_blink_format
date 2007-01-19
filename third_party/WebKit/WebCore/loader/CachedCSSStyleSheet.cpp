@@ -47,9 +47,9 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          const String& charset)
     : CachedResource(url, CSSStyleSheet, cachePolicy, _expireDate),
       m_decoder(new TextResourceDecoder("text/css", charset)) {
-  // It's css we want.
-  setAccept("text/css");
-  // load the file
+  // Prefer text/css but accept any type (dell.com serves a stylesheet
+  // as text/html; see <http://bugs.webkit.org/show_bug.cgi?id=11451>).
+  setAccept("text/css,*/*;q=0.1");
   cache()->loader()->load(dl, this, false);
   m_loading = true;
 }
