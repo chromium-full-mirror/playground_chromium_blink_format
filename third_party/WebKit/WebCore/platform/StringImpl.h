@@ -72,6 +72,7 @@ class StringImpl : public Shared<StringImpl> {
   StringImpl(const KJS::UString&);
   ~StringImpl();
 
+  static PassRefPtr<StringImpl> createStrippingNull(const UChar*, unsigned len);
   static StringImpl* newUninitialized(size_t length, UChar*& characterBuffer);
   static StringImpl* adopt(Vector<UChar>&);
 
