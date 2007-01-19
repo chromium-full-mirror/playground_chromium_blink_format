@@ -90,7 +90,7 @@ class SVGAnimationElement : public SVGElement,
   bool updateForElapsedSeconds(double);
   void handleTimerEvent(double timePercentage);
 
-  double parseClockValue(const String&) const;
+  static double parseClockValue(const String&);
 
   String targetAttribute() const;
   void setTargetAttribute(const String&);
@@ -115,7 +115,7 @@ class SVGAnimationElement : public SVGElement,
                                          int currentItem);
 
   double repeations() const;
-  bool isIndefinite(double value) const;
+  static bool isIndefinite(double value);
 
  protected:
   mutable SVGElement* m_targetElement;
@@ -130,6 +130,7 @@ class SVGAnimationElement : public SVGElement,
   virtual void resetValues() {}
 
   static void parseKeyNumbers(Vector<float>& keyNumbers, const String& value);
+  static void parseBeginOrEndValue(double& number, const String& value);
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,

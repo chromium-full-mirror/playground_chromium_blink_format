@@ -97,10 +97,6 @@ void SVGAnimateMotionElement::applyAnimationToValue(
   ExceptionCode ec;
   if (!isAdditive())
     targetTransforms->clear(ec);
-
-  RefPtr<SVGTransform> targetTransform = new SVGTransform();
-  targetTransform->setMatrix(m_currentTransform);
-  targetTransforms->appendItem(targetTransform.get(), ec);
 }
 }
 
