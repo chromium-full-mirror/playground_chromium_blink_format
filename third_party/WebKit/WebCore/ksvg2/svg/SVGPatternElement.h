@@ -54,7 +54,6 @@ class SVGPatternElement : public SVGStyledElement,
 
   // 'SVGPatternElement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
-
   virtual void notifyAttributeChange() const;
 
   virtual bool rendererIsNeeded(RenderStyle* style) {

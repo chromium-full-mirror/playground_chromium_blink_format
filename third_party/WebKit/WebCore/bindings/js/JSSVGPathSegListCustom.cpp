@@ -26,8 +26,8 @@
 #include "Frame.h"
 #include "JSSVGPathSeg.h"
 #include "SVGDocumentExtensions.h"
+#include "SVGElement.h"
 #include "SVGPathSegList.h"
-#include "SVGStyledElement.h"
 
 #include <wtf/Assertions.h>
 
@@ -44,7 +44,7 @@ static void updatePathSegContextMap(ExecState* exec,
   if (!activeFrame)
     return;
 
-  const SVGStyledElement* context = list->context();
+  const SVGElement* context = list->context();
   ASSERT(context);
 
   // Update the SVGPathSeg* hashmap, so that the JSSVGPathSeg* wrappers, can
@@ -71,7 +71,7 @@ static void removeFromPathSegContextMap(ExecState* exec,
   if (!activeFrame)
     return;
 
-  const SVGStyledElement* context = list->context();
+  const SVGElement* context = list->context();
   ASSERT(context);
 
   SVGDocumentExtensions* extensions =

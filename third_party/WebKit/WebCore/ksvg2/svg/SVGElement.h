@@ -255,6 +255,7 @@ class SVGElement : public StyledElement {
   virtual void insertedIntoDocument();
   virtual void buildPendingResource() {}
 
+  virtual void notifyAttributeChange() const {}
   void sendSVGLoadEventIfPossible(bool sendParentLoadEvents = false);
 
   // Forwarded properties (declared/defined anywhere else in the inheritance

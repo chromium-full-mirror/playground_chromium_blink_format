@@ -40,12 +40,12 @@ class AtomicString;
 class Document;
 class EventListener;
 class Node;
-class SVGElement;
 class String;
-class TimeScheduler;
+class SVGElement;
 class SVGElementInstance;
 class SVGStyledElement;
 class SVGSVGElement;
+class TimeScheduler;
 
 class SVGDocumentExtensions {
  public:
@@ -77,16 +77,18 @@ class SVGDocumentExtensions {
   SVGDocumentExtensions& operator=(const SVGDocumentExtensions&);
 
   template <typename ValueType>
-  HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*> baseValueMap()
+  HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*>* baseValueMap()
       const {
-    static HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*>
-        s_baseValueMap;
+    static HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*>*
+        s_baseValueMap =
+            new HashMap<const SVGElement*, HashMap<StringImpl*, ValueType>*>();
     return s_baseValueMap;
   }
 
   template <typename KeyType>
-  HashMap<const KeyType*, const SVGStyledElement*> genericContextMap() const {
-    static HashMap<const KeyType*, const SVGStyledElement*> s_genericContextMap;
+  HashMap<const KeyType*, const SVGElement*>* genericContextMap() const {
+    static HashMap<const KeyType*, const SVGElement*>* s_genericContextMap =
+        new HashMap<const KeyType*, const SVGElement*>();
     return s_genericContextMap;
   }
 
@@ -113,7 +115,7 @@ class SVGDocumentExtensions {
   ValueType baseValue(const SVGElement* element,
                       const AtomicString& propertyName) const {
     HashMap<StringImpl*, ValueType>* propertyMap =
-        baseValueMap<ValueType>().get(element);
+        baseValueMap<ValueType>()->get(element);
     if (propertyMap)
       return propertyMap->get(propertyName.impl());
 
@@ -125,10 +127,10 @@ class SVGDocumentExtensions {
                     const AtomicString& propertyName,
                     ValueType newValue) {
     HashMap<StringImpl*, ValueType>* propertyMap =
-        baseValueMap<ValueType>().get(element);
+        baseValueMap<ValueType>()->get(element);
     if (!propertyMap) {
       propertyMap = new HashMap<StringImpl*, ValueType>();
-      baseValueMap<ValueType>().set(element, propertyMap);
+      baseValueMap<ValueType>()->set(element, propertyMap);
     }
 
     propertyMap->set(propertyName.impl(), newValue);
@@ -138,7 +140,7 @@ class SVGDocumentExtensions {
   void removeBaseValue(const SVGElement* element,
                        const AtomicString& propertyName) {
     HashMap<StringImpl*, ValueType>* propertyMap =
-        baseValueMap<ValueType>().get(element);
+        baseValueMap<ValueType>()->get(element);
     if (!propertyMap)
       return;
 
@@ -149,7 +151,7 @@ class SVGDocumentExtensions {
   bool hasBaseValue(const SVGElement* element,
                     const AtomicString& propertyName) const {
     HashMap<StringImpl*, ValueType>* propertyMap =
-        baseValueMap<ValueType>().get(element);
+        baseValueMap<ValueType>()->get(element);
     if (propertyMap)
       return propertyMap->contains(propertyName.impl());
 
@@ -158,23 +160,23 @@ class SVGDocumentExtensions {
 
   // Used by several JS wrappers
   template <typename KeyType>
-  const SVGStyledElement* genericContext(const KeyType* obj) const {
-    return genericContextMap<KeyType>().get(obj);
+  const SVGElement* genericContext(const KeyType* obj) const {
+    return genericContextMap<KeyType>()->get(obj);
   }
 
   template <typename KeyType>
-  void setGenericContext(const KeyType* obj, const SVGStyledElement* context) {
-    genericContextMap<KeyType>().set(obj, context);
+  void setGenericContext(const KeyType* obj, const SVGElement* context) {
+    genericContextMap<KeyType>()->set(obj, context);
   }
 
   template <typename KeyType>
   void removeGenericContext(const KeyType* obj) {
-    genericContextMap<KeyType>().remove(obj);
+    genericContextMap<KeyType>()->remove(obj);
   }
 
   template <typename KeyType>
   bool hasGenericContext(const KeyType* obj) {
-    return genericContextMap<KeyType>().contains(obj);
+    return genericContextMap<KeyType>()->contains(obj);
   }
 };
 
@@ -184,7 +186,7 @@ inline String SVGDocumentExtensions::baseValue<String>(
     const SVGElement* element,
     const AtomicString& propertyName) const {
   HashMap<StringImpl*, String>* propertyMap =
-      baseValueMap<String>().get(element);
+      baseValueMap<String>()->get(element);
   if (propertyMap)
     return propertyMap->get(propertyName.impl());
 
@@ -197,7 +199,7 @@ inline FloatRect SVGDocumentExtensions::baseValue<FloatRect>(
     const SVGElement* element,
     const AtomicString& propertyName) const {
   HashMap<StringImpl*, FloatRect>* propertyMap =
-      baseValueMap<FloatRect>().get(element);
+      baseValueMap<FloatRect>()->get(element);
   if (propertyMap)
     return propertyMap->get(propertyName.impl());
 
@@ -209,7 +211,7 @@ template <>
 inline bool SVGDocumentExtensions::baseValue<bool>(
     const SVGElement* element,
     const AtomicString& propertyName) const {
-  HashMap<StringImpl*, bool>* propertyMap = baseValueMap<bool>().get(element);
+  HashMap<StringImpl*, bool>* propertyMap = baseValueMap<bool>()->get(element);
   if (propertyMap)
     return propertyMap->get(propertyName.impl());
 
@@ -222,7 +224,7 @@ inline double SVGDocumentExtensions::baseValue<double>(
     const SVGElement* element,
     const AtomicString& propertyName) const {
   HashMap<StringImpl*, double>* propertyMap =
-      baseValueMap<double>().get(element);
+      baseValueMap<double>()->get(element);
   if (propertyMap)
     return propertyMap->get(propertyName.impl());
 
