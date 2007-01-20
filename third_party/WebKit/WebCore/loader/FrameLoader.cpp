@@ -1064,6 +1064,8 @@ void FrameLoader::finishedParsing() {
   // If not, remove them, relayout, and repaint.
   m_frame->view()->restoreScrollbar();
 
+  m_client->dispatchDidFinishDocumentLoad();
+
   gotoAnchor();
 }
 

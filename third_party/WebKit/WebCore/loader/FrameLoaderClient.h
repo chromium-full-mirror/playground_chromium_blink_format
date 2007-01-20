@@ -125,6 +125,7 @@ class FrameLoaderClient {
   virtual void dispatchDidCommitLoad() = 0;
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) = 0;
   virtual void dispatchDidFailLoad(const ResourceError&) = 0;
+  virtual void dispatchDidFinishDocumentLoad() = 0;
   virtual void dispatchDidFinishLoad() = 0;
   virtual void dispatchDidFirstLayout() = 0;
 

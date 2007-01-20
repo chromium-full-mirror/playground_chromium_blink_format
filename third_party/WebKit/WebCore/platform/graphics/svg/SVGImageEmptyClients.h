@@ -212,6 +212,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) {}
   virtual void dispatchDidFailLoad(const ResourceError&) {}
 #endif
+  virtual void dispatchDidFinishDocumentLoad() {}
   virtual void dispatchDidFinishLoad() {}
   virtual void dispatchDidFirstLayout() {}
 

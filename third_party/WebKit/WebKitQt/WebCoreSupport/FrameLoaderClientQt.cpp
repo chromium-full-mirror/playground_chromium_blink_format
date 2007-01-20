@@ -252,6 +252,10 @@ void FrameLoaderClientQt::dispatchDidCommitLoad() {
   notImplemented();
 }
 
+void FrameLoaderClientQt::dispatchDidFinishDocumentLoad() {
+  notImplemented();
+}
+
 void FrameLoaderClientQt::dispatchDidFinishLoad() {
   notImplemented();
 }

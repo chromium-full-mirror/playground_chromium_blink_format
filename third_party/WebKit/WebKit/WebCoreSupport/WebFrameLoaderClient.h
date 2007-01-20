@@ -128,6 +128,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidCommitLoad();
   virtual void dispatchDidFailProvisionalLoad(const WebCore::ResourceError&);
   virtual void dispatchDidFailLoad(const WebCore::ResourceError&);
+  virtual void dispatchDidFinishDocumentLoad();
   virtual void dispatchDidFinishLoad();
   virtual void dispatchDidFirstLayout();
 
