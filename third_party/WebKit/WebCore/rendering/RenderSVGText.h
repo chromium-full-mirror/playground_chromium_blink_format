@@ -59,6 +59,7 @@ class RenderSVGText : public RenderSVGBlock {
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
                                      bool isOnlyRun = false);
+  virtual bool isSVGText() const { return true; }
 
  private:
   AffineTransform m_transform;
