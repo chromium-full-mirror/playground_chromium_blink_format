@@ -460,9 +460,12 @@ const GlyphData& Font::glyphDataForCharacter(
         characterFontData =
             characterFontData->smallCapsFontData(m_fontDescription);
       if (characterFontData) {
-        GlyphPageTreeNode* fallbackNode =
-            GlyphPageTreeNode::getRootChild(characterFontData, pageNumber);
-        const GlyphData& data = fallbackNode->page()->glyphDataForCharacter(c);
+        GlyphPage* fallbackPage =
+            GlyphPageTreeNode::getRootChild(characterFontData, pageNumber)
+                ->page();
+        const GlyphData& data = fallbackPage
+                                    ? fallbackPage->glyphDataForCharacter(c)
+                                    : characterFontData->missingGlyphData();
         if (!smallCaps)
           page->setGlyphDataForCharacter(c, data.glyph, characterFontData);
         return data;
