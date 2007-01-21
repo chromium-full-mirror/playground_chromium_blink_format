@@ -253,6 +253,8 @@ void HTMLTextAreaElement::setValue(const String& value) {
 
   m_value = valueWithNormalizedLineEndings;
   setValueMatchesRenderer();
+  if (inDocument())
+    document()->updateRendering();
   if (renderer())
     renderer()->updateFromElement();
 
