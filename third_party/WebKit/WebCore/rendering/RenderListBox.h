@@ -66,7 +66,9 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual short baselinePosition(bool firstLine, bool isRootLineBox) const;
   virtual void calcHeight();
 
-  void selectionChanged() { repaint(); }
+  virtual void layout();
+
+  void selectionChanged();
 
   void setOptionsChanged(bool changed) { m_optionsChanged = changed; }
 
@@ -102,8 +104,11 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   void paintItemForeground(PaintInfo&, int tx, int ty, int listIndex);
   void paintItemBackground(PaintInfo&, int tx, int ty, int listIndex);
   bool listIndexIsVisible(int index);
+  void scrollToRevealSelection();
 
   bool m_optionsChanged;
+  bool m_scrollToRevealSelectionAfterLayout;
+  bool m_inAutoscroll;
   int m_optionsWidth;
   int m_indexOffset;
 
