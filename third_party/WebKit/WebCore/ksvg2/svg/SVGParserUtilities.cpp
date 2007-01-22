@@ -62,7 +62,7 @@ bool parseNumber(const UChar*& ptr,
       decimal += (*(ptr++) - '0') * (frac *= 0.1);
   }
 
-  if (ptr < end && *ptr == 'e' || *ptr == 'E') {  // read the exponent part
+  if (ptr < end && (*ptr == 'e' || *ptr == 'E')) {  // read the exponent part
     ptr++;
 
     // read the sign of the exponent
