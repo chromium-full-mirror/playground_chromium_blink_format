@@ -349,9 +349,12 @@ void RenderListBox::paintItemBackground(PaintInfo& paintInfo,
                     : style()->backgroundColor();
 
   // Draw the background for this list box item
-  if (!element->renderStyle() || element->renderStyle()->visibility() != HIDDEN)
-    paintInfo.context->fillRect(itemBoundingBoxRect(tx, ty, listIndex),
-                                backColor);
+  if (!element->renderStyle() ||
+      element->renderStyle()->visibility() != HIDDEN) {
+    IntRect itemRect = itemBoundingBoxRect(tx, ty, listIndex);
+    itemRect.intersect(controlClipRect(tx, ty));
+    paintInfo.context->fillRect(itemRect, backColor);
+  }
 }
 
 bool RenderListBox::isPointInScrollbar(HitTestResult& result,
