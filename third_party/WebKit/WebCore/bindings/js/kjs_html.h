@@ -31,7 +31,6 @@ class HTMLCollection;
 class HTMLDocument;
 class HTMLElement;
 class HTMLOptionsCollection;
-class HTMLSelectElement;
 class HTMLTableCaptionElement;
 class HTMLTableSectionElement;
 }
@@ -125,9 +124,9 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
-  static const ClassInfo select_info, object_info, embed_info, table_info,
-      caption_info, col_info, tablesection_info, tr_info, tablecell_info,
-      frameSet_info, frame_info, iFrame_info, marquee_info;
+  static const ClassInfo object_info, embed_info, table_info, caption_info,
+      col_info, tablesection_info, tr_info, tablecell_info, frameSet_info,
+      frame_info, iFrame_info, marquee_info;
 
   // FIXME: Might make sense to combine this with ClassInfo some day.
   typedef JSValue* (JSHTMLElement::*GetterFunction)(ExecState*,
@@ -141,13 +140,11 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     SetterFunction m_setter;
   };
   const Accessors* accessors() const;
-  static const Accessors select_accessors, object_accessors, embed_accessors,
-      table_accessors, caption_accessors, col_accessors, tablesection_accessors,
-      tr_accessors, tablecell_accessors, frameSet_accessors, frame_accessors,
+  static const Accessors object_accessors, embed_accessors, table_accessors,
+      caption_accessors, col_accessors, tablesection_accessors, tr_accessors,
+      tablecell_accessors, frameSet_accessors, frame_accessors,
       iFrame_accessors, marquee_accessors;
 
-  JSValue* selectGetter(ExecState* exec, int token) const;
-  void selectSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* objectGetter(ExecState* exec, int token) const;
   void objectSetter(ExecState*, int token, JSValue*, const WebCore::String&);
   JSValue* embedGetter(ExecState*, int token) const;
@@ -180,23 +177,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   void marqueeSetter(ExecState*, int token, JSValue*, const WebCore::String&);
 
   enum {
-    SelectAdd,
-    SelectTabIndex,
-    SelectValue,
-    SelectSelectedIndex,
-    SelectLength,
-    SelectRemove,
-    SelectForm,
-    SelectBlur,
-    SelectType,
-    SelectOptions,
-    SelectItem,
-    SelectDisabled,
-    SelectMultiple,
-    SelectName,
-    SelectNamedItem,
-    SelectSize,
-    SelectFocus,
     ObjectHspace,
     ObjectHeight,
     ObjectAlign,
@@ -331,10 +311,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   };
 
  private:
-  static JSValue* selectIndexGetter(ExecState*,
-                                    JSObject*,
-                                    const Identifier&,
-                                    const PropertySlot&);
   static JSValue* framesetNameGetter(ExecState*,
                                      JSObject*,
                                      const Identifier&,
@@ -418,8 +394,8 @@ class ImageConstructorImp : public DOMObject {
   RefPtr<WebCore::Document> m_doc;
 };
 
+JSValue* toJS(ExecState*, WebCore::HTMLOptionsCollection*);
 JSValue* getHTMLCollection(ExecState*, WebCore::HTMLCollection*);
-JSValue* getHTMLOptionsCollection(ExecState*, WebCore::HTMLOptionsCollection*);
 JSValue* getAllHTMLCollection(ExecState*, WebCore::HTMLCollection*);
 
 }  // namespace

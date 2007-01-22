@@ -187,13 +187,12 @@ void HTMLSelectElement::setSelectedIndex(int optionIndex,
   }
 }
 
-int HTMLSelectElement::length() const {
-  int len = 0;
-  unsigned i;
+unsigned HTMLSelectElement::length() const {
+  unsigned len = 0;
   const Vector<HTMLElement*>& items = listItems();
-  for (i = 0; i < items.size(); i++) {
+  for (unsigned i = 0; i < items.size(); ++i) {
     if (items[i]->hasLocalName(optionTag))
-      len++;
+      ++len;
   }
   return len;
 }

@@ -58,6 +58,7 @@
 #include "HTMLPreElement.h"
 #include "HTMLQuoteElement.h"
 #include "HTMLScriptElement.h"
+#include "HTMLSelectElement.h"
 #include "HTMLStyleElement.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLTitleElement.h"
@@ -104,6 +105,7 @@
 #include "JSHTMLPreElement.h"
 #include "JSHTMLQuoteElement.h"
 #include "JSHTMLScriptElement.h"
+#include "JSHTMLSelectElement.h"
 #include "JSHTMLStyleElement.h"
 #include "JSHTMLTextAreaElement.h"
 #include "JSHTMLTitleElement.h"
@@ -124,24 +126,24 @@ typedef DOMNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
                                                      PassRefPtr<HTMLElement>);
 
 #define FOR_EACH_TAG(macro)                                                   \
-  macro(a, Anchor) macro(applet, Applet) macro(area, Area) macro(base, Base)  \
-      macro(basefont, BaseFont) macro(blockquote, Blockquote) macro(          \
-          body, Body) macro(br, BR) macro(button, Button)                     \
-          macro(canvas, Canvas) macro(del, Mod) macro(dir, Directory) macro(  \
-              div, Div) macro(dl, DList) macro(fieldset, FieldSet)            \
-              macro(form, Form) macro(font, Font) macro(h1, Heading)          \
-                  macro(head, Head) macro(hr, HR) macro(html, Html) macro(    \
-                      img, Image) macro(input, Input) macro(isindex, IsIndex) \
-                      macro(label, Label) macro(legend, Legend) macro(li, LI) \
-                          macro(link, Link) macro(map, Map) macro(menu, Menu) \
-                              macro(meta, Meta) macro(ol, OList) macro(       \
-                                  optgroup, OptGroup) macro(option, Option)   \
-                                  macro(p, Paragraph) macro(param, Param)     \
-                                      macro(pre, Pre) macro(q, Quote) macro(  \
-                                          script, Script) macro(style, Style) \
-                                          macro(textarea, TextArea)           \
-                                              macro(title, Title) macro(      \
-                                                  ul, UList)  // end of macro
+  macro(a, Anchor) macro(applet, Applet) macro(area, Area) macro(             \
+      base, Base) macro(basefont, BaseFont) macro(blockquote, Blockquote)     \
+      macro(body, Body) macro(br, BR) macro(button, Button) macro(            \
+          canvas, Canvas) macro(del, Mod) macro(dir, Directory) macro(div,    \
+                                                                      Div)    \
+          macro(dl, DList) macro(fieldset, FieldSet) macro(form, Form) macro( \
+              font, Font) macro(h1, Heading) macro(head, Head) macro(hr, HR)  \
+              macro(html, Html) macro(img, Image) macro(input, Input) macro(  \
+                  isindex, IsIndex) macro(label, Label) macro(legend, Legend) \
+                  macro(li, LI) macro(link, Link) macro(map, Map) macro(      \
+                      menu, Menu) macro(meta, Meta) macro(ol, OList)          \
+                      macro(optgroup, OptGroup) macro(option, Option) macro(  \
+                          p, Paragraph) macro(param, Param) macro(pre, Pre)   \
+                          macro(q, Quote) macro(script, Script)               \
+                              macro(select, Select) macro(style, Style)       \
+                                  macro(textarea, TextArea)                   \
+                                      macro(title, Title)                     \
+                                          macro(ul, UList)  // end of macro
 
 #define CREATE_WRAPPER_FUNCTION(tag, name)                                 \
   static DOMNode* create##name##Wrapper(ExecState* exec,                   \
