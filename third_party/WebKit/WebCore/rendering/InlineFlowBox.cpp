@@ -34,6 +34,7 @@
 #include "RenderListMarker.h"
 #include "RenderTableCell.h"
 #include "RootInlineBox.h"
+#include "Text.h"
 
 #include <math.h>
 
@@ -254,11 +255,12 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
     if (curr->object()->isText()) {
       InlineTextBox* text = static_cast<InlineTextBox*>(curr);
       RenderText* rt = static_cast<RenderText*>(text->object());
-      if (rt->length()) {
+      if (rt->textLength()) {
         if (needsWordSpacing &&
-            DeprecatedChar(rt->text()[text->start()]).isSpace())
-          x += rt->font(m_firstLine)->wordSpacing();
-        needsWordSpacing = !DeprecatedChar(rt->text()[text->end()]).isSpace();
+            DeprecatedChar(rt->characters()[text->start()]).isSpace())
+          x += rt->style(m_firstLine)->font().wordSpacing();
+        needsWordSpacing =
+            !DeprecatedChar(rt->characters()[text->end()]).isSpace();
       }
       text->setXPos(x);
 
@@ -487,7 +489,7 @@ void InlineFlowBox::placeBoxesVertically(int y,
     int overflowTop = 0;
     int overflowBottom = 0;
     if (curr->isText() || curr->isInlineFlowBox()) {
-      const Font& font = curr->object()->font(m_firstLine);
+      const Font& font = curr->object()->style(m_firstLine)->font();
       newBaseline = font.ascent();
       newY += curr->baseline() - newBaseline;
       newHeight = newBaseline + font.descent();
@@ -525,7 +527,7 @@ void InlineFlowBox::placeBoxesVertically(int y,
   }
 
   if (isRootInlineBox()) {
-    const Font& font = object()->font(m_firstLine);
+    const Font& font = object()->style(m_firstLine)->font();
     setHeight(font.ascent() + font.descent());
     setYPos(yPos() + baseline() - font.ascent());
     setBaseline(font.ascent());

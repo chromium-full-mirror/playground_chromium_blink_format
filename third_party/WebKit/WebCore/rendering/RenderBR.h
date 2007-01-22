@@ -45,7 +45,7 @@ class RenderBR : public RenderText {
 
   virtual unsigned width(unsigned /*from*/,
                          unsigned /*len*/,
-                         const Font*,
+                         const Font&,
                          int /*xpos*/) const {
     return 0;
   }

@@ -2805,7 +2805,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
     if (va == BASELINE)
       return vpos;
 
-    const Font& f = parent()->font(firstLine);
+    const Font& f = parent()->style(firstLine)->font();
     int fontsize = f.pixelSize();
 
     if (va == SUB)
@@ -2820,7 +2820,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
     else if (va == TEXT_BOTTOM) {
       vpos += f.descent();
       if (!isReplaced())
-        vpos -= font(firstLine).descent();
+        vpos -= style(firstLine)->font().descent();
     } else if (va == BASELINE_MIDDLE)
       vpos += -lineHeight(firstLine) / 2 + baselinePosition(firstLine);
   }
@@ -2845,7 +2845,7 @@ short RenderObject::lineHeight(bool firstLine, bool /*isRootLineBox*/) const {
 }
 
 short RenderObject::baselinePosition(bool firstLine, bool isRootLineBox) const {
-  const Font& f = font(firstLine);
+  const Font& f = style(firstLine)->font();
   return f.ascent() + (lineHeight(firstLine, isRootLineBox) - f.height()) / 2;
 }
 

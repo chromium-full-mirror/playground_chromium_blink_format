@@ -319,8 +319,8 @@ static void writeTextRun(TextStream& ts,
     if (run.m_dirOverride)
       ts << " override";
   }
-  ts << ": "
-     << quoteAndEscapeNonPrintables(o.data().substring(run.m_start, run.m_len))
+  ts << ": " << quoteAndEscapeNonPrintables(
+                    String(o.text()).substring(run.m_start, run.m_len))
      << "\n";
 }
 

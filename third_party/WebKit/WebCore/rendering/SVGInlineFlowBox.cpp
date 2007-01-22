@@ -176,11 +176,12 @@ static int placePositionedBoxesHorizontally(InlineFlowBox* flow,
       amn = min(amn, x);
       InlineTextBox* text = static_cast<InlineTextBox*>(curr);
       RenderText* rt = static_cast<RenderText*>(text->object());
-      if (rt->length()) {
+      if (rt->textLength()) {
         if (needsWordSpacing &&
-            DeprecatedChar(rt->text()[text->start()]).isSpace())
-          x += rt->font(flow->isFirstLineStyle())->wordSpacing();
-        needsWordSpacing = !DeprecatedChar(rt->text()[text->end()]).isSpace();
+            DeprecatedChar(rt->characters()[text->start()]).isSpace())
+          x += rt->style(flow->isFirstLineStyle())->font().wordSpacing();
+        needsWordSpacing =
+            !DeprecatedChar(rt->characters()[text->end()]).isSpace();
       }
       text->setXPos(x);
       x += text->width();
@@ -281,7 +282,10 @@ static void placeBoxesVerticallyWithAbsBaseline(InlineFlowBox* flow,
                                           heightOfBlock, minY, maxY, baseline,
                                           yPos);
     }
-    const Font& font = curr->object()->font(true);
+    const Font& font =
+        curr->object()
+            ->firstLineStyle()
+            ->font();  // FIXME: Is it right to always use firstLineStyle here?
     int ascent = font.ascent();
     int position = baseline - ascent;
     int height = ascent + font.descent();

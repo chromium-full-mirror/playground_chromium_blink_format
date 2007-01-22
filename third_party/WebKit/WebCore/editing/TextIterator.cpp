@@ -222,7 +222,7 @@ bool TextIterator::handleTextNode() {
   m_lastTextNode = m_node;
 
   RenderText* renderer = static_cast<RenderText*>(m_node->renderer());
-  String str = renderer->string();
+  String str = renderer->text();
 
   // handle pre-formatted text
   if (!renderer->style()->collapseWhiteSpace()) {
@@ -276,7 +276,7 @@ bool TextIterator::handleTextNode() {
 
 void TextIterator::handleTextBox() {
   RenderText* renderer = static_cast<RenderText*>(m_node->renderer());
-  String str = renderer->string();
+  String str = renderer->text();
   int start = m_offset;
   int end = (m_node == m_endContainer) ? m_endOffset : LONG_MAX;
   while (m_textBox) {
@@ -688,7 +688,7 @@ bool SimplifiedBackwardsTextIterator::handleTextNode() {
   m_lastTextNode = m_node;
 
   RenderText* renderer = static_cast<RenderText*>(m_node->renderer());
-  String str = renderer->string();
+  String str = renderer->text();
 
   if (!renderer->firstTextBox() && str.length() > 0)
     return true;
