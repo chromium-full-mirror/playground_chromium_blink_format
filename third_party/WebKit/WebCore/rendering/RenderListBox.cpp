@@ -203,7 +203,7 @@ int RenderListBox::size() const {
 int RenderListBox::numVisibleItems() const {
   // Only count fully visible rows. But don't return 0 even if only part of a
   // row shows.
-  return max(1, (height() + rowSpacing) / itemHeight());
+  return max(1, (contentHeight() + rowSpacing) / itemHeight());
 }
 
 int RenderListBox::numItems() const {
@@ -379,17 +379,21 @@ bool RenderListBox::isPointInScrollbar(HitTestResult& result,
 }
 
 int RenderListBox::listIndexAtOffset(int offsetX, int offsetY) {
-  if (numItems() > 0) {
-    int newOffset = max(0, offsetY / itemHeight()) + m_indexOffset;
-    newOffset = min(max(0, newOffset), numItems() - 1);
-    int scrollbarWidth = m_vBar ? m_vBar->width() : 0;
-    if (offsetX >= borderLeft() + paddingLeft() &&
-        offsetX < absoluteBoundingBoxRect().width() - borderRight() -
-                      paddingRight() - scrollbarWidth)
-      return newOffset;
-  }
+  if (!numItems())
+    return -1;
 
-  return -1;
+  if (offsetY < borderTop() + paddingTop() ||
+      offsetY > height() - paddingBottom() - borderBottom())
+    return -1;
+
+  int scrollbarWidth = m_vBar ? m_vBar->width() : 0;
+  if (offsetX < borderLeft() + paddingLeft() ||
+      offsetX > width() - borderRight() - paddingRight() - scrollbarWidth)
+    return -1;
+
+  int newOffset =
+      (offsetY - borderTop() - paddingTop()) / itemHeight() + m_indexOffset;
+  return newOffset < numItems() ? newOffset : -1;
 }
 
 void RenderListBox::autoscroll() {
@@ -405,9 +409,10 @@ void RenderListBox::autoscroll() {
   int endIndex = -1;
   int rows = numVisibleItems();
   int offset = m_indexOffset;
-  if (offsetY < 0 && scrollToRevealElementAtListIndex(offset - 1))
+  if (offsetY < borderTop() + paddingTop() &&
+      scrollToRevealElementAtListIndex(offset - 1))
     endIndex = offset - 1;
-  else if (offsetY > absoluteBoundingBoxRect().height() &&
+  else if (offsetY > height() - paddingBottom() - borderBottom() &&
            scrollToRevealElementAtListIndex(offset + rows))
     endIndex = offset + rows - 1;
   else
@@ -512,9 +517,9 @@ void RenderListBox::setScrollTop(int newTop) {
 }
 
 IntRect RenderListBox::controlClipRect(int tx, int ty) const {
-  // Clip to the padding box, since we have a scrollbar inside the padding box.
-  return IntRect(tx + borderLeft(), ty + borderTop(), clientWidth(),
-                 clientHeight());
+  IntRect clipRect = contentBox();
+  clipRect.move(tx, ty);
+  return clipRect;
 }
 
 IntRect RenderListBox::windowClipRect() const {
