@@ -47,6 +47,7 @@ class DeleteButtonController;
 class DocumentFragment;
 class EditCommand;
 class EditorClient;
+class EventTargetNode;
 class FontData;
 class Frame;
 class HTMLElement;
@@ -66,6 +67,8 @@ class Editor {
     return m_deleteButtonController.get();
   }
   EditCommand* lastEditCommand() { return m_lastEditCommand.get(); }
+
+  void handleKeyPress(EventTargetNode*, KeyboardEvent*);
 
   bool canEdit() const;
   bool canEditRichly() const;
@@ -217,13 +220,9 @@ class Editor {
   void writeSelectionToPasteboard(Pasteboard*);
 
 #if PLATFORM(MAC)
-  // propogate DOM exception as an ObjC exception
-  void propogateDOMException(ExceptionCode);
-
   void addToKillRing(Range*, bool prepend);
   bool m_startNewKillRingSequence;
 #else
-  void propogateDOMException(ExceptionCode) {}
   void addToKillRing(Range*, bool) {}
 #endif
 };

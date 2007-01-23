@@ -71,6 +71,11 @@ EditorClient* Editor::client() const {
   return 0;
 }
 
+void Editor::handleKeyPress(EventTargetNode* target, KeyboardEvent* event) {
+  if (EditorClient* c = client())
+    c->handleKeyPress(target, event);
+}
+
 bool Editor::canEdit() const {
   SelectionController* selectionController = m_frame->selectionController();
   return selectionController->isCaretOrRange() &&
@@ -170,19 +175,22 @@ void Editor::deleteRange(Range* range,
   if (killRing)
     addToKillRing(range, prepend);
 
-  SelectionController* selectionController = m_frame->selectionController();
-  bool smartDelete = smartDeleteOK ? canSmartCopyOrDelete() : false;
   ExceptionCode ec = 0;
+
+  SelectionController* selectionController = m_frame->selectionController();
+  bool smartDelete = smartDeleteOK && canSmartCopyOrDelete();
   switch (deletionAction) {
     case deleteSelectionAction:
       selectionController->setSelectedRange(range, DOWNSTREAM, true, ec);
-      propogateDOMException(ec);
+      if (ec)
+        return;
       deleteSelectionWithSmartDelete(smartDelete);
       break;
     case deleteKeyAction:
       selectionController->setSelectedRange(
           range, DOWNSTREAM, (granularity != CharacterGranularity), ec);
-      propogateDOMException(ec);
+      if (ec)
+        return;
       if (m_frame->document()) {
         TypingCommand::deleteKeyPressed(m_frame->document(), smartDelete,
                                         granularity);
@@ -192,7 +200,8 @@ void Editor::deleteRange(Range* range,
     case forwardDeleteKeyAction:
       selectionController->setSelectedRange(
           range, DOWNSTREAM, (granularity != CharacterGranularity), ec);
-      propogateDOMException(ec);
+      if (ec)
+        return;
       if (m_frame->document()) {
         TypingCommand::forwardDeleteKeyPressed(m_frame->document(), smartDelete,
                                                granularity);
