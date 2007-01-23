@@ -469,7 +469,7 @@ static IntRect transparencyClipBox(RenderLayer* l) {
   // establish
   // a stacking context.  This means we can just walk the layer tree directly.
   for (RenderLayer* curr = l->firstChild(); curr; curr = curr->nextSibling())
-    clipRect.unite(curr->absoluteBoundingBox());
+    clipRect.unite(transparencyClipBox(curr));
 
   return clipRect;
 }
