@@ -52,7 +52,7 @@ ScrollView::~ScrollView() {}
 
 void ScrollView::setScrollArea(QScrollArea* area) {
   m_area = area;
-  if (isFrameView()) {
+  if (m_area && isFrameView()) {
     ScrollViewCanvasQt* canvas =
         new ScrollViewCanvasQt(static_cast<FrameView*>(this), m_area);
     m_area->setWidget(canvas);
@@ -62,19 +62,25 @@ void ScrollView::setScrollArea(QScrollArea* area) {
 
 void ScrollView::updateContents(const IntRect& updateRect, bool now) {
   // Update is fine for both now=true/false cases
-  if (m_area->widget())
+  if (m_area && m_area->widget())
     m_area->widget()->update(updateRect);
 }
 
 int ScrollView::visibleWidth() const {
+  if (!m_area)
+    return 0;
   return m_area->maximumViewportSize().width();
 }
 
 int ScrollView::visibleHeight() const {
+  if (!m_area)
+    return 0;
   return m_area->maximumViewportSize().height();
 }
 
 FloatRect ScrollView::visibleContentRect() const {
+  if (!m_area)
+    return FloatRect();
   const QSize s(m_area->maximumViewportSize());
 
   return FloatRect(m_area->horizontalScrollBar()->value(),
@@ -82,32 +88,38 @@ FloatRect ScrollView::visibleContentRect() const {
 }
 
 void ScrollView::setContentsPos(int newX, int newY) {
+  if (!m_area)
+    return;
   m_area->horizontalScrollBar()->setValue(newX);
   m_area->verticalScrollBar()->setValue(newY);
 }
 
 void ScrollView::resizeContents(int w, int h) {
-  if (m_area->widget())
+  if (m_area && m_area->widget())
     m_area->widget()->resize(w, h);
 }
 
 int ScrollView::contentsX() const {
+  if (!m_area)
+    return 0;
   return m_area->horizontalScrollBar()->value();
 }
 
 int ScrollView::contentsY() const {
+  if (!m_area)
+    return 0;
   return m_area->verticalScrollBar()->value();
 }
 
 int ScrollView::contentsWidth() const {
-  if (!m_area->widget())
+  if (!m_area || !m_area->widget())
     return 0;
 
   return m_area->widget()->width();
 }
 
 int ScrollView::contentsHeight() const {
-  if (!m_area->widget())
+  if (!m_area || !m_area->widget())
     return 0;
 
   return m_area->widget()->height();
@@ -122,11 +134,15 @@ IntPoint ScrollView::windowToContents(const IntPoint& point) const {
 }
 
 IntSize ScrollView::scrollOffset() const {
+  if (!m_area)
+    return IntSize();
   return IntSize(m_area->horizontalScrollBar()->value(),
                  m_area->verticalScrollBar()->value());
 }
 
 void ScrollView::scrollBy(int dx, int dy) {
+  if (!m_area)
+    return;
   m_area->horizontalScrollBar()->setValue(
       m_area->horizontalScrollBar()->value() + dx);
   m_area->verticalScrollBar()->setValue(m_area->verticalScrollBar()->value() +
@@ -134,6 +150,8 @@ void ScrollView::scrollBy(int dx, int dy) {
 }
 
 ScrollbarMode ScrollView::hScrollbarMode() const {
+  if (!m_area)
+    return ScrollbarAuto;
   switch (m_area->horizontalScrollBarPolicy()) {
     case Qt::ScrollBarAsNeeded:
       return ScrollbarAuto;
@@ -147,6 +165,8 @@ ScrollbarMode ScrollView::hScrollbarMode() const {
 }
 
 ScrollbarMode ScrollView::vScrollbarMode() const {
+  if (!m_area)
+    return ScrollbarAuto;
   switch (m_area->verticalScrollBarPolicy()) {
     case Qt::ScrollBarAsNeeded:
       return ScrollbarAuto;
@@ -165,6 +185,8 @@ void ScrollView::suppressScrollbars(bool suppressed,
 }
 
 void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
+  if (!m_area)
+    return;
   switch (newMode) {
     case ScrollbarAuto:
       m_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -179,6 +201,8 @@ void ScrollView::setHScrollbarMode(ScrollbarMode newMode) {
 }
 
 void ScrollView::setVScrollbarMode(ScrollbarMode newMode) {
+  if (!m_area)
+    return;
   switch (newMode) {
     case ScrollbarAuto:
       m_area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);

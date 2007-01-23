@@ -204,11 +204,17 @@ void FrameLoaderClientQt::detachedFromParent2() {
 }
 
 void FrameLoaderClientQt::detachedFromParent3() {
+  if (!m_webFrame)
+    return;
+  if (m_webFrame->d->frameView)
+    m_webFrame->d->frameView->setScrollArea(0);
   m_webFrame->d->frameView = 0;
 }
 
 void FrameLoaderClientQt::detachedFromParent4() {
   delete m_webFrame;
+  m_webFrame = 0;
+  m_frame = 0;
 }
 
 void FrameLoaderClientQt::loadedFromPageCache() {
@@ -216,7 +222,8 @@ void FrameLoaderClientQt::loadedFromPageCache() {
 }
 
 void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
-  emit m_webFrame->loadDone();
+  if (m_webFrame)
+    emit m_webFrame->loadDone();
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
@@ -303,15 +310,18 @@ void FrameLoaderClientQt::clearUnarchivingState(DocumentLoader*) {
 }
 
 void FrameLoaderClientQt::postProgressStartedNotification() {
-  emit loadStarted(m_webFrame);
+  if (m_webFrame && m_frame->page())
+    emit loadStarted(m_webFrame);
 }
 
 void FrameLoaderClientQt::postProgressEstimateChangedNotification() {
-  emit loadProgressChanged(m_frame->page()->progress()->estimatedProgress());
+  if (m_webFrame && m_frame->page())
+    emit loadProgressChanged(m_frame->page()->progress()->estimatedProgress());
 }
 
 void FrameLoaderClientQt::postProgressFinishedNotification() {
-  emit loadFinished(m_webFrame);
+  if (m_webFrame && m_frame->page())
+    emit loadFinished(m_webFrame);
 }
 
 void FrameLoaderClientQt::setMainFrameDocumentReady(bool b) {
@@ -413,6 +423,7 @@ void FrameLoaderClientQt::dispatchDidReceiveIcon() {
 }
 
 void FrameLoaderClientQt::frameLoaderDestroyed() {
+  m_webFrame = 0;
   m_frame = 0;
   delete this;
 }
@@ -423,7 +434,8 @@ bool FrameLoaderClientQt::canHandleRequest(
 }
 
 void FrameLoaderClientQt::windowObjectCleared() const {
-  emit m_webFrame->cleared();
+  if (m_webFrame)
+    emit m_webFrame->cleared();
 }
 
 void FrameLoaderClientQt::setDocumentViewFromPageCache(WebCore::PageCache*) {
