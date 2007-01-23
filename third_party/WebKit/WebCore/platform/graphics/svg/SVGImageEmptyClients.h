@@ -133,9 +133,6 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void makeDocumentView() {}
   virtual void makeRepresentation(DocumentLoader*) {}
-#if PLATFORM(MAC)
-  virtual void setDocumentViewFromPageCache(NSDictionary*) {}
-#endif
   virtual void forceLayout() {}
   virtual void forceLayoutForNonHTML() {}
 
@@ -150,14 +147,12 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void setCopiesOnScroll() {}
 
-  virtual void detachedFromParent1() {}
   virtual void detachedFromParent2() {}
   virtual void detachedFromParent3() {}
   virtual void detachedFromParent4() {}
 
   virtual void loadedFromPageCache() {}
 
-#if PLATFORM(MAC)
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
                         const ResourceResponse&) {}
@@ -195,7 +190,6 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                                                       int length) {
     return false;
   }
-#endif
 
   virtual void dispatchDidHandleOnloadEvents() {}
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() {}
@@ -209,20 +203,15 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void dispatchDidStartProvisionalLoad() {}
   virtual void dispatchDidReceiveTitle(const String& title) {}
   virtual void dispatchDidCommitLoad() {}
-#if PLATFORM(MAC)
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) {}
   virtual void dispatchDidFailLoad(const ResourceError&) {}
-#endif
   virtual void dispatchDidFinishDocumentLoad() {}
   virtual void dispatchDidFinishLoad() {}
   virtual void dispatchDidFirstLayout() {}
 
-#if PLATFORM(MAC)
   virtual Frame* dispatchCreatePage() { return 0; }
-#endif
   virtual void dispatchShow() {}
 
-#if PLATFORM(MAC)
   virtual void dispatchDecidePolicyForMIMEType(FramePolicyFunction,
                                                const String& MIMEType,
                                                const ResourceRequest&) {}
@@ -235,12 +224,9 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
                                                        const NavigationAction&,
                                                        const ResourceRequest&) {
   }
-#endif
   virtual void cancelPolicyCheck() {}
 
-#if PLATFORM(MAC)
   virtual void dispatchUnableToImplementPolicy(const ResourceError&) {}
-#endif
 
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>) {}
@@ -249,9 +235,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void clearLoadingFromPageCache(DocumentLoader*) {}
   virtual bool isLoadingFromPageCache(DocumentLoader*) { return 0; }
   virtual void revertToProvisionalState(DocumentLoader*) {}
-#if PLATFORM(MAC)
   virtual void setMainDocumentError(DocumentLoader*, const ResourceError&) {}
-#endif
   virtual void clearUnarchivingState(DocumentLoader*) {}
 
   virtual void willChangeEstimatedProgress() {}
@@ -262,20 +246,15 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
 
   virtual void setMainFrameDocumentReady(bool) {}
 
-#if PLATFORM(MAC)
   virtual void startDownload(const ResourceRequest&) {}
-#endif
 
   virtual void willChangeTitle(DocumentLoader*) {}
   virtual void didChangeTitle(DocumentLoader*) {}
 
-#if PLATFORM(MAC)
   virtual void committedLoad(DocumentLoader*, const char*, int) {}
-#endif
   virtual void finishedLoading(DocumentLoader*) {}
   virtual void finalSetupForReplace(DocumentLoader*) {}
 
-#if PLATFORM(MAC)
   virtual ResourceError cancelledError(const ResourceRequest&) {
     return ResourceError();
   }
@@ -294,17 +273,14 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   }
 
   virtual bool shouldFallBack(const ResourceError&) { return false; }
-#endif
 
   virtual void setDefersLoading(bool) {}
 
-#if PLATFORM(MAC)
   virtual bool willUseArchive(ResourceLoader*,
                               const ResourceRequest&,
                               const KURL& originalURL) const {
     return false;
   }
-#endif
   virtual bool isArchiveLoadPending(ResourceLoader*) const { return false; }
   virtual void cancelPendingArchiveLoad(ResourceLoader*) {}
   virtual void clearArchivedResources() {}
@@ -328,12 +304,10 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void didFinishLoad() {}
   virtual void prepareForDataSourceReplacement() {}
 
-#if PLATFORM(MAC)
   virtual PassRefPtr<DocumentLoader> createDocumentLoader(
       const ResourceRequest& request) {
     return new DocumentLoader(request);
   }
-#endif
   virtual void setTitle(const String& title, const KURL&) {}
 
   virtual String userAgent() { return ""; }
@@ -345,6 +319,40 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void saveScrollPositionAndViewStateToItem(HistoryItem*) {}
   virtual void saveDocumentViewToPageCache(PageCache*) {}
   virtual bool canCachePage() const { return false; }
+
+  virtual Frame* createFrame(const KURL& url,
+                             const String& name,
+                             HTMLFrameOwnerElement* ownerElement,
+                             const String& referrer,
+                             bool allowsScrolling,
+                             int marginWidth,
+                             int marginHeight) {
+    return 0;
+  }
+  virtual Widget* createPlugin(Element*,
+                               const KURL&,
+                               const Vector<String>&,
+                               const Vector<String>&,
+                               const String&,
+                               bool) {
+    return 0;
+  }
+  virtual Widget* createJavaAppletWidget(const IntSize&,
+                                         Element*,
+                                         const KURL&,
+                                         const Vector<String>&,
+                                         const Vector<String>&) {
+    return 0;
+  }
+
+  virtual ObjectContentType objectContentType(const KURL& url,
+                                              const String& mimeType) {
+    return ObjectContentType();
+  }
+  virtual String overrideMediaType() const { return String(); }
+
+  virtual void redirectDataToPlugin(WebCore::Widget*) {}
+  virtual void windowObjectCleared() const {}
 };
 
 class SVGEmptyEditorClient : public EditorClient {

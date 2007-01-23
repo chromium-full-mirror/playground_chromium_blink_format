@@ -65,6 +65,13 @@ enum NavigationType {
   NavigationTypeFormResubmitted,
   NavigationTypeOther
 };
+
+enum ObjectContentType {
+  ObjectContentNone,
+  ObjectContentImage,
+  ObjectContentFrame,
+  ObjectContentPlugin
+};
 }
 
 #endif

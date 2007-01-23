@@ -26,10 +26,16 @@
 #include "qwebframe.h"
 #include "qwebpage_p.h"
 
+#include "KURL.h"
+#include "PlatformString.h"
+#include "FrameView.h"
+#include "wtf/RefPtr.h"
+
 namespace WebCore {
 class FrameLoaderClientQt;
 class FrameQt;
 class FrameView;
+class HTMLFrameOwnerElement;
 }
 class QWebPage;
 
@@ -37,9 +43,21 @@ class QWebFramePrivate {
  public:
   QWebFramePrivate() : frameLoaderClient(0), frame(0), frameView(0), page(0) {}
   WebCore::FrameLoaderClientQt* frameLoaderClient;
-  WebCore::FrameQt* frame;
-  WebCore::FrameView* frameView;
+  WTF::RefPtr<WebCore::FrameQt> frame;
+  WTF::RefPtr<WebCore::FrameView> frameView;
   QWebPage* page;
+};
+
+class QWebFrameData {
+ public:
+  WebCore::KURL url;
+  WebCore::String name;
+  WebCore::HTMLFrameOwnerElement* ownerElement;
+
+  WebCore::String referrer;
+  bool allowsScrolling;
+  int marginWidth;
+  int marginHeight;
 };
 
 #endif

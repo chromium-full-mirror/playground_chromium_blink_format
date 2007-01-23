@@ -190,6 +190,8 @@ Frame::Frame(Page* page,
     ownerElement->m_contentFrame = this;
   }
 
+  setSettings(page->settings());
+
 #ifndef NDEBUG
   ++FrameCounter::count;
 #endif

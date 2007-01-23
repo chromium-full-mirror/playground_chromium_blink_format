@@ -83,13 +83,6 @@ struct WindowFeatures;
 template <typename T>
 class Timer;
 
-enum ObjectContentType {
-  ObjectContentNone,
-  ObjectContentImage,
-  ObjectContentFrame,
-  ObjectContentPlugin
-};
-
 typedef HashSet<RefPtr<ResourceLoader>> ResourceLoaderSet;
 
 bool isBackForwardLoadType(FrameLoadType);
@@ -196,9 +189,6 @@ class FrameLoader : Noncopyable {
   // Also not cool.
   void stopLoadingPlugIns();
   void stopLoadingSubresources();
-#if PLATFORM(MAC)
-  void closeBridge();
-#endif
   void cancelMainResourceLoad(const ResourceError&);
   void stopAllLoaders();
   void cancelMainResourceLoad();
@@ -346,10 +336,6 @@ class FrameLoader : Noncopyable {
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& URL,
                     const AtomicString& frameName);
-  Frame* createFrame(const KURL& URL,
-                     const String& name,
-                     HTMLFrameOwnerElement*,
-                     const String& referrer);
   Frame* loadSubframe(HTMLFrameOwnerElement*,
                       const KURL& URL,
                       const String& name,
@@ -436,8 +422,6 @@ class FrameLoader : Noncopyable {
 
   String overrideMediaType() const;
 
-  void redirectDataToPlugin(Widget* pluginWidget);
-
   Frame* opener();
   void setOpener(Frame*);
   bool openedByJavaScript();
@@ -490,15 +474,7 @@ class FrameLoader : Noncopyable {
 
   KURL completeURL(const String& URL);
 
-  Widget* createPlugin(Element*,
-                       const KURL&,
-                       const Vector<String>& paramNames,
-                       const Vector<String>& paramValues,
-                       const String& mimeType);
-
   void clear(bool clearWindowProperties = true);
-
-  ObjectContentType objectContentType(const KURL& url, const String& mimeType);
 
   void didTellBridgeAboutLoad(const String& URL);
   bool haveToldBridgeAboutLoad(const String& URL);
