@@ -39,6 +39,8 @@ class Chrome;
 class ChromeClient;
 class ContextMenuClient;
 class ContextMenuController;
+class DragClient;
+class DragController;
 class EditorClient;
 class FocusController;
 class Frame;
@@ -49,7 +51,7 @@ class Settings;
 
 class Page : Noncopyable {
  public:
-  Page(ChromeClient*, ContextMenuClient*, EditorClient*);
+  Page(ChromeClient*, ContextMenuClient*, EditorClient*, DragClient*);
   ~Page();
 
   EditorClient* editorClient() const { return m_editorClient; }
@@ -87,6 +89,7 @@ class Page : Noncopyable {
   SelectionController* dragCaretController() const {
     return m_dragCaretController.get();
   }
+  DragController* dragController() const { return m_dragController.get(); }
   FocusController* focusController() const { return m_focusController.get(); }
   ContextMenuController* contextMenuController() const {
     return m_contextMenuController.get();
@@ -108,6 +111,7 @@ class Page : Noncopyable {
  private:
   OwnPtr<Chrome> m_chrome;
   OwnPtr<SelectionController> m_dragCaretController;
+  OwnPtr<DragController> m_dragController;
   OwnPtr<FocusController> m_focusController;
   OwnPtr<ContextMenuController> m_contextMenuController;
   RefPtr<BackForwardList> m_backForwardList;

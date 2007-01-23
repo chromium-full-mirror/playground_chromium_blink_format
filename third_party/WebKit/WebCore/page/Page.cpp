@@ -26,6 +26,7 @@
 #include "ContextMenuClient.h"
 #include "ContextMenuController.h"
 #include "EditorClient.h"
+#include "DragController.h"
 #include "FocusController.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -51,9 +52,11 @@ static HashMap<String, HashSet<Page*>*>* frameNamespaces;
 
 Page::Page(ChromeClient* chromeClient,
            ContextMenuClient* contextMenuClient,
-           EditorClient* editorClient)
+           EditorClient* editorClient,
+           DragClient* dragClient)
     : m_chrome(new Chrome(this, chromeClient)),
       m_dragCaretController(new SelectionController(0, true)),
+      m_dragController(new DragController(this, dragClient)),
       m_focusController(new FocusController(this)),
       m_contextMenuController(
           new ContextMenuController(this, contextMenuClient)),

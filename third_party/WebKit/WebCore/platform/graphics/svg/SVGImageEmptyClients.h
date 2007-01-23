@@ -30,6 +30,7 @@
 
 #include "ChromeClient.h"
 #include "ContextMenuClient.h"
+#include "DragClient.h"
 #include "EditorClient.h"
 #include "FocusDirection.h"
 #include "FrameLoaderClient.h"
@@ -432,6 +433,17 @@ class SVGEmptyContextMenuClient : public ContextMenuClient {
 #if PLATFORM(MAC)
   virtual void searchWithSpotlight() {}
 #endif
+};
+
+class SVGEmptyDragClient : public DragClient {
+ public:
+  virtual ~SVGEmptyDragClient() {}
+  virtual void willPerformDragDestinationAction(DragDestinationAction,
+                                                DragData*) {}
+  virtual DragDestinationAction actionMaskForDrag(DragData*) {
+    return DragDestinationActionNone;
+  }
+  virtual void dragControllerDestroyed() {}
 };
 }
 

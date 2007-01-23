@@ -92,9 +92,13 @@ class Editor {
   void indent();
   void outdent();
 
+  bool shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
+                            PassRefPtr<Range> replacingDOMRange,
+                            EditorInsertAction givenAction);
   bool shouldInsertText(String, Range*, EditorInsertAction) const;
   bool shouldShowDeleteInterface(HTMLElement*) const;
   bool shouldDeleteRange(Range*) const;
+  bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
 
   void respondToChangedSelection(const Selection& oldSelection);
   void respondToChangedContents(const Selection& endingSelection);
@@ -181,6 +185,8 @@ class Editor {
   void toggleUnderline();
   void setBaseWritingDirection(String);
 
+  bool smartInsertDeleteEnabled();
+
 #if PLATFORM(MAC)
   NSString* userVisibleString(NSURL*);
   void setStartNewKillRingSequence(bool flag) {
@@ -208,9 +214,6 @@ class Editor {
   void replaceSelectionWithText(String text,
                                 bool selectReplacement,
                                 bool smartReplace);
-  bool shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
-                            PassRefPtr<Range> replacingDOMRange,
-                            EditorInsertAction givenAction);
   void writeSelectionToPasteboard(Pasteboard*);
 
 #if PLATFORM(MAC)
