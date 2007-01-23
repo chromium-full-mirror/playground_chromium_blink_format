@@ -38,7 +38,9 @@ const JSClassDefinition kJSClassDefinitionEmpty = {0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
                              OpaqueJSClass* protoClass)
-    : refCount(0),
+    : refCount(0)
+      // FIXME: <rdar://problem/4949018>
+      ,
       className(definition->className),
       parentClass(definition->parentClass),
       prototypeClass(0),
@@ -59,6 +61,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (JSStaticValue* staticValue = definition->staticValues) {
     staticValues = new StaticValuesTable();
     while (staticValue->name) {
+      // FIXME: <rdar://problem/4949018>
       staticValues->add(Identifier(staticValue->name).ustring().rep(),
                         new StaticValueEntry(staticValue->getProperty,
                                              staticValue->setProperty,
@@ -70,6 +73,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (JSStaticFunction* staticFunction = definition->staticFunctions) {
     staticFunctions = new StaticFunctionsTable();
     while (staticFunction->name) {
+      // FIXME: <rdar://problem/4949018>
       staticFunctions->add(
           Identifier(staticFunction->name).ustring().rep(),
           new StaticFunctionEntry(staticFunction->callAsFunction,

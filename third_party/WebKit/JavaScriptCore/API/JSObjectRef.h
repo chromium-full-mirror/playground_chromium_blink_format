@@ -387,7 +387,7 @@ property's value. May be NULL if the ReadOnly attribute is set.
 property.
 */
 typedef struct {
-  const char* const name;  // FIXME: convert UTF8
+  const char* const name;
   JSObjectGetPropertyCallback getProperty;
   JSObjectSetPropertyCallback setProperty;
   JSPropertyAttributes attributes;
@@ -403,7 +403,7 @@ property is called as a function.
 property.
 */
 typedef struct {
-  const char* const name;  // FIXME: convert UTF8
+  const char* const name;
   JSObjectCallAsFunctionCallback callAsFunction;
   JSPropertyAttributes attributes;
 } JSStaticFunction;
