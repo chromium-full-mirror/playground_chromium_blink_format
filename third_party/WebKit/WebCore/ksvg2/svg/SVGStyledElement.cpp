@@ -202,6 +202,29 @@ void SVGStyledElement::notifyAttributeChange() const {
   // we need
   // to recursively update all children including ourselves.
   updateElementInstance(extensions);
+
+  // If we're a child of an element creating a "resource" (ie. <pattern> child)
+  // then we have to notify our parent resource that we changed.
+  notifyResourceParentIfExistant();
+}
+
+void SVGStyledElement::notifyResourceParentIfExistant() const {
+  Node* node = parentNode();
+  while (node) {
+    if (node->hasTagName(SVGNames::linearGradientTag) ||
+        node->hasTagName(SVGNames::radialGradientTag) ||
+        node->hasTagName(SVGNames::patternTag) ||
+        node->hasTagName(SVGNames::clipPathTag) ||
+        node->hasTagName(SVGNames::markerTag) ||
+        node->hasTagName(SVGNames::maskTag)) {
+      SVGElement* element = svg_dynamic_cast(node);
+      ASSERT(element);
+
+      element->notifyAttributeChange();
+    }
+
+    node = node->parentNode();
+  }
 }
 
 void SVGStyledElement::updateElementInstance(

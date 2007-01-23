@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -182,6 +182,26 @@ RenderObject* SVGMarkerElement::createRenderer(RenderArena* arena,
   markerContainer->setDrawsContents(
       false);  // Marker contents will be explicitly drawn.
   return markerContainer;
+}
+
+void SVGMarkerElement::notifyAttributeChange() const {
+  if (!m_marker || !attached() || ownerDocument()->parsing())
+    return;
+
+  RenderSVGContainer* markerContainer =
+      static_cast<RenderSVGContainer*>(renderer());
+
+  // NOTE: This is a typical case, where proper "attributeChanged" usage would
+  // reduce the number of updates needed.
+  if (markerContainer) {
+    markerContainer->setViewBox(viewBox());
+    markerContainer->setAlign(KCAlign(preserveAspectRatio()->align() - 1));
+    markerContainer->setSlice(preserveAspectRatio()->meetOrSlice() ==
+                              SVGPreserveAspectRatio::SVG_MEETORSLICE_SLICE);
+  }
+
+  m_marker->invalidate();
+  m_marker->repaintClients();
 }
 }
 

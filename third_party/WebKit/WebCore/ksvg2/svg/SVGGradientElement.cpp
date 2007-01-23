@@ -152,11 +152,6 @@ Vector<SVGGradientStop> SVGGradientElement::buildStops() const {
   gradientStyle->deref(view()->renderArena());
   return stops;
 }
-
-void SVGGradientElement::childrenChanged() {
-  notifyAttributeChange();
-  SVGStyledElement::childrenChanged();
-}
 }
 
 #endif  // SVG_SUPPORT

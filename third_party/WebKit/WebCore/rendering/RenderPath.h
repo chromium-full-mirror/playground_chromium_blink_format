@@ -79,9 +79,9 @@ class RenderPath : public RenderObject {
                            int ty,
                            HitTestAction);
 
-  virtual void drawMarkersIfNeeded(GraphicsContext*,
-                                   const FloatRect&,
-                                   const Path&) const;
+  FloatRect drawMarkersIfNeeded(GraphicsContext*,
+                                const FloatRect&,
+                                const Path&) const;
   virtual FloatRect strokeBBox() const;
 
   bool hasRelativeValues() const;
@@ -92,6 +92,7 @@ class RenderPath : public RenderObject {
   mutable Path m_path;
   mutable FloatRect m_fillBBox;
   mutable FloatRect m_strokeBbox;
+  FloatRect m_markerBounds;
   AffineTransform m_matrix;
   IntRect m_absoluteBounds;
 };

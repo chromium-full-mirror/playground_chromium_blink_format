@@ -58,7 +58,7 @@ class SVGStyledElement : public SVGElement {
   RenderView* view() const;
 
   virtual void notifyAttributeChange() const;
-  void updateElementInstance(SVGDocumentExtensions*) const;
+  void notifyResourceParentIfExistant() const;
 
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
@@ -76,6 +76,8 @@ class SVGStyledElement : public SVGElement {
                                  String,
                                  ClassName,
                                  className)
+
+  void updateElementInstance(SVGDocumentExtensions*) const;
 };
 
 }  // namespace WebCore

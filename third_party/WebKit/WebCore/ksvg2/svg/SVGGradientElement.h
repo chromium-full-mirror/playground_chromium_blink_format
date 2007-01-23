@@ -53,8 +53,6 @@ class SVGGradientElement : public SVGStyledElement,
 
   virtual SVGResource* canvasResource();
 
-  virtual void childrenChanged();
-
  protected:
   friend class SVGPaintServerGradient;
   friend class SVGLinearGradientElement;
