@@ -23,11 +23,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <WebCore/DragClient.h>
+#include "DragClient.h"
 
 namespace WebCore {
 
-class WebDragClientQt : public DragClient {
+class DragClientQt : public DragClient {
  public:
   virtual void willPerformDragDestinationAction(DragDestinationAction,
                                                 DragData*);
