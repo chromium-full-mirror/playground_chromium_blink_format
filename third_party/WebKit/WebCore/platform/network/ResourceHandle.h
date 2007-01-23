@@ -58,6 +58,10 @@ typedef struct objc_object* id;
 #endif
 #endif
 
+#if USE(CFNETWORK)
+typedef struct _CFURLConnection* CFURLConnectionRef;
+#endif
+
 namespace WebCore {
 
 class AuthenticationChallenge;
@@ -113,6 +117,9 @@ class ResourceHandle : public Shared<ResourceHandle> {
   NSURLConnection* connection() const;
   WebCoreResourceHandleAsDelegate* delegate();
   void releaseDelegate();
+#elif USE(CFNETWORK)
+  static CFRunLoopRef loaderRunLoop();
+  CFURLConnectionRef connection() const;
 #endif
   PassRefPtr<SharedBuffer> bufferedData();
   static bool supportsBufferedData();

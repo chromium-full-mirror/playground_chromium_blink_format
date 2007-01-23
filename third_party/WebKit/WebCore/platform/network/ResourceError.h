@@ -78,6 +78,7 @@ class ResourceError {
       : m_dataIsUpToDate(false), m_platformError(error), m_isNull(!error) {}
 #elif PLATFORM(CF)
   ResourceError(CFStreamError);
+  ResourceError(CFErrorRef);
 #endif
 
 #if 0
