@@ -86,7 +86,7 @@ class SVGDocumentExtensions {
   }
 
   template <typename KeyType>
-  HashMap<const KeyType*, const SVGElement*>* genericContextMap() const {
+  static HashMap<const KeyType*, const SVGElement*>* genericContextMap() {
     static HashMap<const KeyType*, const SVGElement*>* s_genericContextMap =
         new HashMap<const KeyType*, const SVGElement*>();
     return s_genericContextMap;
@@ -177,6 +177,12 @@ class SVGDocumentExtensions {
   template <typename KeyType>
   bool hasGenericContext(const KeyType* obj) {
     return genericContextMap<KeyType>()->contains(obj);
+  }
+
+  // Used by the generated JS wrappers only
+  template <typename KeyType>
+  static void forgetGenericContext(const KeyType* obj) {
+    genericContextMap<KeyType>()->remove(obj);
   }
 };
 
