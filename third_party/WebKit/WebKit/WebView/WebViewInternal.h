@@ -76,7 +76,6 @@ WebViewGetResourceLoadDelegateImplementations(WebView* webView);
 @interface WebView (WebViewMiscInternal)
 - (WebCorePage*)page;
 - (NSMenu*)_menuForElement:(NSDictionary*)element defaultItems:(NSArray*)items;
-- (void)_setInitiatedDrag:(BOOL)initiatedDrag;
 - (id)_UIDelegateForwarder;
 - (id)_resourceLoadDelegateForwarder;
 - (id)_frameLoadDelegateForwarder;
