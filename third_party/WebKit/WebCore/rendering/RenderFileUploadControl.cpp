@@ -1,6 +1,5 @@
-/**
- *
- * Copyright (C) 2006 Apple Computer, Inc.
+/*
+ * Copyright (C) 2006, 2007 Apple Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -39,38 +38,35 @@ using namespace std;
 
 namespace WebCore {
 
+using namespace HTMLNames;
+
 const int afterButtonSpacing = 4;
 const int iconHeight = 16;
 const int iconWidth = 16;
 const int iconFilenameSpacing = 2;
 const int defaultWidthNumChars = 34;
-
-using namespace HTMLNames;
+const int buttonShadowHeight = 2;
 
 class HTMLFileUploadInnerButtonElement : public HTMLInputElement {
  public:
-  HTMLFileUploadInnerButtonElement(Document*, Node* shadowParent = 0);
-
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  HTMLFileUploadInnerButtonElement(Document*, Node* shadowParent);
 
   virtual bool isShadowNode() const { return true; }
-
   virtual Node* shadowParentNode() { return m_shadowParent; }
 
  private:
   Node* m_shadowParent;
 };
 
-RenderFileUploadControl::RenderFileUploadControl(Node* node)
-    : RenderBlock(node),
+RenderFileUploadControl::RenderFileUploadControl(HTMLInputElement* input)
+    : RenderBlock(input),
       m_button(0),
-      m_fileChooser(FileChooser::create(document(), this)) {}
+      m_fileChooser(FileChooser::create(this, input->value())) {}
 
 RenderFileUploadControl::~RenderFileUploadControl() {
   if (m_button)
     m_button->detach();
-  if (m_fileChooser)
-    m_fileChooser->disconnectUploadControl();
+  m_fileChooser->disconnectClient();
 }
 
 void RenderFileUploadControl::setStyle(RenderStyle* newStyle) {
@@ -95,17 +91,20 @@ void RenderFileUploadControl::valueChanged() {
 }
 
 void RenderFileUploadControl::click() {
-  m_fileChooser->openFileChooser();
+  m_fileChooser->openFileChooser(node()->document());
 }
 
 void RenderFileUploadControl::updateFromElement() {
   if (!m_button) {
     m_button = new HTMLFileUploadInnerButtonElement(document(), node());
+    m_button->setInputType("button");
+    m_button->setValue(fileButtonChooseFileLabel());
     RenderStyle* buttonStyle = createButtonStyle(style());
-    m_button->setRenderer(m_button->createRenderer(renderArena(), buttonStyle));
-    m_button->renderer()->setStyle(buttonStyle);
-    static_cast<RenderButton*>(m_button->renderer())
-        ->setText(fileButtonChooseFileLabel());
+    RenderObject* renderer =
+        m_button->createRenderer(renderArena(), buttonStyle);
+    m_button->setRenderer(renderer);
+    renderer->setStyle(buttonStyle);
+    renderer->updateFromElement();
     m_button->setAttached();
     m_button->setInDocument(true);
 
@@ -114,17 +113,17 @@ void RenderFileUploadControl::updateFromElement() {
   m_button->setDisabled(!theme()->isEnabled(this));
 }
 
-int RenderFileUploadControl::maxFilenameWidth() {
+int RenderFileUploadControl::maxFilenameWidth() const {
   return max(
       0, contentWidth() - m_button->renderer()->width() - afterButtonSpacing -
              (m_fileChooser->icon() ? iconWidth + iconFilenameSpacing : 0));
 }
 
 RenderStyle* RenderFileUploadControl::createButtonStyle(
-    RenderStyle* parentStyle) {
+    RenderStyle* parentStyle) const {
   RenderStyle* style = getPseudoStyle(RenderStyle::FILE_UPLOAD_BUTTON);
   if (!style) {
-    style = new (renderArena()) RenderStyle();
+    style = new (renderArena()) RenderStyle;
     if (parentStyle)
       style->inheritFrom(parentStyle);
   }
@@ -140,8 +139,6 @@ RenderStyle* RenderFileUploadControl::createButtonStyle(
 void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                                           int tx,
                                           int ty) {
-  const int buttonShadowHeight = 2;
-
   // Push a clip.
   if (paintInfo.phase == PaintPhaseForeground ||
       paintInfo.phase == PaintPhaseChildBlockBackgrounds) {
@@ -149,7 +146,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
         tx + borderLeft(), ty + borderTop(),
         width() - borderLeft() - borderRight(),
         height() - borderBottom() - borderTop() + buttonShadowHeight);
-    if (clipRect.width() == 0 || clipRect.height() == 0)
+    if (clipRect.isEmpty())
       return;
     paintInfo.context->save();
     paintInfo.context->clip(clipRect);
@@ -157,7 +154,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
 
   if (paintInfo.phase == PaintPhaseForeground) {
     const String& displayedFilename =
-        m_fileChooser->basenameForWidth(maxFilenameWidth());
+        m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
     TextRun textRun(displayedFilename.characters(), displayedFilename.length());
 
     // Determine where the filename should be placed
@@ -257,14 +254,6 @@ void RenderFileUploadControl::calcMinMaxWidth() {
 HTMLFileUploadInnerButtonElement::HTMLFileUploadInnerButtonElement(
     Document* doc,
     Node* shadowParent)
-    : HTMLInputElement(doc), m_shadowParent(shadowParent) {
-  setInputType("button");
-}
-
-RenderObject* HTMLFileUploadInnerButtonElement::createRenderer(
-    RenderArena* arena,
-    RenderStyle* style) {
-  return HTMLInputElement::createRenderer(arena, style);
-}
+    : HTMLInputElement(doc), m_shadowParent(shadowParent) {}
 
 }  // namespace WebCore
