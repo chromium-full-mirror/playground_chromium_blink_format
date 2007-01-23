@@ -32,6 +32,7 @@ class DragClientQt : public DragClient {
   virtual void willPerformDragDestinationAction(DragDestinationAction,
                                                 DragData*);
   virtual WebCore::DragDestinationAction actionMaskForDrag(DragData*);
+  virtual void dragControllerDestroyed();
 
  private:
 };

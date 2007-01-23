@@ -33,4 +33,6 @@ DragDestinationAction DragClientQt::actionMaskForDrag(DragData*) {
 
 void DragClientQt::willPerformDragDestinationAction(DragDestinationAction,
                                                     DragData*) {}
+
+void DragClientQt::dragControllerDestroyed() {}
 }
