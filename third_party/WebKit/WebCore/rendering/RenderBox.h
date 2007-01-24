@@ -58,36 +58,37 @@ class RenderBox : public RenderObject {
 
   virtual bool absolutePosition(int& x, int& y, bool fixed = false) const;
 
-  virtual void setPos(int x, int y);
-
   virtual int xPos() const { return m_x; }
   virtual int yPos() const { return m_y; }
-  virtual int width() const;
-  virtual int height() const;
+  virtual void setPos(int x, int y);
+
+  virtual int width() const { return m_width; }
+  virtual int height() const { return m_height; }
+  virtual void setWidth(int width) { m_width = width; }
+  virtual void setHeight(int height) { m_height = height; }
 
   virtual int marginTop() const { return m_marginTop; }
   virtual int marginBottom() const { return m_marginBottom; }
   virtual int marginLeft() const { return m_marginLeft; }
   virtual int marginRight() const { return m_marginRight; }
 
-  virtual void setWidth(int width) { m_width = width; }
-  virtual void setHeight(int height) { m_height = height; }
-
   virtual IntRect borderBox() const {
     return IntRect(0, -borderTopExtra(), width(),
                    height() + borderTopExtra() + borderBottomExtra());
   }
 
-  int calcBorderBoxWidth(int w) const;
-  int calcBorderBoxHeight(int h) const;
-  int calcContentBoxWidth(int w) const;
-  int calcContentBoxHeight(int h) const;
+  int calcBorderBoxWidth(int width) const;
+  int calcBorderBoxHeight(int height) const;
+  int calcContentBoxWidth(int width) const;
+  int calcContentBoxHeight(int height) const;
 
   // This method is now public so that centered objects like tables that are
   // shifted right by left-aligned floats can recompute their left and
   // right margins (so that they can remain centered after being
   // shifted. -dwh
-  void calcHorizontalMargins(const Length& ml, const Length& mr, int cw);
+  void calcHorizontalMargins(const Length& marginLeft,
+                             const Length& marginRight,
+                             int containerWidth);
 
   virtual void position(InlineBox*);
 
@@ -98,8 +99,10 @@ class RenderBox : public RenderObject {
   // the replaced RenderObject to quickly determine what line it is contained on
   // and to easily
   // iterate over structures on the line.
-  virtual InlineBox* inlineBoxWrapper() const;
-  virtual void setInlineBoxWrapper(InlineBox*);
+  virtual InlineBox* inlineBoxWrapper() const { return m_inlineBoxWrapper; }
+  virtual void setInlineBoxWrapper(InlineBox* boxWrapper) {
+    m_inlineBoxWrapper = boxWrapper;
+  }
   virtual void deleteLineBoxWrapper();
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
@@ -123,6 +126,7 @@ class RenderBox : public RenderObject {
     return style()->htmlHacks() && style()->height().isAuto() &&
            !isFloatingOrPositioned() && (isRoot() || isBody());
   }
+
   // Whether or not the element shrinks to its intrinsic width (rather than
   // filling the width
   // of a containing block).  HTML4 buttons, <select>s, <input>s, legends, and
@@ -130,7 +134,7 @@ class RenderBox : public RenderObject {
   bool sizesToIntrinsicWidth(WidthType) const;
   virtual bool stretchesToMinIntrinsicWidth() const { return false; }
 
-  int calcWidthUsing(WidthType, int cw);
+  int calcWidthUsing(WidthType, int containerWidth);
   int calcHeightUsing(const Length& height);
   int calcReplacedWidthUsing(Length width) const;
   int calcReplacedHeightUsing(Length height) const;
@@ -157,19 +161,19 @@ class RenderBox : public RenderObject {
   virtual void paintBackgroundExtended(GraphicsContext*,
                                        const Color&,
                                        const BackgroundLayer*,
-                                       int clipy,
-                                       int cliph,
+                                       int clipY,
+                                       int clipHeight,
                                        int tx,
                                        int ty,
-                                       int w,
+                                       int width,
                                        int height,
                                        bool includeLeftEdge = true,
                                        bool includeRightEdge = true);
 
-  virtual void setStaticX(int staticX);
-  virtual void setStaticY(int staticY);
   virtual int staticX() const { return m_staticX; }
   virtual int staticY() const { return m_staticY; }
+  virtual void setStaticX(int staticX) { m_staticX = staticX; }
+  virtual void setStaticY(int staticY) { m_staticY = staticY; }
 
   virtual IntRect getOverflowClipRect(int tx, int ty);
   virtual IntRect getClipRect(int tx, int ty);
@@ -180,12 +184,12 @@ class RenderBox : public RenderObject {
   void paintBackground(GraphicsContext*,
                        const Color&,
                        const BackgroundLayer*,
-                       int clipy,
-                       int cliph,
+                       int clipY,
+                       int clipHeight,
                        int tx,
                        int ty,
-                       int w,
-                       int h);
+                       int width,
+                       int height);
 #if PLATFORM(MAC)
   void paintCustomHighlight(int tx,
                             int ty,
@@ -201,12 +205,12 @@ class RenderBox : public RenderObject {
   void paintBackgrounds(GraphicsContext*,
                         const Color&,
                         const BackgroundLayer*,
-                        int clipy,
-                        int cliph,
+                        int clipY,
+                        int clipHeight,
                         int tx,
                         int ty,
-                        int w,
-                        int h);
+                        int width,
+                        int height);
 
   int containingBlockWidthForPositioned(
       const RenderObject* containingBlock) const;
@@ -244,18 +248,17 @@ class RenderBox : public RenderObject {
   void calcAbsoluteHorizontalReplaced();
 
  protected:
-  int m_height;  // the actual height of the contents + borders + padding
-
-  int m_y;
+  // The width/height of the contents + borders + padding.
+  int m_width;
+  int m_height;
 
   int m_x;
-  int m_width;
-
-  int m_marginTop;
-  int m_marginBottom;
+  int m_y;
 
   int m_marginLeft;
   int m_marginRight;
+  int m_marginTop;
+  int m_marginBottom;
 
   // The minimum width the element needs to be able to render
   // its content without clipping.
@@ -281,6 +284,6 @@ class RenderBox : public RenderObject {
   int m_staticY;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // RenderBox_h
