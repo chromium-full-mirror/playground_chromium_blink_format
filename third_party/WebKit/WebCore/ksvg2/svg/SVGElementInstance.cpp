@@ -54,6 +54,12 @@ SVGElementInstance::SVGElementInstance(PassRefPtr<SVGUseElement> useElement,
 }
 
 SVGElementInstance::~SVGElementInstance() {
+  RefPtr<SVGElementInstance> child = m_firstChild;
+  while (child) {
+    child->setParent(0);
+    child = child->m_nextSibling;
+  }
+
   // Deregister as instance for passed element.
   SVGDocumentExtensions* extensions =
       (m_element->document() ? m_element->document()->accessSVGExtensions()

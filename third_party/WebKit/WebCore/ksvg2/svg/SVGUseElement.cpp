@@ -146,6 +146,10 @@ void SVGUseElement::insertedIntoDocument() {
   buildPendingResource();
 }
 
+void SVGUseElement::removedFromDocument() {
+  m_targetElementInstance = 0;
+}
+
 void SVGUseElement::notifyAttributeChange() const {
   if (!attached())
     return;

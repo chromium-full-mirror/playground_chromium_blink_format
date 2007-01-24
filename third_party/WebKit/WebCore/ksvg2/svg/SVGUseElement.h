@@ -52,6 +52,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   // Derived from: 'Element'
   virtual bool hasChildNodes() const;
   virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
   virtual void buildPendingResource();
 
   // 'SVGUseElement' functions
