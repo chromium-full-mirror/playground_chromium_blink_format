@@ -102,8 +102,8 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   static FloatPoint createSVGPoint();
   static AffineTransform createSVGMatrix();
   static FloatRect createSVGRect();
-  static SVGTransform* createSVGTransform();
-  static SVGTransform* createSVGTransformFromMatrix(const AffineTransform&);
+  static SVGTransform createSVGTransform();
+  static SVGTransform createSVGTransformFromMatrix(const AffineTransform&);
 
   virtual void parseMappedAttribute(MappedAttribute*);
 

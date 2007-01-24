@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-class SVGTransform : public Shared<SVGTransform> {
+class SVGTransform {
  public:
   enum SVGTransformType {
     SVG_TRANSFORM_UNKNOWN = 0,
@@ -43,6 +43,7 @@ class SVGTransform : public Shared<SVGTransform> {
   };
 
   SVGTransform();
+  explicit SVGTransform(const AffineTransform&);
   virtual ~SVGTransform();
 
   unsigned short type() const;
@@ -58,9 +59,11 @@ class SVGTransform : public Shared<SVGTransform> {
   void setSkewX(double angle);
   void setSkewY(double angle);
 
+  bool isValid();
+
  private:
-  double m_angle;
   unsigned short m_type;
+  double m_angle;
   AffineTransform m_matrix;
 };
 

@@ -139,7 +139,7 @@ LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties()
     if (!attributes.hasGradientTransform() &&
         current->hasAttribute(SVGNames::gradientTransformAttr))
       attributes.setGradientTransform(
-          current->gradientTransform()->consolidate()->matrix());
+          current->gradientTransform()->consolidate().matrix());
 
     if (!attributes.hasStops()) {
       const Vector<SVGGradientStop>& stops(current->buildStops());

@@ -292,7 +292,7 @@ PatternAttributes SVGPatternElement::collectPatternProperties() const {
     if (!attributes.hasPatternTransform() &&
         current->hasAttribute(SVGNames::patternTransformAttr))
       attributes.setPatternTransform(
-          current->patternTransform()->consolidate()->matrix());
+          current->patternTransform()->consolidate().matrix());
 
     if (!attributes.hasPatternContentElement() && current->hasChildNodes())
       attributes.setPatternContentElement(current);
