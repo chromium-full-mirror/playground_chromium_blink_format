@@ -73,6 +73,8 @@ class EditorClientQt : public EditorClient {
 
   virtual void toggleContinuousSpellChecking();
   virtual void toggleGrammarChecking();
+
+  virtual void handleKeyPress(EventTargetNode*, KeyboardEvent*);
 };
 }
 

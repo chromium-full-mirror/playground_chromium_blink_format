@@ -166,6 +166,10 @@ void EditorClientQt::toggleContinuousSpellChecking() {
 void EditorClientQt::toggleGrammarChecking() {
   notImplemented();
 }
+
+void EditorClientQt::handleKeyPress(EventTargetNode*, KeyboardEvent*) {
+  notImplemented();
+}
 }
 
 // vim: ts=4 sw=4 et
