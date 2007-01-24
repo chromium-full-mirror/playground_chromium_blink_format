@@ -45,6 +45,9 @@
 
 #define notImplemented() \
   qDebug("FIXME: UNIMPLEMENTED: %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__)
+#define methodDebug()                                       \
+  qDebug("FrameLoaderClientQt: %s loader=%p", __FUNCTION__, \
+         (m_frame ? m_frame->loader() : 0))
 
 namespace WebCore {
 
@@ -221,10 +224,7 @@ void FrameLoaderClientQt::loadedFromPageCache() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
-  if (m_webFrame)
-    emit m_webFrame->loadDone();
-}
+void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {}
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
   notImplemented();
@@ -265,7 +265,8 @@ void FrameLoaderClientQt::dispatchDidFinishDocumentLoad() {
 }
 
 void FrameLoaderClientQt::dispatchDidFinishLoad() {
-  notImplemented();
+  if (m_webFrame)
+    emit m_webFrame->loadDone(true);
 }
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
@@ -336,8 +337,12 @@ void FrameLoaderClientQt::didChangeTitle(DocumentLoader* l) {
   setTitle(l->title(), l->URL());
 }
 
-void FrameLoaderClientQt::finishedLoading(DocumentLoader*) {
-  notImplemented();
+void FrameLoaderClientQt::finishedLoading(DocumentLoader* loader) {
+  if (m_firstData) {
+    FrameLoader* fl = loader->frameLoader();
+    fl->setEncoding(m_response.textEncodingName(), false);
+    m_firstData = false;
+  }
 }
 
 void FrameLoaderClientQt::finalSetupForReplace(DocumentLoader*) {
@@ -470,9 +475,14 @@ bool FrameLoaderClientQt::canCachePage() const {
   return false;
 }
 
-void FrameLoaderClientQt::setMainDocumentError(WebCore::DocumentLoader*,
+void FrameLoaderClientQt::setMainDocumentError(WebCore::DocumentLoader* loader,
                                                const WebCore::ResourceError&) {
-  notImplemented();
+  if (m_firstData) {
+    loader->frameLoader()->setEncoding(m_response.textEncodingName(), false);
+    m_firstData = false;
+  }
+  if (m_webFrame)
+    emit m_webFrame->loadDone(false);
 }
 
 void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
@@ -482,7 +492,10 @@ void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
   if (!m_frame)
     return;
   FrameLoader* fl = loader->frameLoader();
-  fl->setEncoding(m_response.textEncodingName(), false);
+  if (m_firstData) {
+    fl->setEncoding(m_response.textEncodingName(), false);
+    m_firstData = false;
+  }
   fl->addData(data, length);
 }
 
@@ -581,16 +594,19 @@ void FrameLoaderClientQt::dispatchDidReceiveContentLength(
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidFinishLoading(WebCore::DocumentLoader*,
-                                                   unsigned long) {
-  notImplemented();
-}
+void FrameLoaderClientQt::dispatchDidFinishLoading(
+    WebCore::DocumentLoader* loader,
+    unsigned long) {}
 
 void FrameLoaderClientQt::dispatchDidFailLoading(
-    WebCore::DocumentLoader*,
+    WebCore::DocumentLoader* loader,
     unsigned long,
     const WebCore::ResourceError&) {
-  notImplemented();
+  if (m_firstData) {
+    FrameLoader* fl = loader->frameLoader();
+    fl->setEncoding(m_response.textEncodingName(), false);
+    m_firstData = false;
+  }
 }
 
 bool FrameLoaderClientQt::dispatchDidLoadResourceFromMemoryCache(
@@ -635,8 +651,13 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
 void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     FramePolicyFunction function,
     const WebCore::NavigationAction&,
-    const WebCore::ResourceRequest&) {
-  notImplemented();
+    const WebCore::ResourceRequest& request) {
+  KURL url = request.url();
+  if (url.isEmpty() || url.protocol() == "about") {
+    m_policyFunction = function;
+    slotCallPolicyFunction(PolicyUse);
+    return;
+  }
   callPolicyFunction(function, PolicyUse);
 }
 
@@ -663,7 +684,6 @@ Frame* FrameLoaderClientQt::createFrame(const KURL& url,
                                         bool allowsScrolling,
                                         int marginWidth,
                                         int marginHeight) {
-  qDebug() << ">>>>>>>>>>> createFrame";
   QWebFrameData frameData;
   frameData.url = url;
   frameData.name = name;
