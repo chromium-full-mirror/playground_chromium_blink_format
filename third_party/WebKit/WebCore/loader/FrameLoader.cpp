@@ -4463,7 +4463,7 @@ Widget* FrameLoader::createJavaAppletWidget(
 
   Widget* widget = m_client->createJavaAppletWidget(size, element, baseURL,
                                                     paramNames, paramValues);
-  if (widget)
+  if (widget && m_frame->view())
     m_frame->view()->addChild(widget);
   return widget;
 }

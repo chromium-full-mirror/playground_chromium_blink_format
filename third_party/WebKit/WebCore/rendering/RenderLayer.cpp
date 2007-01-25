@@ -1050,7 +1050,10 @@ void RenderLayer::valueChanged(Scrollbar*) {
 }
 
 IntRect RenderLayer::windowClipRect() const {
-  return renderer()->view()->frameView()->windowClipRectForLayer(this, false);
+  FrameView* frameView = renderer()->view()->frameView();
+  if (!frameView)
+    return IntRect();
+  return frameView->windowClipRectForLayer(this, false);
 }
 
 PassRefPtr<Scrollbar> RenderLayer::createScrollbar(
@@ -1231,10 +1234,11 @@ void RenderLayer::updateOverflowStatus(bool horizontalOverflow,
     m_horizontalOverflow = horizontalOverflow;
     m_verticalOverflow = verticalOverflow;
 
-    m_object->element()->document()->view()->scheduleEvent(
-        new OverflowEvent(horizontalOverflowChanged, horizontalOverflow,
-                          verticalOverflowChanged, verticalOverflow),
-        EventTargetNodeCast(m_object->element()), true);
+    if (FrameView* frameView = m_object->element()->document()->view())
+      frameView->scheduleEvent(
+          new OverflowEvent(horizontalOverflowChanged, horizontalOverflow,
+                            verticalOverflowChanged, verticalOverflow),
+          EventTargetNodeCast(m_object->element()), true);
   }
 }
 
@@ -1594,8 +1598,11 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 }
 
 static inline IntRect frameVisibleRect(RenderObject* renderer) {
-  return enclosingIntRect(
-      renderer->document()->frame()->view()->visibleContentRect());
+  FrameView* frameView = renderer->document()->view();
+  if (!frameView)
+    return IntRect();
+
+  return enclosingIntRect(frameView->visibleContentRect());
 }
 
 bool RenderLayer::hitTest(const HitTestRequest& request,
