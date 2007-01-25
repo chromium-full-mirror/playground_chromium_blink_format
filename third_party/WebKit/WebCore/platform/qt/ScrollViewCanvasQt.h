@@ -41,6 +41,7 @@ namespace WebCore {
 
 class ScrollView;
 class FrameView;
+class EventHandler;
 
 class ScrollViewCanvasQt : public QWidget {
   Q_OBJECT
@@ -52,13 +53,18 @@ class ScrollViewCanvasQt : public QWidget {
   virtual void mouseMoveEvent(QMouseEvent*);
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseReleaseEvent(QMouseEvent*);
+  virtual void wheelEvent(QWheelEvent*);
   virtual void keyPressEvent(QKeyEvent*);
   virtual void keyReleaseEvent(QKeyEvent*);
+  virtual void dragEnterEvent(QDragEnterEvent*);
+  virtual void dragLeaveEvent(QDragLeaveEvent*);
+  virtual void dragMoveEvent(QDragMoveEvent*);
 
  private:
   void handleKeyEvent(QKeyEvent*, bool isKeyUp);
 
   FrameView* m_frameView;
+  EventHandler* m_eventHandler;
 };
 }
 
