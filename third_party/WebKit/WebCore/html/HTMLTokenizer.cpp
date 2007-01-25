@@ -296,9 +296,9 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
   while (!src.isEmpty()) {
     checkScriptBuffer();
     UChar ch = *src;
+
     if (!scriptCodeResync && !brokenComments && !state.inTextArea() &&
-        !state.inXmp() && !state.inTitle() && ch == '-' &&
-        scriptCodeSize >= 3 && !src.escaped() &&
+        !state.inXmp() && ch == '-' && scriptCodeSize >= 3 && !src.escaped() &&
         scriptCode[scriptCodeSize - 3] == '<' &&
         scriptCode[scriptCodeSize - 2] == '!' &&
         scriptCode[scriptCodeSize - 1] == '-') {
@@ -587,8 +587,8 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
       }
       if (handleBrokenComments || endCharsCount > 1) {
         ++src;
-        if (!(state.inScript() || state.inXmp() || state.inTextArea() ||
-              state.inStyle())) {
+        if (!(state.inTitle() || state.inScript() || state.inXmp() ||
+              state.inTextArea() || state.inStyle())) {
           checkScriptBuffer();
           scriptCode[scriptCodeSize] = 0;
           scriptCode[scriptCodeSize + 1] = 0;
