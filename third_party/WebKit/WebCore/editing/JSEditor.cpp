@@ -490,6 +490,10 @@ bool enabledAnyRichlyEditableSelection(Frame* frame) {
          frame->selectionController()->isContentRichlyEditable();
 }
 
+bool enabledCopy(Frame* frame) {
+  return !frame->selectionController()->isInPasswordField();
+}
+
 bool enabledPaste(Frame* frame) {
   return supportsPasteCommand && frame->editor()->canPaste();
 }
@@ -618,7 +622,7 @@ CommandMap* createCommandDictionary() {
         valueBackColor}},
       {"Bold",
        {execBold, enabledAnyRichlyEditableSelection, stateBold, valueNull}},
-      {"Copy", {execCopy, enabledAnyRangeSelection, stateNone, valueNull}},
+      {"Copy", {execCopy, enabledCopy, stateNone, valueNull}},
       {"CreateLink",
        {execCreateLink, enabledAnyRichlyEditableRangeSelection, stateNone,
         valueNull}},
