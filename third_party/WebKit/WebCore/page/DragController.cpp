@@ -328,9 +328,11 @@ bool DragController::concludeDrag(DragData* dragData,
     return false;
   }
 
-  RefPtr<Range> range = m_page->dragCaretController()->toRange();
+  Selection dragCaret(m_page->dragCaretController()->selection());
+  m_page->dragCaretController()->clear();
+  RefPtr<Range> range = dragCaret.toRange();
   if (dragIsMove(innerFrame->selectionController(), dragData) ||
-      m_page->dragCaretController()->isContentRichlyEditable()) {
+      dragCaret.isContentRichlyEditable()) {
     bool chosePlainText = false;
     RefPtr<DocumentFragment> fragment =
         documentFragmentFromDragData(dragData, range, true, chosePlainText);
@@ -345,11 +347,10 @@ bool DragController::concludeDrag(DragData* dragData,
       bool smartMove = innerFrame->selectionGranularity() == WordGranularity &&
                        innerFrame->editor()->smartInsertDeleteEnabled() &&
                        dragData->canSmartReplace();
-      applyCommand(new MoveSelectionCommand(
-          fragment, innerFrame->dragCaretController()->base(), smartMove));
+      applyCommand(
+          new MoveSelectionCommand(fragment, dragCaret.base(), smartMove));
     } else {
-      innerFrame->selectionController()->setSelection(
-          innerFrame->dragCaretController()->selection());
+      innerFrame->selectionController()->setSelection(dragCaret);
       applyCommand(new ReplaceSelectionCommand(m_document, fragment, true,
                                                dragData->canSmartReplace(),
                                                chosePlainText));
@@ -363,8 +364,7 @@ bool DragController::concludeDrag(DragData* dragData,
 
     m_client->willPerformDragDestinationAction(DragDestinationActionEdit,
                                                dragData);
-    innerFrame->selectionController()->setSelection(
-        innerFrame->dragCaretController()->selection());
+    innerFrame->selectionController()->setSelection(dragCaret);
     applyCommand(new ReplaceSelectionCommand(
         m_document, createFragmentFromText(range.get(), text), true, false,
         true));
