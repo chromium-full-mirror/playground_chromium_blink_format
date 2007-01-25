@@ -49,12 +49,14 @@ using namespace HTMLNames;
 DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
                                                bool smartDelete,
                                                bool mergeBlocksAfterDelete,
-                                               bool replace)
+                                               bool replace,
+                                               bool expandForSpecialElements)
     : CompositeEditCommand(document),
       m_hasSelectionToDelete(false),
       m_smartDelete(smartDelete),
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
       m_replace(replace),
+      m_expandForSpecialElements(expandForSpecialElements),
       m_startBlock(0),
       m_endBlock(0),
       m_typingStyle(0),
@@ -63,24 +65,27 @@ DeleteSelectionCommand::DeleteSelectionCommand(Document* document,
 DeleteSelectionCommand::DeleteSelectionCommand(const Selection& selection,
                                                bool smartDelete,
                                                bool mergeBlocksAfterDelete,
-                                               bool replace)
+                                               bool replace,
+                                               bool expandForSpecialElements)
     : CompositeEditCommand(selection.start().node()->document()),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
       m_replace(replace),
+      m_expandForSpecialElements(expandForSpecialElements),
       m_selectionToDelete(selection),
       m_startBlock(0),
       m_endBlock(0),
       m_typingStyle(0),
       m_deleteIntoBlockquoteStyle(0) {}
 
-void DeleteSelectionCommand::initializeStartEnd() {
+void DeleteSelectionCommand::initializeStartEnd(Position& start,
+                                                Position& end) {
   Node* startSpecialContainer = 0;
   Node* endSpecialContainer = 0;
 
-  Position start = m_selectionToDelete.start();
-  Position end = m_selectionToDelete.end();
+  start = m_selectionToDelete.start();
+  end = m_selectionToDelete.end();
 
   // For HRs, we'll get a position at (HR,1) when hitting delete from the
   // beginning of the previous line, or (HR,0) when forward deleting,
@@ -89,6 +94,11 @@ void DeleteSelectionCommand::initializeStartEnd() {
     start = Position(start.node(), 0);
   else if (end.node()->hasTagName(hrTag))
     end = Position(end.node(), 1);
+
+  // FIXME: This is only used so that moveParagraphs can avoid the bugs in
+  // special element expanion.
+  if (!m_expandForSpecialElements)
+    return;
 
   while (VisiblePosition(start) == m_selectionToDelete.visibleStart() &&
          VisiblePosition(end) == m_selectionToDelete.visibleEnd()) {
@@ -118,15 +128,16 @@ void DeleteSelectionCommand::initializeStartEnd() {
       end = e;
     }
   }
+}
+
+void DeleteSelectionCommand::initializePositionData() {
+  Position start, end;
+  initializeStartEnd(start, end);
 
   m_upstreamStart = start.upstream();
   m_downstreamStart = start.downstream();
   m_upstreamEnd = end.upstream();
   m_downstreamEnd = end.downstream();
-}
-
-void DeleteSelectionCommand::initializePositionData() {
-  initializeStartEnd();
 
   Node* startCell = enclosingTableCell(m_upstreamStart.node());
   Node* endCell = enclosingTableCell(m_downstreamEnd.node());

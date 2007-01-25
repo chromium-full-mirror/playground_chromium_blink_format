@@ -35,11 +35,13 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   DeleteSelectionCommand(Document*,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
-                         bool replace = false);
+                         bool replace = false,
+                         bool expandForSpecialElements = true);
   DeleteSelectionCommand(const Selection&,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
-                         bool replace = false);
+                         bool replace = false,
+                         bool expandForSpecialElements = true);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
@@ -47,7 +49,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
  private:
   virtual bool preservesTypingStyle() const;
 
-  void initializeStartEnd();
+  void initializeStartEnd(Position&, Position&);
   void initializePositionData();
   void saveTypingStyleState();
   void saveFullySelectedAnchor();
@@ -67,6 +69,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   bool m_mergeBlocksAfterDelete;
   bool m_needPlaceholder;
   bool m_replace;
+  bool m_expandForSpecialElements;
 
   // This data is transient and should be cleared at the end of the doApply
   // function.

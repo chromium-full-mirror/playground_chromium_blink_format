@@ -767,6 +767,7 @@ void CompositeEditCommand::moveParagraphs(
   }
 
   VisiblePosition beforeParagraph = startOfParagraphToMove.previous();
+  VisiblePosition afterParagraph(endOfParagraphToMove.next());
 
   // We upstream() the end and downstream() the start so that we don't include
   // collapsed whitespace in the move.
@@ -793,7 +794,8 @@ void CompositeEditCommand::moveParagraphs(
           : 0;
 
   setEndingSelection(Selection(start, end, DOWNSTREAM));
-  deleteSelection(false, false);
+  applyCommandToComposite(
+      new DeleteSelectionCommand(document(), false, false, false, false));
 
   ASSERT(destination.deepEquivalent().node()->inDocument());
 
@@ -831,10 +833,19 @@ void CompositeEditCommand::moveParagraphs(
   // Imagine moving 'bar' to ^.  'bar' will be deleted and its div pruned.  That
   // would
   // cause 'baz' to collapse onto the line with 'foobar' unless we insert a br.
-  if (beforeParagraph.isNotNull() && !isEndOfParagraph(beforeParagraph))
+  // Must recononicalize these two VisiblePositions after the pruning above.
+  beforeParagraph = VisiblePosition(beforeParagraph.deepEquivalent());
+  afterParagraph = VisiblePosition(afterParagraph.deepEquivalent());
+  if (beforeParagraph.isNotNull() && (!isEndOfParagraph(beforeParagraph) ||
+                                      beforeParagraph == afterParagraph)) {
+    // FIXME: Trim text between beforeParagraph and afterParagraph if they
+    // aren't equal.
     insertNodeAt(createBreakElement(document()).get(),
                  beforeParagraph.deepEquivalent().node(),
                  beforeParagraph.deepEquivalent().offset());
+    // Need an updateLayout here in case inserting the br has split a text node.
+    updateLayout();
+  }
 
   RefPtr<Range> startToDestinationRange(
       new Range(document(), Position(document(), 0),

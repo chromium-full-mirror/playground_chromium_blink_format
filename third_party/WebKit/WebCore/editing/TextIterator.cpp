@@ -187,9 +187,11 @@ void TextIterator::advance() {
     if (!next) {
       next = m_node->nextSibling();
       if (!next) {
-        if (m_node->traverseNextNode() == m_pastEndNode)
-          break;
+        bool pastEnd = m_node->traverseNextNode() == m_pastEndNode;
         while (!next && m_node->parentNode()) {
+          if (pastEnd && m_node->parentNode() == m_endContainer ||
+              m_endContainer->isDescendantOf(m_node->parentNode()))
+            return;
           m_node = m_node->parentNode();
           exitNode();
           if (m_positionNode) {
@@ -444,6 +446,16 @@ static bool shouldEmitNewlinesBeforeAndAfterNode(Node* node) {
   return !r->isInline() && r->isRenderBlock() && !r->isBody();
 }
 
+static bool shouldEmitNewlineAfterNode(Node* node) {
+  // FIXME: It should be better but slower to create a VisiblePosition here.
+  return shouldEmitNewlinesBeforeAndAfterNode(node) &&
+         node->traverseNextSibling();
+}
+
+static bool shouldEmitNewlineBeforeNode(Node* node) {
+  return shouldEmitNewlinesBeforeAndAfterNode(node);
+}
+
 static bool shouldEmitExtraNewlineForNode(Node* node) {
   // When there is a significant collapsed bottom margin, emit an extra
   // newline for a more realistic result.  We end up getting the right
@@ -478,7 +490,7 @@ bool TextIterator::handleNonTextNode() {
     // only add the tab or newline if not at the start of a line
     if (shouldEmitTabBeforeNode(m_node))
       emitCharacter('\t', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
-    else if (shouldEmitNewlinesBeforeAndAfterNode(m_node))
+    else if (shouldEmitNewlineBeforeNode(m_node))
       emitCharacter('\n', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
     else if (shouldEmitSpaceBeforeAndAfterNode(m_node))
       emitCharacter(' ', m_lastTextNode->parentNode(), m_lastTextNode, 0, 1);
@@ -488,7 +500,7 @@ bool TextIterator::handleNonTextNode() {
 }
 
 void TextIterator::exitNode() {
-  if (m_lastTextNode && shouldEmitNewlinesBeforeAndAfterNode(m_node)) {
+  if (m_lastTextNode && shouldEmitNewlineAfterNode(m_node)) {
     // use extra newline to represent margin bottom, as needed
     bool addNewline = shouldEmitExtraNewlineForNode(m_node);
 
@@ -726,8 +738,7 @@ bool SimplifiedBackwardsTextIterator::handleNonTextNode() {
   // only used to
   // find boundaries, not actual content.  A linefeed breaks words, sentences,
   // and paragraphs.
-  if (shouldEmitNewlineForNode(m_node) ||
-      shouldEmitNewlinesBeforeAndAfterNode(m_node) ||
+  if (shouldEmitNewlineForNode(m_node) || shouldEmitNewlineAfterNode(m_node) ||
       shouldEmitTabBeforeNode(m_node))
     emitNewline();
 
