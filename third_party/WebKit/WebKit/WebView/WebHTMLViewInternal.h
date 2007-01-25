@@ -52,9 +52,6 @@
   BOOL handlingMouseDownEvent;
   NSEvent* keyDownEvent;  // Kept after handling the event.
 
-  NSURL* draggingImageURL;
-  unsigned dragSourceActionMask;
-
   NSSize lastLayoutSize;
   NSSize lastLayoutFrameSize;
   BOOL laidOutAtLeastOnce;
