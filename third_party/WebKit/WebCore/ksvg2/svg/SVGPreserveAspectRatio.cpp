@@ -44,7 +44,9 @@ SVGPreserveAspectRatio::SVGPreserveAspectRatio(const SVGStyledElement* context)
     : Shared<SVGPreserveAspectRatio>(),
       m_align(SVG_PRESERVEASPECTRATIO_XMIDYMID),
       m_meetOrSlice(SVG_MEETORSLICE_MEET),
-      m_context(context) {}
+      m_context(context) {
+  // FIXME: Should the two values default to UNKNOWN instead?
+}
 
 SVGPreserveAspectRatio::~SVGPreserveAspectRatio() {}
 
@@ -155,6 +157,7 @@ void SVGPreserveAspectRatio::parsePreserveAspectRatio(const String& string) {
 
   if (end != currParam) {
   bail_out:
+    // FIXME: Should the two values be set to UNKNOWN instead?
     align = SVG_PRESERVEASPECTRATIO_NONE;
     meetOrSlice = SVG_MEETORSLICE_MEET;
   }
