@@ -56,6 +56,7 @@
 #include "HTMLDocument.h"
 #include "HTMLElementFactory.h"
 #include "HTMLFrameOwnerElement.h"
+#include "HTMLHeadElement.h"
 #include "HTMLImageLoader.h"
 #include "HTMLInputElement.h"
 #include "HTMLLinkElement.h"
@@ -1308,14 +1309,14 @@ HTMLElement* Document::body() {
   return static_cast<HTMLElement*>(body);
 }
 
-HTMLElement* Document::head() {
+HTMLHeadElement* Document::head() {
   Node* de = documentElement();
   if (!de)
     return 0;
 
   for (Node* e = de->firstChild(); e; e = e->nextSibling())
     if (e->hasTagName(headTag))
-      return static_cast<HTMLElement*>(e);
+      return static_cast<HTMLHeadElement*>(e);
 
   return 0;
 }
@@ -2010,6 +2011,7 @@ void Document::activeChainNodeDetached(Node* node) {
 }
 
 #if PLATFORM(MAC)
+
 const Vector<DashboardRegionValue>& Document::dashboardRegions() const {
   return m_dashboardRegions;
 }
@@ -2019,6 +2021,7 @@ void Document::setDashboardRegions(
   m_dashboardRegions = regions;
   setDashboardRegionsDirty(false);
 }
+
 #endif
 
 bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {

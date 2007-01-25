@@ -64,6 +64,7 @@ class HTMLDocument;
 class HTMLElement;
 class HTMLFormElement;
 class HTMLGenericFormElement;
+class HTMLHeadElement;
 class HTMLImageLoader;
 class HTMLInputElement;
 class HTMLMapElement;
@@ -613,7 +614,7 @@ class Document : public ContainerNode {
   HTMLMapElement* getImageMap(const String& URL) const;
 
   HTMLElement* body();
-  HTMLElement* head();
+  HTMLHeadElement* head();
 
   String toString() const;
 
