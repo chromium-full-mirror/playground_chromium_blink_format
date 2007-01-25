@@ -224,7 +224,10 @@ void FrameLoaderClientQt::loadedFromPageCache() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {}
+void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
+  if (m_webFrame)
+    emit m_webFrame->loadDone(true);
+}
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
   notImplemented();
@@ -264,10 +267,7 @@ void FrameLoaderClientQt::dispatchDidFinishDocumentLoad() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidFinishLoad() {
-  if (m_webFrame)
-    emit m_webFrame->loadDone(true);
-}
+void FrameLoaderClientQt::dispatchDidFinishLoad() {}
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
   // notImplemented();
