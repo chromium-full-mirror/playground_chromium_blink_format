@@ -67,8 +67,6 @@ class DumpRenderTree : public QObject {
   void quit();
 
  private:
-  void readSkipFile();
-
   QWebPage* page;
   QWebFrame* frame;
 
@@ -77,8 +75,6 @@ class DumpRenderTree : public QObject {
   QFile* m_stdin;
   QSocketNotifier* m_notifier;
 
-  // To be skipped tests
-  QList<QString> m_skipped;
   bool m_loading;
 };
 }
