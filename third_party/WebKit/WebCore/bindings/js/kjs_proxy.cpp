@@ -1,7 +1,7 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
+ *  Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,12 @@
 #include "kjs_proxy.h"
 
 #include "Chrome.h"
-#include "kjs_events.h"
-#include "kjs_window.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "JSDOMWindow.h"
 #include "Page.h"
+#include "kjs_events.h"
+#include "kjs_window.h"
 
 #ifdef SVG_SUPPORT
 #include "JSSVGLazyEventListener.h"
@@ -82,8 +82,8 @@ JSValue* KJSProxy::evaluate(const String& filename,
                             ->toObject(m_script->globalExec())
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
-    m_frame->page()->chrome()->addMessageToConsole(errorMessage, lineNumber,
-                                                   sourceURL);
+    if (Page* page = m_frame->page())
+      page->chrome()->addMessageToConsole(errorMessage, lineNumber, sourceURL);
   }
 
   return 0;

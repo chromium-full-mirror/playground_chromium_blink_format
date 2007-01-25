@@ -1279,7 +1279,7 @@ bool Window::isSafeScript(const ScriptInterpreter* origin,
   if (Page* page = targetFrame->page())
     page->chrome()->addMessageToConsole(
         message, 1,
-        String());  // fixme: provide a real line number and sourceurl
+        String());  // FIXME: provide a real line number and source URL.
 
   return false;
 }
@@ -1930,11 +1930,15 @@ void Window::updateLayout() const {
 ////////////////////// ScheduledAction ////////////////////////
 
 void ScheduledAction::execute(Window* window) {
-  if (!window->m_frame || !window->m_frame->scriptProxy())
+  RefPtr<Frame> frame = window->m_frame;
+  if (!frame)
     return;
 
-  ScriptInterpreter* interpreter =
-      window->m_frame->scriptProxy()->interpreter();
+  KJSProxy* scriptProxy = frame->scriptProxy();
+  if (!scriptProxy)
+    return;
+
+  RefPtr<ScriptInterpreter> interpreter = scriptProxy->interpreter();
 
   interpreter->setProcessingTimerCallback(true);
 
@@ -1954,18 +1958,23 @@ void ScheduledAction::execute(Window* window) {
         int lineNumber = exception->get(exec, "line")->toInt32(exec);
         if (Interpreter::shouldPrintExceptions())
           printf("(timer):%s\n", message.utf8().data());
-        if (Page* page = window->m_frame->page())
+        if (Page* page = frame->page())
           page->chrome()->addMessageToConsole(message, lineNumber, String());
       }
     }
   } else
-    window->m_frame->loader()->executeScript(0, m_code);
+    frame->loader()->executeScript(0, m_code);
 
   // Update our document's rendering following the execution of the timeout
   // callback.
-  // FIXME: Why? Why not other documents, for example?
-  Document* doc = window->m_frame->document();
-  if (doc)
+  // FIXME: Why not use updateDocumentsRendering to update rendering of all
+  // documents?
+  // FIXME: Is this really the right point to do the update? We need a place
+  // that works
+  // for all possible entry points that might possibly execute script, but this
+  // seems
+  // to be a bit too low-level.
+  if (Document* doc = frame->document())
     doc->updateRendering();
 
   interpreter->setProcessingTimerCallback(false);
