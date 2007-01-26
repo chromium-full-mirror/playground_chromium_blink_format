@@ -37,6 +37,7 @@
 #include <QUrl>
 
 #include <QProgressBar>
+#include <QMainWindow>
 #include <QWidget>
 #include <QPainter>
 #include <QPen>
@@ -74,6 +75,30 @@ class InfoWidget : public QProgressBar {
   qreal m_progress;
 };
 
+class MainWindow : public QMainWindow {
+  Q_OBJECT
+ public:
+  MainWindow(const QUrl& url) {
+    page = new QWebPage(this);
+    InfoWidget* info = new InfoWidget(page);
+    info->setGeometry(20, 20, info->sizeHint().width(),
+                      info->sizeHint().height());
+    connect(page, SIGNAL(loadStarted(QWebFrame*)), info, SLOT(startLoad()));
+    connect(page, SIGNAL(loadProgressChanged(double)), info,
+            SLOT(changeLoad(double)));
+    connect(page, SIGNAL(loadFinished(QWebFrame*)), info, SLOT(endLoad()));
+
+    setCentralWidget(page);
+
+    page->open(url);
+
+    info->raise();
+  }
+
+ private:
+  QWebPage* page;
+};
+
 #include "main.moc"
 
 int main(int argc, char** argv) {
@@ -85,28 +110,8 @@ int main(int argc, char** argv) {
   if (args.count() > 1)
     url = args.at(1);
 
-  QWidget topLevel;
-  QBoxLayout* l = new QVBoxLayout(&topLevel);
+  MainWindow window(url);
+  window.show();
 
-  QWebPage* page = new QWebPage(&topLevel);
-  InfoWidget* info = new InfoWidget(page);
-  info->setGeometry(20, 20, info->sizeHint().width(),
-                    info->sizeHint().height());
-  QObject::connect(page, SIGNAL(loadStarted(QWebFrame*)), info,
-                   SLOT(startLoad()));
-  QObject::connect(page, SIGNAL(loadProgressChanged(double)), info,
-                   SLOT(changeLoad(double)));
-  QObject::connect(page, SIGNAL(loadFinished(QWebFrame*)), info,
-                   SLOT(endLoad()));
-
-  l->addWidget(page);
-
-  topLevel.show();
-
-  page->open(url);
-
-  info->raise();
-
-  app.exec();
-  return 0;
+  return app.exec();
 }
