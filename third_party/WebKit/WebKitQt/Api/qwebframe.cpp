@@ -37,6 +37,7 @@
 #include "RenderTreeAsText.h"
 #include "Element.h"
 #include "Document.h"
+#include "RenderObject.h"
 
 #include "bindings/runtime.h"
 #include "bindings/runtime_root.h"
@@ -109,16 +110,30 @@ QString QWebFrame::markup() const {
 }
 
 QString QWebFrame::innerText() const {
+  if (d->frameView->layoutPending())
+    d->frameView->layout();
+
   Element* documentElement = d->frame->document()->documentElement();
   return documentElement->innerText();
 }
 
 QString QWebFrame::renderTreeDump() const {
+  if (d->frameView->layoutPending())
+    d->frameView->layout();
+
   return externalRepresentation(d->frame->renderer());
 }
 
 QWebPage* QWebFrame::page() const {
   return d->page;
+}
+
+void QWebFrame::resizeEvent(QResizeEvent* e) {
+  QScrollArea::resizeEvent(e);
+  RenderObject* renderer = d->frame->renderer();
+  if (renderer)
+    renderer->setNeedsLayout(true);
+  d->frameView->scheduleRelayout();
 }
 
 #include "qwebframe.moc"

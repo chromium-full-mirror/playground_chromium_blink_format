@@ -53,6 +53,9 @@ class QWebFrame : public QScrollArea {
   void cleared();
   void loadDone(bool ok);
 
+ protected:
+  void resizeEvent(QResizeEvent*);
+
  private:
   friend class QWebPage;
   friend class WebCore::FrameLoaderClientQt;
