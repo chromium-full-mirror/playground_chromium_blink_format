@@ -496,6 +496,9 @@ int RenderObject::offsetLeft() const {
       x += curr->xPos();
       curr = curr->parent();
     }
+    if (offsetPar->isBody() && !offsetPar->isRelPositioned() &&
+        !offsetPar->isPositioned())
+      x += offsetPar->xPos();
   }
   return x;
 }
@@ -514,6 +517,9 @@ int RenderObject::offsetTop() const {
         y += curr->yPos();
       curr = curr->parent();
     }
+    if (offsetPar->isBody() && !offsetPar->isRelPositioned() &&
+        !offsetPar->isPositioned())
+      y += offsetPar->yPos();
   }
   return y;
 }
