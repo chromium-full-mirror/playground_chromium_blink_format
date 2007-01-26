@@ -72,6 +72,14 @@ void InlineTextBox::operator delete(void* ptr, size_t sz) {
   *static_cast<size_t*>(ptr) = sz;
 }
 
+int InlineTextBox::selectionTop() {
+  return root()->selectionTop();
+}
+
+int InlineTextBox::selectionHeight() {
+  return root()->selectionHeight();
+}
+
 bool InlineTextBox::isSelected(int startPos, int endPos) const {
   int sPos = max(startPos - m_start, 0);
   int ePos = min(endPos - m_start, (int)m_len);
@@ -111,10 +119,9 @@ IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
   if (sPos >= ePos)
     return IntRect();
 
-  RootInlineBox* rootBox = root();
   RenderText* textObj = textObject();
-  int selTop = rootBox->selectionTop();
-  int selHeight = rootBox->selectionHeight();
+  int selTop = selectionTop();
+  int selHeight = selectionHeight();
   const Font& f = textObj->style(m_firstLine)->font();
 
   IntRect r = enclosingIntRect(f.selectionRectForText(
@@ -573,9 +580,8 @@ void InlineTextBox::paintSelection(GraphicsContext* p,
 
   p->save();
   updateGraphicsContext(p, c, c, 0);  // Don't draw text at all!
-  RootInlineBox* r = root();
-  int y = r->selectionTop();
-  int h = r->selectionHeight();
+  int y = selectionTop();
+  int h = selectionHeight();
   p->clip(IntRect(m_x + tx, y + ty, m_width, h));
   p->drawHighlightForText(
       TextRun(textObject()->text(), m_start, m_len, sPos, ePos),
@@ -606,9 +612,8 @@ void InlineTextBox::paintMarkedTextBackground(GraphicsContext* p,
 
   updateGraphicsContext(p, c, c, 0);  // Don't draw text at all!
 
-  RootInlineBox* r = root();
-  int y = r->selectionTop();
-  int h = r->selectionHeight();
+  int y = selectionTop();
+  int h = selectionHeight();
   p->drawHighlightForText(
       TextRun(textObject()->text(), m_start, m_len, sPos, ePos),
       IntPoint(m_x + tx, y + ty), h,
@@ -623,8 +628,8 @@ void InlineTextBox::paintCustomHighlight(int tx,
                                          int ty,
                                          const AtomicString& type) {
   RootInlineBox* r = root();
-  FloatRect rootRect(tx + r->xPos(), ty + r->selectionTop(), r->width(),
-                     r->selectionHeight());
+  FloatRect rootRect(tx + r->xPos(), ty + selectionTop(), r->width(),
+                     selectionHeight());
   FloatRect textRect(tx + xPos(), rootRect.y(), width(), rootRect.height());
 
   Mac(object()->document()->frame())
@@ -714,7 +719,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
   // elsewhere in order to
   // display a toolTip. We don't do this for misspelling markers.
   if (grammar) {
-    int y = root()->selectionTop();
+    int y = selectionTop();
     IntPoint startPoint = IntPoint(m_x + _tx, y + _ty);
     TextStyle textStyle =
         TextStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
@@ -723,8 +728,8 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     int endPosition = min(marker.endOffset - m_start, (unsigned)m_len);
     TextRun run = TextRun(textObject()->text(), m_start, m_len, startPosition,
                           endPosition);
-    IntRect markerRect = enclosingIntRect(f->selectionRectForText(
-        run, textStyle, startPoint, root()->selectionHeight()));
+    IntRect markerRect = enclosingIntRect(
+        f->selectionRectForText(run, textStyle, startPoint, selectionHeight()));
     object()->document()->setRenderedRectForMarker(object()->node(), marker,
                                                    markerRect);
   }
@@ -764,9 +769,8 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   // Use same y positioning and height as for selection, so that when the
   // selection and this highlight are on
   // the same word there are no pieces sticking out.
-  RootInlineBox* r = root();
-  int y = r->selectionTop();
-  int h = r->selectionHeight();
+  int y = selectionTop();
+  int h = selectionHeight();
 
   int sPos = max(marker.startOffset - m_start, (unsigned)0);
   int ePos = min(marker.endOffset - m_start, (unsigned)m_len);
