@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 Trolltech ASA
+    Copyright (C) 2007 Staikos Computing Services Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -47,14 +48,26 @@ class QWebPage : public QWidget {
 
   QWebFrame* mainFrame() const;
 
+  QWebFrame* focusFrame() const;
+
   QWebPageHistory history() const;
 
   QSize sizeHint() const;
 
+  QString title() const;
+
+  QUrl url() const;
+
  public slots:
+  /**
+   * Stops loading of the page, if loading.
+   */
+  void stop();
+
   void goBack();
   void goForward();
   void goToHistoryItem(const QWebHistoryItem& item);
+
  signals:
   /**
    * Signal is emitted when load is started on one of the child
@@ -73,6 +86,11 @@ class QWebPage : public QWidget {
    * load finished is passed as an argument.
    */
   void loadFinished(QWebFrame* frame);
+  /**
+   * Signal is emitted when the title of this page has changed.
+   * Applies only to the main frame.  Sub-frame titles do not trigger this.
+   */
+  void titleChanged(const QString& title);
 
  protected:
   virtual QWebFrame* createFrame(QWebFrame* parentFrame,

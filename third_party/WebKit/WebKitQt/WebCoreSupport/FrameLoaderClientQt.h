@@ -29,6 +29,7 @@
 #define FrameLoaderClientQt_H
 
 #include <qobject.h>
+#include <QUrl>
 
 #include "FrameLoaderClient.h"
 #include "KURL.h"
@@ -61,6 +62,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   void loadStarted(QWebFrame* frame);
   void loadProgressChanged(double d);
   void loadFinished(QWebFrame* frame);
+  void titleChanged(const QString& title);
 
  public:
   FrameLoaderClientQt();
@@ -161,6 +163,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void addHistoryItemForFragmentScroll();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
+  virtual void setTitle(const String& title);
   virtual void setTitle(const String& title, const KURL&);
 
   virtual String userAgent();
