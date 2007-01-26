@@ -76,6 +76,7 @@ class MediaQueryEvaluator {
   ~MediaQueryEvaluator();
 
   bool mediaTypeMatch(const String& mediaTypeToMatch) const;
+  bool mediaTypeMatchSpecific(const char* mediaTypeToMatch) const;
 
   /** Evaluates a list of media queries */
   bool eval(const MediaList* query) const;

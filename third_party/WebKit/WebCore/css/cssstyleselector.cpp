@@ -785,8 +785,9 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
 
 void CSSStyleSelector::matchUARules(int& firstUARule, int& lastUARule) {
   // First we match rules from the user agent sheet.
-  CSSRuleSet* userAgentStyleSheet =
-      m_medium->mediaTypeMatch("print") ? defaultPrintStyle : defaultStyle;
+  CSSRuleSet* userAgentStyleSheet = m_medium->mediaTypeMatchSpecific("print")
+                                        ? defaultPrintStyle
+                                        : defaultStyle;
   matchRules(userAgentStyleSheet, firstUARule, lastUARule);
 
   // In quirks mode, we match rules from the quirks user agent sheet.
