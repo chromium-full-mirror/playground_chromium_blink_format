@@ -1361,7 +1361,7 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
       // positioned explicitly) this should not incur a performance penalty.
       if (relayoutChildren || (r->hasStaticY() && r->parent() != this &&
                                r->parent()->isBlockFlow()))
-        r->setChildNeedsLayout(true);
+        r->setChildNeedsLayout(true, false);
       r->layoutIfNeeded();
     }
   }
