@@ -107,7 +107,7 @@ bool MediaQueryEvaluator::mediaTypeMatchSpecific(
   // Like mediaTypeMatch, but without the special cases for "" and "all".
   ASSERT(mediaTypeToMatch);
   ASSERT(mediaTypeToMatch[0] != '\0');
-  ASSERT(equalIgnoringCase(mediaTypeToMatch, String("all")));
+  ASSERT(!equalIgnoringCase(mediaTypeToMatch, String("all")));
   return equalIgnoringCase(mediaTypeToMatch, m_mediaType);
 }
 
