@@ -93,6 +93,9 @@ class ValueList {
     return current();
   }
 
+  Value* valueAt(unsigned i) { return i < m_values.size() ? &m_values[i] : 0; }
+  void deleteValueAt(unsigned i) { m_values.remove(i); }
+
  private:
   Vector<Value, 16> m_values;
   unsigned m_current;
@@ -245,6 +248,8 @@ class CSSParser {
   void setupParser(const char* prefix, const String&, const char* suffix);
 
   bool inShorthand() const { return m_inParseShorthand; }
+
+  void checkForOrphanedUnits();
 
   UChar* data;
   UChar* yytext;
