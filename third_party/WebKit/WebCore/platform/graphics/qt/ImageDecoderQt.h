@@ -28,8 +28,10 @@
 #define ImageDecoderQt_h
 
 #include "ImageDecoder.h"
-#include <QtCore/QList>
+#include <QtGui/QImage>
 #include <QtGui/QPixmap>
+#include <QtCore/QList>
+#include <QtCore/QHash>
 
 namespace WebCore {
 
@@ -74,18 +76,17 @@ class ImageDecoderQt : public ImageDecoder {
   };
 
   struct ImageData {
-    ImageData(const QPixmap& image,
-              QImage::Format format,
+    ImageData(const QImage& image,
               ImageState imageState = ImagePartial,
               int duration = 0);
-    QPixmap m_image;
+    QImage m_image;
     ImageState m_imageState;
     int m_duration;
-    QImage::Format m_format;
   };
 
   typedef QList<ImageData> ImageList;
   ImageList m_imageList;
+  mutable QHash<int, QPixmap> m_pixmapCache;
 };
 }
 

@@ -21,6 +21,14 @@
 #include "config.h"
 #include "Icon.h"
 
+#include "GraphicsContext.h"
+#include "DeprecatedString.h"
+#include "PlatformString.h"
+#include "IntRect.h"
+
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qrect.h>
 #include <qglobal.h>
 
 #define notImplemented() \
@@ -28,21 +36,22 @@
 
 namespace WebCore {
 
-Icon::Icon() {
-  notImplemented();
-}
+Icon::Icon() {}
 
-Icon::~Icon() {
-  notImplemented();
-}
+Icon::~Icon() {}
 
 PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
-  notImplemented();
-  return PassRefPtr<Icon>(0);
+  Icon* i = new Icon;
+  i->m_icon = QIcon(filename);
+  return PassRefPtr<Icon>(i);
 }
 
-void Icon::paint(GraphicsContext*, const IntRect&) {
-  notImplemented();
+void Icon::paint(GraphicsContext* ctx, const IntRect& rect) {
+  QPixmap px = m_icon.pixmap(rect.size());
+  QPainter* p = static_cast<QPainter*>(ctx->platformContext());
+  if (p && !px.isNull()) {
+    p->drawPixmap(rect.x(), rect.y(), px);
+  }
 }
 }
 
