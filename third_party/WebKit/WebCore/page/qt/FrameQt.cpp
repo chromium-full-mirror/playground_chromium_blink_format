@@ -102,12 +102,8 @@ static void doScroll(const RenderObject* r, bool isHorizontal, int multiplier)
 
 FrameQt::FrameQt(Page* page,
                  HTMLFrameOwnerElement* ownerElement,
-                 FrameQtClient* frameClient,
                  FrameLoaderClient* frameLoader)
-    : Frame(page, ownerElement, frameLoader), m_bindingRoot(0) {
-  m_client = frameClient;
-  m_client->setFrame(this);
-}
+    : Frame(page, ownerElement, frameLoader), m_bindingRoot(0) {}
 
 FrameQt::~FrameQt() {
   setView(0);
@@ -243,10 +239,6 @@ bool FrameQt::keyEvent(const PlatformKeyboardEvent& keyEvent) {
 
 void FrameQt::setFrameGeometry(const IntRect& r) {
   setFrameGeometry(QRect(r));
-}
-
-FrameQtClient* FrameQt::client() const {
-  return m_client;
 }
 
 void FrameQt::createNewWindow(const FrameLoadRequest& request,
