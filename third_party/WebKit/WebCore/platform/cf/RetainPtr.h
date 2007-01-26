@@ -45,7 +45,7 @@ struct RemovePointer<T*> {
 enum AdoptTag { Adopt };
 
 template <typename T>
-inline void adoptCFReference(T* ptr) {}
+inline void adoptCFReference(T*) {}
 
 #ifdef __OBJC__
 inline void adoptCFReference(id ptr) {
