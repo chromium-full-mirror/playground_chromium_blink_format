@@ -25,6 +25,8 @@
 #include "qwebframe.h"
 #include "qwebpage_p.h"
 #include "qwebframe_p.h"
+#include "qwebpagehistory.h"
+#include "qwebpagehistory_p.h"
 
 #include <qurl.h>
 
@@ -112,6 +114,24 @@ QWebFrame* QWebPage::mainFrame() const {
 
 QSize QWebPage::sizeHint() const {
   return QSize(800, 600);
+}
+
+QWebPageHistory QWebPage::history() const {
+  WebCore::BackForwardList* lst = d->page->backForwardList();
+  QWebPageHistoryPrivate* priv = new QWebPageHistoryPrivate(lst);
+  return QWebPageHistory(priv);
+}
+
+void QWebPage::goBack() {
+  d->page->goBack();
+}
+
+void QWebPage::goForward() {
+  d->page->goForward();
+}
+
+void QWebPage::goToHistoryItem(const QWebHistoryItem& item) {
+  d->page->goToItem(item.d->item, FrameLoadTypeIndexedBackForward);
 }
 
 #include "qwebpage.moc"
