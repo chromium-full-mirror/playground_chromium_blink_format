@@ -484,8 +484,7 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
   // <http://bugs.webkit.org/show_bug.cgi?id=4560> and
   // <http://bugs.webkit.org/show_bug.cgi?id=12165>.
 
-  bool withinTitle = false;
-  bool withinScript = false;
+  AtomicStringImpl* enclosingTagName;
 
   const char* ptr = m_buffer.data();
   const char* pEnd = ptr + m_buffer.size();
@@ -546,10 +545,17 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       tmp[len] = 0;
       AtomicString tag(tmp);
 
-      if (tag == titleTag)
-        withinTitle = !end;
-      else if (tag == scriptTag)
-        withinScript = !end;
+      if (enclosingTagName) {
+        if (end && tag.impl() == enclosingTagName)
+          enclosingTagName = 0;
+      } else {
+        if (tag == titleTag)
+          enclosingTagName = titleTag.localName().impl();
+        else if (tag == scriptTag)
+          enclosingTagName = scriptTag.localName().impl();
+        else if (tag == noscriptTag)
+          enclosingTagName = noscriptTag.localName().impl();
+      }
 
       if (!end && tag == metaTag) {
         const char* end = ptr;
@@ -597,8 +603,7 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       } else if (tag != scriptTag && tag != noscriptTag && tag != styleTag &&
                  tag != linkTag && tag != metaTag && tag != objectTag &&
                  tag != titleTag && tag != baseTag && (end || tag != htmlTag) &&
-                 !withinTitle && !withinScript && (tag != headTag) &&
-                 isalpha(tmp[0])) {
+                 !enclosingTagName && (tag != headTag) && isalpha(tmp[0])) {
         m_checkedForHeadCharset = true;
         return true;
       }
