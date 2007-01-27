@@ -66,17 +66,18 @@ JavaField::JavaField(JNIEnv* env, jobject aField) {
       (jstring)callJNIObjectMethod(aField, "getName", "()Ljava/lang/String;");
   _name = JavaString(env, fieldName);
 
-  _field = new JavaInstance(aField, 0);
+  _field = new JavaInstance(aField);
 }
 
 JSValue* JavaArray::convertJObjectToArray(ExecState* exec,
                                           jobject anObject,
                                           const char* type,
-                                          const RootObject* r) {
+                                          PassRefPtr<RootObject> rootObject) {
   if (type[0] != '[')
     return jsUndefined();
 
-  return new RuntimeArray(exec, new JavaArray((jobject)anObject, type, r));
+  return new RuntimeArray(exec,
+                          new JavaArray((jobject)anObject, type, rootObject));
 }
 
 jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
@@ -94,7 +95,7 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
   if (cls != NULL) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
     if (mid != NULL) {
-      const RootObject* rootObject = instance->rootObject();
+      RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
         JSValue* exceptionDescription = NULL;
         jvalue args[1];
@@ -183,7 +184,7 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
   if (cls != NULL) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
     if (mid != NULL) {
-      const RootObject* rootObject = instance->rootObject();
+      RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
         JSValue* exceptionDescription = NULL;
         jvalue args[2];
@@ -381,22 +382,23 @@ jmethodID JavaMethod::methodID(jobject obj) const {
   return _methodID;
 }
 
-JavaArray::JavaArray(jobject a, const char* t, const RootObject* r) {
-  _array = new JObjectWrapper(a);
+JavaArray::JavaArray(jobject array,
+                     const char* type,
+                     PassRefPtr<RootObject> rootObject) {
+  _array = new JObjectWrapper(array);
   // Java array are fixed length, so we can cache length.
   JNIEnv* env = getJNIEnv();
   _length = env->GetArrayLength((jarray)_array->_instance);
-  _type = strdup(t);
-  _rootObject = r;
+  _type = strdup(type);
+  _rootObject = rootObject;
 }
 
 JavaArray::~JavaArray() {
   free((void*)_type);
 }
 
-JavaArray::JavaArray(const JavaArray& other) : Array() {
-  _array = other._array;
-  _type = strdup(other._type);
+RootObject* JavaArray::rootObject() const {
+  return _rootObject && _rootObject->isValid() ? _rootObject.get() : 0;
 }
 
 void JavaArray::setValueAt(ExecState* exec,

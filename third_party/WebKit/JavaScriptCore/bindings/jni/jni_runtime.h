@@ -247,21 +247,10 @@ class JavaMethod : public Method {
 
 class JavaArray : public Array {
  public:
-  JavaArray(jobject a, const char* type, const RootObject* r);
+  JavaArray(jobject array, const char* type, PassRefPtr<RootObject>);
+  virtual ~JavaArray();
 
-  JavaArray(const JavaArray& other);
-
-  JavaArray& operator=(const JavaArray& other) {
-    if (this == &other)
-      return *this;
-
-    free((void*)_type);
-    _type = strdup(other._type);
-    _rootObject = other._rootObject;
-    _array = other._array;
-
-    return *this;
-  };
+  RootObject* rootObject() const;
 
   virtual void setValueAt(ExecState* exec,
                           unsigned int index,
@@ -269,22 +258,21 @@ class JavaArray : public Array {
   virtual JSValue* valueAt(ExecState* exec, unsigned int index) const;
   virtual unsigned int getLength() const;
 
-  virtual ~JavaArray();
-
   jobject javaArray() const { return _array->_instance; }
 
   static JSValue* convertJObjectToArray(ExecState* exec,
                                         jobject anObject,
                                         const char* type,
-                                        const RootObject* r);
-
-  const RootObject* rootObject() const { return _rootObject; }
+                                        PassRefPtr<RootObject>);
 
  private:
+  JavaArray(const JavaArray&);
+  JavaArray& operator=(const JavaArray&);
+
   RefPtr<JObjectWrapper> _array;
   unsigned int _length;
   const char* _type;
-  const RootObject* _rootObject;
+  RefPtr<RootObject> _rootObject;
 };
 
 }  // namespace Bindings

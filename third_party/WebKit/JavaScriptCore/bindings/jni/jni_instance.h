@@ -62,8 +62,7 @@ class JObjectWrapper {
 
 class JavaInstance : public Instance {
  public:
-  JavaInstance(jobject instance, const RootObject* r);
-
+  JavaInstance(jobject instance);
   ~JavaInstance();
 
   virtual Class* getClass() const;
@@ -85,7 +84,6 @@ class JavaInstance : public Instance {
   JSValue* booleanValue() const;
 
  private:
-  JavaInstance();                          // prevent default construction
   JavaInstance(JavaInstance&);             // prevent copying
   JavaInstance& operator=(JavaInstance&);  // prevent copying
 

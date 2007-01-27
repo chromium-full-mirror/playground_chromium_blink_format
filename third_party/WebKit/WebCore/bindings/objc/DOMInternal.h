@@ -325,8 +325,8 @@ class XPathNSResolver;
 
 namespace KJS {
 id createDOMWrapper(KJS::JSObject*,
-                    const KJS::Bindings::RootObject*,
-                    const KJS::Bindings::RootObject*);
+                    PassRefPtr<Bindings::RootObject> origin,
+                    PassRefPtr<Bindings::RootObject> current);
 }  // namespace KJS
 
 namespace WebCore {

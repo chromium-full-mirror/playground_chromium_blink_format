@@ -141,10 +141,10 @@ class Instance {
 
   static Instance* createBindingForLanguageInstance(BindingLanguage,
                                                     void* nativeInstance,
-                                                    const RootObject* = 0);
+                                                    PassRefPtr<RootObject> = 0);
   static JSObject* createRuntimeObject(BindingLanguage,
                                        void* nativeInstance,
-                                       const RootObject* = 0);
+                                       PassRefPtr<RootObject> = 0);
 
   void ref() { _refCount++; }
   void deref() {
@@ -185,13 +185,13 @@ class Instance {
 
   virtual JSValue* valueOf() const { return jsString(getClass()->name()); }
 
-  void setRootObject(const RootObject* r) { _rootObject = r; }
-  const RootObject* rootObject() const { return _rootObject; }
+  void setRootObject(PassRefPtr<RootObject>);
+  RootObject* rootObject() const;
 
-  virtual ~Instance() {}
+  virtual ~Instance();
 
  protected:
-  const RootObject* _rootObject;
+  RefPtr<RootObject> _rootObject;
   unsigned _refCount;
 
  private:

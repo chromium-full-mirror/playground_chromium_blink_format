@@ -29,6 +29,9 @@
 #include "JSLock.h"
 #include "NP_jsobject.h"
 #include "c_instance.h"
+#include "runtime_object.h"
+#include "runtime_root.h"
+
 #if HAVE(JNI)
 #include "jni_instance.h"
 #endif
@@ -38,7 +41,6 @@
 #if PLATFORM(QT)
 #include "qt_instance.h"
 #endif
-#include "runtime_object.h"
 
 namespace KJS {
 namespace Bindings {
@@ -87,7 +89,9 @@ MethodList& MethodList::operator=(const MethodList& other) {
   return *this;
 }
 
-Instance::Instance() : _rootObject(0), _refCount(0) {}
+Instance::Instance() : _refCount(0) {}
+
+Instance::~Instance() {}
 
 static KJSDidExecuteFunctionPtr _DidExecuteFunction;
 
@@ -111,14 +115,13 @@ void Instance::setValueOfField(ExecState* exec,
 Instance* Instance::createBindingForLanguageInstance(
     BindingLanguage language,
     void* nativeInstance,
-    const RootObject* rootObject) {
+    PassRefPtr<RootObject> rootObject) {
   Instance* newInstance = 0;
 
   switch (language) {
 #if HAVE(JNI)
     case Instance::JavaLanguage: {
-      newInstance =
-          new Bindings::JavaInstance((jobject)nativeInstance, rootObject);
+      newInstance = new Bindings::JavaInstance((jobject)nativeInstance);
       break;
     }
 #endif
@@ -150,12 +153,20 @@ Instance* Instance::createBindingForLanguageInstance(
 
 JSObject* Instance::createRuntimeObject(BindingLanguage language,
                                         void* nativeInstance,
-                                        const RootObject* rootObject) {
-  Instance* interfaceObject = Instance::createBindingForLanguageInstance(
+                                        PassRefPtr<RootObject> rootObject) {
+  Instance* instance = Instance::createBindingForLanguageInstance(
       language, nativeInstance, rootObject);
 
   JSLock lock;
-  return new RuntimeObjectImp(interfaceObject);
+  return new RuntimeObjectImp(instance);
+}
+
+void Instance::setRootObject(PassRefPtr<RootObject> rootObject) {
+  _rootObject = rootObject;
+}
+
+RootObject* Instance::rootObject() const {
+  return _rootObject && _rootObject->isValid() ? _rootObject.get() : 0;
 }
 }
 }  // namespace KJS::Bindings

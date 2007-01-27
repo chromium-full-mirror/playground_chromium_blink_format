@@ -116,6 +116,8 @@ void convertValueToNPVariant(ExecState* exec,
                              NPVariant* result) {
   JSType type = value->type();
 
+  VOID_TO_NPVARIANT(*result);
+
   if (type == StringType) {
     UString ustring = value->toString(exec);
     CString cstring = ustring.UTF8String();
@@ -140,8 +142,7 @@ void convertValueToNPVariant(ExecState* exec,
       OBJECT_TO_NPVARIANT(obj, *result);
     } else {
       Interpreter* originInterpreter = exec->dynamicInterpreter();
-      const Bindings::RootObject* originRootObject =
-          findRootObject(originInterpreter);
+      RootObject* originRootObject = findRootObject(originInterpreter);
 
       Interpreter* interpreter = 0;
       if (originInterpreter->isGlobalObject(value)) {
@@ -151,18 +152,14 @@ void convertValueToNPVariant(ExecState* exec,
       if (!interpreter)
         interpreter = originInterpreter;
 
-      const RootObject* rootObject = findRootObject(interpreter);
-      if (!rootObject) {
-        RootObject* newRootObject = new RootObject(0, interpreter);
-        rootObject = newRootObject;
+      RootObject* rootObject = findRootObject(interpreter);
+      if (rootObject) {
+        NPObject* npObject =
+            _NPN_CreateScriptObject(0, object, originRootObject, rootObject);
+        OBJECT_TO_NPVARIANT(npObject, *result);
       }
-
-      NPObject* npObject =
-          _NPN_CreateScriptObject(0, object, originRootObject, rootObject);
-      OBJECT_TO_NPVARIANT(npObject, *result);
     }
-  } else
-    VOID_TO_NPVARIANT(*result);
+  }
 }
 
 JSValue* convertNPVariantToValue(ExecState*, const NPVariant* variant) {

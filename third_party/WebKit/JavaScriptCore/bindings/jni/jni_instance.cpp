@@ -44,10 +44,9 @@
 using namespace KJS::Bindings;
 using namespace KJS;
 
-JavaInstance::JavaInstance(jobject instance, const RootObject* r) {
+JavaInstance::JavaInstance(jobject instance) {
   _instance = new JObjectWrapper(instance);
   _class = 0;
-  setRootObject(r);
 }
 
 JavaInstance::~JavaInstance() {
@@ -142,9 +141,12 @@ JSValue* JavaInstance::invokeMethod(ExecState* exec,
   // Try to use the JNI abstraction first, otherwise fall back to
   // nornmal JNI.  The JNI dispatch abstraction allows the Java plugin
   // to dispatch the call on the appropriate internal VM thread.
-  const RootObject* rootObject = this->rootObject();
+  RootObject* rootObject = this->rootObject();
+  if (!rootObject)
+    return jsUndefined();
+
   bool handled = false;
-  if (rootObject && rootObject->nativeHandle()) {
+  if (rootObject->nativeHandle()) {
     jobject obj = _instance->_instance;
     JSValue* exceptionDescription = NULL;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
