@@ -228,21 +228,22 @@ void ScrollView::setStaticBackground(bool flag) {
 }
 
 void ScrollView::addChild(Widget* child) {
-  //     Q_ASSERT(child != 0);
-  //     Q_ASSERT(m_area && m_area->widget());
+//     Q_ASSERT(child != 0);
+//     Q_ASSERT(m_area && m_area->widget());
+#if 0
+    if (child && child->qwidget()) {
+        QWidget* w = child->qwidget();
+        QScrollBar *bar = qobject_cast<QScrollBar*>(w);
+        if (bar) {
+            if (bar->orientation() == Qt::Horizontal)
+                m_area->setHorizontalScrollBar(bar);
+            else
+                m_area->setVerticalScrollBar(bar);
 
-  if (child && child->qwidget()) {
-    QWidget* w = child->qwidget();
-    QScrollBar* bar = qobject_cast<QScrollBar*>(w);
-    if (bar) {
-      if (bar->orientation() == Qt::Horizontal)
-        m_area->setHorizontalScrollBar(bar);
-      else
-        m_area->setVerticalScrollBar(bar);
-
-      return;  // done
+            return;//done
+        }
     }
-  }
+#endif
   // anything but the scrollbar is currently a noop
   notImplemented();
 

@@ -22,6 +22,7 @@
 #define BINDINGS_QT_INSTANCE_H_
 
 #include "runtime.h"
+#include "runtime_root.h"
 #include <qpointer.h>
 
 class QObject;
