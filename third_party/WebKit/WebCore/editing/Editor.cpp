@@ -223,15 +223,24 @@ bool Editor::deleteWithDirection(SelectionController::EDirection direction,
   if (!canEdit())
     return false;
 
+  RefPtr<Range> range;
   EditorDeleteAction deletionAction = deleteSelectionAction;
 
   bool smartDeleteOK = false;
 
   if (m_frame->selectionController()->isRange()) {
+    range = selectedRange();
     smartDeleteOK = true;
     if (isTypingAction)
       deletionAction = deleteKeyAction;
   } else {
+    SelectionController selectionController;
+    selectionController.setSelection(
+        m_frame->selectionController()->selection());
+    selectionController.modify(SelectionController::EXTEND, direction,
+                               granularity);
+    range = selectionController.toRange();
+
     switch (direction) {
       case SelectionController::FORWARD:
       case SelectionController::RIGHT:
@@ -244,8 +253,8 @@ bool Editor::deleteWithDirection(SelectionController::EDirection direction,
     }
   }
 
-  deleteRange(selectedRange().get(), killRing, false, smartDeleteOK,
-              deletionAction, granularity);
+  deleteRange(range.get(), killRing, false, smartDeleteOK, deletionAction,
+              granularity);
 
   return true;
 }
