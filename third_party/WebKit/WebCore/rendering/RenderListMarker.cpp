@@ -537,11 +537,6 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
     return;
   }
 
-#ifdef BOX_DEBUG
-  context->setPen(red);
-  context->drawRect(box.x(), box.y(), box.width(), box.height());
-#endif
-
 #if PLATFORM(MAC)
   // FIXME: paint gap between marker and list item proper
   if (style()->highlight() != nullAtom &&
@@ -555,6 +550,7 @@ void RenderListMarker::paint(PaintInfo& paintInfo, int tx, int ty) {
   const Color color(style()->color());
   context->setStrokeColor(color);
   context->setStrokeStyle(SolidStroke);
+  context->setStrokeThickness(1.0f);
   context->setFillColor(color);
 
   switch (style()->listStyleType()) {
