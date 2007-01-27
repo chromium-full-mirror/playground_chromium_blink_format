@@ -131,8 +131,8 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   virtual bool hasRelativeValues() const;
 
  private:
-  void addSVGWindowEventListner(const AtomicString& eventType,
-                                const Attribute* attr);
+  void addSVGWindowEventListener(const AtomicString& eventType,
+                                 const Attribute* attr);
 
   ANIMATED_PROPERTY_FORWARD_DECLARATIONS(SVGExternalResourcesRequired,
                                          bool,
