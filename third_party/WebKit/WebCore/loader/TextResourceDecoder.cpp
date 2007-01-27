@@ -479,12 +479,13 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
   // matches behavior in other browsers; more details in
   // <http://bugs.webkit.org/show_bug.cgi?id=3590>.
 
-  // Additionally, we ignore things that looks like tags in <title> and
-  // <script>; see
-  // <http://bugs.webkit.org/show_bug.cgi?id=4560> and
-  // <http://bugs.webkit.org/show_bug.cgi?id=12165>.
+  // Additionally, we ignore things that looks like tags in <title>, <script>
+  // and <noscript>; see
+  // <http://bugs.webkit.org/show_bug.cgi?id=4560>,
+  // <http://bugs.webkit.org/show_bug.cgi?id=12165>
+  // and <http://bugs.webkit.org/show_bug.cgi?id=12389>.
 
-  AtomicStringImpl* enclosingTagName;
+  AtomicStringImpl* enclosingTagName = 0;
 
   const char* ptr = m_buffer.data();
   const char* pEnd = ptr + m_buffer.size();
