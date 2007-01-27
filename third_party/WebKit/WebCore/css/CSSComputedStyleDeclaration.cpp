@@ -585,11 +585,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return valueForLength(style->backgroundXPosition());
     case CSS_PROP_BACKGROUND_POSITION_Y:
       return valueForLength(style->backgroundYPosition());
-    case CSS_PROP__WEBKIT_BINDING:
-#ifdef XBL_SUPPORT
-// FIXME: unimplemented
-#endif
-      break;
     case CSS_PROP_BORDER_COLLAPSE:
       if (style->borderCollapse())
         return new CSSPrimitiveValue(CSS_VAL_COLLAPSE);
@@ -732,9 +727,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       ASSERT_NOT_REACHED();
       return 0;
-    case CSS_PROP_CLIP:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_COLOR:
       return new CSSPrimitiveValue(style->color().rgb());
     case CSS_PROP__WEBKIT_COLUMN_COUNT:
@@ -792,19 +784,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         return new CSSPrimitiveValue(CSS_VAL_AUTO);
       return new CSSPrimitiveValue(style->columnWidth(),
                                    CSSPrimitiveValue::CSS_NUMBER);
-    case CSS_PROP_CONTENT:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_COUNTER_INCREMENT:
-      // FIXME: unimplemented
-      // Specification says "as specified", which means we'd need to keep a copy
-      // of the original CSS list around.
-      break;
-    case CSS_PROP_COUNTER_RESET:
-      // FIXME: unimplemented
-      // Specification says "as specified", which means we'd need to keep a copy
-      // of the original CSS list around.
-      break;
     case CSS_PROP_CURSOR: {
       CSSValueList* list = 0;
       CursorList* cursors = style->cursors();
@@ -1000,8 +979,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_FONT_SIZE:
       return new CSSPrimitiveValue(style->fontDescription().computedPixelSize(),
                                    CSSPrimitiveValue::CSS_PX);
-    case CSS_PROP_FONT_STRETCH:
-      // FIXME: unimplemented
+    case CSS_PROP__WEBKIT_BINDING:
       break;
     case CSS_PROP_FONT_STYLE:
       if (style->fontDescription().italic())
@@ -1133,9 +1111,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       // FIXME: Supposed to return the percentage if percentage was specified.
       return new CSSPrimitiveValue(renderer->marginLeft(),
                                    CSSPrimitiveValue::CSS_PX);
-    case CSS_PROP__WEBKIT_MARQUEE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_MARQUEE_DIRECTION:
       switch (style->marqueeDirection()) {
         case MFORWARD:
@@ -1162,9 +1137,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         return new CSSPrimitiveValue(CSS_VAL_INFINITE);
       return new CSSPrimitiveValue(style->marqueeLoopCount(),
                                    CSSPrimitiveValue::CSS_NUMBER);
-    case CSS_PROP__WEBKIT_MARQUEE_SPEED:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_MARQUEE_STYLE:
       switch (style->marqueeBehavior()) {
         case MNONE:
@@ -1205,9 +1177,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP_OUTLINE_COLOR:
       return currentColorOrValidColor(style, style->outlineColor());
-    case CSS_PROP_OUTLINE_OFFSET:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_OUTLINE_STYLE:
       if (style->outlineStyleIsAuto())
         return new CSSPrimitiveValue(CSS_VAL_AUTO);
@@ -1258,9 +1227,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSS_PROP_PADDING_LEFT:
       return new CSSPrimitiveValue(renderer->paddingLeft(),
                                    CSSPrimitiveValue::CSS_PX);
-    case CSS_PROP_PAGE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_PAGE_BREAK_AFTER:
       switch (style->pageBreakAfter()) {
         case PBAUTO:
@@ -1307,14 +1273,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       ASSERT_NOT_REACHED();
       return 0;
-    case CSS_PROP_QUOTES:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_RIGHT:
       return getPositionOffsetValue(renderer, CSS_PROP_RIGHT);
-    case CSS_PROP_SIZE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TABLE_LAYOUT:
       switch (style->tableLayout()) {
         case TAUTO:
@@ -1546,50 +1506,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->boxSizing() == CONTENT_BOX)
         new CSSPrimitiveValue(CSS_VAL_CONTENT_BOX);
       return new CSSPrimitiveValue(CSS_VAL_BORDER_BOX);
-    case CSS_PROP_BACKGROUND:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_COLOR:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_STYLE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_TOP:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_RIGHT:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_BOTTOM:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_LEFT:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_BORDER_WIDTH:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_FONT:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_LIST_STYLE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_MARGIN:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_OUTLINE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP_PADDING:
-      // FIXME: unimplemented
-      break;
+    case CSS_PROP__WEBKIT_DASHBOARD_REGION:
 #if PLATFORM(MAC)
-    case CSS_PROP__WEBKIT_DASHBOARD_REGION: {
+    {
       const Vector<StyleDashboardRegion>& regions = style->dashboardRegions();
       unsigned count = regions.size();
       if (count == 1 && regions[0].type == StyleDashboardRegion::None)
@@ -1623,57 +1542,23 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       return new CSSPrimitiveValue(firstRegion.release());
     }
+#else
+      break;
 #endif
     case CSS_PROP__WEBKIT_APPEARANCE:
       return valueForAppearance(style->appearance());
-    case CSS_PROP__WEBKIT_BORDER_IMAGE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_BORDER_BOTTOM_LEFT_RADIUS:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_BORDER_BOTTOM_RIGHT_RADIUS:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_BORDER_RADIUS:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_BORDER_TOP_LEFT_RADIUS:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_BORDER_TOP_RIGHT_RADIUS:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_COLUMN_RULE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_COLUMNS:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_FONT_SIZE_DELTA:
       // Not a real style property -- used by the editing engine -- so has no
       // computed value.
       break;
     case CSS_PROP__WEBKIT_MARGIN_BOTTOM_COLLAPSE:
       return valueForMarginCollapse(style->marginBottomCollapse());
-    case CSS_PROP__WEBKIT_MARGIN_COLLAPSE:
-      // FIXME: unimplemented
-      break;
-    case CSS_PROP__WEBKIT_MARGIN_START:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_MARGIN_TOP_COLLAPSE:
       return valueForMarginCollapse(style->marginTopCollapse());
-    case CSS_PROP__WEBKIT_PADDING_START:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_RTL_ORDERING:
       if (style->visuallyOrdered())
         return new CSSPrimitiveValue(CSS_VAL_VISUAL);
       return new CSSPrimitiveValue(CSS_VAL_LOGICAL);
-    case CSS_PROP__WEBKIT_TEXT_STROKE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP__WEBKIT_USER_DRAG:
       switch (style->userDrag()) {
         case DRAG_AUTO:
@@ -1696,74 +1581,67 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           return new CSSPrimitiveValue(CSS_VAL_IGNORE);
       }
       break;
+    case CSS_PROP_BACKGROUND:
+    case CSS_PROP_BORDER:
+    case CSS_PROP_BORDER_BOTTOM:
+    case CSS_PROP_BORDER_COLOR:
+    case CSS_PROP_BORDER_LEFT:
+    case CSS_PROP_BORDER_RIGHT:
+    case CSS_PROP_BORDER_STYLE:
+    case CSS_PROP_BORDER_TOP:
+    case CSS_PROP_BORDER_WIDTH:
+    case CSS_PROP_CLIP:
+    case CSS_PROP_CONTENT:
+    case CSS_PROP_COUNTER_INCREMENT:
+    case CSS_PROP_COUNTER_RESET:
+    case CSS_PROP_FONT:
+    case CSS_PROP_FONT_STRETCH:
+    case CSS_PROP_LIST_STYLE:
+    case CSS_PROP_MARGIN:
+    case CSS_PROP_OUTLINE:
+    case CSS_PROP_OUTLINE_OFFSET:
+    case CSS_PROP_PADDING:
+    case CSS_PROP_PAGE:
+    case CSS_PROP_QUOTES:
     case CSS_PROP_SCROLLBAR_3DLIGHT_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_ARROW_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_DARKSHADOW_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_FACE_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_HIGHLIGHT_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_SHADOW_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_SCROLLBAR_TRACK_COLOR:
-      // FIXME: unimplemented
-      break;
+    case CSS_PROP_SIZE:
     case CSS_PROP_TEXT_LINE_THROUGH:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_LINE_THROUGH_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_LINE_THROUGH_MODE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_LINE_THROUGH_STYLE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_LINE_THROUGH_WIDTH:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERFLOW:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERLINE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERLINE_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERLINE_MODE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERLINE_STYLE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_OVERLINE_WIDTH:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_UNDERLINE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_UNDERLINE_COLOR:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_UNDERLINE_MODE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_UNDERLINE_STYLE:
-      // FIXME: unimplemented
-      break;
     case CSS_PROP_TEXT_UNDERLINE_WIDTH:
-      // FIXME: unimplemented
+    case CSS_PROP__WEBKIT_BORDER_BOTTOM_LEFT_RADIUS:
+    case CSS_PROP__WEBKIT_BORDER_BOTTOM_RIGHT_RADIUS:
+    case CSS_PROP__WEBKIT_BORDER_IMAGE:
+    case CSS_PROP__WEBKIT_BORDER_RADIUS:
+    case CSS_PROP__WEBKIT_BORDER_TOP_LEFT_RADIUS:
+    case CSS_PROP__WEBKIT_BORDER_TOP_RIGHT_RADIUS:
+    case CSS_PROP__WEBKIT_COLUMNS:
+    case CSS_PROP__WEBKIT_COLUMN_RULE:
+    case CSS_PROP__WEBKIT_MARGIN_COLLAPSE:
+    case CSS_PROP__WEBKIT_MARGIN_START:
+    case CSS_PROP__WEBKIT_MARQUEE:
+    case CSS_PROP__WEBKIT_MARQUEE_SPEED:
+    case CSS_PROP__WEBKIT_PADDING_START:
+    case CSS_PROP__WEBKIT_TEXT_STROKE:
+      // FIXME: The above are unimplemented.
       break;
   }
 
