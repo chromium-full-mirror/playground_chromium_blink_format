@@ -170,8 +170,6 @@ class EventHandler : Noncopyable {
 
   void hoverTimerFired(Timer<EventHandler>*);
 
-  bool lastEventIsMouseUp() const;
-
   static bool canMouseDownStartSelect(Node*);
 
   void handleAutoscroll(RenderObject*);
