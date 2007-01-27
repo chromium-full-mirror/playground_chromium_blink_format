@@ -420,9 +420,12 @@ UString::UString(const UString& a, const UString& b) {
     // prepend
     UString x(a);
     x.expandCapacity(aOffset + length);
-    memcpy(const_cast<UChar*>(a.data() + aSize), b.data(),
-           bSize * sizeof(UChar));
-    m_rep = Rep::create(a.m_rep, 0, length);
+    if (a.data()) {
+      memcpy(const_cast<UChar*>(a.data() + aSize), b.data(),
+             bSize * sizeof(UChar));
+      m_rep = Rep::create(a.m_rep, 0, length);
+    } else
+      m_rep = &Rep::null;
   } else if (-bOffset == b.usedPreCapacity() && 4 * bSize >= aSize) {
     // - b reaches the beginning of its buffer so it qualifies for shared
     // prepend
@@ -431,18 +434,24 @@ UString::UString(const UString& a, const UString& b) {
     //   string does more harm than good
     UString y(b);
     y.expandPreCapacity(-bOffset + aSize);
-    memcpy(const_cast<UChar*>(b.data() - aSize), a.data(),
-           aSize * sizeof(UChar));
-    m_rep = Rep::create(b.m_rep, -aSize, length);
+    if (b.data()) {
+      memcpy(const_cast<UChar*>(b.data() - aSize), a.data(),
+             aSize * sizeof(UChar));
+      m_rep = Rep::create(b.m_rep, -aSize, length);
+    } else
+      m_rep = &Rep::null;
   } else {
     // a does not qualify for append, and b does not qualify for prepend, gotta
     // make a whole new string
     int newCapacity = expandedSize(length, 0);
     UChar* d = static_cast<UChar*>(fastMalloc(sizeof(UChar) * newCapacity));
-    memcpy(d, a.data(), aSize * sizeof(UChar));
-    memcpy(d + aSize, b.data(), bSize * sizeof(UChar));
-    m_rep = Rep::create(d, length);
-    m_rep->capacity = newCapacity;
+    if (d) {
+      memcpy(d, a.data(), aSize * sizeof(UChar));
+      memcpy(d + aSize, b.data(), bSize * sizeof(UChar));
+      m_rep = Rep::create(d, length);
+      m_rep->capacity = newCapacity;
+    } else
+      m_rep = &Rep::null;
   }
 }
 
