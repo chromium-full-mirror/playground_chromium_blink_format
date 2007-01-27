@@ -30,6 +30,9 @@
 
 namespace WebCore {
 
+class FloatPoint;
+class FloatSize;
+
 class SVGTransform {
  public:
   enum SVGTransformType {
@@ -46,7 +49,7 @@ class SVGTransform {
   explicit SVGTransform(const AffineTransform&);
   virtual ~SVGTransform();
 
-  unsigned short type() const;
+  SVGTransformType type() const;
 
   AffineTransform matrix() const;
 
@@ -59,13 +62,26 @@ class SVGTransform {
   void setSkewX(double angle);
   void setSkewY(double angle);
 
+  // Internal use only (animation system)
+  FloatPoint translate() const;
+  FloatSize scale() const;
+
   bool isValid();
 
  private:
-  unsigned short m_type;
+  SVGTransformType m_type;
   double m_angle;
   AffineTransform m_matrix;
 };
+
+inline bool operator==(const SVGTransform& a, const SVGTransform& b) {
+  return a.type() == b.type() && a.angle() == b.angle() &&
+         a.matrix() == b.matrix();
+}
+
+inline bool operator!=(const SVGTransform& a, const SVGTransform& b) {
+  return !(a == b);
+}
 
 }  // namespace WebCore
 

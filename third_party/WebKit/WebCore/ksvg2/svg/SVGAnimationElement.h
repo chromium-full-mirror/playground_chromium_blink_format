@@ -73,6 +73,7 @@ class SVGAnimationElement : public SVGElement,
   SVGElement* targetElement() const;
 
   virtual bool hasValidTarget() const;
+  bool isValidAnimation() const;
 
   virtual bool isValid() const { return SVGTests::isValid(); }
 
@@ -86,19 +87,9 @@ class SVGAnimationElement : public SVGElement,
 
   virtual void closeRenderer();
 
-  // Helpers
-  bool updateForElapsedSeconds(double);
-  void handleTimerEvent(double timePercentage);
-
-  static double parseClockValue(const String&);
-
-  String targetAttribute() const;
-  void setTargetAttribute(const String&);
-
-  static void setTargetAttribute(SVGElement* target,
-                                 const String& name,
-                                 const String& value,
-                                 EAttributeType = ATTRIBUTETYPE_AUTO);
+  virtual bool updateAnimationBaseValueFromElement();
+  bool updateAnimatedValueForElapsedSeconds(double elapsedSeconds);
+  virtual void applyAnimatedValueToElement();
 
   String attributeName() const;
 
@@ -108,26 +99,43 @@ class SVGAnimationElement : public SVGElement,
   bool isAdditive() const;
   bool isAccumulated() const;
 
-  EAnimationMode detectAnimationMode() const;
-
-  int calculateCurrentValueItem(double timePercentage);
-  double calculateRelativeTimePercentage(double timePercentage,
-                                         int currentItem);
-
   double repeations() const;
   static bool isIndefinite(double value);
 
  protected:
   mutable SVGElement* m_targetElement;
 
+  EAnimationMode detectAnimationMode() const;
+
+  static double parseClockValue(const String&);
+  static void setTargetAttribute(SVGElement* target,
+                                 const String& name,
+                                 const String& value,
+                                 EAttributeType = ATTRIBUTETYPE_AUTO);
+
+  String targetAttributeAnimatedValue() const;
+  void setTargetAttributeAnimatedValue(const String&);
+
   void connectTimer();
   void disconnectTimer();
 
-  virtual bool updateCurrentValue(double timePercentage) = 0;
-  virtual bool handleStartCondition() = 0;
-  virtual void updateLastValueWithCurrent() {
-  }  // See bug 12075 for explaination of why this is a bad API
-  virtual void resetValues() {}
+  virtual float calculateTotalDistance();
+  virtual void valueIndexAndPercentagePastForDistance(float distancePercentage,
+                                                      unsigned& valueIndex,
+                                                      float& percentagePast);
+
+  void calculateValueIndexAndPercentagePast(float timePercentage,
+                                            unsigned& valueIndex,
+                                            float& percentagePast);
+
+  void handleTimerEvent(double elapsedSeconds, double timePercentage);
+
+  virtual bool updateAnimatedValue(EAnimationMode,
+                                   float timePercentage,
+                                   unsigned valueIndex,
+                                   float percentagePast) = 0;
+  virtual bool calculateFromAndToValues(EAnimationMode,
+                                        unsigned valueIndex) = 0;
 
   static void parseKeyNumbers(Vector<float>& keyNumbers, const String& value);
   static void parseBeginOrEndValue(double& number, const String& value);
@@ -157,6 +165,9 @@ class SVGAnimationElement : public SVGElement,
   String m_repeatDur;
   String m_attributeName;
 
+  String m_baseValue;
+  String m_animatedValue;
+
   double m_max;
   double m_min;
   double m_end;
@@ -165,7 +176,7 @@ class SVGAnimationElement : public SVGElement,
   double m_repetitions;
   double m_repeatCount;
 
-  RefPtr<SVGStringList> m_values;
+  Vector<String> m_values;
   Vector<float> m_keyTimes;
 
   struct KeySpline {

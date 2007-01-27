@@ -27,6 +27,7 @@
 
 #include "SVGAnimationElement.h"
 #include "SVGTransform.h"
+#include "SVGTransformDistance.h"
 
 namespace WebCore {
 
@@ -41,8 +42,19 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  void applyAnimationToValue(SVGTransformList*);
+  virtual bool updateAnimationBaseValueFromElement();
+  virtual void applyAnimatedValueToElement();
 
+ protected:
+  virtual const SVGElement* contextElement() const { return this; }
+
+  virtual bool updateAnimatedValue(EAnimationMode,
+                                   float timePercentage,
+                                   unsigned valueIndex,
+                                   float percentagePast);
+  virtual bool calculateFromAndToValues(EAnimationMode, unsigned valueIndex);
+
+ private:
   // Helpers
   SVGTransform parseTransformValue(const String&) const;
   void calculateRotationFromMatrix(const AffineTransform&,
@@ -50,31 +62,15 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
                                    double& cx,
                                    double& cy) const;
 
-  AffineTransform currentTransform() const;
-
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-  void storeInitialValue();
-  virtual void resetValues();
-
-  virtual bool updateCurrentValue(double timePercentage);
-  virtual bool handleStartCondition();
-  virtual void updateLastValueWithCurrent();
-
- private:
-  int m_currentItem;
   SVGTransform::SVGTransformType m_type;
 
   SVGTransform m_toTransform;
   SVGTransform m_fromTransform;
-  SVGTransform m_initialTransform;
 
-  AffineTransform m_lastTransform;
-  AffineTransform m_currentTransform;
+  SVGTransform m_baseTransform;
+  SVGTransform m_animatedTransform;
 
-  mutable bool m_rotateSpecialCase : 1;
-  bool m_toRotateSpecialCase : 1;
-  bool m_fromRotateSpecialCase : 1;
+  SVGTransformDistance m_transformDistance;
 };
 
 }  // namespace WebCore
