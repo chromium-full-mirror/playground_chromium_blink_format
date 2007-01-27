@@ -38,12 +38,8 @@ class SVGSetElement : public SVGAnimationElement {
   virtual bool updateAnimatedValue(EAnimationMode,
                                    float timePercentage,
                                    unsigned valueIndex,
-                                   float percentagePast) {
-    return true;
-  }
-  virtual bool calculateFromAndToValues(EAnimationMode, unsigned valueIndex) {
-    return true;
-  }
+                                   float percentagePast);
+  virtual bool calculateFromAndToValues(EAnimationMode, unsigned valueIndex);
 
  private:
   String m_savedTo;
