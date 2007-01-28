@@ -95,6 +95,145 @@ namespace WebCore {
 static int frameNumber = 0;
 static Cursor localCursor;
 
+String contextMenuItemTagOpenLinkInNewWindow() {
+  notImplemented();
+}
+String contextMenuItemTagDownloadLinkToDisk() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCopyLinkToClipboard() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagOpenImageInNewWindow() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagDownloadImageToDisk() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCopyImageToClipboard() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagOpenFrameInNewWindow() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCopy() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagGoBack() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagGoForward() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagStop() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagReload() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCut() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagPaste() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagNoGuessesFound() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagIgnoreSpelling() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagLearnSpelling() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagSearchWeb() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagLookUpInDictionary() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagOpenLink() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagIgnoreGrammar() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagSpellingMenu() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagShowSpellingPanel(bool) {
+  notImplemented();
+}
+String contextMenuItemTagCheckSpelling() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCheckSpellingWhileTyping() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagCheckGrammarWithSpelling() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagFontMenu() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagBold() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagItalic() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagUnderline() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagOutline() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagWritingDirectionMenu() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagDefaultDirection() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagLeftToRight() {
+  notImplemented();
+  return String();
+}
+String contextMenuItemTagRightToLeft() {
+  notImplemented();
+  return String();
+}
+
 void CheckCacheObjectStatus(DocLoader*, CachedResource*) {
   notImplemented();
 }
@@ -227,10 +366,6 @@ bool BitmapImage::getHBITMAP(HBITMAP) {
   return false;
 }
 
-void CachedResource::setAllData(PlatformData) {
-  notImplemented();
-}
-
 ContextMenu::ContextMenu(const HitTestResult& result)
     : m_hitTestResult(result) {
   notImplemented();
@@ -299,82 +434,9 @@ void ContextMenuItem::setEnabled(bool) {
   notImplemented();
 }
 
-void DocumentLoader::setFrame(Frame*) {
-  notImplemented();
-}
-FrameLoader* DocumentLoader::frameLoader() const {
-  notImplemented();
-  return m_frame->loader();
-}
 static ResourceRequest emptyResourceRequestForDocumentLoader;
-const ResourceRequest& DocumentLoader::originalRequest() const {
-  notImplemented();
-  return emptyResourceRequestForDocumentLoader;
-}
-const ResourceRequest& DocumentLoader::request() const {
-  notImplemented();
-  return emptyResourceRequestForDocumentLoader;
-}
-ResourceRequest& DocumentLoader::request() {
-  notImplemented();
-  return emptyResourceRequestForDocumentLoader;
-}
 static KURL emptyKURLForDocumentLoader;
-const KURL& DocumentLoader::URL() const {
-  notImplemented();
-  return emptyKURLForDocumentLoader;
-}
 const KURL DocumentLoader::unreachableURL() const {
-  notImplemented();
-  return KURL();
-}
-bool DocumentLoader::getResponseRefreshAndModifiedHeaders(
-    String& refresh,
-    String& modified) const {
-  notImplemented();
-  return false;
-}
-void DocumentLoader::replaceRequestURLForAnchorScroll(const KURL&) {
-  notImplemented();
-}
-void DocumentLoader::stopLoading() {
-  notImplemented();
-}
-void DocumentLoader::setCommitted(bool) {
-  notImplemented();
-}
-bool DocumentLoader::isLoading() const {
-  notImplemented();
-  return false;
-}
-void DocumentLoader::setLoading(bool) {
-  notImplemented();
-}
-void DocumentLoader::updateLoading() {
-  notImplemented();
-}
-void DocumentLoader::setupForReplaceByMIMEType(const String& newMIMEType) {
-  notImplemented();
-}
-void DocumentLoader::prepareForLoadStart() {
-  notImplemented();
-}
-bool DocumentLoader::isClientRedirect() const {
-  notImplemented();
-  return false;
-}
-bool DocumentLoader::isLoadingInAPISense() const {
-  notImplemented();
-  return false;
-}
-void DocumentLoader::stopRecordingResponses() {
-  notImplemented();
-}
-String DocumentLoader::title() const {
-  notImplemented();
-  return String();
-}
-KURL DocumentLoader::urlForHistory() const {
   notImplemented();
   return KURL();
 }
@@ -480,25 +542,6 @@ void Frame::setNeedsReapplyStyles() {
   notImplemented();
 }
 
-void FrameLoader::load(const FrameLoadRequest&,
-                       bool userGesture,
-                       Event*,
-                       HTMLFormElement*,
-                       const HashMap<String, String>& formValues) {
-  notImplemented();
-}
-void FrameLoader::load(const ResourceRequest&,
-                       const NavigationAction&,
-                       FrameLoadType,
-                       PassRefPtr<FormState>) {
-  notImplemented();
-}
-void FrameLoader::load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>) {
-  notImplemented();
-}
-void FrameLoader::didFirstLayout() {
-  notImplemented();
-}
 String FrameLoader::overrideMediaType() const {
   notImplemented();
   return String();
@@ -512,18 +555,6 @@ Widget* FrameLoader::createJavaAppletWidget(const IntSize&,
 void FrameLoader::redirectDataToPlugin(Widget* pluginWidget) {
   notImplemented();
 }
-int FrameLoader::getHistoryLength() {
-  notImplemented();
-  return 0;
-}
-String FrameLoader::referrer() const {
-  notImplemented();
-  return String();
-}
-KURL FrameLoader::historyURL(int distance) {
-  notImplemented();
-  return KURL();
-}
 Frame* FrameLoader::createFrame(const KURL& URL,
                                 const String& name,
                                 HTMLFrameOwnerElement*,
@@ -533,18 +564,6 @@ Frame* FrameLoader::createFrame(const KURL& URL,
 }
 void FrameLoader::partClearedInBegin() {
   notImplemented();
-}
-KURL FrameLoader::originalRequestURL() const {
-  notImplemented();
-  return KURL();
-}
-KURL FrameLoader::dataURLBaseFromRequest(const ResourceRequest& request) const {
-  notImplemented();
-  return KURL();
-}
-bool FrameLoader::canGoBackOrForward(int) const {
-  notImplemented();
-  return false;
 }
 ObjectContentType FrameLoader::objectContentType(const KURL&, const String&) {
   notImplemented();
@@ -558,24 +577,6 @@ Widget* FrameLoader::createPlugin(Element*,
   notImplemented();
   return 0;
 }
-void FrameLoader::checkLoadCompleteForThisFrame() {
-  notImplemented();
-}
-void FrameLoader::reload() {
-  notImplemented();
-}
-void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
-                                            ResourceResponse& r,
-                                            Vector<char>& data) {
-  notImplemented();
-}
-void FrameLoader::opened() {
-  notImplemented();
-}
-void FrameLoader::applyUserAgent(ResourceRequest& request) {
-  notImplemented();
-}
-
 void FrameView::updateBorder() {
   notImplemented();
 }
@@ -923,22 +924,6 @@ bool PlugInInfoStore::supportsMIMEType(const String&) {
   return false;
 }
 
-PolicyCheck::PolicyCheck() {
-  notImplemented();
-}
-void PolicyCheck::clear() {
-  notImplemented();
-}
-void PolicyCheck::clearRequest() {
-  notImplemented();
-}
-void PolicyCheck::call(bool) {
-  notImplemented();
-}
-void PolicyCheck::call(PolicyAction) {
-  notImplemented();
-}
-
 PopupMenu::PopupMenu(PopupMenuClient*) {
   notImplemented();
 }
@@ -978,10 +963,6 @@ bool ResourceHandle::willLoadFromCache(ResourceRequest&) {
 bool ResourceHandle::loadsBlocked() {
   notImplemented();
   return false;
-}
-
-void ResourceLoader::cancel() {
-  notImplemented();
 }
 
 void ScrollView::addChild(Widget*) {
