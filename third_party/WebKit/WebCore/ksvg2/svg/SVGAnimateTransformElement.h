@@ -69,8 +69,6 @@ class SVGAnimateTransformElement : public SVGAnimationElement {
 
   SVGTransform m_baseTransform;
   SVGTransform m_animatedTransform;
-
-  SVGTransformDistance m_transformDistance;
 };
 
 }  // namespace WebCore

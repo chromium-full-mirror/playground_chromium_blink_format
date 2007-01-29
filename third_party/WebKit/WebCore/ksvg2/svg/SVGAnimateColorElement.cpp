@@ -44,7 +44,6 @@ SVGAnimateColorElement::~SVGAnimateColorElement() {}
 bool SVGAnimateColorElement::updateAnimationBaseValueFromElement() {
   m_baseColor =
       SVGColor::colorFromRGBColorString(targetAttributeAnimatedValue());
-  m_colorDistance = ColorDistance();
   m_fromColor = Color();
   m_toColor = Color();
   return true;
@@ -69,7 +68,8 @@ bool SVGAnimateColorElement::updateAnimatedValue(EAnimationMode animationMode,
                           .scaledDistance(timePercentage)
                           .addToColorAndClamp(m_baseColor);
   else
-    m_animatedColor = m_colorDistance.scaledDistance(percentagePast)
+    m_animatedColor = ColorDistance(m_fromColor, m_toColor)
+                          .scaledDistance(percentagePast)
                           .addToColorAndClamp(m_fromColor);
   return (m_animatedColor != m_baseColor);
 }
@@ -104,8 +104,7 @@ bool SVGAnimateColorElement::calculateFromAndToValues(
       ASSERT_NOT_REACHED();
   }
 
-  m_colorDistance = ColorDistance(m_fromColor, m_toColor);
-  return !m_colorDistance.isZero();
+  return true;
 }
 }
 
