@@ -72,27 +72,26 @@ JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
                                        JSObject* thisObj,
                                        const List& args) {
   if (_methodList.length() > 0) {
-    RuntimeObjectImp* imp;
+    RuntimeObjectImp* imp = 0;
 
-    // If thisObj is the DOM object for a plugin, get the corresponding
-    // runtime object from the DOM object.
-    if (thisObj->classInfo() != &KJS::RuntimeObjectImp::info) {
-      JSValue* runtimeObject = thisObj->get(exec, "__apple_runtime_object");
-      imp = static_cast<RuntimeObjectImp*>(runtimeObject);
-    } else {
+    if (thisObj->classInfo() == &KJS::RuntimeObjectImp::info) {
       imp = static_cast<RuntimeObjectImp*>(thisObj);
+    } else {
+      // If thisObj is the DOM object for a plugin, get the corresponding
+      // runtime object from the DOM object.
+      JSValue* value = thisObj->get(exec, "__apple_runtime_object");
+      if (value->isObject(&KJS::RuntimeObjectImp::info))
+        imp = static_cast<RuntimeObjectImp*>(value);
     }
-    if (imp) {
-      Instance* instance = imp->getInternalInstance();
 
-      instance->begin();
+    if (!imp)
+      return throwError(exec, TypeError);
 
-      JSValue* aValue = instance->invokeMethod(exec, _methodList, args);
-
-      instance->end();
-
-      return aValue;
-    }
+    Instance* instance = imp->getInternalInstance();
+    instance->begin();
+    JSValue* aValue = instance->invokeMethod(exec, _methodList, args);
+    instance->end();
+    return aValue;
   }
 
   return jsUndefined();

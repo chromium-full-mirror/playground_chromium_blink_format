@@ -197,7 +197,7 @@ JSValue* RuntimeObjectImp::callAsFunction(ExecState* exec,
                                           const List& args) {
   instance->begin();
 
-  JSValue* aValue = getInternalInstance()->invokeDefaultMethod(exec, args);
+  JSValue* aValue = instance->invokeDefaultMethod(exec, args);
 
   instance->end();
 
