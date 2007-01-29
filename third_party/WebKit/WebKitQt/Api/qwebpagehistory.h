@@ -142,6 +142,9 @@ class QWebPageHistory {
   QList<QWebHistoryItem> backItems(int maxItems) const;
   QList<QWebHistoryItem> forwardItems(int maxItems) const;
 
+  bool canGoBack() const;
+  bool canGoForward() const;
+
   void goBack();
   void goForward();
   void goToItem(QWebHistoryItem* item);

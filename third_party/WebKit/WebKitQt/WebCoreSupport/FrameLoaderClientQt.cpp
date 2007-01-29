@@ -465,8 +465,11 @@ void FrameLoaderClientQt::updateGlobalHistoryForReload(const WebCore::KURL&) {
   notImplemented();
 }
 
-bool FrameLoaderClientQt::shouldGoToHistoryItem(WebCore::HistoryItem*) const {
-  notImplemented();
+bool FrameLoaderClientQt::shouldGoToHistoryItem(
+    WebCore::HistoryItem* item) const {
+  if (item) {
+    return true;
+  }
   return false;
 }
 

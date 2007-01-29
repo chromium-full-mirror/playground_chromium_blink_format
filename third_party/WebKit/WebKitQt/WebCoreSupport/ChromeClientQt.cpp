@@ -162,7 +162,9 @@ void ChromeClientQt::setResizable(bool) {
 void ChromeClientQt::addMessageToConsole(const String& message,
                                          unsigned int lineNumber,
                                          const String& sourceID) {
-  notImplemented();
+  QString x = message;
+  QString y = sourceID;
+  m_webPage->consoleMessage(x, lineNumber, y);
 }
 
 void ChromeClientQt::chromeDestroyed() {
@@ -182,8 +184,9 @@ void ChromeClientQt::closeWindowSoon() {
   notImplemented();
 }
 
-void ChromeClientQt::runJavaScriptAlert(Frame*, const String&) {
-  notImplemented();
+void ChromeClientQt::runJavaScriptAlert(Frame*, const String& msg) {
+  QString x = msg;
+  m_webPage->runJavaScriptAlert(0, x);
 }
 
 bool ChromeClientQt::runJavaScriptConfirm(Frame*, const String&) {
