@@ -65,7 +65,6 @@ ScrollViewCanvasQt::ScrollViewCanvasQt(FrameView* frameView, QWidget* parent)
       m_eventHandler(frameView->frame()->eventHandler()) {
   setMouseTracking(true);
   setFocusPolicy(Qt::StrongFocus);
-  resize(500, 500);
 }
 
 void ScrollViewCanvasQt::paintEvent(QPaintEvent* ev) {
