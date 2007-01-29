@@ -53,6 +53,8 @@ Value::Value(unsigned long value) : m_type(NumberValue), m_number(value) {}
 
 Value::Value(double value) : m_type(NumberValue), m_number(value) {}
 
+Value::Value(const char* value) : m_type(StringValue), m_string(value) {}
+
 Value::Value(const String& value) : m_type(StringValue), m_string(value) {}
 
 const NodeVector& Value::toNodeVector() const {
