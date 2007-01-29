@@ -172,4 +172,8 @@ QWebPage* QWebPage::createWindow() {
   return 0;
 }
 
+void QWebPage::setWindowGeometry(const QRect& geom) {
+  Q_UNUSED(geom)
+}
+
 #include "qwebpage.moc"
