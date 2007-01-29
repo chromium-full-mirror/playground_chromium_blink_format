@@ -94,6 +94,9 @@ QWebPage::QWebPage(QWidget* parent)
 }
 
 QWebPage::~QWebPage() {
+  FrameLoader* loader = d->mainFrame->d->frame->loader();
+  if (loader)
+    loader->detachFromParent();
   delete d;
 }
 

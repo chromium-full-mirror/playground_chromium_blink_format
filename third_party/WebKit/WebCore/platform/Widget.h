@@ -154,7 +154,7 @@ class Widget {
 #endif
 
 #if PLATFORM(QT)
-  QWidget* qwidget();
+  QWidget* qwidget() const;
   void setQWidget(QWidget*);
 #endif
 

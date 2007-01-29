@@ -23,6 +23,8 @@
 #ifndef QWEBPAGE_P_H
 #define QWEBPAGE_P_H
 
+#include <qpointer.h>
+
 #include "qwebpage.h"
 #include "qwebframe.h"
 
@@ -46,7 +48,7 @@ class QWebPagePrivate {
   WebCore::EditorClientQt* editorClient;
   WebCore::Page* page;
 
-  QWebFrame* mainFrame;
+  QPointer<QWebFrame> mainFrame;
   QVBoxLayout* layout;
 
   QWebPage* q;
