@@ -261,8 +261,7 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
   JSObject* prototype = objCons->construct(exec, List::empty());
   prototype->put(exec, constructorPropertyName, fimp,
                  DontEnum | DontDelete | ReadOnly);
-  fimp->put(exec, prototypePropertyName, prototype,
-            DontEnum | DontDelete | ReadOnly);
+  fimp->put(exec, prototypePropertyName, prototype, Internal | DontDelete);
   return fimp;
 }
 
