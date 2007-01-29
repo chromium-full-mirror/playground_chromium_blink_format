@@ -32,7 +32,8 @@
 
 class WebDocumentLoaderMac : public WebCore::DocumentLoader {
  public:
-  WebDocumentLoaderMac(const WebCore::ResourceRequest&);
+  WebDocumentLoaderMac(const WebCore::ResourceRequest&,
+                       const WebCore::SubstituteData&);
 
   void setDataSource(WebDataSource*);
   WebDataSource* dataSource() const;

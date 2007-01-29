@@ -150,12 +150,6 @@ struct WebCoreHistoryItem;
 
 #endif
 
-- (NSURLRequest*)_webDataRequestForData:(NSData*)data
-                               MIMEType:(NSString*)MIMEType
-                       textEncodingName:(NSString*)encodingName
-                                baseURL:(NSURL*)URL
-                         unreachableURL:(NSURL*)unreachableURL;
-
 - (WebFrameBridge*)_bridge;
 
 - (void)_loadURL:(NSURL*)URL

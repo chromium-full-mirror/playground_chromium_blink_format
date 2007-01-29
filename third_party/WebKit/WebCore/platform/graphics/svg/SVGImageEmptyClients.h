@@ -34,6 +34,7 @@
 #include "EditorClient.h"
 #include "FocusDirection.h"
 #include "FrameLoaderClient.h"
+#include "SharedBuffer.h"
 
 /*
  This file holds empty Client stubs for use by SVGImage.
@@ -305,8 +306,9 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void prepareForDataSourceReplacement() {}
 
   virtual PassRefPtr<DocumentLoader> createDocumentLoader(
-      const ResourceRequest& request) {
-    return new DocumentLoader(request);
+      const ResourceRequest& request,
+      const SubstituteData& substituteData) {
+    return new DocumentLoader(request, substituteData);
   }
   virtual void setTitle(const String& title, const KURL&) {}
 

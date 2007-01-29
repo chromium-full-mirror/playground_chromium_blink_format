@@ -190,7 +190,8 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
       const WebCore::ResourceResponse&);
   virtual bool shouldFallBack(const WebCore::ResourceError&);
   virtual WTF::PassRefPtr<WebCore::DocumentLoader> createDocumentLoader(
-      const WebCore::ResourceRequest&);
+      const WebCore::ResourceRequest&,
+      const WebCore::SubstituteData&);
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);

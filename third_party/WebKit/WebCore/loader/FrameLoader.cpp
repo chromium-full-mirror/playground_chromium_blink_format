@@ -83,7 +83,6 @@
 
 #if PLATFORM(MAC)
 #include "FrameMac.h"
-#import "WebDataProtocol.h"
 #endif
 
 using namespace KJS;
@@ -1844,10 +1843,15 @@ void FrameLoader::load(const KURL& URL,
 }
 
 void FrameLoader::load(const ResourceRequest& request) {
+  load(request, SubstituteData());
+}
+
+void FrameLoader::load(const ResourceRequest& request,
+                       const SubstituteData& substituteData) {
   // FIXME: is this the right place to reset loadType? Perhaps this should be
   // done after loading is finished or aborted.
   m_loadType = FrameLoadTypeStandard;
-  load(m_client->createDocumentLoader(request).get());
+  load(m_client->createDocumentLoader(request, substituteData).get());
 }
 
 void FrameLoader::load(const ResourceRequest& request,
@@ -1871,7 +1875,8 @@ void FrameLoader::load(const ResourceRequest& request,
                        const NavigationAction& action,
                        FrameLoadType type,
                        PassRefPtr<FormState> formState) {
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(request);
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(request, SubstituteData());
   setPolicyDocumentLoader(loader.get());
 
   loader->setTriggeringAction(action);
@@ -1903,8 +1908,7 @@ void FrameLoader::load(DocumentLoader* newDocumentLoader) {
   // When we loading alternate content for an unreachable URL that we're
   // visiting in the b/f list, we treat it as a reload so the b/f list
   // is appropriately maintained.
-  if (shouldReloadToHandleUnreachableURL(
-          newDocumentLoader->originalRequest())) {
+  if (shouldReloadToHandleUnreachableURL(newDocumentLoader)) {
     ASSERT(type == FrameLoadTypeStandard);
     type = FrameLoadTypeReload;
   }
@@ -2005,11 +2009,8 @@ void FrameLoader::checkContentPolicy(const String& MIMEType,
 }
 
 bool FrameLoader::shouldReloadToHandleUnreachableURL(
-    const ResourceRequest& request) {
-  KURL unreachableURL;
-#if PLATFORM(MAC)
-  unreachableURL = [request.nsURLRequest() _webDataRequestUnreachableURL];
-#endif
+    DocumentLoader* docLoader) {
+  KURL unreachableURL = docLoader->unreachableURL();
 
   if (unreachableURL.isEmpty())
     return false;
@@ -2044,7 +2045,8 @@ void FrameLoader::reloadAllowingStaleData(const String& encoding) {
 
   request.setCachePolicy(ReturnCacheDataElseLoad);
 
-  RefPtr<DocumentLoader> loader = m_client->createDocumentLoader(request);
+  RefPtr<DocumentLoader> loader =
+      m_client->createDocumentLoader(request, SubstituteData());
   setPolicyDocumentLoader(loader.get());
 
   loader->setOverrideEncoding(encoding);
@@ -2065,16 +2067,12 @@ void FrameLoader::reload() {
     return;
 
   // Replace error-page URL with the URL we were trying to reach.
-  KURL unreachableURL;
-#if PLATFORM(MAC)
-  unreachableURL =
-      [initialRequest.nsURLRequest() _webDataRequestUnreachableURL];
-#endif
+  KURL unreachableURL = m_documentLoader->unreachableURL();
   if (!unreachableURL.isEmpty())
     initialRequest = ResourceRequest(unreachableURL);
 
   RefPtr<DocumentLoader> loader =
-      m_client->createDocumentLoader(initialRequest);
+      m_client->createDocumentLoader(initialRequest, SubstituteData());
   setPolicyDocumentLoader(loader.get());
 
   ResourceRequest& request = loader->request();
@@ -2337,10 +2335,6 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<PageCache> prpPageCache) {
     pageState->clear();
   } else {
     KURL url = pdl->URL();
-    KURL dataURLBase = dataURLBaseFromRequest(pdl->request());
-    if (!dataURLBase.isEmpty())
-      url = dataURLBase;
-
     if (url.isEmpty())
       url = pdl->responseURL();
     if (url.isEmpty())
@@ -3078,24 +3072,24 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
   sendRemainingDelegateMessages(identifier, response, data.size(), error);
 }
 
-bool FrameLoader::startLoadingMainResource(ResourceRequest& request,
+bool FrameLoader::startLoadingMainResource(DocumentLoader* docLoader,
                                            unsigned long identifier) {
   ASSERT(!m_mainResourceLoader);
   m_mainResourceLoader = MainResourceLoader::create(m_frame);
   m_mainResourceLoader->setIdentifier(identifier);
 
+  ResourceRequest& request = docLoader->actualRequest();
+
   // FIXME: is there any way the extra fields could have not been added by now?
   addExtraFieldsToRequest(request, true, false);
-  if (!m_mainResourceLoader->load(request)) {
-// FIXME: If this should really be caught, we should just ASSERT this doesn't
-// happen;
-// should it be caught by other parts of WebKit or other parts of the app?
-#if PLATFORM(MAC)
+  if (!m_mainResourceLoader->load(request, docLoader->substituteData())) {
+    // FIXME: If this should really be caught, we should just ASSERT this
+    // doesn't happen;
+    // should it be caught by other parts of WebKit or other parts of the app?
     LOG_ERROR(
-        "could not create WebResourceHandle for URL %@ -- should be caught by "
+        "could not create WebResourceHandle for URL %s -- should be caught by "
         "policy handler level",
-        request.url().getNSURL());
-#endif
+        request.url().url().ascii());
     m_mainResourceLoader = 0;
     return false;
   }
@@ -3120,8 +3114,7 @@ void FrameLoader::startLoading() {
       identifier, m_provisionalDocumentLoader.get(),
       m_provisionalDocumentLoader->originalRequest());
 
-  if (!startLoadingMainResource(m_provisionalDocumentLoader->actualRequest(),
-                                identifier))
+  if (!startLoadingMainResource(m_provisionalDocumentLoader.get(), identifier))
     m_provisionalDocumentLoader->updateLoading();
 }
 
@@ -3315,15 +3308,6 @@ void FrameLoader::opened() {
   }
 }
 
-KURL FrameLoader::dataURLBaseFromRequest(const ResourceRequest& request) const {
-#if PLATFORM(MAC)
-  if (WebDataRequestParameters* params =
-          [request.nsURLRequest() _webDataRequestParametersForReading])
-    return params->baseURL;
-#endif
-  return KURL();
-}
-
 void FrameLoader::checkNewWindowPolicy(const NavigationAction& action,
                                        const ResourceRequest& request,
                                        PassRefPtr<FormState> formState,
@@ -3373,16 +3357,14 @@ void FrameLoader::checkNavigationPolicy(
     return;
   }
 
-// We are always willing to show alternate content for unreachable URLs;
-// treat it like a reload so it maintains the right state for b/f list.
-#if PLATFORM(MAC)
-  if ([request.nsURLRequest() _webDataRequestUnreachableURL]) {
+  // We are always willing to show alternate content for unreachable URLs;
+  // treat it like a reload so it maintains the right state for b/f list.
+  if (loader->substituteData().isValid()) {
     if (isBackForwardLoadType(m_policyLoadType))
       m_policyLoadType = FrameLoadTypeReload;
     function(argument, request, 0, true);
     return;
   }
-#endif
 
   loader->setLastCheckedRequest(request);
 

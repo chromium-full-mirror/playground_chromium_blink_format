@@ -28,6 +28,7 @@
 
 #include "FrameLoaderTypes.h"
 #include "ResourceLoader.h"
+#include "SubstituteData.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -40,7 +41,7 @@ class MainResourceLoader : public ResourceLoader {
   static PassRefPtr<MainResourceLoader> create(Frame*);
   virtual ~MainResourceLoader();
 
-  virtual bool load(const ResourceRequest&);
+  virtual bool load(const ResourceRequest&, const SubstituteData&);
   virtual void addData(const char*, int, bool allAtOnce);
 
   virtual void setDefersLoading(bool);
@@ -62,6 +63,9 @@ class MainResourceLoader : public ResourceLoader {
 
   bool loadNow(ResourceRequest&);
 
+  void handleEmptyLoad(const KURL&, bool forURLScheme);
+  void handleDataLoad(ResourceRequest&);
+
   void receivedError(const ResourceError&);
   ResourceError interruptionForPolicyChangeError() const;
   void stopLoadingForPolicyChange();
@@ -80,6 +84,7 @@ class MainResourceLoader : public ResourceLoader {
   void continueAfterContentPolicy(PolicyAction, const ResourceResponse&);
 
   ResourceRequest m_initialRequest;
+  SubstituteData m_substituteData;
 
   bool m_loadingMultipartContent;
   bool m_waitingForContentPolicy;

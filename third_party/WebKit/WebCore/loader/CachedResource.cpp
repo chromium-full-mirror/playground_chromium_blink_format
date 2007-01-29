@@ -35,10 +35,6 @@
 #include <KURL.h>
 #include <wtf/Vector.h>
 
-#if PLATFORM(MAC)
-#include <CoreFoundation/CoreFoundation.h>
-#endif
-
 namespace WebCore {
 
 CachedResource::CachedResource(const String& URL,
