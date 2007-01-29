@@ -371,7 +371,6 @@ rangeByAlteringCurrentSelection:
 
 - (NSString*)MIMETypeForPath:(NSString*)path;
 
-- (void)allowDHTMLDrag:(BOOL*)flagDHTML UADrag:(BOOL*)flagUA;
 - (BOOL)startDraggingImage:(NSImage*)dragImage
                         at:(NSPoint)dragLoc
                  operation:(NSDragOperation)op

@@ -279,6 +279,12 @@ DragOperation DragController::tryDocumentDrag(
   return operation;
 }
 
+DragSourceAction DragController::delegateDragSourceAction(
+    const IntPoint& windowPoint) {
+  m_dragSourceAction = m_client->dragSourceActionMaskForPoint(windowPoint);
+  return m_dragSourceAction;
+}
+
 DragOperation DragController::operationForLoad(DragData* dragData) {
   ASSERT(dragData);
   Document* doc =

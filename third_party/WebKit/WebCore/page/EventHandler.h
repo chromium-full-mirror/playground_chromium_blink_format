@@ -230,6 +230,8 @@ class EventHandler : Noncopyable {
   bool passMouseDownEventToWidget(Widget*);
   bool passWheelEventToWidget(Widget*);
 
+  void allowDHTMLDrag(bool& flagDHTML, bool& flagUA) const;
+
 #if PLATFORM(MAC)
   KeyboardUIMode keyboardUIMode() const;
 

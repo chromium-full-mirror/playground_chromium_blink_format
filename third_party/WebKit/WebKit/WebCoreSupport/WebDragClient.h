@@ -34,6 +34,8 @@ class WebDragClient : public WebCore::DragClient {
                                                 WebCore::DragData*);
   virtual WebCore::DragDestinationAction actionMaskForDrag(WebCore::DragData*);
   virtual void dragControllerDestroyed();
+  virtual WebCore::DragSourceAction dragSourceActionMaskForPoint(
+      const WebCore::IntPoint& windowPoint);
 
  private:
   WebView* m_webView;

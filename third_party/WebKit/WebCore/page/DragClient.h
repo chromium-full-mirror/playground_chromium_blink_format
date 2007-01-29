@@ -39,6 +39,12 @@ class DragClient {
                                                 DragData*) = 0;
   virtual DragDestinationAction actionMaskForDrag(DragData*) = 0;
   virtual void dragControllerDestroyed() = 0;
+
+  // The UI delegate takes the point in view coordinates, however it is easier
+  // to pass
+  // window coordinates here
+  virtual DragSourceAction dragSourceActionMaskForPoint(
+      const IntPoint& windowPoint) = 0;
   virtual ~DragClient(){};
 };
 }
