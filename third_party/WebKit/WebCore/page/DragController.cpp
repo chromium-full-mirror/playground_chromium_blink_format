@@ -237,7 +237,8 @@ DragOperation DragController::dragEnteredOrUpdated(DragData* dragData) {
     cancelDrag();
   else {
     operation = tryDocumentDrag(dragData, m_dragDestinationAction);
-    if (operation == DragOperationNone)
+    if (operation == DragOperationNone &&
+        (m_dragDestinationAction & DragDestinationActionLoad))
       return operationForLoad(dragData);
   }
 
