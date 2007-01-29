@@ -187,6 +187,9 @@ class Document : public ContainerNode {
   virtual PassRefPtr<Element> createElementNS(const String& namespaceURI,
                                               const String& qualifiedName,
                                               ExceptionCode&);
+  PassRefPtr<Element> createElement(const QualifiedName&,
+                                    bool createdByParser,
+                                    ExceptionCode& ec);
   Element* getElementById(const AtomicString&) const;
 
   Element* elementFromPoint(int x, int y) const;

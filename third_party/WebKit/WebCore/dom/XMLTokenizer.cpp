@@ -480,8 +480,7 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
         if (attr->localName() == "xmlns")
           m_defaultNamespaceURI = attr->value();
         else if (attr->prefix() == "xmlns")
-          m_prefixToNamespaceMap.set(attr->localName().impl(),
-                                     attr->value().impl());
+          m_prefixToNamespaceMap.set(attr->localName(), attr->value());
       }
     }
   }
@@ -491,7 +490,6 @@ XMLTokenizer::~XMLTokenizer() {
   setCurrentNode(0);
   if (m_parsingFragment && m_doc)
     m_doc->deref();
-  delete m_pendingCallbacks;
   if (m_pendingScript)
     m_pendingScript->deref(this);
 }
@@ -550,8 +548,11 @@ inline String toString(const xmlChar* str, unsigned len) {
 }
 
 inline String toString(const xmlChar* str) {
-  const char* cstr = str ? reinterpret_cast<const char*>(str) : "";
-  return UTF8Encoding().decode(cstr, strlen(cstr));
+  if (!str)
+    return String();
+
+  return UTF8Encoding().decode(reinterpret_cast<const char*>(str),
+                               strlen(reinterpret_cast<const char*>(str)));
 }
 
 struct _xmlSAX2Namespace {
@@ -634,17 +635,17 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   String localName = toString(xmlLocalName);
   String uri = toString(xmlURI);
   String prefix = toString(xmlPrefix);
-  String qName = prefix.isEmpty() ? localName : prefix + ":" + localName;
 
-  if (m_parsingFragment && uri.isEmpty()) {
-    if (!prefix.isEmpty())
-      uri = String(m_prefixToNamespaceMap.get(prefix.impl()));
+  if (m_parsingFragment && uri.isNull()) {
+    if (!prefix.isNull())
+      uri = m_prefixToNamespaceMap.get(prefix);
     else
       uri = m_defaultNamespaceURI;
   }
 
   ExceptionCode ec = 0;
-  RefPtr<Element> newElement = m_doc->createElementNS(uri, qName, ec);
+  QualifiedName qName(prefix, localName, uri);
+  RefPtr<Element> newElement = m_doc->createElement(qName, true, ec);
   if (!newElement) {
     stopParsing();
     return;
