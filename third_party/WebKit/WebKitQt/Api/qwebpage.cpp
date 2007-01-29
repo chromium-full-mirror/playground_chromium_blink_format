@@ -168,4 +168,8 @@ void QWebPage::statusTextChanged(const QString& text) {}
 
 void QWebPage::runJavaScriptAlert(QWebFrame* frame, const QString& msg) {}
 
+QWebPage* QWebPage::createWindow() {
+  return 0;
+}
+
 #include "qwebpage.moc"

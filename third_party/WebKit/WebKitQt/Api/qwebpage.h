@@ -36,6 +36,8 @@ class QWebFrameData;
 
 namespace WebCore {
 class FrameLoaderClientQt;
+class ChromeClientQt;
+class FrameLoadRequest;
 }
 
 class QWebPage : public QWidget {
@@ -103,12 +105,13 @@ class QWebPage : public QWidget {
  protected:
   virtual QWebFrame* createFrame(QWebFrame* parentFrame,
                                  QWebFrameData* frameData);
-  // virtual QWebPage *createPage(...);
+  virtual QWebPage* createWindow();
 
  private:
   friend class QWebFrame;
   friend class QWebPagePrivate;
   friend class WebCore::FrameLoaderClientQt;
+  friend class WebCore::ChromeClientQt;
   QWebPagePrivate* d;
 };
 
