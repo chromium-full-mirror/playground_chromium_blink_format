@@ -71,22 +71,30 @@ void ScrollView::updateContents(const IntRect& updateRect, bool now) {
 int ScrollView::visibleWidth() const {
   if (!m_area)
     return 0;
-  return m_area->maximumViewportSize().width();
+
+  int scrollBarAdjustments = 0;
+  if (m_area->verticalScrollBar()->isVisible())
+    scrollBarAdjustments = m_area->verticalScrollBar()->width();
+  return m_area->maximumViewportSize().width() - scrollBarAdjustments;
 }
 
 int ScrollView::visibleHeight() const {
   if (!m_area)
     return 0;
-  return m_area->maximumViewportSize().height();
+
+  int scrollBarAdjustments = 0;
+  if (m_area->horizontalScrollBar()->isVisible())
+    scrollBarAdjustments = m_area->horizontalScrollBar()->height();
+  return m_area->maximumViewportSize().height() - scrollBarAdjustments;
 }
 
 FloatRect ScrollView::visibleContentRect() const {
   if (!m_area)
     return FloatRect();
-  const QSize s(m_area->maximumViewportSize());
 
   return FloatRect(m_area->horizontalScrollBar()->value(),
-                   m_area->verticalScrollBar()->value(), s.width(), s.height());
+                   m_area->verticalScrollBar()->value(), visibleWidth(),
+                   visibleHeight());
 }
 
 void ScrollView::setContentsPos(int newX, int newY) {
