@@ -77,6 +77,10 @@ class SVGPaintServerGradient : public SVGPaintServer {
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
+  virtual bool setup(GraphicsContext*&,
+                     const RenderObject*,
+                     SVGPaintTargetType,
+                     bool isPaintingText) const;
 #if PLATFORM(CG)
   virtual void teardown(GraphicsContext*&,
                         const RenderObject*,
@@ -85,11 +89,6 @@ class SVGPaintServerGradient : public SVGPaintServer {
   virtual void renderPath(GraphicsContext*&,
                           const RenderPath*,
                           SVGPaintTargetType) const;
-
-  virtual bool setup(GraphicsContext*&,
-                     const RenderObject*,
-                     SVGPaintTargetType,
-                     bool isPaintingText) const;
 
   virtual void invalidate();
 
@@ -106,6 +105,8 @@ class SVGPaintServerGradient : public SVGPaintServer {
   void fillColorArray(QGradient&,
                       const Vector<SVGGradientStop>&,
                       float opacity) const;
+  virtual QGradient setupGradient(GraphicsContext*&,
+                                  const RenderObject*) const = 0;
 #endif
 
  private:
