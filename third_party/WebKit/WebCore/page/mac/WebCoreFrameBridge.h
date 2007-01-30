@@ -277,7 +277,6 @@ rangeByAlteringCurrentSelection:
 - (void)insertLineBreak;
 - (void)insertParagraphSeparator;
 - (void)insertParagraphSeparatorInQuotedContent;
-- (void)insertText:(NSString*)text selectInsertedText:(BOOL)selectInsertedText;
 
 - (void)setSelectionToDragCaret;
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment

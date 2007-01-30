@@ -412,7 +412,7 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void undo() {}
   virtual void redo() {}
 
-  virtual void handleKeyPress(EventTargetNode*, KeyboardEvent*) {}
+  virtual void handleKeyPress(KeyboardEvent*) {}
 
 #if PLATFORM(MAC)
   // FIXME: This should become SelectionController::toWebArchive()

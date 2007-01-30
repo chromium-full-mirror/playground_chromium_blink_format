@@ -131,7 +131,7 @@ class EventHandler : Noncopyable {
 
   bool keyEvent(const PlatformKeyboardEvent&);
 
-  void defaultKeyboardEventHandler(EventTargetNode*, KeyboardEvent*);
+  void defaultKeyboardEventHandler(KeyboardEvent*);
 
 #if PLATFORM(MAC)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;

@@ -1308,17 +1308,16 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& keyEvent) {
   return result;
 }
 
-void EventHandler::defaultKeyboardEventHandler(EventTargetNode* target,
-                                               KeyboardEvent* event) {
-  if (target == event->target() && event->type() == keypressEvent) {
-    if (Page* page = target->document()->page())
+void EventHandler::defaultKeyboardEventHandler(KeyboardEvent* event) {
+  if (event->type() == keypressEvent) {
+    if (Page* page = event->target()->toNode()->document()->page())
       if (page->tabKeyCyclesThroughElements() &&
           event->keyIdentifier() == "U+000009")
         if (page->focusController()->advanceFocus(event)) {
           event->setDefaultHandled();
           return;
         }
-    m_frame->editor()->handleKeyPress(target, event);
+    m_frame->editor()->handleKeyPress(event);
   }
 }
 }

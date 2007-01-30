@@ -71,9 +71,9 @@ EditorClient* Editor::client() const {
   return 0;
 }
 
-void Editor::handleKeyPress(EventTargetNode* target, KeyboardEvent* event) {
+void Editor::handleKeyPress(KeyboardEvent* event) {
   if (EditorClient* c = client())
-    c->handleKeyPress(target, event);
+    c->handleKeyPress(event);
 }
 
 bool Editor::canEdit() const {
@@ -1149,7 +1149,7 @@ struct Command {
   bool (*exec)(Frame* frame);
 };
 
-typedef HashMap<String, const Command*> CommandMap;
+typedef HashMap<RefPtr<AtomicStringImpl>, const Command*> CommandMap;
 
 static CommandMap* createCommandMap() {
   struct CommandEntry {
@@ -1238,7 +1238,9 @@ static CommandMap* createCommandMap() {
 
   const unsigned numCommands = sizeof(commands) / sizeof(commands[0]);
   for (unsigned i = 0; i < numCommands; i++)
-    commandMap->set(commands[i].name, &commands[i].command);
+    commandMap->set(AtomicString(commands[i].name).impl(),
+                    &commands[i].command);
+
   return commandMap;
 }
 
@@ -1254,12 +1256,12 @@ Editor::Editor(Frame* frame)
 
 Editor::~Editor() {}
 
-bool Editor::execCommand(const String& command) {
+bool Editor::execCommand(const AtomicString& command) {
   static CommandMap* commandMap;
   if (!commandMap)
     commandMap = createCommandMap();
 
-  const Command* c = commandMap->get(command);
+  const Command* c = commandMap->get(command.impl());
   ASSERT(c);
 
   bool handled = false;
@@ -1270,6 +1272,16 @@ bool Editor::execCommand(const String& command) {
   }
 
   return handled;
+}
+
+bool Editor::insertText(const String& text,
+                        bool selectInsertedText,
+                        Event* triggeringEvent) {
+  if (m_frame->selectionController()->isNone())
+    return false;
+  TypingCommand::insertText(m_frame->document(), text, selectInsertedText);
+  m_frame->revealSelection(RenderLayer::gAlignToEdgeIfNeeded);
+  return true;
 }
 
 void Editor::cut() {

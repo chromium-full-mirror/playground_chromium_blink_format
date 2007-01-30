@@ -33,6 +33,12 @@
 @class WebTextCompleteController;
 @class DOMDocumentFragment;
 
+namespace WebCore {
+class KeyboardEvent;
+}
+
+struct WebHTMLViewInterpretKeyEventsParameters;
+
 @interface WebHTMLViewPrivate : NSObject {
  @public
   BOOL closed;
@@ -79,7 +85,7 @@
 
   BOOL transparentBackground;
 
-  BOOL* keyEventWasInterpreted;
+  WebHTMLViewInterpretKeyEventsParameters* interpretKeyEventsParameters;
 
   NSTextView* firstResponderTextViewAtMouseDownTime;
 
@@ -107,7 +113,7 @@
 - (void)closeIfNotCurrentView;
 - (void)_lookUpInDictionaryFromMenu:(id)sender;
 - (void)_hoverFeedbackSuspendedChanged;
-- (BOOL)_interceptEditingKeyEvent:(NSEvent*)event;
+- (BOOL)_interceptEditingKeyEvent:(WebCore::KeyboardEvent*)event;
 - (DOMDocumentFragment*)_documentFragmentFromPasteboard:
     (NSPasteboard*)pasteboard;
 #if !BUILDING_ON_TIGER
