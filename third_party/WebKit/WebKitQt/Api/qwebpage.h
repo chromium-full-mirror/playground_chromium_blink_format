@@ -26,6 +26,7 @@
 #define QWEBPAGE_H
 
 #include "qwebpagehistory.h"
+#include <qwebkitglobal.h>
 
 #include <qwidget.h>
 class QWebFrame;
@@ -40,7 +41,7 @@ class ChromeClientQt;
 class FrameLoadRequest;
 }
 
-class QWebPage : public QWidget {
+class QWEBKIT_EXPORT QWebPage : public QWidget {
   Q_OBJECT
  public:
   QWebPage(QWidget* parent);

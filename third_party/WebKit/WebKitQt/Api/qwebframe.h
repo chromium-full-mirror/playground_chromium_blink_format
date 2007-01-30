@@ -27,6 +27,8 @@
 
 #include <qscrollarea.h>
 
+#include <qwebkitglobal.h>
+
 class QWebFramePrivate;
 class QWebPage;
 
@@ -35,7 +37,7 @@ class FrameLoaderClientQt;
 }
 class QWebFrameData;
 
-class QWebFrame : public QScrollArea {
+class QWEBKIT_EXPORT QWebFrame : public QScrollArea {
   Q_OBJECT
  protected:
   QWebFrame(QWebPage* parent, QWebFrameData* frameData);
