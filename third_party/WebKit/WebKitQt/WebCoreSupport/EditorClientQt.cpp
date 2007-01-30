@@ -167,7 +167,7 @@ void EditorClientQt::toggleGrammarChecking() {
   notImplemented();
 }
 
-void EditorClientQt::handleKeyPress(EventTargetNode*, KeyboardEvent*) {
+void EditorClientQt::handleKeyPress(KeyboardEvent*) {
   notImplemented();
 }
 }
