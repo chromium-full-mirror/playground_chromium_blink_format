@@ -111,7 +111,7 @@ class CSSSelector {
 
   enum PseudoType {
     PseudoNotParsed = 0,
-    PseudoOther,
+    PseudoUnknown,
     PseudoEmpty,
     PseudoFirstChild,
     PseudoFirstOfType,
