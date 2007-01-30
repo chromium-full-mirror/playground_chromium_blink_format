@@ -89,7 +89,7 @@ void ResourceLoader::releaseResources() {
 
 bool ResourceLoader::load(const ResourceRequest& r) {
   ASSERT(!m_handle);
-  ASSERT(m_deferrerdRequest.isNull());
+  ASSERT(m_deferredRequest.isNull());
   ASSERT(!frameLoader()->isArchiveLoadPending(this));
 
   m_originalURL = r.url();
