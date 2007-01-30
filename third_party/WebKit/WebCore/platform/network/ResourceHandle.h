@@ -85,7 +85,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
  private:
   ResourceHandle(const ResourceRequest&,
                  ResourceHandleClient*,
-                 bool defersLoading,
                  bool mightDownloadFromHandle);
 
  public:
@@ -94,7 +93,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
       const ResourceRequest&,
       ResourceHandleClient*,
       Frame*,
-      bool defersLoading,
       bool mightDownloadFromHandle = false);
 
   static void loadResourceSynchronously(const ResourceRequest&,
@@ -158,7 +156,6 @@ class ResourceHandle : public Shared<ResourceHandle> {
   void cancel();
 
   ResourceHandleClient* client() const;
-  void setDefersLoading(bool);
 
   const HTTPHeaderMap& requestHeaders() const;
   const KURL& url() const;

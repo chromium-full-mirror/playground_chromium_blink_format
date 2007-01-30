@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ *           (C) 2007 Graham Dennis (graham.dennis@gmail.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -83,10 +84,12 @@ void ResourceLoader::releaseResources() {
 #endif
   m_handle = 0;
   m_resourceData = 0;
+  m_deferredRequest = 0;
 }
 
 bool ResourceLoader::load(const ResourceRequest& r) {
   ASSERT(!m_handle);
+  ASSERT(m_deferrerdRequest.isNull());
   ASSERT(!frameLoader()->isArchiveLoadPending(this));
 
   m_originalURL = r.url();
@@ -101,16 +104,23 @@ bool ResourceLoader::load(const ResourceRequest& r) {
   if (frameLoader()->willUseArchive(this, clientRequest, m_originalURL))
     return true;
 
-  m_handle = ResourceHandle::create(clientRequest, this, m_frame.get(),
-                                    m_defersLoading);
+  if (m_defersLoading) {
+    m_deferredRequest = clientRequest;
+    return true;
+  }
+
+  m_handle = ResourceHandle::create(clientRequest, this, m_frame.get());
 
   return true;
 }
 
 void ResourceLoader::setDefersLoading(bool defers) {
   m_defersLoading = defers;
-  if (m_handle)
-    m_handle->setDefersLoading(defers);
+  if (!defers && !m_deferredRequest.isNull()) {
+    ResourceRequest request(m_deferredRequest);
+    m_deferredRequest = 0;
+    load(request);
+  }
 }
 
 FrameLoader* ResourceLoader::frameLoader() const {
