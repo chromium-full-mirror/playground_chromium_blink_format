@@ -93,6 +93,10 @@ struct TCMalloc_SpinLock {
         : "memory");
 #endif
   }
+
+#ifdef WTF_CHANGES
+  inline bool IsLocked() { return private_lockword_ != 0; }
+#endif
 };
 
 #define SPINLOCK_INITIALIZER \
