@@ -79,9 +79,8 @@ void ResourceLoader::releaseResources() {
   // <rdar://problem/4372628>
   m_reachedTerminalState = true;
 
-#if PLATFORM(MAC)
-  setIdentifier(nil);
-#endif
+  m_identifier = 0;
+
   m_handle = 0;
   m_resourceData = 0;
   m_deferredRequest = ResourceRequest();
@@ -109,13 +108,16 @@ bool ResourceLoader::load(const ResourceRequest& r) {
     return true;
   }
 
-  m_handle = ResourceHandle::create(clientRequest, this, m_frame.get());
+  m_handle = ResourceHandle::create(clientRequest, this, m_frame.get(),
+                                    m_defersLoading);
 
   return true;
 }
 
 void ResourceLoader::setDefersLoading(bool defers) {
   m_defersLoading = defers;
+  if (m_handle)
+    m_handle->setDefersLoading(defers);
   if (!defers && !m_deferredRequest.isNull()) {
     ResourceRequest request(m_deferredRequest);
     m_deferredRequest = ResourceRequest();
