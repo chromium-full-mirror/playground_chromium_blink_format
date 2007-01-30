@@ -566,6 +566,12 @@ void CSSStyleSelector::initForStyleResolve(Element* e,
   pseudoStyle = RenderStyle::NOPSEUDO;
 
   parentNode = e->parentNode();
+
+#ifdef SVG_SUPPORT
+  if (!parentNode && e->isSVGElement() && e->isShadowNode())
+    parentNode = e->shadowParentNode();
+#endif
+
   if (defaultParent)
     parentStyle = defaultParent;
   else

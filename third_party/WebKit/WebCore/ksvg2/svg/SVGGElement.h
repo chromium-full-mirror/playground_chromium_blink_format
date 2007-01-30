@@ -56,6 +56,10 @@ class SVGGElement : public SVGStyledTransformableElement,
                                          bool,
                                          ExternalResourcesRequired,
                                          externalResourcesRequired)
+
+ private:
+  friend class SVGUseElement;
+  AffineTransform localMatrix() const;
 };
 
 }  // namespace WebCore

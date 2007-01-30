@@ -68,6 +68,11 @@ SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document* doc)
 
 SVGSVGElement::~SVGSVGElement() {
   delete m_timeScheduler;
+  m_timeScheduler = 0;
+
+  // There are cases where removedFromDocument() is not called.
+  // see ContainerNode::removeAllChildren, called by it's destructor.
+  document()->accessSVGExtensions()->removeTimeContainer(this);
 }
 
 ANIMATED_PROPERTY_DEFINITIONS(SVGSVGElement,

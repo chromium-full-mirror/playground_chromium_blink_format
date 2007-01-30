@@ -24,7 +24,7 @@
 
 #ifdef SVG_SUPPORT
 
-#include "Shared.h"
+#include "EventTarget.h"
 
 #include <wtf/RefPtr.h>
 #include <wtf/PassRefPtr.h>
@@ -34,11 +34,9 @@ class SVGElement;
 class SVGUseElement;
 class SVGElementInstanceList;
 
-class SVGElementInstance : public TreeShared<SVGElementInstance> {
+class SVGElementInstance : public EventTarget {
  public:
-  SVGElementInstance(PassRefPtr<SVGUseElement>,
-                     PassRefPtr<SVGElement> clonedElement,
-                     PassRefPtr<SVGElement> originalElement);
+  SVGElementInstance(SVGUseElement*, PassRefPtr<SVGElement> originalElement);
   virtual ~SVGElementInstance();
 
   // 'SVGElementInstance' functions
@@ -55,7 +53,35 @@ class SVGElementInstance : public TreeShared<SVGElementInstance> {
   SVGElementInstance* lastChild() const;
 
   // Internal usage only!
-  SVGElement* clonedElement() const;
+  SVGElement* shadowTreeElement() const;
+  void setShadowTreeElement(SVGElement*);
+
+  // Model the TreeShared concept, integrated within EventTarget inheritance.
+  virtual void refEventTarget() { ++m_refCount; }
+  virtual void derefEventTarget() {
+    if (--m_refCount <= 0 && !m_parent)
+      delete this;
+  }
+
+  bool hasOneRef() { return m_refCount == 1; }
+  int refCount() const { return m_refCount; }
+
+  void setParent(SVGElementInstance* parent) { m_parent = parent; }
+  SVGElementInstance* parent() const { return m_parent; }
+
+  virtual void addEventListener(const AtomicString& eventType,
+                                PassRefPtr<EventListener>,
+                                bool useCapture);
+  virtual void removeEventListener(const AtomicString& eventType,
+                                   EventListener*,
+                                   bool useCapture);
+  virtual bool dispatchEvent(PassRefPtr<Event>,
+                             ExceptionCode&,
+                             bool tempEvent = false);
+
+ private:
+  SVGElementInstance(const SVGElementInstance&);
+  SVGElementInstance& operator=(const SVGElementInstance&);
 
  private:  // Helper methods
   friend class SVGUseElement;
@@ -65,9 +91,12 @@ class SVGElementInstance : public TreeShared<SVGElementInstance> {
   void updateInstance(SVGElement*);
 
  private:
-  RefPtr<SVGUseElement> m_useElement;
+  int m_refCount;
+  SVGElementInstance* m_parent;
+
+  SVGUseElement* m_useElement;
   RefPtr<SVGElement> m_element;
-  RefPtr<SVGElement> m_clonedElement;
+  SVGElement* m_shadowTreeElement;
 
   SVGElementInstance* m_previousSibling;
   SVGElementInstance* m_nextSibling;

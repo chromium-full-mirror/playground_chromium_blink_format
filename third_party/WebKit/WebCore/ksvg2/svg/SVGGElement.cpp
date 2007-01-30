@@ -51,6 +51,10 @@ RenderObject* SVGGElement::createRenderer(RenderArena* arena,
                                           RenderStyle* style) {
   return new (arena) RenderSVGContainer(this);
 }
+
+AffineTransform SVGGElement::localMatrix() const {
+  return m_localMatrix;
+}
 }
 
 #endif  // SVG_SUPPORT
