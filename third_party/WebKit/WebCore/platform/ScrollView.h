@@ -158,9 +158,11 @@ class ScrollView : public Widget {
   ~ScrollView();
 
   void setScrollArea(QScrollArea*);
+  void setAllowsScrolling(bool);
 
  private:
   QScrollArea* m_area;
+  bool m_allowsScrolling;
 #endif
 };
 
