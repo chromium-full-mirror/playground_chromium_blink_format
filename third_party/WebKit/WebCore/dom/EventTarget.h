@@ -29,23 +29,21 @@
 #ifndef EventTarget_h
 #define EventTarget_h
 
-#include <wtf/PassRefPtr.h>
+#include <wtf/Forward.h>
 
 namespace WebCore {
 
 class AtomicString;
 class Event;
 class EventListener;
-class Node;
+class EventTargetNode;
 class XMLHttpRequest;
 
 typedef int ExceptionCode;
 
 class EventTarget {
  public:
-  virtual ~EventTarget();
-
-  virtual Node* toNode();
+  virtual EventTargetNode* toNode();
   virtual XMLHttpRequest* toXMLHttpRequest();
 
   virtual void addEventListener(const AtomicString& eventType,
@@ -60,6 +58,9 @@ class EventTarget {
 
   void ref() { refEventTarget(); }
   void deref() { derefEventTarget(); }
+
+ protected:
+  virtual ~EventTarget();
 
  private:
   virtual void refEventTarget() = 0;

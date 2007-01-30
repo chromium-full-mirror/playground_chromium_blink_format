@@ -69,7 +69,7 @@ class Image : Noncopyable {
   friend class GraphicsContext;
 
  public:
-  Image(ImageAnimationObserver* observer = 0);
+  Image(ImageAnimationObserver* = 0);
   virtual ~Image();
 
   static Image* loadPlatformResource(const char* name);

@@ -47,11 +47,11 @@ namespace WebCore {
 struct FrameData;
 }
 
-// This complicated-looking declaration tells the framedata Vector that it can
-// copy without
-// having to invoke our copy constructor. This allows us to not have to worry
-// about ref counting
-// the native frames.
+// This complicated-looking declaration tells the FrameData Vector that it
+// should copy without
+// invoking our constructor or destructor. This allows us to have a vector even
+// for a struct
+// that's not copyable.
 namespace WTF {
 template <>
 class VectorTraits<WebCore::FrameData> : public SimpleClassVectorTraits {};
@@ -66,7 +66,7 @@ class Timer;
 // FrameData Class
 // ================================================
 
-struct FrameData {
+struct FrameData : Noncopyable {
   FrameData() : m_frame(0), m_duration(0), m_hasAlpha(true) {}
 
   ~FrameData() { clear(); }
@@ -86,7 +86,7 @@ class BitmapImage : public Image {
   friend class GraphicsContext;
 
  public:
-  BitmapImage(ImageAnimationObserver* observer = 0);
+  BitmapImage(ImageAnimationObserver* = 0);
   ~BitmapImage();
 
   virtual IntSize size() const;

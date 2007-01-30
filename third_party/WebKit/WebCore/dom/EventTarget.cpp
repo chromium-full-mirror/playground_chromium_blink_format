@@ -29,14 +29,11 @@
 #include "config.h"
 #include "EventTarget.h"
 
-#include "EventTargetNode.h"
-#include "xmlhttprequest.h"
-
 namespace WebCore {
 
 EventTarget::~EventTarget() {}
 
-Node* EventTarget::toNode() {
+EventTargetNode* EventTarget::toNode() {
   return 0;
 }
 
