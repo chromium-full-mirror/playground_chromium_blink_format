@@ -25,12 +25,16 @@
 
 #include "config.h"
 
+#include <QApplication>
+#include <QColor>
+#include <QDebug>
 #include <QStyle>
 #include <QWidget>
 #include <QPainter>
 #include <QStyleOptionButton>
 #include <QStyleOptionFrameV2>
 
+#include "Color.h"
 #include "Document.h"
 #include "RenderTheme.h"
 #include "GraphicsContext.h"
@@ -44,6 +48,9 @@ class RenderThemeQt : public RenderTheme {
   // A method asking if the theme's controls actually care about redrawing when
   // hovered.
   virtual bool supportsHover(const RenderStyle*) const { return true; }
+  virtual bool supportsFocusRing(const RenderStyle* style) const {
+    return false;
+  }
 
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
@@ -83,6 +90,12 @@ class RenderThemeQt : public RenderTheme {
   virtual bool controlSupportsTints(const RenderObject*) const;
 
   virtual void systemFont(int propId, FontDescription&) const;
+
+  // The platform selection color.
+  virtual Color platformActiveSelectionBackgroundColor() const;
+  virtual Color platformInactiveSelectionBackgroundColor() const;
+  virtual Color platformActiveSelectionForegroundColor() const;
+  virtual Color platformInactiveSelectionForegroundColor() const;
 
  private:
   void addIntrinsicMargins(RenderStyle*) const;
@@ -296,6 +309,26 @@ bool RenderThemeQt::paintTextField(RenderObject* o,
   style->drawPrimitive(QStyle::PE_FrameLineEdit, &panel, painter, widget);
 
   return false;
+}
+
+Color RenderThemeQt::platformActiveSelectionBackgroundColor() const {
+  QPalette pal = QApplication::palette();
+  return pal.brush(QPalette::Active, QPalette::Highlight).color();
+}
+
+Color RenderThemeQt::platformInactiveSelectionBackgroundColor() const {
+  QPalette pal = QApplication::palette();
+  return pal.brush(QPalette::Inactive, QPalette::Highlight).color();
+}
+
+Color RenderThemeQt::platformActiveSelectionForegroundColor() const {
+  QPalette pal = QApplication::palette();
+  return pal.brush(QPalette::Active, QPalette::HighlightedText).color();
+}
+
+Color RenderThemeQt::platformInactiveSelectionForegroundColor() const {
+  QPalette pal = QApplication::palette();
+  return pal.brush(QPalette::Inactive, QPalette::HighlightedText).color();
 }
 }
 
