@@ -34,6 +34,11 @@
 typedef struct CGImage* CGImageRef;
 #endif
 
+#if PLATFORM(QT)
+#include <QPixmap>
+class QPainter;
+#endif
+
 namespace WebCore {
 
 class GraphicsContext;
@@ -56,6 +61,8 @@ class ImageBuffer : Noncopyable {
 
 #if PLATFORM(CG)
   CGImageRef cgImage() const;
+#elif PLATFORM(QT)
+  QPixmap* pixmap() const;
 #endif
 
  private:
@@ -67,6 +74,10 @@ class ImageBuffer : Noncopyable {
 #if PLATFORM(CG)
   ImageBuffer(void* imageData, const IntSize&, std::auto_ptr<GraphicsContext>);
   mutable CGImageRef m_cgImage;
+#elif PLATFORM(QT)
+  ImageBuffer(const QPixmap& px);
+  mutable QPixmap m_pixmap;
+  mutable QPainter* m_painter;
 #endif
 };
 }

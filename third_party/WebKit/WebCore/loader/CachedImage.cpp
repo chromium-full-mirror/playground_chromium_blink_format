@@ -43,7 +43,7 @@
 #endif
 
 #ifdef SVG_SUPPORT
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) || PLATFORM(QT)
 #include "SVGImage.h"
 #endif
 #endif
@@ -144,7 +144,7 @@ inline void CachedImage::createImage() {
   }
 #endif
 #ifdef SVG_SUPPORT
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) || PLATFORM(QT)
   if (m_response.mimeType() == "image/svg+xml") {
     m_image = new SVGImage(this);
     return;

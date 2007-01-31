@@ -29,7 +29,11 @@
 #include "DocumentLoader.h"
 #include "FloatRect.h"
 #include "FrameLoader.h"
+#if PLATFORM(MAC)
 #include "FrameMac.h"
+#elif PLATFORM(QT)
+#include "FrameQt.h"
+#endif
 #include "FrameView.h"
 #include "GraphicsContext.h"
 #include "Page.h"
@@ -112,7 +116,11 @@ NativeImagePtr SVGImage::nativeImageForCurrentFrame() {
     m_frameCache.set(ImageBuffer::create(size(), false).release());
     ImageBuffer::renderSubtreeToImage(m_frameCache.get(), m_frame->renderer());
   }
+#if PLATFORM(CG)
   return m_frameCache->cgImage();
+#elif PLATFORM(QT)
+  return m_frameCache->pixmap();
+#endif
 }
 
 bool SVGImage::setData(bool allDataReceived) {
@@ -136,7 +144,11 @@ bool SVGImage::setData(bool allDataReceived) {
     // know to break the cycle.
     m_page.set(new Page(dummyChromeClient, dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient));
+#if PLATFORM(MAC)
     m_frame = new FrameMac(m_page.get(), 0, dummyFrameLoaderClient);
+#elif PLATFORM(QT)
+    m_frame = new FrameQt(m_page.get(), 0, dummyFrameLoaderClient);
+#endif
     m_frameView = new FrameView(m_frame.get());
     m_frameView->deref();  // FIXME: FrameView starts with a refcount of 1
     m_frame->setView(m_frameView.get());
