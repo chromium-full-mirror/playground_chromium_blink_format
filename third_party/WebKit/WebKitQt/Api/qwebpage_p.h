@@ -52,6 +52,8 @@ class QWebPagePrivate {
   QVBoxLayout* layout;
 
   QWebPage* q;
+
+  bool modified;
 };
 
 #endif

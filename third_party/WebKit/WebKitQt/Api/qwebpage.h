@@ -44,6 +44,8 @@ class EditorClientQt;
 
 class QWEBKIT_EXPORT QWebPage : public QWidget {
   Q_OBJECT
+
+  Q_PROPERTY(bool modified READ isModified)
  public:
   QWebPage(QWidget* parent);
   ~QWebPage();
@@ -59,6 +61,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   QString title() const;
 
   QUrl url() const;
+
+  bool isModified() const;
 
   virtual void javaScriptConsoleMessage(const QString& message,
                                         unsigned int lineNumber,

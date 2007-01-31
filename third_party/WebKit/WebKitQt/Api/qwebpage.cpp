@@ -45,7 +45,7 @@
 
 using namespace WebCore;
 
-QWebPagePrivate::QWebPagePrivate(QWebPage* qq) : q(qq) {
+QWebPagePrivate::QWebPagePrivate(QWebPage* qq) : q(qq), modified(false) {
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
   editorClient = new EditorClientQt(q);
@@ -168,6 +168,13 @@ QWebPage* QWebPage::createWindow() {
 
 void QWebPage::setWindowGeometry(const QRect& geom) {
   Q_UNUSED(geom)
+}
+
+/*!
+  Returns true if the page contains unsubmitted form data.
+*/
+bool QWebPage::isModified() const {
+  return d->modified;
 }
 
 #include "qwebpage.moc"
