@@ -459,7 +459,7 @@ backforward list.
 // FIXME: These two methods should be merged into WebViewEditing when we're not
 // in API freeze
 - (BOOL)isGrammarCheckingEnabled;
-#if !BUILDING_ON_TIGER
+#ifndef BUILDING_ON_TIGER
 - (void)setGrammarCheckingEnabled:(BOOL)flag;
 
 // FIXME: This method should be merged into WebIBActions when we're not in API
