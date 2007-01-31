@@ -443,6 +443,12 @@ void RenderTextControl::setSelectionRange(int start, int end) {
     frame->setSelectionGranularity(CharacterGranularity);
 }
 
+Selection RenderTextControl::selection(int start, int end) const {
+  return Selection(
+      VisiblePosition(m_innerText.get(), start, VP_DEFAULT_AFFINITY),
+      VisiblePosition(m_innerText.get(), end, VP_DEFAULT_AFFINITY));
+}
+
 VisiblePosition RenderTextControl::visiblePositionForIndex(int index) {
   if (index <= 0)
     return VisiblePosition(m_innerText.get(), 0, DOWNSTREAM);

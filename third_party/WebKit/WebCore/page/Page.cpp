@@ -193,6 +193,13 @@ void Page::setNeedsReapplyStylesForSettingsChange(Settings* settings) {
         frame->setNeedsReapplyStyles();
 }
 
+const Selection& Page::selection() const {
+  return focusController()
+      ->focusedOrMainFrame()
+      ->selectionController()
+      ->selection();
+}
+
 void Page::setDefersLoading(bool defers) {
   if (defers == m_defersLoading)
     return;

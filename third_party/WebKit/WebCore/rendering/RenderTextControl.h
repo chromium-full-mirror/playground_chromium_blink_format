@@ -31,6 +31,7 @@ class HTMLTextFieldInnerTextElement;
 class HTMLSearchFieldCancelButtonElement;
 class HTMLSearchFieldResultsButtonElement;
 class SearchPopupMenu;
+class Selection;
 
 class RenderTextControl : public RenderBlock, private PopupMenuClient {
  public:
@@ -67,6 +68,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   void setSelectionEnd(int);
   void select();
   void setSelectionRange(int start, int end);
+  Selection selection(int start, int end) const;
 
   void subtreeHasChanged();
   String text();
