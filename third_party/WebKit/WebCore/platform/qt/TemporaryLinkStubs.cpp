@@ -92,11 +92,6 @@ void WebCore::refreshPlugins(bool) {
   notImplemented();
 }
 
-Color WebCore::focusRingColor() {
-  notImplemented();
-  return 0xFF0000FF;
-}
-
 bool WebCore::historyContains(DeprecatedString const&) {
   return false;
 }
@@ -253,10 +248,6 @@ FloatRect WebCore::screenRect(Widget* w) {
 
 FloatRect WebCore::screenAvailableRect(Widget* w) {
   return (QRectF)QApplication::desktop()->availableGeometry(w->qwidget());
-}
-
-void WebCore::setFocusRingColorChangeFunction(void (*)()) {
-  notImplemented();
 }
 
 void FrameView::updateBorder() {
