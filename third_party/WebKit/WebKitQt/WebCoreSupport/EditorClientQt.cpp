@@ -30,7 +30,17 @@
 #include "config.h"
 #include "EditorClientQt.h"
 
+#include "qwebpage.h"
+#include "qwebpage_p.h"
+
 #include "EditCommand.h"
+#include "Editor.h"
+#include "FocusController.h"
+#include "Frame.h"
+#include "KeyboardCodes.h"
+#include "KeyboardEvent.h"
+#include "Page.h"
+#include "PlatformKeyboardEvent.h"
 
 #include <stdio.h>
 
@@ -150,7 +160,7 @@ bool EditorClientQt::shouldInsertNode(Node*, Range*, EditorInsertAction) {
   notImplemented();
 }
 
-void WebCore::EditorClientQt::pageDestroyed() {
+void EditorClientQt::pageDestroyed() {
   notImplemented();
 }
 
@@ -167,9 +177,45 @@ void EditorClientQt::toggleGrammarChecking() {
   notImplemented();
 }
 
-void EditorClientQt::handleKeyPress(KeyboardEvent*) {
-  notImplemented();
+void EditorClientQt::handleKeyPress(KeyboardEvent* event) {
+  Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
+  if (!frame)
+    return;
+
+  const PlatformKeyboardEvent* kevent = event->keyEvent();
+  if (!kevent->isKeyUp()) {
+    Node* start = frame->selectionController()->start().node();
+    if (start && start->isContentEditable()) {
+      switch (kevent->WindowsKeyCode()) {
+        case VK_BACK:
+          frame->editor()->deleteWithDirection(
+              SelectionController::BACKWARD, CharacterGranularity, false, true);
+          break;
+        case VK_DELETE:
+          frame->editor()->deleteWithDirection(
+              SelectionController::FORWARD, CharacterGranularity, false, true);
+          break;
+        case VK_LEFT:
+          frame->editor()->execCommand("MoveLeft");
+          break;
+        case VK_RIGHT:
+          frame->editor()->execCommand("MoveRight");
+          break;
+        case VK_UP:
+          frame->editor()->execCommand("MoveUp");
+          break;
+        case VK_DOWN:
+          frame->editor()->execCommand("MoveDown");
+          break;
+        default:
+          frame->editor()->insertText(kevent->text(), false, event);
+      }
+      event->setDefaultHandled();
+    }
+  }
 }
+
+EditorClientQt::EditorClientQt(QWebPage* page) : m_page(page) {}
 }
 
 // vim: ts=4 sw=4 et

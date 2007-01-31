@@ -36,9 +36,10 @@ class QWebPagePrivate;
 class QWebFrameData;
 
 namespace WebCore {
-class FrameLoaderClientQt;
 class ChromeClientQt;
+class FrameLoaderClientQt;
 class FrameLoadRequest;
+class EditorClientQt;
 }
 
 class QWEBKIT_EXPORT QWebPage : public QWidget {
@@ -111,8 +112,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
  private:
   friend class QWebFrame;
   friend class QWebPagePrivate;
-  friend class WebCore::FrameLoaderClientQt;
   friend class WebCore::ChromeClientQt;
+  friend class WebCore::EditorClientQt;
+  friend class WebCore::FrameLoaderClientQt;
   QWebPagePrivate* d;
 };
 

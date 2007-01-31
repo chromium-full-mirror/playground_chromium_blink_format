@@ -93,8 +93,6 @@ class FrameQt : public Frame {
   // should be somewhere in platform
   virtual String mimeTypeForFileName(const String&) const;
 
-  bool keyEvent(const PlatformKeyboardEvent& keyEvent);
-
   void setFrameGeometry(const IntRect&);
 
   void createNewWindow(const FrameLoadRequest&, const WindowFeatures&, Frame*&);

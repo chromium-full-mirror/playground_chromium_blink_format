@@ -35,10 +35,14 @@
 
 #include <wtf/Forward.h>
 
+class QWebPage;
+
 namespace WebCore {
 
 class EditorClientQt : public EditorClient {
  public:
+  EditorClientQt(QWebPage* page);
+
   virtual void pageDestroyed();
 
   virtual bool shouldDeleteRange(Range*);
@@ -76,6 +80,9 @@ class EditorClientQt : public EditorClient {
   virtual void redo();
 
   virtual void handleKeyPress(KeyboardEvent*);
+
+ private:
+  QWebPage* m_page;
 };
 }
 

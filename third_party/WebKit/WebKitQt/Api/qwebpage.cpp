@@ -48,7 +48,7 @@ using namespace WebCore;
 QWebPagePrivate::QWebPagePrivate(QWebPage* qq) : q(qq) {
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();
-  editorClient = new EditorClientQt();
+  editorClient = new EditorClientQt(q);
   page = new Page(chromeClient, contextMenuClient, editorClient,
                   new DragClientQt());
 
