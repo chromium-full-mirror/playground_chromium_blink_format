@@ -265,7 +265,7 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
                                  const WindowFeatures& features) {
   ASSERT(!features.dialog || request.frameName().isEmpty());
 
-  if (!request.frameName().isEmpty())
+  if (!request.frameName().isEmpty() && request.frameName() != "_blank")
     if (Frame* frame = m_frame->tree()->find(request.frameName())) {
       if (!request.resourceRequest().url().isEmpty())
         frame->loader()->load(request, true, 0, 0, HashMap<String, String>());
@@ -286,7 +286,8 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
     return 0;
 
   Frame* frame = page->mainFrame();
-  frame->tree()->setName(request.frameName());
+  if (request.frameName() != "_blank")
+    frame->tree()->setName(request.frameName());
 
   page->chrome()->setToolbarsVisible(features.toolBarVisible ||
                                      features.locationBarVisible);
@@ -3505,7 +3506,8 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
   if (!mainFrame)
     return;
 
-  mainFrame->tree()->setName(frameName);
+  if (frameName != "_blank")
+    mainFrame->tree()->setName(frameName);
   mainFrame->loader()->m_client->dispatchShow();
   mainFrame->loader()->setOpener(frame.get());
   mainFrame->loader()->load(request, NavigationAction(), FrameLoadTypeStandard,
