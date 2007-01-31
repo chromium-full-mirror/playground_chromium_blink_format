@@ -29,8 +29,6 @@
 #include "qwebpagehistory.h"
 #include "qwebpagehistory_p.h"
 
-#include <qurl.h>
-
 #include "FrameQt.h"
 #include "ChromeClientQt.h"
 #include "ContextMenuClientQt.h"
@@ -40,9 +38,10 @@
 #include "Page.h"
 #include "FrameLoader.h"
 #include "KURL.h"
-#include "qboxlayout.h"
 
 #include <QDebug>
+#include <QUrl>
+#include <QVBoxLayout>
 
 using namespace WebCore;
 
@@ -125,11 +124,6 @@ QString QWebPage::title() const {
 QWebFrame* QWebPage::mainFrame() const {
   d->createMainFrame();
   return d->mainFrame;
-}
-
-QWebFrame* QWebPage::focusFrame() const {
-  Q_ASSERT(false);
-  return mainFrame();  // FIXME: this is not correct
 }
 
 QSize QWebPage::sizeHint() const {

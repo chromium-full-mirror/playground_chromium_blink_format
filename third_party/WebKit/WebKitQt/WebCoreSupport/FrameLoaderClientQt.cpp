@@ -77,6 +77,10 @@ void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, FrameQt* frame) {
           SIGNAL(titleChanged(const QString&)));
 }
 
+QWebFrame* FrameLoaderClientQt::webFrame() const {
+  return m_webFrame;
+}
+
 void FrameLoaderClientQt::callPolicyFunction(FramePolicyFunction function,
                                              PolicyAction action) {
   qDebug() << "FrameLoaderClientQt::callPolicyFunction";
