@@ -54,6 +54,8 @@ class Range : public Shared<Range> {
   Range(Document*, const Position&, const Position&);
   ~Range();
 
+  Document* ownerDocument() const { return m_ownerDocument.get(); }
+
   Node* startContainer(ExceptionCode&) const;
   int startOffset(ExceptionCode&) const;
   Node* endContainer(ExceptionCode&) const;

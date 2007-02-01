@@ -1050,20 +1050,21 @@ int TextIterator::rangeLength(const Range* r) {
 PassRefPtr<Range> TextIterator::subrange(Range* entireRange,
                                          int characterOffset,
                                          int characterCount) {
-  ExceptionCode ec = 0;
-
-  PassRefPtr<Range> result(entireRange);
   CharacterIterator chars(entireRange);
-  chars.advance(characterOffset);
-  result->setStart(chars.range()->startContainer(ec),
-                   chars.range()->startOffset(ec), ec);
-  ASSERT(ec == 0);
-  chars.advance(characterCount);
-  result->setEnd(chars.range()->startContainer(ec),
-                 chars.range()->startOffset(ec), ec);
-  ASSERT(ec == 0);
 
-  return result;
+  chars.advance(characterOffset);
+  RefPtr<Range> start = chars.range();
+
+  chars.advance(characterCount);
+  RefPtr<Range> end = chars.range();
+
+  ExceptionCode ec = 0;
+  RefPtr<Range> result(new Range(
+      entireRange->ownerDocument(), start->startContainer(ec),
+      start->startOffset(ec), end->startContainer(ec), end->startOffset(ec)));
+  ASSERT(!ec);
+
+  return result.release();
 }
 
 PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(Element* scope,
