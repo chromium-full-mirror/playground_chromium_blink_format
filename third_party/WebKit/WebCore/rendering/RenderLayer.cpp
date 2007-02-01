@@ -2217,6 +2217,7 @@ void RenderLayer::suspendMarquees() {
 Marquee::Marquee(RenderLayer* l)
     : m_layer(l),
       m_currentLoop(0),
+      m_totalLoops(0),
       m_timer(this, &Marquee::timerFired),
       m_start(0),
       m_end(0),
