@@ -97,6 +97,11 @@ class RenderThemeQt : public RenderTheme {
   virtual Color platformActiveSelectionForegroundColor() const;
   virtual Color platformInactiveSelectionForegroundColor() const;
 
+  void adjustMenuListStyle(CSSStyleSelector*, RenderStyle*, Element*) const;
+  bool paintMenuList(RenderObject* o,
+                     const RenderObject::PaintInfo& i,
+                     const IntRect& r);
+
  private:
   void addIntrinsicMargins(RenderStyle*) const;
   void close();
@@ -254,6 +259,12 @@ void RenderThemeQt::adjustButtonStyle(CSSStyleSelector* selector,
   addIntrinsicMargins(style);
 }
 
+void RenderThemeQt::adjustMenuListStyle(CSSStyleSelector*,
+                                        RenderStyle* style,
+                                        Element*) const {
+  addIntrinsicMargins(style);
+}
+
 bool RenderThemeQt::paintButton(RenderObject* o,
                                 const RenderObject::PaintInfo& i,
                                 const IntRect& r) {
@@ -329,6 +340,23 @@ Color RenderThemeQt::platformActiveSelectionForegroundColor() const {
 Color RenderThemeQt::platformInactiveSelectionForegroundColor() const {
   QPalette pal = QApplication::palette();
   return pal.brush(QPalette::Inactive, QPalette::HighlightedText).color();
+}
+
+bool RenderThemeQt::paintMenuList(RenderObject* o,
+                                  const RenderObject::PaintInfo& i,
+                                  const IntRect& r) {
+  QStyle* style = 0;
+  QPainter* painter = 0;
+  QWidget* widget = 0;
+
+  if (!getStylePainterAndWidgetFromPaintInfo(i, style, painter, widget))
+    return true;
+
+  QStyleOptionComboBox opt;
+  opt.initFrom(widget);
+  opt.rect = r;
+  style->drawComplexControl(QStyle::CC_ComboBox, &opt, painter, widget);
+  return false;
 }
 }
 
