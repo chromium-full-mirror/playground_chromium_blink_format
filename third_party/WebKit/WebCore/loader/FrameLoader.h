@@ -511,6 +511,11 @@ class FrameLoader : Noncopyable {
   void setPreviousHistoryItem(PassRefPtr<HistoryItem>);
   void setProvisionalHistoryItem(PassRefPtr<HistoryItem>);
 
+  void continueLoadWithData(SharedBuffer*,
+                            const String& mimeType,
+                            const String& textEncoding,
+                            const KURL&);
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
