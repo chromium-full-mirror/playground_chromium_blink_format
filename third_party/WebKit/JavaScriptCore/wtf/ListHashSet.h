@@ -382,8 +382,8 @@ inline void ListHashSet<T, U>::remove(iterator it) {
   if (it == end())
     return;
 
-  unlinkAndDelete(it.node());
   m_impl.remove(it.node());
+  unlinkAndDelete(it.node());
 }
 
 template <typename T, typename U>
