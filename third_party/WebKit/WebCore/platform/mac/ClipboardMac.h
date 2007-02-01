@@ -76,8 +76,6 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   NSImage* dragNSImage(
       NSPoint&);  // loc converted from dragLoc, based on whole image size
 
-  void setDragHasStarted() { m_dragStarted = true; }
-
  private:
   void setDragImage(CachedImage*, Node*, const IntPoint&);
 
@@ -87,7 +85,6 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   CachedImage* m_dragImage;
   RefPtr<Node> m_dragImageElement;
   int m_changeCount;
-  bool m_dragStarted;
   FrameMac* m_frame;  // used on the source side to generate dragging images
 };
 }

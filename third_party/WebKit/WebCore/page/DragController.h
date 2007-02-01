@@ -36,8 +36,9 @@ class Clipboard;
 class Document;
 class DragClient;
 class DragData;
-class SelectionController;
+class Frame;
 class Page;
+class SelectionController;
 
 class DragController {
  public:
@@ -75,6 +76,7 @@ class DragController {
   }
   DragSourceAction delegateDragSourceAction(const IntPoint& pagePoint);
 
+  bool mayStartDragAtEventLocation(const Frame*, const IntPoint& framePos);
   void dragEnded() {
     m_dragInitiator = 0;
     m_didInitiateDrag = false;

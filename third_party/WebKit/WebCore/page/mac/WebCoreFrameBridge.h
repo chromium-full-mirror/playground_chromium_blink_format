@@ -376,7 +376,6 @@ rangeByAlteringCurrentSelection:
                      event:(NSEvent*)event
              sourceIsDHTML:(BOOL)flag
             DHTMLWroteData:(BOOL)dhtmlWroteData;
-- (BOOL)mayStartDragAtEventLocation:(NSPoint)location;
 
 - (void)textFieldDidBeginEditing:(DOMHTMLInputElement*)element;
 - (void)textFieldDidEndEditing:(DOMHTMLInputElement*)element;
