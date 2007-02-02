@@ -32,6 +32,7 @@
 #include "HTMLNames.h"
 #include "HitTestResult.h"
 #include "InlineTextBox.h"
+#include "RenderImage.h"
 #include "RenderTableCell.h"
 #include "RenderTextFragment.h"
 #include "RenderTheme.h"
@@ -3754,6 +3755,31 @@ static inline void stripTrailingSpace(int& inlineMax,
   }
 }
 
+// This function is to match a crazy quirk that other browsers have. Firefox
+// and Opera will allow a table cell to grow to fit an image inside it under
+// very specific cirucumstances. Not supporting the quirk has caused us to
+// mis-render some real sites. (See Bugzilla 10517.)
+static bool shouldGrowTableCellForImage(RenderBlock* containingBlock,
+                                        RenderObject* image,
+                                        RenderObject* adjacentLeaf) {
+  if (!containingBlock->style()->htmlHacks())
+    return false;
+
+  if (!containingBlock->isTableCell())
+    return false;
+
+  if (!image->isImage())
+    return false;
+
+  if (adjacentLeaf && !adjacentLeaf->isImage())
+    return false;
+
+  if (!containingBlock->style()->width().isAuto())
+    return false;
+
+  return true;
+}
+
 void RenderBlock::calcInlineMinMaxWidth() {
   int inlineMax = 0;
   int inlineMin = 0;
@@ -3771,8 +3797,15 @@ void RenderBlock::calcInlineMinMaxWidth() {
   InlineMinMaxIterator childIterator(this, this);
   bool addedTextIndent = false;  // Only gets added in once.
   RenderObject* prevFloat = 0;
+  RenderObject* previousLeaf = 0;
   while (RenderObject* child = childIterator.next()) {
-    autoWrap = child->style()->autoWrap();
+    InlineMinMaxIterator leafIterator = childIterator;
+    RenderObject* nextLeaf = leafIterator.next();
+    while (nextLeaf && nextLeaf->isInlineFlow())
+      nextLeaf = leafIterator.next();
+
+    autoWrap = child->isReplaced() ? child->parent()->style()->autoWrap()
+                                   : child->style()->autoWrap();
 
     if (!child->isBR()) {
       // Step One: determine whether or not we need to go ahead and
@@ -3866,10 +3899,9 @@ void RenderBlock::calcInlineMinMaxWidth() {
         childMin += child->minWidth();
         childMax += child->maxWidth();
 
-        // FIXME: This isn't right.  WinIE, Opera, Mozilla all do this
-        // differently and
-        // treat replaced elements like characters in a word.
-        if (autoWrap || oldAutoWrap) {
+        bool growForPrevious =
+            shouldGrowTableCellForImage(this, child, previousLeaf);
+        if (!growForPrevious && (autoWrap || oldAutoWrap)) {
           if (m_minWidth < inlineMin)
             m_minWidth = inlineMin;
           inlineMin = 0;
@@ -3901,11 +3933,13 @@ void RenderBlock::calcInlineMinMaxWidth() {
         // Add our width to the max.
         inlineMax += childMax;
 
-        if (!autoWrap)
+        if (!autoWrap || growForPrevious)
           inlineMin += childMin;
-        else {
-          // Now check our line.
+        else
           inlineMin = childMin;
+
+        if (autoWrap && !shouldGrowTableCellForImage(this, child, nextLeaf)) {
+          // Now check our line.
           if (m_minWidth < inlineMin)
             m_minWidth = inlineMin;
 
@@ -4012,6 +4046,8 @@ void RenderBlock::calcInlineMinMaxWidth() {
     }
 
     oldAutoWrap = autoWrap;
+    if (!child->isInlineFlow())
+      previousLeaf = child;
   }
 
   if (style()->collapseWhiteSpace())
