@@ -31,6 +31,12 @@ namespace WebCore {
 const unsigned cNormalWeight = 50;
 const unsigned cBoldWeight = 63;
 
+enum FontStretch {
+  FontStretchCondensed = 3,
+  FontStretchNormal = 5,
+  FontStretchExpanded = 7
+};
+
 class FontDescription {
  public:
   enum GenericFamilyType {
@@ -50,6 +56,7 @@ class FontDescription {
         m_smallCaps(false),
         m_isAbsoluteSize(false),
         m_weight(cNormalWeight),
+        m_stretch(FontStretchNormal),
         m_genericFamily(NoFamily),
         m_usePrinterFont(false),
         m_keywordSize(0) {}
@@ -69,6 +76,15 @@ class FontDescription {
   bool smallCaps() const { return m_smallCaps; }
   bool isAbsoluteSize() const { return m_isAbsoluteSize; }
   unsigned weight() const { return m_weight; }
+  FontStretch stretch() const { return static_cast<FontStretch>(m_stretch); }
+  FontStretch narrowerStretch() const {
+    return (m_stretch == FontStretchExpanded) ? FontStretchNormal
+                                              : FontStretchCondensed;
+  }
+  FontStretch widerStretch() const {
+    return (m_stretch == FontStretchCondensed) ? FontStretchNormal
+                                               : FontStretchExpanded;
+  }
   GenericFamilyType genericFamily() const {
     return static_cast<GenericFamilyType>(m_genericFamily);
   }
@@ -83,6 +99,7 @@ class FontDescription {
   void setSmallCaps(bool c) { m_smallCaps = c; }
   void setIsAbsoluteSize(bool s) { m_isAbsoluteSize = s; }
   void setWeight(unsigned w) { m_weight = w; }
+  void setStretch(FontStretch s) { m_stretch = s; }
   void setGenericFamily(GenericFamilyType genericFamily) {
     m_genericFamily = genericFamily;
   }
@@ -103,6 +120,7 @@ class FontDescription {
   bool m_isAbsoluteSize : 1;  // Whether or not CSS specified an explicit size
                               // (logical sizes like "medium" don't count).
   unsigned m_weight : 8;
+  unsigned m_stretch : 4;        // FontStretch
   unsigned m_genericFamily : 3;  // GenericFamilyType
   bool m_usePrinterFont : 1;
 
@@ -121,7 +139,7 @@ inline bool FontDescription::operator==(const FontDescription& other) const {
          m_computedSize == other.m_computedSize && m_italic == other.m_italic &&
          m_smallCaps == other.m_smallCaps &&
          m_isAbsoluteSize == other.m_isAbsoluteSize &&
-         m_weight == other.m_weight &&
+         m_weight == other.m_weight && m_stretch == other.m_stretch &&
          m_genericFamily == other.m_genericFamily &&
          m_usePrinterFont == other.m_usePrinterFont &&
          m_keywordSize == other.m_keywordSize;
