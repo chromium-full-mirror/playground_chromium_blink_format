@@ -53,6 +53,8 @@ class ListHashSetConstIterator;
 
 template <typename ValueArg>
 struct ListHashSetNode;
+template <typename ValueArg>
+struct ListHashSetNodeAllocator;
 template <typename ValueArg, typename HashArg>
 struct ListHashSetNodeHashFunctions;
 
@@ -61,6 +63,7 @@ template <typename ValueArg,
 class ListHashSet {
  private:
   typedef ListHashSetNode<ValueArg> Node;
+  typedef ListHashSetNodeAllocator<ValueArg> NodeAllocator;
 
   typedef HashTraits<Node*> NodeTraits;
   typedef ListHashSetNodeHashFunctions<ValueArg, HashArg> NodeHash;
@@ -120,12 +123,72 @@ class ListHashSet {
   ImplType m_impl;
   Node* m_head;
   Node* m_tail;
+  NodeAllocator* m_allocator;
+};
+
+template <typename ValueArg>
+struct ListHashSetNodeAllocator {
+  typedef ListHashSetNode<ValueArg> Node;
+  typedef ListHashSetNodeAllocator<ValueArg> NodeAllocator;
+
+  ListHashSetNodeAllocator() : m_freeList(pool()) {
+    memset(m_pool, 0, sizeof(m_pool));
+  }
+
+  Node* allocate() {
+    Node* result = m_freeList;
+
+    if (!result)
+      return static_cast<Node*>(fastMalloc(sizeof(Node)));
+
+    Node* next = result->m_next;
+    if (!next && inPool(result + 1))
+      next = result + 1;
+    m_freeList = next;
+
+    return result;
+  }
+
+  void deallocate(Node* node) {
+    if (inPool(node)) {
+      node->m_next = m_freeList;
+      m_freeList = node;
+      return;
+    }
+
+    fastFree(node);
+  }
+
+ private:
+  Node* pool() { return reinterpret_cast<Node*>(m_pool.pool); }
+  bool inPool(Node* node) {
+    return reinterpret_cast<char*>(node) >= m_pool.pool &&
+           reinterpret_cast<char*>(node) < m_pool.pool + sizeof(m_pool.pool);
+  }
+
+  Node* m_freeList;
+  static const size_t m_poolSize = 256;
+  union {
+    char pool[sizeof(Node) * m_poolSize];
+    double forAlignment;
+  } m_pool;
 };
 
 template <typename ValueArg>
 struct ListHashSetNode {
-  // FIXME: arguably this should use a recycling custom allocator
+  typedef ListHashSetNodeAllocator<ValueArg> NodeAllocator;
+
   ListHashSetNode(ValueArg value) : m_value(value), m_prev(0), m_next(0) {}
+
+  void* operator new(size_t s, NodeAllocator* allocator) {
+    return allocator->allocate();
+  }
+  void operator delete(void* p) {}
+  void destroy(NodeAllocator* allocator) {
+    delete this;
+    allocator->deallocate(this);
+  }
+
   ValueArg m_value;
   ListHashSetNode* m_prev;
   ListHashSetNode* m_next;
@@ -258,6 +321,7 @@ template <typename ValueType, typename HashFunctions>
 struct ListHashSetTranslator {
  private:
   typedef ListHashSetNode<ValueType> Node;
+  typedef ListHashSetNodeAllocator<ValueType> NodeAllocator;
 
  public:
   static unsigned hash(const ValueType& key) {
@@ -268,14 +332,15 @@ struct ListHashSetTranslator {
   }
   static void translate(Node*& location,
                         const ValueType& key,
-                        const ValueType&,
+                        NodeAllocator* allocator,
                         unsigned) {
-    location = new Node(key);
+    location = new (allocator) Node(key);
   }
 };
 
 template <typename T, typename U>
-inline ListHashSet<T, U>::ListHashSet() : m_head(0), m_tail(0) {}
+inline ListHashSet<T, U>::ListHashSet()
+    : m_head(0), m_tail(0), m_allocator(new NodeAllocator) {}
 
 template <typename T, typename U>
 inline ListHashSet<T, U>::ListHashSet(const ListHashSet& other)
@@ -296,6 +361,7 @@ inline ListHashSet<T, U>& ListHashSet<T, U>::operator=(
 template <typename T, typename U>
 inline ListHashSet<T, U>::~ListHashSet() {
   deleteAllNodes();
+  delete m_allocator;
 }
 
 template <typename T, typename U>
@@ -370,7 +436,8 @@ pair<typename ListHashSet<T, U>::iterator, bool> ListHashSet<T, U>::add(
     const ValueType& value) {
   typedef ListHashSetTranslator<ValueType, HashFunctions> Translator;
   pair<typename ImplType::iterator, bool> result =
-      m_impl.template add<ValueType, ValueType, Translator>(value, value);
+      m_impl.template add<ValueType, NodeAllocator*, Translator>(value,
+                                                                 m_allocator);
   if (result.second)
     appendNode(*(result.first));
 
@@ -417,7 +484,7 @@ void ListHashSet<T, U>::unlinkAndDelete(Node* node) {
     node->m_next->m_prev = node->m_prev;
   }
 
-  delete node;
+  node->destroy(m_allocator);
 }
 
 template <typename T, typename U>
@@ -443,7 +510,7 @@ void ListHashSet<T, U>::deleteAllNodes() {
 
   for (Node *node = m_head, *next = m_head->m_next; node;
        node = next, next = node ? node->m_next : 0)
-    delete node;
+    node->destroy(m_allocator);
 }
 
 template <typename T, typename U>
