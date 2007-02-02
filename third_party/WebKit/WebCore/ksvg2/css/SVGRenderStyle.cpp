@@ -87,7 +87,6 @@ bool SVGRenderStyle::operator==(const SVGRenderStyle& o) const {
 
 bool SVGRenderStyle::inheritedNotEqual(const SVGRenderStyle* other) const {
   return (fill != other->fill || stroke != other->stroke ||
-          stops != other->stops || misc != other->misc ||
           markers != other->markers ||
           svg_inherited_flags != other->svg_inherited_flags);
 }
@@ -98,7 +97,6 @@ void SVGRenderStyle::inheritFrom(const SVGRenderStyle* svgInheritParent) {
 
   fill = svgInheritParent->fill;
   stroke = svgInheritParent->stroke;
-  stops = svgInheritParent->stops;
   markers = svgInheritParent->markers;
 
   svg_inherited_flags = svgInheritParent->svg_inherited_flags;

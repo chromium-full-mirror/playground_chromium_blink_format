@@ -35,9 +35,11 @@ class SVGStopElement : public SVGStyledElement {
 
   virtual bool isGradientStop() const { return true; }
 
-  // 'SVGStoplement' functions
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void notifyAttributeChange() const;
+
+  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGStopElement, double, double, Offset, offset)

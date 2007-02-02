@@ -80,7 +80,6 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
   ~SVGRenderStyle();
 
   bool inheritedNotEqual(const SVGRenderStyle*) const;
-
   void inheritFrom(const SVGRenderStyle*);
 
   bool operator==(const SVGRenderStyle&) const;
@@ -316,13 +315,13 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
   // inherited attributes
   DataRef<StyleFillData> fill;
   DataRef<StyleStrokeData> stroke;
-  DataRef<StyleStopData> stops;
-  DataRef<StyleMiscData> misc;
   DataRef<StyleMarkerData> markers;
 
   // non-inherited attributes
+  DataRef<StyleStopData> stops;
   DataRef<StyleClipData> clip;
   DataRef<StyleMaskData> mask;
+  DataRef<StyleMiscData> misc;
 
   // static default style
   static SVGRenderStyle* s_defaultStyle;
