@@ -39,6 +39,7 @@
 #include "PlugInInfoStore.h"
 #include "RegularExpression.h"
 #include "TextDocument.h"
+#include "XMLNames.h"
 
 #ifdef SVG_SUPPORT
 #include "SVGNames.h"
@@ -252,7 +253,7 @@ PassRefPtr<Document> DOMImplementation::createDocument(
 #ifdef SVG_SUPPORT
          namespaceURI != SVGNames::svgNamespaceURI &&
 #endif
-         namespaceURI != "http://www.w3.org/XML/1998/namespace")) {
+         namespaceURI != XMLNames::xmlNamespaceURI)) {
 
       ec = NAMESPACE_ERR;
       return 0;

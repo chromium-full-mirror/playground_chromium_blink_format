@@ -99,10 +99,11 @@
 #ifdef SVG_SUPPORT
 #include "SVGNames.h"
 #include "XLinkNames.h"
-#include "XMLNames.h"
 #include "SVGDocument.h"
 #include "SVGDocumentExtensions.h"
 #endif
+
+#include "XMLNames.h"
 
 using namespace std;
 
@@ -177,8 +178,9 @@ Frame::Frame(Page* page,
 #ifdef SVG_SUPPORT
   SVGNames::init();
   XLinkNames::init();
-  XMLNames::init();
 #endif
+
+  XMLNames::init();
 
   if (!ownerElement)
     page->setMainFrame(this);
