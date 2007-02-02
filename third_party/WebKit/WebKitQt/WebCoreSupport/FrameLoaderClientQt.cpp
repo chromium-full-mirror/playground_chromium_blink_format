@@ -32,6 +32,7 @@
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "DocumentLoader.h"
+#include "MimeTypeRegistry.h"
 #include "ResourceResponse.h"
 #include "Page.h"
 #include "ProgressTracker.h"
@@ -40,6 +41,8 @@
 #include "qwebpage.h"
 #include "qwebframe.h"
 #include "qwebframe_p.h"
+
+#include <qfileinfo.h>
 
 #include "qdebug.h"
 
@@ -728,6 +731,12 @@ ObjectContentType FrameLoaderClientQt::objectContentType(
     const KURL& url,
     const String& mimeType) {
   notImplemented();
+  // This is not really correct. it works because getMIMETypeForExtension
+  //  currently returns only the mimetypes that frames can handle
+  QFileInfo fi(url.path());
+  String rtype = MimeTypeRegistry::getMIMETypeForExtension(fi.suffix());
+  if (!rtype.isEmpty())
+    return ObjectContentFrame;
   return ObjectContentType();
 }
 
