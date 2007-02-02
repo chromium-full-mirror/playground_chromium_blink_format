@@ -78,6 +78,11 @@ class Node : public TreeShared<Node> {
     XPATH_NAMESPACE_NODE = 13
   };
 
+  static bool isSupported(const String& feature, const String& version);
+
+  static void startIgnoringLeaks();
+  static void stopIgnoringLeaks();
+
   Node(Document*);
   virtual ~Node();
 
@@ -119,7 +124,6 @@ class Node : public TreeShared<Node> {
   virtual const AtomicString& prefix() const;
   virtual void setPrefix(const AtomicString&, ExceptionCode&);
   void normalize();
-  static bool isSupported(const String& feature, const String& version);
 
   bool isSameNode(Node* other) const { return this == other; }
   bool isEqualNode(Node*) const;
