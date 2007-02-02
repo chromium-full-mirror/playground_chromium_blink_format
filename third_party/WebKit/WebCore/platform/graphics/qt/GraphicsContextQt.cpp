@@ -674,7 +674,6 @@ void GraphicsContext::setMiterLimit(float limit) {
 void GraphicsContext::setAlpha(float opacity) {
   if (paintingDisabled())
     return;
-
 #if QT_VERSION >= 0x040200
   m_data->p().setOpacity(opacity);
 #endif
@@ -858,13 +857,17 @@ void GraphicsContext::setPlatformFont(const Font& aFont) {
 void GraphicsContext::setPlatformStrokeColor(const Color& color) {
   if (paintingDisabled())
     return;
+  QPen newPen(m_data->p().pen());
+  newPen.setColor(color);
   m_data->p().setPen(color);
 }
 
 void GraphicsContext::setPlatformStrokeStyle(const StrokeStyle& strokeStyle) {
   if (paintingDisabled())
     return;
-  m_data->p().setPen(toQPenStyle(strokeStyle));
+  QPen newPen(m_data->p().pen());
+  newPen.setStyle(toQPenStyle(strokeStyle));
+  m_data->p().setPen(newPen);
 }
 
 void GraphicsContext::setPlatformStrokeThickness(float thickness) {
