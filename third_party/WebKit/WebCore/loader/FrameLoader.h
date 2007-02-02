@@ -120,6 +120,7 @@ class PolicyCheck {
 
   void call(bool shouldContinue);
   void call(PolicyAction);
+  void cancel();
 
  private:
   ResourceRequest m_request;
