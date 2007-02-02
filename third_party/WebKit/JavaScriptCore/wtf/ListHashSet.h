@@ -22,8 +22,8 @@
 #ifndef WTF_ListHashSet_h
 #define WTF_ListHashSet_h
 
-#include "HashTable.h"
 #include "HashSet.h"
+#include "OwnPtr.h"
 
 namespace WTF {
 
@@ -90,6 +90,8 @@ class ListHashSet {
   ListHashSet& operator=(const ListHashSet&);
   ~ListHashSet();
 
+  void swap(ListHashSet&);
+
   int size() const;
   int capacity() const;
   bool isEmpty() const;
@@ -123,7 +125,7 @@ class ListHashSet {
   ImplType m_impl;
   Node* m_head;
   Node* m_tail;
-  NodeAllocator* m_allocator;
+  OwnPtr<NodeAllocator> m_allocator;
 };
 
 template <typename ValueArg>
@@ -132,7 +134,7 @@ struct ListHashSetNodeAllocator {
   typedef ListHashSetNodeAllocator<ValueArg> NodeAllocator;
 
   ListHashSetNodeAllocator() : m_freeList(pool()) {
-    memset(m_pool.pool, 0, sizeof(m_pool));
+    memset(m_pool.pool, 0, sizeof(m_pool.pool));
   }
 
   Node* allocate() {
@@ -161,9 +163,9 @@ struct ListHashSetNodeAllocator {
 
  private:
   Node* pool() { return reinterpret_cast<Node*>(m_pool.pool); }
+
   bool inPool(Node* node) {
-    return reinterpret_cast<char*>(node) >= m_pool.pool &&
-           reinterpret_cast<char*>(node) < m_pool.pool + sizeof(m_pool.pool);
+    return node >= pool() && node < pool() + m_poolSize;
   }
 
   Node* m_freeList;
@@ -279,9 +281,6 @@ class ListHashSetConstIterator {
  public:
   ListHashSetConstIterator() {}
 
-  // default copy, assignment and destructor are OK if CHECK_HASHTABLE_ITERATORS
-  // is 0
-
   PointerType get() const { return &m_position->m_value; }
   ReferenceType operator*() const { return *get(); }
   PointerType operator->() const { return get(); }
@@ -344,7 +343,7 @@ inline ListHashSet<T, U>::ListHashSet()
 
 template <typename T, typename U>
 inline ListHashSet<T, U>::ListHashSet(const ListHashSet& other)
-    : m_head(0), m_tail(0) {
+    : m_head(0), m_tail(0), m_allocator(new NodeAllocator) {
   const_iterator end = other.end();
   for (const_iterator it = other.begin(); it != end; ++it)
     add(*it);
@@ -354,14 +353,22 @@ template <typename T, typename U>
 inline ListHashSet<T, U>& ListHashSet<T, U>::operator=(
     const ListHashSet& other) {
   ListHashSet tmp(other);
-  m_impl.swap(tmp.m_impl);
+  swap(tmp);
+  return *this;
+}
+
+template <typename T, typename U>
+inline void ListHashSet<T, U>::swap(ListHashSet& other) {
+  m_impl.swap(other.m_impl);
+  std::swap(m_head, other.m_head);
+  std::swap(m_tail, other.m_tail);
+  m_allocator.swap(other.m_allocator);
   return *this;
 }
 
 template <typename T, typename U>
 inline ListHashSet<T, U>::~ListHashSet() {
   deleteAllNodes();
-  delete m_allocator;
 }
 
 template <typename T, typename U>
@@ -409,7 +416,6 @@ inline typename ListHashSet<T, U>::iterator ListHashSet<T, U>::find(
       m_impl.template find<ValueType, Translator>(value);
   if (it == m_impl.end())
     return end();
-
   return makeIterator(*it);
 }
 
@@ -421,8 +427,7 @@ inline typename ListHashSet<T, U>::const_iterator ListHashSet<T, U>::find(
       m_impl.template find<ValueType, Translator>(value);
   if (it == m_impl.end())
     return end();
-  return makeConstIterator(
-      *(m_impl.template find<ValueType, Translator>(value)));
+  return makeConstIterator(*it);
 }
 
 template <typename T, typename U>
@@ -436,19 +441,17 @@ pair<typename ListHashSet<T, U>::iterator, bool> ListHashSet<T, U>::add(
     const ValueType& value) {
   typedef ListHashSetTranslator<ValueType, HashFunctions> Translator;
   pair<typename ImplType::iterator, bool> result =
-      m_impl.template add<ValueType, NodeAllocator*, Translator>(value,
-                                                                 m_allocator);
+      m_impl.template add<ValueType, NodeAllocator*, Translator>(
+          value, m_allocator.get());
   if (result.second)
-    appendNode(*(result.first));
-
-  return std::make_pair(makeIterator(*(result.first)), result.second);
+    appendNode(*result.first);
+  return std::make_pair(makeIterator(*result.first), result.second);
 }
 
 template <typename T, typename U>
 inline void ListHashSet<T, U>::remove(iterator it) {
   if (it == end())
     return;
-
   m_impl.remove(it.node());
   unlinkAndDelete(it.node());
 }
@@ -484,7 +487,7 @@ void ListHashSet<T, U>::unlinkAndDelete(Node* node) {
     node->m_next->m_prev = node->m_prev;
   }
 
-  node->destroy(m_allocator);
+  node->destroy(m_allocator.get());
 }
 
 template <typename T, typename U>
@@ -510,7 +513,7 @@ void ListHashSet<T, U>::deleteAllNodes() {
 
   for (Node *node = m_head, *next = m_head->m_next; node;
        node = next, next = node ? node->m_next : 0)
-    node->destroy(m_allocator);
+    node->destroy(m_allocator.get());
 }
 
 template <typename T, typename U>
