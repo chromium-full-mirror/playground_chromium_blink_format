@@ -132,7 +132,7 @@ struct ListHashSetNodeAllocator {
   typedef ListHashSetNodeAllocator<ValueArg> NodeAllocator;
 
   ListHashSetNodeAllocator() : m_freeList(pool()) {
-    memset(m_pool, 0, sizeof(m_pool));
+    memset(m_pool.pool, 0, sizeof(m_pool));
   }
 
   Node* allocate() {
