@@ -489,7 +489,9 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
 
   const char* ptr = m_buffer.data();
   const char* pEnd = ptr + m_buffer.size();
-  while (ptr != pEnd) {
+  while (ptr + 7 < pEnd) {  // +7 guarantees that "<!--" and "<?xml" fit in the
+                            // buffer - and certainly we aren't going to lose
+                            // any "charset" that way.
     if (*ptr == '<') {
       bool end = false;
       ptr++;
@@ -504,12 +506,15 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       // Handle XML declaration, which can have encoding in it.
       // This encoding is honored even for HTML documents.
       if (ptr[0] == '?' && ptr[1] == 'x' && ptr[2] == 'm' && ptr[3] == 'l') {
-        const char* end = ptr;
-        while (*end != '>' && *end != '\0')
-          end++;
-        if (*end == '\0')
-          break;
-        DeprecatedCString str(ptr, end - ptr);
+        const char* xmlDeclarationEnd = ptr;
+        while (xmlDeclarationEnd != pEnd && *xmlDeclarationEnd != '>')
+          ++xmlDeclarationEnd;
+        if (xmlDeclarationEnd == pEnd)
+          return false;
+        DeprecatedCString str(
+            ptr, xmlDeclarationEnd - ptr);  // No need for +1, because we have
+                                            // an extra "?" to lose at the end
+                                            // of XML declaration.
         int len = 0;
         int pos = findXMLEncoding(str, len);
         if (pos != -1)
@@ -539,6 +544,8 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
               (*ptr >= 'A') && (*ptr <= 'Z') ||
               (*ptr >= '0') && (*ptr <= '9')) &&
              len < 19) {
+        if (ptr == pEnd)
+          return false;
         tmp[len] = tolower(*ptr);
         ptr++;
         len++;
@@ -561,20 +568,19 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
       // Find where the opening tag ends.
       const char* tagContentStart = ptr;
       if (!end) {
-        while (*ptr != '>') {
-          if (*ptr == '\0')
-            return false;
+        while (ptr != pEnd && *ptr != '>') {
           if (*ptr == '\'' || *ptr == '"') {
             char quoteMark = *ptr;
             ++ptr;
-            while (*ptr != quoteMark) {
-              if (*ptr == '\0')
-                return false;
+            while (ptr != pEnd && *ptr != quoteMark)
               ++ptr;
-            }
+            if (ptr == pEnd)
+              return false;
           }
           ++ptr;
         }
+        if (ptr == pEnd)
+          return false;
         ++ptr;
       }
 
