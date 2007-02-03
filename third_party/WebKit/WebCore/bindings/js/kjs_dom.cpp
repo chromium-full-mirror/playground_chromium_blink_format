@@ -65,6 +65,7 @@
 
 #ifdef SVG_SUPPORT
 #include "JSSVGDocument.h"
+#include "JSSVGElementInstance.h"
 #include "JSSVGElementWrapperFactory.h"
 #include "SVGDocument.h"
 #include "SVGElement.h"
@@ -1083,7 +1084,14 @@ JSValue* toJS(ExecState* exec, EventTarget* target) {
     return interp->getDOMObject(xhr);
   }
 
+#ifdef SVG_SUPPORT
+  SVGElementInstance* instance = target->toSVGElementInstance();
+  if (instance)
+    return toJS(exec, instance);
+#endif
+
   // There are two kinds of EventTargets: EventTargetNode and XMLHttpRequest.
+  // If SVG support is enabled, there is also SVGElementInstance.
   ASSERT(0);
   return jsNull();
 }

@@ -88,6 +88,10 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                  height)
 
  private:
+  friend class SVGElement;
+  SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
+
+ private:
   // Instance tree handling
   void buildInstanceTree(SVGElement* target,
                          SVGElementInstance* targetInstance,
@@ -106,6 +110,9 @@ class SVGUseElement : public SVGStyledTransformableElement,
       Node* target,
       SVGElementInstance* targetInstance);
 
+  SVGElementInstance* instanceForShadowTreeElement(
+      Node* element,
+      SVGElementInstance* instance) const;
   void transferUseAttributesToReplacedElement(SVGElement* from,
                                               SVGElement* to) const;
 

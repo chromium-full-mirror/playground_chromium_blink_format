@@ -281,6 +281,10 @@ class SVGElement : public StyledElement {
                                        ExternalResourcesRequired,
                                        externalResourcesRequired)
 
+  virtual bool dispatchEvent(PassRefPtr<Event> e,
+                             ExceptionCode& ec,
+                             bool tempEvent = false);
+
  private:
   void addSVGEventListener(const AtomicString& eventType, const Attribute*);
   virtual bool haveLoadedRequiredResources();

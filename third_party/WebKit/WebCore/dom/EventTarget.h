@@ -37,6 +37,7 @@ class AtomicString;
 class Event;
 class EventListener;
 class EventTargetNode;
+class SVGElementInstance;
 class XMLHttpRequest;
 
 typedef int ExceptionCode;
@@ -45,6 +46,10 @@ class EventTarget {
  public:
   virtual EventTargetNode* toNode();
   virtual XMLHttpRequest* toXMLHttpRequest();
+
+#ifdef SVG_SUPPORT
+  virtual SVGElementInstance* toSVGElementInstance();
+#endif
 
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,

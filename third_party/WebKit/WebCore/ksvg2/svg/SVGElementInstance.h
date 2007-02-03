@@ -69,6 +69,8 @@ class SVGElementInstance : public EventTarget {
   void setParent(SVGElementInstance* parent) { m_parent = parent; }
   SVGElementInstance* parent() const { return m_parent; }
 
+  virtual SVGElementInstance* toSVGElementInstance();
+
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
                                 bool useCapture);

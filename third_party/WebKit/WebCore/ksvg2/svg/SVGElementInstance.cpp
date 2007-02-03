@@ -169,6 +169,10 @@ void SVGElementInstance::updateInstance(SVGElement* element) {
   m_shadowTreeElement = svgClone;
 }
 
+SVGElementInstance* SVGElementInstance::toSVGElementInstance() {
+  return this;
+}
+
 void SVGElementInstance::addEventListener(
     const AtomicString& eventType,
     PassRefPtr<EventListener> eventListener,
