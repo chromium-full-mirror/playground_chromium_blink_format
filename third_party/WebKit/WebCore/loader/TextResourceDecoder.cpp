@@ -575,6 +575,7 @@ bool TextResourceDecoder::checkForHeadCharset(const char* data,
           }
           ++ptr;
         }
+        ++ptr;
       }
 
       if (!end && tag == metaTag) {
