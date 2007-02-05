@@ -1813,6 +1813,8 @@ GapRects RenderBlock::selectionGapRects() {
 
   int tx, ty;
   absolutePositionForContent(tx, ty);
+  if (hasOverflowClip())
+    layer()->subtractScrollOffset(tx, ty);
 
   int lastTop = -borderTopExtra();
   int lastLeft = leftSelectionOffset(this, lastTop);
