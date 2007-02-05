@@ -31,10 +31,6 @@ namespace WebCore {
 SVGTitleElement::SVGTitleElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc) {}
 
-String SVGTitleElement::title() const {
-  return textContent();
-}
-
 void SVGTitleElement::insertedIntoDocument() {
   SVGStyledElement::insertedIntoDocument();
   if (firstChild())

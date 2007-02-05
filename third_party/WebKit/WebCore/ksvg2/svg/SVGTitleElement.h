@@ -32,8 +32,6 @@ class SVGTitleElement : public SVGStyledElement, public SVGLangSpace {
  public:
   SVGTitleElement(const QualifiedName&, Document*);
 
-  String title() const;
-
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged();

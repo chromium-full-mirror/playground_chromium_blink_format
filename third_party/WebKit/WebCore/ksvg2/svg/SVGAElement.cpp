@@ -35,6 +35,7 @@
 #include "RenderSVGContainer.h"
 #include "ResourceRequest.h"
 #include "SVGNames.h"
+#include "XLinkNames.h"
 #include "csshelper.h"
 
 namespace WebCore {
@@ -48,6 +49,10 @@ SVGAElement::SVGAElement(const QualifiedName& tagName, Document* doc)
 
 SVGAElement::~SVGAElement() {}
 
+String SVGAElement::title() const {
+  return getAttribute(XLinkNames::titleAttr);
+}
+
 ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
                               String,
                               String,
@@ -58,12 +63,14 @@ ANIMATED_PROPERTY_DEFINITIONS(SVGAElement,
                               m_target)
 
 void SVGAElement::parseMappedAttribute(MappedAttribute* attr) {
-  const AtomicString& value(attr->value());
-  if (attr->name() == SVGNames::targetAttr) {
-    setTargetBaseValue(value);
-  } else {
+  if (attr->name() == SVGNames::targetAttr)
+    setTargetBaseValue(attr->value());
+  else {
     if (SVGURIReference::parseMappedAttribute(attr)) {
-      m_isLink = attr->value() != 0;
+      bool wasLink = m_isLink;
+      m_isLink = !attr->isNull();
+      if (wasLink != m_isLink)
+        setChanged();
       return;
     }
     if (SVGTests::parseMappedAttribute(attr))

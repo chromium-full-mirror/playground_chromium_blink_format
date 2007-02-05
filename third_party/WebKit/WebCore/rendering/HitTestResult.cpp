@@ -38,6 +38,11 @@
 #include "RenderImage.h"
 #include "SelectionController.h"
 
+#ifdef SVG_SUPPORT
+#include "SVGNames.h"
+#include "XLinkNames.h"
+#endif
+
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -134,9 +139,8 @@ String HitTestResult::title() const {
   // using it.
   for (Node* titleNode = m_innerNode.get(); titleNode;
        titleNode = titleNode->parentNode()) {
-    if (titleNode->isHTMLElement()) {
-      HTMLElement* titleHTMLNode = static_cast<HTMLElement*>(titleNode);
-      String title = titleHTMLNode->title();
+    if (titleNode->isElementNode()) {
+      String title = static_cast<Element*>(titleNode)->title();
       if (!title.isEmpty())
         return title;
     }
@@ -202,52 +206,66 @@ KURL HitTestResult::absoluteImageURL() const {
         m_innerNonSharedNode->renderer()->isImage()))
     return KURL();
 
-  String name;
+  AtomicString urlString;
   if (m_innerNonSharedNode->hasTagName(imgTag) ||
       m_innerNonSharedNode->hasTagName(inputTag))
-    name = "src";
+    urlString = static_cast<Element*>(m_innerNonSharedNode.get())
+                    ->getAttribute(srcAttr);
+#ifdef SVG_SUPPORT
+  else if (m_innerNonSharedNode->hasTagName(SVGNames::imageTag))
+    urlString = static_cast<Element*>(m_innerNonSharedNode.get())
+                    ->getAttribute(XLinkNames::hrefAttr);
+#endif
   else if (m_innerNonSharedNode->hasTagName(objectTag))
-    name = "data";
+    urlString = static_cast<Element*>(m_innerNonSharedNode.get())
+                    ->getAttribute(dataAttr);
   else
     return KURL();
 
   return KURL(m_innerNonSharedNode->document()->completeURL(
-      parseURL(
-          static_cast<Element*>(m_innerNonSharedNode.get())->getAttribute(name))
-          .deprecatedString()));
+      parseURL(urlString).deprecatedString()));
 }
 
 KURL HitTestResult::absoluteLinkURL() const {
   if (!(m_innerURLElement && m_innerURLElement->document()))
     return KURL();
 
-  if (!(m_innerURLElement->hasTagName(aTag) ||
-        m_innerURLElement->hasTagName(areaTag) ||
-        m_innerURLElement->hasTagName(linkTag)))
+  AtomicString urlString;
+  if (m_innerURLElement->hasTagName(aTag) ||
+      m_innerURLElement->hasTagName(areaTag) ||
+      m_innerURLElement->hasTagName(linkTag))
+    urlString = m_innerURLElement->getAttribute(hrefAttr);
+#ifdef SVG_SUPPORT
+  else if (m_innerURLElement->hasTagName(SVGNames::aTag))
+    urlString = m_innerURLElement->getAttribute(XLinkNames::hrefAttr);
+#endif
+  else
     return KURL();
 
   return KURL(m_innerURLElement->document()->completeURL(
-      parseURL(
-          static_cast<Element*>(m_innerURLElement.get())->getAttribute("href"))
-          .deprecatedString()));
+      parseURL(urlString).deprecatedString()));
 }
 
 bool HitTestResult::isLiveLink() const {
   if (!(m_innerURLElement && m_innerURLElement->document()))
     return false;
 
-  if (!m_innerURLElement->hasTagName(aTag))
-    return false;
+  if (m_innerURLElement->hasTagName(aTag))
+    return static_cast<HTMLAnchorElement*>(m_innerURLElement.get())
+        ->isLiveLink();
+#ifdef SVG_SUPPORT
+  if (m_innerURLElement->hasTagName(SVGNames::aTag))
+    return m_innerURLElement->isLink();
+#endif
 
-  return static_cast<HTMLAnchorElement*>(m_innerURLElement.get())->isLiveLink();
+  return false;
 }
 
 String HitTestResult::titleDisplayString() const {
-  if (!(m_innerURLElement && m_innerURLElement->isHTMLElement()))
+  if (!m_innerURLElement)
     return String();
 
-  HTMLElement* element = static_cast<HTMLElement*>(m_innerURLElement.get());
-  return displayString(element->title(), element);
+  return displayString(m_innerURLElement->title(), m_innerURLElement.get());
 }
 
 String HitTestResult::textContent() const {

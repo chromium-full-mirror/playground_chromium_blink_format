@@ -41,8 +41,9 @@ class SVGAElement : public SVGStyledTransformableElement,
   SVGAElement(const QualifiedName&, Document*);
   virtual ~SVGAElement();
 
-  // 'SVGAElement' functions
   virtual bool isValid() const { return SVGTests::isValid(); }
+
+  virtual String title() const;
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
 

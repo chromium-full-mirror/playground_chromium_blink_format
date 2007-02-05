@@ -203,7 +203,7 @@ class Element : public ContainerNode {
   String innerText() const;
   String outerText() const;
 
-  String title() const;
+  virtual String title() const;
 
  protected:
   virtual void createAttributeMap() const;
