@@ -29,6 +29,7 @@
 #include "config.h"
 
 #include "CString.h"
+#include "CookieJar.h"
 #include "FrameQt.h"
 #include "ResourceHandle.h"
 #include "ResourceHandleClient.h"
@@ -92,6 +93,9 @@ RequestQt::RequestQt(ResourceHandle* res)
                    QLatin1String("Mozilla/5.0 (PC; U; Intel; Linux; en) "
                                  "AppleWebKit/420+ (KHTML, like Gecko)"));
   request.setValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
+  QString cookies = WebCore::cookies(url);
+  if (!cookies.isEmpty())
+    request.setValue(QLatin1String("Cookie"), cookies);
 
   const HTTPHeaderMap& loaderHeaders = resource->requestHeaders();
   HTTPHeaderMap::const_iterator end = loaderHeaders.end();
