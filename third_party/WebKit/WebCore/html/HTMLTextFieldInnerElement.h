@@ -61,6 +61,9 @@ class HTMLSearchFieldCancelButtonElement : public HTMLTextFieldInnerElement {
  public:
   HTMLSearchFieldCancelButtonElement(Document*);
   virtual void defaultEventHandler(Event*);
+
+ private:
+  bool m_capturing;
 };
 
 }  // namespace
