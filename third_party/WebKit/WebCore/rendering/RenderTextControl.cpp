@@ -114,6 +114,7 @@ RenderStyle* RenderTextControl::createInnerBlockStyle(RenderStyle* startStyle) {
 
   innerBlockStyle->inheritFrom(startStyle);
   innerBlockStyle->setDisplay(BLOCK);
+  innerBlockStyle->setDirection(LTR);
   // We don't want the shadow dom to be editable, so we set this block to
   // read-only in case the input itself is editable.
   innerBlockStyle->setUserModify(READ_ONLY);
@@ -127,6 +128,9 @@ RenderStyle* RenderTextControl::createInnerTextStyle(RenderStyle* startStyle) {
       static_cast<HTMLGenericFormElement*>(node());
 
   textBlockStyle->inheritFrom(startStyle);
+  // The inner block, if present, always has its direction set to LTR,
+  // so we need to inherit the direction from the element.
+  textBlockStyle->setDirection(style()->direction());
   textBlockStyle->setUserModify(element->isReadOnlyControl() ||
                                         element->disabled()
                                     ? READ_ONLY
@@ -638,38 +642,29 @@ bool RenderTextControl::nodeAtPoint(const HitTestRequest& request,
       (result.innerNode() == element() || result.innerNode() == m_innerBlock)) {
     IntPoint localPoint = IntPoint(x - tx - m_x, y - ty - m_y);
     if (m_innerBlock) {
-      Node* leftNode;
-      Node* rightNode;
-      if (style()->direction() == LTR) {
-        leftNode = m_resultsButton.get();
-        rightNode = m_cancelButton.get();
-      } else {
-        leftNode = m_cancelButton.get();
-        rightNode = m_resultsButton.get();
-      }
-
       int textLeft = tx + m_x + m_innerBlock->renderer()->xPos() +
                      m_innerText->renderer()->xPos();
       int textRight = textLeft + m_innerText->renderer()->width();
-      if (leftNode && x < textLeft) {
-        result.setInnerNode(leftNode);
-        result.setLocalPoint(IntPoint(
-            localPoint.x() - m_innerText->renderer()->xPos() -
-                m_innerBlock->renderer()->xPos() - leftNode->renderer()->xPos(),
-            localPoint.y() - m_innerText->renderer()->yPos() -
-                m_innerBlock->renderer()->yPos() -
-                leftNode->renderer()->yPos()));
-        return true;
-      }
-      if (rightNode && x > textRight) {
-        result.setInnerNode(rightNode);
+      if (m_resultsButton && x < textLeft) {
+        result.setInnerNode(m_resultsButton.get());
         result.setLocalPoint(
             IntPoint(localPoint.x() - m_innerText->renderer()->xPos() -
                          m_innerBlock->renderer()->xPos() -
-                         rightNode->renderer()->xPos(),
+                         m_resultsButton->renderer()->xPos(),
                      localPoint.y() - m_innerText->renderer()->yPos() -
                          m_innerBlock->renderer()->yPos() -
-                         rightNode->renderer()->yPos()));
+                         m_resultsButton->renderer()->yPos()));
+        return true;
+      }
+      if (m_cancelButton && x > textRight) {
+        result.setInnerNode(m_cancelButton.get());
+        result.setLocalPoint(
+            IntPoint(localPoint.x() - m_innerText->renderer()->xPos() -
+                         m_innerBlock->renderer()->xPos() -
+                         m_cancelButton->renderer()->xPos(),
+                     localPoint.y() - m_innerText->renderer()->yPos() -
+                         m_innerBlock->renderer()->yPos() -
+                         m_cancelButton->renderer()->yPos()));
         return true;
       }
     }
@@ -812,23 +807,14 @@ void RenderTextControl::forwardEvent(Event* evt) {
   } else if (evt->type() == focusEvent)
     updatePlaceholder();
   else {
-    EventTargetNode* leftNode;
-    EventTargetNode* rightNode;
-    if (style()->direction() == LTR) {
-      leftNode = m_resultsButton.get();
-      rightNode = m_cancelButton.get();
-    } else {
-      leftNode = m_cancelButton.get();
-      rightNode = m_resultsButton.get();
-    }
-    if (evt->isMouseEvent() && leftNode &&
+    if (evt->isMouseEvent() && m_resultsButton &&
         static_cast<MouseEvent*>(evt)->x() <
             m_innerText->renderer()->absoluteBoundingBoxRect().x())
-      leftNode->defaultEventHandler(evt);
-    else if (evt->isMouseEvent() && rightNode &&
+      m_resultsButton->defaultEventHandler(evt);
+    else if (evt->isMouseEvent() && m_cancelButton &&
              static_cast<MouseEvent*>(evt)->x() >
                  m_innerText->renderer()->absoluteBoundingBoxRect().right())
-      rightNode->defaultEventHandler(evt);
+      m_cancelButton->defaultEventHandler(evt);
     else
       m_innerText->defaultEventHandler(evt);
   }
@@ -1001,15 +987,11 @@ Document* RenderTextControl::clientDocument() const {
 }
 
 int RenderTextControl::clientPaddingLeft() const {
-  if (style()->direction() == LTR)
-    return paddingLeft() + m_resultsButton->renderer()->width();
-  return paddingLeft() + m_cancelButton->renderer()->width();
+  return paddingLeft() + m_resultsButton->renderer()->width();
 }
 
 int RenderTextControl::clientPaddingRight() const {
-  if (style()->direction() == LTR)
-    return paddingRight() + m_cancelButton->renderer()->width();
-  return paddingRight() + m_resultsButton->renderer()->width();
+  return paddingRight() + m_cancelButton->renderer()->width();
 }
 
 unsigned RenderTextControl::listSize() const {
