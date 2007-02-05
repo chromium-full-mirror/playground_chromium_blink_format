@@ -412,7 +412,7 @@ bool FunCount::isConstant() const {
 
 Value FunString::doEvaluate() const {
   if (argCount() == 0)
-    return Value(Expression::evaluationContext().node).toString();
+    return Value(Expression::evaluationContext().node.get()).toString();
   return arg(0)->evaluate().toString();
 }
 
@@ -497,13 +497,15 @@ Value FunSubstring::doEvaluate() const {
 
 Value FunStringLength::doEvaluate() const {
   if (argCount() == 0)
-    return Value(Expression::evaluationContext().node).toString().length();
+    return Value(Expression::evaluationContext().node.get())
+        .toString()
+        .length();
   return arg(0)->evaluate().toString().length();
 }
 
 Value FunNormalizeSpace::doEvaluate() const {
   if (argCount() == 0) {
-    String s = Value(Expression::evaluationContext().node).toString();
+    String s = Value(Expression::evaluationContext().node.get()).toString();
     return Value(s.simplifyWhiteSpace());
   }
 
