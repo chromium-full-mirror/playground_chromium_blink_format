@@ -38,8 +38,7 @@ SVGStyleElement::SVGStyleElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc) {}
 
 const AtomicString& SVGStyleElement::xmlspace() const {
-  static const AtomicString defaultValue("xml:space");
-  return getAttribute(defaultValue);
+  return getAttribute(XMLNames::spaceAttr);
 }
 
 void SVGStyleElement::setXmlspace(const AtomicString&, ExceptionCode& ec) {
@@ -64,6 +63,10 @@ const AtomicString& SVGStyleElement::media() const {
 
 void SVGStyleElement::setMedia(const AtomicString&, ExceptionCode& ec) {
   ec = NO_MODIFICATION_ALLOWED_ERR;
+}
+
+String SVGStyleElement::title() const {
+  return getAttribute(titleAttr);
 }
 
 void SVGStyleElement::setTitle(const AtomicString&, ExceptionCode& ec) {
