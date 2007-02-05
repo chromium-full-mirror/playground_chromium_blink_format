@@ -88,18 +88,19 @@ static Frame* subframeForTargetNode(Node* node);
 EventHandler::EventHandler(Frame* frame)
     : m_frame(frame),
       m_mousePressed(false),
+      m_mouseDownMayStartSelect(false),
+      m_mouseDownMayStartDrag(false),
+      m_mouseDownWasSingleClickInSelection(false),
       m_beganSelectingText(false),
       m_hoverTimer(this, &EventHandler::hoverTimerFired),
       m_autoscrollTimer(this, &EventHandler::autoscrollTimerFired),
       m_autoscrollRenderer(0),
       m_mouseDownMayStartAutoscroll(false),
-      m_mouseDownMayStartDrag(false),
+      m_mouseDownWasInSubframe(false),
       m_resizeLayer(0),
       m_capturingMouseEventsNode(0),
       m_clickCount(0),
-      m_mouseDownTimestamp(0),
-      m_mouseDownWasInSubframe(false),
-      m_mouseDownMayStartSelect(false)
+      m_mouseDownTimestamp(0)
 #if PLATFORM(MAC)
       ,
       m_mouseDownView(nil),
@@ -219,8 +220,10 @@ bool EventHandler::handleMousePressEventSingleClick(
   // Don't restart the selection when the mouse is pressed on an
   // existing selection so we can allow for text dragging.
   IntPoint vPoint = m_frame->view()->windowToContents(event.event().pos());
-  if (!extendSelection && m_frame->selectionController()->contains(vPoint))
+  if (!extendSelection && m_frame->selectionController()->contains(vPoint)) {
+    m_mouseDownWasSingleClickInSelection = true;
     return false;
+  }
 
   VisiblePosition visiblePos(
       innerNode->renderer()->positionForPoint(event.localPoint()));
@@ -269,6 +272,8 @@ bool EventHandler::handleMousePressEvent(
 
   // Careful that the drag starting logic stays in sync with eventMayStartDrag()
   m_mouseDownMayStartDrag = singleClick;
+
+  m_mouseDownWasSingleClickInSelection = false;
 
   if (passWidgetMouseDownEventToWidget(event))
     return true;
@@ -443,7 +448,7 @@ bool EventHandler::handleMouseReleaseEvent(
   // Clear the selection if the mouse didn't move after the last mouse press.
   // We do this so when clicking on the selection, the selection goes away.
   // However, if we are editing, place the caret.
-  if (m_mouseDownMayStartSelect && !m_beganSelectingText &&
+  if (m_mouseDownWasSingleClickInSelection && !m_beganSelectingText &&
       m_dragStartPos == event.event().pos() &&
       m_frame->selectionController()->isRange()) {
     Selection newSelection;
