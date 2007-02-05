@@ -161,7 +161,23 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
   if (paintInfo.phase == PaintPhaseForeground) {
     const String& displayedFilename =
         m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
-    TextRun textRun(displayedFilename.characters(), displayedFilename.length());
+    unsigned length = displayedFilename.length();
+    const UChar* string = displayedFilename.characters();
+    TextStyle textStyle(0, 0, 0, false, true);
+
+    if (style()->direction() == RTL && style()->unicodeBidi() == Override)
+      textStyle.setRTL(true);
+    else if ((style()->direction() == RTL ||
+              style()->unicodeBidi() != Override) &&
+             !style()->visuallyOrdered()) {
+      // If necessary, reorder characters by running the string through the bidi
+      // algorithm
+      RenderBlock::CharacterBuffer characterBuffer;
+      characterBuffer.append(string, length);
+      RenderBlock::bidiReorderCharacters(document(), style(), characterBuffer);
+      string = characterBuffer.data();
+    }
+    TextRun textRun(string, length);
 
     // Determine where the filename should be placed
     int contentLeft = tx + borderLeft() + paddingLeft();
@@ -186,7 +202,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     paintInfo.context->setFillColor(style()->color());
 
     // Draw the filename
-    paintInfo.context->drawText(textRun, IntPoint(textX, textY));
+    paintInfo.context->drawText(textRun, IntPoint(textX, textY), textStyle);
 
     if (m_fileChooser->icon()) {
       // Determine where the icon should be placed
