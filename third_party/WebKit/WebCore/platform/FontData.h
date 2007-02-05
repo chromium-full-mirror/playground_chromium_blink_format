@@ -72,6 +72,12 @@ class FontData : Noncopyable {
 
 #if PLATFORM(MAC)
   NSFont* getNSFont() const { return m_font.font; }
+  void checkShapesArabic() const;
+  bool shapesArabic() const {
+    if (!m_checkedShapesArabic)
+      checkShapesArabic();
+    return m_shapesArabic;
+  }
 #endif
 
 #if PLATFORM(WIN)
@@ -115,6 +121,8 @@ class FontData : Noncopyable {
   mutable ATSUStyle m_ATSUStyle;
   mutable bool m_ATSUStyleInitialized;
   mutable bool m_ATSUMirrors;
+  mutable bool m_checkedShapesArabic;
+  mutable bool m_shapesArabic;
 #endif
 
 #if PLATFORM(WIN)
