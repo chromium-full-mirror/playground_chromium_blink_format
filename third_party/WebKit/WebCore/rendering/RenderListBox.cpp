@@ -324,6 +324,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
   unsigned length = itemText.length();
   const UChar* string = itemText.characters();
   TextStyle textStyle(0, 0, 0, false, true);
+  RenderBlock::CharacterBuffer characterBuffer;
 
   if (itemStyle->direction() == RTL && itemStyle->unicodeBidi() == Override)
     textStyle.setRTL(true);
@@ -332,7 +333,6 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
            !itemStyle->visuallyOrdered()) {
     // If necessary, reorder characters by running the string through the bidi
     // algorithm
-    RenderBlock::CharacterBuffer characterBuffer;
     characterBuffer.append(string, length);
     RenderBlock::bidiReorderCharacters(document(), itemStyle, characterBuffer);
     string = characterBuffer.data();

@@ -138,7 +138,7 @@ void RenderBlock::bidiReorderCharacters(Document* document,
 
   // Call bidiReorderLine
   BidiState bidi;
-  BidiContext* startEmbed;
+  PassRefPtr<BidiContext> startEmbed;
   if (style->direction() == LTR) {
     startEmbed =
         new BidiContext(0, LeftToRight, NULL, style->unicodeBidi() == Override);

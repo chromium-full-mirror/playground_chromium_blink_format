@@ -164,6 +164,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
     unsigned length = displayedFilename.length();
     const UChar* string = displayedFilename.characters();
     TextStyle textStyle(0, 0, 0, false, true);
+    RenderBlock::CharacterBuffer characterBuffer;
 
     if (style()->direction() == RTL && style()->unicodeBidi() == Override)
       textStyle.setRTL(true);
@@ -172,7 +173,6 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
              !style()->visuallyOrdered()) {
       // If necessary, reorder characters by running the string through the bidi
       // algorithm
-      RenderBlock::CharacterBuffer characterBuffer;
       characterBuffer.append(string, length);
       RenderBlock::bidiReorderCharacters(document(), style(), characterBuffer);
       string = characterBuffer.data();
