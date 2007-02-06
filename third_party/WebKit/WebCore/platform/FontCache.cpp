@@ -41,34 +41,28 @@ struct FontPlatformDataCacheKey {
   FontPlatformDataCacheKey(const AtomicString& family = AtomicString(),
                            unsigned size = 0,
                            bool bold = false,
-                           unsigned stretch = 5,
                            bool italic = false)
-      : m_family(family),
-        m_size(size),
-        m_bold(bold),
-        m_stretch(stretch),
-        m_italic(italic) {}
+      : m_family(family), m_size(size), m_bold(bold), m_italic(italic) {}
 
   bool operator==(const FontPlatformDataCacheKey& other) const {
     return equalIgnoringCase(m_family, other.m_family) &&
            m_size == other.m_size && m_bold == other.m_bold &&
-           m_stretch == other.m_stretch && m_italic == other.m_italic;
+           m_italic == other.m_italic;
   }
 
   AtomicString m_family;
   unsigned m_size;
   bool m_bold;
-  unsigned m_stretch;
   bool m_italic;
 };
 
 inline unsigned computeHash(const FontPlatformDataCacheKey& fontKey) {
-  unsigned hashCodes[4] = {CaseInsensitiveHash<String>::hash(fontKey.m_family),
-                           fontKey.m_size, fontKey.m_stretch,
+  unsigned hashCodes[3] = {CaseInsensitiveHash<String>::hash(fontKey.m_family),
+                           fontKey.m_size,
                            static_cast<unsigned>(fontKey.m_bold) << 1 |
                                static_cast<unsigned>(fontKey.m_italic)};
   return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
-                                 4 * sizeof(unsigned) / sizeof(UChar));
+                                 3 * sizeof(unsigned) / sizeof(UChar));
 }
 
 struct FontPlatformDataCacheKeyHash {
@@ -87,11 +81,11 @@ struct FontPlatformDataCacheKeyTraits
   static const bool emptyValueIsZero = true;
   static const bool needsDestruction = false;
   static const FontPlatformDataCacheKey& deletedValue() {
-    static FontPlatformDataCacheKey key(nullAtom, 0xFFFFFFFFU, false, 0, false);
+    static FontPlatformDataCacheKey key(nullAtom, 0xFFFFFFFFU, false, false);
     return key;
   }
   static const FontPlatformDataCacheKey& emptyValue() {
-    static FontPlatformDataCacheKey key(nullAtom, 0, false, 0, false);
+    static FontPlatformDataCacheKey key(nullAtom, 0, false, false);
     return key;
   }
 };
@@ -140,7 +134,6 @@ FontPlatformData* FontCache::getCachedFontPlatformData(
 
   FontPlatformDataCacheKey key(familyName, fontDescription.computedPixelSize(),
                                fontDescription.bold(),
-                               static_cast<unsigned>(fontDescription.stretch()),
                                fontDescription.italic());
   FontPlatformData* result = 0;
   bool foundResult;
