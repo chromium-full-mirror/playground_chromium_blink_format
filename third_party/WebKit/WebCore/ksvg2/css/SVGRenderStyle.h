@@ -168,12 +168,12 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                                       StrokeDashArray,
                                                       strokeDashArray,
                                                       0)
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(unsigned int,
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
                                            stroke,
                                            miterLimit,
                                            StrokeMiterLimit,
                                            strokeMiterLimit,
-                                           4)
+                                           4.0)
 
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_REFCOUNTED(CSSValue,
                                                       stroke,

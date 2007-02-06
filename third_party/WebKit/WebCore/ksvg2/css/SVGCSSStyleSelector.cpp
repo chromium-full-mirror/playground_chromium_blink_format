@@ -509,7 +509,7 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
       else
         return;
 
-      svgstyle->setStrokeMiterLimit(lroundf(f));
+      svgstyle->setStrokeMiterLimit(f);
       break;
     }
     case SVGCSS_PROP_FILTER: {
