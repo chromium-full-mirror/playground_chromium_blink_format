@@ -143,11 +143,16 @@ class UserStyleSheetLoader : public CachedResourceClient {
 };
 
 #ifndef NDEBUG
+#ifndef LOG_CHANNEL_PREFIX
+#define LOG_CHANNEL_PREFIX Log
+#endif
+WTFLogChannel LogWebCoreFrameLeaks = {0x00000000, "", WTFLogChannelOn};
+
 struct FrameCounter {
   static int count;
   ~FrameCounter() {
-    if (count != 0)
-      fprintf(stderr, "LEAK: %d Frame\n", count);
+    if (count)
+      LOG(WebCoreFrameLeaks, "LEAK: %d Frame\n", count);
   }
 };
 int FrameCounter::count = 0;
@@ -808,43 +813,21 @@ bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
   return true;
 }
 
-#ifndef NDEBUG
-static HashSet<Frame*> lifeSupportSet;
-#endif
-
-void Frame::endAllLifeSupport() {
-#ifndef NDEBUG
-  HashSet<Frame*> lifeSupportCopy = lifeSupportSet;
-  HashSet<Frame*>::iterator end = lifeSupportCopy.end();
-  for (HashSet<Frame*>::iterator it = lifeSupportCopy.begin(); it != end; ++it)
-    (*it)->endLifeSupport();
-#endif
-}
-
 void Frame::keepAlive() {
   if (d->m_lifeSupportTimer.isActive())
     return;
   ref();
-#ifndef NDEBUG
-  lifeSupportSet.add(this);
-#endif
   d->m_lifeSupportTimer.startOneShot(0);
 }
 
-void Frame::endLifeSupport() {
+void Frame::cancelKeepAlive() {
   if (!d->m_lifeSupportTimer.isActive())
     return;
   d->m_lifeSupportTimer.stop();
-#ifndef NDEBUG
-  lifeSupportSet.remove(this);
-#endif
   deref();
 }
 
 void Frame::lifeSupportTimerFired(Timer<Frame>*) {
-#ifndef NDEBUG
-  lifeSupportSet.remove(this);
-#endif
   deref();
 }
 
