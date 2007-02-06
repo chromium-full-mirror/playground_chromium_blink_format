@@ -103,6 +103,7 @@ Position Position::previous(
     return *this;
 
   int o = offset();
+  // FIXME: Negative offsets shouldn't be allowed. We should catch this earlier.
   assert(o >= 0);
 
   if (o > 0) {
@@ -134,6 +135,7 @@ Position Position::next(
     return *this;
 
   int o = offset();
+  // FIXME: Negative offsets shouldn't be allowed. We should catch this earlier.
   assert(o >= 0);
 
   Node* child = n->childNode(o);

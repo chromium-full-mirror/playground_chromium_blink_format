@@ -74,7 +74,7 @@ void HTMLTextAreaElement::restoreState(const String& state) {
 
 int HTMLTextAreaElement::selectionStart() {
   if (renderer()) {
-    if (document()->focusedNode() != this && cachedSelStart >= 0)
+    if (document()->focusedNode() != this && cachedSelStart != -1)
       return cachedSelStart;
     return static_cast<RenderTextControl*>(renderer())->selectionStart();
   }
@@ -83,7 +83,7 @@ int HTMLTextAreaElement::selectionStart() {
 
 int HTMLTextAreaElement::selectionEnd() {
   if (renderer()) {
-    if (document()->focusedNode() != this && cachedSelEnd >= 0)
+    if (document()->focusedNode() != this && cachedSelEnd != -1)
       return cachedSelEnd;
     return static_cast<RenderTextControl*>(renderer())->selectionEnd();
   }
@@ -261,8 +261,8 @@ void HTMLTextAreaElement::setValue(const String& value) {
 
   // Restore a caret at the starting point of the old selection.
   // This matches Safari 2.0 behavior.
-  if (document()->focusedNode() == this && cachedSelStart >= 0) {
-    ASSERT(cachedSelEnd >= 0);
+  if (document()->focusedNode() == this && cachedSelStart != -1) {
+    ASSERT(cachedSelEnd != -1);
     setSelectionRange(cachedSelStart, cachedSelStart);
   }
   setChanged(true);
@@ -322,7 +322,7 @@ void HTMLTextAreaElement::setRows(int rows) {
 }
 
 Selection HTMLTextAreaElement::selection() const {
-  if (!renderer())
+  if (!renderer() || cachedSelStart == -1 || cachedSelEnd == -1)
     return Selection();
   return static_cast<RenderTextControl*>(renderer())
       ->selection(cachedSelStart, cachedSelEnd);
