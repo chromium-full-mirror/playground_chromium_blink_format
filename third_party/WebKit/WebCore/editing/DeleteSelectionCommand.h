@@ -36,12 +36,12 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
                          bool replace = false,
-                         bool expandForSpecialElements = true);
+                         bool expandForSpecialElements = false);
   DeleteSelectionCommand(const Selection&,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true,
                          bool replace = false,
-                         bool expandForSpecialElements = true);
+                         bool expandForSpecialElements = false);
 
   virtual void doApply();
   virtual EditAction editingAction() const;

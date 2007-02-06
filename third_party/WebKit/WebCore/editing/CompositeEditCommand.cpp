@@ -294,19 +294,23 @@ void CompositeEditCommand::insertNodeAtTabSpanPosition(Node* node,
 
 void CompositeEditCommand::deleteSelection(bool smartDelete,
                                            bool mergeBlocksAfterDelete,
-                                           bool replace) {
+                                           bool replace,
+                                           bool expandForSpecialElements) {
   if (endingSelection().isRange())
     applyCommandToComposite(new DeleteSelectionCommand(
-        document(), smartDelete, mergeBlocksAfterDelete, replace));
+        document(), smartDelete, mergeBlocksAfterDelete, replace,
+        expandForSpecialElements));
 }
 
 void CompositeEditCommand::deleteSelection(const Selection& selection,
                                            bool smartDelete,
                                            bool mergeBlocksAfterDelete,
-                                           bool replace) {
+                                           bool replace,
+                                           bool expandForSpecialElements) {
   if (selection.isRange())
     applyCommandToComposite(new DeleteSelectionCommand(
-        selection, smartDelete, mergeBlocksAfterDelete, replace));
+        selection, smartDelete, mergeBlocksAfterDelete, replace,
+        expandForSpecialElements));
 }
 
 void CompositeEditCommand::removeCSSProperty(CSSStyleDeclaration* decl,
@@ -794,8 +798,7 @@ void CompositeEditCommand::moveParagraphs(
           : 0;
 
   setEndingSelection(Selection(start, end, DOWNSTREAM));
-  applyCommandToComposite(
-      new DeleteSelectionCommand(document(), false, false, false, false));
+  deleteSelection(false, false, false, false);
 
   ASSERT(destination.deepEquivalent().node()->inDocument());
 
