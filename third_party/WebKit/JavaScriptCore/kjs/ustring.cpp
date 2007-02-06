@@ -43,6 +43,7 @@
 #include <wtf/Vector.h>
 
 using std::max;
+using std::min;
 
 namespace KJS {
 
@@ -607,14 +608,20 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
                                                 int rangeCount,
                                                 const UString* separators,
                                                 int separatorCount) const {
-  int totalLength = 0;
+  if (rangeCount == 1 && separatorCount == 0) {
+    int thisSize = size();
+    int position = substringRanges[0].position;
+    int length = substringRanges[0].length;
+    if (position <= 0 && length >= thisSize)
+      return *this;
+    return UString::Rep::create(m_rep, max(0, position), min(thisSize, length));
+  }
 
-  for (int i = 0; i < rangeCount; i++) {
+  int totalLength = 0;
+  for (int i = 0; i < rangeCount; i++)
     totalLength += substringRanges[i].length;
-  }
-  for (int i = 0; i < separatorCount; i++) {
+  for (int i = 0; i < separatorCount; i++)
     totalLength += separators[i].size();
-  }
 
   UChar* buffer = static_cast<UChar*>(fastMalloc(totalLength * sizeof(UChar)));
 
@@ -633,7 +640,7 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
     }
   }
 
-  return UString(UString::Rep::create(buffer, totalLength));
+  return UString::Rep::create(buffer, totalLength);
 }
 
 UString& UString::append(const UString& t) {
