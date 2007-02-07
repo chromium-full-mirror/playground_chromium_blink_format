@@ -66,6 +66,9 @@ static inline String canonicalizedTitle(const String& title, Frame* frame) {
       break;
   }
 
+  if (i == length)
+    return "";
+
   // Replace control characters with spaces, and backslashes with currency
   // symbols, and collapse whitespace.
   bool previousCharWasWS = false;
