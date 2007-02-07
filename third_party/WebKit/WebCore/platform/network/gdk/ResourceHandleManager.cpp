@@ -44,11 +44,11 @@ ResourceHandleManager::ResourceHandleManager()
   curlMultiHandle = curl_multi_init();
 }
 
-ResourceHandleManager* ResourceHandleManager::get() {
-  static ResourceHandleManager* singleton;
-  if (!singleton)
-    singleton = new ResourceHandleManager;
-  return singleton;
+ResourceHandleManager* ResourceHandleManager::sharedInstance() {
+  static ResourceHandleManager* sharedInstance;
+  if (!sharedInstance)
+    sharedInstance = new ResourceHandleManager();
+  return sharedInstance;
 }
 
 void ResourceHandleManager::useSimpleTransfer(bool useSimple) {
@@ -60,7 +60,7 @@ static size_t writeCallback(void* ptr, size_t size, size_t nmemb, void* obj) {
   ResourceHandleInternal* d = job->getInternal();
   int totalSize = size * nmemb;
   if (d->client())
-    d->client()->didReceiveData(job, static_cast<char*>(ptr), totalSize);
+    d->client()->didReceiveData(job, static_cast<char*>(ptr), totalSize, 0);
   return totalSize;
 }
 
@@ -84,7 +84,6 @@ void ResourceHandleManager::downloadTimerCallback(
       if (res != CURLE_OK)
         printf("Error WITH JOB %d\n", res);
       if (d->client()) {
-        d->client()->receivedAllData(job, 0);
         d->client()->didFinishLoading(job);
       }
       curl_easy_cleanup(d->m_handle);
@@ -169,7 +168,6 @@ void ResourceHandleManager::remove(ResourceHandle* job) {
   if (jobs->isEmpty())
     m_downloadTimer.stop();
   if (d->client()) {
-    d->client()->receivedAllData(job, 0);
     d->client()->didFinishLoading(job);
   }
   if (d->m_handle) {
