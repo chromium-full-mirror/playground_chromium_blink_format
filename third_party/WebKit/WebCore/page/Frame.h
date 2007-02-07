@@ -163,7 +163,9 @@ class Frame : public Shared<Frame> {
 
   void keepAlive();  // Used to keep the frame alive when running a script that
                      // might destroy it.
-  void cancelKeepAlive();
+#ifndef NDEBUG
+  static void cancelAllKeepAlive();
+#endif
 
   virtual KJS::Bindings::Instance* getEmbedInstanceForWidget(Widget*) = 0;
   virtual KJS::Bindings::Instance* getObjectInstanceForWidget(Widget*) = 0;

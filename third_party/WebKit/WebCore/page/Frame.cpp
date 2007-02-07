@@ -813,21 +813,39 @@ bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
   return true;
 }
 
+#ifndef NDEBUG
+static HashSet<Frame*>& keepAliveSet() {
+  static HashSet<Frame*> staticKeepAliveSet;
+  return staticKeepAliveSet;
+}
+#endif
+
 void Frame::keepAlive() {
   if (d->m_lifeSupportTimer.isActive())
     return;
+#ifndef NDEBUG
+  keepAliveSet().add(this);
+#endif
   ref();
   d->m_lifeSupportTimer.startOneShot(0);
 }
 
-void Frame::cancelKeepAlive() {
-  if (!d->m_lifeSupportTimer.isActive())
-    return;
-  d->m_lifeSupportTimer.stop();
-  deref();
+#ifndef NDEBUG
+void Frame::cancelAllKeepAlive() {
+  HashSet<Frame*>::iterator end = keepAliveSet().end();
+  for (HashSet<Frame*>::iterator it = keepAliveSet().begin(); it != end; ++it) {
+    Frame* frame = *it;
+    frame->d->m_lifeSupportTimer.stop();
+    frame->deref();
+  }
+  keepAliveSet().clear();
 }
+#endif
 
 void Frame::lifeSupportTimerFired(Timer<Frame>*) {
+#ifndef NDEBUG
+  keepAliveSet().remove(this);
+#endif
   deref();
 }
 
