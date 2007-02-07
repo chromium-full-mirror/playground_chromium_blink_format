@@ -845,6 +845,21 @@ static bool execMoveBackwardAndModifySelection(Frame* frame) {
   return true;
 }
 
+static bool execMoveUpByPageAndModifyCaret(Frame* frame) {
+  RenderObject* renderer = frame->document()->focusedNode()->renderer();
+  if (renderer->style()->overflowY() == OSCROLL ||
+      renderer->style()->overflowY() == OAUTO || renderer->isTextArea()) {
+    int height =
+        -(frame->document()->focusedNode()->renderer()->clientHeight() -
+          PAGE_KEEP);
+    bool handledScroll = renderer->scroll(ScrollUp, ScrollByPage);
+    bool handledCaretMove =
+        frame->selectionController()->modify(SelectionController::MOVE, height);
+    return handledScroll || handledCaretMove;
+  }
+  return false;
+}
+
 static bool execMoveDown(Frame* frame) {
   frame->selectionController()->modify(SelectionController::MOVE,
                                        SelectionController::FORWARD,
@@ -871,6 +886,20 @@ static bool execMoveForwardAndModifySelection(Frame* frame) {
                                        SelectionController::FORWARD,
                                        CharacterGranularity, true);
   return true;
+}
+
+static bool execMoveDownByPageAndModifyCaret(Frame* frame) {
+  RenderObject* renderer = frame->document()->focusedNode()->renderer();
+  if (renderer->style()->overflowY() == OSCROLL ||
+      renderer->style()->overflowY() == OAUTO || renderer->isTextArea()) {
+    int height = frame->document()->focusedNode()->renderer()->clientHeight() -
+                 PAGE_KEEP;
+    bool handledScroll = renderer->scroll(ScrollDown, ScrollByPage);
+    bool handledCaretMove =
+        frame->selectionController()->modify(SelectionController::MOVE, height);
+    return handledScroll || handledCaretMove;
+  }
+  return false;
 }
 
 static bool execMoveLeft(Frame* frame) {
@@ -1200,12 +1229,16 @@ static CommandMap* createCommandMap() {
       {"MoveBackward", {hasEditableSelection, execMoveBackward}},
       {"MoveBackwardAndModifySelection",
        {hasEditableSelection, execMoveBackwardAndModifySelection}},
+      {"MoveUpByPageAndModifyCaret",
+       {hasEditableSelection, execMoveUpByPageAndModifyCaret}},
       {"MoveDown", {hasEditableSelection, execMoveDown}},
       {"MoveDownAndModifySelection",
        {hasEditableSelection, execMoveDownAndModifySelection}},
       {"MoveForward", {hasEditableSelection, execMoveForward}},
       {"MoveForwardAndModifySelection",
        {hasEditableSelection, execMoveForwardAndModifySelection}},
+      {"MoveDownByPageAndModifyCaret",
+       {hasEditableSelection, execMoveDownByPageAndModifyCaret}},
       {"MoveLeft", {hasEditableSelection, execMoveLeft}},
       {"MoveLeftAndModifySelection",
        {hasEditableSelection, execMoveLeftAndModifySelection}},
