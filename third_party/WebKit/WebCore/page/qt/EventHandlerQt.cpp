@@ -102,10 +102,11 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
   return false;
 }
 
-bool EventHandler::handleMouseUp(const MouseEventWithHitTestResults&) {
-  // i don't know what this does. looks like more mac code disguised as
-  //  platform stuff
-  return true;
+bool EventHandler::eventActivatedView(const PlatformMouseEvent&) const {
+  // Qt has an activation event which is sent independently
+  //   of mouse event so this thing will be a snafu to implement
+  //   correctly
+  return false;
 }
 
 bool EventHandler::passSubframeEventToSubframe(
@@ -116,14 +117,6 @@ bool EventHandler::passSubframeEventToSubframe(
 }
 
 bool EventHandler::passWheelEventToWidget(Widget* widget) {
-  notImplemented();
-  return false;
-}
-
-// returns if we should continue "default processing", i.e., whether
-// eventhandler canceled
-bool EventHandler::dispatchDragSrcEvent(const AtomicString& eventType,
-                                        const PlatformMouseEvent& event) {
   notImplemented();
   return false;
 }
