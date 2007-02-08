@@ -30,6 +30,7 @@
 #include "GraphicsContext.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLNames.h"
+#include "RenderView.h"
 
 namespace WebCore {
 
@@ -84,8 +85,10 @@ void RenderHTMLCanvas::layout() {
 
   IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint)
+  if (checkForRepaint) {
     oldBounds = getAbsoluteRepaintRect();
+    oldBounds.move(view()->layoutDelta());
+  }
   calcWidth();
   calcHeight();
   if (checkForRepaint)

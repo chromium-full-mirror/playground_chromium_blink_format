@@ -497,8 +497,11 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   IntRect oldBounds, oldFullBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint)
+  if (checkForRepaint) {
     getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
+    oldBounds.move(view()->layoutDelta());
+    oldFullBounds.move(view()->layoutDelta());
+  }
 
   int oldWidth = m_width;
   int oldColumnWidth = m_desiredColumnWidth;
@@ -957,6 +960,7 @@ void RenderBlock::collapseMargins(RenderObject* child,
     marginInfo.setSelfCollapsingBlockClearedFloat(false);
   }
 
+  view()->addLayoutDelta(IntSize(0, yPosEstimate - ypos));
   child->setPos(child->xPos(), ypos);
   if (ypos != yPosEstimate) {
     if ((child->style()->width().isPercent() ||
@@ -984,6 +988,7 @@ void RenderBlock::clearFloatsIfNeeded(RenderObject* child,
   if (heightIncrease) {
     // The child needs to be lowered.  Move the child so that it just clears the
     // float.
+    view()->addLayoutDelta(IntSize(0, -heightIncrease));
     child->setPos(child->xPos(), child->yPos() + heightIncrease);
 
     if (child->isSelfCollapsingBlock()) {
@@ -1088,6 +1093,7 @@ void RenderBlock::determineHorizontalPosition(RenderObject* child) {
         chPos = leftOff + child->marginLeft();
       }
     }
+    view()->addLayoutDelta(IntSize(child->xPos() - chPos, 0));
     child->setPos(chPos, child->yPos());
   } else {
     int xPos =
@@ -1118,6 +1124,7 @@ void RenderBlock::determineHorizontalPosition(RenderObject* child) {
         chPos = rightOff - child->marginRight() - child->width();
       }
     }
+    view()->addLayoutDelta(IntSize(child->xPos() - chPos, 0));
     child->setPos(chPos, child->yPos());
   }
 }
@@ -1261,6 +1268,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 
     // Go ahead and position the child as though it didn't collapse with the
     // top.
+    view()->addLayoutDelta(IntSize(0, child->yPos() - yPosEstimate));
     child->setPos(child->xPos(), yPosEstimate);
     if (yPosEstimate != oldRect.y() && !child->avoidsFloats() &&
         child->containsFloats())
@@ -1316,6 +1324,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // Insert our compact into the block margin if we have one.
     insertCompactIfNeeded(child, compactInfo);
 
+    view()->addLayoutDelta(
+        IntSize(child->xPos() - oldRect.x(), child->yPos() - oldRect.y()));
+
     // If the child moved, we have to repaint it as well as any
     // floating/positioned
     // descendants.  An exception is if we need a layout.  In this case, we know
@@ -1328,9 +1339,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
         child->repaintDuringLayoutIfMoved(oldRect);
       else if (finalChildY != yPosEstimate ||
                finalChildY != postCollapseChildY) {
-        // The child's repaints during layout were done before it reached its
-        // final position,
-        // so they were wrong.
+        // The child invalidated itself during layout at an intermediate
+        // position,
+        // but not at its final position. Take care of it now.
         child->repaint();
         child->repaintOverhangingFloats();
       }
