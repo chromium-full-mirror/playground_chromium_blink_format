@@ -205,4 +205,8 @@ bool ChromeClientQt::runJavaScriptPrompt(Frame*,
 void ChromeClientQt::setStatusbarText(const String&) {
   notImplemented();
 }
+
+bool ChromeClientQt::shouldInterruptJavaScript() {
+  notImplemented();
+}
 }
