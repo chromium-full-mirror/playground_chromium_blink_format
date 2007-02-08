@@ -49,7 +49,7 @@ class CachedImage : public CachedResource, public ImageAnimationObserver {
   Image* image() const;
 
   bool canRender() const {
-    return !isErrorImage() && imageSize().width() > 0 &&
+    return !errorOccurred() && imageSize().width() > 0 &&
            imageSize().height() > 0;
   }
 
@@ -61,8 +61,6 @@ class CachedImage : public CachedResource, public ImageAnimationObserver {
   virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
   virtual void data(Vector<char>&, bool allDataReceived);
   virtual void error();
-
-  bool isErrorImage() const { return m_errorOccurred; }
 
   virtual bool schedule() const { return true; }
 
@@ -86,8 +84,6 @@ class CachedImage : public CachedResource, public ImageAnimationObserver {
 
   Image* m_image;
   int m_dataSize;
-
-  bool m_errorOccurred : 1;
 
   friend class Cache;
 };

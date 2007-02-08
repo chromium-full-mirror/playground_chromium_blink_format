@@ -102,6 +102,8 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     // The resource does not exist.  Create it.
     resource = createResource(type, docLoader, url, expireDate, charset);
     ASSERT(resource);
+    if (resource->errorOccurred())
+      return resource;
     resource->setInCache(!disabled());
     if (!disabled())
       m_resources.set(url.url(), resource);  // The size will be added in later
@@ -178,8 +180,6 @@ void Cache::setMaximumSize(unsigned bytes) {
 }
 
 void Cache::remove(CachedResource* resource) {
-  ASSERT(resource->inCache());
-
   // Remove from the resource map.
   m_resources.remove(resource->url());
   resource->setInCache(false);
