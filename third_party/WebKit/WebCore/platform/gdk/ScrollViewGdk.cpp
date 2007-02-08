@@ -212,17 +212,24 @@ void ScrollView::setFrameGeometry(const IntRect& r) {
       IntRect(0, 0, r.width() - scrollbarSize, r.height() - scrollbarSize);
 }
 
+void ScrollView::updateGeometry() {
+  GdkDrawable* gdkdrawable = drawable();
+  if (gdkdrawable) {
+    GdkWindow* frame = GDK_WINDOW(gdkdrawable);
+    gint x, y, width, height, depth;
+    gdk_window_get_geometry(frame, &x, &y, &width, &height, &depth);
+    m_data->scrollViewArea = IntRect(0, 0, width, height);
+    m_data->viewportArea =
+        IntRect(0, 0, width - scrollbarSize, height - scrollbarSize);
+  }
+}
+
 void ScrollView::setDrawable(GdkDrawable* gdkdrawable) {
   Widget::setDrawable(gdkdrawable);
   if (!GDK_IS_WINDOW(gdkdrawable)) {
     LOG_ERROR("image scrollview not supported");
     return;
   }
-  GdkWindow* frame = GDK_WINDOW(gdkdrawable);
-  gint x, y, width, height, depth;
-  gdk_window_get_geometry(frame, &x, &y, &width, &height, &depth);
-  m_data->scrollViewArea = IntRect(0, 0, width, height);
-  m_data->viewportArea =
-      IntRect(0, 0, width - scrollbarSize, height - scrollbarSize);
+  updateGeometry();
 }
 }
