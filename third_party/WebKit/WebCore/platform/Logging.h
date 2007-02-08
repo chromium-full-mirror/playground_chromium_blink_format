@@ -52,6 +52,12 @@ extern WTFLogChannel LogNetwork;
 
 void InitializeLoggingChannelsIfNecessary();
 
+void _WebCoreThreadViolationCheck(const char* function);
 }  // namespace WebCore
+
+#define WebCoreThreadViolationCheck()                           \
+  do                                                            \
+    WebCore::_WebCoreThreadViolationCheck(WTF_PRETTY_FUNCTION); \
+  while (0)
 
 #endif  // Logging_h
