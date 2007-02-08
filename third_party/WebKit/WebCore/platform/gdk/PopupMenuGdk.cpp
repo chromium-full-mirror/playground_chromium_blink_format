@@ -22,31 +22,36 @@
  *
  */
 
-#ifndef RenderPopupMenuGdk_h
-#define RenderPopupMenuGdk_h
-
+#include "config.h"
 #include "PopupMenu.h"
+
+#include <stdio.h>
+
+#define notImplemented()                                                    \
+  do {                                                                      \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", __PRETTY_FUNCTION__, \
+            __FILE__, __LINE__);                                            \
+  } while (0)
 
 namespace WebCore {
 
-class HTMLOptionElement;
-class HTMLOptGroupElement;
-
-class PopupMenuGdk : public PopupMenu {
- public:
-  PopupMenuGdk(Node*, RenderMenuList*);
-  ~PopupMenuGdk();
-
-  virtual void clear();
-  virtual void populate();
-  virtual void showPopup(const IntRect&, FrameView*, int index);
-  virtual void hidePopup();
-
- protected:
-  virtual void addSeparator();
-  virtual void addGroupLabel(HTMLOptGroupElement*);
-  virtual void addOption(HTMLOptionElement*);
-};
+PopupMenu::PopupMenu(PopupMenuClient* menuList) {
+  notImplemented();
 }
 
-#endif
+PopupMenu::~PopupMenu() {
+  notImplemented();
+}
+
+void PopupMenu::show(const IntRect&, FrameView*, int) {
+  notImplemented();
+}
+
+void PopupMenu::hide() {
+  notImplemented();
+}
+
+void PopupMenu::updateFromElement() {
+  notImplemented();
+}
+}
