@@ -159,14 +159,36 @@ Vector<char>& CachedImage::bufferData(const char* bytes,
                                       Request* request) {
   createImage();
 
-  // Add new bytes DIRECTLY to the buffer in the Image object.
-  Vector<char>& buffer = m_image->dataBuffer();
+  Vector<char>& imageBuffer = m_image->dataBuffer();
 
-  unsigned oldSize = buffer.size();
-  buffer.resize(oldSize + addedSize);
-  memcpy(buffer.data() + oldSize, bytes, addedSize);
+  if (addedSize > 0) {
+    bool success = false;
+    unsigned oldSize = imageBuffer.size();
+    unsigned newSize = oldSize + addedSize;
 
-  return buffer;
+    // Check for overflow
+    if (newSize > oldSize) {
+      // Use temporary Vector so we can safely detect if the allocation fails
+      //
+      // The code that was here before, just called resize of the imageBuffer.
+      // Vector<>::resize
+      // will crash if the resize of a non-empty Vector<> fails.
+      Vector<char> tempBuffer(newSize);
+
+      char* tempBufferBytes = tempBuffer.data();
+      if (tempBufferBytes) {
+        memcpy(tempBufferBytes, imageBuffer.data(), oldSize);
+        memcpy(tempBufferBytes + oldSize, bytes, addedSize);
+        tempBuffer.swap(imageBuffer);
+        success = true;
+      }
+    }
+
+    if (!success)
+      error();
+  }
+
+  return imageBuffer;
 }
 
 void CachedImage::data(Vector<char>& data, bool allDataReceived) {
