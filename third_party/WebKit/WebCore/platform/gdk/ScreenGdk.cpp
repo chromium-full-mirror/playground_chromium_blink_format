@@ -25,41 +25,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// FIXME: should be renamed to ScreenClientGdk.cpp
-
 #include "config.h"
-#include "ScreenClientGdk.h"
+#include "Screen.h"
 
-#include "FloatRect.h"
-#include <gdk/gdk.h>
+#include <stdio.h>
 
 #define notImplemented()                                                    \
   do {                                                                      \
-    fprintf(stderr, "%s FIXME: UNIMPLEMENTED %s:%d\n", __PRETTY_FUNCTION__, \
+    fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", __PRETTY_FUNCTION__, \
             __FILE__, __LINE__);                                            \
   } while (0)
 
 namespace WebCore {
 
-int ScreenClientGdk::depth() {
+int screenDepth(Widget*) {
   notImplemented();
   return 32;
 }
-int ScreenClientGdk::depthPerComponent() {
+
+int screenDepthPerComponent(Widget*) {
   notImplemented();
   return 8;
 }
 
-bool ScreenClientGdk::isMonochrome() {
+bool screenIsMonochrome(Widget*) {
   notImplemented();
   return false;
 }
 
-FloatRect ScreenClientGdk::rect() {
+FloatRect screenRect(Widget*) {
   notImplemented();
   return FloatRect();
 }
-FloatRect ScreenClientGdk::usableRect() {
+
+FloatRect screenAvailableRect(Widget*) {
   notImplemented();
   return FloatRect();
 }

@@ -44,18 +44,18 @@ class RenderThemeGdk : public RenderTheme {
   // hovered.
   virtual bool supportsHover(const RenderStyle* style) const { return true; }
 
+  // System fonts.
+  virtual void systemFont(int propId, FontDescription&) const;
+
+ protected:
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
-                             const IntRect& r) {
-    return paintButton(o, i, r);
-  }
+                             const IntRect& r);
   virtual void setCheckboxSize(RenderStyle* style) const;
 
   virtual bool paintRadio(RenderObject* o,
                           const RenderObject::PaintInfo& i,
-                          const IntRect& r) {
-    return paintButton(o, i, r);
-  }
+                          const IntRect& r);
   virtual void setRadioSize(RenderStyle* style) const;
 
   virtual void adjustButtonStyle(CSSStyleSelector*,
@@ -72,8 +72,9 @@ class RenderThemeGdk : public RenderTheme {
                               const RenderObject::PaintInfo&,
                               const IntRect&);
 
-  // System fonts.
-  virtual void systemFont(int propId, FontDescription&) const;
+  virtual bool paintTextArea(RenderObject*,
+                             const RenderObject::PaintInfo&,
+                             const IntRect&);
 
  private:
   void addIntrinsicMargins(RenderStyle*) const;
