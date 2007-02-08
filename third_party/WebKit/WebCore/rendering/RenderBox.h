@@ -179,6 +179,7 @@ class RenderBox : public RenderObject {
   virtual IntRect getClipRect(int tx, int ty);
 
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  virtual void imageChanged(CachedImage*);
 
  protected:
   void paintBackground(GraphicsContext*,
@@ -202,6 +203,14 @@ class RenderBox : public RenderObject {
  private:
   void paintRootBoxDecorations(PaintInfo&, int tx, int ty);
 
+  void calculateBackgroundImageGeometry(const BackgroundLayer*,
+                                        int tx,
+                                        int ty,
+                                        int w,
+                                        int h,
+                                        IntRect& destRect,
+                                        IntPoint& phase,
+                                        IntSize& tileSize);
   void paintBackgrounds(GraphicsContext*,
                         const Color&,
                         const BackgroundLayer*,
