@@ -90,6 +90,7 @@ class WebChromeClient : public WebCore::ChromeClient {
                                    const WebCore::String& defaultValue,
                                    WebCore::String& result);
   virtual void setStatusbarText(const WebCore::String&);
+  virtual bool shouldInterruptJavaScript();
 
  private:
   WebView* m_webView;

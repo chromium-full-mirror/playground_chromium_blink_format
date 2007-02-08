@@ -341,7 +341,6 @@ rangeByAlteringCurrentSelection:
 
 - (BOOL)textViewWasFirstResponderAtMouseDownTime:(NSTextView*)textView;
 
-- (BOOL)shouldInterruptJavaScript;
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
 

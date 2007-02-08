@@ -88,6 +88,7 @@ class ChromeClient {
                                    const String& defaultValue,
                                    String& result) = 0;
   virtual void setStatusbarText(const String&) = 0;
+  virtual bool shouldInterruptJavaScript() = 0;
 };
 }
 

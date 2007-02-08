@@ -113,6 +113,7 @@ class SVGEmptyChromeClient : public ChromeClient {
     return false;
   }
   virtual void setStatusbarText(const String&) {}
+  virtual bool shouldInterruptJavaScript() { return false; }
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {

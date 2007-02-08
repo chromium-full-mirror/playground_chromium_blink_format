@@ -94,6 +94,7 @@ class Chrome {
                            const String& defaultValue,
                            String& result);
   void setStatusbarText(Frame*, const String&);
+  bool shouldInterruptJavaScript();
 
  private:
   Page* m_page;
