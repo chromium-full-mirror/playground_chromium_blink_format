@@ -344,9 +344,6 @@ rangeByAlteringCurrentSelection:
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebCoreOpenPanelResultListener>)resultListener;
 
-- (void)formControlIsBecomingFirstResponder:(NSView*)formControl;
-- (void)formControlIsResigningFirstResponder:(NSView*)formControl;
-
 - (void)setNeedsReapplyStyles;
 
 - (NSView*)viewForPluginWithURL:(NSURL*)URL

@@ -75,7 +75,6 @@ struct WebHTMLViewInterpretKeyEventsParameters;
 
   NSMutableDictionary* highlighters;
 
-  BOOL descendantBecomingFirstResponder;
   BOOL resigningFirstResponder;
   BOOL ignoreMarkedTextSelectionChange;
   BOOL nextResponderDisabledOnce;
@@ -96,8 +95,6 @@ struct WebHTMLViewInterpretKeyEventsParameters;
 
 @interface WebHTMLView (WebInternal)
 - (void)_selectionChanged;
-- (void)_formControlIsBecomingFirstResponder:(NSView*)formControl;
-- (void)_formControlIsResigningFirstResponder:(NSView*)formControl;
 - (void)_updateFontPanel;
 - (BOOL)_canSmartCopyOrDelete;
 - (BOOL)_textViewWasFirstResponderAtMouseDownTime:(NSTextView*)textView;
