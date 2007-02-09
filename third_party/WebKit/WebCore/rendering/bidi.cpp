@@ -337,6 +337,7 @@ static inline RenderObject* bidiNext(RenderBlock* block,
     *endOfInline = false;
 
   while (current) {
+    next = 0;
     if (!oldEndOfInline && !current->isFloating() && !current->isReplaced() &&
         !current->isPositioned()) {
       next = current->firstChild();
@@ -402,7 +403,6 @@ static inline RenderObject* bidiNext(RenderBlock* block,
          && next->isInlineFlow()))
       break;
     current = next;
-    next = 0;
   }
   return next;
 }
