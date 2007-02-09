@@ -36,7 +36,6 @@ class Debugger;
 class RuntimeMethod;
 class SavedBuiltins;
 class ScopeChain;
-class TimeoutChecker;
 
 /**
  * Interpreter objects can be used to evaluate ECMAScript code. Each
@@ -46,7 +45,6 @@ class TimeoutChecker;
  */
 class Interpreter {
   friend class Collector;
-  friend class TimeoutChecker;
 
  public:
   /**
@@ -336,10 +334,7 @@ class Interpreter {
   void startTimeoutCheck();
   void stopTimeoutCheck();
 
-  void pauseTimeoutCheck();
-  void resumeTimeoutCheck();
-
-  bool checkTimeout();
+  bool timedOut();
 
   void ref() { ++m_refCount; }
   void deref() {
@@ -352,11 +347,12 @@ class Interpreter {
   virtual ~Interpreter();  // only deref should delete us
   virtual bool shouldInterruptScript() const { return true; }
 
-  long m_timeoutTime;
+  unsigned m_timeoutTime;
 
  private:
-  bool handleTimeout();
+  bool checkTimeout();
   void init();
+  void resetTimeoutCheck();
 
   /**
    * This constructor is not implemented, in order to prevent
@@ -390,11 +386,12 @@ class Interpreter {
   Context* m_context;
   CompatMode m_compatMode;
 
-  TimeoutChecker* m_timeoutChecker;
-  bool m_timedOut;
+  unsigned m_timeAtLastCheckTimeout;
+  unsigned m_timeExecuting;
+  unsigned m_timeoutCheckCount;
 
-  unsigned m_startTimeoutCheckCount;
-  unsigned m_pauseTimeoutCheckCount;
+  unsigned m_tickCount;
+  unsigned m_ticksUntilNextTimeoutCheck;
 
   ProtectedPtr<JSObject> m_Object;
   ProtectedPtr<JSObject> m_Function;
@@ -431,11 +428,13 @@ class Interpreter {
   ProtectedPtr<JSObject> m_UriErrorPrototype;
 };
 
-inline bool Interpreter::checkTimeout() {
-  if (!m_timedOut)
+inline bool Interpreter::timedOut() {
+  m_tickCount++;
+
+  if (m_tickCount != m_ticksUntilNextTimeoutCheck)
     return false;
 
-  return handleTimeout();
+  return checkTimeout();
 }
 
 }  // namespace
