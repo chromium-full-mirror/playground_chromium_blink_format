@@ -1879,7 +1879,6 @@ void FrameLoader::load(const ResourceRequest& request,
                        PassRefPtr<FormState> formState) {
   RefPtr<DocumentLoader> loader =
       m_client->createDocumentLoader(request, SubstituteData());
-  setPolicyDocumentLoader(loader.get());
 
   loader->setTriggeringAction(action);
   if (m_documentLoader)
