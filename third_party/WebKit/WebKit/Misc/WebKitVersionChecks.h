@@ -35,6 +35,10 @@
    A version of -1 is returned if the main executable did not link against
    WebKit (should never happen). */
 
+// FIXME 4927747: We should make the framework version numbers match the
+// info.plist version numbers
+#define WEBKIT_FIRST_VERSION_WITH_3_0_CONTEXT_MENU_TAGS 0x00020000
+
 #ifdef __cplusplus
 extern "C" {
 #endif

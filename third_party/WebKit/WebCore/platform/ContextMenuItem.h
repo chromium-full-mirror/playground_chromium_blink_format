@@ -58,8 +58,9 @@ typedef void* PlatformMenuItemDescription;
 typedef GtkMenuItem* PlatformMenuItemDescription;
 #endif
 
-// This enum needs to be in sync with WebMenuItemTag, which is defined in
-// WebUIDelegate.h
+// This enum needs to be in sync with the WebMenuItemTag enum in WebUIDelegate.h
+// and the
+// extra values in WebUIDelegatePrivate.h
 enum ContextMenuAction {
   ContextMenuItemTagNoAction =
       0,  // This item is not actually in WebUIDelegate.h
@@ -96,7 +97,7 @@ enum ContextMenuAction {
   ContextMenuItemPDFNextPage,
   ContextMenuItemPDFPreviousPage,
   // These are new tags! Not a part of API!!!!
-  ContextMenuItemTagOpenLink = 1000,
+  ContextMenuItemTagOpenLink = 2000,
   ContextMenuItemTagIgnoreGrammar,
   ContextMenuItemTagSpellingMenu,  // Spelling or Spelling/Grammar sub-menu
   ContextMenuItemTagShowSpellingPanel,
