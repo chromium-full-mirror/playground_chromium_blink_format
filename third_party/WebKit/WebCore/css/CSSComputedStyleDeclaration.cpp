@@ -347,18 +347,19 @@ static PassRefPtr<CSSValue> valueForShadow(const ShadowData* shadow) {
   if (!shadow)
     return new CSSPrimitiveValue(CSS_VAL_NONE);
 
-  CSSValueList* list = new CSSValueList;
+  RefPtr<CSSValueList> list = new CSSValueList;
   for (const ShadowData* s = shadow; s; s = s->next) {
-    CSSPrimitiveValue* x =
+    RefPtr<CSSPrimitiveValue> x =
         new CSSPrimitiveValue(s->x, CSSPrimitiveValue::CSS_PX);
-    CSSPrimitiveValue* y =
+    RefPtr<CSSPrimitiveValue> y =
         new CSSPrimitiveValue(s->y, CSSPrimitiveValue::CSS_PX);
-    CSSPrimitiveValue* blur =
+    RefPtr<CSSPrimitiveValue> blur =
         new CSSPrimitiveValue(s->blur, CSSPrimitiveValue::CSS_PX);
-    CSSPrimitiveValue* color = new CSSPrimitiveValue(s->color.rgb());
-    list->append(new ShadowValue(x, y, blur, color));
+    RefPtr<CSSPrimitiveValue> color = new CSSPrimitiveValue(s->color.rgb());
+    list->append(new ShadowValue(x.release(), y.release(), blur.release(),
+                                 color.release()));
   }
-  return list;
+  return list.release();
 }
 
 static PassRefPtr<CSSValue> getPositionOffsetValue(RenderObject* renderer,
@@ -785,7 +786,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return new CSSPrimitiveValue(style->columnWidth(),
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP_CURSOR: {
-      CSSValueList* list = 0;
+      RefPtr<CSSValueList> list;
       CursorList* cursors = style->cursors();
       if (cursors && cursors->size() > 0) {
         list = new CSSValueList;
@@ -793,7 +794,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           list->append(new CSSPrimitiveValue((*cursors)[i].cursorImage->url(),
                                              CSSPrimitiveValue::CSS_URI));
       }
-      CSSValue* value = 0;
+      RefPtr<CSSValue> value;
       switch (style->cursor()) {
         case CURSOR_AUTO:
           value = new CSSPrimitiveValue(CSS_VAL_AUTO);
@@ -895,9 +896,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       ASSERT(value);
       if (list) {
         list->append(value);
-        return list;
+        return list.release();
       }
-      return value;
+      return value.release();
     }
     case CSS_PROP_DIRECTION:
       switch (style->direction()) {
@@ -1504,7 +1505,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
                                    CSSPrimitiveValue::CSS_NUMBER);
     case CSS_PROP_BOX_SIZING:
       if (style->boxSizing() == CONTENT_BOX)
-        new CSSPrimitiveValue(CSS_VAL_CONTENT_BOX);
+        return new CSSPrimitiveValue(CSS_VAL_CONTENT_BOX);
       return new CSSPrimitiveValue(CSS_VAL_BORDER_BOX);
     case CSS_PROP__WEBKIT_DASHBOARD_REGION:
 #if PLATFORM(MAC)
