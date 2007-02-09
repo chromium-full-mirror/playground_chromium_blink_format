@@ -37,6 +37,7 @@
 #include "JSMouseEvent.h"
 #include "JSMutationEvent.h"
 #include "JSOverflowEvent.h"
+#include "JSTextEvent.h"
 #include "JSWheelEvent.h"
 #include "KURL.h"
 #include "KeyboardEvent.h"
@@ -44,6 +45,7 @@
 #include "MutationEvent.h"
 #include "OverflowEvent.h"
 #include "Page.h"
+#include "TextEvent.h"
 #include "UIEvent.h"
 #include "WheelEvent.h"
 #include "kjs_proxy.h"
@@ -464,6 +466,7 @@ JSValue* DOMEventPrototypeFunction::callAsFunction(ExecState* exec,
 JSValue* toJS(ExecState* exec, Event* e) {
   if (!e)
     return jsNull();
+
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
 
@@ -473,6 +476,8 @@ JSValue* toJS(ExecState* exec, Event* e) {
   if (!ret) {
     if (e->isKeyboardEvent())
       ret = new JSKeyboardEvent(exec, static_cast<KeyboardEvent*>(e));
+    else if (e->isTextEvent())
+      ret = new JSTextEvent(exec, static_cast<TextEvent*>(e));
     else if (e->isMouseEvent())
       ret = new JSMouseEvent(exec, static_cast<MouseEvent*>(e));
     else if (e->isWheelEvent())
