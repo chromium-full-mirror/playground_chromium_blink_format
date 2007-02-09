@@ -706,7 +706,15 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
       frame->xPosForVerticalArrowNavigation() ==
           NoXPosForVerticalArrowNavigation) {
     pos = VisiblePosition(pos, m_sel.affinity()).deepEquivalent();
-    x = pos.node()->renderer()->caretRect(pos.offset(), m_sel.affinity()).x();
+    // VisiblePosition creation can fail here if a node containing the selection
+    // becomes visibility:hidden
+    // after the selection is created and before this function is called.
+    x = pos.isNotNull()
+            ? pos.node()
+                  ->renderer()
+                  ->caretRect(pos.offset(), m_sel.affinity())
+                  .x()
+            : 0;
     frame->setXPosForVerticalArrowNavigation(x);
   } else {
     x = frame->xPosForVerticalArrowNavigation();
