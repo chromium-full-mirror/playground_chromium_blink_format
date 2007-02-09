@@ -44,7 +44,8 @@ Settings::Settings()
       m_javaScriptCanOpenWindowsAutomatically(false),
       m_shouldPrintBackgrounds(false),
       m_textAreasAreResizable(false),
-      m_usesDashboardBackwardCompatibilityMode(false) {
+      m_usesDashboardBackwardCompatibilityMode(false),
+      m_needsAcrobatFrameReloadingQuirk(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -190,6 +191,14 @@ void Settings::setUsesDashboardBackwardCompatibilityMode(
     bool usesDashboardBackwardCompatibilityMode) {
   m_usesDashboardBackwardCompatibilityMode =
       usesDashboardBackwardCompatibilityMode;
+}
+
+// FIXME: This quirk is needed because of Radar 4674537. We need to phase it out
+// once Adobe
+// can fix the bug from their end.
+void Settings::setNeedsAcrobatFrameReloadingQuirk(
+    bool shouldNotReloadIFramesForUnchangedSRC) {
+  m_needsAcrobatFrameReloadingQuirk = shouldNotReloadIFramesForUnchangedSRC;
 }
 
 }  // namespace WebCore
