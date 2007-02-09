@@ -402,6 +402,7 @@ static inline RenderObject* bidiNext(RenderBlock* block,
          && next->isInlineFlow()))
       break;
     current = next;
+    next = 0;
   }
   return next;
 }
