@@ -91,9 +91,16 @@ CachedImage* DocLoader::requestImage(const String& url) {
 }
 
 CachedCSSStyleSheet* DocLoader::requestCSSStyleSheet(const String& url,
-                                                     const String& charset) {
-  return static_cast<CachedCSSStyleSheet*>(
-      requestResource(CachedResource::CSSStyleSheet, url, &charset));
+                                                     const String& charset,
+                                                     bool isUserStyleSheet) {
+  return static_cast<CachedCSSStyleSheet*>(requestResource(
+      CachedResource::CSSStyleSheet, url, &charset, isUserStyleSheet));
+}
+
+CachedCSSStyleSheet* DocLoader::requestUserCSSStyleSheet(
+    const String& url,
+    const String& charset) {
+  return requestCSSStyleSheet(url, charset, true);
 }
 
 CachedScript* DocLoader::requestScript(const String& url,
@@ -118,7 +125,8 @@ CachedXBLDocument* DocLoader::requestXBLDocument(const String& url) {
 
 CachedResource* DocLoader::requestResource(CachedResource::Type type,
                                            const String& url,
-                                           const String* charset) {
+                                           const String* charset,
+                                           bool skipCanLoadCheck) {
   KURL fullURL = m_doc->completeURL(url.deprecatedString());
 
   FrameLoader* fl = 0;
@@ -132,7 +140,8 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
   bool hideReferrer;
   CachedResource* resource = 0;
   // If you are not allowed to load you may not get from the cache either.
-  if (fl && fl->canLoad(fullURL, fl->outgoingReferrer(), hideReferrer)) {
+  if (skipCanLoadCheck ||
+      (fl && fl->canLoad(fullURL, fl->outgoingReferrer(), hideReferrer))) {
     resource =
         cache()->requestResource(this, type, fullURL, m_expireDate, charset);
     if (resource) {
