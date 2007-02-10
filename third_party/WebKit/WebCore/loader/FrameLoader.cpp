@@ -4056,7 +4056,9 @@ void FrameLoader::recursiveGoToItem(HistoryItem* item,
   ASSERT(fromItem);
 
   KURL itemURL = item->url();
-  KURL currentURL = documentLoader()->URL();
+  KURL currentURL;
+  if (documentLoader())
+    currentURL = documentLoader()->URL();
 
   // Always reload the target frame of the item we're going to.  This ensures
   // that we will
