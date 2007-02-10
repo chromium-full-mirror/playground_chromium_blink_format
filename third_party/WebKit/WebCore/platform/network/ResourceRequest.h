@@ -128,6 +128,7 @@ struct ResourceRequest {
   void setHTTPReferrer(const String& httpReferrer) {
     setHTTPHeaderField("Referer", httpReferrer);
   }
+  void clearHTTPReferrer() { m_httpHeaderFields.remove("Referer"); }
 
   String httpUserAgent() const { return httpHeaderField("User-Agent"); }
   void setHTTPUserAgent(const String& httpUserAgent) {
