@@ -1409,6 +1409,21 @@ JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(JSValue* val,
   return new JSUnprotectedEventListener(object, this, html);
 }
 
+void Window::clearHelperObjectProperties() {
+  screen = 0;
+  history = 0;
+  frames = 0;
+  loc = 0;
+  m_selection = 0;
+  m_locationbar = 0;
+  m_menubar = 0;
+  m_personalbar = 0;
+  m_scrollbars = 0;
+  m_statusbar = 0;
+  m_toolbar = 0;
+  m_evt = 0;
+}
+
 void Window::clear() {
   JSLock lock;
 
@@ -1417,6 +1432,7 @@ void Window::clear() {
 
   clearAllTimeouts();
   clearProperties();
+  clearHelperObjectProperties();
   setPrototype(JSDOMWindowPrototype::self());  // clear the prototype
 
   // Now recreate a working global object for the next URL that will use us; but

@@ -309,6 +309,7 @@ class Window : public DOMObject {
 
   void updateLayout() const;
 
+  void clearHelperObjectProperties();
   void clearAllTimeouts();
   int installTimeout(ScheduledAction*, int interval, bool singleShot);
 
