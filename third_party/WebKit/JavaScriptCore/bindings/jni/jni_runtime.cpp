@@ -118,6 +118,7 @@ JSValue* JavaField::valueFromInstance(ExecState* exec,
   JSValue* jsresult = jsUndefined();
 
   switch (_JNIType) {
+    case array_type:
     case object_type: {
       jvalue result = dispatchValueFromInstance(
           exec, instance, "get", "(Ljava/lang/Object;)Ljava/lang/Object;",
@@ -210,6 +211,7 @@ void JavaField::setValueToInstance(ExecState* exec,
   JS_LOG("setting value %s to %s\n", name(), aValue->toString(exec).ascii());
 
   switch (_JNIType) {
+    case array_type:
     case object_type: {
       dispatchSetValueToInstance(exec, instance, javaValue, "set",
                                  "(Ljava/lang/Object;Ljava/lang/Object;)V");
@@ -348,16 +350,20 @@ const char* JavaMethod::signature() const {
     for (i = 0; i < _numParameters; i++) {
       JavaParameter* aParameter = static_cast<JavaParameter*>(parameterAt(i));
       JNIType _JNIType = aParameter->getJNIType();
-      _signature->append(signatureFromPrimitiveType(_JNIType));
-      if (_JNIType == object_type) {
+      if (_JNIType == array_type)
         appendClassName(_signature, aParameter->type());
-        _signature->append(";");
+      else {
+        _signature->append(signatureFromPrimitiveType(_JNIType));
+        if (_JNIType == object_type) {
+          appendClassName(_signature, aParameter->type());
+          _signature->append(";");
+        }
       }
     }
     _signature->append(")");
 
     const char* returnType = _returnType.UTF8String();
-    if (returnType[0] == '[') {
+    if (_JNIReturnType == array_type) {
       appendClassName(_signature, returnType);
     } else {
       _signature->append(signatureFromPrimitiveType(_JNIReturnType));

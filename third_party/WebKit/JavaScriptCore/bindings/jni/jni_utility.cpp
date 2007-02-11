@@ -116,6 +116,7 @@ static jvalue callJNIMethod(JNIType type,
           case void_type:
             env->functions->CallVoidMethodV(env, obj, mid, args);
             break;
+          case array_type:
           case object_type:
             result.l = env->functions->CallObjectMethodV(env, obj, mid, args);
             break;
@@ -182,6 +183,7 @@ static jvalue callJNIStaticMethod(JNIType type,
         case void_type:
           env->functions->CallStaticVoidMethodV(env, cls, mid, args);
           break;
+        case array_type:
         case object_type:
           result.l =
               env->functions->CallStaticObjectMethodV(env, cls, mid, args);
@@ -243,6 +245,7 @@ static jvalue callJNIMethodIDA(JNIType type,
       case void_type:
         env->functions->CallVoidMethodA(env, obj, mid, args);
         break;
+      case array_type:
       case object_type:
         result.l = env->functions->CallObjectMethodA(env, obj, mid, args);
         break;
@@ -609,6 +612,8 @@ JNIType JNITypeFromClassName(const char* name) {
     type = boolean_type;
   else if (strcmp("void", name) == 0)
     type = void_type;
+  else if ('[' == name[0])
+    type = array_type;
   else
     type = object_type;
 
@@ -619,6 +624,9 @@ const char* signatureFromPrimitiveType(JNIType type) {
   switch (type) {
     case void_type:
       return "V";
+
+    case array_type:
+      return "[";
 
     case object_type:
       return "L";
@@ -660,8 +668,10 @@ JNIType JNITypeFromPrimitiveType(char type) {
       return void_type;
 
     case 'L':
-    case '[':
       return object_type;
+
+    case '[':
+      return array_type;
 
     case 'Z':
       return boolean_type;
@@ -708,6 +718,7 @@ jvalue getJNIField(jobject obj,
       jfieldID field = env->GetFieldID(cls, name, signature);
       if (field != NULL) {
         switch (type) {
+          case array_type:
           case object_type:
             result.l = env->functions->GetObjectField(env, obj, field);
             break;
@@ -757,6 +768,134 @@ jvalue getJNIField(jobject obj,
   return result;
 }
 
+jobject convertArrayInstanceToJavaArray(ExecState* exec,
+                                        JSValue* value,
+                                        const char* javaClassName) {
+  JNIEnv* env = getJNIEnv();
+  // As JS Arrays can contain a mixture of objects, assume we can convert to
+  // the requested Java Array type requested, unless the array type is some
+  // object array
+  // other than a string.
+  ArrayInstance* jsArray = static_cast<ArrayInstance*>(value);
+  unsigned length = jsArray->getLength();
+  jobjectArray jarray = 0;
+
+  // Build the correct array type
+  switch (JNITypeFromPrimitiveType(javaClassName[1])) {
+    case object_type: {
+      // Only support string object types
+      if (0 == strcmp("[Ljava.lang.String;", javaClassName)) {
+        jarray = (jobjectArray)env->NewObjectArray(
+            length, env->FindClass("java/lang/String"), env->NewStringUTF(""));
+        for (unsigned i = 0; i < length; i++) {
+          JSValue* item = jsArray->getItem(i);
+          UString stringValue = item->toString(exec);
+          env->SetObjectArrayElement(
+              jarray, i,
+              env->functions->NewString(env, (const jchar*)stringValue.data(),
+                                        stringValue.size()));
+        }
+      }
+      break;
+    }
+
+    case boolean_type: {
+      jarray = (jobjectArray)env->NewBooleanArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jboolean value = (jboolean)item->toNumber(exec);
+        env->SetBooleanArrayRegion((jbooleanArray)jarray, (jsize)i, (jsize)1,
+                                   &value);
+      }
+      break;
+    }
+
+    case byte_type: {
+      jarray = (jobjectArray)env->NewByteArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jbyte value = (jbyte)item->toNumber(exec);
+        env->SetByteArrayRegion((jbyteArray)jarray, (jsize)i, (jsize)1, &value);
+      }
+      break;
+    }
+
+    case char_type: {
+      jarray = (jobjectArray)env->NewCharArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        UString stringValue = item->toString(exec);
+        jchar value = 0;
+        if (stringValue.size() > 0)
+          value = ((const jchar*)stringValue.data())[0];
+        env->SetCharArrayRegion((jcharArray)jarray, (jsize)i, (jsize)1, &value);
+      }
+      break;
+    }
+
+    case short_type: {
+      jarray = (jobjectArray)env->NewShortArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jshort value = (jshort)item->toNumber(exec);
+        env->SetShortArrayRegion((jshortArray)jarray, (jsize)i, (jsize)1,
+                                 &value);
+      }
+      break;
+    }
+
+    case int_type: {
+      jarray = (jobjectArray)env->NewIntArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jint value = (jint)item->toNumber(exec);
+        env->SetIntArrayRegion((jintArray)jarray, (jsize)i, (jsize)1, &value);
+      }
+      break;
+    }
+
+    case long_type: {
+      jarray = (jobjectArray)env->NewLongArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jlong value = (jlong)item->toNumber(exec);
+        env->SetLongArrayRegion((jlongArray)jarray, (jsize)i, (jsize)1, &value);
+      }
+      break;
+    }
+
+    case float_type: {
+      jarray = (jobjectArray)env->NewFloatArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jfloat value = (jfloat)item->toNumber(exec);
+        env->SetFloatArrayRegion((jfloatArray)jarray, (jsize)i, (jsize)1,
+                                 &value);
+      }
+      break;
+    }
+
+    case double_type: {
+      jarray = (jobjectArray)env->NewDoubleArray(length);
+      for (unsigned i = 0; i < length; i++) {
+        JSValue* item = jsArray->getItem(i);
+        jdouble value = (jdouble)item->toNumber(exec);
+        env->SetDoubleArrayRegion((jdoubleArray)jarray, (jsize)i, (jsize)1,
+                                  &value);
+      }
+      break;
+    }
+
+    case array_type:    // don't handle embedded arrays
+    case void_type:     // Don't expect arrays of void objects
+    case invalid_type:  // Array of unknown objects
+      break;
+  }
+
+  // if it was not one of the cases handled, then null is returned
+  return jarray;
+}
+
 jvalue convertValueToJValue(ExecState* exec,
                             JSValue* value,
                             JNIType _JNIType,
@@ -764,6 +903,7 @@ jvalue convertValueToJValue(ExecState* exec,
   jvalue result;
 
   switch (_JNIType) {
+    case array_type:
     case object_type: {
       result.l = (jobject)0;
 
@@ -776,9 +916,15 @@ jvalue convertValueToJValue(ExecState* exec,
               static_cast<JavaInstance*>(imp->getInternalInstance());
           result.l = instance->javaInstance();
         } else if (objectImp->classInfo() == &RuntimeArray::info) {
+          // Input is a JavaScript Array that was originally created from a Java
+          // Array
           RuntimeArray* imp = static_cast<RuntimeArray*>(value);
           JavaArray* array = static_cast<JavaArray*>(imp->getConcreteArray());
           result.l = array->javaArray();
+        } else if (objectImp->classInfo() == &ArrayInstance::info) {
+          // Input is a Javascript Array. We need to create it to a Java Array.
+          result.l =
+              convertArrayInstanceToJavaArray(exec, value, javaClassName);
         }
       }
 
@@ -803,7 +949,8 @@ jvalue convertValueToJValue(ExecState* exec,
               env, (const jchar*)stringValue.data(), stringValue.size());
           result.l = javaString;
         }
-      }
+      } else if (result.l == 0)
+        bzero(&result, sizeof(jvalue));  // Handle it the same as a void case
     } break;
 
     case boolean_type: {
@@ -848,5 +995,7 @@ jvalue convertValueToJValue(ExecState* exec,
   }
   return result;
 }
-}
-}
+
+}  // end of namespace Bindings
+
+}  // end of namespace KJS
