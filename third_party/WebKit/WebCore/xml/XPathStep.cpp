@@ -29,6 +29,7 @@
 
 #ifdef XPATH_SUPPORT
 
+#include "Document.h"
 #include "NamedAttrMap.h"
 #include "XPathNSResolver.h"
 #include "XPathParser.h"
@@ -239,9 +240,13 @@ NodeVector Step::nodeTestMatches(const NodeVector& nodes) const {
         // We use tagQName here because we don't want the element name in
         // uppercase
         // like we get with HTML elements.
+        // Paths without namespaces should match HTML elements in HTML documents
+        // despite those having an XHTML namespace.
         if (node->nodeType() == Node::ELEMENT_NODE &&
             static_cast<Element*>(node)->tagQName().localName() == m_nodeTest &&
-            (m_namespaceURI.isNull() || m_namespaceURI == node->namespaceURI()))
+            ((node->isHTMLElement() && node->document()->isHTMLDocument() &&
+              m_namespaceURI.isNull()) ||
+             m_namespaceURI == node->namespaceURI()))
           matches.append(node);
       }
 
