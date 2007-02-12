@@ -213,6 +213,9 @@ class RenderObject : public CachedResourceClient {
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual bool canHaveChildren() const;
+  virtual bool isChildAllowed(RenderObject*, RenderStyle*) const {
+    return true;
+  }
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject*);
   virtual bool createsAnonymousWrapper() const { return false; }
