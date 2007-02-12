@@ -288,12 +288,10 @@ void RenderTable::layout() {
   }
 
   IntRect oldBounds;
-  IntRect oldFullBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
-    getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
+    oldBounds = getAbsoluteRepaintRect();
     oldBounds.move(view()->layoutDelta());
-    oldFullBounds.move(view()->layoutDelta());
   }
 
   m_height = 0;
@@ -460,7 +458,7 @@ void RenderTable::layout() {
   bool didFullRepaint = true;
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
-    didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
+    didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds);
   if (!didFullRepaint && sectionMoved) {
     IntRect repaintRect(m_overflowLeft, movedSectionTop,
                         m_overflowWidth - m_overflowLeft,

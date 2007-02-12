@@ -76,6 +76,8 @@ class RenderBlock : public RenderFlow {
   virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
   virtual void setOverflowWidth(int w) { m_overflowWidth = w; }
 
+  void addVisualOverflow(const IntRect&);
+
   virtual bool isSelfCollapsingBlock() const;
   virtual bool isTopMarginQuirk() const { return m_topMarginQuirk; }
   virtual bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
@@ -112,8 +114,6 @@ class RenderBlock : public RenderFlow {
 
   virtual void repaintObjectsBeforeLayout();
   virtual void repaintOverhangingFloats(bool paintAllDescendants);
-  virtual void getAbsoluteRepaintRectIncludingFloats(IntRect& bounds,
-                                                     IntRect& fullBounds);
 
   virtual void setStyle(RenderStyle*);
 
@@ -207,7 +207,6 @@ class RenderBlock : public RenderFlow {
   int floatBottom() const;
   inline int leftBottom();
   inline int rightBottom();
-  virtual IntRect floatRect() const;
 
   virtual int lineWidth(int y) const;
   virtual int lowestPosition(bool includeOverflowInterior = true,
@@ -402,6 +401,7 @@ class RenderBlock : public RenderFlow {
   void adjustPointToColumnContents(IntPoint&) const;
 
  protected:
+  IntRect floatRect() const;
   void newLine();
   virtual bool hasLineIfEmpty() const;
 
@@ -606,17 +606,9 @@ class RenderBlock : public RenderFlow {
   int m_maxBottomPosMargin;
   int m_maxBottomNegMargin;
 
-  // How much content overflows out of our block vertically or horizontally (all
-  // we support
-  // for now is spillage out of the bottom and the right, which are the common
-  // cases).
-  // FIXME: Generalize to work with top and left as well.
+  // How much content overflows out of our block vertically or horizontally.
   int m_overflowHeight;
   int m_overflowWidth;
-
-  // Left and top overflow.  Does not affect scrolling dimensions, but we do at
-  // least use it
-  // when dirty rect checking and hit testing.
   int m_overflowLeft;
   int m_overflowTop;
 
