@@ -228,8 +228,8 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
   if (oldChild == newChild)  // nothing to do
     return true;
 
-  // Make sure adding the new child is ok
-  checkAddChild(newChild.get(), ec);
+  // Make sure replacing the old child with the new is ok
+  checkReplaceChild(newChild.get(), oldChild, ec);
   if (ec)
     return false;
 

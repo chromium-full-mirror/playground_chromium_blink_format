@@ -370,6 +370,9 @@ class Node : public TreeShared<Node> {
   virtual bool childAllowed(
       Node* newChild);  // Error-checking during parsing that checks the DTD
 
+  void checkReplaceChild(Node* newChild, Node* oldChild, ExceptionCode&);
+  virtual bool canReplaceChild(Node* newChild, Node* oldChild);
+
   // Used to determine whether range offsets use characters or node indices.
   virtual bool offsetInCharacters() const;
 
