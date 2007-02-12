@@ -657,6 +657,10 @@ void GraphicsContext::endTransparencyLayer() {
 void GraphicsContext::setShadow(const IntSize& size,
                                 int blur,
                                 const Color& color) {
+  // Extreme "blur" values can make text drawing crash or take crazy long times,
+  // so clamp
+  blur = min(blur, 1000);
+
   if (paintingDisabled())
     return;
   // Check for an invalid color, as this means that the color was not set for
