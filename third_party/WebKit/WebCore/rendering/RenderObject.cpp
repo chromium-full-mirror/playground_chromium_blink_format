@@ -487,7 +487,7 @@ int RenderObject::offsetLeft() const {
   RenderObject* offsetPar = offsetParent();
   if (!offsetPar)
     return 0;
-  int x = xPos();
+  int x = xPos() - offsetPar->borderLeft();
   if (!isPositioned()) {
     if (isRelPositioned())
       x += static_cast<const RenderBox*>(this)->relativePositionOffsetX();
@@ -507,7 +507,7 @@ int RenderObject::offsetTop() const {
   RenderObject* offsetPar = offsetParent();
   if (!offsetPar)
     return 0;
-  int y = yPos();
+  int y = yPos() - offsetPar->borderTop();
   if (!isPositioned()) {
     if (isRelPositioned())
       y += static_cast<const RenderBox*>(this)->relativePositionOffsetY();
@@ -532,12 +532,13 @@ RenderObject* RenderObject::offsetParent() const {
 
   bool skipTables = isPositioned() || isRelPositioned();
   RenderObject* curr = parent();
-  while (curr && (!curr->element() ||
-                  (!curr->isPositioned() && !curr->isRelPositioned() &&
-                   !(!style()->htmlHacks() && skipTables ? curr->isRoot()
-                                                         : curr->isBody())))) {
+  while (curr &&
+         (!curr->element() || (!curr->isPositioned() &&
+                               !curr->isRelPositioned() && !curr->isBody()))) {
     if (!skipTables && curr->element() &&
-        (curr->isTableCell() || curr->isTable()))
+        (curr->element()->hasTagName(tableTag) ||
+         curr->element()->hasTagName(tdTag) ||
+         curr->element()->hasTagName(thTag)))
       break;
     curr = curr->parent();
   }
