@@ -428,14 +428,12 @@ void GraphicsContext::clearFocusRingClip() {
   // to work around bugs in Mac focus ring clipping
 }
 
-void GraphicsContext::drawLineForText(const IntPoint& point,
-                                      int yOffset,
+void GraphicsContext::drawLineForText(const IntPoint& origin,
                                       int width,
                                       bool printing) {
   if (paintingDisabled())
     return;
 
-  IntPoint origin = point + IntSize(0, yOffset + 1);
   IntPoint endPoint = origin + IntSize(width, 0);
   drawLine(origin, endPoint);
 }
