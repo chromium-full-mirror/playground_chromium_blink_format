@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -98,7 +98,7 @@ class Editor {
   bool shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
                             PassRefPtr<Range> replacingDOMRange,
                             EditorInsertAction givenAction);
-  bool shouldInsertText(String, Range*, EditorInsertAction) const;
+  bool shouldInsertText(const String&, Range*, EditorInsertAction) const;
   bool shouldShowDeleteInterface(HTMLElement*) const;
   bool shouldDeleteRange(Range*) const;
   bool shouldApplyStyle(CSSStyleDeclaration*, Range*);
@@ -154,6 +154,8 @@ class Editor {
   bool insertText(const String&,
                   bool selectInsertedText,
                   Event* triggeringEvent = 0);
+  bool insertLineBreak();
+  bool insertParagraphSeparator();
 
   bool isContinuousSpellCheckingEnabled();
   void toggleContinuousSpellChecking();
@@ -172,8 +174,8 @@ class Editor {
   void showSpellingGuessPanel();
   bool spellingPanelIsShowing();
 
-  bool shouldBeginEditing(Range* range);
-  bool shouldEndEditing(Range* range);
+  bool shouldBeginEditing(Range*);
+  bool shouldEndEditing(Range*);
 
   void clearUndoRedoOperations();
   bool canUndo();
@@ -194,6 +196,17 @@ class Editor {
 
   bool smartInsertDeleteEnabled();
 
+  void selectMarkedText();
+  void unmarkText();
+  void discardMarkedText();
+
+  bool ignoreMarkedTextSelectionChange() const {
+    return m_ignoreMarkedTextSelectionChange;
+  }
+  void setIgnoreMarkedTextSelectionChange(bool ignore) {
+    m_ignoreMarkedTextSelectionChange = ignore;
+  }
+
 #if PLATFORM(MAC)
   NSString* userVisibleString(NSURL*);
   void setStartNewKillRingSequence(bool flag) {
@@ -206,19 +219,20 @@ class Editor {
   OwnPtr<DeleteButtonController> m_deleteButtonController;
   RefPtr<EditCommand> m_lastEditCommand;
   RefPtr<Node> m_removedAnchor;
+  bool m_ignoreMarkedTextSelectionChange;
 
   bool canDeleteRange(Range*) const;
   bool canSmartCopyOrDelete();
-  bool canSmartReplaceWithPasteboard(Pasteboard* pasteboard);
-  PassRefPtr<Clipboard> newGeneralClipboard(ClipboardAccessPolicy policy);
+  bool canSmartReplaceWithPasteboard(Pasteboard*);
+  PassRefPtr<Clipboard> newGeneralClipboard(ClipboardAccessPolicy);
   PassRefPtr<Range> selectedRange();
   void pasteAsPlainTextWithPasteboard(Pasteboard*);
   void pasteWithPasteboard(Pasteboard*, bool allowPlainText);
-  void replaceSelectionWithFragment(PassRefPtr<DocumentFragment> fragment,
+  void replaceSelectionWithFragment(PassRefPtr<DocumentFragment>,
                                     bool selectReplacement,
                                     bool smartReplace,
                                     bool matchStyle);
-  void replaceSelectionWithText(String text,
+  void replaceSelectionWithText(const String&,
                                 bool selectReplacement,
                                 bool smartReplace);
   void writeSelectionToPasteboard(Pasteboard*);

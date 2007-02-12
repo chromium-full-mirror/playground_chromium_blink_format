@@ -76,7 +76,6 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   NSMutableDictionary* highlighters;
 
   BOOL resigningFirstResponder;
-  BOOL ignoreMarkedTextSelectionChange;
   BOOL nextResponderDisabledOnce;
   BOOL willBecomeFirstResponderForNodeFocus;
 

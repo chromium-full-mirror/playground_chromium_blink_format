@@ -416,6 +416,8 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void handleKeyPress(KeyboardEvent*) {}
 
 #if PLATFORM(MAC)
+  virtual void markedTextAbandoned(Frame*) {}
+
   // FIXME: This should become SelectionController::toWebArchive()
   virtual NSData* dataForArchivedSelection(Frame*) { return 0; }
 

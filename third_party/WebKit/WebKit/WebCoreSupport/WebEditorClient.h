@@ -88,6 +88,8 @@ class WebEditorClient : public WebCore::EditorClient {
 
   virtual void handleKeyPress(WebCore::KeyboardEvent*);
 
+  virtual void markedTextAbandoned(WebCore::Frame*);
+
  private:
   void registerCommandForUndoOrRedo(PassRefPtr<WebCore::EditCommand>,
                                     bool isRedo);
