@@ -65,7 +65,7 @@ void SVGImageLoader::updateFromElement() {
 void SVGImageLoader::dispatchLoadEvent() {
   if (!haveFiredLoadEvent() && image()) {
     setHaveFiredLoadEvent(true);
-    if (image()->errorOccurred()) {
+    if (image()->isErrorImage()) {
       // FIXME: We're supposed to put the document in an "error state" per the
       // spec.
     } else

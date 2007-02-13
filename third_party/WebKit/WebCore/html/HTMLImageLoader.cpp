@@ -121,7 +121,7 @@ void HTMLImageLoader::dispatchLoadEvent() {
   if (!haveFiredLoadEvent() && image()) {
     setHaveFiredLoadEvent(true);
     element()->dispatchHTMLEvent(
-        image()->errorOccurred() ? errorEvent : loadEvent, false, false);
+        image()->isErrorImage() ? errorEvent : loadEvent, false, false);
   }
 }
 

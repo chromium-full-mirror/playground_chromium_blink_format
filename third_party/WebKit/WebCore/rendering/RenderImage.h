@@ -86,8 +86,8 @@ class RenderImage : public RenderReplaced {
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
 
-  bool errorOccurred() const {
-    return m_cachedImage && m_cachedImage->errorOccurred();
+  bool isErrorImage() const {
+    return m_cachedImage && m_cachedImage->isErrorImage();
   }
 
   // The image we are rendering.
