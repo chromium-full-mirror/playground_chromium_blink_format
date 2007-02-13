@@ -796,7 +796,10 @@ void Node::attach() {
   m_attached = true;
 }
 
-void Node::willRemove() {}
+void Node::willRemove() {
+  if (m_focused)
+    document()->focusedNodeRemoved(this);
+}
 
 void Node::detach() {
   m_inDetach = true;
@@ -806,8 +809,6 @@ void Node::detach() {
   setRenderer(0);
 
   Document* doc = document();
-  if (m_focused)
-    doc->focusedNodeDetached(this);
   if (m_hovered)
     doc->hoveredNodeDetached(this);
   if (m_inActiveChain)

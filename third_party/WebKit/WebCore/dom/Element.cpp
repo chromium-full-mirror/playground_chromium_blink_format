@@ -28,6 +28,7 @@
 
 #include "cssstyleselector.h"
 #include "Document.h"
+#include "Editor.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
 #include "FrameView.h"
@@ -858,6 +859,8 @@ void Element::updateFocusAppearance() {
     Frame* frame = document()->frame();
     if (!frame)
       return;
+
+    frame->editor()->didBeginEditing();
 
     // FIXME: We should restore the previous selection if there is one.
     Selection newSelection = hasTagName(htmlTag) || hasTagName(bodyTag)

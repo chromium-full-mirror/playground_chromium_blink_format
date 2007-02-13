@@ -2070,7 +2070,7 @@ void Document::setActiveNode(PassRefPtr<Node> newActiveNode) {
   m_activeNode = newActiveNode;
 }
 
-void Document::focusedNodeDetached(Node* node) {
+void Document::focusedNodeRemoved(Node* node) {
   setFocusedNode(0);
 }
 
@@ -2198,9 +2198,6 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
       goto SetFocusedNodeDone;
     }
     m_focusedNode->setFocus();
-
-    if (m_focusedNode.get() == m_focusedNode->rootEditableElement())
-      frame()->editor()->didBeginEditing();
 
     // eww, I suck. set the qt focus correctly
     // ### find a better place in the code for this

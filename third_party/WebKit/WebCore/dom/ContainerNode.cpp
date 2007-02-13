@@ -326,6 +326,7 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
 void ContainerNode::willRemove() {
   for (Node* n = m_firstChild; n != 0; n = n->nextSibling())
     n->willRemove();
+  EventTargetNode::willRemove();
 }
 
 static ExceptionCode willRemoveChild(Node* child) {
