@@ -109,7 +109,7 @@ void RenderSVGContainer::layout() {
   m_absoluteBounds = getAbsoluteRepaintRect();
 
   if (selfNeedsLayout() && checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds);
+    repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
 
   setNeedsLayout(false);
 }

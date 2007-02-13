@@ -71,7 +71,7 @@ void RenderSVGText::layout() {
 
   bool repainted = false;
   if (checkForRepaint)
-    repainted = repaintAfterLayoutIfNeeded(oldBounds);
+    repainted = repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
 
   setNeedsLayout(false);
 }
