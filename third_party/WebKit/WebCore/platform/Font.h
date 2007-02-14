@@ -98,12 +98,10 @@ class Font {
  public:
   Font();
   Font(const FontDescription&, short letterSpacing, short wordSpacing);
-#if PLATFORM(MAC)
   Font(const FontPlatformData&, bool isPrinting);  // This constructor is only
-                                                   // used by Mac-specific code
-                                                   // that already has a native
+                                                   // used if the platform wants
+                                                   // to start with a native
                                                    // font.
-#endif
   ~Font();
 
   Font(const Font&);
