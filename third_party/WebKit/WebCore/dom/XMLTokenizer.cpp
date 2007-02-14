@@ -1101,12 +1101,16 @@ static xmlEntityPtr getXHTMLEntity(const xmlChar* name) {
 static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
   xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(closure);
   xmlEntityPtr ent = xmlGetPredefinedEntity(name);
-  if (ent)
+  if (ent) {
+    ent->etype = XML_INTERNAL_PREDEFINED_ENTITY;
     return ent;
+  }
 
   ent = xmlGetDocEntity(ctxt->myDoc, name);
-  if (!ent && getTokenizer(closure)->isXHTMLDocument())
+  if (!ent && getTokenizer(closure)->isXHTMLDocument()) {
     ent = getXHTMLEntity(name);
+    ent->etype = XML_INTERNAL_GENERAL_ENTITY;
+  }
 
   return ent;
 }
