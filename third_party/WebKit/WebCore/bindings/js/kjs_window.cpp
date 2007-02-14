@@ -1,9 +1,8 @@
 // -*- c-basic-offset: 4 -*-
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2006 Jon Shier (jshier@iastate.edu)
- *  Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reseved.
  *  Copyright (C) 2006 Alexey Proskuryakov (ap@webkit.org)
  *
  *  This library is free software; you can redistribute it and/or
@@ -308,7 +307,6 @@ Window::get
   onchange      Window::Onchange        DontDelete
   onclick       Window::Onclick         DontDelete
   ondblclick    Window::Ondblclick      DontDelete
-  ondragdrop    Window::Ondragdrop      DontDelete
   onerror       Window::Onerror         DontDelete
   onfocus       Window::Onfocus         DontDelete
   onkeydown     Window::Onkeydown       DontDelete
@@ -321,7 +319,6 @@ Window::get
   onmouseover   Window::Onmouseover     DontDelete
   onmouseup     Window::Onmouseup       DontDelete
   onmousewheel  Window::OnWindowMouseWheel      DontDelete
-  onmove        Window::Onmove          DontDelete
   onreset       Window::Onreset         DontDelete
   onresize      Window::Onresize        DontDelete
   onscroll      Window::Onscroll        DontDelete
@@ -864,8 +861,6 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return getListener(exec, clickEvent);
     case Ondblclick:
       return getListener(exec, dblclickEvent);
-    case Ondragdrop:
-      return getListener(exec, khtmlDragdropEvent);
     case Onerror:
       return getListener(exec, errorEvent);
     case Onfocus:
@@ -890,8 +885,6 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
       return getListener(exec, mouseupEvent);
     case OnWindowMouseWheel:
       return getListener(exec, mousewheelEvent);
-    case Onmove:
-      return getListener(exec, khtmlMoveEvent);
     case Onreset:
       return getListener(exec, resetEvent);
     case Onresize:
@@ -1108,10 +1101,6 @@ void Window::put(ExecState* exec,
         if (isSafeScript(exec))
           setListener(exec, dblclickEvent, value);
         return;
-      case Ondragdrop:
-        if (isSafeScript(exec))
-          setListener(exec, khtmlDragdropEvent, value);
-        return;
       case Onerror:
         if (isSafeScript(exec))
           setListener(exec, errorEvent, value);
@@ -1159,10 +1148,6 @@ void Window::put(ExecState* exec,
       case OnWindowMouseWheel:
         if (isSafeScript(exec))
           setListener(exec, mousewheelEvent, value);
-        return;
-      case Onmove:
-        if (isSafeScript(exec))
-          setListener(exec, khtmlMoveEvent, value);
         return;
       case Onreset:
         if (isSafeScript(exec))

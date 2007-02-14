@@ -1,8 +1,7 @@
 /*
- *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2006 Jon Shier (jshier@iastate.edu)
- *  Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ *  Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -368,7 +367,6 @@ oncopy        DOMEventTargetNode::OnCopy                 DontDelete
 onbeforepaste DOMEventTargetNode::OnBeforePaste          DontDelete
 onpaste       DOMEventTargetNode::OnPaste                DontDelete
 ondrag        DOMEventTargetNode::OnDrag                 DontDelete
-ondragdrop    DOMEventTargetNode::OnDragDrop             DontDelete
 ondragend     DOMEventTargetNode::OnDragEnd              DontDelete
 ondragenter   DOMEventTargetNode::OnDragEnter            DontDelete
 ondragleave   DOMEventTargetNode::OnDragLeave            DontDelete
@@ -388,7 +386,6 @@ onmouseout    DOMEventTargetNode::OnMouseOut             DontDelete
 onmouseover   DOMEventTargetNode::OnMouseOver            DontDelete
 onmouseup     DOMEventTargetNode::OnMouseUp              DontDelete
 onmousewheel  DOMEventTargetNode::OnMouseWheel           DontDelete
-onmove        DOMEventTargetNode::OnMove                 DontDelete
 onreset       DOMEventTargetNode::OnReset                DontDelete
 onresize      DOMEventTargetNode::OnResize               DontDelete
 onscroll      DOMEventTargetNode::OnScroll               DontDelete
@@ -427,8 +424,6 @@ JSValue* DOMEventTargetNode::getValueProperty(ExecState* exec,
       return getListener(contextmenuEvent);
     case OnDblClick:
       return getListener(dblclickEvent);
-    case OnDragDrop:
-      return getListener(khtmlDragdropEvent);
     case OnError:
       return getListener(errorEvent);
     case OnFocus:
@@ -481,8 +476,6 @@ JSValue* DOMEventTargetNode::getValueProperty(ExecState* exec,
       return getListener(dragEvent);
     case OnDragEnd:
       return getListener(dragendEvent);
-    case OnMove:
-      return getListener(khtmlMoveEvent);
     case OnReset:
       return getListener(resetEvent);
     case OnResize:
@@ -534,9 +527,6 @@ void DOMEventTargetNode::putValueProperty(ExecState* exec,
       break;
     case OnDblClick:
       setListener(exec, dblclickEvent, value);
-      break;
-    case OnDragDrop:
-      setListener(exec, khtmlDragdropEvent, value);
       break;
     case OnError:
       setListener(exec, errorEvent, value);
@@ -615,9 +605,6 @@ void DOMEventTargetNode::putValueProperty(ExecState* exec,
       break;
     case OnDragEnd:
       setListener(exec, dragendEvent, value);
-      break;
-    case OnMove:
-      setListener(exec, khtmlMoveEvent, value);
       break;
     case OnReset:
       setListener(exec, resetEvent, value);

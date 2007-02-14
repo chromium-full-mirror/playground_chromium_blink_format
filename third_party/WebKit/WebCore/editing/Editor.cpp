@@ -710,10 +710,10 @@ static void dispatchEditableContentChangedEvents(const EditCommand& command) {
   ExceptionCode ec;
   if (startRoot)
     startRoot->dispatchEvent(
-        new Event(khtmlEditableContentChangedEvent, false, false), ec, true);
+        new Event(webkitEditableContentChangedEvent, false, false), ec, true);
   if (endRoot && endRoot != startRoot)
     endRoot->dispatchEvent(
-        new Event(khtmlEditableContentChangedEvent, false, false), ec, true);
+        new Event(webkitEditableContentChangedEvent, false, false), ec, true);
 }
 
 void Editor::appliedEditing(PassRefPtr<EditCommand> cmd) {
