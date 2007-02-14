@@ -110,6 +110,7 @@ struct VectorTraitsBase<false, T> {
   static const bool canMoveWithMemcpy = false;
   static const bool canCopyWithMemcpy = false;
   static const bool canFillWithMemset = false;
+  static const bool canCompareWithMemcmp = false;
 };
 
 template <typename T>
@@ -120,6 +121,7 @@ struct VectorTraitsBase<true, T> {
   static const bool canMoveWithMemcpy = true;
   static const bool canCopyWithMemcpy = true;
   static const bool canFillWithMemset = sizeof(T) == sizeof(char);
+  static const bool canCompareWithMemcmp = true;
 };
 
 template <typename T>
@@ -132,6 +134,7 @@ struct SimpleClassVectorTraits {
   static const bool canMoveWithMemcpy = true;
   static const bool canCopyWithMemcpy = false;
   static const bool canFillWithMemset = false;
+  static const bool canCompareWithMemcmp = true;
 };
 
 // we know RefPtr is simple enough that initializing to 0 and moving with memcpy
@@ -156,6 +159,8 @@ struct VectorTraits<pair<First, Second>> {
   static const bool canCopyWithMemcpy =
       FirstTraits::canCopyWithMemcpy && SecondTraits::canCopyWithMemcpy;
   static const bool canFillWithMemset = false;
+  static const bool canCompareWithMemcmp =
+      FirstTraits::canCompareWithMemcmp && SecondTraits::canCompareWithMemcmp;
 };
 
 }  // namespace WTF
