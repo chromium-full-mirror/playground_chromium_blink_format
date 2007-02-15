@@ -30,10 +30,12 @@
 #include "Document.h"
 #include "Editor.h"
 #include "ExceptionCode.h"
+#include "FocusController.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "HTMLNames.h"
 #include "NamedAttrMap.h"
+#include "Page.h"
 #include "RenderBlock.h"
 #include "SelectionController.h"
 #include "TextIterator.h"
@@ -844,7 +846,8 @@ void Element::focus() {
   if (!supportsFocus())
     return;
 
-  doc->setFocusedNode(this);
+  if (Page* page = doc->page())
+    page->focusController()->setFocusedNode(this);
 
   if (!isFocusable()) {
     setNeedsFocusAppearanceUpdate(true);

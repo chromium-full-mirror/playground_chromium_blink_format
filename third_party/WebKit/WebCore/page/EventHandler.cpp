@@ -1448,7 +1448,11 @@ bool EventHandler::handleTextInputEvent(const String& text,
                                         bool isBackTab) {
   if (!m_frame)
     return false;
-  EventTargetNode* target = eventTargetNodeForDocument(m_frame->document());
+  EventTarget* target;
+  if (underlyingEvent)
+    target = underlyingEvent->target();
+  else
+    target = eventTargetNodeForDocument(m_frame->document());
   if (!target)
     return false;
   RefPtr<TextEvent> event = new TextEvent(m_frame->domWindow(), text);
