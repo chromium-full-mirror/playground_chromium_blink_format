@@ -466,7 +466,7 @@ static void cacluateBackgroundSize(const BackgroundLayer* bgLayer,
 }
 
 void RenderBox::imageChanged(CachedImage* image) {
-  if (!image || !image->canRender() || !parent())
+  if (!image || !image->canRender() || !parent() || !view())
     return;
 
   if (isInlineFlow() || style()->borderImage().image() == image) {
@@ -478,7 +478,7 @@ void RenderBox::imageChanged(CachedImage* image) {
   IntRect absoluteRect;
   RenderBox* backgroundRenderer;
 
-  if (view() && (isBody() || isRoot())) {
+  if (isBody() || isRoot()) {
     // Our background propagates to the root.
     backgroundRenderer = view();
 
