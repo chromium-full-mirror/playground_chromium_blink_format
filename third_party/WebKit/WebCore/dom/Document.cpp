@@ -2787,9 +2787,9 @@ void Document::addMarker(Node* node, DocumentMarker newMarker) {
     Vector<DocumentMarker>& markers = vectorPair->first;
     Vector<IntRect>& rects = vectorPair->second;
     ASSERT(markers.size() == rects.size());
-    Vector<DocumentMarker>::iterator it;
-    for (it = markers.begin(); it != markers.end();) {
-      DocumentMarker marker = *it;
+    size_t i;
+    for (i = 0; i != markers.size();) {
+      DocumentMarker marker = markers[i];
 
       if (newMarker.endOffset < marker.startOffset + 1) {
         // This is the first marker that is completely after newMarker, and
@@ -2798,7 +2798,7 @@ void Document::addMarker(Node* node, DocumentMarker newMarker) {
         break;
       } else if (newMarker.startOffset > marker.endOffset) {
         // maker is before newMarker, and disjoint from it.  Keep scanning.
-        it++;
+        i++;
       } else if (newMarker == marker) {
         // already have this one, NOP
         return;
@@ -2807,16 +2807,14 @@ void Document::addMarker(Node* node, DocumentMarker newMarker) {
         newMarker.startOffset = min(newMarker.startOffset, marker.startOffset);
         newMarker.endOffset = max(newMarker.endOffset, marker.endOffset);
         // remove old one, we'll add newMarker later
-        unsigned removalIndex = it - markers.begin();
-        markers.remove(removalIndex);
-        rects.remove(removalIndex);
+        markers.remove(i);
+        rects.remove(i);
         // it points to the next marker to consider
       }
     }
-    // at this point it points to the node before which we want to insert
-    unsigned insertionIndex = it - markers.begin();
-    markers.insert(insertionIndex, newMarker);
-    rects.insert(insertionIndex, placeholderRectForMarker());
+    // at this point i points to the node before which we want to insert
+    markers.insert(i, newMarker);
+    rects.insert(i, placeholderRectForMarker());
   }
 
   // repaint the affected node
@@ -2845,10 +2843,9 @@ void Document::copyMarkers(Node* srcNode,
 
   bool docDirty = false;
   unsigned endOffset = startOffset + length - 1;
-  Vector<DocumentMarker>::iterator it;
   Vector<DocumentMarker>& markers = vectorPair->first;
-  for (it = markers.begin(); it != markers.end(); ++it) {
-    DocumentMarker marker = *it;
+  for (size_t i = 0; i != markers.size(); ++i) {
+    DocumentMarker marker = markers[i];
 
     // stop if we are now past the specified range
     if (marker.startOffset > endOffset)
@@ -2892,9 +2889,8 @@ void Document::removeMarkers(Node* node,
   ASSERT(markers.size() == rects.size());
   bool docDirty = false;
   unsigned endOffset = startOffset + length - 1;
-  Vector<DocumentMarker>::iterator it;
-  for (it = markers.begin(); it < markers.end();) {
-    DocumentMarker marker = *it;
+  for (size_t i = 0; i < markers.size();) {
+    DocumentMarker marker = markers[i];
 
     // markers are returned in order, so stop if we are now past the specified
     // range
@@ -2905,7 +2901,7 @@ void Document::removeMarkers(Node* node,
     if (marker.endOffset < startOffset ||
         (marker.type != markerType &&
          markerType != DocumentMarker::AllMarkers)) {
-      it++;
+      i++;
       continue;
     }
 
@@ -2913,29 +2909,25 @@ void Document::removeMarkers(Node* node,
     docDirty = true;
 
     // pitch the old marker and any associated rect
-    unsigned removalIndex = it - markers.begin();
-    markers.remove(removalIndex);
-    rects.remove(removalIndex);
-    // it now points to the next node
+    markers.remove(i);
+    rects.remove(i);
 
     // add either of the resulting slices that are left after removing target
     if (startOffset > marker.startOffset) {
       DocumentMarker newLeft = marker;
       newLeft.endOffset = startOffset;
-      unsigned insertionIndex = it - markers.begin();
-      markers.insert(insertionIndex, newLeft);
-      rects.insert(insertionIndex, placeholderRectForMarker());
-      // it now points to the newly-inserted node, but we want to skip that one
-      it++;
+      markers.insert(i, newLeft);
+      rects.insert(i, placeholderRectForMarker());
+      // i now points to the newly-inserted node, but we want to skip that one
+      i++;
     }
     if (marker.endOffset > endOffset) {
       DocumentMarker newRight = marker;
       newRight.startOffset = endOffset;
-      unsigned insertionIndex = it - markers.begin();
-      markers.insert(insertionIndex, newRight);
-      rects.insert(insertionIndex, placeholderRectForMarker());
-      // it now points to the newly-inserted node, but we want to skip that one
-      it++;
+      markers.insert(i, newRight);
+      rects.insert(i, placeholderRectForMarker());
+      // i now points to the newly-inserted node, but we want to skip that one
+      i++;
     }
   }
 
@@ -3047,20 +3039,19 @@ void Document::removeMarkers(DocumentMarker::MarkerType markerType) {
     Vector<DocumentMarker>& markers = vectorPair->first;
     Vector<IntRect>& rects = vectorPair->second;
     ASSERT(markers.size() == rects.size());
-    Vector<DocumentMarker>::iterator markerIterator;
-    for (markerIterator = markers.begin(); markerIterator != markers.end();) {
-      DocumentMarker marker = *markerIterator;
+    for (size_t i = 0; i != markers.size();) {
+      DocumentMarker marker = markers[i];
 
       // skip nodes that are not of the specified type
       if (marker.type != markerType &&
           markerType != DocumentMarker::AllMarkers) {
-        ++markerIterator;
+        ++i;
         continue;
       }
 
       // pitch the old marker
-      markers.remove(markerIterator - markers.begin());
-      rects.remove(markerIterator - markers.begin());
+      markers.remove(i);
+      rects.remove(i);
       nodeNeedsRepaint = true;
       // markerIterator now points to the next node
     }
@@ -3092,11 +3083,9 @@ void Document::repaintMarkers(DocumentMarker::MarkerType markerType) {
     // inner loop: process each marker in the current node
     MarkerMapVectorPair* vectorPair = i->second;
     Vector<DocumentMarker>& markers = vectorPair->first;
-    Vector<DocumentMarker>::iterator markerIterator;
     bool nodeNeedsRepaint = false;
-    for (markerIterator = markers.begin(); markerIterator != markers.end();
-         ++markerIterator) {
-      DocumentMarker marker = *markerIterator;
+    for (size_t i = 0; i != markers.size(); ++i) {
+      DocumentMarker marker = markers[i];
 
       // skip nodes that are not of the specified type
       if (marker.type == markerType ||
@@ -3168,9 +3157,8 @@ void Document::shiftMarkers(Node* node,
   ASSERT(markers.size() == rects.size());
 
   bool docDirty = false;
-  Vector<DocumentMarker>::iterator it;
-  for (it = markers.begin(); it != markers.end(); ++it) {
-    DocumentMarker& marker = *it;
+  for (size_t i = 0; i != markers.size(); ++i) {
+    DocumentMarker& marker = markers[i];
     if (marker.startOffset >= startOffset &&
         (markerType == DocumentMarker::AllMarkers ||
          marker.type == markerType)) {
@@ -3180,7 +3168,7 @@ void Document::shiftMarkers(Node* node,
       docDirty = true;
 
       // Marker moved, so previously-computed rendered rectangle is now invalid
-      rects[it - markers.begin()] = placeholderRectForMarker();
+      rects[i] = placeholderRectForMarker();
     }
   }
 
