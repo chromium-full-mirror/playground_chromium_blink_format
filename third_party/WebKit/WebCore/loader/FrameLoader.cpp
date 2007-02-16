@@ -3749,13 +3749,14 @@ PassRefPtr<HistoryItem> FrameLoader::createHistoryItemTree(Frame* targetFrame,
 }
 
 void FrameLoader::saveScrollPositionAndViewStateToItem(HistoryItem* item) {
-  if (item) {
-    item->setScrollPoint(
-        IntPoint(m_frame->view()->contentsX(), m_frame->view()->contentsY()));
-    // FIXME: It would be great to work out a way to put this code in WebCore
-    // instead of calling through to the client.
-    m_client->saveViewStateToItem(item);
-  }
+  if (!item)
+    return;
+
+  item->setScrollPoint(
+      IntPoint(m_frame->view()->contentsX(), m_frame->view()->contentsY()));
+  // FIXME: It would be great to work out a way to put this code in WebCore
+  // instead of calling through to the client.
+  m_client->saveViewStateToItem(item);
 }
 
 /*
