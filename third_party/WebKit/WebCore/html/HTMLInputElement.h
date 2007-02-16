@@ -66,7 +66,7 @@ class HTMLInputElement : public HTMLGenericFormElement {
   virtual void focus();
   virtual void dispatchFocusEvent();
   virtual void dispatchBlurEvent();
-  virtual void updateFocusAppearance();
+  virtual void updateFocusAppearance(bool restorePreviousSelection = false);
   virtual void aboutToUnload();
 
   virtual const AtomicString& name() const;
