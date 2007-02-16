@@ -157,7 +157,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual String generatedMIMETypeForURLScheme(const String& URLScheme) const;
 
   virtual void frameLoadCompleted();
-  virtual void restoreScrollPositionAndViewState();
+  virtual void restoreViewState();
   virtual void provisionalLoadStarted();
   virtual bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
   virtual void addHistoryItemForFragmentScroll();
@@ -172,7 +172,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void updateGlobalHistoryForStandardLoad(const WebCore::KURL&);
   virtual void updateGlobalHistoryForReload(const WebCore::KURL&);
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
-  virtual void saveScrollPositionAndViewStateToItem(WebCore::HistoryItem*);
+  virtual void saveViewStateToItem(WebCore::HistoryItem*);
   virtual void saveDocumentViewToPageCache(WebCore::PageCache*);
   virtual bool canCachePage() const;
 

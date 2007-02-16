@@ -217,8 +217,8 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::String& URLScheme) const;
 
   virtual void frameLoadCompleted();
-  virtual void saveScrollPositionAndViewStateToItem(WebCore::HistoryItem*);
-  virtual void restoreScrollPositionAndViewState();
+  virtual void saveViewStateToItem(WebCore::HistoryItem*);
+  virtual void restoreViewState();
   virtual void provisionalLoadStarted();
   virtual void didFinishLoad();
   virtual void prepareForDataSourceReplacement();
