@@ -42,15 +42,15 @@ struct RemovePointer<T*> {
 // type or the pointed-to type,
 // so both RetainPtr<NSDictionary> and RetainPtr<CFDictionaryRef> will work.
 
-enum AdoptTag { Adopt };
-
-template <typename T>
-inline void adoptCFReference(T*) {}
+enum AdoptCFTag { AdoptCF };
+enum AdoptNSTag { AdoptNS };
 
 #ifdef __OBJC__
-inline void adoptCFReference(id ptr) {
-  CFRetain(ptr);
-  [ptr release];
+inline void adoptNSReference(id ptr) {
+  if (ptr) {
+    CFRetain(ptr);
+    [ptr release];
+  }
 }
 #endif
 
@@ -67,7 +67,8 @@ class RetainPtr {
       CFRetain(ptr);
   }
 
-  RetainPtr(AdoptTag, PtrType ptr) : m_ptr(ptr) { adoptCFReference(ptr); }
+  RetainPtr(AdoptCFTag, PtrType ptr) : m_ptr(ptr) {}
+  RetainPtr(AdoptNSTag, PtrType ptr) : m_ptr(ptr) { adoptNSReference(ptr); }
 
   RetainPtr(const RetainPtr& o) : m_ptr(o.m_ptr) {
     if (PtrType ptr = m_ptr)
@@ -110,7 +111,8 @@ class RetainPtr {
   template <typename U>
   RetainPtr& operator=(U*);
 
-  void adopt(PtrType);
+  void adoptCF(PtrType);
+  void adoptNS(PtrType);
 
   void swap(RetainPtr&);
 
@@ -155,9 +157,17 @@ inline RetainPtr<T>& RetainPtr<T>::operator=(PtrType optr) {
 }
 
 template <typename T>
-inline void RetainPtr<T>::adopt(PtrType optr) {
-  if (optr)
-    adoptCFReference(optr);
+inline void RetainPtr<T>::adoptCF(PtrType optr) {
+  PtrType ptr = m_ptr;
+  m_ptr = optr;
+  if (ptr)
+    CFRelease(ptr);
+}
+
+template <typename T>
+inline void RetainPtr<T>::adoptNS(PtrType optr) {
+  adoptNSReference(optr);
+
   PtrType ptr = m_ptr;
   m_ptr = optr;
   if (ptr)
