@@ -2079,7 +2079,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
   // Check to see if the hovered node has changed.  If not, then we don't need
   // to
   // do anything.
-  Node* oldHoverNode = doc->hoverNode();
+  RefPtr<Node> oldHoverNode = doc->hoverNode();
   Node* newHoverNode = result.innerNode();
 
   // Update our current hover node.
