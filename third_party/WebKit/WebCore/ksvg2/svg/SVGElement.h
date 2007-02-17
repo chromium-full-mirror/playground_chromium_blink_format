@@ -248,6 +248,9 @@ class SVGElement : public StyledElement {
   virtual bool isShadowNode() const { return m_shadowParent; }
   virtual Node* shadowParentNode() { return m_shadowParent; }
   void setShadowParentNode(Node* node) { m_shadowParent = node; }
+  virtual Node* eventParentNode() {
+    return isShadowNode() ? shadowParentNode() : parentNode();
+  }
 
   // For SVGTests
   virtual bool isValid() const { return true; }

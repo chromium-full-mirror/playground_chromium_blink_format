@@ -157,6 +157,10 @@ class Node : public TreeShared<Node> {
   virtual bool isShadowNode() const { return false; }
   virtual Node* shadowParentNode() { return 0; }
   Node* shadowAncestorNode();
+
+  // The node's parent for the purpose of event capture and bubbling.
+  virtual Node* eventParentNode() { return parentNode(); }
+
   bool isBlockFlow() const;
   bool isBlockFlowOrBlockTable() const;
 
