@@ -123,6 +123,9 @@ class ScrollView : public Widget {
 
   IntRect windowResizerRect();
   bool resizerOverlapsContent() const;
+  void adjustOverlappingScrollbarCount(int overlapDelta);
+
+  virtual void setParent(ScrollView*);
 
   void addToDirtyRegion(const IntRect&);
   void scrollBackingStore(int dx,
