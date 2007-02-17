@@ -92,7 +92,7 @@ bool EventHandler::passMouseDownEventToWidget(Widget* widget) {
 }
 
 bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
-  notImplemented();
+  // notImplemented();  // commented out because it's very chatty
   return false;
 }
 
