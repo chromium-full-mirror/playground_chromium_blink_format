@@ -246,6 +246,14 @@ void FrameLoaderClientGdk::frameLoadCompleted() {
   notImplemented();
 }
 
+void FrameLoaderClientGdk::saveViewStateToItem(HistoryItem*) {
+  notImplemented();
+}
+
+void FrameLoaderClientGdk::restoreViewState() {
+  notImplemented();
+}
+
 bool FrameLoaderClientGdk::privateBrowsingEnabled() const {
   notImplemented();
   return false;
@@ -377,9 +385,6 @@ String FrameLoaderClientGdk::generatedMIMETypeForURLScheme(
   notImplemented();
   return String();
 }
-void FrameLoaderClientGdk::restoreScrollPositionAndViewState() {
-  notImplemented();
-}
 void FrameLoaderClientGdk::provisionalLoadStarted() {
   notImplemented();
 }
@@ -462,9 +467,6 @@ bool FrameLoaderClientGdk::willUseArchive(ResourceLoader*,
                                           const KURL& originalURL) const {
   notImplemented();
   return false;
-}
-void FrameLoaderClientGdk::saveScrollPositionAndViewStateToItem(HistoryItem*) {
-  notImplemented();
 }
 void FrameLoaderClientGdk::saveDocumentViewToPageCache(PageCache*) {
   notImplemented();

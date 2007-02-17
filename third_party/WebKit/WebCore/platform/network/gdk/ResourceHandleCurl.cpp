@@ -40,7 +40,12 @@
 
 namespace WebCore {
 
-ResourceHandleInternal::~ResourceHandleInternal() {}
+ResourceHandleInternal::~ResourceHandleInternal() {
+  free(m_url);
+
+  if (m_customHeaders)
+    curl_slist_free_all(m_customHeaders);
+}
 
 ResourceHandle::~ResourceHandle() {
   cancel();

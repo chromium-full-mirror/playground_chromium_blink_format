@@ -41,7 +41,7 @@
 #endif
 
 #if USE(CURL)
-typedef void CURL;
+#include <curl/curl.h>
 #endif
 
 #if PLATFORM(QT)
@@ -96,7 +96,9 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if USE(CURL)
         ,
-        m_handle(0)
+        m_handle(0),
+        m_url(0),
+        m_customHeaders(0)
 #endif
 #if PLATFORM(MAC)
         ,
@@ -143,6 +145,8 @@ class ResourceHandleInternal : Noncopyable {
 #endif
 #if USE(CURL)
   CURL* m_handle;
+  char* m_url;
+  struct curl_slist* m_customHeaders;
 #endif
 #if PLATFORM(MAC)
   NSURLAuthenticationChallenge* m_currentMacChallenge;
