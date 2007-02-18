@@ -227,6 +227,11 @@ const Cursor& aliasCursor() {
 const Cursor& noneCursor() {
   return Cursors::self()->BlankCursor;
 }
+
+const Cursor& notAllowedCursor() {
+  // FIXME: Build fix -- what is correct here?
+  return Cursors::self()->BlankCursor();
+}
 }
 
 // vim: ts=4 sw=4 et
