@@ -39,4 +39,19 @@ void DragClientQt::dragControllerDestroyed() {}
 DragSourceAction DragClientQt::dragSourceActionMaskForPoint(const IntPoint&) {
   return DragSourceActionAny;
 }
+
+void DragClientQt::willPerformDragSourceAction(DragSourceAction,
+                                               const IntPoint&,
+                                               Clipboard*) {}
+
+void DragClientQt::startDrag(DragImageRef dragImage,
+                             const IntPoint&,
+                             const IntPoint&,
+                             Clipboard*,
+                             Frame*,
+                             bool) {}
+
+DragImageRef DragClientQt::createDragImageForLink(KURL&,
+                                                  const String&,
+                                                  Frame*) {}
 }
