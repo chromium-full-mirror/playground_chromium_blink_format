@@ -98,9 +98,6 @@ class RenderTable : public RenderBlock {
   void recalcHorizontalBorders();
 
   // overrides
-  virtual int overflowHeight(bool includeInterior = true) const {
-    return height();
-  }
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);

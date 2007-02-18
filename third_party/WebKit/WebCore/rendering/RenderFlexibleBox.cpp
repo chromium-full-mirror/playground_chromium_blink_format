@@ -341,7 +341,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
 
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
+    repaintAfterLayoutIfNeeded(oldBounds);
 
   setNeedsLayout(false);
 }
@@ -511,6 +511,11 @@ void RenderFlexibleBox::layoutHorizontalBox(bool relayoutChildren) {
       }
 
       placeChild(child, xPos, childY);
+
+      if (child->isRenderBlock())
+        static_cast<RenderBlock*>(child)->addVisualOverflow(
+            static_cast<RenderBlock*>(child)->floatRect());
+
       m_overflowHeight =
           max(m_overflowHeight, childY + child->overflowHeight(false));
       m_overflowTop =
@@ -928,6 +933,10 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
       // Place the child.
       placeChild(child, childX, m_height);
       m_height += child->height() + child->marginBottom();
+
+      if (child->isRenderBlock())
+        static_cast<RenderBlock*>(child)->addVisualOverflow(
+            static_cast<RenderBlock*>(child)->floatRect());
 
       // See if this child has made our overflow need to grow.
       m_overflowWidth =

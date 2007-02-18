@@ -90,6 +90,13 @@ class RenderTableSection : public RenderContainer {
   virtual int overflowLeft(bool includeInterior = true) const {
     return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowLeft;
   }
+  virtual int overflowHeight(bool includeInterior = true) const {
+    return (!includeInterior && hasOverflowClip()) ? m_height
+                                                   : m_overflowHeight;
+  }
+  virtual int overflowTop(bool includeInterior = true) const {
+    return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowTop;
+  }
 
   virtual int lowestPosition(bool includeOverflowInterior,
                              bool includeSelf) const;
@@ -161,6 +168,8 @@ class RenderTableSection : public RenderContainer {
   int m_outerBorderBottom;
   int m_overflowLeft;
   int m_overflowWidth;
+  int m_overflowTop;
+  int m_overflowHeight;
   bool m_hasOverflowingCell;
 };
 
