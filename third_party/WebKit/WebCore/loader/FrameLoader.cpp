@@ -809,7 +809,7 @@ void FrameLoader::receivedFirstData() {
   double delay;
   String URL;
 
-  if (!parseHTTPRefresh(refresh, delay, URL))
+  if (!parseHTTPRefresh(refresh, false, delay, URL))
     return;
 
   if (URL.isEmpty())
