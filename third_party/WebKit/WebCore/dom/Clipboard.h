@@ -30,13 +30,20 @@
 #include "AtomicString.h"
 #include "ClipboardAccessPolicy.h"
 #include "DragActions.h"
+#include "DragImage.h"
 #include "Node.h"
 #include "Shared.h"
 
 namespace WebCore {
 
 class CachedImage;
+class Element;
+class Frame;
+class Image;
 class IntPoint;
+class KURL;
+class Range;
+class String;
 
 // State available during IE's events for drag and drop and copy/paste
 class Clipboard : public Shared<Clipboard> {
@@ -67,6 +74,17 @@ class Clipboard : public Shared<Clipboard> {
   virtual Node* dragImageElement() = 0;
   virtual void setDragImageElement(Node*, const IntPoint&) = 0;
 
+  // Provides the DOM specified
+  virtual DragImageRef createDragImage(IntPoint& dragLoc) const = 0;
+  virtual void declareAndWriteDragImage(Element*,
+                                        const KURL&,
+                                        const String& title,
+                                        Frame*) = 0;
+  virtual void writeURL(const KURL&, const String&, Frame*) = 0;
+  virtual void writeRange(Range*, Frame*) = 0;
+
+  virtual bool hasData() = 0;
+
   void setAccessPolicy(ClipboardAccessPolicy);
 
   bool sourceOperation(DragOperation&) const;
@@ -75,6 +93,7 @@ class Clipboard : public Shared<Clipboard> {
   void setDestinationOperation(DragOperation);
 
   void setDragHasStarted() { m_dragStarted = true; }
+  static bool canSaveAsWebArchive(Frame*);
 
  protected:
   ClipboardAccessPolicy policy() const { return m_policy; }

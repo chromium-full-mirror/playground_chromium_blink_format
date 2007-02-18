@@ -257,5 +257,9 @@ PassRefPtr<KJS::Bindings::RootObject> FrameQt::createRootObject(
   m_rootObjects.append(rootObject);
   return rootObject.release();
 }
+
+DragImageRef Frame::dragImageForSelection() {
+  return 0;
+}
 }
 // vim: ts=4 sw=4 et

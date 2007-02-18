@@ -30,6 +30,7 @@
 
 #include "Color.h"
 #include "EditAction.h"
+#include "DragImage.h"
 #include "RenderLayer.h"
 #include "TextGranularity.h"
 #include <wtf/unicode/Unicode.h>
@@ -126,6 +127,8 @@ class Frame : public Shared<Frame> {
   friend class FramePrivate;
   friend class FrameQt;
   friend class FrameWin;
+
+  DragImageRef dragImageForSelection();
 
  private:
   FramePrivate* d;
