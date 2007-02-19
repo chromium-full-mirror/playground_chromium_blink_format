@@ -112,8 +112,19 @@ class SVGEmptyChromeClient : public ChromeClient {
                                    String& result) {
     return false;
   }
-  virtual void setStatusbarText(const String&) {}
   virtual bool shouldInterruptJavaScript() { return false; }
+
+  virtual void setStatusbarText(const String&) {}
+
+  virtual bool tabsToLinks() const { return false; }
+
+  virtual IntRect windowResizerRect() const { return IntRect(); }
+  virtual void addToDirtyRegion(const IntRect&) {}
+  virtual void scrollBackingStore(int dx,
+                                  int dy,
+                                  const IntRect& scrollViewRect,
+                                  const IntRect& clipRect) {}
+  virtual void updateBackingStore() {}
 };
 
 class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
@@ -385,8 +396,13 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual bool shouldInsertText(String, Range*, EditorInsertAction) {
     return false;
   }
-  //  virtual bool shouldChangeSelectedRange(Range* fromRange, Range* toRange,
-  //  NSSelectionAffinity, bool stillSelecting) { return false; }
+  virtual bool shouldChangeSelectedRange(Range* fromRange,
+                                         Range* toRange,
+                                         EAffinity,
+                                         bool stillSelecting) {
+    return false;
+  }
+
   virtual bool shouldApplyStyle(CSSStyleDeclaration*, Range*) { return false; }
   //  virtual bool shouldChangeTypingStyle(CSSStyleDeclaration* fromStyle,
   //  CSSStyleDeclaration* toStyle) { return false; }
@@ -414,6 +430,15 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void redo() {}
 
   virtual void handleKeyPress(KeyboardEvent*) {}
+
+  virtual void textFieldDidBeginEditing(Element*) {}
+  virtual void textFieldDidEndEditing(Element*) {}
+  virtual void textDidChangeInTextField(Element*) {}
+  virtual bool doTextFieldCommandFromEvent(Element*, KeyboardEvent*) {
+    return false;
+  }
+  virtual void textWillBeDeletedInTextField(Element*) {}
+  virtual void textDidChangeInTextArea(Element*) {}
 
 #if PLATFORM(MAC)
   virtual void markedTextAbandoned(Frame*) {}

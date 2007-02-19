@@ -27,6 +27,7 @@
 #include "config.h"
 #include "kjs_binding.h"
 
+#include "Chrome.h"
 #include "Event.h"
 #include "EventNames.h"
 #include "Frame.h"

@@ -95,8 +95,15 @@ class ChromeClientQt : public ChromeClient {
                                    const String& message,
                                    const String& defaultValue,
                                    String& result);
-  virtual void setStatusbarText(const String&);
   virtual bool shouldInterruptJavaScript();
+
+  virtual void setStatusbarText(const String&);
+
+  virtual bool tabsToLinks() const;
+  virtual IntRect windowResizerRect() const;
+  virtual void addToDirtyRegion(const IntRect&);
+  virtual void scrollBackingStore(int, int, const IntRect&, const IntRect&);
+  virtual void updateBackingStore();
 
   QWebPage* m_webPage;
 };

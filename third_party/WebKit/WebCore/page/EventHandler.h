@@ -274,6 +274,8 @@ class EventHandler : Noncopyable {
   }
 #endif
 
+  bool invertSenseOfTabsToLinks(KeyboardEvent*) const;
+
   Frame* m_frame;
 
   bool m_mousePressed;

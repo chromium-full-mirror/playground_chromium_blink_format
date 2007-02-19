@@ -209,4 +209,21 @@ void ChromeClientQt::setStatusbarText(const String&) {
 bool ChromeClientQt::shouldInterruptJavaScript() {
   notImplemented();
 }
+
+bool ChromeClientQt::tabsToLinks() const {
+  return false;
+}
+
+IntRect ChromeClientQt::windowResizerRect() const {
+  return IntRect();
+}
+
+void ChromeClientQt::addToDirtyRegion(const IntRect&) {}
+
+void ChromeClientQt::scrollBackingStore(int,
+                                        int,
+                                        const IntRect&,
+                                        const IntRect&) {}
+
+void ChromeClientQt::updateBackingStore() {}
 }

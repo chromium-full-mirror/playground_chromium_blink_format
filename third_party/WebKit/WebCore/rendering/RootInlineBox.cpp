@@ -24,13 +24,10 @@
 
 #include "Document.h"
 #include "EllipsisBox.h"
+#include "Frame.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"
 #include "RenderBlock.h"
-
-#if PLATFORM(MAC)
-#include "FrameMac.h"
-#endif
 
 using namespace std;
 
@@ -121,9 +118,9 @@ void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& paintInfo,
 void RootInlineBox::addHighlightOverflow() {
   // Highlight acts as a selection inflation.
   FloatRect rootRect(0, selectionTop(), width(), selectionHeight());
-  IntRect inflatedRect = enclosingIntRect(
-      Mac(object()->document()->frame())
-          ->customHighlightLineRect(object()->style()->highlight(), rootRect));
+  IntRect inflatedRect =
+      enclosingIntRect(object()->document()->frame()->customHighlightLineRect(
+          object()->style()->highlight(), rootRect));
   m_leftOverflow = min(m_leftOverflow, inflatedRect.x());
   m_rightOverflow = max(m_rightOverflow, inflatedRect.right());
   m_topOverflow = min(m_topOverflow, inflatedRect.y());
@@ -143,11 +140,11 @@ void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
   FloatRect rootRect(tx + xPos(), ty + selectionTop(), width(),
                      selectionHeight());
   FloatRect inflatedRect =
-      Mac(object()->document()->frame())
-          ->customHighlightLineRect(highlightType, rootRect);
+      object()->document()->frame()->customHighlightLineRect(highlightType,
+                                                             rootRect);
   if (inflatedRect.intersects(paintInfo.rect))
-    Mac(object()->document()->frame())
-        ->paintCustomHighlight(highlightType, rootRect, rootRect, false, true);
+    object()->document()->frame()->paintCustomHighlight(highlightType, rootRect,
+                                                        rootRect, false, true);
 }
 #endif
 

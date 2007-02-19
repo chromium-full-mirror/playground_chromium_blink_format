@@ -62,7 +62,7 @@ FrameLoaderClientQt::FrameLoaderClientQt()
 
 FrameLoaderClientQt::~FrameLoaderClientQt() {}
 
-void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, FrameQt* frame) {
+void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, Frame* frame) {
   m_webFrame = webFrame;
   m_frame = frame;
   if (!m_webFrame || !m_webFrame->page()) {

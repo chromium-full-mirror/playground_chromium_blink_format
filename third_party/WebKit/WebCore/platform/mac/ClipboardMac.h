@@ -46,14 +46,14 @@ typedef unsigned NSDragOperation;
 
 namespace WebCore {
 
-class FrameMac;
+class Frame;
 
 class ClipboardMac : public Clipboard, public CachedResourceClient {
  public:
   ClipboardMac(bool forDragging,
                NSPasteboard*,
                ClipboardAccessPolicy,
-               FrameMac* = 0);
+               Frame* = 0);
   virtual ~ClipboardMac();
 
   bool isForDragging() const;
@@ -96,7 +96,7 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   CachedImage* m_dragImage;
   RefPtr<Node> m_dragImageElement;
   int m_changeCount;
-  FrameMac* m_frame;  // used on the source side to generate dragging images
+  Frame* m_frame;  // used on the source side to generate dragging images
 };
 }
 

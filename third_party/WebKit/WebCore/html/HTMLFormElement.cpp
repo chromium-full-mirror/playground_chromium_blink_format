@@ -28,6 +28,7 @@
 #include "HTMLFormElement.h"
 
 #include "CString.h"
+#include "csshelper.h"
 #include "Event.h"
 #include "EventNames.h"
 #include "FormData.h"
@@ -39,7 +40,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "csshelper.h"
+#include "MimeTypeRegistry.h"
 #include "RenderTextControl.h"
 
 namespace WebCore {
@@ -252,8 +253,7 @@ PassRefPtr<FormData> HTMLFormElement::formData() const {
 
             if (!static_cast<HTMLInputElement*>(current)->value().isEmpty()) {
               DeprecatedString mimeType =
-                  frame ? frame->mimeTypeForFileName(path).deprecatedString()
-                        : DeprecatedString();
+                  MimeTypeRegistry::getMIMETypeForPath(path).deprecatedString();
               if (!mimeType.isEmpty()) {
                 hstr += "\r\nContent-Type: ";
                 hstr += mimeType.ascii();

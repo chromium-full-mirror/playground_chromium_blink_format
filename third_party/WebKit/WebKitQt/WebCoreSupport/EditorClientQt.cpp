@@ -88,6 +88,14 @@ bool EditorClientQt::shouldInsertText(String, Range*, EditorInsertAction) {
   return false;
 }
 
+bool EditorClientQt::shouldChangeSelectedRange(Range* fromRange,
+                                               Range* toRange,
+                                               EAffinity,
+                                               bool stillSelecting) {
+  notImplemented();
+  return false;
+}
+
 bool EditorClientQt::shouldApplyStyle(WebCore::CSSStyleDeclaration*,
                                       WebCore::Range*) {
   notImplemented();
@@ -120,10 +128,8 @@ bool EditorClientQt::selectWordBeforeMenuEvent() {
 }
 
 bool EditorClientQt::isEditable() {
-  Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
-  if (!frame)
-    return false;
-  return frame->selectionController()->isContentEditable();
+  // FIXME: should be controllable by a setting in QWebPage
+  return true;
 }
 
 void EditorClientQt::registerCommandForUndo(
@@ -218,6 +224,20 @@ void EditorClientQt::handleKeyPress(KeyboardEvent* event) {
 }
 
 EditorClientQt::EditorClientQt(QWebPage* page) : m_page(page) {}
+
+void EditorClientQt::textFieldDidBeginEditing(Element*) {}
+
+void EditorClientQt::textFieldDidEndEditing(Element*) {}
+
+void EditorClientQt::textDidChangeInTextField(Element*) {}
+
+bool EditorClientQt::doTextFieldCommandFromEvent(Element*, KeyboardEvent*) {
+  return false;
+}
+
+void EditorClientQt::textWillBeDeletedInTextField(Element*) {}
+
+void EditorClientQt::textDidChangeInTextArea(Element*) {}
 }
 
 // vim: ts=4 sw=4 et

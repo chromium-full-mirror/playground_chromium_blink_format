@@ -33,7 +33,7 @@
 #import <WebCore/TextGranularity.h>
 
 namespace WebCore {
-class FrameMac;
+class Frame;
 class HTMLFrameOwnerElement;
 class Page;
 class String;
@@ -96,12 +96,12 @@ typedef enum ObjectElementType {
 
 @interface WebCoreFrameBridge : NSObject {
  @public
-  WebCore::FrameMac* m_frame;
+  WebCore::Frame* m_frame;
   BOOL _shouldCreateRenderers;
   BOOL _closed;
 }
 
-- (WebCore::FrameMac*)
+- (WebCore::Frame*)
     _frame;  // underscore to prevent conflict with -[NSView frame]
 
 + (WebCoreFrameBridge*)bridgeForDOMDocument:(DOMDocument*)document;
@@ -362,24 +362,12 @@ rangeByAlteringCurrentSelection:
 - (ObjectElementType)determineObjectFromMIMEType:(NSString*)MIMEType
                                              URL:(NSURL*)URL;
 
-- (NSString*)MIMETypeForPath:(NSString*)path;
-
 - (BOOL)startDraggingImage:(NSImage*)dragImage
                         at:(NSPoint)dragLoc
                  operation:(NSDragOperation)op
                      event:(NSEvent*)event
              sourceIsDHTML:(BOOL)flag
             DHTMLWroteData:(BOOL)dhtmlWroteData;
-
-- (void)textFieldDidBeginEditing:(DOMHTMLInputElement*)element;
-- (void)textFieldDidEndEditing:(DOMHTMLInputElement*)element;
-- (void)textDidChangeInTextField:(DOMHTMLInputElement*)element;
-- (void)textDidChangeInTextArea:(DOMHTMLTextAreaElement*)element;
-
-- (BOOL)textField:(DOMHTMLInputElement*)element
-    doCommandBySelector:(SEL)commandSelector;
-- (BOOL)textField:(DOMHTMLInputElement*)element
-    shouldHandleEvent:(NSEvent*)event;
 
 - (void)setHasBorder:(BOOL)hasBorder;
 
@@ -390,19 +378,10 @@ rangeByAlteringCurrentSelection:
 // Deprecated, use getAppletInView: instead.
 - (jobject)pollForAppletInView:(NSView*)view;
 
-- (void)issueCutCommand;
-- (void)issueCopyCommand;
 - (void)issuePasteCommand;
-- (void)issuePasteAndMatchStyleCommand;
 - (void)issueTransposeCommand;
 - (void)respondToChangedSelection;
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
-- (BOOL)isEditable;
-- (BOOL)shouldChangeSelectedDOMRange:(DOMRange*)currentRange
-                          toDOMRange:(DOMRange*)proposedRange
-                            affinity:(WebCore::EAffinity)selectionAffinity
-                      stillSelecting:(BOOL)flag;
-- (BOOL)shouldDeleteSelectedDOMRange:(DOMRange*)currentRange;
 
 - (NSString*)overrideMediaType;
 
