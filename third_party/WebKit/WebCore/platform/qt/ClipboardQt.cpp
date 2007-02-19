@@ -24,7 +24,11 @@
  */
 
 #include "config.h"
+#include "HashTable.h"
 #include "ClipboardQt.h"
+#include "IntPoint.h"
+#include "PlatformString.h"
+#include "StringHash.h"
 
 namespace WebCore {
 
@@ -43,7 +47,8 @@ bool ClipboardQt::setData(const String& type, const String& data) {}
 
 // extensions beyond IE's API
 HashSet<String> ClipboardQt::types() const {
-  return HashSet<String>();
+  HashSet<String> result;
+  return result;
 }
 
 IntPoint ClipboardQt::dragLocation() const {
