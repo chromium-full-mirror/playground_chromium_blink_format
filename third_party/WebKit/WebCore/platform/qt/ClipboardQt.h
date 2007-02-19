@@ -55,7 +55,7 @@ class ClipboardQt : public Clipboard {
   Node* dragImageElement();
   void setDragImageElement(Node*, const IntPoint&);
 
-  virtual DragImageRef createDragImage(IntPoint& dragLoc);
+  virtual DragImageRef createDragImage(IntPoint& dragLoc) const;
   virtual void declareAndWriteDragImage(Element*,
                                         const KURL&,
                                         const String& title,
