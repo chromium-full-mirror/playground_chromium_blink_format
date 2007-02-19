@@ -693,7 +693,7 @@ void DragController::doImageDrag(Element* element,
 
     IntSize newSize;
     if (dragImage) {
-      dragImage = fitDragImageToMaxSize(dragImage, MaxDragImageSize);
+      dragImage = fitDragImageToMaxSize(dragImage, maxDragImageSize());
       dragImage = dissolveDragImageToFraction(dragImage, DragImageAlpha);
       newSize = dragImageSize(dragImage);
     }

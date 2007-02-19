@@ -95,9 +95,9 @@ class DragController {
                  const PlatformMouseEvent& dragEvent,
                  const IntPoint& dragOrigin,
                  bool isDHTMLDrag);
+  static const IntSize& maxDragImageSize();
 
   static const int LinkDragBorderInset;
-  static const IntSize MaxDragImageSize;
   static const int MaxOriginalImageArea;
   static const int DragIconRightInset;
   static const int DragIconBottomInset;

@@ -36,7 +36,6 @@ namespace WebCore {
 // FIXME: These values are straight out of DragControllerMac, so probably have
 // little correlation with Qt standards...
 const int DragController::LinkDragBorderInset = 2;
-const IntSize DragController::MaxDragImageSize(400, 400);
 const int DragController::MaxOriginalImageArea = 1500 * 1500;
 const int DragController::DragIconRightInset = 7;
 const int DragController::DragIconBottomInset = 3;
@@ -53,5 +52,11 @@ DragOperation DragController::dragOperation(DragData* dragData) {
     return DragOperationCopy;
 
   return DragOperationNone;
+}
+
+const IntSize& DragController::maxDragImageSize() {
+  static const IntSize maxDragImageSize(400, 400);
+
+  return maxDragImageSize;
 }
 }
