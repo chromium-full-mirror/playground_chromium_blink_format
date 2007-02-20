@@ -88,6 +88,14 @@ bool EditorClientGdk::shouldInsertText(String, Range*, EditorInsertAction) {
   return true;
 }
 
+bool EditorClientGdk::shouldChangeSelectedRange(Range* fromRange,
+                                                Range* toRange,
+                                                EAffinity,
+                                                bool stillSelecting) {
+  notImplemented();
+  return true;
+}
+
 bool EditorClientGdk::shouldApplyStyle(WebCore::CSSStyleDeclaration*,
                                        WebCore::Range*) {
   notImplemented();
@@ -120,10 +128,8 @@ bool EditorClientGdk::selectWordBeforeMenuEvent() {
 }
 
 bool EditorClientGdk::isEditable() {
-  Frame* frame = m_page->focusController()->focusedOrMainFrame();
-  if (!frame)
-    return false;
-  return frame->selectionController()->isContentEditable();
+  notImplemented();
+  return true;
 }
 
 void EditorClientGdk::registerCommandForUndo(
@@ -222,6 +228,31 @@ EditorClientGdk::EditorClientGdk() {}
 
 void EditorClientGdk::setPage(Page* page) {
   m_page = page;
+}
+
+void EditorClientGdk::textFieldDidBeginEditing(Element*) {
+  notImplemented();
+}
+
+void EditorClientGdk::textFieldDidEndEditing(Element*) {
+  notImplemented();
+}
+
+void EditorClientGdk::textDidChangeInTextField(Element*) {
+  notImplemented();
+}
+
+bool EditorClientGdk::doTextFieldCommandFromEvent(Element*, KeyboardEvent*) {
+  notImplemented();
+  return false;
+}
+
+void EditorClientGdk::textWillBeDeletedInTextField(Element*) {
+  notImplemented();
+}
+
+void EditorClientGdk::textDidChangeInTextArea(Element*) {
+  notImplemented();
 }
 }
 
