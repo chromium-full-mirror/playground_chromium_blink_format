@@ -626,7 +626,11 @@ bool DragController::startDrag(Frame* src,
   } else if (!linkURL.isEmpty() &&
              (m_dragSourceAction & DragSourceActionLink)) {
     if (!clipboard->hasData())
-      clipboard->writeURL(linkURL, dragSource.textContent(), src);
+      // Simplify whitespace so the title put on the clipboard resembles what
+      // the user sees
+      // on the web page. This includes replacing newlines with spaces.
+      clipboard->writeURL(linkURL,
+                          dragSource.textContent().simplifyWhiteSpace(), src);
 
     m_client->willPerformDragSourceAction(DragSourceActionLink, dragOrigin,
                                           clipboard);
