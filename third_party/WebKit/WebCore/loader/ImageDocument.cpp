@@ -114,7 +114,8 @@ void ImageTokenizer::finish() {
     cachedImage->data(buffer, true);
     cachedImage->finish();
 
-    cachedImage->setAllData(m_doc->frame()->loader()->mainResourceData());
+    cachedImage->setAllData(
+        m_doc->frame()->loader()->documentLoader()->mainResourceData());
     cachedImage->setResponse(
         m_doc->frame()->loader()->documentLoader()->response());
 

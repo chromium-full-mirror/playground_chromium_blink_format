@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  * Copyright (C) 2007 Trolltech ASA
  *
  * Redistribution and use in source and binary forms, with or without
@@ -162,13 +162,6 @@ struct ScheduledRedirection {
 
 static double storedTimeOfLastCompletedLoad;
 
-static void cancelAll(const ResourceLoaderSet& loaders) {
-  const ResourceLoaderSet copy = loaders;
-  ResourceLoaderSet::const_iterator end = copy.end();
-  for (ResourceLoaderSet::const_iterator it = copy.begin(); it != end; ++it)
-    (*it)->cancel();
-}
-
 static bool getString(JSValue* result, String& string) {
   if (!result)
     return false;
@@ -243,18 +236,13 @@ FrameLoader::~FrameLoader() {
   m_client->frameLoaderDestroyed();
 }
 
-static void setAllDefersLoading(const ResourceLoaderSet& loaders, bool defers) {
-  const ResourceLoaderSet copy = loaders;
-  ResourceLoaderSet::const_iterator end = copy.end();
-  for (ResourceLoaderSet::const_iterator it = copy.begin(); it != end; ++it)
-    (*it)->setDefersLoading(defers);
-}
-
 void FrameLoader::setDefersLoading(bool defers) {
-  if (m_mainResourceLoader)
-    m_mainResourceLoader->setDefersLoading(defers);
-  setAllDefersLoading(m_subresourceLoaders, defers);
-  setAllDefersLoading(m_plugInStreamLoaders, defers);
+  if (m_documentLoader)
+    m_documentLoader->setDefersLoading(defers);
+  if (m_provisionalDocumentLoader)
+    m_provisionalDocumentLoader->setDefersLoading(defers);
+  if (m_policyDocumentLoader)
+    m_policyDocumentLoader->setDefersLoading(defers);
   m_client->setDefersLoading(defers);
 }
 
@@ -548,9 +536,6 @@ void FrameLoader::stopLoading(bool sendUnload) {
   if (m_frame->document() && m_frame->document()->tokenizer())
     m_frame->document()->tokenizer()->stopParsing();
 
-  m_responseRefreshHeader = String();
-  m_responseModifiedHeader = String();
-
   if (sendUnload) {
     if (m_frame->document()) {
       if (m_wasLoadEventEmitted && !m_wasUnloadEventEmitted) {
@@ -801,12 +786,12 @@ void FrameLoader::receivedFirstData() {
   m_frame->document()->docLoader()->setCachePolicy(m_cachePolicy);
   m_workingURL = KURL();
 
-  const String& refresh = m_responseRefreshHeader;
-
   double delay;
   String URL;
-
-  if (!parseHTTPRefresh(refresh, false, delay, URL))
+  if (!m_documentLoader)
+    return;
+  if (!parseHTTPRefresh(m_documentLoader->response().httpHeaderField("Refresh"),
+                        false, delay, URL))
     return;
 
   if (URL.isEmpty())
@@ -1456,10 +1441,6 @@ void FrameLoader::parentCompleted() {
 
 String FrameLoader::outgoingReferrer() const {
   return m_outgoingReferrer;
-}
-
-String FrameLoader::lastModified() const {
-  return m_responseModifiedHeader;
 }
 
 Frame* FrameLoader::opener() {
@@ -2128,14 +2109,6 @@ bool FrameLoader::canTarget(Frame* target) const {
   return equalIgnoringCase(parentDomain, domain);
 }
 
-void FrameLoader::stopLoadingPlugIns() {
-  cancelAll(m_plugInStreamLoaders);
-}
-
-void FrameLoader::stopLoadingSubresources() {
-  cancelAll(m_subresourceLoaders);
-}
-
 void FrameLoader::stopLoadingSubframes() {
   for (Frame* child = m_frame->tree()->firstChild(); child;
        child = child->tree()->nextSibling())
@@ -2163,11 +2136,6 @@ void FrameLoader::stopAllLoaders() {
   m_inStopAllLoaders = false;
 }
 
-void FrameLoader::cancelMainResourceLoad() {
-  if (m_mainResourceLoader)
-    m_mainResourceLoader->cancel();
-}
-
 void FrameLoader::cancelPendingArchiveLoad(ResourceLoader* loader) {
   m_client->cancelPendingArchiveLoad(loader);
 }
@@ -2179,46 +2147,29 @@ DocumentLoader* FrameLoader::activeDocumentLoader() const {
 }
 
 void FrameLoader::addPlugInStreamLoader(ResourceLoader* loader) {
-  m_plugInStreamLoaders.add(loader);
-  activeDocumentLoader()->setLoading(true);
+  activeDocumentLoader()->addPlugInStreamLoader(loader);
 }
 
 void FrameLoader::removePlugInStreamLoader(ResourceLoader* loader) {
-  m_plugInStreamLoaders.remove(loader);
-  activeDocumentLoader()->updateLoading();
-}
-
-bool FrameLoader::hasMainResourceLoader() const {
-  return m_mainResourceLoader != 0;
-}
-
-bool FrameLoader::isLoadingSubresources() const {
-  return !m_subresourceLoaders.isEmpty();
-}
-
-bool FrameLoader::isLoadingPlugIns() const {
-  return !m_plugInStreamLoaders.isEmpty();
+  activeDocumentLoader()->removePlugInStreamLoader(loader);
 }
 
 bool FrameLoader::isLoading() const {
-  return isLoadingMainResource() || isLoadingSubresources() ||
-         isLoadingPlugIns();
+  if (m_isLoadingMainResource)
+    return true;
+  DocumentLoader* docLoader = activeDocumentLoader();
+  if (!docLoader)
+    return false;
+  return docLoader->isLoadingSubresources() || docLoader->isLoadingPlugIns();
 }
 
 void FrameLoader::addSubresourceLoader(ResourceLoader* loader) {
   ASSERT(!m_provisionalDocumentLoader);
-  m_subresourceLoaders.add(loader);
-  activeDocumentLoader()->setLoading(true);
+  activeDocumentLoader()->addSubresourceLoader(loader);
 }
 
 void FrameLoader::removeSubresourceLoader(ResourceLoader* loader) {
-  m_subresourceLoaders.remove(loader);
-  activeDocumentLoader()->updateLoading();
-  checkLoadComplete();
-}
-
-void FrameLoader::releaseMainResourceLoader() {
-  m_mainResourceLoader = 0;
+  activeDocumentLoader()->removeSubresourceLoader(loader);
 }
 
 void FrameLoader::setDocumentLoader(DocumentLoader* loader) {
@@ -2302,8 +2253,10 @@ void FrameLoader::markLoadComplete() {
 }
 
 void FrameLoader::commitProvisionalLoad() {
-  stopLoadingSubresources();
-  stopLoadingPlugIns();
+  if (m_documentLoader)
+    m_documentLoader->stopLoadingSubresources();
+  if (m_documentLoader)
+    m_documentLoader->stopLoadingPlugIns();
 
   setDocumentLoader(m_provisionalDocumentLoader.get());
   setProvisionalDocumentLoader(0);
@@ -2347,11 +2300,7 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<PageCache> prpPageCache) {
     if (url.isEmpty())
       url = "about:blank";
 
-    if (didOpenURL(url)) {
-      m_responseRefreshHeader = pdl->response().httpHeaderField("Refresh");
-      if (!pdl->getResponseModifiedHeader(m_responseModifiedHeader))
-        m_responseModifiedHeader = "";
-    }
+    didOpenURL(url);
   }
   opened();
 }
@@ -3078,30 +3027,6 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
   sendRemainingDelegateMessages(identifier, response, data.size(), error);
 }
 
-bool FrameLoader::startLoadingMainResource(DocumentLoader* docLoader,
-                                           unsigned long identifier) {
-  ASSERT(!m_mainResourceLoader);
-  m_mainResourceLoader = MainResourceLoader::create(m_frame);
-  m_mainResourceLoader->setIdentifier(identifier);
-
-  ResourceRequest& request = docLoader->actualRequest();
-
-  // FIXME: is there any way the extra fields could have not been added by now?
-  addExtraFieldsToRequest(request, true, false);
-  if (!m_mainResourceLoader->load(request, docLoader->substituteData())) {
-    // FIXME: If this should really be caught, we should just ASSERT this
-    // doesn't happen;
-    // should it be caught by other parts of WebKit or other parts of the app?
-    LOG_ERROR(
-        "could not create WebResourceHandle for URL %s -- should be caught by "
-        "policy handler level",
-        request.url().url().ascii());
-    m_mainResourceLoader = 0;
-    return false;
-  }
-  return true;
-}
-
 // FIXME: Poor method name; also, why is this not part of startProvisionalLoad:?
 void FrameLoader::startLoading() {
   if (!m_provisionalDocumentLoader)
@@ -3109,7 +3034,8 @@ void FrameLoader::startLoading() {
 
   m_provisionalDocumentLoader->prepareForLoadStart();
 
-  if (m_mainResourceLoader)
+  DocumentLoader* activeDocLoader = activeDocumentLoader();
+  if (activeDocLoader && activeDocLoader->isLoadingMainResource())
     return;
 
   m_provisionalDocumentLoader->setLoadingFromPageCache(false);
@@ -3120,12 +3046,8 @@ void FrameLoader::startLoading() {
       identifier, m_provisionalDocumentLoader.get(),
       m_provisionalDocumentLoader->originalRequest());
 
-  if (!startLoadingMainResource(m_provisionalDocumentLoader.get(), identifier))
+  if (!m_provisionalDocumentLoader->startLoadingMainResource(identifier))
     m_provisionalDocumentLoader->updateLoading();
-}
-
-void FrameLoader::cancelMainResourceLoad(const ResourceError& error) {
-  m_mainResourceLoader->cancel(error);
 }
 
 void FrameLoader::assignIdentifierToInitialRequest(
@@ -4353,12 +4275,6 @@ void FrameLoader::didFinishLoad(ResourceLoader* loader) {
     m_frame->page()->progress()->completeProgress(loader->identifier());
   m_client->dispatchDidFinishLoading(activeDocumentLoader(),
                                      loader->identifier());
-}
-
-PassRefPtr<SharedBuffer> FrameLoader::mainResourceData() const {
-  if (!m_mainResourceLoader)
-    return 0;
-  return m_mainResourceLoader->resourceData();
 }
 
 void FrameLoader::didReceiveAuthenticationChallenge(
