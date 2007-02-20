@@ -33,6 +33,7 @@ namespace WebCore {
 
 class CSSComputedStyleDeclaration;
 class Element;
+class PositionIterator;
 class Range;
 
 enum EUsingComposedCharacters {
@@ -44,6 +45,7 @@ class Position {
  public:
   Position() : m_node(0), m_offset(0) {}
   Position(Node*, int offset);
+  Position(const PositionIterator&);
 
   void clear();
 
@@ -82,8 +84,12 @@ class Position {
   Position downstream() const;
 
   bool isCandidate() const;
+  bool inRenderedText() const;
   bool isRenderedCharacter() const;
   bool rendersInDifferentPosition(const Position& pos) const;
+
+  static bool hasRenderedNonAnonymousDescendantsWithHeight(RenderObject*);
+  static bool nodeIsUserSelectNone(Node*);
 
   void debugPosition(const char* msg = "") const;
 
@@ -95,11 +101,8 @@ class Position {
  private:
   int renderedOffset() const;
 
-  bool inRenderedText() const;
-
   Position previousCharacterPosition(EAffinity) const;
   Position nextCharacterPosition(EAffinity) const;
-
   RefPtr<Node> m_node;
   int m_offset;
 };
