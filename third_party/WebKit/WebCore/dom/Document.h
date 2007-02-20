@@ -384,7 +384,7 @@ class Document : public ContainerNode {
   DeprecatedString baseURL() const {
     return m_baseURL.isEmpty() ? URL() : m_baseURL;
   }
-  void setBaseURL(const DeprecatedString& baseURL) { m_baseURL = baseURL; }
+  void setBaseURL(const DeprecatedString& baseURL);
 
   String baseTarget() const { return m_baseTarget; }
   void setBaseTarget(const String& baseTarget) { m_baseTarget = baseTarget; }
