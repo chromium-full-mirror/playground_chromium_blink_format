@@ -175,11 +175,13 @@ void ChromeClientQt::chromeDestroyed() {
 
 bool ChromeClientQt::canRunBeforeUnloadConfirmPanel() {
   notImplemented();
+  return false;
 }
 
 bool ChromeClientQt::runBeforeUnloadConfirmPanel(const String& message,
                                                  Frame* frame) {
   notImplemented();
+  return false;
 }
 
 void ChromeClientQt::closeWindowSoon() {
@@ -193,6 +195,7 @@ void ChromeClientQt::runJavaScriptAlert(Frame*, const String& msg) {
 
 bool ChromeClientQt::runJavaScriptConfirm(Frame*, const String&) {
   notImplemented();
+  return false;
 }
 
 bool ChromeClientQt::runJavaScriptPrompt(Frame*,
@@ -200,6 +203,7 @@ bool ChromeClientQt::runJavaScriptPrompt(Frame*,
                                          const String& defaultValue,
                                          String& result) {
   notImplemented();
+  return false;
 }
 
 void ChromeClientQt::setStatusbarText(const String&) {
@@ -208,6 +212,7 @@ void ChromeClientQt::setStatusbarText(const String&) {
 
 bool ChromeClientQt::shouldInterruptJavaScript() {
   notImplemented();
+  return false;
 }
 
 bool ChromeClientQt::tabsToLinks() const {

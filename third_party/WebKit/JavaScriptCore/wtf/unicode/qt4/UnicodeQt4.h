@@ -172,6 +172,7 @@ inline int toLower(UChar* result,
   }
   for (int i = 0; i < srcLength; ++i)
     result[i] = QChar::toLower(src[i]);
+  return srcLength;
 }
 
 inline int toUpper(UChar* str, int strLength, UChar*& destIfNeeded) {
@@ -201,6 +202,7 @@ inline int toUpper(UChar* result,
   }
   for (int i = 0; i < srcLength; ++i)
     result[i] = QChar::toUpper(src[i]);
+  return srcLength;
 }
 
 inline int toTitleCase(UChar32 c) {
@@ -224,6 +226,7 @@ inline int foldCase(UChar* result,
   }
   for (int i = 0; i < srcLength; ++i)
     result[i] = QChar::toCaseFolded(src[i]);
+  return srcLength;
 }
 
 inline bool isFormatChar(UChar32 c) {

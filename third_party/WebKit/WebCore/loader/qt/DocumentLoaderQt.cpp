@@ -46,5 +46,6 @@ namespace WebCore {
 
 bool DocumentLoader::getResponseModifiedHeader(WebCore::String&) const {
   notImplemented();
+  return false;
 }
 }

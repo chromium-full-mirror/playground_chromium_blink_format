@@ -55,6 +55,7 @@ String ClipboardQt::getData(const String& type, bool& success) const {
 
 bool ClipboardQt::setData(const String& type, const String& data) {
   notImplemented();
+  return false;
 }
 
 // extensions beyond IE's API

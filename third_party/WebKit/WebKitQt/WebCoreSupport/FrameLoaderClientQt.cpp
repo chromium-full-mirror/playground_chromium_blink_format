@@ -623,6 +623,7 @@ bool FrameLoaderClientQt::dispatchDidLoadResourceFromMemoryCache(
     const WebCore::ResourceResponse&,
     int) {
   notImplemented();
+  return false;
 }
 
 void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
@@ -636,6 +637,7 @@ void FrameLoaderClientQt::dispatchDidFailLoad(const WebCore::ResourceError&) {
 
 WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {
   notImplemented();
+  return 0;
 }
 
 void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
