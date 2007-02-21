@@ -162,18 +162,14 @@ void RenderThemeQt::setCheckboxSize(RenderStyle* style) const {
   if (!style->width().isIntrinsicOrAuto() && !style->height().isAuto())
     return;
 
-// FIXME:  A hard-coded size of 13 is used.  This is wrong but necessary for
-// now.  It matches Firefox.
-// At different DPI settings on Windows, querying the theme gives you a larger
-// size that accounts for
-// the higher DPI.  Until our entire engine honors a DPI setting other than 96,
-// we can't rely on the theme's
-// metrics.
-#ifdef Q_WS_MAC
-  const int ff = 16;
-#else
+  // FIXME:  A hard-coded size of 13 is used.  This is wrong but necessary for
+  // now.  It matches Firefox.
+  // At different DPI settings on Windows, querying the theme gives you a larger
+  // size that accounts for
+  // the higher DPI.  Until our entire engine honors a DPI setting other than
+  // 96, we can't rely on the theme's
+  // metrics.
   const int ff = 13;
-#endif
   if (style->width().isIntrinsicOrAuto())
     style->setWidth(Length(ff, Fixed));
 
