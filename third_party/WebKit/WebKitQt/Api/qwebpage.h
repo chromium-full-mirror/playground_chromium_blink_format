@@ -30,6 +30,7 @@
 
 #include <qwidget.h>
 class QWebFrame;
+class QUndoStack;
 class QUrl;
 
 class QWebPagePrivate;
@@ -71,6 +72,8 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   virtual void statusTextChanged(const QString& text);
 
   virtual void runJavaScriptAlert(QWebFrame* frame, const QString& msg);
+
+  QUndoStack* undoStack();
 
  public slots:
   /**

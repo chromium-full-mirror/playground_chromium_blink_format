@@ -36,6 +36,7 @@ class Page;
 }
 
 class QVBoxLayout;
+class QUndoStack;
 
 class QWebPagePrivate {
  public:
@@ -52,6 +53,7 @@ class QWebPagePrivate {
   QVBoxLayout* layout;
 
   QWebPage* q;
+  QUndoStack* undoStack;
 
   bool modified;
 };
