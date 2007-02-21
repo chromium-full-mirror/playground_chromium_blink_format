@@ -97,4 +97,8 @@ int textBreakFollowing(TextBreakIterator* bi, int pos) {
 int textBreakCurrent(TextBreakIterator* bi) {
   return ubrk_current(bi);
 }
+
+bool isTextBreak(TextBreakIterator* bi, int pos) {
+  return ubrk_isBoundary(bi, pos);
+}
 }
