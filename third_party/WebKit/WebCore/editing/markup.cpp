@@ -586,8 +586,12 @@ DeprecatedString createMarkup(const Range* range,
   if (annotate && needInterchangeNewlineAfter(visibleEnd.previous()))
     markups.append(interchangeNewlineString);
 
+  bool selectedOneOrMoreParagraphs =
+      startOfParagraph(visibleStart) != startOfParagraph(visibleEnd) ||
+      isStartOfParagraph(visibleStart) && isEndOfParagraph(visibleEnd);
+
   // Retain the Mail quote level by including all ancestor mail block quotes.
-  if (annotate) {
+  if (annotate && selectedOneOrMoreParagraphs) {
     for (Node* ancestor = commonAncestorBlock; ancestor;
          ancestor = ancestor->parentNode()) {
       if (isMailBlockquote(ancestor)) {
