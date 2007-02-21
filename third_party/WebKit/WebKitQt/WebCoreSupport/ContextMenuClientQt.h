@@ -41,7 +41,6 @@ class ContextMenuClientQt : public ContextMenuClient {
   virtual void contextMenuItemSelected(ContextMenuItem*, const ContextMenu*);
 
   virtual void downloadURL(const KURL& url);
-  virtual void copyImageToClipboard(const HitTestResult&);
   virtual void lookUpInDictionary(Frame*);
   virtual void speak(const String&);
   virtual void stopSpeaking();

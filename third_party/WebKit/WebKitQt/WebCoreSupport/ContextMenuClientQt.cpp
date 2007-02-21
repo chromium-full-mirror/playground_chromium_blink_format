@@ -56,10 +56,6 @@ void ContextMenuClientQt::downloadURL(const KURL& url) {
   notImplemented();
 }
 
-void ContextMenuClientQt::copyImageToClipboard(const HitTestResult&) {
-  notImplemented();
-}
-
 void ContextMenuClientQt::lookUpInDictionary(Frame*) {
   notImplemented();
 }
