@@ -155,6 +155,7 @@ class Widget {
 
 #if PLATFORM(QT)
   QWidget* qwidget() const;
+  QWidget* canvas() const;
   void setQWidget(QWidget*);
 #endif
 
