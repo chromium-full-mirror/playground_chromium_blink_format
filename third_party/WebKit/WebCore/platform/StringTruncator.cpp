@@ -142,10 +142,10 @@ static String truncateString(const String& string,
     return string;
 
   unsigned keepCountForLargestKnownToFit = 0;
-  unsigned widthForLargestKnownToFit = (unsigned)currentEllipsisWidth;
+  float widthForLargestKnownToFit = currentEllipsisWidth;
 
   unsigned keepCountForSmallestKnownToNotFit = keepCount;
-  unsigned widthForSmallestKnownToNotFit = (unsigned)width;
+  float widthForSmallestKnownToNotFit = width;
 
   if (currentEllipsisWidth >= maxWidth) {
     keepCountForLargestKnownToFit = 1;
@@ -178,10 +178,10 @@ static String truncateString(const String& string,
     width = stringWidth(font, stringBuffer, truncatedLength);
     if (width <= maxWidth) {
       keepCountForLargestKnownToFit = keepCount;
-      widthForLargestKnownToFit = (unsigned)width;
+      widthForLargestKnownToFit = width;
     } else {
       keepCountForSmallestKnownToNotFit = keepCount;
-      widthForSmallestKnownToNotFit = (unsigned)width;
+      widthForSmallestKnownToNotFit = width;
     }
   }
 
