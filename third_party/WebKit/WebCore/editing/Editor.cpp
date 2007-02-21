@@ -1482,6 +1482,10 @@ void Editor::copyURL(const KURL& url, const String& title) {
   Pasteboard::generalPasteboard()->writeURL(url, title, m_frame);
 }
 
+void Editor::copyImage(const HitTestResult& result) {
+  Pasteboard::generalPasteboard()->writeImage(result);
+}
+
 bool Editor::isContinuousSpellCheckingEnabled() {
   if (client())
     return client()->isContinuousSpellCheckingEnabled();

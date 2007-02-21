@@ -35,6 +35,7 @@
 // knowledge of the frame and editor or moved into the editing directory.
 
 #if PLATFORM(MAC)
+class NSFileWrapper;
 class NSPasteboard;
 class NSArray;
 #endif
@@ -57,6 +58,7 @@ extern NSString* WebURLsWithTitlesPboardType;
 class CString;
 class DocumentFragment;
 class Frame;
+class HitTestResult;
 class KURL;
 class Range;
 class String;
@@ -73,12 +75,17 @@ class Pasteboard : Noncopyable {
                        NSArray* types,
                        const KURL& url,
                        const String& titleStr,
-                       Frame* frame);
+                       Frame* frame,
+                       bool isImage = false);
 #endif
 
   static Pasteboard* generalPasteboard();
   void writeSelection(Range*, bool canSmartCopyOrDelete, Frame*);
-  void writeURL(const KURL&, const String&, Frame* = 0);
+  void writeURL(const KURL&, const String&, Frame* = 0, bool isImage = false);
+  void writeImage(const HitTestResult&);
+#if PLATFORM(MAC)
+  void writeFileWrapperAsRTFDAttachment(NSFileWrapper*);
+#endif
   void clear();
   bool canSmartReplace();
   PassRefPtr<DocumentFragment> documentFragment(Frame*,

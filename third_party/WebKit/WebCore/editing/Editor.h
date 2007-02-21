@@ -92,6 +92,7 @@ class Editor {
   void performDelete();
 
   void copyURL(const KURL&, const String&);
+  void copyImage(const HitTestResult&);
 
   void indent();
   void outdent();
