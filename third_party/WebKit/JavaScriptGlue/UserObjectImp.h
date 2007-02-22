@@ -64,9 +64,6 @@ class UserObjectImp : public JSObject {
 
   JSUserObject* GetJSUserObject() const;
 
- protected:
-  UserObjectImp();
-
  private:
   static JSValue* userObjectGetter(ExecState*,
                                    JSObject* originalObject,
