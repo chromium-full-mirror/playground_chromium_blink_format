@@ -78,10 +78,13 @@
 
 using namespace WebCore;
 
-#define notImplemented()                                                    \
-  do {                                                                      \
-    fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", __PRETTY_FUNCTION__, \
-            __FILE__, __LINE__);                                            \
+#define notImplementedGdk()                                                   \
+  do {                                                                        \
+    static int count;                                                         \
+    if (!count && !getenv("DISABLE_NI_WARNING"))                              \
+      fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", WTF_PRETTY_FUNCTION, \
+              __FILE__, __LINE__);                                            \
+    ++count;                                                                  \
   } while (0)
 
 namespace WebCore {
@@ -89,62 +92,62 @@ class Page;
 }
 
 void FrameView::updateBorder() {
-  notImplemented();
+  notImplementedGdk();
 }
 
 void Widget::setEnabled(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool Widget::isEnabled() const {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 Widget::FocusPolicy Widget::focusPolicy() const {
-  notImplemented();
+  notImplementedGdk();
   return NoFocus;
 }
 void Widget::enableFlushDrawing() {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::disableFlushDrawing() {
-  notImplemented();
+  notImplementedGdk();
 }
 GraphicsContext* Widget::lockDrawingFocus() {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void Widget::unlockDrawingFocus(GraphicsContext*) {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::removeFromParent() {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::paint(GraphicsContext*, IntRect const&) {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::setIsSelected(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::invalidate() {
-  notImplemented();
+  notImplementedGdk();
 }
 void Widget::invalidateRect(const IntRect&) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 int WebCore::findNextSentenceFromIndex(UChar const*, int, int, bool) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void WebCore::findSentenceBoundary(UChar const*, int, int, int*, int*) {
-  notImplemented();
+  notImplementedGdk();
 }
 int WebCore::findNextWordFromIndex(UChar const*, int, int, bool) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void WebCore::findWordBoundary(UChar const* str,
@@ -157,143 +160,148 @@ void WebCore::findWordBoundary(UChar const* str,
 }
 
 void ChromeClientGdk::chromeDestroyed() {
-  notImplemented();
+  notImplementedGdk();
 }
 FloatRect ChromeClientGdk::windowRect() {
-  notImplemented();
+  notImplementedGdk();
   return FloatRect();
 }
 void ChromeClientGdk::setWindowRect(const FloatRect& r) {
-  notImplemented();
+  notImplementedGdk();
 }
 FloatRect ChromeClientGdk::pageRect() {
-  notImplemented();
+  notImplementedGdk();
   return FloatRect();
 }
 float ChromeClientGdk::scaleFactor() {
-  notImplemented();
+  notImplementedGdk();
   return 1.0;
 }
 void ChromeClientGdk::focus() {
-  notImplemented();
+  notImplementedGdk();
 }
 void ChromeClientGdk::unfocus() {
-  notImplemented();
+  notImplementedGdk();
 }
 WebCore::Page* ChromeClientGdk::createWindow(const FrameLoadRequest&) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 WebCore::Page* ChromeClientGdk::createModalDialog(const FrameLoadRequest&) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void ChromeClientGdk::show() {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::canRunModal() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::runModal() {
-  notImplemented();
+  notImplementedGdk();
 }
 void ChromeClientGdk::setToolbarsVisible(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::toolbarsVisible() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::setStatusbarVisible(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::statusbarVisible() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::setScrollbarsVisible(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::scrollbarsVisible() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::setMenubarVisible(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::menubarVisible() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::setResizable(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 void ChromeClientGdk::closeWindowSoon() {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::canTakeFocus(FocusDirection) {
-  notImplemented();
+  notImplementedGdk();
   return true;
 }
 void ChromeClientGdk::takeFocus(FocusDirection) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::canRunBeforeUnloadConfirmPanel() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::addMessageToConsole(const WebCore::String&,
                                           unsigned int,
                                           const WebCore::String&) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::runBeforeUnloadConfirmPanel(const WebCore::String&,
                                                   WebCore::Frame*) {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::runJavaScriptAlert(Frame*, const String&) {
-  notImplemented();
+  notImplementedGdk();
 }
 bool ChromeClientGdk::runJavaScriptConfirm(Frame*, const String&) {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 bool ChromeClientGdk::runJavaScriptPrompt(Frame*,
                                           const String& message,
                                           const String& defaultValue,
                                           String& result) {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ChromeClientGdk::setStatusbarText(const String&) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 bool ChromeClientGdk::shouldInterruptJavaScript() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 
 bool ChromeClientGdk::tabsToLinks() const {
+  notImplementedGdk();
   return false;
 }
 
 IntRect ChromeClientGdk::windowResizerRect() const {
-  notImplemented();
+  notImplementedGdk();
+  return IntRect();
 }
+
 void ChromeClientGdk::addToDirtyRegion(const IntRect&) {
-  notImplemented();
+  notImplementedGdk();
 }
+
 void ChromeClientGdk::scrollBackingStore(int dx,
                                          int dy,
                                          const IntRect& scrollViewRect,
                                          const IntRect& clipRect) {
-  notImplemented();
+  notImplementedGdk();
 }
+
 void ChromeClientGdk::updateBackingStore() {
-  notImplemented();
+  notImplementedGdk();
 }
 
 /********************************************************/
@@ -434,31 +442,31 @@ String WebCore::contextMenuItemTagRightToLeft() {
 }
 
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 unsigned PlugInInfoStore::pluginCount() const {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 bool WebCore::PlugInInfoStore::supportsMIMEType(const WebCore::String&) {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void WebCore::refreshPlugins(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
                                          const Vector<String>& searchItems) {
-  notImplemented();
+  notImplementedGdk();
 }
 void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
                                          Vector<String>& searchItems) {
-  notImplemented();
+  notImplementedGdk();
 }
 SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 void ScrollView::addChild(Widget*) {}
@@ -490,10 +498,10 @@ PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                                      ScrollbarOrientation orientation,
                                      ScrollbarControlSize controlSize)
     : Scrollbar(client, orientation, controlSize) {
-  notImplemented();
+  notImplementedGdk();
 }
 PlatformScrollbar::~PlatformScrollbar() {
-  notImplemented();
+  notImplementedGdk();
 }
 int PlatformScrollbar::width() const {
   return 15;
@@ -502,32 +510,32 @@ int PlatformScrollbar::height() const {
   return 15;
 }
 void PlatformScrollbar::setEnabled(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {
-  notImplemented();
+  notImplementedGdk();
 }
 void PlatformScrollbar::updateThumbPosition() {
-  notImplemented();
+  notImplementedGdk();
 }
 void PlatformScrollbar::updateThumbProportion() {
-  notImplemented();
+  notImplementedGdk();
 }
 void PlatformScrollbar::setRect(const IntRect&) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 FileChooser::FileChooser(FileChooserClient*, const String&) {
-  notImplemented();
+  notImplementedGdk();
 }
 FileChooser::~FileChooser() {
-  notImplemented();
+  notImplementedGdk();
 }
 void FileChooser::openFileChooser(Document*) {
-  notImplemented();
+  notImplementedGdk();
 }
 String FileChooser::basenameForWidth(const Font&, int width) const {
-  notImplemented();
+  notImplementedGdk();
   return String();
 }
 
@@ -539,32 +547,32 @@ void WebCore::setFocusRingColorChangeFunction(void (*)()) {}
 void Frame::setNeedsReapplyStyles() {}
 
 bool ResourceHandle::willLoadFromCache(ResourceRequest&) {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 bool ResourceHandle::loadsBlocked() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 void ResourceHandle::loadResourceSynchronously(const ResourceRequest& request,
                                                ResourceError& error,
                                                ResourceResponse& response,
                                                Vector<char>& data) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 Icon::Icon() {
-  notImplemented();
+  notImplementedGdk();
 }
 Icon::~Icon() {
-  notImplemented();
+  notImplementedGdk();
 }
 PassRefPtr<Icon> Icon::newIconForFile(const String& filename) {
-  notImplemented();
+  notImplementedGdk();
   return PassRefPtr<Icon>(new Icon());
 }
 void Icon::paint(GraphicsContext*, const IntRect&) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,
@@ -577,70 +585,73 @@ void Font::drawComplexText(GraphicsContext*,
                            const TextRun&,
                            const TextStyle&,
                            const FloatPoint&) const {
-  notImplemented();
+  notImplementedGdk();
 }
 float Font::floatWidthForComplexText(const TextRun&, const TextStyle&) const {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 int Font::offsetForPositionForComplexText(const TextRun&,
                                           const TextStyle&,
                                           int,
                                           bool) const {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 
 void PageCache::close() {
-  notImplemented();
+  notImplementedGdk();
 }
 
 void Editor::ignoreSpelling() {
-  notImplemented();
+  notImplementedGdk();
 }
 void Editor::learnSpelling() {
-  notImplemented();
+  notImplementedGdk();
 }
 bool Editor::isSelectionUngrammatical() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 bool Editor::isSelectionMisspelled() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 Vector<String> Editor::guessesForMisspelledSelection() {
-  notImplemented();
+  notImplementedGdk();
   return Vector<String>();
 }
 Vector<String> Editor::guessesForUngrammaticalSelection() {
-  notImplemented();
+  notImplementedGdk();
   return Vector<String>();
 }
 void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition&) {
-  notImplemented();
+  notImplementedGdk();
 }
 PassRefPtr<Clipboard> Editor::newGeneralClipboard(
     ClipboardAccessPolicy policy) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 
 Pasteboard* Pasteboard::generalPasteboard() {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void Pasteboard::writeSelection(Range*, bool canSmartCopyOrDelete, Frame*) {
-  notImplemented();
+  notImplementedGdk();
 }
-void Pasteboard::writeURL(const KURL&, const String&, Frame*) {
-  notImplemented();
+void Pasteboard::writeURL(const KURL&, const String&, Frame*, bool) {
+  notImplementedGdk();
+}
+void Pasteboard::writeImage(const HitTestResult&) {
+  notImplementedGdk();
 }
 void Pasteboard::clear() {
-  notImplemented();
+  notImplementedGdk();
 }
 bool Pasteboard::canSmartReplace() {
-  notImplemented();
+  notImplementedGdk();
   return false;
 }
 PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
@@ -648,29 +659,29 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range>,
     bool allowPlainText,
     bool& chosePlainText) {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 String Pasteboard::plainText(Frame* frame) {
-  notImplemented();
+  notImplementedGdk();
   return String();
 }
 Pasteboard::Pasteboard() {
-  notImplemented();
+  notImplementedGdk();
 }
 Pasteboard::~Pasteboard() {
-  notImplemented();
+  notImplementedGdk();
 }
 
 ContextMenu::ContextMenu(const HitTestResult& result)
     : m_hitTestResult(result) {
-  notImplemented();
+  notImplementedGdk();
 }
 ContextMenu::~ContextMenu() {
-  notImplemented();
+  notImplementedGdk();
 }
 void ContextMenu::appendItem(ContextMenuItem&) {
-  notImplemented();
+  notImplementedGdk();
 }
 void ContextMenu::setPlatformDescription(PlatformMenuDescription menu) {
   m_platformDescription = menu;
@@ -680,62 +691,62 @@ PlatformMenuDescription ContextMenu::platformDescription() const {
 }
 
 ContextMenuItem::ContextMenuItem(PlatformMenuItemDescription) {
-  notImplemented();
+  notImplementedGdk();
 }
 ContextMenuItem::ContextMenuItem(ContextMenu*) {
-  notImplemented();
+  notImplementedGdk();
 }
 ContextMenuItem::ContextMenuItem(ContextMenuItemType type,
                                  ContextMenuAction action,
                                  const String& title,
                                  ContextMenu* subMenu) {
-  notImplemented();
+  notImplementedGdk();
 }
 ContextMenuItem::~ContextMenuItem() {
-  notImplemented();
+  notImplementedGdk();
 }
 PlatformMenuItemDescription ContextMenuItem::releasePlatformDescription() {
-  notImplemented();
+  notImplementedGdk();
   return m_platformDescription;
 }
 ContextMenuItemType ContextMenuItem::type() const {
-  notImplemented();
+  notImplementedGdk();
   return ActionType;
 }
 void ContextMenuItem::setType(ContextMenuItemType) {
-  notImplemented();
+  notImplementedGdk();
 }
 ContextMenuAction ContextMenuItem::action() const {
-  notImplemented();
+  notImplementedGdk();
   return ContextMenuItemTagNoAction;
 }
 void ContextMenuItem::setAction(ContextMenuAction) {
-  notImplemented();
+  notImplementedGdk();
 }
 String ContextMenuItem::title() const {
-  notImplemented();
+  notImplementedGdk();
   return String();
 }
 void ContextMenuItem::setTitle(const String&) {
-  notImplemented();
+  notImplementedGdk();
 }
 PlatformMenuDescription ContextMenuItem::platformSubMenu() const {
-  notImplemented();
+  notImplementedGdk();
   return 0;
 }
 void ContextMenuItem::setSubMenu(ContextMenu*) {
-  notImplemented();
+  notImplementedGdk();
 }
 void ContextMenuItem::setChecked(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 void ContextMenuItem::setEnabled(bool) {
-  notImplemented();
+  notImplementedGdk();
 }
 
 namespace WebCore {
 Vector<String> supportedKeySizes() {
-  notImplemented();
+  notImplementedGdk();
   return Vector<String>();
 }
 String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
@@ -744,10 +755,10 @@ String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
   return String();
 }
 void systemBeep() {
-  notImplemented();
+  notImplementedGdk();
 }
 float userIdleTime() {
-  notImplemented();
+  notImplementedGdk();
   return 0.0;
 }
 }
