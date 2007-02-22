@@ -1220,6 +1220,13 @@ bool SelectionController::isInPasswordField() const {
          HTMLInputElement::PASSWORD;
 }
 
+bool SelectionController::isInsideNode() const {
+  Node* startNode = start().node();
+  if (!startNode)
+    return false;
+  return !isTableElement(startNode) && !editingIgnoresContent(startNode);
+}
+
 #ifndef NDEBUG
 
 void SelectionController::formatForDebugger(char* buffer,
