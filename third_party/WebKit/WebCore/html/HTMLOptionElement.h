@@ -79,6 +79,8 @@ class HTMLOptionElement : public HTMLGenericFormElement {
 
   virtual bool disabled() const;
 
+  virtual void insertedIntoDocument();
+
  private:
   String m_value;
   bool m_selected;

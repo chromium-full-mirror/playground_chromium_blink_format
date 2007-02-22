@@ -143,6 +143,8 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   int activeSelectionStartListIndex() const;
   int activeSelectionEndListIndex() const;
 
+  void scrollToSelection();
+
  private:
   void recalcListItems() const;
   void deselectItems(HTMLOptionElement* excludeElement = 0);
