@@ -965,7 +965,7 @@ void RenderBlock::collapseMargins(RenderObject* child,
       // When the child shifts to clear an item, its width can
       // change (because it has more available line width).
       // So go ahead and mark the item as dirty.
-      child->setChildNeedsLayout(true);
+      child->setChildNeedsLayout(true, false);
 
     if (!child->avoidsFloats() && child->containsFloats())
       child->markAllDescendantsWithFloatsForLayout();
@@ -1030,7 +1030,7 @@ void RenderBlock::clearFloatsIfNeeded(RenderObject* child,
       // When the child shifts to clear an item, its width can
       // change (because it has more available line width).
       // So go ahead and mark the item as dirty.
-      child->setChildNeedsLayout(true);
+      child->setChildNeedsLayout(true, false);
     if (!child->avoidsFloats() && child->containsFloats())
       child->markAllDescendantsWithFloatsForLayout();
     child->layoutIfNeeded();
@@ -1216,7 +1216,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (relayoutChildren || (child->style()->height().isPercent() ||
                              child->style()->minHeight().isPercent() ||
                              child->style()->maxHeight().isPercent()))
-      child->setChildNeedsLayout(true);
+      child->setChildNeedsLayout(true, false);
 
     // Handle the four types of special elements first.  These include
     // positioned content, floating content, compacts and
@@ -1251,7 +1251,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (!child->avoidsFloats() || child->shrinkToAvoidFloats()) {
       int fb = floatBottom();
       if (fb > m_height || fb > yPosEstimate)
-        child->setChildNeedsLayout(true);
+        child->setChildNeedsLayout(true, false);
     }
 
     // Cache our old rect so that we can dirty the proper repaint rects if the

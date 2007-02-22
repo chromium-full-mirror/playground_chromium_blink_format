@@ -1642,7 +1642,7 @@ void RenderBox::setStaticY(int staticY) {
     return;
 
   m_staticY = staticY;
-  setChildNeedsLayout(true);
+  setChildNeedsLayout(true, false);
 }
 
 int RenderBox::containingBlockWidthForPositioned(
