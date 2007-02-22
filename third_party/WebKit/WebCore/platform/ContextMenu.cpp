@@ -522,6 +522,9 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagNoGuessesFound:
       shouldEnable = false;
       break;
+    case ContextMenuItemTagCheckSpellingWhileTyping:
+      shouldCheck = frame->editor()->isContinuousSpellCheckingEnabled();
+      break;
     case ContextMenuItemTagNoAction:
     case ContextMenuItemTagOpenLinkInNewWindow:
     case ContextMenuItemTagDownloadLinkToDisk:
@@ -551,7 +554,6 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
     case ContextMenuItemTagOpenLink:
     case ContextMenuItemTagIgnoreGrammar:
     case ContextMenuItemTagSpellingMenu:
-    case ContextMenuItemTagCheckSpellingWhileTyping:
     case ContextMenuItemTagFontMenu:
     case ContextMenuItemTagShowFonts:
     case ContextMenuItemTagStyles:
