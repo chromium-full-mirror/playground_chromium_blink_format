@@ -337,9 +337,6 @@ class Frame : public Shared<Frame> {
   void paintCaret(GraphicsContext*, const IntRect&) const;
   void paintDragCaret(GraphicsContext*, const IntRect&) const;
 
-  void setXPosForVerticalArrowNavigation(int);
-  int xPosForVerticalArrowNavigation() const;
-
   bool isContentEditable() const;  // if true, everything in frame is editable
 
   void setSecureKeyboardEntry(bool);

@@ -63,7 +63,8 @@ SelectionController::SelectionController(Frame* frame,
       m_modifyBiasSet(false),
       m_frame(frame),
       m_isDragCaretController(isDragCaretController),
-      m_isCaretBlinkingSuspended(false) {}
+      m_isCaretBlinkingSuspended(false),
+      m_xPosForVerticalArrowNavigation(NoXPosForVerticalArrowNavigation) {}
 
 void SelectionController::moveTo(const VisiblePosition& pos,
                                  bool userTriggered) {
@@ -145,7 +146,7 @@ void SelectionController::setSelection(const Selection& s,
   m_frame->selectionLayoutChanged();
   // Always clear the x position used for vertical arrow navigation.
   // It will be restored by the vertical arrow navigation code if necessary.
-  m_frame->setXPosForVerticalArrowNavigation(NoXPosForVerticalArrowNavigation);
+  m_xPosForVerticalArrowNavigation = NoXPosForVerticalArrowNavigation;
   selectFrameElementInParentIfFullySelected();
   m_frame->notifyRendererOfSelectionChange(userTriggered);
   m_frame->respondToChangedSelection(oldSelection, closeTyping);
@@ -313,14 +314,13 @@ VisiblePosition SelectionController::modifyMovingRightForward(
       // nextLinePosition!)
       pos = VisiblePosition(m_sel.end(), m_sel.affinity());
       if (!isRange() || !isStartOfLine(pos))
-        pos = nextLinePosition(pos,
-                               xPosForVerticalArrowNavigation(END, isRange()));
+        pos = nextLinePosition(pos, xPosForVerticalArrowNavigation(START));
       break;
     }
     case ParagraphGranularity:
       pos =
           nextParagraphPosition(VisiblePosition(m_sel.end(), m_sel.affinity()),
-                                xPosForVerticalArrowNavigation(END, isRange()));
+                                xPosForVerticalArrowNavigation(START));
       break;
     case SentenceBoundary:
       pos = endOfSentence(VisiblePosition(m_sel.end(), m_sel.affinity()));
@@ -420,14 +420,14 @@ VisiblePosition SelectionController::modifyMovingLeftBackward(
           VisiblePosition(m_sel.extent(), m_sel.affinity()));
       break;
     case LineGranularity:
-      pos = previousLinePosition(
-          VisiblePosition(m_sel.start(), m_sel.affinity()),
-          xPosForVerticalArrowNavigation(START, isRange()));
+      pos =
+          previousLinePosition(VisiblePosition(m_sel.start(), m_sel.affinity()),
+                               xPosForVerticalArrowNavigation(START));
       break;
     case ParagraphGranularity:
       pos = previousParagraphPosition(
           VisiblePosition(m_sel.start(), m_sel.affinity()),
-          xPosForVerticalArrowNavigation(START, isRange()));
+          xPosForVerticalArrowNavigation(START));
       break;
     case SentenceBoundary:
       pos = startOfSentence(VisiblePosition(m_sel.start(), m_sel.affinity()));
@@ -541,6 +541,14 @@ bool SelectionController::modify(EAlteration alter,
   if (pos.isNull())
     return false;
 
+  // Some of the above operations set an xPosForVerticalArrowNavigation.
+  // Setting a selection will clear it, so save it to possibly restore later.
+  // Note: the START position type is arbitrary because it is unused, it would
+  // be
+  // the requested position type if there were no xPosForVerticalArrowNavigation
+  // set.
+  int x = xPosForVerticalArrowNavigation(START);
+
   switch (alter) {
     case MOVE:
       moveTo(pos, userTriggered);
@@ -549,6 +557,9 @@ bool SelectionController::modify(EAlteration alter,
       setExtent(pos, userTriggered);
       break;
   }
+
+  if (granularity == LineGranularity || granularity == ParagraphGranularity)
+    m_xPosForVerticalArrowNavigation = x;
 
   if (userTriggered) {
     // User modified selection change also sets the granularity back to
@@ -612,7 +623,7 @@ bool SelectionController::modify(EAlteration alter,
   switch (alter) {
     case MOVE:
       pos = VisiblePosition(up ? m_sel.start() : m_sel.end(), m_sel.affinity());
-      xPos = xPosForVerticalArrowNavigation(up ? START : END, isRange());
+      xPos = xPosForVerticalArrowNavigation(up ? START : END);
       m_sel.setAffinity(up ? UPSTREAM : DOWNSTREAM);
       break;
     case EXTEND:
@@ -675,8 +686,7 @@ bool SelectionController::expandUsingGranularity(TextGranularity granularity) {
   return true;
 }
 
-int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
-                                                        bool recalc) const {
+int SelectionController::xPosForVerticalArrowNavigation(EPositionType type) {
   int x = 0;
 
   if (isNone())
@@ -702,9 +712,7 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
   if (!frame)
     return x;
 
-  if (recalc ||
-      frame->xPosForVerticalArrowNavigation() ==
-          NoXPosForVerticalArrowNavigation) {
+  if (m_xPosForVerticalArrowNavigation == NoXPosForVerticalArrowNavigation) {
     pos = VisiblePosition(pos, m_sel.affinity()).deepEquivalent();
     // VisiblePosition creation can fail here if a node containing the selection
     // becomes visibility:hidden
@@ -715,10 +723,10 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
                   ->caretRect(pos.offset(), m_sel.affinity())
                   .x()
             : 0;
-    frame->setXPosForVerticalArrowNavigation(x);
-  } else {
-    x = frame->xPosForVerticalArrowNavigation();
-  }
+    m_xPosForVerticalArrowNavigation = x;
+  } else
+    x = m_xPosForVerticalArrowNavigation;
+
   return x;
 }
 

@@ -102,7 +102,6 @@ class FramePrivate {
   bool m_caretPaint : 1;
   bool m_isActive : 1;
 
-  int m_xPosForVerticalArrowNavigation;
   RefPtr<CSSMutableStyleDeclaration> m_typingStyle;
 
   Timer<Frame> m_lifeSupportTimer;
