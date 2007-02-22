@@ -27,9 +27,10 @@
 #include "qwebframe.h"
 #include "qwebpage_p.h"
 
+#include "EventHandler.h"
+#include "FrameView.h"
 #include "KURL.h"
 #include "PlatformString.h"
-#include "FrameView.h"
 #include "wtf/RefPtr.h"
 
 namespace WebCore {
@@ -39,15 +40,6 @@ class FrameView;
 class HTMLFrameOwnerElement;
 }
 class QWebPage;
-
-class QWebFramePrivate {
- public:
-  QWebFramePrivate() : frameLoaderClient(0), frame(0), frameView(0), page(0) {}
-  WebCore::FrameLoaderClientQt* frameLoaderClient;
-  WTF::RefPtr<WebCore::Frame> frame;
-  WTF::RefPtr<WebCore::FrameView> frameView;
-  QWebPage* page;
-};
 
 class QWebFrameData {
  public:
@@ -59,6 +51,27 @@ class QWebFrameData {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
+};
+
+class QWebFramePrivate {
+ public:
+  QWebFramePrivate()
+      : q(0),
+        frameLoaderClient(0),
+        frame(0),
+        frameView(0),
+        page(0),
+        eventHandler(0) {}
+  void init(QWebFrame* qframe, WebCore::Page* page, QWebFrameData* frameData);
+
+  void _q_adjustScrollbars();
+
+  QWebFrame* q;
+  WebCore::FrameLoaderClientQt* frameLoaderClient;
+  WTF::RefPtr<WebCore::Frame> frame;
+  WTF::RefPtr<WebCore::FrameView> frameView;
+  QWebPage* page;
+  WebCore::EventHandler* eventHandler;
 };
 
 #endif

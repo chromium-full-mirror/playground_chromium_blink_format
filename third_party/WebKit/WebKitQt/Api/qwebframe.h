@@ -25,7 +25,7 @@
 #ifndef QWEBFRAME_H
 #define QWEBFRAME_H
 
-#include <qscrollarea.h>
+#include <qabstractscrollarea.h>
 
 #include <qwebkitglobal.h>
 
@@ -37,7 +37,7 @@ class FrameLoaderClientQt;
 }
 class QWebFrameData;
 
-class QWEBKIT_EXPORT QWebFrame : public QScrollArea {
+class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
   Q_OBJECT
  protected:
   QWebFrame(QWebPage* parent, QWebFrameData* frameData);
@@ -62,7 +62,22 @@ class QWEBKIT_EXPORT QWebFrame : public QScrollArea {
   void titleChanged(const QString& title);
 
  protected:
-  void resizeEvent(QResizeEvent*);
+  virtual void resizeEvent(QResizeEvent*);
+  virtual void paintEvent(QPaintEvent*);
+  virtual void mouseMoveEvent(QMouseEvent*);
+  virtual void mousePressEvent(QMouseEvent*);
+  virtual void mouseReleaseEvent(QMouseEvent*);
+  virtual void wheelEvent(QWheelEvent*);
+  virtual void keyPressEvent(QKeyEvent*);
+  virtual void keyReleaseEvent(QKeyEvent*);
+  virtual void dragEnterEvent(QDragEnterEvent*);
+  virtual void dragLeaveEvent(QDragLeaveEvent*);
+  virtual void dragMoveEvent(QDragMoveEvent*);
+  virtual void scrollContentsBy(int dx, int dy);
+
+ private:
+  void handleKeyEvent(QKeyEvent*, bool isKeyUp);
+  void init(QWebPage* page, QWebFrameData* frameData);
 
  private:
   friend class QWebPage;

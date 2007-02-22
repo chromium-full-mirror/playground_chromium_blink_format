@@ -30,7 +30,7 @@
 #include "Widget.h"
 
 #if PLATFORM(QT)
-class QScrollArea;
+class QAbstractScrollArea;
 #endif
 
 #if PLATFORM(WIN)
@@ -162,12 +162,14 @@ class ScrollView : public Widget {
   ScrollView();
   ~ScrollView();
 
-  void setScrollArea(QScrollArea*);
+  void setScrollArea(QAbstractScrollArea*);
   void setAllowsScrolling(bool);
 
  private:
-  QScrollArea* m_area;
+  QAbstractScrollArea* m_area;
   bool m_allowsScrolling;
+  int m_width;
+  int m_height;
 #endif
 };
 
