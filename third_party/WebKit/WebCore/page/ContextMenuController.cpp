@@ -65,6 +65,10 @@ ContextMenuController::~ContextMenuController() {
   m_client->contextMenuDestroyed();
 }
 
+void ContextMenuController::clearContextMenu() {
+  m_contextMenu.set(0);
+}
+
 void ContextMenuController::handleContextMenuEvent(Event* event) {
   ASSERT(event->type() == contextmenuEvent);
   MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
