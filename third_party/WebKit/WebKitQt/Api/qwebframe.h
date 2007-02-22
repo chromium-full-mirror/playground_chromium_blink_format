@@ -76,10 +76,6 @@ class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
   virtual void scrollContentsBy(int dx, int dy);
 
  private:
-  void handleKeyEvent(QKeyEvent*, bool isKeyUp);
-  void init(QWebPage* page, QWebFrameData* frameData);
-
- private:
   friend class QWebPage;
   friend class WebCore::FrameLoaderClientQt;
   QWebFramePrivate* d;
