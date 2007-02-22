@@ -56,8 +56,6 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
                Frame* = 0);
   virtual ~ClipboardMac();
 
-  bool isForDragging() const;
-
   void clearData(const String& type);
   void clearAllData();
   String getData(const String& type, bool& success) const;
@@ -68,10 +66,7 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   // extensions beyond IE's API
   virtual HashSet<String> types() const;
 
-  IntPoint dragLocation() const;  // same point as client passed us
-  CachedImage* dragImage() const;
   void setDragImage(CachedImage*, const IntPoint&);
-  Node* dragImageElement();
   void setDragImageElement(Node*, const IntPoint&);
 
   virtual DragImageRef createDragImage(IntPoint& dragLoc) const;
@@ -91,10 +86,6 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   void setDragImage(CachedImage*, Node*, const IntPoint&);
 
   RetainPtr<NSPasteboard> m_pasteboard;
-  bool m_forDragging;
-  IntPoint m_dragLoc;
-  CachedImage* m_dragImage;
-  RefPtr<Node> m_dragImageElement;
   int m_changeCount;
   Frame* m_frame;  // used on the source side to generate dragging images
 };

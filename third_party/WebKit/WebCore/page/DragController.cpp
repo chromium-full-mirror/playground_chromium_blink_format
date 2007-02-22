@@ -75,6 +75,7 @@ DragController::DragController(Page* page, DragClient* client)
       m_dragDestinationAction(DragDestinationActionNone),
       m_dragSourceAction(DragSourceActionNone),
       m_didInitiateDrag(false),
+      m_isHandlingDrag(false),
       m_dragOperation(DragOperationNone) {}
 
 DragController::~DragController() {
@@ -92,7 +93,7 @@ static PassRefPtr<DocumentFragment> documentFragmentFromDragData(
   Document* document = context->startNode()->document();
   ASSERT(document);
   if (document && dragData->containsCompatibleContent()) {
-    if (DocumentFragment* fragment = dragData->asFragment(document).get())
+    if (PassRefPtr<DocumentFragment> fragment = dragData->asFragment(document))
       return fragment;
 
     if (dragData->containsURL()) {
@@ -264,8 +265,8 @@ DragOperation DragController::tryDocumentDrag(
     operation = tryDHTMLDrag(dragData);
   m_isHandlingDrag = operation != DragOperationNone;
 
-  RefPtr<FrameView> frameView = 0;
-  if (!m_document || !(frameView = m_document->view()))
+  RefPtr<FrameView> frameView = m_document->view();
+  if (!frameView)
     return operation;
 
   if ((actionMask & DragDestinationActionEdit) && !m_isHandlingDrag &&
@@ -397,9 +398,8 @@ bool DragController::canProcessDrag(DragData* dragData) {
     return false;
 
   IntPoint point =
-      m_document->view()->windowToContents(dragData->clientPosition());
+      m_page->mainFrame()->view()->windowToContents(dragData->clientPosition());
   HitTestResult result = HitTestResult(point);
-
   if (!m_page->mainFrame()->renderer())
     return false;
 
@@ -408,8 +408,10 @@ bool DragController::canProcessDrag(DragData* dragData) {
   if (!result.innerNonSharedNode() ||
       !result.innerNonSharedNode()->isContentEditable())
     return false;
+
   if (m_didInitiateDrag && m_document == m_dragInitiator && result.isSelected())
     return false;
+
   return true;
 }
 
@@ -642,9 +644,7 @@ bool DragController::startDrag(Frame* src,
       dragLoc = IntPoint(mouseDraggedPoint.x() + m_dragOffset.x(),
                          mouseDraggedPoint.y() + m_dragOffset.y());
     }
-    doSystemDrag(dragImage, dragLoc,
-                 src->view()->contentsToWindow(mouseDraggedPoint), clipboard,
-                 src, true);
+    doSystemDrag(dragImage, dragLoc, mouseDraggedPoint, clipboard, src, true);
   } else if (isSelected && (m_dragSourceAction & DragSourceActionSelection)) {
     RefPtr<Range> selectionRange = src->selectionController()->toRange();
     ASSERT(selectionRange);
@@ -743,7 +743,9 @@ void DragController::doSystemDrag(DragImageRef image,
   RefPtr<FrameView> viewProtector = frameProtector->view();
   m_client->startDrag(image, viewProtector->windowToContents(
                                  frame->view()->contentsToWindow(dragLoc)),
-                      eventPos, clipboard, frameProtector.get(), forLink);
+                      viewProtector->windowToContents(
+                          frame->view()->contentsToWindow(eventPos)),
+                      clipboard, frameProtector.get(), forLink);
 
   // Drag has ended, dragEnded *should* have been called, however it is possible
   // for the UIDelegate to take over the drag, and fail to send the appropriate
