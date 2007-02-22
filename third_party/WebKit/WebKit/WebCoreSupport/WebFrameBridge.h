@@ -45,7 +45,6 @@ class Page;
   WebCore::KeyboardUIMode _keyboardUIMode;
   BOOL _keyboardUIModeAccessed;
   BOOL _doingClientRedirect;
-  BOOL _inNextKeyViewOutsideWebFrameViews;
   BOOL _haveUndoRedoOperations;
 
   NSDictionary* lastDashboardRegions;
@@ -57,8 +56,5 @@ class Page;
 - (void)close;
 
 - (WebFrame*)webFrame;
-
-- (BOOL)inNextKeyViewOutsideWebFrameViews;
-- (NSView*)nextValidKeyViewOutsideWebFrameViews;
 
 @end
