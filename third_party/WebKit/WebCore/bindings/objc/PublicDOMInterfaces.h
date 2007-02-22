@@ -349,7 +349,7 @@
 @interface DOMHTMLBaseFontElement : DOMHTMLElement
 @property(copy) NSString* color;
 @property(copy) NSString* face;
-@property int size;
+@property(copy) NSString* size;
 @end
 
 @interface DOMHTMLBodyElement : DOMHTMLElement
@@ -537,7 +537,7 @@
 @property int maxLength;
 @property(copy) NSString* name;
 @property BOOL readOnly;
-@property unsigned size;
+@property(copy) NSString* size;
 @property(copy) NSString* src;
 @property int tabIndex;
 @property(copy) NSString* type;
@@ -653,7 +653,7 @@
 @end
 
 @interface DOMHTMLOptionsCollection : DOMObject
-@property int length;
+@property unsigned length;
 - (DOMNode*)item:(unsigned)index;
 - (DOMNode*)namedItem:(NSString*)name;
 @end
@@ -1178,6 +1178,12 @@
 @end
 
 @protocol DOMEventTarget<NSObject, NSCopying>
+- (void)addEventListener:(NSString*)
+                    type:(id<DOMEventListener>)
+                listener:(BOOL)useCapture;
+- (void)removeEventListener:(NSString*)
+                       type:(id<DOMEventListener>)
+                   listener:(BOOL)useCapture;
 - (void)addEventListener:(NSString*)type
                 listener:(id<DOMEventListener>)listener
               useCapture:(BOOL)useCapture;
