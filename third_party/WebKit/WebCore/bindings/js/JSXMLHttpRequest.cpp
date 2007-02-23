@@ -156,13 +156,13 @@ void JSXMLHttpRequest::putValueProperty(ExecState* exec,
   switch (token) {
     case Onreadystatechange:
       m_impl->setOnReadyStateChangeListener(
-          Window::retrieveActive(exec)->getJSUnprotectedEventListener(value,
-                                                                      true));
+          Window::retrieveActive(exec)->findOrCreateJSUnprotectedEventListener(
+              value, true));
       break;
     case Onload:
       m_impl->setOnLoadListener(
-          Window::retrieveActive(exec)->getJSUnprotectedEventListener(value,
-                                                                      true));
+          Window::retrieveActive(exec)->findOrCreateJSUnprotectedEventListener(
+              value, true));
       break;
   }
 }
@@ -302,8 +302,8 @@ JSValue* JSXMLHttpRequestPrototypeFunction::callAsFunction(ExecState* exec,
 
     case JSXMLHttpRequest::AddEventListener: {
       JSUnprotectedEventListener* listener =
-          Window::retrieveActive(exec)->getJSUnprotectedEventListener(args[1],
-                                                                      true);
+          Window::retrieveActive(exec)->findOrCreateJSUnprotectedEventListener(
+              args[1], true);
       if (listener)
         request->m_impl->addEventListener(args[0]->toString(exec), listener,
                                           args[2]->toBoolean(exec));
@@ -311,8 +311,8 @@ JSValue* JSXMLHttpRequestPrototypeFunction::callAsFunction(ExecState* exec,
     }
     case JSXMLHttpRequest::RemoveEventListener: {
       JSUnprotectedEventListener* listener =
-          Window::retrieveActive(exec)->getJSUnprotectedEventListener(args[1],
-                                                                      true);
+          Window::retrieveActive(exec)->findJSUnprotectedEventListener(args[1],
+                                                                       true);
       if (listener)
         request->m_impl->removeEventListener(args[0]->toString(exec), listener,
                                              args[2]->toBoolean(exec));

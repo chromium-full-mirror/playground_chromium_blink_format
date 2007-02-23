@@ -637,7 +637,8 @@ void DOMEventTargetNode::setListener(ExecState* exec,
                                      const AtomicString& eventType,
                                      JSValue* func) const {
   EventTargetNodeCast(impl())->setHTMLEventListener(
-      eventType, Window::retrieveActive(exec)->getJSEventListener(func, true));
+      eventType,
+      Window::retrieveActive(exec)->findOrCreateJSEventListener(func, true));
 }
 
 JSValue* DOMEventTargetNode::getListener(const AtomicString& eventType) const {
@@ -679,7 +680,7 @@ JSValue* DOMEventTargetNodePrototypeFunction::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMEventTargetNode::AddEventListener: {
       JSEventListener* listener =
-          Window::retrieveActive(exec)->getJSEventListener(args[1]);
+          Window::retrieveActive(exec)->findOrCreateJSEventListener(args[1]);
       if (listener)
         node->addEventListener(args[0]->toString(exec), listener,
                                args[2]->toBoolean(exec));
@@ -687,7 +688,7 @@ JSValue* DOMEventTargetNodePrototypeFunction::callAsFunction(ExecState* exec,
     }
     case DOMEventTargetNode::RemoveEventListener: {
       JSEventListener* listener =
-          Window::retrieveActive(exec)->getJSEventListener(args[1]);
+          Window::retrieveActive(exec)->findJSEventListener(args[1]);
       if (listener)
         node->removeEventListener(args[0]->toString(exec), listener,
                                   args[2]->toBoolean(exec));

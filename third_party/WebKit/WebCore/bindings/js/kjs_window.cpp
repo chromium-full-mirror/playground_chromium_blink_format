@@ -1346,7 +1346,8 @@ void Window::setListener(ExecState* exec,
   if (!doc)
     return;
 
-  doc->setHTMLWindowEventListener(eventType, getJSEventListener(func, true));
+  doc->setHTMLWindowEventListener(eventType,
+                                  findOrCreateJSEventListener(func, true));
 }
 
 JSValue* Window::getListener(ExecState* exec,
@@ -1364,30 +1365,49 @@ JSValue* Window::getListener(ExecState* exec,
     return jsNull();
 }
 
-JSEventListener* Window::getJSEventListener(JSValue* val, bool html) {
+JSEventListener* Window::findJSEventListener(JSValue* val, bool html) {
   if (!val->isObject())
     return 0;
   JSObject* object = static_cast<JSObject*>(val);
-
   ListenersMap& listeners = html ? jsHTMLEventListeners : jsEventListeners;
-  if (JSEventListener* listener = listeners.get(object))
+  return listeners.get(object);
+}
+
+JSEventListener* Window::findOrCreateJSEventListener(JSValue* val, bool html) {
+  JSEventListener* listener = findJSEventListener(val, html);
+  if (listener)
     return listener;
+
+  if (!val->isObject())
+    return 0;
+  JSObject* object = static_cast<JSObject*>(val);
 
   // Note that the JSEventListener constructor adds it to our jsEventListeners
   // list
   return new JSEventListener(object, this, html);
 }
 
-JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(JSValue* val,
-                                                                  bool html) {
+JSUnprotectedEventListener* Window::findJSUnprotectedEventListener(JSValue* val,
+                                                                   bool html) {
   if (!val->isObject())
     return 0;
   JSObject* object = static_cast<JSObject*>(val);
-
   UnprotectedListenersMap& listeners =
       html ? jsUnprotectedHTMLEventListeners : jsUnprotectedEventListeners;
-  if (JSUnprotectedEventListener* listener = listeners.get(object))
+  return listeners.get(object);
+}
+
+JSUnprotectedEventListener* Window::findOrCreateJSUnprotectedEventListener(
+    JSValue* val,
+    bool html) {
+  JSUnprotectedEventListener* listener =
+      findJSUnprotectedEventListener(val, html);
+  if (listener)
     return listener;
+
+  if (!val->isObject())
+    return 0;
+  JSObject* object = static_cast<JSObject*>(val);
 
   // The JSUnprotectedEventListener constructor adds it to our
   // jsUnprotectedEventListeners map.
@@ -1894,7 +1914,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!window->isSafeScript(exec))
         return jsUndefined();
       if (JSEventListener* listener =
-              Window::retrieveActive(exec)->getJSEventListener(args[1]))
+              Window::retrieveActive(exec)->findOrCreateJSEventListener(
+                  args[1]))
         if (Document* doc = frame->document())
           doc->addWindowEventListener(AtomicString(args[0]->toString(exec)),
                                       listener, args[2]->toBoolean(exec));
@@ -1903,7 +1924,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!window->isSafeScript(exec))
         return jsUndefined();
       if (JSEventListener* listener =
-              Window::retrieveActive(exec)->getJSEventListener(args[1]))
+              Window::retrieveActive(exec)->findJSEventListener(args[1]))
         if (Document* doc = frame->document())
           doc->removeWindowEventListener(AtomicString(args[0]->toString(exec)),
                                          listener, args[2]->toBoolean(exec));
