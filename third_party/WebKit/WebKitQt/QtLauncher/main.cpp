@@ -62,6 +62,66 @@ class InfoWidget : public QProgressBar {
   qreal m_progress;
 };
 
+class HoverLabel : public QWidget {
+  Q_OBJECT
+ public:
+  HoverLabel(QWidget* parent = 0) : QWidget(parent) {}
+
+ public slots:
+  void setHoverLink(const QString& link) {
+    m_link = link;
+    if (m_link.isEmpty()) {
+      hide();
+    } else {
+      updateSize();
+      show();
+    }
+  }
+
+  QSize sizeHint() const {
+    QFont f = font();
+    QFontMetrics fm(f);
+    return QSize(fm.width(m_link) + 10, fm.height() + 6);
+  }
+  void updateSize() {
+    QRect r = geometry();
+    QSize newSize = sizeHint();
+    r = QRect(r.x(), r.y(), newSize.width(), newSize.height());
+    setGeometry(r);
+  }
+
+ protected:
+  void paintEvent(QPaintEvent* e) {
+    QPainter p(this);
+    p.setPen(QPen(Qt::black, 1));
+    QLinearGradient gradient(rect().topLeft(), rect().bottomLeft());
+    gradient.setColorAt(0, QColor(255, 255, 255, 220));
+    gradient.setColorAt(1, QColor(193, 193, 193, 220));
+    p.setBrush(QBrush(gradient));
+    {
+      // draw a nicely rounded corner rectangle. to avoid unwanted
+      // borders we move the coordinates outsize the our clip region
+      QRect r(-1, 0, width(), height() + 2);
+      const int roundness = 20;
+      QPainterPath path;
+      path.moveTo(r.x(), r.y());
+      path.lineTo(r.topRight().x() - roundness, r.topRight().y());
+      path.cubicTo(r.topRight().x(), r.topRight().y(), r.topRight().x(),
+                   r.topRight().y(), r.topRight().x(),
+                   r.topRight().y() + roundness);
+      path.lineTo(r.bottomRight());
+      path.lineTo(r.bottomLeft());
+      path.closeSubpath();
+      p.setRenderHint(QPainter::Antialiasing);
+      p.drawPath(path);
+    }
+
+    p.drawText(5, height() - 6, m_link);
+  }
+
+  QString m_link;
+};
+
 class SearchEdit;
 
 class ClearButton : public QPushButton {
@@ -95,7 +155,7 @@ class SearchEdit : public QLineEdit {
   Q_OBJECT
  public:
   SearchEdit(const QString& str, QWidget* parent = 0) : QLineEdit(str, parent) {
-    setMinimumSize(QSize(300, 24));
+    setMinimumSize(QSize(400, 24));
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     setStyleSheet(":enabled { padding-right: 27px }");
@@ -120,12 +180,10 @@ class SearchEdit : public QLineEdit {
   }
   virtual void resizeEvent(QResizeEvent* e) {
     clearButton->setParent(this);
-    qDebug() << "geometry = " << geometry();
     clearButton->setGeometry(QRect(width() - 27, 0, 24, 24));
   }
   virtual void moveEvent(QMoveEvent*) {
     clearButton->setParent(this);
-    qDebug() << "moveevent = " << geometry();
     clearButton->setGeometry(QRect(width() - 27, 1, 24, 24));
   }
 
@@ -147,6 +205,8 @@ class MainWindow : public QMainWindow {
     connect(page, SIGNAL(loadFinished(QWebFrame*)), this, SLOT(loadFinished()));
     connect(page, SIGNAL(titleChanged(const QString&)), this,
             SLOT(setWindowTitle(const QString&)));
+    connect(page, SIGNAL(hoveringOverLink(const QString&, const QString&)),
+            this, SLOT(showLinkHover(const QString&, const QString&)));
 
     setCentralWidget(page);
 
@@ -158,6 +218,9 @@ class MainWindow : public QMainWindow {
     bar->addAction("Go forward", page, SLOT(goForward()));
     bar->addWidget(urlEdit);
 
+    hoverLabel = new HoverLabel(this);
+    hoverLabel->hide();
+
     page->open(url);
 
     info->raise();
@@ -168,10 +231,24 @@ class MainWindow : public QMainWindow {
     page->open(url);
   }
   void loadFinished() { urlEdit->setText(page->url().toString()); }
+  void showLinkHover(const QString& link, const QString& toolTip) {
+    // statusBar()->showMessage(link);
+    hoverLabel->setHoverLink(link);
+    if (!toolTip.isEmpty())
+      QToolTip::showText(QCursor::pos(), toolTip);
+  }
+
+ protected:
+  void resizeEvent(QResizeEvent*) {
+    QSize hoverSize = hoverLabel->sizeHint();
+    hoverLabel->setGeometry(0, height() - hoverSize.height(), 300,
+                            hoverSize.height());
+  }
 
  private:
   QWebPage* page;
   QLineEdit* urlEdit;
+  HoverLabel* hoverLabel;
 };
 
 #include "main.moc"

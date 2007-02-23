@@ -34,6 +34,7 @@
 #include "wtf/RefPtr.h"
 
 namespace WebCore {
+class Element;
 class FrameLoaderClientQt;
 class Frame;
 class FrameView;
@@ -61,7 +62,8 @@ class QWebFramePrivate {
         frame(0),
         frameView(0),
         page(0),
-        eventHandler(0) {}
+        eventHandler(0),
+        lastHoverElement(0) {}
   void init(QWebFrame* qframe, WebCore::Page* page, QWebFrameData* frameData);
 
   void _q_adjustScrollbars();
@@ -73,6 +75,7 @@ class QWebFramePrivate {
   WTF::RefPtr<WebCore::FrameView> frameView;
   QWebPage* page;
   WebCore::EventHandler* eventHandler;
+  WebCore::Element* lastHoverElement;
 };
 
 #endif
