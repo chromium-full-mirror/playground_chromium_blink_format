@@ -27,13 +27,8 @@
 #include "Image.h"
 
 #include "BitmapImage.h"
+#include "NotImplementedGdk.h"
 #include <cairo.h>
-
-#define notImplemented()                                                    \
-  do {                                                                      \
-    fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", __PRETTY_FUNCTION__, \
-            __FILE__, __LINE__);                                            \
-  } while (0)
 
 // This function loads resources from WebKit
 Vector<char> loadResourceIntoArray(const char*);
@@ -57,6 +52,6 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatPoint& phase,
                         CompositeOperator op,
                         const FloatRect& destRect) {
-  notImplemented();
+  notImplementedGdk();
 }
 }
