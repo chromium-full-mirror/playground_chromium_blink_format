@@ -1866,9 +1866,6 @@ void FrameLoader::load(const ResourceRequest& request,
 }
 
 void FrameLoader::load(DocumentLoader* newDocumentLoader) {
-  stopPolicyCheck();
-  setPolicyDocumentLoader(newDocumentLoader);
-
   ResourceRequest& r = newDocumentLoader->request();
   addExtraFieldsToRequest(r, true, false);
   FrameLoadType type;
@@ -2018,7 +2015,7 @@ bool FrameLoader::shouldReloadToHandleUnreachableURL(
     compareDocumentLoader = m_provisionalDocumentLoader.get();
 
   return compareDocumentLoader &&
-         unreachableURL != compareDocumentLoader->request().url();
+         unreachableURL == compareDocumentLoader->request().url();
 }
 
 void FrameLoader::reloadAllowingStaleData(const String& encoding) {
@@ -2658,8 +2655,8 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
         // delegate callback.
         if (pdl == m_provisionalDocumentLoader)
           clearProvisionalLoad();
-        else if (m_documentLoader) {
-          KURL unreachableURL = m_documentLoader->unreachableURL();
+        else {
+          KURL unreachableURL = m_provisionalDocumentLoader->unreachableURL();
           if (!unreachableURL.isEmpty() &&
               unreachableURL == pdl->request().url())
             shouldReset = false;
