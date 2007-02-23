@@ -56,6 +56,7 @@ typedef enum {
 - (BOOL)_firstLayoutDone;
 - (WebFrameLoadType)_loadType;
 - (void)_recursive_resumeNullEventsForAllNetscapePlugins;
+- (void)_recursive_pauseNullEventsForAllNetscapePlugins;
 
 // These methods take and return NSRanges based on the root editable element as
 // the positional base.
