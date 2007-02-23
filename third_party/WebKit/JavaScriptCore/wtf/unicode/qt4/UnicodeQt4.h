@@ -328,6 +328,7 @@ inline int toLower(UChar* result,
   }
   for (int i = 0; i < srcLength; ++i)
     result[i] = QChar(src[i]).toLower().unicode();
+  return srcLength;
 }
 
 inline int toUpper(UChar* str, int strLength, UChar*& destIfNeeded) {
@@ -357,6 +358,7 @@ inline int toUpper(UChar* result,
   }
   for (int i = 0; i < srcLength; ++i)
     result[i] = QChar(src[i]).toUpper().unicode();
+  return srcLength;
 }
 
 inline int toTitleCase(UChar32 c) {
