@@ -138,7 +138,6 @@ void ResourceHandleManager::downloadTimerCallback(
       curl_easy_getinfo(d->m_handle, CURLINFO_EFFECTIVE_URL, &url);
       printf("Curl ERROR for url='%s', error: '%s'\n", url,
              curl_easy_strerror(msg->data.result));
-      free(url);
 #endif
       if (d->client())
         d->client()->didFail(job, ResourceError());
