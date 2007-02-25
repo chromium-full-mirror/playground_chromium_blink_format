@@ -217,12 +217,12 @@ void ContextMenu::populate() {
   ContextMenuItem SearchSpotlightItem(ActionType,
                                       ContextMenuItemTagSearchInSpotlight,
                                       contextMenuItemTagSearchInSpotlight());
-#endif
-  ContextMenuItem SearchWebItem(ActionType, ContextMenuItemTagSearchWeb,
-                                contextMenuItemTagSearchWeb());
   ContextMenuItem LookInDictionaryItem(ActionType,
                                        ContextMenuItemTagLookUpInDictionary,
                                        contextMenuItemTagLookUpInDictionary());
+#endif
+  ContextMenuItem SearchWebItem(ActionType, ContextMenuItemTagSearchWeb,
+                                contextMenuItemTagSearchWeb());
   ContextMenuItem CopyItem(ActionType, ContextMenuItemTagCopy,
                            contextMenuItemTagCopy());
   ContextMenuItem BackItem(ActionType, ContextMenuItemTagGoBack,
@@ -290,8 +290,10 @@ void ContextMenu::populate() {
 #endif
           appendItem(SearchWebItem);
           appendItem(*separatorItem());
+#if PLATFORM(MAC)
           appendItem(LookInDictionaryItem);
           appendItem(*separatorItem());
+#endif
         }
         appendItem(CopyItem);
       } else {
@@ -366,8 +368,10 @@ void ContextMenu::populate() {
       appendItem(SearchWebItem);
       appendItem(*separatorItem());
 
+#if PLATFORM(MAC)
       appendItem(LookInDictionaryItem);
       appendItem(*separatorItem());
+#endif
     }
 
     appendItem(CutItem);
