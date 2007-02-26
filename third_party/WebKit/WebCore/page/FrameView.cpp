@@ -211,11 +211,7 @@ void FrameView::adjustViewSize() {
     RenderView* root = static_cast<RenderView*>(document->renderer());
     if (!root)
       return;
-
-    int docw = root->docWidth();
-    int doch = root->docHeight();
-
-    resizeContents(docw, doch);
+    resizeContents(root->overflowWidth(), root->overflowHeight());
   }
 }
 
@@ -437,7 +433,7 @@ void FrameView::layout(bool allowSubtree) {
   d->layoutSchedulingEnabled = true;
 
   if (!subtree && !static_cast<RenderView*>(root)->printing())
-    resizeContents(layer->width(), layer->height());
+    adjustViewSize();
 
   // Now update the positions of all layers.
   layer->updateLayerPositions(d->doFullRepaint);
