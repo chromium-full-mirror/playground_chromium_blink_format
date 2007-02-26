@@ -49,7 +49,6 @@ class ScrollView : public Widget {
   int visibleWidth() const;
   int visibleHeight() const;
   FloatRect visibleContentRect() const;
-  FloatRect fullyClippedContentRect() const;
 
   int contentsWidth() const;
   int contentsHeight() const;
