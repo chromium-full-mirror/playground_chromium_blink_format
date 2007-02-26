@@ -99,9 +99,6 @@ class RenderView : public RenderBlock {
   void addWidget(RenderObject*);
   void removeWidget(RenderObject*);
 
-  void setFlexBoxInFirstLayout(RenderObject* r) { m_flexBoxInFirstLayout = r; }
-  RenderObject* flexBoxInFirstLayout() { return m_flexBoxInFirstLayout; }
-
   const IntSize& layoutDelta() const { return m_layoutDelta; }
   void addLayoutDelta(const IntSize& delta) { m_layoutDelta += delta; }
 
@@ -124,8 +121,6 @@ class RenderView : public RenderBlock {
   typedef HashSet<RenderObject*> RenderObjectSet;
 
   RenderObjectSet m_widgets;
-
-  RenderObject* m_flexBoxInFirstLayout;
 
  private:
   int m_bestTruncatedAt;
