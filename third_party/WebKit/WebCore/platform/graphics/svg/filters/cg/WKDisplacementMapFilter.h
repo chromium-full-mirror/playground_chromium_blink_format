@@ -26,6 +26,8 @@
 
 #import <QuartzCore/CoreImage.h>
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+
 @interface WKDisplacementMapFilter : CIFilter {
   CIImage* inputImage;
   CIImage* inputDisplacementMap;
@@ -35,3 +37,5 @@
 }
 
 @end
+
+#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)

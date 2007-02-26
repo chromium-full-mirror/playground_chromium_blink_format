@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGTextContentElement.h"
 
 #include "CSSPropertyNames.h"
@@ -138,6 +138,6 @@ void SVGTextContentElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

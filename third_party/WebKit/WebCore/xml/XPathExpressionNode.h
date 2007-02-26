@@ -27,7 +27,7 @@
 #ifndef XPathExpressionNode_h
 #define XPathExpressionNode_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "StringHash.h"
 #include <wtf/HashMap.h>
@@ -82,6 +82,6 @@ class Expression : public ParseNode, Noncopyable {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // EXPRESSION_H

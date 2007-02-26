@@ -25,6 +25,8 @@
 
 #import <QuartzCore/CoreImage.h>
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+
 @interface WKSpecularLightingFilter : CIFilter {
   CISampler* inputNormalMap;
   CISampler* inputLightVectors;
@@ -36,3 +38,5 @@
   NSNumber* inputKernelUnitLengthY;
 }
 @end
+
+#endif ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)

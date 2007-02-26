@@ -23,7 +23,7 @@
 #ifndef SVGUseElement_h
 #define SVGUseElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
@@ -122,7 +122,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

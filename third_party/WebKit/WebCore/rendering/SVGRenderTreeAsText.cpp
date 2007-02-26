@@ -27,7 +27,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGRenderTreeAsText.h"
 
@@ -358,4 +358,4 @@ void writeRenderResources(TextStream& ts, Node* parent) {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

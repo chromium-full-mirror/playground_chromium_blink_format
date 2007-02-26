@@ -22,7 +22,7 @@
 
 #ifndef SVGFETurbulenceElement_h
 #define SVGFETurbulenceElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFETurbulence.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -80,7 +80,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

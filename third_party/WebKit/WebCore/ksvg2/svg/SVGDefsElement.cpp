@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGDefsElement.h"
 
 #include "RenderSVGHiddenContainer.h"
@@ -51,4 +51,4 @@ RenderObject* SVGDefsElement::createRenderer(RenderArena* arena,
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

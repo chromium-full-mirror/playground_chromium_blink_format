@@ -22,7 +22,7 @@
 
 #ifndef RenderForeignObject_h
 #define RenderForeignObject_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "AffineTransform.h"
 #include "RenderSVGBlock.h"
@@ -65,5 +65,5 @@ class RenderForeignObject : public RenderSVGBlock {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // RenderForeignObject_h

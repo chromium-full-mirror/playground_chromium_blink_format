@@ -27,7 +27,7 @@
 #ifndef XPathPath_h
 #define XPathPath_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathExpressionNode.h"
 #include "XPathUtil.h"
@@ -86,6 +86,6 @@ class Path : public Expression {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPath_Path_H

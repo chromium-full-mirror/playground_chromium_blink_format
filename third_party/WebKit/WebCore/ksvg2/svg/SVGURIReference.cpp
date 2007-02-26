@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGURIReference.h"
 
 #include "SVGNames.h"
@@ -67,4 +67,4 @@ String SVGURIReference::getTarget(const String& url) {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFEFuncBElement.h"
 
 namespace WebCore {
@@ -34,6 +34,6 @@ SVGFEFuncBElement::SVGFEFuncBElement(const QualifiedName& tagName,
 SVGFEFuncBElement::~SVGFEFuncBElement() {}
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

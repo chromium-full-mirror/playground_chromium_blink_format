@@ -22,7 +22,7 @@
 
 #ifndef SVGDocument_h
 #define SVGDocument_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "Document.h"
 
@@ -50,7 +50,7 @@ class SVGDocument : public Document {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGDocument_h
 
 // vim:ts=4:noet

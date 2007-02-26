@@ -22,7 +22,7 @@
 
 #ifndef SVGFECompositeElement_h
 #define SVGFECompositeElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFEComposite.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -68,7 +68,7 @@ class SVGFECompositeElement : public SVGFilterPrimitiveStandardAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

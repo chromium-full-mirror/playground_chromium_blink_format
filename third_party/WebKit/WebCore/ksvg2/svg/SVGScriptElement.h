@@ -22,7 +22,7 @@
 
 #ifndef SVGScriptElement_h
 #define SVGScriptElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGElement.h"
 #include "SVGURIReference.h"
@@ -60,7 +60,7 @@ class SVGScriptElement : public SVGElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

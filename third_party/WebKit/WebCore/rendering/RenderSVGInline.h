@@ -24,7 +24,7 @@
 #ifndef RenderSVGInline_h
 #define RenderSVGInline_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "RenderInline.h"
 
 namespace WebCore {
@@ -39,5 +39,5 @@ class RenderSVGInline : public RenderInline {
 };
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // !RenderSVGTSpan_H

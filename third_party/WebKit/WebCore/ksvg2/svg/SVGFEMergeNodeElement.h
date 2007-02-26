@@ -22,7 +22,7 @@
 
 #ifndef SVGFEMergeNodeElement_h
 #define SVGFEMergeNodeElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include <SVGElement.h>
 
@@ -50,7 +50,7 @@ class SVGFEMergeNodeElement : public SVGElement {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

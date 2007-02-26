@@ -22,7 +22,7 @@
 
 #ifndef SVGStyledLocatableElement_h
 #define SVGStyledLocatableElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGLocatable.h"
 #include "SVGStyledElement.h"
@@ -50,7 +50,7 @@ class SVGStyledLocatableElement : public SVGStyledElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGStyledLocatableElement_h
 
 // vim:ts=4:noet

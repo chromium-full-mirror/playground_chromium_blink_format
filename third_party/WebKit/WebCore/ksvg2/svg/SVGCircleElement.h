@@ -23,7 +23,7 @@
 #ifndef SVGCircleElement_h
 #define SVGCircleElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
@@ -67,7 +67,7 @@ class SVGCircleElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGCircleElement_h
 
 // vim:ts=4:noet

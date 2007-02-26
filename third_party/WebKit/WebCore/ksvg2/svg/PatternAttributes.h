@@ -22,7 +22,7 @@
 #ifndef PatternAttributes_h
 #define PatternAttributes_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 namespace WebCore {
 struct PatternAttributes {
@@ -120,7 +120,7 @@ struct PatternAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

@@ -58,7 +58,7 @@
 #include "Settings.h"
 #include "TextEvent.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGCursorElement.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
@@ -79,7 +79,7 @@ const int TextDragHysteresis = 3;
 const int GeneralDragHysteresis = 3;
 const double TextDragDelay = 0.15;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 using namespace SVGNames;
 #endif
 
@@ -348,7 +348,7 @@ bool EventHandler::handleMouseMoveEvent(
   if (!(m_mouseDownMayStartSelect && innerNode->renderer()->shouldSelect()))
     return false;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   Selection curSelection = m_frame->selectionController()->selection();
   if (!curSelection.isNone() && curSelection.base().node()->renderer() &&
       curSelection.base().node()->renderer()->isSVGText() &&
@@ -643,7 +643,7 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
     for (unsigned i = 0; i < cursors->size(); ++i) {
       CachedImage* cimage = (*cursors)[i].cursorImage;
       IntPoint hotSpot = (*cursors)[i].hotSpot;
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
       if (!cimage) {
         Element* e =
             node->document()->getElementById((*cursors)[i].cursorFragmentId);

@@ -99,22 +99,22 @@
 #include "kjs_proxy.h"
 #include "xmlhttprequest.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 #include "XPathEvaluator.h"
 #include "XPathExpression.h"
 #include "XPathNSResolver.h"
 #include "XPathResult.h"
 #endif
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 #include "XSLTProcessor.h"
 #endif
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
 #include "XBLBindingManager.h"
 #endif
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGDocumentExtensions.h"
 #include "SVGElementFactory.h"
 #include "SVGZoomEvent.h"
@@ -291,14 +291,14 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       m_title(""),
       m_titleSetExplicitly(false),
       m_imageLoadEventTimer(this, &Document::imageLoadEventTimerFired)
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
       ,
       m_transformSource(0)
 #endif
       ,
       m_xmlVersion("1.0"),
       m_xmlStandalone(false)
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
       ,
       m_bindingManager(new XBLBindingManager(this))
 #endif
@@ -308,7 +308,7 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       m_secureForms(0),
       m_designMode(inherit),
       m_selfOnlyRefCount(0)
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
       ,
       m_svgExtensions(0)
 #endif
@@ -406,7 +406,7 @@ Document::~Document() {
 
   removeAllEventListeners();
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   delete m_svgExtensions;
 #endif
 
@@ -425,11 +425,11 @@ Document::~Document() {
     m_renderArena = 0;
   }
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   xmlFreeDoc((xmlDocPtr)m_transformSource);
 #endif
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   delete m_bindingManager;
 #endif
 
@@ -667,7 +667,7 @@ PassRefPtr<Element> Document::createElement(const QualifiedName& qName,
   if (qName.namespaceURI() == xhtmlNamespaceURI)
     e = HTMLElementFactory::createHTMLElement(qName.localName(), this, 0,
                                               createdByParser);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (qName.namespaceURI() == SVGNames::svgNamespaceURI)
     e = SVGElementFactory::createSVGElement(qName, this, createdByParser);
 #endif
@@ -1424,7 +1424,7 @@ void Document::implicitClose() {
     axObjectCache()->postNotificationToElement(renderer(), "AXLoadComplete");
 #endif
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   // FIXME: Officially, time 0 is when the outermost <svg> receives its
   // SVGLoad event, but we don't implement those yet.  This is close enough
   // for now.  In some cases we should have fired earlier.
@@ -1951,7 +1951,7 @@ void Document::recalcStyleSelector() {
       // Processing instruction (XML documents only)
       ProcessingInstruction* pi = static_cast<ProcessingInstruction*>(n);
       sheet = pi->sheet();
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
       // Don't apply XSL transforms to already transformed documents --
       // <rdar://problem/4132806>
       if (pi->isXSL() && !transformSourceDocument()) {
@@ -1986,7 +1986,7 @@ void Document::recalcStyleSelector() {
 
     } else if (n->isHTMLElement() &&
                    (n->hasTagName(linkTag) || n->hasTagName(styleTag))
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
                || (n->isSVGElement() && n->hasTagName(SVGNames::styleTag))
 #endif
                    ) {
@@ -2005,7 +2005,7 @@ void Document::recalcStyleSelector() {
 
 // Get the current preferred styleset.  This is the
 // set of sheets that will be enabled.
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
       if (n->isSVGElement() && n->hasTagName(SVGNames::styleTag))
         sheet = static_cast<SVGStyleElement*>(n)->sheet();
       else
@@ -2034,7 +2034,7 @@ void Document::recalcStyleSelector() {
         if (title != m_preferredStylesheetSet)
           sheet = 0;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
         if (!n->isHTMLElement())
           title = title.replace('&', "&&");
 #endif
@@ -2289,7 +2289,7 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
     return new Event;
   if (eventType == "TextEvent")
     return new TextEvent;
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   if (eventType == "SVGEvents")
     return new Event;
   if (eventType == "SVGZoomEvents")
@@ -3183,7 +3183,7 @@ void Document::shiftMarkers(Node* node,
     node->renderer()->repaint();
 }
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 
 void Document::applyXSLTransform(ProcessingInstruction* pi) {
   RefPtr<XSLTProcessor> processor = new XSLTProcessor;
@@ -3269,7 +3269,7 @@ PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
                                StringImpl::empty()));
 }
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 const SVGDocumentExtensions* Document::svgExtensions() {
   return m_svgExtensions;
 }
@@ -3413,7 +3413,7 @@ Vector<String> Document::formElementsState() const {
   return stateVector;
 }
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 PassRefPtr<XPathExpression> Document::createExpression(
     const String& expression,
@@ -3442,7 +3442,7 @@ PassRefPtr<XPathResult> Document::evaluate(const String& expression,
                                     result, ec);
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 void Document::setStateForNewFormElements(const Vector<String>& stateVector) {
   // Walk the state vector backwards so that the value to use for each

@@ -18,7 +18,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "JSSVGElementWrapperFactory.h"
 
@@ -158,6 +158,7 @@ using namespace SVGNames;
 typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
                                                     PassRefPtr<SVGElement>);
 
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #define FOR_EACH_TAG(macro)                                                     \
   macro(a, A) macro(animateColor, AnimateColor) macro(animate, Animate) macro(  \
       animateTransform,                                                         \
@@ -220,6 +221,26 @@ typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
                                                               View)  // end of
                                                                      // macro
 
+#else
+
+#define FOR_EACH_TAG(macro)                                                   \
+  macro(a, A) macro(circle, Circle) macro(clipPath, ClipPath)                 \
+      macro(cursor, Cursor) macro(defs, Defs) macro(desc, Desc) macro(        \
+          ellipse, Ellipse) macro(g, G) macro(image, Image)                   \
+          macro(linearGradient, LinearGradient) macro(line, Line) macro(      \
+              marker, Marker) macro(mask, Mask) macro(metadata, Metadata)     \
+              macro(path, Path) macro(pattern, Pattern)                       \
+                  macro(polyline, Polyline) macro(polygon, Polygon) macro(    \
+                      radialGradient, RadialGradient) macro(rect, Rect)       \
+                      macro(script, Script) macro(set, Set) macro(stop, Stop) \
+                          macro(style, Style) macro(svg, SVG)                 \
+                              macro(switch, Switch) macro(symbol, Symbol)     \
+                                  macro(text, Text) macro(title, Title)       \
+                                      macro(tref, TRef) macro(tspan, TSpan)   \
+                                          macro(view, View)  // end of macro
+
+#endif
+
 #define CREATE_WRAPPER_FUNCTION(tag, name)                                \
   static DOMNode* create##name##Wrapper(ExecState* exec,                  \
                                         PassRefPtr<SVGElement> element) { \
@@ -246,4 +267,4 @@ DOMNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

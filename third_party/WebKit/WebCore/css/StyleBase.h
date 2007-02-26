@@ -65,7 +65,7 @@ class StyleBase : public Shared<StyleBase> {
   virtual bool isPrimitiveValue() const { return false; }
   virtual bool isValueList() { return false; }
   virtual bool isValueCustom() { return false; }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   virtual bool isSVGColor() const { return false; }
   virtual bool isSVGPaint() const { return false; }
 #endif

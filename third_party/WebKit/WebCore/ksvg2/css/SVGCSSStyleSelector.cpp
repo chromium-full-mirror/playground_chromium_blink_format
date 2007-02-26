@@ -28,7 +28,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "cssstyleselector.h"
 
 #include "SVGColor.h"
@@ -661,4 +661,4 @@ void CSSStyleSelector::applySVGProperty(int id, CSSValue* value) {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

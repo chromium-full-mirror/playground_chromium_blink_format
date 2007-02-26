@@ -22,7 +22,7 @@
 
 #ifndef SVGURIReference_h
 #define SVGURIReference_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGElement.h"
 
@@ -54,7 +54,7 @@ class SVGURIReference {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGURIReference_h
 
 // vim:ts=4:noet

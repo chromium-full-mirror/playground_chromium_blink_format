@@ -21,7 +21,7 @@
 
 #ifndef SVGImageLoader_h
 #define SVGImageLoader_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "HTMLImageLoader.h"
 
@@ -40,7 +40,7 @@ class SVGImageLoader : public HTMLImageLoader {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGImageLoader_h
 
 // vim:ts=4:noet

@@ -23,7 +23,7 @@
 #ifndef SVGPathSegCurvetoCubic_h
 #define SVGPathSegCurvetoCubic_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGPathSeg.h"
 
@@ -122,7 +122,7 @@ class SVGPathSegCurvetoCubicRel : public SVGPathSeg {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

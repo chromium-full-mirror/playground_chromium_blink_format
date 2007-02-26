@@ -39,7 +39,7 @@
 
 namespace WebCore {
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 
 CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
                                          const String& url,

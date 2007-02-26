@@ -22,7 +22,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGAnimationElement.h"
 
 #include "CSSPropertyNames.h"
@@ -787,4 +787,4 @@ bool SVGAnimationElement::updateAnimatedValueForElapsedSeconds(
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

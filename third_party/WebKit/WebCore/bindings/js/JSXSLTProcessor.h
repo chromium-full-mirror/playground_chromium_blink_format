@@ -26,7 +26,7 @@
 #ifndef JSXSLTProcessor_h
 #define JSXSLTProcessor_h
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 
 #include "kjs_binding.h"
 
@@ -76,6 +76,6 @@ class XSLTProcessorConstructorImp : public DOMObject {
 
 }  // namespace KJS
 
-#endif  // XSLT_SUPPORT
+#endif  // ENABLE(XSLT)
 
 #endif  // JSXSLTProcessor_h

@@ -26,7 +26,7 @@
 
 #include "config.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathPredicate.h"
 
@@ -214,4 +214,4 @@ void Predicate::optimize() {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

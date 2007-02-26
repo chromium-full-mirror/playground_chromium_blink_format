@@ -27,7 +27,7 @@
 #ifndef XPathNSResolver_h
 #define XPathNSResolver_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "Shared.h"
 
@@ -42,6 +42,6 @@ class XPathNSResolver : public Shared<XPathNSResolver> {
 };
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPathNSResolver_h

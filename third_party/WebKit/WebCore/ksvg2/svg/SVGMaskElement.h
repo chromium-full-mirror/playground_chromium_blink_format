@@ -22,7 +22,7 @@
 #ifndef SVGMaskElement_h
 #define SVGMaskElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGResourceMasker.h"
 #include "SVGExternalResourcesRequired.h"
@@ -85,7 +85,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

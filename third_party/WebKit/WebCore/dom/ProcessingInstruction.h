@@ -59,7 +59,7 @@ class ProcessingInstruction : public ContainerNode,
   virtual void setCSSStyleSheet(const String& URL,
                                 const String& charset,
                                 const String& sheet);
-#if XSLT_SUPPORT
+#if ENABLE(XSLT)
   virtual void setXSLStyleSheet(const String& URL, const String& sheet);
 #endif
   void setCSSStyleSheet(CSSStyleSheet*);
@@ -67,7 +67,7 @@ class ProcessingInstruction : public ContainerNode,
   virtual bool sheetLoaded();
   virtual String toString() const;
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   bool isXSL() const { return m_isXSL; }
 #endif
 
@@ -80,7 +80,7 @@ class ProcessingInstruction : public ContainerNode,
   CachedResource* m_cachedSheet;
   RefPtr<StyleSheet> m_sheet;
   bool m_loading;
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   bool m_isXSL;
 #endif
 };

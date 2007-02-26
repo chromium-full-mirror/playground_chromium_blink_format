@@ -47,7 +47,7 @@ class EventTarget {
   virtual EventTargetNode* toNode();
   virtual XMLHttpRequest* toXMLHttpRequest();
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   virtual SVGElementInstance* toSVGElementInstance();
 #endif
 

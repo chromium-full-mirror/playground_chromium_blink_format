@@ -21,7 +21,7 @@
 
 #ifndef SVGTransformDistance_h
 #define SVGTransformDistance_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGTransform.h"
 
@@ -62,5 +62,5 @@ class SVGTransformDistance {
 };
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGTransformDistance_h

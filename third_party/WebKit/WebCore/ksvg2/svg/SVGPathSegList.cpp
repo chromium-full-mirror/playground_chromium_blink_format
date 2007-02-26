@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGPathSegList.h"
 
 #include "FloatPoint.h"
@@ -144,6 +144,6 @@ Path SVGPathSegList::toPathData() {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

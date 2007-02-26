@@ -22,7 +22,7 @@
 
 #ifndef SVGDescElement_h
 #define SVGDescElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
@@ -38,7 +38,7 @@ class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

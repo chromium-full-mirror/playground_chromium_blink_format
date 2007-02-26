@@ -22,7 +22,7 @@
 
 #ifndef SVGFEImageElement_h
 #define SVGFEImageElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFilterPrimitiveStandardAttributes.h"
 #include "SVGURIReference.h"
@@ -71,7 +71,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

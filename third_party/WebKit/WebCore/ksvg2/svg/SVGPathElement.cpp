@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGPathElement.h"
 
 #include "SVGNames.h"
@@ -380,6 +380,6 @@ Path SVGPathElement::toPathData() const {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

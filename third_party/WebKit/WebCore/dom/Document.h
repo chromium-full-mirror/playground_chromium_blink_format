@@ -87,10 +87,10 @@ class StyleSheetList;
 class Text;
 class Tokenizer;
 class TreeWalker;
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
 class XBLBindingManager;
 #endif
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 class XPathEvaluator;
 class XPathExpression;
 class XPathNSResolver;
@@ -100,7 +100,7 @@ class XPathResult;
 struct DashboardRegionValue;
 struct HitTestRequest;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 class SVGDocumentExtensions;
 #endif
 
@@ -252,7 +252,7 @@ class Document : public ContainerNode {
   // Other methods (not part of DOM)
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   virtual bool isSVGDocument() const { return false; }
 #endif
   virtual bool isPluginDocument() const { return false; }
@@ -677,7 +677,7 @@ class Document : public ContainerNode {
 
   int docID() const { return m_docID; }
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   void applyXSLTransform(ProcessingInstruction* pi);
   void setTransformSource(void* doc) { m_transformSource = doc; }
   const void* transformSource() { return m_transformSource; }
@@ -689,7 +689,7 @@ class Document : public ContainerNode {
   }
 #endif
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   // XBL methods
   XBLBindingManager* bindingManager() const { return m_bindingManager; }
 #endif
@@ -701,7 +701,7 @@ class Document : public ContainerNode {
 
   void finishedParsing();
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
   // XPathEvaluator methods
   PassRefPtr<XPathExpression> createExpression(const String& expression,
                                                XPathNSResolver* resolver,
@@ -713,7 +713,7 @@ class Document : public ContainerNode {
                                    unsigned short type,
                                    XPathResult* result,
                                    ExceptionCode& ec);
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
   enum PendingSheetLayout {
     NoLayoutWithPendingSheets,
@@ -834,12 +834,12 @@ class Document : public ContainerNode {
   double m_startTime;
   bool m_overMinimumLayoutThreshold;
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   void* m_transformSource;
   RefPtr<Document> m_transformSourceDocument;
 #endif
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   XBLBindingManager* m_bindingManager;  // The access point through which
                                         // documents and elements communicate
                                         // with XBL.
@@ -898,7 +898,7 @@ class Document : public ContainerNode {
                                                HTMLFormElement* form);
   void removeRadioButtonGroup(AtomicStringImpl* name, HTMLFormElement* form);
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   const SVGDocumentExtensions* svgExtensions();
   SVGDocumentExtensions* accessSVGExtensions();
 #endif
@@ -937,11 +937,11 @@ class Document : public ContainerNode {
       m_nameCollectionInfo[HTMLCollection::CollectionTypes -
                            HTMLCollection::UnnamedCollectionTypes];
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
   RefPtr<XPathEvaluator> m_xpathEvaluator;
 #endif
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   SVGDocumentExtensions* m_svgExtensions;
 #endif
 

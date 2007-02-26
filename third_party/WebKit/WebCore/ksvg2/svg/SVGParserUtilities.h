@@ -20,7 +20,7 @@
 
 #ifndef SVGParserUtilities_h
 #define SVGParserUtilities_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <PlatformString.h>
 
@@ -147,7 +147,7 @@ class SVGPathParser {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

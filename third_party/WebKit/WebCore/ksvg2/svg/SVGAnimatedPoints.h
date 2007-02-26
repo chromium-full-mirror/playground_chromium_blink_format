@@ -23,7 +23,7 @@
 #ifndef SVGAnimatedPoints_h
 #define SVGAnimatedPoints_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 namespace WebCore {
 class SVGPointList;
@@ -40,7 +40,7 @@ class SVGAnimatedPoints {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

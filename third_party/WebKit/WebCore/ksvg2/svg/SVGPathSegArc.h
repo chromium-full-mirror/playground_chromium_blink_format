@@ -23,7 +23,7 @@
 #ifndef SVGPathSegArc_h
 #define SVGPathSegArc_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGPathSeg.h"
 
@@ -130,7 +130,7 @@ class SVGPathSegArcRel : public SVGPathSeg {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

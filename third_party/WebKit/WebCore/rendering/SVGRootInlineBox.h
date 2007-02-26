@@ -24,7 +24,7 @@
 #ifndef SVGRootInlineBox_h
 #define SVGRootInlineBox_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "RootInlineBox.h"
 
@@ -44,6 +44,6 @@ class SVGRootInlineBox : public RootInlineBox {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 #endif  // SVGRootInlineBox_h

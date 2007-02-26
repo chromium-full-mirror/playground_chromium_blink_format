@@ -23,7 +23,7 @@
 #ifndef SVGPathSeg_h
 #define SVGPathSeg_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "PlatformString.h"
 #include "Shared.h"
@@ -67,7 +67,7 @@ class SVGPathSeg : public Shared<SVGPathSeg> {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

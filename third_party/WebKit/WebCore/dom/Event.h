@@ -97,7 +97,7 @@ class Event : public Shared<Event> {
   virtual bool isWheelEvent() const;
   virtual bool isBeforeTextInsertedEvent() const;
   virtual bool isOverflowEvent() const;
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   virtual bool isSVGZoomEvent() const;
 #endif
 

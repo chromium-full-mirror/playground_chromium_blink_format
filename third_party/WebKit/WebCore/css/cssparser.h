@@ -174,7 +174,7 @@ class CSSParser {
 
   static bool parseColor(const String&, RGBA32& rgb, bool strict);
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   bool parseSVGValue(int propId, bool important);
   CSSValue* parseSVGPaint();
   CSSValue* parseSVGColor();

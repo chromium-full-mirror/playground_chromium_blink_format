@@ -22,7 +22,7 @@
 
 #ifndef SVGFEMergeElement_h
 #define SVGFEMergeElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFEMerge.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -44,5 +44,5 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif

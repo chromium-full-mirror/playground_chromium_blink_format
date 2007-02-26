@@ -28,7 +28,7 @@
 #ifndef CachedResourceClient_h
 #define CachedResourceClient_h
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
 namespace XBL {
 class XBLDocument;
 }
@@ -73,7 +73,7 @@ class CachedResourceClient {
   virtual void setXSLStyleSheet(const String& /*URL*/,
                                 const String& /*sheet*/) {}
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   virtual void setXBLDocument(const String& /*URL*/, XBL::XBLDocument*) {}
 #endif
 

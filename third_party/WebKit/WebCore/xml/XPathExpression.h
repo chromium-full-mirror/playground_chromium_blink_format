@@ -27,7 +27,7 @@
 #ifndef XPathExpression_h
 #define XPathExpression_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "Shared.h"
 #include <wtf/Forward.h>
@@ -61,6 +61,6 @@ class XPathExpression : public Shared<XPathExpression> {
 };
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPathExpression_h

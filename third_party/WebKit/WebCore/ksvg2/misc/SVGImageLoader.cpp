@@ -20,7 +20,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "Attr.h"
 #include "DocLoader.h"
@@ -74,4 +74,4 @@ void SVGImageLoader::dispatchLoadEvent() {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

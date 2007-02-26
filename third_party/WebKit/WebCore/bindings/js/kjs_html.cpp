@@ -57,7 +57,7 @@
 #include "kjs_window.h"
 #include <math.h>
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGDocument.h"
 #endif
 
@@ -1307,7 +1307,7 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
       return jsUndefined();
     }
   }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (element.hasLocalName(objectTag)) {
     HTMLObjectElement& object = static_cast<HTMLObjectElement&>(element);
     if (id == JSHTMLElement::ObjectGetSVGDocument)

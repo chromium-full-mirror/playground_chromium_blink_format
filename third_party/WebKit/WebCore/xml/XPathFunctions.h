@@ -27,7 +27,7 @@
 #ifndef XPathFunctions_h
 #define XPathFunctions_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathExpressionNode.h"
 
@@ -56,6 +56,6 @@ Function* createFunction(
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPath_Functions_H

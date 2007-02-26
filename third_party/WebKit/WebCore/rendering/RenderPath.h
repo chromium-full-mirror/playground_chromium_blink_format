@@ -25,7 +25,7 @@
 #ifndef RenderPath_h
 #define RenderPath_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "AffineTransform.h"
 #include "FloatRect.h"
@@ -98,7 +98,7 @@ class RenderPath : public RenderObject {
 };
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

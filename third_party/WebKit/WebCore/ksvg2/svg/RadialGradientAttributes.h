@@ -24,7 +24,7 @@
 
 #include "GradientAttributes.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 namespace WebCore {
 struct RadialGradientAttributes : GradientAttributes {
@@ -91,7 +91,7 @@ struct RadialGradientAttributes : GradientAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

@@ -22,7 +22,7 @@
 
 #ifndef RenderSVGBlock_h
 #define RenderSVGBlock_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "RenderBlock.h"
 
@@ -36,5 +36,5 @@ class RenderSVGBlock : public RenderBlock {
   virtual void setStyle(RenderStyle*);
 };
 }
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // !RenderSVGBlock_h

@@ -26,7 +26,7 @@
 
 #include "config.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathValue.h"
 #include "Node.h"
@@ -122,4 +122,4 @@ String Value::toString() const {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

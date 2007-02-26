@@ -19,7 +19,7 @@
 
 #ifndef SVGFEDisplacementMapElement_h
 #define SVGFEDisplacementMapElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFEDisplacementMap.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -74,5 +74,5 @@ class SVGFEDisplacementMapElement
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGFEDisplacementMapElement_h

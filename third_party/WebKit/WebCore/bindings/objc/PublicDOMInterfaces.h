@@ -136,7 +136,7 @@
 - (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)element
                         pseudoElement:(NSString*)pseudoElement
                            authorOnly:(BOOL)authorOnly;
-#ifdef XPATH_SUPPORT
+#ifdef ENABLE_XPATH
 - (DOMXPathExpression*)createExpression:(NSString*)
                              expression:(id<DOMXPathNSResolver>)resolver;
 - (DOMXPathExpression*)createExpression:(NSString*)expression

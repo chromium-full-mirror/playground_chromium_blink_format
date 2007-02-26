@@ -22,7 +22,7 @@
 
 #ifndef SVGExternalResourcesRequired_h
 #define SVGExternalResourcesRequired_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <wtf/RefPtr.h>
 #include "SVGElement.h"
@@ -66,7 +66,7 @@ class SVGExternalResourcesRequired {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

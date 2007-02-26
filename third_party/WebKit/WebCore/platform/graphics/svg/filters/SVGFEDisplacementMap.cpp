@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGRenderTreeAsText.h"
 #include "SVGFEDisplacementMap.h"
 
@@ -102,4 +102,4 @@ TextStream& SVGFEDisplacementMap::externalRepresentation(TextStream& ts) const {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)

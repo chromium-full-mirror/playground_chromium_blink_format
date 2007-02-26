@@ -822,7 +822,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         } else if (strict && nrcoords == 2)
           hotspot = IntPoint(coords[0], coords[1]);
         if (strict || coords.size() == 0) {
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
           if (uri.startsWith("#"))
             list->append(
                 new CSSPrimitiveValue(uri, CSSPrimitiveValue::CSS_URI));
@@ -1101,7 +1101,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
 
     case CSS_PROP__WEBKIT_BINDING:
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
       if (id == CSS_VAL_NONE)
         valid_primitive = true;
       else {
@@ -1577,7 +1577,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     }
     delete parsedValue;
   }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   if (parseSVGValue(propId, important))
     return true;
 #endif

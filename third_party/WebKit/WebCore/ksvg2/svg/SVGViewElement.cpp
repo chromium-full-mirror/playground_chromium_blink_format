@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGViewElement.h"
 
 #include "Attr.h"
@@ -63,4 +63,4 @@ void SVGViewElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

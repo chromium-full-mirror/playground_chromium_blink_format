@@ -41,11 +41,11 @@
 #include <kjs/collector.h>
 #include <wtf/HashMap.h>
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGException.h"
 #endif
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 #include "XPathEvaluator.h"
 #endif
 
@@ -342,12 +342,12 @@ static const char* const eventExceptionNames[] = {"UNSPECIFIED_EVENT_TYPE_ERR"};
 
 static const char* const xmlHttpRequestExceptionNames[] = {"NETWORK_ERR"};
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 static const char* const xpathExceptionNames[] = {"INVALID_EXPRESSION_ERR",
                                                   "TYPE_ERR"};
 #endif
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 static const char* const svgExceptionNames[] = {
     "SVG_WRONG_TYPE_ERR", "SVG_INVALID_VALUE_ERR", "SVG_MATRIX_NOT_INVERTABLE"};
 #endif
@@ -392,7 +392,7 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
     nameTable = xmlHttpRequestExceptionNames;
     nameTableSize = sizeof(xmlHttpRequestExceptionNames) /
                     sizeof(xmlHttpRequestExceptionNames[0]);
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
   } else if (code >= XPathExceptionOffset && code <= XPathExceptionMax) {
     type = "DOM XPath";
     // XPath exception codes start with 51 and we don't want 51 empty elements
@@ -403,7 +403,7 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
     nameTableSize =
         sizeof(xpathExceptionNames) / sizeof(xpathExceptionNames[0]);
 #endif
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   } else if (code >= SVGExceptionOffset && code <= SVGExceptionMax) {
     type = "DOM SVG";
     code -= SVGExceptionOffset;

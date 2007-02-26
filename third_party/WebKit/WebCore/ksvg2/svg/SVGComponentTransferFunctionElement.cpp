@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGComponentTransferFunctionElement.h"
 
 #include "SVGFEComponentTransferElement.h"
@@ -151,4 +151,4 @@ SVGComponentTransferFunctionElement::transferFunction() const {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

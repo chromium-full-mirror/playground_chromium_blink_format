@@ -22,7 +22,7 @@
 
 #ifndef SVGSwitchElement_h
 #define SVGSwitchElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
@@ -61,7 +61,7 @@ class SVGSwitchElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

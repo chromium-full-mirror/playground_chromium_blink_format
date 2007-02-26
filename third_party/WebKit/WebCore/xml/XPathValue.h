@@ -27,7 +27,7 @@
 #ifndef XPathValue_h
 #define XPathValue_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "PlatformString.h"
 #include "XPathUtil.h"
@@ -72,6 +72,6 @@ class Value {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPath_Value_H

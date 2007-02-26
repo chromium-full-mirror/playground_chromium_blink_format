@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "JSSVGPathSeg.h"
 #include "JSSVGPathSegArcAbs.h"
 #include "JSSVGPathSegArcRel.h"
@@ -140,6 +140,6 @@ JSValue* toJS(ExecState* exec, SVGPathSeg* obj) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

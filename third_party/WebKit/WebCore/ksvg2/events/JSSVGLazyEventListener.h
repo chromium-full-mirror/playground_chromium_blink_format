@@ -21,7 +21,7 @@
 
 #ifndef JSSVGLazyEventListener_h
 #define JSSVGLazyEventListener_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "kjs_events.h"
 
@@ -40,7 +40,7 @@ class JSSVGLazyEventListener : public KJS::JSLazyEventListener {
 };
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

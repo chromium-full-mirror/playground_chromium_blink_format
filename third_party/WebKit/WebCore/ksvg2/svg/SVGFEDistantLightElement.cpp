@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #include "SVGFEDistantLightElement.h"
 #include "SVGDistantLightSource.h"
 
@@ -35,4 +35,4 @@ SVGLightSource* SVGFEDistantLightElement::lightSource() const {
   return new SVGDistantLightSource(azimuth(), elevation());
 }
 }
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

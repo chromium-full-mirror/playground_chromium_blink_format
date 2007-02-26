@@ -31,9 +31,9 @@
 #import "DOMObject.h"
 #import "DOMRGBColor.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 #import "DOMXPathNSResolver.h"
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 // Auto-generated internal interfaces
 #import "DOMAbstractViewInternal.h"
@@ -142,7 +142,7 @@
 #import "DOMUIEventInternal.h"
 #import "DOMWheelEventInternal.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #import "DOMSVGAElementInternal.h"
 #import "DOMSVGAngleInternal.h"
 #import "DOMSVGAnimateColorElementInternal.h"
@@ -263,12 +263,12 @@
 #import "DOMSVGUseElementInternal.h"
 #import "DOMSVGViewElementInternal.h"
 #import "DOMSVGZoomEventInternal.h"
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 #import "DOMXPathExpressionInternal.h"
 #import "DOMXPathResultInternal.h"
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 namespace KJS {
 class JSObject;
@@ -281,15 +281,15 @@ class RootObject;
 namespace WebCore {
 class NodeFilter;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 class AffineTransform;
 class FloatPoint;
 class FloatRect;
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 class XPathNSResolver;
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 }
 
 // Core Internal Interfaces
@@ -311,7 +311,7 @@ class XPathNSResolver;
 + (DOMNodeFilter*)_nodeFilterWith:(WebCore::NodeFilter*)impl;
 @end
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 // XPath Internal Interfaces
 
 @interface DOMNativeXPathNSResolver : DOMObject<DOMXPathNSResolver>
@@ -320,7 +320,7 @@ class XPathNSResolver;
 - (WebCore::XPathNSResolver*)_xpathNSResolver;
 @end
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 // Helper functions for DOM wrappers and gluing to Objective-C
 

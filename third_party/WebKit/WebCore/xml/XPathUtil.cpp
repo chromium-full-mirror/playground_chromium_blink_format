@@ -27,7 +27,7 @@
 #include "config.h"
 #include "XPathUtil.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "Node.h"
 
@@ -72,4 +72,4 @@ bool isValidContextNode(Node* node) {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

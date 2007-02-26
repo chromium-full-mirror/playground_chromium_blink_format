@@ -22,7 +22,7 @@
 #ifndef SVGUnitTypes_h
 #define SVGUnitTypes_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "Shared.h"
 
@@ -42,7 +42,7 @@ class SVGUnitTypes : public Shared<SVGUnitTypes> {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGUnitTypes_h
 
 // vim:ts=4:noet

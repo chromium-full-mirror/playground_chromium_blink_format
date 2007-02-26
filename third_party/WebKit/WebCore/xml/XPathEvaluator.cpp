@@ -27,7 +27,7 @@
 #include "config.h"
 #include "XPathEvaluator.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "ExceptionCode.h"
 #include "NativeXPathNSResolver.h"
@@ -71,4 +71,4 @@ PassRefPtr<XPathResult> XPathEvaluator::evaluate(const String& expression,
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGInlineFlowBox.h"
 
 #include "GraphicsContext.h"
@@ -85,15 +85,19 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
   AtomicString clipperId(SVGURIReference::getTarget(svgStyle->clipPath()));
   AtomicString maskerId(SVGURIReference::getTarget(svgStyle->maskElement()));
 
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   SVGResourceFilter* filter = getFilterById(object->document(), filterId);
+#endif
   SVGResourceClipper* clipper = getClipperById(object->document(), clipperId);
   SVGResourceMasker* masker = getMaskerById(object->document(), maskerId);
 
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   if (filter)
     filter->prepareFilter(paintInfo.context, boundingBox);
   else if (!filterId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         filterId, styledElement);
+#endif
 
   if (clipper) {
     clipper->addClient(styledElement);
@@ -142,8 +146,10 @@ void paintSVGInlineFlow(InlineFlowBox* flow,
     }
   }
 
+#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   if (filter)
     filter->applyFilter(paintInfo.context, boundingBox);
+#endif
 
   if (opacity < 1.0f)
     paintInfo.context->endTransparencyLayer();
@@ -340,4 +346,4 @@ void placeSVGFlowVertically(InlineFlowBox* flow, int& heightOfBlock) {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

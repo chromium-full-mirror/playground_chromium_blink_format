@@ -23,7 +23,7 @@
 
 #ifndef SVGRenderStyle_h
 #define SVGRenderStyle_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "CSSValueList.h"
 #include "DataRef.h"
@@ -352,7 +352,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGRenderStyle_h
 
 // vim:ts=4:noet

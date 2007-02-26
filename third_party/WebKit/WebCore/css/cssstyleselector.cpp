@@ -61,7 +61,7 @@
 #include "loader.h"
 #include "ShadowValue.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "XLinkNames.h"
 #include "SVGNames.h"
 #endif
@@ -222,7 +222,7 @@ RenderStyle* CSSStyleSelector::styleNotYetAvailable = 0;
 CSSStyleSheet* CSSStyleSelector::quirksSheet = 0;
 CSSStyleSheet* CSSStyleSelector::viewSourceSheet = 0;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 CSSStyleSheet* CSSStyleSelector::svgSheet = 0;
 #endif
 
@@ -381,7 +381,7 @@ void CSSStyleSelector::loadDefaultStyle() {
   defaultStyle->addRulesFromSheet(defaultSheet, &screenEval);
   defaultPrintStyle->addRulesFromSheet(defaultSheet, &printEval);
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   // SVG rules.
   svgSheet = parseUASheet(svgUserAgentStyleSheet);
   defaultStyle->addRulesFromSheet(svgSheet, &screenEval);
@@ -567,7 +567,7 @@ void CSSStyleSelector::initForStyleResolve(Element* e,
 
   parentNode = e->parentNode();
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   if (!parentNode && e->isSVGElement() && e->isShadowNode())
     parentNode = e->shadowParentNode();
 #endif
@@ -636,7 +636,7 @@ static void checkPseudoState(Element* e, bool checkVisited = true) {
   AtomicString attr;
   if (e->isHTMLElement())
     attr = e->getAttribute(hrefAttr);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (e->isSVGElement())
     attr = e->getAttribute(XLinkNames::hrefAttr);
 #endif
@@ -1207,7 +1207,7 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, Element* e) {
     theme()->adjustStyle(this, style, e, m_hasUAAppearance, m_borderData,
                          m_backgroundData, m_backgroundColor);
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   if (e && e->isSVGElement()) {
     // Spec: http://www.w3.org/TR/SVG/masking.html#OverflowProperty
     if (style->overflowY() == OSCROLL)
@@ -2604,7 +2604,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           primitiveValue = static_cast<CSSPrimitiveValue*>(item);
           int type = primitiveValue->primitiveType();
           if (type == CSSPrimitiveValue::CSS_URI) {
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
             if (primitiveValue->getStringValue().find("#") == 0)
               style->addSVGCursor(
                   primitiveValue->getStringValue().substring(1));
@@ -3851,7 +3851,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     }
     case CSS_PROP__WEBKIT_BINDING: {
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
       if (isInitial ||
           (primitiveValue && primitiveValue->getIdent() == CSS_VAL_NONE)) {
         style->deleteBindingURIs();
@@ -4679,7 +4679,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSS_PROP__WEBKIT_TEXT_STROKE:
       return;
   }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   // Try the SVG properties
   applySVGProperty(id, value);
 #endif

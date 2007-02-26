@@ -26,7 +26,7 @@
 #include "config.h"
 #include "JSCustomXPathNSResolver.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "CString.h"
 #include "Document.h"
@@ -133,4 +133,4 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
 }  // namespace WebCore
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

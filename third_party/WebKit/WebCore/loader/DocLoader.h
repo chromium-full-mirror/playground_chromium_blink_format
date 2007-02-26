@@ -64,10 +64,10 @@ class DocLoader {
                                                 const String& charset);
   CachedScript* requestScript(const String& url, const String& charset);
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   CachedXSLStyleSheet* requestXSLStyleSheet(const String& url);
 #endif
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   CachedXBLDocument* requestXBLDocument(const String& url);
 #endif
 

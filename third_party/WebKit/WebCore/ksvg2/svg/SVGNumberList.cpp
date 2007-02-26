@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGNumberList.h"
 
 #include "SVGParserUtilities.h"
@@ -51,4 +51,4 @@ void SVGNumberList::parse(const String& value) {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "RenderSVGGradientStop.h"
 
@@ -64,4 +64,4 @@ SVGGradientElement* RenderSVGGradientStop::gradientElement() const {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

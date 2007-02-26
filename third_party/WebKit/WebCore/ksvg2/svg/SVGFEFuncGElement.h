@@ -22,7 +22,7 @@
 
 #ifndef SVGFEFuncGElement_h
 #define SVGFEFuncGElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGComponentTransferFunctionElement.h"
 
@@ -35,5 +35,5 @@ class SVGFEFuncGElement : public SVGComponentTransferFunctionElement {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif

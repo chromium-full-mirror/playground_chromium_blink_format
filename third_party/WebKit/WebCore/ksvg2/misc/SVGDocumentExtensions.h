@@ -23,7 +23,7 @@
 #ifndef SVGDocumentExtensions_h
 #define SVGDocumentExtensions_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <wtf/Forward.h>
 #include <wtf/HashSet.h>
@@ -239,6 +239,6 @@ inline double SVGDocumentExtensions::baseValue<double>(
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 #endif

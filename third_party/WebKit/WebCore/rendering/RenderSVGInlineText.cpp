@@ -21,9 +21,10 @@
  *
  */
 
-#ifdef SVG_SUPPORT
-
 #include "config.h"
+
+#if ENABLE(SVG)
+
 #include "RenderSVGInlineText.h"
 
 #include "AffineTransform.h"
@@ -55,4 +56,4 @@ InlineTextBox* RenderSVGInlineText::createInlineTextBox() {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

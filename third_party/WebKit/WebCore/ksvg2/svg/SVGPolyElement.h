@@ -23,7 +23,7 @@
 #ifndef SVGPolyElement_h
 #define SVGPolyElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGAnimatedPoints.h"
 #include "SVGExternalResourcesRequired.h"
@@ -73,7 +73,7 @@ class SVGPolyElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

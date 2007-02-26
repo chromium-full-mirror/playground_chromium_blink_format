@@ -22,7 +22,7 @@
 
 #ifndef SVGFEGaussianBlurElement_h
 #define SVGFEGaussianBlurElement_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGFEGaussianBlur.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -66,7 +66,7 @@ class SVGFEGaussianBlurElement : public SVGFilterPrimitiveStandardAttributes {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

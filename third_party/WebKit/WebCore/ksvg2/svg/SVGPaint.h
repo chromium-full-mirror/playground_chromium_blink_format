@@ -23,7 +23,7 @@
 
 #ifndef SVGPaint_h
 #define SVGPaint_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGColor.h"
 
@@ -79,7 +79,7 @@ class SVGPaint : public SVGColor {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGPaint_h
 
 // vim:ts=4:noet

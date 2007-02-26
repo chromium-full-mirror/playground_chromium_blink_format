@@ -26,7 +26,7 @@
  */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <wtf/Assertions.h>
 
@@ -69,4 +69,4 @@ bool RenderPath::strokeContains(const FloatPoint& point,
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

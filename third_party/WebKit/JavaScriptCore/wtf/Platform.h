@@ -35,6 +35,8 @@
 #define HAVE(WTF_FEATURE) (defined(HAVE_##WTF_FEATURE) && HAVE_##WTF_FEATURE)
 #define USE(WTF_FEATURE) \
   (defined(WTF_USE_##WTF_FEATURE) && WTF_USE_##WTF_FEATURE)
+#define ENABLE(WTF_FEATURE) \
+  (defined(ENABLE_##WTF_FEATURE) && ENABLE_##WTF_FEATURE)
 
 /* Operating systems - low-level dependencies */
 

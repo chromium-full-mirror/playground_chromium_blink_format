@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGSymbolElement.h"
 
 #include "PlatformString.h"
@@ -50,4 +50,4 @@ void SVGSymbolElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

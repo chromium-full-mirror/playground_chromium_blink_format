@@ -23,7 +23,7 @@
 #ifndef SVGNumberList_h
 #define SVGNumberList_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGList.h"
 
@@ -40,7 +40,7 @@ class SVGNumberList : public SVGList<double> {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

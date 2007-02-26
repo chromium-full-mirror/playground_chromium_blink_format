@@ -21,7 +21,7 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "TimeScheduler.h"
 #include "Timer.h"
@@ -67,6 +67,6 @@ class SVGTimer : private Timer<TimeScheduler> {
 
 }  // namespace
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

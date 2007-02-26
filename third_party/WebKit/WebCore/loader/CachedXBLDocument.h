@@ -39,7 +39,7 @@ class DocLoader;
 class TextResourceDecoder;
 class CachedResourceClient;
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
 class CachedXBLDocument : public CachedResource {
  public:
   CachedXBLDocument(DocLoader*,

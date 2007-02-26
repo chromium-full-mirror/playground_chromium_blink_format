@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGMPathElement.h"
 #include "SVGPathElement.h"
 
@@ -48,4 +48,4 @@ SVGPathElement* SVGMPathElement::pathElement() {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

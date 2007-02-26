@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGSVGElement.h"
 
 #include "AffineTransform.h"
@@ -414,6 +414,6 @@ void SVGSVGElement::attributeChanged(Attribute* attr, bool preserveDecls) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

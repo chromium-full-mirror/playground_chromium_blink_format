@@ -295,7 +295,7 @@ class RenderObject : public CachedResourceClient {
 
   virtual RenderFlow* continuation() const;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   virtual bool isSVGContainer() const { return false; }
   virtual bool isRenderPath() const { return false; }
   virtual bool isSVGText() const { return false; }

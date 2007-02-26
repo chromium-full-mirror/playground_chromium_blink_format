@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "KCanvasRenderingStyle.h"
 
 #include "CSSValueList.h"
@@ -173,6 +173,6 @@ KCDashArray KSVGPainterFactory::dashArrayFromRenderingStyle(
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

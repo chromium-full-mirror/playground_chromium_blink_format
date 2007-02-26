@@ -21,7 +21,7 @@
 */
 
 #include "config.h"
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGMetadataElement.h"
 
 using namespace WebCore;
@@ -32,4 +32,4 @@ SVGMetadataElement::SVGMetadataElement(const QualifiedName& tagName,
 
 SVGMetadataElement::~SVGMetadataElement() {}
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

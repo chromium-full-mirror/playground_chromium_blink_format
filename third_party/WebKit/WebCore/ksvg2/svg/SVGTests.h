@@ -22,7 +22,7 @@
 
 #ifndef SVGTests_h
 #define SVGTests_h
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <wtf/RefPtr.h>
 
@@ -56,7 +56,7 @@ class SVGTests {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGTests_h
 
 // vim:ts=4:noet

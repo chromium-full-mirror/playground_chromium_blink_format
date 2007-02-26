@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 
 #include "XSLTProcessor.h"
 
@@ -442,4 +442,4 @@ void XSLTProcessor::removeParameter(const String& namespaceURI,
 
 }  // namespace WebCore
 
-#endif  // XSLT_SUPPORT
+#endif  // ENABLE(XSLT)

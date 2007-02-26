@@ -148,7 +148,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   SegmentedString m_pendingSrc;
 };
 
-#if XSLT_SUPPORT
+#if ENABLE(XSLT)
 void* xmlDocPtrForString(DocLoader*,
                          const String& source,
                          const DeprecatedString& URL);

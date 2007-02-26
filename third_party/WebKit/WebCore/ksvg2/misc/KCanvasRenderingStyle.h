@@ -24,7 +24,7 @@
 #ifndef KCanvasRenderingStyle_h
 #define KCanvasRenderingStyle_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include <wtf/Vector.h>
 
@@ -62,7 +62,7 @@ class KSVGPainterFactory {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // KCanvasRenderingStyle_h
 
 // vim:ts=4:noet

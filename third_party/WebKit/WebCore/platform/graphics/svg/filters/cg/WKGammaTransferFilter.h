@@ -26,6 +26,8 @@
 
 #import <QuartzCore/CoreImage.h>
 
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
+
 @interface WKGammaTransferFilter : CIFilter {
   CIImage* inputImage;
   NSNumber* inputAmplitude;
@@ -34,3 +36,5 @@
 }
 
 @end
+
+#endif  // ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)

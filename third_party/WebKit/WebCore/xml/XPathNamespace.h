@@ -27,7 +27,7 @@
 #ifndef XPathNamespace_h
 #define XPathNamespace_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "AtomicString.h"
 #include "Node.h"
@@ -61,6 +61,6 @@ class XPathNamespace : public Node {
 };
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPathNamespace_h

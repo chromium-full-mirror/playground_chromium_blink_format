@@ -23,7 +23,7 @@
 #ifndef SVGMarkerElement_h
 #define SVGMarkerElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGResourceMarker.h"
 #include "SVGExternalResourcesRequired.h"
@@ -126,7 +126,7 @@ class SVGMarkerElement : public SVGStyledElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

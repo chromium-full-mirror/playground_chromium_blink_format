@@ -22,7 +22,8 @@
 
 #ifndef SVGAnimateElement_h
 #define SVGAnimateElement_h
-#ifdef SVG_SUPPORT
+
+#if ENABLE(SVG) && ENABLE(SVG_EXPERIMENTAL_FEATURES)
 
 #include "SVGAnimationElement.h"
 
@@ -54,7 +55,7 @@ class SVGAnimateElement : public SVGAnimationElement {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // SVGAnimateElement_h
 
 // vim:ts=4:noet

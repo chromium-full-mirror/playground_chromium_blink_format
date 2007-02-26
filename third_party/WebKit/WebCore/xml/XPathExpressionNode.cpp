@@ -27,7 +27,7 @@
 #include "config.h"
 #include "XPathExpressionNode.h"
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "Node.h"
 #include "XPathValue.h"
@@ -98,4 +98,4 @@ bool Expression::isConstant() const {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)

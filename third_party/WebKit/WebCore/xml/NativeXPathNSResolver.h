@@ -26,7 +26,7 @@
 #ifndef NativeXPathNSResolver_h
 #define NativeXPathNSResolver_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathNSResolver.h"
 #include <wtf/Forward.h>
@@ -49,6 +49,6 @@ class NativeXPathNSResolver : public XPathNSResolver {
 
 }  // namespace WebCore
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // NativeXPathNSResolver_h

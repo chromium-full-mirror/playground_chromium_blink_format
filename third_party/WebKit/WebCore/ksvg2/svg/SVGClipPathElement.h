@@ -23,7 +23,7 @@
 #ifndef SVGClipPathElement_h
 #define SVGClipPathElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGResourceClipper.h"
 #include "SVGExternalResourcesRequired.h"
@@ -68,7 +68,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

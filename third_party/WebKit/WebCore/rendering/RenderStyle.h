@@ -51,7 +51,7 @@
 #include <wtf/HashMap.h>
 #include <wtf/Vector.h>
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGRenderStyle.h"
 #endif
 
@@ -725,7 +725,7 @@ struct ShadowData {
   ShadowData* next;
 };
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
 struct BindingURI {
   BindingURI(StringImpl*);
   ~BindingURI();
@@ -902,7 +902,7 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
   ~StyleRareNonInheritedData();
   StyleRareNonInheritedData(const StyleRareNonInheritedData&);
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   bool bindingsEquivalent(const StyleRareNonInheritedData&) const;
 #endif
 
@@ -939,7 +939,7 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
 
   ShadowData* m_boxShadow;  // For box-shadow decorations.
 
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   BindingURI* bindingURI;  // The XBL binding URI list.
 #endif
 };
@@ -1292,7 +1292,7 @@ class RenderStyle {
   bool m_unique : 1;
   int m_ref;
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   DataRef<SVGRenderStyle> m_svgStyle;
 #endif
 
@@ -1683,7 +1683,7 @@ class RenderStyle {
   }
 
 // CSS3 Getter Methods
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   BindingURI* bindingURIs() const { return rareNonInheritedData->bindingURI; }
 #endif
   int outlineOffset() const {
@@ -2109,7 +2109,7 @@ class RenderStyle {
   }
 
 // CSS3 Setters
-#ifdef XBL_SUPPORT
+#if ENABLE(XBL)
   void deleteBindingURIs() {
     delete rareNonInheritedData->bindingURI;
     SET_VAR(rareNonInheritedData, bindingURI, (BindingURI*)0);
@@ -2257,7 +2257,7 @@ class RenderStyle {
     SET_VAR(rareInheritedData, textSecurity, aTextSecurity);
   }
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   const SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
   SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
 #endif

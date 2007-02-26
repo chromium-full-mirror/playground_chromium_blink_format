@@ -27,7 +27,7 @@
 #ifndef XPathEvaluator_h
 #define XPathEvaluator_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "Shared.h"
 #include <wtf/Forward.h>
@@ -65,6 +65,6 @@ class XPathEvaluator : public Shared<XPathEvaluator> {
 };
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPathEvaluator_h

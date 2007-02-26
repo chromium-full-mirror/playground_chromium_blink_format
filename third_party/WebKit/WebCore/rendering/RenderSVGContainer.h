@@ -23,7 +23,7 @@
 #ifndef RenderSVGContainer_h
 #define RenderSVGContainer_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "RenderContainer.h"
 #include "RenderPath.h"
@@ -117,7 +117,7 @@ class RenderSVGContainer : public RenderContainer {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif  // RenderSVGContainer_h
 
 // vim:ts=4:noet

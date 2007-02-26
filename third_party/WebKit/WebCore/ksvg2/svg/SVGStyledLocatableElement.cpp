@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGStyledLocatableElement.h"
 
@@ -62,4 +62,4 @@ AffineTransform SVGStyledLocatableElement::getScreenCTM() const {
 }
 
 // vim:ts=4:noet
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)

@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGCursorElement.h"
 
 #include "Attr.h"
@@ -92,6 +92,6 @@ void SVGCursorElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet

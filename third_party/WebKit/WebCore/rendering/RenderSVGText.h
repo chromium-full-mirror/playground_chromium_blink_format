@@ -24,7 +24,7 @@
 #ifndef RenderSVGText_h
 #define RenderSVGText_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "AffineTransform.h"
 #include "RenderSVGBlock.h"
@@ -67,7 +67,7 @@ class RenderSVGText : public RenderSVGBlock {
 };
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

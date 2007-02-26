@@ -27,7 +27,7 @@
 #ifndef XPathPredicate_h
 #define XPathPredicate_h
 
-#ifdef XPATH_SUPPORT
+#if ENABLE(XPATH)
 
 #include "XPathExpressionNode.h"
 
@@ -120,6 +120,6 @@ class Predicate : Noncopyable {
 }
 }
 
-#endif  // XPATH_SUPPORT
+#endif  // ENABLE(XPATH)
 
 #endif  // XPathPredicate_h

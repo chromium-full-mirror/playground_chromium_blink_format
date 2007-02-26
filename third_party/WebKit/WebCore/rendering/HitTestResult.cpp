@@ -38,7 +38,7 @@
 #include "RenderImage.h"
 #include "SelectionController.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGNames.h"
 #include "XLinkNames.h"
 #endif
@@ -211,7 +211,7 @@ KURL HitTestResult::absoluteImageURL() const {
       m_innerNonSharedNode->hasTagName(inputTag))
     urlString = static_cast<Element*>(m_innerNonSharedNode.get())
                     ->getAttribute(srcAttr);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (m_innerNonSharedNode->hasTagName(SVGNames::imageTag))
     urlString = static_cast<Element*>(m_innerNonSharedNode.get())
                     ->getAttribute(XLinkNames::hrefAttr);
@@ -235,7 +235,7 @@ KURL HitTestResult::absoluteLinkURL() const {
       m_innerURLElement->hasTagName(areaTag) ||
       m_innerURLElement->hasTagName(linkTag))
     urlString = m_innerURLElement->getAttribute(hrefAttr);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (m_innerURLElement->hasTagName(SVGNames::aTag))
     urlString = m_innerURLElement->getAttribute(XLinkNames::hrefAttr);
 #endif
@@ -253,7 +253,7 @@ bool HitTestResult::isLiveLink() const {
   if (m_innerURLElement->hasTagName(aTag))
     return static_cast<HTMLAnchorElement*>(m_innerURLElement.get())
         ->isLiveLink();
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   if (m_innerURLElement->hasTagName(SVGNames::aTag))
     return m_innerURLElement->isLink();
 #endif

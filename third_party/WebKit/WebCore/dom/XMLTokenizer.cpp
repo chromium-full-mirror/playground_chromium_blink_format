@@ -51,11 +51,11 @@
 #include <wtf/Platform.h>
 #include <wtf/Vector.h>
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 #include <libxslt/xslt.h>
 #endif
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGNames.h"
 #include "XLinkNames.h"
 #endif
@@ -683,7 +683,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
     static_cast<HTMLScriptElement*>(newElement.get())->setCreatedByParser(true);
 
   if (newElement->hasTagName(HTMLNames::scriptTag)
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
       || newElement->hasTagName(SVGNames::scriptTag)
 #endif
           )
@@ -719,7 +719,7 @@ void XMLTokenizer::endElementNs() {
   // don't load external scripts for standalone documents (for now)
   if (n->isElementNode() && m_view &&
       (static_cast<Element*>(n)->hasTagName(scriptTag)
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
        || static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag)
 #endif
            )) {
@@ -733,7 +733,7 @@ void XMLTokenizer::endElementNs() {
 
     if (static_cast<Element*>(n)->hasTagName(scriptTag))
       scriptHref = scriptElement->getAttribute(srcAttr);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
     else if (static_cast<Element*>(n)->hasTagName(SVGNames::scriptTag))
       scriptHref = scriptElement->getAttribute(XLinkNames::hrefAttr);
 #endif
@@ -890,7 +890,7 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
   // don't load stylesheets for standalone documents
   if (m_doc->frame()) {
     m_sawXSLTransform = !m_sawFirstElement && !pi->checkStyleSheet();
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
     // Pretend we didn't see this PI if we're the result of a transform.
     if (m_sawXSLTransform && !m_doc->transformSourceDocument())
 #else
@@ -1181,7 +1181,7 @@ void XMLTokenizer::initializeParserContext() {
 }
 
 void XMLTokenizer::end() {
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   if (m_sawXSLTransform) {
     m_doc->setTransformSource(xmlDocPtrForString(
         m_doc->docLoader(), m_originalSourceForTransform, m_doc->URL()));
@@ -1272,7 +1272,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
     rootElement->appendChild(body, ec);
     documentElement = body.get();
   }
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   else if (documentElement->namespaceURI() == SVGNames::svgNamespaceURI) {
     // Until our SVG implementation has text support, it is best if we
     // wrap the erroneous SVG document in an xhtml document and render
@@ -1291,7 +1291,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
       createXHTMLParserErrorHeader(doc, m_errorMessages);
   documentElement->insertBefore(reportElement, documentElement->firstChild(),
                                 ec);
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
   if (doc->transformSourceDocument()) {
     RefPtr<Element> par = doc->createElementNS(xhtmlNamespaceURI, "p", ec);
     reportElement->appendChild(par, ec);
@@ -1337,7 +1337,7 @@ bool XMLTokenizer::isWaitingForScripts() const {
   return m_pendingScript != 0;
 }
 
-#ifdef XSLT_SUPPORT
+#if ENABLE(XSLT)
 void* xmlDocPtrForString(DocLoader* docLoader,
                          const String& source,
                          const DeprecatedString& url) {

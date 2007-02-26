@@ -23,7 +23,7 @@
 #ifndef SVGLinearGradientElement_h
 #define SVGLinearGradientElement_h
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 
 #include "SVGGradientElement.h"
 
@@ -75,7 +75,7 @@ class SVGLinearGradientElement : public SVGGradientElement {
 
 }  // namespace WebCore
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 #endif
 
 // vim:ts=4:noet

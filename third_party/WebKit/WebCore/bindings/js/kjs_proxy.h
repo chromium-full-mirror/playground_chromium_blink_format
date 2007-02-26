@@ -47,7 +47,7 @@ class KJSProxy {
   EventListener* createHTMLEventHandler(const String& functionName,
                                         const String& code,
                                         Node*);
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
   EventListener* createSVGEventHandler(const String& functionName,
                                        const String& code,
                                        Node*);

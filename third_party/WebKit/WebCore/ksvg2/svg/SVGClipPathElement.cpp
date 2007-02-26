@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#ifdef SVG_SUPPORT
+#if ENABLE(SVG)
 #include "SVGClipPathElement.h"
 
 #include "Document.h"
@@ -112,6 +112,6 @@ void SVGClipPathElement::notifyAttributeChange() const {
 }
 }
 
-#endif  // SVG_SUPPORT
+#endif  // ENABLE(SVG)
 
 // vim:ts=4:noet
