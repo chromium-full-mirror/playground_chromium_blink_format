@@ -406,6 +406,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       matchNearestMailBlockquoteColor(
           RenderStyle::initialMatchNearestMailBlockquoteColor()),
       m_appearance(RenderStyle::initialAppearance()),
+      m_borderFit(RenderStyle::initialBorderFit()),
       m_boxShadow(0)
 #if ENABLE(XBL)
       ,
@@ -431,6 +432,7 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       marginBottomCollapse(o.marginBottomCollapse),
       matchNearestMailBlockquoteColor(o.matchNearestMailBlockquoteColor),
       m_appearance(o.m_appearance),
+      m_borderFit(o.m_borderFit),
       m_boxShadow(o.m_boxShadow ? new ShadowData(*o.m_boxShadow) : 0)
 #if ENABLE(XBL)
       ,
@@ -473,7 +475,8 @@ bool StyleRareNonInheritedData::operator==(
          marginTopCollapse == o.marginTopCollapse &&
          marginBottomCollapse == o.marginBottomCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
-         m_appearance == o.m_appearance && shadowDataEquivalent(o)
+         m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
+         shadowDataEquivalent(o)
 #if ENABLE(XBL)
          && bindingsEquivalent(o)
 #endif
@@ -1041,6 +1044,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       rareNonInheritedData->userSelect !=
           other->rareNonInheritedData->userSelect ||
       rareNonInheritedData->userDrag != other->rareNonInheritedData->userDrag ||
+      rareNonInheritedData->m_borderFit !=
+          other->rareNonInheritedData->m_borderFit ||
       rareInheritedData->textFillColor !=
           other->rareInheritedData->textFillColor ||
       rareInheritedData->textStrokeColor !=

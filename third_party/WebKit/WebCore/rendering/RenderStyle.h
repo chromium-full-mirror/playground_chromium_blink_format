@@ -891,6 +891,8 @@ struct ContentData : Noncopyable {
   ContentData* m_next;
 };
 
+enum EBorderFit { BorderFitBorder, BorderFitLines };
+
 // This struct is for rarely used non-inherited CSS3, CSS2, and WebKit-specific
 // properties.
 // By grouping them together, we save space, and only allocate this object when
@@ -936,8 +938,8 @@ class StyleRareNonInheritedData : public Shared<StyleRareNonInheritedData> {
                                             // eliminated. It should never have
                                             // been added.
   unsigned m_appearance : 6;                // EAppearance
-
-  ShadowData* m_boxShadow;  // For box-shadow decorations.
+  unsigned m_borderFit : 1;                 // EBorderFit
+  ShadowData* m_boxShadow;                  // For box-shadow decorations.
 
 #if ENABLE(XBL)
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1771,6 +1773,9 @@ class RenderStyle {
         rareNonInheritedData->matchNearestMailBlockquoteColor);
   }
   const AtomicString& highlight() const { return rareInheritedData->highlight; }
+  EBorderFit borderFit() const {
+    return static_cast<EBorderFit>(rareNonInheritedData->m_borderFit);
+  }
   EResize resize() const {
     return static_cast<EResize>(rareInheritedData->resize);
   }
@@ -2200,6 +2205,9 @@ class RenderStyle {
   void setHighlight(const AtomicString& h) {
     SET_VAR(rareInheritedData, highlight, h);
   }
+  void setBorderFit(EBorderFit b) {
+    SET_VAR(rareNonInheritedData, m_borderFit, b);
+  }
   void setResize(EResize r) { SET_VAR(rareInheritedData, resize, r); }
   void setColumnWidth(float f) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_autoWidth, false);
@@ -2398,6 +2406,7 @@ class RenderStyle {
     return BCNORMAL;
   }
   static const AtomicString& initialHighlight() { return nullAtom; }
+  static EBorderFit initialBorderFit() { return BorderFitBorder; }
   static EResize initialResize() { return RESIZE_NONE; }
   static EAppearance initialAppearance() { return NoAppearance; }
   static bool initialVisuallyOrdered() { return false; }

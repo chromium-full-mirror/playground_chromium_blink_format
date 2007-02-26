@@ -1404,6 +1404,11 @@ bool CSSParser::parseValue(int propId, bool important) {
         valid_primitive = true;
       break;
 
+    case CSS_PROP__WEBKIT_BORDER_FIT:
+      if (id == CSS_VAL_BORDER || id == CSS_VAL_LINES)
+        valid_primitive = true;
+      break;
+
     case CSS_PROP__WEBKIT_TEXT_SECURITY:
       // disc | circle | square | none | inherit
       if (id == CSS_VAL_DISC || id == CSS_VAL_CIRCLE || id == CSS_VAL_SQUARE ||
