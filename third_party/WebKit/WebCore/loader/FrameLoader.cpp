@@ -2057,7 +2057,6 @@ void FrameLoader::reload() {
 
   RefPtr<DocumentLoader> loader =
       m_client->createDocumentLoader(initialRequest, SubstituteData());
-  setPolicyDocumentLoader(loader.get());
 
   ResourceRequest& request = loader->request();
 
