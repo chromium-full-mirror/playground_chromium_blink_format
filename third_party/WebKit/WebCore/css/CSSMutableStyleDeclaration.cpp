@@ -528,8 +528,12 @@ void CSSMutableStyleDeclaration::addParsedProperties(
     const CSSProperty* const* properties,
     int numProperties) {
   for (int i = 0; i < numProperties; ++i) {
-    removeProperty(properties[i]->id(), false);
-    m_values.append(*properties[i]);
+    // Only add properties that have no !important counterpart present
+    if (!getPropertyPriority(properties[i]->id()) ||
+        properties[i]->isImportant()) {
+      removeProperty(properties[i]->id(), false);
+      m_values.append(*properties[i]);
+    }
   }
   // FIXME: This probably should have a call to setChanged() if something
   // changed. We may also wish to add
