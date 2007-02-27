@@ -95,7 +95,7 @@ class EventTargetNode : public Node, public EventTarget {
                               bool sendMouseEvents = false,
                               bool showPressedLook = true);
 
-  void handleLocalEvents(Event*, bool useCapture);
+  virtual void handleLocalEvents(Event*, bool useCapture);
 
   virtual void dispatchFocusEvent();
   virtual void dispatchBlurEvent();

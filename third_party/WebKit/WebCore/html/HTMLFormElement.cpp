@@ -108,6 +108,16 @@ void HTMLFormElement::removedFromDocument() {
   HTMLElement::removedFromDocument();
 }
 
+void HTMLFormElement::handleLocalEvents(Event* event, bool useCapture) {
+  EventTargetNode* targetNode = event->target()->toNode();
+  if (!useCapture && targetNode && targetNode != this &&
+      (event->type() == submitEvent || event->type() == resetEvent)) {
+    event->stopPropagation();
+    return;
+  }
+  HTMLElement::handleLocalEvents(event, useCapture);
+}
+
 unsigned HTMLFormElement::length() const {
   int len = 0;
   for (unsigned i = 0; i < formElements.size(); ++i)
