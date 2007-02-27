@@ -331,7 +331,7 @@ bool Editor::shouldInsertFragment(PassRefPtr<DocumentFragment> fragment,
                                   EditorInsertAction givenAction) {
   if (client()) {
     Node* child = fragment->firstChild();
-    if (fragment->lastChild() == child && child->isCharacterDataNode())
+    if (child && fragment->lastChild() == child && child->isCharacterDataNode())
       return client()->shouldInsertText(
           static_cast<CharacterData*>(child)->data(), replacingDOMRange.get(),
           givenAction);
