@@ -55,6 +55,7 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual bool rendererIsNeeded(RenderStyle* style) {
     return StyledElement::rendererIsNeeded(style);
   }
+  virtual bool supportsMarkers() const { return true; }
 
  protected:
   virtual const SVGElement* contextElement() const { return this; }

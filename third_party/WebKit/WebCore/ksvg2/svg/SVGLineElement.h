@@ -51,6 +51,8 @@ class SVGLineElement : public SVGStyledTransformableElement,
   }
   virtual Path toPathData() const;
 
+  virtual bool supportsMarkers() const { return true; }
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
   virtual bool hasRelativeValues() const;

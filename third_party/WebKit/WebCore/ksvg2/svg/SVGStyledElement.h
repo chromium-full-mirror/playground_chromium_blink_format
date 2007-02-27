@@ -44,6 +44,7 @@ class SVGStyledElement : public SVGElement {
   virtual ~SVGStyledElement();
 
   virtual bool isStyled() const { return true; }
+  virtual bool supportsMarkers() const { return false; }
 
   // 'SVGStylable' functions
   // These need to be implemented.
