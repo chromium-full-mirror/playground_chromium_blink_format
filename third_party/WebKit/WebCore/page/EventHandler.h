@@ -146,6 +146,8 @@ class EventHandler : Noncopyable {
   void dragSourceMovedTo(const PlatformMouseEvent&);
   void dragSourceEndedAt(const PlatformMouseEvent&, DragOperation);
 
+  void focusDocumentView();
+
 #if PLATFORM(MAC)
   PassRefPtr<KeyboardEvent> currentKeyboardEvent() const;
 
@@ -223,8 +225,6 @@ class EventHandler : Noncopyable {
                          Clipboard*);
 
   void freeClipboard();
-
-  void focusDocumentView();
 
   bool handleDrag(const MouseEventWithHitTestResults&);
   bool handleMouseUp(const MouseEventWithHitTestResults&);
