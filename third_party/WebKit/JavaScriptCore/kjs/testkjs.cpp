@@ -130,7 +130,7 @@ JSValue* TestFunctionImp::callAsFunction(ExecState* exec,
       return jsUndefined();
     case GC: {
       JSLock lock;
-      Interpreter::collect();
+      Collector::collect();
       return jsUndefined();
     }
     case Version:
