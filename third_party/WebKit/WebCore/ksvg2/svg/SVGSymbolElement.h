@@ -41,6 +41,8 @@ class SVGSymbolElement : public SVGStyledElement,
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual bool shouldAttachChild(Element*) const { return false; }
 
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 

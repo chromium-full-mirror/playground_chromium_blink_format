@@ -48,7 +48,7 @@ class SVGStyledElement : public SVGElement {
 
   // 'SVGStylable' functions
   // These need to be implemented.
-  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+  virtual bool rendererIsNeeded(RenderStyle*);
   virtual Path toPathData() const { return Path(); }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource() { return 0; }

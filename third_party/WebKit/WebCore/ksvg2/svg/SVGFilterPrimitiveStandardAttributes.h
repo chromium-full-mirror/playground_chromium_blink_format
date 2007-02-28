@@ -42,6 +42,8 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
 
   virtual SVGFilterEffect* filterEffect() const = 0;
 
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+
  protected:
   void setStandardAttributes(SVGFilterEffect* filterEffect) const;
 

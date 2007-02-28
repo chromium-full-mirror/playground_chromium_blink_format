@@ -50,6 +50,8 @@ class SVGFilterElement : public SVGStyledElement,
 
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 

@@ -32,9 +32,6 @@ class SVGTSpanElement : public SVGTextPositioningElement {
   SVGTSpanElement(const QualifiedName&, Document*);
   virtual ~SVGTSpanElement();
 
-  virtual bool rendererIsNeeded(RenderStyle* style) {
-    return StyledElement::rendererIsNeeded(style);
-  }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   bool childShouldCreateRenderer(Node*) const;
 

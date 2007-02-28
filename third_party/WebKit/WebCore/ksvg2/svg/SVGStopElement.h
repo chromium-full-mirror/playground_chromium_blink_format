@@ -38,7 +38,6 @@ class SVGStopElement : public SVGStyledElement {
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void notifyAttributeChange() const;
 
-  virtual bool rendererIsNeeded(RenderStyle*) { return true; }
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:

@@ -48,9 +48,6 @@ class SVGAElement : public SVGStyledTransformableElement,
   virtual void parseMappedAttribute(MappedAttribute* attr);
 
   // Derived from: 'SVGStyledElement'
-  virtual bool rendererIsNeeded(RenderStyle* style) {
-    return StyledElement::rendererIsNeeded(style);
-  }
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
   virtual void defaultEventHandler(Event* evt);

@@ -34,6 +34,8 @@ class SVGDescElement : public SVGStyledElement, public SVGLangSpace {
   virtual ~SVGDescElement();
 
   String description() const;
+
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 };
 
 }  // namespace WebCore

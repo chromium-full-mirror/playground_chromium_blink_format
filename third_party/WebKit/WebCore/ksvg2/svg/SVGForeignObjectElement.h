@@ -46,9 +46,6 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
   virtual void parseMappedAttribute(MappedAttribute*);
 
-  virtual bool rendererIsNeeded(RenderStyle* style) {
-    return StyledElement::rendererIsNeeded(style);
-  }
   bool childShouldCreateRenderer(Node*) const;
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
