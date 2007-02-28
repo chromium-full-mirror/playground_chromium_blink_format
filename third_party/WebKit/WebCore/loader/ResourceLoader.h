@@ -39,19 +39,9 @@
 
 #include <wtf/Forward.h>
 
-#if PLATFORM(MAC)
-
-#import <objc/objc.h>
-
-#ifdef __OBJC__
-@class NSCachedURLResponse;
-#else
-class NSCachedURLResponse;
-#endif
-#endif
-
 namespace WebCore {
 
+class DocumentLoader;
 class Frame;
 class FrameLoader;
 class ResourceHandle;
@@ -67,6 +57,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   virtual bool load(const ResourceRequest&);
 
   FrameLoader* frameLoader() const;
+  DocumentLoader* documentLoader() const { return m_documentLoader.get(); }
 
   virtual void cancel(const ResourceError&);
   ResourceError cancelledError();
@@ -93,9 +84,6 @@ class ResourceLoader : public Shared<ResourceLoader>,
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
-#if PLATFORM(MAC)
-  NSCachedURLResponse* willCacheResponse(NSCachedURLResponse*);
-#endif
 
   void didReceiveAuthenticationChallenge(const AuthenticationChallenge&);
   void didCancelAuthenticationChallenge(const AuthenticationChallenge&);
@@ -160,6 +148,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   // FIXME: Once everything is made cross platform, these can be private instead
   // of protected
   RefPtr<Frame> m_frame;
+  RefPtr<DocumentLoader> m_documentLoader;
   ResourceResponse m_response;
   unsigned long m_identifier;
 

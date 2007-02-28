@@ -58,15 +58,14 @@ void MainResourceLoader::receivedError(const ResourceError& error) {
   // to this object to go away.
   RefPtr<MainResourceLoader> protect(this);
 
+  frameLoader()->receivedMainResourceError(error, true);
+
   if (!cancelled()) {
     ASSERT(!reachedTerminalState());
     frameLoader()->didFailToLoad(this, error);
-  }
 
-  frameLoader()->receivedMainResourceError(error, true);
-
-  if (!cancelled())
     releaseResources();
+  }
 
   ASSERT(reachedTerminalState());
 }
