@@ -347,9 +347,10 @@ bool ReplaceSelectionCommand::shouldMerge(const VisiblePosition& from,
                            isMailBlockquote(fromNodeBlock)) &&
          enclosingListChild(fromNode) == enclosingListChild(toNode) &&
          enclosingTableCell(fromNode) == enclosingTableCell(toNode) &&
-         !(fromNode->renderer() && fromNode->renderer()->isTable()) &&
-         !(toNode->renderer() && toNode->renderer()->isTable()) &&
-         !fromNode->hasTagName(hrTag) && !toNode->hasTagName(hrTag);
+         // Don't merge to or from a position before or after a block because it
+         // would
+         // be a no-op and cause infinite recursion.
+         !isBlock(fromNode) && !isBlock(toNode);
 }
 
 void ReplaceSelectionCommand::removeRedundantStyles(
