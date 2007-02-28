@@ -90,7 +90,9 @@
 - (NSString*)contextMenuItemTagLeftToRight;
 - (NSString*)contextMenuItemTagRightToLeft;
 
-- (NSMenu*)cellMenuForSearchField;
+- (NSString*)searchMenuNoRecentSearchesText;
+- (NSString*)searchMenuRecentSearchesText;
+- (NSString*)searchMenuClearRecentSearchesText;
 
 - (NSString*)defaultLanguageCode;
 
@@ -114,6 +116,12 @@
 - (void)unregisterUniqueIdForUIElement:(id)element;
 
 - (WebCoreFrameBridge*)bridgeForView:(NSView*)aView;
+
+- (NSString*)AXWebAreaText;
+- (NSString*)AXLinkText;
+- (NSString*)AXListMarkerText;
+- (NSString*)AXImageMapText;
+- (NSString*)AXHeadingText;
 
 @end
 
