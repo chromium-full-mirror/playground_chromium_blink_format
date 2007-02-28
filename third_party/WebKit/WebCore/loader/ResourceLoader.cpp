@@ -61,7 +61,6 @@ ResourceLoader::ResourceLoader(Frame* frame)
       m_defersLoading(frame->page()->defersLoading()) {}
 
 ResourceLoader::~ResourceLoader() {
-  // FIXME: Once everything uses the loader, enable this assert again
   ASSERT(m_reachedTerminalState);
 }
 
