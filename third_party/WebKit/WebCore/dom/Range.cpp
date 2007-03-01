@@ -1633,6 +1633,7 @@ bool operator==(const Range& a, const Range& b) {
 }
 
 PassRefPtr<Range> rangeOfContents(Node* node) {
+  ASSERT(node);
   RefPtr<Range> range = new Range(node->document());
   int exception = 0;
   range->selectNodeContents(node, exception);

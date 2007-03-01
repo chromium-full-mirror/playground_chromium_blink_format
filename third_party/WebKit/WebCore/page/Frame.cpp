@@ -1545,7 +1545,7 @@ bool Frame::findString(const String& target,
                        bool caseFlag,
                        bool wrapFlag,
                        bool startInSelection) {
-  if (target.isEmpty())
+  if (target.isEmpty() || !document())
     return false;
 
   // Start from an edge of the selection, if there's a selection that's not in
@@ -1615,7 +1615,7 @@ bool Frame::findString(const String& target,
 unsigned Frame::markAllMatchesForText(const String& target,
                                       bool caseFlag,
                                       unsigned limit) {
-  if (target.isEmpty())
+  if (target.isEmpty() || !document())
     return 0;
 
   RefPtr<Range> searchRange(rangeOfContents(document()));
