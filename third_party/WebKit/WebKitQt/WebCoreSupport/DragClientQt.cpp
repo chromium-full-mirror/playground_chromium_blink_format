@@ -53,5 +53,8 @@ void DragClientQt::startDrag(DragImageRef dragImage,
 
 DragImageRef DragClientQt::createDragImageForLink(KURL&,
                                                   const String&,
-                                                  Frame*) {}
+                                                  Frame*) {
+  return 0;
 }
+
+}  // namespace WebCore

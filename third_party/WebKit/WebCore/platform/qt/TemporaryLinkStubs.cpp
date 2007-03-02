@@ -223,6 +223,30 @@ String WebCore::contextMenuItemTagLeftToRight() {
 String WebCore::contextMenuItemTagRightToLeft() {
   return String();
 }
+String WebCore::searchMenuNoRecentSearchesText() {
+  return String();
+}
+String WebCore::searchMenuRecentSearchesText() {
+  return String();
+}
+String WebCore::searchMenuClearRecentSearchesText() {
+  return String();
+}
+String WebCore::AXWebAreaText() {
+  return String();
+}
+String WebCore::AXLinkText() {
+  return String();
+}
+String WebCore::AXListMarkerText() {
+  return String();
+}
+String WebCore::AXImageMapText() {
+  return String();
+}
+String WebCore::AXHeadingText() {
+  return String();
+}
 
 void Frame::setNeedsReapplyStyles() {
   notImplemented();
