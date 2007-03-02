@@ -1268,7 +1268,7 @@ void Document::open() {
     setURL(parent->baseURL());
     setBaseURL(parent->baseURL());
   } else
-    setURL(DeprecatedString());
+    setURL(m_url);
 
   if ((frame() && frame()->loader()->isLoadingMainResource()) ||
       (tokenizer() && tokenizer()->executingScript()))
