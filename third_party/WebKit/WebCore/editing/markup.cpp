@@ -168,14 +168,13 @@ static DeprecatedString startMarkup(const Node* node,
   switch (node->nodeType()) {
     case Node::TEXT_NODE: {
       if (Node* parent = node->parentNode()) {
-        if (parent->hasTagName(listingTag) || parent->hasTagName(preTag) ||
-            parent->hasTagName(scriptTag) || parent->hasTagName(styleTag) ||
-            parent->hasTagName(textareaTag) || parent->hasTagName(xmpTag))
+        if (parent->hasTagName(listingTag) || parent->hasTagName(scriptTag) ||
+            parent->hasTagName(styleTag) || parent->hasTagName(textareaTag) ||
+            parent->hasTagName(xmpTag))
           return stringValueForRange(node, range).deprecatedString();
       }
       bool useRenderedText =
           annotate && !enclosingNodeWithTag(const_cast<Node*>(node), selectTag);
-
       DeprecatedString markup =
           useRenderedText
               ? escapeTextForMarkup(renderedText(node, range), false)
@@ -207,7 +206,9 @@ static DeprecatedString startMarkup(const Node* node,
           }
         }
       }
-      return annotate ? convertHTMLTextToInterchangeFormat(markup) : markup;
+      return annotate ? convertHTMLTextToInterchangeFormat(
+                            markup, static_cast<const Text*>(node))
+                      : markup;
     }
     case Node::COMMENT_NODE:
       return static_cast<const Comment*>(node)->toString().deprecatedString();
