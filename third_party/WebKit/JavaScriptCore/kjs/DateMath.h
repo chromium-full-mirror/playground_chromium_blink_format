@@ -47,6 +47,13 @@
 
 namespace KJS {
 
+struct GregorianDateTime;
+
+void msToGregorianDateTime(double, bool outputIsUTC, GregorianDateTime&);
+double gregorianDateTimeToMS(const GregorianDateTime&, double, bool inputIsUTC);
+double getUTCOffset();
+int equivalentYearForDST(int year);
+
 const char* const weekdayName[7] = {"Mon", "Tue", "Wed", "Thu",
                                     "Fri", "Sat", "Sun"};
 const char* const monthName[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -136,11 +143,6 @@ struct GregorianDateTime : Noncopyable {
   int utcOffset;
   char* timeZone;
 };
-
-void msToGregorianDateTime(double, bool outputIsUTC, struct GregorianDateTime&);
-double gregorianDateTimeToMS(const GregorianDateTime&, double, bool inputIsUTC);
-double getUTCOffset();
-int equivalentYearForDST(int year);
 
 }  // namespace KJS
 
