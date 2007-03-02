@@ -115,7 +115,8 @@
 - (DOMDocumentFragment*)_documentFragmentFromPasteboard:
                             (NSPasteboard*)pasteboard
                                                 forType:(NSString*)pboardType
-                                              inContext:(DOMRange*)context;
+                                              inContext:(DOMRange*)context
+                                           subresources:(NSArray**)subresources;
 
 // SPI for DumpRenderTree
 - (void)_updateActiveState;
