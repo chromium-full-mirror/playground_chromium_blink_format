@@ -728,6 +728,10 @@ class Document : public ContainerNode {
   String iconURL();
   void setIconURL(const String& iconURL, const String& type);
 
+  bool isAllowedToLoadLocalResources() const {
+    return m_isAllowedToLoadLocalResources;
+  }
+
  protected:
   CSSStyleSelector* m_styleSelector;
   FrameView* m_view;
@@ -904,6 +908,8 @@ class Document : public ContainerNode {
 #endif
 
  private:
+  bool shouldBeAllowedToLoadLocalResources() const;
+
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
   void imageLoadEventTimerFired(Timer<Document>*);
@@ -955,6 +961,8 @@ class Document : public ContainerNode {
   bool m_createRenderers;
   bool m_inPageCache;
   String m_iconURL;
+
+  bool m_isAllowedToLoadLocalResources;
 };
 
 }  // namespace

@@ -136,6 +136,9 @@ class CachedResource {
   String accept() const { return m_accept; }
   void setAccept(const String& accept) { m_accept = accept; }
 
+  bool errorOccurred() const { return m_errorOccurred; }
+  bool treatAsLocal() const { return m_shouldTreatAsLocal; }
+
  protected:
   void setSize(unsigned size);
 
@@ -150,6 +153,8 @@ class CachedResource {
 
   Type m_type;
   Status m_status;
+
+  bool m_errorOccurred;
 
  private:
   unsigned m_size;
@@ -169,6 +174,8 @@ class CachedResource {
   CachedResource* m_nextInLRUList;
   CachedResource* m_prevInLRUList;
   friend class Cache;
+
+  bool m_shouldTreatAsLocal;
 };
 }
 

@@ -198,6 +198,11 @@ void HTMLLinkElement::process() {
           document()->docLoader()->requestCSSStyleSheet(m_url, chset);
       if (m_cachedSheet)
         m_cachedSheet->ref(this);
+      else if (!isAlternate()) {  // request may have been denied if stylesheet
+                                  // is local and document is remote.
+        m_loading = false;
+        document()->stylesheetLoaded();
+      }
     }
   } else if (m_sheet) {
     // we no longer contain a stylesheet, e.g. perhaps rel or type was changed

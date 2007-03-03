@@ -29,6 +29,7 @@
 #ifndef FrameLoader_h
 #define FrameLoader_h
 
+#include "CachedResource.h"
 #include "CachePolicy.h"
 #include "FormState.h"
 #include "FrameLoaderTypes.h"
@@ -50,6 +51,7 @@ class JSValue;
 namespace WebCore {
 
 class AuthenticationChallenge;
+class Document;
 class DocumentLoader;
 class Element;
 class Event;
@@ -175,7 +177,11 @@ class FrameLoader : Noncopyable {
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
 
-  bool canLoad(const KURL&, const String& referrer, bool& hideReferrer);
+  static bool canLoad(const KURL&, const String& referrer, bool& hideReferrer);
+  static bool canLoad(const KURL&, const Document*);
+  static bool canLoad(const CachedResource&, const Document*);
+
+  static bool shouldHideReferrer(const KURL& url, const String& referrer);
 
   Frame* createWindow(const FrameLoadRequest&, const WindowFeatures&);
 
@@ -501,6 +507,11 @@ class FrameLoader : Noncopyable {
                             const String& mimeType,
                             const String& textEncoding,
                             const KURL&);
+
+  static void registerSchemeAsLocal(const String& scheme);
+  static bool restrictAccessToLocal();
+  static void setRestrictAccessToLocal(bool);
+  static bool shouldTreatURLAsLocal(const String& url);
 
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);

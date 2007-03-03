@@ -92,14 +92,12 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
 
   ResourceRequest newRequest = request;
 
-  // Since this is a subresource, we can load any URL (we ignore the return
-  // value).
-  // But we still want to know whether we should hide the referrer or not, so we
-  // call the canLoadURL method.
-  // FIXME: is that really the rule we want for subresources?
-  bool hideReferrer;
-  fl->canLoad(request.url(), fl->outgoingReferrer(), hideReferrer);
-  if (hideReferrer)
+  // If linked-on-or-after check canLoad
+  if (FrameLoader::restrictAccessToLocal() &&
+      !FrameLoader::canLoad(request.url(), frame->document()))
+    return 0;
+
+  if (FrameLoader::shouldHideReferrer(request.url(), fl->outgoingReferrer()))
     newRequest.clearHTTPReferrer();
   else if (!request.httpReferrer())
     newRequest.setHTTPReferrer(fl->outgoingReferrer());

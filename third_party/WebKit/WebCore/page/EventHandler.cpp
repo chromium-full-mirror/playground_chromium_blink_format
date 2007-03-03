@@ -659,9 +659,8 @@ static Cursor selectCursor(const MouseEventWithHitTestResults& event,
         continue;
       if (cimage->image()->isNull())
         break;
-      if (!cimage->isErrorImage()) {
+      if (!cimage->errorOccurred())
         return Cursor(cimage->image(), hotSpot);
-      }
     }
   }
 

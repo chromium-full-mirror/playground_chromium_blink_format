@@ -49,7 +49,6 @@ CachedScript::CachedScript(DocLoader* dl,
   // But some websites think their scripts are <some wrong mimetype here>
   // and refuse to serve them if we only accept application/x-javascript.
   setAccept("*/*");
-  m_errorOccurred = false;
   // load the file
   cache()->loader()->load(dl, this, false);
   m_loading = true;

@@ -35,6 +35,7 @@
 #include "CachedXSLStyleSheet.h"
 #include "DocLoader.h"
 #include "Document.h"
+#include "FrameLoader.h"
 #include "Image.h"
 #include "ResourceHandle.h"
 
@@ -98,7 +99,15 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
   // Look up the resource in our map.
   CachedResource* resource = m_resources.get(url.url());
 
-  if (!resource) {
+  if (resource) {
+    if (FrameLoader::restrictAccessToLocal() &&
+        !FrameLoader::canLoad(*resource, docLoader->doc()))
+      return 0;
+  } else {
+    if (FrameLoader::restrictAccessToLocal() &&
+        !FrameLoader::canLoad(url, docLoader->doc()))
+      return 0;
+
     // The resource does not exist.  Create it.
     resource = createResource(type, docLoader, url, expireDate, charset);
     ASSERT(resource);

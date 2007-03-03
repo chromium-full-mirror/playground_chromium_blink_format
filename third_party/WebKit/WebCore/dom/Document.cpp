@@ -320,7 +320,8 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       ,
       m_accessKeyMapValid(false),
       m_createRenderers(true),
-      m_inPageCache(false) {
+      m_inPageCache(false),
+      m_isAllowedToLoadLocalResources(false) {
   m_document.resetSkippingRef(this);
 
   m_printing = false;
@@ -1267,8 +1268,7 @@ void Document::open() {
   if (Document* parent = parentDocument()) {
     setURL(parent->baseURL());
     setBaseURL(parent->baseURL());
-  } else
-    setURL(m_url);
+  }
 
   if ((frame() && frame()->loader()->isLoadingMainResource()) ||
       (tokenizer() && tokenizer()->executingScript()))
@@ -1526,9 +1526,29 @@ void Document::clear() {
 }
 
 void Document::setURL(const DeprecatedString& url) {
+  if (url == m_url)
+    return;
+
   m_url = url;
   if (m_styleSelector)
     m_styleSelector->setEncodedURL(m_url);
+
+  m_isAllowedToLoadLocalResources = shouldBeAllowedToLoadLocalResources();
+}
+
+bool Document::shouldBeAllowedToLoadLocalResources() const {
+  if (FrameLoader::shouldTreatURLAsLocal(m_url))
+    return true;
+
+  Frame* frame = this->frame();
+  if (!frame)
+    return false;
+
+  DocumentLoader* documentLoader = frame->loader()->documentLoader();
+  if (!documentLoader)
+    return false;
+
+  return documentLoader->substituteData().isValid();
 }
 
 void Document::setBaseURL(const DeprecatedString& baseURL) {
