@@ -55,8 +55,6 @@ class SubresourceLoader : public ResourceLoader {
 
   virtual ~SubresourceLoader();
 
-  void stopLoading();
-
   virtual bool load(const ResourceRequest&);
 
   virtual void willSendRequest(ResourceRequest&,
