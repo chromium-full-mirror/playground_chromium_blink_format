@@ -45,7 +45,6 @@ class FrameGdk : public Frame {
   FrameGdk(Page*, HTMLFrameOwnerElement*, FrameLoaderClientGdk*);
   virtual ~FrameGdk();
 
-  // FrameGdk-only
   void handleGdkEvent(GdkEvent*);
   bool keyPress(const PlatformKeyboardEvent& keyEvent);
 
