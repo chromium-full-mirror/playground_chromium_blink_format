@@ -762,7 +762,7 @@ int StringImpl::find(const StringImpl* str,
 }
 
 int StringImpl::reverseFind(const UChar c, int index) const {
-  if (index >= (int)m_length)
+  if (index >= (int)m_length || m_length == 0)
     return -1;
 
   if (index < 0)
