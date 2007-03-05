@@ -617,7 +617,7 @@ void EventTargetNode::defaultEventHandler(Event* event) {
   if (event->target() != this)
     return;
   const AtomicString& eventType = event->type();
-  if (eventType == keypressEvent) {
+  if (eventType == keydownEvent || eventType == keypressEvent) {
     if (event->isKeyboardEvent())
       if (Frame* frame = document()->frame())
         frame->eventHandler()->defaultKeyboardEventHandler(
