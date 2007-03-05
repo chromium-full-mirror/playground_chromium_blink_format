@@ -214,7 +214,7 @@ void ProcessingInstruction::setXSLStyleSheet(const String& url,
 #endif
 
 void ProcessingInstruction::parseStyleSheet(const String& sheet) {
-  m_sheet->parseString(sheet);
+  m_sheet->parseString(sheet, true);
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
   m_cachedSheet = 0;
