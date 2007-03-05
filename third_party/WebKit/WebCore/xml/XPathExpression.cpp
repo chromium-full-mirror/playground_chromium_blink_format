@@ -75,6 +75,8 @@ PassRefPtr<XPathResult> XPathExpression::evaluate(Node* contextNode,
                                    : static_cast<EventTargetNode*>(contextNode);
 
   Expression::evaluationContext().node = contextNode;
+  Expression::evaluationContext().size = 1;
+  Expression::evaluationContext().position = 1;
   m_topExpression->optimize();
   RefPtr<XPathResult> result =
       new XPathResult(eventTarget, m_topExpression->evaluate());
