@@ -36,9 +36,17 @@ class String;
 
 class StringTruncator {
  public:
-  static String centerTruncate(const String&, float maxWidth, const Font&);
-  static String rightTruncate(const String&, float maxWidth, const Font&);
-  static float width(const String&, const Font&);
+  static String centerTruncate(const String&,
+                               float maxWidth,
+                               const Font&,
+                               bool disableRoundingHacks = true);
+  static String rightTruncate(const String&,
+                              float maxWidth,
+                              const Font&,
+                              bool disableRoundingHacks = true);
+  static float width(const String&,
+                     const Font&,
+                     bool disableRoundingHacks = true);
 };
 
 }  // namespace WebCore
