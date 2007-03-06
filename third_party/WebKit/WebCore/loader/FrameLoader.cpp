@@ -4506,7 +4506,7 @@ void FrameLoader::continueLoadWithData(SharedBuffer* buffer,
   addData(buffer->data(), buffer->size());
 }
 
-void FrameLoader::registerSchemeAsLocal(const String& scheme) {
+void FrameLoader::registerURLSchemeAsLocal(const String& scheme) {
   localSchemes().add(scheme);
 }
 
