@@ -238,7 +238,7 @@ incremental searching), NO to begin search after the selected text.
 - (BOOL)allowsUndo;
 - (void)setAllowsUndo:(BOOL)flag;
 
-+ (void)registerSchemeAsLocal:(NSString*)protocol;
++ (void)registerURLSchemeAsLocal:(NSString*)scheme;
 
 @end
 
