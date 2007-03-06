@@ -216,7 +216,8 @@ JSValue* JSHTMLDocument::namedItemGetter(ExecState* exec,
         (frame = static_cast<HTMLIFrameElement*>(node)->contentFrame()))
       return Window::retrieve(frame);
     return toJS(exec, node);
-  }
+  } else if (collection->length() == 0)
+    return jsUndefined();
 
   return getHTMLCollection(exec, collection.get());
 }

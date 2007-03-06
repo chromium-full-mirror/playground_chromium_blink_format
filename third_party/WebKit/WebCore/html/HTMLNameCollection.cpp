@@ -63,9 +63,10 @@ Node* HTMLNameCollection::traverseNextItem(Node* current) const {
           break;
         case DocumentNamedItems:
           // find images, forms, applets, embeds, objects and iframes by name,
-          // but only applets and object by id (this strange rule matches IE)
-          if (e->hasTagName(imgTag) || e->hasTagName(formTag) ||
-              e->hasTagName(embedTag) || e->hasTagName(iframeTag))
+          // applets and object by id, and images by id but only if they have
+          // a name attribute (this very strange rule matches IE)
+          if (e->hasTagName(formTag) || e->hasTagName(embedTag) ||
+              e->hasTagName(iframeTag))
             found = e->getAttribute(nameAttr) == m_name;
           else if (e->hasTagName(appletTag))
             found = e->getAttribute(nameAttr) == m_name ||
@@ -74,6 +75,10 @@ Node* HTMLNameCollection::traverseNextItem(Node* current) const {
             found = (e->getAttribute(nameAttr) == m_name ||
                      e->getAttribute(idAttr) == m_name) &&
                     static_cast<HTMLObjectElement*>(e)->isDocNamedItem();
+          else if (e->hasTagName(imgTag))
+            found = e->getAttribute(nameAttr) == m_name ||
+                    (e->getAttribute(idAttr) == m_name &&
+                     e->hasAttribute(nameAttr));
           break;
         default:
           ASSERT(0);
