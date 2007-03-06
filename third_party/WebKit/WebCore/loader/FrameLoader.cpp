@@ -2864,8 +2864,8 @@ void FrameLoader::urlSelected(const FrameLoadRequest& request, Event* event) {
   load(copy, true, event, 0, HashMap<String, String>());
 }
 
-String FrameLoader::userAgent() const {
-  return m_client->userAgent();
+String FrameLoader::userAgent(const KURL& url) const {
+  return m_client->userAgent(url);
 }
 
 void FrameLoader::createEmptyDocument() {
@@ -3049,7 +3049,7 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
                                         ->documentLoader()
                                         ->request()
                                         .url());
-  initialRequest.setHTTPUserAgent(client()->userAgent());
+  initialRequest.setHTTPUserAgent(client()->userAgent(request.url()));
 
   unsigned long identifier = 0;
   ResourceRequest newRequest(initialRequest);
@@ -3534,7 +3534,7 @@ void FrameLoader::loadedResourceFromMemoryCache(
 }
 
 void FrameLoader::applyUserAgent(ResourceRequest& request) {
-  String userAgent = client()->userAgent();
+  String userAgent = client()->userAgent(request.url());
   ASSERT(!userAgent.isNull());
   request.setHTTPUserAgent(userAgent);
 }

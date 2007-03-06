@@ -200,7 +200,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void setDefersLoading(bool);
 
-  virtual WebCore::String userAgent();
+  virtual WebCore::String userAgent(const WebCore::KURL&);
 
   virtual bool willUseArchive(WebCore::ResourceLoader*,
                               const WebCore::ResourceRequest&,

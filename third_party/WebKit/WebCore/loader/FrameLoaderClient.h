@@ -221,7 +221,7 @@ class FrameLoaderClient {
       const SubstituteData&) = 0;
   virtual void setTitle(const String& title, const KURL&) = 0;
 
-  virtual String userAgent() = 0;
+  virtual String userAgent(const KURL&) = 0;
 
   virtual void saveDocumentViewToPageCache(PageCache*) = 0;
   virtual bool canCachePage() const = 0;

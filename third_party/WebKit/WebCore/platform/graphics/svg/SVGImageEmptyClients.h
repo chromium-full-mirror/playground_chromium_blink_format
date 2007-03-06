@@ -324,7 +324,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   }
   virtual void setTitle(const String& title, const KURL&) {}
 
-  virtual String userAgent() { return ""; }
+  virtual String userAgent(const KURL&) { return ""; }
 
   virtual void setDocumentViewFromPageCache(PageCache*) {}
   virtual void updateGlobalHistoryForStandardLoad(const KURL&) {}

@@ -405,7 +405,7 @@ class FrameLoader : Noncopyable {
   void tokenizerProcessedData();
 
   void handledOnloadEvents();
-  String userAgent() const;
+  String userAgent(const KURL&) const;
 
   Widget* createJavaAppletWidget(const IntSize&,
                                  Element*,
