@@ -237,7 +237,8 @@ typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
                               macro(switch, Switch) macro(symbol, Symbol)     \
                                   macro(text, Text) macro(title, Title)       \
                                       macro(tref, TRef) macro(tspan, TSpan)   \
-                                          macro(view, View)  // end of macro
+                                          macro(use, Use) macro(              \
+                                              view, View)  // end of macro
 
 #endif
 

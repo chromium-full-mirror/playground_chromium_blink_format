@@ -78,9 +78,7 @@ class SVGStyledElement : public SVGElement {
                                  ClassName,
                                  className)
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   void updateElementInstance(SVGDocumentExtensions*) const;
-#endif
 };
 
 }  // namespace WebCore

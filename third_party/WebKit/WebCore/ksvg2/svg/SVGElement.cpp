@@ -203,7 +203,6 @@ void SVGElement::insertedIntoDocument() {
   }
 }
 
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
 static Node* shadowTreeParentElementForShadowTreeElement(Node* node) {
   for (Node* n = node; n; n = n->parentNode()) {
     if (n->isShadowNode())
@@ -212,14 +211,11 @@ static Node* shadowTreeParentElementForShadowTreeElement(Node* node) {
 
   return 0;
 }
-#endif
 
 bool SVGElement::dispatchEvent(PassRefPtr<Event> e,
                                ExceptionCode& ec,
                                bool tempEvent) {
   EventTarget* target = this;
-
-#if ENABLE(SVG_EXPERIMENTAL_FEATURES)
   Node* useNode = shadowTreeParentElementForShadowTreeElement(this);
 
   // If we are a hidden shadow tree element, the target must
@@ -233,7 +229,6 @@ bool SVGElement::dispatchEvent(PassRefPtr<Event> e,
     if (instance)
       target = instance;
   }
-#endif
 
   return EventTargetNode::dispatchEvent(e, ec, tempEvent, target);
 }
