@@ -134,8 +134,8 @@ CachedResource* DocLoader::requestResource(CachedResource::Type type,
 
   checkForReload(fullURL);
 
-  CachedResource* resource =
-      cache()->requestResource(this, type, fullURL, m_expireDate, charset);
+  CachedResource* resource = cache()->requestResource(
+      this, type, fullURL, m_expireDate, charset, skipCanLoadCheck);
   if (resource) {
     m_docResources.set(resource->url(), resource);
     checkCacheObjectStatus(resource);

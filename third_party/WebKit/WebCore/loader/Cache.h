@@ -72,7 +72,8 @@ class Cache {
                                   CachedResource::Type,
                                   const KURL& url,
                                   time_t expireDate = 0,
-                                  const String* charset = 0);
+                                  const String* charset = 0,
+                                  bool skipCanLoadCheck = false);
 
   // Set/retreive the size of the cache. This will only hold approximately,
   // since the size some

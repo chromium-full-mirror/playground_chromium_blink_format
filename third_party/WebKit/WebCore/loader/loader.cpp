@@ -55,13 +55,16 @@ Loader::~Loader() {
   deleteAllValues(m_requestsLoading);
 }
 
-void Loader::load(DocLoader* dl, CachedResource* object, bool incremental) {
+void Loader::load(DocLoader* dl,
+                  CachedResource* object,
+                  bool incremental,
+                  bool skipCanLoadCheck) {
   Request* req = new Request(dl, object, incremental);
   m_requestsPending.append(req);
-  servePendingRequests();
+  servePendingRequests(skipCanLoadCheck);
 }
 
-void Loader::servePendingRequests() {
+void Loader::servePendingRequests(bool skipCanLoadCheck) {
   if (m_requestsPending.count() == 0)
     return;
 
@@ -85,7 +88,7 @@ void Loader::servePendingRequests() {
   }
 
   RefPtr<SubresourceLoader> loader = SubresourceLoader::create(
-      req->docLoader()->doc()->frame(), this, request);
+      req->docLoader()->doc()->frame(), this, request, skipCanLoadCheck);
 
   if (loader)
     m_requestsLoading.add(loader.release(), req);

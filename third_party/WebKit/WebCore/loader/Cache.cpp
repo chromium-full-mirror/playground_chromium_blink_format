@@ -60,7 +60,8 @@ static CachedResource* createResource(CachedResource::Type type,
                                       DocLoader* docLoader,
                                       const KURL& url,
                                       time_t expireDate,
-                                      const String* charset) {
+                                      const String* charset,
+                                      bool skipCanLoadCheck = false) {
   switch (type) {
     case CachedResource::ImageResource:
       // User agent images need to null check the docloader.  No other resources
@@ -69,8 +70,9 @@ static CachedResource* createResource(CachedResource::Type type,
           docLoader, url.url(),
           docLoader ? docLoader->cachePolicy() : CachePolicyCache, expireDate);
     case CachedResource::CSSStyleSheet:
-      return new CachedCSSStyleSheet(
-          docLoader, url.url(), docLoader->cachePolicy(), expireDate, *charset);
+      return new CachedCSSStyleSheet(docLoader, url.url(),
+                                     docLoader->cachePolicy(), expireDate,
+                                     *charset, skipCanLoadCheck);
     case CachedResource::Script:
       return new CachedScript(docLoader, url.url(), docLoader->cachePolicy(),
                               expireDate, *charset);
@@ -95,21 +97,23 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
                                        CachedResource::Type type,
                                        const KURL& url,
                                        time_t expireDate,
-                                       const String* charset) {
+                                       const String* charset,
+                                       bool skipCanLoadCheck) {
   // Look up the resource in our map.
   CachedResource* resource = m_resources.get(url.url());
 
   if (resource) {
-    if (FrameLoader::restrictAccessToLocal() &&
+    if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
         !FrameLoader::canLoad(*resource, docLoader->doc()))
       return 0;
   } else {
-    if (FrameLoader::restrictAccessToLocal() &&
+    if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
         !FrameLoader::canLoad(url, docLoader->doc()))
       return 0;
 
     // The resource does not exist.  Create it.
-    resource = createResource(type, docLoader, url, expireDate, charset);
+    resource = createResource(type, docLoader, url, expireDate, charset,
+                              skipCanLoadCheck);
     ASSERT(resource);
     resource->setInCache(!disabled());
     if (!disabled())

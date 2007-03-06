@@ -82,7 +82,8 @@ bool SubresourceLoader::load(const ResourceRequest& r) {
 PassRefPtr<SubresourceLoader> SubresourceLoader::create(
     Frame* frame,
     SubresourceLoaderClient* client,
-    const ResourceRequest& request) {
+    const ResourceRequest& request,
+    bool skipCanLoadCheck) {
   if (!frame)
     return 0;
 
@@ -92,8 +93,7 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
 
   ResourceRequest newRequest = request;
 
-  // If linked-on-or-after check canLoad
-  if (FrameLoader::restrictAccessToLocal() &&
+  if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
       !FrameLoader::canLoad(request.url(), frame->document()))
     return 0;
 

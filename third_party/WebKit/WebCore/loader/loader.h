@@ -50,7 +50,10 @@ class Loader : private SubresourceLoaderClient {
   Loader();
   ~Loader();
 
-  void load(DocLoader*, CachedResource*, bool incremental = true);
+  void load(DocLoader*,
+            CachedResource*,
+            bool incremental = true,
+            bool skipCanLoadCheck = false);
 
   int numRequests(DocLoader*) const;
   void cancelRequests(DocLoader*);
@@ -61,7 +64,7 @@ class Loader : private SubresourceLoaderClient {
   virtual void didFinishLoading(SubresourceLoader*);
   virtual void didFail(SubresourceLoader*, const ResourceError&);
 
-  void servePendingRequests();
+  void servePendingRequests(bool skipCanLoadCheck = false);
 
   DeprecatedPtrList<Request> m_requestsPending;
   typedef HashMap<RefPtr<SubresourceLoader>, Request*> RequestMap;
