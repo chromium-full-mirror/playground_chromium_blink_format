@@ -50,6 +50,7 @@
 #include "HTMLIFrameElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLIsIndexElement.h"
+#include "HTMLKeygenElement.h"
 #include "HTMLLabelElement.h"
 #include "HTMLLegendElement.h"
 #include "HTMLLIElement.h"
@@ -202,6 +203,13 @@ static PassRefPtr<HTMLElement> fieldsetConstructor(const AtomicString&,
                                                    HTMLFormElement* form,
                                                    bool) {
   return new HTMLFieldSetElement(doc, form);
+}
+
+static PassRefPtr<HTMLElement> keygenConstructor(const AtomicString&,
+                                                 Document* doc,
+                                                 HTMLFormElement* form,
+                                                 bool) {
+  return new HTMLKeygenElement(doc, form);
 }
 
 static PassRefPtr<HTMLElement> labelConstructor(const AtomicString&,
@@ -542,6 +550,7 @@ static void createFunctionMap() {
   addTag(inputTag, inputConstructor);
   addTag(insTag, modConstructor);
   addTag(isindexTag, isindexConstructor);
+  addTag(keygenTag, keygenConstructor);
   addTag(labelTag, labelConstructor);
   addTag(legendTag, legendConstructor);
   addTag(liTag, liConstructor);
