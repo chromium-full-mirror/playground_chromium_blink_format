@@ -30,13 +30,14 @@
 #include "SubresourceLoader.h"
 
 #include "Document.h"
+#include "DocumentLoader.h"
 #include "Frame.h"
+#include "FrameLoader.h"
 #include "Logging.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "SubresourceLoaderClient.h"
 #include "SharedBuffer.h"
-#include "FrameLoader.h"
 
 namespace WebCore {
 
@@ -64,7 +65,7 @@ SubresourceLoader::SubresourceLoader(Frame* frame,
 #ifndef NDEBUG
   ++SubresourceLoaderCounter::count;
 #endif
-  frameLoader()->addSubresourceLoader(this);
+  m_documentLoader->addSubresourceLoader(this);
 }
 
 SubresourceLoader::~SubresourceLoader() {
@@ -199,7 +200,7 @@ void SubresourceLoader::didFinishLoading() {
 
   if (cancelled())
     return;
-  frameLoader()->removeSubresourceLoader(this);
+  m_documentLoader->removeSubresourceLoader(this);
   ResourceLoader::didFinishLoading();
 }
 
@@ -219,7 +220,7 @@ void SubresourceLoader::didFail(const ResourceError& error) {
 
   if (cancelled())
     return;
-  frameLoader()->removeSubresourceLoader(this);
+  m_documentLoader->removeSubresourceLoader(this);
   ResourceLoader::didFail(error);
 }
 
@@ -235,7 +236,7 @@ void SubresourceLoader::didCancel(const ResourceError& error) {
 
   if (cancelled())
     return;
-  frameLoader()->removeSubresourceLoader(this);
+  m_documentLoader->removeSubresourceLoader(this);
   ResourceLoader::didCancel(error);
 }
 }
