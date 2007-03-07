@@ -429,7 +429,8 @@ class SVGEmptyEditorClient : public EditorClient {
   virtual void undo() {}
   virtual void redo() {}
 
-  virtual void handleKeyPress(KeyboardEvent*) {}
+  virtual void handleKeypress(KeyboardEvent*) {}
+  virtual void handleInputMethodKeypress(KeyboardEvent*) {}
 
   virtual void textFieldDidBeginEditing(Element*) {}
   virtual void textFieldDidEndEditing(Element*) {}

@@ -68,7 +68,8 @@ class Editor {
   }
   EditCommand* lastEditCommand() { return m_lastEditCommand.get(); }
 
-  void handleKeyPress(KeyboardEvent*);
+  void handleKeypress(KeyboardEvent*);
+  void handleInputMethodKeypress(KeyboardEvent*);
 
   bool canEdit() const;
   bool canEditRichly() const;

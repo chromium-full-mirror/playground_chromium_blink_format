@@ -187,7 +187,7 @@ void EditorClientQt::toggleGrammarChecking() {
   notImplemented();
 }
 
-void EditorClientQt::handleKeyPress(KeyboardEvent* event) {
+void EditorClientQt::handleKeypress(KeyboardEvent* event) {
   Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
   if (!frame)
     return;
@@ -240,6 +240,8 @@ void EditorClientQt::handleKeyPress(KeyboardEvent* event) {
     }
   }
 }
+
+void EditorClientQt::handleInputMethodKeypress(KeyboardEvent*) {}
 
 EditorClientQt::EditorClientQt(QWebPage* page)
     : m_page(page), m_editing(false), m_inUndoRedo(false) {}

@@ -109,7 +109,8 @@ struct WebHTMLViewInterpretKeyEventsParameters;
 - (void)closeIfNotCurrentView;
 - (void)_lookUpInDictionaryFromMenu:(id)sender;
 - (void)_hoverFeedbackSuspendedChanged;
-- (BOOL)_interceptEditingKeyEvent:(WebCore::KeyboardEvent*)event;
+- (BOOL)_interceptEditingKeyEvent:(WebCore::KeyboardEvent*)event
+                shouldSaveCommand:(BOOL)shouldSave;
 - (DOMDocumentFragment*)_documentFragmentFromPasteboard:
     (NSPasteboard*)pasteboard;
 - (NSEvent*)_mouseDownEvent;
