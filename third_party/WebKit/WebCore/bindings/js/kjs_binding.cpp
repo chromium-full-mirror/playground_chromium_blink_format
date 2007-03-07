@@ -108,16 +108,18 @@ DOMObject::~DOMObject() {
 #endif
 
 static DOMObjectMap& domObjects() {
+  // Don't use malloc here. Calling malloc from a mark function can deadlock.
   static DOMObjectMap staticDOMObjects;
   return staticDOMObjects;
 }
 
 static NodePerDocMap& domNodesPerDocument() {
   // domNodesPerDocument() callers must synchronize using the JSLock because
-  // domNodesPerDocument() is called during garbage collection, which can happen
+  // domNodesPerDocument() is called from a mark function, which can run
   // on a secondary thread.
   ASSERT(JSLock::lockCount());
 
+  // Don't use malloc here. Calling malloc from a mark function can deadlock.
   static NodePerDocMap staticDOMNodesPerDocument;
   return staticDOMNodesPerDocument;
 }

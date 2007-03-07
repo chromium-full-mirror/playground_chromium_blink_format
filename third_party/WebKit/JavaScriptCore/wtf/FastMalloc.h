@@ -34,12 +34,22 @@ void* fastCalloc(size_t n_elements, size_t element_size);
 void fastFree(void* p);
 void* fastRealloc(void* p, size_t n);
 
+#ifndef NDEBUG
+void fastMallocForbid();
+void fastMallocAllow();
+#endif
+
 }  // namespace WTF
 
 using WTF::fastMalloc;
 using WTF::fastCalloc;
 using WTF::fastRealloc;
 using WTF::fastFree;
+
+#ifndef NDEBUG
+using WTF::fastMallocForbid;
+using WTF::fastMallocAllow;
+#endif
 
 #if PLATFORM(GCC) && PLATFORM(DARWIN)
 #define WTF_PRIVATE_INLINE \
