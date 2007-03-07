@@ -78,13 +78,25 @@
 #ifndef NDEBUG
 namespace WTF {
 
-static bool isForbidden = false;
+static pthread_key_t isForbiddenKey;
+static pthread_once_t isForbiddenKeyOnce = PTHREAD_ONCE_INIT;
+static void initializeIsForbiddenKey() {
+  pthread_key_create(&isForbiddenKey, 0);
+}
+
+static bool isForbidden() {
+  pthread_once(&isForbiddenKeyOnce, initializeIsForbiddenKey);
+  return !!pthread_getspecific(isForbiddenKey);
+}
+
 void fastMallocForbid() {
-  isForbidden = true;
+  pthread_once(&isForbiddenKeyOnce, initializeIsForbiddenKey);
+  pthread_setspecific(isForbiddenKey, &isForbiddenKey);
 }
 
 void fastMallocAllow() {
-  isForbidden = false;
+  pthread_once(&isForbiddenKeyOnce, initializeIsForbiddenKey);
+  pthread_setspecific(isForbiddenKey, 0);
 }
 
 }  // namespace WTF
@@ -100,22 +112,22 @@ void fastMallocAllow() {
 namespace WTF {
 
 void* fastMalloc(size_t n) {
-  ASSERT(!isForbidden);
+  ASSERT(!isForbidden());
   return malloc(n);
 }
 
 void* fastCalloc(size_t n_elements, size_t element_size) {
-  ASSERT(!isForbidden);
+  ASSERT(!isForbidden());
   return calloc(n_elements, element_size);
 }
 
 void fastFree(void* p) {
-  ASSERT(!isForbidden);
+  ASSERT(!isForbidden());
   free(p);
 }
 
 void* fastRealloc(void* p, size_t n) {
-  ASSERT(!isForbidden);
+  ASSERT(!isForbidden());
   return realloc(p, n);
 }
 
@@ -1915,7 +1927,7 @@ static ALWAYS_INLINE void* do_malloc(size_t size) {
 
 #ifdef WTF_CHANGES
   ASSERT(isMultiThreaded || pthread_main_np());
-  ASSERT(!isForbidden);
+  ASSERT(!isForbidden());
 #endif
 
 #ifndef WTF_CHANGES
