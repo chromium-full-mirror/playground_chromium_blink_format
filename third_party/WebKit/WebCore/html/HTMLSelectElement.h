@@ -162,7 +162,7 @@ class HTMLSelectElement : public HTMLGenericFormElement {
   int m_size;
   bool m_multiple;
   mutable bool m_recalcListItems;
-  int m_lastOnChangeIndex;
+  mutable int m_lastOnChangeIndex;
 
   int m_activeSelectionAnchorIndex;
   int m_activeSelectionEndIndex;
