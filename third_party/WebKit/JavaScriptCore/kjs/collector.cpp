@@ -502,8 +502,7 @@ bool Collector::collect() {
 #endif
 
 #if USE(MULTIPLE_THREADS)
-  bool currentThreadIsMainThread =
-      !pthread_is_threaded_np() || pthread_main_np();
+  bool currentThreadIsMainThread = pthread_main_np();
 #else
   bool currentThreadIsMainThread = true;
 #endif
