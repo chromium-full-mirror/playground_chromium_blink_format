@@ -435,8 +435,7 @@ class RenderLayer : public ScrollbarClient {
   RenderLayer* m_last;
 
   IntRect m_repaintRect;  // Cached repaint rects. Used by layout.
-  int m_repaintX;
-  int m_repaintY;
+  IntRect m_outlineBox;
 
   // Our current relative position offset.
   int m_relX;

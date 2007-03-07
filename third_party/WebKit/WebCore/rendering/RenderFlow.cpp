@@ -471,7 +471,7 @@ bool RenderFlow::hitTestLines(const HitTestRequest& request,
   return false;
 }
 
-IntRect RenderFlow::getAbsoluteRepaintRect() {
+IntRect RenderFlow::absoluteClippedOverflowRect() {
   if (isInlineFlow()) {
     // Find our leftmost position.
     int left = 0;
@@ -538,7 +538,7 @@ IntRect RenderFlow::getAbsoluteRepaintRect() {
     return r;
   }
 
-  return RenderContainer::getAbsoluteRepaintRect();
+  return RenderContainer::absoluteClippedOverflowRect();
 }
 
 int RenderFlow::lowestPosition(bool includeOverflowInterior,

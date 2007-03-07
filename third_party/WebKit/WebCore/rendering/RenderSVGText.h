@@ -52,7 +52,7 @@ class RenderSVGText : public RenderSVGBlock {
                            int ty,
                            HitTestAction);
   virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
-  virtual IntRect getAbsoluteRepaintRect();
+  virtual IntRect absoluteClippedOverflowRect();
   virtual bool requiresLayer();
   virtual void layout();
   virtual FloatRect relativeBBox(bool includeStroke = true) const;

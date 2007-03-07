@@ -109,24 +109,27 @@ const Path& RenderPath::path() const {
 
 void RenderPath::layout() {
   IntRect oldBounds;
+  IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
-  if (selfNeedsLayout() && checkForRepaint)
+  if (selfNeedsLayout() && checkForRepaint) {
     oldBounds = m_absoluteBounds;
+    oldOutlineBox = absoluteOutlineBox();
+  }
 
   setPath(static_cast<SVGStyledElement*>(element())->toPathData());
 
-  m_absoluteBounds = getAbsoluteRepaintRect();
+  m_absoluteBounds = absoluteClippedOverflowRect();
 
   setWidth(m_absoluteBounds.width());
   setHeight(m_absoluteBounds.height());
 
   if (selfNeedsLayout() && checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds);
+    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 
   setNeedsLayout(false);
 }
 
-IntRect RenderPath::getAbsoluteRepaintRect() {
+IntRect RenderPath::absoluteClippedOverflowRect() {
   FloatRect repaintRect = absoluteTransform().mapRect(relativeBBox(true));
 
   // Markers can expand the bounding box
@@ -237,7 +240,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
 }
 
 void RenderPath::absoluteRects(Vector<IntRect>& rects, int _tx, int _ty) {
-  rects.append(getAbsoluteRepaintRect());
+  rects.append(absoluteClippedOverflowRect());
 }
 
 bool RenderPath::nodeAtPoint(const HitTestRequest& request,
@@ -447,7 +450,7 @@ FloatRect RenderPath::drawMarkersIfNeeded(GraphicsContext* context,
 
   // We know the marker boundaries, only after they're drawn!
   // Otherwhise we'd need to do all the marker calculation twice
-  // once here (through paint()) and once in getAbsoluteRepaintRect().
+  // once here (through paint()) and once in absoluteClippedOverflowRect().
   FloatRect bounds;
 
   if (startMarker)

@@ -716,6 +716,7 @@ class RenderObject : public CachedResourceClient {
   virtual int height() const { return 0; }
 
   virtual IntRect borderBox() const { return IntRect(0, 0, width(), height()); }
+  IntRect absoluteOutlineBox() const;
 
   // The height of a block when you include normal flow overflow spillage out of
   // the bottom
@@ -888,7 +889,8 @@ class RenderObject : public CachedResourceClient {
   void repaintRectangle(const IntRect&, bool immediate = false);
 
   // Repaint only if our old bounds and new bounds are different.
-  bool repaintAfterLayoutIfNeeded(const IntRect& oldBounds);
+  bool repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
+                                  const IntRect& oldOutlineBox);
 
   // Repaint only if the object moved.
   virtual void repaintDuringLayoutIfMoved(const IntRect& rect);
@@ -905,7 +907,7 @@ class RenderObject : public CachedResourceClient {
   // Returns the rect that should be repainted whenever this object changes.
   // The rect is in the view's
   // coordinate space.  This method deals with outlines and overflow.
-  virtual IntRect getAbsoluteRepaintRect();
+  virtual IntRect absoluteClippedOverflowRect();
 
   IntRect getAbsoluteRepaintRectWithOutline(int ow);
 

@@ -496,10 +496,13 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   }
 
   IntRect oldBounds;
+  IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
-    oldBounds = getAbsoluteRepaintRect();
+    oldBounds = absoluteClippedOverflowRect();
     oldBounds.move(view()->layoutDelta());
+    oldOutlineBox = absoluteOutlineBox();
+    oldOutlineBox.move(view()->layoutDelta());
   }
 
   int oldWidth = m_width;
@@ -625,7 +628,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   // Repaint with our new bounds if they are different from our old bounds.
   bool didFullRepaint = false;
   if (checkForRepaint)
-    didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds);
+    didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
   if (!didFullRepaint && !repaintRect.isEmpty()) {
     // FIXME: Deal with multiple column repainting.  We have to split the
     // repaint

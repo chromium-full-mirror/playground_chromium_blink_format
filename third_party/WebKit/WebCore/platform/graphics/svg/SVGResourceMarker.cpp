@@ -104,7 +104,7 @@ void SVGResourceMarker::draw(GraphicsContext* context,
   m_marker->setDrawsContents(false);
   context->restore();
 
-  m_cachedBounds = transform.mapRect(m_marker->getAbsoluteRepaintRect());
+  m_cachedBounds = transform.mapRect(m_marker->absoluteClippedOverflowRect());
 
   currentlyDrawingMarkers.remove(this);
 }

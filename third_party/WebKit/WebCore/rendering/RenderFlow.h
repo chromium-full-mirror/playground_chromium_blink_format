@@ -86,7 +86,7 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction);
 
-  virtual IntRect getAbsoluteRepaintRect();
+  virtual IntRect absoluteClippedOverflowRect();
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;

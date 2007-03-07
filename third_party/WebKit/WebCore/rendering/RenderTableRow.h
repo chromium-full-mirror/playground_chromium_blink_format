@@ -55,7 +55,7 @@ class RenderTableRow : public RenderContainer {
   }
   virtual void position(InlineBox*) {}
   virtual void layout();
-  virtual IntRect getAbsoluteRepaintRect();
+  virtual IntRect absoluteClippedOverflowRect();
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

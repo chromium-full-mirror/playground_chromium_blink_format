@@ -45,7 +45,7 @@ class RenderTableCol : public RenderContainer {
   virtual bool canHaveChildren() const;
   virtual bool requiresLayer() { return false; }
 
-  virtual IntRect getAbsoluteRepaintRect();
+  virtual IntRect absoluteClippedOverflowRect();
   virtual void imageChanged(CachedImage*);
 
 #ifndef NDEBUG

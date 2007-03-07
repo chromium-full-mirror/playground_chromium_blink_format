@@ -257,10 +257,13 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
   }
 
   IntRect oldBounds;
+  IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
-    oldBounds = getAbsoluteRepaintRect();
+    oldBounds = absoluteClippedOverflowRect();
     oldBounds.move(view()->layoutDelta());
+    oldOutlineBox = absoluteOutlineBox();
+    oldOutlineBox.move(view()->layoutDelta());
   }
 
   int previousWidth = m_width;
@@ -339,7 +342,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
 
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds);
+    repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 
   setNeedsLayout(false);
 }

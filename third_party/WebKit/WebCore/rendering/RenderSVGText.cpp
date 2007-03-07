@@ -42,7 +42,7 @@ namespace WebCore {
 
 RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
 
-IntRect RenderSVGText::getAbsoluteRepaintRect() {
+IntRect RenderSVGText::absoluteClippedOverflowRect() {
   return enclosingIntRect(absoluteTransform().mapRect(relativeBBox(true)));
 }
 
@@ -55,9 +55,12 @@ void RenderSVGText::layout() {
   ASSERT(minMaxKnown());
 
   IntRect oldBounds;
+  IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
-  if (checkForRepaint)
+  if (checkForRepaint) {
     oldBounds = m_absoluteBounds;
+    oldOutlineBox = absoluteOutlineBox();
+  }
 
   // FIXME: need to allow floating point positions
   SVGTextElement* text = static_cast<SVGTextElement*>(element());
@@ -67,11 +70,11 @@ void RenderSVGText::layout() {
 
   RenderBlock::layout();
 
-  m_absoluteBounds = getAbsoluteRepaintRect();
+  m_absoluteBounds = absoluteClippedOverflowRect();
 
   bool repainted = false;
   if (checkForRepaint)
-    repainted = repaintAfterLayoutIfNeeded(oldBounds);
+    repainted = repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 
   setNeedsLayout(false);
 }
@@ -120,7 +123,7 @@ bool RenderSVGText::nodeAtPoint(const HitTestRequest& request,
 }
 
 void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
-  rects.append(getAbsoluteRepaintRect());
+  rects.append(absoluteClippedOverflowRect());
 }
 
 void RenderSVGText::paint(PaintInfo& paintInfo, int tx, int ty) {
