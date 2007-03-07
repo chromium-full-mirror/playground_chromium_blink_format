@@ -337,6 +337,7 @@ ContainerNode* HTMLSelectElement::addChild(PassRefPtr<Node> newChild) {
 void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
   bool oldUsesMenuList = usesMenuList();
   if (attr->name() == sizeAttr) {
+    int oldSize = m_size;
     // Set the attribute value to a number.
     // This is important since the style rules for this attribute can determine
     // the appearance property.
@@ -346,7 +347,9 @@ void HTMLSelectElement::parseMappedAttribute(MappedAttribute* attr) {
       attr->setValue(attrSize);
 
     m_size = max(size, 1);
-    if (oldUsesMenuList != usesMenuList() && attached()) {
+    if ((oldUsesMenuList != usesMenuList() ||
+         !oldUsesMenuList && m_size != oldSize) &&
+        attached()) {
       detach();
       attach();
     }
