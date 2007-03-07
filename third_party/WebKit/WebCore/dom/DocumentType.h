@@ -54,6 +54,8 @@ class DocumentType : public Node {
   String systemId() const { return m_systemId; }
   String internalSubset() const { return m_subset; }
 
+  virtual String baseURI() const;
+
   // Other methods (not part of DOM)
   DOMImplementation* implementation() const { return m_implementation.get(); }
 

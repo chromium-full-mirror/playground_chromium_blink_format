@@ -78,6 +78,10 @@ String DocumentType::toString() const {
   return result;
 }
 
+String DocumentType::baseURI() const {
+  return String();
+}
+
 String DocumentType::nodeName() const {
   return name();
 }

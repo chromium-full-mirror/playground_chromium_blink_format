@@ -135,6 +135,8 @@ class Element : public ContainerNode {
     return m_tagName.namespaceURI();
   }
 
+  virtual String baseURI() const;
+
   // DOM methods overridden from  parent classes
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
