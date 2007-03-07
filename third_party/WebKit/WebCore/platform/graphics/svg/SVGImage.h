@@ -42,7 +42,7 @@ class Page;
 
 class SVGImage : public Image {
  public:
-  SVGImage(ImageAnimationObserver*);
+  SVGImage(ImageObserver*);
   ~SVGImage();
 
   virtual IntSize size() const;

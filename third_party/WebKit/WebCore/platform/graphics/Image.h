@@ -62,14 +62,15 @@ class IntRect;
 class IntSize;
 class String;
 
-// This class gets notified when an image advances animation frames.
-class ImageAnimationObserver;
+// This class gets notified when an image creates or destroys decoded frames and
+// when it advances animation frames.
+class ImageObserver;
 
 class Image : Noncopyable {
   friend class GraphicsContext;
 
  public:
-  Image(ImageAnimationObserver* = 0);
+  Image(ImageObserver* = 0);
   virtual ~Image();
 
   static Image* loadPlatformResource(const char* name);
@@ -87,6 +88,12 @@ class Image : Noncopyable {
     return false;
   }
 
+  // FIXME: PDF/SVG will be underreporting decoded sizes and will be unable to
+  // prune because these functions are not
+  // implemented yet for those image types.
+  virtual void destroyDecodedData(bool incremental = false){};
+  virtual unsigned decodedSize() const { return 0; }
+
   Vector<char>& dataBuffer() { return m_data; }
 
   // It may look unusual that there is no start animation call as public API.
@@ -99,9 +106,7 @@ class Image : Noncopyable {
   virtual void resetAnimation() {}
 
   // Typically the CachedImage that owns us.
-  ImageAnimationObserver* animationObserver() const {
-    return m_animationObserver;
-  }
+  ImageObserver* imageObserver() const { return m_imageObserver; }
 
   enum TileRule { StretchTile, RepeatTile };
 
@@ -168,7 +173,7 @@ class Image : Noncopyable {
 #endif
 
   Vector<char> m_data;  // The encoded raw data for the image.
-  ImageAnimationObserver* m_animationObserver;
+  ImageObserver* m_imageObserver;
 };
 }
 

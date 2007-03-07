@@ -40,8 +40,7 @@
 
 namespace WebCore {
 
-Image::Image(ImageAnimationObserver* observer)
-    : m_animationObserver(observer) {}
+Image::Image(ImageObserver* observer) : m_imageObserver(observer) {}
 
 Image::~Image() {}
 

@@ -45,7 +45,7 @@
 
 namespace WebCore {
 
-SVGImage::SVGImage(ImageAnimationObserver* observer)
+SVGImage::SVGImage(ImageObserver* observer)
     : Image(observer), m_document(0), m_page(0), m_frame(0), m_frameView(0) {}
 
 SVGImage::~SVGImage() {
