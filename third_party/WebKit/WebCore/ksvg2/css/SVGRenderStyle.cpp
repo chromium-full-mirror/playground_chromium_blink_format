@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
@@ -40,6 +40,7 @@ SVGRenderStyle::SVGRenderStyle() {
 
   fill = s_defaultStyle->fill;
   stroke = s_defaultStyle->stroke;
+  text = s_defaultStyle->text;
   stops = s_defaultStyle->stops;
   clip = s_defaultStyle->clip;
   mask = s_defaultStyle->mask;
@@ -54,6 +55,7 @@ SVGRenderStyle::SVGRenderStyle(bool) {
 
   fill.init();
   stroke.init();
+  text.init();
   stops.init();
   clip.init();
   mask.init();
@@ -65,6 +67,7 @@ SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
     : Shared<SVGRenderStyle>() {
   fill = other.fill;
   stroke = other.stroke;
+  text = other.text;
   stops = other.stops;
   clip = other.clip;
   mask = other.mask;
@@ -78,16 +81,16 @@ SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
 SVGRenderStyle::~SVGRenderStyle() {}
 
 bool SVGRenderStyle::operator==(const SVGRenderStyle& o) const {
-  return (fill == o.fill && stroke == o.stroke && stops == o.stops &&
-          clip == o.clip && mask == o.mask && misc == o.misc &&
-          markers == o.markers &&
+  return (fill == o.fill && stroke == o.stroke && text == o.text &&
+          stops == o.stops && clip == o.clip && mask == o.mask &&
+          misc == o.misc && markers == o.markers &&
           svg_inherited_flags == o.svg_inherited_flags &&
           svg_noninherited_flags == o.svg_noninherited_flags);
 }
 
 bool SVGRenderStyle::inheritedNotEqual(const SVGRenderStyle* other) const {
   return (fill != other->fill || stroke != other->stroke ||
-          markers != other->markers ||
+          markers != other->markers || text != other->text ||
           svg_inherited_flags != other->svg_inherited_flags);
 }
 
@@ -98,10 +101,12 @@ void SVGRenderStyle::inheritFrom(const SVGRenderStyle* svgInheritParent) {
   fill = svgInheritParent->fill;
   stroke = svgInheritParent->stroke;
   markers = svgInheritParent->markers;
+  text = svgInheritParent->text;
 
   svg_inherited_flags = svgInheritParent->svg_inherited_flags;
 }
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)
+
+// vim:ts=4:noet
