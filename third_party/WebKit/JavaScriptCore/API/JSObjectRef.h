@@ -103,7 +103,7 @@ typedef void (*JSObjectInitializeCallback)(JSContextRef ctx,
 /*!
 @typedef JSObjectFinalizeCallback
 @abstract The callback invoked when an object is finalized (prepared for garbage
-collection).
+collection). An object may be finalized on any thread.
 @param object The JSObject being finalized.
 @discussion If you named your function Finalize, you would declare it like this:
 

@@ -46,9 +46,11 @@ namespace KJS {
  */
 class DOMObject : public JSObject {
  protected:
-  // DOMObject Destruction is not thread-safe because JS DOM objects
-  // wrap unsafe WebCore DOM data structures
-  DOMObject() : JSObject(false) {}
+  DOMObject() {
+    // DOMObject destruction is not thread-safe because DOMObjects wrap
+    // unsafe WebCore DOM data structures.
+    Collector::collectOnMainThreadOnly(this);
+  }
 #ifndef NDEBUG
   virtual ~DOMObject();
 #endif
@@ -98,7 +100,6 @@ class ScriptInterpreter : public Interpreter {
    */
   bool wasRunByUserGesture() const;
 
-  virtual void mark(bool currentThreadIsMainThread);
   virtual ExecState* globalExec();
 
   WebCore::Event* getCurrentEvent() const { return m_currentEvent; }

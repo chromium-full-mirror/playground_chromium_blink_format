@@ -628,21 +628,18 @@ DateObjectImp::DateObjectImp(ExecState* exec,
                              FunctionPrototype* funcProto,
                              DatePrototype* dateProto)
     : InternalFunctionImp(funcProto) {
-  // ECMA 15.9.4.1 Date.prototype
-  putDirect(prototypePropertyName, dateProto, DontEnum | DontDelete | ReadOnly);
+  static const Identifier* parsePropertyName = new Identifier("parse");
+  static const Identifier* UTCPropertyName = new Identifier("UTC");
 
-  static const Identifier parsePropertyName("parse");
+  putDirect(prototypePropertyName, dateProto, DontEnum | DontDelete | ReadOnly);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1,
-                            parsePropertyName),
+                            *parsePropertyName),
       DontEnum);
-  static const Identifier UTCPropertyName("UTC");
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
-                            UTCPropertyName),
+                            *UTCPropertyName),
       DontEnum);
-
-  // no. of arguments for constructor
   putDirect(lengthPropertyName, 7, ReadOnly | DontDelete | DontEnum);
 }
 

@@ -24,23 +24,24 @@
 #include "config.h"
 #include "ustring.h"
 
+#include "JSLock.h"
+#include "dtoa.h"
+#include "identifier.h"
+#include "operations.h"
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
+#include <float.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <wtf/Vector.h>
+
 #if HAVE(STRING_H)
 #include <string.h>
 #endif
 #if HAVE(STRINGS_H)
 #include <strings.h>
 #endif
-
-#include "dtoa.h"
-#include "identifier.h"
-#include "operations.h"
-#include <float.h>
-#include <math.h>
-#include <wtf/Vector.h>
 
 using std::max;
 using std::min;
@@ -145,6 +146,8 @@ UCharReference& UCharReference::operator=(UChar c) {
 }
 
 UChar& UCharReference::ref() const {
+  ASSERT(JSLock::lockCount() > 0);
+
   if (offset < str->rep()->len)
     return *(str->rep()->data() + offset);
   else {
@@ -154,6 +157,8 @@ UChar& UCharReference::ref() const {
 }
 
 PassRefPtr<UString::Rep> UString::Rep::createCopying(const UChar* d, int l) {
+  ASSERT(JSLock::lockCount() > 0);
+
   int sizeInBytes = l * sizeof(UChar);
   UChar* copyD = static_cast<UChar*>(fastMalloc(sizeInBytes));
   memcpy(copyD, d, sizeInBytes);
@@ -162,6 +167,8 @@ PassRefPtr<UString::Rep> UString::Rep::createCopying(const UChar* d, int l) {
 }
 
 PassRefPtr<UString::Rep> UString::Rep::create(UChar* d, int l) {
+  ASSERT(JSLock::lockCount() > 0);
+
   Rep* r = new Rep;
   r->offset = 0;
   r->len = l;
@@ -182,7 +189,8 @@ PassRefPtr<UString::Rep> UString::Rep::create(UChar* d, int l) {
 PassRefPtr<UString::Rep> UString::Rep::create(PassRefPtr<Rep> base,
                                               int offset,
                                               int length) {
-  assert(base);
+  ASSERT(JSLock::lockCount() > 0);
+  ASSERT(base);
 
   int baseOffset = base->offset;
 
@@ -211,6 +219,8 @@ PassRefPtr<UString::Rep> UString::Rep::create(PassRefPtr<Rep> base,
 }
 
 void UString::Rep::destroy() {
+  ASSERT(JSLock::lockCount() > 0);
+
   if (isIdentifier)
     Identifier::remove(this);
   if (baseString) {
@@ -459,8 +469,8 @@ UString::UString(const UString& a, const UString& b) {
 }
 
 const UString& UString::null() {
-  static UString n;
-  return n;
+  static UString* n = new UString;
+  return *n;
 }
 
 UString UString::from(int i) {

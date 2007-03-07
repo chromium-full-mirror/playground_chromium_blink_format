@@ -48,15 +48,14 @@ RegExpPrototype::RegExpPrototype(ExecState* exec,
                                  ObjectPrototype* objProto,
                                  FunctionPrototype* funcProto)
     : JSObject(objProto) {
-  // The constructor will be added later in RegExpObject's constructor (?)
+  static const Identifier* execPropertyName = new Identifier("exec");
+  static const Identifier* testPropertyName = new Identifier("test");
 
-  static const Identifier execPropertyName("exec");
-  static const Identifier testPropertyName("test");
   putDirectFunction(new RegExpProtoFunc(exec, funcProto, RegExpProtoFunc::Exec,
-                                        0, execPropertyName),
+                                        0, *execPropertyName),
                     DontEnum);
   putDirectFunction(new RegExpProtoFunc(exec, funcProto, RegExpProtoFunc::Test,
-                                        0, testPropertyName),
+                                        0, *testPropertyName),
                     DontEnum);
   putDirectFunction(
       new RegExpProtoFunc(exec, funcProto, RegExpProtoFunc::ToString, 0,

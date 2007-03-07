@@ -299,7 +299,7 @@ class Interpreter {
    * Called during the mark phase of the garbage collector. Subclasses
    * implementing custom mark methods must make sure to chain to this one.
    */
-  virtual void mark(bool currentThreadIsMainThread);
+  virtual void mark();
 
 #ifdef KJS_DEBUG_MEM
   /**

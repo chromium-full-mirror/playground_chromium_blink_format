@@ -51,8 +51,6 @@ static CFTypeRef KJSValueToCFTypeInternal(JSValue* inValue,
 //--------------------------------------------------------------------------
 
 UString CFStringToUString(CFStringRef inCFString) {
-  JSLock lock;
-
   UString result;
   if (inCFString) {
     CFIndex len = CFStringGetLength(inCFString);

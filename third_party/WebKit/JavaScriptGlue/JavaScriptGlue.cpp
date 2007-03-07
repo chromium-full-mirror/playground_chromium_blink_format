@@ -254,6 +254,7 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
   JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
+    JSLock lock;
     Completion completion = ptr->Evaluate();
     if (completion.isValueCompletion()) {
       result = (JSObjectRef)KJSValueToJSObject(
@@ -282,9 +283,8 @@ bool JSRunCheckSyntax(JSRunRef ref) {
   bool result = false;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
-    JSLockInterpreter();
+    JSLock lock;
     result = ptr->CheckSyntax();
-    JSUnlockInterpreter();
   }
   return result;
 }
