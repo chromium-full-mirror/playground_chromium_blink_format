@@ -1101,14 +1101,17 @@ PassRefPtr<DocumentFragment> Range::createContextualFragment(
     return 0;
   }
 
-  if (!m_startContainer->isHTMLElement()) {
+  Node* htmlElement = m_startContainer->isHTMLElement()
+                          ? m_startContainer.get()
+                          : m_startContainer->parentNode();
+
+  if (!htmlElement->isHTMLElement()) {
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }
 
   RefPtr<DocumentFragment> fragment =
-      static_cast<HTMLElement*>(m_startContainer.get())
-          ->createContextualFragment(html);
+      static_cast<HTMLElement*>(htmlElement)->createContextualFragment(html);
   if (!fragment) {
     ec = NOT_SUPPORTED_ERR;
     return 0;
