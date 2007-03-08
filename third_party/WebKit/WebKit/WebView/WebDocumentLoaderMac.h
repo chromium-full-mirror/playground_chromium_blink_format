@@ -45,7 +45,11 @@ class WebDocumentLoaderMac : public WebCore::DocumentLoader {
   virtual void attachToFrame();
   virtual void detachFromFrame();
 
+  void increaseLoadCount();
+  void decreaseLoadCount();
+
  private:
-  WebCore::RetainPtr<WebDataSource> m_dataSource;
-  WebDataSource* m_detachedDataSource;  // not retained
+  WebDataSource* m_dataSource;
+  bool m_hasEverBeenDetached;
+  unsigned m_loadCount;
 };
