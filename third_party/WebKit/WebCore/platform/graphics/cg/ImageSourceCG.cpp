@@ -148,7 +148,7 @@ void ImageSource::destroyFrameAtIndex(size_t index) {
   // mismatch, and it will then drop
   // its reference to the old decoded image.
   CGImageRef image = CGImageSourceCreateImageAtIndex(m_decoder, index, NULL);
-  CFRelease(image);
+  CGImageRelease(image);
 }
 
 float ImageSource::frameDurationAtIndex(size_t index) {
