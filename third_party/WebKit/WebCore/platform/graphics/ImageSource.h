@@ -87,6 +87,8 @@ class ImageSource : Noncopyable {
   float frameDurationAtIndex(size_t);
   bool frameHasAlphaAtIndex(
       size_t);  // Whether or not the frame actually used any alpha.
+  bool frameIsCompleteAtIndex(
+      size_t);  // Whether or not the frame is completely decoded.
 
  private:
   NativeImageSourcePtr m_decoder;
