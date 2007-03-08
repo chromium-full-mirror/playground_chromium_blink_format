@@ -45,7 +45,7 @@ Filter::~Filter() {
   deleteAllValues(m_predicates);
 }
 
-Value Filter::doEvaluate() const {
+Value Filter::evaluate() const {
   Value v = m_expr->evaluate();
 
   if (!v.isNodeVector())
@@ -78,12 +78,7 @@ LocationPath::~LocationPath() {
   deleteAllValues(m_steps);
 }
 
-void LocationPath::optimize() {
-  for (unsigned i = 0; i < m_steps.size(); i++)
-    m_steps[i]->optimize();
-}
-
-Value LocationPath::doEvaluate() const {
+Value LocationPath::evaluate() const {
   /* For absolute location paths, the context node is ignored - the
    * document's root node is used instead.
    */
@@ -129,7 +124,7 @@ Path::~Path() {
   delete m_path;
 }
 
-Value Path::doEvaluate() const {
+Value Path::evaluate() const {
   return m_path->evaluate(m_filter->evaluate().toNodeVector());
 }
 }

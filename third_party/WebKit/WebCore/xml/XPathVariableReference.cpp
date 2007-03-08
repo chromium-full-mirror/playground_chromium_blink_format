@@ -37,11 +37,7 @@ namespace XPath {
 
 VariableReference::VariableReference(const String& name) : m_name(name) {}
 
-bool VariableReference::isConstant() const {
-  return false;
-}
-
-Value VariableReference::doEvaluate() const {
+Value VariableReference::evaluate() const {
   HashMap<String, String>& bindings = evaluationContext().variableBindings;
   if (!bindings.contains(m_name))
     // FIXME: Is this the right thing to do if an unknown variable is

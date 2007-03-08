@@ -70,121 +70,111 @@ struct FunctionRec {
 static HashMap<String, FunctionRec>* functionMap;
 
 class FunLast : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunPosition : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunCount : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunId : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunLocalName : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunNamespaceURI : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunName : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunString : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunConcat : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunStartsWith : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunContains : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunSubstringBefore : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunSubstringAfter : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunSubstring : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunStringLength : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunNormalizeSpace : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunTranslate : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunBoolean : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunNot : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunTrue : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunFalse : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunLang : public Function {
-  virtual bool isConstant() const;
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunNumber : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunSum : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunFloor : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunCeiling : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 };
 
 class FunRound : public Function {
-  virtual Value doEvaluate() const;
+  virtual Value evaluate() const;
 
  public:
   static double round(double);
@@ -269,27 +259,15 @@ String Function::name() const {
   return m_name;
 }
 
-Value FunLast::doEvaluate() const {
+Value FunLast::evaluate() const {
   return Expression::evaluationContext().size;
 }
 
-bool FunLast::isConstant() const {
-  return false;
-}
-
-Value FunPosition::doEvaluate() const {
+Value FunPosition::evaluate() const {
   return Expression::evaluationContext().position;
 }
 
-bool FunPosition::isConstant() const {
-  return false;
-}
-
-bool FunId::isConstant() const {
-  return false;
-}
-
-Value FunId::doEvaluate() const {
+Value FunId::evaluate() const {
   // FIXME: this algorithm does not produce an ordered node-set, as it should.
 
   Value a = arg(0)->evaluate();
@@ -339,11 +317,7 @@ Value FunId::doEvaluate() const {
   return result;
 }
 
-bool FunLocalName::isConstant() const {
-  return false;
-}
-
-Value FunLocalName::doEvaluate() const {
+Value FunLocalName::evaluate() const {
   Node* node = 0;
   if (argCount() > 0) {
     Value a = arg(0)->evaluate();
@@ -359,11 +333,7 @@ Value FunLocalName::doEvaluate() const {
   return Value(node->localName());
 }
 
-bool FunNamespaceURI::isConstant() const {
-  return false;
-}
-
-Value FunNamespaceURI::doEvaluate() const {
+Value FunNamespaceURI::evaluate() const {
   Node* node = 0;
   if (argCount() > 0) {
     Value a = arg(0)->evaluate();
@@ -379,11 +349,7 @@ Value FunNamespaceURI::doEvaluate() const {
   return Value(node->namespaceURI());
 }
 
-bool FunName::isConstant() const {
-  return false;
-}
-
-Value FunName::doEvaluate() const {
+Value FunName::evaluate() const {
   Node* node = 0;
   if (argCount() > 0) {
     Value a = arg(0)->evaluate();
@@ -401,7 +367,7 @@ Value FunName::doEvaluate() const {
                           : node->prefix() + ":" + node->localName();
 }
 
-Value FunCount::doEvaluate() const {
+Value FunCount::evaluate() const {
   Value a = arg(0)->evaluate();
 
   if (!a.isNodeVector())
@@ -410,17 +376,13 @@ Value FunCount::doEvaluate() const {
   return a.toNodeVector().size();
 }
 
-bool FunCount::isConstant() const {
-  return false;
-}
-
-Value FunString::doEvaluate() const {
+Value FunString::evaluate() const {
   if (!argCount())
     return Value(Expression::evaluationContext().node.get()).toString();
   return arg(0)->evaluate().toString();
 }
 
-Value FunConcat::doEvaluate() const {
+Value FunConcat::evaluate() const {
   String str = "";
 
   for (unsigned i = 0; i < argCount(); ++i)
@@ -429,7 +391,7 @@ Value FunConcat::doEvaluate() const {
   return str;
 }
 
-Value FunStartsWith::doEvaluate() const {
+Value FunStartsWith::evaluate() const {
   String s1 = arg(0)->evaluate().toString();
   String s2 = arg(1)->evaluate().toString();
 
@@ -439,7 +401,7 @@ Value FunStartsWith::doEvaluate() const {
   return s1.startsWith(s2);
 }
 
-Value FunContains::doEvaluate() const {
+Value FunContains::evaluate() const {
   String s1 = arg(0)->evaluate().toString();
   String s2 = arg(1)->evaluate().toString();
 
@@ -449,7 +411,7 @@ Value FunContains::doEvaluate() const {
   return s1.contains(s2) != 0;
 }
 
-Value FunSubstringBefore::doEvaluate() const {
+Value FunSubstringBefore::evaluate() const {
   String s1 = arg(0)->evaluate().toString();
   String s2 = arg(1)->evaluate().toString();
 
@@ -464,7 +426,7 @@ Value FunSubstringBefore::doEvaluate() const {
   return s1.left(i);
 }
 
-Value FunSubstringAfter::doEvaluate() const {
+Value FunSubstringAfter::evaluate() const {
   String s1 = arg(0)->evaluate().toString();
   String s2 = arg(1)->evaluate().toString();
 
@@ -478,7 +440,7 @@ Value FunSubstringAfter::doEvaluate() const {
   return s1.substring(s2.length());
 }
 
-Value FunSubstring::doEvaluate() const {
+Value FunSubstring::evaluate() const {
   String s = arg(0)->evaluate().toString();
   long pos = static_cast<long>(FunRound::round(arg(1)->evaluate().toNumber()));
   bool haveLength = argCount() == 3;
@@ -503,7 +465,7 @@ Value FunSubstring::doEvaluate() const {
   return s.substring(pos - 1, len);
 }
 
-Value FunStringLength::doEvaluate() const {
+Value FunStringLength::evaluate() const {
   if (!argCount())
     return Value(Expression::evaluationContext().node.get())
         .toString()
@@ -511,7 +473,7 @@ Value FunStringLength::doEvaluate() const {
   return arg(0)->evaluate().toString().length();
 }
 
-Value FunNormalizeSpace::doEvaluate() const {
+Value FunNormalizeSpace::evaluate() const {
   if (!argCount()) {
     String s = Value(Expression::evaluationContext().node.get()).toString();
     return Value(s.simplifyWhiteSpace());
@@ -521,7 +483,7 @@ Value FunNormalizeSpace::doEvaluate() const {
   return Value(s.simplifyWhiteSpace());
 }
 
-Value FunTranslate::doEvaluate() const {
+Value FunTranslate::evaluate() const {
   String s1 = arg(0)->evaluate().toString();
   String s2 = arg(1)->evaluate().toString();
   String s3 = arg(2)->evaluate().toString();
@@ -543,23 +505,19 @@ Value FunTranslate::doEvaluate() const {
   return newString;
 }
 
-Value FunBoolean::doEvaluate() const {
+Value FunBoolean::evaluate() const {
   return arg(0)->evaluate().toBoolean();
 }
 
-Value FunNot::doEvaluate() const {
+Value FunNot::evaluate() const {
   return !arg(0)->evaluate().toBoolean();
 }
 
-Value FunTrue::doEvaluate() const {
+Value FunTrue::evaluate() const {
   return true;
 }
 
-bool FunTrue::isConstant() const {
-  return true;
-}
-
-Value FunLang::doEvaluate() const {
+Value FunLang::evaluate() const {
   String lang = arg(0)->evaluate().toString();
 
   RefPtr<Node> langNode = 0;
@@ -591,25 +549,17 @@ Value FunLang::doEvaluate() const {
   return false;
 }
 
-bool FunLang::isConstant() const {
+Value FunFalse::evaluate() const {
   return false;
 }
 
-Value FunFalse::doEvaluate() const {
-  return false;
-}
-
-bool FunFalse::isConstant() const {
-  return true;
-}
-
-Value FunNumber::doEvaluate() const {
+Value FunNumber::evaluate() const {
   if (!argCount())
     return Value(Expression::evaluationContext().node.get()).toNumber();
   return arg(0)->evaluate().toNumber();
 }
 
-Value FunSum::doEvaluate() const {
+Value FunSum::evaluate() const {
   Value a = arg(0)->evaluate();
   if (!a.isNodeVector())
     return 0.0;
@@ -623,11 +573,11 @@ Value FunSum::doEvaluate() const {
   return sum;
 }
 
-Value FunFloor::doEvaluate() const {
+Value FunFloor::evaluate() const {
   return floor(arg(0)->evaluate().toNumber());
 }
 
-Value FunCeiling::doEvaluate() const {
+Value FunCeiling::evaluate() const {
   return ceil(arg(0)->evaluate().toNumber());
 }
 
@@ -641,7 +591,7 @@ double FunRound::round(double val) {
   return val;
 }
 
-Value FunRound::doEvaluate() const {
+Value FunRound::evaluate() const {
   return round(arg(0)->evaluate().toNumber());
 }
 

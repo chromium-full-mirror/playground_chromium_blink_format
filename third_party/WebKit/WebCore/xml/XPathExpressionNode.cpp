@@ -40,39 +40,14 @@ EvaluationContext& Expression::evaluationContext() {
   return evaluationContext;
 }
 
-Expression::Expression() : m_constantValue(0) {}
+Expression::Expression() {}
 
 Expression::~Expression() {
   deleteAllValues(m_subExpressions);
-  delete m_constantValue;
-}
-
-Value Expression::evaluate() const {
-  if (m_constantValue)
-    return *m_constantValue;
-  return doEvaluate();
 }
 
 void Expression::addSubExpression(Expression* expr) {
   m_subExpressions.append(expr);
-}
-
-void Expression::optimize() {
-  bool allSubExpressionsConstant = true;
-
-  for (unsigned i = 0; i < m_subExpressions.size(); i++) {
-    if (m_subExpressions[i]->isConstant())
-      m_subExpressions[i]->optimize();
-    else
-      allSubExpressionsConstant = false;
-  }
-
-  if (allSubExpressionsConstant) {
-    ASSERT(!m_constantValue);
-    m_constantValue = new Value(doEvaluate());
-    deleteAllValues(m_subExpressions);
-    m_subExpressions.clear();
-  }
 }
 
 unsigned Expression::subExprCount() const {
@@ -87,13 +62,6 @@ Expression* Expression::subExpr(unsigned i) {
 const Expression* Expression::subExpr(unsigned i) const {
   ASSERT(i < subExprCount());
   return m_subExpressions[i];
-}
-
-bool Expression::isConstant() const {
-  for (unsigned i = 0; i < m_subExpressions.size(); i++)
-    if (!m_subExpressions[i]->isConstant())
-      return false;
-  return true;
 }
 }
 }
