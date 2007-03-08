@@ -83,7 +83,12 @@ ImageDecoder* createDecoder(const Vector<char>& data) {
 ImageSource::ImageSource() : m_decoder(0) {}
 
 ImageSource::~ImageSource() {
+  clear();
+}
+
+void ImageSource::clear() {
   delete m_decoder;
+  m_decoder = 0;
 }
 
 bool ImageSource::initialized() const {
