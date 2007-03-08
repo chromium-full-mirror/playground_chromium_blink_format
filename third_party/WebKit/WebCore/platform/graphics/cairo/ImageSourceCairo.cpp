@@ -142,6 +142,10 @@ NativeImagePtr ImageSource::createFrameAtIndex(size_t index) {
       size().width(), buffer->height(), size().width() * 4);
 }
 
+void ImageSource::destroyFrameAtIndex(size_t) {
+  // FIXME: write me
+}
+
 float ImageSource::frameDurationAtIndex(size_t index) {
   if (!m_decoder)
     return 0;

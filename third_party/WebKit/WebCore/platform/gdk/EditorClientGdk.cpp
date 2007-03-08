@@ -181,7 +181,7 @@ void EditorClientGdk::toggleGrammarChecking() {
   EditorClientGdk();
 }
 
-void EditorClientGdk::handleKeyPress(KeyboardEvent* event) {
+void EditorClientGdk::handleKeypress(KeyboardEvent* event) {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
   if (!frame)
     return;
@@ -217,6 +217,10 @@ void EditorClientGdk::handleKeyPress(KeyboardEvent* event) {
       event->setDefaultHandled();
     }
   }
+}
+
+void EditorClientGdk::handleInputMethodKeypress(KeyboardEvent*) {
+  notImplementedGdk();
 }
 
 EditorClientGdk::EditorClientGdk() {}
