@@ -373,9 +373,12 @@ void Cache::resourceAccessed(CachedResource* resource) {
 }
 
 void Cache::adjustSize(bool live, int delta) {
+  ASSERT(delta >= 0 || ((int)m_currentSize + delta >= 0));
   m_currentSize += delta;
-  if (live)
+  if (live) {
+    ASSERT(delta >= 0 || ((int)m_liveResourcesSize + delta >= 0));
     m_liveResourcesSize += delta;
+  }
 }
 
 Cache::Statistics Cache::getStatistics() {
