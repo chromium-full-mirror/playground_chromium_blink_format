@@ -68,6 +68,8 @@ class ImageSource : Noncopyable {
   ImageSource();
   ~ImageSource();
 
+  void clear();
+
   bool initialized() const;
 
   void setData(NativeBytePtr, bool allDataReceived);
