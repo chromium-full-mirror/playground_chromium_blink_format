@@ -775,11 +775,11 @@ void RenderBox::paintCustomHighlight(int tx,
                        r->selectionHeight());
     FloatRect imageRect(tx + m_x, rootRect.y(), width(), rootRect.height());
     document()->frame()->paintCustomHighlight(type, imageRect, rootRect,
-                                              behindText, false);
+                                              behindText, false, node());
   } else {
     FloatRect imageRect(tx + m_x, ty + m_y, width(), height());
     document()->frame()->paintCustomHighlight(type, imageRect, imageRect,
-                                              behindText, false);
+                                              behindText, false, node());
   }
 }
 #endif

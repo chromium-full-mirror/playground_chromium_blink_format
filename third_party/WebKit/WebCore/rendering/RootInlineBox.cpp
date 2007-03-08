@@ -120,7 +120,7 @@ void RootInlineBox::addHighlightOverflow() {
   FloatRect rootRect(0, selectionTop(), width(), selectionHeight());
   IntRect inflatedRect =
       enclosingIntRect(object()->document()->frame()->customHighlightLineRect(
-          object()->style()->highlight(), rootRect));
+          object()->style()->highlight(), rootRect, object()->node()));
   m_leftOverflow = min(m_leftOverflow, inflatedRect.x());
   m_rightOverflow = max(m_rightOverflow, inflatedRect.right());
   m_topOverflow = min(m_topOverflow, inflatedRect.y());
@@ -140,11 +140,11 @@ void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
   FloatRect rootRect(tx + xPos(), ty + selectionTop(), width(),
                      selectionHeight());
   FloatRect inflatedRect =
-      object()->document()->frame()->customHighlightLineRect(highlightType,
-                                                             rootRect);
+      object()->document()->frame()->customHighlightLineRect(
+          highlightType, rootRect, object()->node());
   if (inflatedRect.intersects(paintInfo.rect))
-    object()->document()->frame()->paintCustomHighlight(highlightType, rootRect,
-                                                        rootRect, false, true);
+    object()->document()->frame()->paintCustomHighlight(
+        highlightType, rootRect, rootRect, false, true, object()->node());
 }
 #endif
 

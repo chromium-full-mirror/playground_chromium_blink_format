@@ -400,12 +400,14 @@ class Frame : public Shared<Frame> {
 
  public:
   FloatRect customHighlightLineRect(const AtomicString& type,
-                                    const FloatRect& lineRect);
+                                    const FloatRect& lineRect,
+                                    Node*);
   void paintCustomHighlight(const AtomicString& type,
                             const FloatRect& boxRect,
                             const FloatRect& lineRect,
                             bool text,
-                            bool line);
+                            bool line,
+                            Node*);
 
   // === to be moved into Editor
 
