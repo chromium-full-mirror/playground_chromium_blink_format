@@ -73,8 +73,13 @@ UString StringImp::toString(ExecState*) const {
 }
 
 JSObject* StringImp::toObject(ExecState* exec) const {
+  // Put the reference onto the stack so it is not subject to garbage
+  // collection.
+  // <http://bugs.webkit.org/show_bug.cgi?id=12535>
+  UString valCopy = val;
+
   return new StringInstance(
-      exec->lexicalInterpreter()->builtinStringPrototype(), val);
+      exec->lexicalInterpreter()->builtinStringPrototype(), valCopy);
 }
 
 // ------------------------------ NumberImp ------------------------------------
