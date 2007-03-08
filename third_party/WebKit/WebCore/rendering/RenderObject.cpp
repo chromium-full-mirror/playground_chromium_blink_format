@@ -1969,8 +1969,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   int width = abs(newOutlineBox.width() - oldOutlineBox.width());
   if (width) {
     int borderWidth =
-        max(borderRight(), max(style()->borderTopRightRadius().width(),
-                               style()->borderBottomRightRadius().width())) +
+        max(-style()->outlineOffset(),
+            max(borderRight(),
+                max(style()->borderTopRightRadius().width(),
+                    style()->borderBottomRightRadius().width()))) +
         ow;
     IntRect rightRect(newOutlineBox.x() +
                           min(newOutlineBox.width(), oldOutlineBox.width()) -
@@ -1986,8 +1988,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   int height = abs(newOutlineBox.height() - oldOutlineBox.height());
   if (height) {
     int borderHeight =
-        max(borderBottom(), max(style()->borderBottomLeftRadius().height(),
-                                style()->borderBottomRightRadius().height())) +
+        max(-style()->outlineOffset(),
+            max(borderBottom(),
+                max(style()->borderBottomLeftRadius().height(),
+                    style()->borderBottomRightRadius().height()))) +
         ow;
     IntRect bottomRect(
         newOutlineBox.x(),
