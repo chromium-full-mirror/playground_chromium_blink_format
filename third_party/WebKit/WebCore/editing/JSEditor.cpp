@@ -497,10 +497,6 @@ bool enabledPaste(Frame* frame) {
   return supportsPasteCommand && frame->editor()->canPaste();
 }
 
-bool enabledPasteAndMatchStyle(Frame* frame) {
-  return supportsPasteCommand && frame->editor()->canPaste();
-}
-
 bool enabledAnyRangeSelection(Frame* frame) {
   return frame->selectionController()->isRange();
 }
@@ -694,8 +690,7 @@ CommandMap* createCommandDictionary() {
        {execOutdent, enabledAnyRichlyEditableSelection, stateNone, valueNull}},
       {"Paste", {execPaste, enabledPaste, stateNone, valueNull}},
       {"PasteAndMatchStyle",
-       {execPasteAndMatchStyle, enabledPasteAndMatchStyle, stateNone,
-        valueNull}},
+       {execPasteAndMatchStyle, enabledPaste, stateNone, valueNull}},
       {"Print", {execPrint, enabled, stateNone, valueNull}},
       {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
       {"RemoveFormat",
