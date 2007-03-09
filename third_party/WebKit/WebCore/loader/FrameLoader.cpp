@@ -226,6 +226,7 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
       m_encodingWasChosenByUser(false),
       m_containsPlugIns(false),
       m_redirectionTimer(this, &FrameLoader::redirectionTimerFired),
+      m_checkCompletedTimer(this, &FrameLoader::checkCompletedTimerFired),
       m_opener(0),
       m_openedByJavaScript(false) {}
 
@@ -777,6 +778,8 @@ void FrameLoader::clear(bool clearWindowProperties) {
   m_redirectionTimer.stop();
   m_scheduledRedirection.clear();
 
+  m_checkCompletedTimer.stop();
+
   m_receivedData = false;
 
   if (!m_encodingWasChosenByUser)
@@ -1117,6 +1120,7 @@ void FrameLoader::checkCompleted() {
   // OK, completed.
   m_isComplete = true;
 
+  RefPtr<Frame> protect(m_frame);
   checkEmitLoadEvent();  // if we didn't do it before
 
   // Do not start a redirection timer for subframes here.
@@ -1125,6 +1129,15 @@ void FrameLoader::checkCompleted() {
     startRedirectionTimer();
 
   completed();
+}
+
+void FrameLoader::checkCompletedTimerFired(Timer<FrameLoader>*) {
+  checkCompleted();
+}
+
+void FrameLoader::scheduleCheckCompleted() {
+  if (!m_checkCompletedTimer.isActive())
+    m_checkCompletedTimer.startOneShot(0);
 }
 
 void FrameLoader::checkEmitLoadEvent() {
@@ -2889,9 +2902,10 @@ void FrameLoader::detachFromParent() {
   m_client->detachedFromParent2();
   setDocumentLoader(0);
   m_client->detachedFromParent3();
-  if (Frame* parent = m_frame->tree()->parent())
+  if (Frame* parent = m_frame->tree()->parent()) {
     parent->tree()->removeChild(m_frame);
-  else {
+    parent->loader()->scheduleCheckCompleted();
+  } else {
     m_frame->setView(0);
     m_frame->pageDestroyed();
   }

@@ -1402,11 +1402,15 @@ void Document::implicitClose() {
 
   m_processingLoadEvent = false;
 
+  // An event handler may have removed the frame
+  if (!frame())
+    return;
+
   // Make sure both the initial layout and reflow happen after the onload
   // fires. This will improve onload scores, and other browsers do it.
   // If they wanna cheat, we can too. -dwh
 
-  if (frame() && frame()->loader()->isScheduledLocationChangePending() &&
+  if (frame()->loader()->isScheduledLocationChangePending() &&
       elapsedTime() < cLayoutScheduleThreshold) {
     // Just bail out. Before or during the onload we were shifted to another
     // page.
@@ -1416,8 +1420,7 @@ void Document::implicitClose() {
     return;
   }
 
-  if (frame())
-    frame()->loader()->checkEmitLoadEvent();
+  frame()->loader()->checkEmitLoadEvent();
 
   // Now do our painting/layout, but only if we aren't in a subframe or if we're
   // in a subframe
