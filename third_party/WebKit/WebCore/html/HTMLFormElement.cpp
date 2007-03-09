@@ -413,24 +413,21 @@ void HTMLFormElement::submit(Event* event, bool activateSubmitButton) {
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
 
-  if (!m_post)
-
-    if (m_post) {
-      if (!m_multipart)
-        frame->loader()->submitForm("POST", m_url, formData(0), m_target,
-                                    enctype(), String(), event);
-      else {
-        Vector<char> boundary;
-        getUniqueBoundaryString(boundary);
-        frame->loader()->submitForm("POST", m_url, formData(boundary.data()),
-                                    m_target, enctype(), boundary.data(),
-                                    event);
-      }
-    } else {
-      m_multipart = false;
-      frame->loader()->submitForm("GET", m_url, formData(0), m_target, String(),
-                                  String(), event);
+  if (m_post) {
+    if (!m_multipart)
+      frame->loader()->submitForm("POST", m_url, formData(0), m_target,
+                                  enctype(), String(), event);
+    else {
+      Vector<char> boundary;
+      getUniqueBoundaryString(boundary);
+      frame->loader()->submitForm("POST", m_url, formData(boundary.data()),
+                                  m_target, enctype(), boundary.data(), event);
     }
+  } else {
+    m_multipart = false;
+    frame->loader()->submitForm("GET", m_url, formData(0), m_target, String(),
+                                String(), event);
+  }
 
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(false);
