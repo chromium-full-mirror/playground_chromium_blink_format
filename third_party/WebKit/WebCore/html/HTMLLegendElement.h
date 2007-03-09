@@ -51,7 +51,7 @@ class HTMLLegendElement : public HTMLGenericFormElement {
   String align() const;
   void setAlign(const String&);
 
-  void focus();
+  void focus(bool restorePreviousSelection = true);
 };
 
 }  // namespace

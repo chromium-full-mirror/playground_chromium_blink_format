@@ -180,7 +180,7 @@ bool HTMLInputElement::isMouseFocusable() const {
   return HTMLGenericFormElement::isMouseFocusable();
 }
 
-void HTMLInputElement::focus() {
+void HTMLInputElement::focus(bool restorePreviousSelection) {
   if (isTextField()) {
     Document* doc = document();
     if (doc->focusedNode() == this)
@@ -195,10 +195,10 @@ void HTMLInputElement::focus() {
       setNeedsFocusAppearanceUpdate(true);
       return;
     }
-    updateFocusAppearance();
+    updateFocusAppearance(restorePreviousSelection);
     return;
   }
-  HTMLGenericFormElement::focus();
+  HTMLGenericFormElement::focus(restorePreviousSelection);
 }
 
 void HTMLInputElement::updateFocusAppearance(bool restorePreviousSelection) {
@@ -517,8 +517,7 @@ void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
     case RANGE:
     case RESET:
     case SUBMIT:
-      // focus
-      focus();
+      focus(false);
       // send the mouse button events iff the caller specified sendToAnyElement
       dispatchSimulatedClick(0, sendToAnyElement);
       break;
@@ -529,7 +528,8 @@ void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
     case PASSWORD:
     case SEARCH:
     case TEXT:
-      focus();
+      // should never restore previous selection here
+      focus(false);
       break;
   }
 }

@@ -63,7 +63,7 @@ class HTMLLabelElement : public HTMLElement {
   String htmlFor() const;
   void setHtmlFor(const String&);
 
-  void focus();
+  void focus(bool restorePreviousSelection = true);
 
  private:
   String m_formElementID;

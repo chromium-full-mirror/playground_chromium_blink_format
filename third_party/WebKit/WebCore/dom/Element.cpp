@@ -860,7 +860,7 @@ CSSStyleDeclaration* Element::style() {
   return 0;
 }
 
-void Element::focus() {
+void Element::focus(bool restorePreviousSelection) {
   Document* doc = document();
   doc->updateLayout();
 
@@ -875,7 +875,7 @@ void Element::focus() {
     return;
   }
 
-  updateFocusAppearance();
+  updateFocusAppearance(restorePreviousSelection);
 }
 
 void Element::updateFocusAppearance(bool restorePreviousSelection) {

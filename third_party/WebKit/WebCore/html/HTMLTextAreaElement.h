@@ -72,7 +72,7 @@ class HTMLTextAreaElement : public HTMLGenericFormElement {
   virtual void defaultEventHandler(Event*);
   virtual bool isMouseFocusable() const;
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
-  virtual void focus();
+  virtual void focus(bool restorePreviousSelection = true);
   virtual void updateFocusAppearance(bool restorePreviousSelection = true);
 
   String value() const;

@@ -182,7 +182,7 @@ class Element : public ContainerNode {
   virtual bool isURLAttribute(Attribute* attr) const;
   virtual String target() const { return String(); }
 
-  virtual void focus();
+  virtual void focus(bool restorePreviousSelection = true);
   virtual void updateFocusAppearance(bool restorePreviousSelection = false);
   void blur();
   bool needsFocusAppearanceUpdate() const {

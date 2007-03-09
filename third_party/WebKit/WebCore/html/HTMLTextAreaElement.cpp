@@ -188,7 +188,7 @@ bool HTMLTextAreaElement::isMouseFocusable() const {
   return HTMLGenericFormElement::isFocusable();
 }
 
-void HTMLTextAreaElement::focus() {
+void HTMLTextAreaElement::focus(bool) {
   Document* doc = document();
   if (doc->focusedNode() == this)
     return;

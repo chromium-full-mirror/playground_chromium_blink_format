@@ -206,7 +206,7 @@ bool FocusController::advanceFocus(FocusDirection direction,
   if (newDocument)
     setFocusedFrame(newDocument->frame());
 
-  static_cast<Element*>(node)->focus();
+  static_cast<Element*>(node)->focus(false);
   return true;
 }
 
