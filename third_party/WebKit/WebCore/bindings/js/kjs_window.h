@@ -155,6 +155,7 @@ class Window : public DOMObject {
                            const ScriptInterpreter* target);
   Location* location() const;
   Selection* selection() const;
+  bool find(const WebCore::String&, bool, bool, bool, bool, bool, bool) const;
   BarInfo* locationbar(ExecState*) const;
   BarInfo* menubar(ExecState*) const;
   BarInfo* personalbar(ExecState*) const;
@@ -293,7 +294,8 @@ class Window : public DOMObject {
     Statusbar,
     Toolbar,
     FrameElement,
-    ShowModalDialog
+    ShowModalDialog,
+    Find
   };
 
  private:
