@@ -174,6 +174,10 @@ void HTMLSelectElement::setSelectedIndex(int optionIndex,
   int lastOnChangeIndex = m_lastOnChangeIndex;
 
   if (listIndex >= 0) {
+    if (m_activeSelectionAnchorIndex < 0 || deselect)
+      setActiveSelectionAnchorIndex(listIndex);
+    if (m_activeSelectionEndIndex < 0 || deselect)
+      setActiveSelectionEndIndex(listIndex);
     element = static_cast<HTMLOptionElement*>(items[listIndex]);
     element->setSelected(true);
   } else if (deselect)
@@ -181,13 +185,6 @@ void HTMLSelectElement::setSelectedIndex(int optionIndex,
 
   if (deselect)
     deselectItems(element);
-
-  if (listIndex >= 0) {
-    if (m_activeSelectionAnchorIndex < 0 || deselect)
-      setActiveSelectionAnchorIndex(listIndex);
-    if (m_activeSelectionEndIndex < 0 || deselect)
-      setActiveSelectionEndIndex(listIndex);
-  }
 
   ASSERT(m_lastOnChangeIndex == -1 || m_lastOnChangeIndex == optionIndex);
   if (fireOnChange && usesMenuList() && lastOnChangeIndex != optionIndex)
@@ -590,8 +587,7 @@ void HTMLSelectElement::defaultEventHandler(Event* evt) {
   if (evt->defaultHandled())
     return;
 
-  if (!evt->defaultHandled() && evt->type() == keypressEvent &&
-      evt->isKeyboardEvent()) {
+  if (evt->type() == keypressEvent && evt->isKeyboardEvent()) {
     KeyboardEvent* keyboardEvent = static_cast<KeyboardEvent*>(evt);
 
     if (!keyboardEvent->ctrlKey() && !keyboardEvent->altKey() &&
