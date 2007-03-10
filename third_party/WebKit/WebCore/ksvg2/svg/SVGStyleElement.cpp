@@ -94,6 +94,14 @@ void SVGStyleElement::removedFromDocument() {
 void SVGStyleElement::childrenChanged() {
   StyleElement::childrenChanged(this);
 }
+
+bool SVGStyleElement::sheetLoaded() {
+  if (!isLoading()) {
+    document()->stylesheetLoaded();
+    return true;
+  }
+  return false;
+}
 }
 
 // vim:ts=4:noet
