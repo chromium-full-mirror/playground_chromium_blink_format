@@ -27,26 +27,50 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"
+#include "RenderArena.h"
 #include "RenderBlock.h"
 
 using namespace std;
 
 namespace WebCore {
 
+typedef WTF::HashMap<const RootInlineBox*, EllipsisBox*> EllipsisBoxMap;
+static EllipsisBoxMap* gEllipsisBoxMap = 0;
+
+void* RootInlineBox::Overflow::operator new(size_t sz,
+                                            RenderArena* renderArena) throw() {
+  return renderArena->allocate(sz);
+}
+
+void RootInlineBox::Overflow::operator delete(void* ptr, size_t sz) {
+  // Stash size where destroy can find it.
+  *(size_t*)ptr = sz;
+}
+
+void RootInlineBox::Overflow::destroy(RenderArena* renderArena) {
+  delete this;
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
+}
+
 void RootInlineBox::destroy(RenderArena* arena) {
+  if (m_overflow)
+    m_overflow->destroy(arena);
   detachEllipsisBox(arena);
   InlineFlowBox::destroy(arena);
 }
 
 void RootInlineBox::detachEllipsisBox(RenderArena* arena) {
-  if (m_ellipsisBox) {
-    m_ellipsisBox->destroy(arena);
-    m_ellipsisBox = 0;
+  if (m_hasEllipsisBox) {
+    EllipsisBoxMap::iterator it = gEllipsisBoxMap->find(this);
+    it->second->destroy(arena);
+    gEllipsisBoxMap->remove(it);
+    m_hasEllipsisBox = false;
   }
 }
 
 void RootInlineBox::clearTruncation() {
-  if (m_ellipsisBox) {
+  if (m_hasEllipsisBox) {
     detachEllipsisBox(m_object->renderArena());
     InlineFlowBox::clearTruncation();
   }
@@ -74,13 +98,18 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
                                   int ellipsisWidth,
                                   InlineBox* markupBox) {
   // Create an ellipsis box.
-  m_ellipsisBox = new (m_object->renderArena())
+  EllipsisBox* ellipsisBox = new (m_object->renderArena())
       EllipsisBox(m_object, ellipsisStr, this,
                   ellipsisWidth - (markupBox ? markupBox->width() : 0), yPos(),
                   height(), baseline(), !prevRootBox(), markupBox);
 
+  if (!gEllipsisBoxMap)
+    gEllipsisBoxMap = new EllipsisBoxMap();
+  gEllipsisBoxMap->add(this, ellipsisBox);
+  m_hasEllipsisBox = true;
+
   if (ltr && (xPos() + width() + ellipsisWidth) <= blockEdge) {
-    m_ellipsisBox->m_x = xPos() + width();
+    ellipsisBox->m_x = xPos() + width();
     return;
   }
 
@@ -90,8 +119,7 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   // not painting (as being
   // truncated).
   bool foundBox = false;
-  m_ellipsisBox->m_x =
-      placeEllipsisBox(ltr, blockEdge, ellipsisWidth, foundBox);
+  ellipsisBox->m_x = placeEllipsisBox(ltr, blockEdge, ellipsisWidth, foundBox);
 }
 
 int RootInlineBox::placeEllipsisBox(bool ltr,
@@ -108,10 +136,10 @@ int RootInlineBox::placeEllipsisBox(bool ltr,
 void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& paintInfo,
                                      int tx,
                                      int ty) const {
-  if (m_ellipsisBox && object()->shouldPaintWithinRoot(paintInfo) &&
+  if (m_hasEllipsisBox && object()->shouldPaintWithinRoot(paintInfo) &&
       object()->style()->visibility() == VISIBLE &&
       paintInfo.phase == PaintPhaseForeground)
-    m_ellipsisBox->paint(paintInfo, tx, ty);
+    ellipsisBox()->paint(paintInfo, tx, ty);
 }
 
 #if PLATFORM(MAC)
@@ -121,10 +149,10 @@ void RootInlineBox::addHighlightOverflow() {
   IntRect inflatedRect =
       enclosingIntRect(object()->document()->frame()->customHighlightLineRect(
           object()->style()->highlight(), rootRect, object()->node()));
-  m_leftOverflow = min(m_leftOverflow, inflatedRect.x());
-  m_rightOverflow = max(m_rightOverflow, inflatedRect.right());
-  m_topOverflow = min(m_topOverflow, inflatedRect.y());
-  m_bottomOverflow = max(m_bottomOverflow, inflatedRect.bottom());
+  setVerticalOverflowPositions(min(leftOverflow(), inflatedRect.x()),
+                               max(rightOverflow(), inflatedRect.right()));
+  setHorizontalOverflowPositions(min(topOverflow(), inflatedRect.y()),
+                                 max(bottomOverflow(), inflatedRect.bottom()));
 }
 
 void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
@@ -165,8 +193,8 @@ bool RootInlineBox::nodeAtPoint(const HitTestRequest& request,
                                 int y,
                                 int tx,
                                 int ty) {
-  if (m_ellipsisBox && object()->style()->visibility() == VISIBLE) {
-    if (m_ellipsisBox->nodeAtPoint(request, result, x, y, tx, ty)) {
+  if (m_hasEllipsisBox && object()->style()->visibility() == VISIBLE) {
+    if (ellipsisBox()->nodeAtPoint(request, result, x, y, tx, ty)) {
       object()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
       return true;
     }
@@ -176,11 +204,13 @@ bool RootInlineBox::nodeAtPoint(const HitTestRequest& request,
 
 void RootInlineBox::adjustPosition(int dx, int dy) {
   InlineFlowBox::adjustPosition(dx, dy);
-  m_topOverflow += dy;
-  m_bottomOverflow += dy;
+  if (m_overflow) {
+    m_overflow->m_topOverflow += dy;
+    m_overflow->m_bottomOverflow += dy;
+    m_overflow->m_selectionTop += dy;
+    m_overflow->m_selectionBottom += dy;
+  }
   m_blockHeight += dy;
-  m_selectionTop += dy;
-  m_selectionBottom += dy;
 }
 
 void RootInlineBox::childRemoved(InlineBox* box) {
@@ -290,11 +320,12 @@ InlineBox* RootInlineBox::lastSelectedBox() {
 }
 
 int RootInlineBox::selectionTop() {
+  int selectionTop = m_overflow ? m_overflow->m_selectionTop : m_y;
   if (!prevRootBox())
-    return m_selectionTop;
+    return selectionTop;
 
   int prevBottom = prevRootBox()->selectionBottom();
-  if (prevBottom < m_selectionTop && block()->containsFloats()) {
+  if (prevBottom < selectionTop && block()->containsFloats()) {
     // This line has actually been moved further down, probably from a large
     // line-height, but possibly because the
     // line was forced to clear floats.  If so, let's check the offsets, and
@@ -302,10 +333,10 @@ int RootInlineBox::selectionTop() {
     // line's bottom overflow if the offsets are greater on both sides.
     int prevLeft = block()->leftOffset(prevBottom);
     int prevRight = block()->rightOffset(prevBottom);
-    int newLeft = block()->leftOffset(m_selectionTop);
-    int newRight = block()->rightOffset(m_selectionTop);
+    int newLeft = block()->leftOffset(selectionTop);
+    int newRight = block()->rightOffset(selectionTop);
     if (prevLeft > newLeft || prevRight < newRight)
-      return m_selectionTop;
+      return selectionTop;
   }
 
   return prevBottom;
@@ -354,8 +385,47 @@ void RootInlineBox::setLineBreakInfo(RenderObject* obj,
   m_lineBreakObj = obj;
   m_lineBreakPos = breakPos;
   m_lineBreakContext = context;
-  if (status)
-    m_lineBreakBidiStatus = *status;
+  if (status) {
+    m_lineBreakBidiStatusEor = status->eor;
+    m_lineBreakBidiStatusLastStrong = status->lastStrong;
+    m_lineBreakBidiStatusLast = status->last;
+  }
+}
+
+EllipsisBox* RootInlineBox::ellipsisBox() const {
+  if (!m_hasEllipsisBox)
+    return false;
+  return gEllipsisBoxMap->get(this);
+}
+
+void RootInlineBox::setVerticalOverflowPositions(int top, int bottom) {
+  if (!m_overflow) {
+    if (top == m_y && bottom == m_y + m_height)
+      return;
+    m_overflow = new (m_object->renderArena()) Overflow(this);
+  }
+  m_overflow->m_topOverflow = top;
+  m_overflow->m_bottomOverflow = bottom;
+}
+
+void RootInlineBox::setHorizontalOverflowPositions(int left, int right) {
+  if (!m_overflow) {
+    if (left == m_x && right == m_x + m_width)
+      return;
+    m_overflow = new (m_object->renderArena()) Overflow(this);
+  }
+  m_overflow->m_leftOverflow = left;
+  m_overflow->m_rightOverflow = right;
+}
+
+void RootInlineBox::setVerticalSelectionPositions(int top, int bottom) {
+  if (!m_overflow) {
+    if (top == m_y && bottom == m_y + m_height)
+      return;
+    m_overflow = new (m_object->renderArena()) Overflow(this);
+  }
+  m_overflow->m_selectionTop = top;
+  m_overflow->m_selectionBottom = bottom;
 }
 
 }  // namespace WebCore

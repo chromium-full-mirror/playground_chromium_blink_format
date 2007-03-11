@@ -37,10 +37,7 @@ class InlineFlowBox : public InlineRunBox {
       : InlineRunBox(obj),
         m_firstChild(0),
         m_lastChild(0),
-        m_maxHorizontalVisualOverflow(0),
-        m_includeLeftEdge(false),
-        m_includeRightEdge(false),
-        m_hasTextChildren(false) {}
+        m_maxHorizontalVisualOverflow(0) {}
 
   RenderFlow* flowObject();
 
@@ -196,9 +193,6 @@ class InlineFlowBox : public InlineRunBox {
   InlineBox* m_firstChild;
   InlineBox* m_lastChild;
   int m_maxHorizontalVisualOverflow;
-  bool m_includeLeftEdge : 1;
-  bool m_includeRightEdge : 1;
-  bool m_hasTextChildren : 1;
 };
 
 }  // namespace WebCore

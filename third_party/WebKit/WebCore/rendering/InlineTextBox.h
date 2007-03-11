@@ -31,8 +31,8 @@
 
 namespace WebCore {
 
-const int cNoTruncation = -1;
-const int cFullTruncation = -2;
+const unsigned short cNoTruncation = USHRT_MAX;
+const unsigned short cFullTruncation = USHRT_MAX - 1;
 
 class String;
 class StringImpl;
@@ -43,13 +43,7 @@ class Position;
 class InlineTextBox : public InlineRunBox {
  public:
   InlineTextBox(RenderObject* obj)
-      : InlineRunBox(obj),
-        m_start(0),
-        m_len(0),
-        m_truncation(cNoTruncation),
-        m_reversed(false),
-        m_treatAsText(true),
-        m_toAdd(0) {}
+      : InlineRunBox(obj), m_start(0), m_len(0), m_truncation(cNoTruncation) {}
 
   InlineTextBox* nextTextBox() const {
     return static_cast<InlineTextBox*>(nextLineBox());
@@ -176,16 +170,10 @@ class InlineTextBox : public InlineRunBox {
   int m_start;
   unsigned short m_len;
 
-  int m_truncation;  // Where to truncate when text overflow is applied.  We use
-                     // special constants to
+  unsigned short m_truncation;  // Where to truncate when text overflow is
+                                // applied.  We use special constants to
   // denote no truncation (the whole run paints) and full truncation (nothing
   // paints at all).
-
-  bool m_reversed : 1;
-  bool m_dirOverride : 1;
-  bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
-                           // purposes of line height.
-  int m_toAdd : 13;        // for justified text
 
  private:
   friend class RenderText;

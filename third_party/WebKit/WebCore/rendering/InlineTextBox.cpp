@@ -189,7 +189,7 @@ int InlineTextBox::placeEllipsisBox(bool ltr,
 
       // Set the truncation index on the text run.  The ellipsis needs to be
       // placed just after the last visible character.
-      m_truncation = offset + m_start;
+      m_truncation = offset;
       return m_x +
              static_cast<RenderText*>(m_object)->width(m_start, offset,
                                                        textPos(), m_firstLine);
@@ -442,7 +442,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     // for non-reversed LTR strings.
     int endPoint = m_len;
     if (m_truncation != cNoTruncation)
-      endPoint = m_truncation - m_start;
+      endPoint = m_truncation;
     paintInfo.context->drawText(TextRun(textStr, m_start, endPoint),
                                 IntPoint(m_x + tx, m_y + ty + m_baseline),
                                 textStyle);
@@ -641,11 +641,10 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
   if (m_truncation == cFullTruncation)
     return;
 
-  int width =
-      (m_truncation == cNoTruncation)
-          ? m_width
-          : static_cast<RenderText*>(m_object)->width(
-                m_start, m_truncation - m_start, textPos(), m_firstLine);
+  int width = (m_truncation == cNoTruncation)
+                  ? m_width
+                  : static_cast<RenderText*>(m_object)->width(
+                        m_start, m_truncation, textPos(), m_firstLine);
 
   // Get the text decoration colors.
   Color underline, overline, linethrough;
@@ -703,7 +702,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     useWholeWidth = false;
   }
   if (m_truncation != cNoTruncation) {
-    paintEnd = min(paintEnd, (unsigned)m_truncation);
+    paintEnd = min(paintEnd, (unsigned)m_start + m_truncation);
     useWholeWidth = false;
   }
   if (!useWholeWidth) {
@@ -889,7 +888,7 @@ void InlineTextBox::paintMarkedTextUnderline(
     useWholeWidth = false;
   }
   if (m_truncation != cNoTruncation) {
-    paintEnd = min(paintEnd, (unsigned)m_truncation);
+    paintEnd = min(paintEnd, (unsigned)m_start + m_truncation);
     useWholeWidth = false;
   }
   if (!useWholeWidth) {
