@@ -89,7 +89,11 @@ JSValue* CInstance::invokeMethod(ExecState* exec,
   // Invoke the 'C' method.
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
-  _object->_class->invoke(_object, ident, cArgs, count, &resultVariant);
+
+  {
+    JSLock::DropAllLocks dropAllLocks;
+    _object->_class->invoke(_object, ident, cArgs, count, &resultVariant);
+  }
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -113,7 +117,10 @@ JSValue* CInstance::invokeDefaultMethod(ExecState* exec, const List& args) {
   // Invoke the 'C' method.
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
-  _object->_class->invokeDefault(_object, cArgs, count, &resultVariant);
+  {
+    JSLock::DropAllLocks dropAllLocks;
+    _object->_class->invokeDefault(_object, cArgs, count, &resultVariant);
+  }
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);

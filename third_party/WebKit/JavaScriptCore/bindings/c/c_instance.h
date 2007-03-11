@@ -37,7 +37,7 @@ namespace Bindings {
 
 class CClass;
 
-class CInstance : public Instance, Noncopyable {
+class CInstance : public Instance {
  public:
   CInstance(NPObject*);
   ~CInstance();

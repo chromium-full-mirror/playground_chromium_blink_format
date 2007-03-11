@@ -29,29 +29,55 @@ namespace KJS {
 
 #if USE(MULTIPLE_THREADS)
 
-static pthread_once_t interpreterLockOnce = PTHREAD_ONCE_INIT;
-static pthread_mutex_t interpreterLock;
-static int interpreterLockCount = 0;
+// Acquire this mutex before accessing lock-related data.
+static pthread_mutex_t JSMutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void initializeJSLock() {
-  pthread_mutexattr_t attr;
+// Thread-specific key that tells whether a thread holds the JSMutex.
+pthread_key_t didLockJSMutex;
 
-  pthread_mutexattr_init(&attr);
-  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+// Lock nesting count.
+static int JSLockCount;
 
-  pthread_mutex_init(&interpreterLock, &attr);
+static void createDidLockJSMutex() {
+  pthread_key_create(&didLockJSMutex, 0);
 }
+pthread_once_t createDidLockJSMutexOnce = PTHREAD_ONCE_INIT;
 
 void JSLock::lock() {
-  pthread_once(&interpreterLockOnce, initializeJSLock);
-  pthread_mutex_lock(&interpreterLock);
-  interpreterLockCount++;
+  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
+
+  if (!pthread_getspecific(didLockJSMutex)) {
+    pthread_mutex_lock(&JSMutex);
+    pthread_setspecific(didLockJSMutex, &didLockJSMutex);
+  }
+  ++JSLockCount;
+
   Collector::registerThread();
 }
 
 void JSLock::unlock() {
-  interpreterLockCount--;
-  pthread_mutex_unlock(&interpreterLock);
+  ASSERT(JSLockCount);
+  ASSERT(!!pthread_getspecific(didLockJSMutex));
+
+  --JSLockCount;
+  if (!JSLockCount) {
+    pthread_setspecific(didLockJSMutex, 0);
+    pthread_mutex_unlock(&JSMutex);
+  }
+}
+
+JSLock::DropAllLocks::DropAllLocks() : m_lockCount(0) {
+  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
+
+  m_lockCount = !!pthread_getspecific(didLockJSMutex) ? JSLock::lockCount() : 0;
+  for (int i = 0; i < m_lockCount; i++)
+    JSLock::unlock();
+}
+
+JSLock::DropAllLocks::~DropAllLocks() {
+  for (int i = 0; i < m_lockCount; i++)
+    JSLock::lock();
+  m_lockCount = 0;
 }
 
 #else
@@ -59,30 +85,19 @@ void JSLock::unlock() {
 // If threading support is off, set the lock count to a constant value of 1 so
 // assertions
 // that the lock is held don't fail
-const int interpreterLockCount = 1;
+const int JSLockCount = 1;
 
 void JSLock::lock() {}
 
 void JSLock::unlock() {}
 
-#endif
+JSLock::DropAllLocks::DropAllLocks() {}
+
+JSLock::DropAllLocks::~DropAllLocks() {}
+
+#endif  // USE(MULTIPLE_THREADS)
 
 int JSLock::lockCount() {
-  return interpreterLockCount;
-}
-
-JSLock::DropAllLocks::DropAllLocks() {
-  int lockCount = JSLock::lockCount();
-  for (int i = 0; i < lockCount; i++) {
-    JSLock::unlock();
-  }
-  m_lockCount = lockCount;
-}
-
-JSLock::DropAllLocks::~DropAllLocks() {
-  int lockCount = m_lockCount;
-  for (int i = 0; i < lockCount; i++) {
-    JSLock::lock();
-  }
+  return JSLockCount;
 }
 }
