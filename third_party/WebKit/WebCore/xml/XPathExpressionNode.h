@@ -64,12 +64,12 @@ class Expression : public ParseNode, Noncopyable {
 
   virtual Value evaluate() const = 0;
 
-  void addSubExpression(Expression*);
+  void addSubExpression(Expression* expr) { m_subExpressions.append(expr); }
 
  protected:
-  unsigned subExprCount() const;
-  Expression* subExpr(unsigned);
-  const Expression* subExpr(unsigned) const;
+  unsigned subExprCount() const { return m_subExpressions.size(); }
+  Expression* subExpr(unsigned i) { return m_subExpressions[i]; }
+  const Expression* subExpr(unsigned i) const { return m_subExpressions[i]; }
 
  private:
   Vector<Expression*> m_subExpressions;

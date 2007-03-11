@@ -90,6 +90,9 @@ class Parser : Noncopyable {
   void registerString(String*);
   void deleteString(String*);
 
+  void registerNodeTest(Step::NodeTest*);
+  void deleteNodeTest(Step::NodeTest*);
+
  private:
   bool isOperatorContext() const;
 
@@ -121,6 +124,7 @@ class Parser : Noncopyable {
   HashSet<Vector<Predicate*>*> m_predicateVectors;
   HashSet<Vector<Expression*>*> m_expressionVectors;
   HashSet<String*> m_strings;
+  HashSet<Step::NodeTest*> m_nodeTests;
 };
 }
 }

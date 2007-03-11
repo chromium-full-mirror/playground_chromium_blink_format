@@ -508,6 +508,9 @@ Expression* Parser::parseStatement(const String& statement,
     deleteAllValues(m_strings);
     m_strings.clear();
 
+    deleteAllValues(m_nodeTests);
+    m_nodeTests.clear();
+
     m_topExpr = 0;
 
     if (m_gotNamespaceError)
@@ -522,6 +525,7 @@ Expression* Parser::parseStatement(const String& statement,
   ASSERT(m_expressionVectors.size() == 0);
   ASSERT(m_predicateVectors.size() == 0);
   ASSERT(m_strings.size() == 0);
+  ASSERT(m_nodeTests.size() == 0);
 
   m_parseNodes.clear();
   Expression* result = m_topExpr;
@@ -603,6 +607,25 @@ void Parser::deleteString(String* s) {
 
   m_strings.remove(s);
   delete s;
+}
+
+void Parser::registerNodeTest(Step::NodeTest* t) {
+  if (t == 0)
+    return;
+
+  ASSERT(!m_nodeTests.contains(t));
+
+  m_nodeTests.add(t);
+}
+
+void Parser::deleteNodeTest(Step::NodeTest* t) {
+  if (t == 0)
+    return;
+
+  ASSERT(m_nodeTests.contains(t));
+
+  m_nodeTests.remove(t);
+  delete t;
 }
 }
 }
