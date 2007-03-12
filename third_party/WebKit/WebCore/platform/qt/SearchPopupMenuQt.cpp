@@ -31,4 +31,8 @@ void SearchPopupMenu::saveRecentSearches(const AtomicString& name,
 
 void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
                                          Vector<String>& searchItems) {}
+
+bool SearchPopupMenu::enabled() {
+  return true;
+}
 }
