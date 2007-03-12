@@ -52,6 +52,8 @@ class SVGAElement : public SVGStyledTransformableElement,
 
   virtual void defaultEventHandler(Event* evt);
 
+  virtual bool childShouldCreateRenderer(Node*) const;
+
  protected:
   virtual const SVGElement* contextElement() const { return this; }
 

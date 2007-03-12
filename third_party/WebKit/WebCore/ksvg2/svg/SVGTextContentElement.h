@@ -47,6 +47,7 @@ class SVGTextContentElement : public SVGStyledElement,
   virtual ~SVGTextContentElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
+  virtual bool isTextContent() const { return true; }
 
   // 'SVGTextContentElement' functions
   long getNumberOfChars() const;
