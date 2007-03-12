@@ -41,26 +41,33 @@ struct FontPlatformDataCacheKey {
   FontPlatformDataCacheKey(const AtomicString& family = AtomicString(),
                            unsigned size = 0,
                            bool bold = false,
-                           bool italic = false)
-      : m_family(family), m_size(size), m_bold(bold), m_italic(italic) {}
+                           bool italic = false,
+                           bool isPrinterFont = false)
+      : m_family(family),
+        m_size(size),
+        m_bold(bold),
+        m_italic(italic),
+        m_printerFont(isPrinterFont) {}
 
   bool operator==(const FontPlatformDataCacheKey& other) const {
     return equalIgnoringCase(m_family, other.m_family) &&
            m_size == other.m_size && m_bold == other.m_bold &&
-           m_italic == other.m_italic;
+           m_italic == other.m_italic && m_printerFont == other.m_printerFont;
   }
 
   AtomicString m_family;
   unsigned m_size;
   bool m_bold;
   bool m_italic;
+  bool m_printerFont;
 };
 
 inline unsigned computeHash(const FontPlatformDataCacheKey& fontKey) {
   unsigned hashCodes[3] = {CaseInsensitiveHash<String>::hash(fontKey.m_family),
                            fontKey.m_size,
-                           static_cast<unsigned>(fontKey.m_bold) << 1 |
-                               static_cast<unsigned>(fontKey.m_italic)};
+                           static_cast<unsigned>(fontKey.m_bold) << 2 |
+                               static_cast<unsigned>(fontKey.m_italic) << 1 |
+                               static_cast<unsigned>(fontKey.m_printerFont)};
   return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
                                  3 * sizeof(unsigned) / sizeof(UChar));
 }
@@ -133,8 +140,8 @@ FontPlatformData* FontCache::getCachedFontPlatformData(
   }
 
   FontPlatformDataCacheKey key(familyName, fontDescription.computedPixelSize(),
-                               fontDescription.bold(),
-                               fontDescription.italic());
+                               fontDescription.bold(), fontDescription.italic(),
+                               fontDescription.usePrinterFont());
   FontPlatformData* result = 0;
   bool foundResult;
   FontPlatformDataCache::iterator it = gFontPlatformDataCache->find(key);
