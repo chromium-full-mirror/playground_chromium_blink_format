@@ -139,7 +139,8 @@ static String singleCharacterString(UChar c) {
 
 PlatformKeyboardEvent::PlatformKeyboardEvent(HWND hWnd,
                                              WPARAM wParam,
-                                             LPARAM lParam)
+                                             LPARAM lParam,
+                                             UChar)
     : m_text(singleCharacterString(wParam)),
       m_unmodifiedText(singleCharacterString(wParam)),
       m_keyIdentifier(keyIdentifierForWindowsKeyCode(wParam)),

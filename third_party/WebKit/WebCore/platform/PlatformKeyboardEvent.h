@@ -75,7 +75,7 @@ class PlatformKeyboardEvent {
 #endif
 
 #if PLATFORM(WIN)
-  PlatformKeyboardEvent(HWND, WPARAM, LPARAM);
+  PlatformKeyboardEvent(HWND, WPARAM, LPARAM, UChar);
 #endif
 
 #if PLATFORM(GDK)
