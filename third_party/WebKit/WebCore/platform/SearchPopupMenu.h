@@ -40,6 +40,8 @@ class SearchPopupMenu : public PopupMenu {
   void loadRecentSearches(const AtomicString& name,
                           Vector<String>& searchItems);
 
+  bool enabled();
+
  protected:
   SearchPopupMenu(PopupMenuClient* client);
 };
