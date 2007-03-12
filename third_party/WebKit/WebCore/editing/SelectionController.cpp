@@ -150,7 +150,6 @@ void SelectionController::setSelection(const Selection& s,
   selectFrameElementInParentIfFullySelected();
   m_frame->notifyRendererOfSelectionChange(userTriggered);
   m_frame->respondToChangedSelection(oldSelection, closeTyping);
-  m_frame->editor()->respondToChangedSelection(oldSelection);
   if (userTriggered)
     m_frame->revealCaret(RenderLayer::gAlignToEdgeIfNeeded);
 }

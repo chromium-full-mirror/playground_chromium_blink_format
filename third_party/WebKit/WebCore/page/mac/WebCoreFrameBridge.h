@@ -380,7 +380,6 @@ rangeByAlteringCurrentSelection:
 
 - (void)issuePasteCommand;
 - (void)issueTransposeCommand;
-- (void)respondToChangedSelection;
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 
 - (NSString*)overrideMediaType;

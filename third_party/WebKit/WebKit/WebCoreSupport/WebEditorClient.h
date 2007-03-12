@@ -80,6 +80,7 @@ class WebEditorClient : public WebCore::EditorClient {
 #endif
 
   virtual void respondToChangedContents();
+  virtual void respondToChangedSelection();
 
   virtual void registerCommandForUndo(PassRefPtr<WebCore::EditCommand>);
   virtual void registerCommandForRedo(PassRefPtr<WebCore::EditCommand>);
