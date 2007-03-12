@@ -105,6 +105,10 @@ void EditorClientGdk::respondToChangedContents() {
   notImplementedGdk();
 }
 
+void EditorClientGdk::respondToChangedSelection() {
+  notImplementedGdk();
+}
+
 void EditorClientGdk::didEndEditing() {
   notImplementedGdk();
 }

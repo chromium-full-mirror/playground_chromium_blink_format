@@ -604,17 +604,19 @@ Vector<String> Editor::guessesForUngrammaticalSelection() {
 void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition&) {
   notImplementedGdk();
 }
-PassRefPtr<Clipboard> Editor::newGeneralClipboard(
-    ClipboardAccessPolicy policy) {
+PassRefPtr<Clipboard> Editor::newGeneralClipboard(ClipboardAccessPolicy) {
   notImplementedGdk();
   return 0;
+}
+void Editor::markMisspellings(const Selection&) {
+  notImplementedGdk();
 }
 
 Pasteboard* Pasteboard::generalPasteboard() {
   notImplementedGdk();
   return 0;
 }
-void Pasteboard::writeSelection(Range*, bool canSmartCopyOrDelete, Frame*) {
+void Pasteboard::writeSelection(Range*, bool, Frame*) {
   notImplementedGdk();
 }
 void Pasteboard::writeURL(const KURL&, const String&, Frame*, bool) {
