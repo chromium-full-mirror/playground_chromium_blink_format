@@ -61,7 +61,6 @@ Color DragData::asColor() const {
 }
 
 Clipboard* DragData::createClipboard(ClipboardAccessPolicy policy) const {
-  notImplemented();
   return new ClipboardQt(policy, true);
 }
 

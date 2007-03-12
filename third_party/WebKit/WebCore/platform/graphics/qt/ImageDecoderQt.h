@@ -61,6 +61,8 @@ class ImageDecoderQt : public ImageDecoder {
 
   int duration(size_t index) const;
 
+  void clearFrame(size_t index);
+
  private:
   class ReadContext;
   void reset();

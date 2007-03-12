@@ -27,6 +27,9 @@
 #define ClipboardQt_h
 
 #include "Clipboard.h"
+#include "ClipboardAccessPolicy.h"
+
+class QMimeData;
 
 namespace WebCore {
 
@@ -67,6 +70,7 @@ class ClipboardQt : public Clipboard {
 
  private:
   bool m_isForDragging;
+  ClipboardAccessPolicy m_policy;
 };
 }
 
