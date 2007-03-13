@@ -353,7 +353,7 @@ void HTMLFormElement::submit() {
 // Returns a 0-terminated C string in the vector.
 static void getUniqueBoundaryString(Vector<char>& boundary) {
   // Start with an informative prefix.
-  const char boundaryPrefix[] = "----WebKit-form-boundary-";
+  const char boundaryPrefix[] = "----WebKitFormBoundary";
   boundary.append(boundaryPrefix, strlen(boundaryPrefix));
 
   // Append 16 characters of base 64 randomness.
