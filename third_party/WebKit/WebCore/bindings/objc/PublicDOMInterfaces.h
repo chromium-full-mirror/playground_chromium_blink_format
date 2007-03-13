@@ -371,6 +371,11 @@
 @property(copy) NSString* value;
 @end
 
+@interface DOMHTMLCanvasElement : DOMHTMLElement
+@property int height;
+@property int width;
+@end
+
 @interface DOMHTMLCollection : DOMObject
 @property(readonly) unsigned length;
 - (DOMNode*)item:(unsigned)index;
@@ -1012,6 +1017,9 @@
 @property(readonly) unsigned short orient;
 @property(readonly) BOOL horizontalOverflow;
 @property(readonly) BOOL verticalOverflow;
+- (void)initOverflowEvent:(unsigned short)orient
+       horizontalOverflow:(BOOL)horizontalOverflow
+         verticalOverflow:(BOOL)verticalOverflow;
 @end
 
 @interface DOMWheelEvent : DOMUIEvent

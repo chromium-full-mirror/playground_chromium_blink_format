@@ -274,6 +274,7 @@ class DOMRGBColor : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum { Red, Green, Blue };
+  unsigned impl() const { return m_color; }
 
  private:
   unsigned m_color;
@@ -291,6 +292,7 @@ class DOMRect : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum { Top, Right, Bottom, Left };
+  WebCore::RectImpl* impl() const { return m_rect.get(); }
 
  private:
   RefPtr<WebCore::RectImpl> m_rect;

@@ -452,7 +452,7 @@ const ClassInfo JSHTMLElement::frame_info = {
     "HTMLFrameElement", &JSHTMLElement::info, &HTMLFrameElementTable, 0};
 const ClassInfo JSHTMLElement::iFrame_info = {
     "HTMLIFrameElement", &JSHTMLElement::info, &HTMLIFrameElementTable, 0};
-const ClassInfo JSHTMLElement::info = {"DOMHTMLElement", &JSElement::info,
+const ClassInfo JSHTMLElement::info = {"HTMLElement", &JSElement::info,
                                        &HTMLElementTable, 0};
 const ClassInfo JSHTMLElement::marquee_info = {
     "HTMLMarqueeElement", &JSHTMLElement::info, &HTMLMarqueeElementTable, 0};
@@ -717,7 +717,7 @@ rows          KJS::JSHTMLElement::FrameSetRows                  DontDelete
 */
 
 KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLElementPrototypeFunction)
-KJS_IMPLEMENT_PROTOTYPE("DOMHTMLElement",
+KJS_IMPLEMENT_PROTOTYPE("HTMLElement",
                         JSHTMLElementPrototype,
                         JSHTMLElementPrototypeFunction)
 
@@ -1903,7 +1903,7 @@ KJS_IMPLEMENT_PROTOTYPE("HTMLCollection",
                         JSHTMLCollectionPrototype,
                         JSHTMLCollectionPrototypeFunction)
 
-const ClassInfo JSHTMLCollection::info = {"Collection", 0, 0, 0};
+const ClassInfo JSHTMLCollection::info = {"HTMLCollection", 0, 0, 0};
 
 JSHTMLCollection::JSHTMLCollection(ExecState* exec, HTMLCollection* c)
     : m_impl(c) {

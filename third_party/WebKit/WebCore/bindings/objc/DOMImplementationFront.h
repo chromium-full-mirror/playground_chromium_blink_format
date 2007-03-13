@@ -36,6 +36,7 @@ class CSSStyleSheet;
 class Document;
 class DocumentType;
 class HTMLDocument;
+class JSDOMImplementation;
 class String;
 
 typedef int ExceptionCode;
@@ -61,6 +62,7 @@ class DOMImplementationFront {
 };
 
 DOMImplementationFront* implementationFront(Document*);
+DOMImplementationFront* implementationFront(JSDOMImplementation*);
 
 }  // namespace WebCore
 
