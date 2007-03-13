@@ -117,8 +117,8 @@ void CachedResource::deref(CachedResourceClient* c) {
   if (canDelete() && !inCache())
     delete this;
   else if (!referenced() && inCache()) {
-    allReferencesRemoved();
     cache()->removeFromLiveObjectSize(size());
+    allReferencesRemoved();
     cache()->prune();
   }
 }
