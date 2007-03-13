@@ -469,6 +469,10 @@ void SearchPopupMenu::loadRecentSearches(const AtomicString& name,
 SearchPopupMenu::SearchPopupMenu(PopupMenuClient* client) : PopupMenu(client) {
   notImplementedGdk();
 }
+bool SearchPopupMenu::enabled() {
+  notImplementedGdk();
+  return true;
+}
 
 PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                                      ScrollbarOrientation orientation,
