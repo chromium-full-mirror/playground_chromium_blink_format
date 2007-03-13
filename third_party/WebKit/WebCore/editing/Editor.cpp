@@ -245,6 +245,12 @@ void Editor::deleteRange(Range* range,
       }
       break;
   }
+
+  // clear the "start new kill ring sequence" setting, because it was set to
+  // true
+  // when the selection was updated by deleting the range
+  if (killRing)
+    setStartNewKillRingSequence(false);
 }
 
 bool Editor::deleteWithDirection(SelectionController::EDirection direction,
@@ -273,6 +279,11 @@ bool Editor::deleteWithDirection(SelectionController::EDirection direction,
         m_frame->selectionController()->selection());
     selectionController.modify(SelectionController::EXTEND, direction,
                                granularity);
+    if (killRing && selectionController.isCaret() &&
+        granularity != CharacterGranularity)
+      selectionController.modify(SelectionController::EXTEND, direction,
+                                 CharacterGranularity);
+
     range = selectionController.toRange();
 
     switch (direction) {

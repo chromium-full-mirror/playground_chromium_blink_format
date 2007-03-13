@@ -59,12 +59,10 @@ PassRefPtr<Range> findPlainText(const Range*,
 // back in
 // chunks so as to optimize for performance of the iteration.
 
-enum IteratorKind { CONTENT = 0, RUNFINDER = 1 };
-
 class TextIterator {
  public:
   TextIterator();
-  explicit TextIterator(const Range*, IteratorKind kind = CONTENT);
+  explicit TextIterator(const Range*);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
@@ -84,6 +82,8 @@ class TextIterator {
 
  private:
   void exitNode();
+  bool shouldRepresentNodeOffsetZero();
+  void representNodeOffsetZero();
   bool handleTextNode();
   bool handleReplacedElement();
   bool handleNonTextNode();
@@ -93,6 +93,7 @@ class TextIterator {
                      Node* offsetBaseNode,
                      int textStartOffset,
                      int textEndOffset);
+  void emitText(Node* textNode, int textStartOffset, int textEndOffset);
 
   // Current position, not necessarily of the text being returned, but position
   // as we walk through the DOM tree.
@@ -101,7 +102,9 @@ class TextIterator {
   bool m_handledNode;
   bool m_handledChildren;
 
-  // End of the range.
+  // The range.
+  Node* m_startContainer;
+  int m_startOffset;
   Node* m_endContainer;
   int m_endOffset;
   Node* m_pastEndNode;
@@ -133,6 +136,10 @@ class TextIterator {
   // Used when text boxes are out of order (Hebrew/Arabic w/ embeded LTR text)
   Vector<InlineTextBox*> m_sortedTextBoxes;
   size_t m_sortedTextBoxesPosition;
+
+  // Used when deciding whether to emit a "positioning" (e.g. newline) before
+  // any other content
+  bool m_haveEmitted;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
