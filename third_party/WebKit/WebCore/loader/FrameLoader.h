@@ -300,6 +300,7 @@ class FrameLoader : Noncopyable {
                                      const ResourceResponse&,
                                      int length);
 
+  void recursiveCheckLoadComplete();
   void checkLoadComplete();
   void detachFromParent();
   void detachChildren();
