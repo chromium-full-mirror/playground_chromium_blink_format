@@ -317,7 +317,8 @@ static bool setSelectionToDragCaret(Frame* frame,
     frame->selectionController()->setSelection(dragCaret);
     range = dragCaret.toRange();
   }
-  return !frame->selectionController()->isNone();
+  return !frame->selectionController()->isNone() &&
+         frame->selectionController()->isContentEditable();
 }
 
 bool DragController::concludeDrag(DragData* dragData,
