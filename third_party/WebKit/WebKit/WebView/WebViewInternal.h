@@ -35,6 +35,7 @@
 #ifdef __cplusplus
 namespace WebCore {
 class KeyboardEvent;
+class KURL;
 class Page;
 class String;
 }
@@ -64,7 +65,7 @@ typedef WebCore::Page WebCorePage;
 
 @interface WebView (WebViewInternal)
 #ifdef __cplusplus
-- (WebCore::String&)_userAgent;
+- (WebCore::String)_userAgentForURL:(const WebCore::KURL&)url;
 #endif
 @end
 
