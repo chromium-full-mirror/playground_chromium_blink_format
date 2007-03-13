@@ -215,6 +215,8 @@ class Editor {
   void setStartNewKillRingSequence(bool flag) {
     m_startNewKillRingSequence = flag;
   }
+#else
+  void setStartNewKillRingSequence(bool) {}
 #endif
 
  private:
