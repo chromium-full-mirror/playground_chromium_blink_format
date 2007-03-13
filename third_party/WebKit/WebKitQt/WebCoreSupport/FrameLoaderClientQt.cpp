@@ -665,13 +665,9 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     const WebCore::NavigationAction&,
     const WebCore::ResourceRequest& request) {
   Q_ASSERT(!m_policyFunction);
-  KURL url = request.url();
-  if (url.isEmpty() || url.protocol() == "about") {
-    m_policyFunction = function;
-    slotCallPolicyFunction(PolicyUse);
-    return;
-  }
-  callPolicyFunction(function, PolicyUse);
+  m_policyFunction = function;
+  slotCallPolicyFunction(PolicyUse);
+  return;
 }
 
 void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
