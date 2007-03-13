@@ -28,14 +28,12 @@
 #include "Element.h"
 #include "HTMLNames.h"
 
-using namespace WebCore;
-
 namespace WebCore {
 
 using namespace HTMLNames;
 
 NameNodeList::NameNodeList(Node* n, const String& t)
-    : NodeList(n), nodeName(t) {}
+    : TreeNodeList(n), nodeName(t) {}
 
 unsigned NameNodeList::length() const {
   return recursiveLength();
@@ -45,7 +43,7 @@ Node* NameNodeList::item(unsigned index) const {
   return recursiveItem(index);
 }
 
-bool NameNodeList::nodeMatches(Node* testNode) const {
-  return static_cast<Element*>(testNode)->getAttribute(nameAttr) == nodeName;
+bool NameNodeList::elementMatches(Element* element) const {
+  return element->getAttribute(nameAttr) == nodeName;
 }
 }

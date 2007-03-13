@@ -50,20 +50,17 @@ using namespace HTMLNames;
 /**
  * NodeList which lists all Nodes in a document with a given tag name
  */
-class TagNodeList : public NodeList {
+class TagNodeList : public TreeNodeList {
  public:
-  TagNodeList(Node* n,
+  TagNodeList(Node*,
               const AtomicString& namespaceURI,
               const AtomicString& localName);
 
-  // DOM methods overridden from  parent classes
   virtual unsigned length() const;
   virtual Node* item(unsigned index) const;
 
-  // Other methods (not part of DOM)
-
  protected:
-  virtual bool nodeMatches(Node* testNode) const;
+  virtual bool elementMatches(Element*) const;
 
   AtomicString m_namespaceURI;
   AtomicString m_localName;
@@ -72,7 +69,7 @@ class TagNodeList : public NodeList {
 TagNodeList::TagNodeList(Node* n,
                          const AtomicString& namespaceURI,
                          const AtomicString& localName)
-    : NodeList(n), m_namespaceURI(namespaceURI), m_localName(localName) {}
+    : TreeNodeList(n), m_namespaceURI(namespaceURI), m_localName(localName) {}
 
 unsigned TagNodeList::length() const {
   return recursiveLength();
@@ -82,10 +79,7 @@ Node* TagNodeList::item(unsigned index) const {
   return recursiveItem(index);
 }
 
-bool TagNodeList::nodeMatches(Node* testNode) const {
-  if (!testNode->isElementNode())
-    return false;
-
+bool TagNodeList::elementMatches(Element* testNode) const {
   if (m_namespaceURI != starAtom && m_namespaceURI != testNode->namespaceURI())
     return false;
 
@@ -393,13 +387,13 @@ unsigned Node::nodeIndex() const {
   return count;
 }
 
-void Node::registerNodeList(NodeList* list) {
+void Node::registerNodeList(TreeNodeList* list) {
   if (!m_nodeLists)
     m_nodeLists = new NodeListSet;
   m_nodeLists->add(list);
 }
 
-void Node::unregisterNodeList(NodeList* list) {
+void Node::unregisterNodeList(TreeNodeList* list) {
   if (!m_nodeLists)
     return;
   m_nodeLists->remove(list);
