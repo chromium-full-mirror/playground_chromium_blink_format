@@ -129,6 +129,7 @@ void CachedImage::notifyObservers() {
 }
 
 void CachedImage::clear() {
+  destroyDecodedData();
   delete m_image;
   m_image = 0;
   setEncodedSize(0);
@@ -266,7 +267,8 @@ void CachedImage::decodedSizeChanged(const Image* image, int delta) {
   if (image != m_image)
     return;
 
-  cache()->adjustSize(referenced(), delta);
+  if (inCache())
+    cache()->adjustSize(referenced(), delta);
 }
 
 bool CachedImage::shouldPauseAnimation(const Image* image) {
