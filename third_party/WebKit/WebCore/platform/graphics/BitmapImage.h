@@ -203,6 +203,8 @@ class BitmapImage : public Image {
   bool m_animationFinished;   // Whether or not we've completed the entire
                               // animation.
 
+  bool m_allDataReceived;  // Whether or not we've received all our data.
+
   mutable bool m_haveSize;  // Whether or not our |m_size| member variable has
                             // the final overall image size yet.
   bool m_sizeAvailable;    // Whether or not we can obtain the size of the first
