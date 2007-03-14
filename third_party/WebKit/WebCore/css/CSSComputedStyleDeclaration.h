@@ -72,6 +72,8 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
   RefPtr<Node> m_node;
 };
 
+PassRefPtr<CSSComputedStyleDeclaration> computedStyle(Node*);
+
 }  // namespace WebCore
 
 #endif  // CSSComputedStyleDeclaration_h

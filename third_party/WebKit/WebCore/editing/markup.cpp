@@ -484,10 +484,6 @@ DeprecatedString createMarkup(const Range* range,
       ancestorsToClose.append(n);
   }
 
-  Node* rangeStartNode = range->startNode();
-  int rangeStartOffset = range->startOffset(ec);
-  ASSERT(ec == 0);
-
   // Add a wrapper span with the styles that all of the nodes in the markup
   // inherit.
   if (!commonAncestor->isElementNode())
@@ -516,35 +512,21 @@ DeprecatedString createMarkup(const Range* range,
     }
   }
 
-  // Add ancestors up to the common ancestor block so inline ancestors such as
-  // FONT and B are part of the markup.
-  // FIXME: This seems unecessary.
-  if (lastClosed) {
+  // Include ancestor blocks that are required to retain the appearance of the
+  // copied markup.
+  if (annotate && (commonAncestorBlock->hasTagName(listingTag) ||
+                   commonAncestorBlock->hasTagName(olTag) ||
+                   commonAncestorBlock->hasTagName(preTag) ||
+                   commonAncestorBlock->hasTagName(tableTag) ||
+                   commonAncestorBlock->hasTagName(ulTag) ||
+                   commonAncestorBlock->hasTagName(xmpTag))) {
     for (Node* ancestor = lastClosed->parentNode(); ancestor;
          ancestor = ancestor->parentNode()) {
-      if (Range::compareBoundaryPoints(ancestor, 0, rangeStartNode,
-                                       rangeStartOffset) >= 0) {
-        // we have already added markup for this node
-        continue;
-      }
-      bool breakAtEnd = false;
-      if (commonAncestorBlock == ancestor) {
-        // Include ancestors that are required to retain the appearance of the
-        // copied markup.
-        if (annotate &&
-            (ancestor->hasTagName(listingTag) || ancestor->hasTagName(olTag) ||
-             ancestor->hasTagName(preTag) || ancestor->hasTagName(tableTag) ||
-             ancestor->hasTagName(ulTag) || ancestor->hasTagName(xmpTag))) {
-          breakAtEnd = true;
-        } else
-          break;
-      }
       markups.prepend(startMarkup(ancestor, range, annotate));
       markups.append(endMarkup(ancestor));
-      if (nodes) {
+      if (nodes)
         nodes->append(ancestor);
-      }
-      if (breakAtEnd)
+      if (ancestor == commonAncestorBlock)
         break;
     }
   }
