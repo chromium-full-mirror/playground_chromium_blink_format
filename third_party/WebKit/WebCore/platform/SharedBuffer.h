@@ -53,6 +53,7 @@ class SharedBuffer : public Shared<SharedBuffer> {
 
   const char* data() const;
   unsigned size() const;
+  const Vector<char>& buffer() { return m_buffer; }
 
   bool isEmpty() const { return size() == 0; }
 

@@ -29,6 +29,7 @@
 #include "config.h"
 #include "ImageSource.h"
 #include "ImageDecoderQt.h"
+#include "SharedBuffer.h"
 
 #include <QImage>
 #include <qdebug.h>
@@ -44,7 +45,7 @@ enum ImageFormat {
   ImageFormat_XBM
 };
 
-ImageFormat detectImageFormat(const Vector<char>& data) {
+ImageFormat detectImageFormat(const SharedBuffer& data) {
   // We need at least 4 bytes to figure out what kind of image we're dealing
   // with.
   int length = data.size();
@@ -85,7 +86,7 @@ ImageFormat detectImageFormat(const Vector<char>& data) {
   return ImageFormat_None;
 }
 
-ImageDecoderQt* createDecoder(const Vector<char>& data) {
+ImageDecoderQt* createDecoder(const SharedBuffer& data) {
   if (detectImageFormat(data) != ImageFormat_None)
     return new ImageDecoderQt();
   return 0;
@@ -101,7 +102,7 @@ bool ImageSource::initialized() const {
   return m_decoder;
 }
 
-void ImageSource::setData(const Vector<char>* data, bool allDataReceived) {
+void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
   // Make the decoder by sniffing the bytes.
   // This method will examine the data and instantiate an instance of the
   // appropriate decoder plugin.
@@ -114,7 +115,7 @@ void ImageSource::setData(const Vector<char>* data, bool allDataReceived) {
   if (!m_decoder)
     return;
 
-  m_decoder->setData(*data, allDataReceived);
+  m_decoder->setData(data->buffer(), allDataReceived);
 }
 
 bool ImageSource::isSizeAvailable() {
