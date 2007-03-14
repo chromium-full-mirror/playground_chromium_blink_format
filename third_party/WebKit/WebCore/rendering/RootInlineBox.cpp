@@ -149,10 +149,10 @@ void RootInlineBox::addHighlightOverflow() {
   IntRect inflatedRect =
       enclosingIntRect(object()->document()->frame()->customHighlightLineRect(
           object()->style()->highlight(), rootRect, object()->node()));
-  setVerticalOverflowPositions(min(leftOverflow(), inflatedRect.x()),
-                               max(rightOverflow(), inflatedRect.right()));
-  setHorizontalOverflowPositions(min(topOverflow(), inflatedRect.y()),
-                                 max(bottomOverflow(), inflatedRect.bottom()));
+  setHorizontalOverflowPositions(min(leftOverflow(), inflatedRect.x()),
+                                 max(rightOverflow(), inflatedRect.right()));
+  setVerticalOverflowPositions(min(topOverflow(), inflatedRect.y()),
+                               max(bottomOverflow(), inflatedRect.bottom()));
 }
 
 void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
