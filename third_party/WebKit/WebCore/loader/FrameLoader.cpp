@@ -1525,15 +1525,21 @@ void FrameLoader::provisionalLoadStarted() {
       canCachePage() && m_currentHistoryItem && !isQuickRedirectComing() &&
       loadType != FrameLoadTypeReload &&
       loadType != FrameLoadTypeReloadAllowingStaleData &&
-      loadType != FrameLoadTypeSame && !documentLoader()->isLoading() &&
+      loadType != FrameLoadTypeSame &&
+      !documentLoader()->isLoadingInAPISense() &&
       !documentLoader()->isStopping()) {
-    if (!m_currentHistoryItem->pageCache()) {
-      // Add the items to this page's cache.
-      if (createPageCache(m_currentHistoryItem.get())) {
-        // See if any page caches need to be purged after the addition of this
-        // new page cache.
-        purgePageCache();
+    if (m_client->canCachePage()) {
+      if (!m_currentHistoryItem->pageCache()) {
+        // Add the items to this page's cache.
+        if (createPageCache(m_currentHistoryItem.get())) {
+          // See if any page caches need to be purged after the addition of this
+          // new page cache.
+          purgePageCache();
+        }
       }
+    } else {
+      // Put the document into a null state, so it can be restored correctly.
+      clear();
     }
   }
 }
@@ -1574,7 +1580,7 @@ void FrameLoader::addData(const char* bytes, int length) {
 }
 
 bool FrameLoader::canCachePage() {
-  if (!m_client->canCachePage())
+  if (documentLoader() && !documentLoader()->mainDocumentError().isNull())
     return false;
 
   return m_frame->document() && !m_frame->tree()->childCount() &&
