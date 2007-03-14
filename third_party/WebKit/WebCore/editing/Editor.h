@@ -152,11 +152,12 @@ class Editor {
   bool selectWordBeforeMenuEvent() const;
   bool clientIsEditable() const;
 
-  bool execCommand(const AtomicString&);
+  bool execCommand(const AtomicString&, Event* triggeringEvent = 0);
 
-  bool insertText(const String&,
-                  bool selectInsertedText,
-                  Event* triggeringEvent = 0);
+  bool insertText(const String&, Event* triggeringEvent);
+  bool insertTextWithoutSendingTextEvent(const String&,
+                                         bool selectInsertedText,
+                                         Event* triggeringEvent = 0);
   bool insertLineBreak();
   bool insertParagraphSeparator();
 
