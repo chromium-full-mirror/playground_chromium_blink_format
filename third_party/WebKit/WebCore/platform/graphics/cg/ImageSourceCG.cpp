@@ -82,7 +82,7 @@ void ImageSource::setData(SharedBuffer* data, bool allDataReceived) {
   // vector.  That means no secret changes can occur to it behind the
   // scenes.  We use CFDataCreateWithBytesNoCopy in that case.
   CFDataRef cfData = CFDataCreateWithBytesNoCopy(
-      0, reinterpret_cast<const UInt8*>(data->data()), length,
+      0, reinterpret_cast<const UInt8*>(data->data()), data->size(),
       kCFAllocatorNull);
 #endif
   CGImageSourceUpdateData(m_decoder, cfData, allDataReceived);

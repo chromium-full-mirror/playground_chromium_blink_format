@@ -64,7 +64,7 @@ bool PDFDocumentImage::dataChanged(bool allDataReceived) {
     // a vector.  That means no secret changes can occur to it behind the
     // scenes.  We use CFDataCreateWithBytesNoCopy in that case.
     CFDataRef data = CFDataCreateWithBytesNoCopy(
-        0, reinterpret_cast<const UInt8*>(m_data->data()), length,
+        0, reinterpret_cast<const UInt8*>(m_data->data()), m_data->size(),
         kCFAllocatorNull);
 #endif
     CGDataProviderRef dataProvider = CGDataProviderCreateWithCFData(data);
