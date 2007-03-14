@@ -45,8 +45,8 @@ class WebDocumentLoaderMac : public WebCore::DocumentLoader {
   virtual void attachToFrame();
   virtual void detachFromFrame();
 
-  void increaseLoadCount();
-  void decreaseLoadCount();
+  void increaseLoadCount(unsigned long identifier);
+  void decreaseLoadCount(unsigned long identifier);
 
  private:
   WebDataSource* m_dataSource;
