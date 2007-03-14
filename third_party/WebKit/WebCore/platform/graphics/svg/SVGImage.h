@@ -47,7 +47,7 @@ class SVGImage : public Image {
 
   virtual IntSize size() const;
 
-  virtual bool setData(bool allDataReceived);
+  virtual bool dataChanged(bool allDataReceived);
 
   virtual NativeImagePtr frameAtIndex(size_t) { return 0; }
 

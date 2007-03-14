@@ -80,8 +80,7 @@ class CachedResource {
   virtual ~CachedResource();
 
   virtual void setEncoding(const String&) {}
-  virtual Vector<char>& bufferData(const char* bytes, int addedSize, Request*);
-  virtual void data(Vector<char>&, bool allDataReceived) = 0;
+  virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived) = 0;
   virtual void error() = 0;
 
   const String& url() const { return m_url; }
@@ -122,8 +121,7 @@ class CachedResource {
 
   void setRequest(Request*);
 
-  SharedBuffer* allData() const { return m_allData.get(); }
-  void setAllData(PassRefPtr<SharedBuffer> allData) { m_allData = allData; }
+  SharedBuffer* data() const { return m_data.get(); }
 
   void setResponse(const ResourceResponse& response) { m_response = response; }
   const ResourceResponse& response() const { return m_response; }
@@ -154,7 +152,7 @@ class CachedResource {
   Request* m_request;
 
   ResourceResponse m_response;
-  RefPtr<SharedBuffer> m_allData;
+  RefPtr<SharedBuffer> m_data;
 
   Type m_type;
   Status m_status;

@@ -81,7 +81,7 @@ class SQLStatement : public Noncopyable {
   int getColumnInt(int col);
   int64_t getColumnInt64(int col);
   const void* getColumnBlob(int col, int& size);
-  void getColumnBlobAsVector(int col, Vector<unsigned char>&);
+  void getColumnBlobAsVector(int col, Vector<char>&);
 
   bool returnTextResults(int col, Vector<String>&);
   bool returnTextResults16(int col, Vector<String>&);

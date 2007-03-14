@@ -49,7 +49,6 @@ CachedResource::CachedResource(const String& URL,
   m_inCache = false;
   m_cachePolicy = cachePolicy;
   m_request = 0;
-  m_allData = 0;
   m_expireDateChanged = false;
   m_accessCount = 0;
   m_nextInLRUList = 0;
@@ -68,20 +67,6 @@ CachedResource::~CachedResource() {
 #ifndef NDEBUG
   m_deleted = true;
 #endif
-  setAllData(0);
-}
-
-Vector<char>& CachedResource::bufferData(const char* bytes,
-                                         int addedSize,
-                                         Request* request) {
-  // Add new bytes to the buffer in the Request object.
-  Vector<char>& buffer = request->buffer();
-
-  unsigned oldSize = buffer.size();
-  buffer.resize(oldSize + addedSize);
-  memcpy(buffer.data() + oldSize, bytes, addedSize);
-
-  return buffer;
 }
 
 void CachedResource::finish() {

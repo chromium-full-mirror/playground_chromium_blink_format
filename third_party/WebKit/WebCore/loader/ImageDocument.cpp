@@ -96,7 +96,8 @@ bool ImageTokenizer::writeRawData(const char* data, int len) {
     createDocumentStructure();
 
   CachedImage* cachedImage = m_imageElement->cachedImage();
-  cachedImage->data(cachedImage->bufferData(data, len, 0), false);
+  cachedImage->data(
+      m_doc->frame()->loader()->documentLoader()->mainResourceData(), false);
 
   return false;
 }
@@ -110,12 +111,10 @@ void ImageTokenizer::stopParsing() {
 void ImageTokenizer::finish() {
   if (!m_parserStopped && m_imageElement) {
     CachedImage* cachedImage = m_imageElement->cachedImage();
-    Vector<char>& buffer = cachedImage->bufferData(0, 0, 0);
-    cachedImage->data(buffer, true);
+    cachedImage->data(
+        m_doc->frame()->loader()->documentLoader()->mainResourceData(), true);
     cachedImage->finish();
 
-    cachedImage->setAllData(
-        m_doc->frame()->loader()->documentLoader()->mainResourceData());
     cachedImage->setResponse(
         m_doc->frame()->loader()->documentLoader()->response());
 
