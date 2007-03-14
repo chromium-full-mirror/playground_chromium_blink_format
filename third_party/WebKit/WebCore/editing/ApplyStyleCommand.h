@@ -88,7 +88,8 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void applyBlockStyle(CSSMutableStyleDeclaration*);
   void applyRelativeFontStyleChange(CSSMutableStyleDeclaration*);
   void applyInlineStyle(CSSMutableStyleDeclaration*);
-  void addBlockStyleIfNeeded(CSSMutableStyleDeclaration*, Node*);
+  void addBlockStyleIfNeeded(CSSMutableStyleDeclaration*,
+                             const VisiblePosition&);
   void addInlineStyleIfNeeded(CSSMutableStyleDeclaration*,
                               Node* start,
                               Node* end);

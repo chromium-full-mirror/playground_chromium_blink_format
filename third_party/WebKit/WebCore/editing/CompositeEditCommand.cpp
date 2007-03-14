@@ -600,10 +600,10 @@ void CompositeEditCommand::removePlaceholderAt(
   }
 }
 
-void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
+Node* CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
     const Position& pos) {
   if (pos.isNull())
-    return;
+    return 0;
 
   updateLayout();
 
@@ -619,7 +619,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   // If there are no VisiblePositions in the same block as pos then
   // paragraphStart will be outside the paragraph
   if (Range::compareBoundaryPoints(pos, paragraphStart) < 0)
-    return;
+    return 0;
 
   // Perform some checks to see if we need to perform work in this function.
   if (isBlock(paragraphStart.node())) {
@@ -628,25 +628,21 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
         // If the paragraph end is a descendant of paragraph start, then we need
         // to run
         // the rest of this function. If not, we can bail here.
-        return;
+        return 0;
       }
     } else if (enclosingBlock(end.node()) != paragraphStart.node()) {
       // The visibleEnd.  It must be an ancestor of the paragraph start.
       // We can bail as we have a full block to work with.
       ASSERT(paragraphStart.node()->isDescendantOf(enclosingBlock(end.node())));
-      return;
+      return 0;
     } else if (isEndOfDocument(visibleEnd)) {
       // At the end of the document. We can bail here as well.
-      return;
+      return 0;
     }
   }
 
   RefPtr<Node> newBlock = createDefaultParagraphElement(document());
-
-  Node* moveNode = paragraphStart.node();
-  if (paragraphStart.offset() >= paragraphStart.node()->caretMaxOffset())
-    moveNode = moveNode->traverseNextNode();
-  Node* endNode = end.node();
+  appendNode(createBreakElement(document()).get(), newBlock.get());
 
   if (!isAtomicNode(paragraphStart.node()))
     insertNodeAt(newBlock.get(), paragraphStart.node(),
@@ -658,14 +654,10 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
                  paragraphStart.node()->nodeIndex() + paragraphStart.offset());
   }
 
-  while (moveNode && !isBlock(moveNode)) {
-    Node* next = moveNode->traverseNextSibling();
-    removeNode(moveNode);
-    appendNode(moveNode, newBlock.get());
-    if (moveNode == endNode)
-      break;
-    moveNode = next;
-  }
+  moveParagraphs(visibleParagraphStart, visibleParagraphEnd,
+                 VisiblePosition(Position(newBlock.get(), 0)));
+
+  return newBlock.get();
 }
 
 Node* enclosingAnchorElement(Node* node) {

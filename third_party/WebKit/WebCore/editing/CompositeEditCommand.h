@@ -109,7 +109,7 @@ class CompositeEditCommand : public EditCommand {
   Node* addBlockPlaceholderIfNeeded(Node*);
   void removePlaceholderAt(const VisiblePosition&);
 
-  void moveParagraphContentsToNewBlockIfNecessary(const Position&);
+  Node* moveParagraphContentsToNewBlockIfNecessary(const Position&);
 
   void pushAnchorElementDown(Node*);
   void pushPartiallySelectedAnchorElementsDown();
