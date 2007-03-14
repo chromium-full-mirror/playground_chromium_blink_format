@@ -162,7 +162,6 @@ struct WebCoreHistoryItem;
 - (void)_addChild:(WebFrame*)child;
 
 + (CFAbsoluteTime)_timeOfLastCompletedLoad;
-- (BOOL)_canCachePage;
 
 - (int)_numPendingOrLoadingRequests:(BOOL)recurse;
 
