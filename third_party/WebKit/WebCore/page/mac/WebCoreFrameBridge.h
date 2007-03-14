@@ -305,7 +305,7 @@ rangeByAlteringCurrentSelection:
 
 - (BOOL)getData:(NSData**)data
     andResponse:(NSURLResponse**)response
-         forURL:(NSURL*)URL;
+         forURL:(NSString*)URL;
 - (void)getAllResourceDatas:(NSArray**)datas andResponses:(NSArray**)responses;
 
 - (BOOL)canProvideDocumentSource;
