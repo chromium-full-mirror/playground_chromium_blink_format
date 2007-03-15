@@ -42,6 +42,9 @@
                 URL:(NSURL*)URL
            response:(NSURLResponse*)response;
 
+- (BOOL)_shouldIgnoreWhenUnarchiving;
+- (void)_ignoreWhenUnarchiving;
+
 + (NSArray*)_resourcesFromPropertyLists:(NSArray*)propertyLists;
 + (NSArray*)_propertyListsFromResources:(NSArray*)resources;
 
