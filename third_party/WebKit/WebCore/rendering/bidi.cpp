@@ -2747,7 +2747,7 @@ end:
 
   if (lBreak == start && !lBreak.obj->isBR()) {
     // we just add as much as possible
-    if (shouldPreserveNewline(this)) {
+    if (style()->whiteSpace() == PRE) {
       // FIXME: Don't really understand this case.
       if (pos != 0) {
         lBreak.obj = o;
