@@ -54,7 +54,6 @@ class RenderArena;
 class RenderObject;
 class RenderStyle;
 class TextStream;
-class TreeNodeList;
 
 typedef int ExceptionCode;
 
@@ -491,8 +490,8 @@ class Node : public TreeShared<Node> {
                        const char* markedLabel2 = 0) const;
 #endif
 
-  void registerNodeList(TreeNodeList*);
-  void unregisterNodeList(TreeNodeList*);
+  void registerNodeList(NodeList*);
+  void unregisterNodeList(NodeList*);
   void notifyNodeListsChildrenChanged();
   void notifyLocalNodeListsChildrenChanged();
   void notifyNodeListsAttributeChanged();
@@ -509,7 +508,7 @@ class Node : public TreeShared<Node> {
   RenderObject* m_renderer;
 
  protected:
-  typedef HashSet<TreeNodeList*> NodeListSet;
+  typedef HashSet<NodeList*> NodeListSet;
   NodeListSet* m_nodeLists;
 
   short m_tabIndex;

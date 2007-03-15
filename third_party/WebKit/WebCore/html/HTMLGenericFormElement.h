@@ -111,7 +111,6 @@ class HTMLGenericFormElement : public HTMLElement {
   bool m_disabled;
   bool m_readOnly;
   mutable bool m_valueMatchesRenderer;
-  AtomicString m_oldName;
 };
 
 }  // namespace
