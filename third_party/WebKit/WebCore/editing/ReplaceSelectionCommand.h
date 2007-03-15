@@ -56,6 +56,7 @@ class ReplacementFragment : Noncopyable {
   }
 
   void removeNode(PassRefPtr<Node>);
+  void removeNodePreservingChildren(Node*);
 
  private:
   PassRefPtr<Node> insertFragmentForTestRendering(Node* context);
@@ -63,7 +64,6 @@ class ReplacementFragment : Noncopyable {
   void restoreTestRenderingNodesToFragment(Node*);
   void removeInterchangeNodes(Node*);
 
-  void removeNodePreservingChildren(Node*);
   void insertNodeBefore(Node* node, Node* refNode);
 
   RefPtr<Document> m_document;
