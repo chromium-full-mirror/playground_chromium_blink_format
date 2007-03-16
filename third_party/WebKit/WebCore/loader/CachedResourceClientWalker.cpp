@@ -32,13 +32,13 @@
 namespace WebCore {
 
 CachedResourceClientWalker::CachedResourceClientWalker(
-    const HashSet<CachedResourceClient*>& set)
+    const HashCountedSet<CachedResourceClient*>& set)
     : m_clientSet(set), m_clientVector(set.size()), m_index(0) {
-  typedef HashSet<CachedResourceClient*>::const_iterator Iterator;
+  typedef HashCountedSet<CachedResourceClient*>::const_iterator Iterator;
   Iterator end = set.end();
   size_t clientIndex = 0;
   for (Iterator current = set.begin(); current != end; ++current)
-    m_clientVector[clientIndex++] = *current;
+    m_clientVector[clientIndex++] = current->first;
 }
 
 CachedResourceClient* CachedResourceClientWalker::next() {
