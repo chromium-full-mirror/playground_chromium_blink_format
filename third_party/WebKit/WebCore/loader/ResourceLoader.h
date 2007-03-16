@@ -61,6 +61,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
 
   virtual void cancel(const ResourceError&);
   ResourceError cancelledError();
+  ResourceError blockedError();
 
   virtual void setDefersLoading(bool);
 
@@ -84,6 +85,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
+  virtual void wasBlocked();
 
   void didReceiveAuthenticationChallenge(const AuthenticationChallenge&);
   void didCancelAuthenticationChallenge(const AuthenticationChallenge&);
@@ -100,6 +102,7 @@ class ResourceLoader : public Shared<ResourceLoader>,
                               int lengthReceived);
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
+  virtual void wasBlocked(ResourceHandle*);
   virtual void willStopBufferingData(ResourceHandle*,
                                      const char* data,
                                      int length) {

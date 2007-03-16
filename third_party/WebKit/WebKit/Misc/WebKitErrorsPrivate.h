@@ -33,6 +33,15 @@
 // prevent loading plugin content twice.  See <rdar://problem/4258008>
 #define WebKitErrorPlugInWillHandleLoad 204
 
+/*!
+    @enum
+    @abstract Policy errors - Pending Public API Review
+    @constant WebKitErrorCannotUseRestrictedPort
+*/
+enum {
+  WebKitErrorCannotUseRestrictedPort = 103,
+};
+
 @interface NSError (WebKitExtras)
 + (NSError*)_webKitErrorWithCode:(int)code failingURL:(NSString*)URL;
 + (NSError*)_webKitErrorWithDomain:(NSString*)domain

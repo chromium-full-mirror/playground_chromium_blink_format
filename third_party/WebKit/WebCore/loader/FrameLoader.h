@@ -236,6 +236,7 @@ class FrameLoader : Noncopyable {
 
   ResourceError cancelledError(const ResourceRequest&) const;
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
+  ResourceError blockedError(const ResourceRequest&) const;
   bool willUseArchive(ResourceLoader*,
                       const ResourceRequest&,
                       const KURL&) const;

@@ -66,6 +66,7 @@ class ResourceHandleClient {
                               int lengthReceived) {}
   virtual void didFinishLoading(ResourceHandle*) {}
   virtual void didFail(ResourceHandle*, const ResourceError&) {}
+  virtual void wasBlocked(ResourceHandle*) {}
 
   virtual void willCacheResponse(ResourceHandle*, CacheStoragePolicy&) {}
 

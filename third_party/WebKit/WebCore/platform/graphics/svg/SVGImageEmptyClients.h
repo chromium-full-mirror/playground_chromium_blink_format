@@ -271,6 +271,9 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual ResourceError cancelledError(const ResourceRequest&) {
     return ResourceError();
   }
+  virtual ResourceError blockedError(const ResourceRequest&) {
+    return ResourceError();
+  }
   virtual ResourceError cannotShowURLError(const ResourceRequest&) {
     return ResourceError();
   }

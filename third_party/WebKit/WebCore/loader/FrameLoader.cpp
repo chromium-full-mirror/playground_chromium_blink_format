@@ -4330,6 +4330,10 @@ ResourceError FrameLoader::cancelledError(
   return m_client->cancelledError(request);
 }
 
+ResourceError FrameLoader::blockedError(const ResourceRequest& request) const {
+  return m_client->blockedError(request);
+}
+
 ResourceError FrameLoader::fileDoesNotExistError(
     const ResourceResponse& response) const {
   return m_client->fileDoesNotExistError(response);

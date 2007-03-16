@@ -186,6 +186,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual WebCore::ResourceError cancelledError(
       const WebCore::ResourceRequest&);
+  virtual WebCore::ResourceError blockedError(const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError cannotShowURLError(
       const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError interruptForPolicyChangeError(
