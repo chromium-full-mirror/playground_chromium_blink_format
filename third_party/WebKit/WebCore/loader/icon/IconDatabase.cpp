@@ -37,6 +37,7 @@
 #if PLATFORM(WIN)
 #include <windows.h>
 #include <winbase.h>
+#include <shlobj.h>
 #else
 #include <sys/stat.h>
 #endif
@@ -95,9 +96,12 @@ IconDatabase::IconDatabase()
 bool makeAllDirectories(const String& path) {
 #if PLATFORM(WIN)
   String fullPath = path;
-  if (!CreateDirectory(fullPath.charactersWithNullTermination(), 0)) {
-    LOG_ERROR("Failed to create path %s", path.ascii().data());
-    return false;
+  if (!SHCreateDirectoryEx(0, fullPath.charactersWithNullTermination(), 0)) {
+    DWORD error = GetLastError();
+    if (error != ERROR_FILE_EXISTS && error != ERROR_ALREADY_EXISTS) {
+      LOG_ERROR("Failed to create path %s", path.ascii().data());
+      return false;
+    }
   }
 #else
   CString fullPath = path.utf8();
