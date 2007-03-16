@@ -31,6 +31,7 @@
 namespace WebCore {
 
 class HTMLElement;
+class StyleChange;
 
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
@@ -88,8 +89,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void applyBlockStyle(CSSMutableStyleDeclaration*);
   void applyRelativeFontStyleChange(CSSMutableStyleDeclaration*);
   void applyInlineStyle(CSSMutableStyleDeclaration*);
-  void addBlockStyleIfNeeded(CSSMutableStyleDeclaration*,
-                             const VisiblePosition&);
+  void addBlockStyle(const StyleChange&, HTMLElement*);
   void addInlineStyleIfNeeded(CSSMutableStyleDeclaration*,
                               Node* start,
                               Node* end);
