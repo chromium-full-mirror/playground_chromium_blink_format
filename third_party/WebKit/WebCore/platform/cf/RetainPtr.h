@@ -88,8 +88,8 @@ class RetainPtr {
 
   PtrType get() const { return m_ptr; }
 
-  T* releaseRef() {
-    T* tmp = m_ptr;
+  PtrType releaseRef() {
+    PtrType tmp = m_ptr;
     m_ptr = 0;
     return tmp;
   }

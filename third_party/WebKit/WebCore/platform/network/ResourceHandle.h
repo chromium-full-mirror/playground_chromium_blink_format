@@ -120,6 +120,7 @@ class ResourceHandle : public Shared<ResourceHandle> {
 #elif USE(CFNETWORK)
   static CFRunLoopRef loaderRunLoop();
   CFURLConnectionRef connection() const;
+  CFURLConnectionRef releaseConnectionForDownload();
 #endif
   PassRefPtr<SharedBuffer> bufferedData();
   static bool supportsBufferedData();
