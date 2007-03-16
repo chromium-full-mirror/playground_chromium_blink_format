@@ -185,6 +185,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
   virtual bool shouldGoToHistoryItem(HistoryItem*) const;
 
   virtual ResourceError cancelledError(const ResourceRequest&);
+  virtual ResourceError blockedError(const ResourceRequest&);
   virtual ResourceError cannotShowURLError(const ResourceRequest&);
   virtual ResourceError interruptForPolicyChangeError(const ResourceRequest&);
 

@@ -441,6 +441,10 @@ ResourceError FrameLoaderClientGdk::cancelledError(const ResourceRequest&) {
   notImplementedGdk();
   return ResourceError();
 }
+ResourceError FrameLoaderClientGdk::blockedError(const ResourceRequest&) {
+  notImplementedGdk();
+  return ResourceError();
+}
 ResourceError FrameLoaderClientGdk::cannotShowURLError(const ResourceRequest&) {
   notImplementedGdk();
   return ResourceError();
