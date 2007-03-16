@@ -75,13 +75,12 @@ class Pasteboard : Noncopyable {
                        NSArray* types,
                        const KURL& url,
                        const String& titleStr,
-                       Frame* frame,
-                       bool isImage = false);
+                       Frame* frame);
 #endif
 
   static Pasteboard* generalPasteboard();
   void writeSelection(Range*, bool canSmartCopyOrDelete, Frame*);
-  void writeURL(const KURL&, const String&, Frame* = 0, bool isImage = false);
+  void writeURL(const KURL&, const String&, Frame* = 0);
   void writeImage(const HitTestResult&);
 #if PLATFORM(MAC)
   void writeFileWrapperAsRTFDAttachment(NSFileWrapper*);
