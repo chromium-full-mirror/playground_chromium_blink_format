@@ -23,16 +23,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "config.h"
-#import "Pasteboard.h"
+#include "config.h"
+#include "Pasteboard.h"
 
-#import "DocumentFragment.h"
-#import "Editor.h"
-#import "markup.h"
+#include "DocumentFragment.h"
+#include "Editor.h"
+#include "markup.h"
+#include <qdebug.h>
+
+#define notImplemented() \
+  qDebug("FIXME: UNIMPLEMENTED: %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__)
 
 namespace WebCore {
 
-Pasteboard::Pasteboard() {}
+Pasteboard::Pasteboard() {
+  notImplemented();
+}
 
 Pasteboard* Pasteboard::generalPasteboard() {
   static Pasteboard* pasteboard = new Pasteboard();
@@ -41,13 +47,16 @@ Pasteboard* Pasteboard::generalPasteboard() {
 
 void Pasteboard::writeSelection(Range* selectedRange,
                                 bool canSmartCopyOrDelete,
-                                Frame* frame) {}
+                                Frame* frame) {
+  notImplemented();
+}
 
 bool Pasteboard::canSmartReplace() {
   return false;
 }
 
 String Pasteboard::plainText(Frame* frame) {
+  notImplemented();
   return String();
 }
 
@@ -56,12 +65,19 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     PassRefPtr<Range> context,
     bool allowPlainText,
     bool& chosePlainText) {
+  notImplemented();
   return 0;
 }
 
-void Pasteboard::writeURL(const KURL&, const String&, Frame*, bool isImage) {}
+void Pasteboard::writeURL(const KURL&, const String&, Frame*) {
+  notImplemented();
+}
 
-void Pasteboard::writeImage(const HitTestResult&) {}
+void Pasteboard::writeImage(const HitTestResult&) {
+  notImplemented();
+}
 
-void Pasteboard::clear() {}
+void Pasteboard::clear() {
+  notImplemented();
+}
 }

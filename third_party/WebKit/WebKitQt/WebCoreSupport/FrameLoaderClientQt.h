@@ -181,6 +181,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void committedLoad(WebCore::DocumentLoader*, const char*, int);
   virtual WebCore::ResourceError cancelledError(
       const WebCore::ResourceRequest&);
+  virtual WebCore::ResourceError blockedError(const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError cannotShowURLError(
       const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError interruptForPolicyChangeError(

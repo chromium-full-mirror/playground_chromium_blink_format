@@ -512,6 +512,12 @@ WebCore::ResourceError FrameLoaderClientQt::cancelledError(
   return ResourceError();
 }
 
+WebCore::ResourceError FrameLoaderClientQt::blockedError(
+    const WebCore::ResourceRequest&) {
+  notImplemented();
+  return ResourceError();
+}
+
 WebCore::ResourceError FrameLoaderClientQt::cannotShowURLError(
     const WebCore::ResourceRequest&) {
   notImplemented();
