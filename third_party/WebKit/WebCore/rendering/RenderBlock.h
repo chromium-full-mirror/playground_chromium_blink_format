@@ -62,6 +62,7 @@ class RenderBlock : public RenderFlow {
   virtual bool childrenInline() const { return m_childrenInline; }
   virtual void setChildrenInline(bool b) { m_childrenInline = b; }
   void makeChildrenNonInline(RenderObject* insertionPoint = 0);
+  void deleteLineBoxTree();
 
   // The height (and width) of a block when you include overflow spillage out of
   // the bottom

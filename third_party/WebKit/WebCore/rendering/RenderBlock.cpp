@@ -285,6 +285,17 @@ static void getInlineRun(RenderObject* start,
   } while (!sawInline);
 }
 
+void RenderBlock::deleteLineBoxTree() {
+  InlineFlowBox* line = m_firstLineBox;
+  InlineFlowBox* nextLine;
+  while (line) {
+    nextLine = line->nextFlowBox();
+    line->deleteLine(renderArena());
+    line = nextLine;
+  }
+  m_firstLineBox = m_lastLineBox = 0;
+}
+
 void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
   // makeChildrenNonInline takes a block whose children are *all* inline and it
   // makes sure that inline children are coalesced under anonymous
@@ -302,14 +313,7 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
 
   m_childrenInline = false;
 
-  InlineFlowBox* line = m_firstLineBox;
-  InlineFlowBox* nextLine;
-  while (line) {
-    nextLine = line->nextFlowBox();
-    line->deleteLine(renderArena());
-    line = nextLine;
-  }
-  m_firstLineBox = m_lastLineBox = 0;
+  deleteLineBoxTree();
 
   RenderObject* child = firstChild();
 
@@ -362,24 +366,8 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       no->setNeedsLayoutAndMinMaxRecalc();
     }
 
-    // Do the same with line boxes.
-    RenderBlock* prevBlock = static_cast<RenderBlock*>(prev);
     RenderBlock* nextBlock = static_cast<RenderBlock*>(next);
-    if (RootInlineBox* box = nextBlock->firstRootBox()) {
-      if (prevBlock->lastRootBox()) {
-        prevBlock->lastRootBox()->setNextLineBox(box);
-        box->setPreviousLineBox(prevBlock->lastRootBox());
-      } else
-        prevBlock->m_firstLineBox = box;
-
-      while (box) {
-        prevBlock->m_lastLineBox = box;
-        box->m_object = prevBlock;
-        box = box->nextRootBox();
-      }
-      nextBlock->m_firstLineBox = 0;
-      nextBlock->m_lastLineBox = 0;
-    }
+    nextBlock->deleteLineBoxTree();
 
     // Nuke the now-empty block.
     next->destroy();
@@ -404,18 +392,8 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       no->setNeedsLayoutAndMinMaxRecalc();
     }
 
-    // Take over the anonymous child's line boxes.
-    RootInlineBox* box = anonBlock->firstRootBox();
-    m_firstLineBox = box;
-    while (box) {
-      m_lastLineBox = box;
-      box->m_object = this;
-      box = box->nextRootBox();
-    }
-    anonBlock->m_firstLineBox = 0;
-    anonBlock->m_lastLineBox = 0;
-
-    // Nuke the now-empty block.
+    // Delete the now-empty block's lines and nuke it.
+    anonBlock->deleteLineBoxTree();
     anonBlock->destroy();
   }
 }
