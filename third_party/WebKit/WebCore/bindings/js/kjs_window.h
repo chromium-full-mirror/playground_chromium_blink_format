@@ -295,7 +295,8 @@ class Window : public DOMObject {
     Toolbar,
     FrameElement,
     ShowModalDialog,
-    Find
+    Find,
+    Stop
   };
 
  private:

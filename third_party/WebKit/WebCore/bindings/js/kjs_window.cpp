@@ -332,7 +332,8 @@ Window::get
   onbeforeunload Window::Onbeforeunload DontDelete
   frameElement  Window::FrameElement    DontDelete|ReadOnly
   showModalDialog Window::ShowModalDialog    DontDelete|Function 1
-  find            Window::Find               DontDelete|Function 7
+  find          Window::Find            DontDelete|Function 7
+  stop          Window::Stop            DontDelete|Function 0
 @end
 */
 KJS_IMPLEMENT_PROTOTYPE_FUNCTION(WindowFunc)
@@ -1948,6 +1949,9 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       JSValue* result = showModalDialog(exec, window, args);
       return result;
     }
+    case Window::Stop:
+      frame->loader()->stopAllLoaders();
+      return jsUndefined();
     case Window::Find:
       if (!window->isSafeScript(exec))
         return jsUndefined();
