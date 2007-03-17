@@ -53,8 +53,7 @@ class WebDragClient : public WebCore::DragClient {
                                         DOMElement*,
                                         NSURL*,
                                         NSString*,
-                                        WebCore::Frame*,
-                                        bool canSaveAsWebArchive);
+                                        WebCore::Frame*);
 
  private:
   WebView* m_webView;

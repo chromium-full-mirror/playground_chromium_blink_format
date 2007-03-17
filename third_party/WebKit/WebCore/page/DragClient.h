@@ -85,8 +85,7 @@ class DragClient {
                                         DOMElement*,
                                         NSURL*,
                                         NSString*,
-                                        Frame*,
-                                        bool canSaveAsWebArchive){};
+                                        Frame*){};
 #endif
 
   virtual ~DragClient(){};

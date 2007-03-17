@@ -40,15 +40,6 @@ Clipboard::Clipboard(ClipboardAccessPolicy policy, bool isForDragging)
       m_forDragging(isForDragging),
       m_dragImage(0) {}
 
-bool Clipboard::canSaveAsWebArchive(Frame* frame) {
-  ASSERT(frame);
-  String mimeType = frame->loader()->responseMIMEType();
-
-  return !(DOMImplementation::isTextMIMEType(mimeType) ||
-           Image::supportsType(mimeType) ||
-           PlugInInfoStore::supportsMIMEType(mimeType));
-}
-
 void Clipboard::setAccessPolicy(ClipboardAccessPolicy policy) {
   // once you go numb, can never go back
   ASSERT(m_policy != ClipboardNumb || policy == ClipboardNumb);
