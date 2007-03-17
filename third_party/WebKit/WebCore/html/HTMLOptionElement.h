@@ -64,6 +64,7 @@ class HTMLOptionElement : public HTMLGenericFormElement {
 
   bool selected() const { return m_selected; }
   void setSelected(bool);
+  void setSelectedState(bool);
 
   HTMLSelectElement* getSelect() const;
 
