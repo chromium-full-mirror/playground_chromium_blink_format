@@ -623,7 +623,7 @@ Pasteboard* Pasteboard::generalPasteboard() {
 void Pasteboard::writeSelection(Range*, bool, Frame*) {
   notImplementedGdk();
 }
-void Pasteboard::writeURL(const KURL&, const String&, Frame*, bool) {
+void Pasteboard::writeURL(const KURL&, const String&, Frame*) {
   notImplementedGdk();
 }
 void Pasteboard::writeImage(const HitTestResult&) {
