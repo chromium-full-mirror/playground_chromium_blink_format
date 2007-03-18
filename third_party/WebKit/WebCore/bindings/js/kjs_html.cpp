@@ -1953,7 +1953,7 @@ bool JSHTMLCollection::getOwnPropertySlot(ExecState* exec,
 
     // name or index ?
     bool ok;
-    unsigned int u = propertyName.toUInt32(&ok);
+    unsigned int u = propertyName.toUInt32(&ok, false);
     if (ok) {
       slot.setCustomIndex(this, u, indexGetter);
       return true;
@@ -1983,7 +1983,7 @@ JSValue* JSHTMLCollection::callAsFunction(ExecState* exec,
     // support for document.all(<index>) etc.
     bool ok;
     UString s = args[0]->toString(exec);
-    unsigned int u = s.toUInt32(&ok);
+    unsigned int u = s.toUInt32(&ok, false);
     if (ok)
       return toJS(exec, collection.item(u));
     // support for document.images('<name>') etc.
@@ -1993,7 +1993,7 @@ JSValue* JSHTMLCollection::callAsFunction(ExecState* exec,
   {
     bool ok;
     UString s = args[0]->toString(exec);
-    unsigned int u = args[1]->toString(exec).toUInt32(&ok);
+    unsigned int u = args[1]->toString(exec).toUInt32(&ok, false);
     if (ok) {
       WebCore::String pstr = s;
       WebCore::Node* node = collection.namedItem(pstr);
@@ -2037,7 +2037,7 @@ JSValue* JSHTMLCollectionPrototypeFunction::callAsFunction(ExecState* exec,
           coll.base()->getElementsByTagName(args[0]->toString(exec)).get());
     case JSHTMLCollection::Item: {
       bool ok;
-      uint32_t index = args[0]->toUInt32(exec, ok);
+      uint32_t index = args[0]->toString(exec).toUInt32(&ok, false);
       if (ok)
         return toJS(exec, coll.item(index));
     }
