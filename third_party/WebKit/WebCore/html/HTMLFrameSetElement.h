@@ -27,6 +27,7 @@
 #define HTMLFrameSetElement_h
 
 #include "HTMLElement.h"
+#include "Color.h"
 
 namespace WebCore {
 
@@ -39,7 +40,10 @@ class HTMLFrameSetElement : public HTMLElement {
   virtual int tagPriority() const { return 10; }
   virtual bool checkDTD(const Node* newChild);
 
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttribute*);
+
   virtual void attach();
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
@@ -52,6 +56,8 @@ class HTMLFrameSetElement : public HTMLElement {
   int totalRows() const { return m_totalRows; }
   int totalCols() const { return m_totalCols; }
   int border() const { return m_border; }
+
+  bool hasBorderColor() const { return m_borderColorSet; }
 
   virtual void recalcStyle(StyleChange ch);
 
@@ -70,7 +76,11 @@ class HTMLFrameSetElement : public HTMLElement {
 
   int m_totalRows;
   int m_totalCols;
+
   int m_border;
+  bool m_borderSet;
+
+  bool m_borderColorSet;
 
   bool frameborder;
   bool frameBorderSet;

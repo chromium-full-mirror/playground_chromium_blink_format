@@ -48,6 +48,7 @@ class RenderFrameSet : public RenderContainer {
                            int tx,
                            int ty,
                            HitTestAction);
+  virtual void paint(PaintInfo& paintInfo, int tx, int ty);
 
   bool userResize(MouseEvent*);
 
@@ -89,6 +90,9 @@ class RenderFrameSet : public RenderContainer {
 
   void startResizing(GridAxis&, int position);
   void continueResizing(GridAxis&, int position);
+
+  void paintRowBorder(const PaintInfo& paintInfo, const IntRect& rect);
+  void paintColumnBorder(const PaintInfo& paintInfo, const IntRect& rect);
 
   GridAxis m_rows;
   GridAxis m_cols;

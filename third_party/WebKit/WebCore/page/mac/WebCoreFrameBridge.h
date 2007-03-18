@@ -369,8 +369,6 @@ rangeByAlteringCurrentSelection:
              sourceIsDHTML:(BOOL)flag
             DHTMLWroteData:(BOOL)dhtmlWroteData;
 
-- (void)setHasBorder:(BOOL)hasBorder;
-
 - (void)print;
 
 - (jobject)getAppletInView:(NSView*)view;
