@@ -65,6 +65,10 @@ static Color borderEndEdgeColor() {
   return Color::black;
 }
 
+static Color borderFillColor() {
+  return Color(208, 208, 208);
+}
+
 void RenderFrameSet::paintColumnBorder(const PaintInfo& paintInfo,
                                        const IntRect& borderRect) {
   if (!paintInfo.rect.intersects(borderRect))
@@ -77,7 +81,7 @@ void RenderFrameSet::paintColumnBorder(const PaintInfo& paintInfo,
   GraphicsContext* context = paintInfo.context;
   context->fillRect(borderRect, frameSet()->hasBorderColor()
                                     ? style()->borderLeftColor()
-                                    : Color::white);
+                                    : borderFillColor());
 
   // Now stroke the edges but only if we have enough room to paint both edges
   // with a little
@@ -103,7 +107,7 @@ void RenderFrameSet::paintRowBorder(const PaintInfo& paintInfo,
   GraphicsContext* context = paintInfo.context;
   context->fillRect(borderRect, frameSet()->hasBorderColor()
                                     ? style()->borderLeftColor()
-                                    : Color::white);
+                                    : borderFillColor());
 
   // Now stroke the edges but only if we have enough room to paint both edges
   // with a little
