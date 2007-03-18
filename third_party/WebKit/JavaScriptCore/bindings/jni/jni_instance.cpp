@@ -70,6 +70,8 @@ Class* JavaInstance::getClass() const {
 }
 
 JSValue* JavaInstance::stringValue() const {
+  JSLock lock;
+
   jstring stringValue = (jstring)callJNIObjectMethod(
       _instance->_instance, "toString", "()Ljava/lang/String;");
   JNIEnv* env = getJNIEnv();

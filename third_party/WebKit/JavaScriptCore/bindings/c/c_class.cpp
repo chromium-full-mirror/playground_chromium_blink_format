@@ -28,11 +28,8 @@
 
 #include "c_instance.h"
 #include "c_runtime.h"
-#include "npruntime_impl.h"
 #include "identifier.h"
-
-// FIXME: Should use HashMap instead of CFDictionary for better performance and
-// for portability.
+#include "npruntime_impl.h"
 
 namespace KJS {
 namespace Bindings {
@@ -42,8 +39,13 @@ CClass::CClass(NPClass* aClass) {
 }
 
 CClass::~CClass() {
+  JSLock lock;
+
   deleteAllValues(_methods);
+  _methods.clear();
+
   deleteAllValues(_fields);
+  _fields.clear();
 }
 
 typedef HashMap<NPClass*, CClass*> ClassesByIsAMap;
@@ -81,7 +83,10 @@ MethodList CClass::methodsNamed(const Identifier& identifier,
   NPObject* obj = inst->getObject();
   if (_isa->hasMethod && _isa->hasMethod(obj, ident)) {
     Method* aMethod = new CMethod(ident);  // deleted in the CClass destructor
-    _methods.set(identifier.ustring().rep(), aMethod);
+    {
+      JSLock lock;
+      _methods.set(identifier.ustring().rep(), aMethod);
+    }
     methodList.addMethod(aMethod);
   }
 
@@ -99,9 +104,12 @@ Field* CClass::fieldNamed(const Identifier& identifier,
   NPObject* obj = inst->getObject();
   if (_isa->hasProperty && _isa->hasProperty(obj, ident)) {
     aField = new CField(ident);  // deleted in the CClass destructor
-    _fields.set(identifier.ustring().rep(), aField);
+    {
+      JSLock lock;
+      _fields.set(identifier.ustring().rep(), aField);
+    }
   }
   return aField;
 }
 }
-}
+}  // namespace KJS::Bindings

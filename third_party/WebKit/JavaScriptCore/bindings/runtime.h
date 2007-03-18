@@ -94,7 +94,7 @@ class MethodList {
   unsigned int _length;
 };
 
-class Method {
+class Method : Noncopyable {
  public:
   virtual const char* name() const = 0;
 

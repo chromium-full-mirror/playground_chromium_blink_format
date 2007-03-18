@@ -100,20 +100,11 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
 }
 
 // Variant value must be released with NPReleaseVariantValue()
-void coerceValueToNPVariantStringType(ExecState* exec,
-                                      JSValue* value,
-                                      NPVariant* result) {
-  UString ustring = value->toString(exec);
-  CString cstring = ustring.UTF8String();
-  NPString string = {(const NPUTF8*)cstring.c_str(),
-                     static_cast<uint32_t>(cstring.size())};
-  NPN_InitializeVariantWithStringCopy(result, &string);
-}
-
-// Variant value must be released with NPReleaseVariantValue()
 void convertValueToNPVariant(ExecState* exec,
                              JSValue* value,
                              NPVariant* result) {
+  JSLock lock;
+
   JSType type = value->type();
 
   VOID_TO_NPVARIANT(*result);
@@ -163,6 +154,8 @@ void convertValueToNPVariant(ExecState* exec,
 }
 
 JSValue* convertNPVariantToValue(ExecState*, const NPVariant* variant) {
+  JSLock lock;
+
   NPVariantType type = variant->type;
 
   if (type == NPVariantType_Bool)
