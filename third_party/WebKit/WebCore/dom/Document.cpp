@@ -1437,6 +1437,14 @@ void Document::implicitClose() {
     if (view() && renderer() &&
         (!renderer()->firstChild() || renderer()->needsLayout()))
       view()->layout();
+
+    // Paint immediately after the document is ready.  We do this to ensure that
+    // any timers set by the
+    // onload don't have a chance to fire before we would have painted.  To
+    // avoid over-flushing we only
+    // worry about this for the top-level document.
+    if (view() && !ownerElement())
+      view()->update();
   }
 
 #if PLATFORM(MAC)
