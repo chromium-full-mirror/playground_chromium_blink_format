@@ -53,6 +53,11 @@ bool HTMLIFrameElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
+  if (attrName == frameborderAttr) {
+    result = eReplaced;
+    return false;
+  }
+
   return HTMLFrameElementBase::mapToEntry(attrName, result);
 }
 
@@ -71,6 +76,13 @@ void HTMLIFrameElement::parseMappedAttribute(MappedAttribute* attr) {
       doc->addDocExtraNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
+  } else if (attr->name() == frameborderAttr) {
+    // Frame border doesn't really match the HTML4 spec definition for iframes.
+    // It simply adds
+    // a presentational hint that the border should be off if set to zero.
+    if (!attr->isNull() && !attr->value().toInt())
+      // Add a rule that nulls out our border width.
+      addCSSLength(attr, CSS_PROP_BORDER_WIDTH, "0");
   } else
     HTMLFrameElementBase::parseMappedAttribute(attr);
 }
