@@ -765,6 +765,7 @@ static const char* dotExprDoesNotAllowCallsString() {
 // ECMA 11.2.3
 JSValue* FunctionCallDotNode::evaluate(ExecState* exec) {
   JSValue* baseVal = base->evaluate(exec);
+  KJS_CHECKEXCEPTIONVALUE
 
   JSObject* baseObj = baseVal->toObject(exec);
   PropertySlot slot;
