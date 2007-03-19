@@ -1309,10 +1309,10 @@ Frame* Frame::frameForWidget(const Widget* widget) {
   return static_cast<const FrameView*>(widget)->frame();
 }
 
-void Frame::forceLayout() {
+void Frame::forceLayout(bool allowSubtree) {
   FrameView* v = d->m_view.get();
   if (v) {
-    v->layout(false);
+    v->layout(allowSubtree);
     // We cannot unschedule a pending relayout, since the force can be called
     // with
     // a tiny rectangle from a drawRect update.  By unscheduling we in effect

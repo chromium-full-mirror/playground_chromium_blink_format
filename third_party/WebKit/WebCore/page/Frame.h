@@ -225,7 +225,7 @@ class Frame : public Shared<Frame> {
                         float oldBottom,
                         float bottomLimit);
 
-  void forceLayout();
+  void forceLayout(bool allowSubtree = false);
   void forceLayoutWithPageWidthRange(float minPageWidth, float maxPageWidth);
 
   void sendResizeEvent();
