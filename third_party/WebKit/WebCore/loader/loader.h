@@ -63,6 +63,7 @@ class Loader : private SubresourceLoaderClient {
   virtual void didReceiveData(SubresourceLoader*, const char*, int);
   virtual void didFinishLoading(SubresourceLoader*);
   virtual void didFail(SubresourceLoader*, const ResourceError&);
+  void didFail(SubresourceLoader*, bool cancelled = false);
 
   void servePendingRequests(bool skipCanLoadCheck = false);
 
