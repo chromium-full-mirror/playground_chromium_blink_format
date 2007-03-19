@@ -195,8 +195,6 @@ inline JSValue* jsNumber(double d) {
 
 inline JSValue::JSValue() {}
 
-inline JSValue::~JSValue() {}
-
 inline JSCell::JSCell() : m_collectOnMainThreadOnly(false), m_marked(false) {}
 
 inline JSCell::~JSCell() {}
