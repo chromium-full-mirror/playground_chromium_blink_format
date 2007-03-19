@@ -52,15 +52,15 @@ ObjectPrototype::ObjectPrototype(ExecState* exec, FunctionPrototype* funcProto)
 
   putDirectFunction(
       new ObjectProtoFunc(exec, funcProto, ObjectProtoFunc::ToString, 0,
-                          toStringPropertyName),
+                          exec->propertyNames().toString),
       DontEnum);
   putDirectFunction(
       new ObjectProtoFunc(exec, funcProto, ObjectProtoFunc::ToLocaleString, 0,
-                          toLocaleStringPropertyName),
+                          exec->propertyNames().toLocaleString),
       DontEnum);
   putDirectFunction(
       new ObjectProtoFunc(exec, funcProto, ObjectProtoFunc::ValueOf, 0,
-                          valueOfPropertyName),
+                          exec->propertyNames().valueOf),
       DontEnum);
   putDirectFunction(
       new ObjectProtoFunc(exec, funcProto, ObjectProtoFunc::HasOwnProperty, 1,
@@ -97,13 +97,14 @@ ObjectPrototype::ObjectPrototype(ExecState* exec, FunctionPrototype* funcProto)
 // ------------------------------ ObjectProtoFunc
 // --------------------------------
 
-ObjectProtoFunc::ObjectProtoFunc(ExecState*,
+ObjectProtoFunc::ObjectProtoFunc(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  int i,
                                  int len,
                                  const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 // ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5, 15.2.4.7
@@ -198,15 +199,17 @@ JSValue* ObjectProtoFunc::callAsFunction(ExecState* exec,
 // ------------------------------ ObjectObjectImp
 // --------------------------------
 
-ObjectObjectImp::ObjectObjectImp(ExecState*,
+ObjectObjectImp::ObjectObjectImp(ExecState* exec,
                                  ObjectPrototype* objProto,
                                  FunctionPrototype* funcProto)
     : InternalFunctionImp(funcProto) {
   // ECMA 15.2.3.1
-  putDirect(prototypePropertyName, objProto, DontEnum | DontDelete | ReadOnly);
+  putDirect(exec->propertyNames().prototype, objProto,
+            DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 bool ObjectObjectImp::implementsConstruct() const {

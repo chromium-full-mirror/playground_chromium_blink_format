@@ -47,19 +47,21 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
     : JSObject(objectProto) {
   // The constructor will be added later in ErrorObjectImp's constructor
 
-  put(exec, namePropertyName, jsString("Error"), DontEnum);
-  put(exec, messagePropertyName, jsString("Unknown error"), DontEnum);
-  putDirectFunction(new ErrorProtoFunc(exec, funcProto, toStringPropertyName),
-                    DontEnum);
+  put(exec, exec->propertyNames().name, jsString("Error"), DontEnum);
+  put(exec, exec->propertyNames().message, jsString("Unknown error"), DontEnum);
+  putDirectFunction(
+      new ErrorProtoFunc(exec, funcProto, exec->propertyNames().toString),
+      DontEnum);
 }
 
 // ------------------------------ ErrorProtoFunc ----------------------------
 
-ErrorProtoFunc::ErrorProtoFunc(ExecState*,
+ErrorProtoFunc::ErrorProtoFunc(ExecState* exec,
                                FunctionPrototype* funcProto,
                                const Identifier& name)
     : InternalFunctionImp(funcProto, name) {
-  putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(0),
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
@@ -68,12 +70,12 @@ JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
   // toString()
   UString s = "Error";
 
-  JSValue* v = thisObj->get(exec, namePropertyName);
+  JSValue* v = thisObj->get(exec, exec->propertyNames().name);
   if (!v->isUndefined()) {
     s = v->toString(exec);
   }
 
-  v = thisObj->get(exec, messagePropertyName);
+  v = thisObj->get(exec, exec->propertyNames().message);
   if (!v->isUndefined()) {
     s += ": " + v->toString(exec);  // Mozilla compatible format
   }
@@ -83,14 +85,15 @@ JSValue* ErrorProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ ErrorObjectImp -------------------------------
 
-ErrorObjectImp::ErrorObjectImp(ExecState*,
+ErrorObjectImp::ErrorObjectImp(ExecState* exec,
                                FunctionPrototype* funcProto,
                                ErrorPrototype* errorProto)
     : InternalFunctionImp(funcProto) {
   // ECMA 15.11.3.1 Error.prototype
-  putDirect(prototypePropertyName, errorProto,
+  putDirect(exec->propertyNames().prototype, errorProto,
             DontEnum | DontDelete | ReadOnly);
-  putDirect(lengthPropertyName, jsNumber(1), DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            DontDelete | ReadOnly | DontEnum);
   // putDirect(namePropertyName, jsString(n));
 }
 
@@ -106,7 +109,8 @@ JSObject* ErrorObjectImp::construct(ExecState* exec, const List& args) {
   JSObject* obj(imp);
 
   if (!args[0]->isUndefined())
-    imp->putDirect(messagePropertyName, jsString(args[0]->toString(exec)));
+    imp->putDirect(exec->propertyNames().message,
+                   jsString(args[0]->toString(exec)));
 
   return obj;
 }
@@ -121,15 +125,15 @@ JSValue* ErrorObjectImp::callAsFunction(ExecState* exec,
 
 // ------------------------------ NativeErrorPrototype ----------------------
 
-NativeErrorPrototype::NativeErrorPrototype(ExecState*,
+NativeErrorPrototype::NativeErrorPrototype(ExecState* exec,
                                            ErrorPrototype* errorProto,
                                            ErrorType et,
                                            UString name,
                                            UString message)
     : JSObject(errorProto) {
   errType = et;
-  putDirect(namePropertyName, jsString(name), 0);
-  putDirect(messagePropertyName, jsString(message), 0);
+  putDirect(exec->propertyNames().name, jsString(name), 0);
+  putDirect(exec->propertyNames().message, jsString(message), 0);
 }
 
 // ------------------------------ NativeErrorImp -------------------------------
@@ -137,13 +141,14 @@ NativeErrorPrototype::NativeErrorPrototype(ExecState*,
 const ClassInfo NativeErrorImp::info = {"Function", &InternalFunctionImp::info,
                                         0, 0};
 
-NativeErrorImp::NativeErrorImp(ExecState*,
+NativeErrorImp::NativeErrorImp(ExecState* exec,
                                FunctionPrototype* funcProto,
                                JSObject* prot)
     : InternalFunctionImp(funcProto), proto(prot) {
-  putDirect(lengthPropertyName, jsNumber(1),
+  putDirect(exec->propertyNames().length, jsNumber(1),
             DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
-  putDirect(prototypePropertyName, proto, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().prototype, proto,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 bool NativeErrorImp::implementsConstruct() const {
@@ -154,12 +159,13 @@ JSObject* NativeErrorImp::construct(ExecState* exec, const List& args) {
   JSObject* imp = new ErrorInstance(proto);
   JSObject* obj(imp);
   if (!args[0]->isUndefined())
-    imp->putDirect(messagePropertyName, jsString(args[0]->toString(exec)));
+    imp->putDirect(exec->propertyNames().message,
+                   jsString(args[0]->toString(exec)));
   return obj;
 }
 
 JSValue* NativeErrorImp::callAsFunction(ExecState* exec,
-                                        JSObject* /*thisObj*/,
+                                        JSObject*,
                                         const List& args) {
   return construct(exec, args);
 }

@@ -59,19 +59,20 @@ RegExpPrototype::RegExpPrototype(ExecState* exec,
                     DontEnum);
   putDirectFunction(
       new RegExpProtoFunc(exec, funcProto, RegExpProtoFunc::ToString, 0,
-                          toStringPropertyName),
+                          exec->propertyNames().toString),
       DontEnum);
 }
 
 // ------------------------------ RegExpProtoFunc ---------------------------
 
-RegExpProtoFunc::RegExpProtoFunc(ExecState*,
+RegExpProtoFunc::RegExpProtoFunc(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  int i,
                                  int len,
                                  const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* RegExpProtoFunc::callAsFunction(ExecState* exec,
@@ -191,7 +192,7 @@ const ClassInfo RegExpObjectImp::info = {"Function", &InternalFunctionImp::info,
 @end
 */
 
-RegExpObjectImp::RegExpObjectImp(ExecState*,
+RegExpObjectImp::RegExpObjectImp(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  RegExpPrototype* regProto)
 
@@ -200,10 +201,12 @@ RegExpObjectImp::RegExpObjectImp(ExecState*,
       lastNumSubPatterns(0),
       multiline(false) {
   // ECMA 15.10.5.1 RegExp.prototype
-  putDirect(prototypePropertyName, regProto, DontEnum | DontDelete | ReadOnly);
+  putDirect(exec->propertyNames().prototype, regProto,
+            DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(2), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(2),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 /*

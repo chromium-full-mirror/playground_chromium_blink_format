@@ -80,7 +80,7 @@ JSHTMLInputElementBaseFunction::JSHTMLInputElementBaseFunction(
               exec->lexicalInterpreter()->builtinFunctionPrototype()),
           name),
       m_id(i) {
-  put(exec, lengthPropertyName, jsNumber(len),
+  put(exec, exec->propertyNames().length, jsNumber(len),
       DontDelete | ReadOnly | DontEnum);
 }
 

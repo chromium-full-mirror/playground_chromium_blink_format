@@ -204,8 +204,7 @@ void JSObject::put(ExecState* exec,
   assert(value);
 
   // non-standard netscape extension
-  if (propertyName ==
-      exec->dynamicInterpreter()->specialPrototypeIdentifier()) {
+  if (propertyName == exec->propertyNames().underscoreProto) {
     setPrototype(value);
     return;
   }
@@ -356,11 +355,11 @@ JSValue* JSObject::defaultValue(ExecState* exec, JSType hint) const {
   if ((hint == StringType) ||
       (hint != StringType) && (hint != NumberType) &&
           (_proto == exec->lexicalInterpreter()->builtinDatePrototype())) {
-    firstPropertyName = toStringPropertyName;
-    secondPropertyName = valueOfPropertyName;
+    firstPropertyName = exec->propertyNames().toString;
+    secondPropertyName = exec->propertyNames().valueOf;
   } else {
-    firstPropertyName = valueOfPropertyName;
-    secondPropertyName = toStringPropertyName;
+    firstPropertyName = exec->propertyNames().valueOf;
+    secondPropertyName = exec->propertyNames().toString;
   }
 
   JSValue* v;
@@ -453,7 +452,7 @@ bool JSObject::implementsHasInstance() const {
 }
 
 bool JSObject::hasInstance(ExecState* exec, JSValue* value) {
-  JSValue* proto = get(exec, prototypePropertyName);
+  JSValue* proto = get(exec, exec->propertyNames().prototype);
   if (!proto->isObject()) {
     throwError(
         exec, TypeError,

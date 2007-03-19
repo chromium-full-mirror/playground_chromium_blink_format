@@ -26,6 +26,7 @@
 #define KJS_OBJECT_H
 
 #include "JSType.h"
+#include "CommonIdentifiers.h"
 #include "interpreter.h"
 #include "property_map.h"
 #include "property_slot.h"
@@ -611,8 +612,7 @@ ALWAYS_INLINE bool JSObject::getOwnPropertySlot(ExecState* exec,
   }
 
   // non-standard Netscape extension
-  if (propertyName ==
-      exec->dynamicInterpreter()->specialPrototypeIdentifier()) {
+  if (propertyName == exec->propertyNames().underscoreProto) {
     slot.setValueSlot(this, &_proto);
     return true;
   }

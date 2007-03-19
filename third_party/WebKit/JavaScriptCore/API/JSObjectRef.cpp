@@ -104,7 +104,7 @@ JSObjectRef JSObjectMakeConstructor(
 
   JSObject* constructor =
       new JSCallbackConstructor(exec, jsClass, callAsConstructor);
-  constructor->put(exec, prototypePropertyName, jsPrototype,
+  constructor->put(exec, exec->propertyNames().prototype, jsPrototype,
                    DontEnum | DontDelete | ReadOnly);
   return toRef(constructor);
 }

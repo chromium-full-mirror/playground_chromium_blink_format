@@ -469,7 +469,8 @@ DateProtoFunc::DateProtoFunc(ExecState* exec,
       utc(i < 0)
 // We use a negative ID to denote the "UTC" variant.
 {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
@@ -631,7 +632,8 @@ DateObjectImp::DateObjectImp(ExecState* exec,
   static const Identifier* parsePropertyName = new Identifier("parse");
   static const Identifier* UTCPropertyName = new Identifier("UTC");
 
-  putDirect(prototypePropertyName, dateProto, DontEnum | DontDelete | ReadOnly);
+  putDirect(exec->propertyNames().prototype, dateProto,
+            DontEnum | DontDelete | ReadOnly);
   putDirectFunction(
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::Parse, 1,
                             *parsePropertyName),
@@ -640,7 +642,7 @@ DateObjectImp::DateObjectImp(ExecState* exec,
       new DateObjectFuncImp(exec, funcProto, DateObjectFuncImp::UTC, 7,
                             *UTCPropertyName),
       DontEnum);
-  putDirect(lengthPropertyName, 7, ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, 7, ReadOnly | DontDelete | DontEnum);
 }
 
 bool DateObjectImp::implementsConstruct() const {
@@ -706,13 +708,14 @@ JSValue* DateObjectImp::callAsFunction(ExecState* /*exec*/,
 
 // ------------------------------ DateObjectFuncImp ----------------------------
 
-DateObjectFuncImp::DateObjectFuncImp(ExecState*,
+DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      int i,
                                      int len,
                                      const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 // ECMA 15.9.4.2 - 3

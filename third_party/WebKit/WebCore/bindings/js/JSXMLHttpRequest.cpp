@@ -66,7 +66,8 @@ JSXMLHttpRequestConstructorImp::JSXMLHttpRequestConstructorImp(ExecState* exec,
                                                                Document* d)
     : doc(d) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
-  putDirect(prototypePropertyName, JSXMLHttpRequestPrototype::self(exec), None);
+  putDirect(exec->propertyNames().prototype,
+            JSXMLHttpRequestPrototype::self(exec), None);
 }
 
 bool JSXMLHttpRequestConstructorImp::implementsConstruct() const {

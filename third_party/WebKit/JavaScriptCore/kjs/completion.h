@@ -25,7 +25,7 @@
 #ifndef _KJS_COMPLETION_H_
 #define _KJS_COMPLETION_H_
 
-#include "identifier.h"
+#include "CommonIdentifiers.h"
 #include "value.h"
 
 namespace KJS {
@@ -49,7 +49,7 @@ class Completion {
  public:
   Completion(ComplType c = Normal,
              JSValue* v = NULL,
-             const Identifier& t = Identifier::null())
+             const Identifier& t = CommonIdentifiers::shared()->nullIdentifier)
       : comp(c), val(v), tar(t) {}
 
   ComplType complType() const { return comp; }

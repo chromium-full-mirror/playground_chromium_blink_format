@@ -47,24 +47,25 @@ BooleanPrototype::BooleanPrototype(ExecState* exec,
 
   putDirectFunction(
       new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ToString, 0,
-                           toStringPropertyName),
+                           exec->propertyNames().toString),
       DontEnum);
   putDirectFunction(
       new BooleanProtoFunc(exec, funcProto, BooleanProtoFunc::ValueOf, 0,
-                           valueOfPropertyName),
+                           exec->propertyNames().valueOf),
       DontEnum);
   setInternalValue(jsBoolean(false));
 }
 
 // ------------------------------ BooleanProtoFunc --------------------------
 
-BooleanProtoFunc::BooleanProtoFunc(ExecState*,
+BooleanProtoFunc::BooleanProtoFunc(ExecState* exec,
                                    FunctionPrototype* funcProto,
                                    int i,
                                    int len,
                                    const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 // ECMA 15.6.4.2 + 15.6.4.3
@@ -87,15 +88,16 @@ JSValue* BooleanProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ BooleanObjectImp -----------------------------
 
-BooleanObjectImp::BooleanObjectImp(ExecState*,
+BooleanObjectImp::BooleanObjectImp(ExecState* exec,
                                    FunctionPrototype* funcProto,
                                    BooleanPrototype* booleanProto)
     : InternalFunctionImp(funcProto) {
-  putDirect(prototypePropertyName, booleanProto,
+  putDirect(exec->propertyNames().prototype, booleanProto,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 bool BooleanObjectImp::implementsConstruct() const {

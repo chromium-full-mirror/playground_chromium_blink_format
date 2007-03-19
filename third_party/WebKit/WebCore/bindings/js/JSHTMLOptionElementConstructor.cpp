@@ -33,7 +33,8 @@ JSHTMLOptionElementConstructor::JSHTMLOptionElementConstructor(ExecState* exec,
                                                                Document* d)
     : m_doc(d) {
   setPrototype(exec->lexicalInterpreter()->builtinObjectPrototype());
-  put(exec, lengthPropertyName, jsNumber(4), ReadOnly | DontDelete | DontEnum);
+  put(exec, exec->propertyNames().length, jsNumber(4),
+      ReadOnly | DontDelete | DontEnum);
 }
 
 bool JSHTMLOptionElementConstructor::implementsConstruct() const {

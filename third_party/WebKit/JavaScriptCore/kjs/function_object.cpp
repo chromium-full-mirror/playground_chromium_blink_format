@@ -43,10 +43,11 @@ FunctionPrototype::FunctionPrototype(ExecState* exec) {
   static const Identifier* applyPropertyName = new Identifier("apply");
   static const Identifier* callPropertyName = new Identifier("call");
 
-  putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(0),
+            DontDelete | ReadOnly | DontEnum);
   putDirectFunction(
       new FunctionProtoFunc(exec, this, FunctionProtoFunc::ToString, 0,
-                            toStringPropertyName),
+                            exec->propertyNames().toString),
       DontEnum);
   putDirectFunction(new FunctionProtoFunc(exec, this, FunctionProtoFunc::Apply,
                                           2, *applyPropertyName),
@@ -67,13 +68,14 @@ JSValue* FunctionPrototype::callAsFunction(ExecState*,
 
 // ------------------------------ FunctionProtoFunc -------------------------
 
-FunctionProtoFunc::FunctionProtoFunc(ExecState*,
+FunctionProtoFunc::FunctionProtoFunc(ExecState* exec,
                                      FunctionPrototype* funcProto,
                                      int i,
                                      int len,
                                      const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
@@ -129,7 +131,8 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
              static_cast<JSObject*>(argArray)->inherits(&Arguments::info))) {
           JSObject* argArrayObj = static_cast<JSObject*>(argArray);
           unsigned int length =
-              argArrayObj->get(exec, lengthPropertyName)->toUInt32(exec);
+              argArrayObj->get(exec, exec->propertyNames().length)
+                  ->toUInt32(exec);
           for (unsigned int i = 0; i < length; i++)
             applyArgs.append(argArrayObj->get(exec, i));
         } else
@@ -159,12 +162,15 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ FunctionObjectImp ----------------------------
 
-FunctionObjectImp::FunctionObjectImp(ExecState*, FunctionPrototype* funcProto)
+FunctionObjectImp::FunctionObjectImp(ExecState* exec,
+                                     FunctionPrototype* funcProto)
     : InternalFunctionImp(funcProto) {
-  putDirect(prototypePropertyName, funcProto, DontEnum | DontDelete | ReadOnly);
+  putDirect(exec->propertyNames().prototype, funcProto,
+            DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 FunctionObjectImp::~FunctionObjectImp() {}
@@ -260,9 +266,10 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
 
   JSObject* objCons = exec->lexicalInterpreter()->builtinObject();
   JSObject* prototype = objCons->construct(exec, List::empty());
-  prototype->put(exec, constructorPropertyName, fimp,
+  prototype->put(exec, exec->propertyNames().constructor, fimp,
                  DontEnum | DontDelete | ReadOnly);
-  fimp->put(exec, prototypePropertyName, prototype, Internal | DontDelete);
+  fimp->put(exec, exec->propertyNames().prototype, prototype,
+            Internal | DontDelete);
   return fimp;
 }
 

@@ -394,7 +394,7 @@ inline JSObject* cacheGlobalObject(ExecState* exec,
                   exec->lexicalInterpreter()->builtinFunctionPrototype()), \
               name),                                                       \
           id(i) {                                                          \
-      put(exec, lengthPropertyName, jsNumber(len),                         \
+      put(exec, exec->propertyNames().length, jsNumber(len),               \
           DontDelete | ReadOnly | DontEnum);                               \
     }                                                                      \
     /* Macro user needs to implement the callAsFunction function. */       \

@@ -52,39 +52,40 @@ NumberPrototype::NumberPrototype(ExecState* exec,
 
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ToString, 1,
-                          toStringPropertyName),
+                          exec->propertyNames().toString),
       DontEnum);
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ToLocaleString, 0,
-                          toLocaleStringPropertyName),
+                          exec->propertyNames().toLocaleString),
       DontEnum);
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ValueOf, 0,
-                          valueOfPropertyName),
+                          exec->propertyNames().valueOf),
       DontEnum);
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ToFixed, 1,
-                          toFixedPropertyName),
+                          exec->propertyNames().toFixed),
       DontEnum);
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ToExponential, 1,
-                          toExponentialPropertyName),
+                          exec->propertyNames().toExponential),
       DontEnum);
   putDirectFunction(
       new NumberProtoFunc(exec, funcProto, NumberProtoFunc::ToPrecision, 1,
-                          toPrecisionPropertyName),
+                          exec->propertyNames().toPrecision),
       DontEnum);
 }
 
 // ------------------------------ NumberProtoFunc ---------------------------
 
-NumberProtoFunc::NumberProtoFunc(ExecState*,
+NumberProtoFunc::NumberProtoFunc(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  int i,
                                  int len,
                                  const Identifier& name)
     : InternalFunctionImp(funcProto, name), id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 static UString integer_part_noexp(double d) {
@@ -432,16 +433,17 @@ DontEnum|DontDelete|ReadOnly
   MIN_VALUE             NumberObjectImp::MinValue DontEnum|DontDelete|ReadOnly
 @end
 */
-NumberObjectImp::NumberObjectImp(ExecState*,
+NumberObjectImp::NumberObjectImp(ExecState* exec,
                                  FunctionPrototype* funcProto,
                                  NumberPrototype* numberProto)
     : InternalFunctionImp(funcProto) {
   // Number.Prototype
-  putDirect(prototypePropertyName, numberProto,
+  putDirect(exec->propertyNames().prototype, numberProto,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 bool NumberObjectImp::getOwnPropertySlot(ExecState* exec,

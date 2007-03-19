@@ -1245,7 +1245,7 @@ HTMLElementFunction::HTMLElementFunction(ExecState* exec,
               exec->lexicalInterpreter()->builtinFunctionPrototype()),
           name),
       id(i) {
-  put(exec, lengthPropertyName, jsNumber(len),
+  put(exec, exec->propertyNames().length, jsNumber(len),
       DontDelete | ReadOnly | DontEnum);
 }
 
@@ -1941,7 +1941,7 @@ JSValue* JSHTMLCollection::nameGetter(ExecState* exec,
 bool JSHTMLCollection::getOwnPropertySlot(ExecState* exec,
                                           const Identifier& propertyName,
                                           PropertySlot& slot) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
   } else {

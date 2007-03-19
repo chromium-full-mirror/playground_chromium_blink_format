@@ -61,7 +61,7 @@ JSValue* RuntimeArray::indexGetter(ExecState* exec,
 bool RuntimeArray::getOwnPropertySlot(ExecState* exec,
                                       const Identifier& propertyName,
                                       PropertySlot& slot) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
   }
@@ -93,7 +93,7 @@ void RuntimeArray::put(ExecState* exec,
                        const Identifier& propertyName,
                        JSValue* value,
                        int attr) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     throwError(exec, RangeError);
     return;
   }

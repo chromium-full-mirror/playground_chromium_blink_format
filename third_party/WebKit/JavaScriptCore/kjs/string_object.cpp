@@ -78,7 +78,7 @@ JSValue* StringInstance::indexGetter(ExecState* exec,
 bool StringInstance::getOwnPropertySlot(ExecState* exec,
                                         const Identifier& propertyName,
                                         PropertySlot& slot) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
   }
@@ -101,14 +101,14 @@ void StringInstance::put(ExecState* exec,
                          const Identifier& propertyName,
                          JSValue* value,
                          int attr) {
-  if (propertyName == lengthPropertyName)
+  if (propertyName == exec->propertyNames().length)
     return;
   JSObject::put(exec, propertyName, value, attr);
 }
 
 bool StringInstance::deleteProperty(ExecState* exec,
                                     const Identifier& propertyName) {
-  if (propertyName == lengthPropertyName)
+  if (propertyName == exec->propertyNames().length)
     return false;
   return JSObject::deleteProperty(exec, propertyName);
 }
@@ -165,10 +165,11 @@ const ClassInfo StringPrototype::info = {"String", &StringInstance::info,
 @end
 */
 // ECMA 15.5.4
-StringPrototype::StringPrototype(ExecState*, ObjectPrototype* objProto)
+StringPrototype::StringPrototype(ExecState* exec, ObjectPrototype* objProto)
     : StringInstance(objProto) {
   // The constructor will be added later, after StringObjectImp has been built
-  putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(0),
+            DontDelete | ReadOnly | DontEnum);
 }
 
 bool StringPrototype::getOwnPropertySlot(ExecState* exec,
@@ -189,7 +190,8 @@ StringProtoFunc::StringProtoFunc(ExecState* exec,
               exec->lexicalInterpreter()->builtinFunctionPrototype()),
           name),
       id(i) {
-  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, len,
+            DontDelete | ReadOnly | DontEnum);
 }
 
 static inline void expandSourceRanges(UString::Range*& array,
@@ -646,7 +648,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
         RegExp* reg = static_cast<RegExpImp*>(a0)->regExp();
         if (u.isEmpty() && !reg->match(u, 0).isNull()) {
           // empty string matched by regexp -> empty array
-          res->put(exec, lengthPropertyName, jsNumber(0));
+          res->put(exec, exec->propertyNames().length, jsNumber(0));
           break;
         }
         pos = 0;
@@ -671,7 +673,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
         if (u2.isEmpty()) {
           if (u.isEmpty()) {
             // empty separator matches empty string -> empty array
-            put(exec, lengthPropertyName, jsNumber(0));
+            put(exec, exec->propertyNames().length, jsNumber(0));
             break;
           } else {
             while (static_cast<uint32_t>(i) != limit && i < u.size() - 1)
@@ -689,7 +691,7 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       // add remaining string, if any
       if (static_cast<uint32_t>(i) != limit)
         res->put(exec, i++, jsString(u.substr(p0)));
-      res->put(exec, lengthPropertyName, jsNumber(i));
+      res->put(exec, exec->propertyNames().length, jsNumber(i));
     } break;
     case Substr: {
       double d = a0->toInteger(exec);
@@ -833,15 +835,16 @@ StringObjectImp::StringObjectImp(ExecState* exec,
                                  StringPrototype* stringProto)
     : InternalFunctionImp(funcProto) {
   // ECMA 15.5.3.1 String.prototype
-  putDirect(prototypePropertyName, stringProto,
+  putDirect(exec->propertyNames().prototype, stringProto,
             DontEnum | DontDelete | ReadOnly);
 
-  putDirectFunction(
-      new StringObjectFuncImp(exec, funcProto, fromCharCodePropertyName),
-      DontEnum);
+  putDirectFunction(new StringObjectFuncImp(exec, funcProto,
+                                            exec->propertyNames().fromCharCode),
+                    DontEnum);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 bool StringObjectImp::implementsConstruct() const {
@@ -871,11 +874,12 @@ JSValue* StringObjectImp::callAsFunction(ExecState* exec,
 // ------------------------------ StringObjectFuncImp --------------------------
 
 // ECMA 15.5.3.2 fromCharCode()
-StringObjectFuncImp::StringObjectFuncImp(ExecState*,
+StringObjectFuncImp::StringObjectFuncImp(ExecState* exec,
                                          FunctionPrototype* funcProto,
                                          const Identifier& name)
     : InternalFunctionImp(funcProto, name) {
-  putDirect(lengthPropertyName, jsNumber(1), DontDelete | ReadOnly | DontEnum);
+  putDirect(exec->propertyNames().length, jsNumber(1),
+            DontDelete | ReadOnly | DontEnum);
 }
 
 JSValue* StringObjectFuncImp::callAsFunction(ExecState* exec,

@@ -889,7 +889,7 @@ JSValue* DOMNamedNodeMap::nameGetter(ExecState* exec,
 bool DOMNamedNodeMap::getOwnPropertySlot(ExecState* exec,
                                          const Identifier& propertyName,
                                          PropertySlot& slot) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
   } else {
@@ -1203,7 +1203,7 @@ JSValue* DOMNamedNodesCollection::indexGetter(ExecState* exec,
 bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
                                                  const Identifier& propertyName,
                                                  PropertySlot& slot) {
-  if (propertyName == lengthPropertyName) {
+  if (propertyName == exec->propertyNames().length) {
     slot.setCustom(this, lengthGetter);
     return true;
   }
