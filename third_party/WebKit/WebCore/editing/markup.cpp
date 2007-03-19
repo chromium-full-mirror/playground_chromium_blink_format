@@ -209,7 +209,7 @@ static DeprecatedString startMarkup(const Node* node,
       const Element* el = static_cast<const Element*>(node);
       markup += el->nodeNamePreservingCase().deprecatedString();
       String additionalStyle;
-      if (annotate && el->isHTMLElement()) {
+      if (el->isHTMLElement()) {
         RefPtr<CSSMutableStyleDeclaration> style =
             styleFromMatchedRulesForElement(const_cast<Element*>(el));
         if (style->length() > 0)
@@ -221,7 +221,7 @@ static DeprecatedString startMarkup(const Node* node,
       for (unsigned int i = 0; i < length; i++) {
         Attribute* attr = attrs->attributeItem(i);
         String value = attr->value();
-        if (annotate && attr->name() == styleAttr && additionalStyle.length()) {
+        if (attr->name() == styleAttr && additionalStyle.length() > 0) {
           value += "; " + additionalStyle;
           additionalStyle = "";
         }
@@ -234,7 +234,7 @@ static DeprecatedString startMarkup(const Node* node,
             "=\"" + escapeTextForMarkup(value.deprecatedString(), true) + "\"";
       }
 
-      if (annotate && additionalStyle.length())
+      if (additionalStyle.length() > 0)
         // FIXME: Handle case where additionalStyle has illegal characters in
         // it, like "
         markup += " " + styleAttr.localName().deprecatedString() + "=\"" +
