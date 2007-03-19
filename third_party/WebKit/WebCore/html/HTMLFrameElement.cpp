@@ -36,7 +36,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLFrameElement::HTMLFrameElement(Document* doc)
-    : HTMLFrameElementBase(frameTag, doc) {}
+    : HTMLFrameElementBase(frameTag, doc),
+      m_frameBorder(true),
+      m_frameBorderSet(false) {}
 
 bool HTMLFrameElement::rendererIsNeeded(RenderStyle* style) {
   // For compatibility, frames render even when display: none is set.
@@ -60,10 +62,19 @@ void HTMLFrameElement::attach() {
 
   if (HTMLFrameSetElement* frameSetElement = containingFrameSetElement(this)) {
     if (!m_frameBorderSet)
-      m_frameBorder = frameSetElement->frameBorder();
+      m_frameBorder = frameSetElement->hasFrameBorder();
     if (!m_noResize)
       m_noResize = frameSetElement->noResize();
   }
+}
+
+void HTMLFrameElement::parseMappedAttribute(MappedAttribute* attr) {
+  if (attr->name() == frameborderAttr) {
+    m_frameBorder = attr->value().toInt();
+    m_frameBorderSet = !attr->isNull();
+    // FIXME: If we are already attached, this has no effect.
+  } else
+    HTMLFrameElementBase::parseMappedAttribute(attr);
 }
 
 }  // namespace WebCore

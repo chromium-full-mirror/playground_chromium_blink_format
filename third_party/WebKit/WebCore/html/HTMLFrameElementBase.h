@@ -48,7 +48,7 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   virtual bool isURLAttribute(Attribute*) const;
 
   ScrollbarMode scrollingMode() const { return m_scrolling; }
-  bool hasFrameBorder() const { return m_frameBorder; }
+
   int getMarginWidth() const { return m_marginWidth; }
   int getMarginHeight() const { return m_marginHeight; }
 
@@ -97,8 +97,6 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   int m_marginWidth;
   int m_marginHeight;
 
-  bool m_frameBorder;
-  bool m_frameBorderSet;
   bool m_noResize;
   bool m_viewSource;
 };

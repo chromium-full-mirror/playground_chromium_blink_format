@@ -32,6 +32,31 @@ namespace WebCore {
 class HTMLFrameSetElement;
 class MouseEvent;
 
+enum FrameEdge { LeftFrameEdge, RightFrameEdge, TopFrameEdge, BottomFrameEdge };
+
+struct FrameEdgeInfo {
+  FrameEdgeInfo(bool preventResize = false, bool allowBorder = true) {
+    m_preventResize.resize(4);
+    m_preventResize.fill(preventResize);
+    m_allowBorder.resize(4);
+    m_allowBorder.fill(allowBorder);
+  }
+
+  bool preventResize(FrameEdge edge) const { return m_preventResize[edge]; }
+  bool allowBorder(FrameEdge edge) const { return m_allowBorder[edge]; }
+
+  void setPreventResize(FrameEdge edge, bool preventResize) {
+    m_preventResize[edge] = preventResize;
+  }
+  void setAllowBorder(FrameEdge edge, bool allowBorder) {
+    m_allowBorder[edge] = allowBorder;
+  }
+
+ private:
+  Vector<bool> m_preventResize;
+  Vector<bool> m_allowBorder;
+};
+
 class RenderFrameSet : public RenderContainer {
  public:
   RenderFrameSet(HTMLFrameSetElement*);
@@ -49,6 +74,8 @@ class RenderFrameSet : public RenderContainer {
                            int ty,
                            HitTestAction);
   virtual void paint(PaintInfo& paintInfo, int tx, int ty);
+
+  FrameEdgeInfo edgeInfo() const;
 
   bool userResize(MouseEvent*);
 
@@ -71,7 +98,8 @@ class RenderFrameSet : public RenderContainer {
     void resize(int);
     Vector<int> m_sizes;
     Vector<int> m_deltas;
-    Vector<bool> m_isSplitResizable;
+    Vector<bool> m_preventResize;
+    Vector<bool> m_allowBorder;
     int m_splitBeingResized;
     int m_splitResizeOffset;
   };
@@ -82,7 +110,8 @@ class RenderFrameSet : public RenderContainer {
   void setIsResizing(bool);
 
   void layOutAxis(GridAxis&, const Length*, int availableSpace);
-  void findNonResizableSplits();
+  void computeEdgeInfo();
+  void fillFromEdgeInfo(const FrameEdgeInfo& edgeInfo, int r, int c);
   void positionFrames();
 
   int splitPosition(const GridAxis&, int split) const;

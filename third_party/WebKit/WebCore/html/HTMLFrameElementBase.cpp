@@ -51,8 +51,6 @@ HTMLFrameElementBase::HTMLFrameElementBase(const QualifiedName& tagName,
       m_scrolling(ScrollbarAuto),
       m_marginWidth(-1),
       m_marginHeight(-1),
-      m_frameBorder(true),
-      m_frameBorderSet(false),
       m_noResize(false),
       m_viewSource(false) {}
 
@@ -122,10 +120,6 @@ void HTMLFrameElementBase::parseMappedAttribute(MappedAttribute* attr) {
     // frame's name.
     // FIXME: If we are already attached, this doesn't check for frame name
     // conflicts and generate a unique frame name.
-  } else if (attr->name() == frameborderAttr) {
-    m_frameBorder = attr->value().toInt();
-    m_frameBorderSet = !attr->isNull();
-    // FIXME: If we are already attached, this has no effect.
   } else if (attr->name() == marginwidthAttr) {
     m_marginWidth = attr->value().toInt();
     // FIXME: If we are already attached, this has no effect.

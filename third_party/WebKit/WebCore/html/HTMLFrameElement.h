@@ -46,6 +46,14 @@ class HTMLFrameElement : public HTMLFrameElementBase {
 
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+
+  virtual void parseMappedAttribute(MappedAttribute*);
+
+  bool hasFrameBorder() const { return m_frameBorder; }
+
+ private:
+  bool m_frameBorder;
+  bool m_frameBorderSet;
 };
 
 }  // namespace WebCore
