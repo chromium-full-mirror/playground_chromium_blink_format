@@ -183,7 +183,7 @@ void HTMLSelectElement::setSelectedIndex(int optionIndex,
 
   scrollToSelection();
 
-  // ASSERT(m_lastOnChangeIndex == -1 || m_lastOnChangeIndex == optionIndex);
+  // This only gets called with fireOnChange for menu lists.
   if (fireOnChange && usesMenuList())
     menuListOnChange();
 }
@@ -396,6 +396,8 @@ void HTMLSelectElement::selectAll() {
   if (!renderer() || !multiple())
     return;
 
+  // Save the selection so it can be compared to the new selectAll selection
+  // when we call onChange
   saveLastSelection();
 
   m_activeSelectionState = true;
@@ -563,6 +565,8 @@ void HTMLSelectElement::reset() {
 void HTMLSelectElement::dispatchFocusEvent() {
 #if !ARROW_KEYS_POP_MENU
   if (usesMenuList())
+    // Save the selection so it can be compared to the new selection when we
+    // call onChange during dispatchBlurEvent.
     saveLastSelection();
 #endif
   HTMLGenericFormElement::dispatchFocusEvent();
@@ -570,6 +574,9 @@ void HTMLSelectElement::dispatchFocusEvent() {
 
 void HTMLSelectElement::dispatchBlurEvent() {
 #if !ARROW_KEYS_POP_MENU
+  // We only need to fire onChange here for menu lists, because we fire onChange
+  // for list boxes whenever the selection change is actually made.
+  // This matches other browsers' behavior.
   if (usesMenuList())
     menuListOnChange();
 #endif
@@ -622,6 +629,10 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
          keyIdentifier == "U+000020") &&
         renderer() && usesMenuList()) {
       focus();
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange during setSelectedIndex,
+      // which gets called from RenderMenuList::valueChanged, which gets called
+      // after the user makes a selection from the menu.
       saveLastSelection();
       menuList->showPopup();
       handled = true;
@@ -651,6 +662,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
         setSelectedIndex(listToOptionIndex(listIndex));
       handled = true;
     } else if (keyIdentifier == "Enter") {
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange during setSetSelectedIndex.
       saveLastSelection();
       setSelectedIndex(listToOptionIndex(listIndex), true, true);
     }
@@ -663,6 +676,10 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
     if (menuList->popupIsVisible())
       menuList->hidePopup();
     else {
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange during setSelectedIndex,
+      // which gets called from RenderMenuList::valueChanged, which gets called
+      // after the user makes a selection from the menu.
       saveLastSelection();
       menuList->showPopup();
     }
@@ -681,6 +698,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
     int listIndex = static_cast<RenderListBox*>(renderer())
                         ->listIndexAtOffset(mEvt->offsetX(), mEvt->offsetY());
     if (listIndex >= 0) {
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange during mouseup, or after autoscroll finishes.
       saveLastSelection();
 
       m_activeSelectionState = true;
@@ -779,6 +798,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
     }
 
     if (keyIdentifier == "Down" || keyIdentifier == "Up") {
+      // Save the selection so it can be compared to the new selection when we
+      // call onChange immediately after making the new selection.
       saveLastSelection();
 
       ASSERT(endIndex >= 0 && (unsigned)endIndex < listItems().size());
@@ -848,11 +869,14 @@ void HTMLSelectElement::updateListBoxSelection(bool deselectOtherOptions) {
 }
 
 void HTMLSelectElement::menuListOnChange() {
+  ASSERT(usesMenuList());
   if (m_lastOnChangeIndex != selectedIndex())
     onChange();
 }
 
 void HTMLSelectElement::listBoxOnChange() {
+  ASSERT(!usesMenuList());
+
   const Vector<HTMLElement*>& items = listItems();
 
   // If the cached selection list is empty, or the size has changed, then fire
@@ -882,15 +906,16 @@ void HTMLSelectElement::saveLastSelection() {
 
   if (usesMenuList()) {
     m_lastOnChangeIndex = selectedIndex();
-  } else {
-    m_lastOnChangeSelection.clear();
-    for (unsigned i = 0; i < items.size(); i++) {
-      if (items[i]->hasLocalName(optionTag)) {
-        HTMLOptionElement* option = static_cast<HTMLOptionElement*>(items[i]);
-        m_lastOnChangeSelection.append(option->selected());
-      } else
-        m_lastOnChangeSelection.append(false);
-    }
+    return;
+  }
+
+  m_lastOnChangeSelection.clear();
+  for (unsigned i = 0; i < items.size(); i++) {
+    if (items[i]->hasLocalName(optionTag)) {
+      HTMLOptionElement* option = static_cast<HTMLOptionElement*>(items[i]);
+      m_lastOnChangeSelection.append(option->selected());
+    } else
+      m_lastOnChangeSelection.append(false);
   }
 }
 
