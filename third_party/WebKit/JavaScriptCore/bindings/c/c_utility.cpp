@@ -81,7 +81,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
 
   // Check to see if the conversion was successful
   // Some plugins return invalid UTF-8 in NPVariantType_String, see
-  // <http://bugzilla.opendarwin.org/show_bug.cgi?id=5163>
+  // <http://bugs.webkit.org/show_bug.cgi?id=5163>
   // There is no "bad data" for latin1. It is unlikely that the plugin was
   // really sending text in this encoding,
   // but it should have used UTF-8, and now we are simply avoiding a crash.
