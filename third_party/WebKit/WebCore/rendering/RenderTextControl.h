@@ -90,6 +90,7 @@ class RenderTextControl : public RenderBlock, private PopupMenuClient {
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,
                       float multiplier = 1.0f);
+  virtual bool isScrollable() const;
 
   VisiblePosition visiblePositionForIndex(int index);
   int indexForVisiblePosition(const VisiblePosition&);

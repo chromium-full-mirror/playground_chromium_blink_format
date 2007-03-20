@@ -3261,6 +3261,11 @@ IntRect RenderObject::absoluteOutlineBox() const {
   return box;
 }
 
+bool RenderObject::isScrollable() const {
+  RenderLayer* l = enclosingLayer();
+  return l && (l->verticalScrollbar() || l->horizontalScrollbar());
+}
+
 #if ENABLE(SVG)
 
 FloatRect RenderObject::relativeBBox(bool) const {
