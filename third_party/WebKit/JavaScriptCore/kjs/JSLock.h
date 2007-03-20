@@ -58,6 +58,7 @@ class JSLock : Noncopyable {
   static void lock();
   static void unlock();
   static int lockCount();
+  static bool currentThreadIsHoldingLock();
 
   static void registerThread();
 

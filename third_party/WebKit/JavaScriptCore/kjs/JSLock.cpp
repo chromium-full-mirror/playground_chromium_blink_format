@@ -24,6 +24,9 @@
 #include "JSLock.h"
 
 #include "collector.h"
+#if USE(MULTIPLE_THREADS)
+#include <pthread.h>
+#endif
 
 namespace KJS {
 
@@ -62,6 +65,11 @@ void JSLock::unlock() {
     pthread_setspecific(didLockJSMutex, 0);
     pthread_mutex_unlock(&JSMutex);
   }
+}
+
+bool JSLock::currentThreadIsHoldingLock() {
+  pthread_once(&createDidLockJSMutexOnce, createDidLockJSMutex);
+  return !!pthread_getspecific(didLockJSMutex);
 }
 
 void JSLock::registerThread() {
