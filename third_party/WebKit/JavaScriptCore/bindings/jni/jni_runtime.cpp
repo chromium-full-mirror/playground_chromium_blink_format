@@ -326,7 +326,8 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
 }
 
 JavaMethod::~JavaMethod() {
-  delete _signature;
+  if (_signature)
+    free(_signature);
   delete[] _parameters;
 };
 
