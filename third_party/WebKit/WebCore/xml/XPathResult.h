@@ -78,7 +78,8 @@ class XPathResult : public Shared<XPathResult> {
  private:
   XPath::Value m_value;
   unsigned m_nodeSetPosition;
-  XPath::NodeVector m_nodeSet;
+  XPath::NodeSet
+      m_nodeSet;  // FIXME: why duplicate the node set stored in m_value?
   unsigned short m_resultType;
   bool m_invalidIteratorState;
   RefPtr<EventTargetNode> m_eventTarget;

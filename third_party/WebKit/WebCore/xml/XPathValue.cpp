@@ -25,11 +25,13 @@
  */
 
 #include "config.h"
+#include "XPathValue.h"
 
 #if ENABLE(XPATH)
 
-#include "XPathValue.h"
 #include "Node.h"
+#include "XPathUtil.h"
+
 #include <wtf/MathExtras.h>
 #include <math.h>
 
@@ -38,12 +40,11 @@ namespace XPath {
 
 Value::Value() : m_type(BooleanValue), m_bool(false) {}
 
-Value::Value(Node* value) : m_type(NodeVectorValue) {
-  m_nodeVector.append(value);
+Value::Value(Node* value) : m_type(NodeSetValue) {
+  m_nodeSet.append(value);
 }
 
-Value::Value(const NodeVector& value)
-    : m_type(NodeVectorValue), m_nodeVector(value) {}
+Value::Value(const NodeSet& value) : m_type(NodeSetValue), m_nodeSet(value) {}
 
 Value::Value(bool value) : m_type(BooleanValue), m_bool(value) {}
 
@@ -57,14 +58,14 @@ Value::Value(const char* value) : m_type(StringValue), m_string(value) {}
 
 Value::Value(const String& value) : m_type(StringValue), m_string(value) {}
 
-const NodeVector& Value::toNodeVector() const {
-  return m_nodeVector;
+const NodeSet& Value::toNodeSet() const {
+  return m_nodeSet;
 }
 
 bool Value::toBoolean() const {
   switch (m_type) {
-    case NodeVectorValue:
-      return !m_nodeVector.isEmpty();
+    case NodeSetValue:
+      return !m_nodeSet.isEmpty();
     case BooleanValue:
       return m_bool;
     case NumberValue:
@@ -78,7 +79,7 @@ bool Value::toBoolean() const {
 
 double Value::toNumber() const {
   switch (m_type) {
-    case NodeVectorValue:
+    case NodeSetValue:
       return Value(toString()).toNumber();
     case NumberValue:
       return m_number;
@@ -98,10 +99,10 @@ double Value::toNumber() const {
 
 String Value::toString() const {
   switch (m_type) {
-    case NodeVectorValue:
-      if (m_nodeVector.isEmpty())
+    case NodeSetValue:
+      if (m_nodeSet.isEmpty())
         return "";
-      return stringValue(m_nodeVector[0].get());
+      return stringValue(m_nodeSet.firstNode());
     case StringValue:
       return m_string;
     case NumberValue:

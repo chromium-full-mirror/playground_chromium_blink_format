@@ -31,7 +31,7 @@
 
 #include "Node.h"
 #include "XPathExpressionNode.h"
-#include "XPathUtil.h"
+#include "XPathNodeSet.h"
 
 namespace WebCore {
 
@@ -88,7 +88,7 @@ class Step : public ParseNode, Noncopyable {
        const Vector<Predicate*>& predicates = Vector<Predicate*>());
   ~Step();
 
-  NodeVector evaluate(Node* context) const;
+  NodeSet evaluate(Node* context) const;
 
   Axis axis() const { return m_axis; }
   NodeTest nodeTest() const { return m_nodeTest; }
@@ -110,8 +110,8 @@ class Step : public ParseNode, Noncopyable {
 
  private:
   void parseNodeTest(const String&);
-  NodeVector nodesInAxis(Node* context) const;
-  NodeVector nodeTestMatches(const NodeVector& nodes) const;
+  NodeSet nodesInAxis(Node* context) const;
+  NodeSet nodeTestMatches(const NodeSet& nodes) const;
   String namespaceFromNodetest(const String& nodeTest) const;
   Node::NodeType primaryNodeType(Axis) const;
 

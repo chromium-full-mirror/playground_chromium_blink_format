@@ -38,8 +38,6 @@ class String;
 
 namespace XPath {
 
-typedef Vector<RefPtr<Node>> NodeVector;
-
 /* @return whether the given node is the root node */
 bool isRootDomNode(Node*);
 
