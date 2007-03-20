@@ -195,6 +195,11 @@ class Font {
                   int from,
                   int to,
                   const FloatPoint&) const;
+  void drawGlyphBuffer(GraphicsContext*,
+                       const GlyphBuffer&,
+                       const TextRun&,
+                       const TextStyle&,
+                       const FloatPoint&) const;
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
                        const TextStyle&,

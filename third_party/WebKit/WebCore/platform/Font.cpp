@@ -644,20 +644,28 @@ void Font::drawSimpleText(GraphicsContext* context,
   if (glyphBuffer.isEmpty())
     return;
 
-  // Calculate the starting point of the glyphs to be displayed by adding
-  // all the advances up to the first glyph.
-  startX += point.x();
-  FloatPoint startPoint(startX, point.y());
-
   // Swap the order of the glyphs if right-to-left.
   if (style.rtl())
     for (int i = 0, end = glyphBuffer.size() - 1; i < glyphBuffer.size() / 2;
          ++i, --end)
       glyphBuffer.swap(i, end);
 
+  // Calculate the starting point of the glyphs to be displayed by adding
+  // all the advances up to the first glyph.
+  startX += point.x();
+  FloatPoint startPoint(startX, point.y());
+  drawGlyphBuffer(context, glyphBuffer, run, style, startPoint);
+}
+
+void Font::drawGlyphBuffer(GraphicsContext* context,
+                           const GlyphBuffer& glyphBuffer,
+                           const TextRun& run,
+                           const TextStyle& style,
+                           const FloatPoint& point) const {
   // Draw each contiguous run of glyphs that use the same font data.
   const FontData* fontData = glyphBuffer.fontDataAt(0);
-  float nextX = startX;
+  FloatPoint startPoint(point);
+  float nextX = startPoint.x();
   int lastFrom = 0;
   int nextGlyph = 0;
   while (nextGlyph < glyphBuffer.size()) {
