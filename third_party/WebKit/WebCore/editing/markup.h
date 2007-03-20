@@ -51,7 +51,8 @@ PassRefPtr<DocumentFragment> createFragmentFromNodes(Document*,
 DeprecatedString createMarkup(
     const Range*,
     Vector<Node*>* = 0,
-    EAnnotateForInterchange = DoNotAnnotateForInterchange);
+    EAnnotateForInterchange = DoNotAnnotateForInterchange,
+    bool includeInlineSpecialAncestors = false);
 DeprecatedString createMarkup(
     const Node*,
     EChildrenOnly = IncludeNode,

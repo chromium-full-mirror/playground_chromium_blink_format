@@ -786,7 +786,10 @@ void CompositeEditCommand::moveParagraphs(
   // small.
   RefPtr<DocumentFragment> fragment =
       startOfParagraphToMove != endOfParagraphToMove
-          ? createFragmentFromMarkup(document(), range->toHTML(), "")
+          ? createFragmentFromMarkup(
+                document(),
+                createMarkup(range.get(), 0, DoNotAnnotateForInterchange, true),
+                "")
           : 0;
 
   setEndingSelection(Selection(start, end, DOWNSTREAM));
