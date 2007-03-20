@@ -60,6 +60,8 @@ typedef struct objc_object* id;
 
 #if USE(CFNETWORK)
 typedef struct _CFURLConnection* CFURLConnectionRef;
+typedef int CFHTTPCookieStorageAcceptPolicy;
+typedef struct OpaqueCFHTTPCookieStorage* CFHTTPCookieStorageRef;
 #endif
 
 namespace WebCore {
@@ -121,6 +123,14 @@ class ResourceHandle : public Shared<ResourceHandle> {
   static CFRunLoopRef loaderRunLoop();
   CFURLConnectionRef connection() const;
   CFURLConnectionRef releaseConnectionForDownload();
+
+  static CFHTTPCookieStorageAcceptPolicy cookieStorageAcceptPolicy();
+  static void setCookieStorageAcceptPolicy(CFHTTPCookieStorageAcceptPolicy);
+
+  static CFHTTPCookieStorageRef cookieStorage();
+  static void setCookieStorage(CFHTTPCookieStorageRef);
+
+  static void setHostAllowsAnyHTTPSCertificate(const String&);
 #endif
   PassRefPtr<SharedBuffer> bufferedData();
   static bool supportsBufferedData();
