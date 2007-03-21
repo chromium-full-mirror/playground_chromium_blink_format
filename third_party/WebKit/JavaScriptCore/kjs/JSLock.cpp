@@ -97,6 +97,10 @@ JSLock::DropAllLocks::~DropAllLocks() {
 // that the lock is held don't fail
 const int JSLockCount = 1;
 
+bool JSLock::currentThreadIsHoldingLock() {
+  return true;
+}
+
 void JSLock::lock() {}
 
 void JSLock::unlock() {}
