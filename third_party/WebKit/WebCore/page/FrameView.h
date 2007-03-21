@@ -135,6 +135,8 @@ class FrameView : public ScrollView {
   void scheduleEvent(PassRefPtr<Event>,
                      PassRefPtr<EventTargetNode>,
                      bool tempEvent);
+  void pauseScheduledEvents();
+  void resumeScheduledEvents();
 
  private:
   void init();
