@@ -133,8 +133,7 @@ class IconDatabase : Noncopyable {
 
   // Returns the image data for the given IconURL, checking both databases if
   // necessary
-  void imageDataForIconURL(const String& iconURL,
-                           PassRefPtr<SharedBuffer> result);
+  PassRefPtr<SharedBuffer> imageDataForIconURL(const String& iconURL);
 
   // Retains an iconURL, bringing it back from the brink if it was pending
   // deletion
@@ -178,9 +177,8 @@ class IconDatabase : Noncopyable {
 
   // Query - Returns the image data from the given database for the given
   // IconURL
-  void imageDataForIconURLQuery(SQLDatabase& db,
-                                const String& iconURL,
-                                PassRefPtr<SharedBuffer> result);
+  PassRefPtr<SharedBuffer> imageDataForIconURLQuery(SQLDatabase& db,
+                                                    const String& iconURL);
   SQLStatement* m_imageDataForIconURLStatement;
 
   void deleteAllPreparedStatements(bool withSync);

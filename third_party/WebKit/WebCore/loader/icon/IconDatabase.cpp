@@ -354,18 +354,19 @@ void IconDatabase::createDatabaseTables(SQLDatabase& db) {
   }
 }
 
-void IconDatabase::imageDataForIconURL(const String& iconURL,
-                                       PassRefPtr<SharedBuffer> result) {
+PassRefPtr<SharedBuffer> IconDatabase::imageDataForIconURL(
+    const String& iconURL) {
   // If private browsing is enabled, we'll check there first as the most
   // up-to-date data for an icon will be there
   if (m_privateBrowsingEnabled) {
-    imageDataForIconURLQuery(m_privateBrowsingDB, iconURL, result);
-    if (!result->isEmpty())
-      return;
+    RefPtr<SharedBuffer> result =
+        imageDataForIconURLQuery(m_privateBrowsingDB, iconURL);
+    if (result && !result->isEmpty())
+      return result.release();
   }
 
   // It wasn't found there, so lets check the main tables
-  imageDataForIconURLQuery(m_mainDB, iconURL, result);
+  return imageDataForIconURLQuery(m_mainDB, iconURL);
 }
 
 void IconDatabase::setPrivateBrowsingEnabled(bool flag) {
@@ -405,8 +406,7 @@ Image* IconDatabase::iconForPageURL(const String& pageURL,
   // If it's a new IconDataCache object that doesn't have its imageData set yet,
   // we'll read in that image data now
   if (icon->imageDataStatus() == ImageDataStatusUnknown) {
-    RefPtr<SharedBuffer> data = new SharedBuffer();
-    imageDataForIconURL(iconURL, data.get());
+    RefPtr<SharedBuffer> data = imageDataForIconURL(iconURL);
     icon->setImageData(data.get());
   }
 
@@ -1057,24 +1057,27 @@ bool IconDatabase::pageURLTableIsEmptyQuery(SQLDatabase& db) {
               .returnsAtLeastOneResult();
 }
 
-void IconDatabase::imageDataForIconURLQuery(
+PassRefPtr<SharedBuffer> IconDatabase::imageDataForIconURLQuery(
     SQLDatabase& db,
-    const String& iconURL,
-    PassRefPtr<SharedBuffer> imageData) {
+    const String& iconURL) {
+  RefPtr<SharedBuffer> imageData;
+
   readySQLStatement(m_imageDataForIconURLStatement, db,
                     "SELECT Icon.data FROM Icon WHERE Icon.url = (?);");
   m_imageDataForIconURLStatement->bindText16(1, iconURL, false);
 
   int result = m_imageDataForIconURLStatement->step();
-  imageData->clear();
   if (result == SQLResultRow) {
     Vector<char> data;
     m_imageDataForIconURLStatement->getColumnBlobAsVector(0, data);
+    imageData = new SharedBuffer;
     imageData->append(data.data(), data.size());
   } else if (result != SQLResultDone)
     LOG_ERROR("imageDataForIconURLQuery failed");
 
   m_imageDataForIconURLStatement->reset();
+
+  return imageData.release();
 }
 
 int IconDatabase::timeStampForIconURLQuery(SQLDatabase& db,
