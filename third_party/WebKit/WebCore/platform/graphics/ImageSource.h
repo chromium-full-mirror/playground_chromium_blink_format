@@ -80,7 +80,6 @@ class ImageSource : Noncopyable {
   size_t frameCount() const;
 
   NativeImagePtr createFrameAtIndex(size_t);
-  void destroyFrameAtIndex(size_t);
 
   float frameDurationAtIndex(size_t);
   bool frameHasAlphaAtIndex(

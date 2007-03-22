@@ -73,8 +73,6 @@ void BitmapImage::destroyDecodedData(bool incremental) {
       if (m_frames[i].m_frame) {
         sizeChange -= frameSize;
         m_frames[i].clear();
-        if (!incremental)
-          m_source.destroyFrameAtIndex(i);
       }
     }
 
