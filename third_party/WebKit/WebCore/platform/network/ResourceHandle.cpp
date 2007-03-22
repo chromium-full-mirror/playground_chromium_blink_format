@@ -102,6 +102,8 @@ const ResourceRequest& ResourceHandle::request() const {
 void ResourceHandle::clearAuthentication() {
 #if PLATFORM(MAC)
   d->m_currentMacChallenge = nil;
+#elif PLATFORM(CF)
+  d->m_currentCFChallenge = 0;
 #endif
   d->m_currentWebChallenge.nullify();
 }
