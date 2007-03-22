@@ -57,14 +57,27 @@ static inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
   return ptr < end;
 }
 
-static inline bool checkString(const UChar*& ptr,
-                               const UChar*& end,
-                               const UChar* name,
-                               int length) {
-  if ((end - ptr) < length)
+static inline bool skipString(const UChar*& ptr,
+                              const UChar*& end,
+                              const UChar* name,
+                              int length) {
+  if (end - ptr < length)
     return false;
   if (memcmp(name, ptr, sizeof(UChar) * length))
     return false;
+  ptr += length;
+  return true;
+}
+
+static inline bool skipString(const UChar*& ptr,
+                              const UChar*& end,
+                              const char* str) {
+  int length = strlen(str);
+  if (end - ptr < length)
+    return false;
+  for (int i = 0; i < length; ++i)
+    if (ptr[i] != str[i])
+      return false;
   ptr += length;
   return true;
 }
