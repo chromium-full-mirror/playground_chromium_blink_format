@@ -48,6 +48,7 @@ class SharedBuffer : public Shared<SharedBuffer> {
   SharedBuffer(const char*, int);
 #if PLATFORM(MAC)
   NSData* createNSData();
+  CFDataRef createCFData();
   static PassRefPtr<SharedBuffer> wrapNSData(NSData* data);
 #endif
 
