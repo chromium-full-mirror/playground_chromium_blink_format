@@ -32,6 +32,7 @@
 #include "CSSRule.h"
 #include "CSSRuleList.h"
 #include "CSSStyleRule.h"
+#include "CSSValueKeywords.h"
 #include "cssstyleselector.h"
 #include "Comment.h"
 #include "DeleteButtonController.h"
@@ -359,7 +360,20 @@ styleFromMatchedRulesAndInlineDecl(Node* node) {
   RefPtr<CSSMutableStyleDeclaration> inlineStyleDecl =
       element->getInlineStyleDecl();
   style->merge(inlineStyleDecl.get());
-  return style;
+  return style.release();
+}
+
+static bool propertyMissingOrEqualToNone(CSSMutableStyleDeclaration* style,
+                                         int propertyID) {
+  if (!style)
+    return false;
+  RefPtr<CSSValue> value = style->getPropertyCSSValue(propertyID);
+  if (!value)
+    return true;
+  if (!value->isPrimitiveValue())
+    return false;
+  return static_cast<CSSPrimitiveValue*>(value.get())->getIdent() ==
+         CSS_VAL_NONE;
 }
 
 bool elementHasTextDecorationProperty(Node* node) {
@@ -367,9 +381,7 @@ bool elementHasTextDecorationProperty(Node* node) {
       styleFromMatchedRulesAndInlineDecl(node);
   if (!style)
     return false;
-  RefPtr<CSSValue> textDecoration =
-      style->getPropertyCSSValue(CSS_PROP_TEXT_DECORATION);
-  return textDecoration && textDecoration->cssText() != "none";
+  return !propertyMissingOrEqualToNone(style.get(), CSS_PROP_TEXT_DECORATION);
 }
 
 // FIXME: Shouldn't we omit style info when annotate ==
@@ -521,10 +533,11 @@ DeprecatedString createMarkup(const Range* range,
 
   Node* checkAncestor =
       specialCommonAncestor ? specialCommonAncestor : commonAncestor;
-  if (computedStyle(checkAncestor)
-          ->copyInheritableProperties()
-          ->getPropertyValue(CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT) !=
-      "none")
+  RefPtr<CSSMutableStyleDeclaration> checkAncestorStyle =
+      computedStyle(checkAncestor)->copyInheritableProperties();
+  if (!propertyMissingOrEqualToNone(
+          checkAncestorStyle.get(),
+          CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT))
     specialCommonAncestor =
         elementHasTextDecorationProperty(checkAncestor)
             ? checkAncestor
