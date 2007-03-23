@@ -188,6 +188,11 @@ class Frame : public Shared<Frame> {
   void setZoomFactor(int percent);
   int zoomFactor() const;
 
+  void setPrinting(bool printing,
+                   float minPageWidth,
+                   float maxPageWidth,
+                   bool adjustViewSize);
+
   bool inViewSourceMode() const;
   void setInViewSourceMode(bool = true) const;
 
@@ -226,7 +231,9 @@ class Frame : public Shared<Frame> {
                         float bottomLimit);
 
   void forceLayout(bool allowSubtree = false);
-  void forceLayoutWithPageWidthRange(float minPageWidth, float maxPageWidth);
+  void forceLayoutWithPageWidthRange(float minPageWidth,
+                                     float maxPageWidth,
+                                     bool adjustViewSize);
 
   void sendResizeEvent();
   void sendScrollEvent();
