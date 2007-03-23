@@ -749,7 +749,7 @@ void CompositeEditCommand::moveParagraphs(
         RefPtr<Range> startRange =
             new Range(document(), startOfParagraphToMove.deepEquivalent(),
                       visibleStart.deepEquivalent());
-        startIndex = TextIterator::rangeLength(startRange.get());
+        startIndex = TextIterator::rangeLength(startRange.get(), true);
       }
 
       endIndex = 0;
@@ -757,7 +757,7 @@ void CompositeEditCommand::moveParagraphs(
         RefPtr<Range> endRange =
             new Range(document(), startOfParagraphToMove.deepEquivalent(),
                       visibleEnd.deepEquivalent());
-        endIndex = TextIterator::rangeLength(endRange.get());
+        endIndex = TextIterator::rangeLength(endRange.get(), true);
       }
     }
   }
@@ -848,7 +848,8 @@ void CompositeEditCommand::moveParagraphs(
   RefPtr<Range> startToDestinationRange(
       new Range(document(), Position(document(), 0),
                 rangeCompliantEquivalent(destination.deepEquivalent())));
-  destinationIndex = TextIterator::rangeLength(startToDestinationRange.get());
+  destinationIndex =
+      TextIterator::rangeLength(startToDestinationRange.get(), true);
 
   setEndingSelection(destination);
   applyCommandToComposite(new ReplaceSelectionCommand(
@@ -856,11 +857,12 @@ void CompositeEditCommand::moveParagraphs(
 
   if (preserveSelection && startIndex != -1) {
     setEndingSelection(Selection(
-        TextIterator::rangeFromLocationAndLength(
-            document()->documentElement(), destinationIndex + startIndex, 0)
-            ->startPosition(),
         TextIterator::rangeFromLocationAndLength(document()->documentElement(),
-                                                 destinationIndex + endIndex, 0)
+                                                 destinationIndex + startIndex,
+                                                 0, true)
+            ->startPosition(),
+        TextIterator::rangeFromLocationAndLength(
+            document()->documentElement(), destinationIndex + endIndex, 0, true)
             ->startPosition(),
         DOWNSTREAM));
   }

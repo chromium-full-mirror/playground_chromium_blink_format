@@ -399,11 +399,13 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
   Node* scope = highestAncestor(visibleStart.deepEquivalent().node());
   Position rangeStart(scope, 0);
   RefPtr<Range> startRange =
-      new Range(document(), rangeStart, visibleStart.deepEquivalent());
+      new Range(document(), rangeStart,
+                rangeCompliantEquivalent(visibleStart.deepEquivalent()));
   RefPtr<Range> endRange =
-      new Range(document(), rangeStart, visibleEnd.deepEquivalent());
-  int startIndex = TextIterator::rangeLength(startRange.get());
-  int endIndex = TextIterator::rangeLength(endRange.get());
+      new Range(document(), rangeStart,
+                rangeCompliantEquivalent(visibleEnd.deepEquivalent()));
+  int startIndex = TextIterator::rangeLength(startRange.get(), true);
+  int endIndex = TextIterator::rangeLength(endRange.get(), true);
 
   VisiblePosition paragraphStart(startOfParagraph(visibleStart));
   VisiblePosition nextParagraphStart(endOfParagraph(paragraphStart).next());
@@ -430,10 +432,10 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
   }
 
   updateStartEnd(TextIterator::rangeFromLocationAndLength(
-                     static_cast<Element*>(scope), startIndex, 0)
+                     static_cast<Element*>(scope), startIndex, 0, true)
                      ->startPosition(),
                  TextIterator::rangeFromLocationAndLength(
-                     static_cast<Element*>(scope), endIndex, 0)
+                     static_cast<Element*>(scope), endIndex, 0, true)
                      ->startPosition());
 }
 
