@@ -159,7 +159,7 @@ void HTMLBodyElement::insertedIntoDocument() {
       setAttribute(marginheightAttr, String::number(marginHeight));
   }
 
-  // FIXME: This call to scheduleRelayout not be needed here.
+  // FIXME: This call to scheduleRelayout should not be needed here.
   // But without it we hang during WebKit tests; need to fix that and remove
   // this.
   if (FrameView* view = document()->view())
