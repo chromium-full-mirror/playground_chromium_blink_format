@@ -451,6 +451,11 @@ void HTMLInputElement::restoreState(const String& state) {
   }
 }
 
+void HTMLInputElement::closeRenderer() {
+  m_originalValue = value();
+  HTMLGenericFormElement::closeRenderer();
+}
+
 bool HTMLInputElement::canHaveSelection() const {
   return isTextField();
 }
@@ -847,6 +852,8 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
 void HTMLInputElement::reset() {
   if (storesValueSeparateFromAttribute())
     setValue(String());
+  else if (inputType() == HIDDEN)
+    setValue(m_originalValue);
   setChecked(m_defaultChecked);
   m_useDefaultChecked = true;
 }
@@ -953,9 +960,7 @@ void HTMLInputElement::setValue(const String& value) {
       document()->updateRendering();
     if (renderer())
       renderer()->updateFromElement();
-    // Changes to hidden values don't require re-rendering.
-    if (m_type != HIDDEN)
-      setChanged();
+    setChanged();
   } else
     setAttribute(valueAttr, constrainValue(value));
 
@@ -993,13 +998,13 @@ bool HTMLInputElement::storesValueSeparateFromAttribute() const {
     case BUTTON:
     case CHECKBOX:
     case FILE:
+    case HIDDEN:
     case IMAGE:
     case RADIO:
     case RANGE:
     case RESET:
     case SUBMIT:
       return false;
-    case HIDDEN:
     case ISINDEX:
     case PASSWORD:
     case SEARCH:
