@@ -237,7 +237,7 @@ void BitmapImage::advanceAnimation(Timer<BitmapImage>* timer) {
   if (imageObserver()->shouldPauseAnimation(this))
     return;
 
-  size_t previousFrame = m_currentFrame++;
+  m_currentFrame++;
   if (m_currentFrame >= frameCount()) {
     m_repetitionsComplete += 1;
     if (m_repetitionCount && m_repetitionsComplete >= m_repetitionCount) {
@@ -255,20 +255,11 @@ void BitmapImage::advanceAnimation(Timer<BitmapImage>* timer) {
   // footprint.
   int frameSize = m_size.width() * m_size.height() * 4;
   if (frameCount() * frameSize > cLargeAnimationCutoff) {
-    // Clear and reset the source.
-    m_source.clear();
-    m_source.setData(m_data.get(), m_allDataReceived);
+    // Destroy all of our frames and just redecode every time.
+    destroyDecodedData();
 
     // Go ahead and decode the next frame.
     frameAtIndex(m_currentFrame);
-
-    // Now throw away the previous frame.
-    if (m_frames[previousFrame].m_frame) {
-      m_frames[previousFrame].clear();
-      m_decodedSize -= frameSize;
-      if (imageObserver())
-        imageObserver()->decodedSizeChanged(this, -frameSize);
-    }
   }
 
   // Kick off a timer to move to the next frame, but only if the current frame
