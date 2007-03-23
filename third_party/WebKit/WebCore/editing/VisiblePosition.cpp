@@ -158,7 +158,8 @@ Position VisiblePosition::canonicalPosition(const Position& position) {
   // descent
   // from non-editable to editable content since rootEditableElement() always
   // stops at the body.
-  if (editingRoot && editingRoot->hasTagName(htmlTag))
+  if (editingRoot && editingRoot->hasTagName(htmlTag) ||
+      position.node()->isDocumentNode())
     return next.isNotNull() ? next : prev;
 
   bool prevIsInSameEditableElement =
