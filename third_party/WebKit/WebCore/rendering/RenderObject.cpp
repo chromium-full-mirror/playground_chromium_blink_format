@@ -1911,10 +1911,13 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   IntRect newBounds = absoluteClippedOverflowRect();
   IntRect newOutlineBox;
 
-  bool fullRepaint = selfNeedsLayout() || mustRepaintBackgroundOrBorder();
+  bool fullRepaint = selfNeedsLayout();
   if (!fullRepaint) {
     newOutlineBox = absoluteOutlineBox();
     if (newOutlineBox.location() != oldOutlineBox.location())
+      fullRepaint = true;
+    else if (mustRepaintBackgroundOrBorder() &&
+             (newBounds != oldBounds || newOutlineBox != oldOutlineBox))
       fullRepaint = true;
   }
   if (fullRepaint) {
