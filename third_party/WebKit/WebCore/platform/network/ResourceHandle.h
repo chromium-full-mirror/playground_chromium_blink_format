@@ -43,7 +43,7 @@ typedef LONG_PTR LRESULT;
 #endif
 
 #if PLATFORM(MAC)
-#include "RetainPtr.h"
+#include <wtf/RetainPtr.h>
 #ifdef __OBJC__
 @class NSData;
 @class NSError;

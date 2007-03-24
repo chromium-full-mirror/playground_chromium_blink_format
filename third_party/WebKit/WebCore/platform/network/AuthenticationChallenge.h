@@ -33,7 +33,7 @@
 #include <wtf/RefPtr.h>
 
 #if PLATFORM(MAC)
-#include "RetainPtr.h"
+#include <wtf/RetainPtr.h>
 #ifndef __OBJC__
 typedef struct objc_object* id;
 class NSURLAuthenticationChallenge;
