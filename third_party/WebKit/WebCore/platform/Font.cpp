@@ -26,6 +26,7 @@
 #include "config.h"
 #include "Font.h"
 
+#include "CharacterNames.h"
 #include "FloatRect.h"
 #include "FontCache.h"
 #include "FontFallbackList.h"
@@ -462,8 +463,16 @@ const GlyphData& Font::glyphDataForCharacter(
 
     if (node->isSystemFallback()) {
       // System fallback is character-dependent.
-      const FontData* characterFontData =
-          FontCache::getFontDataForCharacters(*this, cluster, clusterLength);
+      // Convert characters that shouldn't render to zero width spaces when
+      // asking what font is
+      // appropriate.
+      const FontData* characterFontData;
+      if (clusterLength == 1 && Font::treatAsZeroWidthSpace(cluster[0]))
+        characterFontData =
+            FontCache::getFontDataForCharacters(*this, &zeroWidthSpace, 1);
+      else
+        characterFontData =
+            FontCache::getFontDataForCharacters(*this, cluster, clusterLength);
       if (smallCaps)
         characterFontData =
             characterFontData->smallCapsFontData(m_fontDescription);
