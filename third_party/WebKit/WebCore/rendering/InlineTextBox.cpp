@@ -87,11 +87,13 @@ RenderObject::SelectionState InlineTextBox::selectionState() {
       state == RenderObject::SelectionBoth) {
     int startPos, endPos;
     object()->selectionStartEnd(startPos, endPos);
+    // The position after a hard line break is considered to be past its end.
+    int lastSelectable = start() + len() - (isLineBreak() ? 1 : 0);
 
     bool start = (state != RenderObject::SelectionEnd && startPos >= m_start &&
                   startPos < m_start + m_len);
     bool end = (state != RenderObject::SelectionStart && endPos > m_start &&
-                endPos <= m_start + m_len);
+                endPos <= lastSelectable);
     if (start && end)
       state = RenderObject::SelectionBoth;
     else if (start)
@@ -99,9 +101,10 @@ RenderObject::SelectionState InlineTextBox::selectionState() {
     else if (end)
       state = RenderObject::SelectionEnd;
     else if ((state == RenderObject::SelectionEnd || startPos < m_start) &&
-             (state == RenderObject::SelectionStart ||
-              endPos > m_start + m_len))
+             (state == RenderObject::SelectionStart || endPos > lastSelectable))
       state = RenderObject::SelectionInside;
+    else if (state == RenderObject::SelectionBoth)
+      state = RenderObject::SelectionNone;
   }
   return state;
 }
