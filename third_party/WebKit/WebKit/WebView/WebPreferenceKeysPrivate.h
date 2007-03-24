@@ -81,6 +81,8 @@
 #define WebKitPDFDisplayModePreferenceKey @"WebKitPDFDisplayMode"
 #define WebKitPDFScaleFactorPreferenceKey @"WebKitPDFScaleFactor"
 #define WebKitUsePDFPreviewViewPreferenceKey @"WebKitUsePDFPreviewView"
+#define WebKitUseSiteSpecificSpoofingPreferenceKey \
+  @"WebKitUseSiteSpecificSpoofing"
 #define WebKitEditableLinkBehaviorPreferenceKey @"WebKitEditableLinkBehavior"
 
 // CoreGraphics deferred updates are disabled if
