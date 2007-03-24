@@ -271,6 +271,7 @@ void Frame::setView(FrameView* view) {
     if (d->m_view)
       d->m_view->unscheduleRelayout();
   }
+  eventHandler()->clear();
 
   d->m_view = view;
 
