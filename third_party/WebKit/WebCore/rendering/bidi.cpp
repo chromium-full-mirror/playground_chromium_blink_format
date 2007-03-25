@@ -2207,6 +2207,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
   RenderObject* last = o;
   RenderObject* previous = o;
   int pos = start.pos;
+  bool atStart = true;
 
   bool prevLineBrokeCleanly = previousLineBrokeCleanly;
   previousLineBrokeCleanly = false;
@@ -2450,7 +2451,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
         bool betweenWords =
             c == '\n' ||
-            (currWS != PRE &&
+            (currWS != PRE && !atStart &&
              isBreakable(str, pos, strlen, nextBreakable, breakNBSP));
 
         if (betweenWords || midWordBreak) {
@@ -2639,6 +2640,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
         pos++;
         len--;
+        atStart = false;
       }
 
       // IMPORTANT: pos is > length here!
@@ -2672,8 +2674,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               checkForBreak = true;
           }
           bool willFitOnLine = (w + tmpW <= width);
-          bool canPlaceOnLine =
-              willFitOnLine || !willFitOnLine && !autoWrapWasEverTrueOnLine;
+          bool canPlaceOnLine = willFitOnLine || !autoWrapWasEverTrueOnLine;
           if (canPlaceOnLine && checkForBreak) {
             w += tmpW;
             tmpW = 0;
@@ -2736,6 +2737,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       currentCharacterIsSpace = false;
 
     pos = 0;
+    atStart = false;
   }
 
   if (w + tmpW <= width || lastWS == NOWRAP) {
