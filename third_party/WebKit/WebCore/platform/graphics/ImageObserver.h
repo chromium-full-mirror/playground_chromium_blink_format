@@ -36,6 +36,7 @@ class ImageObserver {
   virtual ~ImageObserver() {}
 
  public:
+  virtual void decodedSizeWillChange(const Image*, int delta) = 0;
   virtual void decodedSizeChanged(const Image*, int delta) = 0;
 
   virtual bool shouldPauseAnimation(const Image*) = 0;
