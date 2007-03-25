@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <CoreFoundation/CoreFoundation.h>
 
-namespace WebCore {
+namespace WTF {
 
 template <typename T>
 struct RemovePointer {
@@ -225,6 +225,11 @@ template <typename T, typename U>
 inline bool operator!=(T* a, const RetainPtr<U>& b) {
   return a != b.get();
 }
-}
 
-#endif  // RetainPtr_h
+}  // namespace WTF
+
+using WTF::AdoptCF;
+using WTF::AdoptNS;
+using WTF::RetainPtr;
+
+#endif  // WTF_RetainPtr_h

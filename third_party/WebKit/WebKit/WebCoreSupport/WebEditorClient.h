@@ -111,7 +111,7 @@ class WebEditorClient : public WebCore::EditorClient {
   WebEditorClient();
 
   WebView* m_webView;
-  WebCore::RetainPtr<WebEditorUndoTarget> m_undoTarget;
+  RetainPtr<WebEditorUndoTarget> m_undoTarget;
 
   bool m_haveUndoRedoOperations;
 };
