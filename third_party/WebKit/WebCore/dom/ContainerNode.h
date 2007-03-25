@@ -76,6 +76,9 @@ class ContainerNode : public EventTargetNode {
  protected:
   static void queuePostAttachCallback(NodeCallback, Node*);
 
+  void fastSetFirstChild(Node* child) { m_firstChild = child; }
+  void fastSetLastChild(Node* child) { m_lastChild = child; }
+
  private:
   Node* m_firstChild;
   Node* m_lastChild;
