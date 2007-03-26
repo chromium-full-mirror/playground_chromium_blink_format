@@ -559,7 +559,7 @@ short Range::compareBoundaryPoints(Node* containerA,
   }
 
   // Should never reach this point.
-  assert(0);
+  ASSERT(0);
   return 0;
 }
 

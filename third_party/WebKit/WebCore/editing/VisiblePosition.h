@@ -59,7 +59,7 @@ class VisiblePosition {
 
   Position deepEquivalent() const { return m_deepPosition; }
   EAffinity affinity() const {
-    assert(m_affinity == UPSTREAM || m_affinity == DOWNSTREAM);
+    ASSERT(m_affinity == UPSTREAM || m_affinity == DOWNSTREAM);
     return m_affinity;
   }
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }

@@ -391,7 +391,7 @@ bool RenderImage::isWidthSpecified() const {
     default:
       return false;
   }
-  assert(false);
+  ASSERT(false);
   return false;
 }
 
@@ -403,7 +403,7 @@ bool RenderImage::isHeightSpecified() const {
     default:
       return false;
   }
-  assert(false);
+  ASSERT(false);
   return false;
 }
 

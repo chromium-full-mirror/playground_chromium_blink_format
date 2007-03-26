@@ -1708,7 +1708,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel,
         dynamicPseudo = RenderStyle::SEARCH_RESULTS_BUTTON;
         return true;
       case CSSSelector::PseudoNotParsed:
-        assert(false);
+        ASSERT(false);
         break;
     }
     return false;

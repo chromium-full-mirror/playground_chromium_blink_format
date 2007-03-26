@@ -153,7 +153,7 @@ static void removeItemFromMap(HTMLDocument::NameCountMap& map,
     return;
 
   int oldVal = it->second;
-  assert(oldVal != 0);
+  ASSERT(oldVal != 0);
   int newVal = oldVal - 1;
   if (newVal == 0)
     map.remove(it);
@@ -386,7 +386,7 @@ void HTMLDocument::determineParseMode(const String& str) {
           hMode = Html4;
           break;
         default:
-          assert(false);
+          ASSERT(false);
       }
     }
   } else {

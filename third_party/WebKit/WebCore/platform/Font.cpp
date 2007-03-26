@@ -507,18 +507,18 @@ const GlyphData& Font::glyphDataForCharacter(
 }
 
 const FontData* Font::primaryFont() const {
-  assert(m_fontList);
+  ASSERT(m_fontList);
   return m_fontList->primaryFont(this);
 }
 
 const FontData* Font::fontDataAt(unsigned index) const {
-  assert(m_fontList);
+  ASSERT(m_fontList);
   return m_fontList->fontDataAt(this, index);
 }
 
 const FontData* Font::fontDataForCharacters(const UChar* characters,
                                             int length) const {
-  assert(m_fontList);
+  ASSERT(m_fontList);
   return m_fontList->fontDataForCharacters(this, characters, length);
 }
 
@@ -564,7 +564,7 @@ float Font::xHeight() const {
 }
 
 bool Font::isFixedPitch() const {
-  assert(m_fontList);
+  ASSERT(m_fontList);
   return m_fontList->isFixedPitch(this);
 }
 

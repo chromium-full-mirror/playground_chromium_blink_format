@@ -697,7 +697,7 @@ static void fillContainerFromString(ContainerNode* paragraph,
     return;
   }
 
-  assert(string.find('\n') == -1);
+  ASSERT(string.find('\n') == -1);
 
   DeprecatedStringList tabList =
       DeprecatedStringList::split('\t', string, true);

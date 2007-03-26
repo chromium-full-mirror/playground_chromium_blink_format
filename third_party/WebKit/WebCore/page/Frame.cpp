@@ -650,7 +650,7 @@ void Frame::paintCaret(GraphicsContext* p, const IntRect& rect) const {
 
 void Frame::paintDragCaret(GraphicsContext* p, const IntRect& rect) const {
   SelectionController* dragCaretController = d->m_page->dragCaretController();
-  assert(dragCaretController->selection().isCaret());
+  ASSERT(dragCaretController->selection().isCaret());
   if (dragCaretController->selection().start().node()->document()->frame() ==
       this)
     dragCaretController->paintCaret(p, rect);
@@ -857,7 +857,7 @@ Frame::TriState Frame::selectionHasStyle(CSSStyleDeclaration* style) const {
     if (nodeToRemove) {
       ExceptionCode ec = 0;
       nodeToRemove->remove(ec);
-      assert(ec == 0);
+      ASSERT(ec == 0);
     }
   } else {
     for (Node* node = selectionController()->start().node(); node;
@@ -888,7 +888,7 @@ String Frame::selectionStartStylePropertyValue(int stylePropertyID) const {
   if (nodeToRemove) {
     ExceptionCode ec = 0;
     nodeToRemove->remove(ec);
-    assert(ec == 0);
+    ASSERT(ec == 0);
   }
 
   return value;
@@ -937,7 +937,7 @@ CSSComputedStyleDeclaration* Frame::selectionComputedStyle(
         parent->appendChild(styleElement, ec);
       }
     }
-    assert(ec == 0);
+    ASSERT(ec == 0);
 
     nodeToRemove = styleElement.get();
   }

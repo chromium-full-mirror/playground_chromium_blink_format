@@ -2940,7 +2940,7 @@ struct BorderImageParseContext {
     else if (!m_bottom)
       m_bottom = val;
     else {
-      assert(!m_left);
+      ASSERT(!m_left);
       m_left = val;
     }
 
@@ -2959,7 +2959,7 @@ struct BorderImageParseContext {
     else if (!m_borderBottom)
       m_borderBottom = val;
     else {
-      assert(!m_borderLeft);
+      ASSERT(!m_borderLeft);
       m_borderLeft = val;
     }
 

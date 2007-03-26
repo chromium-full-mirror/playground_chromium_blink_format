@@ -48,7 +48,7 @@ HTMLEmbedElement::HTMLEmbedElement(Document* doc)
 HTMLEmbedElement::~HTMLEmbedElement() {
 #if USE(JAVASCRIPTCORE_BINDINGS)
   // m_instance should have been cleaned up in detach().
-  assert(!m_instance);
+  ASSERT(!m_instance);
 #endif
 }
 
@@ -124,7 +124,7 @@ bool HTMLEmbedElement::rendererIsNeeded(RenderStyle* style) {
 
   Node* p = parentNode();
   if (p && p->hasTagName(objectTag)) {
-    assert(p->renderer());
+    ASSERT(p->renderer());
     return false;
   }
 

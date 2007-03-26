@@ -73,7 +73,7 @@ void HTMLLIElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void HTMLLIElement::attach() {
-  assert(!attached());
+  ASSERT(!attached());
 
   HTMLElement::attach();
 

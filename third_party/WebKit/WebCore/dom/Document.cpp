@@ -244,8 +244,8 @@ static Widget* widgetForNode(Node* focusedNode) {
 }
 
 static bool relinquishesEditingFocus(Node* node) {
-  assert(node);
-  assert(node->isContentEditable());
+  ASSERT(node);
+  ASSERT(node->isContentEditable());
 
   Node* root = node->rootEditableElement();
   Frame* frame = node->document()->frame();
@@ -256,8 +256,8 @@ static bool relinquishesEditingFocus(Node* node) {
 }
 
 static bool acceptsEditingFocus(Node* node) {
-  assert(node);
-  assert(node->isContentEditable());
+  ASSERT(node);
+  ASSERT(node->isContentEditable());
 
   Node* root = node->rootEditableElement();
   Frame* frame = node->document()->frame();
@@ -1107,8 +1107,8 @@ void Document::updateLayoutIgnorePendingStylesheets() {
 }
 
 void Document::attach() {
-  assert(!attached());
-  assert(!m_inPageCache);
+  ASSERT(!attached());
+  ASSERT(!m_inPageCache);
 
   if (!m_renderArena)
     m_renderArena = new RenderArena();
@@ -1509,7 +1509,7 @@ void Document::write(const String& text) {
 
   if (!m_tokenizer) {
     open();
-    assert(m_tokenizer);
+    ASSERT(m_tokenizer);
     if (!m_tokenizer)
       return;
     write(DeprecatedString("<html>"));
@@ -1728,7 +1728,7 @@ Node* Document::previousFocusableNode(Node* start, KeyboardEvent* event) {
 }
 
 int Document::nodeAbsIndex(Node* node) {
-  assert(node->document() == this);
+  ASSERT(node->document() == this);
 
   int absIndex = 0;
   for (Node* n = node; n && n != this; n = n->traversePreviousNode())
@@ -1745,7 +1745,7 @@ Node* Document::nodeWithAbsIndex(int absIndex) {
 }
 
 void Document::processHttpEquiv(const String& equiv, const String& content) {
-  assert(!equiv.isNull() && !content.isNull());
+  ASSERT(!equiv.isNull() && !content.isNull());
 
   Frame* frame = this->frame();
 
@@ -1941,7 +1941,7 @@ void Document::setSelectedStylesheetSet(const String& aString) {
 void Document::stylesheetLoaded() {
   // Make sure we knew this sheet was pending, and that our count isn't out of
   // sync.
-  assert(m_pendingStylesheets > 0);
+  ASSERT(m_pendingStylesheets > 0);
 
   m_pendingStylesheets--;
 
@@ -2717,7 +2717,7 @@ void Document::passwordFieldAdded() {
 }
 
 void Document::passwordFieldRemoved() {
-  assert(m_passwordFields > 0);
+  ASSERT(m_passwordFields > 0);
   m_passwordFields--;
 }
 
@@ -2730,7 +2730,7 @@ void Document::secureFormAdded() {
 }
 
 void Document::secureFormRemoved() {
-  assert(m_secureForms > 0);
+  ASSERT(m_secureForms > 0);
   m_secureForms--;
 }
 
@@ -2830,7 +2830,7 @@ void Document::removeMarkers(Range* range,
 // required by the drawing code in RenderText.cpp.
 
 void Document::addMarker(Node* node, DocumentMarker newMarker) {
-  assert(newMarker.endOffset >= newMarker.startOffset);
+  ASSERT(newMarker.endOffset >= newMarker.startOffset);
   if (newMarker.endOffset == newMarker.startOffset)
     return;
 
@@ -3220,7 +3220,7 @@ void Document::shiftMarkers(Node* node,
     if (marker.startOffset >= startOffset &&
         (markerType == DocumentMarker::AllMarkers ||
          marker.type == markerType)) {
-      assert((int)marker.startOffset + delta >= 0);
+      ASSERT((int)marker.startOffset + delta >= 0);
       marker.startOffset += delta;
       marker.endOffset += delta;
       docDirty = true;

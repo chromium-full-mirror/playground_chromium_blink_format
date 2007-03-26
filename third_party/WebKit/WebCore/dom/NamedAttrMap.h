@@ -78,7 +78,7 @@ class NamedAttrMap : public NamedNodeMap {
   // used during parsing: only inserts if not already there
   // no error checking!
   void insertAttribute(Attribute* newAttribute) {
-    assert(!element);
+    ASSERT(!element);
     if (!getAttributeItem(newAttribute->name()))
       addAttribute(newAttribute);
     else

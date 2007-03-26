@@ -574,7 +574,7 @@ void TextIterator::exitNode() {
       emitCharacter('\n', baseNode->parentNode(), baseNode, 1, 1);
 
       // remember whether to later add a newline for the current node
-      assert(!m_needAnotherNewline);
+      ASSERT(!m_needAnotherNewline);
       m_needAnotherNewline = addNewline;
     } else if (addNewline) {
       // insert a newline with a position following this block's contents.
@@ -710,7 +710,7 @@ SimplifiedBackwardsTextIterator::SimplifiedBackwardsTextIterator(
 }
 
 void SimplifiedBackwardsTextIterator::advance() {
-  assert(m_positionNode);
+  ASSERT(m_positionNode);
 
   m_positionNode = 0;
   m_textLength = 0;
@@ -886,11 +886,11 @@ PassRefPtr<Range> CharacterIterator::range() const {
   RefPtr<Range> r = m_textIterator.range();
   if (!m_textIterator.atEnd()) {
     if (m_textIterator.length() <= 1) {
-      assert(m_runOffset == 0);
+      ASSERT(m_runOffset == 0);
     } else {
       int exception = 0;
       Node* n = r->startContainer(exception);
-      assert(n == r->endContainer(exception));
+      ASSERT(n == r->endContainer(exception));
       int offset = r->startOffset(exception) + m_runOffset;
       r->setStart(n, offset, exception);
       r->setEnd(n, offset + 1, exception);
@@ -983,7 +983,7 @@ void WordAwareIterator::advance() {
 
   // If last time we did a look-ahead, start with that looked-ahead chunk now
   if (!m_didLookAhead) {
-    assert(!m_textIterator.atEnd());
+    ASSERT(!m_textIterator.atEnd());
     m_textIterator.advance();
   }
   m_didLookAhead = false;
@@ -1052,7 +1052,7 @@ const UChar* WordAwareIterator::characters() const {
 CircularSearchBuffer::CircularSearchBuffer(const String& s,
                                            bool isCaseSensitive)
     : m_target(s) {
-  assert(!s.isEmpty());
+  ASSERT(!s.isEmpty());
 
   if (!isCaseSensitive)
     m_target = s.foldCase();
@@ -1081,8 +1081,8 @@ void CircularSearchBuffer::append(UChar c) {
 void CircularSearchBuffer::append(int count, const UChar* characters) {
   int tailSpace = m_buffer + length() - m_cursor;
 
-  assert(!m_bufferFull);
-  assert(count <= tailSpace);
+  ASSERT(!m_bufferFull);
+  ASSERT(count <= tailSpace);
 
   if (m_isCaseSensitive) {
     for (int i = 0; i != count; ++i) {
@@ -1108,7 +1108,7 @@ int CircularSearchBuffer::neededCharacters() const {
 }
 
 bool CircularSearchBuffer::isMatch() const {
-  assert(m_bufferFull);
+  ASSERT(m_bufferFull);
 
   int headSpace = m_cursor - m_buffer;
   int tailSpace = length() - headSpace;
@@ -1169,9 +1169,9 @@ PassRefPtr<Range> TextIterator::rangeFromLocationAndLength(
 
     resultRange->setStart(textRunRange->startContainer(exception), 0,
                           exception);
-    assert(exception == 0);
+    ASSERT(exception == 0);
     resultRange->setEnd(textRunRange->startContainer(exception), 0, exception);
-    assert(exception == 0);
+    ASSERT(exception == 0);
 
     return resultRange.release();
   }

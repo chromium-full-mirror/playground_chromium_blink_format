@@ -222,7 +222,7 @@ JSValue* DOMCSSStyleDeclaration::getValueProperty(ExecState* exec, int token) {
     case ParentRule:
       return toJS(exec, m_impl->parentRule());
     default:
-      assert(0);
+      ASSERT(0);
       return jsUndefined();
   }
 }
@@ -407,7 +407,7 @@ JSValue* DOMStyleSheetList::getValueProperty(ExecState* exec, int token) const {
     case Length:
       return jsNumber(m_impl->length());
     default:
-      assert(0);
+      ASSERT(0);
       return jsUndefined();
   }
 }
@@ -537,7 +537,7 @@ JSValue* DOMMediaList::getValueProperty(ExecState* exec, int token) {
     case Length:
       return jsNumber(m_impl->length());
     default:
-      assert(0);
+      ASSERT(0);
       return jsUndefined();
   }
 }
@@ -651,7 +651,7 @@ JSValue* DOMCSSStyleSheet::getValueProperty(ExecState* exec, int token) const {
     case Rules:
       return toJS(exec, static_cast<CSSStyleSheet*>(impl())->cssRules(true));
     default:
-      assert(0);
+      ASSERT(0);
       return jsUndefined();
   }
 }
@@ -845,7 +845,7 @@ JSValue* DOMCSSRule::getValueProperty(ExecState* exec, int token) const {
           static_cast<CSSCharsetRule*>(m_impl.get())->encoding());
 
     default:
-      assert(0);
+      ASSERT(0);
   }
   return jsUndefined();
 }
@@ -963,7 +963,7 @@ JSValue* DOMCSSValue::getValueProperty(ExecState* exec, int token) const {
     case CssValueType:
       return jsNumber(cssValue.cssValueType());
     default:
-      assert(0);
+      ASSERT(0);
       return jsUndefined();
   }
 }

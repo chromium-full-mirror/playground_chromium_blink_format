@@ -443,13 +443,13 @@ Node* Node::childNode(unsigned /*index*/) const {
 
 Node* Node::traverseNextNode(const Node* stayWithin) const {
   if (firstChild()) {
-    assert(!stayWithin || firstChild()->isDescendantOf(stayWithin));
+    ASSERT(!stayWithin || firstChild()->isDescendantOf(stayWithin));
     return firstChild();
   }
   if (this == stayWithin)
     return 0;
   if (nextSibling()) {
-    assert(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
+    ASSERT(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
     return nextSibling();
   }
   const Node* n = this;
@@ -457,7 +457,7 @@ Node* Node::traverseNextNode(const Node* stayWithin) const {
          (!stayWithin || n->parentNode() != stayWithin))
     n = n->parentNode();
   if (n) {
-    assert(!stayWithin || !n->nextSibling() ||
+    ASSERT(!stayWithin || !n->nextSibling() ||
            n->nextSibling()->isDescendantOf(stayWithin));
     return n->nextSibling();
   }
@@ -468,7 +468,7 @@ Node* Node::traverseNextSibling(const Node* stayWithin) const {
   if (this == stayWithin)
     return 0;
   if (nextSibling()) {
-    assert(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
+    ASSERT(!stayWithin || nextSibling()->isDescendantOf(stayWithin));
     return nextSibling();
   }
   const Node* n = this;
@@ -476,7 +476,7 @@ Node* Node::traverseNextSibling(const Node* stayWithin) const {
          (!stayWithin || n->parentNode() != stayWithin))
     n = n->parentNode();
   if (n) {
-    assert(!stayWithin || !n->nextSibling() ||
+    ASSERT(!stayWithin || !n->nextSibling() ||
            n->nextSibling()->isDescendantOf(stayWithin));
     return n->nextSibling();
   }
@@ -497,13 +497,13 @@ Node* Node::traversePreviousNode(const Node* stayWithin) const {
 
 Node* Node::traversePreviousNodePostOrder(const Node* stayWithin) const {
   if (lastChild()) {
-    assert(!stayWithin || lastChild()->isDescendantOf(stayWithin));
+    ASSERT(!stayWithin || lastChild()->isDescendantOf(stayWithin));
     return lastChild();
   }
   if (this == stayWithin)
     return 0;
   if (previousSibling()) {
-    assert(!stayWithin || previousSibling()->isDescendantOf(stayWithin));
+    ASSERT(!stayWithin || previousSibling()->isDescendantOf(stayWithin));
     return previousSibling();
   }
   const Node* n = this;
@@ -511,7 +511,7 @@ Node* Node::traversePreviousNodePostOrder(const Node* stayWithin) const {
          (!stayWithin || n->parentNode() != stayWithin))
     n = n->parentNode();
   if (n) {
-    assert(!stayWithin || !n->previousSibling() ||
+    ASSERT(!stayWithin || !n->previousSibling() ||
            n->previousSibling()->isDescendantOf(stayWithin));
     return n->previousSibling();
   }
@@ -796,8 +796,8 @@ void Node::dump(TextStream* stream, DeprecatedString ind) const {
 #endif
 
 void Node::attach() {
-  assert(!attached());
-  assert(!renderer() || (renderer()->style() && renderer()->parent()));
+  ASSERT(!attached());
+  ASSERT(!renderer() || (renderer()->style() && renderer()->parent()));
   document()->incDOMTreeVersion();
   m_attached = true;
 }
@@ -866,7 +866,7 @@ Node* Node::previousEditable() const {
 // Offset specifies the child node to start at.  If it is past
 // the last child, it specifies to start at next sibling.
 Node* Node::nextEditable(int offset) const {
-  assert(offset >= 0);
+  ASSERT(offset >= 0);
   Node* node;
   if (hasChildNodes())
     node = (offset >= (int)childNodeCount())
@@ -966,11 +966,11 @@ void Node::createRendererIfNeeded() {
   if (!document()->shouldCreateRenderers())
     return;
 
-  assert(!attached());
-  assert(!renderer());
+  ASSERT(!attached());
+  ASSERT(!renderer());
 
   Node* parent = parentNode();
-  assert(parent);
+  ASSERT(parent);
 
   RenderObject* parentRenderer = parent->renderer();
   if (parentRenderer && parentRenderer->canHaveChildren()
@@ -1003,7 +1003,7 @@ bool Node::rendererIsNeeded(RenderStyle* style) {
 }
 
 RenderObject* Node::createRenderer(RenderArena* arena, RenderStyle* style) {
-  assert(false);
+  ASSERT(false);
   return 0;
 }
 

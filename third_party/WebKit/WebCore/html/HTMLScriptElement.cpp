@@ -95,7 +95,7 @@ void HTMLScriptElement::closeRenderer() {
 void HTMLScriptElement::insertedIntoDocument() {
   HTMLElement::insertedIntoDocument();
 
-  assert(!m_cachedScript);
+  ASSERT(!m_cachedScript);
 
   if (m_createdByParser)
     return;
@@ -134,7 +134,7 @@ void HTMLScriptElement::removedFromDocument() {
 void HTMLScriptElement::notifyFinished(CachedResource* o) {
   CachedScript* cs = static_cast<CachedScript*>(o);
 
-  assert(cs == m_cachedScript);
+  ASSERT(cs == m_cachedScript);
 
   // Evaluating the script could lead to a garbage collection which
   // can delete the script element so we need to protect it.

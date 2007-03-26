@@ -83,7 +83,7 @@ void HTMLGenericFormElement::parseMappedAttribute(MappedAttribute* attr) {
 }
 
 void HTMLGenericFormElement::attach() {
-  assert(!attached());
+  ASSERT(!attached());
 
   HTMLElement::attach();
 
