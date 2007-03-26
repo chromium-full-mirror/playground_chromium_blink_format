@@ -59,7 +59,6 @@ class RetainPtr {
  public:
   typedef typename RemovePointer<T>::type ValueType;
   typedef ValueType* PtrType;
-  typedef ValueType& RefType;
 
   RetainPtr() : m_ptr(0) {}
   RetainPtr(PtrType ptr) : m_ptr(ptr) {
@@ -94,7 +93,6 @@ class RetainPtr {
     return tmp;
   }
 
-  RefType operator*() const { return *m_ptr; }
   PtrType operator->() const { return m_ptr; }
 
   bool operator!() const { return !m_ptr; }
