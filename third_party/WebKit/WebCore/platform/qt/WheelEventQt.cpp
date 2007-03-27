@@ -39,6 +39,7 @@ PlatformWheelEvent::PlatformWheelEvent(QWheelEvent* e)
       m_shiftKey(e->modifiers() & Qt::ShiftModifier),
       m_ctrlKey(e->modifiers() & Qt::ControlModifier),
       m_altKey(e->modifiers() & Qt::AltModifier),
-      m_metaKey(e->modifiers() & Qt::MetaModifier) {}
+      m_metaKey(e->modifiers() & Qt::MetaModifier),
+      m_isContinuous(false) {}
 
 }  // namespace WebCore

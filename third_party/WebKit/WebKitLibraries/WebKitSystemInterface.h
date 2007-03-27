@@ -180,6 +180,11 @@ NSString* WKPathFromFont(NSFont* font);
 
 BOOL WKCGContextIsBitmapContext(CGContextRef context);
 
+void WKGetWheelEventDeltas(NSEvent*,
+                           float* deltaX,
+                           float* deltaY,
+                           BOOL* continuous);
+
 #ifdef __cplusplus
 }
 #endif

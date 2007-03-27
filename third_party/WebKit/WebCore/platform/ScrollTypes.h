@@ -34,7 +34,7 @@ enum ScrollGranularity {
   ScrollByLine,
   ScrollByPage,
   ScrollByDocument,
-  ScrollByWheel
+  ScrollByPixel
 };
 
 enum ScrollbarOrientation { HorizontalScrollbar, VerticalScrollbar };

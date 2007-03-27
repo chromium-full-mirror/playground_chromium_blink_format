@@ -74,6 +74,8 @@ class PlatformWheelEvent {
   void accept() { m_isAccepted = true; }
   void ignore() { m_isAccepted = false; }
 
+  bool isContinuous() const { return m_isContinuous; }
+
 #if PLATFORM(MAC)
   PlatformWheelEvent(NSEvent*);
 #endif
@@ -97,6 +99,7 @@ class PlatformWheelEvent {
   bool m_ctrlKey;
   bool m_altKey;
   bool m_metaKey;
+  bool m_isContinuous;
 };
 
 }  // namespace WebCore

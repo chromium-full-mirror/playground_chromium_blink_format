@@ -61,11 +61,11 @@ class Scrollbar : public Shared<Scrollbar> {
   virtual bool isWidget() const = 0;
 
   ScrollbarOrientation orientation() const { return m_orientation; }
-  int value() const { return m_currentPos; }
+  int value() const { return lroundf(m_currentPos); }
 
   ScrollbarControlSize controlSize() const { return m_controlSize; }
 
-  void setSteps(int lineStep, int pageStep);
+  void setSteps(int lineStep, int pageStep, int pixelsPerStep = 1);
 
   bool setValue(int);
   void setProportion(int visibleSize, int totalSize);
@@ -107,9 +107,10 @@ class Scrollbar : public Shared<Scrollbar> {
   ScrollbarControlSize m_controlSize;
   int m_visibleSize;
   int m_totalSize;
-  int m_currentPos;
+  float m_currentPos;
   int m_lineStep;
   int m_pageStep;
+  float m_pixelStep;
 };
 }
 
