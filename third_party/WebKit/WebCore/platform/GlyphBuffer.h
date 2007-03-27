@@ -64,7 +64,9 @@ class GlyphBuffer {
     m_fontData.clear();
     m_glyphs.clear();
     m_advances.clear();
+#if PLATFORM(WIN)
     m_offsets.clear();
+#endif
   }
 
   GlyphBufferGlyph* glyphs(int from) { return m_glyphs.data() + from; }
