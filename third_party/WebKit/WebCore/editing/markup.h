@@ -52,7 +52,7 @@ DeprecatedString createMarkup(
     const Range*,
     Vector<Node*>* = 0,
     EAnnotateForInterchange = DoNotAnnotateForInterchange,
-    bool includeInlineSpecialAncestors = false);
+    bool convertBlocksToInlines = false);
 DeprecatedString createMarkup(
     const Node*,
     EChildrenOnly = IncludeNode,
