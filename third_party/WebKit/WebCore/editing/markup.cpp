@@ -226,9 +226,11 @@ static DeprecatedString startMarkup(const Node* node,
       for (unsigned int i = 0; i < length; i++) {
         Attribute* attr = attrs->attributeItem(i);
         String value = attr->value();
-        if (attr->name() == styleAttr && convertBlocksToInlines) {
+        if (attr->name() == styleAttr && convertBlocksToInlines &&
+            el->isHTMLElement()) {
+          Element* element = const_cast<Element*>(el);
           RefPtr<CSSMutableStyleDeclaration> inlineStyle =
-              static_cast<const HTMLElement*>(el)->getInlineStyleDecl()->copy();
+              static_cast<HTMLElement*>(element)->getInlineStyleDecl()->copy();
           inlineStyle->setProperty(CSS_PROP_DISPLAY, CSS_VAL_INLINE, true);
           value = inlineStyle->cssText();
         }
