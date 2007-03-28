@@ -128,7 +128,8 @@ void LocationPath::optimizeStepPair(unsigned index) {
       first->nodeTest().kind() == Step::NodeTest::AnyNodeTest &&
       first->predicates().size() == 0) {
     Step* second = m_steps[index + 1];
-    if (second->axis() == Step::ChildAxis && second->namespaceURI().isEmpty() &&
+    if (second->axis() == Step::ChildAxis &&
+        second->nodeTest().namespaceURI().isEmpty() &&
         second->nodeTest().kind() == Step::NodeTest::NameTest &&
         second->nodeTest().data() == "*") {
       // Optimize the common case of "//*" AKA
