@@ -43,7 +43,7 @@ using namespace std;
 
 namespace WebCore {
 
-const int cDefaultCacheSize = 1000;  // 8192 * 1024;
+const int cDefaultCacheSize = 8192 * 1024;
 
 Cache* cache() {
   static Cache cache;
@@ -175,7 +175,6 @@ void Cache::pruneLiveResources() {
 }
 
 void Cache::pruneAllResources() {
-  m_maximumSize = 1000;
   // No need to prune if all of our objects fit.
   if (m_currentSize <= m_maximumSize)
     return;
