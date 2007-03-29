@@ -29,7 +29,6 @@
 #ifndef CachedResource_h
 #define CachedResource_h
 
-#include "CachePolicy.h"
 #include "PlatformString.h"
 #include "ResourceResponse.h"
 #include "SharedBuffer.h"
@@ -73,10 +72,7 @@ class CachedResource {
     Cached      // regular case
   };
 
-  CachedResource(const String& URL,
-                 Type type,
-                 CachePolicy cachePolicy,
-                 unsigned encodedSize = 0);
+  CachedResource(const String& URL, Type type, unsigned encodedSize = 0);
   virtual ~CachedResource();
 
   virtual void setEncoding(const String&) {}
@@ -121,8 +117,6 @@ class CachedResource {
   // if the number of clients observing it ever drops to 0.
   void setInCache(bool b) { m_inCache = b; }
   bool inCache() const { return m_inCache; }
-
-  CachePolicy cachePolicy() const { return m_cachePolicy; }
 
   void setRequest(Request*);
 
@@ -170,7 +164,6 @@ class CachedResource {
   unsigned m_liveAccessCount;
 
  protected:
-  CachePolicy m_cachePolicy;
   bool m_inCache;
   bool m_loading;
   bool m_expireDateChanged;

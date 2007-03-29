@@ -40,7 +40,6 @@ class CachedScript : public CachedResource {
  public:
   CachedScript(DocLoader*,
                const String& URL,
-               CachePolicy,
                time_t expireDate,
                const String& charset);
   virtual ~CachedScript();

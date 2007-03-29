@@ -42,7 +42,6 @@ class CachedCSSStyleSheet : public CachedResource {
  public:
   CachedCSSStyleSheet(DocLoader*,
                       const String& URL,
-                      CachePolicy,
                       time_t expireDate,
                       const String& charset,
                       bool skipCanLoadCheck = false);

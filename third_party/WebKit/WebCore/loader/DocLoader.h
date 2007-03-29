@@ -95,6 +95,10 @@ class DocLoader {
   void setLoadInProgress(bool);
   bool loadInProgress() const { return m_loadInProgress; }
 
+  void setPasteInProgress(bool pasteInProgress) {
+    m_pasteInProgress = pasteInProgress;
+  }
+
  private:
   CachedResource* requestResource(CachedResource::Type,
                                   const String& url,
@@ -109,10 +113,13 @@ class DocLoader {
   mutable HashMap<String, CachedResource*> m_docResources;
   time_t m_expireDate;
   CachePolicy m_cachePolicy;
-  bool m_autoLoadImages : 1;
   Frame* m_frame;
   Document* m_doc;
-  bool m_loadInProgress;
+
+  // 29 bits left
+  bool m_autoLoadImages : 1;
+  bool m_loadInProgress : 1;
+  bool m_pasteInProgress : 1;
 };
 }
 

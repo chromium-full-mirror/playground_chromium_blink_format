@@ -40,10 +40,7 @@ class TextResourceDecoder;
 #if ENABLE(XSLT)
 class CachedXSLStyleSheet : public CachedResource {
  public:
-  CachedXSLStyleSheet(DocLoader*,
-                      const String& url,
-                      CachePolicy,
-                      time_t expireDate);
+  CachedXSLStyleSheet(DocLoader*, const String& url, time_t expireDate);
 
   const String& sheet() const { return m_sheet; }
 

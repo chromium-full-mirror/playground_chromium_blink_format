@@ -31,6 +31,7 @@
 #include "CSSStyleDeclaration.h"
 #include "Document.h"
 #include "DocumentFragment.h"
+#include "DocLoader.h"
 #include "DragActions.h"
 #include "Editor.h"
 #include "EditorClient.h"
@@ -363,15 +364,19 @@ bool DragController::concludeDrag(DragData* dragData,
   Selection dragCaret(m_page->dragCaretController()->selection());
   m_page->dragCaretController()->clear();
   RefPtr<Range> range = dragCaret.toRange();
+  DocLoader* loader = range->ownerDocument()->docLoader();
+  loader->setPasteInProgress(true);
   if (dragIsMove(innerFrame->selectionController(), dragData) ||
       dragCaret.isContentRichlyEditable()) {
     bool chosePlainText = false;
     RefPtr<DocumentFragment> fragment =
         documentFragmentFromDragData(dragData, range, true, chosePlainText);
     if (!fragment ||
-        !innerFrame->editor()->shouldInsertFragment(fragment, range,
-                                                    EditorInsertActionDropped))
+        !innerFrame->editor()->shouldInsertFragment(
+            fragment, range, EditorInsertActionDropped)) {
+      loader->setPasteInProgress(false);
       return false;
+    }
 
     m_client->willPerformDragDestinationAction(DragDestinationActionEdit,
                                                dragData);
@@ -391,8 +396,10 @@ bool DragController::concludeDrag(DragData* dragData,
     String text = dragData->asPlainText();
     if (text.isEmpty() ||
         !innerFrame->editor()->shouldInsertText(text, range.get(),
-                                                EditorInsertActionDropped))
+                                                EditorInsertActionDropped)) {
+      loader->setPasteInProgress(false);
       return false;
+    }
 
     m_client->willPerformDragDestinationAction(DragDestinationActionEdit,
                                                dragData);
@@ -401,6 +408,7 @@ bool DragController::concludeDrag(DragData* dragData,
           m_document, createFragmentFromText(range.get(), text), true, false,
           true));
   }
+  loader->setPasteInProgress(false);
 
   return true;
 }
