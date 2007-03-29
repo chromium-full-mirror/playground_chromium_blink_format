@@ -185,6 +185,8 @@ void WKGetWheelEventDeltas(NSEvent*,
                            float* deltaY,
                            BOOL* continuous);
 
+BOOL WKAppVersionCheckLessThan(NSString*, int, double);
+
 #ifdef __cplusplus
 }
 #endif
