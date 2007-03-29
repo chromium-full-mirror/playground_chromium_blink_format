@@ -63,6 +63,7 @@ typedef struct {
   NPObject header;
   NPP npp;
   Boolean eventLogging;
+  NPStream* stream;
 } PluginObject;
 
 extern NPClass* getPluginClass(void);
