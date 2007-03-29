@@ -365,7 +365,7 @@ bool DragController::concludeDrag(DragData* dragData,
   m_page->dragCaretController()->clear();
   RefPtr<Range> range = dragCaret.toRange();
   DocLoader* loader = range->ownerDocument()->docLoader();
-  loader->setPasteInProgress(true);
+  loader->setAllowStaleResources(true);
   if (dragIsMove(innerFrame->selectionController(), dragData) ||
       dragCaret.isContentRichlyEditable()) {
     bool chosePlainText = false;
@@ -374,7 +374,7 @@ bool DragController::concludeDrag(DragData* dragData,
     if (!fragment ||
         !innerFrame->editor()->shouldInsertFragment(
             fragment, range, EditorInsertActionDropped)) {
-      loader->setPasteInProgress(false);
+      loader->setAllowStaleResources(false);
       return false;
     }
 
@@ -397,7 +397,7 @@ bool DragController::concludeDrag(DragData* dragData,
     if (text.isEmpty() ||
         !innerFrame->editor()->shouldInsertText(text, range.get(),
                                                 EditorInsertActionDropped)) {
-      loader->setPasteInProgress(false);
+      loader->setAllowStaleResources(false);
       return false;
     }
 
@@ -408,7 +408,7 @@ bool DragController::concludeDrag(DragData* dragData,
           m_document, createFragmentFromText(range.get(), text), true, false,
           true));
   }
-  loader->setPasteInProgress(false);
+  loader->setAllowStaleResources(false);
 
   return true;
 }
