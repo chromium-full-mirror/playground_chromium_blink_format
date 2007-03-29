@@ -35,7 +35,10 @@
 #include "DeleteSelectionCommand.h"
 #include "Document.h"
 #include "DocumentFragment.h"
+#include "Editor.h"
+#include "EditorInsertAction.h"
 #include "Element.h"
+#include "Frame.h"
 #include "HTMLNames.h"
 #include "InlineTextBox.h"
 #include "InsertIntoTextNodeCommand.h"
@@ -791,6 +794,14 @@ void CompositeEditCommand::moveParagraphs(
                 createMarkup(range.get(), 0, DoNotAnnotateForInterchange, true),
                 "")
           : 0;
+
+  // FIXME (5098931): We should add a new insert action
+  // "WebViewInsertActionMoved" for this shouldInsert... call.
+  if (fragment.get() &&
+      !document()->frame()->editor()->shouldInsertFragment(
+          fragment.get(), Selection(destination).toRange(),
+          EditorInsertActionPasted))
+    return;
 
   setEndingSelection(Selection(start, end, DOWNSTREAM));
   deleteSelection(false, false, false, false);
