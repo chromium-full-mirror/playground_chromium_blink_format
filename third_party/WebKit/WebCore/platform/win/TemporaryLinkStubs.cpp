@@ -959,7 +959,7 @@ void ScrollView::addChild(Widget*) {
 void ScrollView::removeChild(Widget*) {
   notImplemented();
 }
-void ScrollView::scrollPointRecursively(int x, int y) {
+void ScrollView::scrollRectIntoViewRecursively(const IntRect&) {
   notImplemented();
 }
 bool ScrollView::inWindow() const {

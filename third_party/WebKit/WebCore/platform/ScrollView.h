@@ -50,6 +50,7 @@ class ScrollView : public Widget {
   int visibleWidth() const;
   int visibleHeight() const;
   FloatRect visibleContentRect() const;
+  FloatRect visibleContentRectConsideringExternalScrollers() const;
 
   int contentsWidth() const;
   int contentsHeight() const;
@@ -57,7 +58,7 @@ class ScrollView : public Widget {
   int contentsY() const;
   IntSize scrollOffset() const;
   void scrollBy(int dx, int dy);
-  virtual void scrollPointRecursively(int dx, int dy);
+  virtual void scrollRectIntoViewRecursively(const IntRect&);
 
   virtual void setContentsPos(int x, int y);
 

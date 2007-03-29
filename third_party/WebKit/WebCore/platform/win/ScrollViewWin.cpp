@@ -93,6 +93,11 @@ FloatRect ScrollView::visibleContentRect() const {
   return contentRect;
 }
 
+FloatRect ScrollView::visibleContentRectConsideringExternalScrollers() const {
+  // external scrollers not supported for now
+  return visibleContentRect();
+}
+
 void ScrollView::setContentsPos(int newX, int newY) {
   int dx = newX - contentsX();
   int dy = newY - contentsY();
