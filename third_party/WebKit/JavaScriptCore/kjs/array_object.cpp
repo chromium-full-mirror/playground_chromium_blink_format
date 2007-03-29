@@ -100,7 +100,7 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
       return false;
     if (index < storageLength) {
       JSValue* v = storage[index];
-      if (!v || v->isUndefined())
+      if (!v)
         return false;
       slot.setValueSlot(this, &storage[index]);
       return true;
@@ -120,7 +120,7 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
     return false;
   if (index < storageLength) {
     JSValue* v = storage[index];
-    if (!v || v->isUndefined())
+    if (!v)
       return false;
     slot.setValueSlot(this, &storage[index]);
     return true;
@@ -872,7 +872,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       if (id == Some || id == Every)
         result = jsBoolean(id == Every);
       else
-        result = thisObj;
+        result = jsUndefined();
 
       for (unsigned k = 0; k < length && !exec->hadException(); ++k) {
         PropertySlot slot;
@@ -921,7 +921,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       for (; index < length; ++index) {
         JSValue* e = getProperty(exec, thisObj, index);
         if (!e)
-          e = jsUndefined();
+          continue;
         if (strictEqual(exec, searchElement, e))
           return jsNumber(index);
       }
@@ -948,7 +948,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       for (; index >= 0; --index) {
         JSValue* e = getProperty(exec, thisObj, index);
         if (!e)
-          e = jsUndefined();
+          continue;
         if (strictEqual(exec, searchElement, e))
           return jsNumber(index);
       }
