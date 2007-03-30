@@ -30,6 +30,7 @@
 #if ENABLE(XPATH)
 
 #include "XPathExpressionNode.h"
+#include "XPathValue.h"
 
 namespace WebCore {
 
@@ -41,7 +42,7 @@ class Number : public Expression {
 
  private:
   virtual Value evaluate() const;
-  double m_value;
+  Value m_value;
 };
 
 class StringExpression : public Expression {
@@ -50,7 +51,7 @@ class StringExpression : public Expression {
 
  private:
   virtual Value evaluate() const;
-  String m_value;
+  Value m_value;
 };
 
 class Negative : public Expression {

@@ -88,7 +88,7 @@ class Step : public ParseNode, Noncopyable {
        const Vector<Predicate*>& predicates = Vector<Predicate*>());
   ~Step();
 
-  NodeSet evaluate(Node* context) const;
+  void evaluate(Node* context, NodeSet&) const;
 
   Axis axis() const { return m_axis; }
   NodeTest nodeTest() const { return m_nodeTest; }
@@ -102,7 +102,7 @@ class Step : public ParseNode, Noncopyable {
 
  private:
   void parseNodeTest(const String&);
-  NodeSet nodesInAxis(Node* context) const;
+  void nodesInAxis(Node* context, NodeSet&) const;
   bool nodeMatches(Node*) const;
   String namespaceFromNodetest(const String& nodeTest) const;
   Node::NodeType primaryNodeType(Axis) const;
