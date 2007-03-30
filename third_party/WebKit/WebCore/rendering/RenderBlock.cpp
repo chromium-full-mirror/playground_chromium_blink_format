@@ -113,7 +113,6 @@ RenderBlock::RenderBlock(Node* node) : RenderFlow(node) {
   m_topMarginQuirk = m_bottomMarginQuirk = false;
   m_overflowHeight = m_overflowWidth = 0;
   m_overflowLeft = m_overflowTop = 0;
-  m_tabWidth = -1;
   m_desiredColumnCount = 1;
   m_desiredColumnWidth = 0;
   m_columnRects = 0;
@@ -144,7 +143,6 @@ void RenderBlock::setStyle(RenderStyle* _style) {
   }
 
   m_lineHeight = -1;
-  m_tabWidth = -1;
 
   // Update pseudos for :before and :after now.
   updatePseudoChild(RenderStyle::BEFORE);

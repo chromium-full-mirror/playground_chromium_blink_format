@@ -479,8 +479,6 @@ class RenderObject : public CachedResourceClient {
   // the offset of baseline from the top of the object.
   virtual short baselinePosition(bool firstLine,
                                  bool isRootLineBox = false) const;
-  // width of tab character
-  int tabWidth() const;
 
   /*
    * Paint the object and its children, clipped by (x|y|w|h).

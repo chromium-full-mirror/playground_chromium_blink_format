@@ -123,7 +123,7 @@ IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
 
   IntRect r = enclosingIntRect(f.selectionRectForText(
       TextRun(textObj->text(), m_start, m_len, sPos, ePos),
-      TextStyle(textObj->tabWidth(), textPos(), m_toAdd, m_reversed,
+      TextStyle(textObj->allowTabs(), textPos(), m_toAdd, m_reversed,
                 m_dirOverride),
       IntPoint(tx + m_x, ty + selTop), selHeight));
   if (r.x() > tx + m_x + m_width)
@@ -435,7 +435,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
   StringImpl* textStr = textObject()->text();
 
-  TextStyle textStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
+  TextStyle textStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                       m_dirOverride || styleToUse->visuallyOrdered());
 
   if (!paintSelectedTextOnly && !paintSelectedTextSeparately) {
@@ -583,7 +583,7 @@ void InlineTextBox::paintSelection(GraphicsContext* p,
   p->drawHighlightForText(
       TextRun(textObject()->text(), m_start, m_len, sPos, ePos),
       IntPoint(m_x + tx, y + ty), h,
-      TextStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
+      TextStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                 m_dirOverride || style->visuallyOrdered()),
       c);
   p->restore();
@@ -614,7 +614,7 @@ void InlineTextBox::paintMarkedTextBackground(GraphicsContext* p,
   p->drawHighlightForText(
       TextRun(textObject()->text(), m_start, m_len, sPos, ePos),
       IntPoint(m_x + tx, y + ty), h,
-      TextStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
+      TextStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                 m_dirOverride || style->visuallyOrdered()),
       c);
   p->restore();
@@ -720,7 +720,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     int y = selectionTop();
     IntPoint startPoint = IntPoint(m_x + tx, y + ty);
     TextStyle textStyle =
-        TextStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
+        TextStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                   m_dirOverride || style->visuallyOrdered());
     int startPosition = max(marker.startOffset - m_start, (unsigned)0);
     int endPosition = min(marker.endOffset - m_start, (unsigned)m_len);
@@ -774,7 +774,7 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   int ePos = min(marker.endOffset - m_start, (unsigned)m_len);
   TextRun run = TextRun(textObject()->text(), m_start, m_len, sPos, ePos);
   TextStyle renderStyle =
-      TextStyle(textObject()->tabWidth(), textPos(), m_toAdd, m_reversed,
+      TextStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                 m_dirOverride || style->visuallyOrdered());
   IntPoint startPoint = IntPoint(m_x + tx, y + ty);
 
@@ -946,7 +946,7 @@ int InlineTextBox::offsetForPosition(int _x, bool includePartialGlyphs) const {
   const Font* f = &style->font();
   return f->offsetForPosition(
       TextRun(textObject()->text(), m_start, m_len),
-      TextStyle(text->tabWidth(), textPos(), m_toAdd, m_reversed,
+      TextStyle(textObject()->allowTabs(), textPos(), m_toAdd, m_reversed,
                 m_dirOverride || style->visuallyOrdered()),
       _x - m_x, includePartialGlyphs);
 }
@@ -962,8 +962,8 @@ int InlineTextBox::positionForOffset(int offset) const {
   // FIXME: Do we need to add rightBearing here?
   return enclosingIntRect(f.selectionRectForText(
                               TextRun(text->text(), m_start, m_len, from, to),
-                              TextStyle(text->tabWidth(), textPos(), m_toAdd,
-                                        m_reversed, m_dirOverride),
+                              TextStyle(textObject()->allowTabs(), textPos(),
+                                        m_toAdd, m_reversed, m_dirOverride),
                               IntPoint(m_x, 0), 0))
       .right();
 }
