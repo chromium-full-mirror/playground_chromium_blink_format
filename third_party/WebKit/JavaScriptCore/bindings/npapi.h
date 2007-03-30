@@ -102,7 +102,7 @@
 /*----------------------------------------------------------------------*/
 
 #define NP_VERSION_MAJOR 0
-#define NP_VERSION_MINOR 14
+#define NP_VERSION_MINOR 17
 
 /*----------------------------------------------------------------------*/
 /*             Definition of Basic Types                                */
@@ -669,6 +669,8 @@ NPError NPN_SetValue(NPP instance, NPPVariable variable, void* value);
 void NPN_InvalidateRect(NPP instance, NPRect* invalidRect);
 void NPN_InvalidateRegion(NPP instance, NPRegion invalidRegion);
 void NPN_ForceRedraw(NPP instance);
+void NPN_PushPopupsEnabledState(NPP instance, NPBool enabled);
+void NPN_PopPopupsEnabledState(NPP instance);
 
 #ifdef __cplusplus
 } /* end extern "C" */

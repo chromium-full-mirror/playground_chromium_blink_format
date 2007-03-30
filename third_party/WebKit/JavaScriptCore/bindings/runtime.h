@@ -35,6 +35,7 @@ namespace KJS {
 
 class Identifier;
 class List;
+class PropertyNameArray;
 
 namespace Bindings {
 
@@ -181,6 +182,8 @@ class Instance : Noncopyable {
   virtual JSValue* invokeDefaultMethod(ExecState*, const List&) {
     return jsUndefined();
   }
+
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&) {}
 
   virtual JSValue* defaultValue(JSType hint) const = 0;
 

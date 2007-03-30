@@ -49,6 +49,7 @@ class RuntimeObjectImp : public JSObject {
   virtual JSValue* callAsFunction(ExecState* exec,
                                   JSObject* thisObj,
                                   const List& args);
+  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   Bindings::Instance* getInternalInstance() const { return instance.get(); }
 
