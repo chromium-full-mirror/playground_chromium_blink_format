@@ -248,7 +248,7 @@ VisiblePosition SelectionController::modifyExtendingRightForward(
   VisiblePosition pos(m_sel.extent(), m_sel.affinity());
   switch (granularity) {
     case CharacterGranularity:
-      pos = pos.next();
+      pos = pos.next(true);
       break;
     case WordGranularity:
       pos = nextWordPosition(pos);
@@ -349,7 +349,7 @@ VisiblePosition SelectionController::modifyExtendingLeftBackward(
   // over everything.
   switch (granularity) {
     case CharacterGranularity:
-      pos = pos.previous();
+      pos = pos.previous(true);
       break;
     case WordGranularity:
       pos = previousWordPosition(pos);
