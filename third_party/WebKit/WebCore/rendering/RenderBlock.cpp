@@ -1619,7 +1619,7 @@ void RenderBlock::paintCaret(PaintInfo& paintInfo, CaretType type) {
       renderer->isBlockFlow() && selectionController->isInsideNode();
   if ((cursorInsideBlockCaretNode ? renderer : renderer->containingBlock()) ==
           this &&
-      caretNode->isContentEditable()) {
+      selectionController->isContentEditable()) {
     if (type == CursorCaret)
       document()->frame()->paintCaret(paintInfo.context, paintInfo.rect);
     else

@@ -273,7 +273,7 @@ VisiblePosition SelectionController::modifyExtendingRightForward(
       break;
     case DocumentBoundary:
       pos = VisiblePosition(m_sel.end(), m_sel.affinity());
-      if (pos.deepEquivalent().node()->isContentEditable())
+      if (isEditablePosition(pos.deepEquivalent()))
         pos = endOfEditableContent(pos);
       else
         pos = endOfDocument(pos);
@@ -327,7 +327,7 @@ VisiblePosition SelectionController::modifyMovingRightForward(
       break;
     case DocumentBoundary:
       pos = VisiblePosition(m_sel.end(), m_sel.affinity());
-      if (pos.deepEquivalent().node()->isContentEditable())
+      if (isEditablePosition(pos.deepEquivalent()))
         pos = endOfEditableContent(pos);
       else
         pos = endOfDocument(pos);
@@ -375,10 +375,10 @@ VisiblePosition SelectionController::modifyExtendingLeftBackward(
       break;
     case DocumentBoundary:
       pos = VisiblePosition(m_sel.start(), m_sel.affinity());
-      if (pos.deepEquivalent().node()->isContentEditable())
+      if (isEditablePosition(pos.deepEquivalent()))
         pos = startOfEditableContent(pos);
       else
-        pos = startOfDocument(VisiblePosition(m_sel.start(), m_sel.affinity()));
+        pos = startOfDocument(pos);
       break;
   }
   return pos;
@@ -424,10 +424,10 @@ VisiblePosition SelectionController::modifyMovingLeftBackward(
       break;
     case DocumentBoundary:
       pos = VisiblePosition(m_sel.start(), m_sel.affinity());
-      if (pos.deepEquivalent().node()->isContentEditable())
+      if (isEditablePosition(pos.deepEquivalent()))
         pos = startOfEditableContent(pos);
       else
-        pos = startOfDocument(VisiblePosition(m_sel.start(), m_sel.affinity()));
+        pos = startOfDocument(pos);
       break;
   }
   return pos;
