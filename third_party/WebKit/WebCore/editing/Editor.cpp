@@ -832,6 +832,18 @@ static bool execDelete(Frame* frame, Event*) {
   return true;
 }
 
+static bool execDeleteWordBackward(Frame* frame, Event*) {
+  frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
+                                       WordGranularity, true, false);
+  return true;
+}
+
+static bool execDeleteWordForward(Frame* frame, Event*) {
+  frame->editor()->deleteWithDirection(SelectionController::FORWARD,
+                                       WordGranularity, true, false);
+  return true;
+}
+
 static bool execBackwardDelete(Frame* frame, Event*) {
   frame->editor()->deleteWithDirection(SelectionController::BACKWARD,
                                        CharacterGranularity, false, true);
@@ -1285,6 +1297,8 @@ static CommandMap* createCommandMap() {
       {"Copy", {hasRangeSelection, execCopy}},
       {"Cut", {hasEditableRangeSelection, execCut}},
       {"Delete", {hasEditableSelection, execDelete}},
+      {"DeleteWordBackward", {hasEditableSelection, execDeleteWordBackward}},
+      {"DeleteWordForward", {hasEditableSelection, execDeleteWordForward}},
       {"ForwardDelete", {hasEditableSelection, execForwardDelete}},
       {"InsertBacktab", {hasEditableSelection, execInsertBacktab}},
       {"InsertTab", {hasEditableSelection, execInsertTab}},
