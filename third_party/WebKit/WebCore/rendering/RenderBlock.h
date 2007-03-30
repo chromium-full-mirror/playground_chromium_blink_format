@@ -183,7 +183,6 @@ class RenderBlock : public RenderFlow {
 
   void insertFloatingObject(RenderObject*);
   void removeFloatingObject(RenderObject*);
-  void setPaintsFloatingObject(RenderObject*, bool);
 
   // called from lineWidth, to position the floats added in the last line.
   void positionNewFloats();
