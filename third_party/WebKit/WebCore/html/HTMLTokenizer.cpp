@@ -896,7 +896,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
         unsigned int ll = min(src.length(), CBUFLEN - cBufferPos);
         while (ll--) {
           UChar curchar = *src;
-          if (curchar <= ' ' || curchar == '>') {
+          if (curchar <= ' ' || curchar == '>' || curchar == '<') {
             finish = true;
             break;
           }
@@ -976,7 +976,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           // this if we have a non-empty attribute name.  This allows the
           // degenerate case of <input type=checkbox checked/>
           // to work (despite it being utterly invalid).
-          if (curchar <= '>' && (curchar >= '=' || curchar <= ' ' ||
+          if (curchar <= '>' && (curchar >= '<' || curchar <= ' ' ||
                                  (curchar == '/' && attrName.length() > 0))) {
             cBuffer[cBufferPos] = '\0';
             attrName = AtomicString(cBuffer);
