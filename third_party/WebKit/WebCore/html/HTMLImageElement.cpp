@@ -245,6 +245,7 @@ int HTMLImageElement::height(bool ignorePendingStylesheets) const {
 
 bool HTMLImageElement::isURLAttribute(Attribute* attr) const {
   return attr->name() == srcAttr || attr->name() == lowsrcAttr ||
+         attr->name() == longdescAttr ||
          (attr->name() == usemapAttr && attr->value().domString()[0] != '#');
 }
 
@@ -302,7 +303,7 @@ void HTMLImageElement::setIsMap(bool isMap) {
 }
 
 String HTMLImageElement::longDesc() const {
-  return getAttribute(longdescAttr);
+  return document()->completeURL(getAttribute(longdescAttr));
 }
 
 void HTMLImageElement::setLongDesc(const String& value) {
