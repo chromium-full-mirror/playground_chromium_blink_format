@@ -121,7 +121,9 @@ class RenderBlock : public RenderFlow {
   virtual void layout();
   virtual void layoutBlock(bool relayoutChildren);
   void layoutBlockChildren(bool relayoutChildren);
-  IntRect layoutInlineChildren(bool relayoutChildren);
+  void layoutInlineChildren(bool relayoutChildren,
+                            int& repaintTop,
+                            int& repaintBottom);
 
   void layoutPositionedObjects(bool relayoutChildren);
   void insertPositionedObject(RenderObject*);
