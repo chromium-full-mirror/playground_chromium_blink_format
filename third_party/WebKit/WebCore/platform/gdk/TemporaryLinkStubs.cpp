@@ -558,13 +558,18 @@ void Icon::paint(GraphicsContext*, const IntRect&) {
 FloatRect Font::selectionRectForComplexText(const TextRun&,
                                             const TextStyle&,
                                             const IntPoint&,
+                                            int,
+                                            int,
                                             int) const {
   return FloatRect();
+  notImplementedGdk();
 }
 void Font::drawComplexText(GraphicsContext*,
                            const TextRun&,
                            const TextStyle&,
-                           const FloatPoint&) const {
+                           const FloatPoint&,
+                           int from,
+                           int to) const {
   notImplementedGdk();
 }
 float Font::floatWidthForComplexText(const TextRun&, const TextStyle&) const {
