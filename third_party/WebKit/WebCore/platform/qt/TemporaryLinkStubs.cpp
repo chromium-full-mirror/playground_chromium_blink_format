@@ -70,6 +70,8 @@ using namespace WebCore;
 FloatRect Font::selectionRectForComplexText(const TextRun&,
                                             const TextStyle&,
                                             const IntPoint&,
+                                            int,
+                                            int,
                                             int) const {
   notImplemented();
   return FloatRect();

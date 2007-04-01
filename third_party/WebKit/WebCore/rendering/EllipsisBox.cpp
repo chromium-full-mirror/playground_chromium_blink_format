@@ -47,7 +47,7 @@ void EllipsisBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
   const String& str = m_str;
   TextStyle textStyle(0, 0, 0, false, style->visuallyOrdered());
-  context->drawText(TextRun(str.impl()),
+  context->drawText(TextRun(str.characters(), str.length()),
                     IntPoint(m_x + tx, m_y + ty + m_baseline), textStyle);
 
   if (setShadow)
