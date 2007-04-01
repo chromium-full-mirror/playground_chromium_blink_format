@@ -82,7 +82,7 @@ bool HTMLImageElement::mapToEntry(const QualifiedName& attrName,
 void HTMLImageElement::parseMappedAttribute(MappedAttribute* attr) {
   const QualifiedName& attrName = attr->name();
   if (attrName == altAttr) {
-    if (renderer())
+    if (renderer() && renderer()->isImage())
       static_cast<RenderImage*>(renderer())->updateAltText();
   } else if (attrName == srcAttr)
     m_imageLoader.updateFromElement();
@@ -168,7 +168,7 @@ RenderObject* HTMLImageElement::createRenderer(RenderArena* arena,
 void HTMLImageElement::attach() {
   HTMLElement::attach();
 
-  if (renderer()) {
+  if (renderer() && renderer()->isImage()) {
     RenderImage* imageObj = static_cast<RenderImage*>(renderer());
     imageObj->setCachedImage(m_imageLoader.image());
 
