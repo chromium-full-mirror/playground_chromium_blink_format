@@ -33,8 +33,6 @@
   KJS::Bindings::RootObject* rootObject;
   KJS::Bindings::RootObject* originRootObject;
   BOOL isCreatedByDOMWrapper;
-  BOOL shouldRespondToCount;
-  BOOL shouldRespondToCountSet;
 }
 @end
 
