@@ -1403,6 +1403,9 @@ Editor::Editor(Frame* frame)
 Editor::~Editor() {}
 
 bool Editor::execCommand(const AtomicString& command, Event* triggeringEvent) {
+  if (!m_frame->document())
+    return false;
+
   static CommandMap* commandMap;
   if (!commandMap)
     commandMap = createCommandMap();
