@@ -380,6 +380,11 @@ class RenderLayer : public ScrollbarClient {
 
   IntRect repaintRect() const { return m_repaintRect; }
 
+  int staticX() const { return m_staticX; }
+  int staticY() const { return m_staticY; }
+  void setStaticX(int staticX) { m_staticX = staticX; }
+  void setStaticY(int staticY) { m_staticY = staticY; }
+
   void destroy(RenderArena*);
 
   // Overloaded new operator.  Derived classes must override operator new
@@ -504,6 +509,11 @@ class RenderLayer : public ScrollbarClient {
   bool m_hasVisibleDescendant : 1;
 
   Marquee* m_marquee;  // Used by layers with overflow:marquee
+
+  // Cached normal flow values for absolute positioned elements with static
+  // left/top values.
+  int m_staticX;
+  int m_staticY;
 };
 
 }  // namespace WebCore

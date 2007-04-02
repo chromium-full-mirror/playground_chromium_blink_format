@@ -81,6 +81,10 @@ void RenderWidget::destroy() {
     widgetRendererMap().remove(m_widget);
   }
 
+  // removes from override size map
+  if (hasOverrideSize())
+    setOverrideSize(-1);
+
   RenderLayer* layer = m_layer;
   RenderArena* arena = renderArena();
 

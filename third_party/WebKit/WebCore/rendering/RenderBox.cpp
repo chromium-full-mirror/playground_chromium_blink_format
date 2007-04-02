@@ -50,6 +50,10 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
+// Used by flexible boxes when flexing this element.
+typedef WTF::HashMap<const RenderBox*, int> OverrideSizeMap;
+static OverrideSizeMap* gOverrideSizeMap = 0;
+
 RenderBox::RenderBox(Node* node)
     : RenderObject(node),
       m_width(0),
@@ -63,10 +67,7 @@ RenderBox::RenderBox(Node* node)
       m_minWidth(-1),
       m_maxWidth(-1),
       m_layer(0),
-      m_inlineBoxWrapper(0),
-      m_overrideSize(-1),
-      m_staticX(0),
-      m_staticY(0) {}
+      m_inlineBoxWrapper(0) {}
 
 void RenderBox::setStyle(RenderStyle* newStyle) {
   bool wasFloating = isFloating();
@@ -147,6 +148,9 @@ void RenderBox::destroy() {
   // RenderWidget::destroy. If anything in this function changes,
   // be sure to fix RenderWidget::destroy() as well.
 
+  if (hasOverrideSize())
+    gOverrideSizeMap->remove(this);
+
   RenderLayer* layer = m_layer;
   RenderArena* arena = renderArena();
 
@@ -160,12 +164,32 @@ void RenderBox::destroy() {
     layer->destroy(arena);
 }
 
+int RenderBox::overrideSize() const {
+  if (!hasOverrideSize())
+    return -1;
+  return gOverrideSizeMap->get(this);
+}
+
+void RenderBox::setOverrideSize(int s) {
+  if (s == -1) {
+    if (hasOverrideSize()) {
+      setHasOverrideSize(false);
+      gOverrideSizeMap->remove(this);
+    }
+  } else {
+    if (!gOverrideSizeMap)
+      gOverrideSizeMap = new OverrideSizeMap();
+    setHasOverrideSize(true);
+    gOverrideSizeMap->set(this, s);
+  }
+}
+
 int RenderBox::overrideWidth() const {
-  return m_overrideSize == -1 ? m_width : m_overrideSize;
+  return hasOverrideSize() ? overrideSize() : m_width;
 }
 
 int RenderBox::overrideHeight() const {
-  return m_overrideSize == -1 ? m_height : m_overrideSize;
+  return hasOverrideSize() ? overrideSize() : m_height;
 }
 
 void RenderBox::setPos(int xPos, int yPos) {
@@ -926,7 +950,7 @@ void RenderBox::position(InlineBox* box) {
       // our object was inline originally, since otherwise it would have ended
       // up underneath
       // the inlines.
-      m_staticX = box->xPos();
+      setStaticX(box->xPos());
       setChildNeedsLayout(true, false);  // Just go ahead and mark the
                                          // positioned object as needing layout,
                                          // so it will update its position
@@ -939,7 +963,7 @@ void RenderBox::position(InlineBox* box) {
       // wrapped in an anonymous block, which is what would have happened had we
       // been
       // in flow).  This value was cached in the yPos() of the box.
-      m_staticY = box->yPos();
+      setStaticY(box->yPos());
       setChildNeedsLayout(true, false);  // Just go ahead and mark the
                                          // positioned object as needing layout,
                                          // so it will update its position
@@ -1147,9 +1171,9 @@ void RenderBox::calcWidth() {
 
   // The parent box is flexing us, so it has increased or decreased our
   // width.  Use the width from the style context.
-  if (m_overrideSize != -1 && parent()->style()->boxOrient() == HORIZONTAL &&
+  if (hasOverrideSize() && parent()->style()->boxOrient() == HORIZONTAL &&
       parent()->isFlexibleBox() && parent()->isFlexingChildren()) {
-    m_width = m_overrideSize;
+    m_width = overrideSize();
     return;
   }
 
@@ -1355,10 +1379,10 @@ void RenderBox::calcHeight() {
     // The parent box is flexing us, so it has increased or decreased our
     // height.  We have to
     // grab our cached flexible height.
-    if (m_overrideSize != -1 && parent()->isFlexibleBox() &&
+    if (hasOverrideSize() && parent()->isFlexibleBox() &&
         parent()->style()->boxOrient() == VERTICAL &&
         parent()->isFlexingChildren())
-      h = Length(m_overrideSize - borderTop() - borderBottom() - paddingTop() -
+      h = Length(overrideSize() - borderTop() - borderBottom() - paddingTop() -
                      paddingBottom(),
                  Fixed);
     else if (treatAsReplaced)
@@ -1630,11 +1654,26 @@ void RenderBox::calcVerticalMargins() {
   m_marginBottom = style()->marginBottom().calcMinValue(cw);
 }
 
+int RenderBox::staticX() const {
+  return m_layer ? m_layer->staticX() : 0;
+}
+
+int RenderBox::staticY() const {
+  return m_layer ? m_layer->staticY() : 0;
+}
+
+void RenderBox::setStaticX(int staticX) {
+  ASSERT(isPositioned());
+  m_layer->setStaticX(staticX);
+}
+
 void RenderBox::setStaticY(int staticY) {
-  if (staticY == m_staticY)
+  ASSERT(isPositioned());
+
+  if (staticY == m_layer->staticY())
     return;
 
-  m_staticY = staticY;
+  m_layer->setStaticY(staticY);
   setChildNeedsLayout(true, false);
 }
 
@@ -1760,16 +1799,16 @@ void RenderBox::calcAbsoluteHorizontal() {
   // Calculate the static distance if needed.
   if (left.isAuto() && right.isAuto()) {
     if (containerDirection == LTR) {
-      // 'm_staticX' should already have been set through layout of the parent.
-      int staticPosition = m_staticX - containerBlock->borderLeft();
+      // 'staticX' should already have been set through layout of the parent.
+      int staticPosition = staticX() - containerBlock->borderLeft();
       for (RenderObject* po = parent(); po && po != containerBlock;
            po = po->parent())
         staticPosition += po->xPos();
       left.setValue(Fixed, staticPosition);
     } else {
       RenderObject* po = parent();
-      // 'm_staticX' should already have been set through layout of the parent.
-      int staticPosition = m_staticX + containerWidth +
+      // 'staticX' should already have been set through layout of the parent.
+      int staticPosition = staticX() + containerWidth +
                            containerBlock->borderRight() - po->width();
       for (; po && po != containerBlock; po = po->parent())
         staticPosition -= po->xPos();
@@ -2071,8 +2110,8 @@ void RenderBox::calcAbsoluteVertical() {
   // see FIXME 2
   // Calculate the static distance if needed.
   if (top.isAuto() && bottom.isAuto()) {
-    // m_staticY should already have been set through layout of the parent()
-    int staticTop = m_staticY - containerBlock->borderTop();
+    // staticY should already have been set through layout of the parent()
+    int staticTop = staticY() - containerBlock->borderTop();
     for (RenderObject* po = parent(); po && po != containerBlock;
          po = po->parent()) {
       if (!po->isTableRow())
@@ -2318,16 +2357,16 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
   if (left.isAuto() && right.isAuto()) {
     // see FIXME 1
     if (containerDirection == LTR) {
-      // 'm_staticX' should already have been set through layout of the parent.
-      int staticPosition = m_staticX - containerBlock->borderLeft();
+      // 'staticX' should already have been set through layout of the parent.
+      int staticPosition = staticX() - containerBlock->borderLeft();
       for (RenderObject* po = parent(); po && po != containerBlock;
            po = po->parent())
         staticPosition += po->xPos();
       left.setValue(Fixed, staticPosition);
     } else {
       RenderObject* po = parent();
-      // 'm_staticX' should already have been set through layout of the parent.
-      int staticPosition = m_staticX + containerWidth +
+      // 'staticX' should already have been set through layout of the parent.
+      int staticPosition = staticX() + containerWidth +
                            containerBlock->borderRight() - po->width();
       for (; po && po != containerBlock; po = po->parent())
         staticPosition -= po->xPos();
@@ -2492,8 +2531,8 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
   \*-----------------------------------------------------------------------*/
   // see FIXME 2
   if (top.isAuto() && bottom.isAuto()) {
-    // m_staticY should already have been set through layout of the parent().
-    int staticTop = m_staticY - containerBlock->borderTop();
+    // staticY should already have been set through layout of the parent().
+    int staticTop = staticY() - containerBlock->borderTop();
     for (RenderObject* po = parent(); po && po != containerBlock;
          po = po->parent()) {
       if (!po->isTableRow())
