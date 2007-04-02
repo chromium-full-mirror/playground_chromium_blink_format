@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -77,6 +77,11 @@ typedef union PluginPort {
   // These are only valid when drawingModel is NPDrawingModelOpenGL
   AGLContext aglContext;
   NSWindow* aglWindow;
+
+#ifndef NP_NO_QUICKDRAW
+  // This is only valid when drawingModel is NPDrawingModelQuickDraw
+  GWorldPtr offscreenGWorld;
+#endif
 
   BOOL isStarted;
   BOOL inSetWindow;
