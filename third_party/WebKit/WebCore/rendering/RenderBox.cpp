@@ -1663,12 +1663,12 @@ int RenderBox::staticY() const {
 }
 
 void RenderBox::setStaticX(int staticX) {
-  ASSERT(isPositioned());
+  ASSERT(isPositioned() || isRelPositioned());
   m_layer->setStaticX(staticX);
 }
 
 void RenderBox::setStaticY(int staticY) {
-  ASSERT(isPositioned());
+  ASSERT(isPositioned() || isRelPositioned());
 
   if (staticY == m_layer->staticY())
     return;
