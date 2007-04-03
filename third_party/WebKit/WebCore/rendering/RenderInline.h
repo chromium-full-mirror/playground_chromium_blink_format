@@ -90,10 +90,6 @@ class RenderInline : public RenderFlow {
 
  protected:
   static RenderInline* cloneInline(RenderFlow* src);
-
- private:
-  bool m_isContinuation : 1;  // Whether or not we're a continuation of an
-                              // inline.
 };
 
 }  // namespace WebCore
