@@ -33,6 +33,7 @@
 #include "FocusController.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "KURL.h"
 #include "NamedAttrMap.h"
@@ -238,11 +239,16 @@ int Element::clientTop() {
 int Element::clientWidth() {
   document()->updateLayoutIgnorePendingStylesheets();
 
-  // When in strict mode, clientWidth for the document
-  // element should return the width of the containing frame.
-  if (!document()->inCompatMode() && document()->documentElement() == this)
+  // When in strict mode, clientWidth for the document element should return the
+  // width of the containing frame.
+  // When in quirks mode, clientWidth for the body element should return the
+  // width of the containing frame.
+  bool inCompatMode = document()->inCompatMode();
+  if ((!inCompatMode && document()->documentElement() == this) ||
+      (inCompatMode && isHTMLElement() && document()->body() == this)) {
     if (FrameView* view = document()->view())
       return view->visibleWidth();
+  }
 
   if (RenderObject* rend = renderer())
     return rend->clientWidth();
@@ -252,11 +258,17 @@ int Element::clientWidth() {
 int Element::clientHeight() {
   document()->updateLayoutIgnorePendingStylesheets();
 
-  // When in strict mode, clientHeight for the document
-  // element should return the height of the containing frame.
-  if (!document()->inCompatMode() && document()->documentElement() == this)
+  // When in strict mode, clientHeight for the document element should return
+  // the height of the containing frame.
+  // When in quirks mode, clientHeight for the body element should return the
+  // height of the containing frame.
+  bool inCompatMode = document()->inCompatMode();
+
+  if ((!inCompatMode && document()->documentElement() == this) ||
+      (inCompatMode && isHTMLElement() && document()->body() == this)) {
     if (FrameView* view = document()->view())
       return view->visibleHeight();
+  }
 
   if (RenderObject* rend = renderer())
     return rend->clientHeight();
