@@ -71,7 +71,6 @@ class Cache {
   CachedResource* requestResource(DocLoader*,
                                   CachedResource::Type,
                                   const KURL& url,
-                                  time_t expireDate = 0,
                                   const String* charset = 0,
                                   bool skipCanLoadCheck = false);
 

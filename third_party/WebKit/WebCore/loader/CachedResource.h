@@ -72,7 +72,7 @@ class CachedResource {
     Cached      // regular case
   };
 
-  CachedResource(const String& URL, Type type, unsigned encodedSize = 0);
+  CachedResource(const String& URL, Type type);
   virtual ~CachedResource();
 
   virtual void setEncoding(const String&) {}

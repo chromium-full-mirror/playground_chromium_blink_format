@@ -61,26 +61,25 @@ Cache::Cache()
 static CachedResource* createResource(CachedResource::Type type,
                                       DocLoader* docLoader,
                                       const KURL& url,
-                                      time_t expireDate,
                                       const String* charset,
                                       bool skipCanLoadCheck = false) {
   switch (type) {
     case CachedResource::ImageResource:
       // User agent images need to null check the docloader.  No other resources
       // need to.
-      return new CachedImage(docLoader, url.url(), expireDate);
+      return new CachedImage(docLoader, url.url());
     case CachedResource::CSSStyleSheet:
-      return new CachedCSSStyleSheet(docLoader, url.url(), expireDate, *charset,
+      return new CachedCSSStyleSheet(docLoader, url.url(), *charset,
                                      skipCanLoadCheck);
     case CachedResource::Script:
-      return new CachedScript(docLoader, url.url(), expireDate, *charset);
+      return new CachedScript(docLoader, url.url(), *charset);
 #if ENABLE(XSLT)
     case CachedResource::XSLStyleSheet:
-      return new CachedXSLStyleSheet(docLoader, url.url(), expireDate);
+      return new CachedXSLStyleSheet(docLoader, url.url());
 #endif
 #if ENABLE(XBL)
     case CachedResource::XBLStyleSheet:
-      return new CachedXBLDocument(docLoader, url.url(), expireDate);
+      return new CachedXBLDocument(docLoader, url.url());
 #endif
     default:
       break;
@@ -92,7 +91,6 @@ static CachedResource* createResource(CachedResource::Type type,
 CachedResource* Cache::requestResource(DocLoader* docLoader,
                                        CachedResource::Type type,
                                        const KURL& url,
-                                       time_t expireDate,
                                        const String* charset,
                                        bool skipCanLoadCheck) {
   // Look up the resource in our map.
@@ -108,8 +106,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
       return 0;
 
     // The resource does not exist.  Create it.
-    resource = createResource(type, docLoader, url, expireDate, charset,
-                              skipCanLoadCheck);
+    resource = createResource(type, docLoader, url, charset, skipCanLoadCheck);
     ASSERT(resource);
     resource->setInCache(!disabled());
     if (!disabled())
