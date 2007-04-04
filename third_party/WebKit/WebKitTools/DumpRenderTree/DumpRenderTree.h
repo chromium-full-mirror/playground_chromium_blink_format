@@ -34,3 +34,4 @@ extern WebFrame* frame;
 extern DumpRenderTreeDraggingInfo* draggingInfo;
 extern volatile BOOL done;
 extern BOOL shouldDumpResourceLoadCallbacks;
+extern NSMutableSet* disallowedURLs;
