@@ -674,7 +674,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
     if (handled)
       evt->setDefaultHandled();
   }
-  if (evt->type() == mousedownEvent &&
+  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
     if (menuList->popupIsVisible())
@@ -695,7 +695,7 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
   if (!renderer() || !renderer()->canSelect())
     return;
 
-  if (evt->type() == mousedownEvent &&
+  if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
       static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
 
@@ -766,7 +766,7 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
 
       evt->setDefaultHandled();
     }
-  } else if (evt->type() == mouseupEvent &&
+  } else if (evt->type() == mouseupEvent && evt->isMouseEvent() &&
              static_cast<MouseEvent*>(evt)->button() == LeftButton &&
              document()->frame()->eventHandler()->autoscrollRenderer() !=
                  renderer())

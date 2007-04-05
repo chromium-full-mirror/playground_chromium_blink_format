@@ -89,7 +89,7 @@ void HTMLSliderThumbElement::defaultEventHandler(Event* event) {
       event->setDefaultHandled();
       return;
     }
-  } else if (eventType == mouseupEvent &&
+  } else if (eventType == mouseupEvent && event->isMouseEvent() &&
              static_cast<MouseEvent*>(event)->button() == LeftButton) {
     if (m_inDragMode) {
       if (Frame* frame = document()->frame())
