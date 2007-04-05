@@ -671,7 +671,8 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
     if (handled)
       evt->setDefaultHandled();
   }
-  if (evt->type() == mousedownEvent) {
+  if (evt->type() == mousedownEvent &&
+      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
     if (menuList->popupIsVisible())
       menuList->hidePopup();
@@ -691,7 +692,8 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
   if (!renderer() || !renderer()->canSelect())
     return;
 
-  if (evt->type() == mousedownEvent) {
+  if (evt->type() == mousedownEvent &&
+      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     focus();
 
     MouseEvent* mEvt = static_cast<MouseEvent*>(evt);
@@ -762,6 +764,7 @@ void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
       evt->setDefaultHandled();
     }
   } else if (evt->type() == mouseupEvent &&
+             static_cast<MouseEvent*>(evt)->button() == LeftButton &&
              document()->frame()->eventHandler()->autoscrollRenderer() !=
                  renderer())
     // This makes sure we fire onChange for a single click.  For drag selection,

@@ -1022,7 +1022,7 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
   void* result = 0;
   if ((inputType() == CHECKBOX || inputType() == RADIO) &&
       evt->isMouseEvent() && evt->type() == clickEvent &&
-      static_cast<MouseEvent*>(evt)->button() == 0) {
+      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     if (inputType() == CHECKBOX) {
       // As a way to store the state, we return 0 if we were unchecked, 1 if we
       // were checked, and 2 for
@@ -1066,7 +1066,7 @@ void* HTMLInputElement::preDispatchEventHandler(Event* evt) {
 void HTMLInputElement::postDispatchEventHandler(Event* evt, void* data) {
   if ((inputType() == CHECKBOX || inputType() == RADIO) &&
       evt->isMouseEvent() && evt->type() == clickEvent &&
-      static_cast<MouseEvent*>(evt)->button() == 0) {
+      static_cast<MouseEvent*>(evt)->button() == LeftButton) {
     if (inputType() == CHECKBOX) {
       // Reverse the checking we did in preDispatch.
       if (evt->defaultPrevented() || evt->defaultHandled()) {
@@ -1319,7 +1319,8 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
 
   if (inputType() == RANGE && renderer()) {
     RenderSlider* slider = static_cast<RenderSlider*>(renderer());
-    if (evt->isMouseEvent() && evt->type() == mousedownEvent) {
+    if (evt->isMouseEvent() && evt->type() == mousedownEvent &&
+        static_cast<MouseEvent*>(evt)->button() == LeftButton) {
       MouseEvent* mEvt = static_cast<MouseEvent*>(evt);
       if (!slider->mouseEventIsInThumb(mEvt)) {
         slider->setValueForPosition(slider->positionForOffset(
