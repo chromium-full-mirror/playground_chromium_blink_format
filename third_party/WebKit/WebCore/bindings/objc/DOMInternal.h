@@ -30,9 +30,12 @@
 #import "Color.h"
 #import "DOMObject.h"
 #import "DOMRGBColor.h"
+#import "HitTestResult.h"
 
 #if ENABLE(XPATH)
+#import "DOMXPathExpressionInternal.h"
 #import "DOMXPathNSResolver.h"
+#import "DOMXPathResultInternal.h"
 #endif  // ENABLE(XPATH)
 
 // Auto-generated internal interfaces
@@ -265,11 +268,6 @@
 #import "DOMSVGZoomEventInternal.h"
 #endif  // ENABLE(SVG)
 
-#if ENABLE(XPATH)
-#import "DOMXPathExpressionInternal.h"
-#import "DOMXPathResultInternal.h"
-#endif  // ENABLE(XPATH)
-
 namespace KJS {
 class JSObject;
 
@@ -344,7 +342,5 @@ template <class Source>
 inline void addDOMWrapper(NSObject* wrapper, Source impl) {
   addDOMWrapper(wrapper, reinterpret_cast<DOMObjectInternal*>(impl));
 }
-
-NSString* displayString(const String&, const Node*);
 
 }  // namespace WebCore

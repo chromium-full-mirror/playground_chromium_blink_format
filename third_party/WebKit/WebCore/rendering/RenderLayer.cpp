@@ -2077,8 +2077,6 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
     return;
 
   Document* doc = renderer()->document();
-  if (!doc)
-    return;
 
   Node* activeNode = doc->activeNode();
   if (activeNode && !request.active) {
