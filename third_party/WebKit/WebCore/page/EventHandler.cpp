@@ -314,7 +314,7 @@ bool EventHandler::handleMousePressEvent(
   return swallowEvent;
 }
 
-bool EventHandler::handleMouseMoveEvent(
+bool EventHandler::handleMouseDraggedEvent(
     const MouseEventWithHitTestResults& event) {
   if (handleDrag(event))
     return true;
@@ -604,7 +604,7 @@ IntPoint EventHandler::currentMousePosition() const {
   return m_currentMousePosition;
 }
 
-static Frame* subframeForTargetNode(Node* node) {
+Frame* subframeForTargetNode(Node* node) {
   if (!node)
     return 0;
 
@@ -812,6 +812,12 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 
   Frame* subframe = subframeForTargetNode(mev.targetNode());
   if (subframe && passMousePressEventToSubframe(mev, subframe)) {
+    // Start capturing future events for this frame.  We only do this if we
+    // didn't clear
+    // the m_mousePressed flag, which may happen if an AppKit widget entered a
+    // modal event loop.
+    if (m_mousePressed)
+      m_capturingMouseEventsNode = mev.targetNode();
     invalidateClick();
     return true;
   }
@@ -919,6 +925,10 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
     return dispatchMouseEvent(mousemoveEvent, m_frameSetBeingResized.get(),
                               false, 0, mouseEvent, false);
 
+  // Send events right to a scrollbar if the mouse is pressed.
+  if (m_lastScrollbarUnderMouse && m_mousePressed)
+    return m_lastScrollbarUnderMouse->handleMouseMoveEvent(mouseEvent);
+
   // Treat mouse move events while the mouse is pressed as "read-only" in
   // prepareMouseEvent
   // if we are allowed to select.
@@ -929,13 +939,6 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   HitTestRequest request(m_mousePressed && m_mouseDownMayStartSelect,
                          m_mousePressed, true);
   MouseEventWithHitTestResults mev = prepareMouseEvent(request, mouseEvent);
-
-  if (m_lastMouseMoveEventSubframe &&
-      m_lastMouseMoveEventSubframe->tree()->isDescendantOf(m_frame))
-    passMouseMoveEventToSubframe(mev, m_lastMouseMoveEventSubframe.get());
-
-  bool swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.targetNode(),
-                                         false, 0, mouseEvent, true);
 
   PlatformScrollbar* scrollbar = 0;
   if (m_frame->view())
@@ -954,14 +957,18 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   if (m_resizeLayer && m_resizeLayer->inResizeMode())
     m_resizeLayer->resize(mouseEvent, m_offsetFromResizeCorner);
 
-  if (!swallowEvent)
-    swallowEvent = handleMouseMoveEvent(mev);
-
-  RefPtr<Frame> newSubframe = subframeForTargetNode(mev.targetNode());
-  if (newSubframe) {
-    if (m_lastMouseMoveEventSubframe != newSubframe)
-      swallowEvent |= passMouseMoveEventToSubframe(mev, newSubframe.get());
-  } else {
+  bool swallowEvent = false;
+  Node* targetNode = m_capturingMouseEventsNode.get()
+                         ? m_capturingMouseEventsNode.get()
+                         : mev.targetNode();
+  RefPtr<Frame> newSubframe = subframeForTargetNode(targetNode);
+  if (m_lastMouseMoveEventSubframe &&
+      m_lastMouseMoveEventSubframe->tree()->isDescendantOf(m_frame) &&
+      m_lastMouseMoveEventSubframe != newSubframe)
+    passMouseMoveEventToSubframe(mev, m_lastMouseMoveEventSubframe.get());
+  if (newSubframe)
+    swallowEvent |= passMouseMoveEventToSubframe(mev, newSubframe.get());
+  else {
     if (scrollbar && !m_mousePressed)
       scrollbar->handleMouseMoveEvent(mouseEvent);  // Handle hover effects on
                                                     // platforms that support
@@ -973,6 +980,14 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   }
 
   m_lastMouseMoveEventSubframe = newSubframe;
+
+  if (swallowEvent)
+    return true;
+
+  swallowEvent = dispatchMouseEvent(mousemoveEvent, mev.targetNode(), false, 0,
+                                    mouseEvent, true);
+  if (!swallowEvent)
+    swallowEvent = handleMouseDraggedEvent(mev);
 
   return swallowEvent;
 }
@@ -996,9 +1011,18 @@ bool EventHandler::handleMouseReleaseEvent(
     return dispatchMouseEvent(mouseupEvent, m_frameSetBeingResized.get(), true,
                               m_clickCount, mouseEvent, false);
 
+  if (m_lastScrollbarUnderMouse) {
+    invalidateClick();
+    return m_lastScrollbarUnderMouse->handleMouseReleaseEvent(mouseEvent);
+  }
+
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(HitTestRequest(false, false, false, true), mouseEvent);
-  Frame* subframe = subframeForTargetNode(mev.targetNode());
+  Node* targetNode = m_capturingMouseEventsNode.get()
+                         ? m_capturingMouseEventsNode.get()
+                         : mev.targetNode();
+  setCapturingMouseEventsNode(0);
+  Frame* subframe = subframeForTargetNode(targetNode);
   if (subframe && passMouseReleaseEventToSubframe(mev, subframe))
     return true;
 

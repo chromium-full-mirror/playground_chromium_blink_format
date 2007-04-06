@@ -97,6 +97,12 @@ class Scrollbar : public Shared<Scrollbar> {
   virtual bool handleMouseMoveEvent(const PlatformMouseEvent&) { return false; }
   virtual bool handleMouseOutEvent(const PlatformMouseEvent&) { return false; }
 
+  // Used by some platform scrollbars to know when they've been released from
+  // capture.
+  virtual bool handleMouseReleaseEvent(const PlatformMouseEvent&) {
+    return false;
+  }
+
  protected:
   virtual void updateThumbPosition() = 0;
   virtual void updateThumbProportion() = 0;
