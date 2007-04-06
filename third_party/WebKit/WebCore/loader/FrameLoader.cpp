@@ -409,8 +409,10 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
   }
 
   bool hideReferrer;
-  if (!canLoad(url, referrer, hideReferrer))
+  if (!canLoad(url, referrer, hideReferrer)) {
+    FrameLoader::reportLocalLoadFailed(frame()->page(), url.url());
     return 0;
+  }
 
   Frame* frame = m_client->createFrame(
       url, name, ownerElement, hideReferrer ? String() : referrer,
@@ -1440,8 +1442,10 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
     if (renderer->node() && renderer->node()->isElementNode())
       pluginElement = static_cast<Element*>(renderer->node());
 
-    if (!canLoad(url, frame()->document()))
+    if (!canLoad(url, frame()->document())) {
+      FrameLoader::reportLocalLoadFailed(frame()->page(), url.url());
       return false;
+    }
 
     widget = m_client->createPlugin(pluginElement, url, paramNames, paramValues,
                                     mimeType,
@@ -1752,8 +1756,12 @@ void FrameLoader::load(const FrameLoadRequest& request,
     referrer = m_outgoingReferrer;
 
   bool hideReferrer;
-  if (!canLoad(request.resourceRequest().url(), referrer, hideReferrer))
+  if (!canLoad(request.resourceRequest().url(), referrer, hideReferrer)) {
+    FrameLoader::reportLocalLoadFailed(frame()->page(),
+                                       request.resourceRequest().url().url());
     return;
+  }
+
   if (hideReferrer)
     referrer = String();
 
@@ -1956,6 +1964,7 @@ void FrameLoader::load(DocumentLoader* loader,
                         callContinueLoadAfterNavigationPolicy, this);
 }
 
+// FIXME: It would be nice if we could collapse these into one or two functions.
 bool FrameLoader::canLoad(const KURL& url,
                           const String& referrer,
                           bool& hideReferrer) {
@@ -1979,6 +1988,13 @@ bool FrameLoader::canLoad(const CachedResource& resource, const Document* doc) {
     return true;
 
   return doc && doc->isAllowedToLoadLocalResources();
+}
+
+void FrameLoader::reportLocalLoadFailed(const Page* page, const String& url) {
+  ASSERT(!url.isEmpty());
+  if (page)
+    page->chrome()->addMessageToConsole(
+        "Not allowed to load local resource: " + url, 0, String());
 }
 
 bool FrameLoader::shouldHideReferrer(const KURL& url, const String& referrer) {

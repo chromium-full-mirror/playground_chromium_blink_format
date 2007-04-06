@@ -238,8 +238,6 @@ incremental searching), NO to begin search after the selected text.
 - (BOOL)allowsUndo;
 - (void)setAllowsUndo:(BOOL)flag;
 
-+ (void)registerURLSchemeAsLocal:(NSString*)scheme;
-
 @end
 
 @interface WebView (WebPrivate)
