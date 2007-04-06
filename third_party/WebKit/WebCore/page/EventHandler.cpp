@@ -1157,15 +1157,15 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
                                       int clickCount,
                                       const PlatformMouseEvent& mouseEvent,
                                       bool setUnder) {
+  if (m_capturingMouseEventsNode)
+    targetNode = m_capturingMouseEventsNode.get();
+
   // if the target node is a text node, dispatch on the parent node -
   // rdar://4196646
   if (targetNode && targetNode->isTextNode())
     targetNode = targetNode->parentNode();
   if (targetNode)
     targetNode = targetNode->shadowAncestorNode();
-
-  if (m_capturingMouseEventsNode)
-    targetNode = m_capturingMouseEventsNode.get();
 
   m_nodeUnderMouse = targetNode;
 
