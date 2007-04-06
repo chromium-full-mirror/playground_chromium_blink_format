@@ -1623,8 +1623,7 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
                                   dragState().m_dragSrcIsDHTML);
     if (!startedDrag && dragState().m_dragSrcMayBeDHTML) {
       // Drag was canned at the last minute - we owe m_dragSrc a DRAGEND event
-      PlatformMouseEvent event(PlatformMouseEvent::currentEvent);
-      dispatchDragSrcEvent(dragendEvent, event);
+      dispatchDragSrcEvent(dragendEvent, event.event());
       m_mouseDownMayStartDrag = false;
     }
   }

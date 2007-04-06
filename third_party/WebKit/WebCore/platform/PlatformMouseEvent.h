@@ -70,9 +70,6 @@ enum MouseEventType {
 
 class PlatformMouseEvent {
  public:
-  static const struct CurrentEventTag {
-  } currentEvent;
-
   PlatformMouseEvent()
       : m_button(NoButton),
         m_eventType(MouseEventMoved),
@@ -82,8 +79,6 @@ class PlatformMouseEvent {
         m_altKey(false),
         m_metaKey(false),
         m_timestamp(0) {}
-
-  PlatformMouseEvent(const CurrentEventTag&);
 
   PlatformMouseEvent(const IntPoint& pos,
                      const IntPoint& globalPos,

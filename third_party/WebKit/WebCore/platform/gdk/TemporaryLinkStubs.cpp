@@ -127,10 +127,6 @@ void Widget::invalidateRect(const IntRect&) {
   notImplementedGdk();
 }
 
-PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
-  notImplementedGdk();
-}
-
 int WebCore::findNextSentenceFromIndex(UChar const*, int, int, bool) {
   notImplementedGdk();
   return 0;

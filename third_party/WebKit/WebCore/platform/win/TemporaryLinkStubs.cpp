@@ -865,10 +865,6 @@ void Path::transform(const AffineTransform&) {
   notImplemented();
 }
 
-PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
-  notImplemented();
-}
-
 PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
                                      ScrollbarOrientation orientation,
                                      ScrollbarControlSize controlSize)
