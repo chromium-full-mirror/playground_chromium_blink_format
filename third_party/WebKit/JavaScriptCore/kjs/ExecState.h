@@ -34,7 +34,6 @@ class Interpreter;
 
 class Interpreter;
 class FunctionImp;
-class RuntimeMethodImp;
 class GlobalFuncImp;
 
 /**
@@ -45,7 +44,6 @@ class GlobalFuncImp;
 class ExecState {
   friend class Interpreter;
   friend class FunctionImp;
-  friend class RuntimeMethodImp;
   friend class GlobalFuncImp;
 
  public:
