@@ -413,10 +413,10 @@ bool EventTargetNode::dispatchMouseEvent(const PlatformMouseEvent& event,
 
   ASSERT(event.eventType() == MouseEventMoved || button != NoButton);
 
-  return dispatchMouseEvent(
-      eventType, button == NoButton ? 0 : button, detail, contentsPos.x(),
-      contentsPos.y(), event.globalX(), event.globalY(), event.ctrlKey(),
-      event.altKey(), event.shiftKey(), event.metaKey(), false, relatedTarget);
+  return dispatchMouseEvent(eventType, button, detail, contentsPos.x(),
+                            contentsPos.y(), event.globalX(), event.globalY(),
+                            event.ctrlKey(), event.altKey(), event.shiftKey(),
+                            event.metaKey(), false, relatedTarget);
 }
 
 void EventTargetNode::dispatchSimulatedMouseEvent(

@@ -31,7 +31,7 @@ namespace WebCore {
 
 using namespace EventNames;
 
-MouseEvent::MouseEvent() : m_button(0) {}
+MouseEvent::MouseEvent() : m_button(0), m_buttonDown(false) {}
 
 MouseEvent::MouseEvent(const AtomicString& eventType,
                        bool canBubble,
@@ -64,7 +64,8 @@ MouseEvent::MouseEvent(const AtomicString& eventType,
                         shiftKey,
                         metaKey,
                         isSimulated),
-      m_button(button),
+      m_button(button == (unsigned short)-1 ? 0 : button),
+      m_buttonDown(button != (unsigned short)-1),
       m_relatedTarget(relatedTarget),
       m_clipboard(clipboard) {}
 
@@ -96,7 +97,8 @@ void MouseEvent::initMouseEvent(const AtomicString& type,
   m_altKey = altKey;
   m_shiftKey = shiftKey;
   m_metaKey = metaKey;
-  m_button = button;
+  m_button = button == (unsigned short)-1 ? 0 : button;
+  m_buttonDown = button != (unsigned short)-1;
   m_relatedTarget = relatedTarget;
 
   initCoordinates(clientX, clientY);

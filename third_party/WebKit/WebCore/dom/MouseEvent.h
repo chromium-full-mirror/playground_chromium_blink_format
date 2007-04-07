@@ -75,6 +75,7 @@ class MouseEvent : public MouseRelatedEvent {
   // mousedown/up, maybe others),
   // but we will match the standard DOM.
   unsigned short button() const { return m_button; }
+  bool buttonDown() const { return m_buttonDown; }
   EventTargetNode* relatedTarget() const { return m_relatedTarget.get(); }
   Clipboard* clipboard() const { return m_clipboard.get(); }
 
@@ -87,6 +88,7 @@ class MouseEvent : public MouseRelatedEvent {
 
  private:
   unsigned short m_button;
+  bool m_buttonDown;
   RefPtr<EventTargetNode> m_relatedTarget;
   RefPtr<Clipboard> m_clipboard;
 };
