@@ -134,6 +134,7 @@ void EventHandler::clear() {
   m_currentMousePosition = IntPoint();
   m_mousePressNode = 0;
   m_mousePressed = false;
+  m_capturingMouseEventsNode = 0;
 }
 
 void EventHandler::selectClosestWordFromMouseEvent(
@@ -1023,7 +1024,7 @@ bool EventHandler::handleMouseReleaseEvent(
                          : mev.targetNode();
   Frame* subframe = subframeForTargetNode(targetNode);
   if (subframe && passMouseReleaseEventToSubframe(mev, subframe)) {
-    setCapturingMouseEventsNode(0);
+    m_capturingMouseEventsNode = 0;
     return true;
   }
 
