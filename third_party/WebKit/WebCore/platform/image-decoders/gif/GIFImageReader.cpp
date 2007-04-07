@@ -749,7 +749,8 @@ bool GIFImageReader::read(const unsigned char* buf,
           // The decoder needs to stop.  Hand back the number of bytes we
           // consumed from
           // buffer minus 9 (the amount we consumed to read the header).
-          clientptr->decodingHalted(len + 9);
+          if (clientptr)
+            clientptr->decodingHalted(len + 9);
           GETN(9, gif_image_header);
           return true;
         }
