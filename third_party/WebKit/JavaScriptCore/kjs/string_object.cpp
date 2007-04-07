@@ -430,8 +430,10 @@ static JSValue* replace(ExecState* exec,
       pushSourceRange(sourceRanges, sourceRangeCount, sourceRangeCapacity,
                       UString::Range(lastIndex, source.size() - lastIndex));
 
-    UString result = source.spliceSubstringsWithSeparators(
-        sourceRanges, sourceRangeCount, replacements, replacementCount);
+    UString result;
+    if (sourceRanges)
+      result = source.spliceSubstringsWithSeparators(
+          sourceRanges, sourceRangeCount, replacements, replacementCount);
 
     delete[] sourceRanges;
     delete[] replacements;
