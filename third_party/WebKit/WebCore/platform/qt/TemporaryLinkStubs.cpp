@@ -84,12 +84,6 @@ int Font::offsetForPositionForComplexText(const TextRun&,
   return 0;
 }
 
-namespace WebCore {
-PlatformMouseEvent::PlatformMouseEvent(const CurrentEventTag&) {
-  notImplemented();
-}
-}
-
 void WebCore::refreshPlugins(bool) {
   notImplemented();
 }
