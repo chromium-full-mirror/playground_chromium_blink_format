@@ -711,18 +711,14 @@ void DragController::doImageDrag(Element* element,
 
   Image* image = getImage(element);
   if (image &&
-      image->size().height() * image->size().width() <= MaxOriginalImageArea) {
+      image->size().height() * image->size().width() <= MaxOriginalImageArea &&
+      (dragImage = createDragImageFromImage(image))) {
     IntSize originalSize = rect.size();
     origin = rect.location();
 
-    dragImage = createDragImageFromImage(image);
-
-    IntSize newSize;
-    if (dragImage) {
-      dragImage = fitDragImageToMaxSize(dragImage, maxDragImageSize());
-      dragImage = dissolveDragImageToFraction(dragImage, DragImageAlpha);
-      newSize = dragImageSize(dragImage);
-    }
+    dragImage = fitDragImageToMaxSize(dragImage, maxDragImageSize());
+    dragImage = dissolveDragImageToFraction(dragImage, DragImageAlpha);
+    IntSize newSize = dragImageSize(dragImage);
 
     // Properly orient the drag image and orient it differently if it's smaller
     // than the original
