@@ -66,4 +66,7 @@ typedef enum {
 // possible.
 - (NSRange)_selectedNSRange;
 - (void)_selectNSRange:(NSRange)range;
+
+- (BOOL)_isDisplayingStandaloneImage;
+
 @end
