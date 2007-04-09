@@ -210,6 +210,13 @@ class EventHandler : Noncopyable {
 
   Node* nodeUnderMouse() const;
 
+  void updateMouseEventTargetNode(Node*,
+                                  const PlatformMouseEvent&,
+                                  bool fireMouseOverOut);
+  void fireMouseOverOut(bool fireMouseOver = true,
+                        bool fireMouseOut = true,
+                        bool updateLastNodeUnderMouse = true);
+
   MouseEventWithHitTestResults prepareMouseEvent(const HitTestRequest&,
                                                  const PlatformMouseEvent&);
 
