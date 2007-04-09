@@ -1416,13 +1416,11 @@ bool CSSParser::parseValue(int propId, bool important) {
         valid_primitive = true;
       break;
 
-#if PLATFORM(MAC)
     case CSS_PROP__WEBKIT_DASHBOARD_REGION:  // <dashboard-region> |
                                              // <dashboard-region>
       if (value->unit == Value::Function || id == CSS_VAL_NONE)
         return parseDashboardRegions(propId, important);
       break;
-#endif
     // End Apple-specific properties
 
     /* shorthand properties */
@@ -2158,8 +2156,6 @@ failed:
   return false;
 }
 
-#if PLATFORM(MAC)
-
 #define DASHBOARD_REGION_NUM_PARAMETERS 6
 #define DASHBOARD_REGION_SHORT_NUM_PARAMETERS 2
 
@@ -2302,7 +2298,6 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 
   return valid;
 }
-#endif
 
 PassRefPtr<CSSValue> CSSParser::parseCounterContent(ValueList* args,
                                                     bool counters) {

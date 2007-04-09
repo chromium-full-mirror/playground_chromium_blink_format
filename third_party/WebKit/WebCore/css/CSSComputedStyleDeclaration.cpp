@@ -167,10 +167,7 @@ static const int computedProperties[] = {
     CSS_PROP__WEBKIT_USER_DRAG,
     CSS_PROP__WEBKIT_USER_MODIFY,
     CSS_PROP__WEBKIT_USER_SELECT,
-
-#if PLATFORM(MAC)
     CSS_PROP__WEBKIT_DASHBOARD_REGION,
-#endif
 };
 
 const unsigned numComputedProperties =
@@ -1519,9 +1516,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->boxSizing() == CONTENT_BOX)
         return new CSSPrimitiveValue(CSS_VAL_CONTENT_BOX);
       return new CSSPrimitiveValue(CSS_VAL_BORDER_BOX);
-    case CSS_PROP__WEBKIT_DASHBOARD_REGION:
-#if PLATFORM(MAC)
-    {
+    case CSS_PROP__WEBKIT_DASHBOARD_REGION: {
       const Vector<StyleDashboardRegion>& regions = style->dashboardRegions();
       unsigned count = regions.size();
       if (count == 1 && regions[0].type == StyleDashboardRegion::None)
@@ -1555,9 +1550,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       }
       return new CSSPrimitiveValue(firstRegion.release());
     }
-#else
-      break;
-#endif
     case CSS_PROP__WEBKIT_APPEARANCE:
       return valueForAppearance(style->appearance());
     case CSS_PROP__WEBKIT_FONT_SIZE_DELTA:

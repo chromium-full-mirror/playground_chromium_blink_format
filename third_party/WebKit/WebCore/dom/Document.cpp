@@ -314,12 +314,9 @@ Document::Document(DOMImplementation* impl, FrameView* v)
       ,
       m_svgExtensions(0)
 #endif
-#if PLATFORM(MAC)
       ,
       m_hasDashboardRegions(false),
-      m_dashboardRegionsDirty(false)
-#endif
-      ,
+      m_dashboardRegionsDirty(false),
       m_accessKeyMapValid(false),
       m_createRenderers(true),
       m_inPageCache(false),
@@ -2152,8 +2149,6 @@ void Document::activeChainNodeDetached(Node* node) {
     m_activeNode = m_activeNode->parent();
 }
 
-#if PLATFORM(MAC)
-
 const Vector<DashboardRegionValue>& Document::dashboardRegions() const {
   return m_dashboardRegions;
 }
@@ -2163,8 +2158,6 @@ void Document::setDashboardRegions(
   m_dashboardRegions = regions;
   setDashboardRegionsDirty(false);
 }
-
-#endif
 
 bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
   // Make sure newFocusedNode is actually in this document

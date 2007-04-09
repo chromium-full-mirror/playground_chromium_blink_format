@@ -82,12 +82,9 @@ class CSSPrimitiveValue : public CSSValue {
   CSSPrimitiveValue(PassRefPtr<RectImpl>);
   CSSPrimitiveValue(unsigned color);  // RGB value
   CSSPrimitiveValue(PassRefPtr<Pair>);
-
-#if PLATFORM(MAC)
   CSSPrimitiveValue(PassRefPtr<DashboardRegion>);  // FIXME: Why is dashboard
                                                    // region a primitive value?
                                                    // This makes no sense.
-#endif
 
   virtual ~CSSPrimitiveValue();
 
@@ -139,11 +136,9 @@ class CSSPrimitiveValue : public CSSValue {
   }
   Pair* getPairValue() const { return m_type != CSS_PAIR ? 0 : m_value.pair; }
 
-#if PLATFORM(MAC)
   DashboardRegion* getDashboardRegionValue() const {
     return m_type != CSS_DASHBOARD_REGION ? 0 : m_value.region;
   }
-#endif
 
   virtual bool isPrimitiveValue() const { return true; }
 
@@ -166,9 +161,7 @@ class CSSPrimitiveValue : public CSSValue {
     RectImpl* rect;
     unsigned rgbcolor;
     Pair* pair;
-#if PLATFORM(MAC)
     DashboardRegion* region;
-#endif
   } m_value;
 };
 

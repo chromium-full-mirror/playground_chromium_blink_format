@@ -122,5 +122,7 @@ bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
 DragImageRef Frame::dragImageForSelection() {
   return 0;
 }
+
+void Frame::dashboardRegionsChanged() {}
 }
 // vim: ts=4 sw=4 et

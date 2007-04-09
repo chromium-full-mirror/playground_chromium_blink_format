@@ -254,6 +254,8 @@ class Frame : public Shared<Frame> {
   bool prohibitsScrolling() const;
   void setProhibitsScrolling(const bool);
 
+  void dashboardRegionsChanged();
+
  private:
   void cleanupScriptObjects();
   void cleanupPlatformScriptObjects();
@@ -391,7 +393,6 @@ class Frame : public Shared<Frame> {
   NSString* matchLabelsAgainstElement(NSArray* labels, Element*);
 
   NSMutableDictionary* dashboardRegionsDictionary();
-  void dashboardRegionsChanged();
 
   void willPopupMenu(NSMenu*);
 

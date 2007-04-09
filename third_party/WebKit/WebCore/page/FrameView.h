@@ -125,9 +125,7 @@ class FrameView : public ScrollView {
   void addSlowRepaintObject();
   void removeSlowRepaintObject();
 
-#if PLATFORM(MAC)
   void updateDashboardRegions();
-#endif
 
   void restoreScrollbar();
 
