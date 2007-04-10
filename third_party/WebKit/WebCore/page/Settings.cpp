@@ -201,4 +201,8 @@ void Settings::setNeedsAcrobatFrameReloadingQuirk(
   m_needsAcrobatFrameReloadingQuirk = shouldNotReloadIFramesForUnchangedSRC;
 }
 
+void Settings::setDOMPasteAllowed(bool DOMPasteAllowed) {
+  m_isDOMPasteAllowed = DOMPasteAllowed;
+}
+
 }  // namespace WebCore

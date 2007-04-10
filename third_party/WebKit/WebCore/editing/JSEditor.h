@@ -46,8 +46,6 @@ class JSEditor : Noncopyable {
   bool queryCommandSupported(const String& command);
   String queryCommandValue(const String& command);
 
-  static void setSupportsPasteCommand(bool flag = true);
-
  private:
   Document* m_document;
 };
