@@ -323,8 +323,9 @@ class FrameLoader : Noncopyable {
   void urlSelected(const ResourceRequest&,
                    const String& target,
                    Event*,
-                   bool lockHistory = false);
-  void urlSelected(const FrameLoadRequest&, Event*);
+                   bool lockHistory,
+                   bool userGesture);
+  void urlSelected(const FrameLoadRequest&, Event*, bool userGesture);
 
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& URL,
@@ -357,9 +358,7 @@ class FrameLoader : Noncopyable {
   String baseTarget() const;
   KURL dataURLBaseFromRequest(const ResourceRequest& request) const;
 
-  void scheduleRedirection(double delay,
-                           const String& URL,
-                           bool lockHistory = true);
+  void scheduleRedirection(double delay, const String& URL);
 
   void scheduleLocationChange(const String& URL,
                               const String& referrer,
