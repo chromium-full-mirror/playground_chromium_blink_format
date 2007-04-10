@@ -1809,6 +1809,7 @@ void Frame::respondToChangedSelection(const Selection& oldSelection,
   if (document()) {
     if (editor()->isContinuousSpellCheckingEnabled()) {
       Selection oldAdjacentWords;
+      Selection oldSelectedSentence;
 
       // If this is a change in selection resulting from a delete operation,
       // oldSelection may no longer
@@ -1819,22 +1820,31 @@ void Frame::respondToChangedSelection(const Selection& oldSelection,
         oldAdjacentWords =
             Selection(startOfWord(oldStart, LeftWordIfOnBoundary),
                       endOfWord(oldStart, RightWordIfOnBoundary));
+        oldSelectedSentence =
+            Selection(startOfSentence(oldStart), endOfSentence(oldStart));
       }
 
       VisiblePosition newStart(
           selectionController()->selection().visibleStart());
       Selection newAdjacentWords(startOfWord(newStart, LeftWordIfOnBoundary),
                                  endOfWord(newStart, RightWordIfOnBoundary));
+      Selection newSelectedSentence(startOfSentence(newStart),
+                                    endOfSentence(newStart));
 
       // When typing we check spelling elsewhere, so don't redo it here.
-      if (closeTyping && oldAdjacentWords != newAdjacentWords)
+      if (closeTyping && oldAdjacentWords != newAdjacentWords) {
         editor()->markMisspellings(oldAdjacentWords);
 
-      // This only erases a marker in the first word of the selection.
+        if (oldSelectedSentence != newSelectedSentence)
+          editor()->markBadGrammar(oldSelectedSentence);
+      }
+
+      // This only erases a marker in the first unit (word or sentence) of the
+      // selection.
       // Perhaps peculiar, but it matches AppKit.
       document()->removeMarkers(newAdjacentWords.toRange().get(),
                                 DocumentMarker::Spelling);
-      document()->removeMarkers(newAdjacentWords.toRange().get(),
+      document()->removeMarkers(newSelectedSentence.toRange().get(),
                                 DocumentMarker::Grammar);
     } else {
       // When continuous spell checking is off, existing markers disappear after
