@@ -42,12 +42,12 @@
 
 namespace WebCore {
 
+class CachedPage;
 class Frame;
 class FrameLoader;
 class HistoryItem;
 class KURL;
 class MainResourceLoader;
-class PageCache;
 class ResourceLoader;
 class SharedBuffer;
 class SubstituteData;
@@ -127,9 +127,9 @@ class DocumentLoader : public Shared<DocumentLoader> {
   String title() const;
   KURL urlForHistory() const;
 
-  void loadFromPageCache(PassRefPtr<PageCache>);
-  void setLoadingFromPageCache(bool);
-  bool isLoadingFromPageCache() const;
+  void loadFromCachedPage(PassRefPtr<CachedPage>);
+  void setLoadingFromCachedPage(bool);
+  bool isLoadingFromCachedPage() const;
 
   void setDefersLoading(bool);
 
@@ -193,7 +193,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
   bool m_gotFirstByte;
   bool m_primaryLoadComplete;
   bool m_isClientRedirect;
-  bool m_loadingFromPageCache;
+  bool m_loadingFromCachedPage;
 
   String m_pageTitle;
 

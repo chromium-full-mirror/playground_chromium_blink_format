@@ -44,9 +44,9 @@ typedef struct objc_object* id;
 
 namespace WebCore {
 
+class CachedPage;
 class Image;
 class KURL;
-class PageCache;
 class ResourceRequest;
 
 class HistoryItem;
@@ -82,10 +82,9 @@ class HistoryItem : public Shared<HistoryItem> {
   Image* icon() const;
 
   void retainIconInDatabase(bool retain);
-  static void releaseAllPendingPageCaches();
-  bool hasPageCache() const;
-  void setHasPageCache(bool);
-  PageCache* pageCache();
+  static void performPendingReleaseOfCachedPages();
+  void setCachedPage(PassRefPtr<CachedPage>);
+  CachedPage* cachedPage();
 
   const String& parent() const;
   KURL url() const;
@@ -129,8 +128,8 @@ class HistoryItem : public Shared<HistoryItem> {
   const HistoryItemVector& children() const;
   bool hasChildren() const;
 
-  void setAlwaysAttemptToUsePageCache(bool);
-  bool alwaysAttemptToUsePageCache() const;
+  void setAlwaysAttemptToUseCachedPage(bool);
+  bool alwaysAttemptToUseCachedPage() const;
 
   // This should not be called directly for HistoryItems that are already
   // included
@@ -150,9 +149,7 @@ class HistoryItem : public Shared<HistoryItem> {
   void setTransientProperty(const String&, id);
 #endif
 
-  void scheduleRelease();
-  void cancelRelease();
-  void releasePageCache();
+  void scheduleCachedPageForRelease();
 
 #ifndef NDEBUG
   int showTree() const;
@@ -161,7 +158,7 @@ class HistoryItem : public Shared<HistoryItem> {
 
  private:
   HistoryItem(const HistoryItem&);
-  static void releasePageCachesOrReschedule();
+  static void releaseCachedPagesOrReschedule();
 
   String m_urlString;
   String m_originalURLString;
@@ -176,11 +173,11 @@ class HistoryItem : public Shared<HistoryItem> {
   Vector<String> m_documentState;
 
   HistoryItemVector m_subItems;
-  bool m_pageCacheIsPendingRelease;
-  RefPtr<PageCache> m_pageCache;
+
+  RefPtr<CachedPage> m_cachedPage;
 
   bool m_isTargetItem;
-  bool m_alwaysAttemptToUsePageCache;
+  bool m_alwaysAttemptToUseCachedPage;
   int m_visitCount;
 
   // info used to repost form data

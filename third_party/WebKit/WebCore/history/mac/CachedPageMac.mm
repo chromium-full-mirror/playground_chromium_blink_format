@@ -20,56 +20,39 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef PageState_h
-#define PageState_h
+#include "config.h"
+#include "CachedPage.h"
 
-#include "KURL.h"
-#include "Shared.h"
-#include <wtf/Forward.h>
-#include <wtf/OwnPtr.h>
-
-namespace KJS {
-class PausedTimeouts;
-class SavedBuiltins;
-class SavedProperties;
-}
+#import <objc/objc-runtime.h>
 
 namespace WebCore {
 
-class Document;
-class FrameView;
-class Node;
-class Page;
+void CachedPage::close()
+{
+    if (!m_document)
+        return;
+        
+    // FIXME: <rdar://problem/4886844>
+    // The current method of tracking the "document view" is messy and quite platform specific
+    // Having a WebCore-way to track this would be great.
+    if (m_documentView)
+        objc_msgSend(m_documentView.get(), @selector(closeIfNotCurrentView));
 
-class PageState : public Shared<PageState> {
- public:
-  static PassRefPtr<PageState> create(Page*);
-  ~PageState();
+    clear();
+}
 
-  void clear();
+void CachedPage::setDocumentView(id documentView)
+{
+    m_documentView = documentView;
+}
 
-  Document* document() { return m_document.get(); }
-  Node* mousePressNode() { return m_mousePressNode.get(); }
-  const KURL& URL() { return m_URL; }
+id CachedPage::documentView()
+{
+    return m_documentView.get();
+}
 
-  void restore(Page*);
+} //namespace WebCore
 
- private:
-  PageState(Page*);
-
-  RefPtr<Document> m_document;
-  RefPtr<FrameView> m_view;
-  RefPtr<Node> m_mousePressNode;
-  KURL m_URL;
-  OwnPtr<KJS::SavedProperties> m_windowProperties;
-  OwnPtr<KJS::SavedProperties> m_locationProperties;
-  OwnPtr<KJS::SavedBuiltins> m_interpreterBuiltins;
-  OwnPtr<KJS::PausedTimeouts> m_pausedTimeouts;
-};  // class PageState
-
-}  // namespace WebCore
-
-#endif  // PageState_h

@@ -51,8 +51,6 @@ class String;
 
 @protocol WebCoreRenderTreeCopier;
 
-extern NSString* WebCorePageCacheStateKey;
-
 enum WebCoreDeviceType { WebCoreDeviceScreen, WebCoreDevicePrinter };
 
 enum WebScrollDirection {

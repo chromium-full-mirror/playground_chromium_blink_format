@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,31 +23,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PageCache_h
-#define PageCache_h
+#ifndef CachedPage_h
+#define CachedPage_h
 
 #include "DocumentLoader.h"
-#include "PageState.h"
 #include "Shared.h"
 #include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
+#include <wtf/OwnPtr.h>
 
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
 typedef struct objc_object* id;
 #endif
 
+namespace KJS {
+
+class PausedTimeouts;
+class SavedBuiltins;
+class SavedProperties;
+}
+
 namespace WebCore {
 
-class PageCache : public Shared<PageCache> {
+class Document;
+class FrameView;
+class Node;
+class Page;
+
+class CachedPage : public Shared<CachedPage> {
  public:
-  PageCache();
-  ~PageCache();
+  static PassRefPtr<CachedPage> create(Page*);
+  ~CachedPage();
+
+  void clear();
+  Document* document() const { return m_document.get(); }
+  Node* mousePressNode() const { return m_mousePressNode.get(); }
+  const KURL& URL() const { return m_URL; }
+  void restore(Page*);
 
   void close();
 
-  void setPageState(PassRefPtr<PageState>);
-  PageState* pageState();
   void setTimeStamp(double);
   void setTimeStampToNow();
   double timeStamp() const;
@@ -59,19 +75,24 @@ class PageCache : public Shared<PageCache> {
 #endif
 
  private:
-  // FIXME: <rdar://problem/4887095>
-  // PageCache should consume PageState and take its role, as well.  The reasons
-  // for the division are obsolete
-  // now that everything is in WebCore instead of split with WebKit
-  RefPtr<PageState> m_pageState;
+  CachedPage(Page*);
   RefPtr<DocumentLoader> m_documentLoader;
   double m_timeStamp;
+
+  RefPtr<Document> m_document;
+  RefPtr<FrameView> m_view;
+  RefPtr<Node> m_mousePressNode;
+  KURL m_URL;
+  OwnPtr<KJS::SavedProperties> m_windowProperties;
+  OwnPtr<KJS::SavedProperties> m_locationProperties;
+  OwnPtr<KJS::SavedBuiltins> m_interpreterBuiltins;
+  OwnPtr<KJS::PausedTimeouts> m_pausedTimeouts;
 
 #if PLATFORM(MAC)
   RetainPtr<id> m_documentView;
 #endif
-};  // class PageCache
+};  // class CachedPage
 
 }  // namespace WebCore
 
-#endif  // PageCache_h
+#endif  // CachedPage_h

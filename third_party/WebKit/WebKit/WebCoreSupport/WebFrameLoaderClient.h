@@ -39,8 +39,8 @@
 
 namespace WebCore {
 class AuthenticationChallenge;
+class CachedPage;
 class HistoryItem;
-class PageCache;
 class String;
 class ResourceLoader;
 class ResourceRequest;
@@ -66,7 +66,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   virtual void makeDocumentView();
   virtual void makeRepresentation(WebCore::DocumentLoader*);
-  virtual void setDocumentViewFromPageCache(WebCore::PageCache*);
+  virtual void setDocumentViewFromCachedPage(WebCore::CachedPage*);
   virtual void forceLayout();
   virtual void forceLayoutForNonHTML();
 
@@ -76,7 +76,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
 
-  virtual void loadedFromPageCache();
+  virtual void loadedFromCachedPage();
 
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
@@ -267,7 +267,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
 
   NSDictionary* actionDictionary(const WebCore::NavigationAction&) const;
 
-  void saveDocumentViewToPageCache(WebCore::PageCache* pageCache);
+  void saveDocumentViewToCachedPage(WebCore::CachedPage* cachedPage);
 
   virtual bool canCachePage() const;
 

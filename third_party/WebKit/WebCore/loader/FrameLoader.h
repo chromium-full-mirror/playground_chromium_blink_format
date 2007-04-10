@@ -51,6 +51,7 @@ class JSValue;
 namespace WebCore {
 
 class AuthenticationChallenge;
+class CachedPage;
 class Document;
 class DocumentLoader;
 class Element;
@@ -66,8 +67,6 @@ class IntSize;
 class NavigationAction;
 class Node;
 class Page;
-class PageCache;
-class PageState;
 class RenderPart;
 class ResourceError;
 class ResourceLoader;
@@ -481,7 +480,7 @@ class FrameLoader : Noncopyable {
   bool shouldGoToHistoryItem(HistoryItem*) const;
   bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
 
-  void commitProvisionalLoad(PassRefPtr<PageCache>);
+  void commitProvisionalLoad(PassRefPtr<CachedPage>);
 
   void goToItem(HistoryItem*, FrameLoadType);
   void saveDocumentAndScrollState();
@@ -519,7 +518,7 @@ class FrameLoader : Noncopyable {
   void loadItem(HistoryItem*, FrameLoadType);
   bool urlsMatchItem(HistoryItem*) const;
   void purgePageCache();
-  void invalidateCurrentItemPageCache();
+  void invalidateCurrentItemCachedPage();
   void recursiveGoToItem(HistoryItem*, HistoryItem*, FrameLoadType);
   bool childFramesMatchItem(HistoryItem*) const;
 
@@ -551,8 +550,8 @@ class FrameLoader : Noncopyable {
                   const Vector<String>& paramValues,
                   bool useFallback);
 
-  bool loadProvisionalItemFromPageCache();
-  bool createPageCache(HistoryItem*);
+  bool loadProvisionalItemFromCachedPage();
+  bool cachePageToHistoryItem(HistoryItem*);
 
   void emitLoadEvent();
 
@@ -572,7 +571,7 @@ class FrameLoader : Noncopyable {
   void clearProvisionalLoad();
   void markLoadComplete();
   void commitProvisionalLoad();
-  void transitionToCommitted(PassRefPtr<PageCache>);
+  void transitionToCommitted(PassRefPtr<CachedPage>);
   void frameLoadCompleted();
 
   void mainReceivedError(const ResourceError&, bool isComplete);
@@ -632,7 +631,7 @@ class FrameLoader : Noncopyable {
   void setState(FrameState);
 
   void closeOldDataSources();
-  void open(PageState&);
+  void open(CachedPage&);
   void opened();
   void updateHistoryAfterClientRedirect();
 

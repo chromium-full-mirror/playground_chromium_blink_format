@@ -29,13 +29,14 @@
 #include "config.h"
 #include "DocumentLoader.h"
 
+#include "CachedPage.h"
 #include "Document.h"
 #include "Event.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "HistoryItem.h"
+#include "Logging.h"
 #include "MainResourceLoader.h"
-#include "PageCache.h"
 #include "PlatformString.h"
 #include "SharedBuffer.h"
 #include "XMLTokenizer.h"
@@ -130,7 +131,7 @@ DocumentLoader::DocumentLoader(const ResourceRequest& req,
       m_gotFirstByte(false),
       m_primaryLoadComplete(false),
       m_isClientRedirect(false),
-      m_loadingFromPageCache(false),
+      m_loadingFromCachedPage(false),
       m_stopRecordingResponses(false) {}
 
 FrameLoader* DocumentLoader::frameLoader() const {
@@ -506,23 +507,27 @@ KURL DocumentLoader::urlForHistory() const {
   return m_originalRequestCopy.url();
 }
 
-void DocumentLoader::loadFromPageCache(PassRefPtr<PageCache> pageCache) {
+void DocumentLoader::loadFromCachedPage(PassRefPtr<CachedPage> cachedPage) {
+  LOG(PageCache,
+      "WebCorePageCache: DocumentLoader %p loading from cached page %p", this,
+      cachedPage.get());
+
   prepareForLoadStart();
-  setLoadingFromPageCache(true);
+  setLoadingFromCachedPage(true);
   setCommitted(true);
-  frameLoader()->commitProvisionalLoad(pageCache);
+  frameLoader()->commitProvisionalLoad(cachedPage);
 }
 
 const ResourceResponse& DocumentLoader::response() const {
   return m_response;
 }
 
-void DocumentLoader::setLoadingFromPageCache(bool loading) {
-  m_loadingFromPageCache = loading;
+void DocumentLoader::setLoadingFromCachedPage(bool loading) {
+  m_loadingFromCachedPage = loading;
 }
 
-bool DocumentLoader::isLoadingFromPageCache() const {
-  return m_loadingFromPageCache;
+bool DocumentLoader::isLoadingFromCachedPage() const {
+  return m_loadingFromCachedPage;
 }
 
 void DocumentLoader::setResponse(const ResourceResponse& response) {

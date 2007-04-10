@@ -41,7 +41,7 @@ class HistoryItemTimer {
   void invalidate();
 
  private:
-  void callReleasePageCachesOrReschedule(Timer<HistoryItemTimer>*);
+  void callReleaseCachedPagesOrReschedule(Timer<HistoryItemTimer>*);
   Timer<HistoryItemTimer> m_timer;
 };
 }
