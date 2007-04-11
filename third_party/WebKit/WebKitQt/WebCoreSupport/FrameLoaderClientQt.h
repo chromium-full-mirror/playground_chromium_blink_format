@@ -108,7 +108,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
 
-  virtual void loadedFromPageCache();
+  virtual void loadedFromCachedPage();
 
   virtual void frameLoaderDestroyed();
   virtual bool canHandleRequest(const WebCore::ResourceRequest&) const;
@@ -168,12 +168,12 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual String userAgent(const WebCore::KURL&);
 
-  virtual void setDocumentViewFromPageCache(WebCore::PageCache*);
+  virtual void setDocumentViewFromCachedPage(CachedPage*);
   virtual void updateGlobalHistoryForStandardLoad(const WebCore::KURL&);
   virtual void updateGlobalHistoryForReload(const WebCore::KURL&);
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
   virtual void saveViewStateToItem(WebCore::HistoryItem*);
-  virtual void saveDocumentViewToPageCache(WebCore::PageCache*);
+  virtual void saveDocumentViewToCachedPage(CachedPage*);
   virtual bool canCachePage() const;
 
   virtual void setMainDocumentError(WebCore::DocumentLoader*,
