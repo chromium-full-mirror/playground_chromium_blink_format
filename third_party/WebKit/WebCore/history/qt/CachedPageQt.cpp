@@ -24,12 +24,12 @@
  */
 
 #include "config.h"
-#include "PageCache.h"
+#include "CachedPage.h"
 
 namespace WebCore {
 
-void PageCache::close() {
-  if (!m_pageState)
+void CachedPage::close() {
+  if (!m_document)
     return;
 
   // FIXME: <rdar://problem/4886844>
@@ -40,11 +40,7 @@ void PageCache::close() {
   //         objc_msgSend(m_documentView.get(),
   //         @selector(closeIfNotCurrentView));
 
-  m_pageState->clear();
-
-  // Setting these to null is how the PageCache object knows it's been closed
-  m_pageState = 0;
-  m_documentLoader = 0;
+  clear();
 }
 
 }  // namespace WebCore

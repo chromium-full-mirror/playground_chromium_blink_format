@@ -78,4 +78,6 @@ void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
 
 void Editor::markMisspellings(const Selection& selection) {}
 
+void Editor::markBadGrammar(const Selection& selection) {}
+
 }  // namespace WebCore
