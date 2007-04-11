@@ -73,11 +73,7 @@ void Pasteboard::writeURL(const KURL&, const String&, Frame*) {
   notImplemented();
 }
 
-void Pasteboard::writeImage(const HitTestResult&) {
-  notImplemented();
-}
-
-void Pasteboard::writeImage(Node* imageNode, const KURL& url) {
+void Pasteboard::writeImage(Node*, const KURL&, const String&) {
   notImplemented();
 }
 
