@@ -62,8 +62,7 @@ PassRefPtr<Range> findPlainText(const Range*,
 class TextIterator {
  public:
   TextIterator();
-  explicit TextIterator(const Range*,
-                        bool emitSpaceForReplacedElements = false);
+  explicit TextIterator(const Range*, bool emitForReplacedElements = false);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
@@ -145,7 +144,7 @@ class TextIterator {
   bool m_haveEmitted;
 
   // Used by selection preservation code.
-  bool m_emitSpaceForReplacedElements;
+  bool m_emitForReplacedElements;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
@@ -172,7 +171,6 @@ class SimplifiedBackwardsTextIterator {
   bool handleReplacedElement();
   bool handleNonTextNode();
   void emitCharacter(UChar, Node* Node, int startOffset, int endOffset);
-  void emitNewline();
 
   // Current position, not necessarily of the text being returned, but position
   // as we walk through the DOM tree.
@@ -200,6 +198,9 @@ class SimplifiedBackwardsTextIterator {
   // Used for whitespace characters that aren't in the DOM, so we can point at
   // them.
   UChar m_singleCharacterBuffer;
+
+  // The node after the last node this iterator should process.
+  Node* m_pastStartNode;
 };
 
 // Builds on the text iterator, adding a character position so we can walk one
@@ -207,7 +208,8 @@ class SimplifiedBackwardsTextIterator {
 class CharacterIterator {
  public:
   CharacterIterator();
-  explicit CharacterIterator(const Range* r);
+  explicit CharacterIterator(const Range* r,
+                             bool emitForReplacedElements = false);
 
   void advance(int numCharacters);
 
