@@ -2735,7 +2735,7 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
 
     case FrameStateCommittedPage: {
       DocumentLoader* dl = m_documentLoader.get();
-      if (dl->isLoadingInAPISense())
+      if (!dl || dl->isLoadingInAPISense())
         return;
 
       markLoadComplete();
