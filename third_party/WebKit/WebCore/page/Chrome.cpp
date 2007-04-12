@@ -74,12 +74,14 @@ void Chrome::takeFocus(FocusDirection direction) const {
   m_client->takeFocus(direction);
 }
 
-Page* Chrome::createWindow(const FrameLoadRequest& request) const {
-  return m_client->createWindow(request);
+Page* Chrome::createWindow(Frame* frame,
+                           const FrameLoadRequest& request) const {
+  return m_client->createWindow(frame, request);
 }
 
-Page* Chrome::createModalDialog(const FrameLoadRequest& request) const {
-  return m_client->createModalDialog(request);
+Page* Chrome::createModalDialog(Frame* frame,
+                                const FrameLoadRequest& request) const {
+  return m_client->createModalDialog(frame, request);
 }
 
 void Chrome::show() const {

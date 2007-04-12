@@ -91,9 +91,10 @@ void ContextMenuController::handleContextMenuEvent(Event* event) {
   event->setDefaultHandled();
 }
 
-static void openNewWindow(const KURL& urlToLoad, const Frame* frame) {
-  Page* newPage = frame->page()->chrome()->createWindow(FrameLoadRequest(
-      ResourceRequest(urlToLoad, frame->loader()->outgoingReferrer())));
+static void openNewWindow(const KURL& urlToLoad, Frame* frame) {
+  Page* newPage = frame->page()->chrome()->createWindow(
+      frame, FrameLoadRequest(ResourceRequest(
+                 urlToLoad, frame->loader()->outgoingReferrer())));
   if (newPage)
     newPage->chrome()->show();
 }
