@@ -67,6 +67,10 @@ typedef struct {
   NPObject* testObject;
   NPStream* stream;
   char* onStreamLoad;
+  char* firstUrl;
+  char* firstHeaders;
+  char* lastUrl;
+  char* lastHeaders;
 } PluginObject;
 
 extern NPClass* getPluginClass(void);
@@ -74,3 +78,6 @@ extern void handleCallback(PluginObject* object,
                            const char* url,
                            NPReason reason,
                            void* notifyData);
+extern void notifyStream(PluginObject* object,
+                         const char* url,
+                         const char* headers);
