@@ -1079,6 +1079,9 @@ bool EventHandler::updateDragAndDrop(const PlatformMouseEvent& event,
                                      Clipboard* clipboard) {
   bool accept = false;
 
+  if (!m_frame->document())
+    return false;
+
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(HitTestRequest(true, false), event);
 
