@@ -1330,19 +1330,19 @@ void RenderBox::calcHorizontalMargins(const Length& marginLeft,
   if ((marginLeft.isAuto() && marginRight.isAuto() &&
        m_width < containerWidth) ||
       (!marginLeft.isAuto() && !marginRight.isAuto() &&
-       containingBlock()->style()->textAlign() == KHTML_CENTER)) {
+       containingBlock()->style()->textAlign() == WEBKIT_CENTER)) {
     m_marginLeft = max(0, (containerWidth - m_width) / 2);
     m_marginRight = containerWidth - m_width - m_marginLeft;
   } else if ((marginRight.isAuto() && m_width < containerWidth) ||
              (!marginLeft.isAuto() &&
               containingBlock()->style()->direction() == RTL &&
-              containingBlock()->style()->textAlign() == KHTML_LEFT)) {
+              containingBlock()->style()->textAlign() == WEBKIT_LEFT)) {
     m_marginLeft = marginLeft.calcValue(containerWidth);
     m_marginRight = containerWidth - m_width - m_marginLeft;
   } else if ((marginLeft.isAuto() && m_width < containerWidth) ||
              (!marginRight.isAuto() &&
               containingBlock()->style()->direction() == LTR &&
-              containingBlock()->style()->textAlign() == KHTML_RIGHT)) {
+              containingBlock()->style()->textAlign() == WEBKIT_RIGHT)) {
     m_marginRight = marginRight.calcValue(containerWidth);
     m_marginLeft = containerWidth - m_width - m_marginRight;
   } else {
