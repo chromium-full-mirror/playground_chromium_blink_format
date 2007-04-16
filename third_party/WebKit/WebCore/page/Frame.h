@@ -1,30 +1,29 @@
 // -*- c-basic-offset: 4 -*-
-/* This file is part of the KDE project
-*
-* Copyright (C) 1998, 1999 Torben Weis <weis@kde.org>
-*                     1999-2001 Lars Knoll <knoll@kde.org>
-*                     1999-2001 Antti Koivisto <koivisto@kde.org>
-*                     2000-2001 Simon Hausmann <hausmann@kde.org>
-*                     2000-2001 Dirk Mueller <mueller@kde.org>
-*                     2000 Stefan Schimanski <1Stein@gmx.de>
-* Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
-* Copyright (C) 2007 Trolltech ASA
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Library General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Library General Public License for more details.
-*
-* You should have received a copy of the GNU Library General Public License
-* along with this library; see the file COPYING.LIB.  If not, write to
-* the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-* Boston, MA 02111-1307, USA.
-*/
+/*
+ * Copyright (C) 1998, 1999 Torben Weis <weis@kde.org>
+ *                     1999-2001 Lars Knoll <knoll@kde.org>
+ *                     1999-2001 Antti Koivisto <koivisto@kde.org>
+ *                     2000-2001 Simon Hausmann <hausmann@kde.org>
+ *                     2000-2001 Dirk Mueller <mueller@kde.org>
+ *                     2000 Stefan Schimanski <1Stein@gmx.de>
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007 Trolltech ASA
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this library; see the file COPYING.LIB.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
 
 #ifndef Frame_h
 #define Frame_h
@@ -42,7 +41,6 @@ class NPObject;
 
 namespace KJS {
 class Interpreter;
-class JSObject;
 
 namespace Bindings {
 class Instance;
@@ -52,28 +50,21 @@ class RootObject;
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
-@class WebCoreFrameBridge;
-@class WebScriptObject;
 @class NSArray;
 @class NSDictionary;
-@class NSFont;
-@class NSImage;
 @class NSMenu;
 @class NSMutableDictionary;
 @class NSString;
 @class WebCoreFrameBridge;
+@class WebScriptObject;
 #else
-class WebCoreFrameBridge;
-class WebScriptObject;
 class NSArray;
 class NSDictionary;
-class NSFont;
-class NSImage;
 class NSMenu;
 class NSMutableDictionary;
 class NSString;
 class WebCoreFrameBridge;
-typedef unsigned int NSDragOperation;
+class WebScriptObject;
 typedef int NSWritingDirection;
 #endif
 #endif
@@ -105,9 +96,7 @@ class KURL;
 class Node;
 class Page;
 class Range;
-class RenderObject;
 class RenderPart;
-class RenderStyle;
 class Selection;
 class SelectionController;
 class Settings;
@@ -180,7 +169,7 @@ class Frame : public Shared<Frame> {
 
   // should move to FrameView
   void paint(GraphicsContext*, const IntRect&);
-  void setPaintRestriction(PaintRestriction pr);
+  void setPaintRestriction(PaintRestriction);
 
   void setUserStyleSheetLocation(const KURL&);
   void setUserStyleSheet(const String& styleSheetData);
@@ -348,8 +337,7 @@ class Frame : public Shared<Frame> {
 
   bool isContentEditable() const;  // if true, everything in frame is editable
 
-  void setSecureKeyboardEntry(bool);
-  bool isSecureKeyboardEntry();
+  void setUseSecureKeyboardEntryWhenActive(bool);
 
   CSSMutableStyleDeclaration* typingStyle() const;
   void setTypingStyle(CSSMutableStyleDeclaration*);
@@ -368,6 +356,7 @@ class Frame : public Shared<Frame> {
 
  private:
   void caretBlinkTimerFired(Timer<Frame>*);
+  void setUseSecureKeyboardEntry(bool);
 
   // === to be moved into the Platform directory
 
@@ -384,6 +373,7 @@ class Frame : public Shared<Frame> {
   String matchLabelsAgainstElement(const Vector<String>& labels, Element*);
 
 #if PLATFORM(MAC)
+
   // === undecided, may or may not belong here
 
  public:
@@ -424,6 +414,7 @@ class Frame : public Shared<Frame> {
   NSWritingDirection baseWritingDirectionForSelectionStart() const;
 
   void setMarkedTextRange(const Range*, NSArray* attributes, NSArray* ranges);
+
 #endif
 };
 

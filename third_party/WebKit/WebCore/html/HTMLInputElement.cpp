@@ -226,7 +226,7 @@ void HTMLInputElement::dispatchFocusEvent() {
   if (isTextField()) {
     setAutofilled(false);
     if (inputType() == PASSWORD && document()->frame())
-      document()->frame()->setSecureKeyboardEntry(true);
+      document()->frame()->setUseSecureKeyboardEntryWhenActive(true);
   }
   HTMLGenericFormElement::dispatchFocusEvent();
 }
@@ -234,7 +234,7 @@ void HTMLInputElement::dispatchFocusEvent() {
 void HTMLInputElement::dispatchBlurEvent() {
   if (isTextField() && document()->frame()) {
     if (inputType() == PASSWORD)
-      document()->frame()->setSecureKeyboardEntry(false);
+      document()->frame()->setUseSecureKeyboardEntryWhenActive(false);
     document()->frame()->textFieldDidEndEditing(this);
   }
   HTMLGenericFormElement::dispatchBlurEvent();
