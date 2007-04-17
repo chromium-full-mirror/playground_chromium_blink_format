@@ -372,8 +372,10 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
         bool userGesture =
             static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->wasRunByUserGesture();
+        // FIXME: This always passes false for userGesture.
         frame->loader()->scheduleLocationChange(
-            str, activeFrame->loader()->outgoingReferrer(), !userGesture);
+            str, activeFrame->loader()->outgoingReferrer(), !userGesture,
+            false);
       }
       break;
     case BgColor:

@@ -257,7 +257,7 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
   if (!request.frameName().isEmpty() && request.frameName() != "_blank")
     if (Frame* frame = m_frame->tree()->find(request.frameName())) {
       if (!request.resourceRequest().url().isEmpty())
-        frame->loader()->load(request, true, 0, 0, HashMap<String, String>());
+        frame->loader()->load(request, 0, 0, HashMap<String, String>());
       frame->page()->chrome()->focus();
       return frame;
     }
@@ -342,11 +342,15 @@ void FrameLoader::changeLocation(const String& URL,
 }
 
 void FrameLoader::urlSelected(const ResourceRequest& request,
-                              const String& _target,
+                              const String& explicitTarget,
                               Event* triggeringEvent,
                               bool lockHistory,
                               bool userGesture) {
-  String target = _target;
+  // FIXME: This function ignores the lockHistory parameter and does not pass it
+  // along
+  // in the FrameLoadRequest it creates.
+
+  String target = explicitTarget;
   if (target.isEmpty() && m_frame->document())
     target = m_frame->document()->baseTarget();
 
@@ -361,11 +365,12 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
     return;
 
   FrameLoadRequest frameRequest(request, target);
+  frameRequest.setIsUserGesture(userGesture);
 
   if (frameRequest.resourceRequest().httpReferrer().isEmpty())
     frameRequest.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
 
-  urlSelected(frameRequest, triggeringEvent, userGesture);
+  load(frameRequest, triggeringEvent, 0, HashMap<String, String>());
 }
 
 bool FrameLoader::requestFrame(HTMLFrameOwnerElement* ownerElement,
@@ -1752,19 +1757,15 @@ void FrameLoader::finalSetupForReplace(DocumentLoader* loader) {
 }
 
 void FrameLoader::load(const KURL& URL, Event* event) {
-  load(ResourceRequest(URL), true, event, 0, HashMap<String, String>());
+  load(ResourceRequest(URL), event, 0, HashMap<String, String>());
 }
 
 void FrameLoader::load(const FrameLoadRequest& request,
-                       bool userGesture,
                        Event* event,
                        HTMLFormElement* submitForm,
                        const HashMap<String, String>& formValues) {
-  String referrer;
-  String argsReferrer = request.resourceRequest().httpReferrer();
-  if (!argsReferrer.isEmpty())
-    referrer = argsReferrer;
-  else
+  String referrer = request.resourceRequest().httpReferrer();
+  if (referrer.isEmpty())
     referrer = m_outgoingReferrer;
 
   bool hideReferrer;
@@ -1773,7 +1774,6 @@ void FrameLoader::load(const FrameLoadRequest& request,
                                        request.resourceRequest().url().url());
     return;
   }
-
   if (hideReferrer)
     referrer = String();
 
@@ -1785,11 +1785,10 @@ void FrameLoader::load(const FrameLoadRequest& request,
     FrameLoadType loadType;
     if (request.resourceRequest().cachePolicy() == ReloadIgnoringCacheData)
       loadType = FrameLoadTypeReload;
-    else if (!userGesture)
+    else if (!request.isUserGesture())
       loadType = FrameLoadTypeInternal;
     else
       loadType = FrameLoadTypeStandard;
-
     load(request.resourceRequest().url(), referrer, loadType,
          request.frameName(), event, submitForm, formValues);
   } else
@@ -2889,21 +2888,10 @@ void FrameLoader::submitForm(const FrameLoadRequest& request, Event* event) {
     m_submittedFormURL = request.resourceRequest().url();
   }
 
-  // FIXME: Why do we always pass true for userGesture?
-  load(request, true, event, m_formAboutToBeSubmitted.get(),
+  load(request, event, m_formAboutToBeSubmitted.get(),
        m_formValuesAboutToBeSubmitted);
 
   clearRecordedFormValues();
-}
-
-void FrameLoader::urlSelected(const FrameLoadRequest& request,
-                              Event* event,
-                              bool userGesture) {
-  FrameLoadRequest copy = request;
-  if (copy.resourceRequest().httpReferrer().isEmpty())
-    copy.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
-
-  load(copy, userGesture, event, 0, HashMap<String, String>());
 }
 
 String FrameLoader::userAgent(const KURL& url) const {
