@@ -149,10 +149,10 @@ void IndentOutdentCommand::indentRegion() {
 
   // Special case empty root editable elements because there's nothing to split
   // and there's nothing to move.
-  Node* startNode = startOfSelection.deepEquivalent().downstream().node();
-  if (startNode == startNode->rootEditableElement()) {
+  Position start = startOfSelection.deepEquivalent().downstream();
+  if (start.node() == editableRootForPosition(start)) {
     RefPtr<Node> blockquote = createIndentBlockquoteElement(document());
-    insertNodeAt(blockquote.get(), startNode, 0);
+    insertNodeAt(blockquote.get(), start.node(), 0);
     RefPtr<Node> placeholder = createBreakElement(document());
     appendNode(placeholder.get(), blockquote.get());
     setEndingSelection(Selection(Position(placeholder.get(), 0), DOWNSTREAM));
@@ -206,10 +206,9 @@ void IndentOutdentCommand::indentRegion() {
       // this by splitting all parents of the current paragraph up to that
       // point.
       RefPtr<Node> blockquote = createIndentBlockquoteElement(document());
-      Node* startNode =
-          startOfParagraph(endOfCurrentParagraph).deepEquivalent().node();
+      Position start = startOfParagraph(endOfCurrentParagraph).deepEquivalent();
       Node* startOfNewBlock =
-          splitTreeToNode(startNode, startNode->rootEditableElement());
+          splitTreeToNode(start.node(), editableRootForPosition(start));
       insertNodeBefore(blockquote.get(), startOfNewBlock);
       newBlockquote = blockquote.get();
       insertionPoint = prepareBlockquoteLevelForInsertion(endOfCurrentParagraph,
