@@ -53,7 +53,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
 
   virtual void makeDocumentView();
   virtual void makeRepresentation(DocumentLoader*);
-  virtual void setDocumentViewFromPageCache(PageCache*);
+  virtual void setDocumentViewFromCachedPage(CachedPage*);
   virtual void forceLayout();
   virtual void forceLayoutForNonHTML();
 
@@ -64,7 +64,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
 
-  virtual void loadedFromPageCache();
+  virtual void loadedFromCachedPage();
 
   virtual void assignIdentifierToInitialRequest(unsigned long identifier,
                                                 DocumentLoader*,
@@ -222,7 +222,7 @@ class FrameLoaderClientGdk : public FrameLoaderClient {
 
   virtual String userAgent(const KURL&);
 
-  virtual void saveDocumentViewToPageCache(PageCache*);
+  virtual void saveDocumentViewToCachedPage(CachedPage*);
   virtual bool canCachePage() const;
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,

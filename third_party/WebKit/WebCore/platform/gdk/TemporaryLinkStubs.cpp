@@ -61,7 +61,7 @@
 #include "MainResourceLoader.h"
 #include "Node.h"
 #include "NotImplementedGdk.h"
-#include "PageCache.h"
+#include "CachedPage.h"
 #include "Pasteboard.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformScrollBar.h"
@@ -580,7 +580,7 @@ int Font::offsetForPositionForComplexText(const TextRun&,
   return 0;
 }
 
-void PageCache::close() {
+void CachedPage::close() {
   notImplementedGdk();
 }
 

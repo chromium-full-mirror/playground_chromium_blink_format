@@ -287,7 +287,7 @@ void FrameLoaderClientGdk::detachedFromParent3() {
 void FrameLoaderClientGdk::detachedFromParent4() {
   notImplementedGdk();
 }
-void FrameLoaderClientGdk::loadedFromPageCache() {
+void FrameLoaderClientGdk::loadedFromCachedPage() {
   notImplementedGdk();
 }
 void FrameLoaderClientGdk::dispatchDidHandleOnloadEvents() {
@@ -399,7 +399,7 @@ void FrameLoaderClientGdk::prepareForDataSourceReplacement() {
 void FrameLoaderClientGdk::setTitle(const String&, const KURL&) {
   notImplementedGdk();
 }
-void FrameLoaderClientGdk::setDocumentViewFromPageCache(WebCore::PageCache*) {
+void FrameLoaderClientGdk::setDocumentViewFromCachedPage(WebCore::CachedPage*) {
   notImplementedGdk();
 }
 void FrameLoaderClientGdk::dispatchDidReceiveContentLength(
@@ -474,7 +474,7 @@ bool FrameLoaderClientGdk::willUseArchive(ResourceLoader*,
   notImplementedGdk();
   return false;
 }
-void FrameLoaderClientGdk::saveDocumentViewToPageCache(PageCache*) {
+void FrameLoaderClientGdk::saveDocumentViewToCachedPage(CachedPage*) {
   notImplementedGdk();
 }
 bool FrameLoaderClientGdk::canCachePage() const {
