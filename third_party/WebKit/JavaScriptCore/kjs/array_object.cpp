@@ -287,7 +287,7 @@ void ArrayInstance::mark() {
   }
 }
 
-static ExecState* execForCompareByStringForQSort;
+static ExecState* execForCompareByStringForQSort = 0;
 
 static int compareByStringForQSort(const void* a, const void* b) {
   ExecState* exec = execForCompareByStringForQSort;
@@ -305,10 +305,11 @@ static int compareByStringForQSort(const void* a, const void* b) {
 void ArrayInstance::sort(ExecState* exec) {
   int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd(exec);
 
+  ExecState* oldExec = execForCompareByStringForQSort;
   execForCompareByStringForQSort = exec;
   qsort(storage, lengthNotIncludingUndefined, sizeof(JSValue*),
         compareByStringForQSort);
-  execForCompareByStringForQSort = 0;
+  execForCompareByStringForQSort = oldExec;
 }
 
 struct CompareWithCompareFunctionArguments {
@@ -326,7 +327,8 @@ struct CompareWithCompareFunctionArguments {
   JSObject* globalObject;
 };
 
-static CompareWithCompareFunctionArguments* compareWithCompareFunctionArguments;
+static CompareWithCompareFunctionArguments*
+    compareWithCompareFunctionArguments = 0;
 
 static int compareWithCompareFunctionForQSort(const void* a, const void* b) {
   CompareWithCompareFunctionArguments* args =
@@ -354,11 +356,13 @@ static int compareWithCompareFunctionForQSort(const void* a, const void* b) {
 void ArrayInstance::sort(ExecState* exec, JSObject* compareFunction) {
   int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd(exec);
 
+  CompareWithCompareFunctionArguments* oldArgs =
+      compareWithCompareFunctionArguments;
   CompareWithCompareFunctionArguments args(exec, compareFunction);
   compareWithCompareFunctionArguments = &args;
   qsort(storage, lengthNotIncludingUndefined, sizeof(JSValue*),
         compareWithCompareFunctionForQSort);
-  compareWithCompareFunctionArguments = 0;
+  compareWithCompareFunctionArguments = oldArgs;
 }
 
 unsigned ArrayInstance::pushUndefinedObjectsToEnd(ExecState* exec) {
