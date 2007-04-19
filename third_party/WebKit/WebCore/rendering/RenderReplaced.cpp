@@ -146,6 +146,8 @@ VisiblePosition RenderReplaced::positionForCoordinates(int x, int y) {
 }
 
 IntRect RenderReplaced::selectionRect() {
+  ASSERT(!needsLayout());
+
   if (!isSelected())
     return IntRect();
   if (!m_inlineBoxWrapper)

@@ -997,7 +997,7 @@ class RenderObject : public CachedResourceClient {
 
     SelectionInfo(RenderObject* o)
         : m_object(o),
-          m_rect(o->selectionRect()),
+          m_rect(o->needsLayout() ? IntRect() : o->selectionRect()),
           m_state(o->selectionState()) {}
 
     RenderObject* object() const { return m_object; }

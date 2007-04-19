@@ -1815,6 +1815,8 @@ bool RenderBlock::isSelectionRoot() const {
 }
 
 GapRects RenderBlock::selectionGapRects() {
+  ASSERT(!needsLayout());
+
   if (!shouldPaintSelectionGaps())
     return GapRects();
 
