@@ -127,6 +127,10 @@ class CompositeEditCommand : public EditCommand {
 
   bool breakOutOfEmptyListItem();
 
+  Position positionAvoidingSpecialElementBoundary(
+      const Position&,
+      bool alwaysAvoidAnchors = true);
+
   Vector<RefPtr<EditCommand>> m_commands;
 
  private:
