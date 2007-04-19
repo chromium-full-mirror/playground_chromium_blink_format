@@ -112,6 +112,10 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                       unsigned long identifier,
                                       const WebCore::ResourceError&);
 
+  virtual NSCachedURLResponse* willCacheResponse(WebCore::DocumentLoader*,
+                                                 unsigned long identifier,
+                                                 NSCachedURLResponse*) const;
+
   virtual void dispatchDidHandleOnloadEvents();
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad();
   virtual void dispatchDidCancelClientRedirect();

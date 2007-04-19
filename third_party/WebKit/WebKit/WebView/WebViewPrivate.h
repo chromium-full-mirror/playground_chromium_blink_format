@@ -91,6 +91,12 @@ typedef void (*WebDidLoadResourceFromMemoryCacheFunc)(id,
                                                       NSURLResponse*,
                                                       WebNSInteger,
                                                       WebDataSource*);
+typedef NSCachedURLResponse* (*WebWillCacheResponseFunc)(id,
+                                                         SEL,
+                                                         WebView*,
+                                                         id,
+                                                         NSCachedURLResponse*,
+                                                         WebDataSource*);
 
 typedef struct _WebResourceDelegateImplementationCache {
   uint delegateImplementsDidCancelAuthenticationChallenge : 1;
@@ -101,6 +107,7 @@ typedef struct _WebResourceDelegateImplementationCache {
   uint delegateImplementsWillSendRequest : 1;
   uint delegateImplementsIdentifierForRequest : 1;
   uint delegateImplementsDidLoadResourceFromMemoryCache : 1;
+  uint delegateImplementsWillCacheResponse : 1;
 
   WebDidCancelAuthenticationChallengeFunc didCancelAuthenticationChallengeFunc;
   WebDidReceiveAuthenticationChallengeFunc
@@ -111,6 +118,7 @@ typedef struct _WebResourceDelegateImplementationCache {
   WebDidReceiveContentLengthFunc didReceiveContentLengthFunc;
   WebDidFinishLoadingFromDataSourceFunc didFinishLoadingFromDataSourceFunc;
   WebDidLoadResourceFromMemoryCacheFunc didLoadResourceFromMemoryCacheFunc;
+  WebWillCacheResponseFunc willCacheResponseFunc;
 } WebResourceDelegateImplementationCache;
 
 extern NSString* _WebCanGoBackKey;
@@ -494,8 +502,16 @@ backforward list.
 // of its subresources.
 - (void)webView:(WebView*)sender didFinishDocumentLoadForFrame:(WebFrame*)frame;
 
-// Addresses 4192534.  Private API for now.
+// Addresses 4192534.  SPI for now.
 - (void)webView:(WebView*)sender didHandleOnloadEventsForFrame:(WebFrame*)frame;
+@end
+
+@interface NSObject (WebResourceLoadDelegatePrivate)
+// Addresses <rdar://problem/5008925> - SPI for now
+- (NSCachedURLResponse*)webView:(WebView*)sender
+                       resource:(id)identifier
+              willCacheResponse:(NSCachedURLResponse*)respose
+                 fromDataSource:(WebDataSource*)dataSource;
 @end
 
 #undef WebNSInteger

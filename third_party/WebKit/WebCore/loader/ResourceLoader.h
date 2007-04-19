@@ -123,6 +123,10 @@ class ResourceLoader : public Shared<ResourceLoader>,
     receivedCancellation(challenge);
   }
   virtual void willCacheResponse(ResourceHandle*, CacheStoragePolicy&);
+#if PLATFORM(MAC)
+  virtual NSCachedURLResponse* willCacheResponse(ResourceHandle*,
+                                                 NSCachedURLResponse*);
+#endif
 
   ResourceHandle* handle() const { return m_handle.get(); }
 
