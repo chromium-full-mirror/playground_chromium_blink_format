@@ -171,11 +171,12 @@ void ChromeClientGdk::focus() {
 void ChromeClientGdk::unfocus() {
   notImplementedGdk();
 }
-WebCore::Page* ChromeClientGdk::createWindow(const FrameLoadRequest&) {
+WebCore::Page* ChromeClientGdk::createWindow(Frame*, const FrameLoadRequest&) {
   notImplementedGdk();
   return 0;
 }
-WebCore::Page* ChromeClientGdk::createModalDialog(const FrameLoadRequest&) {
+WebCore::Page* ChromeClientGdk::createModalDialog(Frame*,
+                                                  const FrameLoadRequest&) {
   notImplementedGdk();
   return 0;
 }
@@ -614,6 +615,9 @@ PassRefPtr<Clipboard> Editor::newGeneralClipboard(ClipboardAccessPolicy) {
   return 0;
 }
 void Editor::markMisspellings(const Selection&) {
+  notImplementedGdk();
+}
+void Editor::markBadGrammar(const Selection&) {
   notImplementedGdk();
 }
 
