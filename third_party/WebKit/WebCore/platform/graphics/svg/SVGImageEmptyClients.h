@@ -378,7 +378,7 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
       NSCachedURLResponse* response) const {
     return response;
   }
-#endif PLATFORM(MAC)
+#endif
 };
 
 class SVGEmptyEditorClient : public EditorClient {
