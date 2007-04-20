@@ -136,8 +136,14 @@ void CompositeEditCommand::insertNodeAfter(Node* insertChild, Node* refChild) {
 }
 
 void CompositeEditCommand::insertNodeAt(Node* insertChild,
-                                        Node* refChild,
-                                        int offset) {
+                                        const Position& editingPosition) {
+  ASSERT(isEditablePosition(editingPosition));
+  // For editing positions like [table, 0], insert before the table,
+  // likewise for replaced elements, brs, etc.
+  Position p = rangeCompliantEquivalent(editingPosition);
+  Node* refChild = p.node();
+  int offset = p.offset();
+
   if (canHaveChildrenForEditing(refChild)) {
     Node* child = refChild->firstChild();
     for (int i = 0; child && i < offset; i++)
@@ -290,7 +296,7 @@ void CompositeEditCommand::insertNodeAtTabSpanPosition(Node* node,
                                                        const Position& pos) {
   // insert node before, after, or at split of tab span
   Position insertPos = positionOutsideTabSpan(pos);
-  insertNodeAt(node, insertPos.node(), insertPos.offset());
+  insertNodeAt(node, insertPos);
 }
 
 void CompositeEditCommand::deleteSelection(bool smartDelete,
@@ -554,7 +560,7 @@ Node* CompositeEditCommand::insertBlockPlaceholder(const Position& pos) {
   ASSERT(pos.node()->renderer());
 
   RefPtr<Node> placeholder = createBlockPlaceholderElement(document());
-  insertNodeAt(placeholder.get(), pos.node(), pos.offset());
+  insertNodeAt(placeholder.get(), pos);
   return placeholder.get();
 }
 
@@ -644,16 +650,7 @@ Node* CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
 
   RefPtr<Node> newBlock = createDefaultParagraphElement(document());
   appendNode(createBreakElement(document()).get(), newBlock.get());
-
-  if (!isAtomicNode(paragraphStart.node()))
-    insertNodeAt(newBlock.get(), paragraphStart.node(),
-                 paragraphStart.offset());
-  else {
-    ASSERT(paragraphStart.offset() <= 1);
-    ASSERT(paragraphStart.node()->parentNode());
-    insertNodeAt(newBlock.get(), paragraphStart.node()->parentNode(),
-                 paragraphStart.node()->nodeIndex() + paragraphStart.offset());
-  }
+  insertNodeAt(newBlock.get(), paragraphStart);
 
   moveParagraphs(visibleParagraphStart, visibleParagraphEnd,
                  VisiblePosition(Position(newBlock.get(), 0)));
@@ -840,8 +837,7 @@ void CompositeEditCommand::moveParagraphs(
     // FIXME: Trim text between beforeParagraph and afterParagraph if they
     // aren't equal.
     insertNodeAt(createBreakElement(document()).get(),
-                 beforeParagraph.deepEquivalent().node(),
-                 beforeParagraph.deepEquivalent().offset());
+                 beforeParagraph.deepEquivalent());
     // Need an updateLayout here in case inserting the br has split a text node.
     updateLayout();
   }
@@ -958,16 +954,6 @@ Position CompositeEditCommand::positionAvoidingSpecialElementBoundary(
         }
       result = positionBeforeNode(enclosingAnchor);
     }
-    // FIXME: If this avoids positions before/after tables, then it should
-    // probably avoid positions before/after replaced elements, before brs,
-    // etc.  Since it doesn't and there are no known cases where we insert
-    // into such elements, avoiding tables is probably done elsewhere
-    // and is not needed here.
-  } else if (isTableElement(p.node())) {
-    if (isFirstPositionAfterTable(visiblePos))
-      result = positionAfterNode(p.node());
-    if (isLastPositionBeforeTable(visiblePos))
-      result = positionBeforeNode(p.node());
   }
 
   if (result.isNull() || !editableRootForPosition(result))

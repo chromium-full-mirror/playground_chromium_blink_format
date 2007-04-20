@@ -124,7 +124,7 @@ void FormatBlockCommand::doApply() {
     // we can swap with the new tag
     insertNodeBefore(blockNode.get(), refNode);
   else {
-    insertNodeAt(blockNode.get(), upstreamStart.node(), upstreamStart.offset());
+    insertNodeAt(blockNode.get(), upstreamStart);
   }
   appendNode(placeholder.get(), blockNode.get());
   moveParagraph(paragraphStart, paragraphEnd,

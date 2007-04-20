@@ -555,8 +555,7 @@ void DeleteSelectionCommand::mergeParagraphs() {
   if (!mergeDestination.deepEquivalent().node() ||
       !mergeDestination.deepEquivalent().node()->isDescendantOf(
           m_upstreamStart.node()->enclosingBlockFlowElement())) {
-    insertNodeAt(createBreakElement(document()).get(), m_upstreamStart.node(),
-                 m_upstreamStart.offset());
+    insertNodeAt(createBreakElement(document()).get(), m_upstreamStart);
     mergeDestination = VisiblePosition(m_upstreamStart);
   }
 
@@ -755,8 +754,7 @@ void DeleteSelectionCommand::doApply() {
   mergeParagraphs();
 
   if (placeholder)
-    insertNodeAt(placeholder.get(), m_endingPosition.node(),
-                 m_endingPosition.offset());
+    insertNodeAt(placeholder.get(), m_endingPosition);
 
   rebalanceWhitespaceAt(m_endingPosition);
 

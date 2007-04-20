@@ -618,8 +618,7 @@ void ReplaceSelectionCommand::doApply() {
   RefPtr<Node> node = refNode->nextSibling();
 
   fragment.removeNode(refNode);
-  insertNodeAtAndUpdateNodesInserted(refNode.get(), insertionPos.node(),
-                                     insertionPos.offset());
+  insertNodeAtAndUpdateNodesInserted(refNode.get(), insertionPos);
 
   while (node) {
     Node* next = node->nextSibling();
@@ -642,8 +641,7 @@ void ReplaceSelectionCommand::doApply() {
       (unsigned)insertionPos.offset() < startBlock->nodeIndex() &&
       !isStartOfParagraph(startOfInsertedContent))
     insertNodeAt(createBreakElement(document()).get(),
-                 startOfInsertedContent.deepEquivalent().node(),
-                 startOfInsertedContent.deepEquivalent().offset());
+                 startOfInsertedContent.deepEquivalent());
 
   Position lastPositionToSelect;
 
@@ -874,9 +872,8 @@ void ReplaceSelectionCommand::insertNodeAfterAndUpdateNodesInserted(
 
 void ReplaceSelectionCommand::insertNodeAtAndUpdateNodesInserted(
     Node* insertChild,
-    Node* refChild,
-    int offset) {
-  insertNodeAt(insertChild, refChild, offset);
+    const Position& p) {
+  insertNodeAt(insertChild, p);
   updateNodesInserted(insertChild);
 }
 

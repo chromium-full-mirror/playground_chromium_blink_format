@@ -152,7 +152,7 @@ void IndentOutdentCommand::indentRegion() {
   Position start = startOfSelection.deepEquivalent().downstream();
   if (start.node() == editableRootForPosition(start)) {
     RefPtr<Node> blockquote = createIndentBlockquoteElement(document());
-    insertNodeAt(blockquote.get(), start.node(), 0);
+    insertNodeAt(blockquote.get(), start);
     RefPtr<Node> placeholder = createBreakElement(document());
     appendNode(placeholder.get(), blockquote.get());
     setEndingSelection(Selection(Position(placeholder.get(), 0), DOWNSTREAM));
@@ -266,13 +266,11 @@ void IndentOutdentCommand::outdentParagraph() {
     if (visibleStartOfParagraph.isNotNull() &&
         !isStartOfParagraph(visibleStartOfParagraph))
       insertNodeAt(createBreakElement(document()).get(),
-                   visibleStartOfParagraph.deepEquivalent().node(),
-                   visibleStartOfParagraph.deepEquivalent().offset());
+                   visibleStartOfParagraph.deepEquivalent());
     if (visibleEndOfParagraph.isNotNull() &&
         !isEndOfParagraph(visibleEndOfParagraph))
       insertNodeAt(createBreakElement(document()).get(),
-                   visibleEndOfParagraph.deepEquivalent().node(),
-                   visibleEndOfParagraph.deepEquivalent().offset());
+                   visibleEndOfParagraph.deepEquivalent());
     return;
   }
   Node* enclosingBlockFlow = enclosingBlockFlowElement(visibleStartOfParagraph);
