@@ -123,6 +123,8 @@ Node* outermostEnclosingList(Node*);
 Node* enclosingListChild(Node*);
 Node* highestAncestor(Node*);
 bool isTableElement(Node*);
+
+bool lineBreakExistsAtPosition(const VisiblePosition&);
 }
 
 #endif

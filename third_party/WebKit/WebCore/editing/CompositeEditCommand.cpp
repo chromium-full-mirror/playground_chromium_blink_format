@@ -601,8 +601,7 @@ void CompositeEditCommand::removePlaceholderAt(
   if (isEndOfBlock(visiblePosition) && isStartOfParagraph(visiblePosition)) {
     if (p.node()->hasTagName(brTag) && p.offset() == 0)
       removeNode(p.node());
-    else if (p.node()->renderer()->style()->preserveNewline() &&
-             visiblePosition.characterAfter() == '\n')
+    else if (lineBreakExistsAtPosition(visiblePosition))
       deleteTextFromNode(static_cast<Text*>(p.node()), p.offset(), 1);
   }
 }
@@ -816,8 +815,7 @@ void CompositeEditCommand::moveParagraphs(
     // expects this behavior).
     else if (isBlock(node))
       removeNodeAndPruneAncestors(node);
-    else if (node->renderer() && node->renderer()->style()->preserveNewline() &&
-             caretAfterDelete.characterAfter() == '\n')
+    else if (lineBreakExistsAtPosition(caretAfterDelete))
       deleteTextFromNode(static_cast<Text*>(node), position.offset(), 1);
   }
 

@@ -261,9 +261,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   // to the new paragraph
   // element.  If the first node to be inserted won't be one that will hold an
   // empty line open, add a br.
-  if (isEndOfParagraph(visiblePos) && !startNode->hasTagName(brTag) &&
-      !(startNode->renderer()->style()->preserveNewline() &&
-        visiblePos.characterAfter() == '\n'))
+  if (isEndOfParagraph(visiblePos) && !lineBreakExistsAtPosition(visiblePos))
     appendNode(createBreakElement(document()).get(), blockToInsert.get());
 
   // Move the start node and the siblings of the start node.

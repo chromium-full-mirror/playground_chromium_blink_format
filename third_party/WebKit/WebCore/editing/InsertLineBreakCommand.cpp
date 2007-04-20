@@ -74,17 +74,6 @@ void InsertLineBreakCommand::insertNodeBeforePosition(Node* node,
     insertNodeBefore(node, pos.node());
 }
 
-static bool lineBreakExistsAtPosition(VisiblePosition& visiblePosition) {
-  if (visiblePosition.isNull())
-    return false;
-
-  Position downstream(visiblePosition.deepEquivalent().downstream());
-  return downstream.node()->hasTagName(brTag) ||
-         downstream.node()->isTextNode() &&
-             downstream.node()->renderer()->style()->preserveNewline() &&
-             visiblePosition.characterAfter() == '\n';
-}
-
 void InsertLineBreakCommand::doApply() {
   deleteSelection();
   Selection selection = endingSelection();
