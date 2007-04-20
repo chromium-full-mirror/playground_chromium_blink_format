@@ -763,7 +763,9 @@ enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT, SELECT_IGNORE };
 
 // Word Break Values. Matches WinIE, rather than CSS3
 
-enum EWordWrap { WBNORMAL, BREAK_WORD };
+enum EWordBreak { NormalWordBreak, BreakAllWordBreak, BreakWordBreak };
+
+enum EWordWrap { NormalWordWrap, BreakWordWrap };
 
 enum ENBSPMode { NBNORMAL, SPACE };
 
@@ -973,6 +975,7 @@ class StyleRareInheritedData : public Shared<StyleRareInheritedData> {
       highlight;  // Apple-specific extension for custom highlight rendering.
   unsigned textSecurity : 2;    // ETextSecurity
   unsigned userModify : 2;      // EUserModify (editing)
+  unsigned wordBreak : 2;       // EWordBreak
   unsigned wordWrap : 1;        // EWordWrap
   unsigned nbspMode : 1;        // ENBSPMode
   unsigned khtmlLineBreak : 1;  // EKHTMLLineBreak
@@ -1592,6 +1595,9 @@ class RenderStyle {
   bool breakOnlyAfterWhiteSpace() const {
     return whiteSpace() == PRE_WRAP || khtmlLineBreak() == AFTER_WHITE_SPACE;
   }
+  bool breakWords() const {
+    return wordBreak() == BreakWordBreak || wordWrap() == BreakWordWrap;
+  }
 
   const Color& backgroundColor() const { return background->m_color; }
   CachedImage* backgroundImage() const {
@@ -1758,6 +1764,9 @@ class RenderStyle {
   EMarginCollapse marginBottomCollapse() const {
     return static_cast<EMarginCollapse>(
         rareNonInheritedData->marginBottomCollapse);
+  }
+  EWordBreak wordBreak() const {
+    return static_cast<EWordBreak>(rareInheritedData->wordBreak);
   }
   EWordWrap wordWrap() const {
     return static_cast<EWordWrap>(rareInheritedData->wordWrap);
@@ -2194,6 +2203,7 @@ class RenderStyle {
   void setMarginBottomCollapse(EMarginCollapse c) {
     SET_VAR(rareNonInheritedData, marginBottomCollapse, c);
   }
+  void setWordBreak(EWordBreak b) { SET_VAR(rareInheritedData, wordBreak, b); }
   void setWordWrap(EWordWrap b) { SET_VAR(rareInheritedData, wordWrap, b); }
   void setNBSPMode(ENBSPMode b) { SET_VAR(rareInheritedData, nbspMode, b); }
   void setKHTMLLineBreak(EKHTMLLineBreak b) {
@@ -2398,7 +2408,8 @@ class RenderStyle {
   static bool initialTextOverflow() { return false; }
   static EMarginCollapse initialMarginTopCollapse() { return MCOLLAPSE; }
   static EMarginCollapse initialMarginBottomCollapse() { return MCOLLAPSE; }
-  static EWordWrap initialWordWrap() { return WBNORMAL; }
+  static EWordBreak initialWordBreak() { return NormalWordBreak; }
+  static EWordWrap initialWordWrap() { return NormalWordWrap; }
   static ENBSPMode initialNBSPMode() { return NBNORMAL; }
   static EKHTMLLineBreak initialKHTMLLineBreak() { return LBNORMAL; }
   static EMatchNearestMailBlockquoteColor

@@ -157,14 +157,14 @@ RenderStyle* RenderTextControl::createInnerTextStyle(RenderStyle* startStyle) {
     if (static_cast<HTMLTextAreaElement*>(element)->wrap() ==
         HTMLTextAreaElement::ta_NoWrap) {
       textBlockStyle->setWhiteSpace(PRE);
-      textBlockStyle->setWordWrap(WBNORMAL);
+      textBlockStyle->setWordWrap(NormalWordWrap);
     } else {
       textBlockStyle->setWhiteSpace(PRE_WRAP);
-      textBlockStyle->setWordWrap(BREAK_WORD);
+      textBlockStyle->setWordWrap(BreakWordWrap);
     }
   } else {
     textBlockStyle->setWhiteSpace(PRE);
-    textBlockStyle->setWordWrap(WBNORMAL);
+    textBlockStyle->setWordWrap(NormalWordWrap);
     textBlockStyle->setOverflowX(OHIDDEN);
     textBlockStyle->setOverflowY(OHIDDEN);
 
@@ -634,7 +634,7 @@ void RenderTextControl::calcHeight() {
   // or if its auto and there's no word wrap.
   if (m_innerText->renderer()->style()->overflowX() == OSCROLL ||
       (m_innerText->renderer()->style()->overflowX() == OAUTO &&
-       m_innerText->renderer()->style()->wordWrap() == WBNORMAL))
+       m_innerText->renderer()->style()->wordWrap() == NormalWordWrap))
     scrollbarSize = 15;
 
   m_height = line * rows + toAdd + scrollbarSize;

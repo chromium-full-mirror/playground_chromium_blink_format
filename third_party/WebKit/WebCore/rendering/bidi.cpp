@@ -2353,9 +2353,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       // not wrap before the word,
       // which is only possible if the word is the first thing on the line, that
       // is, if |w| is zero.
-      bool breakWords = o->style()->wordWrap() == BREAK_WORD &&
-                        ((autoWrap && !w) || currWS == PRE);
+      bool breakWords =
+          o->style()->breakWords() && ((autoWrap && !w) || currWS == PRE);
       bool midWordBreak = false;
+      bool breakAll = o->style()->wordBreak() == BreakAllWordBreak && autoWrap;
 
       while (len) {
         bool previousCharacterIsSpace = currentCharacterIsSpace;
@@ -2415,7 +2416,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         currentCharacterIsWS =
             currentCharacterIsSpace || (breakNBSP && c == noBreakSpace);
 
-        if (breakWords && !midWordBreak) {
+        if (breakAll || (breakWords && !midWordBreak)) {
           wrapW += t->width(pos, 1, f, w + wrapW);
           midWordBreak = w + wrapW > width;
         }
@@ -2425,7 +2426,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             (currWS != PRE && !atStart &&
              isBreakable(str, pos, strlen, nextBreakable, breakNBSP));
 
-        if (betweenWords || midWordBreak) {
+        if (betweenWords || midWordBreak || breakAll) {
           bool stoppedIgnoringSpaces = false;
           if (ignoringSpaces) {
             if (!currentCharacterIsSpace) {

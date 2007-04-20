@@ -497,7 +497,8 @@ StyleRareInheritedData::StyleRareInheritedData()
       textShadow(0),
       textSecurity(RenderStyle::initialTextSecurity()),
       userModify(READ_ONLY),
-      wordWrap(WBNORMAL),
+      wordBreak(RenderStyle::initialWordBreak()),
+      wordWrap(RenderStyle::initialWordWrap()),
       nbspMode(NBNORMAL),
       khtmlLineBreak(LBNORMAL),
       textSizeAdjust(RenderStyle::initialTextSizeAdjust()),
@@ -512,6 +513,7 @@ StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
       highlight(o.highlight),
       textSecurity(o.textSecurity),
       userModify(o.userModify),
+      wordBreak(o.wordBreak),
       wordWrap(o.wordWrap),
       nbspMode(o.nbspMode),
       khtmlLineBreak(o.khtmlLineBreak),
@@ -527,8 +529,9 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          textStrokeWidth == o.textStrokeWidth &&
          textFillColor == o.textFillColor && shadowDataEquivalent(o) &&
          highlight == o.highlight && textSecurity == o.textSecurity &&
-         userModify == o.userModify && wordWrap == o.wordWrap &&
-         nbspMode == o.nbspMode && khtmlLineBreak == o.khtmlLineBreak &&
+         userModify == o.userModify && wordBreak == o.wordBreak &&
+         wordWrap == o.wordWrap && nbspMode == o.nbspMode &&
+         khtmlLineBreak == o.khtmlLineBreak &&
          textSizeAdjust == o.textSizeAdjust;
 }
 
@@ -905,6 +908,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
     if (rareInheritedData->highlight != other->rareInheritedData->highlight ||
         rareInheritedData->textSizeAdjust !=
             other->rareInheritedData->textSizeAdjust ||
+        rareInheritedData->wordBreak != other->rareInheritedData->wordBreak ||
         rareInheritedData->wordWrap != other->rareInheritedData->wordWrap ||
         rareInheritedData->nbspMode != other->rareInheritedData->nbspMode ||
         rareInheritedData->khtmlLineBreak !=

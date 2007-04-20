@@ -2862,22 +2862,40 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     }
 
+    case CSS_PROP_WORD_BREAK: {
+      HANDLE_INHERIT_AND_INITIAL(wordBreak, WordBreak)
+
+      EWordBreak b;
+      switch (primitiveValue->getIdent()) {
+        case CSS_VAL_BREAK_ALL:
+          b = BreakAllWordBreak;
+          break;
+        case CSS_VAL_BREAK_WORD:
+          b = BreakWordBreak;
+          break;
+        case CSS_VAL_NORMAL:
+        default:
+          b = NormalWordBreak;
+          break;
+      }
+      style->setWordBreak(b);
+      return;
+    }
+
     case CSS_PROP_WORD_WRAP: {
       HANDLE_INHERIT_AND_INITIAL(wordWrap, WordWrap)
-
-      if (!primitiveValue->getIdent())
-        return;
 
       EWordWrap s;
       switch (primitiveValue->getIdent()) {
         case CSS_VAL_BREAK_WORD:
-          s = BREAK_WORD;
+          s = BreakWordWrap;
           break;
         case CSS_VAL_NORMAL:
         default:
-          s = WBNORMAL;
+          s = NormalWordWrap;
           break;
       }
+
       style->setWordWrap(s);
       return;
     }
