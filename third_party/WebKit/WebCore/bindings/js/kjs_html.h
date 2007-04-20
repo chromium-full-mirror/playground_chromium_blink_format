@@ -281,7 +281,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     FrameWidth,
     FrameHeight,
     IFrameLongDesc,
-    IFrameDocument,
     IFrameAlign,
     IFrameFrameBorder,
     IFrameSrc,
