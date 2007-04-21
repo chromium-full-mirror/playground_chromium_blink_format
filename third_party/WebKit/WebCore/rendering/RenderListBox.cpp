@@ -375,11 +375,11 @@ void RenderListBox::paintItemBackground(PaintInfo& paintInfo,
   }
 }
 
-bool RenderListBox::isPointInScrollbar(HitTestResult& result,
-                                       int _x,
-                                       int _y,
-                                       int _tx,
-                                       int _ty) {
+bool RenderListBox::isPointInOverflowControl(HitTestResult& result,
+                                             int _x,
+                                             int _y,
+                                             int _tx,
+                                             int _ty) {
   if (!m_vBar)
     return false;
 

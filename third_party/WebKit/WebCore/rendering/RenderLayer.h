@@ -274,7 +274,7 @@ class RenderLayer : public ScrollbarClient {
   Scrollbar* horizontalScrollbar() { return m_hBar.get(); }
   Scrollbar* verticalScrollbar() { return m_vBar.get(); }
 
-  PlatformScrollbar* horizontaScrollbarWidget() const;
+  PlatformScrollbar* horizontalScrollbarWidget() const;
   PlatformScrollbar* verticalScrollbarWidget() const;
 
   int verticalScrollbarWidth() const;
@@ -282,6 +282,7 @@ class RenderLayer : public ScrollbarClient {
 
   void positionOverflowControls();
   bool isPointInResizeControl(const IntPoint&);
+  bool hitTestOverflowControls(HitTestResult&);
   IntSize offsetFromResizeCorner(const IntPoint&) const;
 
   void paintOverflowControls(GraphicsContext*,

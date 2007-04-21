@@ -56,7 +56,11 @@ class RenderListBox : public RenderBlock, private ScrollbarClient {
   virtual void paintObject(PaintInfo&, int tx, int ty);
   virtual IntRect controlClipRect(int tx, int ty) const;
 
-  virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
+  virtual bool isPointInOverflowControl(HitTestResult&,
+                                        int x,
+                                        int y,
+                                        int tx,
+                                        int ty);
 
   virtual bool scroll(ScrollDirection,
                       ScrollGranularity,

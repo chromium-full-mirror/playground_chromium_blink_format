@@ -266,7 +266,11 @@ class RenderBlock : public RenderFlow {
                                int ty,
                                HitTestAction);
 
-  virtual bool isPointInScrollbar(HitTestResult&, int x, int y, int tx, int ty);
+  virtual bool isPointInOverflowControl(HitTestResult&,
+                                        int x,
+                                        int y,
+                                        int tx,
+                                        int ty);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
