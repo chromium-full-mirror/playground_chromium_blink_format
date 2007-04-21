@@ -2837,6 +2837,9 @@ bool RenderObject::nodeAtPoint(const HitTestRequest&,
 }
 
 short RenderObject::verticalPositionHint(bool firstLine) const {
+  if (firstLine)  // We're only really a first-line style if the document
+                  // actually uses first-line rules.
+    firstLine = document()->usesFirstLineRules();
   short vpos = m_verticalPosition;
   if (m_verticalPosition == PositionUndefined || firstLine) {
     vpos = getVerticalPosition(firstLine);
@@ -2992,6 +2995,9 @@ void RenderObject::setInlineBoxWrapper(InlineBox*) {}
 void RenderObject::deleteLineBoxWrapper() {}
 
 RenderStyle* RenderObject::firstLineStyle() const {
+  if (!document()->usesFirstLineRules())
+    return m_style;
+
   RenderStyle* s = m_style;
   const RenderObject* obj = isText() ? parent() : this;
   if (obj->isBlockFlow()) {

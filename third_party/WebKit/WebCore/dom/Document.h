@@ -310,6 +310,8 @@ class Document : public ContainerNode {
   void setUsesDescendantRules(bool b) { m_usesDescendantRules = b; }
   bool usesSiblingRules() const { return m_usesSiblingRules; }
   void setUsesSiblingRules(bool b) { m_usesSiblingRules = b; }
+  bool usesFirstLineRules() const { return m_usesFirstLineRules; }
+  void setUsesFirstLineRules(bool b) { m_usesFirstLineRules = b; }
 
   // Machinery for saving and restoring state when you leave and then go back to
   // a page.
@@ -820,6 +822,7 @@ class Document : public ContainerNode {
   bool m_closeAfterStyleRecalc;
   bool m_usesDescendantRules;
   bool m_usesSiblingRules;
+  bool m_usesFirstLineRules;
 
   String m_title;
   bool m_titleSetExplicitly;
