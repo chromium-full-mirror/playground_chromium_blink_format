@@ -58,6 +58,10 @@ class InlineBox {
         m_hasEllipsisBox(false),
         m_reversed(false),
         m_treatAsText(true),
+        m_determinedIfNextOnLineExists(false),
+        m_determinedIfPrevOnLineExists(false),
+        m_nextOnLineExists(false),
+        m_prevOnLineExists(false),
         m_toAdd(0) {}
 
   InlineBox(RenderObject* obj,
@@ -94,6 +98,10 @@ class InlineBox {
         m_hasEllipsisBox(false),
         m_reversed(false),
         m_treatAsText(true),
+        m_determinedIfNextOnLineExists(false),
+        m_determinedIfPrevOnLineExists(false),
+        m_nextOnLineExists(false),
+        m_prevOnLineExists(false),
         m_toAdd(0) {}
 
   virtual ~InlineBox() {}
@@ -254,7 +262,11 @@ class InlineBox {
   bool m_dirOverride : 1;
   bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
                            // purposes of line height.
-  int m_toAdd : 13;        // for justified text
+  mutable bool m_determinedIfNextOnLineExists : 1;
+  mutable bool m_determinedIfPrevOnLineExists : 1;
+  mutable bool m_nextOnLineExists : 1;
+  mutable bool m_prevOnLineExists : 1;
+  int m_toAdd : 13;  // for justified text
 };
 
 }  // namespace WebCore

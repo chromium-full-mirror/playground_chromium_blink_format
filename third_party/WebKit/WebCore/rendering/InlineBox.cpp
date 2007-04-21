@@ -173,23 +173,31 @@ RootInlineBox* InlineBox::root() {
 }
 
 bool InlineBox::nextOnLineExists() const {
-  if (!parent())
-    return false;
+  if (!m_determinedIfNextOnLineExists) {
+    m_determinedIfNextOnLineExists = true;
 
-  if (nextOnLine())
-    return true;
-
-  return parent()->nextOnLineExists();
+    if (!parent())
+      m_nextOnLineExists = false;
+    else if (nextOnLine())
+      m_nextOnLineExists = true;
+    else
+      m_nextOnLineExists = parent()->nextOnLineExists();
+  }
+  return m_nextOnLineExists;
 }
 
 bool InlineBox::prevOnLineExists() const {
-  if (!parent())
-    return false;
+  if (!m_determinedIfPrevOnLineExists) {
+    m_determinedIfPrevOnLineExists = true;
 
-  if (prevOnLine())
-    return true;
-
-  return parent()->prevOnLineExists();
+    if (!parent())
+      m_prevOnLineExists = false;
+    else if (prevOnLine())
+      m_prevOnLineExists = true;
+    else
+      m_prevOnLineExists = parent()->prevOnLineExists();
+  }
+  return m_prevOnLineExists;
 }
 
 InlineBox* InlineBox::firstLeafChild() {
