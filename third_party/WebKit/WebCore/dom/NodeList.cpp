@@ -30,21 +30,28 @@
 
 namespace WebCore {
 
-NodeList::NodeList(PassRefPtr<Node> _rootNode)
-    : rootNode(_rootNode), isLengthCacheValid(false), isItemCacheValid(false) {
-  rootNode->registerNodeList(this);
+NodeList::NodeList(PassRefPtr<Node> rootNode)
+    : m_rootNode(rootNode), m_caches(new Caches), m_ownsCaches(true) {
+  m_rootNode->registerNodeList(this);
+}
+
+NodeList::NodeList(PassRefPtr<Node> rootNode, NodeList::Caches* info)
+    : m_rootNode(rootNode), m_caches(info), m_ownsCaches(false) {
+  m_rootNode->registerNodeList(this);
 }
 
 NodeList::~NodeList() {
-  rootNode->unregisterNodeList(this);
+  m_rootNode->unregisterNodeList(this);
+  if (m_ownsCaches)
+    delete m_caches;
 }
 
 unsigned NodeList::recursiveLength(Node* start) const {
   if (!start)
-    start = rootNode.get();
+    start = m_rootNode.get();
 
-  if (isLengthCacheValid && start == rootNode)
-    return cachedLength;
+  if (m_caches->isLengthCacheValid && start == m_rootNode)
+    return m_caches->cachedLength;
 
   unsigned len = 0;
 
@@ -55,9 +62,9 @@ unsigned NodeList::recursiveLength(Node* start) const {
       len += recursiveLength(n);
     }
 
-  if (start == rootNode) {
-    cachedLength = len;
-    isLengthCacheValid = true;
+  if (start == m_rootNode) {
+    m_caches->cachedLength = len;
+    m_caches->isLengthCacheValid = true;
   }
 
   return len;
@@ -68,13 +75,13 @@ Node* NodeList::itemForwardsFromCurrent(Node* start,
                                         int remainingOffset) const {
   ASSERT(remainingOffset >= 0);
 
-  for (Node* n = start; n; n = n->traverseNextNode(rootNode.get())) {
+  for (Node* n = start; n; n = n->traverseNextNode(m_rootNode.get())) {
     if (n->isElementNode()) {
       if (nodeMatches(n)) {
         if (!remainingOffset) {
-          lastItem = n;
-          lastItemOffset = offset;
-          isItemCacheValid = true;
+          m_caches->lastItem = n;
+          m_caches->lastItemOffset = offset;
+          m_caches->isItemCacheValid = true;
           return n;
         }
         remainingOffset--;
@@ -89,13 +96,13 @@ Node* NodeList::itemBackwardsFromCurrent(Node* start,
                                          unsigned offset,
                                          int remainingOffset) const {
   ASSERT(remainingOffset < 0);
-  for (Node* n = start; n; n = n->traversePreviousNode(rootNode.get())) {
+  for (Node* n = start; n; n = n->traversePreviousNode(m_rootNode.get())) {
     if (n->isElementNode()) {
       if (nodeMatches(n)) {
         if (!remainingOffset) {
-          lastItem = n;
-          lastItemOffset = offset;
-          isItemCacheValid = true;
+          m_caches->lastItem = n;
+          m_caches->lastItemOffset = offset;
+          m_caches->isItemCacheValid = true;
           return n;
         }
         remainingOffset++;
@@ -109,13 +116,14 @@ Node* NodeList::itemBackwardsFromCurrent(Node* start,
 Node* NodeList::recursiveItem(unsigned offset, Node* start) const {
   int remainingOffset = offset;
   if (!start) {
-    start = rootNode->firstChild();
-    if (isItemCacheValid) {
-      if (offset == lastItemOffset) {
-        return lastItem;
-      } else if (offset > lastItemOffset || lastItemOffset - offset < offset) {
-        start = lastItem;
-        remainingOffset -= lastItemOffset;
+    start = m_rootNode->firstChild();
+    if (m_caches->isItemCacheValid) {
+      if (offset == m_caches->lastItemOffset) {
+        return m_caches->lastItem;
+      } else if (offset > m_caches->lastItemOffset ||
+                 m_caches->lastItemOffset - offset < offset) {
+        start = m_caches->lastItem;
+        remainingOffset -= m_caches->lastItemOffset;
       }
     }
   }
@@ -127,14 +135,14 @@ Node* NodeList::recursiveItem(unsigned offset, Node* start) const {
 }
 
 Node* NodeList::itemWithName(const AtomicString& elementId) const {
-  if (rootNode->isDocumentNode() || rootNode->inDocument()) {
-    Node* node = rootNode->document()->getElementById(elementId);
+  if (m_rootNode->isDocumentNode() || m_rootNode->inDocument()) {
+    Node* node = m_rootNode->document()->getElementById(elementId);
 
     if (!node || !nodeMatches(node))
       return 0;
 
     for (Node* p = node->parentNode(); p; p = p->parentNode())
-      if (p == rootNode)
+      if (p == m_rootNode)
         return node;
 
     return 0;
@@ -152,8 +160,15 @@ Node* NodeList::itemWithName(const AtomicString& elementId) const {
 }
 
 void NodeList::rootNodeChildrenChanged() {
+  m_caches->reset();
+}
+
+NodeList::Caches::Caches()
+    : lastItem(0), isLengthCacheValid(false), isItemCacheValid(false) {}
+
+void NodeList::Caches::reset() {
+  lastItem = 0;
   isLengthCacheValid = false;
   isItemCacheValid = false;
-  lastItem = 0;
 }
 }
