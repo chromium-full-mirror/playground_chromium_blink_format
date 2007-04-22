@@ -1,6 +1,4 @@
 /*
-    This file is part of the KDE libraries
-
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller <mueller@kde.org>
     Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
@@ -95,6 +93,10 @@ class DocLoader {
   void setAllowStaleResources(bool allowStaleResources) {
     m_allowStaleResources = allowStaleResources;
   }
+
+#if USE(LOW_BANDWIDTH_DISPLAY)
+  void replaceDocument(Document* doc) { m_doc = doc; }
+#endif
 
  private:
   CachedResource* requestResource(CachedResource::Type,
