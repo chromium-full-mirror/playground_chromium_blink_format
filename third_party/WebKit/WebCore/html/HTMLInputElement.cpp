@@ -828,10 +828,7 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
 
     case FILE:
       // Can't submit file on GET.
-      // Don't submit if display: none or display: hidden to avoid uploading
-      // files quietly.
-      if (!multipart || !renderer() ||
-          renderer()->style()->visibility() != VISIBLE)
+      if (!multipart)
         return false;
 
       // If no filename at all is entered, return successful but empty.
@@ -948,7 +945,9 @@ String HTMLInputElement::valueWithDefault() const {
 }
 
 void HTMLInputElement::setValue(const String& value) {
-  if (inputType() == FILE)
+  // For security reasons, we don't allow setting the filename, but we do allow
+  // clearing it.
+  if (inputType() == FILE && !value.isEmpty())
     return;
 
   setValueMatchesRenderer(false);
@@ -995,7 +994,6 @@ bool HTMLInputElement::storesValueSeparateFromAttribute() const {
   switch (inputType()) {
     case BUTTON:
     case CHECKBOX:
-    case FILE:
     case HIDDEN:
     case IMAGE:
     case RADIO:
@@ -1003,6 +1001,7 @@ bool HTMLInputElement::storesValueSeparateFromAttribute() const {
     case RESET:
     case SUBMIT:
       return false;
+    case FILE:
     case ISINDEX:
     case PASSWORD:
     case SEARCH:
