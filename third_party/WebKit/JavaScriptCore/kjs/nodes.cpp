@@ -2382,7 +2382,28 @@ void FunctionBodyNode::processFuncDecl(ExecState* exec) {
     source->processFuncDecl(exec);
 }
 
+void FunctionBodyNode::addParam(const Identifier& ident) {
+  m_parameters.append(Parameter(ident));
+}
+
+UString FunctionBodyNode::paramString() const {
+  UString s("");
+  size_t count = numParams();
+  for (size_t pos = 0; pos < count; ++pos) {
+    if (!s.isEmpty())
+      s += ", ";
+    s += paramName(pos).ustring();
+  }
+
+  return s;
+}
+
 // ------------------------------ FuncDeclNode ---------------------------------
+
+void FuncDeclNode::addParams() {
+  for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
+    body->addParam(p->ident());
+}
 
 // ECMA 13
 void FuncDeclNode::processFuncDecl(ExecState* exec) {
@@ -2399,11 +2420,7 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
   func->put(exec, exec->propertyNames().prototype, proto,
             Internal | DontDelete);
 
-  int plen = 0;
-  for (ParameterNode *p = param.get(); p != 0L; p = p->nextParam(), plen++)
-    func->addParameter(p->ident());
-
-  func->put(exec, exec->propertyNames().length, jsNumber(plen),
+  func->put(exec, exec->propertyNames().length, jsNumber(body->numParams()),
             ReadOnly | DontDelete | DontEnum);
 
   // ECMA 10.2.2
@@ -2431,6 +2448,11 @@ Completion FuncDeclNode::execute(ExecState*) {
 // ------------------------------ FuncExprNode ---------------------------------
 
 // ECMA 13
+void FuncExprNode::addParams() {
+  for (ParameterNode* p = param.get(); p != 0L; p = p->nextParam())
+    body->addParam(p->ident());
+}
+
 JSValue* FuncExprNode::evaluate(ExecState* exec) {
   Context* context = exec->context();
   bool named = !ident.isNull();
@@ -2452,10 +2474,6 @@ JSValue* FuncExprNode::evaluate(ExecState* exec) {
              ReadOnly | DontDelete | DontEnum);
   func->put(exec, exec->propertyNames().prototype, proto,
             Internal | DontDelete);
-
-  int plen = 0;
-  for (ParameterNode *p = param.get(); p != 0L; p = p->nextParam(), plen++)
-    func->addParameter(p->ident());
 
   if (named) {
     functionScopeObject->put(

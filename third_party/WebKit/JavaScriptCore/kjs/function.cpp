@@ -52,13 +52,6 @@ namespace KJS {
 const ClassInfo FunctionImp::info = {"Function", &InternalFunctionImp::info, 0,
                                      0};
 
-class Parameter {
- public:
-  Parameter(){};
-  Parameter(const Identifier& n) : name(n) {}
-  Identifier name;
-};
-
 FunctionImp::FunctionImp(ExecState* exec,
                          const Identifier& n,
                          FunctionBodyNode* b)
@@ -89,7 +82,7 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
   ctx.setExecState(&newExec);
 
   // assign user supplied arguments to parameters
-  processParameters(&newExec, args);
+  passInParameters(&newExec, args);
   // add variable declarations (initialized to undefined)
   processVarDecls(&newExec);
 
@@ -152,32 +145,9 @@ JSValue* FunctionImp::callAsFunction(ExecState* exec,
     return jsUndefined();
 }
 
-void FunctionImp::addParameter(const Identifier& n) {
-  if (!parameters)
-    parameters.set(new Vector<Parameter>);
-
-  parameters->append(Parameter(n));
-}
-
-UString FunctionImp::parameterString() const {
-  UString s;
-
-  if (!parameters)
-    return s;
-
-  for (size_t i = 0; i < parameters->size(); ++i) {
-    if (!s.isEmpty())
-      s += ", ";
-    s += parameters->at(i).name.ustring();
-  }
-
-  return s;
-}
-
 // ECMA 10.1.3q
-void FunctionImp::processParameters(ExecState* exec, const List& args) {
-  if (!parameters)
-    return;
+inline void FunctionImp::passInParameters(ExecState* exec, const List& args) {
+  Vector<Parameter>& parameters = body->parameters();
 
   JSObject* variable = exec->context()->variableObject();
 
@@ -188,26 +158,14 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
           name().isEmpty() ? "(internal)" : name().ascii());
 #endif
 
-  ListIterator it = args.begin();
-
-  JSValue* v = *it;
-  for (size_t i = 0; i < parameters->size(); ++i) {
-    if (it != args.end()) {
+  size_t size = parameters.size();
+  for (size_t i = 0; i < size; ++i) {
 #ifdef KJS_VERBOSE
-      fprintf(stderr, "setting parameter %s ", parameters->at(i).name.ascii());
-      printInfo(exec, "to", *it);
+    fprintf(stderr, "setting parameter %s ", parameters->at(i).name.ascii());
+    printInfo(exec, "to", args[i]);
 #endif
-      variable->put(exec, parameters->at(i).name, v);
-      v = ++it;
-    } else
-      variable->put(exec, parameters->at(i).name, jsUndefined());
+    variable->put(exec, parameters[i].name, args[i]);
   }
-#ifdef KJS_VERBOSE
-  else {
-    for (int i = 0; i < args.size(); ++i)
-      printInfo(exec, "setting argument", args[i]);
-  }
-#endif
 }
 
 void FunctionImp::processVarDecls(ExecState*) {}
@@ -258,7 +216,7 @@ JSValue* FunctionImp::lengthGetter(ExecState*,
                                    const Identifier&,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
-  return jsNumber(thisObj->parameters ? thisObj->parameters->size() : 0);
+  return jsNumber(thisObj->body->numParams());
 }
 
 bool FunctionImp::getOwnPropertySlot(ExecState* exec,
@@ -310,17 +268,17 @@ bool FunctionImp::deleteProperty(ExecState* exec,
  * function f2(x, x): getParameterName(0) --> null
  */
 Identifier FunctionImp::getParameterName(int index) {
-  if (!parameters)
+  Vector<Parameter>& parameters = body->parameters();
+
+  if (static_cast<size_t>(index) >= body->numParams())
     return CommonIdentifiers::shared()->nullIdentifier;
 
-  if (static_cast<size_t>(index) >= parameters->size())
-    return CommonIdentifiers::shared()->nullIdentifier;
-
-  Identifier name = parameters->at(index).name;
+  Identifier name = parameters[index].name;
 
   // Are there any subsequent parameters with the same name?
-  for (size_t i = index + 1; i < parameters->size(); ++i)
-    if (parameters->at(i).name == name)
+  size_t size = parameters.size();
+  for (size_t i = index + 1; i < size; ++i)
+    if (parameters[i].name == name)
       return CommonIdentifiers::shared()->nullIdentifier;
 
   return name;

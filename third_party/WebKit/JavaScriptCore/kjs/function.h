@@ -32,7 +32,6 @@ namespace KJS {
 
 class ActivationImp;
 class FunctionBodyNode;
-class Parameter;
 
 /**
  * @short Implementation class for internal Functions.
@@ -55,10 +54,9 @@ class FunctionImp : public InternalFunctionImp {
                                   JSObject* thisObj,
                                   const List& args);
 
-  void addParameter(const Identifier& n);
+  // Note: unlike body->paramName, this returns Identifier::null for parameters
+  // that will never get set, due to later param having the same name
   Identifier getParameterName(int index);
-  // parameters in string representation, e.g. (a, b, c)
-  UString parameterString() const;
   virtual CodeType codeType() const = 0;
 
   virtual Completion execute(ExecState*) = 0;
@@ -99,9 +97,6 @@ class FunctionImp : public InternalFunctionImp {
 
   virtual void mark();
 
- protected:
-  OwnPtr<Vector<Parameter>> parameters;
-
  private:
   ScopeChain _scope;
 
@@ -118,7 +113,7 @@ class FunctionImp : public InternalFunctionImp {
                                const Identifier&,
                                const PropertySlot&);
 
-  void processParameters(ExecState*, const List&);
+  void passInParameters(ExecState*, const List&);
   virtual void processVarDecls(ExecState*);
 };
 

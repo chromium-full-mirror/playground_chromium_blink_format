@@ -95,7 +95,7 @@ JSValue* FunctionProtoFunc::callAsFunction(ExecState* exec,
       if (thisObj->inherits(&DeclaredFunctionImp::info)) {
         DeclaredFunctionImp* fi = static_cast<DeclaredFunctionImp*>(thisObj);
         return jsString("function " + fi->functionName().ustring() + "(" +
-                        fi->parameterString() + ") " + fi->body->toString());
+                        fi->body->paramString() + ") " + fi->body->toString());
       } else if (thisObj->inherits(&InternalFunctionImp::info) &&
                  !static_cast<InternalFunctionImp*>(thisObj)
                       ->functionName()
@@ -249,11 +249,11 @@ JSObject* FunctionObjectImp::construct(ExecState* exec,
       while (i < len && *c == ' ')
         c++, i++;
       if (i == len) {
-        fimp->addParameter(Identifier(param));
+        bodyNode->addParam(Identifier(param));
         params++;
         break;
       } else if (*c == ',') {
-        fimp->addParameter(Identifier(param));
+        bodyNode->addParam(Identifier(param));
         params++;
         c++, i++;
         continue;
