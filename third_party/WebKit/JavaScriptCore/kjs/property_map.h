@@ -113,8 +113,8 @@ class PropertyMap {
   } m_u;
 
   short m_singleEntryAttributes;
-  bool m_getterSetterFlag;
-  bool m_usingTable;
+  bool m_getterSetterFlag : 8;
+  bool m_usingTable : 8;
 };
 
 inline PropertyMap::PropertyMap()
