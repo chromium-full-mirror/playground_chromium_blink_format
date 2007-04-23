@@ -69,7 +69,7 @@ class RegExpImp : public JSObject {
   RegExp* reg;
 };
 
-class RegExpObjectImpPrivate;
+struct RegExpObjectImpPrivate;
 
 class RegExpObjectImp : public InternalFunctionImp {
  public:
