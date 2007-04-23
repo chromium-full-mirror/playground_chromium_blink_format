@@ -61,6 +61,8 @@ namespace WebCore {
 using namespace EventNames;
 using namespace HTMLNames;
 
+const int maxSavedResults = 256;
+
 static int numGraphemeClusters(const StringImpl* s) {
   if (!s)
     return 0;
@@ -643,8 +645,8 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
     setHTMLEventListener(searchEvent, attr);
   } else if (attr->name() == resultsAttr) {
     int oldResults = m_maxResults;
-    // Enforce a maximum of 256 saved results for the search field.
-    m_maxResults = !attr->isNull() ? min(attr->value().toInt(), 256) : -1;
+    m_maxResults =
+        !attr->isNull() ? min(attr->value().toInt(), maxSavedResults) : -1;
     // FIXME: Detaching just for maxResults change is not ideal.  We should
     // figure out the right
     // time to relayout for this change.
