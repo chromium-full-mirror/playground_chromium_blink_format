@@ -328,40 +328,38 @@ UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
 // Font Implementation (Cross-Platform Portion)
 // ============================================================================================
 
-Font::Font() : m_fontList(0), m_letterSpacing(0), m_wordSpacing(0) {}
+Font::Font() : m_pageZero(0), m_letterSpacing(0), m_wordSpacing(0) {}
 
 Font::Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
     : m_fontDescription(fd),
-      m_fontList(0),
       m_pageZero(0),
       m_letterSpacing(letterSpacing),
       m_wordSpacing(wordSpacing) {}
 
 Font::Font(const FontPlatformData& fontData, bool isPrinterFont)
-    : m_pageZero(0), m_letterSpacing(0), m_wordSpacing(0) {
+    : m_fontList(new FontFallbackList),
+      m_pageZero(0),
+      m_letterSpacing(0),
+      m_wordSpacing(0) {
   m_fontDescription.setUsePrinterFont(isPrinterFont);
-  m_fontList = new FontFallbackList();
   m_fontList->setPlatformFont(fontData);
 }
 
-Font::Font(const Font& other) {
-  m_fontDescription = other.m_fontDescription;
-  m_fontList = other.m_fontList;
-  m_letterSpacing = other.m_letterSpacing;
-  m_wordSpacing = other.m_wordSpacing;
-  m_pages = other.m_pages;
-  m_pageZero = other.m_pageZero;
-}
+Font::Font(const Font& other)
+    : m_fontDescription(other.m_fontDescription),
+      m_fontList(other.m_fontList),
+      m_pages(other.m_pages),
+      m_pageZero(other.m_pageZero),
+      m_letterSpacing(other.m_letterSpacing),
+      m_wordSpacing(other.m_wordSpacing) {}
 
 Font& Font::operator=(const Font& other) {
-  if (&other != this) {
-    m_fontDescription = other.m_fontDescription;
-    m_fontList = other.m_fontList;
-    m_pages = other.m_pages;
-    m_pageZero = other.m_pageZero;
-    m_letterSpacing = other.m_letterSpacing;
-    m_wordSpacing = other.m_wordSpacing;
-  }
+  m_fontDescription = other.m_fontDescription;
+  m_fontList = other.m_fontList;
+  m_pages = other.m_pages;
+  m_pageZero = other.m_pageZero;
+  m_letterSpacing = other.m_letterSpacing;
+  m_wordSpacing = other.m_wordSpacing;
   return *this;
 }
 
@@ -513,13 +511,13 @@ void Font::update() const {
   // but it ends up
   // being reasonably safe (because inherited fonts in the render tree pick up
   // the new
-  // style anyway.  Other copies are transient, e.g., the state in the
+  // style anyway. Other copies are transient, e.g., the state in the
   // GraphicsContext, and
-  // won't stick around long enough to get you in trouble).  Still, this is
+  // won't stick around long enough to get you in trouble). Still, this is
   // pretty disgusting,
   // and could eventually be rectified by using RefPtrs for Fonts themselves.
   if (!m_fontList)
-    m_fontList = new FontFallbackList();
+    m_fontList = new FontFallbackList;
   m_fontList->invalidate();
   m_pageZero = 0;
   m_pages.clear();
