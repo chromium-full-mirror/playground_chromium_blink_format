@@ -2,7 +2,7 @@
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2002 Harri Porten (porten@kde.org)
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -52,34 +52,31 @@ using namespace KJS;
       exec->dynamicInterpreter()->imp()->debugger()->imp()->aborted()) \
     return Completion(Normal);
 
-#define KJS_CHECKEXCEPTION             \
-  if (exec->hadException()) {          \
-    setExceptionDetailsIfNeeded(exec); \
-    JSValue* ex = exec->exception();   \
-    exec->clearException();            \
-    debugExceptionIfNeeded(exec, ex);  \
-    return Completion(Throw, ex);      \
-  }                                    \
-  if (Collector::isOutOfMemory())      \
-    return Completion(Throw,           \
+#define KJS_CHECKEXCEPTION           \
+  if (exec->hadException()) {        \
+    JSValue* ex = exec->exception(); \
+    exec->clearException();          \
+    handleException(exec, ex);       \
+    return Completion(Throw, ex);    \
+  }                                  \
+  if (Collector::isOutOfMemory())    \
+    return Completion(Throw,         \
                       Error::create(exec, GeneralError, "Out of memory"));
 
-#define KJS_CHECKEXCEPTIONVALUE                      \
-  if (exec->hadException()) {                        \
-    setExceptionDetailsIfNeeded(exec);               \
-    debugExceptionIfNeeded(exec, exec->exception()); \
-    return jsUndefined();                            \
-  }                                                  \
-  if (Collector::isOutOfMemory())                    \
+#define KJS_CHECKEXCEPTIONVALUE   \
+  if (exec->hadException()) {     \
+    handleException(exec);        \
+    return jsUndefined();         \
+  }                               \
+  if (Collector::isOutOfMemory()) \
     return jsUndefined();  // will be picked up by KJS_CHECKEXCEPTION
 
-#define KJS_CHECKEXCEPTIONLIST                       \
-  if (exec->hadException()) {                        \
-    setExceptionDetailsIfNeeded(exec);               \
-    debugExceptionIfNeeded(exec, exec->exception()); \
-    return List();                                   \
-  }                                                  \
-  if (Collector::isOutOfMemory())                    \
+#define KJS_CHECKEXCEPTIONLIST    \
+  if (exec->hadException()) {     \
+    handleException(exec);        \
+    return List();                \
+  }                               \
+  if (Collector::isOutOfMemory()) \
     return List();  // will be picked up by KJS_CHECKEXCEPTION
 
 // ------------------------------ Node -----------------------------------------
@@ -222,6 +219,16 @@ JSValue* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
 JSValue* Node::throwError(ExecState* exec,
                           ErrorType e,
                           const char* msg,
+                          const char* string) {
+  UString message = msg;
+  substitute(message, string);
+  return KJS::throwError(exec, e, message, lineNo(), currentSourceId(exec),
+                         currentSourceURL(exec));
+}
+
+JSValue* Node::throwError(ExecState* exec,
+                          ErrorType e,
+                          const char* msg,
                           JSValue* v,
                           Node* expr) {
   UString message = msg;
@@ -286,8 +293,11 @@ JSValue* Node::throwUndefinedVariableError(ExecState* exec,
   return throwError(exec, ReferenceError, "Can't find variable: %s", ident);
 }
 
-void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
-  JSValue* exceptionValue = exec->exception();
+void Node::handleException(ExecState* exec) {
+  handleException(exec, exec->exception());
+}
+
+void Node::handleException(ExecState* exec, JSValue* exceptionValue) {
   if (exceptionValue->isObject()) {
     JSObject* exception = static_cast<JSObject*>(exceptionValue);
     if (!exception->hasProperty(exec, "line") &&
@@ -296,9 +306,6 @@ void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
       exception->put(exec, "sourceURL", jsString(currentSourceURL(exec)));
     }
   }
-}
-
-void Node::debugExceptionIfNeeded(ExecState* exec, JSValue* exceptionValue) {
   Debugger* dbg = exec->dynamicInterpreter()->debugger();
   if (dbg && !dbg->hasHandledException(exec, exceptionValue)) {
     bool cont =
@@ -894,10 +901,22 @@ JSValue* PostfixDotNode::evaluate(ExecState* exec) {
   return jsNumber(n);
 }
 
-// ECMA 11.4.1
+// ------------------------------ PostfixErrorNode
+// -----------------------------------
+
+JSValue* PostfixErrorNode::evaluate(ExecState* exec) {
+  throwError(exec, ReferenceError,
+             "Postfix %s operator applied to value that is not a reference.",
+             m_oper == OpPlusPlus ? "++" : "--");
+  handleException(exec);
+  return jsUndefined();
+}
 
 // ------------------------------ DeleteResolveNode
 // -----------------------------------
+
+// ECMA 11.4.1
+
 JSValue* DeleteResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->context()->scopeChain();
   ScopeChainIterator iter = chain.begin();
@@ -922,6 +941,7 @@ JSValue* DeleteResolveNode::evaluate(ExecState* exec) {
 
 // ------------------------------ DeleteBracketNode
 // -----------------------------------
+
 JSValue* DeleteBracketNode::evaluate(ExecState* exec) {
   JSValue* baseValue = m_base->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
@@ -1132,6 +1152,17 @@ JSValue* PrefixDotNode::evaluate(ExecState* exec) {
   base->put(exec, m_ident, n2);
 
   return n2;
+}
+
+// ------------------------------ PrefixErrorNode
+// -----------------------------------
+
+JSValue* PrefixErrorNode::evaluate(ExecState* exec) {
+  throwError(exec, ReferenceError,
+             "Prefix %s operator applied to value that is not a reference.",
+             m_oper == OpPlusPlus ? "++" : "--");
+  handleException(exec);
+  return jsUndefined();
 }
 
 // ------------------------------ UnaryPlusNode --------------------------------
@@ -1487,6 +1518,16 @@ JSValue* AssignDotNode::evaluate(ExecState* exec) {
 
   base->put(exec, m_ident, v);
   return v;
+}
+
+// ------------------------------ AssignErrorNode
+// -----------------------------------
+
+JSValue* AssignErrorNode::evaluate(ExecState* exec) {
+  throwError(exec, ReferenceError,
+             "Left side of assignment is not a reference.");
+  handleException(exec);
+  return jsUndefined();
 }
 
 // ------------------------------ AssignBracketNode
@@ -2279,8 +2320,7 @@ Completion ThrowNode::execute(ExecState* exec) {
   JSValue* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTION
 
-  debugExceptionIfNeeded(exec, v);
-
+  handleException(exec, v);
   return Completion(Throw, v);
 }
 

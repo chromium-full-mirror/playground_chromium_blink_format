@@ -1,7 +1,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2002 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -261,6 +261,14 @@ void PostfixDotNode::streamTo(SourceStream& s) const {
     s << "--";
 }
 
+void PostfixErrorNode::streamTo(SourceStream& s) const {
+  s << m_expr;
+  if (m_oper == OpPlusPlus)
+    s << "++";
+  else
+    s << "--";
+}
+
 void DeleteResolveNode::streamTo(SourceStream& s) const {
   s << "delete " << m_ident;
 }
@@ -311,6 +319,14 @@ void PrefixDotNode::streamTo(SourceStream& s) const {
   else
     s << "--";
   s << m_base << "." << m_ident;
+}
+
+void PrefixErrorNode::streamTo(SourceStream& s) const {
+  if (m_oper == OpPlusPlus)
+    s << "++";
+  else
+    s << "--";
+  s << m_expr;
 }
 
 void UnaryPlusNode::streamTo(SourceStream& s) const {
@@ -472,6 +488,12 @@ void AssignBracketNode::streamTo(SourceStream& s) const {
 
 void AssignDotNode::streamTo(SourceStream& s) const {
   s << m_base << "." << m_ident;
+  streamAssignmentOperatorTo(s, m_oper);
+  s << m_right;
+}
+
+void AssignErrorNode::streamTo(SourceStream& s) const {
+  s << m_left;
   streamAssignmentOperatorTo(s, m_oper);
   s << m_right;
 }
