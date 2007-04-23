@@ -28,15 +28,18 @@
 
 #include "context.h"
 #include "runtime_object.h"
+#include "function_object.h"
 
 using namespace KJS::Bindings;
 using namespace KJS;
 
-// FIXME: this should probably use InternalFunctionImp, not FunctionImp
 RuntimeMethod::RuntimeMethod(ExecState* exec,
                              const Identifier& ident,
                              Bindings::MethodList& m)
-    : FunctionImp(exec, ident, 0) {
+    : InternalFunctionImp(
+          static_cast<FunctionPrototype*>(
+              exec->lexicalInterpreter()->builtinFunctionPrototype()),
+          ident) {
   _methodList = m;
 }
 
@@ -65,7 +68,7 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
     return true;
   }
 
-  return FunctionImp::getOwnPropertySlot(exec, propertyName, slot);
+  return InternalFunctionImp::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
