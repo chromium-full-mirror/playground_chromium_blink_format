@@ -71,6 +71,7 @@ class GraphicsContextPlatformPrivate {
   ~GraphicsContextPlatformPrivate();
 
   cairo_t* context;
+  cairo_user_data_key_t opacityKey;
 };
 
 static inline void setColor(cairo_t* cr, const Color& col) {
@@ -473,6 +474,8 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& frect) {
 }
 
 void GraphicsContext::translate(float x, float y) {
+  if (paintingDisabled())
+    return;
   cairo_t* context = m_data->context;
   cairo_translate(context, x, y);
 }
@@ -495,6 +498,8 @@ void GraphicsContext::setPlatformStrokeColor(const Color& col) {
 }
 
 void GraphicsContext::setPlatformStrokeThickness(float strokeThickness) {
+  if (paintingDisabled())
+    return;
   cairo_set_line_width(m_data->context, strokeThickness);
 }
 
@@ -562,12 +567,36 @@ void GraphicsContext::clearShadow() {
   notImplemented();
 }
 
-void GraphicsContext::beginTransparencyLayer(float) {
-  notImplemented();
+void GraphicsContext::beginTransparencyLayer(float opacity) {
+  if (paintingDisabled())
+    return;
+
+  ASSERT(opacity >= 0 && opacity <= 1);
+
+  cairo_t* context = m_data->context;
+  cairo_push_group(context);
+  // We insert the opacity into a Cairo surface data slot.
+  // Rather than passing a pointer, we store the opacity value directly.
+  void* odata =
+      reinterpret_cast<void*>(static_cast<unsigned int>(opacity * UINT_MAX));
+  cairo_surface_set_user_data(cairo_get_target(context), &m_data->opacityKey,
+                              odata, NULL);
 }
 
 void GraphicsContext::endTransparencyLayer() {
-  notImplemented();
+  if (paintingDisabled())
+    return;
+
+  cairo_t* context = m_data->context;
+  void* odata = cairo_surface_get_user_data(cairo_get_target(context),
+                                            &m_data->opacityKey);
+  float opacity =
+      static_cast<float>(reinterpret_cast<unsigned int>(odata)) / UINT_MAX;
+
+  ASSERT(opacity >= 0 && opacity <= 1);
+
+  cairo_pop_group_to_source(context);
+  cairo_paint_with_alpha(context, opacity);
 }
 
 void GraphicsContext::clearRect(const FloatRect&) {
@@ -662,6 +691,8 @@ static inline cairo_operator_t toCairoOperator(CompositeOperator op) {
 }
 
 void GraphicsContext::setCompositeOperation(CompositeOperator op) {
+  if (paintingDisabled())
+    return;
   cairo_set_operator(m_data->context, toCairoOperator(op));
 }
 
@@ -669,12 +700,16 @@ void GraphicsContext::clip(const Path&) {
   notImplemented();
 }
 
-void GraphicsContext::rotate(float) {
-  notImplemented();
+void GraphicsContext::rotate(float angle) {
+  if (paintingDisabled())
+    return;
+  cairo_rotate(m_data->context, angle);
 }
 
-void GraphicsContext::scale(const FloatSize&) {
-  notImplemented();
+void GraphicsContext::scale(const FloatSize& size) {
+  if (paintingDisabled())
+    return;
+  cairo_scale(m_data->context, size.width(), size.height());
 }
 
 void GraphicsContext::clipOut(const IntRect&) {
