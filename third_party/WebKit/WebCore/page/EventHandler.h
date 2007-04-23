@@ -248,7 +248,6 @@ class EventHandler : Noncopyable {
                                     Frame* subframe);
   bool passMouseReleaseEventToSubframe(MouseEventWithHitTestResults&,
                                        Frame* subframe);
-  bool passWheelEventToSubframe(PlatformWheelEvent&, Frame* subframe);
 
   bool passSubframeEventToSubframe(MouseEventWithHitTestResults&,
                                    Frame* subframe);
@@ -260,7 +259,7 @@ class EventHandler : Noncopyable {
   bool passWidgetMouseDownEventToWidget(RenderWidget*);
 
   bool passMouseDownEventToWidget(Widget*);
-  bool passWheelEventToWidget(Widget*);
+  bool passWheelEventToWidget(PlatformWheelEvent&, Widget*);
 
   void defaultTabEventHandler(Event*, bool isBackTab);
 
