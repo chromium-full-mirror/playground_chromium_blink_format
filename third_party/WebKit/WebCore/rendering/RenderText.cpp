@@ -178,7 +178,8 @@ void RenderText::addLineBoxRects(Vector<IntRect>& rects,
       rects.append(IntRect(x + box->xPos(), y + box->yPos(), box->width(),
                            box->height()));
     else {
-      IntRect r = box->selectionRect(x, y, start, end);
+      unsigned realEnd = (end == UINT_MAX ? box->len() : end);
+      IntRect r = box->selectionRect(x, y, start, realEnd);
       if (!r.isEmpty()) {
         // change the height and y position because selectionRect uses
         // selection-specific values
