@@ -67,51 +67,11 @@ namespace KJS {
 
 // tunable parameters
 
-template <size_t bytesPerWord>
-struct CellSize;
-template <>
-struct CellSize<sizeof(uint32_t)> {
-  static const size_t m_value = 40;
-};  // 32-bit
-template <>
-struct CellSize<sizeof(uint64_t)> {
-  static const size_t m_value = 64;
-};  // 64-bit
-
-const size_t BLOCK_SIZE = (16 * 4096);  // 64k
 const size_t SPARE_EMPTY_BLOCKS = 2;
 const size_t MIN_ARRAY_SIZE = 14;
 const size_t GROWTH_FACTOR = 2;
 const size_t LOW_WATER_FACTOR = 4;
 const size_t ALLOCATIONS_PER_COLLECTION = 1000;
-
-// derived constants
-const size_t PTR_IN_BLOCK_MASK = (BLOCK_SIZE - 1);
-const size_t BLOCK_MASK = (~PTR_IN_BLOCK_MASK);
-const size_t MINIMUM_CELL_SIZE = CellSize<sizeof(void*)>::m_value;
-const size_t CELL_ARRAY_LENGTH =
-    (MINIMUM_CELL_SIZE / sizeof(double)) +
-    (MINIMUM_CELL_SIZE % sizeof(double) != 0 ? 1 : 0);
-const size_t CELL_SIZE = CELL_ARRAY_LENGTH * sizeof(double);
-const size_t CELLS_PER_BLOCK =
-    ((BLOCK_SIZE * 8 - sizeof(uint32_t) * 8 - sizeof(void*) * 8) /
-     (CELL_SIZE * 8));
-
-struct CollectorCell {
-  union {
-    double memory[CELL_ARRAY_LENGTH];
-    struct {
-      void* zeroIfFree;
-      ptrdiff_t next;
-    } freeCell;
-  } u;
-};
-
-struct CollectorBlock {
-  CollectorCell cells[CELLS_PER_BLOCK];
-  uint32_t usedCells;
-  CollectorCell* freeList;
-};
 
 struct CollectorHeap {
   CollectorBlock** blocks;
@@ -151,7 +111,7 @@ bool GCLock::isLocked = false;
 static CollectorBlock* allocateBlock() {
 #if PLATFORM(DARWIN)
   vm_address_t address = 0;
-  vm_map(current_task(), &address, BLOCK_SIZE, PTR_IN_BLOCK_MASK,
+  vm_map(current_task(), &address, BLOCK_SIZE, BLOCK_OFFSET_MASK,
          VM_FLAGS_ANYWHERE, MEMORY_OBJECT_NULL, 0, FALSE, VM_PROT_DEFAULT,
          VM_PROT_DEFAULT, VM_INHERIT_DEFAULT);
 #elif PLATFORM(WIN)
@@ -174,8 +134,8 @@ static CollectorBlock* allocateBlock() {
   uintptr_t address = reinterpret_cast<uintptr_t>(mmapResult);
 
   size_t adjust = 0;
-  if ((address & PTR_IN_BLOCK_MASK) != 0)
-    adjust = BLOCK_SIZE - (address & PTR_IN_BLOCK_MASK);
+  if ((address & BLOCK_OFFSET_MASK) != 0)
+    adjust = BLOCK_SIZE - (address & BLOCK_OFFSET_MASK);
 
   if (adjust > 0)
     munmap(reinterpret_cast<void*>(address), adjust);
@@ -422,8 +382,8 @@ void Collector::registerThread() {
 
 #define IS_POINTER_ALIGNED(p) (((intptr_t)(p) & (sizeof(char*) - 1)) == 0)
 
-// cells are 8-byte aligned
-#define IS_CELL_ALIGNED(p) (((intptr_t)(p)&7) == 0)
+// cell size needs to be a power of two for this to be valid
+#define IS_CELL_ALIGNED(p) (((intptr_t)(p)&CELL_MASK) == 0)
 
 void Collector::markStackObjectsConservatively(void* start, void* end) {
   if (start > end) {
@@ -447,9 +407,10 @@ void Collector::markStackObjectsConservatively(void* start, void* end) {
   while (p != e) {
     char* x = *p++;
     if (IS_CELL_ALIGNED(x) && x) {
+      uintptr_t offset = reinterpret_cast<uintptr_t>(x) & BLOCK_OFFSET_MASK;
+      CollectorBlock* blockAddr = reinterpret_cast<CollectorBlock*>(x - offset);
       for (size_t block = 0; block < usedBlocks; block++) {
-        size_t offset = x - reinterpret_cast<char*>(blocks[block]);
-        if (offset <= lastCellOffset && offset % sizeof(CollectorCell) == 0) {
+        if ((blocks[block] == blockAddr) & (offset <= lastCellOffset)) {
           if (((CollectorCell*)x)->u.freeCell.zeroIfFree != 0) {
             JSCell* imp = reinterpret_cast<JSCell*>(x);
             if (!imp->marked())
@@ -694,7 +655,7 @@ void Collector::collectOnMainThreadOnly(JSValue* value) {
     return;
 
   JSCell* cell = value->downcast();
-  cell->m_collectOnMainThreadOnly = true;
+  cellBlock(cell)->collectOnMainThreadOnly.set(cellOffset(cell));
   ++mainThreadOnlyObjectCount;
 }
 
@@ -737,10 +698,11 @@ void Collector::markMainThreadOnlyObjects() {
       if (cell->u.freeCell.zeroIfFree == 0)
         ++minimumCellsToProcess;
       else {
-        JSCell* imp = reinterpret_cast<JSCell*>(cell);
-        if (imp->m_collectOnMainThreadOnly) {
-          if (!imp->marked())
+        if (curBlock->collectOnMainThreadOnly.get(i)) {
+          if (!curBlock->marked.get(i)) {
+            JSCell* imp = reinterpret_cast<JSCell*>(cell);
             imp->mark();
+          }
           if (++count == mainThreadOnlyObjectCount)
             return;
         }
@@ -809,20 +771,23 @@ bool Collector::collect() {
       // special case with a block where all cells are used -- testing indicates
       // this happens often
       for (size_t i = 0; i < CELLS_PER_BLOCK; i++) {
-        CollectorCell* cell = curBlock->cells + i;
-        JSCell* imp = reinterpret_cast<JSCell*>(cell);
-        if (imp->m_marked) {
-          imp->m_marked = false;
-        } else {
+        if (!curBlock->marked.get(i)) {
+          CollectorCell* cell = curBlock->cells + i;
+
           // special case for allocated but uninitialized object
           // (We don't need this check earlier because nothing prior this point
           // assumes the object has a valid vptr.)
           if (cell->u.freeCell.zeroIfFree == 0)
             continue;
 
-          ASSERT(currentThreadIsMainThread || !imp->m_collectOnMainThreadOnly);
-          if (imp->m_collectOnMainThreadOnly)
+          JSCell* imp = reinterpret_cast<JSCell*>(cell);
+
+          ASSERT(currentThreadIsMainThread ||
+                 !curBlock->collectOnMainThreadOnly.get(i));
+          if (curBlock->collectOnMainThreadOnly.get(i)) {
+            curBlock->collectOnMainThreadOnly.clear(i);
             --mainThreadOnlyObjectCount;
+          }
           imp->~JSCell();
           --usedCells;
           --numLiveObjects;
@@ -842,14 +807,14 @@ bool Collector::collect() {
         if (cell->u.freeCell.zeroIfFree == 0) {
           ++minimumCellsToProcess;
         } else {
-          JSCell* imp = reinterpret_cast<JSCell*>(cell);
-          if (imp->m_marked) {
-            imp->m_marked = false;
-          } else {
+          if (!curBlock->marked.get(i)) {
+            JSCell* imp = reinterpret_cast<JSCell*>(cell);
             ASSERT(currentThreadIsMainThread ||
-                   !imp->m_collectOnMainThreadOnly);
-            if (imp->m_collectOnMainThreadOnly)
+                   !curBlock->collectOnMainThreadOnly.get(i));
+            if (curBlock->collectOnMainThreadOnly.get(i)) {
+              curBlock->collectOnMainThreadOnly.clear(i);
               --mainThreadOnlyObjectCount;
+            }
             imp->~JSCell();
             --usedCells;
             --numLiveObjects;
@@ -866,6 +831,7 @@ bool Collector::collect() {
 
     curBlock->usedCells = static_cast<uint32_t>(usedCells);
     curBlock->freeList = freeList;
+    curBlock->marked.clearAll();
 
     if (usedCells == 0) {
       emptyBlocks++;
