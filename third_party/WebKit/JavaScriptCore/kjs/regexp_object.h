@@ -69,6 +69,8 @@ class RegExpImp : public JSObject {
   RegExp* reg;
 };
 
+class RegExpObjectImpPrivate;
+
 class RegExpObjectImp : public InternalFunctionImp {
  public:
   enum {
@@ -118,11 +120,7 @@ class RegExpObjectImp : public InternalFunctionImp {
   JSValue* getLeftContext() const;
   JSValue* getRightContext() const;
 
-  // Global search cache / settings
-  UString lastInput;
-  OwnArrayPtr<int> lastOvector;
-  unsigned lastNumSubPatterns : 31;
-  bool multiline : 1;
+  OwnPtr<RegExpObjectImpPrivate> d;
 
   static const ClassInfo info;
 };
