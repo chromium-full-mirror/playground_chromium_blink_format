@@ -796,6 +796,9 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
   // we get the affine transform matrix and extract the scale.
   CGAffineTransform deviceMatrix =
       CGContextGetUserSpaceToDeviceSpaceTransform(platformContext());
+  if (CGAffineTransformIsIdentity(deviceMatrix))
+    return rect;
+
   float deviceScaleX =
       sqrtf(deviceMatrix.a * deviceMatrix.a + deviceMatrix.b * deviceMatrix.b);
   float deviceScaleY =
