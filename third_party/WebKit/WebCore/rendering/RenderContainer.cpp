@@ -433,7 +433,8 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
       newChild->style()->visibility() == VISIBLE && !newChild->layer()) {
     if (!layer)
       layer = enclosingLayer();
-    layer->setHasVisibleContent(true);
+    if (layer)
+      layer->setHasVisibleContent(true);
   }
 
   newChild->setNeedsLayoutAndMinMaxRecalc();  // Goes up the containing block
@@ -493,7 +494,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
       child->style()->visibility() == VISIBLE && !child->layer()) {
     if (!layer)
       layer = enclosingLayer();
-    layer->setHasVisibleContent(true);
+    if (layer)
+      layer->setHasVisibleContent(true);
   }
 
   child->setNeedsLayoutAndMinMaxRecalc();
