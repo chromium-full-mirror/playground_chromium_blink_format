@@ -147,9 +147,10 @@ void TypingCommand::insertText(Document* document,
   if (isOpenForMoreTypingCommand(lastEditCommand.get())) {
     TypingCommand* lastTypingCommand =
         static_cast<TypingCommand*>(lastEditCommand.get());
-    if (changeSelection)
+    if (changeSelection) {
       lastTypingCommand->setStartingSelection(selectionForInsertion);
-    lastTypingCommand->setEndingSelection(selectionForInsertion);
+      lastTypingCommand->setEndingSelection(selectionForInsertion);
+    }
     lastTypingCommand->insertText(newText, selectInsertedText);
     if (changeSelection) {
       lastTypingCommand->setEndingSelection(currentSelection);
@@ -160,9 +161,10 @@ void TypingCommand::insertText(Document* document,
 
   RefPtr<TypingCommand> cmd =
       new TypingCommand(document, InsertText, newText, selectInsertedText);
-  if (changeSelection)
+  if (changeSelection) {
     cmd->setStartingSelection(selectionForInsertion);
-  cmd->setEndingSelection(selectionForInsertion);
+    cmd->setEndingSelection(selectionForInsertion);
+  }
   applyCommand(cmd);
   if (changeSelection) {
     cmd->setEndingSelection(currentSelection);
@@ -354,12 +356,16 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent() {
 
 void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
   Selection selectionToDelete;
+  Selection selectionAfterUndo;
 
   switch (endingSelection().state()) {
     case Selection::RANGE:
       selectionToDelete = endingSelection();
+      selectionAfterUndo = selectionToDelete;
       break;
     case Selection::CARET: {
+      m_smartDelete = false;
+
       SelectionController selectionController;
       selectionController.setSelection(endingSelection());
       selectionController.modify(SelectionController::EXTEND,
@@ -397,7 +403,17 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
       }
 
       selectionToDelete = selectionController.selection();
-
+      if (!startingSelection().isRange() ||
+          selectionToDelete.base() != startingSelection().start())
+        selectionAfterUndo = selectionToDelete;
+      else
+        // It's a little tricky to compute what the starting selection would
+        // have been in the original document.
+        // We can't let the Selection class's validation kick in or it'll adjust
+        // for us based on
+        // the current state of the document and we'll get the wrong result.
+        selectionAfterUndo.setWithoutValidation(startingSelection().end(),
+                                                selectionToDelete.extent());
       break;
     }
     case Selection::NONE:
@@ -407,10 +423,8 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
 
   if (selectionToDelete.isCaretOrRange() &&
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
-    // setStartingSelection so that undo selects what was deleted
-    if (granularity != CharacterGranularity)
-      setStartingSelection(selectionToDelete);
-
+    // make undo select what was deleted
+    setStartingSelection(selectionAfterUndo);
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();
@@ -419,12 +433,16 @@ void TypingCommand::deleteKeyPressed(TextGranularity granularity) {
 
 void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
   Selection selectionToDelete;
+  Selection selectionAfterUndo;
 
   switch (endingSelection().state()) {
     case Selection::RANGE:
       selectionToDelete = endingSelection();
+      selectionAfterUndo = selectionToDelete;
       break;
     case Selection::CARET: {
+      m_smartDelete = false;
+
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
@@ -458,7 +476,31 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
                                    CharacterGranularity);
 
       selectionToDelete = selectionController.selection();
-
+      if (!startingSelection().isRange() ||
+          selectionToDelete.base() != startingSelection().start())
+        selectionAfterUndo = selectionToDelete;
+      else {
+        // It's a little tricky to compute what the starting selection would
+        // have been in the original document.
+        // We can't let the Selection class's validation kick in or it'll adjust
+        // for us based on
+        // the current state of the document and we'll get the wrong result.
+        Position extent = startingSelection().end();
+        if (extent.node() != selectionToDelete.end().node())
+          extent = selectionToDelete.extent();
+        else {
+          int extraCharacters;
+          if (selectionToDelete.start().node() ==
+              selectionToDelete.end().node())
+            extraCharacters = selectionToDelete.end().offset() -
+                              selectionToDelete.start().offset();
+          else
+            extraCharacters = selectionToDelete.end().offset();
+          extent = Position(extent.node(), extent.offset() + extraCharacters);
+        }
+        selectionAfterUndo.setWithoutValidation(startingSelection().start(),
+                                                extent);
+      }
       break;
     }
     case Selection::NONE:
@@ -468,10 +510,8 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity) {
 
   if (selectionToDelete.isCaretOrRange() &&
       document()->frame()->shouldDeleteSelection(selectionToDelete)) {
-    // setStartingSelection so that undo selects what was deleted
-    if (granularity != CharacterGranularity)
-      setStartingSelection(selectionToDelete);
-
+    // make undo select what was deleted
+    setStartingSelection(selectionAfterUndo);
     deleteSelection(selectionToDelete, m_smartDelete);
     setSmartDelete(false);
     typingAddedToOpenCommand();

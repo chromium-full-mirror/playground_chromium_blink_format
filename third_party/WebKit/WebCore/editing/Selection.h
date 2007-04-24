@@ -97,6 +97,8 @@ class Selection {
   void showTreeForThis() const;
 #endif
 
+  void setWithoutValidation(const Position&, const Position&);
+
  private:
   void validate();
   void adjustForEditableContent();
