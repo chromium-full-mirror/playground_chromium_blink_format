@@ -105,7 +105,7 @@ class CSSStyleSelector : public StyleSelector {
                                      RenderStyle* parentStyle = 0);
 
   RenderStyle* locateSharedStyle();
-  Node* locateCousinList(Element* parent);
+  Node* locateCousinList(Element* parent, unsigned depth = 1);
   bool canShareStyleWithElement(Node* n);
 
   // These methods will give back the set of rules that matched for a given

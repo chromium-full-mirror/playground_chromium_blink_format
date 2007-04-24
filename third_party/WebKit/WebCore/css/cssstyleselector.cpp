@@ -669,28 +669,29 @@ static int fraction = 0;
 static int total = 0;
 #endif
 
-const int siblingThreshold = 10;
+static const unsigned cStyleSearchThreshold = 10;
 
-Node* CSSStyleSelector::locateCousinList(Element* parent) {
+Node* CSSStyleSelector::locateCousinList(Element* parent, unsigned depth) {
   if (parent && parent->isStyledElement()) {
     StyledElement* p = static_cast<StyledElement*>(parent);
     if (!p->inlineStyleDecl() && !p->hasID()) {
       Node* r = p->previousSibling();
-      int subcount = 0;
+      unsigned subcount = 0;
       RenderStyle* st = p->renderStyle();
       while (r) {
         if (r->renderStyle() == st)
           return r->lastChild();
-        if (subcount++ == siblingThreshold)
+        if (subcount++ == cStyleSearchThreshold)
           return 0;
         r = r->previousSibling();
       }
-      if (!r)
-        r = locateCousinList(static_cast<Element*>(parent->parentNode()));
+      if (!r && depth < cStyleSearchThreshold)
+        r = locateCousinList(static_cast<Element*>(parent->parentNode()),
+                             depth + 1);
       while (r) {
         if (r->renderStyle() == st)
           return r->lastChild();
-        if (subcount++ == siblingThreshold)
+        if (subcount++ == cStyleSearchThreshold)
           return 0;
         r = r->previousSibling();
       }
@@ -758,7 +759,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
       !styledElement->hasID() &&
       !styledElement->document()->usesSiblingRules()) {
     // Check previous siblings.
-    int count = 0;
+    unsigned count = 0;
     Node* n;
     for (n = element->previousSibling(); n && !n->isElementNode();
          n = n->previousSibling())
@@ -766,7 +767,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
     while (n) {
       if (canShareStyleWithElement(n))
         return n->renderStyle();
-      if (count++ == siblingThreshold)
+      if (count++ == cStyleSearchThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
            n = n->previousSibling())
@@ -777,7 +778,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
     while (n) {
       if (canShareStyleWithElement(n))
         return n->renderStyle();
-      if (count++ == siblingThreshold)
+      if (count++ == cStyleSearchThreshold)
         return 0;
       for (n = n->previousSibling(); n && !n->isElementNode();
            n = n->previousSibling())

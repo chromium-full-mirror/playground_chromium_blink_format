@@ -54,7 +54,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-const int maxRedundantTagDepth = 20;
+static const unsigned cMaxRedundantTagDepth = 20;
+static const unsigned cResidualStyleMaxDepth = 200;
 
 struct HTMLStackElem : Noncopyable {
   HTMLStackElem(const AtomicString& t,
@@ -860,12 +861,12 @@ bool HTMLParser::allowNestedRedundantTag(const AtomicString& tagName) {
   // of
   // about 1500 tags, all from a bunch of <b>s.  We will only allow at most 20
   // nested tags of the same type before just ignoring them all together.
-  int i = 0;
+  unsigned i = 0;
   for (HTMLStackElem *curr = blockStack;
-       i < maxRedundantTagDepth && curr && curr->tagName == tagName;
+       i < cMaxRedundantTagDepth && curr && curr->tagName == tagName;
        curr = curr->next, i++)
     ;
-  return i != maxRedundantTagDepth;
+  return i != cMaxRedundantTagDepth;
 }
 
 void HTMLParser::processCloseTag(Token* t) {
@@ -1181,12 +1182,16 @@ void HTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
 
   // Step 7: Reopen intermediate inlines, e.g., <b><p><i>Foo</b>Goo</p>.
   // In the above example, Goo should stay italic.
+  // We cap the number of tags we're willing to reopen based off
+  // cResidualStyleMaxDepth.
   curr = blockStack;
   HTMLStackElem* residualStyleStack = 0;
+  unsigned stackDepth = 1;
   while (curr && curr != maxElem) {
     // We will actually schedule this tag for reopening
     // after we complete the close of this entire block.
-    if (isResidualStyleTag(curr->tagName))
+    if (isResidualStyleTag(curr->tagName) &&
+        stackDepth++ < cResidualStyleMaxDepth)
       // We've overloaded the use of stack elements and are just reusing the
       // struct with a slightly different meaning to the variables.  Instead of
       // chaining
@@ -1290,6 +1295,7 @@ void HTMLParser::popBlock(const AtomicString& tagName) {
   Node* malformedTableParent = 0;
 
   elem = blockStack;
+  unsigned stackDepth = 1;
   while (elem) {
     if (elem->tagName == tagName) {
       int strayTable = inStrayTableContent;
@@ -1319,7 +1325,8 @@ void HTMLParser::popBlock(const AtomicString& tagName) {
 
       // Schedule this tag for reopening
       // after we complete the close of this entire block.
-      if (isAffectedByStyle && isResidualStyleTag(elem->tagName))
+      if (isAffectedByStyle && isResidualStyleTag(elem->tagName) &&
+          stackDepth++ < cResidualStyleMaxDepth)
         // We've overloaded the use of stack elements and are just reusing the
         // struct with a slightly different meaning to the variables.  Instead
         // of chaining
