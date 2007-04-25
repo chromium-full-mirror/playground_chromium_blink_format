@@ -597,7 +597,6 @@ bool Editor::isSelectionUngrammatical() {
 }
 void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
   notImplementedGdk();
-  return false;
 }
 bool Editor::isSelectionMisspelled() {
   notImplementedGdk();
