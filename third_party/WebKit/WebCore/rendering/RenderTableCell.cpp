@@ -860,7 +860,7 @@ void RenderTableCell::paintBackgroundsBehindCell(
     // We have to clip here because the background would paint
     // on top of the borders otherwise.  This only matters for cells and rows.
     bool shouldClip =
-        backgroundObject->layer() &&
+        backgroundObject->hasLayer() &&
         (backgroundObject == this || backgroundObject == parent()) &&
         tableElt->collapseBorders();
     if (shouldClip) {

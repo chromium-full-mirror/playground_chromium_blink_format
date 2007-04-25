@@ -518,7 +518,7 @@ void RenderTable::paint(PaintInfo& paintInfo, int tx, int ty) {
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
-    if (!child->layer() && (child->isTableSection() || child == m_caption))
+    if (!child->hasLayer() && (child->isTableSection() || child == m_caption))
       child->paint(info, tx, ty);
   }
 
