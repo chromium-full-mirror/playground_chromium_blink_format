@@ -41,7 +41,7 @@ class NodeList : public Shared<NodeList> {
     Caches();
     void reset();
 
-    int cachedLength;
+    unsigned cachedLength;
     Node* lastItem;
     unsigned lastItemOffset;
     bool isLengthCacheValid : 1;

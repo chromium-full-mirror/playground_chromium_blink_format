@@ -55,16 +55,35 @@ Node* ChildNodeList::item(unsigned index) const {
   if (m_caches->isItemCacheValid) {
     if (index == m_caches->lastItemOffset)
       return m_caches->lastItem;
-    if (index > m_caches->lastItemOffset) {
+
+    unsigned dist = abs(index - m_caches->lastItemOffset);
+    if (dist < index) {
       n = m_caches->lastItem;
       pos = m_caches->lastItemOffset;
     }
   }
 
-  while (n && pos < index) {
-    n = n->nextSibling();
-    pos++;
+  if (m_caches->isLengthCacheValid) {
+    if (index >= m_caches->cachedLength)
+      return 0;
+
+    unsigned dist = abs(index - pos);
+    if (dist > m_caches->cachedLength - 1 - index) {
+      n = m_rootNode->lastChild();
+      pos = m_caches->cachedLength - 1;
+    }
   }
+
+  if (pos <= index)
+    while (n && pos < index) {
+      n = n->nextSibling();
+      ++pos;
+    }
+  else
+    while (n && pos > index) {
+      n = n->previousSibling();
+      --pos;
+    }
 
   if (n) {
     m_caches->lastItem = n;
