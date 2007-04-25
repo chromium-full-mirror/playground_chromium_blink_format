@@ -595,6 +595,10 @@ bool Editor::isSelectionUngrammatical() {
   notImplementedGdk();
   return false;
 }
+void Editor::advanceToNextMisspelling(bool startBeforeSelection) {
+  notImplementedGdk();
+  return false;
+}
 bool Editor::isSelectionMisspelled() {
   notImplementedGdk();
   return false;
