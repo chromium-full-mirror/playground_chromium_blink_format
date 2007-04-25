@@ -73,6 +73,7 @@ class RenderListMarker : public RenderBox {
  private:
   IntRect getRelativeMarkerRect();
 
+  String m_text;
   CachedImage* m_image;
   RenderListItem* m_listItem;
   SelectionState m_selectionState;
