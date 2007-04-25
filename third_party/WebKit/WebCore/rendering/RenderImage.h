@@ -68,7 +68,7 @@ class RenderImage : public RenderReplaced {
   virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
 
-  virtual void calcMinMaxWidth();
+  virtual void calcPrefWidths();
 
   HTMLMapElement* imageMap();
 

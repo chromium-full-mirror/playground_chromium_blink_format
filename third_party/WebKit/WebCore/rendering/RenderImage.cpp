@@ -169,8 +169,8 @@ void RenderImage::imageChanged(CachedImage* newImage) {
   if (ensureLayout) {
     if (!selfNeedsLayout())
       setNeedsLayout(true);
-    if (minMaxKnown())
-      setMinMaxKnown(false);
+    if (!prefWidthsDirty())
+      setPrefWidthsDirty(true);
   } else
     // FIXME: We always just do a complete repaint, since we always pass in the
     // full image
@@ -315,7 +315,7 @@ void RenderImage::paint(PaintInfo& paintInfo, int tx, int ty) {
 
 void RenderImage::layout() {
   ASSERT(needsLayout());
-  ASSERT(minMaxKnown());
+  ASSERT(!prefWidthsDirty());
 
   IntRect oldBounds;
   IntRect oldOutlineBox;
@@ -455,20 +455,20 @@ int RenderImage::calcAspectRatioHeight() const {
          intrinsicWidth();
 }
 
-void RenderImage::calcMinMaxWidth() {
-  ASSERT(!minMaxKnown());
+void RenderImage::calcPrefWidths() {
+  ASSERT(prefWidthsDirty());
 
-  m_maxWidth = calcReplacedWidth() + paddingLeft() + paddingRight() +
-               borderLeft() + borderRight();
+  m_maxPrefWidth = calcReplacedWidth() + paddingLeft() + paddingRight() +
+                   borderLeft() + borderRight();
 
   if (style()->width().isPercent() || style()->height().isPercent() ||
       style()->maxWidth().isPercent() || style()->maxHeight().isPercent() ||
       style()->minWidth().isPercent() || style()->minHeight().isPercent())
-    m_minWidth = 0;
+    m_minPrefWidth = 0;
   else
-    m_minWidth = m_maxWidth;
+    m_minPrefWidth = m_maxPrefWidth;
 
-  setMinMaxKnown();
+  setPrefWidthsDirty(false);
 }
 
 Image* RenderImage::nullImage() {

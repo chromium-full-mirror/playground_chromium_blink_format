@@ -48,10 +48,10 @@ short RenderSVGHiddenContainer::baselinePosition(bool b,
   return 0;
 }
 
-void RenderSVGHiddenContainer::calcMinMaxWidth() {
-  ASSERT(!minMaxKnown());
-  m_minWidth = m_maxWidth = 0;
-  setMinMaxKnown();
+void RenderSVGHiddenContainer::calcPrefWidths() {
+  ASSERT(prefWidthsDirty());
+  m_minPrefWidth = m_maxPrefWidth = 0;
+  setPrefWidthsDirty(false);
 }
 
 void RenderSVGHiddenContainer::layout() {

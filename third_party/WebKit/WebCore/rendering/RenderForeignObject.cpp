@@ -83,7 +83,7 @@ bool RenderForeignObject::requiresLayer() {
 
 void RenderForeignObject::layout() {
   ASSERT(needsLayout());
-  ASSERT(minMaxKnown());
+  ASSERT(!prefWidthsDirty());
 
   IntRect oldBounds;
   IntRect oldOutlineBox;

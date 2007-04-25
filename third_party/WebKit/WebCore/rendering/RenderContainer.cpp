@@ -165,7 +165,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   // exposed when the child
   // disappears gets repainted properly.
   if (!documentBeingDestroyed()) {
-    oldChild->setNeedsLayoutAndMinMaxRecalc();
+    oldChild->setNeedsLayoutAndPrefWidthsRecalc();
     oldChild->repaint();
   }
 
@@ -177,13 +177,13 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
     // layer visibility any more
     RenderLayer* layer = 0;
     if (m_style->visibility() != VISIBLE &&
-        oldChild->style()->visibility() == VISIBLE && !oldChild->layer()) {
+        oldChild->style()->visibility() == VISIBLE && !oldChild->hasLayer()) {
       layer = enclosingLayer();
       layer->dirtyVisibleContentStatus();
     }
 
     // Keep our layer hierarchy updated.
-    if (oldChild->firstChild() || oldChild->layer()) {
+    if (oldChild->firstChild() || oldChild->hasLayer()) {
       if (!layer)
         layer = enclosingLayer();
       oldChild->removeLayers(layer);
@@ -437,8 +437,8 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
       layer->setHasVisibleContent(true);
   }
 
-  newChild->setNeedsLayoutAndMinMaxRecalc();  // Goes up the containing block
-                                              // hierarchy.
+  newChild->setNeedsLayoutAndPrefWidthsRecalc();  // Goes up the containing
+                                                  // block hierarchy.
   if (!normalChildNeedsLayout())
     setChildNeedsLayout(true);  // We may supply the static position for an
                                 // absolute positioned child.
@@ -498,7 +498,7 @@ void RenderContainer::insertChildNode(RenderObject* child,
       layer->setHasVisibleContent(true);
   }
 
-  child->setNeedsLayoutAndMinMaxRecalc();
+  child->setNeedsLayoutAndPrefWidthsRecalc();
   if (!normalChildNeedsLayout())
     setChildNeedsLayout(true);  // We may supply the static position for an
                                 // absolute positioned child.
@@ -512,7 +512,7 @@ void RenderContainer::insertChildNode(RenderObject* child,
 
 void RenderContainer::layout() {
   ASSERT(needsLayout());
-  ASSERT(minMaxKnown());
+  ASSERT(!prefWidthsDirty());
 
   RenderObject* child = m_firstChild;
   while (child) {

@@ -429,18 +429,18 @@ ALWAYS_INLINE int RenderText::widthFromCache(const Font& f,
                  TextStyle(allowTabs(), xPos));
 }
 
-void RenderText::trimmedMinMaxWidth(int leadWidth,
-                                    int& beginMinW,
-                                    bool& beginWS,
-                                    int& endMinW,
-                                    bool& endWS,
-                                    bool& hasBreakableChar,
-                                    bool& hasBreak,
-                                    int& beginMaxW,
-                                    int& endMaxW,
-                                    int& minW,
-                                    int& maxW,
-                                    bool& stripFrontSpaces) {
+void RenderText::trimmedPrefWidths(int leadWidth,
+                                   int& beginMinW,
+                                   bool& beginWS,
+                                   int& endMinW,
+                                   bool& endWS,
+                                   bool& hasBreakableChar,
+                                   bool& hasBreak,
+                                   int& beginMaxW,
+                                   int& endMaxW,
+                                   int& minW,
+                                   int& maxW,
+                                   bool& stripFrontSpaces) {
   bool collapseWhiteSpace = style()->collapseWhiteSpace();
   if (!collapseWhiteSpace)
     stripFrontSpaces = false;
@@ -453,7 +453,7 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
   }
 
   if (m_hasTab)
-    calcMinMaxWidthInternal(leadWidth);
+    calcPrefWidthsInternal(leadWidth);
 
   minW = m_minWidth;
   maxW = m_maxWidth;
@@ -514,20 +514,20 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
   }
 }
 
-void RenderText::calcMinMaxWidth() {
+void RenderText::calcPrefWidths() {
   // Use 0 for the leadWidth. If the text contains a variable width tab, the
   // real width
   // will get measured when trimmedMinMaxWidth calls again with the real
   // leadWidth.
-  ASSERT(!minMaxKnown());
-  calcMinMaxWidthInternal(0);
+  ASSERT(prefWidthsDirty());
+  calcPrefWidthsInternal(0);
 }
 
 inline bool isSpaceAccordingToStyle(UChar c, RenderStyle* style) {
   return c == ' ' || (c == noBreakSpace && style->nbspMode() == SPACE);
 }
 
-void RenderText::calcMinMaxWidthInternal(int leadWidth) {
+void RenderText::calcPrefWidthsInternal(int leadWidth) {
   m_minWidth = 0;
   m_beginMinWidth = 0;
   m_endMinWidth = 0;
@@ -698,7 +698,7 @@ void RenderText::calcMinMaxWidthInternal(int leadWidth) {
     m_endMinWidth = currMaxWidth;
   }
 
-  setMinMaxKnown();
+  setPrefWidthsDirty(false);
 }
 
 bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
@@ -952,7 +952,7 @@ void RenderText::setText(PassRefPtr<StringImpl> text, bool force) {
     return;
 
   setTextInternal(text);
-  setNeedsLayoutAndMinMaxRecalc();
+  setNeedsLayoutAndPrefWidthsRecalc();
 }
 
 int RenderText::height() const {

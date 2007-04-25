@@ -43,7 +43,7 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
-  virtual void calcMinMaxWidth();
+  virtual void calcPrefWidths();
   virtual void paintObject(PaintInfo&, int tx, int ty);
 
   void click();

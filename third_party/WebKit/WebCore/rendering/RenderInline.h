@@ -70,7 +70,7 @@ class RenderInline : public RenderFlow {
                            int ty,
                            HitTestAction);
 
-  virtual void calcMinMaxWidth();
+  virtual void calcPrefWidths();
 
   // overrides RenderObject
   virtual bool requiresLayer();

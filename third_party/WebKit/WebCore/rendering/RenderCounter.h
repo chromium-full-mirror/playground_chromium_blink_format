@@ -35,7 +35,7 @@ class RenderCounter : public RenderText {
   virtual const char* renderName() const;
   virtual bool isRenderCounter() const;
   virtual PassRefPtr<StringImpl> originalText() const;
-  virtual void calcMinMaxWidth();
+  virtual void calcPrefWidths();
 
   static void destroyCounterNodes(RenderObject*);
 

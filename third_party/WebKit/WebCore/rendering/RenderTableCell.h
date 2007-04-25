@@ -61,11 +61,11 @@ class RenderTableCell : public RenderBlock {
     return static_cast<RenderTable*>(parent()->parent()->parent());
   }
 
-  Length styleOrColWidth();
+  Length styleOrColWidth() const;
 
   virtual bool requiresLayer();
 
-  virtual void calcMinMaxWidth();
+  virtual void calcPrefWidths();
   virtual void calcWidth();
   virtual void setWidth(int);
   virtual void setStyle(RenderStyle*);

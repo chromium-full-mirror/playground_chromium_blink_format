@@ -1358,7 +1358,7 @@ void Frame::forceLayoutWithPageWidthRange(float minPageWidth,
     // This magic is basically copied from khtmlview::print
     int pageW = (int)ceilf(minPageWidth);
     root->setWidth(pageW);
-    root->setNeedsLayoutAndMinMaxRecalc();
+    root->setNeedsLayoutAndPrefWidthsRecalc();
     forceLayout();
 
     // If we don't fit in the minimum page width, we'll lay out again. If we
@@ -1372,7 +1372,7 @@ void Frame::forceLayoutWithPageWidthRange(float minPageWidth,
     if (rightmostPos > minPageWidth) {
       pageW = min(rightmostPos, (int)ceilf(maxPageWidth));
       root->setWidth(pageW);
-      root->setNeedsLayoutAndMinMaxRecalc();
+      root->setNeedsLayoutAndPrefWidthsRecalc();
       forceLayout();
     }
   }

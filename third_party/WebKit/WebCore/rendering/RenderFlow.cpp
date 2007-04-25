@@ -498,7 +498,7 @@ IntRect RenderFlow::absoluteClippedOverflowRect() {
          inlineFlow && inlineFlow->isInlineFlow() && inlineFlow != cb;
          inlineFlow = inlineFlow->parent()) {
       if (inlineFlow->style()->position() == RelativePosition &&
-          inlineFlow->layer())
+          inlineFlow->hasLayer())
         inlineFlow->layer()->relativePositionOffset(left, top);
     }
 

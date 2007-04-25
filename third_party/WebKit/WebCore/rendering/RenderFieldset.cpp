@@ -39,10 +39,10 @@ using namespace HTMLNames;
 RenderFieldset::RenderFieldset(HTMLGenericFormElement* element)
     : RenderBlock(element) {}
 
-void RenderFieldset::calcMinMaxWidth() {
-  RenderBlock::calcMinMaxWidth();
+void RenderFieldset::calcPrefWidths() {
+  RenderBlock::calcPrefWidths();
   if (RenderObject* legend = findLegend()) {
-    int legendMinWidth = legend->minWidth();
+    int legendMinWidth = legend->minPrefWidth();
 
     Length legendMarginLeft = legend->style()->marginLeft();
     Length legendMarginRight = legend->style()->marginLeft();
@@ -53,9 +53,9 @@ void RenderFieldset::calcMinMaxWidth() {
     if (legendMarginRight.isFixed())
       legendMinWidth += legendMarginRight.value();
 
-    m_minWidth =
-        max(m_minWidth, legendMinWidth + paddingLeft() + paddingRight() +
-                            borderLeft() + borderRight());
+    m_minPrefWidth =
+        max(m_minPrefWidth, legendMinWidth + paddingLeft() + paddingRight() +
+                                borderLeft() + borderRight());
   }
 }
 

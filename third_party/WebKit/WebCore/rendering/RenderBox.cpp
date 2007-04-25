@@ -64,8 +64,8 @@ RenderBox::RenderBox(Node* node)
       m_marginRight(0),
       m_marginTop(0),
       m_marginBottom(0),
-      m_minWidth(-1),
-      m_maxWidth(-1),
+      m_minPrefWidth(-1),
+      m_maxPrefWidth(-1),
       m_layer(0),
       m_inlineBoxWrapper(0) {}
 
@@ -250,7 +250,7 @@ bool RenderBox::nodeAtPoint(const HitTestRequest& request,
     // table-specific hit-test method (which we should do for performance
     // reasons anyway),
     // then we can remove this check.
-    if (!child->layer() && !child->isInlineFlow() &&
+    if (!child->hasLayer() && !child->isInlineFlow() &&
         child->nodeAtPoint(request, result, x, y, tx, ty, action)) {
       updateHitTestResult(result, IntPoint(x - tx, y - ty));
       return true;
@@ -1190,7 +1190,7 @@ void RenderBox::calcWidth() {
     if (treatAsReplaced)
       m_width = max(width.value() + borderLeft() + borderRight() +
                         paddingLeft() + paddingRight(),
-                    m_minWidth);
+                    m_minPrefWidth);
 
     return;
   }
@@ -1220,8 +1220,8 @@ void RenderBox::calcWidth() {
     }
   }
 
-  if (m_width < m_minWidth && stretchesToMinIntrinsicWidth()) {
-    m_width = m_minWidth;
+  if (m_width < m_minPrefWidth && stretchesToMinIntrinsicWidth()) {
+    m_width = m_minPrefWidth;
     width = Length(m_width, Fixed);
   }
 
@@ -1262,8 +1262,8 @@ int RenderBox::calcWidthUsing(WidthType widthType, int cw) {
       width = cw - marginLeft - marginRight;
 
     if (sizesToIntrinsicWidth(widthType)) {
-      width = max(width, m_minWidth);
-      width = min(width, m_maxWidth);
+      width = max(width, m_minPrefWidth);
+      width = min(width, m_maxPrefWidth);
     }
   } else
     width = calcBorderBoxWidth(w.calcValue(cw));
@@ -1861,10 +1861,10 @@ void RenderBox::calcAbsoluteHorizontal() {
     }
   }
 
-  if (m_width < m_minWidth - bordersPlusPadding &&
+  if (m_width < m_minPrefWidth - bordersPlusPadding &&
       stretchesToMinIntrinsicWidth())
     calcAbsoluteHorizontalValues(
-        Length(m_minWidth - bordersPlusPadding, Fixed), containerBlock,
+        Length(m_minPrefWidth - bordersPlusPadding, Fixed), containerBlock,
         containerDirection, containerWidth, bordersPlusPadding, left, right,
         marginLeft, marginRight, m_width, m_marginLeft, m_marginRight, m_x);
 
@@ -2011,8 +2011,8 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
       int rightValue = right.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = m_maxWidth - bordersPlusPadding;
-      int preferredMinWidth = m_minWidth - bordersPlusPadding;
+      int preferredWidth = m_maxPrefWidth - bordersPlusPadding;
+      int preferredMinWidth = m_minPrefWidth - bordersPlusPadding;
       int availableWidth = availableSpace - rightValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
       leftValue = availableSpace - (widthValue + rightValue);
@@ -2021,8 +2021,8 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
       leftValue = left.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = m_maxWidth - bordersPlusPadding;
-      int preferredMinWidth = m_minWidth - bordersPlusPadding;
+      int preferredWidth = m_maxPrefWidth - bordersPlusPadding;
+      int preferredMinWidth = m_minPrefWidth - bordersPlusPadding;
       int availableWidth = availableSpace - leftValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
     } else if (leftIsAuto && !width.isAuto() && !rightIsAuto) {

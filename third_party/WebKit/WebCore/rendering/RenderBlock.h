@@ -278,9 +278,9 @@ class RenderBlock : public RenderFlow {
   // (shrinking the width available to children when laying out.)
   virtual int availableWidth() const;
 
-  virtual void calcMinMaxWidth();
-  void calcInlineMinMaxWidth();
-  void calcBlockMinMaxWidth();
+  virtual void calcPrefWidths();
+  void calcInlinePrefWidths();
+  void calcBlockPrefWidths();
 
   virtual int getBaselineOfFirstLineBox() const;
   virtual int getBaselineOfLastLineBox() const;
