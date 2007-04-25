@@ -288,7 +288,7 @@ void EditorClientQt::checkGrammarOfString(const UChar*,
   notImplemented();
 }
 
-void EditorClientQt::udpateSpellingUIWithGrammarString(const String&,
+void EditorClientQt::updateSpellingUIWithGrammarString(const String&,
                                                        const Vector<String>&) {
   notImplemented();
 }

@@ -106,7 +106,7 @@ class EditorClientQt : public EditorClient {
                                     Vector<GrammarDetail>&,
                                     int* badGrammarLocation,
                                     int* badGrammarLength);
-  virtual void udpateSpellingUIWithGrammarString(const String&,
+  virtual void updateSpellingUIWithGrammarString(const String&,
                                                  const Vector<String>& guesses);
   virtual void updateSpellingUIWithMisspelledWord(const String&);
   virtual void showSpellingUI(bool show);

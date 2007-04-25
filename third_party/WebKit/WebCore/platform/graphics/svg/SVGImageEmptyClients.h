@@ -464,7 +464,7 @@ class SVGEmptyEditorClient : public EditorClient {
 #ifdef BUILDING_ON_TIGER
   virtual NSArray* pasteboardTypesForSelection(Frame*) { return 0; }
 #endif
-#else
+#endif
   virtual void ignoreWordInSpellDocument(const String&) {}
   virtual void learnWord(const String&) {}
   virtual void checkSpellingOfString(const UChar*,
@@ -476,14 +476,13 @@ class SVGEmptyEditorClient : public EditorClient {
                                     Vector<GrammarDetail>&,
                                     int* badGrammarLocation,
                                     int* badGrammarLength) {}
-  virtual void udpateSpellingUIWithGrammarString(
+  virtual void updateSpellingUIWithGrammarString(
       const String&,
       const Vector<String>& guesses) {}
   virtual void updateSpellingUIWithMisspelledWord(const String&) {}
   virtual void showSpellingUI(bool show) {}
   virtual bool spellingUIIsShowing() { return false; }
   virtual void getGuessesForWord(const String&, Vector<String>& guesses) {}
-#endif
 };
 
 class SVGEmptyContextMenuClient : public ContextMenuClient {
