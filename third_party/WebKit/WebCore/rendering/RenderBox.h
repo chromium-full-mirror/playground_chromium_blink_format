@@ -48,8 +48,8 @@ class RenderBox : public RenderObject {
 
   virtual void destroy();
 
-  virtual int minPrefWidth() const { return m_minPrefWidth; }
-  virtual int maxPrefWidth() const { return m_maxPrefWidth; }
+  virtual int minPrefWidth() const;
+  virtual int maxPrefWidth() const;
 
   virtual int overrideSize() const;
   virtual int overrideWidth() const;
@@ -260,6 +260,12 @@ class RenderBox : public RenderObject {
 
   void calcAbsoluteVerticalReplaced();
   void calcAbsoluteHorizontalReplaced();
+
+  // This function calculates the minimum and maximum preferred widths for an
+  // object.
+  // These values are used in shrink-to-fit layout systems.
+  // These include tables, positioned objects, floats and flexible boxes.
+  virtual void calcPrefWidths() = 0;
 
  protected:
   // The width/height of the contents + borders + padding.

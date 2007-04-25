@@ -316,7 +316,6 @@ CSSStyleSelector::CSSStyleSelector(CSSStyleSheet* sheet) {
 void CSSStyleSelector::init() {
   element = 0;
   settings = 0;
-  m_matchedRules.clear();
   m_matchedDecls.clear();
   m_ruleList = 0;
   m_collectRulesOnly = false;
@@ -581,7 +580,6 @@ void CSSStyleSelector::initForStyleResolve(Element* e,
 
   style = 0;
 
-  m_matchedRules.clear();
   m_matchedDecls.clear();
 
   m_ruleList = 0;

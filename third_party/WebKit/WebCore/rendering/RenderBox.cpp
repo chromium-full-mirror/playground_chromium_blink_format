@@ -115,6 +115,7 @@ void RenderBox::setStyle(RenderStyle* newStyle) {
       if (wasFloating && isFloating())
         setChildNeedsLayout(true);
       m_layer = new (renderArena()) RenderLayer(this);
+      setHasLayer(true);
       m_layer->insertOnlyThisLayer();
       if (parent() && !needsLayout() && containingBlock())
         m_layer->updateLayerPositions();
@@ -123,6 +124,7 @@ void RenderBox::setStyle(RenderStyle* newStyle) {
     ASSERT(m_layer->parent());
     RenderLayer* layer = m_layer;
     m_layer = 0;
+    setHasLayer(false);
     layer->removeOnlyThisLayer();
     if (wasFloating && isFloating())
       setChildNeedsLayout(true);
@@ -162,6 +164,20 @@ void RenderBox::destroy() {
 
   if (layer)
     layer->destroy(arena);
+}
+
+int RenderBox::minPrefWidth() const {
+  if (prefWidthsDirty())
+    const_cast<RenderBox*>(this)->calcPrefWidths();
+
+  return m_minPrefWidth;
+}
+
+int RenderBox::maxPrefWidth() const {
+  if (prefWidthsDirty())
+    const_cast<RenderBox*>(this)->calcPrefWidths();
+
+  return m_maxPrefWidth;
 }
 
 int RenderBox::overrideSize() const {
@@ -1190,7 +1206,7 @@ void RenderBox::calcWidth() {
     if (treatAsReplaced)
       m_width = max(width.value() + borderLeft() + borderRight() +
                         paddingLeft() + paddingRight(),
-                    m_minPrefWidth);
+                    minPrefWidth());
 
     return;
   }
@@ -1220,8 +1236,8 @@ void RenderBox::calcWidth() {
     }
   }
 
-  if (m_width < m_minPrefWidth && stretchesToMinIntrinsicWidth()) {
-    m_width = m_minPrefWidth;
+  if (stretchesToMinIntrinsicWidth()) {
+    m_width = max(m_width, minPrefWidth());
     width = Length(m_width, Fixed);
   }
 
@@ -1262,8 +1278,8 @@ int RenderBox::calcWidthUsing(WidthType widthType, int cw) {
       width = cw - marginLeft - marginRight;
 
     if (sizesToIntrinsicWidth(widthType)) {
-      width = max(width, m_minPrefWidth);
-      width = min(width, m_maxPrefWidth);
+      width = max(width, minPrefWidth());
+      width = min(width, maxPrefWidth());
     }
   } else
     width = calcBorderBoxWidth(w.calcValue(cw));
@@ -1861,10 +1877,10 @@ void RenderBox::calcAbsoluteHorizontal() {
     }
   }
 
-  if (m_width < m_minPrefWidth - bordersPlusPadding &&
-      stretchesToMinIntrinsicWidth())
+  if (stretchesToMinIntrinsicWidth() &&
+      m_width < minPrefWidth() - bordersPlusPadding)
     calcAbsoluteHorizontalValues(
-        Length(m_minPrefWidth - bordersPlusPadding, Fixed), containerBlock,
+        Length(minPrefWidth() - bordersPlusPadding, Fixed), containerBlock,
         containerDirection, containerWidth, bordersPlusPadding, left, right,
         marginLeft, marginRight, m_width, m_marginLeft, m_marginRight, m_x);
 
@@ -2011,8 +2027,8 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
       int rightValue = right.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = m_maxPrefWidth - bordersPlusPadding;
-      int preferredMinWidth = m_minPrefWidth - bordersPlusPadding;
+      int preferredWidth = maxPrefWidth() - bordersPlusPadding;
+      int preferredMinWidth = minPrefWidth() - bordersPlusPadding;
       int availableWidth = availableSpace - rightValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
       leftValue = availableSpace - (widthValue + rightValue);
@@ -2021,8 +2037,8 @@ void RenderBox::calcAbsoluteHorizontalValues(Length width,
       leftValue = left.calcValue(containerWidth);
 
       // FIXME: would it be better to have shrink-to-fit in one step?
-      int preferredWidth = m_maxPrefWidth - bordersPlusPadding;
-      int preferredMinWidth = m_minPrefWidth - bordersPlusPadding;
+      int preferredWidth = maxPrefWidth() - bordersPlusPadding;
+      int preferredMinWidth = minPrefWidth() - bordersPlusPadding;
       int availableWidth = availableSpace - leftValue;
       widthValue = min(max(preferredMinWidth, availableWidth), preferredWidth);
     } else if (leftIsAuto && !width.isAuto() && !rightIsAuto) {

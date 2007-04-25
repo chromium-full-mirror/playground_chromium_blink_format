@@ -110,7 +110,6 @@ void RenderTableRow::addChild(RenderObject* child, RenderObject* beforeChild) {
 
 void RenderTableRow::layout() {
   ASSERT(needsLayout());
-  ASSERT(!prefWidthsDirty());
 
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {

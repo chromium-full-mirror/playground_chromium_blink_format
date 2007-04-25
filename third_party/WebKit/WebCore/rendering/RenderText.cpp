@@ -452,8 +452,8 @@ void RenderText::trimmedPrefWidths(int leadWidth,
     return;
   }
 
-  if (m_hasTab)
-    calcPrefWidthsInternal(leadWidth);
+  if (m_hasTab || prefWidthsDirty())
+    calcPrefWidths(leadWidth);
 
   minW = m_minWidth;
   maxW = m_maxWidth;
@@ -514,20 +514,27 @@ void RenderText::trimmedPrefWidths(int leadWidth,
   }
 }
 
-void RenderText::calcPrefWidths() {
-  // Use 0 for the leadWidth. If the text contains a variable width tab, the
-  // real width
-  // will get measured when trimmedMinMaxWidth calls again with the real
-  // leadWidth.
-  ASSERT(prefWidthsDirty());
-  calcPrefWidthsInternal(0);
-}
-
 inline bool isSpaceAccordingToStyle(UChar c, RenderStyle* style) {
   return c == ' ' || (c == noBreakSpace && style->nbspMode() == SPACE);
 }
 
-void RenderText::calcPrefWidthsInternal(int leadWidth) {
+int RenderText::minPrefWidth() const {
+  if (prefWidthsDirty())
+    const_cast<RenderText*>(this)->calcPrefWidths(0);
+
+  return m_minWidth;
+}
+
+int RenderText::maxPrefWidth() const {
+  if (prefWidthsDirty())
+    const_cast<RenderText*>(this)->calcPrefWidths(0);
+
+  return m_maxWidth;
+}
+
+void RenderText::calcPrefWidths(int leadWidth) {
+  ASSERT(m_hasTab || prefWidthsDirty());
+
   m_minWidth = 0;
   m_beginMinWidth = 0;
   m_endMinWidth = 0;
@@ -1036,7 +1043,7 @@ unsigned int RenderText::width(unsigned int from,
   int w;
   if (&f == &style()->font()) {
     if (!style()->preserveNewline() && !from && len == textLength())
-      w = m_maxWidth;
+      w = maxPrefWidth();
     else
       w = widthFromCache(f, from, len, xPos);
   } else

@@ -256,7 +256,6 @@ void RenderPartObject::updateWidget() {
 
 void RenderPartObject::layout() {
   ASSERT(needsLayout());
-  ASSERT(!prefWidthsDirty());
 
   calcWidth();
   calcHeight();

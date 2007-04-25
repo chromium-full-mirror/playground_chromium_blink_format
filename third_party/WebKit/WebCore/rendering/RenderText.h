@@ -96,9 +96,8 @@ class RenderText : public RenderObject {
 
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
-  virtual void calcPrefWidths();
-  virtual int minPrefWidth() const { return m_minWidth; }
-  virtual int maxPrefWidth() const { return m_maxWidth; }
+  virtual int minPrefWidth() const;
+  virtual int maxPrefWidth() const;
 
   void trimmedPrefWidths(int leadWidth,
                          int& beginMinW,
@@ -167,6 +166,7 @@ class RenderText : public RenderObject {
 
  protected:
   void setTextInternal(PassRefPtr<StringImpl>);
+  virtual void calcPrefWidths(int leadWidth);
 
  private:
   // Make length() private so that callers that have a RenderText*
@@ -176,8 +176,6 @@ class RenderText : public RenderObject {
 
   void deleteTextBoxes();
   bool containsOnlyWhitespace(unsigned from, unsigned len) const;
-  void calcPrefWidthsInternal(int leadWidth);
-
   int widthFromCache(const Font&, int start, int len, int xPos) const;
   bool isAllASCII() const { return m_isAllASCII; }
 

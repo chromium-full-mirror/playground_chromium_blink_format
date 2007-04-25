@@ -172,6 +172,13 @@ void RenderListItem::updateValue() {
   }
 }
 
+static RenderObject* firstNonMarkerChild(RenderObject* parent) {
+  RenderObject* result = parent->firstChild();
+  while (result && result->isListMarker())
+    result = result->nextSibling();
+  return result;
+}
+
 void RenderListItem::updateMarkerLocation() {
   // Sanity check the location of our marker.
   if (m_marker) {
@@ -189,27 +196,27 @@ void RenderListItem::updateMarkerLocation() {
     }
 
     if (markerPar != lineBoxParent || m_marker->prefWidthsDirty()) {
+      updateFirstLetter();
       m_marker->remove();
       if (!lineBoxParent)
         lineBoxParent = this;
-      lineBoxParent->addChild(m_marker, lineBoxParent->firstChild());
+      lineBoxParent->addChild(m_marker, firstNonMarkerChild(lineBoxParent));
       if (m_marker->prefWidthsDirty())
         m_marker->calcPrefWidths();
-      recalcMinMaxWidths();
     }
   }
 }
 
 void RenderListItem::calcPrefWidths() {
-  // Make sure our marker is in the correct location.
+  ASSERT(prefWidthsDirty());
+
   updateMarkerLocation();
-  if (prefWidthsDirty())
-    RenderBlock::calcPrefWidths();
+
+  RenderBlock::calcPrefWidths();
 }
 
 void RenderListItem::layout() {
   ASSERT(needsLayout());
-  ASSERT(!prefWidthsDirty());
 
   updateMarkerLocation();
   RenderBlock::layout();

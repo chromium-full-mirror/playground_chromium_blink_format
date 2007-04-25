@@ -242,6 +242,8 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
 }
 
 void RenderFileUploadControl::calcPrefWidths() {
+  ASSERT(prefWidthsDirty());
+
   m_minPrefWidth = 0;
   m_maxPrefWidth = 0;
 

@@ -479,7 +479,6 @@ FrameEdgeInfo RenderFrameSet::edgeInfo() const {
 
 void RenderFrameSet::layout() {
   ASSERT(needsLayout());
-  ASSERT(!prefWidthsDirty());
 
   if (!parent()->isFrameSet()) {
     FrameView* v = view()->frameView();
