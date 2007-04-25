@@ -1,7 +1,5 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -77,10 +75,8 @@ bool operator==(const AtomicString& a, const char* b) {
 StringImpl* AtomicString::add(const char* c) {
   if (!c)
     return 0;
-  int length = strlen(c);
-  if (length == 0)
+  if (!*c)
     return StringImpl::empty();
-
   return *stringTable->add<const char*, CStringTranslator>(c).first;
 }
 
