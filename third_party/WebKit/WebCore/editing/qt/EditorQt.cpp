@@ -80,4 +80,10 @@ void Editor::markMisspellings(const Selection& selection) {}
 
 void Editor::markBadGrammar(const Selection& selection) {}
 
+void Editor::showSpellingGuessPanel() {}
+
+bool Editor::spellingPanelIsShowing() {
+  return false;
+}
+
 }  // namespace WebCore

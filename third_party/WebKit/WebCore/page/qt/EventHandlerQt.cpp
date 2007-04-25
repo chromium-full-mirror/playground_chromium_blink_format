@@ -112,7 +112,8 @@ bool EventHandler::passSubframeEventToSubframe(
   return false;
 }
 
-bool EventHandler::passWheelEventToWidget(Widget* widget) {
+bool EventHandler::passWheelEventToWidget(PlatformWheelEvent& event,
+                                          Widget* widget) {
   notImplemented();
   return false;
 }
@@ -139,14 +140,10 @@ bool EventHandler::passMouseReleaseEventToSubframe(
   return passSubframeEventToSubframe(mev, subframe);
 }
 
-bool EventHandler::passWheelEventToSubframe(PlatformWheelEvent&,
-                                            Frame* subframe) {
-  return passWheelEventToWidget(subframe->view());
-}
-
 bool EventHandler::passMousePressEventToScrollbar(
-    MouseEventWithHitTestResults&,
+    MouseEventWithHitTestResults& event,
     PlatformScrollbar* scrollbar) {
-  return passWheelEventToWidget(scrollbar);
+  notImplemented();
+  return false;
 }
 }

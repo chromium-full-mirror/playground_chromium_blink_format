@@ -620,6 +620,13 @@ void Editor::markMisspellings(const Selection&) {
 void Editor::markBadGrammar(const Selection&) {
   notImplementedGdk();
 }
+void Editor::showSpellingGuessPanel() {
+  notImplementedGdk();
+}
+bool Editor::spellingPanelIsShowing() {
+  notImplementedGdk();
+  return false;
+}
 
 Pasteboard* Pasteboard::generalPasteboard() {
   notImplementedGdk();
