@@ -43,4 +43,4 @@ class FormatBlockCommand : public CompositeEditCommand {
 
 }  // namespace WebCore
 
-#endif  // InsertListCommand_h
+#endif  // FormatBlockCommand_h
