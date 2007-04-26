@@ -120,7 +120,6 @@ class RenderBlock : public RenderFlow {
                               RenderObject* beforeChild);
   virtual void removeChild(RenderObject*);
 
-  virtual void repaintObjectsBeforeLayout();
   virtual void repaintOverhangingFloats(bool paintAllDescendants);
 
   virtual void setStyle(RenderStyle*);
