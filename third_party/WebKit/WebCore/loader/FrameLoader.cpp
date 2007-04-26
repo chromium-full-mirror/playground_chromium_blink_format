@@ -3477,7 +3477,8 @@ void FrameLoader::continueAfterNavigationPolicy(PolicyAction policy) {
       // Data loads without a base URL get an applewebdata URL for backward
       // compat reasons.
       bool isLoadingData =
-          activeDocumentLoader()->substituteData().isValid() &&
+          m_policydocumentLoader &&
+          m_policyDocumentLoader->substituteData().isValid() &&
           equalIgnoringCase(String(request.url().protocol()), "applewebdata");
       if (!isLoadingData && !m_client->canHandleRequest(request)) {
         handleUnimplementablePolicy(
