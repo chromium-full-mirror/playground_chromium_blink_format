@@ -61,7 +61,8 @@ class AutoTableLayout : public TableLayout {
           maxWidth(0),
           effMinWidth(0),
           effMaxWidth(0),
-          calcWidth(0) {}
+          calcWidth(0),
+          emptyCellsOnly(true) {}
     Length width;
     Length effWidth;
     int minWidth;
@@ -69,6 +70,7 @@ class AutoTableLayout : public TableLayout {
     int effMinWidth;
     int effMaxWidth;
     int calcWidth;
+    bool emptyCellsOnly;
   };
 
   Vector<Layout, 4> m_layoutStruct;
