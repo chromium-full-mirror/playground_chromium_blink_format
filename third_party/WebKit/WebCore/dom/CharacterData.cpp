@@ -68,12 +68,10 @@ void CharacterData::setData(const String& _data, ExceptionCode& ec) {
   if (str)
     str->ref();
 
-  if (!renderer() && attached()) {
+  if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
     attach();
-  }
-
-  if (renderer())
+  } else if (renderer())
     static_cast<RenderText*>(renderer())->setText(str);
 
   dispatchModifiedEvent(oldStr);
@@ -112,12 +110,10 @@ void CharacterData::appendData(const String& arg, ExceptionCode& ec) {
   str->ref();
   str->append(arg.impl());
 
-  if (!renderer() && attached()) {
+  if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
     attach();
-  }
-
-  if (renderer())
+  } else if (renderer())
     static_cast<RenderText*>(renderer())
         ->setTextWithOffset(str, oldStr->length(), 0);
 
@@ -138,12 +134,10 @@ void CharacterData::insertData(const unsigned offset,
   str->ref();
   str->insert(arg.impl(), offset);
 
-  if (!renderer() && attached()) {
+  if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
     attach();
-  }
-
-  if (renderer())
+  } else if (renderer())
     static_cast<RenderText*>(renderer())->setTextWithOffset(str, offset, 0);
 
   dispatchModifiedEvent(oldStr);
@@ -166,7 +160,11 @@ void CharacterData::deleteData(const unsigned offset,
   str = str->copy();
   str->ref();
   str->remove(offset, count);
-  if (renderer())
+
+  if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
+    detach();
+    attach();
+  } else if (renderer())
     static_cast<RenderText*>(renderer())->setTextWithOffset(str, offset, count);
 
   dispatchModifiedEvent(oldStr);
@@ -198,12 +196,10 @@ void CharacterData::replaceData(const unsigned offset,
   str->remove(offset, realCount);
   str->insert(arg.impl(), offset);
 
-  if (!renderer() && attached()) {
+  if ((!renderer() || !rendererIsNeeded(renderer()->style())) && attached()) {
     detach();
     attach();
-  }
-
-  if (renderer())
+  } else if (renderer())
     static_cast<RenderText*>(renderer())->setTextWithOffset(str, offset, count);
 
   dispatchModifiedEvent(oldStr);

@@ -210,7 +210,9 @@ static CounterNode* counter(RenderObject* object,
 }
 
 RenderCounter::RenderCounter(Document* node, const CounterContent& counter)
-    : RenderText(node, 0), m_counter(counter), m_counterNode(0) {}
+    : RenderText(node, StringImpl::empty()),
+      m_counter(counter),
+      m_counterNode(0) {}
 
 const char* RenderCounter::renderName() const {
   return "RenderCounter";
