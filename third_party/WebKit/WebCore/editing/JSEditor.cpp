@@ -616,7 +616,7 @@ CommandMap* createCommandDictionary() {
        {execBold, enabledAnyRichlyEditableSelection, stateBold, valueNull}},
       {"Copy", {execCopy, enabledCopy, stateNone, valueNull}},
       {"CreateLink",
-       {execCreateLink, enabledAnyRichlyEditableRangeSelection, stateNone,
+       {execCreateLink, enabledAnyRichlyEditableSelection, stateNone,
         valueNull}},
       {"Cut",
        {execCut, enabledAnyEditableRangeSelection, stateNone, valueNull}},
