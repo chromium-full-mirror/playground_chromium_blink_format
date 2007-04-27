@@ -978,7 +978,12 @@ inline XMLTokenizer* getTokenizer(void* closure) {
 // Otherwise libxml seems to call all the SAX callbacks twice for any replaced
 // entity.
 static inline bool hackAroundLibXMLEntityBug(void* closure) {
+#if LIBXML_VERSION >= 20627
+  // This bug has been fixed in libxml 2.6.27.
+  return false;
+#else
   return static_cast<xmlParserCtxtPtr>(closure)->node;
+#endif
 }
 
 static void startElementNsHandler(void* closure,
