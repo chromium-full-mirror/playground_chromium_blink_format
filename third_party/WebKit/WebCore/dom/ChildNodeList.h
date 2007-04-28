@@ -36,6 +36,8 @@ class ChildNodeList : public NodeList {
   virtual unsigned length() const;
   virtual Node* item(unsigned index) const;
 
+  virtual void rootNodeChildrenChanged();
+
  protected:
   virtual bool nodeMatches(Node* testNode) const;
 };

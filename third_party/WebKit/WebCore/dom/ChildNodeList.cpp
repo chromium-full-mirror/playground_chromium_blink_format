@@ -100,4 +100,10 @@ Node* ChildNodeList::item(unsigned index) const {
 bool ChildNodeList::nodeMatches(Node* testNode) const {
   return testNode->parentNode() == m_rootNode;
 }
+
+void ChildNodeList::rootNodeChildrenChanged() {
+  // For child node lists, the common cache is reset in
+  // Node::notifyLocalNodeListsChildrenChanged()
+  ASSERT(!m_ownsCaches);
+}
 }
