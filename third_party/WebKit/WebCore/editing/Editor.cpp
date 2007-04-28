@@ -598,7 +598,7 @@ bool Editor::canDecreaseSelectionListLevel() {
 
 PassRefPtr<Node> Editor::increaseSelectionListLevel() {
   if (!canEditRichly() || m_frame->selectionController()->isNone())
-    return nil;
+    return 0;
 
   RefPtr<Node> newList =
       IncreaseSelectionListLevelCommand::increaseSelectionListLevel(
@@ -609,7 +609,7 @@ PassRefPtr<Node> Editor::increaseSelectionListLevel() {
 
 PassRefPtr<Node> Editor::increaseSelectionListLevelOrdered() {
   if (!canEditRichly() || m_frame->selectionController()->isNone())
-    return nil;
+    return 0;
 
   PassRefPtr<Node> newList =
       IncreaseSelectionListLevelCommand::increaseSelectionListLevelOrdered(
@@ -620,7 +620,7 @@ PassRefPtr<Node> Editor::increaseSelectionListLevelOrdered() {
 
 PassRefPtr<Node> Editor::increaseSelectionListLevelUnordered() {
   if (!canEditRichly() || m_frame->selectionController()->isNone())
-    return nil;
+    return 0;
 
   PassRefPtr<Node> newList =
       IncreaseSelectionListLevelCommand::increaseSelectionListLevelUnordered(
