@@ -84,6 +84,12 @@ typedef void (*WebDidFinishLoadingFromDataSourceFunc)(id,
                                                       WebView*,
                                                       id,
                                                       WebDataSource*);
+typedef void (*WebDidFailLoadingWithErrorFromDataSourceFunc)(id,
+                                                             SEL,
+                                                             WebView*,
+                                                             id,
+                                                             NSError*,
+                                                             WebDataSource*);
 typedef void (*WebDidLoadResourceFromMemoryCacheFunc)(id,
                                                       SEL,
                                                       WebView*,
@@ -104,6 +110,7 @@ typedef struct _WebResourceDelegateImplementationCache {
   uint delegateImplementsDidReceiveResponse : 1;
   uint delegateImplementsDidReceiveContentLength : 1;
   uint delegateImplementsDidFinishLoadingFromDataSource : 1;
+  uint delegateImplementsDidFailLoadingWithErrorFromDataSource : 1;
   uint delegateImplementsWillSendRequest : 1;
   uint delegateImplementsIdentifierForRequest : 1;
   uint delegateImplementsDidLoadResourceFromMemoryCache : 1;
@@ -117,6 +124,8 @@ typedef struct _WebResourceDelegateImplementationCache {
   WebDidReceiveResponseFunc didReceiveResponseFunc;
   WebDidReceiveContentLengthFunc didReceiveContentLengthFunc;
   WebDidFinishLoadingFromDataSourceFunc didFinishLoadingFromDataSourceFunc;
+  WebDidFailLoadingWithErrorFromDataSourceFunc
+      didFailLoadingWithErrorFromDataSourceFunc;
   WebDidLoadResourceFromMemoryCacheFunc didLoadResourceFromMemoryCacheFunc;
   WebWillCacheResponseFunc willCacheResponseFunc;
 } WebResourceDelegateImplementationCache;
@@ -352,9 +361,6 @@ backforward list.
 - (NSDictionary*)_dashboardRegions;
 
 - (void)_setDashboardBehavior:(WebDashboardBehavior)behavior to:(BOOL)flag;
-- (void)handleAuthenticationForResource:(id)identifier
-                              challenge:(NSURLAuthenticationChallenge*)challenge
-                         fromDataSource:(WebDataSource*)dataSource;
 - (BOOL)_dashboardBehavior:(WebDashboardBehavior)behavior;
 
 + (void)_setShouldUseFontSmoothing:(BOOL)f;
