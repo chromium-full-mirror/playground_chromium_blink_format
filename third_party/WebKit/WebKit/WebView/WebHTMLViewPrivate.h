@@ -112,6 +112,8 @@
 // SPI's for Mail.
 - (NSImage*)_selectionDraggingImage;
 - (NSRect)_selectionDraggingRect;
+- (DOMNode*)_insertOrderedList;
+- (DOMNode*)_insertUnorderedList;
 - (BOOL)_canIncreaseSelectionListLevel;
 - (BOOL)_canDecreaseSelectionListLevel;
 - (DOMNode*)_increaseSelectionListLevel;

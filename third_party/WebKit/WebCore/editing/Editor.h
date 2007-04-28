@@ -113,6 +113,14 @@ class Editor {
 
   Frame::TriState selectionUnorderedListState() const;
   Frame::TriState selectionOrderedListState() const;
+  PassRefPtr<Node> insertOrderedList();
+  PassRefPtr<Node> insertUnorderedList();
+  bool canIncreaseSelectionListLevel();
+  bool canDecreaseSelectionListLevel();
+  PassRefPtr<Node> increaseSelectionListLevel();
+  PassRefPtr<Node> increaseSelectionListLevelOrdered();
+  PassRefPtr<Node> increaseSelectionListLevelUnordered();
+  void decreaseSelectionListLevel();
 
   void removeFormattingAndStyle();
 

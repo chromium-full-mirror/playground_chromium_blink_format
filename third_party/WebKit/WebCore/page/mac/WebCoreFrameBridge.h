@@ -265,13 +265,6 @@ rangeByAlteringCurrentSelection:
                selectReplacement:(BOOL)selectReplacement
                     smartReplace:(BOOL)smartReplace;
 
-- (bool)canIncreaseSelectionListLevel;
-- (bool)canDecreaseSelectionListLevel;
-- (DOMNode*)increaseSelectionListLevel;
-- (DOMNode*)increaseSelectionListLevelOrdered;
-- (DOMNode*)increaseSelectionListLevelUnordered;
-- (void)decreaseSelectionListLevel;
-
 - (void)insertParagraphSeparatorInQuotedContent;
 
 - (void)setSelectionToDragCaret;
