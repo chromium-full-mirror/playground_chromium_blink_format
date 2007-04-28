@@ -885,8 +885,10 @@ bool EventHandler::handleMouseDoubleClickEvent(
   MouseEventWithHitTestResults mev =
       prepareMouseEvent(HitTestRequest(false, true), mouseEvent);
   Frame* subframe = subframeForTargetNode(mev.targetNode());
-  if (subframe && passMousePressEventToSubframe(mev, subframe))
+  if (subframe && passMousePressEventToSubframe(mev, subframe)) {
+    m_capturingMouseEventsNode = 0;
     return true;
+  }
 
   m_clickCount = mouseEvent.clickCount();
   bool swallowMouseUpEvent = dispatchMouseEvent(
