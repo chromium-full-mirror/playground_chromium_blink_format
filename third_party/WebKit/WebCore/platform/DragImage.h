@@ -27,6 +27,7 @@
 #define DragImage_h
 
 #include "IntSize.h"
+#include "FloatSize.h"
 
 #if PLATFORM(MAC)
 #include <wtf/RetainPtr.h>
@@ -70,8 +71,10 @@ IntSize dragImageSize(DragImageRef);
 // they should release the input image.  As a corollary these methods don't
 // guarantee
 // the input image ref will still be valid after they have been called
-DragImageRef fitDragImageToMaxSize(DragImageRef image, const IntSize& size);
-DragImageRef scaleDragImage(DragImageRef, float);
+DragImageRef fitDragImageToMaxSize(DragImageRef image,
+                                   const IntSize& srcSize,
+                                   const IntSize& size);
+DragImageRef scaleDragImage(DragImageRef, FloatSize scale);
 DragImageRef dissolveDragImageToFraction(DragImageRef image, float delta);
 
 DragImageRef createDragImageFromImage(Image*);

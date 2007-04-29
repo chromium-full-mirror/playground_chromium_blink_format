@@ -716,7 +716,8 @@ void DragController::doImageDrag(Element* element,
     IntSize originalSize = rect.size();
     origin = rect.location();
 
-    dragImage = fitDragImageToMaxSize(dragImage, maxDragImageSize());
+    dragImage =
+        fitDragImageToMaxSize(dragImage, rect.size(), maxDragImageSize());
     dragImage = dissolveDragImageToFraction(dragImage, DragImageAlpha);
     IntSize newSize = dragImageSize(dragImage);
 
