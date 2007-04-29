@@ -283,7 +283,7 @@ static void clearSelectionIfNeeded(Frame* frame, Node* newFocusedNode) {
 DeprecatedPtrList<Document>* Document::changedDocuments = 0;
 
 // FrameView might be 0
-Document::Document(DOMImplementation* impl, FrameView* v)
+Document::Document(DOMImplementation* impl, Frame* frame)
     : ContainerNode(0),
       m_implementation(impl),
       m_domtree_version(0),
@@ -328,12 +328,13 @@ Document::Document(DOMImplementation* impl, FrameView* v)
 
   m_printing = false;
 
-  m_view = v;
+  m_frame = frame;
   m_renderArena = 0;
 
   m_axObjectCache = 0;
 
-  m_docLoader = new DocLoader(v ? v->frame() : 0, this);
+  // FIXME: DocLoader probably no longer needs the frame argument
+  m_docLoader = new DocLoader(frame, this);
 
   visuallyOrdered = false;
   m_bParsing = false;
@@ -913,11 +914,11 @@ Node::NodeType Document::nodeType() const {
 }
 
 FrameView* Document::view() const {
-  return m_view;
+  return m_frame ? m_frame->view() : 0;
 }
 
 Frame* Document::frame() const {
-  return m_view ? m_view->frame() : 0;
+  return m_frame;
 }
 
 Page* Document::page() const {
@@ -995,8 +996,8 @@ void Document::recalcStyle(StyleChange change) {
 
     FontDescription fontDescription;
     fontDescription.setUsePrinterFont(printing());
-    if (m_view) {
-      const Settings* settings = m_view->frame()->settings();
+    if (Frame* f = frame()) {
+      const Settings* settings = f->settings();
       if (printing() && !settings->shouldPrintBackgrounds())
         _style->setForceBackgroundsToWhite(true);
       const AtomicString& stdfont = settings->standardFontFamily();
@@ -1030,8 +1031,8 @@ void Document::recalcStyle(StyleChange change) {
     if (change >= Inherit || n->hasChangedChild() || n->changed())
       n->recalcStyle(change);
 
-  if (changed() && m_view)
-    m_view->layout();
+  if (changed() && view())
+    view()->layout();
 
 bail_out:
   setChanged(false);
@@ -1072,9 +1073,9 @@ void Document::updateLayout() {
   updateRendering();
 
   // Only do a layout if changes have occurred that make it necessary.
-  if (m_view && renderer() &&
-      (m_view->layoutPending() || renderer()->needsLayout()))
-    m_view->layout();
+  FrameView* v = view();
+  if (v && renderer() && (v->layoutPending() || renderer()->needsLayout()))
+    v->layout();
 }
 
 // FIXME: This is a bad idea and needs to be removed eventually.
@@ -1118,7 +1119,7 @@ void Document::attach() {
     m_renderArena = new RenderArena();
 
   // Create the rendering tree
-  setRenderer(new (m_renderArena) RenderView(this, m_view));
+  setRenderer(new (m_renderArena) RenderView(this, view()));
 
   recalcStyle(Force);
 
@@ -1157,7 +1158,8 @@ void Document::detach() {
   if (render)
     render->destroy();
 
-  m_view = 0;
+  // FIXME: is this needed or desirable?
+  m_frame = 0;
 
   if (m_renderArena) {
     delete m_renderArena;
@@ -1280,7 +1282,8 @@ void Document::updateSelection() {
 }
 
 Tokenizer* Document::createTokenizer() {
-  return new XMLTokenizer(this, m_view);
+  // FIXME: this should probably pass the frame instead
+  return new XMLTokenizer(this, view());
 }
 
 void Document::open() {
@@ -2112,7 +2115,7 @@ void Document::recalcStyleSelector() {
   // Create a new style selector
   delete m_styleSelector;
   String usersheet = m_usersheet;
-  if (m_view && m_view->mediaType() == "print")
+  if (view() && view()->mediaType() == "print")
     usersheet += m_printSheet;
   m_styleSelector = new CSSStyleSelector(this, usersheet, m_styleSheets.get(),
                                          !inCompatMode());
@@ -2704,8 +2707,8 @@ void Document::setInPageCache(bool flag) {
   if (flag) {
     ASSERT(m_savedRenderer == 0);
     m_savedRenderer = renderer();
-    if (m_view)
-      m_view->resetScrollbars();
+    if (FrameView* v = view())
+      v->resetScrollbars();
   } else {
     ASSERT(renderer() == 0 || renderer() == m_savedRenderer);
     ASSERT(m_renderArena);
@@ -3252,7 +3255,7 @@ void Document::applyXSLTransform(ProcessingInstruction* pi) {
   // FIXME: If the transform failed we should probably report an error (like
   // Mozilla does).
   processor->createDocumentFromSource(newSource, resultEncoding, resultMIMEType,
-                                      this, view());
+                                      this, frame());
 }
 
 #endif

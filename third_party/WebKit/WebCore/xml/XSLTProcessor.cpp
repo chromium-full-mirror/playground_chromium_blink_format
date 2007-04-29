@@ -203,27 +203,27 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     const DeprecatedString& sourceEncoding,
     const DeprecatedString& sourceMIMEType,
     Node* sourceNode,
-    FrameView* view) {
+    Frame* frame) {
   RefPtr<Document> ownerDocument = sourceNode->document();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
   String documentSource = sourceString;
 
   RefPtr<Document> result;
-  if (sourceMIMEType == "text/html")
-    result = ownerDocument->implementation()->createHTMLDocument(view);
-  else {
-    result = ownerDocument->implementation()->createDocument(view);
-    if (sourceMIMEType == "text/plain")
-      transformTextStringToXHTMLDocumentString(documentSource);
-  }
+  if (sourceMIMEType == "text/plain") {
+    result = ownerDocument->implementation()->createDocument(frame);
+    transformTextStringToXHTMLDocumentString(documentSource);
+  } else
+    result = ownerDocument->implementation()->createDocument(sourceMIMEType,
+                                                             frame, false);
 
   // Before parsing, we need to save & detach the old document and get the new
   // document
   // in place. We have to do this only if we're rendering the result document.
-  if (view) {
-    view->clear();
-    result->setTransformSourceDocument(view->frame()->document());
-    view->frame()->setDocument(result.get());
+  if (frame) {
+    if (FrameView* view = frame->view())
+      view->clear();
+    result->setTransformSourceDocument(frame->document());
+    frame->setDocument(result.get());
   }
 
   result->open();
@@ -242,8 +242,8 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
 
   result->write(documentSource);
   result->finishParsing();
-  if (view)
-    view->frame()->loader()->checkCompleted();
+  if (frame)
+    frame->loader()->checkCompleted();
   else
     result->close();  // FIXME: Even viewless docs can load subresources. onload
                       // will fire too early.
@@ -398,7 +398,7 @@ RefPtr<Document> XSLTProcessor::transformToDocument(Node* sourceNode) {
                          resultEncoding))
     return 0;
   return createDocumentFromSource(resultString, resultEncoding, resultMIMEType,
-                                  sourceNode);
+                                  sourceNode, 0);
 }
 
 RefPtr<DocumentFragment> XSLTProcessor::transformToFragment(

@@ -34,7 +34,7 @@ class DOMImplementation;
 
 class SVGDocument : public Document {
  public:
-  SVGDocument(DOMImplementation*, FrameView*);
+  SVGDocument(DOMImplementation*, Frame*);
   virtual ~SVGDocument();
 
   virtual bool isSVGDocument() const { return true; }

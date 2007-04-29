@@ -37,8 +37,8 @@ using namespace HTMLNames;
 
 HTMLViewSourceDocument::HTMLViewSourceDocument(
     DOMImplementation* implementation,
-    FrameView* v)
-    : HTMLDocument(implementation, v), m_current(0) {}
+    Frame* frame)
+    : HTMLDocument(implementation, frame), m_current(0) {}
 
 Tokenizer* HTMLViewSourceDocument::createTokenizer() {
   return new HTMLTokenizer(this);
