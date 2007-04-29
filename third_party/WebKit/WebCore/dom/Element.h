@@ -1,11 +1,9 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -27,22 +25,21 @@
 #ifndef Element_h
 #define Element_h
 
-#include "Attr.h"
+#include "ContainerNode.h"
+#include "QualifiedName.h"
 #include "ScrollTypes.h"
 #include "Timer.h"
 
 namespace WebCore {
 
 class AtomicStringList;
+class Attr;
 class Attribute;
+class CSSStyleDeclaration;
+class ElementRareData;
+class IntSize;
 
 class Element : public ContainerNode {
-  friend class Document;
-  friend class NamedAttrMap;
-  friend class Attr;
-  friend class Node;
-  friend class CSSStyleSelector;
-
  public:
   Element(const QualifiedName&, Document*);
   ~Element();
@@ -50,12 +47,10 @@ class Element : public ContainerNode {
   // Used to quickly determine whether or not an element has a given CSS class.
   virtual const AtomicStringList* getClassList() const;
   const AtomicString& getIDAttribute() const;
-  bool hasAttribute(const QualifiedName& name) const;
-  const AtomicString& getAttribute(const QualifiedName& name) const;
-  void setAttribute(const QualifiedName& name,
-                    StringImpl* value,
-                    ExceptionCode&);
-  void removeAttribute(const QualifiedName& name, ExceptionCode&);
+  bool hasAttribute(const QualifiedName&) const;
+  const AtomicString& getAttribute(const QualifiedName&) const;
+  void setAttribute(const QualifiedName&, StringImpl* value, ExceptionCode&);
+  void removeAttribute(const QualifiedName&, ExceptionCode&);
 
   bool hasAttributes() const;
 
@@ -96,7 +91,7 @@ class Element : public ContainerNode {
   int scrollWidth();
   int scrollHeight();
 
-  void removeAttribute(const String& name, ExceptionCode& ec);
+  void removeAttribute(const String& name, ExceptionCode&);
   void removeAttributeNS(const String& namespaceURI,
                          const String& localName,
                          ExceptionCode&);
@@ -105,9 +100,7 @@ class Element : public ContainerNode {
   PassRefPtr<Attr> getAttributeNodeNS(const String& namespaceURI,
                                       const String& localName);
   PassRefPtr<Attr> setAttributeNode(Attr*, ExceptionCode&);
-  PassRefPtr<Attr> setAttributeNodeNS(Attr* newAttr, ExceptionCode& ec) {
-    return setAttributeNode(newAttr, ec);
-  }
+  PassRefPtr<Attr> setAttributeNodeNS(Attr*, ExceptionCode&);
   PassRefPtr<Attr> removeAttributeNode(Attr*, ExceptionCode&);
 
   virtual CSSStyleDeclaration* style();
@@ -148,13 +141,13 @@ class Element : public ContainerNode {
   String nodeNamePreservingCase() const;
 
   // convenience methods which ignore exceptions
-  void setAttribute(const QualifiedName& name, const String& value);
+  void setAttribute(const QualifiedName&, const String& value);
 
   virtual NamedAttrMap* attributes() const;
   NamedAttrMap* attributes(bool readonly) const;
 
   // This method is called whenever an attribute is added, changed or removed.
-  virtual void attributeChanged(Attribute* attr, bool preserveDecls = false) {}
+  virtual void attributeChanged(Attribute*, bool preserveDecls = false) {}
 
   // not part of the DOM
   void setAttributeMap(NamedAttrMap*);
@@ -172,14 +165,14 @@ class Element : public ContainerNode {
   virtual Attribute* createAttribute(const QualifiedName& name,
                                      StringImpl* value);
 
-  void dispatchAttrRemovalEvent(Attribute* attr);
-  void dispatchAttrAdditionEvent(Attribute* attr);
+  void dispatchAttrRemovalEvent(Attribute*);
+  void dispatchAttrAdditionEvent(Attribute*);
 
   virtual void accessKeyAction(bool sendToAnyEvent) {}
 
   virtual String toString() const;
 
-  virtual bool isURLAttribute(Attribute* attr) const;
+  virtual bool isURLAttribute(Attribute*) const;
   virtual String target() const { return String(); }
 
   virtual void focus(bool restorePreviousSelection = true);
@@ -193,13 +186,13 @@ class Element : public ContainerNode {
   }
 
 #ifndef NDEBUG
-  virtual void dump(TextStream* stream, DeprecatedString ind = "") const;
+  virtual void dump(TextStream*, DeprecatedString ind = "") const;
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 
   Node* insertAdjacentElement(const String& where,
                               Node* newChild,
-                              int& exception);
+                              ExceptionCode&);
   bool contains(const Node*) const;
 
   String innerText() const;
@@ -207,12 +200,19 @@ class Element : public ContainerNode {
 
   virtual String title() const;
 
- protected:
-  virtual void createAttributeMap() const;
   String openTagStartToString() const;
 
- private:
   void updateId(const AtomicString& oldId, const AtomicString& newId);
+
+  IntSize minimumSizeForResizing() const;
+  void setMinimumSizeForResizing(const IntSize&);
+
+ private:
+  ElementRareData* rareData();
+  const ElementRareData* rareData() const;
+  ElementRareData* createRareData();
+
+  virtual void createAttributeMap() const;
 
   virtual void updateStyleAttributeIfNeeded() const {}
 
@@ -221,8 +221,10 @@ class Element : public ContainerNode {
   Timer<Element> m_updateFocusAppearanceTimer;
   bool m_needsFocusAppearanceUpdate;
 
- protected:  // member variables
+ protected:
   mutable RefPtr<NamedAttrMap> namedAttrMap;
+
+ private:
   QualifiedName m_tagName;
 };
 

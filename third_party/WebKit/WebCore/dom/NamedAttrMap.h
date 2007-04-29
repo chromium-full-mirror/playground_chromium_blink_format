@@ -27,7 +27,7 @@
 #ifndef NamedAttrMap_h
 #define NamedAttrMap_h
 
-#include "Element.h"
+#include "Attribute.h"
 #include "NamedNodeMap.h"
 
 #ifdef __OBJC__
@@ -41,7 +41,7 @@ class NamedAttrMap : public NamedNodeMap {
   friend class Element;
 
  public:
-  NamedAttrMap(Element* e);
+  NamedAttrMap(Element*);
   virtual ~NamedAttrMap();
   NamedAttrMap(const NamedAttrMap&);
   NamedAttrMap& operator=(const NamedAttrMap& other);
@@ -71,9 +71,7 @@ class NamedAttrMap : public NamedNodeMap {
   }
   Attribute* getAttributeItem(const QualifiedName& name) const;
   Attribute* getAttributeItem(const String& name) const;
-  virtual bool isReadOnlyNode() {
-    return element ? element->isReadOnlyNode() : false;
-  }
+  virtual bool isReadOnlyNode();
 
   // used during parsing: only inserts if not already there
   // no error checking!

@@ -1,6 +1,4 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
@@ -61,7 +59,7 @@ String HTMLElement::nodeName() const {
   // chars that does not have to copy
   // the string on a hit in the hash.
   if (document()->isHTMLDocument())
-    return m_tagName.localName().impl()->upper();
+    return tagQName().localName().impl()->upper();
   return Element::nodeName();
 }
 
@@ -90,7 +88,7 @@ int HTMLElement::tagPriority() const {
 
 PassRefPtr<Node> HTMLElement::cloneNode(bool deep) {
   RefPtr<HTMLElement> clone = HTMLElementFactory::createHTMLElement(
-      m_tagName.localName(), document(), 0, false);
+      tagQName().localName(), document(), 0, false);
   if (!clone)
     return 0;
 
