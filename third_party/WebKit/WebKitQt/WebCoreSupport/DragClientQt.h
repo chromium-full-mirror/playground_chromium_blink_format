@@ -24,11 +24,12 @@
  */
 
 #include "DragClient.h"
-
+class QWebPage;
 namespace WebCore {
 
 class DragClientQt : public DragClient {
  public:
+  DragClientQt(QWebPage* webPage) : m_webPage(webPage){};
   virtual void willPerformDragDestinationAction(DragDestinationAction,
                                                 DragData*);
   virtual WebCore::DragDestinationAction actionMaskForDrag(DragData*);
@@ -48,5 +49,6 @@ class DragClientQt : public DragClient {
                                               Frame*);
 
  private:
+  QWebPage* m_webPage;
 };
 }

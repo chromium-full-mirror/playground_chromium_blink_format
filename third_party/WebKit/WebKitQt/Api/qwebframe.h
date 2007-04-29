@@ -71,9 +71,6 @@ class QWEBKIT_EXPORT QWebFrame : public QAbstractScrollArea {
   virtual void wheelEvent(QWheelEvent*);
   virtual void keyPressEvent(QKeyEvent*);
   virtual void keyReleaseEvent(QKeyEvent*);
-  virtual void dragEnterEvent(QDragEnterEvent*);
-  virtual void dragLeaveEvent(QDragLeaveEvent*);
-  virtual void dragMoveEvent(QDragMoveEvent*);
   virtual void scrollContentsBy(int dx, int dy);
 
  private:

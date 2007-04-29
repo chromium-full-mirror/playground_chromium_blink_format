@@ -38,11 +38,13 @@ class CachedImage;
 // State available during IE's events for drag and drop and copy/paste
 class ClipboardQt : public Clipboard {
  public:
-  ClipboardQt(ClipboardAccessPolicy policy, bool forDragging);
-  ~ClipboardQt() {}
+  ClipboardQt(ClipboardAccessPolicy policy,
+              const QMimeData* readableClipboard,
+              bool forDragging);
 
-  // Is this operation a drag-drop or a copy-paste?
-  bool isForDragging() const { return m_isForDragging; }
+  // Clipboard is writable so it will create its own QMimeData object
+  ClipboardQt(ClipboardAccessPolicy policy, bool forDragging);
+  ~ClipboardQt();
 
   void clearData(const String& type);
   void clearAllData();
@@ -68,9 +70,12 @@ class ClipboardQt : public Clipboard {
 
   virtual bool hasData();
 
+  QMimeData* clipboardData() const { return m_writableData; }
+  void invalidateWritableData() { m_writableData = 0; }
+
  private:
-  bool m_isForDragging;
-  ClipboardAccessPolicy m_policy;
+  const QMimeData* m_readableData;
+  QMimeData* m_writableData;
 };
 }
 

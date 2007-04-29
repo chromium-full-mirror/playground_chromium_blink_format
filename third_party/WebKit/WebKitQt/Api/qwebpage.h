@@ -75,6 +75,11 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
 
   QUndoStack* undoStack();
 
+  virtual void dragEnterEvent(QDragEnterEvent*);
+  virtual void dragLeaveEvent(QDragLeaveEvent*);
+  virtual void dragMoveEvent(QDragMoveEvent*);
+  virtual void dropEvent(QDropEvent*);
+
  public slots:
   /**
    * Stops loading of the page, if loading.
