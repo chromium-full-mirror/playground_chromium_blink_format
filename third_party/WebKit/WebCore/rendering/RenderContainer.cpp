@@ -519,12 +519,16 @@ void RenderContainer::insertChildNode(RenderObject* child,
 void RenderContainer::layout() {
   ASSERT(needsLayout());
 
+  view()->pushLayoutState(this, IntSize(m_x, m_y));
+
   RenderObject* child = m_firstChild;
   while (child) {
     child->layoutIfNeeded();
     ASSERT(child->isRenderInline() || !child->needsLayout());
     child = child->nextSibling();
   }
+
+  view()->popLayoutState();
   setNeedsLayout(false);
 }
 

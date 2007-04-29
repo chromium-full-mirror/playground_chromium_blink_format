@@ -212,7 +212,7 @@ bool RenderObject::isDescendantOf(const RenderObject* obj) const {
 
 bool RenderObject::isRoot() const {
   return element() && element()->renderer() == this &&
-         element()->document()->documentElement() == element();
+         document()->documentElement() == element();
 }
 
 bool RenderObject::isBody() const {
@@ -2079,7 +2079,7 @@ IntRect RenderObject::absoluteClippedOverflowRect() {
 
 void RenderObject::computeAbsoluteRepaintRect(IntRect& r, bool f) {
   if (parent())
-    return parent()->computeAbsoluteRepaintRect(r, f);
+    parent()->computeAbsoluteRepaintRect(r, f);
 }
 
 void RenderObject::dirtyLinesFromChangedChild(RenderObject* child) {}
@@ -2634,8 +2634,12 @@ RenderObject* RenderObject::container() const {
   // calcAbsoluteHorizontal and
   // calcAbsoluteVertical have to use container().
   RenderObject* o = parent();
+
+  if (isText())
+    return o;
+
   EPosition pos = m_style->position();
-  if (!isText() && pos == FixedPosition) {
+  if (pos == FixedPosition) {
     // container() can be called on an object that is not in the
     // tree yet.  We don't call view() since it will assert if it
     // can't get back to the canvas.  Instead we just walk as high up
@@ -2644,7 +2648,7 @@ RenderObject* RenderObject::container() const {
     // we'll just return 0).
     while (o && o->parent())
       o = o->parent();
-  } else if (!isText() && pos == AbsolutePosition) {
+  } else if (pos == AbsolutePosition) {
     // Same goes here.  We technically just want our containing block, but
     // we may not have one if we're part of an uninstalled subtree.  We'll
     // climb as high as we can though.
@@ -3234,6 +3238,7 @@ IntRect RenderObject::absoluteOutlineBox() const {
   int x, y;
   absolutePosition(x, y);
   box.move(x, y);
+  box.move(view()->layoutDelta());
   box.inflate(style()->outlineSize());
   return box;
 }

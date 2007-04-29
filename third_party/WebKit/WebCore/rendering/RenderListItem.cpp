@@ -30,6 +30,7 @@
 #include "HTMLNames.h"
 #include "HTMLOListElement.h"
 #include "RenderListMarker.h"
+#include "RenderView.h"
 
 using namespace std;
 
@@ -196,6 +197,9 @@ void RenderListItem::updateMarkerLocation() {
     }
 
     if (markerPar != lineBoxParent || m_marker->prefWidthsDirty()) {
+      // Removing and adding the marker can trigger repainting in
+      // containers other than ourselves, so we need to disable LayoutState.
+      view()->disableLayoutState();
       updateFirstLetter();
       m_marker->remove();
       if (!lineBoxParent)
@@ -203,6 +207,7 @@ void RenderListItem::updateMarkerLocation() {
       lineBoxParent->addChild(m_marker, firstNonMarkerChild(lineBoxParent));
       if (m_marker->prefWidthsDirty())
         m_marker->calcPrefWidths();
+      view()->enableLayoutState();
     }
   }
 }

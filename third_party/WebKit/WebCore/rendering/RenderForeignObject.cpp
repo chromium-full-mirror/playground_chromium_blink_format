@@ -84,6 +84,9 @@ bool RenderForeignObject::requiresLayer() {
 void RenderForeignObject::layout() {
   ASSERT(needsLayout());
 
+  // Arbitrary affine transforms are incompatible with LayoutState.
+  view()->disableLayoutState();
+
   IntRect oldBounds;
   IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
@@ -99,6 +102,7 @@ void RenderForeignObject::layout() {
   if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 
+  view()->enableLayoutState();
   setNeedsLayout(false);
 }
 

@@ -510,25 +510,22 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
                                                     // can
     return;  // cause us to come in here.  Just bail.
 
-  if (!relayoutChildren && posChildNeedsLayout() && !normalChildNeedsLayout() &&
-      !selfNeedsLayout()) {
-    // All we have to is lay out our positioned objects.
-    layoutPositionedObjects(false);
-    if (hasOverflowClip())
-      m_layer->updateScrollInfoAfterLayout();
-    setNeedsLayout(false);
+  if (!relayoutChildren && layoutOnlyPositionedObjects())
     return;
-  }
 
   IntRect oldBounds;
   IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
     oldBounds = absoluteClippedOverflowRect();
-    oldBounds.move(view()->layoutDelta());
     oldOutlineBox = absoluteOutlineBox();
-    oldOutlineBox.move(view()->layoutDelta());
   }
+
+  bool hadColumns = m_hasColumns;
+  if (!hadColumns)
+    view()->pushLayoutState(this, IntSize(xPos(), yPos()));
+  else
+    view()->disableLayoutState();
 
   int oldWidth = m_width;
   int oldColumnWidth = desiredColumnWidth();
@@ -645,6 +642,11 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   // width/height.
   m_overflowWidth = max(m_overflowWidth, m_width);
   m_overflowHeight = max(m_overflowHeight, m_height);
+
+  if (!hadColumns)
+    view()->popLayoutState();
+  else
+    view()->enableLayoutState();
 
   // Update our scroll information if we're overflow:auto/scroll/hidden now that
   // we know if
@@ -1389,6 +1391,29 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   handleBottomOfBlock(top, bottom, marginInfo);
 }
 
+bool RenderBlock::layoutOnlyPositionedObjects() {
+  if (!posChildNeedsLayout() || normalChildNeedsLayout() || selfNeedsLayout())
+    return false;
+
+  // All we have to is lay out our positioned objects.
+  if (!m_hasColumns)
+    view()->pushLayoutState(this, IntSize(xPos(), yPos()));
+  else
+    view()->disableLayoutState();
+
+  layoutPositionedObjects(false);
+  if (hasOverflowClip())
+    m_layer->updateScrollInfoAfterLayout();
+
+  if (!m_hasColumns)
+    view()->popLayoutState();
+  else
+    view()->enableLayoutState();
+
+  setNeedsLayout(false);
+  return true;
+}
+
 void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
   if (m_positionedObjects) {
     RenderObject* r;
@@ -1437,6 +1462,12 @@ void RenderBlock::repaintOverhangingFloats(bool paintAllDescendants) {
 
     FloatingObject* r;
     DeprecatedPtrListIterator<FloatingObject> it(*m_floatingObjects);
+
+    // FIXME: Avoid disabling LayoutState. At the very least, don't disable it
+    // for floats originating
+    // in this block. Better yet would be to push extra state for the containers
+    // of other floats.
+    view()->disableLayoutState();
     for (; (r = it.current()); ++it) {
       // Only repaint the object if it is overhanging, is not in its own layer,
       // and
@@ -1451,6 +1482,7 @@ void RenderBlock::repaintOverhangingFloats(bool paintAllDescendants) {
         r->node->repaintOverhangingFloats();
       }
     }
+    view()->enableLayoutState();
   }
 }
 
@@ -4365,6 +4397,10 @@ void RenderBlock::updateFirstLetter() {
   // If the child does not already have style, we create it here.
   if (currChild->isText() && !currChild->isBR() &&
       currChild->parent()->style()->styleType() != RenderStyle::FIRST_LETTER) {
+    // Our layout state is not valid for the repaints we are going to trigger by
+    // adding and removing children of firstLetterContainer.
+    view()->disableLayoutState();
+
     RenderText* textObj = static_cast<RenderText*>(currChild);
 
     // Create our pseudo style now that we have our firstLetterContainer
@@ -4428,6 +4464,7 @@ void RenderBlock::updateFirstLetter() {
 
       textObj->destroy();
     }
+    view()->enableLayoutState();
   }
 }
 

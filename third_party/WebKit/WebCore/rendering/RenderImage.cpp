@@ -321,9 +321,7 @@ void RenderImage::layout() {
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint) {
     oldBounds = absoluteClippedOverflowRect();
-    oldBounds.move(view()->layoutDelta());
     oldOutlineBox = absoluteOutlineBox();
-    oldOutlineBox.move(view()->layoutDelta());
   }
 
   // minimum height

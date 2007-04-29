@@ -26,6 +26,7 @@
 #include "RenderSVGContainer.h"
 
 #include "GraphicsContext.h"
+#include "RenderView.h"
 #include "SVGLength.h"
 #include "SVGMarkerElement.h"
 #include "SVGResourceClipper.h"
@@ -80,6 +81,9 @@ void RenderSVGContainer::layout() {
 
   calcViewport();
 
+  // Arbitrary affine transforms are incompatible with LayoutState.
+  view()->disableLayoutState();
+
   IntRect oldBounds;
   IntRect oldOutlineBox;
   bool checkForRepaint = checkForRepaintDuringLayout();
@@ -107,6 +111,7 @@ void RenderSVGContainer::layout() {
   if (selfNeedsLayout() && checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldOutlineBox);
 
+  view()->enableLayoutState();
   setNeedsLayout(false);
 }
 
