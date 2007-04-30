@@ -199,6 +199,12 @@ class SelectionController : Noncopyable {
 
   int xPosForVerticalArrowNavigation(EPositionType);
 
+#if PLATFORM(MAC)
+  void notifyAccessibilityForSelectionChange();
+#else
+  void notifyAccessibilityForSelectionChange(){};
+#endif
+
   Selection m_sel;
 
   IntRect m_caretRect;  // caret coordinates, size, and position

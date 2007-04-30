@@ -152,6 +152,8 @@ void SelectionController::setSelection(const Selection& s,
   m_frame->respondToChangedSelection(oldSelection, closeTyping);
   if (userTriggered)
     m_frame->revealCaret(RenderLayer::gAlignToEdgeIfNeeded);
+
+  notifyAccessibilityForSelectionChange();
 }
 
 static bool removingNodeRemovesPosition(Node* node, const Position& position) {
