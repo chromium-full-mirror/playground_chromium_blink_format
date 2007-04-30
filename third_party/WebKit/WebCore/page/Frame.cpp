@@ -1821,10 +1821,14 @@ void Frame::respondToChangedSelection(const Selection& oldSelection,
                                  endOfWord(newStart, RightWordIfOnBoundary));
 
       // When typing we check spelling elsewhere, so don't redo it here.
-      if (closeTyping && oldAdjacentWords != newAdjacentWords)
+      if (closeTyping && oldAdjacentWords != newAdjacentWords) {
         editor()->markMisspellings(oldAdjacentWords);
+        // FIXME(4859132): Check grammar of sentence sized chunks.
+        editor()->markBadGrammar(oldAdjacentWords);
+      }
 
-      // This only erases a marker in the first word of the selection.
+      // This only erases a marker in the first unit (word or sentence) of the
+      // selection.
       // Perhaps peculiar, but it matches AppKit.
       document()->removeMarkers(newAdjacentWords.toRange().get(),
                                 DocumentMarker::Spelling);
