@@ -38,11 +38,8 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLTableSectionElement::HTMLTableSectionElement(const QualifiedName& tagName,
-                                                 Document* doc,
-                                                 bool implicit)
-    : HTMLTablePartElement(tagName, doc) {
-  m_implicit = implicit;
-}
+                                                 Document* document)
+    : HTMLTablePartElement(tagName, document) {}
 
 bool HTMLTableSectionElement::checkDTD(const Node* newChild) {
   return newChild->hasTagName(trTag) || newChild->hasTagName(formTag) ||
@@ -75,8 +72,9 @@ HTMLTableSectionElement::additionalAttributeStyleDecl() {
 
 // these functions are rather slow, since we need to get the row at
 // the index... but they aren't used during usual HTML parsing anyway
-HTMLElement* HTMLTableSectionElement::insertRow(int index, ExceptionCode& ec) {
-  HTMLTableRowElement* r = 0L;
+PassRefPtr<HTMLElement> HTMLTableSectionElement::insertRow(int index,
+                                                           ExceptionCode& ec) {
+  RefPtr<HTMLTableRowElement> r;
   RefPtr<NodeList> children = childNodes();
   int numRows = children ? (int)children->length() : 0;
   if (index < -1 || index > numRows)
@@ -94,7 +92,7 @@ HTMLElement* HTMLTableSectionElement::insertRow(int index, ExceptionCode& ec) {
       insertBefore(r, n, ec);
     }
   }
-  return r;
+  return r.release();
 }
 
 void HTMLTableSectionElement::deleteRow(int index, ExceptionCode& ec) {

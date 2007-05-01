@@ -479,7 +479,7 @@ static PassRefPtr<HTMLElement> tableSectionConstructor(
     HTMLFormElement*,
     bool) {
   return new HTMLTableSectionElement(
-      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), doc, false);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), doc);
 }
 
 static PassRefPtr<HTMLElement> brConstructor(const AtomicString&,

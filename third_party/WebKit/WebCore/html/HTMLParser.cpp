@@ -579,8 +579,7 @@ bool HTMLParser::handleError(Node* n,
             if (current->hasTagName(trTag))
               e = new HTMLTableCellElement(tdTag, document);
             else if (current->hasTagName(tableTag))
-              e = new HTMLTableSectionElement(tbodyTag, document,
-                                              true);  // implicit
+              e = new HTMLTableSectionElement(tbodyTag, document);
             else
               e = new HTMLTableRowElement(document);
 
