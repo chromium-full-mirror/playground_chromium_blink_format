@@ -60,8 +60,10 @@ void RenderInline::setStyle(RenderStyle* newStyle) {
   m_lineHeight = -1;
 
   // Update pseudos for :before and :after now.
-  updatePseudoChild(RenderStyle::BEFORE);
-  updatePseudoChild(RenderStyle::AFTER);
+  if (!isAnonymous()) {
+    updateBeforeAfterContent(RenderStyle::BEFORE);
+    updateBeforeAfterContent(RenderStyle::AFTER);
+  }
 }
 
 bool RenderInline::isInlineContinuation() const {
@@ -106,11 +108,11 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
 
     // Someone may have put a <p> inside a <q>, causing a split.  When this
     // happens, the :after content
-    // has to move into the inline continuation.  Call updatePseudoChild to
-    // ensure that our :after
+    // has to move into the inline continuation.  Call updateBeforeAfterContent
+    // to ensure that our :after
     // content gets properly destroyed.
     bool isLastChild = (beforeChild == lastChild());
-    updatePseudoChild(RenderStyle::AFTER);
+    updateBeforeAfterContent(RenderStyle::AFTER);
     if (isLastChild && beforeChild != lastChild())
       beforeChild = 0;  // We destroyed the last child, so now we need to update
                         // our insertion
@@ -185,10 +187,10 @@ void RenderInline::splitInlines(RenderBlock* fromBlock,
 
       // Someone may have indirectly caused a <q> to split.  When this happens,
       // the :after content
-      // has to move into the inline continuation.  Call updatePseudoChild to
-      // ensure that the inline's :after
+      // has to move into the inline continuation.  Call
+      // updateBeforeAfterContent to ensure that the inline's :after
       // content gets properly destroyed.
-      curr->updatePseudoChild(RenderStyle::AFTER);
+      curr->updateBeforeAfterContent(RenderStyle::AFTER);
 
       // Now we need to take all of the children starting from the first child
       // *after* currChild and append them all to the clone.

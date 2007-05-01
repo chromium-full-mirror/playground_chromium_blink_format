@@ -46,7 +46,7 @@ class RenderButton : public RenderFlexibleBox {
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
 
-  virtual void updatePseudoChild(RenderStyle::PseudoId);
+  virtual void updateBeforeAfterContent(RenderStyle::PseudoId);
 
   virtual bool hasControlClip() const { return true; }
   virtual IntRect controlClipRect(int /*tx*/, int /*ty*/) const;

@@ -104,6 +104,11 @@ static inline void resetSectionPointerIfNotBefore(RenderTableSection*& ptr,
 }
 
 void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
+  // Make sure we don't append things after :after-generated content if we have
+  // it.
+  if (!beforeChild && isAfterContent(lastChild()))
+    beforeChild = lastChild();
+
   bool wrapInAnonymousSection = true;
   bool isTableElement = element() && element()->hasTagName(tableTag);
 

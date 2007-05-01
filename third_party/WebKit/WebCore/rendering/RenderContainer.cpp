@@ -238,43 +238,62 @@ void RenderContainer::removeChild(RenderObject* oldChild) {
   removeChildNode(oldChild);
 }
 
-RenderObject* RenderContainer::pseudoChild(RenderStyle::PseudoId type) const {
+RenderObject* RenderContainer::beforeAfterContainer(
+    RenderStyle::PseudoId type) {
   if (type == RenderStyle::BEFORE) {
-    RenderObject* first = firstChild();
-    while (first && first->isListMarker())
-      first = first->nextSibling();
+    RenderObject* first = this;
+    do {
+      // Skip list markers.
+      first = first->firstChild();
+      while (first && first->isListMarker())
+        first = first->nextSibling();
+    } while (first && first->isAnonymous() &&
+             first->style()->styleType() == RenderStyle::NOPSEUDO);
+    if (first && first->style()->styleType() != type)
+      return 0;
     return first;
   }
-  if (type == RenderStyle::AFTER)
-    return lastChild();
+  if (type == RenderStyle::AFTER) {
+    RenderObject* last = this;
+    do {
+      last = last->lastChild();
+    } while (last && last->isAnonymous() &&
+             last->style()->styleType() == RenderStyle::NOPSEUDO &&
+             !last->isListMarker());
+    if (last && last->style()->styleType() != type)
+      return 0;
+    return last;
+  }
 
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type) {
-  // If this is an anonymous wrapper, then parent applies its own pseudo style
-  // to it.
+void RenderContainer::updateBeforeAfterContent(RenderStyle::PseudoId type) {
+  // If this is an anonymous wrapper, then the parent applies its own
+  // pseudo-element style to it.
   if (parent() && parent()->createsAnonymousWrapper())
     return;
-  updatePseudoChildForObject(type, this);
+  updateBeforeAfterContentForContainer(type, this);
 }
 
-void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
-                                                 RenderObject* styledObject) {
+void RenderContainer::updateBeforeAfterContentForContainer(
+    RenderStyle::PseudoId type,
+    RenderContainer* styledObject) {
   // In CSS2, before/after pseudo-content cannot nest.  Check this first.
   if (style()->styleType() == RenderStyle::BEFORE ||
       style()->styleType() == RenderStyle::AFTER)
     return;
 
-  RenderStyle* pseudo = styledObject->getPseudoStyle(type);
-  RenderObject* child = pseudoChild(type);
+  RenderStyle* pseudoElementStyle = styledObject->getPseudoStyle(type);
+  RenderObject* child = beforeAfterContainer(type);
 
   // Whether or not we currently have generated content attached.
-  bool oldContentPresent = child && (child->style()->styleType() == type);
+  bool oldContentPresent = child;
 
   // Whether or not we now want generated content.
-  bool newContentWanted = pseudo && pseudo->display() != NONE;
+  bool newContentWanted =
+      pseudoElementStyle && pseudoElementStyle->display() != NONE;
 
   // For <q><p/></q>, if this object is the inline continuation of the <q>, we
   // only want to generate
@@ -295,7 +314,8 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
   // we nuke all
   // of the old generated content.
   if (!newContentWanted ||
-      (oldContentPresent && !child->style()->contentDataEquivalent(pseudo))) {
+      (oldContentPresent &&
+       !child->style()->contentDataEquivalent(pseudoElementStyle))) {
     // Nuke the child.
     if (child && child->style()->styleType() == type) {
       oldContentPresent = false;
@@ -304,12 +324,13 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
     }
   }
 
-  // If we have no pseudo-style or if the pseudo's display type is NONE, then we
+  // If we have no pseudo-element style or if the pseudo-element style's display
+  // type is NONE, then we
   // have no generated content and can now return.
   if (!newContentWanted)
     return;
 
-  if (isInlineFlow() && !pseudo->isDisplayInlineType())
+  if (isInlineFlow() && !pseudoElementStyle->isDisplayInlineType())
     // According to the CSS2 spec (the end of section 12.1), the only allowed
     // display values for the pseudo style are NONE and INLINE for inline flows.
     // FIXME: CSS2.1 lifted this restriction, but block display types will
@@ -317,14 +338,14 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
     // For now we at least relax the restriction to allow all inline types like
     // inline-block
     // and inline-table.
-    pseudo->setDisplay(INLINE);
+    pseudoElementStyle->setDisplay(INLINE);
 
   if (oldContentPresent) {
     if (child && child->style()->styleType() == type) {
       // We have generated content present still.  We want to walk this content
       // and update our
-      // style information with the new pseudo style.
-      child->setStyle(pseudo);
+      // style information with the new pseudo-element style.
+      child->setStyle(pseudoElementStyle);
 
       // Note that if we ever support additional types of generated content
       // (which should be way off
@@ -333,12 +354,12 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
            genChild = genChild->nextSibling()) {
         if (genChild->isText())
           // Generated text content is a child whose style also needs to be set
-          // to the pseudo style.
-          genChild->setStyle(pseudo);
+          // to the pseudo-element style.
+          genChild->setStyle(pseudoElementStyle);
         else {
           // Images get an empty style that inherits from the pseudo.
           RenderStyle* style = new (renderArena()) RenderStyle;
-          style->inheritFrom(pseudo);
+          style->inheritFrom(pseudoElementStyle);
           genChild->setStyle(style);
         }
       }
@@ -346,16 +367,16 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
     return;  // We've updated the generated content. That's all we needed to do.
   }
 
-  RenderObject* insertBefore = (type == RenderStyle::BEFORE) ? child : 0;
+  RenderObject* insertBefore = (type == RenderStyle::BEFORE) ? firstChild() : 0;
 
   // Generated content consists of a single container that houses multiple
   // children (specified
-  // by the content property).  This pseudo container gets the pseudo style set
-  // on it.
-  RenderObject* pseudoContainer = 0;
+  // by the content property).  This generated content container gets the
+  // pseudo-element style set on it.
+  RenderObject* generatedContentContainer = 0;
 
   // Walk our list of generated content and create render objects for each.
-  for (const ContentData* content = pseudo->contentData(); content;
+  for (const ContentData* content = pseudoElementStyle->contentData(); content;
        content = content->m_next) {
     RenderObject* renderer = 0;
     switch (content->m_type) {
@@ -364,7 +385,7 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
       case CONTENT_TEXT:
         renderer = new (renderArena()) RenderTextFragment(
             document() /* anonymous object */, content->m_content.m_text);
-        renderer->setStyle(pseudo);
+        renderer->setStyle(pseudoElementStyle);
         break;
       case CONTENT_OBJECT:
         if (CachedResource* resource = content->m_content.m_object)
@@ -372,7 +393,7 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
             RenderImage* image = new (renderArena())
                 RenderImage(document());  // anonymous object
             RenderStyle* style = new (renderArena()) RenderStyle;
-            style->inheritFrom(pseudo);
+            style->inheritFrom(pseudoElementStyle);
             image->setStyle(style);
             image->setCachedImage(static_cast<CachedImage*>(resource));
             image->setIsAnonymousImage(true);
@@ -382,23 +403,39 @@ void RenderContainer::updatePseudoChildForObject(RenderStyle::PseudoId type,
       case CONTENT_COUNTER:
         renderer = new (renderArena())
             RenderCounter(document(), *content->m_content.m_counter);
-        renderer->setStyle(pseudo);
+        renderer->setStyle(pseudoElementStyle);
         break;
     }
 
     if (renderer) {
-      if (!pseudoContainer)
-        pseudoContainer = RenderFlow::createAnonymousFlow(
-            document(), pseudo);  // anonymous box
-      pseudoContainer->addChild(renderer);
+      if (!generatedContentContainer) {
+        // Make a generated box that might be any display type now that we are
+        // able to drill down into children
+        // to find the original content properly.
+        generatedContentContainer =
+            RenderObject::createObject(document(), pseudoElementStyle);
+        generatedContentContainer->setStyle(pseudoElementStyle);
+      }
+      generatedContentContainer->addChild(renderer);
     }
   }
 
   // Add the pseudo after we've installed all our content so that addChild will
   // be able to find the text
   // inside the inline for e.g., first-letter styling.
-  if (pseudoContainer)
-    addChild(pseudoContainer, insertBefore);
+  if (generatedContentContainer)
+    addChild(generatedContentContainer, insertBefore);
+}
+
+bool RenderContainer::isAfterContent(RenderObject* child) const {
+  if (!child)
+    return false;
+  if (child->style()->styleType() != RenderStyle::AFTER)
+    return false;
+  // Text nodes don't have their own styles, so ignore the style on a text node.
+  if (child->isText() && !child->isBR())
+    return false;
+  return true;
 }
 
 void RenderContainer::appendChildNode(RenderObject* newChild, bool fullAppend) {
