@@ -652,10 +652,6 @@ class RenderObject : public CachedResourceClient {
     return clientHeight() - paddingTop() - paddingBottom();
   }
 
-  // intrinsic extend of replaced elements. undefined otherwise
-  virtual int intrinsicWidth() const { return 0; }
-  virtual int intrinsicHeight() const { return 0; }
-
   // used by flexible boxes to impose a flexed width/height override
   virtual int overrideSize() const { return 0; }
   virtual int overrideWidth() const { return 0; }

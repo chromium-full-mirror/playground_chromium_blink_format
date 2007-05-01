@@ -133,6 +133,8 @@ class RenderBox : public RenderObject {
            !isFloatingOrPositioned() && (isRoot() || isBody());
   }
 
+  virtual IntSize intrinsicSize() const { return IntSize(); }
+
   // Whether or not the element shrinks to its intrinsic width (rather than
   // filling the width
   // of a containing block).  HTML4 buttons, <select>s, <input>s, legends, and

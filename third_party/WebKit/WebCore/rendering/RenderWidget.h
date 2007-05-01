@@ -59,8 +59,6 @@ class RenderWidget : public RenderReplaced {
 
   virtual void setWidget(Widget*);
 
-  using RenderReplaced::element;
-
  private:
   void resizeWidget(Widget*, int w, int h);
 
