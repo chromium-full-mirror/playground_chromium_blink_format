@@ -53,6 +53,8 @@ class RenderButton : public RenderFlexibleBox {
 
   void setText(const String&);
 
+  virtual bool canHaveChildren() const;
+
  protected:
   virtual bool hasLineIfEmpty() const { return true; }
 
