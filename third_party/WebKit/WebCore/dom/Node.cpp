@@ -137,9 +137,8 @@ Node::Node(Document* doc)
       m_tabIndex(0),
       m_hasId(false),
       m_hasClass(false),
-      m_hasStyle(false),
       m_attached(false),
-      m_changed(false),
+      m_styleChange(NoStyleChange),
       m_hasChangedChild(false),
       m_inDocument(false),
       m_isLink(false),
@@ -362,17 +361,17 @@ IntRect Node::getRect() const {
   return IntRect();
 }
 
-void Node::setChanged(bool b) {
-  if (b && !attached())  // changed compared to what?
+void Node::setChanged(StyleChangeType changeType) {
+  if ((changeType != NoStyleChange) &&
+      !attached())  // changed compared to what?
     return;
 
-  m_changed = b;
-  if (b) {
-    Node* p = parentNode();
-    while (p) {
+  if (!(changeType == InlineStyleChange && m_styleChange == FullStyleChange))
+    m_styleChange = changeType;
+
+  if (m_styleChange != NoStyleChange) {
+    for (Node* p = parentNode(); p; p = p->parentNode())
       p->setHasChangedChild(true);
-      p = p->parentNode();
-    }
     document()->setDocumentChanged(true);
   }
 }
@@ -776,9 +775,6 @@ void Node::dump(TextStream* stream, DeprecatedString ind) const {
   }
   if (m_hasClass) {
     *stream << " hasClass";
-  }
-  if (m_hasStyle) {
-    *stream << " hasStyle";
   }
   if (m_focused) {
     *stream << " focused";

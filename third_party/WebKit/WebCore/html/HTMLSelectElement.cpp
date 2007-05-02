@@ -293,7 +293,7 @@ void HTMLSelectElement::restoreState(const String& state) {
       static_cast<HTMLOptionElement*>(items[i])->setSelectedState(state[i] ==
                                                                   'X');
 
-  setChanged(true);
+  setChanged();
 }
 
 bool HTMLSelectElement::insertBefore(PassRefPtr<Node> newChild,
@@ -562,7 +562,7 @@ void HTMLSelectElement::reset() {
   if (!optionSelected && firstOption && usesMenuList())
     firstOption->setSelectedState(true);
 
-  setChanged(true);
+  setChanged();
 }
 
 void HTMLSelectElement::dispatchFocusEvent() {

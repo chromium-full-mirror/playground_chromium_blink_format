@@ -123,7 +123,7 @@ void SVGTimer::applyAnimations(double elapsedSeconds,
        ++targetIterator) {
     SVGElement* key = targetIterator->first;
     if (key && key->isStyled())
-      static_cast<SVGStyledElement*>(key)->setChanged(true);
+      static_cast<SVGStyledElement*>(key)->setChanged();
   }
 }
 

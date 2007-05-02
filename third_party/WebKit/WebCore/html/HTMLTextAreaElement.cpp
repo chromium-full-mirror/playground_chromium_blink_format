@@ -267,7 +267,7 @@ void HTMLTextAreaElement::setValue(const String& value) {
     ASSERT(cachedSelEnd != -1);
     setSelectionRange(cachedSelStart, cachedSelStart);
   }
-  setChanged(true);
+  setChanged();
 }
 
 String HTMLTextAreaElement::defaultValue() const {

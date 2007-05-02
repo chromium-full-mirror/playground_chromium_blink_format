@@ -1035,7 +1035,7 @@ void Document::recalcStyle(StyleChange change) {
     view()->layout();
 
 bail_out:
-  setChanged(false);
+  setChanged(NoStyleChange);
   setHasChangedChild(false);
   setDocumentChanged(false);
 

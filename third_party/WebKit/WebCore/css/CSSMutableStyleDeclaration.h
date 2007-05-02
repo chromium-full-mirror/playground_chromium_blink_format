@@ -26,6 +26,7 @@
 #include "CSSStyleDeclaration.h"
 #include "CSSPrimitiveValue.h"
 #include "DeprecatedValueList.h"
+#include "Node.h"
 #include "PlatformString.h"
 
 namespace WebCore {
@@ -97,7 +98,7 @@ class CSSMutableStyleDeclaration : public CSSStyleDeclaration {
 
   void clear();
 
-  void setChanged();
+  void setChanged(StyleChangeType changeType = FullStyleChange);
 
   // setLengthProperty treats integers as pixels! (Needed for conversion of HTML
   // attributes.)
