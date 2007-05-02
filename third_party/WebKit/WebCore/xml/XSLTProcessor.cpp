@@ -223,7 +223,7 @@ RefPtr<Document> XSLTProcessor::createDocumentFromSource(
     if (FrameView* view = frame->view())
       view->clear();
     result->setTransformSourceDocument(frame->document());
-    frame->setDocument(result.get());
+    frame->setDocument(result);
   }
 
   result->open();

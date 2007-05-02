@@ -150,7 +150,6 @@ class Frame : public Shared<Frame> {
   RenderPart*
   ownerRenderer();  // renderer for the element that contains this frame
 
-  friend class FrameLoader;
   friend class FramePrivate;
 
   DragImageRef dragImageForSelection();
@@ -208,7 +207,7 @@ class Frame : public Shared<Frame> {
 #endif
   NPObject* windowScriptNPObject();
 
-  void setDocument(Document*);
+  void setDocument(PassRefPtr<Document>);
 
   KJSProxy* scriptProxy();
 
@@ -245,8 +244,9 @@ class Frame : public Shared<Frame> {
 
   void dashboardRegionsChanged();
 
- private:
   void cleanupScriptObjects();
+
+ private:
   void cleanupPlatformScriptObjects();
 
   void lifeSupportTimerFired(Timer<Frame>*);

@@ -470,8 +470,6 @@ class FrameLoader : Noncopyable
 
   KURL completeURL(const String& URL);
 
-  void clear(bool clearWindowProperties = true);
-
   void didTellBridgeAboutLoad(const String& URL);
   bool haveToldBridgeAboutLoad(const String& URL);
 
@@ -658,6 +656,8 @@ class FrameLoader : Noncopyable
   void open(CachedPage&);
   void opened();
   void updateHistoryAfterClientRedirect();
+
+  void clear(bool clearWindowProperties = true);
 
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
   void handleUnimplementablePolicy(const ResourceError&);

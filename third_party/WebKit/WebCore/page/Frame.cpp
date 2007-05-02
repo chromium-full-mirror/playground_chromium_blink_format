@@ -297,7 +297,7 @@ Document* Frame::document() const {
   return 0;
 }
 
-void Frame::setDocument(Document* newDoc) {
+void Frame::setDocument(PassRefPtr<Document> newDoc) {
   if (d) {
     if (d->m_doc) {
       if (d->m_doc->attached())
@@ -310,8 +310,8 @@ void Frame::setDocument(Document* newDoc) {
       setUseSecureKeyboardEntryWhenActive(false);
     }
     d->m_doc = newDoc;
-    if (newDoc && !newDoc->attached())
-      newDoc->attach();
+    if (d->m_doc && !d->m_doc->attached())
+      d->m_doc->attach();
   }
 }
 
