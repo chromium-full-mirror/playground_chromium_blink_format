@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -108,6 +108,7 @@ typedef HashMap<const char*, TextCodecFactory> TextCodecMap;
 
 static TextEncodingNameMap* textEncodingNameMap;
 static TextCodecMap* textCodecMap;
+static bool didExtendTextCodecMaps;
 
 #if ERROR_DISABLED
 
@@ -152,41 +153,41 @@ static void addToTextCodecMap(const char* name,
                     TextCodecFactory(function, additionalData));
 }
 
-void buildTextEncodingNameMap() {
+static void buildBaseTextCodecMaps() {
+  textCodecMap = new TextCodecMap;
   textEncodingNameMap = new TextEncodingNameMap;
 
-  TextCodecUTF16::registerEncodingNames(addToTextEncodingNameMap);
   TextCodecLatin1::registerEncodingNames(addToTextEncodingNameMap);
+  TextCodecLatin1::registerCodecs(addToTextCodecMap);
+
+  TextCodecUTF16::registerEncodingNames(addToTextEncodingNameMap);
+  TextCodecUTF16::registerCodecs(addToTextCodecMap);
+
 #if USE(ICU_UNICODE)
-  TextCodecICU::registerEncodingNames(addToTextEncodingNameMap);
-#endif
-#if USE(QT4_UNICODE)
-  TextCodecQt::registerEncodingNames(addToTextEncodingNameMap);
-#endif
-#if PLATFORM(MAC)
-  TextCodecMac::registerEncodingNames(addToTextEncodingNameMap);
+  TextCodecICU::registerBaseEncodingNames(addToTextEncodingNameMap);
+  TextCodecICU::registerBaseCodecs(addToTextCodecMap);
 #endif
 }
 
-static void buildTextCodecMap() {
-  textCodecMap = new TextCodecMap;
-
-  TextCodecUTF16::registerCodecs(addToTextCodecMap);
-  TextCodecLatin1::registerCodecs(addToTextCodecMap);
+static void extendTextCodecMaps() {
 #if USE(ICU_UNICODE)
-  TextCodecICU::registerCodecs(addToTextCodecMap);
+  TextCodecICU::registerExtendedEncodingNames(addToTextEncodingNameMap);
+  TextCodecICU::registerExtendedCodecs(addToTextCodecMap);
 #endif
+
 #if USE(QT4_UNICODE)
+  TextCodecQt::registerEncodingNames(addToTextEncodingNameMap);
   TextCodecQt::registerCodecs(addToTextCodecMap);
 #endif
+
 #if PLATFORM(MAC)
+  TextCodecMac::registerEncodingNames(addToTextEncodingNameMap);
   TextCodecMac::registerCodecs(addToTextCodecMap);
 #endif
 }
 
 std::auto_ptr<TextCodec> newTextCodec(const TextEncoding& encoding) {
-  if (!textCodecMap)
-    buildTextCodecMap();
+  ASSERT(textCodecMap);
   TextCodecFactory factory = textCodecMap->get(encoding.name());
   ASSERT(factory.function);
   return factory.function(encoding, factory.additionalData);
@@ -196,7 +197,13 @@ const char* atomicCanonicalTextEncodingName(const char* name) {
   if (!name)
     return 0;
   if (!textEncodingNameMap)
-    buildTextEncodingNameMap();
+    buildBaseTextCodecMaps();
+  if (const char* atomicName = textEncodingNameMap->get(name))
+    return atomicName;
+  if (didExtendTextCodecMaps)
+    return 0;
+  extendTextCodecMaps();
+  didExtendTextCodecMaps = true;
   return textEncodingNameMap->get(name);
 }
 
@@ -214,6 +221,10 @@ const char* atomicCanonicalTextEncodingName(const UChar* characters,
   }
   buffer[j] = 0;
   return atomicCanonicalTextEncodingName(buffer);
+}
+
+bool noExtendedTextEncodingNameUsed() {
+  return !didExtendTextCodecMaps;
 }
 
 }  // namespace WebCore

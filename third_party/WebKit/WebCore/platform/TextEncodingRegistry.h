@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,6 +45,9 @@ std::auto_ptr<TextCodec> newTextCodec(const TextEncoding&);
 const char* atomicCanonicalTextEncodingName(const char* alias);
 const char* atomicCanonicalTextEncodingName(const UChar* aliasCharacters,
                                             size_t aliasLength);
+
+// Only TextEncoding should use this function directly.
+bool noExtendedTextEncodingNameUsed();
 }
 
 #endif  // TextEncodingRegistry_h
