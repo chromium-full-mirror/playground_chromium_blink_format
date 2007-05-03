@@ -2406,7 +2406,7 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
 
   transitionToCommitted(cachedPage);
 
-  // Call -_clientRedirectCancelledOrFinished: here so that the frame load
+  // Call clientRedirectCancelledOrFinished() here so that the frame load
   // delegate is notified that the redirect's
   // status has changed, if there was a redirect.  The frame load delegate may
   // have saved some state about
@@ -2857,8 +2857,26 @@ void FrameLoader::continueAfterContentPolicy(PolicyAction policy) {
   check.call(policy);
 }
 
-void FrameLoader::continueAfterWillSubmitForm(PolicyAction) {
-  startLoading();
+void FrameLoader::continueLoadAfterWillSubmitForm(PolicyAction) {
+  if (!m_provisionalDocumentLoader)
+    return;
+
+  m_provisionalDocumentLoader->prepareForLoadStart();
+
+  DocumentLoader* activeDocLoader = activeDocumentLoader();
+  if (activeDocLoader && activeDocLoader->isLoadingMainResource())
+    return;
+
+  m_provisionalDocumentLoader->setLoadingFromCachedPage(false);
+
+  unsigned long identifier =
+      m_frame->page()->progress()->createUniqueIdentifier();
+  m_client->assignIdentifierToInitialRequest(
+      identifier, m_provisionalDocumentLoader.get(),
+      m_provisionalDocumentLoader->originalRequest());
+
+  if (!m_provisionalDocumentLoader->startLoadingMainResource(identifier))
+    m_provisionalDocumentLoader->updateLoading();
 }
 
 void FrameLoader::didFirstLayout() {
@@ -3179,29 +3197,6 @@ void FrameLoader::loadResourceSynchronously(const ResourceRequest& request,
   }
 
   sendRemainingDelegateMessages(identifier, response, data.size(), error);
-}
-
-// FIXME: Poor method name; also, why is this not part of startProvisionalLoad:?
-void FrameLoader::startLoading() {
-  if (!m_provisionalDocumentLoader)
-    return;
-
-  m_provisionalDocumentLoader->prepareForLoadStart();
-
-  DocumentLoader* activeDocLoader = activeDocumentLoader();
-  if (activeDocLoader && activeDocLoader->isLoadingMainResource())
-    return;
-
-  m_provisionalDocumentLoader->setLoadingFromCachedPage(false);
-
-  unsigned long identifier =
-      m_frame->page()->progress()->createUniqueIdentifier();
-  m_client->assignIdentifierToInitialRequest(
-      identifier, m_provisionalDocumentLoader.get(),
-      m_provisionalDocumentLoader->originalRequest());
-
-  if (!m_provisionalDocumentLoader->startLoadingMainResource(identifier))
-    m_provisionalDocumentLoader->updateLoading();
 }
 
 void FrameLoader::assignIdentifierToInitialRequest(
@@ -3565,10 +3560,10 @@ void FrameLoader::continueLoadAfterNavigationPolicy(
     return;
 
   if (formState)
-    m_client->dispatchWillSubmitForm(&FrameLoader::continueAfterWillSubmitForm,
-                                     formState);
+    m_client->dispatchWillSubmitForm(
+        &FrameLoader::continueLoadAfterWillSubmitForm, formState);
   else
-    continueAfterWillSubmitForm();
+    continueLoadAfterWillSubmitForm();
 }
 
 void FrameLoader::callContinueLoadAfterNewWindowPolicy(

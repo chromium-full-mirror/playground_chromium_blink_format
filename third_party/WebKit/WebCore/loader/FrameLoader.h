@@ -587,7 +587,6 @@ class FrameLoader : Noncopyable
   void replaceContentsWithScriptResult(const KURL&);
 
   // Also not cool.
-  void startLoading();
   void stopLoadingSubframes();
 
   void clearProvisionalLoad();
@@ -612,7 +611,7 @@ class FrameLoader : Noncopyable
   void continueAfterNavigationPolicy(PolicyAction);
   void continueAfterNewWindowPolicy(PolicyAction);
   void continueAfterContentPolicy(PolicyAction);
-  void continueAfterWillSubmitForm(PolicyAction = PolicyUse);
+  void continueLoadAfterWillSubmitForm(PolicyAction = PolicyUse);
 
   static void callContinueLoadAfterNavigationPolicy(void*,
                                                     const ResourceRequest&,
