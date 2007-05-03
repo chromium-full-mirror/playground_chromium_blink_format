@@ -592,7 +592,6 @@ class FrameLoader : Noncopyable
 
   void clearProvisionalLoad();
   void markLoadComplete();
-  void commitProvisionalLoad();
   void transitionToCommitted(PassRefPtr<CachedPage>);
   void frameLoadCompleted();
 

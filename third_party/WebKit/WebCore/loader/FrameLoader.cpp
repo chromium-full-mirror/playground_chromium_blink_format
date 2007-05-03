@@ -2394,17 +2394,6 @@ void FrameLoader::markLoadComplete() {
   setState(FrameStateComplete);
 }
 
-void FrameLoader::commitProvisionalLoad() {
-  if (m_documentLoader)
-    m_documentLoader->stopLoadingSubresources();
-  if (m_documentLoader)
-    m_documentLoader->stopLoadingPlugIns();
-
-  setDocumentLoader(m_provisionalDocumentLoader.get());
-  setProvisionalDocumentLoader(0);
-  setState(FrameStateCommittedPage);
-}
-
 void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
   RefPtr<CachedPage> cachedPage = prpCachedPage;
   RefPtr<DocumentLoader> pdl = m_provisionalDocumentLoader;
@@ -2464,7 +2453,16 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
   if (pdl != m_provisionalDocumentLoader)
     return;
 
-  commitProvisionalLoad();
+  // Nothing else can interupt this commit - set the Provisional->Committed
+  // transition in stone
+  if (m_documentLoader)
+    m_documentLoader->stopLoadingSubresources();
+  if (m_documentLoader)
+    m_documentLoader->stopLoadingPlugIns();
+
+  setDocumentLoader(m_provisionalDocumentLoader.get());
+  setProvisionalDocumentLoader(0);
+  setState(FrameStateCommittedPage);
 
   // Handle adding the URL to the back/forward list.
   DocumentLoader* dl = m_documentLoader.get();
