@@ -53,10 +53,7 @@ static HashSet<RefPtr<CachedPage>>& cachedPagesPendingRelease() {
 }
 
 HistoryItem::HistoryItem()
-    : m_lastVisitedTime(0),
-      m_isTargetItem(false),
-      m_alwaysAttemptToUseCachedPage(false),
-      m_visitCount(0) {}
+    : m_lastVisitedTime(0), m_isTargetItem(false), m_visitCount(0) {}
 
 HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
@@ -66,7 +63,6 @@ HistoryItem::HistoryItem(const String& urlString,
       m_title(title),
       m_lastVisitedTime(time),
       m_isTargetItem(false),
-      m_alwaysAttemptToUseCachedPage(false),
       m_visitCount(0) {
   retainIconInDatabase(true);
 }
@@ -77,7 +73,6 @@ HistoryItem::HistoryItem(const KURL& url, const String& title)
       m_title(title),
       m_lastVisitedTime(0),
       m_isTargetItem(false),
-      m_alwaysAttemptToUseCachedPage(false),
       m_visitCount(0) {
   retainIconInDatabase(true);
 }
@@ -93,7 +88,6 @@ HistoryItem::HistoryItem(const KURL& url,
       m_title(title),
       m_lastVisitedTime(0),
       m_isTargetItem(false),
-      m_alwaysAttemptToUseCachedPage(false),
       m_visitCount(0) {
   retainIconInDatabase(true);
 }
@@ -113,7 +107,6 @@ HistoryItem::HistoryItem(const HistoryItem& item)
       m_lastVisitedTime(item.m_lastVisitedTime),
       m_scrollPoint(item.m_scrollPoint),
       m_isTargetItem(item.m_isTargetItem),
-      m_alwaysAttemptToUseCachedPage(item.m_alwaysAttemptToUseCachedPage),
       m_visitCount(item.m_visitCount),
       m_formContentType(item.m_formContentType),
       m_formReferrer(item.m_formReferrer),
@@ -288,14 +281,6 @@ bool HistoryItem::isTargetItem() const {
 
 void HistoryItem::setIsTargetItem(bool flag) {
   m_isTargetItem = flag;
-}
-
-bool HistoryItem::alwaysAttemptToUseCachedPage() const {
-  return m_alwaysAttemptToUseCachedPage;
-}
-
-void HistoryItem::setAlwaysAttemptToUseCachedPage(bool flag) {
-  m_alwaysAttemptToUseCachedPage = flag;
 }
 
 void HistoryItem::addChildItem(PassRefPtr<HistoryItem> child) {

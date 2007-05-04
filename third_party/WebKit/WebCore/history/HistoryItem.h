@@ -128,9 +128,6 @@ class HistoryItem : public Shared<HistoryItem> {
   const HistoryItemVector& children() const;
   bool hasChildren() const;
 
-  void setAlwaysAttemptToUseCachedPage(bool);
-  bool alwaysAttemptToUseCachedPage() const;
-
   // This should not be called directly for HistoryItems that are already
   // included
   // in GlobalHistory. The WebKit api for this is to use -[WebHistory
@@ -177,7 +174,6 @@ class HistoryItem : public Shared<HistoryItem> {
   RefPtr<CachedPage> m_cachedPage;
 
   bool m_isTargetItem;
-  bool m_alwaysAttemptToUseCachedPage;
   int m_visitCount;
 
   // info used to repost form data

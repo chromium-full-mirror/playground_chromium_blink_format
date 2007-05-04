@@ -40,7 +40,6 @@
 - (int)visitCount;
 
 - (NSString*)RSSFeedReferrer;
-- (void)setAlwaysAttemptToUsePageCache:(BOOL)flag;
 - (void)setRSSFeedReferrer:(NSString*)referrer;
 - (NSCalendarDate*)_lastVisitedDate;
 
@@ -54,5 +53,4 @@
 // included
 // in WebHistory. Use -[WebHistory setLastVisitedTimeInterval:forItem:] instead.
 - (void)_setLastVisitedTimeInterval:(NSTimeInterval)time;
-
 @end
