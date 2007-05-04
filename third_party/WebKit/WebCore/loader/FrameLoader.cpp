@@ -199,9 +199,10 @@ bool isBackForwardLoadType(FrameLoadType type) {
 }
 
 static int numRequests(Document* document) {
-  if (document)
-    return cache()->loader()->numRequests(document->docLoader());
-  return 0;
+  if (!document)
+    return 0;
+
+  return document->docLoader()->requestCount();
 }
 
 FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
@@ -1172,8 +1173,8 @@ void FrameLoader::checkCompleted() {
     return;
 
   // Still waiting for images/scripts?
-  if (m_frame->document() && m_frame->document()->docLoader())
-    if (cache()->loader()->numRequests(m_frame->document()->docLoader()))
+  if (m_frame->document())
+    if (numRequests(m_frame->document()))
       return;
 
 #if USE(LOW_BANDWIDTH_DISPLAY)

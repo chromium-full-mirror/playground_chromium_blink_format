@@ -55,7 +55,6 @@ class Loader : private SubresourceLoaderClient {
             bool incremental = true,
             bool skipCanLoadCheck = false);
 
-  int numRequests(DocLoader*) const;
   void cancelRequests(DocLoader*);
 
  private:

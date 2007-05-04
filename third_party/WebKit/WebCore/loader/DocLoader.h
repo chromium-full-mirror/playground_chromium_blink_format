@@ -98,6 +98,10 @@ class DocLoader {
   void replaceDocument(Document* doc) { m_doc = doc; }
 #endif
 
+  void incrementRequestCount();
+  void decrementRequestCount();
+  int requestCount();
+
  private:
   CachedResource* requestResource(CachedResource::Type,
                                   const String& url,
@@ -113,6 +117,8 @@ class DocLoader {
   CachePolicy m_cachePolicy;
   Frame* m_frame;
   Document* m_doc;
+
+  int m_requestCount;
 
   // 29 bits left
   bool m_autoLoadImages : 1;

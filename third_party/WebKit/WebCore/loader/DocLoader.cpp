@@ -46,6 +46,7 @@ DocLoader::DocLoader(Frame* frame, Document* doc)
       m_cachePolicy(CachePolicyVerify),
       m_frame(frame),
       m_doc(doc),
+      m_requestCount(0),
       m_autoLoadImages(true),
       m_loadInProgress(false),
       m_allowStaleResources(false) {
@@ -208,5 +209,20 @@ void DocLoader::checkCacheObjectStatus(CachedResource* resource) {
   m_frame->loader()->loadedResourceFromMemoryCache(request, response,
                                                    data ? data->size() : 0);
   m_frame->loader()->didTellBridgeAboutLoad(resource->url());
+}
+
+void DocLoader::incrementRequestCount() {
+  ++m_requestCount;
+}
+
+void DocLoader::decrementRequestCount() {
+  --m_requestCount;
+  ASSERT(m_requestCount > -1);
+}
+
+int DocLoader::requestCount() {
+  if (loadInProgress())
+    return m_requestCount + 1;
+  return m_requestCount;
 }
 }
