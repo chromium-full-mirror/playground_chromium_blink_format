@@ -601,16 +601,18 @@ DeprecatedString createMarkup(const Range* range,
 
   Node* checkAncestor =
       specialCommonAncestor ? specialCommonAncestor : commonAncestor;
-  RefPtr<CSSMutableStyleDeclaration> checkAncestorStyle =
-      computedStyle(checkAncestor)->copyInheritableProperties();
-  if (!propertyMissingOrEqualToNone(
-          checkAncestorStyle.get(),
-          CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT))
-    specialCommonAncestor =
-        elementHasTextDecorationProperty(checkAncestor)
-            ? checkAncestor
-            : enclosingNodeOfType(checkAncestor,
-                                  &elementHasTextDecorationProperty);
+  if (checkAncestor->renderer()) {
+    RefPtr<CSSMutableStyleDeclaration> checkAncestorStyle =
+        computedStyle(checkAncestor)->copyInheritableProperties();
+    if (!propertyMissingOrEqualToNone(
+            checkAncestorStyle.get(),
+            CSS_PROP__WEBKIT_TEXT_DECORATIONS_IN_EFFECT))
+      specialCommonAncestor =
+          elementHasTextDecorationProperty(checkAncestor)
+              ? checkAncestor
+              : enclosingNodeOfType(checkAncestor,
+                                    &elementHasTextDecorationProperty);
+  }
 
   if (Node* enclosingAnchor = enclosingNodeWithTag(
           specialCommonAncestor ? specialCommonAncestor : commonAncestor, aTag))
@@ -672,7 +674,8 @@ DeprecatedString createMarkup(const Range* range,
 
   // Add a wrapper span with the styles that all of the nodes in the markup
   // inherit.
-  if (Node* parentOfLastClosed = lastClosed->parentNode()) {
+  Node* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
+  if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
         computedStyle(parentOfLastClosed)->copyInheritableProperties();
     // Styles that Mail blockquotes contribute should only be placed on the Mail
@@ -701,7 +704,7 @@ DeprecatedString createMarkup(const Range* range,
       isStartOfParagraph(visibleStart) && isEndOfParagraph(visibleEnd);
 
   // Retain the Mail quote level by including all ancestor mail block quotes.
-  if (annotate && selectedOneOrMoreParagraphs) {
+  if (lastClosed && annotate && selectedOneOrMoreParagraphs) {
     for (Node* ancestor = lastClosed->parentNode(); ancestor;
          ancestor = ancestor->parentNode()) {
       if (isMailBlockquote(ancestor)) {
