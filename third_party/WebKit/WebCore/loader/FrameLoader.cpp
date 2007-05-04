@@ -1665,7 +1665,7 @@ bool FrameLoader::canCachePage() {
          // keyboard
          // entry mode if the document's focused node requires it.
          && !m_frame->document()->hasPasswordField() && m_frame->page() &&
-         m_frame->page()->backForwardList()->usesPageCache() &&
+         m_frame->page()->backForwardList()->pageCacheSize() != 0 &&
          m_currentHistoryItem && !isQuickRedirectComing() &&
          loadType != FrameLoadTypeReload &&
          loadType != FrameLoadTypeReloadAllowingStaleData &&
