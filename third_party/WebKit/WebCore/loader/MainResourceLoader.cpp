@@ -342,7 +342,11 @@ void MainResourceLoader::handleEmptyLoad(const KURL& url, bool forURLScheme) {
 void MainResourceLoader::handleDataLoadNow(Timer<MainResourceLoader>*) {
   RefPtr<MainResourceLoader> protect(this);
 
-  ResourceResponse response(m_initialRequest.url(), m_substituteData.mimeType(),
+  KURL url = m_substituteData.responseURL();
+  if (url.isEmpty())
+    url = m_initialRequest.url();
+
+  ResourceResponse response(url, m_substituteData.mimeType(),
                             m_substituteData.content()->size(),
                             m_substituteData.textEncoding(), "");
   didReceiveResponse(response);
@@ -371,7 +375,8 @@ bool MainResourceLoader::loadNow(ResourceRequest& r) {
     return false;
 
   const KURL& url = r.url();
-  bool shouldLoadEmpty = shouldLoadAsEmptyDocument(url);
+  bool shouldLoadEmpty =
+      shouldLoadAsEmptyDocument(url) && !m_substituteData.isValid();
 
   if (shouldLoadEmptyBeforeRedirect && !shouldLoadEmpty && defersLoading())
     return true;
