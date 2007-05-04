@@ -573,7 +573,7 @@ class FrameLoader : Noncopyable
                   bool useFallback);
 
   bool loadProvisionalItemFromCachedPage();
-  bool cachePageToHistoryItem(HistoryItem*);
+  void cachePageToHistoryItem(HistoryItem*);
 
   void emitLoadEvent();
 
