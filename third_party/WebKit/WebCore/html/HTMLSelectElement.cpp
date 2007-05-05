@@ -391,7 +391,7 @@ bool HTMLSelectElement::isMouseFocusable() const {
 }
 
 bool HTMLSelectElement::canSelectAll() const {
-  return !usesMenuList() && renderer() && renderer()->canSelect();
+  return !usesMenuList();
 }
 
 void HTMLSelectElement::selectAll() {
@@ -686,7 +686,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
 }
 
 void HTMLSelectElement::listBoxDefaultEventHandler(Event* evt) {
-  if (!renderer() || !renderer()->canSelect())
+  if (!renderer())
     return;
 
   if (evt->type() == mousedownEvent && evt->isMouseEvent() &&
