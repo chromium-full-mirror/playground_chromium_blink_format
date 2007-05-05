@@ -32,6 +32,7 @@ class TextBreakIterator;
 TextBreakIterator* characterBreakIterator(const UChar*, int length);
 TextBreakIterator* wordBreakIterator(const UChar*, int length);
 TextBreakIterator* lineBreakIterator(const UChar*, int length);
+TextBreakIterator* sentenceBreakIterator(const UChar*, int length);
 
 int textBreakFirst(TextBreakIterator*);
 int textBreakNext(TextBreakIterator*);

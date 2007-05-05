@@ -32,6 +32,7 @@
 #include "RenderBlock.h"
 #include "RenderLayer.h"
 #include "TextBoundaries.h"
+#include "TextBreakIterator.h"
 #include "TextIterator.h"
 #include "htmlediting.h"
 
@@ -519,9 +520,8 @@ VisiblePosition nextLinePosition(const VisiblePosition& visiblePosition,
 
 static unsigned startSentenceBoundary(const UChar* characters,
                                       unsigned length) {
-  int start, end;
-  findSentenceBoundary(characters, length, length, &start, &end);
-  return start;
+  TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
+  return textBreakPreceding(iterator, length);
 }
 
 VisiblePosition startOfSentence(const VisiblePosition& c) {
@@ -529,9 +529,9 @@ VisiblePosition startOfSentence(const VisiblePosition& c) {
 }
 
 static unsigned endSentenceBoundary(const UChar* characters, unsigned length) {
-  int start, end;
-  findSentenceBoundary(characters, length, 0, &start, &end);
-  return end;
+  TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
+  int start = textBreakPreceding(iterator, length);
+  return textBreakFollowing(iterator, start);
 }
 
 VisiblePosition endOfSentence(const VisiblePosition& c) {
@@ -540,7 +540,8 @@ VisiblePosition endOfSentence(const VisiblePosition& c) {
 
 static unsigned previousSentencePositionBoundary(const UChar* characters,
                                                  unsigned length) {
-  return findNextSentenceFromIndex(characters, length, length, false);
+  TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
+  return textBreakPreceding(iterator, length);
 }
 
 VisiblePosition previousSentencePosition(const VisiblePosition& c) {
@@ -549,7 +550,8 @@ VisiblePosition previousSentencePosition(const VisiblePosition& c) {
 
 static unsigned nextSentencePositionBoundary(const UChar* characters,
                                              unsigned length) {
-  return findNextSentenceFromIndex(characters, length, 0, true);
+  TextBreakIterator* iterator = sentenceBreakIterator(characters, length);
+  return textBreakFollowing(iterator, 0);
 }
 
 VisiblePosition nextSentencePosition(const VisiblePosition& c) {

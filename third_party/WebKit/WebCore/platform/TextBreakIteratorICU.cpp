@@ -22,6 +22,8 @@
 #include "config.h"
 #include "TextBreakIterator.h"
 
+#include "TextBreakIteratorInternalICU.h"
+
 #include <unicode/ubrk.h>
 
 namespace WebCore {
@@ -30,7 +32,8 @@ static TextBreakIterator* setUpIterator(bool& createdIterator,
                                         TextBreakIterator*& iterator,
                                         UBreakIteratorType type,
                                         const UChar* string,
-                                        int length) {
+                                        int length,
+                                        const char* locale) {
   if (!string)
     return 0;
 
@@ -42,7 +45,7 @@ static TextBreakIterator* setUpIterator(bool& createdIterator,
     // break iterators, though!
     UErrorCode openStatus = U_ZERO_ERROR;
     iterator = static_cast<TextBreakIterator*>(
-        ubrk_open(type, "en_us", 0, 0, &openStatus));
+        ubrk_open(type, locale, 0, 0, &openStatus));
     createdIterator = true;
   }
   if (!iterator)
@@ -61,21 +64,29 @@ TextBreakIterator* characterBreakIterator(const UChar* string, int length) {
   static TextBreakIterator* staticCharacterBreakIterator;
   return setUpIterator(createdCharacterBreakIterator,
                        staticCharacterBreakIterator, UBRK_CHARACTER, string,
-                       length);
+                       length, "en_us");
 }
 
 TextBreakIterator* wordBreakIterator(const UChar* string, int length) {
   static bool createdWordBreakIterator = false;
   static TextBreakIterator* staticWordBreakIterator;
   return setUpIterator(createdWordBreakIterator, staticWordBreakIterator,
-                       UBRK_WORD, string, length);
+                       UBRK_WORD, string, length, "en_us");
 }
 
 TextBreakIterator* lineBreakIterator(const UChar* string, int length) {
   static bool createdLineBreakIterator = false;
   static TextBreakIterator* staticLineBreakIterator;
   return setUpIterator(createdLineBreakIterator, staticLineBreakIterator,
-                       UBRK_LINE, string, length);
+                       UBRK_LINE, string, length, "en_us");
+}
+
+TextBreakIterator* sentenceBreakIterator(const UChar* string, int length) {
+  static bool createdSentenceBreakIterator = false;
+  static TextBreakIterator* staticSentenceBreakIterator;
+  return setUpIterator(createdSentenceBreakIterator,
+                       staticSentenceBreakIterator, UBRK_SENTENCE, string,
+                       length, currentTextBreakLocaleID());
 }
 
 int textBreakFirst(TextBreakIterator* bi) {
