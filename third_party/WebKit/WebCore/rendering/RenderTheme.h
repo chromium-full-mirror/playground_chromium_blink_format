@@ -144,6 +144,8 @@ class RenderTheme {
   virtual Color inactiveListBoxSelectionBackgroundColor() const;
   virtual Color inactiveListBoxSelectionForegroundColor() const;
 
+  void platformColorsDidChange();
+
   // System fonts.
   virtual void systemFont(int propId, FontDescription&) const = 0;
 
@@ -290,6 +292,10 @@ class RenderTheme {
                                              const IntRect&) {
     return true;
   }
+
+ private:
+  mutable Color m_activeSelectionColor;
+  mutable Color m_inactiveSelectionColor;
 };
 
 // Function to obtain the theme.  This is implemented in your platform-specific
