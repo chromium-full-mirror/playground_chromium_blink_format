@@ -1053,27 +1053,19 @@ bool SelectionController::contains(const IntPoint& point) {
   if (!innerNode || !innerNode->renderer())
     return false;
 
-  Position pos(innerNode->renderer()
-                   ->positionForPoint(result.localPoint())
-                   .deepEquivalent());
-  if (pos.isNull())
+  VisiblePosition visiblePos(
+      innerNode->renderer()->positionForPoint(result.localPoint()));
+  if (visiblePos.isNull())
     return false;
 
-  Node* n = start().node();
-  while (n) {
-    if (n == pos.node()) {
-      if ((n == start().node() && pos.offset() < start().offset()) ||
-          (n == end().node() && pos.offset() > end().offset())) {
-        return false;
-      }
-      return true;
-    }
-    if (n == end().node())
-      break;
-    n = n->traverseNextNode();
-  }
+  // A selection doesn't contain it's endpoints.
+  if (visiblePos == m_sel.visibleStart() || visiblePos == m_sel.visibleEnd())
+    return false;
 
-  return false;
+  RefPtr<Range> range = toRange();
+  ExceptionCode ec = 0;
+  Position p(visiblePos.deepEquivalent());
+  return range->comparePoint(p.node(), p.offset(), ec) == 0 && ec == 0;
 }
 
 // Workaround for the fact that it's hard to delete a frame.
