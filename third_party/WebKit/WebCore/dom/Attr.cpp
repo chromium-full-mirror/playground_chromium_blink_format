@@ -55,8 +55,8 @@ void Attr::createTextChild() {
     // m_ignoreChildrenChanged was set),
     // but much more efficiently.
     textNode->setParent(this);
-    fastSetFirstChild(textNode.get());
-    fastSetLastChild(textNode.get());
+    setFirstChild(textNode.get());
+    setLastChild(textNode.get());
   }
 }
 

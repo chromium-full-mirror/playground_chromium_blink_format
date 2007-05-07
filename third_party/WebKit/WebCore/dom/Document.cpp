@@ -1027,7 +1027,7 @@ void Document::recalcStyle(StyleChange change) {
       oldStyle->deref(m_renderArena);
   }
 
-  for (Node* n = fastFirstChild(); n; n = n->nextSibling())
+  for (Node* n = firstChild(); n; n = n->nextSibling())
     if (change >= Inherit || n->hasChangedChild() || n->changed())
       n->recalcStyle(change);
 

@@ -50,10 +50,6 @@ CharacterData::~CharacterData() {
     str->deref();
 }
 
-String CharacterData::data() const {
-  return str;
-}
-
 void CharacterData::setData(const String& _data, ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
   if (isReadOnlyNode()) {
@@ -79,10 +75,6 @@ void CharacterData::setData(const String& _data, ExceptionCode& ec) {
     oldStr->deref();
 
   document()->removeMarkers(this);
-}
-
-unsigned CharacterData::length() const {
-  return str->length();
 }
 
 String CharacterData::substringData(const unsigned offset,

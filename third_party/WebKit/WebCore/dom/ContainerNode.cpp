@@ -109,11 +109,11 @@ ContainerNode::~ContainerNode() {
   removeAllChildren();
 }
 
-Node* ContainerNode::firstChild() const {
+Node* ContainerNode::virtualFirstChild() const {
   return m_firstChild;
 }
 
-Node* ContainerNode::lastChild() const {
+Node* ContainerNode::virtualLastChild() const {
   return m_lastChild;
 }
 

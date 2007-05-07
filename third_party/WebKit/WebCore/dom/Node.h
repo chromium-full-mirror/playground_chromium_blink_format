@@ -98,8 +98,8 @@ class Node : public TreeShared<Node> {
   Node* previousSibling() const { return m_previous; }
   Node* nextSibling() const { return m_next; }
   virtual PassRefPtr<NodeList> childNodes();
-  virtual Node* firstChild() const;
-  virtual Node* lastChild() const;
+  Node* firstChild() const { return virtualFirstChild(); }
+  Node* lastChild() const { return virtualLastChild(); }
   virtual bool hasAttributes() const;
   virtual NamedAttrMap* attributes() const;
 
@@ -537,6 +537,9 @@ class Node : public TreeShared<Node> {
 
  private:
   Element* ancestorElement() const;
+
+  virtual Node* virtualFirstChild() const;
+  virtual Node* virtualLastChild() const;
 };
 
 }  // namespace

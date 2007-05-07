@@ -37,8 +37,8 @@ class ContainerNode : public EventTargetNode {
   ContainerNode(Document* doc);
   virtual ~ContainerNode();
 
-  virtual Node* firstChild() const;
-  virtual Node* lastChild() const;
+  Node* firstChild() const { return m_firstChild; }
+  Node* lastChild() const { return m_lastChild; }
 
   virtual bool insertBefore(PassRefPtr<Node> newChild,
                             Node* refChild,
@@ -66,9 +66,6 @@ class ContainerNode : public EventTargetNode {
   virtual void insertedIntoTree(bool deep);
   virtual void removedFromTree(bool deep);
 
-  Node* fastFirstChild() const { return m_firstChild; }
-  Node* fastLastChild() const { return m_lastChild; }
-
   void removeAllChildren();
   void removeChildren();
   void cloneChildNodes(Node* clone);
@@ -76,15 +73,18 @@ class ContainerNode : public EventTargetNode {
  protected:
   static void queuePostAttachCallback(NodeCallback, Node*);
 
-  void fastSetFirstChild(Node* child) { m_firstChild = child; }
-  void fastSetLastChild(Node* child) { m_lastChild = child; }
+  void setFirstChild(Node* child) { m_firstChild = child; }
+  void setLastChild(Node* child) { m_lastChild = child; }
 
  private:
-  Node* m_firstChild;
-  Node* m_lastChild;
+  virtual Node* virtualFirstChild() const;
+  virtual Node* virtualLastChild() const;
 
   bool getUpperLeftCorner(int& x, int& y) const;
   bool getLowerRightCorner(int& x, int& y) const;
+
+  Node* m_firstChild;
+  Node* m_lastChild;
 };
 
 }  // namespace WebCore
