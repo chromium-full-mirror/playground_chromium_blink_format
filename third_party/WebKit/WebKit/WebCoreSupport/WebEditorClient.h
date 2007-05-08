@@ -119,8 +119,7 @@ class WebEditorClient : public WebCore::EditorClient {
                                     int* badGrammarLength) {}
   virtual void updateSpellingUIWithGrammarString(
       const WebCore::String&,
-      const WebCore::String&,
-      const WTF::Vector<WebCore::String>& guesses) {}
+      const WebCore::GrammarDetail&) {}
   virtual void updateSpellingUIWithMisspelledWord(const WebCore::String&) {}
   virtual void showSpellingUI(bool show) {}
   virtual bool spellingUIIsShowing() { return false; }

@@ -476,10 +476,8 @@ class SVGEmptyEditorClient : public EditorClient {
                                     Vector<GrammarDetail>&,
                                     int* badGrammarLocation,
                                     int* badGrammarLength) {}
-  virtual void updateSpellingUIWithGrammarString(
-      const String&,
-      const String&,
-      const Vector<String>& guesses) {}
+  virtual void updateSpellingUIWithGrammarString(const String&,
+                                                 const GrammarDetail&) {}
   virtual void updateSpellingUIWithMisspelledWord(const String&) {}
   virtual void showSpellingUI(bool show) {}
   virtual bool spellingUIIsShowing() { return false; }

@@ -147,8 +147,7 @@ class EditorClient {
                                     int* badGrammarLength) = 0;
   virtual void updateSpellingUIWithGrammarString(
       const String&,
-      const String& userDescription,
-      const Vector<String>& guesses) = 0;
+      const GrammarDetail& detail) = 0;
   virtual void updateSpellingUIWithMisspelledWord(const String&) = 0;
   virtual void showSpellingUI(bool show) = 0;
   virtual bool spellingUIIsShowing() = 0;
