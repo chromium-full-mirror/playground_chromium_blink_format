@@ -50,8 +50,24 @@ namespace WebCore {
 const unsigned int maxViewWidth = 800;
 const unsigned int maxViewHeight = 600;
 
+class WebPage : public QWebPage {
+ public:
+  WebPage(QWidget* parent) : QWebPage(parent) {}
+
+  void javaScriptConsoleMessage(const QString& message,
+                                unsigned int lineNumber,
+                                const QString& sourceID);
+};
+
+void WebPage::javaScriptConsoleMessage(const QString& message,
+                                       unsigned int lineNumber,
+                                       const QString&) {
+  fprintf(stdout, "CONSOLE MESSAGE: line %d: %s\n", lineNumber,
+          message.toUtf8().constData());
+}
+
 DumpRenderTree::DumpRenderTree() : m_stdin(0), m_notifier(), m_loading(false) {
-  page = new QWebPage(0);
+  page = new WebPage(0);
   page->resize(maxViewWidth, maxViewHeight);
   frame = page->mainFrame();
   frame->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -138,7 +154,7 @@ void DumpRenderTree::dump() {
     printf("ERROR: nil result from %s",
            m_controller->shouldDumpAsText()
                ? "[documentElement innerText]"
-               : "[frame renderTreeAsExternalRepresentation]");
+               : "[frame renderTreeAsExternalRepresentation]\n#EOF\n");
   } else {
     fprintf(stdout, "%s#EOF\n", renderDump.toUtf8().constData());
   }
