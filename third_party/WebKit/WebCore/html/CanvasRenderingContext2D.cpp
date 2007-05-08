@@ -373,7 +373,7 @@ void CanvasRenderingContext2D::arcTo(float x0,
                                      float r,
                                      ExceptionCode& ec) {
   ec = 0;
-  if (r < 0) {
+  if (!(r > 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -388,7 +388,7 @@ void CanvasRenderingContext2D::arc(float x,
                                    bool clockwise,
                                    ExceptionCode& ec) {
   ec = 0;
-  if (r < 0) {
+  if (!(r > 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -401,7 +401,7 @@ void CanvasRenderingContext2D::rect(float x,
                                     float height,
                                     ExceptionCode& ec) {
   ec = 0;
-  if (width < 0 || height < 0) {
+  if (!(width >= 0 && height >= 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -488,7 +488,7 @@ void CanvasRenderingContext2D::clearRect(float x,
                                          float height,
                                          ExceptionCode& ec) {
   ec = 0;
-  if (width < 0 || height < 0) {
+  if (!(width >= 0 && height >= 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -507,7 +507,7 @@ void CanvasRenderingContext2D::fillRect(float x,
                                         ExceptionCode& ec) {
   ec = 0;
 
-  if (width < 0 || height < 0) {
+  if (!(width >= 0 && height >= 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -552,7 +552,7 @@ void CanvasRenderingContext2D::strokeRect(float x,
                                           ExceptionCode& ec) {
   ec = 0;
 
-  if (width < 0 || height < 0 || lineWidth < 0) {
+  if (!(width >= 0 && height >= 0 && lineWidth >= 0)) {
     ec = INDEX_SIZE_ERR;
     return;
   }
