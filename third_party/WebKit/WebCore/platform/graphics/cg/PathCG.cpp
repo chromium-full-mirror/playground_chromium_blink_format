@@ -35,6 +35,8 @@
 #include "IntRect.h"
 #include "PlatformString.h"
 
+#include <wtf/MathExtras.h>
+
 namespace WebCore {
 
 Path::Path() : m_path(CGPathCreateMutable()) {}
@@ -112,7 +114,10 @@ void Path::addArc(const FloatPoint& p,
                   float sa,
                   float ea,
                   bool clockwise) {
-  CGPathAddArc(m_path, 0, p.x(), p.y(), r, sa, ea, clockwise);
+  // Workaround for <rdar://problem/5189233> CGPathAddArc hangs or crashes when
+  // passed inf as start or end angle
+  if (isfinite(sa) && isfinite(ea))
+    CGPathAddArc(m_path, 0, p.x(), p.y(), r, sa, ea, clockwise);
 }
 
 void Path::addRect(const FloatRect& r) {
