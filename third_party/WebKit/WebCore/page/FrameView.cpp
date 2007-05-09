@@ -54,7 +54,8 @@ struct ScheduledEvent {
 class FrameViewPrivate {
  public:
   FrameViewPrivate(FrameView* view)
-      : layoutTimer(view, &FrameView::layoutTimerFired),
+      : m_slowRepaintObjectCount(0),
+        layoutTimer(view, &FrameView::layoutTimerFired),
         m_mediaType("screen"),
         m_enqueueEvents(0),
         m_overflowStatusDirty(true),
@@ -67,7 +68,6 @@ class FrameViewPrivate {
   }
   void reset() {
     useSlowRepaints = false;
-    slowRepaintObjectCount = 0;
     borderX = 30;
     borderY = 30;
     layoutTimer.stop();
@@ -85,7 +85,7 @@ class FrameViewPrivate {
   ScrollbarMode vmode;
   ScrollbarMode hmode;
   bool useSlowRepaints;
-  unsigned slowRepaintObjectCount;
+  unsigned m_slowRepaintObjectCount;
 
   int borderX, borderY;
 
@@ -552,7 +552,7 @@ String FrameView::mediaType() const {
 }
 
 bool FrameView::useSlowRepaints() const {
-  return d->useSlowRepaints || d->slowRepaintObjectCount > 0;
+  return d->useSlowRepaints || d->m_slowRepaintObjectCount > 0;
 }
 
 void FrameView::setUseSlowRepaints() {
@@ -561,14 +561,15 @@ void FrameView::setUseSlowRepaints() {
 }
 
 void FrameView::addSlowRepaintObject() {
-  if (d->slowRepaintObjectCount == 0)
+  if (!d->m_slowRepaintObjectCount)
     setStaticBackground(true);
-  d->slowRepaintObjectCount++;
+  d->m_slowRepaintObjectCount++;
 }
 
 void FrameView::removeSlowRepaintObject() {
-  d->slowRepaintObjectCount--;
-  if (d->slowRepaintObjectCount == 0)
+  ASSERT(d->m_slowRepaintObjectCount > 0);
+  d->m_slowRepaintObjectCount--;
+  if (!d->m_slowRepaintObjectCount)
     setStaticBackground(d->useSlowRepaints);
 }
 

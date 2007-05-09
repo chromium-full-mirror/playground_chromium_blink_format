@@ -2462,9 +2462,9 @@ void RenderObject::setStyle(RenderStyle* style) {
     // FIXME: A better solution would be to only invalidate the fixed regions
     // when scrolling.  It's overkill to
     // prevent the entire view from blitting on a scroll.
-    bool oldStyleSlowScroll = style && (style->position() == FixedPosition ||
+    bool newStyleSlowScroll = style && (style->position() == FixedPosition ||
                                         style->hasFixedBackgroundImage());
-    bool newStyleSlowScroll =
+    bool oldStyleSlowScroll =
         m_style && (m_style->position() == FixedPosition ||
                     m_style->hasFixedBackgroundImage());
     if (oldStyleSlowScroll != newStyleSlowScroll) {
