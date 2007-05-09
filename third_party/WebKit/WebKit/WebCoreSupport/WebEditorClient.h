@@ -106,25 +106,24 @@ class WebEditorClient : public WebCore::EditorClient {
   virtual void textWillBeDeletedInTextField(WebCore::Element*);
   virtual void textDidChangeInTextArea(WebCore::Element*);
 
-  virtual void ignoreWordInSpellDocument(const WebCore::String&) {}
-  virtual void learnWord(const WebCore::String&) {}
+  virtual void ignoreWordInSpellDocument(const WebCore::String&);
+  virtual void learnWord(const WebCore::String&);
   virtual void checkSpellingOfString(const UChar*,
                                      int length,
                                      int* misspellingLocation,
-                                     int* misspellingLength) {}
+                                     int* misspellingLength);
   virtual void checkGrammarOfString(const UChar*,
                                     int length,
                                     WTF::Vector<WebCore::GrammarDetail>&,
                                     int* badGrammarLocation,
-                                    int* badGrammarLength) {}
-  virtual void updateSpellingUIWithGrammarString(
-      const WebCore::String&,
-      const WebCore::GrammarDetail&) {}
-  virtual void updateSpellingUIWithMisspelledWord(const WebCore::String&) {}
-  virtual void showSpellingUI(bool show) {}
-  virtual bool spellingUIIsShowing() { return false; }
+                                    int* badGrammarLength);
+  virtual void updateSpellingUIWithGrammarString(const WebCore::String&,
+                                                 const WebCore::GrammarDetail&);
+  virtual void updateSpellingUIWithMisspelledWord(const WebCore::String&);
+  virtual void showSpellingUI(bool show);
+  virtual bool spellingUIIsShowing();
   virtual void getGuessesForWord(const WebCore::String&,
-                                 WTF::Vector<WebCore::String>& guesses) {}
+                                 WTF::Vector<WebCore::String>& guesses);
 
  private:
   void registerCommandForUndoOrRedo(PassRefPtr<WebCore::EditCommand>,
