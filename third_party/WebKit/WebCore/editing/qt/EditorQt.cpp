@@ -44,46 +44,4 @@ PassRefPtr<Clipboard> Editor::newGeneralClipboard(
   return 0;
 }
 
-void Editor::ignoreSpelling() {
-  String text = frame()->selectedText();
-}
-
-void Editor::learnSpelling() {
-  String text = frame()->selectedText();
-}
-
-void Editor::advanceToNextMisspelling(bool startBeforeSelection) {}
-
-bool Editor::isSelectionMisspelled() {
-  return false;
-}
-
-bool Editor::isSelectionUngrammatical() {
-  return false;
-}
-
-Vector<String> Editor::guessesForUngrammaticalSelection() {
-  return Vector<String>();
-}
-
-Vector<String> Editor::guessesForMisspelledSelection() {
-  String selectedString = frame()->selectedText();
-  return Vector<String>();
-}
-
-void Editor::markMisspellingsAfterTypingToPosition(const VisiblePosition& p) {
-  if (!isContinuousSpellCheckingEnabled())
-    return;
-}
-
-void Editor::markMisspellings(const Selection& selection) {}
-
-void Editor::markBadGrammar(const Selection& selection) {}
-
-void Editor::showSpellingGuessPanel() {}
-
-bool Editor::spellingPanelIsShowing() {
-  return false;
-}
-
 }  // namespace WebCore
