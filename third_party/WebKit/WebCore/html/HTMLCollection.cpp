@@ -28,6 +28,7 @@
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
+#include "HTMLObjectElement.h"
 
 namespace WebCore {
 
@@ -136,8 +137,11 @@ Node* HTMLCollection::traverseNextItem(Node* current) const {
           if (e->hasLocalName(areaTag))
             found = true;
           break;
-        case DocApplets:  // all OBJECT and APPLET elements
-          if (e->hasLocalName(objectTag) || e->hasLocalName(appletTag))
+        case DocApplets:  // all APPLET elements and OBJECT elements that
+                          // contain Java Applets
+          if (e->hasLocalName(appletTag) ||
+              (e->hasLocalName(objectTag) &&
+               static_cast<HTMLObjectElement*>(e)->containsJavaApplet()))
             found = true;
           break;
         case DocEmbeds:  // all EMBED elements
