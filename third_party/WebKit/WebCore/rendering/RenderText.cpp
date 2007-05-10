@@ -1116,6 +1116,9 @@ IntRect RenderText::selectionRect() {
 }
 
 short RenderText::verticalPositionHint(bool firstLine) const {
+  if (parent()->isReplaced())
+    return 0;  // Treat inline blocks just like blocks.  There can't be any
+               // vertical position hint.
   return parent()->verticalPositionHint(firstLine);
 }
 
