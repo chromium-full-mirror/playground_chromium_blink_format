@@ -58,13 +58,16 @@ void MainResourceLoader::receivedError(const ResourceError& error) {
   // Calling receivedMainResourceError will likely result in the last reference
   // to this object to go away.
   RefPtr<MainResourceLoader> protect(this);
-
-  frameLoader()->receivedMainResourceError(error, true);
+  RefPtr<Frame> protectFrame(m_frame);
 
   if (!cancelled()) {
     ASSERT(!reachedTerminalState());
     frameLoader()->didFailToLoad(this, error);
+  }
 
+  frameLoader()->receivedMainResourceError(error, true);
+
+  if (!cancelled()) {
     releaseResources();
   }
 

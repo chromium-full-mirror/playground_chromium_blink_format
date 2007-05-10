@@ -510,7 +510,8 @@ DeprecatedString externalRepresentation(RenderObject* o) {
 #if ENABLE(SVG)
     writeRenderResources(ts, o->document());
 #endif
-    o->view()->frameView()->layout();
+    if (o->view()->frameView())
+      o->view()->frameView()->layout();
     RenderLayer* l = o->layer();
     if (l) {
       writeLayers(ts, l, l,

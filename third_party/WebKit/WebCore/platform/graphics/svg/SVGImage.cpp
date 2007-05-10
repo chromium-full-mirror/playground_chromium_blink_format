@@ -141,6 +141,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     m_page.set(new Page(dummyChromeClient, dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient));
     m_frame = new Frame(m_page.get(), 0, dummyFrameLoaderClient);
+    m_frame->init();
     m_frameView = new FrameView(m_frame.get());
     m_frameView->deref();  // FIXME: FrameView starts with a refcount of 1
     m_frame->setView(m_frameView.get());

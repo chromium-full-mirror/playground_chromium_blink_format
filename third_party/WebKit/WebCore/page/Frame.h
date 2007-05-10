@@ -123,6 +123,8 @@ class Frame : public Shared<Frame> {
   virtual void setView(FrameView*);
   virtual ~Frame();
 
+  void init();
+
 #if PLATFORM(MAC)
   void setBridge(WebCoreFrameBridge*);
   WebCoreFrameBridge* bridge() const;

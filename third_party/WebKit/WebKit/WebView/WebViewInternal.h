@@ -126,4 +126,5 @@ WebViewGetResourceLoadDelegateImplementations(WebView* webView);
 - (void)_addObject:(id)object forIdentifier:(unsigned long)identifier;
 - (id)_objectForIdentifier:(unsigned long)identifier;
 - (void)_removeObjectForIdentifier:(unsigned long)identifier;
+- (BOOL)_becomingFirstResponderFromOutside;
 @end

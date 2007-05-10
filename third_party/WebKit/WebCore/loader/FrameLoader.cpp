@@ -233,7 +233,9 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
       m_redirectionTimer(this, &FrameLoader::redirectionTimerFired),
       m_checkCompletedTimer(this, &FrameLoader::checkCompletedTimerFired),
       m_opener(0),
-      m_openedByJavaScript(false)
+      m_openedByJavaScript(false),
+      m_creatingInitialEmptyDocument(false),
+      m_committedFirstRealDocumentLoad(false)
 #if USE(LOW_BANDWIDTH_DISPLAY)
       ,
       m_useLowBandwidthDisplay(true),
@@ -253,6 +255,25 @@ FrameLoader::~FrameLoader() {
   m_client->frameLoaderDestroyed();
 }
 
+void FrameLoader::init() {
+  // this somewhat odd set of steps is needed to give the frame an initial empty
+  // document
+  m_creatingInitialEmptyDocument = true;
+  setPolicyDocumentLoader(
+      m_client
+          ->createDocumentLoader(ResourceRequest(String("")), SubstituteData())
+          .get());
+  setProvisionalDocumentLoader(m_policyDocumentLoader.get());
+  setState(FrameStateProvisional);
+  m_provisionalDocumentLoader->finishedLoading();
+  begin();
+  write("<body>");
+  end();
+  m_frame->document()->cancelParsing();
+  m_creatingInitialEmptyDocument = false;
+  m_wasLoadEventEmitted = true;
+}
+
 void FrameLoader::setDefersLoading(bool defers) {
   if (m_documentLoader)
     m_documentLoader->setDefersLoading(defers);
@@ -264,7 +285,8 @@ void FrameLoader::setDefersLoading(bool defers) {
 }
 
 Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
-                                 const WindowFeatures& features) {
+                                 const WindowFeatures& features,
+                                 bool& created) {
   ASSERT(!features.dialog || request.frameName().isEmpty());
 
   if (!request.frameName().isEmpty() && request.frameName() != "_blank")
@@ -272,6 +294,7 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
       if (!request.resourceRequest().url().isEmpty())
         frame->loader()->load(request, true, 0, 0, HashMap<String, String>());
       frame->page()->chrome()->focus();
+      created = false;
       return frame;
     }
 
@@ -320,6 +343,7 @@ Frame* FrameLoader::createWindow(const FrameLoadRequest& request,
 
   page->chrome()->show();
 
+  created = true;
   return frame;
 }
 
@@ -856,10 +880,6 @@ void FrameLoader::begin() {
 }
 
 void FrameLoader::begin(const KURL& url) {
-  if (m_workingURL.isEmpty())
-    createEmptyDocument();  // Creates an empty document if we don't have one
-                            // already
-
   clear();
   partClearedInBegin();
 
@@ -882,6 +902,9 @@ void FrameLoader::begin(const KURL& url) {
   RefPtr<Document> document = DOMImplementation::instance()->createDocument(
       m_responseMIMEType, m_frame, m_frame->inViewSourceMode());
   m_frame->setDocument(document);
+
+  if (!m_creatingInitialEmptyDocument)
+    m_committedFirstRealDocumentLoad = true;
 
   document->setURL(m_URL.url());
   // We prefer m_baseURL over m_URL because m_URL changes when we are
@@ -1132,6 +1155,9 @@ void FrameLoader::gotoAnchor() {
 }
 
 void FrameLoader::finishedParsing() {
+  if (m_creatingInitialEmptyDocument)
+    return;
+
   // This can be called from the Frame's destructor, in which case we shouldn't
   // protect ourselves
   // because doing so will cause us to re-enter the destructor when protector
@@ -1196,6 +1222,8 @@ void FrameLoader::checkCompleted() {
     startRedirectionTimer();
 
   completed();
+  if (m_frame->page())
+    checkLoadComplete();
 }
 
 void FrameLoader::checkCompletedTimerFired(Timer<FrameLoader>*) {
@@ -1236,20 +1264,17 @@ void FrameLoader::checkEmitLoadEvent() {
 }
 
 KURL FrameLoader::baseURL() const {
-  if (!m_frame->document())
-    return KURL();
+  ASSERT(m_frame->document());
   return m_frame->document()->baseURL();
 }
 
 String FrameLoader::baseTarget() const {
-  if (!m_frame->document())
-    return String();
+  ASSERT(m_frame->document());
   return m_frame->document()->baseTarget();
 }
 
 KURL FrameLoader::completeURL(const String& url) {
-  if (!m_frame->document())
-    return url.deprecatedString();
+  ASSERT(m_frame->document());
   return m_frame->document()->completeURL(url).deprecatedString();
 }
 
@@ -1281,13 +1306,16 @@ void FrameLoader::scheduleLocationChange(const String& url,
 
   // Handle a location change of a page with no document as a special case.
   // This may happen when a frame changes the location of another frame.
-  bool duringLoad = !m_frame->document();
+  bool duringLoad = !m_committedFirstRealDocumentLoad;
 
   // If a redirect was scheduled during a load, then stop the current load.
   // Otherwise when the current load transitions from a provisional to a
   // committed state, pending redirects may be cancelled.
-  if (duringLoad)
+  if (duringLoad) {
+    if (m_provisionalDocumentLoader)
+      m_provisionalDocumentLoader->stopLoading();
     stopLoading(true);
+  }
 
   ScheduledRedirection::Type type =
       duringLoad ? ScheduledRedirection::locationChangeDuringLoad
@@ -1411,8 +1439,7 @@ String FrameLoader::encoding() const {
 }
 
 bool FrameLoader::gotoAnchor(const String& name) {
-  if (!m_frame->document())
-    return false;
+  ASSERT(m_frame->document());
 
   Node* anchorNode = m_frame->document()->getElementById(AtomicString(name));
   if (!anchorNode)
@@ -1767,15 +1794,6 @@ void FrameLoader::stopRedirectionTimer() {
     }
     ASSERT_NOT_REACHED();
   }
-}
-
-void FrameLoader::updateBaseURLForEmptyDocument() {
-  HTMLFrameOwnerElement* owner = m_frame->ownerElement();
-  // FIXME: Should embed be included?
-  if (owner && (owner->hasTagName(iframeTag) || owner->hasTagName(objectTag) ||
-                owner->hasTagName(embedTag)))
-    m_frame->document()->setBaseURL(
-        m_frame->tree()->parent()->document()->baseURL());
 }
 
 void FrameLoader::completed() {
@@ -2240,9 +2258,8 @@ bool FrameLoader::canTarget(Frame* target) const {
   if (m_frame->page() == target->page())
     return true;
 
-  String domain;
-  if (Document* document = m_frame->document())
-    domain = document->domain();
+  ASSERT(m_frame->document());
+  String domain = m_frame->document()->domain();
   // Allow if the request is made from a local file.
   if (domain.isEmpty())
     return true;
@@ -2284,6 +2301,12 @@ void FrameLoader::stopAllLoaders() {
   m_client->clearArchivedResources();
 
   m_inStopAllLoaders = false;
+}
+
+void FrameLoader::stopForUserCancel() {
+  stopAllLoaders();
+  if (m_frame->page())
+    checkLoadComplete();
 }
 
 void FrameLoader::cancelPendingArchiveLoad(ResourceLoader* loader) {
@@ -2442,7 +2465,8 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
   // current load,
   // or the two will stomp each other.
   DocumentLoader* pdl = m_provisionalDocumentLoader.get();
-  closeURL();
+  if (m_documentLoader)
+    closeURL();
   if (pdl != m_provisionalDocumentLoader)
     return;
 
@@ -2511,6 +2535,10 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
   // Tell the client we've committed this URL.
   ASSERT(m_client->hasFrameView());
+
+  if (m_creatingInitialEmptyDocument)
+    return;
+
   m_client->dispatchDidCommitLoad();
 
   // If we have a title let the WebView know about it.
@@ -2821,6 +2849,9 @@ void FrameLoader::checkLoadCompleteForThisFrame() {
           m_frame->page() && m_frame->page()->backForwardList())
         restoreScrollPositionAndViewState();
 
+      if (m_creatingInitialEmptyDocument)
+        return;
+
       const ResourceError& error = dl->mainDocumentError();
       if (!error.isNull())
         m_client->dispatchDidFailLoad(error);
@@ -2994,20 +3025,11 @@ String FrameLoader::userAgent(const KURL& url) const {
   return m_client->userAgent(url);
 }
 
-void FrameLoader::createEmptyDocument() {
-  // Although it's not completely clear from the name of this function,
-  // it does nothing if we already have a document, and just creates an
-  // empty one if we have no document at all.
-  if (!m_frame->document()) {
-    loadEmptyDocumentSynchronously();
-    updateBaseURLForEmptyDocument();
-  }
-}
-
 void FrameLoader::tokenizerProcessedData() {
-  if (m_frame->document())
-    checkCompleted();
-  checkLoadComplete();
+  ASSERT(m_frame->page());
+  ASSERT(m_frame->document());
+
+  checkCompleted();
 }
 
 void FrameLoader::didTellBridgeAboutLoad(const String& URL) {
@@ -3268,9 +3290,7 @@ void FrameLoader::receivedMainResourceError(const ResourceError& error,
     // here is to restore any state
     // so that the existing view (that wenever got far enough to replace) can
     // continue being used.
-    Document* document = m_frame->document();
-    if (document)
-      document->setInPageCache(false);
+    m_frame->document()->setInPageCache(false);
     invalidateCurrentItemCachedPage();
 
     // Call clientRedirectCancelledOrFinished here so that the frame load
@@ -3906,10 +3926,14 @@ void FrameLoader::invalidateCurrentItemCachedPage() {
 }
 
 void FrameLoader::saveDocumentState() {
+  if (m_creatingInitialEmptyDocument)
+    return;
+
   // Do not save doc state if the page has a password field and a form that
   // would be submitted via https.
   Document* document = m_frame->document();
-  if (document && document->hasPasswordField() && document->hasSecureForm())
+  ASSERT(document);
+  if (document->hasPasswordField() && document->hasSecureForm())
     return;
 
   // For a standard page load, we will have a previous item set, which will be
@@ -4406,7 +4430,7 @@ void FrameLoader::mainReceivedCompleteError(DocumentLoader* loader,
                                             const ResourceError& error) {
   loader->setPrimaryLoadComplete(true);
   m_client->dispatchDidLoadMainResource(activeDocumentLoader());
-  checkLoadComplete();
+  checkCompleted();
 }
 
 void FrameLoader::mainReceivedError(const ResourceError& error,
@@ -4609,8 +4633,7 @@ void FrameLoader::continueLoadWithData(SharedBuffer* buffer,
     encoding = textEncoding;
   setEncoding(encoding, userChosen);
 
-  if (!m_frame->document())
-    return;
+  ASSERT(m_frame->document());
 
   addData(buffer->data(), buffer->size());
 }

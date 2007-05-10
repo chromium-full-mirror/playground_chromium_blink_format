@@ -142,6 +142,8 @@ class FrameLoader : Noncopyable
   FrameLoader(Frame*, FrameLoaderClient*);
   ~FrameLoader();
 
+  void init();
+
   Frame* frame() const { return m_frame; }
 
   // FIXME: This is not cool, people.
@@ -189,7 +191,9 @@ class FrameLoader : Noncopyable
 
   static bool shouldHideReferrer(const KURL& url, const String& referrer);
 
-  Frame* createWindow(const FrameLoadRequest&, const WindowFeatures&);
+  Frame* createWindow(const FrameLoadRequest&,
+                      const WindowFeatures&,
+                      bool& created);
 
   void loadResourceSynchronously(const ResourceRequest&,
                                  ResourceError&,
@@ -200,6 +204,7 @@ class FrameLoader : Noncopyable
 
   // Also not cool.
   void stopAllLoaders();
+  void stopForUserCancel();
   void cancelPendingArchiveLoad(ResourceLoader*);
 
   bool isLoadingMainResource() const;
@@ -411,8 +416,6 @@ class FrameLoader : Noncopyable
   Widget* createJavaAppletWidget(const IntSize&,
                                  Element*,
                                  const HashMap<String, String>& args);
-
-  void createEmptyDocument();
 
   void partClearedInBegin();
   void restoreDocumentState();
@@ -747,6 +750,9 @@ class FrameLoader : Noncopyable
   HashSet<Frame*> m_openedFrames;
 
   bool m_openedByJavaScript;
+
+  bool m_creatingInitialEmptyDocument;
+  bool m_committedFirstRealDocumentLoad;
 
   RefPtr<HistoryItem> m_currentHistoryItem;
   RefPtr<HistoryItem> m_previousHistoryItem;
