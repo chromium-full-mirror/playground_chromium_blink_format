@@ -4044,10 +4044,15 @@ void RenderBlock::calcInlinePrefWidths() {
                              hasBreakableChar, hasBreak, beginMax, endMax,
                              childMin, childMax, stripFrontSpaces);
 
-        // This text object is insignificant and will not be rendered.  Just
-        // continue.
-        if (!hasBreak && childMax == 0)
+        // This text object will not be rendered, but it may still provide a
+        // breaking opportunity.
+        if (!hasBreak && childMax == 0) {
+          if (autoWrap && (beginWS || endWS)) {
+            m_minPrefWidth = max(inlineMin, m_minPrefWidth);
+            inlineMin = 0;
+          }
           continue;
+        }
 
         if (stripFrontSpaces)
           trailingSpaceChild = child;
