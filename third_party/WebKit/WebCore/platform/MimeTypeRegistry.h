@@ -52,6 +52,9 @@ class MimeTypeRegistry {
   // document in a frame.
   static bool isSupportedNonImageMIMEType(const String& mimeType);
 
+  // Check to see if a mime type is a valid Java applet mime type
+  static bool isJavaAppletMIMEType(const String& mimeType);
+
   static const HashSet<String>& getSupportedImageMIMETypes();
   static const HashSet<String>& getSupportedImageResourceMIMETypes();
   static const HashSet<String>& getSupportedNonImageMIMETypes();

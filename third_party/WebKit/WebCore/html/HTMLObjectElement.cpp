@@ -36,6 +36,7 @@
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "Image.h"
+#include "MimeTypeRegistry.h"
 #include "RenderImage.h"
 #include "RenderPartObject.h"
 #include "RenderWidget.h"
@@ -438,7 +439,7 @@ void HTMLObjectElement::setVspace(int value) {
 }
 
 bool HTMLObjectElement::containsJavaApplet() const {
-  if (type().lower() == "application/x-java-applet")
+  if (MimeTypeRegistry::isJavaAppletMIMEType(type()))
     return true;
 
   Node* child = firstChild();
@@ -447,8 +448,8 @@ bool HTMLObjectElement::containsJavaApplet() const {
       Element* e = static_cast<Element*>(child);
       if (e->hasTagName(paramTag) &&
           e->getAttribute(nameAttr).domString().lower() == "type" &&
-          e->getAttribute(valueAttr).domString().lower() ==
-              "application/x-java-applet")
+          MimeTypeRegistry::isJavaAppletMIMEType(
+              e->getAttribute(valueAttr).domString()))
         return true;
       else if (e->hasTagName(objectTag) &&
                static_cast<HTMLObjectElement*>(e)->containsJavaApplet())
