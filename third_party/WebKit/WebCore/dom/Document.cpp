@@ -74,6 +74,7 @@
 #include "NodeFilter.h"
 #include "NodeIterator.h"
 #include "OverflowEvent.h"
+#include "Page.h"
 #include "PlatformKeyboardEvent.h"
 #include "ProcessingInstruction.h"
 #include "RegisteredEventListener.h"
@@ -564,7 +565,9 @@ PassRefPtr<Node> Document::importNode(Node* importedNode,
                                       ExceptionCode& ec) {
   ec = 0;
 
-  if (!importedNode) {
+  if (!importedNode ||
+      (importedNode->isSVGElement() && page() &&
+       page()->settings()->usesDashboardBackwardCompatibilityMode())) {
     ec = NOT_SUPPORTED_ERR;
     return 0;
   }
