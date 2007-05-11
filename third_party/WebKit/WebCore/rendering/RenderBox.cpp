@@ -1038,7 +1038,10 @@ IntRect RenderBox::absoluteClippedOverflowRect() {
 
     // FIXME: Technically the outline inflation could fit within the theme
     // inflation.
-    r.inflate(style()->outlineSize());
+    if (!isInline() && continuation())
+      r.inflate(continuation()->style()->outlineSize());
+    else
+      r.inflate(style()->outlineSize());
   }
   computeAbsoluteRepaintRect(r);
   return r;

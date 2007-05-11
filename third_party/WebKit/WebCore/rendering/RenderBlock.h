@@ -416,6 +416,9 @@ class RenderBlock : public RenderFlow {
 
   void adjustRectForColumns(IntRect&) const;
 
+  void addContinuationWithOutline(RenderFlow*);
+  void paintContinuationOutlines(PaintInfo&, int tx, int ty);
+
  private:
   void adjustPointToColumnContents(IntPoint&) const;
   void adjustForBorderFit(int x, int& left, int& right)

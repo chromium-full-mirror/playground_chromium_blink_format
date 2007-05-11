@@ -2010,11 +2010,13 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   // We didn't move, but we did change size.  Invalidate the delta, which will
   // consist of possibly
   // two rectangles (but typically only one).
-  int ow = style() ? style()->outlineSize() : 0;
+  RenderStyle* outlineStyle =
+      !isInline() && continuation() ? continuation()->style() : style();
+  int ow = outlineStyle->outlineSize();
   int width = abs(newOutlineBox.width() - oldOutlineBox.width());
   if (width) {
     int borderWidth =
-        max(-style()->outlineOffset(),
+        max(-outlineStyle->outlineOffset(),
             max(borderRight(),
                 max(style()->borderTopRightRadius().width(),
                     style()->borderBottomRightRadius().width()))) +
@@ -2033,7 +2035,7 @@ bool RenderObject::repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
   int height = abs(newOutlineBox.height() - oldOutlineBox.height());
   if (height) {
     int borderHeight =
-        max(-style()->outlineOffset(),
+        max(-outlineStyle->outlineOffset(),
             max(borderBottom(),
                 max(style()->borderBottomLeftRadius().height(),
                     style()->borderBottomRightRadius().height()))) +
@@ -3249,7 +3251,10 @@ IntRect RenderObject::absoluteOutlineBox() const {
   absolutePosition(x, y);
   box.move(x, y);
   box.move(view()->layoutDelta());
-  box.inflate(style()->outlineSize());
+  if (!isInline() && continuation())
+    box.inflate(continuation()->style()->outlineSize());
+  else
+    box.inflate(style()->outlineSize());
   return box;
 }
 
