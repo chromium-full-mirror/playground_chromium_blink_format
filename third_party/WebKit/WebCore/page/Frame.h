@@ -345,8 +345,7 @@ class Frame : public Shared<Frame> {
   void setTypingStyle(CSSMutableStyleDeclaration*);
   void clearTypingStyle();
 
-  IntRect selectionRect() const;
-  FloatRect visibleSelectionRect() const;
+  FloatRect selectionRect(bool clipToVisibleContent = true) const;
 
   HTMLFormElement* currentForm() const;
 

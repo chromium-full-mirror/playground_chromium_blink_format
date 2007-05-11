@@ -41,7 +41,7 @@ class RenderBR : public RenderText {
 
   virtual const char* renderName() const { return "RenderBR"; }
 
-  virtual IntRect selectionRect() { return IntRect(); }
+  virtual IntRect selectionRect(bool) { return IntRect(); }
 
   virtual unsigned width(unsigned /*from*/,
                          unsigned /*len*/,

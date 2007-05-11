@@ -132,7 +132,7 @@ class RenderText : public RenderObject {
     return static_cast<SelectionState>(m_selectionState);
   }
   virtual void setSelectionState(SelectionState s);
-  virtual IntRect selectionRect();
+  virtual IntRect selectionRect(bool clipToVisibleContent = true);
   virtual IntRect caretRect(int offset,
                             EAffinity,
                             int* extraWidthToEndOfLine = 0);

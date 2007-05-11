@@ -53,7 +53,7 @@ class RenderReplaced : public RenderBox {
     return static_cast<SelectionState>(m_selectionState);
   }
   virtual void setSelectionState(SelectionState);
-  virtual IntRect selectionRect();
+  virtual IntRect selectionRect(bool clipToVisibleContent = true);
 
   bool isSelected() const;
 
