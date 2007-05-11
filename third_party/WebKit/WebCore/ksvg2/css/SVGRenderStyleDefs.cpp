@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005, 2007 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Antti Koivisto (koivisto@kde.org)
@@ -62,7 +62,7 @@ bool StyleFillData::operator==(const StyleFillData& other) const {
   if (paint->paintType() == SVGPaint::SVG_PAINTTYPE_RGBCOLOR)
     return paint->color() == other.paint->color();
 
-  return (paint == other.paint) && (opacity == other.opacity);
+  return paint == other.paint;
 }
 
 StyleStrokeData::StyleStrokeData() : Shared<StyleStrokeData>() {
