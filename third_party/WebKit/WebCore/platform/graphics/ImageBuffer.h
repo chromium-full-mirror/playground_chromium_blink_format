@@ -39,6 +39,10 @@ typedef struct CGImage* CGImageRef;
 class QPainter;
 #endif
 
+#if PLATFORM(CAIRO)
+struct _cairo_surface;
+#endif
+
 namespace WebCore {
 
 class GraphicsContext;
@@ -78,6 +82,9 @@ class ImageBuffer : Noncopyable {
   ImageBuffer(const QPixmap& px);
   mutable QPixmap m_pixmap;
   mutable QPainter* m_painter;
+#elif PLATFORM(CAIRO)
+  ImageBuffer(_cairo_surface* surface);
+  mutable _cairo_surface* m_surface;
 #endif
 };
 }
