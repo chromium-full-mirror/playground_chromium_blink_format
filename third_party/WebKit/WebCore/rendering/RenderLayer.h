@@ -302,7 +302,6 @@ class RenderLayer : public ScrollbarClient {
   void updateLayerPosition();
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
-  void checkForRepaintOnResize();
 
   void relativePositionOffset(int& relX, int& relY) {
     relX += m_relX;
@@ -380,6 +379,7 @@ class RenderLayer : public ScrollbarClient {
   void updateHoverActiveState(const HitTestRequest&, HitTestResult&);
 
   IntRect repaintRect() const { return m_repaintRect; }
+  void setNeedsFullRepaint(bool f = true) { m_needsFullRepaint = f; }
 
   int staticX() const { return m_staticX; }
   int staticY() const { return m_staticY; }
@@ -501,7 +501,7 @@ class RenderLayer : public ScrollbarClient {
   // we ended up painting this layer or any descendants (and therefore need to
   // blend).
   bool m_inOverflowRelayout : 1;
-  bool m_repaintOverflowOnResize : 1;
+  bool m_needsFullRepaint : 1;
 
   bool m_overflowStatusDirty : 1;
   bool m_horizontalOverflow : 1;
