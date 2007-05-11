@@ -44,7 +44,7 @@
 
 namespace WebCore {
 
-static IconDatabase* sharedInstance = 0;
+static IconDatabase* sharedIconDatabase = 0;
 
 // This version number is in the DB and marks the current generation of the
 // schema
@@ -68,10 +68,10 @@ const String& IconDatabase::defaultDatabaseFilename() {
   return defaultDatabaseFilename;
 }
 
-IconDatabase* IconDatabase::sharedIconDatabase() {
-  if (!sharedInstance)
-    sharedInstance = new IconDatabase;
-  return sharedInstance;
+IconDatabase* iconDatabase() {
+  if (!sharedIconDatabase)
+    sharedIconDatabase = new IconDatabase;
+  return sharedIconDatabase;
 }
 
 IconDatabase::IconDatabase()
@@ -1030,11 +1030,7 @@ void IconDatabase::setImported(bool import) {
 }
 
 IconDatabase::~IconDatabase() {
-  close();
-  m_startupTimer.stop();
-  m_updateTimer.stop();
-  if (sharedInstance == this)
-    sharedInstance = 0;
+  ASSERT_NOT_REACHED();
 }
 
 // readySQLStatement() handles two things

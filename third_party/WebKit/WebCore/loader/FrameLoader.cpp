@@ -1055,10 +1055,7 @@ void FrameLoader::startIconLoader() {
   if (!isLoadingMainFrame())
     return;
 
-  IconDatabase* iconDB = IconDatabase::sharedIconDatabase();
-  if (!iconDB)
-    return;
-  if (!iconDB->enabled())
+  if (!iconDatabase() || !iconDatabase()->enabled())
     return;
 
   KURL url(iconURL());
@@ -1068,9 +1065,9 @@ void FrameLoader::startIconLoader() {
 
   // If we already have an unexpired icon, we won't kick off a load but we
   // *will* map the appropriate URLs to it
-  if (iconDB->hasEntryForIconURL(urlString) &&
+  if (iconDatabase()->hasEntryForIconURL(urlString) &&
       loadType() != FrameLoadTypeReload &&
-      !iconDB->isIconExpiredForIconURL(urlString)) {
+      !iconDatabase()->isIconExpiredForIconURL(urlString)) {
     commitIconURLToIconDatabase(url);
     return;
   }
@@ -1100,10 +1097,9 @@ static HashSet<String, CaseInsensitiveHash<String>>& localSchemes() {
 }
 
 void FrameLoader::commitIconURLToIconDatabase(const KURL& icon) {
-  IconDatabase* iconDB = IconDatabase::sharedIconDatabase();
-  ASSERT(iconDB);
-  iconDB->setIconURLForPageURL(icon.url(), m_URL.url());
-  iconDB->setIconURLForPageURL(icon.url(), originalRequestURL().url());
+  ASSERT(iconDatabase());
+  iconDatabase()->setIconURLForPageURL(icon.url(), m_URL.url());
+  iconDatabase()->setIconURLForPageURL(icon.url(), originalRequestURL().url());
 }
 
 void FrameLoader::restoreDocumentState() {

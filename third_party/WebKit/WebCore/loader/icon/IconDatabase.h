@@ -43,8 +43,6 @@ class SQLTransaction;
 
 class IconDatabase : Noncopyable {
  public:
-  static IconDatabase* sharedIconDatabase();
-
   bool open(const String& path);
   bool isOpen() { return m_mainDB.isOpen() && m_privateBrowsingDB.isOpen(); }
   void close();
@@ -86,6 +84,7 @@ class IconDatabase : Noncopyable {
  private:
   IconDatabase();
   ~IconDatabase();
+  friend IconDatabase* iconDatabase();
 
   // This tries to get the iconID for the IconURL and, if it doesn't exist and
   // createIfNecessary is true,
@@ -228,6 +227,9 @@ class IconDatabase : Noncopyable {
   HashSet<String> m_pageURLsPendingDeletion;
   HashSet<String> m_iconURLsPendingDeletion;
 };
+
+// Function to obtain the global icon database.
+IconDatabase* iconDatabase();
 
 }  // namespace WebCore
 
