@@ -305,7 +305,6 @@ Document::Document(DOMImplementation* impl, Frame* frame)
 #endif
       ,
       m_savedRenderer(0),
-      m_passwordFields(0),
       m_secureForms(0),
       m_designMode(inherit),
       m_selfOnlyRefCount(0)
@@ -319,7 +318,8 @@ Document::Document(DOMImplementation* impl, Frame* frame)
       m_accessKeyMapValid(false),
       m_createRenderers(true),
       m_inPageCache(false),
-      m_isAllowedToLoadLocalResources(false)
+      m_isAllowedToLoadLocalResources(false),
+      m_useSecureKeyboardEntryWhenActive(false)
 #if USE(LOW_BANDWIDTH_DISPLAY)
       ,
       m_inLowBandwidthDisplay(false)
@@ -2709,17 +2709,18 @@ void Document::setInPageCache(bool flag) {
   }
 }
 
-void Document::passwordFieldAdded() {
-  m_passwordFields++;
+void Document::registerForDidRestoreFromCacheCallback(Element* e) {
+  m_didRestorePageCallbackSet.add(e);
 }
 
-void Document::passwordFieldRemoved() {
-  ASSERT(m_passwordFields > 0);
-  m_passwordFields--;
+void Document::unregisterForDidRestoreFromCacheCallback(Element* e) {
+  m_didRestorePageCallbackSet.remove(e);
 }
 
-bool Document::hasPasswordField() const {
-  return m_passwordFields > 0;
+void Document::didRestoreFromCache() {
+  HashSet<Element*>::iterator it = m_didRestorePageCallbackSet.begin();
+  for (; it != m_didRestorePageCallbackSet.end(); ++it)
+    (*it)->didRestoreFromCache();
 }
 
 void Document::secureFormAdded() {
@@ -3618,5 +3619,17 @@ void Document::setIconURL(const String& iconURL, const String& type) {
     m_iconURL = iconURL;
   else if (!type.isEmpty())
     m_iconURL = iconURL;
+}
+
+void Document::setUseSecureKeyboardEntryWhenActive(bool usesSecureKeyboard) {
+  if (m_useSecureKeyboardEntryWhenActive == usesSecureKeyboard)
+    return;
+
+  m_useSecureKeyboardEntryWhenActive = usesSecureKeyboard;
+  m_frame->updateSecureKeyboardEntryIfActive();
+}
+
+bool Document::useSecureKeyboardEntryWhenActive() const {
+  return m_useSecureKeyboardEntryWhenActive;
 }
 }

@@ -320,7 +320,7 @@ class Document : public ContainerNode {
   void registerFormElementWithState(HTMLGenericFormElement* e) {
     m_formElementsWithState.add(e);
   }
-  void deregisterFormElementWithState(HTMLGenericFormElement* e) {
+  void unregisterFormElementWithState(HTMLGenericFormElement* e) {
     m_formElementsWithState.remove(e);
   }
   Vector<String> formElementsState() const;
@@ -742,6 +742,9 @@ class Document : public ContainerNode {
     return m_isAllowedToLoadLocalResources;
   }
 
+  void setUseSecureKeyboardEntryWhenActive(bool);
+  bool useSecureKeyboardEntryWhenActive() const;
+
 #if USE(LOW_BANDWIDTH_DISPLAY)
   void setDocLoader(DocLoader* loader) { m_docLoader = loader; }
   bool inLowBandwidthDisplay() const { return m_inLowBandwidthDisplay; }
@@ -817,6 +820,8 @@ class Document : public ContainerNode {
   ListHashSet<HTMLGenericFormElement*> m_formElementsWithState;
   FormElementStateMap m_stateForNewFormElements;
 
+  HashSet<Element*> m_didRestorePageCallbackSet;
+
   Color m_linkColor;
   Color m_visitedLinkColor;
   Color m_activeLinkColor;
@@ -886,9 +891,13 @@ class Document : public ContainerNode {
   bool inPageCache();
   void setInPageCache(bool flag);
 
-  void passwordFieldAdded();
-  void passwordFieldRemoved();
-  bool hasPasswordField() const;
+  // Elements can register themselves for the "didRestoreFromCache()" callback
+  // which will be
+  // called if the document is restored from the Page Cache
+  void registerForDidRestoreFromCacheCallback(Element*);
+  void unregisterForDidRestoreFromCacheCallback(Element*);
+
+  void didRestoreFromCache();
 
   void secureFormAdded();
   void secureFormRemoved();
@@ -936,7 +945,6 @@ class Document : public ContainerNode {
 
   mutable String m_domain;
   RenderObject* m_savedRenderer;
-  int m_passwordFields;
   int m_secureForms;
 
   RefPtr<TextResourceDecoder> m_decoder;
@@ -978,6 +986,8 @@ class Document : public ContainerNode {
   String m_iconURL;
 
   bool m_isAllowedToLoadLocalResources;
+
+  bool m_useSecureKeyboardEntryWhenActive;
 
 #if USE(LOW_BANDWIDTH_DISPLAY)
   bool m_inLowBandwidthDisplay;

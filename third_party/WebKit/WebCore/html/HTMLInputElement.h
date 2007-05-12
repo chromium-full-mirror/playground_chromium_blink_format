@@ -196,6 +196,8 @@ class HTMLInputElement : public HTMLGenericFormElement {
 
   String constrainValue(const String& proposedValue) const;
 
+  virtual void didRestoreFromCache();
+
  protected:
   AtomicString m_name;
 

@@ -58,7 +58,7 @@ HTMLTextAreaElement::HTMLTextAreaElement(Document* doc, HTMLFormElement* f)
 }
 
 HTMLTextAreaElement::~HTMLTextAreaElement() {
-  document()->deregisterFormElementWithState(this);
+  document()->unregisterFormElementWithState(this);
 }
 
 const AtomicString& HTMLTextAreaElement::type() const {

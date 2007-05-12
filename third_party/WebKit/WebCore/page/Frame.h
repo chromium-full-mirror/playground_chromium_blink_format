@@ -339,7 +339,7 @@ class Frame : public Shared<Frame> {
 
   bool isContentEditable() const;  // if true, everything in frame is editable
 
-  void setUseSecureKeyboardEntryWhenActive(bool);
+  void updateSecureKeyboardEntryIfActive();
 
   CSSMutableStyleDeclaration* typingStyle() const;
   void setTypingStyle(CSSMutableStyleDeclaration*);
