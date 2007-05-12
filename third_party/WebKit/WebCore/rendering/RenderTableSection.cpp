@@ -181,7 +181,7 @@ bool RenderTableSection::ensureRows(int numRows) {
       m_grid[r].row = new Row(nCols);
       m_grid[r].row->fill(emptyCellStruct);
       m_grid[r].rowRenderer = 0;
-      m_grid[r].baseLine = 0;
+      m_grid[r].baseline = 0;
       m_grid[r].height = Length();
     }
   }
@@ -389,7 +389,7 @@ void RenderTableSection::calcRowHeight() {
       m_rowPos[r + 1] =
           max(m_rowPos[r + 1],
               baseline + bdesc + (m_grid[r].rowRenderer ? spacing : 0));
-      m_grid[r].baseLine = baseline;
+      m_grid[r].baseline = baseline;
     }
 
     m_rowPos[r + 1] = max(m_rowPos[r + 1], m_rowPos[r]);
@@ -543,6 +543,16 @@ int RenderTableSection::layoutRows(int toAdd) {
             max(0, rHeight - cell->borderTop() - cell->paddingTop() -
                        cell->borderBottom() - cell->paddingBottom()));
         cell->layoutIfNeeded();
+
+        // If the baseline moved, we may have to update the data for our row.
+        // Find out the new baseline.
+        EVerticalAlign va = cell->style()->verticalAlign();
+        if (va == BASELINE || va == TEXT_BOTTOM || va == TEXT_TOP ||
+            va == SUPER || va == SUB) {
+          int b = cell->baselinePosition();
+          if (b > cell->borderTop() + cell->paddingTop())
+            m_grid[r].baseline = max(m_grid[r].baseline, b);
+        }
       }
 
       int te = 0;
