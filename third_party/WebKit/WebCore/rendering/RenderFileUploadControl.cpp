@@ -286,6 +286,10 @@ void RenderFileUploadControl::calcPrefWidths() {
   setPrefWidthsDirty(false);
 }
 
+void RenderFileUploadControl::receiveDroppedFile(const String& filename) {
+  m_fileChooser->chooseFile(filename);
+}
+
 HTMLFileUploadInnerButtonElement::HTMLFileUploadInnerButtonElement(
     Document* doc,
     Node* shadowParent)

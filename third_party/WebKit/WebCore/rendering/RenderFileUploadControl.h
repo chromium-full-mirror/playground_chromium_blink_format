@@ -50,6 +50,8 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   void valueChanged();
 
+  void receiveDroppedFile(const String&);
+
  private:
   int maxFilenameWidth() const;
   RenderStyle* createButtonStyle(RenderStyle* parentStyle) const;

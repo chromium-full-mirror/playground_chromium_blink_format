@@ -32,6 +32,7 @@
 #include "IntPoint.h"
 
 #include <wtf/Forward.h>
+#include <wtf/Vector.h>
 
 #if PLATFORM(MAC)
 #ifdef __OBJC__
@@ -93,10 +94,12 @@ class DragData {
   bool containsCompatibleContent() const;
   String asURL(String* title = 0) const;
   String asPlainText() const;
+  void asFilenames(Vector<String>&) const;
   Color asColor() const;
   PassRefPtr<DocumentFragment> asFragment(Document*) const;
   bool canSmartReplace() const;
   bool containsColor() const;
+  bool containsFiles() const;
 
  private:
   IntPoint m_clientPosition;
