@@ -92,8 +92,8 @@ void IconLoader::didReceiveResponse(SubresourceLoader* resourceLoader,
   LOG(IconDatabase, "IconLoader::didReceiveResponse() - Loader %p, response %i",
       resourceLoader, status);
   if (status && (status < 200 || status > 299)) {
-    KURL iconURL = resourceLoader->handle()->url();
-    finishLoading(iconURL);
+    ResourceHandle* handle = resourceLoader->handle();
+    finishLoading(handle ? handle->url() : KURL());
     m_resourceLoader = 0;
   }
 }
@@ -111,7 +111,8 @@ void IconLoader::didFail(SubresourceLoader* resourceLoader,
   LOG(IconDatabase, "IconLoader::didFail() - Loader %p", resourceLoader);
   ASSERT(resourceLoader == m_resourceLoader);
   ASSERT(m_loadIsInProgress);
-  finishLoading(resourceLoader->handle()->url());
+  ResourceHandle* handle = resourceLoader->handle();
+  finishLoading(handle ? handle->url() : KURL());
 }
 
 void IconLoader::didFinishLoading(SubresourceLoader* resourceLoader) {
@@ -123,7 +124,8 @@ void IconLoader::didFinishLoading(SubresourceLoader* resourceLoader) {
   // Otherwise, finishLoading() as expected
   if (m_loadIsInProgress) {
     ASSERT(resourceLoader == m_resourceLoader);
-    finishLoading(resourceLoader->handle()->url());
+    ResourceHandle* handle = resourceLoader->handle();
+    finishLoading(handle ? handle->url() : KURL());
   }
 }
 
