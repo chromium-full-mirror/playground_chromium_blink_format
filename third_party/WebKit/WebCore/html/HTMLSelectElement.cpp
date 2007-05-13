@@ -624,7 +624,7 @@ void HTMLSelectElement::menuListDefaultEventHandler(Event* evt) {
       handled = true;
     }
     if (keyIdentifier == "Down" || keyIdentifier == "Up" ||
-        keyIdentifier == "U+000020") {
+        keyIdentifier == "U+0020") {
       focus();
       // Save the selection so it can be compared to the new selection when we
       // call onChange during setSelectedIndex,

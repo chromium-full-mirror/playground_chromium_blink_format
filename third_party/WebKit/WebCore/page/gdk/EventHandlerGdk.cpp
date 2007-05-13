@@ -46,7 +46,7 @@ using namespace EventNames;
 static bool isKeyboardOptionTab(KeyboardEvent* event) {
   return event &&
          (event->type() == keydownEvent || event->type() == keypressEvent) &&
-         event->altKey() && event->keyIdentifier() == "U+000009";
+         event->altKey() && event->keyIdentifier() == "U+0009";
 }
 
 bool EventHandler::tabsToAllControls(KeyboardEvent* event) const {
