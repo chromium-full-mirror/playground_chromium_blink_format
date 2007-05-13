@@ -133,8 +133,8 @@ void HTMLInputElement::init() {
 }
 
 HTMLInputElement::~HTMLInputElement() {
-  document()->unregisterFormElementWithState(this);
-  document()->unregisterForDidRestoreFromCacheCallback(this);
+  ownerDocument()->unregisterFormElementWithState(this);
+  ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
   delete m_imageLoader;
 }
 
@@ -316,11 +316,11 @@ void HTMLInputElement::setInputType(const String& t) {
         recheckValue();
 
       if (wasPasswordField && !isPasswordField) {
-        document()->registerFormElementWithState(this);
-        document()->unregisterForDidRestoreFromCacheCallback(this);
+        ownerDocument()->registerFormElementWithState(this);
+        ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
       } else if (!wasPasswordField && isPasswordField) {
-        document()->unregisterFormElementWithState(this);
-        document()->registerForDidRestoreFromCacheCallback(this);
+        ownerDocument()->unregisterFormElementWithState(this);
+        ownerDocument()->registerForDidRestoreFromCacheCallback(this);
       }
 
       if (didRespectHeightAndWidth != willRespectHeightAndWidth) {
@@ -741,9 +741,6 @@ void HTMLInputElement::attach() {
         imageObj->setImageSizeForAltText();
     }
   }
-
-  if (inputType() == PASSWORD)
-    document()->registerForDidRestoreFromCacheCallback(this);
 }
 
 void HTMLInputElement::detach() {
@@ -1465,6 +1462,24 @@ Selection HTMLInputElement::selection() const {
 void HTMLInputElement::didRestoreFromCache() {
   ASSERT(inputType() == PASSWORD);
   reset();
+}
+
+void HTMLInputElement::willMoveToNewOwnerDocument() {
+  if (inputType() == PASSWORD)
+    ownerDocument()->unregisterForDidRestoreFromCacheCallback(this);
+  else
+    ownerDocument()->unregisterFormElementWithState(this);
+
+  HTMLGenericFormElement::willMoveToNewOwnerDocument();
+}
+
+void HTMLInputElement::didMoveToNewOwnerDocument() {
+  if (inputType() == PASSWORD)
+    document()->registerForDidRestoreFromCacheCallback(this);
+  else
+    document()->registerFormElementWithState(this);
+
+  HTMLGenericFormElement::didMoveToNewOwnerDocument();
 }
 
 }  // namespace
