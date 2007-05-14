@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,33 +23,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "HistoryItemTimer.h"
+#ifndef PageCache_h
+#define PageCache_h
 
-#include "HistoryItem.h"
+#include "Timer.h"
+#include <wtf/Forward.h>
+#include <wtf/HashSet.h>
+#include <wtf/Noncopyable.h>
 
 namespace WebCore {
 
-const double DefaultPageCacheReleaseInterval = 3;
+class CachedPage;
 
-HistoryItemTimer::HistoryItemTimer()
-    : m_timer(this, &HistoryItemTimer::callReleaseCachedPagesOrReschedule) {}
+class PageCache : Noncopyable {
+ public:
+  void autorelease(PassRefPtr<CachedPage>);
+  void autoreleaseNow();
 
-bool HistoryItemTimer::isActive() const {
-  return m_timer.isActive();
-}
+ private:
+  friend PageCache* pageCache();
+  typedef HashSet<RefPtr<CachedPage>> CachedPageSet;
 
-void HistoryItemTimer::schedule(double seconds) {
-  m_timer.startOneShot(seconds);
-}
+  PageCache();
+  ~PageCache();  // not implemented because we're a singleton
 
-void HistoryItemTimer::invalidate() {
-  m_timer.stop();
-}
+  void autoreleaseNowOrReschedule(Timer<PageCache>*);
 
-void HistoryItemTimer::callReleaseCachedPagesOrReschedule(
-    Timer<HistoryItemTimer>*) {
-  HistoryItem::releaseCachedPagesOrReschedule();
-}
+  Timer<PageCache> m_autoreleaseTimer;
+  CachedPageSet m_autoreleaseSet;
+};
+
+// Function to obtain the global page cache.
+PageCache* pageCache();
 
 }  // namespace WebCore
+
+#endif  // PageCache_h

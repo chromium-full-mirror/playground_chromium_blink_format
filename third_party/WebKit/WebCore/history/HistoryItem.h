@@ -81,7 +81,6 @@ class HistoryItem : public Shared<HistoryItem> {
 
   Image* icon() const;
 
-  static void performPendingReleaseOfCachedPages();
   void setCachedPage(PassRefPtr<CachedPage>);
   CachedPage* cachedPage();
 
@@ -144,8 +143,6 @@ class HistoryItem : public Shared<HistoryItem> {
   id getTransientProperty(const String&) const;
   void setTransientProperty(const String&, id);
 #endif
-
-  void scheduleCachedPageForRelease();
 
 #ifndef NDEBUG
   int showTree() const;
