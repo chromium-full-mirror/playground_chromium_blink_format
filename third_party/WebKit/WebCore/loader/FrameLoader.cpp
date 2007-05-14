@@ -2643,7 +2643,10 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_wasLoadEventEmitted = false;
   m_outgoingReferrer = URL.url();
 
-  m_frame->setView(cachedPage.view());
+  FrameView* view = cachedPage.view();
+  if (view)
+    view->setWasScrolledByUser(false);
+  m_frame->setView(view);
 
   m_frame->setDocument(document);
   m_decoder = document->decoder();
@@ -3854,13 +3857,15 @@ void FrameLoader::restoreScrollPositionAndViewState() {
     return;
 
   // FIXME: It would be great to work out a way to put this code in WebCore
-  // instead of calling through to the client.
+  // instead of calling
+  // through to the client. It's currently used only for the PDF view on Mac.
   m_client->restoreViewState();
 
-  if (m_frame->view()) {
-    const IntPoint& scrollPoint = m_currentHistoryItem->scrollPoint();
-    m_frame->view()->setContentsPos(scrollPoint.x(), scrollPoint.y());
-  }
+  if (FrameView* view = m_frame->view())
+    if (!view->wasScrolledByUser()) {
+      const IntPoint& scrollPoint = m_currentHistoryItem->scrollPoint();
+      view->setContentsPos(scrollPoint.x(), scrollPoint.y());
+    }
 }
 
 void FrameLoader::purgePageCache() {
@@ -3972,23 +3977,17 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
   // check for all that as an additional optimization.
   // We also do not do anchor-style navigation if we're posting a form.
 
-  // FIXME: These checks don't match the ones in
-  // _loadURL:referrer:loadType:target:triggeringEvent:isFormSubmission:
-  // Perhaps they should.
   if (!formData && !shouldReload(itemURL, currentURL) && urlsMatchItem(item)) {
-#if 0
-        // FIXME:  We need to normalize the code paths for anchor navigation.  Something
-        // like the following line of code should be done, but also accounting for correct
-        // updates to the back/forward list and scroll position.
-        // rjw 4/9/03 See 3223929.
-        [self _loadURL:itemURL referrer:[[[self dataSource] request] HTTPReferrer] loadType:loadType target:nil triggeringEvent:nil form:nil formValues:nil];
-#endif
-
     // Must do this maintenance here, since we don't go through a real page
     // reload
     saveScrollPositionAndViewStateToItem(m_currentHistoryItem.get());
 
-    // FIXME: form state might want to be saved here too
+    if (FrameView* view = m_frame->view())
+      view->setWasScrolledByUser(false);
+
+    m_currentHistoryItem = item;
+
+    // FIXME: Form state might need to be saved here too.
 
     // We always call scrollToAnchor here, even if the URL doesn't have an
     // anchor fragment. This is so we'll keep the WebCore Frame's URL
@@ -3997,7 +3996,6 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
 
     // must do this maintenance here, since we don't go through a real page
     // reload
-    m_currentHistoryItem = item;
     restoreScrollPositionAndViewState();
 
     // Fake the URL change by updating the data source's request.  This will no
@@ -4024,11 +4022,9 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
       RefPtr<CachedPage> cachedPage = item->cachedPage();
       double interval = currentTime() - cachedPage->timeStamp();
 
-      // FIXME: 1800 is the current backforwardcache expiration time, but we
-      // actually store as a pref -
-      // previously, this code was -
-      // if (interval <= [[getWebView(self) preferences]
-      // _backForwardCacheExpirationInterval]) {
+      // FIXME: 1800 should not be hardcoded, it should come from
+      // WebKitBackForwardCacheExpirationIntervalKey in WebKit.
+      // Or we should remove WebKitBackForwardCacheExpirationIntervalKey.
       if (interval <= 1800) {
         load(cachedPage->documentLoader(), loadType, 0);
         inPageCache = true;
@@ -4189,12 +4185,17 @@ void FrameLoader::recursiveGoToItem(HistoryItem* item,
     ASSERT(!m_previousHistoryItem);
     saveDocumentState();
     saveScrollPositionAndViewStateToItem(m_currentHistoryItem.get());
+
+    if (FrameView* view = m_frame->view())
+      view->setWasScrolledByUser(false);
+
     m_currentHistoryItem = item;
 
     // Restore form state (works from currentItem)
     restoreDocumentState();
 
-    // Restore the scroll position (taken in favor of going back to the anchor)
+    // Restore the scroll position (we choose to do this rather than going back
+    // to the anchor point)
     restoreScrollPositionAndViewState();
 
     const HistoryItemVector& childItems = item->children();
