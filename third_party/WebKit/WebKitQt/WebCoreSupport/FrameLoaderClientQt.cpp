@@ -223,10 +223,7 @@ void FrameLoaderClientQt::loadedFromCachedPage() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
-  if (m_webFrame)
-    emit m_webFrame->loadDone(true);
-}
+void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {}
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
   notImplemented();
@@ -266,7 +263,10 @@ void FrameLoaderClientQt::dispatchDidFinishDocumentLoad() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidFinishLoad() {}
+void FrameLoaderClientQt::dispatchDidFinishLoad() {
+  if (m_webFrame)
+    emit m_webFrame->loadDone(true);
+}
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
   // notImplemented();
@@ -407,7 +407,7 @@ void FrameLoaderClientQt::addHistoryItemForFragmentScroll() {
 }
 
 void FrameLoaderClientQt::didFinishLoad() {
-  notImplemented();
+  //     notImplemented();
 }
 
 void FrameLoaderClientQt::prepareForDataSourceReplacement() {
@@ -483,14 +483,13 @@ bool FrameLoaderClientQt::canCachePage() const {
   return false;
 }
 
-void FrameLoaderClientQt::setMainDocumentError(WebCore::DocumentLoader* loader,
-                                               const WebCore::ResourceError&) {
+void FrameLoaderClientQt::setMainDocumentError(
+    WebCore::DocumentLoader* loader,
+    const WebCore::ResourceError& error) {
   if (m_firstData) {
     loader->frameLoader()->setEncoding(m_response.textEncodingName(), false);
     m_firstData = false;
   }
-  if (m_webFrame)
-    emit m_webFrame->loadDone(false);
 }
 
 void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
@@ -575,8 +574,8 @@ void FrameLoaderClientQt::dispatchWillSendRequest(
     WebCore::ResourceRequest& request,
     const WebCore::ResourceResponse& response) {
   // seems like the Mac code doesn't do anything here by default neither
-  qDebug() << "FrameLoaderClientQt::dispatchWillSendRequest" << request.isNull()
-           << request.url().url();
+  // qDebug() << "FrameLoaderClientQt::dispatchWillSendRequest" <<
+  // request.isNull() << request.url().url();
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveAuthenticationChallenge(
@@ -599,7 +598,7 @@ void FrameLoaderClientQt::dispatchDidReceiveResponse(
     const WebCore::ResourceResponse& response) {
   m_response = response;
   m_firstData = true;
-  qDebug() << "    got response from" << response.url().url();
+  // qDebug() << "    got response from" << response.url().url();
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveContentLength(
@@ -635,11 +634,13 @@ bool FrameLoaderClientQt::dispatchDidLoadResourceFromMemoryCache(
 
 void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
     const WebCore::ResourceError&) {
-  notImplemented();
+  if (m_webFrame)
+    emit m_webFrame->loadDone(false);
 }
 
 void FrameLoaderClientQt::dispatchDidFailLoad(const WebCore::ResourceError&) {
-  notImplemented();
+  if (m_webFrame)
+    emit m_webFrame->loadDone(false);
 }
 
 WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {

@@ -4420,6 +4420,9 @@ void FrameLoader::mainReceivedCompleteError(DocumentLoader* loader,
   loader->setPrimaryLoadComplete(true);
   m_client->dispatchDidLoadMainResource(activeDocumentLoader());
   checkCompleted();
+#if PLATFORM(QT)
+  checkLoadComplete();
+#endif
 }
 
 void FrameLoader::mainReceivedError(const ResourceError& error,
