@@ -976,8 +976,12 @@ void Element::updateFocusAppearanceTimerFired(Timer<Element>*) {
 void Element::blur() {
   stopUpdateFocusAppearanceTimer();
   Document* doc = document();
-  if (doc->focusedNode() == this)
-    doc->setFocusedNode(0);
+  if (doc->focusedNode() == this) {
+    if (doc->frame())
+      doc->frame()->page()->focusController()->setFocusedNode(0);
+    else
+      doc->setFocusedNode(0);
+  }
 }
 
 void Element::stopUpdateFocusAppearanceTimer() {
