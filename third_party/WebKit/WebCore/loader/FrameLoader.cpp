@@ -3843,6 +3843,9 @@ void FrameLoader::saveScrollPositionAndViewStateToItem(HistoryItem* item) {
  fails.  We then successfully restore it when the layout happens.
 */
 void FrameLoader::restoreScrollPositionAndViewState() {
+  if (!m_committedFirstRealDocumentLoad)
+    return;
+
   ASSERT(m_currentHistoryItem);
 
   // FIXME: As the ASSERT attests, it seems we should always have a currentItem
