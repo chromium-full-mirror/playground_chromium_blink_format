@@ -1004,10 +1004,17 @@ bool Window::getOverridePropertySlot(ExecState* exec,
   // Look for overrides first
   JSValue** val = getDirectLocation(propertyName);
   if (val) {
-    if (isSafeScript(exec))
-      slot.setValueSlot(this, val);
-    else
+    if (!isSafeScript(exec)) {
       slot.setUndefined(this);
+      return true;
+    }
+
+    // FIXME: Come up with a way of having JavaScriptCore handle getters/setters
+    // in this case
+    if (_prop.hasGetterSetterProperties() && val[0]->type() == GetterSetterType)
+      fillGetterPropertySlot(slot, val);
+    else
+      slot.setValueSlot(this, val);
     return true;
   }
 
