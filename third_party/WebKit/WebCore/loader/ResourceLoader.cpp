@@ -244,7 +244,8 @@ void ResourceLoader::didFail(const ResourceError& error) {
   // 3266216.
   RefPtr<ResourceLoader> protector(this);
 
-  frameLoader()->didFailToLoad(this, error);
+  if (!m_calledDidFinishLoad)
+    frameLoader()->didFailToLoad(this, error);
 
   releaseResources();
 }
@@ -272,7 +273,8 @@ void ResourceLoader::didCancel(const ResourceError& error) {
     m_handle->cancel();
     m_handle = 0;
   }
-  frameLoader()->didFailToLoad(this, error);
+  if (!m_calledDidFinishLoad)
+    frameLoader()->didFailToLoad(this, error);
 
   releaseResources();
 }
