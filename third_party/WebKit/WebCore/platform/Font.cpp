@@ -328,19 +328,25 @@ UChar32 WidthIterator::normalizeVoicingMarks(int currentCharacter) {
 // Font Implementation (Cross-Platform Portion)
 // ============================================================================================
 
-Font::Font() : m_pageZero(0), m_letterSpacing(0), m_wordSpacing(0) {}
+Font::Font()
+    : m_pageZero(0),
+      m_letterSpacing(0),
+      m_wordSpacing(0),
+      m_isPlatformFont(false) {}
 
 Font::Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
     : m_fontDescription(fd),
       m_pageZero(0),
       m_letterSpacing(letterSpacing),
-      m_wordSpacing(wordSpacing) {}
+      m_wordSpacing(wordSpacing),
+      m_isPlatformFont(false) {}
 
 Font::Font(const FontPlatformData& fontData, bool isPrinterFont)
     : m_fontList(new FontFallbackList),
       m_pageZero(0),
       m_letterSpacing(0),
-      m_wordSpacing(0) {
+      m_wordSpacing(0),
+      m_isPlatformFont(true) {
   m_fontDescription.setUsePrinterFont(isPrinterFont);
   m_fontList->setPlatformFont(fontData);
 }
@@ -351,7 +357,8 @@ Font::Font(const Font& other)
       m_pages(other.m_pages),
       m_pageZero(other.m_pageZero),
       m_letterSpacing(other.m_letterSpacing),
-      m_wordSpacing(other.m_wordSpacing) {}
+      m_wordSpacing(other.m_wordSpacing),
+      m_isPlatformFont(other.m_isPlatformFont) {}
 
 Font& Font::operator=(const Font& other) {
   m_fontDescription = other.m_fontDescription;
