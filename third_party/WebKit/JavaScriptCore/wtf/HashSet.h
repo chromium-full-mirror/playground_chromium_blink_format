@@ -229,7 +229,7 @@ inline HashSet<T, U, V>::HashSet(const HashSet& other) : m_impl(other.m_impl) {
 template <typename T, typename U, typename V>
 inline HashSet<T, U, V>& HashSet<T, U, V>::operator=(const HashSet& other) {
   HashSet tmp(other);
-  swap(other);
+  swap(tmp);
   return *this;
 }
 
