@@ -903,9 +903,6 @@ void FrameLoader::begin(const KURL& url) {
       m_responseMIMEType, m_frame, m_frame->inViewSourceMode());
   m_frame->setDocument(document);
 
-  if (!m_creatingInitialEmptyDocument)
-    m_committedFirstRealDocumentLoad = true;
-
   document->setURL(m_URL.url());
   // We prefer m_baseURL over m_URL because m_URL changes when we are
   // about to load a new page.
@@ -2312,6 +2309,11 @@ bool FrameLoader::isLoading() const {
          docLoader->isLoadingSubresources() || docLoader->isLoadingPlugIns();
 }
 
+bool FrameLoader::frameHasLoaded() const {
+  return m_committedFirstRealDocumentLoad ||
+         isLoading() && !m_creatingInitialEmptyDocument;
+}
+
 void FrameLoader::setDocumentLoader(DocumentLoader* loader) {
   if (!loader && !m_documentLoader)
     return;
@@ -2523,6 +2525,8 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
 
   if (m_creatingInitialEmptyDocument)
     return;
+
+  m_committedFirstRealDocumentLoad = true;
 
   m_client->dispatchDidCommitLoad();
 

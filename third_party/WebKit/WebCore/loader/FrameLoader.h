@@ -209,6 +209,7 @@ class FrameLoader : Noncopyable
 
   bool isLoadingMainResource() const;
   bool isLoading() const;
+  bool frameHasLoaded() const;
 
   int numPendingOrLoadingRequests(bool recurse) const;
   bool isReloading() const;
