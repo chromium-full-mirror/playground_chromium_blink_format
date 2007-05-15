@@ -70,18 +70,12 @@ void PageCache::autoreleaseNowOrReschedule(Timer<PageCache>* timer) {
 void PageCache::autoreleaseNow() {
   m_autoreleaseTimer.stop();
 
-  Vector<CachedPage*> cachedPages;
-  cachedPages.reserveCapacity(m_autoreleaseSet.size());
+  CachedPageSet tmp;
+  tmp.swap(m_autoreleaseSet);
 
-  CachedPageSet::iterator i = m_autoreleaseSet.begin();
-  CachedPageSet::iterator end = m_autoreleaseSet.end();
-  for (; i != end; ++i)
-    cachedPages.append((*i).get());
-
-  m_autoreleaseSet.clear();
-
-  for (unsigned j = 0; j < cachedPages.size(); ++j)
-    cachedPages[j]->close();
+  CachedPageSet::iterator end = tmp.end();
+  for (CachedPageSet::iterator it = tmp.begin(); it != end; ++it)
+    (*it)->close();
 }
 
 void PageCache::autorelease(PassRefPtr<CachedPage> page) {
