@@ -344,7 +344,7 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
 
   switch (token) {
     case Title:
-      doc.setTitle(value->toString(exec));
+      doc.setTitle(valueToStringWithNullCheck(exec, value));
       break;
     case Body:
       doc.setBody(toHTMLElement(value), exception);
@@ -353,7 +353,7 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
       doc.setDomain(value->toString(exec));
       break;
     case Cookie:
-      doc.setCookie(value->toString(exec));
+      doc.setCookie(valueToStringWithNullCheck(exec, value));
       break;
     case Location:
       if (Frame* frame = doc.frame()) {
@@ -378,18 +378,18 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
       break;
     case BgColor:
       if (bodyElement)
-        bodyElement->setBgColor(value->toString(exec));
+        bodyElement->setBgColor(valueToStringWithNullCheck(exec, value));
       break;
     case FgColor:
       if (bodyElement)
-        bodyElement->setText(value->toString(exec));
+        bodyElement->setText(valueToStringWithNullCheck(exec, value));
       break;
     case AlinkColor:
       if (bodyElement) {
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec);
+        String newColor = valueToStringWithNullCheck(exec, value);
         if (bodyElement->aLink() != newColor)
           bodyElement->setALink(newColor);
       }
@@ -399,7 +399,7 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec);
+        String newColor = valueToStringWithNullCheck(exec, value);
         if (bodyElement->link() != newColor)
           bodyElement->setLink(newColor);
       }
@@ -409,17 +409,17 @@ void JSHTMLDocument::putValueProperty(ExecState* exec,
         // this check is a bit silly, but some benchmarks like to set the
         // document's link colors over and over to the same value and we
         // don't want to incur a style update each time.
-        String newColor = value->toString(exec);
+        String newColor = valueToStringWithNullCheck(exec, value);
         if (bodyElement->vLink() != newColor)
           bodyElement->setVLink(newColor);
       }
       break;
     case Dir:
       if (body)
-        body->setDir(value->toString(exec));
+        body->setDir(valueToStringWithNullCheck(exec, value));
       break;
     case DesignMode: {
-      String modeString = value->toString(exec);
+      String modeString = valueToStringWithNullCheck(exec, value);
       Document::InheritedBool mode;
       if (equalIgnoringCase(modeString, "on"))
         mode = Document::on;
@@ -1362,40 +1362,37 @@ void JSHTMLElement::put(ExecState* exec,
       exec, propertyName, value, attr, &HTMLElementTable, this);
 }
 
-void JSHTMLElement::objectSetter(ExecState* exec,
-                                 int token,
-                                 JSValue* value,
-                                 const WebCore::String& str) {
+void JSHTMLElement::objectSetter(ExecState* exec, int token, JSValue* value) {
   HTMLObjectElement& object = *static_cast<HTMLObjectElement*>(impl());
   switch (token) {
     // read-only: form
     case ObjectCode: {
-      object.setCode(str);
+      object.setCode(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectAlign: {
-      object.setAlign(str);
+      object.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectArchive: {
-      object.setArchive(str);
+      object.setArchive(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectBorder: {
-      object.setBorder(str);
+      object.setBorder(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectCodeBase: {
-      object.setCodeBase(str);
+      object.setCodeBase(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectCodeType: {
-      object.setCodeType(str);
+      object.setCodeType(valueToStringWithNullCheck(exec, value));
       return;
     }
     // read-only: ObjectContentDocument
     case ObjectData: {
-      object.setData(str);
+      object.setData(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectDeclare: {
@@ -1403,7 +1400,7 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectHeight: {
-      object.setHeight(str);
+      object.setHeight(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectHspace: {
@@ -1411,11 +1408,11 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectName: {
-      object.setName(str);
+      object.setName(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectStandby: {
-      object.setStandby(str);
+      object.setStandby(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectTabIndex: {
@@ -1423,11 +1420,11 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectType: {
-      object.setType(str);
+      object.setType(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectUseMap: {
-      object.setUseMap(str);
+      object.setUseMap(valueToStringWithNullCheck(exec, value));
       return;
     }
     case ObjectVspace: {
@@ -1435,49 +1432,43 @@ void JSHTMLElement::objectSetter(ExecState* exec,
       return;
     }
     case ObjectWidth: {
-      object.setWidth(str);
+      object.setWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
 }
 
-void JSHTMLElement::embedSetter(ExecState*,
-                                int token,
-                                JSValue*,
-                                const WebCore::String& str) {
+void JSHTMLElement::embedSetter(ExecState* exec, int token, JSValue* value) {
   HTMLEmbedElement& embed = *static_cast<HTMLEmbedElement*>(impl());
   switch (token) {
     case EmbedAlign: {
-      embed.setAlign(str);
+      embed.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case EmbedHeight: {
-      embed.setHeight(str);
+      embed.setHeight(value->toString(exec));
       return;
     }
     case EmbedName: {
-      embed.setName(str);
+      embed.setName(valueToStringWithNullCheck(exec, value));
       return;
     }
     case EmbedSrc: {
-      embed.setSrc(str);
+      embed.setSrc(valueToStringWithNullCheck(exec, value));
       return;
     }
     case EmbedType: {
-      embed.setType(str);
+      embed.setType(valueToStringWithNullCheck(exec, value));
       return;
     }
     case EmbedWidth: {
-      embed.setWidth(str);
+      embed.setWidth(value->toString(exec));
       return;
     }
   }
 }
 
-void JSHTMLElement::tableSetter(ExecState* exec,
-                                int token,
-                                JSValue* value,
-                                const WebCore::String& str) {
+void JSHTMLElement::tableSetter(ExecState* exec, int token, JSValue* value) {
   HTMLTableElement& table = *static_cast<HTMLTableElement*>(impl());
   switch (token) {
     case TableCaption: {
@@ -1495,39 +1486,39 @@ void JSHTMLElement::tableSetter(ExecState* exec,
     // read-only: rows
     // read-only: tbodies
     case TableAlign: {
-      table.setAlign(str);
+      table.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableBgColor: {
-      table.setBgColor(str);
+      table.setBgColor(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableBorder: {
-      table.setBorder(str);
+      table.setBorder(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellPadding: {
-      table.setCellPadding(str);
+      table.setCellPadding(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellSpacing: {
-      table.setCellSpacing(str);
+      table.setCellSpacing(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableFrame: {
-      table.setFrame(str);
+      table.setFrame(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableRules: {
-      table.setRules(str);
+      table.setRules(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableSummary: {
-      table.setSummary(str);
+      table.setSummary(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableWidth: {
-      table.setWidth(str);
+      table.setWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
@@ -1535,30 +1526,26 @@ void JSHTMLElement::tableSetter(ExecState* exec,
 
 void JSHTMLElement::tableCaptionSetter(ExecState* exec,
                                        int token,
-                                       JSValue* value,
-                                       const WebCore::String& str) {
+                                       JSValue* value) {
   HTMLTableCaptionElement& tableCaption =
       *static_cast<HTMLTableCaptionElement*>(impl());
   if (token == TableCaptionAlign)
-    tableCaption.setAlign(str);
+    tableCaption.setAlign(valueToStringWithNullCheck(exec, value));
 }
 
-void JSHTMLElement::tableColSetter(ExecState* exec,
-                                   int token,
-                                   JSValue* value,
-                                   const WebCore::String& str) {
+void JSHTMLElement::tableColSetter(ExecState* exec, int token, JSValue* value) {
   HTMLTableColElement& tableCol = *static_cast<HTMLTableColElement*>(impl());
   switch (token) {
     case TableColAlign: {
-      tableCol.setAlign(str);
+      tableCol.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableColCh: {
-      tableCol.setCh(str);
+      tableCol.setCh(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableColChOff: {
-      tableCol.setChOff(str);
+      tableCol.setChOff(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableColSpan: {
@@ -1566,11 +1553,11 @@ void JSHTMLElement::tableColSetter(ExecState* exec,
       return;
     }
     case TableColVAlign: {
-      tableCol.setVAlign(str);
+      tableCol.setVAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableColWidth: {
-      tableCol.setWidth(str);
+      tableCol.setWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
@@ -1578,58 +1565,54 @@ void JSHTMLElement::tableColSetter(ExecState* exec,
 
 void JSHTMLElement::tableSectionSetter(ExecState* exec,
                                        int token,
-                                       JSValue* value,
-                                       const WebCore::String& str) {
+                                       JSValue* value) {
   HTMLTableSectionElement& tableSection =
       *static_cast<HTMLTableSectionElement*>(impl());
   switch (token) {
     case TableSectionAlign: {
-      tableSection.setAlign(str);
+      tableSection.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableSectionCh: {
-      tableSection.setCh(str);
+      tableSection.setCh(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableSectionChOff: {
-      tableSection.setChOff(str);
+      tableSection.setChOff(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableSectionVAlign: {
-      tableSection.setVAlign(str);
+      tableSection.setVAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
       // read-only: rows
   }
 }
 
-void JSHTMLElement::tableRowSetter(ExecState* exec,
-                                   int token,
-                                   JSValue* value,
-                                   const WebCore::String& str) {
+void JSHTMLElement::tableRowSetter(ExecState* exec, int token, JSValue* value) {
   HTMLTableRowElement& tableRow = *static_cast<HTMLTableRowElement*>(impl());
   switch (token) {
     // read-only: rowIndex
     // read-only: sectionRowIndex
     // read-only: cells
     case TableRowAlign: {
-      tableRow.setAlign(str);
+      tableRow.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableRowBgColor: {
-      tableRow.setBgColor(str);
+      tableRow.setBgColor(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableRowCh: {
-      tableRow.setCh(str);
+      tableRow.setCh(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableRowChOff: {
-      tableRow.setChOff(str);
+      tableRow.setChOff(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableRowVAlign: {
-      tableRow.setVAlign(str);
+      tableRow.setVAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
@@ -1637,33 +1620,32 @@ void JSHTMLElement::tableRowSetter(ExecState* exec,
 
 void JSHTMLElement::tableCellSetter(ExecState* exec,
                                     int token,
-                                    JSValue* value,
-                                    const WebCore::String& str) {
+                                    JSValue* value) {
   HTMLTableCellElement& tableCell = *static_cast<HTMLTableCellElement*>(impl());
   switch (token) {
     // read-only: cellIndex
     case TableCellAbbr: {
-      tableCell.setAbbr(str);
+      tableCell.setAbbr(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellAlign: {
-      tableCell.setAlign(str);
+      tableCell.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellAxis: {
-      tableCell.setAxis(str);
+      tableCell.setAxis(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellBgColor: {
-      tableCell.setBgColor(str);
+      tableCell.setBgColor(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellCh: {
-      tableCell.setCh(str);
+      tableCell.setCh(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellChOff: {
-      tableCell.setChOff(str);
+      tableCell.setChOff(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellColSpan: {
@@ -1671,11 +1653,11 @@ void JSHTMLElement::tableCellSetter(ExecState* exec,
       return;
     }
     case TableCellHeaders: {
-      tableCell.setHeaders(str);
+      tableCell.setHeaders(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellHeight: {
-      tableCell.setHeight(str);
+      tableCell.setHeight(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellNoWrap: {
@@ -1687,62 +1669,56 @@ void JSHTMLElement::tableCellSetter(ExecState* exec,
       return;
     }
     case TableCellScope: {
-      tableCell.setScope(str);
+      tableCell.setScope(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellVAlign: {
-      tableCell.setVAlign(str);
+      tableCell.setVAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     case TableCellWidth: {
-      tableCell.setWidth(str);
+      tableCell.setWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
 }
 
-void JSHTMLElement::frameSetSetter(ExecState* exec,
-                                   int token,
-                                   JSValue* value,
-                                   const WebCore::String& str) {
+void JSHTMLElement::frameSetSetter(ExecState* exec, int token, JSValue* value) {
   HTMLFrameSetElement& frameSet = *static_cast<HTMLFrameSetElement*>(impl());
   switch (token) {
     case FrameSetCols: {
-      frameSet.setCols(str);
+      frameSet.setCols(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameSetRows: {
-      frameSet.setRows(str);
+      frameSet.setRows(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
 }
 
-void JSHTMLElement::frameSetter(ExecState* exec,
-                                int token,
-                                JSValue* value,
-                                const WebCore::String& str) {
+void JSHTMLElement::frameSetter(ExecState* exec, int token, JSValue* value) {
   HTMLFrameElement& frameElement = *static_cast<HTMLFrameElement*>(impl());
   switch (token) {
     // read-only: FrameContentDocument:
     case FrameFrameBorder: {
-      frameElement.setFrameBorder(str);
+      frameElement.setFrameBorder(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameLongDesc: {
-      frameElement.setLongDesc(str);
+      frameElement.setLongDesc(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameMarginHeight: {
-      frameElement.setMarginHeight(str);
+      frameElement.setMarginHeight(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameMarginWidth: {
-      frameElement.setMarginWidth(str);
+      frameElement.setMarginWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameName: {
-      frameElement.setName(str);
+      frameElement.setName(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameNoResize: {
@@ -1750,74 +1726,68 @@ void JSHTMLElement::frameSetter(ExecState* exec,
       return;
     }
     case FrameScrolling: {
-      frameElement.setScrolling(str);
+      frameElement.setScrolling(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameSrc: {
-      frameElement.setSrc(str);
+      frameElement.setSrc(valueToStringWithNullCheck(exec, value));
       return;
     }
     case FrameLocation: {
-      frameElement.setLocation(str);
+      frameElement.setLocation(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
 }
 
-void JSHTMLElement::iFrameSetter(ExecState* exec,
-                                 int token,
-                                 JSValue* value,
-                                 const WebCore::String& str) {
+void JSHTMLElement::iFrameSetter(ExecState* exec, int token, JSValue* value) {
   HTMLIFrameElement& iFrame = *static_cast<HTMLIFrameElement*>(impl());
   switch (token) {
     case IFrameAlign: {
-      iFrame.setAlign(str);
+      iFrame.setAlign(valueToStringWithNullCheck(exec, value));
       return;
     }
     // read-only: IFrameContentDocument
     case IFrameFrameBorder: {
-      iFrame.setFrameBorder(str);
+      iFrame.setFrameBorder(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameHeight: {
-      iFrame.setHeight(str);
+      iFrame.setHeight(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameLongDesc: {
-      iFrame.setLongDesc(str);
+      iFrame.setLongDesc(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameMarginHeight: {
-      iFrame.setMarginHeight(str);
+      iFrame.setMarginHeight(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameMarginWidth: {
-      iFrame.setMarginWidth(str);
+      iFrame.setMarginWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameName: {
-      iFrame.setName(str);
+      iFrame.setName(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameScrolling: {
-      iFrame.setScrolling(str);
+      iFrame.setScrolling(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameSrc: {
-      iFrame.setSrc(str);
+      iFrame.setSrc(valueToStringWithNullCheck(exec, value));
       return;
     }
     case IFrameWidth: {
-      iFrame.setWidth(str);
+      iFrame.setWidth(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
 }
 
-void JSHTMLElement::marqueeSetter(ExecState* exec,
-                                  int token,
-                                  JSValue* value,
-                                  const WebCore::String& str) {
+void JSHTMLElement::marqueeSetter(ExecState* exec, int token, JSValue* value) {
   // FIXME: Find out what WinIE supports and implement it.
 }
 
@@ -1826,44 +1796,43 @@ void JSHTMLElement::putValueProperty(ExecState* exec,
                                      JSValue* value,
                                      int) {
   DOMExceptionTranslator exception(exec);
-  WebCore::String str = value->toString(exec);
 
   // Check our set of generic properties first.
   HTMLElement& element = *static_cast<HTMLElement*>(impl());
   switch (token) {
     case ElementId:
-      element.setId(str);
+      element.setId(valueToStringWithNullCheck(exec, value));
       return;
     case ElementLang:
-      element.setLang(str);
+      element.setLang(valueToStringWithNullCheck(exec, value));
       return;
     case ElementDir:
-      element.setDir(str);
+      element.setDir(valueToStringWithNullCheck(exec, value));
       return;
     case ElementClassName:
-      element.setClassName(str);
+      element.setClassName(valueToStringWithNullCheck(exec, value));
       return;
     case ElementInnerHTML:
-      element.setInnerHTML(str, exception);
+      element.setInnerHTML(valueToStringWithNullCheck(exec, value), exception);
       return;
     case ElementInnerText:
-      element.setInnerText(str, exception);
+      element.setInnerText(valueToStringWithNullCheck(exec, value), exception);
       return;
     case ElementOuterHTML:
-      element.setOuterHTML(str, exception);
+      element.setOuterHTML(valueToStringWithNullCheck(exec, value), exception);
       return;
     case ElementOuterText:
-      element.setOuterText(str, exception);
+      element.setOuterText(valueToStringWithNullCheck(exec, value), exception);
       return;
     case ElementContentEditable:
-      element.setContentEditable(str);
+      element.setContentEditable(valueToStringWithNullCheck(exec, value));
       return;
   }
 
   // Now check for properties that apply to a specific element type.
   const Accessors* access = accessors();
   if (access && access->m_setter)
-    return (this->*(access->m_setter))(exec, token, value, str);
+    return (this->*(access->m_setter))(exec, token, value);
 }
 
 HTMLElement* toHTMLElement(JSValue* val) {
