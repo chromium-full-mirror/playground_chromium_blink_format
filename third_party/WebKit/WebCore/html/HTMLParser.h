@@ -27,6 +27,7 @@
 #include "QualifiedName.h"
 #include <wtf/Forward.h>
 #include <wtf/RefPtr.h>
+#include "HTMLParserErrorCodes.h"
 
 namespace WebCore {
 
@@ -136,6 +137,18 @@ class HTMLParser : Noncopyable {
   void startBody();  // inserts the isindex element
   PassRefPtr<Node> handleIsindex(Token*);
 
+  void reportError(HTMLParserErrorCode errorCode,
+                   const AtomicString* tagName1 = 0,
+                   const AtomicString* tagName2 = 0) {
+    if (!m_reportErrors)
+      return;
+    reportErrorToConsole(errorCode, tagName1, tagName2);
+  }
+
+  void reportErrorToConsole(HTMLParserErrorCode,
+                            const AtomicString* tagName1,
+                            const AtomicString* tagName2);
+
   Document* document;
 
   // The currently active element (the one new elements will be added to). Can
@@ -161,6 +174,7 @@ class HTMLParser : Noncopyable {
                                // reaches the one specified
 
   bool m_isParsingFragment;
+  bool m_reportErrors;
   int inStrayTableContent;
 };
 }
