@@ -353,13 +353,6 @@ rangeByAlteringCurrentSelection:
 - (ObjectElementType)determineObjectFromMIMEType:(NSString*)MIMEType
                                              URL:(NSURL*)URL;
 
-- (BOOL)startDraggingImage:(NSImage*)dragImage
-                        at:(NSPoint)dragLoc
-                 operation:(NSDragOperation)op
-                     event:(NSEvent*)event
-             sourceIsDHTML:(BOOL)flag
-            DHTMLWroteData:(BOOL)dhtmlWroteData;
-
 - (void)print;
 
 - (jobject)getAppletInView:(NSView*)view;
