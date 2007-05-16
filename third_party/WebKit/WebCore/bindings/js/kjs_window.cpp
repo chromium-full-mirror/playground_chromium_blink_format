@@ -631,7 +631,7 @@ static Frame* createNewWindow(ExecState* exec,
   Window* newWindow = Window::retrieveWindow(newFrame);
 
   newFrame->loader()->setOpener(openerFrame);
-  newFrame->loader()->setOpenedByJavaScript();
+  newFrame->loader()->setOpenedByDOM();
   if (dialogArgs)
     newWindow->putDirect("dialogArguments", dialogArgs);
 
@@ -1799,7 +1799,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (!newFrame)
         return jsUndefined();
       newFrame->loader()->setOpener(frame);
-      newFrame->loader()->setOpenedByJavaScript();
+      newFrame->loader()->setOpenedByDOM();
 
       if (created) {
         if (Document* oldDoc = frame->document()) {
@@ -1947,7 +1947,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::Close:
       // Do not close windows that have history unless they were opened by
       // JavaScript.
-      if (frame->loader()->openedByJavaScript() ||
+      if (frame->loader()->openedByDOM() ||
           frame->loader()->getHistoryLength() <= 1)
         const_cast<Window*>(window)->scheduleClose();
       return jsUndefined();

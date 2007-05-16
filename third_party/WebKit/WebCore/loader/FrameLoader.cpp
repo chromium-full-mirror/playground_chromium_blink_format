@@ -233,7 +233,7 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
       m_redirectionTimer(this, &FrameLoader::redirectionTimerFired),
       m_checkCompletedTimer(this, &FrameLoader::checkCompletedTimerFired),
       m_opener(0),
-      m_openedByJavaScript(false),
+      m_openedByDOM(false),
       m_creatingInitialEmptyDocument(false),
       m_committedFirstRealDocumentLoad(false)
 #if USE(LOW_BANDWIDTH_DISPLAY)
@@ -1592,12 +1592,12 @@ void FrameLoader::setOpener(Frame* opener) {
   m_opener = opener;
 }
 
-bool FrameLoader::openedByJavaScript() {
-  return m_openedByJavaScript;
+bool FrameLoader::openedByDOM() const {
+  return m_openedByDOM;
 }
 
-void FrameLoader::setOpenedByJavaScript() {
-  m_openedByJavaScript = true;
+void FrameLoader::setOpenedByDOM() {
+  m_openedByDOM = true;
 }
 
 void FrameLoader::handleFallbackContent() {
@@ -3595,6 +3595,8 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
 
   if (frameName != "_blank")
     mainFrame->tree()->setName(frameName);
+
+  mainFrame->loader()->setOpenedByDOM();
   mainFrame->loader()->m_client->dispatchShow();
   mainFrame->loader()->setOpener(frame.get());
   mainFrame->loader()->load(request, NavigationAction(), FrameLoadTypeStandard,
