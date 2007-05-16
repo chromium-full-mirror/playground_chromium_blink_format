@@ -434,7 +434,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
       strokeThickness() <= 0.0f || !strokeColor().alpha())
     return;
 
-  m_data->p().drawArc(rect, startAngle, angleSpan);
+  m_data->p().drawArc(rect, startAngle * 16, angleSpan * 16);
 }
 
 void GraphicsContext::drawConvexPolygon(size_t npoints,
