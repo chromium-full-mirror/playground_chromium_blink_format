@@ -33,6 +33,9 @@
 // FIXME: CG-specific parts need to move to the platform directory.
 typedef struct CGContext* CGContextRef;
 typedef struct CGImage* CGImageRef;
+#elif PLATFORM(QT)
+class QPixmap;
+class QPainter;
 #endif
 
 namespace WebCore {
@@ -70,6 +73,8 @@ class HTMLCanvasElement : public HTMLElement {
 
 #if PLATFORM(CG)
   CGImageRef createPlatformImage() const;
+#elif PLATFORM(QT)
+  QPixmap createPlatformImage() const;
 #endif
 
  private:
@@ -85,7 +90,12 @@ class HTMLCanvasElement : public HTMLElement {
   // if we ever drew any images outside the domain, so we can disable toDataURL.
 
   mutable bool m_createdDrawingContext;
+#if PLATFORM(CG)
   mutable void* m_data;
+#elif PLATFORM(QT)
+  mutable QPixmap* m_data;
+  mutable QPainter* m_painter;
+#endif
   mutable GraphicsContext* m_drawingContext;
 };
 
