@@ -39,9 +39,6 @@ const char* htmlParserErrorMessageTemplate(HTMLParserErrorCode errorCode) {
       "</object> is encountered.",
       "<area> is not allowed inside %tag1. Moving the <area> into the nearest "
       "enclosing <map>.",
-      "<caption> found outside of a table.  Content ignored.",
-      "<caption> is not allowed inside %tag1. Moving the <caption> into the "
-      "enclosing table before all table sections.",
       "%tag1 is not allowed inside %tag2. Content ignored.",
       "%tag1 is not allowed in a <frameset> page. Content ignored.",
       "%tag1 is not allowed inside %tag2. Closing %tag2 and trying the "
