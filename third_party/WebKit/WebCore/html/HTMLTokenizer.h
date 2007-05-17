@@ -30,6 +30,8 @@
 #include "Timer.h"
 #include "Tokenizer.h"
 #include "CachedResourceClient.h"
+#include <wtf/Vector.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -50,11 +52,13 @@ class Node;
  */
 class Token {
  public:
-  Token() : beginTag(true), flat(false) {}
+  Token() : beginTag(true), flat(false), m_sourceInfo(0) {}
+  ~Token() {}
 
   void addAttribute(Document*,
-                    const AtomicString& attrName,
-                    const AtomicString& v);
+                    AtomicString& attrName,
+                    const AtomicString& v,
+                    bool viewSourceMode);
 
   bool isOpenTag(const QualifiedName& fullName) const {
     return beginTag && fullName.localName() == tagName;
@@ -69,6 +73,14 @@ class Token {
     tagName = nullAtom;
     beginTag = true;
     flat = false;
+    if (m_sourceInfo)
+      m_sourceInfo->clear();
+  }
+
+  void addViewSourceChar(UChar c) {
+    if (!m_sourceInfo.get())
+      m_sourceInfo.set(new Vector<UChar>);
+    m_sourceInfo->append(c);
   }
 
   RefPtr<NamedMappedAttrMap> attrs;
@@ -76,6 +88,7 @@ class Token {
   AtomicString tagName;
   bool beginTag;
   bool flat;
+  OwnPtr<Vector<UChar>> m_sourceInfo;
 };
 
 //-----------------------------------------------------------------------------

@@ -37,7 +37,6 @@ class HTMLViewSourceDocument : public HTMLDocument {
   virtual Tokenizer* createTokenizer();
 
   void addViewSourceToken(Token*);
-  void addViewSourceAttribute(Attribute*);
 
  private:
   Element* addSpanWithClassName(const String&);
