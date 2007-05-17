@@ -32,6 +32,7 @@
 
 @class WebTextCompleteController;
 @class DOMDocumentFragment;
+@class DOMElement;
 
 namespace WebCore {
 class KeyboardEvent;
@@ -88,6 +89,7 @@ struct WebHTMLViewInterpretKeyEventsParameters;
   NSTextView* firstResponderTextViewAtMouseDownTime;
 
   WebDataSource* dataSource;
+  DOMElement* promisedDragTIFFDataSource;
 }
 - (void)clear;
 @end

@@ -29,6 +29,7 @@
 #import <WebKit/WebHTMLView.h>
 
 @class DOMDocumentFragment;
+@class DOMElement;
 @class DOMNode;
 @class DOMRange;
 @class WebArchive;
@@ -139,4 +140,6 @@
 - (BOOL)markedTextMatchesAreHighlighted;
 - (NSArray*)rectsForTextMatches;
 
+- (DOMElement*)promisedDragTIFFDataSource;
+- (void)setPromisedDragTIFFDataSource:(DOMElement*)source;
 @end
