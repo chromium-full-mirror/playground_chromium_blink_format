@@ -4432,7 +4432,8 @@ void FrameLoader::mainReceivedCompleteError(DocumentLoader* loader,
   loader->setPrimaryLoadComplete(true);
   m_client->dispatchDidLoadMainResource(activeDocumentLoader());
   checkCompleted();
-  checkLoadComplete();
+  if (m_frame->page())
+    checkLoadComplete();
 }
 
 void FrameLoader::mainReceivedError(const ResourceError& error,
