@@ -2311,7 +2311,7 @@ bool FrameLoader::isLoading() const {
 
 bool FrameLoader::frameHasLoaded() const {
   return m_committedFirstRealDocumentLoad ||
-         isLoading() && !m_creatingInitialEmptyDocument;
+         (m_provisionalDocumentLoader && !m_creatingInitialEmptyDocument);
 }
 
 void FrameLoader::setDocumentLoader(DocumentLoader* loader) {
