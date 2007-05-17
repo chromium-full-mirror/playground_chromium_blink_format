@@ -57,7 +57,7 @@ void HTMLViewSourceDocument::addViewSourceToken(Token* token) {
     Attribute* a = new MappedAttribute(
         styleAttr, "white-space:pre-wrap;margin:0;word-wrap:break-word");
     NamedMappedAttrMap* attrs = new NamedMappedAttrMap(0);
-    attrs->insertAttribute(a);
+    attrs->insertAttribute(a, true);
     pre->setAttributeMap(attrs);
     body->addChild(pre);
     pre->attach();
@@ -163,7 +163,7 @@ Element* HTMLViewSourceDocument::addSpanWithClassName(const String& className) {
   Element* span = new HTMLElement(spanTag, this);
   Attribute* a = new MappedAttribute(classAttr, className);
   NamedMappedAttrMap* attrs = new NamedMappedAttrMap(0);
-  attrs->insertAttribute(a);
+  attrs->insertAttribute(a, true);
   span->setAttributeMap(attrs);
   m_current->addChild(span);
   span->attach();
