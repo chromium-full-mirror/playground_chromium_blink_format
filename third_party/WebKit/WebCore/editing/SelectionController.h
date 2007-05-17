@@ -128,8 +128,9 @@ class SelectionController : Noncopyable {
   void setBaseAndExtent(Node* baseNode,
                         int baseOffset,
                         Node* extentNode,
-                        int extentOffset);
-  void setPosition(Node*, int offset);
+                        int extentOffset,
+                        ExceptionCode&);
+  void setPosition(Node*, int offset, ExceptionCode&);
   bool modify(const String& alterString,
               const String& directionString,
               const String& granularityString,
@@ -155,11 +156,11 @@ class SelectionController : Noncopyable {
   }
   bool isCollapsed() const { return !isRange(); }
   String toString() const;
-  void collapse(Node*, int offset);
+  void collapse(Node*, int offset, ExceptionCode&);
   void collapseToEnd();
   void collapseToStart();
-  void extend(Node*, int offset);
-  PassRefPtr<Range> getRangeAt(int index) const;
+  void extend(Node*, int offset, ExceptionCode&);
+  PassRefPtr<Range> getRangeAt(int index, ExceptionCode&) const;
   int rangeCount() const { return !isNone() ? 1 : 0; }
   void removeAllRanges();
   void addRange(const Range*);

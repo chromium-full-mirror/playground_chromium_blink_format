@@ -31,6 +31,7 @@
 #include "Editor.h"
 #include "Element.h"
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "FocusController.h"
 #include "Frame.h"
 #include "FrameTree.h"
@@ -767,8 +768,13 @@ String SelectionController::toString() const {
   return String(plainText(m_sel.toRange().get()));
 }
 
-PassRefPtr<Range> SelectionController::getRangeAt(int index) const {
-  return index == 0 ? m_sel.toRange() : 0;
+PassRefPtr<Range> SelectionController::getRangeAt(int index,
+                                                  ExceptionCode& ec) const {
+  if (index < 0 || index >= rangeCount()) {
+    ec = INDEX_SIZE_ERR;
+    return 0;
+  }
+  return m_sel.toRange();
 }
 
 void SelectionController::removeAllRanges() {
@@ -814,7 +820,12 @@ void SelectionController::addRange(const Range* r) {
 void SelectionController::setBaseAndExtent(Node* baseNode,
                                            int baseOffset,
                                            Node* extentNode,
-                                           int extentOffset) {
+                                           int extentOffset,
+                                           ExceptionCode& ec) {
+  if (baseOffset < 0 || extentOffset < 0) {
+    ec = INDEX_SIZE_ERR;
+    return;
+  }
   VisiblePosition visibleBase =
       VisiblePosition(baseNode, baseOffset, DOWNSTREAM);
   VisiblePosition visibleExtent =
@@ -823,11 +834,21 @@ void SelectionController::setBaseAndExtent(Node* baseNode,
   moveTo(visibleBase, visibleExtent);
 }
 
-void SelectionController::setPosition(Node* node, int offset) {
+void SelectionController::setPosition(Node* node,
+                                      int offset,
+                                      ExceptionCode& ec) {
+  if (offset < 0) {
+    ec = INDEX_SIZE_ERR;
+    return;
+  }
   moveTo(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
-void SelectionController::collapse(Node* node, int offset) {
+void SelectionController::collapse(Node* node, int offset, ExceptionCode& ec) {
+  if (offset < 0) {
+    ec = INDEX_SIZE_ERR;
+    return;
+  }
   moveTo(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
@@ -843,7 +864,11 @@ void SelectionController::empty() {
   moveTo(VisiblePosition());
 }
 
-void SelectionController::extend(Node* node, int offset) {
+void SelectionController::extend(Node* node, int offset, ExceptionCode& ec) {
+  if (offset < 0) {
+    ec = INDEX_SIZE_ERR;
+    return;
+  }
   moveTo(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
