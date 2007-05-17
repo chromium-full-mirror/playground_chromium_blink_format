@@ -162,8 +162,7 @@ class FrameLoader : Noncopyable
             FrameLoadType,
             const String& target,
             Event*,
-            HTMLFormElement*,
-            const HashMap<String, String>& formValues);
+            PassRefPtr<FormState>);
   void post(const KURL&,
             const String& referrer,
             const String& target,
