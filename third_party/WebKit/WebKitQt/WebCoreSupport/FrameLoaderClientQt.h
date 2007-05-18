@@ -60,7 +60,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
  signals:
   void sigCallPolicyFunction(int);
   void loadStarted(QWebFrame* frame);
-  void loadProgressChanged(double d);
+  void loadProgressChanged(int d);
   void loadFinished(QWebFrame* frame);
   void titleChanged(const QString& title);
 
