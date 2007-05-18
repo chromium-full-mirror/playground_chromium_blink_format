@@ -156,7 +156,11 @@ void FrameLoaderClientQt::forceLayout() {
 }
 
 void FrameLoaderClientQt::forceLayoutForNonHTML() {
-  notImplemented();
+  // This will never be the case unless we implement alternative views
+  // such as QPDFPage or something...
+  if (!canShowMIMEType(MimeTypeRegistry::getMIMETypeForExtension("html"))) {
+    forceLayout();
+  }
 }
 
 void FrameLoaderClientQt::updateHistoryForCommit() {
