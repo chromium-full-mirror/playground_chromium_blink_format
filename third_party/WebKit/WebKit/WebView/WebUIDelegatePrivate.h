@@ -98,5 +98,6 @@ enum {
 - (void)webView:(WebView*)sender
     contextMenuItemSelected:(NSMenuItem*)item
                  forElement:(NSDictionary*)element;
+- (void)webView:(WebView*)sender saveFrameView:(WebFrameView*)frameView;
 
 @end
