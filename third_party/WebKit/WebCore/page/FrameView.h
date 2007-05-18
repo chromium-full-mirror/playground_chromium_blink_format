@@ -123,9 +123,6 @@ class FrameView : public ScrollView {
 
   void restoreScrollbar();
 
-  virtual bool handleMouseMoveEvent(const PlatformMouseEvent&);
-  virtual bool handleMouseReleaseEvent(const PlatformMouseEvent&);
-
   void scheduleEvent(PassRefPtr<Event>,
                      PassRefPtr<EventTargetNode>,
                      bool tempEvent);

@@ -856,14 +856,6 @@ IntRect FrameView::windowClipRectForLayer(const RenderLayer* layer,
   return intersection(clipRect, windowClipRect());
 }
 
-bool FrameView::handleMouseMoveEvent(const PlatformMouseEvent& event) {
-  return m_frame->eventHandler()->handleMouseMoveEvent(event);
-}
-
-bool FrameView::handleMouseReleaseEvent(const PlatformMouseEvent& event) {
-  return m_frame->eventHandler()->handleMouseReleaseEvent(event);
-}
-
 void FrameView::updateDashboardRegions() {
   Document* doc = m_frame->document();
   if (doc->hasDashboardRegions()) {

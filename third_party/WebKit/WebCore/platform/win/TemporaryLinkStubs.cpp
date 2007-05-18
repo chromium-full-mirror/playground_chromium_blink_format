@@ -897,14 +897,6 @@ void PlatformScrollbar::updateThumbProportion() {
 void PlatformScrollbar::setRect(const IntRect&) {
   notImplemented();
 }
-bool PlatformScrollbar::handleMouseMoveEvent(const PlatformMouseEvent&) {
-  notImplemented();
-  return false;
-}
-bool PlatformScrollbar::handleMouseReleaseEvent(const PlatformMouseEvent&) {
-  notImplemented();
-  return false;
-}
 
 PluginInfo* PlugInInfoStore::createPluginInfoForPluginAtIndex(unsigned) {
   notImplemented();
