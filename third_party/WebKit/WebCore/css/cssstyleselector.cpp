@@ -978,7 +978,7 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
   // Check UA, user and author rules.
   int firstUARule = -1, lastUARule = -1, firstUserRule = -1, lastUserRule = -1,
       firstAuthorRule = -1, lastAuthorRule = -1;
-  matchRules(defaultStyle, firstUARule, lastUARule);
+  matchUARules(firstUARule, lastUARule);
   matchRules(m_userStyle, firstUserRule, lastUserRule);
   matchRules(m_authorStyle, firstAuthorRule, lastAuthorRule);
 
