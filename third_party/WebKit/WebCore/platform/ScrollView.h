@@ -152,7 +152,7 @@ class ScrollView : public Widget {
   ~ScrollView();
 
   void updateView(const IntRect&, bool now = false);
-  virtual void setDrawable(GdkDrawable* drawable);
+  virtual void setGtkWidget(GtkWidget* widget);
   virtual void setFrameGeometry(const IntRect&);
   void updateGeometry();
 

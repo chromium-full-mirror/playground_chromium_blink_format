@@ -233,9 +233,9 @@ void ScrollView::updateGeometry() {
   }
 }
 
-void ScrollView::setDrawable(GdkDrawable* gdkdrawable) {
-  Widget::setDrawable(gdkdrawable);
-  if (!GDK_IS_WINDOW(gdkdrawable)) {
+void ScrollView::setGtkWidget(GtkWidget* widget) {
+  Widget::setGtkWidget(widget);
+  if (!GDK_IS_WINDOW(drawable())) {
     LOG_ERROR("image scrollview not supported");
     return;
   }

@@ -469,37 +469,6 @@ bool SearchPopupMenu::enabled() {
   return true;
 }
 
-PlatformScrollbar::PlatformScrollbar(ScrollbarClient* client,
-                                     ScrollbarOrientation orientation,
-                                     ScrollbarControlSize controlSize)
-    : Scrollbar(client, orientation, controlSize) {
-  notImplementedGdk();
-}
-PlatformScrollbar::~PlatformScrollbar() {
-  notImplementedGdk();
-}
-int PlatformScrollbar::width() const {
-  return 15;
-}
-int PlatformScrollbar::height() const {
-  return 15;
-}
-void PlatformScrollbar::setEnabled(bool) {
-  notImplementedGdk();
-}
-void PlatformScrollbar::paint(GraphicsContext*, const IntRect& damageRect) {
-  notImplementedGdk();
-}
-void PlatformScrollbar::updateThumbPosition() {
-  notImplementedGdk();
-}
-void PlatformScrollbar::updateThumbProportion() {
-  notImplementedGdk();
-}
-void PlatformScrollbar::setRect(const IntRect&) {
-  notImplementedGdk();
-}
-
 FileChooser::FileChooser(FileChooserClient*, const String&) {
   notImplementedGdk();
 }
