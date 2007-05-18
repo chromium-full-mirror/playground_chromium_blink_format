@@ -371,7 +371,7 @@ void FrameLoaderClientGdk::clearArchivedResources() {
 }
 bool FrameLoaderClientGdk::canHandleRequest(const ResourceRequest&) const {
   notImplementedGdk();
-  return false;
+  return true;
 }
 bool FrameLoaderClientGdk::canShowMIMEType(const String&) const {
   notImplementedGdk();
