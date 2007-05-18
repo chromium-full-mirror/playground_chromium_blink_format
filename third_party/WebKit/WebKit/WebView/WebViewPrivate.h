@@ -645,7 +645,7 @@ backforward list.
 // Addresses <rdar://problem/5008925> - SPI for now
 - (NSCachedURLResponse*)webView:(WebView*)sender
                        resource:(id)identifier
-              willCacheResponse:(NSCachedURLResponse*)respose
+              willCacheResponse:(NSCachedURLResponse*)response
                  fromDataSource:(WebDataSource*)dataSource;
 @end
 
