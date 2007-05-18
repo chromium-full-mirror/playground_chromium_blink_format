@@ -95,23 +95,6 @@ bool Widget::isEnabled() const {
   notImplementedGdk();
   return false;
 }
-Widget::FocusPolicy Widget::focusPolicy() const {
-  notImplementedGdk();
-  return NoFocus;
-}
-void Widget::enableFlushDrawing() {
-  notImplementedGdk();
-}
-void Widget::disableFlushDrawing() {
-  notImplementedGdk();
-}
-GraphicsContext* Widget::lockDrawingFocus() {
-  notImplementedGdk();
-  return 0;
-}
-void Widget::unlockDrawingFocus(GraphicsContext*) {
-  notImplementedGdk();
-}
 void Widget::removeFromParent() {
   notImplementedGdk();
 }
