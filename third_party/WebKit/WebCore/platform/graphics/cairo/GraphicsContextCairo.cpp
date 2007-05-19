@@ -546,14 +546,6 @@ void GraphicsContext::setURLForRect(const KURL& link, const IntRect& destRect) {
   notImplemented();
 }
 
-void GraphicsContext::addRoundedRectClip(const IntRect& rect,
-                                         const IntSize& topLeft,
-                                         const IntSize& topRight,
-                                         const IntSize& bottomLeft,
-                                         const IntSize& bottomRight) {
-  notImplemented();
-}
-
 void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
                                               int thickness) {
   notImplemented();
@@ -687,6 +679,10 @@ void GraphicsContext::setCompositeOperation(CompositeOperator op) {
 }
 
 void GraphicsContext::clip(const Path&) {
+  notImplemented();
+}
+
+void GraphicsContext::clipOut(const Path&) {
   notImplemented();
 }
 

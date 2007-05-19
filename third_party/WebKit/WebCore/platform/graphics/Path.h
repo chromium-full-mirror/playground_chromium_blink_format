@@ -107,6 +107,11 @@ class Path {
 
   static Path createRoundedRectangle(const FloatRect&,
                                      const FloatSize& roundingRadii);
+  static Path createRoundedRectangle(const FloatRect&,
+                                     const FloatSize& topLeftRadius,
+                                     const FloatSize& topRightRadius,
+                                     const FloatSize& bottomLeftRadius,
+                                     const FloatSize& bottomRightRadius);
   static Path createRectangle(const FloatRect&);
   static Path createEllipse(const FloatPoint& center, float rx, float ry);
   static Path createCircle(const FloatPoint& center, float r);
