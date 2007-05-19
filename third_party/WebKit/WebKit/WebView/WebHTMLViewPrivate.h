@@ -139,7 +139,4 @@
 - (void)setMarkedTextMatchesAreHighlighted:(BOOL)newValue;
 - (BOOL)markedTextMatchesAreHighlighted;
 - (NSArray*)rectsForTextMatches;
-
-- (DOMElement*)promisedDragTIFFDataSource;
-- (void)setPromisedDragTIFFDataSource:(DOMElement*)source;
 @end
