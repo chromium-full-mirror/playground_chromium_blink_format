@@ -481,6 +481,11 @@ FrameEdgeInfo RenderFrameSet::edgeInfo() const {
 void RenderFrameSet::layout() {
   ASSERT(needsLayout());
 
+  bool doFullRepaint = selfNeedsLayout() && checkForRepaintDuringLayout();
+  IntRect oldBounds;
+  if (doFullRepaint)
+    oldBounds = absoluteClippedOverflowRect();
+
   if (!parent()->isFrameSet()) {
     FrameView* v = view()->frameView();
     m_width = v->visibleWidth();
@@ -506,6 +511,13 @@ void RenderFrameSet::layout() {
   RenderContainer::layout();
 
   computeEdgeInfo();
+
+  if (doFullRepaint) {
+    view()->repaintViewRectangle(oldBounds);
+    IntRect newBounds = absoluteClippedOverflowRect();
+    if (newBounds != oldBounds)
+      view()->repaintViewRectangle(newBounds);
+  }
 
   setNeedsLayout(false);
 }
