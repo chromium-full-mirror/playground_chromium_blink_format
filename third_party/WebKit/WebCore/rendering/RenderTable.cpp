@@ -652,7 +652,7 @@ RenderTableCol* RenderTable::colElement(int col) const {
   return 0;
 }
 
-void RenderTable::recalcSections() {
+void RenderTable::recalcSections() const {
   m_caption = 0;
   m_head = 0;
   m_foot = 0;
@@ -722,8 +722,9 @@ void RenderTable::recalcSections() {
   m_columns.resize(maxCols);
   m_columnPos.resize(maxCols + 1);
 
+  ASSERT(selfNeedsLayout());
+
   m_needsSectionRecalc = false;
-  setNeedsLayout(true);
 }
 
 RenderObject* RenderTable::removeChildNode(RenderObject* child,
@@ -986,8 +987,11 @@ int RenderTable::outerBorderRight() const {
 
 RenderTableSection* RenderTable::sectionAbove(const RenderTableSection* section,
                                               bool skipEmptySections) const {
+  recalcSectionsIfNeeded();
+
   if (section == m_head)
     return 0;
+
   RenderObject* prevSection =
       section == m_foot ? lastChild() : section->previousSibling();
   while (prevSection) {
@@ -1005,8 +1009,11 @@ RenderTableSection* RenderTable::sectionAbove(const RenderTableSection* section,
 
 RenderTableSection* RenderTable::sectionBelow(const RenderTableSection* section,
                                               bool skipEmptySections) const {
+  recalcSectionsIfNeeded();
+
   if (section == m_foot)
     return 0;
+
   RenderObject* nextSection =
       section == m_head ? firstChild() : section->nextSibling();
   while (nextSection) {
@@ -1023,6 +1030,8 @@ RenderTableSection* RenderTable::sectionBelow(const RenderTableSection* section,
 }
 
 RenderTableCell* RenderTable::cellAbove(const RenderTableCell* cell) const {
+  recalcSectionsIfNeeded();
+
   // Find the section and row to look in
   int r = cell->row();
   RenderTableSection* section = 0;
@@ -1052,6 +1061,8 @@ RenderTableCell* RenderTable::cellAbove(const RenderTableCell* cell) const {
 }
 
 RenderTableCell* RenderTable::cellBelow(const RenderTableCell* cell) const {
+  recalcSectionsIfNeeded();
+
   // Find the section and row to look in
   int r = cell->row() + cell->rowSpan() - 1;
   RenderTableSection* section = 0;
@@ -1081,6 +1092,8 @@ RenderTableCell* RenderTable::cellBelow(const RenderTableCell* cell) const {
 }
 
 RenderTableCell* RenderTable::cellBefore(const RenderTableCell* cell) const {
+  recalcSectionsIfNeeded();
+
   RenderTableSection* section = cell->section();
   int effCol = colToEffCol(cell->col());
   if (!effCol)
@@ -1096,6 +1109,8 @@ RenderTableCell* RenderTable::cellBefore(const RenderTableCell* cell) const {
 }
 
 RenderTableCell* RenderTable::cellAfter(const RenderTableCell* cell) const {
+  recalcSectionsIfNeeded();
+
   int effCol = colToEffCol(cell->col() + cell->colSpan());
   if (effCol >= numEffCols())
     return 0;
