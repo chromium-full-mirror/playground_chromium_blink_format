@@ -244,7 +244,14 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
                                           bool& needsWordSpacing) {
   // Set our x position.
   setXPos(x);
-  leftPosition = min(x, leftPosition);
+
+  int boxShadowLeft = 0;
+  int boxShadowRight = 0;
+  if (ShadowData* boxShadow = object()->style(m_firstLine)->boxShadow()) {
+    boxShadowLeft = min(boxShadow->x - boxShadow->blur, 0);
+    boxShadowRight = max(boxShadow->x + boxShadow->blur, 0);
+  }
+  leftPosition = min(x + boxShadowLeft, leftPosition);
 
   int startX = x;
   x += borderLeft() + paddingLeft();
@@ -262,9 +269,6 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
       }
       text->setXPos(x);
 
-      // FIXME: Setting this as layout overflow is bad.  We need to have a
-      // separate concept of
-      // visual overflow.
       int strokeOverflow =
           static_cast<int>(ceilf(rt->style()->textStrokeWidth() / 2.0));
 
@@ -335,7 +339,7 @@ int InlineFlowBox::placeBoxesHorizontally(int x,
 
   x += borderRight() + paddingRight();
   setWidth(x - startX);
-  rightPosition = max(xPos() + width(), rightPosition);
+  rightPosition = max(xPos() + width() + boxShadowRight, rightPosition);
 
   return x;
 }
@@ -509,6 +513,13 @@ void InlineFlowBox::placeBoxesVertically(int y,
         overflowTop = min(overflowTop, shadow->y - shadow->blur);
         overflowBottom = max(overflowBottom, shadow->y + shadow->blur);
       }
+
+      if (ShadowData* boxShadow =
+              curr->object()->style(m_firstLine)->boxShadow()) {
+        overflowTop = min(overflowTop, boxShadow->y - boxShadow->blur);
+        overflowBottom = max(overflowBottom, boxShadow->y + boxShadow->blur);
+      }
+
       if (curr->isInlineFlowBox()) {
         newHeight +=
             curr->object()->borderTop() + curr->object()->paddingTop() +
@@ -603,6 +614,11 @@ bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,
 void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   int xPos = tx + m_x - object()->maximalOutlineSize(paintInfo.phase);
   int w = width() + 2 * object()->maximalOutlineSize(paintInfo.phase);
+  if (ShadowData* boxShadow = object()->style(m_firstLine)->boxShadow()) {
+    int shadowLeft = min(boxShadow->x - boxShadow->blur, 0);
+    xPos += shadowLeft;
+    w += -shadowLeft + max(boxShadow->x + boxShadow->blur, 0);
+  }
   bool intersectsDamageRect =
       xPos < paintInfo.rect.right() && xPos + w > paintInfo.rect.x();
 
