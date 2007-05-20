@@ -1042,7 +1042,8 @@ void FrameLoader::endIfNotLoading() {
     // last one to complete.
     checkCompleted();
 
-  startIconLoader();
+  if (m_documentLoader && !m_documentLoader->isLoadingFromCachedPage())
+    startIconLoader();
 }
 
 void FrameLoader::startIconLoader() {
@@ -1065,6 +1066,9 @@ void FrameLoader::startIconLoader() {
   if (iconDatabase()->hasEntryForIconURL(urlString) &&
       loadType() != FrameLoadTypeReload &&
       !iconDatabase()->isIconExpiredForIconURL(urlString)) {
+    LOG(IconDatabase,
+        "FrameLoader::startIconLoader() - Committing iconURL %s to database",
+        urlString.ascii().data());
     commitIconURLToIconDatabase(url);
     return;
   }
@@ -1095,6 +1099,9 @@ static HashSet<String, CaseInsensitiveHash<String>>& localSchemes() {
 
 void FrameLoader::commitIconURLToIconDatabase(const KURL& icon) {
   ASSERT(iconDatabase());
+  LOG(IconDatabase, "Committing iconURL %s to database for pageURLs %s and %s",
+      icon.url().ascii(), m_URL.url().ascii(),
+      originalRequestURL().url().ascii());
   iconDatabase()->setIconURLForPageURL(icon.url(), m_URL.url());
   iconDatabase()->setIconURLForPageURL(icon.url(), originalRequestURL().url());
 }
