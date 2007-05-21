@@ -35,10 +35,12 @@
 #include "HTMLFieldSetElement.h"
 #include "HTMLFontElement.h"
 #include "HTMLFormElement.h"
+#include "HTMLFrameElement.h"
 #include "HTMLHRElement.h"
 #include "HTMLHeadElement.h"
 #include "HTMLHeadingElement.h"
 #include "HTMLHtmlElement.h"
+#include "HTMLIFrameElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLIsIndexElement.h"
@@ -88,10 +90,12 @@
 #include "JSHTMLFieldSetElement.h"
 #include "JSHTMLFontElement.h"
 #include "JSHTMLFormElement.h"
+#include "JSHTMLFrameElement.h"
 #include "JSHTMLHRElement.h"
 #include "JSHTMLHeadElement.h"
 #include "JSHTMLHeadingElement.h"
 #include "JSHTMLHtmlElement.h"
+#include "JSHTMLIFrameElement.h"
 #include "JSHTMLImageElement.h"
 #include "JSHTMLInputElement.h"
 #include "JSHTMLIsIndexElement.h"
@@ -141,27 +145,28 @@ typedef DOMNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
   macro(a, Anchor) macro(applet, Applet) macro(area, Area) macro(              \
       base, Base) macro(basefont, BaseFont) macro(blockquote, Blockquote)      \
       macro(body, Body) macro(br, BR) macro(button, Button) macro(             \
-          caption, TableCaption) macro(canvas, Canvas) macro(col, TableCol)    \
+          canvas, Canvas) macro(caption, TableCaption) macro(col, TableCol)    \
           macro(del, Mod) macro(dir, Directory) macro(div, Div) macro(         \
-              dl, DList) macro(fieldset, FieldSet) macro(form, Form)           \
-              macro(font, Font) macro(h1, Heading) macro(head, Head) macro(    \
-                  hr, HR) macro(html, Html) macro(img, Image)                  \
-                  macro(input, Input) macro(isindex, IsIndex) macro(           \
-                      label, Label) macro(legend, Legend) macro(li, LI)        \
-                      macro(link, Link) macro(map, Map) macro(menu, Menu)      \
-                          macro(meta, Meta) macro(ol, OList) macro(            \
-                              optgroup, OptGroup) macro(option, Option)        \
-                              macro(p, Paragraph) macro(param, Param)          \
-                                  macro(pre, Pre) macro(q, Quote) macro(       \
-                                      script, Script) macro(select, Select)    \
-                                      macro(style, Style) macro(table, Table)  \
-                                          macro(tbody, TableSection) macro(    \
-                                              td, TableCell)                   \
-                                              macro(textarea, TextArea) macro( \
-                                                  tr, TableRow)                \
-                                                  macro(title, Title) macro(   \
-                                                      ul,                      \
-                                                      UList)  // end of macro
+              dl, DList) macro(fieldset, FieldSet) macro(font, Font)           \
+              macro(form, Form) macro(frame, Frame) macro(h1, Heading)         \
+                  macro(head, Head) macro(hr, HR) macro(html, Html) macro(     \
+                      iframe, IFrame) macro(img, Image) macro(input, Input)    \
+                      macro(isindex, IsIndex) macro(label, Label) macro(       \
+                          legend, Legend) macro(li, LI) macro(link, Link)      \
+                          macro(map, Map) macro(menu, Menu) macro(             \
+                              meta, Meta) macro(ol, OList) macro(optgroup,     \
+                                                                 OptGroup)     \
+                              macro(option, Option) macro(p, Paragraph) macro( \
+                                  param, Param) macro(pre, Pre)                \
+                                  macro(q, Quote) macro(script, Script) macro( \
+                                      select, Select) macro(style, Style)      \
+                                      macro(table, Table) macro(               \
+                                          tbody,                               \
+                                          TableSection) macro(td, TableCell)   \
+                                          macro(textarea, TextArea) macro(     \
+                                              tr, TableRow)                    \
+                                              macro(title, Title) macro(       \
+                                                  ul, UList)  // end of macro
 
 #define CREATE_WRAPPER_FUNCTION(tag, name)                                 \
   static DOMNode* create##name##Wrapper(ExecState* exec,                   \

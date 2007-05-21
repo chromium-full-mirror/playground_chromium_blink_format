@@ -122,8 +122,7 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
-  static const ClassInfo object_info, embed_info, frameSet_info, frame_info,
-      iFrame_info, marquee_info;
+  static const ClassInfo object_info, embed_info, frameSet_info, marquee_info;
 
   // FIXME: Might make sense to combine this with ClassInfo some day.
   typedef JSValue* (JSHTMLElement::*GetterFunction)(ExecState*,
@@ -137,7 +136,7 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   };
   const Accessors* accessors() const;
   static const Accessors object_accessors, embed_accessors, frameSet_accessors,
-      frame_accessors, iFrame_accessors, marquee_accessors;
+      marquee_accessors;
 
   JSValue* objectGetter(ExecState* exec, int token) const;
   void objectSetter(ExecState*, int token, JSValue*);
@@ -145,10 +144,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
   void embedSetter(ExecState*, int token, JSValue*);
   JSValue* frameSetGetter(ExecState* exec, int token) const;
   void frameSetSetter(ExecState*, int token, JSValue*);
-  JSValue* frameGetter(ExecState* exec, int token) const;
-  void frameSetter(ExecState*, int token, JSValue*);
-  JSValue* iFrameGetter(ExecState* exec, int token) const;
-  void iFrameSetter(ExecState*, int token, JSValue*);
   JSValue* marqueeGetter(ExecState* exec, int token) const;
   void marqueeSetter(ExecState*, int token, JSValue*);
 
@@ -182,31 +177,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     EmbedGetSVGDocument,
     FrameSetCols,
     FrameSetRows,
-    FrameSrc,
-    FrameLocation,
-    FrameFrameBorder,
-    FrameScrolling,
-    FrameMarginWidth,
-    FrameLongDesc,
-    FrameMarginHeight,
-    FrameName,
-    FrameContentDocument,
-    FrameContentWindow,
-    FrameNoResize,
-    FrameWidth,
-    FrameHeight,
-    IFrameLongDesc,
-    IFrameAlign,
-    IFrameFrameBorder,
-    IFrameSrc,
-    IFrameName,
-    IFrameHeight,
-    IFrameMarginHeight,
-    IFrameMarginWidth,
-    IFrameScrolling,
-    IFrameWidth,
-    IFrameContentDocument,
-    IFrameContentWindow,
     MarqueeStart,
     MarqueeStop,
     GetContext,
