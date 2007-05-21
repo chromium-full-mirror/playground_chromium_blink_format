@@ -46,31 +46,13 @@ class QWEBKIT_EXPORT QWebNetworkJob {
   void ref();
   bool deref();
 
-  template <typename T>
-  void setHandle(T* t);
-  template <typename T>
-  T* handle() const;
-
  private:
   QWebNetworkJob();
   ~QWebNetworkJob();
 
-  void setUserHandle(void*);
-  void* userHandle() const;
-
   friend class QWebNetworkManager;
   QWebNetworkJobPrivate* d;
 };
-
-template <typename T>
-void QWebNetworkJob::setHandle(T* t) {
-  setUserHandle(t);
-}
-
-template <typename T>
-T* QWebNetworkJob::handle() const {
-  return static_cast<T*>(userHandle());
-}
 
 class QWebNetworkInterfacePrivate;
 
