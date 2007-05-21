@@ -542,6 +542,12 @@ backforward list.
 - (BOOL)defersCallbacks;                 // called by QuickTime plug-in
 - (void)setDefersCallbacks:(BOOL)defer;  // called by QuickTime plug-in
 
+// Re-adding this for the third time - please see <rdar://problem/5217124> for
+// details
+- (void)handleAuthenticationForResource:(id)identifier
+                              challenge:(NSURLAuthenticationChallenge*)challenge
+                         fromDataSource:(WebDataSource*)dataSource;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
