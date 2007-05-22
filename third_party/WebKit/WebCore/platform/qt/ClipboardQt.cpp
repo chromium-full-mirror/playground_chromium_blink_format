@@ -76,20 +76,28 @@ void ClipboardQt::clearAllData() {
 }
 
 String ClipboardQt::getData(const String& type, bool& success) const {
-  notImplemented();
-  return "";
+  ASSERT(m_writableData);
+  QByteArray data = m_writableData->data(QString(type));
+  success = !data.isEmpty();
+  return String(data.data(), data.size());
 }
 
 bool ClipboardQt::setData(const String& type, const String& data) {
   ASSERT(m_writableData);
-  notImplemented();
-  return false;
+  QByteArray array(reinterpret_cast<const char*>(data.characters()),
+                   data.length());
+  m_writableData->setData(QString(type), array);
+  return true;
 }
 
 // extensions beyond IE's API
 HashSet<String> ClipboardQt::types() const {
-  notImplemented();
   HashSet<String> result;
+  QStringList formats = m_writableData->formats();
+  for (int i = 0; i < formats.count(); ++i) {
+    String type(formats.at(i).toLatin1().data());
+    result.add(type);
+  }
   return result;
 }
 
