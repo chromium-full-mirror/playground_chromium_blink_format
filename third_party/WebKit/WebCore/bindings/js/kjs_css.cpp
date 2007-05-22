@@ -776,17 +776,19 @@ bool DOMCSSRule::getOwnPropertySlot(ExecState* exec,
                                     const Identifier& propertyName,
                                     PropertySlot& slot) {
   // first try the properties specific to this rule type
-  const HashEntry* entry =
-      Lookup::findEntry(DOMCSSRule::classInfo()->propHashTable, propertyName);
-  if (entry) {
-    // FIXME: for now we single out the media rule functions.
-    // This is a temporary hack since we should try to generate
-    // them. See http://bugs.webkit.org/show_bug.cgi?id=11898
-    if (entry->attr & Function)
-      return getStaticPropertySlot<DOMCSSRuleFunc, DOMCSSRule, DOMObject>(
-          exec, &DOMCSSMediaRuleTable, this, propertyName, slot);
-    slot.setStaticEntry(this, entry, staticValueGetter<DOMCSSRule>);
-    return true;
+  const HashTable* table = DOMCSSRule::classInfo()->propHashTable;
+  if (table) {
+    const HashEntry* entry = Lookup::findEntry(table, propertyName);
+    if (entry) {
+      // FIXME: for now we single out the media rule functions.
+      // This is a temporary hack since we should try to generate
+      // them. See http://bugs.webkit.org/show_bug.cgi?id=11898
+      if (entry->attr & Function)
+        return getStaticPropertySlot<DOMCSSRuleFunc, DOMCSSRule, DOMObject>(
+            exec, &DOMCSSMediaRuleTable, this, propertyName, slot);
+      slot.setStaticEntry(this, entry, staticValueGetter<DOMCSSRule>);
+      return true;
+    }
   }
 
   // now the stuff that applies to all rules
@@ -856,19 +858,21 @@ void DOMCSSRule::put(ExecState* exec,
                      int attr) {
   const HashTable* table =
       DOMCSSRule::classInfo()->propHashTable;  // get the right hashtable
-  const HashEntry* entry = Lookup::findEntry(table, propertyName);
-  if (entry) {
-    if (entry->attr & Function)  // function: put as override property
-    {
-      JSObject::put(exec, propertyName, value, attr);
-      return;
-    } else if ((entry->attr & ReadOnly) ==
-               0)  // let lookupPut print the warning if not
-    {
-      putValueProperty(exec, entry->value, value, attr);
-      return;
+  if (table) {
+    const HashEntry* entry = Lookup::findEntry(table, propertyName);
+    if (entry) {
+      if (entry->attr & Function) {
+        // function: put as override property
+        JSObject::put(exec, propertyName, value, attr);
+        return;
+      } else if ((entry->attr & ReadOnly) == 0) {
+        // let lookupPut print the warning if not
+        putValueProperty(exec, entry->value, value, attr);
+        return;
+      }
     }
   }
+
   lookupPut<DOMCSSRule, DOMObject>(exec, propertyName, value, attr,
                                    &DOMCSSRuleTable, this);
 }

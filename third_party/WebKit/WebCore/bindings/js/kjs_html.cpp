@@ -440,8 +440,6 @@ const ClassInfo JSHTMLElement::embed_info = {
     "HTMLEmbedElement", &JSHTMLElement::info, &HTMLEmbedElementTable, 0};
 const ClassInfo JSHTMLElement::frameSet_info = {
     "HTMLFrameSetElement", &JSHTMLElement::info, &HTMLFrameSetElementTable, 0};
-const ClassInfo JSHTMLElement::marquee_info = {
-    "HTMLMarqueeElement", &JSHTMLElement::info, &HTMLMarqueeElementTable, 0};
 const ClassInfo JSHTMLElement::object_info = {
     "HTMLObjectElement", &JSHTMLElement::info, &HTMLObjectElementTable, 0};
 
@@ -450,7 +448,6 @@ const ClassInfo* JSHTMLElement::classInfo() const {
   if (classInfoMap.isEmpty()) {
     classInfoMap.set(embedTag.localName().impl(), &embed_info);
     classInfoMap.set(framesetTag.localName().impl(), &frameSet_info);
-    classInfoMap.set(marqueeTag.localName().impl(), &marquee_info);
     classInfoMap.set(objectTag.localName().impl(), &object_info);
   }
 
@@ -467,15 +464,12 @@ const JSHTMLElement::Accessors JSHTMLElement::embed_accessors = {
     &JSHTMLElement::embedGetter, &JSHTMLElement::embedSetter};
 const JSHTMLElement::Accessors JSHTMLElement::frameSet_accessors = {
     &JSHTMLElement::frameSetGetter, &JSHTMLElement::frameSetSetter};
-const JSHTMLElement::Accessors JSHTMLElement::marquee_accessors = {
-    &JSHTMLElement::marqueeGetter, &JSHTMLElement::marqueeSetter};
 
 const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
   static HashMap<AtomicStringImpl*, const Accessors*> accessorMap;
   if (accessorMap.isEmpty()) {
     accessorMap.add(embedTag.localName().impl(), &embed_accessors);
     accessorMap.add(framesetTag.localName().impl(), &frameSet_accessors);
-    accessorMap.add(marqueeTag.localName().impl(), &marquee_accessors);
     accessorMap.add(objectTag.localName().impl(), &object_accessors);
   }
 
@@ -540,10 +534,6 @@ DontDelete|ReadOnly
 @begin HTMLFrameSetElementTable 2
 cols          KJS::JSHTMLElement::FrameSetCols                  DontDelete
 rows          KJS::JSHTMLElement::FrameSetRows                  DontDelete
-@end
-@begin HTMLMarqueeElementTable 2
-  start           KJS::JSHTMLElement::MarqueeStart DontDelete|Function 0
-  stop            KJS::JSHTMLElement::MarqueeStop DontDelete|Function 0
 @end
 */
 
@@ -632,14 +622,16 @@ bool JSHTMLElement::getOwnPropertySlot(ExecState* exec,
 
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
-  const HashEntry* entry = Lookup::findEntry(table, propertyName);
-  if (entry) {
-    if (entry->attr & Function)
-      slot.setStaticEntry(this, entry,
-                          staticFunctionGetter<HTMLElementFunction>);
-    else
-      slot.setStaticEntry(this, entry, staticValueGetter<JSHTMLElement>);
-    return true;
+  if (table) {
+    const HashEntry* entry = Lookup::findEntry(table, propertyName);
+    if (entry) {
+      if (entry->attr & Function)
+        slot.setStaticEntry(this, entry,
+                            staticFunctionGetter<HTMLElementFunction>);
+      else
+        slot.setStaticEntry(this, entry, staticValueGetter<JSHTMLElement>);
+      return true;
+    }
   }
 
   // Base JSHTMLElement stuff or parent class forward, as usual
@@ -749,11 +741,6 @@ JSValue* JSHTMLElement::frameSetGetter(ExecState* exec, int token) const {
     case FrameSetRows:
       return jsString(frameSet.rows());
   }
-  return jsUndefined();
-}
-
-JSValue* JSHTMLElement::marqueeGetter(ExecState* exec, int token) const {
-  // FIXME: Find out what WinIE exposes as properties and implement this.
   return jsUndefined();
 }
 
@@ -870,22 +857,8 @@ JSValue* HTMLElementFunction::callAsFunction(ExecState* exec,
   HTMLElement& element =
       *static_cast<HTMLElement*>(static_cast<JSHTMLElement*>(thisObj)->impl());
 
-  if (element.hasLocalName(marqueeTag)) {
-    if (id == JSHTMLElement::MarqueeStart && element.renderer() &&
-        element.renderer()->hasLayer() &&
-        element.renderer()->layer()->marquee()) {
-      element.renderer()->layer()->marquee()->start();
-      return jsUndefined();
-    }
-    if (id == JSHTMLElement::MarqueeStop && element.renderer() &&
-        element.renderer()->hasLayer() &&
-        element.renderer()->layer()->marquee()) {
-      element.renderer()->layer()->marquee()->stop();
-      return jsUndefined();
-    }
-  }
 #if ENABLE(SVG)
-  else if (element.hasLocalName(objectTag)) {
+  if (element.hasLocalName(objectTag)) {
     HTMLObjectElement& object = static_cast<HTMLObjectElement&>(element);
     if (id == JSHTMLElement::ObjectGetSVGDocument)
       return checkNodeSecurity(exec, object.getSVGDocument(exception))
@@ -920,15 +893,17 @@ void JSHTMLElement::put(ExecState* exec,
 
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
-  const HashEntry* entry = Lookup::findEntry(table, propertyName);
-  if (entry) {
-    if (entry->attr & Function) {  // function: put as override property
-      JSObject::put(exec, propertyName, value, attr);
-      return;
-    } else if (!(entry->attr &
-                 ReadOnly)) {  // let lookupPut print the warning if read-only
-      putValueProperty(exec, entry->value, value, attr);
-      return;
+  if (table) {
+    const HashEntry* entry = Lookup::findEntry(table, propertyName);
+    if (entry) {
+      if (entry->attr & Function) {  // function: put as override property
+        JSObject::put(exec, propertyName, value, attr);
+        return;
+      } else if (!(entry->attr &
+                   ReadOnly)) {  // let lookupPut print the warning if read-only
+        putValueProperty(exec, entry->value, value, attr);
+        return;
+      }
     }
   }
 
@@ -1054,10 +1029,6 @@ void JSHTMLElement::frameSetSetter(ExecState* exec, int token, JSValue* value) {
       return;
     }
   }
-}
-
-void JSHTMLElement::marqueeSetter(ExecState* exec, int token, JSValue* value) {
-  // FIXME: Find out what WinIE supports and implement it.
 }
 
 void JSHTMLElement::putValueProperty(ExecState* exec,

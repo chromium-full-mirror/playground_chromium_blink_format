@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2006, 2007 Apple Inc.
+ *  Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -49,6 +49,7 @@
 #include "HTMLLegendElement.h"
 #include "HTMLLinkElement.h"
 #include "HTMLMapElement.h"
+#include "HTMLMarqueeElement.h"
 #include "HTMLMenuElement.h"
 #include "HTMLMetaElement.h"
 #include "HTMLModElement.h"
@@ -104,6 +105,7 @@
 #include "JSHTMLLegendElement.h"
 #include "JSHTMLLinkElement.h"
 #include "JSHTMLMapElement.h"
+#include "JSHTMLMarqueeElement.h"
 #include "JSHTMLMenuElement.h"
 #include "JSHTMLMetaElement.h"
 #include "JSHTMLModElement.h"
@@ -148,14 +150,15 @@ typedef DOMNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
           canvas, Canvas) macro(caption, TableCaption) macro(col, TableCol)    \
           macro(del, Mod) macro(dir, Directory) macro(div, Div) macro(         \
               dl, DList) macro(fieldset, FieldSet) macro(font, Font)           \
-              macro(form, Form) macro(frame, Frame) macro(h1, Heading)         \
-                  macro(head, Head) macro(hr, HR) macro(html, Html) macro(     \
-                      iframe, IFrame) macro(img, Image) macro(input, Input)    \
-                      macro(isindex, IsIndex) macro(label, Label) macro(       \
-                          legend, Legend) macro(li, LI) macro(link, Link)      \
-                          macro(map, Map) macro(menu, Menu) macro(             \
-                              meta, Meta) macro(ol, OList) macro(optgroup,     \
-                                                                 OptGroup)     \
+              macro(form, Form) macro(frame, Frame) macro(h1, Heading) macro(  \
+                  head, Head) macro(hr, HR) macro(html, Html)                  \
+                  macro(iframe, IFrame) macro(img, Image) macro(               \
+                      input, Input) macro(isindex, IsIndex) macro(label,       \
+                                                                  Label)       \
+                      macro(legend, Legend) macro(li, LI) macro(               \
+                          link, Link) macro(map, Map) macro(menu, Menu)        \
+                          macro(meta, Meta) macro(marquee, Marquee) macro(     \
+                              ol, OList) macro(optgroup, OptGroup)             \
                               macro(option, Option) macro(p, Paragraph) macro( \
                                   param, Param) macro(pre, Pre)                \
                                   macro(q, Quote) macro(script, Script) macro( \
