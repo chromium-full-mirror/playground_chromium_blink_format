@@ -181,7 +181,6 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     ElementLang,
     ElementClassName,
     ElementInnerText,
-    ElementDocument,
     ElementChildren,
     ElementContentEditable,
     ElementIsContentEditable,
