@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
+                  2007 Apple Inc.  All rights reserved.
 
     This file is part of the KDE project
 
@@ -284,6 +285,11 @@ float SVGLength::PercentageOfViewport(float value,
     } else {
       width = svg->width().value();
       height = svg->height().value();
+    }
+  } else if (context->parent() && !context->parent()->isSVGElement()) {
+    if (RenderObject* renderer = context->renderer()) {
+      width = renderer->width();
+      height = renderer->height();
     }
   }
 
