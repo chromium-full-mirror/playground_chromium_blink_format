@@ -207,11 +207,9 @@ bool QWebNetworkManager::add(ResourceHandle* handle) {
   int id;
   // handle and perform a 'POST' request
   if (handle->method() == "POST") {
-    job->d->request.setValue(QLatin1String("PropagateHttpHeader"),
-                             QLatin1String("true"));
     job->d->request.setValue(
-        QLatin1String("content-type"),
-        QLatin1String("Content-Type: application/x-www-form-urlencoded"));
+        QLatin1String("Content-Type"),
+        QLatin1String("application/x-www-form-urlencoded"));
 
     DeprecatedString pd =
         handle->postData()->flattenToString().deprecatedString();
