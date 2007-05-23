@@ -506,7 +506,6 @@ void FrameLoaderClientQt::setMainDocumentError(
 void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
                                         const char* data,
                                         int length) {
-  qDebug() << "FrameLoaderClientQt::committedLoad" << length;
   if (!m_frame)
     return;
   FrameLoader* fl = loader->frameLoader();
@@ -615,9 +614,7 @@ void FrameLoaderClientQt::dispatchDidReceiveResponse(
 void FrameLoaderClientQt::dispatchDidReceiveContentLength(
     WebCore::DocumentLoader*,
     unsigned long,
-    int) {
-  notImplemented();
-}
+    int) {}
 
 void FrameLoaderClientQt::dispatchDidFinishLoading(
     WebCore::DocumentLoader* loader,

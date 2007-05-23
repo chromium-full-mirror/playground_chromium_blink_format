@@ -65,8 +65,6 @@ class QWebNetworkManager : public QObject {
   void finished(QWebNetworkJob*, int errorCode);
 
  signals:
-  void networkRequest(QWebNetworkJob*);
-  void networkCancel(QWebNetworkJob*);
   void fileRequest(QWebNetworkJob*);
 
  private:
@@ -79,8 +77,7 @@ namespace WebCore {
 class LoaderThread : public QThread {
   Q_OBJECT
  public:
-  enum Type { Network, File };
-  LoaderThread(QWebNetworkInterface* manager, Type type);
+  LoaderThread(QWebNetworkInterface* manager);
 
   void waitForSetup() {
     while (!m_setup)
@@ -91,7 +88,6 @@ class LoaderThread : public QThread {
   void run();
 
  private:
-  Type m_type;
   QObject* m_loader;
   QWebNetworkInterface* m_manager;
   volatile bool m_setup;
@@ -166,7 +162,7 @@ class WebCoreHttp : public QObject {
 class NetworkLoader : public QObject {
   Q_OBJECT
  public:
-  NetworkLoader();
+  NetworkLoader(QObject* parent);
   ~NetworkLoader();
 
  public slots:
@@ -187,7 +183,7 @@ class NetworkLoader : public QObject {
 
 class QWebNetworkInterfacePrivate {
  public:
-  WebCore::LoaderThread* networkLoader;
+  WebCore::NetworkLoader* networkLoader;
   WebCore::LoaderThread* fileLoader;
 };
 
