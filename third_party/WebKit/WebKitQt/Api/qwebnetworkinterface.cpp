@@ -22,10 +22,6 @@
   pages from the web. It has a memory cache for these objects.
 */
 #include <qglobal.h>
-namespace WebCore {
-class HostInfo;
-}
-uint qHash(const WebCore::HostInfo& info);
 #include "qwebnetworkinterface.h"
 #include "qwebnetworkinterface_p.h"
 #include <qdebug.h>
@@ -57,7 +53,7 @@ using namespace WebCore;
 void QWebNetworkJobPrivate::setURL(const QUrl& u) {
   url = u;
   int port = url.port();
-  if (port && port != 80)
+  if (port > 0 && port != 80)
     request.setValue(QLatin1String("Host"),
                      url.host() + QLatin1Char(':') + QString::number(port));
   else
@@ -291,7 +287,7 @@ void QWebNetworkManager::started(QWebNetworkJob* job) {
     DEBUG() << "Redirection";
     if (!location.isEmpty()) {
       ResourceRequest newRequest = job->d->resourceHandle->request();
-      newRequest.setURL(DeprecatedString(location));
+      newRequest.setURL(KURL(newRequest.url(), DeprecatedString(location)));
       client->willSendRequest(job->d->resourceHandle, newRequest, response);
       job->d->request.setRequest(
           job->d->request.method(),
