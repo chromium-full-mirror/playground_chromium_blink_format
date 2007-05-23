@@ -116,19 +116,7 @@ class JSHTMLElement : public WebCore::JSHTMLElement {
     EmbedWidth,
     EmbedGetSVGDocument,
     FrameSetCols,
-    FrameSetRows,
-    GetContext,
-    ElementInnerHTML,
-    ElementId,
-    ElementDir,
-    ElementLang,
-    ElementClassName,
-    ElementInnerText,
-    ElementChildren,
-    ElementContentEditable,
-    ElementIsContentEditable,
-    ElementOuterHTML,
-    ElementOuterText
+    FrameSetRows
   };
 
  private:
