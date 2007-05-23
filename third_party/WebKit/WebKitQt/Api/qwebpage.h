@@ -35,12 +35,14 @@ class QUrl;
 
 class QWebPagePrivate;
 class QWebFrameData;
+class QWebNetworkInterface;
 
 namespace WebCore {
 class ChromeClientQt;
 class FrameLoaderClientQt;
 class FrameLoadRequest;
 class EditorClientQt;
+class ResourceHandle;
 }
 
 class QWEBKIT_EXPORT QWebPage : public QWidget {
@@ -79,6 +81,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   virtual void dragLeaveEvent(QDragLeaveEvent*);
   virtual void dragMoveEvent(QDragMoveEvent*);
   virtual void dropEvent(QDropEvent*);
+
+  void setNetworkInterface(QWebNetworkInterface* interface);
+  QWebNetworkInterface* networkInterface() const;
 
  public slots:
   /**
@@ -134,6 +139,7 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   friend class WebCore::ChromeClientQt;
   friend class WebCore::EditorClientQt;
   friend class WebCore::FrameLoaderClientQt;
+  friend class WebCore::ResourceHandle;
   QWebPagePrivate* d;
 };
 

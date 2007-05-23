@@ -31,6 +31,11 @@
 #include <qwebkitglobal.h>
 
 class QWebNetworkJobPrivate;
+class QWebNetworkInterface;
+
+namespace WebCore {
+class WebCoreHttp;
+}
 
 class QWEBKIT_EXPORT QWebNetworkJob {
  public:
@@ -46,6 +51,8 @@ class QWEBKIT_EXPORT QWebNetworkJob {
   void ref();
   bool deref();
 
+  QWebNetworkInterface* networkInterface() const;
+
  private:
   QWebNetworkJob();
   ~QWebNetworkJob();
@@ -59,7 +66,7 @@ class QWebNetworkInterfacePrivate;
 class QWEBKIT_EXPORT QWebNetworkInterface : public QObject {
   Q_OBJECT
  public:
-  QWebNetworkInterface();
+  QWebNetworkInterface(QObject* parent = 0);
   ~QWebNetworkInterface();
 
   static void setDefaultInterface(QWebNetworkInterface* defaultInterface);
@@ -74,7 +81,9 @@ class QWEBKIT_EXPORT QWebNetworkInterface : public QObject {
   void finished(QWebNetworkJob*, int errorCode);
 
  private:
+  Q_PRIVATE_SLOT(d, void httpConnectionClosed(const WebCore::HostInfo&));
   friend class QWebNetworkInterfacePrivate;
+  friend class WebCore::WebCoreHttp;
   QWebNetworkInterfacePrivate* d;
 };
 

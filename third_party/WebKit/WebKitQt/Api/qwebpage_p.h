@@ -55,6 +55,8 @@ class QWebPagePrivate {
   QWebPage* q;
   QUndoStack* undoStack;
 
+  QWebNetworkInterface* networkInterface;
+
   bool modified;
 };
 

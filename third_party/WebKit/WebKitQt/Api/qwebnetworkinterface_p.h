@@ -48,6 +48,8 @@ class QWebNetworkJobPrivate {
   WebCore::ResourceHandle* resourceHandle;
   bool redirected;
 
+  QWebNetworkInterface* interface;
+
   void setURL(const QUrl& u);
 };
 
@@ -56,7 +58,8 @@ class QWebNetworkManager : public QObject {
  public:
   static QWebNetworkManager* self();
 
-  bool add(WebCore::ResourceHandle* resourceHandle);
+  bool add(WebCore::ResourceHandle* resourceHandle,
+           QWebNetworkInterface* interface);
   void cancel(WebCore::ResourceHandle* resourceHandle);
 
  public slots:
@@ -74,45 +77,6 @@ class QWebNetworkManager : public QObject {
 
 namespace WebCore {
 
-class LoaderThread : public QThread {
-  Q_OBJECT
- public:
-  LoaderThread(QWebNetworkInterface* manager);
-
-  void waitForSetup() {
-    while (!m_setup)
-      ;
-  }
-
- protected:
-  void run();
-
- private:
-  QObject* m_loader;
-  QWebNetworkInterface* m_manager;
-  volatile bool m_setup;
-};
-
-class FileLoader : public QObject {
-  Q_OBJECT
- public:
-  FileLoader();
-
- public slots:
-  void request(QWebNetworkJob*);
-
- signals:
-  void receivedResponse(QWebNetworkJob* resource);
-  void receivedData(QWebNetworkJob* resource, const QByteArray& data);
-  void receivedFinished(QWebNetworkJob* resource, int errorCode);
-
- private:
-  void parseDataUrl(QWebNetworkJob* request);
-  void sendData(QWebNetworkJob* request,
-                int statusCode,
-                const QByteArray& data);
-};
-
 class NetworkLoader;
 
 struct HostInfo {
@@ -126,14 +90,14 @@ struct HostInfo {
 class WebCoreHttp : public QObject {
   Q_OBJECT
  public:
-  WebCoreHttp(NetworkLoader* parent, const HostInfo&);
+  WebCoreHttp(QWebNetworkInterface* parent, const HostInfo&);
   ~WebCoreHttp();
 
   void request(QWebNetworkJob* resource);
   void cancel(QWebNetworkJob*);
 
  signals:
-  void connectionClosed(const HostInfo&);
+  void connectionClosed(const WebCore::HostInfo&);
 
  private slots:
   void onResponseHeaderReceived(const QHttpResponseHeader& resp);
@@ -149,7 +113,7 @@ class WebCoreHttp : public QObject {
   HostInfo info;
 
  private:
-  NetworkLoader* m_loader;
+  QWebNetworkInterface* m_networkInterface;
   QList<QWebNetworkJob*> m_pendingRequests;
   struct HttpConnection {
     QHttp* http;
@@ -158,33 +122,21 @@ class WebCoreHttp : public QObject {
   HttpConnection connection[2];
   bool m_inCancel;
 };
-
-class NetworkLoader : public QObject {
-  Q_OBJECT
- public:
-  NetworkLoader(QObject* parent);
-  ~NetworkLoader();
-
- public slots:
-  void request(QWebNetworkJob*);
-  void cancel(QWebNetworkJob*);
-  void connectionClosed(const HostInfo&);
-
- signals:
-  void receivedResponse(QWebNetworkJob* resource);
-  void receivedData(QWebNetworkJob* resource, const QByteArray& data);
-  void receivedFinished(QWebNetworkJob* resource, int errorCode);
-
- private:
-  friend class WebCoreHttp;
-  QHash<HostInfo, WebCoreHttp*> m_hostMapping;
-};
 }
 
 class QWebNetworkInterfacePrivate {
  public:
-  WebCore::NetworkLoader* networkLoader;
-  WebCore::LoaderThread* fileLoader;
+  void sendFileData(QWebNetworkJob* job,
+                    int statusCode,
+                    const QByteArray& data);
+  void parseDataUrl(QWebNetworkJob* job);
+
+  void addHttpJob(QWebNetworkJob* job);
+
+  void httpConnectionClosed(const WebCore::HostInfo&);
+
+  QHash<WebCore::HostInfo, WebCore::WebCoreHttp*> m_hostMapping;
+  QWebNetworkInterface* q;
 };
 
 #endif
