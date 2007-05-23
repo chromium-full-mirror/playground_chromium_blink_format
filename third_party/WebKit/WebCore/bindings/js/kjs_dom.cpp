@@ -1112,8 +1112,8 @@ JSValue* getRuntimeObject(ExecState* exec, Node* n) {
   return 0;
 }
 
-JSValue* toJS(ExecState* exec, PassRefPtr<NodeList> l) {
-  return cacheDOMObject<NodeList, DOMNodeList>(exec, l.get());
+JSValue* toJS(ExecState* exec, NodeList* l) {
+  return cacheDOMObject<NodeList, DOMNodeList>(exec, l);
 }
 
 // -------------------------------------------------------------------------
