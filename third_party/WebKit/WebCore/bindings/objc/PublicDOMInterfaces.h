@@ -596,6 +596,11 @@
 @property(copy) NSString* name;
 @end
 
+@interface DOMHTMLMarqueeElement : DOMHTMLElement
+- (void)start;
+- (void)stop;
+@end
+
 @interface DOMHTMLMenuElement : DOMHTMLElement
 @property BOOL compact;
 @end
