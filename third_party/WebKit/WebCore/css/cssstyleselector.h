@@ -249,6 +249,7 @@ class CSSStyleSelector : public StyleSelector {
   RenderStyle::PseudoId pseudoStyle;
   FrameView* view;
   Frame* frame;
+  CSSValue* m_lineHeightValue;
   const Settings* settings;
   bool fontDirty;
   bool isXMLDoc;
