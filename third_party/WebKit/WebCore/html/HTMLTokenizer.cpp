@@ -1053,8 +1053,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           if (inViewSourceMode())
             currToken.addViewSourceChar(curchar);
 
-          // This is a deliberate quirk for (with a long sad history).  We have
-          // to do this
+          // This is a quirk (with a long sad history).  We have to do this
           // since widgets do <script src="foo.js"/> and expect the tag to
           // close.
           if (currToken.tagName == scriptTag && curchar == '/')
