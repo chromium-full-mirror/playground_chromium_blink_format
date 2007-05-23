@@ -46,12 +46,12 @@ class InfoWidget : public QProgressBar {
   }
  public slots:
   void startLoad() {
-    setValue(int(m_progress * 100));
+    setValue(m_progress);
     show();
   }
-  void changeLoad(double change) {
+  void changeLoad(int change) {
     m_progress = change;
-    setValue(int(change * 100));
+    setValue(change);
   }
   void endLoad() {
     QTimer::singleShot(1000, this, SLOT(hide()));
@@ -59,7 +59,7 @@ class InfoWidget : public QProgressBar {
   }
 
  protected:
-  qreal m_progress;
+  int m_progress;
 };
 
 class HoverLabel : public QWidget {
@@ -252,8 +252,8 @@ class MainWindow : public QMainWindow {
     info->setGeometry(20, 20, info->sizeHint().width(),
                       info->sizeHint().height());
     connect(page, SIGNAL(loadStarted(QWebFrame*)), info, SLOT(startLoad()));
-    connect(page, SIGNAL(loadProgressChanged(double)), info,
-            SLOT(changeLoad(double)));
+    connect(page, SIGNAL(loadProgressChanged(int)), info,
+            SLOT(changeLoad(int)));
     connect(page, SIGNAL(loadFinished(QWebFrame*)), info, SLOT(endLoad()));
     connect(page, SIGNAL(loadFinished(QWebFrame*)), this, SLOT(loadFinished()));
     connect(page, SIGNAL(titleChanged(const QString&)), this,
