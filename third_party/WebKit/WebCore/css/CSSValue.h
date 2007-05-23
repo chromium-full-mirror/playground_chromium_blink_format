@@ -45,6 +45,7 @@ class CSSValue : public StyleBase {
 
   virtual bool isValue() { return true; }
   virtual bool isFontValue() { return false; }
+  virtual bool isImplicitInitialValue() const { return false; }
 };
 
 }  // namespace
