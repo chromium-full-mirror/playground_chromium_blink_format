@@ -232,6 +232,14 @@ const Cursor& notAllowedCursor() {
   // FIXME: Build fix -- what is correct here?
   return Cursors::self()->BlankCursor;
 }
+
+const Cursor& zoomInCursor() {
+  return Cursors::self()->PointerCursor;
+}
+
+const Cursor& zoomOutCursor() {
+  return Cursors::self()->PointerCursor;
+}
 }
 
 // vim: ts=4 sw=4 et
