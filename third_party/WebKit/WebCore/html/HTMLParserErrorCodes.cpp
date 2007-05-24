@@ -49,8 +49,9 @@ const char* htmlParserErrorMessageTemplate(HTMLParserErrorCode errorCode) {
       "inserting the new <table> as a sibling.",
       "%tag1 is not allowed inside %tag2. Inserting %tag1 before the <table> "
       "instead.",
-      "%tag1 misplaced in <table>. Creating %tag2 and putting %tag1 inside "
-      "it."};
+      "%tag1 misplaced in <table>. Creating %tag2 and putting %tag1 inside it.",
+      "</br> encountered.  Converting </br> into <br>.",
+      "XML self-closing tag syntax used on %tag1. The tag will not be closed."};
 
   if (errorCode >= MisplacedTablePartError &&
       errorCode <= TablePartRequiredError)

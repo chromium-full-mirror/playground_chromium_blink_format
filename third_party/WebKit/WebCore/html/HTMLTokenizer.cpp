@@ -1055,12 +1055,14 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           if (inViewSourceMode())
             currToken.addViewSourceChar(curchar);
 
-          // This is a quirk (with a long sad history).  We have to do this
-          // since widgets do <script src="foo.js"/> and expect the tag to
-          // close.
-          if (currToken.tagName == scriptTag && curchar == '/')
-            currToken.flat = true;
-
+          if (curchar == '/') {
+            // This is a quirk (with a long sad history).  We have to do this
+            // since widgets do <script src="foo.js"/> and expect the tag to
+            // close.
+            if (currToken.tagName == scriptTag)
+              currToken.flat = true;
+            currToken.brokenXMLStyle = true;
+          }
           src.advance(lineNoPtr);
         }
         break;
