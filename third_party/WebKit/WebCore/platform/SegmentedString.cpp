@@ -29,7 +29,6 @@ SegmentedString::SegmentedString(const SegmentedString& other)
       m_pushedChar2(other.m_pushedChar2),
       m_currentString(other.m_currentString),
       m_substrings(other.m_substrings),
-      m_lines(other.m_lines),
       m_composite(other.m_composite) {
   if (other.m_currentChar == &other.m_pushedChar1)
     m_currentChar = &m_pushedChar1;
@@ -45,7 +44,6 @@ const SegmentedString& SegmentedString::operator=(
   m_pushedChar2 = other.m_pushedChar2;
   m_currentString = other.m_currentString;
   m_substrings = other.m_substrings;
-  m_lines = other.m_lines;
   m_composite = other.m_composite;
   if (other.m_currentChar == &other.m_pushedChar1)
     m_currentChar = &m_pushedChar1;
@@ -79,7 +77,6 @@ void SegmentedString::clear() {
   m_currentChar = 0;
   m_currentString.clear();
   m_substrings.clear();
-  m_lines = 0;
   m_composite = false;
 }
 

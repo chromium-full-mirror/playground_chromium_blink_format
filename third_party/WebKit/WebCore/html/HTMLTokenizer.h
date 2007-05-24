@@ -111,7 +111,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   virtual int lineNumber() const { return lineno; }
   virtual int columnNumber() const { return 1; }
 
-  int tagStartLineNumber() const { return tagStartLineno; }
+  int* lineNumberPtr() { return m_executingScript ? 0 : &lineno; }
 
  private:
   class State;

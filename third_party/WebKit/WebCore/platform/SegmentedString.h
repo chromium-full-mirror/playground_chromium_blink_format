@@ -69,21 +69,18 @@ class SegmentedString {
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentChar(0),
-        m_lines(0),
         m_composite(false) {}
   SegmentedString(const UChar* str, int length)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str, length),
         m_currentChar(m_currentString.m_current),
-        m_lines(0),
         m_composite(false) {}
   SegmentedString(const String& str)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str),
         m_currentChar(m_currentString.m_current),
-        m_lines(0),
         m_composite(false) {}
   SegmentedString(const SegmentedString&);
 
@@ -108,12 +105,13 @@ class SegmentedString {
   bool isEmpty() const { return !current(); }
   unsigned length() const;
 
-  void advance() {
+  void advance(int* lineNumber = 0) {
     if (m_pushedChar1) {
       m_pushedChar1 = m_pushedChar2;
       m_pushedChar2 = 0;
     } else if (m_currentString.m_current) {
-      m_lines += *m_currentString.m_current++ == '\n';
+      if (*m_currentString.m_current++ == '\n' && lineNumber)
+        *lineNumber = *lineNumber + 1;
       if (--m_currentString.m_length == 0)
         advanceSubstring();
     }
@@ -122,12 +120,8 @@ class SegmentedString {
 
   bool escaped() const { return m_pushedChar1; }
 
-  int lineCount() const { return m_lines; }
-  void resetLineCount() { m_lines = 0; }
-
   String toString() const;
 
-  void operator++() { advance(); }
   const UChar& operator*() const { return *current(); }
   const UChar* operator->() const { return current(); }
 
@@ -143,7 +137,6 @@ class SegmentedString {
   SegmentedSubstring m_currentString;
   const UChar* m_currentChar;
   DeprecatedValueList<SegmentedSubstring> m_substrings;
-  int m_lines;
   bool m_composite;
 };
 }
