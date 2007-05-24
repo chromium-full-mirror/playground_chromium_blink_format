@@ -243,8 +243,12 @@ PassRefPtr<Node> HTMLParser::parseToken(Token* t) {
     // If the node does not have a forbidden end tag requirement, and if the
     // broken XML self-closing
     // syntax was used, report an error.
-    if (t->brokenXMLStyle && e->endTagRequirement() != TagStatusForbidden)
-      reportError(IncorrectXMLSelfCloseError, &t->tagName);
+    if (t->brokenXMLStyle && e->endTagRequirement() != TagStatusForbidden) {
+      if (t->tagName == scriptTag)
+        reportError(IncorrectXMLCloseScriptWarning);
+      else
+        reportError(IncorrectXMLSelfCloseError, &t->tagName);
+    }
   }
 
   if (!insertNode(n.get(), t->flat)) {
@@ -1505,11 +1509,15 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   }
 
   const char* errorMsg = htmlParserErrorMessageTemplate(errorCode);
+  if (!errorMsg)
+    return;
   String message(errorMsg);
   message.replace("%tag1", tag1);
   message.replace("%tag2", tag2);
 
-  page->chrome()->addMessageToConsole(HTMLMessageSource, ErrorMessageLevel,
-                                      message, lineNumber, document->URL());
+  page->chrome()->addMessageToConsole(
+      HTMLMessageSource,
+      isWarning(errorCode) ? WarningMessageLevel : ErrorMessageLevel, message,
+      lineNumber, document->URL());
 }
 }
