@@ -75,7 +75,7 @@ HTMLTableSectionElement::additionalAttributeStyleDecl() {
 PassRefPtr<HTMLElement> HTMLTableSectionElement::insertRow(int index,
                                                            ExceptionCode& ec) {
   RefPtr<HTMLTableRowElement> r;
-  RefPtr<NodeList> children = childNodes();
+  RefPtr<HTMLCollection> children = rows();
   int numRows = children ? (int)children->length() : 0;
   if (index < -1 || index > numRows)
     ec = INDEX_SIZE_ERR;  // per the DOM
@@ -96,7 +96,7 @@ PassRefPtr<HTMLElement> HTMLTableSectionElement::insertRow(int index,
 }
 
 void HTMLTableSectionElement::deleteRow(int index, ExceptionCode& ec) {
-  RefPtr<NodeList> children = childNodes();
+  RefPtr<HTMLCollection> children = rows();
   int numRows = children ? (int)children->length() : 0;
   if (index == -1)
     index = numRows - 1;
