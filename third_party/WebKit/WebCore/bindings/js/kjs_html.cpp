@@ -33,7 +33,6 @@
 #include "HTMLEmbedElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElement.h"
-#include "HTMLFrameSetElement.h"
 #include "HTMLIFrameElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLLabelElement.h"
@@ -79,8 +78,6 @@ const ClassInfo JSHTMLElement::info = {"HTMLElement", &JSElement::info,
 
 const ClassInfo JSHTMLElement::embed_info = {
     "HTMLEmbedElement", &JSHTMLElement::info, &HTMLEmbedElementTable, 0};
-const ClassInfo JSHTMLElement::frameSet_info = {
-    "HTMLFrameSetElement", &JSHTMLElement::info, &HTMLFrameSetElementTable, 0};
 const ClassInfo JSHTMLElement::object_info = {
     "HTMLObjectElement", &JSHTMLElement::info, &HTMLObjectElementTable, 0};
 
@@ -88,7 +85,6 @@ const ClassInfo* JSHTMLElement::classInfo() const {
   static HashMap<AtomicStringImpl*, const ClassInfo*> classInfoMap;
   if (classInfoMap.isEmpty()) {
     classInfoMap.set(embedTag.localName().impl(), &embed_info);
-    classInfoMap.set(framesetTag.localName().impl(), &frameSet_info);
     classInfoMap.set(objectTag.localName().impl(), &object_info);
   }
 
@@ -103,14 +99,11 @@ const JSHTMLElement::Accessors JSHTMLElement::object_accessors = {
     &JSHTMLElement::objectGetter, &JSHTMLElement::objectSetter};
 const JSHTMLElement::Accessors JSHTMLElement::embed_accessors = {
     &JSHTMLElement::embedGetter, &JSHTMLElement::embedSetter};
-const JSHTMLElement::Accessors JSHTMLElement::frameSet_accessors = {
-    &JSHTMLElement::frameSetGetter, &JSHTMLElement::frameSetSetter};
 
 const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
   static HashMap<AtomicStringImpl*, const Accessors*> accessorMap;
   if (accessorMap.isEmpty()) {
     accessorMap.add(embedTag.localName().impl(), &embed_accessors);
-    accessorMap.add(framesetTag.localName().impl(), &frameSet_accessors);
     accessorMap.add(objectTag.localName().impl(), &object_accessors);
   }
 
@@ -155,10 +148,6 @@ const JSHTMLElement::Accessors* JSHTMLElement::accessors() const {
   type          KJS::JSHTMLElement::EmbedType            DontDelete
   width         KJS::JSHTMLElement::EmbedWidth           DontDelete
 @end
-@begin HTMLFrameSetElementTable 2
-cols          KJS::JSHTMLElement::FrameSetCols                  DontDelete
-rows          KJS::JSHTMLElement::FrameSetRows                  DontDelete
-@end
 */
 
 KJS_IMPLEMENT_PROTOTYPE_FUNCTION(JSHTMLElementPrototypeFunction)
@@ -175,21 +164,6 @@ JSValue* JSHTMLElementPrototypeFunction::callAsFunction(ExecState*,
 JSHTMLElement::JSHTMLElement(ExecState* exec, HTMLElement* e)
     : WebCore::JSHTMLElement(exec, e) {
   setPrototype(JSHTMLElementPrototype::self(exec));
-}
-
-JSValue* JSHTMLElement::framesetNameGetter(ExecState* exec,
-                                           JSObject* originalObject,
-                                           const Identifier& propertyName,
-                                           const PropertySlot& slot) {
-  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(slot.slotBase());
-  HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
-
-  WebCore::Node* frame = element->children()->namedItem(propertyName);
-  if (Document* doc = static_cast<HTMLFrameElement*>(frame)->contentDocument())
-    if (Window* window = Window::retrieveWindow(doc->frame()))
-      return window;
-
-  return jsUndefined();
 }
 
 JSValue* JSHTMLElement::runtimeObjectGetter(ExecState* exec,
@@ -221,15 +195,8 @@ bool JSHTMLElement::getOwnPropertySlot(ExecState* exec,
   HTMLElement& element = *static_cast<HTMLElement*>(impl());
 
   // First look at dynamic properties
-  if (element.hasLocalName(framesetTag)) {
-    WebCore::Node* frame = element.children()->namedItem(propertyName);
-    if (frame && frame->hasTagName(frameTag)) {
-      slot.setCustom(this, framesetNameGetter);
-      return true;
-    }
-  } else if (element.hasLocalName(embedTag) ||
-             element.hasLocalName(objectTag) ||
-             element.hasLocalName(appletTag)) {
+  if (element.hasLocalName(embedTag) || element.hasLocalName(objectTag) ||
+      element.hasLocalName(appletTag)) {
     if (propertyName == "__apple_runtime_object") {
       slot.setCustom(this, runtimeObjectGetter);
       return true;
@@ -353,17 +320,6 @@ JSValue* JSHTMLElement::embedGetter(ExecState* exec, int token) const {
       return jsString(embed.type());
     case EmbedWidth:
       return jsString(embed.width());
-  }
-  return jsUndefined();
-}
-
-JSValue* JSHTMLElement::frameSetGetter(ExecState* exec, int token) const {
-  HTMLFrameSetElement& frameSet = *static_cast<HTMLFrameSetElement*>(impl());
-  switch (token) {
-    case FrameSetCols:
-      return jsString(frameSet.cols());
-    case FrameSetRows:
-      return jsString(frameSet.rows());
   }
   return jsUndefined();
 }
@@ -603,20 +559,6 @@ void JSHTMLElement::embedSetter(ExecState* exec, int token, JSValue* value) {
     }
     case EmbedWidth: {
       embed.setWidth(value->toString(exec));
-      return;
-    }
-  }
-}
-
-void JSHTMLElement::frameSetSetter(ExecState* exec, int token, JSValue* value) {
-  HTMLFrameSetElement& frameSet = *static_cast<HTMLFrameSetElement*>(impl());
-  switch (token) {
-    case FrameSetCols: {
-      frameSet.setCols(valueToStringWithNullCheck(exec, value));
-      return;
-    }
-    case FrameSetRows: {
-      frameSet.setRows(valueToStringWithNullCheck(exec, value));
       return;
     }
   }
