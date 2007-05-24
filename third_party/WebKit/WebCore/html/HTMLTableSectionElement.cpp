@@ -32,6 +32,7 @@
 #include "HTMLTableRowElement.h"
 #include "HTMLTableElement.h"
 #include "NodeList.h"
+#include "Text.h"
 
 namespace WebCore {
 
@@ -42,6 +43,8 @@ HTMLTableSectionElement::HTMLTableSectionElement(const QualifiedName& tagName,
     : HTMLTablePartElement(tagName, document) {}
 
 bool HTMLTableSectionElement::checkDTD(const Node* newChild) {
+  if (newChild->isTextNode())
+    return static_cast<const Text*>(newChild)->containsOnlyWhitespace();
   return newChild->hasTagName(trTag) || newChild->hasTagName(formTag) ||
          newChild->hasTagName(scriptTag);
 }
