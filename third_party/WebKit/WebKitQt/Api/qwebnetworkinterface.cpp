@@ -373,6 +373,33 @@ void QWebNetworkManager::finished(QWebNetworkJob* job, int errorCode) {
   job->deref();
 }
 
+void QWebNetworkManager::addHttpJob(QWebNetworkJob* job) {
+  HostInfo hostInfo(job->url());
+  WebCoreHttp* httpConnection = m_hostMapping.value(hostInfo);
+  if (!httpConnection) {
+    // #### fix custom ports
+    DEBUG() << "   new connection to" << hostInfo.host << hostInfo.port;
+    httpConnection = new WebCoreHttp(this, hostInfo);
+    QObject::connect(httpConnection,
+                     SIGNAL(connectionClosed(const WebCore::HostInfo&)), this,
+                     SLOT(httpConnectionClosed(const WebCore::HostInfo&)));
+
+    m_hostMapping[hostInfo] = httpConnection;
+  }
+  httpConnection->request(job);
+}
+
+void QWebNetworkManager::cancelHttpJob(QWebNetworkJob* job) {
+  WebCoreHttp* httpConnection = m_hostMapping.value(job->url());
+  if (httpConnection)
+    httpConnection->cancel(job);
+}
+
+void QWebNetworkManager::httpConnectionClosed(const WebCore::HostInfo& info) {
+  WebCoreHttp* connection = m_hostMapping.take(info);
+  delete connection;
+}
+
 void QWebNetworkInterfacePrivate::sendFileData(QWebNetworkJob* job,
                                                int statusCode,
                                                const QByteArray& data) {
@@ -434,28 +461,6 @@ void QWebNetworkInterfacePrivate::parseDataUrl(QWebNetworkJob* job) {
   job->setResponse(response);
 
   sendFileData(job, statusCode, data);
-}
-
-void QWebNetworkInterfacePrivate::addHttpJob(QWebNetworkJob* job) {
-  HostInfo hostInfo(job->url());
-  WebCoreHttp* httpConnection = m_hostMapping.value(hostInfo);
-  if (!httpConnection) {
-    // #### fix custom ports
-    DEBUG() << "   new connection to" << hostInfo.host << hostInfo.port;
-    httpConnection = new WebCoreHttp(q, hostInfo);
-    QObject::connect(httpConnection,
-                     SIGNAL(connectionClosed(const WebCore::HostInfo&)), q,
-                     SLOT(httpConnectionClosed(const WebCore::HostInfo&)));
-
-    m_hostMapping[hostInfo] = httpConnection;
-  }
-  httpConnection->request(job);
-}
-
-void QWebNetworkInterfacePrivate::httpConnectionClosed(
-    const WebCore::HostInfo& info) {
-  WebCoreHttp* connection = m_hostMapping.take(info);
-  delete connection;
 }
 
 /*!
@@ -539,8 +544,7 @@ QWebNetworkInterface::~QWebNetworkInterface() {
 void QWebNetworkInterface::addJob(QWebNetworkJob* job) {
   QString protocol = job->url().scheme();
   if (protocol == QLatin1String("http")) {
-    // DEBUG() << "networkRequest";
-    d->addHttpJob(job);
+    QWebNetworkManager::self()->addHttpJob(job);
     return;
   }
 
@@ -592,16 +596,13 @@ void QWebNetworkInterface::addJob(QWebNetworkJob* job) {
 */
 void QWebNetworkInterface::cancelJob(QWebNetworkJob* job) {
   QString protocol = job->url().scheme();
-  if (protocol == QLatin1String("http")) {
-    WebCoreHttp* httpConnection = d->m_hostMapping.value(job->url());
-    if (httpConnection)
-      httpConnection->cancel(job);
-  }
+  if (protocol == QLatin1String("http"))
+    QWebNetworkManager::self()->cancelHttpJob(job);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-WebCoreHttp::WebCoreHttp(QWebNetworkInterface* parent, const HostInfo& hi)
-    : info(hi), m_networkInterface(parent), m_inCancel(false) {
+WebCoreHttp::WebCoreHttp(QObject* parent, const HostInfo& hi)
+    : QObject(parent), info(hi), m_inCancel(false) {
   for (int i = 0; i < 2; ++i) {
     connection[i].http = new QHttp(info.host, info.port);
     connection[i].current = 0;
@@ -640,7 +641,7 @@ void WebCoreHttp::scheduleNextRequest() {
   while (!job && !m_pendingRequests.isEmpty()) {
     job = m_pendingRequests.takeFirst();
     if (job->cancelled()) {
-      emit m_networkInterface->finished(job, 1);
+      emit job->networkInterface()->finished(job, 1);
       job = 0;
     }
   }
@@ -679,7 +680,7 @@ void WebCoreHttp::onResponseHeaderReceived(const QHttpResponseHeader& resp) {
 
   job->setResponse(resp);
 
-  emit m_networkInterface->started(job);
+  emit job->networkInterface()->started(job);
 }
 
 void WebCoreHttp::onReadyRead() {
@@ -691,7 +692,7 @@ void WebCoreHttp::onReadyRead() {
   QByteArray data;
   data.resize(http->bytesAvailable());
   http->read(data.data(), data.length());
-  emit m_networkInterface->data(req, data);
+  emit req->networkInterface()->data(req, data);
 }
 
 void WebCoreHttp::onRequestFinished(int, bool error) {
@@ -711,9 +712,9 @@ void WebCoreHttp::onRequestFinished(int, bool error) {
     QByteArray data;
     data.resize(http->bytesAvailable());
     http->read(data.data(), data.length());
-    emit m_networkInterface->data(req, data);
+    emit req->networkInterface()->data(req, data);
   }
-  emit m_networkInterface->finished(req, error ? 1 : 0);
+  emit req->networkInterface()->finished(req, error ? 1 : 0);
 
   connection[c].current = 0;
   scheduleNextRequest();
@@ -741,7 +742,7 @@ void WebCoreHttp::cancel(QWebNetworkJob* request) {
   m_inCancel = false;
 
   if (doEmit)
-    emit m_networkInterface->finished(request, 1);
+    emit request->networkInterface()->finished(request, 1);
 
   if (m_pendingRequests.isEmpty() && !connection[0].current &&
       !connection[1].current)
