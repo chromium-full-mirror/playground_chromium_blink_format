@@ -45,7 +45,8 @@ Settings::Settings()
       m_shouldPrintBackgrounds(false),
       m_textAreasAreResizable(false),
       m_usesDashboardBackwardCompatibilityMode(false),
-      m_needsAcrobatFrameReloadingQuirk(false) {
+      m_needsAcrobatFrameReloadingQuirk(false),
+      m_shrinksStandaloneImagesToFit(true) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -203,6 +204,11 @@ void Settings::setNeedsAcrobatFrameReloadingQuirk(
 
 void Settings::setDOMPasteAllowed(bool DOMPasteAllowed) {
   m_isDOMPasteAllowed = DOMPasteAllowed;
+}
+
+void Settings::setShrinksStandaloneImagesToFit(
+    bool shrinksStandaloneImagesToFit) {
+  m_shrinksStandaloneImagesToFit = shrinksStandaloneImagesToFit;
 }
 
 }  // namespace WebCore
