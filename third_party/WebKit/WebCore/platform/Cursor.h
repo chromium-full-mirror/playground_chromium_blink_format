@@ -111,6 +111,8 @@ const Cursor& noDropCursor();
 const Cursor& notAllowedCursor();
 const Cursor& progressCursor();
 const Cursor& aliasCursor();
+const Cursor& zoomInCursor();
+const Cursor& zoomOutCursor();
 const Cursor& copyCursor();
 const Cursor& noneCursor();
 
