@@ -2080,6 +2080,7 @@ void FrameLoader::reportLocalLoadFailed(const Page* page, const String& url) {
   ASSERT(!url.isEmpty());
   if (page)
     page->chrome()->addMessageToConsole(
+        JSMessageSource, ErrorMessageLevel,
         "Not allowed to load local resource: " + url, 0, String());
 }
 

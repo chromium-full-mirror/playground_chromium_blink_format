@@ -43,6 +43,15 @@ class String;
 
 struct FrameLoadRequest;
 
+enum MessageSource {
+  HTMLMessageSource,
+  XMLMessageSource,
+  JSMessageSource,
+  CSSMessageSource
+};
+
+enum MessageLevel { LogMessageLevel, WarningMessageLevel, ErrorMessageLevel };
+
 class Chrome {
  public:
   Chrome(Page*, ChromeClient*);
@@ -85,8 +94,10 @@ class Chrome {
 
   void setResizable(bool) const;
 
-  void addMessageToConsole(const String& message,
-                           unsigned int lineNumber,
+  void addMessageToConsole(MessageSource,
+                           MessageLevel,
+                           const String& message,
+                           unsigned lineNumber,
                            const String& sourceID);
 
   bool canRunBeforeUnloadConfirmPanel();

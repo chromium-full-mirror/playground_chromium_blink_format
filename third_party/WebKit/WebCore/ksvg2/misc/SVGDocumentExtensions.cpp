@@ -95,7 +95,7 @@ void SVGDocumentExtensions::reportWarning(const String& message) {
   if (Frame* frame = m_doc->frame())
     if (Page* page = frame->page())
       page->chrome()->addMessageToConsole(
-          "Warning: " + message,
+          JSMessageSource, ErrorMessageLevel, "Warning: " + message,
           m_doc->tokenizer() ? m_doc->tokenizer()->lineNumber() : 1, String());
 }
 
@@ -103,7 +103,7 @@ void SVGDocumentExtensions::reportError(const String& message) {
   if (Frame* frame = m_doc->frame())
     if (Page* page = frame->page())
       page->chrome()->addMessageToConsole(
-          "Error: " + message,
+          JSMessageSource, ErrorMessageLevel, "Error: " + message,
           m_doc->tokenizer() ? m_doc->tokenizer()->lineNumber() : 1, String());
 }
 

@@ -1514,6 +1514,7 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   message.replace("%tag1", tag1);
   message.replace("%tag2", tag2);
 
-  page->chrome()->addMessageToConsole(message, lineNumber, document->URL());
+  page->chrome()->addMessageToConsole(HTMLMessageSource, ErrorMessageLevel,
+                                      message, lineNumber, document->URL());
 }
 }
