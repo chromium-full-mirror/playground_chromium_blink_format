@@ -3973,9 +3973,9 @@ void FrameLoader::saveDocumentState() {
   if (!item)
     return;
 
-  if (document) {
+  if (document && item->isCurrentDocument(document)) {
     LOG(Loading, "WebCoreLoading %s: saving form state to %p",
-        ((String&)m_frame->tree()->name()).ascii().data(), item);
+        m_frame->tree()->name().domString().utf8().data(), item);
     item->setDocumentState(document->formElementsState());
   }
 }

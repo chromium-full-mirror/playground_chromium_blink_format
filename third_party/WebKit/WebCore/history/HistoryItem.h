@@ -44,6 +44,7 @@ typedef struct objc_object* id;
 
 namespace WebCore {
 
+class Document;
 class CachedPage;
 class Image;
 class KURL;
@@ -131,6 +132,8 @@ class HistoryItem : public Shared<HistoryItem> {
   // in GlobalHistory. The WebKit api for this is to use -[WebHistory
   // setLastVisitedTimeInterval:forItem:] instead.
   void setLastVisitedTime(double);
+
+  bool isCurrentDocument(Document*) const;
 
 #if PLATFORM(MAC)
   id viewState() const;
