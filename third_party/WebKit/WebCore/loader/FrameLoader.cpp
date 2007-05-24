@@ -1834,14 +1834,6 @@ void FrameLoader::load(const FrameLoadRequest& request,
                        Event* event,
                        HTMLFormElement* submitForm,
                        const HashMap<String, String>& formValues) {
-  KURL url = request.resourceRequest().url();
-
-  ASSERT(frame()->document());
-  if (!canLoad(url, frame()->document())) {
-    FrameLoader::reportLocalLoadFailed(frame()->page(), url.url());
-    return;
-  }
-
   String referrer;
   String argsReferrer = request.resourceRequest().httpReferrer();
   if (!argsReferrer.isEmpty())
@@ -1849,7 +1841,14 @@ void FrameLoader::load(const FrameLoadRequest& request,
   else
     referrer = m_outgoingReferrer;
 
-  if (shouldHideReferrer(url, referrer))
+  bool hideReferrer;
+  if (!canLoad(request.resourceRequest().url(), referrer, hideReferrer)) {
+    FrameLoader::reportLocalLoadFailed(frame()->page(),
+                                       request.resourceRequest().url().url());
+    return;
+  }
+
+  if (hideReferrer)
     referrer = String();
 
   Frame* targetFrame = m_frame->tree()->find(request.frameName());
@@ -1869,10 +1868,10 @@ void FrameLoader::load(const FrameLoadRequest& request,
     if (submitForm && !formValues.isEmpty())
       formState = FormState::create(submitForm, formValues, m_frame);
 
-    load(url, referrer, loadType, request.frameName(), event,
-         formState.release());
+    load(request.resourceRequest().url(), referrer, loadType,
+         request.frameName(), event, formState.release());
   } else
-    post(url, referrer, request.frameName(),
+    post(request.resourceRequest().url(), referrer, request.frameName(),
          request.resourceRequest().httpBody(),
          request.resourceRequest().httpContentType(), event, submitForm,
          formValues);
@@ -2654,6 +2653,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
   m_isComplete = false;
   m_wasLoadEventEmitted = false;
   m_outgoingReferrer = URL.url();
+
   FrameView* view = cachedPage.view();
   if (view)
     view->setWasScrolledByUser(false);
