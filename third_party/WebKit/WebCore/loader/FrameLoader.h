@@ -183,7 +183,7 @@ class FrameLoader : Noncopyable
   void load(DocumentLoader*);
   void load(DocumentLoader*, FrameLoadType, PassRefPtr<FormState>);
 
-  static bool canLoad(const KURL&, const String& referrer, bool& hideReferrer);
+  static bool canLoad(const KURL&, const String& referrer);
   static bool canLoad(const KURL&, const Document*);
   static bool canLoad(const CachedResource&, const Document*);
   static void reportLocalLoadFailed(const Page*, const String& url);
