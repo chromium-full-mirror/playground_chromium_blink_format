@@ -32,6 +32,8 @@
 
 namespace WebCore {
 
+class Page;
+
 enum EditableLinkBehavior {
   EditableLinkDefaultBehavior = 0,
   EditableLinkAlwaysLive,
@@ -42,7 +44,7 @@ enum EditableLinkBehavior {
 
 class Settings {
  public:
-  Settings();
+  Settings(Page*);
 
   void setStandardFontFamily(const AtomicString&);
   const AtomicString& standardFontFamily() const {
@@ -136,15 +138,17 @@ class Settings {
   }
 
  private:
+  Page* m_page;
+
   String m_defaultTextEncodingName;
   KURL m_userStyleSheetLocation;
-  EditableLinkBehavior m_editableLinkBehavior;
   AtomicString m_standardFontFamily;
   AtomicString m_fixedFontFamily;
   AtomicString m_serifFontFamily;
   AtomicString m_sansSerifFontFamily;
   AtomicString m_cursiveFontFamily;
   AtomicString m_fantasyFontFamily;
+  EditableLinkBehavior m_editableLinkBehavior;
   int m_minimumFontSize;
   int m_minimumLogicalFontSize;
   int m_defaultFontSize;

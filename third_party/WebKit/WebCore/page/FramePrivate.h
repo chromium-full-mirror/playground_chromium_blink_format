@@ -82,8 +82,6 @@ class FramePrivate {
 
   KJSProxy* m_jscript;
 
-  Settings* m_settings;
-
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;
 

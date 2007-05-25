@@ -80,6 +80,7 @@ class ProcessingInstruction;
 class Range;
 class RegisteredEventListener;
 class RenderArena;
+class Settings;
 class StyleSheet;
 class StyleSheetList;
 class Text;
@@ -334,9 +335,10 @@ class Document : public ContainerNode {
                                AtomicStringImpl* type,
                                String& state);
 
-  FrameView* view() const;  // can be NULL
-  Frame* frame() const;     // can be NULL
-  Page* page() const;       // can be NULL
+  FrameView* view() const;     // can be NULL
+  Frame* frame() const;        // can be NULL
+  Page* page() const;          // can be NULL
+  Settings* settings() const;  // can be NULL
 
   PassRefPtr<Range> createRange();
 

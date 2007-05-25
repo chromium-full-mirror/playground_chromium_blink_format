@@ -84,6 +84,7 @@
 #include "RenderWidget.h"
 #include "SegmentedString.h"
 #include "SelectionController.h"
+#include "Settings.h"
 #include "StringHash.h"
 #include "StyleSheetList.h"
 #include "SystemTime.h"
@@ -733,8 +734,8 @@ String Document::inputEncoding() const {
 }
 
 String Document::defaultCharset() const {
-  if (Frame* f = frame())
-    return f->settings()->defaultTextEncodingName();
+  if (Settings* settings = this->settings())
+    return settings->defaultTextEncodingName();
   return String();
 }
 
@@ -903,8 +904,11 @@ Frame* Document::frame() const {
 }
 
 Page* Document::page() const {
-  Frame* frame = this->frame();
-  return frame ? frame->page() : 0;
+  return m_frame ? m_frame->page() : 0;
+}
+
+Settings* Document::settings() const {
+  return m_frame ? m_frame->settings() : 0;
 }
 
 PassRefPtr<Range> Document::createRange() {
@@ -977,8 +981,7 @@ void Document::recalcStyle(StyleChange change) {
 
     FontDescription fontDescription;
     fontDescription.setUsePrinterFont(printing());
-    if (Frame* f = frame()) {
-      const Settings* settings = f->settings();
+    if (Settings* settings = this->settings()) {
       if (printing() && !settings->shouldPrintBackgrounds())
         _style->setForceBackgroundsToWhite(true);
       const AtomicString& stdfont = settings->standardFontFamily();

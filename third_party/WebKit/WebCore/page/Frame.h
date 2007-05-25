@@ -164,8 +164,7 @@ class Frame : public Shared<Frame> {
  public:
   static Frame* frameForWidget(const Widget*);
 
-  void setSettings(Settings*);
-  const Settings* settings() const;
+  Settings* settings() const;  // can be NULL
   void reparseConfiguration();
 
   // should move to FrameView

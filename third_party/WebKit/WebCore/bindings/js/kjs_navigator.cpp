@@ -30,6 +30,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "Language.h"
+#include "Page.h"
 #include "PlugInInfoStore.h"
 #include "Settings.h"
 
@@ -550,7 +551,9 @@ JSValue* MimeType::getValueProperty(ExecState* exec, int token) const {
       ScriptInterpreter* interpreter =
           static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
       Frame* frame = interpreter->frame();
-      if (frame && frame->settings()->arePluginsEnabled())
+      ASSERT(frame);
+      Settings* settings = frame->settings();
+      if (settings && settings->arePluginsEnabled())
         return new Plugin(exec, m_info->plugin);
       else
         return jsUndefined();
@@ -581,7 +584,8 @@ JSValue* NavigatorFunc::callAsFunction(ExecState* exec,
     return throwError(exec, TypeError);
   Navigator* nav = static_cast<Navigator*>(thisObj);
   // javaEnabled()
-  return jsBoolean(nav->frame()->settings()->isJavaEnabled());
+  Settings* settings = nav->frame() ? nav->frame()->settings() : 0;
+  return jsBoolean(settings && settings->isJavaEnabled());
 }
 
 }  // namespace

@@ -39,7 +39,6 @@
 #include "SVGImage.h"
 #include "SVGLength.h"
 #include "SVGSVGElement.h"
-#include "Settings.h"
 
 #include "SVGImageEmptyClients.h"
 
@@ -132,7 +131,6 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     static ContextMenuClient* dummyContextMenuClient =
         new SVGEmptyContextMenuClient;
     static DragClient* dummyDragClient = new SVGEmptyDragClient;
-    static Settings* dummySettings = new Settings;
 
     // FIXME: If this SVG ends up loading itself, we'll leak this Frame (and
     // associated DOM & render trees).
@@ -145,7 +143,6 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     m_frameView = new FrameView(m_frame.get());
     m_frameView->deref();  // FIXME: FrameView starts with a refcount of 1
     m_frame->setView(m_frameView.get());
-    m_frame->setSettings(dummySettings);
     ResourceRequest fakeRequest(KURL(""));
     m_frame->loader()->load(
         fakeRequest);  // Make sure the DocumentLoader is created
