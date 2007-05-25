@@ -273,6 +273,7 @@ Node* FrameView::layoutRoot() const {
 }
 
 void FrameView::layout(bool allowSubtree) {
+  ASSERT(!d->midLayout);
   if (d->midLayout)
     return;
 
