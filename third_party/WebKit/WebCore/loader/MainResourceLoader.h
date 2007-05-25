@@ -59,6 +59,8 @@ class MainResourceLoader : public ResourceLoader {
 
   void handleDataLoadNow(Timer<MainResourceLoader>*);
 
+  bool isLoadingMultipartContent() const { return m_loadingMultipartContent; }
+
  private:
   MainResourceLoader(Frame*);
 

@@ -139,6 +139,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
   bool isLoadingMainResource() const;
   bool isLoadingSubresources() const;
   bool isLoadingPlugIns() const;
+  bool isLoadingMultipartContent() const;
 
   void stopLoadingPlugIns();
   void stopLoadingSubresources();
