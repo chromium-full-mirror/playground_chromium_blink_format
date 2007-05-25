@@ -155,6 +155,7 @@ void RenderBlock::setStyle(RenderStyle* _style) {
     updateBeforeAfterContent(RenderStyle::BEFORE);
     updateBeforeAfterContent(RenderStyle::AFTER);
   }
+  updateFirstLetter();
 }
 
 void RenderBlock::addChildToFlow(RenderObject* newChild,
@@ -4482,6 +4483,12 @@ RenderBlock* RenderBlock::firstLineBlock() const {
 }
 
 void RenderBlock::updateFirstLetter() {
+  if (!document()->usesFirstLetterRules())
+    return;
+  // Don't recurse
+  if (style()->styleType() == RenderStyle::FIRST_LETTER)
+    return;
+
   // FIXME: We need to destroy the first-letter object if it is no longer the
   // first child.  Need to find
   // an efficient way to check for that situation though before implementing
