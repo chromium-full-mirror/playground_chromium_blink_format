@@ -31,8 +31,10 @@
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
 #define WebNSInteger int
+#define WebNSUInteger unsigned int
 #else
 #define WebNSInteger NSInteger
+#define WebNSUInteger NSUInteger
 #endif
 
 @class NSError;
@@ -347,10 +349,10 @@ incremental searching), NO to begin search after the selected text.
 // whether or not they implement the protocol. For now we'll just deal with
 // HTML.
 // These methods are still in flux; don't rely on them yet.
-- (unsigned)markAllMatchesForText:(NSString*)string
-                    caseSensitive:(BOOL)caseFlag
-                        highlight:(BOOL)highlight
-                            limit:(unsigned)limit;
+- (WebNSUInteger)markAllMatchesForText:(NSString*)string
+                         caseSensitive:(BOOL)caseFlag
+                             highlight:(BOOL)highlight
+                                 limit:(WebNSUInteger)limit;
 - (void)unmarkAllTextMatches;
 - (NSArray*)rectsForTextMatches;
 
@@ -632,3 +634,4 @@ backforward list.
 @end
 
 #undef WebNSInteger
+#undef WebNSUInteger

@@ -503,7 +503,7 @@ typedef enum {
    WebDragDestinationActionAny to allow any kind of action or
     WebDragDestinationActionNone to not accept the drag.
 */
-- (unsigned)webView:(WebView*)webView
+- (WebNSUInteger)webView:(WebView*)webView
     dragDestinationActionMaskForDraggingInfo:(id<NSDraggingInfo>)draggingInfo;
 
 /*!
@@ -533,7 +533,7 @@ typedef enum {
     which drag source actions can occur, WebDragSourceActionAny to allow any
    kind of action or WebDragSourceActionNone to not begin a drag.
 */
-- (unsigned)webView:(WebView*)webView
+- (WebNSUInteger)webView:(WebView*)webView
     dragSourceActionMaskForPoint:(NSPoint)point;
 
 /*!
