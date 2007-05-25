@@ -1519,7 +1519,11 @@ void HTMLParser::reportErrorToConsole(HTMLParserErrorCode errorCode,
   const char* errorMsg = htmlParserErrorMessageTemplate(errorCode);
   if (!errorMsg)
     return;
-  String message(errorMsg);
+
+  String message;
+  if (htmlTokenizer->processingContentWrittenByScript())
+    message += htmlParserDocumentWriteMessage();
+  message += errorMsg;
   message.replace("%tag1", tag1);
   message.replace("%tag2", tag2);
 

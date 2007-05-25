@@ -1369,20 +1369,23 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   if (m_parserStopped)
     return false;
 
+  SegmentedString source(str);
+  if (m_executingScript)
+    source.setExcludeLineNumbers();
+
   if ((m_executingScript && appendData) || !pendingScripts.isEmpty()) {
     // don't parse; we will do this later
-    if (currentPrependingSrc) {
-      currentPrependingSrc->append(str);
-    } else {
-      pendingSrc.append(str);
-    }
+    if (currentPrependingSrc)
+      currentPrependingSrc->append(source);
+    else
+      pendingSrc.append(source);
     return false;
   }
 
   if (!src.isEmpty())
-    src.append(str);
+    src.append(source);
   else
-    setSrc(str);
+    setSrc(source);
 
   // Once a timer is set, it has control of when the tokenizer continues.
   if (m_timer.isActive())
@@ -1503,7 +1506,7 @@ bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
       else {
         // Process this LF
         *dest++ = '\n';
-        if (cc == '\r')
+        if (cc == '\r' && !src.excludeLineNumbers())
           lineno++;
       }
 

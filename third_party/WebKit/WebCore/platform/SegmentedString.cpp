@@ -71,6 +71,16 @@ unsigned SegmentedString::length() const {
   return length;
 }
 
+void SegmentedString::setExcludeLineNumbers() {
+  if (m_composite) {
+    DeprecatedValueListIterator<SegmentedSubstring> i = m_substrings.begin();
+    DeprecatedValueListIterator<SegmentedSubstring> e = m_substrings.end();
+    for (; i != e; ++i)
+      (*i).setExcludeLineNumbers();
+  } else
+    m_currentString.setExcludeLineNumbers();
+}
+
 void SegmentedString::clear() {
   m_pushedChar1 = 0;
   m_pushedChar2 = 0;

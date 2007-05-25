@@ -114,7 +114,11 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   virtual int lineNumber() const { return lineno; }
   virtual int columnNumber() const { return 1; }
 
-  int* lineNumberPtr() { return m_executingScript ? 0 : &lineno; }
+  int* lineNumberPtr() { return &lineno; }
+
+  bool processingContentWrittenByScript() const {
+    return src.excludeLineNumbers();
+  }
 
  private:
   class State;
