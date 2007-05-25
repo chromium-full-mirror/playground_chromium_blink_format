@@ -1996,10 +1996,12 @@ static String findFirstBadGrammarInRange(EditorClient* client,
                                  grammarDetails, &badGrammarPhraseLocation,
                                  &badGrammarPhraseLength);
 
-    if (badGrammarPhraseLocation == -1) {
-      ASSERT(badGrammarPhraseLength == 0);
+    if (badGrammarPhraseLength == 0) {
+      ASSERT(badGrammarPhraseLocation == -1);
       return String();
     }
+
+    ASSERT(badGrammarPhraseLocation >= 0);
     badGrammarPhraseLocation += startOffset;
 
     // Found some bad grammar. Find the earliest detail range that starts in our
