@@ -588,7 +588,10 @@ void Frame::selectionLayoutChanged() {
   // already blinking in the right location.
   if (shouldBlink && !d->m_caretBlinkTimer.isActive()) {
     d->m_caretBlinkTimer.startRepeating(caretBlinkFrequency);
-    d->m_caretPaint = true;
+    if (!d->m_caretPaint) {
+      d->m_caretPaint = true;
+      selectionController()->invalidateCaretRect();
+    }
   }
 
   if (d->m_doc)
