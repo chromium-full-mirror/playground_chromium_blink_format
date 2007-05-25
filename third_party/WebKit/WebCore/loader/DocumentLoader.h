@@ -149,6 +149,8 @@ class DocumentLoader : public Shared<DocumentLoader> {
   void addPlugInStreamLoader(ResourceLoader*);
   void removePlugInStreamLoader(ResourceLoader*);
 
+  void subresourceLoaderFinishedLoadingOnePart(ResourceLoader*);
+
  private:
   void setupForReplace();
   void commitIfReady();
@@ -161,6 +163,7 @@ class DocumentLoader : public Shared<DocumentLoader> {
 
   RefPtr<MainResourceLoader> m_mainResourceLoader;
   ResourceLoaderSet m_subresourceLoaders;
+  ResourceLoaderSet m_multipartSubresourceLoaders;
   ResourceLoaderSet m_plugInStreamLoaders;
 
   RefPtr<SharedBuffer> m_mainResourceData;
