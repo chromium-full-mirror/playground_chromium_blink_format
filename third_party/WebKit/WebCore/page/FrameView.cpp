@@ -77,6 +77,7 @@ class FrameViewPrivate {
     delayedLayout = false;
     doFullRepaint = true;
     layoutSchedulingEnabled = true;
+    midLayout = false;
     layoutCount = 0;
     firstLayout = true;
     repaintRects.clear();
@@ -97,6 +98,7 @@ class FrameViewPrivate {
   RefPtr<Node> layoutRoot;
 
   bool layoutSchedulingEnabled;
+  bool midLayout;
   int layoutCount;
 
   bool firstLayout;
@@ -271,6 +273,9 @@ Node* FrameView::layoutRoot() const {
 }
 
 void FrameView::layout(bool allowSubtree) {
+  if (d->midLayout)
+    return;
+
   d->layoutTimer.stop();
   d->delayedLayout = false;
 
@@ -416,7 +421,9 @@ void FrameView::layout(bool allowSubtree) {
 
   if (subtree)
     root->view()->pushLayoutState(root);
+  d->midLayout = true;
   root->layout();
+  d->midLayout = false;
   if (subtree)
     root->view()->popLayoutState();
   d->layoutRoot = 0;
