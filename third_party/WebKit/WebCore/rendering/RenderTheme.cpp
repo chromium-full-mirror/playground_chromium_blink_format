@@ -404,6 +404,8 @@ void RenderTheme::adjustCheckboxStyle(CSSStyleSelector* selector,
   // box and turns off the Windows XP theme)
   // for now, we will not honor it.
   style->resetBorder();
+
+  style->setBoxShadow(0);
 }
 
 void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
@@ -423,6 +425,8 @@ void RenderTheme::adjustRadioStyle(CSSStyleSelector* selector,
   // box and turns off the Windows XP theme)
   // for now, we will not honor it.
   style->resetBorder();
+
+  style->setBoxShadow(0);
 }
 
 void RenderTheme::adjustButtonStyle(CSSStyleSelector* selector,
