@@ -45,7 +45,6 @@ typedef struct objc_object* id;
 namespace WebCore {
 
 class Document;
-class CachedPage;
 class Image;
 class KURL;
 class ResourceRequest;
@@ -56,8 +55,6 @@ typedef Vector<RefPtr<HistoryItem>> HistoryItemVector;
 extern void (*notifyHistoryItemChanged)();
 
 class HistoryItem : public Shared<HistoryItem> {
-  friend class HistoryItemTimer;
-
  public:
   HistoryItem();
   HistoryItem(const String& urlString, const String& title, double lastVisited);
@@ -75,15 +72,15 @@ class HistoryItem : public Shared<HistoryItem> {
   const String& urlString() const;
   const String& title() const;
 
+  void setInPageCache(bool inPageCache) { m_isInPageCache = inPageCache; }
+  bool isInPageCache() const { return m_isInPageCache; }
+
   double lastVisitedTime() const;
 
   void setAlternateTitle(const String& alternateTitle);
   const String& alternateTitle() const;
 
   Image* icon() const;
-
-  void setCachedPage(PassRefPtr<CachedPage>);
-  CachedPage* cachedPage();
 
   const String& parent() const;
   KURL url() const;
@@ -154,7 +151,6 @@ class HistoryItem : public Shared<HistoryItem> {
 
  private:
   HistoryItem(const HistoryItem&);
-  static void releaseCachedPagesOrReschedule();
 
   String m_urlString;
   String m_originalURLString;
@@ -170,8 +166,7 @@ class HistoryItem : public Shared<HistoryItem> {
 
   HistoryItemVector m_subItems;
 
-  RefPtr<CachedPage> m_cachedPage;
-
+  bool m_isInPageCache;
   bool m_isTargetItem;
   int m_visitCount;
 

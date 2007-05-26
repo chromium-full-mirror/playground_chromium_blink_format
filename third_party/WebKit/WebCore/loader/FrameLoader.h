@@ -541,7 +541,6 @@ class FrameLoader : Noncopyable
   void saveDocumentState();
   void loadItem(HistoryItem*, FrameLoadType);
   bool urlsMatchItem(HistoryItem*) const;
-  void purgePageCache();
   void invalidateCurrentItemCachedPage();
   void recursiveGoToItem(HistoryItem*, HistoryItem*, FrameLoadType);
   bool childFramesMatchItem(HistoryItem*) const;
@@ -576,7 +575,7 @@ class FrameLoader : Noncopyable
                   bool useFallback);
 
   bool loadProvisionalItemFromCachedPage();
-  void cachePageToHistoryItem(HistoryItem*);
+  void cachePageForHistoryItem(HistoryItem*);
 
   void emitLoadEvent();
 

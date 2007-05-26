@@ -74,6 +74,7 @@
 #define WebContinuousSpellCheckingEnabled @"WebContinuousSpellCheckingEnabled"
 #define WebGrammarCheckingEnabled @"WebGrammarCheckingEnabled"
 #define WebKitDOMPasteAllowedPreferenceKey @"WebKitDOMPasteAllowedPreferenceKey"
+#define WebKitUsesPageCachePreferenceKey @"WebKitUsesPageCachePreferenceKey"
 
 // These are private both because callers should be using the cover methods and
 // because the

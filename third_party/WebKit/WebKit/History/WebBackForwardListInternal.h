@@ -37,7 +37,6 @@ WebCore::BackForwardList* core(WebBackForwardList*);
 WebBackForwardList* kit(WebCore::BackForwardList*);
 
 @interface WebBackForwardList (WebBackForwardListInternal)
-+ (void)setDefaultPageCacheSizeIfNecessary;
 - (id)initWithBackForwardList:
     (PassRefPtr<WebCore::BackForwardList>)backForwardList;
 @end

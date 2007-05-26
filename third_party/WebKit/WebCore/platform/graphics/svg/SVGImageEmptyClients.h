@@ -164,8 +164,6 @@ class SVGEmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void detachedFromParent3() {}
   virtual void detachedFromParent4() {}
 
-  virtual void loadedFromCachedPage() {}
-
   virtual void download(ResourceHandle*,
                         const ResourceRequest&,
                         const ResourceResponse&) {}

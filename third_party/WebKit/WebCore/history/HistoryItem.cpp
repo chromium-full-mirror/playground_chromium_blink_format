@@ -27,7 +27,6 @@
 #include "HistoryItem.h"
 
 #include "Document.h"
-#include "CachedPage.h"
 #include "FrameLoader.h"
 #include "IconDatabase.h"
 #include "IntSize.h"
@@ -42,7 +41,10 @@ void defaultNotifyHistoryItemChanged() {}
 void (*notifyHistoryItemChanged)() = defaultNotifyHistoryItemChanged;
 
 HistoryItem::HistoryItem()
-    : m_lastVisitedTime(0), m_isTargetItem(false), m_visitCount(0) {}
+    : m_lastVisitedTime(0),
+      m_isInPageCache(false),
+      m_isTargetItem(false),
+      m_visitCount(0) {}
 
 HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
@@ -51,6 +53,7 @@ HistoryItem::HistoryItem(const String& urlString,
       m_originalURLString(urlString),
       m_title(title),
       m_lastVisitedTime(time),
+      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
@@ -61,6 +64,7 @@ HistoryItem::HistoryItem(const KURL& url, const String& title)
       m_originalURLString(url.url()),
       m_title(title),
       m_lastVisitedTime(0),
+      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
@@ -76,12 +80,14 @@ HistoryItem::HistoryItem(const KURL& url,
       m_parent(parent),
       m_title(title),
       m_lastVisitedTime(0),
+      m_isInPageCache(false),
       m_isTargetItem(false),
       m_visitCount(0) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
 HistoryItem::~HistoryItem() {
+  ASSERT(!m_isInPageCache);
   iconDatabase()->releaseIconForPageURL(m_urlString);
 }
 
@@ -95,6 +101,7 @@ HistoryItem::HistoryItem(const HistoryItem& item)
       m_displayTitle(item.m_displayTitle),
       m_lastVisitedTime(item.m_lastVisitedTime),
       m_scrollPoint(item.m_scrollPoint),
+      m_isInPageCache(item.m_isInPageCache),
       m_isTargetItem(item.m_isTargetItem),
       m_visitCount(item.m_visitCount),
       m_formContentType(item.m_formContentType),
@@ -111,17 +118,6 @@ HistoryItem::HistoryItem(const HistoryItem& item)
 
 PassRefPtr<HistoryItem> HistoryItem::copy() const {
   return new HistoryItem(*this);
-}
-
-void HistoryItem::setCachedPage(PassRefPtr<CachedPage> cachedPage) {
-  ASSERT(cachedPage != m_cachedPage || !cachedPage);
-
-  if (m_cachedPage)
-    pageCache()->autorelease(m_cachedPage.release());
-  m_cachedPage = cachedPage;
-
-  LOG(PageCache, "WebCorePageCache: HistoryItem %p (%s) set cached page to %p",
-      this, m_urlString.ascii().data(), m_cachedPage.get());
 }
 
 const String& HistoryItem::urlString() const {
@@ -184,8 +180,8 @@ void HistoryItem::setURLString(const String& urlString) {
 }
 
 void HistoryItem::setURL(const KURL& url) {
+  pageCache()->remove(this);
   setURLString(url.url());
-  setCachedPage(0);
   clearDocumentState();
 }
 
@@ -291,10 +287,6 @@ HistoryItem* HistoryItem::targetItem() {
   if (!m_subItems.size())
     return this;
   return recurseToFindTargetItem();
-}
-
-CachedPage* HistoryItem::cachedPage() {
-  return m_cachedPage.get();
 }
 
 const HistoryItemVector& HistoryItem::children() const {

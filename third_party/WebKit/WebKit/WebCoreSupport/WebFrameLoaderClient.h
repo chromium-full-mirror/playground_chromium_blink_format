@@ -76,8 +76,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void detachedFromParent3();
   virtual void detachedFromParent4();
 
-  virtual void loadedFromCachedPage();
-
   virtual void download(WebCore::ResourceHandle*,
                         const WebCore::ResourceRequest&,
                         const WebCore::ResourceResponse&);

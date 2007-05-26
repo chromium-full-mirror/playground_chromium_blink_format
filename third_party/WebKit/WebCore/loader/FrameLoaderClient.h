@@ -89,8 +89,6 @@ class FrameLoaderClient {
   virtual void detachedFromParent3() = 0;
   virtual void detachedFromParent4() = 0;
 
-  virtual void loadedFromCachedPage() = 0;
-
   virtual void assignIdentifierToInitialRequest(unsigned long identifier,
                                                 DocumentLoader*,
                                                 const ResourceRequest&) = 0;
