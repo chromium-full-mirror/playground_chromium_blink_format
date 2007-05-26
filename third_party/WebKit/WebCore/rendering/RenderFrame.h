@@ -36,6 +36,7 @@ class RenderFrame : public RenderPart {
   RenderFrame(HTMLFrameElement*);
 
   virtual const char* renderName() const { return "RenderFrame"; }
+  virtual bool isFrame() const { return true; }
 
   HTMLFrameElement* element() const {
     return static_cast<HTMLFrameElement*>(RenderPart::element());

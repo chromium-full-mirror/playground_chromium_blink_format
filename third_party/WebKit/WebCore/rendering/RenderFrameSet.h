@@ -74,6 +74,7 @@ class RenderFrameSet : public RenderContainer {
                            int ty,
                            HitTestAction);
   virtual void paint(PaintInfo& paintInfo, int tx, int ty);
+  virtual bool isChildAllowed(RenderObject*, RenderStyle*) const;
 
   FrameEdgeInfo edgeInfo() const;
 

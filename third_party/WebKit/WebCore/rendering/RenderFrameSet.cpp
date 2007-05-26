@@ -139,8 +139,7 @@ void RenderFrameSet::paint(PaintInfo& paintInfo, int tx, int ty) {
   for (int r = 0; r < rows; r++) {
     int xPos = 0;
     for (int c = 0; c < cols; c++) {
-      if (!child->isInline())
-        child->paint(paintInfo, tx, ty);
+      child->paint(paintInfo, tx, ty);
       xPos += m_cols.m_sizes[c];
       if (borderThickness && m_cols.m_allowBorder[c + 1]) {
         paintColumnBorder(paintInfo, IntRect(tx + xPos, ty + yPos,
@@ -684,6 +683,11 @@ int RenderFrameSet::hitTestSplit(const GridAxis& axis, int position) const {
     splitPosition += borderThickness + axis.m_sizes[i];
   }
   return noSplit;
+}
+
+bool RenderFrameSet::isChildAllowed(RenderObject* child,
+                                    RenderStyle* style) const {
+  return child->isFrame() || child->isFrameSet();
 }
 
 #ifndef NDEBUG
