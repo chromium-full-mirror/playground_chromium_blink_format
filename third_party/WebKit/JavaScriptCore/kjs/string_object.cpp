@@ -781,6 +781,8 @@ JSValue* StringProtoFunc::callAsFunction(ExecState* exec,
       break;
     }
     case LocaleCompare:
+      if (args.size() < 1)
+        return jsNumber(0);
       return jsNumber(localeCompare(s, a0->toString(exec)));
 #ifndef KJS_PURE_ECMA
     case Big:
