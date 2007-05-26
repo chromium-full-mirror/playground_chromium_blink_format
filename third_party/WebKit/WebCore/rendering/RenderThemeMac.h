@@ -129,9 +129,13 @@ class RenderThemeMac : public RenderTheme {
   virtual void adjustSliderTrackStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const;
+
   virtual bool paintSliderThumb(RenderObject*,
                                 const RenderObject::PaintInfo&,
                                 const IntRect&);
+  virtual void adjustSliderThumbStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
 
   virtual bool paintSearchField(RenderObject*,
                                 const RenderObject::PaintInfo&,
