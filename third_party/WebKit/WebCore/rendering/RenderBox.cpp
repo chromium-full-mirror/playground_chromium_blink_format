@@ -1492,6 +1492,14 @@ int RenderBox::calcPercentageHeight(const Length& height) {
       cb = cb->containingBlock();
   }
 
+  // A positioned element that specified both top/bottom or that specifies
+  // height should be treated as though it has a height
+  // explicitly specified that can be used for any percentage computations.
+  bool isPositionedWithSpecifiedHeight =
+      cb->isPositioned() &&
+      (!cb->style()->height().isAuto() ||
+       (!cb->style()->top().isAuto() && !cb->style()->bottom().isAuto()));
+
   // Table cells violate what the CSS spec says to do with heights.  Basically
   // we
   // don't care if the cell specified a height or not.  We just always make
@@ -1522,22 +1530,20 @@ int RenderBox::calcPercentageHeight(const Length& height) {
     }
     includeBorderPadding = true;
   }
-
   // Otherwise we only use our percentage height if our containing block had a
   // specified
   // height.
   else if (cb->style()->height().isFixed())
     result = cb->calcContentBoxHeight(cb->style()->height().value());
-  else if (cb->style()->height().isPercent()) {
+  else if (cb->style()->height().isPercent() &&
+           !isPositionedWithSpecifiedHeight) {
     // We need to recur and compute the percentage height for our containing
     // block.
     result = cb->calcPercentageHeight(cb->style()->height());
     if (result != -1)
       result = cb->calcContentBoxHeight(result);
   } else if (cb->isRenderView() || (cb->isBody() && style()->htmlHacks()) ||
-             (cb->isPositioned() &&
-              !(cb->style()->top().isAuto() ||
-                cb->style()->bottom().isAuto()))) {
+             isPositionedWithSpecifiedHeight) {
     // Don't allow this to affect the block' m_height member variable, since
     // this
     // can get called while the block is still laying out its kids.
