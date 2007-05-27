@@ -48,7 +48,6 @@ class SegmentedSubstring {
   void clear() {
     m_length = 0;
     m_current = 0;
-    m_excludeLineNumbers = false;
   }
 
   bool excludeLineNumbers() const { return m_excludeLineNumbers; }
