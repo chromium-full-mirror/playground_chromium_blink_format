@@ -26,6 +26,7 @@
 #define QWEBPAGE_H
 
 #include "qwebpagehistory.h"
+#include "qwebsettings.h"
 #include <qwebkitglobal.h>
 
 #include <qwidget.h>
@@ -58,6 +59,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   QWebFrame* mainFrame() const;
 
   QWebPageHistory history() const;
+
+  void setSettings(const QWebSettings& settings);
+  QWebSettings settings() const;
 
   QSize sizeHint() const;
 

@@ -94,6 +94,10 @@ class AtomicString {
   AtomicString(const TDesC& s) : m_string(add(String(s).impl())) {}
   operator TPtrC() const { return m_string; }
 #endif
+#if PLATFORM(QT)
+  AtomicString(const QString& s) : m_string(add(String(s).impl())) {}
+  operator QString() const { return m_string; }
+#endif
 
   AtomicString(const DeprecatedString&);
   DeprecatedString deprecatedString() const;
