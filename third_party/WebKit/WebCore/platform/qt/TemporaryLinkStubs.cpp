@@ -58,14 +58,12 @@
 #include "AXObjectCache.h"
 #include "IconLoader.h"
 #include "SystemTime.h"
+#include "NotImplemented.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
 
 using namespace WebCore;
-
-#define notImplemented() \
-  qDebug("FIXME: UNIMPLEMENTED: %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__)
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,
                                             const TextStyle&,

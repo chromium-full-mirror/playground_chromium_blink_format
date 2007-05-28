@@ -25,29 +25,29 @@
 #include "config.h"
 #include "PopupMenu.h"
 
-#include "NotImplementedGdk.h"
+#include "NotImplemented.h"
 
 #include <stdio.h>
 
 namespace WebCore {
 
 PopupMenu::PopupMenu(PopupMenuClient* menuList) {
-  notImplementedGdk();
+  notImplemented();
 }
 
 PopupMenu::~PopupMenu() {
-  notImplementedGdk();
+  notImplemented();
 }
 
 void PopupMenu::show(const IntRect&, FrameView*, int) {
-  notImplementedGdk();
+  notImplemented();
 }
 
 void PopupMenu::hide() {
-  notImplementedGdk();
+  notImplemented();
 }
 
 void PopupMenu::updateFromElement() {
-  notImplementedGdk();
+  notImplemented();
 }
 }

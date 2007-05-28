@@ -26,7 +26,7 @@
 #include "RenderThemeGdk.h"
 
 #include "GraphicsContext.h"
-#include "NotImplementedGdk.h"
+#include "NotImplemented.h"
 #include "RenderObject.h"
 
 #define THEME_COLOR 204
@@ -142,7 +142,7 @@ ThemeData RenderThemeGdk::getThemeData(RenderObject* o) {
 }
 
 void RenderThemeGdk::setCheckboxSize(RenderStyle*) const {
-  notImplementedGdk();
+  notImplemented();
 }
 
 bool RenderThemeGdk::paintCheckbox(RenderObject* o,
@@ -153,7 +153,7 @@ bool RenderThemeGdk::paintCheckbox(RenderObject* o,
 }
 
 void RenderThemeGdk::setRadioSize(RenderStyle*) const {
-  notImplementedGdk();
+  notImplemented();
 }
 
 bool RenderThemeGdk::paintRadio(RenderObject* o,
@@ -173,7 +173,7 @@ bool RenderThemeGdk::paintButton(RenderObject*,
 void RenderThemeGdk::adjustTextFieldStyle(CSSStyleSelector*,
                                           RenderStyle*,
                                           Element* e) const {
-  notImplementedGdk();
+  notImplemented();
 }
 
 bool RenderThemeGdk::paintTextField(RenderObject* o,

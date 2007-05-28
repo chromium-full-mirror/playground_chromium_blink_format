@@ -40,7 +40,7 @@
 #include "HitTestRequest.h"
 #include "HitTestResult.h"
 #include "KeyboardCodes.h"
-#include "NotImplementedGdk.h"
+#include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformMouseEvent.h"
@@ -274,15 +274,15 @@ void FrameGdk::handleGdkEvent(GdkEvent* event) {
 }
 
 void Frame::print() {
-  notImplementedGdk();
+  notImplemented();
 }
 
 void Frame::issueTransposeCommand() {
-  notImplementedGdk();
+  notImplemented();
 }
 
 void Frame::cleanupPlatformScriptObjects() {
-  notImplementedGdk();
+  notImplemented();
 }
 
 bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
@@ -291,7 +291,7 @@ bool Frame::isCharacterSmartReplaceExempt(UChar, bool) {
 }
 
 DragImageRef Frame::dragImageForSelection() {
-  notImplementedGdk();
+  notImplemented();
   return 0;
 }
 

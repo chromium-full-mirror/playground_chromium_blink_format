@@ -30,13 +30,11 @@
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "markup.h"
+#include "NotImplemented.h"
 
 #include <QList>
 #include <QMimeData>
 #include <QUrl>
-
-#define notImplemented() \
-  qDebug("FIXME: UNIMPLEMENTED: %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__)
 
 namespace WebCore {
 
