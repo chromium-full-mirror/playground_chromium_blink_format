@@ -125,7 +125,7 @@ bool EventHandler::passMouseReleaseEventToSubframe(
 bool EventHandler::passMousePressEventToScrollbar(
     MouseEventWithHitTestResults&,
     PlatformScrollbar* scrollbar) {
-  notImplementedGdk();
+  notImplemented();
   return false;
 }
 }

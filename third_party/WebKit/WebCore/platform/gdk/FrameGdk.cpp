@@ -296,6 +296,6 @@ DragImageRef Frame::dragImageForSelection() {
 }
 
 void Frame::dashboardRegionsChanged() {
-  notImplementedGdk();
+  notImplemented();
 }
 }
