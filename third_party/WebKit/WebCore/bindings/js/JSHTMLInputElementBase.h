@@ -20,17 +20,18 @@
 #ifndef JSHTMLInputElementBase_h
 #define JSHTMLInputElementBase_h
 
-#include "kjs_html.h"
+#include "JSHTMLElement.h"
 #include "kjs_binding.h"
+#include "kjs_html.h"
 
 namespace WebCore {
 
 class HTMLInputElement;
 
 KJS_DEFINE_PROTOTYPE_WITH_PROTOTYPE(JSHTMLInputElementBasePrototype,
-                                    KJS::JSHTMLElementPrototype)
+                                    JSHTMLElementPrototype)
 
-class JSHTMLInputElementBase : public KJS::JSHTMLElement {
+class JSHTMLInputElementBase : public JSHTMLElement {
  public:
   JSHTMLInputElementBase(KJS::ExecState*, PassRefPtr<HTMLInputElement>);
   virtual bool getOwnPropertySlot(KJS::ExecState*,
@@ -46,6 +47,7 @@ class JSHTMLInputElementBase : public KJS::JSHTMLElement {
   static const KJS::ClassInfo info;
   enum { SetSelectionRange, SelectionStart, SelectionEnd };
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // JSHTMLInputElementBase_h

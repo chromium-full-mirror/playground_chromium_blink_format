@@ -214,7 +214,7 @@ DOMNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
       map.get(element->localName().impl());
   if (createWrapperFunction)
     return createWrapperFunction(exec, element);
-  return new KJS::JSHTMLElement(exec, element.get());
+  return new JSHTMLElement(exec, element.get());
 }
 
 }  // namespace WebCore

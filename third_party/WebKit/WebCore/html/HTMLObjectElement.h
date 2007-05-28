@@ -122,6 +122,8 @@ class HTMLObjectElement : public HTMLPlugInElement {
 
   bool containsJavaApplet() const;
 
+  virtual HTMLFormElement* formForEventHandlerScope() const;
+
 #if ENABLE(SVG)
   SVGDocument* getSVGDocument(ExceptionCode&) const;
 #endif

@@ -29,6 +29,7 @@ namespace WebCore {
 
 class DocumentFragment;
 class HTMLCollection;
+class HTMLFormElement;
 class String;
 
 enum HTMLTagStatus { TagStatusOptional, TagStatusRequired, TagStatusForbidden };
@@ -99,6 +100,8 @@ class HTMLElement : public StyledElement {
   void setHTMLEventListener(const AtomicString& eventType, Attribute*);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+
+  virtual HTMLFormElement* formForEventHandlerScope() const;
 
  protected:
   // for IMG, OBJECT and APPLET

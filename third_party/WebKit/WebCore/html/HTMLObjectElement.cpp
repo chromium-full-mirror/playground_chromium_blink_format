@@ -473,4 +473,8 @@ SVGDocument* HTMLObjectElement::getSVGDocument(ExceptionCode& ec) const {
   return 0;
 }
 #endif
+
+HTMLFormElement* HTMLObjectElement::formForEventHandlerScope() const {
+  return form();
+}
 }

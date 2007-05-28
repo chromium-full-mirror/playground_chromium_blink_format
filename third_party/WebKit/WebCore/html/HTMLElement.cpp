@@ -848,4 +848,9 @@ RenderObject* HTMLElement::createRenderer(RenderArena* arena,
     return new (arena) RenderWordBreak(this);
   return RenderObject::createObject(this, style);
 }
+
+HTMLFormElement* HTMLElement::formForEventHandlerScope() const {
+  return 0;
 }
+
+}  // namespace WebCore
