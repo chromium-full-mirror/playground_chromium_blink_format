@@ -28,6 +28,12 @@
 
 #import "WebScriptDebugDelegate.h"
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+#define WebNSUInteger unsigned int
+#else
+#define WebNSUInteger NSUInteger
+#endif
+
 extern NSString* WebScriptDebugServerProcessNameKey;
 extern NSString* WebScriptDebugServerProcessBundleIdentifierKey;
 extern NSString* WebScriptDebugServerProcessIdentifierKey;
@@ -46,14 +52,14 @@ extern NSString* WebScriptDebugServerWillUnloadNotification;
 
 - (void)webView:(WebView*)webView
     didParseSource:(NSString*)source
-    baseLineNumber:(unsigned)lineNumber
+    baseLineNumber:(WebNSUInteger)lineNumber
            fromURL:(NSURL*)url
           sourceId:(int)sid
        forWebFrame:(WebFrame*)webFrame;
 
 - (void)webView:(WebView*)webView
     failedToParseSource:(NSString*)source
-         baseLineNumber:(unsigned)lineNumber
+         baseLineNumber:(WebNSUInteger)lineNumber
                 fromURL:(NSURL*)url
               withError:(NSError*)error
             forWebFrame:(WebFrame*)webFrame;
@@ -91,3 +97,5 @@ extern NSString* WebScriptDebugServerWillUnloadNotification;
 - (oneway void)resume;
 - (oneway BOOL)isPaused;
 @end
+
+#undef WebNSUInteger
