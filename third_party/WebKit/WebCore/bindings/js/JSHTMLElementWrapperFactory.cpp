@@ -32,6 +32,7 @@
 #include "HTMLDListElement.h"
 #include "HTMLDirectoryElement.h"
 #include "HTMLDivElement.h"
+#include "HTMLEmbedElement.h"
 #include "HTMLFieldSetElement.h"
 #include "HTMLFontElement.h"
 #include "HTMLFormElement.h"
@@ -55,6 +56,7 @@
 #include "HTMLMetaElement.h"
 #include "HTMLModElement.h"
 #include "HTMLOListElement.h"
+#include "HTMLObjectElement.h"
 #include "HTMLOptGroupElement.h"
 #include "HTMLOptionElement.h"
 #include "HTMLParagraphElement.h"
@@ -89,6 +91,7 @@
 #include "JSHTMLDListElement.h"
 #include "JSHTMLDirectoryElement.h"
 #include "JSHTMLDivElement.h"
+#include "JSHTMLEmbedElement.h"
 #include "JSHTMLFieldSetElement.h"
 #include "JSHTMLFontElement.h"
 #include "JSHTMLFormElement.h"
@@ -112,6 +115,7 @@
 #include "JSHTMLMetaElement.h"
 #include "JSHTMLModElement.h"
 #include "JSHTMLOListElement.h"
+#include "JSHTMLObjectElement.h"
 #include "JSHTMLOptGroupElement.h"
 #include "JSHTMLOptionElement.h"
 #include "JSHTMLParagraphElement.h"
@@ -151,15 +155,16 @@ typedef DOMNode* (*CreateHTMLElementWrapperFunction)(ExecState*,
       macro(body, Body) macro(br, BR) macro(button, Button) macro(             \
           canvas, Canvas) macro(caption, TableCaption) macro(col, TableCol)    \
           macro(del, Mod) macro(dir, Directory) macro(div, Div) macro(         \
-              dl, DList) macro(fieldset, FieldSet) macro(font, Font)           \
-              macro(form, Form) macro(frame, Frame) macro(                     \
+              dl, DList) macro(embed, Embed) macro(fieldset, FieldSet)         \
+              macro(font, Font) macro(form, Form) macro(frame, Frame) macro(   \
                   frameset, FrameSet) macro(h1, Heading) macro(head, Head)     \
                   macro(hr, HR) macro(html, Html) macro(iframe, IFrame) macro( \
                       img, Image) macro(input, Input) macro(isindex, IsIndex)  \
                       macro(label, Label) macro(legend, Legend) macro(         \
                           li, LI) macro(link, Link) macro(map, Map)            \
-                          macro(menu, Menu) macro(meta, Meta) macro(           \
-                              marquee, Marquee) macro(ol, OList)               \
+                          macro(marquee, Marquee) macro(menu, Menu) macro(     \
+                              meta, Meta) macro(object, Object) macro(ol,      \
+                                                                      OList)   \
                               macro(optgroup, OptGroup) macro(                 \
                                   option, Option) macro(p, Paragraph)          \
                                   macro(param, Param) macro(pre, Pre) macro(   \
@@ -211,4 +216,5 @@ DOMNode* createJSHTMLWrapper(ExecState* exec, PassRefPtr<HTMLElement> element) {
     return createWrapperFunction(exec, element);
   return new KJS::JSHTMLElement(exec, element.get());
 }
-}
+
+}  // namespace WebCore
