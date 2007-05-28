@@ -169,8 +169,7 @@ void JSCallbackObject::put(ExecState* exec,
             return;
         } else
           throwError(exec, ReferenceError,
-                     "Writable static value property defined with NULL "
-                     "setProperty callback.");
+                     "Attempt to set a property that is not settable.");
       }
     }
 
