@@ -26,7 +26,14 @@
 #ifndef NotImplemented_h
 #define NotImplemented_h
 
+#include "Logging.h"
 #include <wtf/Assertions.h>
+
+#if PLATFORM(GDK)
+#define supressNotImplementedWarning() getenv("DISABLE_NI_WARNING")
+#else
+#define supressNotImplementedWarning() false
+#endif
 
 #if PLATFORM(QT)
 
@@ -41,39 +48,17 @@
 
 #else
 
-#if PLATFORM(GDK)
-
-#define notImplemented()                                                      \
-  do {                                                                        \
-    static bool printed = false;                                              \
-    if (!printed && !getenv("DISABLE_NI_WARNING")) {                          \
-      fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", WTF_PRETTY_FUNCTION, \
-              __FILE__, __LINE__);                                            \
-      printed = true;                                                         \
-    }                                                                         \
+#define notImplemented()                                                     \
+  do {                                                                       \
+    static bool havePrinted = false;                                         \
+    if (!havePrinted && !supressNotImplementedWarning()) {                   \
+      WTFLog(__FILE__, __LINE__, WTF_PRETTY_FUNCTION, &LogNotYetImplemented, \
+             "%s is not implemented", __FUNCTION__);                         \
+      havePrinted = true;                                                    \
+    }                                                                        \
   } while (0)
 
-#else
-
-#if COMPILER(GCC)
-#define notImplemented()                                                    \
-  do {                                                                      \
-    fprintf(stderr, "FIXME: UNIMPLEMENTED %s %s:%d\n", WTF_PRETTY_FUNCTION, \
-            __FILE__, __LINE__);                                            \
-  } while (0)
 #endif
-
-#if COMPILER(MSVC)
-#define notImplemented()                                                   \
-  do {                                                                     \
-    char buf[256] = {0};                                                   \
-    _snprintf(buf, sizeof(buf), "FIXME: UNIMPLEMENTED: %s:%d\n", __FILE__, \
-              __LINE__);                                                   \
-    OutputDebugStringA(buf);                                               \
-  } while (0)
-#endif
-
-#endif  // PLATFORM(GDK)
 
 #endif  // NDEBUG
 
