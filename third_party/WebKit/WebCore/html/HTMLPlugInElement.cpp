@@ -116,7 +116,7 @@ bool HTMLPlugInElement::mapToEntry(const QualifiedName& attrName,
     return false;
   }
 
-  return HTMLElement::mapToEntry(attrName, result);
+  return HTMLFrameOwnerElement::mapToEntry(attrName, result);
 }
 
 void HTMLPlugInElement::parseMappedAttribute(MappedAttribute* attr) {
@@ -133,11 +133,12 @@ void HTMLPlugInElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == alignAttr)
     addHTMLAlignment(attr);
   else
-    HTMLElement::parseMappedAttribute(attr);
+    HTMLFrameOwnerElement::parseMappedAttribute(attr);
 }
 
 bool HTMLPlugInElement::checkDTD(const Node* newChild) {
-  return newChild->hasTagName(paramTag) || HTMLElement::checkDTD(newChild);
+  return newChild->hasTagName(paramTag) ||
+         HTMLFrameOwnerElement::checkDTD(newChild);
 }
 
 void HTMLPlugInElement::detach() {
@@ -147,7 +148,7 @@ void HTMLPlugInElement::detach() {
       contentFrame->disconnectOwnerElement();
   }
 
-  HTMLElement::detach();
+  HTMLFrameOwnerElement::detach();
 }
 
 void HTMLPlugInElement::defaultEventHandler(Event* event) {
