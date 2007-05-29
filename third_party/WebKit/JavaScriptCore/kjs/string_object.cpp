@@ -316,15 +316,13 @@ static inline UString substituteBackreferences(const UString& replacement,
 
   return substitutedReplacement;
 }
-
+static inline int localeCompare(const UString& a, const UString& b) {
 #if PLATFORM(WIN_OS)
-static inline int localeCompare(const UString& a, const UString& b) {
-  return CompareStringW(LOCALE_USER_DEFAULT, 0,
-                        reinterpret_cast<LPCWSTR>(a.data()), a.size(),
-                        reinterpret_cast<LPCWSTR>(b.data()), b.size());
-}
+  int retval = CompareStringW(LOCALE_USER_DEFAULT, 0,
+                              reinterpret_cast<LPCWSTR>(a.data()), a.size(),
+                              reinterpret_cast<LPCWSTR>(b.data()), b.size());
+  return !retval ? retval : retval - 2;
 #elif PLATFORM(CF)
-static inline int localeCompare(const UString& a, const UString& b) {
   CFStringRef sa = CFStringCreateWithCharactersNoCopy(
       kCFAllocatorDefault, reinterpret_cast<const UniChar*>(a.data()), a.size(),
       kCFAllocatorNull);
@@ -338,12 +336,10 @@ static inline int localeCompare(const UString& a, const UString& b) {
   CFRelease(sb);
 
   return retval;
-}
 #else
-static inline int localeCompare(const UString& a, const UString& b) {
   return compare(a, b);
-}
 #endif
+}
 
 static JSValue* replace(ExecState* exec,
                         const UString& source,
