@@ -1,9 +1,7 @@
-/**
- * This file is part of the DOM implementation for KDE.
- *
+/*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -50,17 +48,18 @@ CharacterData::~CharacterData() {
     str->deref();
 }
 
-void CharacterData::setData(const String& _data, ExceptionCode& ec) {
+void CharacterData::setData(const String& data, ExceptionCode& ec) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
   if (isReadOnlyNode()) {
     ec = NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
 
-  if (str == _data.impl())
-    return;  // ### fire DOMCharacterDataModified if modified?
+  if (equal(str, data.impl()))
+    return;
+
   StringImpl* oldStr = str;
-  str = _data.impl();
+  str = data.impl();
   if (str)
     str->ref();
 
