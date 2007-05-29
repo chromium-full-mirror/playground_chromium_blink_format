@@ -1,9 +1,7 @@
 /*
- * This file is part of the DOM implementation for KDE.
- *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004, 2006 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006, 2007 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -27,20 +25,10 @@
 
 #include "HTMLPlugInElement.h"
 
-#if USE(JAVASCRIPTCORE_BINDINGS)
-#include <JavaScriptCore/runtime.h>
-#else
-namespace KJS {
-namespace Bindings {
-class Instance;
-}
-}
-#endif
-
 namespace WebCore {
 
-class HTMLFormElement;
 class HTMLImageLoader;
+
 #if ENABLE(SVG)
 class SVGDocument;
 #endif
@@ -96,8 +84,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   bool declare() const;
   void setDeclare(bool);
 
-  HTMLFormElement* form() const;
-
   int hspace() const;
   void setHspace(int);
 
@@ -121,8 +107,6 @@ class HTMLObjectElement : public HTMLPlugInElement {
   bool isDocNamedItem() const { return m_docNamedItem; }
 
   bool containsJavaApplet() const;
-
-  virtual HTMLFormElement* formForEventHandlerScope() const;
 
 #if ENABLE(SVG)
   SVGDocument* getSVGDocument(ExceptionCode&) const;
