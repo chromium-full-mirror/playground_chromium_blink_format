@@ -263,6 +263,10 @@ void IndentOutdentCommand::outdentParagraph() {
     // be totally removed.
     removeNodePreservingChildren(enclosingNode);
     updateLayout();
+    visibleStartOfParagraph =
+        VisiblePosition(visibleStartOfParagraph.deepEquivalent());
+    visibleEndOfParagraph =
+        VisiblePosition(visibleEndOfParagraph.deepEquivalent());
     if (visibleStartOfParagraph.isNotNull() &&
         !isStartOfParagraph(visibleStartOfParagraph))
       insertNodeAt(createBreakElement(document()).get(),

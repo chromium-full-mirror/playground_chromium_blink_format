@@ -68,8 +68,6 @@ class VisiblePosition {
   VisiblePosition next(bool stayInEditableContent = false) const;
   VisiblePosition previous(bool stayInEditableContent = false) const;
 
-  bool isLastInBlock() const;
-
   UChar characterAfter() const;
   UChar characterBefore() const { return previous().characterAfter(); }
 
@@ -96,10 +94,9 @@ class VisiblePosition {
   EAffinity m_affinity;
 };
 
+// FIXME: This shouldn't ignore affinity.
 inline bool operator==(const VisiblePosition& a, const VisiblePosition& b) {
-  return a.deepEquivalent() == b.deepEquivalent() ||
-         // FIXME (8622): This is a slow but temporary workaround.
-         a.deepEquivalent().downstream() == b.deepEquivalent().downstream();
+  return a.deepEquivalent() == b.deepEquivalent();
 }
 
 inline bool operator!=(const VisiblePosition& a, const VisiblePosition& b) {
