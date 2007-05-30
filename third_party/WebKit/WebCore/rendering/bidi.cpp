@@ -1631,9 +1631,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
   bool useRepaintBounds = false;
 
-  m_overflowHeight = 0;
+  invalidateVerticalPosition();
 
-  invalidateVerticalPositions();
+  m_overflowHeight = 0;
 
   m_height = borderTop() + paddingTop();
   int toAdd = borderBottom() + paddingBottom() + horizontalScrollbarHeight();
@@ -1666,6 +1666,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
     RenderObject* o = bidiFirst(this, bidi, false);
     bool hasFloat = false;
     while (o) {
+      o->invalidateVerticalPosition();
       if (o->isReplaced() || o->isFloating() || o->isPositioned()) {
         if (relayoutChildren || o->style()->width().isPercent() ||
             o->style()->height().isPercent())

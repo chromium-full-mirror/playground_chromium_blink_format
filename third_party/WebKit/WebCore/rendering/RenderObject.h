@@ -1063,6 +1063,8 @@ class RenderObject : public CachedResourceClient {
       parent()->removeChild(this);
   }
 
+  void invalidateVerticalPosition() { m_verticalPosition = PositionUndefined; }
+
  protected:
   virtual void printBoxDecorations(GraphicsContext*,
                                    int /*x*/,
@@ -1074,7 +1076,6 @@ class RenderObject : public CachedResourceClient {
 
   virtual IntRect viewRect() const;
 
-  void invalidateVerticalPositions();
   short getVerticalPosition(bool firstLine) const;
 
   virtual void removeLeftoverAnonymousBoxes();
