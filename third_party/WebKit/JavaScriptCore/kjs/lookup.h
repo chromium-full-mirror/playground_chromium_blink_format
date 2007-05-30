@@ -25,9 +25,7 @@
 #define _KJSLOOKUP_H_
 
 #include "interpreter.h"
-#include "internal.h"
 #include "identifier.h"
-#include "function_object.h"
 #include "object.h"
 #include <stdio.h>
 

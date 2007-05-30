@@ -122,8 +122,6 @@ class LabelStack : Noncopyable {
 //                            Evaluation
 // ---------------------------------------------------------------------------
 
-enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
-
 struct AttachedInterpreter;
 class DebuggerImp {
  public:
@@ -137,26 +135,6 @@ class DebuggerImp {
 
   AttachedInterpreter* interps;
   bool isAborted;
-};
-
-class InternalFunctionImp : public JSObject {
- public:
-  InternalFunctionImp();
-  InternalFunctionImp(FunctionPrototype*);
-  InternalFunctionImp(FunctionPrototype*, const Identifier&);
-
-  virtual bool implementsCall() const;
-  virtual JSValue* callAsFunction(ExecState*,
-                                  JSObject* thisObjec,
-                                  const List& args) = 0;
-  virtual bool implementsHasInstance() const;
-
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-  const Identifier& functionName() const { return m_name; }
-
- private:
-  Identifier m_name;
 };
 
 // helper function for toInteger, toInt32, toUInt32 and toUInt16

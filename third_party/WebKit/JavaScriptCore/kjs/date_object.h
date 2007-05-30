@@ -22,7 +22,7 @@
 #ifndef DATE_OBJECT_H
 #define DATE_OBJECT_H
 
-#include "internal.h"
+#include "function.h"
 #include "JSWrapperObject.h"
 
 namespace KJS {

@@ -26,6 +26,7 @@
 #define KJS_Context_h
 
 #include "function.h"
+#include "internal.h"
 
 namespace KJS {
 

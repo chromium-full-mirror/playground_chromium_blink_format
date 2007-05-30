@@ -24,7 +24,7 @@
 #ifndef KJS_FUNCTION_H
 #define KJS_FUNCTION_H
 
-#include "internal.h"
+#include "object.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
 
@@ -32,6 +32,45 @@ namespace KJS {
 
 class ActivationImp;
 class FunctionBodyNode;
+class FunctionPrototype;
+
+enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
+
+class InternalFunctionImp : public JSObject {
+ public:
+  InternalFunctionImp();
+  InternalFunctionImp(FunctionPrototype*);
+  InternalFunctionImp(FunctionPrototype*, const Identifier&);
+
+  virtual bool implementsCall() const;
+  virtual JSValue* callAsFunction(ExecState*,
+                                  JSObject* thisObjec,
+                                  const List& args) = 0;
+  virtual bool implementsHasInstance() const;
+
+  virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
+  const Identifier& functionName() const { return m_name; }
+
+ private:
+  Identifier m_name;
+};
+
+/**
+ * @internal
+ *
+ * The initial value of Function.prototype (and thus all objects created
+ * with the Function constructor)
+ */
+class FunctionPrototype : public InternalFunctionImp {
+ public:
+  FunctionPrototype(ExecState* exec);
+  virtual ~FunctionPrototype();
+
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
+};
 
 /**
  * @short Implementation class for internal Functions.
