@@ -344,6 +344,10 @@ void PopupMenu::hide() {
 void PopupMenu::updateFromElement() {
   notImplemented();
 }
+bool PopupMenu::itemWritingDirectionIsNatural() {
+  notImplemented();
+  return false;
+}
 
 Icon::Icon() {
   notImplemented();

@@ -919,6 +919,10 @@ void PopupMenu::hide() {
 void PopupMenu::updateFromElement() {
   notImplemented();
 }
+bool PopupMenu::itemWritingDirectionIsNatural() {
+  notImplemented();
+  return false;
+}
 
 void RenderThemeWin::systemFont(int propId,
                                 FontDescription& fontDescription) const {
