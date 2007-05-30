@@ -106,7 +106,6 @@ class HTMLInputElement : public HTMLGenericFormElement {
 
   virtual String stateValue() const;
   virtual void restoreState(const String&);
-  virtual void closeRenderer();
 
   bool canHaveSelection() const;
   int selectionStart() const;
