@@ -51,7 +51,8 @@ String CSSStyleRule::selectorText() const {
   return String();
 }
 
-void CSSStyleRule::setSelectorText(String /*selectorText*/) {
+void CSSStyleRule::setSelectorText(const String& /*selectorText*/,
+                                   ExceptionCode& /*ec*/) {
   // FIXME: Implement!
 }
 
