@@ -88,6 +88,9 @@ class RenderThemeWin : public RenderTheme {
     return paintTextField(o, i, r);
   }
 
+  void adjustMenuListStyle(CSSStyleSelector* selector,
+                           RenderStyle* style,
+                           Element* e) const;
   virtual bool paintMenuList(RenderObject*,
                              const RenderObject::PaintInfo&,
                              const IntRect&);
