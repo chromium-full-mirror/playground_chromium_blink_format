@@ -1,6 +1,6 @@
 /* -*- mode: c++; c-basic-offset: 4 -*- */
 /*
- * Copyright (C) 2003, 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -117,12 +117,13 @@ void WTFReportError(const char* file,
                     const char* function,
                     const char* format,
                     ...);
-void WTFLog(const char* file,
-            int line,
-            const char* function,
-            WTFLogChannel* channel,
-            const char* format,
-            ...);
+void WTFLog(WTFLogChannel* channel, const char* format, ...);
+void WTFLogVerbose(const char* file,
+                   int line,
+                   const char* function,
+                   WTFLogChannel* channel,
+                   const char* format,
+                   ...);
 
 #ifdef __cplusplus
 }
@@ -226,12 +227,22 @@ void WTFLog(const char* file,
 #define LOG(channel, ...) ((void)0)
 #else
 #define LOG(channel, ...)                                            \
-  WTFLog(__FILE__, __LINE__, WTF_PRETTY_FUNCTION,                    \
-         &JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
+  WTFLog(&JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
          __VA_ARGS__)
 #define JOIN_LOG_CHANNEL_WITH_PREFIX(prefix, channel) \
   JOIN_LOG_CHANNEL_WITH_PREFIX_LEVEL_2(prefix, channel)
 #define JOIN_LOG_CHANNEL_WITH_PREFIX_LEVEL_2(prefix, channel) prefix##channel
+#endif
+
+/* LOG_VERBOSE */
+
+#if LOG_DISABLED
+#define LOG_VERBOSE(channel, ...) ((void)0)
+#else
+#define LOG_VERBOSE(channel, ...)                                           \
+  WTFLogVerbose(__FILE__, __LINE__, WTF_PRETTY_FUNCTION,                    \
+                &JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
+                __VA_ARGS__)
 #endif
 
 #endif  // WTF_Assertions_h
