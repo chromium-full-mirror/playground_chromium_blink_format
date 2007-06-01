@@ -26,6 +26,7 @@
 #ifndef ScrollView_h
 #define ScrollView_h
 
+#include "IntRect.h"
 #include "ScrollTypes.h"
 #include "Widget.h"
 #include <wtf/HashSet.h>
@@ -94,6 +95,22 @@ class ScrollView : public Widget {
   // NSWindow.)
   IntPoint windowToContents(const IntPoint&) const;
   IntPoint contentsToWindow(const IntPoint&) const;
+
+#if PLATFORM(MAC)
+  // On Mac only because of flipped NSWindow y-coordinates, we have to have a
+  // special implementation.
+  IntRect windowToContents(const IntRect&) const;
+  IntRect contentsToWindow(const IntRect&) const;
+#else
+  // Other platforms can just implement these helper methods using the
+  // corresponding point conversion methods.
+  IntRect contentsToWindow(const IntRect& rect) const {
+    return IntRect(contentsToWindow(rect.location()), rect.size());
+  }
+  IntRect windowToContents(const IntRect& rect) const {
+    return IntRect(windowToContents(rect.location()), rect.size());
+  }
+#endif
 
   void setStaticBackground(bool);
 
