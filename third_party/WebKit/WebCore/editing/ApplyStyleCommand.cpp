@@ -548,7 +548,8 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
       if (!nodeFullySelected(node, start, end))
         continue;
       elem = static_cast<HTMLElement*>(node);
-    } else if (node->isTextNode() && node->parentNode() != lastStyledNode) {
+    } else if (node->isTextNode() && node->renderer() &&
+               node->parentNode() != lastStyledNode) {
       // Last styled node was not parent node of this text node, but we wish to
       // style this
       // text node. To make this possible, add a style span to surround this
