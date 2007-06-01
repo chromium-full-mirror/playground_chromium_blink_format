@@ -61,6 +61,7 @@
 
 #if ENABLE(SVG)
 #include "SVGCursorElement.h"
+#include "SVGDocument.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #endif
@@ -99,7 +100,12 @@ EventHandler::EventHandler(Frame* frame)
       m_autoscrollTimer(this, &EventHandler::autoscrollTimerFired),
       m_autoscrollRenderer(0),
       m_mouseDownMayStartAutoscroll(false),
-      m_mouseDownWasInSubframe(false),
+      m_mouseDownWasInSubframe(false)
+#if ENABLE(SVG)
+      ,
+      m_svgPan(false)
+#endif
+      ,
       m_resizeLayer(0),
       m_capturingMouseEventsNode(0),
       m_clickCount(0),
@@ -281,6 +287,18 @@ bool EventHandler::handleMousePressEvent(
 
   if (passWidgetMouseDownEventToWidget(event))
     return true;
+
+#if ENABLE(SVG)
+  if (m_frame->document()->isSVGDocument() &&
+      static_cast<SVGDocument*>(m_frame->document())->zoomAndPanEnabled()) {
+    if (event.event().shiftKey() && singleClick) {
+      m_svgPan = true;
+      static_cast<SVGDocument*>(m_frame->document())
+          ->startPan(event.event().pos());
+      return true;
+    }
+  }
+#endif
 
   // We don't do this at the start of mouse down handling,
   // because we don't want to do it until we know we didn't hit a widget.
@@ -929,6 +947,13 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent) {
   if (m_hoverTimer.isActive())
     m_hoverTimer.stop();
 
+#if ENABLE(SVG)
+  if (m_svgPan) {
+    static_cast<SVGDocument*>(m_frame->document())
+        ->updatePan(m_currentMousePosition);
+    return true;
+  }
+#endif
   if (m_frameSetBeingResized)
     return dispatchMouseEvent(mousemoveEvent, m_frameSetBeingResized.get(),
                               false, 0, mouseEvent, false);
@@ -1022,6 +1047,13 @@ bool EventHandler::handleMouseReleaseEvent(
 
   m_mousePressed = false;
   m_currentMousePosition = mouseEvent.pos();
+
+#if ENABLE(SVG)
+  if (m_svgPan) {
+    m_svgPan = false;
+    return true;
+  }
+#endif
 
   if (m_frameSetBeingResized)
     return dispatchMouseEvent(mouseupEvent, m_frameSetBeingResized.get(), true,

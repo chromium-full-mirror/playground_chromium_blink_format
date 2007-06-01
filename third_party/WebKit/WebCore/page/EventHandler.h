@@ -300,6 +300,9 @@ class EventHandler : Noncopyable {
   RenderObject* m_autoscrollRenderer;
   bool m_mouseDownMayStartAutoscroll;
   bool m_mouseDownWasInSubframe;
+#if ENABLE(SVG)
+  bool m_svgPan;
+#endif
 
   RenderLayer* m_resizeLayer;
 
