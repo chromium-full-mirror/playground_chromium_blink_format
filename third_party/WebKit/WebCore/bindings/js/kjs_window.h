@@ -185,7 +185,6 @@ class Window : public DOMObject {
       bool html = false);
 
   void clear();
-  virtual UString toString(ExecState*) const;
 
   // Set the current "event" object
   void setCurrentEvent(WebCore::Event*);
@@ -364,8 +363,6 @@ class Location : public DOMObject {
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual JSValue* toPrimitive(ExecState* exec, JSType preferred) const;
-  virtual UString toString(ExecState*) const;
   enum {
     Hash,
     Href,
@@ -394,8 +391,6 @@ class Selection : public DOMObject {
  public:
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual JSValue* toPrimitive(ExecState* exec, JSType preferred) const;
-  virtual UString toString(ExecState*) const;
   enum {
     AnchorNode,
     AnchorOffset,

@@ -48,10 +48,6 @@ class DOMNode : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
-  virtual JSValue* toPrimitive(ExecState*,
-                               JSType preferred = UndefinedType) const;
-  virtual UString toString(ExecState*) const;
-
   enum {
     NodeName,
     NodeValue,

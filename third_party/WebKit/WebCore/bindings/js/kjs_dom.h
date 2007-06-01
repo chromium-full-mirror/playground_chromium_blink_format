@@ -136,9 +136,6 @@ class DOMNodeList : public DOMObject {
   enum { Length, Item };
   WebCore::NodeList* impl() const { return m_impl.get(); }
 
-  virtual JSValue* toPrimitive(ExecState* exec,
-                               JSType preferred = UndefinedType) const;
-
  private:
   static JSValue* indexGetter(ExecState* exec,
                               JSObject*,
