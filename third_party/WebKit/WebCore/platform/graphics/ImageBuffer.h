@@ -68,6 +68,8 @@ class ImageBuffer : Noncopyable {
   CGImageRef cgImage() const;
 #elif PLATFORM(QT)
   QPixmap* pixmap() const;
+#elif PLATFORM(CAIRO)
+  _cairo_surface* surface() const;
 #endif
 
  private:
