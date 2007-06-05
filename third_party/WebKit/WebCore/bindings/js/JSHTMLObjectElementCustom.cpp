@@ -63,7 +63,7 @@ JSValue* JSHTMLObjectElement::callAsFunction(ExecState* exec,
 
 bool JSHTMLObjectElement::canGetItemsForName(ExecState*,
                                              HTMLObjectElement*,
-                                             const AtomicString& propertyName) {
+                                             const Identifier& propertyName) {
   return propertyName == "__apple_runtime_object";
 }
 

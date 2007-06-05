@@ -44,7 +44,7 @@ using namespace HTMLNames;
 
 bool JSHTMLDocument::canGetItemsForName(ExecState*,
                                         HTMLDocument* doc,
-                                        const AtomicString& propertyName) {
+                                        const Identifier& propertyName) {
   return doc->hasNamedItem(propertyName) ||
          doc->hasDocExtraNamedItem(propertyName);
 }
