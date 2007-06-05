@@ -170,6 +170,32 @@ static bool canSetRequestHeader(const String& name) {
   return !forbiddenHeaders.contains(name);
 }
 
+// Determines if a string is a valid token, as defined by
+// "token" in section 2.2 of RFC 2616.
+static bool isValidToken(const String& name) {
+  unsigned length = name.length();
+  for (unsigned i = 0; i < length; i++) {
+    UniChar c = name[i];
+
+    if (c >= 127 || c <= 32)
+      return false;
+
+    if (c == '(' || c == ')' || c == '<' || c == '>' || c == '@' || c == ',' ||
+        c == ';' || c == ':' || c == '\\' || c == '\"' || c == '/' ||
+        c == '[' || c == ']' || c == '?' || c == '=' || c == '{' || c == '}')
+      return false;
+  }
+
+  return true;
+}
+
+static bool isValidHeaderValue(const String& name) {
+  // FIXME: This should really match name against
+  // field-value in section 4.2 of RFC 2616.
+
+  return !name.contains("\r\n");
+}
+
 XMLHttpRequestState XMLHttpRequest::getReadyState() const {
   return m_state;
 }
@@ -364,6 +390,11 @@ void XMLHttpRequest::open(const String& method,
     return;
   }
 
+  if (!isValidToken(method)) {
+    ec = SYNTAX_ERR;
+    return;
+  }
+
   m_url = url;
 
   if (!user.isNull())
@@ -513,6 +544,11 @@ void XMLHttpRequest::setRequestHeader(const String& name,
       return;
 
     ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  if (!isValidToken(name) || !isValidHeaderValue(value)) {
+    ec = SYNTAX_ERR;
     return;
   }
 
