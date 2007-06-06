@@ -29,6 +29,8 @@
 #include "MimeTypeRegistry.h"
 #include "NotImplemented.h"
 
+#include "qwebobjectplugin_p.h"
+
 namespace WebCore {
 
 struct ExtensionMap {
@@ -63,13 +65,17 @@ static const ExtensionMap extensionMap[] = {{"bmp", "image/bmp"},
 
 String MimeTypeRegistry::getMIMETypeForExtension(const String& ext) {
   String s = ext.lower();
+
   const ExtensionMap* e = extensionMap;
   while (e->extension) {
     if (s == e->extension)
       return e->mimeType;
     ++e;
   }
-  // unknown, let's just assume plain text
-  return "text/plain";
+  QString type = QWebFactoryLoader::self()->mimeTypeForExtension(ext);
+  if (!type.isEmpty())
+    return type;
+
+  return "application/octet-stream";
 }
 }

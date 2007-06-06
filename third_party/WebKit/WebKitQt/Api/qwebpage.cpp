@@ -317,5 +317,3 @@ QWebSettings QWebPage::settings() const {
 
   return settings;
 }
-
-#include "qwebpage.moc"

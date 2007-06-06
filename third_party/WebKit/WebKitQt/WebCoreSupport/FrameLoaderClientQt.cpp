@@ -44,6 +44,7 @@
 #include "qwebpage.h"
 #include "qwebframe.h"
 #include "qwebframe_p.h"
+#include "qwebobjectplugin_p.h"
 
 #include <qfileinfo.h>
 
@@ -224,7 +225,9 @@ void FrameLoaderClientQt::loadedFromCachedPage() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {}
+void FrameLoaderClientQt::dispatchDidHandleOnloadEvents() {
+  // don't need this one
+}
 
 void FrameLoaderClientQt::dispatchDidReceiveServerRedirectForProvisionalLoad() {
   notImplemented();
@@ -318,8 +321,8 @@ void FrameLoaderClientQt::postProgressStartedNotification() {
 
 void FrameLoaderClientQt::postProgressEstimateChangedNotification() {
   if (m_webFrame && m_frame->page())
-    emit loadProgressChanged(m_frame->page()->progress()->estimatedProgress() *
-                             100);
+    emit loadProgressChanged(
+        qRound(m_frame->page()->progress()->estimatedProgress() * 100));
 }
 
 void FrameLoaderClientQt::postProgressFinishedNotification() {
@@ -741,26 +744,62 @@ Frame* FrameLoaderClientQt::createFrame(const KURL& url,
 
 ObjectContentType FrameLoaderClientQt::objectContentType(
     const KURL& url,
-    const String& mimeType) {
+    const String& _mimeType) {
+  // qDebug()<<" ++++++++++++++++ url is "<<url.prettyURL()<<", mime =
+  // "<<mimeType;
   if (!url.isValid())
-    return ObjectContentType();
+    return ObjectContentNone;
 
-  // This is not really correct. it works because getMIMETypeForExtension
-  //  currently returns only the mimetypes that frames can handle
-  QFileInfo fi(url.path());
-  String rtype = MimeTypeRegistry::getMIMETypeForExtension(fi.suffix());
-  if (!rtype.isEmpty())
+  String mimeType = _mimeType;
+  if (!mimeType.length()) {
+    QFileInfo fi(url.path());
+    mimeType = MimeTypeRegistry::getMIMETypeForExtension(fi.suffix());
+  }
+
+  if (!mimeType.length())
     return ObjectContentFrame;
-  return ObjectContentType();
+
+  if (MimeTypeRegistry::isSupportedImageMIMEType(mimeType))
+    return ObjectContentImage;
+
+  if (QWebFactoryLoader::self()->supportsMimeType(mimeType))
+    return ObjectContentPlugin;
+
+  if (MimeTypeRegistry::isSupportedNonImageMIMEType(mimeType))
+    return ObjectContentFrame;
+
+  return ObjectContentNone;
 }
 
-Widget* FrameLoaderClientQt::createPlugin(Element*,
-                                          const KURL&,
-                                          const Vector<String>&,
-                                          const Vector<String>&,
-                                          const String&,
-                                          bool) {
-  notImplemented();
+Widget* FrameLoaderClientQt::createPlugin(Element* element,
+                                          const KURL& url,
+                                          const Vector<String>& paramNames,
+                                          const Vector<String>& paramValues,
+                                          const String& mimeType,
+                                          bool loadManually) {
+  // qDebug()<<"------ Creating plugin in FrameLoaderClientQt::createPlugin for
+  // "<<mimeType;
+  // qDebug()<<"------\t url = "<<url.prettyURL();
+  QStringList params;
+  QStringList values;
+  for (int i = 0; i < paramNames.size(); ++i)
+    params.append(paramNames[i]);
+  for (int i = 0; i < paramValues.size(); ++i)
+    values.append(paramValues[i]);
+
+  QObject* object = QWebFactoryLoader::self()->create(m_webFrame->viewport(),
+                                                      mimeType, params, values);
+  if (object) {
+    QWidget* widget = qobject_cast<QWidget*>(object);
+    if (widget) {
+      Widget* w = new Widget();
+      w->setQWidget(widget);
+      return w;
+    }
+    // FIXME: make things work for widgetless plugins as well
+    delete object;
+  }
+
   return 0;
 }
 
@@ -784,5 +823,3 @@ String FrameLoaderClientQt::overrideMediaType() const {
   return String();
 }
 }
-
-#include "FrameLoaderClientQt.moc"

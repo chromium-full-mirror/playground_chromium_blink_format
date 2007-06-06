@@ -757,6 +757,3 @@ HostInfo::HostInfo(const QUrl& url)
       port = 443;
   }
 }
-
-#include "qwebnetworkinterface_p.moc"
-#include "qwebnetworkinterface.moc"
