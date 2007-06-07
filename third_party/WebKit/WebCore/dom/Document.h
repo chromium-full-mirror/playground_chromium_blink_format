@@ -344,13 +344,13 @@ class Document : public ContainerNode {
 
   PassRefPtr<NodeIterator> createNodeIterator(Node* root,
                                               unsigned whatToShow,
-                                              PassRefPtr<NodeFilter>,
+                                              NodeFilter*,
                                               bool expandEntityReferences,
                                               ExceptionCode&);
 
   PassRefPtr<TreeWalker> createTreeWalker(Node* root,
                                           unsigned whatToShow,
-                                          PassRefPtr<NodeFilter>,
+                                          NodeFilter*,
                                           bool expandEntityReferences,
                                           ExceptionCode&);
 

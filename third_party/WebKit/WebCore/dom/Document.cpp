@@ -918,7 +918,7 @@ PassRefPtr<Range> Document::createRange() {
 PassRefPtr<NodeIterator> Document::createNodeIterator(
     Node* root,
     unsigned whatToShow,
-    PassRefPtr<NodeFilter> filter,
+    NodeFilter* filter,
     bool expandEntityReferences,
     ExceptionCode& ec) {
   if (!root) {
@@ -930,7 +930,7 @@ PassRefPtr<NodeIterator> Document::createNodeIterator(
 
 PassRefPtr<TreeWalker> Document::createTreeWalker(Node* root,
                                                   unsigned whatToShow,
-                                                  PassRefPtr<NodeFilter> filter,
+                                                  NodeFilter* filter,
                                                   bool expandEntityReferences,
                                                   ExceptionCode& ec) {
   if (!root) {
