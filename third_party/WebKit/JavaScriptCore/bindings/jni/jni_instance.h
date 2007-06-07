@@ -63,7 +63,7 @@ class JObjectWrapper {
 
 class JavaInstance : public Instance {
  public:
-  JavaInstance(jobject instance);
+  JavaInstance(jobject instance, PassRefPtr<RootObject>);
   ~JavaInstance();
 
   virtual Class* getClass() const;
