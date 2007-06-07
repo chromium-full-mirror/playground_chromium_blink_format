@@ -150,16 +150,13 @@ class JavaField : public Field {
  public:
   JavaField() : _field(0){};
   JavaField(JNIEnv* env, jobject aField);
-  ~JavaField() { delete _field; };
 
   JavaField(const JavaField& other)
-      : Field(), _name(other._name), _type(other._type), _field(other._field){};
+      : Field(), _name(other._name), _type(other._type){};
 
   JavaField& operator=(const JavaField& other) {
     if (this == &other)
       return *this;
-
-    delete _field;
 
     _name = other._name;
     _type = other._type;
@@ -194,7 +191,7 @@ class JavaField : public Field {
   JavaString _name;
   JavaString _type;
   JNIType _JNIType;
-  JavaInstance* _field;
+  RefPtr<JObjectWrapper> _field;
 };
 
 class JavaMethod : public Method {

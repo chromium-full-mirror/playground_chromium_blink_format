@@ -40,6 +40,7 @@ class JavaClass;
 class JObjectWrapper {
   friend class RefPtr<JObjectWrapper>;
   friend class JavaArray;
+  friend class JavaField;
   friend class JavaInstance;
   friend class JavaMethod;
 
