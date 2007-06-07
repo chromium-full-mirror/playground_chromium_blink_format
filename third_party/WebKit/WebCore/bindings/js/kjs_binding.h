@@ -38,6 +38,7 @@ class Event;
 class Frame;
 class Node;
 class String;
+class JSNode;
 
 typedef int ExceptionCode;
 }
@@ -59,8 +60,6 @@ class DOMObject : public JSObject {
 #endif
 };
 
-class DOMNode;
-
 /**
  * We inherit from Interpreter, to save a pointer to the HTML part
  * that the interpreter runs for.
@@ -74,10 +73,11 @@ class ScriptInterpreter : public Interpreter {
   static void putDOMObject(void* objectHandle, DOMObject*);
   static void forgetDOMObject(void* objectHandle);
 
-  static DOMNode* getDOMNodeForDocument(WebCore::Document*, WebCore::Node*);
+  static WebCore::JSNode* getDOMNodeForDocument(WebCore::Document*,
+                                                WebCore::Node*);
   static void putDOMNodeForDocument(WebCore::Document*,
                                     WebCore::Node*,
-                                    DOMNode* nodeWrapper);
+                                    WebCore::JSNode* nodeWrapper);
   static void forgetDOMNodeForDocument(WebCore::Document*, WebCore::Node*);
   static void forgetAllDOMNodesForDocument(WebCore::Document*);
   static void updateDOMNodeDocument(WebCore::Node*,

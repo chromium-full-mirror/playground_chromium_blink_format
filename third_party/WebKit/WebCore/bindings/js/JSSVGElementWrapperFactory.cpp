@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2006 Apple Computer, Inc.
+ *  Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -155,8 +155,8 @@ namespace WebCore {
 
 using namespace SVGNames;
 
-typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
-                                                    PassRefPtr<SVGElement>);
+typedef JSNode* (*CreateSVGElementWrapperFunction)(ExecState*,
+                                                   PassRefPtr<SVGElement>);
 
 #if ENABLE(SVG_EXPERIMENTAL_FEATURES)
 #define FOR_EACH_TAG(macro)                                                     \
@@ -242,16 +242,16 @@ typedef DOMNode* (*CreateSVGElementWrapperFunction)(ExecState*,
 
 #endif
 
-#define CREATE_WRAPPER_FUNCTION(tag, name)                                \
-  static DOMNode* create##name##Wrapper(ExecState* exec,                  \
-                                        PassRefPtr<SVGElement> element) { \
-    return new JSSVG##name##Element(                                      \
-        exec, static_cast<SVG##name##Element*>(element.get()));           \
+#define CREATE_WRAPPER_FUNCTION(tag, name)                               \
+  static JSNode* create##name##Wrapper(ExecState* exec,                  \
+                                       PassRefPtr<SVGElement> element) { \
+    return new JSSVG##name##Element(                                     \
+        exec, static_cast<SVG##name##Element*>(element.get()));          \
   }
 FOR_EACH_TAG(CREATE_WRAPPER_FUNCTION)
 #undef CREATE_WRAPPER_FUNCTION
 
-DOMNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
+JSNode* createJSSVGWrapper(ExecState* exec, PassRefPtr<SVGElement> element) {
   static HashMap<WebCore::AtomicStringImpl*, CreateSVGElementWrapperFunction>
       map;
   if (map.isEmpty()) {
