@@ -553,6 +553,8 @@ backforward list.
                               challenge:(NSURLAuthenticationChallenge*)challenge
                          fromDataSource:(WebDataSource*)dataSource;
 
+- (void)_clearUndoRedoOperations;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
