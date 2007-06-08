@@ -623,6 +623,8 @@ backforward list.
 // didFinishDocumentLoadForFrame is sent when the document has finished loading,
 // though not necessarily all
 // of its subresources.
+// FIXME 5259339: Currently this callback is not sent for (some?) pages loaded
+// entirely from the cache.
 - (void)webView:(WebView*)sender didFinishDocumentLoadForFrame:(WebFrame*)frame;
 
 // Addresses 4192534.  SPI for now.
