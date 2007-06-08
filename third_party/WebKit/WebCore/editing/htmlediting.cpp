@@ -476,7 +476,6 @@ Position positionBeforeContainingSpecialElement(
     const Position& pos,
     Node** containingSpecialElement) {
   Node* n = firstInSpecialElement(pos);
-  ASSERT(n);
   if (!n)
     return pos;
   Position result = positionBeforeNode(n);
@@ -496,7 +495,6 @@ Position positionAfterContainingSpecialElement(
     const Position& pos,
     Node** containingSpecialElement) {
   Node* n = lastInSpecialElement(pos);
-  ASSERT(n);
   if (!n)
     return pos;
   Position result = positionAfterNode(n);
