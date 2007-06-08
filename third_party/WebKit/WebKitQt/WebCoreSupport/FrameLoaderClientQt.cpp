@@ -787,7 +787,9 @@ Widget* FrameLoaderClientQt::createPlugin(Element* element,
   for (int i = 0; i < paramValues.size(); ++i)
     values.append(paramValues[i]);
 
-  QObject* object = QWebFactoryLoader::self()->create(m_webFrame->viewport(),
+  QUrl qurl = QString(url.url());
+
+  QObject* object = QWebFactoryLoader::self()->create(m_webFrame, qurl,
                                                       mimeType, params, values);
   if (object) {
     QWidget* widget = qobject_cast<QWidget*>(object);
