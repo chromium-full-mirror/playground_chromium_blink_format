@@ -29,6 +29,7 @@
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
+#include "NodeList.h"
 
 namespace WebCore {
 
@@ -402,4 +403,9 @@ Node* HTMLCollection::nextNamedItem(const String& name) const {
 
   return 0;
 }
+
+PassRefPtr<NodeList> HTMLCollection::tags(const String& name) {
+  return base()->getElementsByTagName(name);
 }
+
+}  // namespace WebCore
