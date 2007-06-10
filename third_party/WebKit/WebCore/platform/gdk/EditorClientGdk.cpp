@@ -128,7 +128,7 @@ bool EditorClientGdk::selectWordBeforeMenuEvent() {
 
 bool EditorClientGdk::isEditable() {
   notImplemented();
-  return true;
+  return false;
 }
 
 void EditorClientGdk::registerCommandForUndo(
