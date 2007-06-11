@@ -45,6 +45,7 @@
 #include "qwebframe.h"
 #include "qwebframe_p.h"
 #include "qwebobjectplugin_p.h"
+#include "qwebnetworkinterface_p.h"
 
 #include <qfileinfo.h>
 
@@ -684,6 +685,18 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     const WebCore::ResourceRequest& request) {
   Q_ASSERT(!m_policyFunction);
   m_policyFunction = function;
+  if (m_webFrame) {
+    QWebNetworkRequest r;
+    r.init(request);
+    QWebPage* page = m_webFrame->page();
+
+    if (page->d->navigationRequested(m_webFrame, r.url, r.request,
+                                     r.postData) ==
+        QWebPage::IgnoreNavigationRequest) {
+      slotCallPolicyFunction(PolicyIgnore);
+      return;
+    }
+  }
   slotCallPolicyFunction(PolicyUse);
   return;
 }
