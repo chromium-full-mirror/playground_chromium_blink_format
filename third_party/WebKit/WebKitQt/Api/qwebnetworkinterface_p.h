@@ -28,6 +28,7 @@
 
 namespace WebCore {
 struct HostInfo;
+class ResourceRequest;
 };
 uint qHash(const WebCore::HostInfo& info);
 #include <qhash.h>
@@ -36,7 +37,18 @@ namespace WebCore {
 class ResourceHandle;
 }
 
-class QWebNetworkJobPrivate {
+struct QWebNetworkRequest {
+  QUrl url;
+  QHttpRequestHeader request;
+  QByteArray postData;
+
+  void init(const QString& method,
+            const QUrl& url,
+            const WebCore::ResourceRequest* resourceRequest = 0);
+  void setURL(const QUrl& u);
+};
+
+class QWebNetworkJobPrivate : public QWebNetworkRequest {
  public:
   QWebNetworkJobPrivate()
       : ref(1),
@@ -45,9 +57,6 @@ class QWebNetworkJobPrivate {
         interface(0),
         connector(0) {}
   int ref;
-  QUrl url;
-  QHttpRequestHeader request;
-  QByteArray postData;
 
   QHttpResponseHeader response;
 
@@ -56,9 +65,6 @@ class QWebNetworkJobPrivate {
 
   QWebNetworkInterface* interface;
   QWebObjectPluginConnector* connector;
-
-  void setURL(const QUrl& u);
-  void setDefaults(const QString& method, const QUrl& url);
 };
 
 class QWebNetworkManager : public QObject {
