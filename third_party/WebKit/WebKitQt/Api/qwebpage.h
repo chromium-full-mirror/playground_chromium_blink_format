@@ -33,12 +33,11 @@
 class QWebFrame;
 class QUndoStack;
 class QUrl;
+class QHttpRequestHeader;
 
 class QWebPagePrivate;
 class QWebFrameData;
 class QWebNetworkInterface;
-
-class QHttpRequestHeader;
 
 namespace WebCore {
 class ChromeClientQt;
@@ -62,6 +61,9 @@ class QWEBKIT_EXPORT QWebPage : public QWidget {
   ~QWebPage();
 
   void open(const QUrl& url);
+  void open(const QUrl& url,
+            const QHttpRequestHeader& httpHeader,
+            const QByteArray& postData);
 
   QWebFrame* mainFrame() const;
 
