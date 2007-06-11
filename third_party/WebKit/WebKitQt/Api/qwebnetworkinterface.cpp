@@ -59,6 +59,12 @@ static bool operator==(const HostInfo& i1, const HostInfo& i2) {
   return i1.port == i2.port && i1.host == i2.host;
 }
 
+void QWebNetworkRequest::init(const WebCore::ResourceRequest& resourceRequest) {
+  KURL url = resourceRequest.url();
+  QUrl qurl = QString(url.url());
+  init(resourceRequest.httpMethod(), qurl, &resourceRequest);
+}
+
 void QWebNetworkRequest::init(const QString& method,
                               const QUrl& url,
                               const WebCore::ResourceRequest* resourceRequest) {
@@ -237,9 +243,7 @@ bool QWebNetworkManager::add(ResourceHandle* handle,
   job->d->interface = interface;
   job->d->connector = 0;
 
-  KURL url = handle->url();
-  QUrl qurl = QString(url.url());
-  job->d->init(handle->method(), qurl, &handle->request());
+  job->d->init(handle->request());
 
   if (handle->method() != "POST" && handle->method() != "GET") {
     // don't know what to do! (probably a request error!!)
