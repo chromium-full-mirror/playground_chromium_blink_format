@@ -35,7 +35,7 @@ class QWebObjectPluginConnectorPrivate;
 class QWebFactoryLoader;
 class QWebNetworkManager;
 
-class QWebObjectPluginConnector : public QObject {
+class QWEBKIT_EXPORT QWebObjectPluginConnector : public QObject {
   Q_OBJECT
  public:
   QWebFrame* frame() const;
