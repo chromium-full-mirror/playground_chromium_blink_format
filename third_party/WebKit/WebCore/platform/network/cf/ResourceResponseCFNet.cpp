@@ -1,6 +1,5 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,8 +26,10 @@
 #include "config.h"
 #include "ResourceResponseCFNet.h"
 
+#include "MimeTypeRegistry.h"
 #include "ResourceResponse.h"
 #include <CFNetwork/CFURLResponsePriv.h>
+#include <wtf/RetainPtr.h>
 
 using std::min;
 
@@ -39,48 +40,118 @@ using std::min;
 
 namespace WebCore {
 
-void getResourceResponse(ResourceResponse& response,
-                         CFURLResponseRef cfResponse) {
-  if (!cfResponse)
+CFURLResponseRef ResourceResponse::cfURLResponse() const {
+  return m_cfResponse.get();
+}
+
+// FIXME: Move this to HTTPParsers.h
+static inline String filenameFromHTTPContentDisposition(const String& value) {
+  Vector<String> keyValuePairs = value.split(';');
+
+  unsigned length = keyValuePairs.size();
+  for (unsigned i = 0; i < length; i++) {
+    int valueStartPos = keyValuePairs[i].find('=');
+    if (valueStartPos < 0)
+      continue;
+
+    String key = keyValuePairs[i].left(valueStartPos).stripWhiteSpace();
+
+    if (key.isEmpty() || key != "filename")
+      continue;
+
+    String value =
+        keyValuePairs[i].substring(valueStartPos + 1).stripWhiteSpace();
+
+    // Remove quotes if there are any
+    if (value[0] == '\"')
+      value = value.substring(1, value.length() - 2);
+
+    return value;
+  }
+
+  return String();
+}
+
+static inline bool filenameHasSaneExtension(const String& filename) {
+  int dot = filename.find('.');
+
+  // The dot can't be the first or last character in the filename.
+  return dot > 0 && dot < filename.length() - 1;
+}
+
+static inline String suggestedFilenameForResponse(
+    const ResourceResponse& response,
+    const HTTPHeaderMap& headers) {
+  // FIXME: When <rdar://problem/5053780> is fixed we can get rid of this
+  // function.
+  CFURLResponseRef cfURLResponse = response.cfURLResponse();
+  ASSERT(cfURLResponse);
+
+  String filename;
+
+  // First, try the Content-Disposition header.
+  String contentDisposition = headers.get("Content-Disposition");
+  if (!contentDisposition.isNull())
+    filename = filenameFromHTTPContentDisposition(contentDisposition);
+
+  if (filename.isNull()) {
+    RetainPtr<CFStringRef> suggestedFilename(
+        AdoptCF, CFURLResponseCopySuggestedFilename(cfURLResponse));
+
+    filename = suggestedFilename.get();
+  }
+
+  return filename;
+}
+
+void ResourceResponse::doUpdateResourceResponse() {
+  if (!m_cfResponse.get())
     return;
 
-  // FIXME: we may need to do MIME type sniffing here (unless that is done
-  // in CFURLResponseGetMIMEType
+  // FIXME: We may need to do MIME type sniffing here (unless that is done in
+  // CFURLResponseGetMIMEType).
 
-  response = ResourceResponse(
-      CFURLResponseGetURL(cfResponse), CFURLResponseGetMIMEType(cfResponse),
-      CFURLResponseGetExpectedContentLength(cfResponse),
-      CFURLResponseGetTextEncodingName(cfResponse), /* suggestedFilename */ "");
+  m_url = CFURLResponseGetURL(m_cfResponse.get());
+  m_mimeType = CFURLResponseGetMIMEType(m_cfResponse.get());
+  m_expectedContentLength =
+      CFURLResponseGetExpectedContentLength(m_cfResponse.get());
+  m_textEncodingName = CFURLResponseGetTextEncodingName(m_cfResponse.get());
 
-  CFAbsoluteTime expiration = CFURLResponseGetExpirationTime(cfResponse);
-  response.setExpirationDate(
-      min((time_t)(expiration + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T));
+  CFAbsoluteTime expiration =
+      CFURLResponseGetExpirationTime(m_cfResponse.get());
+  m_expirationDate =
+      min((time_t)(expiration + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T);
 
-  CFAbsoluteTime lastModified = CFURLResponseGetLastModifiedDate(cfResponse);
-  response.setLastModifiedDate(min(
-      (time_t)(lastModified + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T));
+  CFAbsoluteTime lastModified =
+      CFURLResponseGetLastModifiedDate(m_cfResponse.get());
+  m_lastModifiedDate = min(
+      (time_t)(lastModified + kCFAbsoluteTimeIntervalSince1970), MAX_TIME_T);
 
-  CFHTTPMessageRef httpResponse = CFURLResponseGetHTTPResponse(cfResponse);
+  CFHTTPMessageRef httpResponse =
+      CFURLResponseGetHTTPResponse(m_cfResponse.get());
   if (httpResponse) {
-    response.setHTTPStatusCode(
-        CFHTTPMessageGetResponseStatusCode(httpResponse));
+    m_httpStatusCode = CFHTTPMessageGetResponseStatusCode(httpResponse);
 
-    CFStringRef statusLine = CFHTTPMessageCopyResponseStatusLine(httpResponse);
-    String statusText(statusLine);
-    CFRelease(statusLine);
+    RetainPtr<CFStringRef> statusLine(
+        AdoptCF, CFHTTPMessageCopyResponseStatusLine(httpResponse));
+    String statusText(statusLine.get());
     int spacePos = statusText.find(" ");
     if (spacePos != -1)
       statusText = statusText.substring(spacePos + 1);
-    response.setHTTPStatusText(statusText);
+    m_httpStatusText = statusText;
 
-    CFDictionaryRef headers = CFHTTPMessageCopyAllHeaderFields(httpResponse);
-    CFIndex headerCount = CFDictionaryGetCount(headers);
+    RetainPtr<CFDictionaryRef> headers(
+        AdoptCF, CFHTTPMessageCopyAllHeaderFields(httpResponse));
+    CFIndex headerCount = CFDictionaryGetCount(headers.get());
     Vector<const void*, 128> keys(headerCount);
     Vector<const void*, 128> values(headerCount);
-    CFDictionaryGetKeysAndValues(headers, keys.data(), values.data());
+    CFDictionaryGetKeysAndValues(headers.get(), keys.data(), values.data());
     for (int i = 0; i < headerCount; ++i)
-      response.httpHeaderFields().set((CFStringRef)keys[i],
-                                      (CFStringRef)values[i]);
-  }
+      m_httpHeaderFields.set((CFStringRef)keys[i], (CFStringRef)values[i]);
+  } else
+    m_httpStatusCode = 0;
+
+  m_suggestedFilename =
+      suggestedFilenameForResponse(m_cfResponse.get(), m_httpHeaderFields);
 }
 }

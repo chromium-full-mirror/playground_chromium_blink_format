@@ -1,6 +1,5 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,45 +33,14 @@
 
 namespace WebCore {
 
-void getResourceRequest(ResourceRequest& request, CFURLRequestRef cfRequest) {
-  request = ResourceRequest(CFURLRequestGetURL(cfRequest));
+CFURLRequestRef ResourceRequest::cfURLRequest() const {
+  updatePlatformRequest();
 
-  request.setCachePolicy(
-      (ResourceRequestCachePolicy)CFURLRequestGetCachePolicy(cfRequest));
-  request.setTimeoutInterval(CFURLRequestGetTimeoutInterval(cfRequest));
-  request.setMainDocumentURL(KURL(CFURLRequestGetMainDocumentURL(cfRequest)));
-  if (CFStringRef method = CFURLRequestCopyHTTPRequestMethod(cfRequest)) {
-    request.setHTTPMethod(method);
-    CFRelease(method);
-  }
-  request.setAllowHTTPCookies(CFURLRequestShouldHandleHTTPCookies(cfRequest));
-
-  if (CFDictionaryRef headers =
-          CFURLRequestCopyAllHTTPHeaderFields(cfRequest)) {
-    CFIndex headerCount = CFDictionaryGetCount(headers);
-    Vector<const void*, 128> keys(headerCount);
-    Vector<const void*, 128> values(headerCount);
-    CFDictionaryGetKeysAndValues(headers, keys.data(), values.data());
-    for (int i = 0; i < headerCount; ++i)
-      request.setHTTPHeaderField((CFStringRef)keys[i], (CFStringRef)values[i]);
-    CFRelease(headers);
-  }
-
-  if (CFDataRef bodyData = CFURLRequestCopyHTTPRequestBody(cfRequest)) {
-    request.setHTTPBody(
-        new FormData(CFDataGetBytePtr(bodyData), CFDataGetLength(bodyData)));
-    CFRelease(bodyData);
-  } else if (CFReadStreamRef bodyStream =
-                 CFURLRequestCopyHTTPRequestBodyStream(cfRequest)) {
-    if (FormData* formData = httpBodyFromStream(bodyStream))
-      request.setHTTPBody(formData);
-    CFRelease(bodyStream);
-  }
-  // FIXME: what to do about arbitrary body streams?
+  return m_cfRequest.get();
 }
 
-static void addHeadersFromHashMap(CFMutableURLRequestRef request,
-                                  const HTTPHeaderMap& requestHeaders) {
+static inline void addHeadersFromHashMap(CFMutableURLRequestRef request,
+                                         const HTTPHeaderMap& requestHeaders) {
   if (!requestHeaders.size())
     return;
 
@@ -87,25 +55,73 @@ static void addHeadersFromHashMap(CFMutableURLRequestRef request,
   }
 }
 
-CFURLRequestRef cfURLRequest(const ResourceRequest& request) {
-  CFURLRef url = request.url().createCFURL();
-  CFURLRef mainDocumentURL = request.mainDocumentURL().createCFURL();
+void ResourceRequest::doUpdatePlatformRequest() {
+  RetainPtr<CFURLRef> url(AdoptCF, ResourceRequest::url().createCFURL());
+  RetainPtr<CFURLRef> mainDocumentURL(
+      AdoptCF, ResourceRequest::mainDocumentURL().createCFURL());
 
   CFMutableURLRequestRef cfRequest = CFURLRequestCreateMutable(
-      0, url, (CFURLRequestCachePolicy)request.cachePolicy(),
-      request.timeoutInterval(), mainDocumentURL);
+      0, url.get(), (CFURLRequestCachePolicy)cachePolicy(), timeoutInterval(),
+      mainDocumentURL.get());
 
-  CFRelease(url);
-  CFRelease(mainDocumentURL);
+  RetainPtr<CFStringRef> requestMethod(AdoptCF, httpMethod().createCFString());
+  CFURLRequestSetHTTPRequestMethod(cfRequest, requestMethod.get());
 
-  CFStringRef requestMethod = request.httpMethod().createCFString();
-  CFURLRequestSetHTTPRequestMethod(cfRequest, requestMethod);
-  CFRelease(requestMethod);
+  addHeadersFromHashMap(cfRequest, httpHeaderFields());
+  WebCore::setHTTPBody(cfRequest, httpBody());
+  CFURLRequestSetShouldHandleHTTPCookies(cfRequest, allowHTTPCookies());
 
-  addHeadersFromHashMap(cfRequest, request.httpHeaderFields());
-  setHTTPBody(cfRequest, request.httpBody());
-  CFURLRequestSetShouldHandleHTTPCookies(cfRequest, request.allowHTTPCookies());
+  if (m_cfRequest) {
+#ifdef CFNETWORK_HAS_NEW_COOKIE_FUNCTIONS
+    RetainPtr<CFHTTPCookieStorageRef> cookieStorage(
+        AdoptCF, CFURLRequestCopyHTTPCookieStorage(m_cfRequest.get()));
+    CFURLRequestSetHTTPCookieStorage(cfRequest, cookieStorage.get());
+    CFURLRequestSetHTTPCookieStorageAcceptPolicy(
+        cfRequest,
+        CFURLRequestGetHTTPCookieStorageAcceptPolicy(m_cfRequest.get()));
+#endif
+    CFURLRequestSetSSLProperties(
+        cfRequest, CFURLRequestGetSSLProperties(m_cfRequest.get()));
+  }
 
-  return cfRequest;
+  m_cfRequest.adoptCF(cfRequest);
+}
+
+void ResourceRequest::doUpdateResourceRequest() {
+  m_url = CFURLRequestGetURL(m_cfRequest.get());
+
+  m_cachePolicy =
+      (ResourceRequestCachePolicy)CFURLRequestGetCachePolicy(m_cfRequest.get());
+  m_timeoutInterval = CFURLRequestGetTimeoutInterval(m_cfRequest.get());
+  m_mainDocumentURL = CFURLRequestGetMainDocumentURL(m_cfRequest.get());
+  if (CFStringRef method =
+          CFURLRequestCopyHTTPRequestMethod(m_cfRequest.get())) {
+    m_httpMethod = method;
+    CFRelease(method);
+  }
+  m_allowHTTPCookies = CFURLRequestShouldHandleHTTPCookies(m_cfRequest.get());
+
+  if (CFDictionaryRef headers =
+          CFURLRequestCopyAllHTTPHeaderFields(m_cfRequest.get())) {
+    CFIndex headerCount = CFDictionaryGetCount(headers);
+    Vector<const void*, 128> keys(headerCount);
+    Vector<const void*, 128> values(headerCount);
+    CFDictionaryGetKeysAndValues(headers, keys.data(), values.data());
+    for (int i = 0; i < headerCount; ++i)
+      m_httpHeaderFields.set((CFStringRef)keys[i], (CFStringRef)values[i]);
+    CFRelease(headers);
+  }
+
+  if (CFDataRef bodyData = CFURLRequestCopyHTTPRequestBody(m_cfRequest.get())) {
+    m_httpBody =
+        new FormData(CFDataGetBytePtr(bodyData), CFDataGetLength(bodyData));
+    CFRelease(bodyData);
+  } else if (CFReadStreamRef bodyStream =
+                 CFURLRequestCopyHTTPRequestBodyStream(m_cfRequest.get())) {
+    if (FormData* formData = httpBodyFromStream(bodyStream))
+      m_httpBody = formData;
+    CFRelease(bodyStream);
+  }
+  // FIXME: what to do about arbitrary body streams?
 }
 }

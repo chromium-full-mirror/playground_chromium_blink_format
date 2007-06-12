@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,38 +35,52 @@
 
 namespace WebCore {
 
-FloatRect scaleScreenRectToPageCoordinates(const FloatRect& rect, const Page*) {
-  return rect;
+// Returns info for the default monitor if widget is NULL
+static MONITORINFOEX monitorInfoForWidget(Widget* widget) {
+  HWND window = widget ? widget->containingWindow() : 0;
+  HMONITOR monitor = MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY);
+
+  MONITORINFOEX monitorInfo;
+  monitorInfo.cbSize = sizeof(MONITORINFOEX);
+  GetMonitorInfo(monitor, &monitorInfo);
+  return monitorInfo;
 }
 
-FloatRect scalePageRectToScreenCoordinates(const FloatRect& rect, const Page*) {
-  return rect;
-}
+static DEVMODE deviceInfoForWidget(Widget* widget) {
+  MONITORINFOEX monitorInfo = monitorInfoForWidget(widget);
 
-static MONITORINFOEX monitorInfo(Widget* widget) {
-  HMONITOR monitor =
-      MonitorFromWindow(widget->containingWindow(), MONITOR_DEFAULTTOPRIMARY);
-  MONITORINFOEX info;
-  info.cbSize = sizeof(MONITORINFOEX);
-  GetMonitorInfo(monitor, &info);
-  return info;
-}
-
-FloatRect screenRect(Widget* widget) {
-  return monitorInfo(widget).rcMonitor;
-}
-
-FloatRect screenAvailableRect(Widget* widget) {
-  // FIXME: I have no idea if this is correct
-  return monitorInfo(widget).rcWork;
-}
-
-int screenDepth(Widget*) {
   DEVMODE deviceInfo;
   deviceInfo.dmSize = sizeof(DEVMODE);
   deviceInfo.dmDriverExtra = 0;
-  EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &deviceInfo);
+  EnumDisplaySettings(monitorInfo.szDevice, ENUM_CURRENT_SETTINGS, &deviceInfo);
+
+  return deviceInfo;
+}
+
+int screenDepth(Widget* widget) {
+  DEVMODE deviceInfo = deviceInfoForWidget(widget);
   return deviceInfo.dmBitsPerPel;
+}
+
+int screenDepthPerComponent(Widget* widget) {
+  // FIXME: Assumes RGB -- not sure if this is right.
+  DEVMODE deviceInfo = deviceInfoForWidget(widget);
+  return deviceInfo.dmBitsPerPel / 3;
+}
+
+bool screenIsMonochrome(Widget* widget) {
+  DEVMODE deviceInfo = deviceInfoForWidget(widget);
+  return deviceInfo.dmColor == DMCOLOR_MONOCHROME;
+}
+
+FloatRect screenRect(Widget* widget) {
+  MONITORINFOEX monitorInfo = monitorInfoForWidget(widget);
+  return monitorInfo.rcMonitor;
+}
+
+FloatRect screenAvailableRect(Widget* widget) {
+  MONITORINFOEX monitorInfo = monitorInfoForWidget(widget);
+  return monitorInfo.rcWork;
 }
 
 }  // namespace WebCore
