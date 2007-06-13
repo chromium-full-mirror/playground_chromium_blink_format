@@ -125,6 +125,9 @@ QWebNetworkRequest& QWebNetworkRequest::operator=(
   return *this;
 }
 
+QWebNetworkRequest::QWebNetworkRequest(QWebNetworkRequestPrivate* priv)
+    : d(new QWebNetworkRequestPrivate(*priv)) {}
+
 QWebNetworkRequest::~QWebNetworkRequest() {
   delete d;
 }
@@ -202,8 +205,15 @@ QByteArray QWebNetworkJob::postData() const {
 /*!
   The HTTP request header that should be used to download the job.
 */
-QHttpRequestHeader QWebNetworkJob::request() const {
+QHttpRequestHeader QWebNetworkJob::httpHeader() const {
   return d->request.httpHeader;
+}
+
+/*!
+  The complete network request that should be used to download the job.
+*/
+QWebNetworkRequest QWebNetworkJob::request() const {
+  return QWebNetworkRequest(&d->request);
 }
 
 /*!
@@ -697,7 +707,7 @@ WebCoreHttp::~WebCoreHttp() {}
 
 void WebCoreHttp::request(QWebNetworkJob* job) {
   DEBUG() << ">>>>>>>>>>>>>> WebCoreHttp::request";
-  DEBUG() << job->request().toString() << "\n";
+  DEBUG() << job->httpHeader().toString() << "\n";
   m_pendingRequests.append(job);
 
   scheduleNextRequest();
@@ -726,9 +736,9 @@ void WebCoreHttp::scheduleNextRequest() {
   QHttp* http = connection[c].http;
   QByteArray postData = job->postData();
   if (!postData.isEmpty())
-    http->request(job->request(), postData);
+    http->request(job->httpHeader(), postData);
   else
-    http->request(job->request());
+    http->request(job->httpHeader());
   connection[c].current = job;
 
   DEBUG() << "WebCoreHttp::scheduleNextRequest: using connection" << c;
