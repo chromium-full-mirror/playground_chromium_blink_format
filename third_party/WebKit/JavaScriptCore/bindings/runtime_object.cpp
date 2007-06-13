@@ -110,8 +110,9 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
       // that method.
       MethodList methodList =
           aClass->methodsNamed(propertyName, instance.get());
-      if (methodList.length() > 0) {
+      if (methodList.size() > 0) {
         slot.setCustom(this, methodGetter);
+
         instance->end();
         return true;
       }
