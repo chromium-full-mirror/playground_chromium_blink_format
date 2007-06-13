@@ -39,7 +39,7 @@ class ResourceHandle;
 
 struct QWebNetworkRequest {
   QUrl url;
-  QHttpRequestHeader request;
+  QHttpRequestHeader httpHeader;
   QByteArray postData;
 
   void init(const WebCore::ResourceRequest& resourceRequest);
