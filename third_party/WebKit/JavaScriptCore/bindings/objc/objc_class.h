@@ -56,9 +56,6 @@ class ObjcClass : public Class {
   ClassStructPtr isa() { return _isa; }
 
  private:
-  ObjcClass(const ObjcClass& other);             // prohibit copying
-  ObjcClass& operator=(const ObjcClass& other);  // ditto
-
   ClassStructPtr _isa;
   CFMutableDictionaryRef _methods;
   CFMutableDictionaryRef _fields;

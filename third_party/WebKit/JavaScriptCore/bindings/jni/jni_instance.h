@@ -85,9 +85,6 @@ class JavaInstance : public Instance {
   JSValue* booleanValue() const;
 
  private:
-  JavaInstance(JavaInstance&);             // prevent copying
-  JavaInstance& operator=(JavaInstance&);  // prevent copying
-
   RefPtr<JObjectWrapper> _instance;
   mutable JavaClass* _class;
 };

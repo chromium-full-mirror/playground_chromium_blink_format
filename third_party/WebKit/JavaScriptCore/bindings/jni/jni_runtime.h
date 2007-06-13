@@ -243,13 +243,9 @@ class JavaArray : public Array {
                                         PassRefPtr<RootObject>);
 
  private:
-  JavaArray(const JavaArray&);
-  JavaArray& operator=(const JavaArray&);
-
   RefPtr<JObjectWrapper> _array;
   unsigned int _length;
   const char* _type;
-  RefPtr<RootObject> _rootObject;
 };
 
 }  // namespace Bindings

@@ -120,10 +120,7 @@ class ObjcMethod : public Method {
 
 class ObjcArray : public Array {
  public:
-  ObjcArray(ObjectStructPtr);
-
-  ObjcArray(const ObjcArray&);
-  ObjcArray& operator=(const ObjcArray&);
+  ObjcArray(ObjectStructPtr, PassRefPtr<RootObject>);
 
   virtual ~ObjcArray();
 
@@ -142,7 +139,7 @@ class ObjcArray : public Array {
   ObjectStructPtr _array;
 };
 
-class ObjcFallbackObjectImp : public JSObject {
+class ObjcFallbackObjectImp : public JSObject, Noncopyable {
  public:
   ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
 
@@ -166,9 +163,6 @@ class ObjcFallbackObjectImp : public JSObject {
 
  private:
   ObjcFallbackObjectImp();  // prevent default construction
-  ObjcFallbackObjectImp(const ObjcFallbackObjectImp& other);  // prevent copying
-  ObjcFallbackObjectImp& operator=(
-      const ObjcFallbackObjectImp& other);  // ditto
 
   static const ClassInfo info;
 

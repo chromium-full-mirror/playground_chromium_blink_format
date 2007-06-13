@@ -53,9 +53,7 @@ class JavaClass : public Class {
   bool isStringClass() const;
 
  private:
-  JavaClass();                                   // prevent default construction
-  JavaClass(const JavaClass& other);             // prevent copying
-  JavaClass& operator=(const JavaClass& other);  // prevent copying
+  JavaClass();  // prevent default construction
 
   const char* _name;
   FieldMap _fields;

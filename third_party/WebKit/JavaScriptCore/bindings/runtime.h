@@ -104,7 +104,7 @@ class Method : Noncopyable {
   virtual ~Method() {}
 };
 
-class Class {
+class Class : Noncopyable {
  public:
   virtual const char* name() const = 0;
 
@@ -198,12 +198,17 @@ class Instance : Noncopyable {
   unsigned _refCount;
 };
 
-class Array {
+class Array : Noncopyable {
  public:
+  Array(PassRefPtr<RootObject>);
+  virtual ~Array();
+
   virtual void setValueAt(ExecState*, unsigned index, JSValue*) const = 0;
   virtual JSValue* valueAt(ExecState*, unsigned index) const = 0;
   virtual unsigned int getLength() const = 0;
-  virtual ~Array() {}
+
+ protected:
+  RefPtr<RootObject> _rootObject;
 };
 
 const char* signatureForParameters(const List&);
