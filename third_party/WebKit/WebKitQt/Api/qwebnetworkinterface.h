@@ -65,7 +65,7 @@ class QWEBKIT_EXPORT QWebNetworkRequest {
   void setPostData(const QByteArray& data);
 
  private:
-  explicit QWebNetworkRequest(QWebNetworkRequestPrivate* priv);
+  explicit QWebNetworkRequest(const QWebNetworkRequestPrivate& priv);
   explicit QWebNetworkRequest(const WebCore::ResourceRequest& request);
   friend class QWebNetworkJob;
   friend class WebCore::FrameLoaderClientQt;

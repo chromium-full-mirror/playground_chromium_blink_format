@@ -138,8 +138,8 @@ QWebNetworkRequest& QWebNetworkRequest::operator=(
 /*!
   \internal
 */
-QWebNetworkRequest::QWebNetworkRequest(QWebNetworkRequestPrivate* priv)
-    : d(new QWebNetworkRequestPrivate(*priv)) {}
+QWebNetworkRequest::QWebNetworkRequest(const QWebNetworkRequestPrivate& priv)
+    : d(new QWebNetworkRequestPrivate(priv)) {}
 
 /*!
   \internal
@@ -248,7 +248,7 @@ QHttpRequestHeader QWebNetworkJob::httpHeader() const {
   The complete network request that should be used to download the job.
 */
 QWebNetworkRequest QWebNetworkJob::request() const {
-  return QWebNetworkRequest(&d->request);
+  return QWebNetworkRequest(d->request);
 }
 
 /*!
