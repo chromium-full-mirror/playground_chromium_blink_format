@@ -42,7 +42,7 @@ class QWEBKIT_EXPORT QWebObjectPluginConnector : public QObject {
   QWidget* pluginParentWidget() const;
 
   enum Target { Plugin, New, Self, Parent, Top };
-  QWebNetworkJob* requestUrl(QWebNetworkJob::Method,
+  QWebNetworkJob* requestUrl(QWebNetworkRequest::Method,
                              const QUrl& url,
                              Target target = Plugin);
 

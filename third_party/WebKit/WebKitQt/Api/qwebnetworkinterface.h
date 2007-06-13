@@ -41,6 +41,12 @@ class WebCoreHttp;
 struct QWebNetworkRequestPrivate;
 class QWEBKIT_EXPORT QWebNetworkRequest {
  public:
+  enum Method {
+    Get,
+    Post
+    // Head
+  };
+
   QWebNetworkRequest();
   QWebNetworkRequest(const QWebNetworkRequest& other);
   QWebNetworkRequest& operator=(const QWebNetworkRequest& other);
@@ -63,11 +69,6 @@ class QWEBKIT_EXPORT QWebNetworkRequest {
 
 class QWEBKIT_EXPORT QWebNetworkJob {
  public:
-  enum Method {
-    Get,
-    Post
-    // Head
-  };
   QUrl url() const;
   QByteArray postData() const;
   QHttpRequestHeader httpHeader() const;
