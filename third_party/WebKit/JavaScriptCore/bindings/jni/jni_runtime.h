@@ -74,14 +74,13 @@ class JavaString {
   mutable CString _utf8String;
 };
 
-class JavaParameter : public Parameter {
+class JavaParameter {
  public:
   JavaParameter() : _JNIType(invalid_type){};
-
   JavaParameter(JNIEnv* env, jstring type);
+  virtual ~JavaParameter() {}
 
-  virtual RuntimeType type() const { return _type.UTF8String(); }
-
+  RuntimeType type() const { return _type.UTF8String(); }
   JNIType getJNIType() const { return _JNIType; }
 
  private:
@@ -91,7 +90,6 @@ class JavaParameter : public Parameter {
 
 class JavaField : public Field {
  public:
-  JavaField() : _field(0){};
   JavaField(JNIEnv* env, jobject aField);
 
   virtual JSValue* valueFromInstance(ExecState* exec,
@@ -130,8 +128,8 @@ class JavaMethod : public Method {
 
   virtual const char* name() const { return _name.UTF8String(); };
   RuntimeType returnType() const { return _returnType.UTF8String(); };
-  virtual Parameter* parameterAt(int i) const { return &_parameters[i]; };
-  virtual int numParameters() const { return _numParameters; };
+  JavaParameter* parameterAt(int i) const { return &_parameters[i]; };
+  int numParameters() const { return _numParameters; };
 
   const char* signature() const;
   JNIType JNIReturnType() const;
